@@ -23,13 +23,6 @@ The result:
 hello world
 #+END_SRC
 
-** Commands
-
-- nextline — make substitutions in the next line 
-- block — make substitutions in the next block of lines
-- replace — replace a block of lines
-- # — comment
-
 ** Process
 
 Each command is one line in the template and it applies to the
@@ -51,7 +44,14 @@ template with normal tools.
 The template designer can develop templates as if they were
 static pages.
 
-** Nextline Command
+** Commands
+
+- nextline — make substitutions in the next line 
+- block — make substitutions in the next block of lines
+- replace — replace a block of lines
+- # — comment
+
+*** Nextline Command
 
 The nextline command tells the template system that the next line
 in the file has variable content.  The content comes from the
@@ -80,7 +80,7 @@ result:
 Mail support at steve@flenniken.net.
 #+END_SRC
 
-** Block Command 
+*** Block Command 
 
 The block command targets multiple lines for replacement. The block starts after the command and continues until another block line is found. It behaves like the nextline command except with multiple lines. 
 
@@ -95,14 +95,15 @@ or write us at {address}.
 <!--block -->
 #+END_SRC
 
-** Replace Command 
+*** Replace Command 
 
 You use the replace command for replacing a block with one
 variable.  The lines in the block mirror the variable so you can
 test the template as if it was a static file.
 
 The command is useful for sharing common template lines between
-templates.
+templates and it has the special property that you can update the
+template to keep it in sync with the variable.
 
 The following example shares a common header between templates.
 
@@ -121,7 +122,8 @@ template:
 <!--$ replace -->
 #+END_SRC
 
-The replace block gets replaced with the header lines in the result file.
+The replace block gets replaced with the header lines in the
+result file.
 
 result:
 
@@ -130,9 +132,12 @@ result:
 <html lang="en">
 #+END_SRC
 
-The above example doesn’t work as a static template because it’s missing the header lines.
+The above example doesn’t work as a static template because it’s
+missing the header lines.
 
-You can fix this by adding the header lines inside the replace block. The inside lines do not appear in the result, just the data from the json does. 
+You can fix this by adding the header lines inside the replace
+block. The inside lines do not appear in the result, just the
+data from the json does.
 
 #+BEGIN_SRC
 <!-replace _shared header -->
@@ -141,45 +146,18 @@ You can fix this by adding the header lines inside the replace block. The inside
 <!-replace—>
 #+END_SRC
 
-The template replace lines may get out of sync with the json lines.  You can update the template to match the json with the update option. The replace lines change to match the json. 
+The template replace lines may get out of sync with the json
+lines.  You can update the template to match the json with the
+update option. The replace lines change to match the json.
 
 #+BEGIN_SRC
 statictea --update --shared shared.json --template mytea.html
 #+END_SRC
 
-** Replace Command
+*** Comment Command
 
-You can optionally show text using the replace command. In the
-following example an admin message is shown when an admin is
-logged in.
-
-template:
-
-#+BEGIN_SRC
-<!--$ replace _show=admin -->
-<p>Hi admin {admin}.
-This message is seen by admins.</p>
-<!--$ replace -->
-#+END_SRC
-
-json:
-
-#+BEGIN_SRC
-{
-"admin": "Steve"
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-<p>Hi admin Steve. 
-This message is seen by admins.</p>
-#+END_SRC
-
-** Comment Command
-
-You can comment templates.  Comments are line based and use the # character. They do not appear in the result. 
+You can comment templates.  Comments are line based and use the #
+character. They do not appear in the result.
 
 template:
 
@@ -225,6 +203,7 @@ send to: Steve Flenniken at steve@flenniken.net
 
 ** Template Prefix Postfix 
 
+
 You specify the template commands as comments. This allows you to edit the template using its native editor. 
 For example, you can edit an html template with an html editor. 
 
@@ -247,41 +226,8 @@ statictea--prepost "@$" "|"
 statictea--prepost "[comment$" "]"
 statictea--prepost "#$"
 #+END_SRC
-
-** List Statement 
-
-If the command contains a list statement, the line or block is
-duplicated for each item in the list.
-
-For the following example, the list statement says to use
-email_list key and the result has two lines.
-
-template:
-
-#+BEGIN_SRC
-<!--$ nextline _list=email_list -->
-Mail support at {email}.
-#+END_SRC
-
-the json:
-
-#+BEGIN_SRC
-{
-"email_list": [
- {"email": "steve@flenniken.net"},
- {"email": "webmaster@google.com"}
-]
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-Mail support at steve@flenniken.net.
-Mail support at webmaster@google.com.
-#+END_SRC
-
-** Variables
+** Types
+*** Variables
 
 The json keys are variables and they’re equal to their value.
 
@@ -317,13 +263,88 @@ example messages:
 - template.html(45): w0005: server json file not found 
 - template.html(45): w0006: unable to parse server.json
 
-** Special Variables 
+*** Constants:
 
-- _list
-- _skip
-- _line_limit
+- 0
+- 1
+- _true
+- _false
 
-** Skip Variable
+*** Strings 
+
+You can use a strings in statements to create or override a
+variable.  You can use single or double quotes.
+
+template:
+
+#+BEGIN_SRC
+<!--$ nextline email = "Steve" -->
+mail to {email}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+mail to Steve
+#+END_SRC
+
+*** Numbers
+
+You can use ordinal numbers in statements. 
+
+#+BEGIN_SRC
+0, 1, 2, 3,...
+#+END_SRC
+
+*** Special Variables 
+
+*** Max Lines Variable
+
+StaticTea reads lines looking for the terminating line a block or
+replace command. By default if the terminator is not found in 10
+lines, the 10 lines are used for the block and a warning is
+output.  You can specify other values with the _max_lines
+variable.
+
+#+BEGIN_SRC
+<!--$ block _max_lines=20 -->
+#+END_SRC
+
+*** List Variable 
+
+The list variable causes the line or block to be duplicated for
+each item in a list from the json file.  The json list contains a
+dictionary for each item.
+
+For the following example, the list statement says to use
+email_list key. The result has two lines.
+
+template:
+
+#+BEGIN_SRC
+<!--$ nextline _list = email_list -->
+Mail support at {email}.
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+"email_list": [
+    {"email": "steve@flenniken.net"},
+    {"email": "webmaster@google.com"}
+  ]
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+Mail support at steve@flenniken.net.
+Mail support at webmaster@google.com.
+#+END_SRC
+
+*** Skip Variable
 
 You can skip a block of lines with the _skip variable . By
 default the block is shown.  When _skip is true, the lines do not
@@ -381,15 +402,7 @@ email = _shared(address)
 email = _shared address
 #+END_SRC
 
-
-Constants:
-
-- 0
-- 1
-- _true
-- _false
-
-** Shared Function
+*** Shared Function
 
 You can share common template lines by pulling content from the
 shared json file.
@@ -417,7 +430,7 @@ result:
 email to: support@flenniken.net
 #+END_SRC
 
-** If Function 
+*** If Function 
 
 You can use a simple if statement in a template. 
 
@@ -500,7 +513,7 @@ result:
 </select>
 #+END_SRC
 
-** Row Function
+*** Row Function
 
 The special row function contains the row of the current list. You control the start number. 
 
@@ -534,56 +547,32 @@ results in:
 <li>2. Ford </li>
 #+END_SRC
 
-** Strings 
-
-You can use a strings in statements to create or override a variable.  You can use single or double quotes. 
-
-template:
-
-#+BEGIN_SRC
-<!--$ nextline email = "Steve" -->
-mail to {email}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-mail to Steve
-#+END_SRC
-
 ** Json Files
 
-There are two types of json files the server json and the shared json.
+There are two types of json files the server json and the shared
+json.
 
-The server json comes from the server and doesn’t contain any presentation data.
+The server json comes from the server and doesn’t contain any
+presentation data.
 
-The share json is used by the template builder to share common template lines and it contains presentation data.
+The share json is used by the template builder to share common
+template lines and it contains presentation data.
 
-The server json file is specified with the —server option. 
+The server json file is specified with the —server option.
 
-The shared json file is specified with the —shared option. 
+The shared json file is specified with the —shared option.
 
-You can specify multiple of both types. Internally there is one dictionary for the server and one for the shared. The files get added from left to right so the last duplicate variable wins. 
+You can specify multiple of both types. Internally there is one
+dictionary for the server and one for the shared. The files get
+added from left to right so the last duplicate variable wins.
 
-** Defaults
+** Warnings and Defaults
 
-Note: when a variable is missing, empty or not a string, it is treated as a empty string. 
+Note: when a variable is missing, empty or not a string, it is
+treated as a empty string.
 
-When the postfix is missing, the line command is still used, but a warning message is output. 
-
-StaticTea reads lines looking for the terminating block or replace line. By default is reads 10 lines. If it is not found, the 10 lines are used and a warning is output.  You can specify other values with the _line_limit variable. 
-
-#+BEGIN_SRC
-block _line_limit=20
-#+END_SRC
-
-# Numbers
-
-You can use ordinal numbers in statements. 
-
-#+BEGIN_SRC
-0, 1, 2, 3,...
-#+END_SRC
+When the postfix is missing, the line command is still used, but
+a warning message is output.
 
 
 ** Template Specification
@@ -622,28 +611,27 @@ string = "_string(" .* ")"
 examples variables
 
 #+BEGIN_SRC
-{_row0}
+{_row 0}
 {name}
-{name=name}
-{name=_string(string)}
+{name = name}
+{name= "string"}
 { name = _if name name name }
 #+END_SRC
 
+#+BEGIN_SRC
 nextline {email}
-
-nextline {_row78}
-
+nextline {_row 78}
 nextline {_shared header}
-
-nextline {email=_str(hello)}
-
-nextline {email=steve_email}
-
-nextline {email=_if admin one two}
+nextline {email = "hello"}
+nextline {email = steve_email}
+nextline {email = _if admin one two}
+#+END_SRC
 
 ** Run on Command Line
 
-You can run StaticTea from the command line. The example below shows a typical invocation. You specify three file parameters, the server json, the template and the result. 
+You can run StaticTea from the command line. The example below
+shows a typical invocation. You specify three file parameters,
+the server json, the template and the result.
 
 #+BEGIN_SRC
 statictea --server server.json template.html result.html
@@ -660,9 +648,7 @@ The StaticTea command line options:
 
 #+BEGIN_SRC
 statictea mytemplate.html result.html
-
-
-#+END_SRCt
+#+END_SRC
 
 ** TODO test all examples.
 ** TODO use tea examples 
