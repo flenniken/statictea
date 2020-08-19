@@ -134,7 +134,7 @@ The following example shares a common header between templates.
 template:
 
 #+BEGIN_SRC
-<!--$ replace s.header -->
+<!--$ replace t.content=s.header -->
 <!--$ replace -->
 #+END_SRC
 
@@ -197,6 +197,40 @@ result:
 #+BEGIN_SRC
 hello again
 #+END_SRC
+
+** Version Function, Command?
+
+Commands have statements.  command statement statement statement ...
+
+
+t.version(min, max)
+
+You use the version function to verify that the version of code
+you are running works with the template version. Both are
+optional.
+If the version below the minimum or above the maximum, the
+function returns a message good for displaying to standard error
+using the t.result variable.
+
+template:
+
+#+BEGIN_SRC
+<--$ replace t.result='stderr' t.content=t.version("1.2.3", "3.4.5") -->
+<--$ replace -->
+#+END_SRC
+
+If the current version is between, for example 1.9, nothing is
+output. If the version is out of range you see one of these:
+
+result:
+
+#+BEGIN_SRC
+template(line): the current version 4.0.2 is greater than the maximum
+3.4.5.
+template(line): the current version 1.0.0 is less than the minumum
+1.2.3.
+#+END_SRC
+
 
 ** Types
 *** Variables
@@ -316,13 +350,20 @@ Mail support at steve@flenniken.net.
 Mail support at webmaster@google.com.
 #+END_SRC
 
-*** Skip Variable
+*** Result Variable
 
-You can skip a block of lines with the _skip variable . By
-default the block is shown.  When _skip is true, the lines do not
-appear in the result.
+The system result variable determines where the result goes.  By
+default it goes to the result file. You can also direct it to
+standard out or to skip it.
 
-The skip variable is good for building test lists.
+Result variable options:
+
+- "resultFile" - send the replacement block to the file (default)
+- "skip" - skip the block
+- "stderr" - send the block to standard error
+
+The skip case is good for building test lists.  The stderr case
+is good for communicating that the json data is unexpected.
 
 When you view the following template fragment in a browser it
 shows one item in the list.
@@ -330,31 +371,58 @@ shows one item in the list.
 template:
 
 #+BEGIN_SRC
-<h3>Campbell's Soup</h3>
+<h3>Tea</h3>
 <ul>
-<!--$ nextline list=soup_list -->
-   <li>{soup}</li>
+<!--$ nextline t.list = teaList -->
+  <li>{tea}</li>
 </ul>
 #+END_SRC
 
-To create a static page that has more products you could use the
-skip variable like this:
+To create a static page that has more products for better testing
+you could use the skip option like this:
 
 template:
 
 #+BEGIN_SRC
-<h3>Campbell's Soup</h3>
+<h3>Tea</h3>
 <ul>
-<!--$ nextline _list=soup_list -->
-   <li>{soup}</li>
-<!--$  block _skip = 1 -->
-   <li>Jonathan's Soup</li>
-   <li>Meat Balls</li>
-   <li>Noodles</li>
-   <li>Spicy Diced Chicken</li>
+<!--$ nextline t.list = teaList -->
+  <li>{tea}</li>
+<!--$ block t.result = 'skip' -->
+  <li>Black</li>
+  <li>Green</li>
+  <li>Oolong</li>
+  <li>Sencha</li>
+  <li>Herbal</li>
 <!--$ block -->
 </ul>
 #+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+  "teaList": [
+    {"tea": "Chamomile"},
+    {"tea": "Chrysanthemum"},
+    {"tea": "White"},
+    {"tea": "Puer"}
+  ]
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+<h3>Tea</h3>
+<ul>
+  <li>Chamomile</li>
+  <li>Chrysanthemum</li>
+  <li>White</li>
+  <li>Puer</li>
+</ul>
+#+END_SRC
+
 
 ** Special Functions
 
