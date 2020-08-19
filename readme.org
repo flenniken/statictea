@@ -1,0 +1,646 @@
+* StaticTea
+
+** A template processor and language. 
+
+StaticTea combines a template with data to produce a result. 
+
+Example template:
+
+~~~
+<!--nextline-->
+hello {name}
+~~~
+
+The associated json data:
+
+~~~
+{“name”: “world”}
+~~~
+
+And the result:
+
+~~~
+hello world
+~~~
+
+** Commands
+
+- nextline — make substitutions in the next line 
+- block — make substitutions in the next block of lines
+- replace — replace a block of lines
+- # — comment
+
+** Process
+
+Each command is one line in the template and it applies to the current line, next line or next block of lines. 
+
+StaticTea processes the template one line at a time with one pass through the file. 
+
+It only keeps the current replacement lines in memory so it can handle large template files with little resources. 
+
+You can place all the markup 
+in the template instead of embedding it in the server.
+
+The template commands are encoded as comments so they do not interfere with the page. You can view, edit and validate the template with normal tools.
+
+The template designer can develop templates as if they were static pages.
+
+** Template Prefix Postfix 
+
+You specify the template commands as comments. This allows you to edit the template using its native editor. 
+For example, you can edit an html template with an html editor. 
+
+Comment syntax varies depending on the type of template file and sometimes depending on the location within the file. StaticTea supports several varieties and you can specify others. 
+
+You want to distinguish StaticTea commands from normal comments. The convention is to add a $ as the last character of the prefix and only use $ with Statictea commands. 
+
+- `<!--$... -->` for html
+- `/*--$... --*/` for javascript in html
+- `&lt;!--$... --&gt;` for textarea elements
+
+You can define other comment types on the command line using the prepost option one or more times. 
+
+You separate the prefix from the postfix with a space and the postfix is optional. 
+
+examples:
+
+~~~
+statictea--prepost “@$“ “|”
+statictea--prepost “[comment$” “]”
+statictea--prepost “#$”
+~~~
+
+** nextline
+
+use more advanced example
+
+The nextline command tells the template system that the next line in the file has some variable content.  The content comes from the json file. 
+
+The variable parts are described by the bracketed variables.
+
+For the example template:
+
+~~~
+<!--nextline-->
+Mail support at {email}.
+~~~
+
+json file:
+
+~~~
+{
+“email”: “steve@flenniken.net”
+}
+~~~
+
+result:
+
+~~~
+Mail support at steve@flenniken.net.
+~~~
+
+** List Statement 
+
+If the command contains a list statement, the line or block is duplicated for each item in the list. 
+
+For the following example, the list statement says to use email_list key which produces two lines. 
+
+template:
+
+~~~
+<!--nextline _list=email_list-->
+Mail support at {email}.
+~~~
+
+the json:
+
+~~~
+{
+“email_list”: [
+ {“email”: “steve@flenniken.net”},
+ {“email”: “webmaster@google.com”}
+]
+}
+~~~
+
+result:
+
+~~~
+Mail support at steve@flenniken.net.
+Mail support at webmaster@google.com.
+~~~
+
+** Special Variables 
+
+- _list
+- _skip
+- \_line_limit
+
+** Special Functions
+
+Special built in functions start with a leading underscore.
+
+- _row
+- _if
+- _shared
+
+Functions take different numbers of arguments. If you call with one arg, you can drop the parentheses. 
+
+These are equivalent:
+
+~~~
+email = _shared(address)
+email = _shared address
+~~~
+
+
+Constants:
+
+- 0
+- 1
+- _true
+- _false
+
+** add strings here
+
+** Row Function
+
+The special row function contains the row of the current list. You control the start number. 
+
+- row — starts at 0
+- _row 0 — starts at 0
+- _row 1 — starts at 1
+- _row N — starts at N where N is some ordinal number. 
+
+Here is an example using the row variable:
+
+~~~
+<!--nextline _list=car_list-->
+<li>{_row 1}. {car}</li>
+~~~
+
+the json:
+
+~~~
+{
+“car_list”: [
+   {“car”: “Tesla”},
+   {“car”: “Ford”}
+]
+}
+~~~
+
+results in:
+
+~~~
+<li>1. Tesla</li>
+<li>2. Ford </li>
+~~~
+
+** Multiple Variables 
+
+You can have any number of variables in the replacement line or block. 
+
+Here is an example of a nextline command with two variables.
+
+todo: use tea examples 
+
+template:
+
+~~~
+<!--nextline-->
+sent to: {name} at {email}
+~~~
+
+json:
+
+~~~
+{
+“name”: “Steve Flenniken”,
+“email”: “steve@flenniken.net”
+}
+~~~
+
+result:
+
+~~~
+send to: Steve Flenniken at steve@flenniken.net
+~~~
+
+** Block
+
+The block command targets multiple lines for replacement. The block starts after the command and continues until another block line is found. It behaves like the nextline command except with multiple lines. 
+
+In the following example the block has two lines. The block contains an email and an address that will be replaced.
+
+template:
+
+~~~
+<!--block-->
+Email to {email} for a quick reply
+or write us at {address}.
+<!--block-->
+~~~
+
+** Skip Variable
+
+You can skip a block of lines with the _skip variable . By default the block is shown.   When _skip is true, the lines do not appear in the result. 
+
+The _ skip variable is good for building 
+test lists. 
+
+When you view the following template fragment in a browser it shows one item in the list. 
+
+template:
+
+~~~
+<h3>Campbell's Soup</h3>
+<ul>
+<!--nextline list=soup_list-->
+   <li>{soup}</li>
+</ul>
+~~~
+
+To create a static page that has more products you could use the _skip variable like this:
+
+template:
+
+~~~
+<h3>Campbell's Soup</h3>
+<ul>
+<!--nextline _list=soup_list-->
+   <li>{soup}</li>
+<!-- block _skip = 1-->
+   <li>Jonathan's Soup</li>
+   <li>Meat Balls</li>
+   <li>Noodles</li>
+   <li>Spicy Diced Chicken</li>
+<!--block-->
+</ul>
+~~~
+
+** Json Files
+
+There are two types of json files the server json and the shared json.
+
+The server json comes from the server and doesn’t contain any presentation data.
+
+The share json is used by the template builder to share common template lines and it contains presentation data.
+
+The server json file is specified with the —server option. 
+
+The shared json file is specified with the —shared option. 
+
+You can specify multiple of both types. Internally there is one dictionary for the server and one for the shared. The files get added from left to right so the last duplicate variable wins. 
+
+** Shared Variables
+
+You can share common template lines by pulling content from the shared json file. 
+
+You refer to the shared variables using the _shared function. 
+
+template:
+
+~~~
+nextline
+email to: {_shared support_email}
+~~~
+
+shared json:
+
+~~~
+{
+“support_email”: “support@flenniken.net”
+}
+~~~
+
+result:
+
+~~~
+email to: support@flenniken.net
+~~~
+
+** Replace Command 
+
+You use the replace command for replacing a block with one variable. 
+The lines in the block mirror the variable so you can test the template as if it was a static file. 
+
+The command is useful for sharing common template lines between templates. 
+
+The following example shares a common header between templates. 
+
+shared json file:
+
+~~~
+{
+“header”: “<!doctype html>\n<html lang="en">\n”
+}
+~~~
+
+template:
+
+~~~
+<!-replace _shared header-->
+<!-replace-->
+~~~
+
+The replace block gets replaced with the header lines in the result file.
+
+result:
+
+~~~
+<!doctype html>
+<html lang="en">
+~~~
+
+The above example doesn’t work as a static template because it’s missing the header lines.
+
+You can fix this by adding the header lines inside the replace block. The inside lines do not appear in the result, just the data from the json does. 
+
+~~~
+<!-replace _shared header -->
+<!doctype html>
+<html lang=““n””
+<!-replace—>
+~~~
+
+The template replace lines may get out of sync with the json lines.  You can update the template to match the json with the update option. The replace lines change to match the json. 
+
+~~~
+statictea --update --shared shared.json --template mytea.html
+~~~
+
+** Comments
+
+You can comment templates.  Comments are line based and use the # character. They do not appear in the result. 
+
+template:
+
+~~~
+''<!--# This is a comment. -->
+hello
+~~~
+
+result:
+
+~~~
+hello
+~~~
+
+** Strings 
+
+You can use a strings in statements to create or override a variable.  You can use single or double quotes. 
+
+template:
+
+~~~
+nextline email = “Steve”
+mail to {email}
+~~~
+
+result:
+
+~~~
+mail to Steve
+~~~
+
+** If Statement 
+
+You can use a simple if statement in a template. 
+
+The general form of the if statement has a condition variable, true variable and a false variable. 
+
+~~~
+email = _if (condition_var true_var false_var)
+~~~
+
+You can drop the false variable or both the true and false variables. When you drop both, 1 or 0 get returned. 
+
+~~~
+_if (user)
+_if (user last_login)
+_if (carnivore meat plants)
+~~~
+
+The 1 and 0 constants stand for true and false.  You can instead use _true or _false. 
+
+simple example:
+
+~~~
+replace _show=_if(user) 
+Welcome back {user}!
+replace
+~~~
+
+json:
+
+~~~
+{
+“user”: “Steve”
+}
+~~~
+
+result:
+
+~~~
+Welcome back Steve!
+~~~
+
+The following example builds a select list of cars where one car is selected.
+
+template:
+
+~~~
+<h4>Car List</h3>
+<select>
+<!--nextline _list=car_list current=_if ( selected ‘selected="selected"’) -->
+ <option{current}>{car}</option>
+</select>
+~~~
+
+json:
+
+~~~
+{
+“car_list”: [
+          {'car': 'vwbug'},
+          {'car': 'corvete'},
+          {'car': 'mazda'},
+          {'car': 'ford pickup'},
+          {'car': 'BMW', 'selected': 1},
+          {'car': 'Honda'}
+]
+}
+~~~
+
+result:
+
+~~~
+<h4>Car List</h3>
+<select>
+  <option>vwbug</option>
+  <option>corvete</option>
+  <option>mazda</option>
+  <option>ford pickup</option>
+  <option selected="selected">BMW</option>
+  <option>Honda</option>
+</select>
+~~~
+
+** Defaults
+
+Note: when a variable is missing, empty or not a string, it is treated as a empty string. 
+
+When the postfix is missing, the line command is still used, but a warning message is output. 
+
+StaticTea reads lines looking for the terminating block or replace line. By default is reads 10 lines. If it is not found, the 10 lines are used and a warning is output.  You can specify other values with the _line_limit variable. 
+
+~~~
+block _line_limit=20
+~~~
+
+# Numbers
+
+You can use ordinal numbers in statements. 
+
+~~~
+0, 1, 2, 3,...
+~~~
+
+
+** Optional Content
+
+You can optionally show text using the replace command. In the following example an admin message is shown when an admin is logged in. 
+
+template:
+
+~~~
+<!--replace _show=admin-->
+<p>Hi admin {admin}.
+This message is seen by admins.</p>
+<!--replace-->
+~~~
+
+json:
+
+~~~
+{
+“admin”: “Steve”
+}
+~~~
+
+result:
+
+~~~
+<p>Hi admin Steve. 
+This message is seen by admins.</p>
+~~~
+
+** Template Specification
+
+~~~
+template = [line]*
+line = prefix os commands os postfix
+s = [“ “ | tab]+
+os = [“ “ | tab]*
+
+commands = nextline | block | comment | skip | shared
+
+skip = .*
+comment = “#” .*
+nextline = “nextline” [s variable ]*
+block = “block” [s variable ]*
+shared = “shared” [s variable]+
+
+list = “_list” os “=“ os right_side 
+
+variable = “{“ os name os “}”
+
+name = key | row
+row = “_row” [0-9]+
+key =  [“_shared” s] [a-zA-Z]+[a-zA-Z0-9_]*
+
+
+replace = key os “=“ os right_side
+right_side = name | string | if
+
+string = “_string(“ .* “)”
+ if = “_if“ s name s name s name
+
+~~~
+
+examples variables
+
+~~~
+{_row0}
+{name}
+{name=name}
+{name=_string(string)}
+{ name = _if name name name }
+~~~
+
+nextline {email}
+
+nextline {_row78}
+
+nextline {_shared header}
+
+nextline {email=_str(hello)}
+
+nextline {email=steve_email}
+
+nextline {email=_if admin one two}
+
+** Variables
+
+The json keys are variables and they’re equal to their value. 
+
+The special system variables start with an underscore. 
+
+The variables defined on the command lines are local to its block. These local variables take precedence over the json variables. 
+
+You can define any number of variables that will fit on the line. You can put them on the end block if needed. 
+
+The variables are processed from left to right, so the last one takes precedence when there are duplicates. 
+
+
+
+# Messages
+
+When a problem is detected, a message is written to standard out and processing continues. All issues are handled, usually by skipping the problem. 
+
+It’s good style to change your template or json so no messages get output. 
+
+example messages:
+
+- template.html(45): email missing from server.json. 
+- template.html(45): postfix missing. 
+- command missing. 
+- unknown system variable _asdf. 
+- server json file not found 
+- unable to parse server.json
+
+todo: test all examples. use double quotes in json
+
+** Run on Command Line
+
+You can run StaticTea from the command line. The example below shows a typical invocation. You specify three file parameters, the server json, the template and the result. 
+
+~~~
+statictea --server server.json template.html result.html
+~~~
+
+** Options
+
+The statictea command line options:
+
+- version 
+- server - the server json file
+- shared - the shared json file
+- update - update the template replace blocks
+
+~~~
+statictea mytemplate.html result.html
+
+
+~~~
