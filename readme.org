@@ -27,16 +27,16 @@ hello world
 
 You specify each template command on one line. The command 
 applies to the current line, next line or next block of
-lines (the replacement block).
+lines (the replacement block) depending on the command.
 
 You use variables in brackets to mark locations in the
-replacement block. These variables get replaced by their
-associated json value.
+replacement block for replacement. These variables typically get
+replaced by their associated json value.
 
-You can use two types of json files, server json and shared json.
-The server json comes from the server and does not contain any
-presentation markup. The shared json, maintained by the template
-builder, contains shared presentation markup.
+You can use two types of json files, a server json file and
+shared json file.  The server json comes from the server and does
+not contain any presentation markup. The shared json, maintained
+by the template builder, contains shared presentation markup.
 
 Since the template commands are encoded as comments, the template
 file looks like a native file and you can view, edit, validate,
@@ -45,13 +45,12 @@ they were static pages.
 
 ** Commands
 
-StaticTea has five commands:
+StaticTea has four commands:
 
 - nextline — make substitutions in the next line 
 - block — make substitutions in the next block of lines
 - replace — replace a block of lines
 - # — comment
-- version - validate the template version with the code version
 
 *** Nextline Command
 
@@ -101,8 +100,9 @@ Join our tea party on {weekday} at
 <!--block -->
 #+END_SRC
 
-#+BEGIN_SRC
 json:
+
+#+BEGIN_SRC
 {
   "weekday": "Friday",
   "name": "John",
@@ -158,22 +158,23 @@ template is missing the header lines.
 
 You can fix this by adding the header lines inside the replace
 block. The inside lines do not appear in the result, just the
-data from the json variable does.
+data from the json variable.
 
 template:
 
 #+BEGIN_SRC
-<!--$ replace s.header -->
+<!--$ replace t.content=s.header -->
 <!doctype html>
 <html lang="en">
 <!--$ replace -—>
 #+END_SRC
 
 The template replacement block may get out of sync with the
-variable.  You can update the replacement block to match the variable with the
-update option.
+variable.  You can update the replacement block to match the
+variable with the update option.
 
-Update mytea.html replacement blocks to match their variables in shared.json:
+The following example updates the mytea.html template's
+replacement blocks to match their variables in the shared.json file:
 
 #+BEGIN_SRC
 statictea --update --shared shared.json --template mytea.html
@@ -198,50 +199,20 @@ result:
 hello again
 #+END_SRC
 
-** Version Function, Command?
-
-Commands have statements.  command statement statement statement ...
-
-
-t.version(min, max)
-
-You use the version function to verify that the version of code
-you are running works with the template version. Both are
-optional.
-If the version below the minimum or above the maximum, the
-function returns a message good for displaying to standard error
-using the t.result variable.
-
-template:
-
-#+BEGIN_SRC
-<--$ replace t.result='stderr' t.content=t.version("1.2.3", "3.4.5") -->
-<--$ replace -->
-#+END_SRC
-
-If the current version is between, for example 1.9, nothing is
-output. If the version is out of range you see one of these:
-
-result:
-
-#+BEGIN_SRC
-template(line): the current version 4.0.2 is greater than the maximum
-3.4.5.
-template(line): the current version 1.0.0 is less than the minumum
-1.2.3.
-#+END_SRC
-
-
 ** Types
 *** Variables
 
-The json keys are variables and they’re equal to their value.
+The json file contain variables.  The keys are variable names and
+their value becomes part of the template when they are
+used. Internally two json namespace exists, one for the shared
+json and one for the server json.  You access the shared json
+with "s." and the server with no prefix.
 
-The special system variables and symbols start with an
-underscore.
+StaticTea has a number of system variables. You access them in
+the t namespace, by using the prefix "t.".
 
-The variables defined on the command lines are local to its
-block. These local variables take precedence over the json
+You can define new variables on the command's line. These
+variables are local to the block and take precedence over the json
 variables.
 
 You can define any number of variables that will fit on the
@@ -250,27 +221,39 @@ line. You can put them on the end block if needed.
 The variables are processed from left to right, so the last one
 takes precedence when there are duplicates.
 
+example variables:
+
+#+BEGIN_SRC
+t.row
+serverVar
+s.name
+#+END_SRC
 
 # Messages
 
-When a problem is detected, a message is written to standard out
+When a problem is detected, a message is written to standard error
 and processing continues. All issues are handled, usually by
 skipping the problem.
 
 It’s good style to change your template or json so no messages
 get output.
 
+StaticTea return code is success (0) when no message get output, else it
+returns 1.
+
 example messages:
 
-- template.html(45): w0001: email missing from server.json. 
-- template.html(45): w0002: postfix missing. 
-- template.html(45): w0003: command missing. 
-- template.html(45): w0004: unknown system variable _asdf. 
-- template.html(45): w0005: server json file not found 
+- template.html(45): w0001: email variable is missing from server.json. 
+- template.html(45): w0002: The command line's postfix is missing. 
+- template.html(45): w0003: The command line doesn't have a valid
+  command.
+- template.html(45): w0004: unknown system variable t.asdf. 
+- template.html(45): w0005: server json file not found: asdf 
 - template.html(45): w0006: unable to parse server.json
 
 *** Constants:
 
+**** TODO are these needed?
 - 0
 - 1
 - _true
@@ -278,20 +261,14 @@ example messages:
 
 *** Strings 
 
-You can use a strings in statements to create or override a
-variable.  You can use single or double quotes.
+You define a string using single or double quotes.
 
-template:
-
-#+BEGIN_SRC
-<!--$ nextline email = "Steve" -->
-mail to {email}
-#+END_SRC
-
-result:
+example strings:
 
 #+BEGIN_SRC
-mail to Steve
+"this is a string"
+"what's up?"
+'using single quote'
 #+END_SRC
 
 *** Numbers
@@ -302,21 +279,16 @@ You can use ordinal numbers in statements.
 0, 1, 2, 3,...
 #+END_SRC
 
-*** Special Variables 
+*** System Variables 
 
-*** Max Lines Variable
+- t.list - the list used to repeat a the block for each elements
+  in the list
+- t.content - the content of a replace block
+- t.maxLines - the maximum number of lines before the block ends.
+- t.result - where the block goes, either the result file,
+  standard out or no where.
 
-StaticTea reads lines looking for the terminating line a block or
-replace command. By default if the terminator is not found in 10
-lines, the 10 lines are used for the block and a warning is
-output.  You can specify other values with the _max_lines
-variable.
-
-#+BEGIN_SRC
-<!--$ block _max_lines=20 -->
-#+END_SRC
-
-*** List Variable 
+**** List Variable 
 
 The list variable causes the line or block to be duplicated for
 each item in a list from the json file.  The json list contains a
@@ -350,11 +322,23 @@ Mail support at steve@flenniken.net.
 Mail support at webmaster@google.com.
 #+END_SRC
 
-*** Result Variable
+**** Max Lines Variable
+
+StaticTea reads lines looking for the terminating line a block or
+replace command. By default if the terminator is not found in 10
+lines, the 10 lines are used for the block and a warning is
+output.  You can specify other values with the _max_lines
+variable.
+
+#+BEGIN_SRC
+<!--$ block _max_lines=20 -->
+#+END_SRC
+
+**** Result Variable
 
 The system result variable determines where the result goes.  By
 default it goes to the result file. You can also direct it to
-standard out or to skip it.
+standard out or skip it.
 
 Result variable options:
 
@@ -423,94 +407,125 @@ result:
 </ul>
 #+END_SRC
 
+** Content Variable
 
-** Special Functions
+The content variable defines what goes in the replace block.
 
-Special built in functions start with a leading underscore.
+** System Functions
 
-- _row
-- _if
-- _shared
+There are three built in system functions:
 
-Functions take different numbers of arguments. If you call with
-one arg, you can drop the parentheses.
+- t.row
+- t.if
+- t.version
+
+Functions take different numbers of parameters. If you call with
+one parameters, you can drop the parentheses.
 
 These are equivalent:
 
 #+BEGIN_SRC
-email = _shared(address)
-email = _shared address
+email = t.row(0)
+email = t.row 0
 #+END_SRC
 
-*** Shared Function
+** Version Function
 
-You can share common template lines by pulling content from the
-shared json file.
+You use the version function to verify that the version of
+StaticTea code you are running works with your template and to
+get the current version string.
 
-You refer to the shared variables using the shared function.
+The version function take to parameters, the minimum version and
+the maximum version, both are optional.
+
+If the current version is below the minimum or above the maximum,
+the function outputs a message to standard out. 
+
+You can use the function multiple times for fine grain checking.
+
+Below is typical useage:
 
 template:
 
 #+BEGIN_SRC
-<!--$ nextline -->
-email to: {_shared support_email}
-#+END_SRC
-
-shared json:
-
-#+BEGIN_SRC
-{
-"support_email": "support@flenniken.net"
-}
+<--$ nextline version=t.version("1.2.3", "3.4.5") -->
+<-- StaticTea current version is: {version}. -->
 #+END_SRC
 
 result:
 
 #+BEGIN_SRC
-email to: support@flenniken.net
+<-- StaticTea current version is: 1.9.0. -->
+#+END_SRC
+
+If the current version is not between the min and max, a message
+is output to standard error.  Example messages:
+
+stdout:
+
+#+BEGIN_SRC
+template(line): the current version 4.0.2 is greater than the maximum
+allowed verion of 3.4.5.
+
+template(line): the current version 1.0.0 is less than the minumum
+allowed verion of 1.2.3.
 #+END_SRC
 
 *** If Function 
 
-You can use a simple if statement in a template. 
+You can use an if statement in a template. 
 
-The general form of the if statement has a condition variable, true variable and a false variable. 
+The general form of the if statement has three variable
+parameters.  If the first variable is true, the second variable
+is returned, else the third variable is returned.
 
-#+BEGIN_SRC
-email = _if (condition_var true_var false_var)
-#+END_SRC
+You can drop the third and second parameters and there are
+defaults for each case.
 
-You can drop the false variable or both the true and false variables. When you drop both, 1 or 0 get returned. 
+When you drop both, 0 or 1 is returned. 
 
-#+BEGIN_SRC
-_if (user)
-_if (user last_login)
-_if (carnivore meat plants)
-#+END_SRC
-
-The 1 and 0 constants stand for true and false.  You can instead use _true or _false. 
-
-simple example:
+template:
 
 #+BEGIN_SRC
-replace _show=_if(user) 
-Welcome back {user}!
-replace
+<--$ block var1 = t.if (cond0 t f) var2 = t.if (cond0 t) var3 = t.if (cond0) -->
+cond0 = {cond0}, cond1 = {cond1}
+t = {true}, f = {false}
+
+var1 = {var1}, var2 = {var2}, var3 = {var3}
+var4 = {var4}, var5 = {var5}, var6 = {var6}
+
+<--$ block var4 = t.if (cond1 t f) var5 = t.if (cond1 t) var6 = t.if (cond1) -->
 #+END_SRC
 
 json:
 
 #+BEGIN_SRC
 {
-"user": "Steve"
+  "cond0": 0,
+  "cond1": 1,
+  "t": "true",
+  "f": "false",
 }
 #+END_SRC
 
 result:
 
 #+BEGIN_SRC
-Welcome back Steve!
+cond0 = 0, cond1 = 1
+t = true, f = false
+
+var1 = false, var2 = 0, var3 = 0
+var4 = true, var5 = true, var6 = 1
 #+END_SRC
+
+
+
+
+
+
+
+
+** t.list example
 
 The following example builds a select list of cars where one car is selected.
 
@@ -519,7 +534,7 @@ template:
 #+BEGIN_SRC
 <h4>Car List</h3>
 <select>
-<!--$ nextline _list=car_list current=_if ( selected ‘selected="selected"’) -->
+<!--$ nextline t.list=car_list current=t.if( selected 'selected="selected"') -->
   <option{current}>{car}</option>
 </select>
 #+END_SRC
@@ -562,25 +577,27 @@ The special row function contains the row of the current list. You control the s
 - _row 1 — starts at 1
 - _row N — starts at N where N is some ordinal number. 
 
-Here is an example using the row variable:
+Here is an example using the row variable.
+
+template:
 
 #+BEGIN_SRC
-<!--$ $nextline _list=car_list -->
-<li>{_row 1}. {car}</li>
+<!--$ nextline t.list=car_list -->
+<li>{t.row 1}. {car}</li>
 #+END_SRC
 
-the json:
+json:
 
 #+BEGIN_SRC
 {
-"car_list": [
-   {"car": "Tesla"},
-   {"car": "Ford"}
-]
+  "car_list": [
+    {"car": "Tesla"},
+    {"car": "Ford"}
+  ]
 }
 #+END_SRC
 
-results in:
+result:
 
 #+BEGIN_SRC
 <li>1. Tesla</li>
@@ -589,21 +606,29 @@ results in:
 
 ** Template Prefix Postfix 
 
-You specify the template commands as comments. This allows you to
-edit the template using its native editor.  For example, you can
-edit an html template with an html editor.
+You specify the template commands as comments for the type of
+result file. This allows you to edit the template using its
+native editor.  For example, you can edit an html template with
+an html editor.
 
-Comment syntax varies depending on the type of template file and sometimes depending on the location within the file. StaticTea supports several varieties and you can specify others. 
+Comment syntax varies depending on the type of template file and
+sometimes depending on the location within the file. StaticTea
+supports several varieties and you can specify others.
 
-You want to distinguish StaticTea commands from normal comments. The convention is to add a $ as the last character of the prefix and only use $ with StaticTea commands. 
+You want to distinguish StaticTea commands from normal
+comments. The convention is to add a $ as the last character of
+the prefix and only use $ with StaticTea commands and space for
+normal comments.
 
 - `<!--$ ... -->` for html
 - `/*--$... --*/` for javascript in html
 - `&lt;!--$... --&gt;` for textarea elements
 
-You can define other comment types on the command line using the prepost option one or more times. 
+You can define other comment types on the command line using the
+prepost option one or more times.
 
-You separate the prefix from the postfix with a space and the postfix is optional. 
+You separate the prefix from the postfix with a space and the
+postfix is optional.
 
 examples:
 
@@ -612,6 +637,7 @@ statictea--prepost "@$" "|"
 statictea--prepost "[comment$" "]"
 statictea--prepost "#$"
 #+END_SRC
+
 ** Json Files
 
 There are two types of json files the server json and the shared
@@ -623,15 +649,26 @@ presentation data.
 The share json is used by the template builder to share common
 template lines and it contains presentation data.
 
-The server json file is specified with the —server option.
+The server json file is included with the "-server" option.  Its
+variables are referenced with the json key names.
 
-The shared json file is specified with the —shared option.
+The shared json file is specified with the "—shared" option. Its
+variables are referenced with the "s." namespace.
 
-You can specify multiple of both types. Internally there is one
-dictionary for the server and one for the shared. The files get
-added from left to right so the last duplicate variable wins.
+You can specify multiple files of both types. Internally there is
+one dictionary for the server and one for the shared. The files
+get added from left to right so the last duplicate variable wins.
 
 ** Warnings and Defaults
+
+When StaticTea encounters an error, it outputs a message to
+standard error and continues.  It skips the element with the
+problem using some default.
+
+For example, if a variable in a block is used but it doesn't
+exist, the variable remains as is and a message is output telling
+the line and variable missing.
+
 
 Note: when a variable is missing, empty or not a string, it is
 treated as a empty string.
@@ -639,6 +676,32 @@ treated as a empty string.
 When the postfix is missing, the line command is still used, but
 a warning message is output.
 
+
+** Run StaticTea
+
+You run StaticTea from the command line. The example below shows
+a typical invocation. You specify four file parameters, the
+server json, the shared json the template and the result.
+
+#+BEGIN_SRC
+statictea --server server.json --shared shared.json --template template.html --result result.html
+#+END_SRC
+
+- Warning messages go to standard error.
+- If you don't specify the result parameter, the result goes to
+standard out.
+- It you specify "stdin" for the template, the template comes
+  from stdin.
+
+** Options
+
+The StaticTea command line options:
+
+- help - show the usage and options.
+- version -outputs the version number to standard out and exits.
+- server - the server json file. You can specify multiple files.
+- shared - the shared json file. You can specify multiple files.
+- update - update the template replace blocks.
 
 ** Template Specification
 
@@ -673,15 +736,6 @@ string = "_string(" .* ")"
 
 #+END_SRC
 
-examples variables
-
-#+BEGIN_SRC
-{_row 0}
-{name}
-{name = name}
-{name= "string"}
-{ name = _if name name name }
-#+END_SRC
 
 #+BEGIN_SRC
 nextline {email}
@@ -690,29 +744,6 @@ nextline {_shared header}
 nextline {email = "hello"}
 nextline {email = steve_email}
 nextline {email = _if admin one two}
-#+END_SRC
-
-** Run on Command Line
-
-You can run StaticTea from the command line. The example below
-shows a typical invocation. You specify three file parameters,
-the server json, the template and the result.
-
-#+BEGIN_SRC
-statictea --server server.json template.html result.html
-#+END_SRC
-
-** Options
-
-The StaticTea command line options:
-
-- version 
-- server - the server json file
-- shared - the shared json file
-- update - update the template replace blocks
-
-#+BEGIN_SRC
-statictea mytemplate.html result.html
 #+END_SRC
 
 ** Tea References in Examples.
