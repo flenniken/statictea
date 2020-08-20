@@ -251,14 +251,6 @@ example messages:
 - template.html(45): w0005: server json file not found: asdf 
 - template.html(45): w0006: unable to parse server.json
 
-*** Constants:
-
-**** TODO are these needed?
-- 0
-- 1
-- _true
-- _false
-
 *** Strings 
 
 You define a string using single or double quotes.
@@ -482,19 +474,24 @@ is returned, else the third variable is returned.
 You can drop the third and second parameters and there are
 defaults for each case.
 
-When you drop both, 0 or 1 is returned. 
+When you drop both, 0 or 1 is returned. The following example
+uses the template system to show what happens when you drop the
+t.if parameters.
 
 template:
 
 #+BEGIN_SRC
-<--$ block var1 = t.if (cond0 t f) var2 = t.if (cond0 t) var3 = t.if (cond0) -->
-cond0 = {cond0}, cond1 = {cond1}
-t = {true}, f = {false}
+<--$ block var1=t.if(cond0 dog cat) var2=t.if(cond0 dog) var3=t.if(cond0) -->
 
-var1 = {var1}, var2 = {var2}, var3 = {var3}
-var4 = {var4}, var5 = {var5}, var6 = {var6}
+t.if({cond0} dog cat) -> {var1}
+t.if({cond0} dog)     -> {var2}
+t.if({cond0})         -> {var3}
 
-<--$ block var4 = t.if (cond1 t f) var5 = t.if (cond1 t) var6 = t.if (cond1) -->
+t.if({cond1} dog cat) -> {var4}
+t.if({cond1} dog)     -> {var5}
+t.if({cond1})         -> {var6}
+
+<--$ block var4=t.if(cond0 dog cat) var5=t.if(cond0 dog) var6=t.if(cond0) -->
 #+END_SRC
 
 json:
@@ -503,26 +500,82 @@ json:
 {
   "cond0": 0,
   "cond1": 1,
-  "t": "true",
-  "f": "false",
+  "dog": "dog",
+  "cat": "cat",
 }
 #+END_SRC
 
 result:
 
 #+BEGIN_SRC
-cond0 = 0, cond1 = 1
-t = true, f = false
 
-var1 = false, var2 = 0, var3 = 0
-var4 = true, var5 = true, var6 = 1
+t.if(0 dog cat) -> cat
+t.if(0 dog)      -> 0
+t.if(0)          -> 0
+
+t.if(1 dog cat) -> dog
+t.if(1 dog)      -> dog
+t.if(1)          -> 0
+
 #+END_SRC
 
 
+# StaticTea as a Filter
 
+You can use the statictea command as a filter and pipe template
+lines to it and see the result output on the screen.  
 
+You can try out the examples in the document by copy and pasting
+into a posix terminal window.
 
+The examples use the Here Document feature to easily create
+multi-line templates. The following shows a simple Here Document
+that pipes three lines, to the wc command which reports the
+number of lines.
 
+Here is an example you can copy and paste into your terminal. It
+creates a template.txt file containing two lines, then it creates
+the server.json file containing one line, then it runs statictea
+using those files.
+
+#+BEGIN_SRC
+cat <<EOF >template.txt
+<!--$ nextline -->
+hello {name}
+EOF
+
+cat <<EOF >server.json
+{"name": "world"}
+EOF
+
+statictea --template template.txt --server server.json
+#+END_SRC
+
+If you copy and paste those lines to your terminal, it will look
+like:
+
+#+BEGIN_SRC
+$ cat <<EOF >template.txt
+> <!--$ nextline -->
+> hello {name}
+> EOF
+$                                                                                                        
+$ cat <<EOF >server.json
+> {"name": "world"}
+> EOF
+$                                                                                                        
+$ statictea --template template.txt --server server.json
+hello world
+#+END_SRC
+
+The following example uses statictea as a filter and pipes to it the
+template.txt file created in the last example:
+
+#+BEGIN_SRC
+cat template.txt | statictea --template stdin --server server.json
+
+hello world
+#+END_SRC
 
 
 ** t.list example
@@ -774,3 +827,7 @@ through the file and it only needs to keep the current
 
 It only keeps the current replacement lines in memory so it can
 handle large template files with little resources.
+
+Chai
+Oolong
+Jasmine
