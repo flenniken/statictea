@@ -72,7 +72,7 @@ template:
 Drink {drink} -- {drinkType} is my favorite.
 #+END_SRC
 
-json file:
+json:
 
 #+BEGIN_SRC
 {
@@ -184,7 +184,8 @@ variable.  You can update the replacement block to match the
 variable with the update option.
 
 The following example updates the mytea.html template's
-replacement blocks to match their variables in the shared.json file:
+replacement blocks to match their variables in the shared.json
+file:
 
 #+BEGIN_SRC
 statictea --update --shared shared.json --template mytea.html
@@ -213,7 +214,8 @@ hello again
 
 *** Strings
 
-You define a string using single or double quotes.
+You define a string using single or double quotes. You use
+strings in command statements.
 
 example strings:
 
@@ -223,15 +225,41 @@ example strings:
 'using single quote'
 #+END_SRC
 
+example usage:
+
+#+BEGIN_SRC
+<!--$ nextline message=t.if(admin, 'Earl Grey' 'Jasmine') -->
+<h2>{message}</h2>
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+  "admin": 0
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+<h2>Earl Grey</h2>
+#+END_SRC
+
 *** Numbers
 
 You can use ordinal numbers in statements.
+**** TODO are numbers needed?
 
 #+BEGIN_SRC
 0, 1, 2, 3,...
 #+END_SRC
 
 *** Variables
+
+You assign variables to system variables to control how the
+command works and you use variables in the replacement block as
+content.
 
 The json files contain variables.  The keys are the variable
 names and their value becomes part of the template when they are
@@ -260,9 +288,9 @@ serverVar
 s.name
 #+END_SRC
 
-# Messages
+# Warning Messages
 
-When StaticTea detects a problem, a message is written to
+When StaticTea detects a problem, a warning message is written to
 standard error and processing continues. All issues are handled,
 usually by skipping the problem.
 
@@ -272,8 +300,8 @@ get output.
 StaticTea returns success (0) when no message get output, else it
 returns 1.
 
-The message tells the line of the issue and each message has its
-own number.
+The warning message show the line number of the problem
+happened. Every message has a unique number.
 
 example messages:
 
