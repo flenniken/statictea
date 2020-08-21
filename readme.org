@@ -52,14 +52,20 @@ StaticTea has four commands:
 - replace — replace a block of lines
 - # — comment
 
+You add statements to commands to control how it behaves.
+
 *** Nextline Command
 
 The nextline command tells the template system that the next line
-in the file has variable content.  The content comes from a
-variable that you wrap with brackets.
+in the file has variable content.
 
-In the following example there are two variables, the
-drink and drinkType variables:
+The content comes from text in the line and variables wrapped
+with brackets.
+
+In the following example there is some text and two variables, the
+drink and drinkType variables.
+
+template:
 
 #+BEGIN_SRC
 <!--$ nextline -->
@@ -88,6 +94,9 @@ block starts after the command and continues until another block
 line is found. It behaves like the nextline command except with
 multiple lines.
 
+The content comes from text in the block and variables wrapped
+with brackets.
+
 In the following example the block has two lines. The block
 contains three replacement variables, weekday, name and time.
 
@@ -97,7 +106,7 @@ template:
 <!--$ block -->
 Join our tea party on {weekday} at
 {name}'s house at {time}.
-<!--block -->
+<!-- block -->
 #+END_SRC
 
 json:
@@ -120,7 +129,8 @@ John's house at 5:00 pm.
 *** Replace Command
 
 The replace command replaces the replacement block with a
-variable's value.
+variable's value. You set the block content by assigning the
+t.content variable.
 
 The lines in the block mirror the variable so you can
 test the template as if it was a static file.
@@ -200,6 +210,7 @@ hello again
 #+END_SRC
 
 ** Types
+
 *** Strings
 
 You define a string using single or double quotes.
@@ -222,8 +233,8 @@ You can use ordinal numbers in statements.
 
 *** Variables
 
-The json file contain variables.  The keys are variable names and
-their value becomes part of the template when they are
+The json files contain variables.  The keys are the variable
+names and their value becomes part of the template when they are
 used. Internally two json namespace exists, one for the shared
 json and one for the server json.  You access the shared json
 with "s." and the server with no prefix.
@@ -232,8 +243,8 @@ StaticTea has a number of system variables. You access them in
 the t namespace, by using the prefix "t.".
 
 You can define new variables on the command's line. These
-variables are local to the block and take precedence over the json
-variables.
+variables are local to the block and take precedence over the
+json variables.
 
 You can define any number of variables that will fit on the
 line. You can put them on the end block if needed.
@@ -251,15 +262,18 @@ s.name
 
 # Messages
 
-When a problem is detected, a message is written to standard error
-and processing continues. All issues are handled, usually by
-skipping the problem.
+When StaticTea detects a problem, a message is written to
+standard error and processing continues. All issues are handled,
+usually by skipping the problem.
 
 It’s good style to change your template or json so no messages
 get output.
 
-StaticTea return code is success (0) when no message get output, else it
+StaticTea returns success (0) when no message get output, else it
 returns 1.
+
+The message tells the line of the issue and each message has its
+own number.
 
 example messages:
 
@@ -273,18 +287,23 @@ example messages:
 
 *** System Variables
 
-- t.list - the list used to repeat a the block for each elements
-  in the list
-- t.content - the content of a replace block
-- t.maxLines - the maximum number of lines before the block ends.
-- t.result - where the block goes, either the result file,
-  standard out or no where.
+You primarily use the system variables on a command line to
+control what the command does.
+
+System variables:
+
+- t.list - repeats the block for each item in a list.
+- t.maxLines - the max number of lines in the block.
+- t.result - defines whether the block goes to the result file,
+  standard out or nowhere.
+- t.content - defines what goes in the replace block.
 
 **** List Variable
 
-The list variable causes the line or block to be duplicated for
-each item in a list from the json file.  The json list contains a
-dictionary for each item.
+The list variable controls how many times the command's block
+repeats. You assign it with your list variable and the block
+repeats for each item in a list. The default is "" which means no
+repeat.
 
 For the following example, the list statement says to use
 email_list key. The result has two lines.
@@ -359,6 +378,10 @@ result:
 
 **** Max Lines Variable
 
+- t.maxLines - you assign the maxLines variable when the block
+  has more then 10 lines (the default). The number of lines in
+  the block is limited to this value.
+
 StaticTea reads lines looking for the terminating line a block or
 replace command. By default if the terminator is not found in 10
 lines, the 10 lines are used for the block and a warning is
@@ -370,6 +393,11 @@ variable.
 #+END_SRC
 
 **** Result Variable
+
+- t.result - you assign the result variable to determine where
+  the command's result goes, either the result file, standard out
+  or nowhere.
+
 
 The system result variable determines where the result goes.  By
 default it goes to the result file. You can also direct it to
@@ -444,6 +472,11 @@ result:
 
 **** Content Variable
 
+- t.content - you assign the content variable to your variable
+  when you want it to replace the whole replace block. The
+  default is "". The content variable only applies to the replace
+  command.
+
 The content variable defines what goes in the replace block.
 
 *** System Functions
@@ -464,46 +497,40 @@ email = t.row(0)
 email = t.row 0
 #+END_SRC
 
-**** Version Function
+**** Row Function
 
-You use the version function to verify that the version of
-StaticTea code you are running works with your template and to
-get the current version string.
+The special row function contains the row of the current list. You control the start number.
 
-The version function take to parameters, the minimum version and
-the maximum version, both are optional.
+- row — starts at 0
+- _row 0 — starts at 0
+- _row 1 — starts at 1
+- _row N — starts at N where N is some ordinal number.
 
-If the current version is below the minimum or above the maximum,
-the function outputs a message to standard out.
-
-You can use the function multiple times for fine grain checking.
-
-Below is typical useage:
+Here is an example using the row variable.
 
 template:
 
 #+BEGIN_SRC
-<--$ nextline version=t.version("1.2.3", "3.4.5") -->
-<-- StaticTea current version is: {version}. -->
+<!--$ nextline t.list=car_list -->
+<li>{t.row 1}. {car}</li>
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+  "car_list": [
+    {"car": "Tesla"},
+    {"car": "Ford"}
+  ]
+}
 #+END_SRC
 
 result:
 
 #+BEGIN_SRC
-<-- StaticTea current version is: 1.9.0. -->
-#+END_SRC
-
-If the current version is not between the min and max, a message
-is output to standard error.  Example messages:
-
-stdout:
-
-#+BEGIN_SRC
-template(line): the current version 4.0.2 is greater than the maximum
-allowed verion of 3.4.5.
-
-template(line): the current version 1.0.0 is less than the minumum
-allowed verion of 1.2.3.
+<li>1. Tesla</li>
+<li>2. Ford </li>
 #+END_SRC
 
 **** If Function
@@ -620,40 +647,46 @@ cat template.txt | statictea --template stdin --server server.json
 hello world
 #+END_SRC
 
-**** Row Function
+**** Version Function
 
-The special row function contains the row of the current list. You control the start number.
+You use the version function to verify that the version of
+StaticTea code you are running works with your template and to
+get the current version string.
 
-- row — starts at 0
-- _row 0 — starts at 0
-- _row 1 — starts at 1
-- _row N — starts at N where N is some ordinal number.
+The version function take to parameters, the minimum version and
+the maximum version, both are optional.
 
-Here is an example using the row variable.
+If the current version is below the minimum or above the maximum,
+the function outputs a message to standard out.
+
+You can use the function multiple times for fine grain checking.
+
+Below is typical useage:
 
 template:
 
 #+BEGIN_SRC
-<!--$ nextline t.list=car_list -->
-<li>{t.row 1}. {car}</li>
-#+END_SRC
-
-json:
-
-#+BEGIN_SRC
-{
-  "car_list": [
-    {"car": "Tesla"},
-    {"car": "Ford"}
-  ]
-}
+<--$ nextline version=t.version("1.2.3", "3.4.5") -->
+<-- StaticTea current version is: {version}. -->
 #+END_SRC
 
 result:
 
 #+BEGIN_SRC
-<li>1. Tesla</li>
-<li>2. Ford </li>
+<-- StaticTea current version is: 1.9.0. -->
+#+END_SRC
+
+If the current version is not between the min and max, a message
+is output to standard error.  Example messages:
+
+stdout:
+
+#+BEGIN_SRC
+template(line): the current version 4.0.2 is greater than the maximum
+allowed verion of 3.4.5.
+
+template(line): the current version 1.0.0 is less than the minumum
+allowed verion of 1.2.3.
 #+END_SRC
 
 ** Template Prefix Postfix
