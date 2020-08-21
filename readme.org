@@ -330,16 +330,16 @@ System variables:
 
 The list variable controls how many times the command's block
 repeats. You assign it with your list variable and the block
-repeats for each item in a list. The default is "" which means no
-repeat.
+repeats for each item in the list. The default is "" which means
+no repeat.
 
-For the following example, the list statement says to use
-email_list key. The result has two lines.
+For the following example, email_list is assigned to the list
+variable. The email_list has two items.
 
 template:
 
 #+BEGIN_SRC
-<!--$ nextline _list = email_list -->
+<!--$ nextline t.list = email_list -->
 Mail support at {email}.
 #+END_SRC
 
@@ -361,9 +361,8 @@ Mail support at steve@flenniken.net.
 Mail support at webmaster@google.com.
 #+END_SRC
 
-**** t.list example
-
-The following example builds a select list of cars where one car is selected.
+The following example builds a select list of cars where one car
+is selected.
 
 template:
 
@@ -406,15 +405,11 @@ result:
 
 **** Max Lines Variable
 
-- t.maxLines - you assign the maxLines variable when the block
-  has more then 10 lines (the default). The number of lines in
-  the block is limited to this value.
+StaticTea reads lines looking for the terminating command.  By
+default if the terminator is not found in 10 lines, the 10 lines
+are used for the block and a warning is output.
 
-StaticTea reads lines looking for the terminating line a block or
-replace command. By default if the terminator is not found in 10
-lines, the 10 lines are used for the block and a warning is
-output.  You can specify other values with the _max_lines
-variable.
+You can increase this value to support blocks with more lines.
 
 #+BEGIN_SRC
 <!--$ block _max_lines=20 -->
@@ -422,14 +417,9 @@ variable.
 
 **** Result Variable
 
-- t.result - you assign the result variable to determine where
-  the command's result goes, either the result file, standard out
-  or nowhere.
-
-
-The system result variable determines where the result goes.  By
-default it goes to the result file. You can also direct it to
-standard out or skip it.
+You assign the system result variable to control where
+replacement block's result goes, either the result file, standard
+out or nowhere. By default it goes to the result file.
 
 Result variable options:
 
@@ -500,12 +490,11 @@ result:
 
 **** Content Variable
 
-- t.content - you assign the content variable to your variable
-  when you want it to replace the whole replace block. The
-  default is "". The content variable only applies to the replace
-  command.
-
 The content variable defines what goes in the replace block.
+
+You assign your variable to the content variable and your
+variable's value replaces the whole replace block.  The default
+is "". The content variable only applies to the replace command.
 
 *** System Functions
 
@@ -563,14 +552,14 @@ result:
 
 **** If Function
 
-You can use an if statement in a template.
+You can use an if statement in a template statement.
 
-The general form of the if statement has three variable
-parameters.  If the first variable is true, the second variable
-is returned, else the third variable is returned.
+The general form of the if statement has three parameters.  If
+the first variable is true, the second parameter is returned, else
+the third parameter is returned.
 
-You can drop the third and second parameters and there are
-defaults for each case.
+You can drop the third and second parameters. Defaults are used
+for the missing parameters.
 
 When you drop both, 0 or 1 is returned. The following example
 uses the template system to show what happens when you drop the
@@ -717,7 +706,7 @@ template(line): the current version 1.0.0 is less than the minumum
 allowed verion of 1.2.3.
 #+END_SRC
 
-** Template Prefix Postfix
+** Prefix Postfix
 
 You specify the template commands as comments for the type of
 result file. This allows you to edit the template using its
@@ -782,12 +771,10 @@ For example, if a variable in a block is used but it doesn't
 exist, the variable remains as is and a message is output telling
 the line and variable missing.
 
-
-Note: when a variable is missing, empty or not a string, it is
-treated as a empty string.
-
 When the postfix is missing, the line command is still used, but
 a warning message is output.
+
+*** TODO add more later
 
 ** Run StaticTea
 
@@ -858,13 +845,3 @@ nextline {email = steve_email}
 nextline {email = _if admin one two}
 #+END_SRC
 
-** Tea References in Examples.
-
-  Use pictures too. teapot, Japanese tea hut
-
-** TODO Output to standard out when the result option is missing.
-** TODO Access items in the namespace with a dot, i.e.:
-   t.list, t.maxLines, etc
-** TODO Use standard in when the template parameter is called stdin.
-** TODO Errors on the command line use line(0) to standard out.
-** TODO Set error code
