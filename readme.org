@@ -1,8 +1,8 @@
 * StaticTea
 
-** A template processor and language. 
+** A template processor and language.
 
-StaticTea combines a template with data to produce a result. 
+StaticTea combines a template with data to produce a result.
 
 Example template:
 
@@ -25,7 +25,7 @@ hello world
 
 ** Basics
 
-You specify each template command on one line. The command 
+You specify each template command on one line. The command
 applies to the current line, next line or next block of
 lines (the replacement block) depending on the command.
 
@@ -47,7 +47,7 @@ they were static pages.
 
 StaticTea has four commands:
 
-- nextline — make substitutions in the next line 
+- nextline — make substitutions in the next line
 - block — make substitutions in the next block of lines
 - replace — replace a block of lines
 - # — comment
@@ -58,7 +58,7 @@ The nextline command tells the template system that the next line
 in the file has variable content.  The content comes from a
 variable that you wrap with brackets.
 
-In the following example there are two variables, the 
+In the following example there are two variables, the
 drink and drinkType variables:
 
 #+BEGIN_SRC
@@ -81,7 +81,7 @@ result:
 Drink tea -- Earl Grey is my favorite.
 #+END_SRC
 
-*** Block Command 
+*** Block Command
 
 The block command targets multiple lines for replacement. The
 block starts after the command and continues until another block
@@ -117,7 +117,7 @@ Join our tea party on Friday at
 John's house at 5:00 pm.
 #+END_SRC
 
-*** Replace Command 
+*** Replace Command
 
 The replace command replaces the replacement block with a
 variable's value.
@@ -200,6 +200,26 @@ hello again
 #+END_SRC
 
 ** Types
+*** Strings
+
+You define a string using single or double quotes.
+
+example strings:
+
+#+BEGIN_SRC
+"this is a string"
+"what's up?"
+'using single quote'
+#+END_SRC
+
+*** Numbers
+
+You can use ordinal numbers in statements.
+
+#+BEGIN_SRC
+0, 1, 2, 3,...
+#+END_SRC
+
 *** Variables
 
 The json file contain variables.  The keys are variable names and
@@ -243,35 +263,15 @@ returns 1.
 
 example messages:
 
-- template.html(45): w0001: email variable is missing from server.json. 
-- template.html(45): w0002: The command line's postfix is missing. 
+- template.html(45): w0001: email variable is missing from server.json.
+- template.html(45): w0002: The command line's postfix is missing.
 - template.html(45): w0003: The command line doesn't have a valid
   command.
-- template.html(45): w0004: unknown system variable t.asdf. 
-- template.html(45): w0005: server json file not found: asdf 
+- template.html(45): w0004: unknown system variable t.asdf.
+- template.html(45): w0005: server json file not found: asdf
 - template.html(45): w0006: unable to parse server.json
 
-*** Strings 
-
-You define a string using single or double quotes.
-
-example strings:
-
-#+BEGIN_SRC
-"this is a string"
-"what's up?"
-'using single quote'
-#+END_SRC
-
-*** Numbers
-
-You can use ordinal numbers in statements. 
-
-#+BEGIN_SRC
-0, 1, 2, 3,...
-#+END_SRC
-
-*** System Variables 
+*** System Variables
 
 - t.list - the list used to repeat a the block for each elements
   in the list
@@ -280,7 +280,7 @@ You can use ordinal numbers in statements.
 - t.result - where the block goes, either the result file,
   standard out or no where.
 
-**** List Variable 
+**** List Variable
 
 The list variable causes the line or block to be duplicated for
 each item in a list from the json file.  The json list contains a
@@ -312,6 +312,49 @@ result:
 #+BEGIN_SRC
 Mail support at steve@flenniken.net.
 Mail support at webmaster@google.com.
+#+END_SRC
+
+**** t.list example
+
+The following example builds a select list of cars where one car is selected.
+
+template:
+
+#+BEGIN_SRC
+<h4>Car List</h3>
+<select>
+<!--$ nextline t.list=car_list current=t.if( selected 'selected="selected"') -->
+  <option{current}>{car}</option>
+</select>
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+"car_list": [
+    {"car": "vwbug"},
+    {"car": "corvete"},
+    {"car": "mazda"},
+    {"car": "ford pickup"},
+    {"car": "BMW", "selected": 1},
+    {"car": "Honda"}
+  ]
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+<h3>Car List</h3>
+<select>
+  <option>vwbug</option>
+  <option>corvete</option>
+  <option>mazda</option>
+  <option>ford pickup</option>
+  <option selected="selected">BMW</option>
+  <option>Honda</option>
+</select>
 #+END_SRC
 
 **** Max Lines Variable
@@ -399,11 +442,11 @@ result:
 </ul>
 #+END_SRC
 
-** Content Variable
+**** Content Variable
 
 The content variable defines what goes in the replace block.
 
-** System Functions
+*** System Functions
 
 There are three built in system functions:
 
@@ -421,7 +464,7 @@ email = t.row(0)
 email = t.row 0
 #+END_SRC
 
-** Version Function
+**** Version Function
 
 You use the version function to verify that the version of
 StaticTea code you are running works with your template and to
@@ -431,7 +474,7 @@ The version function take to parameters, the minimum version and
 the maximum version, both are optional.
 
 If the current version is below the minimum or above the maximum,
-the function outputs a message to standard out. 
+the function outputs a message to standard out.
 
 You can use the function multiple times for fine grain checking.
 
@@ -463,9 +506,9 @@ template(line): the current version 1.0.0 is less than the minumum
 allowed verion of 1.2.3.
 #+END_SRC
 
-*** If Function 
+**** If Function
 
-You can use an if statement in a template. 
+You can use an if statement in a template.
 
 The general form of the if statement has three variable
 parameters.  If the first variable is true, the second variable
@@ -523,7 +566,7 @@ t.if(1)          -> 0
 # StaticTea as a Filter
 
 You can use the statictea command as a filter and pipe template
-lines to it and see the result output on the screen.  
+lines to it and see the result output on the screen.
 
 You can try out the examples in the document by copy and pasting
 into a posix terminal window.
@@ -559,11 +602,11 @@ $ cat <<EOF >template.txt
 > <!--$ nextline -->
 > hello {name}
 > EOF
-$                                                                                                        
+$
 $ cat <<EOF >server.json
 > {"name": "world"}
 > EOF
-$                                                                                                        
+$
 $ statictea --template template.txt --server server.json
 hello world
 #+END_SRC
@@ -577,58 +620,14 @@ cat template.txt | statictea --template stdin --server server.json
 hello world
 #+END_SRC
 
+**** Row Function
 
-** t.list example
-
-The following example builds a select list of cars where one car is selected.
-
-template:
-
-#+BEGIN_SRC
-<h4>Car List</h3>
-<select>
-<!--$ nextline t.list=car_list current=t.if( selected 'selected="selected"') -->
-  <option{current}>{car}</option>
-</select>
-#+END_SRC
-
-json:
-
-#+BEGIN_SRC
-{
-"car_list": [
-    {"car": "vwbug"},
-    {"car": "corvete"},
-    {"car": "mazda"},
-    {"car": "ford pickup"},
-    {"car": "BMW", "selected": 1},
-    {"car": "Honda"}
-  ]
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-<h3>Car List</h3>
-<select>
-  <option>vwbug</option>
-  <option>corvete</option>
-  <option>mazda</option>
-  <option>ford pickup</option>
-  <option selected="selected">BMW</option>
-  <option>Honda</option>
-</select>
-#+END_SRC
-
-*** Row Function
-
-The special row function contains the row of the current list. You control the start number. 
+The special row function contains the row of the current list. You control the start number.
 
 - row — starts at 0
 - _row 0 — starts at 0
 - _row 1 — starts at 1
-- _row N — starts at N where N is some ordinal number. 
+- _row N — starts at N where N is some ordinal number.
 
 Here is an example using the row variable.
 
@@ -657,7 +656,7 @@ result:
 <li>2. Ford </li>
 #+END_SRC
 
-** Template Prefix Postfix 
+** Template Prefix Postfix
 
 You specify the template commands as comments for the type of
 result file. This allows you to edit the template using its
@@ -729,7 +728,6 @@ treated as a empty string.
 When the postfix is missing, the line command is still used, but
 a warning message is output.
 
-
 ** Run StaticTea
 
 You run StaticTea from the command line. The example below shows
@@ -746,7 +744,7 @@ standard out.
 - It you specify "stdin" for the template, the template comes
   from stdin.
 
-** Options
+*** Options
 
 The StaticTea command line options:
 
@@ -772,7 +770,7 @@ nextline = "nextline" [s variable ]*
 block = "block" [s variable ]*
 shared = "shared" [s variable]+
 
-list = "_list" os "=" os right_side 
+list = "_list" os "=" os right_side
 
 variable = "{" os name os "}"
 
@@ -803,31 +801,9 @@ nextline {email = _if admin one two}
 
   Use pictures too. teapot, Japanese tea hut
 
-** TODO test all examples.
 ** TODO Output to standard out when the result option is missing.
-** TODO Output warnings to standard error.
-** TODO Use the t namespace for system symbols.
-** TODO Use the s namespace for the shared json.
-** TODO Use the d namespace (or nothing) for the server json.
 ** TODO Access items in the namespace with a dot, i.e.:
    t.list, t.maxLines, etc
 ** TODO Use standard in when the template parameter is called stdin.
 ** TODO Errors on the command line use line(0) to standard out.
 ** TODO Set error code
-** add version command: version minVersion maxVersion
-The version outputs a warning when the current version is outside
-the range.
-** TODO add version variable: t.version
-** TODO add warning command? 
-or command statement?  these go to standard error with normal replacement behavior.
-
-
-StaticTea processes the template one line at a time with one pass
-through the file and it only needs to keep the current
-
-It only keeps the current replacement lines in memory so it can
-handle large template files with little resources.
-
-Chai
-Oolong
-Jasmine
