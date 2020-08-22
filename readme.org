@@ -56,12 +56,13 @@ You add statements to commands to control how it behaves and to
 define variables. You use commas to separate statements. You can
 continue the line with the "\" character at the end.
 
-example commands:
+example command lines:
 
 #+BEGIN_SRC
 <!--$ nextline -->
-
-<!--$ nextline t.list = locations, tea="Darjeeling" -->
+<!--$ block t.list = teaProducingCountries, tea="Darjeeling" -->
+<!--$ replace t.content = header -->
+<!--$ # this is a comment command -->
 #+END_SRC
 
 *** Nextline Command
@@ -223,8 +224,15 @@ hello again
 ** Long Lines
 
 You can continue a command line with the "\" character at the end
-before the postfix. The the continuation line contains the prefix and postfix
-but not the command keyword. You can continue the line multiple times.
+before the postfix. The following continuation line contains the
+prefix and postfix but not the command keyword. You can continue
+the line multiple times.
+
+Template command lines length is limited to MaxCommandLineLength.
+The number of continuation lines is limited to MaxContinuationLines.
+
+In the following example the nextline command continues on a
+second line.
 
 template:
 
@@ -628,12 +636,16 @@ the function outputs a message to standard out.
 
 You can use the function multiple times for fine grain checking.
 
+StaticTea uses [[https://semver.org/] Semantic Versioning] with
+the added restriction that each version component is limited to
+three digits.
+
 Below is typical useage:
 
 template:
 
 #+BEGIN_SRC
-<--$ nextline version=t.version("1.2.3", "3.4.5") -->
+<--$ nextline version=t.version("1.20.3", "3.4.005") -->
 <-- StaticTea current version is: {version}. -->
 #+END_SRC
 
