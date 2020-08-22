@@ -26,8 +26,8 @@ hello world
 ** Basics
 
 You specify each template command on one line. The command
-applies to the current line, next line or next block of
-lines (the replacement block) depending on the command.
+applies to the current line, next line or next block of lines
+(the replacement block) depending on the command.
 
 You use variables in brackets to mark locations in the
 replacement block for replacement. These variables typically get
@@ -52,7 +52,16 @@ StaticTea has four commands:
 - replace — replace a block of lines
 - # — comment
 
-You add statements to commands to control how it behaves.
+You add statements to commands to control how it behaves and to
+define variables. You use commas to separate statements.
+
+example commands:
+
+#+BEGIN_SRC
+<!--$ nextline -->
+
+<!--$ nextline t.list = locations, tea="Darjeeling" -->
+#+END_SRC
 
 *** Nextline Command
 
@@ -228,7 +237,7 @@ example strings:
 example usage:
 
 #+BEGIN_SRC
-<!--$ nextline message=t.if(admin, 'Earl Grey' 'Jasmine') -->
+<!--$ nextline message=t.if(admin, 'Earl Grey', 'Jasmine') -->
 <h2>{message}</h2>
 #+END_SRC
 
@@ -236,7 +245,7 @@ json:
 
 #+BEGIN_SRC
 {
-  "admin": 0
+  "admin": 1
 }
 #+END_SRC
 
@@ -248,8 +257,8 @@ result:
 
 *** Numbers
 
-You can use ordinal numbers in statements.
-**** TODO are numbers needed?
+You can use ordinal numbers in statements. You use them with the
+row function and 0, 1 for false and true.
 
 #+BEGIN_SRC
 0, 1, 2, 3,...
@@ -257,18 +266,19 @@ You can use ordinal numbers in statements.
 
 *** Variables
 
-You assign variables to system variables to control how the
-command works and you use variables in the replacement block as
-content.
+You use variables for dynamic replacement block content and to
+control how a command works.
 
-The json files contain variables.  The keys are the variable
-names and their value becomes part of the template when they are
-used. Internally two json namespace exists, one for the shared
-json and one for the server json.  You access the shared json
-with "s." and the server with no prefix.
+You specify variables in json files or you create them in
+template statements.
 
-StaticTea has a number of system variables. You access them in
-the t namespace, by using the prefix "t.".
+A json dictionary keys are the variable names and their value
+becomes part of the template when they are used.
+
+Internally two json namespace exists, one for the shared json and
+one for the server json.  You access the shared json with "s."
+prefix the system variables with "t." and you access the server
+variables with no prefix.
 
 You can define new variables on the command's line. These
 variables are local to the block and take precedence over the
@@ -297,11 +307,14 @@ usually by skipping the problem.
 It’s good style to change your template or json so no messages
 get output.
 
-StaticTea returns success (0) when no message get output, else it
+StaticTea returns success, 0, when no message get output, else it
 returns 1.
 
 The warning message show the line number of the problem
-happened. Every message has a unique number.
+happened. Every message has a unique number which doesn't
+change. The message may change to a different language, to fix
+grammer etc. and should not be counted on to remain
+unchanged. All new messages get added to the bottom.
 
 example messages:
 
@@ -369,7 +382,7 @@ template:
 #+BEGIN_SRC
 <h4>Car List</h3>
 <select>
-<!--$ nextline t.list=car_list current=t.if( selected 'selected="selected"') -->
+<!--$ nextline t.list=car_list, current=t.if( selected 'selected="selected"') -->
   <option{current}>{car}</option>
 </select>
 #+END_SRC
@@ -565,10 +578,14 @@ When you drop both, 0 or 1 is returned. The following example
 uses the template system to show what happens when you drop the
 t.if parameters.
 
+The condition is true when it is 1 or true, else it is false.
+
+***** TODO exists, len functions?
+
 template:
 
 #+BEGIN_SRC
-<--$ block var1=t.if(cond0 dog cat) var2=t.if(cond0 dog) var3=t.if(cond0) -->
+<--$ block var1=t.if(cond0 dog cat), var2=t.if(cond0 dog), var3=t.if(cond0) -->
 
 t.if({cond0} dog cat) -> {var1}
 t.if({cond0} dog)     -> {var2}
@@ -578,7 +595,7 @@ t.if({cond1} dog cat) -> {var4}
 t.if({cond1} dog)     -> {var5}
 t.if({cond1})         -> {var6}
 
-<--$ block var4=t.if(cond0 dog cat) var5=t.if(cond0 dog) var6=t.if(cond0) -->
+<--$ block var4=t.if(cond0 dog cat), var5=t.if(cond0 dog), var6=t.if(cond0) -->
 #+END_SRC
 
 json:
@@ -602,7 +619,7 @@ t.if(0)          -> 0
 
 t.if(1 dog cat) -> dog
 t.if(1 dog)      -> dog
-t.if(1)          -> 0
+t.if(1)          -> 1
 
 #+END_SRC
 
@@ -612,25 +629,19 @@ t.if(1)          -> 0
 You can use the statictea command as a filter and pipe template
 lines to it and see the result output on the screen.
 
-You can try out the examples in the document by copy and pasting
-into a posix terminal window.
-
-The examples use the Here Document feature to easily create
-multi-line templates. The following shows a simple Here Document
-that pipes three lines, to the wc command which reports the
-number of lines.
-
-Here is an example you can copy and paste into your terminal. It
+Below is an example you can copy and paste into your terminal. It
 creates a template.txt file containing two lines, then it creates
 the server.json file containing one line, then it runs statictea
-using those files.
+using those files and the result goes to the screen.
 
 #+BEGIN_SRC
+# create template file
 cat <<EOF >template.txt
 <!--$ nextline -->
 hello {name}
 EOF
 
+# create server json file
 cat <<EOF >server.json
 {"name": "world"}
 EOF
@@ -655,8 +666,8 @@ $ statictea --template template.txt --server server.json
 hello world
 #+END_SRC
 
-The following example uses statictea as a filter and pipes to it the
-template.txt file created in the last example:
+The following example pipes template.txt to statictea. The result
+goes to the screen.
 
 #+BEGIN_SRC
 cat template.txt | statictea --template stdin --server server.json
@@ -666,12 +677,15 @@ hello world
 
 **** Version Function
 
-You use the version function to verify that the version of
-StaticTea code you are running works with your template and to
-get the current version string.
+You use the version function to get the current version of
+StaticTea or to verify that the version you are running works
+with your template.
 
-The version function take to parameters, the minimum version and
-the maximum version, both are optional.
+The version function takes 0, 1 or 2 parameters. The first parameter
+is the minimum version supported and the second parameter is the
+maximum version supported.
+
+The default minimum is 0.0.0 and the default maximum is anything.
 
 If the current version is below the minimum or above the maximum,
 the function outputs a message to standard out.
@@ -767,14 +781,12 @@ When StaticTea encounters an error, it outputs a message to
 standard error and continues.  It skips the element with the
 problem using some default.
 
-For example, if a variable in a block is used but it doesn't
-exist, the variable remains as is and a message is output telling
-the line and variable missing.
+For example, if a variable in a replacement block is used but it
+doesn't exist, the variable remains as is and a message is output
+telling the line and variable missing.
 
 When the postfix is missing, the line command is still used, but
 a warning message is output.
-
-*** TODO add more later
 
 ** Run StaticTea
 
@@ -797,51 +809,41 @@ standard out.
 The StaticTea command line options:
 
 - help - show the usage and options.
-- version -outputs the version number to standard out and exits.
+- version - outputs the version number to standard out and exits.
 - server - the server json file. You can specify multiple files.
 - shared - the shared json file. You can specify multiple files.
 - update - update the template replace blocks.
+
+*** General Limits
+
+- max command line length
+- max number of shared variables
+- max number of server variables
+- max replacement block size in bytes
 
 ** Template Specification
 
 #+BEGIN_SRC
 template = [line]*
-line = prefix os commands os postfix
-s = [" " | tab]+
-os = [" " | tab]*
-
-commands = nextline | block | comment | skip | shared
-
-skip = .*
-comment = "#" .*
-nextline = "nextline" [s variable ]*
-block = "block" [s variable ]*
-shared = "shared" [s variable]+
-
-list = "_list" os "=" os right_side
-
-variable = "{" os name os "}"
-
-name = key | row
-row = "_row" [0-9]+
-key =  ["_shared" s] [a-zA-Z]+[a-zA-Z0-9_]*
-
-
-replace = key os "=" os right_side
-right_side = name | string | if
-
-string = "_string(" .* ")"
- if = "_if" s name s name s name
-
+line = text | replacementLine | commandLine
+text = .*
+replacementLine = [text [bracketedVar]]*
+bracketedVar = "{" os rightSide os "}"
+commandLine = prefix s command [os "," os statement]* s postfix
+space = " " | tab
+s = [space]+
+os = [space]*
+command = "nextline" | "block" | "replace" | "#"
+statement = variable os "=" os rightSide
+variable = [namespace][a-zA-Z]+[a-zA-Z0-9_]*
+namespace = "t." | "s."
+rightSide = number | string | variable | function
+number = [0-9]+
+string = " .* " | ' .* '
+function = row | version | if
+row =  "t.row" [s number] | "t.row" os "(" os [number] os ")"
+version = "t.version" [s minVersion] | "t.version" os "(" os [minVersion [os "," os maxVersion]] os ")"
+if = "t.if" rightSide | "t.if" os "(" os rightSide [os "," os rightSide [os "," os rightSide]] os ")" 
 #+END_SRC
 
-
-#+BEGIN_SRC
-nextline {email}
-nextline {_row 78}
-nextline {_shared header}
-nextline {email = "hello"}
-nextline {email = steve_email}
-nextline {email = _if admin one two}
-#+END_SRC
-
+** TODO encodings?
