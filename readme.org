@@ -53,7 +53,8 @@ StaticTea has four commands:
 - # — comment
 
 You add statements to commands to control how it behaves and to
-define variables. You use commas to separate statements.
+define variables. You use commas to separate statements. You can
+continue the line with the "\" character at the end.
 
 example commands:
 
@@ -219,6 +220,26 @@ result:
 hello again
 #+END_SRC
 
+** Long Lines
+
+You can continue a command line with the "\" character at the end
+before the postfix. The the continuation line contains the prefix and postfix
+but not the command keyword. You can continue the line multiple times.
+
+template:
+
+#+BEGIN_SRC
+<!--$ nextline \-->
+<!--$ tea = 'Earl Grey' -->
+{tea}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+Earl Grey
+#+END_SRC
+
 ** Types
 
 *** Strings
@@ -258,10 +279,20 @@ result:
 *** Numbers
 
 You can use ordinal numbers in statements. You use them with the
-row function and 0, 1 for false and true.
+row function and 0, 1 for false and true. Numbers are limited to
+5 digits.
 
 #+BEGIN_SRC
-0, 1, 2, 3,...
+0, 1, 2, 3,...,99999
+#+END_SRC
+
+Example numbers:
+
+#+BEGIN_SRC
+12345
+0
+8823
+42
 #+END_SRC
 
 *** Variables
@@ -542,7 +573,7 @@ template:
 
 #+BEGIN_SRC
 <!--$ nextline t.list=car_list -->
-<li>{t.row 1}. {car}</li>
+<li id="r{t.row}>{t.row 1}. {car}</li>
 #+END_SRC
 
 json:
@@ -559,8 +590,8 @@ json:
 result:
 
 #+BEGIN_SRC
-<li>1. Tesla</li>
-<li>2. Ford </li>
+<li id="r0">1. Tesla</li>
+<li id="r1">2. Ford </li>
 #+END_SRC
 
 **** If Function
@@ -580,12 +611,59 @@ t.if parameters.
 
 The condition is true when it is 1 or true, else it is false.
 
-***** TODO exists, len functions?
+**** Version Function
+
+You use the version function to get the current version of
+StaticTea or to verify that the version you are running works
+with your template.
+
+The version function takes 0, 1 or 2 parameters. The first parameter
+is the minimum version supported and the second parameter is the
+maximum version supported.
+
+The default minimum is 0.0.0 and the default maximum is anything.
+
+If the current version is below the minimum or above the maximum,
+the function outputs a message to standard out.
+
+You can use the function multiple times for fine grain checking.
+
+Below is typical useage:
 
 template:
 
 #+BEGIN_SRC
-<--$ block var1=t.if(cond0 dog cat), var2=t.if(cond0 dog), var3=t.if(cond0) -->
+<--$ nextline version=t.version("1.2.3", "3.4.5") -->
+<-- StaticTea current version is: {version}. -->
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+<-- StaticTea current version is: 1.9.0. -->
+#+END_SRC
+
+If the current version is not between the min and max, a message
+is output to standard error.  Example messages:
+
+stdout:
+
+#+BEGIN_SRC
+template(line): the current version 4.0.2 is greater than the maximum
+allowed verion of 3.4.5.
+
+template(line): the current version 1.0.0 is less than the minumum
+allowed verion of 1.2.3.
+#+END_SRC
+
+**** TODO exists, len functions?
+
+template:
+
+#+BEGIN_SRC
+<--$ block \-->
+<--$ var1=t.if(cond0 dog cat), var2=t.if(cond0 dog), var3=t.if(cond0) \-->
+<--$ var4=t.if(cond0 dog cat), var5=t.if(cond0 dog), var6=t.if(cond0) -->
 
 t.if({cond0} dog cat) -> {var1}
 t.if({cond0} dog)     -> {var2}
@@ -595,7 +673,7 @@ t.if({cond1} dog cat) -> {var4}
 t.if({cond1} dog)     -> {var5}
 t.if({cond1})         -> {var6}
 
-<--$ block var4=t.if(cond0 dog cat), var5=t.if(cond0 dog), var6=t.if(cond0) -->
+<--$ block -->
 #+END_SRC
 
 json:
@@ -673,51 +751,6 @@ goes to the screen.
 cat template.txt | statictea --template stdin --server server.json
 
 hello world
-#+END_SRC
-
-**** Version Function
-
-You use the version function to get the current version of
-StaticTea or to verify that the version you are running works
-with your template.
-
-The version function takes 0, 1 or 2 parameters. The first parameter
-is the minimum version supported and the second parameter is the
-maximum version supported.
-
-The default minimum is 0.0.0 and the default maximum is anything.
-
-If the current version is below the minimum or above the maximum,
-the function outputs a message to standard out.
-
-You can use the function multiple times for fine grain checking.
-
-Below is typical useage:
-
-template:
-
-#+BEGIN_SRC
-<--$ nextline version=t.version("1.2.3", "3.4.5") -->
-<-- StaticTea current version is: {version}. -->
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-<-- StaticTea current version is: 1.9.0. -->
-#+END_SRC
-
-If the current version is not between the min and max, a message
-is output to standard error.  Example messages:
-
-stdout:
-
-#+BEGIN_SRC
-template(line): the current version 4.0.2 is greater than the maximum
-allowed verion of 3.4.5.
-
-template(line): the current version 1.0.0 is less than the minumum
-allowed verion of 1.2.3.
 #+END_SRC
 
 ** Prefix Postfix
@@ -814,36 +847,95 @@ The StaticTea command line options:
 - shared - the shared json file. You can specify multiple files.
 - update - update the template replace blocks.
 
-*** General Limits
+** General Limits
 
 - max command line length
+- max continuation lines per command
 - max number of shared variables
 - max number of server variables
 - max replacement block size in bytes
+- max literal string length
+- max literal number length
+- max literal name length
+- max json key name length
+- max json string value length
+- max json size in bytes
 
-** Template Specification
+Templates are utf-8 encoded or it's subset ascii.  Three line
+endings are supported, LF, CR LF, or CR on all platforms.
+
+StaticTea checkes the json file size and if within the limit it
+reads it and adds its elements to the shared or server
+dictionaries. Duplicate elements overwrite existing elements.  If
+a json key length or string value exceeds a limit, it is skipped
+and a warning is output.
+
+StaticTea processes template lines. The is not limit on the size
+of the template.  It reads lines
+
+
+** Template Regular Expressions
+
+Literal numbers are small ordinal numbers, 0,1,2,...,99999.
+
+number = ^[0-9]{1,5}$
+
+Literal strings are 0 to 60 characters long. You wrap them with
+single or double quotes.
+
+string = ^["][^"]*["]{0,60}|['][^']{0,60}[']$
+
+Literal name starts with a letter followed by letters, digits or
+underscores and they are limited to 1 to 32 characters.
+
+Literal name = ^[a-zA-Z][a-zA-Z0-9_]{0,31}$
+
+A namespace is "t." or "s.".
+
+namespace = ^t\.$|^s\.$
+
+A literal variable starts with an optional namespace followed by a name.
+
+variable = [namespace] name
+
+A command is "nextline", "block", "replace" or "#".
+
+command = ^nextline$|^block$|^replace$|^#$
+
+A row function is row(number) where the number is optional and
+you can drop the parentheses.
+
+row function = ^row$|^row[\s]+[number]$|^row[\s]*\([\s]*[number]{0,1}[\s]*\)$
+
+A vstring (version string) is 1 to 3 digits three times with a
+period between them. "ddd.ddd.ddd"
+
+vstring = ^'\d{1,3}\.\d{1,3}\.\d{1,3}'$|^"\d{1,3}\.\d{1,3}\.\d{1,3}"$
+
+A version function is "version" or "version(vstring, vstring)" where
+the vstrings are optional and you can drop the parentheses when
+there is only one parameter.
+
+version function = ^version$|^version[\s]+[vstring]+$|^row[\s]*\([\s]*[number]*[\s]*\)$
+
+if function =
 
 #+BEGIN_SRC
 template = [line]*
 line = text | replacementLine | commandLine
 text = .*
 replacementLine = [text [bracketedVar]]*
+replacementLine = text | [text] bracketedVar [text]
 bracketedVar = "{" os rightSide os "}"
 commandLine = prefix s command [os "," os statement]* s postfix
 space = " " | tab
 s = [space]+
 os = [space]*
-command = "nextline" | "block" | "replace" | "#"
 statement = variable os "=" os rightSide
 variable = [namespace][a-zA-Z]+[a-zA-Z0-9_]*
 namespace = "t." | "s."
 rightSide = number | string | variable | function
-number = [0-9]+
-string = " .* " | ' .* '
 function = row | version | if
 row =  "t.row" [s number] | "t.row" os "(" os [number] os ")"
-version = "t.version" [s minVersion] | "t.version" os "(" os [minVersion [os "," os maxVersion]] os ")"
-if = "t.if" rightSide | "t.if" os "(" os rightSide [os "," os rightSide [os "," os rightSide]] os ")" 
+if = "t.if" rightSide | "t.if" os "(" os rightSide [os "," os rightSide [os "," os rightSide]] os ")"
 #+END_SRC
-
-** TODO encodings?
