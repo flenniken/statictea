@@ -26,10 +26,10 @@ hello world
 ** Basics
 
 You specify each template command on one line. The command
-applies to the current line, next line or next block of lines
-(the replacement block) depending on the command.
+applies to the current line, the next line or the next block of
+lines called the replacement block.
 
-You use variables in brackets to mark locations in the
+You use variables in brackets to identify locations in the
 replacement block for replacement. These variables typically get
 replaced by their associated json value.
 
@@ -48,10 +48,10 @@ they were static pages.
 StaticTea commands:
 
 - nextline — make substitutions in the next line
-- block — mark start of block for substitutions
-- endblock - mark end of block
-- replace — mark start of block for replacement
-- endreplace - mark end of replace block
+- block — make substitutions in the next block of lines
+- endblock - end of block
+- replace — replace block with a variable
+- endreplace - end of replace block
 - # — comment
 
 You add statements to commands to control how it behaves and to
@@ -60,8 +60,8 @@ continue the line with the "\\" character at the end.
 
 You use the block and replace commands to define the start and
 end points of the replacement block.  You end the block command
-with another block command and you end the replace block with
-another replace command. No statements are allowed on the ending
+with the endblock command and you end the replace block with
+the endreplace command. No statements are allowed on the end
 commands.
 
 example command lines:
@@ -109,7 +109,7 @@ Drink tea -- Earl Grey is my favorite.
 *** Block Command
 
 The block command targets multiple lines for replacement. The
-block starts after the command and continues until another block
+block starts after the command and continues until the endblock
 line is found. It behaves like the nextline command except with
 multiple lines.
 
@@ -218,8 +218,8 @@ character. They do not appear in the result.
 template:
 
 #+BEGIN_SRC
-<!--$# This is a comment. -->
 <!--$ # This is a comment. -->
+<!--$ # How you make tea. -->
 You make Oolong Tea in five time intensive steps.
 #+END_SRC
 
@@ -236,8 +236,9 @@ before the postfix. The following continuation line contains the
 prefix and postfix but not the command keyword. You can continue
 the line multiple times.
 
-Template command lines length is limited to maxCommandLineLength.
-The number of continuation lines is limited to maxContinuationLines.
+The template's command line length is limited to
+maxCommandLineLength characters and number of continuation lines
+is limited to maxContinuationLines lines.
 
 In the following example the nextline command continues on a
 second line.
@@ -268,7 +269,7 @@ StaticTea has three types:
 
 You define a string using single or double quotes. You use
 strings in command statements. The literal strings you define are
-limited to maxStringLength.
+limited to maxStringLength characters.
 
 example strings:
 
@@ -300,8 +301,8 @@ result:
 *** Numbers
 
 You can use ordinal numbers in statements. You use them with the
-row function and 0, 1 for false and true. Numbers are limited to
-5 digits.
+row function and you use 0, 1 in if statements for false and
+true. Numbers are limited to maxNumberDigits digits.
 
 #+BEGIN_SRC
 0, 1, 2, 3,...,99999
@@ -327,14 +328,14 @@ template statements.
 A json dictionary keys are the variable names and their value
 becomes part of the template when they are used.
 
-Internally two json namespace exists, one for the shared json and
+Internally two json namespaces exist, one for the shared json and
 one for the server json.  You access the shared json with "s."
 prefix the system variables with "t." and you access the server
 variables with no prefix.
 
-You can define new variables on the command's line. These
-variables are local to the block and take precedence over the
-json variables.
+You can define new variables on the command line in
+statements. These variables are local to the block and take
+precedence over the json variables.
 
 You can define any number of variables that will fit on the
 line.
@@ -371,7 +372,7 @@ repeats for each item in the list. The default is 0 which means
 no repeat.
 
 For the following example, tea_list is assigned to the list
-variable. The tea_list has two items.
+variable. The tea_list has five items.
 
 template:
 
@@ -448,14 +449,14 @@ result:
 
 **** Max Lines Variable
 
-StaticTea reads lines looking for the terminating command.  By
-default if the terminator is not found in 10 lines, the 10 lines
-are used for the block and a warning is output.
+StaticTea reads lines looking for the endblock or endreplace
+commands.  By default if it is not found in 10 lines, the 10
+lines are used for the block and a warning is output.
 
 You can increase this value to support blocks with more lines.
 
 #+BEGIN_SRC
-<!--$ block _max_lines=20 -->
+<!--$ block t.maxLines=20 -->
 #+END_SRC
 
 **** Result Variable
@@ -537,7 +538,8 @@ The content variable defines what goes in the replace block.
 
 You assign your variable to the content variable and your
 variable's value replaces the whole replace block.  The default
-is 0. The content variable only applies to the replace command.
+is 0, which mean the block is replaced with nothing. The content
+variable only applies to the replace command.
 
 **** System Variable Values
 
@@ -625,8 +627,8 @@ result:
 #+BEGIN_SRC
   <li id="r0">1. Mighty Leaf Tea</li>
   <li id="r1">2. Numi Organic Tea</li>
-  <li id="r1">3. Peet's Coffee & Tea</li>
-  <li id="r1">4. Red Diamond</li>
+  <li id="r2">3. Peet's Coffee & Tea</li>
+  <li id="r3">4. Red Diamond</li>
 #+END_SRC
 
 **** If Function
@@ -634,20 +636,49 @@ result:
 You can use an if statement in a template statement to create or
 assign a variable.
 
-The general form of the if statement has three parameters.  If
-the first variable is true, the second parameter is returned, else
-the third parameter is returned.
+The general form of the if statement has three parameters. The
+first variable is the condition, the second is the true case and
+the third is the false case. When the condition is true, the
+second parameter is returned, else the third parameter is
+returned.
 
-You can drop the third and second parameters. The default of 0 is
-returned for the missing parameters.
-
-When you drop both, 0 or 1 is returned. The following example
-uses the template system to show what happens when you drop the
-t.if parameters.
+You can drop the third and/or the second parameter. The default
+of 0 is returned for the missing parameters.
 
 The condition is true when it is 1 or true, else it is false.
 
+The following example uses the template system to show how it
+works and what happens when you drop the t.if parameters.
 
+template:
+
+#+BEGIN_SRC
+<--$ block \-->
+<--$ var1=t.if(0, 'dog', 'cat'), var2=t.if(0, 'dog'), var3=t.if(0) \-->
+<--$ var4=t.if(1, 'dog', 'cat'), var5=t.if(1, 'dog'), var6=t.if(1) -->
+
+t.if(0, 'dog', 'cat') -> {var1}
+t.if(0, 'dog')        -> {var2}
+t.if(0)               -> {var3}
+
+t.if(1, 'dog', 'cat') -> {var4}
+t.if(1, 'dog')        -> {var5}
+t.if(1)               -> {var6}
+<--$ endblock -->
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+
+t.if(0, 'dog', 'cat') -> cat
+t.if(0, 'dog')        -> 0
+t.if(0)               -> 0
+
+t.if(1, 'dog', 'cat') -> dog
+t.if(1, 'dog')        -> dog
+t.if(1)               -> 1
+#+END_SRC
 
 **** Version Function
 
@@ -699,37 +730,6 @@ allowed verion of 1.2.3.
 #+END_SRC
 
 **** TODO exists, len functions?
-
-template:
-
-#+BEGIN_SRC
-<--$ block \-->
-<--$ var1=t.if(0, 'dog', 'cat'), var2=t.if(0, 'dog'), var3=t.if(0) \-->
-<--$ var4=t.if(1, 'dog', 'cat'), var5=t.if(1, 'dog'), var6=t.if(1) -->
-
-t.if(0, 'dog', 'cat') -> {var1}
-t.if(0, 'dog')        -> {var2}
-t.if(0)               -> {var3}
-
-t.if(1, 'dog', 'cat') -> {var4}
-t.if(1, 'dog')        -> {var5}
-t.if(1)               -> {var6}
-<--$ endblock -->
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-
-t.if(0, 'dog', 'cat') -> cat
-t.if(0, 'dog')        -> 0
-t.if(0)               -> 0
-
-t.if(1, 'dog', 'cat') -> dog
-t.if(1, 'dog')        -> dog
-t.if(1)               -> 1
-#+END_SRC
-
 
 ** StaticTea as a Filter
 
@@ -784,10 +784,10 @@ hello world
 
 ** Prefix Postfix
 
-You specify the template commands as comments for the type of
-result file. This allows you to edit the template using its
-native editor.  For example, you can edit an html template with
-an html editor.
+You make the template commands look like comments for your
+template file type. This allows you to edit the template using
+its native editor and run other native tools.  For example, you
+can edit StaticTea html template with an html editor.
 
 Comment syntax varies depending on the type of template file and
 sometimes depending on the location within the file. StaticTea
@@ -834,9 +834,10 @@ variables are referenced with the json key names.
 The shared json file is specified with the shared option. Its
 variables are referenced with the "s." namespace.
 
-You can specify multiple files of both types. Internally there is
-one dictionary for the server and one for the shared. The files
-get added from left to right so the last duplicate variable wins.
+You can use multiple files of both types by specifying multiple
+files on the statictea command line. Internally there is one
+dictionary for the server and one for the shared. The files get
+added from left to right so the last duplicate variable wins.
 
 ** Warning Messages
 
@@ -905,15 +906,17 @@ missing. When it is not missing nothing gets output.
 
 template:
 
+#+BEGIN_SRC
 <!--$ replace t.result="stderr", t.content = t.if(admin, "", \-->
 <!--$   "warning: the admin variable is missing") -->
 <!--$ endreplace -->
+#+END_SRC
 
 ** Run StaticTea
 
 You run StaticTea from the command line. The example below shows
-a typical invocation. You specify four file parameters, the
-server json, the shared json the template and the result.
+a typical invocation which specifies four file parameters, the
+server json, the shared json, the template and the result.
 
 #+BEGIN_SRC
 statictea --server server.json --shared shared.json --template template.html --result result.html
@@ -941,7 +944,7 @@ The StaticTea command line options:
 - maxSharedVariables - max number of shared variables
 - maxServerVariables - max number of server variables
 - maxStringLength - max literal string length
-- maxNumberLength - max literal number length
+- maxNumberDigits - max literal number length
 - maxNameLength - max literal name length
 - maxJsonKeyLength - max json key name length
 - maxJsonValueLength - max json string value length
@@ -954,15 +957,12 @@ dictionaries. Duplicate elements overwrite existing elements.  If
 a json key length or string value exceeds a limit, it is skipped
 and a warning is output.
 
-StaticTea processes template lines. There is not limit on the size
-of the template.
+There is no limit on the size of the template.
 
 ** Encoding and Line Endings
 
 Templates are utf-8 encoded or it's subset ascii.  Three line
 endings are supported, LF, CR LF, or CR on all platforms.
-
-
 
 ** Template Regular Expressions
 
@@ -988,9 +988,9 @@ A literal variable starts with an optional namespace followed by a name.
 
 variable = [namespace] name
 
-A command is "nextline", "block", "replace" or "#".
+A command is "nextline", "block", "endblock", "replace", "endreplace" or "#".
 
-command = ^nextline$|^block$|^replace$|^#$
+command = ^nextline$|^block$|^endblock$|^replace$|^endreplace$|^#$
 
 A row function is row(number) where the number is optional and
 you can drop the parentheses.
@@ -1008,27 +1008,13 @@ there is only one parameter.
 
 version function = ^version$|^version[\s]+[vstring]+$|^row[\s]*\([\s]*[number]*[\s]*\)$
 
-if function =
+A if function takes a three parameters, the last two are
+optional. When called with one parameter you can drop the
+parentheses.
 
-#+BEGIN_SRC
-template = [line]*
-line = text | replacementLine | commandLine
-text = .*
-replacementLine = [text [bracketedVar]]*
-replacementLine = text | [text] bracketedVar [text]
-bracketedVar = "{" os rightSide os "}"
-commandLine = prefix s command [os "," os statement]* s postfix
-space = " " | tab
-s = [space]+
-os = [space]*
-statement = variable os "=" os rightSide
-variable = [namespace][a-zA-Z]+[a-zA-Z0-9_]*
-namespace = "t." | "s."
-rightSide = number | string | variable | function
-function = row | version | if
-row =  "t.row" [s number] | "t.row" os "(" os [number] os ")"
-if = "t.if" rightSide | "t.if" os "(" os rightSide [os "," os rightSide [os "," os rightSide]] os ")"
-#+END_SRC
+if function = if (condition)| if (condition, trueCase) | if (condition, trueCase, falseCase)
+
+** Tea Info
 
 Tea is the most popular manufactured drink consumed in the world,
 equaling all others – including coffee, soft drinks, and alcohol
@@ -1036,33 +1022,33 @@ equaling all others – including coffee, soft drinks, and alcohol
 (2004). The Empire of Tea. The Overlook Press. p. 32. ISBN
 978-1-58567-493-0.
 
-Some tea companies:
+** Some Tea Companies
 
-    Lipton
-    Tetley
-    Twinings
-    American Tea Room
-    Argo Tea
-    Bigelow Tea Company
-    Capital Teas
-    Celestial Seasonings
-    Good Earth Tea
-    Harney & Sons
-    Honest Tea
-    Imperial Tea Court
-    Luzianne
-    Mighty Leaf Tea
-    Numi Organic Tea
-    Peet's Coffee & Tea
-    Red Diamond
-    Salada tea
-    Stash Tea
-    Talbott Teas
-    Tavalon Tea
-    Tazo
-    Té Company
-    Tea Forté
-    TeaGschwendner
-    Teavana
-    Upton Tea
-    Yogi Tea
+- Lipton
+- Tetley
+- Twinings
+- American Tea Room
+- Argo Tea
+- Bigelow Tea Company
+- Capital Teas
+- Celestial Seasonings
+- Good Earth Tea
+- Harney & Sons
+- Honest Tea
+- Imperial Tea Court
+- Luzianne
+- Mighty Leaf Tea
+- Numi Organic Tea
+- Peet's Coffee & Tea
+- Red Diamond
+- Salada tea
+- Stash Tea
+- Talbott Teas
+- Tavalon Tea
+- Tazo
+- Té Company
+- Tea Forté
+- TeaGschwendner
+- Teavana
+- Upton Tea
+- Yogi Tea
