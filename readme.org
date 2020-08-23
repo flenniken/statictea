@@ -301,7 +301,7 @@ result:
 *** Numbers
 
 You can use ordinal numbers in statements. You use them with the
-row function and you use 0, 1 in if statements for false and
+row function and you use 0, 1 in if function for false and
 true. Numbers are limited to maxNumberDigits digits.
 
 #+BEGIN_SRC
@@ -361,17 +361,17 @@ System variables:
 - t.list - repeats the block for each item in a list.
 - t.maxLines - the max number of lines in the block.
 - t.result - defines whether the block goes to the result file,
-  standard out or nowhere.
+  standard error or nowhere.
 - t.content - defines what goes in the replace block.
 
 **** List Variable
 
-The list variable controls how many times the command's block
+The t.list variable controls how many times the command's block
 repeats. You assign it with your list variable and the block
 repeats for each item in the list. The default is 0 which means
 no repeat.
 
-For the following example, tea_list is assigned to the list
+For the following example, tea_list is assigned to the t.list
 variable. The tea_list has five items.
 
 template:
@@ -450,29 +450,55 @@ result:
 **** Max Lines Variable
 
 StaticTea reads lines looking for the endblock or endreplace
-commands.  By default if it is not found in 10 lines, the 10
+commands.  By default, if it is not found in 10 lines, the 10
 lines are used for the block and a warning is output.
 
-You can increase this value to support blocks with more lines.
+You can increase this value to support blocks with more lines by
+setting the t.maxLines system variable.
 
 #+BEGIN_SRC
 <!--$ block t.maxLines=20 -->
 #+END_SRC
 
+Note: only endblock ends a block command, and the same for
+replace. Other commands inside a block are not treated as commands
+but instead treated as replacement block text. For example:
+
+template:
+
+#+BEGIN_SRC
+<!--$ block -->
+<!--$ # this is not a comment, just text -->
+fake nextline
+<!--$ nextline -->
+<!--$ endblock -->
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+<!--$ # this is not a comment, just text -->
+fake nextline
+<!--$ nextline -->
+#+END_SRC
+
+
 **** Result Variable
 
-You assign the system result variable to control where
+You assign the system t.result variable to control where
 replacement block's result goes, either the result file, standard
-out or nowhere. By default it goes to the result file.
+error or nowhere. By default it goes to the result file.
 
 Result variable options:
 
 - "resultFile" - send the replacement block to the file (default)
 - "skip" - skip the block
-- "stderr" - send the block to standard error
+- "stderr" - send the block to standard error, good for
+  communicating that the json data is unexpected.
 
-The skip case is good for building test lists.  The stderr case
-is good for communicating that the json data is unexpected.
+** Skip Example
+
+The skip t.result case is good for building test lists.
 
 When you view the following template fragment in a browser it
 shows one item in the list.
@@ -534,17 +560,18 @@ result:
 
 **** Content Variable
 
-The content variable defines what goes in the replace block.
+The t.content variable defines what goes in the replace block.
 
-You assign your variable to the content variable and your
+You assign your variable to the t.content variable and your
 variable's value replaces the whole replace block.  The default
-is 0, which mean the block is replaced with nothing. The content
-variable only applies to the replace command.
+is 0, which mean the block is replaced with nothing. The
+t.content variable only applies to the replace command.
 
-**** System Variable Values
+**** Default Variable Values
 
-You can use the system variables in replacement blocks to see
-their default values.
+You can use the system variables in a template to see their
+default values. The following example shows the default values
+for each of the system variables.
 
 template:
 
@@ -593,7 +620,9 @@ email = t.row 0
 
 **** Row Function
 
-The special row function contains the row of the current list. You control the start number.
+The special row function returns the current row for lists. The
+function takes an option parameter which specifies the starting
+number to return.
 
 - t.row   — returns 0, 1, 2,...
 - t.row 0 — returns 0, 1, 2,...
@@ -633,17 +662,18 @@ result:
 
 **** If Function
 
-You can use an if statement in a template statement to create or
+You can use an if function in a template statement to create or
 assign a variable.
 
-The general form of the if statement has three parameters. The
-first variable is the condition, the second is the true case and
+The general form of the if function has three parameters. The
+first parameter is the condition, the second is the true case and
 the third is the false case. When the condition is true, the
 second parameter is returned, else the third parameter is
 returned.
 
-You can drop the third and/or the second parameter. The default
-of 0 is returned for the missing parameters.
+You can drop the third or both the third and the second
+parameters. The default of 0 is returned for the missing
+parameters.
 
 The condition is true when it is 1 or true, else it is false.
 
@@ -654,8 +684,12 @@ template:
 
 #+BEGIN_SRC
 <--$ block \-->
-<--$ var1=t.if(0, 'dog', 'cat'), var2=t.if(0, 'dog'), var3=t.if(0) \-->
-<--$ var4=t.if(1, 'dog', 'cat'), var5=t.if(1, 'dog'), var6=t.if(1) -->
+<--$ var1=t.if(0, 'dog', 'cat'), \-->
+<--$ var2=t.if(0, 'dog'),        \-->
+<--$ var3=t.if(0)                \-->
+<--$ var4=t.if(1, 'dog', 'cat'), \-->
+<--$ var5=t.if(1, 'dog'),        \-->
+<--$ var6=t.if(1) -->
 
 t.if(0, 'dog', 'cat') -> {var1}
 t.if(0, 'dog')        -> {var2}
@@ -693,13 +727,13 @@ maximum version supported.
 The default minimum is 0.0.0 and the default maximum is anything.
 
 If the current version is below the minimum or above the maximum,
-the function outputs a message to standard out.
+the function outputs a message to standard error.
 
 You can use the function multiple times for fine grain checking.
 
-StaticTea uses [[https://semver.org/] Semantic Versioning] with
-the added restriction that each version component is limited to
-three digits and all components have at least one digit.
+StaticTea uses [[https://semver.org/][Semantic Versioning]] with the added restriction
+that each version component is limited to three digits and all
+components have at least one digit.
 
 Below is typical useage:
 
@@ -813,8 +847,7 @@ postfix is optional.
 examples:
 
 #+BEGIN_SRC
-statictea--prepost "@$" "|"
-statictea--prepost "[comment$" "]"
+statictea --prepost "@$" "|" --prepost "[comment$" "]"
 #+END_SRC
 
 ** Json Files
@@ -832,7 +865,7 @@ The server json file is included with the server option.  Its
 variables are referenced with the json key names.
 
 The shared json file is specified with the shared option. Its
-variables are referenced with the "s." namespace.
+variables are referenced with the "s." namespace prefix.
 
 You can use multiple files of both types by specifying multiple
 files on the statictea command line. Internally there is one
@@ -846,8 +879,9 @@ standard error and processing continues. All issues are handled,
 usually by skipping the problem.
 
 If a variable in a replacement block is used but it doesn't
-exist, the variable remains as is and a message is output telling
-the line and variable missing. There are many potential warnings.
+exist, the variable remains as is in the result, and a message is
+output to standard error telling the line and the name of the
+missing variable.  There are many different potential warnings.
 
 It’s good style to change your template or json so no messages
 get output.
@@ -915,41 +949,41 @@ template:
 ** Run StaticTea
 
 You run StaticTea from the command line. The example below shows
-a typical invocation which specifies four file parameters, the
+a typical invocation which specifies four file arguments, the
 server json, the shared json, the template and the result.
+
+- Warning messages go to standard error.
+- If you don't specify the result argument, the result goes to standard out.
+- If you specify "stdin" for the template, the template comes
+  from stdin.
 
 #+BEGIN_SRC
 statictea --server server.json --shared shared.json --template template.html --result result.html
 #+END_SRC
 
-- Warning messages go to standard error.
-- If you don't specify the result parameter, the result goes to standard out.
-- It you specify "stdin" for the template, the template comes
-  from stdin.
-
 *** Options
 
 The StaticTea command line options:
 
-- help - show the usage and options.
-- version - outputs the version number to standard out and exits.
-- server - the server json file. You can specify multiple files.
-- shared - the shared json file. You can specify multiple files.
+- help - show the help, usage and options.
+- version - outputs the version number.
+- server - the server json file, you can specify multiple.
+- shared - the shared json file, you can specify multiple.
 - update - update the template replace blocks.
 
 ** General Limits
 
-- maxCommandLineLength - max command line length,
-- maxContinuationLines - max continuation lines per command,
-- maxSharedVariables - max number of shared variables
-- maxServerVariables - max number of server variables
-- maxStringLength - max literal string length
-- maxNumberDigits - max literal number length
-- maxNameLength - max literal name length
-- maxJsonKeyLength - max json key name length
-- maxJsonValueLength - max json string value length
-- maxJsonFileSize - max json file size in bytes
-- maxNumberOfListItems - max number if items in a list
+- max command line length: maxCommandLineLength
+- max continuation lines per command: maxContinuationLines
+- max number of shared variables: maxSharedVariables
+- max number of server variables: maxServerVariables
+- max literal string length: maxStringLength
+- max literal number length: maxNumberDigits
+- max literal name length: maxNameLength
+- max json key name length: maxJsonKeyLength
+- max json string value length: maxJsonValueLength
+- max json file size in bytes: maxJsonFileSize
+- max number if items in a list: maxNumberOfListItems
 
 StaticTea checkes the json file size and if within the limit it
 reads it and adds its elements to the shared or server
@@ -961,58 +995,81 @@ There is no limit on the size of the template.
 
 ** Encoding and Line Endings
 
-Templates are utf-8 encoded or it's subset ascii.  Three line
-endings are supported, LF, CR LF, or CR on all platforms.
+Templates are utf-8 encoded or its ascii subset.  Three line
+endings are supported on all platforms: LF, CR LF, or CR.
 
 ** Template Regular Expressions
 
 Literal numbers are small ordinal numbers, 0,1,2,...,99999.
 
+#+BEGIN_SRC
 number = ^[0-9]{1,5}$
+#+END_SRC
 
 Literal strings are 0 to 60 characters long. You wrap them with
 single or double quotes.
 
+#+BEGIN_SRC
 string = ^["][^"]*["]{0,60}|['][^']{0,60}[']$
+#+END_SRC
 
 Literal name starts with a letter followed by letters, digits or
 underscores and they are limited to 1 to 32 characters.
 
+#+BEGIN_SRC
 Literal name = ^[a-zA-Z][a-zA-Z0-9_]{0,31}$
+#+END_SRC
 
 A namespace is "t." or "s.".
 
+#+BEGIN_SRC
 namespace = ^t\.$|^s\.$
+#+END_SRC
 
 A literal variable starts with an optional namespace followed by a name.
 
+#+BEGIN_SRC
 variable = [namespace] name
+#+END_SRC
 
 A command is "nextline", "block", "endblock", "replace", "endreplace" or "#".
 
+#+BEGIN_SRC
 command = ^nextline$|^block$|^endblock$|^replace$|^endreplace$|^#$
+#+END_SRC
 
 A row function is row(number) where the number is optional and
 you can drop the parentheses.
 
+#+BEGIN_SRC
 row function = ^row$|^row[\s]+[number]$|^row[\s]*\([\s]*[number]{0,1}[\s]*\)$
+#+END_SRC
 
 A vstring (version string) is 1 to 3 digits three times with a
 period between them. "ddd.ddd.ddd"
 
+#+BEGIN_SRC
 vstring = ^'\d{1,3}\.\d{1,3}\.\d{1,3}'$|^"\d{1,3}\.\d{1,3}\.\d{1,3}"$
+#+END_SRC
 
 A version function is "version" or "version(vstring, vstring)" where
 the vstrings are optional and you can drop the parentheses when
 there is only one parameter.
 
+#+BEGIN_SRC
 version function = ^version$|^version[\s]+[vstring]+$|^row[\s]*\([\s]*[number]*[\s]*\)$
+#+END_SRC
 
-A if function takes a three parameters, the last two are
+An if function takes a three parameters, the last two are
 optional. When called with one parameter you can drop the
 parentheses.
 
-if function = if (condition)| if (condition, trueCase) | if (condition, trueCase, falseCase)
+#+BEGIN_SRC
+if function =
+  if (condition) |
+  if (condition, trueCase) |
+  if (condition, trueCase, falseCase)
+#+END_SRC
 
 ** Tea Info
 
