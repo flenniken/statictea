@@ -53,10 +53,7 @@ StaticTea commands:
 - replace — replace block with a variable
 - endreplace - end of replace block
 - # — comment
-
-You add statements to commands to control how it behaves and to
-define variables. You use commas to separate statements. You can
-continue the line with the "\\" character at the end.
+- : - continue line, used for continuation lines
 
 You use the block and replace commands to define the start and
 end points of the replacement block.  You end the block command
@@ -68,10 +65,20 @@ example command lines:
 
 #+BEGIN_SRC
 <!--$ nextline -->
-<!--$ block t.list = teaProducingCountries, tea="Darjeeling" -->
+<!--$ block t.list = teaProducingCountries; tea="Darjeeling" -->
 <!--$ replace t.content = header -->
 <!--$ # this is a comment command -->
 #+END_SRC
+
+** Statements
+
+You add statements to commands to control how it behaves and to
+define variables. You use semicolons to separate statements. You can
+continue the line with the "\\" character at the end if you need
+more space.
+
+The full line is loaded into memory then statements are run from
+left to right.
 
 *** Nextline Command
 
@@ -229,34 +236,35 @@ result:
 You make Oolong Tea in five time intensive steps.
 #+END_SRC
 
-** Long Lines
+** Continue Command
 
-You can continue a command line with the "\\" character at the end
-before the postfix. The following continuation line contains the
-prefix and postfix but not the command keyword. You can continue
-the line multiple times.
+You can continue a long command line with the "\\" character at
+the end before the postfix. The line following is a continuation
+command. The continuation command allows you to continue adding
+statements as if it is one long line. You can continue the
+continue command too, if you need more space.
 
 The template's command line length is limited to
-maxCommandLineLength characters and number of continuation lines
-is limited to maxContinuationLines lines.
+maxCommandLineLength characters. This includes the continuation
+lines.
 
 In the following example the nextline command continues on a
-second line.
+second line and third line.
 
 template:
 
 #+BEGIN_SRC
 <!--$ nextline \-->
-<!--$ tea = 'Earl Grey' -->
-{tea}
+<!--$ : tea = 'Earl Grey' \-->
+<!--$ : tea2 = 'Masala chai' -->
+{tea}, {tea2}
 #+END_SRC
 
 result:
 
 #+BEGIN_SRC
-Earl Grey
+Earl Grey, Masala chai
 #+END_SRC
-
 ** Types
 
 StaticTea has three types:
@@ -264,6 +272,7 @@ StaticTea has three types:
 - strings
 - numbers
 - variables
+- functions
 
 *** Strings
 
@@ -300,20 +309,16 @@ result:
 
 *** Numbers
 
-You can use ordinal numbers in statements. You use them with the
-row function and you use 0, 1 in if function for false and
-true. Numbers are limited to maxNumberDigits digits.
-
-#+BEGIN_SRC
-0, 1, 2, 3,...,99999
-#+END_SRC
+You can use numbers in statements. You use them with the
+row function and you use -1, 0, 1 in if functions.
+Numbers are 32 bit signed integers.
 
 Example numbers:
 
 #+BEGIN_SRC
 12345
 0
-8823
+-8823
 42
 #+END_SRC
 
@@ -363,13 +368,17 @@ System variables:
 - t.result - defines whether the block goes to the result file,
   standard error or nowhere.
 - t.content - defines what goes in the replace block.
+- t.server - the internal dictionary containing all the server
+  json
+- t.shared - the internal dictionary containing all the shared
+  json
 
 **** List Variable
 
 The t.list variable controls how many times the command's block
 repeats. You assign it with your list variable and the block
-repeats for each item in the list. The default is 0 which means
-no repeat.
+repeats for each item in the list. The default is an empty list
+which means no repeat.
 
 For the following example, tea_list is assigned to the t.list
 variable. The tea_list has five items.
@@ -378,7 +387,7 @@ template:
 
 #+BEGIN_SRC
 <!--$ nextline t.list = tea_list -->
-* {tea}
+  * {tea}
 #+END_SRC
 
 json:
@@ -398,11 +407,11 @@ json:
 result:
 
 #+BEGIN_SRC
-* Black
-* Green
-* Oolong
-* Sencha
-* Herbal
+  * Black
+  * Green
+  * Oolong
+  * Sencha
+  * Herbal
 #+END_SRC
 
 The following example builds a select list of tea companies where
@@ -413,7 +422,7 @@ template:
 #+BEGIN_SRC
 <h4>Tea Companies</h3>
 <select>
-<!--$ nextline t.list=companyList, current=t.if (selected ' selected="selected"') -->
+<!--$ nextline t.list=companyList; current=t.if (selected ' selected="selected"') -->
   <option{current}>{company}</option>
 </select>
 #+END_SRC
@@ -482,7 +491,6 @@ fake nextline
 <!--$ nextline -->
 #+END_SRC
 
-
 **** Result Variable
 
 You assign the system t.result variable to control where
@@ -491,12 +499,12 @@ error or nowhere. By default it goes to the result file.
 
 Result variable options:
 
-- "resultFile" - send the replacement block to the file (default)
+- "result" - send the replacement block to the result file (default)
 - "skip" - skip the block
 - "stderr" - send the block to standard error, good for
   communicating that the json data is unexpected.
 
-** Skip Example
+Skip Example:
 
 The skip t.result case is good for building test lists.
 
@@ -564,10 +572,44 @@ The t.content variable defines what goes in the replace block.
 
 You assign your variable to the t.content variable and your
 variable's value replaces the whole replace block.  The default
-is 0, which mean the block is replaced with nothing. The
+is "", which mean the block is replaced with nothing. The
 t.content variable only applies to the replace command.
 
-**** Default Variable Values
+**** Json Dictionaries
+
+You have access to the server and shared dictionaries with the
+t.server and t.shared system variables.
+
+template:
+
+#+BEGIN_SRC
+<!-- block serverElements = t.len(t.server) \-->
+<!-- : jsonElements = t.len(t.shared) -->
+The server passed {serverElements} elements
+and the shared json has {jsonElements}.
+<!-- endblock -->
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+  "tea1": "Black",
+  "tea2": "Green",
+  "tea3": "Oolong",
+  "tea4": "Sencha",
+  "tea5": "Herbal"
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+The server passed 5 elements
+and the shared json has 0.
+#+END_SRC
+
+**** System Defaults
 
 You can use the system variables in a template to see their
 default values. The following example shows the default values
@@ -591,22 +633,24 @@ result:
 
 #+BEGIN_SRC
 default t.row = 0
-default t.list = 0
-default t.content = 0
+default t.list = ""
+default t.content = ""
 default t.maxLines = 10
 t.maxLines = 20
 #+END_SRC
 
-
-
 *** System Functions
 
-There are three built in system functions used to control how
-commands work and to create variables.
+StaticTea provides functions to to control how commands work and
+to create variables.
 
 - t.row
 - t.if
 - t.version
+- t.len
+- t.tf
+- t.if<=>
+- t.cmp<=>
 
 Functions take different numbers of parameters. If you call with
 one parameters, you can drop the parentheses.
@@ -618,7 +662,7 @@ email = t.row(0)
 email = t.row 0
 #+END_SRC
 
-**** Row Function
+**** t.row: Row Function
 
 The special row function returns the current row for lists. The
 function takes an option parameter which specifies the starting
@@ -660,7 +704,7 @@ result:
   <li id="r3">4. Red Diamond</li>
 #+END_SRC
 
-**** If Function
+**** t.if: If Function
 
 You can use an if function in a template statement to create or
 assign a variable.
@@ -675,7 +719,8 @@ You can drop the third or both the third and the second
 parameters. The default of 0 is returned for the missing
 parameters.
 
-The condition is true when it is 1 or true, else it is false.
+The condition is false when it is 0 and true when it is 1. Other
+values generate a warning.  See t.tf for other options.
 
 The following example uses the template system to show how it
 works and what happens when you drop the t.if parameters.
@@ -714,7 +759,7 @@ t.if(1, 'dog')        -> dog
 t.if(1)               -> 1
 #+END_SRC
 
-**** Version Function
+**** t.version: Version Function
 
 You use the version function to get the current version of
 StaticTea or to verify that the version you are running works
@@ -763,7 +808,122 @@ template(line): the current version 1.0.0 is less than the minumum
 allowed verion of 1.2.3.
 #+END_SRC
 
-**** TODO exists, len functions?
+**** t.len: Length Function
+
+The t.len function returns the number of characters in a string,
+the number of elements in a list or the number of elements in a
+dictionary.
+
+#+BEGIN_SRC
+<!-- nextline strlen = t.len("Tetley"); \-->
+<!-- : listLen = t.len(tea_list); serverJson = t.len(t.server) -->
+The Tetley name has {length} characters.
+The tea list has {listlen} elements.
+The server json dictionary has {serverJson} elements.
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+"tea_list": [
+    {"tea": "Black"},
+    {"tea": "Green"},
+    {"tea": "Oolong"},
+    {"tea": "Sencha"},
+    {"tea": "Herbal"}
+  ]
+}
+#+END_SRC
+
+
+result:
+
+#+BEGIN_SRC
+The Tetley name has 6 characters.
+The tea list has 5 elements.
+The server json dictionary has 1 elements.
+#+END_SRC
+
+**** t.tf: True False
+
+The t.tf function returns 0 or 1 depending on its parameter and
+type.
+
+t.tf return types:
+
+- 0 - returns 0
+- any non-zero number - 1
+- empty string - returns 0
+- non-empty string - returns 1
+- empty list - 0
+- non-empty list - 1
+- empty dictionary - 0
+- non-empty dictionary - 1
+- false - 0
+- true - 1
+- null - 0
+
+todo: why is the necessary?
+
+**** t.if<=>: Spaceship If
+
+The t.if<=> function takes four parameters. The first parameter
+determines which of the others gets returned.
+
+- -1 - second parameter
+-  0 - third parameter
+-  1 - fourth parameter
+
+template:
+
+#+BEGIN_SRC
+<--$ nextline \-->
+<--$ : minus = t.if<=>(-1, "a", "b", "c") \-->
+<--$ :  zero = t.if<=>( 0, "a", "b", "c") \-->
+<--$ :   one = t.if<=>( 1, "a", "b", "c") -->
+The spaceship if: -1 -> '{minus}', 0 -> '{zero}', 1 -> '{one}'
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+The spaceship if: -1 -> 'a', 0 -> 'b', 1 -> 'c'
+#+END_SRC
+
+**** t.cmp<=>: Spaceship Compare
+
+The t.cmp<=> function compares two numbers or two strings and
+returns whether the first parameter is less than, equal to or greater than
+the second parameter. It returns -1 for less, 0 for equal and 1
+for greater than. You use it with the t.if<=> function.
+
+See the wikipedia article for more information about the [[https://en.wikipedia.org/wiki/Three-way_comparison][Three-way Comparison]].
+
+template:
+
+#+BEGIN_SRC
+<!--$ nextline sold = t.cmp<=>(earlgrey, oolong); \-->
+<!--$ : bestSelling = if<=>(sold, earlgreyName, earlgreyName, oolongName -->
+The best selling tea this week is {bestSelling}.
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+  earlgrey: 500,
+  oolong: 300,
+  earlgreyName: "Earl Grey, Twinings",
+  oolongName: "Oolon, Mighty Leaf Tea"
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+The best selling tea this week is Earl Grey, Twinings.
+#+END_SRC
 
 ** StaticTea as a Filter
 
@@ -816,7 +976,7 @@ cat template.txt | statictea --template stdin --server server.json
 hello world
 #+END_SRC
 
-** Prefix Postfix
+** TODO Prefix Postfix
 
 You make the template commands look like comments for your
 template file type. This allows you to edit the template using
@@ -832,22 +992,27 @@ when you create your own. The convention is to add a $ as the
 last character of the prefix and only use $ with StaticTea
 commands and space for normal comments.
 
-- '<!--$ ... -->' for html
-- '/*--$ ... --*/' for javascript in html
-- '&lt;!--$ ... --&gt;' for textarea elements
-- '#$ ...' for python and bash scripts
-- ';$ ...' for config files and asm
+Built in Prefixes:
+
+- '<!--$' '-->' - for html
+- '/!--$' '--*\slash{}' - for javascript in html
+- '&lt;!--$' '--&gt;' - for html textarea elements
+- '#$' - for bash scripts and others
+- ';$' - for config files and others
 
 You can define other comment types on the command line using the
 prepost option one or more times.
 
-You separate the prefix from the postfix with a space and the
-postfix is optional.
+You separate the prefix from the postfix with one space and the
+postfix is optional. The second example below only specifies the
+prefix and several prefixes with different amounts of leading
+space.
 
 examples:
 
 #+BEGIN_SRC
 statictea --prepost "@$" "|" --prepost "[comment$" "]"
+statictea --prepost "  #$" --prepost "    #$" --prepost "      #$"
 #+END_SRC
 
 ** Json Files
@@ -941,7 +1106,7 @@ missing. When it is not missing nothing gets output.
 template:
 
 #+BEGIN_SRC
-<!--$ replace t.result="stderr", t.content = t.if(admin, "", \-->
+<!--$ replace t.result="stderr";t.content = t.if(admin, "", \-->
 <!--$   "warning: the admin variable is missing") -->
 <!--$ endreplace -->
 #+END_SRC
@@ -974,11 +1139,9 @@ The StaticTea command line options:
 ** General Limits
 
 - max command line length: maxCommandLineLength
-- max continuation lines per command: maxContinuationLines
 - max number of shared variables: maxSharedVariables
 - max number of server variables: maxServerVariables
 - max literal string length: maxStringLength
-- max literal number length: maxNumberDigits
 - max literal name length: maxNameLength
 - max json key name length: maxJsonKeyLength
 - max json string value length: maxJsonValueLength
@@ -997,14 +1160,11 @@ There is no limit on the size of the template.
 
 Templates are utf-8 encoded or its ascii subset.  Three line
 endings are supported on all platforms: LF, CR LF, or CR.
+The template syntax only uses ascii.
 
 ** Template Regular Expressions
 
-Literal numbers are small ordinal numbers, 0,1,2,...,99999.
-
-#+BEGIN_SRC
-number = ^[0-9]{1,5}$
-#+END_SRC
+Literal numbers are signed integers.
 
 Literal strings are 0 to 60 characters long. You wrap them with
 single or double quotes.
@@ -1013,7 +1173,7 @@ single or double quotes.
 string = ^["][^"]*["]{0,60}|['][^']{0,60}[']$
 #+END_SRC
 
-Literal name starts with a letter followed by letters, digits or
+Literal names start with a letter followed by letters, digits or
 underscores and they are limited to 1 to 32 characters.
 
 #+BEGIN_SRC
@@ -1032,10 +1192,11 @@ A literal variable starts with an optional namespace followed by a name.
 variable = [namespace] name
 #+END_SRC
 
-A command is "nextline", "block", "endblock", "replace", "endreplace" or "#".
+A command is "nextline" | "block" | "endblock" | "replace" |
+"endreplace" |  "#" | ":".
 
 #+BEGIN_SRC
-command = ^nextline$|^block$|^endblock$|^replace$|^endreplace$|^#$
+command = ^nextline$|^block$|^endblock$|^replace$|^endreplace$|^#$|^:
 #+END_SRC
 
 A row function is row(number) where the number is optional and
@@ -1078,6 +1239,9 @@ equaling all others – including coffee, soft drinks, and alcohol
 – combined. -- Wikipedia -- Macfarlane, Alan; Macfarlane, Iris
 (2004). The Empire of Tea. The Overlook Press. p. 32. ISBN
 978-1-58567-493-0.
+
+There are five main groups of teas, white, green, oolong, black,
+and pu'erh.
 
 ** Some Tea Companies
 
