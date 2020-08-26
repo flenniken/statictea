@@ -56,7 +56,7 @@ StaticTea commands:
 - : - continue line, used for continuation lines
 
 You use the block and replace commands to define the start and
-end points of the replacement block.  You end the block command
+end lines of the replacement block.  You end the block command
 with the endblock command and you end the replace block with
 the endreplace command. No statements are allowed on the end
 commands.
@@ -165,6 +165,11 @@ The command is useful for sharing common template lines between
 templates and it has the special property that you can update the
 replacement block to keep it in sync with the variable.
 
+You can assign t.content the special "tempTesting" value and the
+block content is used as is.  This is good for testing changes
+you want to make to the shared value. The block is not updated in
+this case, instead you get a warning.
+
 The following example shares a common header between templates.
 
 template:
@@ -236,7 +241,7 @@ result:
 You make Oolong Tea in five time intensive steps.
 #+END_SRC
 
-** Continue Command
+*** Continue Command
 
 You can continue a long command line with the "\\" character at
 the end before the postfix. The line following is a continuation
@@ -267,7 +272,7 @@ Earl Grey, Masala chai
 #+END_SRC
 ** Types
 
-StaticTea has three types:
+StaticTea has several variable types:
 
 - strings
 - numbers
@@ -356,29 +361,194 @@ serverVar
 s.name
 #+END_SRC
 
-*** System Variables
+** System Variables and Functions
 
-You primarily use the system variables on a command line to
-control what the command does.
+You primarily use the system variables and functions on a command
+line to control what the command does.
 
-System variables:
+System variables and functions:
 
-- t.list - repeats the block for each item in a list.
-- t.maxLines - the max number of lines in the block.
-- t.result - defines whether the block goes to the result file,
-  standard error or nowhere.
-- t.content - defines what goes in the replace block.
-- t.server - the internal dictionary containing all the server
-  json
-- t.shared - the internal dictionary containing all the shared
-  json
+- t.case -- case function
+- t.cmp -- spaceship compare function
+- t.concat -- concatenate strings function
+- t.content -- content of replace block
+- t.else -- else condition of case function
+- t.exists -- tells whether variables exists
+- t.if -- if function
+- t.len -- length of string function
+- t.list -- where the block variables come from, may repeat
+- t.maxLines -- maximum lines before block ends
+- t.result -- where the block result goes
+- t.row -- function returns the current row
+- t.server -- the server json dictionary
+- t.shared -- the shared json dictionary
+- t.version -- function returns and verifies the version
 
-**** List Variable
+*** t.case
+
+The t.case function is a generalized if statement or case
+statement. The first parameter's value determines which case is
+returned. After the first you have pairs of parameters, the case
+value, then the associated return value.
+
+You need to specify a variable to return when none of the cases
+match.  You do this with the t.else variable as the case value.
+
+template:
+
+#+BEGIN_SRC
+<--$ nextline \-->
+<--$ : abbr = t.case(tea, 'Darjeeling', "Darj", "Earl Gray", "EG", t.else, "unknown") \-->
+The abbreviation for {tea} is {abbr}.
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+  "tea": "Darjeeling"
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+The abbreviation for Darjeeling is Darj.
+#+END_SRC
+
+The t.if statement is shorthand for the following t.case:
+
+#+BEGIN_SRC
+t.if(cond, v1, v2) is equivalent to: t.case(cond, 1, v1, t.else, v2)
+#+END_SRC
+
+*** t.cmp
+
+The t.cmp function compares two numbers or two strings and
+returns whether the first parameter is less than, equal to or
+greater than the second parameter. It returns -1 for less, 0 for
+equal and 1 for greater than.
+
+Normally you can pick one of the three cases you want.
+
+template:
+
+#+BEGIN_SRC
+<!--$ nextline sold = t.cmp(earlgrey, oolong); \-->
+<!--$ : bestSelling = t.case(sold, 1, earlgreyName, t.else, oolongName) -->
+The best selling tea this week is {bestSelling}.
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+  earlgrey: 500,
+  oolong: 300,
+  earlgreyName: "Earl Grey, Twinings",
+  oolongName: "Oolon, Mighty Leaf Tea"
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+The best selling tea this week is Earl Grey, Twinings.
+#+END_SRC
+
+*** t.concat
+*** t.content: Content Variable
+
+The t.content variable defines what goes in the replace block.
+
+You assign your variable to the t.content variable and your
+variable's value replaces the whole replace block.  The default
+is "", which mean the block is replaced with nothing. The
+t.content variable only applies to the replace command.
+
+*** t.else
+*** t.exists
+
+The t.exists returns 1 when a variable exists, else it returns 0.
+
+*** t.if:
+
+You can use an if function in a template statement to create or
+assign a variable.
+
+The if function has three parameters. The first parameter is the
+condition, the second is the 1 case and the third is the 0
+case. When the condition is 1, the second parameter is returned,
+else the third parameter is returned.
+
+The following example uses the template system to show how it
+works.
+
+template:
+
+#+BEGIN_SRC
+<--$ block \-->
+<--$ var1=t.if(1, 'dog', 'cat'), \-->
+<--$ var2=t.if(0, 'dog', 'cat'), -->
+
+t.if(1, 'dog', 'cat') -> {var1}
+t.if(0, 'dog', 'cat') -> {var2}
+<--$ endblock -->
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+
+t.if(1, 'dog', 'cat') -> dog
+t.if(0, 'dog', 'cat') -> cat
+#+END_SRC
+
+*** t.len:
+
+The t.len function returns the number of characters in a string,
+the number of elements in a list or the number of elements in a
+dictionary.
+
+#+BEGIN_SRC
+<!-- nextline strlen = t.len("Tetley"); \-->
+<!-- : listLen = t.len(tea_list); serverJson = t.len(t.server) -->
+The Tetley name has {length} characters.
+The tea list has {listlen} elements.
+The server json dictionary has {serverJson} elements.
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+"tea_list": [
+    {"tea": "Black"},
+    {"tea": "Green"},
+    {"tea": "Oolong"},
+    {"tea": "Sencha"},
+    {"tea": "Herbal"}
+  ]
+}
+#+END_SRC
+
+
+result:
+
+#+BEGIN_SRC
+The Tetley name has 6 characters.
+The tea list has 5 elements.
+The server json dictionary has 1 elements.
+#+END_SRC
+
+*** t.list: List Variable
 
 The t.list variable controls how many times the command's block
 repeats. You assign it with your list variable and the block
-repeats for each item in the list. The default is an empty list
-which means no repeat.
+repeats for each item in the list. The values come from the list
+items. The default is t.server which means show the block once
+using values from the t.server. An empty list means don't show the
+block at all. You can assign the t.list a list or dictionary value.
 
 For the following example, tea_list is assigned to the t.list
 variable. The tea_list has five items.
@@ -422,7 +592,8 @@ template:
 #+BEGIN_SRC
 <h4>Tea Companies</h3>
 <select>
-<!--$ nextline t.list=companyList; current=t.if (selected ' selected="selected"') -->
+<!--$ nextline t.list=companyList; \-->
+<!--$ : current=t.if(selected, ' selected="selected"', "") -->
   <option{current}>{company}</option>
 </select>
 #+END_SRC
@@ -456,7 +627,7 @@ result:
 </select>
 #+END_SRC
 
-**** Max Lines Variable
+*** t.maxLines: Max Lines Variable
 
 StaticTea reads lines looking for the endblock or endreplace
 commands.  By default, if it is not found in 10 lines, the 10
@@ -491,7 +662,7 @@ fake nextline
 <!--$ nextline -->
 #+END_SRC
 
-**** Result Variable
+*** t.result: Result Variable
 
 You assign the system t.result variable to control where
 replacement block's result goes, either the result file, standard
@@ -566,103 +737,7 @@ result:
 </ul>
 #+END_SRC
 
-**** Content Variable
-
-The t.content variable defines what goes in the replace block.
-
-You assign your variable to the t.content variable and your
-variable's value replaces the whole replace block.  The default
-is "", which mean the block is replaced with nothing. The
-t.content variable only applies to the replace command.
-
-**** Json Dictionaries
-
-You have access to the server and shared dictionaries with the
-t.server and t.shared system variables.
-
-template:
-
-#+BEGIN_SRC
-<!-- block serverElements = t.len(t.server) \-->
-<!-- : jsonElements = t.len(t.shared) -->
-The server passed {serverElements} elements
-and the shared json has {jsonElements}.
-<!-- endblock -->
-#+END_SRC
-
-json:
-
-#+BEGIN_SRC
-{
-  "tea1": "Black",
-  "tea2": "Green",
-  "tea3": "Oolong",
-  "tea4": "Sencha",
-  "tea5": "Herbal"
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-The server passed 5 elements
-and the shared json has 0.
-#+END_SRC
-
-**** System Defaults
-
-You can use the system variables in a template to see their
-default values. The following example shows the default values
-for each of the system variables.
-
-template:
-
-#+BEGIN_SRC
-<!--$ block -->
-default t.row = {t.row}
-default t.list = {t.list}
-default t.content = {t.content}
-default t.maxLines = {t.maxLines}
-<!--$ endblock -->
-<!--$ block t.maxLines = 20 -->
-t.maxLines = {t.maxLines}
-<!--$ endblock -->
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-default t.row = 0
-default t.list = ""
-default t.content = ""
-default t.maxLines = 10
-t.maxLines = 20
-#+END_SRC
-
-*** System Functions
-
-StaticTea provides functions to to control how commands work and
-to create variables.
-
-- t.row
-- t.if
-- t.version
-- t.len
-- t.tf
-- t.if<=>
-- t.cmp<=>
-
-Functions take different numbers of parameters. If you call with
-one parameters, you can drop the parentheses.
-
-These are equivalent:
-
-#+BEGIN_SRC
-email = t.row(0)
-email = t.row 0
-#+END_SRC
-
-**** t.row: Row Function
+*** t.row:
 
 The special row function returns the current row for lists. The
 function takes an option parameter which specifies the starting
@@ -671,7 +746,7 @@ number to return.
 - t.row   — returns 0, 1, 2,...
 - t.row 0 — returns 0, 1, 2,...
 - t.row 1 — returns 1, 2, 3,...
-- t.row N — returns N, N+1, N+2,... where N is some ordinal number
+- t.row N — returns N, N+1, N+2,... where N is some integer.
 
 Here is an example using the row variable.
 
@@ -704,62 +779,9 @@ result:
   <li id="r3">4. Red Diamond</li>
 #+END_SRC
 
-**** t.if: If Function
-
-You can use an if function in a template statement to create or
-assign a variable.
-
-The general form of the if function has three parameters. The
-first parameter is the condition, the second is the true case and
-the third is the false case. When the condition is true, the
-second parameter is returned, else the third parameter is
-returned.
-
-You can drop the third or both the third and the second
-parameters. The default of 0 is returned for the missing
-parameters.
-
-The condition is false when it is 0 and true when it is 1. Other
-values generate a warning.  See t.tf for other options.
-
-The following example uses the template system to show how it
-works and what happens when you drop the t.if parameters.
-
-template:
-
-#+BEGIN_SRC
-<--$ block \-->
-<--$ var1=t.if(0, 'dog', 'cat'), \-->
-<--$ var2=t.if(0, 'dog'),        \-->
-<--$ var3=t.if(0)                \-->
-<--$ var4=t.if(1, 'dog', 'cat'), \-->
-<--$ var5=t.if(1, 'dog'),        \-->
-<--$ var6=t.if(1) -->
-
-t.if(0, 'dog', 'cat') -> {var1}
-t.if(0, 'dog')        -> {var2}
-t.if(0)               -> {var3}
-
-t.if(1, 'dog', 'cat') -> {var4}
-t.if(1, 'dog')        -> {var5}
-t.if(1)               -> {var6}
-<--$ endblock -->
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-
-t.if(0, 'dog', 'cat') -> cat
-t.if(0, 'dog')        -> 0
-t.if(0)               -> 0
-
-t.if(1, 'dog', 'cat') -> dog
-t.if(1, 'dog')        -> dog
-t.if(1)               -> 1
-#+END_SRC
-
-**** t.version: Version Function
+*** t.server
+*** t.shared
+*** t.version:
 
 You use the version function to get the current version of
 StaticTea or to verify that the version you are running works
@@ -808,121 +830,80 @@ template(line): the current version 1.0.0 is less than the minumum
 allowed verion of 1.2.3.
 #+END_SRC
 
-**** t.len: Length Function
+** Json Dictionaries
 
-The t.len function returns the number of characters in a string,
-the number of elements in a list or the number of elements in a
-dictionary.
+You have access to the server and shared dictionaries with the
+t.server and t.shared system variables.
+
+template:
 
 #+BEGIN_SRC
-<!-- nextline strlen = t.len("Tetley"); \-->
-<!-- : listLen = t.len(tea_list); serverJson = t.len(t.server) -->
-The Tetley name has {length} characters.
-The tea list has {listlen} elements.
-The server json dictionary has {serverJson} elements.
+<!-- block serverElements = t.len(t.server) \-->
+<!-- : jsonElements = t.len(t.shared) -->
+The server passed {serverElements} elements
+and the shared json has {jsonElements}.
+<!-- endblock -->
 #+END_SRC
 
 json:
 
 #+BEGIN_SRC
 {
-"tea_list": [
-    {"tea": "Black"},
-    {"tea": "Green"},
-    {"tea": "Oolong"},
-    {"tea": "Sencha"},
-    {"tea": "Herbal"}
-  ]
-}
-#+END_SRC
-
-
-result:
-
-#+BEGIN_SRC
-The Tetley name has 6 characters.
-The tea list has 5 elements.
-The server json dictionary has 1 elements.
-#+END_SRC
-
-**** t.tf: True False
-
-The t.tf function returns 0 or 1 depending on its parameter and
-type.
-
-t.tf return types:
-
-- 0 - returns 0
-- any non-zero number - 1
-- empty string - returns 0
-- non-empty string - returns 1
-- empty list - 0
-- non-empty list - 1
-- empty dictionary - 0
-- non-empty dictionary - 1
-- false - 0
-- true - 1
-- null - 0
-
-todo: why is the necessary?
-
-**** t.if<=>: Spaceship If
-
-The t.if<=> function takes four parameters. The first parameter
-determines which of the others gets returned.
-
-- -1 - second parameter
--  0 - third parameter
--  1 - fourth parameter
-
-template:
-
-#+BEGIN_SRC
-<--$ nextline \-->
-<--$ : minus = t.if<=>(-1, "a", "b", "c") \-->
-<--$ :  zero = t.if<=>( 0, "a", "b", "c") \-->
-<--$ :   one = t.if<=>( 1, "a", "b", "c") -->
-The spaceship if: -1 -> '{minus}', 0 -> '{zero}', 1 -> '{one}'
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-The spaceship if: -1 -> 'a', 0 -> 'b', 1 -> 'c'
-#+END_SRC
-
-**** t.cmp<=>: Spaceship Compare
-
-The t.cmp<=> function compares two numbers or two strings and
-returns whether the first parameter is less than, equal to or greater than
-the second parameter. It returns -1 for less, 0 for equal and 1
-for greater than. You use it with the t.if<=> function.
-
-See the wikipedia article for more information about the [[https://en.wikipedia.org/wiki/Three-way_comparison][Three-way Comparison]].
-
-template:
-
-#+BEGIN_SRC
-<!--$ nextline sold = t.cmp<=>(earlgrey, oolong); \-->
-<!--$ : bestSelling = if<=>(sold, earlgreyName, earlgreyName, oolongName -->
-The best selling tea this week is {bestSelling}.
-#+END_SRC
-
-json:
-
-#+BEGIN_SRC
-{
-  earlgrey: 500,
-  oolong: 300,
-  earlgreyName: "Earl Grey, Twinings",
-  oolongName: "Oolon, Mighty Leaf Tea"
+  "tea1": "Black",
+  "tea2": "Green",
+  "tea3": "Oolong",
+  "tea4": "Sencha",
+  "tea5": "Herbal"
 }
 #+END_SRC
 
 result:
 
 #+BEGIN_SRC
-The best selling tea this week is Earl Grey, Twinings.
+The server passed 5 elements
+and the shared json has 0.
+#+END_SRC
+
+** System Defaults
+
+You can use the system variables in a template to see their
+default values. The following example shows the default values of
+so of the system variables.
+
+template:
+
+#+BEGIN_SRC
+<!--$ block -->
+default t.row = {t.row}
+default t.list = {t.list}
+default t.content = {t.content}
+default t.maxLines = {t.maxLines}
+<!--$ endblock -->
+<!--$ block t.maxLines = 20 -->
+t.maxLines = {t.maxLines}
+<!--$ endblock -->
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+default t.row = 0
+default t.list = ""
+default t.content = ""
+default t.maxLines = 10
+t.maxLines = 20
+#+END_SRC
+
+** Optional Parentheses:
+
+Functions take different numbers of parameters. If you call with
+one parameters, you can drop the parentheses.
+
+These are equivalent:
+
+#+BEGIN_SRC
+email = t.row(0)
+email = t.row 0
 #+END_SRC
 
 ** StaticTea as a Filter
@@ -1106,9 +1087,9 @@ missing. When it is not missing nothing gets output.
 template:
 
 #+BEGIN_SRC
-<!--$ replace t.result="stderr";t.content = t.if(admin, "", \-->
+<!--$ block t.result="stderr"; t.list = t.if(t.exists(admin), "", "showBlock") \-->
 <!--$   "warning: the admin variable is missing") -->
-<!--$ endreplace -->
+<!--$ endblock -->
 #+END_SRC
 
 ** Run StaticTea
@@ -1162,75 +1143,14 @@ Templates are utf-8 encoded or its ascii subset.  Three line
 endings are supported on all platforms: LF, CR LF, or CR.
 The template syntax only uses ascii.
 
-** Template Regular Expressions
+** Ellipsize
 
-Literal numbers are signed integers.
-
-Literal strings are 0 to 60 characters long. You wrap them with
-single or double quotes.
-
-#+BEGIN_SRC
-string = ^["][^"]*["]{0,60}|['][^']{0,60}[']$
-#+END_SRC
-
-Literal names start with a letter followed by letters, digits or
-underscores and they are limited to 1 to 32 characters.
-
-#+BEGIN_SRC
-Literal name = ^[a-zA-Z][a-zA-Z0-9_]{0,31}$
-#+END_SRC
-
-A namespace is "t." or "s.".
-
-#+BEGIN_SRC
-namespace = ^t\.$|^s\.$
-#+END_SRC
-
-A literal variable starts with an optional namespace followed by a name.
-
-#+BEGIN_SRC
-variable = [namespace] name
-#+END_SRC
-
-A command is "nextline" | "block" | "endblock" | "replace" |
-"endreplace" |  "#" | ":".
-
-#+BEGIN_SRC
-command = ^nextline$|^block$|^endblock$|^replace$|^endreplace$|^#$|^:
-#+END_SRC
-
-A row function is row(number) where the number is optional and
-you can drop the parentheses.
-
-#+BEGIN_SRC
-row function = ^row$|^row[\s]+[number]$|^row[\s]*\([\s]*[number]{0,1}[\s]*\)$
-#+END_SRC
-
-A vstring (version string) is 1 to 3 digits three times with a
-period between them. "ddd.ddd.ddd"
-
-#+BEGIN_SRC
-vstring = ^'\d{1,3}\.\d{1,3}\.\d{1,3}'$|^"\d{1,3}\.\d{1,3}\.\d{1,3}"$
-#+END_SRC
-
-A version function is "version" or "version(vstring, vstring)" where
-the vstrings are optional and you can drop the parentheses when
-there is only one parameter.
-
-#+BEGIN_SRC
-version function = ^version$|^version[\s]+[vstring]+$|^row[\s]*\([\s]*[number]*[\s]*\)$
-#+END_SRC
-
-An if function takes a three parameters, the last two are
-optional. When called with one parameter you can drop the
-parentheses.
-
-#+BEGIN_SRC
-if function =
-  if (condition) |
-  if (condition, trueCase) |
-  if (condition, trueCase, falseCase)
-#+END_SRC
+<!--$ # If the name is longer than 10 characters, -->
+<!--$ # clip it to 7 and add "...".               -->
+<!--$ cmp = t.cmp(len(name), 10);                \-->
+<!--$ name = t.case(cmd,                         \-->
+<!--$ : 1, t.concat(substr(name, 0, 7), "..."),  \-->
+<!--$ : t.else, name))                            -->
 
 ** Tea Info
 
@@ -1242,34 +1162,3 @@ equaling all others – including coffee, soft drinks, and alcohol
 
 There are five main groups of teas, white, green, oolong, black,
 and pu'erh.
-
-** Some Tea Companies
-
-- Lipton
-- Tetley
-- Twinings
-- American Tea Room
-- Argo Tea
-- Bigelow Tea Company
-- Capital Teas
-- Celestial Seasonings
-- Good Earth Tea
-- Harney & Sons
-- Honest Tea
-- Imperial Tea Court
-- Luzianne
-- Mighty Leaf Tea
-- Numi Organic Tea
-- Peet's Coffee & Tea
-- Red Diamond
-- Salada tea
-- Stash Tea
-- Talbott Teas
-- Tavalon Tea
-- Tazo
-- Té Company
-- Tea Forté
-- TeaGschwendner
-- Teavana
-- Upton Tea
-- Yogi Tea
