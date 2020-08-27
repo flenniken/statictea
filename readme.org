@@ -47,19 +47,13 @@ they were static pages.
 
 StaticTea commands:
 
-- nextline — make substitutions in the next line
-- block — make substitutions in the next block of lines
-- endblock - end of block
-- replace — replace block with a variable
-- endreplace - end of replace block
-- # — comment
-- : - continue line, used for continuation lines
-
-You use the block and replace commands to define the start and
-end lines of the replacement block.  You end the block command
-with the endblock command and you end the replace block with
-the endreplace command. No statements are allowed on the end
-commands.
+- nextline -— make substitutions in the next line
+- block —- make substitutions in the next block of lines
+- endblock -- end of block
+- replace -— replace block with a variable
+- endreplace -- end of replace block
+- # —- comment
+- : -- continue line, used for continuation lines
 
 example command lines:
 
@@ -72,13 +66,28 @@ example command lines:
 
 ** Statements
 
-You add statements to commands to control how it behaves and to
-define variables. You use semicolons to separate statements. You can
-continue the line with the "\\" character at the end if you need
-more space.
+A statement assigns a variable a value using the standard equal
+sign. The varable being assigned is on the left hand side and on
+the right hand side is either another variable or a function.
+Here are examples of both:
 
-The full line is loaded into memory then statements are run from
-left to right.
+#+BEGIN_SRC
+var1 = var2
+var3 = t.row
+t.list = teaList
+#+END_SRC
+
+You define variables to use in the replacement block or you
+assign system variables to control how the block behaves.
+
+Statements go on the newline, block or replace command line. You
+can use multiple statements separated with semicolons.
+
+If you need more space, you can continue the line with the "\\"
+character at the end.
+
+Statements are executed from left to right. No statements are
+allowed on the end commands.
 
 *** Nextline Command
 
@@ -249,9 +258,8 @@ command. The continuation command allows you to continue adding
 statements as if it is one long line. You can continue the
 continue command too, if you need more space.
 
-The template's command line length is limited to
-maxCommandLineLength characters. This includes the continuation
-lines.
+The template's command line plus continuation lines length is
+limited, see limits.
 
 In the following example the nextline command continues on a
 second line and third line.
@@ -282,8 +290,8 @@ StaticTea has several variable types:
 *** Strings
 
 You define a string using single or double quotes. You use
-strings in command statements. The literal strings you define are
-limited to maxStringLength characters.
+strings in command statements. The literal strings you define
+have a limited number of characters. See limits.
 
 example strings:
 
@@ -314,8 +322,6 @@ result:
 
 *** Numbers
 
-You can use numbers in statements. You use them with the
-row function and you use -1, 0, 1 in if functions.
 Numbers are 32 bit signed integers.
 
 Example numbers:
@@ -329,8 +335,8 @@ Example numbers:
 
 *** Variables
 
-You use variables for dynamic replacement block content and to
-control how a command works.
+You use variables for block content and to control how a command
+works.
 
 You specify variables in json files or you create them in
 template statements.
@@ -361,10 +367,23 @@ serverVar
 s.name
 #+END_SRC
 
-** System Variables and Functions
+** Functions
 
-You primarily use the system variables and functions on a command
-line to control what the command does.
+A function returns a value.  You can assign the value to another
+variable in a statement or you can use it in a replacement block.
+There are a number of system functions.
+
+The following example assigns the numberVars variable to the
+number of variables in the t.server dictionary.  The t.version
+function is used directly in the replacement block.
+
+#+BEGIN_SRC
+<!--$ nextline numberVars = t.len(t.server) -->
+The server json contains {numberVars} variables.
+Were running version {t.version} of StaticTea.
+#+END_SRC
+
+** System Variables and Functions
 
 System variables and functions:
 
@@ -392,7 +411,7 @@ returned. After the first you have pairs of parameters, the case
 value, then the associated return value.
 
 You need to specify a variable to return when none of the cases
-match.  You do this with the t.else variable as the case value.
+match.  You do this with the t.else variable.
 
 template:
 
@@ -427,15 +446,16 @@ t.if(cond, v1, v2) is equivalent to: t.case(cond, 1, v1, t.else, v2)
 The t.cmp function compares two numbers or two strings and
 returns whether the first parameter is less than, equal to or
 greater than the second parameter. It returns -1 for less, 0 for
-equal and 1 for greater than.
+equal and 1 for greater than. You get three compares for the
+price of one!
 
-Normally you can pick one of the three cases you want.
+The example does a greater than or equal compare.
 
 template:
 
 #+BEGIN_SRC
 <!--$ nextline sold = t.cmp(earlgrey, oolong); \-->
-<!--$ : bestSelling = t.case(sold, 1, earlgreyName, t.else, oolongName) -->
+<!--$ : bestSelling = t.case(sold, 1, earlgreyName, 0, earlgreyName, t.else, oolongName) -->
 The best selling tea this week is {bestSelling}.
 #+END_SRC
 
@@ -477,7 +497,7 @@ You can use an if function in a template statement to create or
 assign a variable.
 
 The if function has three parameters. The first parameter is the
-condition, the second is the 1 case and the third is the 0
+condition, the second is the 1 case and the third is the else
 case. When the condition is 1, the second parameter is returned,
 else the third parameter is returned.
 
@@ -866,9 +886,9 @@ and the shared json has 0.
 
 ** System Defaults
 
-You can use the system variables in a template to see their
-default values. The following example shows the default values of
-so of the system variables.
+You can use the system variables in a replacement block to see
+their default values. The following example shows the default
+values of so of the system variables.
 
 template:
 
@@ -897,7 +917,7 @@ t.maxLines = 20
 ** Optional Parentheses:
 
 Functions take different numbers of parameters. If you call with
-one parameters, you can drop the parentheses.
+one parameter, you can drop the parentheses.
 
 These are equivalent:
 
@@ -1008,21 +1028,20 @@ The share json is used by the template builder to share common
 template lines and it contains presentation data.
 
 The server json file is included with the server option.  Its
-variables are referenced with the json key names.
-
-The shared json file is specified with the shared option. Its
 variables are referenced with the "s." namespace prefix.
 
-You can use multiple files of both types by specifying multiple
-files on the statictea command line. Internally there is one
-dictionary for the server and one for the shared. The files get
-added from left to right so the last duplicate variable wins.
+You can specify multiple server or shared files on the statictea
+command line. The server variables get added to the t.server
+dictionary and the shared to the t.shared dictionary.
+
+The get added from left to right so the last duplicate variable
+wins.
 
 ** Warning Messages
 
 When StaticTea detects a problem, a warning message is written to
-standard error and processing continues. All issues are handled,
-usually by skipping the problem.
+standard error, the statement is skipped, and processing
+continues.
 
 If a variable in a replacement block is used but it doesn't
 exist, the variable remains as is in the result, and a message is
@@ -1050,7 +1069,7 @@ example messages:
 The statictea program returns success, 0, when no message get
 output, else it returns 1.
 
-Example of running statictea with template errors:
+Example of running statictea when a variable is missing:
 
 template:
 
@@ -1087,7 +1106,7 @@ missing. When it is not missing nothing gets output.
 template:
 
 #+BEGIN_SRC
-<!--$ block t.result="stderr"; t.list = t.if(t.exists(admin), "", "showBlock") \-->
+<!--$ block t.result="stderr"; t.list = t.if(t.exists(admin), "", t.server) \-->
 <!--$   "warning: the admin variable is missing") -->
 <!--$ endblock -->
 #+END_SRC
@@ -1119,15 +1138,15 @@ The StaticTea command line options:
 
 ** General Limits
 
-- max command line length: maxCommandLineLength
-- max number of shared variables: maxSharedVariables
-- max number of server variables: maxServerVariables
-- max literal string length: maxStringLength
-- max literal name length: maxNameLength
-- max json key name length: maxJsonKeyLength
-- max json string value length: maxJsonValueLength
-- max json file size in bytes: maxJsonFileSize
-- max number if items in a list: maxNumberOfListItems
+- max command line length
+- max number of shared variables
+- max number of server variables
+- max literal string length
+- max literal name length
+- max json key name length
+- max json string value length
+- max json file size in bytes
+- max number if items in a list
 
 StaticTea checkes the json file size and if within the limit it
 reads it and adds its elements to the shared or server
@@ -1145,12 +1164,14 @@ The template syntax only uses ascii.
 
 ** Ellipsize
 
+#+BEGIN_SRC
 <!--$ # If the name is longer than 10 characters, -->
 <!--$ # clip it to 7 and add "...".               -->
 <!--$ cmp = t.cmp(len(name), 10);                \-->
 <!--$ name = t.case(cmd,                         \-->
 <!--$ : 1, t.concat(substr(name, 0, 7), "..."),  \-->
 <!--$ : t.else, name))                            -->
+#+END_SRC
 
 ** Tea Info
 
@@ -1162,3 +1183,44 @@ equaling all others – including coffee, soft drinks, and alcohol
 
 There are five main groups of teas, white, green, oolong, black,
 and pu'erh.
+
+** Other
+
+You can show a dictionary content using the t.show function.
+Show list too?
+
+#+BEGIN_SRC
+<!--$ nextline tserver = t.show(t.server) -->
+{tserver}
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+  admin: 0,
+  "teaList": [
+    {"tea": "Chamomile"},
+    {"tea": "Chrysanthemum"},
+    {"tea": "White"},
+    {"tea": "Puer"}
+  ],
+  "company": "Twinings",
+  "example": true
+  "dict": {}
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+admin: 0
+teaList: [4]
+company: "Twinings"
+example: true
+dict: {0}
+#+END_SRC
+
+** t.limits
+
+The t.limits dictionary contains the global limit values.
