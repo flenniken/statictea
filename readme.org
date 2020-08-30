@@ -60,7 +60,7 @@ example command lines:
 #+BEGIN_SRC
 <!--$ nextline -->
 <!--$ block t.list = teaProducingCountries; tea="Darjeeling" -->
-<!--$ replace t.content = header -->
+<!--$ replace t.replaceContent = header -->
 <!--$ # this is a comment command -->
 #+END_SRC
 
@@ -73,7 +73,7 @@ Here are examples of both:
 
 #+BEGIN_SRC
 var1 = var2
-var3 = t.row
+var3 = t.row()
 t.list = teaList
 #+END_SRC
 
@@ -165,7 +165,7 @@ John's house at 5:00 pm.
 
 The replace command replaces the replacement block with a
 variable's value. You set the block content by assigning the
-t.content variable.
+t.replaceContent variable.
 
 The lines in the block mirror the variable so you can
 test the template as if it was a static file.
@@ -174,7 +174,7 @@ The command is useful for sharing common template lines between
 templates and it has the special property that you can update the
 replacement block to keep it in sync with the variable.
 
-You can assign t.content the special "tempTesting" value and the
+You can assign t.replaceContent the special "tempTesting" value and the
 block content is used as is.  This is good for testing changes
 you want to make to the shared value. The block is not updated in
 this case, instead you get a warning.
@@ -184,7 +184,7 @@ The following example shares a common header between templates.
 template:
 
 #+BEGIN_SRC
-<!--$ replace t.content=s.header -->
+<!--$ replace t.replaceContent=s.header -->
 <!--$ endreplace -->
 #+END_SRC
 
@@ -213,7 +213,7 @@ data from the json variable.
 template:
 
 #+BEGIN_SRC
-<!--$ replace t.content=s.header -->
+<!--$ replace t.replaceContent=s.header -->
 <!doctype html>
 <html lang="en">
 <!--$ endreplace -—>
@@ -229,6 +229,39 @@ file:
 
 #+BEGIN_SRC
 statictea --update --shared shared.json --template mytea.html
+#+END_SRC
+
+The shared variable may contain replacement content too.  Here is
+another header example:
+
+template:
+
+#+BEGIN_SRC
+<!DOCTYPE html>
+<html lang="{languageCode}" dir="{languageDirection}">
+<head>
+<meta charset="UTF-8"/>
+<title>{Page Title}</title>
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+"languageCode": "en",
+"languageDirection": "ltr",
+"title": "Teas in England"
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<title>Teas in England</title>
 #+END_SRC
 
 *** Comment Command
@@ -293,11 +326,16 @@ You define a string using single or double quotes. You use
 strings in command statements. The literal strings you define
 have a limited number of characters. See limits.
 
+If you pass a string to a function taking a number, the string
+is converted to an integer. It's an error when the string doesn't
+look like a number.
+
 example strings:
 
 - "this is a string"
 - 'using single quote'
 - "You can store black teas longer than green teas."
+- "100"
 
 example usage:
 
@@ -320,9 +358,11 @@ result:
 <h2>Earl Grey</h2>
 #+END_SRC
 
-*** Numbers
+*** Integers
 
-Numbers are 32 bit signed integers.
+Integers are 32 bit signed numbers. When you use pass an integer
+to a function that takes a string, the number is converted to a
+string.
 
 Example numbers:
 
@@ -367,57 +407,72 @@ serverVar
 s.name
 #+END_SRC
 
-** Functions
+** System Functions
 
-A function returns a value.  You can assign the value to another
-variable in a statement or you can use it in a replacement block.
-There are a number of system functions.
+StaticTea has many built in functions you can call to format your
+varibles for output.  Functions take zero or more input parameters
+and return a value that you assign to a variable.
+
+You use functions on a command line and you use the resulting
+variables in its replacement block. The variables you define here
+are local to the block.
 
 The following example assigns the numberVars variable to the
-number of variables in the t.server dictionary.  The t.version
-function is used directly in the replacement block.
+number of variables in the t.server dictionary then it uses the
+variable in its replacement block.
 
 #+BEGIN_SRC
 <!--$ nextline numberVars = t.len(t.server) -->
 The server json contains {numberVars} variables.
-Were running version {t.version} of StaticTea.
 #+END_SRC
 
-** System Variables and Functions
+- t.case() -- generalized if function
+- t.cmp() -- spaceship compare function <=>
+- t.concat() -- concatenate strings
+- t.exists() -- tells whether a variables exists
+- t.find() -- find a substring in a string
+- t.format() -- format a string
+- t.if() -- if function
+- t.len() -- length of string
+- t.read() -- read a file for the replace command
+- t.row() -- special function that returns the current row
+- t.substr() -- extract a substring from a string by indexes
+- t.version() -- the current version and version checker
 
-System variables and functions:
+** System Variables
 
-- t.case -- case function
-- t.cmp -- spaceship compare function
-- t.concat -- concatenate strings function
-- t.content -- content of replace block
-- t.else -- else condition of case function
-- t.exists -- tells whether variables exists
-- t.if -- if function
-- t.len -- length of string function
-- t.list -- where the block variables come from, may repeat
-- t.maxLines -- maximum lines before block ends
+System variables control how the replacement block works.
+
+- t.list -- determines whether the current block repeats
+- t.maxLines -- maximum lines in a block
+- t.replaceContent -- replacement block content for the replace command
 - t.result -- where the block result goes
-- t.row -- function returns the current row
-- t.server -- the server json dictionary
-- t.shared -- the shared json dictionary
-- t.version -- function returns and verifies the version
+- t.server -- the server json variables
+- t.shared -- the shared json variables
 
 *** t.case
 
-The t.case function is a generalized if statement or case
-statement. The first parameter's value determines which case is
-returned. After the first you have pairs of parameters, the case
-value, then the associated return value.
+The t.case function is a generalized if statement.  You use it to
+preform different actions depending on the condition parameter.
 
-You need to specify a variable to return when none of the cases
-match.  You do this with the t.else variable.
+It requires at least two parameters, the condition and the the "else"
+case.
+
+The rest of the parameters you specify in pairs, the first is the
+case value and the second is the return value when the condition
+matches the case.
+
+When none of none of the cases match the condition, the else case
+is used.
+
+For the example below the abbr variable is set to an abbreviation
+depending on the type of tea.
 
 template:
 
 #+BEGIN_SRC
 <--$ nextline \-->
-<--$ : abbr = t.case(tea, 'Darjeeling', "Darj", "Earl Gray", "EG", t.else, "unknown") \-->
+<--$ : abbr = t.case(tea, "unknown", 'Darjeeling', "Darj", "Earl Gray", "EG") \-->
 The abbreviation for {tea} is {abbr}.
 #+END_SRC
 
@@ -438,7 +493,7 @@ The abbreviation for Darjeeling is Darj.
 The t.if statement is shorthand for the following t.case:
 
 #+BEGIN_SRC
-t.if(cond, v1, v2) is equivalent to: t.case(cond, 1, v1, t.else, v2)
+t.if(cond, v1, v2) is equivalent to: t.case(cond, v2, 1, v1)
 #+END_SRC
 
 *** t.cmp
@@ -446,16 +501,17 @@ t.if(cond, v1, v2) is equivalent to: t.case(cond, 1, v1, t.else, v2)
 The t.cmp function compares two numbers or two strings and
 returns whether the first parameter is less than, equal to or
 greater than the second parameter. It returns -1 for less, 0 for
-equal and 1 for greater than. You get three compares for the
-price of one!
+equal and 1 for greater than.
 
-The example does a greater than or equal compare.
+The example below shows the best selling tea between Earl Grey
+and Oolong. If Oolong out sells Earl Grey it's the best else it's
+Earl Grey.  Eary Grey wins ties.
 
 template:
 
 #+BEGIN_SRC
 <!--$ nextline sold = t.cmp(earlgrey, oolong); \-->
-<!--$ : bestSelling = t.case(sold, 1, earlgreyName, 0, earlgreyName, t.else, oolongName) -->
+<!--$ : bestSelling = t.case(sold, earlgreyName, 1, oolongName) -->
 The best selling tea this week is {bestSelling}.
 #+END_SRC
 
@@ -476,20 +532,46 @@ result:
 The best selling tea this week is Earl Grey, Twinings.
 #+END_SRC
 
-*** t.concat
-*** t.content: Content Variable
+*** t.concat()
 
-The t.content variable defines what goes in the replace block.
+The t.concat function concatenates strings.
 
-You assign your variable to the t.content variable and your
-variable's value replaces the whole replace block.  The default
-is "", which mean the block is replaced with nothing. The
-t.content variable only applies to the replace command.
+#+BEGIN_SRC
+t.concat() => ""
+t.concat("Tea") => "Tea"
+t.concat("Tea", "Time") => "TeaTime"
+t.concat("Tea", " ",  "Time") => "Tea Time"
+#+END_SRC
 
-*** t.else
+*** t.replaceContent: Content Variable
+
+The t.replaceContent variable defines what goes in the replace
+block. It only applies to the replace command.
+
+The default is "", which mean the block is replaced with nothing.
+
+The assigned value replaces the whole replace block.
+
 *** t.exists
 
 The t.exists returns 1 when a variable exists, else it returns 0.
+
+template:
+
+#+BEGIN_SRC
+<--$ block a = "apple"; ra = t.exists(a); rb = t.exists(b) -->
+t.exists(a) => {ra}
+t.exists(b) => {rb}
+<--$ endblock -->
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+t.exists(a) => 1
+t.exists(b) => 0
+#+END_SRC
+
 
 *** t.if:
 
@@ -561,17 +643,19 @@ The tea list has 5 elements.
 The server json dictionary has 1 elements.
 #+END_SRC
 
-*** t.list: List Variable
+*** t.list Variable
 
-The t.list variable controls how many times the command's block
-repeats. You assign it with your list variable and the block
-repeats for each item in the list. The values come from the list
-items. The default is t.server which means show the block once
-using values from the t.server. An empty list means don't show the
-block at all. You can assign the t.list a list or dictionary value.
+The t.list variable determines whether the current replacement block
+repeats or not. By default the block is output once. You can
+assign a list, to output the block zero or more times, once for
+each item in the list.
+
+The list must be a list of dictionaries. Each dictionary contains
+local variables you use in the block. An empty list means
+don't show the block at all.
 
 For the following example, tea_list is assigned to the t.list
-variable. The tea_list has five items.
+variable which outputs the block five times.
 
 template:
 
@@ -760,13 +844,12 @@ result:
 *** t.row:
 
 The special row function returns the current row for lists. The
-function takes an option parameter which specifies the starting
-number to return.
+function takes an optional parameter which specifies the starting
+point. You can use it in replacement blocks.
 
-- t.row   — returns 0, 1, 2,...
-- t.row 0 — returns 0, 1, 2,...
-- t.row 1 — returns 1, 2, 3,...
-- t.row N — returns N, N+1, N+2,... where N is some integer.
+- t.row(0) — returns 0, 1, 2,...
+- t.row(1) — returns 1, 2, 3,...
+- t.row(N) — returns N, N+1, N+2,... where N is some integer.
 
 Here is an example using the row variable.
 
@@ -774,7 +857,7 @@ template:
 
 #+BEGIN_SRC
 <!--$ nextline t.list=companies -->
-  <li id="r{t.row}>{t.row 1}. {teaCompany}</li>
+  <li id="r{t.row(0)}>{t.row(1)}. {teaCompany}</li>
 #+END_SRC
 
 json:
@@ -882,48 +965,6 @@ result:
 #+BEGIN_SRC
 The server passed 5 elements
 and the shared json has 0.
-#+END_SRC
-
-** System Defaults
-
-You can use the system variables in a replacement block to see
-their default values. The following example shows the default
-values of so of the system variables.
-
-template:
-
-#+BEGIN_SRC
-<!--$ block -->
-default t.row = {t.row}
-default t.list = {t.list}
-default t.content = {t.content}
-default t.maxLines = {t.maxLines}
-<!--$ endblock -->
-<!--$ block t.maxLines = 20 -->
-t.maxLines = {t.maxLines}
-<!--$ endblock -->
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-default t.row = 0
-default t.list = ""
-default t.content = ""
-default t.maxLines = 10
-t.maxLines = 20
-#+END_SRC
-
-** Optional Parentheses:
-
-Functions take different numbers of parameters. If you call with
-one parameter, you can drop the parentheses.
-
-These are equivalent:
-
-#+BEGIN_SRC
-email = t.row(0)
-email = t.row 0
 #+END_SRC
 
 ** StaticTea as a Filter
@@ -1168,9 +1209,8 @@ The template syntax only uses ascii.
 <!--$ # If the name is longer than 10 characters, -->
 <!--$ # clip it to 7 and add "...".               -->
 <!--$ cmp = t.cmp(len(name), 10);                \-->
-<!--$ name = t.case(cmd,                         \-->
-<!--$ : 1, t.concat(substr(name, 0, 7), "..."),  \-->
-<!--$ : t.else, name))                            -->
+<!--$ name = t.case(cmd, name                    \-->
+<!--$ : 1, t.concat(substr(name, 0, 7), "..."))   -->
 #+END_SRC
 
 ** Tea Info
@@ -1223,4 +1263,41 @@ dict: {0}
 
 ** t.limits
 
-The t.limits dictionary contains the global limit values.
+The t.limits dictionary contains the limit values.
+
+There are several reasons for all the limits. It makes testing
+the limit and one more than the limit possible. It allows the
+code to be optimized for memory and speed for the default
+cases. Its clear what needs to be supported so undo engineering
+for the unlimited cases are reduced.  The user can tailor usage
+to be withing the limits and they know it will perform well.
+
+** System Defaults
+
+You can use the system variables in a replacement block to see
+their default values. The following example shows the default
+values of so of the system variables.
+
+template:
+
+#+BEGIN_SRC
+<!--$ block -->
+default t.row = {t.row}
+default t.list = {t.list}
+default t.replaceContent = {t.replaceContent}
+default t.maxLines = {t.maxLines}
+<!--$ endblock -->
+<!--$ block t.maxLines = 20 -->
+t.maxLines = {t.maxLines}
+<!--$ endblock -->
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+default t.row = 0
+default t.list = 0
+default t.replaceContent = ""
+default t.maxLines = 10
+t.maxLines = 20
+#+END_SRC
