@@ -15,8 +15,9 @@ type
     shared: seq[string]
     templates: seq[string]
 
+
 proc `$`*(args: Args): string =
-  ## Return a string representation of the Args.
+  ## Return a string representation of Args.
   result = """
 Args:
   help=$1
@@ -27,13 +28,15 @@ Args:
 """ % [$args.help, $args.version, $args.server, $args.shared, $args.templates]
 
 
-proc parseCommandLine*(optParser: var OptParser, warnings: Stream): Args =
+proc parseCommandLine*(warnings: Stream, cmdLine: string=""): Args =
   ## Return the command line parameters and write warnings to the stream.
+
+  # var optParser = initOptParser(cmdLine, shortNoVal={'h', 'v'})
+  var optParser = initOptParser(cmdLine)
 
   # Iterate over all arguments passed to the cmdline.
   for kind, key, value in getopt(optParser):
-    # echo "kind: ", kind, ", key: ", key, ", value: ", value
-
+    # echo "kind: $1, key: $2, value: $3" % [$kind, $key, $value]
     case kind
       of CmdLineKind.cmdShortOption:
         var keyEnd = key.len - 1
@@ -45,21 +48,21 @@ proc parseCommandLine*(optParser: var OptParser, warnings: Stream): Args =
             result.version = true
           elif letter == 'd':
             if value == "":
-              warnings.writeLine("warning 4: No server json filename.")
+              warnings.writeLine("warning 4: No server json filename. Use -d=filename.")
             else:
               result.server.add(value)
           elif letter == 's':
             if value == "":
-              warnings.writeLine("warning 4: No shared json filename.")
+              warnings.writeLine("warning 4: No shared json filename. Use -s=filename.")
             else:
               result.shared.add(value)
           elif letter == 't':
             if value == "":
-              warnings.writeLine("warning 4: No template filename.")
+              warnings.writeLine("warning 4: No template filename. Use -t=filename.")
             else:
               result.templates.add(value)
           else:
-            warnings.writeLine("warning 3: Unknown switch: ", key)
+            warnings.writeLine("warning 3: Unknown switch: $1" % key)
       of CmdLineKind.cmdLongOption:
         if key == "help":
           result.help = true
@@ -67,23 +70,23 @@ proc parseCommandLine*(optParser: var OptParser, warnings: Stream): Args =
           result.version = true
         elif key == "data":
           if value == "":
-            warnings.writeLine("warning 4: No server json filename.")
+            warnings.writeLine("warning 4: No server json filename. Use --data=filename.")
           else:
             result.server.add(value)
         elif key == "shared":
           if value == "":
-            warnings.writeLine("warning 4: No shared json filename.")
+            warnings.writeLine("warning 4: No shared json filename. Use --shared=filename.")
           else:
             result.shared.add(value)
         elif key == "template":
           if value == "":
-            warnings.writeLine("warning 4: No template filename.")
+            warnings.writeLine("warning 4: No template filename. Use --template=filename.")
           else:
             result.templates.add(value)
         else:
-          warnings.writeLine("warning 3: Unknown switch: ", key)
+          warnings.writeLine("warning 3: Unknown switch: %1" % key)
       of CmdLineKind.cmdArgument:
-        warnings.writeLine("warning 1: Unknown argument, use a switch with all arguments: ", key)
+        warnings.writeLine("warning 1: Unknown argument: $1" % key)
       of CmdLineKind.cmdEnd:
         discard
 
@@ -95,7 +98,7 @@ when isMainModule:
   setControlCHook(controlCHandler)
 
   # Process the command line args and run.
-  var optParser = initOptParser()
+  var optParser = initOptParser(shortNoVal={'h', 'v'})
   var stream = newFileStream(stderr)
-  let args = parseCommandLine(optParser, stream)
+  let args = parseCommandLine(stream)
   echo $args
