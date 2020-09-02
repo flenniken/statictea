@@ -19,8 +19,8 @@ proc parseCmdLine(cmdLine: string): tuple[args: Args, warningLines: seq[string]]
   result = (args, warningLines)
 
 
-# statictea --data=serverdata.json --shared=shared.json --template=template.html --result=result.html
-# -d -s -t -r -v -h
+# statictea --server=server.json --sharedJson=shared.json --template=template.html --result=result.htm
+# -s -j -t -r -v -h
 
 
 suite "Test statictea.nim":
@@ -84,30 +84,30 @@ suite "Test statictea.nim":
     check(args.templateList[0] == "tea.html")
     check(args.resultList.len == 0)
 
-  test "parseCommandLine-d":
-    var (args, lines) = parseCmdLine("-d=server.json")
-    check(lines.len == 0)
-    check(args.help == false)
-    check(args.version == false)
-    check(args.serverList.len == 1)
-    check(args.serverList[0] == "server.json")
-    check(args.sharedList.len == 0)
-    check(args.templateList.len == 0)
-    check(args.resultList.len == 0)
-
-  test "parseCommandLine-data":
-    var (args, lines) = parseCmdLine("--data=server.json")
-    check(lines.len == 0)
-    check(args.help == false)
-    check(args.version == false)
-    check(args.serverList.len == 1)
-    check(args.serverList[0] == "server.json")
-    check(args.sharedList.len == 0)
-    check(args.templateList.len == 0)
-    check(args.resultList.len == 0)
-
   test "parseCommandLine-s":
-    var (args, lines) = parseCmdLine("-s=shared.json")
+    var (args, lines) = parseCmdLine("-s=server.json")
+    check(lines.len == 0)
+    check(args.help == false)
+    check(args.version == false)
+    check(args.serverList.len == 1)
+    check(args.serverList[0] == "server.json")
+    check(args.sharedList.len == 0)
+    check(args.templateList.len == 0)
+    check(args.resultList.len == 0)
+
+  test "parseCommandLine-server":
+    var (args, lines) = parseCmdLine("--server=server.json")
+    check(lines.len == 0)
+    check(args.help == false)
+    check(args.version == false)
+    check(args.serverList.len == 1)
+    check(args.serverList[0] == "server.json")
+    check(args.sharedList.len == 0)
+    check(args.templateList.len == 0)
+    check(args.resultList.len == 0)
+
+  test "parseCommandLine-j":
+    var (args, lines) = parseCmdLine("-j=shared.json")
     check(lines.len == 0)
     check(args.help == false)
     check(args.version == false)
@@ -128,8 +128,30 @@ suite "Test statictea.nim":
     check(args.templateList.len == 0)
     check(args.resultList.len == 0)
 
+  test "parseCommandLine-r":
+    var (args, lines) = parseCmdLine("-r=result.html")
+    check(lines.len == 0)
+    check(args.help == false)
+    check(args.version == false)
+    check(args.serverList.len == 0)
+    check(args.sharedList.len == 0)
+    check(args.templateList.len == 0)
+    check(args.resultList.len == 1)
+    check(args.resultList[0] == "result.html")
+
+  test "parseCommandLine-result":
+    var (args, lines) = parseCmdLine("--result=result.html")
+    check(lines.len == 0)
+    check(args.help == false)
+    check(args.version == false)
+    check(args.serverList.len == 0)
+    check(args.sharedList.len == 0)
+    check(args.templateList.len == 0)
+    check(args.resultList.len == 1)
+    check(args.resultList[0] == "result.html")
+
   test "parseCommandLine-happy-path":
-    var (args, lines) = parseCmdLine("-d=server.json -s=shared.json -t=tea.html -r=result.html")
+    var (args, lines) = parseCmdLine("-s=server.json -j=shared.json -t=tea.html -r=result.html")
     check(args.help == false)
     check(args.version == false)
     check(args.serverList.len == 1)
@@ -143,7 +165,7 @@ suite "Test statictea.nim":
     check(lines.len == 0)
 
   test "parseCommandLine-multiple":
-    var (args, lines) = parseCmdLine("-d=server.json -d=server2.json -s=shared.json -s=shared2.json -t=tea.html -r=result.html")
+    var (args, lines) = parseCmdLine("-s=server.json -s=server2.json -j=shared.json -j=shared2.json -t=tea.html -r=result.html")
     check(lines.len == 0)
     check(args.help == false)
     check(args.version == false)
@@ -169,4 +191,4 @@ suite "Test statictea.nim":
     check(args.templateList.len == 0)
     check(args.resultList.len == 0)
     check(lines.len == 1)
-    check(lines[0] == "warning 4: No shared json filename. Use -s=filename.")
+    check(lines[0] == "warning 4: No server json filename. Use -s=filename.")

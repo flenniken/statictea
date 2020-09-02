@@ -30,7 +30,6 @@ Args:
 proc parseCommandLine*(warnings: Stream, cmdLine: string=""): Args =
   ## Return the command line parameters and write warnings to the stream.
 
-  # var optParser = initOptParser(cmdLine, shortNoVal={'h', 'v'})
   var optParser = initOptParser(cmdLine)
 
   # Iterate over all arguments passed to the cmdline.
@@ -45,14 +44,14 @@ proc parseCommandLine*(warnings: Stream, cmdLine: string=""): Args =
             result.help = true
           elif letter == 'v':
             result.version = true
-          elif letter == 'd':
-            if value == "":
-              warnings.writeLine("warning 4: No server json filename. Use -d=filename.")
-            else:
-              result.serverList.add(value)
           elif letter == 's':
             if value == "":
-              warnings.writeLine("warning 4: No shared json filename. Use -s=filename.")
+              warnings.writeLine("warning 4: No server json filename. Use -s=filename.")
+            else:
+              result.serverList.add(value)
+          elif letter == 'j':
+            if value == "":
+              warnings.writeLine("warning 4: No shared json filename. Use -j=filename.")
             else:
               result.sharedList.add(value)
           elif letter == 't':
@@ -72,9 +71,9 @@ proc parseCommandLine*(warnings: Stream, cmdLine: string=""): Args =
           result.help = true
         elif key == "version":
           result.version = true
-        elif key == "data":
+        elif key == "server":
           if value == "":
-            warnings.writeLine("warning 4: No server json filename. Use --data=filename.")
+            warnings.writeLine("warning 4: No server json filename. Use --server=filename.")
           else:
             result.serverList.add(value)
         elif key == "shared":
