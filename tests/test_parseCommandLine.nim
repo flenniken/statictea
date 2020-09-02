@@ -31,7 +31,7 @@ suite "Test statictea.nim":
     let warningLines = stream.readLines()
     check(warningLines.len == 1)
     check(warningLines[0] == "testing")
-    
+
   test "readLines2":
     var stream = newStringStream()
     defer: stream.close()
@@ -41,7 +41,7 @@ suite "Test statictea.nim":
     check(warningLines.len == 2)
     check(warningLines[0] == "this is a test")
     check(warningLines[1] == "1 2 3")
-    
+
   test "parseCommandLine-v":
     var (args, lines) = parseCmdLine("-v")
     check(lines.len == 0)
@@ -191,4 +191,4 @@ suite "Test statictea.nim":
     check(args.templateList.len == 0)
     check(args.resultList.len == 0)
     check(lines.len == 1)
-    check(lines[0] == "warning 4: No server json filename. Use -s=filename.")
+    check(lines[0] == "warning 4: No s filename. Use -s=filename.")
