@@ -127,6 +127,9 @@ suite "Test statictea.nim":
     tpcl("bare naked", warningLines = @["warning 3: Unknown argument: bare",
     "warning 3: Unknown argument: naked"])
 
+  test "parseCommandLine-missing-result":
+    tpcl("-r", warningLines = @["warning 1: No result filename. Use r=filename."])
+
   test "parseCommandLine-two-results":
     tpcl("-r=result.html -r=asdf.html", resultFilename="result.html",
          warningLines = @["warning 4: One result file allowed, skipping: asdf.html"])
