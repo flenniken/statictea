@@ -191,4 +191,4 @@ suite "Test statictea.nim":
     check(args.templateList.len == 0)
     check(args.resultList.len == 0)
     check(lines.len == 1)
-    check(lines[0] == "warning 4: No s filename. Use -s=filename.")
+    check(lines[0] == "warning 4: No server filename. Use s=filename.")

@@ -28,27 +28,63 @@ Args:
 """ % [$args.help, $args.version, $args.serverList, $args.sharedList, $args.templateList, $args.resultList]
 
 
-proc addFilename(args: var Args, switch: string, value: string) =
-  ## Add a filename to the args list specified by the switch.
-  case switch
-    of "server", "s":
-      args.serverList.add(value)
-    of "shared", "j":
-      args.sharedList.add(value)
-    of "template", "t":
-      args.templateList.add(value)
-    of "result", "r":
-      args.resultList.add(value)
+proc addFilename(word: string, filename: string, args: var Args) =
+  ## Add a filename to the args list specified by the word.
+  case word
+  of "server":
+    args.serverList.add(filename)
+  of "shared":
+    args.sharedList.add(filename)
+  of "template":
+    args.templateList.add(filename)
+  of "result":
+    args.resultList.add(filename)
+  else:
+    discard
+
+
+proc letterToWord(letter: char): string =
+  case letter
+  of 's':
+    result = "server"
+  of 'j':
+    result = "shared"
+  of 't':
+    result = "template"
+  of 'r':
+    result = "result"
+  of 'h':
+    result = "help"
+  of 'v':
+    result = "version"
+  else:
+    result = ""
+
+
+proc handleWord(switch: string, word: string, value: string,
+                warnings: Stream, args: var Args) =
+  ## switch is either a word or a letter, the value from the command line.
+  ## word is the name in the args object.
+
+  let filenameList = toHashSet(["server", "shared", "template", "result"])
+  if word in filenameList:
+    if value == "":
+      warnings.writeLine("warning 4: No $1 filename. Use $2=filename." % [word, $switch])
     else:
-      discard
+      addFilename(word, value, args)
+  elif word == "help":
+    args.help = true
+  elif word == "version":
+    args.version = true
+  else:
+    warnings.writeLine("warning 3: Unknown switch: $1" % $switch)
+
 
 
 proc parseCommandLine*(warnings: Stream, cmdLine: string=""): Args =
   ## Return the command line parameters and write warnings to the stream.
 
   var optParser = initOptParser(cmdLine)
-  let letterNameList = toHashSet("sjtr")
-  let wordNameList = toHashSet(["server", "shared", "template", "result"])
 
   # Iterate over all arguments passed to the cmdline.
   for kind, key, value in getopt(optParser):
@@ -56,33 +92,18 @@ proc parseCommandLine*(warnings: Stream, cmdLine: string=""): Args =
     case kind
       of CmdLineKind.cmdShortOption:
         for ix in 0..key.len-1:
-          var letter = key[ix]
-          if letter in letterNameList:
-            if value == "":
-              warnings.writeLine("warning 4: No $1 filename. Use -$1=filename." % $letter)
-            else:
-              addFilename(result, $letter, value)
-          elif letter == 'h':
-            result.help = true
-          elif letter == 'v':
-            result.version = true
+          let letter = key[ix]
+          let word = letterToWord(letter)
+          if word == "":
+            warnings.writeLine("warning 3: Unknown switch: $1" % $letter)
           else:
-            warnings.writeLine("warning 3: Unknown switch: %1" % $letter)
+            handleWord($letter, word, value, warnings, result)
 
       of CmdLineKind.cmdLongOption:
-        if key in wordNameList:
-          if value == "":
-            warnings.writeLine("warning 4: No $1 filename. Use --$1=filename." % key)
-          else:
-            addFilename(result, key, value)
-        elif key == "help":
-          result.help = true
-        elif key == "version":
-          result.version = true
-        else:
-          warnings.writeLine("warning 3: Unknown switch: %1" % key)
+        handleWord(key, key, value, warnings, result)
 
       of CmdLineKind.cmdArgument:
         warnings.writeLine("warning 1: Unknown argument: $1" % key)
+
       of CmdLineKind.cmdEnd:
         discard
