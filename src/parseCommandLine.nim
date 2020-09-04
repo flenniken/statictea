@@ -3,38 +3,46 @@
 import parseopt
 import streams
 import strutils
-import tables
-
+import tpub
 
 type
-  # ListType = enum serverList, sharedList, templateList, resultList
   Args* = object
     ## Command line arguments.
     help*: bool
     version*: bool
-    filenames*: array[4, seq[string]]
+    serverList*: seq[string]
+    sharedList*: seq[string]
+    templateList*: seq[string]
+    resultList*: seq[string]
+
+const
+  fileLists = ["server", "shared", "template", "result"]
+  switches = [
+    ('h', "help"),
+    ('v', "version"),
+    ('s', "server"),
+    ('j', "shared"),
+    ('t', "template"),
+    ('r', "result"),
+  ]
 
 
-let wordToListIndex = {
-  "server": 0,
-  "shared": 1,
-  "template": 2,
-  "result": 3,
-}.toTable
+func fileListIndex(word: string): int {.tpub.} =
+  for ix, w in fileLists:
+    if w == word:
+      return ix
+  return -1
 
 
-let letterToWord = {
-  's': "server",
-  'j': "shared",
-  't': "template",
-  'r': "result",
-  'h': "help",
-  'v': "version",
-}.toTable
+func letterToWord(letter: char): string {.tpub.} =
+  for tup in switches:
+    if tup[0] == letter:
+      return tup[1]
+  return ""
 
 
 proc `$`*(args: Args): string =
-  ## Return a string representation of Args.
+  ## A string representation of Args.
   result = """
 Args:
   help=$1
@@ -43,36 +51,37 @@ Args:
   sharedList=$4
   templateList=$5
   resultList=$6
-""" % [$args.help, $args.version, $args.filenames[0], $args.filenames[1],
-       $args.filenames[2], $args.filenames[3]]
-
-
+""" % [$args.help, $args.version, $args.serverList, $args.sharedList,
+       $args.templateList, $args.resultList]
 
 
 proc handleWord(switch: string, word: string, value: string,
-                warnings: Stream, args: var Args) =
-  ## switch is either a word or a letter, the value from the command line.
-  ## word is the name in the args object.
+    warnings: Stream, help: var bool, version: var bool,
+    filenames: var array[4, seq[string]]) =
+  ## Handle one switch and return its value.  Switch is the key from
+  ## the command line, either a word or a letter.  Word is the long
+  ## form of the switch.
 
-  let listIndex = wordToListIndex.getOrDefault(word, -1)
+  let listIndex = fileListIndex(word)
   if listIndex != -1:
     if value == "":
-      warnings.writeLine("warning 4: No $1 filename. Use $2=filename." % [word, $switch])
+      warnings.writeLine("warning 1: No $1 filename. Use $2=filename." % [word, $switch])
     else:
-      args.filenames[listIndex].add(value)
+      filenames[listIndex].add(value)
   elif word == "help":
-    args.help = true
+    help = true
   elif word == "version":
-    args.version = true
+    version = true
   else:
-    warnings.writeLine("warning 3: Unknown switch: $1" % $switch)
+    warnings.writeLine("warning 2: Unknown switch: $1" % $switch)
 
 
 proc parseCommandLine*(warnings: Stream, cmdLine: string=""): Args =
   ## Return the command line parameters and write warnings to the stream.
 
-  # result = Args(help: false, version: false, filenames: [seq[], seq[], seq[], seq[]])
-
+  var help: bool = false
+  var version: bool = false
+  var filenames: array[4, seq[string]]
   var optParser = initOptParser(cmdLine)
 
   # Iterate over all arguments passed to the cmdline.
@@ -82,17 +91,24 @@ proc parseCommandLine*(warnings: Stream, cmdLine: string=""): Args =
       of CmdLineKind.cmdShortOption:
         for ix in 0..key.len-1:
           let letter = key[ix]
-          let word = letterToWord.getOrDefault(letter, "")
+          let word = letterToWord(letter)
           if word == "":
-            warnings.writeLine("warning 3: Unknown switch: $1" % $letter)
+            warnings.writeLine("warning 2: Unknown switch: $1" % $letter)
           else:
-            handleWord($letter, word, value, warnings, result)
+            handleWord($letter, word, value, warnings, help, version, filenames)
 
       of CmdLineKind.cmdLongOption:
-        handleWord(key, key, value, warnings, result)
+        handleWord(key, key, value, warnings, help, version, filenames)
 
       of CmdLineKind.cmdArgument:
-        warnings.writeLine("warning 1: Unknown argument: $1" % key)
+        warnings.writeLine("warning 3: Unknown argument: $1" % key)
 
       of CmdLineKind.cmdEnd:
         discard
+
+  result.help = help
+  result.version = version
+  result.serverList = filenames[0]
+  result.sharedList = filenames[1]
+  result.templateList = filenames[2]
+  result.resultList = filenames[3]

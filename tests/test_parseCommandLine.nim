@@ -12,7 +12,7 @@ proc readLines(stream: Stream): seq[string] =
 proc tpcl(cmdLine: string, version: bool=false, help: bool=false, serverList: seq[string] = @[],
   sharedList: seq[string] = @[], templateList: seq[string] = @[], resultList: seq[string] = @[],
   warningLines: seq[string] = @[]) =
-  
+
   var stream = newStringStream()
   defer: stream.close()
 
@@ -21,10 +21,10 @@ proc tpcl(cmdLine: string, version: bool=false, help: bool=false, serverList: se
 
   check(args.version == version)
   check(args.help == help)
-  check(args.filenames[0] == serverList)
-  check(args.filenames[1] == sharedList)
-  check(args.filenames[2] == templateList)
-  check(args.filenames[3] == resultList)
+  check(args.serverList == serverList)
+  check(args.sharedList == sharedList)
+  check(args.templateList == templateList)
+  check(args.resultList == resultList)
   check(lines == warningLines)
 
 
@@ -34,6 +34,22 @@ proc tpcl(cmdLine: string, version: bool=false, help: bool=false, serverList: se
 
 
 suite "Test statictea.nim":
+
+  test "fileListIndex":
+    check(fileListIndex("server") == 0)
+    check(fileListIndex("shared") == 1)
+    check(fileListIndex("template") == 2)
+    check(fileListIndex("result") == 3)
+    check(fileListIndex("other") == -1)
+
+  test "letterToWord":
+    check(letterToWord('s') == "server")
+    check(letterToWord('j') == "shared")
+    check(letterToWord('t') == "template")
+    check(letterToWord('r') == "result")
+    check(letterToWord('h') == "help")
+    check(letterToWord('v') == "version")
+    check(letterToWord('p') == "")
 
   test "readLines":
     var stream = newStringStream("testing")
@@ -100,5 +116,18 @@ suite "Test statictea.nim":
 
   # Test some error cases.
 
-  test "parseCommandLine-missing-name":
-    tpcl("-s", warningLines = @["warning 4: No server filename. Use s=filename."])
+  test "parseCommandLine-no-filename":
+    tpcl("-s", warningLines = @["warning 1: No server filename. Use s=filename."])
+
+  test "parseCommandLine-no-switch":
+    tpcl("-w", warningLines = @["warning 2: Unknown switch: w"])
+
+  test "parseCommandLine-no-long-switch":
+    tpcl("--hello", warningLines = @["warning 2: Unknown switch: hello"])
+
+  test "parseCommandLine-no-arg":
+    tpcl("bare", warningLines = @["warning 3: Unknown argument: bare"])
+
+  test "parseCommandLine-no-args":
+    tpcl("bare naked", warningLines = @["warning 3: Unknown argument: bare",
+    "warning 3: Unknown argument: naked"])
