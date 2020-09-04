@@ -63,6 +63,36 @@ suite "Test statictea.nim":
     check(warningLines[0] == "this is a test")
     check(warningLines[1] == "1 2 3")
 
+  test "args to string":
+    var args: Args
+    let expected = """
+Args:
+  help=false
+  version=false
+  serverList=
+  sharedList=
+  templateList=
+  resultFilename=
+"""
+    check($args == expected)
+
+  test "args to string2":
+    var args: Args
+    args.help = true
+    args.serverList = @["server.json", "more.json"]
+    args.sharedList = @["shared.json"]
+    args.resultFilename = "result.html"
+    let expected = """
+Args:
+  help=true
+  version=false
+  serverList=server.json, more.json
+  sharedList=shared.json
+  templateList=
+  resultFilename=result.html
+"""
+    check($args == expected)
+
   test "parseCommandLine-v":
     tpcl("-v", version=true)
 

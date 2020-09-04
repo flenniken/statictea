@@ -11,7 +11,7 @@ when isMainModule:
     quit 0
   setControlCHook(controlCHandler)
 
-  # Process the command line args and run.
+  # Process the command line args.
   var stream = newFileStream(stderr)
   let args = parseCommandLine(stream)
   echo $args

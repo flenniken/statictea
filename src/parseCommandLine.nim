@@ -40,6 +40,8 @@ func letterToWord(letter: char): string {.tpub.} =
       return tup[1]
   return ""
 
+proc `$`(sequence: seq[string]): string =
+  result = sequence.join(", ")
 
 proc `$`*(args: Args): string =
   ## A string representation of Args.
