@@ -9,9 +9,10 @@ proc readLines(stream: Stream): seq[string] =
   for line in stream.lines():
     result.add line
 
-proc tpcl(cmdLine: string, version: bool=false, help: bool=false, serverList: seq[string] = @[],
-  sharedList: seq[string] = @[], templateList: seq[string] = @[], resultList: seq[string] = @[],
-  warningLines: seq[string] = @[]) =
+proc tpcl(cmdLine: string, version: bool=false, help: bool=false,
+    resultFilename: string = "", serverList: seq[string] = @[],
+    sharedList: seq[string] = @[], templateList: seq[string] = @[],
+    warningLines: seq[string] = @[]) =
 
   var stream = newStringStream()
   defer: stream.close()
@@ -24,13 +25,8 @@ proc tpcl(cmdLine: string, version: bool=false, help: bool=false, serverList: se
   check(args.serverList == serverList)
   check(args.sharedList == sharedList)
   check(args.templateList == templateList)
-  check(args.resultList == resultList)
+  check(args.resultFilename == resultFilename)
   check(lines == warningLines)
-
-
-
-# statictea --server=server.json --sharedJson=shared.json --template=template.html --result=result.htm
-# -s -j -t -r -v -h
 
 
 suite "Test statictea.nim":
@@ -39,7 +35,6 @@ suite "Test statictea.nim":
     check(fileListIndex("server") == 0)
     check(fileListIndex("shared") == 1)
     check(fileListIndex("template") == 2)
-    check(fileListIndex("result") == 3)
     check(fileListIndex("other") == -1)
 
   test "letterToWord":
@@ -93,17 +88,17 @@ suite "Test statictea.nim":
     tpcl("--shared=shared.json", sharedList = @["shared.json"])
 
   test "parseCommandLine-r":
-    tpcl("-r=result.html", resultList = @["result.html"])
+    tpcl("-r=result.html", resultFilename = "result.html")
 
   test "parseCommandLine-result":
-    tpcl("--result=result.html", resultList = @["result.html"])
+    tpcl("--result=result.html", resultFilename = "result.html")
 
   test "parseCommandLine-happy-path":
     tpcl("-s=server.json -j=shared.json -t=tea.html -r=result.html",
          serverList = @["server.json"],
          sharedList = @["shared.json"],
          templateList = @["tea.html"],
-         resultList = @["result.html"],
+         resultFilename = "result.html",
     )
 
   test "parseCommandLine-multiple":
@@ -111,7 +106,7 @@ suite "Test statictea.nim":
          serverList = @["server.json", "server2.json"],
          sharedList = @["shared.json", "shared2.json"],
          templateList = @["tea.html"],
-         resultList = @["result.html"],
+         resultFilename = "result.html",
     )
 
   # Test some error cases.
@@ -131,3 +126,7 @@ suite "Test statictea.nim":
   test "parseCommandLine-no-args":
     tpcl("bare naked", warningLines = @["warning 3: Unknown argument: bare",
     "warning 3: Unknown argument: naked"])
+
+  test "parseCommandLine-two-results":
+    tpcl("-r=result.html -r=asdf.html", resultFilename="result.html",
+         warningLines = @["warning 4: One result file allowed, skipping: asdf.html"])

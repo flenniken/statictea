@@ -13,10 +13,10 @@ type
     serverList*: seq[string]
     sharedList*: seq[string]
     templateList*: seq[string]
-    resultList*: seq[string]
+    resultFilename*: string
 
 const
-  fileLists = ["server", "shared", "template", "result"]
+  fileLists = ["server", "shared", "template"]
   switches = [
     ('h', "help"),
     ('v', "version"),
@@ -50,14 +50,14 @@ Args:
   serverList=$3
   sharedList=$4
   templateList=$5
-  resultList=$6
+  resultFilename=$6
 """ % [$args.help, $args.version, $args.serverList, $args.sharedList,
-       $args.templateList, $args.resultList]
+       $args.templateList, $args.resultFilename]
 
 
 proc handleWord(switch: string, word: string, value: string,
-    warnings: Stream, help: var bool, version: var bool,
-    filenames: var array[4, seq[string]]) =
+                warnings: Stream, help: var bool, version: var bool,
+                resultFilename: var string, filenames: var array[4, seq[string]]) =
   ## Handle one switch and return its value.  Switch is the key from
   ## the command line, either a word or a letter.  Word is the long
   ## form of the switch.
@@ -72,6 +72,13 @@ proc handleWord(switch: string, word: string, value: string,
     help = true
   elif word == "version":
     version = true
+  elif word == "result":
+    if value == "":
+      warnings.writeLine("warning 1: No $1 filename. Use $2=filename." % [word, $switch])
+    elif resultFilename != "":
+      warnings.writeLine("warning 4: One result file allowed, skipping: $1" % [value])
+    else:
+      resultFilename = value
   else:
     warnings.writeLine("warning 2: Unknown switch: $1" % $switch)
 
@@ -83,6 +90,7 @@ proc parseCommandLine*(warnings: Stream, cmdLine: string=""): Args =
   var version: bool = false
   var filenames: array[4, seq[string]]
   var optParser = initOptParser(cmdLine)
+  var resultFilename: string
 
   # Iterate over all arguments passed to the cmdline.
   for kind, key, value in getopt(optParser):
@@ -95,10 +103,10 @@ proc parseCommandLine*(warnings: Stream, cmdLine: string=""): Args =
           if word == "":
             warnings.writeLine("warning 2: Unknown switch: $1" % $letter)
           else:
-            handleWord($letter, word, value, warnings, help, version, filenames)
+            handleWord($letter, word, value, warnings, help, version, resultFilename, filenames)
 
       of CmdLineKind.cmdLongOption:
-        handleWord(key, key, value, warnings, help, version, filenames)
+        handleWord(key, key, value, warnings, help, version, resultFilename, filenames)
 
       of CmdLineKind.cmdArgument:
         warnings.writeLine("warning 3: Unknown argument: $1" % key)
@@ -111,4 +119,4 @@ proc parseCommandLine*(warnings: Stream, cmdLine: string=""): Args =
   result.serverList = filenames[0]
   result.sharedList = filenames[1]
   result.templateList = filenames[2]
-  result.resultList = filenames[3]
+  result.resultFilename = resultFilename
