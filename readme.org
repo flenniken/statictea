@@ -38,7 +38,7 @@ shared json file.  The server json comes from the server and does
 not contain any presentation markup. The shared json, maintained
 by the template builder, contains shared presentation markup.
 
-Since the template commands are encoded as comments, the template
+The template commands are encoded as comments so the template
 file looks like a native file and you can view, edit, validate,
 etc. the file with its normal tools. You develop templates as if
 they were static pages.
@@ -66,19 +66,19 @@ example command lines:
 
 ** Statements
 
-A statement assigns a variable a value using the standard equal
-sign. The varable being assigned is on the left hand side and on
-the right hand side is either another variable or a function.
-Here are examples of both:
+A statement assigns a variable a value using the equal sign. The
+varable being assigned is on the left hand side and on the right
+hand side is either another variable or a function.  Here are
+examples of both:
 
 #+BEGIN_SRC
 var1 = var2
-var3 = t.row()
+var3 = t.row(0)
 t.list = teaList
 #+END_SRC
 
-You define variables to use in the replacement block or you
-assign system variables to control how the block behaves.
+You define variables to use in the replacement block or to
+control how the block behaves.
 
 Statements go on the newline, block or replace command line. You
 can use multiple statements separated with semicolons.
@@ -97,7 +97,7 @@ in the file has variable content.
 The content comes from text in the line and variables wrapped
 with brackets.
 
-In the following example there is some text and two variables, the
+The following example contains some text and two variables, the
 drink and drinkType variables.
 
 template:
@@ -176,8 +176,7 @@ replacement block to keep it in sync with the variable.
 
 You can assign t.replaceContent the special "tempTesting" value and the
 block content is used as is.  This is good for testing changes
-you want to make to the shared value. The block is not updated in
-this case, instead you get a warning.
+you want to make to the shared value.
 
 The following example shares a common header between templates.
 
@@ -237,11 +236,13 @@ another header example:
 template:
 
 #+BEGIN_SRC
+<--$ block -->
 <!DOCTYPE html>
 <html lang="{languageCode}" dir="{languageDirection}">
 <head>
 <meta charset="UTF-8"/>
-<title>{Page Title}</title>
+<title>{title}</title>
+<--$ endBlock -->
 #+END_SRC
 
 json:
@@ -313,7 +314,7 @@ Earl Grey, Masala chai
 #+END_SRC
 ** Types
 
-StaticTea has several variable types:
+StaticTea variable types:
 
 - strings
 - numbers
@@ -322,9 +323,9 @@ StaticTea has several variable types:
 
 *** Strings
 
-You define a string using single or double quotes. You use
-strings in command statements. The literal strings you define
-have a limited number of characters. See limits.
+You define a string with single or double quotes. You use strings
+in statements. The strings you define are limited to 60
+characters. See limits.
 
 If you pass a string to a function taking a number, the string
 is converted to an integer. It's an error when the string doesn't
@@ -360,8 +361,8 @@ result:
 
 *** Integers
 
-Integers are 32 bit signed numbers. When you use pass an integer
-to a function that takes a string, the number is converted to a
+Integers are 32 bit signed numbers. When you pass an integer to a
+function that takes a string, the number is converted to a
 string.
 
 Example numbers:
@@ -381,13 +382,13 @@ works.
 You specify variables in json files or you create them in
 template statements.
 
-A json dictionary keys are the variable names and their value
+A json dictionary keys become the variable names and their value
 becomes part of the template when they are used.
 
 Internally two json namespaces exist, one for the shared json and
-one for the server json.  You access the shared json with "s."
-prefix the system variables with "t." and you access the server
-variables with no prefix.
+one for the server json.  You access the shared json with the
+"s."  prefix the system variables with the "t." prefix, and the
+server variables with no prefix.
 
 You can define new variables on the command line in
 statements. These variables are local to the block and take
@@ -402,20 +403,31 @@ takes precedence when there are duplicates.
 example variables:
 
 #+BEGIN_SRC
-t.row
 serverVar
 s.name
+mytea
+t.list
 #+END_SRC
 
-** System Functions
+** System Variables
+
+System variables control how the replacement block works.
+
+- t.list -- determines whether the current block repeats
+- t.maxLines -- maximum lines in a block
+- t.replaceContent -- content for the replace command
+- t.result -- where the block result goes
+- t.server -- the server json variables
+- t.shared -- the shared json variables
+
+** Functions
 
 StaticTea has many built in functions you can call to format your
 varibles for output.  Functions take zero or more input parameters
 and return a value that you assign to a variable.
 
 You use functions on a command line and you use the resulting
-variables in its replacement block. The variables you define here
-are local to the block.
+variables in its replacement block.
 
 The following example assigns the numberVars variable to the
 number of variables in the t.server dictionary then it uses the
@@ -426,10 +438,12 @@ variable in its replacement block.
 The server json contains {numberVars} variables.
 #+END_SRC
 
+List of functions:
+
 - t.case() -- generalized if function
 - t.cmp() -- spaceship compare function <=>
 - t.concat() -- concatenate strings
-- t.exists() -- tells whether a variables exists
+- t.exists() -- whether a variables exists
 - t.find() -- find a substring in a string
 - t.format() -- format a string
 - t.if() -- if function
@@ -439,31 +453,20 @@ The server json contains {numberVars} variables.
 - t.substr() -- extract a substring from a string by indexes
 - t.version() -- the current version and version checker
 
-** System Variables
-
-System variables control how the replacement block works.
-
-- t.list -- determines whether the current block repeats
-- t.maxLines -- maximum lines in a block
-- t.replaceContent -- replacement block content for the replace command
-- t.result -- where the block result goes
-- t.server -- the server json variables
-- t.shared -- the shared json variables
-
 *** t.case
 
 The t.case function is a generalized if statement.  You use it to
 preform different actions depending on the condition parameter.
 
-It requires at least two parameters, the condition and the the "else"
+It requires at least two parameters, the condition and the "else"
 case.
 
 The rest of the parameters you specify in pairs, the first is the
 case value and the second is the return value when the condition
 matches the case.
 
-When none of none of the cases match the condition, the else case
-is used.
+When none of the cases match the condition, the else case is
+used.
 
 For the example below the abbr variable is set to an abbreviation
 depending on the type of tea.
@@ -493,7 +496,9 @@ The abbreviation for Darjeeling is Darj.
 The t.if statement is shorthand for the following t.case:
 
 #+BEGIN_SRC
-t.if(cond, v1, v2) is equivalent to: t.case(cond, v2, 1, v1)
+t.if(cond, v1, v2)
+is equivalent to:
+t.case(cond, v2, 1, v1)
 #+END_SRC
 
 *** t.cmp
@@ -504,8 +509,8 @@ greater than the second parameter. It returns -1 for less, 0 for
 equal and 1 for greater than.
 
 The example below shows the best selling tea between Earl Grey
-and Oolong. If Oolong out sells Earl Grey it's the best else it's
-Earl Grey.  Eary Grey wins ties.
+and Oolong. If Oolong out sells Earl Grey it's the best,
+otherwise it's Earl Gray.  Eary Grey wins ties.
 
 template:
 
@@ -575,8 +580,7 @@ t.exists(b) => 0
 
 *** t.if:
 
-You can use an if function in a template statement to create or
-assign a variable.
+You use the if function to select a value based on a condition.
 
 The if function has three parameters. The first parameter is the
 condition, the second is the 1 case and the third is the else
@@ -731,53 +735,17 @@ result:
 </select>
 #+END_SRC
 
-*** t.maxLines: Max Lines Variable
-
-StaticTea reads lines looking for the endblock or endreplace
-commands.  By default, if it is not found in 10 lines, the 10
-lines are used for the block and a warning is output.
-
-You can increase this value to support blocks with more lines by
-setting the t.maxLines system variable.
-
-#+BEGIN_SRC
-<!--$ block t.maxLines=20 -->
-#+END_SRC
-
-Note: only endblock ends a block command, and the same for
-replace. Other commands inside a block are not treated as commands
-but instead treated as replacement block text. For example:
-
-template:
-
-#+BEGIN_SRC
-<!--$ block -->
-<!--$ # this is not a comment, just text -->
-fake nextline
-<!--$ nextline -->
-<!--$ endblock -->
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-<!--$ # this is not a comment, just text -->
-fake nextline
-<!--$ nextline -->
-#+END_SRC
-
 *** t.result: Result Variable
 
-You assign the system t.result variable to control where
-replacement block's result goes, either the result file, standard
-error or nowhere. By default it goes to the result file.
+The t.result variable determines where the replacement blocks's
+result goes, either the results file, standard error or
+nowhere. By default it goes to the result file.
 
 Result variable options:
 
 - "result" - send the replacement block to the result file (default)
 - "skip" - skip the block
-- "stderr" - send the block to standard error, good for
-  communicating that the json data is unexpected.
+- "stderr" - send the block to standard error
 
 Skip Example:
 
@@ -844,7 +812,7 @@ result:
 *** t.row:
 
 The special row function returns the current row for lists. The
-function takes an optional parameter which specifies the starting
+function takes a parameter which specifies the starting
 point. You can use it in replacement blocks.
 
 - t.row(0) — returns 0, 1, 2,...
@@ -1075,7 +1043,7 @@ You can specify multiple server or shared files on the statictea
 command line. The server variables get added to the t.server
 dictionary and the shared to the t.shared dictionary.
 
-The get added from left to right so the last duplicate variable
+They get added from left to right so the last duplicate variable
 wins.
 
 ** Warning Messages
@@ -1147,9 +1115,9 @@ missing. When it is not missing nothing gets output.
 template:
 
 #+BEGIN_SRC
-<!--$ block t.result="stderr"; t.list = t.if(t.exists(admin), "", t.server) \-->
-<!--$   "warning: the admin variable is missing") -->
-<!--$ endblock -->
+<--$ block t.result = t.if(t.exists(admin), "skip", "stderr") -->
+warning: the admin variable is missing
+<--$ endBlock -->
 #+END_SRC
 
 ** Run StaticTea
@@ -1173,8 +1141,10 @@ The StaticTea command line options:
 
 - help - show the help, usage and options.
 - version - outputs the version number.
-- server - the server json file, you can specify multiple.
-- shared - the shared json file, you can specify multiple.
+- server - the server json file(s), you can specify multiple.
+- shared - the shared json file(s), you can specify multiple.
+- template - the template file.
+- result - the result file.
 - update - update the template replace blocks.
 
 ** General Limits
@@ -1272,11 +1242,46 @@ cases. Its clear what needs to be supported so undo engineering
 for the unlimited cases are reduced.  The user can tailor usage
 to be withing the limits and they know it will perform well.
 
+*** t.maxLines: Max Lines Variable
+
+StaticTea reads lines looking for the endblock or endreplace
+commands.  By default, if it is not found in 10 lines, the 10
+lines are used for the block and a warning is output.
+
+You can increase this value to support blocks with more lines by
+setting the t.maxLines system variable.
+
+#+BEGIN_SRC
+<!--$ block t.maxLines=20 -->
+#+END_SRC
+
+Note: only endblock ends a block command, and the same for
+replace. Other commands inside a block are not treated as commands
+but instead treated as replacement block text. For example:
+
+template:
+
+#+BEGIN_SRC
+<!--$ block -->
+<!--$ # this is not a comment, just text -->
+fake nextline
+<!--$ nextline -->
+<!--$ endblock -->
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+<!--$ # this is not a comment, just text -->
+fake nextline
+<!--$ nextline -->
+#+END_SRC
+
 ** System Defaults
 
 You can use the system variables in a replacement block to see
 their default values. The following example shows the default
-values of so of the system variables.
+values of some of the system variables.
 
 template:
 

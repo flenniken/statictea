@@ -4,6 +4,8 @@ import unittest
 import parseCommandLine
 import streams
 
+# todo: add update option.
+
 proc readLines(stream: Stream): seq[string] =
   stream.setPosition(0)
   for line in stream.lines():
