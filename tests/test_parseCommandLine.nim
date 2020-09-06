@@ -4,17 +4,23 @@ import unittest
 import parseCommandLine
 import streams
 
-# todo: add update option.
-
 proc readLines(stream: Stream): seq[string] =
   stream.setPosition(0)
   for line in stream.lines():
     result.add line
 
-proc tpcl(cmdLine: string, version: bool=false, help: bool=false,
-    resultFilename: string = "", serverList: seq[string] = @[],
-    sharedList: seq[string] = @[], templateList: seq[string] = @[],
-    warningLines: seq[string] = @[]) =
+proc tpcl(
+    cmdLine: string,
+    version: bool=false,
+    help: bool=false,
+    update: bool=false,
+    resultFilename: string = "",
+    serverList: seq[string] = @[],
+    sharedList: seq[string] = @[],
+    templateList: seq[string] = @[],
+    warningLines: seq[string] = @[],
+    prepostList: seq[Prepost]= @[]
+     ) =
 
   var stream = newStringStream()
   defer: stream.close()
@@ -22,12 +28,14 @@ proc tpcl(cmdLine: string, version: bool=false, help: bool=false,
   let args = parseCommandLine(stream, cmdLine)
   let lines = stream.readLines()
 
-  check(args.version == version)
   check(args.help == help)
+  check(args.version == version)
+  check(args.update == update)
   check(args.serverList == serverList)
   check(args.sharedList == sharedList)
   check(args.templateList == templateList)
   check(args.resultFilename == resultFilename)
+  check(args.prepostList == prepostList)
   check(lines == warningLines)
 
 
@@ -46,7 +54,9 @@ suite "Test statictea.nim":
     check(letterToWord('r') == "result")
     check(letterToWord('h') == "help")
     check(letterToWord('v') == "version")
-    check(letterToWord('p') == "")
+    check(letterToWord('u') == "update")
+    check(letterToWord('p') == "prepost")
+    check(letterToWord('z') == "")
 
   test "readLines":
     var stream = newStringStream("testing")
@@ -65,16 +75,40 @@ suite "Test statictea.nim":
     check(warningLines[0] == "this is a test")
     check(warningLines[1] == "1 2 3")
 
+  test "prepost string representation":
+    var prepostList: seq[Prepost]
+
+    prepostList = @[("#$", "")]
+    check($prepostList == "(#$, )")
+
+    prepostList = @[("<--$", "-->")]
+    check($prepostList == "(<--$, -->)")
+
+    prepostList = @[("<--$", "-->"), ("#$", "")]
+    check($prepostList == "(<--$, -->), (#$, )")
+
+  test "parsePrepost":
+    check(parsePrepost("") == (("", ""), ""))
+    check(parsePrepost("<--$") == (("<--$", ""), ""))
+    check(parsePrepost("<--$ -->") == (("<--$", "-->"), ""))
+    check(parsePrepost("<--$ --> extra") == (("<--$", "-->"), "extra"))
+    check(parsePrepost("<--$ -->   extra  ") == (("<--$", "-->"), "extra  "))
+    check(parsePrepost("a") == (("a", ""), ""))
+    check(parsePrepost("a b") == (("a", "b"), ""))
+    check(parsePrepost("a b c") == (("a", "b"), "c"))
+
   test "args to string":
     var args: Args
     let expected = """
 Args:
   help=false
   version=false
+  update=false
   serverList=
   sharedList=
   templateList=
   resultFilename=
+  prepostList=
 """
     check($args == expected)
 
@@ -88,10 +122,12 @@ Args:
 Args:
   help=true
   version=false
+  update=false
   serverList=server.json, more.json
   sharedList=shared.json
   templateList=
   resultFilename=result.html
+  prepostList=
 """
     check($args == expected)
 
@@ -140,6 +176,16 @@ Args:
          templateList = @["tea.html"],
          resultFilename = "result.html",
     )
+
+  # You cannot test quotes here. The quote processing happens before sending to the parser.
+  # test "parseCommandLine-quotes1":
+  #   tpcl("-r='result.html'", resultFilename = "result.html")
+
+  # test "parseCommandLine-quotes2":
+  #   tpcl("-r=\"name with spaces result.html\"", resultFilename = "name with spaces result.html")
+
+  test "parseCommandLine-prepost":
+    tpcl("--prepost=<--$", prepostList = @[("<--$", "")])
 
   # Test some error cases.
 
