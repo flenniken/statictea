@@ -2,6 +2,7 @@ import unittest
 import warnings
 import streams
 import testUtils
+import strUtils
 
 suite "Test warnings.nim":
 
@@ -24,3 +25,10 @@ suite "Test warnings.nim":
     let lines = stream.readLines()
     check lines.len == 1
     check lines[0] == "tea.html(23): w2: Unknown argument: missing."
+
+  test "warningsList":
+    for message in warningsList:
+      # Verify messages start with a capital letter.
+      check isUpperAscii(message[0]) == true
+      # Verfiy messages end with a period.
+      check message[^1] == '.'

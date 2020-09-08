@@ -39,9 +39,9 @@ macro tpubType*(x: untyped): untyped =
   # echo "treeRepr = ", treeRepr(x)
   when defined(test):
     if x.kind == nnkStmtList:
-      if x[0].kind == nnkTypeSection:
+      if x[0].kind == nnkTypeSection or x[0].kind == nnkConstSection:
         for n in x[0].children:
-          if n.kind == nnkTypeDef:
+          if n.kind == nnkTypeDef or n.kind == nnkConstDef:
             if n[0].kind == nnkIdent:
               n[0] = newTree(nnkPostfix, ident"*", n[0])
   # echo "after:"
