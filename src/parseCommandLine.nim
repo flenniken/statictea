@@ -5,20 +5,8 @@ import streams
 import strutils
 import tpub
 import re
+import args
 
-type
-  Prepost* = tuple[pre: string, post: string]
-
-  Args* = object
-    ## Command line arguments.
-    help*: bool
-    version*: bool
-    update*: bool
-    serverList*: seq[string]
-    sharedList*: seq[string]
-    templateList*: seq[string]
-    resultFilename*: string
-    prepostList*: seq[Prepost]
 
 const
   fileLists = ["server", "shared", "template"]
@@ -48,18 +36,18 @@ func letterToWord(letter: char): string {.tpub.} =
   return ""
 
 
-proc `$`(sequence: seq[string]): string =
+func `$`(sequence: seq[string]): string =
   result = sequence.join(", ")
 
 
-proc `$`(prepostList: seq[Prepost]): string {.tpub.} =
+func `$`(prepostList: seq[Prepost]): string {.tpub.} =
   var parts: seq[string]
   for pp in prepostList:
     parts.add("($1, $2)" % [pp.pre, pp.post])
   result = parts.join(", ")
 
 
-proc `$`*(args: Args): string =
+func `$`*(args: Args): string =
   ## A string representation of Args.
   result = """
 Args:

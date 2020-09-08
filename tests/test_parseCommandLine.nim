@@ -1,13 +1,10 @@
 ## Test parseCommandLine.nim
 
 import unittest
+import args
 import parseCommandLine
 import streams
-
-proc readLines(stream: Stream): seq[string] =
-  stream.setPosition(0)
-  for line in stream.lines():
-    result.add line
+import testUtils
 
 proc tpcl(
     cmdLine: string,
@@ -20,7 +17,7 @@ proc tpcl(
     templateList: seq[string] = @[],
     warningLines: seq[string] = @[],
     prepostList: seq[Prepost]= @[]
-     ) =
+      ) =
 
   var stream = newStringStream()
   defer: stream.close()

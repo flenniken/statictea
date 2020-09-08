@@ -4,6 +4,8 @@
 
 import streams
 import parseCommandLine
+import strutils
+import processTemplate
 
 when isMainModule:
   # Detect control-c and stop.
@@ -12,6 +14,16 @@ when isMainModule:
   setControlCHook(controlCHandler)
 
   # Process the command line args.
-  var stream = newFileStream(stderr)
-  let args = parseCommandLine(stream)
-  echo $args
+  var warnings = newFileStream(stderr)
+  let args = parseCommandLine(warnings)
+
+  if args.help:
+    echo "showHelp()"
+  elif args.version:
+    echo "showVersion()"
+  elif args.update:
+    echo "updateTemplate(warnings, args)"
+  elif args.templateList.len > 0:
+    processTemplate(warnings, args)
+  else:
+    echo "showHelp()"

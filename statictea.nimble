@@ -65,3 +65,9 @@ task t, "Run tests":
   for filename in test_filenames:
     let cmd = get_test_module_cmd(filename)
     exec cmd
+
+task showTests, "Show tests":
+  let test_filenames = get_test_filenames()
+  for filename in test_filenames:
+    let cmd = get_test_module_cmd(filename)
+    echo cmd
