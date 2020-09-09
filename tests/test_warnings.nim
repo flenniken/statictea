@@ -28,7 +28,11 @@ suite "Test warnings.nim":
 
   test "warningsList":
     for message in warningsList:
-      # Verify messages start with a capital letter.
-      check isUpperAscii(message[0]) == true
-      # Verfiy messages end with a period.
-      check message[^1] == '.'
+      if not isUpperAscii(message[0]):
+        echo "The following message does not start with a capital letter."
+        echo message
+        check isUpperAscii(message[0]) == true
+      if not (message[^1] == '.'):
+        echo "The following message does not end with a period."
+        echo message
+        check message[^1] == '.'

@@ -6,6 +6,7 @@ import strutils
 import tpub
 import re
 import args
+import warnings
 
 
 const
@@ -86,7 +87,7 @@ proc parsePrepost(str: string): (Prepost, string) {.tpub.} =
 
 
 proc handleWord(switch: string, word: string, value: string,
-                warnings: Stream, help: var bool, version: var bool, update: var bool,
+                stream: Stream, help: var bool, version: var bool, update: var bool,
                 resultFilename: var string, filenames: var array[4, seq[string]],
                 prepostList: var seq[Prepost]) =
   ## Handle one switch and return its value.  Switch is the key from
@@ -96,7 +97,7 @@ proc handleWord(switch: string, word: string, value: string,
   let listIndex = fileListIndex(word)
   if listIndex != -1:
     if value == "":
-      warnings.writeLine("warning 1: No $1 filename. Use $2=filename." % [word, $switch])
+      warning(stream, "cmdline", 0, warnNoFilename, word, $switch)
     else:
       filenames[listIndex].add(value)
   elif word == "help":
@@ -107,26 +108,26 @@ proc handleWord(switch: string, word: string, value: string,
     update = true
   elif word == "result":
     if value == "":
-      warnings.writeLine("warning 1: No $1 filename. Use $2=filename." % [word, $switch])
+      warning(stream, "cmdline", 0, warnNoFilename, word, $switch)
     elif resultFilename != "":
-      warnings.writeLine("warning 4: One result file allowed, skipping: $1" % [value])
+      warning(stream, "cmdline", 0, warnOneResultAllowed, value)
     else:
       resultFilename = value
   elif word == "prepost":
     # prepost is a string with a space dividing the prefix from the
     # postfix. The postfix is optional. -p="<--$ -->" or -p="#$"
     if value == "":
-      warnings.writeLine("warning 1: No prepost value. Use $2=\"...\"" % [word, $switch])
+      warning(stream, "cmdline", 0, noPrepostValue, $switch)
     else:
       let (prepost, extra) = parsePrepost(value)
       if extra != "":
-        warnings.writeLine("warning 5: Skipping extra prepost text: $1" % [extra])
+        warning(stream, "cmdline", 0, skippingExtraPrepost, extra)
       prepostList.add(prepost)
   else:
-    warnings.writeLine("warning 2: Unknown switch: $1" % $switch)
+    warning(stream, "cmdline", 0, warnUnknownSwitch, $switch)
 
 
-proc parseCommandLine*(warnings: Stream, cmdLine: string=""): Args =
+proc parseCommandLine*(stream: Stream, cmdLine: string=""): Args =
   ## Return the command line parameters and write warnings to the stream.
 
   var help: bool = false
@@ -145,17 +146,17 @@ proc parseCommandLine*(warnings: Stream, cmdLine: string=""): Args =
           let letter = key[ix]
           let word = letterToWord(letter)
           if word == "":
-            warnings.writeLine("warning 2: Unknown switch: $1" % $letter)
+            warning(stream, "cmdline", 0, warnUnknownSwitch, $letter)
           else:
-            handleWord($letter, word, value, warnings, help, version, update,
+            handleWord($letter, word, value, stream, help, version, update,
                        resultFilename, filenames, prepostList)
 
       of CmdLineKind.cmdLongOption:
-        handleWord(key, key, value, warnings, help, version, update,
+        handleWord(key, key, value, stream, help, version, update,
                    resultFilename, filenames, prepostList)
 
       of CmdLineKind.cmdArgument:
-        warnings.writeLine("warning 3: Unknown argument: $1" % key)
+        warning(stream, "cmdline", 0, warnUnknownArg, key)
 
       of CmdLineKind.cmdEnd:
         discard

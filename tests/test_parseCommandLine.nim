@@ -187,24 +187,24 @@ Args:
   # Test some error cases.
 
   test "parseCommandLine-no-filename":
-    tpcl("-s", warningLines = @["warning 1: No server filename. Use s=filename."])
+    tpcl("-s", warningLines = @["cmdline(0): w0: No server filename. Use s=filename."])
 
   test "parseCommandLine-no-switch":
-    tpcl("-w", warningLines = @["warning 2: Unknown switch: w"])
+    tpcl("-w", warningLines = @["cmdline(0): w1: Unknown switch: w."])
 
   test "parseCommandLine-no-long-switch":
-    tpcl("--hello", warningLines = @["warning 2: Unknown switch: hello"])
+    tpcl("--hello", warningLines = @["cmdline(0): w1: Unknown switch: hello."])
 
   test "parseCommandLine-no-arg":
-    tpcl("bare", warningLines = @["warning 3: Unknown argument: bare"])
+    tpcl("bare", warningLines = @["cmdline(0): w2: Unknown argument: bare."])
 
   test "parseCommandLine-no-args":
-    tpcl("bare naked", warningLines = @["warning 3: Unknown argument: bare",
-    "warning 3: Unknown argument: naked"])
+    tpcl("bare naked", warningLines = @["cmdline(0): w2: Unknown argument: bare.",
+    "cmdline(0): w2: Unknown argument: naked."])
 
   test "parseCommandLine-missing-result":
-    tpcl("-r", warningLines = @["warning 1: No result filename. Use r=filename."])
+    tpcl("-r", warningLines = @["cmdline(0): w0: No result filename. Use r=filename."])
 
   test "parseCommandLine-two-results":
     tpcl("-r=result.html -r=asdf.html", resultFilename="result.html",
-         warningLines = @["warning 4: One result file allowed, skipping: asdf.html"])
+         warningLines = @["cmdline(0): w3: One result file allowed, skipping: asdf.html."])

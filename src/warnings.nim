@@ -12,6 +12,8 @@ type
      warnOneResultAllowed,
      warnExtraPrepostText,
      warnOneTemplateAllowed,
+     noPrepostValue,
+     skippingExtraPrepost,
 
 tpubType:
   const
@@ -24,6 +26,8 @@ tpubType:
       #[warnOneResultAllowed  ]# "One result file allowed, skipping: $1.",
       #[warnExtraPrepostText  ]# "Skipping extra prepost text: $1.",
       #[warnOneTemplateAllowed]# "One template file allowed, skipping: $1.",
+      #[noPrepostValue        ]# "No prepost value. Use $1=\"...\".",
+      #[skippingExtraPrepost  ]# "Skipping extra prepost text: $1.",
     ]
 
 func getWarning(filename: string, lineNum: int,
