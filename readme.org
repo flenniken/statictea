@@ -66,15 +66,13 @@ example command lines:
 
 ** Statements
 
-A statement assigns a variable a value using the equal sign. The
-varable being assigned is on the left hand side and on the right
-hand side is either another variable or a function.  Here are
-examples of both:
+A statement consists of a variable and equal sign and a right
+hand side. The right side is either another vriable or a
+function. Here are examples of both:
 
 #+BEGIN_SRC
-var1 = var2
-var3 = t.row(0)
 t.list = teaList
+nameLen = t.len(name)
 #+END_SRC
 
 You define variables to use in the replacement block or to
@@ -413,12 +411,183 @@ t.list
 
 System variables control how the replacement block works.
 
-- t.list -- determines whether the current block repeats
-- t.maxLines -- maximum lines in a block
-- t.replaceContent -- content for the replace command
-- t.result -- where the block result goes
-- t.server -- the server json variables
-- t.shared -- the shared json variables
+*** t.list
+
+The t.list variable determines whether the current replacement block
+repeats or not. By default the block is output once. You can
+assign a list, to output the block zero or more times, once for
+each item in the list.
+
+The list must be a list of dictionaries. Each dictionary contains
+local variables you use in the block. An empty list means
+don't show the block at all.
+
+For the following example, tea_list is assigned to the t.list
+variable which outputs the block five times.
+
+template:
+
+#+BEGIN_SRC
+<!--$ nextline t.list = tea_list -->
+  * {tea}
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+"tea_list": [
+    {"tea": "Black"},
+    {"tea": "Green"},
+    {"tea": "Oolong"},
+    {"tea": "Sencha"},
+    {"tea": "Herbal"}
+  ]
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+  * Black
+  * Green
+  * Oolong
+  * Sencha
+  * Herbal
+#+END_SRC
+
+The following example builds a select list of tea companies where
+one company is selected.
+
+template:
+
+#+BEGIN_SRC
+<h4>Tea Companies</h3>
+<select>
+<!--$ nextline t.list=companyList; \-->
+<!--$ : current=t.if(selected, ' selected="selected"', "") -->
+  <option{current}>{company}</option>
+</select>
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+"companyList": [
+    {"company": "Lipton"},
+    {"company": "Tetley"},
+    {"company": "Twinings, "selected": 1"},
+    {"company": "American Tea Room"},
+    {"company": "Argo Tea"},
+    {"company": "Bigelow Tea Company"}
+  ]
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+<h3>Tea Companies</h3>
+<select>
+  <option>Lipton</option>
+  <option>Tetley</option>
+  <option selected="selected">Twinings</option>
+  <option>Argo Tea</option>
+  <option>American Tea Room</option>
+  <option>Bigelow Tea Company</option>
+</select>
+#+END_SRC
+
+*** t.maxLines
+The t.maxLines variable determines the maximum lines in a block.
+
+*** t.replaceContent
+
+The t.replaceContent variable determines the text for the replace
+command block.
+
+*** t.result
+
+The t.result variable determines where the replacement blocks's
+result goes, either the results file, standard error or
+nowhere. By default it goes to the result file.
+
+Result variable options:
+
+- "result" - send the replacement block to the result file (default)
+- "skip" - skip the block
+- "stderr" - send the block to standard error
+
+Skip Example:
+
+The skip t.result case is good for building test lists.
+
+When you view the following template fragment in a browser it
+shows one item in the list.
+
+template:
+
+#+BEGIN_SRC
+<h3>Tea</h3>
+<ul>
+<!--$ nextline t.list = teaList -->
+  <li>{tea}</li>
+</ul>
+#+END_SRC
+
+To create a static page that has more products for better testing
+you could use the skip option like this:
+
+template:
+
+#+BEGIN_SRC
+<h3>Tea</h3>
+<ul>
+<!--$ nextline t.list = teaList -->
+  <li>{tea}</li>
+<!--$ block t.result = 'skip' -->
+  <li>Black</li>
+  <li>Green</li>
+  <li>Oolong</li>
+  <li>Sencha</li>
+  <li>Herbal</li>
+<!--$ endblock -->
+</ul>
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+  "teaList": [
+    {"tea": "Chamomile"},
+    {"tea": "Chrysanthemum"},
+    {"tea": "White"},
+    {"tea": "Puer"}
+  ]
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+<h3>Tea</h3>
+<ul>
+  <li>Chamomile</li>
+  <li>Chrysanthemum</li>
+  <li>White</li>
+  <li>Puer</li>
+</ul>
+#+END_SRC
+
+*** t.server
+
+The t.server variable contains the server json variables.
+
+*** t.shared
+
+The t.shared variable contains the shared json variables
 
 ** Functions
 
@@ -548,7 +717,7 @@ t.concat("Tea", "Time") => "TeaTime"
 t.concat("Tea", " ",  "Time") => "Tea Time"
 #+END_SRC
 
-*** t.replaceContent: Content Variable
+*** t.replaceContent
 
 The t.replaceContent variable defines what goes in the replace
 block. It only applies to the replace command.
@@ -577,8 +746,7 @@ t.exists(a) => 1
 t.exists(b) => 0
 #+END_SRC
 
-
-*** t.if:
+*** t.if
 
 You use the if function to select a value based on a condition.
 
@@ -610,7 +778,17 @@ t.if(1, 'dog', 'cat') -> dog
 t.if(0, 'dog', 'cat') -> cat
 #+END_SRC
 
-*** t.len:
+*** t.format
+
+You use the t.format function to format variables.
+
+#+BEGIN_SRC
+{var:arg} where arg is a format specifier.
+
+cost = "{teaCost:2.2}"
+#+END_SRC
+
+*** t.len
 
 The t.len function returns the number of characters in a string,
 the number of elements in a list or the number of elements in a
@@ -647,169 +825,7 @@ The tea list has 5 elements.
 The server json dictionary has 1 elements.
 #+END_SRC
 
-*** t.list Variable
-
-The t.list variable determines whether the current replacement block
-repeats or not. By default the block is output once. You can
-assign a list, to output the block zero or more times, once for
-each item in the list.
-
-The list must be a list of dictionaries. Each dictionary contains
-local variables you use in the block. An empty list means
-don't show the block at all.
-
-For the following example, tea_list is assigned to the t.list
-variable which outputs the block five times.
-
-template:
-
-#+BEGIN_SRC
-<!--$ nextline t.list = tea_list -->
-  * {tea}
-#+END_SRC
-
-json:
-
-#+BEGIN_SRC
-{
-"tea_list": [
-    {"tea": "Black"},
-    {"tea": "Green"},
-    {"tea": "Oolong"},
-    {"tea": "Sencha"},
-    {"tea": "Herbal"}
-  ]
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-  * Black
-  * Green
-  * Oolong
-  * Sencha
-  * Herbal
-#+END_SRC
-
-The following example builds a select list of tea companies where
-one company is selected.
-
-template:
-
-#+BEGIN_SRC
-<h4>Tea Companies</h3>
-<select>
-<!--$ nextline t.list=companyList; \-->
-<!--$ : current=t.if(selected, ' selected="selected"', "") -->
-  <option{current}>{company}</option>
-</select>
-#+END_SRC
-
-json:
-
-#+BEGIN_SRC
-{
-"companyList": [
-    {"company": "Lipton"},
-    {"company": "Tetley"},
-    {"company": "Twinings, "selected": 1"},
-    {"company": "American Tea Room"},
-    {"company": "Argo Tea"},
-    {"company": "Bigelow Tea Company"}
-  ]
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-<h3>Tea Companies</h3>
-<select>
-  <option>Lipton</option>
-  <option>Tetley</option>
-  <option selected="selected">Twinings</option>
-  <option>Argo Tea</option>
-  <option>American Tea Room</option>
-  <option>Bigelow Tea Company</option>
-</select>
-#+END_SRC
-
-*** t.result: Result Variable
-
-The t.result variable determines where the replacement blocks's
-result goes, either the results file, standard error or
-nowhere. By default it goes to the result file.
-
-Result variable options:
-
-- "result" - send the replacement block to the result file (default)
-- "skip" - skip the block
-- "stderr" - send the block to standard error
-
-Skip Example:
-
-The skip t.result case is good for building test lists.
-
-When you view the following template fragment in a browser it
-shows one item in the list.
-
-template:
-
-#+BEGIN_SRC
-<h3>Tea</h3>
-<ul>
-<!--$ nextline t.list = teaList -->
-  <li>{tea}</li>
-</ul>
-#+END_SRC
-
-To create a static page that has more products for better testing
-you could use the skip option like this:
-
-template:
-
-#+BEGIN_SRC
-<h3>Tea</h3>
-<ul>
-<!--$ nextline t.list = teaList -->
-  <li>{tea}</li>
-<!--$ block t.result = 'skip' -->
-  <li>Black</li>
-  <li>Green</li>
-  <li>Oolong</li>
-  <li>Sencha</li>
-  <li>Herbal</li>
-<!--$ endblock -->
-</ul>
-#+END_SRC
-
-json:
-
-#+BEGIN_SRC
-{
-  "teaList": [
-    {"tea": "Chamomile"},
-    {"tea": "Chrysanthemum"},
-    {"tea": "White"},
-    {"tea": "Puer"}
-  ]
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-<h3>Tea</h3>
-<ul>
-  <li>Chamomile</li>
-  <li>Chrysanthemum</li>
-  <li>White</li>
-  <li>Puer</li>
-</ul>
-#+END_SRC
-
-*** t.row:
+*** t.row
 
 The special row function returns the current row for lists. The
 function takes a parameter which specifies the starting
@@ -850,9 +866,7 @@ result:
   <li id="r3">4. Red Diamond</li>
 #+END_SRC
 
-*** t.server
-*** t.shared
-*** t.version:
+*** t.version
 
 You use the version function to get the current version of
 StaticTea or to verify that the version you are running works
@@ -1014,15 +1028,14 @@ You can define other comment types on the command line using the
 prepost option one or more times.
 
 You separate the prefix from the postfix with one space and the
-postfix is optional. The second example below only specifies the
-prefix and several prefixes with different amounts of leading
-space.
+postfix is optional.
 
 examples:
 
 #+BEGIN_SRC
-statictea --prepost "@$" "|" --prepost "[comment$" "]"
-statictea --prepost "  #$" --prepost "    #$" --prepost "      #$"
+--prepost="@$ |"
+--prepost="[comment$ ]"
+--prepost="#[ ]#"
 #+END_SRC
 
 ** Json Files
@@ -1183,17 +1196,6 @@ The template syntax only uses ascii.
 <!--$ : 1, t.concat(substr(name, 0, 7), "..."))   -->
 #+END_SRC
 
-** Tea Info
-
-Tea is the most popular manufactured drink consumed in the world,
-equaling all others – including coffee, soft drinks, and alcohol
-– combined. -- Wikipedia -- Macfarlane, Alan; Macfarlane, Iris
-(2004). The Empire of Tea. The Overlook Press. p. 32. ISBN
-978-1-58567-493-0.
-
-There are five main groups of teas, white, green, oolong, black,
-and pu'erh.
-
 ** Other
 
 You can show a dictionary content using the t.show function.
@@ -1306,3 +1308,13 @@ default t.replaceContent = ""
 default t.maxLines = 10
 t.maxLines = 20
 #+END_SRC
+** Tea Info
+
+Tea is the most popular manufactured drink consumed in the world,
+equaling all others – including coffee, soft drinks, and alcohol
+– combined. -- Wikipedia -- Macfarlane, Alan; Macfarlane, Iris
+(2004). The Empire of Tea. The Overlook Press. p. 32. ISBN
+978-1-58567-493-0.
+
+There are five main groups of teas, white, green, oolong, black,
+and pu'erh.
