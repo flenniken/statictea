@@ -39,21 +39,21 @@ not contain any presentation markup. The shared json, maintained
 by the template builder, contains shared presentation markup.
 
 The template commands are encoded as comments so the template
-file looks like a native file and you can view, edit, validate,
+file looks like a native file so you can view, edit, validate,
 etc. the file with its normal tools. You develop templates as if
 they were static pages.
 
-** Commands
+** TODO Commands
 
 StaticTea commands:
 
 - nextline -— make substitutions in the next line
 - block —- make substitutions in the next block of lines
-- endblock -- end of block
 - replace -— replace block with a variable
-- endreplace -- end of replace block
 - # —- comment
 - : -- continue line, used for continuation lines
+- endblock -- end of block
+- endreplace -- end of replace block
 
 example command lines:
 
@@ -66,13 +66,15 @@ example command lines:
 
 ** Statements
 
-A statement consists of a variable and equal sign and a right
-hand side. The right side is either another vriable or a
-function. Here are examples of both:
+A statement consists of a variable an equal sign and a right
+hand side. The right side is either another variable, a
+function or a literal. Here are some examples:
 
 #+BEGIN_SRC
 t.list = teaList
 nameLen = t.len(name)
+tea = "Earl Grey"
+num = 5
 #+END_SRC
 
 You define variables to use in the replacement block or to
@@ -240,7 +242,7 @@ template:
 <head>
 <meta charset="UTF-8"/>
 <title>{title}</title>
-<--$ endBlock -->
+<--$ endblock -->
 #+END_SRC
 
 json:
@@ -273,13 +275,15 @@ template:
 #+BEGIN_SRC
 <!--$ # This is a comment. -->
 <!--$ # How you make tea. -->
-You make Oolong Tea in five time intensive steps.
+There are five main groups of teas, white, green, oolong, black,
+and pu'erh. You make Oolong Tea in five time intensive steps.
 #+END_SRC
 
 result:
 
 #+BEGIN_SRC
-You make Oolong Tea in five time intensive steps.
+There are five main groups of teas, white, green, oolong, black,
+and pu'erh. You make Oolong Tea in five time intensive steps.
 #+END_SRC
 
 *** Continue Command
@@ -625,7 +629,7 @@ List of functions:
 *** t.case
 
 The t.case function is a generalized if statement.  You use it to
-preform different actions depending on the condition parameter.
+preform different actions depending on a condition.
 
 It requires at least two parameters, the condition and the "else"
 case.
@@ -666,9 +670,12 @@ The t.if statement is shorthand for the following t.case:
 
 #+BEGIN_SRC
 t.if(cond, v1, v2)
+#+END_SRC
 is equivalent to:
+#+BEGIN_SRC
 t.case(cond, v2, 1, v1)
 #+END_SRC
+
 
 *** t.cmp
 
@@ -795,11 +802,14 @@ the number of elements in a list or the number of elements in a
 dictionary.
 
 #+BEGIN_SRC
-<!-- nextline strlen = t.len("Tetley"); \-->
-<!-- : listLen = t.len(tea_list); serverJson = t.len(t.server) -->
+<!--$ block \-->
+<!--$ : length = t.len("Tetley"); \-->
+<!--$ : listLen = t.len(tea_list); \-->
+<!--$ : serverLen = t.len(t.server) -->
 The Tetley name has {length} characters.
 The tea list has {listlen} elements.
-The server json dictionary has {serverJson} elements.
+The server json dictionary has {serverLen} elements.
+<!--$ endblock -->
 #+END_SRC
 
 json:
@@ -824,6 +834,10 @@ The Tetley name has 6 characters.
 The tea list has 5 elements.
 The server json dictionary has 1 elements.
 #+END_SRC
+
+*** t.read
+
+You can read a file for replace block content.
 
 *** t.row
 
@@ -908,10 +922,10 @@ is output to standard error.  Example messages:
 stdout:
 
 #+BEGIN_SRC
-template(line): the current version 4.0.2 is greater than the maximum
+tea.html(45): w22: The current version 4.0.2 is greater than the maximum
 allowed verion of 3.4.5.
 
-template(line): the current version 1.0.0 is less than the minumum
+tea.html(45): w23: The current version 1.0.0 is less than the minumum
 allowed verion of 1.2.3.
 #+END_SRC
 
@@ -923,11 +937,12 @@ t.server and t.shared system variables.
 template:
 
 #+BEGIN_SRC
-<!-- block serverElements = t.len(t.server) \-->
-<!-- : jsonElements = t.len(t.shared) -->
-The server passed {serverElements} elements
+<!--$ block \-->
+<!--$ : serverElements = t.len(t.server) \-->
+<!--$ : jsonElements = t.len(t.shared) -->
+The server has {serverElements} elements
 and the shared json has {jsonElements}.
-<!-- endblock -->
+<!--$ endblock -->
 #+END_SRC
 
 json:
@@ -974,7 +989,7 @@ EOF
 statictea --template template.txt --server server.json
 #+END_SRC
 
-If you copy and paste those lines to your terminal, it will look
+If you copy and paste those lines to your terminal on Linux, it will look
 like:
 
 #+BEGIN_SRC
@@ -1005,7 +1020,7 @@ hello world
 You make the template commands look like comments for your
 template file type. This allows you to edit the template using
 its native editor and run other native tools.  For example, you
-can edit StaticTea html template with an html editor.
+can edit a StaticTea html template with an html editor.
 
 Comment syntax varies depending on the type of template file and
 sometimes depending on the location within the file. StaticTea
@@ -1068,28 +1083,27 @@ continues.
 If a variable in a replacement block is used but it doesn't
 exist, the variable remains as is in the result, and a message is
 output to standard error telling the line and the name of the
-missing variable.  There are many different potential warnings.
+missing variable.  There are many other potential warnings.
 
 It’s good style to change your template or json so no messages
 get output.
 
-The warning messages show the line number where the problem
-happened. Every message has a unique number which doesn't
-change. Don't count on the message text remaining constant.  All
-new messages get added to the bottom.
+Each warning message shows the file and line number where the problem
+happened. Each warning has an associated number which doesn't
+change. Don't count on the message text remaining constant.
 
 example messages:
 
-- template.html(45): w0001: Unknown server variable: teaMaster
-- template.html(45): w0002: The postfix is missing.
-- template.html(45): w0003: The command line doesn't have a valid
-  command: blocker
-- template.html(45): w0004: Unknown system variable: t.asdf.
-- template.html(45): w0005: Server json file not found: server.json
-- template.html(45): w0006: Unable to parse server.json.
+- tea.html(45): w1: Unknown server variable: teaMaster.
+- tea.html(45): w2: The postfix is missing.
+- tea.html(45): w3: The command line doesn't have a valid
+  command, found: blocker.
+- tea.html(45): w4: Unknown system variable: t.asdf.
+- tea.html(45): w5: Server json file not found: server.json.
+- tea.html(45): w6: Unable to parse server.json.
 
-The statictea program returns success, 0, when no message get
-output, else it returns 1.
+The statictea program returns 0 when no message gets
+output to standard error, else it returns 1.
 
 Example of running statictea when a variable is missing:
 
@@ -1111,7 +1125,7 @@ json:
 stderr:
 
 #+BEGIN_SRC
-template.html(2): w0001: Unknown server variable: teaMaster
+template.html(2): w1: Unknown server variable: teaMaster
 #+END_SRC
 
 result:
@@ -1128,9 +1142,9 @@ missing. When it is not missing nothing gets output.
 template:
 
 #+BEGIN_SRC
-<--$ block t.result = t.if(t.exists(admin), "skip", "stderr") -->
+<--$ nextline t.result = t.if( \-->
+<--$ : t.exists(admin), "skip", "stderr") -->
 warning: the admin variable is missing
-<--$ endBlock -->
 #+END_SRC
 
 ** Run StaticTea
@@ -1188,49 +1202,16 @@ The template syntax only uses ascii.
 
 ** Ellipsize
 
+You can "ellipsize" a string when it gets long. The following
+exmple ellipsizes when a name is longer than 10 characters.
+
 #+BEGIN_SRC
 <!--$ # If the name is longer than 10 characters, -->
 <!--$ # clip it to 7 and add "...".               -->
-<!--$ cmp = t.cmp(len(name), 10);                \-->
-<!--$ name = t.case(cmd, name                    \-->
+<!--$ nextline                                   \-->
+<!--$ : cmp = t.cmp(len(name), 10);              \-->
+<!--$ : name = t.case(cmd, name                  \-->
 <!--$ : 1, t.concat(substr(name, 0, 7), "..."))   -->
-#+END_SRC
-
-** Other
-
-You can show a dictionary content using the t.show function.
-Show list too?
-
-#+BEGIN_SRC
-<!--$ nextline tserver = t.show(t.server) -->
-{tserver}
-#+END_SRC
-
-json:
-
-#+BEGIN_SRC
-{
-  admin: 0,
-  "teaList": [
-    {"tea": "Chamomile"},
-    {"tea": "Chrysanthemum"},
-    {"tea": "White"},
-    {"tea": "Puer"}
-  ],
-  "company": "Twinings",
-  "example": true
-  "dict": {}
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-admin: 0
-teaList: [4]
-company: "Twinings"
-example: true
-dict: {0}
 #+END_SRC
 
 ** t.limits
@@ -1289,25 +1270,20 @@ template:
 
 #+BEGIN_SRC
 <!--$ block -->
-default t.row = {t.row}
 default t.list = {t.list}
 default t.replaceContent = {t.replaceContent}
 default t.maxLines = {t.maxLines}
-<!--$ endblock -->
-<!--$ block t.maxLines = 20 -->
-t.maxLines = {t.maxLines}
 <!--$ endblock -->
 #+END_SRC
 
 result:
 
 #+BEGIN_SRC
-default t.row = 0
 default t.list = 0
 default t.replaceContent = ""
 default t.maxLines = 10
-t.maxLines = 20
 #+END_SRC
+
 ** Tea Info
 
 Tea is the most popular manufactured drink consumed in the world,
@@ -1315,6 +1291,3 @@ equaling all others – including coffee, soft drinks, and alcohol
 – combined. -- Wikipedia -- Macfarlane, Alan; Macfarlane, Iris
 (2004). The Empire of Tea. The Overlook Press. p. 32. ISBN
 978-1-58567-493-0.
-
-There are five main groups of teas, white, green, oolong, black,
-and pu'erh.
