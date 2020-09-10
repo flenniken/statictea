@@ -25,23 +25,15 @@ hello world
 
 ** Basics
 
-You specify each template command on one line. The command
-applies to the current line, the next line or the next block of
-lines called the replacement block.
+You develop templates as if they were static pages because the
+template commands are encoded as comments enabling you to view,
+edit, and validate the template with its normal tools.
 
-You use variables in brackets to identify locations in the
-replacement block for replacement. These variables typically get
-replaced by their associated json value.
+The line orientated commands identify the replacement block,
+either the current line, next line or next block of lines.
 
-You can use two types of json files, a server json file and
-shared json file.  The server json comes from the server and does
-not contain any presentation markup. The shared json, maintained
-by the template builder, contains shared presentation markup.
-
-The template commands are encoded as comments so the template
-file looks like a native file so you can view, edit, validate,
-etc. the file with its normal tools. You develop templates as if
-they were static pages.
+Bracketed variables in the replacement block get replaced with
+server values or with values you define in the template.
 
 ** TODO Commands
 
@@ -238,13 +230,13 @@ another header example:
 template:
 
 #+BEGIN_SRC
-<--$ block -->
+<!--$ replace t.replaceContent=s.header -->
 <!DOCTYPE html>
 <html lang="{languageCode}" dir="{languageDirection}">
 <head>
 <meta charset="UTF-8"/>
 <title>{title}</title>
-<--$ endblock -->
+<--$ endreplace -->
 #+END_SRC
 
 json:
@@ -275,10 +267,11 @@ character. They do not appear in the result.
 template:
 
 #+BEGIN_SRC
-<!--$ # This is a comment. -->
 <!--$ # How you make tea. -->
-There are five main groups of teas, white, green, oolong, black,
-and pu'erh. You make Oolong Tea in five time intensive steps.
+There are five main groups of teas:
+white, green, oolong, black, and pu'erh.
+You make Oolong Tea in five time
+intensive steps.
 #+END_SRC
 
 result:
@@ -291,8 +284,8 @@ and pu'erh. You make Oolong Tea in five time intensive steps.
 *** Continue Command
 
 You can continue a long command line with the "\\" character at
-the end before the postfix. The continuation line must be a
-continue command.
+the end before the postfix. The following continuation line must
+be a continue command.
 
 The continuation command allows you to continue adding
 statements as if it is one long line. You can continue the
@@ -318,14 +311,14 @@ result:
 #+BEGIN_SRC
 Earl Grey, Masala chai
 #+END_SRC
+
 ** Types
 
-StaticTea variable types:
+StaticTea variables types:
 
 - strings
-- numbers
-- variables
-- functions
+- integers
+- floats
 
 *** Strings
 
@@ -388,17 +381,17 @@ works.
 You specify variables in json files or you create them in
 template statements.
 
-A json dictionary keys become the variable names and their value
-becomes part of the template when they are used.
+The server or shared json dictionary keys become the variable
+names and their values becomes part of the template when they are
+used.
 
-Internally two json namespaces exist, one for the shared json and
-one for the server json.  You access the shared json with the
-"s."  prefix the system variables with the "t." prefix, and the
-server variables with no prefix.
+Internally two json namespaces exist, one for the server json and
+one for the shared json.  You access the shared json variables
+with the "s." prefix. No prefix for the the server variables.
 
-You can define new variables on the command line in
-statements. These variables are local to the block and take
-precedence over the json variables.
+Variables defined in the template are local to the block where
+they are defined. Local variables and take precedence over the
+json variables.
 
 You can define any number of variables that will fit on the
 line.
@@ -409,15 +402,15 @@ takes precedence when there are duplicates.
 example variables:
 
 #+BEGIN_SRC
-serverVar
-s.name
 mytea
+s.name
 t.list
 #+END_SRC
 
 ** System Variables
 
-System variables control how the replacement block works.
+The built in system variables control how the replacement block
+works.
 
 - t.list - controls whether the block repeats
 - t.maxLines - maximum lines before endblock or endreplace
@@ -728,10 +721,10 @@ t.case(cond, v2, 1, v1)
 
 *** t.cmp
 
-The t.cmp function compares two numbers or two strings and
-returns whether the first parameter is less than, equal to or
-greater than the second parameter. It returns -1 for less, 0 for
-equal and 1 for greater than.
+The t.cmp function compares two variables, either numbers or
+strings, and returns whether the first parameter is less than,
+equal to or greater than the second parameter. It returns -1 for
+less, 0 for equal and 1 for greater than.
 
 The example below shows the best selling tea between Earl Grey
 and Oolong. If Oolong out sells Earl Grey it's the best,
@@ -944,11 +937,12 @@ result:
 *** t.substr
 
 The t.substr function extracts a substring from a string by
-indexes. You can pass one or two parameters. The first parameter
-is the starting index of the substring to extract. The second
-parameter is the ending index (one past it). The second parameter
-defaults to one past the end of the string. The end-start is
-equal to the length of the substring.
+indexes. The last parameter is optional. The first parameter is
+the string to operate on, the second is the starting index of the
+substring to extract and the third is the ending index (one past
+it). The third parameter defaults to one past the end of the
+string. The end minus the start is equal to the length of the
+substring.
 
 #+BEGIN_SRC
 Earl Grey
@@ -1148,7 +1142,7 @@ examples:
 There are two types of json files the server json and the shared
 json.
 
-The server json comes from the server and doesn’t contain any
+The server json comes from the server and shouldn't contain any
 presentation data.
 
 The share json is used by the template builder to share common
@@ -1171,9 +1165,9 @@ standard error, the statement is skipped, and processing
 continues.
 
 For example, if a variable in a replacement block is used but it
-doesn't exist, the variable remains as is in the result, and a
-message is output to standard. There are many other potential
-warnings.
+doesn't exist, the bracketed variable remains as is in the
+result, and a message is output to standard error. There are many
+other potential warnings.
 
 It’s good style to change your template or json so no messages
 get output.
@@ -1306,9 +1300,7 @@ example ellipsizes when a name is longer than 10 characters.
 <!--$ : 1, t.concat(substr(name, 0, 7), "..."))   -->
 #+END_SRC
 
-** t.limits
-
-The t.limits dictionary contains the limit values.
+** Limits
 
 There are several reasons for all the limits. It makes testing
 the limit and one more than the limit possible. It allows the
