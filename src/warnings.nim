@@ -6,28 +6,28 @@ import strutils
 
 type
   Warning* = enum
-     warnNoFilename,
-     warnUnknownSwitch,
-     warnUnknownArg,
-     warnOneResultAllowed,
-     warnExtraPrepostText,
-     warnOneTemplateAllowed,
-     noPrepostValue,
-     skippingExtraPrepost,
+     wNoFilename,
+     wUnknownSwitch,
+     wUnknownArg,
+     wOneResultAllowed,
+     wExtraPrepostText,
+     wOneTemplateAllowed,
+     wNoPrepostValue,
+     wSkippingExtraPrepost,
 
 tpubType:
   const
     # The list of warnings. Add new messages to the bottom and do not
     # reorder the messages.
     warningsList: array[low(Warning)..high(Warning), string] = [
-      #[warnNoFilename        ]# "No $1 filename. Use $2=filename.",
-      #[warnUnknownSwitch     ]# "Unknown switch: $1.",
-      #[warnUnknownArg        ]# "Unknown argument: $1.",
-      #[warnOneResultAllowed  ]# "One result file allowed, skipping: $1.",
-      #[warnExtraPrepostText  ]# "Skipping extra prepost text: $1.",
-      #[warnOneTemplateAllowed]# "One template file allowed, skipping: $1.",
-      #[noPrepostValue        ]# "No prepost value. Use $1=\"...\".",
-      #[skippingExtraPrepost  ]# "Skipping extra prepost text: $1.",
+      #[wNoFilename          ]# "No $1 filename. Use $2=filename.",
+      #[wUnknownSwitch       ]# "Unknown switch: $1.",
+      #[wUnknownArg          ]# "Unknown argument: $1.",
+      #[wOneResultAllowed    ]# "One result file allowed, skipping: $1.",
+      #[wExtraPrepostText    ]# "Skipping extra prepost text: $1.",
+      #[wOneTemplateAllowed  ]# "One template file allowed, skipping: $1.",
+      #[wNoPrepostValue      ]# "No prepost value. Use $1=\"...\".",
+      #[wSkippingExtraPrepost]# "Skipping extra prepost text: $1.",
     ]
 
 func getWarning(filename: string, lineNum: int,

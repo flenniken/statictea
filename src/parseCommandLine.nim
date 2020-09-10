@@ -97,7 +97,7 @@ proc handleWord(switch: string, word: string, value: string,
   let listIndex = fileListIndex(word)
   if listIndex != -1:
     if value == "":
-      warning(stream, "cmdline", 0, warnNoFilename, word, $switch)
+      warning(stream, "cmdline", 0, wNoFilename, word, $switch)
     else:
       filenames[listIndex].add(value)
   elif word == "help":
@@ -108,23 +108,23 @@ proc handleWord(switch: string, word: string, value: string,
     update = true
   elif word == "result":
     if value == "":
-      warning(stream, "cmdline", 0, warnNoFilename, word, $switch)
+      warning(stream, "cmdline", 0, wNoFilename, word, $switch)
     elif resultFilename != "":
-      warning(stream, "cmdline", 0, warnOneResultAllowed, value)
+      warning(stream, "cmdline", 0, wOneResultAllowed, value)
     else:
       resultFilename = value
   elif word == "prepost":
     # prepost is a string with a space dividing the prefix from the
     # postfix. The postfix is optional. -p="<--$ -->" or -p="#$"
     if value == "":
-      warning(stream, "cmdline", 0, noPrepostValue, $switch)
+      warning(stream, "cmdline", 0, wNoPrepostValue, $switch)
     else:
       let (prepost, extra) = parsePrepost(value)
       if extra != "":
-        warning(stream, "cmdline", 0, skippingExtraPrepost, extra)
+        warning(stream, "cmdline", 0, wSkippingExtraPrepost, extra)
       prepostList.add(prepost)
   else:
-    warning(stream, "cmdline", 0, warnUnknownSwitch, $switch)
+    warning(stream, "cmdline", 0, wUnknownSwitch, $switch)
 
 
 proc parseCommandLine*(stream: Stream, cmdLine: string=""): Args =
@@ -146,7 +146,7 @@ proc parseCommandLine*(stream: Stream, cmdLine: string=""): Args =
           let letter = key[ix]
           let word = letterToWord(letter)
           if word == "":
-            warning(stream, "cmdline", 0, warnUnknownSwitch, $letter)
+            warning(stream, "cmdline", 0, wUnknownSwitch, $letter)
           else:
             handleWord($letter, word, value, stream, help, version, update,
                        resultFilename, filenames, prepostList)
@@ -156,7 +156,7 @@ proc parseCommandLine*(stream: Stream, cmdLine: string=""): Args =
                    resultFilename, filenames, prepostList)
 
       of CmdLineKind.cmdArgument:
-        warning(stream, "cmdline", 0, warnUnknownArg, key)
+        warning(stream, "cmdline", 0, wUnknownArg, key)
 
       of CmdLineKind.cmdEnd:
         discard
