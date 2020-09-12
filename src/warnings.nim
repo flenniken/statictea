@@ -14,6 +14,7 @@ type
      wOneTemplateAllowed,
      wNoPrepostValue,
      wSkippingExtraPrepost,
+     wUnableToOpenLogFile,
 
 tpubType:
   const
@@ -23,11 +24,13 @@ tpubType:
       #[wNoFilename          ]# "No $1 filename. Use $2=filename.",
       #[wUnknownSwitch       ]# "Unknown switch: $1.",
       #[wUnknownArg          ]# "Unknown argument: $1.",
-      #[wOneResultAllowed    ]# "One result file allowed, skipping: $1.",
+      #[wOneResultAllowed    ]# "One result file allowed, skipping: '$1'.",
       #[wExtraPrepostText    ]# "Skipping extra prepost text: $1.",
       #[wOneTemplateAllowed  ]# "One template file allowed, skipping: $1.",
       #[wNoPrepostValue      ]# "No prepost value. Use $1=\"...\".",
       #[wSkippingExtraPrepost]# "Skipping extra prepost text: $1.",
+      #[wUnableToOpenLogFile ]# "Unable to open log file: '$1'.",
+
     ]
 
 func getWarning(filename: string, lineNum: int,

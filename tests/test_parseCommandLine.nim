@@ -207,4 +207,4 @@ Args:
 
   test "parseCommandLine-two-results":
     tpcl("-r=result.html -r=asdf.html", resultFilename="result.html",
-         warningLines = @["cmdline(0): w3: One result file allowed, skipping: asdf.html."])
+         warningLines = @["cmdline(0): w3: One result file allowed, skipping: 'asdf.html'."])
