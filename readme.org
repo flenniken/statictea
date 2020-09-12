@@ -23,19 +23,29 @@ The result:
 hello world
 #+END_SRC
 
-** Basics
+** Advantages
 
-You develop templates as if they were static pages because the
-template commands are encoded as comments enabling you to view,
-edit, and validate the template with its normal tools.
+You develop templates as if they were static pages.  You can
+view, edit and validate your templates with its normal tools.
 
-The line orientated commands identify the replacement block,
-either the current line, next line or next block of lines.
+The template designer has full control over the presentation.
+You can change the lok without changing the server.
 
-Bracketed variables in the replacement block get replaced with
-server values or with values you define in the template.
+** How it Works
 
-** TODO Commands
+The variable content comes from the server unformatted. You
+format it in the template with commands.
+
+You mark replacement text with brackets and by preceding command
+lines.
+
+The commands are encoded as comments to match the prticular
+template type.
+
+You can share common template fragments between templates.
+
+
+** Commands
 
 StaticTea commands:
 
@@ -71,11 +81,12 @@ tea = "Earl Grey"
 num = 5
 #+END_SRC
 
-You define variables to use in the replacement block or to
-control how the block behaves.
+You define variables for the replacement block or to control how
+the block behaves.
 
-Statements go on the nextline, block or replace command
-lines. You can use multiple statements separated with semicolons.
+Statements go on the the nextline, block or replace commands.
+
+You can use multiple statements separated with semicolons.
 
 If you need more space, you can continue the line with the "\\"
 character at the end.
@@ -312,6 +323,31 @@ result:
 Earl Grey, Masala chai
 #+END_SRC
 
+Note: only the endblock command ends a block command. All text
+until the endblock is part of the replacement block. This
+includes other commands. For example:
+
+template:
+
+#+BEGIN_SRC
+<!--$ block -->
+<!--$ # this is not a comment, just text -->
+fake nextline
+<!--$ nextline -->
+<!--$ endblock -->
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+<!--$ # this is not a comment, just text -->
+fake nextline
+<!--$ nextline -->
+#+END_SRC
+
+*** Endblock Command
+*** Endreplace Command
+
 ** Types
 
 StaticTea variables types:
@@ -319,6 +355,8 @@ StaticTea variables types:
 - strings
 - integers
 - floats
+- dictionary
+- list
 
 *** Strings
 
@@ -333,7 +371,7 @@ look like a number.
 example strings:
 
 - "this is a string"
-- 'using single quote'
+- 'using single quotes'
 - "You can store black teas longer than green teas."
 - "100"
 
@@ -360,7 +398,8 @@ result:
 
 *** Integers
 
-Integers are 32 bit signed numbers. When you pass an integer to a
+Integers are 32 bit signed numbers. If you need bigger numbers,
+use floats or strings. When you pass an integer to a
 function that takes a string, the number is converted to a
 string.
 
@@ -373,7 +412,11 @@ Example numbers:
 42
 #+END_SRC
 
-*** Variables
+*** Floats
+*** Dictionaries
+*** Lists
+
+** Variables
 
 You use variables for block content and to control how a command
 works.
@@ -390,11 +433,8 @@ one for the shared json.  You access the shared json variables
 with the "s." prefix. No prefix for the the server variables.
 
 Variables defined in the template are local to the block where
-they are defined. Local variables and take precedence over the
+they are defined. Local variables take precedence over the
 json variables.
-
-You can define any number of variables that will fit on the
-line.
 
 The variables are processed from left to right, so the last one
 takes precedence when there are duplicates.
@@ -421,14 +461,15 @@ works.
 
 *** t.list
 
-The t.list variable determines whether the current replacement block
-repeats or not. By default the block is output once. You can
-assign a list, to output the block zero or more times, once for
-each item in the list.
+The t.list variable determines whether the current replacement
+block repeats or not. It repeats once for each item in the list.
+By default the block is output once.  An empty list means don't
+show the block at all.
 
 The list must be a list of dictionaries. Each dictionary contains
-local variables you use in the block. An empty list means
-don't show the block at all.
+local variables you use in the block. The command variables get
+re-evaluated for each item in the list which allows you to format
+them for the block.
 
 For the following example, tea_list is assigned to the t.list
 variable which outputs the block five times.
@@ -522,36 +563,15 @@ setting the t.maxLines system variable.
 <!--$ block t.maxLines=20 -->
 #+END_SRC
 
-Note: only the endblock command ends a block command. All text
-until the endblock is part of the replacement block. This
-includes other commands. For example:
-
-template:
-
-#+BEGIN_SRC
-<!--$ block -->
-<!--$ # this is not a comment, just text -->
-fake nextline
-<!--$ nextline -->
-<!--$ endblock -->
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-<!--$ # this is not a comment, just text -->
-fake nextline
-<!--$ nextline -->
-#+END_SRC
-
 *** t.replaceContent
 
 The t.replaceContent variable defines what goes in the replace
-block. It only applies to the replace command.
+block. The assigned value replaces the whole replace block.  The
+default is "", which mean the block is replaced with nothing.
 
-The default is "", which mean the block is replaced with nothing.
+The variable only applies to the replace command.
 
-The assigned value replaces the whole replace block.
+See the replace command section for an example.
 
 *** t.result
 
@@ -567,7 +587,7 @@ Result variable options:
 
 Skip Example:
 
-The skip t.result case is good for building test lists.
+The skip case is good for building test lists.
 
 When you view the following template fragment in a browser it
 shows one item in the list.
@@ -655,6 +675,7 @@ The server json contains {numberVars} variables.
 
 List of functions:
 
+- t.bignum() -- add commas to big numbers for readability
 - t.case() -- generalized if function
 - t.cmp() -- spaceship compare function <=>
 - t.concat() -- concatenate strings
@@ -663,10 +684,15 @@ List of functions:
 - t.format() -- format a string
 - t.if() -- if function
 - t.len() -- length of string
-- t.read() -- read a file for the replace command
 - t.row() -- special function that returns the current row
 - t.substr() -- extract a substring from a string by indexes
 - t.version() -- the current version and version checker
+
+*** t.bignum
+
+#+BEGIN_SRC
+var = t.bignum(num, ",")
+#+END_SRC
 
 *** t.case
 
@@ -678,7 +704,7 @@ case.
 
 The rest of the parameters you specify in pairs, the first is the
 case value and the second is the return value when the condition
-matches the case.
+matches that case.
 
 When none of the cases match the condition, the else case is
 used.
@@ -690,7 +716,10 @@ template:
 
 #+BEGIN_SRC
 <--$ nextline \-->
-<--$ : abbr = t.case(tea, "unknown", 'Darjeeling', "Darj", "Earl Gray", "EG") \-->
+<--$ : abbr = t.case( \-->
+<--$ : tea, "unknown",  \-->
+<--$ : 'Darjeeling', "Darj",  \-->
+<--$ : "Earl Gray", "EG") -->
 The abbreviation for {tea} is {abbr}.
 #+END_SRC
 
@@ -708,7 +737,7 @@ result:
 The abbreviation for Darjeeling is Darj.
 #+END_SRC
 
-The t.if statement is shorthand for the following t.case:
+The t.if statement is shorthand for a simple t.case:
 
 #+BEGIN_SRC
 t.if(cond, v1, v2)
@@ -757,7 +786,8 @@ The best selling tea this week is Earl Grey, Twinings.
 
 *** t.concat()
 
-The t.concat function concatenates strings.
+The t.concat function concatenates strings. You can specify 0 or
+more parameters. Examples:
 
 #+BEGIN_SRC
 t.concat() => ""
@@ -807,6 +837,19 @@ result:
 4
 #+END_SRC
 
+*** t.get
+
+You use the t.get function to access list or dictionary
+values. It takes three parameters. The first is the list or
+dictionary to use. The second is the key name for dictionaries or
+the index for lists. The third is the default value when the item
+doesn't exist.
+
+#+BEGIN_SRC
+var = t.get(t.server, "tea", "Earl Grey")
+var2 = t.get(t.list, 2, ???)
+#+END_SRC
+
 *** t.if
 
 You use the if function to select a value based on a condition.
@@ -826,8 +869,8 @@ template:
 <--$ var1=t.if(1, 'dog', 'cat'), \-->
 <--$ var2=t.if(0, 'dog', 'cat'), -->
 
-t.if(1, 'dog', 'cat') -> {var1}
-t.if(0, 'dog', 'cat') -> {var2}
+t.if(1, 'dog', 'cat') => {var1}
+t.if(0, 'dog', 'cat') => {var2}
 <--$ endblock -->
 #+END_SRC
 
@@ -841,12 +884,30 @@ t.if(0, 'dog', 'cat') -> cat
 
 *** t.format
 
-You use the t.format function to format variables.
+The t.format function is a powerful way to format your
+variables. You can left, right or center the variable.  You can
+specify the number of digits after the decimal point and other
+things. For all the details see: https://nim-lang.org/docs/strformat.html.
+
+template:
 
 #+BEGIN_SRC
-{var:arg} where arg is a format specifier.
+<--$ nextline -->
+Kathleen spent ${cost:.2f} on tea for Steve's birthday.
+#+END_SRC
 
-cost = "{teaCost:2.2}"
+json:
+
+#+BEGIN_SRC
+{
+  "cost": 52.436789
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+Kathleen spent $52.44 on tea for Steve's birthday.
 #+END_SRC
 
 *** t.len
@@ -888,10 +949,6 @@ The Tetley name has 6 characters.
 The tea list has 5 elements.
 The server json dictionary has 1 elements.
 #+END_SRC
-
-*** t.read
-
-You can read a file for replace block content.
 
 *** t.row
 
@@ -1013,98 +1070,13 @@ tea.html(45): w23: The current version 1.0.0 is less than the minumum
 allowed verion of 1.2.3.
 #+END_SRC
 
-** Json Dictionaries
+** Prefix Postfix
 
-You have access to the server and shared dictionaries with the
-t.server and t.shared system variables.
-
-template:
-
-#+BEGIN_SRC
-<!--$ block \-->
-<!--$ : serverElements = t.len(t.server) \-->
-<!--$ : jsonElements = t.len(t.shared) -->
-The server has {serverElements} elements
-and the shared json has {jsonElements}.
-<!--$ endblock -->
-#+END_SRC
-
-json:
-
-#+BEGIN_SRC
-{
-  "tea1": "Black",
-  "tea2": "Green",
-  "tea3": "Oolong",
-  "tea4": "Sencha",
-  "tea5": "Herbal"
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-The server has 5 elements
-and the shared json has 0.
-#+END_SRC
-
-** StaticTea as a Filter
-
-You can use the statictea command as a filter and pipe template
-lines to it and see the result output on the screen.
-
-Below is an example you can copy and paste into your terminal. It
-creates a template.txt file containing two lines, then it creates
-the server.json file containing one line, then it runs statictea
-using those files and the result goes to the screen.
-
-#+BEGIN_SRC
-# create template file
-cat <<EOF >template.txt
-<!--$ nextline -->
-hello {name}
-EOF
-
-# create server json file
-cat <<EOF >server.json
-{"name": "world"}
-EOF
-
-statictea --template template.txt --server server.json
-#+END_SRC
-
-If you copy and paste those lines to your terminal on Linux, it will look
-like:
-
-#+BEGIN_SRC
-$ cat <<EOF >template.txt
-> <!--$ nextline -->
-> hello {name}
-> EOF
-$
-$ cat <<EOF >server.json
-> {"name": "world"}
-> EOF
-$
-$ statictea --template template.txt --server server.json
-hello world
-#+END_SRC
-
-The following example pipes template.txt to statictea. The result
-goes to the screen.
-
-#+BEGIN_SRC
-cat template.txt | statictea --template stdin --server server.json
-
-hello world
-#+END_SRC
-
-** TODO Prefix Postfix
-
-You make the template commands look like comments for your
-template file type. This allows you to edit the template using
-its native editor and run other native tools.  For example, you
-can edit a StaticTea html template with an html editor.
+You make the template commands look like comments tailored for
+your template file type. This allows you to edit the template
+using its native editor and run other native tools.  For example,
+you can edit a StaticTea html template with an html editor and
+validate it online with w3.org (https://validator.w3.org).
 
 Comment syntax varies depending on the type of template file and
 sometimes depending on the location within the file. StaticTea
@@ -1143,25 +1115,63 @@ There are two types of json files the server json and the shared
 json.
 
 The server json comes from the server and shouldn't contain any
-presentation data.
+presentation data so the template designers have full control of
+the presentation. You include zero, one or more server files
+with the server option. The variables get added to the t.server
+dictionary.
 
-The share json is used by the template builder to share common
-template lines and it contains presentation data.
+You use the shared json to share common template lines and other
+presentation information. You can include zero, one or more
+shared files with the shared option. You reference them with the
+"s." namespace prefix. The variables get added to the t.shared
+dictionary.
 
-The server json file is included with the server option.  Its
-variables are referenced with the "s." namespace prefix.
+When you specify multiple files on the command line, they get
+added to the dictionary from left to right so the last duplicate
+variable wins.
 
-You can specify multiple server or shared files on the statictea
-command line. The server variables get added to the t.server
-dictionary and the shared to the t.shared dictionary.
+** Json Dictionaries
 
-They get added from left to right so the last duplicate variable
-wins.
+You have access to the server and shared dictionaries with the
+t.server and t.shared system variables.
+
+The json null values get converted to the string "null". Json
+True and False get converted to ints 1 and 0.
+
+template:
+
+#+BEGIN_SRC
+<!--$ block \-->
+<!--$ : serverElements = t.len(t.server) \-->
+<!--$ : jsonElements = t.len(t.shared) -->
+The server has {serverElements} elements
+and the shared json has {jsonElements}.
+<!--$ endblock -->
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+{
+  "tea1": "Black",
+  "tea2": "Green",
+  "tea3": "Oolong",
+  "tea4": "Sencha",
+  "tea5": "Herbal"
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+The server has 5 elements
+and the shared json has 0.
+#+END_SRC
 
 ** Warning Messages
 
 When StaticTea detects a problem, a warning message is written to
-standard error, the statement is skipped, and processing
+standard error, the problem is skipped, and processing
 continues.
 
 For example, if a variable in a replacement block is used but it
@@ -1260,25 +1270,86 @@ The StaticTea command line options:
 - update - update the template replace blocks.
 - prepost - add a command prefix and postfix, you can specify multiple.
 
-** General Limits
+** StaticTea as a Filter
 
-- max command line length
-- max number of shared variables
-- max number of server variables
-- max literal string length
-- max literal name length
-- max json key name length
-- max json string value length
-- max json file size in bytes
-- max number if items in a list
+You can use the statictea command as a filter and pipe template
+lines to it and see the result output on the screen.
 
-StaticTea checkes the json file size and if within the limit it
-reads it and adds its elements to the shared or server
-dictionaries. Duplicate elements overwrite existing elements.  If
-a json key length or string value exceeds a limit, it is skipped
-and a warning is output.
+Below is an example you can copy and paste into your terminal. It
+creates a template.txt file containing two lines, then it creates
+the server.json file containing one line, then it runs statictea
+using those files and the result goes to the screen.
 
-There is no limit on the size of the template.
+#+BEGIN_SRC
+# create template file
+cat <<EOF >template.txt
+<!--$ nextline -->
+hello {name}
+EOF
+
+# create server json file
+cat <<EOF >server.json
+{"name": "world"}
+EOF
+
+statictea --template template.txt --server server.json
+#+END_SRC
+
+If you copy and paste those lines to your terminal on Linux, it will look
+like:
+
+#+BEGIN_SRC
+$ cat <<EOF >template.txt
+> <!--$ nextline -->
+> hello {name}
+> EOF
+$
+$ cat <<EOF >server.json
+> {"name": "world"}
+> EOF
+$
+$ statictea --template template.txt --server server.json
+hello world
+#+END_SRC
+
+The following example pipes template.txt to statictea. The result
+goes to the screen.
+
+#+BEGIN_SRC
+cat template.txt | statictea --template stdin --server server.json
+
+hello world
+#+END_SRC
+
+** Limits
+
+There is no limit on the size of the template. However there are
+several limits on variables and commands.
+
+Having limit can seem restrictive but there are many reasons for
+them.
+
+- It makes testing the easier since you can test at the limit as
+well as over the limit for warning messages.
+- It's easier to optimize memory usage to a known value then for
+  the general unlimited case.
+- Engineering does not need to spend time supporting unlimited
+  cases that are not used much.
+- The users know and automatically stay within ranges for good
+  performance.
+
+You can overwride the t.maxLine limit but not others. Here are
+the limits:
+
+- t.maxLines - number of lines before the end block
+  command. Useful when you forget to end the block. You can
+  override this with bigger or smaller values.  Default 10.
+- max command line length - 4096 characters.
+- max variable name length - 100 characters.
+- max literal string length - 256 characters.
+- max json file size - xxx bytes.
+- max number of items in a list - 500 items.  Use multiple lists
+  if you need more.
 
 ** Encoding and Line Endings
 
@@ -1299,15 +1370,6 @@ example ellipsizes when a name is longer than 10 characters.
 <!--$ : name = t.case(cmd, name                  \-->
 <!--$ : 1, t.concat(substr(name, 0, 7), "..."))   -->
 #+END_SRC
-
-** Limits
-
-There are several reasons for all the limits. It makes testing
-the limit and one more than the limit possible. It allows the
-code to be optimized for memory and speed for the default
-cases. Its clear what needs to be supported so undo engineering
-for the unlimited cases are reduced.  The user can tailor usage
-to be within the limits and they know it will perform well.
 
 ** System Defaults
 
