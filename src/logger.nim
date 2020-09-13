@@ -1,75 +1,78 @@
-## Logging System
+## Write log messages to a file.
+##
+## Example Usage:
+##
+## .. code-block::
+##   import logger as loggers
+##   import options
+##   let option = openLogger("my.log")
+##   doAssert option.isSome
+##   var logger = option.get()
+##   logger.log("first log message")
+##   logger.log("second log message")
+##   logger.close()
+##   for line in lines("my.log"):
+##     echo line
+##
+## Results::
+##
+##   2020-09-13 11:20:39.407: first log message
+##   2020-09-13 11:20:39.407: second log message
+##
+## A closed or non-opened logger does nothing.
+##
+## .. code-block::
+##   import logger as loggers
+##   var doNothingLogger = Logger()
+##   doNothingLogger.log("mesage")
+##   doNothingLogger.close()
 
 import times
 import strutils
-import re
-import streams
-import warnings
 import posix
-
+import options
 
 type
   Logger* = object
-    filename: string
-    fh: File
+    file: File
 
 const
-  staticteaLog* = "statictea.log"
-  dtFormat = "yyyy-MM-dd HH:mm:ss'.'fff"
+  dtFormat* = "yyyy-MM-dd HH:mm:ss'.'fff" ## \
+  ## The date time format in local time.
 
 
-# 2020-09-12 11:45:24.369: first message
-let logLineRegex = re"^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d): (.*)$"
-
-
-proc openLogger*(filename: string, truncateFile: bool=false, warn: Stream = nil): Logger =
-  ## Open the given file for logging. The file is first truncate when
-  ## specified. Warnings are written to the warn stream if specified.
-  ## Call closeLogger when you are done logging.
+proc openLogger*(filename: string, truncateFile: bool=false): Option[Logger] =
+  ## Open the given file for logging. The file is truncated when
+  ## specified. Call close when you are done logging.
 
   if truncateFile:
     discard truncate(filename, 0)
-  try:
-    result.fh = open(filename, fmAppend)
-    result.filename = filename
-  except:
-    if warn != nil:
-      warning(warn, "logger", 0, wUnableToOpenLogFile, filename)
+
+  var logger: Logger
+  var file: File
+  if open(file, filename, fmAppend):
+    logger.file = file
+    result = some(logger)
 
 
 proc log*(logger: Logger, message: string) =
-  ## Log a message.
+  ## Append a message to the log file. Do nothing when not open.
 
-  if logger.fh != nil:
-    let dt = now()
-    let dtString = dt.format(dtFormat)
-    for line in splitLines(message):
-      let line = "$1: $2" % [dtString, line]
-      logger.fh.writeLine(line)
+  if logger.file == nil:
+    return
+
+  let dt = now()
+  let dtString = dt.format(dtFormat)
+
+  # Split messages with newlines into separate lines in the log.
+  for line in splitLines(message):
+    let line = "$1: $2" % [dtString, line]
+    logger.file.writeLine(line)
 
 
 proc close*(logger: var Logger) =
-  ## Close the logger.
+  ## Close the log file if it's open.
 
-  if logger.fh != nil:
-    logger.fh.close()
-    logger.fh = nil
-
-
-proc parseLogLine*(line: string): (string, string) =
-  ## Parse a log line and return the datetime string and message
-  ## string.
-
-  var matches: array[2, string]
-  if match(line, logLineRegex, matches):
-    let dtString = matches[0]
-    let message = matches[1]
-    result = (dtString, message)
-
-
-proc parseDateTime*(dtString: string): DateTime =
-  result = parse(dtString, dtFormat)
-
-
-func formatDateTime*(dt: DateTime): string =
-  result = dt.format(dtFormat)
+  if logger.file != nil:
+    logger.file.close()
+    logger.file = nil

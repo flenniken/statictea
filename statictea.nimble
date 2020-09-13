@@ -71,3 +71,16 @@ task showTests, "Show tests":
   for filename in test_filenames:
     let cmd = get_test_module_cmd(filename)
     echo cmd
+
+proc doc_module(name: string) =
+  let cmd = "nim doc --hints:off -d:test --index:on --out:docs/html/$1.html src/$1.nim" % [name]
+  echo cmd
+  exec cmd
+
+proc open_in_browser(filename: string) =
+  ## Open the given file in a browser if the system has an open command.
+  exec "(hash open 2>/dev/null && open $1) || echo 'open $1'" % filename
+
+task docs1, "Build docs for one module.":
+  doc_module("logger")
+  open_in_browser("docs/html/logger.html")

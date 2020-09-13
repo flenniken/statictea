@@ -1,13 +1,35 @@
 import unittest
 import logger
 import os
-import streams
-import testUtils
+import re
+import options
+import times
+
+
+# Regex to match the log time format.
+# 2020-09-12 11:45:24.369: first message
+let logLineRegex = re"^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d): (.*)$"
+
+proc parseLogLine*(line: string): (string, string) =
+  ## Parse a log line and return the datetime string and message
+  ## string.
+
+  var matches: array[2, string]
+  if match(line, logLineRegex, matches):
+    let dtString = matches[0]
+    let message = matches[1]
+    result = (dtString, message)
+
+
+proc parseDateTime*(dtString: string): DateTime =
+  result = parse(dtString, dtFormat)
+
+
+func formatDateTime*(dt: DateTime): string =
+  result = dt.format(dtFormat)
+
 
 suite "Test logger.nim":
-
-  test "test default log name":
-    check staticteaLog == "statictea.log"
 
   test "test parseDateTime":
     let dtString = "2020-09-12 11:47:14.673"
@@ -24,9 +46,11 @@ suite "Test logger.nim":
     check dtString == ""
     check message == ""
 
-  test "test basics":
+  test "test happy path":
     let filename = "_logger_test.log"
-    var logger = openLogger(filename)
+    var option = openLogger(filename)
+    check option.isSome == true
+    var logger = option.get()
     logger.log("first message")
     logger.log("second message")
     logger.log("")
@@ -44,7 +68,9 @@ suite "Test logger.nim":
     var fh = open(filename, fmWrite)
     fh.writeLine("logger test file")
     fh.close()
-    var logger = openLogger(filename, truncateFile=true)
+    var option = openLogger(filename, truncateFile=true)
+    check option.isSome == true
+    var logger = option.get()
     logger.close()
     let numBytes = getFileSize(filename)
     check numBytes == 0
@@ -53,12 +79,24 @@ suite "Test logger.nim":
   test "test logger open close":
     let filename = "_logger_openclose.log"
     var logger: Logger
-    logger = openLogger(filename)
+    var option: Option[Logger]
+
+    option = openLogger(filename)
+    check option.isSome == true
+    logger = option.get()
     logger.log("open and close")
     logger.close()
-    logger = openLogger(filename)
+
+    option = openLogger(filename)
+    check option.isSome == true
+    logger = option.get()
     logger.log("another log")
     logger.close()
+
+    # Check that a closed logger doesn't log or crash.
+    logger.log("closed logger")
+    logger.close()
+
     var count = 0
     for line in lines(filename):
       count += 1
@@ -66,30 +104,10 @@ suite "Test logger.nim":
     discard tryRemoveFile(filename)
 
   test "test cannot open":
-    var warn = newStringStream()
-    defer: warn.close()
-    var logger = openLogger("", warn=warn)
-    let lines = warn.readLines()
-    check lines.len == 1
-    check lines[0] == "logger(0): w8: Unable to open log file: ''."
-    logger.log("something")
-    logger.close()
+    var option = openLogger("")
+    check option.isSome == false
 
-  test "test no warnings normally":
-    var warn = newStringStream()
-    defer: warn.close()
-    let filename = "_logger_nowarning.log"
-    var logger: Logger
-    logger = openLogger(filename, warn=warn)
-    logger.log("open and close")
+  test "test un-opened logger":
+    var logger = Logger()
+    logger.log("message")
     logger.close()
-    logger = openLogger(filename, warn=warn)
-    logger.log("another log")
-    logger.close()
-    var count = 0
-    for line in lines(filename):
-      count += 1
-    check count == 2
-    let lines = warn.readLines()
-    check lines.len == 0
-    discard tryRemoveFile(filename)
