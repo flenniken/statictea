@@ -64,14 +64,16 @@ example command lines:
 <!--$ replace t.content = header -->
 <!--$ # this is a comment command -->
 <!--$ : var="Oolong" -->
+<!--$ endblock -->
+<!--$ endreplace -->
 #+END_SRC
 
 ** Statements
 
-You use a statement to create or assign a local variable.
+You define local variables with statements.
 
 A statement consists of a variable, an equal sign, and a right
-hand side. The right side is either another variable, a
+hand side. The right hand side is either another variable, a
 function or a literal. Here are some examples:
 
 #+BEGIN_SRC
@@ -80,9 +82,6 @@ nameLen = t.len(name)
 tea = "Earl Grey"
 num = 5
 #+END_SRC
-
-You use local variables in the replacement block, or you assign
-them to system variables to control how the block behaves.
 
 Statements go on the the nextline, block or replace commands.
 
@@ -164,9 +163,7 @@ John's house at 5:00 pm.
 
 *** Replace Command
 
-The replace command replaces the replacement block with a
-variable's value. You set the block content by assigning the
-t.content variable.
+The replace command gets replaced with the t.content variable.
 
 The lines in the block mirror the variable so you can
 test the template as if it was a static file.
@@ -344,7 +341,12 @@ fake nextline
 #+END_SRC
 
 *** Endblock Command
+
+The endblock command ends the block command.
+
 *** Endreplace Command
+
+The endreplace command ends the replace command.
 
 ** Types
 
@@ -396,9 +398,8 @@ result:
 
 *** Integer
 
-Integers are 32 bit signed numbers. If you need bigger numbers,
-use floats or strings. When you pass an integer to a
-function that takes a string, the number is converted to a
+Integers are 32 bit signed numbers.  When you pass an integer to
+a function that takes a string, the number is converted to a
 string.
 
 Example numbers:
@@ -412,16 +413,20 @@ Example numbers:
 
 *** Float
 
+A float is a real number.  float64.
+
 *** Dictionary
 
-You cannot define list and dictionaries in the template but you
-can reference them in the json.
+You access items in a dictionary with t.get.  The dictionaries
+are defined in the json files.
 
 *** List
 
+You can fetch items from lists defined in json files with t.get.
+
 ** Variables
 
-You use variables for block content and to control how a command
+You use variables to format content for a block and to control how a command
 works.
 
 You specify variables in json files or you create them in
@@ -455,11 +460,21 @@ The built in system variables control how the replacement block
 works.
 
 - t.list - controls whether the block repeats
-- t.maxLines - maximum lines before endblock or endreplace
+- t.maxlines - maximum lines before endblock or endreplace
 - t.content - content of the replace block
 - t.result - where the result goes
 - t.server - dictionary containing the server variables
 - t.shared - dictionary containing the shared variables
+
+*** t.content
+
+The t.content variable determines what content to use for the
+whole block. The default is an empty string, which mean the block
+is replaced with nothing.
+
+The variable only applies to the replace command.
+
+See the replace command section for an example.
 
 *** t.list
 
@@ -556,9 +571,9 @@ The t.local variable is the dictionary of local variables for the
 current command. It is recalculated for each item in the list.
 How do you override shared vars? Allow s.var?
 
-*** t.maxLines
+*** t.maxlines
 
-The t.maxLines variable determines the maximum lines in a block.
+The t.maxlines variable determines the maximum lines in a block.
 
 StaticTea reads lines looking for the endblock or endreplace
 commands.  By default, if it is not found in 10 lines, the 10
@@ -566,21 +581,11 @@ lines are used for the block and a warning is output. The catches
 the case where you forget the end command.
 
 You can increase this value to support blocks with more lines by
-setting the t.maxLines system variable.
+setting the t.maxlines system variable.
 
 #+BEGIN_SRC
-<!--$ block t.maxLines=20 -->
+<!--$ block t.maxlines=20 -->
 #+END_SRC
-
-*** t.content
-
-The t.content variable determines what content to use for the
-whole block. The default is an empty string, which mean the block
-is replaced with nothing.
-
-The variable only applies to the replace command.
-
-See the replace command section for an example.
 
 *** t.result
 
@@ -670,8 +675,7 @@ StaticTea has many built in functions you can call to format your
 varibles for output.  Functions take zero or more input parameters
 and return a value that you assign to a variable.
 
-You use functions on a command line and you use the resulting
-variables in its replacement block.
+You use functions on a command line.
 
 The following example assigns the numberVars variable to the
 number of variables in the t.server dictionary then it uses the
@@ -684,7 +688,6 @@ The server json contains {numberVars} variables.
 
 List of functions:
 
-- t.bignum() -- add commas to big numbers for readability
 - t.case() -- generalized if function
 - t.cmp() -- spaceship compare function <=>
 - t.concat() -- concatenate strings
@@ -696,12 +699,6 @@ List of functions:
 - t.row() -- special function that returns the current row
 - t.substr() -- extract a substring from a string by indexes
 - t.version() -- the current version and version checker
-
-*** t.bignum
-
-#+BEGIN_SRC
-var = t.bignum(num, ",")
-#+END_SRC
 
 *** t.case
 
@@ -856,7 +853,7 @@ default, a warning is generated when the item doesn't exist.
 
 #+BEGIN_SRC
 var = t.get(t.server, "tea", "Earl Grey")
-var2 = t.get(t.list, 2, ???)
+var2 = t.get(t.list, 2, "default")
 #+END_SRC
 
 *** t.if
@@ -1003,12 +1000,14 @@ result:
 *** t.substr
 
 The t.substr function extracts a substring from a string by
-indexes. The last parameter is optional. The first parameter is
-the string to operate on, the second is the starting index of the
-substring to extract and the third is the ending index (one past
-it). The third parameter defaults to one past the end of the
-string. The end minus the start is equal to the length of the
-substring.
+indexes. The first parameter is the string to operate on, the
+second is the starting index of the substring to extract and the
+third is the ending index (one past it). The third parameter is
+optional and defaults to one past the end of the string. The end
+minus the start is equal to the length of the substring.
+
+Showing the indexes under Earl Grey helps to understand how the
+function works.
 
 #+BEGIN_SRC
 Earl Grey
@@ -1129,11 +1128,12 @@ the presentation. You include zero, one or more server files
 with the server option. The variables get added to the t.server
 dictionary.
 
-You use the shared json to share common template lines and other
-presentation information. You can include zero, one or more
-shared files with the shared option. You reference them with the
-"s." namespace prefix. The variables get added to the t.shared
-dictionary.
+The shared json is created by the template designer for sharing
+common template fragments and other presentation needs.
+
+You can include zero, one or more shared files with the shared
+option. You reference them with the "s." namespace prefix. The
+variables get added to the t.shared dictionary.
 
 When you specify multiple files on the command line, they get
 added to the dictionary from left to right so the last duplicate
@@ -1142,11 +1142,11 @@ variable wins.
 The json null values get converted to the string "null". Json
 True and False get converted to ints 1 and 0.
 
-You have access to the server and shared dictionaries with the
-t.server and t.shared system variables. You cannot change the
-json variables but you can define local variables of the same
-name and they take precedent.
+You cannot change the json variables but you can define local
+variables of the same name and they take precedent.
 
+Here is an example showing the number of elements in the t.server
+and t.shared dictionaries.
 
 template:
 
@@ -1189,8 +1189,8 @@ doesn't exist, the bracketed variable remains as is in the
 result, and a message is output to standard error. There are many
 other potential warnings.
 
-It’s good style to change your template or json so no messages
-get output.
+It’s good style to change your template or json to be free of
+messages.
 
 Each warning message shows the file and line number where the problem
 happened. Each warning has an associated number which doesn't
@@ -1288,7 +1288,7 @@ The StaticTea command line options:
 - result - the result file.
 - update - update the template replace blocks.
 - prepost - add a command prefix and postfix, you can specify multiple.
-- log - the log file, no logging by default.
+- log - the log file, no loggingnothing by default.
 
 ** StaticTea as a Filter
 
@@ -1346,26 +1346,24 @@ hello world
 There is no limit on the size of the template. However there are
 several limits on variables and commands.
 
-Having limit can seem restrictive but there are many reasons for
+Having limits may seem restrictive but there are many reasons for
 them.
 
-- It makes testing the easier since you can test at the limit as
-well as over the limit for warning messages.
-- It's easier to optimize memory usage to a known value then for
-  the general unlimited case.
-- Engineering does not need to spend time supporting unlimited
-  cases that are not used much.
-- The users know and automatically stay within ranges for good
-  performance.
+- It makes it easier to test the limits and to test the warning messages.
+- It's easier to optimize statictea's memory usage when the
+  limits are known.
+- Engineering time is better spent on more general needs than
+  supporting the rarely needed unlimited cases.
+- Defining limits tells the users how to best use the program.
 
 You can overwride the t.maxLine limit but not others. Here are
 the limits:
 
-- t.maxLines - number of lines before the end block
+- t.maxlines - number of lines before the end block
   command. Useful when you forget to end the block. You can
   override this with bigger or smaller values.  Default 10.
 - max command line length - 4096 characters.
-- max variable name length - 100 characters.
+- max variable name length - 64 characters.
 - max literal string length - 256 characters.
 - max json file size - xxx bytes.
 - max number of items in a list - 500 items.  Use multiple lists
@@ -1397,13 +1395,16 @@ You can use the system variables in a replacement block to see
 their default values. The following example shows the default
 values of some of the system variables.
 
+The next example shows the default values of some system
+variables.
+
 template:
 
 #+BEGIN_SRC
 <!--$ block -->
 default t.list = {t.list}
 default t.content = {t.content}
-default t.maxLines = {t.maxLines}
+default t.maxlines = {t.maxlines}
 <!--$ endblock -->
 #+END_SRC
 
@@ -1412,7 +1413,7 @@ result:
 #+BEGIN_SRC
 default t.list = 0
 default t.content = ""
-default t.maxLines = 10
+default t.maxlines = 10
 #+END_SRC
 
 ** Tea Info
@@ -1423,8 +1424,9 @@ equaling all others – including coffee, soft drinks, and alcohol
 (2004). The Empire of Tea. The Overlook Press. p. 32. ISBN
 978-1-58567-493-0.
 
-** TODO support functions as parameters
-** TODO use system variables instead of limits dictionary
-** TODO Is leading whitespace prefixes needed?
-** TODO document bracketed replacements to generalize them to include a format specifier
-** TODO add example adding an s or not.
+** TODO
+- Is leading whitespace prefixes needed?
+- document bracketed replacements to generalize them to include a
+  format specifier
+- format date and time values
+- add commas to big numbers
