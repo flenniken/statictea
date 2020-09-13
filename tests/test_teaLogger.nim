@@ -1,5 +1,5 @@
 import unittest
-import tea_logger
+import teaLogger
 import streams
 import testUtils
 import args

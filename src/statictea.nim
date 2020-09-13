@@ -6,7 +6,7 @@ import streams
 import parseCommandLine
 import strutils
 import processTemplate
-import tea_logger
+import teaLogger
 
 when isMainModule:
   # Detect control-c and stop.
