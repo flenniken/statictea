@@ -25,7 +25,7 @@ proc tpcl(
   defer: stream.close()
 
   let args = parseCommandLine(stream, cmdLine)
-  let lines = stream.readLines()
+  let lines = stream.theLines()
 
   check(args.help == help)
   check(args.version == version)
@@ -58,23 +58,6 @@ suite "Test statictea.nim":
     check(letterToWord('u') == "update")
     check(letterToWord('p') == "prepost")
     check(letterToWord('z') == "")
-
-  test "readLines":
-    var stream = newStringStream("testing")
-    defer: stream.close()
-    let warningLines = stream.readLines()
-    check(warningLines.len == 1)
-    check(warningLines[0] == "testing")
-
-  test "readLines2":
-    var stream = newStringStream()
-    defer: stream.close()
-    stream.writeLine("this is a test")
-    stream.writeLine("1 2 3")
-    let warningLines = stream.readLines()
-    check(warningLines.len == 2)
-    check(warningLines[0] == "this is a test")
-    check(warningLines[1] == "1 2 3")
 
   test "prepost string representation":
     var prepostList: seq[Prepost]

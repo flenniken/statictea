@@ -22,7 +22,7 @@ suite "Test warnings.nim":
     var stream = newStringStream()
     defer: stream.close()
     warning(stream, "tea.html", 23, wUnknownArg, "missing")
-    let lines = stream.readLines()
+    let lines = stream.theLines()
     check lines.len == 1
     check lines[0] == "tea.html(23): w2: Unknown argument: missing."
 

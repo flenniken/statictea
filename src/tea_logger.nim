@@ -24,7 +24,7 @@ proc openStaticTeaLogger*(args: Args, warnings: Stream) =
   ## log file.
 
   if loggerSet:
-    logger.log("Only call openStaticTeaLogger once.")
+    logger.log("Calling open for statictea log when it's already open.")
     return
   loggerSet = true
 
@@ -46,3 +46,11 @@ proc openStaticTeaLogger*(args: Args, warnings: Stream) =
     return
 
   logger = option.get()
+
+
+proc closeStaticTeaLogger*() =
+  if not loggerSet:
+    # Calling close for statictea log when it's not open.
+    return
+  logger.close()
+  loggerSet = false

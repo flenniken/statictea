@@ -1,8 +1,4 @@
+import strutils
 
-proc theLines*(filename: string): seq[string] =
-  ## Read all the lines in the file.
-  for line in lines(filename):
-    result.add line
-
-var testLines = theLines("statictea.log")
-echo testLines.len
+let cond = "this is a test".contains("test")
+echo cond
