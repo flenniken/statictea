@@ -1,5 +1,5 @@
 import unittest
-import logger
+import loggers
 import os
 import re
 import options

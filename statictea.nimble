@@ -82,5 +82,8 @@ proc open_in_browser(filename: string) =
   exec "(hash open 2>/dev/null && open $1) || echo 'open $1'" % filename
 
 task docs1, "Build docs for one module.":
-  doc_module("logger")
-  open_in_browser("docs/html/logger.html")
+  doc_module("loggers")
+  open_in_browser("docs/html/loggers.html")
+
+task tt, "Compile and run t.nim":
+  exec "nim c -r --outdir:bin/tests/ src/t.nim"

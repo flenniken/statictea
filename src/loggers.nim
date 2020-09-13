@@ -3,7 +3,7 @@
 ## Example Usage:
 ##
 ## .. code-block::
-##   import logger as loggers
+##   import loggers
 ##   import options
 ##   let option = openLogger("my.log")
 ##   doAssert option.isSome
@@ -22,7 +22,7 @@
 ## A closed or non-opened logger does nothing.
 ##
 ## .. code-block::
-##   import logger as loggers
+##   import loggers
 ##   var doNothingLogger = Logger()
 ##   doNothingLogger.log("mesage")
 ##   doNothingLogger.close()
@@ -71,7 +71,7 @@ proc log*(logger: Logger, message: string) =
 
 
 proc close*(logger: var Logger) =
-  ## Close the log file if it's open.
+  ## Close the log file, if it's open.
 
   if logger.file != nil:
     logger.file.close()
