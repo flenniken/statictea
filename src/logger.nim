@@ -22,28 +22,19 @@ const
 let logLineRegex = re"^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d): (.*)$"
 
 
-proc openWithWarning(filename: string, mode: FileMode, warn: Stream = nil): File =
+proc openLogger*(filename: string, truncateFile: bool=false, warn: Stream = nil): Logger =
+  ## Open the given file for logging. The file is first truncate when
+  ## specified. Warnings are written to the warn stream if specified.
+  ## Call closeLogger when you are done logging.
+
+  if truncateFile:
+    discard truncate(filename, 0)
   try:
-    result = open(filename, mode)
+    result.fh = open(filename, fmAppend)
+    result.filename = filename
   except:
     if warn != nil:
       warning(warn, "logger", 0, wUnableToOpenLogFile, filename)
-
-
-proc openLogger*(filename: string, warn: Stream = nil): Logger =
-  ## Open the given file for logging. Call closeLogger when you are
-  ## done with logging.
-
-  result.fh = openWithWarning(filename, fmAppend, warn)
-  result.filename = filename
-
-
-proc openLogger*(warn: Stream = nil): Logger =
-  ## Truncate the statictea.log then open it for logging. Call
-  ## closeLogger when you are done logging.
-
-  discard truncate(staticteaLog, 0)
-  result = openLogger(staticteaLog, warn)
 
 
 proc log*(logger: Logger, message: string) =

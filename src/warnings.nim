@@ -15,6 +15,7 @@ type
      wNoPrepostValue,
      wSkippingExtraPrepost,
      wUnableToOpenLogFile,
+     wOneLogAllowed,
 
 tpubType:
   const
@@ -30,7 +31,7 @@ tpubType:
       #[wNoPrepostValue      ]# "No prepost value. Use $1=\"...\".",
       #[wSkippingExtraPrepost]# "Skipping extra prepost text: $1.",
       #[wUnableToOpenLogFile ]# "Unable to open log file: '$1'.",
-
+      #[wOneLogAllowed       ]# "One log file allowed, skipping: '$1'.",
     ]
 
 func getWarning(filename: string, lineNum: int,

@@ -1288,8 +1288,7 @@ The StaticTea command line options:
 - result - the result file.
 - update - update the template replace blocks.
 - prepost - add a command prefix and postfix, you can specify multiple.
-- warning - the warning file, standard error by default.
-- log - the log file, nothing by default.
+- log - the log file, no logging by default.
 
 ** StaticTea as a Filter
 

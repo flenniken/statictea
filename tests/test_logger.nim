@@ -6,6 +6,9 @@ import testUtils
 
 suite "Test logger.nim":
 
+  test "test default log name":
+    check staticteaLog == "statictea.log"
+
   test "test parseDateTime":
     let dtString = "2020-09-12 11:47:14.673"
     let dt = parseDateTime(dtString)
@@ -21,15 +24,14 @@ suite "Test logger.nim":
     check dtString == ""
     check message == ""
 
-  test "test logger with filename":
-    let filename = "test.log"
+  test "test basics":
+    let filename = "_logger_test.log"
     var logger = openLogger(filename)
     logger.log("first message")
     logger.log("second message")
     logger.log("")
     logger.log("line with newline\nin it")
     logger.close()
-
     for line in lines(filename):
       let (dtString, message) = parseLogLine(line)
       if dtString == "":
@@ -37,52 +39,19 @@ suite "Test logger.nim":
         doAssert(false, "invalid line")
     discard tryRemoveFile(filename)
 
-  test "test statictea log name":
-    check staticteaLog == "statictea.log"
-
-  test "test statictea logger":
-    var logger = openLogger()
-    logger.log("first message")
-    logger.log("second message")
-    logger.log("")
-    logger.log("line with newline\nin it")
+  test "test truncate":
+    let filename = "_logger_truncate.log"
+    var fh = open(filename, fmWrite)
+    fh.writeLine("logger test file")
+    fh.close()
+    var logger = openLogger(filename, truncateFile=true)
     logger.close()
-
-    var lines = newSeq[string]()
-    for line in lines(staticteaLog):
-      # echo line
-      lines.add(line)
-
-    check lines.len == 5
-    let expectedMessages = @[
-      "first message",
-      "second message",
-      "",
-      "line with newline",
-      "in it",
-    ]
-    for ix, line in lines:
-      let (dtString, message) = parseLogLine(lines[ix])
-      check message == expectedMessages[ix]
-
-    discard tryRemoveFile(staticteaLog)
-
-  test "test statictea open close":
-    var logger: Logger
-    logger = openLogger()
-    logger.log("open and close")
-    logger.close()
-    logger = openLogger()
-    logger.log("another log")
-    logger.close()
-    var count = 0
-    for line in lines(staticteaLog):
-      count += 1
-    check count == 1
-    discard tryRemoveFile(staticteaLog)
+    let numBytes = getFileSize(filename)
+    check numBytes == 0
+    discard tryRemoveFile(filename)
 
   test "test logger open close":
-    let filename = "openclose.log"
+    let filename = "_logger_openclose.log"
     var logger: Logger
     logger = openLogger(filename)
     logger.log("open and close")
@@ -99,29 +68,28 @@ suite "Test logger.nim":
   test "test cannot open":
     var warn = newStringStream()
     defer: warn.close()
-    let filename = ""
-    var logger = openLogger(filename, warn)
+    var logger = openLogger("", warn=warn)
     let lines = warn.readLines()
     check lines.len == 1
     check lines[0] == "logger(0): w8: Unable to open log file: ''."
     logger.log("something")
     logger.close()
 
-  test "test logger open close no warn":
+  test "test no warnings normally":
     var warn = newStringStream()
     defer: warn.close()
-    let filename = "openclose.log"
+    let filename = "_logger_nowarning.log"
     var logger: Logger
-    logger = openLogger(filename, warn)
+    logger = openLogger(filename, warn=warn)
     logger.log("open and close")
     logger.close()
-    logger = openLogger(filename, warn)
+    logger = openLogger(filename, warn=warn)
     logger.log("another log")
     logger.close()
     var count = 0
     for line in lines(filename):
       count += 1
     check count == 2
-    discard tryRemoveFile(filename)
     let lines = warn.readLines()
     check lines.len == 0
+    discard tryRemoveFile(filename)

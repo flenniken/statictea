@@ -11,12 +11,14 @@ proc tpcl(
     version: bool=false,
     help: bool=false,
     update: bool=false,
+    log: bool=false,
     resultFilename: string = "",
     serverList: seq[string] = @[],
     sharedList: seq[string] = @[],
     templateList: seq[string] = @[],
     warningLines: seq[string] = @[],
-    prepostList: seq[Prepost]= @[]
+    prepostList: seq[Prepost]= @[],
+    logFilename: string = "",
       ) =
 
   var stream = newStringStream()
@@ -28,11 +30,13 @@ proc tpcl(
   check(args.help == help)
   check(args.version == version)
   check(args.update == update)
+  check(args.log == log)
   check(args.serverList == serverList)
   check(args.sharedList == sharedList)
   check(args.templateList == templateList)
   check(args.resultFilename == resultFilename)
   check(args.prepostList == prepostList)
+  check(args.logFilename == logFilename)
   check(lines == warningLines)
 
 
@@ -101,11 +105,13 @@ Args:
   help=false
   version=false
   update=false
+  log=false
   serverList=
   sharedList=
   templateList=
   resultFilename=
   prepostList=
+  logFilename=
 """
     check($args == expected)
 
@@ -120,11 +126,13 @@ Args:
   help=true
   version=false
   update=false
+  log=false
   serverList=server.json, more.json
   sharedList=shared.json
   templateList=
   resultFilename=result.html
   prepostList=
+  logFilename=
 """
     check($args == expected)
 
@@ -157,6 +165,18 @@ Args:
 
   test "parseCommandLine-result":
     tpcl("--result=result.html", resultFilename = "result.html")
+
+  test "parseCommandLine-l":
+    tpcl("-l", log=true, logFilename = "")
+
+  test "parseCommandLine-l-name":
+    tpcl("-l=testsss.log", log=true, logFilename = "testsss.log")
+
+  test "parseCommandLine-log":
+    tpcl("--log", log=true, logFilename = "")
+
+  test "parseCommandLine-log-name":
+    tpcl("--log=testsss.log", log=true, logFilename = "testsss.log")
 
   test "parseCommandLine-happy-path":
     tpcl("-s=server.json -j=shared.json -t=tea.html -r=result.html",
