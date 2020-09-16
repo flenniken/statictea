@@ -137,7 +137,7 @@ proc handleWord(switch: string, word: string, value: string,
     warning(stream, "cmdline", 0, wUnknownSwitch, $switch)
 
 
-proc parseCommandLine*(stream: Stream, cmdLine: string=""): Args =
+proc parseCommandLine*(stream: Stream, cmdLine: string = ""): Args =
   ## Return the command line parameters and write warnings to the stream.
 
   var help: bool = false
