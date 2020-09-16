@@ -17,7 +17,7 @@ type
     wUnableToOpenLogFile,
     wOneLogAllowed,
 
-    tpubType:
+tpubType:
   const
     # The list of warnings. Add new messages to the bottom and do not
     # reorder the messages.
@@ -33,6 +33,7 @@ type
       "Unable to open log file: '$1'.", # wUnableToOpenLogFile
       "One log file allowed, skipping: '$1'.", # wOneLogAllowed
     ]
+
 
 func getWarning(filename: string, lineNum: int,
     warning: Warning, p1: string = "", p2: string = ""): string {.tpub.} =
