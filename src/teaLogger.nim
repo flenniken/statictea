@@ -10,7 +10,8 @@ var logger: Logger
 var loggerSet = false
 
 const
-  staticteaLog* = "statictea.log"
+  staticteaLog* = "statictea.log" ## \
+  ## Name of the default statictea log file.
 
 
 proc log*(message: string) =

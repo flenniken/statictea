@@ -86,4 +86,6 @@ task docs1, "Build docs for one module.":
   open_in_browser("docs/html/loggers.html")
 
 task tt, "Compile and run t.nim":
-  exec "nim c -r --outdir:bin/tests/ src/t.nim"
+  let cmd = "nim c -r --hints:off --outdir:bin/tests/ src/t.nim"
+  echo cmd
+  exec cmd

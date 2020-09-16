@@ -1,4 +1,2 @@
-import strutils
-
-let cond = "this is a test".contains("test")
-echo cond
+# try out things here
+# build and run with "n tt"
