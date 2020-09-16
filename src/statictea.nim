@@ -20,6 +20,7 @@ when isMainModule:
 
   # Open the log file and set the global logger variable.
   openStaticTeaLogger(args, warnings)
+  log($args)
 
   if args.help:
     echo "showHelp()"

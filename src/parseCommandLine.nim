@@ -8,7 +8,6 @@ import re
 import args
 import warnings
 
-
 const
   fileLists = ["server", "shared", "template"]
   switches = [
