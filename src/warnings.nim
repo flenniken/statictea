@@ -17,7 +17,7 @@ type
     wUnableToOpenLogFile,
     wOneLogAllowed,
 
-tpubType:
+    tpubType:
   const
     # The list of warnings. Add new messages to the bottom and do not
     # reorder the messages.
@@ -43,7 +43,7 @@ func getWarning(filename: string, lineNum: int,
   result = "$1($2): w$3: $4" % [filename, $lineNum, $messageNum, message]
 
 
-proc warning*(outStream: Stream, filename: string = "", lineNum: int=0,
+proc warning*(outStream: Stream, filename: string = "", lineNum: int = 0,
     warning: Warning, p1: string = "", p2: string = "") =
 
   let fullLine = getWarning(filename, lineNum, warning, p1, p2)
