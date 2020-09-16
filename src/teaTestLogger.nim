@@ -4,14 +4,11 @@ import streams
 
 var testStream: Stream
 
-
 proc openTestLog*() =
   testStream = newStringStream()
 
-
 proc closeTestLog*() =
   testStream.close()
-
 
 proc readTestLines*(): seq[string] =
   ## Read all the lines in the stream.
@@ -19,12 +16,9 @@ proc readTestLines*(): seq[string] =
   for line in testStream.lines():
     result.add line
 
-
 proc clearTestLog*() =
   testStream.close()
   testStream = newStringStream()
 
-
 proc log*(message: string) =
   testStream.writeLine(message)
-
