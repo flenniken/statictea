@@ -6,7 +6,7 @@ import streams
 import parseCommandLine
 import strutils
 import processTemplate
-import teaLogger
+import logenv
 import warnLogger
 
 when isMainModule:

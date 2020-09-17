@@ -1,4 +1,4 @@
-## Global logger for statictea.
+## Logger environment.
 
 import loggers
 import streams
