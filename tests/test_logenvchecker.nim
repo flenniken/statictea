@@ -1,12 +1,12 @@
 import unittest
-import teaTestLogger
+import logenvchecker
 
 proc someProc() =
   log("running someProc")
   log("asdf")
   log("leaving someProc")
 
-suite "Test statictea.nim":
+suite "Test logenvchecker.nim":
 
   setup:
     openTestLog()
