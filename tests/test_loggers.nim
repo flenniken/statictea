@@ -57,6 +57,7 @@ suite "Test logger.nim":
     logger.log("line with newline\nin it")
     logger.close()
     for line in lines(filename):
+      # echo line
       let (dtString, message) = parseLogLine(line)
       if dtString == "":
         echo line

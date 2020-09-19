@@ -62,8 +62,7 @@ proc close*(logger: var Logger) =
     logger.file.close()
     logger.file = nil
 
-
-proc log*(logger: var Logger, message: string) =
+proc logLine*(logger: var Logger, filename: string, lineNum: int, message: string) =
   ## Append a message to the log file. Do nothing when not open. On
   ## write error, write an error message to stderr and close the
   ## logger.
@@ -76,10 +75,15 @@ proc log*(logger: var Logger, message: string) =
 
   # Split messages with newlines into separate lines in the log.
   for line in splitLines(message):
-    let line = "$1: $2" % [dtString, line]
+    let line = "$1: $2($3): $4" % [dtString, filename, $lineNum, line]
     try:
       # raise newException(IOError, "test io error")
       logger.file.writeLine(line)
     except:
       stderr.writeline("IO error writing to the log file.")
       logger.close()
+
+template log*(logger: var Logger, message: string) =
+  ## Log the message.
+  let info = instantiationInfo()
+  logger.logLine(info.filename, info.line, message)

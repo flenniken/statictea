@@ -9,8 +9,14 @@ var logger: Logger
 var loggerSet = false
 
 
-proc log*(message: string) =
-  logger.log(message)
+proc logLine*(filename: string, lineNum: int, message: string) =
+  logger.logLine(filename, lineNum, message)
+
+
+template log*(message: string) =
+  ## Log the message.
+  let info = instantiationInfo()
+  logLine(info.filename, info.line, message)
 
 
 proc openStaticTeaLogger*(filename: string, warnings: Stream) =
@@ -20,7 +26,7 @@ proc openStaticTeaLogger*(filename: string, warnings: Stream) =
   ## log file.
 
   if loggerSet:
-    logger.log("Calling open for statictea log when it's already open.")
+    log("Calling open for statictea log when it's already open.")
     return
   loggerSet = true
 
