@@ -17,8 +17,7 @@ proc tpcl(
     sharedList: seq[string] = @[],
     templateList: seq[string] = @[],
     warningLines: seq[string] = @[],
-    prepostList: seq[Prepost]= @[],
-    logFilename: string = "",
+    prepostList: seq[Prepost]= @[]
       ) =
 
   var stream = newStringStream()
@@ -36,7 +35,6 @@ proc tpcl(
   check(args.templateList == templateList)
   check(args.resultFilename == resultFilename)
   check(args.prepostList == prepostList)
-  check(args.logFilename == logFilename)
   check(lines == warningLines)
 
 
@@ -94,7 +92,6 @@ Args:
   templateList=
   resultFilename=
   prepostList=
-  logFilename=
 """
     check($args == expected)
 
@@ -115,7 +112,6 @@ Args:
   templateList=
   resultFilename=result.html
   prepostList=
-  logFilename=
 """
     check($args == expected)
 
@@ -150,16 +146,10 @@ Args:
     tpcl("--result=result.html", resultFilename = "result.html")
 
   test "parseCommandLine-l":
-    tpcl("-l", log=true, logFilename = "")
-
-  test "parseCommandLine-l-name":
-    tpcl("-l=testsss.log", log=true, logFilename = "testsss.log")
+    tpcl("-l", log=true)
 
   test "parseCommandLine-log":
-    tpcl("--log", log=true, logFilename = "")
-
-  test "parseCommandLine-log-name":
-    tpcl("--log=testsss.log", log=true, logFilename = "testsss.log")
+    tpcl("--log", log=true)
 
   test "parseCommandLine-happy-path":
     tpcl("-s=server.json -j=shared.json -t=tea.html -r=result.html",

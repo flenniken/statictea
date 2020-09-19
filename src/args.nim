@@ -13,5 +13,4 @@ type
     templateList*: seq[string]
     resultFilename*: string
     prepostList*: seq[Prepost]
-    logFilename*: string
 

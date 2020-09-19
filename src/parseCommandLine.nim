@@ -61,11 +61,10 @@ Args:
   templateList=$7
   resultFilename=$8
   prepostList=$9
-  logFilename=$10
 """ % [$args.help, $args.version, $args.update, $args.log,
        $args.serverList, $args.sharedList,
        $args.templateList, $args.resultFilename,
-       $args.prepostList, $args.logFilename]
+       $args.prepostList]
 
 let prepostRegex = re"^\s*(\S+)\s*(\S*)\s*(.*)$"
 
@@ -91,8 +90,7 @@ proc parsePrepost(str: string): (Prepost, string) {.tpub.} =
 proc handleWord(switch: string, word: string, value: string,
     stream: Stream, help: var bool, version: var bool, update: var bool,
     log: var bool, resultFilename: var string,
-    filenames: var array[4, seq[string]], prepostList: var seq[Prepost],
-    logFilename: var string) =
+    filenames: var array[4, seq[string]], prepostList: var seq[Prepost]) =
   ## Handle one switch and return its value.  Switch is the key from
   ## the command line, either a word or a letter.  Word is the long
   ## form of the switch.
@@ -128,11 +126,6 @@ proc handleWord(switch: string, word: string, value: string,
       prepostList.add(prepost)
   elif word == "log":
     log = true
-    if value != "":
-      if logFilename == "":
-        logFilename = value
-      else:
-        warning(stream, "cmdline", 0, wOneLogAllowed, value)
   else:
     warning(stream, "cmdline", 0, wUnknownSwitch, $switch)
 
@@ -148,7 +141,6 @@ proc parseCommandLine*(stream: Stream, cmdLine: string = ""): Args =
   var optParser = initOptParser(cmdLine)
   var resultFilename: string
   var prepostList: seq[Prepost]
-  var logFilename: string
 
   # Iterate over all arguments passed to the cmdline.
   for kind, key, value in getopt(optParser):
@@ -161,11 +153,11 @@ proc parseCommandLine*(stream: Stream, cmdLine: string = ""): Args =
             warning(stream, "cmdline", 0, wUnknownSwitch, $letter)
           else:
             handleWord($letter, word, value, stream, help, version, update,
-                 log, resultFilename, filenames, prepostList, logFilename)
+                 log, resultFilename, filenames, prepostList)
 
       of CmdLineKind.cmdLongOption:
         handleWord(key, key, value, stream, help, version, update, log,
-                   resultFilename, filenames, prepostList, logFilename)
+                   resultFilename, filenames, prepostList)
 
       of CmdLineKind.cmdArgument:
         warning(stream, "cmdline", 0, wUnknownArg, key)
@@ -182,4 +174,3 @@ proc parseCommandLine*(stream: Stream, cmdLine: string = ""): Args =
   result.templateList = filenames[2]
   result.resultFilename = resultFilename
   result.prepostList = prepostList
-  result.logFilename = logFilename

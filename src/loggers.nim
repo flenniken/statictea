@@ -55,8 +55,18 @@ proc openLogger*(filename: string, truncateFile: bool=false): Option[Logger] =
     result = some(logger)
 
 
-proc log*(logger: Logger, message: string) =
-  ## Append a message to the log file. Do nothing when not open.
+proc close*(logger: var Logger) =
+  ## Close the log file, if it's open.
+
+  if logger.file != nil:
+    logger.file.close()
+    logger.file = nil
+
+
+proc log*(logger: var Logger, message: string) =
+  ## Append a message to the log file. Do nothing when not open. On
+  ## write error, write an error message to stderr and close the
+  ## logger.
 
   if logger.file == nil:
     return
@@ -67,12 +77,9 @@ proc log*(logger: Logger, message: string) =
   # Split messages with newlines into separate lines in the log.
   for line in splitLines(message):
     let line = "$1: $2" % [dtString, line]
-    logger.file.writeLine(line)
-
-
-proc close*(logger: var Logger) =
-  ## Close the log file, if it's open.
-
-  if logger.file != nil:
-    logger.file.close()
-    logger.file = nil
+    try:
+      # raise newException(IOError, "test io error")
+      logger.file.writeLine(line)
+    except:
+      stderr.writeline("IO error writing to the log file.")
+      logger.close()

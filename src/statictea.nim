@@ -9,6 +9,12 @@ import processTemplate
 import logenv
 import warnLogger
 
+
+const
+  staticteaLog* = "statictea.log" ## \
+  ## Name of the default statictea log file.
+
+
 when isMainModule:
   # Detect control-c and stop.
   proc controlCHandler() {.noconv.} =
@@ -20,7 +26,7 @@ when isMainModule:
   let args = parseCommandLine(warnings)
 
   # Open the log file and set the global logger variable.
-  openStaticTeaLogger(args, warnings)
+  openStaticTeaLogger(staticteaLog, warnings)
   log($args)
 
   if args.help:
