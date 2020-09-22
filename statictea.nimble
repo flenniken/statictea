@@ -69,6 +69,8 @@ task t, "Run tests":
 task showTests, "Show tests":
   let test_filenames = get_test_filenames()
   for filename in test_filenames:
+    echo ""
+    echo "$1:" % filename
     let cmd = get_test_module_cmd(filename)
     echo cmd
 
@@ -89,3 +91,15 @@ task tt, "Compile and run t.nim":
   let cmd = "nim c -r --hints:off --outdir:bin/tests/ src/t.nim"
   echo cmd
   exec cmd
+
+task args, "show command line arguments":
+  let count = system.paramCount()+1
+  echo "argument count: $1" % $count
+  for i in 0..count-1:
+    echo "$1: $2" % [$i, system.paramStr(i)]
+
+task hello, "Say hello":
+  echo "hello there"
+
+task boo, "Say boo":
+  echo "boo"

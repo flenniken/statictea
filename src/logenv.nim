@@ -1,46 +1,76 @@
 ## Logging environment.
 
-import loggers
-import streams
-import options
+import warnenv
+import tpub
+import times
+import strutils
 import warnings
+import streams
 
-var logger: Logger
-var loggerSet = false
+when defined(test):
+  var logFile: Stream
+else:
+  var logFile: File
 
+tpubType:
+  const
+    dtFormat = "yyyy-MM-dd HH:mm:ss'.'fff" ## \
+    ## The date time format in local time.
+
+func formatLine(filename: string, lineNum: int, message: string, dt=now()):
+     string {.tpub.} =
+  ## Format and return the log line.
+  let dtString = dt.format(dtFormat)
+  result = "$1; $2($3); $4" % [dtString, filename, $lineNum, message]
+
+proc closeLogFile*() =
+  ## Close the log file.
+  if logFile == nil:
+    return
+  logFile.close()
+  logFile = nil
 
 proc logLine*(filename: string, lineNum: int, message: string) =
-  logger.logLine(filename, lineNum, message)
+  ## Append a message to the log file.
 
+  if logFile == nil:
+    return
+  let line = formatLine(filename, lineNum, message)
+  try:
+    # raise newException(IOError, "test io error")
+    logFile.writeLine(line)
+  except:
+    warn("logger", 0, wUnableToWriteLogFile, filename)
+    warn("logger", 0, wExceptionMsg, getCurrentExceptionMsg())
+    # The stack trace is only available in the debug builds.
+    when not defined(release):
+      warn("logger", 0, wStackTrace, getCurrentException().getStackTrace())
+    closeLogFile()
 
 template log*(message: string) =
-  ## Log the message.
+  ## Append the message to the log file.
   let info = instantiationInfo()
   logLine(info.filename, info.line, message)
 
+when not defined(test):
+  proc openLogFile*(filename: string) =
+    ## Open the log file.
+    if logFile != nil:
+      return
+    var file: File
+    if open(file, filename, fmAppend):
+      logFile = file
+    else:
+      warn("logger", 0, wUnableToOpenLogFile, filename)
+else:
+  proc openLogFile*(filename: string) =
+    ## Open the log file.
+    if logFile == nil:
+      logFile = newStringStream()
 
-proc openStaticTeaLogger*(filename: string, warnings: Stream) =
-  ## Open the statictea logger dependent on the command line arguments
-  ## and set the logger variable.  Set a do nothing logger when
-  ## logging is not specified or when there is an error opening the
-  ## log file.
-
-  if loggerSet:
-    log("Calling open for statictea log when it's already open.")
-    return
-  loggerSet = true
-
-  let option = openLogger(filename, false)
-  if not option.isSome:
-    warning(warnings, "logger", 0, wUnableToOpenLogFile, filename)
-    return
-
-  logger = option.get()
-
-
-proc closeStaticTeaLogger*() =
-  if not loggerSet:
-    # Calling close for statictea log when it's not open.
-    return
-  logger.close()
-  loggerSet = false
+  proc readTestLines*(): seq[string] =
+    ## Read all the lines in the stream.
+    if logFile != nil:
+      logFile.setPosition(0)
+      for line in logFile.lines():
+        result.add line

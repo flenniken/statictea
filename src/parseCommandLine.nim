@@ -1,12 +1,12 @@
 ## Parse the command line and return the arguments.
 
 import parseopt
-import streams
 import strutils
 import tpub
 import re
 import args
 import warnings
+import warnenv
 
 const
   fileLists = ["server", "shared", "template"]
@@ -88,7 +88,7 @@ proc parsePrepost(str: string): (Prepost, string) {.tpub.} =
 
 
 proc handleWord(switch: string, word: string, value: string,
-    stream: Stream, help: var bool, version: var bool, update: var bool,
+    help: var bool, version: var bool, update: var bool,
     log: var bool, resultFilename: var string,
     filenames: var array[4, seq[string]], prepostList: var seq[Prepost]) =
   ## Handle one switch and return its value.  Switch is the key from
@@ -98,7 +98,7 @@ proc handleWord(switch: string, word: string, value: string,
   let listIndex = fileListIndex(word)
   if listIndex != -1:
     if value == "":
-      warning(stream, "cmdline", 0, wNoFilename, word, $switch)
+      warn("cmdline", 0, wNoFilename, word, $switch)
     else:
       filenames[listIndex].add(value)
   elif word == "help":
@@ -109,29 +109,29 @@ proc handleWord(switch: string, word: string, value: string,
     update = true
   elif word == "result":
     if value == "":
-      warning(stream, "cmdline", 0, wNoFilename, word, $switch)
+      warn("cmdline", 0, wNoFilename, word, $switch)
     elif resultFilename != "":
-      warning(stream, "cmdline", 0, wOneResultAllowed, value)
+      warn("cmdline", 0, wOneResultAllowed, value)
     else:
       resultFilename = value
   elif word == "prepost":
     # prepost is a string with a space dividing the prefix from the
     # postfix. The postfix is optional. -p="<--$ -->" or -p="#$"
     if value == "":
-      warning(stream, "cmdline", 0, wNoPrepostValue, $switch)
+      warn("cmdline", 0, wNoPrepostValue, $switch)
     else:
       let (prepost, extra) = parsePrepost(value)
       if extra != "":
-        warning(stream, "cmdline", 0, wSkippingExtraPrepost, extra)
+        warn("cmdline", 0, wSkippingExtraPrepost, extra)
       prepostList.add(prepost)
   elif word == "log":
     log = true
   else:
-    warning(stream, "cmdline", 0, wUnknownSwitch, $switch)
+    warn("cmdline", 0, wUnknownSwitch, $switch)
 
 
-proc parseCommandLine*(stream: Stream, cmdLine: string = ""): Args =
-  ## Return the command line parameters and write warnings to the stream.
+proc parseCommandLine*(cmdLine: string = ""): Args =
+  ## Return the command line parameters.
 
   var help: bool = false
   var version: bool = false
@@ -150,17 +150,17 @@ proc parseCommandLine*(stream: Stream, cmdLine: string = ""): Args =
           let letter = key[ix]
           let word = letterToWord(letter)
           if word == "":
-            warning(stream, "cmdline", 0, wUnknownSwitch, $letter)
+            warn("cmdline", 0, wUnknownSwitch, $letter)
           else:
-            handleWord($letter, word, value, stream, help, version, update,
+            handleWord($letter, word, value, help, version, update,
                  log, resultFilename, filenames, prepostList)
 
       of CmdLineKind.cmdLongOption:
-        handleWord(key, key, value, stream, help, version, update, log,
+        handleWord(key, key, value, help, version, update, log,
                    resultFilename, filenames, prepostList)
 
       of CmdLineKind.cmdArgument:
-        warning(stream, "cmdline", 0, wUnknownArg, key)
+        warn("cmdline", 0, wUnknownArg, key)
 
       of CmdLineKind.cmdEnd:
         discard

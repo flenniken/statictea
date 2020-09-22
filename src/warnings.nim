@@ -1,6 +1,5 @@
-## Handle warning messages.
+## Table of warning messages.
 
-import streams
 import tpub
 import strutils
 
@@ -16,6 +15,9 @@ type
     wSkippingExtraPrepost,
     wUnableToOpenLogFile,
     wOneLogAllowed,
+    wUnableToWriteLogFile,
+    wExceptionMsg,
+    wStackTrace,
 
 tpubType:
   const
@@ -32,20 +34,15 @@ tpubType:
       "Skipping extra prepost text: $1.", # wSkippingExtraPrepost
       "Unable to open log file: '$1'.", # wUnableToOpenLogFile
       "One log file allowed, skipping: '$1'.", # wOneLogAllowed
+      "Unable to write to the log file: '$1'.", # wUnableToWriteLogFile
+      "Exception: '$1'.", # wExceptionMsg
+      "Stack trace: '$1'.", # wStackTrace
     ]
-
 
 func getWarning(filename: string, lineNum: int,
     warning: Warning, p1: string = "", p2: string = ""): string {.tpub.} =
-
+  ## Return the formatted warning line.
   let pattern = warningsList[warning]
   let message = pattern % [p1, p2]
   let messageNum = ord(warning)
   result = "$1($2): w$3: $4" % [filename, $lineNum, $messageNum, message]
-
-
-proc warning*(outStream: Stream, filename: string = "", lineNum: int = 0,
-    warning: Warning, p1: string = "", p2: string = "") =
-
-  let fullLine = getWarning(filename, lineNum, warning, p1, p2)
-  outStream.writeLine(fullLine)

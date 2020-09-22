@@ -3,8 +3,7 @@
 import unittest
 import args
 import parseCommandLine
-import streams
-import testUtils
+import warnenv
 
 proc tpcl(
     cmdLine: string,
@@ -20,11 +19,10 @@ proc tpcl(
     prepostList: seq[Prepost]= @[]
       ) =
 
-  var stream = newStringStream()
-  defer: stream.close()
-
-  let args = parseCommandLine(stream, cmdLine)
-  let lines = stream.theLines()
+  openWarnStream()
+  let args = parseCommandLine(cmdLine)
+  let lines = readWarnLines()
+  closeWarnStream()
 
   check(args.help == help)
   check(args.version == version)
