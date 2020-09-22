@@ -23,21 +23,17 @@ proc warn*(filename: string, lineNum: int, warning: Warning,
   except:
     closeWarnStream()
 
-when not defined(test):
-  proc openWarnStream*(stderrStream: bool) =
-    ## Open the strerr as the warning stream.
-    if warnStream != nil:
-      return
+proc openWarnStream*(stream: Stream=nil) =
+  ## Open the strerr or the given stream as the warning stream.
+  if warnStream != nil:
+    return
+  if stream == nil:
     warnStream = newFileStream(stderr)
-else:
-  proc openWarnStream*() =
-    ## Open the warning stream as either the stderr stream or a
-    ## string stream.
-    if warnStream != nil:
-      return
-    warnStream = newStringStream()
+  else:
+    warnStream = stream
 
-  proc readWarnLines*(): seq[string] =
+when defined(test):
+   proc readWarnLines*(): seq[string] =
     # Read the warning lines from the string stream.
     if warnStream == nil:
       return

@@ -5,12 +5,8 @@ import tpub
 import times
 import strutils
 import warnings
-import streams
 
-when defined(test):
-  var logFile: Stream
-else:
-  var logFile: File
+var logFile: File
 
 tpubType:
   const
@@ -52,25 +48,13 @@ template log*(message: string) =
   let info = instantiationInfo()
   logLine(info.filename, info.line, message)
 
-when not defined(test):
-  proc openLogFile*(filename: string) =
-    ## Open the log file.
-    if logFile != nil:
-      return
-    var file: File
-    if open(file, filename, fmAppend):
-      logFile = file
-    else:
-      warn("logger", 0, wUnableToOpenLogFile, filename)
-else:
-  proc openLogFile*(filename: string) =
-    ## Open the log file.
-    if logFile == nil:
-      logFile = newStringStream()
+proc openLogFile*(filename: string) =
+  ## Open the log file.
+  if logFile != nil:
+    return
+  var file: File
+  if open(file, filename, fmAppend):
+    logFile = file
+  else:
+    warn("logger", 0, wUnableToOpenLogFile, filename)
 
-  proc readTestLines*(): seq[string] =
-    ## Read all the lines in the stream.
-    if logFile != nil:
-      logFile.setPosition(0)
-      for line in logFile.lines():
-        result.add line

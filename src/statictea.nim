@@ -7,26 +7,30 @@ import parseCommandLine
 import strutils
 import processTemplate
 import logenv
-import warnLogger
-
+import warnenv
 
 const
   staticteaLog* = "statictea.log" ## \
   ## Name of the default statictea log file.
 
-
-when isMainModule:
-  # Detect control-c and stop.
+proc main() =
+  # Setup control-c monitoring so ctrl-c stops the program.
   proc controlCHandler() {.noconv.} =
     quit 0
   setControlCHook(controlCHandler)
 
-  # Process the command line args.
-  var warnings = newFileStream(stderr)
-  let args = parseCommandLine(warnings)
+  # Open the global warn stream.
+  openWarnStream()
 
-  # Open the log file and set the global logger variable.
-  openStaticTeaLogger(staticteaLog, warnings)
+  # Process the command line args.
+  let args = parseCommandLine()
+
+  # Open the global statictea.log file when logging is turned on.
+  if args.log:
+    openLogFile(staticteaLog)
+
+  # We go through the motions of logging even when logging is turned
+  # off so the logging code gets exercised.
   log($args)
 
   if args.help:
@@ -36,6 +40,12 @@ when isMainModule:
   elif args.update:
     echo "updateTemplate(warnings, args)"
   elif args.templateList.len > 0:
-    processTemplate(warnings, args)
+    processTemplate(args)
   else:
     echo "showHelp()"
+
+  closeLogFile()
+  closeWarnStream()
+
+when isMainModule:
+  main()

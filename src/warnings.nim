@@ -39,8 +39,8 @@ tpubType:
       "Stack trace: '$1'.", # wStackTrace
     ]
 
-func getWarning(filename: string, lineNum: int,
-    warning: Warning, p1: string = "", p2: string = ""): string {.tpub.} =
+func getWarning*(filename: string, lineNum: int,
+    warning: Warning, p1: string = "", p2: string = ""): string =
   ## Return the formatted warning line.
   let pattern = warningsList[warning]
   let message = pattern % [p1, p2]

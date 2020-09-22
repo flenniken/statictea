@@ -2,10 +2,24 @@ import unittest
 import logenv
 import strutils
 import random
+import os
 
 randomize()
 
-# todo: test logenv with real file.
+proc readLines(filename: string, maximum: int = -1): seq[string] =
+  var count = 0
+  if maximum == 0:
+    return
+  var maxLines: int
+  if maximum < 0:
+    maxLines = high(int)
+  else:
+    maxLines = maximum
+  for line in lines(filename):
+    result.add(line)
+    inc(count)
+    if count > maxLines:
+      break
 
 proc endsWith(line: string, str: string): bool =
   let strlen = str.len
@@ -13,7 +27,6 @@ proc endsWith(line: string, str: string): bool =
     if line[^strlen..^1] == str:
       return true
   return false
-
 
 suite "Test logenv.nim":
 
@@ -30,7 +43,8 @@ suite "Test logenv.nim":
     check endsWith("", "3") == false
 
   test "logenv":
-    openLogFile("filename")
+    let filename = "_logenv.log"
+    openLogFile(filename)
 
     let testLine1 = "test line 1: $1" % $rand(100)
     log(testLine1)
@@ -38,7 +52,9 @@ suite "Test logenv.nim":
     let testLine2 = "test line 2: $1" % $rand(100)
     log(testLine2)
 
-    var logLines = readTestLines()
+    closeLogFile()
+
+    var logLines = readLines(filename, 20)
     for line in logLines:
       echo line
 
@@ -46,5 +62,4 @@ suite "Test logenv.nim":
     check logLines[^2].endsWith(testLine1)
     check logLines[^1].endsWith(testLine2)
 
-    closeLogFile()
-
+    discard tryRemoveFile(filename)

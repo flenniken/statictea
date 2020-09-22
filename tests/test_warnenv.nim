@@ -1,6 +1,7 @@
 import unittest
 import warnenv
 import warnings
+import streams
 
 proc someProc() =
   warn("filename", 2, wUnknownSwitch, "testing")
@@ -9,7 +10,7 @@ proc someProc() =
 suite "Test warnLogger.nim":
 
   test "happy path":
-    openWarnStream()
+    openWarnStream(newStringStream())
     warn("filename", 2, wUnknownSwitch, "happy")
     var lines = readWarnLines()
     check lines.len == 1
@@ -17,7 +18,7 @@ suite "Test warnLogger.nim":
     closeWarnStream()
 
   test "warn from proc":
-    openWarnStream()
+    openWarnStream(newStringStream())
     someProc()
     var lines = readWarnLines()
     check lines.len == 2
@@ -33,7 +34,7 @@ suite "Test warnLogger.nim":
     var lines = readWarnLines()
     check lines.len == 0
 
-    openWarnStream()
+    openWarnStream(newStringStream())
     someProc()
     lines = readWarnLines()
     check lines.len == 2
