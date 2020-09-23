@@ -36,7 +36,7 @@ proc readJson(filename: string, serverVars: var Table[string, Value]) {.tpub.} =
   echo "readJson not implemented"
 
 
-proc processTemplate*(args: Args) =
+proc processTemplate*(args: Args): int =
 
 # templateList: seq[string],
 #     serverList: seq[string], sharedList: seq[string],

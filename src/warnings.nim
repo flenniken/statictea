@@ -18,6 +18,7 @@ type
     wUnableToWriteLogFile,
     wExceptionMsg,
     wStackTrace,
+    wUnexpectedException,
 
 tpubType:
   const
@@ -37,6 +38,7 @@ tpubType:
       "Unable to write to the log file: '$1'.", # wUnableToWriteLogFile
       "Exception: '$1'.", # wExceptionMsg
       "Stack trace: '$1'.", # wStackTrace
+      "Unexpected exception: '$1'.", # wUnexpectedException
     ]
 
 func getWarning*(filename: string, lineNum: int,

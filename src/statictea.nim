@@ -8,12 +8,28 @@ import strutils
 import processTemplate
 import logenv
 import warnenv
+import args
+import warnings
 
 const
   staticteaLog* = "statictea.log" ## \
   ## Name of the default statictea log file.
 
-proc main() =
+proc processArgs(args: Args): int =
+  if args.help:
+    echo "showHelp()"
+  elif args.version:
+    echo "showVersion()"
+  elif args.update:
+    echo "updateTemplate(warnings, args)"
+  elif args.templateList.len > 0:
+    result = processTemplate(args)
+  else:
+    echo "showHelp()"
+
+proc main(): int =
+  ## Run statictea.
+
   # Setup control-c monitoring so ctrl-c stops the program.
   proc controlCHandler() {.noconv.} =
     quit 0
@@ -33,19 +49,27 @@ proc main() =
   # off so the logging code gets exercised.
   log($args)
 
-  if args.help:
-    echo "showHelp()"
-  elif args.version:
-    echo "showVersion()"
-  elif args.update:
-    echo "updateTemplate(warnings, args)"
-  elif args.templateList.len > 0:
-    processTemplate(args)
-  else:
-    echo "showHelp()"
+  try:
+    result = processArgs(args)
+  except:
+    result = 1
+    let msg = getCurrentExceptionMsg()
+    log(msg)
+    warn("error exit", 0, wUnexpectedException)
+    warn("error exit", 0, wExceptionMsg, msg)
+    # The stack trace is only available in the debug builds.
+    when not defined(release):
+      warn("exiting", 0, wStackTrace, getCurrentException().getStackTrace())
 
   closeLogFile()
   closeWarnStream()
 
 when isMainModule:
-  main()
+  var rc: int
+  try:
+    rc = main()
+  except:
+    echo getCurrentExceptionMsg()
+    rc = 1
+
+  quit(if rc == 0: QuitSuccess else: QuitFailure)
