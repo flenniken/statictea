@@ -10,6 +10,7 @@ import logenv
 import warnenv
 import args
 import warnings
+import showhelp
 
 const
   staticteaLog* = "statictea.log" ## \
@@ -17,15 +18,16 @@ const
 
 proc processArgs(args: Args): int =
   if args.help:
-    echo "showHelp()"
+    result = showHelp()
   elif args.version:
     echo "showVersion()"
   elif args.update:
-    echo "updateTemplate(warnings, args)"
+    echo "updateTemplate(args)"
   elif args.templateList.len > 0:
     result = processTemplate(args)
   else:
-    echo "showHelp()"
+    # echo $args
+    result = showHelp()
 
 proc main(): int =
   ## Run statictea.

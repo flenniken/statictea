@@ -48,23 +48,6 @@ func `$`(prepostList: seq[Prepost]): string {.tpub.} =
   result = parts.join(", ")
 
 
-func `$`*(args: Args): string =
-  ## A string representation of Args.
-  result = """
-Args:
-  help=$1
-  version=$2
-  update=$3
-  log=$4
-  serverList=$5
-  sharedList=$6
-  templateList=$7
-  resultFilename=$8
-  prepostList=$9
-""" % [$args.help, $args.version, $args.update, $args.log,
-       $args.serverList, $args.sharedList,
-       $args.templateList, $args.resultFilename,
-       $args.prepostList]
 
 let prepostRegex = re"^\s*(\S+)\s*(\S*)\s*(.*)$"
 

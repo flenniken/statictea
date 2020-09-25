@@ -78,42 +78,6 @@ suite "Test statictea.nim":
     check(parsePrepost("a b") == (("a", "b"), ""))
     check(parsePrepost("a b c") == (("a", "b"), "c"))
 
-  test "args to string":
-    var args: Args
-    let expected = """
-Args:
-  help=false
-  version=false
-  update=false
-  log=false
-  serverList=
-  sharedList=
-  templateList=
-  resultFilename=
-  prepostList=
-"""
-    check($args == expected)
-
-  test "args to string2":
-    var args: Args
-    args.help = true
-    args.serverList = @["server.json", "more.json"]
-    args.sharedList = @["shared.json"]
-    args.resultFilename = "result.html"
-    let expected = """
-Args:
-  help=true
-  version=false
-  update=false
-  log=false
-  serverList=server.json, more.json
-  sharedList=shared.json
-  templateList=
-  resultFilename=result.html
-  prepostList=
-"""
-    check($args == expected)
-
   test "parseCommandLine-v":
     tpcl("-v", version=true)
 
