@@ -24,8 +24,7 @@ serverList: [$5]
 sharedList: [$6]
 templateList: [$7]
 prepostList: [$8]
-resultFilename: "$9"
-""" % [$args.help, $args.version, $args.update, $args.log,
+resultFilename: "$9"""" % [$args.help, $args.version, $args.update, $args.log,
   $args.serverList.join(", "), $args.sharedList.join(", "),
   $args.templateList.join(", "), $args.prepostList.join(", "),
   $args.resultFilename]

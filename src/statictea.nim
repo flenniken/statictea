@@ -11,6 +11,7 @@ import warnenv
 import args
 import warnings
 import showhelp
+import os
 
 const
   staticteaLog* = "statictea.log" ## \
@@ -49,6 +50,8 @@ proc main(): int =
 
   # We go through the motions of logging even when logging is turned
   # off so the logging code gets exercised.
+  log("----- starting -----")
+  log("Cmdline: " & commandLineParams().join(" "))
   log($args)
 
   try:
@@ -63,6 +66,7 @@ proc main(): int =
     when not defined(release):
       warn("exiting", 0, wStackTrace, getCurrentException().getStackTrace())
 
+  log("Done")
   closeLogFile()
   closeWarnStream()
 

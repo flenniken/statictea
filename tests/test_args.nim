@@ -12,8 +12,7 @@ serverList: []
 sharedList: []
 templateList: []
 prepostList: []
-resultFilename: ""
-"""
+resultFilename: """""
     check $args == expected
 
   test "args string":
@@ -29,8 +28,7 @@ serverList: [one.json, two.json]
 sharedList: []
 templateList: []
 prepostList: [(pre: "#", post: "@"), (pre: "begin", post: "end")]
-resultFilename: "result.html"
-"""
+resultFilename: "result.html""""
     check $args == expected
 
   test "args string2":
@@ -46,6 +44,5 @@ serverList: [server.json, more.json]
 sharedList: [shared.json]
 templateList: []
 prepostList: []
-resultFilename: "result.html"
-"""
+resultFilename: "result.html""""
     check($args == expected)
