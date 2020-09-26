@@ -5,8 +5,11 @@ import tpub
 import times
 import strutils
 import warnings
+when defined(test):
+  import os
 
 var logFile: File
+var logFilename: string
 
 tpubType:
   const
@@ -25,6 +28,8 @@ proc closeLogFile*() =
     return
   logFile.close()
   logFile = nil
+  logFilename = ""
+
 
 proc logLine*(filename: string, lineNum: int, message: string) =
   ## Append a message to the log file.
@@ -55,6 +60,31 @@ proc openLogFile*(filename: string) =
   var file: File
   if open(file, filename, fmAppend):
     logFile = file
+    logFilename = filename
   else:
     warn("logger", 0, wUnableToOpenLogFile, filename)
 
+when defined(test):
+  proc readLines*(filename: string, maximum: int = -1): seq[string] =
+    ## Read up to maximum lines from the given file. When maximum is
+    ## negative, read all lines.
+    var count = 0
+    if maximum == 0:
+      return
+    var maxLines: int
+    if maximum < 0:
+      maxLines = high(int)
+    else:
+      maxLines = maximum
+    for line in lines(filename):
+      result.add(line)
+      inc(count)
+      if count > maxLines:
+        break
+
+  proc logReadDelete*(maximum: int = -1): seq[string] =
+    # Close the log file, read its lines, then delete the file.
+    let filename = logFilename
+    closeLogFile()
+    result = readLines(filename, maximum)
+    discard tryRemoveFile(filename)

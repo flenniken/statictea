@@ -6,35 +6,8 @@ import warnings
 import warnenv
 import tables
 import tpub
-
-type
-  ValueKind = enum
-    vkString,
-    vkInt,
-    vkFloat,
-    vkDict,
-    vkList,
-
-  Value = ref ValueObj
-  ValueObj = object
-    case kind: ValueKind
-      of vkString:
-        stringValue: string
-      of vkInt:
-        intValue: int
-      of vkFloat:
-        floatValue: float
-      of vkDict:
-        dictValue: Table[string, Value]
-      of vkList:
-        listValue: seq[Value]
-
-
-proc readJson(filename: string, serverVars: var Table[string, Value]) {.tpub.} =
-  ## Read a json file add the variables to the given table.
-
-  echo "readJson not implemented"
-
+import readjson
+import vartypes
 
 proc processTemplate*(args: Args): int =
 

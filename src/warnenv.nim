@@ -40,3 +40,8 @@ when defined(test):
     warnStream.setPosition(0)
     for line in warnStream.lines():
       result.add line
+
+   proc readAndClose*(): seq[string] =
+    # Read the warning lines from the string stream then close it.
+    result = readWarnLines()
+    closeWarnStream()

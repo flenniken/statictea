@@ -6,7 +6,7 @@ NAME
      statictea - combines a template with data to produce a result
 
 SYNOPSIS
-     statictea [-h] [-l] [-v] [-s=server.json] [-j=shared.json] [-t=template.html]
+     statictea [-h] [-l] [-v] [-u] [-s=server.json] [-j=shared.json] [-t=template.html]
        [-p="pre post"] [-r=result.html]
 
 DESCRIPTION
@@ -46,6 +46,10 @@ DESCRIPTION
              specify zero or more. Separate prefix from postfix with a space. The
              postfix is optional.
 
+     -u, --update
+             Update the template's replace blocks to keep them insync with the
+             json data.
+
 EXAMPES
      Typical usage:
              statictea -l -s=server.json -j=shared.json -t:template.html -r=home.html
@@ -56,6 +60,10 @@ EXAMPES
      You can specify comment styles to use in your templates with the --prepost option.
      If you want to use the c style comments: /* ... */ the prepost option:
              statictea -p="/* */" ...
+
+     You can specify update to syncronize your template's replace blocks with the
+     json data.
+             statictea -u -j=shared.json -t=template.html
 
 SEE ALSO
      For more information see https://github.com/flenniken/statictea

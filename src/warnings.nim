@@ -3,6 +3,7 @@
 import tpub
 import strutils
 
+# Add new warnings to the bottom so the warning numbers never change.
 type
   Warning* = enum
     wNoFilename,
@@ -19,6 +20,8 @@ type
     wExceptionMsg,
     wStackTrace,
     wUnexpectedException,
+    wInvalidJsonRoot,
+    wJsonParseError,
 
 tpubType:
   const
@@ -39,12 +42,14 @@ tpubType:
       "Exception: '$1'.", # wExceptionMsg
       "Stack trace: '$1'.", # wStackTrace
       "Unexpected exception: '$1'.", # wUnexpectedException
+      "The root json element must be an object. Skipping file: $1.", # wInvalidJsonRoot
+      "Unable to parse the json file. Skipping file: $1.", # wJsonParseError
     ]
 
 func getWarning*(filename: string, lineNum: int,
     warning: Warning, p1: string = "", p2: string = ""): string =
   ## Return the formatted warning line.
   let pattern = warningsList[warning]
-  let message = pattern % [p1, p2]
   let messageNum = ord(warning)
+  let message = pattern % [p1, p2]
   result = "$1($2): w$3: $4" % [filename, $lineNum, $messageNum, message]

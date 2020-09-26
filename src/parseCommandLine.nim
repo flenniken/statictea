@@ -8,6 +8,8 @@ import args
 import warnings
 import warnenv
 
+# todo: enable logging by default.
+
 const
   fileLists = ["server", "shared", "template"]
   switches = [

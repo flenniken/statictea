@@ -1,5 +1,14 @@
 # try out things here
 # build and run with "n tt"
-import os
-import strutils
-echo commandLineParams().join(" ")
+
+proc unsafeCall() =
+  raise newException(OSError, "OS")
+
+proc p(): bool {.raises: [].} =
+  try:
+    unsafeCall()
+    result = true
+  except:
+    result = false
+
+echo $p()

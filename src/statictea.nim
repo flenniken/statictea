@@ -12,6 +12,7 @@ import args
 import warnings
 import showhelp
 import os
+import version
 
 const
   staticteaLog* = "statictea.log" ## \
@@ -21,13 +22,13 @@ proc processArgs(args: Args): int =
   if args.help:
     result = showHelp()
   elif args.version:
-    echo "showVersion()"
+    echo staticteaVersion
+    result = 0
   elif args.update:
     echo "updateTemplate(args)"
   elif args.templateList.len > 0:
     result = processTemplate(args)
   else:
-    # echo $args
     result = showHelp()
 
 proc main(): int =
@@ -51,7 +52,7 @@ proc main(): int =
   # We go through the motions of logging even when logging is turned
   # off so the logging code gets exercised.
   log("----- starting -----")
-  log("Cmdline: " & commandLineParams().join(" "))
+  log("Cmdline: $1" % $commandLineParams())
   log($args)
 
   try:

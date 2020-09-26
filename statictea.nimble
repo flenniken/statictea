@@ -1,13 +1,16 @@
 # Package
 import os
 
+# Include the version number.
+include src/version
+
+version       = staticteaVersion
 version       = "0.1.0"
 author        = "Steve Flenniken"
 description   = "A template processor and language."
 license       = "MIT"
 srcDir        = "src"
 bin           = @["statictea"]
-
 
 
 # Dependencies
