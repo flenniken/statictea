@@ -4,11 +4,29 @@ import warnings
 import warnenv
 # import logenv
 import tables
-# import tpub
+import tpub
 import streams
 import vartypes
 import json
 import os
+import json
+
+func jsonToValue(val: JsonNode): Value {.tpub.} =
+  case val.kind
+  of JNull:
+    result = nil
+  of JBool:
+    result = Value(kind: vkInt, intv: if val.getBool(): 1 else: 0)
+  of JInt:
+    result = Value(kind: vkInt, intv: val.getInt())
+  of JFloat:
+    result = Value(kind: vkFloat, floatv: val.getFloat())
+  of JString:
+    result = Value(kind: vkString, stringv: val.getStr())
+  of JObject:
+    result = nil
+  of JArray:
+    result = nil
 
 proc readJson*(filename: string, vars: var Table[string, Value]) =
   ## Read a json file and add the variables to the given vars table.
@@ -18,9 +36,8 @@ proc readJson*(filename: string, vars: var Table[string, Value]) =
     return
 
   var stream: Stream
-  try:
-    stream = newFileStream(filename)
-  except:
+  stream = newFileStream(filename)
+  if stream == nil:
     warn("read json", 0, wUnableToOpenFile, filename)
     return
 
@@ -35,15 +52,14 @@ proc readJson*(filename: string, vars: var Table[string, Value]) =
     warn("read json", 0, wInvalidJsonRoot, filename)
     return
 
-  echo "object"
   for key, val in rootNode:
-    echo key, $val
+    # echo "$1 = $2" % [key, $val]
+    let value = jsonToValue(val)
+    if value != nil:
+      vars[key] = value
 
 # jsonNode.kind == JObject
 #     getInt
-#     getFloat
-#     getStr
-#     getBool
 #     getFloat
 #     getStr
 #     getBool
