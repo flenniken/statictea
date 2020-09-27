@@ -6,22 +6,24 @@ import strutils
 # Add new warnings to the bottom so the warning numbers never change.
 type
   Warning* = enum
-    wNoFilename,
-    wUnknownSwitch,
-    wUnknownArg,
-    wOneResultAllowed,
-    wExtraPrepostText,
-    wOneTemplateAllowed,
-    wNoPrepostValue,
-    wSkippingExtraPrepost,
-    wUnableToOpenLogFile,
-    wOneLogAllowed,
-    wUnableToWriteLogFile,
-    wExceptionMsg,
-    wStackTrace,
-    wUnexpectedException,
-    wInvalidJsonRoot,
-    wJsonParseError,
+    wNoFilename, # w0
+    wUnknownSwitch, # w1
+    wUnknownArg, # w2
+    wOneResultAllowed, # w3
+    wExtraPrepostText, # w4
+    wOneTemplateAllowed, # w5
+    wNoPrepostValue, # w6
+    wSkippingExtraPrepost, # w7
+    wUnableToOpenLogFile, # w8
+    wOneLogAllowed, # w9
+    wUnableToWriteLogFile, # w10
+    wExceptionMsg, # w11
+    wStackTrace, # w12
+    wUnexpectedException, # w13
+    wInvalidJsonRoot, # w14
+    wJsonParseError, # w15
+    wFileNotFound, # w16
+    wUnableToOpenFile, # w17
 
 tpubType:
   const
@@ -44,12 +46,14 @@ tpubType:
       "Unexpected exception: '$1'.", # wUnexpectedException
       "The root json element must be an object. Skipping file: $1.", # wInvalidJsonRoot
       "Unable to parse the json file. Skipping file: $1.", # wJsonParseError
+      "File not found: $1.", # wFileNotFound
+      "Unable to open file: $1.", # wUnableToOpenFile
     ]
 
 func getWarning*(filename: string, lineNum: int,
     warning: Warning, p1: string = "", p2: string = ""): string =
   ## Return the formatted warning line.
   let pattern = warningsList[warning]
-  let messageNum = ord(warning)
+  let warningCode = $ord(warning)
   let message = pattern % [p1, p2]
-  result = "$1($2): w$3: $4" % [filename, $lineNum, $messageNum, message]
+  result = "$1($2): w$3: $4" % [filename, $lineNum, warningCode, message]

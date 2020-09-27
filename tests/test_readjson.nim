@@ -12,23 +12,26 @@ proc createFile(filename: string, content: string) =
   file.write(content)
   file.close()
 
-suite "readjson.nim":
-
-  test "readJson":
-    var value: Value
-
+proc testReadJson(jsonContent: string, expectedVars: Table[string, Value],
+      expectedWarnLines: seq[string] = @[], expectedLogLines: seq[string] = @[]) =
     openWarnStream(newStringStream())
     openLogFile("_readJson.log")
 
     let jsonFilename = "_readJson.json"
-    createFile(jsonFilename, "5")
+    createFile(jsonFilename, jsonContent)
     var vars = initTable[string, Value]()
     readJson(jsonFilename, vars)
     discard tryRemoveFile(jsonFilename)
 
     let warnLines = readAndClose()
-    for line in warnLines:
-      echo line
+    check warnLines == expectedWarnLines
     var logLines = logReadDelete(20)
-    for line in logLines:
-      echo line
+    check logLines == expectedLogLines
+
+    check vars == expectedVars
+
+suite "readjson.nim":
+
+  test "readJson empty":
+    let expectedVars = initTable[string, Value]()
+    testReadJson("{}", expectedVars)
