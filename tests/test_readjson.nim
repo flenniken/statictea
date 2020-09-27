@@ -83,6 +83,7 @@ suite "readjson.nim":
     let jsonNode = newJString("string")
     let value = jsonToValue(jsonNode)
     check value.stringv == "string"
+    check $value == """"string""""
 
   test "jsonToValue float":
     let jsonNode = newJFloat(1.5)
@@ -98,3 +99,45 @@ suite "readjson.nim":
     let jsonNode = newJBool(false)
     let value = jsonToValue(jsonNode)
     check value.intv == 0
+
+  test "jsonToValue null":
+    let jsonNode = newJNull()
+    let value = jsonToValue(jsonNode)
+    check value.intv == 0
+
+  test "jsonToValue list":
+    let jsonNode = newJArray()
+    let value = jsonToValue(jsonNode)
+    check value.listv.len == 0
+    check $value == "[]"
+
+  test "jsonToValue list null":
+    var jsonNode = newJArray()
+    jsonNode.add(newJNull())
+    let value = jsonToValue(jsonNode)
+    check value.listv.len == 1
+    check $value == "[0]"
+
+  test "jsonToValue list items":
+    var jsonNode = newJArray()
+    jsonNode.add(newJNull())
+    jsonNode.add(newJInt(5))
+    jsonNode.add(newJString("string"))
+    jsonNode.add(newJFloat(1.5))
+    jsonNode.add(newJBool(true))
+    jsonNode.add(newJBool(false))
+    let value = jsonToValue(jsonNode)
+    check value.listv.len == 6
+    check $value == """[0, 5, "string", 1.5, 1, 0]"""
+
+  test "jsonToValue nested list":
+    var jsonNode = newJArray()
+    jsonNode.add(newJInt(5))
+    jsonNode.add(newJInt(6))
+    var nested = newJArray()
+    nested.add(newJInt(8))
+    jsonNode.add(nested)
+    jsonNode.add(newJInt(7))
+    let value = jsonToValue(jsonNode)
+    check value.listv.len == 4
+    check $value == "[5, 6, [8], 7]"

@@ -28,7 +28,7 @@ func `$`*(value: Value): string =
   ## A string representation of Value.
   case value.kind
   of vkString:
-    result = value.stringv
+    result = "\"" & value.stringv & "\""
   of vkInt:
     result = $value.intv
   of vkFloat:
@@ -36,4 +36,5 @@ func `$`*(value: Value): string =
   of vkDict:
     result = $value.dictv
   of vkList:
-    result = $value.listv
+    var str = $value.listv
+    result = str[1..^1]

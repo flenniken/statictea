@@ -11,22 +11,30 @@ import json
 import os
 import json
 
-func jsonToValue(val: JsonNode): Value {.tpub.} =
-  case val.kind
+func jsonToValue(jsonNode: JsonNode): Value {.tpub.} =
+  case jsonNode.kind
   of JNull:
-    result = nil
+    result = Value(kind: vkInt, intv: 0)
   of JBool:
-    result = Value(kind: vkInt, intv: if val.getBool(): 1 else: 0)
+    result = Value(kind: vkInt, intv: if jsonNode.getBool(): 1 else: 0)
   of JInt:
-    result = Value(kind: vkInt, intv: val.getInt())
+    result = Value(kind: vkInt, intv: jsonNode.getInt())
   of JFloat:
-    result = Value(kind: vkFloat, floatv: val.getFloat())
+    result = Value(kind: vkFloat, floatv: jsonNode.getFloat())
   of JString:
-    result = Value(kind: vkString, stringv: val.getStr())
+    result = Value(kind: vkString, stringv: jsonNode.getStr())
   of JObject:
-    result = nil
+    var objectVars = initTable[string, Value]()
+    for key, jnode in jsonNode:
+      let value = jsonToValue(jnode)
+      objectVars[key] = value
+    result = Value(kind: vkDict, dictv: objectVars)
   of JArray:
-    result = nil
+    var listVars: seq[Value]
+    for jnode in jsonNode:
+      let value = jsonToValue(jnode)
+      listVars.add(value)
+    result = Value(kind: vkList, listv: listVars)
 
 proc readJson*(filename: string, vars: var Table[string, Value]) =
   ## Read a json file and add the variables to the given vars table.
