@@ -3,6 +3,8 @@
 import tables
 
 type
+  VarsDict* = OrderedTable[string, Value]
+
   ValueKind* = enum
     vkString,
     vkInt,
@@ -11,7 +13,7 @@ type
     vkList,
 
   Value* = ref ValueObj
-  ValueObj* = object
+  ValueObj* {.acyclic.} = object
     case kind*: ValueKind
     of vkString:
       stringv*: string
@@ -20,7 +22,7 @@ type
     of vkFloat:
       floatv*: float64
     of vkDict:
-      dictv*: Table[string, Value]
+      dictv*: VarsDict
     of vkList:
       listv*: seq[Value]
 
@@ -34,7 +36,10 @@ func `$`*(value: Value): string =
   of vkFloat:
     result = $value.floatv
   of vkDict:
-    result = $value.dictv
+    if value.dictv.len == 0:
+      result = "{}"
+    else:
+      result = $value.dictv
   of vkList:
     var str = $value.listv
     result = str[1..^1]

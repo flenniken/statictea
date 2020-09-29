@@ -11,6 +11,9 @@ import json
 import os
 import json
 
+func getEmptyVars*(): VarsDict =
+  result = initOrderedTable[string, Value]()
+
 func jsonToValue(jsonNode: JsonNode): Value {.tpub.} =
   case jsonNode.kind
   of JNull:
@@ -24,7 +27,7 @@ func jsonToValue(jsonNode: JsonNode): Value {.tpub.} =
   of JString:
     result = Value(kind: vkString, stringv: jsonNode.getStr())
   of JObject:
-    var objectVars = initTable[string, Value]()
+    var objectVars = getEmptyVars()
     for key, jnode in jsonNode:
       let value = jsonToValue(jnode)
       objectVars[key] = value
@@ -36,8 +39,8 @@ func jsonToValue(jsonNode: JsonNode): Value {.tpub.} =
       listVars.add(value)
     result = Value(kind: vkList, listv: listVars)
 
-proc readJson*(filename: string, vars: var Table[string, Value]) =
-  ## Read a json file and add the variables to the given vars table.
+proc readJson*(filename: string): VarsDict =
+  ## Read a json file and return its variables.
 
   if not fileExists(filename):
     warn("read json", 0, wFileNotFound, filename)
@@ -60,22 +63,4 @@ proc readJson*(filename: string, vars: var Table[string, Value]) =
     warn("read json", 0, wInvalidJsonRoot, filename)
     return
 
-  for key, val in rootNode:
-    # echo "$1 = $2" % [key, $val]
-    let value = jsonToValue(val)
-    if value != nil:
-      vars[key] = value
-
-# jsonNode.kind == JObject
-#     getInt
-#     getFloat
-#     getStr
-#     getBool
-# JsonNodeKind = enum
-#   JNull, JBool, JInt, JFloat, JString, JObject, JArray
-
-#   of JObject:
-#       fields*: OrderedTable[string, JsonNode]
-
-#   of JArray:
-#       elems*: seq[JsonNode]
+  result = jsonToValue(rootNode).dictv

@@ -14,70 +14,69 @@ proc createFile(filename: string, content: string) =
   file.write(content)
   file.close()
 
-proc testReadJson(filename: string, jsonContent: string, expectedVars: Table[string, Value],
+proc testReadJson(filename: string, jsonContent: string, expectedVars: VarsDict,
       expectedWarnLines: seq[string] = @[], expectedLogLines: seq[string] = @[]) =
-    openWarnStream(newStringStream())
-    openLogFile("_readJson.log")
 
-    var jsonFilename: string
-    if filename == "":
-      jsonFilename = "_readJson.json"
-      createFile(jsonFilename, jsonContent)
-    else:
-      jsonFilename = filename
-    var vars = initTable[string, Value]()
-    readJson(jsonFilename, vars)
-    discard tryRemoveFile(jsonFilename)
+  openWarnStream(newStringStream())
+  openLogFile("_readJson.log")
 
-    let warnLines = readAndClose()
-    check warnLines == expectedWarnLines
-    var logLines = logReadDelete(20)
-    check logLines == expectedLogLines
+  var jsonFilename: string
+  if filename == "":
+    jsonFilename = "_readJson.json"
+    createFile(jsonFilename, jsonContent)
+  else:
+    jsonFilename = filename
 
-    check $vars == $expectedVars
+  let vars = readJson(jsonFilename)
+  discard tryRemoveFile(jsonFilename)
 
-    discard tryRemoveFile(jsonFilename)
+  let warnLines = readAndClose()
+  check warnLines == expectedWarnLines
+  var logLines = logReadDelete(20)
+  check logLines == expectedLogLines
+
+  check $vars == $expectedVars
+
+  discard tryRemoveFile(jsonFilename)
 
 
 suite "readjson.nim":
 
-  test "readJson empty":
-    let expectedVars = initTable[string, Value]()
-    testReadJson("", "{}", expectedVars)
-
   test "readJson file not found":
+    var jsonNode = newJObject()
     let expectedWarnLines = @["read json(0): w16: File not found: missing."]
-    let expectedVars = initTable[string, Value]()
-    testReadJson("missing", "{}", expectedVars, expectedWarnLines=expectedWarnLines)
+    var expectedValue = getEmptyVars()
+    testReadJson("missing", "{}", expectedValue, expectedWarnLines=expectedWarnLines)
 
   test "readJson cannot open file":
-    let expectedWarnLines = @["read json(0): w17: Unable to open file: _cannotopen.tmp."]
-    let expectedVars = initTable[string, Value]()
+    let expectedWarnLines =
+      @["read json(0): w17: Unable to open file: _cannotopen.tmp."]
+    let expectedValue = getEmptyVars()
     let filename = "_cannotopen.tmp"
     createFile(filename, "temp")
     setFilePermissions(filename, {fpUserWrite, fpGroupWrite})
-    testReadJson(filename, "{}", expectedVars, expectedWarnLines=expectedWarnLines)
+    testReadJson(filename, "{}", expectedValue, expectedWarnLines=expectedWarnLines)
 
   test "readJson parse error":
     let expectedWarnLines = @["read json(0): w15: Unable to parse the json file. Skipping file: _readJson.json."]
-    let expectedVars = initTable[string, Value]()
-    testReadJson("", "{", expectedVars, expectedWarnLines=expectedWarnLines)
+    let expectedValue = getEmptyVars()
+    testReadJson("", "{", expectedValue, expectedWarnLines=expectedWarnLines)
 
-  test "readJson not root object":
+  test "readJson no root object":
     let expectedWarnLines = @["read json(0): w14: The root json element must be an object. Skipping file: _readJson.json."]
-    let expectedVars = initTable[string, Value]()
-    testReadJson("", "[5]", expectedVars, expectedWarnLines=expectedWarnLines)
+    let expectedValue = getEmptyVars()
+    testReadJson("", "[5]", expectedValue, expectedWarnLines=expectedWarnLines)
 
   test "readJson a=5":
-    var expectedVars = initTable[string, Value]()
-    let value = Value(kind: vkInt, intv: 5)
-    expectedVars["a"] = value
-    testReadJson("", """{"a": 5}""", expectedVars)
+    var expectedValue = getEmptyVars()
+    expectedValue["a"] = Value(kind: vkInt, intv: 5)
+    testReadJson("", """{"a": 5}""", expectedValue)
 
   test "jsonToValue int":
     let jsonNode = newJInt(5)
     let value = jsonToValue(jsonNode)
     check value.intv == 5
+    check $value == "5"
 
   test "jsonToValue string":
     let jsonNode = newJString("string")
@@ -94,16 +93,19 @@ suite "readjson.nim":
     let jsonNode = newJBool(true)
     let value = jsonToValue(jsonNode)
     check value.intv == 1
+    check $value == "1"
 
   test "jsonToValue bool false":
     let jsonNode = newJBool(false)
     let value = jsonToValue(jsonNode)
     check value.intv == 0
+    check $value == "0"
 
   test "jsonToValue null":
     let jsonNode = newJNull()
     let value = jsonToValue(jsonNode)
     check value.intv == 0
+    check $value == "0"
 
   test "jsonToValue list":
     let jsonNode = newJArray()
@@ -141,3 +143,9 @@ suite "readjson.nim":
     let value = jsonToValue(jsonNode)
     check value.listv.len == 4
     check $value == "[5, 6, [8], 7]"
+
+  test "empty dict":
+    var jsonNode = newJObject()
+    let value = jsonToValue(jsonNode)
+    check value.dictv.len == 0
+    check $value == "{}"
