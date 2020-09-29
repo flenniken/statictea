@@ -1288,7 +1288,8 @@ The StaticTea command line options:
 - result - the result file.
 - update - update the template replace blocks.
 - prepost - add a command prefix and postfix, you can specify multiple.
-- log - the log file, no loggingnothing by default.
+- noLog - disable logging. The default logs to statictea.log in
+  the system log folder.
 
 ** StaticTea as a Filter
 

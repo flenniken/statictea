@@ -7,7 +7,7 @@ suite "test_args.nim":
     var args: Args
     let expected = """
 Args:
-help=false, version=false, update=false, log=false
+help=false, version=false, update=false, nolog=false
 serverList: []
 sharedList: []
 templateList: []
@@ -23,7 +23,7 @@ resultFilename: """""
     args.prepostList = @[("#", "@"), ("begin", "end")]
     let expected = """
 Args:
-help=true, version=false, update=false, log=false
+help=true, version=false, update=false, nolog=false
 serverList: [one.json, two.json]
 sharedList: []
 templateList: []
@@ -39,7 +39,7 @@ resultFilename: "result.html""""
     args.resultFilename = "result.html"
     let expected = """
 Args:
-help=true, version=false, update=false, log=false
+help=true, version=false, update=false, nolog=false
 serverList: [server.json, more.json]
 sharedList: [shared.json]
 templateList: []

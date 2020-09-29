@@ -46,7 +46,8 @@ proc main(): int =
   let args = parseCommandLine()
 
   # Open the global statictea.log file when logging is turned on.
-  if args.log:
+  if not args.nolog:
+    # todo: put the log in the system standard log location.
     openLogFile(staticteaLog)
 
   # We go through the motions of logging even when logging is turned

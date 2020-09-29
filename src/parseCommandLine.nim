@@ -8,8 +8,6 @@ import args
 import warnings
 import warnenv
 
-# todo: enable logging by default.
-
 const
   fileLists = ["server", "shared", "template"]
   switches = [
@@ -21,7 +19,7 @@ const
     ('r', "result"),
     ('u', "update"),
     ('p', "prepost"),
-    ('l', "log"),
+    ('n', "nolog"),
   ]
 
 
@@ -74,7 +72,7 @@ proc parsePrepost(str: string): (Prepost, string) {.tpub.} =
 
 proc handleWord(switch: string, word: string, value: string,
     help: var bool, version: var bool, update: var bool,
-    log: var bool, resultFilename: var string,
+    nolog: var bool, resultFilename: var string,
     filenames: var array[4, seq[string]], prepostList: var seq[Prepost]) =
   ## Handle one switch and return its value.  Switch is the key from
   ## the command line, either a word or a letter.  Word is the long
@@ -109,8 +107,8 @@ proc handleWord(switch: string, word: string, value: string,
       if extra != "":
         warn("cmdline", 0, wSkippingExtraPrepost, extra)
       prepostList.add(prepost)
-  elif word == "log":
-    log = true
+  elif word == "nolog":
+    nolog = true
   else:
     warn("cmdline", 0, wUnknownSwitch, $switch)
 
@@ -121,7 +119,7 @@ proc parseCommandLine*(cmdLine: string = ""): Args =
   var help: bool = false
   var version: bool = false
   var update: bool = false
-  var log: bool = false
+  var nolog: bool = false
   var filenames: array[4, seq[string]]
   var optParser = initOptParser(cmdLine)
   var resultFilename: string
@@ -138,10 +136,10 @@ proc parseCommandLine*(cmdLine: string = ""): Args =
             warn("cmdline", 0, wUnknownSwitch, $letter)
           else:
             handleWord($letter, word, value, help, version, update,
-                 log, resultFilename, filenames, prepostList)
+                 nolog, resultFilename, filenames, prepostList)
 
       of CmdLineKind.cmdLongOption:
-        handleWord(key, key, value, help, version, update, log,
+        handleWord(key, key, value, help, version, update, nolog,
                    resultFilename, filenames, prepostList)
 
       of CmdLineKind.cmdArgument:
@@ -153,7 +151,7 @@ proc parseCommandLine*(cmdLine: string = ""): Args =
   result.help = help
   result.version = version
   result.update = update
-  result.log = log
+  result.nolog = nolog
   result.serverList = filenames[0]
   result.sharedList = filenames[1]
   result.templateList = filenames[2]
