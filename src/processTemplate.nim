@@ -8,12 +8,13 @@ import warnenv
 # import tpub
 import readjson
 # import vartypes
+import streams
 
 # templateList: seq[string],
 #     serverList: seq[string], sharedList: seq[string],
 #     resultFilename: string , prepostList: seq[Prepost]) =
 
-proc processTemplate*(args: Args): int =
+proc processTemplate*(args: Args, stream: Stream): int =
   ## Process the template and return 0 on success.
 
   assert args.templateList.len > 0

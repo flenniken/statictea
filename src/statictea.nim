@@ -2,7 +2,7 @@
 ## A template processor and language.
 ## See https://github.com/flenniken/statictea
 
-# import streams
+import streams
 import parseCommandLine
 import strutils
 import processTemplate
@@ -23,22 +23,20 @@ const
   staticteaLog* = "statictea.log" ## \
   ## Name of the default statictea log file.
 
-# todo: write to a file instead of stdout.
-
-proc processArgs(args: Args): int =
+proc processArgs(args: Args, stream: Stream): int =
   if args.help:
-    result = showHelp()
+    result = showHelp(stream)
   elif args.version:
-    echo staticteaVersion
+    stream.writeLine(staticteaVersion)
     result = 0
   elif args.update:
     echo "updateTemplate(args)"
   elif args.templateList.len > 0:
-    result = processTemplate(args)
+    result = processTemplate(args, stream)
   else:
-    result = showHelp()
+    result = showHelp(stream)
 
-proc main(argv: seq[string]): int {.tpub.} =
+proc main(argv: seq[string], stream: Stream): int {.tpub.} =
   ## Run statictea.
 
   # Setup control-c monitoring so ctrl-c stops the program.
@@ -72,7 +70,7 @@ proc main(argv: seq[string]): int {.tpub.} =
     warn(line)
 
   try:
-    result = processArgs(args)
+    result = processArgs(args, stream)
   except:
     result = 1
     let msg = getCurrentExceptionMsg()
@@ -90,7 +88,8 @@ proc main(argv: seq[string]): int {.tpub.} =
 when isMainModule:
   var rc: int
   try:
-    rc = main(commandLineParams())
+    var stream = newFileStream(stdout)
+    rc = main(commandLineParams(), stream)
   except:
     echo getCurrentExceptionMsg()
     rc = 1

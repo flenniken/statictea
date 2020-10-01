@@ -1,4 +1,5 @@
 ## Show help on the command line.
+import streams
 
 proc getHelp(): string =
   result = """
@@ -51,10 +52,10 @@ DESCRIPTION
 
 EXAMPES
      Typical usage:
-             statictea -l -s=server.json -j=shared.json -t:template.html -r=home.html
+             statictea -s=server.json -j=shared.json -t:template.html -r=home.html
 
      You can specify multiple shared of server json files.
-             statictea -l -s=server.json -j=s1.json -j=s2.json -t=template.html -r=h.html
+             statictea -s=server.json -j=s1.json -j=s2.json -t=template.html -r=h.html
 
      You can specify comment styles to use in your templates with the --prepost option.
      If you want to use the c style comments: /* ... */ the prepost option:
@@ -68,5 +69,6 @@ SEE ALSO
      For more information see https://github.com/flenniken/statictea
 """
 
-proc showHelp*(): int =
-  echo getHelp()
+proc showHelp*(stream: Stream): int =
+  stream.writeLine(getHelp())
+  result = 0
