@@ -10,37 +10,46 @@ import vartypes
 import json
 import os
 import json
+import options
+
+var depth_limit = 3
 
 func getEmptyVars*(): VarsDict =
   result = initOrderedTable[string, Value]()
 
-func jsonToValue(jsonNode: JsonNode): Value {.tpub.} =
+proc jsonToValue(jsonNode: JsonNode, depth: int = 0): Option[Value] {.tpub.} =
+  if depth > depth_limit:
+    return none(Value)
+  var value: Value
   case jsonNode.kind
   of JNull:
-    result = Value(kind: vkInt, intv: 0)
+    value = Value(kind: vkInt, intv: 0)
   of JBool:
-    result = Value(kind: vkInt, intv: if jsonNode.getBool(): 1 else: 0)
+    value = Value(kind: vkInt, intv: if jsonNode.getBool(): 1 else: 0)
   of JInt:
-    result = Value(kind: vkInt, intv: jsonNode.getInt())
+    value = Value(kind: vkInt, intv: jsonNode.getInt())
   of JFloat:
-    result = Value(kind: vkFloat, floatv: jsonNode.getFloat())
+    value = Value(kind: vkFloat, floatv: jsonNode.getFloat())
   of JString:
-    result = Value(kind: vkString, stringv: jsonNode.getStr())
+    value = Value(kind: vkString, stringv: jsonNode.getStr())
   of JObject:
     var objectVars = getEmptyVars()
     for key, jnode in jsonNode:
-      let value = jsonToValue(jnode)
-      objectVars[key] = value
-    result = Value(kind: vkDict, dictv: objectVars)
+      let option = jsonToValue(jnode, depth + 1)
+      if option.isSome():
+        objectVars[key] = option.get()
+    value = Value(kind: vkDict, dictv: objectVars)
   of JArray:
     var listVars: seq[Value]
     for jnode in jsonNode:
-      let value = jsonToValue(jnode)
-      listVars.add(value)
-    result = Value(kind: vkList, listv: listVars)
+      let option = jsonToValue(jnode, depth)
+      assert option.isSome
+      listVars.add(option.get())
+    value = Value(kind: vkList, listv: listVars)
+  result = some(value)
 
-proc readJson*(filename: string): VarsDict =
-  ## Read a json file and return its variables.
+proc readJson*(filename: string, vars: var VarsDict) =
+  ## Read a json file and add the variables to the vars dictionary.
 
   if not fileExists(filename):
     warn("read json", 0, wFileNotFound, filename)
@@ -63,4 +72,7 @@ proc readJson*(filename: string): VarsDict =
     warn("read json", 0, wInvalidJsonRoot, filename)
     return
 
-  result = jsonToValue(rootNode).dictv
+  for key, jnode in rootNode:
+    let option = jsonToValue(jnode)
+    assert option.isSome
+    vars[key] = option.get()

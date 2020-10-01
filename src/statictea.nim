@@ -2,7 +2,7 @@
 ## A template processor and language.
 ## See https://github.com/flenniken/statictea
 
-import streams
+# import streams
 import parseCommandLine
 import strutils
 import processTemplate
@@ -13,6 +13,11 @@ import warnings
 import showhelp
 import os
 import version
+# import limits
+import tpub
+
+var logSizeWarning*: BiggestInt = 1024 * 1024 * 1024 ##/
+ ## Warn the user when the log file gets big.
 
 const
   staticteaLog* = "statictea.log" ## \
@@ -31,7 +36,7 @@ proc processArgs(args: Args): int =
   else:
     result = showHelp()
 
-proc main(): int =
+proc main(): int {.tpub.} =
   ## Run statictea.
 
   # Setup control-c monitoring so ctrl-c stops the program.
@@ -46,8 +51,10 @@ proc main(): int =
   let args = parseCommandLine()
 
   # Open the global statictea.log file when logging is turned on.
+  var logSize: BiggestInt = 0
   if not args.nolog:
     # todo: put the log in the system standard log location.
+    logSize = getFileSize(statictealog)
     openLogFile(staticteaLog)
 
   # We go through the motions of logging even when logging is turned
@@ -55,6 +62,12 @@ proc main(): int =
   log("----- starting -----")
   log("Cmdline: $1" % $commandLineParams())
   log($args)
+  log(staticteaVersion)
+  if logSize > logSizeWarning:
+    let numStr = insertSep($logSize, ',')
+    let line = get_warning("startup", 0, wBigLogFile, numStr)
+    log(line)
+    warn(line)
 
   try:
     result = processArgs(args)

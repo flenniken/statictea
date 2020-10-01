@@ -1,4 +1,3 @@
-# import strutils
 import unittest
 import warnenv
 import logenv
@@ -8,6 +7,7 @@ import tables
 import readjson
 import os
 import json
+import options
 
 proc createFile(filename: string, content: string) =
   var file = open(filename, fmWrite)
@@ -27,7 +27,8 @@ proc testReadJson(filename: string, jsonContent: string, expectedVars: VarsDict,
   else:
     jsonFilename = filename
 
-  let vars = readJson(jsonFilename)
+  var vars = getEmptyVars()
+  readJson(jsonFilename, vars)
   discard tryRemoveFile(jsonFilename)
 
   let warnLines = readAndClose()
@@ -74,49 +75,57 @@ suite "readjson.nim":
 
   test "jsonToValue int":
     let jsonNode = newJInt(5)
-    let value = jsonToValue(jsonNode)
+    let option = jsonToValue(jsonNode)
+    let value = option.get()
     check value.intv == 5
     check $value == "5"
 
   test "jsonToValue string":
     let jsonNode = newJString("string")
-    let value = jsonToValue(jsonNode)
+    let option = jsonToValue(jsonNode)
+    let value = option.get()
     check value.stringv == "string"
     check $value == """"string""""
 
   test "jsonToValue float":
     let jsonNode = newJFloat(1.5)
-    let value = jsonToValue(jsonNode)
+    let option = jsonToValue(jsonNode)
+    let value = option.get()
     check value.floatv == 1.5
 
   test "jsonToValue bool true":
     let jsonNode = newJBool(true)
-    let value = jsonToValue(jsonNode)
+    let option = jsonToValue(jsonNode)
+    let value = option.get()
     check value.intv == 1
     check $value == "1"
 
   test "jsonToValue bool false":
     let jsonNode = newJBool(false)
-    let value = jsonToValue(jsonNode)
+    let option = jsonToValue(jsonNode)
+    let value = option.get()
     check value.intv == 0
     check $value == "0"
 
   test "jsonToValue null":
     let jsonNode = newJNull()
-    let value = jsonToValue(jsonNode)
+    let option = jsonToValue(jsonNode)
+    let value = option.get()
     check value.intv == 0
     check $value == "0"
 
   test "jsonToValue list":
     let jsonNode = newJArray()
-    let value = jsonToValue(jsonNode)
+    let option = jsonToValue(jsonNode)
+    let value = option.get()
     check value.listv.len == 0
     check $value == "[]"
 
   test "jsonToValue list null":
     var jsonNode = newJArray()
     jsonNode.add(newJNull())
-    let value = jsonToValue(jsonNode)
+    let option = jsonToValue(jsonNode)
+    let value = option.get()
     check value.listv.len == 1
     check $value == "[0]"
 
@@ -128,7 +137,8 @@ suite "readjson.nim":
     jsonNode.add(newJFloat(1.5))
     jsonNode.add(newJBool(true))
     jsonNode.add(newJBool(false))
-    let value = jsonToValue(jsonNode)
+    let option = jsonToValue(jsonNode)
+    let value = option.get()
     check value.listv.len == 6
     check $value == """[0, 5, "string", 1.5, 1, 0]"""
 
@@ -140,12 +150,14 @@ suite "readjson.nim":
     nested.add(newJInt(8))
     jsonNode.add(nested)
     jsonNode.add(newJInt(7))
-    let value = jsonToValue(jsonNode)
+    let option = jsonToValue(jsonNode)
+    let value = option.get()
     check value.listv.len == 4
     check $value == "[5, 6, [8], 7]"
 
   test "empty dict":
     var jsonNode = newJObject()
-    let value = jsonToValue(jsonNode)
+    let option = jsonToValue(jsonNode)
+    let value = option.get()
     check value.dictv.len == 0
     check $value == "{}"

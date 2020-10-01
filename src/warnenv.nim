@@ -11,17 +11,23 @@ proc closeWarnStream*() =
     warnStream.close()
     warnStream = nil
 
+proc warn*(line: string) =
+  ## Write to the warning stream. Do nothing when it's not open. If
+  ## there is an io error writing, close the stream.
+  if warnStream == nil:
+    return
+  try:
+    warnStream.writeLine(line)
+  except:
+    closeWarnStream()
+
 proc warn*(filename: string, lineNum: int, warning: Warning,
            p1: string = "", p2: string = "") =
   ## Write to the warning stream. Do nothing when it's not open. If
   ## there is an io error writing, close the stream.
   if warnStream == nil:
     return
-  let line = getWarning(filename, lineNum, warning, p1, p2)
-  try:
-    warnStream.writeLine(line)
-  except:
-    closeWarnStream()
+  warn(getWarning(filename, lineNum, warning, p1, p2))
 
 proc openWarnStream*(stream: Stream=nil) =
   ## Open the strerr or the given stream as the warning stream.

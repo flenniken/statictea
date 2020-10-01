@@ -1,6 +1,6 @@
 # try out things here
 # build and run with "n tt"
 
-let value = false
-let t = if value: 1 else: 0
-echo $t
+var t:int = 0
+let r = t += 1
+echo $r

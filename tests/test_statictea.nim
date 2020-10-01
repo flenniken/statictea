@@ -1,7 +1,8 @@
 import unittest
-# import statictea
+import statictea
 
 suite "Test statictea.nim":
 
-  test "hello":
-    echo "hello"
+  test "main":
+    let rc = main()
+    echo rc

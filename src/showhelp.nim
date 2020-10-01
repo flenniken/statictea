@@ -6,7 +6,7 @@ NAME
      statictea - combines a template with data to produce a result
 
 SYNOPSIS
-     statictea [-h] [-l] [-v] [-u] [-s=server.json] [-j=shared.json] [-t=template.html]
+     statictea [-h] [-n] [-v] [-u] [-s=server.json] [-j=shared.json] [-t=template.html]
        [-p="pre post"] [-r=result.html]
 
 DESCRIPTION
@@ -18,9 +18,8 @@ DESCRIPTION
      -h, --help
              Show this help text then exit.
 
-     -l, --log
-             Log timing, system statistics, and diognatics information to the
-             statictea.log file.
+     -n, --nolog
+             Turn off logging to statictea.log.
 
      -v, --version
              Show the version number then exit.
