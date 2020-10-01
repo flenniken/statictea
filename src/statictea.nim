@@ -23,6 +23,8 @@ const
   staticteaLog* = "statictea.log" ## \
   ## Name of the default statictea log file.
 
+# todo: write to a file instead of stdout.
+
 proc processArgs(args: Args): int =
   if args.help:
     result = showHelp()
@@ -36,7 +38,7 @@ proc processArgs(args: Args): int =
   else:
     result = showHelp()
 
-proc main(): int {.tpub.} =
+proc main(argv: seq[string]): int {.tpub.} =
   ## Run statictea.
 
   # Setup control-c monitoring so ctrl-c stops the program.
@@ -48,7 +50,7 @@ proc main(): int {.tpub.} =
   openWarnStream()
 
   # Process the command line args.
-  let args = parseCommandLine()
+  let args = parseCommandLine(argv)
 
   # Open the global statictea.log file when logging is turned on.
   var logSize: BiggestInt = 0
@@ -60,7 +62,7 @@ proc main(): int {.tpub.} =
   # We go through the motions of logging even when logging is turned
   # off so the logging code gets exercised.
   log("----- starting -----")
-  log("Cmdline: $1" % $commandLineParams())
+  log("argv: $1" % $argv)
   log($args)
   log(staticteaVersion)
   if logSize > logSizeWarning:
@@ -88,7 +90,7 @@ proc main(): int {.tpub.} =
 when isMainModule:
   var rc: int
   try:
-    rc = main()
+    rc = main(commandLineParams())
   except:
     echo getCurrentExceptionMsg()
     rc = 1

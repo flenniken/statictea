@@ -113,7 +113,7 @@ proc handleWord(switch: string, word: string, value: string,
     warn("cmdline", 0, wUnknownSwitch, $switch)
 
 
-proc parseCommandLine*(cmdLine: string = ""): Args =
+proc parseCommandLine*(argv: seq[string]): Args =
   ## Return the command line parameters.
 
   var help: bool = false
@@ -121,11 +121,11 @@ proc parseCommandLine*(cmdLine: string = ""): Args =
   var update: bool = false
   var nolog: bool = false
   var filenames: array[4, seq[string]]
-  var optParser = initOptParser(cmdLine)
+  var optParser = initOptParser(argv)
   var resultFilename: string
   var prepostList: seq[Prepost]
 
-  # Iterate over all arguments passed to the cmdline.
+  # Iterate over all arguments passed to the command line.
   for kind, key, value in getopt(optParser):
     case kind
       of CmdLineKind.cmdShortOption:
@@ -157,3 +157,7 @@ proc parseCommandLine*(cmdLine: string = ""): Args =
   result.templateList = filenames[2]
   result.resultFilename = resultFilename
   result.prepostList = prepostList
+
+proc parseCommandLine*(cmdLine: string = ""): Args =
+  let argv = cmdLine.splitWhitespace()
+  result = parseCommandLine(argv)
