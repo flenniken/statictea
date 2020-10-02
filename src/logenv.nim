@@ -84,7 +84,9 @@ when defined(test):
 
   proc logReadDelete*(maximum: int = -1): seq[string] =
     # Close the log file, read its lines, then delete the file.
-    let filename = logFilename
+    if logFilename == "":
+      return
+    let logFilenameSave = logFilename
     closeLogFile()
-    result = readLines(filename, maximum)
-    discard tryRemoveFile(filename)
+    result = readLines(logFilenameSave, maximum)
+    discard tryRemoveFile(logFilenameSave)

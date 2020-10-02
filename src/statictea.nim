@@ -13,15 +13,16 @@ import warnings
 import showhelp
 import os
 import version
-# import limits
 import tpub
 
-var logSizeWarning*: BiggestInt = 1024 * 1024 * 1024 ##/
- ## Warn the user when the log file gets big.
+# todo: put the log in the standard log location, ie /var/log.
 
 const
-  staticteaLog* = "statictea.log" ## \
+  staticteaLog = "statictea.log" ## \
   ## Name of the default statictea log file.
+
+  logWarnSize: BiggestInt = 1024 * 1024 * 1024 ##/
+   ## Warn the user when the log file gets big.
 
 proc processArgs(args: Args, stream: Stream): int =
   if args.help:
@@ -36,7 +37,8 @@ proc processArgs(args: Args, stream: Stream): int =
   else:
     result = showHelp(stream)
 
-proc main(argv: seq[string], stream: Stream): int {.tpub.} =
+proc main(argv: seq[string], logFilename: string,
+          logWarnSize: BiggestInt, stream: Stream): int {.tpub.} =
   ## Run statictea.
 
   # Setup control-c monitoring so ctrl-c stops the program.
@@ -53,19 +55,18 @@ proc main(argv: seq[string], stream: Stream): int {.tpub.} =
   # Open the global statictea.log file when logging is turned on.
   var logSize: BiggestInt = 0
   if not args.nolog:
-    # todo: put the log in the system standard log location.
-    logSize = getFileSize(statictealog)
-    openLogFile(staticteaLog)
-
-  # We go through the motions of logging even when logging is turned
-  # off so the logging code gets exercised.
+    openLogFile(logFilename)
+    logSize = getFileSize(logFilename)
   log("----- starting -----")
   log("argv: $1" % $argv)
   log($args)
-  log(staticteaVersion)
-  if logSize > logSizeWarning:
+
+  # We go through the motions of logging even when logging is turned
+  # off so the logging code gets exercised.
+  log("version: " & staticteaVersion)
+  if logSize > logWarnSize:
     let numStr = insertSep($logSize, ',')
-    let line = get_warning("startup", 0, wBigLogFile, numStr)
+    let line = get_warning("startup", 0, wBigLogFile, logFilename, numStr)
     log(line)
     warn(line)
 
@@ -89,7 +90,7 @@ when isMainModule:
   var rc: int
   try:
     var stream = newFileStream(stdout)
-    rc = main(commandLineParams(), stream)
+    rc = main(commandLineParams(), staticteaLog, logWarnSize, stream)
   except:
     echo getCurrentExceptionMsg()
     rc = 1

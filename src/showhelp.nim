@@ -47,14 +47,14 @@ DESCRIPTION
              postfix is optional.
 
      -u, --update
-             Update the template's replace blocks to keep them insync with the
+             Update the template's replace blocks to syncronize them with the
              json data.
 
 EXAMPES
      Typical usage:
              statictea -s=server.json -j=shared.json -t:template.html -r=home.html
 
-     You can specify multiple shared of server json files.
+     You can specify multiple shared or server json files.
              statictea -s=server.json -j=s1.json -j=s2.json -t=template.html -r=h.html
 
      You can specify comment styles to use in your templates with the --prepost option.

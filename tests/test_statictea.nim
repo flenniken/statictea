@@ -3,6 +3,7 @@ import statictea
 import version
 import streams
 import strutils
+import logenv
 
 proc readAndClose(stream: Stream): seq[string] =
   ## Read the stream's lines then close it.
@@ -14,18 +15,25 @@ proc readAndClose(stream: Stream): seq[string] =
 suite "Test statictea.nim":
 
   test "main version":
-    var stream = newStringStream()
-    let rc = main(@["-v"], stream)
+    var stdoutStream = newStringStream()
+
+    let rc = main(@["-v"], "_logfile1.txt", 2000, stdoutStream)
     check rc == 0
-    let output = readAndClose(stream)
+
+    let output = readAndClose(stdoutStream)
     check output.len == 1
     check output[0] == $staticteaVersion
 
+    var logLines = logReadDelete(20)
+    for line in logLines:
+      echo line
+
+
   test "main help":
-    var stream = newStringStream()
-    let rc = main(@["-h"], stream)
+    var stdoutStream = newStringStream()
+    let rc = main(@["-h"], "_logfile1.txt", 2000, stdoutStream)
     check rc == 0
-    let output = readAndClose(stream)
+    let output = readAndClose(stdoutStream)
     check output.len > 10
     let expected = """
 NAME

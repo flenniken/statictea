@@ -49,7 +49,7 @@ tpubType:
       "Unable to parse the json file. Skipping file: $1.", # wJsonParseError
       "File not found: $1.", # wFileNotFound
       "Unable to open file: $1.", # wUnableToOpenFile
-      "The statictea.log file is getting big, delete it or setup log rotation. Size: $1.", # wBigLogFile
+      "Setup log rotation for $1 which has $2 bytes.", # wBigLogFile
     ]
 
 func getWarning*(filename: string, lineNum: int,
