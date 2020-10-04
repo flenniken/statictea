@@ -1,70 +1,130 @@
-## Logging environment.
+## Support logging to a file.
 
 import warnenv
-import tpub
 import times
 import strutils
 import warnings
+import tpub
+import options
+import regex
 when defined(test):
   import os
 
-var logFile: File
-var logFilename: string
+type
+  LogEnv* = object ##/
+    ## Log environment holding the log File and filename.
+    file: File
+    filename: string
 
-tpubType:
-  const
-    dtFormat = "yyyy-MM-dd HH:mm:ss'.'fff" ## \
-    ## The date time format in local time.
+const
+  dtFormat = "yyyy-MM-dd HH:mm:ss'.'fff" ## \
+  ## The date time format in local time written to the log.
 
-func formatLine(filename: string, lineNum: int, message: string, dt=now()):
-     string {.tpub.} =
-  ## Format and return the log line.
-  let dtString = dt.format(dtFormat)
+func formatDateTime*(dt: DateTime): string =
+  result = dt.format(dtFormat)
+
+func formatLine*(filename: string, lineNum: int, message: string, dt=now()):
+     string =
+  ## Return a formatted log line.
+  let dtString = formatDateTime(dt)
   result = "$1; $2($3); $4" % [dtString, filename, $lineNum, message]
 
-proc closeLogFile*() =
-  ## Close the log file.
-  if logFile == nil:
-    return
-  logFile.close()
-  logFile = nil
-  logFilename = ""
+func isOpen*(env: LogEnv): bool =
+  ## Return true when the log file is open.
+  result = env.file != nil
 
+func isClosed*(env: LogEnv): bool =
+  ## Return true when the log file is closed.
+  result = env.file == nil
 
-proc logLine*(filename: string, lineNum: int, message: string) =
-  ## Append a message to the log file.
+func filename*(env: LogEnv): string =
+  ## Return the log filename.
+  result = env.filename
 
-  if logFile == nil:
+func getFileSize*(env: LogEnv): int64 =
+  result = env.file.getFileSize()
+
+proc close*(env: var LogEnv) =
+  ## Close the log file and set the filename to "". Do nothing when
+  ## it's already closed.
+  if env.file != nil:
+    env.file.close()
+  env.file = nil
+  env.filename = ""
+
+proc logLine(env: var LogEnv, filename: string, lineNum: int, message: string) {.tpub.} =
+  ## Append a message to the log file. If there is an error writing,
+  ## close the log. Do nothing when the log is closed.
+  if isClosed(env):
     return
   let line = formatLine(filename, lineNum, message)
   try:
     # raise newException(IOError, "test io error")
-    logFile.writeLine(line)
+    env.file.writeLine(line)
   except:
     warn("logger", 0, wUnableToWriteLogFile, filename)
     warn("logger", 0, wExceptionMsg, getCurrentExceptionMsg())
     # The stack trace is only available in the debug builds.
     when not defined(release):
       warn("logger", 0, wStackTrace, getCurrentException().getStackTrace())
-    closeLogFile()
+    env.close()
 
-template log*(message: string) =
-  ## Append the message to the log file.
-  let info = instantiationInfo()
-  logLine(info.filename, info.line, message)
+template log*(env: var LogEnv, message: string) =
+  ## Append the message to the log file. The current file and line
+  ## becomes part of the message.
+  if env.isOpen:
+    let info = instantiationInfo()
+    logLine(env, info.filename, info.line, message)
 
-proc openLogFile*(filename: string) =
-  ## Open the log file.
-  if logFile != nil:
-    return
+proc openLogFile*(filename: string): LogEnv =
+  ## Open the log file for appending and return the LogEnv. If the
+  ## file cannot be opened, a closed LogEnv is returned.
   var file: File
   if open(file, filename, fmAppend):
-    logFile = file
-    logFilename = filename
+    result.file = file
+    result.filename = filename
   else:
     warn("logger", 0, wUnableToOpenLogFile, filename)
 
 when defined(test):
+  type
+    FileLine* = object
+      filename*: string
+      lineNum*: Natural
+
+    LogLine* = object
+      dt*: DateTime
+      filename*: string
+      lineNum*: Natural
+      message*: string
+
+  proc parseTimeStamp*(str: string): Option[DateTime] =
+    try:
+      result = some(parse(str, dtFormat))
+    except TimeParseError:
+      result = none(DateTime)
+
+  proc parseFileLine*(str: string): Option[FileLine] =
+    let pattern = getPattern(r"^(.*)\(([0-9]+)\)$")
+    var groups: array[2, string]
+    if matches(str, pattern, groups):
+      let lineNum =  parseUInt(groups[1])
+      result = some(FileLine(filename: groups[0], lineNum: lineNum))
+
+  proc parseLine*(line: string): Option[LogLine] =
+    var parts = split(line, "; ", 3)
+    if parts.len != 3:
+      return none(LogLine)
+    let dtO = parseTimeStamp(parts[0])
+    if not dtO.isSome:
+      return none(LogLine)
+    let fileLineO = parseFileLine(parts[1])
+    if not fileLineO.isSome:
+      return none(LogLine)
+    let fileLine = fileLineO.get()
+    result = some(LogLine(dt: dtO.get(), filename: fileLine.filename,
+      lineNum: fileLine.lineNum, message: parts[2]))
+
   proc readLines*(filename: string, maximum: int = -1): seq[string] =
     ## Read up to maximum lines from the given file. When maximum is
     ## negative, read all lines.
@@ -82,11 +142,10 @@ when defined(test):
       if count > maxLines:
         break
 
-  proc logReadDelete*(maximum: int = -1): seq[string] =
+proc closeReadDelete*(env: var LogEnv, maximum: int = -1): seq[string] =
     # Close the log file, read its lines, then delete the file.
-    if logFilename == "":
-      return
-    let logFilenameSave = logFilename
-    closeLogFile()
-    result = readLines(logFilenameSave, maximum)
-    discard tryRemoveFile(logFilenameSave)
+    let name = env.filename
+    if env.isOpen:
+      env.close()
+      result = readLines(name, maximum)
+      discard tryRemoveFile(name)

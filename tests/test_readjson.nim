@@ -18,7 +18,7 @@ proc testReadJson(filename: string, jsonContent: string, expectedVars: VarsDict,
       expectedWarnLines: seq[string] = @[], expectedLogLines: seq[string] = @[]) =
 
   openWarnStream(newStringStream())
-  openLogFile("_readJson.log")
+  var env = openLogFile("_readJson.log")
 
   var jsonFilename: string
   if filename == "":
@@ -33,7 +33,7 @@ proc testReadJson(filename: string, jsonContent: string, expectedVars: VarsDict,
 
   let warnLines = readAndClose()
   check warnLines == expectedWarnLines
-  var logLines = logReadDelete(20)
+  var logLines = env.closeReadDelete(20)
   check logLines == expectedLogLines
 
   check $vars == $expectedVars

@@ -4,6 +4,7 @@ import version
 import streams
 import strutils
 import logenv
+import options
 
 proc readAndClose(stream: Stream): seq[string] =
   ## Read the stream's lines then close it.
@@ -15,24 +16,44 @@ proc readAndClose(stream: Stream): seq[string] =
 suite "Test statictea.nim":
 
   test "main version":
+    let filename = "_logfile1.txt"
+    let mainFilename = "statictea.nim"
     var stdoutStream = newStringStream()
+    var env = openLogFile(filename)
+    check env.isOpen
+    check env.filename == filename
 
-    let rc = main(@["-v"], "_logfile1.txt", 2000, stdoutStream)
+    let rc = main(env, @["-v"], 2000, stdoutStream)
     check rc == 0
+    check env.isOpen
+    check env.filename == filename
 
     let output = readAndClose(stdoutStream)
     check output.len == 1
     check output[0] == $staticteaVersion
 
-    var logLines = logReadDelete(20)
+    let expectedMessages = [
+      "----- starting -----",
+      """argv: @["-v"]""",
+      "version: 0.1.0",
+      "Done",
+    ]
+    var logLines = env.closeReadDelete(20)
+    check logLines.len >= 4
     for line in logLines:
-      echo line
-
+      let logLineO = parseLine(line)
+      check logLineO.isSome
+      let logLine = logLineO.get()
+      check logLine.filename == mainFilename
+      check logLine.message in expectedMessages
 
   test "main help":
     var stdoutStream = newStringStream()
-    let rc = main(@["-h"], "_logfile1.txt", 2000, stdoutStream)
+    var env = openLogFile("_logfile2.txt")
+
+    let rc = main(env, @["-h"], 2000, stdoutStream)
     check rc == 0
+
     let output = readAndClose(stdoutStream)
     check output.len > 10
     let expected = """
@@ -51,3 +72,7 @@ SYNOPSIS
       echo expected
       echo "----"
       fail()
+
+    var logLines = env.closeReadDelete(20)
+    # for line in logLines:
+    #   echo line
