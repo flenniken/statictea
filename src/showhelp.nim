@@ -1,5 +1,5 @@
 ## Show help on the command line.
-import streams
+import env
 
 proc getHelp(): string =
   result = """
@@ -69,6 +69,6 @@ SEE ALSO
      For more information see https://github.com/flenniken/statictea
 """
 
-proc showHelp*(stream: Stream): int =
-  stream.writeLine(getHelp())
+proc showHelp*(env: Env): int =
+  env.writeLine(getHelp())
   result = 0

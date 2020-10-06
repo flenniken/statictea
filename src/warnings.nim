@@ -2,6 +2,7 @@
 
 import tpub
 import strutils
+import Streams
 
 # Add new warnings to the bottom so the warning numbers never change.
 type
@@ -59,3 +60,10 @@ func getWarning*(filename: string, lineNum: int,
   let warningCode = $ord(warning)
   let message = pattern % [p1, p2]
   result = "$1($2): w$3: $4" % [filename, $lineNum, warningCode, message]
+
+proc warn*(stream: Stream, filename: string, lineNum: int, warning: Warning,
+           p1: string = "", p2: string = "") =
+  ## Write the warning to the stream.
+  if stream == nil:
+    return
+  stream.writeLine(getWarning(filename, lineNum, warning, p1, p2))

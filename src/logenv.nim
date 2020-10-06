@@ -4,7 +4,6 @@ import warnenv
 import times
 import strutils
 import warnings
-import tpub
 import options
 import regex
 when defined(test):
@@ -29,52 +28,52 @@ func formatLine*(filename: string, lineNum: int, message: string, dt=now()):
   let dtString = formatDateTime(dt)
   result = "$1; $2($3); $4" % [dtString, filename, $lineNum, message]
 
-func isOpen*(env: LogEnv): bool =
+func isOpen*(logEnv: LogEnv): bool =
   ## Return true when the log file is open.
-  result = env.file != nil
+  result = logEnv.file != nil
 
-func isClosed*(env: LogEnv): bool =
+func isClosed*(logEnv: LogEnv): bool =
   ## Return true when the log file is closed.
-  result = env.file == nil
+  result = logEnv.file == nil
 
-func filename*(env: LogEnv): string =
+func filename*(logEnv: LogEnv): string =
   ## Return the log filename.
-  result = env.filename
+  result = logEnv.filename
 
-func getFileSize*(env: LogEnv): int64 =
-  result = env.file.getFileSize()
+func getFileSize*(logEnv: LogEnv): int64 =
+  result = logEnv.file.getFileSize()
 
-proc close*(env: var LogEnv) =
+proc close*(logEnv: var LogEnv) =
   ## Close the log file and set the filename to "". Do nothing when
   ## it's already closed.
-  if env.file != nil:
-    env.file.close()
-  env.file = nil
-  env.filename = ""
+  if logEnv.file != nil:
+    logEnv.file.close()
+  logEnv.file = nil
+  logEnv.filename = ""
 
-proc logLine(env: var LogEnv, filename: string, lineNum: int, message: string) {.tpub.} =
+proc logLine*(logEnv: var LogEnv, filename: string, lineNum: int, message: string) =
   ## Append a message to the log file. If there is an error writing,
   ## close the log. Do nothing when the log is closed.
-  if isClosed(env):
+  if isClosed(logEnv):
     return
   let line = formatLine(filename, lineNum, message)
   try:
     # raise newException(IOError, "test io error")
-    env.file.writeLine(line)
+    logEnv.file.writeLine(line)
   except:
     warn("logger", 0, wUnableToWriteLogFile, filename)
     warn("logger", 0, wExceptionMsg, getCurrentExceptionMsg())
     # The stack trace is only available in the debug builds.
     when not defined(release):
       warn("logger", 0, wStackTrace, getCurrentException().getStackTrace())
-    env.close()
+    logEnv.close()
 
-template log*(env: var LogEnv, message: string) =
+template log*(logEnv: var LogEnv, message: string) =
   ## Append the message to the log file. The current file and line
   ## becomes part of the message.
-  if env.isOpen:
+  if logEnv.isOpen:
     let info = instantiationInfo()
-    logLine(env, info.filename, info.line, message)
+    logLine(logEnv, info.filename, info.line, message)
 
 proc openLogFile*(filename: string): LogEnv =
   ## Open the log file for appending and return the LogEnv. If the
@@ -142,10 +141,10 @@ when defined(test):
       if count > maxLines:
         break
 
-proc closeReadDelete*(env: var LogEnv, maximum: int = -1): seq[string] =
+proc closeReadDelete*(logEnv: var LogEnv, maximum: int = -1): seq[string] =
     # Close the log file, read its lines, then delete the file.
-    let name = env.filename
-    if env.isOpen:
-      env.close()
+    let name = logEnv.filename
+    if logEnv.isOpen:
+      logEnv.close()
       result = readLines(name, maximum)
       discard tryRemoveFile(name)
