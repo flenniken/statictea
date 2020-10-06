@@ -25,10 +25,11 @@ proc testReadJson(filename: string, jsonContent: string, expectedVars: VarsDict,
     jsonFilename = filename
 
   var vars = getEmptyVars()
-  readJson(jsonFilename, vars)
+  readJson(env, jsonFilename, vars)
   discard tryRemoveFile(jsonFilename)
 
   let (logLines, errLines, outLines) = env.readCloseDelete()
+  # todo check log, err and out lines
 
   check $vars == $expectedVars
 

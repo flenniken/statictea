@@ -1,8 +1,7 @@
 ## Read json files.
 
 import warnings
-import warnenv
-# import logenv
+import env
 import tables
 import tpub
 import streams
@@ -48,31 +47,31 @@ proc jsonToValue(jsonNode: JsonNode, depth: int = 0): Option[Value] {.tpub.} =
     value = Value(kind: vkList, listv: listVars)
   result = some(value)
 
-proc readJson*(filename: string, vars: var VarsDict) =
+proc readJson*(env: Env, filename: string, vars: var VarsDict) =
   ## Read a json file and add the variables to the vars dictionary.
 
   if not fileExists(filename):
-    warn("read json", 0, wFileNotFound, filename)
+    env.warn("read json", 0, wFileNotFound, filename)
     return
 
   var stream: Stream
   stream = newFileStream(filename)
   if stream == nil:
-    warn("read json", 0, wUnableToOpenFile, filename)
+    env.warn("read json", 0, wUnableToOpenFile, filename)
     return
 
   var rootNode: JsonNode
   try:
      rootNode = parseJson(stream, filename)
   except:
-    warn("read json", 0, wJsonParseError, filename)
+    env.warn("read json", 0, wJsonParseError, filename)
     return
 
   if rootNode.kind != JObject:
-    warn("read json", 0, wInvalidJsonRoot, filename)
+    env.warn("read json", 0, wInvalidJsonRoot, filename)
     return
 
   for key, jnode in rootNode:
-    let option = jsonToValue(jnode)
-    assert option.isSome
-    vars[key] = option.get()
+    let valueO = jsonToValue(jnode)
+    assert valueO.isSome
+    vars[key] = valueO.get()

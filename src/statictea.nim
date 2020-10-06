@@ -12,6 +12,7 @@ import showhelp
 import version
 import tpub
 import env
+import os
 
 # todo: put the log in the standard log location, ie /var/log.
 # todo: always log!
@@ -27,7 +28,7 @@ proc processArgs(env: Env, args: Args): int =
   elif args.templateList.len > 0:
     result = processTemplate(env, args)
   else:
-    result = showHelp(env)
+    env.writeOut("Use -h for help.")
 
 proc main(env: var Env, argv: seq[string]): int {.tpub.} =
   ## Run statictea.

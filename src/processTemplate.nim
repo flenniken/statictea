@@ -15,10 +15,12 @@ proc processTemplate*(env: Env, args: Args): int =
     env.warn("starting", 0, wOneTemplateAllowed, skipping)
   echo "processing template"
 
+  # Read the server json.
   var serverVars = getEmptyVars()
   for filename in args.serverList:
-    readJson(filename, serverVars)
+    readJson(env, filename, serverVars)
 
+  # Read the shared json.
   var sharedVars = getEmptyVars()
   for filename in args.sharedList:
-    readJson(filename, sharedVars)
+    readJson(env, filename, sharedVars)

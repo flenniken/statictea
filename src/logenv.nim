@@ -141,10 +141,11 @@ when defined(test):
       if count > maxLines:
         break
 
-proc closeReadDelete*(logEnv: var LogEnv, maximum: int = -1): seq[string] =
-    # Close the log file, read its lines, then delete the file.
-    let name = logEnv.filename
-    if logEnv.isOpen:
-      logEnv.close()
-      result = readLines(name, maximum)
-      discard tryRemoveFile(name)
+when defined(test):
+  proc closeReadDelete*(logEnv: var LogEnv, maximum: int = -1): seq[string] =
+      # Close the log file, read its lines, then delete the file.
+      let name = logEnv.filename
+      if logEnv.isOpen:
+        logEnv.close()
+        result = readLines(name, maximum)
+        discard tryRemoveFile(name)
