@@ -70,5 +70,5 @@ SEE ALSO
 """
 
 proc showHelp*(env: Env): int =
-  env.writeLine(getHelp())
+  env.writeOut(getHelp())
   result = 0

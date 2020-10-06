@@ -16,15 +16,11 @@ import env
 # todo: put the log in the standard log location, ie /var/log.
 # todo: always log!
 
-const
-  logWarnSize: BiggestInt = 1024 * 1024 * 1024 ##/
-   ## Warn the user when the log file gets big.
-
 proc processArgs(env: Env, args: Args): int =
   if args.help:
     result = showHelp(env)
   elif args.version:
-    env.writeLine(staticteaVersion)
+    env.writeOut(staticteaVersion)
     result = 0
   elif args.update:
     echo "updateTemplate(args)"
@@ -33,18 +29,12 @@ proc processArgs(env: Env, args: Args): int =
   else:
     result = showHelp(env)
 
-proc main(env: var Env, argv: seq[string], logWarnSize: BiggestInt): int {.tpub.} =
+proc main(env: var Env, argv: seq[string]): int {.tpub.} =
   ## Run statictea.
 
   env.log("----- starting -----")
   env.log("argv: $1" % $argv)
   env.log("version: " & staticteaVersion)
-  let logSize = getFileSize(env.logEnv)
-  if logSize > logWarnSize:
-    let numStr = insertSep($logSize, ',')
-    let line = get_warning("startup", 0, wBigLogFile, staticteaLog, numStr)
-    env.log(line)
-    env.warn(line)
 
   # Setup control-c monitoring so ctrl-c stops the program.
   proc controlCHandler() {.noconv.} =
@@ -71,7 +61,7 @@ when isMainModule:
   var rc: int
   try:
     var env = openEnv()
-    rc = main(env, commandLineParams(), logWarnSize)
+    rc = main(env, commandLineParams())
     env.close()
   except:
     echo getCurrentExceptionMsg()

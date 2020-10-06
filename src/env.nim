@@ -2,10 +2,14 @@ import logenv
 import streams
 import warnings
 import os
+import strutils
 
 const
   staticteaLog* = "statictea.log" ## \
   ## Name of the default statictea log file.
+
+  logWarnSize: BiggestInt = 1024 * 1024 * 1024 ##/
+   ## Warn the user when the log file gets big.
 
 type
   Env* = object
@@ -13,27 +17,6 @@ type
     errStream*: Stream
     outStream*: Stream
     closeStreams: bool
-
-proc openEnv*(filename: string=""): Env =
-
-  var name: string
-  var closeStreams: bool
-  var err: Stream
-  var output: Stream
-  if filename == "":
-    name = staticteaLog
-    err = newFileStream(stderr)
-    output = newFileStream(stdout)
-    closeStreams = false
-  else:
-    name = filename
-    err = newStringStream()
-    output = newStringStream()
-    closeStreams = true
-
-  var log = openLogFile(name)
-  result = Env(logEnv: log, errStream: err, outStream: output,
-               closeStreams: closeStreams)
 
 proc close*(env: var Env) =
   env.logEnv.close()
@@ -54,8 +37,38 @@ proc warn*(env: Env, filename: string, lineNum: int, warning: Warning,
 proc warn*(env: Env, message: string) =
   env.errStream.writeLine(message)
 
-proc writeLine*(env: Env, message: string) =
+proc writeOut*(env: Env, message: string) =
   env.outStream.writeLine(message)
+
+proc checkLogSize(env: var Env) =
+  let logSize = getFileSize(env.logEnv)
+  if logSize > logWarnSize:
+    let numStr = insertSep($logSize, ',')
+    let line = get_warning("startup", 0, wBigLogFile, staticteaLog, numStr)
+    env.log(line)
+    env.warn(line)
+
+proc openEnv*(filename: string="", warnSize: BiggestInt=logWarnSize): Env =
+
+  var name: string
+  var closeStreams: bool
+  var err: Stream
+  var output: Stream
+  if filename == "":
+    name = staticteaLog
+    err = newFileStream(stderr)
+    output = newFileStream(stdout)
+    closeStreams = false
+  else:
+    name = filename
+    err = newStringStream()
+    output = newStringStream()
+    closeStreams = true
+
+  var log = openLogFile(name)
+  result = Env(logEnv: log, errStream: err, outStream: output,
+               closeStreams: closeStreams)
+  checkLogSize(result)
 
 when defined(test):
   proc readAndClose(stream: Stream): seq[string] =
@@ -71,3 +84,15 @@ when defined(test):
     result = (env.logEnv.closeReadDelete(20),
       env.errStream.readAndClose(), env.outStream.readAndClose())
     discard tryRemoveFile(env.logEnv.filename)
+
+  proc echoLines*(logLines, errLines, outLines: seq[string]) =
+    echo "=== log ==="
+    for line in logLines:
+      echo line
+    echo "=== err ==="
+    for line in errLines:
+      echo line
+    echo "=== out ==="
+    for line in outLines:
+      echo line
+    echo "==="

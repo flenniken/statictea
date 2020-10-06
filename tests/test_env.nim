@@ -24,7 +24,7 @@ suite "env.nim":
     let errMsg = "this is a warning"
     var env = openEnv("_test.log")
     testProc(env)
-    env.writeLine(outMsg)
+    env.writeOut(outMsg)
     env.warn(errMsg)
     var (logLines, errLines, outLines) = env.readCloseDelete()
 
@@ -40,3 +40,4 @@ suite "env.nim":
     check outLines.len == 1
     check outLines[0] == outMsg
 
+    # echoLines(logLines, errLines, outLines)

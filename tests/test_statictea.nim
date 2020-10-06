@@ -21,7 +21,7 @@ suite "Test statictea.nim":
     let mainFilename = "statictea.nim"
     var env = openEnv(filename)
 
-    let rc = main(env, @["-v"], 2000)
+    let rc = main(env, @["-v"])
     check rc == 0
 
     let (logLines, errLines, outLines) = env.readCloseDelete()
@@ -48,7 +48,7 @@ suite "Test statictea.nim":
     let mainFilename = "statictea.nim"
     var env = openEnv(filename)
 
-    let rc = main(env, @["-h"], 2000)
+    let rc = main(env, @["-h"])
     check rc == 0
 
     let (logLines, errLines, outLines) = env.readCloseDelete()
