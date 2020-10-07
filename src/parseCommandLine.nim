@@ -19,7 +19,6 @@ const
     ('r', "result"),
     ('u', "update"),
     ('p', "prepost"),
-    ('n', "nolog"),
   ]
 
 
@@ -72,7 +71,7 @@ proc parsePrepost(str: string): (Prepost, string) {.tpub.} =
 
 proc handleWord(switch: string, word: string, value: string,
     help: var bool, version: var bool, update: var bool,
-    nolog: var bool, resultFilename: var string,
+    resultFilename: var string,
     filenames: var array[4, seq[string]], prepostList: var seq[Prepost]) =
   ## Handle one switch and return its value.  Switch is the key from
   ## the command line, either a word or a letter.  Word is the long
@@ -107,8 +106,6 @@ proc handleWord(switch: string, word: string, value: string,
       if extra != "":
         warn("cmdline", 0, wSkippingExtraPrepost, extra)
       prepostList.add(prepost)
-  elif word == "nolog":
-    nolog = true
   else:
     warn("cmdline", 0, wUnknownSwitch, $switch)
 
@@ -119,7 +116,6 @@ proc parseCommandLine*(argv: seq[string]): Args =
   var help: bool = false
   var version: bool = false
   var update: bool = false
-  var nolog: bool = false
   var filenames: array[4, seq[string]]
   var optParser = initOptParser(argv)
   var resultFilename: string
@@ -136,10 +132,10 @@ proc parseCommandLine*(argv: seq[string]): Args =
             warn("cmdline", 0, wUnknownSwitch, $letter)
           else:
             handleWord($letter, word, value, help, version, update,
-                 nolog, resultFilename, filenames, prepostList)
+                 resultFilename, filenames, prepostList)
 
       of CmdLineKind.cmdLongOption:
-        handleWord(key, key, value, help, version, update, nolog,
+        handleWord(key, key, value, help, version, update,
                    resultFilename, filenames, prepostList)
 
       of CmdLineKind.cmdArgument:
@@ -151,7 +147,6 @@ proc parseCommandLine*(argv: seq[string]): Args =
   result.help = help
   result.version = version
   result.update = update
-  result.nolog = nolog
   result.serverList = filenames[0]
   result.sharedList = filenames[1]
   result.templateList = filenames[2]

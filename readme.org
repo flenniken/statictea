@@ -8,7 +8,7 @@ Example template:
 
 #+BEGIN_SRC
 <!--$ nextline -->
-hello {name}
+hello {v.name}
 #+END_SRC
 
 The associated json data:
@@ -107,10 +107,10 @@ template:
 
 #+BEGIN_SRC
 <!--$ nextline -->
-Drink {drink} -- {drinkType} is my favorite.
+Drink {v.drink} -- {v.drinkType} is my favorite.
 #+END_SRC
 
-json:
+server json:
 
 #+BEGIN_SRC
 {
@@ -140,11 +140,11 @@ template:
 #+BEGIN_SRC
 <!--$ block -->
 Join our tea party on {weekday} at
-{name}'s house at {time}.
+{v.name}'s house at {v.time}.
 <!--$ endblock -->
 #+END_SRC
 
-json:
+server json:
 
 #+BEGIN_SRC
 {
@@ -185,7 +185,7 @@ template:
 <!--$ endreplace -->
 #+END_SRC
 
-json:
+shared json:
 
 #+BEGIN_SRC
 {
@@ -236,20 +236,34 @@ template:
 #+BEGIN_SRC
 <!--$ replace t.content=s.header -->
 <!DOCTYPE html>
-<html lang="{languageCode}" dir="{languageDirection}">
+<html lang="{v.languageCode}" dir="{v.languageDirection}">
 <head>
 <meta charset="UTF-8"/>
-<title>{title}</title>
+<title>{v.title}</title>
 <--$ endreplace -->
 #+END_SRC
 
-json:
+server json:
 
 #+BEGIN_SRC
 {
 "languageCode": "en",
 "languageDirection": "ltr",
 "title": "Teas in England"
+}
+#+END_SRC
+
+shared json:
+
+#+BEGIN_SRC
+{
+  "header": """\
+    <!DOCTYPE html>
+    <html lang="{v.languageCode}" dir="{v.languageDirection}">
+    <head>
+    <meta charset="UTF-8"/>
+    <title>{v.title}</title>
+  """
 }
 #+END_SRC
 
@@ -378,11 +392,11 @@ example strings:
 example usage:
 
 #+BEGIN_SRC
-<!--$ nextline message=t.if(admin, 'Earl Grey', 'Jasmine') -->
-<h2>{message}</h2>
+<!--$ nextline message=t.if(v.admin, 'Earl Grey', 'Jasmine') -->
+<h2>{v.message}</h2>
 #+END_SRC
 
-json:
+server json:
 
 #+BEGIN_SRC
 {
@@ -413,7 +427,18 @@ Example numbers:
 
 *** Float
 
-A float is a real number.  float64.
+A float is a 64 bit real number. Like integers a float is
+converted to a string when passed to a function takeing a sring.
+A float has a decial point.
+
+Example floats:
+
+#+BEGIN_SRC
+3.14159
+24.95
+.123
+-34.0
+#+END_SRC
 
 *** Dictionary
 
@@ -426,8 +451,8 @@ You can fetch items from lists defined in json files with t.get.
 
 ** Variables
 
-You use variables to format content for a block and to control how a command
-works.
+You use variables to format content for a block and to control
+how a command works.
 
 You specify variables in json files or you create them in
 template statements.
@@ -437,16 +462,28 @@ the variable name and the item value becomes the variable value.
 
 Internally two json namespaces exist, one for the server json and
 one for the shared json.  You access the shared json variables
-with the "s." prefix. No prefix for the the server variables.
+with the "s." prefix, and the v prefix for the the server
+variables, no prefix for the local variables.
 
 Variables defined in the template are local to the block where
 they are defined. Local variables take precedence over the
 json variables.
 
+Variables defined in templates can add t, v, s vars to the local
+vars which overrides the others.  You can only override some t
+vars.
+
 The variables are processed from left to right, so the last one
 takes precedence when there are duplicates.
 
-example variables:
+Prefixes:
+
+- t. -- System variables, tea vars
+- v. -- Server varaibles
+- s. -- Shared variables
+- no prefix -- Local variables
+
+Example variables:
 
 #+BEGIN_SRC
 mytea
@@ -494,11 +531,11 @@ variable which outputs the block five times.
 template:
 
 #+BEGIN_SRC
-<!--$ nextline t.list = tea_list -->
+<!--$ nextline t.list = v.tea_list -->
   * {tea}
 #+END_SRC
 
-json:
+server json:
 
 #+BEGIN_SRC
 {
@@ -530,13 +567,13 @@ template:
 #+BEGIN_SRC
 <h4>Tea Companies</h3>
 <select>
-<!--$ nextline t.list=companyList; \-->
-<!--$ : current=t.if(selected, ' selected="selected"', "") -->
-  <option{current}>{company}</option>
+<!--$ nextline t.list=v.companyList; \-->
+<!--$ : current=t.if(v.selected, ' selected="selected"', "") -->
+  <option{v.current}>{v.company}</option>
 </select>
 #+END_SRC
 
-json:
+server json:
 
 #+BEGIN_SRC
 {
@@ -569,7 +606,6 @@ result:
 
 The t.local variable is the dictionary of local variables for the
 current command. It is recalculated for each item in the list.
-How do you override shared vars? Allow s.var?
 
 *** t.maxlines
 
@@ -611,8 +647,8 @@ template:
 #+BEGIN_SRC
 <h3>Tea</h3>
 <ul>
-<!--$ nextline t.list = teaList -->
-  <li>{tea}</li>
+<!--$ nextline t.list = v.teaList -->
+  <li>{v.tea}</li>
 </ul>
 #+END_SRC
 
@@ -636,7 +672,7 @@ template:
 </ul>
 #+END_SRC
 
-json:
+server json:
 
 #+BEGIN_SRC
 {
@@ -696,6 +732,7 @@ List of functions:
 - t.format() -- format a string
 - t.if() -- if function
 - t.len() -- length of string
+- t.quoteHtml -- replace html special characters
 - t.row() -- special function that returns the current row
 - t.substr() -- extract a substring from a string by indexes
 - t.version() -- the current version and version checker
@@ -723,13 +760,13 @@ template:
 #+BEGIN_SRC
 <--$ nextline \-->
 <--$ : abbr = t.case( \-->
-<--$ : tea, "unknown",  \-->
+<--$ : v.tea, "unknown",  \-->
 <--$ : 'Darjeeling', "Darj",  \-->
 <--$ : "Earl Gray", "EG") -->
-The abbreviation for {tea} is {abbr}.
+The abbreviation for {v.tea} is {v.abbr}.
 #+END_SRC
 
-json:
+server json:
 
 #+BEGIN_SRC
 {
@@ -767,12 +804,12 @@ otherwise it's Earl Gray.  Eary Grey wins ties.
 template:
 
 #+BEGIN_SRC
-<!--$ nextline sold = t.cmp(earlgrey, oolong); \-->
-<!--$ : bestSelling = t.case(sold, earlgreyName, 1, oolongName) -->
-The best selling tea this week is {bestSelling}.
+<!--$ nextline sold = t.cmp(v.earlgrey, v.oolong); \-->
+<!--$ : bestSelling = t.case(v.sold, v.earlgreyName, 0, v.oolongName) -->
+The best selling tea this week is {v.bestSelling}.
 #+END_SRC
 
-json:
+server json:
 
 #+BEGIN_SRC
 {
@@ -899,10 +936,10 @@ template:
 
 #+BEGIN_SRC
 <--$ nextline -->
-Kathleen spent ${cost:.2f} on tea for Steve's birthday.
+Kathleen spent ${v.cost:.2f} on tea for Steve's birthday.
 #+END_SRC
 
-json:
+server json:
 
 #+BEGIN_SRC
 {
@@ -971,11 +1008,12 @@ Here is an example using the row variable.
 template:
 
 #+BEGIN_SRC
-<!--$ nextline t.list=companies -->
-  <li id="r{t.row(0)}>{t.row(1)}. {teaCompany}</li>
+<!--$ nextline t.list=v.companies \-->
+<!--$ : id = row(0); num = run(1) -->
+  <li id="r{id}>{num}. {v.teaCompany}</li>
 #+END_SRC
 
-json:
+server json:
 
 #+BEGIN_SRC
 {
@@ -1139,8 +1177,8 @@ When you specify multiple files on the command line, they get
 added to the dictionary from left to right so the last duplicate
 variable wins.
 
-The json null values get converted to the string "null". Json
-True and False get converted to ints 1 and 0.
+The json null values get converted to the 0. Json True and False
+get converted to 1 and 0.
 
 You cannot change the json variables but you can define local
 variables of the same name and they take precedent.
@@ -1216,10 +1254,10 @@ template:
 
 #+BEGIN_SRC
 <!--$ nextline -->
-You're a {webmaster}, I'm a {teaMaster}!
+You're a {v.webmaster}, I'm a {v.teaMaster}!
 #+END_SRC
 
-json:
+server json:
 
 #+BEGIN_SRC
 {
@@ -1230,13 +1268,13 @@ json:
 stderr:
 
 #+BEGIN_SRC
-template.html(2): w1: Unknown server variable: teaMaster
+template.html(2): w1: Unknown server variable: v.teaMaster
 #+END_SRC
 
 result:
 
 #+BEGIN_SRC
-You're a html wizard, I'm a {teaMaster}!
+You're a html wizard, I'm a {v.teaMaster}!
 #+END_SRC
 
 You can write your own warning messages using the system t.result
@@ -1254,12 +1292,10 @@ warning: the admin variable is missing
 
 ** Log File
 
-The optional log file contains timing, memory usage and low
-priority warnings. When the option is used without specifying a
-file, statictea.log is created in the current folder and each run
-overwrites the file.  When a file is specified, log information
-is appended to the file and it grows without bounds. Make sure to
-setup log rotate when using it this way.
+The log file contains timing, memory usage and low priority
+warnings. Statictea.log is created in the current folder.  Log
+information is appended to the file and it grows without
+bounds. Make sure to setup log rotation.
 
 ** Run StaticTea
 
@@ -1288,8 +1324,6 @@ The StaticTea command line options:
 - result - the result file.
 - update - update the template replace blocks.
 - prepost - add a command prefix and postfix, you can specify multiple.
-- noLog - disable logging. The default logs to statictea.log in
-  the system log folder.
 
 ** StaticTea as a Filter
 
@@ -1305,7 +1339,7 @@ using those files and the result goes to the screen.
 # create template file
 cat <<EOF >template.txt
 <!--$ nextline -->
-hello {name}
+hello {v.name}
 EOF
 
 # create server json file
@@ -1322,7 +1356,7 @@ like:
 #+BEGIN_SRC
 $ cat <<EOF >template.txt
 > <!--$ nextline -->
-> hello {name}
+> hello {v.name}
 > EOF
 $
 $ cat <<EOF >server.json
@@ -1385,9 +1419,9 @@ example ellipsizes when a name is longer than 10 characters.
 <!--$ # If the name is longer than 10 characters, -->
 <!--$ # clip it to 7 and add "...".               -->
 <!--$ nextline                                   \-->
-<!--$ : cmp = t.cmp(len(name), 10);              \-->
-<!--$ : name = t.case(cmd, name                  \-->
-<!--$ : 1, t.concat(substr(name, 0, 7), "..."))   -->
+<!--$ : cmp = t.cmp(len(v.name), 10);            \-->
+<!--$ : name = t.case(cmd, v.name                \-->
+<!--$ : 1, t.concat(substr(v.name, 0, 7), "...")) -->
 #+END_SRC
 
 ** System Defaults
@@ -1395,9 +1429,6 @@ example ellipsizes when a name is longer than 10 characters.
 You can use the system variables in a replacement block to see
 their default values. The following example shows the default
 values of some of the system variables.
-
-The next example shows the default values of some system
-variables.
 
 template:
 
@@ -1424,10 +1455,3 @@ equaling all others – including coffee, soft drinks, and alcohol
 – combined. -- Wikipedia -- Macfarlane, Alan; Macfarlane, Iris
 (2004). The Empire of Tea. The Overlook Press. p. 32. ISBN
 978-1-58567-493-0.
-
-** TODO
-- Is leading whitespace prefixes needed?
-- document bracketed replacements to generalize them to include a
-  format specifier
-- format date and time values
-- add commas to big numbers

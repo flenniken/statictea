@@ -11,7 +11,6 @@ proc tpcl(
     version: bool=false,
     help: bool=false,
     update: bool=false,
-    nolog: bool=false,
     resultFilename: string = "",
     serverList: seq[string] = @[],
     sharedList: seq[string] = @[],
@@ -28,7 +27,6 @@ proc tpcl(
   check(args.help == help)
   check(args.version == version)
   check(args.update == update)
-  check(args.nolog == nolog)
   check(args.serverList == serverList)
   check(args.sharedList == sharedList)
   check(args.templateList == templateList)
@@ -107,12 +105,6 @@ suite "Test statictea.nim":
 
   test "parseCommandLine-result":
     tpcl("--result=result.html", resultFilename = "result.html")
-
-  test "parseCommandLine-n":
-    tpcl("-n", nolog=true)
-
-  test "parseCommandLine-nolog":
-    tpcl("--nolog", nolog=true)
 
   test "parseCommandLine-happy-path":
     tpcl("-s=server.json -j=shared.json -t=tea.html -r=result.html",
