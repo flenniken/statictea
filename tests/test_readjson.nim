@@ -6,11 +6,7 @@ import readjson
 import os
 import json
 import options
-
-proc createFile(filename: string, content: string) =
-  var file = open(filename, fmWrite)
-  file.write(content)
-  file.close()
+import testutils
 
 proc testReadJson(filename: string, jsonContent: string, expectedVars: VarsDict,
       expectedWarnLines: seq[string] = @[], expectedLogLines: seq[string] = @[]) =

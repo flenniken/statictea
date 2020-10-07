@@ -14,7 +14,6 @@ import tpub
 import env
 
 # todo: put the log in the standard log location, ie /var/log.
-# todo: always log!
 
 proc processArgs(env: Env, args: Args): int =
   if args.help:
