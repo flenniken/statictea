@@ -8,61 +8,64 @@ import json
 import options
 import testutils
 
-proc testReadJson(filename: string, jsonContent: string, expectedVars: VarsDict,
-      expectedWarnLines: seq[string] = @[], expectedLogLines: seq[string] = @[]) =
+proc testReadJsonFile(filename: string, expectedVars: VarsDict,
+    expectedLogLines: seq[string] = @[],
+    expectedErrLines: seq[string] = @[],
+    expectedOutLines: seq[string] = @[] ) =
 
   var env = openEnv("_readJson.log")
 
-  var jsonFilename: string
-  if filename == "":
-    jsonFilename = "_readJson.json"
-    createFile(jsonFilename, jsonContent)
-  else:
-    jsonFilename = filename
-
   var vars = getEmptyVars()
-  readJson(env, jsonFilename, vars)
-  discard tryRemoveFile(jsonFilename)
+  readJson(env, filename, vars)
 
   let (logLines, errLines, outLines) = env.readCloseDelete()
-  # todo check log, err and out lines
-
+  check expectedLogLines == logLines
+  check expectedErrLines == errLines
+  check expectedoutLines == outLines
   check $vars == $expectedVars
 
-  discard tryRemoveFile(jsonFilename)
 
+proc testReadJsonContent(jsonContent: string, expectedVars: VarsDict,
+    expectedLogLines: seq[string] = @[],
+    expectedErrLines: seq[string] = @[],
+    expectedOutLines: seq[string] = @[] ) =
+
+  var filename = "_readJson.json"
+  createFile(filename, jsonContent)
+  defer: discard tryRemoveFile(filename)
+  testReadJsonFile(filename, expectedVars, expectedLogLines,
+                   expectedErrLines, expectedOutLines)
 
 suite "readjson.nim":
 
   test "readJson file not found":
-    var jsonNode = newJObject()
-    let expectedWarnLines = @["read json(0): w16: File not found: missing."]
+    let expectedErrLines = @["read json(0): w16: File not found: missing."]
     var expectedValue = getEmptyVars()
-    testReadJson("missing", "{}", expectedValue, expectedWarnLines=expectedWarnLines)
+    testReadJsonFile("missing", expectedValue, expectedErrLines=expectedErrLines)
 
   test "readJson cannot open file":
-    let expectedWarnLines =
+    let expectedErrLines =
       @["read json(0): w17: Unable to open file: _cannotopen.tmp."]
     let expectedValue = getEmptyVars()
     let filename = "_cannotopen.tmp"
     createFile(filename, "temp")
     setFilePermissions(filename, {fpUserWrite, fpGroupWrite})
-    testReadJson(filename, "{}", expectedValue, expectedWarnLines=expectedWarnLines)
+    testReadJsonFile(filename, expectedValue, expectedErrLines=expectedErrLines)
 
   test "readJson parse error":
-    let expectedWarnLines = @["read json(0): w15: Unable to parse the json file. Skipping file: _readJson.json."]
+    let expectedErrLines = @["read json(0): w15: Unable to parse the json file. Skipping file: _readJson.json."]
     let expectedValue = getEmptyVars()
-    testReadJson("", "{", expectedValue, expectedWarnLines=expectedWarnLines)
+    testReadJsonContent("{", expectedValue, expectedErrLines=expectedErrLines)
 
   test "readJson no root object":
-    let expectedWarnLines = @["read json(0): w14: The root json element must be an object. Skipping file: _readJson.json."]
+    let expectedErrLines = @["read json(0): w14: The root json element must be an object. Skipping file: _readJson.json."]
     let expectedValue = getEmptyVars()
-    testReadJson("", "[5]", expectedValue, expectedWarnLines=expectedWarnLines)
+    testReadJsonContent("[5]", expectedValue, expectedErrLines=expectedErrLines)
 
   test "readJson a=5":
     var expectedValue = getEmptyVars()
     expectedValue["a"] = Value(kind: vkInt, intv: 5)
-    testReadJson("", """{"a": 5}""", expectedValue)
+    testReadJsonContent("""{"a": 5}""", expectedValue)
 
   test "jsonToValue int":
     let jsonNode = newJInt(5)
@@ -152,3 +155,39 @@ suite "readjson.nim":
     let value = option.get()
     check value.dictv.len == 0
     check $value == "{}"
+
+  test "tea list":
+    let content = """
+{
+  "teaList": [
+    {"tea": "Chamomile"},
+    {"tea": "Chrysanthemum"},
+    {"tea": "White"},
+    {"tea": "Puer"}
+  ]
+}"""
+    var expectedValue = getEmptyVars()
+    var listValues: seq[Value]
+    let teaList = ["Chamomile", "Chrysanthemum", "White", "Puer"]
+    for tea in teaList:
+      let value = Value(kind: vkString, stringv: tea)
+      var dv: VarsDict
+      dv["tea"] = value
+      let listValue = Value(kind: vkDict, dictv: dv)
+      listValues.add(listValue)
+    expectedValue["teaList"] = Value(kind: vkList, listv: listValues)
+
+    testReadJsonContent(content, expectedValue)
+
+# todo: test depth limit
+# todo: test multiple json files
+# todo: test long variable names
+# todo: test variables dots
+# todo: test long strings
+# todo: test big ints
+# todo: test big floats
+# todo: test scientific notation floats
+# todo: test duplicate variables
+# todo: test long lists
+# todo: test long dicts
+# todo: test list with different types of values

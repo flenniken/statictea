@@ -14,6 +14,7 @@ suite "processTemplate.nim":
 
     let content = "Hello"
     createFile(filename, content)
+    defer: discard tryRemoveFile(filename)
 
     var args: Args
     args.templateList = @["template.html"]
@@ -21,6 +22,7 @@ suite "processTemplate.nim":
     check rc == 0
 
     let (logLines, errLines, outLines) = env.readCloseDelete()
-    echoLines(logLines, errLines, outLines)
+    check logLines.len == 0
+    check errLines.len == 0
+    check outLines.len == 0
 
-    discard tryRemoveFile(filename)
