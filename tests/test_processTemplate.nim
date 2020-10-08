@@ -10,11 +10,11 @@ suite "processTemplate.nim":
 
   test "processTemplate":
     var env = openEnv("_processTemplate.log")
-    let filename = "template.html"
 
+    let templateFilename = "template.html"
     let content = "Hello"
-    createFile(filename, content)
-    defer: discard tryRemoveFile(filename)
+    createFile(templateFilename, content)
+    defer: discard tryRemoveFile(templateFilename)
 
     var args: Args
     args.templateList = @["template.html"]

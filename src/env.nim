@@ -4,6 +4,8 @@ import warnings
 import os
 import strutils
 
+# todo: count the number of warnings written to errStream.
+
 const
   staticteaLog* = "statictea.log" ## \
   ## Name of the default statictea log file.
