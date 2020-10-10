@@ -12,7 +12,6 @@ import showhelp
 import version
 import tpub
 import env
-import os
 
 # todo: put the log in the standard log location, ie /var/log.
 

@@ -1,5 +1,4 @@
 
-import strutils
 import unittest
 import processTemplate
 import env
@@ -7,7 +6,6 @@ import args
 import testutils
 import os
 import logenv
-import tables
 
 # todo: test line endings on Windows
 

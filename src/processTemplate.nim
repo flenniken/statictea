@@ -8,9 +8,7 @@ import readjson
 import streams
 import vartypes
 import os
-import regex
-import tables
-import tpub
+import prepost
 
 proc processCmd(env: Env, templateStream: Stream, resultStream: Stream,
                 serverVars: VarsDict, sharedVars: VarsDict, prefix: string) =

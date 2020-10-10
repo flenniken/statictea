@@ -52,7 +52,7 @@ tpubType:
       "File not found: $1.", # wFileNotFound
       "Unable to open file: $1.", # wUnableToOpenFile
       "Setup log rotation for $1 which has $2 bytes.", # wBigLogFile
-      "Unable to open standard device: $1", # wCannotOpenStd
+      "Unable to open standard device: $1.", # wCannotOpenStd
     ]
 
 func getWarning*(filename: string, lineNum: int,

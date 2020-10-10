@@ -3,7 +3,7 @@ import unittest
 import prepost
 import args
 import tables
-import strutils
+# import strutils
 
 suite "prepost.nim":
 
