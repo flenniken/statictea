@@ -8,11 +8,27 @@ import readjson
 import streams
 import vartypes
 import os
+import regex
+import tables
+import tpub
+
+proc processCmd(env: Env, templateStream: Stream, resultStream: Stream,
+                serverVars: VarsDict, sharedVars: VarsDict, prefix: string) =
+  return
 
 proc processTemplate(env: Env, templateStream: Stream, resultStream: Stream,
-    serverVars: VarsDict, sharedVars: VarsDict) =
+    serverVars: VarsDict, sharedVars: VarsDict, prepostList: seq[Prepost]) =
   ## Process the given template file.
-  resultStream.writeLine("template result")
+
+  initPrepost(prepostList)
+
+  for line in templateStream.lines():
+    let prefix = isPrefixLine(line)
+    if prefix != "":
+      processCmd(env, templateStream, resultStream, serverVars,
+                 sharedVars, prefix)
+    else:
+      resultStream.writeLine(line)
 
 proc processTemplate*(env: Env, args: Args): int =
   ## Process the template and return 0 on success.
@@ -52,17 +68,15 @@ proc processTemplate*(env: Env, args: Args): int =
 
   var resultStream: Stream
   if args.resultFilename == "":
-    resultStream = newFileStream(stdout)
-    if resultStream == nil:
-      env.warn("startup", 0, wCannotOpenStd, "stdout")
-      return 1
+    resultStream = env.outStream
   else:
     resultStream = newFileStream(args.resultFilename, fmWrite)
     if resultStream == nil:
       env.warn("startup", 0, wUnableToOpenFile, args.resultFilename)
       return 1
 
-  processTemplate(env, templateStream, resultStream, serverVars, sharedVars)
+  processTemplate(env, templateStream, resultStream, serverVars,
+    sharedVars, args.prepostList)
 
   if args.resultFilename != "":
     resultStream.close()

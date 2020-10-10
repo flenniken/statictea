@@ -20,11 +20,26 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 import re
 
-proc getPattern*(reString: string): Regex =
+type
+  Pattern* = Regex
+
+proc getPattern*(reString: string): Pattern =
+  ## Compile the regular expression string and return a pattern used
+  ## with match and matches.
   result = re(reString)
 
-proc match*(str: string, pattern: Regex): bool =
+proc match*(str: string, pattern: Pattern): bool =
+  ## Return true when the string matches the pattern.
   result = str =~ pattern
 
-proc matches*(str: string, pattern: Regex, groups: var openArray[string]): bool =
+proc matches*(str: string, pattern: Pattern, groups: var openArray[string]): bool =
+  ## Return true when the string matches the pattern and fill in the
+  ## groups array with the groups found. Usage:
+  ##
+  ## let pattern = getPattern(r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$")
+  ## var groups: array[3, string]
+  ## check matches("5.67.8", pattern, groups)
+  ## check groups[0] == "5"
+  ## check groups[1] == "67"
+  ## check groups[2] == "8"
   result = match(str, pattern, groups)

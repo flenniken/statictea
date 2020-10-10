@@ -1136,10 +1136,11 @@ commands and space for normal comments.
 Built in Prefixes:
 
 - '<!--$' '-->' - for html
-- '/!--$' '--*\slash{}' - for javascript in html
 - '&lt;!--$' '--&gt;' - for html textarea elements
 - '#$' - for bash scripts and others
 - ';$' - for config files and others
+- '//$' - for c++
+- '/*$' '*/' - for c
 
 You can define other comment types on the command line using the
 prepost option one or more times.
@@ -1407,8 +1408,9 @@ the limits:
 ** Encoding and Line Endings
 
 Templates are utf-8 encoded or its ascii subset.  Three line
-endings are supported on all platforms: LF, CR LF, or CR.
-The template syntax only uses ascii.
+endings are supported on all platforms: LF, CR LF, or CR. Any
+style is read and the platform style is written.  The template
+syntax only uses ascii.
 
 ** Ellipsize
 
