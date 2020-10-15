@@ -9,6 +9,7 @@ import streams
 import vartypes
 import os
 import prepost
+import readlines
 
 proc processCmd(env: Env, templateStream: Stream, resultStream: Stream,
                 serverVars: VarsDict, sharedVars: VarsDict, prefix: string) =
@@ -20,13 +21,14 @@ proc processTemplate(env: Env, templateStream: Stream, resultStream: Stream,
 
   initPrepost(prepostList)
 
-  for line in templateStream.lines():
-    let prefix = isPrefixLine(line)
-    if prefix != "":
-      processCmd(env, templateStream, resultStream, serverVars,
-                 sharedVars, prefix)
-    else:
-      resultStream.writeLine(line)
+  for line, ascii in readline(templateStream):
+    if ascii:
+      let prefix = isPrefixLine(line)
+      if prefix != "":
+        processCmd(env, templateStream, resultStream, serverVars,
+                   sharedVars, prefix)
+        continue
+    resultStream.write(line)
 
 proc processTemplate*(env: Env, args: Args): int =
   ## Process the template and return 0 on success.
