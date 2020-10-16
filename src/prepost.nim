@@ -3,6 +3,7 @@ import strutils
 import args
 import regex
 import tables
+import options
 
 const
   predefined: array[6, Prepost] = [
@@ -40,16 +41,15 @@ proc initPrepost*(prepostList: seq[Prepost]) =
     prepostTable[prepost.pre] = prepost.post
   prefixPattern = getPattern("($1)" % terms.join("|"))
 
-proc isPrefixLine*(line: string): string =
-  ## Determine whether the line starts with a prefix. Return the
-  ## prefix matched. Return "" when not a prefix line.
+proc getPrefix*(line: string): Option[string] =
+  ## Return the prefix that starts the line, if it exists.
   assert prefixPattern != nil, "Call initPrepost first."
   var groups: array[1, string]
   if matches(line, prefixPattern, groups):
-    result = groups[0]
+    result = some(groups[0])
 
-proc getPostfix*(prefix: string): string =
+proc getPostfix*(prefix: string): Option[string] =
   ## Return the postfix associated with the given prefix.
   assert prepostTable.len != 0, "Call initPrepost first."
-  assert prefix in prepostTable, "The string is not a prefix."
-  result = prepostTable.getOrDefault(prefix, "")
+  if prefix in prepostTable:
+    result = some(prepostTable[prefix])

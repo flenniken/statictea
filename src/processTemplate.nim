@@ -10,6 +10,7 @@ import vartypes
 import os
 import prepost
 import readlines
+import options
 
 proc processCmd(env: Env, templateStream: Stream, resultStream: Stream,
                 serverVars: VarsDict, sharedVars: VarsDict, prefix: string) =
@@ -23,10 +24,10 @@ proc processTemplate(env: Env, templateStream: Stream, resultStream: Stream,
 
   for line, ascii in readline(templateStream):
     if ascii:
-      let prefix = isPrefixLine(line)
-      if prefix != "":
+      let prefixO = getPrefix(line)
+      if prefixO.isSome:
         processCmd(env, templateStream, resultStream, serverVars,
-                   sharedVars, prefix)
+                   sharedVars, prefixO.get())
         continue
     resultStream.write(line)
 

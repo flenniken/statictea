@@ -3,7 +3,7 @@ import unittest
 import prepost
 import args
 import tables
-# import strutils
+import options
 
 suite "prepost.nim":
 
@@ -24,10 +24,10 @@ suite "prepost.nim":
 # todo: test one letter prefix.
 # todo: test getPostfix
 
-  test "isPrefixLine":
-    check isPrefixLine("<--!$ nextline -->") == "<--!$"
-    check isPrefixLine("#$ nextline") == "#$"
-    check isPrefixLine(";$ nextline") == ";$"
-    check isPrefixLine("//$ nextline") == "//$"
-    check isPrefixLine("/*$ nextline */") == "/*$"
-    check isPrefixLine("&lt;!--$ nextline --&gt;") == "&lt;!--$"
+  test "getPrefix":
+    check getPrefix("<--!$ nextline -->").get() == "<--!$"
+    check getPrefix("#$ nextline").get() == "#$"
+    check getPrefix(";$ nextline").get() == ";$"
+    check getPrefix("//$ nextline").get() == "//$"
+    check getPrefix("/*$ nextline */").get() == "/*$"
+    check getPrefix("&lt;!--$ nextline --&gt;").get() == "&lt;!--$"

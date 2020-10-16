@@ -56,15 +56,3 @@ iterator readline*(stream: Stream, maxLineLen: int = maxLineLen,
   # Output the last line, if any.
   if line.len > 0:
     yield((line, ascii))
-
-
-
-when defined(test):
-  type
-    TGenericSeq = object
-      len, reserved: int
-    PGenericSeq = ptr TGenericSeq
-
-  proc getCap*[T](s: seq[T]): int =
-    ## Return the capacity of the sequence.
-    result = cast[PGenericSeq](s).reserved
