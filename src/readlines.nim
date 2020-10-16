@@ -24,9 +24,9 @@ iterator readline*(stream: Stream, maxLineLen: int = maxLineLen,
   ## cannot tell whether the line was truncated or not without reading
   ## the next line. The ascii return value is true when all the bytes
   ## in the line are ascii (no high bit set).  The maxLineLen must be
-  ## greater than 8 and lessthan or equal to bufferSize.
+  ## greater than or equal to 8 and less than or equal to bufferSize.
 
-  assert maxLineLen > 8
+  assert maxLineLen >= 8
   assert maxLineLen <= bufferSize
 
   var buffer: string
