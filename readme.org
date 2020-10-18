@@ -8,7 +8,7 @@ Example template:
 
 #+BEGIN_SRC
 <!--$ nextline -->
-hello {v.name}
+hello {s.name}
 #+END_SRC
 
 The associated json data:
@@ -107,7 +107,7 @@ template:
 
 #+BEGIN_SRC
 <!--$ nextline -->
-Drink {v.drink} -- {v.drinkType} is my favorite.
+Drink {s.drink} -- {s.drinkType} is my favorite.
 #+END_SRC
 
 server json:
@@ -139,8 +139,8 @@ template:
 
 #+BEGIN_SRC
 <!--$ block -->
-Join our tea party on {weekday} at
-{v.name}'s house at {v.time}.
+Join our tea party on {s.weekday} at
+{s.name}'s house at {s.time}.
 <!--$ endblock -->
 #+END_SRC
 
@@ -181,7 +181,7 @@ The following example shares a common header between templates.
 template:
 
 #+BEGIN_SRC
-<!--$ replace t.content=s.header -->
+<!--$ replace t.content=h.header -->
 <!--$ endreplace -->
 #+END_SRC
 
@@ -210,7 +210,7 @@ data from the json variable.
 template:
 
 #+BEGIN_SRC
-<!--$ replace t.content=s.header -->
+<!--$ replace t.content=h.header -->
 <!doctype html>
 <html lang="en">
 <!--$ endreplace -—>
@@ -234,12 +234,12 @@ another header example:
 template:
 
 #+BEGIN_SRC
-<!--$ replace t.content=s.header -->
+<!--$ replace t.content=h.header -->
 <!DOCTYPE html>
-<html lang="{v.languageCode}" dir="{v.languageDirection}">
+<html lang="{s.languageCode}" dir="{s.languageDirection}">
 <head>
 <meta charset="UTF-8"/>
-<title>{v.title}</title>
+<title>{s.title}</title>
 <--$ endreplace -->
 #+END_SRC
 
@@ -257,13 +257,11 @@ shared json:
 
 #+BEGIN_SRC
 {
-  "header": """\
-    <!DOCTYPE html>
-    <html lang="{v.languageCode}" dir="{v.languageDirection}">
-    <head>
-    <meta charset="UTF-8"/>
-    <title>{v.title}</title>
-  """
+  "header": "<!DOCTYPE html>\n
+<html lang="{s.languageCode}" dir="{s.languageDirection}">\n
+<head>\n
+<meta charset="UTF-8"/>\n
+<title>{s.title}</title>\n"
 }
 #+END_SRC
 
@@ -304,11 +302,11 @@ intensive steps.
 *** Continue Command
 
 You can continue a long command line with the "\\" character at
-the end before the postfix. The following continuation line must
-be a continue command.
+the end before the postfix. The following line must be a continue
+command.
 
 The continuation command allows you to continue adding
-statements as if it is one long line. You can continue the
+statements as if it was one long line. You can continue the
 continue command too, if you need more space.
 
 The template's command line plus continuation lines length is
@@ -392,8 +390,8 @@ example strings:
 example usage:
 
 #+BEGIN_SRC
-<!--$ nextline message=t.if(v.admin, 'Earl Grey', 'Jasmine') -->
-<h2>{v.message}</h2>
+<!--$ nextline message=t.if(s.admin, 'Earl Grey', 'Jasmine') -->
+<h2>{message}</h2>
 #+END_SRC
 
 server json:
@@ -412,7 +410,7 @@ result:
 
 *** Integer
 
-Integers are 32 bit signed numbers.  When you pass an integer to
+Integers are 64 bit signed numbers.  When you pass an integer to
 a function that takes a string, the number is converted to a
 string.
 
@@ -429,7 +427,7 @@ Example numbers:
 
 A float is a 64 bit real number. Like integers a float is
 converted to a string when passed to a function takeing a sring.
-A float has a decial point.
+A float has a decimal point.
 
 Example floats:
 
@@ -466,12 +464,7 @@ with the "s." prefix, and the v prefix for the the server
 variables, no prefix for the local variables.
 
 Variables defined in the template are local to the block where
-they are defined. Local variables take precedence over the
-json variables.
-
-Variables defined in templates can add t, v, s vars to the local
-vars which overrides the others.  You can only override some t
-vars.
+they are defined.
 
 The variables are processed from left to right, so the last one
 takes precedence when there are duplicates.
@@ -479,15 +472,15 @@ takes precedence when there are duplicates.
 Prefixes:
 
 - t. -- System variables, tea vars
-- v. -- Server varaibles
-- s. -- Shared variables
+- s. -- Server varaibles
+- h. -- Shared variables
 - no prefix -- Local variables
 
 Example variables:
 
 #+BEGIN_SRC
 mytea
-s.name
+h.name
 t.list
 #+END_SRC
 
@@ -531,7 +524,7 @@ variable which outputs the block five times.
 template:
 
 #+BEGIN_SRC
-<!--$ nextline t.list = v.tea_list -->
+<!--$ nextline t.list = s.tea_list -->
   * {tea}
 #+END_SRC
 
@@ -567,9 +560,9 @@ template:
 #+BEGIN_SRC
 <h4>Tea Companies</h3>
 <select>
-<!--$ nextline t.list=v.companyList; \-->
-<!--$ : current=t.if(v.selected, ' selected="selected"', "") -->
-  <option{v.current}>{v.company}</option>
+<!--$ nextline t.list=s.companyList; \-->
+<!--$ : current=t.if(s.selected, ' selected="selected"', "") -->
+  <option{s.current}>{s.company}</option>
 </select>
 #+END_SRC
 
@@ -613,7 +606,7 @@ The t.maxlines variable determines the maximum lines in a block.
 
 StaticTea reads lines looking for the endblock or endreplace
 commands.  By default, if it is not found in 10 lines, the 10
-lines are used for the block and a warning is output. The catches
+lines are used for the block and a warning is output. This catches
 the case where you forget the end command.
 
 You can increase this value to support blocks with more lines by
@@ -647,8 +640,8 @@ template:
 #+BEGIN_SRC
 <h3>Tea</h3>
 <ul>
-<!--$ nextline t.list = v.teaList -->
-  <li>{v.tea}</li>
+<!--$ nextline t.list = s.teaList -->
+  <li>{s.tea}</li>
 </ul>
 #+END_SRC
 
@@ -760,10 +753,10 @@ template:
 #+BEGIN_SRC
 <--$ nextline \-->
 <--$ : abbr = t.case( \-->
-<--$ : v.tea, "unknown",  \-->
+<--$ : s.tea, "unknown",  \-->
 <--$ : 'Darjeeling', "Darj",  \-->
 <--$ : "Earl Gray", "EG") -->
-The abbreviation for {v.tea} is {v.abbr}.
+The abbreviation for {s.tea} is {s.abbr}.
 #+END_SRC
 
 server json:
@@ -804,9 +797,9 @@ otherwise it's Earl Gray.  Eary Grey wins ties.
 template:
 
 #+BEGIN_SRC
-<!--$ nextline sold = t.cmp(v.earlgrey, v.oolong); \-->
-<!--$ : bestSelling = t.case(v.sold, v.earlgreyName, 0, v.oolongName) -->
-The best selling tea this week is {v.bestSelling}.
+<!--$ nextline sold = t.cmp(s.earlgrey, s.oolong); \-->
+<!--$ : bestSelling = t.case(s.sold, s.earlgreyName, 0, s.oolongName) -->
+The best selling tea this week is {s.bestSelling}.
 #+END_SRC
 
 server json:
@@ -936,7 +929,7 @@ template:
 
 #+BEGIN_SRC
 <--$ nextline -->
-Kathleen spent ${v.cost:.2f} on tea for Steve's birthday.
+Kathleen spent ${s.cost:.2f} on tea for Steve's birthday.
 #+END_SRC
 
 server json:
@@ -1008,9 +1001,9 @@ Here is an example using the row variable.
 template:
 
 #+BEGIN_SRC
-<!--$ nextline t.list=v.companies \-->
+<!--$ nextline t.list=s.companies \-->
 <!--$ : id = row(0); num = run(1) -->
-  <li id="r{id}>{num}. {v.teaCompany}</li>
+  <li id="r{id}>{num}. {s.teaCompany}</li>
 #+END_SRC
 
 server json:
@@ -1171,7 +1164,7 @@ The shared json is created by the template designer for sharing
 common template fragments and other presentation needs.
 
 You can include zero, one or more shared files with the shared
-option. You reference them with the "s." namespace prefix. The
+option. You reference them with the "h." namespace prefix. The
 variables get added to the t.shared dictionary.
 
 When you specify multiple files on the command line, they get
@@ -1255,7 +1248,7 @@ template:
 
 #+BEGIN_SRC
 <!--$ nextline -->
-You're a {v.webmaster}, I'm a {v.teaMaster}!
+You're a {s.webmaster}, I'm a {s.teaMaster}!
 #+END_SRC
 
 server json:
@@ -1269,13 +1262,13 @@ server json:
 stderr:
 
 #+BEGIN_SRC
-template.html(2): w1: Unknown server variable: v.teaMaster
+template.html(2): w1: Unknown server variable: s.teaMaster
 #+END_SRC
 
 result:
 
 #+BEGIN_SRC
-You're a html wizard, I'm a {v.teaMaster}!
+You're a html wizard, I'm a {s.teaMaster}!
 #+END_SRC
 
 You can write your own warning messages using the system t.result
@@ -1340,7 +1333,7 @@ using those files and the result goes to the screen.
 # create template file
 cat <<EOF >template.txt
 <!--$ nextline -->
-hello {v.name}
+hello {s.name}
 EOF
 
 # create server json file
@@ -1357,7 +1350,7 @@ like:
 #+BEGIN_SRC
 $ cat <<EOF >template.txt
 > <!--$ nextline -->
-> hello {v.name}
+> hello {s.name}
 > EOF
 $
 $ cat <<EOF >server.json
@@ -1421,9 +1414,9 @@ example ellipsizes when a name is longer than 10 characters.
 <!--$ # If the name is longer than 10 characters, -->
 <!--$ # clip it to 7 and add "...".               -->
 <!--$ nextline                                   \-->
-<!--$ : cmp = t.cmp(len(v.name), 10);            \-->
-<!--$ : name = t.case(cmd, v.name                \-->
-<!--$ : 1, t.concat(substr(v.name, 0, 7), "...")) -->
+<!--$ : cmp = t.cmp(len(s.name), 10);            \-->
+<!--$ : name = t.case(cmd, s.name                \-->
+<!--$ : 1, t.concat(substr(s.name, 0, 7), "...")) -->
 #+END_SRC
 
 ** System Defaults

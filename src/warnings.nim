@@ -27,6 +27,8 @@ type
     wUnableToOpenFile, # w17
     wBigLogFile, # w18
     wCannotOpenStd, # w19
+    wNotACommand, # w20
+    wCmdLineTooLong, # w21
 
 tpubType:
   const
@@ -53,6 +55,8 @@ tpubType:
       "Unable to open file: $1.", # wUnableToOpenFile
       "Setup log rotation for $1 which has $2 bytes.", # wBigLogFile
       "Unable to open standard device: $1.", # wCannotOpenStd
+      "No command specified on the line, treating it as a comment.", # wNotACommand
+      "Command line too long.", # wCmdLineTooLong
     ]
 
 func getWarning*(filename: string, lineNum: int,

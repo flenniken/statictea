@@ -12,24 +12,38 @@ import prepost
 import readlines
 import options
 
-proc processCmd(env: Env, templateStream: Stream, resultStream: Stream,
-                serverVars: VarsDict, sharedVars: VarsDict, prefix: string) =
-  return
+proc getCmdType(line: string, prefix: string): Option[int] =
+  result = some(0)
+
+proc processCmd(env: Env, line: string, lineNum: int,
+    templateStream: Stream, resultStream: Stream, serverVars: VarsDict,
+    sharedVars: VarsDict, prefix: string, templateFilename: string) =
+  ## Process the command line.
+  let cmdTypeO = getCmdType(line, prefix)
+  if not cmdTypeO.isSome:
+    env.warn(templateFilename, lineNum, wNotACommand)
 
 proc processTemplate(env: Env, templateStream: Stream, resultStream: Stream,
-    serverVars: VarsDict, sharedVars: VarsDict, prepostList: seq[Prepost]) =
+    serverVars: VarsDict, sharedVars: VarsDict,
+    prepostList: seq[Prepost], templateFilename: string) =
   ## Process the given template file.
 
   initPrepost(prepostList)
 
+  var lineNum = 0
+  var longCmdLineMaybe = false
   for line, ascii in readline(templateStream):
-    if ascii:
-      let prefixO = getPrefix(line)
-      if prefixO.isSome:
-        processCmd(env, templateStream, resultStream, serverVars,
-                   sharedVars, prefixO.get())
-        continue
-    resultStream.write(line)
+    if line[^1] == '\n':
+      inc(lineNum)
+    let prefixO = getPrefix(line)
+    if not prefixO.isSome:
+      resultStream.write(line)
+      continue
+    if longCmdLineMaybe:
+      env.warn(templateFilename, lineNum-1, wCmdLineTooLong)
+    longCmdLineMaybe = line.len == maxLineLen
+    processCmd(env, line, lineNum, templateStream, resultStream, serverVars,
+               sharedVars, prefixO.get(), templateFilename)
 
 proc processTemplate*(env: Env, args: Args): int =
   ## Process the template and return 0 on success.
@@ -44,14 +58,14 @@ proc processTemplate*(env: Env, args: Args): int =
   for filename in args.sharedList:
     readJson(env, filename, sharedVars)
 
+  # Get the template filename.
   assert args.templateList.len > 0
-
   if args.templateList.len > 1:
     let skipping = join(args.templateList[1..^1], ", ")
     env.warn("starting", 0, wOneTemplateAllowed, skipping)
-
   let templateFilename = args.templateList[0]
 
+  # Open the template stream.
   var templateStream: Stream
   if templateFilename == "stdin":
     templateStream = newFileStream(stdin)
@@ -67,6 +81,7 @@ proc processTemplate*(env: Env, args: Args): int =
       env.warn("startup", 0, wUnableToOpenFile, templateFilename)
       return 1
 
+  # Open the result stream.
   var resultStream: Stream
   if args.resultFilename == "":
     resultStream = env.outStream
@@ -77,7 +92,7 @@ proc processTemplate*(env: Env, args: Args): int =
       return 1
 
   processTemplate(env, templateStream, resultStream, serverVars,
-    sharedVars, args.prepostList)
+    sharedVars, args.prepostList, templateFilename)
 
   if args.resultFilename != "":
     resultStream.close()
