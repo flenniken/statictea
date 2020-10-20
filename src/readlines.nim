@@ -1,58 +1,81 @@
-## Read lines from a file preserving line endings and with control
-## over the maximum line length.  You can readlines from text or
-## binary files or mixtures of both.
-##
-## You can copy a file using the following code without changing the
-## bytes.
-##
-## for line, ascii in readline(inStream):
-##   outStream.write(line)
+## Read lines from a stream without exceeding the maximum line
+## length. The returned lines contain the line ending, either crlf or
+## lf.
 
 import streams
+import options
 
 const
-  newline = char('\n')
-  maxLineLen* = 1024
-  bufferSize* = 16*1024
+  minMaxLineLen* = 8
+  maxMaxLineLen* = 8*1024
+  defaultMaxLineLen* = 1024
+  defaultBufferSize* = 16*1024
 
-iterator readline*(stream: Stream, maxLineLen: int = maxLineLen,
-    bufferSize: int = bufferSize): tuple[line: string, ascii: bool] =
-  ## Return all lines of the stream. A line end is defined by either a
-  ## crlf or lf and they get returned with the line bytes. A line is
-  ## returned when the line ending is found, when the streams runs out
-  ## of bytes or when the maximum line length is reached. Note: you
-  ## cannot tell whether the line was truncated or not without reading
-  ## the next line. The ascii return value is true when all the bytes
-  ## in the line are ascii (no high bit set).  The maxLineLen must be
-  ## greater than or equal to 8 and less than or equal to bufferSize.
+type
+  LineBuffer* = object
+    stream: Stream
+    maxLineLen: int
+    bufferSize: int
+    lineNum: int
+    pos: int       ## Current byte position in the buffer.
+    charsRead: int ## Number of bytes of chars in the buffer.
+    buffer: string ## Memory pre-allocated for the buffer.
 
-  assert maxLineLen >= 8
-  assert maxLineLen <= bufferSize
+proc getLineNum*(lineBuffer: LineBuffer): int =
+  result = lineBuffer.lineNum
 
-  var buffer: string
-  buffer.setLen(bufferSize)
-  var line = newStringOfCap(maxLineLen)
-  var pos = 0 # current position in the buffer
-  var ascii = true
+proc getMaxLineLen*(lineBuffer: LineBuffer): int =
+  result = lineBuffer.maxLineLen
+
+proc newLineBuffer*(stream: Stream, maxLineLen: int = defaultMaxLineLen,
+    bufferSize: int = defaultBufferSize): Option[LineBuffer] =
+  ## Return a new LineBuffer.
+
+  if maxLineLen < minMaxLineLen or maxLineLen > maxMaxLineLen:
+    return
+  if bufferSize < maxLineLen:
+    return
+
+  var lb: LineBuffer
+  lb.stream = stream
+  lb.maxLineLen = maxLineLen
+  lb.bufferSize = bufferSize
+  lb.charsRead = 0
+  lb.pos = 0
+  lb.buffer.setLen(bufferSize)
+
+  result = some(lb)
+
+proc readline*(lb: var LineBuffer): string =
+  ## Return a line from the LineBuffer. Reading starts from
+  ## the current position in the stream and advances the amount read.
+  ##
+  ## A line end is defined by either a crlf or lf and they get
+  ## returned with the line bytes. A line is returned when the line
+  ## ending is found, when the streams runs out of bytes or when the
+  ## maximum line length is reached. You cannot tell whether the
+  ## line was truncated or not without reading the next line. When no
+  ## more data exists in the stream, an empty string is returned.
+
+  if lb.stream == nil:
+    return
+
+  var line = newStringOfCap(lb.maxLineLen)
 
   while true:
-    let charsRead = stream.readDataStr(buffer, 0..<bufferSize)
-    if charsRead == 0:
-      break # Done reading the stream.
-    pos = 0
-    while true:
-      if pos >= charsRead:
-        break # go read another buffer
-      let ch = buffer[pos]
-      pos += 1
-      line.add(ch)
-      if ord(ch) > 0x7f:
-        ascii = false
-      if ch == newline or line.len >= maxLineLen:
-        yield((line, ascii))
-        line.setLen(0)
-        ascii = true
+    if lb.pos >= lb.charsRead:
+      # Read a buffer.
+      lb.charsRead = lb.stream.readDataStr(lb.buffer, 0..<lb.bufferSize)
+      lb.pos = 0
+      if lb.charsRead == 0:
+        break # Done reading the stream.
+    let charByte = lb.buffer[lb.pos]
+    line.add(charByte)
+    lb.pos += 1
+    if charByte == char('\n'):
+      inc(lb.lineNum)
+      break
+    if line.len == lb.maxLineLen:
+      break
 
-  # Output the last line, if any.
-  if line.len > 0:
-    yield((line, ascii))
+  result = line

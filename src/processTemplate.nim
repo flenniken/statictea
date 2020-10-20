@@ -15,35 +15,57 @@ import options
 proc getCmdType(line: string, prefix: string): Option[int] =
   result = some(0)
 
-proc processCmd(env: Env, line: string, lineNum: int,
-    templateStream: Stream, resultStream: Stream, serverVars: VarsDict,
-    sharedVars: VarsDict, prefix: string, templateFilename: string) =
-  ## Process the command line.
-  let cmdTypeO = getCmdType(line, prefix)
-  if not cmdTypeO.isSome:
-    env.warn(templateFilename, lineNum, wNotACommand)
+type
+  LineMode* = enum
+    lmOther,
+    lmCommand,
+    lmBlock
 
-proc processTemplate(env: Env, templateStream: Stream, resultStream: Stream,
+proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream,
     serverVars: VarsDict, sharedVars: VarsDict,
     prepostList: seq[Prepost], templateFilename: string) =
   ## Process the given template file.
 
   initPrepost(prepostList)
 
-  var lineNum = 0
-  var longCmdLineMaybe = false
-  for line, ascii in readline(templateStream):
-    if line[^1] == '\n':
-      inc(lineNum)
+  var longCmdLineMaybe: bool
+
+  var lineBufferO = newLineBuffer(templateStream)
+  var lb = lineBufferO.get()
+
+  while true:
+    var line = lb.readline()
+    if line == "":
+      break
+
+    if longCmdLineMaybe:
+      env.warn(templateFilename, lb.getlineNum()-1, wCmdLineTooLong)
+    longCmdLineMaybe = line.len == lb.getMaxLineLen()
+
     let prefixO = getPrefix(line)
     if not prefixO.isSome:
       resultStream.write(line)
       continue
-    if longCmdLineMaybe:
-      env.warn(templateFilename, lineNum-1, wCmdLineTooLong)
-    longCmdLineMaybe = line.len == maxLineLen
-    processCmd(env, line, lineNum, templateStream, resultStream, serverVars,
-               sharedVars, prefixO.get(), templateFilename)
+
+#[
+There are three line types:
+
+* cmd lines -- cmd lines start with a prefix. One or more lines that follow each other.
+* replacement block lines -- block lines follow cmd lines. One or more lines that follow each other.
+* other lines -- not cmd or block lines.  These lines get echoed to the output file unchanged.
+
+Read lines and echo other lines. Collect up the cmd lines into a list of lines then process them. Then read the block lines, if any, and process them.
+
+modes:
+* other line mode
+* collecting cmd lines -- you're done collecting when you find a non cmd line, reach the limit or reach the end of file.
+* collecting block lines -- you're done when you find an ending cmd line, reach the limit or reach the end of file.
+
+
+Read a command's lines until no more continuation lines.
+
+]#
+
 
 proc processTemplate*(env: Env, args: Args): int =
   ## Process the template and return 0 on success.
@@ -91,7 +113,7 @@ proc processTemplate*(env: Env, args: Args): int =
       env.warn("startup", 0, wUnableToOpenFile, args.resultFilename)
       return 1
 
-  processTemplate(env, templateStream, resultStream, serverVars,
+  processTemplateLines(env, templateStream, resultStream, serverVars,
     sharedVars, args.prepostList, templateFilename)
 
   if args.resultFilename != "":

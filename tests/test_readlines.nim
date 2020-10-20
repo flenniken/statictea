@@ -3,30 +3,34 @@ import unittest
 import readlines
 import strutils
 import streams
-# import os
+import options
 
-proc readContentTest(content: string, expected: seq[(string, bool)],
-    maxLineLen: int = maxLineLen,
-    bufferSize: int = bufferSize, showExpected: bool = false) =
+proc readContentTest(content: string, expected: seq[string],
+    maxLineLen: int = defaultMaxLineLen,
+    bufferSize: int = defaultBufferSize, showExpected: bool = false) =
   ## Call readline and check the result.
 
   var inStream = newStringStream(content)
   var outStream = newStringStream()
 
+  var lineBufferO = newLineBuffer(inStream, maxLineLen, bufferSize)
+  check lineBufferO.isSome
+
   var lines: seq[string]
   var asciiValues: seq[bool]
-  for line, ascii in readline(inStream, maxLineLen, bufferSize):
+  while true:
+    var line = lineBufferO.get().readline()
+    if line == "":
+      break
     lines.add(line)
-    asciiValues.add(ascii)
     outStream.write(line)
 
   if showExpected:
     echo "    let expected = @["
     for ix in 0..<lines.len:
       var line = lines[ix]
-      var ascii = asciiValues[ix]
       var fixedLine = line.multiReplace(("\r", r"\r"), ("\n", r"\n"))
-      echo """      ("$1", $2),""" % [fixedLine, $ascii]
+      echo """      "$1"""" % [fixedLine]
     echo "    ]"
   inStream.close()
 
@@ -37,10 +41,7 @@ proc readContentTest(content: string, expected: seq[(string, bool)],
 
   check lines.len == expected.len
   for ix in 0..<lines.len:
-    check lines[ix] == expected[ix][0]
-  check asciiValues.len == expected.len
-  for ix in 0..<asciiValues.len:
-    check asciiValues[ix] == expected[ix][1]
+    check lines[ix] == expected[ix]
 
 
 suite "readlines.nim":
@@ -56,38 +57,38 @@ suite "readlines.nim":
   #   echo $line.getCap
 
   test "readwrite":
-    let expected = @[("hello\n", true), ("world", true)]
+    let expected = @["hello\n", "world"]
     readContentTest("hello\nworld", expected)
 
   test "readwrite crlf":
     # test crlf
-    let expected = @[("hello\r\n", true), ("world", true)]
+    let expected = @["hello\r\n", "world"]
     readContentTest("hello\r\nworld", expected)
 
   test "readwrite line longer than max":
     # line longer than max
-    let expected = @[("hello wo", true), ("rld\n", true)]
+    let expected = @["hello wo", "rld\n"]
     readContentTest("hello world\n", expected,
                     maxLineLen=8, bufferSize = 24)
 
   test "readwrite non-ascii lines":
     # non-ascii lines
-    let expected = @[("\u2020asdf\n", false), ("\n", true)]
+    let expected = @["\u2020asdf\n", "\n"]
     readContentTest("\u2020asdf\n\n", expected, maxLineLen=8, bufferSize = 24)
 
   test "readwrite empty file":
     # empty file
-    let expected: seq[(string, bool)] = @[]
+    let expected: seq[string] = @[]
     readContentTest("", expected, maxLineLen=8, bufferSize = 24)
 
   test "readwrite one line":
     # one line
-    let expected = @[("one", true)]
+    let expected = @["one"]
     readContentTest("one", expected, maxLineLen=8, bufferSize = 24)
 
   test "readwrite one character":
     # one character
-    let expected = @[("a", true)]
+    let expected = @["a"]
     readContentTest("a", expected, maxLineLen=8, bufferSize = 24)
 
   test "readwrite two buffers":
@@ -107,22 +108,51 @@ testing
 4 5 6
 """
     let expected = @[
-      ("1234567\n", true),
-      ("12345678", true),
-      ("\n", true),
-      ("testing\n", true),
-      ("abc\n", true),
-      ("\n", true),
-      ("mixed\n", true),
-      ("\n", true),
-      ("hi\n", true),
-      ("another ", true),
-      ("long lin", true),
-      ("e\n", true),
-      ("asdf\n", true),
-      ("testing\n", true),
-      ("1 2 3\n", true),
-      ("4 5 6\n", true),
+      "1234567\n",
+      "12345678",
+      "\n",
+      "testing\n",
+      "abc\n",
+      "\n",
+      "mixed\n",
+      "\n",
+      "hi\n",
+      "another ",
+      "long lin",
+      "e\n",
+      "asdf\n",
+      "testing\n",
+      "1 2 3\n",
+      "4 5 6\n",
     ]
     readContentTest(content, expected,
       maxLineLen=8, bufferSize = 24, showExpected = false)
+
+  test "getLineNum":
+    let content = """
+1234567
+12345678long
+testing
+"""
+    var inStream = newStringStream(content)
+    var lineBufferO = newLineBuffer(inStream, 8, 24)
+    check lineBufferO.isSome
+
+    var lb = lineBufferO.get()
+    check lb.getLineNum() == 0
+
+    var line = lb.readline()
+    check line == "1234567\n"
+    check lb.getLineNum() == 1
+
+    line = lb.readline()
+    check line == "12345678"
+    check lb.getLineNum() == 1
+
+    line = lb.readline()
+    check line == "long\n"
+    check lb.getLineNum() == 2
+
+    line = lb.readline()
+    check line == "testing\n"
+    check lb.getLineNum() == 3
