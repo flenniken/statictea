@@ -19,27 +19,47 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 ]#
 
 import re
+import options
 
 type
-  Pattern* = Regex
+  Pattern* = object
+    regex*: Regex
+    numGroups*: Natural
 
-proc getPattern*(reString: string): Pattern =
-  ## Compile the regular expression string and return a pattern used
-  ## with match and matches.
-  result = re(reString)
+  Matches* = object
+    groups*: seq[string]
+    length*: Natural
+# todo: make groups and length private?
 
-proc match*(str: string, pattern: Pattern): bool =
-  ## Return true when the string matches the pattern.
-  result = str =~ pattern
+proc getGroup*(matches: Matches): string =
+  result = matches.groups[0]
 
-proc matches*(str: string, pattern: Pattern, groups: var openArray[string]): bool =
-  ## Return true when the string matches the pattern and fill in the
-  ## groups array with the groups found. Usage:
-  ##
-  ## let pattern = getPattern(r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$")
-  ## var groups: array[3, string]
-  ## check matches("5.67.8", pattern, groups)
-  ## check groups[0] == "5"
-  ## check groups[1] == "67"
-  ## check groups[2] == "8"
-  result = match(str, pattern, groups)
+proc get2Groups*(matches: Matches): (string, string) =
+  result = (matches.groups[0], matches.groups[1])
+
+proc get3Groups*(matches: Matches): (string, string, string) =
+  result = (matches.groups[0], matches.groups[1], matches.groups[2])
+
+
+proc getPattern*(reString: string, numGroups: Natural): Pattern =
+  ## Compile the regular expression string. Pass the number of groups
+  ## defined in the string.
+  result.regex = re(reString)
+  result.numGroups = numGroups
+
+proc getMatches*(str: string, pattern: Pattern, start: Natural = 0): Option[Matches] =
+  ## Match the str with the pattern.  Start is the starting index in
+  ## str to start the match. Return the groups and the length of the
+  ## match.
+
+  var matches: Matches
+  var groups = newSeq[string](pattern.numGroups)
+  var length: int
+  if pattern.numGroups == 0:
+    length = matchLen(str, pattern.regex, start)
+  else:
+    length = matchLen(str, pattern.regex, groups, start)
+  if length != -1:
+    matches.groups = groups
+    matches.length = length
+    result = some(matches)

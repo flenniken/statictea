@@ -13,13 +13,14 @@ const
 
 type
   LineBuffer* = object
-    stream: Stream
-    maxLineLen: int
-    bufferSize: int
-    lineNum: int
-    pos: int       ## Current byte position in the buffer.
-    charsRead: int ## Number of bytes of chars in the buffer.
-    buffer: string ## Memory pre-allocated for the buffer.
+    stream*: Stream
+    maxLineLen*: int
+    bufferSize*: int
+    lineNum*: int
+    pos*: int       ## Current byte position in the buffer.
+    charsRead*: int ## Number of bytes of chars in the buffer.
+    buffer*: string ## Memory pre-allocated for the buffer.
+    filename*: string ## Optional. The stream's filename.
 
 proc getLineNum*(lineBuffer: LineBuffer): int =
   result = lineBuffer.lineNum
@@ -27,8 +28,11 @@ proc getLineNum*(lineBuffer: LineBuffer): int =
 proc getMaxLineLen*(lineBuffer: LineBuffer): int =
   result = lineBuffer.maxLineLen
 
+proc getFilename*(lineBuffer: LineBuffer): string =
+  result = lineBuffer.filename
+
 proc newLineBuffer*(stream: Stream, maxLineLen: int = defaultMaxLineLen,
-    bufferSize: int = defaultBufferSize): Option[LineBuffer] =
+    bufferSize: int = defaultBufferSize, templateFilename: string = ""): Option[LineBuffer] =
   ## Return a new LineBuffer.
 
   if maxLineLen < minMaxLineLen or maxLineLen > maxMaxLineLen:

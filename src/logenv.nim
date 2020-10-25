@@ -5,7 +5,7 @@ import times
 import strutils
 import warnings
 import options
-import regex
+import regexes
 when defined(test):
   import os
 
@@ -104,11 +104,12 @@ when defined(test):
       result = none(DateTime)
 
   proc parseFileLine*(str: string): Option[FileLine] =
-    let pattern = getPattern(r"^(.*)\(([0-9]+)\)$")
-    var groups: array[2, string]
-    if matches(str, pattern, groups):
-      let lineNum =  parseUInt(groups[1])
-      result = some(FileLine(filename: groups[0], lineNum: lineNum))
+    let pattern = getPattern(r"^(.*)\(([0-9]+)\)$", 2)
+    let matchesO = getMatches(str, pattern)
+    if matchesO.isSome:
+      let matches = matchesO.get()
+      let lineNum =  parseUInt(matches.groups[1])
+      result = some(FileLine(filename: matches.groups[0], lineNum: lineNum))
 
   proc parseLine*(line: string): Option[LogLine] =
     var parts = split(line, "; ", 3)

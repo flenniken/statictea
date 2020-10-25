@@ -1,24 +1,17 @@
-# try out things here
-# build and run with "n tt"
-import streams
-import testUtils
-import os
 
-proc createFile*(filename: string, content: string) =
-  var file = open(filename, fmWrite)
-  file.write(content)
-  file.close()
+var list = @["1", "2", "3"]
 
-let templateFilename = "template.html"
-let content = "Hello"
-createFile(templateFilename, content)
-var stream = newFileStream(templateFilename)
+proc get1Group(list: seq[string]): string =
+  result = list[0]
+proc get2Groups(list: seq[string]): (string, string) =
+  result = (list[0], list[1])
+proc get3Groups(list: seq[string]): (string, string, string) =
+  result = (list[0], list[1], list[2])
+proc get4Groups(list: seq[string]): (string, string, string, string) =
+  result = (list[0], list[1], list[2], list[3])
 
-var buffer: array[1024, byte]
-var bytesRead = stream.readData(buffer.addr, buffer.sizeof)
+let (a, b, c) = getGroups(list)
 
-doAssert bytesRead == 5
-doAssert stream.atEnd() == true
-stream.close()
-
-discard tryRemoveFile(templateFilename)
+assert a == 1
+assert b == 2
+assert c == 3

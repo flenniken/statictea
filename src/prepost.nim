@@ -1,7 +1,7 @@
 
 import strutils
 import args
-import regex
+import regexes
 import tables
 import options
 
@@ -39,14 +39,14 @@ proc initPrepost*(prepostList: seq[Prepost]) =
     assert prepost.pre != ""
     terms.add(r"^\Q$1\E" % prepost.pre)
     prepostTable[prepost.pre] = prepost.post
-  prefixPattern = getPattern("($1)" % terms.join("|"))
+  prefixPattern = getPattern("($1)" % terms.join("|"), 1)
 
 proc getPrefix*(line: string): Option[string] =
   ## Return the prefix that starts the line, if it exists.
-  assert prefixPattern != nil, "Call initPrepost first."
-  var groups: array[1, string]
-  if matches(line, prefixPattern, groups):
-    result = some(groups[0])
+  assert prepostTable.len != 0, "Call initPrepost first."
+  let matchesO = getMatches(line, prefixPattern)
+  if matchesO.isSome():
+    result = some(matchesO.get().groups[0])
 
 proc getPostfix*(prefix: string): Option[string] =
   ## Return the postfix associated with the given prefix.

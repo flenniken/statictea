@@ -11,15 +11,144 @@ import os
 import prepost
 import readlines
 import options
+import regexes
 
 proc getCmdType(line: string, prefix: string): Option[int] =
   result = some(0)
 
 type
-  LineMode* = enum
-    lmOther,
-    lmCommand,
-    lmBlock
+  LineParts = object
+    prefix: string
+    middle: string
+    command: string
+    continuation: bool
+    postfix: string
+    lineEnding: bool
+
+  MatchPos = object
+    match: string
+    pos: int
+
+
+const
+  commands: array[7, string] = [
+    "nextline",
+    "block",
+    "replace",
+    "comment",
+    ":",
+    "endblock",
+    "endreplace",
+  ]
+
+var commandPattern: Pattern
+var lastPartPattern: Pattern
+
+proc matchLastPart(line: string, postfix: string): Option[Matches] =
+  ## Match the end of the command line and return the optional
+  ## continuation character and the length of the match.  Command line
+  ## length is limited so we know we have the whole line so these
+  ## lines must end with a newline.
+  if lastPartPattern.regex == nil:
+    let term = r"^\Q$1\E" % postfix
+    lastPartPattern = getPattern(r"([\\])$1[\r]\n$" % term, 1)
+  result = getMatches(line, commandPattern)
+
+proc getCommandPos(line: string, start: Natural): Option[Matches] =
+  ## Return the command starting at the given position in the
+  ## line. Skip leading whitespace. Return the command and length of
+  ## the match.
+  if commandPattern.regex == nil:
+    commandPattern = getPattern(r"\s($1)" % commands.join("|"), 1)
+  result = getMatches(line, commandPattern, start)
+
+proc parseCmdLine(env: Env, line: string, prefix: string): Option[LineParts] =
+  ## Parse the line and return its parts if possible.
+  # prefix   command    middle    \postfix end
+  # <--!$    nextline   a = 5     \-->\n
+
+  let postfix = getPostfix(prefix).get() # code error if no postfix
+
+  let start = len(prefix)
+  let commandPosO = getCommandPos(line, start)
+  if not isSome(commandPosO):
+    env.warn("Invalid command")
+    return
+  var commandPos = commandPosO.get()
+  let command = commandPos.getGroup()
+  let pos = start + commandPos.length
+
+  # Get the optional continuation and its position.
+  let lastPartO = matchLastPart(line, postfix)
+  if not isSome(lastPartO):
+    env.warn("Missing postfix")
+    return
+  var lastPart = lastPartO.get()
+  let continuation = lastPart.getGroup()
+  let endPos = line.len - lastPart.length
+
+  # Get the middle string.
+  let middle = line[pos..^endPos]
+
+  var lineParts: LineParts
+  lineParts.prefix = prefix
+  lineParts.middle = middle
+  lineParts.command = command
+  lineParts.continuation = if continuation == "": false else: true
+  lineParts.postfix = postfix
+  lineParts.lineEnding = line.endsWith('\n')
+  result = some(lineParts)
+
+proc readCmdLines(env: Env, lb: var LineBuffer, prefix: string,
+                  cmdLine: string): Option[seq[string]] =
+  ## Read the command lines.
+  # Strip the prefix, postfix and command out and store the remaining text in lines.
+  var lines: seq[string]
+
+  let lineNum = lb.lineNum
+  var linePartsO = parseCmdLine(env, cmdLine, prefix)
+  if not linePartsO.isSome():
+    return
+  var lp = linePartsO.get()
+  lines.add(lp.middle)
+
+  var lastLineEnding = lp.lineEnding
+  while lp.continuation:
+    var line = lb.readline()
+    if line == "":
+      # todo: missing continuation line warning.
+      # todo: missing replace block
+      return
+
+    if not lastLineEnding:
+      env.warn(lb.filename, lb.getlineNum()-1, wCmdLineTooLong)
+      return
+    lastLineEnding = lp.lineEnding
+
+    linePartsO = parseCmdLine(env, line, prefix)
+    if not linePartsO.isSome():
+      return
+    lp = linePartsO.get()
+    if lp.command != ":":
+      env.warn("not continuation command")
+      return
+
+    lines.add(lp.middle)
+    result = some(lines)
+
+
+proc processCmd(env: Env, lb: var LineBuffer, resultStream: Stream,
+    serverVars: VarsDict, sharedVars: VarsDict, prefix: string, cmdLine: string): bool =
+  # Collect cmd lines, process them, then process block lines
+  # There is a limit on cmd line length 1K and memory for all lines 16K.
+
+  let currentLineNum = lb.lineNum
+  var cmdLinesO = readCmdLines(env, lb, prefix, cmdLine)
+  if not isSome(cmdLinesO):
+    return false
+  # let localVars = runCmds(cmdLines, serverVars, sharedVars)
+  # processBlockLines(...)
+
 
 proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream,
     serverVars: VarsDict, sharedVars: VarsDict,
@@ -28,9 +157,8 @@ proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream
 
   initPrepost(prepostList)
 
-  var longCmdLineMaybe: bool
-
-  var lineBufferO = newLineBuffer(templateStream)
+  var lineBufferO = newLineBuffer(templateStream, templateFilename=templateFilename)
+  # todo: handle error case.
   var lb = lineBufferO.get()
 
   while true:
@@ -38,14 +166,14 @@ proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream
     if line == "":
       break
 
-    if longCmdLineMaybe:
-      env.warn(templateFilename, lb.getlineNum()-1, wCmdLineTooLong)
-    longCmdLineMaybe = line.len == lb.getMaxLineLen()
-
     let prefixO = getPrefix(line)
     if not prefixO.isSome:
       resultStream.write(line)
-      continue
+    else:
+      let done = processCmd(env, lb, resultStream, serverVars, sharedVars, prefixO.get(), line)
+      if done:
+        break
+
 
 #[
 There are three line types:
