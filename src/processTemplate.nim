@@ -12,9 +12,7 @@ import prepost
 import readlines
 import options
 import regexes
-
-proc getCmdType(line: string, prefix: string): Option[int] =
-  result = some(0)
+import tpub
 
 type
   LineParts = object
@@ -29,7 +27,6 @@ type
     match: string
     pos: int
 
-
 const
   commands: array[7, string] = [
     "nextline",
@@ -41,20 +38,28 @@ const
     "endreplace",
   ]
 
+# <--$ nextline -->\n
+# <--$ nextline \-->\n
+# <--$ nextline a = 5 \-->\n
+# <--$ nextline a = 5; b = \-->\n
+# <--$ : 20 \-->\n
+
+
+
 var commandPattern: Pattern
 var lastPartPattern: Pattern
 
-proc matchLastPart(line: string, postfix: string): Option[Matches] =
+proc matchLastPart(line: string, postfix: string, start: Natural): Option[Matches] {.tpub.} =
   ## Match the end of the command line and return the optional
   ## continuation character and the length of the match.  Command line
-  ## length is limited so we know we have the whole line so these
-  ## lines must end with a newline.
+  ## length is limited so we know we have the whole line with an
+  ## ending newline.
   if lastPartPattern.regex == nil:
-    let term = r"^\Q$1\E" % postfix
-    lastPartPattern = getPattern(r"([\\])$1[\r]\n$" % term, 1)
-  result = getMatches(line, commandPattern)
+    let regstr = r"([\\]{0,1})\Q$1\E[\r]{0,1}\n$" % postfix
+    lastPartPattern = getPattern(regstr, 1)
+  result = getMatches(line, lastPartPattern)
 
-proc getCommandPos(line: string, start: Natural): Option[Matches] =
+proc getCommandPos(line: string, start: Natural): Option[Matches] {.tpub.} =
   ## Return the command starting at the given position in the
   ## line. Skip leading whitespace. Return the command and length of
   ## the match.

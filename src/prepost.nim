@@ -37,16 +37,15 @@ proc initPrepost*(prepostList: seq[Prepost]) =
   var terms = newSeq[string]()
   for prepost in combine(prepostList, predefined):
     assert prepost.pre != ""
-    terms.add(r"^\Q$1\E" % prepost.pre)
+    terms.add(r"\Q$1\E" % prepost.pre)
     prepostTable[prepost.pre] = prepost.post
-  prefixPattern = getPattern("($1)" % terms.join("|"), 1)
+  prefixPattern = getPattern(r"^($1)\s+" % terms.join("|"), 1)
 
-proc getPrefix*(line: string): Option[string] =
-  ## Return the prefix that starts the line, if it exists.
+proc getPrefix*(line: string): Option[Matches] =
+  ## Return the prefix that starts the line, if it exists. Include the
+  ## following whitespace in the match length.
   assert prepostTable.len != 0, "Call initPrepost first."
-  let matchesO = getMatches(line, prefixPattern)
-  if matchesO.isSome():
-    result = some(matchesO.get().groups[0])
+  result = getMatches(line, prefixPattern)
 
 proc getPostfix*(prefix: string): Option[string] =
   ## Return the postfix associated with the given prefix.

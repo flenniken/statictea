@@ -6,10 +6,22 @@ import args
 import testutils
 import os
 import logenv
+import options
+import regexes
 
 # todo: test line endings on Windows
 
-suite "processTemplate.nim":
+suite "processTemplate":
+
+  test "matchLastPart":
+    let line = "<--$ nextline -->\n"
+    let matchesO = matchLastPart(line, "-->")
+    check matchesO.isSome
+    let matches = matchesO.get()
+    let continuation = matches.getGroup()
+    let length = matches.length
+    check continuation == ""
+    check length == 4
 
   test "processTemplate to stdout":
     var env = openEnv("_processTemplate.log")

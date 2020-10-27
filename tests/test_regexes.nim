@@ -1,7 +1,7 @@
-
 import regexes
 import unittest
 import options
+import strutils
 
 suite "regexes.nim":
 
@@ -29,8 +29,22 @@ suite "regexes.nim":
     check g2 == "67"
     check g3 == "8"
 
+  test "getMatches1":
+    let pattern = getPattern(r".*abc$", 0)
+    let matchesO = getMatches("123 abc", pattern)
+    check matchesO.isSome
+
   test "getMatches no match":
     let pattern = getPattern(r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$", 3)
     check not getMatches("b.67.8", pattern).isSome
 
-  # todo: test with non zero start
+  test "lastPart":
+    let pattern = getPattern(r"([^\\]*)([\\]{0,1})(\Q-->\E[\r]{0,1}\n)$", 3)
+    var line = "<--$\t nextline " & $'\\' & "-->\n"
+    var matchesO = getMatches(line, pattern)
+    check matchesO.isSome
+    let (a, b, c) = matchesO.get().get3Groups()
+    echo line
+    echo "a = ($1)'$2'" % [$a.len, a]
+    echo "b = ($1)'$2'" % [$b.len, b]
+    echo "c = ($1)'$2'" % [$c.len, c]

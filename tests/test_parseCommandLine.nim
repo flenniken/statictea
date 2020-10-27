@@ -35,7 +35,7 @@ proc tpcl(
   check(lines == warningLines)
 
 
-suite "Test statictea.nim":
+suite "parseCommandLine":
 
   test "fileListIndex":
     check(fileListIndex("server") == 0)
