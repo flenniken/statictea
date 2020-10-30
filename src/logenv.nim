@@ -103,13 +103,14 @@ when defined(test):
     except TimeParseError:
       result = none(DateTime)
 
-  proc parseFileLine*(str: string): Option[FileLine] =
-    let pattern = getPattern(r"^(.*)\(([0-9]+)\)$", 2)
-    let matchesO = getMatches(str, pattern)
+  proc parseFileLine*(line: string): Option[FileLine] =
+    var matcher = newMatcher(r"^(.*)\(([0-9]+)\)$", 2)
+    let matchesO = getMatches(matcher, line, 0)
     if matchesO.isSome:
       let matches = matchesO.get()
-      let lineNum =  parseUInt(matches.groups[1])
-      result = some(FileLine(filename: matches.groups[0], lineNum: lineNum))
+      let (filename, lineNumString) = matches.get2Groups()
+      let lineNum =  parseUInt(lineNumString)
+      result = some(FileLine(filename: filename, lineNum: lineNum))
 
   proc parseLine*(line: string): Option[LogLine] =
     var parts = split(line, "; ", 3)

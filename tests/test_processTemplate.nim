@@ -11,17 +11,28 @@ import regexes
 
 # todo: test line endings on Windows
 
-suite "processTemplate":
+proc checkGetCommand(line: string, start: Natural, expected: string, expectedLength: Natural) =
+  let matchesO = getCommand(line, start)
+  check matchesO.isSome
+  let matches = matchesO.get()
+  check matches.getGroup() == expected
+  check matches.length == expectedLength
 
-  test "matchLastPart":
-    let line = "<--$ nextline -->\n"
-    let matchesO = matchLastPart(line, "-->")
-    check matchesO.isSome
-    let matches = matchesO.get()
-    let continuation = matches.getGroup()
-    let length = matches.length
-    check continuation == ""
-    check length == 4
+suite "processTemplate":
+  test "getCommand":
+    let line = "<--$ nextline -->"
+    let expected = "nextline"
+    checkGetCommand(line, 5, expected, 9)
+
+  # test "matchLastPart":
+  #   let line = "<--$ nextline -->\n"
+  #   let matchesO = matchLastPart(line, "-->", 15)
+  #   check matchesO.isSome
+  #   let matches = matchesO.get()
+  #   let continuation = matches.getGroup()
+  #   let length = matches.length
+  #   check continuation == ""
+  #   check length == 4
 
   test "processTemplate to stdout":
     var env = openEnv("_processTemplate.log")
@@ -65,4 +76,3 @@ suite "processTemplate":
     let lines = readLines(args.resultFilename, maximum=4)
     check lines.len == 1
     check lines[0] == "Hello"
-

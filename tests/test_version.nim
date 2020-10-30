@@ -7,8 +7,8 @@ import options
 suite "Test version.nim":
 
   test "test version string":
-    let pattern = getPattern(r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$", 0)
-    let matchesO = getMatches(staticteaVersion, pattern)
+    var matcher = newMatcher(r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$", 0)
+    let matchesO = matcher.getMatches(staticteaVersion, 0)
     if not matchesO.isSome:
       echo "Invalid version number: " & staticteaVersion
       fail

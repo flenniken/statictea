@@ -44,38 +44,37 @@ const
 # <--$ nextline a = 5; b = \-->\n
 # <--$ : 20 \-->\n
 
+var commandMatcher: Matcher
+var lastPartMatcher: Matcher
 
-
-var commandPattern: Pattern
-var lastPartPattern: Pattern
+proc getCommand(line: string, start: Natural): Option[Matches] {.tpub.} =
+  ## Return the command starting at the given position in the line. No
+  ## leading whitespace. Match ending whitespace. Return the command
+  ## and length of the match.
+  if commandMatcher.pattern == "":
+    commandMatcher = newMatcher(r"($1)\s+" % commands.join("|"), 1)
+  result = commandMatcher.getMatches(line, start)
 
 proc matchLastPart(line: string, postfix: string, start: Natural): Option[Matches] {.tpub.} =
   ## Match the end of the command line and return the optional
   ## continuation character and the length of the match.  Command line
   ## length is limited so we know we have the whole line with an
   ## ending newline.
-  if lastPartPattern.regex == nil:
-    let regstr = r"([\\]{0,1})\Q$1\E[\r]{0,1}\n$" % postfix
-    lastPartPattern = getPattern(regstr, 1)
-  result = getMatches(line, lastPartPattern)
+  if lastPartMatcher.pattern == "":
+    let pattern = r"([\\]{0,1})\Q$1\E[\r]{0,1}\n$" % postfix
+    lastPartMatcher = newMatcher(pattern, 1)
+  result = lastPartMatcher.getMatches(line, start)
 
-proc getCommandPos(line: string, start: Natural): Option[Matches] {.tpub.} =
-  ## Return the command starting at the given position in the
-  ## line. Skip leading whitespace. Return the command and length of
-  ## the match.
-  if commandPattern.regex == nil:
-    commandPattern = getPattern(r"\s($1)" % commands.join("|"), 1)
-  result = getMatches(line, commandPattern, start)
-
-proc parseCmdLine(env: Env, line: string, prefix: string): Option[LineParts] =
+proc parseCmdLine(env: Env, line: string, prefixMatches: Matches): Option[LineParts] =
   ## Parse the line and return its parts if possible.
   # prefix   command    middle    \postfix end
   # <--!$    nextline   a = 5     \-->\n
 
+  let prefix = prefixMatches.getGroup()
+  let start = prefixMatches.length
   let postfix = getPostfix(prefix).get() # code error if no postfix
 
-  let start = len(prefix)
-  let commandPosO = getCommandPos(line, start)
+  let commandPosO = getCommand(line, start)
   if not isSome(commandPosO):
     env.warn("Invalid command")
     return
@@ -84,7 +83,7 @@ proc parseCmdLine(env: Env, line: string, prefix: string): Option[LineParts] =
   let pos = start + commandPos.length
 
   # Get the optional continuation and its position.
-  let lastPartO = matchLastPart(line, postfix)
+  let lastPartO = matchLastPart(line, postfix, pos)
   if not isSome(lastPartO):
     env.warn("Missing postfix")
     return
@@ -104,14 +103,14 @@ proc parseCmdLine(env: Env, line: string, prefix: string): Option[LineParts] =
   lineParts.lineEnding = line.endsWith('\n')
   result = some(lineParts)
 
-proc readCmdLines(env: Env, lb: var LineBuffer, prefix: string,
+proc readCmdLines(env: Env, lb: var LineBuffer, prefixMatches: Matches,
                   cmdLine: string): Option[seq[string]] =
   ## Read the command lines.
   # Strip the prefix, postfix and command out and store the remaining text in lines.
   var lines: seq[string]
 
   let lineNum = lb.lineNum
-  var linePartsO = parseCmdLine(env, cmdLine, prefix)
+  var linePartsO = parseCmdLine(env, cmdLine, prefixMatches)
   if not linePartsO.isSome():
     return
   var lp = linePartsO.get()
@@ -130,7 +129,7 @@ proc readCmdLines(env: Env, lb: var LineBuffer, prefix: string,
       return
     lastLineEnding = lp.lineEnding
 
-    linePartsO = parseCmdLine(env, line, prefix)
+    linePartsO = parseCmdLine(env, line, prefixMatches)
     if not linePartsO.isSome():
       return
     lp = linePartsO.get()
@@ -143,12 +142,12 @@ proc readCmdLines(env: Env, lb: var LineBuffer, prefix: string,
 
 
 proc processCmd(env: Env, lb: var LineBuffer, resultStream: Stream,
-    serverVars: VarsDict, sharedVars: VarsDict, prefix: string, cmdLine: string): bool =
+    serverVars: VarsDict, sharedVars: VarsDict, prefixMatches: Matches, cmdLine: string): bool =
   # Collect cmd lines, process them, then process block lines
   # There is a limit on cmd line length 1K and memory for all lines 16K.
 
   let currentLineNum = lb.lineNum
-  var cmdLinesO = readCmdLines(env, lb, prefix, cmdLine)
+  var cmdLinesO = readCmdLines(env, lb, prefixMatches, cmdLine)
   if not isSome(cmdLinesO):
     return false
   # let localVars = runCmds(cmdLines, serverVars, sharedVars)

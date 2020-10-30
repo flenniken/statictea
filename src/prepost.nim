@@ -16,14 +16,11 @@ const
   ]
 
 var prepostTable = initOrderedTable[string, string]()
-var prefixPattern: Pattern
+var prefixMatcher: Matcher
 
 when defined(test):
   proc getPrepostTable*(): OrderedTable[string, string] =
     result = prepostTable
-
-  proc getPrefixPattern*(): Pattern =
-    result = prefixPattern
 
 iterator combine(list1: openArray[Prepost], list2: openArray[Prepost]): Prepost =
   ## Iterate through list1 then list2.
@@ -39,16 +36,21 @@ proc initPrepost*(prepostList: seq[Prepost]) =
     assert prepost.pre != ""
     terms.add(r"\Q$1\E" % prepost.pre)
     prepostTable[prepost.pre] = prepost.post
-  prefixPattern = getPattern(r"^($1)\s+" % terms.join("|"), 1)
+  prefixMatcher = newMatcher(r"^($1)\s+" % terms.join("|"), 1)
 
 proc getPrefix*(line: string): Option[Matches] =
   ## Return the prefix that starts the line, if it exists. Include the
   ## following whitespace in the match length.
   assert prepostTable.len != 0, "Call initPrepost first."
-  result = getMatches(line, prefixPattern)
+  result = prefixMatcher.getMatches(line, 0)
 
 proc getPostfix*(prefix: string): Option[string] =
   ## Return the postfix associated with the given prefix.
   assert prepostTable.len != 0, "Call initPrepost first."
   if prefix in prepostTable:
     result = some(prepostTable[prefix])
+
+when defined(test):
+  proc getPre*(line: string, start: Natural = 0): Option[Matches] =
+    ## Same as getPrefix with Matcher signature. Start is not used.
+    result = getPrefix(line)

@@ -7,24 +7,12 @@ import options
 import regexes
 import strutils
 
-proc checkPrefixNo(line: string) =
-  var matchO = getPrefix(line)
-  check not matchO.isSome
-
-proc checkPrefix(line: string, expectedPrefix: string, expectedLength: Natural) =
-  var matchO = getPrefix(line)
-  check matchO.isSome
-  var match = matchO.get()
-
-  if match.getGroup() != expectedPrefix:
-    echo "line: $1" % [line]
-    echo "expectedPrefix: $1" % [expectedPrefix]
-    echo "           got: $1" % [match.getGroup()]
-
-  if match.length != expectedLength:
-    echo "line: $1" % [line]
-    echo "expectedLength: $1" % [$expectedLength]
-    echo "           got: $1" % [$match.length]
+proc checkGetPrefix(line: string, expected: string, expectedLength: Natural) =
+  let matchesO = getPrefix(line)
+  check matchesO.isSome
+  let matches = matchesO.get()
+  check matches.getGroup() == expected
+  check matches.length == expectedLength
 
 suite "prepost.nim":
 
@@ -32,26 +20,24 @@ suite "prepost.nim":
     var list: seq[Prepost]
     initPrepost(list)
     let table = getPrepostTable()
-    let pattern = getPrefixPattern()
     check table.len == 6
     # for k, v in table.pairs:
     #   echo "$1 nextline $2" % [k, v]
-    check getPrefixPattern().regex != nil
 
   test "getPrefix":
-    checkPrefix("<--!$ nextline -->", "<--!$", 6)
-    checkPrefix("#$ nextline", "#$", 3)
-    checkPrefix(";$ nextline", ";$", 3)
-    checkPrefix("//$ nextline", "//$", 4)
-    checkPrefix("/*$ nextline */", "/*$", 4)
-    checkPrefix("&lt;!--$ nextline --&gt;", "&lt;!--$", 9)
-    checkPrefix("<--!$ : -->", "<--!$", 6)
-    checkPrefix("<--!$         nextline -->", "<--!$", 14)
-    checkPrefix("<--!$\tnextline -->", "<--!$", 6)
+    checkGetPrefix( "<--!$ nextline -->", "<--!$", 6)
+    checkGetPrefix( "#$ nextline", "#$", 3)
+    checkGetPrefix(";$ nextline", ";$", 3)
+    checkGetPrefix("//$ nextline", "//$", 4)
+    checkGetPrefix("/*$ nextline */", "/*$", 4)
+    checkGetPrefix("&lt;!--$ nextline --&gt;", "&lt;!--$", 9)
+    checkGetPrefix("<--!$ : -->", "<--!$", 6)
+    checkGetPrefix( "<--!$         nextline -->", "<--!$", 14)
+    checkGetPrefix("<--!$\tnextline -->", "<--!$", 6)
 
   test "getPrefix no match":
-    checkPrefixNo("<--$ nextline -->")
-    checkPrefixNo("<--!$nextline -->")
+    check not getPre("<--$ nextline -->").isSome
+    check not getPre("<--!$nextline -->").isSome
 
   test "getPostfix":
     var postFixO = getPostfix("<--!$")
@@ -67,14 +53,14 @@ suite "prepost.nim":
     table = getPrepostTable()
     check table.len == 7
     check table["abc"] == "def"
-    checkPrefix("abc nextline def", "abc", 4)
+    checkGetPrefix("abc nextline def", "abc", 4)
 
   test "initPrepost long":
     let prefix = "this is a very long prefix nextline post"
     var prepostList = @[(prefix, "post")]
     initPrepost(prepostList)
     let line = "$1  nextline post" % prefix
-    checkPrefix(line, prefix, 42)
+    checkGetPrefix(line, prefix, 42)
     let postFixO = getPostfix(prefix)
     check postFixO.isSome
     check postFixO.get() == "post"

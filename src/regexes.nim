@@ -20,16 +20,25 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 import re
 import options
+when defined(test):
+  import strutils
 
 type
-  Pattern* = object
-    regex*: Regex
-    numGroups*: Natural
-
   Matches* = object
     groups*: seq[string]
     length*: Natural
-# todo: make groups and length private?
+
+  Matcher* = object
+    pattern*: string
+    numGroups*: Natural
+    regex: Regex
+
+proc newMatcher*(pattern: string, numGroups: Natural): Matcher =
+  ## Return a new matcher.  The regular expression string is compiled.
+  ## The numGroups is the number of groups defined in the string.
+  result.pattern = pattern
+  result.regex = re(pattern)
+  result.numGroups = numGroups
 
 proc getGroup*(matches: Matches): string =
   result = matches.groups[0]
@@ -40,26 +49,56 @@ proc get2Groups*(matches: Matches): (string, string) =
 proc get3Groups*(matches: Matches): (string, string, string) =
   result = (matches.groups[0], matches.groups[1], matches.groups[2])
 
-
-proc getPattern*(reString: string, numGroups: Natural): Pattern =
-  ## Compile the regular expression string. Pass the number of groups
-  ## defined in the string.
-  result.regex = re(reString)
-  result.numGroups = numGroups
-
-proc getMatches*(str: string, pattern: Pattern, start: Natural = 0): Option[Matches] =
-  ## Match the str with the pattern.  Start is the starting index in
-  ## str to start the match. Return the groups and the length of the
-  ## match.
+proc getMatches*(matcher: Matcher, line: string, start: Natural = 0): Option[Matches] =
+  ## Match the line with the pattern.  Start is the starting index in
+  ## line to start the match. Return the matched groups and the length
+  ## of the match.
 
   var matches: Matches
-  var groups = newSeq[string](pattern.numGroups)
+  var groups = newSeq[string](matcher.numGroups)
   var length: int
-  if pattern.numGroups == 0:
-    length = matchLen(str, pattern.regex, start)
+  if matcher.numGroups == 0:
+    length = matchLen(line, matcher.regex, start)
   else:
-    length = matchLen(str, pattern.regex, groups, start)
+    length = matchLen(line, matcher.regex, groups, start)
   if length != -1:
     matches.groups = groups
     matches.length = length
     result = some(matches)
+
+when defined(test):
+  proc startPointer*(start: Natural): string =
+    ## Return the number of spaces and symbols to point at the line
+    ## start value.
+    if start > 100:
+      result.add("$1" % $start)
+    else:
+      for ix in 0..<start:
+        result.add(' ')
+      result.add("^$1" % $start)
+
+  proc checkMatch*(matcher: Matcher, line: string, start: Natural,
+      expectedStrings: seq[string], expectedLength: Natural): bool =
+    ## Return true when the matcher matches the line with the
+    ## expected outcome, else return false.
+    let matchO = getMatches(matcher, line, start)
+
+    if matchO.isSome:
+      var match = matchO.get()
+      if match.groups != expectedStrings or match.length != expectedLength:
+        echo "---Unexpected match---"
+        echo "   line: $1" % [line]
+        echo "  start: $1" % startPointer(start)
+        echo "pattern: $1" % matcher.pattern
+        echo "expectedLength: $1, got: $2" % [$expectedLength, $match.length]
+        for group in expectedStrings:
+          echo "expected: '$1'" % [group]
+        for group in match.groups:
+          echo "     got: '$1'" % [group]
+      else:
+        result = true
+    else:
+      echo "---No match---"
+      echo "   line: '$1'" % [line]
+      echo "  start: '$1'" % startPointer(start)
+      echo "pattern: '$1'" % matcher.pattern
