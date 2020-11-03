@@ -34,8 +34,8 @@ type
     regex: Regex
 
 proc newMatcher*(pattern: string, numGroups: Natural): Matcher =
-  ## Return a new matcher.  The regular expression string is compiled.
-  ## The numGroups is the number of groups defined in the string.
+  ## Return a new matcher.  The regular expression pattern is compiled.
+  ## The numGroups is the number of groups defined in the pattern.
   result.pattern = pattern
   result.regex = re(pattern)
   result.numGroups = numGroups

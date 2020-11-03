@@ -11,18 +11,7 @@ import regexes
 
 # todo: test line endings on Windows
 
-proc checkGetCommand(line: string, start: Natural, expected: string, expectedLength: Natural) =
-  let matchesO = getCommand(line, start)
-  check matchesO.isSome
-  let matches = matchesO.get()
-  check matches.getGroup() == expected
-  check matches.length == expectedLength
-
 suite "processTemplate":
-  test "getCommand":
-    let line = "<--$ nextline -->"
-    let expected = "nextline"
-    checkGetCommand(line, 5, expected, 9)
 
   # test "matchLastPart":
   #   let line = "<--$ nextline -->\n"

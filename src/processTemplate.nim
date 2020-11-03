@@ -27,35 +27,23 @@ type
     match: string
     pos: int
 
-const
-  commands: array[7, string] = [
-    "nextline",
-    "block",
-    "replace",
-    "comment",
-    ":",
-    "endblock",
-    "endreplace",
-  ]
-
 # <--$ nextline -->\n
 # <--$ nextline \-->\n
 # <--$ nextline a = 5 \-->\n
 # <--$ nextline a = 5; b = \-->\n
 # <--$ : 20 \-->\n
 
-var commandMatcher: Matcher
 var lastPartMatcher: Matcher
 
-proc getCommand(line: string, start: Natural): Option[Matches] {.tpub.} =
-  ## Return the command starting at the given position in the line. No
-  ## leading whitespace. Match ending whitespace. Return the command
-  ## and length of the match.
-  if commandMatcher.pattern == "":
-    commandMatcher = newMatcher(r"($1)\s+" % commands.join("|"), 1)
-  result = commandMatcher.getMatches(line, start)
+proc getCommandMatcher(commands: openArray[string]): Matcher =
+  result = newMatcher(r"($1)\s+" % commands.join("|"), 1)
 
-proc matchLastPart(line: string, postfix: string, start: Natural): Option[Matches] {.tpub.} =
+proc getLastPartMatcher(postfix: string): Matcher = 
+  let pattern = r"([\\]{0,1})\Q$1\E[\r]{0,1}\n$" % postfix
+  lastPartMatcher = newMatcher(pattern, 1)
+
+proc getLastPartMatcher(line: string, postfix: string, start: Natural): Option[Matches] {.tpub.} =
+
   ## Match the end of the command line and return the optional
   ## continuation character and the length of the match.  Command line
   ## length is limited so we know we have the whole line with an
@@ -65,43 +53,59 @@ proc matchLastPart(line: string, postfix: string, start: Natural): Option[Matche
     lastPartMatcher = newMatcher(pattern, 1)
   result = lastPartMatcher.getMatches(line, start)
 
-proc parseCmdLine(env: Env, line: string, prefixMatches: Matches): Option[LineParts] =
-  ## Parse the line and return its parts if possible.
+    let linePartsO = parseCmdLine(env, prefixMatcher, prepostTable, line)
+
+proc parseCmdLine(env: Env, prefixMatcher: Matcher, prepostTable: PrepostTable,
+    line: string): Option[LineParts] =
+  ## Parse the line and return its parts. Return quickly when not a
+  ## command line.
   # prefix   command    middle    \postfix end
   # <--!$    nextline   a = 5     \-->\n
+  var lineParts: LineParts
 
-  let prefix = prefixMatches.getGroup()
-  let start = prefixMatches.length
-  let postfix = getPostfix(prefix).get() # code error if no postfix
+  # Get the prefix.
+  let prefixMatchO = prefixMatcher(line, 0)
+  if not prefixMatchO.isSome():
+    return
+  let prefixMatch = prefixMatchO.get()
+  lineParts.prefix = prefixMatch.getGroup()
 
-  let commandPosO = getCommand(line, start)
-  if not isSome(commandPosO):
+  # Get the command.
+  let commandMatchO = commandMatcher(line, prefixMatch.length)
+  if not isSome(commandMatchO):
     env.warn("Invalid command")
     return
-  var commandPos = commandPosO.get()
-  let command = commandPos.getGroup()
-  let pos = start + commandPos.length
+  var commandMatch = commandMatchO.get()
+  lineParts.prefix = commandMatch.getGroup()
+
+  # Get the postfix.
+  if lineParts.prefix not in prepostTable:
+    env.warn("Invalid postfix")
+  lineParts.postfix = prepostTable[lineParts.prefix]
+
+  let middleStart = prefixMatch.length + commandMatch.length
 
   # Get the optional continuation and its position.
-  let lastPartO = matchLastPart(line, postfix, pos)
+  let lastPartO = matchLastPart(line, lineParts.postfix, middleStart)
   if not isSome(lastPartO):
     env.warn("Missing postfix")
     return
   var lastPart = lastPartO.get()
   let continuation = lastPart.getGroup()
+  lineParts.continuation = if continuation == "": false else: true
+
   let endPos = line.len - lastPart.length
 
-  # Get the middle string.
-  let middle = line[pos..^endPos]
 
-  var lineParts: LineParts
-  lineParts.prefix = prefix
+  # Get the middle string.
+  let middle = line[middleStart..^endPos]
   lineParts.middle = middle
-  lineParts.command = command
-  lineParts.continuation = if continuation == "": false else: true
-  lineParts.postfix = postfix
+
+  # Line ending is required except for the last line of the file.
   lineParts.lineEnding = line.endsWith('\n')
+
   result = some(lineParts)
+
 
 proc readCmdLines(env: Env, lb: var LineBuffer, prefixMatches: Matches,
                   cmdLine: string): Option[seq[string]] =
@@ -140,7 +144,6 @@ proc readCmdLines(env: Env, lb: var LineBuffer, prefixMatches: Matches,
     lines.add(lp.middle)
     result = some(lines)
 
-
 proc processCmd(env: Env, lb: var LineBuffer, resultStream: Stream,
     serverVars: VarsDict, sharedVars: VarsDict, prefixMatches: Matches, cmdLine: string): bool =
   # Collect cmd lines, process them, then process block lines
@@ -159,7 +162,8 @@ proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream
     prepostList: seq[Prepost], templateFilename: string) =
   ## Process the given template file.
 
-  initPrepost(prepostList)
+  var prepostTable = getPrepostTable(prepostList)
+  var prefixMatcher = getPrefixMatcher(prepostTable)
 
   var lineBufferO = newLineBuffer(templateStream, templateFilename=templateFilename)
   # todo: handle error case.
@@ -170,11 +174,11 @@ proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream
     if line == "":
       break
 
-    let prefixO = getPrefix(line)
-    if not prefixO.isSome:
+    let linePartsO = parseCmdLine(env, prefixMatcher, prepostTable, line)
+    if not linePartsO.isSome:
       resultStream.write(line)
     else:
-      let done = processCmd(env, lb, resultStream, serverVars, sharedVars, prefixO.get(), line)
+      let done = processCmd(env, lb, resultStream, serverVars, sharedVars, linePartsO.get())
       if done:
         break
 
