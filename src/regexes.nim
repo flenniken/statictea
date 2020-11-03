@@ -32,13 +32,15 @@ type
     pattern*: string
     numGroups*: Natural
     regex: Regex
+    arg1*: string
 
-proc newMatcher*(pattern: string, numGroups: Natural): Matcher =
+proc newMatcher*(pattern: string, numGroups: Natural, arg1: string = ""): Matcher =
   ## Return a new matcher.  The regular expression pattern is compiled.
   ## The numGroups is the number of groups defined in the pattern.
   result.pattern = pattern
   result.regex = re(pattern)
   result.numGroups = numGroups
+  result.arg1 = arg1
 
 proc getGroup*(matches: Matches): string =
   result = matches.groups[0]

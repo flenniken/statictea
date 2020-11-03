@@ -69,25 +69,11 @@ suite "matches.nim":
   test "last part matcher":
     var matcher = getLastPartMatcher("-->")
 
-    check checkMatch(matcher, "<--!$ nextline -->", 15, @["", "", ""], 3)
-    check checkMatch(matcher, "<--!$ nextline -->\n", 15, @["", "", "\n"], 4)
-    check checkMatch(matcher, "<--!$ nextline -->\r\n", 15, @["", "", "\r\n"], 5)
-    check checkMatch(matcher, r"<--!$ nextline \-->", 15, @["", r"\", ""], 4)
-    check checkMatch(matcher, "<--!$ nextline \\-->", 15, @["", r"\", ""], 4)
-    check checkMatch(matcher, "<--!$ nextline \\-->\n", 15, @["", r"\", "\n"], 5)
-    check checkMatch(matcher, "<--!$ nextline \\-->\r\n", 15, @["", r"\", "\r\n"], 6)
+    check checkMatch(matcher, "<--!$ nextline -->", 15, @["", ""], 3)
+    check checkMatch(matcher, "<--!$ nextline -->\n", 15, @["", "\n"], 4)
+    check checkMatch(matcher, "<--!$ nextline -->\r\n", 15, @["", "\r\n"], 5)
+    check checkMatch(matcher, r"<--!$ nextline \-->", 15, @[r"\", ""], 4)
+    check checkMatch(matcher, "<--!$ nextline \\-->", 15, @[r"\", ""], 4)
+    check checkMatch(matcher, "<--!$ nextline \\-->\n", 15, @[r"\", "\n"], 5)
+    check checkMatch(matcher, "<--!$ nextline \\-->\r\n", 15, @[r"\", "\r\n"], 6)
 
-
-    check checkMatch(matcher, "<--!$ nextline a = 5 -->", 15, @["a = 5 ", "", ""], 9)
-    check checkMatch(matcher, "<--!$ nextline a = 5 -->\n", 15, @["a = 5 ", "", "\n"], 10)
-    check checkMatch(matcher, "<--!$ nextline a = 5 -->\r\n", 15, @["a = 5 ", "", "\r\n"], 11)
-    check checkMatch(matcher, r"<--!$ nextline a = 5 \-->", 15, @["a = 5 ", r"\", ""], 10)
-    check checkMatch(matcher, "<--!$ nextline a = 5 \\-->", 15, @["a = 5 ", r"\", ""], 10)
-    check checkMatch(matcher, "<--!$ nextline a = 5 \\-->\n", 15, @["a = 5 ", r"\", "\n"], 11)
-    check checkMatch(matcher, "<--!$ nextline a = 5 \\-->\r\n", 15, @["a = 5 ", r"\", "\r\n"], 12)
-
-
-    check checkMatch(matcher, """ a = "hi5" -->""", 1, @["""a = "hi5" """, "", ""], 13)
-    check checkMatch(matcher, """ a = "h\\5" -->""", 1, @["""a = "hi\\5" """, "", ""], 13)
-
-    check not matcher.getMatches("  -->>", 2).isSome

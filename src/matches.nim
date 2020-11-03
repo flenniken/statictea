@@ -57,17 +57,15 @@ proc getCommandMatcher*(): Matcher =
 proc getLastPartMatcher*(postfix: string): Matcher =
   ## Get the matcher to use with
   let pattern = r"([\\]{0,1})\Q$1\E([\r]{0,1}\n){0,1}$" % postfix
-  result = newMatcher(pattern, 3)
+  result = newMatcher(pattern, 2, postfix)
 
-proc getLastPart*(matcher: Matcher, line: string, postfix: string): Option[Matches] =
-  ## Determine whether the line ends with the given postfix.  Return
-  ## the optional slash and line endings. The postfix string must be
-  ## the same one used with the matcher.
+proc getLastPart*(matcher: Matcher, line: string): Option[Matches] =
+  ## Return the optional slash and line endings.
 
   # Start checking 3 characters before the end to account for the
   # optional slash, cr and linefeed. If the line is too short, return
   # no match.
-  var startPos = line.len - postfix.len - 3
+  var startPos = line.len - matcher.arg1.len - 3
   if startPos < 0:
     return
 

@@ -33,28 +33,6 @@ type
 # <--$ nextline a = 5; b = \-->\n
 # <--$ : 20 \-->\n
 
-var lastPartMatcher: Matcher
-
-proc getCommandMatcher(commands: openArray[string]): Matcher =
-  result = newMatcher(r"($1)\s+" % commands.join("|"), 1)
-
-proc getLastPartMatcher(postfix: string): Matcher = 
-  let pattern = r"([\\]{0,1})\Q$1\E[\r]{0,1}\n$" % postfix
-  lastPartMatcher = newMatcher(pattern, 1)
-
-proc getLastPartMatcher(line: string, postfix: string, start: Natural): Option[Matches] {.tpub.} =
-
-  ## Match the end of the command line and return the optional
-  ## continuation character and the length of the match.  Command line
-  ## length is limited so we know we have the whole line with an
-  ## ending newline.
-  if lastPartMatcher.pattern == "":
-    let pattern = r"([\\]{0,1})\Q$1\E[\r]{0,1}\n$" % postfix
-    lastPartMatcher = newMatcher(pattern, 1)
-  result = lastPartMatcher.getMatches(line, start)
-
-    let linePartsO = parseCmdLine(env, prefixMatcher, prepostTable, line)
-
 proc parseCmdLine(env: Env, prefixMatcher: Matcher, prepostTable: PrepostTable,
     line: string): Option[LineParts] =
   ## Parse the line and return its parts. Return quickly when not a
