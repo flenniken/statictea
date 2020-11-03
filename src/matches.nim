@@ -69,8 +69,8 @@ proc getLastPart*(matcher: Matcher, line: string): Option[Matches] =
   if startPos < 0:
     return
 
-  for start in [startPos..startPos+3]:
-    let matchesO = getMatches(matcher, line)
+  for start in startPos..startPos+3:
+    let matchesO = getMatches(matcher, line, start)
     if matchesO.isSome:
       return matchesO
 

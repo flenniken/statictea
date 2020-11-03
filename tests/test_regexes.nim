@@ -9,23 +9,23 @@ suite "regexes.nim":
     check startPointer(2) == "  ^2"
     check startPointer(101) == "101"
 
-  test "checkMatch":
+  test "checkMatcher":
     # Uncomment to test output for cases the don't match.
 
     # var abcMatcher = newMatcher(r"(abc)\s+", 1)
-    # check checkMatch(abcMatcher, " abc   def", 0, @["abc"], 6)
-    # check checkMatch(abcMatcher, "abc   def", 0, @["abe"], 6)
-    # check checkMatch(abcMatcher, "abc   def", 0, @["abc"], 7)
+    # check checkMatcher(abcMatcher, " abc   def", 0, @["abc"], 6)
+    # check checkMatcher(abcMatcher, "abc   def", 0, @["abe"], 6)
+    # check checkMatcher(abcMatcher, "abc   def", 0, @["abc"], 7)
     # var matcher = newMatcher(r"(abc)(\s+)", 2)
-    # check checkMatch(matcher, "abc   def", 0, @["abc", "1"], 7)
-    # check checkMatch(matcher, "abc   def", 3, @["abc", "1"], 7)
+    # check checkMatcher(matcher, "abc   def", 0, @["abc", "1"], 7)
+    # check checkMatcher(matcher, "abc   def", 3, @["abc", "1"], 7)
     discard
 
   test "no groups":
     var versionMatcher = newMatcher(r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$", 0)
-    check checkMatch(versionMatcher, "0.1.0", 0, @[], 5)
-    check checkMatch(versionMatcher, "0.12.345", 0, @[], 8)
-    check checkMatch(versionMatcher, "999.888.777", 0, @[], 11)
+    check checkMatcher(versionMatcher, "0.1.0", 0, @[], 5)
+    check checkMatcher(versionMatcher, "0.12.345", 0, @[], 8)
+    check checkMatcher(versionMatcher, "999.888.777", 0, @[], 11)
 
   test "no match":
     var matcher = newMatcher(r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$", 0)
@@ -35,7 +35,7 @@ suite "regexes.nim":
 
   test "getMatches1":
     let matcher = newMatcher(r".*abc$", 0)
-    check checkMatch(matcher, "123 abc", 0, @[], 7)
+    check checkMatcher(matcher, "123 abc", 0, @[], 7)
 
   test "getMatches no match":
     let matcher = newMatcher(r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$", 3)
@@ -50,7 +50,7 @@ suite "regexes.nim":
 
   test "two groups":
     let matcher = newMatcher(r"(abc).*(def)$", 2)
-    check checkMatch(matcher, "  abc asdfasdfdef def", 2, @["abc", "def"], 19)
+    check checkMatcher(matcher, "  abc asdfasdfdef def", 2, @["abc", "def"], 19)
 
     let matchesO = getMatches(matcher, "  abc asdfasdfdef def", 2)
     check matchesO.isSome
@@ -60,8 +60,8 @@ suite "regexes.nim":
 
   test "three groups":
     let versionMatcher = newMatcher(r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$", 3)
-    check checkMatch(versionMatcher, "999.888.777", 0, @["999", "888", "777"], 11)
-    check checkMatch(versionMatcher, "5.67.8", 0, @["5", "67", "8"], 6)
+    check checkMatcher(versionMatcher, "999.888.777", 0, @["999", "888", "777"], 11)
+    check checkMatcher(versionMatcher, "5.67.8", 0, @["5", "67", "8"], 6)
     let matchesO = getMatches(versionMatcher, "5.67.8", 0)
     check matchesO.isSome
     let (one, two, three) = matchesO.get().get3Groups()
@@ -74,4 +74,4 @@ suite "regexes.nim":
     # let matcher = newMatcher(r"^(abc)", 1)
 
     let matcher = newMatcher(r"(abc)", 1)
-    check checkMatch(matcher, "  abc asdfasdfdef def", 2, @["abc"], 3)
+    check checkMatcher(matcher, "  abc asdfasdfdef def", 2, @["abc"], 3)

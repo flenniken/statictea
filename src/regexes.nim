@@ -79,23 +79,22 @@ when defined(test):
         result.add(' ')
       result.add("^$1" % $start)
 
-  proc checkMatch*(matcher: Matcher, line: string, start: Natural,
+  proc checkMatches*(matchesO: Option[Matches], matcher: Matcher, line: string, start: Natural,
       expectedStrings: seq[string], expectedLength: Natural): bool =
-    ## Return true when the matcher matches the line with the
-    ## expected outcome, else return false.
-    let matchO = getMatches(matcher, line, start)
+    ## Return true when the matches object has the expected content,
+    ## else return false.
 
-    if matchO.isSome:
-      var match = matchO.get()
-      if match.groups != expectedStrings or match.length != expectedLength:
+    if matchesO.isSome:
+      var matches = matchesO.get()
+      if matches.groups != expectedStrings or matches.length != expectedLength:
         echo "---Unexpected match---"
         echo "   line: $1" % [line]
         echo "  start: $1" % startPointer(start)
         echo "pattern: $1" % matcher.pattern
-        echo "expectedLength: $1, got: $2" % [$expectedLength, $match.length]
+        echo "expectedLength: $1, got: $2" % [$expectedLength, $matches.length]
         for group in expectedStrings:
           echo "expected: '$1'" % [group]
-        for group in match.groups:
+        for group in matches.groups:
           echo "     got: '$1'" % [group]
       else:
         result = true
@@ -104,3 +103,10 @@ when defined(test):
       echo "   line: '$1'" % [line]
       echo "  start: '$1'" % startPointer(start)
       echo "pattern: '$1'" % matcher.pattern
+
+  proc checkMatcher*(matcher: Matcher, line: string, start: Natural,
+      expectedStrings: seq[string], expectedLength: Natural): bool =
+    ## Return true when the matcher matches the line with the
+    ## expected outcome, else return false.
+    let matches = getMatches(matcher, line, start)
+    result = checkMatches(matches, matcher, line, start, expectedStrings, expectedLength)
