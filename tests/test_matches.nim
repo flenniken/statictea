@@ -6,6 +6,12 @@ import options
 import regexes
 import strutils
 
+proc checkGetLastPart(matcher: Matcher, line: string, expectedStart: Natural,
+    expected: seq[string], expectedLength: Natural) =
+  let matchesO = getLastPart(matcher, line)
+  check checkMatches(matchesO, matcher, line, expectedStart,
+    expected, expectedLength)
+
 suite "matches.nim":
 
   test "prepost table":
@@ -80,5 +86,20 @@ suite "matches.nim":
   test "getLastPart":
     var matcher = getLastPartMatcher("-->")
 
-    let matchesO = getLastPart(matcher, "<--!$ nextline -->")
-    check checkMatches(matchesO, matcher, "<--!$ nextline -->", 0, @["", ""], 3)
+    checkGetLastPart(matcher, "<--!$ nextline -->", 15, @["", ""], 3)
+    checkGetLastPart(matcher, "<--!$ nextline -->\n", 15, @["", "\n"], 4)
+    checkGetLastPart(matcher, "<--!$ nextline -->\r\n", 15, @["", "\r\n"], 5)
+    checkGetLastPart(matcher, r"<--!$ nextline \-->", 15, @[r"\", ""], 4)
+    checkGetLastPart(matcher, "<--!$ nextline \\-->", 15, @[r"\", ""], 4)
+    checkGetLastPart(matcher, "<--!$ nextline \\-->\n", 15, @[r"\", "\n"], 5)
+    checkGetLastPart(matcher, "<--!$ nextline \\-->\r\n", 15, @[r"\", "\r\n"], 6)
+
+  test "getLastPart blank postfix":
+    var matcher = getLastPartMatcher("")
+    checkGetLastPart(matcher, "<--!$ nextline a", 16, @["", ""], 0)
+    checkGetLastPart(matcher, "<--!$ nextline a\n", 16, @["", "\n"], 1)
+    checkGetLastPart(matcher, "<--!$ nextline a\r\n", 16, @["", "\r\n"], 2)
+    checkGetLastPart(matcher, r"<--!$ nextline a\", 16, @[r"\", ""], 1)
+    checkGetLastPart(matcher, "<--!$ nextline a\\", 16, @[r"\", ""], 1)
+    checkGetLastPart(matcher, "<--!$ nextline a\\\n", 16, @[r"\", "\n"], 2)
+    checkGetLastPart(matcher, "<--!$ nextline a\\\r\n", 16, @[r"\", "\r\n"], 3)

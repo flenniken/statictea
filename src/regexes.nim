@@ -27,6 +27,7 @@ type
   Matches* = object
     groups*: seq[string]
     length*: Natural
+    start*: Natural
 
   Matcher* = object
     pattern*: string
@@ -66,6 +67,7 @@ proc getMatches*(matcher: Matcher, line: string, start: Natural = 0): Option[Mat
   if length != -1:
     matches.groups = groups
     matches.length = length
+    matches.start = start
     result = some(matches)
 
 when defined(test):
@@ -79,19 +81,22 @@ when defined(test):
         result.add(' ')
       result.add("^$1" % $start)
 
-  proc checkMatches*(matchesO: Option[Matches], matcher: Matcher, line: string, start: Natural,
-      expectedStrings: seq[string], expectedLength: Natural): bool =
+  proc checkMatches*(matchesO: Option[Matches], matcher: Matcher, line: string,
+      expectedStart: Natural, expectedStrings: seq[string],
+      expectedLength: Natural): bool =
     ## Return true when the matches object has the expected content,
     ## else return false.
 
     if matchesO.isSome:
       var matches = matchesO.get()
-      if matches.groups != expectedStrings or matches.length != expectedLength:
+      if matches.groups != expectedStrings or matches.length != expectedLength or
+         matches.start != expectedStart:
         echo "---Unexpected match---"
         echo "   line: $1" % [line]
-        echo "  start: $1" % startPointer(start)
+        echo "  start: $1" % startPointer(matches.start)
         echo "pattern: $1" % matcher.pattern
         echo "expectedLength: $1, got: $2" % [$expectedLength, $matches.length]
+        echo "expectedStart: $1, got: $2" % [$expectedStart, $matches.start]
         for group in expectedStrings:
           echo "expected: '$1'" % [group]
         for group in matches.groups:
@@ -101,7 +106,6 @@ when defined(test):
     else:
       echo "---No match---"
       echo "   line: '$1'" % [line]
-      echo "  start: '$1'" % startPointer(start)
       echo "pattern: '$1'" % matcher.pattern
 
   proc checkMatcher*(matcher: Matcher, line: string, start: Natural,

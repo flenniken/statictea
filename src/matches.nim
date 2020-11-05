@@ -56,7 +56,12 @@ proc getCommandMatcher*(): Matcher =
 
 proc getLastPartMatcher*(postfix: string): Matcher =
   ## Get the matcher to use with
-  let pattern = r"([\\]{0,1})\Q$1\E([\r]{0,1}\n){0,1}$" % postfix
+  var pattern: string
+  if postfix == "":
+    pattern = r"([\\]{0,1})([\r]{0,1}\n){0,1}$"
+  else:
+    pattern = r"([\\]{0,1})\Q$1\E([\r]{0,1}\n){0,1}$" % postfix
+
   result = newMatcher(pattern, 2, postfix)
 
 proc getLastPart*(matcher: Matcher, line: string): Option[Matches] =
