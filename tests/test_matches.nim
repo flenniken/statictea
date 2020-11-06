@@ -34,6 +34,9 @@ suite "matches.nim":
     check checkMatcher(prefixMatcher, "<--!$ : -->", 0, @["<--!$"], 6)
     check checkMatcher(prefixMatcher, "<--!$         nextline -->", 0, @["<--!$"], 14)
     check checkMatcher(prefixMatcher, "<--!$\tnextline -->", 0, @["<--!$"], 6)
+    check checkMatcher(prefixMatcher, "#$ nextline\n", 0, @["#$"], 3)
+    check checkMatcher(prefixMatcher, "#$ nextline   \n", 0, @["#$"], 3)
+    check checkMatcher(prefixMatcher, "#$ nextline   \\\n", 0, @["#$"], 3)
 
     check not prefixMatcher.getMatches("<--$ nextline -->", 0).isSome
     check not prefixMatcher.getMatches("<--!$nextline -->", 0).isSome

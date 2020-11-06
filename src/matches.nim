@@ -26,7 +26,7 @@ const
   ]
 
 type
-  PrepostTable = OrderedTable[string, string]
+  PrepostTable* = OrderedTable[string, string]
 
 iterator combine(list1: openArray[Prepost], list2: openArray[Prepost]): Prepost =
   ## Iterate through list1 then list2.

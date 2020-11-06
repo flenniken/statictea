@@ -1,5 +1,12 @@
-import re
-var matches: array[2, string]
-let len = matchLen("abcdefg", re"^c(d)ef(g)", matches, 2)
-doAssert len == 5
-doAssert $matches == """["d", "g"]"""
+type
+  Test = object
+    value: int
+
+var test = Test(value: 2)
+echo $test
+
+var test2 = Test(value: 2)
+echo $test2
+
+if test == test2:
+  echo "they're the same"

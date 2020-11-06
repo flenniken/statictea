@@ -8,7 +8,7 @@ import readjson
 import streams
 import vartypes
 import os
-import prepost
+import matches
 import readlines
 import options
 import regexes
@@ -33,66 +33,14 @@ type
 # <--$ nextline a = 5; b = \-->\n
 # <--$ : 20 \-->\n
 
-proc parseCmdLine(env: Env, prefixMatcher: Matcher, prepostTable: PrepostTable,
-    line: string): Option[LineParts] =
-  ## Parse the line and return its parts. Return quickly when not a
-  ## command line.
-  # prefix   command    middle    \postfix end
-  # <--!$    nextline   a = 5     \-->\n
-  var lineParts: LineParts
-
-  # Get the prefix.
-  let prefixMatchO = prefixMatcher(line, 0)
-  if not prefixMatchO.isSome():
-    return
-  let prefixMatch = prefixMatchO.get()
-  lineParts.prefix = prefixMatch.getGroup()
-
-  # Get the command.
-  let commandMatchO = commandMatcher(line, prefixMatch.length)
-  if not isSome(commandMatchO):
-    env.warn("Invalid command")
-    return
-  var commandMatch = commandMatchO.get()
-  lineParts.prefix = commandMatch.getGroup()
-
-  # Get the postfix.
-  if lineParts.prefix not in prepostTable:
-    env.warn("Invalid postfix")
-  lineParts.postfix = prepostTable[lineParts.prefix]
-
-  let middleStart = prefixMatch.length + commandMatch.length
-
-  # Get the optional continuation and its position.
-  let lastPartO = matchLastPart(line, lineParts.postfix, middleStart)
-  if not isSome(lastPartO):
-    env.warn("Missing postfix")
-    return
-  var lastPart = lastPartO.get()
-  let continuation = lastPart.getGroup()
-  lineParts.continuation = if continuation == "": false else: true
-
-  let endPos = line.len - lastPart.length
-
-
-  # Get the middle string.
-  let middle = line[middleStart..^endPos]
-  lineParts.middle = middle
-
-  # Line ending is required except for the last line of the file.
-  lineParts.lineEnding = line.endsWith('\n')
-
-  result = some(lineParts)
-
-
 proc readCmdLines(env: Env, lb: var LineBuffer, prefixMatches: Matches,
-                  cmdLine: string): Option[seq[string]] =
+                  line: string): Option[seq[string]] =
   ## Read the command lines.
   # Strip the prefix, postfix and command out and store the remaining text in lines.
   var lines: seq[string]
 
   let lineNum = lb.lineNum
-  var linePartsO = parseCmdLine(env, cmdLine, prefixMatches)
+  let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher, commandMatcher, line)
   if not linePartsO.isSome():
     return
   var lp = linePartsO.get()
@@ -111,7 +59,7 @@ proc readCmdLines(env: Env, lb: var LineBuffer, prefixMatches: Matches,
       return
     lastLineEnding = lp.lineEnding
 
-    linePartsO = parseCmdLine(env, line, prefixMatches)
+    let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher, commandMatcher, line)
     if not linePartsO.isSome():
       return
     lp = linePartsO.get()
@@ -142,6 +90,7 @@ proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream
 
   var prepostTable = getPrepostTable(prepostList)
   var prefixMatcher = getPrefixMatcher(prepostTable)
+  var commandMatcher = getCommandMatcher()
 
   var lineBufferO = newLineBuffer(templateStream, templateFilename=templateFilename)
   # todo: handle error case.
@@ -152,7 +101,7 @@ proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream
     if line == "":
       break
 
-    let linePartsO = parseCmdLine(env, prefixMatcher, prepostTable, line)
+    let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher, commandMatcher, line)
     if not linePartsO.isSome:
       resultStream.write(line)
     else:
