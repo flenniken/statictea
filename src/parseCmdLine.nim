@@ -1,9 +1,10 @@
 import strutils
-import env
-import matches
 import options
-import regexes
 import tables
+import env
+import regexes
+import warnings
+import matches
 
 type
   LineParts* = object
@@ -15,7 +16,8 @@ type
     ending*: string
 
 proc parseCmdLine*(env: Env, prepostTable: PrepostTable,
-    prefixMatcher: Matcher, commandMatcher: Matcher, line: string):
+    prefixMatcher: Matcher, commandMatcher: Matcher, line: string,
+    templateFilename: string, lineNum: Natural):
     Option[LineParts] =
   ## Parse the line and return its parts. Return quickly when not a
   ## command line.
@@ -26,14 +28,19 @@ proc parseCmdLine*(env: Env, prepostTable: PrepostTable,
   # Get the prefix.
   let prefixMatchO = getMatches(prefixMatcher, line)
   if not prefixMatchO.isSome():
+    # No prefix so not a command line. No error.
     return
   let prefixMatch = prefixMatchO.get()
   lineParts.prefix = prefixMatch.getGroup()
 
   # Get the command.
+  # todo: currently the command must be on the first line.
+  # Make one big line then parse it?
   let commandMatchO = getMatches(commandMatcher, line, prefixMatch.length)
   if not isSome(commandMatchO):
-    env.warn("Invalid command")
+    # todo: add column number of the error. It would be the start
+    # command position.
+    env.warn(templateFilename, lineNum, wNoCommand)
     return
   var commandMatch = commandMatchO.get()
   lineParts.command = commandMatch.getGroup()
@@ -48,7 +55,7 @@ proc parseCmdLine*(env: Env, prepostTable: PrepostTable,
   var lastPartMatcher = getLastPartMatcher(lineParts.postfix)
   let lastPartO = getLastPart(lastPartMatcher, line)
   if not isSome(lastPartO):
-    env.warn("Missing postfix")
+    env.warn(templateFilename, lineNum, wNoPostfix, lineParts.postfix)
     return
   var lastPart = lastPartO.get()
   let (continuation, ending) = lastPart.get2Groups()

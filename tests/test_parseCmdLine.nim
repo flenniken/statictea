@@ -7,6 +7,7 @@ import options
 import strutils
 
 proc testParseCmdLine(line: string, expectedLineParts: LineParts,
+    templateFilename: string = "template.html", lineNum: Natural=12,
     expectedLogLines: seq[string] = @[],
     expectedErrLines: seq[string] = @[],
     expectedOutLines: seq[string] = @[] ): bool =
@@ -17,7 +18,8 @@ proc testParseCmdLine(line: string, expectedLineParts: LineParts,
   var prepostTable = getPrepostTable()
   var prefixMatcher = getPrefixMatcher(prepostTable)
   var commandMatcher = getCommandMatcher()
-  let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher, commandMatcher, line)
+  let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
+    commandMatcher, line, templateFilename, lineNum)
 
   let (logLines, errLines, outLines) = env.readCloseDelete()
 
@@ -56,6 +58,53 @@ proc testParseCmdLine(line: string, expectedLineParts: LineParts,
 
   return true
 
+proc parseCmdLineError(line: string,
+    expectedLogLines: seq[string] = @[],
+    expectedErrLines: seq[string] = @[],
+    expectedOutLines: seq[string] = @[] ): bool =
+  ## Test that we get an error parsing the command line. Return true
+  ## when we get the expected errors.
+
+  var env = openEnv("_parseCmdLine.log")
+  let templateFilename = "template.html"
+  let lineNum = 12
+
+  var prepostTable = getPrepostTable()
+  var prefixMatcher = getPrefixMatcher(prepostTable)
+  var commandMatcher = getCommandMatcher()
+  let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
+    commandMatcher, line, templateFilename, lineNum)
+
+  let (logLines, errLines, outLines) = env.readCloseDelete()
+
+  if linePartsO.isSome:
+    echo line
+    echo "We parsed the line when we shouldn't have."
+    return false
+
+  if expectedLogLines != logLines:
+    for line in logLines:
+      echo "log line: $1" % line
+    for line in expectedLogLines:
+      echo "expected: $1" % line
+    return false
+
+  if expectedErrLines != errLines:
+    for line in errLines:
+      echo "error line: $1" % line
+    for line in expectedErrLines:
+      echo "  expected: $1" % line
+    return false
+
+  if expectedoutLines != outLines:
+    for line in outLines:
+      echo "out line:: $1" % line
+    for line in expectedoutLines:
+      echo " expected: $1" % line
+    return false
+
+  return true
+
 suite "parseCmdLine.nim":
 
   test "newLineParts":
@@ -87,6 +136,11 @@ suite "parseCmdLine.nim":
     var expectedLineParts = newLineParts(middle = "middle part ")
     check testParseCmdLine(line, expectedLineParts)
 
+  test "parseCmdLine middle 2":
+    let line = "<--!$ nextline    middle part  -->\n"
+    var expectedLineParts = newLineParts(middle = "   middle part  ")
+    check testParseCmdLine(line, expectedLineParts)
+
   test "parseCmdLine continue":
     let line = "<--!$ nextline \\-->\n"
     var expectedLineParts = newLineParts(continuation = true)
@@ -113,3 +167,23 @@ suite "parseCmdLine.nim":
       middle = "a = 5; b = 'hi'", postfix = "", ending = "")
     check testParseCmdLine(line, expectedLineParts)
 
+  # We require the command on the first line.
+  # test "parseCmdLine no command":
+  #   let line = r"#$   \"
+  #   var expectedLineParts = newLineParts(prefix = "#$", command = "",
+  #     postfix = "", ending = "")
+  #   check testParseCmdLine(line, expectedLineParts)
+
+  test "no prefix":
+    let line = " nextline -->\n"
+    check parseCmdLineError(line)
+
+  test "no command error":
+    let line = "<--!$ -->\n"
+    let expectedWarn = "template.html(12): w22: No valid command found on the line, skipping."
+    check parseCmdLineError(line, expectedErrLines = @[expectedWarn])
+
+  test "no postfix error":
+    let line = "<--!$ nextline \n"
+    let expectedWarn = """template.html(12): w23: The matching closing comment was not found. Expected: "-->""""
+    check parseCmdLineError(line, expectedErrLines = @[expectedWarn])

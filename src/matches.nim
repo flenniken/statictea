@@ -52,7 +52,7 @@ proc getPrefixMatcher*(prepostTable: PrepostTable): Matcher =
   result = newMatcher(r"^($1)\s+" % terms.join("|"), 1)
 
 proc getCommandMatcher*(): Matcher =
-  result = newMatcher(r"($1)\s+" % commands.join("|"), 1)
+  result = newMatcher(r"($1)\s" % commands.join("|"), 1)
 
 proc getLastPartMatcher*(postfix: string): Matcher =
   ## Get the matcher to use with

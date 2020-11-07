@@ -29,6 +29,8 @@ type
     wCannotOpenStd, # w19
     wNotACommand, # w20
     wCmdLineTooLong, # w21
+    wNoCommand, # w22
+    wNoPostfix, # w23
 
 tpubType:
   const
@@ -57,6 +59,8 @@ tpubType:
       "Unable to open standard device: $1.", # wCannotOpenStd
       "No command specified on the line, treating it as a comment.", # wNotACommand
       "Command line too long.", # wCmdLineTooLong
+      "No valid command found on the line, skipping.", # wNoCommand
+      """The matching closing comment was not found. Expected: "$1".""", # wNoPostfix
     ]
 
 func getWarning*(filename: string, lineNum: int,

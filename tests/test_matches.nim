@@ -64,12 +64,12 @@ suite "matches.nim":
     var commandMatcher = getCommandMatcher()
 
     check checkMatcher(commandMatcher, "<--!$ nextline -->", 6, @["nextline"], 9)
-    check checkMatcher(commandMatcher, "<--!$ block    -->", 6, @["block"], 9)
-    check checkMatcher(commandMatcher, "<--!$ replace  -->", 6, @["replace"], 9)
+    check checkMatcher(commandMatcher, "<--!$ block    -->", 6, @["block"], 6)
+    check checkMatcher(commandMatcher, "<--!$ replace  -->", 6, @["replace"], 8)
     check checkMatcher(commandMatcher, "<--!$ endblock -->", 6, @["endblock"], 9)
-    check checkMatcher(commandMatcher, "<--!$ endreplace  -->", 6, @["endreplace"], 12)
-    check checkMatcher(commandMatcher, "<--!$ #  -->", 6, @["#"], 3)
-    check checkMatcher(commandMatcher, "<--!$ :  -->", 6, @[":"], 3)
+    check checkMatcher(commandMatcher, "<--!$ endreplace  -->", 6, @["endreplace"], 11)
+    check checkMatcher(commandMatcher, "<--!$ #  -->", 6, @["#"], 2)
+    check checkMatcher(commandMatcher, "<--!$ :  -->", 6, @[":"], 2)
     check checkMatcher(commandMatcher, "  nextline ", 2, @["nextline"], 9)
 
     check not commandMatcher.getMatches(" nextline", 2).isSome

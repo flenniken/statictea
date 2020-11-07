@@ -13,6 +13,7 @@ import readlines
 import options
 import regexes
 import tpub
+import parseCmdLine
 
 type
   LineParts = object
@@ -33,14 +34,31 @@ type
 # <--$ nextline a = 5; b = \-->\n
 # <--$ : 20 \-->\n
 
-proc readCmdLines(env: Env, lb: var LineBuffer, prefixMatches: Matches,
-                  line: string): Option[seq[string]] =
-  ## Read the command lines.
-  # Strip the prefix, postfix and command out and store the remaining text in lines.
+proc readCmdLines(env: Env, lb: var LineBuffer, lineParts: lineParts,
+    prepostTable: PrepostTable, prefixMatcher: Matcher, commandMatcher: Matcher,
+    line: string, templateFilename: string,
+    lineNum: Natural): Option[seq[string]] =
+
+  ## Read the lines from the current position until the
+  ## command doesn't continue. Return the list of lines.
+
+  # Each line has a command. The current line continues when it has a
+  # slash at the end. The continue line starts with a : command.  It
+  # may continue too. The last line doesn't have a slash.
+
+  #[
+<--!$ nextline a = 5 \-->\n
+<--!$ : a = 5 \-->\n
+<--!$ : b = 6 \-->\n
+<--!$ : c = 7  -->\n
+  ]#
+
+
   var lines: seq[string]
 
   let lineNum = lb.lineNum
-  let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher, commandMatcher, line)
+  let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
+    commandMatcher, line, lb.templateFilename, lb.lineNum)
   if not linePartsO.isSome():
     return
   var lp = linePartsO.get()
@@ -59,7 +77,8 @@ proc readCmdLines(env: Env, lb: var LineBuffer, prefixMatches: Matches,
       return
     lastLineEnding = lp.lineEnding
 
-    let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher, commandMatcher, line)
+    let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
+      commandMatcher, line, lb.templateFilename, lb.lineNum)
     if not linePartsO.isSome():
       return
     lp = linePartsO.get()
@@ -70,15 +89,17 @@ proc readCmdLines(env: Env, lb: var LineBuffer, prefixMatches: Matches,
     lines.add(lp.middle)
     result = some(lines)
 
-proc processCmd(env: Env, lb: var LineBuffer, resultStream: Stream,
-    serverVars: VarsDict, sharedVars: VarsDict, prefixMatches: Matches, cmdLine: string): bool =
-  # Collect cmd lines, process them, then process block lines
-  # There is a limit on cmd line length 1K and memory for all lines 16K.
 
-  let currentLineNum = lb.lineNum
-  var cmdLinesO = readCmdLines(env, lb, prefixMatches, cmdLine)
-  if not isSome(cmdLinesO):
-    return false
+proc processCmd(env: Env, lb: var LineBuffer, resultStream: Stream,
+   serverVars: VarsDict, sharedVars: VarsDict, lineParts: LineParts): bool =
+  ## Collect cmd lines, process them, then process replacement block
+  ## lines.
+  # There is a limit on cmd line length 1K and memory for all
+  # lines 16K.
+
+  var cmdLines = readCmdLines(...)
+
+
   # let localVars = runCmds(cmdLines, serverVars, sharedVars)
   # processBlockLines(...)
 
@@ -88,24 +109,29 @@ proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream
     prepostList: seq[Prepost], templateFilename: string) =
   ## Process the given template file.
 
+  # Get the line matchers.
   var prepostTable = getPrepostTable(prepostList)
   var prefixMatcher = getPrefixMatcher(prepostTable)
   var commandMatcher = getCommandMatcher()
 
+  # Allocate a buffer for reading lines.
   var lineBufferO = newLineBuffer(templateStream, templateFilename=templateFilename)
   # todo: handle error case.
   var lb = lineBufferO.get()
 
+  # Read and process lines.
   while true:
     var line = lb.readline()
     if line == "":
       break
 
-    let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher, commandMatcher, line)
+    let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
+        commandMatcher, line, lb.templateFilename, lb.lineNum)
     if not linePartsO.isSome:
       resultStream.write(line)
     else:
-      let done = processCmd(env, lb, resultStream, serverVars, sharedVars, linePartsO.get())
+      # Process the command lines and replacement block.
+      let done = processCmd(...)
       if done:
         break
 
@@ -176,11 +202,12 @@ proc processTemplate*(env: Env, args: Args): int =
       env.warn("startup", 0, wUnableToOpenFile, args.resultFilename)
       return 1
 
+  # Process the template.
   processTemplateLines(env, templateStream, resultStream, serverVars,
     sharedVars, args.prepostList, templateFilename)
 
+  # Close the streams.
   if args.resultFilename != "":
     resultStream.close()
-
   if templateFilename != "stdin":
     templateStream.close()
