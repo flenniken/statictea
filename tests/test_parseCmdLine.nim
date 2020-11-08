@@ -32,12 +32,15 @@ proc testParseCmdLine(line: string, expectedLineParts: LineParts,
   let elps = expectedLineParts
   if lps != elps:
     echo line
+    echo "0123456789 123456789 123456789"
     echo "got prefix: '$1'" % lps.prefix
     echo "  expected: '$1'" % elps.prefix
     echo "got command: '$1'" % lps.command
     echo "   expected: '$1'" % elps.command
-    echo "got middle: '$1'" % lps.middle
-    echo "  expected: '$1'" % elps.middle
+    echo "got middle start: '$1'" % $lps.middleStart
+    echo "        expected: '$1'" % $elps.middleStart
+    echo "got middle len: '$1'" % $lps.middleLen
+    echo "      expected: '$1'" % $elps.middleLen
     echo "got continuation: $1" % $lps.continuation
     echo "        expected: $1" % $elps.continuation
     echo "got postfix: '$1'" % lps.postfix
@@ -111,17 +114,20 @@ suite "parseCmdLine.nim":
     var lps = newLineParts()
     check lps.prefix == "<--!$"
     check lps.command == "nextline"
-    check lps.middle == ""
+    check lps.middleStart == 15
+    check lps.middleLen == 0
     check lps.continuation == false
     check lps.postfix == "-->"
     check lps.ending == "\n"
 
   test "newLineParts set":
     var lps = newLineParts(prefix = "asdf", command = "command",
-      middle="middle", continuation = true, postfix = "post", ending = "ending")
+      middleStart = 15, middleLen = 20, continuation = true,
+      postfix = "post", ending = "ending")
     check lps.prefix == "asdf"
     check lps.command == "command"
-    check lps.middle == "middle"
+    check lps.middleStart == 15
+    check lps.middleLen == 20
     check lps.continuation == true
     check lps.postfix == "post"
     check lps.ending == "ending"
@@ -133,12 +139,12 @@ suite "parseCmdLine.nim":
 
   test "parseCmdLine middle":
     let line = "<--!$ nextline middle part -->\n"
-    var expectedLineParts = newLineParts(middle = "middle part ")
+    var expectedLineParts = newLineParts(middleStart = 15, middleLen = 12)
     check testParseCmdLine(line, expectedLineParts)
 
   test "parseCmdLine middle 2":
     let line = "<--!$ nextline    middle part  -->\n"
-    var expectedLineParts = newLineParts(middle = "   middle part  ")
+    var expectedLineParts = newLineParts(middleStart = 15, middleLen = 16)
     check testParseCmdLine(line, expectedLineParts)
 
   test "parseCmdLine continue":
@@ -153,26 +159,20 @@ suite "parseCmdLine.nim":
 
   test "parseCmdLine block":
     let line = "<--!$ block -->\n"
-    var expectedLineParts = newLineParts(command = "block")
+    var expectedLineParts = newLineParts(command = "block", middleStart = 12)
     check testParseCmdLine(line, expectedLineParts)
 
   test "parseCmdLine prefix":
     let line = "#$ nextline \n"
-    var expectedLineParts = newLineParts(prefix = "#$", postfix = "")
+    var expectedLineParts = newLineParts(prefix = "#$",
+      middleStart = 12, postfix = "")
     check testParseCmdLine(line, expectedLineParts)
 
   test "parseCmdLine multiple":
     let line = "#$ block a = 5; b = 'hi'"
     var expectedLineParts = newLineParts(prefix = "#$", command = "block",
-      middle = "a = 5; b = 'hi'", postfix = "", ending = "")
+      middleStart = 9, middleLen = 15, postfix = "", ending = "")
     check testParseCmdLine(line, expectedLineParts)
-
-  # We require the command on the first line.
-  # test "parseCmdLine no command":
-  #   let line = r"#$   \"
-  #   var expectedLineParts = newLineParts(prefix = "#$", command = "",
-  #     postfix = "", ending = "")
-  #   check testParseCmdLine(line, expectedLineParts)
 
   test "no prefix":
     let line = " nextline -->\n"
@@ -180,10 +180,10 @@ suite "parseCmdLine.nim":
 
   test "no command error":
     let line = "<--!$ -->\n"
-    let expectedWarn = "template.html(12): w22: No valid command found on the line, skipping."
+    let expectedWarn = "template.html(12): w22: No command found at column 7, skipping line."
     check parseCmdLineError(line, expectedErrLines = @[expectedWarn])
 
   test "no postfix error":
     let line = "<--!$ nextline \n"
-    let expectedWarn = """template.html(12): w23: The matching closing comment was not found. Expected: "-->""""
+    let expectedWarn = """template.html(12): w23: The matching closing comment postfix was not found, expected: "-->"."""
     check parseCmdLineError(line, expectedErrLines = @[expectedWarn])

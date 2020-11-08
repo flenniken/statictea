@@ -11,98 +11,32 @@ import os
 import matches
 import readlines
 import options
-import regexes
-import tpub
 import parseCmdLine
 
-type
-  LineParts = object
-    prefix: string
-    middle: string
-    command: string
-    continuation: bool
-    postfix: string
-    lineEnding: bool
+#[
 
-  MatchPos = object
-    match: string
-    pos: int
+<--$ nextline -->\n
+<--$ nextline \-->\n
+<--$ nextline a = 5 \-->\n
+<--$ nextline a = 5; b = \-->\n
+<--$ : 20 \-->\n
 
-# <--$ nextline -->\n
-# <--$ nextline \-->\n
-# <--$ nextline a = 5 \-->\n
-# <--$ nextline a = 5; b = \-->\n
-# <--$ : 20 \-->\n
+Each line has a command. The current line continues when it has a
+slash at the end. The continue line starts with a : command.  It may
+continue too. The last line doesn't have a slash. If an error is
+found, a warning is written, and the lines get written as is as if
+they weren't command lines.
 
-proc readCmdLines(env: Env, lb: var LineBuffer, lineParts: lineParts,
-    prepostTable: PrepostTable, prefixMatcher: Matcher, commandMatcher: Matcher,
-    line: string, templateFilename: string,
-    lineNum: Natural): Option[seq[string]] =
-
-  ## Read the lines from the current position until the
-  ## command doesn't continue. Return the list of lines.
-
-  # Each line has a command. The current line continues when it has a
-  # slash at the end. The continue line starts with a : command.  It
-  # may continue too. The last line doesn't have a slash.
-
-  #[
 <--!$ nextline a = 5 \-->\n
 <--!$ : a = 5 \-->\n
 <--!$ : b = 6 \-->\n
 <--!$ : c = 7  -->\n
-  ]#
 
+]#
 
-  var lines: seq[string]
-
-  let lineNum = lb.lineNum
-  let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
-    commandMatcher, line, lb.templateFilename, lb.lineNum)
-  if not linePartsO.isSome():
-    return
-  var lp = linePartsO.get()
-  lines.add(lp.middle)
-
-  var lastLineEnding = lp.lineEnding
-  while lp.continuation:
-    var line = lb.readline()
-    if line == "":
-      # todo: missing continuation line warning.
-      # todo: missing replace block
-      return
-
-    if not lastLineEnding:
-      env.warn(lb.filename, lb.getlineNum()-1, wCmdLineTooLong)
-      return
-    lastLineEnding = lp.lineEnding
-
-    let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
-      commandMatcher, line, lb.templateFilename, lb.lineNum)
-    if not linePartsO.isSome():
-      return
-    lp = linePartsO.get()
-    if lp.command != ":":
-      env.warn("not continuation command")
-      return
-
-    lines.add(lp.middle)
-    result = some(lines)
-
-
-proc processCmd(env: Env, lb: var LineBuffer, resultStream: Stream,
-   serverVars: VarsDict, sharedVars: VarsDict, lineParts: LineParts): bool =
-  ## Collect cmd lines, process them, then process replacement block
-  ## lines.
-  # There is a limit on cmd line length 1K and memory for all
-  # lines 16K.
-
-  var cmdLines = readCmdLines(...)
-
-
-  # let localVars = runCmds(cmdLines, serverVars, sharedVars)
-  # processBlockLines(...)
-
+proc echoCmdLines(resultStream: Stream, cmdLines: seq[string]) =
+  for line in cmdLines:
+    resultStream.write(line)
 
 proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream,
     serverVars: VarsDict, sharedVars: VarsDict,
@@ -125,33 +59,51 @@ proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream
     if line == "":
       break
 
-    let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
-        commandMatcher, line, lb.templateFilename, lb.lineNum)
+    var linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
+        commandMatcher, line, lb.filename, lb.lineNum)
     if not linePartsO.isSome:
       resultStream.write(line)
     else:
-      # Process the command lines and replacement block.
-      let done = processCmd(...)
-      if done:
-        break
+      var lineParts = linePartsO.get()
+      var cmdLines: seq[string] = @[]
+      var cmdLineParts: seq[LineParts] = @[]
+
+      # Collect all the continuation command lines.
+      while lineParts.continuation:
+        line = lb.readline()
+        if line == "":
+          env.warn("missing continuation line")
+          echoCmdLines(resultStream, cmdLines)
+          break
+        cmdLines.add(line)
+        linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
+            commandMatcher, line, lb.filename, lb.lineNum)
+        if not linePartsO.isSome:
+          env.warn("not command line")
+          echoCmdLines(resultStream, cmdLines)
+          break
+        lineParts = linePartsO.get()
+        if lineParts.command != ":":
+          env.warn("not continuation line")
+          echoCmdLines(resultStream, cmdLines)
+          break
+
+
 
 
 #[
-There are three line types:
 
-* cmd lines -- cmd lines start with a prefix. One or more lines that follow each other.
-* replacement block lines -- block lines follow cmd lines. One or more lines that follow each other.
-* other lines -- not cmd or block lines.  These lines get echoed to the output file unchanged.
+There are three line types cmd lines, replacement block lines and
+other lines.
 
-Read lines and echo other lines. Collect up the cmd lines into a list of lines then process them. Then read the block lines, if any, and process them.
+Cmd lines start with a prefix, and they may continue on multiple
+lines.
 
-modes:
-* other line mode
-* collecting cmd lines -- you're done collecting when you find a non cmd line, reach the limit or reach the end of file.
-* collecting block lines -- you're done when you find an ending cmd line, reach the limit or reach the end of file.
+Replacement block lines follow cmd lines. One line for the nextline
+command and one or more lines for replace and block commands.
 
-
-Read a command's lines until no more continuation lines.
+Other lines, not cmd or block lines, get echoed to the output file
+unchanged.
 
 ]#
 

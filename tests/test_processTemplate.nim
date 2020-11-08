@@ -6,8 +6,6 @@ import args
 import testutils
 import os
 import logenv
-import options
-import regexes
 
 # todo: test line endings on Windows
 

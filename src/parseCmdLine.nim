@@ -1,4 +1,3 @@
-import strutils
 import options
 import tables
 import env
@@ -9,8 +8,9 @@ import matches
 type
   LineParts* = object
     prefix*: string
-    middle*: string
     command*: string
+    middleStart*: Natural
+    middleLen*: Natural
     continuation*: bool
     postfix*: string
     ending*: string
@@ -19,10 +19,13 @@ proc parseCmdLine*(env: Env, prepostTable: PrepostTable,
     prefixMatcher: Matcher, commandMatcher: Matcher, line: string,
     templateFilename: string, lineNum: Natural):
     Option[LineParts] =
-  ## Parse the line and return its parts. Return quickly when not a
-  ## command line.
-  # prefix   command    middle    \postfix end
-  # <--!$    nextline   a = 5     \-->\n
+  ## Parse the line and return its parts when it is a command. Return
+  ## quickly when not a command line.
+
+  # prefix   command     middle    \postfix ending
+  # <--!$    nextline    a = 5     \-->\n
+  #                   ^middleStart
+
   var lineParts: LineParts
 
   # Get the prefix.
@@ -34,24 +37,21 @@ proc parseCmdLine*(env: Env, prepostTable: PrepostTable,
   lineParts.prefix = prefixMatch.getGroup()
 
   # Get the command.
-  # todo: currently the command must be on the first line.
-  # Make one big line then parse it?
   let commandMatchO = getMatches(commandMatcher, line, prefixMatch.length)
   if not isSome(commandMatchO):
-    # todo: add column number of the error. It would be the start
-    # command position.
-    env.warn(templateFilename, lineNum, wNoCommand)
+    env.warn(templateFilename, lineNum, wNoCommand, $(prefixMatch.length+1))
     return
   var commandMatch = commandMatchO.get()
   lineParts.command = commandMatch.getGroup()
 
-  # Get the postfix.
+  lineParts.middleStart = prefixMatch.length + commandMatch.length
+
+  # Get the expected postfix.
   assert prepostTable.hasKey(lineParts.prefix)
   lineParts.postfix = prepostTable[lineParts.prefix]
 
-  let middleStart = prefixMatch.length + commandMatch.length
-
-  # Get the optional continuation and its position.
+  # Match the expected postfix at the end and return the optional
+  # continuation and its position when it matches.
   var lastPartMatcher = getLastPartMatcher(lineParts.postfix)
   let lastPartO = getLastPart(lastPartMatcher, line)
   if not isSome(lastPartO):
@@ -60,14 +60,10 @@ proc parseCmdLine*(env: Env, prepostTable: PrepostTable,
   var lastPart = lastPartO.get()
   let (continuation, ending) = lastPart.get2Groups()
   lineParts.continuation = if continuation == "": false else: true
-  let endPos = line.len - lastPart.length
+  lineParts.middleLen = line.len - lastPart.length - lineParts.middleStart
 
   # Line ending is required except for the last line of the file.
   lineParts.ending = ending
-
-  # Get the middle string.
-  if endPos - middleStart > 0:
-    lineParts.middle = line[middleStart..<endPos]
   result = some(lineParts)
 
 when defined(test):
@@ -79,29 +75,33 @@ when defined(test):
     else:
       result = ending
 
-  func `$`*(lp: LineParts): string =
-    ## A string representation of LineParts.
-    var ending: string
-    if lp.ending == "\n":
-      ending = r"\n"
-    elif lp.ending == "\r\n":
-      ending = r"\r\n"
-    else:
-      ending = lp.ending
-    result = """
-  LineParts:
-  prefix: '$1'
-  command: '$2'
-  middle: '$3'
-  continuation: $4
-  ending: '$5'""" % [$lp.prefix, $lp.command, $lp.middle, $lp.continuation,
-                     getEndingString(lp.ending)]
+  # func `$`*(lp: LineParts): string =
+  #   ## A string representation of LineParts.
+  #   var ending: string
+  #   if lp.ending == "\n":
+  #     ending = r"\n"
+  #   elif lp.ending == "\r\n":
+  #     ending = r"\r\n"
+  #   else:
+  #     ending = lp.ending
+  #   result = """
+  # LineParts:
+  # prefix: '$1'
+  # command: '$2'
+  # middle: '$3'
+  # continuation: $4
+  # ending: '$5'""" % [$lp.prefix, $lp.command, $lp.middle, $lp.continuation,
+  #                    getEndingString(lp.ending)]
 
-  proc newLineParts*(prefix: string = "<--!$",
+  proc newLineParts*(
+      prefix: string = "<--!$",
       command: string = "nextline",
-      middle: string = "",
+      middleStart: Natural = 15,
+      middleLen: Natural = 0,
       continuation: bool = false,
       postfix: string = "-->",
       ending: string = "\n"): LineParts =
+    ## Return a new LineParts object. The default is: <--!$ nextline -->\n.
     result = LineParts(prefix: prefix, command: command,
-      middle: middle, continuation: continuation, postfix: postfix, ending: ending)
+      middleStart: middleStart, middleLen: middleLen,
+      continuation: continuation, postfix: postfix, ending: ending)
