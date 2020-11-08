@@ -7,8 +7,6 @@ import testutils
 import os
 import logenv
 
-# todo: test line endings on Windows
-
 suite "processTemplate":
 
   # test "matchLastPart":

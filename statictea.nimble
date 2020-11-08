@@ -1,5 +1,6 @@
 # Package
 import os
+import strutils
 
 # Include the version number.
 include src/version
@@ -106,3 +107,48 @@ task hello, "Say hello":
 
 task boo, "Say boo":
   echo "boo"
+
+task newfile, "Create a new source file and an associated test file.":
+  let count = system.paramCount()+1
+  let name = system.paramStr(count-1)
+  if name == "newfile":
+     echo "Specify the name of the new file without an extension."
+     return
+  let sourceFilename = "src/$1.nim" % name
+  let testFilename = "tests/test_$1.nim" % name
+
+  let sourceFilenameContent = """
+## Parse the command line and return the arguments.
+
+import strutils
+"""
+
+  let testFilenameContent = """
+import unittest
+import $1
+
+suite "$1.nim":
+
+  test "$1":
+    echo "testing"
+""" % name
+
+  let cmd1 = "cp src/version.nim $1" % sourceFilename
+  echo cmd1
+  exec cmd1
+
+  let cmd2 = "cp tests/test_version.nim $1" % testFilename
+  echo cmd2
+  exec cmd2
+
+  echo "Created $1" % sourceFilename
+  echo "Created $1" % testFilename
+
+  # How do you create a file in a nimble task?
+  # var file = open(sourceFilename, fmWrite)
+  # file.write(sourceFilenameContent)
+  # file.close()
+
+  # var file2 = open(testFilename, fmWrite)
+  # file2.write(testFilenameContent)
+  # file2.close()

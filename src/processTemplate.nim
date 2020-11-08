@@ -12,6 +12,7 @@ import matches
 import readlines
 import options
 import parseCmdLine
+import processLinesReturnCmd
 
 #[
 
@@ -32,67 +33,6 @@ they weren't command lines.
 <--!$ : b = 6 \-->\n
 <--!$ : c = 7  -->\n
 
-]#
-
-proc echoCmdLines(resultStream: Stream, cmdLines: seq[string]) =
-  for line in cmdLines:
-    resultStream.write(line)
-
-proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream,
-    serverVars: VarsDict, sharedVars: VarsDict,
-    prepostList: seq[Prepost], templateFilename: string) =
-  ## Process the given template file.
-
-  # Get the line matchers.
-  var prepostTable = getPrepostTable(prepostList)
-  var prefixMatcher = getPrefixMatcher(prepostTable)
-  var commandMatcher = getCommandMatcher()
-
-  # Allocate a buffer for reading lines.
-  var lineBufferO = newLineBuffer(templateStream, templateFilename=templateFilename)
-  # todo: handle error case.
-  var lb = lineBufferO.get()
-
-  # Read and process lines.
-  while true:
-    var line = lb.readline()
-    if line == "":
-      break
-
-    var linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
-        commandMatcher, line, lb.filename, lb.lineNum)
-    if not linePartsO.isSome:
-      resultStream.write(line)
-    else:
-      var lineParts = linePartsO.get()
-      var cmdLines: seq[string] = @[]
-      var cmdLineParts: seq[LineParts] = @[]
-
-      # Collect all the continuation command lines.
-      while lineParts.continuation:
-        line = lb.readline()
-        if line == "":
-          env.warn("missing continuation line")
-          echoCmdLines(resultStream, cmdLines)
-          break
-        cmdLines.add(line)
-        linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
-            commandMatcher, line, lb.filename, lb.lineNum)
-        if not linePartsO.isSome:
-          env.warn("not command line")
-          echoCmdLines(resultStream, cmdLines)
-          break
-        lineParts = linePartsO.get()
-        if lineParts.command != ":":
-          env.warn("not continuation line")
-          echoCmdLines(resultStream, cmdLines)
-          break
-
-
-
-
-#[
-
 There are three line types cmd lines, replacement block lines and
 other lines.
 
@@ -106,6 +46,38 @@ Other lines, not cmd or block lines, get echoed to the output file
 unchanged.
 
 ]#
+
+proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream,
+    serverVars: VarsDict, sharedVars: VarsDict,
+    prepostList: seq[Prepost], templateFilename: string) =
+  ## Process the given template file.
+
+  # Get the line matchers.
+  var prepostTable = getPrepostTable(prepostList)
+  var prefixMatcher = getPrefixMatcher(prepostTable)
+  var commandMatcher = getCommandMatcher()
+
+  # Allocate a buffer for reading lines.
+  var lineBufferO = newLineBuffer(templateStream, templateFilename=templateFilename)
+  if not lineBufferO.isSome():
+    env.warn("Not enough memory for the line buffer.")
+    return
+  var lb = lineBufferO.get()
+
+  # Read and process template lines.
+  while true:
+    # Read template lines and write out non-command lines. When a
+    # command is found, collect its lines and return them.
+    var cmdLines: seq[string] = @[]
+    var cmdLineParts: seq[LineParts] = @[]
+    ReadAndProcessLines(env, lb, prepostTable, prefixMatcher,
+      commandMatcher, cmdLines, cmdLineParts)
+    if cmdLines.len == 0:
+      break # done, no more lines
+
+    # Run the command.
+
+    # Process the replacement block.
 
 
 proc processTemplate*(env: Env, args: Args): int =
