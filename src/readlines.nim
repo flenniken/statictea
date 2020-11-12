@@ -83,3 +83,19 @@ proc readline*(lb: var LineBuffer): string =
       break
 
   result = line
+
+when defined(test):
+
+  proc readlines*(lb: var LineBuffer): seq[string] =
+    while true:
+      var line = lb.readline()
+      if line == "":
+        break
+      result.add(line)
+
+  proc readlines*(stream: Stream): seq[string] =
+    var lineBufferO = newLineBuffer(stream)
+    if not lineBufferO.isSome:
+      return
+    var lb = lineBufferO.get()
+    result = readLines(lb)

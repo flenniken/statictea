@@ -58,3 +58,4 @@ proc processLinesReturnCmd*(env: Env, lb: var LineBuffer, prepostTable: PrepostT
 
         cmdLines.add(line)
         cmdLineParts.add(lineParts)
+      return

@@ -156,3 +156,41 @@ testing
     line = lb.readline()
     check line == "testing\n"
     check lb.getLineNum() == 3
+
+  test "readlines":
+    let content = """
+line one
+line two asdfadsf
+and three
+"""
+    var inStream = newStringStream(content)
+    var lineBufferO = newLineBuffer(inStream)
+    check lineBufferO.isSome
+    var lb = lineBufferO.get()
+    let theLines = readLines(lb)
+    let theLinesString = theLines.join("")
+    if theLinesString != content:
+      echo "---lines:"
+      echo theLinesString
+      echo "---expected lines:"
+      echo content
+      echo "---"
+      check false
+
+
+  test "readlines stream":
+    let content = """
+line one
+line two asdfadsf
+and three
+"""
+    var inStream = newStringStream(content)
+    let theLines = readlines(inStream)
+    let theLinesString = theLines.join("")
+    if theLinesString != content:
+      echo "---lines:"
+      echo theLinesString
+      echo "---expected lines:"
+      echo content
+      echo "---"
+      check false
