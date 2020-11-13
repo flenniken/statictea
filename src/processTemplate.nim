@@ -12,7 +12,7 @@ import matches
 import readlines
 import options
 import parseCmdLine
-import processLinesReturnCmd
+import collectCommand
 
 #[
 
@@ -70,8 +70,8 @@ proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream
     # command is found, collect its lines and return them.
     var cmdLines: seq[string] = @[]
     var cmdLineParts: seq[LineParts] = @[]
-    ReadAndProcessLines(env, lb, prepostTable, prefixMatcher,
-      commandMatcher, cmdLines, cmdLineParts)
+    collectCommand(env, lb, prepostTable, prefixMatcher,
+      commandMatcher, resultStream, cmdLines, cmdLineParts)
     if cmdLines.len == 0:
       break # done, no more lines
 

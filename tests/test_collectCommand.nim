@@ -5,7 +5,7 @@ import matches
 import readlines
 import options
 import parseCmdLine
-import processLinesReturnCmd
+import collectCommand
 import strutils
 
 proc splitLines(content: string): seq[string] =
@@ -69,9 +69,9 @@ proc testProcess(
   var cmdLines: seq[string] = @[]
   var cmdLineParts: seq[LineParts] = @[]
 
-  var env = openEnv("_processLinesReturnCmd.log")
+  var env = openEnv("_collectCommand.log")
 
-  processLinesReturnCmd(env, lb, prepostTable, prefixMatcher,
+  collectCommand(env, lb, prepostTable, prefixMatcher,
     commandMatcher, resultStream, cmdLines, cmdLineParts)
 
   let (logLines, errLines, outLines) = env.readCloseDelete()
@@ -88,7 +88,7 @@ proc testProcess(
   notReturn expectedItems("outLines", outLines, eOutLines)
   result = true
 
-suite "processLinesReturnCmd.nim":
+suite "collectCommand.nim":
 
   test "splitLines":
     check splitLines("").len == 0

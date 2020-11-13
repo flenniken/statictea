@@ -18,13 +18,7 @@ proc dumpCmdLines(resultStream: Stream, cmdLines: var seq[string],
   cmdLines.setlen(0)
   cmdLineParts.setlen(0)
 
-template warnNoContinuationAndDump() =
-  warn(env, lb.filename, lb.lineNum, wNoContinuationLine)
-  dumpCmdLines(resultStream, cmdLines, cmdLineParts, line)
-
-
-# todo: rename to collectCommand
-proc processLinesReturnCmd*(env: Env, lb: var LineBuffer, prepostTable: PrepostTable,
+proc collectCommand*(env: Env, lb: var LineBuffer, prepostTable: PrepostTable,
       prefixMatcher: Matcher, commandMatcher: Matcher, resultStream: Stream,
       cmdLines: var seq[string], cmdLineParts: var seq[LineParts]) =
   ## Read template lines and write out non-command lines. When a
@@ -35,13 +29,16 @@ proc processLinesReturnCmd*(env: Env, lb: var LineBuffer, prepostTable: PrepostT
   while true:
     var line = lb.readline()
     if line == "":
-      break
+      break # No more lines.
 
     var linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
         commandMatcher, line, lb.filename, lb.lineNum)
+
     if not linePartsO.isSome:
+      # Write out non-command lines.
       resultStream.write(line)
     else:
+      # Found command line.
       var lineParts = linePartsO.get()
 
       # Collect all the continuation command lines.
@@ -53,17 +50,16 @@ proc processLinesReturnCmd*(env: Env, lb: var LineBuffer, prepostTable: PrepostT
           return # Return the command lines.
 
         line = lb.readline()
+        if line != "":
+          linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
+              commandMatcher, line, lb.filename, lb.lineNum)
+          if linePartsO.isSome:
+            lineParts = linePartsO.get()
+            if lineParts.command == ":":
+              continue # Got command line, continue looking for more.
+
+        warn(env, lb.filename, lb.lineNum, wNoContinuationLine)
+        dumpCmdLines(resultStream, cmdLines, cmdLineParts, line)
         if line == "":
-          warnNoContinuationAndDump()
           return # No more lines
-
-        linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
-            commandMatcher, line, lb.filename, lb.lineNum)
-        if not linePartsO.isSome:
-          warnNoContinuationAndDump()
-          break # Continue looking for a command.
-
-        lineParts = linePartsO.get()
-        if lineParts.command != ":":
-          warnNoContinuationAndDump()
-          break # Continue looking for a command.
+        break # Continue looking for a command.
