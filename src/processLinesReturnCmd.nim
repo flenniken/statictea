@@ -18,7 +18,7 @@ proc dumpCmdLines(resultStream: Stream, cmdLines: var seq[string],
   cmdLines.setlen(0)
   cmdLineParts.setlen(0)
 
-template warnNoContAndDump() =
+template warnNoContinuationAndDump() =
   warn(env, lb.filename, lb.lineNum, wNoContinuationLine)
   dumpCmdLines(resultStream, cmdLines, cmdLineParts, line)
 
@@ -54,16 +54,16 @@ proc processLinesReturnCmd*(env: Env, lb: var LineBuffer, prepostTable: PrepostT
 
         line = lb.readline()
         if line == "":
-          warnNoContAndDump()
+          warnNoContinuationAndDump()
           return # No more lines
 
         linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
             commandMatcher, line, lb.filename, lb.lineNum)
         if not linePartsO.isSome:
-          warnNoContAndDump()
+          warnNoContinuationAndDump()
           break # Continue looking for a command.
 
         lineParts = linePartsO.get()
         if lineParts.command != ":":
-          warnNoContAndDump()
+          warnNoContinuationAndDump()
           break # Continue looking for a command.

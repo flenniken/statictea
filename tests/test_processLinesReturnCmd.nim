@@ -110,8 +110,7 @@ three
   test "one line":
     let content = "<--!$ nextline -->\n"
     let eCmdLines = @[content]
-    let eLineParts = newLineParts()
-    let eCmdLineParts = @[eLineParts]
+    let eCmdLineParts = @[newLineParts()]
     check testProcess(content, eCmdLines, eCmdLineParts)
 
   test "two lines":
@@ -203,8 +202,63 @@ asdf
                       eResultStreamLines = splitLines(content),
                       eErrLines = @[warning])
 
+  test "empty file":
+    let content = ""
+    check testProcess(content, @[], @[])
 
-  # empty file
-  # more lines after dumping
-  # another command after dumping
-  # two warnings
+
+  test "more lines after dumping":
+    let content = """
+<--!$ nextline \-->
+<--!$ block -->
+asdf
+asdf
+ttasdfasdf
+"""
+    let warning = "template.html(2): w24: Missing the continuation line, " &
+      "abandoning the command."
+    check testProcess(content, @[], @[],
+                      eResultStreamLines = splitLines(content),
+                      eErrLines = @[warning])
+
+  test "another command after dumping":
+    let content = """
+<--!$ nextline \-->
+<--!$ block -->
+asdf
+asdf
+ttasdfasdf
+<--!$ nextline -->
+block
+asdf
+"""
+    let eCmdLines = @["<--!$ nextline -->\n"]
+    let eCmdLineParts = @[newLineParts()]
+    let warning = "template.html(2): w24: Missing the continuation line, " &
+      "abandoning the command."
+    let p = splitLines(content)
+    let eResultStreamLines = @[p[0], p[1], p[2], p[3], p[4]]
+    check testProcess(content, eCmdLines, eCmdLineParts,
+                      eResultStreamLines = eResultStreamLines,
+                      eErrLines = @[warning])
+
+  test "two warnings":
+    let content = """
+<--!$ nextline \-->
+<--!$ block -->
+asdf
+asdf
+ttasdfasdf
+<--!$ nextline \-->
+block
+asdf
+"""
+    let warning1 = "template.html(2): w24: Missing the continuation line, " &
+      "abandoning the command."
+    let warning2 = "template.html(7): w24: Missing the continuation line, " &
+      "abandoning the command."
+    let eResultStreamLines = splitLines(content)
+    check testProcess(content, @[], @[],
+                      eResultStreamLines = eResultStreamLines,
+                      eErrLines = @[warning1, warning2])
+
