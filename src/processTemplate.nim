@@ -76,6 +76,7 @@ proc processTemplateLines(env: var Env, templateStream: Stream, resultStream: St
       break # done, no more lines
 
     # Run the command.
+    let localVars = runCommand(env, cmdLines, cmdLineParts, serverVars, sharedVars)
 
     # Process the replacement block.
 
