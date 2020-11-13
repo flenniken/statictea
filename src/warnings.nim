@@ -31,6 +31,7 @@ type
     wCmdLineTooLong, # w21
     wNoCommand, # w22
     wNoPostfix, # w23
+    wNoContinuationLine, # w24
 
 tpubType:
   const
@@ -61,6 +62,7 @@ tpubType:
       "Command line too long.", # wCmdLineTooLong
       "No command found at column $1, skipping line.", # wNoCommand
       """The matching closing comment postfix was not found, expected: "$1".""", # wNoPostfix
+      "Missing the continuation line, abandoning the command.", # wNoContinuationLine
     ]
 
 func getWarning*(filename: string, lineNum: int,

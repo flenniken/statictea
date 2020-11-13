@@ -32,7 +32,7 @@ proc getFilename*(lineBuffer: LineBuffer): string =
   result = lineBuffer.filename
 
 proc newLineBuffer*(stream: Stream, maxLineLen: int = defaultMaxLineLen,
-    bufferSize: int = defaultBufferSize, templateFilename: string = ""): Option[LineBuffer] =
+    bufferSize: int = defaultBufferSize, filename: string = ""): Option[LineBuffer] =
   ## Return a new LineBuffer.
 
   if maxLineLen < minMaxLineLen or maxLineLen > maxMaxLineLen:
@@ -47,6 +47,7 @@ proc newLineBuffer*(stream: Stream, maxLineLen: int = defaultMaxLineLen,
   lb.charsRead = 0
   lb.pos = 0
   lb.buffer.setLen(bufferSize)
+  lb.filename = filename
 
   result = some(lb)
 

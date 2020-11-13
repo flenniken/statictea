@@ -22,8 +22,6 @@ proc splitLines(content: string): seq[string] =
   if start < content.len:
     result.add(content[start ..< content.len])
 
-
-
 template notReturn(boolProc: untyped) =
   if not boolProc:
     return false
@@ -66,7 +64,7 @@ proc testProcess(
   var commandMatcher = getCommandMatcher()
   var inStream = newStringStream(content)
   var resultStream = newStringStream()
-  var lineBufferO = newLineBuffer(inStream, templateFilename="template.html")
+  var lineBufferO = newLineBuffer(inStream, filename="template.html")
   var lb = lineBufferO.get()
   var cmdLines: seq[string] = @[]
   var cmdLineParts: seq[LineParts] = @[]
@@ -159,7 +157,6 @@ more stuff no newline at end"""
     check testProcess(content, eCmdLines, eCmdLineParts,
                       eResultStreamLines = splitLines(content))
 
-
   test "command and non command":
     let content = """
 not a command
@@ -171,3 +168,43 @@ the next line
     let eCmdLineParts = @[newLineParts()]
     check testProcess(content, eCmdLines, eCmdLineParts,
       eResultStreamLines = @[split[0]])
+
+  test "regular line not continuation line":
+    let content = """
+<--!$ nextline \-->
+asdf
+"""
+    let warning = "template.html(2): w24: Missing the continuation line, " &
+      "abandoning the command."
+    check testProcess(content, @[], @[],
+                      eResultStreamLines = splitLines(content),
+                      eErrLines = @[warning])
+
+  test "block command not continuation command":
+    let content = """
+<--!$ nextline \-->
+<--!$ block -->
+asdf
+"""
+    let warning = "template.html(2): w24: Missing the continuation line, " &
+      "abandoning the command."
+    check testProcess(content, @[], @[],
+                      eResultStreamLines = splitLines(content),
+                      eErrLines = @[warning])
+
+
+  test "no more lines, need continuation":
+    let content = """
+<--!$ nextline \-->
+"""
+    let warning = "template.html(1): w24: Missing the continuation line, " &
+      "abandoning the command."
+    check testProcess(content, @[], @[],
+                      eResultStreamLines = splitLines(content),
+                      eErrLines = @[warning])
+
+
+  # empty file
+  # more lines after dumping
+  # another command after dumping
+  # two warnings

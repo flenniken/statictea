@@ -58,7 +58,7 @@ proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream
   var commandMatcher = getCommandMatcher()
 
   # Allocate a buffer for reading lines.
-  var lineBufferO = newLineBuffer(templateStream, templateFilename=templateFilename)
+  var lineBufferO = newLineBuffer(templateStream, filename=templateFilename)
   if not lineBufferO.isSome():
     env.warn("Not enough memory for the line buffer.")
     return

@@ -194,3 +194,14 @@ and three
       echo content
       echo "---"
       check false
+
+  test "lineBuffer filename":
+    let content = """
+1234567
+testing
+"""
+    var inStream = newStringStream(content)
+    var lineBufferO = newLineBuffer(inStream, filename="template.html")
+    check lineBufferO.isSome
+    var lb = lineBufferO.get()
+    check lb.filename == "template.html"
