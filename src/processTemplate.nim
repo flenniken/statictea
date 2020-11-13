@@ -47,7 +47,7 @@ unchanged.
 
 ]#
 
-proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream,
+proc processTemplateLines(env: var Env, templateStream: Stream, resultStream: Stream,
     serverVars: VarsDict, sharedVars: VarsDict,
     prepostList: seq[Prepost], templateFilename: string) =
   ## Process the given template file.
@@ -80,8 +80,9 @@ proc processTemplateLines(env: Env, templateStream: Stream, resultStream: Stream
     # Process the replacement block.
 
 
-proc processTemplate*(env: Env, args: Args): int =
-  ## Process the template and return 0 on success.
+proc processTemplate*(env: var Env, args: Args): int =
+  ## Process the template and return 0 when no warning messages were
+  ## written.
 
   # Read the server json.
   var serverVars = getEmptyVars()
@@ -135,3 +136,6 @@ proc processTemplate*(env: Env, args: Args): int =
     resultStream.close()
   if templateFilename != "stdin":
     templateStream.close()
+
+  if env.warningWritten:
+    result = 1

@@ -15,7 +15,7 @@ type
     postfix*: string
     ending*: string
 
-proc parseCmdLine*(env: Env, prepostTable: PrepostTable,
+proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
     prefixMatcher: Matcher, commandMatcher: Matcher, line: string,
     templateFilename: string, lineNum: Natural):
     Option[LineParts] =

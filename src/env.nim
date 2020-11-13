@@ -18,6 +18,7 @@ type
     logEnv*: LogEnv
     errStream*: Stream
     outStream*: Stream
+    warningWritten*: bool
     closeStreams: bool
 
 proc close*(env: var Env) =
@@ -32,14 +33,15 @@ template log*(env: var Env, message: string) =
   let info = instantiationInfo()
   env.logEnv.logLine(info.filename, info.line, message)
 
-proc warn*(env: Env, filename: string, lineNum: int, warning: Warning,
+proc warn*(env: var Env, filename: string, lineNum: int, warning: Warning,
            p1: string = "", p2: string = "") =
   warn(env.errStream, filename, lineNum, warning, p1, p2)
 
-proc warn*(env: Env, message: string) =
+proc warn*(env: var Env, message: string) =
   env.errStream.writeLine(message)
+  env.warningWritten = true
 
-proc writeOut*(env: Env, message: string) =
+proc writeOut*(env: var Env, message: string) =
   env.outStream.writeLine(message)
 
 proc checkLogSize(env: var Env) =

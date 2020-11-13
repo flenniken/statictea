@@ -70,17 +70,17 @@ example command lines:
 
 ** Statements
 
-You define local variables with statements.
+You format server content in variables you create in statements.
 
 A statement consists of a variable, an equal sign, and a right
 hand side. The right hand side is either another variable, a
 function or a literal. Here are some examples:
 
 #+BEGIN_SRC
-t.list = teaList
-nameLen = t.len(name)
 tea = "Earl Grey"
 num = 5
+t.list = s.teaList
+nameLen = t.len(s.name)
 #+END_SRC
 
 Statements go on the the nextline, block or replace commands.
@@ -426,7 +426,7 @@ Example numbers:
 *** Float
 
 A float is a 64 bit real number. Like integers a float is
-converted to a string when passed to a function takeing a sring.
+converted to a string when passed to a function taking a sring.
 A float has a decimal point.
 
 Example floats:
@@ -460,7 +460,7 @@ the variable name and the item value becomes the variable value.
 
 Internally two json namespaces exist, one for the server json and
 one for the shared json.  You access the shared json variables
-with the "s." prefix, and the v prefix for the the server
+with the "h." prefix, and the s prefix for the the server
 variables, no prefix for the local variables.
 
 Variables defined in the template are local to the block where
@@ -472,7 +472,7 @@ takes precedence when there are duplicates.
 Prefixes:
 
 - t. -- System variables, tea vars
-- s. -- Server varaibles
+- s. -- Server variables
 - h. -- Shared variables
 - no prefix -- Local variables
 
@@ -562,7 +562,7 @@ template:
 <select>
 <!--$ nextline t.list=s.companyList; \-->
 <!--$ : current=t.if(s.selected, ' selected="selected"', "") -->
-  <option{s.current}>{s.company}</option>
+  <option{current}>{s.company}</option>
 </select>
 #+END_SRC
 
@@ -701,18 +701,17 @@ The t.shared variable contains the shared json variables
 ** Functions
 
 StaticTea has many built in functions you can call to format your
-varibles for output.  Functions take zero or more input parameters
+variables for output.  Functions take zero or more input parameters
 and return a value that you assign to a variable.
 
-You use functions on a command line.
+You use functions on a command line to assign variables.
 
-The following example assigns the numberVars variable to the
-number of variables in the t.server dictionary then it uses the
-variable in its replacement block.
+The following example assigns the greeting variable a personalized
+greeting, then it uses the variable in the replacement block.
 
 #+BEGIN_SRC
-<!--$ nextline numberVars = t.len(t.server) -->
-The server json contains {numberVars} variables.
+<!--$ nextline greeting = t.concat("Hello ", s.name) -->
+{greeting}
 #+END_SRC
 
 List of functions:
@@ -1287,9 +1286,10 @@ warning: the admin variable is missing
 ** Log File
 
 The log file contains timing, memory usage and low priority
-warnings. Statictea.log is created in the current folder.  Log
-information is appended to the file and it grows without
-bounds. Make sure to setup log rotation.
+warnings. The log file, statictea.log, is created in the current
+folder (system default log location?).  Log information is
+appended to the file and it grows without bounds. Make sure to
+setup log rotation.
 
 ** Run StaticTea
 
@@ -1400,10 +1400,10 @@ the limits:
 
 ** Encoding and Line Endings
 
-Templates are utf-8 encoded or its ascii subset.  Three line
-endings are supported on all platforms: LF, CR LF, or CR. Any
-style is read and the platform style is written.  The template
-syntax only uses ascii.
+Templates are utf-8 encoded or its ascii subset.  Two line
+endings are supported on all platforms: LF, and CR/LF.  Line
+endings are preserved.  The template syntax only uses ascii
+except utf-8 characters may appear in quoted strings.
 
 ** Ellipsize
 

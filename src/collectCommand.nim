@@ -18,7 +18,7 @@ proc dumpCmdLines(resultStream: Stream, cmdLines: var seq[string],
   cmdLines.setlen(0)
   cmdLineParts.setlen(0)
 
-proc collectCommand*(env: Env, lb: var LineBuffer, prepostTable: PrepostTable,
+proc collectCommand*(env: var Env, lb: var LineBuffer, prepostTable: PrepostTable,
       prefixMatcher: Matcher, commandMatcher: Matcher, resultStream: Stream,
       cmdLines: var seq[string], cmdLineParts: var seq[LineParts]) =
   ## Read template lines and write out non-command lines. When a

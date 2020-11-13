@@ -25,7 +25,9 @@ suite "env.nim":
     var env = openEnv("_test.log")
     testProc(env)
     env.writeOut(outMsg)
+    check env.warningWritten == false
     env.warn(errMsg)
+    check env.warningWritten == true
     var (logLines, errLines, outLines) = env.readCloseDelete()
 
     check logLines.len == 2

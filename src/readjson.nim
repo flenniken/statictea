@@ -47,7 +47,7 @@ proc jsonToValue(jsonNode: JsonNode, depth: int = 0): Option[Value] {.tpub.} =
     value = Value(kind: vkList, listv: listVars)
   result = some(value)
 
-proc readJson*(env: Env, filename: string, vars: var VarsDict) =
+proc readJson*(env: var Env, filename: string, vars: var VarsDict) =
   ## Read a json file and add the variables to the vars dictionary.
 
   if not fileExists(filename):

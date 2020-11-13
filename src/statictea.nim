@@ -14,8 +14,9 @@ import tpub
 import env
 
 # todo: put the log in the standard log location, ie /var/log.
+# check free disk space where the template is being written?
 
-proc processArgs(env: Env, args: Args): int =
+proc processArgs(env: var Env, args: Args): int =
   if args.help:
     result = showHelp(env)
   elif args.version:
@@ -29,7 +30,7 @@ proc processArgs(env: Env, args: Args): int =
     env.writeOut("No template name. Use -h for help.")
 
 proc main(env: var Env, argv: seq[string]): int {.tpub.} =
-  ## Run statictea.
+  ## Run statictea. Return 0 when no warning messages were written.
 
   env.log("----- starting -----")
   env.log("argv: $1" % $argv)

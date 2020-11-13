@@ -69,6 +69,6 @@ SEE ALSO
      For more information see https://github.com/flenniken/statictea
 """
 
-proc showHelp*(env: Env): int =
+proc showHelp*(env: var Env): int =
   env.writeOut(getHelp())
   result = 0
