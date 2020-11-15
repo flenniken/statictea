@@ -51,6 +51,7 @@ suite "processTemplate":
     args.templateList = @["template.html"]
     args.resultFilename = "resultToFile.txt"
     let rc = processTemplate(env, args)
+    defer: discard tryRemoveFile(args.resultFilename)
     check rc == 0
 
     let (logLines, errLines, outLines) = env.readCloseDelete()

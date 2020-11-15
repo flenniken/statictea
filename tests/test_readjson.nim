@@ -48,6 +48,7 @@ suite "readjson.nim":
       @["read json(0): w17: Unable to open file: _cannotopen.tmp."]
     let expectedValue = getEmptyVars()
     let filename = "_cannotopen.tmp"
+    defer: discard tryRemoveFile(filename)
     createFile(filename, "temp")
     setFilePermissions(filename, {fpUserWrite, fpGroupWrite})
     testReadJsonFile(filename, expectedValue, expectedErrLines=expectedErrLines)
