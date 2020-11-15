@@ -38,7 +38,7 @@ proc splitStatements(content: string): seq[string] =
   ## b = 6_
   ## """
   ## returns two strings: "a = 5" and "b = 6 ".
-  var eLines = collectCommand.splitLines(content)
+  var eLines = splitNewLines(content)
   for line in eLines:
     var rline = line.replace('_', ' ')
     if rline.len > 0:
@@ -46,6 +46,12 @@ proc splitStatements(content: string): seq[string] =
       if rline[lastIndex] == '\n':
         rline = rline[0 ..< lastIndex]
     result.add(rline)
+
+proc testGetStatements(content: string): seq[string] =
+  let cmdLines = splitNewLines(content)
+  let cmdLineParts = getCmdLineParts(cmdLines)
+  result = getStatements(cmdLines, cmdLineParts)
+
 
 proc compareStatements(statements: seq[string], eContent: string): bool =
   ## Return true when the statements match the expected
@@ -94,8 +100,6 @@ a = 5
     check sLines[0] == "a = 5"
     check sLines[1] == " b = 6 "
 
-
-
   test "no statements":
     let cmdLines = @["<--!$ nextline -->\n"]
     let cmdLineParts = @[newLineParts()]
@@ -106,7 +110,7 @@ a = 5
     let content = """
 <--!$ nextline a = 5 -->
 """
-    let cmdLines = collectCommand.splitLines(content)
+    let cmdLines = splitNewLines(content)
     let cmdLineParts = getCmdLineParts(cmdLines)
     let statements = getStatements(cmdLines, cmdLineParts)
     check statements.len == 1
@@ -117,7 +121,7 @@ a = 5
     let content = """
 <--!$ nextline a = 5; b = 6 -->
 """
-    let cmdLines = collectCommand.splitLines(content)
+    let cmdLines = splitNewLines(content)
     let cmdLineParts = getCmdLineParts(cmdLines)
     let statements = getStatements(cmdLines, cmdLineParts)
     check statements.len == 2
@@ -128,12 +132,160 @@ a = 5
     let content = """
 <--!$ nextline a = 5; b = 6 ;c=7-->
 """
-    let cmdLines = collectCommand.splitLines(content)
+    let cmdLines = splitNewLines(content)
     let cmdLineParts = getCmdLineParts(cmdLines)
     let statements = getStatements(cmdLines, cmdLineParts)
     let eStatements = """
 a = 5
  b = 6_
 c=7
+"""
+    check compareStatements(statements, eStatements)
+
+  test "two lines":
+    let content = """
+<--!$ nextline a = 5; \-->
+<--!$ : asdf -->
+"""
+    let cmdLines = splitNewLines(content)
+    let cmdLineParts = getCmdLineParts(cmdLines)
+    let statements = getStatements(cmdLines, cmdLineParts)
+    let eStatements = """
+a = 5
+ asdf_
+"""
+    check compareStatements(statements, eStatements)
+
+  test "semicolon at the start":
+    let content = """
+<--!$ nextline ;a = 5 -->
+"""
+    let statements = testGetStatements(content)
+    let eStatements = """
+a = 5_
+"""
+    check compareStatements(statements, eStatements)
+
+  test "double quotes":
+    let content = """
+<--!$ nextline a="hi" -->
+"""
+    let statements = testGetStatements(content)
+    let eStatements = """
+a="hi"_
+"""
+    check compareStatements(statements, eStatements)
+
+  test "double quotes with semicolon":
+    let content = """
+<--!$ nextline a="h\i;" -->
+"""
+    let statements = testGetStatements(content)
+    let eStatements = """
+a="h\i;"_
+"""
+    check compareStatements(statements, eStatements)
+
+  test "double quotes with slashed double quote":
+    let content = """
+<--!$ nextline a="\"hi\"" -->
+"""
+    let statements = testGetStatements(content)
+    let eStatements = """
+a="\"hi\""_
+"""
+    check compareStatements(statements, eStatements)
+
+  test "double quotes with single quote":
+    let content = """
+<--!$ nextline a="'hi'" -->
+"""
+    let statements = testGetStatements(content)
+    let eStatements = """
+a="'hi'"_
+"""
+    check compareStatements(statements, eStatements)
+
+  test "single quotes":
+    let content = """
+<--!$ nextline a='hi' -->
+"""
+    let statements = testGetStatements(content)
+    let eStatements = """
+a='hi'_
+"""
+    check compareStatements(statements, eStatements)
+
+  test "single quotes with semicolon":
+    let content = """
+<--!$ nextline a='hi;there' -->
+"""
+    let statements = testGetStatements(content)
+    let eStatements = """
+a='hi;there'_
+"""
+    check compareStatements(statements, eStatements)
+
+  test "single quotes with slashed single quote":
+    let content = """
+<--!$ nextline a='hi\'there' -->
+"""
+    let statements = testGetStatements(content)
+    let eStatements = """
+a='hi\'there'_
+"""
+    check compareStatements(statements, eStatements)
+
+  test "single quotes with double quote":
+    let content = """
+<--!$ nextline a='hi "there"' -->
+"""
+    let statements = testGetStatements(content)
+    let eStatements = """
+a='hi "there"'_
+"""
+    check compareStatements(statements, eStatements)
+
+  test "semicolon at the end":
+    let content = """
+<--!$ nextline a = 5;-->
+"""
+    let statements = testGetStatements(content)
+    let eStatements = """
+a = 5
+"""
+    check compareStatements(statements, eStatements)
+
+  test "two semicolons together":
+    let content = """
+<--!$ nextline asdf;;fdsa-->
+"""
+    let statements = testGetStatements(content)
+    let eStatements = """
+asdf
+fdsa
+"""
+    check compareStatements(statements, eStatements)
+
+  test "white space statement":
+    let content = """
+<--!$ nextline asdf; -->
+"""
+    let statements = testGetStatements(content)
+    let eStatements = """
+asdf
+"""
+    check compareStatements(statements, eStatements)
+
+  test "white space statement 2":
+    let content = """
+<--!$ nextline asdf; \-->
+<--!$ : ;   ; \-->
+<--!$ : ;x = y -->
+"""
+    let statements = testGetStatements(content)
+    let eStatements = """
+asdf
+x = y_
 """
     check compareStatements(statements, eStatements)

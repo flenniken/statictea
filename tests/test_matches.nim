@@ -106,3 +106,30 @@ suite "matches.nim":
     checkGetLastPart(matcher, "<--!$ nextline a\\", 16, @[r"\", ""], 1)
     checkGetLastPart(matcher, "<--!$ nextline a\\\n", 16, @[r"\", "\n"], 2)
     checkGetLastPart(matcher, "<--!$ nextline a\\\r\n", 16, @[r"\", "\r\n"], 3)
+
+
+  test "get space tab":
+    let matcher = getSpaceTabMatcher()
+    check checkMatcher(matcher, "    ", 0, @[], 4)
+    check checkMatcher(matcher, " \t \t   ", 0, @[], 7)
+    check not matcher.getMatches("    s   ", 0).isSome
+
+  test "get variable":
+    var matcher = getVariableMatcher()
+    check checkMatcher(matcher, "a = 5", 0, @["", "a"], 4)
+    check checkMatcher(matcher, "t.a = 5", 0, @["t.", "a"], 6)
+    check checkMatcher(matcher, "abc = 5", 0, @["", "abc"], 6)
+    check checkMatcher(matcher, "   a = 5", 0, @["", "a"], 7)
+    check checkMatcher(matcher, "aBcD_t = 5", 0, @["", "aBcD_t"], 9)
+    check checkMatcher(matcher, "t.server = 5", 0, @["t.", "server"], 11)
+    check checkMatcher(matcher, "t.server =", 0, @["t.", "server"], 10)
+    check checkMatcher(matcher, "   a =    5", 0, @["", "a"], 10)
+
+    check checkMatcherNot(matcher, "abc", 0)
+    check checkMatcherNot(matcher, ".a =", 0)
+    check checkMatcherNot(matcher, "tt.a =", 0)
+    check checkMatcherNot(matcher, "_a =", 0)
+    check checkMatcherNot(matcher, "*a =", 0)
+    check checkMatcherNot(matcher, "34r =", 0)
+    check checkMatcherNot(matcher, "  2 =", 0)
+    check checkMatcherNot(matcher, "abc() =", 0)

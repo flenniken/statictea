@@ -13,6 +13,7 @@ import readlines
 import options
 import parseCmdLine
 import collectCommand
+import runCommand
 
 #[
 
@@ -56,6 +57,7 @@ proc processTemplateLines(env: var Env, templateStream: Stream, resultStream: St
   var prepostTable = getPrepostTable(prepostList)
   var prefixMatcher = getPrefixMatcher(prepostTable)
   var commandMatcher = getCommandMatcher()
+  var variableMatcher = getVariableMatcher()
 
   # Allocate a buffer for reading lines.
   var lineBufferO = newLineBuffer(templateStream, filename=templateFilename)
@@ -76,7 +78,8 @@ proc processTemplateLines(env: var Env, templateStream: Stream, resultStream: St
       break # done, no more lines
 
     # Run the command.
-    let localVars = runCommand(env, cmdLines, cmdLineParts, serverVars, sharedVars)
+    let localVars = runCommand(env, cmdLines, cmdLineParts,
+                               serverVars, sharedVars, variableMatcher)
 
     # Process the replacement block.
 

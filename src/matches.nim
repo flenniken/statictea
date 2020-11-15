@@ -85,3 +85,20 @@ proc getLastPart*(matcher: Matcher, line: string): Option[Matches] =
 #  \-->n
 #   -->n
 #    -->
+
+proc getSpaceTabMatcher*(): Matcher =
+  ## Return a matcher that determines whether a string is all spaces
+  ## and tabs.
+  result = newMatcher(r"^[ \t]*$", 0)
+
+proc notEmptyOrSpaces*(spaceTabMatcher: Matcher, statement: string): bool =
+  ## Return true when a statement is not empty or not all whitespace.
+  if statement.len != 0:
+    let matches = getMatches(spaceTabMatcher, statement)
+    if not matches.isSome:
+      result = true
+
+proc getVariableMatcher*(): Matcher =
+  # Match a variable, equal sign and surrounding whitespace.
+  # Return the optional namespace and the required name.
+  result = newMatcher(r"^\s*([a-z]\.){0,1}([a-zA-Z][a-zA-Z0-9_]*)\s*=\s*", 2)

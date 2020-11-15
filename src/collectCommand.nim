@@ -65,8 +65,7 @@ proc collectCommand*(env: var Env, lb: var LineBuffer, prepostTable: PrepostTabl
         break # Continue looking for a command.
 
 when defined(test):
-  # todo: rename splitLines so it is not confused with the system proc. splitNewLines
-  proc splitLines*(content: string): seq[string] =
+  proc splitNewLines*(content: string): seq[string] =
     ## Split lines and keep the line endings.
     if content.len == 0:
       return

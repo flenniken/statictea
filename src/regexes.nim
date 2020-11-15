@@ -114,3 +114,18 @@ when defined(test):
     ## expected outcome, else return false.
     let matches = getMatches(matcher, line, start)
     result = checkMatches(matches, matcher, line, start, expectedStrings, expectedLength)
+
+  proc checkMatcherNot*(matcher: Matcher, line: string, start: Natural = 0): bool =
+    # Return true when the matcher does not match.
+
+    var matchesO = matcher.getMatches(line, start)
+    if not matchesO.isSome:
+      return true
+    var matches = matchesO.get()
+
+    echo "---Found unexpected match---"
+    echo "   line: $1" % [line]
+    echo "  start: $1" % startPointer(matches.start)
+    echo "pattern: $1" % matcher.pattern
+    for group in matches.groups:
+      echo "got: '$1'" % [group]
