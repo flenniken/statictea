@@ -56,18 +56,6 @@ StaticTea commands:
 - endblock - end of block
 - endreplace - end of replace block
 
-example command lines:
-
-#+BEGIN_SRC
-<!--$ nextline -->
-<!--$ block t.list = tea_list -->
-<!--$ replace t.content = header -->
-<!--$ # this is a comment command -->
-<!--$ : var="Oolong" -->
-<!--$ endblock -->
-<!--$ endreplace -->
-#+END_SRC
-
 ** Statements
 
 You format server content in variables you create in statements.
@@ -94,14 +82,13 @@ Statements are executed from left to right.
 
 *** Nextline Command
 
-The nextline command targets the next line for replacement. The
-next line is called the replacement block.
+The nextline command targets the line following it for
+replacement. The targeted line is called the replacement block.
 
-The content comes from text in the line and variables wrapped
-with brackets.
+The replacement block contains any number of variables wrapped
+with brackets.  They get replaced with the variables's value.
 
-The following example contains some text and two variables, the
-drink and drinkType variables.
+The following example's replacement block contains two variables.
 
 template:
 
@@ -445,7 +432,8 @@ are defined in the json files.
 
 *** List
 
-You can fetch items from lists defined in json files with t.get.
+You can fetch items from lists defined in json files with
+t.get. You define the lists in the json files.
 
 ** Variables
 
@@ -459,9 +447,9 @@ The json dictionary items become variables.  The item key becomes
 the variable name and the item value becomes the variable value.
 
 Internally two json namespaces exist, one for the server json and
-one for the shared json.  You access the shared json variables
-with the "h." prefix, and the s prefix for the the server
-variables, no prefix for the local variables.
+one for the shared json.  You access the server json variables
+with the "s." prefix and the shared json variables with the "h."
+prefix, no prefix for the local variables.
 
 Variables defined in the template are local to the block where
 they are defined.
@@ -487,11 +475,12 @@ t.list
 ** System Variables
 
 The built in system variables control how the replacement block
-works.
+works and they are prefixed with "t."
 
-- t.list - controls whether the block repeats
-- t.maxlines - maximum lines before endblock or endreplace
 - t.content - content of the replace block
+- t.list - controls whether the block repeats
+- t.local - dictionary containing the current block's local variables.
+- t.maxlines - maximum lines before endblock or endreplace
 - t.result - where the result goes
 - t.server - dictionary containing the server variables
 - t.shared - dictionary containing the shared variables
@@ -552,8 +541,8 @@ result:
   * Herbal
 #+END_SRC
 
-The following example builds a select list of tea companies where
-Twinings is selected.
+The following example builds an html select list of tea companies
+with the Twinings company selected.
 
 template:
 
@@ -797,7 +786,7 @@ template:
 
 #+BEGIN_SRC
 <!--$ nextline sold = t.cmp(s.earlgrey, s.oolong); \-->
-<!--$ : bestSelling = t.case(s.sold, s.earlgreyName, 0, s.oolongName) -->
+<!--$ : bestSelling = t.case(sold, s.earlgreyName, -1, s.oolongName) -->
 The best selling tea this week is {s.bestSelling}.
 #+END_SRC
 
@@ -855,7 +844,8 @@ t.exists(b) => 0
 *** t.find()
 
 The t.find function searches a string for substring and returns
-its position when found. When not found it returns -1.
+its position when found. When not found it returns -1. Positions
+start at 0.
 
 template:
 
@@ -890,9 +880,9 @@ var2 = t.get(t.list, 2, "default")
 You use the if function to select a value based on a condition.
 
 The if function has three parameters. The first parameter is the
-condition, the second is the 1 case and the third is the else
-case. When the condition is 1, the second parameter is returned,
-else the third parameter is returned.
+condition value (1 or not 1), the second is the true case (1 case) and the
+third is the else case (not 1 case).  When the condition value is 1, the second
+parameter is returned, else the third parameter is returned.
 
 The following example uses the template system to show how it
 works.
@@ -902,10 +892,12 @@ template:
 #+BEGIN_SRC
 <--$ block \-->
 <--$ var1=t.if(1, 'dog', 'cat'), \-->
-<--$ var2=t.if(0, 'dog', 'cat'), -->
+<--$ var2=t.if(0, 'dog', 'cat'), \-->
+<--$ var3=t.if(8, 'dog', 'cat'), -->
 
 t.if(1, 'dog', 'cat') => {var1}
 t.if(0, 'dog', 'cat') => {var2}
+t.if(8, 'dog', 'cat') => {var3}
 <--$ endblock -->
 #+END_SRC
 
@@ -915,6 +907,7 @@ result:
 
 t.if(1, 'dog', 'cat') -> dog
 t.if(0, 'dog', 'cat') -> cat
+t.if(8, 'dog', 'cat') -> cat
 #+END_SRC
 
 *** t.format
@@ -927,8 +920,8 @@ things. For all the details see: https://nim-lang.org/docs/strformat.html.
 template:
 
 #+BEGIN_SRC
-<--$ nextline -->
-Kathleen spent ${s.cost:.2f} on tea for Steve's birthday.
+<--$ nextline cost=t.format(".2f", s.cost)-->
+Kathleen spent ${cost} on tea for Steve's birthday.
 #+END_SRC
 
 server json:
@@ -987,9 +980,9 @@ The server json dictionary has 1 elements.
 
 *** t.row
 
-The special row function returns the current row for lists. The
-function takes a parameter which specifies the starting
-point. You can use it in replacement blocks.
+The special row function returns the current row number for
+lists. The function takes a parameter which specifies the
+starting point. You can use it in replacement blocks.
 
 - t.row(0) — returns 0, 1, 2,...
 - t.row(1) — returns 1, 2, 3,...
@@ -1135,7 +1128,9 @@ Built in Prefixes:
 - '/*$' '*/' - for c
 
 You can define other comment types on the command line using the
-prepost option one or more times.
+prepost option one or more times. When you specify your own
+prepost values, the defaults no longer exist so you have control
+of which prefixes get used and have specify meaning.
 
 You separate the prefix from the postfix with one space and the
 postfix is optional.
@@ -1173,8 +1168,7 @@ variable wins.
 The json null values get converted to the 0. Json True and False
 get converted to 1 and 0.
 
-You cannot change the json variables but you can define local
-variables of the same name and they take precedent.
+You cannot change the json variables.
 
 Here is an example showing the number of elements in the t.server
 and t.shared dictionaries.
@@ -1314,10 +1308,11 @@ The StaticTea command line options:
 - version - outputs the version number.
 - server - the server json file(s), you can specify multiple.
 - shared - the shared json file(s), you can specify multiple.
-- template - the template file.
+- template - the template file, or "stdin".
 - result - the result file.
 - update - update the template replace blocks.
-- prepost - add a command prefix and postfix, you can specify multiple.
+- prepost - add a command prefix and postfix, you can specify
+  multiple. When you specify values, the defaults are no longer used.
 
 ** StaticTea as a Filter
 
@@ -1385,17 +1380,17 @@ them.
   supporting the rarely needed unlimited cases.
 - Defining limits tells the users how to best use the program.
 
-You can overwride the t.maxLine limit but not others. Here are
+You can override the t.maxLine limit but not others. Here are
 the limits:
 
 - t.maxlines - number of lines before the end block
   command. Useful when you forget to end the block. You can
   override this with bigger or smaller values.  Default 10.
-- max command line length - 4096 characters.
-- max variable name length - 64 characters.
-- max literal string length - 256 characters.
-- max json file size - xxx bytes.
-- max number of items in a list - 500 items.  Use multiple lists
+- Maximum command line length - 1024 characters.
+- Maximum variable name length - 64 characters.
+- Maximum literal string length - 256 characters.
+- Maximum json file size - xxx bytes.
+- Maximum number of items in a list - 500 items.  Use multiple lists
   if you need more.
 
 ** Encoding and Line Endings
