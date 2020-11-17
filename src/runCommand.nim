@@ -9,11 +9,16 @@ import parseCmdLine
 import tables
 import readLines
 import matches
+import strUtils
+import warnings
 
 type
   State = enum
     ## Finite state machine states for finding statements.
     start, double, single, slashdouble, slashsingle
+
+proc warn(message: string) =
+ echo "replace with the real warning"
 
 iterator yieldStatements(cmdLines: seq[string], cmdLineParts: seq[LineParts]): string {.tpub.} =
   ## Iterate through the command's statements.  Statements are
@@ -64,8 +69,39 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts: seq[LineParts]): s
   if notEmptyOrSpaces(spaceTabMatcher, statement):
     yield statement
 
+proc getString(env: var Env, statement: string, start: Natural): Option[Value] =
+  echo "getString"
+
+proc getNumber(env: var Env, statement: string, start: Natural): Option[Value] =
+  echo "getNumber"
+# todo: number could be stored as a string of digits.
+
+
+proc getVarOrFunctionValue(env: var Env, statement: string, start: Natural): Option[Value] =
+  echo "getVarOrFunctionValue"
+
+proc getValue(env: var Env, statement: string, start: Natural): Option[Value] =
+
+  # If the value starts with a quote, it's a string.
+  # quote - string
+  # digit, period or minus sign - number
+  # a-zA-Z - variable or function
+  assert start < statement.len
+
+  let char = statement[start]
+
+  if char == '\'' or char == '"':
+    result = getString(env, statement, start)
+  elif isDigit(char) or char == '-' or char == '.':
+    result = getNumber(env, statement, start)
+  elif isLowerAscii(char) or isUpperAscii(char):
+    result = getVarOrFunctionValue(env, statement, start)
+  else:
+    # warn("Invalid character, expected a string, number, variable or function.")
+    discard
+
 proc runStatement(env: var Env, statement: string, variableMatcher: Matcher):
-    Option[tuple[name: string, value:Value]] {.tpub.} =
+    Option[tuple[nameSpace: string, varName: string, value:Value]] {.tpub.} =
   ## Run one statement.
 
   # Get the variable name. Match the surrounding white space and the
@@ -74,13 +110,19 @@ proc runStatement(env: var Env, statement: string, variableMatcher: Matcher):
   if not matchesO.isSome:
     env.warn("The statement does not start with a variable name.")
     return
-  var matches = matchesO.get()
-  var (nameSpace, varName) = matches.get2Groups()
+  let matches = matchesO.get()
+  let (nameSpace, varName) = matches.get2Groups()
 
+  # Get the right hand side value.
+  let valueO = getValue(env, statement, matches.length)
+  if not matchesO.isSome:
+    return
+  result = some((nameSpace, varName, valueO.get()))
 
-  # Get the right hand side.
+proc assignSystemVar(env: var Env, nameSpace: string, value: Value) =
+  echo "assignSystemVar"
 
-
+# todo: pass in the system vars.
 proc runCommand*(env: var Env, cmdLines: seq[string],
     cmdLineParts: seq[LineParts],
     serverVars: VarsDict, sharedVars: VarsDict,
@@ -93,5 +135,15 @@ proc runCommand*(env: var Env, cmdLines: seq[string],
     # nameValue is returned and we skip the statement.
     let nameValueO = runStatement(env, statement, variableMatcher)
     if nameValueO.isSome():
+      # Assign the variable to its dictionary.
       let tup = nameValueO.get()
-      result[tup.name] = tup.value
+      let (nameSpace, varName, value) = tup
+      case nameSpace:
+        of "":
+          result[varName] = value
+        of "t.":
+          assignSystemVar(env, nameSpace, value)
+        of "s.", "h.":
+          warn("You cannot overwrite the server or shared variables.")
+        else:
+          warn("Unknown variable namespace: $1." % nameSpace)
