@@ -73,8 +73,29 @@ proc getString(env: var Env, statement: string, start: Natural): Option[Value] =
   echo "getString"
 
 proc getNumber(env: var Env, statement: string, start: Natural): Option[Value] =
+  # n = 2345
+  # n = 23.45
+  # n = -2345
+  # n = -23.45
+  #     ^
+  # n = 23.45abc
+  # n = 23.45 abc
+  # n = -23.450000000000000...000001
+  # too big
+  # too small
+
+  if intType:
+    try:
+      parseInt(statement, number, start)
+    except ValueError:
+      warn("Integer out of range."
+  else:
+    int length = parseBiggestFloat(statement, number, start)
+    if length == 0:
+      warn("Invalid float number."
+      
   echo "getNumber"
-# todo: number could be stored as a string of digits.
+
 
 
 proc getVarOrFunctionValue(env: var Env, statement: string, start: Natural): Option[Value] =
