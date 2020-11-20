@@ -133,3 +133,31 @@ suite "matches.nim":
     check checkMatcherNot(matcher, "34r =", 0)
     check checkMatcherNot(matcher, "  2 =", 0)
     check checkMatcherNot(matcher, "abc() =", 0)
+
+  test "getNumberMatcher":
+    var matcher = getNumberMatcher()
+    check checkMatcher(matcher, "5", start = 0, expectedStrings = @[""], expectedLength = 1)
+
+    check checkMatcher(matcher, "-5", 0, @[""], 2)
+    check checkMatcher(matcher, "-5.", 0, @["."], 3)
+    check checkMatcher(matcher, "-5.6", 0, @["."], 4)
+    check checkMatcher(matcher, "56789.654321", 0, @["."], 12)
+    check checkMatcher(matcher, "4a", 0, @[""], 1)
+    check checkMatcher(matcher, "4 ", 0, @[""], 1)
+    check checkMatcher(matcher, "4.abc ", 0, @["."], 2)
+    check checkMatcher(matcher, "-4.abc ", 0, @["."], 3)
+    check checkMatcher(matcher, "4_123_456.0 ", 0, @["."], 11)
+    check checkMatcher(matcher, "4_123_456 ", 0, @[""], 9)
+
+  test "getNumberMatcherNot":
+    var matcher = getNumberMatcher()
+    check checkMatcherNot(matcher, "abc")
+    check checkMatcherNot(matcher, "")
+    check checkMatcherNot(matcher, ".")
+    check checkMatcherNot(matcher, "+") # no plus signs
+    check checkMatcherNot(matcher, "-")
+    check checkMatcherNot(matcher, "_")
+    check checkMatcherNot(matcher, "_4")
+    check checkMatcherNot(matcher, "-a")
+    check checkMatcherNot(matcher, ".1") # need a leading digit
+    check checkMatcherNot(matcher, "-.1")

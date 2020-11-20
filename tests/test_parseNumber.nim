@@ -31,6 +31,35 @@ proc testParseIntegerError(str: string, start: Natural = 0): bool =
   if not intPosO.isSome:
     result = true
 
+
+proc testParseFloat(str: string, expectedFloat: BiggestFloat, expectedLength: int,
+                      start: Natural = 0): bool =
+  # Return true when the string parses as expected.
+  var number: BiggestFloat
+  var floatPosO = parseFloat64(str, start)
+  if not isSome(floatPosO):
+    echo "Did not find a float for:"
+    echo string
+    return false
+  let floatPos = floatPosO.get()
+  if floatPos.length != expectedLength:
+    echo "         length: $1" % $floatPos.length
+    echo "expected length: $1" % $expectedLength
+    return false
+  if floatPos.number != expectedFloat:
+    echo "         number: $1" % $floatPos.number
+    echo "expected number: $1" % $expectedFloat
+    return false
+  return true
+
+proc testParseFloatError(str: string, start: Natural = 0): bool =
+  # Return true when the given string does not parse as a float, else
+  # return false.
+  var floatPosO = parseFloat64(str, start)
+  if not floatPosO.isSome:
+    result = true
+
+
 suite "parseNumber.nim":
 
   test "parseInteger1":
@@ -91,3 +120,23 @@ suite "parseNumber.nim":
   test "parseIntegerOverflow":
     check testParseIntegerError("9_223_372_036_854_775_808")
     check testParseIntegerError("-9_223_372_036_854_775_809")
+
+  test "parseFloat":
+    check testParseFloat("0", 0.0, 1)
+    check testParseFloat("9", 9.0, 1)
+
+    check testParseFloat("-9", -9.0, 2)
+    check testParseFloat("+9", 9.0, 2)
+
+    check testParseFloat("1.0", 1.0, 3)
+    check testParseFloat("123", 123, 3)
+
+    check testParseFloat("12.33", 12.33, 5)
+
+    check testParseFloat(".33", 0.33, 3)
+
+    check testParseFloat("2_777.33", 2777.33, 8)
+
+#[ A float64 can represent all integers in the range 2**54 to -2**52
+including boundaries.  If we limited our int to this range, we could
+use float64 for all numbers.  ]#

@@ -11,6 +11,7 @@ import readLines
 import matches
 import strUtils
 import warnings
+import parseNumber
 
 type
   State = enum
@@ -73,28 +74,32 @@ proc getString(env: var Env, statement: string, start: Natural): Option[Value] =
   echo "getString"
 
 proc getNumber(env: var Env, statement: string, start: Natural): Option[Value] =
-  # n = 2345
-  # n = 23.45
-  # n = -2345
-  # n = -23.45
-  #     ^
-  # n = 23.45abc
-  # n = 23.45 abc
-  # n = -23.450000000000000...000001
-  # too big
-  # too small
+  ## Return the literal number value from the statement.
 
-  if intType:
-    try:
-      parseInt(statement, number, start)
-    except ValueError:
-      warn("Integer out of range."
+  # todo: pass this in
+  var matcher = getNumberMatcher()
+
+  var matchesO = matcher.getMatches(statement, start)
+  if not matchesO.isSome:
+    warn("not a number")
+    return
+  var matches = matchesO.get()
+  if matches.length != statement.len - start:
+    warn("Extra gunk after the number that we're skipping")
+
+  var value: Value
+  let decimalPoint = matches.getGroup()
+  if decimalPoint == ".":
+    let floatPosO = parseFloat64(statement, start)
+    if not floatPosO.isSome:
+      warn("unable to parse the float")
+    value = Value(kind: vkFloat, floatv: floatPosO.get().number)
   else:
-    int length = parseBiggestFloat(statement, number, start)
-    if length == 0:
-      warn("Invalid float number."
-      
-  echo "getNumber"
+    let intPosO = parseInteger(statement, start)
+    if not intPosO.isSome:
+      warn("unable to parse the integer")
+    value = Value(kind: vkInt, intv: intPosO.get().integer)
+  result = some(value)
 
 
 
@@ -113,12 +118,12 @@ proc getValue(env: var Env, statement: string, start: Natural): Option[Value] =
 
   if char == '\'' or char == '"':
     result = getString(env, statement, start)
-  elif isDigit(char) or char == '-' or char == '.':
+  elif char in { '0' .. '9', '-' }:
     result = getNumber(env, statement, start)
   elif isLowerAscii(char) or isUpperAscii(char):
     result = getVarOrFunctionValue(env, statement, start)
   else:
-    # warn("Invalid character, expected a string, number, variable or function.")
+    warn("Invalid character, expected a string, number, variable or function.")
     discard
 
 proc runStatement(env: var Env, statement: string, variableMatcher: Matcher):
