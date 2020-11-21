@@ -14,12 +14,8 @@ proc testParseCmdLine(line: string, expectedLineParts: LineParts,
   ## Return true on success.
 
   var env = openEnv("_parseCmdLine.log")
-
-  var prepostTable = getPrepostTable()
-  var prefixMatcher = getPrefixMatcher(prepostTable)
-  var commandMatcher = getCommandMatcher()
-  let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
-    commandMatcher, line, templateFilename, lineNum)
+  let compiledMatchers = getCompiledMatchers()
+  let linePartsO = parseCmdLine(env, compiledMatchers, line, templateFilename, lineNum)
 
   let (logLines, errLines, outLines) = env.readCloseDelete()
 
@@ -72,11 +68,8 @@ proc parseCmdLineError(line: string,
   let templateFilename = "template.html"
   let lineNum = 12
 
-  var prepostTable = getPrepostTable()
-  var prefixMatcher = getPrefixMatcher(prepostTable)
-  var commandMatcher = getCommandMatcher()
-  let linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
-    commandMatcher, line, templateFilename, lineNum)
+  let compiledMatchers = getCompiledMatchers()
+  let linePartsO = parseCmdLine(env, compiledMatchers, line, templateFilename, lineNum)
 
   let (logLines, errLines, outLines) = env.readCloseDelete()
 

@@ -131,13 +131,13 @@ proc getValue(env: var Env, statement: string, start: Natural): Option[Value] =
     warn("Invalid character, expected a string, number, variable or function.")
     discard
 
-proc runStatement(env: var Env, statement: string, variableMatcher: Matcher):
+proc runStatement(env: var Env, statement: string, compiledMatchers: Compiledmatchers):
     Option[tuple[nameSpace: string, varName: string, value:Value]] {.tpub.} =
   ## Run one statement.
 
   # Get the variable name. Match the surrounding white space and the
   # equal sign.
-  let matchesO = getMatches(variableMatcher, statement)
+  let matchesO = getMatches(compiledMatchers.variableMatcher, statement)
   if not matchesO.isSome:
     env.warn("The statement does not start with a variable name.")
     return
@@ -157,14 +157,14 @@ proc assignSystemVar(env: var Env, nameSpace: string, value: Value) =
 proc runCommand*(env: var Env, cmdLines: seq[string],
     cmdLineParts: seq[LineParts],
     serverVars: VarsDict, sharedVars: VarsDict,
-    variableMatcher: Matcher): VarsDict =
+    compiledMatchers: CompiledMatchers): VarsDict =
   ## Run a command and return the local variables defined by it.
 
   # Loop over the statements and run each one.
   for statement in yieldStatements(cmdLines, cmdLineParts):
     # Run the statement.  When there is a statement error, no
     # nameValue is returned and we skip the statement.
-    let nameValueO = runStatement(env, statement, variableMatcher)
+    let nameValueO = runStatement(env, statement, compiledMatchers)
     if nameValueO.isSome():
       # Assign the variable to its dictionary.
       let tup = nameValueO.get()

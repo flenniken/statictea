@@ -53,11 +53,7 @@ proc processTemplateLines(env: var Env, templateStream: Stream, resultStream: St
     prepostList: seq[Prepost], templateFilename: string) =
   ## Process the given template file.
 
-  # Get the line matchers.
-  var prepostTable = getPrepostTable(prepostList)
-  var prefixMatcher = getPrefixMatcher(prepostTable)
-  var commandMatcher = getCommandMatcher()
-  var variableMatcher = getVariableMatcher()
+  let compiledMatchers = getCompiledMatchers(prepostList)
 
   # Allocate a buffer for reading lines.
   var lineBufferO = newLineBuffer(templateStream, filename=templateFilename)
@@ -72,14 +68,13 @@ proc processTemplateLines(env: var Env, templateStream: Stream, resultStream: St
     # command is found, collect its lines and return them.
     var cmdLines: seq[string] = @[]
     var cmdLineParts: seq[LineParts] = @[]
-    collectCommand(env, lb, prepostTable, prefixMatcher,
-      commandMatcher, resultStream, cmdLines, cmdLineParts)
+    collectCommand(env, lb, compiledMatchers, resultStream, cmdLines, cmdLineParts)
     if cmdLines.len == 0:
       break # done, no more lines
 
     # Run the command.
     let localVars = runCommand(env, cmdLines, cmdLineParts,
-                               serverVars, sharedVars, variableMatcher)
+                               serverVars, sharedVars, compiledMatchers)
 
     # Process the replacement block.
 

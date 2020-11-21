@@ -28,6 +28,14 @@ const
 type
   PrepostTable* = OrderedTable[string, string]
 
+  CompiledMatchers* = object
+    prepostTable*: PrepostTable
+    prefixMatcher*: Matcher
+    commandMatcher*: Matcher
+    variableMatcher*: Matcher
+    spaceTabMatcher*: Matcher
+    numberMatcher*: Matcher
+
 iterator combine(list1: openArray[Prepost], list2: openArray[Prepost]): Prepost =
   ## Iterate through list1 then list2.
   for prepost in list1:
@@ -117,6 +125,12 @@ proc getNumberMatcher*(): Matcher =
   # note: nim sets the regex anchor option.
   result = newMatcher(r"[-]{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*", 1)
 
-
-  # var matchers = getCompiledMatchers()
-  
+proc getCompiledMatchers*(prepostList: seq[Prepost] = @[]): CompiledMatchers =
+  ## Compile all the matchers and return them in the
+  ## CompiledMatchers object.
+  result.prepostTable = getPrepostTable(prepostList)
+  result.prefixMatcher = getPrefixMatcher(result.prepostTable)
+  result.commandMatcher = getCommandMatcher()
+  result.variableMatcher = getVariableMatcher()
+  result.spaceTabMatcher = getSpaceTabMatcher()
+  result.numberMatcher = getNumberMatcher()

@@ -4,7 +4,6 @@ import matches
 import readlines
 import options
 import parseCmdLine
-import regexes
 import warnings
 
 proc dumpCmdLines(resultStream: Stream, cmdLines: var seq[string],
@@ -18,8 +17,8 @@ proc dumpCmdLines(resultStream: Stream, cmdLines: var seq[string],
   cmdLines.setlen(0)
   cmdLineParts.setlen(0)
 
-proc collectCommand*(env: var Env, lb: var LineBuffer, prepostTable: PrepostTable,
-      prefixMatcher: Matcher, commandMatcher: Matcher, resultStream: Stream,
+proc collectCommand*(env: var Env, lb: var LineBuffer,
+      compiledMatchers: CompiledMatchers, resultStream: Stream,
       cmdLines: var seq[string], cmdLineParts: var seq[LineParts]) =
   ## Read template lines and write out non-command lines. When a
   ## command is found, collect its lines in the given lists, cmdLines
@@ -31,8 +30,8 @@ proc collectCommand*(env: var Env, lb: var LineBuffer, prepostTable: PrepostTabl
     if line == "":
       break # No more lines.
 
-    var linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
-        commandMatcher, line, lb.filename, lb.lineNum)
+    var linePartsO = parseCmdLine(env, compiledMatchers,
+        line, lb.filename, lb.lineNum)
 
     if not linePartsO.isSome:
       # Write out non-command lines.
@@ -51,8 +50,8 @@ proc collectCommand*(env: var Env, lb: var LineBuffer, prepostTable: PrepostTabl
 
         line = lb.readline()
         if line != "":
-          linePartsO = parseCmdLine(env, prepostTable, prefixMatcher,
-              commandMatcher, line, lb.filename, lb.lineNum)
+          linePartsO = parseCmdLine(env, compiledMatchers,
+              line, lb.filename, lb.lineNum)
           if linePartsO.isSome:
             lineParts = linePartsO.get()
             if lineParts.command == ":":

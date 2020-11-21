@@ -167,3 +167,7 @@ suite "matches.nim":
     check checkMatcherNot(matcher, "-a")
     check checkMatcherNot(matcher, ".1") # need a leading digit
     check checkMatcherNot(matcher, "-.1")
+
+  test "getCompiledMatchers":
+    let compiledMatchers = getCompiledMatchers()
+    check checkMatcher(compiledMatchers.numberMatcher, "a = 5", 4, @[""], 1)

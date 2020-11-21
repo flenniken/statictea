@@ -28,9 +28,8 @@ proc testProcess(
   var cmdLineParts: seq[LineParts] = @[]
 
   var env = openEnv("_collectCommand.log")
-
-  collectCommand(env, lb, prepostTable, prefixMatcher,
-    commandMatcher, resultStream, cmdLines, cmdLineParts)
+  let compiledMatchers = getCompiledMatchers()
+  collectCommand(env, lb, compiledMatchers, resultStream, cmdLines, cmdLineParts)
 
   let (logLines, errLines, outLines) = env.readCloseDelete()
 

@@ -12,11 +12,8 @@ import vartypes
 
 proc getCmdLineParts(line: string): Option[LineParts] =
   var env = openEnv("_testRunCommand.log")
-  var prepostTable = getPrepostTable()
-  var prefixMatcher = getPrefixMatcher(prepostTable)
-  var commandMatcher = getCommandMatcher()
-  result = parseCmdLine(env, prepostTable, prefixMatcher,
-                        commandMatcher, line, "templateFilename", 99)
+  let compiledMatchers = getCompiledMatchers()
+  result = parseCmdLine(env, compiledMatchers, line, "templateFilename", 99)
   discard env.readCloseDelete()
 
 proc getCmdLineParts(cmdLines: seq[string]): seq[LineParts] =
