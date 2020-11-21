@@ -62,7 +62,7 @@ You format server content in variables you create in statements.
 
 A statement consists of a variable, an equal sign, and a right
 hand side. The right hand side is either another variable, a
-function or a literal. Here are some examples:
+string, a number or a function. Here are some examples:
 
 #+BEGIN_SRC
 tea = "Earl Grey"
@@ -150,7 +150,8 @@ John's house at 5:00 pm.
 
 *** Replace Command
 
-The replace command gets replaced with the t.content variable.
+The replace command's replacement block gets replaced with the
+t.content variable.
 
 The lines in the block mirror the variable so you can
 test the template as if it was a static file.
@@ -187,8 +188,9 @@ result:
 <html lang="en">
 #+END_SRC
 
-The above example doesn’t work as a static template because the
-template is missing the header lines.
+The above example generates the correct result but it doesn’t
+work as a static template because the template is missing the
+header lines.
 
 You can fix this by adding the header lines inside the replace
 block. The inside lines do not appear in the result, just the
@@ -216,7 +218,7 @@ statictea --update --shared shared.json --template mytea.html
 #+END_SRC
 
 The shared variable may contain replacement content too.  Here is
-another header example:
+another html header example:
 
 template:
 
@@ -296,9 +298,6 @@ The continuation command allows you to continue adding
 statements as if it was one long line. You can continue the
 continue command too, if you need more space.
 
-The template's command line plus continuation lines length is
-limited, see limits.
-
 In the following example the nextline command continues on a
 second line and third line.
 
@@ -359,13 +358,11 @@ StaticTea variables types:
 
 *** String
 
-You define a string with single or double quotes. You use strings
-in statements. The literal strings you define are limited, see
-limits.
+You define a string with single or double quotes and use them in
+statements.
 
 If you pass a string to a function taking a number, the string
-is converted to a number. It's a warning when the string doesn't
-look like a number.
+is converted to a number.
 
 example strings:
 
@@ -397,7 +394,7 @@ result:
 
 *** Integer
 
-Integers are 64 bit signed numbers.  When you pass an integer to
+An integer is a 64 bit signed number.  When you pass an integer to
 a function that takes a string, the number is converted to a
 string.
 
@@ -427,13 +424,13 @@ Example floats:
 
 *** Dictionary
 
-You access items in a dictionary with t.get.  The dictionaries
-are defined in the json files.
+You access dictionary items with t.get and you define them in the
+json files.
 
 *** List
 
-You can fetch items from lists defined in json files with
-t.get. You define the lists in the json files.
+Like dictionaires, you access list items with t.get and you
+define them in the json files.
 
 ** Variables
 
@@ -443,39 +440,39 @@ how a command works.
 You specify variables in json files or you create them in
 template statements.
 
-The json dictionary items become variables.  The item key becomes
-the variable name and the item value becomes the variable value.
+A json dictionary item key becomes the variable name its value
+becomes the variable's value.
 
-Internally two json namespaces exist, one for the server json and
-one for the shared json.  You access the server json variables
-with the "s." prefix and the shared json variables with the "h."
-prefix, no prefix for the local variables.
+Internally a dictionary exists for the server json, one for the
+shared json and one for local variables. You access the server
+variables with the "s." prefix, the shared variables with the
+"h." and no prefix for the local variables.
 
 Variables defined in the template are local to the block where
-they are defined.
-
-The variables are processed from left to right, so the last one
-takes precedence when there are duplicates.
+they are defined and they are processed from left to right. If
+there are duplicate variables, the last one overwrites the
+previous one.
 
 Prefixes:
 
-- t. -- System variables, tea vars
-- s. -- Server variables
-- h. -- Shared variables
-- no prefix -- Local variables
+- t. -- system variables, tea vars
+- s. -- server variables
+- h. -- shared variables
+- no prefix -- local variables
 
 Example variables:
 
 #+BEGIN_SRC
-mytea
-h.name
 t.list
+s.companyName
+h.userName
+mytea
 #+END_SRC
 
 ** System Variables
 
-The built in system variables control how the replacement block
-works and they are prefixed with "t."
+The built in system variables, prefixed with "t.", control how
+the replacement block works.
 
 - t.content - content of the replace block
 - t.list - controls whether the block repeats
@@ -488,12 +485,11 @@ works and they are prefixed with "t."
 *** t.content
 
 The t.content variable determines what content to use for the
-whole block. The default is an empty string, which mean the block
-is replaced with nothing.
+whole replace block. The default is an empty string, which mean
+the block is replaced with nothing.
 
-The variable only applies to the replace command.
-
-See the replace command section for an example.
+The variable only applies to the replace command. See the replace
+command section for an example.
 
 *** t.list
 
@@ -547,7 +543,7 @@ with the Twinings company selected.
 template:
 
 #+BEGIN_SRC
-<h4>Tea Companies</h3>
+<h3>Tea Companies</h3>
 <select>
 <!--$ nextline t.list=s.companyList; \-->
 <!--$ : current=t.if(s.selected, ' selected="selected"', "") -->
@@ -708,6 +704,7 @@ List of functions:
 - t.case() -- generalized if function
 - t.cmp() -- spaceship compare function <=>
 - t.concat() -- concatenate strings
+- t.currency() -- format currency
 - t.exists() -- whether a variables exists
 - t.find() -- find a substring in a string
 - t.format() -- format a string
@@ -715,8 +712,11 @@ List of functions:
 - t.len() -- length of string
 - t.quoteHtml -- replace html special characters
 - t.row() -- special function that returns the current row
+- t.sizes -- format bytes counts, KB, MB, GB, etc.
 - t.substr() -- extract a substring from a string by indexes
+- t.time() -- format the date and time.
 - t.version() -- the current version and version checker
+- t.warn() -- format a warning message with file and line number.
 
 *** t.case
 
@@ -843,7 +843,7 @@ t.exists(b) => 0
 
 *** t.find()
 
-The t.find function searches a string for substring and returns
+The t.find function searches a string for a substring and returns
 its position when found. When not found it returns -1. Positions
 start at 0.
 
@@ -981,8 +981,9 @@ The server json dictionary has 1 elements.
 *** t.row
 
 The special row function returns the current row number for
-lists. The function takes a parameter which specifies the
-starting point. You can use it in replacement blocks.
+blocks using a t.list. The function takes a parameter which
+specifies the starting point. You can use it in replacement
+blocks.
 
 - t.row(0) — returns 0, 1, 2,...
 - t.row(1) — returns 1, 2, 3,...
@@ -1069,7 +1070,7 @@ the function outputs a message to standard error.
 
 You can use the function multiple times for fine grain checking.
 
-StaticTea uses [[https://semver.org/][Semantic Versioning]] with the added restriction
+StaticTea uses [[https://semver.org/][Semantic Versioning]] with the added restrictions
 that each version component is limited to three digits and all
 components have at least one digit.
 
@@ -1095,10 +1096,10 @@ stdout:
 
 #+BEGIN_SRC
 tea.html(45): w22: The current version 4.0.2 is greater than the maximum
-allowed verion of 3.4.5.
+allowed verion of 3.4.005.
 
 tea.html(45): w23: The current version 1.0.0 is less than the minumum
-allowed verion of 1.2.3.
+allowed verion of 1.20.3.
 #+END_SRC
 
 ** Prefix Postfix
@@ -1125,12 +1126,12 @@ Built in Prefixes:
 - '#$' - for bash scripts and others
 - ';$' - for config files and others
 - '//$' - for c++
-- '/*$' '*/' - for c
+- '\/*$' '*\/' - for c
 
 You can define other comment types on the command line using the
 prepost option one or more times. When you specify your own
 prepost values, the defaults no longer exist so you have control
-of which prefixes get used and have specify meaning.
+of which prefixes get used.
 
 You separate the prefix from the postfix with one space and the
 postfix is optional.
@@ -1140,7 +1141,7 @@ examples:
 #+BEGIN_SRC
 --prepost="@$ |"
 --prepost="[comment$ ]"
---prepost="#[ ]#"
+--prepost="#[$ ]#"
 #+END_SRC
 
 ** Json Files and Variables
@@ -1150,20 +1151,22 @@ json.
 
 The server json comes from the server and shouldn't contain any
 presentation data so the template designers have full control of
-the presentation. You include zero, one or more server files
-with the server option. The variables get added to the t.server
+the presentation. The shared json is created by the template
+designer for sharing common template fragments and other
+presentation needs.
+
+You can use multiple server and shared json files by specifying
+multiple options on the command line. The files are processed
+left to right which is important when there are duplicate
+variables since the last one processed overwrites the previous
+one.
+
+The the server json variables get added to the t.server
+dictionary and the shared json get added to the t.shared
 dictionary.
 
-The shared json is created by the template designer for sharing
-common template fragments and other presentation needs.
-
-You can include zero, one or more shared files with the shared
-option. You reference them with the "h." namespace prefix. The
-variables get added to the t.shared dictionary.
-
-When you specify multiple files on the command line, they get
-added to the dictionary from left to right so the last duplicate
-variable wins.
+You reference the server variables with the "s." namespace prefix
+and the shared variables with "h.".
 
 The json null values get converted to the 0. Json True and False
 get converted to 1 and 0.
@@ -1217,10 +1220,8 @@ other potential warnings.
 It’s good style to change your template or json to be free of
 messages.
 
-Each warning message shows the file and line number where the problem
-happened. Each warning has an associated number which doesn't
-change. Don't count on the message text remaining constant
-between versions of StaticTea.
+Each warning message shows the file and line number where the
+problem happened.
 
 example messages:
 
@@ -1314,56 +1315,6 @@ The StaticTea command line options:
 - prepost - add a command prefix and postfix, you can specify
   multiple. When you specify values, the defaults are no longer used.
 
-** StaticTea as a Filter
-
-You can use the statictea command as a filter and pipe template
-lines to it and see the result output on the screen.
-
-Below is an example you can copy and paste into your terminal. It
-creates a template.txt file containing two lines, then it creates
-the server.json file containing one line, then it runs statictea
-using those files and the result goes to the screen.
-
-#+BEGIN_SRC
-# create template file
-cat <<EOF >template.txt
-<!--$ nextline -->
-hello {s.name}
-EOF
-
-# create server json file
-cat <<EOF >server.json
-{"name": "world"}
-EOF
-
-statictea --template template.txt --server server.json
-#+END_SRC
-
-If you copy and paste those lines to your terminal on Linux, it will look
-like:
-
-#+BEGIN_SRC
-$ cat <<EOF >template.txt
-> <!--$ nextline -->
-> hello {s.name}
-> EOF
-$
-$ cat <<EOF >server.json
-> {"name": "world"}
-> EOF
-$
-$ statictea --template template.txt --server server.json
-hello world
-#+END_SRC
-
-The following example pipes template.txt to statictea. The result
-goes to the screen.
-
-#+BEGIN_SRC
-cat template.txt | statictea --template stdin --server server.json
-
-hello world
-#+END_SRC
 
 ** Limits
 
@@ -1373,7 +1324,7 @@ several limits on variables and commands.
 Having limits may seem restrictive but there are many reasons for
 them.
 
-- It makes it easier to test the limits and to test the warning messages.
+- It makes it easier to verify the limits and to test the warning messages.
 - It's easier to optimize statictea's memory usage when the
   limits are known.
 - Engineering time is better spent on more general needs than
