@@ -36,26 +36,31 @@ type
     arg1*: string
 
 proc newMatcher*(pattern: string, numGroups: Natural, arg1: string = ""): Matcher =
-  ## Return a new matcher.  The regular expression pattern is compiled.
-  ## The numGroups is the number of groups defined in the pattern.
+  ## Return a new matcher.  The regular expression pattern is
+  ## compiled.  The numGroups is the number of groups defined in the
+  ## pattern.  Note: all patterns are anchored. This makes a
+  ## difference when matching and the start point is not 0.
   result.pattern = pattern
   result.regex = re(pattern)
   result.numGroups = numGroups
   result.arg1 = arg1
 
 proc getGroup*(matches: Matches): string =
+  ## Get the group when there is only one in matches.
   result = matches.groups[0]
 
 proc get2Groups*(matches: Matches): (string, string) =
+  ## Get the two groups when there are two groups in matches.
   result = (matches.groups[0], matches.groups[1])
 
 proc get3Groups*(matches: Matches): (string, string, string) =
+  ## Get the three groups when there are three groups in matches.
   result = (matches.groups[0], matches.groups[1], matches.groups[2])
 
 proc getMatches*(matcher: Matcher, line: string, start: Natural = 0): Option[Matches] =
-  ## Match the line with the pattern.  Start is the starting index in
-  ## line to start the match. Return the matched groups and the length
-  ## of the match.
+  ## Match the line with the matcher pattern starting at the "start"
+  ## index in the line.  Return the matches object containing the
+  ## matching groups and the length of the match.
 
   var matches: Matches
   var groups = newSeq[string](matcher.numGroups)
@@ -72,8 +77,8 @@ proc getMatches*(matcher: Matcher, line: string, start: Natural = 0): Option[Mat
 
 when defined(test):
   proc startPointer*(start: Natural): string =
-    ## Return the number of spaces and symbols to point at the line
-    ## start value.
+    ## Return a string containing the number of spaces and symbols to
+    ## point at the line start value. Display it under the line.
     if start > 100:
       result.add("$1" % $start)
     else:
@@ -84,8 +89,9 @@ when defined(test):
   proc checkMatches*(matchesO: Option[Matches], matcher: Matcher, line: string,
       expectedStart: Natural, expectedStrings: seq[string],
       expectedLength: Natural): bool =
-    ## Return true when the matches object has the expected content,
-    ## else return false.
+    ## Return true when the matchesO object has the expected content,
+    ## else return false. When false, show the expected text and the
+    ## the actual text.
 
     if matchesO.isSome:
       var matches = matchesO.get()
@@ -113,8 +119,8 @@ when defined(test):
       expectedStrings: seq[string], expectedLength: Natural): bool =
     ## Return true when the matcher matches the line with the
     ## expected outcome, else return false.
-    let matches = getMatches(matcher, line, start)
-    result = checkMatches(matches, matcher, line, start, expectedStrings, expectedLength)
+    let matchesO = getMatches(matcher, line, start)
+    result = checkMatches(matchesO, matcher, line, start, expectedStrings, expectedLength)
 
   proc checkMatcherNot*(matcher: Matcher, line: string, start: Natural = 0): bool =
     # Return true when the matcher does not match.

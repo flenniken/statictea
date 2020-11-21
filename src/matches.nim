@@ -55,14 +55,15 @@ proc getCommandMatcher*(): Matcher =
   result = newMatcher(r"($1)\s" % commands.join("|"), 1)
 
 proc getLastPartMatcher*(postfix: string): Matcher =
-  ## Get the matcher to use with
+  ## Get the matcher that matches the optional continuation slash, the
+  ## optional postfix and the line endings. The postfix used is
+  ## remembered in the matcher object.
   var pattern: string
   if postfix == "":
     pattern = r"([\\]{0,1})([\r]{0,1}\n){0,1}$"
   else:
     pattern = r"([\\]{0,1})\Q$1\E([\r]{0,1}\n){0,1}$" % postfix
-
-  result = newMatcher(pattern, 2, postfix)
+  result = newMatcher(pattern, 2, arg1 = postfix)
 
 proc getLastPart*(matcher: Matcher, line: string): Option[Matches] =
   ## Return the optional slash and line endings.
@@ -115,3 +116,7 @@ proc getNumberMatcher*(): Matcher =
   # one decimal point is allowed and underscores are skipped.
   # note: nim sets the regex anchor option.
   result = newMatcher(r"[-]{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*", 1)
+
+
+  # var matchers = getCompiledMatchers()
+  
