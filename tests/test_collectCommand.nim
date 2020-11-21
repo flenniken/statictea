@@ -7,7 +7,6 @@ import options
 import parseCmdLine
 import collectCommand
 import strutils
-import testUtils
 
 proc testProcess(
     content: string,

@@ -75,3 +75,10 @@ proc readJson*(env: var Env, filename: string, vars: var VarsDict) =
     let valueO = jsonToValue(jnode)
     assert valueO.isSome
     vars[key] = valueO.get()
+
+when defined(test):
+
+  proc createFile*(filename: string, content: string) =
+    var file = open(filename, fmWrite)
+    file.write(content)
+    file.close()

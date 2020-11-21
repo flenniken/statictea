@@ -1,7 +1,6 @@
 import regexes
 import unittest
 import options
-import testUtils
 
 suite "regexes.nim":
   test "startPointer":

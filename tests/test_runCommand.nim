@@ -8,7 +8,6 @@ import options
 import env
 import matches
 import collectCommand
-import testUtils
 import vartypes
 
 proc getCmdLineParts(line: string): Option[LineParts] =

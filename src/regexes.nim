@@ -22,7 +22,6 @@ import re
 import options
 when defined(test):
   import strutils
-  import testUtils
 
 type
   Matches* = object
@@ -72,6 +71,16 @@ proc getMatches*(matcher: Matcher, line: string, start: Natural = 0): Option[Mat
     result = some(matches)
 
 when defined(test):
+  proc startPointer*(start: Natural): string =
+    ## Return the number of spaces and symbols to point at the line
+    ## start value.
+    if start > 100:
+      result.add("$1" % $start)
+    else:
+      for ix in 0..<start:
+        result.add(' ')
+      result.add("^$1" % $start)
+
   proc checkMatches*(matchesO: Option[Matches], matcher: Matcher, line: string,
       expectedStart: Natural, expectedStrings: seq[string],
       expectedLength: Natural): bool =

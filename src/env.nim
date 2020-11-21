@@ -3,6 +3,9 @@ import streams
 import warnings
 import os
 import strutils
+when defined(test):
+  import options
+  import regexes
 
 # todo: count the number of warnings written to errStream.
 
@@ -100,3 +103,55 @@ when defined(test):
     for line in outLines:
       echo line
     echo "==="
+
+  template notReturn*(boolProc: untyped) =
+    if not boolProc:
+      return false
+
+  proc expectedItem*[T](name: string, item: T, expectedItem: T): bool =
+    ## Compare the item with the expected item and show them when
+    ## different. Return true when they are the same.
+
+    if item == expectedItem:
+      result = true
+    else:
+      echo "$1" % name
+      echo "     got: $1" % $item
+      echo "expected: $1" % $expectedItem
+      result = false
+
+  proc expectedItems*[T](name: string, items: seq[T], expectedItems: seq[T]): bool =
+    ## Compare the items with the expected items and show them when
+    ## different. Return true when they are the same.
+
+    if items == expectedItems:
+      result = true
+    else:
+      if items.len != expectedItems.len:
+        echo "~~~~~~~~~~ $1 ~~~~~~~~~~~:" % name
+        for item in items:
+          echo $item
+        echo "~~~~~~ expected $1 ~~~~~~:" % name
+        for item in expectedItems:
+          echo $item
+      else:
+        echo "~~~~~~~~~~ $1 ~~~~~~~~~~~:" % name
+        for ix in 0 ..< items.len:
+          if items[ix] == expectedItems[ix]:
+            echo "$1: same" % [$ix]
+          else:
+            echo "$1:      got: $2" % [$ix, $items[ix]]
+            echo "$1: expected: $2" % [$ix, $expectedItems[ix]]
+      result = false
+
+  proc testSome*[T](valueO: Option[T], eValueO: Option[T],
+      statement: string, start: Natural): bool =
+
+    if valueO == eValueO:
+      return true
+
+    echo "Did not get the expected value."
+    echo "     got: $1" % $valueO
+    echo "expected: $1" % $eValueO
+    echo "statement: $1" % statement
+    echo "    start: $1" % startPointer(start)

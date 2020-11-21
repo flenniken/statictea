@@ -6,7 +6,6 @@ import readjson
 import os
 import json
 import options
-import testutils
 
 proc testReadJsonFile(filename: string, expectedVars: VarsDict,
     expectedLogLines: seq[string] = @[],
