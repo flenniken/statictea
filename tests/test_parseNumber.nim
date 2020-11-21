@@ -31,7 +31,6 @@ proc testParseIntegerError(str: string, start: Natural = 0): bool =
   if not intPosO.isSome:
     result = true
 
-
 proc testParseFloat(str: string, expectedFloat: BiggestFloat, expectedLength: int,
                       start: Natural = 0): bool =
   # Return true when the string parses as expected.
@@ -51,14 +50,6 @@ proc testParseFloat(str: string, expectedFloat: BiggestFloat, expectedLength: in
     echo "expected number: $1" % $expectedFloat
     return false
   return true
-
-proc testParseFloatError(str: string, start: Natural = 0): bool =
-  # Return true when the given string does not parse as a float, else
-  # return false.
-  var floatPosO = parseFloat64(str, start)
-  if not floatPosO.isSome:
-    result = true
-
 
 suite "parseNumber.nim":
 

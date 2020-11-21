@@ -26,6 +26,20 @@ type
     of vkList:
       listv*: seq[Value]
 
+proc `==`*(value1: Value, value2: Value): bool =
+  if value1.kind == value2.kind:
+    case value1.kind:
+      of vkString:
+        result = value1.stringv == value2.stringv
+      of vkInt:
+        result = value1.intv == value2.intv
+      of vkFloat:
+        result = value1.floatv == value2.floatv
+      of vkDict:
+        result = value1.dictv == value2.dictv
+      of vkList:
+        result = value1.listv == value2.listv
+
 func `$`*(value: Value): string =
   ## A string representation of Value.
   case value.kind

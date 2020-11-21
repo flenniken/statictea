@@ -32,6 +32,9 @@ type
     wNoCommand, # w22
     wNoPostfix, # w23
     wNoContinuationLine, # w24
+    wSkippingTextAfterNum, # w25
+    wNotNumber, # w26
+    wNumberOverFlow, # w27
 
 tpubType:
   const
@@ -63,6 +66,9 @@ tpubType:
       "No command found at column $1, skipping line.", # wNoCommand
       """The matching closing comment postfix was not found, expected: "$1".""", # wNoPostfix
       "Missing the continuation line, abandoning the command.", # wNoContinuationLine
+      "Ignoring extra text after the number.", # wSkippingTextAfterNum
+      "Invalid number, skipping the statement.", # wNotNumber
+      "The number is too big or too small, skipping the statement.", # wNumberOverFlow
     ]
 
 func getWarning*(filename: string, lineNum: int,

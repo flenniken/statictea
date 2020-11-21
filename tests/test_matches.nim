@@ -149,6 +149,12 @@ suite "matches.nim":
     check checkMatcher(matcher, "4_123_456.0 ", 0, @["."], 11)
     check checkMatcher(matcher, "4_123_456 ", 0, @[""], 9)
 
+  test "getNumberMatcher":
+    var matcher = getNumberMatcher()
+    check checkMatcher(matcher, "a = 5", 4, @[""], 1)
+    check checkMatcher(matcher, "a = -5.2", 4, @["."], 4)
+    check checkMatcher(matcher, "a = -5.2abc", 4, @["."], 4)
+
   test "getNumberMatcherNot":
     var matcher = getNumberMatcher()
     check checkMatcherNot(matcher, "abc")

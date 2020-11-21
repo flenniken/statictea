@@ -19,7 +19,8 @@ type
     start, double, single, slashdouble, slashsingle
 
 proc warn(message: string) =
- echo "replace with the real warning"
+  echo "replace with the real warning"
+  echo message
 
 iterator yieldStatements(cmdLines: seq[string], cmdLineParts: seq[LineParts]): string {.tpub.} =
   ## Iterate through the command's statements.  Statements are
@@ -73,35 +74,39 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts: seq[LineParts]): s
 proc getString(env: var Env, statement: string, start: Natural): Option[Value] =
   echo "getString"
 
-proc getNumber(env: var Env, statement: string, start: Natural): Option[Value] =
+# todo: need templateFilename and line number to output error messages.
+
+proc getNumber*(env: var Env, statement: string, start: Natural): Option[Value] =
   ## Return the literal number value from the statement.
 
   # todo: pass this in
+  let filename = "template.html"
+  let lineNum = 23
   var matcher = getNumberMatcher()
 
   var matchesO = matcher.getMatches(statement, start)
   if not matchesO.isSome:
-    warn("not a number")
+    env.warn(filename, lineNum, wNotNumber)
     return
   var matches = matchesO.get()
   if matches.length != statement.len - start:
-    warn("Extra gunk after the number that we're skipping")
+    env.warn(filename, lineNum, wSkippingTextAfterNum)
 
   var value: Value
   let decimalPoint = matches.getGroup()
   if decimalPoint == ".":
     let floatPosO = parseFloat64(statement, start)
     if not floatPosO.isSome:
-      warn("unable to parse the float")
+      env.warn(filename, lineNum, wNumberOverFlow)
+      return
     value = Value(kind: vkFloat, floatv: floatPosO.get().number)
   else:
     let intPosO = parseInteger(statement, start)
     if not intPosO.isSome:
-      warn("unable to parse the integer")
+      env.warn(filename, lineNum, wNumberOverFlow)
+      return
     value = Value(kind: vkInt, intv: intPosO.get().integer)
   result = some(value)
-
-
 
 proc getVarOrFunctionValue(env: var Env, statement: string, start: Natural): Option[Value] =
   echo "getVarOrFunctionValue"

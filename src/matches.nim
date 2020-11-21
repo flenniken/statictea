@@ -69,7 +69,10 @@ proc getLastPart*(matcher: Matcher, line: string): Option[Matches] =
 
   # Start checking 3 characters before the end to account for the
   # optional slash, cr and linefeed. If the line is too short, return
-  # no match.
+  # no match.  Note the nim regex uses the anchored option. Using ^ to
+  # anchor in the pattern does not do what I expect when the start
+  # position is not 1.
+
   var startPos = line.len - matcher.arg1.len - 3
   if startPos < 0:
     return
@@ -110,4 +113,5 @@ proc getNumberMatcher*(): Matcher =
   # A number starts with an optional minus sign, followed by a
   # digit, followed by digits, underscores or a decimal point. Only
   # one decimal point is allowed and underscores are skipped.
-  result = newMatcher(r"^[-]{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*", 1)
+  # note: nim sets the regex anchor option.
+  result = newMatcher(r"[-]{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*", 1)

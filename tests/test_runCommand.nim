@@ -8,6 +8,8 @@ import options
 import env
 import matches
 import collectCommand
+import testUtils
+import vartypes
 
 proc getCmdLineParts(line: string): Option[LineParts] =
   var env = openEnv("_testRunCommand.log")
@@ -52,6 +54,24 @@ proc testGetStatements(content: string): seq[string] =
   let cmdLineParts = getCmdLineParts(cmdLines)
   result = getStatements(cmdLines, cmdLineParts)
 
+proc testGetNumber(
+    statement: string,
+    start: Natural,
+    eValueO: Option[Value],
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[]): bool =
+  ## Return true when the statement contains the expected number.
+
+  var env = openEnv("_testGetNumber.log")
+  let valueO = getNumber(env, statement, start)
+  let (logLines, errLines, outLines) = env.readCloseDelete()
+
+  notReturn testSome(valueO, eValueO, statement, start)
+  notReturn expectedItems("logLines", logLines, eLogLines)
+  notReturn expectedItems("errLines", errLines, eErrLines)
+  notReturn expectedItems("outLines", outLines, eOutLines)
+  result = true
 
 proc compareStatements(statements: seq[string], eContent: string): bool =
   ## Return true when the statements match the expected
@@ -289,3 +309,27 @@ asdf
 x = y_
 """
     check compareStatements(statements, eStatements)
+
+  test "getNumber":
+    check testGetNumber("a = 5", 4, some(Value(kind: vkInt, intv: 5)))
+    check testGetNumber("a = 5.0", 4, some(Value(kind: vkFloat, floatv: 5.0)))
+    check testGetNumber("a = -2", 4, some(Value(kind: vkInt, intv: -2)))
+    check testGetNumber("a = -3.4", 4, some(Value(kind: vkFloat, floatv: -3.4)))
+
+  test "getNumberExtra":
+    let message = "template.html(23): w25: Ignoring extra text after the number."
+    check testGetNumber("a = 88 ", 4, some(Value(kind: vkInt, intv: 88)),
+      eErrLines = @[message])
+
+  test "getNumberExtra":
+    let message = "template.html(23): w25: Ignoring extra text after the number."
+    check testGetNumber("a = 5 abc", 4, some(Value(kind: vkInt, intv: 5)),
+      eErrLines = @[message])
+
+  test "getNumberNotNumber":
+    let message = "template.html(23): w26: Invalid number, skipping the statement."
+    check testGetNumber("a = -abc", 4, none(Value), eErrLines = @[message])
+
+  test "getNumberIntTooBig":
+    let message = "template.html(23): w27: The number is too big or too small, skipping the statement."
+    check testGetNumber("a = 9_223_372_036_854_775_808", 4, none(Value), eErrLines = @[message])

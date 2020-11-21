@@ -7,34 +7,7 @@ import options
 import parseCmdLine
 import collectCommand
 import strutils
-
-template notReturn(boolProc: untyped) =
-  if not boolProc:
-    return false
-
-proc expectedItems[T](name: string, items: seq[T], expectedItems: seq[T]): bool =
-  ## Compare the items with the expected items and show them when
-  ## different. Return true when they are the same.
-
-  if items == expectedItems:
-    result = true
-  else:
-    if items.len != expectedItems.len:
-      echo "~~~~~~~~~~ $1 ~~~~~~~~~~~:" % name
-      for item in items:
-        echo $item
-      echo "~~~~~~ expected $1 ~~~~~~:" % name
-      for item in expectedItems:
-        echo $item
-    else:
-      echo "~~~~~~~~~~ $1 ~~~~~~~~~~~:" % name
-      for ix in 0 ..< items.len:
-        if items[ix] == expectedItems[ix]:
-          echo "$1: same" % [$ix]
-        else:
-          echo "$1:      got: $2" % [$ix, $items[ix]]
-          echo "$1: expected: $2" % [$ix, $expectedItems[ix]]
-    result = false
+import testUtils
 
 proc testProcess(
     content: string,
