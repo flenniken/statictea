@@ -71,12 +71,12 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts: seq[LineParts]): s
   if notEmptyOrSpaces(spaceTabMatcher, statement):
     yield statement
 
-proc getString(env: var Env, statement: string, start: Natural): Option[Value] =
+proc getString(env: var Env, compiledMatchers: Compiledmatchers, statement: string, start: Natural): Option[Value] =
   echo "getString"
 
 # todo: need templateFilename and line number to output error messages.
 
-proc getNumber*(env: var Env, statement: string, start: Natural): Option[Value] =
+proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers, statement: string, start: Natural): Option[Value] =
   ## Return the literal number value from the statement.
 
   # todo: pass this in
@@ -108,25 +108,25 @@ proc getNumber*(env: var Env, statement: string, start: Natural): Option[Value] 
     value = Value(kind: vkInt, intv: intPosO.get().integer)
   result = some(value)
 
-proc getVarOrFunctionValue(env: var Env, statement: string, start: Natural): Option[Value] =
+proc getVarOrFunctionValue(env: var Env, compiledMatchers: Compiledmatchers, statement: string, start: Natural): Option[Value] =
   echo "getVarOrFunctionValue"
 
-proc getValue(env: var Env, statement: string, start: Natural): Option[Value] =
+proc getValue(env: var Env, compiledMatchers: Compiledmatchers, statement: string, start: Natural): Option[Value] =
 
   # If the value starts with a quote, it's a string.
   # quote - string
-  # digit, period or minus sign - number
+  # digit or minus sign - number
   # a-zA-Z - variable or function
   assert start < statement.len
 
   let char = statement[start]
 
   if char == '\'' or char == '"':
-    result = getString(env, statement, start)
+    result = getString(env, compiledMatchers, statement, start)
   elif char in { '0' .. '9', '-' }:
-    result = getNumber(env, statement, start)
+    result = getNumber(env, compiledMatchers, statement, start)
   elif isLowerAscii(char) or isUpperAscii(char):
-    result = getVarOrFunctionValue(env, statement, start)
+    result = getVarOrFunctionValue(env, compiledMatchers, statement, start)
   else:
     warn("Invalid character, expected a string, number, variable or function.")
     discard
@@ -145,7 +145,7 @@ proc runStatement(env: var Env, statement: string, compiledMatchers: Compiledmat
   let (nameSpace, varName) = matches.get2Groups()
 
   # Get the right hand side value.
-  let valueO = getValue(env, statement, matches.length)
+  let valueO = getValue(env, compiledMatchers, statement, matches.length)
   if not matchesO.isSome:
     return
   result = some((nameSpace, varName, valueO.get()))

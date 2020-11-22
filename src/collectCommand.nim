@@ -57,6 +57,8 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
             if lineParts.command == ":":
               continue # Got command line, continue looking for more.
 
+        # Show warning about missing a continuation line and that we
+        # are abandoning the command.
         warn(env, lb.filename, lb.lineNum, wNoContinuationLine)
         dumpCmdLines(resultStream, cmdLines, cmdLineParts, line)
         if line == "":

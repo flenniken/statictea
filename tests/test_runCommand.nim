@@ -60,7 +60,8 @@ proc testGetNumber(
   ## Return true when the statement contains the expected number.
 
   var env = openEnv("_testGetNumber.log")
-  let valueO = getNumber(env, statement, start)
+  let compiledMatchers = getCompiledMatchers()
+  let valueO = getNumber(env, compiledMatchers, statement, start)
   let (logLines, errLines, outLines) = env.readCloseDelete()
 
   notReturn testSome(valueO, eValueO, statement, start)
