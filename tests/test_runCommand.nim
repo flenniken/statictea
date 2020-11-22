@@ -11,12 +11,14 @@ import collectCommand
 import vartypes
 
 proc getCmdLineParts(line: string): Option[LineParts] =
+  ## Return the line parts from the given line.
   var env = openEnv("_testRunCommand.log")
   let compiledMatchers = getCompiledMatchers()
   result = parseCmdLine(env, compiledMatchers, line, "templateFilename", 99)
   discard env.readCloseDelete()
 
 proc getCmdLineParts(cmdLines: seq[string]): seq[LineParts] =
+  ## Return the line parts from the given lines.
   for line in cmdLines:
     let parts = getCmdLineParts(line)
     if not parts.isSome():
@@ -25,6 +27,7 @@ proc getCmdLineParts(cmdLines: seq[string]): seq[LineParts] =
     result.add(parts.get())
 
 proc getStatements(cmdLines: seq[string], cmdLineParts: seq[LineParts]): seq[string] =
+  ## Return a list of statements for the given lines.
   for statement in yieldStatements(cmdLines, cmdLineParts):
     result.add(statement)
 
@@ -46,9 +49,16 @@ proc splitStatements(content: string): seq[string] =
     result.add(rline)
 
 proc testGetStatements(content: string): seq[string] =
+  ## Return a list of statements for the given multiline content.
   let cmdLines = splitNewLines(content)
   let cmdLineParts = getCmdLineParts(cmdLines)
   result = getStatements(cmdLines, cmdLineParts)
+
+proc newIntValueO(number: int | int64): Option[Value] =
+  result = some(Value(kind: vkInt, intv: number))
+
+proc newFloatValueO(number: float64): Option[Value] =
+  result = some(Value(kind: vkFloat, floatv: number))
 
 proc testGetNumber(
     statement: string,
@@ -57,7 +67,8 @@ proc testGetNumber(
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]): bool =
-  ## Return true when the statement contains the expected number.
+  ## Return true when the statement contains the expected number. When
+  ## it doesn't show the values and expected values and return false.
 
   var env = openEnv("_testGetNumber.log")
   let compiledMatchers = getCompiledMatchers()
@@ -308,20 +319,18 @@ x = y_
     check compareStatements(statements, eStatements)
 
   test "getNumber":
-    check testGetNumber("a = 5", 4, some(Value(kind: vkInt, intv: 5)))
-    check testGetNumber("a = 5.0", 4, some(Value(kind: vkFloat, floatv: 5.0)))
-    check testGetNumber("a = -2", 4, some(Value(kind: vkInt, intv: -2)))
-    check testGetNumber("a = -3.4", 4, some(Value(kind: vkFloat, floatv: -3.4)))
+    check testGetNumber("a = 5", 4, newIntValueO(5))
+    check testGetNumber("a = 5.0", 4, newFloatValueO(5.0))
+    check testGetNumber("a = -2", 4, newIntValueO(-2))
+    check testGetNumber("a = -3.4", 4, newFloatValueO(-3.4))
 
   test "getNumberExtra":
     let message = "template.html(23): w25: Ignoring extra text after the number."
-    check testGetNumber("a = 88 ", 4, some(Value(kind: vkInt, intv: 88)),
-      eErrLines = @[message])
+    check testGetNumber("a = 88 ", 4, newIntValueO(88), eErrLines = @[message])
 
   test "getNumberExtra":
     let message = "template.html(23): w25: Ignoring extra text after the number."
-    check testGetNumber("a = 5 abc", 4, some(Value(kind: vkInt, intv: 5)),
-      eErrLines = @[message])
+    check testGetNumber("a = 5 abc", 4, newIntValueO(5), eErrLines = @[message])
 
   test "getNumberNotNumber":
     let message = "template.html(23): w26: Invalid number, skipping the statement."
