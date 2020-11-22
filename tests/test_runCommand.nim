@@ -54,12 +54,6 @@ proc testGetStatements(content: string): seq[string] =
   let cmdLineParts = getCmdLineParts(cmdLines)
   result = getStatements(cmdLines, cmdLineParts)
 
-proc newIntValueO(number: int | int64): Option[Value] =
-  result = some(Value(kind: vkInt, intv: number))
-
-proc newFloatValueO(number: float64): Option[Value] =
-  result = some(Value(kind: vkFloat, floatv: number))
-
 proc testGetNumber(
     statement: string,
     start: Natural,
@@ -323,16 +317,13 @@ x = y_
     check testGetNumber("a = 5.0", 4, newFloatValueO(5.0))
     check testGetNumber("a = -2", 4, newIntValueO(-2))
     check testGetNumber("a = -3.4", 4, newFloatValueO(-3.4))
+    check testGetNumber("a = 88 ", 4, newIntValueO(88))
 
-  test "getNumberExtra":
-    let message = "template.html(23): w25: Ignoring extra text after the number."
-    check testGetNumber("a = 88 ", 4, newIntValueO(88), eErrLines = @[message])
+  test "getNumber with extra":
+    let message = "template.html(23): w26: Invalid number, skipping the statement."
+    check testGetNumber("a = 5 abc", 4, none(Value), eErrLines = @[message])
 
-  test "getNumberExtra":
-    let message = "template.html(23): w25: Ignoring extra text after the number."
-    check testGetNumber("a = 5 abc", 4, newIntValueO(5), eErrLines = @[message])
-
-  test "getNumberNotNumber":
+  test "getNumber not a number":
     let message = "template.html(23): w26: Invalid number, skipping the statement."
     check testGetNumber("a = -abc", 4, none(Value), eErrLines = @[message])
 

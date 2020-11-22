@@ -116,14 +116,14 @@ proc getVariableMatcher*(): Matcher =
   result = newMatcher(r"^\s*([a-z]\.){0,1}([a-zA-Z][a-zA-Z0-9_]*)\s*=\s*", 2)
 
 proc getNumberMatcher*(): Matcher =
-  ## Match a number. Return the optional decimal point that tells
-  ## whether the number is a float or integer.
+  ## Match a number. Return the optional decimal point
+  ## that tells whether the number is a float or integer.
 
   # A number starts with an optional minus sign, followed by a
   # digit, followed by digits, underscores or a decimal point. Only
   # one decimal point is allowed and underscores are skipped.
   # note: nim sets the regex anchor option.
-  result = newMatcher(r"[-]{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*", 1)
+  result = newMatcher(r"[-]{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*\s*$", 1)
 
 proc getCompiledMatchers*(prepostList: seq[Prepost] = @[]): CompiledMatchers =
   ## Compile all the matchers and return them in the

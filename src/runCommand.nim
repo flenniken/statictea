@@ -74,39 +74,44 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts: seq[LineParts]): s
 proc getString(env: var Env, compiledMatchers: Compiledmatchers, statement: string, start: Natural): Option[Value] =
   echo "getString"
 
-# todo: need templateFilename and line number to output error messages.
+# todo: we need to calculate the line number for the statement. It may
+# be split across multiple lines.
 
-proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers, statement: string, start: Natural): Option[Value] =
-  ## Return the literal number value from the statement.
+
+proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
+    statement: string, start: Natural): Option[Value] =
+  ## Return the literal number value from the statement. We expect a
+  ## number because it starts with a digit or minus sign.
 
   # todo: pass this in
   let filename = "template.html"
   let lineNum = 23
-  var matcher = getNumberMatcher()
 
-  var matchesO = matcher.getMatches(statement, start)
+  # Check that we have a statictea number.
+  var matchesO = compiledMatchers.numberMatcher.getMatches(statement, start)
   if not matchesO.isSome:
     env.warn(filename, lineNum, wNotNumber)
     return
-  var matches = matchesO.get()
-  if matches.length != statement.len - start:
-    env.warn(filename, lineNum, wSkippingTextAfterNum)
 
+  # The decimal point determines whether the number is an int or
+  # float.
   var value: Value
+  let matches = matchesO.get()
   let decimalPoint = matches.getGroup()
   if decimalPoint == ".":
+    # Parse the float.
     let floatPosO = parseFloat64(statement, start)
     if not floatPosO.isSome:
       env.warn(filename, lineNum, wNumberOverFlow)
       return
-    value = Value(kind: vkFloat, floatv: floatPosO.get().number)
+    result = some(Value(kind: vkFloat, floatv: floatPosO.get().number))
   else:
+    # Parse the int.
     let intPosO = parseInteger(statement, start)
     if not intPosO.isSome:
       env.warn(filename, lineNum, wNumberOverFlow)
       return
-    value = Value(kind: vkInt, intv: intPosO.get().integer)
-  result = some(value)
+    result = some(Value(kind: vkInt, intv: intPosO.get().integer))
 
 proc getVarOrFunctionValue(env: var Env, compiledMatchers: Compiledmatchers, statement: string, start: Natural): Option[Value] =
   echo "getVarOrFunctionValue"
@@ -178,3 +183,10 @@ proc runCommand*(env: var Env, cmdLines: seq[string],
           warn("You cannot overwrite the server or shared variables.")
         else:
           warn("Unknown variable namespace: $1." % nameSpace)
+
+when defined(test):
+  proc newIntValueO*(number: int | int64): Option[Value] =
+    result = some(Value(kind: vkInt, intv: number))
+
+  proc newFloatValueO*(number: float64): Option[Value] =
+    result = some(Value(kind: vkFloat, floatv: number))

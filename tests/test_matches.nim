@@ -107,7 +107,6 @@ suite "matches.nim":
     checkGetLastPart(matcher, "<--!$ nextline a\\\n", 16, @[r"\", "\n"], 2)
     checkGetLastPart(matcher, "<--!$ nextline a\\\r\n", 16, @[r"\", "\r\n"], 3)
 
-
   test "get space tab":
     let matcher = getSpaceTabMatcher()
     check checkMatcher(matcher, "    ", 0, @[], 4)
@@ -137,26 +136,26 @@ suite "matches.nim":
   test "getNumberMatcher":
     var matcher = getNumberMatcher()
     check checkMatcher(matcher, "5", start = 0, expectedStrings = @[""], expectedLength = 1)
-
     check checkMatcher(matcher, "-5", 0, @[""], 2)
     check checkMatcher(matcher, "-5.", 0, @["."], 3)
     check checkMatcher(matcher, "-5.6", 0, @["."], 4)
     check checkMatcher(matcher, "56789.654321", 0, @["."], 12)
-    check checkMatcher(matcher, "4a", 0, @[""], 1)
-    check checkMatcher(matcher, "4 ", 0, @[""], 1)
-    check checkMatcher(matcher, "4.abc ", 0, @["."], 2)
-    check checkMatcher(matcher, "-4.abc ", 0, @["."], 3)
-    check checkMatcher(matcher, "4_123_456.0 ", 0, @["."], 11)
-    check checkMatcher(matcher, "4_123_456 ", 0, @[""], 9)
+    check checkMatcher(matcher, "4 ", 0, @[""], 2)
+    check checkMatcher(matcher, "4_123_456.0 ", 0, @["."], 12)
+    check checkMatcher(matcher, "4_123_456 ", 0, @[""], 10)
 
-  test "getNumberMatcher":
+  test "getNumberMatcher with start":
     var matcher = getNumberMatcher()
     check checkMatcher(matcher, "a = 5", 4, @[""], 1)
+    check checkMatcher(matcher, "a = 5 ", 4, @[""], 2)
     check checkMatcher(matcher, "a = -5.2", 4, @["."], 4)
-    check checkMatcher(matcher, "a = -5.2abc", 4, @["."], 4)
+    check checkMatcher(matcher, "a = 0.2", 4, @["."], 3)
+    check checkMatcher(matcher, "a = 0.2   ", 4, @["."], 6)
 
   test "getNumberMatcherNot":
     var matcher = getNumberMatcher()
+    check checkMatcherNot(matcher, "a = 5 abc")
+    check checkMatcherNot(matcher, "a = -5.2abc")
     check checkMatcherNot(matcher, "abc")
     check checkMatcherNot(matcher, "")
     check checkMatcherNot(matcher, ".")
