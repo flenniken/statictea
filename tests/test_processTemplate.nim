@@ -9,22 +9,19 @@ import readjson
 
 suite "processTemplate":
 
-  # test "matchLastPart":
-  #   let line = "<--$ nextline -->\n"
-  #   let matchesO = matchLastPart(line, "-->", 15)
-  #   check matchesO.isSome
-  #   let matches = matchesO.get()
-  #   let continuation = matches.getGroup()
-  #   let length = matches.length
-  #   check continuation == ""
-  #   check length == 4
+  test "createFile":
+    let filename = "template.html"
+    createFile(filename, "Hello")
+    defer: discard tryRemoveFile(filename)
+    let lines = readLines(filename, maximum=4)
+    check lines.len == 1
+    check lines[0] == "Hello"
 
   test "processTemplate to stdout":
     var env = openEnv("_processTemplate.log")
 
     let templateFilename = "template.html"
-    let content = "Hello"
-    createFile(templateFilename, content)
+    createFile(templateFilename, "Hello")
     defer: discard tryRemoveFile(templateFilename)
 
     var args: Args
@@ -43,22 +40,30 @@ suite "processTemplate":
     var env = openEnv("_processTemplateFile.log")
 
     let templateFilename = "template.html"
-    let content = "Hello"
-    createFile(templateFilename, content)
+    createFile(templateFilename, "Hello")
     defer: discard tryRemoveFile(templateFilename)
+    var lines = readLines(templateFilename, maximum=4)
+    check lines.len == 1
+    check lines[0] == "Hello"
 
     var args: Args
-    args.templateList = @["template.html"]
+    args.templateList = @[templateFilename]
     args.resultFilename = "resultToFile.txt"
     let rc = processTemplate(env, args)
-    defer: discard tryRemoveFile(args.resultFilename)
-    check rc == 0
+    # defer: discard tryRemoveFile(args.resultFilename)
+
+    # The template ane result streams should be closed.
+    check env.templateFilename == templateFilename
+    check env.templateStream == nil
+    check env.resultFilename == args.resultFilename
+    check env.resultStream == nil
 
     let (logLines, errLines, outLines) = env.readCloseDelete()
     # echoLines(logLines, errLines, outLines)
     check logLines.len == 0
     check errLines.len == 0
     check outLines.len == 0
-    let lines = readLines(args.resultFilename, maximum=4)
+
+    lines = readLines(args.resultFilename, maximum=4)
     check lines.len == 1
     check lines[0] == "Hello"

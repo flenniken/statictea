@@ -1,13 +1,10 @@
 ## Process the template.
 
-import strutils
 import args
 import warnings
 import env
 import readjson
-import streams
 import vartypes
-import os
 import matches
 import readlines
 import options
@@ -48,16 +45,15 @@ unchanged.
 
 ]#
 
-proc processTemplateLines(env: var Env, templateStream: Stream, resultStream: Stream,
-    serverVars: VarsDict, sharedVars: VarsDict,
-    prepostList: seq[Prepost], templateFilename: string) =
+proc processTemplateLines(env: var Env, serverVars: VarsDict, sharedVars: VarsDict,
+    prepostList: seq[Prepost]) =
   ## Process the given template file.
 
   # Get all the compiled regular expression matchers.
   let compiledMatchers = getCompiledMatchers(prepostList)
 
   # Allocate a buffer for reading lines.
-  var lineBufferO = newLineBuffer(templateStream, filename=templateFilename)
+  var lineBufferO = newLineBuffer(env.templateStream, filename=env.templateFilename)
   if not lineBufferO.isSome():
     env.warn("startup", 0, wNotEnoughMemoryForLB)
     return
@@ -69,7 +65,7 @@ proc processTemplateLines(env: var Env, templateStream: Stream, resultStream: St
     # command is found, collect its lines and return them.
     var cmdLines: seq[string] = @[]
     var cmdLineParts: seq[LineParts] = @[]
-    collectCommand(env, lb, compiledMatchers, resultStream, cmdLines, cmdLineParts)
+    collectCommand(env, lb, compiledMatchers, env.resultStream, cmdLines, cmdLineParts)
     if cmdLines.len == 0:
       break # done, no more lines
 
@@ -81,8 +77,12 @@ proc processTemplateLines(env: var Env, templateStream: Stream, resultStream: St
 
 
 proc processTemplate*(env: var Env, args: Args): int =
-  ## Process the template and return 0 when no warning messages were
-  ## written.
+  ## Process the template and return 0 on success. It's an error when
+  ## a warning messages was written.
+
+  # Add the template and result streams to the environment.
+  if not env.addExtraStreams(args):
+    return 1
 
   # Read the server json.
   var serverVars = getEmptyVars()
@@ -94,48 +94,11 @@ proc processTemplate*(env: var Env, args: Args): int =
   for filename in args.sharedList:
     readJson(env, filename, sharedVars)
 
-  # Get the template filename.
-  assert args.templateList.len > 0
-  if args.templateList.len > 1:
-    let skipping = join(args.templateList[1..^1], ", ")
-    env.warn("starting", 0, wOneTemplateAllowed, skipping)
-  let templateFilename = args.templateList[0]
-
-  # Open the template stream.
-  var templateStream: Stream
-  if templateFilename == "stdin":
-    templateStream = newFileStream(stdin)
-    if templateStream == nil:
-      env.warn("startup", 0, wCannotOpenStd, "stdin")
-      return 1
-  else:
-    if not fileExists(templateFilename):
-      env.warn("startup", 0, wFileNotFound, templateFilename)
-      return 1
-    templateStream = newFileStream(templateFilename, fmRead)
-    if templateStream == nil:
-      env.warn("startup", 0, wUnableToOpenFile, templateFilename)
-      return 1
-
-  # Open the result stream.
-  var resultStream: Stream
-  if args.resultFilename == "":
-    resultStream = env.outStream
-  else:
-    resultStream = newFileStream(args.resultFilename, fmWrite)
-    if resultStream == nil:
-      env.warn("startup", 0, wUnableToOpenFile, args.resultFilename)
-      return 1
-
   # Process the template.
-  processTemplateLines(env, templateStream, resultStream, serverVars,
-    sharedVars, args.prepostList, templateFilename)
+  processTemplateLines(env, serverVars, sharedVars, args.prepostList)
 
-  # Close the streams.
-  if args.resultFilename != "":
-    resultStream.close()
-  if templateFilename != "stdin":
-    templateStream.close()
+  # Close the template and result streams.
+  env.closeExtraStreams()
 
-  if env.warningWritten:
+  if env.warningWritten > 0:
     result = 1

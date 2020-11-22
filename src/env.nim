@@ -3,11 +3,10 @@ import streams
 import warnings
 import os
 import strutils
+import args
 when defined(test):
   import options
   import regexes
-
-# todo: count the number of warnings written to errStream.
 
 const
   staticteaLog* = "statictea.log" ## \
@@ -21,14 +20,29 @@ type
     logEnv*: LogEnv
     errStream*: Stream
     outStream*: Stream
-    warningWritten*: bool
+    warningWritten*: Natural
     closeStreams: bool
+    templateFilename*: string
+    templateStream*: Stream
+    resultFilename*: string
+    resultStream*: Stream
+
+proc closeExtraStreams*(env: var Env) =
+  ## Close the template and result streams.
+  # A resultFilename of "" means stdout, don't close it.
+  if env.resultFilename != "" and env.resultStream != nil:
+    env.resultStream.close()
+    env.resultStream = nil
+  if env.templateFilename != "stdin" and env.templateStream != nil:
+    env.templateStream.close()
+    env.templateStream = nil
 
 proc close*(env: var Env) =
   env.logEnv.close()
   if env.closeStreams:
     env.errStream.close()
     env.outStream.close()
+  env.closeExtraStreams()
 
 template log*(env: var Env, message: string) =
   ## Append the message to the log file. The current file and line
@@ -38,7 +52,7 @@ template log*(env: var Env, message: string) =
 
 proc warn(env: var Env, message: string) =
   env.errStream.writeLine(message)
-  env.warningWritten = true
+  inc(env.warningWritten)
 
 proc warn*(env: var Env, filename: string, lineNum: int, warning: Warning,
            p1: string = "", p2: string = "") =
@@ -56,27 +70,69 @@ proc checkLogSize(env: var Env) =
     env.log(line)
     env.warn(line)
 
-proc openEnv*(filename: string="", warnSize: BiggestInt=logWarnSize): Env =
+proc openEnv*(logFilename: string="", warnSize: BiggestInt=logWarnSize): Env =
 
-  var name: string
+  var logName: string
   var closeStreams: bool
-  var err: Stream
-  var output: Stream
-  if filename == "":
-    name = staticteaLog
-    err = newFileStream(stderr)
-    output = newFileStream(stdout)
+  var errStream: Stream
+  var outStream: Stream
+  if logFilename == "":
+    logName = staticteaLog
+    errStream = newFileStream(stderr)
+    outStream = newFileStream(stdout)
     closeStreams = false
   else:
-    name = filename
-    err = newStringStream()
-    output = newStringStream()
+    logName = logFilename
+    errStream = newStringStream()
+    outStream = newStringStream()
     closeStreams = true
 
-  var log = openLogFile(name)
-  result = Env(logEnv: log, errStream: err, outStream: output,
+  var log = openLogFile(logName)
+  result = Env(logEnv: log, errStream: errStream, outStream: outStream,
                closeStreams: closeStreams)
   checkLogSize(result)
+
+proc addExtraStreams*(env: var Env, args: Args): bool =
+  ## Add the template and result streams to the environment. Return
+  ## true on success.
+
+  assert env.templateFilename == ""
+  assert env.templateStream == nil
+  assert env.resultFilename == ""
+  assert env.resultStream == nil
+
+  # Get the template filename.
+  assert args.templateList.len > 0
+  if args.templateList.len > 1:
+    let skipping = join(args.templateList[1..^1], ", ")
+    env.warn("starting", 0, wOneTemplateAllowed, skipping)
+  env.templateFilename = args.templateList[0]
+
+  # Open the template stream.
+  if env.templateFilename == "stdin":
+    env.templateStream = newFileStream(stdin)
+    if env.templateStream == nil:
+      env.warn("startup", 0, wCannotOpenStd, "stdin")
+      return
+  else:
+    if not fileExists(env.templateFilename):
+      env.warn("startup", 0, wFileNotFound, env.templateFilename)
+      return
+    env.templateStream = newFileStream(env.templateFilename, fmRead)
+    if env.templateStream == nil:
+      env.warn("startup", 0, wUnableToOpenFile, env.templateFilename)
+      return
+
+  # Open the result stream.
+  if args.resultFilename == "":
+    env.resultStream = env.outStream
+  else:
+    env.resultStream = newFileStream(args.resultFilename, fmWrite)
+    if env.resultStream == nil:
+      env.warn("startup", 0, wUnableToOpenFile, args.resultFilename)
+      return
+    env.resultFilename = args.resultFilename
+  result = true
 
 when defined(test):
   proc readAndClose(stream: Stream): seq[string] =

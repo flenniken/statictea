@@ -25,11 +25,13 @@ suite "env.nim":
     var env = openEnv("_test.log")
     testProc(env)
     env.writeOut(outMsg)
-    check env.warningWritten == false
+    check env.warningWritten == 0
     env.warn("testing", 12, wNotEnoughMemoryForLB)
-    check env.warningWritten == true
+    check env.warningWritten == 1
+    env.warn("testing", 12, wNotEnoughMemoryForLB)
+    check env.warningWritten == 2
     var (logLines, errLines, outLines) = env.readCloseDelete()
-
+    # echoLines(logLines, errLines, outLines)
     check logLines.len == 2
     var logLine = parseLine(logLines[0]).get()
     check logLine.message == testMsg1
@@ -37,8 +39,9 @@ suite "env.nim":
     check logLine.message == testMsg2
 
     let errMsg = getWarning("testing", 12, wNotEnoughMemoryForLB)
-    check errLines.len == 1
+    check errLines.len == 2
     check errLines[0] == errMsg
+    check errLines[1] == errMsg
 
     check outLines.len == 1
     check outLines[0] == outMsg

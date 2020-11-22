@@ -17,9 +17,8 @@ proc readAndClose(stream: Stream): seq[string] =
 suite "Test statictea.nim":
 
   test "main version":
-    let filename = "_logfile1.txt"
     let mainFilename = "statictea.nim"
-    var env = openEnv(filename)
+    var env = openEnv("_logfile1.txt")
 
     let rc = main(env, @["-v"])
     check rc == 0
@@ -44,9 +43,8 @@ suite "Test statictea.nim":
       check logLine.message in expectedMessages
 
   test "main help":
-    let filename = "_logfile2.txt"
     let mainFilename = "statictea.nim"
-    var env = openEnv(filename)
+    var env = openEnv("_logfile2.txt")
 
     let rc = main(env, @["-h"])
     check rc == 0
