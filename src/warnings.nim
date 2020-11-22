@@ -2,7 +2,6 @@
 
 import tpub
 import strutils
-import Streams
 
 # Add new warnings to the bottom so the warning numbers never change.
 type
@@ -35,6 +34,7 @@ type
     wSkippingTextAfterNum, # w25
     wNotNumber, # w26
     wNumberOverFlow, # w27
+    wNotEnoughMemoryForLB, # w28
 
 tpubType:
   const
@@ -69,6 +69,7 @@ tpubType:
       "Ignoring extra text after the number.", # wSkippingTextAfterNum
       "Invalid number, skipping the statement.", # wNotNumber
       "The number is too big or too small, skipping the statement.", # wNumberOverFlow
+      "Not enough memory for the line buffer.", # wNotEnoughMemoryForLB
     ]
 
 func getWarning*(filename: string, lineNum: int,
@@ -78,10 +79,3 @@ func getWarning*(filename: string, lineNum: int,
   let warningCode = $ord(warning)
   let message = pattern % [p1, p2]
   result = "$1($2): w$3: $4" % [filename, $lineNum, warningCode, message]
-
-proc warn*(stream: Stream, filename: string, lineNum: int, warning: Warning,
-           p1: string = "", p2: string = "") =
-  ## Write the warning to the stream.
-  if stream == nil:
-    return
-  stream.writeLine(getWarning(filename, lineNum, warning, p1, p2))

@@ -53,12 +53,13 @@ proc processTemplateLines(env: var Env, templateStream: Stream, resultStream: St
     prepostList: seq[Prepost], templateFilename: string) =
   ## Process the given template file.
 
+  # Get all the compiled regular expression matchers.
   let compiledMatchers = getCompiledMatchers(prepostList)
 
   # Allocate a buffer for reading lines.
   var lineBufferO = newLineBuffer(templateStream, filename=templateFilename)
   if not lineBufferO.isSome():
-    env.warn("Not enough memory for the line buffer.")
+    env.warn("startup", 0, wNotEnoughMemoryForLB)
     return
   var lb = lineBufferO.get()
 

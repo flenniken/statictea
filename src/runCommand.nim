@@ -139,7 +139,7 @@ proc runStatement(env: var Env, statement: string, compiledMatchers: Compiledmat
   # equal sign.
   let matchesO = getMatches(compiledMatchers.variableMatcher, statement)
   if not matchesO.isSome:
-    env.warn("The statement does not start with a variable name.")
+    warn("The statement does not start with a variable name.")
     return
   let matches = matchesO.get()
   let (nameSpace, varName) = matches.get2Groups()

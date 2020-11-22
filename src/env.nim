@@ -36,13 +36,14 @@ template log*(env: var Env, message: string) =
   let info = instantiationInfo()
   env.logEnv.logLine(info.filename, info.line, message)
 
-proc warn*(env: var Env, filename: string, lineNum: int, warning: Warning,
-           p1: string = "", p2: string = "") =
-  warn(env.errStream, filename, lineNum, warning, p1, p2)
-
-proc warn*(env: var Env, message: string) =
+proc warn(env: var Env, message: string) =
   env.errStream.writeLine(message)
   env.warningWritten = true
+
+proc warn*(env: var Env, filename: string, lineNum: int, warning: Warning,
+           p1: string = "", p2: string = "") =
+  let message = getWarning(filename, lineNum, warning, p1, p2)
+  warn(env, message)
 
 proc writeOut*(env: var Env, message: string) =
   env.outStream.writeLine(message)
