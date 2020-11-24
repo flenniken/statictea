@@ -6,11 +6,15 @@ import matches
 import options
 import strutils
 
-proc testParseCmdLine(line: string, expectedLineParts: LineParts,
-    templateFilename: string = "template.html", lineNum: Natural=12,
+proc testParseCmdLine(
+    line: string,
+    templateFilename: string = "template.html",
+    lineNum: Natural = 1,
+    expectedLineParts: LineParts,
     expectedLogLines: seq[string] = @[],
     expectedErrLines: seq[string] = @[],
-    expectedOutLines: seq[string] = @[] ): bool =
+    expectedOutLines: seq[string] = @[]
+  ): bool =
   ## Return true on success.
 
   var env = openEnv("_parseCmdLine.log")
@@ -43,6 +47,8 @@ proc testParseCmdLine(line: string, expectedLineParts: LineParts,
     echo "    postfix: '$1'" % elps.postfix
     echo "got ending: '$1'" % getEndingString(lps.ending)
     echo "  expected: '$1'" % getEndingString(elps.ending)
+    echo "got lineNum: '$1'" % $lps.lineNum
+    echo "   expected: '$1'" % $elps.lineNum
     return false
 
   if expectedLogLines != logLines:
@@ -57,7 +63,10 @@ proc testParseCmdLine(line: string, expectedLineParts: LineParts,
 
   return true
 
-proc parseCmdLineError(line: string,
+proc parseCmdLineError(
+    line: string,
+    templateFilename: string = "template.html",
+    lineNum: Natural = 12,
     expectedLogLines: seq[string] = @[],
     expectedErrLines: seq[string] = @[],
     expectedOutLines: seq[string] = @[] ): bool =
@@ -65,8 +74,6 @@ proc parseCmdLineError(line: string,
   ## when we get the expected errors.
 
   var env = openEnv("_parseCmdLine.log")
-  let templateFilename = "template.html"
-  let lineNum = 12
 
   let compiledMatchers = getCompiledMatchers()
   let linePartsO = parseCmdLine(env, compiledMatchers, line, templateFilename, lineNum)
@@ -112,11 +119,12 @@ suite "parseCmdLine.nim":
     check lps.continuation == false
     check lps.postfix == "-->"
     check lps.ending == "\n"
+    check lps.lineNum == 1
 
   test "newLineParts set":
     var lps = newLineParts(prefix = "asdf", command = "command",
       middleStart = 15, middleLen = 20, continuation = true,
-      postfix = "post", ending = "ending")
+      postfix = "post", ending = "ending", lineNum = 12)
     check lps.prefix == "asdf"
     check lps.command == "command"
     check lps.middleStart == 15
@@ -124,48 +132,49 @@ suite "parseCmdLine.nim":
     check lps.continuation == true
     check lps.postfix == "post"
     check lps.ending == "ending"
+    check lps.lineNum == 12
 
   test "parseCmdLine":
     let line = "<--!$ nextline -->\n"
-    var expectedLineParts = newLineParts()
-    check testParseCmdLine(line, expectedLineParts)
+    var elps = newLineParts()
+    check testParseCmdLine(line, expectedLineParts = elps)
 
   test "parseCmdLine middle":
     let line = "<--!$ nextline middle part -->\n"
-    var expectedLineParts = newLineParts(middleStart = 15, middleLen = 12)
-    check testParseCmdLine(line, expectedLineParts)
+    var elps = newLineParts(middleStart = 15, middleLen = 12)
+    check testParseCmdLine(line, expectedLineParts = elps)
 
   test "parseCmdLine middle 2":
     let line = "<--!$ nextline    middle part  -->\n"
-    var expectedLineParts = newLineParts(middleStart = 15, middleLen = 16)
-    check testParseCmdLine(line, expectedLineParts)
+    var elps = newLineParts(middleStart = 15, middleLen = 16)
+    check testParseCmdLine(line, expectedLineParts = elps)
 
   test "parseCmdLine continue":
     let line = "<--!$ nextline \\-->\n"
-    var expectedLineParts = newLineParts(continuation = true)
-    check testParseCmdLine(line, expectedLineParts)
+    var elps = newLineParts(continuation = true)
+    check testParseCmdLine(line, expectedLineParts = elps)
 
   test "parseCmdLine last line":
     let line = "<--!$ nextline -->"
-    var expectedLineParts = newLineParts(ending = "")
-    check testParseCmdLine(line, expectedLineParts)
+    var elps = newLineParts(ending = "")
+    check testParseCmdLine(line, expectedLineParts = elps)
 
   test "parseCmdLine block":
     let line = "<--!$ block -->\n"
-    var expectedLineParts = newLineParts(command = "block", middleStart = 12)
-    check testParseCmdLine(line, expectedLineParts)
+    var elps = newLineParts(command = "block", middleStart = 12)
+    check testParseCmdLine(line, expectedLineParts = elps)
 
   test "parseCmdLine prefix":
     let line = "#$ nextline \n"
-    var expectedLineParts = newLineParts(prefix = "#$",
+    var elps = newLineParts(prefix = "#$",
       middleStart = 12, postfix = "")
-    check testParseCmdLine(line, expectedLineParts)
+    check testParseCmdLine(line, expectedLineParts = elps)
 
   test "parseCmdLine multiple":
     let line = "#$ block a = 5; b = 'hi'"
-    var expectedLineParts = newLineParts(prefix = "#$", command = "block",
+    var elps = newLineParts(prefix = "#$", command = "block",
       middleStart = 9, middleLen = 15, postfix = "", ending = "")
-    check testParseCmdLine(line, expectedLineParts)
+    check testParseCmdLine(line, expectedLineParts = elps)
 
   test "no prefix":
     let line = " nextline -->\n"
@@ -178,5 +187,6 @@ suite "parseCmdLine.nim":
 
   test "no postfix error":
     let line = "<--!$ nextline \n"
-    let expectedWarn = """template.html(12): w23: The matching closing comment postfix was not found, expected: "-->"."""
-    check parseCmdLineError(line, expectedErrLines = @[expectedWarn])
+    let expectedWarn = """hello.html(16): w23: The matching closing comment postfix was not found, expected: "-->"."""
+    check parseCmdLineError(line, templateFilename = "hello.html",
+      lineNum = 16, expectedErrLines = @[expectedWarn])

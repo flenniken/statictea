@@ -202,7 +202,7 @@ when defined(test):
       result = false
 
   proc testSome*[T](valueO: Option[T], eValueO: Option[T],
-      statement: string, start: Natural): bool =
+      text: string, start: Natural): bool =
 
     if valueO == eValueO:
       return true
@@ -210,5 +210,5 @@ when defined(test):
     echo "Did not get the expected value."
     echo "     got: $1" % $valueO
     echo "expected: $1" % $eValueO
-    echo "statement: $1" % statement
-    echo "    start: $1" % startPointer(start)
+    echo " text: $1" % text
+    echo "start: $1" % startPointer(start)

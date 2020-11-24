@@ -78,7 +78,7 @@ three
     let eCmdLines = splitNewLines(content)
     let eCmdLineParts = @[
       newLineParts(continuation = true),
-      newLineParts(command = ":", middleStart = 8)
+      newLineParts(lineNum = 2, command = ":", middleStart = 8)
     ]
     check testProcess(content, eCmdLines, eCmdLineParts)
 
@@ -91,8 +91,9 @@ three
     let eCmdLines = splitNewLines(content)
     let eCmdLineParts = @[
       newLineParts(continuation = true),
-      newLineParts(command = ":", middleStart = 8, middleLen = 4, continuation = true),
-      newLineParts(command = ":", middleStart = 8, middleLen = 14)
+      newLineParts(lineNum = 2, command = ":", middleStart = 8,
+        middleLen = 4, continuation = true),
+      newLineParts(lineNum = 3, command = ":", middleStart = 8, middleLen = 14)
     ]
     check testProcess(content, eCmdLines, eCmdLineParts)
 
@@ -121,7 +122,7 @@ the next line
 """
     let split = splitNewLines(content)
     let eCmdLines = @[split[1]]
-    let eCmdLineParts = @[newLineParts()]
+    let eCmdLineParts = @[newLineParts(lineNum = 2)]
     check testProcess(content, eCmdLines, eCmdLineParts,
       eResultStreamLines = @[split[0]])
 
@@ -190,7 +191,7 @@ block
 asdf
 """
     let eCmdLines = @["<--!$ nextline -->\n"]
-    let eCmdLineParts = @[newLineParts()]
+    let eCmdLineParts = @[newLineParts(lineNum = 6)]
     let warning = "template.html(2): w24: Missing the continuation line, " &
       "abandoning the command."
     let p = splitNewLines(content)

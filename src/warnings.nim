@@ -35,6 +35,7 @@ type
     wNotNumber, # w26
     wNumberOverFlow, # w27
     wNotEnoughMemoryForLB, # w28
+    wMissingStatementVar, # w29
 
 tpubType:
   const
@@ -70,6 +71,7 @@ tpubType:
       "Invalid number, skipping the statement.", # wNotNumber
       "The number is too big or too small, skipping the statement.", # wNumberOverFlow
       "Not enough memory for the line buffer.", # wNotEnoughMemoryForLB
+      "The statement starting at column $1 does not start with a variable name.", # wMissingStatementVar
     ]
 
 func getWarning*(filename: string, lineNum: int,

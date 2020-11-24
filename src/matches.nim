@@ -103,10 +103,10 @@ proc getSpaceTabMatcher*(): Matcher =
   ## and tabs.
   result = newMatcher(r"^[ \t]*$", 0)
 
-proc notEmptyOrSpaces*(spaceTabMatcher: Matcher, statement: string): bool =
+proc notEmptyOrSpaces*(spaceTabMatcher: Matcher, text: string): bool =
   ## Return true when a statement is not empty or not all whitespace.
-  if statement.len != 0:
-    let matches = getMatches(spaceTabMatcher, statement)
+  if text.len != 0:
+    let matches = getMatches(spaceTabMatcher, text)
     if not matches.isSome:
       result = true
 

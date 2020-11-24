@@ -14,6 +14,7 @@ type
     continuation*: bool
     postfix*: string
     ending*: string
+    lineNum*: Natural
 
 proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
     line: string, templateFilename: string, lineNum: Natural):
@@ -64,6 +65,7 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
 
   # Line ending is required except for the last line of the file.
   lineParts.ending = ending
+  lineParts.lineNum = lineNum
   result = some(lineParts)
 
 when defined(test):
@@ -100,8 +102,10 @@ when defined(test):
       middleLen: Natural = 0,
       continuation: bool = false,
       postfix: string = "-->",
-      ending: string = "\n"): LineParts =
+      ending: string = "\n",
+      lineNum: Natural = 1): LineParts =
     ## Return a new LineParts object. The default is: <--!$ nextline -->\n.
     result = LineParts(prefix: prefix, command: command,
       middleStart: middleStart, middleLen: middleLen,
-      continuation: continuation, postfix: postfix, ending: ending)
+      continuation: continuation, postfix: postfix,
+      ending: ending, lineNum: lineNum)

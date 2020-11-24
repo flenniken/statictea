@@ -10,52 +10,46 @@ import matches
 import collectCommand
 import vartypes
 
-proc getCmdLineParts(line: string): Option[LineParts] =
+proc toString(statements: seq[Statement]): string =
+  var lines: seq[string]
+  for ix, statement in statements:
+    lines.add "$1: $2" % [$(ix+1), $statement]
+  result = join(lines, "\n")
+
+proc getCmdLineParts(line: string, templateFilename = "template.html",
+    lineNum: Natural = 1): Option[LineParts] =
   ## Return the line parts from the given line.
   var env = openEnv("_testRunCommand.log")
+  # todo: get pass in the compiledMatchers.
   let compiledMatchers = getCompiledMatchers()
-  result = parseCmdLine(env, compiledMatchers, line, "templateFilename", 99)
+  result = parseCmdLine(env, compiledMatchers, line, templateFilename, lineNum)
+  # todo: remove open and close of the env.
   discard env.readCloseDelete()
 
 proc getCmdLineParts(cmdLines: seq[string]): seq[LineParts] =
   ## Return the line parts from the given lines.
-  for line in cmdLines:
-    let parts = getCmdLineParts(line)
-    if not parts.isSome():
+  for ix, line in cmdLines:
+    let partsO = getCmdLineParts(line, lineNum = ix + 1)
+    if not partsO.isSome():
       echo "cannot get command line parts for:"
       echo "line: '$1'" % line
-    result.add(parts.get())
+    result.add(partsO.get())
 
-proc getStatements(cmdLines: seq[string], cmdLineParts: seq[LineParts]): seq[string] =
+proc getStatements(cmdLines: seq[string], cmdLineParts: seq[LineParts]): seq[Statement] =
   ## Return a list of statements for the given lines.
   for statement in yieldStatements(cmdLines, cmdLineParts):
     result.add(statement)
 
-proc splitStatements(content: string): seq[string] =
-  ## Split a multiline string into lines. The ending newlines get
-  ## removed and underscores get converted to spaces.
-  ## example: let content = """
-  ## a = 5
-  ## b = 6_
-  ## """
-  ## returns two strings: "a = 5" and "b = 6 ".
-  var eLines = splitNewLines(content)
-  for line in eLines:
-    var rline = line.replace('_', ' ')
-    if rline.len > 0:
-      let lastIndex = rline.len - 1
-      if rline[lastIndex] == '\n':
-        rline = rline[0 ..< lastIndex]
-    result.add(rline)
-
-proc testGetStatements(content: string): seq[string] =
+proc testGetStatements(content: string): seq[Statement] =
   ## Return a list of statements for the given multiline content.
   let cmdLines = splitNewLines(content)
   let cmdLineParts = getCmdLineParts(cmdLines)
+  # for part in cmdLineParts:
+  #   echo $part
   result = getStatements(cmdLines, cmdLineParts)
 
 proc testGetNumber(
-    statement: string,
+    statement: Statement,
     start: Natural,
     eValueO: Option[Value],
     eLogLines: seq[string] = @[],
@@ -69,58 +63,67 @@ proc testGetNumber(
   let valueO = getNumber(env, compiledMatchers, statement, start)
   let (logLines, errLines, outLines) = env.readCloseDelete()
 
-  notReturn testSome(valueO, eValueO, statement, start)
+  notReturn testSome(valueO, eValueO, statement.text, start)
   notReturn expectedItems("logLines", logLines, eLogLines)
   notReturn expectedItems("errLines", errLines, eErrLines)
   notReturn expectedItems("outLines", outLines, eOutLines)
   result = true
 
-proc compareStatements(statements: seq[string], eContent: string): bool =
+proc stripNewline(line: string): string =
+  if line.len > 0 and line[^1] == '\n':
+    result = line[0 .. ^2]
+  else:
+    result = line
+
+proc compareStatements(statements: seq[Statement], eContent: string): bool =
   ## Return true when the statements match the expected
-  ## statements. The newlines in the eStatements are stripped out
-  ## before comparing.
-  let eLines = splitStatements(eContent)
-  if statements == eLines:
-    return true
-  if statements.len != eLines.len:
-    echo "got $1 statements, expected $2" % [$statements.len, $eLines.len]
-    for line in statements:
-      echo "'$1'" % line
-    echo "expected:"
-    for line in eLines:
-      echo "'$1'" % line
-    return false
-  for ix in 0 ..< eLines.len:
-    let line = statements[ix]
-    let eLine = eLines[ix]
-    if line == eLine:
-      echo "$1 same" % $ix
-    else:
-      echo "$1      got: '$2'" % [$ix, line]
-      echo "$1 expected: '$2'" % [$ix, eLine]
+  ## statements.
+  let lines = splitNewLines(eContent)
+  for ix, statement in statements:
+    let got = $statement
+    let expected = stripNewline(lines[ix])
+    if got != expected:
+      echo "     got: $1" % got
+      echo "expected: $1" % expected
+      return false
+  return true
 
 suite "runCommand.nim":
 
-  test "splitStatements empty":
-    check splitStatements("").len == 0
+  test "stripNewline":
+    check stripNewline("") == ""
+    check stripNewline("\n") == ""
+    check stripNewline("1\n") == "1"
+    check stripNewline("asdf") == "asdf"
+    check stripNewline("asdf\n") == "asdf"
 
-  test "splitStatements one":
-    let content = """
-a = 5
+  test "compareStatements one":
+    let expected = """
+1, 1: 'a = 5'
 """
-    let sLines = splitStatements(content)
-    check sLines.len == 1
-    check sLines[0] == "a = 5"
+    check compareStatements(@[newStatement("a = 5")], expected)
 
-  test "splitStatements two":
-    let content = """
-a = 5
- b = 6_
+  test "compareStatements two":
+    let expected = """
+1, 1: 'a = 5'
+1, 1: '  b = 235 '
 """
-    let sLines = splitStatements(content)
-    check sLines.len == 2
-    check sLines[0] == "a = 5"
-    check sLines[1] == " b = 6 "
+    check compareStatements(@[
+      newStatement("a = 5"),
+      newStatement("  b = 235 ")
+    ], expected)
+
+  test "compareStatements three":
+    let expected = """
+1, 1: 'a = 5'
+2, 10: '  b = 235 '
+2, 20: '  c = 0'
+"""
+    check compareStatements(@[
+      newStatement("a = 5"),
+      newStatement("  b = 235 ", lineNum = 2, start = 10),
+      newStatement("  c = 0", lineNum = 2, start = 20)
+    ], expected)
 
   test "no statements":
     let cmdLines = @["<--!$ nextline -->\n"]
@@ -135,9 +138,10 @@ a = 5
     let cmdLines = splitNewLines(content)
     let cmdLineParts = getCmdLineParts(cmdLines)
     let statements = getStatements(cmdLines, cmdLineParts)
-    check statements.len == 1
-    check statements[0] == "a = 5 "
-    # echo "'$1'" % statements
+    let expected = """
+1, 15: 'a = 5 '
+"""
+    check compareStatements(statements, expected)
 
   test "two statements":
     let content = """
@@ -146,9 +150,11 @@ a = 5
     let cmdLines = splitNewLines(content)
     let cmdLineParts = getCmdLineParts(cmdLines)
     let statements = getStatements(cmdLines, cmdLineParts)
-    check statements.len == 2
-    check statements[0] == "a = 5"
-    check statements[1] == " b = 6 "
+    let expected = """
+1, 15: 'a = 5'
+1, 21: ' b = 6 '
+"""
+    check compareStatements(statements, expected)
 
   test "three statements":
     let content = """
@@ -157,12 +163,12 @@ a = 5
     let cmdLines = splitNewLines(content)
     let cmdLineParts = getCmdLineParts(cmdLines)
     let statements = getStatements(cmdLines, cmdLineParts)
-    let eStatements = """
-a = 5
- b = 6_
-c=7
+    let expected = """
+1, 15: 'a = 5'
+1, 21: ' b = 6 '
+1, 29: 'c=7'
 """
-    check compareStatements(statements, eStatements)
+    check compareStatements(statements, expected)
 
   test "two lines":
     let content = """
@@ -172,132 +178,146 @@ c=7
     let cmdLines = splitNewLines(content)
     let cmdLineParts = getCmdLineParts(cmdLines)
     let statements = getStatements(cmdLines, cmdLineParts)
-    let eStatements = """
-a = 5
- asdf_
+    let expected = """
+1, 15: 'a = 5'
+1, 21: ' asdf '
 """
-    check compareStatements(statements, eStatements)
+    check compareStatements(statements, expected)
+
+  test "three statements split":
+    let content = """
+<--!$ block a = 5; b = \-->
+<--!$ : "hello"; \-->
+<--!$ : c = t.len(s.header) -->
+"""
+    let statements = testGetStatements(content)
+    let expected = """
+1, 12: 'a = 5'
+1, 18: ' b = "hello"'
+2, 16: ' c = t.len(s.header) '
+"""
+    check compareStatements(statements, expected)
 
   test "semicolon at the start":
     let content = """
 <--!$ nextline ;a = 5 -->
 """
     let statements = testGetStatements(content)
-    let eStatements = """
-a = 5_
+    let expected = """
+1, 16: 'a = 5 '
 """
-    check compareStatements(statements, eStatements)
+    check compareStatements(statements, expected)
 
   test "double quotes":
     let content = """
 <--!$ nextline a="hi" -->
 """
     let statements = testGetStatements(content)
-    let eStatements = """
-a="hi"_
+    let expected = """
+1, 15: 'a="hi" '
 """
-    check compareStatements(statements, eStatements)
+    check compareStatements(statements, expected)
 
   test "double quotes with semicolon":
     let content = """
 <--!$ nextline a="h\i;" -->
 """
     let statements = testGetStatements(content)
-    let eStatements = """
-a="h\i;"_
+    let expected = """
+1, 15: 'a="h\i;" '
 """
-    check compareStatements(statements, eStatements)
+    check compareStatements(statements, expected)
 
   test "double quotes with slashed double quote":
     let content = """
 <--!$ nextline a="\"hi\"" -->
 """
     let statements = testGetStatements(content)
-    let eStatements = """
-a="\"hi\""_
+    let expected = """
+1, 15: 'a="\"hi\"" '
 """
-    check compareStatements(statements, eStatements)
+    check compareStatements(statements, expected)
 
   test "double quotes with single quote":
     let content = """
 <--!$ nextline a="'hi'" -->
 """
     let statements = testGetStatements(content)
-    let eStatements = """
-a="'hi'"_
+    let expected = """
+1, 15: 'a="'hi'" '
 """
-    check compareStatements(statements, eStatements)
+    check compareStatements(statements, expected)
 
   test "single quotes":
     let content = """
 <--!$ nextline a='hi' -->
 """
     let statements = testGetStatements(content)
-    let eStatements = """
-a='hi'_
+    let expected = """
+1, 15: 'a='hi' '
 """
-    check compareStatements(statements, eStatements)
+    check compareStatements(statements, expected)
 
   test "single quotes with semicolon":
     let content = """
 <--!$ nextline a='hi;there' -->
 """
     let statements = testGetStatements(content)
-    let eStatements = """
-a='hi;there'_
+    let expected = """
+1, 15: 'a='hi;there' '
 """
-    check compareStatements(statements, eStatements)
+    check compareStatements(statements, expected)
 
   test "single quotes with slashed single quote":
     let content = """
 <--!$ nextline a='hi\'there' -->
 """
     let statements = testGetStatements(content)
-    let eStatements = """
-a='hi\'there'_
+    let expected = """
+1, 15: 'a='hi\'there' '
 """
-    check compareStatements(statements, eStatements)
+    check compareStatements(statements, expected)
 
   test "single quotes with double quote":
     let content = """
 <--!$ nextline a='hi "there"' -->
 """
     let statements = testGetStatements(content)
-    let eStatements = """
-a='hi "there"'_
+    let expected = """
+1, 15: 'a='hi "there"' '
 """
-    check compareStatements(statements, eStatements)
+    check compareStatements(statements, expected)
 
   test "semicolon at the end":
     let content = """
 <--!$ nextline a = 5;-->
 """
     let statements = testGetStatements(content)
-    let eStatements = """
-a = 5
+    let expected = """
+1, 15: 'a = 5'
 """
-    check compareStatements(statements, eStatements)
+    check compareStatements(statements, expected)
 
   test "two semicolons together":
     let content = """
 <--!$ nextline asdf;;fdsa-->
 """
     let statements = testGetStatements(content)
-    let eStatements = """
-asdf
-fdsa
+    let expected = """
+1, 15: 'asdf'
+1, 21: 'fdsa'
 """
-    check compareStatements(statements, eStatements)
+    check compareStatements(statements, expected)
 
   test "white space statement":
     let content = """
 <--!$ nextline asdf; -->
 """
     let statements = testGetStatements(content)
-    let eStatements = """
-asdf
+    let expected = """
+1, 15: 'asdf'
 """
-    check compareStatements(statements, eStatements)
+    check compareStatements(statements, expected)
 
   test "white space statement 2":
     let content = """
@@ -306,27 +326,27 @@ asdf
 <--!$ : ;x = y -->
 """
     let statements = testGetStatements(content)
-    let eStatements = """
-asdf
-x = y_
+    let expected = """
+1, 15: 'asdf'
+3, 9: 'x = y '
 """
-    check compareStatements(statements, eStatements)
+    check compareStatements(statements, expected)
 
   test "getNumber":
-    check testGetNumber("a = 5", 4, newIntValueO(5))
-    check testGetNumber("a = 5.0", 4, newFloatValueO(5.0))
-    check testGetNumber("a = -2", 4, newIntValueO(-2))
-    check testGetNumber("a = -3.4", 4, newFloatValueO(-3.4))
-    check testGetNumber("a = 88 ", 4, newIntValueO(88))
+    check testGetNumber(newStatement("a = 5"), 4, newIntValueO(5))
+    check testGetNumber(newStatement("a = 5.0"), 4, newFloatValueO(5.0))
+    check testGetNumber(newStatement("a = -2"), 4, newIntValueO(-2))
+    check testGetNumber(newStatement("a = -3.4"), 4, newFloatValueO(-3.4))
+    check testGetNumber(newStatement("a = 88 "), 4, newIntValueO(88))
 
   test "getNumber with extra":
     let message = "template.html(23): w26: Invalid number, skipping the statement."
-    check testGetNumber("a = 5 abc", 4, none(Value), eErrLines = @[message])
+    check testGetNumber(newStatement("a = 5 abc"), 4, none(Value), eErrLines = @[message])
 
   test "getNumber not a number":
     let message = "template.html(23): w26: Invalid number, skipping the statement."
-    check testGetNumber("a = -abc", 4, none(Value), eErrLines = @[message])
+    check testGetNumber(newStatement("a = -abc"), 4, none(Value), eErrLines = @[message])
 
   test "getNumberIntTooBig":
     let message = "template.html(23): w27: The number is too big or too small, skipping the statement."
-    check testGetNumber("a = 9_223_372_036_854_775_808", 4, none(Value), eErrLines = @[message])
+    check testGetNumber(newStatement("a = 9_223_372_036_854_775_808"), 4, none(Value), eErrLines = @[message])
