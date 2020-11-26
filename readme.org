@@ -1,7 +1,7 @@
 #+TITLE: StaticTea
 
 ** A template processor and language.
-[[#contents][Contents]]
+[[Contents]]
 
 StaticTea combines a template with data to produce a result.
 
@@ -1403,10 +1403,25 @@ default t.content = ""
 default t.maxlines = 10
 #+END_SRC
 
-** Contents :TOC:QUOTE:
+** Contents
 #+BEGIN_QUOTE
-- [[#advantages][Advantages]]
-- [[#statements][Statements]]
+- [[Advantages]]
+- [[How it Works]]
+- [[Commands]]
+- [[Statements]]
+- [[Types]]
+- [[Variables]]
+- [[System Variables]]
+- [[Functions]]
+- [[Prefix Postfix]]
+- [[Json Files and Variables]]
+- [[Warning Messages]]
+- [[Log File]]
+- [[Run StaticTea]]
+- [[Limits]]
+- [[Encoding and Line Endings]]
+- [[Ellipsize]]
+- [[System Defaults]]
 #+END_QUOTE
 
 ** Tea Info
