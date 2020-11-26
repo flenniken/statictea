@@ -24,6 +24,9 @@ The result:
 hello world
 #+END_SRC
 
+Contents :TOC:
+
+
 ** Advantages
 
 You develop templates as if they were static pages.  You can
