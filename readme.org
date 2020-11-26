@@ -1,7 +1,7 @@
 #+TITLE: StaticTea
 
 ** A template processor and language.
-[[Contents]]
+[[#contents][Contents]]
 
 StaticTea combines a template with data to produce a result.
 
@@ -23,9 +23,6 @@ The result:
 #+BEGIN_SRC
 hello world
 #+END_SRC
-
-Contents :TOC:
-
 
 ** Advantages
 
@@ -1408,9 +1405,9 @@ default t.maxlines = 10
 
 ** Contents
 #+BEGIN_QUOTE
-- [[Advantages]]
-- [[How it Works]]
-- [[Commands]]
+- [[#adv][Advantages]]
+- [[#hiw][How it Works]]
+- [[#cmd][Commands]]
 - [[Statements]]
 - [[Types]]
 - [[Variables]]
