@@ -1,6 +1,8 @@
 * StaticTea
 
 ** A template processor and language.
+[[*Contents]]
+#+OPTIONS: toc:nil
 
 StaticTea combines a template with data to produce a result.
 
@@ -67,7 +69,7 @@ string, a number or a function. Here are some examples:
 #+BEGIN_SRC
 tea = "Earl Grey"
 num = 5
-t.list = s.teaList
+t.repeat = s.teaList
 nameLen = t.len(s.name)
 #+END_SRC
 
@@ -157,12 +159,13 @@ The lines in the block mirror the variable so you can
 test the template as if it was a static file.
 
 The command is useful for sharing common template lines between
-templates and it has the special property that you can update the
-replacement block to keep it in sync with the variable.
+templates and it has the special property that you can
+automatically update the replacement block to keep it in sync
+with the variable.
 
-You can assign t.content the special "useblock" value and the
-block content is used as is.  This is good for testing changes
-you want to make to the shared value.
+If you don't assign the t.content variable, the block content is
+used as is.  This is good for testing changes you want to make to
+the shared value.
 
 The following example shares a common header between templates.
 
@@ -396,7 +399,7 @@ result:
 
 An integer is a 64 bit signed number.  When you pass an integer to
 a function that takes a string, the number is converted to a
-string.
+string. Plus signs are not used with numbers.
 
 Example numbers:
 
@@ -411,7 +414,8 @@ Example numbers:
 
 A float is a 64 bit real number. Like integers a float is
 converted to a string when passed to a function taking a sring.
-A float has a decimal point.
+A float has a decimal point and starts with a digit or minus
+sign.
 
 Example floats:
 
@@ -440,7 +444,7 @@ how a command works.
 You specify variables in json files or you create them in
 template statements.
 
-A json dictionary item key becomes the variable name its value
+A json dictionary's item key becomes the variable name its value
 becomes the variable's value.
 
 Internally a dictionary exists for the server json, one for the
@@ -463,7 +467,7 @@ Prefixes:
 Example variables:
 
 #+BEGIN_SRC
-t.list
+t.repeat
 s.companyName
 h.userName
 mytea
@@ -475,7 +479,7 @@ The built in system variables, prefixed with "t.", control how
 the replacement block works.
 
 - t.content - content of the replace block
-- t.list - controls whether the block repeats
+- t.repeat - controls whether the block repeats
 - t.local - dictionary containing the current block's local variables.
 - t.maxlines - maximum lines before endblock or endreplace
 - t.result - where the result goes
@@ -491,25 +495,39 @@ the block is replaced with nothing.
 The variable only applies to the replace command. See the replace
 command section for an example.
 
-*** t.list
+*** t.repeat
 
-The t.list variable determines whether the current replacement
-block repeats or not. It repeats once for each item in the list.
-By default the block is output once.  An empty list means don't
+The t.repeat variable tells many times to repeat the block. You
+can assign it a number or a special type of list, one containing
+dictionaries.
+
+Each time the block repeats the local variables get
+recalculated. The repeat variable is only assigned once per
+block.
+
+By default the block is output once. A value of zero means don't
 show the block at all.
 
-The list must be a list of dictionaries. Each dictionary contains
-local variables you use in the block. The command variables get
-re-evaluated for each item in the list which allows you to format
-them for the block.
+The variable you assign to t.repeat must be a list containing
+dictionaries. Ech dictionary provides another source of local
+variables, the first dictionary goes with the first row, the
+sceond goes with the secon row and so on. All the block's local
+variables get recalculated for each row.
 
-For the following example, tea_list is assigned to the t.list
+#+BEGIN_SRC
+t.repeat = t.len(s.companies)
+t.copy(t.get(s.companies, t.row()))
+
+t.repeat = s.companies
+#+END_SRC
+
+For the following example, tea_list is assigned to the t.repeat
 variable which outputs the block five times.
 
 template:
 
 #+BEGIN_SRC
-<!--$ nextline t.list = s.tea_list -->
+<!--$ nextline t.repeat = s.tea_list -->
   * {tea}
 #+END_SRC
 
@@ -545,7 +563,7 @@ template:
 #+BEGIN_SRC
 <h3>Tea Companies</h3>
 <select>
-<!--$ nextline t.list=s.companyList; \-->
+<!--$ nextline t.repeat=s.companyList; \-->
 <!--$ : current=t.if(s.selected, ' selected="selected"', "") -->
   <option{current}>{s.company}</option>
 </select>
@@ -558,7 +576,7 @@ server json:
 "companyList": [
     {"company": "Lipton"},
     {"company": "Tetley"},
-    {"company": "Twinings, "selected": 1"},
+    {"company": "Twinings, "selected": 1},
     {"company": "American Tea Room"},
     {"company": "Argo Tea"},
     {"company": "Bigelow Tea Company"}
@@ -601,17 +619,6 @@ setting the t.maxlines system variable.
 <!--$ block t.maxlines=20 -->
 #+END_SRC
 
-*** t.result
-
-The t.result variable determines where the replacement blocks's
-result goes, either the results file, standard error or
-nowhere. By default it goes to the result file.
-
-Result variable options:
-
-- "result" - send the replacement block to the result file (default)
-- "skip" - skip the block
-- "stderr" - send the block to standard error
 
 Skip Example:
 
@@ -625,7 +632,7 @@ template:
 #+BEGIN_SRC
 <h3>Tea</h3>
 <ul>
-<!--$ nextline t.list = s.teaList -->
+<!--$ nextline t.repeat = s.teaList -->
   <li>{s.tea}</li>
 </ul>
 #+END_SRC
@@ -638,9 +645,9 @@ template:
 #+BEGIN_SRC
 <h3>Tea</h3>
 <ul>
-<!--$ nextline t.list = teaList -->
+<!--$ nextline t.repeat = teaList -->
   <li>{tea}</li>
-<!--$ block t.result = 'skip' -->
+<!--$ block t.repeat = 0 -->
   <li>Black</li>
   <li>Green</li>
   <li>Oolong</li>
@@ -689,10 +696,12 @@ StaticTea has many built in functions you can call to format your
 variables for output.  Functions take zero or more input parameters
 and return a value that you assign to a variable.
 
-You use functions on a command line to assign variables.
+You use functions in statements to generate values you assign to
+variables.
 
-The following example assigns the greeting variable a personalized
-greeting, then it uses the variable in the replacement block.
+The following example the t.concat function generates a
+personalized greeting that it assigns to the greeting variable
+which is used in the replacement block.
 
 #+BEGIN_SRC
 <!--$ nextline greeting = t.concat("Hello ", s.name) -->
@@ -704,6 +713,7 @@ List of functions:
 - t.case() -- generalized if function
 - t.cmp() -- spaceship compare function <=>
 - t.concat() -- concatenate strings
+- t.copy() -- copy variables to the local dictionary
 - t.currency() -- format currency
 - t.exists() -- whether a variables exists
 - t.find() -- find a substring in a string
@@ -841,6 +851,12 @@ t.exists(a) => 1
 t.exists(b) => 0
 #+END_SRC
 
+*** t.copy()
+
+The t.copy function copies variables to the local variables
+dictionary. It takes one parameter which can be a variable or a
+dictionary.
+
 *** t.find()
 
 The t.find function searches a string for a substring and returns
@@ -872,7 +888,7 @@ default, a warning is generated when the item doesn't exist.
 
 #+BEGIN_SRC
 var = t.get(t.server, "tea", "Earl Grey")
-var2 = t.get(t.list, 2, "default")
+var2 = t.get(t.repeat, 2, "default")
 #+END_SRC
 
 *** t.if
@@ -981,7 +997,7 @@ The server json dictionary has 1 elements.
 *** t.row
 
 The special row function returns the current row number for
-blocks using a t.list. The function takes a parameter which
+blocks using a t.repeat. The function takes a parameter which
 specifies the starting point. You can use it in replacement
 blocks.
 
@@ -994,9 +1010,9 @@ Here is an example using the row variable.
 template:
 
 #+BEGIN_SRC
-<!--$ nextline t.list=s.companies \-->
+<!--$ nextline t.repeat=s.companies \-->
 <!--$ : id = row(0); num = run(1) -->
-  <li id="r{id}>{num}. {s.teaCompany}</li>
+<li id="r{id}>{num}. {s.teaCompany}</li>
 #+END_SRC
 
 server json:
@@ -1126,7 +1142,7 @@ Built in Prefixes:
 - '#$' - for bash scripts and others
 - ';$' - for config files and others
 - '//$' - for c++
-- '\/*$' '*\/' - for c
+- '/\star$' '\star/' - for c
 
 You can define other comment types on the command line using the
 prepost option one or more times. When you specify your own
@@ -1161,7 +1177,7 @@ left to right which is important when there are duplicate
 variables since the last one processed overwrites the previous
 one.
 
-The the server json variables get added to the t.server
+The server json variables get added to the t.server
 dictionary and the shared json get added to the t.shared
 dictionary.
 
@@ -1315,7 +1331,6 @@ The StaticTea command line options:
 - prepost - add a command prefix and postfix, you can specify
   multiple. When you specify values, the defaults are no longer used.
 
-
 ** Limits
 
 There is no limit on the size of the template. However there are
@@ -1375,7 +1390,7 @@ template:
 
 #+BEGIN_SRC
 <!--$ block -->
-default t.list = {t.list}
+default t.repeat = {t.repeat}
 default t.content = {t.content}
 default t.maxlines = {t.maxlines}
 <!--$ endblock -->
@@ -1384,10 +1399,14 @@ default t.maxlines = {t.maxlines}
 result:
 
 #+BEGIN_SRC
-default t.list = 0
+default t.repeat = 0
 default t.content = ""
 default t.maxlines = 10
 #+END_SRC
+
+** Contents
+
+#+TOC: headlines 1
 
 ** Tea Info
 
