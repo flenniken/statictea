@@ -1,8 +1,7 @@
-* StaticTea
+#+TITLE: StaticTea
 
 ** A template processor and language.
-[[*Contents]]
-#+OPTIONS: toc:nil
+[[#contents][Contents]]
 
 StaticTea combines a template with data to produce a result.
 
@@ -1404,9 +1403,11 @@ default t.content = ""
 default t.maxlines = 10
 #+END_SRC
 
-** Contents
-
-#+TOC: headlines 1
+** Contents :TOC:QUOTE:
+#+BEGIN_QUOTE
+- [[#advantages][Advantages]]
+- [[#statements][Statements]]
+#+END_QUOTE
 
 ** Tea Info
 
