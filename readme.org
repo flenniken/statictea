@@ -24,6 +24,26 @@ The result:
 hello world
 #+END_SRC
 
+* Contents                                                         :noexport:
+:PROPERTIES:
+:TOC:      :include all :depth 1
+:visibility: folded
+:CUSTOM_ID: contents
+:END:
+:CONTENTS:
+:END:
+* Getting started
+:PROPERTIES:
+:CUSTOM_ID: getting-started
+:END:
+Testing toc generation.
+* Hello
+:PROPERTIES:
+:CUSTOM_ID: hello
+:END:
+the hello section
+
+
 ** Advantages
 
 You develop templates as if they were static pages.  You can
@@ -1402,10 +1422,6 @@ default t.repeat = 0
 default t.content = ""
 default t.maxlines = 10
 #+END_SRC
-
-
-** Contents  :TOC_4_gh:noexport:
-
 
 ** Tea Info
 
