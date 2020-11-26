@@ -1403,26 +1403,9 @@ default t.content = ""
 default t.maxlines = 10
 #+END_SRC
 
-** Contents
-#+BEGIN_QUOTE
-- [[#adv][Advantages]]
-- [[#hiw][How it Works]]
-- [[#cmd][Commands]]
-- [[Statements]]
-- [[Types]]
-- [[Variables]]
-- [[System Variables]]
-- [[Functions]]
-- [[Prefix Postfix]]
-- [[Json Files and Variables]]
-- [[Warning Messages]]
-- [[Log File]]
-- [[Run StaticTea]]
-- [[Limits]]
-- [[Encoding and Line Endings]]
-- [[Ellipsize]]
-- [[System Defaults]]
-#+END_QUOTE
+
+** Contents  :TOC_4_gh:noexport:
+
 
 ** Tea Info
 
