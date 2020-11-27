@@ -1,6 +1,7 @@
 #+TITLE: StaticTea
 
-** A template processor and language.
+* A template processor and language. :noexport:
+
 [[#contents][Contents]]
 
 StaticTea combines a template with data to produce a result.
@@ -24,27 +25,7 @@ The result:
 hello world
 #+END_SRC
 
-* Contents                                                         :noexport:
-:PROPERTIES:
-:TOC:      :include all :depth 1
-:visibility: folded
-:CUSTOM_ID: contents
-:END:
-:CONTENTS:
-:END:
-* Getting started
-:PROPERTIES:
-:CUSTOM_ID: getting-started
-:END:
-Testing toc generation.
-* Hello
-:PROPERTIES:
-:CUSTOM_ID: hello
-:END:
-the hello section
-
-
-** Advantages
+* Advantages
 
 You develop templates as if they were static pages.  You can
 view, edit and validate your templates with its normal tools.
@@ -54,7 +35,7 @@ You can change the look without changing the server.
 
 You can share common template fragments between templates.
 
-** How it Works
+* How it Works
 
 The variable content comes from the server unformatted. You
 format it in the template with commands.
@@ -65,7 +46,7 @@ lines.
 The commands are encoded as comments to match the particular
 template type.
 
-** Commands
+* Commands
 
 StaticTea commands:
 
@@ -77,7 +58,7 @@ StaticTea commands:
 - endblock - end of block
 - endreplace - end of replace block
 
-** Statements
+* Statements
 
 You format server content in variables you create in statements.
 
@@ -101,7 +82,7 @@ character at the end.
 
 Statements are executed from left to right.
 
-*** Nextline Command
+** Nextline Command
 
 The nextline command targets the line following it for
 replacement. The targeted line is called the replacement block.
@@ -133,7 +114,7 @@ result:
 Drink tea -- Earl Grey is my favorite.
 #+END_SRC
 
-*** Block Command
+** Block Command
 
 The block command targets multiple lines for replacement. The
 block starts after the command and continues until the endblock
@@ -169,7 +150,7 @@ Join our tea party on Friday at
 John's house at 5:00 pm.
 #+END_SRC
 
-*** Replace Command
+** Replace Command
 
 The replace command's replacement block gets replaced with the
 t.content variable.
@@ -286,7 +267,7 @@ result:
 <title>Teas in England</title>
 #+END_SRC
 
-*** Comment Command
+** Comment Command
 
 You can comment templates.  Comments are line based and use the #
 character. They do not appear in the result.
@@ -310,7 +291,7 @@ You make Oolong Tea in five time
 intensive steps.
 #+END_SRC
 
-*** Continue Command
+** Continue Command
 
 You can continue a long command line with the "\\" character at
 the end before the postfix. The following line must be a continue
@@ -360,15 +341,15 @@ fake nextline
 <!--$ nextline -->
 #+END_SRC
 
-*** Endblock Command
+** Endblock Command
 
 The endblock command ends the block command.
 
-*** Endreplace Command
+** Endreplace Command
 
 The endreplace command ends the replace command.
 
-** Types
+* Types
 
 StaticTea variables types:
 
@@ -378,7 +359,7 @@ StaticTea variables types:
 - dictionary
 - list
 
-*** String
+** String
 
 You define a string with single or double quotes and use them in
 statements.
@@ -414,7 +395,7 @@ result:
 <h2>Earl Grey</h2>
 #+END_SRC
 
-*** Integer
+** Integer
 
 An integer is a 64 bit signed number.  When you pass an integer to
 a function that takes a string, the number is converted to a
@@ -429,7 +410,7 @@ Example numbers:
 42
 #+END_SRC
 
-*** Float
+** Float
 
 A float is a 64 bit real number. Like integers a float is
 converted to a string when passed to a function taking a sring.
@@ -445,17 +426,17 @@ Example floats:
 -34.0
 #+END_SRC
 
-*** Dictionary
+** Dictionary
 
 You access dictionary items with t.get and you define them in the
 json files.
 
-*** List
+** List
 
 Like dictionaires, you access list items with t.get and you
 define them in the json files.
 
-** Variables
+* Variables
 
 You use variables to format content for a block and to control
 how a command works.
@@ -492,7 +473,7 @@ h.userName
 mytea
 #+END_SRC
 
-** System Variables
+* System Variables
 
 The built in system variables, prefixed with "t.", control how
 the replacement block works.
@@ -505,7 +486,7 @@ the replacement block works.
 - t.server - dictionary containing the server variables
 - t.shared - dictionary containing the shared variables
 
-*** t.content
+** t.content
 
 The t.content variable determines what content to use for the
 whole replace block. The default is an empty string, which mean
@@ -514,7 +495,7 @@ the block is replaced with nothing.
 The variable only applies to the replace command. See the replace
 command section for an example.
 
-*** t.repeat
+** t.repeat
 
 The t.repeat variable tells many times to repeat the block. You
 can assign it a number or a special type of list, one containing
@@ -617,12 +598,12 @@ result:
 </select>
 #+END_SRC
 
-*** t.local
+** t.local
 
 The t.local variable is the dictionary of local variables for the
 current command. It is recalculated for each item in the list.
 
-*** t.maxlines
+** t.maxlines
 
 The t.maxlines variable determines the maximum lines in a block.
 
@@ -701,15 +682,15 @@ result:
 </ul>
 #+END_SRC
 
-*** t.server
+** t.server
 
 The t.server variable contains the server json variables.
 
-*** t.shared
+** t.shared
 
 The t.shared variable contains the shared json variables
 
-** Functions
+* Functions
 
 StaticTea has many built in functions you can call to format your
 variables for output.  Functions take zero or more input parameters
@@ -747,7 +728,7 @@ List of functions:
 - t.version() -- the current version and version checker
 - t.warn() -- format a warning message with file and line number.
 
-*** t.case
+** t.case
 
 The t.case function is a generalized if statement.  You use it to
 preform different actions depending on a condition.
@@ -800,7 +781,7 @@ is equivalent to:
 t.case(cond, v2, 1, v1)
 #+END_SRC
 
-*** t.cmp
+** t.cmp
 
 The t.cmp function compares two variables, either numbers or
 strings, and returns whether the first parameter is less than,
@@ -836,7 +817,7 @@ result:
 The best selling tea this week is Earl Grey, Twinings.
 #+END_SRC
 
-*** t.concat()
+** t.concat()
 
 The t.concat function concatenates strings. You can specify 0 or
 more parameters. Examples:
@@ -848,7 +829,7 @@ t.concat("Tea", "Time") => "TeaTime"
 t.concat("Tea", " ",  "Time") => "Tea Time"
 #+END_SRC
 
-*** t.exists
+** t.exists
 
 The t.exists returns 1 when a variable exists, else it returns 0.
 
@@ -870,13 +851,13 @@ t.exists(a) => 1
 t.exists(b) => 0
 #+END_SRC
 
-*** t.copy()
+** t.copy()
 
 The t.copy function copies variables to the local variables
 dictionary. It takes one parameter which can be a variable or a
 dictionary.
 
-*** t.find()
+** t.find()
 
 The t.find function searches a string for a substring and returns
 its position when found. When not found it returns -1. Positions
@@ -896,7 +877,7 @@ result:
 4
 #+END_SRC
 
-*** t.get
+** t.get
 
 You use the t.get function to access list or dictionary
 values. It takes three parameters. The first is the list or
@@ -910,7 +891,7 @@ var = t.get(t.server, "tea", "Earl Grey")
 var2 = t.get(t.repeat, 2, "default")
 #+END_SRC
 
-*** t.if
+** t.if
 
 You use the if function to select a value based on a condition.
 
@@ -945,7 +926,7 @@ t.if(0, 'dog', 'cat') -> cat
 t.if(8, 'dog', 'cat') -> cat
 #+END_SRC
 
-*** t.format
+** t.format
 
 The t.format function is a powerful way to format your
 variables. You can left, right or center the variable.  You can
@@ -973,7 +954,7 @@ result:
 Kathleen spent $52.44 on tea for Steve's birthday.
 #+END_SRC
 
-*** t.len
+** t.len
 
 The t.len function returns the number of characters in a string,
 the number of elements in a list or the number of elements in a
@@ -1013,7 +994,7 @@ The tea list has 5 elements.
 The server json dictionary has 1 elements.
 #+END_SRC
 
-*** t.row
+** t.row
 
 The special row function returns the current row number for
 blocks using a t.repeat. The function takes a parameter which
@@ -1056,7 +1037,7 @@ result:
   <li id="r3">4. Red Diamond</li>
 #+END_SRC
 
-*** t.substr
+** t.substr
 
 The t.substr function extracts a substring from a string by
 indexes. The first parameter is the string to operate on, the
@@ -1088,7 +1069,7 @@ result:
 sub1 = Grey, sub2 = Earl
 #+END_SRC
 
-*** t.version
+** t.version
 
 You use the version function to get the current version of
 StaticTea or to verify that the version you are running works
@@ -1137,7 +1118,7 @@ tea.html(45): w23: The current version 1.0.0 is less than the minumum
 allowed verion of 1.20.3.
 #+END_SRC
 
-** Prefix Postfix
+* Prefix Postfix
 
 You make the template commands look like comments tailored for
 your template file type. This allows you to edit the template
@@ -1179,7 +1160,7 @@ examples:
 --prepost="#[$ ]#"
 #+END_SRC
 
-** Json Files and Variables
+* Json Files and Variables
 
 There are two types of json files the server json and the shared
 json.
@@ -1241,7 +1222,7 @@ The server has 5 elements
 and the shared json has 0.
 #+END_SRC
 
-** Warning Messages
+* Warning Messages
 
 When StaticTea detects a problem, a warning message is written to
 standard error, the problem is skipped, and processing
@@ -1313,7 +1294,7 @@ template:
 warning: the admin variable is missing
 #+END_SRC
 
-** Log File
+* Log File
 
 The log file contains timing, memory usage and low priority
 warnings. The log file, statictea.log, is created in the current
@@ -1321,7 +1302,7 @@ folder (system default log location?).  Log information is
 appended to the file and it grows without bounds. Make sure to
 setup log rotation.
 
-** Run StaticTea
+* Run StaticTea
 
 You run StaticTea from the command line. The example below shows
 a typical invocation which specifies four file arguments, the
@@ -1336,7 +1317,7 @@ server json, the shared json, the template and the result.
 statictea --server server.json --shared shared.json --template template.html --result result.html
 #+END_SRC
 
-*** Options
+** Options
 
 The StaticTea command line options:
 
@@ -1350,7 +1331,7 @@ The StaticTea command line options:
 - prepost - add a command prefix and postfix, you can specify
   multiple. When you specify values, the defaults are no longer used.
 
-** Limits
+* Limits
 
 There is no limit on the size of the template. However there are
 several limits on variables and commands.
@@ -1378,14 +1359,14 @@ the limits:
 - Maximum number of items in a list - 500 items.  Use multiple lists
   if you need more.
 
-** Encoding and Line Endings
+* Encoding and Line Endings
 
 Templates are utf-8 encoded or its ascii subset.  Two line
 endings are supported on all platforms: LF, and CR/LF.  Line
 endings are preserved.  The template syntax only uses ascii
 except utf-8 characters may appear in quoted strings.
 
-** Ellipsize
+* Ellipsize
 
 You can "ellipsize" a string when it gets long. The following
 example ellipsizes when a name is longer than 10 characters.
@@ -1399,7 +1380,7 @@ example ellipsizes when a name is longer than 10 characters.
 <!--$ : 1, t.concat(substr(s.name, 0, 7), "...")) -->
 #+END_SRC
 
-** System Defaults
+* System Defaults
 
 You can use the system variables in a replacement block to see
 their default values. The following example shows the default
@@ -1423,7 +1404,26 @@ default t.content = ""
 default t.maxlines = 10
 #+END_SRC
 
-** Tea Info
+* Contents  :TOC:
+  - [[#advantages][Advantages]]
+  - [[#how-it-works][How it Works]]
+  - [[#commands][Commands]]
+  - [[#statements][Statements]]
+  - [[#types][Types]]
+  - [[#variables][Variables]]
+  - [[#system-variables][System Variables]]
+  - [[#functions][Functions]]
+  - [[#prefix-postfix][Prefix Postfix]]
+  - [[#json-files-and-variables][Json Files and Variables]]
+  - [[#warning-messages][Warning Messages]]
+  - [[#log-file][Log File]]
+  - [[#run-statictea][Run StaticTea]]
+  - [[#limits][Limits]]
+  - [[#encoding-and-line-endings][Encoding and Line Endings]]
+  - [[#ellipsize][Ellipsize]]
+  - [[#system-defaults][System Defaults]]
+
+* Tea Info :noexport:
 
 Tea is the most popular manufactured drink consumed in the world,
 equaling all others – including coffee, soft drinks, and alcohol
