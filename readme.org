@@ -1405,7 +1405,7 @@ default t.content = ""
 default t.maxlines = 10
 #+END_SRC
 
-* 茶Contents  :TOC:
+* Contents  :TOC:
   - [[#advantages][Advantages]]
   - [[#how-it-works][How it Works]]
   - [[#commands][Commands]]
