@@ -1,5 +1,5 @@
 #+TITLE: StaticTea
-* A template processor and language.
+* A template processor and language.  :notoc:
 
 # Turn off the table of contents (toc) so it doesn't go at the
 # top. It is turned on at the bottom.
@@ -29,11 +29,8 @@ The result:
 #+BEGIN_SRC
 hello world
 #+END_SRC
-#
-# 茶
-# [[#contents][茶]]
 
-* Advantages
+* Advantages [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: advantages
 :END:
@@ -46,9 +43,10 @@ You can change the look without changing the server.
 
 You can share common template fragments between templates.
 
-* How it Works
+* How it Works [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: how-it-works
+:ID:       D1DEF7D8-9583-4762-98B6-DFBBD919CFB9
 :END:
 
 The variable content comes from the server unformatted. You
@@ -60,7 +58,7 @@ lines.
 The commands are encoded as comments to match the particular
 template type.
 
-* Commands
+* Commands [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: commands
 :END:
@@ -75,7 +73,7 @@ StaticTea commands:
 - endblock - end of block
 - endreplace - end of replace block
 
-* Statements
+* Statements [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: statements
 :END:
@@ -369,7 +367,8 @@ The endblock command ends the block command.
 
 The endreplace command ends the replace command.
 
-* Types
+* Types [[#contents][茶]]
+
 :PROPERTIES:
 :CUSTOM_ID: types
 :END:
@@ -459,7 +458,7 @@ json files.
 Like dictionaires, you access list items with t.get and you
 define them in the json files.
 
-* Variables
+* Variables [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: variables
 :END:
@@ -499,7 +498,7 @@ h.userName
 mytea
 #+END_SRC
 
-* System Variables
+* System Variables [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: system-variables
 :END:
@@ -719,7 +718,7 @@ The t.server variable contains the server json variables.
 
 The t.shared variable contains the shared json variables
 
-* Functions
+* Functions [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: functions
 :END:
@@ -1150,7 +1149,7 @@ tea.html(45): w23: The current version 1.0.0 is less than the minumum
 allowed verion of 1.20.3.
 #+END_SRC
 
-* Prefix Postfix
+* Prefix Postfix [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: prefix-postfix
 :END:
@@ -1195,7 +1194,7 @@ examples:
 --prepost="#[$ ]#"
 #+END_SRC
 
-* Json Files and Variables
+* Json Files and Variables [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: json-files-and-variables
 :END:
@@ -1260,7 +1259,7 @@ The server has 5 elements
 and the shared json has 0.
 #+END_SRC
 
-* Warning Messages
+* Warning Messages [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: warning-messages
 :END:
@@ -1335,7 +1334,7 @@ template:
 warning: the admin variable is missing
 #+END_SRC
 
-* Log File
+* Log File [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: log-file
 :END:
@@ -1346,7 +1345,7 @@ folder (system default log location?).  Log information is
 appended to the file and it grows without bounds. Make sure to
 setup log rotation.
 
-* Run StaticTea
+* Run StaticTea [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: run-statictea
 :END:
@@ -1378,7 +1377,7 @@ The StaticTea command line options:
 - prepost - add a command prefix and postfix, you can specify
   multiple. When you specify values, the defaults are no longer used.
 
-* Limits
+* Limits [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: limits
 :END:
@@ -1409,7 +1408,7 @@ the limits:
 - Maximum number of items in a list - 500 items.  Use multiple lists
   if you need more.
 
-* Encoding and Line Endings
+* Encoding and Line Endings [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: encoding-and-line-endings
 :END:
@@ -1419,7 +1418,7 @@ endings are supported on all platforms: LF, and CR/LF.  Line
 endings are preserved.  The template syntax only uses ascii
 except utf-8 characters may appear in quoted strings.
 
-* Ellipsize
+* Ellipsize [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: ellipsize
 :END:
@@ -1436,7 +1435,7 @@ example ellipsizes when a name is longer than 10 characters.
 <!--$ : 1, t.concat(substr(s.name, 0, 7), "...")) -->
 #+END_SRC
 
-* System Defaults
+* System Defaults [[#contents][茶]]
 :PROPERTIES:
 :CUSTOM_ID: system-defaults
 :END:
@@ -1463,32 +1462,35 @@ default t.content = ""
 default t.maxlines = 10
 #+END_SRC
 
-* Contents
+# You run this to make the table of contents. Copy to scratch
+# to remove the pound signs.
+# grep '^\* ' readme.org | grep -v ":notoc" | cut -c 3- | \
+# sed 's/ \[.*$//' | \
+# awk '{a = $0; gsub(" ", "-", a); printf "- [[#%s][%s]]\n", tolower(a), $0 }'
+* Contents                                                            :notoc:
 :PROPERTIES:
 :CUSTOM_ID: contents
 :END:
 
-#+TOC: headlines 1
-- [#advantages][Advantages]
-- [#how-it-works][How it Works]
-- [#commands][Commands]
-- [#statements][Statements]
-- [#types][Types]
-- [#variables][Variables]
-- [#system-variables][System Variables]
-- [#functions][Functions]
-- [#prefix-postfix][Prefix Postfix]
-- [#json-files-and-variables][Json Files and Variables]
-- [#warning-messages][Warning Messages]
-- [#log-file][Log File]
-- [#run-statictea][Run StaticTea]
-- [#limits][Limits]
-- [#encoding-and-line-endings][Encoding and Line Endings]
-- [#ellipsize][Ellipsize]
-- [#system-defaults][System Defaults]
-- [#contents][Contents]
+- [[#advantages][Advantages]]
+- [[#how-it-works][How it Works]]
+- [[#commands][Commands]]
+- [[#statements][Statements]]
+- [[#types][Types]]
+- [[#variables][Variables]]
+- [[#system-variables][System Variables]]
+- [[#functions][Functions]]
+- [[#prefix-postfix][Prefix Postfix]]
+- [[#json-files-and-variables][Json Files and Variables]]
+- [[#warning-messages][Warning Messages]]
+- [[#log-file][Log File]]
+- [[#run-statictea][Run StaticTea]]
+- [[#limits][Limits]]
+- [[#encoding-and-line-endings][Encoding and Line Endings]]
+- [[#ellipsize][Ellipsize]]
+- [[#system-defaults][System Defaults]]
 
-* Tea Info
+* Tea Info :notoc:
 
 Tea is the most popular manufactured drink consumed in the world,
 equaling all others – including coffee, soft drinks, and alcohol
