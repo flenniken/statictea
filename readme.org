@@ -1,8 +1,13 @@
 #+TITLE: StaticTea
+* A template processor and language.
 
-* A template processor and language. :noexport:
+# Turn off the table of contents (toc) so it doesn't go at the
+# top. It is turned on at the bottom.
+#+OPTIONS: toc:nil
+# Turn off headline (section) numbering when exporting.
+#+OPTIONS: num:nil
 
-[[#contents][茶Contents]]
+[[#contents][Contents]]
 
 StaticTea combines a template with data to produce a result.
 
@@ -24,9 +29,14 @@ The result:
 #+BEGIN_SRC
 hello world
 #+END_SRC
+#
+# 茶
+# [[#contents][茶]]
 
-* Advantages [[contents][茶]]
-
+* Advantages
+:PROPERTIES:
+:CUSTOM_ID: advantages
+:END:
 
 You develop templates as if they were static pages.  You can
 view, edit and validate your templates with its normal tools.
@@ -36,7 +46,10 @@ You can change the look without changing the server.
 
 You can share common template fragments between templates.
 
-* How it Works [[contents][茶]]
+* How it Works
+:PROPERTIES:
+:CUSTOM_ID: how-it-works
+:END:
 
 The variable content comes from the server unformatted. You
 format it in the template with commands.
@@ -47,7 +60,10 @@ lines.
 The commands are encoded as comments to match the particular
 template type.
 
-* Commands [[contents][茶]]
+* Commands
+:PROPERTIES:
+:CUSTOM_ID: commands
+:END:
 
 StaticTea commands:
 
@@ -59,7 +75,10 @@ StaticTea commands:
 - endblock - end of block
 - endreplace - end of replace block
 
-* Statements [[contents][茶]]
+* Statements
+:PROPERTIES:
+:CUSTOM_ID: statements
+:END:
 
 You format server content in variables you create in statements.
 
@@ -350,7 +369,10 @@ The endblock command ends the block command.
 
 The endreplace command ends the replace command.
 
-* Types [[contents][茶]]
+* Types
+:PROPERTIES:
+:CUSTOM_ID: types
+:END:
 
 StaticTea variables types:
 
@@ -437,7 +459,10 @@ json files.
 Like dictionaires, you access list items with t.get and you
 define them in the json files.
 
-* Variables [[contents][茶]]
+* Variables
+:PROPERTIES:
+:CUSTOM_ID: variables
+:END:
 
 You use variables to format content for a block and to control
 how a command works.
@@ -474,7 +499,10 @@ h.userName
 mytea
 #+END_SRC
 
-* System Variables [[contents][茶]]
+* System Variables
+:PROPERTIES:
+:CUSTOM_ID: system-variables
+:END:
 
 The built in system variables, prefixed with "t.", control how
 the replacement block works.
@@ -691,7 +719,10 @@ The t.server variable contains the server json variables.
 
 The t.shared variable contains the shared json variables
 
-* Functions [[contents][茶]]
+* Functions
+:PROPERTIES:
+:CUSTOM_ID: functions
+:END:
 
 StaticTea has many built in functions you can call to format your
 variables for output.  Functions take zero or more input parameters
@@ -1119,7 +1150,10 @@ tea.html(45): w23: The current version 1.0.0 is less than the minumum
 allowed verion of 1.20.3.
 #+END_SRC
 
-* Prefix Postfix [[contents][茶]]
+* Prefix Postfix
+:PROPERTIES:
+:CUSTOM_ID: prefix-postfix
+:END:
 
 You make the template commands look like comments tailored for
 your template file type. This allows you to edit the template
@@ -1161,7 +1195,10 @@ examples:
 --prepost="#[$ ]#"
 #+END_SRC
 
-* Json Files and Variables [[contents][茶]]
+* Json Files and Variables
+:PROPERTIES:
+:CUSTOM_ID: json-files-and-variables
+:END:
 
 There are two types of json files the server json and the shared
 json.
@@ -1223,7 +1260,10 @@ The server has 5 elements
 and the shared json has 0.
 #+END_SRC
 
-* Warning Messages [[contents][茶]]
+* Warning Messages
+:PROPERTIES:
+:CUSTOM_ID: warning-messages
+:END:
 
 When StaticTea detects a problem, a warning message is written to
 standard error, the problem is skipped, and processing
@@ -1295,7 +1335,10 @@ template:
 warning: the admin variable is missing
 #+END_SRC
 
-* Log File [[contents][茶]]
+* Log File
+:PROPERTIES:
+:CUSTOM_ID: log-file
+:END:
 
 The log file contains timing, memory usage and low priority
 warnings. The log file, statictea.log, is created in the current
@@ -1303,7 +1346,10 @@ folder (system default log location?).  Log information is
 appended to the file and it grows without bounds. Make sure to
 setup log rotation.
 
-* Run StaticTea [[contents][茶]]
+* Run StaticTea
+:PROPERTIES:
+:CUSTOM_ID: run-statictea
+:END:
 
 You run StaticTea from the command line. The example below shows
 a typical invocation which specifies four file arguments, the
@@ -1332,7 +1378,10 @@ The StaticTea command line options:
 - prepost - add a command prefix and postfix, you can specify
   multiple. When you specify values, the defaults are no longer used.
 
-* Limits [[contents][茶]]
+* Limits
+:PROPERTIES:
+:CUSTOM_ID: limits
+:END:
 
 There is no limit on the size of the template. However there are
 several limits on variables and commands.
@@ -1360,14 +1409,20 @@ the limits:
 - Maximum number of items in a list - 500 items.  Use multiple lists
   if you need more.
 
-* Encoding and Line Endings [[contents][茶]]
+* Encoding and Line Endings
+:PROPERTIES:
+:CUSTOM_ID: encoding-and-line-endings
+:END:
 
 Templates are utf-8 encoded or its ascii subset.  Two line
 endings are supported on all platforms: LF, and CR/LF.  Line
 endings are preserved.  The template syntax only uses ascii
 except utf-8 characters may appear in quoted strings.
 
-* Ellipsize [[contents][茶]]
+* Ellipsize
+:PROPERTIES:
+:CUSTOM_ID: ellipsize
+:END:
 
 You can "ellipsize" a string when it gets long. The following
 example ellipsizes when a name is longer than 10 characters.
@@ -1381,7 +1436,10 @@ example ellipsizes when a name is longer than 10 characters.
 <!--$ : 1, t.concat(substr(s.name, 0, 7), "...")) -->
 #+END_SRC
 
-* System Defaults [[contents][茶]]
+* System Defaults
+:PROPERTIES:
+:CUSTOM_ID: system-defaults
+:END:
 
 You can use the system variables in a replacement block to see
 their default values. The following example shows the default
@@ -1405,26 +1463,32 @@ default t.content = ""
 default t.maxlines = 10
 #+END_SRC
 
-* Contents  :TOC:
-  - [[#advantages][Advantages]]
-  - [[#how-it-works][How it Works]]
-  - [[#commands][Commands]]
-  - [[#statements][Statements]]
-  - [[#types][Types]]
-  - [[#variables][Variables]]
-  - [[#system-variables][System Variables]]
-  - [[#functions][Functions]]
-  - [[#prefix-postfix][Prefix Postfix]]
-  - [[#json-files-and-variables][Json Files and Variables]]
-  - [[#warning-messages][Warning Messages]]
-  - [[#log-file][Log File]]
-  - [[#run-statictea][Run StaticTea]]
-  - [[#limits][Limits]]
-  - [[#encoding-and-line-endings][Encoding and Line Endings]]
-  - [[#ellipsize][Ellipsize]]
-  - [[#system-defaults][System Defaults]]
+* Contents
+:PROPERTIES:
+:CUSTOM_ID: contents
+:END:
 
-* Tea Info :noexport:
+#+TOC: headlines 1
+- [#advantages][Advantages]
+- [#how-it-works][How it Works]
+- [#commands][Commands]
+- [#statements][Statements]
+- [#types][Types]
+- [#variables][Variables]
+- [#system-variables][System Variables]
+- [#functions][Functions]
+- [#prefix-postfix][Prefix Postfix]
+- [#json-files-and-variables][Json Files and Variables]
+- [#warning-messages][Warning Messages]
+- [#log-file][Log File]
+- [#run-statictea][Run StaticTea]
+- [#limits][Limits]
+- [#encoding-and-line-endings][Encoding and Line Endings]
+- [#ellipsize][Ellipsize]
+- [#system-defaults][System Defaults]
+- [#contents][Contents]
+
+* Tea Info
 
 Tea is the most popular manufactured drink consumed in the world,
 equaling all others – including coffee, soft drinks, and alcohol
