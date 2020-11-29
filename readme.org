@@ -1,12 +1,6 @@
 #+TITLE: StaticTea
 * A template processor and language.  :notoc:
 
-# Turn off the table of contents (toc) so it doesn't go at the
-# top. It is turned on at the bottom.
-#+OPTIONS: toc:nil
-# Turn off headline (section) numbering when exporting.
-#+OPTIONS: num:nil
-
 [[#contents][Contents]]
 
 StaticTea combines a template with data to produce a result.
@@ -32,7 +26,7 @@ hello world
 
 * Advantages [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: advantages
+:CUSTOM_ID: advantages-茶
 :END:
 
 You develop templates as if they were static pages.  You can
@@ -45,8 +39,7 @@ You can share common template fragments between templates.
 
 * How it Works [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: how-it-works
-:ID:       D1DEF7D8-9583-4762-98B6-DFBBD919CFB9
+:CUSTOM_ID: how-it-works-茶
 :END:
 
 The variable content comes from the server unformatted. You
@@ -60,7 +53,7 @@ template type.
 
 * Commands [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: commands
+:CUSTOM_ID: commands-茶
 :END:
 
 StaticTea commands:
@@ -75,7 +68,7 @@ StaticTea commands:
 
 * Statements [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: statements
+:CUSTOM_ID: statements-茶
 :END:
 
 You format server content in variables you create in statements.
@@ -370,7 +363,7 @@ The endreplace command ends the replace command.
 * Types [[#contents][茶]]
 
 :PROPERTIES:
-:CUSTOM_ID: types
+:CUSTOM_ID: types-茶
 :END:
 
 StaticTea variables types:
@@ -460,7 +453,7 @@ define them in the json files.
 
 * Variables [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: variables
+:CUSTOM_ID: variables-茶
 :END:
 
 You use variables to format content for a block and to control
@@ -500,7 +493,7 @@ mytea
 
 * System Variables [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: system-variables
+:CUSTOM_ID: system-variables-茶
 :END:
 
 The built in system variables, prefixed with "t.", control how
@@ -720,7 +713,7 @@ The t.shared variable contains the shared json variables
 
 * Functions [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: functions
+:CUSTOM_ID: functions-茶
 :END:
 
 StaticTea has many built in functions you can call to format your
@@ -1151,7 +1144,7 @@ allowed verion of 1.20.3.
 
 * Prefix Postfix [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: prefix-postfix
+:CUSTOM_ID: prefix-postfix-茶
 :END:
 
 You make the template commands look like comments tailored for
@@ -1196,7 +1189,7 @@ examples:
 
 * Json Files and Variables [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: json-files-and-variables
+:CUSTOM_ID: json-files-and-variables-茶
 :END:
 
 There are two types of json files the server json and the shared
@@ -1261,7 +1254,7 @@ and the shared json has 0.
 
 * Warning Messages [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: warning-messages
+:CUSTOM_ID: warning-messages-茶
 :END:
 
 When StaticTea detects a problem, a warning message is written to
@@ -1336,7 +1329,7 @@ warning: the admin variable is missing
 
 * Log File [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: log-file
+:CUSTOM_ID: log-file-茶
 :END:
 
 The log file contains timing, memory usage and low priority
@@ -1347,7 +1340,7 @@ setup log rotation.
 
 * Run StaticTea [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: run-statictea
+:CUSTOM_ID: run-statictea-茶
 :END:
 
 You run StaticTea from the command line. The example below shows
@@ -1379,7 +1372,7 @@ The StaticTea command line options:
 
 * Limits [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: limits
+:CUSTOM_ID: limits-茶
 :END:
 
 There is no limit on the size of the template. However there are
@@ -1410,7 +1403,7 @@ the limits:
 
 * Encoding and Line Endings [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: encoding-and-line-endings
+:CUSTOM_ID: encoding-and-line-endings-茶
 :END:
 
 Templates are utf-8 encoded or its ascii subset.  Two line
@@ -1420,7 +1413,7 @@ except utf-8 characters may appear in quoted strings.
 
 * Ellipsize [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: ellipsize
+:CUSTOM_ID: ellipsize-茶
 :END:
 
 You can "ellipsize" a string when it gets long. The following
@@ -1437,7 +1430,7 @@ example ellipsizes when a name is longer than 10 characters.
 
 * System Defaults [[#contents][茶]]
 :PROPERTIES:
-:CUSTOM_ID: system-defaults
+:CUSTOM_ID: system-defaults-茶
 :END:
 
 You can use the system variables in a replacement block to see
@@ -1462,11 +1455,11 @@ default t.content = ""
 default t.maxlines = 10
 #+END_SRC
 
-# You run this to make the table of contents. Copy to scratch
-# to remove the pound signs.
+# You run the command below to make the table of contents. Copy
+# to scratch to remove the leading pound signs.
 # grep '^\* ' readme.org | grep -v ":notoc" | cut -c 3- | \
 # sed 's/ \[.*$//' | \
-# awk '{a = $0; gsub(" ", "-", a); printf "- [[#%s][%s]]\n", tolower(a), $0 }'
+# awk '{a = $0 "-茶"; gsub(" ", "-", a); printf "- [[#%s][%s]]\n", tolower(a), $0 }'
 * Contents                                                            :notoc:
 :PROPERTIES:
 :CUSTOM_ID: contents
