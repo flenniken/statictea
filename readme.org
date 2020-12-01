@@ -1,5 +1,4 @@
-<h2>StaticTea<h2>
-
+#+TITLE: StaticTea
 * A template processor and language.  :notoc:
 
 StaticTea combines a template with data to produce a result.
