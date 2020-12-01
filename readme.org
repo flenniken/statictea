@@ -3,7 +3,7 @@
 
 StaticTea combines a template with data to produce a result.
 
-Example html hello world template:
+Example hello world template:
 
 #+BEGIN_SRC
 <!--$ nextline -->
@@ -71,6 +71,8 @@ StaticTea commands:
 - [[#endblock-command][endblock]] - end of block
 - [[#endreplace-command][endreplace]] - end of replace block
 
+[[#contents][茶]]
+
 ** Nextline Command
 :PROPERTIES:
 :CUSTOM_ID: nextline-command
@@ -106,6 +108,8 @@ result:
 #+BEGIN_SRC
 Drink tea -- Earl Grey is my favorite.
 #+END_SRC
+
+[[#contents][茶]]
 
 ** Block Command
 :PROPERTIES:
@@ -147,6 +151,8 @@ Join our tea party on
 Friday at John's
 house at 5:00 pm.
 #+END_SRC
+
+[[#contents][茶]]
 
 ** Replace Command
 :PROPERTIES:
@@ -271,6 +277,8 @@ dir="ltr">
 <title>Teas in England</title>
 #+END_SRC
 
+[[#contents][茶]]
+
 ** Comment Command
 :PROPERTIES:
 :CUSTOM_ID: comment-command
@@ -297,6 +305,8 @@ white, green, oolong, black, and pu'erh.
 You make Oolong Tea in five time
 intensive steps.
 #+END_SRC
+
+[[#contents][茶]]
 
 ** Continue Command
 :PROPERTIES:
@@ -329,6 +339,8 @@ result:
 Earl Grey, Masala chai
 #+END_SRC
 
+[[#contents][茶]]
+
 ** Endblock Command
 :PROPERTIES:
 :CUSTOM_ID: endblock-command
@@ -356,6 +368,8 @@ result:
 fake nextline
 <!--$ nextline -->
 #+END_SRC
+
+[[#contents][茶]]
 
 ** Endreplace Command
 :PROPERTIES:
@@ -440,16 +454,18 @@ mytea
 The built in system variables, prefixed with "t.", control how
 the replacement block works.
 
-- [[#t-content][t.content]] - content of the replace block
-- [[#t-repeat][t.repeat]] - controls how many times the block repeats
-- [[#t-local][t.local]] - dictionary containing the current block's local variables.
-- [[#t-maxlines][t.maxlines]] - maximum lines before endblock or endreplace
-- [[#t-server][t.server]] - dictionary containing the server variables
-- [[#t-shared][t.shared]] - dictionary containing the shared variables
+- [[#tcontent][t.content]] - content of the replace block
+- [[#trepeat][t.repeat]] - controls how many times the block repeats
+- [[#tlocal][t.local]] - dictionary containing the current block's local variables.
+- [[#tmaxlines][t.maxlines]] - maximum lines before endblock or endreplace
+- [[#tserver][t.server]] - dictionary containing the server variables
+- [[#tshared][t.shared]] - dictionary containing the shared variables
+
+[[#contents][茶]]
 
 *** t.content
 :PROPERTIES:
-:CUSTOM_ID: t-content
+:CUSTOM_ID: tcontent
 :END:
 
 The t.content variable determines what content to use for the
@@ -459,17 +475,21 @@ the block is replaced with nothing.
 The variable only applies to the replace command. See the [[#replace-command][replace
 command]] section for an example.
 
+[[#contents][茶]]
+
 *** t.local
 :PROPERTIES:
-:CUSTOM_ID: t-local
+:CUSTOM_ID: tlocal
 :END:
 
 The t.local variable is the dictionary of local variables for the
 current command. It is recalculated for each item in the list.
 
+[[#contents][茶]]
+
 *** t.maxlines
 :PROPERTIES:
-:CUSTOM_ID: t-maxlines
+:CUSTOM_ID: tmaxlines
 :END:
 
 The t.maxlines variable determines the maximum lines in a block.
@@ -548,9 +568,11 @@ result:
 </ul>
 #+END_SRC
 
+[[#contents][茶]]
+
 *** t.repeat
 :PROPERTIES:
-:CUSTOM_ID: t-repeat
+:CUSTOM_ID: trepeat
 :END:
 
 The t.repeat variable tells many times to repeat the block. You
@@ -654,16 +676,20 @@ result:
 </select>
 #+END_SRC
 
+[[#contents][茶]]
+
 *** t.server
 :PROPERTIES:
-:CUSTOM_ID: t-server
+:CUSTOM_ID: tserver
 :END:
 
 The t.server variable contains the server json variables.
 
+[[#contents][茶]]
+
 *** t.shared
 :PROPERTIES:
-:CUSTOM_ID: t-shared
+:CUSTOM_ID: tshared
 :END:
 
 The t.shared variable contains the shared json variables
@@ -750,6 +776,8 @@ StaticTea variables types:
 - [[#dictionary][dictionary]]
 - [[#list][list]]
 
+[[#contents][茶]]
+
 ** String
 :PROPERTIES:
 :CUSTOM_ID: string
@@ -789,6 +817,8 @@ result:
 <h2>Earl Grey</h2>
 #+END_SRC
 
+[[#contents][茶]]
+
 ** Integer
 :PROPERTIES:
 :CUSTOM_ID: integer
@@ -806,6 +836,8 @@ Example numbers:
 -8823
 42
 #+END_SRC
+
+[[#contents][茶]]
 
 ** Float
 :PROPERTIES:
@@ -826,6 +858,8 @@ Example floats:
 -34.0
 #+END_SRC
 
+[[#contents][茶]]
+
 ** Dictionary
 :PROPERTIES:
 :CUSTOM_ID: dictionary
@@ -833,6 +867,8 @@ Example floats:
 
 You access dictionary items with t.get and you define them in the
 json files.
+
+[[#contents][茶]]
 
 ** List
 :PROPERTIES:
@@ -867,27 +903,29 @@ which is used in the replacement block.
 
 List of functions:
 
-- [[#t-case][t.case()]] -- generalized if function
-- [[#t-cmp][t.cmp()]] -- spaceship compare function <=>
-- [[#t-concat][t.concat()]] -- concatenate strings
-- [[#t-copy][t.copy()]] -- copy variables to the local dictionary
-- [[#t-currency][t.currency()]] -- format currency
-- [[#t-exists][t.exists()]] -- whether a variables exists
-- [[#t-find][t.find()]] -- find a substring in a string
-- [[#t-format][t.format()]] -- format a string
-- [[#t-if][t.if()]] -- if function
-- [[#t-len][t.len()]] -- length of string
-- [[#t-quotehtml][t.quoteHtml]] -- replace html special characters
-- [[#t-row][t.row()]] -- special function that returns the current row
-- [[#t-sizes][t.sizes()]] -- format bytes counts, KB, MB, GB, etc.
-- [[#t-substr][t.substr()]] -- extract a substring from a string by indexes
-- [[#t-time][t.time()]] -- format the date and time.
-- [[#t-version][t.version()]] -- the current version and version checker
-- [[#t-warn][t.warn()]] -- format a warning message with file and line number.
+- [[#tcase][t.case()]] -- generalized if function
+- [[#tcmp][t.cmp()]] -- spaceship compare function <=>
+- [[#tconcat][t.concat()]] -- concatenate strings
+- [[#tcopy][t.copy()]] -- copy variables to the local dictionary
+- [[#tcurrency][t.currency()]] -- format currency
+- [[#texists][t.exists()]] -- whether a variables exists
+- [[#tfind][t.find()]] -- find a substring in a string
+- [[#tformat][t.format()]] -- format a string
+- [[#tif][t.if()]] -- if function
+- [[#tlen][t.len()]] -- length of string
+- [[#tquotehtml][t.quoteHtml]] -- replace html special characters
+- [[#trow][t.row()]] -- special function that returns the current row
+- [[#tsizes][t.sizes()]] -- format bytes counts, KB, MB, GB, etc.
+- [[#tsubstr][t.substr()]] -- extract a substring from a string by indexes
+- [[#ttime][t.time()]] -- format the date and time.
+- [[#tversion][t.version()]] -- the current version and version checker
+- [[#twarn][t.warn()]] -- format a warning message with file and line number.
+
+[[#contents][茶]]
 
 ** t.case()
 :PROPERTIES:
-:CUSTOM_ID: t-case
+:CUSTOM_ID: tcase
 :END:
 
 The t.case function is a generalized if statement.  You use it to
@@ -941,9 +979,11 @@ is equivalent to:
 t.case(cond, v2, 1, v1)
 #+END_SRC
 
+[[#contents][茶]]
+
 ** t.cmp()
 :PROPERTIES:
-:CUSTOM_ID: t-cmp
+:CUSTOM_ID: tcmp
 :END:
 
 The t.cmp function compares two variables, either numbers or
@@ -993,9 +1033,11 @@ than 10 characters.
 <!--$ : 1, t.concat(substr(s.name, 0, 7), "...")) -->
 #+END_SRC
 
+[[#contents][茶]]
+
 ** t.concat()
 :PROPERTIES:
-:CUSTOM_ID: t-concat
+:CUSTOM_ID: tconcat
 :END:
 
 The t.concat function concatenates strings. You can specify 0 or
@@ -1008,9 +1050,11 @@ t.concat("Tea", "Time") => "TeaTime"
 t.concat("Tea", " ",  "Time") => "Tea Time"
 #+END_SRC
 
+[[#contents][茶]]
+
 ** t.exists()
 :PROPERTIES:
-:CUSTOM_ID: t-exists
+:CUSTOM_ID: texists
 :END:
 
 The t.exists returns 1 when a variable exists, else it returns 0.
@@ -1033,25 +1077,31 @@ t.exists(a) => 1
 t.exists(b) => 0
 #+END_SRC
 
+[[#contents][茶]]
+
 ** t.copy()
 :PROPERTIES:
-:CUSTOM_ID: t-copy
+:CUSTOM_ID: tcopy
 :END:
 
 The t.copy function copies variables to the local variables
 dictionary. It takes one parameter which can be a variable or a
 dictionary.
 
+[[#contents][茶]]
+
 ** t.currency()
 :PROPERTIES:
-:CUSTOM_ID: t-currency
+:CUSTOM_ID: tcurrency
 :END:
 
 The t.currency function formats numbers as currency.
 
+[[#contents][茶]]
+
 ** t.find()
 :PROPERTIES:
-:CUSTOM_ID: t-find
+:CUSTOM_ID: tfind
 :END:
 
 The t.find function searches a string for a substring and returns
@@ -1072,9 +1122,11 @@ result:
 4
 #+END_SRC
 
+[[#contents][茶]]
+
 ** t.get
 :PROPERTIES:
-:CUSTOM_ID: t-get
+:CUSTOM_ID: tget
 :END:
 
 You use the t.get function to access list or dictionary
@@ -1089,9 +1141,11 @@ var = t.get(t.server, "tea", "Earl Grey")
 var2 = t.get(t.repeat, 2, "default")
 #+END_SRC
 
+[[#contents][茶]]
+
 ** t.if()
 :PROPERTIES:
-:CUSTOM_ID: t-if
+:CUSTOM_ID: tif
 :END:
 
 You use the if function to select a value based on a condition.
@@ -1127,9 +1181,11 @@ t.if(0, 'dog', 'cat') -> cat
 t.if(8, 'dog', 'cat') -> cat
 #+END_SRC
 
+[[#contents][茶]]
+
 ** t.format()
 :PROPERTIES:
-:CUSTOM_ID: t-format
+:CUSTOM_ID: tformat
 :END:
 
 The t.format function is a powerful way to format your
@@ -1158,9 +1214,11 @@ result:
 Kathleen spent $52.44 on tea for Steve's birthday.
 #+END_SRC
 
+[[#contents][茶]]
+
 ** t.len()
 :PROPERTIES:
-:CUSTOM_ID: t-len
+:CUSTOM_ID: tlen
 :END:
 
 The t.len function returns the number of characters in a string,
@@ -1200,16 +1258,20 @@ The tea list has 5 elements.
 The server json dictionary has 1 elements.
 #+END_SRC
 
+[[#contents][茶]]
+
 ** t.quoteHtml()
 :PROPERTIES:
-:CUSTOM_ID: t-quoteHtml
+:CUSTOM_ID: tquoteHtml
 :END:
 
 The t.quoteHtml replaces special html characters with equivalents.
 
+[[#contents][茶]]
+
 ** t.row()
 :PROPERTIES:
-:CUSTOM_ID: t-row
+:CUSTOM_ID: trow
 :END:
 
 The special row function returns the current row number for
@@ -1253,16 +1315,20 @@ result:
   <li id="r3">4. Red Diamond</li>
 #+END_SRC
 
+[[#contents][茶]]
+
 ** t.sizes()
 :PROPERTIES:
-:CUSTOM_ID: t-sizes
+:CUSTOM_ID: tsizes
 :END:
 
 The t.sizes function formats number of bytes as KB, MB, GB, etc.
 
+[[#contents][茶]]
+
 ** t.substr()
 :PROPERTIES:
-:CUSTOM_ID: t-substr
+:CUSTOM_ID: tsubstr
 :END:
 
 The t.substr function extracts a substring from a string by
@@ -1295,16 +1361,20 @@ result:
 sub1 = Grey, sub2 = Earl
 #+END_SRC
 
+[[#contents][茶]]
+
 ** t.time()
 :PROPERTIES:
-:CUSTOM_ID: t-time
+:CUSTOM_ID: ttime
 :END:
 
 The t.time function formats data and time values.
 
+[[#contents][茶]]
+
 ** t.version()
 :PROPERTIES:
-:CUSTOM_ID: t-version
+:CUSTOM_ID: tversion
 :END:
 
 You use the version function to get the current version of
@@ -1354,9 +1424,11 @@ tea.html(45): w23: The current version 1.0.0 is less than the minumum
 allowed verion of 1.20.3.
 #+END_SRC
 
+[[#contents][茶]]
+
 ** t.warn()
 :PROPERTIES:
-:CUSTOM_ID: t-warn
+:CUSTOM_ID: twarn
 :END:
 
 The t.warn function formats a warning message with file and line
@@ -1463,6 +1535,8 @@ statictea --server server.json \
   --template template.html \
   --result result.html
 #+END_SRC
+
+[[#contents][茶]]
 
 ** Options
 :PROPERTIES:
