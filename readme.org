@@ -1586,7 +1586,7 @@ Built in Prefixes:
 - bash: #$
 - config files: ;$
 - C++: //$
-- C language /\star$ and \star/
+- C language /​\star$ and \star​/
 
 You can define other comment types on the command line using the
 prepost option one or more times. When you specify your own
