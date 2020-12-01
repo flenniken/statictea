@@ -1000,9 +1000,13 @@ otherwise it's Earl Gray.  Eary Grey wins ties.
 template:
 
 #+BEGIN_SRC
-<!--$ nextline sold = t.cmp(s.earlgrey, s.oolong); \-->
-<!--$ : bestSelling = t.case(sold, s.earlgreyName, -1, s.oolongName) -->
-The best selling tea this week is {s.bestSelling}.
+<!--$ block \-->
+<!--$ : sold = t.cmp(s.earlgrey, s.oolong); \-->
+<!--$ : bestSelling = t.case(sold, \-->
+<!--$ :   s.earlgreyName, -1, s.oolongName) -->
+The best selling tea this
+week is {s.bestSelling}.
+<!--$ endblock -->
 #+END_SRC
 
 server json:
@@ -1019,7 +1023,8 @@ server json:
 result:
 
 #+BEGIN_SRC
-The best selling tea this week is Earl Grey, Twinings.
+The best selling tea this
+week is Earl Grey, Twinings.
 #+END_SRC
 
 Here is another example using cmp to "ellipsize" a string when it
