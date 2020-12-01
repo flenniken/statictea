@@ -1,4 +1,5 @@
-#+TITLE: StaticTea
+<h2>StaticTea<h2>
+
 * A template processor and language.  :notoc:
 
 StaticTea combines a template with data to produce a result.
@@ -224,7 +225,9 @@ replacement blocks to match their variables in the shared.json
 file:
 
 #+BEGIN_SRC
-statictea --update --shared shared.json --template mytea.html
+statictea --update \
+   --shared shared.json \
+   --template mytea.html
 #+END_SRC
 
 The shared variable may contain replacement content too.  Here is
@@ -455,9 +458,9 @@ The built in system variables, prefixed with "t.", control how
 the replacement block works.
 
 - [[#tcontent][t.content]] - content of the replace block
-- [[#trepeat][t.repeat]] - controls how many times the block repeats
 - [[#tlocal][t.local]] - dictionary containing the current block's local variables.
 - [[#tmaxlines][t.maxlines]] - maximum lines before endblock or endreplace
+- [[#trepeat][t.repeat]] - controls how many times the block repeats
 - [[#tserver][t.server]] - dictionary containing the server variables
 - [[#tshared][t.shared]] - dictionary containing the shared variables
 
@@ -1474,8 +1477,10 @@ Example of running statictea when a variable is missing:
 template:
 
 #+BEGIN_SRC
-<!--$ nextline -->
-You're a {s.webmaster}, I'm a {s.teaMaster}!
+<!--$ block -->
+You're a {s.webmaster},
+I'm a {s.teaMaster}!
+<!--$ endblock -->
 #+END_SRC
 
 server json:
@@ -1495,7 +1500,8 @@ template.html(2): w1: Unknown server variable: s.teaMaster
 result:
 
 #+BEGIN_SRC
-You're a html wizard, I'm a {s.teaMaster}!
+You're a html wizard,
+I'm a {s.teaMaster}!
 #+END_SRC
 
 You can write your own warning messages using the system t.result
