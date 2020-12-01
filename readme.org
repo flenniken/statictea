@@ -1,11 +1,9 @@
 #+TITLE: StaticTea
 * A template processor and language.  :notoc:
 
-[[#contents][Contents]]
-
 StaticTea combines a template with data to produce a result.
 
-Example template:
+Example html hello world template:
 
 #+BEGIN_SRC
 <!--$ nextline -->
@@ -46,8 +44,9 @@ You can share common template fragments between templates.
 :CUSTOM_ID: how-it-works
 :END:
 
-The variable content comes from the server unformatted. You
-format it in the template with commands.
+You pass unformatted variable content from the server as json.
+You format it in the template with commands to create new
+variables that get inserted into the template.
 
 You mark replacement text with brackets and with preceding command
 lines.
@@ -64,15 +63,18 @@ template type.
 
 StaticTea commands:
 
-- nextline - make substitutions in the next line
-- block — make substitutions in the next block of lines
-- replace — replace the block with a variable
-- # — comment
-- : - continue command, used for continuation lines
-- endblock - end of block
-- endreplace - end of replace block
+- [[#nextline-command][nextline]] - make substitutions in the next line
+- [[#block-command][block]] — make substitutions in the next block of lines
+- [[#replace-command][replace]] — replace the block with a variable
+- # — [[#comment-command][comment command]]
+- : - [[#continue-command][continue command]], used for continue a command line
+- [[#endblock-command][endblock]] - end of block
+- [[#endreplace-command][endreplace]] - end of replace block
 
 ** Nextline Command
+:PROPERTIES:
+:CUSTOM_ID: nextline-command
+:END:
 
 The nextline command targets the line following it for
 replacement. The targeted line is called the replacement block.
@@ -80,7 +82,8 @@ replacement. The targeted line is called the replacement block.
 The replacement block contains any number of variables wrapped
 with brackets.  They get replaced with the variables's value.
 
-The following example's replacement block contains two variables.
+The following example's replacement block contains two variables,
+drink and drinkType.
 
 template:
 
@@ -105,6 +108,9 @@ Drink tea -- Earl Grey is my favorite.
 #+END_SRC
 
 ** Block Command
+:PROPERTIES:
+:CUSTOM_ID: block-command
+:END:
 
 The block command targets multiple lines for replacement. The
 replacement block starts after the command and continues until
@@ -118,8 +124,9 @@ template:
 
 #+BEGIN_SRC
 <!--$ block -->
-Join our tea party on {s.weekday} at
-{s.name}'s house at {s.time}.
+Join our tea party on
+{s.weekday} at {s.name}'s
+house at {s.time}.
 <!--$ endblock -->
 #+END_SRC
 
@@ -136,11 +143,15 @@ server json:
 result:
 
 #+BEGIN_SRC
-Join our tea party on Friday at
-John's house at 5:00 pm.
+Join our tea party on
+Friday at John's
+house at 5:00 pm.
 #+END_SRC
 
 ** Replace Command
+:PROPERTIES:
+:CUSTOM_ID: replace-command
+:END:
 
 The replace command's replacement block gets replaced with the
 t.content variable.
@@ -218,7 +229,8 @@ template:
 #+BEGIN_SRC
 <!--$ replace t.content=h.header -->
 <!DOCTYPE html>
-<html lang="{s.languageCode}" dir="{s.languageDirection}">
+<html lang="{s.languageCode}"
+dir="{s.languageDirection}">
 <head>
 <meta charset="UTF-8"/>
 <title>{s.title}</title>
@@ -240,7 +252,8 @@ shared json:
 #+BEGIN_SRC
 {
   "header": "<!DOCTYPE html>\n
-<html lang="{s.languageCode}" dir="{s.languageDirection}">\n
+<html lang="{s.languageCode}"
+dir="{s.languageDirection}">\n
 <head>\n
 <meta charset="UTF-8"/>\n
 <title>{s.title}</title>\n"
@@ -251,13 +264,17 @@ result:
 
 #+BEGIN_SRC
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en"
+dir="ltr">
 <head>
 <meta charset="UTF-8"/>
 <title>Teas in England</title>
 #+END_SRC
 
 ** Comment Command
+:PROPERTIES:
+:CUSTOM_ID: comment-command
+:END:
 
 You can comment templates.  Comments are line based and use the #
 character. They do not appear in the result.
@@ -282,12 +299,15 @@ intensive steps.
 #+END_SRC
 
 ** Continue Command
+:PROPERTIES:
+:CUSTOM_ID: continue-command
+:END:
 
 You can continue a long command line with the "\\" character at
 the end before the postfix. The following line must be a continue
 command.
 
-The continuation command allows you to continue adding statements
+The continue command allows you to continue adding statements
 when you need more space. You can continue the continue command
 too.
 
@@ -309,9 +329,15 @@ result:
 Earl Grey, Masala chai
 #+END_SRC
 
-Note: only the endblock command ends a block command. All text
-until the endblock is part of the replacement block. This
-includes lines that look like commands. For example:
+** Endblock Command
+:PROPERTIES:
+:CUSTOM_ID: endblock-command
+:END:
+
+The endblock command ends the block command. Only the endblock
+command ends a block command. All text until the endblock is part
+of the replacement block. This includes lines that look like
+commands. For example:
 
 template:
 
@@ -331,11 +357,10 @@ fake nextline
 <!--$ nextline -->
 #+END_SRC
 
-** Endblock Command
-
-The endblock command ends the block command.
-
 ** Endreplace Command
+:PROPERTIES:
+:CUSTOM_ID: endreplace-command
+:END:
 
 The endreplace command ends the replace command.
 
@@ -359,14 +384,11 @@ t.repeat = s.teaList
 nameLen = t.len(s.name)
 #+END_SRC
 
-Statements go on the the nextline, block or replace commands.
-
-You can use multiple statements separated with semicolons.
-
-If you need more space, you can continue the line with the "\\"
-character at the end.
-
-Statements are executed from left to right.
+Statements are allowed on the nextline, block and replace
+commands. You can use multiple statements separated with
+semicolons. If you need more space, you can continue the line
+with the "\\" character at the end. Statements are executed from
+left to right.
 
 * Variables
 :PROPERTIES:
@@ -379,10 +401,10 @@ how a command works.
 You specify variables in json files or you create them in
 template statements.
 
-A json dictionary's item key becomes the variable name its value
+A json dictionary key becomes the variable's name and its value
 becomes the variable's value.
 
-Internally a dictionary exists for the server json, one for the
+Internally one dictionary exists for the server json, one for the
 shared json and one for local variables. You access the server
 variables with the "s." prefix, the shared variables with the
 "h." and no prefix for the local variables.
@@ -411,309 +433,327 @@ mytea
 [[#contents][茶]]
 
 ** System Variables
-   :PROPERTIES:
+:PROPERTIES:
    :CUSTOM_ID: system-variables
    :END:
 
- The built in system variables, prefixed with "t.", control how
- the replacement block works.
+The built in system variables, prefixed with "t.", control how
+the replacement block works.
 
- - t.content - content of the replace block
- - t.repeat - controls whether the block repeats
- - t.local - dictionary containing the current block's local variables.
- - t.maxlines - maximum lines before endblock or endreplace
- - t.result - where the result goes
- - t.server - dictionary containing the server variables
- - t.shared - dictionary containing the shared variables
+- [[#t-content][t.content]] - content of the replace block
+- [[#t-repeat][t.repeat]] - controls how many times the block repeats
+- [[#t-local][t.local]] - dictionary containing the current block's local variables.
+- [[#t-maxlines][t.maxlines]] - maximum lines before endblock or endreplace
+- [[#t-server][t.server]] - dictionary containing the server variables
+- [[#t-shared][t.shared]] - dictionary containing the shared variables
 
 *** t.content
+:PROPERTIES:
+:CUSTOM_ID: t-content
+:END:
 
- The t.content variable determines what content to use for the
- whole replace block. The default is an empty string, which mean
- the block is replaced with nothing.
+The t.content variable determines what content to use for the
+whole replace block. The default is an empty string, which mean
+the block is replaced with nothing.
 
- The variable only applies to the replace command. See the replace
- command section for an example.
-
-*** t.repeat
-
- The t.repeat variable tells many times to repeat the block. You
- can assign it a number or a special type of list, one containing
- dictionaries.
-
- Each time the block repeats the local variables get
- recalculated. The repeat variable is only assigned once per
- block.
-
- By default the block is output once. A value of zero means don't
- show the block at all.
-
- The variable you assign to t.repeat must be a list containing
- dictionaries. Ech dictionary provides another source of local
- variables, the first dictionary goes with the first row, the
- sceond goes with the secon row and so on. All the block's local
- variables get recalculated for each row.
-
- #+BEGIN_SRC
- t.repeat = t.len(s.companies)
- t.copy(t.get(s.companies, t.row()))
-
- t.repeat = s.companies
- #+END_SRC
-
- For the following example, tea_list is assigned to the t.repeat
- variable which outputs the block five times.
-
- template:
-
- #+BEGIN_SRC
- <!--$ nextline t.repeat = s.tea_list -->
-   * {tea}
- #+END_SRC
-
- server json:
-
- #+BEGIN_SRC
- {
- "tea_list": [
-     {"tea": "Black"},
-     {"tea": "Green"},
-     {"tea": "Oolong"},
-     {"tea": "Sencha"},
-     {"tea": "Herbal"}
-   ]
- }
- #+END_SRC
-
- result:
-
- #+BEGIN_SRC
-   * Black
-   * Green
-   * Oolong
-   * Sencha
-   * Herbal
- #+END_SRC
-
- The following example builds an html select list of tea companies
- with the Twinings company selected.
-
- template:
-
- #+BEGIN_SRC
- <h3>Tea Companies</h3>
- <select>
- <!--$ nextline t.repeat=s.companyList; \-->
- <!--$ : current=t.if(s.selected, ' selected="selected"', "") -->
-   <option{current}>{s.company}</option>
- </select>
- #+END_SRC
-
- server json:
-
- #+BEGIN_SRC
- {
- "companyList": [
-     {"company": "Lipton"},
-     {"company": "Tetley"},
-     {"company": "Twinings, "selected": 1},
-     {"company": "American Tea Room"},
-     {"company": "Argo Tea"},
-     {"company": "Bigelow Tea Company"}
-   ]
- }
- #+END_SRC
-
- result:
-
- #+BEGIN_SRC
- <h3>Tea Companies</h3>
- <select>
-   <option>Lipton</option>
-   <option>Tetley</option>
-   <option selected="selected">Twinings</option>
-   <option>Argo Tea</option>
-   <option>American Tea Room</option>
-   <option>Bigelow Tea Company</option>
- </select>
- #+END_SRC
+The variable only applies to the replace command. See the [[#replace-command][replace
+command]] section for an example.
 
 *** t.local
+:PROPERTIES:
+:CUSTOM_ID: t-local
+:END:
 
- The t.local variable is the dictionary of local variables for the
- current command. It is recalculated for each item in the list.
+The t.local variable is the dictionary of local variables for the
+current command. It is recalculated for each item in the list.
 
 *** t.maxlines
+:PROPERTIES:
+:CUSTOM_ID: t-maxlines
+:END:
 
- The t.maxlines variable determines the maximum lines in a block.
+The t.maxlines variable determines the maximum lines in a block.
 
- StaticTea reads lines looking for the endblock or endreplace
- commands.  By default, if it is not found in 10 lines, the 10
- lines are used for the block and a warning is output. This catches
- the case where you forget the end command.
+StaticTea reads lines looking for the endblock or endreplace
+commands.  By default, if it is not found in 10 lines, the 10
+lines are used for the block and a warning is output. This catches
+the case where you forget the end command.
 
- You can increase this value to support blocks with more lines by
- setting the t.maxlines system variable.
+You can increase this value to support blocks with more lines by
+setting the t.maxlines system variable.
 
- #+BEGIN_SRC
- <!--$ block t.maxlines=20 -->
- #+END_SRC
+#+BEGIN_SRC
+<!--$ block t.maxlines=20 -->
+#+END_SRC
 
+Skip Example:
 
- Skip Example:
+The skip case is good for building test lists.
 
- The skip case is good for building test lists.
+When you view the following template fragment in a browser it
+shows one item in the list.
 
- When you view the following template fragment in a browser it
- shows one item in the list.
+template:
 
- template:
+#+BEGIN_SRC
+<h3>Tea</h3>
+<ul>
+<!--$ nextline t.repeat = s.teaList -->
+ <li>{s.tea}</li>
+</ul>
+#+END_SRC
 
- #+BEGIN_SRC
- <h3>Tea</h3>
- <ul>
- <!--$ nextline t.repeat = s.teaList -->
-   <li>{s.tea}</li>
- </ul>
- #+END_SRC
+To create a static page that has more products for better testing
+you could use the skip option like this:
 
- To create a static page that has more products for better testing
- you could use the skip option like this:
+template:
 
- template:
+#+BEGIN_SRC
+<h3>Tea</h3>
+<ul>
+<!--$ nextline t.repeat = teaList -->
+ <li>{tea}</li>
+<!--$ block t.repeat = 0 -->
+ <li>Black</li>
+ <li>Green</li>
+ <li>Oolong</li>
+ <li>Sencha</li>
+ <li>Herbal</li>
+<!--$ endblock -->
+</ul>
+#+END_SRC
 
- #+BEGIN_SRC
- <h3>Tea</h3>
- <ul>
- <!--$ nextline t.repeat = teaList -->
-   <li>{tea}</li>
- <!--$ block t.repeat = 0 -->
-   <li>Black</li>
-   <li>Green</li>
-   <li>Oolong</li>
-   <li>Sencha</li>
-   <li>Herbal</li>
- <!--$ endblock -->
- </ul>
- #+END_SRC
+server json:
 
- server json:
+#+BEGIN_SRC
+{
+ "teaList": [
+   {"tea": "Chamomile"},
+   {"tea": "Chrysanthemum"},
+   {"tea": "White"},
+   {"tea": "Puer"}
+ ]
+}
+#+END_SRC
 
- #+BEGIN_SRC
- {
-   "teaList": [
-     {"tea": "Chamomile"},
-     {"tea": "Chrysanthemum"},
-     {"tea": "White"},
-     {"tea": "Puer"}
-   ]
- }
- #+END_SRC
+result:
 
- result:
+#+BEGIN_SRC
+<h3>Tea</h3>
+<ul>
+ <li>Chamomile</li>
+ <li>Chrysanthemum</li>
+ <li>White</li>
+ <li>Puer</li>
+</ul>
+#+END_SRC
 
- #+BEGIN_SRC
- <h3>Tea</h3>
- <ul>
-   <li>Chamomile</li>
-   <li>Chrysanthemum</li>
-   <li>White</li>
-   <li>Puer</li>
- </ul>
- #+END_SRC
+*** t.repeat
+:PROPERTIES:
+:CUSTOM_ID: t-repeat
+:END:
+
+The t.repeat variable tells many times to repeat the block. You
+can assign it a number or a special type of list, one containing
+dictionaries.
+
+Each time the block repeats the local variables get
+recalculated. The repeat variable is only assigned once per
+block.
+
+By default the block is output once. A value of zero means don't
+show the block at all.
+
+The variable you assign to t.repeat must be a number or a list
+containing dictionaries. Each dictionary provides another source
+of local variables, the first dictionary goes with the first
+row, the sceond goes with the secon row and so on. All the
+block's local variables get recalculated for each row.
+
+#+BEGIN_SRC
+t.repeat = t.len(s.companies)
+t.copy(t.get(s.companies, t.row()))
+
+t.repeat = s.companies
+#+END_SRC
+
+For the following example, tea_list is assigned to the t.repeat
+variable which outputs the block five times.
+
+template:
+
+#+BEGIN_SRC
+<!--$ nextline t.repeat = s.tea_list -->
+ * {tea}
+#+END_SRC
+
+server json:
+
+#+BEGIN_SRC
+{
+"tea_list": [
+   {"tea": "Black"},
+   {"tea": "Green"},
+   {"tea": "Oolong"},
+   {"tea": "Sencha"},
+   {"tea": "Herbal"}
+ ]
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+ * Black
+ * Green
+ * Oolong
+ * Sencha
+ * Herbal
+#+END_SRC
+
+The following example builds an html select list of tea companies
+with the Twinings company selected.
+
+template:
+
+#+BEGIN_SRC
+<h3>Tea Companies</h3>
+<select>
+<!--$ nextline t.repeat=s.companyList; \-->
+<!--$ : current=t.if(s.selected, ' selected="selected"', "") -->
+ <option{current}>{s.company}</option>
+</select>
+#+END_SRC
+
+server json:
+
+#+BEGIN_SRC
+{
+"companyList": [
+   {"company": "Lipton"},
+   {"company": "Tetley"},
+   {"company": "Twinings, "selected": 1},
+   {"company": "American Tea Room"},
+   {"company": "Argo Tea"},
+   {"company": "Bigelow Tea Company"}
+ ]
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+<h3>Tea Companies</h3>
+<select>
+ <option>Lipton</option>
+ <option>Tetley</option>
+ <option selected="selected">Twinings</option>
+ <option>Argo Tea</option>
+ <option>American Tea Room</option>
+ <option>Bigelow Tea Company</option>
+</select>
+#+END_SRC
 
 *** t.server
+:PROPERTIES:
+:CUSTOM_ID: t-server
+:END:
 
- The t.server variable contains the server json variables.
+The t.server variable contains the server json variables.
 
 *** t.shared
+:PROPERTIES:
+:CUSTOM_ID: t-shared
+:END:
 
- The t.shared variable contains the shared json variables
+The t.shared variable contains the shared json variables
 
- [[#contents][茶]]
+[[#contents][茶]]
 
 ** Json Files and Variables
-   :PROPERTIES:
-   :CUSTOM_ID: json-files-and-variables
-   :END:
+:PROPERTIES:
+:CUSTOM_ID: json-files-and-variables
+:END:
 
- There are two types of json files the server json and the shared
- json.
+There are two types of json files the server json and the shared
+json.
 
- The server json comes from the server and shouldn't contain any
- presentation data so the template designers have full control of
- the presentation. The shared json is created by the template
- designer for sharing common template fragments and other
- presentation needs.
+The server json comes from the server and shouldn't contain any
+presentation data so the template designers have full control of
+the presentation. The shared json is created by the template
+designer for sharing common template fragments and other
+presentation needs.
 
- You can use multiple server and shared json files by specifying
- multiple options on the command line. The files are processed
- left to right which is important when there are duplicate
- variables since the last one processed overwrites the previous
- one.
+You can use multiple server and shared json files by specifying
+multiple options on the command line. The files are processed
+left to right which is important when there are duplicate
+variables since the last one processed overwrites the previous
+one.
 
- The server json variables get added to the t.server
- dictionary and the shared json get added to the t.shared
- dictionary.
+The server json variables get added to the t.server
+dictionary and the shared json get added to the t.shared
+dictionary.
 
- You reference the server variables with the "s." namespace prefix
- and the shared variables with "h.".
+You reference the server variables with the "s." namespace prefix
+and the shared variables with "h.".
 
- The json null values get converted to the 0. Json True and False
- get converted to 1 and 0.
+The json null values get converted to the 0. Json True and False
+get converted to 1 and 0.
 
- You cannot change the json variables.
+You cannot change the json variables.
 
- Here is an example showing the number of elements in the t.server
- and t.shared dictionaries.
+Here is an example showing the number of elements in the t.server
+and t.shared dictionaries.
 
- template:
+template:
 
- #+BEGIN_SRC
- <!--$ block \-->
- <!--$ : serverElements = t.len(t.server) \-->
- <!--$ : jsonElements = t.len(t.shared) -->
- The server has {serverElements} elements
- and the shared json has {jsonElements}.
- <!--$ endblock -->
- #+END_SRC
+#+BEGIN_SRC
+<!--$ block \-->
+<!--$ : serverElements = t.len(t.server) \-->
+<!--$ : jsonElements = t.len(t.shared) -->
+The server has {serverElements} elements
+and the shared json has {jsonElements}.
+<!--$ endblock -->
+#+END_SRC
 
- json:
+json:
 
- #+BEGIN_SRC
- {
-   "tea1": "Black",
-   "tea2": "Green",
-   "tea3": "Oolong",
-   "tea4": "Sencha",
-   "tea5": "Herbal"
- }
- #+END_SRC
+#+BEGIN_SRC
+{
+ "tea1": "Black",
+ "tea2": "Green",
+ "tea3": "Oolong",
+ "tea4": "Sencha",
+ "tea5": "Herbal"
+}
+#+END_SRC
 
- result:
+result:
 
- #+BEGIN_SRC
- The server has 5 elements
- and the shared json has 0.
- #+END_SRC
+#+BEGIN_SRC
+The server has 5 elements
+and the shared json has 0.
+#+END_SRC
 
- [[#contents][茶]]
+[[#contents][茶]]
 
 * Types
-
 :PROPERTIES:
 :CUSTOM_ID: types
 :END:
 
 StaticTea variables types:
 
-- string
-- integer
-- float
-- dictionary
-- list
+- [[#string][string]]
+- [[#integer][integer]]
+- [[#float][float]]
+- [[#dictionary][dictionary]]
+- [[#list][list]]
 
 ** String
+:PROPERTIES:
+:CUSTOM_ID: string
+:END:
 
 You define a string with single or double quotes and use them in
 statements.
@@ -750,6 +790,9 @@ result:
 #+END_SRC
 
 ** Integer
+:PROPERTIES:
+:CUSTOM_ID: integer
+:END:
 
 An integer is a 64 bit signed number.  When you pass an integer to
 a function that takes a string, the number is converted to a
@@ -765,6 +808,9 @@ Example numbers:
 #+END_SRC
 
 ** Float
+:PROPERTIES:
+:CUSTOM_ID: float
+:END:
 
 A float is a 64 bit real number. Like integers a float is
 converted to a string when passed to a function taking a sring.
@@ -781,11 +827,17 @@ Example floats:
 #+END_SRC
 
 ** Dictionary
+:PROPERTIES:
+:CUSTOM_ID: dictionary
+:END:
 
 You access dictionary items with t.get and you define them in the
 json files.
 
 ** List
+:PROPERTIES:
+:CUSTOM_ID: list
+:END:
 
 Like dictionaires, you access list items with t.get and you
 define them in the json files.
@@ -815,25 +867,28 @@ which is used in the replacement block.
 
 List of functions:
 
-- t.case() -- generalized if function
-- t.cmp() -- spaceship compare function <=>
-- t.concat() -- concatenate strings
-- t.copy() -- copy variables to the local dictionary
-- t.currency() -- format currency
-- t.exists() -- whether a variables exists
-- t.find() -- find a substring in a string
-- t.format() -- format a string
-- t.if() -- if function
-- t.len() -- length of string
-- t.quoteHtml -- replace html special characters
-- t.row() -- special function that returns the current row
-- t.sizes -- format bytes counts, KB, MB, GB, etc.
-- t.substr() -- extract a substring from a string by indexes
-- t.time() -- format the date and time.
-- t.version() -- the current version and version checker
-- t.warn() -- format a warning message with file and line number.
+- [[#t-case][t.case()]] -- generalized if function
+- [[#t-cmp][t.cmp()]] -- spaceship compare function <=>
+- [[#t-concat][t.concat()]] -- concatenate strings
+- [[#t-copy][t.copy()]] -- copy variables to the local dictionary
+- [[#t-currency][t.currency()]] -- format currency
+- [[#t-exists][t.exists()]] -- whether a variables exists
+- [[#t-find][t.find()]] -- find a substring in a string
+- [[#t-format][t.format()]] -- format a string
+- [[#t-if][t.if()]] -- if function
+- [[#t-len][t.len()]] -- length of string
+- [[#t-quotehtml][t.quoteHtml]] -- replace html special characters
+- [[#t-row][t.row()]] -- special function that returns the current row
+- [[#t-sizes][t.sizes()]] -- format bytes counts, KB, MB, GB, etc.
+- [[#t-substr][t.substr()]] -- extract a substring from a string by indexes
+- [[#t-time][t.time()]] -- format the date and time.
+- [[#t-version][t.version()]] -- the current version and version checker
+- [[#t-warn][t.warn()]] -- format a warning message with file and line number.
 
-** t.case
+** t.case()
+:PROPERTIES:
+:CUSTOM_ID: t-case
+:END:
 
 The t.case function is a generalized if statement.  You use it to
 preform different actions depending on a condition.
@@ -886,7 +941,10 @@ is equivalent to:
 t.case(cond, v2, 1, v1)
 #+END_SRC
 
-** t.cmp
+** t.cmp()
+:PROPERTIES:
+:CUSTOM_ID: t-cmp
+:END:
 
 The t.cmp function compares two variables, either numbers or
 strings, and returns whether the first parameter is less than,
@@ -936,6 +994,9 @@ than 10 characters.
 #+END_SRC
 
 ** t.concat()
+:PROPERTIES:
+:CUSTOM_ID: t-concat
+:END:
 
 The t.concat function concatenates strings. You can specify 0 or
 more parameters. Examples:
@@ -947,7 +1008,10 @@ t.concat("Tea", "Time") => "TeaTime"
 t.concat("Tea", " ",  "Time") => "Tea Time"
 #+END_SRC
 
-** t.exists
+** t.exists()
+:PROPERTIES:
+:CUSTOM_ID: t-exists
+:END:
 
 The t.exists returns 1 when a variable exists, else it returns 0.
 
@@ -970,12 +1034,25 @@ t.exists(b) => 0
 #+END_SRC
 
 ** t.copy()
+:PROPERTIES:
+:CUSTOM_ID: t-copy
+:END:
 
 The t.copy function copies variables to the local variables
 dictionary. It takes one parameter which can be a variable or a
 dictionary.
 
+** t.currency()
+:PROPERTIES:
+:CUSTOM_ID: t-currency
+:END:
+
+The t.currency function formats numbers as currency.
+
 ** t.find()
+:PROPERTIES:
+:CUSTOM_ID: t-find
+:END:
 
 The t.find function searches a string for a substring and returns
 its position when found. When not found it returns -1. Positions
@@ -996,6 +1073,9 @@ result:
 #+END_SRC
 
 ** t.get
+:PROPERTIES:
+:CUSTOM_ID: t-get
+:END:
 
 You use the t.get function to access list or dictionary
 values. It takes three parameters. The first is the list or
@@ -1009,7 +1089,10 @@ var = t.get(t.server, "tea", "Earl Grey")
 var2 = t.get(t.repeat, 2, "default")
 #+END_SRC
 
-** t.if
+** t.if()
+:PROPERTIES:
+:CUSTOM_ID: t-if
+:END:
 
 You use the if function to select a value based on a condition.
 
@@ -1044,7 +1127,10 @@ t.if(0, 'dog', 'cat') -> cat
 t.if(8, 'dog', 'cat') -> cat
 #+END_SRC
 
-** t.format
+** t.format()
+:PROPERTIES:
+:CUSTOM_ID: t-format
+:END:
 
 The t.format function is a powerful way to format your
 variables. You can left, right or center the variable.  You can
@@ -1072,7 +1158,10 @@ result:
 Kathleen spent $52.44 on tea for Steve's birthday.
 #+END_SRC
 
-** t.len
+** t.len()
+:PROPERTIES:
+:CUSTOM_ID: t-len
+:END:
 
 The t.len function returns the number of characters in a string,
 the number of elements in a list or the number of elements in a
@@ -1103,7 +1192,6 @@ json:
 }
 #+END_SRC
 
-
 result:
 
 #+BEGIN_SRC
@@ -1112,7 +1200,17 @@ The tea list has 5 elements.
 The server json dictionary has 1 elements.
 #+END_SRC
 
-** t.row
+** t.quoteHtml()
+:PROPERTIES:
+:CUSTOM_ID: t-quoteHtml
+:END:
+
+The t.quoteHtml replaces special html characters with equivalents.
+
+** t.row()
+:PROPERTIES:
+:CUSTOM_ID: t-row
+:END:
 
 The special row function returns the current row number for
 blocks using a t.repeat. The function takes a parameter which
@@ -1155,7 +1253,17 @@ result:
   <li id="r3">4. Red Diamond</li>
 #+END_SRC
 
-** t.substr
+** t.sizes()
+:PROPERTIES:
+:CUSTOM_ID: t-sizes
+:END:
+
+The t.sizes function formats number of bytes as KB, MB, GB, etc.
+
+** t.substr()
+:PROPERTIES:
+:CUSTOM_ID: t-substr
+:END:
 
 The t.substr function extracts a substring from a string by
 indexes. The first parameter is the string to operate on, the
@@ -1187,7 +1295,17 @@ result:
 sub1 = Grey, sub2 = Earl
 #+END_SRC
 
-** t.version
+** t.time()
+:PROPERTIES:
+:CUSTOM_ID: t-time
+:END:
+
+The t.time function formats data and time values.
+
+** t.version()
+:PROPERTIES:
+:CUSTOM_ID: t-version
+:END:
 
 You use the version function to get the current version of
 StaticTea or to verify that the version you are running works
@@ -1235,6 +1353,14 @@ allowed verion of 3.4.005.
 tea.html(45): w23: The current version 1.0.0 is less than the minumum
 allowed verion of 1.20.3.
 #+END_SRC
+
+** t.warn()
+:PROPERTIES:
+:CUSTOM_ID: t-warn
+:END:
+
+The t.warn function formats a warning message with file and line
+number and writes it to standard out.
 
 [[#contents][茶]]
 
@@ -1320,7 +1446,7 @@ warning: the admin variable is missing
 :CUSTOM_ID: run-statictea
 :END:
 
-You run StaticTea from the command line. 
+You run StaticTea from the command line.
 
 - Warning messages go to standard error.
 - If you don't specify the result argument, the result goes to standard out.
@@ -1332,11 +1458,16 @@ file arguments, the server json, the shared json, the template
 and the result.
 
 #+BEGIN_SRC
-statictea --server server.json --shared shared.json \
-  --template template.html --result result.html
+statictea --server server.json \
+  --shared shared.json \
+  --template template.html \
+  --result result.html
 #+END_SRC
 
 ** Options
+:PROPERTIES:
+:CUSTOM_ID: options
+:END:
 
 The StaticTea command line options:
 
@@ -1346,7 +1477,8 @@ The StaticTea command line options:
 - shared - the shared json file(s), you can specify multiple.
 - template - the template file, or "stdin".
 - result - the result file, or standard out when not specified.
-- update - update the template replace blocks. See the [[#commands][replace command]].
+- update - update the template replace blocks. See the
+  [[#replace-command][Replace Command]].
 - prepost - add a command prefix and postfix, you can specify
   multiple. When you specify values, the defaults are no longer
   used. See the [[#prefix-postfix][Prefix Postfix]] section.
@@ -1491,7 +1623,7 @@ default t.maxlines = 10
 # to scratch to remove the leading pound signs.
 # grep '^\* ' readme.org | grep -v ":notoc" | cut -c 3- | \
 # awk '{a = $0; gsub(" ", "-", a); printf "- [[#%s][%s]]\n", tolower(a), $0 }'
-* Contents                                                            :notoc:
+* Contents :notoc:
 :PROPERTIES:
 :CUSTOM_ID: contents
 :END:
