@@ -1,5 +1,5 @@
 #+TITLE: StaticTea
-* A template processor and language.  :notoc:
+* A template processor and language.
 :PROPERTIES:
 :CUSTOM_ID: top
 :END:
@@ -419,7 +419,7 @@ left to right.
 You use variables to format content for a block and to control
 how a command works. You create them in json files or in template
 statements. Internally one dictionary exists for each of the four
-types of variables, you access the with different prefixes, and
+types of variables, you access them with different prefixes, and
 they are stored in different dictionaries:
 
 - [[#json-variables][Server Json Variables]] --  "s.", t.server
@@ -1047,41 +1047,6 @@ cmp(2, 2) returns 0
 cmp(5, 4) returns 1
 #+END_SRC
 
-
-The example below shows the best selling tea between Earl Grey
-and Oolong. If Oolong out sells Earl Grey it's the best,
-otherwise it's Earl Gray.  Eary Grey wins ties.
-
-template:
-
-#+BEGIN_SRC
-<!--$ block \-->
-<!--$ : sold = cmp(s.earlgrey, s.oolong); \-->
-<!--$ : bestSelling = case(sold, \-->
-<!--$ :   s.earlgreyName, -1, s.oolongName) -->
-The best selling tea this
-week is {s.bestSelling}.
-<!--$ endblock -->
-#+END_SRC
-
-server json:
-
-#+BEGIN_SRC
-{
-  earlgrey: 500,
-  oolong: 300,
-  earlgreyName: "Earl Grey, Twinings",
-  oolongName: "Oolon, Mighty Leaf Tea"
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-The best selling tea this
-week is Earl Grey, Twinings.
-#+END_SRC
-
 Here is another example using cmp to "ellipsize" a string when it
 gets long. The following example ellipsizes when a name is longer
 than 10 characters.
@@ -1090,9 +1055,9 @@ than 10 characters.
 <!--$ # If the name is longer than 10 characters, -->
 <!--$ # clip it to 7 and add "...".               -->
 <!--$ nextline                                   \-->
-<!--$ : cmp = cmp(len(s.name), 10);            \-->
-<!--$ : name = case(cmd, s.name                \-->
-<!--$ : 1, concat(substr(s.name, 0, 7), "...")) -->
+<!--$ : cmp = cmp(len(s.name), 10);              \-->
+<!--$ : name = case(cmd, s.name                  \-->
+<!--$ : 1, concat(substr(s.name, 0, 7), "..."))   -->
 #+END_SRC
 
 [[#contents][茶]]
@@ -1112,20 +1077,20 @@ prefix:
 #$ : x2 = concat("Tea"); \
 #$ : x3 = concat("Tea", "Time"); \
 #$ : x4 = concat("Tea", " ",  "Time")
-'{x1}' <= concat()
-'{x2}' <= concat("Tea")
-'{x3}' <= concat("Tea", "Time")
-'{x4}' <= concat("Tea", " ",  "Time")
+concat() => '{x1}'
+concat("Tea") => '{x2}'
+concat("Tea", "Time") => '{x3}'
+concat("Tea", " ",  "Time") => '{x4}'
 #$ endblock
 #+END_SRC
 
 Result:
 
 #+BEGIN_SRC
-'' <= concat()
-'Tea' <= concat("Tea")
-'TeaTime' <= concat("Tea", "Time")
-'Tea Time' <= concat("Tea", " ",  "Time")
+concat() => ''
+concat("Tea") => 'Tea'
+concat("Tea", "Time") => 'TeaTime'
+concat("Tea", " ",  "Time") => 'Tea Time'
 #+END_SRC
 
 [[#contents][茶]]
@@ -1565,7 +1530,7 @@ Miscellaneous topics:
 
 - [[#warning-messages][Warning Messages]]
 - [[#prefix-postfix][Prefix Postfix]]
-- [[#line-endings][Encoding and Line Endings]]
+- [[#encoding-and-line-endings][Encoding and Line Endings]]
 - [[#log-file][Log File]]
 - [[#limits][Limits]]
 - [[#system-defaults][System Defaults]]
@@ -1699,7 +1664,7 @@ Miscellaneous topics:
 
 ** Encoding and Line Endings
 :PROPERTIES:
-:CUSTOM_ID: line-endings
+:CUSTOM_ID: encoding-and-line-endings
 :END:
 
  Templates are utf-8 encoded.  Two line endings are supported on
@@ -1723,7 +1688,7 @@ Miscellaneous topics:
  [[#contents][茶]]
 
 ** Limits
-   :PROPERTIES:
+ :PROPERTIES:
    :CUSTOM_ID: limits
    :END:
 
@@ -1746,6 +1711,7 @@ Miscellaneous topics:
  - t.maxLines -- number of lines before the end block
    command. Useful when you forget to end the block. You can
    override this with bigger or smaller values.  Default 10.
+ - t.maxRepeat -- maximum number of times to repeat a block.
  - Maximum command line length -- 1024 characters.
  - Maximum variable name length -- 64 characters.
  - Maximum literal string length -- 256 characters.
