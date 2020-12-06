@@ -23,7 +23,7 @@ import runCommand
 Each line has a command. The current line continues when it has a
 slash at the end. The continue line starts with a : command.  It may
 continue too. The last line doesn't have a slash. If an error is
-found, a warning is written, and the lines get written as is as if
+found, a warning is written, and the lines get written as is, as if
 they weren't command lines.
 
 <--!$ nextline a = 5 \-->\n
@@ -31,7 +31,7 @@ they weren't command lines.
 <--!$ : b = 6 \-->\n
 <--!$ : c = 7  -->\n
 
-There are three line types cmd lines, replacement block lines and
+There are three line types: cmd lines, replacement block lines and
 other lines.
 
 Cmd lines start with a prefix, and they may continue on multiple

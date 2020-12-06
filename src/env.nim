@@ -70,26 +70,38 @@ proc checkLogSize(env: var Env) =
     env.log(line)
     env.warn(line)
 
-proc openEnv*(logFilename: string="", warnSize: BiggestInt=logWarnSize): Env =
-
+proc openEnv*(logFilename: string="", warnSize: BiggestInt=logWarnSize
+    ): Env =
+  ## Open the log file, error stream and out stream. When the
+  ## logFilename is not specified, the statictea.log file is used
+  ## along with the stderr and stdout. When you specify a log file
+  ## (used for testing), logging goes to it and the error and warn
+  ## streams are string type streams.
   var logName: string
   var closeStreams: bool
   var errStream: Stream
   var outStream: Stream
-  if logFilename == "":
+  when not defined(test):
     logName = staticteaLog
     errStream = newFileStream(stderr)
     outStream = newFileStream(stdout)
     closeStreams = false
   else:
-    logName = logFilename
-    errStream = newStringStream()
-    outStream = newStringStream()
-    closeStreams = true
+    if logFilename != "":
+      logName = logFilename
+      errStream = newStringStream()
+      outStream = newStringStream()
+      closeStreams = true
 
   var log = openLogFile(logName)
   result = Env(logEnv: log, errStream: errStream, outStream: outStream,
                closeStreams: closeStreams)
+
+  # When running tests set the template name.
+  when defined(test):
+    if logFilename != "":
+      result.templateFilename = "template.html"
+
   checkLogSize(result)
 
 proc addExtraStreams*(env: var Env, args: Args): bool =
@@ -201,14 +213,21 @@ when defined(test):
             echo "$1: expected: $2" % [$ix, $expectedItems[ix]]
       result = false
 
-  proc testSome*[T](valueO: Option[T], eValueO: Option[T],
+  proc testSome*[T](valueAndLengthO: Option[T], eValueAndLengthO: Option[T],
       text: string, start: Natural): bool =
 
-    if valueO == eValueO:
+    if valueAndLengthO == eValueAndLengthO:
       return true
 
+    let value = valueAndLengthO.get().value
+    let length = valueAndLengthO.get().length
+    let eValue = eValueAndLengthO.get().value
+    let eLength = eValueAndLengthO.get().length
+
     echo "Did not get the expected value."
-    echo "     got: $1" % $valueO
-    echo "expected: $1" % $eValueO
     echo " text: $1" % text
     echo "start: $1" % startPointer(start)
+    echo "got value: $1" % $value
+    echo " expected: $1" % $evalue
+    echo "got length: $1" % $length
+    echo "  expected: $1" % $eLength

@@ -35,6 +35,7 @@ type
     variableMatcher*: Matcher
     spaceTabMatcher*: Matcher
     numberMatcher*: Matcher
+    stringMatcher*: Matcher
 
 iterator combine(list1: openArray[Prepost], list2: openArray[Prepost]): Prepost =
   ## Iterate through list1 then list2.
@@ -125,6 +126,14 @@ proc getNumberMatcher*(): Matcher =
   # note: nim sets the regex anchor option.
   result = newMatcher(r"[-]{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*\s*$", 1)
 
+proc getStringMatcher*(): Matcher =
+  ## Match a string.
+
+  # A string is inside quotes, either single or double quotes. The
+  # optional white space after the string is matched too.  Note: nim
+  # sets the regex anchor option.
+  result = newMatcher("""'([^']*)'\s*$|"([^"]*)"\s*""", 2)
+
 proc getCompiledMatchers*(prepostList: seq[Prepost] = @[]): CompiledMatchers =
   ## Compile all the matchers and return them in the
   ## CompiledMatchers object.
@@ -134,3 +143,4 @@ proc getCompiledMatchers*(prepostList: seq[Prepost] = @[]): CompiledMatchers =
   result.variableMatcher = getVariableMatcher()
   result.spaceTabMatcher = getSpaceTabMatcher()
   result.numberMatcher = getNumberMatcher()
+  result.stringMatcher = getStringMatcher()

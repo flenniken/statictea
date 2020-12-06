@@ -36,6 +36,10 @@ type
     wNumberOverFlow, # w27
     wNotEnoughMemoryForLB, # w28
     wMissingStatementVar, # w29
+    wNotString, # w30
+    wTextAfterValue, # w31
+    wInvalidUtf8, # w32
+    wInvalidRightHandSide, # 33
 
 tpubType:
   const
@@ -72,6 +76,10 @@ tpubType:
       "The number is too big or too small, skipping the statement.", # wNumberOverFlow
       "Not enough memory for the line buffer.", # wNotEnoughMemoryForLB
       "The statement starting at column $1 does not start with a variable name.", # wMissingStatementVar
+      "Invalid string in the statement starting at column $1.", # wNotString
+      "Unprocessed text at the end of the statement.", # wTextAfterValue
+      "Invalid UTF-8 byte in the string at column $1.", # wInvalidUtf8
+      "Invalid right hand side, expected a string, number, variable or function.", # wInvalidRightHandSide
     ]
 
 func getWarning*(filename: string, lineNum: int,

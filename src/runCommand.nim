@@ -12,6 +12,7 @@ import matches
 import strUtils
 import warnings
 import parseNumber
+import unicode
 
 type
   State = enum
@@ -20,10 +21,19 @@ type
 
   Statement* = object
     ## A Statement object stores the statement text and the lineNum
-    ## and position where it starts in the template.
+    ## and column position where it starts in the template.
     lineNum*: Natural
     start*: Natural
     text*: string
+
+  ValueAndLength* = object
+    ## A value and the length of the matching text in the statement.
+    ## For the example statement: "var = 567 ". The value 567 starts
+    ## index 6 and the matching length is 4 because it includes the
+    ## trailing spaces. For example "id = row( 3 )" the value is 3 and
+    ## the length is 2.
+    value*: Value
+    length*: Natural
 
 func `$`*(s: Statement): string =
   ## A string representation of a Statement.
@@ -127,30 +137,49 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
   if notEmptyOrSpaces(spaceTabMatcher, text):
     yield Statement(text: text, lineNum: lineNum, start: start)
 
+proc getString*(env: var Env, compiledMatchers: Compiledmatchers,
+    statement: Statement, start: Natural): Option[ValueAndLength] =
+  ## Return a literal string value and the length of the match.  The
+  ## start parameter is the index of the first quote in the statement
+  ## and the return length includes optional trailing white space
+  ## after the last quote.
 
-proc getString(env: var Env, compiledMatchers: Compiledmatchers, statement: Statement, start: Natural): Option[Value] =
-  echo "getString"
+  # Check that we have a statictea string.
+  var matchesO = compiledMatchers.stringMatcher.getMatches(statement.text, start)
+  if not matchesO.isSome:
+    env.warn(env.templateFilename, statement.lineNum,
+             wNotString, $statement.start)
+    return
 
-# todo: we need to calculate the line number for the statement. It may
-# be split across multiple lines.
+  # Get the string. The string is either in s1 or s2, s1 means single
+  # quotes were used, s2 double.
+  let matches = matchesO.get()
+  let (s1, s2) = matches.get2Groups()
+  var str = if (s1 == ""): s2 else: s1
 
+  # Validate the utf-8 bytes.
+  var pos = validateUtf8(str)
+  if pos != -1:
+    let column = start + pos + 1
+    env.warn(env.templateFilename, statement.lineNum,
+             wInvalidUtf8, $column)
+    return
+
+  let value = Value(kind: vkString, stringv: str)
+  result = some(ValueAndLength(value: value, length: matches.length))
 
 proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
-    statement: Statement, start: Natural): Option[Value] =
+    statement: Statement, start: Natural): Option[ValueAndLength] =
   ## Return the literal number value from the statement. We expect a
   ## number because it starts with a digit or minus sign.
-
-  # todo: pass this in
-  let filename = "template.html"
-  let lineNum = 23
 
   # Check that we have a statictea number.
   var matchesO = compiledMatchers.numberMatcher.getMatches(statement.text, start)
   if not matchesO.isSome:
-    env.warn(filename, lineNum, wNotNumber)
+    env.warn(env.templateFilename, statement.lineNum, wNotNumber)
     return
 
-  # The decimal point determines whether the number is an int or
+  # The decimal point determines whether the number is an integer or
   # float.
   var value: Value
   let matches = matchesO.get()
@@ -159,28 +188,38 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
     # Parse the float.
     let floatPosO = parseFloat64(statement.text, start)
     if not floatPosO.isSome:
-      env.warn(filename, lineNum, wNumberOverFlow)
+      env.warn(env.templateFilename, statement.lineNum, wNumberOverFlow)
       return
-    result = some(Value(kind: vkFloat, floatv: floatPosO.get().number))
+    let floatPos = floatPosO.get()
+    let value = Value(kind: vkFloat, floatv: floatPos.number)
+    assert floatPos.length <= matches.length
+    result = some(ValueAndLength(value: value, length: matches.length))
   else:
     # Parse the int.
     let intPosO = parseInteger(statement.text, start)
     if not intPosO.isSome:
-      env.warn(filename, lineNum, wNumberOverFlow)
+      env.warn(env.templateFilename, statement.lineNum, wNumberOverFlow)
       return
-    result = some(Value(kind: vkInt, intv: intPosO.get().integer))
+    let intPos = intPosO.get()
+    let value = Value(kind: vkInt, intv: intPos.integer)
+    assert intPos.length <= matches.length
+    result = some(ValueAndLength(value: value, length: matches.length))
 
 proc getVarOrFunctionValue(env: var Env, compiledMatchers: Compiledmatchers,
-                           statement: Statement, start: Natural): Option[Value] =
+   statement: Statement, start: Natural): Option[ValueAndLength] =
   echo "getVarOrFunctionValue"
 
 proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
-      statement: Statement, start: Natural): Option[Value] =
+      statement: Statement, start: Natural): Option[ValueAndLength] =
+  ## Return the statements right hand side value. The right hand side
+  ## starts at the index specified by start.
 
-  # If the value starts with a quote, it's a string.
-  # quote - string
-  # digit or minus sign - number
-  # a-zA-Z - variable or function
+  # The first character of the right hand side value determines its
+  # type.
+  # * quote -- string
+  # * digit or minus sign -- number
+  # * a-zA-Z -- variable or function
+
   assert start < statement.text.len
 
   let char = statement.text[start]
@@ -192,27 +231,37 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
   elif isLowerAscii(char) or isUpperAscii(char):
     result = getVarOrFunctionValue(env, compiledMatchers, statement, start)
   else:
-    warn("Invalid character, expected a string, number, variable or function.")
-    discard
+    env.warn(env.templateFilename, statement.lineNum,
+             wInvalidRightHandSide, $statement.start)
 
 proc runStatement(env: var Env, statement: Statement, compiledMatchers: Compiledmatchers):
     Option[tuple[nameSpace: string, varName: string, value:Value]] {.tpub.} =
-  ## Run one statement.
+  ## Run one statement. Return the variable name and value.
 
   # Get the variable name. Match the surrounding white space and the
   # equal sign.
   let matchesO = getMatches(compiledMatchers.variableMatcher, statement.text)
   if not matchesO.isSome:
-    env.warn(env.templateFilename, statement.lineNum, wMissingStatementVar, $statement.start)
+    env.warn(env.templateFilename, statement.lineNum,
+             wMissingStatementVar, $statement.start)
     return
   let matches = matchesO.get()
   let (nameSpace, varName) = matches.get2Groups()
 
   # Get the right hand side value.
-  let valueO = getValue(env, compiledMatchers, statement, matches.length)
-  if not matchesO.isSome:
+  let valueAndLengthO = getValue(env, compiledMatchers, statement, matches.length)
+  if not valueAndLengthO.isSome:
     return
-  result = some((nameSpace, varName, valueO.get()))
+
+  # Check that there is not any unprocessed text following the value.
+  let value = valueAndLengthO.get().value
+  let length = valueAndLengthO.get().length
+  if length != statement.text.len:
+    env.warn(env.templateFilename, statement.lineNum,
+             wTextAfterValue)
+    return
+
+  result = some((nameSpace, varName, value))
 
 proc assignSystemVar(env: var Env, nameSpace: string, value: Value) =
   echo "assignSystemVar"
@@ -244,8 +293,17 @@ proc runCommand*(env: var Env, cmdLines: seq[string],
           warn("Unknown variable namespace: $1." % nameSpace)
 
 when defined(test):
-  proc newIntValueO*(number: int | int64): Option[Value] =
-    result = some(Value(kind: vkInt, intv: number))
+  proc newIntValueAndLengthO*(number: int | int64,
+                              length: Natural): Option[ValueAndLength] =
+    let value = Value(kind: vkInt, intv: number)
+    result = some(ValueAndLength(value: value, length: length))
 
-  proc newFloatValueO*(number: float64): Option[Value] =
-    result = some(Value(kind: vkFloat, floatv: number))
+  proc newFloatValueAndLengthO*(number: float64,
+                                length: Natural): Option[ValueAndLength] =
+    let value = Value(kind: vkFloat, floatv: number)
+    result = some(ValueAndLength(value: value, length: length))
+
+  proc newStringValueAndLengthO*(str: string,
+                                 length: Natural): Option[ValueAndLength] =
+    let value = Value(kind: vkString, stringv: str)
+    result = some(ValueAndLength(value: value, length: length))

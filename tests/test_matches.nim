@@ -170,3 +170,30 @@ suite "matches.nim":
   test "getCompiledMatchers":
     let compiledMatchers = getCompiledMatchers()
     check checkMatcher(compiledMatchers.numberMatcher, "a = 5", 4, @[""], 1)
+
+  test "getStringMatcher":
+    var matcher = getStringMatcher()
+    check checkMatcher(matcher, "'hi'", start = 0, expectedStrings = @["hi", ""], expectedLength = 4)
+    check checkMatcher(matcher, "'1234'", 0, @["1234", ""], 6)
+    check checkMatcher(matcher, "'abc def' ", 0, @["abc def", ""], 10)
+    check checkMatcher(matcher, """"string"""", 0, @["", "string"], 8)
+    check checkMatcher(matcher, """"string"  """, 0, @["", "string"], 10)
+    check checkMatcher(matcher, """'12"4'""", 0, @["12\"4", ""], 6)
+    check checkMatcher(matcher, """"12'4"  """, 0, @["", "12'4"], 8)
+    # todo: test utf-8
+
+  test "getStringMatcher with start":
+    var matcher = getStringMatcher()
+    check checkMatcher(matcher, "a = 'hello'", 4, @["hello", ""], 7)
+    check checkMatcher(matcher, "a = '   4 '  ", 4, @["   4 ", ""], 9)
+    check checkMatcher(matcher, """a = "hello" """, 4, @["", "hello"], 8)
+    check checkMatcher(matcher, """a = 'hel"lo' """, 4, @["hel\"lo", ""], 9)
+    check checkMatcher(matcher, """a = "it's true"  """, 4, @["", "it's true"], 13)
+
+  test "getStringMatcherNot":
+    var matcher = getStringMatcher()
+    check checkMatcherNot(matcher, "a = 'b' abc")
+    check checkMatcherNot(matcher, "a = 'abc")
+    check checkMatcherNot(matcher, """'a"bc """)
+    check checkMatcherNot(matcher, "")
+    check checkMatcherNot(matcher, ".")
