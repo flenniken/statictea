@@ -238,18 +238,25 @@ proc runStatement(env: var Env, statement: Statement, compiledMatchers: Compiled
     Option[tuple[nameSpace: string, varName: string, value:Value]] {.tpub.} =
   ## Run one statement. Return the variable name and value.
 
-  # Get the variable name. Match the surrounding white space and the
-  # equal sign.
-  let matchesO = getMatches(compiledMatchers.variableMatcher, statement.text)
-  if not matchesO.isSome:
+  # Get the variable name. Match the surrounding white space.
+  let variableO = getMatches(compiledMatchers.variableMatcher, statement.text)
+  if not variableO.isSome:
     env.warn(env.templateFilename, statement.lineNum,
              wMissingStatementVar, $statement.start)
     return
-  let matches = matchesO.get()
-  let (nameSpace, varName) = matches.get2Groups()
+  let variable = variableO.get()
+  let (nameSpace, varName) = variable.get2Groups()
+
+  let equalSignO = getMatches(compiledMatchers.equalSignMatcher,
+                              statement.text, variable.length)
+  if not equalSignO.isSome:
+    env.warn(env.templateFilename, statement.lineNum,
+             wInvalidVariable, $statement.start)
+  let equalSign = equalSignO.get()
 
   # Get the right hand side value.
-  let valueAndLengthO = getValue(env, compiledMatchers, statement, matches.length)
+  let valueAndLengthO = getValue(env, compiledMatchers, statement,
+                                 variable.length + equalSign.length)
   if not valueAndLengthO.isSome:
     return
 
@@ -266,6 +273,7 @@ proc runStatement(env: var Env, statement: Statement, compiledMatchers: Compiled
 proc assignSystemVar(env: var Env, nameSpace: string, value: Value) =
   echo "assignSystemVar"
 
+# todo: add global variables g. vars.
 # todo: pass in the system vars.
 proc runCommand*(env: var Env, cmdLines: seq[string],
     cmdLineParts: seq[LineParts],

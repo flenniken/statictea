@@ -25,6 +25,9 @@ proc processArgs(env: var Env, args: Args): int =
   elif args.update:
     echo "updateTemplate(args)"
   elif args.templateList.len > 0:
+    # Add the template and result streams to the environment.
+    if not env.addExtraStreams(args):
+      return 1
     result = processTemplate(env, args)
   else:
     env.writeOut("No template name. Use -h for help.")

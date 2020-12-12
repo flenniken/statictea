@@ -25,7 +25,7 @@ proc toString(statements: seq[Statement]): string =
 proc getCmdLineParts(line: string, templateFilename = "template.html",
     lineNum: Natural = 1): Option[LineParts] =
   ## Return the line parts from the given line.
-  var env = openEnv("_testRunCommand.log")
+  var env = openEnvTest("_testRunCommand.log")
   # todo: get pass in the compiledMatchers.
   let compiledMatchers = getCompiledMatchers()
   result = parseCmdLine(env, compiledMatchers, line, templateFilename, lineNum)
@@ -64,7 +64,9 @@ proc testGetNumber(
   ## Return true when the statement contains the expected number. When
   ## it doesn't, show the values and expected values and return false.
 
-  var env = openEnv("_testGetNumber.log")
+  var env = openEnvTest("_testGetNumber.log")
+  env.templateFilename = "template.html"
+
   let compiledMatchers = getCompiledMatchers()
   let valueAndLengthO = getNumber(env, compiledMatchers, statement, start)
   let (logLines, errLines, outLines) = env.readCloseDelete()
@@ -85,7 +87,9 @@ proc testGetString(
   ## Return true when the statement contains the expected string. When
   ## it doesn't, show the values and expected values and return false.
 
-  var env = openEnv("_testGetString.log")
+  var env = openEnvTest("_testGetString.log")
+  env.templateFilename = "template.html"
+
   let compiledMatchers = getCompiledMatchers()
   let valueAndLengthO = getString(env, compiledMatchers, statement, start)
   let (logLines, errLines, outLines) = env.readCloseDelete()
@@ -366,9 +370,8 @@ suite "runCommand.nim":
     check testGetNumber(newStatement("a = -3.4"), 4, newFloatValueAndLengthO(-3.4, 4))
     check testGetNumber(newStatement("a = 88 "), 4, newIntValueAndLengthO(88, 3))
 
-  test "getNumber with extra":
-    let message = "template.html(1): w26: Invalid number, skipping the statement."
-    check testGetNumber(newStatement("a = 5 abc"), 4, none(ValueAndLength), eErrLines = @[message])
+    # Starts with Valid number but invalid statement.
+    check testGetNumber(newStatement("a = 88 abc "), 4, newIntValueAndLengthO(88, 3))
 
   test "getNumber not a number":
     let message = "template.html(1): w26: Invalid number, skipping the statement."

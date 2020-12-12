@@ -27,7 +27,7 @@ proc testProcess(
   var cmdLines: seq[string] = @[]
   var cmdLineParts: seq[LineParts] = @[]
 
-  var env = openEnv("_collectCommand.log")
+  var env = openEnvTest("_collectCommand.log")
   let compiledMatchers = getCompiledMatchers()
   collectCommand(env, lb, compiledMatchers, resultStream, cmdLines, cmdLineParts)
 

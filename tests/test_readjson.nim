@@ -12,7 +12,7 @@ proc testReadJsonFile(filename: string, expectedVars: VarsDict,
     expectedErrLines: seq[string] = @[],
     expectedOutLines: seq[string] = @[] ) =
 
-  var env = openEnv("_readJson.log")
+  var env = openEnvTest("_readJson.log")
 
   var vars = getEmptyVars()
   readJson(env, filename, vars)

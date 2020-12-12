@@ -115,23 +115,48 @@ suite "matches.nim":
 
   test "get variable":
     var matcher = getVariableMatcher()
-    check checkMatcher(matcher, "a = 5", 0, @["", "a"], 4)
-    check checkMatcher(matcher, "t.a = 5", 0, @["t.", "a"], 6)
-    check checkMatcher(matcher, "abc = 5", 0, @["", "abc"], 6)
-    check checkMatcher(matcher, "   a = 5", 0, @["", "a"], 7)
-    check checkMatcher(matcher, "aBcD_t = 5", 0, @["", "aBcD_t"], 9)
-    check checkMatcher(matcher, "t.server = 5", 0, @["t.", "server"], 11)
-    check checkMatcher(matcher, "t.server =", 0, @["t.", "server"], 10)
-    check checkMatcher(matcher, "   a =    5", 0, @["", "a"], 10)
+    check checkMatcher(matcher, "a = 5", 0, @["", "a"], 2)
+    check checkMatcher(matcher, " a = 5 ", 0, @["", "a"], 3)
+    check checkMatcher(matcher, "t.a = 5", 0, @["t.", "a"], 4)
+    check checkMatcher(matcher, "abc = 5", 0, @["", "abc"], 4)
+    check checkMatcher(matcher, "   a = 5", 0, @["", "a"], 5)
+    check checkMatcher(matcher, "aBcD_t = 5", 0, @["", "aBcD_t"], 7)
+    check checkMatcher(matcher, "t.server = 5", 0, @["t.", "server"], 9)
+    check checkMatcher(matcher, "t.server =", 0, @["t.", "server"], 9)
+    check checkMatcher(matcher, "   a =    5", 0, @["", "a"], 5)
+    let longVar = "a23456789_123456789_123456789_123456789_123456789_123456789_1234"
+    check checkMatcher(matcher, longVar, 0, @["", longVar], longVar.len)
+    check checkMatcher(matcher, longVar & " = 5", 0, @["", longVar],
+                                          longVar.len + 1)
 
-    check checkMatcherNot(matcher, "abc", 0)
+    # These start with a variable but are not valid statements.
+    check checkMatcher(matcher, "t. =", 0, @["", "t"], 1)
+    check checkMatcher(matcher, "tt.a =", 0, @["", "tt"], 2)
+    check checkMatcher(matcher, "abc() =", 0, @["", "abc"], 3)
+    check checkMatcher(matcher, "abc", 0, @["", "abc"], 3)
+    check checkMatcher(matcher, "t.1a", 0, @["", "t"], 1)
+    # It matches up to 64 characters.
+    let tooLong = "a23456789_123456789_123456789_123456789_123456789_123456789_12345"
+    check checkMatcher(matcher, tooLong, 0, @["", longVar], longVar.len)
+
     check checkMatcherNot(matcher, ".a =", 0)
-    check checkMatcherNot(matcher, "tt.a =", 0)
     check checkMatcherNot(matcher, "_a =", 0)
     check checkMatcherNot(matcher, "*a =", 0)
     check checkMatcherNot(matcher, "34r =", 0)
     check checkMatcherNot(matcher, "  2 =", 0)
-    check checkMatcherNot(matcher, "abc() =", 0)
+    check checkMatcherNot(matcher, ". =", 0)
+
+  test "get equal sign":
+    var matcher = getEqualSignMatcher()
+    check checkMatcher(matcher, "=5", 0, @["="], 1)
+    check checkMatcher(matcher, "= 5", 0, @["="], 2)
+
+    # Starts with equal sign but not valid statement.
+    check checkMatcher(matcher, "==5", 0, @["="], 1)
+
+    check checkMatcherNot(matcher, " =", 0)
+    check checkMatcherNot(matcher, "2=", 0)
+    check checkMatcherNot(matcher, "a", 0)
 
   test "getNumberMatcher":
     var matcher = getNumberMatcher()
@@ -152,6 +177,11 @@ suite "matches.nim":
     check checkMatcher(matcher, "a = 0.2", 4, @["."], 3)
     check checkMatcher(matcher, "a = 0.2   ", 4, @["."], 6)
 
+    # Starts with a number but not a valid statement.
+    check checkMatcher(matcher, "5a", 0, @[""], 1)
+    check checkMatcher(matcher, "5.5.", 0, @["."], 3)
+    check checkMatcher(matcher, "5.5.6", 0, @["."], 3)
+
   test "getNumberMatcherNot":
     var matcher = getNumberMatcher()
     check checkMatcherNot(matcher, "a = 5 abc")
@@ -166,6 +196,7 @@ suite "matches.nim":
     check checkMatcherNot(matcher, "-a")
     check checkMatcherNot(matcher, ".1") # need a leading digit
     check checkMatcherNot(matcher, "-.1")
+    check checkMatcherNot(matcher, " 4")
 
   test "getCompiledMatchers":
     let compiledMatchers = getCompiledMatchers()

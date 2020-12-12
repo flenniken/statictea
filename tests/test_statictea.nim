@@ -18,7 +18,7 @@ suite "Test statictea.nim":
 
   test "main version":
     let mainFilename = "statictea.nim"
-    var env = openEnv("_logfile1.txt")
+    var env = openEnvTest("_logfile1.txt")
 
     let rc = main(env, @["-v"])
     check rc == 0
@@ -44,7 +44,7 @@ suite "Test statictea.nim":
 
   test "main help":
     let mainFilename = "statictea.nim"
-    var env = openEnv("_logfile2.txt")
+    var env = openEnvTest("_logfile2.txt")
 
     let rc = main(env, @["-h"])
     check rc == 0

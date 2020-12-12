@@ -1713,7 +1713,8 @@ Miscellaneous topics:
    override this with bigger or smaller values.  Default 10.
  - t.maxRepeat -- maximum number of times to repeat a block.
  - Maximum command line length -- 1024 characters.
- - Maximum variable name length -- 64 characters.
+ - Maximum variable name length -- 64 characters, 66 including
+   option prefix.
  - Maximum literal string length -- 256 characters.
  - Maximum json file size -- xxx bytes.
  - Maximum number of items in a list -- 500 items.  Use multiple lists

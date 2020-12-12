@@ -22,7 +22,7 @@ suite "env.nim":
 
   test "log":
     let outMsg = "standard out line"
-    var env = openEnv("_test.log")
+    var env = openEnvTest("_test.log")
     testProc(env)
     env.writeOut(outMsg)
     check env.warningWritten == 0

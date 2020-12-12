@@ -17,32 +17,41 @@ const
 
 type
   Env* = object
+    # These streams get set at the start.
     logEnv*: LogEnv
     errStream*: Stream
     outStream*: Stream
-    warningWritten*: Natural
-    closeStreams: bool
+
+    # You don't close the stderr or stdout.
+    closeErrStream*: bool
+    closeOutStream*: bool
+    closeTemplateStream*: bool
+    closeResultStream*: bool
+
+    # The following streams get set after parsing the command line
+    # options.
     templateFilename*: string
     templateStream*: Stream
     resultFilename*: string
     resultStream*: Stream
 
-proc closeExtraStreams*(env: var Env) =
-  ## Close the template and result streams.
-  # A resultFilename of "" means stdout, don't close it.
-  if env.resultFilename != "" and env.resultStream != nil:
-    env.resultStream.close()
-    env.resultStream = nil
-  if env.templateFilename != "stdin" and env.templateStream != nil:
-    env.templateStream.close()
-    env.templateStream = nil
+    # Count of warnings written.
+    warningWritten*: Natural
 
 proc close*(env: var Env) =
   env.logEnv.close()
-  if env.closeStreams:
+  if env.closeErrStream:
     env.errStream.close()
+    env.errStream = nil
+  if env.closeOutStream:
     env.outStream.close()
-  env.closeExtraStreams()
+    env.outStream = nil
+  if env.closeTemplateStream:
+    env.templateStream.close()
+    env.templateStream = nil
+  if env.closeResultStream:
+    env.resultStream.close()
+    env.resultStream = nil
 
 template log*(env: var Env, message: string) =
   ## Append the message to the log file. The current file and line
@@ -51,18 +60,23 @@ template log*(env: var Env, message: string) =
   env.logEnv.logLine(info.filename, info.line, message)
 
 proc warn(env: var Env, message: string) =
+  ## Write a message to the error stream.
   env.errStream.writeLine(message)
   inc(env.warningWritten)
 
 proc warn*(env: var Env, filename: string, lineNum: int, warning: Warning,
            p1: string = "", p2: string = "") =
+  ## Write a formatted warning message to the error stream.
   let message = getWarning(filename, lineNum, warning, p1, p2)
   warn(env, message)
 
 proc writeOut*(env: var Env, message: string) =
+  ## Write a message to the output stream.
   env.outStream.writeLine(message)
 
 proc checkLogSize(env: var Env) =
+  ## Check the log file size and write a warning message when the file
+  ## is big.
   let logSize = getFileSize(env.logEnv)
   if logSize > logWarnSize:
     let numStr = insertSep($logSize, ',')
@@ -70,80 +84,91 @@ proc checkLogSize(env: var Env) =
     env.log(line)
     env.warn(line)
 
-proc openEnv*(logFilename: string="", warnSize: BiggestInt=logWarnSize
-    ): Env =
-  ## Open the log file, error stream and out stream. When the
-  ## logFilename is not specified, the statictea.log file is used
-  ## along with the stderr and stdout. When you specify a log file
-  ## (used for testing), logging goes to it and the error and warn
-  ## streams are string type streams.
-  var logName: string
-  var closeStreams: bool
-  var errStream: Stream
-  var outStream: Stream
-  when not defined(test):
-    logName = staticteaLog
-    errStream = newFileStream(stderr)
-    outStream = newFileStream(stdout)
-    closeStreams = false
-  else:
-    if logFilename != "":
-      logName = logFilename
-      errStream = newStringStream()
-      outStream = newStringStream()
-      closeStreams = true
+proc openEnvTest*(logFilename: string): Env =
+  ## Open the log, error, and out streams. The given log file is used.
+  ## The error and out streams get created as a string type streams.
 
-  var log = openLogFile(logName)
-  result = Env(logEnv: log, errStream: errStream, outStream: outStream,
-               closeStreams: closeStreams)
+  var logEnv = openLogFile(logFilename)
+  result = Env(
+    logEnv: logEnv,
+    errStream: newStringStream(), closeErrStream: true,
+    outStream: newStringStream(), closeOutStream: true,
+  )
+  checkLogSize(result)
 
-  # When running tests set the template name.
-  when defined(test):
-    if logFilename != "":
-      result.templateFilename = "template.html"
+proc openEnv*(logFilename: string = staticteaLog, warnSize: BiggestInt
+                 = logWarnSize): Env =
+  ## Open the log, error, and out streams. The statictea.log file is
+  ## used by default. Stderr and stdout are used for err and out
+  ## streams.
 
+  var logEnv = openLogFile(logFilename)
+  result = Env(
+    logEnv: logEnv,
+    errStream: newFileStream(stderr),
+    outStream: newFileStream(stdout),
+  )
   checkLogSize(result)
 
 proc addExtraStreams*(env: var Env, args: Args): bool =
   ## Add the template and result streams to the environment. Return
   ## true on success.
 
-  assert env.templateFilename == ""
-  assert env.templateStream == nil
-  assert env.resultFilename == ""
-  assert env.resultStream == nil
-
   # Get the template filename.
   assert args.templateList.len > 0
   if args.templateList.len > 1:
     let skipping = join(args.templateList[1..^1], ", ")
     env.warn("starting", 0, wOneTemplateAllowed, skipping)
-  env.templateFilename = args.templateList[0]
+  let templateFilename = args.templateList[0]
+
+  # You can only call it once.
+  assert env.templateFilename == ""
+  assert env.templateStream == nil
+  assert env.resultFilename == ""
+  assert env.resultStream == nil
 
   # Open the template stream.
-  if env.templateFilename == "stdin":
-    env.templateStream = newFileStream(stdin)
-    if env.templateStream == nil:
+  var tStream: Stream
+  var closeTStream: bool
+  if templateFilename == "stdin":
+    tStream = newFileStream(stdin)
+    if tStream == nil:
       env.warn("startup", 0, wCannotOpenStd, "stdin")
       return
   else:
-    if not fileExists(env.templateFilename):
-      env.warn("startup", 0, wFileNotFound, env.templateFilename)
+    if not fileExists(templateFilename):
+      env.warn("startup", 0, wFileNotFound, templateFilename)
       return
-    env.templateStream = newFileStream(env.templateFilename, fmRead)
-    if env.templateStream == nil:
-      env.warn("startup", 0, wUnableToOpenFile, env.templateFilename)
+    tStream = newFileStream(templateFilename, fmRead)
+    if tStream == nil:
+      env.warn("startup", 0, wUnableToOpenFile, templateFilename)
       return
+    closeTStream = true
+
+  env.templateFilename = templateFilename
+  env.templateStream = tStream
+  env.closeTemplateStream = closeTStream
+
+  # Get the result filename.
+  let resultFilename = args.resultFilename
 
   # Open the result stream.
-  if args.resultFilename == "":
-    env.resultStream = env.outStream
+  var rStream: Stream
+  var closeRStream: bool
+  if resultFilename == "":
+    # No result filename means use standard out.
+    rStream = env.outStream
   else:
-    env.resultStream = newFileStream(args.resultFilename, fmWrite)
-    if env.resultStream == nil:
-      env.warn("startup", 0, wUnableToOpenFile, args.resultFilename)
+    rStream = newFileStream(resultFilename, fmWrite)
+    if rStream == nil:
+      env.warn("startup", 0, wUnableToOpenFile, resultFilename)
       return
-    env.resultFilename = args.resultFilename
+    closeRStream = true
+
+  env.resultFilename = resultFilename
+  env.resultStream = rStream
+  env.closeResultStream = closeRStream
+
   result = true
 
 when defined(test):
@@ -155,11 +180,10 @@ when defined(test):
 
   proc readCloseDelete*(env: var Env): tuple[logLine: seq[string],
       errLines: seq[string], outLines: seq[string]] =
-    if not env.closeStreams:
-      return
-    result = (env.logEnv.closeReadDelete(20),
-      env.errStream.readAndClose(), env.outStream.readAndClose())
-    discard tryRemoveFile(env.logEnv.filename)
+    if env.closeErrStream and env.closeOutStream:
+      result = (env.logEnv.closeReadDelete(20),
+        env.errStream.readAndClose(), env.outStream.readAndClose())
+      discard tryRemoveFile(env.logEnv.filename)
 
   proc echoLines*(logLines, errLines, outLines: seq[string]) =
     echo "=== log ==="
@@ -218,6 +242,11 @@ when defined(test):
 
     if valueAndLengthO == eValueAndLengthO:
       return true
+
+    if not isSome(eValueAndLengthO):
+      echo "Expected nothing be got something."
+      echo $valueAndLengthO
+      return false
 
     let value = valueAndLengthO.get().value
     let length = valueAndLengthO.get().length

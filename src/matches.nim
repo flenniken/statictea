@@ -33,6 +33,7 @@ type
     prefixMatcher*: Matcher
     commandMatcher*: Matcher
     variableMatcher*: Matcher
+    equalSignMatcher*: Matcher
     spaceTabMatcher*: Matcher
     numberMatcher*: Matcher
     stringMatcher*: Matcher
@@ -67,6 +68,7 @@ proc getLastPartMatcher*(postfix: string): Matcher =
   ## Get the matcher that matches the optional continuation slash, the
   ## optional postfix and the line endings. The postfix used is
   ## remembered in the matcher object.
+  # Note: nim sets the regex anchor option.
   var pattern: string
   if postfix == "":
     pattern = r"([\\]{0,1})([\r]{0,1}\n){0,1}$"
@@ -112,19 +114,36 @@ proc notEmptyOrSpaces*(spaceTabMatcher: Matcher, text: string): bool =
       result = true
 
 proc getVariableMatcher*(): Matcher =
-  ## Match a variable, equal sign and surrounding whitespace.
-  ## Return the optional namespace and the required name.
-  result = newMatcher(r"^\s*([a-z]\.){0,1}([a-zA-Z][a-zA-Z0-9_]*)\s*=\s*", 2)
+  ## Match a variable and surrounding whitespace.
+  ##
+  ## A variable starts with an optional prefix followed by a required
+  ## variable name. The prefix is a lowercase letter followed by a
+  ## period. The variable name starts with a letter followed by
+  ## letter, digits and underscores. The variable name length is 1 to
+  ## 64 characters. Variables are ascii.
+  ##
+  ## The match stops on the first non matching character. You need to
+  ## check the next character to see whether it makes sense in the
+  ## statement, for example, "t." matches and returns "t".
+  # Note: nim sets the regex anchor option.
+  result = newMatcher(r"\s*([a-z]\.){0,1}([a-zA-Z][a-zA-Z0-9_]{0,63})\s*", 2)
+
+proc getEqualSignMatcher*(): Matcher =
+  ## Match an equal sign and the optional following white space.
+  # Note: nim sets the regex anchor option.
+  result = newMatcher(r"(=)\s*", 1)
 
 proc getNumberMatcher*(): Matcher =
-  ## Match a number. Return the optional decimal point
-  ## that tells whether the number is a float or integer.
+  ## Match a number and the optional trailing whitespace. Return the
+  ## optional decimal point that tells whether the number is a float
+  ## or integer.
+  ##
+  ## A number starts with an optional minus sign, followed by a digit,
+  ## followed by digits, underscores or a decimal point. Only one
+  ## decimal point is allowed and underscores are skipped.  Note: nim
+  ## sets the regex anchor option.
 
-  # A number starts with an optional minus sign, followed by a
-  # digit, followed by digits, underscores or a decimal point. Only
-  # one decimal point is allowed and underscores are skipped.
-  # note: nim sets the regex anchor option.
-  result = newMatcher(r"[-]{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*\s*$", 1)
+  result = newMatcher(r"-{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*\s*", 1)
 
 proc getStringMatcher*(): Matcher =
   ## Match a string.
@@ -132,6 +151,7 @@ proc getStringMatcher*(): Matcher =
   # A string is inside quotes, either single or double quotes. The
   # optional white space after the string is matched too.  Note: nim
   # sets the regex anchor option.
+
   result = newMatcher("""'([^']*)'\s*$|"([^"]*)"\s*""", 2)
 
 proc getCompiledMatchers*(prepostList: seq[Prepost] = @[]): CompiledMatchers =
@@ -143,4 +163,5 @@ proc getCompiledMatchers*(prepostList: seq[Prepost] = @[]): CompiledMatchers =
   result.variableMatcher = getVariableMatcher()
   result.spaceTabMatcher = getSpaceTabMatcher()
   result.numberMatcher = getNumberMatcher()
+  result.equalSignMatcher = getEqualSignMatcher()
   result.stringMatcher = getStringMatcher()

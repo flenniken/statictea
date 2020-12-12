@@ -40,6 +40,7 @@ type
     wTextAfterValue, # w31
     wInvalidUtf8, # w32
     wInvalidRightHandSide, # 33
+    wInvalidVariable, # 34
 
 tpubType:
   const
@@ -80,6 +81,7 @@ tpubType:
       "Unprocessed text at the end of the statement.", # wTextAfterValue
       "Invalid UTF-8 byte in the string at column $1.", # wInvalidUtf8
       "Invalid right hand side, expected a string, number, variable or function.", # wInvalidRightHandSide
+      "The statement at column $1 has an invalid variable or is missing an equal sign.", # wInvalidVariable
     ]
 
 func getWarning*(filename: string, lineNum: int,

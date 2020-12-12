@@ -75,14 +75,9 @@ proc processTemplateLines(env: var Env, serverVars: VarsDict, sharedVars: VarsDi
 
     # Process the replacement block.
 
-
 proc processTemplate*(env: var Env, args: Args): int =
   ## Process the template and return 0 on success. It's an error when
   ## a warning messages was written.
-
-  # Add the template and result streams to the environment.
-  if not env.addExtraStreams(args):
-    return 1
 
   # Read the server json.
   var serverVars = getEmptyVars()
@@ -96,9 +91,6 @@ proc processTemplate*(env: var Env, args: Args): int =
 
   # Process the template.
   processTemplateLines(env, serverVars, sharedVars, args.prepostList)
-
-  # Close the template and result streams.
-  env.closeExtraStreams()
 
   if env.warningWritten > 0:
     result = 1
