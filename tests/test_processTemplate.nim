@@ -17,65 +17,72 @@ suite "processTemplate":
     check lines.len == 1
     check lines[0] == "Hello"
 
-  # todo don't skip
-  # test "processTemplate to stdout":
-  #   var env = openEnv("_processTemplate.log")
+  test "processTemplate to stdout":
+    var env = openEnvTest("_processTemplateToStdout.log")
 
-  #   let templateFilename = "template.html"
-  #   createFile(templateFilename, "Hello")
-  #   defer: discard tryRemoveFile(templateFilename)
+    let templateFilename = "template.html"
+    createFile(templateFilename, "Hello")
+    defer: discard tryRemoveFile(templateFilename)
 
-  #   var args: Args
-  #   args.templateList = @["template.html"]
-  #   check env.addExtraStreams(args) == true
-  #   check env.templateFilename == templateFilename
-  #   check env.resultFilename == ""
+    var args: Args
+    args.templateList = @["template.html"]
+    check env.addExtraStreams(args) == true
+    check env.templateFilename == templateFilename
+    check env.resultFilename == ""
 
-  #   let rc = processTemplate(env, args)
-  #   check rc == 0
+    let rc = processTemplate(env, args)
+    check rc == 0
 
-  #   let (logLines, errLines, outLines) = env.readCloseDelete()
-  #   # echoLines(logLines, errLines, outLines)
-  #   check logLines.len == 0
-  #   check errLines.len == 0
-  #   check outLines.len == 1
-  #   check outLines[0] == "Hello"
+    let (logLines, errLines, outLines) = env.readCloseDelete()
+    # echoLines(logLines, errLines, outLines)
+    check logLines.len == 0
+    check errLines.len == 0
+    check outLines.len == 1
+    check outLines[0] == "Hello"
 
-  #   env.close()
+    env.close()
 
-  # test "processTemplate to file":
-  #   skip() # todo don't skip
+  test "processTemplate to file":
+    var env = openEnvTest("_processTemplateToFile.log")
 
-  #   var env = openEnv()
+    # Create template file.
+    let templateFilename = "template.html"
+    createFile(templateFilename, "Hello")
+    defer: discard tryRemoveFile(templateFilename)
+    var lines = readLines(templateFilename, maximum=4)
+    check lines.len == 1
+    check lines[0] == "Hello"
 
-  #   let templateFilename = "template.html"
-  #   createFile(templateFilename, "Hello")
-  #   defer: discard tryRemoveFile(templateFilename)
-  #   var lines = readLines(templateFilename, maximum=4)
-  #   check lines.len == 1
-  #   check lines[0] == "Hello"
+    # Add the template and result file to the environment.
+    var args: Args
+    args.templateList = @[templateFilename]
+    args.resultFilename = "resultToFile.txt"
+    let success = env.addExtraStreams(args)
+    check success == true
+    check env.templateFilename == templateFilename
+    check env.resultFilename == args.resultFilename
+    check env.resultStream != nil
+    check env.templateStream != nil
 
-  #   var args: Args
-  #   args.templateList = @[templateFilename]
-  #   args.resultFilename = "resultToFile.txt"
-  #   let success = env.addExtraStreams(args)
-  #   check success == true
-  #   check env.templateFilename == templateFilename
-  #   check env.resultFilename == args.resultFilename
+    # echo "template stream:"
+    # echoStream(env.templateStream)
 
-  #   let rc = processTemplate(env, args)
+    # Process the template and write out the result.
+    let rc = processTemplate(env, args)
 
-  #   let (logLines, errLines, outLines) = env.readCloseDelete()
-  #   # echoLines(logLines, errLines, outLines)
-  #   check logLines.len == 0
-  #   check errLines.len == 0
-  #   check outLines.len == 0
+    # Read the log, err and out streams.
+    let (logLines, errLines, outLines) = env.readCloseDelete()
+    # echoLines(logLines, errLines, outLines)
+    check logLines.len == 0
+    check errLines.len == 0
+    check outLines.len == 0
 
-  #   lines = readLines(args.resultFilename, maximum=4)
-  #   check lines.len == 1
-  #   check lines[0] == "Hello"
+    # Read the result file.
+    let resultLines = env.readCloseDeleteResult()
+    check resultLines.len == 1
+    check resultLines[0] == "Hello"
 
-  #   # The template and result streams should be closed.
-  #   env.close()
-  #   check env.templateStream == nil
-  #   check env.resultStream == nil
+    # The template and result streams should be closed.
+    env.close()
+    check env.templateStream == nil
+    check env.resultStream == nil

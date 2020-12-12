@@ -156,10 +156,11 @@ proc addExtraStreams*(env: var Env, args: Args): bool =
   var rStream: Stream
   var closeRStream: bool
   if resultFilename == "":
-    # No result filename means use standard out.
+    # No result filename means use the out stream. The out stream might
+    # be a string stream or standard out.
     rStream = env.outStream
   else:
-    rStream = newFileStream(resultFilename, fmWrite)
+    rStream = newFileStream(resultFilename, fmReadWrite)
     if rStream == nil:
       env.warn("startup", 0, wUnableToOpenFile, resultFilename)
       return
@@ -172,11 +173,39 @@ proc addExtraStreams*(env: var Env, args: Args): bool =
   result = true
 
 when defined(test):
+  # You treat string streams different than file streams. Once you
+  # close a string stream the data is gone, so you need to read it
+  # before and you need to set the position at the start.
+
+  proc readStream*(stream: Stream): seq[string] =
+    let pos = stream.getPosition()
+    stream.setPosition(0)
+    for line in stream.lines():
+      result.add line
+    stream.setPosition(pos)
+
+  proc echoStream*(stream: Stream) =
+    if stream == nil:
+      echo "nil stream"
+    else:
+      try:
+        echo readStream(stream)
+      except:
+        echo "Unable to read the stream."
+        echo "Is it open for reading?"
+        echo "Is it stdout or stderr?"
+
   proc readAndClose(stream: Stream): seq[string] =
     stream.setPosition(0)
     for line in stream.lines():
       result.add line
     stream.close()
+
+  proc readCloseDeleteResult*(env: var Env): seq[string] =
+    # If the result is going to stdout, read it to get the result.
+    if env.closeResultStream:
+      result = env.resultStream.readAndClose()
+      discard tryRemoveFile(env.resultFilename)
 
   proc readCloseDelete*(env: var Env): tuple[logLine: seq[string],
       errLines: seq[string], outLines: seq[string]] =
