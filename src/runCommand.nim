@@ -208,12 +208,13 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
 
 proc getFunctionValue(env: var Env, compiledMatchers:
                       Compiledmatchers, name: string, statement:
-                        Statement, start: Natural):
+                        Statement, start: Natural, variables: Variables):
                           Option[ValueAndLength] =
   echo "asdf"
 
-proc getVarOrFunctionValue(env: var Env, compiledMatchers: Compiledmatchers,
-   statement: Statement, start: Natural): Option[ValueAndLength] =
+proc getVarOrFunctionValue(env: var Env, compiledMatchers:
+           Compiledmatchers, statement: Statement,
+           start: Natural, variables: Variables): Option[ValueAndLength] =
   echo "getVarOrFunctionValue"
   # a = len(name)
   # a = len (name)
@@ -239,20 +240,20 @@ proc getVarOrFunctionValue(env: var Env, compiledMatchers: Compiledmatchers,
       # We have a function, run it.
       let parentheses = parenthesesO.get()
       return getFunctionValue(env, compiledMatchers, varName, statement,
-                         variable.length+parentheses.length)
+                              variable.length+parentheses.length, variables)
 
   # We have a variable, return its value.
 
-  # todo: need access to the variable dictionaries.
+  # todo: look up the variable and return its value
+  # todo: show warning when the variable doesn't exist.
   # let value = Value(kind: vkString, stringv: str)
   # return some(ValueAndLength(value: value, length: matches.length))
 
 
 
-
-
 proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
-      statement: Statement, start: Natural): Option[ValueAndLength] =
+              statement: Statement, start: Natural, variables:
+                Variables): Option[ValueAndLength] =
   ## Return the statements right hand side value and the length
   ## matched. The right hand side starts at the index specified by
   ## start.
@@ -272,12 +273,15 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
   elif char in { '0' .. '9', '-' }:
     result = getNumber(env, compiledMatchers, statement, start)
   elif isLowerAscii(char) or isUpperAscii(char):
-    result = getVarOrFunctionValue(env, compiledMatchers, statement, start)
+    result = getVarOrFunctionValue(env, compiledMatchers, statement,
+                                   start, variables)
   else:
     env.warn(env.templateFilename, statement.lineNum,
              wInvalidRightHandSide, $statement.start)
 
-proc runStatement(env: var Env, statement: Statement, compiledMatchers: Compiledmatchers):
+proc runStatement(env: var Env, statement: Statement,
+                  compiledMatchers: Compiledmatchers, variables:
+                    Variables):
     Option[tuple[nameSpace: string, varName: string, value:Value]] {.tpub.} =
   ## Run one statement. Return the variable namespace, name and value.
 
@@ -299,7 +303,8 @@ proc runStatement(env: var Env, statement: Statement, compiledMatchers: Compiled
 
   # Get the right hand side value.
   let valueAndLengthO = getValue(env, compiledMatchers, statement,
-                                 variable.length + equalSign.length)
+                                 variable.length + equalSign.length,
+                                 variables)
   if not valueAndLengthO.isSome:
     return
 
@@ -322,7 +327,8 @@ proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
   for statement in yieldStatements(cmdLines, cmdLineParts):
     # Run the statement.  When there is a statement error, no
     # nameValue is returned and we skip the statement.
-    let nameValueO = runStatement(env, statement, compiledMatchers)
+    let nameValueO = runStatement(env, statement, compiledMatchers,
+                                  variables)
     if nameValueO.isSome():
       # Assign the variable to its dictionary.
       let tup = nameValueO.get()
