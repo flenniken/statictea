@@ -13,6 +13,7 @@ import strUtils
 import warnings
 import parseNumber
 import unicode
+import variables
 
 type
   State = enum
@@ -205,14 +206,56 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
     assert intPos.length <= matches.length
     result = some(ValueAndLength(value: value, length: matches.length))
 
+proc getFunctionValue(env: var Env, compiledMatchers:
+                      Compiledmatchers, name: string, statement:
+                        Statement, start: Natural):
+                          Option[ValueAndLength] =
+  echo "asdf"
+
 proc getVarOrFunctionValue(env: var Env, compiledMatchers: Compiledmatchers,
    statement: Statement, start: Natural): Option[ValueAndLength] =
   echo "getVarOrFunctionValue"
+  # a = len(name)
+  # a = len (name)
+  # a = concat(name, " ", asdf)
+  # a = concat(upper(name), " ", asdf)
+
+  # A function name looks like a variable without the namespace part and
+  # it is followed by a (.
+
+  # Get the variable or function name. Match the surrounding white space.
+  let variableO = getMatches(compiledMatchers.variableMatcher, statement.text)
+  if not variableO.isSome:
+    env.warn(env.templateFilename, statement.lineNum,
+             wInvalidRightHandSide, $statement.start)
+    return
+  let variable = variableO.get()
+  let (nameSpace, varName) = variable.get2Groups()
+  if nameSpace == "":
+    # We might have a variable or a function.
+    let parenthesesO = getMatches(compiledMatchers.leftParenthesesMatcher,
+                                statement.text, variable.length)
+    if parenthesesO.isSome:
+      # We have a function, run it.
+      let parentheses = parenthesesO.get()
+      return getFunctionValue(env, compiledMatchers, varName, statement,
+                         variable.length+parentheses.length)
+
+  # We have a variable, return its value.
+
+  # todo: need access to the variable dictionaries.
+  # let value = Value(kind: vkString, stringv: str)
+  # return some(ValueAndLength(value: value, length: matches.length))
+
+
+
+
 
 proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
       statement: Statement, start: Natural): Option[ValueAndLength] =
-  ## Return the statements right hand side value. The right hand side
-  ## starts at the index specified by start.
+  ## Return the statements right hand side value and the length
+  ## matched. The right hand side starts at the index specified by
+  ## start.
 
   # The first character of the right hand side value determines its
   # type.
@@ -236,7 +279,7 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
 
 proc runStatement(env: var Env, statement: Statement, compiledMatchers: Compiledmatchers):
     Option[tuple[nameSpace: string, varName: string, value:Value]] {.tpub.} =
-  ## Run one statement. Return the variable name and value.
+  ## Run one statement. Return the variable namespace, name and value.
 
   # Get the variable name. Match the surrounding white space.
   let variableO = getMatches(compiledMatchers.variableMatcher, statement.text)
@@ -270,16 +313,10 @@ proc runStatement(env: var Env, statement: Statement, compiledMatchers: Compiled
 
   result = some((nameSpace, varName, value))
 
-proc assignSystemVar(env: var Env, nameSpace: string, value: Value) =
-  echo "assignSystemVar"
-
-# todo: add global variables g. vars.
-# todo: pass in the system vars.
-proc runCommand*(env: var Env, cmdLines: seq[string],
-    cmdLineParts: seq[LineParts],
-    serverVars: VarsDict, sharedVars: VarsDict,
-    compiledMatchers: CompiledMatchers): VarsDict =
-  ## Run a command and return the local variables defined by it.
+proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
+                 seq[LineParts], compiledMatchers: CompiledMatchers,
+                 variables: var Variables) =
+  ## Run a command and return fill in the local variables dictionary.
 
   # Loop over the statements and run each one.
   for statement in yieldStatements(cmdLines, cmdLineParts):
@@ -292,9 +329,10 @@ proc runCommand*(env: var Env, cmdLines: seq[string],
       let (nameSpace, varName, value) = tup
       case nameSpace:
         of "":
-          result[varName] = value
+          variables.local[varName] = value
         of "t.":
-          assignSystemVar(env, nameSpace, value)
+          # todo: check that it is ok to assign to this tea variable.
+          variables.tea[varName] = value
         of "s.", "h.":
           warn("You cannot overwrite the server or shared variables.")
         else:

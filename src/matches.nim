@@ -37,6 +37,7 @@ type
     spaceTabMatcher*: Matcher
     numberMatcher*: Matcher
     stringMatcher*: Matcher
+    leftParenthesesMatcher*: Matcher
 
 iterator combine(list1: openArray[Prepost], list2: openArray[Prepost]): Prepost =
   ## Iterate through list1 then list2.
@@ -133,6 +134,11 @@ proc getEqualSignMatcher*(): Matcher =
   # Note: nim sets the regex anchor option.
   result = newMatcher(r"(=)\s*", 1)
 
+proc getLeftParenthesesMatcher*(): Matcher =
+  ## Match a left parentheses and the optional following white space.
+  # Note: nim sets the regex anchor option.
+  result = newMatcher(r"\(\s*", 0)
+
 proc getNumberMatcher*(): Matcher =
   ## Match a number and the optional trailing whitespace. Return the
   ## optional decimal point that tells whether the number is a float
@@ -165,3 +171,4 @@ proc getCompiledMatchers*(prepostList: seq[Prepost] = @[]): CompiledMatchers =
   result.numberMatcher = getNumberMatcher()
   result.equalSignMatcher = getEqualSignMatcher()
   result.stringMatcher = getStringMatcher()
+  result.leftParenthesesMatcher = getLeftParenthesesMatcher()

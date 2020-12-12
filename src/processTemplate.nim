@@ -3,14 +3,13 @@
 import args
 import warnings
 import env
-import readjson
-import vartypes
 import matches
 import readlines
 import options
 import parseCmdLine
 import collectCommand
 import runCommand
+import variables
 
 #[
 
@@ -45,7 +44,7 @@ unchanged.
 
 ]#
 
-proc processTemplateLines(env: var Env, serverVars: VarsDict, sharedVars: VarsDict,
+proc processTemplateLines(env: var Env, variables: var Variables,
     prepostList: seq[Prepost]) =
   ## Process the given template file.
 
@@ -65,13 +64,14 @@ proc processTemplateLines(env: var Env, serverVars: VarsDict, sharedVars: VarsDi
     # command is found, collect its lines and return them.
     var cmdLines: seq[string] = @[]
     var cmdLineParts: seq[LineParts] = @[]
-    collectCommand(env, lb, compiledMatchers, env.resultStream, cmdLines, cmdLineParts)
+    collectCommand(env, lb, compiledMatchers, env.resultStream,
+                   cmdLines, cmdLineParts)
     if cmdLines.len == 0:
       break # done, no more lines
 
-    # Run the command.
-    let localVars = runCommand(env, cmdLines, cmdLineParts,
-                               serverVars, sharedVars, compiledMatchers)
+    # Run the command and fill in the variables.
+    runCommand(env, cmdLines, cmdLineParts, compiledMatchers,
+               variables)
 
     # Process the replacement block.
 
@@ -79,18 +79,10 @@ proc processTemplate*(env: var Env, args: Args): int =
   ## Process the template and return 0 on success. It's an error when
   ## a warning messages was written.
 
-  # Read the server json.
-  var serverVars = getEmptyVars()
-  for filename in args.serverList:
-    readJson(env, filename, serverVars)
-
-  # Read the shared json.
-  var sharedVars = getEmptyVars()
-  for filename in args.sharedList:
-    readJson(env, filename, sharedVars)
+  var variables = readJsonVariables(env, args)
 
   # Process the template.
-  processTemplateLines(env, serverVars, sharedVars, args.prepostList)
+  processTemplateLines(env, variables, args.prepostList)
 
   if env.warningWritten > 0:
     result = 1

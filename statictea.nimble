@@ -108,7 +108,7 @@ task hello, "Say hello":
 task boo, "Say boo":
   echo "boo"
 
-task newfile, "Create a new source file and an associated test file.":
+task newfile, "Create a new source file and an associated test file: newfile name":
   let count = system.paramCount()+1
   let name = system.paramStr(count-1)
   if name == "newfile":

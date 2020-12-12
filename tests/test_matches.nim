@@ -228,3 +228,15 @@ suite "matches.nim":
     check checkMatcherNot(matcher, """'a"bc """)
     check checkMatcherNot(matcher, "")
     check checkMatcherNot(matcher, ".")
+
+  test "getLeftParenthesesMatcher":
+    var matcher = getLeftParenthesesMatcher()
+    check checkMatcher(matcher, "(", 0, @[], 1)
+    check checkMatcher(matcher, "( ", 0, @[], 2)
+    check checkMatcher(matcher, "( 5", 0, @[], 2)
+    check checkMatcher(matcher, "( 'abc'", 0, @[], 2)
+
+    check checkMatcherNot(matcher, ", (", 0)
+    check checkMatcherNot(matcher, "2(", 0)
+    check checkMatcherNot(matcher, "abc(", 0)
+    check checkMatcherNot(matcher, " (", 0)
