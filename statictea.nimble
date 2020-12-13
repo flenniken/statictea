@@ -55,16 +55,16 @@ proc get_test_module_cmd(filename: string, release = false): string =
 
 # Tasks below
 
-task b, "Build the statictea exe.":
+task b, "\tBuild the statictea exe.":
   exec "nimble build"
 
-task r, "Run statictea.":
+task r, "\tRun statictea.":
   exec "./statictea"
 
-task tree, "Show the project directory tree.":
+task tree, "\tShow the project directory tree.":
   exec "tree -I '*.nims' | less"
 
-task t, "Run tests":
+task t, "\tRun tests":
   let test_filenames = get_test_filenames()
   for filename in test_filenames:
     if filename == "testall.nim":
@@ -72,13 +72,24 @@ task t, "Run tests":
     let cmd = get_test_module_cmd(filename)
     exec cmd
 
-task showTests, "Show tests":
+task showtests, "Show tests":
   let test_filenames = get_test_filenames()
   for filename in test_filenames:
     echo ""
     echo "$1:" % filename
     let cmd = get_test_module_cmd(filename)
     echo cmd
+
+task showtest, "Show one test: showtest name":
+  let count = system.paramCount()+1
+  let name = system.paramStr(count-1)
+  if name == "showtest":
+     echo "Specify part of the test name."
+     return
+  let test_filenames = get_test_filenames()
+  for filename in test_filenames:
+    if name in filename:
+      echo get_test_module_cmd(filename)
 
 proc doc_module(name: string) =
   let cmd = "nim doc --hints:off -d:test --index:on --out:docs/html/$1.html src/$1.nim" % [name]
@@ -89,28 +100,28 @@ proc open_in_browser(filename: string) =
   ## Open the given file in a browser if the system has an open command.
   exec "(hash open 2>/dev/null && open $1) || echo 'open $1'" % filename
 
-task docs1, "Build docs for one module.":
+task docs1, "\tBuild docs for one module.":
   doc_module("loggers")
   open_in_browser("docs/html/loggers.html")
 
-task tt, "Compile and run t.nim":
+task tt, "\tCompile and run t.nim":
   let cmd = "nim c -r --hints:off --outdir:bin/tests/ src/t.nim"
   echo cmd
   exec cmd
 
-task args, "show command line arguments":
+task args, "\tshow command line arguments":
   let count = system.paramCount()+1
   echo "argument count: $1" % $count
   for i in 0..count-1:
     echo "$1: $2" % [$i, system.paramStr(i)]
 
-task hello, "Say hello":
+task hello, "\tSay hello":
   echo "hello there"
 
-task boo, "Say boo":
+task boo, "\tSay boo":
   echo "boo"
 
-task newfile, "Create a new source file and an associated test file: newfile name":
+task newfile, "\tCreate a new source file and an associated test file: newfile name":
   let count = system.paramCount()+1
   let name = system.paramStr(count-1)
   if name == "newfile":
@@ -155,7 +166,7 @@ suite "$1.nim":
   # file2.write(testFilenameContent)
   # file2.close()
 
-task testonefile, "Run all the tests at once from one file. 5x faster":
+task testall, "\tRun all the tests at once from one file. 5x faster":
   exec """ls -1 tests | grep -v testall | sed 's/\.nim//' | awk '{print "include", $0}' > tests/testall.nim"""
   let cmd = get_test_module_cmd("testall.nim")
   exec cmd
