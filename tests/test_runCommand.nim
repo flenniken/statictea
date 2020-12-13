@@ -9,7 +9,8 @@ import env
 import matches
 import collectCommand
 import vartypes
-
+import variables
+import tables
 
 proc newStrFromBuffer(buffer: seq[uint8]): string =
   result = newStringOfCap(buffer.len)
@@ -118,6 +119,38 @@ proc compareStatements(statements: seq[Statement], eContent: string): bool =
       echo "expected: $1" % expected
       return false
   return true
+
+proc testGetVariable(nameSpace: string, varName: string, eValueO:
+                     Option[Value] = none(Value), eErrLines:
+                        seq[string] = @[]): bool =
+
+  var env = openEnvTest("_getVariable.log")
+  env.templateFilename = "template.html"
+
+  let statement = newStatement("test statement", 12, 4)
+  var variables = newVariables()
+  let value1 = Value(kind: vkString, stringv: "hello")
+  variables.server["test"] = value1
+  let value2 = Value(kind: vkString, stringv: "there")
+  variables.shared["test"] = value2
+  let value3 = Value(kind: vkInt, intv: 5)
+  variables.local["five"] = value3
+  let value4 = Value(kind: vkInt, intv: 5)
+  variables.tea["five"] = value4
+  let value5 = Value(kind: vkFloat, floatv: 5.11)
+  variables.global["aboutfive"] = value5
+
+  let valueO = getVariable(env, statement, variables, namespace, varName)
+
+  let (logLines, errLines, outLines) = env.readCloseDelete()
+
+  notReturn expectedItem("value", valueO, eValueO)
+
+
+  notReturn logLines.len == 0
+  notReturn expectedItems("errLines", errLines, eErrLines)
+  notReturn outLines.len == 0
+  result = true
 
 suite "runCommand.nim":
 
@@ -435,3 +468,37 @@ suite "runCommand.nim":
       "template.html(1): w30: Invalid string.",
     ]
     check testGetString(newStatement("a = 'abc"), 4, none(ValueAndLength), eErrLines = messages)
+
+  test "getVariable server":
+    let value = Value(kind: vkString, stringv: "hello")
+    check testGetVariable("s.", "test", some(value))
+
+  test "getVariable shared":
+    let value = Value(kind: vkString, stringv: "there")
+    check testGetVariable("h.", "test", some(value))
+
+  test "getVariable local":
+    let value = Value(kind: vkInt, intv: 5)
+    check testGetVariable("", "five", some(value))
+
+  test "getVariable tea":
+    let value = Value(kind: vkInt, intv: 5)
+    check testGetVariable("t.", "five", some(value))
+
+  test "getVariable global":
+    let value = Value(kind: vkFloat, floatv: 5.11)
+    check testGetVariable("g.", "aboutfive", some(value))
+
+  test "getVariable missing":
+    let eErrLines = @[
+      "template.html(12): w37: The statement starting at column 4 has an error.",
+      "template.html(12): w36: The variable 's.missing' does not exist.",
+    ]
+    check testGetVariable("s.", "missing", eErrLines = eErrLines)
+
+  test "getVariable invalid namespace":
+    let eErrLines = @[
+      "template.html(12): w37: The statement starting at column 4 has an error.",
+      "template.html(12): w35: The variable namespace 'd.' does not exist.",
+    ]
+    check testGetVariable("d.", "key", eErrLines = eErrLines)

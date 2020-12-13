@@ -24,3 +24,7 @@ proc readJsonVariables*(env: var Env, args: Args): Variables =
   result.shared = getEmptyVars()
   for filename in args.sharedList:
     readJson(env, filename, result.shared)
+
+when defined(test):
+  func newVariables*(): Variables =
+    return

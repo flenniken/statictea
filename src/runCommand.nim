@@ -217,7 +217,7 @@ proc getFunctionValue(env: var Env, compiledMatchers:
                           Option[ValueAndLength] =
   echo "asdf"
 
-proc getVariable(env: var Env, statement: Statement, variables:
+proc getVariable*(env: var Env, statement: Statement, variables:
                  Variables, nameSpace: string, varName: string): Option[Value] =
   ## Look up the variable and return its value. Show an error when the
   ## variable doesn't exists.
