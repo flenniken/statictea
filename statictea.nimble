@@ -67,6 +67,8 @@ task tree, "Show the project directory tree.":
 task t, "Run tests":
   let test_filenames = get_test_filenames()
   for filename in test_filenames:
+    if filename == "testall.nim":
+      continue
     let cmd = get_test_module_cmd(filename)
     exec cmd
 
@@ -152,3 +154,9 @@ suite "$1.nim":
   # var file2 = open(testFilename, fmWrite)
   # file2.write(testFilenameContent)
   # file2.close()
+
+task testonefile, "Run all the tests at once from one file. 5x faster":
+  exec """ls -1 tests | grep -v testall | sed 's/\.nim//' | awk '{print "include", $0}' > tests/testall.nim"""
+  let cmd = get_test_module_cmd("testall.nim")
+  exec cmd
+  exec "rm tests/testall.nim"

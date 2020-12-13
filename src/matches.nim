@@ -172,3 +172,10 @@ proc getCompiledMatchers*(prepostList: seq[Prepost] = @[]): CompiledMatchers =
   result.equalSignMatcher = getEqualSignMatcher()
   result.stringMatcher = getStringMatcher()
   result.leftParenthesesMatcher = getLeftParenthesesMatcher()
+
+when defined(test):
+  proc checkGetLastPart*(matcher: Matcher, line: string, expectedStart: Natural,
+      expected: seq[string], expectedLength: Natural): bool =
+    let matchesO = getLastPart(matcher, line)
+    result = checkMatches(matchesO, matcher, line, expectedStart,
+      expected, expectedLength)

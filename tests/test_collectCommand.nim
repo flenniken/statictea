@@ -8,7 +8,7 @@ import parseCmdLine
 import collectCommand
 import strutils
 
-proc testProcess(
+proc testCollectCommand(
     content: string,
     eCmdLines: seq[string],
     eCmdLineParts: seq[LineParts],
@@ -68,7 +68,7 @@ three
     let content = "<--!$ nextline -->\n"
     let eCmdLines = @[content]
     let eCmdLineParts = @[newLineParts()]
-    check testProcess(content, eCmdLines, eCmdLineParts)
+    check testCollectCommand(content, eCmdLines, eCmdLineParts)
 
   test "two lines":
     let content = """
@@ -80,7 +80,7 @@ three
       newLineParts(continuation = true),
       newLineParts(lineNum = 2, command = ":", middleStart = 8)
     ]
-    check testProcess(content, eCmdLines, eCmdLineParts)
+    check testCollectCommand(content, eCmdLines, eCmdLineParts)
 
   test "three lines":
     let content = """
@@ -95,13 +95,13 @@ three
         middleLen = 4, continuation = true),
       newLineParts(lineNum = 3, command = ":", middleStart = 8, middleLen = 14)
     ]
-    check testProcess(content, eCmdLines, eCmdLineParts)
+    check testCollectCommand(content, eCmdLines, eCmdLineParts)
 
   test "non command":
     let content = "not a command\n"
     let eCmdLines: seq[string] = @[]
     let eCmdLineParts: seq[LineParts] = @[]
-    check testProcess(content, eCmdLines, eCmdLineParts,
+    check testCollectCommand(content, eCmdLines, eCmdLineParts,
       eResultStreamLines = @[content])
 
   test "non command 2":
@@ -111,7 +111,7 @@ still not
 more stuff no newline at end"""
     let eCmdLines: seq[string] = @[]
     let eCmdLineParts: seq[LineParts] = @[]
-    check testProcess(content, eCmdLines, eCmdLineParts,
+    check testCollectCommand(content, eCmdLines, eCmdLineParts,
                       eResultStreamLines = splitNewLines(content))
 
   test "command and non command":
@@ -123,7 +123,7 @@ the next line
     let split = splitNewLines(content)
     let eCmdLines = @[split[1]]
     let eCmdLineParts = @[newLineParts(lineNum = 2)]
-    check testProcess(content, eCmdLines, eCmdLineParts,
+    check testCollectCommand(content, eCmdLines, eCmdLineParts,
       eResultStreamLines = @[split[0]])
 
   test "regular line not continuation line":
@@ -133,7 +133,7 @@ asdf
 """
     let warning = "template.html(2): w24: Missing the continuation line, " &
       "abandoning the command."
-    check testProcess(content, @[], @[],
+    check testCollectCommand(content, @[], @[],
                       eResultStreamLines = splitNewLines(content),
                       eErrLines = @[warning])
 
@@ -145,7 +145,7 @@ asdf
 """
     let warning = "template.html(2): w24: Missing the continuation line, " &
       "abandoning the command."
-    check testProcess(content, @[], @[],
+    check testCollectCommand(content, @[], @[],
                       eResultStreamLines = splitNewLines(content),
                       eErrLines = @[warning])
 
@@ -156,13 +156,13 @@ asdf
 """
     let warning = "template.html(1): w24: Missing the continuation line, " &
       "abandoning the command."
-    check testProcess(content, @[], @[],
+    check testCollectCommand(content, @[], @[],
                       eResultStreamLines = splitNewLines(content),
                       eErrLines = @[warning])
 
   test "empty file":
     let content = ""
-    check testProcess(content, @[], @[])
+    check testCollectCommand(content, @[], @[])
 
 
   test "more lines after dumping":
@@ -175,7 +175,7 @@ ttasdfasdf
 """
     let warning = "template.html(2): w24: Missing the continuation line, " &
       "abandoning the command."
-    check testProcess(content, @[], @[],
+    check testCollectCommand(content, @[], @[],
                       eResultStreamLines = splitNewLines(content),
                       eErrLines = @[warning])
 
@@ -196,7 +196,7 @@ asdf
       "abandoning the command."
     let p = splitNewLines(content)
     let eResultStreamLines = @[p[0], p[1], p[2], p[3], p[4]]
-    check testProcess(content, eCmdLines, eCmdLineParts,
+    check testCollectCommand(content, eCmdLines, eCmdLineParts,
                       eResultStreamLines = eResultStreamLines,
                       eErrLines = @[warning])
 
@@ -216,6 +216,6 @@ asdf
     let warning2 = "template.html(7): w24: Missing the continuation line, " &
       "abandoning the command."
     let eResultStreamLines = splitNewLines(content)
-    check testProcess(content, @[], @[],
+    check testCollectCommand(content, @[], @[],
                       eResultStreamLines = eResultStreamLines,
                       eErrLines = @[warning1, warning2])
