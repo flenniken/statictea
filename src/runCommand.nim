@@ -50,6 +50,13 @@ func newStatement*(text: string, lineNum: Natural = 1,
     start: Natural = 1): Statement =
   result = Statement(lineNum: lineNum, start: start, text: text)
 
+proc warnStatement*(env: var Env, statement: Statement, warning:
+                    Warning, p1: string = "", p2: string = "") =
+  ## Warning about an invalid statement. Tell which statement then show
+  ## the problem.
+  env.warn(statement.lineNum, wStatementError, $statement.start)
+  env.warn(statement.lineNum, warning, p1, p2)
+
 #[
 
 When an error is detected on a statement, the error message tells the
@@ -148,8 +155,7 @@ proc getString*(env: var Env, compiledMatchers: Compiledmatchers,
   # Check that we have a statictea string.
   var matchesO = compiledMatchers.stringMatcher.getMatches(statement.text, start)
   if not matchesO.isSome:
-    env.warn(env.templateFilename, statement.lineNum,
-             wNotString, $statement.start)
+    env.warnStatement(statement, wNotString)
     return
 
   # Get the string. The string is either in s1 or s2, s1 means single
@@ -162,8 +168,7 @@ proc getString*(env: var Env, compiledMatchers: Compiledmatchers,
   var pos = validateUtf8(str)
   if pos != -1:
     let column = start + pos + 1
-    env.warn(env.templateFilename, statement.lineNum,
-             wInvalidUtf8, $column)
+    env.warnStatement(statement, wInvalidUtf8, $column)
     return
 
   let value = Value(kind: vkString, stringv: str)
@@ -177,7 +182,7 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
   # Check that we have a statictea number.
   var matchesO = compiledMatchers.numberMatcher.getMatches(statement.text, start)
   if not matchesO.isSome:
-    env.warn(env.templateFilename, statement.lineNum, wNotNumber)
+    env.warnStatement(statement, wNotNumber)
     return
 
   # The decimal point determines whether the number is an integer or
@@ -189,7 +194,7 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
     # Parse the float.
     let floatPosO = parseFloat64(statement.text, start)
     if not floatPosO.isSome:
-      env.warn(env.templateFilename, statement.lineNum, wNumberOverFlow)
+      env.warnStatement(statement, wNumberOverFlow)
       return
     let floatPos = floatPosO.get()
     let value = Value(kind: vkFloat, floatv: floatPos.number)
@@ -199,7 +204,7 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
     # Parse the int.
     let intPosO = parseInteger(statement.text, start)
     if not intPosO.isSome:
-      env.warn(env.templateFilename, statement.lineNum, wNumberOverFlow)
+      env.warnStatement(statement, wNumberOverFlow)
       return
     let intPos = intPosO.get()
     let value = Value(kind: vkInt, intv: intPos.integer)
@@ -211,6 +216,34 @@ proc getFunctionValue(env: var Env, compiledMatchers:
                         Statement, start: Natural, variables: Variables):
                           Option[ValueAndLength] =
   echo "asdf"
+
+proc getVariable(env: var Env, statement: Statement, variables:
+                 Variables, nameSpace: string, varName: string): Option[Value] =
+  ## Look up the variable and return its value. Show an error when the
+  ## variable doesn't exists.
+  case nameSpace:
+    of "":
+      if varName in variables.local:
+        return some(variables.local[varName])
+    of "s.":
+      if varName in variables.server:
+        return some(variables.server[varName])
+    of "h.":
+      if varName in variables.shared:
+        return some(variables.shared[varName])
+    of "g.":
+      if varName in variables.global:
+        return some(variables.global[varName])
+    of "t.":
+      if varName in variables.tea:
+        return some(variables.tea[varName])
+    else:
+      # Invalid namespace.
+      env.warnStatement(statement, wInvalidNameSpace, nameSpace)
+      return
+
+  # Variable does not exists.
+  env.warnStatement(statement, wVariableMissing, nameSpace & varName)
 
 proc getVarOrFunctionValue(env: var Env, compiledMatchers:
            Compiledmatchers, statement: Statement,
@@ -227,13 +260,12 @@ proc getVarOrFunctionValue(env: var Env, compiledMatchers:
   # Get the variable or function name. Match the surrounding white space.
   let variableO = getMatches(compiledMatchers.variableMatcher, statement.text)
   if not variableO.isSome:
-    env.warn(env.templateFilename, statement.lineNum,
-             wInvalidRightHandSide, $statement.start)
+    env.warnStatement(statement, wInvalidRightHandSide)
     return
   let variable = variableO.get()
   let (nameSpace, varName) = variable.get2Groups()
   if nameSpace == "":
-    # We might have a variable or a function.
+    # We have a variable or a function.
     let parenthesesO = getMatches(compiledMatchers.leftParenthesesMatcher,
                                 statement.text, variable.length)
     if parenthesesO.isSome:
@@ -242,14 +274,12 @@ proc getVarOrFunctionValue(env: var Env, compiledMatchers:
       return getFunctionValue(env, compiledMatchers, varName, statement,
                               variable.length+parentheses.length, variables)
 
-  # We have a variable, return its value.
-
-  # todo: look up the variable and return its value
-  # todo: show warning when the variable doesn't exist.
-  # let value = Value(kind: vkString, stringv: str)
-  # return some(ValueAndLength(value: value, length: matches.length))
-
-
+  # We have a variable, look it up and return its value.  Show a
+  # warning when the variable doesn't exist.
+  let valueO = getVariable(env, statement, variables, nameSpace,
+                           varName)
+  if isSome(valueO):
+    result = some(ValueAndLength(value: valueO.get(), length: variable.length))
 
 proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
               statement: Statement, start: Natural, variables:
@@ -276,8 +306,7 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
     result = getVarOrFunctionValue(env, compiledMatchers, statement,
                                    start, variables)
   else:
-    env.warn(env.templateFilename, statement.lineNum,
-             wInvalidRightHandSide, $statement.start)
+    env.warnStatement(statement, wInvalidRightHandSide)
 
 proc runStatement(env: var Env, statement: Statement,
                   compiledMatchers: Compiledmatchers, variables:
@@ -288,8 +317,7 @@ proc runStatement(env: var Env, statement: Statement,
   # Get the variable name. Match the surrounding white space.
   let variableO = getMatches(compiledMatchers.variableMatcher, statement.text)
   if not variableO.isSome:
-    env.warn(env.templateFilename, statement.lineNum,
-             wMissingStatementVar, $statement.start)
+    env.warnStatement(statement, wMissingStatementVar)
     return
   let variable = variableO.get()
   let (nameSpace, varName) = variable.get2Groups()
@@ -297,8 +325,8 @@ proc runStatement(env: var Env, statement: Statement,
   let equalSignO = getMatches(compiledMatchers.equalSignMatcher,
                               statement.text, variable.length)
   if not equalSignO.isSome:
-    env.warn(env.templateFilename, statement.lineNum,
-             wInvalidVariable, $statement.start)
+    env.warnStatement(statement, wInvalidVariable)
+    return
   let equalSign = equalSignO.get()
 
   # Get the right hand side value.
@@ -312,8 +340,7 @@ proc runStatement(env: var Env, statement: Statement,
   let value = valueAndLengthO.get().value
   let length = valueAndLengthO.get().length
   if length != statement.text.len:
-    env.warn(env.templateFilename, statement.lineNum,
-             wTextAfterValue)
+    env.warnStatement(statement, wTextAfterValue)
     return
 
   result = some((nameSpace, varName, value))

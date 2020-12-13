@@ -64,7 +64,7 @@ task r, "\tRun statictea.":
 task tree, "\tShow the project directory tree.":
   exec "tree -I '*.nims' | less"
 
-task t, "\tRun tests":
+task testallslow, "\tRun tests":
   let test_filenames = get_test_filenames()
   for filename in test_filenames:
     if filename == "testall.nim":
@@ -166,8 +166,11 @@ suite "$1.nim":
   # file2.write(testFilenameContent)
   # file2.close()
 
-task testall, "\tRun all the tests at once from one file. 5x faster":
-  exec """ls -1 tests | grep -v testall | sed 's/\.nim//' | awk '{print "include", $0}' > tests/testall.nim"""
+task t, "\tRun all tests":
+  exec """
+ls -1 tests | grep -v testall | sed 's/\.nim//' |
+awk '{printf "include %s\n", $0}' > tests/testall.nim
+"""
   let cmd = get_test_module_cmd("testall.nim")
   exec cmd
   exec "rm tests/testall.nim"

@@ -41,6 +41,9 @@ type
     wInvalidUtf8, # w32
     wInvalidRightHandSide, # 33
     wInvalidVariable, # 34
+    wInvalidNameSpace, # 35
+    wVariableMissing, # 36
+    wStatementError, # 37
 
 tpubType:
   const
@@ -76,12 +79,15 @@ tpubType:
       "Invalid number, skipping the statement.", # wNotNumber
       "The number is too big or too small, skipping the statement.", # wNumberOverFlow
       "Not enough memory for the line buffer.", # wNotEnoughMemoryForLB
-      "The statement starting at column $1 does not start with a variable name.", # wMissingStatementVar
-      "Invalid string in the statement starting at column $1.", # wNotString
-      "Unprocessed text at the end of the statement.", # wTextAfterValue
+      "Statement does not start with a variable name.", # wMissingStatementVar
+      "Invalid string.", # wNotString
+      "Unused text at the end of the statement.", # wTextAfterValue
       "Invalid UTF-8 byte in the string at column $1.", # wInvalidUtf8
-      "Invalid right hand side, expected a string, number, variable or function.", # wInvalidRightHandSide
-      "The statement at column $1 has an invalid variable or is missing an equal sign.", # wInvalidVariable
+      "Expected a string, number, variable or function on the right hand side.", # wInvalidRightHandSide
+      "Invalid variable or missing equal sign.", # wInvalidVariable
+      "The variable namespace '$1' does not exist.", # wInvalidNameSpace
+      "The variable '$1' does not exist.", # wVariableMissing
+      "The statement starting at column $1 has an error.", # wStatementError
     ]
 
 func getWarning*(filename: string, lineNum: int,

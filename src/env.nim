@@ -67,7 +67,15 @@ proc warn(env: var Env, message: string) =
 proc warn*(env: var Env, filename: string, lineNum: int, warning: Warning,
            p1: string = "", p2: string = "") =
   ## Write a formatted warning message to the error stream.
+  # todo: replace this with the warn below. No need to pass in the filename.
   let message = getWarning(filename, lineNum, warning, p1, p2)
+  warn(env, message)
+
+proc warn*(env: var Env, lineNum: Natural, warning: Warning, p1:
+           string = "", p2: string = "") =
+  ## Write a formatted warning message to the error stream.
+  let message = getWarning(env.templateFilename, lineNum,
+                           warning, p1, p2)
   warn(env, message)
 
 proc writeOut*(env: var Env, message: string) =

@@ -371,15 +371,24 @@ suite "runCommand.nim":
     check testGetNumber(newStatement("a = 88 "), 4, newIntValueAndLengthO(88, 3))
 
     # Starts with Valid number but invalid statement.
-    check testGetNumber(newStatement("a = 88 abc "), 4, newIntValueAndLengthO(88, 3))
+    check testGetNumber(newStatement("a = 88 abc "), 4,
+                        newIntValueAndLengthO(88, 3))
 
   test "getNumber not a number":
-    let message = "template.html(1): w26: Invalid number, skipping the statement."
-    check testGetNumber(newStatement("a = -abc"), 4, none(ValueAndLength), eErrLines = @[message])
+    let messages = @[
+      "template.html(1): w37: The statement starting at column 1 has an error.",
+      "template.html(1): w26: Invalid number, skipping the statement.",
+    ]
+    check testGetNumber(newStatement("a = -abc"), 4,
+                        none(ValueAndLength), eErrLines = messages)
 
   test "getNumberIntTooBig":
-    let message = "template.html(1): w27: The number is too big or too small, skipping the statement."
-    check testGetNumber(newStatement("a = 9_223_372_036_854_775_808"), 4, none(ValueAndLength), eErrLines = @[message])
+    let messages = @[
+      "template.html(1): w37: The statement starting at column 1 has an error.",
+      "template.html(1): w27: The number is too big or too small, skipping the statement.",
+    ]
+    check testGetNumber(newStatement("a = 9_223_372_036_854_775_808"),
+                        4, none(ValueAndLength), eErrLines = messages)
 
   test "getString":
     check testGetString(newStatement("a = 'hello'"), 4, newStringValueAndLengthO("hello", 7))
@@ -414,9 +423,15 @@ suite "runCommand.nim":
     for buffer in byteBuffers:
       str = newStrFromBuffer(buffer)
     var statement = "a = '$1'" % str
-    var message = "template.html(1): w32: Invalid UTF-8 byte in the string at column 5."
-    check testGetString(newStatement(statement), 4, none(ValueAndLength), eErrLines = @[message])
+    var messages = @[
+      "template.html(1): w37: The statement starting at column 1 has an error.",
+      "template.html(1): w32: Invalid UTF-8 byte in the string at column 5.",
+    ]
+    check testGetString(newStatement(statement), 4, none(ValueAndLength), eErrLines = messages)
 
   test "getString not string":
-    let message = "template.html(1): w30: Invalid string in the statement starting at column 1."
-    check testGetString(newStatement("a = 'abc"), 4, none(ValueAndLength), eErrLines = @[message])
+    let messages = @[
+      "template.html(1): w37: The statement starting at column 1 has an error.",
+      "template.html(1): w30: Invalid string.",
+    ]
+    check testGetString(newStatement("a = 'abc"), 4, none(ValueAndLength), eErrLines = messages)
