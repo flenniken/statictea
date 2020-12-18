@@ -245,17 +245,20 @@ proc getVariable*(env: var Env, statement: Statement, variables:
   # Variable does not exists.
   env.warnStatement(statement, wVariableMissing, nameSpace & varName)
 
-proc getVarOrFunctionValue(env: var Env, compiledMatchers:
+# a = len(name)
+# a = len (name)
+# a = concat(name, " ", asdf)
+# a = concat(upper(name), " ", asdf)
+
+# A function name looks like a variable without the namespace part and
+# it is followed by a (.
+
+proc getVarOrFunctionValue*(env: var Env, compiledMatchers:
            Compiledmatchers, statement: Statement,
            start: Natural, variables: Variables): Option[ValueAndLength] =
-  echo "getVarOrFunctionValue"
-  # a = len(name)
-  # a = len (name)
-  # a = concat(name, " ", asdf)
-  # a = concat(upper(name), " ", asdf)
-
-  # A function name looks like a variable without the namespace part and
-  # it is followed by a (.
+  ## Return the statements right hand side value and the length
+  ## matched. The right hand side starts at the index specified by
+  ## start.
 
   # Get the variable or function name. Match the surrounding white space.
   let variableO = getMatches(compiledMatchers.variableMatcher, statement.text)

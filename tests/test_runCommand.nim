@@ -120,35 +120,55 @@ proc compareStatements(statements: seq[Statement], eContent: string): bool =
       return false
   return true
 
+func getTestVariables(): Variables =
+  result = newVariables()
+  let value1 = Value(kind: vkString, stringv: "hello")
+  result.server["test"] = value1
+  let value2 = Value(kind: vkString, stringv: "there")
+  result.shared["test"] = value2
+  let value3 = Value(kind: vkInt, intv: 5)
+  result.local["five"] = value3
+  let value4 = Value(kind: vkInt, intv: 5)
+  result.tea["five"] = value4
+  let value5 = Value(kind: vkFloat, floatv: 5.11)
+  result.global["aboutfive"] = value5
+
+
 proc testGetVariable(nameSpace: string, varName: string, eValueO:
                      Option[Value] = none(Value), eErrLines:
                         seq[string] = @[]): bool =
 
   var env = openEnvTest("_getVariable.log")
   env.templateFilename = "template.html"
-
   let statement = newStatement("test statement", 12, 4)
-  var variables = newVariables()
-  let value1 = Value(kind: vkString, stringv: "hello")
-  variables.server["test"] = value1
-  let value2 = Value(kind: vkString, stringv: "there")
-  variables.shared["test"] = value2
-  let value3 = Value(kind: vkInt, intv: 5)
-  variables.local["five"] = value3
-  let value4 = Value(kind: vkInt, intv: 5)
-  variables.tea["five"] = value4
-  let value5 = Value(kind: vkFloat, floatv: 5.11)
-  variables.global["aboutfive"] = value5
+  var variables = getTestVariables()
 
   let valueO = getVariable(env, statement, variables, namespace, varName)
 
   let (logLines, errLines, outLines) = env.readCloseDelete()
-
   notReturn expectedItem("value", valueO, eValueO)
-
-
   notReturn logLines.len == 0
   notReturn expectedItems("errLines", errLines, eErrLines)
+  notReturn outLines.len == 0
+  result = true
+
+proc testGetVarOrFunctionValue(statement: Statement, start: Natural,
+                               eValueAndLengthO: Option[ValueAndLength]
+                                   = none(ValueAndLength), eErrLines:
+                                     seq[string] = @[]): bool =
+  var env = openEnvTest("_getVariable.log")
+  env.templateFilename = "template.html"
+  var variables = getTestVariables()
+  let compiledMatchers = getCompiledMatchers()
+
+  let valueAndLengthO = getVarOrFunctionValue(env, compiledMatchers,
+                                              statement, start,
+                                              variables)
+
+  let (logLines, errLines, outLines) = env.readCloseDelete()
+  notReturn expectedItems("errLines", errLines, eErrLines)
+  notReturn expectedItem("valueAndLength", valueAndLengthO, eValueAndLengthO)
+  notReturn logLines.len == 0
   notReturn outLines.len == 0
   result = true
 
@@ -502,3 +522,10 @@ suite "runCommand.nim":
       "template.html(12): w35: The variable namespace 'd.' does not exist.",
     ]
     check testGetVariable("d.", "key", eErrLines = eErrLines)
+
+  test "getVarOrFunctionValue":
+    let start = 6
+    let statement = newStatement(text="tea = five", lineNum=12, start)
+    let value = Value(kind: vkInt, intv: 5)
+    let eValueAndLengthO = some(ValueAndLength(value: value, length: 4))
+    check testGetVarOrFunctionValue(statement, start, eValueAndLengthO)
