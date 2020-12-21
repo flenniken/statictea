@@ -30,8 +30,7 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
     if line == "":
       break # No more lines.
 
-    var linePartsO = parseCmdLine(env, compiledMatchers,
-        line, lb.filename, lb.lineNum)
+    var linePartsO = parseCmdLine(env, compiledMatchers, line, lb.lineNum)
 
     if not linePartsO.isSome:
       # Write out non-command lines.
@@ -51,7 +50,7 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
         line = lb.readline()
         if line != "":
           linePartsO = parseCmdLine(env, compiledMatchers,
-              line, lb.filename, lb.lineNum)
+              line, lb.lineNum)
           if linePartsO.isSome:
             lineParts = linePartsO.get()
             if lineParts.command == ":":

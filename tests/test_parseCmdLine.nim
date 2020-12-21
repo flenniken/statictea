@@ -8,7 +8,6 @@ import strutils
 
 proc testParseCmdLine(
     line: string,
-    templateFilename: string = "template.html",
     lineNum: Natural = 1,
     expectedLineParts: LineParts,
     expectedLogLines: seq[string] = @[],
@@ -18,8 +17,10 @@ proc testParseCmdLine(
   ## Return true on success.
 
   var env = openEnvTest("_parseCmdLine.log")
+  env.templateFilename = "template.html"
+
   let compiledMatchers = getCompiledMatchers()
-  let linePartsO = parseCmdLine(env, compiledMatchers, line, templateFilename, lineNum)
+  let linePartsO = parseCmdLine(env, compiledMatchers, line, lineNum)
 
   let (logLines, errLines, outLines) = env.readCloseDelete()
 
@@ -65,7 +66,6 @@ proc testParseCmdLine(
 
 proc parseCmdLineError(
     line: string,
-    templateFilename: string = "template.html",
     lineNum: Natural = 12,
     expectedLogLines: seq[string] = @[],
     expectedErrLines: seq[string] = @[],
@@ -74,9 +74,9 @@ proc parseCmdLineError(
   ## when we get the expected errors.
 
   var env = openEnvTest("_parseCmdLine.log")
-
+  env.templateFilename = "template.html"
   let compiledMatchers = getCompiledMatchers()
-  let linePartsO = parseCmdLine(env, compiledMatchers, line, templateFilename, lineNum)
+  let linePartsO = parseCmdLine(env, compiledMatchers, line, lineNum)
 
   let (logLines, errLines, outLines) = env.readCloseDelete()
 
@@ -182,11 +182,10 @@ suite "parseCmdLine.nim":
 
   test "no command error":
     let line = "<--!$ -->\n"
-    let expectedWarn = "initializing(12): w22: No command found at column 7, skipping line."
+    let expectedWarn = "template.html(12): w22: No command found at column 7, skipping line."
     check parseCmdLineError(line, expectedErrLines = @[expectedWarn])
 
   test "no postfix error":
     let line = "<--!$ nextline \n"
-    let expectedWarn = """initializing(16): w23: The matching closing comment postfix was not found, expected: "-->"."""
-    check parseCmdLineError(line, templateFilename = "hello.html",
-      lineNum = 16, expectedErrLines = @[expectedWarn])
+    let expectedWarn = """template.html(16): w23: The matching closing comment postfix was not found, expected: "-->"."""
+    check parseCmdLineError(line, lineNum = 16, expectedErrLines = @[expectedWarn])

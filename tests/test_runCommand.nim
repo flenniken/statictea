@@ -24,13 +24,13 @@ proc toString(statements: seq[Statement]): string =
     lines.add "$1: $2" % [$(ix+1), $statement]
   result = join(lines, "\n")
 
+# todo: remove templateFilename argument, it is part of the env.
 proc getCmdLineParts(line: string, templateFilename = "template.html",
     lineNum: Natural = 1): Option[LineParts] =
   ## Return the line parts from the given line.
   var env = openEnvTest("_testRunCommand.log")
-  # todo: get pass in the compiledMatchers.
   let compiledMatchers = getCompiledMatchers()
-  result = parseCmdLine(env, compiledMatchers, line, templateFilename, lineNum)
+  result = parseCmdLine(env, compiledMatchers, line, lineNum)
   # todo: remove open and close of the env.
   discard env.readCloseDelete()
 
