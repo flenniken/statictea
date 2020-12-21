@@ -62,7 +62,7 @@ tpubType:
       "Unknown argument: $1.", # wUnknownArg
       "One result file allowed, skipping: '$1'.", # wOneResultAllowed
       "Skipping extra prepost text: $1.", # wExtraPrepostText
-      "One template file allowed, skipping: $1.", # wOneTemplateAllowed
+      "One template file allowed on the command line, skipping: $1.", # wOneTemplateAllowed
       "No prepost value. Use $1=\"...\".", # wNoPrepostValue
       "Skipping extra prepost text: $1.", # wSkippingExtraPrepost
       "Unable to open log file: '$1'.", # wUnableToOpenLogFile

@@ -51,24 +51,24 @@ proc readJson*(env: var Env, filename: string, vars: var VarsDict) =
   ## Read a json file and add the variables to the vars dictionary.
 
   if not fileExists(filename):
-    env.warn("read json", 0, wFileNotFound, filename)
+    env.warn(0, wFileNotFound, filename)
     return
 
   var stream: Stream
   stream = newFileStream(filename)
   if stream == nil:
-    env.warn("read json", 0, wUnableToOpenFile, filename)
+    env.warn(0, wUnableToOpenFile, filename)
     return
 
   var rootNode: JsonNode
   try:
      rootNode = parseJson(stream, filename)
   except:
-    env.warn("read json", 0, wJsonParseError, filename)
+    env.warn(0, wJsonParseError, filename)
     return
 
   if rootNode.kind != JObject:
-    env.warn("read json", 0, wInvalidJsonRoot, filename)
+    env.warn(0, wInvalidJsonRoot, filename)
     return
 
   for key, jnode in rootNode:

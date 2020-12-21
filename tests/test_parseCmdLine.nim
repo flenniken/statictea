@@ -182,11 +182,11 @@ suite "parseCmdLine.nim":
 
   test "no command error":
     let line = "<--!$ -->\n"
-    let expectedWarn = "template.html(12): w22: No command found at column 7, skipping line."
+    let expectedWarn = "initializing(12): w22: No command found at column 7, skipping line."
     check parseCmdLineError(line, expectedErrLines = @[expectedWarn])
 
   test "no postfix error":
     let line = "<--!$ nextline \n"
-    let expectedWarn = """hello.html(16): w23: The matching closing comment postfix was not found, expected: "-->"."""
+    let expectedWarn = """initializing(16): w23: The matching closing comment postfix was not found, expected: "-->"."""
     check parseCmdLineError(line, templateFilename = "hello.html",
       lineNum = 16, expectedErrLines = @[expectedWarn])

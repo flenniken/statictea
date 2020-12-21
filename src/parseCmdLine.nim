@@ -16,6 +16,7 @@ type
     ending*: string
     lineNum*: Natural
 
+# todo: remove templateFilename, it's part of the env.
 proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
     line: string, templateFilename: string, lineNum: Natural):
     Option[LineParts] =
@@ -40,7 +41,7 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
   # Get the command.
   let commandMatchO = getMatches(cm.commandMatcher, line, prefixMatch.length)
   if not isSome(commandMatchO):
-    env.warn(templateFilename, lineNum, wNoCommand, $(prefixMatch.length+1))
+    env.warn(lineNum, wNoCommand, $(prefixMatch.length+1))
     return
   var commandMatch = commandMatchO.get()
   lineParts.command = commandMatch.getGroup()
@@ -56,7 +57,7 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
   var lastPartMatcher = getLastPartMatcher(lineParts.postfix)
   let lastPartO = getLastPart(lastPartMatcher, line)
   if not isSome(lastPartO):
-    env.warn(templateFilename, lineNum, wNoPostfix, lineParts.postfix)
+    env.warn(lineNum, wNoPostfix, lineParts.postfix)
     return
   var lastPart = lastPartO.get()
   let (continuation, ending) = lastPart.get2Groups()

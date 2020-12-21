@@ -53,11 +53,11 @@ proc main(env: var Env, argv: seq[string]): int {.tpub.} =
     result = 1
     let msg = getCurrentExceptionMsg()
     env.log(msg)
-    env.warn("error exit", 0, wUnexpectedException)
-    env.warn("error exit", 0, wExceptionMsg, msg)
+    env.warn(0, wUnexpectedException)
+    env.warn(0, wExceptionMsg, msg)
     # The stack trace is only available in the debug builds.
     when not defined(release):
-      env.warn("exiting", 0, wStackTrace, getCurrentException().getStackTrace())
+      env.warn(0, wStackTrace, getCurrentException().getStackTrace())
   env.log("Done")
 
 when isMainModule:

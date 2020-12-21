@@ -18,6 +18,7 @@ proc testReadJsonFile(filename: string, expectedVars: VarsDict,
   readJson(env, filename, vars)
 
   let (logLines, errLines, outLines) = env.readCloseDelete()
+  # echoLines(logLines, errLines, outLines)
   check expectedLogLines == logLines
   check expectedErrLines == errLines
   check expectedoutLines == outLines
@@ -38,13 +39,13 @@ proc testReadJsonContent(jsonContent: string, expectedVars: VarsDict,
 suite "readjson.nim":
 
   test "readJson file not found":
-    let expectedErrLines = @["read json(0): w16: File not found: missing."]
+    let expectedErrLines = @["initializing(0): w16: File not found: missing."]
     var expectedValue = getEmptyVars()
     testReadJsonFile("missing", expectedValue, expectedErrLines=expectedErrLines)
 
   test "readJson cannot open file":
     let expectedErrLines =
-      @["read json(0): w17: Unable to open file: _cannotopen.tmp."]
+      @["initializing(0): w17: Unable to open file: _cannotopen.tmp."]
     let expectedValue = getEmptyVars()
     let filename = "_cannotopen.tmp"
     defer: discard tryRemoveFile(filename)
@@ -53,12 +54,12 @@ suite "readjson.nim":
     testReadJsonFile(filename, expectedValue, expectedErrLines=expectedErrLines)
 
   test "readJson parse error":
-    let expectedErrLines = @["read json(0): w15: Unable to parse the json file. Skipping file: _readJson.json."]
+    let expectedErrLines = @["initializing(0): w15: Unable to parse the json file. Skipping file: _readJson.json."]
     let expectedValue = getEmptyVars()
     testReadJsonContent("{", expectedValue, expectedErrLines=expectedErrLines)
 
   test "readJson no root object":
-    let expectedErrLines = @["read json(0): w14: The root json element must be an object. Skipping file: _readJson.json."]
+    let expectedErrLines = @["initializing(0): w14: The root json element must be an object. Skipping file: _readJson.json."]
     let expectedValue = getEmptyVars()
     testReadJsonContent("[5]", expectedValue, expectedErrLines=expectedErrLines)
 

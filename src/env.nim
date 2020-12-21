@@ -64,18 +64,20 @@ proc warn*(env: var Env, message: string) =
   env.errStream.writeLine(message)
   inc(env.warningWritten)
 
-proc warn*(env: var Env, filename: string, lineNum: int, warning: Warning,
-           p1: string = "", p2: string = "") =
-  ## Write a formatted warning message to the error stream.
-  # todo: replace this with the warn below. No need to pass in the filename.
-  let message = getWarning(filename, lineNum, warning, p1, p2)
-  warn(env, message)
+# proc warn*(env: var Env, filename: string, lineNum: int, warning: Warning,
+#            p1: string = "", p2: string = "") =
+#   ## Write a formatted warning message to the error stream.
+#   # todo: replace this with the warn below. No need to pass in the filename.
+#   let message = getWarning(filename, lineNum, warning, p1, p2)
+#   warn(env, message)
 
 proc warn*(env: var Env, lineNum: Natural, warning: Warning, p1:
            string = "", p2: string = "") =
   ## Write a formatted warning message to the error stream.
-  let message = getWarning(env.templateFilename, lineNum,
-                           warning, p1, p2)
+  var filename = env.templateFilename
+  if filename == "":
+    filename = "initializing"
+  let message = getWarning(filename, lineNum, warning, p1, p2)
   warn(env, message)
 
 proc writeOut*(env: var Env, message: string) =
@@ -126,7 +128,7 @@ proc addExtraStreams*(env: var Env, args: Args): bool =
   assert args.templateList.len > 0
   if args.templateList.len > 1:
     let skipping = join(args.templateList[1..^1], ", ")
-    env.warn("starting", 0, wOneTemplateAllowed, skipping)
+    env.warn(0, wOneTemplateAllowed, skipping)
   let templateFilename = args.templateList[0]
 
   # You can only call it once.
@@ -141,15 +143,15 @@ proc addExtraStreams*(env: var Env, args: Args): bool =
   if templateFilename == "stdin":
     tStream = newFileStream(stdin)
     if tStream == nil:
-      env.warn("startup", 0, wCannotOpenStd, "stdin")
+      env.warn(0, wCannotOpenStd, "stdin")
       return
   else:
     if not fileExists(templateFilename):
-      env.warn("startup", 0, wFileNotFound, templateFilename)
+      env.warn(0, wFileNotFound, templateFilename)
       return
     tStream = newFileStream(templateFilename, fmRead)
     if tStream == nil:
-      env.warn("startup", 0, wUnableToOpenFile, templateFilename)
+      env.warn(0, wUnableToOpenFile, templateFilename)
       return
     closeTStream = true
 
@@ -170,7 +172,7 @@ proc addExtraStreams*(env: var Env, args: Args): bool =
   else:
     rStream = newFileStream(resultFilename, fmReadWrite)
     if rStream == nil:
-      env.warn("startup", 0, wUnableToOpenFile, resultFilename)
+      env.warn(0, wUnableToOpenFile, resultFilename)
       return
     closeRStream = true
 

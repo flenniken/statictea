@@ -54,7 +54,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
   # Allocate a buffer for reading lines.
   var lineBufferO = newLineBuffer(env.templateStream, filename=env.templateFilename)
   if not lineBufferO.isSome():
-    env.warn("startup", 0, wNotEnoughMemoryForLB)
+    env.warn(0, wNotEnoughMemoryForLB)
     return
   var lb = lineBufferO.get()
 
