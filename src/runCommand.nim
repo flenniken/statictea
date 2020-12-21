@@ -24,10 +24,14 @@ type
     start, double, single, slashdouble, slashsingle
 
   Statement* = object
-    ## A Statement object stores the statement text and the lineNum
-    ## and column position starting at 1 where the statement starts on
-    ## the line.
-    # todo: change column to an index. Still show as 1 based.
+    ## A Statement object stores the statement text and where it
+    ## starts in the template file.
+    ##
+    ## * lineNum -- Line number starting at 1 where the statement
+    ##              starts.
+    ## * start -- Column position starting at 1 where the statement
+    ##            starts on the line.
+    ## * text -- The statement text.
     lineNum*: Natural
     start*: Natural
     text*: string
@@ -131,7 +135,7 @@ proc warn(message: string) =
   echo message
 
 iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
-    seq[LineParts]): Statement {.tpub.} =
+    seq[LineParts], spaceTabMatcher: Matcher):  Statement {.tpub.} =
   ## Iterate through the command's statements.  Statements are
   ## separated by semicolons and are not empty or all spaces.
 
@@ -453,7 +457,7 @@ proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
   setState(variables)
 
   # Loop over the statements and run each one.
-  for statement in yieldStatements(cmdLines, cmdLineParts):
+  for statement in yieldStatements(cmdLines, cmdLineParts, compiledMatchers.spaceTabMatcher):
     # Run the statement.  When there is a statement error, no
     # nameValue is returned and we skip the statement.
     let nameValueO = runStatement(env, statement, compiledMatchers,
