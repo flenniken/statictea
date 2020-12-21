@@ -53,7 +53,19 @@ func `$`*(value: Value): string =
     if value.dictv.len == 0:
       result = "{}"
     else:
-      result = $value.dictv
+      result = "{...}"
   of vkList:
-    var str = $value.listv
-    result = str[1..^1]
+    if value.listv.len == 0:
+      result = "[]"
+    else:
+      result = "[...]"
+
+
+  # of vkDict:
+  #   if value.dictv.len == 0:
+  #     result = "{}"
+  #   else:
+  #     result = $value.dictv
+  # of vkList:
+  #   var str = $value.listv
+  #   result = str[1..^1]

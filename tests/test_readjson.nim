@@ -121,7 +121,7 @@ suite "readjson.nim":
     let option = jsonToValue(jsonNode)
     let value = option.get()
     check value.listv.len == 1
-    check $value == "[0]"
+    check $value == "[...]"
 
   test "jsonToValue list items":
     var jsonNode = newJArray()
@@ -134,7 +134,8 @@ suite "readjson.nim":
     let option = jsonToValue(jsonNode)
     let value = option.get()
     check value.listv.len == 6
-    check $value == """[0, 5, "string", 1.5, 1, 0]"""
+    # check $value == """[0, 5, "string", 1.5, 1, 0]"""
+    # check $value == """[...]"""
 
   test "jsonToValue nested list":
     var jsonNode = newJArray()
@@ -147,7 +148,8 @@ suite "readjson.nim":
     let option = jsonToValue(jsonNode)
     let value = option.get()
     check value.listv.len == 4
-    check $value == "[5, 6, [8], 7]"
+    # check $value == "[5, 6, [8], 7]"
+    check $value == "[...]"
 
   test "empty dict":
     var jsonNode = newJObject()

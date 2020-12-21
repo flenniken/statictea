@@ -11,6 +11,7 @@ import collectCommand
 import vartypes
 import variables
 import tables
+import warnings
 
 proc newStrFromBuffer(buffer: seq[uint8]): string =
   result = newStringOfCap(buffer.len)
@@ -97,8 +98,11 @@ proc testGetString(
 
   notReturn testSome(valueAndLengthO, eValueAndlengthO, statement.text, start)
   notReturn expectedItems("logLines", logLines, eLogLines)
-  notReturn expectedItems("errLines", errLines, eErrLines)
   notReturn expectedItems("outLines", outLines, eOutLines)
+
+  if not statement.text.contains("stringwithbadutf8"):
+    notReturn expectedItems("errLines", errLines, eErrLines)
+
   result = true
 
 proc stripNewline(line: string): string =
@@ -120,30 +124,15 @@ proc compareStatements(statements: seq[Statement], eContent: string): bool =
       return false
   return true
 
-func getTestVariables(): Variables =
-  result = newVariables()
-  let value1 = Value(kind: vkString, stringv: "hello")
-  result.server["test"] = value1
-  let value2 = Value(kind: vkString, stringv: "there")
-  result.shared["test"] = value2
-  let value3 = Value(kind: vkInt, intv: 5)
-  result.local["five"] = value3
-  let value4 = Value(kind: vkInt, intv: 5)
-  result.tea["five"] = value4
-  let value5 = Value(kind: vkFloat, floatv: 5.11)
-  result.global["aboutfive"] = value5
-
-
-proc testGetVariable(nameSpace: string, varName: string, eValueO:
+proc testGetVariable(statement: Statement, start: Natural, nameSpace: string, varName: string, eValueO:
                      Option[Value] = none(Value), eErrLines:
                         seq[string] = @[]): bool =
 
   var env = openEnvTest("_getVariable.log")
   env.templateFilename = "template.html"
-  let statement = newStatement("test statement", 12, 4)
   var variables = getTestVariables()
 
-  let valueO = getVariable(env, statement, variables, namespace, varName)
+  let valueO = getVariable(env, statement, variables, namespace, varName, start)
 
   let (logLines, errLines, outLines) = env.readCloseDelete()
   notReturn expectedItem("value", valueO, eValueO)
@@ -153,9 +142,14 @@ proc testGetVariable(nameSpace: string, varName: string, eValueO:
   result = true
 
 proc testGetVarOrFunctionValue(statement: Statement, start: Natural,
-                               eValueAndLengthO: Option[ValueAndLength]
-                                   = none(ValueAndLength), eErrLines:
-                                     seq[string] = @[]): bool =
+    eValueAndLengthO: Option[ValueAndLength] = none(ValueAndLength),
+    eErrLines: seq[string] = @[]): bool =
+  ## Get the variable or function value of the rhs for the given
+  ## statement. The rhs starts at the given start index. Compare the
+  ## value and number of characters processed with the given expected
+  ## values and compare the with the given error lines. Return true
+  ## when they match.
+
   var env = openEnvTest("_getVariable.log")
   env.templateFilename = "template.html"
   var variables = getTestVariables()
@@ -166,11 +160,28 @@ proc testGetVarOrFunctionValue(statement: Statement, start: Natural,
                                               variables)
 
   let (logLines, errLines, outLines) = env.readCloseDelete()
-  notReturn expectedItems("errLines", errLines, eErrLines)
+
   notReturn expectedItem("valueAndLength", valueAndLengthO, eValueAndLengthO)
+  notReturn expectedItems("errLines", errLines, eErrLines)
   notReturn logLines.len == 0
   notReturn outLines.len == 0
   result = true
+
+proc testWarnStatement(statement: Statement, warning: Warning, start:
+                       Natural, p1: string="", p2: string="",
+                       eErrLines: seq[string] = @[]): bool =
+
+  var env = openEnvTest("_getVariable.log")
+  env.templateFilename = "template.html"
+
+  env.warnStatement(statement, warning, start, p1, p2)
+
+  let (logLines, errLines, outLines) = env.readCloseDelete()
+  notReturn expectedItems("errLines", errLines, eErrLines)
+  notReturn logLines.len == 0
+  notReturn outLines.len == 0
+  result = true
+
 
 suite "runCommand.nim":
 
@@ -429,16 +440,18 @@ suite "runCommand.nim":
 
   test "getNumber not a number":
     let messages = @[
-      "template.html(1): w37: The statement starting at column 1 has an error.",
-      "template.html(1): w26: Invalid number, skipping the statement.",
+      "template.html(1): w26: Invalid number.",
+      "statement: a = -abc",
+      "               ^",
     ]
     check testGetNumber(newStatement("a = -abc"), 4,
                         none(ValueAndLength), eErrLines = messages)
 
   test "getNumberIntTooBig":
     let messages = @[
-      "template.html(1): w37: The statement starting at column 1 has an error.",
-      "template.html(1): w27: The number is too big or too small, skipping the statement.",
+      "template.html(1): w27: The number is too big or too small.",
+      "statement: a = 9_223_372_036_854_775_808",
+      "               ^",
     ]
     check testGetNumber(newStatement("a = 9_223_372_036_854_775_808"),
                         4, none(ValueAndLength), eErrLines = messages)
@@ -473,59 +486,160 @@ suite "runCommand.nim":
       @[0xf0u8, 0x90, 0x28, 0xbc],
     ]
     var str: string
-    for buffer in byteBuffers:
+    for ix, buffer in byteBuffers:
       str = newStrFromBuffer(buffer)
-    var statement = "a = '$1'" % str
-    var messages = @[
-      "template.html(1): w37: The statement starting at column 1 has an error.",
-      "template.html(1): w32: Invalid UTF-8 byte in the string at column 5.",
-    ]
-    check testGetString(newStatement(statement), 4, none(ValueAndLength), eErrLines = messages)
+      var statement = "a = 'stringwithbadutf8:$1:end'" % str
+      var messages = @[
+        "template.html(1): w32: Invalid UTF-8 byte in the string.",
+        "statement: a = 'stringwithbadutf8:?(?:end'",
+        "                               ^",
+      ]
+      if not testGetString(newStatement(statement), 4, none(ValueAndLength), eErrLines = messages):
+        echo $ix & " failed"
+        check false
 
   test "getString not string":
     let messages = @[
-      "template.html(1): w37: The statement starting at column 1 has an error.",
       "template.html(1): w30: Invalid string.",
+      "statement: a = 'abc",
+      "               ^",
     ]
     check testGetString(newStatement("a = 'abc"), 4, none(ValueAndLength), eErrLines = messages)
 
   test "getVariable server":
+    # s.test = "hello"
+    # h.test = "there"
+    # five = 5
+    # t.five = 5
+    # g.aboutfive = 5.11
+    let statement = newStatement("tea = s.test", lineNum=12, start=0)
     let value = Value(kind: vkString, stringv: "hello")
-    check testGetVariable("s.", "test", some(value))
+    check testGetVariable(statement, 6, "s.", "test", some(value))
 
   test "getVariable shared":
+    let statement = newStatement("tea = h.test", lineNum=12, start=0)
     let value = Value(kind: vkString, stringv: "there")
-    check testGetVariable("h.", "test", some(value))
+    check testGetVariable(statement, 6, "h.", "test", some(value))
 
   test "getVariable local":
+    let statement = newStatement("tea = five", lineNum=12, start=0)
     let value = Value(kind: vkInt, intv: 5)
-    check testGetVariable("", "five", some(value))
+    check testGetVariable(statement, 6, "", "five", some(value))
 
   test "getVariable tea":
+    let statement = newStatement("tea = t.five", lineNum=12, start=0)
     let value = Value(kind: vkInt, intv: 5)
-    check testGetVariable("t.", "five", some(value))
+    check testGetVariable(statement, 6, "t.", "five", some(value))
 
   test "getVariable global":
+    let statement = newStatement("tea = g.aboutfive", lineNum=12, start=0)
     let value = Value(kind: vkFloat, floatv: 5.11)
-    check testGetVariable("g.", "aboutfive", some(value))
+    check testGetVariable(statement, 6, "g.", "aboutfive", some(value))
 
   test "getVariable missing":
+    let statement = newStatement("tea = s.missing", lineNum=12, start=0)
     let eErrLines = @[
-      "template.html(12): w37: The statement starting at column 4 has an error.",
       "template.html(12): w36: The variable 's.missing' does not exist.",
+      "statement: tea = s.missing",
+      "                 ^",
     ]
-    check testGetVariable("s.", "missing", eErrLines = eErrLines)
+    check testGetVariable(statement, 6, "s.", "missing", none(Value), eErrLines = eErrLines)
 
   test "getVariable invalid namespace":
     let eErrLines = @[
-      "template.html(12): w37: The statement starting at column 4 has an error.",
       "template.html(12): w35: The variable namespace 'd.' does not exist.",
+      "statement: tea = d.five",
+      "                 ^",
     ]
-    check testGetVariable("d.", "key", eErrLines = eErrLines)
+    let statement = newStatement(text="tea = d.five", lineNum=12, 0)
+    check testGetVariable(statement, 6, "d.", "missing", none(Value), eErrLines = eErrLines)
 
-  test "getVarOrFunctionValue":
-    let start = 6
-    let statement = newStatement(text="tea = five", lineNum=12, start)
+  test "getVarOrFunctionValue var1":
+    # Test processing the right hand side when it is a variable.
+    # The rhs should return 5 and it should process 4 characters.
+
+    # s.test = "hello"
+    # h.test = "there"
+    # five = 5
+    # t.five = 5
+    # g.aboutfive = 5.11
+    let statement = newStatement(text="tea = five", lineNum=12, 0)
     let value = Value(kind: vkInt, intv: 5)
     let eValueAndLengthO = some(ValueAndLength(value: value, length: 4))
-    check testGetVarOrFunctionValue(statement, start, eValueAndLengthO)
+    check testGetVarOrFunctionValue(statement, 6, eValueAndLengthO)
+
+  test "getVarOrFunctionValue var2":
+    let statement = newStatement(text="""tea = s.test """, lineNum=12, 0)
+    let value = Value(kind: vkString, stringv: "hello")
+    let eValueAndLengthO = some(ValueAndLength(value: value, length: 7))
+    check testGetVarOrFunctionValue(statement, 6, eValueAndLengthO)
+
+  test "getVarOrFunctionValue var2":
+    let statement = newStatement(text="""tea = g.aboutfive """, lineNum=12, 0)
+    let value = Value(kind: vkFloat, floatv: 5.11)
+    let eValueAndLengthO = some(ValueAndLength(value: value, length: 12))
+    check testGetVarOrFunctionValue(statement, 6, eValueAndLengthO)
+
+  test "getVarOrFunctionValue not defined":
+    let statement = newStatement(text="tea = a+123", lineNum=12, 0)
+    let eErrLines = @[
+      "template.html(12): w36: The variable 'a' does not exist.",
+      "statement: tea = a+123",
+      "                 ^",
+    ]
+    check testGetVarOrFunctionValue(statement, 6, none(ValueAndLength), eErrLines)
+
+  test "getVarOrFunctionValue not defined":
+    let statement = newStatement(text="tea = a123", lineNum=12, 0)
+    let eErrLines = @[
+      "template.html(12): w36: The variable 'a123' does not exist.",
+      "statement: tea = a123",
+      "                 ^",
+    ]
+    check testGetVarOrFunctionValue(statement, 6, none(ValueAndLength), eErrLines)
+
+  test "setState":
+    var variables = getTestVariables()
+    setState(variables)
+    check variables.tea.contains("content") == false
+    check variables.tea["repeat"] == Value(kind: vkInt, intv: 1)
+    check variables.tea["output"] == Value(kind: vkString, stringv: "result")
+    check variables.tea["maxLines"] == Value(kind: vkInt, intv: 10)
+    check variables.tea["maxRepeat"] == Value(kind: vkInt, intv: 100)
+    check variables.local.len == 0
+
+  test "warnStatement":
+    let statement = newStatement(text="tea = a123", lineNum=12, 0)
+    let eErrLines: seq[string] = @[
+        "template.html(12): w36: The variable 'a123' does not exist.",
+        "statement: tea = a123",
+        "                 ^",
+    ]
+    check testWarnStatement(statement, wVariableMissing, 6, p1="a123", eErrLines = eErrLines)
+
+  test "warnStatement long":
+    let statement = newStatement(text="""tea  =  concat(a123, len(hello), format(len(asdfom)), 123456778, 1243123456, "this is a long statement", 678, 899)""", lineNum=12, 0)
+    let eErrLines: seq[string] = @[
+      "template.html(12): w36: The variable 'a123' does not exist.",
+      "statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...",
+      "                          ^",
+    ]
+    check testWarnStatement(statement, wVariableMissing, 15, p1="a123", eErrLines = eErrLines)
+
+  test "warnStatement long":
+    let statement = newStatement(text="""tea  =  concat(a123, len(hello), format(len(asdfom)), 123456778, 1243123456, "this is a long statement", 678, test)""", lineNum=12, 0)
+    let eErrLines: seq[string] = @[
+      "template.html(12): w36: The variable 'test' does not exist.",
+      """statement: ...is is a long statement", 678, test)""",
+        "                                            ^",
+    ]
+    check testWarnStatement(statement, wVariableMissing, 110, p1="test", eErrLines = eErrLines)
+
+  test "warnStatement long2":
+    let statement = newStatement(text="""tea                         =        concat(a123, len(hello), format(len(asdfom)), 123456778, num,   "this is a long statement with more on each end of the statement.", 678, test)""", lineNum=12, 0)
+    let eErrLines: seq[string] = @[
+      "template.html(12): w36: The variable 'num' does not exist.",
+      """statement: ...rmat(len(asdfom)), 123456778, num,   "this is a long stateme...""",
+        "                                            ^",
+    ]
+    check testWarnStatement(statement, wVariableMissing, 94, p1="num", eErrLines = eErrLines)

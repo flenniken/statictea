@@ -59,7 +59,7 @@ template log*(env: var Env, message: string) =
   let info = instantiationInfo()
   env.logEnv.logLine(info.filename, info.line, message)
 
-proc warn(env: var Env, message: string) =
+proc warn*(env: var Env, message: string) =
   ## Write a message to the error stream.
   env.errStream.writeLine(message)
   inc(env.warningWritten)
@@ -268,10 +268,11 @@ when defined(test):
         echo "~~~~~~~~~~ $1 ~~~~~~~~~~~:" % name
         for ix in 0 ..< items.len:
           if items[ix] == expectedItems[ix]:
-            echo "$1: same" % [$ix]
+            echo "$1 (same):      got: $2" % [$ix, $items[ix]]
+            echo "$1 (same): expected: $2" % [$ix, $expectedItems[ix]]
           else:
-            echo "$1:      got: $2" % [$ix, $items[ix]]
-            echo "$1: expected: $2" % [$ix, $expectedItems[ix]]
+            echo "$1       :      got: $2" % [$ix, $items[ix]]
+            echo "$1       : expected: $2" % [$ix, $expectedItems[ix]]
       result = false
 
   proc testSome*[T](valueAndLengthO: Option[T], eValueAndLengthO: Option[T],

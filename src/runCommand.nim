@@ -15,6 +15,9 @@ import parseNumber
 import unicode
 import variables
 
+const
+  outputValues = ["result", "stderr", "log", "skip"]
+
 type
   State = enum
     ## Finite state machine states for finding statements.
@@ -22,7 +25,9 @@ type
 
   Statement* = object
     ## A Statement object stores the statement text and the lineNum
-    ## and column position where it starts in the template.
+    ## and column position starting at 1 where the statement starts on
+    ## the line.
+    # todo: change column to an index. Still show as 1 based.
     lineNum*: Natural
     start*: Natural
     text*: string
@@ -50,12 +55,52 @@ func newStatement*(text: string, lineNum: Natural = 1,
     start: Natural = 1): Statement =
   result = Statement(lineNum: lineNum, start: start, text: text)
 
+proc startColumn*(start: Natural): string =
+  ## Return a string containing the number of spaces and symbols to
+  ## point at the line start value used under the statement line.
+  for ix in 0..<start:
+    result.add(' ')
+  result.add("^")
+
 proc warnStatement*(env: var Env, statement: Statement, warning:
-                    Warning, p1: string = "", p2: string = "") =
-  ## Warning about an invalid statement. Tell which statement then show
-  ## the problem.
-  env.warn(statement.lineNum, wStatementError, $statement.start)
+                    Warning, start: Natural, p1: string = "", p2:
+                                         string = "") =
+  ## Warn about an invalid statement. Show and tell the statement with
+  ## the problem.  Start is the position in the statement where the
+  ## problem starts. If the statement is long, trim it around the
+  ## problem area.
+
+  var fragment: string
+  var extraStart = ""
+  var extraEnd = ""
+  let fragmentMax = 60
+  let halfFragment = fragmentMax div 2
+  var startPos: int
+  var endPos: int
+  var pointerPos: int
+  if statement.text.len <= fragmentMax:
+    fragment = statement.text
+    startPos = start
+    pointerPos = start
+  else:
+    startPos = start.int - halfFragment
+    if startPos < 0:
+      startPos = 0
+    else:
+      extraStart = "..."
+
+    endPos = startPos + fragmentMax
+    if endPos > statement.text.len:
+      endPos = statement.text.len
+    else:
+      extraEnd = "..."
+    fragment = extraStart & statement.text[startPos ..< endPos] & extraEnd
+    pointerPos = start.int - startPos + extraStart.len
+
   env.warn(statement.lineNum, warning, p1, p2)
+  env.warn("statement: $1" % fragment)
+  env.warn("           $1" % startColumn(pointerPos))
+
 
 #[
 
@@ -155,7 +200,7 @@ proc getString*(env: var Env, compiledMatchers: Compiledmatchers,
   # Check that we have a statictea string.
   var matchesO = compiledMatchers.stringMatcher.getMatches(statement.text, start)
   if not matchesO.isSome:
-    env.warnStatement(statement, wNotString)
+    env.warnStatement(statement, wNotString, start)
     return
 
   # Get the string. The string is either in s1 or s2, s1 means single
@@ -167,8 +212,7 @@ proc getString*(env: var Env, compiledMatchers: Compiledmatchers,
   # Validate the utf-8 bytes.
   var pos = validateUtf8(str)
   if pos != -1:
-    let column = start + pos + 1
-    env.warnStatement(statement, wInvalidUtf8, $column)
+    env.warnStatement(statement, wInvalidUtf8, start + pos + 1)
     return
 
   let value = Value(kind: vkString, stringv: str)
@@ -182,7 +226,7 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
   # Check that we have a statictea number.
   var matchesO = compiledMatchers.numberMatcher.getMatches(statement.text, start)
   if not matchesO.isSome:
-    env.warnStatement(statement, wNotNumber)
+    env.warnStatement(statement, wNotNumber, start)
     return
 
   # The decimal point determines whether the number is an integer or
@@ -194,7 +238,7 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
     # Parse the float.
     let floatPosO = parseFloat64(statement.text, start)
     if not floatPosO.isSome:
-      env.warnStatement(statement, wNumberOverFlow)
+      env.warnStatement(statement, wNumberOverFlow, start)
       return
     let floatPos = floatPosO.get()
     let value = Value(kind: vkFloat, floatv: floatPos.number)
@@ -204,7 +248,7 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
     # Parse the int.
     let intPosO = parseInteger(statement.text, start)
     if not intPosO.isSome:
-      env.warnStatement(statement, wNumberOverFlow)
+      env.warnStatement(statement, wNumberOverFlow, start)
       return
     let intPos = intPosO.get()
     let value = Value(kind: vkInt, intv: intPos.integer)
@@ -218,7 +262,7 @@ proc getFunctionValue(env: var Env, compiledMatchers:
   echo "asdf"
 
 proc getVariable*(env: var Env, statement: Statement, variables:
-                 Variables, nameSpace: string, varName: string): Option[Value] =
+                  Variables, nameSpace: string, varName: string, start: Natural): Option[Value] =
   ## Look up the variable and return its value. Show an error when the
   ## variable doesn't exists.
   case nameSpace:
@@ -239,11 +283,11 @@ proc getVariable*(env: var Env, statement: Statement, variables:
         return some(variables.tea[varName])
     else:
       # Invalid namespace.
-      env.warnStatement(statement, wInvalidNameSpace, nameSpace)
+      env.warnStatement(statement, wInvalidNameSpace, start, nameSpace)
       return
 
   # Variable does not exists.
-  env.warnStatement(statement, wVariableMissing, nameSpace & varName)
+  env.warnStatement(statement, wVariableMissing, start, nameSpace & varName)
 
 # a = len(name)
 # a = len (name)
@@ -256,14 +300,15 @@ proc getVariable*(env: var Env, statement: Statement, variables:
 proc getVarOrFunctionValue*(env: var Env, compiledMatchers:
            Compiledmatchers, statement: Statement,
            start: Natural, variables: Variables): Option[ValueAndLength] =
-  ## Return the statements right hand side value and the length
+  ## Return the statement's right hand side value and the length
   ## matched. The right hand side starts at the index specified by
   ## start.
 
   # Get the variable or function name. Match the surrounding white space.
-  let variableO = getMatches(compiledMatchers.variableMatcher, statement.text)
+  let variableO = getMatches(compiledMatchers.variableMatcher, statement.text, start)
   if not variableO.isSome:
-    env.warnStatement(statement, wInvalidRightHandSide)
+    # Shouldn't hit this line.
+    env.warnStatement(statement, wInvalidRightHandSide, start)
     return
   let variable = variableO.get()
   let (nameSpace, varName) = variable.get2Groups()
@@ -280,7 +325,7 @@ proc getVarOrFunctionValue*(env: var Env, compiledMatchers:
   # We have a variable, look it up and return its value.  Show a
   # warning when the variable doesn't exist.
   let valueO = getVariable(env, statement, variables, nameSpace,
-                           varName)
+                           varName, start)
   if isSome(valueO):
     result = some(ValueAndLength(value: valueO.get(), length: variable.length))
 
@@ -309,7 +354,47 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
     result = getVarOrFunctionValue(env, compiledMatchers, statement,
                                    start, variables)
   else:
-    env.warnStatement(statement, wInvalidRightHandSide)
+    env.warnStatement(statement, wInvalidRightHandSide, start)
+
+proc assignTeaVariable(env: var Env, statement: Statement,
+                       compiledMatchers: Compiledmatchers, variables:
+                         var Variables, varName: string, value: Value,
+                             start: Natural) =
+  ## Assign the given tea variable with the given value.  Show
+  ## warnings when it's not possible to make the assignment.
+
+  case varName:
+    of "maxLines", "maxRepeat":
+      # The maxLines and maxRepeat variables must be an integer >= 0.
+      if value.kind == vkInt and value.intv >= 0:
+        variables.tea[varName] = value
+      else:
+        env.warnStatement(statement, wInvalidMaxCount, start)
+    of "content":
+      # Content must be a string.
+      if value.kind == vkString:
+        variables.tea[varName] = value
+      else:
+        env.warnStatement(statement, wInvalidTeaContent, start)
+    of "output":
+      # Output must be a string of "result", etc.
+      if value.kind == vkString:
+        if value.stringv in outputValues:
+          variables.tea[varName] = value
+          return
+      env.warnStatement(statement, wInvalidOutputValue, start, $value)
+    of "repeat":
+      # Repeat is an integer >= 0 and <= t.maxRepeat.
+      if value.kind == vkInt and value.intv >= 0 and
+         value.intv <= variables.tea["maxRepeat"].intv:
+        variables.tea[varName] = value
+      else:
+        env.warnStatement(statement, wInvalidMaxRepeat, start, $value)
+    of "server", "shared", "local", "global":
+      env.warnStatement(statement, wReadOnlyTeaVar, start, varName)
+    else:
+      env.warnStatement(statement, wInvalidTeaVar, start, varName)
+
 
 proc runStatement(env: var Env, statement: Statement,
                   compiledMatchers: Compiledmatchers, variables:
@@ -320,7 +405,7 @@ proc runStatement(env: var Env, statement: Statement,
   # Get the variable name. Match the surrounding white space.
   let variableO = getMatches(compiledMatchers.variableMatcher, statement.text)
   if not variableO.isSome:
-    env.warnStatement(statement, wMissingStatementVar)
+    env.warnStatement(statement, wMissingStatementVar, 0)
     return
   let variable = variableO.get()
   let (nameSpace, varName) = variable.get2Groups()
@@ -328,7 +413,7 @@ proc runStatement(env: var Env, statement: Statement,
   let equalSignO = getMatches(compiledMatchers.equalSignMatcher,
                               statement.text, variable.length)
   if not equalSignO.isSome:
-    env.warnStatement(statement, wInvalidVariable)
+    env.warnStatement(statement, wInvalidVariable, 0)
     return
   let equalSign = equalSignO.get()
 
@@ -343,15 +428,29 @@ proc runStatement(env: var Env, statement: Statement,
   let value = valueAndLengthO.get().value
   let length = valueAndLengthO.get().length
   if length != statement.text.len:
-    env.warnStatement(statement, wTextAfterValue)
+    env.warnStatement(statement, wTextAfterValue, length)
     return
 
   result = some((nameSpace, varName, value))
 
+proc setState*(variables: var Variables) =
+  ## Clear the local dictionary and set the tea variables to their
+  ## initial state.
+  variables.tea["output"] = Value(kind: vkString, stringv: "result")
+  variables.tea["repeat"] = Value(kind: vkInt, intv: 1)
+  variables.tea["maxLines"] = Value(kind: vkInt, intv: 10)
+  variables.tea["maxRepeat"] = Value(kind: vkInt, intv: 100)
+  variables.tea.del("content")
+  variables.local.clear()
+
 proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
                  seq[LineParts], compiledMatchers: CompiledMatchers,
                  variables: var Variables) =
-  ## Run a command and return fill in the local variables dictionary.
+  ## Run a command and fill in the variables dictionaries.
+
+  # Clear the local variables and set the tea vars to their initial
+  # state.
+  setState(variables)
 
   # Loop over the statements and run each one.
   for statement in yieldStatements(cmdLines, cmdLineParts):
@@ -366,13 +465,14 @@ proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
       case nameSpace:
         of "":
           variables.local[varName] = value
+        of "g.":
+          variables.global[varName] = value
         of "t.":
-          # todo: check that it is ok to assign to this tea variable.
-          variables.tea[varName] = value
+          assignTeaVariable(env, statement, compiledMatchers, variables, varName, value, 0)
         of "s.", "h.":
-          warn("You cannot overwrite the server or shared variables.")
+          env.warnStatement(statement, wReadOnlyDictionary, 0)
         else:
-          warn("Unknown variable namespace: $1." % nameSpace)
+          env.warnStatement(statement, wInvalidNameSpace, 0, nameSpace)
 
 when defined(test):
   proc newIntValueAndLengthO*(number: int | int64,

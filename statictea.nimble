@@ -80,7 +80,7 @@ task showtests, "Show tests":
     let cmd = get_test_module_cmd(filename)
     echo cmd
 
-task showtest, "Show one test: showtest name":
+task test, "Run one test: test name":
   let count = system.paramCount()+1
   let name = system.paramStr(count-1)
   if name == "showtest":
@@ -89,7 +89,9 @@ task showtest, "Show one test: showtest name":
   let test_filenames = get_test_filenames()
   for filename in test_filenames:
     if name in filename:
-      echo get_test_module_cmd(filename)
+      let cmd = get_test_module_cmd(filename)
+      echo cmd
+      exec cmd
 
 proc doc_module(name: string) =
   let cmd = "nim doc --hints:off -d:test --index:on --out:docs/html/$1.html src/$1.nim" % [name]

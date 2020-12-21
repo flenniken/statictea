@@ -44,6 +44,13 @@ type
     wInvalidNameSpace, # 35
     wVariableMissing, # 36
     wStatementError, # 37
+    wReadOnlyDictionary, # 38
+    wReadOnlyTeaVar, # 39
+    wInvalidTeaVar, # 40
+    wInvalidOutputValue, # 41
+    wInvalidMaxCount, # 42
+    wInvalidTeaContent, # 43
+    wInvalidMaxRepeat, # 44
 
 tpubType:
   const
@@ -76,18 +83,25 @@ tpubType:
       """The matching closing comment postfix was not found, expected: "$1".""", # wNoPostfix
       "Missing the continuation line, abandoning the command.", # wNoContinuationLine
       "Ignoring extra text after the number.", # wSkippingTextAfterNum
-      "Invalid number, skipping the statement.", # wNotNumber
-      "The number is too big or too small, skipping the statement.", # wNumberOverFlow
+      "Invalid number.", # wNotNumber
+      "The number is too big or too small.", # wNumberOverFlow
       "Not enough memory for the line buffer.", # wNotEnoughMemoryForLB
       "Statement does not start with a variable name.", # wMissingStatementVar
       "Invalid string.", # wNotString
       "Unused text at the end of the statement.", # wTextAfterValue
-      "Invalid UTF-8 byte in the string at column $1.", # wInvalidUtf8
+      "Invalid UTF-8 byte in the string.", # wInvalidUtf8
       "Expected a string, number, variable or function on the right hand side.", # wInvalidRightHandSide
       "Invalid variable or missing equal sign.", # wInvalidVariable
       "The variable namespace '$1' does not exist.", # wInvalidNameSpace
       "The variable '$1' does not exist.", # wVariableMissing
       "The statement starting at column $1 has an error.", # wStatementError
+      "You cannot overwrite the server or shared variables.", # wReadOnlyDictionary
+      "You cannot change the $1 tea variable.", # wReadOnlyTeaVar
+      "Invalid tea variable: $1.", # wInvalidTeaVar
+      """Invalid t.output value, use: "result", "stderr", "log", or "skip".""", # wInvalidOutputValue
+      "Invalid max count, it must be an integer >= 0.", # wInvalidMaxCount
+      "Invalid t.content, it must be a string.", # wInvalidTeaContent
+      "Invalid t.repeat, it must be an integer >= 0 and <= t.maxRepeat.", # wInvalidMaxRepeat
     ]
 
 func getWarning*(filename: string, lineNum: int,
