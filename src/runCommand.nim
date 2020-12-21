@@ -150,8 +150,6 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
 
   assert cmdLines.len == cmdLineParts.len
 
-  # todo: pass in the spaceTabMatcher?
-  let spaceTabMatcher = getSpaceTabMatcher()
   var text = newStringOfCap(defaultMaxLineLen)
   var lineNum: Natural
   var start: Natural
