@@ -1,7 +1,6 @@
 
 import unittest
 import env
-import logenv
 import typetraits
 import options
 import warnings
@@ -17,7 +16,7 @@ suite "env.nim":
 
   test "open close":
     var env = openEnv()
-    check env.logEnv.filename == "statictea.log"
+    check env.logFilename == "statictea.log"
     env.close()
 
   test "log":
@@ -26,9 +25,9 @@ suite "env.nim":
     testProc(env)
     env.writeOut(outMsg)
     check env.warningWritten == 0
-    env.warn(12, wNotEnoughMemoryForLB)
+    env.warn(0, wNotEnoughMemoryForLB)
     check env.warningWritten == 1
-    env.warn(12, wNotEnoughMemoryForLB)
+    env.warn(0, wNotEnoughMemoryForLB)
     check env.warningWritten == 2
     var (logLines, errLines, outLines) = env.readCloseDelete()
     # echoLines(logLines, errLines, outLines)
@@ -38,7 +37,7 @@ suite "env.nim":
     logLine = parseLine(logLines[1]).get()
     check logLine.message == testMsg2
 
-    let errMsg = getWarning("initializing", 12, wNotEnoughMemoryForLB)
+    let errMsg = getWarning("initializing", 0, wNotEnoughMemoryForLB)
     check errLines.len == 2
     check errLines[0] == errMsg
     check errLines[1] == errMsg

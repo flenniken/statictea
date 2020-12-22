@@ -1,12 +1,14 @@
-import logenv
 import streams
 import warnings
 import os
 import strutils
 import args
+import times
 when defined(test):
   import options
   import regexes
+
+# todo: try nimpretty
 
 const
   staticteaLog* = "statictea.log" ## \
@@ -15,12 +17,16 @@ const
   logWarnSize: BiggestInt = 1024 * 1024 * 1024 ##/
    ## Warn the user when the log file gets big.
 
+  dtFormat = "yyyy-MM-dd HH:mm:ss'.'fff" ## \
+  ## The date time format in local time written to the log.
+
 type
   Env* = object
-    # These streams get set at the start.
-    logEnv*: LogEnv
+    # These get set at the start.
     errStream*: Stream
     outStream*: Stream
+    logFile*: File
+    logFilename*: string
 
     # You don't close the stderr or stdout.
     closeErrStream*: bool
@@ -39,7 +45,6 @@ type
     warningWritten*: Natural
 
 proc close*(env: var Env) =
-  env.logEnv.close()
   if env.closeErrStream:
     env.errStream.close()
     env.errStream = nil
@@ -52,12 +57,9 @@ proc close*(env: var Env) =
   if env.closeResultStream:
     env.resultStream.close()
     env.resultStream = nil
-
-template log*(env: var Env, message: string) =
-  ## Append the message to the log file. The current file and line
-  ## becomes part of the message.
-  let info = instantiationInfo()
-  env.logEnv.logLine(info.filename, info.line, message)
+  if env.logFile != nil:
+    env.logFile.close()
+    env.logFile = nil
 
 proc warn*(env: var Env, message: string) =
   ## Write a message to the error stream.
@@ -70,8 +72,44 @@ proc warn*(env: var Env, lineNum: Natural, warning: Warning, p1:
   var filename = env.templateFilename
   if filename == "":
     filename = "initializing"
+    assert lineNum == 0
   let message = getWarning(filename, lineNum, warning, p1, p2)
   warn(env, message)
+
+func formatDateTime*(dt: DateTime): string =
+  result = dt.format(dtFormat)
+
+func formatLine*(filename: string, lineNum: int, message: string, dt=now()):
+     string =
+  ## Return a formatted log line.
+  let dtString = formatDateTime(dt)
+  result = "$1; $2($3); $4" % [dtString, filename, $lineNum, message]
+
+proc logLine*(env: var Env, filename: string, lineNum: int, message: string) =
+  ## Append a message to the log file. If there is an error writing,
+  ## close the log. Do nothing when the log is closed.
+  if env.logFile == nil:
+    return
+  let line = formatLine(filename, lineNum, message)
+  try:
+    # raise newException(IOError, "test io error")
+    env.logFile.writeLine(line)
+  except:
+    # todo: replace warn with env.warn
+    env.warn(0, wUnableToWriteLogFile, filename)
+    env.warn(0, wExceptionMsg, getCurrentExceptionMsg())
+    # The stack trace is only available in the debug builds.
+    when not defined(release):
+      env.warn(0, wStackTrace, getCurrentException().getStackTrace())
+    # Close the log file.  Only one warning goes out about it not working.
+    env.logFile.close()
+    env.logFile = nil
+
+template log*(env: var Env, message: string) =
+  ## Append the message to the log file. The current file and line
+  ## becomes part of the message.
+  let info = instantiationInfo()
+  logLine(env, info.filename, info.line, message)
 
 proc writeOut*(env: var Env, message: string) =
   ## Write a message to the output stream.
@@ -80,37 +118,43 @@ proc writeOut*(env: var Env, message: string) =
 proc checkLogSize(env: var Env) =
   ## Check the log file size and write a warning message when the file
   ## is big.
-  let logSize = getFileSize(env.logEnv)
-  if logSize > logWarnSize:
-    let numStr = insertSep($logSize, ',')
-    let line = get_warning("startup", 0, wBigLogFile, staticteaLog, numStr)
-    env.log(line)
-    env.warn(line)
+  if env.logFile != nil:
+    let logSize = env.logFile.getFileSize()
+    if logSize > logWarnSize:
+      let numStr = insertSep($logSize, ',')
+      env.warn(0, wBigLogFile, env.logFilename, numStr)
+
+proc openLogFile(env: var Env, logFilename: string) =
+  ## Open the log file and update the environment.
+  var file: File
+  if open(file, logFilename, fmAppend):
+    env.logFile = file
+    env.logFilename = logFilename
+  else:
+    env.warn(0, wUnableToOpenLogFile, logFilename)
 
 proc openEnvTest*(logFilename: string): Env =
-  ## Open the log, error, and out streams. The given log file is used.
-  ## The error and out streams get created as a string type streams.
+  ## Open the log, error, and out streams. The given log file is used
+  ## for the log stream.  The error and out streams get created as a
+  ## string type streams.
 
-  var logEnv = openLogFile(logFilename)
   result = Env(
-    logEnv: logEnv,
     errStream: newStringStream(), closeErrStream: true,
     outStream: newStringStream(), closeOutStream: true,
   )
+  openLogFile(result, logFilename)
   checkLogSize(result)
 
-proc openEnv*(logFilename: string = staticteaLog, warnSize: BiggestInt
-                 = logWarnSize): Env =
-  ## Open the log, error, and out streams. The statictea.log file is
-  ## used by default. Stderr and stdout are used for err and out
-  ## streams.
+proc openEnv*(logFilename: string = staticteaLog,
+                  warnSize: BiggestInt = logWarnSize): Env =
+  ## Open and return the environment containing the standard error,
+  ## standard out and the log file as streams.
 
-  var logEnv = openLogFile(logFilename)
   result = Env(
-    logEnv: logEnv,
     errStream: newFileStream(stderr),
     outStream: newFileStream(stdout),
   )
+  openLogFile(result, logFilename)
   checkLogSize(result)
 
 proc addExtraStreams*(env: var Env, args: Args): bool =
@@ -180,6 +224,73 @@ when defined(test):
   # close a string stream the data is gone, so you need to read it
   # before and you need to set the position at the start.
 
+
+  type
+    FileLine* = object
+      filename*: string
+      lineNum*: Natural
+
+    LogLine* = object
+      dt*: DateTime
+      filename*: string
+      lineNum*: Natural
+      message*: string
+
+  proc parseTimeStamp*(str: string): Option[DateTime] =
+    try:
+      result = some(parse(str, dtFormat))
+    except TimeParseError:
+      result = none(DateTime)
+
+  proc parseFileLine*(line: string): Option[FileLine] =
+    var matcher = newMatcher(r"^(.*)\(([0-9]+)\)$", 2)
+    let matchesO = getMatches(matcher, line, 0)
+    if matchesO.isSome:
+      let matches = matchesO.get()
+      let (filename, lineNumString) = matches.get2Groups()
+      let lineNum =  parseUInt(lineNumString)
+      result = some(FileLine(filename: filename, lineNum: lineNum))
+
+  proc parseLine*(line: string): Option[LogLine] =
+    var parts = split(line, "; ", 3)
+    if parts.len != 3:
+      return none(LogLine)
+    let dtO = parseTimeStamp(parts[0])
+    if not dtO.isSome:
+      return none(LogLine)
+    let fileLineO = parseFileLine(parts[1])
+    if not fileLineO.isSome:
+      return none(LogLine)
+    let fileLine = fileLineO.get()
+    result = some(LogLine(dt: dtO.get(), filename: fileLine.filename,
+      lineNum: fileLine.lineNum, message: parts[2]))
+
+  proc readLines*(filename: string, maximum: int = -1): seq[string] =
+    ## Read up to maximum lines from the given file. When maximum is
+    ## negative, read all lines.
+    var count = 0
+    if maximum == 0:
+      return
+    var maxLines: int
+    if maximum < 0:
+      maxLines = high(int)
+    else:
+      maxLines = maximum
+    for line in lines(filename):
+      result.add(line)
+      inc(count)
+      if count > maxLines:
+        break
+
+  proc closeReadDeleteLog*(env: var Env, maximum: int = -1): seq[string] =
+    # Close the log file, read its lines, then delete the file.
+    if env.logFile != nil:
+      env.logFile.close()
+      env.logFile = nil
+      result = readLines(env.logFilename, maximum)
+      discard tryRemoveFile(env.logFilename)
+
+
   proc readStream*(stream: Stream): seq[string] =
     let pos = stream.getPosition()
     stream.setPosition(0)
@@ -213,9 +324,8 @@ when defined(test):
   proc readCloseDelete*(env: var Env): tuple[logLine: seq[string],
       errLines: seq[string], outLines: seq[string]] =
     if env.closeErrStream and env.closeOutStream:
-      result = (env.logEnv.closeReadDelete(20),
+      result = (env.closeReadDeleteLog(100),
         env.errStream.readAndClose(), env.outStream.readAndClose())
-      discard tryRemoveFile(env.logEnv.filename)
 
   proc echoLines*(logLines, errLines, outLines: seq[string]) =
     echo "=== log ==="

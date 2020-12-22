@@ -1,11 +1,12 @@
 ## Support logging to a file.
 
-import warnenv
 import times
+import warnenv
 import strutils
 import warnings
 import options
 import regexes
+import env
 when defined(test):
   import os
 
@@ -144,7 +145,6 @@ when defined(test):
       if count > maxLines:
         break
 
-when defined(test):
   proc closeReadDelete*(logEnv: var LogEnv, maximum: int = -1): seq[string] =
       # Close the log file, read its lines, then delete the file.
       let name = logEnv.filename
