@@ -9,13 +9,30 @@
 Written by Philip Hazel
 Copyright (c) 1997-2005 University of Cambridge
 
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
 
-    Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-    Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-    Neither the name of the University of Cambridge nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+  Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+  Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+  Neither the name of the University of Cambridge nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]#
 
 import re
@@ -35,7 +52,8 @@ type
     regex: Regex
     arg1*: string
 
-proc newMatcher*(pattern: string, numGroups: Natural, arg1: string = ""): Matcher =
+proc newMatcher*(pattern: string, numGroups: Natural,
+    arg1: string = ""): Matcher =
   ## Return a new matcher.  The regular expression pattern is
   ## compiled.  The numGroups is the number of groups defined in the
   ## pattern.  Note: all patterns are anchored. This makes a
@@ -57,7 +75,8 @@ proc get3Groups*(matches: Matches): (string, string, string) =
   ## Get the three groups when there are three groups in matches.
   result = (matches.groups[0], matches.groups[1], matches.groups[2])
 
-proc getMatches*(matcher: Matcher, line: string, start: Natural = 0): Option[Matches] =
+proc getMatches*(matcher: Matcher, line: string, start: Natural = 0):
+               Option[Matches] =
   ## Match the line with the matcher pattern starting at the "start"
   ## index in the line.  Return the matches object containing the
   ## matching groups and the length of the match.
@@ -95,7 +114,8 @@ when defined(test):
 
     if matchesO.isSome:
       var matches = matchesO.get()
-      if matches.groups != expectedStrings or matches.length != expectedLength or
+      if matches.groups != expectedStrings or matches.length !=
+          expectedLength or
          matches.start != expectedStart:
         echo "---Unexpected match---"
         echo "   line: $1" % [line]
@@ -120,9 +140,11 @@ when defined(test):
     ## Return true when the matcher matches the line with the
     ## expected outcome, else return false.
     let matchesO = getMatches(matcher, line, start)
-    result = checkMatches(matchesO, matcher, line, start, expectedStrings, expectedLength)
+    result = checkMatches(matchesO, matcher, line, start,
+                          expectedStrings, expectedLength)
 
-  proc checkMatcherNot*(matcher: Matcher, line: string, start: Natural = 0): bool =
+  proc checkMatcherNot*(matcher: Matcher, line: string,
+      start: Natural = 0): bool =
     # Return true when the matcher does not match.
 
     var matchesO = matcher.getMatches(line, start)

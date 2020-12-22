@@ -62,7 +62,7 @@ proc readJson*(env: var Env, filename: string, vars: var VarsDict) =
 
   var rootNode: JsonNode
   try:
-     rootNode = parseJson(stream, filename)
+    rootNode = parseJson(stream, filename)
   except:
     env.warn(0, wJsonParseError, filename)
     return

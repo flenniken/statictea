@@ -39,7 +39,8 @@ type
     stringMatcher*: Matcher
     leftParenthesesMatcher*: Matcher
 
-iterator combine(list1: openArray[Prepost], list2: openArray[Prepost]): Prepost =
+iterator combine(list1: openArray[Prepost], list2: openArray[
+    Prepost]): Prepost =
   ## Iterate through list1 then list2.
   for prepost in list1:
     yield(prepost)

@@ -8,16 +8,14 @@ when defined(test):
   import options
   import regexes
 
-# todo: try nimpretty
-
 const
-  staticteaLog* = "statictea.log" ## \
+  staticteaLog* = "statictea.log"                    ## \
   ## Name of the default statictea log file.
 
-  logWarnSize: BiggestInt = 1024 * 1024 * 1024 ##/
-   ## Warn the user when the log file gets big.
+  logWarnSize: BiggestInt = 1024 * 1024 * 1024       ## \
+  ## Warn the user when the log file gets over 1 GB.
 
-  dtFormat = "yyyy-MM-dd HH:mm:ss'.'fff" ## \
+  dtFormat = "yyyy-MM-dd HH:mm:ss'.'fff"             ## \
   ## The date time format in local time written to the log.
 
 type
@@ -79,7 +77,7 @@ proc warn*(env: var Env, lineNum: Natural, warning: Warning, p1:
 func formatDateTime*(dt: DateTime): string =
   result = dt.format(dtFormat)
 
-func formatLine*(filename: string, lineNum: int, message: string, dt=now()):
+func formatLine*(filename: string, lineNum: int, message: string, dt = now()):
      string =
   ## Return a formatted log line.
   let dtString = formatDateTime(dt)
@@ -247,7 +245,7 @@ when defined(test):
     if matchesO.isSome:
       let matches = matchesO.get()
       let (filename, lineNumString) = matches.get2Groups()
-      let lineNum =  parseUInt(lineNumString)
+      let lineNum = parseUInt(lineNumString)
       result = some(FileLine(filename: filename, lineNum: lineNum))
 
   proc parseLine*(line: string): Option[LogLine] =
@@ -354,7 +352,8 @@ when defined(test):
       echo "expected: $1" % $expectedItem
       result = false
 
-  proc expectedItems*[T](name: string, items: seq[T], expectedItems: seq[T]): bool =
+  proc expectedItems*[T](name: string, items: seq[T], expectedItems:
+                         seq[T]): bool =
     ## Compare the items with the expected items and show them when
     ## different. Return true when they are the same.
 

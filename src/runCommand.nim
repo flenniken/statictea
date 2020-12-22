@@ -135,7 +135,7 @@ proc warn(message: string) =
   echo message
 
 iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
-    seq[LineParts], spaceTabMatcher: Matcher):  Statement {.tpub.} =
+    seq[LineParts], spaceTabMatcher: Matcher): Statement {.tpub.} =
   ## Iterate through the command's statements.  Statements are
   ## separated by semicolons and are not empty or all spaces.
 
@@ -200,7 +200,8 @@ proc getString*(env: var Env, compiledMatchers: Compiledmatchers,
   ## after the last quote.
 
   # Check that we have a statictea string.
-  var matchesO = compiledMatchers.stringMatcher.getMatches(statement.text, start)
+  var matchesO = compiledMatchers.stringMatcher.getMatches(
+    statement.text, start)
   if not matchesO.isSome:
     env.warnStatement(statement, wNotString, start)
     return
@@ -226,7 +227,8 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
   ## number because it starts with a digit or minus sign.
 
   # Check that we have a statictea number.
-  var matchesO = compiledMatchers.numberMatcher.getMatches(statement.text, start)
+  var matchesO = compiledMatchers.numberMatcher.getMatches(
+    statement.text, start)
   if not matchesO.isSome:
     env.warnStatement(statement, wNotNumber, start)
     return
@@ -264,7 +266,8 @@ proc getFunctionValue(env: var Env, compiledMatchers:
   echo "asdf"
 
 proc getVariable*(env: var Env, statement: Statement, variables:
-                  Variables, nameSpace: string, varName: string, start: Natural): Option[Value] =
+                  Variables, nameSpace: string, varName: string,
+                  start: Natural): Option[Value] =
   ## Look up the variable and return its value. Show an error when the
   ## variable doesn't exists.
   case nameSpace:
@@ -307,7 +310,8 @@ proc getVarOrFunctionValue*(env: var Env, compiledMatchers:
   ## start.
 
   # Get the variable or function name. Match the surrounding white space.
-  let variableO = getMatches(compiledMatchers.variableMatcher, statement.text, start)
+  let variableO = getMatches(compiledMatchers.variableMatcher,
+                             statement.text, start)
   if not variableO.isSome:
     # Shouldn't hit this line.
     env.warnStatement(statement, wInvalidRightHandSide, start)
@@ -350,7 +354,7 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
 
   if char == '\'' or char == '"':
     result = getString(env, compiledMatchers, statement, start)
-  elif char in { '0' .. '9', '-' }:
+  elif char in {'0' .. '9', '-'}:
     result = getNumber(env, compiledMatchers, statement, start)
   elif isLowerAscii(char) or isUpperAscii(char):
     result = getVarOrFunctionValue(env, compiledMatchers, statement,
@@ -401,7 +405,7 @@ proc assignTeaVariable(env: var Env, statement: Statement,
 proc runStatement(env: var Env, statement: Statement,
                   compiledMatchers: Compiledmatchers, variables:
                     Variables):
-    Option[tuple[nameSpace: string, varName: string, value:Value]] {.tpub.} =
+    Option[tuple[nameSpace: string, varName: string, value: Value]] {.tpub.} =
   ## Run one statement. Return the variable namespace, name and value.
 
   # Get the variable name. Match the surrounding white space.
@@ -455,7 +459,8 @@ proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
   setState(variables)
 
   # Loop over the statements and run each one.
-  for statement in yieldStatements(cmdLines, cmdLineParts, compiledMatchers.spaceTabMatcher):
+  for statement in yieldStatements(cmdLines, cmdLineParts,
+      compiledMatchers.spaceTabMatcher):
     # Run the statement.  When there is a statement error, no
     # nameValue is returned and we skip the statement.
     let nameValueO = runStatement(env, statement, compiledMatchers,
@@ -470,7 +475,8 @@ proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
         of "g.":
           variables.global[varName] = value
         of "t.":
-          assignTeaVariable(env, statement, compiledMatchers, variables, varName, value, 0)
+          assignTeaVariable(env, statement, compiledMatchers, variables,
+              varName, value, 0)
         of "s.", "h.":
           env.warnStatement(statement, wReadOnlyDictionary, 0)
         else:

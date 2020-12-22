@@ -53,16 +53,19 @@ suite "Test statictea.nim":
     check outLines.len > 10
     let expected = """
 NAME
+
      statictea - combines a template with data to produce a result
 
 SYNOPSIS
-     statictea [-h] [-n] [-v] [-u] [-s=server.json] [-j=shared.json] [-t=template.html]
-       [-p="pre post"] [-r=result.html]"""
 
-    let firstFew = outLines[0..5].join("\n")
+     statictea [-h] [-n] [-v] [-u] [-s=server.json] [-j=shared.json] 
+         [-t=template.html] [-p="pre post"] [-r=result.html]"""
+
+    let count = 7
+    let firstFew = outLines[0..count].join("\n")
     if firstFew != expected:
       echo "----got----"
-      echo outLines[0..5].join("\n")
+      echo outLines[0..count].join("\n")
       echo "----expected----"
       echo expected
       echo "----"

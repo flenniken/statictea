@@ -52,7 +52,8 @@ proc processTemplateLines(env: var Env, variables: var Variables,
   let compiledMatchers = getCompiledMatchers(prepostTable)
 
   # Allocate a buffer for reading lines.
-  var lineBufferO = newLineBuffer(env.templateStream, filename=env.templateFilename)
+  var lineBufferO = newLineBuffer(env.templateStream,
+      filename = env.templateFilename)
   if not lineBufferO.isSome():
     env.warn(0, wNotEnoughMemoryForLB)
     return

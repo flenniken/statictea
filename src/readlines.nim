@@ -17,9 +17,9 @@ type
     maxLineLen*: int
     bufferSize*: int
     lineNum*: int
-    pos*: int       ## Current byte position in the buffer.
-    charsRead*: int ## Number of bytes of chars in the buffer.
-    buffer*: string ## Memory pre-allocated for the buffer.
+    pos*: int         ## Current byte position in the buffer.
+    charsRead*: int   ## Number of bytes of chars in the buffer.
+    buffer*: string   ## Memory pre-allocated for the buffer.
     filename*: string ## Optional. The stream's filename.
 
 proc getLineNum*(lineBuffer: LineBuffer): int =
@@ -31,8 +31,9 @@ proc getMaxLineLen*(lineBuffer: LineBuffer): int =
 proc getFilename*(lineBuffer: LineBuffer): string =
   result = lineBuffer.filename
 
-proc newLineBuffer*(stream: Stream, maxLineLen: int = defaultMaxLineLen,
-    bufferSize: int = defaultBufferSize, filename: string = ""): Option[LineBuffer] =
+proc newLineBuffer*(stream: Stream, maxLineLen: int =
+    defaultMaxLineLen, bufferSize: int =
+    defaultBufferSize, filename: string = ""): Option[LineBuffer] =
   ## Return a new LineBuffer.
 
   if maxLineLen < minMaxLineLen or maxLineLen > maxMaxLineLen:

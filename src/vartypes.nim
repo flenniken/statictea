@@ -10,7 +10,7 @@ type
     vkInt,
     vkFloat,
     vkDict,
-    vkList,
+    vkList
 
   Value* = ref ValueObj
   ValueObj* {.acyclic.} = object

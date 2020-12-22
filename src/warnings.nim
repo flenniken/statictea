@@ -6,52 +6,52 @@ import strutils
 # Add new warnings to the bottom so the warning numbers never change.
 type
   Warning* = enum
-    wNoFilename, # w0
-    wUnknownSwitch, # w1
-    wUnknownArg, # w2
-    wOneResultAllowed, # w3
-    wExtraPrepostText, # w4
-    wOneTemplateAllowed, # w5
-    wNoPrepostValue, # w6
+    wNoFilename,           # w0
+    wUnknownSwitch,        # w1
+    wUnknownArg,           # w2
+    wOneResultAllowed,     # w3
+    wExtraPrepostText,     # w4
+    wOneTemplateAllowed,   # w5
+    wNoPrepostValue,       # w6
     wSkippingExtraPrepost, # w7
-    wUnableToOpenLogFile, # w8
-    wOneLogAllowed, # w9
+    wUnableToOpenLogFile,  # w8
+    wOneLogAllowed,        # w9
     wUnableToWriteLogFile, # w10
-    wExceptionMsg, # w11
-    wStackTrace, # w12
-    wUnexpectedException, # w13
-    wInvalidJsonRoot, # w14
-    wJsonParseError, # w15
-    wFileNotFound, # w16
-    wUnableToOpenFile, # w17
-    wBigLogFile, # w18
-    wCannotOpenStd, # w19
-    wNotACommand, # w20
-    wCmdLineTooLong, # w21
-    wNoCommand, # w22
-    wNoPostfix, # w23
-    wNoContinuationLine, # w24
+    wExceptionMsg,         # w11
+    wStackTrace,           # w12
+    wUnexpectedException,  # w13
+    wInvalidJsonRoot,      # w14
+    wJsonParseError,       # w15
+    wFileNotFound,         # w16
+    wUnableToOpenFile,     # w17
+    wBigLogFile,           # w18
+    wCannotOpenStd,        # w19
+    wNotACommand,          # w20
+    wCmdLineTooLong,       # w21
+    wNoCommand,            # w22
+    wNoPostfix,            # w23
+    wNoContinuationLine,   # w24
     wSkippingTextAfterNum, # w25
-    wNotNumber, # w26
-    wNumberOverFlow, # w27
+    wNotNumber,            # w26
+    wNumberOverFlow,       # w27
     wNotEnoughMemoryForLB, # w28
-    wMissingStatementVar, # w29
-    wNotString, # w30
-    wTextAfterValue, # w31
-    wInvalidUtf8, # w32
+    wMissingStatementVar,  # w29
+    wNotString,            # w30
+    wTextAfterValue,       # w31
+    wInvalidUtf8,          # w32
     wInvalidRightHandSide, # 33
-    wInvalidVariable, # 34
-    wInvalidNameSpace, # 35
-    wVariableMissing, # 36
-    wStatementError, # 37
-    wReadOnlyDictionary, # 38
-    wReadOnlyTeaVar, # 39
-    wInvalidTeaVar, # 40
-    wInvalidOutputValue, # 41
-    wInvalidMaxCount, # 42
-    wInvalidTeaContent, # 43
-    wInvalidMaxRepeat, # 44
-    wInvalidPrepost, # 45
+    wInvalidVariable,      # 34
+    wInvalidNameSpace,     # 35
+    wVariableMissing,      # 36
+    wStatementError,       # 37
+    wReadOnlyDictionary,   # 38
+    wReadOnlyTeaVar,       # 39
+    wInvalidTeaVar,        # 40
+    wInvalidOutputValue,   # 41
+    wInvalidMaxCount,      # 42
+    wInvalidTeaContent,    # 43
+    wInvalidMaxRepeat,     # 44
+    wInvalidPrepost,       # 45
 
 tpubType:
   const
