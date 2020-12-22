@@ -5,7 +5,6 @@
 import parseCommandLine
 import strutils
 import processTemplate
-import logenv
 import args
 import warnings
 import showhelp

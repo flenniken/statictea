@@ -4,7 +4,6 @@ import processTemplate
 import env
 import args
 import os
-import logenv
 import readjson
 
 suite "processTemplate":

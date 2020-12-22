@@ -3,7 +3,6 @@ import statictea
 import version
 import streams
 import strutils
-import logenv
 import options
 import env
 
