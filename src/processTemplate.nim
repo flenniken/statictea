@@ -87,6 +87,7 @@ proc processTemplate*(env: var Env, args: Args): int =
   # them, so that they have complete control over the preposts used.
   var prepostTable: PrepostTable
   if args.prepostList.len > 0:
+    # The prepostList has been validated already.
     prepostTable = getUserPrepostTable(args.prepostList)
   else:
     prepostTable = getDefaultPrepostTable()

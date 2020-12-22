@@ -306,8 +306,8 @@ proc getVarOrFunctionValue*(env: var Env, compiledMatchers:
            Compiledmatchers, statement: Statement,
            start: Natural, variables: Variables): Option[ValueAndLength] =
   ## Return the statement's right hand side value and the length
-  ## matched. The right hand side starts at the index specified by
-  ## start.
+  ## matched when the right hand side is a variable or a function. The
+  ## right hand side starts at the index specified by start.
 
   # Get the variable or function name. Match the surrounding white space.
   let variableO = getMatches(compiledMatchers.variableMatcher,
@@ -403,8 +403,7 @@ proc assignTeaVariable(env: var Env, statement: Statement,
 
 
 proc runStatement(env: var Env, statement: Statement,
-                  compiledMatchers: Compiledmatchers, variables:
-                    Variables):
+    compiledMatchers: Compiledmatchers, variables: Variables):
     Option[tuple[nameSpace: string, varName: string, value: Value]] {.tpub.} =
   ## Run one statement. Return the variable namespace, name and value.
 
@@ -416,6 +415,7 @@ proc runStatement(env: var Env, statement: Statement,
   let variable = variableO.get()
   let (nameSpace, varName) = variable.get2Groups()
 
+  # Get the equal sign and following whitespace.
   let equalSignO = getMatches(compiledMatchers.equalSignMatcher,
                               statement.text, variable.length)
   if not equalSignO.isSome:
