@@ -4,12 +4,11 @@ import matches
 import tables
 import options
 import regexes
-import strutils
 
 suite "matches.nim":
 
   test "prepost table":
-    var prepostTable = getPrepostTable()
+    var prepostTable = getDefaultPrepostTable()
     check prepostTable.len == 6
     for prefix, postfix in prepostTable.pairs:
       check prefix.len > 0
@@ -17,7 +16,7 @@ suite "matches.nim":
     check prepostTable["<--!$"] == "-->"
 
   test "prefixMatcher tests":
-    var prefixMatcher = getPrefixMatcher(getPrepostTable())
+    var prefixMatcher = getPrefixMatcher(getDefaultPrepostTable())
 
     check checkMatcher(prefixMatcher, "<--!$ nextline -->", 0, @["<--!$"], 6)
     check checkMatcher(prefixMatcher, "#$ nextline", 0, @["#$"], 3)
@@ -35,23 +34,17 @@ suite "matches.nim":
     check not prefixMatcher.getMatches("<--$ nextline -->", 0).isSome
     check not prefixMatcher.getMatches("<--!$nextline -->", 0).isSome
 
-  test "add prefix":
+  test "getUserPrepostTable user prefix":
     var prepostList = @[("abc", "def")]
-    var prepostTable = getPrepostTable(prepostList)
-    check prepostTable.len == 7
+    var prepostTable = getUserPrepostTable(prepostList)
+    check prepostTable.len == 1
     check prepostTable["abc"] == "def"
-    var prefixMatcher = getPrefixMatcher(prepostTable)
-    check checkMatcher(prefixMatcher, "abc nextline def", 0, @["abc"], 4)
-
-# todo: prefix with newline in it!
 
   test "long prefix":
     let prefix = "this is a very long prefix nextline post"
     var prepostList = @[(prefix, "post")]
-    var prepostTable = getPrepostTable(prepostList)
-    var prefixMatcher = getPrefixMatcher(prepostTable)
-    let line = "$1  nextline post" % prefix
-    check checkMatcher(prefixMatcher, line, 0, @[prefix], 42)
+    var prepostTable = getUserPrepostTable(prepostList)
+    check prepostTable.len == 1
     check prepostTable[prefix] == "post"
 
   test "command matcher":

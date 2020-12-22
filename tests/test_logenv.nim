@@ -61,10 +61,6 @@ suite "logenv.nim":
     var logLines = env.closeReadDelete(20)
     check logLines.len == 0
 
-  test "logenv file line":
-    # todo: log from another procedure.
-    discard
-
   test "parseTimeStamp":
     let dtOption = parseTimeStamp("2020-10-01 08:21:28.618")
     check dtOption.isSome

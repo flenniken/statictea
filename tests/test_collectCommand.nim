@@ -17,8 +17,7 @@ proc testCollectCommand(
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]): bool =
 
-  var prepostTable = getPrepostTable()
-  var prefixMatcher = getPrefixMatcher(prepostTable)
+  var prefixMatcher = getPrefixMatcher(getDefaultPrepostTable())
   var commandMatcher = getCommandMatcher()
   var inStream = newStringStream(content)
   var resultStream = newStringStream()

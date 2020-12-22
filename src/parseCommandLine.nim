@@ -47,8 +47,8 @@ func `$`(prepostList: seq[Prepost]): string {.tpub.} =
   result = parts.join(", ")
 
 
-
-let prepostRegex = re"^\s*(\S+)\s*(\S*)\s*(.*)$"
+# \x21-\x7F is ascii without spaces or control characters.
+let prepostRegex = re"^\s*([\x21-\x7F]+)\s*([\x21-\x7F]*)\s*(.*)$"
 
 proc parsePrepost(str: string): (Prepost, string) {.tpub.} =
   ## Parse a prepost string. Return the Prepost object and another
@@ -80,6 +80,7 @@ proc handleWord(switch: string, word: string, value: string,
   let listIndex = fileListIndex(word)
   if listIndex != -1:
     if value == "":
+      # todo: replace this with env.warn. Remove all warn calls.
       warn("cmdline", 0, wNoFilename, word, $switch)
     else:
       filenames[listIndex].add(value)
@@ -105,7 +106,10 @@ proc handleWord(switch: string, word: string, value: string,
       let (prepost, extra) = parsePrepost(value)
       if extra != "":
         warn("cmdline", 0, wSkippingExtraPrepost, extra)
-      prepostList.add(prepost)
+      if prepost.pre == "":
+        warn("cmdline", 0, wInvalidPrepost, value)
+      else:
+        prepostList.add(prepost)
   else:
     warn("cmdline", 0, wUnknownSwitch, $switch)
 

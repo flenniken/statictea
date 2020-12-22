@@ -5,6 +5,7 @@ import args
 import parseCommandLine
 import warnenv
 import streams
+import env
 
 proc tpcl(
     cmdLine: string,
@@ -17,23 +18,23 @@ proc tpcl(
     templateList: seq[string] = @[],
     warningLines: seq[string] = @[],
     prepostList: seq[Prepost]= @[]
-      ) =
+      ): bool =
 
   openWarnStream(newStringStream())
   let args = parseCommandLine(cmdLine)
   let lines = readWarnLines()
   closeWarnStream()
 
-  check(args.help == help)
-  check(args.version == version)
-  check(args.update == update)
-  check(args.serverList == serverList)
-  check(args.sharedList == sharedList)
-  check(args.templateList == templateList)
-  check(args.resultFilename == resultFilename)
-  check(args.prepostList == prepostList)
-  check(lines == warningLines)
-
+  notReturn expectedItem("help", args.help, help)
+  notReturn expectedItem("version", args.version, version)
+  notReturn expectedItem("update", args.update, update)
+  notReturn expectedItem("serverList", args.serverList, serverList)
+  notReturn expectedItem("sharedList", args.sharedList, sharedList)
+  notReturn expectedItem("templateList", args.templateList, templateList)
+  notReturn expectedItem("resultFilename", args.resultFilename, resultFilename)
+  notReturn expectedItems("prepostList", args.prepostList, prepostList)
+  notReturn expectedItems("warningLines", lines, warningLines)
+  result = true
 
 suite "parseCommandLine":
 
@@ -75,39 +76,47 @@ suite "parseCommandLine":
     check(parsePrepost("a") == (("a", ""), ""))
     check(parsePrepost("a b") == (("a", "b"), ""))
     check(parsePrepost("a b c") == (("a", "b"), "c"))
+    check(parsePrepost("   a b") == (("a", "b"), ""))
+    check(parsePrepost("   a  ") == (("a", ""), ""))
+    check(parsePrepost("     ") == (("", ""), ""))
+    check(parsePrepost("a\n b\n") == (("a", "b"), ""))
+    check(parsePrepost("nextline block") == (("nextline", "block"), ""))
+    check(parsePrepost("\x19a b") == (("", ""), ""))
+    check(parsePrepost("a b\x00y") == (("a", "b"), "\x00y"))
+    check(parsePrepost("a \x00y") == (("a", ""), "\x00y"))
 
   test "parseCommandLine-v":
-    tpcl("-v", version=true)
+    check tpcl("-v", version=true)
 
   test "parseCommandLine-h":
-    tpcl("-h", help=true)
+    check tpcl("-h", help=true)
 
   test "parseCommandLine-t":
-    tpcl("-t=tea.html", templateList = @["tea.html"])
+    check tpcl("-t=tea.html", templateList = @["tea.html"])
 
   test "parseCommandLine-template":
-    tpcl("--template=tea.html", templateList = @["tea.html"])
+    check tpcl("--template=tea.html", templateList = @["tea.html"])
 
   test "parseCommandLine-s":
-    tpcl("-s=server.json", serverList = @["server.json"])
+    check tpcl("-s=server.json", serverList = @["server.json"])
 
   test "parseCommandLine-server":
-    tpcl("--server=server.json", serverList = @["server.json"])
+    check tpcl("--server=server.json", serverList = @["server.json"])
 
   test "parseCommandLine-j":
-    tpcl("-j=shared.json", sharedList = @["shared.json"])
+    check tpcl("-j=shared.json", sharedList = @["shared.json"])
 
   test "parseCommandLine-shared":
-    tpcl("--shared=shared.json", sharedList = @["shared.json"])
+    check tpcl("--shared=shared.json", sharedList = @["shared.json"])
 
   test "parseCommandLine-r":
-    tpcl("-r=result.html", resultFilename = "result.html")
+    check tpcl("-r=result.html", resultFilename = "result.html")
 
   test "parseCommandLine-result":
-    tpcl("--result=result.html", resultFilename = "result.html")
+    check tpcl("--result=result.html", resultFilename = "result.html")
 
   test "parseCommandLine-happy-path":
-    tpcl("-s=server.json -j=shared.json -t=tea.html -r=result.html",
+    check tpcl("-s=server.json -j=shared.json -t=tea.html -r=result.html",
          serverList = @["server.json"],
          sharedList = @["shared.json"],
          templateList = @["tea.html"],
@@ -115,7 +124,7 @@ suite "parseCommandLine":
     )
 
   test "parseCommandLine-multiple":
-    tpcl("-s=server.json -s=server2.json -j=shared.json -j=shared2.json -t=tea.html -r=result.html",
+    check tpcl("-s=server.json -s=server2.json -j=shared.json -j=shared2.json -t=tea.html -r=result.html",
          serverList = @["server.json", "server2.json"],
          sharedList = @["shared.json", "shared2.json"],
          templateList = @["tea.html"],
@@ -124,35 +133,35 @@ suite "parseCommandLine":
 
   # You cannot test quotes here. The quote processing happens before sending to the parser.
   # test "parseCommandLine-quotes1":
-  #   tpcl("-r='result.html'", resultFilename = "result.html")
+  #   check tpcl("-r='result.html'", resultFilename = "result.html")
 
   # test "parseCommandLine-quotes2":
-  #   tpcl("-r=\"name with spaces result.html\"", resultFilename = "name with spaces result.html")
+  #   check tpcl("-r=\"name with spaces result.html\"", resultFilename = "name with spaces result.html")
 
   test "parseCommandLine-prepost":
-    tpcl("--prepost=<--$", prepostList = @[("<--$", "")])
+    check tpcl("--prepost=<--$", prepostList = @[("<--$", "")])
 
   # Test some error cases.
 
   test "parseCommandLine-no-filename":
-    tpcl("-s", warningLines = @["cmdline(0): w0: No server filename. Use s=filename."])
+    check tpcl("-s", warningLines = @["cmdline(0): w0: No server filename. Use s=filename."])
 
   test "parseCommandLine-no-switch":
-    tpcl("-w", warningLines = @["cmdline(0): w1: Unknown switch: w."])
+    check tpcl("-w", warningLines = @["cmdline(0): w1: Unknown switch: w."])
 
   test "parseCommandLine-no-long-switch":
-    tpcl("--hello", warningLines = @["cmdline(0): w1: Unknown switch: hello."])
+    check tpcl("--hello", warningLines = @["cmdline(0): w1: Unknown switch: hello."])
 
   test "parseCommandLine-no-arg":
-    tpcl("bare", warningLines = @["cmdline(0): w2: Unknown argument: bare."])
+    check tpcl("bare", warningLines = @["cmdline(0): w2: Unknown argument: bare."])
 
   test "parseCommandLine-no-args":
-    tpcl("bare naked", warningLines = @["cmdline(0): w2: Unknown argument: bare.",
+    check tpcl("bare naked", warningLines = @["cmdline(0): w2: Unknown argument: bare.",
     "cmdline(0): w2: Unknown argument: naked."])
 
   test "parseCommandLine-missing-result":
-    tpcl("-r", warningLines = @["cmdline(0): w0: No result filename. Use r=filename."])
+    check tpcl("-r", warningLines = @["cmdline(0): w0: No result filename. Use r=filename."])
 
   test "parseCommandLine-two-results":
-    tpcl("-r=result.html -r=asdf.html", resultFilename="result.html",
+    check tpcl("-r=result.html -r=asdf.html", resultFilename="result.html",
          warningLines = @["cmdline(0): w3: One result file allowed, skipping: 'asdf.html'."])

@@ -46,12 +46,22 @@ iterator combine(list1: openArray[Prepost], list2: openArray[Prepost]): Prepost 
   for prepost in list2:
     yield(prepost)
 
-proc getPrepostTable*(prepostList: seq[Prepost] = @[]): PrepostTable =
-  ## Return an ordered table that maps prefixes to postfixes.  The
-  ## returned table contains the given prepost items together with
-  ## the predefined items.
+proc getDefaultPrepostTable*(): PrepostTable =
+  ## Return the default prepost table.
   result = initOrderedTable[string, string]()
-  for prepost in combine(prepostList, predefinedPrepost):
+  for prepost in predefinedPrepost:
+    assert prepost.pre != ""
+    result[prepost.pre] = prepost.post
+
+proc getUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
+  ## Return an ordered table that maps prefixes to postfixes. The
+  ## given prepostList contains optional prefixes and postfixes from
+  ## the user on the command line.
+  assert prepostList.len > 0
+  result = initOrderedTable[string, string]()
+  for prepost in prepostList:
+    # The prefix and postfix values have been validated by the command line
+    # processing procedure parsePrepost.
     assert prepost.pre != ""
     result[prepost.pre] = prepost.post
 
@@ -160,10 +170,10 @@ proc getStringMatcher*(): Matcher =
 
   result = newMatcher("""'([^']*)'\s*$|"([^"]*)"\s*""", 2)
 
-proc getCompiledMatchers*(prepostList: seq[Prepost] = @[]): CompiledMatchers =
+proc getCompiledMatchers*(prepostTable: PrepostTable): CompiledMatchers =
   ## Compile all the matchers and return them in the
   ## CompiledMatchers object.
-  result.prepostTable = getPrepostTable(prepostList)
+  result.prepostTable = prepostTable
   result.prefixMatcher = getPrefixMatcher(result.prepostTable)
   result.commandMatcher = getCommandMatcher()
   result.variableMatcher = getVariableMatcher()
@@ -179,3 +189,8 @@ when defined(test):
     let matchesO = getLastPart(matcher, line)
     result = checkMatches(matchesO, matcher, line, expectedStart,
       expected, expectedLength)
+
+  proc getCompiledMatchers*(): CompiledMatchers =
+    ## Get the compile matchers for testing.  It uses the default
+    ## prepost items.
+    result = getCompiledMatchers(getDefaultPrepostTable())

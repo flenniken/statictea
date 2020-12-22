@@ -45,11 +45,11 @@ unchanged.
 ]#
 
 proc processTemplateLines(env: var Env, variables: var Variables,
-    prepostList: seq[Prepost]) =
+                          prepostTable: PrepostTable) =
   ## Process the given template file.
 
   # Get all the compiled regular expression matchers.
-  let compiledMatchers = getCompiledMatchers(prepostList)
+  let compiledMatchers = getCompiledMatchers(prepostTable)
 
   # Allocate a buffer for reading lines.
   var lineBufferO = newLineBuffer(env.templateStream, filename=env.templateFilename)
@@ -81,8 +81,17 @@ proc processTemplate*(env: var Env, args: Args): int =
 
   var variables = readJsonVariables(env, args)
 
+  # Get the prepost table, either the user specified one or the
+  # default one. The defaults are not used when the user specifies
+  # them, so that they have complete control over the preposts used.
+  var prepostTable: PrepostTable
+  if args.prepostList.len > 0:
+    prepostTable = getUserPrepostTable(args.prepostList)
+  else:
+    prepostTable = getDefaultPrepostTable()
+
   # Process the template.
-  processTemplateLines(env, variables, args.prepostList)
+  processTemplateLines(env, variables, prepostTable)
 
   if env.warningWritten > 0:
     result = 1
