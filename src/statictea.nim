@@ -45,7 +45,7 @@ proc main(env: var Env, argv: seq[string]): int {.tpub.} =
   setControlCHook(controlCHandler)
 
   # Process the command line args.
-  let args = parseCommandLine(argv)
+  let args = parseCommandLine(env, argv)
 
   try:
     result = processArgs(env, args)

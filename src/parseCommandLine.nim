@@ -6,7 +6,7 @@ import tpub
 import re
 import args
 import warnings
-import warnenv
+import env
 
 const
   fileLists = ["server", "shared", "template"]
@@ -69,7 +69,7 @@ proc parsePrepost(str: string): (Prepost, string) {.tpub.} =
     result = (("", ""), "")
 
 
-proc handleWord(switch: string, word: string, value: string,
+proc handleWord(env: var Env, switch: string, word: string, value: string,
     help: var bool, version: var bool, update: var bool,
     resultFilename: var string,
     filenames: var array[4, seq[string]], prepostList: var seq[Prepost]) =
@@ -80,8 +80,7 @@ proc handleWord(switch: string, word: string, value: string,
   let listIndex = fileListIndex(word)
   if listIndex != -1:
     if value == "":
-      # todo: replace this with env.warn. Remove all warn calls.
-      warn("cmdline", 0, wNoFilename, word, $switch)
+      env.warn(0, wNoFilename, word, $switch)
     else:
       filenames[listIndex].add(value)
   elif word == "help":
@@ -92,29 +91,29 @@ proc handleWord(switch: string, word: string, value: string,
     update = true
   elif word == "result":
     if value == "":
-      warn("cmdline", 0, wNoFilename, word, $switch)
+      env.warn(0, wNoFilename, word, $switch)
     elif resultFilename != "":
-      warn("cmdline", 0, wOneResultAllowed, value)
+      env.warn(0, wOneResultAllowed, value)
     else:
       resultFilename = value
   elif word == "prepost":
     # prepost is a string with a space dividing the prefix from the
     # postfix. The postfix is optional. -p="<--$ -->" or -p="#$"
     if value == "":
-      warn("cmdline", 0, wNoPrepostValue, $switch)
+      env.warn(0, wNoPrepostValue, $switch)
     else:
       let (prepost, extra) = parsePrepost(value)
       if extra != "":
-        warn("cmdline", 0, wSkippingExtraPrepost, extra)
+        env.warn(0, wSkippingExtraPrepost, extra)
       if prepost.pre == "":
-        warn("cmdline", 0, wInvalidPrepost, value)
+        env.warn(0, wInvalidPrepost, value)
       else:
         prepostList.add(prepost)
   else:
-    warn("cmdline", 0, wUnknownSwitch, $switch)
+    env.warn(0, wUnknownSwitch, $switch)
 
 
-proc parseCommandLine*(argv: seq[string]): Args =
+proc parseCommandLine*(env: var Env, argv: seq[string]): Args =
   ## Return the command line parameters.
 
   var help: bool = false
@@ -133,17 +132,18 @@ proc parseCommandLine*(argv: seq[string]): Args =
           let letter = key[ix]
           let word = letterToWord(letter)
           if word == "":
-            warn("cmdline", 0, wUnknownSwitch, $letter)
+            # todo: remove unused lineNum parameter.
+            env.warn(0, wUnknownSwitch, $letter)
           else:
-            handleWord($letter, word, value, help, version, update,
+            handleWord(env, $letter, word, value, help, version, update,
                  resultFilename, filenames, prepostList)
 
       of CmdLineKind.cmdLongOption:
-        handleWord(key, key, value, help, version, update,
+        handleWord(env, key, key, value, help, version, update,
                    resultFilename, filenames, prepostList)
 
       of CmdLineKind.cmdArgument:
-        warn("cmdline", 0, wUnknownArg, key)
+        env.warn(0, wUnknownArg, key)
 
       of CmdLineKind.cmdEnd:
         discard
@@ -157,6 +157,7 @@ proc parseCommandLine*(argv: seq[string]): Args =
   result.resultFilename = resultFilename
   result.prepostList = prepostList
 
-proc parseCommandLine*(cmdLine: string = ""): Args =
-  let argv = cmdLine.splitWhitespace()
-  result = parseCommandLine(argv)
+when defined(test):
+  proc parseCommandLine*(env: var Env, cmdLine: string = ""): Args =
+    let argv = cmdLine.splitWhitespace()
+    result = parseCommandLine(env, argv)

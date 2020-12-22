@@ -3,8 +3,6 @@
 import unittest
 import args
 import parseCommandLine
-import warnenv
-import streams
 import env
 
 proc tpcl(
@@ -16,14 +14,17 @@ proc tpcl(
     serverList: seq[string] = @[],
     sharedList: seq[string] = @[],
     templateList: seq[string] = @[],
-    warningLines: seq[string] = @[],
-    prepostList: seq[Prepost]= @[]
+    prepostList: seq[Prepost]= @[],
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[],
       ): bool =
 
-  openWarnStream(newStringStream())
-  let args = parseCommandLine(cmdLine)
-  let lines = readWarnLines()
-  closeWarnStream()
+  var env = openEnvTest("_parseCommandLine.log")
+
+  let args = parseCommandLine(env, cmdLine)
+
+  let (logLines, errLines, outLines) = env.readCloseDelete()
 
   notReturn expectedItem("help", args.help, help)
   notReturn expectedItem("version", args.version, version)
@@ -33,7 +34,11 @@ proc tpcl(
   notReturn expectedItem("templateList", args.templateList, templateList)
   notReturn expectedItem("resultFilename", args.resultFilename, resultFilename)
   notReturn expectedItems("prepostList", args.prepostList, prepostList)
-  notReturn expectedItems("warningLines", lines, warningLines)
+
+  notReturn expectedItems("logLines", logLines, eLogLines)
+  notReturn expectedItems("errLines", errLines, eErrLines)
+  notReturn expectedItems("outLines", outLines, eOutLines)
+
   result = true
 
 suite "parseCommandLine":
@@ -144,24 +149,24 @@ suite "parseCommandLine":
   # Test some error cases.
 
   test "parseCommandLine-no-filename":
-    check tpcl("-s", warningLines = @["cmdline(0): w0: No server filename. Use s=filename."])
+    check tpcl("-s", eErrLines = @["initializing(0): w0: No server filename. Use s=filename."])
 
   test "parseCommandLine-no-switch":
-    check tpcl("-w", warningLines = @["cmdline(0): w1: Unknown switch: w."])
+    check tpcl("-w", eErrLines = @["initializing(0): w1: Unknown switch: w."])
 
   test "parseCommandLine-no-long-switch":
-    check tpcl("--hello", warningLines = @["cmdline(0): w1: Unknown switch: hello."])
+    check tpcl("--hello", eErrLines = @["initializing(0): w1: Unknown switch: hello."])
 
   test "parseCommandLine-no-arg":
-    check tpcl("bare", warningLines = @["cmdline(0): w2: Unknown argument: bare."])
+    check tpcl("bare", eErrLines = @["initializing(0): w2: Unknown argument: bare."])
 
   test "parseCommandLine-no-args":
-    check tpcl("bare naked", warningLines = @["cmdline(0): w2: Unknown argument: bare.",
-    "cmdline(0): w2: Unknown argument: naked."])
+    check tpcl("bare naked", eErrLines = @["initializing(0): w2: Unknown argument: bare.",
+    "initializing(0): w2: Unknown argument: naked."])
 
   test "parseCommandLine-missing-result":
-    check tpcl("-r", warningLines = @["cmdline(0): w0: No result filename. Use r=filename."])
+    check tpcl("-r", eErrLines = @["initializing(0): w0: No result filename. Use r=filename."])
 
   test "parseCommandLine-two-results":
     check tpcl("-r=result.html -r=asdf.html", resultFilename="result.html",
-         warningLines = @["cmdline(0): w3: One result file allowed, skipping: 'asdf.html'."])
+         eErrLines = @["initializing(0): w3: One result file allowed, skipping: 'asdf.html'."])
