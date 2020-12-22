@@ -95,7 +95,6 @@ proc logLine*(env: var Env, filename: string, lineNum: int, message: string) =
     # raise newException(IOError, "test io error")
     env.logFile.writeLine(line)
   except:
-    # todo: replace warn with env.warn
     env.warn(0, wUnableToWriteLogFile, filename)
     env.warn(0, wExceptionMsg, getCurrentExceptionMsg())
     # The stack trace is only available in the debug builds.

@@ -132,7 +132,6 @@ proc parseCommandLine*(env: var Env, argv: seq[string]): Args =
           let letter = key[ix]
           let word = letterToWord(letter)
           if word == "":
-            # todo: remove unused lineNum parameter.
             env.warn(0, wUnknownSwitch, $letter)
           else:
             handleWord(env, $letter, word, value, help, version, update,

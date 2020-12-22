@@ -13,7 +13,6 @@ import tpub
 import env
 
 # todo: put the log in the standard log location, ie /var/log.
-# check free disk space where the template is being written?
 
 proc processArgs(env: var Env, args: Args): int =
   if args.help:

@@ -198,7 +198,6 @@ suite "matches.nim":
     check checkMatcher(matcher, """"string"  """, 0, @["", "string"], 10)
     check checkMatcher(matcher, """'12"4'""", 0, @["12\"4", ""], 6)
     check checkMatcher(matcher, """"12'4"  """, 0, @["", "12'4"], 8)
-    # todo: test utf-8
 
   test "getStringMatcher with start":
     var matcher = getStringMatcher()
