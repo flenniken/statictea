@@ -52,6 +52,7 @@ type
     wInvalidTeaContent,    # 43
     wInvalidMaxRepeat,     # 44
     wInvalidPrepost,       # 45
+    wMissingCommaParen,    # 46
 
 tpubType:
   const
@@ -104,6 +105,7 @@ tpubType:
       "Invalid t.content, it must be a string.", # wInvalidTeaContent
       "Invalid t.repeat, it must be an integer >= 0 and <= t.maxRepeat.", # wInvalidMaxRepeat
       "Invalid prepost: $1.", # wInvalidPrepost
+      "Expected comma or right parentheses." # wMissingCommaParen
     ]
 
 func getWarning*(filename: string, lineNum: int,

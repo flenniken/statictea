@@ -259,11 +259,50 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
     assert intPos.length <= matches.length
     result = some(ValueAndLength(value: value, length: matches.length))
 
-proc getFunctionValue(env: var Env, compiledMatchers:
-                      Compiledmatchers, name: string, statement:
-                        Statement, start: Natural, variables: Variables):
-                          Option[ValueAndLength] =
-  echo "asdf"
+proc runFunction(env: var Env, functionName: string, parameters:
+                 seq[Value]): Option[Value] =
+  ## Call the given function and return its value.
+  echo "runFunction"
+  if functionName == "len":
+    result = some(Value(kind: vkInt, intv: 3))
+
+# forward reference
+proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
+              statement: Statement, start: Natural, variables:
+                Variables): Option[ValueAndLength]
+
+proc getFunctionValue*(env: var Env, compiledMatchers:
+    Compiledmatchers, functionName: string, statement:
+    Statement, start: Natural, variables: Variables): Option[ValueAndLength] =
+  ## Collect the function parameter values then call it.
+
+  var parameters: seq[Value] = @[]
+  var pos = start
+  while true:
+    let valueAndLengthO = getValue(env, compiledMatchers, statement,
+                                   pos, variables)
+    if not valueAndLengthO.isSome:
+      return
+
+    parameters.add(valueAndLengthO.get().value)
+    pos = pos + valueAndLengthO.get().length
+
+    # Get the comma or parentheses and white space following the value.
+    let commaParenO = getMatches(compiledMatchers.commaParenthesesMatcher,
+                                statement.text, pos)
+    if not commaParenO.isSome:
+      env.warnStatement(statement, wMissingCommaParen, pos)
+      return
+    let commaParen = commaParenO.get()
+    pos = pos + commaParen.length
+    let symbol = commaParen.getGroup()
+    if symbol == ")":
+      break
+
+  # Run the function.
+  let valueO = runFunction(env, functionName, parameters)
+  if valueO.isSome:
+    result = some(ValueAndLength(value: valueO.get(), length: pos))
 
 proc getVariable*(env: var Env, statement: Statement, variables:
                   Variables, nameSpace: string, varName: string,
