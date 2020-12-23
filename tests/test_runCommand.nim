@@ -165,9 +165,12 @@ proc testGetVarOrFunctionValue(statement: Statement, start: Natural,
   notReturn outLines.len == 0
   result = true
 
-proc testWarnStatement(statement: Statement, warning: Warning, start:
-                       Natural, p1: string="", p2: string="",
-                       eErrLines: seq[string] = @[]): bool =
+proc testWarnStatement(statement: Statement,
+    warning: Warning, start: Natural, p1: string="", p2: string="",
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[]
+  ): bool =
 
   var env = openEnvTest("_getVariable.log")
   env.templateFilename = "template.html"
@@ -180,6 +183,30 @@ proc testWarnStatement(statement: Statement, warning: Warning, start:
   notReturn outLines.len == 0
   result = true
 
+proc testGetFunctionValue(functionName: string, statement: Statement, start: Natural,
+    eValueAndLengthO: Option[ValueAndLength] = none(ValueAndLength),
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[]
+  ): bool =
+
+  var env = openEnvTest("_testGetFunctionValue.log")
+  env.templateFilename = "template.html"
+  var variables = getTestVariables()
+  let compiledMatchers = getCompiledMatchers()
+
+  let valueAndLengthO = getFunctionValue(env, compiledMatchers,
+                          functionName, statement, start, variables)
+
+  let (logLines, errLines, outLines) = env.readCloseDelete()
+
+  notReturn expectedItems("errLines", errLines, eErrLines)
+  notReturn expectedItems("outLines", outLines, eOutLines)
+  notReturn expectedItems("logLines", logLines, eLogLines)
+
+  notReturn expectedItem("valueAndLength", valueAndLengthO, eValueAndLengthO)
+
+  result = true
 
 suite "runCommand.nim":
 
@@ -641,3 +668,19 @@ suite "runCommand.nim":
         "                                            ^",
     ]
     check testWarnStatement(statement, wVariableMissing, 94, p1="num", eErrLines = eErrLines)
+
+  test "getFunctionValue":
+    let functionName = "len"
+    let statement = newStatement(text="""tea = len("abc") """, lineNum=16, 0)
+    let start = 10
+    let value = Value(kind: vkInt, intv: 3)
+    let eValueAndLengthO = some(ValueAndLength(value: value, length: 7))
+    check testGetFunctionValue(functionName, statement, start, eValueAndLengthO = eValueAndLengthO)
+
+  test "getFunctionValue 2 parameters":
+    let functionName = "concat"
+    let statement = newStatement(text="""tea = concat("abc", "def") """, lineNum=16, 0)
+    let start = 13
+    let value = Value(kind: vkString, stringv: "abcdef")
+    let eValueAndLengthO = some(ValueAndLength(value: value, length: 14))
+    check testGetFunctionValue(functionName, statement, start, eValueAndLengthO = eValueAndLengthO)

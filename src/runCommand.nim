@@ -262,9 +262,11 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
 proc runFunction(env: var Env, functionName: string, parameters:
                  seq[Value]): Option[Value] =
   ## Call the given function and return its value.
-  echo "runFunction"
   if functionName == "len":
     result = some(Value(kind: vkInt, intv: 3))
+  elif functionName == "concat":
+    result = some(Value(kind: vkString, stringv: "abcdef"))
+
 
 # forward reference
 proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
@@ -274,11 +276,13 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
 proc getFunctionValue*(env: var Env, compiledMatchers:
     Compiledmatchers, functionName: string, statement:
     Statement, start: Natural, variables: Variables): Option[ValueAndLength] =
-  ## Collect the function parameter values then call it.
+  ## Collect the function parameter values then call it. Start should
+  ## be pointing at the first parameter.
 
   var parameters: seq[Value] = @[]
   var pos = start
   while true:
+    # Get the parameter's value.
     let valueAndLengthO = getValue(env, compiledMatchers, statement,
                                    pos, variables)
     if not valueAndLengthO.isSome:
@@ -302,7 +306,7 @@ proc getFunctionValue*(env: var Env, compiledMatchers:
   # Run the function.
   let valueO = runFunction(env, functionName, parameters)
   if valueO.isSome:
-    result = some(ValueAndLength(value: valueO.get(), length: pos))
+    result = some(ValueAndLength(value: valueO.get(), length: pos-start))
 
 proc getVariable*(env: var Env, statement: Statement, variables:
                   Variables, nameSpace: string, varName: string,
