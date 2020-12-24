@@ -39,20 +39,21 @@ type
     wNotString,            # w30
     wTextAfterValue,       # w31
     wInvalidUtf8,          # w32
-    wInvalidRightHandSide, # 33
-    wInvalidVariable,      # 34
-    wInvalidNameSpace,     # 35
-    wVariableMissing,      # 36
-    wStatementError,       # 37
-    wReadOnlyDictionary,   # 38
-    wReadOnlyTeaVar,       # 39
-    wInvalidTeaVar,        # 40
-    wInvalidOutputValue,   # 41
-    wInvalidMaxCount,      # 42
-    wInvalidTeaContent,    # 43
-    wInvalidMaxRepeat,     # 44
-    wInvalidPrepost,       # 45
-    wMissingCommaParen,    # 46
+    wInvalidRightHandSide, # w33
+    wInvalidVariable,      # w34
+    wInvalidNameSpace,     # w35
+    wVariableMissing,      # w36
+    wStatementError,       # w37
+    wReadOnlyDictionary,   # w38
+    wReadOnlyTeaVar,       # w39
+    wInvalidTeaVar,        # w40
+    wInvalidOutputValue,   # w41
+    wInvalidMaxCount,      # w42
+    wInvalidTeaContent,    # w43
+    wInvalidMaxRepeat,     # w44
+    wInvalidPrepost,       # w45
+    wMissingCommaParen,    # w46
+    wExpectedStrings,      # w47
 
 tpubType:
   const
@@ -92,7 +93,7 @@ tpubType:
       "Invalid string.", # wNotString
       "Unused text at the end of the statement.", # wTextAfterValue
       "Invalid UTF-8 byte in the string.", # wInvalidUtf8
-      "Expected a string, number, variable or function on the right hand side.", # wInvalidRightHandSide
+      "Expected a string, number, variable or function.", # wInvalidRightHandSide
       "Invalid variable or missing equal sign.", # wInvalidVariable
       "The variable namespace '$1' does not exist.", # wInvalidNameSpace
       "The variable '$1' does not exist.", # wVariableMissing
@@ -105,7 +106,8 @@ tpubType:
       "Invalid t.content, it must be a string.", # wInvalidTeaContent
       "Invalid t.repeat, it must be an integer >= 0 and <= t.maxRepeat.", # wInvalidMaxRepeat
       "Invalid prepost: $1.", # wInvalidPrepost
-      "Expected comma or right parentheses." # wMissingCommaParen
+      "Expected comma or right parentheses.", # wMissingCommaParen
+      "Concat parameter $1 is not a string.", # wExpectedStrings
     ]
 
 func getWarning*(filename: string, lineNum: int,

@@ -38,6 +38,7 @@ type
     numberMatcher*: Matcher
     stringMatcher*: Matcher
     leftParenthesesMatcher*: Matcher
+    rightParenthesesMatcher*: Matcher
     commaParenthesesMatcher*: Matcher
 
 iterator combine(list1: openArray[Prepost], list2: openArray[
@@ -157,6 +158,11 @@ proc getCommaParenthesesMatcher*(): Matcher =
   # Note: nim sets the regex anchor option.
   result = newMatcher(r"([,)])\s*", 1)
 
+proc getRightParenthesesMatcher*(): Matcher =
+  ## Match a right parentheses and the optional following white space.
+  # Note: nim sets the regex anchor option.
+  result = newMatcher(r"\)\s*", 0)
+
 proc getNumberMatcher*(): Matcher =
   ## Match a number and the optional trailing whitespace. Return the
   ## optional decimal point that tells whether the number is a float
@@ -190,6 +196,7 @@ proc getCompiledMatchers*(prepostTable: PrepostTable): CompiledMatchers =
   result.equalSignMatcher = getEqualSignMatcher()
   result.stringMatcher = getStringMatcher()
   result.leftParenthesesMatcher = getLeftParenthesesMatcher()
+  result.rightParenthesesMatcher = getRightParenthesesMatcher()
   result.commaParenthesesMatcher = getCommaParenthesesMatcher()
 
 when defined(test):

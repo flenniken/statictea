@@ -208,6 +208,26 @@ proc testGetFunctionValue(functionName: string, statement: Statement, start: Nat
 
   result = true
 
+proc testFunConcat(parameters: seq[Value],
+    eValueO: Option[Value] = none(Value),
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[]
+  ): bool =
+
+  var env = openEnvTest("_testFunConcat.log")
+  env.templateFilename = "template.html"
+
+  let valueO = funConcat(env, 1, parameters)
+
+  let (logLines, errLines, outLines) = env.readCloseDelete()
+  notReturn expectedItem("value", valueO, eValueO)
+  notReturn expectedItems("logLines", logLines, eLogLines)
+  notReturn expectedItems("errLines", errLines, eErrLines)
+  notReturn expectedItems("outLines", outLines, eOutLines)
+  result = true
+
+
 suite "runCommand.nim":
 
   test "stripNewline":
@@ -684,3 +704,66 @@ suite "runCommand.nim":
     let value = Value(kind: vkString, stringv: "abcdef")
     let eValueAndLengthO = some(ValueAndLength(value: value, length: 14))
     check testGetFunctionValue(functionName, statement, start, eValueAndLengthO = eValueAndLengthO)
+
+  test "getFunctionValue nested":
+    let functionName = "concat"
+    let statement = newStatement(text="""tea = concat("abc", concat("xyz"), "def") """, lineNum=16, 0)
+    let start = 13
+    let value = Value(kind: vkString, stringv: "abcxyzdef")
+    let eValueAndLengthO = some(ValueAndLength(value: value, length: 29))
+    check testGetFunctionValue(functionName, statement, start, eValueAndLengthO = eValueAndLengthO)
+
+  test "getFunctionValue no parameters":
+    let functionName = "concat"
+    let statement = newStatement(text="""tea = concat()""", lineNum=16, 0)
+    let start = 13
+    let value = Value(kind: vkString, stringv: "")
+    let eValueAndLengthO = some(ValueAndLength(value: value, length: 1))
+    check testGetFunctionValue(functionName, statement, start, eValueAndLengthO = eValueAndLengthO)
+
+  test "getFunctionValue missing )":
+    let statement = newStatement(text="""tea = len("abc" """, lineNum=16, 0)
+    let eErrLines = @[
+      "template.html(16): w46: Expected comma or right parentheses.",
+      """statement: tea = len("abc" """,
+        "                           ^",
+    ]
+    check testGetFunctionValue("len", statement, 10, eErrLines = eErrLines)
+
+  test "getFunctionValue missing quote":
+    let statement = newStatement(text="""tea = len("abc) """, lineNum=16, 0)
+    let eErrLines = @[
+      "template.html(16): w30: Invalid string.",
+      """statement: tea = len("abc) """,
+        "                     ^",
+    ]
+    check testGetFunctionValue("len", statement, 10, eErrLines = eErrLines)
+
+  test "getFunctionValue extra comma":
+    let statement = newStatement(text="""tea = len("abc",) """, lineNum=16, 0)
+    let eErrLines = @[
+      "template.html(16): w33: Expected a string, number, variable or function.",
+      """statement: tea = len("abc",) """,
+        "                           ^",
+    ]
+    check testGetFunctionValue("len", statement, 10, eErrLines = eErrLines)
+
+  test "funConcat 0":
+    var parameters: seq[Value] = @[]
+    let eValueO = some(newStringValue(""))
+    check testFunConcat(parameters, eValueO = eValueO)
+
+  test "funConcat 1":
+    var parameters = @[newStringValue("abc")]
+    let eValueO = some(newStringValue("abc"))
+    check testFunConcat(parameters, eValueO = eValueO)
+
+  test "funConcat 2":
+    var parameters = @[newStringValue("abc"), newStringValue(" def")]
+    let eValueO = some(newStringValue("abc def"))
+    check testFunConcat(parameters, eValueO = eValueO)
+
+  test "funConcat 3":
+    var parameters = @[newStringValue("abc"), newStringValue(""), newStringValue("def")]
+    let eValueO = some(newStringValue("abcdef"))
+    check testFunConcat(parameters, eValueO = eValueO)

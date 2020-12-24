@@ -259,16 +259,27 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
     assert intPos.length <= matches.length
     result = some(ValueAndLength(value: value, length: matches.length))
 
-proc runFunction(env: var Env, functionName: string, parameters:
-                 seq[Value]): Option[Value] =
+proc funConcat*(env: var Env, lineNum: Natural, parameters:
+               seq[Value]): Option[Value] =
+  ## Concatentate the string parameters.
+  var string = ""
+  for ix, value in parameters:
+    if value.kind != vkString:
+      env.warn(lineNum, wExpectedStrings, $(ix+1))
+      return
+    string.add(value.stringv)
+  result = some(newStringValue(string))
+
+proc runFunction(env: var Env, functionName: string,
+    statement: Statement, start: Natural, variables: Variables,
+    parameters: seq[Value]): Option[Value] =
   ## Call the given function and return its value.
   if functionName == "len":
     result = some(Value(kind: vkInt, intv: 3))
   elif functionName == "concat":
-    result = some(Value(kind: vkString, stringv: "abcdef"))
+    result = funConcat(env, statement.lineNum, parameters)
 
-
-# forward reference
+# Forward reference needed because we call getValue recursively.
 proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
               statement: Statement, start: Natural, variables:
                 Variables): Option[ValueAndLength]
@@ -279,34 +290,44 @@ proc getFunctionValue*(env: var Env, compiledMatchers:
   ## Collect the function parameter values then call it. Start should
   ## be pointing at the first parameter.
 
+  # env.warnStatement(statement, wStackTrace, start,  "enter getFunctionValue: " & functionName)
+
   var parameters: seq[Value] = @[]
   var pos = start
-  while true:
-    # Get the parameter's value.
-    let valueAndLengthO = getValue(env, compiledMatchers, statement,
-                                   pos, variables)
-    if not valueAndLengthO.isSome:
-      return
 
-    parameters.add(valueAndLengthO.get().value)
-    pos = pos + valueAndLengthO.get().length
+  # If we get a right parentheses, there are no parameters.
+  let rightParenO = getMatches(compiledMatchers.rightParenthesesMatcher,
+                              statement.text, pos)
+  if rightParenO.isSome:
+    pos = pos + rightParenO.get().length
+  else:
+    while true:
+      # Get the parameter's value.
+      let valueAndLengthO = getValue(env, compiledMatchers, statement,
+                                     pos, variables)
+      if not valueAndLengthO.isSome:
+        return
 
-    # Get the comma or parentheses and white space following the value.
-    let commaParenO = getMatches(compiledMatchers.commaParenthesesMatcher,
-                                statement.text, pos)
-    if not commaParenO.isSome:
-      env.warnStatement(statement, wMissingCommaParen, pos)
-      return
-    let commaParen = commaParenO.get()
-    pos = pos + commaParen.length
-    let symbol = commaParen.getGroup()
-    if symbol == ")":
-      break
+      parameters.add(valueAndLengthO.get().value)
+      pos = pos + valueAndLengthO.get().length
+
+      # Get the comma or right parentheses and white space following the value.
+      let commaParenO = getMatches(compiledMatchers.commaParenthesesMatcher,
+                                  statement.text, pos)
+      if not commaParenO.isSome:
+        env.warnStatement(statement, wMissingCommaParen, pos)
+        return
+      let commaParen = commaParenO.get()
+      pos = pos + commaParen.length
+      let symbol = commaParen.getGroup()
+      if symbol == ")":
+        break
 
   # Run the function.
-  let valueO = runFunction(env, functionName, parameters)
+  let valueO = runFunction(env, functionName, statement, start, variables, parameters)
   if valueO.isSome:
     result = some(ValueAndLength(value: valueO.get(), length: pos-start))
+  # env.warnStatement(statement, wStackTrace, pos,  "leave getFunctionValue $1. len = $2." % [functionName, $(pos-start)])
 
 proc getVariable*(env: var Env, statement: Statement, variables:
                   Variables, nameSpace: string, varName: string,
@@ -355,21 +376,24 @@ proc getVarOrFunctionValue*(env: var Env, compiledMatchers:
   # Get the variable or function name. Match the surrounding white space.
   let variableO = getMatches(compiledMatchers.variableMatcher,
                              statement.text, start)
-  if not variableO.isSome:
-    # Shouldn't hit this line.
-    env.warnStatement(statement, wInvalidRightHandSide, start)
-    return
+  assert variableO.isSome
+
   let variable = variableO.get()
   let (nameSpace, varName) = variable.get2Groups()
   if nameSpace == "":
     # We have a variable or a function.
     let parenthesesO = getMatches(compiledMatchers.leftParenthesesMatcher,
-                                statement.text, variable.length)
+                                statement.text, start+variable.length)
     if parenthesesO.isSome:
       # We have a function, run it.
       let parentheses = parenthesesO.get()
-      return getFunctionValue(env, compiledMatchers, varName, statement,
-                              variable.length+parentheses.length, variables)
+      let funValueLengthO = getFunctionValue(env, compiledMatchers, varName, statement,
+                              start+variable.length+parentheses.length, variables)
+      if not isSome(funValueLengthO):
+        return
+      let funValueLength = funValueLengthO.get()
+      return some(ValueAndLength(value: funValueLength.value,
+        length: variable.length+parentheses.length+funValueLength.length))
 
   # We have a variable, look it up and return its value.  Show a
   # warning when the variable doesn't exist.
@@ -391,6 +415,8 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
   # * digit or minus sign -- number
   # * a-zA-Z -- variable or function
 
+  # env.warnStatement(statement, wStackTrace, start,  "enter getValue")
+
   assert start < statement.text.len
 
   let char = statement.text[start]
@@ -404,6 +430,10 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
                                    start, variables)
   else:
     env.warnStatement(statement, wInvalidRightHandSide, start)
+
+  # let valueAndLength = result.get()
+  # env.warnStatement(statement, wStackTrace, start+valueAndLength.length,  "leave getValue")
+
 
 proc assignTeaVariable(env: var Env, statement: Statement,
                        compiledMatchers: Compiledmatchers, variables:

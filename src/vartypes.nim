@@ -26,6 +26,15 @@ type
     of vkList:
       listv*: seq[Value]
 
+proc newStringValue*(str: string): Value =
+  result = Value(kind: vkString, stringv: str)
+
+proc newIntValue*(num: int64): Value =
+  result = Value(kind: vkInt, intv: num)
+
+proc newFloatValue*(num: float64): Value =
+  result = Value(kind: vkFloat, floatv: num)
+
 proc `==`*(value1: Value, value2: Value): bool =
   if value1.kind == value2.kind:
     case value1.kind:
