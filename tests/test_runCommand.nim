@@ -72,12 +72,10 @@ proc testGetNumber(
   let compiledMatchers = getCompiledMatchers()
   let valueAndLengthO = getNumber(env, compiledMatchers, statement, start)
 
-  let (logLines, errLines, outLines) = env.readCloseDelete()
-  notReturn testSome(valueAndLengthO, eValueAndLengthO, statement.text, start)
-  notReturn expectedItems("logLines", logLines, eLogLines)
-  notReturn expectedItems("errLines", errLines, eErrLines)
-  notReturn expectedItems("outLines", outLines, eOutLines)
-  result = true
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+
+  if not testSome(valueAndLengthO, eValueAndLengthO, statement.text, start):
+    result = false
 
 proc testGetString(
     statement: Statement,
@@ -124,24 +122,28 @@ proc compareStatements(statements: seq[Statement], eContent: string): bool =
   return true
 
 proc testGetVariable(statement: Statement, start: Natural, nameSpace: string, varName: string, eValueO:
-                     Option[Value] = none(Value), eErrLines:
-                        seq[string] = @[]): bool =
+                     Option[Value] = none(Value),
+                     eLogLines: seq[string] = @[],
+                     eErrLines: seq[string] = @[],
+                     eOutLines: seq[string] = @[],
+                    ): bool =
 
   var env = openEnvTest("_getVariable.log", "template.html")
 
   var variables = getTestVariables()
   let valueO = getVariable(env, statement, variables, namespace, varName, start)
 
-  let (logLines, errLines, outLines) = env.readCloseDelete()
-  notReturn expectedItem("value", valueO, eValueO)
-  notReturn logLines.len == 0
-  notReturn expectedItems("errLines", errLines, eErrLines)
-  notReturn outLines.len == 0
-  result = true
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+
+  if not expectedItem("value", valueO, eValueO):
+    result = false
 
 proc testGetVarOrFunctionValue(statement: Statement, start: Natural,
     eValueAndLengthO: Option[ValueAndLength] = none(ValueAndLength),
-    eErrLines: seq[string] = @[]): bool =
+                     eLogLines: seq[string] = @[],
+                     eErrLines: seq[string] = @[],
+                     eOutLines: seq[string] = @[],
+                              ): bool =
   ## Get the variable or function value of the rhs for the given
   ## statement. The rhs starts at the given start index. Compare the
   ## value and number of characters processed with the given expected
@@ -157,13 +159,10 @@ proc testGetVarOrFunctionValue(statement: Statement, start: Natural,
                                               statement, start,
                                               variables)
 
-  let (logLines, errLines, outLines) = env.readCloseDelete()
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-  notReturn expectedItem("valueAndLength", valueAndLengthO, eValueAndLengthO)
-  notReturn expectedItems("errLines", errLines, eErrLines)
-  notReturn logLines.len == 0
-  notReturn outLines.len == 0
-  result = true
+  if not expectedItem("valueAndLength", valueAndLengthO, eValueAndLengthO):
+    result = false
 
 proc testWarnStatement(statement: Statement,
     warning: Warning, start: Natural, p1: string="", p2: string="",
@@ -176,11 +175,7 @@ proc testWarnStatement(statement: Statement,
 
   env.warnStatement(statement, warning, start, p1, p2)
 
-  let (logLines, errLines, outLines) = env.readCloseDelete()
-  notReturn expectedItems("errLines", errLines, eErrLines)
-  notReturn logLines.len == 0
-  notReturn outLines.len == 0
-  result = true
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
 proc testGetFunctionValue(functionName: string, statement: Statement, start: Natural,
     eValueAndLengthO: Option[ValueAndLength] = none(ValueAndLength),
@@ -196,15 +191,11 @@ proc testGetFunctionValue(functionName: string, statement: Statement, start: Nat
   let valueAndLengthO = getFunctionValue(env, compiledMatchers,
                           functionName, statement, start, variables)
 
-  let (logLines, errLines, outLines) = env.readCloseDelete()
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-  notReturn expectedItems("errLines", errLines, eErrLines)
-  notReturn expectedItems("outLines", outLines, eOutLines)
-  notReturn expectedItems("logLines", logLines, eLogLines)
+  if not expectedItem("valueAndLength", valueAndLengthO, eValueAndLengthO):
+    result = false
 
-  notReturn expectedItem("valueAndLength", valueAndLengthO, eValueAndLengthO)
-
-  result = true
 
 proc testFunConcat(parameters: seq[Value],
     eValueO: Option[Value] = none(Value),
@@ -217,12 +208,9 @@ proc testFunConcat(parameters: seq[Value],
 
   let valueO = funConcat(env, 1, parameters)
 
-  let (logLines, errLines, outLines) = env.readCloseDelete()
-  notReturn expectedItem("value", valueO, eValueO)
-  notReturn expectedItems("logLines", logLines, eLogLines)
-  notReturn expectedItems("errLines", errLines, eErrLines)
-  notReturn expectedItems("outLines", outLines, eOutLines)
-  result = true
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+  if not expectedItem("value", valueO, eValueO):
+    result = false
 
 
 suite "runCommand.nim":
@@ -629,7 +617,7 @@ suite "runCommand.nim":
       "statement: tea = a+123",
       "                 ^",
     ]
-    check testGetVarOrFunctionValue(statement, 6, none(ValueAndLength), eErrLines)
+    check testGetVarOrFunctionValue(statement, 6, none(ValueAndLength), eErrLines = eErrLines)
 
   test "getVarOrFunctionValue not defined":
     let statement = newStatement(text="tea = a123", lineNum=12, 0)
@@ -638,7 +626,7 @@ suite "runCommand.nim":
       "statement: tea = a123",
       "                 ^",
     ]
-    check testGetVarOrFunctionValue(statement, 6, none(ValueAndLength), eErrLines)
+    check testGetVarOrFunctionValue(statement, 6, none(ValueAndLength), eErrLines = eErrLines)
 
   test "setState":
     var variables = getTestVariables()

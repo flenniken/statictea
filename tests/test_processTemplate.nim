@@ -120,15 +120,13 @@ suite "processTemplate":
     let rc = processTemplate(env, args)
 
     # Read the log, err and out streams.
-    let (logLines, errLines, outLines) = env.readCloseDelete()
+    let eErrLines = @[
+      "initializing(0): w5: One template file allowed on the command line, skipping: template2.html.",
+    ]
+    check env.readCloseDeleteCompare(eErrLines = eErrLines)
 
     # Read the result file.
     let resultLines = env.readCloseDeleteResult()
     check resultLines.len == 1
     check resultLines[0] == "Hello"
 
-    # echoLines(logLines, errLines, outLines)
-    check logLines.len == 0
-    check outLines.len == 0
-    check errLines.len == 1
-    check errLines[0] == "initializing(0): w5: One template file allowed on the command line, skipping: template2.html."

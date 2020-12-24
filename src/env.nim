@@ -402,3 +402,19 @@ when defined(test):
     )
     openLogFile(result, logFilename)
     checkLogSize(result)
+
+  proc readCloseDeleteCompare*(env: var Env, eLogLines: seq[string] = @[],
+                               eErrLines: seq[string] = @[], eOutLines: seq[string] = @[]): bool =
+    ## Read the env streams and close and delete them. Compare the
+    ## streams with the expected content. Return true when they are
+    ## the same.
+
+    result = true
+    let (logLines, errLines, outLines) = env.readCloseDelete()
+
+    if not expectedItems("logLines", logLines, eLogLines):
+      result = false
+    if not expectedItems("errLines", errLines, eErrLines):
+      result = false
+    if not expectedItems("outLines", outLines, eOutLines):
+      result = false
