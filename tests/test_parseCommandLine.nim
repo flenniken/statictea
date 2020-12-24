@@ -24,22 +24,25 @@ proc tpcl(
 
   let args = parseCommandLine(env, cmdLine)
 
-  let (logLines, errLines, outLines) = env.readCloseDelete()
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-  notReturn expectedItem("help", args.help, help)
-  notReturn expectedItem("version", args.version, version)
-  notReturn expectedItem("update", args.update, update)
-  notReturn expectedItem("serverList", args.serverList, serverList)
-  notReturn expectedItem("sharedList", args.sharedList, sharedList)
-  notReturn expectedItem("templateList", args.templateList, templateList)
-  notReturn expectedItem("resultFilename", args.resultFilename, resultFilename)
-  notReturn expectedItems("prepostList", args.prepostList, prepostList)
+  if not expectedItem("help", args.help, help):
+    result = false
+  if not expectedItem("version", args.version, version):
+    result = false
+  if not expectedItem("update", args.update, update):
+    result = false
+  if not expectedItem("serverList", args.serverList, serverList):
+    result = false
+  if not expectedItem("sharedList", args.sharedList, sharedList):
+    result = false
+  if not expectedItem("templateList", args.templateList, templateList):
+    result = false
+  if not expectedItem("resultFilename", args.resultFilename, resultFilename):
+    result = false
+  if not expectedItems("prepostList", args.prepostList, prepostList):
+    result = false
 
-  notReturn expectedItems("logLines", logLines, eLogLines)
-  notReturn expectedItems("errLines", errLines, eErrLines)
-  notReturn expectedItems("outLines", outLines, eOutLines)
-
-  result = true
 
 suite "parseCommandLine":
 

@@ -31,19 +31,18 @@ proc testCollectCommand(
   let compiledMatchers = getCompiledMatchers()
   collectCommand(env, lb, compiledMatchers, resultStream, cmdLines, cmdLineParts)
 
-  let (logLines, errLines, outLines) = env.readCloseDelete()
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
   resultStream.setPosition(0)
   var resultStreamLines = readlines(resultStream)
   resultStream.close()
 
-  notReturn expectedItems("cmdLines", cmdLines, eCmdLines)
-  notReturn expectedItems("cmdLineParts", cmdLineParts, eCmdLineParts)
-  notReturn expectedItems("resultStreamLines", resultStreamLines, eResultStreamLines)
-  notReturn expectedItems("logLines", logLines, eLogLines)
-  notReturn expectedItems("errLines", errLines, eErrLines)
-  notReturn expectedItems("outLines", outLines, eOutLines)
-  result = true
+  if not expectedItems("cmdLines", cmdLines, eCmdLines):
+    result = false
+  if not expectedItems("cmdLineParts", cmdLineParts, eCmdLineParts):
+    result = false
+  if not expectedItems("resultStreamLines", resultStreamLines, eResultStreamLines):
+    result = false
 
 suite "collectCommand.nim":
 

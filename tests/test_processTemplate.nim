@@ -30,16 +30,12 @@ suite "processTemplate":
     check env.resultFilename == ""
 
     let rc = processTemplate(env, args)
+
+    let eOutLines = @["Hello"]
+    check env.readCloseDeleteCompare(eOutLines = eOutLines)
+
     check rc == 0
 
-    let (logLines, errLines, outLines) = env.readCloseDelete()
-    # echoLines(logLines, errLines, outLines)
-    check logLines.len == 0
-    check errLines.len == 0
-    check outLines.len == 1
-    check outLines[0] == "Hello"
-
-    env.close()
 
   test "processTemplate to file":
     var env = openEnvTest("_processTemplateToFile.log")
@@ -63,18 +59,10 @@ suite "processTemplate":
     check env.resultStream != nil
     check env.templateStream != nil
 
-    # echo "template stream:"
-    # echoStream(env.templateStream)
-
     # Process the template and write out the result.
     let rc = processTemplate(env, args)
 
-    # Read the log, err and out streams.
-    let (logLines, errLines, outLines) = env.readCloseDelete()
-    # echoLines(logLines, errLines, outLines)
-    check logLines.len == 0
-    check errLines.len == 0
-    check outLines.len == 0
+    check env.readCloseDeleteCompare()
 
     # Read the result file.
     let resultLines = env.readCloseDeleteResult()

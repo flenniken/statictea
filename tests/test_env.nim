@@ -100,12 +100,10 @@ suite "env.nim":
     let testLine2 = "test line 2: $1" % $rand(100)
     env.log(testLine2)
 
-    var (logLines, errLines, outLines) = env.readCloseDelete()
-    # echoLines(logLines, errLines, outLines)
-    check logLines.len == 0
-    check errLines.len == 1
-    check errLines[0] == "initializing(0): w8: Unable to open log file: ''."
-    check outLines.len == 0
+    let eErrLines = @[
+      "initializing(0): w8: Unable to open log file: ''."
+    ]
+    check env.readCloseDeleteCompare(eErrLines = eErrLines)
 
   test "parseTimeStamp":
     let dtOption = parseTimeStamp("2020-10-01 08:21:28.618")

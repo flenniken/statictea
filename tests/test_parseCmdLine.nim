@@ -10,9 +10,9 @@ proc testParseCmdLine(
     line: string,
     lineNum: Natural = 1,
     expectedLineParts: LineParts,
-    expectedLogLines: seq[string] = @[],
-    expectedErrLines: seq[string] = @[],
-    expectedOutLines: seq[string] = @[]
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[]
   ): bool =
   ## Return true on success.
 
@@ -21,7 +21,7 @@ proc testParseCmdLine(
   let compiledMatchers = getCompiledMatchers()
   let linePartsO = parseCmdLine(env, compiledMatchers, line, lineNum)
 
-  let (logLines, errLines, outLines) = env.readCloseDelete()
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
   if not linePartsO.isSome:
     echo line
@@ -33,42 +33,29 @@ proc testParseCmdLine(
   if lps != elps:
     echo line
     echo "0123456789 123456789 123456789"
-    echo "got prefix: '$1'" % lps.prefix
-    echo "  expected: '$1'" % elps.prefix
-    echo "got command: '$1'" % lps.command
-    echo "   expected: '$1'" % elps.command
-    echo "got middle start: '$1'" % $lps.middleStart
-    echo "        expected: '$1'" % $elps.middleStart
-    echo "got middle len: '$1'" % $lps.middleLen
-    echo "      expected: '$1'" % $elps.middleLen
-    echo "got continuation: $1" % $lps.continuation
-    echo "        expected: $1" % $elps.continuation
-    echo "got postfix: '$1'" % lps.postfix
-    echo "    postfix: '$1'" % elps.postfix
-    echo "got ending: '$1'" % getEndingString(lps.ending)
-    echo "  expected: '$1'" % getEndingString(elps.ending)
-    echo "got lineNum: '$1'" % $lps.lineNum
-    echo "   expected: '$1'" % $elps.lineNum
-    return false
-
-  if expectedLogLines != logLines:
-    echo "expectedLogLines"
-    return false
-  if expectedErrLines != errLines:
-    echo "expectedErrLines"
-    return false
-  if expectedoutLines != outLines:
-    echo "expectedoutLines"
-    return false
-
-  return true
+    if not expectedItem("prefix", lps.prefix, elps.prefix):
+      result = false
+    if not expectedItem("command", lps.command, elps.command):
+      result = false
+    if not expectedItem("middleStart", lps.middleStart, elps.middleStart):
+      result = false
+    if not expectedItem("middleLen", lps.middleLen, elps.middleLen):
+      result = false
+    if not expectedItem("continuation", lps.continuation, elps.continuation):
+      result = false
+    if not expectedItem("postfix", lps.postfix, elps.postfix):
+      result = false
+    if not expectedItem("ending", getEndingString(lps.ending), getEndingString(elps.ending)):
+      result = false
+    if not expectedItem("lineNum", lps.lineNum, elps.lineNum):
+      result = false
 
 proc parseCmdLineError(
     line: string,
     lineNum: Natural = 12,
-    expectedLogLines: seq[string] = @[],
-    expectedErrLines: seq[string] = @[],
-    expectedOutLines: seq[string] = @[] ): bool =
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[] ): bool =
   ## Test that we get an error parsing the command line. Return true
   ## when we get the expected errors.
 
@@ -77,35 +64,12 @@ proc parseCmdLineError(
   let compiledMatchers = getCompiledMatchers()
   let linePartsO = parseCmdLine(env, compiledMatchers, line, lineNum)
 
-  let (logLines, errLines, outLines) = env.readCloseDelete()
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
   if linePartsO.isSome:
     echo line
     echo "We parsed the line when we shouldn't have."
-    return false
-
-  if expectedLogLines != logLines:
-    for line in logLines:
-      echo "log line: $1" % line
-    for line in expectedLogLines:
-      echo "expected: $1" % line
-    return false
-
-  if expectedErrLines != errLines:
-    for line in errLines:
-      echo "error line: $1" % line
-    for line in expectedErrLines:
-      echo "  expected: $1" % line
-    return false
-
-  if expectedoutLines != outLines:
-    for line in outLines:
-      echo "out line:: $1" % line
-    for line in expectedoutLines:
-      echo " expected: $1" % line
-    return false
-
-  return true
+    result = false
 
 suite "parseCmdLine.nim":
 
@@ -182,9 +146,9 @@ suite "parseCmdLine.nim":
   test "no command error":
     let line = "<--!$ -->\n"
     let expectedWarn = "template.html(12): w22: No command found at column 7, skipping line."
-    check parseCmdLineError(line, expectedErrLines = @[expectedWarn])
+    check parseCmdLineError(line, eErrLines = @[expectedWarn])
 
   test "no postfix error":
     let line = "<--!$ nextline \n"
     let expectedWarn = """template.html(16): w23: The matching closing comment postfix was not found, expected: "-->"."""
-    check parseCmdLineError(line, lineNum = 16, expectedErrLines = @[expectedWarn])
+    check parseCmdLineError(line, lineNum = 16, eErrLines = @[expectedWarn])
