@@ -1,6 +1,10 @@
 ## StaticTea variable types.
 
 import tables
+import strutils
+
+const
+  outputValues* = ["result", "stderr", "log", "skip"]
 
 type
   VarsDict* = OrderedTable[string, Value]
@@ -25,6 +29,28 @@ type
       dictv*: VarsDict
     of vkList:
       listv*: seq[Value]
+
+  Statement* = object
+    ## A Statement object stores the statement text and where it
+    ## starts in the template file.
+    ##
+    ## * lineNum -- Line number starting at 1 where the statement
+    ##              starts.
+    ## * start -- Column position starting at 1 where the statement
+    ##            starts on the line.
+    ## * text -- The statement text.
+    lineNum*: Natural
+    start*: Natural
+    text*: string
+
+  ValueAndLength* = object
+    ## A value and the length of the matching text in the statement.
+    ## For the example statement: "var = 567 ". The value 567 starts
+    ## index 6 and the matching length is 4 because it includes the
+    ## trailing spaces. For example "id = row( 3 )" the value is 3 and
+    ## the length is 2.
+    value*: Value
+    length*: Natural
 
 proc newStringValue*(str: string): Value =
   result = Value(kind: vkString, stringv: str)
@@ -69,12 +95,12 @@ func `$`*(value: Value): string =
     else:
       result = "[...]"
 
+func `$`*(s: Statement): string =
+  ## A string representation of a Statement.
+  result = "$1, $2: '$3'" % [$s.lineNum, $s.start, s.text]
 
-  # of vkDict:
-  #   if value.dictv.len == 0:
-  #     result = "{}"
-  #   else:
-  #     result = $value.dictv
-  # of vkList:
-  #   var str = $value.listv
-  #   result = str[1..^1]
+func `==`*(s1: Statement, s2: Statement): bool =
+  ## Return true when the two statements are equal.
+  if s1.lineNum == s2.lineNum and s1.start == s2.start and
+      s1.text == s2.text:
+    result = true

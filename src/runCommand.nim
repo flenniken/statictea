@@ -14,46 +14,12 @@ import warnings
 import parseNumber
 import unicode
 import variables
-
-const
-  outputValues = ["result", "stderr", "log", "skip"]
+import runFunction
 
 type
   State = enum
     ## Finite state machine states for finding statements.
     start, double, single, slashdouble, slashsingle
-
-  Statement* = object
-    ## A Statement object stores the statement text and where it
-    ## starts in the template file.
-    ##
-    ## * lineNum -- Line number starting at 1 where the statement
-    ##              starts.
-    ## * start -- Column position starting at 1 where the statement
-    ##            starts on the line.
-    ## * text -- The statement text.
-    lineNum*: Natural
-    start*: Natural
-    text*: string
-
-  ValueAndLength* = object
-    ## A value and the length of the matching text in the statement.
-    ## For the example statement: "var = 567 ". The value 567 starts
-    ## index 6 and the matching length is 4 because it includes the
-    ## trailing spaces. For example "id = row( 3 )" the value is 3 and
-    ## the length is 2.
-    value*: Value
-    length*: Natural
-
-func `$`*(s: Statement): string =
-  ## A string representation of a Statement.
-  result = "$1, $2: '$3'" % [$s.lineNum, $s.start, s.text]
-
-func `==`*(s1: Statement, s2: Statement): bool =
-  ## True true when the two statements are equal.
-  if s1.lineNum == s2.lineNum and s1.start == s2.start and
-      s1.text == s2.text:
-    result = true
 
 func newStatement*(text: string, lineNum: Natural = 1,
     start: Natural = 1): Statement =
@@ -258,26 +224,6 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
     let value = Value(kind: vkInt, intv: intPos.integer)
     assert intPos.length <= matches.length
     result = some(ValueAndLength(value: value, length: matches.length))
-
-proc funConcat*(env: var Env, lineNum: Natural, parameters:
-               seq[Value]): Option[Value] =
-  ## Concatentate the string parameters.
-  var string = ""
-  for ix, value in parameters:
-    if value.kind != vkString:
-      env.warn(lineNum, wExpectedStrings, $(ix+1))
-      return
-    string.add(value.stringv)
-  result = some(newStringValue(string))
-
-proc runFunction(env: var Env, functionName: string,
-    statement: Statement, start: Natural, variables: Variables,
-    parameters: seq[Value]): Option[Value] =
-  ## Call the given function and return its value.
-  if functionName == "len":
-    result = some(Value(kind: vkInt, intv: 3))
-  elif functionName == "concat":
-    result = funConcat(env, statement.lineNum, parameters)
 
 # Forward reference needed because we call getValue recursively.
 proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
