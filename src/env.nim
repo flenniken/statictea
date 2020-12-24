@@ -324,10 +324,6 @@ when defined(test):
       echo line
     echo "==="
 
-  template notReturn*(boolProc: untyped) =
-    if not boolProc:
-      return false
-
   proc expectedItem*[T](name: string, item: T, expectedItem: T): bool =
     ## Compare the item with the expected item and show them when
     ## different. Return true when they are the same.

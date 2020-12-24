@@ -91,16 +91,19 @@ proc testGetString(
 
   let compiledMatchers = getCompiledMatchers()
   let valueAndLengthO = getString(env, compiledMatchers, statement, start)
+
   let (logLines, errLines, outLines) = env.readCloseDelete()
-
-  notReturn testSome(valueAndLengthO, eValueAndlengthO, statement.text, start)
-  notReturn expectedItems("logLines", logLines, eLogLines)
-  notReturn expectedItems("outLines", outLines, eOutLines)
-
-  if not statement.text.contains("stringwithbadutf8"):
-    notReturn expectedItems("errLines", errLines, eErrLines)
-
   result = true
+
+  if not testSome(valueAndLengthO, eValueAndlengthO, statement.text, start):
+    result = false
+  if not expectedItems("logLines", logLines, eLogLines):
+    result = false
+  if not expectedItems("outLines", outLines, eOutLines):
+    result = false
+  if not statement.text.contains("stringwithbadutf8"):
+    if not expectedItems("errLines", errLines, eErrLines):
+      result = false
 
 proc stripNewline(line: string): string =
   if line.len > 0 and line[^1] == '\n':
