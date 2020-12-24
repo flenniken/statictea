@@ -26,9 +26,12 @@ proc toString(statements: seq[Statement]): string =
 
 proc getCmdLineParts(line: string, lineNum: Natural = 1): Option[LineParts] =
   ## Return the line parts from the given line.
+  # todo: remove this. Call it at a higher level.
   var env = openEnvTest("_testRunCommand.log")
+
   let compiledMatchers = getCompiledMatchers()
   result = parseCmdLine(env, compiledMatchers, line, lineNum)
+
   discard env.readCloseDelete()
 
 proc getCmdLineParts(cmdLines: seq[string]): seq[LineParts] =
@@ -64,13 +67,12 @@ proc testGetNumber(
   ## Return true when the statement contains the expected number. When
   ## it doesn't, show the values and expected values and return false.
 
-  var env = openEnvTest("_testGetNumber.log")
-  env.templateFilename = "template.html"
+  var env = openEnvTest("_testGetNumber.log", "template.html")
 
   let compiledMatchers = getCompiledMatchers()
   let valueAndLengthO = getNumber(env, compiledMatchers, statement, start)
-  let (logLines, errLines, outLines) = env.readCloseDelete()
 
+  let (logLines, errLines, outLines) = env.readCloseDelete()
   notReturn testSome(valueAndLengthO, eValueAndLengthO, statement.text, start)
   notReturn expectedItems("logLines", logLines, eLogLines)
   notReturn expectedItems("errLines", errLines, eErrLines)
@@ -87,8 +89,7 @@ proc testGetString(
   ## Return true when the statement contains the expected string. When
   ## it doesn't, show the values and expected values and return false.
 
-  var env = openEnvTest("_testGetString.log")
-  env.templateFilename = "template.html"
+  var env = openEnvTest("_testGetString.log", "template.html")
 
   let compiledMatchers = getCompiledMatchers()
   let valueAndLengthO = getString(env, compiledMatchers, statement, start)
@@ -126,10 +127,9 @@ proc testGetVariable(statement: Statement, start: Natural, nameSpace: string, va
                      Option[Value] = none(Value), eErrLines:
                         seq[string] = @[]): bool =
 
-  var env = openEnvTest("_getVariable.log")
-  env.templateFilename = "template.html"
-  var variables = getTestVariables()
+  var env = openEnvTest("_getVariable.log", "template.html")
 
+  var variables = getTestVariables()
   let valueO = getVariable(env, statement, variables, namespace, varName, start)
 
   let (logLines, errLines, outLines) = env.readCloseDelete()
@@ -148,8 +148,8 @@ proc testGetVarOrFunctionValue(statement: Statement, start: Natural,
   ## values and compare the with the given error lines. Return true
   ## when they match.
 
-  var env = openEnvTest("_getVariable.log")
-  env.templateFilename = "template.html"
+  var env = openEnvTest("_getVariable.log", "template.html")
+
   var variables = getTestVariables()
   let compiledMatchers = getCompiledMatchers()
 
@@ -172,8 +172,7 @@ proc testWarnStatement(statement: Statement,
     eOutLines: seq[string] = @[]
   ): bool =
 
-  var env = openEnvTest("_getVariable.log")
-  env.templateFilename = "template.html"
+  var env = openEnvTest("_getVariable.log", "template.html")
 
   env.warnStatement(statement, warning, start, p1, p2)
 
@@ -190,11 +189,10 @@ proc testGetFunctionValue(functionName: string, statement: Statement, start: Nat
     eOutLines: seq[string] = @[]
   ): bool =
 
-  var env = openEnvTest("_testGetFunctionValue.log")
-  env.templateFilename = "template.html"
+  var env = openEnvTest("_testGetFunctionValue.log", "template.html")
+
   var variables = getTestVariables()
   let compiledMatchers = getCompiledMatchers()
-
   let valueAndLengthO = getFunctionValue(env, compiledMatchers,
                           functionName, statement, start, variables)
 
@@ -215,8 +213,7 @@ proc testFunConcat(parameters: seq[Value],
     eOutLines: seq[string] = @[]
   ): bool =
 
-  var env = openEnvTest("_testFunConcat.log")
-  env.templateFilename = "template.html"
+  var env = openEnvTest("_testFunConcat.log", "template.html")
 
   let valueO = funConcat(env, 1, parameters)
 

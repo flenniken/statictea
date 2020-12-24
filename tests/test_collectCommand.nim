@@ -26,8 +26,8 @@ proc testCollectCommand(
   var cmdLines: seq[string] = @[]
   var cmdLineParts: seq[LineParts] = @[]
 
-  var env = openEnvTest("_collectCommand.log")
-  env.templateFilename = "template.html"
+  var env = openEnvTest("_collectCommand.log", "template.html")
+
   let compiledMatchers = getCompiledMatchers()
   collectCommand(env, lb, compiledMatchers, resultStream, cmdLines, cmdLineParts)
 

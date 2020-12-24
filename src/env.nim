@@ -130,18 +130,6 @@ proc openLogFile(env: var Env, logFilename: string) =
   else:
     env.warn(0, wUnableToOpenLogFile, logFilename)
 
-proc openEnvTest*(logFilename: string): Env =
-  ## Open the log, error, and out streams. The given log file is used
-  ## for the log stream.  The error and out streams get created as a
-  ## string type streams.
-
-  result = Env(
-    errStream: newStringStream(), closeErrStream: true,
-    outStream: newStringStream(), closeOutStream: true,
-  )
-  openLogFile(result, logFilename)
-  checkLogSize(result)
-
 proc openEnv*(logFilename: string = staticteaLog,
                   warnSize: BiggestInt = logWarnSize): Env =
   ## Open and return the environment containing the standard error,
@@ -401,3 +389,16 @@ when defined(test):
     echo " expected: $1" % $evalue
     echo "got length: $1" % $length
     echo "  expected: $1" % $eLength
+
+  proc openEnvTest*(logFilename: string, templateFilename: string = ""): Env =
+    ## Open the log, error, and out streams. The given log file is used
+    ## for the log stream.  The error and out streams get created as a
+    ## string type streams. The templateFilename is used for warning messages.
+
+    result = Env(
+      errStream: newStringStream(), closeErrStream: true,
+      outStream: newStringStream(), closeOutStream: true,
+      templateFilename: templateFilename,
+    )
+    openLogFile(result, logFilename)
+    checkLogSize(result)
