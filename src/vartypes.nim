@@ -2,6 +2,8 @@
 
 import tables
 import strutils
+import env
+import warnings
 
 const
   outputValues* = ["result", "stderr", "log", "skip"]
@@ -52,13 +54,13 @@ type
     value*: Value
     length*: Natural
 
-proc newStringValue*(str: string): Value =
+proc newValue*(str: string): Value =
   result = Value(kind: vkString, stringv: str)
 
-proc newIntValue*(num: int64): Value =
+proc newValue*(num: int): Value =
   result = Value(kind: vkInt, intv: num)
 
-proc newFloatValue*(num: float64): Value =
+proc newValue*(num: float): Value =
   result = Value(kind: vkFloat, floatv: num)
 
 proc `==`*(value1: Value, value2: Value): bool =
@@ -104,3 +106,53 @@ func `==`*(s1: Statement, s2: Statement): bool =
   if s1.lineNum == s2.lineNum and s1.start == s2.start and
       s1.text == s2.text:
     result = true
+
+func newStatement*(text: string, lineNum: Natural = 1,
+    start: Natural = 1): Statement =
+  result = Statement(lineNum: lineNum, start: start, text: text)
+
+proc startColumn*(start: Natural): string =
+  ## Return a string containing the number of spaces and symbols to
+  ## point at the line start value used under the statement line.
+  for ix in 0..<start:
+    result.add(' ')
+  result.add("^")
+
+proc warnStatement*(env: var Env, statement: Statement, warning:
+                    Warning, start: Natural, p1: string = "", p2:
+                                         string = "") =
+  ## Warn about an invalid statement. Show and tell the statement with
+  ## the problem.  Start is the position in the statement where the
+  ## problem starts. If the statement is long, trim it around the
+  ## problem area.
+
+  var fragment: string
+  var extraStart = ""
+  var extraEnd = ""
+  let fragmentMax = 60
+  let halfFragment = fragmentMax div 2
+  var startPos: int
+  var endPos: int
+  var pointerPos: int
+  if statement.text.len <= fragmentMax:
+    fragment = statement.text
+    startPos = start
+    pointerPos = start
+  else:
+    startPos = start.int - halfFragment
+    if startPos < 0:
+      startPos = 0
+    else:
+      extraStart = "..."
+
+    endPos = startPos + fragmentMax
+    if endPos > statement.text.len:
+      endPos = statement.text.len
+    else:
+      extraEnd = "..."
+    fragment = extraStart & statement.text[startPos ..< endPos] & extraEnd
+    pointerPos = start.int - startPos + extraStart.len
+
+  env.warn(statement.lineNum, warning, p1, p2)
+  env.warn("statement: $1" % fragment)
+  env.warn("           $1" % startColumn(pointerPos))

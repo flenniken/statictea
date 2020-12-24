@@ -54,6 +54,7 @@ type
     wInvalidPrepost,       # w45
     wMissingCommaParen,    # w46
     wExpectedStrings,      # w47
+    wInvalidStatement,     # w48
 
 tpubType:
   const
@@ -108,6 +109,7 @@ tpubType:
       "Invalid prepost: $1.", # wInvalidPrepost
       "Expected comma or right parentheses.", # wMissingCommaParen
       "Concat parameter $1 is not a string.", # wExpectedStrings
+      "Invalid statement, skipping it.", # wInvalidStatement
     ]
 
 func getWarning*(filename: string, lineNum: int,
