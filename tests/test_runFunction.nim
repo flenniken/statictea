@@ -7,16 +7,19 @@ import vartypes
 import runFunction
 import variables
 
-proc testFunConcat(parameters: seq[Value],
+proc testFunction(functionName: string, parameters: seq[Value],
     eValueO: Option[Value] = none(Value),
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]
   ): bool =
 
-  var env = openEnvTest("_testFunConcat.log", "template.html")
+  var env = openEnvTest("_testFunction.log", "template.html")
+  let lineNum = 1
 
-  let valueO = funConcat(env, 1, parameters)
+  let functionO = getFunction(functionName)
+  let function = functionO.get()
+  let valueO = function(env, lineNum, parameters)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
   if not expectedItem("value", valueO, eValueO):
@@ -49,22 +52,22 @@ suite "runFunction.nim":
   test "funConcat 0":
     var parameters: seq[Value] = @[]
     let eValueO = some(newValue(""))
-    check testFunConcat(parameters, eValueO = eValueO)
+    check testFunction("concat", parameters, eValueO = eValueO)
 
   test "funConcat 1":
     var parameters = @[newValue("abc")]
     let eValueO = some(newValue("abc"))
-    check testFunConcat(parameters, eValueO = eValueO)
+    check testFunction("concat", parameters, eValueO = eValueO)
 
   test "funConcat 2":
     var parameters = @[newValue("abc"), newValue(" def")]
     let eValueO = some(newValue("abc def"))
-    check testFunConcat(parameters, eValueO = eValueO)
+    check testFunction("concat", parameters, eValueO = eValueO)
 
   test "funConcat 3":
     var parameters = @[newValue("abc"), newValue(""), newValue("def")]
     let eValueO = some(newValue("abcdef"))
-    check testFunConcat(parameters, eValueO = eValueO)
+    check testFunction("concat", parameters, eValueO = eValueO)
 
   test "funConcat not string":
     var parameters = @[newValue(5)]
@@ -72,7 +75,7 @@ suite "runFunction.nim":
     let eErrLines = @[
       "template.html(1): w47: Concat parameter 1 is not a string.",
     ]
-    check testFunConcat(parameters, eValueO = eValueO, eErrLines = eErrLines)
+    check testFunction("concat", parameters, eValueO = eValueO, eErrLines = eErrLines)
 
 
   test "runFunction":
@@ -95,3 +98,16 @@ suite "runFunction.nim":
         "                        ^",
     ]
     check testRunFunction("concat", parameters, statement, start, eValueO, eErrLines = eErrLines)
+
+  test "len":
+    var parameters = @[newValue("abc")]
+    let eValueO = some(newValue(3))
+    check testFunction("len", parameters, eValueO = eValueO)
+
+  test "getFunction":
+    var functionO = getFunction("concat")
+    check functionO.isSome
+    functionO = getFunction("len")
+    check functionO.isSome
+    functionO = getFunction("notafunction")
+    check not functionO.isSome

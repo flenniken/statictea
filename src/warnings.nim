@@ -55,6 +55,9 @@ type
     wMissingCommaParen,    # w46
     wExpectedStrings,      # w47
     wInvalidStatement,     # w48
+    wOneParameter,         # w49
+    wStringListDict,       # w50
+    wInvalidFunction,      # w51
 
 tpubType:
   const
@@ -110,6 +113,9 @@ tpubType:
       "Expected comma or right parentheses.", # wMissingCommaParen
       "Concat parameter $1 is not a string.", # wExpectedStrings
       "Invalid statement, skipping it.", # wInvalidStatement
+      "Expected one parameter.", # wOneParameter
+      "Len takes a string, list or dict parameter.", # wStringListDict
+      "Not a function: $1.", # wInvalidFunction
     ]
 
 func getWarning*(filename: string, lineNum: int,
