@@ -49,6 +49,14 @@ proc testRunFunction(
 
 suite "runFunction.nim":
 
+  test "getFunction":
+    let function = getFunction("len")
+    check isSome(function)
+
+  test "getFunction not":
+    let function = getFunction("notfunction")
+    check not isSome(function)
+
   test "funConcat 0":
     var parameters: seq[Value] = @[]
     let eValueO = some(newValue(""))
@@ -77,7 +85,6 @@ suite "runFunction.nim":
     ]
     check testFunction("concat", parameters, eValueO = eValueO, eErrLines = eErrLines)
 
-
   test "runFunction":
     let parameters = @[newValue("Hello"), newValue(" World")]
     let eValueO = some(newValue("Hello World"))
@@ -99,15 +106,42 @@ suite "runFunction.nim":
     ]
     check testRunFunction("concat", parameters, statement, start, eValueO, eErrLines = eErrLines)
 
-  test "len":
+  test "len string":
     var parameters = @[newValue("abc")]
     let eValueO = some(newValue(3))
     check testFunction("len", parameters, eValueO = eValueO)
 
-  test "getFunction":
-    var functionO = getFunction("concat")
-    check functionO.isSome
-    functionO = getFunction("len")
-    check functionO.isSome
-    functionO = getFunction("notafunction")
-    check not functionO.isSome
+  test "len list":
+    var parameters = @[newValue([5, 3])]
+    let eValueO = some(newValue(2))
+    check testFunction("len", parameters, eValueO = eValueO)
+
+  test "len dict":
+    var parameters = @[newValue([("a", 5), ("b", 3)])]
+    let eValueO = some(newValue(2))
+    check testFunction("len", parameters, eValueO = eValueO)
+
+  test "len strings":
+    var parameters = @[newValue(["5", "3", "hi"])]
+    let eValueO = some(newValue(3))
+    check testFunction("len", parameters, eValueO = eValueO)
+
+  test "len float":
+    let eErrLines = @["template.html(1): w50: Len takes a string, list or dict parameter."]
+    var parameters = @[newValue(3.4)]
+    check testFunction("len", parameters, eErrLines = eErrLines)
+
+  test "len int":
+    let eErrLines = @["template.html(1): w50: Len takes a string, list or dict parameter."]
+    var parameters = @[newValue(3)]
+    check testFunction("len", parameters, eErrLines = eErrLines)
+
+  test "len nothing":
+    let eErrLines = @["template.html(1): w49: Expected one parameter."]
+    var parameters: seq[Value] = @[]
+    check testFunction("len", parameters, eErrLines = eErrLines)
+
+  test "len 2":
+    let eErrLines = @["template.html(1): w49: Expected one parameter."]
+    var parameters = @[newValue(3), newValue(2)]
+    check testFunction("len", parameters, eErrLines = eErrLines)

@@ -63,6 +63,29 @@ proc newValue*(num: int): Value =
 proc newValue*(num: float): Value =
   result = Value(kind: vkFloat, floatv: num)
 
+proc newValue*(valueList: seq[Value]): Value =
+  result = Value(kind: vkList, listv: valueList)
+
+proc newValue*(varsDict: VarsDict): Value =
+  result = Value(kind: vkDict, dictv: varsDict)
+
+when defined(test):
+  proc newValue*[T](list: openArray[T]): Value =
+    ## New list value from an array of items.
+    var valueList: seq[Value]
+    for num in list:
+      valueList.add(newValue(num))
+    result = Value(kind: vkList, listv: valueList)
+
+  proc newValue*[T](dictPairs: openArray[(string, T)]): Value =
+    ## New dict value from an array of pairs.
+    var varsTable: VarsDict
+    for tup in dictPairs:
+      let (a, b) = tup
+      let value = newValue(b)
+      varsTable[a] = value
+    result = Value(kind: vkDict, dictv: varsTable)
+
 proc `==`*(value1: Value, value2: Value): bool =
   if value1.kind == value2.kind:
     case value1.kind:

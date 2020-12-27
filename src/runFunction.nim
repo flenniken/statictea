@@ -8,7 +8,9 @@ import variables
 import tables
 
 type
-  functionPtr* = proc (env: var Env, lineNum: Natural, parameters: seq[Value]): Option[Value]
+  FunctionPtr* = proc (env: var Env, lineNum: Natural, parameters: seq[Value]): Option[Value]
+
+var functions: Table[string, FunctionPtr]
 
 proc funConcat*(env: var Env, lineNum: Natural, parameters:
                seq[Value]): Option[Value] =
@@ -43,23 +45,31 @@ proc funLen*(env: var Env, lineNum: Natural, parameters:
       return
   result = some(retValue)
 
-# todo: use a table for the functions.
-proc getFunction*(functionName: string): Option[functionPtr] =
+const
+  functionsList = [
+    ("len", funLen),
+    ("concat", funConcat),
+  ]
+
+proc getFunction*(functionName: string): Option[FunctionPtr] =
   ## Return the function pointer for the given function name.
-  var function: functionPtr
-  case functionName
-  of "len":
-    function = funLen
-  of "concat":
-    function = funConcat
-  else:
-    return
-  result = some(function)
+
+  if functions.len == 0:
+    for item in functionsList:
+      var (name, fun) = item
+      functions[name] = fun
+
+  var function = functions.getOrDefault(functionName)
+  if function != nil:
+    result = some(function)
 
 proc runFunction*(env: var Env, functionName: string,
     statement: Statement, start: Natural, variables: Variables,
     parameters: seq[Value]): Option[Value] =
-  ## Call the given function and return its value.
+  ## Call the given function and return its value. When the function
+  ## does not return a value, show the statement and the warning
+  ## position.
+
   var functionO = getFunction(functionName)
   if not isSome(functionO):
     env.warnStatement(statement, wInvalidFunction, start)
@@ -68,4 +78,3 @@ proc runFunction*(env: var Env, functionName: string,
   result = function(env, statement.lineNum, parameters)
   if not isSome(result):
     env.warnStatement(statement, wInvalidStatement, start)
-
