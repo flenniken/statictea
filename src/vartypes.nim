@@ -69,6 +69,10 @@ proc newValue*(valueList: seq[Value]): Value =
 proc newValue*(varsDict: VarsDict): Value =
   result = Value(kind: vkDict, dictv: varsDict)
 
+proc newValue*(value: Value): Value =
+  ## Copy the given value.
+  result = value
+
 when defined(test):
   proc newValue*[T](list: openArray[T]): Value =
     ## New list value from an array of items.
@@ -119,6 +123,20 @@ func `$`*(value: Value): string =
       result = "[]"
     else:
       result = "[...]"
+
+func `$`*(kind: ValueKind): string =
+  ## A string representation of a value's type.
+  case kind
+  of vkString:
+    result = "string"
+  of vkInt:
+    result = "int"
+  of vkFloat:
+    result = "float"
+  of vkDict:
+    result = "dict"
+  of vkList:
+    result = "list"
 
 func `$`*(s: Statement): string =
   ## A string representation of a Statement.

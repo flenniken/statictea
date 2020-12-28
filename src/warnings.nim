@@ -58,6 +58,12 @@ type
     wOneParameter,         # w49
     wStringListDict,       # w50
     wInvalidFunction,      # w51
+    wGetTakes2or3Params,   # w52
+    wExpectedIntFor2,      # w53
+    wMissingListItem,      # w54
+    wExpectedStringFor2,   # w55
+    wMissingDictItem,      # w56
+    wExpectedListOrDict,   # w57
 
 tpubType:
   const
@@ -116,6 +122,13 @@ tpubType:
       "Expected one parameter.", # wOneParameter
       "Len takes a string, list or dict parameter.", # wStringListDict
       "Not a function: $1.", # wInvalidFunction
+      "The get function takes 2 or 3 parameters.", # wGetTakes2or3Params
+      "Expected an int for the second parameter, got $1.", # wExpectedIntFor2
+      "The list index $1 out of range.", # wMissingListItem
+      "Expected a string for the second parameter, got $1.", # wExpectedStringFor2
+      "The dictionary does not have an item with key $1.", # wMissingDictItem
+      "Expected a list or dictionary as the first parameter.", # wExpectedListOrDict
+
     ]
 
 func getWarning*(filename: string, lineNum: int,

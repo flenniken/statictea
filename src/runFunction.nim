@@ -26,8 +26,9 @@ proc funConcat*(env: var Env, lineNum: Natural, parameters:
 
 proc funLen*(env: var Env, lineNum: Natural, parameters:
                seq[Value]): Option[Value] =
-  ## Get the byte length of a string, or the number of elements in
-  ## list or dictionary.  One parameter. Added in version 0.1.0.
+  ## Get the length of the parameter, either the byte length of a
+  ## string, or the number of elements in list or dictionary.  Added
+  ## in version 0.1.0.
   if parameters.len() != 1:
     env.warn(lineNum, wOneParameter)
     return
@@ -45,10 +46,50 @@ proc funLen*(env: var Env, lineNum: Natural, parameters:
       return
   result = some(retValue)
 
+proc funGet*(env: var Env, lineNum: Natural, parameters:
+               seq[Value]): Option[Value] =
+  ## Get an item from a list or dictionary. The first parameter is the
+  ## list or dictionary. The second parameter is the list index or the
+  ## dictionary key. The third optional parameter is the value to use
+  ## when the item doesn't exists.  Added in version 0.1.0.
+
+  if parameters.len() < 2 or parameters.len() > 3:
+    env.warn(lineNum, wGetTakes2or3Params)
+    return
+
+  let container = parameters[0]
+  case container.kind
+    of vkList:
+      let p2 = parameters[1]
+      if p2.kind != vkInt:
+        env.warn(lineNum, wExpectedIntFor2, $p2.kind)
+        return
+      var index = p2.intv
+      if index < 0 or index >= container.listv.len:
+        if parameters.len == 3:
+          return some(newValue(parameters[2]))
+        env.warn(lineNum, wMissingListItem, $index)
+        return
+      return some(newValue(container.listv[index]))
+    of vkDict:
+      let p2 = parameters[1]
+      if p2.kind != vkString:
+        env.warn(lineNum, wExpectedStringFor2, $p2.kind)
+        return
+      var key = p2.stringv
+      if key in container.dictv:
+        return some(container.dictv[key])
+      if parameters.len == 3:
+        return some(newValue(parameters[2]))
+      env.warn(lineNum, wMissingDictItem, $key)
+    else:
+      env.warn(lineNum, wExpectedListOrDict)
+
 const
   functionsList = [
     ("len", funLen),
     ("concat", funConcat),
+    ("get", funGet),
   ]
 
 proc getFunction*(functionName: string): Option[FunctionPtr] =

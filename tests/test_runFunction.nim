@@ -145,3 +145,72 @@ suite "runFunction.nim":
     let eErrLines = @["template.html(1): w49: Expected one parameter."]
     var parameters = @[newValue(3), newValue(2)]
     check testFunction("len", parameters, eErrLines = eErrLines)
+
+  test "get list item":
+    var list = newValue([1, 2, 3, 4, 5])
+    var parameters = @[list, newValue(0)]
+    check testFunction("get", parameters, eValueO = some(newValue(1)))
+
+  test "get list default":
+    var list = newValue([1, 2, 3, 4, 5])
+    var hi = newValue("hi")
+    # Index below.
+    var parameters = @[list, newValue(-1), hi]
+    check testFunction("get", parameters, eValueO = some(hi))
+    # Index above.
+    parameters = @[list, newValue(5), newValue(100)]
+    check testFunction("get", parameters, eValueO = some(newValue(100)))
+
+  test "get list invalid index":
+    var list = newValue([1, 2, 3, 4, 5])
+    var parameters = @[list, newValue(12)]
+    let eErrLines = @["template.html(1): w54: The list index 12 out of range."]
+    check testFunction("get", parameters, eErrLines = eErrLines)
+
+  test "get dict item":
+    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
+    var parameters = @[dict, newValue("b")]
+    let eValueO = some(newValue(2))
+    check testFunction("get", parameters, eValueO = eValueO)
+
+  test "get dict default":
+    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
+    var hi = newValue("hi")
+    var parameters = @[dict, newValue("t"), hi]
+    check testFunction("get", parameters, eValueO = some(hi))
+
+  test "get dict item missing":
+    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
+    var parameters = @[dict, newValue("p")]
+    let eErrLines = @["template.html(1): w56: The dictionary does not have an item with key p."]
+    check testFunction("get", parameters, eErrLines = eErrLines)
+
+  test "get one parameter":
+    var list = newValue([1, 2, 3, 4, 5])
+    var parameters = @[list]
+    let eErrLines = @["template.html(1): w52: The get function takes 2 or 3 parameters."]
+    check testFunction("get", parameters, eErrLines = eErrLines)
+
+  test "get 4 parameters":
+    var list = newValue([1, 2, 3, 4, 5])
+    let p = newValue(1)
+    var parameters = @[list, p, p, p]
+    let eErrLines = @["template.html(1): w52: The get function takes 2 or 3 parameters."]
+    check testFunction("get", parameters, eErrLines = eErrLines)
+
+  test "get parameter 2 wrong type":
+    var list = newValue([1, 2, 3, 4, 5])
+    var parameters = @[list, newValue("a")]
+    let eErrLines = @["template.html(1): w53: Expected an int for the second parameter, got string."]
+    check testFunction("get", parameters, eErrLines = eErrLines)
+
+  test "get parameter 2 wrong type dict":
+    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
+    var parameters = @[dict, newValue(3.5)]
+    let eErrLines = @["template.html(1): w55: Expected a string for the second parameter, got float."]
+    check testFunction("get", parameters, eErrLines = eErrLines)
+
+  test "get wrong first parameter":
+    var parameters = @[newValue(2), newValue(3.5)]
+    let eErrLines = @["template.html(1): w57: Expected a list or dictionary as the first parameter."]
+    check testFunction("get", parameters, eErrLines = eErrLines)
