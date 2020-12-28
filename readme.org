@@ -533,6 +533,7 @@ with "g." prefix.  They are stored in the t.global dictionary.
   - [[#tmaxlines][t.maxLines]] -- maximum lines before endblock or endreplace
   - [[#toutput][t.output]] -- where the block output goes
   - [[#trepeat][t.repeat]] -- controls how many times the block repeats
+  - [[#trow][t.row]] -- the current row number of a repeating block
   - [[#tserver][t.server]] -- dictionary containing the server variables
   - [[#tshared][t.shared]] -- dictionary containing the shared variables
 
@@ -675,7 +676,7 @@ with "g." prefix.  They are stored in the t.global dictionary.
 
  #+BEGIN_SRC
  <!--$ nextline t.repeat = len(s.tea_list); \-->
- <!--$ : tea = get(s.tea_list, row()) -->
+ <!--$ : tea = get(s.tea_list, t.row) -->
   * {tea}
  #+END_SRC
 
@@ -713,7 +714,7 @@ with "g." prefix.  They are stored in the t.global dictionary.
  <h3>Tea Companies</h3>
  <select>
  <!--$ nextline t.repeat=len(s.companyList); \-->
- <!--$ : d = get(s.companyList, row()); \-->
+ <!--$ : d = get(s.companyList, t.row); \-->
  <!--$ : company = get(d, "company"); \-->
  <!--$ : selected = get(d, "selected", 0); \-->
  <!--$ : current=if(selected, ' selected="selected"', "") -->
@@ -761,7 +762,7 @@ with "g." prefix.  They are stored in the t.global dictionary.
  <h3>Tea</h3>
  <ul>
  <!--$ nextline t.repeat = len(s.teaList); \-->
- <!--$ : tea = get(s.teaList, row()) -->
+ <!--$ : tea = get(s.teaList, t.row) -->
   <li>{tea}</li>
  </ul>
  #+END_SRC
@@ -775,7 +776,7 @@ with "g." prefix.  They are stored in the t.global dictionary.
  <h3>Tea</h3>
  <ul>
  <!--$ nextline t.repeat = len(s.teaList) \-->
- <!--$ : tea = get(s.teaList, row()) -->
+ <!--$ : tea = get(s.teaList, t.row) -->
   <li>{tea}</li>
  <!--$ block t.repeat = 0 -->
   <li>Black</li>
@@ -814,14 +815,58 @@ with "g." prefix.  They are stored in the t.global dictionary.
 
  [[#contents][茶]]
 
+*** t.row
+    :PROPERTIES:
+    :CUSTOM_ID: trow
+    :END:
+
+The t.row variable contains the current row number for blocks
+that repeat. The row numbers start at 0 and increase.  You use it
+to format lists and other repeating content in the template.
+
+Here is an example using the row variable.  In the example the
+row number is used in three places.
+
+template:
+
+#+BEGIN_SRC
+<!--$ nextline t.repeat=len(s.companies); \-->
+<!--$ : company = get(s.companies, t.row); \-->
+<!--$ : num = add(t.row, 1) -->
+<li id="r{t.row}>{num}. {company}</li>
+#+END_SRC
+
+server json:
+
+#+BEGIN_SRC
+{
+  "companies": [
+    "Mighty Leaf Tea",
+    "Numi Organic Tea",
+    "Peet's Coffee & Tea",
+    "Red Diamond"
+  ]
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+  <li id="r0">1. Mighty Leaf Tea</li>
+  <li id="r1">2. Numi Organic Tea</li>
+  <li id="r2">3. Peet's Coffee & Tea</li>
+  <li id="r3">4. Red Diamond</li>
+#+END_SRC
+
+
+ [[#contents][茶]]
+
 *** t.server
     :PROPERTIES:
     :CUSTOM_ID: tserver
     :END:
 
  The t.server variable is a dictionary containing the server json variables.
-
- [[#contents][茶]]
 
 *** t.shared
     :PROPERTIES:
@@ -969,7 +1014,6 @@ List of functions:
 - [[#len][len()]] -- length of string
 - [[#lineNumber][lineNumber()]] -- the current line number
 - [[#quotehtml][quoteHtml]] -- replace html special characters
-- [[#row][row()]] -- function that returns the current row number
 - [[#sizes][sizes()]] -- format bytes counts, KB, MB, GB, etc.
 - [[#substr][substr()]] -- extract a substring from a string by indexes
 - [[#time][time()]] -- format the date and time.
@@ -1329,55 +1373,6 @@ Return the line in the template where the function is called.
 :END:
 
 The quoteHtml replaces special html characters with equivalents.
-
-[[#contents][茶]]
-
-** row()
-:PROPERTIES:
-:CUSTOM_ID: row
-:END:
-
-The row function returns the current row number for
-blocks that repeat. The function takes a parameter which
-specifies the starting point.
-
-- row()  -— returns 0, 1, 2,...
-- row(0) -— returns 0, 1, 2,...
-- row(1) -— returns 1, 2, 3,...
-- row(N) -— returns N, N+1, N+2,...
-
-Here is an example using the row variable.
-
-template:
-
-#+BEGIN_SRC
-<!--$ nextline t.repeat=len(s.companies); \-->
-<!--$ : company = get(s.companies, row()); \-->
-<!--$ : id = row(0); num = row(1) -->
-<li id="r{id}>{num}. {company}</li>
-#+END_SRC
-
-server json:
-
-#+BEGIN_SRC
-{
-  "companies": [
-    "Mighty Leaf Tea",
-    "Numi Organic Tea",
-    "Peet's Coffee & Tea",
-    "Red Diamond"
-  ]
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-  <li id="r0">1. Mighty Leaf Tea</li>
-  <li id="r1">2. Numi Organic Tea</li>
-  <li id="r2">3. Peet's Coffee & Tea</li>
-  <li id="r3">4. Red Diamond</li>
-#+END_SRC
 
 [[#contents][茶]]
 
