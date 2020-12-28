@@ -29,7 +29,7 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
   # * CommandLine -- is a line at a terminal for system commands.
 
   # prefix   command     middle    \postfix ending
-  # <--!$    nextline    a = 5     \-->\n
+  # <!--$    nextline    a = 5     \-->\n
   #                   ^middleStart
 
   var lineParts: LineParts
@@ -102,7 +102,7 @@ when defined(test):
   #                    getEndingString(lp.ending)]
 
   proc newLineParts*(
-      prefix: string = "<--!$",
+      prefix: string = "<!--$",
       command: string = "nextline",
       middleStart: Natural = 15,
       middleLen: Natural = 0,
@@ -110,7 +110,7 @@ when defined(test):
       postfix: string = "-->",
       ending: string = "\n",
       lineNum: Natural = 1): LineParts =
-    ## Return a new LineParts object. The default is: <--!$ nextline -->\n.
+    ## Return a new LineParts object. The default is: <!--$ nextline -->\n.
     result = LineParts(prefix: prefix, command: command,
       middleStart: middleStart, middleLen: middleLen,
       continuation: continuation, postfix: postfix,

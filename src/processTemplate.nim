@@ -10,6 +10,8 @@ import parseCmdLine
 import collectCommand
 import runCommand
 import variables
+import vartypes
+import tables
 
 #[
 
@@ -25,10 +27,10 @@ continue too. The last line doesn't have a slash. If an error is
 found, a warning is written, and the lines get written as is, as if
 they weren't command lines.
 
-<--!$ nextline a = 5 \-->\n
-<--!$ : a = 5 \-->\n
-<--!$ : b = 6 \-->\n
-<--!$ : c = 7  -->\n
+<!--$ nextline a = 5 \-->\n
+<!--$ : a = 5 \-->\n
+<!--$ : b = 6 \-->\n
+<!--$ : c = 7  -->\n
 
 There are three line types: cmd lines, replacement block lines and
 other lines.
@@ -43,6 +45,9 @@ Other lines, not cmd or block lines, get echoed to the output file
 unchanged.
 
 ]#
+
+proc processReplacementBlock() =
+  echo "processReplacementBlock"
 
 proc processTemplateLines(env: var Env, variables: var Variables,
                           prepostTable: PrepostTable) =
@@ -71,10 +76,27 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       break # done, no more lines
 
     # Run the command and fill in the variables.
+    var row = 0
+    variables.tea["row"] = newValue(row)
     runCommand(env, cmdLines, cmdLineParts, compiledMatchers,
                variables)
 
-    # Process the replacement block.
+    let repeat = getTeaVarInt(variables, "repeat")
+    if repeat == 0:
+      continue
+
+    while true:
+      processReplacementBlock()
+
+      inc(row)
+      if row >= repeat:
+        break
+
+      # Run the command and fill in the variables.
+      variables.tea["row"] = newValue(row)
+      runCommand(env, cmdLines, cmdLineParts, compiledMatchers,
+                 variables)
+
 
 proc processTemplate*(env: var Env, args: Args): int =
   ## Process the template and return 0 on success. It's an error when

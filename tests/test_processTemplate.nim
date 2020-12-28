@@ -118,3 +118,39 @@ suite "processTemplate":
     check resultLines.len == 1
     check resultLines[0] == "Hello"
 
+  test "processTemplate with command":
+    var env = openEnvTest("_processTemplateCmd.log")
+
+    # Create template file.
+    let templateFilename = "template.html"
+    let content = """
+<!--$ nextline t.repeat = 4 -->
+{t.row}
+"""
+    createFile(templateFilename, content)
+    defer: discard tryRemoveFile(templateFilename)
+    var lines = readLines(templateFilename, maximum=4)
+    check lines.len == 2
+
+    # Add the template and result file to the environment.
+    var args: Args
+    args.templateList = @[templateFilename]
+    args.resultFilename = "resultToFile.txt"
+    let success = env.addExtraStreams(args)
+    check success == true
+    check env.templateFilename == templateFilename
+    check env.resultFilename == args.resultFilename
+    check env.resultStream != nil
+    check env.templateStream != nil
+
+    # Process the template and write out the result.
+    let rc = processTemplate(env, args)
+
+    check env.readCloseDeleteCompare()
+
+    # Read the result file.
+    let resultLines = env.readCloseDeleteResult()
+    # for line in resultLines:
+    #   echo line
+    # check resultLines.len == 4
+    # check resultLines[0] == "Hello"

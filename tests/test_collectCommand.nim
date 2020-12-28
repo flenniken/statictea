@@ -64,15 +64,15 @@ three
     check splitNewLines(content) == @["line one\n", "two\n", "three\n"]
 
   test "one line":
-    let content = "<--!$ nextline -->\n"
+    let content = "<!--$ nextline -->\n"
     let eCmdLines = @[content]
     let eCmdLineParts = @[newLineParts()]
     check testCollectCommand(content, eCmdLines, eCmdLineParts)
 
   test "two lines":
     let content = """
-<--!$ nextline \-->
-<--!$ : -->
+<!--$ nextline \-->
+<!--$ : -->
 """
     let eCmdLines = splitNewLines(content)
     let eCmdLineParts = @[
@@ -83,9 +83,9 @@ three
 
   test "three lines":
     let content = """
-<--!$ nextline \-->
-<--!$ : a=5 \-->
-<--!$ : var = "hello" -->
+<!--$ nextline \-->
+<!--$ : a=5 \-->
+<!--$ : var = "hello" -->
 """
     let eCmdLines = splitNewLines(content)
     let eCmdLineParts = @[
@@ -116,7 +116,7 @@ more stuff no newline at end"""
   test "command and non command":
     let content = """
 not a command
-<--!$ nextline -->
+<!--$ nextline -->
 the next line
 """
     let split = splitNewLines(content)
@@ -127,7 +127,7 @@ the next line
 
   test "regular line not continuation line":
     let content = """
-<--!$ nextline \-->
+<!--$ nextline \-->
 asdf
 """
     let warning = "template.html(2): w24: Missing the continuation line, " &
@@ -138,8 +138,8 @@ asdf
 
   test "block command not continuation command":
     let content = """
-<--!$ nextline \-->
-<--!$ block -->
+<!--$ nextline \-->
+<!--$ block -->
 asdf
 """
     let warning = "template.html(2): w24: Missing the continuation line, " &
@@ -151,7 +151,7 @@ asdf
 
   test "no more lines, need continuation":
     let content = """
-<--!$ nextline \-->
+<!--$ nextline \-->
 """
     let warning = "template.html(1): w24: Missing the continuation line, " &
       "abandoning the command."
@@ -166,8 +166,8 @@ asdf
 
   test "more lines after dumping":
     let content = """
-<--!$ nextline \-->
-<--!$ block -->
+<!--$ nextline \-->
+<!--$ block -->
 asdf
 asdf
 ttasdfasdf
@@ -180,16 +180,16 @@ ttasdfasdf
 
   test "another command after dumping":
     let content = """
-<--!$ nextline \-->
-<--!$ block -->
+<!--$ nextline \-->
+<!--$ block -->
 asdf
 asdf
 ttasdfasdf
-<--!$ nextline -->
+<!--$ nextline -->
 block
 asdf
 """
-    let eCmdLines = @["<--!$ nextline -->\n"]
+    let eCmdLines = @["<!--$ nextline -->\n"]
     let eCmdLineParts = @[newLineParts(lineNum = 6)]
     let warning = "template.html(2): w24: Missing the continuation line, " &
       "abandoning the command."
@@ -201,12 +201,12 @@ asdf
 
   test "two warnings":
     let content = """
-<--!$ nextline \-->
-<--!$ block -->
+<!--$ nextline \-->
+<!--$ block -->
 asdf
 asdf
 ttasdfasdf
-<--!$ nextline \-->
+<!--$ nextline \-->
 block
 asdf
 """

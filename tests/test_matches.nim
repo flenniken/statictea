@@ -13,26 +13,26 @@ suite "matches.nim":
     for prefix, postfix in prepostTable.pairs:
       check prefix.len > 0
       # echo "$1 nextline $2" % [prefix, postfix]
-    check prepostTable["<--!$"] == "-->"
+    check prepostTable["<!--$"] == "-->"
 
   test "prefixMatcher tests":
     var prefixMatcher = getPrefixMatcher(getDefaultPrepostTable())
 
-    check checkMatcher(prefixMatcher, "<--!$ nextline -->", 0, @["<--!$"], 6)
+    check checkMatcher(prefixMatcher, "<!--$ nextline -->", 0, @["<!--$"], 6)
     check checkMatcher(prefixMatcher, "#$ nextline", 0, @["#$"], 3)
     check checkMatcher(prefixMatcher, ";$ nextline", 0, @[";$"], 3)
     check checkMatcher(prefixMatcher, "//$ nextline", 0, @["//$"], 4)
     check checkMatcher(prefixMatcher, "/*$ nextline */", 0, @["/*$"], 4)
     check checkMatcher(prefixMatcher, "&lt;!--$ nextline --&gt;", 0, @["&lt;!--$"], 9)
-    check checkMatcher(prefixMatcher, "<--!$ : -->", 0, @["<--!$"], 6)
-    check checkMatcher(prefixMatcher, "<--!$         nextline -->", 0, @["<--!$"], 14)
-    check checkMatcher(prefixMatcher, "<--!$\tnextline -->", 0, @["<--!$"], 6)
+    check checkMatcher(prefixMatcher, "<!--$ : -->", 0, @["<!--$"], 6)
+    check checkMatcher(prefixMatcher, "<!--$         nextline -->", 0, @["<!--$"], 14)
+    check checkMatcher(prefixMatcher, "<!--$\tnextline -->", 0, @["<!--$"], 6)
     check checkMatcher(prefixMatcher, "#$ nextline\n", 0, @["#$"], 3)
     check checkMatcher(prefixMatcher, "#$ nextline   \n", 0, @["#$"], 3)
     check checkMatcher(prefixMatcher, "#$ nextline   \\\n", 0, @["#$"], 3)
 
     check not prefixMatcher.getMatches("<--$ nextline -->", 0).isSome
-    check not prefixMatcher.getMatches("<--!$nextline -->", 0).isSome
+    check not prefixMatcher.getMatches("<!--$nextline -->", 0).isSome
 
   test "getUserPrepostTable user prefix":
     var prepostList = @[("abc", "def")]
@@ -50,13 +50,13 @@ suite "matches.nim":
   test "command matcher":
     var commandMatcher = getCommandMatcher()
 
-    check checkMatcher(commandMatcher, "<--!$ nextline -->", 6, @["nextline"], 9)
-    check checkMatcher(commandMatcher, "<--!$ block    -->", 6, @["block"], 6)
-    check checkMatcher(commandMatcher, "<--!$ replace  -->", 6, @["replace"], 8)
-    check checkMatcher(commandMatcher, "<--!$ endblock -->", 6, @["endblock"], 9)
-    check checkMatcher(commandMatcher, "<--!$ endreplace  -->", 6, @["endreplace"], 11)
-    check checkMatcher(commandMatcher, "<--!$ #  -->", 6, @["#"], 2)
-    check checkMatcher(commandMatcher, "<--!$ :  -->", 6, @[":"], 2)
+    check checkMatcher(commandMatcher, "<!--$ nextline -->", 6, @["nextline"], 9)
+    check checkMatcher(commandMatcher, "<!--$ block    -->", 6, @["block"], 6)
+    check checkMatcher(commandMatcher, "<!--$ replace  -->", 6, @["replace"], 8)
+    check checkMatcher(commandMatcher, "<!--$ endblock -->", 6, @["endblock"], 9)
+    check checkMatcher(commandMatcher, "<!--$ endreplace  -->", 6, @["endreplace"], 11)
+    check checkMatcher(commandMatcher, "<!--$ #  -->", 6, @["#"], 2)
+    check checkMatcher(commandMatcher, "<!--$ :  -->", 6, @[":"], 2)
     check checkMatcher(commandMatcher, "  nextline ", 2, @["nextline"], 9)
 
     check not commandMatcher.getMatches(" nextline", 2).isSome
@@ -65,34 +65,34 @@ suite "matches.nim":
   test "last part matcher":
     var matcher = getLastPartMatcher("-->")
 
-    check checkMatcher(matcher, "<--!$ nextline -->", 15, @["", ""], 3)
-    check checkMatcher(matcher, "<--!$ nextline -->\n", 15, @["", "\n"], 4)
-    check checkMatcher(matcher, "<--!$ nextline -->\r\n", 15, @["", "\r\n"], 5)
-    check checkMatcher(matcher, r"<--!$ nextline \-->", 15, @[r"\", ""], 4)
-    check checkMatcher(matcher, "<--!$ nextline \\-->", 15, @[r"\", ""], 4)
-    check checkMatcher(matcher, "<--!$ nextline \\-->\n", 15, @[r"\", "\n"], 5)
-    check checkMatcher(matcher, "<--!$ nextline \\-->\r\n", 15, @[r"\", "\r\n"], 6)
+    check checkMatcher(matcher, "<!--$ nextline -->", 15, @["", ""], 3)
+    check checkMatcher(matcher, "<!--$ nextline -->\n", 15, @["", "\n"], 4)
+    check checkMatcher(matcher, "<!--$ nextline -->\r\n", 15, @["", "\r\n"], 5)
+    check checkMatcher(matcher, r"<!--$ nextline \-->", 15, @[r"\", ""], 4)
+    check checkMatcher(matcher, "<!--$ nextline \\-->", 15, @[r"\", ""], 4)
+    check checkMatcher(matcher, "<!--$ nextline \\-->\n", 15, @[r"\", "\n"], 5)
+    check checkMatcher(matcher, "<!--$ nextline \\-->\r\n", 15, @[r"\", "\r\n"], 6)
 
   test "getLastPart":
     var matcher = getLastPartMatcher("-->")
 
-    check checkGetLastPart(matcher, "<--!$ nextline -->", 15, @["", ""], 3)
-    check checkGetLastPart(matcher, "<--!$ nextline -->\n", 15, @["", "\n"], 4)
-    check checkGetLastPart(matcher, "<--!$ nextline -->\r\n", 15, @["", "\r\n"], 5)
-    check checkGetLastPart(matcher, r"<--!$ nextline \-->", 15, @[r"\", ""], 4)
-    check checkGetLastPart(matcher, "<--!$ nextline \\-->", 15, @[r"\", ""], 4)
-    check checkGetLastPart(matcher, "<--!$ nextline \\-->\n", 15, @[r"\", "\n"], 5)
-    check checkGetLastPart(matcher, "<--!$ nextline \\-->\r\n", 15, @[r"\", "\r\n"], 6)
+    check checkGetLastPart(matcher, "<!--$ nextline -->", 15, @["", ""], 3)
+    check checkGetLastPart(matcher, "<!--$ nextline -->\n", 15, @["", "\n"], 4)
+    check checkGetLastPart(matcher, "<!--$ nextline -->\r\n", 15, @["", "\r\n"], 5)
+    check checkGetLastPart(matcher, r"<!--$ nextline \-->", 15, @[r"\", ""], 4)
+    check checkGetLastPart(matcher, "<!--$ nextline \\-->", 15, @[r"\", ""], 4)
+    check checkGetLastPart(matcher, "<!--$ nextline \\-->\n", 15, @[r"\", "\n"], 5)
+    check checkGetLastPart(matcher, "<!--$ nextline \\-->\r\n", 15, @[r"\", "\r\n"], 6)
 
   test "getLastPart blank postfix":
     var matcher = getLastPartMatcher("")
-    check checkGetLastPart(matcher, "<--!$ nextline a", 16, @["", ""], 0)
-    check checkGetLastPart(matcher, "<--!$ nextline a\n", 16, @["", "\n"], 1)
-    check checkGetLastPart(matcher, "<--!$ nextline a\r\n", 16, @["", "\r\n"], 2)
-    check checkGetLastPart(matcher, r"<--!$ nextline a\", 16, @[r"\", ""], 1)
-    check checkGetLastPart(matcher, "<--!$ nextline a\\", 16, @[r"\", ""], 1)
-    check checkGetLastPart(matcher, "<--!$ nextline a\\\n", 16, @[r"\", "\n"], 2)
-    check checkGetLastPart(matcher, "<--!$ nextline a\\\r\n", 16, @[r"\", "\r\n"], 3)
+    check checkGetLastPart(matcher, "<!--$ nextline a", 16, @["", ""], 0)
+    check checkGetLastPart(matcher, "<!--$ nextline a\n", 16, @["", "\n"], 1)
+    check checkGetLastPart(matcher, "<!--$ nextline a\r\n", 16, @["", "\r\n"], 2)
+    check checkGetLastPart(matcher, r"<!--$ nextline a\", 16, @[r"\", ""], 1)
+    check checkGetLastPart(matcher, "<!--$ nextline a\\", 16, @[r"\", ""], 1)
+    check checkGetLastPart(matcher, "<!--$ nextline a\\\n", 16, @[r"\", "\n"], 2)
+    check checkGetLastPart(matcher, "<!--$ nextline a\\\r\n", 16, @[r"\", "\r\n"], 3)
 
   test "get space tab":
     let matcher = getSpaceTabMatcher()

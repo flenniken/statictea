@@ -75,7 +75,7 @@ suite "parseCmdLine.nim":
 
   test "newLineParts":
     var lps = newLineParts()
-    check lps.prefix == "<--!$"
+    check lps.prefix == "<!--$"
     check lps.command == "nextline"
     check lps.middleStart == 15
     check lps.middleLen == 0
@@ -98,32 +98,32 @@ suite "parseCmdLine.nim":
     check lps.lineNum == 12
 
   test "parseCmdLine":
-    let line = "<--!$ nextline -->\n"
+    let line = "<!--$ nextline -->\n"
     var elps = newLineParts()
     check testParseCmdLine(line, expectedLineParts = elps)
 
   test "parseCmdLine middle":
-    let line = "<--!$ nextline middle part -->\n"
+    let line = "<!--$ nextline middle part -->\n"
     var elps = newLineParts(middleStart = 15, middleLen = 12)
     check testParseCmdLine(line, expectedLineParts = elps)
 
   test "parseCmdLine middle 2":
-    let line = "<--!$ nextline    middle part  -->\n"
+    let line = "<!--$ nextline    middle part  -->\n"
     var elps = newLineParts(middleStart = 15, middleLen = 16)
     check testParseCmdLine(line, expectedLineParts = elps)
 
   test "parseCmdLine continue":
-    let line = "<--!$ nextline \\-->\n"
+    let line = "<!--$ nextline \\-->\n"
     var elps = newLineParts(continuation = true)
     check testParseCmdLine(line, expectedLineParts = elps)
 
   test "parseCmdLine last line":
-    let line = "<--!$ nextline -->"
+    let line = "<!--$ nextline -->"
     var elps = newLineParts(ending = "")
     check testParseCmdLine(line, expectedLineParts = elps)
 
   test "parseCmdLine block":
-    let line = "<--!$ block -->\n"
+    let line = "<!--$ block -->\n"
     var elps = newLineParts(command = "block", middleStart = 12)
     check testParseCmdLine(line, expectedLineParts = elps)
 
@@ -144,11 +144,11 @@ suite "parseCmdLine.nim":
     check parseCmdLineError(line)
 
   test "no command error":
-    let line = "<--!$ -->\n"
+    let line = "<!--$ -->\n"
     let expectedWarn = "template.html(12): w22: No command found at column 7, skipping line."
     check parseCmdLineError(line, eErrLines = @[expectedWarn])
 
   test "no postfix error":
-    let line = "<--!$ nextline \n"
+    let line = "<!--$ nextline \n"
     let expectedWarn = """template.html(16): w23: The matching closing comment postfix was not found, expected: "-->"."""
     check parseCmdLineError(line, lineNum = 16, eErrLines = @[expectedWarn])

@@ -329,11 +329,16 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
   # let valueAndLength = result.get()
   # env.warnStatement(statement, wStackTrace, start+valueAndLength.length,  "leave getValue")
 
+proc getTeaVarInt*(variables: Variables, varName: string): int64 =
+  ## Get one of the int tea variables number.
+  assert varName in ["row", "repeat", "maxRepeat", "maxLines"]
+  let value = variables.tea[varName]
+  assert value.kind == vkInt
+  result = value.intv
 
-proc assignTeaVariable(env: var Env, statement: Statement,
-                       compiledMatchers: Compiledmatchers, variables:
-                         var Variables, varName: string, value: Value,
-                             start: Natural) =
+proc assignTeaVariable(env: var Env, statement: Statement, variables:
+                       var Variables, varName: string, value: Value,
+                           start: Natural) =
   ## Assign the given tea variable with the given value.  Show
   ## warnings when it's not possible to make the assignment.
 
@@ -364,15 +369,13 @@ proc assignTeaVariable(env: var Env, statement: Statement,
         variables.tea[varName] = value
       else:
         env.warnStatement(statement, wInvalidMaxRepeat, start, $value)
-    of "server", "shared", "local", "global":
+    of "server", "shared", "local", "global", "row":
       env.warnStatement(statement, wReadOnlyTeaVar, start, varName)
     else:
       env.warnStatement(statement, wInvalidTeaVar, start, varName)
 
-
-proc runStatement(env: var Env, statement: Statement,
-    compiledMatchers: Compiledmatchers, variables: Variables):
-    Option[tuple[nameSpace: string, varName: string, value: Value]] {.tpub.} =
+proc runStatement*(env: var Env, statement: Statement,
+    compiledMatchers: Compiledmatchers, variables: Variables): Option[SpaceNameValue] =
   ## Run one statement. Return the variable namespace, name and value.
 
   # Get the variable name. Match the surrounding white space.
@@ -401,21 +404,43 @@ proc runStatement(env: var Env, statement: Statement,
   # Check that there is not any unprocessed text following the value.
   let value = valueAndLengthO.get().value
   let length = valueAndLengthO.get().length
-  if length != statement.text.len:
-    env.warnStatement(statement, wTextAfterValue, length)
+  let pos = variable.length + equalSign.length + length
+  if pos != statement.text.len:
+    env.warnStatement(statement, wTextAfterValue, pos)
     return
 
-  result = some((nameSpace, varName, value))
+  result = some(newSpaceNameValue(nameSpace, varName, value))
 
-proc setState*(variables: var Variables) =
-  ## Clear the local dictionary and set the tea variables to their
-  ## initial state.
+proc setInitialVariables*(variables: var Variables) =
+  ## Set the variable dictionaries to their initial state before
+  ## running a command.
   variables.tea["output"] = Value(kind: vkString, stringv: "result")
   variables.tea["repeat"] = Value(kind: vkInt, intv: 1)
   variables.tea["maxLines"] = Value(kind: vkInt, intv: 10)
   variables.tea["maxRepeat"] = Value(kind: vkInt, intv: 100)
+  # The row variable is handled at a higher scope.
+  # variables.tea["row"] = Value(kind: vkInt, intv: 0)
   variables.tea.del("content")
   variables.local.clear()
+
+proc assignVariable(env: var Env, statement: Statement, variables: var
+                    Variables, spaceNameValue: SpaceNameValue) =
+  ## Assign the variable to its dictionary.
+  let nameSpace = spaceNameValue.nameSpace
+  let varName = spaceNameValue.varName
+  let value = spaceNameValue.value
+  case nameSpace:
+    of "":
+      variables.local[varName] = value
+    of "g.":
+      variables.global[varName] = value
+    of "t.":
+      assignTeaVariable(env, statement, variables,
+          varName, value, 0)
+    of "s.", "h.":
+      env.warnStatement(statement, wReadOnlyDictionary, 0)
+    else:
+      env.warnStatement(statement, wInvalidNameSpace, 0, nameSpace)
 
 proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
                  seq[LineParts], compiledMatchers: CompiledMatchers,
@@ -424,44 +449,29 @@ proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
 
   # Clear the local variables and set the tea vars to their initial
   # state.
-  setState(variables)
+  setInitialVariables(variables)
 
   # Loop over the statements and run each one.
   for statement in yieldStatements(cmdLines, cmdLineParts,
       compiledMatchers.spaceTabMatcher):
     # Run the statement.  When there is a statement error, no
     # nameValue is returned and we skip the statement.
-    let nameValueO = runStatement(env, statement, compiledMatchers,
+    let spaceNameValue = runStatement(env, statement, compiledMatchers,
                                   variables)
-    if nameValueO.isSome():
-      # Assign the variable to its dictionary.
-      let tup = nameValueO.get()
-      let (nameSpace, varName, value) = tup
-      case nameSpace:
-        of "":
-          variables.local[varName] = value
-        of "g.":
-          variables.global[varName] = value
-        of "t.":
-          assignTeaVariable(env, statement, compiledMatchers, variables,
-              varName, value, 0)
-        of "s.", "h.":
-          env.warnStatement(statement, wReadOnlyDictionary, 0)
-        else:
-          env.warnStatement(statement, wInvalidNameSpace, 0, nameSpace)
+    # Assign the variable to its dictionary.
+    if spaceNameValue.isSome():
+      assignVariable(env, statement, variables, spaceNameValue.get())
+
 
 when defined(test):
   proc newIntValueAndLengthO*(number: int | int64,
                               length: Natural): Option[ValueAndLength] =
-    let value = Value(kind: vkInt, intv: number)
-    result = some(ValueAndLength(value: value, length: length))
+    result = some(ValueAndLength(value: newValue(number), length: length))
 
   proc newFloatValueAndLengthO*(number: float64,
                                 length: Natural): Option[ValueAndLength] =
-    let value = Value(kind: vkFloat, floatv: number)
-    result = some(ValueAndLength(value: value, length: length))
+    result = some(ValueAndLength(value: newValue(number), length: length))
 
   proc newStringValueAndLengthO*(str: string,
                                  length: Natural): Option[ValueAndLength] =
-    let value = Value(kind: vkString, stringv: str)
-    result = some(ValueAndLength(value: value, length: length))
+    result = some(ValueAndLength(value: newValue(str), length: length))

@@ -7,7 +7,7 @@ import options
 
 const
   predefinedPrepost: array[6, Prepost] = [
-    ("<--!$", "-->"),
+    ("<!--$", "-->"),
     ("#$", ""),
     (";$", ""),
     ("//$", ""),

@@ -199,6 +199,23 @@ proc testGetFunctionValue(functionName: string, statement: Statement, start: Nat
   if not expectedItem("valueAndLength", valueAndLengthO, eValueAndLengthO):
     result = false
 
+proc testRunStatement(statement: Statement,
+    eSpaceNameValueO = none(SpaceNameValue),
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[]
+  ): bool =
+  var env = openEnvTest("_runStatement.log", "template.html")
+
+  var variables = newVariables()
+  let compiledMatchers = getCompiledMatchers()
+  let spaceNameValueO = runStatement(env, statement, compiledMatchers, variables)
+
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+
+  if not expectedItem("SpaceNameValue", spaceNameValueO, eSpaceNameValueO):
+    result = false
+
 suite "runCommand.nim":
 
   test "stripNewline":
@@ -237,14 +254,14 @@ suite "runCommand.nim":
     ], expected)
 
   test "no statements":
-    let cmdLines = @["<--!$ nextline -->\n"]
+    let cmdLines = @["<!--$ nextline -->\n"]
     let cmdLineParts = @[newLineParts()]
     let statements = getStatements(cmdLines, cmdLineParts)
     check statements.len == 0
 
   test "one statement":
     let content = """
-<--!$ nextline a = 5 -->
+<!--$ nextline a = 5 -->
 """
     let cmdLines = splitNewLines(content)
     let cmdLineParts = getCmdLineParts(cmdLines)
@@ -256,7 +273,7 @@ suite "runCommand.nim":
 
   test "two statements":
     let content = """
-<--!$ nextline a = 5; b = 6 -->
+<!--$ nextline a = 5; b = 6 -->
 """
     let cmdLines = splitNewLines(content)
     let cmdLineParts = getCmdLineParts(cmdLines)
@@ -269,7 +286,7 @@ suite "runCommand.nim":
 
   test "three statements":
     let content = """
-<--!$ nextline a = 5; b = 6 ;c=7-->
+<!--$ nextline a = 5; b = 6 ;c=7-->
 """
     let cmdLines = splitNewLines(content)
     let cmdLineParts = getCmdLineParts(cmdLines)
@@ -283,8 +300,8 @@ suite "runCommand.nim":
 
   test "two lines":
     let content = """
-<--!$ nextline a = 5; \-->
-<--!$ : asdf -->
+<!--$ nextline a = 5; \-->
+<!--$ : asdf -->
 """
     let cmdLines = splitNewLines(content)
     let cmdLineParts = getCmdLineParts(cmdLines)
@@ -297,9 +314,9 @@ suite "runCommand.nim":
 
   test "three statements split":
     let content = """
-<--!$ block a = 5; b = \-->
-<--!$ : "hello"; \-->
-<--!$ : c = t.len(s.header) -->
+<!--$ block a = 5; b = \-->
+<!--$ : "hello"; \-->
+<!--$ : c = t.len(s.header) -->
 """
     let statements = testGetStatements(content)
     let expected = """
@@ -311,7 +328,7 @@ suite "runCommand.nim":
 
   test "semicolon at the start":
     let content = """
-<--!$ nextline ;a = 5 -->
+<!--$ nextline ;a = 5 -->
 """
     let statements = testGetStatements(content)
     let expected = """
@@ -321,7 +338,7 @@ suite "runCommand.nim":
 
   test "double quotes":
     let content = """
-<--!$ nextline a="hi" -->
+<!--$ nextline a="hi" -->
 """
     let statements = testGetStatements(content)
     let expected = """
@@ -331,7 +348,7 @@ suite "runCommand.nim":
 
   test "double quotes with semicolon":
     let content = """
-<--!$ nextline a="h\i;" -->
+<!--$ nextline a="h\i;" -->
 """
     let statements = testGetStatements(content)
     let expected = """
@@ -341,7 +358,7 @@ suite "runCommand.nim":
 
   test "double quotes with slashed double quote":
     let content = """
-<--!$ nextline a="\"hi\"" -->
+<!--$ nextline a="\"hi\"" -->
 """
     let statements = testGetStatements(content)
     let expected = """
@@ -351,7 +368,7 @@ suite "runCommand.nim":
 
   test "double quotes with single quote":
     let content = """
-<--!$ nextline a="'hi'" -->
+<!--$ nextline a="'hi'" -->
 """
     let statements = testGetStatements(content)
     let expected = """
@@ -361,7 +378,7 @@ suite "runCommand.nim":
 
   test "single quotes":
     let content = """
-<--!$ nextline a='hi' -->
+<!--$ nextline a='hi' -->
 """
     let statements = testGetStatements(content)
     let expected = """
@@ -371,7 +388,7 @@ suite "runCommand.nim":
 
   test "single quotes with semicolon":
     let content = """
-<--!$ nextline a='hi;there' -->
+<!--$ nextline a='hi;there' -->
 """
     let statements = testGetStatements(content)
     let expected = """
@@ -381,7 +398,7 @@ suite "runCommand.nim":
 
   test "single quotes with slashed single quote":
     let content = """
-<--!$ nextline a='hi\'there' -->
+<!--$ nextline a='hi\'there' -->
 """
     let statements = testGetStatements(content)
     let expected = """
@@ -391,7 +408,7 @@ suite "runCommand.nim":
 
   test "single quotes with double quote":
     let content = """
-<--!$ nextline a='hi "there"' -->
+<!--$ nextline a='hi "there"' -->
 """
     let statements = testGetStatements(content)
     let expected = """
@@ -401,7 +418,7 @@ suite "runCommand.nim":
 
   test "semicolon at the end":
     let content = """
-<--!$ nextline a = 5;-->
+<!--$ nextline a = 5;-->
 """
     let statements = testGetStatements(content)
     let expected = """
@@ -411,7 +428,7 @@ suite "runCommand.nim":
 
   test "two semicolons together":
     let content = """
-<--!$ nextline asdf;;fdsa-->
+<!--$ nextline asdf;;fdsa-->
 """
     let statements = testGetStatements(content)
     let expected = """
@@ -422,7 +439,7 @@ suite "runCommand.nim":
 
   test "white space statement":
     let content = """
-<--!$ nextline asdf; -->
+<!--$ nextline asdf; -->
 """
     let statements = testGetStatements(content)
     let expected = """
@@ -432,9 +449,9 @@ suite "runCommand.nim":
 
   test "white space statement 2":
     let content = """
-<--!$ nextline asdf; \-->
-<--!$ : ;   ; \-->
-<--!$ : ;x = y -->
+<!--$ nextline asdf; \-->
+<!--$ : ;   ; \-->
+<!--$ : ;x = y -->
 """
     let statements = testGetStatements(content)
     let expected = """
@@ -455,22 +472,22 @@ suite "runCommand.nim":
                         newIntValueAndLengthO(88, 3))
 
   test "getNumber not a number":
-    let messages = @[
+    let eErrLines = @[
       "template.html(1): w26: Invalid number.",
       "statement: a = -abc",
       "               ^",
     ]
     check testGetNumber(newStatement("a = -abc"), 4,
-                        none(ValueAndLength), eErrLines = messages)
+                        none(ValueAndLength), eErrLines = eErrLines)
 
   test "getNumberIntTooBig":
-    let messages = @[
+    let eErrLines = @[
       "template.html(1): w27: The number is too big or too small.",
       "statement: a = 9_223_372_036_854_775_808",
       "               ^",
     ]
     check testGetNumber(newStatement("a = 9_223_372_036_854_775_808"),
-                        4, none(ValueAndLength), eErrLines = messages)
+                        4, none(ValueAndLength), eErrLines = eErrLines)
 
   test "getString":
     check testGetString(newStatement("a = 'hello'"), 4, newStringValueAndLengthO("hello", 7))
@@ -505,22 +522,22 @@ suite "runCommand.nim":
     for ix, buffer in byteBuffers:
       str = newStrFromBuffer(buffer)
       var statement = "a = 'stringwithbadutf8:$1:end'" % str
-      var messages = @[
+      var eErrLines = @[
         "template.html(1): w32: Invalid UTF-8 byte in the string.",
         "statement: a = 'stringwithbadutf8:?(?:end'",
         "                               ^",
       ]
-      if not testGetString(newStatement(statement), 4, none(ValueAndLength), eErrLines = messages):
+      if not testGetString(newStatement(statement), 4, none(ValueAndLength), eErrLines = eErrLines):
         echo $ix & " failed"
         check false
 
   test "getString not string":
-    let messages = @[
+    let eErrLines = @[
       "template.html(1): w30: Invalid string.",
       "statement: a = 'abc",
       "               ^",
     ]
-    check testGetString(newStatement("a = 'abc"), 4, none(ValueAndLength), eErrLines = messages)
+    check testGetString(newStatement("a = 'abc"), 4, none(ValueAndLength), eErrLines = eErrLines)
 
   test "getVariable server":
     # s.test = "hello"
@@ -614,9 +631,9 @@ suite "runCommand.nim":
     ]
     check testGetVarOrFunctionValue(statement, 6, none(ValueAndLength), eErrLines = eErrLines)
 
-  test "setState":
+  test "setInitialVariables":
     var variables = getTestVariables()
-    setState(variables)
+    setInitialVariables(variables)
     check variables.tea.contains("content") == false
     check variables.tea["repeat"] == Value(kind: vkInt, intv: 1)
     check variables.tea["output"] == Value(kind: vkString, stringv: "result")
@@ -718,3 +735,23 @@ suite "runCommand.nim":
         "                           ^",
     ]
     check testGetFunctionValue("len", statement, 10, eErrLines = eErrLines)
+
+
+  test "runStatement":
+    let statement = newStatement(text="""t.repeat = 4 """, lineNum=1, 0)
+    let eSpaceNameValueO = some(newSpaceNameValue("t.", "repeat", newValue(4)))
+    check testRunStatement(statement, eSpaceNameValueO)
+
+  test "runStatement string":
+    let statement = newStatement(text="""str = "testing" """, lineNum=1, 0)
+    let eSpaceNameValueO = some(newSpaceNameValue("", "str", newValue("testing")))
+    check testRunStatement(statement, eSpaceNameValueO)
+
+  test "runStatement junk at end":
+    let statement = newStatement(text="""str = "testing" junk at end""", lineNum=1, 0)
+    let eErrLines = @[
+      "template.html(1): w31: Unused text at the end of the statement.",
+      """statement: str = "testing" junk at end""",
+      "                           ^",
+    ]
+    check testRunStatement(statement, eErrLines = eErrLines)
