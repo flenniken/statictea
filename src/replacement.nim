@@ -18,7 +18,7 @@ proc replaceLine*(env: var Env, compiledMatchers: CompiledMatchers,
   var nextPos: int
 
   while true:
-    # Get the text before the variable.
+    # Get the text before the variable including the left bracket.
     let beforeVarO = getMatches(compiledMatchers.leftBracketMatcher,
                                 line, pos)
     if not beforeVarO.isSome:
@@ -26,9 +26,8 @@ proc replaceLine*(env: var Env, compiledMatchers: CompiledMatchers,
       stream.write(line[pos .. ^1])
       break
     let beforeVar = beforeVarO.get()
-    echo "beforeVar.length: " & $beforeVar.length
 
-    # Get the variable.
+    # Match the variable. It matches leading and trailing whitespace.
     let variableO = getMatches(compiledMatchers.variableMatcher,
                                 line, pos + beforeVar.length)
     if not variableO.isSome:
@@ -38,20 +37,19 @@ proc replaceLine*(env: var Env, compiledMatchers: CompiledMatchers,
       continue
     let variable = variableO.get()
     let (nameSpace, varName) = variable.get2Groups()
-    echo "variable.length: " & $variable.length
 
     # Check that the variable ends with a right bracket.
-    if line[pos+beforeVar.length+variable.length] != '}':
-      nextPos = pos + beforeVar.length + variable.length
-      stream.write(line[pos .. ^nextPos])
+    nextPos = pos + beforeVar.length + variable.length
+    if nextPos == line.len or line[nextPos] != '}':
+      stream.write(line[pos ..< nextPos])
       pos = nextPos
       continue
 
     # Look up the variable's value.
     let valueO = getVariable(variables, namespace, varName)
     if not isSome(valueO):
-      env.warn(lineNum, wMissingReplacementVar, varName)
-      nextPos = pos + beforeVar.length + variable.length
+      env.warn(lineNum, wMissingReplacementVar, namespace, varName)
+      nextPos = pos + beforeVar.length + variable.length + 1
       stream.write(line[pos ..< nextPos])
       pos = nextPos
       continue
