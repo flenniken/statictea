@@ -142,21 +142,13 @@ proc openEnv*(logFilename: string = staticteaLog,
   openLogFile(result, logFilename)
   checkLogSize(result)
 
-proc addExtraStreams*(env: var Env, args: Args): bool =
+proc addExtraStreams*(env: var Env, templateFilename: string,
+                      resultFilename: string): bool =
   ## Add the template and result streams to the environment. Return
   ## true on success.
 
-  # Get the template filename.
-  assert args.templateList.len > 0
-  if args.templateList.len > 1:
-    let skipping = join(args.templateList[1..^1], ", ")
-    env.warn(0, wOneTemplateAllowed, skipping)
-  let templateFilename = args.templateList[0]
-
-  # You can only call it once.
-  assert env.templateFilename == ""
+  # You can only add them once.
   assert env.templateStream == nil
-  assert env.resultFilename == ""
   assert env.resultStream == nil
 
   # Open the template stream.
@@ -181,9 +173,6 @@ proc addExtraStreams*(env: var Env, args: Args): bool =
   env.templateStream = tStream
   env.closeTemplateStream = closeTStream
 
-  # Get the result filename.
-  let resultFilename = args.resultFilename
-
   # Open the result stream.
   var rStream: Stream
   var closeRStream: bool
@@ -203,6 +192,22 @@ proc addExtraStreams*(env: var Env, args: Args): bool =
   env.closeResultStream = closeRStream
 
   result = true
+
+proc addExtraStreams*(env: var Env, args: Args): bool =
+  ## Add the template and result streams to the environment. Return
+  ## true on success.
+
+  # Get the template filename.
+  assert args.templateList.len > 0
+  if args.templateList.len > 1:
+    let skipping = join(args.templateList[1..^1], ", ")
+    env.warn(0, wOneTemplateAllowed, skipping)
+  let templateFilename = args.templateList[0]
+
+  # Get the result filename.
+  let resultFilename = args.resultFilename
+
+  result = addExtraStreams(env, templateFilename, resultFilename)
 
 when defined(test):
   # You treat string streams different than file streams. Once you
@@ -275,7 +280,6 @@ when defined(test):
       result = readLines(env.logFilename, maximum)
       discard tryRemoveFile(env.logFilename)
 
-
   proc readStream*(stream: Stream): seq[string] =
     let pos = stream.getPosition()
     stream.setPosition(0)
@@ -294,7 +298,7 @@ when defined(test):
         echo "Is it open for reading?"
         echo "Is it stdout or stderr?"
 
-  proc readAndClose(stream: Stream): seq[string] =
+  proc readAndClose*(stream: Stream): seq[string] =
     stream.setPosition(0)
     for line in stream.lines():
       result.add line
@@ -414,3 +418,14 @@ when defined(test):
       result = false
     if not expectedItems("outLines", outLines, eOutLines):
       result = false
+
+  proc readCloseDeleteCompareResult*(env: var Env, eResultLines: seq[string] = @[]): bool =
+    result = true
+    let resultLines = env.readCloseDeleteResult()
+    if not expectedItems("resultLines", resultLines, eResultLines):
+      result = false
+
+  proc createFile*(filename: string, content: string) =
+    var file = open(filename, fmWrite)
+    file.write(content)
+    file.close()

@@ -77,7 +77,7 @@ suite "readjson.nim":
     let option = jsonToValue(jsonNode)
     let value = option.get()
     check value.stringv == "string"
-    check $value == """"string""""
+    check $value == "string"
 
   test "jsonToValue float":
     let jsonNode = newJFloat(1.5)

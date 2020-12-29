@@ -28,9 +28,9 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
   # * CmdLine -- is a line in the template for statictea commands.
   # * CommandLine -- is a line at a terminal for system commands.
 
-  # prefix   command     middle    \postfix ending
-  # <!--$    nextline    a = 5     \-->\n
-  #                   ^middleStart
+  # prefix   command     middle       \postfix ending
+  # <!--$    nextline    a = 5        \-->\n
+  #                      ^middleStart
 
   var lineParts: LineParts
   let cm = compiledMatchers

@@ -4,7 +4,6 @@ import processTemplate
 import env
 import args
 import os
-import readjson
 
 suite "processTemplate":
 
@@ -150,7 +149,7 @@ suite "processTemplate":
 
     # Read the result file.
     let resultLines = env.readCloseDeleteResult()
-    # for line in resultLines:
-    #   echo line
+    for line in resultLines:
+      echo line
     # check resultLines.len == 4
     # check resultLines[0] == "Hello"

@@ -238,3 +238,13 @@ suite "matches.nim":
     check checkMatcherNot(matcher, "2,", 0)
     check checkMatcherNot(matcher, "abc)", 0)
     check checkMatcherNot(matcher, " ,", 0)
+
+  test "getLeftBracketMatcher":
+    var matcher = getLeftBracketMatcher()
+    check checkMatcher(matcher, "{", 0, @[], 1)
+    check checkMatcher(matcher, "{t}", 0, @[], 1)
+    check checkMatcher(matcher, "asdf{tea}fdsa\r\n", 0, @[], 5)
+
+    check checkMatcherNot(matcher, "", 0)
+    check checkMatcherNot(matcher, "a", 0)
+    check checkMatcherNot(matcher, "asdf", 0)

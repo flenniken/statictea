@@ -12,6 +12,7 @@ import runCommand
 import variables
 import vartypes
 import tables
+import replacement
 
 #[
 
@@ -45,9 +46,6 @@ Other lines, not cmd or block lines, get echoed to the output file
 unchanged.
 
 ]#
-
-proc processReplacementBlock() =
-  echo "processReplacementBlock"
 
 proc processTemplateLines(env: var Env, variables: var Variables,
                           prepostTable: PrepostTable) =
@@ -85,8 +83,9 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     if repeat == 0:
       continue
 
+    let command = cmdLineParts[0].command
     while true:
-      processReplacementBlock()
+      processReplacementBlock(env, lb, compiledMatchers, command, variables)
 
       inc(row)
       if row >= repeat:

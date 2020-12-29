@@ -752,6 +752,11 @@ suite "runCommand.nim":
     let eErrLines = @[
       "template.html(1): w31: Unused text at the end of the statement.",
       """statement: str = "testing" junk at end""",
-      "                           ^",
+        "                           ^",
     ]
     check testRunStatement(statement, eErrLines = eErrLines)
+
+  test "getVariables 2":
+    var variables = getTestVariables()
+    let valueO = getVariable(variables, "s.", "test")
+    check expectedItem("valueO", valueO, some(newValue("hello")))

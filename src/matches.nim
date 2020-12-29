@@ -40,6 +40,7 @@ type
     leftParenthesesMatcher*: Matcher
     rightParenthesesMatcher*: Matcher
     commaParenthesesMatcher*: Matcher
+    leftBracketMatcher*: Matcher
 
 iterator combine(list1: openArray[Prepost], list2: openArray[
     Prepost]): Prepost =
@@ -184,6 +185,17 @@ proc getStringMatcher*(): Matcher =
 
   result = newMatcher("""'([^']*)'\s*$|"([^"]*)"\s*""", 2)
 
+proc getLeftBracketMatcher*(): Matcher =
+  ## Match everything up to a left backet. The match length includes
+  ## the bracket.
+
+  # A replacement variable is inside brackets.  Note: nim sets the
+  # regex anchor option.
+
+  # text on the line {variable} more text {variable2} asdf
+  #                   ^
+  result = newMatcher("[^{]*{", 0)
+
 proc getCompiledMatchers*(prepostTable: PrepostTable): CompiledMatchers =
   ## Compile all the matchers and return them in the
   ## CompiledMatchers object.
@@ -198,6 +210,7 @@ proc getCompiledMatchers*(prepostTable: PrepostTable): CompiledMatchers =
   result.leftParenthesesMatcher = getLeftParenthesesMatcher()
   result.rightParenthesesMatcher = getRightParenthesesMatcher()
   result.commaParenthesesMatcher = getCommaParenthesesMatcher()
+  result.leftBracketMatcher = getLeftBracketMatcher()
 
 when defined(test):
   proc checkGetLastPart*(matcher: Matcher, line: string, expectedStart: Natural,

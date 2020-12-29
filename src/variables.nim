@@ -4,6 +4,7 @@ import args
 import vartypes
 import readjson
 import tables
+import options
 
 type
   Variables* = object
@@ -12,6 +13,31 @@ type
     local*: VarsDict
     global*: VarsDict
     tea*: VarsDict
+
+proc getNamespaceDict*(variables: Variables, nameSpace: string): Option[VarsDict] =
+  case nameSpace:
+    of "":
+      result = some(variables.local)
+    of "s.":
+      result = some(variables.server)
+    of "h.":
+      result = some(variables.shared)
+    of "g.":
+      result = some(variables.global)
+    of "t.":
+      result = some(variables.tea)
+    else:
+      discard
+
+proc getVariable*(variables: Variables, namespace: string, varName:
+                  string): Option[Value] =
+  ## Look up the variable and return its value.
+
+  let dictO = getNamespaceDict(variables, namespace)
+  if isSome(dictO):
+    let dict = dictO.get()
+    if varName in dict:
+      result = some(dict[varName])
 
 proc readJsonVariables*(env: var Env, args: Args): Variables =
   ## Read the server and shared json files and return their variables.

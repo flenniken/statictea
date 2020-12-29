@@ -114,10 +114,11 @@ proc `==`*(value1: Value, value2: Value): bool =
         result = value1.listv == value2.listv
 
 func `$`*(value: Value): string =
-  ## A string representation of Value.
+  ## A string representation of Value. This is used to convert values
+  ## to strings in replacement blocks.
   case value.kind
   of vkString:
-    result = "\"" & value.stringv & "\""
+    result = value.stringv
   of vkInt:
     result = $value.intv
   of vkFloat:

@@ -64,6 +64,7 @@ type
     wExpectedStringFor2,   # w55
     wMissingDictItem,      # w56
     wExpectedListOrDict,   # w57
+    wMissingReplacementVar, # w58
 
 tpubType:
   const
@@ -128,7 +129,7 @@ tpubType:
       "Expected a string for the second parameter, got $1.", # wExpectedStringFor2
       "The dictionary does not have an item with key $1.", # wMissingDictItem
       "Expected a list or dictionary as the first parameter.", # wExpectedListOrDict
-
+      "The replacement variable doesn't exist: $1.", # wMissingReplacementVar
     ]
 
 func getWarning*(filename: string, lineNum: int,

@@ -229,29 +229,16 @@ proc getVariable*(env: var Env, statement: Statement, variables:
                   start: Natural): Option[Value] =
   ## Look up the variable and return its value. Show an error when the
   ## variable doesn't exists.
-  case nameSpace:
-    of "":
-      if varName in variables.local:
-        return some(variables.local[varName])
-    of "s.":
-      if varName in variables.server:
-        return some(variables.server[varName])
-    of "h.":
-      if varName in variables.shared:
-        return some(variables.shared[varName])
-    of "g.":
-      if varName in variables.global:
-        return some(variables.global[varName])
-    of "t.":
-      if varName in variables.tea:
-        return some(variables.tea[varName])
-    else:
-      # Invalid namespace.
-      env.warnStatement(statement, wInvalidNameSpace, start, nameSpace)
-      return
 
-  # Variable does not exists.
-  env.warnStatement(statement, wVariableMissing, start, nameSpace & varName)
+  let dictO = getNamespaceDict(variables, namespace)
+  if not isSome(dictO):
+    env.warnStatement(statement, wInvalidNameSpace, start, nameSpace)
+    return
+  let dict = dictO.get()
+  if not dict.contains(varName):
+    env.warnStatement(statement, wVariableMissing, start, nameSpace & varName)
+    return
+  result = some(dict[varName])
 
 # a = len(name)
 # a = len (name)
