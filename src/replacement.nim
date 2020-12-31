@@ -97,6 +97,9 @@ type
     lb: LineBuffer
     oneWarnTable: HashSet[string]
 
+  TempFileStream = object
+    tempFile: TempFile
+    stream: Stream
 
 proc replaceLine*(env: var Env, compiledMatchers: CompiledMatchers,
                   variables: Variables, lineNum: int, line: string, stream: Stream) =
@@ -149,13 +152,10 @@ proc replaceLine*(env: var Env, compiledMatchers: CompiledMatchers,
 
     pos = pos + beforeVar.length + variable.length + 1
 
-proc allocateTempSegments*(): Option[TempSegments] =
-  ## Create a TempSegments object. This reserves memory for a line
-  ## buffer and creates a backing temp file. Call the freeCloseDelete
-  ## procedure when done to free the memory and to close and delete
-  ## the file.
+proc getTempFileStream(): Option[TempFileStream] =
+  ## Get a temporary file and an associated stream.
 
-  # Create a temporary file for the replacement block segments.
+  # Get a temp file.
   let tempFileO = openTempFile()
   if not isSome(tempFileO):
     return
@@ -166,6 +166,22 @@ proc allocateTempSegments*(): Option[TempSegments] =
   if stream == nil:
     tempFile.closeDelete()
     return
+  result = some(TempFileStream(tempFile: tempFile, stream: stream))
+
+proc allocateTempSegments*(env: var Env, lineNum: Natural): Option[TempSegments] =
+  ## Create a TempSegments object. This reserves memory for a line
+  ## buffer and creates a backing temp file. Call the freeCloseDelete
+  ## procedure when done to free the memory and to close and delete
+  ## the file.
+
+  # Create a temporary file for the replacement block segments.
+  let tempFileStreamO = getTempFileStream()
+  if not isSome(tempFileStreamO):
+    env.warn(lineNum, wNoTempFile)
+    return
+  let tempFileStream = tempFileStreamO.get()
+  let tempFile = tempFileStream.tempFile
+  let stream = tempFileStream.stream
 
   # Allocate a line buffer for reading lines.
   var lineBufferO = newLineBuffer(stream, filename = tempFile.filename,
@@ -173,6 +189,7 @@ proc allocateTempSegments*(): Option[TempSegments] =
                                   maxLineLen = maxLineLen)
   if not lineBufferO.isSome():
     tempFile.closeDelete()
+    env.warn(lineNum, wNotEnoughMemoryForLB)
     return
 
   result = some(TempSegments(tempFile: tempFile, lb: lineBufferO.get()))

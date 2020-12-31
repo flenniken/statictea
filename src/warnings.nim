@@ -65,6 +65,7 @@ type
     wMissingDictItem,      # w56
     wExpectedListOrDict,   # w57
     wMissingReplacementVar, # w58
+    wNoTempFile,           # w59
 
 tpubType:
   const
@@ -130,6 +131,7 @@ tpubType:
       "The dictionary does not have an item with key $1.", # wMissingDictItem
       "Expected a list or dictionary as the first parameter.", # wExpectedListOrDict
       "The replacement variable doesn't exist: $1$2.", # wMissingReplacementVar
+      "Unable to create a temporary file.", # wNoTempFile
     ]
 
 func getWarning*(filename: string, lineNum: int,

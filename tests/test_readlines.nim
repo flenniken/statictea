@@ -239,7 +239,7 @@ and three
     check tempFileO.isSome
     var tempFile = tempFileO.get()
     tempFile.file.write(content)
-    tempFile.close()
+    tempFile.file.close()
     defer: tempFile.closeDelete()
 
     var stream = newFileStream(tempFile.filename, fmRead)

@@ -88,10 +88,16 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
     let repeat = getTeaVarInt(variables, "repeat")
 
-    # Read the replacement block lines and return the compiled
-    # replacement block.
-    let replacementBlock = collectReplacementBlock(env, lb,
-      compiledMatchers, command, repeat, variables)
+    var tempSegmentsO = allocateTempSegments(env, lb.lineNum)
+    if not isSome(tempSegmentsO):
+      continue
+    var tempSegments = tempSegmentsO.get()
+
+    # todo: just read the lines when repeat is 0?
+
+    # Read the replacement block lines and add them to the TempSegments object.
+    fillTempSegments(env, tempSegments, lb, compiledMatchers, command,
+                     repeat, variables)
 
     if repeat == 0:
       continue
@@ -99,7 +105,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     # Generate t.repeat number of replacement blocks. Recalculate the
     # variables for each one.
     while true:
-      playReplacementBlock(env, variables, replacementBlock)
+      writeTempSegments(env, tempSegments, lb.lineNum, variables, env.resultStream)
 
       inc(row)
       if row >= repeat:
