@@ -4,6 +4,8 @@ import readlines
 import strutils
 import streams
 import options
+import tempFile
+import options
 
 proc readContentTest(content: string, expected: seq[string],
     maxLineLen: int = defaultMaxLineLen,
@@ -227,13 +229,31 @@ and three
       echo "---"
       check false
 
-  test "lineBuffer filename":
+  test "lineBuffer reset":
     let content = """
-1234567
-testing
+line one
+line two asdfadsf
+and three
 """
-    var inStream = newStringStream(content)
-    var lineBufferO = newLineBuffer(inStream, filename="template.html")
+    var tempFileO = openTempFile()
+    check tempFileO.isSome
+    var tempFile = tempFileO.get()
+    tempFile.file.write(content)
+    tempFile.close()
+    defer: tempFile.closeDelete()
+
+    var stream = newFileStream(tempFile.filename, fmRead)
+    var lineBufferO = newLineBuffer(stream)
     check lineBufferO.isSome
     var lb = lineBufferO.get()
-    check lb.filename == "template.html"
+
+    var theLines = readLines(lb)
+    check theLines.len == 3
+
+    theLines = readLines(lb)
+    check theLines.len == 0
+
+    lb.reset()
+
+    theLines = readLines(lb)
+    check theLines.len == 3

@@ -73,6 +73,13 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     if cmdLines.len == 0:
       break # done, no more lines
 
+    # Run the commands that have statements and skip the others.
+    let command = cmdLineParts[0].command
+    if not (command in ["nextline", "block", "replace"]):
+      # todo: show error when we get endblock before block.
+      # todo: make it an error when other commands have statements?
+      continue
+
     # Run the command and fill in the variables.
     var row = 0
     variables.tea["row"] = newValue(row)
@@ -80,12 +87,19 @@ proc processTemplateLines(env: var Env, variables: var Variables,
                variables)
 
     let repeat = getTeaVarInt(variables, "repeat")
+
+    # Read the replacement block lines and return the compiled
+    # replacement block.
+    let replacementBlock = collectReplacementBlock(env, lb,
+      compiledMatchers, command, repeat, variables)
+
     if repeat == 0:
       continue
 
-    let command = cmdLineParts[0].command
+    # Generate t.repeat number of replacement blocks. Recalculate the
+    # variables for each one.
     while true:
-      processReplacementBlock(env, lb, compiledMatchers, command, variables)
+      playReplacementBlock(env, variables, replacementBlock)
 
       inc(row)
       if row >= repeat:

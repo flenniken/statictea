@@ -16,7 +16,7 @@ type
     stream*: Stream
     maxLineLen*: int
     bufferSize*: int
-    lineNum*: int
+    lineNum*: int     ## The current line number in the file starting at 1.
     pos*: int         ## Current byte position in the buffer.
     charsRead*: int   ## Number of bytes of chars in the buffer.
     buffer*: string   ## Memory pre-allocated for the buffer.
@@ -31,11 +31,12 @@ proc getMaxLineLen*(lineBuffer: LineBuffer): int =
 proc getFilename*(lineBuffer: LineBuffer): string =
   result = lineBuffer.filename
 
-proc newLineBuffer*(stream: Stream, maxLineLen: int =
-    defaultMaxLineLen, bufferSize: int =
-    defaultBufferSize, filename: string = ""): Option[LineBuffer] =
-  ## Return a new LineBuffer.
+proc newLineBuffer*(stream: Stream, maxLineLen: int = defaultMaxLineLen,
+    bufferSize: int = defaultBufferSize, filename: string = ""): Option[LineBuffer] =
+  ## Return a new LineBuffer for the given stream.
 
+  if stream == nil:
+    return
   if maxLineLen < minMaxLineLen or maxLineLen > maxMaxLineLen:
     return
   if bufferSize < maxLineLen:
@@ -51,6 +52,12 @@ proc newLineBuffer*(stream: Stream, maxLineLen: int =
   lb.filename = filename
 
   result = some(lb)
+
+proc reset*(lb: var LineBuffer) =
+  ## Reset the line buffer to the beginning of the file.
+  lb.stream.setPosition(0)
+  lb.charsRead = 0
+  lb.pos = 0
 
 proc readline*(lb: var LineBuffer): string =
   ## Return a line from the LineBuffer. Reading starts from

@@ -39,6 +39,13 @@ proc getVariable*(variables: Variables, namespace: string, varName:
     if varName in dict:
       result = some(dict[varName])
 
+proc getTeaVarInt*(variables: Variables, varName: string): int64 =
+  ## Return the int value of one of the tea dictionary integer items.
+  assert varName in ["row", "repeat", "maxRepeat", "maxLines"]
+  let value = variables.tea[varName]
+  assert value.kind == vkInt
+  result = value.intv
+
 proc readJsonVariables*(env: var Env, args: Args): Variables =
   ## Read the server and shared json files and return their variables.
 

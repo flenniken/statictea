@@ -316,13 +316,6 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
   # let valueAndLength = result.get()
   # env.warnStatement(statement, wStackTrace, start+valueAndLength.length,  "leave getValue")
 
-proc getTeaVarInt*(variables: Variables, varName: string): int64 =
-  ## Get one of the int tea variables number.
-  assert varName in ["row", "repeat", "maxRepeat", "maxLines"]
-  let value = variables.tea[varName]
-  assert value.kind == vkInt
-  result = value.intv
-
 proc assignTeaVariable(env: var Env, statement: Statement, variables:
                        var Variables, varName: string, value: Value,
                            start: Natural) =
