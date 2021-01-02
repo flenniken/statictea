@@ -1,9 +1,50 @@
+import os
 import unittest
 import env
 import replacement
 import matches
 import variables
 import streams
+import options
+import tempFile
+import sets
+import readlines
+
+proc testTempSegments(content: string, command: string = "nextline", repeat: Natural = 1,
+    eResultLines: seq[string] = @[],
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[]
+  ): bool =
+
+  var env = openEnvTest("_testTempSegments.log")
+  var inStream = newStringStream(content)
+  if inStream == nil:
+    return false
+  var resultStream = newStringStream()
+  if resultStream == nil:
+    return false
+  var lineBufferO = newLineBuffer(inStream)
+  if not lineBufferO.isSome:
+    return false
+  var lb = lineBufferO.get()
+  var tempSegmentsO = allocateTempSegments(env, lb.lineNum)
+  if not isSome(tempSegmentsO):
+    return false
+  var tempSegments = tempSegmentsO.get()
+  var variables = getTestVariables()
+  let compiledMatchers = getCompiledMatchers()
+  fillTempSegments(env, tempSegments, lb, compiledMatchers, command,
+                   repeat, variables)
+  # tempSegments.echoSegments()
+  writeTempSegments(env, tempSegments, lb.lineNum, variables, resultStream)
+  freeCloseDelete(tempSegments)
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+
+  var resultLines = readStream(resultStream)
+  if not expectedItems("resultLines", resultLines, eResultLines):
+    result = false
+
 
 proc testReplaceLine(line: string,
     eLogLines: seq[string] = @[],
@@ -97,3 +138,125 @@ suite "processReplacementBlock":
     let line = "{        s.test       }"
     let eResultLines = @["hello"]
     check testReplaceLine(line, eResultLines = eResultLines)
+
+  test "getTempFileStream":
+    let tempFileStreamO = getTempFileStream()
+    check isSome(tempFileStreamO)
+    let tempFileStream = tempFileStreamO.get()
+    let tempFile = tempFileStream.tempFile
+    let stream = tempFileStream.stream
+    tempFile.closeDelete()
+    check not fileExists(tempFile.filename)
+
+  test "stringSegment":
+    check stringSegment("a", 0, 1) == "0,a\n"
+    check stringSegment("\n", 0, 1) == "1,\n"
+    check stringSegment("ab", 0, 2) == "0,ab\n"
+    check stringSegment("a\n", 0, 2) == "1,a\n"
+
+    check stringSegment("ab", 0, 1) == "0,a\n"
+    check stringSegment("a\n", 0, 1) == "0,a\n"
+
+    check stringSegment("ab", 1, 2) == "0,b\n"
+    check stringSegment("a\n", 1, 2) == "1,\n"
+
+    check stringSegment("test\n", 0, 2) == "0,te\n"
+    check stringSegment("test\n", 1, 3) == "0,es\n"
+    check stringSegment("test\n", 2, 4) == "0,st\n"
+    check stringSegment("test\n", 3, 5) == "1,t\n"
+
+    check stringSegment("", 0, 0) == "0,\n"
+    check stringSegment("test", 4, 5) == "0,\n"
+    check stringSegment("test", 3, 3) == "0,\n"
+    check stringSegment("test", 3, 2) == "0,\n"
+
+  test "varSegment":
+    check varSegment("{a}", 1, 0, 1)     == "2,1   ,0,1  ,{a}\n"
+    check varSegment("{ a }", 2, 0, 1)   == "2,2   ,0,1  ,{ a }\n"
+    check varSegment("{ abc }", 2, 0, 3) == "2,2   ,0,3  ,{ abc }\n"
+    check varSegment("{t.a}", 1, 2, 1)   == "2,1   ,2,1  ,{t.a}\n"
+    check varSegment("{t.ab}", 1, 2, 2)  == "2,1   ,2,2  ,{t.ab}\n"
+
+  test "lineToSegments":
+    let compiledMatchers = getCompiledMatchers()
+    check expectedItems("segments", lineToSegments(compiledMatchers, "test\n"), @["1,test\n"])
+    check expectedItems("segments", lineToSegments(compiledMatchers, "test"), @["0,test\n"])
+    check expectedItems("segments", lineToSegments(compiledMatchers, "te{1st"), @[
+      "0,te{\n",
+      "0,1st\n",
+    ])
+    check expectedItems("segments", lineToSegments(compiledMatchers, "te{st "), @["0,te{st \n"])
+    check expectedItems("segments", lineToSegments(compiledMatchers, "te{st 123"), @[
+      "0,te{st \n",
+      "0,123\n",
+    ])
+    check expectedItems("segments", lineToSegments(compiledMatchers, "{var}"), @["2,1   ,0,3  ,{var}\n"])
+    check expectedItems("segments", lineToSegments(compiledMatchers, "test\n"), @["1,test\n"])
+    check expectedItems("segments", lineToSegments(compiledMatchers, "{var}\n"), @["2,1   ,0,3  ,{var}\n", "1,\n"])
+
+    check expectedItems("segments", lineToSegments(compiledMatchers, "before{var}after\n"), @[
+      "0,before\n",
+      "2,1   ,0,3  ,{var}\n",
+      "1,after\n",
+    ])
+
+    check expectedItems("segments", lineToSegments(compiledMatchers, "before {s.name} after {h.header}{ a }end\n"), @[
+      "0,before \n",
+      "2,1   ,2,4  ,{s.name}\n",
+      "0, after \n",
+      "2,1   ,2,6  ,{h.header}\n",
+      "2,2   ,0,1  ,{ a }\n",
+      "1,end\n",
+    ])
+
+    check expectedItems("segments", lineToSegments(compiledMatchers,
+      "{  t.row}before {s.name} after {h.header}{ a }end\n"), @[
+        "2,3   ,2,3  ,{  t.row}\n",
+        "0,before \n",
+        "2,1   ,2,4  ,{s.name}\n",
+        "0, after \n",
+        "2,1   ,2,6  ,{h.header}\n",
+        "2,2   ,0,1  ,{ a }\n",
+        "1,end\n",
+      ])
+
+
+  test "allocateTempSegments":
+    var env = openEnvTest("_allocateTempSegments.log")
+
+    var tempSegmentsO = allocateTempSegments(env, 0)
+
+    check env.readCloseDeleteCompare()
+
+    check tempSegmentsO.isSome
+    var tempSegments = tempSegmentsO.get()
+    check tempSegments.tempFile.filename != ""
+    check tempSegments.lb.filename == tempSegments.tempFile.filename
+    check tempSegments.oneWarnTable.len == 0
+
+    tempSegments.freeCloseDelete()
+
+  test "parseVarSegment":
+    check parseVarSegment("2,1   ,0,1  ,{n}") == (namespace: "", name: "n")
+    check parseVarSegment("2,1   ,2,1  ,{t.n}") == (namespace: "t.", name: "n")
+    check parseVarSegment("2,2   ,2,4  ,{ s.name }") == (namespace: "s.", name: "name")
+    check parseVarSegment("2,2   ,2,4  ,{ s.name    }") == (namespace: "s.", name: "name")
+    check parseVarSegment("2,7   ,2,4  ,{      s.name }") == (namespace: "s.", name: "name")
+    check parseVarSegment("2,4   ,0,4  ,{   name }") == (namespace: "", name: "name")
+
+  test "TempSegments":
+    let content = """
+replacement block
+line 2
+more text
+<!--endblock-->
+"""
+    let eResultLines = @[
+      "replacement block",
+    ]
+    check testTempSegments(content, command = "nextline", repeat = 1, eResultLines = eResultLines)
+    # check testTempSegments(content, command = "nextline", repeat = 1, eResultLines = eResultLines)
+
+
+  # test "writeTempSegments":
+  #   writeTempSegments(env, tempSegments, lineNum, variables, stream)

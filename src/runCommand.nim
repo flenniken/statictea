@@ -261,7 +261,7 @@ proc getVarOrFunctionValue*(env: var Env, compiledMatchers:
   assert variableO.isSome
 
   let variable = variableO.get()
-  let (nameSpace, varName) = variable.get2Groups()
+  let (whitespace, nameSpace, varName) = variable.get3Groups()
   if nameSpace == "":
     # We have a variable or a function.
     let parenthesesO = getMatches(compiledMatchers.leftParenthesesMatcher,
@@ -364,7 +364,7 @@ proc runStatement*(env: var Env, statement: Statement,
     env.warnStatement(statement, wMissingStatementVar, 0)
     return
   let variable = variableO.get()
-  let (nameSpace, varName) = variable.get2Groups()
+  let (whitespace, nameSpace, varName) = variable.get3Groups()
 
   # Get the equal sign and following whitespace.
   let equalSignO = getMatches(compiledMatchers.equalSignMatcher,

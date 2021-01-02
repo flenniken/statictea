@@ -102,29 +102,29 @@ suite "matches.nim":
 
   test "get variable":
     var matcher = getVariableMatcher()
-    check checkMatcher(matcher, "a = 5", 0, @["", "a"], 2)
-    check checkMatcher(matcher, " a = 5 ", 0, @["", "a"], 3)
-    check checkMatcher(matcher, "t.a = 5", 0, @["t.", "a"], 4)
-    check checkMatcher(matcher, "abc = 5", 0, @["", "abc"], 4)
-    check checkMatcher(matcher, "   a = 5", 0, @["", "a"], 5)
-    check checkMatcher(matcher, "aBcD_t = 5", 0, @["", "aBcD_t"], 7)
-    check checkMatcher(matcher, "t.server = 5", 0, @["t.", "server"], 9)
-    check checkMatcher(matcher, "t.server =", 0, @["t.", "server"], 9)
-    check checkMatcher(matcher, "   a =    5", 0, @["", "a"], 5)
+    check checkMatcher(matcher, "a = 5", 0, @["", "", "a"], 2)
+    check checkMatcher(matcher, " a = 5 ", 0, @[" ", "", "a"], 3)
+    check checkMatcher(matcher, "t.a = 5", 0, @["", "t.", "a"], 4)
+    check checkMatcher(matcher, "abc = 5", 0, @["", "", "abc"], 4)
+    check checkMatcher(matcher, "   a = 5", 0, @["   ", "", "a"], 5)
+    check checkMatcher(matcher, "aBcD_t = 5", 0, @["", "", "aBcD_t"], 7)
+    check checkMatcher(matcher, "t.server = 5", 0, @["", "t.", "server"], 9)
+    check checkMatcher(matcher, "t.server =", 0, @["", "t.", "server"], 9)
+    check checkMatcher(matcher, "   a =    5", 0, @["   ", "", "a"], 5)
     let longVar = "a23456789_123456789_123456789_123456789_123456789_123456789_1234"
-    check checkMatcher(matcher, longVar, 0, @["", longVar], longVar.len)
-    check checkMatcher(matcher, longVar & " = 5", 0, @["", longVar],
+    check checkMatcher(matcher, longVar, 0, @["", "", longVar], longVar.len)
+    check checkMatcher(matcher, longVar & " = 5", 0, @["", "", longVar],
                                           longVar.len + 1)
 
     # These start with a variable but are not valid statements.
-    check checkMatcher(matcher, "t. =", 0, @["", "t"], 1)
-    check checkMatcher(matcher, "tt.a =", 0, @["", "tt"], 2)
-    check checkMatcher(matcher, "abc() =", 0, @["", "abc"], 3)
-    check checkMatcher(matcher, "abc", 0, @["", "abc"], 3)
-    check checkMatcher(matcher, "t.1a", 0, @["", "t"], 1)
+    check checkMatcher(matcher, "t. =", 0, @["", "", "t"], 1)
+    check checkMatcher(matcher, "tt.a =", 0, @["", "", "tt"], 2)
+    check checkMatcher(matcher, "abc() =", 0, @["", "", "abc"], 3)
+    check checkMatcher(matcher, "abc", 0, @["", "", "abc"], 3)
+    check checkMatcher(matcher, "t.1a", 0, @["", "", "t"], 1)
     # It matches up to 64 characters.
     let tooLong = "a23456789_123456789_123456789_123456789_123456789_123456789_12345"
-    check checkMatcher(matcher, tooLong, 0, @["", longVar], longVar.len)
+    check checkMatcher(matcher, tooLong, 0, @["", "", longVar], longVar.len)
 
     check checkMatcherNot(matcher, ".a =", 0)
     check checkMatcherNot(matcher, "_a =", 0)

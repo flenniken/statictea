@@ -129,7 +129,8 @@ proc notEmptyOrSpaces*(spaceTabMatcher: Matcher, text: string): bool =
       result = true
 
 proc getVariableMatcher*(): Matcher =
-  ## Match a variable and surrounding whitespace.
+  ## Match a variable and surrounding whitespace. Return the leading
+  ## whitespace, the namespace and the variable name.
   ##
   ## A variable starts with an optional prefix followed by a required
   ## variable name. The prefix is a lowercase letter followed by a
@@ -140,8 +141,9 @@ proc getVariableMatcher*(): Matcher =
   ## The match stops on the first non matching character. You need to
   ## check the next character to see whether it makes sense in the
   ## statement, for example, "t." matches and returns "t".
+  ## "{ t.repeat #" matches.
   # Note: nim sets the regex anchor option.
-  result = newMatcher(r"\s*([a-z]\.){0,1}([a-zA-Z][a-zA-Z0-9_]{0,63})\s*", 2)
+  result = newMatcher(r"(\s*)([a-z]\.){0,1}([a-zA-Z][a-zA-Z0-9_]{0,63})\s*", 3)
 
 proc getEqualSignMatcher*(): Matcher =
   ## Match an equal sign and the optional following white space.

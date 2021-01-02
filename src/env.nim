@@ -288,15 +288,12 @@ when defined(test):
     stream.setPosition(pos)
 
   proc echoStream*(stream: Stream) =
-    if stream == nil:
-      echo "nil stream"
-    else:
-      try:
-        echo readStream(stream)
-      except:
-        echo "Unable to read the stream."
-        echo "Is it open for reading?"
-        echo "Is it stdout or stderr?"
+    assert stream != nil
+    let pos = stream.getPosition()
+    stream.setPosition(0)
+    for line in stream.lines():
+      echo line
+    stream.setPosition(pos)
 
   proc readAndClose*(stream: Stream): seq[string] =
     stream.setPosition(0)

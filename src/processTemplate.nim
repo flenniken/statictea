@@ -116,6 +116,8 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       runCommand(env, cmdLines, cmdLineParts, compiledMatchers,
                  variables)
 
+    freeCloseDelete(tempSegments)
+
 
 proc processTemplate*(env: var Env, args: Args): int =
   ## Process the template and return 0 on success. It's an error when
