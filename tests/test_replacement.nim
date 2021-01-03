@@ -9,6 +9,10 @@ import options
 import tempFile
 import readlines
 
+
+# todo: replace command content.
+# todo: t.output support, result, stderr, log, skip
+
 proc testTempSegments(content: string, command: string = "nextline", repeat: Natural = 1,
     eResultLines: seq[string] = @[],
     eLogLines: seq[string] = @[],

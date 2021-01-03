@@ -375,24 +375,20 @@ proc allocTempSegments*(env: var Env, lineNum: Natural): Option[TempSegments] =
 
   result = some(TempSegments(tempFile: tempFile, lb: lineBufferO.get()))
 
-proc fillTempSegments*(env: var Env, tempSegments: TempSegments, lb: var LineBuffer,
-                              compiledMatchers: CompiledMatchers,
-                              command: string, repeat: Natural,
-                              variables: Variables) =
-  ## Read the replacement block lines from the template and store
-  ## their segments in TempSegments.
+iterator yieldReplacementLine*(env: var Env, variables: Variables, command: string, lb: var
+    LineBuffer, compiledMatchers: Compiledmatchers): string =
+  ## Yield all the replacement block lines.
 
-  # For the nextline command, process the next line and return.
-  if command == "nextline":
-    let line = lb.readline()
-    storeLineSegments(env, tempSegments, compiledMatchers, line)
-    return
+  var maxLines = getTeaVarInt(variables, "maxLines")
 
-  let maxLines = getTeaVarInt(variables, "maxLines")
   var count = 0
 
   while true:
-    # Stop is we reach the maximum line count for a replacement block.
+    # For the nextline command, read and process one line.
+    if command == "nextline" and count >= 1:
+      break
+
+    # Stop when we reach the maximum line count for a replacement block.
     if count >= maxLines:
       env.warn(lb.lineNum, wExceededMaxLine)
       break
@@ -408,8 +404,7 @@ proc fillTempSegments*(env: var Env, tempSegments: TempSegments, lb: var LineBuf
       if linePartsO.get().command == "endblock":
         break # done, found endblock
 
-    # Store the line segments.
-    storeLineSegments(env, tempSegments, compiledMatchers, line)
+    yield(line)
     count.inc
 
 proc newTempSegments*(env: var Env, lb: var LineBuffer, compiledMatchers: CompiledMatchers,
@@ -422,8 +417,11 @@ proc newTempSegments*(env: var Env, lb: var LineBuffer, compiledMatchers: Compil
   result = allocTempSegments(env, lb.lineNum)
   if not isSome(result):
     return
-  fillTempSegments(env, result.get(), lb, compiledMatchers, command,
-                   repeat, variables)
+  # Read the replacement lines and store their compiled segments in
+  # TempSegments.
+  for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
+    storeLineSegments(env, result.get(), compiledMatchers, line)
+
 
 when defined(test):
   proc echoSegments*(tempSegments: TempSegments) =
