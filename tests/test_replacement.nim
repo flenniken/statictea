@@ -37,6 +37,8 @@ proc testTempSegments(content: string, command: string = "nextline", repeat: Nat
   if not isSome(tempSegmentsO):
     return false
   var tempSegments = tempSegmentsO.get()
+  for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
+    storeLineSegments(env, tempSegments, compiledMatchers, line)
   # tempSegments.echoSegments()
   writeTempSegments(env, tempSegments, lb.lineNum, variables, resultStream)
   closeDelete(tempSegments)
