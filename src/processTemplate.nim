@@ -96,24 +96,33 @@ proc processTemplateLines(env: var Env, variables: var Variables,
         discard
       continue
 
-    # Read the replacement block lines and add them to the TempSegments object.
+    # Create a new TempSegments object for storing segments.
     var startLineNum = lb.lineNum
     var tempSegmentsO = newTempSegments(env, lb, compiledMatchers, command, repeat, variables)
     if not isSome(tempSegmentsO):
       break # Cannot create temp file or allocate memory, quit.
     var tempSegments = tempSegmentsO.get()
 
+    # Read the replacement lines and store their compiled segments in
+    # TempSegments.
+    for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
+      storeLineSegments(env, tempSegments, compiledMatchers, line)
+
     # Generate t.repeat number of replacement blocks. Recalculate the
     # variables for each one.
     while true:
-      writeTempSegments(env, tempSegments, startLineNum, variables, env.resultStream)
+      # Write out all the stored replacement block lines and make the
+      # variable substitutions.
+      writeTempSegments(env, tempSegments, startLineNum, variables,
+                        env.resultStream)
 
+      # Increment the row variable.
       inc(row)
       if row >= repeat:
         break
+      variables.tea["row"] = newValue(row)
 
       # Run the command and fill in the variables.
-      variables.tea["row"] = newValue(row)
       runCommand(env, cmdLines, cmdLineParts, compiledMatchers,
                  variables)
 
@@ -122,6 +131,10 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 proc processTemplate*(env: var Env, args: Args): int =
   ## Process the template and return 0 on success. It's an error when
   ## a warning messages was written.
+
+  # Add the template and result streams to the environment.
+  if not env.addExtraStreams(args):
+    return 1
 
   var variables = readJsonVariables(env, args)
 

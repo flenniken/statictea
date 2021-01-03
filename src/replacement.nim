@@ -417,10 +417,6 @@ proc newTempSegments*(env: var Env, lb: var LineBuffer, compiledMatchers: Compil
   result = allocTempSegments(env, lb.lineNum)
   if not isSome(result):
     return
-  # Read the replacement lines and store their compiled segments in
-  # TempSegments.
-  for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
-    storeLineSegments(env, result.get(), compiledMatchers, line)
 
 
 when defined(test):
