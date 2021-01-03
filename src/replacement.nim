@@ -14,6 +14,7 @@ import sets
 import parseNumber
 import strformat
 import strutils
+
 #[
 
 The replacement block may consist of many lines and it may repeat many
@@ -34,14 +35,14 @@ What we do is read the lines from the template, compile them and store
 them in a temp file in a format that is easy to write out.
 
 The temp file consites of three types of lines called segments. One
-type for strings ending with a newline, one for strings without a
+type for strings without and an ending newline, one for strings with a
 newline and one type for variables.
 
 Segment types:
 
 * 0 string segment without ending newline
 * 1 string segment with ending newline
-* 2 variable segments start with 1.
+* 2 variable segment
 
 For the example replacement block with three lines:
 
@@ -69,7 +70,7 @@ segments you write from index 2 to the end. This preserves line
 ending, both cr lf and lf.
 
 The variable segments start with some numbers telling where the
-variable namespace and name are in the line. The variable segment
+variable namespace and name are in the segment. The variable segment
 numbers are left aligned and padded with spaces so the text part
 always starts at index 13.
 
@@ -89,7 +90,7 @@ always starts at index 13.
 ]#
 
 const
-  replacementBufferSize* = 2*1024
+  replacementBufferSize* = 2*1024 # Space reserved for the replacement block line buffer.
   maxLineLen* = defaultMaxLineLen + 20 # 20 more than a template line for the segment prefix info.
 
 type
@@ -102,6 +103,7 @@ type
     tempFile*: TempFile
     stream*: Stream
 
+# todo: delete replaceLine or use it.
 proc replaceLine*(env: var Env, compiledMatchers: CompiledMatchers,
                   variables: Variables, lineNum: int, line: string, stream: Stream) =
   ## Replace the variable content in the line and output to the given
@@ -195,22 +197,36 @@ proc allocateTempSegments*(env: var Env, lineNum: Natural): Option[TempSegments]
 
   result = some(TempSegments(tempFile: tempFile, lb: lineBufferO.get()))
 
+proc clear*(tempSegments: var TempSegments) =
+  ## Clear the temp file and line buffer so you can read new segments.
+  echo "clear"
+
+  # todo: is there a way to do this without closing the file and stream?
+  # todo: open an close the file instead?  Save the line buffer memory so we can reuse it.
+
+  # # Close the temp file, truncate it, then open it again.
+  # tempSegments.tempFile.truncate()
+
+  # # Clear the line buffer.
+  # var stream = newFileStream(tempSegments.tempFile.file)
+  # tempSegments.lb.reset(stream)
+
+  # # Clear the one warning table.
+  # tempSegments.oneWarnTable.clear()
+
 proc freeCloseDelete*(tempSegments: TempSegments) =
   ## Close the TempSegments and delete its backing temporary file.
   tempSegments.tempFile.closeDelete()
 
 proc seekToStart*(tempSegments: var TempSegments) =
   ## Seek to the start of the TempSegments file so you can read the
-  ## segments again with readNextSegment.
+  ## same segments again with readNextSegment.
   tempSegments.lb.reset()
 
 proc readNextSegment*(env: var Env, tempSegments: var TempSegments): string =
   ## Read the next segment from TempSegments. Return "" when there are
   ## no more segments.
   result = tempSegments.lb.readline()
-
-proc echoSegments*(tempSegments: TempSegments) =
-  tempSegments.lb.stream.echoStream()
 
 proc stringSegment*(line: string, start: Natural, finish: Natural): string =
   ## Return the string segment.
@@ -234,13 +250,12 @@ proc varSegment*(bracketedVar: string, namespacePos: Natural,
   assert bracketedVar[0] == '{'
   assert bracketedVar[^1] == '}'
   # 2,namespacePos
-  #   |    namespaceLen
-  #   |    | varNameLen
-  #   |    | |   bracketedVar
-  #   |    | |   |
+  # | |    namespaceLen
+  # | |    | varNameLen
+  # | |    | |   bracketedVar
+  # | |    | |   |
   # 2,2   ,2,4  ,{ s.name }
   result.add("2,{namespacePos:<4},{namespaceLen},{varNameLen:<3},{bracketedVar}\n".fmt)
-
 
 proc lineToSegments*(compiledMatchers: CompiledMatchers, line: string): seq[string] =
   ## Convert a line to a list of segments.
@@ -326,48 +341,56 @@ func parseVarSegment*(segment: string): tuple[namespace: string, name: string] =
   let name = segment[namePos ..< namePos + nameLen]
   result = (namespace, name)
 
+proc writeSegment(env: var Env, lineNum: Natural, variables:
+                  Variables, oneWarnTable: var HashSet[string], segment: string, stream: Stream) =
+  ## Write one segment to the given stream.
+
+  # Write out each type of segment.
+  case segment[0]:
+  of '0':
+    stream.write(segment[2 .. ^2])
+  of '1':
+    stream.write(segment[2 .. ^1])
+  of '2':
+    # Update variable content and write out the updated segment.
+
+    # Get the variable name.
+    let (namespace, varName) = parseVarSegment(segment)
+
+    # Look up the variable's value.
+    let valueO = getVariable(variables, namespace, varName)
+    if isSome(valueO):
+      # Write the variables value.
+      stream.write($valueO.get())
+    else:
+      # The variable is missing. Write the original variable name
+      # text with spacing and brackets.  Warn about the missing
+      # variable but only once per variable.
+      if not oneWarnTable.containsOrIncl(namespace & varName):
+        env.warn(lineNum, wMissingReplacementVar, namespace, varName)
+      stream.write(segment[13 .. ^2])
+  else:
+    discard
+
 # todo: handle line numbers better so you know which line the missing var is on.
 
 proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
                         lineNum: Natural, variables: Variables, stream: Stream) =
   ## This procedure writes the updated replacement block to the result
-  ## stream.  It does it by updating variable content and writing all
-  ## the stored segments.
+  ## stream.  It does it by writing all the stored segments and
+  ## updating variable segments as it goes.
 
   # Seek to the beginning of the temp file.
   tempSegments.seekToStart()
 
+  var rLineNum = lineNum
   while true:
-    let line = readNextSegment(env, tempSegments)
-    if line == "":
-       break # No more lines.
-
-    # Write out each type of segment.
-    case line[0]:
-    of '0':
-      stream.write(line[2 .. ^2])
-    of '1':
-      stream.write(line[2 .. ^1])
-    of '2':
-      # Update variable content and write out the updated segment.
-
-      # Get the variable name.
-      let (namespace, varName) = parseVarSegment(line)
-
-      # Look up the variable's value.
-      let valueO = getVariable(variables, namespace, varName)
-      if isSome(valueO):
-        # Write the variables value.
-        stream.write($valueO.get())
-      else:
-        # The variable is missing. Write the original variable name
-        # text with spacing and brackets.  Warn about the missing
-        # variable but only once per variable.
-        if not tempSegments.oneWarnTable.containsOrIncl(namespace & varName):
-          env.warn(lineNum, wMissingReplacementVar, namespace, varName)
-        stream.write(line[13 .. ^2])
-    else:
-      break
+    let segment = readNextSegment(env, tempSegments)
+    if segment == "":
+       break # No more segments.
+    if segment[0] == '1':
+      inc(rLineNum)
+    writeSegment(env, rLineNum, variables, tempSegments.oneWarnTable, segment, stream)
 
 proc fillTempSegments*(env: var Env, tempSegments: TempSegments, lb: var LineBuffer,
                               compiledMatchers: CompiledMatchers,
@@ -376,6 +399,7 @@ proc fillTempSegments*(env: var Env, tempSegments: TempSegments, lb: var LineBuf
   ## Read the replacement block lines from the template and store
   ## their segments in TempSegments.
 
+  # For the nextline command, process the next line and return.
   if command == "nextline":
     let line = lb.readline()
     storeLineSegments(env, tempSegments, compiledMatchers, line)
@@ -385,8 +409,9 @@ proc fillTempSegments*(env: var Env, tempSegments: TempSegments, lb: var LineBuf
   var count = 0
 
   while true:
+    # Stop is we reach the maximum line count for a replacement block.
     if count >= maxLines:
-      env.warn("Reached the maximum replacement block line count without finding the endblock.")
+      env.warn(lb.lineNum, wExceededMaxLine)
       break
 
     # Read the next template replacement block line.
@@ -394,11 +419,16 @@ proc fillTempSegments*(env: var Env, tempSegments: TempSegments, lb: var LineBuf
     if line == "":
       break # No more lines.
 
+    # Look for an endblock command and stop when found.
     var linePartsO = parseCmdLine(env, compiledMatchers, line, lb.lineNum)
     if linePartsO.isSome:
       if linePartsO.get().command == "endblock":
-        break
+        break # done, found endblock
 
-    # Store non-endblock lines.
+    # Store the line segments.
     storeLineSegments(env, tempSegments, compiledMatchers, line)
     count.inc
+
+when defined(test):
+  proc echoSegments*(tempSegments: TempSegments) =
+    tempSegments.lb.stream.echoStream()

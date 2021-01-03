@@ -70,13 +70,16 @@ proc getUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
     result[prepost.pre] = prepost.post
 
 proc getPrefixMatcher*(prepostTable: PrepostTable): Matcher =
-  ## Return a matcher for matching the prefixes.
+  ## Return a matcher for matching the prefixes. Match the prefix and
+  ## one or more following whitespace.
   var terms = newSeq[string]()
   for prefix, _ in prepostTable:
     terms.add(r"\Q$1\E" % prefix)
   result = newMatcher(r"^($1)\s+" % terms.join("|"), 1)
 
+# todo: allow <!--$nextline-->, <!--$endblock-->
 proc getCommandMatcher*(): Matcher =
+  ## Match commands and one following space.
   result = newMatcher(r"($1)\s" % commands.join("|"), 1)
 
 proc getLastPartMatcher*(postfix: string): Matcher =

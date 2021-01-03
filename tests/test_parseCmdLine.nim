@@ -127,6 +127,16 @@ suite "parseCmdLine.nim":
     var elps = newLineParts(command = "block", middleStart = 12)
     check testParseCmdLine(line, expectedLineParts = elps)
 
+  test "parseCmdLine endblock":
+    let line = "<!--$ endblock -->"
+    var elps = newLineParts(command = "endblock", middleStart = 15, ending = "")
+    check testParseCmdLine(line, expectedLineParts = elps)
+
+  test "parseCmdLine comment":
+    let line = "<!--$ # this is comment -->"
+    var elps = newLineParts(command = "#", middleStart = 8, middleLen = 16, ending = "")
+    check testParseCmdLine(line, expectedLineParts = elps)
+
   test "parseCmdLine prefix":
     let line = "#$ nextline \n"
     var elps = newLineParts(prefix = "#$",

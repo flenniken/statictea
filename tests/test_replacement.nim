@@ -17,7 +17,7 @@ proc testTempSegments(content: string, command: string = "nextline", repeat: Nat
     eOutLines: seq[string] = @[]
   ): bool =
 
-  var env = openEnvTest("_testTempSegments.log")
+  var env = openEnvTest("_testTempSegments.log", "template.html")
   var inStream = newStringStream(content)
   if inStream == nil:
     return false
@@ -244,19 +244,130 @@ suite "processReplacementBlock":
     check parseVarSegment("2,7   ,2,4  ,{      s.name }") == (namespace: "s.", name: "name")
     check parseVarSegment("2,4   ,0,4  ,{   name }") == (namespace: "", name: "name")
 
-  test "TempSegments":
+  test "TempSegments nextline":
     let content = """
 replacement block
 line 2
 more text
-<!--endblock-->
 """
-    let eResultLines = @[
+    var eResultLines = @[
       "replacement block",
     ]
     check testTempSegments(content, command = "nextline", repeat = 1, eResultLines = eResultLines)
-    # check testTempSegments(content, command = "nextline", repeat = 1, eResultLines = eResultLines)
+
+  test "TempSegments nextline variables":
+    let content = """
+{s.test} {h.test}!
+"""
+    var eResultLines = @[
+      "hello there!",
+    ]
+    check testTempSegments(content, command = "nextline", repeat = 1, eResultLines = eResultLines)
+
+  test "TempSegments nextline variables":
+    let content = """
+{s.test} {h.test}!
+"""
+    var eResultLines = @[
+      "hello there!",
+    ]
+    check testTempSegments(content, command = "nextline", repeat = 1, eResultLines = eResultLines)
 
 
-  # test "writeTempSegments":
-  #   writeTempSegments(env, tempSegments, lineNum, variables, stream)
+  # s.test = "hello"
+  # h.test = "there"
+  # five = 5
+  # t.five = 5
+  # g.aboutfive = 5.11
+
+  test "TempSegments block":
+    let content = """
+replacement {abc} block
+{s.test} {abc}
+more text {missing}
+<!--$ endblock -->
+"""
+    var eResultLines = @[
+      "replacement {abc} block",
+      "hello {abc}",
+      "more text {missing}",
+    ]
+    # Note: the line number is handled at a higher level.
+    var eErrLines = @[
+      "template.html(4): w58: The replacement variable doesn't exist: abc.",
+      "template.html(6): w58: The replacement variable doesn't exist: missing.",
+    ]
+    check testTempSegments(content, command = "block", repeat = 1,
+      eErrLines = eErrLines, eResultLines = eResultLines)
+
+  test "TempSegments maxLines":
+    let content = """
+one
+two
+three
+four
+five
+six
+seven
+eight
+nine
+ten
+eleven
+twelve
+"""
+    var eResultLines = @[
+      "one",
+      "two",
+      "three",
+      "four",
+      "five",
+      "six",
+      "seven",
+      "eight",
+      "nine",
+      "ten",
+    ]
+    # Note: the line number is handled at a higher level.
+    var eErrLines = @[
+      "template.html(10): w60: Reached the maximum replacement block line count without finding the endblock.",
+    ]
+    check testTempSegments(content, command = "block", repeat = 1,
+      eErrLines = eErrLines, eResultLines = eResultLines)
+
+
+  test "TempSegments clear":
+    var env = openEnvTest("_allocateTempSegments.log")
+
+    var tempSegmentsO = allocateTempSegments(env, 0)
+
+    check env.readCloseDeleteCompare()
+
+    check tempSegmentsO.isSome
+    var tempSegments = tempSegmentsO.get()
+    check tempSegments.tempFile.filename != ""
+    check tempSegments.lb.filename == tempSegments.tempFile.filename
+    check tempSegments.oneWarnTable.len == 0
+
+    # Store segments in tempSegments.
+    var variables = getTestVariables()
+    let compiledMatchers = getCompiledMatchers()
+    storeLineSegments(env, tempSegments, compiledMatchers, "first test line")
+
+    # Clear the tempSegments object.
+    tempSegments.clear()
+
+    # Store segments in tempSegments.
+    storeLineSegments(env, tempSegments, compiledMatchers, "after truncate line")
+
+    # Read the stored segments.
+    var resultStream = newStringStream()
+    check resultStream != nil
+    writeTempSegments(env, tempSegments, 0, variables, resultStream)
+
+    tempSegments.freeCloseDelete()
+
+    # echoStream(resultStream)
+    var resultLines = readStream(resultStream)
+
+    let eResultLines = @["after truncate line"]
+    check expectedItems("resultLines", resultLines, eResultLines)

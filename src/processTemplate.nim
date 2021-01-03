@@ -47,6 +47,8 @@ unchanged.
 
 ]#
 
+# todo: allocate memory for the replacement block line buffer outside the loop.
+
 proc processTemplateLines(env: var Env, variables: var Variables,
                           prepostTable: PrepostTable) =
   ## Process the given template file.
@@ -61,6 +63,12 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     env.warn(0, wNotEnoughMemoryForLB)
     return
   var lb = lineBufferO.get()
+
+  var tempSegmentsO = allocateTempSegments(env, lb.lineNum)
+  if not isSome(tempSegmentsO):
+    return
+  var tempSegments = tempSegmentsO.get()
+  defer: freeCloseDelete(tempSegments)
 
   # Read and process template lines.
   while true:
@@ -88,14 +96,11 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
     let repeat = getTeaVarInt(variables, "repeat")
 
-    var tempSegmentsO = allocateTempSegments(env, lb.lineNum)
-    if not isSome(tempSegmentsO):
-      continue
-    var tempSegments = tempSegmentsO.get()
-
-    # todo: just read the lines when repeat is 0?
+    # todo: Optimize for the repeat 0 and 1 cases?
 
     # Read the replacement block lines and add them to the TempSegments object.
+    var startLineNum = lb.lineNum
+    tempSegments.clear()
     fillTempSegments(env, tempSegments, lb, compiledMatchers, command,
                      repeat, variables)
 
@@ -105,7 +110,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     # Generate t.repeat number of replacement blocks. Recalculate the
     # variables for each one.
     while true:
-      writeTempSegments(env, tempSegments, lb.lineNum, variables, env.resultStream)
+      writeTempSegments(env, tempSegments, startLineNum, variables, env.resultStream)
 
       inc(row)
       if row >= repeat:
@@ -115,8 +120,6 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       variables.tea["row"] = newValue(row)
       runCommand(env, cmdLines, cmdLineParts, compiledMatchers,
                  variables)
-
-    freeCloseDelete(tempSegments)
 
 
 proc processTemplate*(env: var Env, args: Args): int =

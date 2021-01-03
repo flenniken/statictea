@@ -261,15 +261,15 @@ when defined(test):
     var count = 0
     if maximum == 0:
       return
-    var maxLines: int
+    var max: int
     if maximum < 0:
-      maxLines = high(int)
+      max = high(int)
     else:
-      maxLines = maximum
+      max = maximum
     for line in lines(filename):
       result.add(line)
       inc(count)
-      if count > maxLines:
+      if count > max:
         break
 
   proc closeReadDeleteLog*(env: var Env, maximum: int = -1): seq[string] =

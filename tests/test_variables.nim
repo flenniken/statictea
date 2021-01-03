@@ -31,7 +31,7 @@ suite "variables.nim":
     check variables.shared.len == 1
     check variables.local.len == 1
     check variables.global.len == 1
-    check variables.tea.len == 1
+    check variables.tea.len == 5
 
   test "set var":
     var variables = getTestVariables()

@@ -5,6 +5,16 @@ import regexes
 import warnings
 import matches
 
+#[
+
+We have two command lines.  We distingush them using different names
+CmdLine and CommandLine.
+
+* CmdLine -- is a line in the template for statictea commands.
+* CommandLine -- is a line at a terminal for system commands.
+
+]#
+
 type
   LineParts* = object
     prefix*: string
@@ -22,15 +32,11 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
   ## Parse the line and return its parts when it is a command. Return
   ## quickly when not a command line.
 
-  # We have two command lines.  We distingush them using different
-  # names CmdLine and CommandLine.
-  #
-  # * CmdLine -- is a line in the template for statictea commands.
-  # * CommandLine -- is a line at a terminal for system commands.
-
-  # prefix   command     middle       \postfix ending
+  # prefix   command     middleStart  continuation
+  # |        |           |            |postfix
+  # |        |           |            ||  ending
+  # |        |           |            ||  |
   # <!--$    nextline    a = 5        \-->\n
-  #                      ^middleStart
 
   var lineParts: LineParts
   let cm = compiledMatchers

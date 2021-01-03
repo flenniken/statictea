@@ -391,18 +391,6 @@ proc runStatement*(env: var Env, statement: Statement,
 
   result = some(newSpaceNameValue(nameSpace, varName, value))
 
-proc setInitialVariables*(variables: var Variables) =
-  ## Set the variable dictionaries to their initial state before
-  ## running a command.
-  variables.tea["output"] = Value(kind: vkString, stringv: "result")
-  variables.tea["repeat"] = Value(kind: vkInt, intv: 1)
-  variables.tea["maxLines"] = Value(kind: vkInt, intv: 10)
-  variables.tea["maxRepeat"] = Value(kind: vkInt, intv: 100)
-  # The row variable is handled at a higher scope.
-  # variables.tea["row"] = Value(kind: vkInt, intv: 0)
-  variables.tea.del("content")
-  variables.local.clear()
-
 proc assignVariable(env: var Env, statement: Statement, variables: var
                     Variables, spaceNameValue: SpaceNameValue) =
   ## Assign the variable to its dictionary.

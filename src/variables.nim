@@ -59,6 +59,18 @@ proc readJsonVariables*(env: var Env, args: Args): Variables =
   for filename in args.sharedList:
     readJson(env, filename, result.shared)
 
+proc setInitialVariables*(variables: var Variables) =
+  ## Set the variable dictionaries to their initial state before
+  ## running a command.
+  variables.tea["output"] = Value(kind: vkString, stringv: "result")
+  variables.tea["repeat"] = Value(kind: vkInt, intv: 1)
+  variables.tea["maxLines"] = Value(kind: vkInt, intv: 10)
+  variables.tea["maxRepeat"] = Value(kind: vkInt, intv: 100)
+  # The row variable is handled at a higher scope.
+  # variables.tea["row"] = Value(kind: vkInt, intv: 0)
+  variables.tea.del("content")
+  variables.local.clear()
+
 when defined(test):
   func newVariables*(): Variables =
     return
@@ -70,6 +82,9 @@ when defined(test):
     # t.five = 5
     # g.aboutfive = 5.11
     result = newVariables()
+
+    setInitialVariables(result)
+
     result.server["test"] = Value(kind: vkString, stringv: "hello")
     result.shared["test"] = Value(kind: vkString, stringv: "there")
     result.local["five"] = Value(kind: vkInt, intv: 5)

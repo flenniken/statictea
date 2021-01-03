@@ -54,7 +54,7 @@ proc newLineBuffer*(stream: Stream, maxLineLen: int = defaultMaxLineLen,
   result = some(lb)
 
 proc reset*(lb: var LineBuffer) =
-  ## Reset the line buffer to the beginning of the file.
+  ## Clear the buffer.
   lb.stream.setPosition(0)
   lb.charsRead = 0
   lb.pos = 0

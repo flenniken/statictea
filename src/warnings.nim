@@ -66,6 +66,7 @@ type
     wExpectedListOrDict,   # w57
     wMissingReplacementVar, # w58
     wNoTempFile,           # w59
+    wExceededMaxLine,      # w60
 
 tpubType:
   const
@@ -132,6 +133,7 @@ tpubType:
       "Expected a list or dictionary as the first parameter.", # wExpectedListOrDict
       "The replacement variable doesn't exist: $1$2.", # wMissingReplacementVar
       "Unable to create a temporary file.", # wNoTempFile
+      "Reached the maximum replacement block line count without finding the endblock.", # wExceededMaxLine
     ]
 
 func getWarning*(filename: string, lineNum: int,
