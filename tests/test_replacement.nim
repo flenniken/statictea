@@ -7,7 +7,6 @@ import variables
 import streams
 import options
 import tempFile
-import sets
 import readlines
 
 proc testTempSegments(content: string, command: string = "nextline", repeat: Natural = 1,
@@ -28,17 +27,15 @@ proc testTempSegments(content: string, command: string = "nextline", repeat: Nat
   if not lineBufferO.isSome:
     return false
   var lb = lineBufferO.get()
-  var tempSegmentsO = allocateTempSegments(env, lb.lineNum)
+  var variables = getTestVariables()
+  let compiledMatchers = getCompiledMatchers()
+  var tempSegmentsO = newTempSegments(env, lb, compiledMatchers, command, repeat, variables)
   if not isSome(tempSegmentsO):
     return false
   var tempSegments = tempSegmentsO.get()
-  var variables = getTestVariables()
-  let compiledMatchers = getCompiledMatchers()
-  fillTempSegments(env, tempSegments, lb, compiledMatchers, command,
-                   repeat, variables)
   # tempSegments.echoSegments()
   writeTempSegments(env, tempSegments, lb.lineNum, variables, resultStream)
-  freeCloseDelete(tempSegments)
+  closeDelete(tempSegments)
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
   var resultLines = readStream(resultStream)
@@ -220,22 +217,6 @@ suite "processReplacementBlock":
         "1,end\n",
       ])
 
-
-  test "allocateTempSegments":
-    var env = openEnvTest("_allocateTempSegments.log")
-
-    var tempSegmentsO = allocateTempSegments(env, 0)
-
-    check env.readCloseDeleteCompare()
-
-    check tempSegmentsO.isSome
-    var tempSegments = tempSegmentsO.get()
-    check tempSegments.tempFile.filename != ""
-    check tempSegments.lb.filename == tempSegments.tempFile.filename
-    check tempSegments.oneWarnTable.len == 0
-
-    tempSegments.freeCloseDelete()
-
   test "parseVarSegment":
     check parseVarSegment("2,1   ,0,1  ,{n}") == (namespace: "", name: "n")
     check parseVarSegment("2,1   ,2,1  ,{t.n}") == (namespace: "t.", name: "n")
@@ -333,41 +314,3 @@ twelve
     ]
     check testTempSegments(content, command = "block", repeat = 1,
       eErrLines = eErrLines, eResultLines = eResultLines)
-
-
-  test "TempSegments clear":
-    var env = openEnvTest("_allocateTempSegments.log")
-
-    var tempSegmentsO = allocateTempSegments(env, 0)
-
-    check env.readCloseDeleteCompare()
-
-    check tempSegmentsO.isSome
-    var tempSegments = tempSegmentsO.get()
-    check tempSegments.tempFile.filename != ""
-    check tempSegments.lb.filename == tempSegments.tempFile.filename
-    check tempSegments.oneWarnTable.len == 0
-
-    # Store segments in tempSegments.
-    var variables = getTestVariables()
-    let compiledMatchers = getCompiledMatchers()
-    storeLineSegments(env, tempSegments, compiledMatchers, "first test line")
-
-    # Clear the tempSegments object.
-    tempSegments.clear()
-
-    # Store segments in tempSegments.
-    storeLineSegments(env, tempSegments, compiledMatchers, "after truncate line")
-
-    # Read the stored segments.
-    var resultStream = newStringStream()
-    check resultStream != nil
-    writeTempSegments(env, tempSegments, 0, variables, resultStream)
-
-    tempSegments.freeCloseDelete()
-
-    # echoStream(resultStream)
-    var resultLines = readStream(resultStream)
-
-    let eResultLines = @["after truncate line"]
-    check expectedItems("resultLines", resultLines, eResultLines)

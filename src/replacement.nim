@@ -171,50 +171,7 @@ proc getTempFileStream*(): Option[TempFileStream] =
     return
   result = some(TempFileStream(tempFile: tempFile, stream: stream))
 
-proc allocateTempSegments*(env: var Env, lineNum: Natural): Option[TempSegments] =
-  ## Create a TempSegments object. This reserves memory for a line
-  ## buffer and creates a backing temp file. Call the freeCloseDelete
-  ## procedure when done to free the memory and to close and delete
-  ## the file.
-
-  # Create a temporary file for the replacement block segments.
-  let tempFileStreamO = getTempFileStream()
-  if not isSome(tempFileStreamO):
-    env.warn(lineNum, wNoTempFile)
-    return
-  let tempFileStream = tempFileStreamO.get()
-  let tempFile = tempFileStream.tempFile
-  let stream = tempFileStream.stream
-
-  # Allocate a line buffer for reading lines.
-  var lineBufferO = newLineBuffer(stream, filename = tempFile.filename,
-                                  bufferSize = replacementBufferSize,
-                                  maxLineLen = maxLineLen)
-  if not lineBufferO.isSome():
-    tempFile.closeDelete()
-    env.warn(lineNum, wNotEnoughMemoryForLB)
-    return
-
-  result = some(TempSegments(tempFile: tempFile, lb: lineBufferO.get()))
-
-proc clear*(tempSegments: var TempSegments) =
-  ## Clear the temp file and line buffer so you can read new segments.
-  echo "clear"
-
-  # todo: is there a way to do this without closing the file and stream?
-  # todo: open an close the file instead?  Save the line buffer memory so we can reuse it.
-
-  # # Close the temp file, truncate it, then open it again.
-  # tempSegments.tempFile.truncate()
-
-  # # Clear the line buffer.
-  # var stream = newFileStream(tempSegments.tempFile.file)
-  # tempSegments.lb.reset(stream)
-
-  # # Clear the one warning table.
-  # tempSegments.oneWarnTable.clear()
-
-proc freeCloseDelete*(tempSegments: TempSegments) =
+proc closeDelete*(tempSegments: TempSegments) =
   ## Close the TempSegments and delete its backing temporary file.
   tempSegments.tempFile.closeDelete()
 
@@ -392,6 +349,32 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
       inc(rLineNum)
     writeSegment(env, rLineNum, variables, tempSegments.oneWarnTable, segment, stream)
 
+proc allocTempSegments*(env: var Env, lineNum: Natural): Option[TempSegments] =
+  ## Create a TempSegments object. This reserves memory for a line
+  ## buffer and creates a backing temp file. Call the closeDelete
+  ## procedure when done to free the memory and to close and delete
+  ## the file.
+
+  # Create a temporary file for the replacement block segments.
+  let tempFileStreamO = getTempFileStream()
+  if not isSome(tempFileStreamO):
+    env.warn(lineNum, wNoTempFile)
+    return
+  let tempFileStream = tempFileStreamO.get()
+  let tempFile = tempFileStream.tempFile
+  let stream = tempFileStream.stream
+
+  # Allocate a line buffer for reading lines.
+  var lineBufferO = newLineBuffer(stream, filename = tempFile.filename,
+                                  bufferSize = replacementBufferSize,
+                                  maxLineLen = maxLineLen)
+  if not lineBufferO.isSome():
+    tempFile.closeDelete()
+    env.warn(lineNum, wNotEnoughMemoryForLB)
+    return
+
+  result = some(TempSegments(tempFile: tempFile, lb: lineBufferO.get()))
+
 proc fillTempSegments*(env: var Env, tempSegments: TempSegments, lb: var LineBuffer,
                               compiledMatchers: CompiledMatchers,
                               command: string, repeat: Natural,
@@ -428,6 +411,19 @@ proc fillTempSegments*(env: var Env, tempSegments: TempSegments, lb: var LineBuf
     # Store the line segments.
     storeLineSegments(env, tempSegments, compiledMatchers, line)
     count.inc
+
+proc newTempSegments*(env: var Env, lb: var LineBuffer, compiledMatchers: CompiledMatchers,
+    command: string, repeat: Natural, variables: Variables): Option[TempSegments] =
+  ## Read replacement block lines and return a TempSegments object
+  ## containing the compiled block. Call writeTempSegments to write
+  ## out the segments. Call closeDelete to close and delete the
+  ## associated temp file.
+
+  result = allocTempSegments(env, lb.lineNum)
+  if not isSome(result):
+    return
+  fillTempSegments(env, result.get(), lb, compiledMatchers, command,
+                   repeat, variables)
 
 when defined(test):
   proc echoSegments*(tempSegments: TempSegments) =

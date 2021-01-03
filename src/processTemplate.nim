@@ -64,12 +64,6 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     return
   var lb = lineBufferO.get()
 
-  var tempSegmentsO = allocateTempSegments(env, lb.lineNum)
-  if not isSome(tempSegmentsO):
-    return
-  var tempSegments = tempSegmentsO.get()
-  defer: freeCloseDelete(tempSegments)
-
   # Read and process template lines.
   while true:
     # Read template lines and write out non-command lines. When a
@@ -100,9 +94,10 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
     # Read the replacement block lines and add them to the TempSegments object.
     var startLineNum = lb.lineNum
-    tempSegments.clear()
-    fillTempSegments(env, tempSegments, lb, compiledMatchers, command,
-                     repeat, variables)
+    var tempSegmentsO = newTempSegments(env, lb, compiledMatchers, command, repeat, variables)
+    if not isSome(tempSegmentsO):
+      break # Cannot create temp file or allocate memory, quit.
+    var tempSegments = tempSegmentsO.get()
 
     if repeat == 0:
       continue
@@ -121,6 +116,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       runCommand(env, cmdLines, cmdLineParts, compiledMatchers,
                  variables)
 
+    closeDelete(tempSegments)
 
 proc processTemplate*(env: var Env, args: Args): int =
   ## Process the template and return 0 on success. It's an error when

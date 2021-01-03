@@ -149,7 +149,10 @@ suite "processTemplate":
 
     # Read the result file.
     let resultLines = env.readCloseDeleteResult()
-    for line in resultLines:
-      echo line
-    # check resultLines.len == 4
-    # check resultLines[0] == "Hello"
+    # for line in resultLines:
+    #   echo line
+    check resultLines.len == 4
+    check resultLines[0] == "0"
+    check resultLines[1] == "1"
+    check resultLines[2] == "2"
+    check resultLines[3] == "3"
