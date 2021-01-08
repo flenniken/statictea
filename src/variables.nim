@@ -91,3 +91,19 @@ when defined(test):
     result.tea["five"] = Value(kind: vkInt, intv: 5)
     result.global["aboutfive"] = Value(kind: vkFloat, floatv: 5.11)
 
+  proc echoVariables*(variables: Variables) =
+    echo "---tea variables:"
+    for k, v in variables.tea.pairs():
+      echo k, ": ", $v
+    echo "---server variables:"
+    for k, v in variables.server.pairs():
+      echo k, ": ", $v
+    echo "---shared variables:"
+    for k, v in variables.shared.pairs():
+      echo k, ": ", $v
+    echo "---local variables:"
+    for k, v in variables.local.pairs():
+      echo k, ": ", $v
+    echo "---global variables:"
+    for k, v in variables.global.pairs():
+      echo k, ": ", $v

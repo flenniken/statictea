@@ -185,8 +185,6 @@ proc getFunctionValue*(env: var Env, compiledMatchers:
   ## Collect the function parameter values then call it. Start should
   ## be pointing at the first parameter.
 
-  # env.warnStatement(statement, wStackTrace, start,  "enter getFunctionValue: " & functionName)
-
   var parameters: seq[Value] = @[]
   var pos = start
 
@@ -222,7 +220,6 @@ proc getFunctionValue*(env: var Env, compiledMatchers:
   let valueO = runFunction(env, functionName, statement, start, variables, parameters)
   if valueO.isSome:
     result = some(ValueAndLength(value: valueO.get(), length: pos-start))
-  # env.warnStatement(statement, wStackTrace, pos,  "leave getFunctionValue $1. len = $2." % [functionName, $(pos-start)])
 
 proc getVariable*(env: var Env, statement: Statement, variables:
                   Variables, nameSpace: string, varName: string,
@@ -268,7 +265,14 @@ proc getVarOrFunctionValue*(env: var Env, compiledMatchers:
                                 statement.text, start+variable.length)
     if parenthesesO.isSome:
       # We have a function, run it.
+
+      var functionO = getFunction(varName)
+      if not isSome(functionO):
+        env.warnStatement(statement, wInvalidFunction, start)
+        return
+      var function = functionO.get()
       let parentheses = parenthesesO.get()
+      # todo: we are looking up the function twice.
       let funValueLengthO = getFunctionValue(env, compiledMatchers, varName, statement,
                               start+variable.length+parentheses.length, variables)
       if not isSome(funValueLengthO):

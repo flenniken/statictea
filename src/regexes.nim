@@ -145,7 +145,7 @@ when defined(test):
 
   proc checkMatcherNot*(matcher: Matcher, line: string,
       start: Natural = 0): bool =
-    # Return true when the matcher does not match.
+    ## Return true when the matcher does not match.
 
     var matchesO = matcher.getMatches(line, start)
     if not matchesO.isSome:

@@ -185,10 +185,12 @@ proc getStringMatcher*(): Matcher =
   ## Match a string.
 
   # A string is inside quotes, either single or double quotes. The
-  # optional white space after the string is matched too.  Note: nim
-  # sets the regex anchor option.
+  # optional white space after the string is matched too. There are
+  # two returned groups and only one will contain anything. The first
+  # is for single quotes and the second is for double quotes. Note:
+  # nim sets the regex anchor option.
 
-  result = newMatcher("""'([^']*)'\s*$|"([^"]*)"\s*""", 2)
+  result = newMatcher("""'([^']*)'\s*|"([^"]*)"\s*""", 2)
 
 proc getLeftBracketMatcher*(): Matcher =
   ## Match everything up to a left backet. The match length includes

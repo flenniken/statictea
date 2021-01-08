@@ -207,6 +207,11 @@ suite "matches.nim":
     check checkMatcher(matcher, """a = 'hel"lo' """, 4, @["hel\"lo", ""], 9)
     check checkMatcher(matcher, """a = "it's true"  """, 4, @["", "it's true"], 13)
 
+  test "getStringMatcher extra text after":
+    var matcher = getStringMatcher()
+    check checkMatcher(matcher, "tea = 'Earl Grey' tea2 = 'Masala chai'", 6,
+                       @["Earl Grey", ""], 12)
+
   test "getStringMatcherNot":
     var matcher = getStringMatcher()
     check checkMatcherNot(matcher, "a = 'b' abc")

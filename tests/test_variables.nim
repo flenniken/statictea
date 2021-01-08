@@ -36,3 +36,7 @@ suite "variables.nim":
   test "set var":
     var variables = getTestVariables()
     variables.tea["repeat"] = Value(kind: vkInt, intv: 100)
+
+  # test "echoVariables":
+  #   var variables = getTestVariables()
+  #   echoVariables(variables)

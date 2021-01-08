@@ -66,10 +66,10 @@ StaticTea commands:
 - [[#nextline-command][nextline]] -- make substitutions in the next line
 - [[#block-command][block]] —- make substitutions in the next block of lines
 - [[#replace-command][replace]] -— replace the block with a variable
+- [[#endblock-command][endblock]] -- end of the replacement block for block or replace
+  commands.
 - # —- [[#comment-command][comment command]]
 - : -- [[#continue-command][continue command]], used to continue a command line
-- [[#endblock-command][endblock]] -- end of block
-- [[#endreplace-command][endreplace]] -- end of replace block
 
 [[#contents][茶]]
 
@@ -99,7 +99,7 @@ server json:
 #+BEGIN_SRC
 {
   "drink": "tea",
-  "drinkType": "Earl Grey""
+  "drinkType": "Earl Grey"
 }
 #+END_SRC
 
@@ -180,14 +180,14 @@ template:
 
 #+BEGIN_SRC
 <!--$ replace t.content=h.header -->
-<!--$ endreplace -->
+<!--$ endblock -->
 #+END_SRC
 
 shared json:
 
 #+BEGIN_SRC
 {
-  "header": "<!doctype html>\n<html lang="en">\n"
+  "header": "<!doctype html>\n<html lang=\"en\">\n"
 }
 #+END_SRC
 
@@ -212,7 +212,7 @@ template:
 <!--$ replace t.content=h.header -->
 <!doctype html>
 <html lang="en">
-<!--$ endreplace -—>
+<!--$ endblock -—>
 #+END_SRC
 
 The template replacement block may get out of sync with the
@@ -242,7 +242,7 @@ dir="{s.languageDirection}">
 <head>
 <meta charset="UTF-8"/>
 <title>{s.title}</title>
-<--$ endreplace -->
+<--$ endblock -->
 #+END_SRC
 
 server json:
@@ -260,10 +260,10 @@ shared json:
 #+BEGIN_SRC
 {
   "header": "<!DOCTYPE html>\n
-<html lang="{s.languageCode}"
-dir="{s.languageDirection}">\n
+<html lang=\"{s.languageCode}\"
+dir=\"{s.languageDirection}\">\n
 <head>\n
-<meta charset="UTF-8"/>\n
+<meta charset=\"UTF-8\"/>\n
 <title>{s.title}</title>\n"
 }
 #+END_SRC
@@ -330,7 +330,7 @@ template:
 
 #+BEGIN_SRC
 <!--$ nextline \-->
-<!--$ : tea = 'Earl Grey' \-->
+<!--$ : tea = 'Earl Grey'; \-->
 <!--$ : tea2 = 'Masala chai' -->
 {tea}, {tea2}
 #+END_SRC
@@ -348,9 +348,9 @@ Earl Grey, Masala chai
 :CUSTOM_ID: endblock-command
 :END:
 
-The endblock command ends the block command. Only the endblock
-command ends a block command. All text until the endblock is part
-of the replacement block. This includes lines that look like
+The endblock command ends the block and replace commands. Only
+the endblock command ends them. All text until the endblock is
+part of the replacement block. This includes lines that look like
 commands. For example:
 
 template:
@@ -370,15 +370,6 @@ result:
 fake nextline
 <!--$ nextline -->
 #+END_SRC
-
-[[#contents][茶]]
-
-** Endreplace Command
-:PROPERTIES:
-:CUSTOM_ID: endreplace-command
-:END:
-
-The endreplace command ends the replace command.
 
 [[#contents][茶]]
 
@@ -466,10 +457,10 @@ template:
 
 #+BEGIN_SRC
 <!--$ block \-->
-<!--$ : serverElements = len(t.server) \-->
-<!--$ : jsonElements = len(t.shared) -->
+<!--$ : serverElements = len(t.server); \-->
+<!--$ : sharedElements = len(t.shared) -->
 The server has {serverElements} elements
-and the shared json has {jsonElements}.
+and the shared json has {sharedElements}.
 <!--$ endblock -->
 #+END_SRC
 
@@ -530,7 +521,7 @@ with "g." prefix.  They are stored in the t.global dictionary.
   - [[#tlocal][t.local]] -- dictionary containing the current block's local variables.
   - [[#tglobal][t.global]] -- dictionary containing the global variables.
   - [[#tmaxrepeat][t.maxRepeat]] -- maximum number of times to repeat the block
-  - [[#tmaxlines][t.maxLines]] -- maximum lines before endblock or endreplace
+  - [[#tmaxlines][t.maxLines]] -- maximum number of replacementblock lines (lines before endblock)
   - [[#toutput][t.output]] -- where the block output goes
   - [[#trepeat][t.repeat]] -- controls how many times the block repeats
   - [[#trow][t.row]] -- the current row number of a repeating block
@@ -600,12 +591,13 @@ with "g." prefix.  They are stored in the t.global dictionary.
     :CUSTOM_ID: tmaxlines
     :END:
 
- The t.maxLines variable determines the maximum lines in a block.
+ The t.maxLines variable determines the maximum lines in a
+ replacement block.
 
- StaticTea reads lines looking for the endblock or endreplace
- commands.  By default, if it is not found in 10 lines, the 10
- lines are used for the block and a warning is output. This catches
- the case where you forget the end command.
+ StaticTea reads lines looking for the endblock.  By default, if
+ it is not found in 10 lines, the 10 lines are used for the block
+ and a warning is output. This catches the case where you forget
+ the endblock command.
 
  You can increase this value to support blocks with more lines by
  setting the t.maxLines system variable.
@@ -621,38 +613,38 @@ with "g." prefix.  They are stored in the t.global dictionary.
     :CUSTOM_ID: toutput
     :END:
 
- The t.output variable determines where the block output goes.  By
- default it goes to the result file specified when you run
- statictea.
+The t.output variable determines where the block output goes.  By
+default it goes to the result file specified when you run
+statictea.
 
- - "result" -- the block output goes to the result file (default)
- - "stderr" -- the block output goes to standard error
- - "log" -- the block output goes to the log file
- - "skip" -- the block is skipped
+- "result" -- the block output goes to the result file (default)
+- "stderr" -- the block output goes to standard error
+- "log" -- the block output goes to the log file
+- "skip" -- the block is skipped
 
- You can use the stderr option to write your own warning messages.
+You can use the stderr option to write your own warning messages.
 
- template:
+template:
 
- #+BEGIN_SRC
- <!--$ nextline \-->
- <!--$ : t.output = if( \-->
- <!--$ :   exists(s.admin), "skip", \-->
- <!--$ :   "stderr"); \-->
- <!--$ : msg = concat( \-->
- <!--$ :   template(), "(", \-->
- <!--$ :   getLineNumber(), ")", \-->
- <!--$ :   "missing admin var") -->
- {msg}
- #+END_SRC
+#+BEGIN_SRC
+<!--$ nextline \-->
+<!--$ : t.output = if( \-->
+<!--$ :   exists("s.admin"), "skip", \-->
+<!--$ :   "stderr"); \-->
+<!--$ : msg = concat( \-->
+<!--$ :   template(), "(", \-->
+<!--$ :   getLineNumber(), ")", \-->
+<!--$ :   "missing admin var") -->
+{msg}
+#+END_SRC
 
- result:
+result:
 
- #+BEGIN_SRC
- template.html(45): missing admin var
- #+END_SRC
+#+BEGIN_SRC
+template.html(45): missing admin var
+#+END_SRC
 
- [[#contents][茶]]
+[[#contents][茶]]
 
 *** t.repeat
     :PROPERTIES:
@@ -662,7 +654,7 @@ with "g." prefix.  They are stored in the t.global dictionary.
  The t.repeat variable is a number that tells how many times to
  repeat the block.
 
- You use the row function to customize each block.  Each time
+ You use the row variable to customize each block.  Each time
  the block repeats the local variables get recalculated.
 
  By default the block is output once. A value of zero means don't
@@ -744,7 +736,7 @@ with "g." prefix.  They are stored in the t.global dictionary.
  <select>
   <option>Lipton</option>
   <option>Tetley</option>
-  <option selected="selected">Twinings</option>
+  <option>selected="selected">Twinings</option>
   <option>Argo Tea</option>
   <option>American Tea Room</option>
   <option>Bigelow Tea Company</option>
@@ -900,11 +892,8 @@ StaticTea variables types:
 You define a string with single or double quotes and use them in
 statements.
 
-If you pass a string to a function taking a number, the string
-is converted to a number.
-
 It's easier to define long strings in the json files instead of
-locally.
+in the template.
 
 example strings:
 
@@ -1006,6 +995,7 @@ List of functions:
 - [[#case][case()]] -- generalized if function
 - [[#cmp][cmp()]] -- spaceship compare function <=>
 - [[#concat][concat()]] -- concatenate strings
+- [[#convert][convert()]] -- convert variable to a different type
 - [[#currency][currency()]] -- format currency
 - [[#exists][exists()]] -- whether a variables exists
 - [[#find][find()]] -- find a substring in a string
@@ -1160,29 +1150,67 @@ concat("Tea", " ",  "Time") => 'Tea Time'
 
 [[#contents][茶]]
 
+** convert()
+:PROPERTIES:
+:CUSTOM_ID: convert
+:END:
+
+The convert function converts variables from one type to
+another. From int to float, float to int, string to int and
+string to float. It takes two or three parameters, the variable
+to convert and the type name to convert to, and how to
+round. Only strings that look like numbers can be converted.
+
+Conversion Combinations:
+
+- int to float
+- int to string
+- float to int, with round options
+- float to string
+- string to int with round options
+- string to float
+
+Round Options:
+
+- "round" - rounds to the nearest int, when equal rounds up.
+- "floor" - uses int below.
+- "ceiling" - uses int above.
+
+#+BEGIN_SRC
+v1 = convert(5.6, "int", "round")
+v3 = convert(333, "float")
+v2 = convert("2", "int")
+v4 = convert("2.2", "int", "floor")
+v5 = convert("2.3", "float")
+#+END_SRC
+
+[[#contents][茶]]
+
 ** exists()
 :PROPERTIES:
 :CUSTOM_ID: exists
 :END:
 
-The exists returns 1 when a variable exists, else it returns 0.
+The exists function takes one string parameter which is the name
+of a variable. It returns 1 when a variable exists, else it
+returns 0.
 
 template:
 
 #+BEGIN_SRC
 <--$ block a = "apple"; \-->
-<--$ : ax = exists(a); \-->
-<--$ : bx = exists(b) -->
-exists(a) => {ax}
-exists(b) => {bx}
+<--$ : ax = exists("a"); \-->
+<--$ : bx = exists("b") -->
+exists("a") => {ax}
+exists("b") => {bx}
 <--$ endblock -->
 #+END_SRC
 
 result:
 
 #+BEGIN_SRC
-exists(a) => 1
-exists(b) => 0
+exists("a") => 1
+exists("b") => 0
 #+END_SRC
 
 [[#contents][茶]]
@@ -1628,7 +1656,7 @@ Miscellaneous topics:
 
  #+BEGIN_SRC
  <--$ nextline t.output = if( \-->
- <--$ : exists(admin), "skip", "stderr") -->
+ <--$ : exists("admin"), "skip", "stderr") -->
  warning: the admin variable is missing
  #+END_SRC
 

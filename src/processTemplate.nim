@@ -47,8 +47,6 @@ unchanged.
 
 ]#
 
-# todo: allocate memory for the replacement block line buffer outside the loop.
-
 proc processTemplateLines(env: var Env, variables: var Variables,
                           prepostTable: PrepostTable) =
   ## Process the given template file.
@@ -87,7 +85,6 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     variables.tea["row"] = newValue(row)
     runCommand(env, cmdLines, cmdLineParts, compiledMatchers,
                variables)
-
     let repeat = getTeaVarInt(variables, "repeat")
 
     # If repeat is 0, read the replacement lines and discard them.
@@ -115,6 +112,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       # variable substitutions.
       writeTempSegments(env, tempSegments, startLineNum, variables,
                         env.resultStream)
+      # tempSegments.echoSegments
 
       # Increment the row variable.
       inc(row)
@@ -137,6 +135,7 @@ proc processTemplate*(env: var Env, args: Args): int =
     return 1
 
   var variables = readJsonVariables(env, args)
+  setInitialVariables(variables)
 
   # Get the prepost table, either the user specified one or the
   # default one. The defaults are not used when the user specifies
