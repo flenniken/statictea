@@ -631,15 +631,19 @@ suite "runCommand.nim":
     ]
     check testGetVarOrFunctionValue(statement, 6, none(ValueAndLength), eErrLines = eErrLines)
 
-  test "setInitialVariables":
-    var variables = getTestVariables()
-    setInitialVariables(variables)
-    check variables.tea.contains("content") == false
-    check variables.tea["repeat"] == Value(kind: vkInt, intv: 1)
-    check variables.tea["output"] == Value(kind: vkString, stringv: "result")
-    check variables.tea["maxLines"] == Value(kind: vkInt, intv: 10)
-    check variables.tea["maxRepeat"] == Value(kind: vkInt, intv: 100)
-    check variables.local.len == 0
+  test "getNewVariables":
+    var variables = newVariables()
+    # echoVariables(variables)
+    check variables.contains("content") == false
+    check variables["local"].dictv.len == 0
+    check variables["global"].dictv.len == 0
+    check variables["output"] == Value(kind: vkString, stringv: "result")
+    check variables["maxRepeat"] == Value(kind: vkInt, intv: 100)
+    check variables["maxLines"] == Value(kind: vkInt, intv: 10)
+    check variables["repeat"] == Value(kind: vkInt, intv: 1)
+    check variables["row"] == Value(kind: vkInt, intv: 0)
+    check variables["server"].dictv.len == 0
+    check variables["shared"].dictv.len == 0
 
   test "warnStatement":
     let statement = newStatement(text="tea = a123", lineNum=12, 0)

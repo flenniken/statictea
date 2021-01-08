@@ -320,7 +320,7 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
   # let valueAndLength = result.get()
   # env.warnStatement(statement, wStackTrace, start+valueAndLength.length,  "leave getValue")
 
-proc assignTeaVariable(env: var Env, statement: Statement, variables:
+proc assignTeaVariable*(env: var Env, statement: Statement, variables:
                        var Variables, varName: string, value: Value,
                            start: Natural) =
   ## Assign the given tea variable with the given value.  Show
@@ -330,27 +330,27 @@ proc assignTeaVariable(env: var Env, statement: Statement, variables:
     of "maxLines", "maxRepeat":
       # The maxLines and maxRepeat variables must be an integer >= 0.
       if value.kind == vkInt and value.intv >= 0:
-        variables.tea[varName] = value
+        variables[varName] = value
       else:
         env.warnStatement(statement, wInvalidMaxCount, start)
     of "content":
       # Content must be a string.
       if value.kind == vkString:
-        variables.tea[varName] = value
+        variables[varName] = value
       else:
         env.warnStatement(statement, wInvalidTeaContent, start)
     of "output":
       # Output must be a string of "result", etc.
       if value.kind == vkString:
         if value.stringv in outputValues:
-          variables.tea[varName] = value
+          variables[varName] = value
           return
       env.warnStatement(statement, wInvalidOutputValue, start, $value)
     of "repeat":
       # Repeat is an integer >= 0 and <= t.maxRepeat.
       if value.kind == vkInt and value.intv >= 0 and
-         value.intv <= variables.tea["maxRepeat"].intv:
-        variables.tea[varName] = value
+         value.intv <= variables["maxRepeat"].intv:
+        variables[varName] = value
       else:
         env.warnStatement(statement, wInvalidMaxRepeat, start, $value)
     of "server", "shared", "local", "global", "row":
@@ -403,9 +403,9 @@ proc assignVariable(env: var Env, statement: Statement, variables: var
   let value = spaceNameValue.value
   case nameSpace:
     of "":
-      variables.local[varName] = value
+      variables["local"].dictv[varName] = value
     of "g.":
-      variables.global[varName] = value
+      variables["global"].dictv[varName] = value
     of "t.":
       assignTeaVariable(env, statement, variables,
           varName, value, 0)
@@ -421,7 +421,7 @@ proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
 
   # Clear the local variables and set the tea vars to their initial
   # state.
-  setInitialVariables(variables)
+  resetVariables(variables)
 
   # Loop over the statements and run each one.
   for statement in yieldStatements(cmdLines, cmdLineParts,

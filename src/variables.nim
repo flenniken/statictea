@@ -7,25 +7,21 @@ import tables
 import options
 
 type
-  Variables* = object
-    server*: VarsDict
-    shared*: VarsDict
-    local*: VarsDict
-    global*: VarsDict
-    tea*: VarsDict
+  Variables* = VarsDict
 
 proc getNamespaceDict*(variables: Variables, nameSpace: string): Option[VarsDict] =
+  ## Get the dictionary for the given namespace.
   case nameSpace:
     of "":
-      result = some(variables.local)
+      result = some(variables["local"].dictv)
     of "s.":
-      result = some(variables.server)
+      result = some(variables["server"].dictv)
     of "h.":
-      result = some(variables.shared)
+      result = some(variables["shared"].dictv)
     of "g.":
-      result = some(variables.global)
+      result = some(variables["global"].dictv)
     of "t.":
-      result = some(variables.tea)
+      result = some(variables)
     else:
       discard
 
@@ -42,39 +38,45 @@ proc getVariable*(variables: Variables, namespace: string, varName:
 proc getTeaVarInt*(variables: Variables, varName: string): int64 =
   ## Return the int value of one of the tea dictionary integer items.
   assert varName in ["row", "repeat", "maxRepeat", "maxLines"]
-  let value = variables.tea[varName]
+  let value = variables[varName]
   assert value.kind == vkInt
   result = value.intv
 
-proc readJsonVariables*(env: var Env, args: Args): Variables =
-  ## Read the server and shared json files and return their variables.
-
-  # Read the server json.
-  result.server = getEmptyVars()
+proc readServerVariables*(env: var Env, args: Args): VarsDict =
+  ## Read the server json.
+  result = getEmptyVars()
   for filename in args.serverList:
-    readJson(env, filename, result.server)
+    readJson(env, filename, result)
 
-  # Read the shared json.
-  result.shared = getEmptyVars()
+proc readSharedVariables*(env: var Env, args: Args): VarsDict =
+  ## Read the shared json.
+  result = getEmptyVars()
   for filename in args.sharedList:
-    readJson(env, filename, result.shared)
+    readJson(env, filename, result)
 
-proc setInitialVariables*(variables: var Variables) =
-  ## Set the variable dictionaries to their initial state before
-  ## running a command.
-  variables.tea["output"] = Value(kind: vkString, stringv: "result")
-  variables.tea["repeat"] = Value(kind: vkInt, intv: 1)
-  variables.tea["maxLines"] = Value(kind: vkInt, intv: 10)
-  variables.tea["maxRepeat"] = Value(kind: vkInt, intv: 100)
-  # The row variable is handled at a higher scope.
-  # variables.tea["row"] = Value(kind: vkInt, intv: 0)
-  variables.tea.del("content")
-  variables.local.clear()
+proc resetVariables*(variables: var Variables) =
+  ## Clear the local variables and reset the tea variables for running
+  ## a command.
+  var varsDict: VarsDict
+  variables["output"] = newValue("result")
+  variables["repeat"] = newValue(1)
+  variables["maxLines"] = newValue(10)
+  variables["maxRepeat"] = newValue(100)
+  variables.del("content")
+  variables["local"] = newValue(varsDict)
+
+proc newVariables*(server: VarsDict = newVarsDict(), shared: VarsDict = newVarsDict()): Variables =
+  ## Create the "tea" variables in their initial state.
+  var varsDict: VarsDict
+  # todo: can we move the dictionary instead of copy it? Does it
+  # matter here?
+  result["server"] = newValue(server)
+  result["shared"] = newValue(shared)
+  result["global"] = newValue(varsDict)
+  result["row"] = newValue(0)
+  resetVariables(result)
 
 when defined(test):
-  func newVariables*(): Variables =
-    return
-
   func getTestVariables*(): Variables =
     # s.test = "hello"
     # h.test = "there"
@@ -82,28 +84,25 @@ when defined(test):
     # t.five = 5
     # g.aboutfive = 5.11
     result = newVariables()
-
-    setInitialVariables(result)
-
-    result.server["test"] = Value(kind: vkString, stringv: "hello")
-    result.shared["test"] = Value(kind: vkString, stringv: "there")
-    result.local["five"] = Value(kind: vkInt, intv: 5)
-    result.tea["five"] = Value(kind: vkInt, intv: 5)
-    result.global["aboutfive"] = Value(kind: vkFloat, floatv: 5.11)
+    result["server"].dictv["test"] = Value(kind: vkString, stringv: "hello")
+    result["shared"].dictv["test"] = Value(kind: vkString, stringv: "there")
+    result["local"].dictv["five"] = Value(kind: vkInt, intv: 5)
+    result["five"] = Value(kind: vkInt, intv: 5)
+    result["global"].dictv["aboutfive"] = Value(kind: vkFloat, floatv: 5.11)
 
   proc echoVariables*(variables: Variables) =
     echo "---tea variables:"
-    for k, v in variables.tea.pairs():
+    for k, v in variables.pairs():
       echo k, ": ", $v
     echo "---server variables:"
-    for k, v in variables.server.pairs():
+    for k, v in variables["server"].dictv.pairs():
       echo k, ": ", $v
     echo "---shared variables:"
-    for k, v in variables.shared.pairs():
+    for k, v in variables["shared"].dictv.pairs():
       echo k, ": ", $v
     echo "---local variables:"
-    for k, v in variables.local.pairs():
+    for k, v in variables["local"].dictv.pairs():
       echo k, ": ", $v
     echo "---global variables:"
-    for k, v in variables.global.pairs():
+    for k, v in variables["global"].dictv.pairs():
       echo k, ": ", $v

@@ -82,7 +82,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
     # Run the command and fill in the variables.
     var row = 0
-    variables.tea["row"] = newValue(row)
+    variables["row"] = newValue(row)
     runCommand(env, cmdLines, cmdLineParts, compiledMatchers,
                variables)
     let repeat = getTeaVarInt(variables, "repeat")
@@ -118,7 +118,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       inc(row)
       if row >= repeat:
         break
-      variables.tea["row"] = newValue(row)
+      variables["row"] = newValue(row)
 
       # Run the command and fill in the variables.
       runCommand(env, cmdLines, cmdLineParts, compiledMatchers,
@@ -134,8 +134,12 @@ proc processTemplate*(env: var Env, args: Args): int =
   if not env.addExtraStreams(args):
     return 1
 
-  var variables = readJsonVariables(env, args)
-  setInitialVariables(variables)
+  # The tea variables are the top level items.  All variables are tea
+  # variables in the sense that they all exists somewhere in this
+  # dictionary.
+  var server = readServerVariables(env, args)
+  var shared = readSharedVariables(env, args)
+  var variables = newVariables(server, shared)
 
   # Get the prepost table, either the user specified one or the
   # default one. The defaults are not used when the user specifies

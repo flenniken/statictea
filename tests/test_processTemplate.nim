@@ -102,63 +102,63 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
     check testProcessTemplate(content = content, serverJson =
         serverJson, eResultLines = eResultLines)
 
-  test "Shared Header":
-    let content = """
-<!--$ replace t.content=h.header -->
-<!--$ endblock -->
-"""
-    let sharedJson = """
-{
-  "header": "<!doctype html>\n<html lang=\"en\">\n"
-}
-"""
-    let eResultLines = @[
-      """<!doctype html>""",
-      """<html lang="en">"""
-    ]
-    check testProcessTemplate(content = content, sharedJson =
-        sharedJson, eResultLines = eResultLines)
+#   test "Shared Header":
+#     let content = """
+# <!--$ replace t.content=h.header -->
+# <!--$ endblock -->
+# """
+#     let sharedJson = """
+# {
+#   "header": "<!doctype html>\n<html lang=\"en\">\n"
+# }
+# """
+#     let eResultLines = @[
+#       """<!doctype html>""",
+#       """<html lang="en">"""
+#     ]
+#     check testProcessTemplate(content = content, sharedJson =
+#         sharedJson, eResultLines = eResultLines)
 
-  test "Shared Header2":
-    let content = """
-<!--$ replace t.content=h.header -->
-<!DOCTYPE html>
-<html lang="{s.languageCode}"
-dir="{s.languageDirection}">
-<head>
-<meta charset="UTF-8"/>
-<title>{s.title}</title>
-<--$ endblock -->
-"""
-    let serverJson = """
-{
-"languageCode": "en",
-"languageDirection": "ltr",
-"title": "Teas in England"
-}
-"""
+#   test "Shared Header2":
+#     let content = """
+# <!--$ replace t.content=h.header -->
+# <!DOCTYPE html>
+# <html lang="{s.languageCode}"
+# dir="{s.languageDirection}">
+# <head>
+# <meta charset="UTF-8"/>
+# <title>{s.title}</title>
+# <--$ endblock -->
+# """
+#     let serverJson = """
+# {
+# "languageCode": "en",
+# "languageDirection": "ltr",
+# "title": "Teas in England"
+# }
+# """
 
-    let sharedJson = """
-{
-  "header": "<!DOCTYPE html>\n
-<html lang=\"{s.languageCode}\"
-dir=\"{s.languageDirection}\">\n
-<head>\n
-<meta charset=\"UTF-8\"/>\n
-<title>{s.title}</title>\n"
-}
-"""
+#     let sharedJson = """
+# {
+#   "header": "<!DOCTYPE html>\n
+# <html lang=\"{s.languageCode}\"
+# dir=\"{s.languageDirection}\">\n
+# <head>\n
+# <meta charset=\"UTF-8\"/>\n
+# <title>{s.title}</title>\n"
+# }
+# """
 
-    let eResultLines = @[
-      "<!DOCTYPE html>",
-      "<html lang=\"en\"",
-      "dir=\"ltr\">",
-      "<head>",
-      "<meta charset=\"UTF-8\"/>",
-      "<title>Teas in England</title>",
-    ]
-    check testProcessTemplate(content = content, serverJson = serverJson, sharedJson =
-        sharedJson, eResultLines = eResultLines)
+#     let eResultLines = @[
+#       "<!DOCTYPE html>",
+#       "<html lang=\"en\"",
+#       "dir=\"ltr\">",
+#       "<head>",
+#       "<meta charset=\"UTF-8\"/>",
+#       "<title>Teas in England</title>",
+#     ]
+#     check testProcessTemplate(content = content, serverJson = serverJson, sharedJson =
+#         sharedJson, eResultLines = eResultLines)
 
   test "Comment":
 
@@ -253,38 +253,38 @@ and the shared json has {jsonElements}.
     ]
     check testProcessTemplate(content = content, serverJson = serverJson, eResultLines = eResultLines)
 
-  test "output admin var missing":
+#   test "output admin var missing":
 
-    let content = """
-<!--$ nextline \-->
-<!--$ : t.output = if( \-->
-<!--$ :   exists("s.admin"), "skip", \-->
-<!--$ :   "stderr"); \-->
-<!--$ : msg = concat( \-->
-<!--$ :   template(), "(", \-->
-<!--$ :   getLineNumber(), ")", \-->
-<!--$ :   "missing admin var") -->
-{msg}
-"""
-    let eResultLines = @[
-      "template.html(45): missing admin var"
-    ]
-    check testProcessTemplate(content = content, eResultLines = eResultLines)
+#     let content = """
+# <!--$ nextline \-->
+# <!--$ : t.output = if( \-->
+# <!--$ :   exists("s.admin"), "skip", \-->
+# <!--$ :   "stderr"); \-->
+# <!--$ : msg = concat( \-->
+# <!--$ :   template(), "(", \-->
+# <!--$ :   getLineNumber(), ")", \-->
+# <!--$ :   "missing admin var") -->
+# {msg}
+# """
+#     let eResultLines = @[
+#       "template.html(45): missing admin var"
+#     ]
+#     check testProcessTemplate(content = content, eResultLines = eResultLines)
 
-  test "output no output":
+#   test "output no output":
 
-    let content = """
-<!--$ nextline \-->
-<!--$ : t.output = if( \-->
-<!--$ :   exists("s.admin"), "skip", \-->
-<!--$ :   "stderr"); \-->
-<!--$ : msg = concat( \-->
-<!--$ :   template(), "(", \-->
-<!--$ :   getLineNumber(), ")", \-->
-<!--$ :   "missing admin var") -->
-{msg}
-"""
-    check testProcessTemplate(content = content)
+#     let content = """
+# <!--$ nextline \-->
+# <!--$ : t.output = if( \-->
+# <!--$ :   exists("s.admin"), "skip", \-->
+# <!--$ :   "stderr"); \-->
+# <!--$ : msg = concat( \-->
+# <!--$ :   template(), "(", \-->
+# <!--$ :   getLineNumber(), ")", \-->
+# <!--$ :   "missing admin var") -->
+# {msg}
+# """
+#     check testProcessTemplate(content = content)
 
 
 # todo: readme examples

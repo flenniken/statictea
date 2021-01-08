@@ -79,6 +79,9 @@ proc newValue*(value: Value): Value =
   ## Copy the given value.
   result = value
 
+proc newVarsDict*(): VarsDict =
+  return result
+
 proc newSpaceNameValue*(namespace: string, varName: string, value: Value): SpaceNameValue =
   result = SpaceNameValue(namespace: namespace, varName: varName, value: value)
 
