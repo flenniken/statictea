@@ -237,8 +237,7 @@ template:
 #+BEGIN_SRC
 <!--$ replace t.content=h.header -->
 <!DOCTYPE html>
-<html lang="{s.languageCode}"
-dir="{s.languageDirection}">
+<html lang="{s.languageCode}" dir="{s.languageDirection}">
 <head>
 <meta charset="UTF-8"/>
 <title>{s.title}</title>
@@ -271,8 +270,7 @@ result:
 
 #+BEGIN_SRC
 <!DOCTYPE html>
-<html lang="en"
-dir="ltr">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8"/>
 <title>Teas in England</title>
@@ -1009,6 +1007,286 @@ List of functions:
 
 [[#contents][茶]]
 
+* Run StaticTea
+:PROPERTIES:
+:CUSTOM_ID: run-statictea
+:END:
+
+You run StaticTea from the command line.
+
+- Warning messages go to standard error.
+- If you don't specify the result argument, the result goes to standard out.
+- If you specify "stdin" for the template, the template comes
+  from stdin.
+
+The example below shows a typical invocation which specifies four
+file arguments, the server json, the shared json, the template
+and the result.
+
+#+BEGIN_SRC
+statictea \
+  --server server.json \
+  --shared shared.json \
+  --template template.html \
+  --result result.html
+#+END_SRC
+
+The StaticTea command line options:
+
+- help -- show options and usage documentation.
+- version -- outputs the version number.
+- server -- the server json file(s), you can specify multiple.
+- shared -- the shared json file(s), you can specify multiple.
+- template -- the template file, or "stdin".
+- result -- the result file, or standard out when not specified.
+- update -- update the template replace blocks. See the
+  [[#replace-command][Replace Command]].
+- prepost -- add a command prefix and postfix, you can specify
+  multiple. When you specify values, the defaults are no longer
+  used. See the [[#prefix-postfix][Prefix Postfix]] section.
+
+[[#contents][茶]]
+
+* Miscellaneous
+:PROPERTIES:
+:CUSTOM_ID: miscellaneous
+:END:
+
+Miscellaneous topics:
+
+- [[#warning-messages][Warning Messages]]
+- [[#prefix-postfix][Prefix Postfix]]
+- [[#encoding-and-line-endings][Encoding and Line Endings]]
+- [[#log-file][Log File]]
+- [[#limits][Limits]]
+- [[#system-defaults][System Defaults]]
+
+** Warning Messages
+   :PROPERTIES:
+   :CUSTOM_ID: warning-messages
+   :END:
+
+ When StaticTea detects a problem, a warning message is written to
+ standard error, the problem is skipped, and processing
+ continues.
+
+ For example, if a variable in a replacement block is used but it
+ doesn't exist, the bracketed variable remains as is in the
+ result, and a message is output to standard error. There are many
+ other potential warnings.
+
+ It’s good style to change your template or json to be free of
+ messages.
+
+ Each warning message shows the file and line number where the
+ problem happened.
+
+ example messages:
+
+ - tea.html(45): w1: Unknown server variable: teaMaster.
+ - tea.html(45): w2: The postfix is missing.
+ - tea.html(45): w3: The command line doesn't have a valid
+   command, found: blocker.
+ - tea.html(45): w4: Unknown system variable: t.asdf.
+ - tea.html(45): w5: Server json file not found: server.json.
+ - tea.html(45): w6: Unable to parse server.json.
+
+ The statictea program returns 0 when no message gets
+ output to standard error, else it returns 1.
+
+ Example of running statictea when a variable is missing:
+
+ template:
+
+ #+BEGIN_SRC
+ <!--$ block -->
+ You're a {s.webmaster},
+ I'm a {s.teaMaster}!
+ <!--$ endblock -->
+ #+END_SRC
+
+ server json:
+
+ #+BEGIN_SRC
+ {
+   "webmaster": "html wizard"
+ }
+ #+END_SRC
+
+ stderr:
+
+ #+BEGIN_SRC
+ template.html(2): w1: Unknown server variable: s.teaMaster
+ #+END_SRC
+
+ result:
+
+ #+BEGIN_SRC
+ You're a html wizard,
+ I'm a {s.teaMaster}!
+ #+END_SRC
+
+ You can write your own warning messages using the system t.output
+ set to stderr. In the following example a warning message is
+ written to standard error when the server admin variable is
+ missing. When it is not missing nothing gets output.
+
+ template:
+
+ #+BEGIN_SRC
+ <--$ nextline t.output = if( \-->
+ <--$ : exists("admin"), "skip", "stderr") -->
+ warning: the admin variable is missing
+ #+END_SRC
+
+ [[#contents][茶]]
+
+** Prefix Postfix
+   :PROPERTIES:
+   :CUSTOM_ID: prefix-postfix
+   :END:
+
+ You make the template commands look like comments tailored for
+ your template file type. This allows you to edit the template
+ using its native editor and run other native tools.  For example,
+ you can edit a StaticTea html template with an html editor and
+ validate it online with w3.org's validator.
+
+ Comment syntax varies depending on the type of template file and
+ sometimes depending on the location within the file. StaticTea
+ supports several varieties and you can specify others.
+
+ You want to distinguish StaticTea commands from normal comments
+ when you create your own. The convention is to add a $ as the
+ last character of the prefix and only use $ with StaticTea
+ commands and space for normal comments.
+
+ Built in Prefixes:
+
+ - html: <!--$ and -->
+ - html: &lt;!--$ and --&gt; for textarea elements
+ - bash: #$
+ - config files: ;$
+ - C++: //$
+ - C language: ​/\star$ and \star​/
+
+ You can define other comment types on the command line using the
+ prepost option one or more times. When you specify your own
+ prepost values, the defaults no longer exist so you have control
+ of which prefixes get used.
+
+ You separate the prefix from the postfix with one space and the
+ postfix is optional.
+
+ examples:
+
+ #+BEGIN_SRC
+ --prepost="@$ |"
+ --prepost="[comment$ ]"
+ --prepost="#[$ ]#"
+ #+END_SRC
+
+ [[#contents][茶]]
+
+** Encoding and Line Endings
+:PROPERTIES:
+:CUSTOM_ID: encoding-and-line-endings
+:END:
+
+ Templates are utf-8 encoded.  Two line endings are supported on
+ all platforms: LF, and CR/LF.  Line endings are preserved.  The
+ template syntax only uses ascii except unicode characters are used
+ in quoted strings.
+
+ [[#contents][茶]]
+
+** Log File
+   :PROPERTIES:
+   :CUSTOM_ID: log-file
+   :END:
+
+ The log file contains timing, memory usage and low priority
+ warnings. The log file, statictea.log, is created in the current
+ folder (system default log location?).  Log information is
+ appended to the file and it grows without bounds. Make sure to
+ setup log rotation. When the file size exceeds 1 GB a warning
+ message is generated.
+
+ [[#contents][茶]]
+
+** Limits
+ :PROPERTIES:
+   :CUSTOM_ID: limits
+   :END:
+
+ There is no limit on the size of the template. However there are
+ several limits on variables and commands.
+
+ Having limits may seem restrictive but there are many reasons for
+ them.
+
+ - It catches common mistakes, like missing the end block.
+ - The limits tells how to best use the program.
+ - It's easier to test the limits and verify the warning messages.
+ - It's easier to optimize the code when the limits are defined.
+
+ You can override the t.maxLine and t.maxRepeat limits but not
+ others. Here are the limits:
+
+ - t.maxLines -- number of lines before the end block
+   command. Useful when you forget to end the block. You can
+   override this with bigger or smaller values.  Default 10.
+ - t.maxRepeat -- maximum number of times to repeat a block.
+ - Maximum command line length -- 1024 characters.
+ - Maximum variable name length -- 64 characters, 66 including
+   option prefix.
+ - Maximum literal string length -- 256 bytes. Use json for
+   longer strings.
+
+ [[#contents][茶]]
+
+** System Defaults
+   :PROPERTIES:
+   :CUSTOM_ID: system-defaults
+   :END:
+
+ You can use the system variables in a replacement block to see
+ their default values. The following example shows the default
+ values of some of the system variables.
+
+ template:
+
+ #+BEGIN_SRC
+ <!--$ block -->
+ default t.local = {t.local}
+ default t.global = {t.global}
+ default t.maxLines = {t.maxLines}
+ default t.maxRepeat = {t.maxRepeat}
+ default t.output = {t.output}
+ default t.repeat = {t.repeat}
+ default t.server = {t.server}
+ <!--$ endblock -->
+ #+END_SRC
+
+ result:
+
+ #+BEGIN_SRC
+ default t.local = {}
+ default t.global = {}
+ default t.maxLines = 10
+ default t.maxRepeat = 100
+ default t.output = "result"
+ default t.repeat = 1
+ default t.server = {}
+ #+END_SRC
+
+ [[#contents][茶]]
+
+* Function Docs
+:PROPERTIES:
+:CUSTOM_ID: function-docs
+:END:
+
 ** case()
 :PROPERTIES:
 :CUSTOM_ID: case
@@ -1525,289 +1803,15 @@ allowed verion of 1.20.3.
 
 [[#contents][茶]]
 
-* Run StaticTea
-:PROPERTIES:
-:CUSTOM_ID: run-statictea
-:END:
-
-You run StaticTea from the command line.
-
-- Warning messages go to standard error.
-- If you don't specify the result argument, the result goes to standard out.
-- If you specify "stdin" for the template, the template comes
-  from stdin.
-
-The example below shows a typical invocation which specifies four
-file arguments, the server json, the shared json, the template
-and the result.
-
-#+BEGIN_SRC
-statictea \
-  --server server.json \
-  --shared shared.json \
-  --template template.html \
-  --result result.html
-#+END_SRC
-
-The StaticTea command line options:
-
-- help -- show options and usage documentation.
-- version -- outputs the version number.
-- server -- the server json file(s), you can specify multiple.
-- shared -- the shared json file(s), you can specify multiple.
-- template -- the template file, or "stdin".
-- result -- the result file, or standard out when not specified.
-- update -- update the template replace blocks. See the
-  [[#replace-command][Replace Command]].
-- prepost -- add a command prefix and postfix, you can specify
-  multiple. When you specify values, the defaults are no longer
-  used. See the [[#prefix-postfix][Prefix Postfix]] section.
-
-[[#contents][茶]]
-
-* Miscellaneous
-:PROPERTIES:
-:CUSTOM_ID: miscellaneous
-:END:
-
-Miscellaneous topics:
-
-- [[#warning-messages][Warning Messages]]
-- [[#prefix-postfix][Prefix Postfix]]
-- [[#encoding-and-line-endings][Encoding and Line Endings]]
-- [[#log-file][Log File]]
-- [[#limits][Limits]]
-- [[#system-defaults][System Defaults]]
-
-** Warning Messages
-   :PROPERTIES:
-   :CUSTOM_ID: warning-messages
-   :END:
-
- When StaticTea detects a problem, a warning message is written to
- standard error, the problem is skipped, and processing
- continues.
-
- For example, if a variable in a replacement block is used but it
- doesn't exist, the bracketed variable remains as is in the
- result, and a message is output to standard error. There are many
- other potential warnings.
-
- It’s good style to change your template or json to be free of
- messages.
-
- Each warning message shows the file and line number where the
- problem happened.
-
- example messages:
-
- - tea.html(45): w1: Unknown server variable: teaMaster.
- - tea.html(45): w2: The postfix is missing.
- - tea.html(45): w3: The command line doesn't have a valid
-   command, found: blocker.
- - tea.html(45): w4: Unknown system variable: t.asdf.
- - tea.html(45): w5: Server json file not found: server.json.
- - tea.html(45): w6: Unable to parse server.json.
-
- The statictea program returns 0 when no message gets
- output to standard error, else it returns 1.
-
- Example of running statictea when a variable is missing:
-
- template:
-
- #+BEGIN_SRC
- <!--$ block -->
- You're a {s.webmaster},
- I'm a {s.teaMaster}!
- <!--$ endblock -->
- #+END_SRC
-
- server json:
-
- #+BEGIN_SRC
- {
-   "webmaster": "html wizard"
- }
- #+END_SRC
-
- stderr:
-
- #+BEGIN_SRC
- template.html(2): w1: Unknown server variable: s.teaMaster
- #+END_SRC
-
- result:
-
- #+BEGIN_SRC
- You're a html wizard,
- I'm a {s.teaMaster}!
- #+END_SRC
-
- You can write your own warning messages using the system t.output
- set to stderr. In the following example a warning message is
- written to standard error when the server admin variable is
- missing. When it is not missing nothing gets output.
-
- template:
-
- #+BEGIN_SRC
- <--$ nextline t.output = if( \-->
- <--$ : exists("admin"), "skip", "stderr") -->
- warning: the admin variable is missing
- #+END_SRC
-
- [[#contents][茶]]
-
-** Prefix Postfix
-   :PROPERTIES:
-   :CUSTOM_ID: prefix-postfix
-   :END:
-
- You make the template commands look like comments tailored for
- your template file type. This allows you to edit the template
- using its native editor and run other native tools.  For example,
- you can edit a StaticTea html template with an html editor and
- validate it online with w3.org's validator.
-
- Comment syntax varies depending on the type of template file and
- sometimes depending on the location within the file. StaticTea
- supports several varieties and you can specify others.
-
- You want to distinguish StaticTea commands from normal comments
- when you create your own. The convention is to add a $ as the
- last character of the prefix and only use $ with StaticTea
- commands and space for normal comments.
-
- Built in Prefixes:
-
- - html: <!--$ and -->
- - html: &lt;!--$ and --&gt; for textarea elements
- - bash: #$
- - config files: ;$
- - C++: //$
- - C language: ​/\star$ and \star​/
-
- You can define other comment types on the command line using the
- prepost option one or more times. When you specify your own
- prepost values, the defaults no longer exist so you have control
- of which prefixes get used.
-
- You separate the prefix from the postfix with one space and the
- postfix is optional.
-
- examples:
-
- #+BEGIN_SRC
- --prepost="@$ |"
- --prepost="[comment$ ]"
- --prepost="#[$ ]#"
- #+END_SRC
-
- [[#contents][茶]]
-
-** Encoding and Line Endings
-:PROPERTIES:
-:CUSTOM_ID: encoding-and-line-endings
-:END:
-
- Templates are utf-8 encoded.  Two line endings are supported on
- all platforms: LF, and CR/LF.  Line endings are preserved.  The
- template syntax only uses ascii except unicode characters are used
- in quoted strings.
-
- [[#contents][茶]]
-
-** Log File
-   :PROPERTIES:
-   :CUSTOM_ID: log-file
-   :END:
-
- The log file contains timing, memory usage and low priority
- warnings. The log file, statictea.log, is created in the current
- folder (system default log location?).  Log information is
- appended to the file and it grows without bounds. Make sure to
- setup log rotation. When the file size exceeds 1 GB a warning
- message is generated.
-
- [[#contents][茶]]
-
-** Limits
- :PROPERTIES:
-   :CUSTOM_ID: limits
-   :END:
-
- There is no limit on the size of the template. However there are
- several limits on variables and commands.
-
- Having limits may seem restrictive but there are many reasons for
- them.
-
- - It catches common mistakes, like missing the end block.
- - The limits tells how to best use the program.
- - It's easier to test the limits and verify the warning messages.
- - It's easier to optimize the code when the limits are defined.
-
- You can override the t.maxLine and t.maxRepeat limits but not
- others. Here are the limits:
-
- - t.maxLines -- number of lines before the end block
-   command. Useful when you forget to end the block. You can
-   override this with bigger or smaller values.  Default 10.
- - t.maxRepeat -- maximum number of times to repeat a block.
- - Maximum command line length -- 1024 characters.
- - Maximum variable name length -- 64 characters, 66 including
-   option prefix.
- - Maximum literal string length -- 256 bytes. Use json for
-   longer strings.
-
- [[#contents][茶]]
-
-** System Defaults
-   :PROPERTIES:
-   :CUSTOM_ID: system-defaults
-   :END:
-
- You can use the system variables in a replacement block to see
- their default values. The following example shows the default
- values of some of the system variables.
-
- template:
-
- #+BEGIN_SRC
- <!--$ block -->
- default t.local = {t.local}
- default t.global = {t.global}
- default t.maxLines = {t.maxLines}
- default t.maxRepeat = {t.maxRepeat}
- default t.output = {t.output}
- default t.repeat = {t.repeat}
- default t.server = {t.server}
- <!--$ endblock -->
- #+END_SRC
-
- result:
-
- #+BEGIN_SRC
- default t.local = {}
- default t.global = {}
- default t.maxLines = 10
- default t.maxRepeat = 100
- default t.output = "result"
- default t.repeat = 1
- default t.server = {}
- #+END_SRC
-
- [[#contents][茶]]
-
- # You run the command below to make the table of contents. Copy
- # to scratch to remove the leading pound signs.
- # grep '^\* ' readme.org | grep -v ":notoc" | cut -c 3- | \
- # awk '{a = $0; gsub(" ", "-", a); printf "- [[#%s][%s]]\n", tolower(a), $0 }'
 * Contents :notoc:
 :PROPERTIES:
 :CUSTOM_ID: contents
 :END:
+
+# You run the command below to make the table of contents. Copy
+# to scratch to remove the leading pound signs.
+# grep '^\* ' readme.org | grep -v ":notoc" | cut -c 3- | \
+# awk '{a = $0; gsub(" ", "-", a); printf "- [[#%s][%s]]\n", tolower(a), $0 }'
 
 - [[#advantages][Advantages]]
 - [[#how-it-works][How it Works]]
@@ -1818,6 +1822,7 @@ Miscellaneous topics:
 - [[#functions][Functions]]
 - [[#run-statictea][Run StaticTea]]
 - [[#miscellaneous][Miscellaneous]]
+- [[#function-docs][Function Docs]]
 
 * Tea Info                                                            :notoc:
 

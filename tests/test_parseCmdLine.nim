@@ -149,6 +149,13 @@ suite "parseCmdLine.nim":
       middleStart = 9, middleLen = 15, postfix = "", ending = "")
     check testParseCmdLine(line, expectedLineParts = elps)
 
+  # todo: enable this test.
+  # test "parseCmdLine endblock":
+  #   let line = "#$ endblock\n"
+  #   var elps = newLineParts(prefix = "#$", command = "endblock",
+  #     middleStart = 11, middleLen = 1, postfix = "", ending = "")
+  #   check testParseCmdLine(line, expectedLineParts = elps)
+
   test "no prefix":
     let line = " nextline -->\n"
     check parseCmdLineError(line)

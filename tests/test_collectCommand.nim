@@ -10,8 +10,8 @@ import strutils
 
 proc testCollectCommand(
     content: string,
-    eCmdLines: seq[string],
-    eCmdLineParts: seq[LineParts],
+    eCmdLines: seq[string] = @[],
+    eCmdLineParts: seq[LineParts] = @[],
     eResultStreamLines: seq[string] = @[],
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
@@ -218,3 +218,20 @@ asdf
     check testCollectCommand(content, @[], @[],
                       eResultStreamLines = eResultStreamLines,
                       eErrLines = @[warning1, warning2])
+
+# todo: enable test
+#   test "cmp example":
+#     let content = """
+# #$ block \
+# #$ cond1 = cmp(4, 5); \
+# #$ cond2 = cmp(2, 2); \
+# #$ cond3 = cmp(5, 4)
+# cmp(4, 5) returns {cond1}
+# cmp(2, 2) returns {cond2}
+# cmp(5, 4) returns {cond3}
+# #$ endblock
+# """
+#     let eResultStreamLines = @[
+#       "asdf"
+#     ]
+#     check testCollectCommand(content)

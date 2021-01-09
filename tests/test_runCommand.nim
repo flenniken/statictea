@@ -46,7 +46,7 @@ proc getCmdLineParts(cmdLines: seq[string]): seq[LineParts] =
 proc getStatements(cmdLines: seq[string], cmdLineParts: seq[LineParts]): seq[Statement] =
   ## Return a list of statements for the given lines.
   let matchers = getCompiledMatchers()
-  for statement in yieldStatements(cmdLines, cmdLineParts, matchers.spaceTabMatcher):
+  for statement in yieldStatements(cmdLines, cmdLineParts, matchers.allSpaceTabMatcher):
     result.add(statement)
 
 proc testGetStatements(content: string): seq[Statement] =

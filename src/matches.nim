@@ -34,7 +34,7 @@ type
     commandMatcher*: Matcher
     variableMatcher*: Matcher
     equalSignMatcher*: Matcher
-    spaceTabMatcher*: Matcher
+    allSpaceTabMatcher*: Matcher
     numberMatcher*: Matcher
     stringMatcher*: Matcher
     leftParenthesesMatcher*: Matcher
@@ -85,7 +85,7 @@ proc getCommandMatcher*(): Matcher =
 proc getLastPartMatcher*(postfix: string): Matcher =
   ## Get the matcher that matches the optional continuation slash, the
   ## optional postfix and the line endings. The postfix used is
-  ## remembered in the matcher object.
+  ## remembered in the matcher object returned.
   # Note: nim sets the regex anchor option.
   var pattern: string
   if postfix == "":
@@ -119,15 +119,15 @@ proc getLastPart*(matcher: Matcher, line: string): Option[Matches] =
 #   -->n
 #    -->
 
-proc getSpaceTabMatcher*(): Matcher =
+proc getAllSpaceTabMatcher*(): Matcher =
   ## Return a matcher that determines whether a string is all spaces
   ## and tabs.
   result = newMatcher(r"^[ \t]*$", 0)
 
-proc notEmptyOrSpaces*(spaceTabMatcher: Matcher, text: string): bool =
+proc notEmptyOrSpaces*(allSpaceTabMatcher: Matcher, text: string): bool =
   ## Return true when a statement is not empty or not all whitespace.
   if text.len != 0:
-    let matches = getMatches(spaceTabMatcher, text)
+    let matches = getMatches(allSpaceTabMatcher, text)
     if not matches.isSome:
       result = true
 
@@ -210,7 +210,7 @@ proc getCompiledMatchers*(prepostTable: PrepostTable): CompiledMatchers =
   result.prefixMatcher = getPrefixMatcher(result.prepostTable)
   result.commandMatcher = getCommandMatcher()
   result.variableMatcher = getVariableMatcher()
-  result.spaceTabMatcher = getSpaceTabMatcher()
+  result.allSpaceTabMatcher = getAllSpaceTabMatcher()
   result.numberMatcher = getNumberMatcher()
   result.equalSignMatcher = getEqualSignMatcher()
   result.stringMatcher = getStringMatcher()

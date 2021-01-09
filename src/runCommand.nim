@@ -50,7 +50,7 @@ proc warn(message: string) =
   echo message
 
 iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
-    seq[LineParts], spaceTabMatcher: Matcher): Statement {.tpub.} =
+    seq[LineParts], allSpaceTabMatcher: Matcher): Statement {.tpub.} =
   ## Iterate through the command's statements.  Statements are
   ## separated by semicolons and are not empty or all spaces.
 
@@ -79,7 +79,7 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
       let ch = line[pos]
       if state == State.start:
         if ch == ';':
-          if notEmptyOrSpaces(spaceTabMatcher, text):
+          if notEmptyOrSpaces(allSpaceTabMatcher, text):
             yield Statement(text: text, lineNum: lineNum, start: start)
           text.setLen(0)
           lineNum = lp.lineNum
@@ -104,7 +104,7 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
       elif state == slashdouble:
         state = double
       text.add(ch)
-  if notEmptyOrSpaces(spaceTabMatcher, text):
+  if notEmptyOrSpaces(allSpaceTabMatcher, text):
     yield Statement(text: text, lineNum: lineNum, start: start)
 
 proc getString*(env: var Env, compiledMatchers: Compiledmatchers,
@@ -425,7 +425,7 @@ proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
 
   # Loop over the statements and run each one.
   for statement in yieldStatements(cmdLines, cmdLineParts,
-      compiledMatchers.spaceTabMatcher):
+      compiledMatchers.allSpaceTabMatcher):
     # Run the statement.  When there is a statement error, no
     # nameValue is returned and we skip the statement.
     let spaceNameValue = runStatement(env, statement, compiledMatchers,

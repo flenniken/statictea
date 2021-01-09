@@ -95,7 +95,7 @@ suite "matches.nim":
     check checkGetLastPart(matcher, "<!--$ nextline a\\\r\n", 16, @[r"\", "\r\n"], 3)
 
   test "get space tab":
-    let matcher = getSpaceTabMatcher()
+    let matcher = getAllSpaceTabMatcher()
     check checkMatcher(matcher, "    ", 0, @[], 4)
     check checkMatcher(matcher, " \t \t   ", 0, @[], 7)
     check not matcher.getMatches("    s   ", 0).isSome

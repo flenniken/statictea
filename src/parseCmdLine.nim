@@ -73,6 +73,7 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
   var lastPart = lastPartO.get()
   let (continuation, ending) = lastPart.get2Groups()
   lineParts.continuation = if continuation == "": false else: true
+  # todo: middleLen becomes -1 for "#$ endblock\n".
   lineParts.middleLen = line.len - lastPart.length - lineParts.middleStart
 
   # Line ending is required except for the last line of the file.

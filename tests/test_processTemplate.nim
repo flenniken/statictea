@@ -148,13 +148,10 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
     let content = """
 <!--$ replace t.content=h.header -->
 <!DOCTYPE html>
-<html lang="{s.languageCode}"
-dir="{s.languageDirection}">
+<html lang="{s.languageCode}" dir="{s.languageDirection}">
 <head>
 <meta charset="UTF-8"/>
-
 <title>{s.title}</title>
-
 <--$ endblock -->
 """
 
@@ -311,6 +308,28 @@ and the shared json has {jsonElements}.
 # {msg}
 # """
 #     check testProcessTemplate(content = content)
+
+#   test "cmd example":
+
+#     let content = """
+# #$ block \
+# #$ cond1 = cmp(4, 5); \
+# #$ cond2 = cmp(2, 2); \
+# #$ cond3 = cmp(5, 4)
+# cmp(4, 5) returns {cond1}
+# cmp(2, 2) returns {cond2}
+# cmp(5, 4) returns {cond3}
+# #$ endblock
+# """
+#     let eResultLines = @[
+#       "cmp(4, 5) returns -1",
+#       "cmp(2, 2) returns 0",
+#       "cmp(5, 4) returns 1",
+#     ]
+#     check testProcessTemplate(content = content, eResultLines = eResultLines)
+
+
+
 
 
 # todo: readme examples
