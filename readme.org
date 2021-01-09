@@ -121,7 +121,7 @@ replacement block starts after the command and continues until
 the endblock line is found. It behaves like the nextline command
 except with multiple lines.
 
-In the following example the block has two lines. The block
+In the following example the block has three lines. The block
 contains three replacement variables, weekday, name and time.
 
 template:
@@ -174,7 +174,7 @@ If you don't assign the t.content variable, the block content is
 used as is.  This is good for testing changes you want to make to
 the shared value.
 
-The following example shares a common header between templates.
+The following example uses a common header from the shared json. between templates.
 
 template:
 
@@ -259,12 +259,11 @@ shared json:
 
 #+BEGIN_SRC
 {
-  "header": "<!DOCTYPE html>\n
-<html lang=\"{s.languageCode}\"
-dir=\"{s.languageDirection}\">\n
-<head>\n
-<meta charset=\"UTF-8\"/>\n
-<title>{s.title}</title>\n"
+  "header": "<!DOCTYPE html>
+<html lang=\"{s.languageCode}\" dir=\"{s.languageDirection}\">
+<head>
+<meta charset=\"UTF-8\"/>
+<title>{s.title}</title>"
 }
 #+END_SRC
 
@@ -760,7 +759,7 @@ template.html(45): missing admin var
  #+END_SRC
 
  To create a static page that has more products for better testing
- you could use the skip option like this:
+ you could use the repeat variable like this:
 
  template:
 
@@ -813,7 +812,7 @@ template.html(45): missing admin var
     :END:
 
 The t.row variable contains the current row number for blocks
-that repeat. The row numbers start at 0 and increase.  You use it
+that repeat. The row numbers start at 0 and increases.  You use it
 to format lists and other repeating content in the template.
 
 Here is an example using the row variable.  In the example the
@@ -892,8 +891,9 @@ StaticTea variables types:
 You define a string with single or double quotes and use them in
 statements.
 
-It's easier to define long strings in the json files instead of
-in the template.
+Literal strings are limited to 256 bytes, if you need a longer
+string define it in a json file.
+
 
 example strings:
 
@@ -922,9 +922,8 @@ result:
 :CUSTOM_ID: integer
 :END:
 
-An integer is a 64 bit signed number.  When you pass an integer to
-a function that takes a string, the number is converted to a
-string. Plus signs are not used with numbers.
+An integer is a 64 bit signed number.  Plus signs are not used
+with numbers.
 
 Example numbers:
 
@@ -942,10 +941,8 @@ Example numbers:
 :CUSTOM_ID: float
 :END:
 
-A float is a 64 bit real number. Like integers a float is
-converted to a string when passed to a function taking a sring.
-A float has a decimal point and starts with a digit or minus
-sign.
+A float is a 64 bit real number, it has a decimal point and
+starts with a digit or minus sign.
 
 Example floats:
 
@@ -963,7 +960,7 @@ Example floats:
 :CUSTOM_ID: dictionary
 :END:
 
-You access dictionary items with get and you define them in the
+You access dictionary items with the get function and you define them in the
 json files.
 
 [[#contents][茶]]
@@ -973,7 +970,7 @@ json files.
 :CUSTOM_ID: list
 :END:
 
-Like dictionaires, you access list items with get and you
+Like dictionaires, you access list items with the get function and you
 define them in the json files.
 
 [[#contents][茶]]
@@ -1104,7 +1101,7 @@ cmp(5, 4) returns 1
 
 Here is another example using cmp to "ellipsize" a string when it
 gets long. The following example ellipsizes when a name is longer
-than 10 characters.
+than 10 bytes.
 
 #+BEGIN_SRC
 <!--$ # If the name is longer than 10 characters, -->
@@ -1716,8 +1713,8 @@ Miscellaneous topics:
 
  Templates are utf-8 encoded.  Two line endings are supported on
  all platforms: LF, and CR/LF.  Line endings are preserved.  The
- template syntax only uses ascii except unicode characters may
- appear in quoted strings.
+ template syntax only uses ascii except unicode characters are used
+ in quoted strings.
 
  [[#contents][茶]]
 
@@ -1761,9 +1758,8 @@ Miscellaneous topics:
  - Maximum command line length -- 1024 characters.
  - Maximum variable name length -- 64 characters, 66 including
    option prefix.
- - Maximum literal string length -- 256 characters. Use json for
+ - Maximum literal string length -- 256 bytes. Use json for
    longer strings.
- - Maximum json file size -- ? bytes.
 
  [[#contents][茶]]
 

@@ -47,6 +47,19 @@ unchanged.
 
 ]#
 
+
+iterator yieldContentLine*(content: string): string =
+  ## Yield one content line at a time and keep the line endings.
+  var start = 0
+  var pos: int
+  for pos in 0 ..< content.len:
+    let ch = content[pos]
+    if ch == '\n':
+      yield(content[start .. pos])
+      start = pos+1
+  if start < content.len:
+    yield(content[start ..< content.len])
+
 proc processTemplateLines(env: var Env, variables: var Variables,
                           prepostTable: PrepostTable) =
   ## Process the given template file.
@@ -76,7 +89,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     # Run the commands that have statements and skip the others.
     let command = cmdLineParts[0].command
     if not (command in ["nextline", "block", "replace"]):
-      # todo: show error when we get endblock before block.
+      # todo: show error when we get endblock before block?
       # todo: make it an error when other commands have statements?
       continue
 
@@ -100,10 +113,19 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       break # Cannot create temp file or allocate memory, quit.
     var tempSegments = tempSegmentsO.get()
 
-    # Read the replacement lines and store their compiled segments in
-    # TempSegments.
-    for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
-      storeLineSegments(env, tempSegments, compiledMatchers, line)
+    if command == "replace" and variables.contains("content"):
+      # Discard the replacement block lines.
+      for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
+        discard
+      # Use the content as the replacement lines.
+      var content = getVariable(variables, "t.", "content").get().stringv
+      for line in yieldContentLine(content):
+        storeLineSegments(env, tempSegments, compiledMatchers, line)
+    else:
+      # Read the replacement lines and store their compiled segments in
+      # TempSegments.
+      for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
+        storeLineSegments(env, tempSegments, compiledMatchers, line)
 
     # Generate t.repeat number of replacement blocks. Recalculate the
     # variables for each one.

@@ -346,10 +346,10 @@ when defined(test):
       result = true
     else:
       if items.len != expectedItems.len:
-        echo "~~~~~~~~~~ $1 ~~~~~~~~~~~:" % name
+        echo "~~~~~~~~~~ $1 ($2)~~~~~~~~~~~:" % [name, $items.len]
         for item in items:
           echo $item
-        echo "~~~~~~ expected $1 ~~~~~~:" % name
+        echo "~~~~~~ expected $1 ($2)~~~~~~:" % [name, $expectedItems.len]
         for item in expectedItems:
           echo $item
       else:

@@ -57,8 +57,30 @@ proc testProcessTemplate(content: string = "",
   discard tryRemoveFile("server.json")
   discard tryRemoveFile("shared.json")
 
+proc testYieldcontentline(content: string, eLines: seq[string] = @[]): bool =
+  var lines = newSeq[string]()
+  for line in yieldContentLine(content):
+    lines.add(line)
+  result = expectedItems("lines", lines, eLines)
 
 suite "processTemplate":
+
+  test "yieldContentLine empty":
+    check testYieldcontentline("")
+
+  test "yieldContentLine 1":
+    check testYieldcontentline("1", @["1"])
+
+  test "yieldContentLine 2":
+    let content = "1\ntwo\r\n"
+    check testYieldcontentline(content, @["1\n", "two\r\n"])
+
+  test "yieldContentLine 3":
+    let content = "1\ntwo\r\nthree"
+    check testYieldcontentline(content, @["1\n", "two\r\n", "three"])
+
+  test "yieldContentLine 4":
+    check testYieldcontentline("\n", @["\n"])
 
   test "createFile":
     let filename = "template.html"
@@ -102,63 +124,67 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
     check testProcessTemplate(content = content, serverJson =
         serverJson, eResultLines = eResultLines)
 
-#   test "Shared Header":
-#     let content = """
-# <!--$ replace t.content=h.header -->
-# <!--$ endblock -->
-# """
-#     let sharedJson = """
-# {
-#   "header": "<!doctype html>\n<html lang=\"en\">\n"
-# }
-# """
-#     let eResultLines = @[
-#       """<!doctype html>""",
-#       """<html lang="en">"""
-#     ]
-#     check testProcessTemplate(content = content, sharedJson =
-#         sharedJson, eResultLines = eResultLines)
+  test "Shared Header":
+    let content = """
+<!--$ replace t.content=h.header -->
+<!--$ endblock -->
+"""
 
-#   test "Shared Header2":
-#     let content = """
-# <!--$ replace t.content=h.header -->
-# <!DOCTYPE html>
-# <html lang="{s.languageCode}"
-# dir="{s.languageDirection}">
-# <head>
-# <meta charset="UTF-8"/>
-# <title>{s.title}</title>
-# <--$ endblock -->
-# """
-#     let serverJson = """
-# {
-# "languageCode": "en",
-# "languageDirection": "ltr",
-# "title": "Teas in England"
-# }
-# """
+    let sharedJson = """
+{
+  "header": "<!doctype html>\n<html lang=\"en\">\n"
+}
+"""
 
-#     let sharedJson = """
-# {
-#   "header": "<!DOCTYPE html>\n
-# <html lang=\"{s.languageCode}\"
-# dir=\"{s.languageDirection}\">\n
-# <head>\n
-# <meta charset=\"UTF-8\"/>\n
-# <title>{s.title}</title>\n"
-# }
-# """
+    let eResultLines = @[
+      """<!doctype html>""",
+      """<html lang="en">"""
+    ]
 
-#     let eResultLines = @[
-#       "<!DOCTYPE html>",
-#       "<html lang=\"en\"",
-#       "dir=\"ltr\">",
-#       "<head>",
-#       "<meta charset=\"UTF-8\"/>",
-#       "<title>Teas in England</title>",
-#     ]
-#     check testProcessTemplate(content = content, serverJson = serverJson, sharedJson =
-#         sharedJson, eResultLines = eResultLines)
+    check testProcessTemplate(content = content, sharedJson =
+        sharedJson, eResultLines = eResultLines)
+
+  test "Shared Header2":
+    let content = """
+<!--$ replace t.content=h.header -->
+<!DOCTYPE html>
+<html lang="{s.languageCode}"
+dir="{s.languageDirection}">
+<head>
+<meta charset="UTF-8"/>
+
+<title>{s.title}</title>
+
+<--$ endblock -->
+"""
+
+    let serverJson = """
+{
+"languageCode": "en",
+"languageDirection": "ltr",
+"title": "Teas in England"
+}
+"""
+
+    let sharedJson = """
+{
+  "header": "<!DOCTYPE html>
+<html lang=\"{s.languageCode}\" dir=\"{s.languageDirection}\">
+<head>
+<meta charset=\"UTF-8\"/>
+<title>{s.title}</title>"
+}
+"""
+
+    let eResultLines = @[
+      "<!DOCTYPE html>",
+      "<html lang=\"en\" dir=\"ltr\">",
+      "<head>",
+      "<meta charset=\"UTF-8\"/>",
+      "<title>Teas in England</title>",
+    ]
+    check testProcessTemplate(content = content, serverJson = serverJson, sharedJson =
+        sharedJson, eResultLines = eResultLines)
 
   test "Comment":
 
@@ -291,3 +317,5 @@ and the shared json has {jsonElements}.
 # todo: repeat of 0
 # todo: repeat of 0 with warnings to verify line number
 # todo: repeat > 0 with warnings to verify line number
+# todo: when t.content is not set for a replace block.
+# todo: the value is clipped to the maximum, see readme.
