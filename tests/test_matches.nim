@@ -31,8 +31,17 @@ suite "matches.nim":
     check checkMatcher(prefixMatcher, "#$ nextline   \n", 0, @["#$"], 3)
     check checkMatcher(prefixMatcher, "#$ nextline   \\\n", 0, @["#$"], 3)
 
+    check checkMatcher(prefixMatcher, "#$", 0, @["#$"], 2)
+    check checkMatcher(prefixMatcher, "#$ ", 0, @["#$"], 3)
+    check checkMatcher(prefixMatcher, "#$    ", 0, @["#$"], 6)
+    check checkMatcher(prefixMatcher, "#$nextline", 0, @["#$"], 2)
+    check checkMatcher(prefixMatcher, "#$ nextline", 0, @["#$"], 3)
+    check checkMatcher(prefixMatcher, "#$  nextline", 0, @["#$"], 4)
+    check checkMatcher(prefixMatcher, "#$\n", 0, @["#$"], 3)
+    check checkMatcher(prefixMatcher, "<!--$", 0, @["<!--$"], 5)
+    check checkMatcher(prefixMatcher, "<!--$ ", 0, @["<!--$"], 6)
+
     check not prefixMatcher.getMatches("<--$ nextline -->", 0).isSome
-    check not prefixMatcher.getMatches("<!--$nextline -->", 0).isSome
 
   test "getUserPrepostTable user prefix":
     var prepostList = @[("abc", "def")]
