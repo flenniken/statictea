@@ -62,7 +62,7 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
         dumpCmdLines(resultStream, cmdLines, cmdLineParts, line)
         if line == "":
           return # No more lines
-        break # Continue looking for a command.
+        break # Start looking for another command.
 
 when defined(test):
   proc splitNewLines*(content: string): seq[string] =

@@ -128,8 +128,8 @@ the next line
 <!--$ nextline \-->
 asdf
 """
-    let warning = "template.html(2): w24: Missing the continuation line, " &
-      "abandoning the command."
+    let warning = "template.html(2): w24: Missing the continuation command, " &
+      "abandoning the previous command."
     check testCollectCommand(content, @[], @[],
                       eResultStreamLines = splitNewLines(content),
                       eErrLines = @[warning])
@@ -140,8 +140,8 @@ asdf
 <!--$ block -->
 asdf
 """
-    let warning = "template.html(2): w24: Missing the continuation line, " &
-      "abandoning the command."
+    let warning = "template.html(2): w24: Missing the continuation command, " &
+      "abandoning the previous command."
     check testCollectCommand(content, @[], @[],
                       eResultStreamLines = splitNewLines(content),
                       eErrLines = @[warning])
@@ -151,8 +151,8 @@ asdf
     let content = """
 <!--$ nextline \-->
 """
-    let warning = "template.html(1): w24: Missing the continuation line, " &
-      "abandoning the command."
+    let warning = "template.html(1): w24: Missing the continuation command, " &
+      "abandoning the previous command."
     check testCollectCommand(content, @[], @[],
                       eResultStreamLines = splitNewLines(content),
                       eErrLines = @[warning])
@@ -170,8 +170,8 @@ asdf
 asdf
 ttasdfasdf
 """
-    let warning = "template.html(2): w24: Missing the continuation line, " &
-      "abandoning the command."
+    let warning = "template.html(2): w24: Missing the continuation command, " &
+      "abandoning the previous command."
     check testCollectCommand(content, @[], @[],
                       eResultStreamLines = splitNewLines(content),
                       eErrLines = @[warning])
@@ -189,8 +189,8 @@ asdf
 """
     let eCmdLines = @["<!--$ nextline -->\n"]
     let eCmdLineParts = @[newLineParts(lineNum = 6)]
-    let warning = "template.html(2): w24: Missing the continuation line, " &
-      "abandoning the command."
+    let warning = "template.html(2): w24: Missing the continuation command, " &
+      "abandoning the previous command."
     let p = splitNewLines(content)
     let eResultStreamLines = @[p[0], p[1], p[2], p[3], p[4]]
     check testCollectCommand(content, eCmdLines, eCmdLineParts,
@@ -208,28 +208,41 @@ ttasdfasdf
 block
 asdf
 """
-    let warning1 = "template.html(2): w24: Missing the continuation line, " &
-      "abandoning the command."
-    let warning2 = "template.html(7): w24: Missing the continuation line, " &
-      "abandoning the command."
+# todo: compare the start of the error lines: template.html(2): w24:
+# Then you can change the wording without changing the tests.
+
+    let warning1 = "template.html(2): w24: Missing the continuation command, " &
+      "abandoning the previous command."
+    let warning2 = "template.html(7): w24: Missing the continuation command, " &
+      "abandoning the previous command."
     let eResultStreamLines = splitNewLines(content)
     check testCollectCommand(content, @[], @[],
                       eResultStreamLines = eResultStreamLines,
                       eErrLines = @[warning1, warning2])
 
-# todo: enable test
-#   test "cmp example":
-#     let content = """
-# #$ block \
-# #$ cond1 = cmp(4, 5); \
-# #$ cond2 = cmp(2, 2); \
-# #$ cond3 = cmp(5, 4)
-# cmp(4, 5) returns {cond1}
-# cmp(2, 2) returns {cond2}
-# cmp(5, 4) returns {cond3}
-# #$ endblock
-# """
-#     let eResultStreamLines = @[
-#       "asdf"
-#     ]
-#     check testCollectCommand(content)
+  test "missing continue command":
+    let content = """
+#$ block \
+#$ cond1 = cmp(4, 5); \
+#$ cond2 = cmp(2, 2); \
+#$ cond3 = cmp(5, 4)
+cmp(4, 5) returns {cond1}
+cmp(2, 2) returns {cond2}
+cmp(5, 4) returns {cond3}
+#$ endblock
+"""
+    let eErrLines = @[
+      "template.html(2): w22: No command found at column 4, treating it as a non-command line.",
+      "template.html(2): w24: Missing the continuation command, abandoning the previous command.",
+      "template.html(3): w22: No command found at column 4, treating it as a non-command line.",
+      "template.html(4): w22: No command found at column 4, treating it as a non-command line.",
+    ]
+    let eCmdLines = @["#$ endblock\n"]
+    let eCmdLineParts = @[newLineParts(prefix = "#$", command =
+        "endblock", lineNum = 8, middleStart = 11, postfix = "")]
+
+    let p = splitNewLines(content)
+    let eResultStreamLines = p[0 .. ^2]
+
+    check testCollectCommand(content, eErrLines = eErrLines, eCmdLines = eCmdLines,
+      eCmdLineParts = eCmdLineParts, eResultStreamLines = eResultStreamLines)

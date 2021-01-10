@@ -1360,9 +1360,9 @@ template:
 
 #+BEGIN_SRC
 #$ block \
-#$ cond1 = cmp(4, 5); \
-#$ cond2 = cmp(2, 2); \
-#$ cond3 = cmp(5, 4)
+#$ : cond1 = cmp(4, 5); \
+#$ : cond2 = cmp(2, 2); \
+#$ : cond3 = cmp(5, 4)
 cmp(4, 5) returns {cond1}
 cmp(2, 2) returns {cond2}
 cmp(5, 4) returns {cond3}

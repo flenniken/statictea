@@ -96,9 +96,9 @@ tpubType:
       "Unable to open standard device: $1.", # wCannotOpenStd
       "No command specified on the line, treating it as a comment.", # wNotACommand
       "Command line too long.", # wCmdLineTooLong
-      "No command found at column $1, skipping line.", # wNoCommand
+      "No command found at column $1, treating it as a non-command line.", # wNoCommand
       """The matching closing comment postfix was not found, expected: "$1".""", # wNoPostfix
-      "Missing the continuation line, abandoning the command.", # wNoContinuationLine
+      "Missing the continuation command, abandoning the previous command.", # wNoContinuationLine
       "Ignoring extra text after the number.", # wSkippingTextAfterNum
       "Invalid number.", # wNotNumber
       "The number is too big or too small.", # wNumberOverFlow

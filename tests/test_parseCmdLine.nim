@@ -189,7 +189,8 @@ suite "parseCmdLine.nim":
 
   test "no command error":
     let line = "<!--$ -->\n"
-    let expectedWarn = "template.html(12): w22: No command found at column 7, skipping line."
+    let expectedWarn = "template.html(12): w22: No command found at column 7, treating it as a non-command line."
+
     check parseCmdLineError(line, eErrLines = @[expectedWarn])
 
   test "no postfix error":
