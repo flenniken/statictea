@@ -4,7 +4,6 @@ import env
 import vartypes
 import options
 import warnings
-import variables
 import tables
 
 type
@@ -103,19 +102,3 @@ proc getFunction*(functionName: string): Option[FunctionPtr] =
   var function = functions.getOrDefault(functionName)
   if function != nil:
     result = some(function)
-
-proc runFunction*(env: var Env, functionName: string,
-    statement: Statement, start: Natural, variables: Variables,
-    parameters: seq[Value]): Option[Value] =
-  ## Call the given function and return its value. When the function
-  ## does not return a value, show the statement and the warning
-  ## position.
-
-  var functionO = getFunction(functionName)
-  if not isSome(functionO):
-    env.warnStatement(statement, wInvalidFunction, start)
-    return
-  var function = functionO.get()
-  result = function(env, statement.lineNum, parameters)
-  if not isSome(result):
-    env.warnStatement(statement, wInvalidStatement, start)

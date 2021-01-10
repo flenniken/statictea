@@ -191,8 +191,12 @@ proc testGetFunctionValue(functionName: string, statement: Statement, start: Nat
 
   var variables = getTestVariables()
   let compiledMatchers = getCompiledMatchers()
+  var functionO = getFunction(varName)
+  if not isSome(functionO):
+    return false
+  let function = functionO.get()
   let valueAndLengthO = getFunctionValue(env, compiledMatchers,
-                          functionName, statement, start, variables)
+                          function, statement, start, variables)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 

@@ -16,9 +16,9 @@ proc testFunction(functionName: string, parameters: seq[Value],
 
   var env = openEnvTest("_testFunction.log", "template.html")
   let lineNum = 1
-
   let functionO = getFunction(functionName)
   let function = functionO.get()
+
   let valueO = function(env, lineNum, parameters)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
@@ -40,10 +40,15 @@ proc testRunFunction(
   var env = openEnvTest("_testRunFunction.log", "template.html")
 
   var variables = getTestVariables()
-  let valueO = runFunction(env, functionName, statement, start, variables, parameters)
+  var functionO = getFunction(functionName)
+  if not isSome(functionO):
+    echo "Function doesn't exists: " & functionName
+    return false
+  var function = functionO.get()
+
+  let valueO = function(env, statement.lineNum, parameters)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
-
   if not expectedItem("value", valueO, eValueO):
     result = false
 
@@ -100,9 +105,6 @@ suite "runFunction.nim":
     let eValueO = none(Value)
     let eErrLines = @[
       "template.html(16): w47: Concat parameter 2 is not a string.",
-      "template.html(16): w48: Invalid statement, skipping it.",
-      """statement: tea = concat("hello", 5)""",
-        "                        ^",
     ]
     check testRunFunction("concat", parameters, statement, start, eValueO, eErrLines = eErrLines)
 

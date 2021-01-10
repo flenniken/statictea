@@ -309,13 +309,31 @@ and the shared json has {jsonElements}.
 # """
 #     check testProcessTemplate(content = content)
 
-#   test "cmd example":
+  test "not a command":
+
+    let content = """
+#$ block \
+#$ : cond1 = notfunction(4, 5); \
+#$ : cond3 = hello(5, 4)
+#$ endblock
+"""
+    let eErrLines = @[
+      "template.html(1): w51: Not a function: notfunction.",
+      "statement: cond1 = notfunction(4, 5)",
+      "                   ^",
+      "template.html(2): w51: Not a function: hello.",
+      "statement:  cond3 = hello(5, 4)",
+      "                    ^",
+    ]
+    check testProcessTemplate(content = content, eRc = 1, eErrLines = eErrLines)
+
+# test "cmp example":
 
 #     let content = """
 # #$ block \
-# #$ cond1 = cmp(4, 5); \
-# #$ cond2 = cmp(2, 2); \
-# #$ cond3 = cmp(5, 4)
+# #$ : cond1 = cmp(4, 5); \
+# #$ : cond2 = cmp(2, 2); \
+# #$ : cond3 = cmp(5, 4)
 # cmp(4, 5) returns {cond1}
 # cmp(2, 2) returns {cond2}
 # cmp(5, 4) returns {cond3}
