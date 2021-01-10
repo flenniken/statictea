@@ -406,13 +406,13 @@ You use variables to create formatted content for a block and to
 control how a command works. You create them in json files or in
 template statements. Internally one dictionary exists for each of
 the five types of variables, you access them with different
-prefixes, and they are stored in different dictionaries:
+prefixes. Here are the prefixes and sections for each one.
 
-- [[#json-variables][Server Json Variables]] --  "s.", t.server
-- [[#json-variables][Shared Json Variables]] -- "h.", t.shared
-- [[#local-variables][Local Variables]] -- no prefix, t.local
-- [[#global-variables][Global Variables]] -- "g.", t.global
-- [[#tea-variables][Tea Variables]] -- "t.", built in
+- s. -- [[#json-variables][Server Json Variables]]
+- h. -- [[#json-variables][Shared Json Variables]]
+-    -- [[#local-variables][Local Variables]]
+- g. -- [[#global-variables][Global Variables]]
+- t. -- [[#tea-variables][Tea Variables]]
 
 [[#contents][茶]]
 
@@ -871,7 +871,7 @@ result:
 :CUSTOM_ID: types
 :END:
 
-StaticTea variables types:
+StaticTea variable types:
 
 - [[#string][string]]
 - [[#integer][integer]]
@@ -973,46 +973,14 @@ define them in the json files.
 
 [[#contents][茶]]
 
-* Functions
-:PROPERTIES:
-:CUSTOM_ID: functions
-:ORDERED:  t
-:END:
-
-You use a function in a statement to generate a value. You either
-assign the value to a variable or you pass it to another function.
-
-Functions can take zero or more parameters and return a
-value. Some functions have optional parameters.
-
-List of functions:
-
-- [[#case][case()]] -- generalized if function
-- [[#cmp][cmp()]] -- spaceship compare function <=>
-- [[#concat][concat()]] -- concatenate strings
-- [[#convert][convert()]] -- convert variable to a different type
-- [[#currency][currency()]] -- format currency
-- [[#exists][exists()]] -- whether a variables exists
-- [[#find][find()]] -- find a substring in a string
-- [[#format][format()]] -- format a string or a number
-- [[#if][if()]] -- if function
-- [[#len][len()]] -- length of string
-- [[#lineNumber][lineNumber()]] -- the current line number
-- [[#quotehtml][quoteHtml]] -- replace html special characters
-- [[#sizes][sizes()]] -- format bytes counts, KB, MB, GB, etc.
-- [[#substr][substr()]] -- extract a substring from a string by indexes
-- [[#time][time()]] -- format the date and time.
-- [[#template][template()]] -- the filename of the current template
-- [[#version][version()]] -- the current version and version checker
-
-[[#contents][茶]]
-
 * Run StaticTea
 :PROPERTIES:
 :CUSTOM_ID: run-statictea
 :END:
 
-You run StaticTea from the command line.
+You run StaticTea from the command line. You specify the template
+file to process along with the json data files and a result file
+is generated.
 
 - Warning messages go to standard error.
 - If you don't specify the result argument, the result goes to standard out.
@@ -1246,46 +1214,77 @@ Miscellaneous topics:
  [[#contents][茶]]
 
 ** System Defaults
-   :PROPERTIES:
+:PROPERTIES:
    :CUSTOM_ID: system-defaults
    :END:
 
- You can use the system variables in a replacement block to see
- their default values. The following example shows the default
- values of some of the system variables.
+You can use the system variables in a replacement block to see
+their default values. The following example shows the default
+values of some of the system variables.
 
- template:
+template:
 
- #+BEGIN_SRC
- <!--$ block -->
- default t.local = {t.local}
- default t.global = {t.global}
- default t.maxLines = {t.maxLines}
- default t.maxRepeat = {t.maxRepeat}
- default t.output = {t.output}
- default t.repeat = {t.repeat}
- default t.server = {t.server}
- <!--$ endblock -->
- #+END_SRC
+#+BEGIN_SRC
+<!--$ block -->
+Defaults:
+  t.local = {t.local}
+  t.global = {t.global}
+  t.maxLines = {t.maxLines}
+  t.maxRepeat = {t.maxRepeat}
+  t.output = {t.output}
+  t.repeat = {t.repeat}
+  t.server = {t.server}
+<!--$ endblock -->
+#+END_SRC
 
- result:
+result:
 
- #+BEGIN_SRC
- default t.local = {}
- default t.global = {}
- default t.maxLines = 10
- default t.maxRepeat = 100
- default t.output = "result"
- default t.repeat = 1
- default t.server = {}
- #+END_SRC
+#+BEGIN_SRC
+Defaults:
+  t.local = {}
+  t.global = {}
+  t.maxLines = 10
+  t.maxRepeat = 100
+  t.output = "result"
+  t.repeat = 1
+  t.server = {}
+#+END_SRC
 
  [[#contents][茶]]
 
-* Function Docs
+* Functions
 :PROPERTIES:
-:CUSTOM_ID: function-docs
+:CUSTOM_ID: functions
+:ORDERED:  t
 :END:
+
+You use a function in a statement to generate a value. You either
+assign the value to a variable or you pass it to another function.
+
+Functions can take zero or more parameters and return a
+value. Some functions have optional parameters.
+
+List of functions:
+
+- [[#case][case()]] -- generalized if function
+- [[#cmp][cmp()]] -- spaceship compare function <=>
+- [[#concat][concat()]] -- concatenate strings
+- [[#convert][convert()]] -- convert variable to a different type
+- [[#currency][currency()]] -- format currency
+- [[#exists][exists()]] -- whether a variables exists
+- [[#find][find()]] -- find a substring in a string
+- [[#format][format()]] -- format a string or a number
+- [[#if][if()]] -- if function
+- [[#len][len()]] -- length of string
+- [[#lineNumber][lineNumber()]] -- the current line number
+- [[#quotehtml][quoteHtml]] -- replace html special characters
+- [[#sizes][sizes()]] -- format bytes counts, KB, MB, GB, etc.
+- [[#substr][substr()]] -- extract a substring from a string by indexes
+- [[#time][time()]] -- format the date and time.
+- [[#template][template()]] -- the filename of the current template
+- [[#version][version()]] -- the current version and version checker
+
+[[#contents][茶]]
 
 ** case()
 :PROPERTIES:
@@ -1622,9 +1621,9 @@ Kathleen spent $52.44 on tea for Steve's birthday.
 :CUSTOM_ID: len
 :END:
 
-The len function returns the number of characters in a string,
-the number of elements in a list or the number of elements in a
-dictionary.
+The len function returns the number of characters in a string
+(not bytes), the number of elements in a list or the number of
+elements in a dictionary.
 
 #+BEGIN_SRC
 <!--$ block \-->
@@ -1822,7 +1821,7 @@ allowed verion of 1.20.3.
 - [[#functions][Functions]]
 - [[#run-statictea][Run StaticTea]]
 - [[#miscellaneous][Miscellaneous]]
-- [[#function-docs][Function Docs]]
+- [[#functions][Functions]]
 
 * Tea Info                                                            :notoc:
 

@@ -5,6 +5,7 @@ import vartypes
 import options
 import warnings
 import tables
+import unicode
 
 type
   FunctionPtr* = proc (env: var Env, lineNum: Natural, parameters: seq[Value]): Option[Value]
@@ -25,7 +26,7 @@ proc funConcat*(env: var Env, lineNum: Natural, parameters:
 
 proc funLen*(env: var Env, lineNum: Natural, parameters:
                seq[Value]): Option[Value] =
-  ## Get the length of the parameter, either the byte length of a
+  ## Get the length of the parameter, either the character length of a
   ## string, or the number of elements in list or dictionary.  Added
   ## in version 0.1.0.
   if parameters.len() != 1:
@@ -35,7 +36,7 @@ proc funLen*(env: var Env, lineNum: Natural, parameters:
   let value = parameters[0]
   case value.kind
     of vkString:
-      retValue = newValue(value.stringv.len)
+      retValue = newValue(runeLen(value.stringv))
     of vkList:
       retValue = newValue(value.listv.len)
     of vkDict:

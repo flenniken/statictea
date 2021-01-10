@@ -113,6 +113,14 @@ suite "runFunction.nim":
     let eValueO = some(newValue(3))
     check testFunction("len", parameters, eValueO = eValueO)
 
+  test "len unicode string":
+    # The byte length is different than the number of unicode characters.
+    let str = "añyóng"
+    check str.len == 8
+    var parameters = @[newValue(str)]
+    let eValueO = some(newValue(6))
+    check testFunction("len", parameters, eValueO = eValueO)
+
   test "len list":
     var parameters = @[newValue([5, 3])]
     let eValueO = some(newValue(2))
