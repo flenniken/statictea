@@ -41,6 +41,7 @@ type
     rightParenthesesMatcher*: Matcher
     commaParenthesesMatcher*: Matcher
     leftBracketMatcher*: Matcher
+    tabSpaceMatcher*: Matcher
 
 iterator combine(list1: openArray[Prepost], list2: openArray[
     Prepost]): Prepost =
@@ -77,10 +78,9 @@ proc getPrefixMatcher*(prepostTable: PrepostTable): Matcher =
     terms.add(r"\Q$1\E" % prefix)
   result = newMatcher(r"^($1)\s*" % terms.join("|"), 1)
 
-# todo: allow <!--$nextline-->, <!--$endblock-->
 proc getCommandMatcher*(): Matcher =
-  ## Match commands and one following space.
-  result = newMatcher(r"($1)\s" % commands.join("|"), 1)
+  ## Match a command. The group contains the command matched.
+  result = newMatcher(r"($1)" % commands.join("|"), 1)
 
 proc getLastPartMatcher*(postfix: string): Matcher =
   ## Get the matcher that matches the optional continuation slash, the
@@ -123,6 +123,10 @@ proc getAllSpaceTabMatcher*(): Matcher =
   ## Return a matcher that determines whether a string is all spaces
   ## and tabs.
   result = newMatcher(r"^[ \t]*$", 0)
+
+proc getTabSpaceMatcher*(): Matcher =
+  ## Match one or more tabs and spaces.
+  result = newMatcher(r"[ \t]+", 0)
 
 proc notEmptyOrSpaces*(allSpaceTabMatcher: Matcher, text: string): bool =
   ## Return true when a statement is not empty or not all whitespace.
@@ -218,6 +222,7 @@ proc getCompiledMatchers*(prepostTable: PrepostTable): CompiledMatchers =
   result.rightParenthesesMatcher = getRightParenthesesMatcher()
   result.commaParenthesesMatcher = getCommaParenthesesMatcher()
   result.leftBracketMatcher = getLeftBracketMatcher()
+  result.tabSpaceMatcher = getTabSpaceMatcher()
 
 when defined(test):
   proc checkGetLastPart*(matcher: Matcher, line: string, expectedStart: Natural,

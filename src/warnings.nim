@@ -67,6 +67,7 @@ type
     wMissingReplacementVar, # w58
     wNoTempFile,           # w59
     wExceededMaxLine,      # w60
+    wSpaceAfterCommand,    # w61
 
 tpubType:
   const
@@ -134,6 +135,7 @@ tpubType:
       "The replacement variable doesn't exist: $1$2.", # wMissingReplacementVar
       "Unable to create a temporary file.", # wNoTempFile
       "Reached the maximum replacement block line count without finding the endblock.", # wExceededMaxLine
+      "No space after the command." # wSpaceAfterCommand
     ]
 
 func getWarning*(filename: string, lineNum: int,

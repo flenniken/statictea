@@ -109,7 +109,34 @@ suite "parseCmdLine.nim":
 
   test "parseCmdLine middle 2":
     let line = "<!--$ nextline    middle part  -->\n"
-    var elps = newLineParts(middleStart = 15, middleLen = 16)
+    var elps = newLineParts(middleStart = 18, middleLen = 13)
+    check testParseCmdLine(line, expectedLineParts = elps)
+
+  test "parseCmdLine middle 3":
+    let line = "#$nextline\n"
+    var elps = newLineParts(middleStart = 10, middleLen = 0, prefix="#$", postfix="")
+    check testParseCmdLine(line, expectedLineParts = elps)
+
+  test "parseCmdLine middle 4":
+    let line = "#$nextline"
+    var elps = newLineParts(middleStart = 10, middleLen = 0, prefix =
+          "#$", postfix = "", ending = "")
+    check testParseCmdLine(line, expectedLineParts = elps)
+
+  test "parseCmdLine middle 5":
+    let line = r"#$ nextline \"
+    var elps = newLineParts(middleStart = 12, middleLen = 0, prefix =
+          "#$", postfix = "", ending = "", continuation = true)
+    check testParseCmdLine(line, expectedLineParts = elps)
+
+  test "parseCmdLine middle 6":
+    let line = "<!--$nextline-->\n"
+    var elps = newLineParts(middleStart = 13, middleLen = 0)
+    check testParseCmdLine(line, expectedLineParts = elps)
+
+  test "parseCmdLine middle 7":
+    let line = "<!--$nextline -->\n"
+    var elps = newLineParts(middleStart = 14, middleLen = 0)
     check testParseCmdLine(line, expectedLineParts = elps)
 
   test "parseCmdLine continue":

@@ -57,9 +57,11 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
   var commandMatch = commandMatchO.get()
   lineParts.command = commandMatch.getGroup()
 
-  lineParts.middleStart = prefixMatch.length + commandMatch.length
+  # Get the optional spaces.
+  let spaceMatchO = getMatches(cm.tabSpaceMatcher, line,
+                               prefixMatch.length + commandMatch.length)
 
-  # Get the expected postfix.
+  # Get the expected postfix. Not all prefixes have a postfix.
   assert cm.prepostTable.hasKey(lineParts.prefix)
   lineParts.postfix = cm.prepostTable[lineParts.prefix]
 
@@ -73,8 +75,24 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
   var lastPart = lastPartO.get()
   let (continuation, ending) = lastPart.get2Groups()
   lineParts.continuation = if continuation == "": false else: true
-  # todo: middleLen becomes -1 for "#$ endblock\n".
-  lineParts.middleLen = line.len - lastPart.length - lineParts.middleStart
+
+  # We have a prefix, command and optional postfix.  Determine whether
+  # there is a middle part.  There must be a space after the command
+  # before the middle part starts.
+  var spaceLength: int
+  if isSome(spaceMatchO):
+    spaceLength = spaceMatchO.get().length
+  else:
+    spaceLength = 0
+
+  lineParts.middleStart = prefixMatch.length + commandMatch.length + spaceLength
+  let middleLength: int = line.len - lineParts.middleStart - lastPart.length
+
+  if spaceLength == 0 and middleLength > 0:
+    env.warn(lineNum, wSpaceAfterCommand)
+    return
+  if middleLength > 0:
+    lineParts.middleLen = middleLength
 
   # Line ending is required except for the last line of the file.
   lineParts.ending = ending

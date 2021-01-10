@@ -17,7 +17,6 @@ proc testCollectCommand(
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]): bool =
 
-  var commandMatcher = getCommandMatcher()
   var inStream = newStringStream(content)
   var resultStream = newStringStream()
   var lineBufferO = newLineBuffer(inStream, filename="template.html")

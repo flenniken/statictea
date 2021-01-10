@@ -59,17 +59,32 @@ suite "matches.nim":
   test "command matcher":
     var commandMatcher = getCommandMatcher()
 
-    check checkMatcher(commandMatcher, "<!--$ nextline -->", 6, @["nextline"], 9)
-    check checkMatcher(commandMatcher, "<!--$ block    -->", 6, @["block"], 6)
-    check checkMatcher(commandMatcher, "<!--$ replace  -->", 6, @["replace"], 8)
-    check checkMatcher(commandMatcher, "<!--$ endblock -->", 6, @["endblock"], 9)
-    check checkMatcher(commandMatcher, "<!--$ endreplace  -->", 6, @["endreplace"], 11)
-    check checkMatcher(commandMatcher, "<!--$ #  -->", 6, @["#"], 2)
-    check checkMatcher(commandMatcher, "<!--$ :  -->", 6, @[":"], 2)
-    check checkMatcher(commandMatcher, "  nextline ", 2, @["nextline"], 9)
+    check checkMatcher(commandMatcher, "<!--$ nextline -->", 6, @["nextline"], 8)
+    check checkMatcher(commandMatcher, "<!--$ block    -->", 6, @["block"], 5)
+    check checkMatcher(commandMatcher, "<!--$ replace  -->", 6, @["replace"], 7)
+    check checkMatcher(commandMatcher, "<!--$ endblock -->", 6, @["endblock"], 8)
+    check checkMatcher(commandMatcher, "<!--$ endreplace  -->", 6, @["endreplace"], 10)
+    check checkMatcher(commandMatcher, "<!--$ #  -->", 6, @["#"], 1)
+    check checkMatcher(commandMatcher, "<!--$ :  -->", 6, @[":"], 1)
+    check checkMatcher(commandMatcher, "  nextline ", 2, @["nextline"], 8)
 
-    check not commandMatcher.getMatches(" nextline", 2).isSome
-    check not commandMatcher.getMatches(" comment ", 2).isSome
+    check checkMatcher(commandMatcher, "<!--$nextline-->", 5, @["nextline"], 8)
+    check checkMatcher(commandMatcher, "<!--$nextline-->\n", 5, @["nextline"], 8)
+    check checkMatcher(commandMatcher, "#$nextline", 2, @["nextline"], 8)
+    check checkMatcher(commandMatcher, "#$nextline\n", 2, @["nextline"], 8)
+    check checkMatcher(commandMatcher, "#$nextline ", 2, @["nextline"], 8)
+    check checkMatcher(commandMatcher, "#$nextline  ", 2, @["nextline"], 8)
+    check checkMatcher(commandMatcher, r"#$nextline\", 2, @["nextline"], 8)
+    check checkMatcher(commandMatcher, "#$nextline\\", 2, @["nextline"], 8)
+    check checkMatcher(commandMatcher, "#$nextline\\\n", 2, @["nextline"], 8)
+    check checkMatcher(commandMatcher, "#$nextline\r\n", 2, @["nextline"], 8)
+    check checkMatcher(commandMatcher, "#$nextline\\\r\n", 2, @["nextline"], 8)
+    check checkMatcher(commandMatcher, "#$nextline \\\r\n", 2, @["nextline"], 8)
+    check checkMatcher(commandMatcher, "#$#", 2, @["#"], 1)
+    check checkMatcher(commandMatcher, "#$#a", 2, @["#"], 1)
+
+    check not commandMatcher.getMatches(" nextlin", 2).isSome
+    check not commandMatcher.getMatches(" coment ", 2).isSome
 
   test "last part matcher":
     var matcher = getLastPartMatcher("-->")
@@ -108,6 +123,24 @@ suite "matches.nim":
     check checkMatcher(matcher, "    ", 0, @[], 4)
     check checkMatcher(matcher, " \t \t   ", 0, @[], 7)
     check not matcher.getMatches("    s   ", 0).isSome
+
+  test "get tab space":
+    let matcher = getTabSpaceMatcher()
+    check checkMatcher(matcher, " ", 0, @[], 1)
+    check checkMatcher(matcher, "\t", 0, @[], 1)
+    check checkMatcher(matcher, " \t", 0, @[], 2)
+    check checkMatcher(matcher, "\t ", 0, @[], 2)
+    check checkMatcher(matcher, " a", 0, @[], 1)
+    check checkMatcher(matcher, "  a", 0, @[], 2)
+    check checkMatcher(matcher, "  \n", 0, @[], 2)
+    check checkMatcher(matcher, "  \r", 0, @[], 2)
+    check checkMatcher(matcher, "a ", 1, @[], 1)
+    check checkMatcher(matcher, "ab   ", 2, @[], 3)
+
+    check not matcher.getMatches("a", 0).isSome
+    check not matcher.getMatches("\n", 0).isSome
+    check not matcher.getMatches("\r", 0).isSome
+    check not matcher.getMatches(" a ", 1).isSome
 
   test "get variable":
     var matcher = getVariableMatcher()
