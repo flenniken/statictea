@@ -2,6 +2,7 @@
 import unittest
 import options
 import runCommand
+import runFunction
 import parseCmdLine
 import strutils
 import options
@@ -191,7 +192,7 @@ proc testGetFunctionValue(functionName: string, statement: Statement, start: Nat
 
   var variables = getTestVariables()
   let compiledMatchers = getCompiledMatchers()
-  var functionO = getFunction(varName)
+  var functionO = getFunction(functionName)
   if not isSome(functionO):
     return false
   let function = functionO.get()
