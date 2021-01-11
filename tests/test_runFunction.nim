@@ -52,6 +52,16 @@ proc testRunFunction(
   if not expectedItem("value", valueO, eValueO):
     result = false
 
+proc testCmpFun[T](a: T, b: T, caseInsensitive: bool = false, expected: int = 0): bool =
+  ## Test the cmpFun
+  var parameters: seq[Value]
+  if caseInsensitive:
+    parameters = @[newValue(a), newValue(b), newValue(1)]
+  else:
+    parameters = @[newValue(a), newValue(b)]
+  let eValueO = some(newValue(expected))
+  result = testFunction("cmp", parameters, eValueO = eValueO)
+
 suite "runFunction.nim":
 
   test "getFunction":
@@ -224,3 +234,49 @@ suite "runFunction.nim":
     var parameters = @[newValue(2), newValue(3.5)]
     let eErrLines = @["template.html(1): w57: Expected a list or dictionary as the first parameter."]
     check testFunction("get", parameters, eErrLines = eErrLines)
+
+  test "cmpString":
+    check cmpString("", "") == 0
+    check cmpString("a", "a") == 0
+    check cmpString("abc", "abc") == 0
+    check cmpString("abc", "ab") == 1
+    check cmpString("ab", "abc") == -1
+    check cmpString("a", "b") == -1
+    check cmpString("b", "a") == 1
+    check cmpString("abc", "abd") == -1
+    check cmpString("abd", "abc") == 1
+    check cmpString("ABC", "abc") == -1
+    check cmpString("abc", "ABC") == 1
+
+  test "cmpString case insensitive":
+    check cmpString("", "", true) == 0
+    check cmpString("a", "a", true) == 0
+    check cmpString("abc", "abc", true) == 0
+    check cmpString("abc", "ABC", true) == 0
+    check cmpString("aBc", "Abd", true) == -1
+    check cmpString("Abd", "aBc", true) == 1
+
+  test "cmp ints":
+    check testCmpFun(1, 1, expected = 0)
+    check testCmpFun(1, 2, expected = -1)
+    check testCmpFun(2, 1, expected = 1)
+
+  test "cmp floats":
+    check testCmpFun(1.0, 1.0, expected = 0)
+    check testCmpFun(1.2, 2.0, expected = -1)
+    check testCmpFun(2.1, 1.3, expected = 1)
+
+  test "cmp strings":
+    check testCmpFun("abc", "abc", expected = 0)
+    check testCmpFun("abc", "abd", expected = -1)
+    check testCmpFun("abd", "abc", expected = 1)
+    check testCmpFun("ab", "abc", expected = -1)
+    check testCmpFun("ab", "a", expected = 1)
+
+  test "cmp strings case insensitive":
+    check testCmpFun("abc", "abc", true, expected = 0)
+    check testCmpFun("abc", "abd", true, expected = -1)
+    check testCmpFun("abd", "abc", true, expected = 1)
+    check testCmpFun("ABC", "abc", true, expected = 0)
+    check testCmpFun("abc", "ABD", true, expected = -1)
+    check testCmpFun("ABD", "abc", true, expected = 1)

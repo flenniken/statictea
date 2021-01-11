@@ -12,6 +12,66 @@ type
 
 var functions: Table[string, FunctionPtr]
 
+proc cmpString*(a, b: string, ignoreCase: bool = false): int =
+  ## Compares two UTF-8 strings and returns 0 when equal, 1 when a > b
+  ## and -1 when a < b. Optionally Ignore case.
+  var i = 0
+  var j = 0
+  var ar, br: Rune
+  var ret: int
+  while i < a.len and j < b.len:
+    fastRuneAt(a, i, ar)
+    fastRuneAt(b, j, br)
+    if ignoreCase:
+      ar = toLower(ar)
+      br = toLower(br)
+    ret = int(ar) - int(br)
+    if ret != 0:
+      break
+  if ret == 0:
+    ret = a.len - b.len
+  if ret < 0:
+    result = -1
+  elif ret > 0:
+    result = 1
+  else:
+    result = 0
+
+proc funCmp*(env: var Env, lineNum: Natural, parameters:
+               seq[Value]): Option[Value] =
+  ## The cmp function compares two variables, either numbers or
+  ## strings (both the same type), and returns whether the first
+  ## parameter is less than, equal to or greater than the second
+  ## parameter. It returns -1 for less, 0 for equal and 1 for greater
+  ## than. The optional third parameter compares strings case
+  ## insensitive when it is 1. Added in version 0.1.0.
+  if parameters.len() < 2 or parameters.len() > 3:
+    env.warn(lineNum, wTwoOrThreeParameters)
+    return
+  let value1 = parameters[0]
+  let value2 = parameters[1]
+  if value1.kind != value2.kind:
+    env.warn(lineNum, wNotSameKind)
+    return
+  var ret: int
+  case value1.kind
+    of vkString:
+      var caseInsensitive: bool
+      if parameters.len() == 3:
+        let value3 = parameters[2]
+        if value3.kind == vkInt and value3.intv == 1:
+          caseInsensitive = true
+      ret = cmpString(value1.stringv, value2.stringv, caseInsensitive)
+    of vkInt:
+      ret = cmp(value1.intv, value2.intv)
+    of vkFloat:
+      ret = cmp(value1.floatv, value2.floatv)
+    else:
+      env.warn(lineNum, wNotNumberOrString)
+      return
+  result = some(newValue(ret))
+
+
 proc funConcat*(env: var Env, lineNum: Natural, parameters:
                seq[Value]): Option[Value] =
   ## Concatentate the string parameters.
@@ -26,9 +86,10 @@ proc funConcat*(env: var Env, lineNum: Natural, parameters:
 
 proc funLen*(env: var Env, lineNum: Natural, parameters:
                seq[Value]): Option[Value] =
-  ## Get the length of the parameter, either the character length of a
-  ## string, or the number of elements in list or dictionary.  Added
-  ## in version 0.1.0.
+  ## The len function takes one parameter and returns the number of
+  ## characters in a string (not bytes), the number of elements in a
+  ## list or the number of elements in a dictionary.  Added in version
+  ## 0.1.0.
   if parameters.len() != 1:
     env.warn(lineNum, wOneParameter)
     return
@@ -90,6 +151,7 @@ const
     ("len", funLen),
     ("concat", funConcat),
     ("get", funGet),
+    ("cmp", funCmp),
   ]
 
 proc getFunction*(functionName: string): Option[FunctionPtr] =

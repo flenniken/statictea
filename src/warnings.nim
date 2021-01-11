@@ -68,6 +68,10 @@ type
     wNoTempFile,           # w59
     wExceededMaxLine,      # w60
     wSpaceAfterCommand,    # w61
+    wTwoParameters,        # w62
+    wNotSameKind,          # w63
+    wNotNumberOrString,    # w64
+    wTwoOrThreeParameters, # w65
 
 tpubType:
   const
@@ -135,7 +139,11 @@ tpubType:
       "The replacement variable doesn't exist: $1$2.", # wMissingReplacementVar
       "Unable to create a temporary file.", # wNoTempFile
       "Reached the maximum replacement block line count without finding the endblock.", # wExceededMaxLine
-      "No space after the command." # wSpaceAfterCommand
+      "No space after the command.", # wSpaceAfterCommand
+      "The function takes two parameters.", # wTwoParameters
+      "The two parameters are not the same type.", # wNotSameKind
+      "The parameters must be numbers or strings.", # wNotNumberOrString
+      "The function takes two or three parameters.", # wTwoOrThreeParameters
     ]
 
 func getWarning*(filename: string, lineNum: int,

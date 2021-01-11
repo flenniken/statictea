@@ -887,11 +887,11 @@ StaticTea variable types:
 :END:
 
 You define a string with single or double quotes and use them in
-statements.
+statements. You encode strings as unicode utf-8.  Invalid utf-8
+sequences generate a warning and the statement is skipped.
 
 Literal strings are limited to 256 bytes, if you need a longer
 string define it in a json file.
-
 
 example strings:
 
@@ -1275,7 +1275,7 @@ List of functions:
 - [[#find][find()]] -- find a substring in a string
 - [[#format][format()]] -- format a string or a number
 - [[#if][if()]] -- if function
-- [[#len][len()]] -- length of string
+- [[#len][len()]] -- length of string, list or dictionary
 - [[#lineNumber][lineNumber()]] -- the current line number
 - [[#quotehtml][quoteHtml]] -- replace html special characters
 - [[#sizes][sizes()]] -- format bytes counts, KB, MB, GB, etc.
@@ -1353,7 +1353,8 @@ The cmp function compares two variables, either numbers or
 strings (both the same type), and returns whether the first
 parameter is less than, equal to or greater than the second
 parameter. It returns -1 for less, 0 for equal and 1 for greater
-than.
+than. The optional third parameter compares strings case
+insensitive when it is 1. Added in version 0.1.0.
 
 template:
 
@@ -1361,10 +1362,14 @@ template:
 #$ block \
 #$ : cond1 = cmp(4, 5); \
 #$ : cond2 = cmp(2, 2); \
-#$ : cond3 = cmp(5, 4)
+#$ : cond3 = cmp(5, 4); \
+#$ : cond4 = cmp("abc", "abd"); \
+#$ : cond5 = cmp("abc", "ABC", 1)
 cmp(4, 5) returns {cond1}
 cmp(2, 2) returns {cond2}
 cmp(5, 4) returns {cond3}
+cmp("abc", "abd") returns {cond4}
+cmp("abc", "ABC") returns {cond5}
 #$ endblock
 #+END_SRC
 
@@ -1374,6 +1379,8 @@ result:
 cmp(4, 5) returns -1
 cmp(2, 2) returns 0
 cmp(5, 4) returns 1
+cmp("abc", "abd") returns -1
+cmp("abc", "ABC") returns 0
 #+END_SRC
 
 Here is another example using cmp to "ellipsize" a string when it
@@ -1621,9 +1628,10 @@ Kathleen spent $52.44 on tea for Steve's birthday.
 :CUSTOM_ID: len
 :END:
 
-The len function returns the number of characters in a string
-(not bytes), the number of elements in a list or the number of
-elements in a dictionary.
+The len function takes one parameter and returns the number of
+characters in a string (not bytes), the number of elements in a
+list or the number of elements in a dictionary.  Added in version
+0.1.0.
 
 #+BEGIN_SRC
 <!--$ block \-->
