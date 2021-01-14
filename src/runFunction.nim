@@ -74,9 +74,10 @@ proc funCmp*(env: var Env, lineNum: Natural, parameters:
 
 proc funConcat*(env: var Env, lineNum: Natural, parameters:
                seq[Value]): Option[Value] =
-  ## Concatentate the string parameters.
-  ## Added in version 0.1.0.
+  ## Concatentate the string parameters. You pass 2 or more string
+  ## parameters.  Added in version 0.1.0.
   var str = ""
+  # todo: two or more string parameters
   for ix, value in parameters:
     if value.kind != vkString:
       env.warn(lineNum, wExpectedStrings, $(ix+1))

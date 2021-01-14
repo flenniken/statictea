@@ -45,13 +45,14 @@ You can share common template fragments between templates.
 :END:
 
 You pass unformatted variable content from the server as json.
-You format it in the template with commands to create new
-variables that get inserted into the template.
+You format the content with commands to create new variables that
+substitute text in the template.
 
-You mark replacement text with brackets and with preceding command
-lines.
+You define replacement blocks by surrounding them with commands
+and you target replacement variables inside the block by wrapping
+them with brackets.
 
-The commands are encoded as comments to match the particular
+You encode the commands as comments to match the particular
 template type.
 
 [[#contents][茶]]
@@ -421,9 +422,15 @@ prefixes. Here are the prefixes and sections for each one.
 :CUSTOM_ID: json-variables
 :END:
 
+You pass variables to the template in json files.
+
+The variables are defined by the top level dictionary items. Each
+items's key is the name of a variable and the items's value is
+the variables's value.
+
 There are two types of json files, the server json and the shared
-json.  The top level json dictionary key becomes the variable's
-name and its value becomes the variable's value.
+json. The server file populates the t.server dictionary and the
+shared file populates the t.shared dictionary.
 
 You can use multiple server and shared json files by specifying
 multiple files on the command line. The files are processed
@@ -440,45 +447,12 @@ The server variables are stored in the t.server dictionary.
 
 The shared variables are stored in the t.shared dictionary.
 
-The server json comes from the server and shouldn't contain any
-presentation data so the template designers have full control of
-the presentation.
+To give full control of the presentation to the template
+designers, the server json shouldn't contain any presentation
+data.
 
 The shared json is created by the template designer for sharing
 common template fragments and other presentation needs.
-
-Here is an example showing the number of elements in the t.server
-and t.shared dictionaries.
-
-template:
-
-#+BEGIN_SRC
-<!--$ block \-->
-<!--$ : serverElements = len(t.server); \-->
-<!--$ : sharedElements = len(t.shared) -->
-The server has {serverElements} elements
-and the shared json has {sharedElements}.
-<!--$ endblock -->
-#+END_SRC
-
-json:
-
-#+BEGIN_SRC
-{
- "tea1": "Black",
- "tea2": "Green",
- "tea3": "Oolong",
- "tea4": "Sencha",
- "tea5": "Herbal"
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-The server has 5 elements
-and the shared json has 0.
-#+END_SRC
 
 [[#contents][茶]]
 
@@ -490,7 +464,8 @@ and the shared json has 0.
 You create local variables with template statements.  They are
 local to the block where they are defined.  They are processed
 from left to right.  There is no prefix for local variables. They
-are stored in the t.local dictionary.
+are stored in the t.local dictionary. The local variables are
+cleared and recalculated for each repeated block.
 
 [[#contents][茶]]
 
@@ -651,7 +626,7 @@ template.html(45): missing admin var
  The t.repeat variable is a number that tells how many times to
  repeat the block.
 
- You use the row variable to customize each block.  Each time
+ You use the t.row variable to customize each block.  Each time
  the block repeats the local variables get recalculated.
 
  By default the block is output once. A value of zero means don't
@@ -1274,6 +1249,7 @@ List of functions:
 - [[#exists][exists()]] -- whether a variables exists
 - [[#find][find()]] -- find a substring in a string
 - [[#format][format()]] -- format a string or a number
+- [[#get][get()]] -- get an element from a list or dictionary
 - [[#if][if()]] -- if function
 - [[#len][len()]] -- length of string, list or dictionary
 - [[#lineNumber][lineNumber()]] -- the current line number
@@ -1403,18 +1379,14 @@ than 10 bytes.
 :CUSTOM_ID: concat
 :END:
 
-The concat function concatenates strings. You can specify 0 or
-more parameters. The following example also shows using the "#$"
-prefix:
+The concat function concatenates strings. You can specify 2 or
+more string parameters. The following example also shows using
+the "#$" prefix:
 
 #+BEGIN_SRC
 #$ block \
-#$ : x1 = concat(); \
-#$ : x2 = concat("Tea"); \
 #$ : x3 = concat("Tea", "Time"); \
 #$ : x4 = concat("Tea", " ",  "Time")
-concat() => '{x1}'
-concat("Tea") => '{x2}'
 concat("Tea", "Time") => '{x3}'
 concat("Tea", " ",  "Time") => '{x4}'
 #$ endblock
@@ -1423,8 +1395,6 @@ concat("Tea", " ",  "Time") => '{x4}'
 Result:
 
 #+BEGIN_SRC
-concat() => ''
-concat("Tea") => 'Tea'
 concat("Tea", "Time") => 'TeaTime'
 concat("Tea", " ",  "Time") => 'Tea Time'
 #+END_SRC
@@ -1438,16 +1408,19 @@ concat("Tea", " ",  "Time") => 'Tea Time'
 
 The convert function converts variables from one type to
 another. From int to float, float to int, string to int and
-string to float. It takes two or three parameters, the variable
-to convert and the type name to convert to, and how to
-round. Only strings that look like numbers can be converted.
+string to float. It takes two or three parameters. The first
+parameter is the variable to convert, the second parameter is the
+type name to convert to, and the third parameter tells how to
+convert.  If the variable to convert is a string, it must look
+like a number.
+
+Note: if you want to convert a number to a string, use the format
+function.
 
 Conversion Combinations:
 
 - int to float
-- int to string
 - float to int, with round options
-- float to string
 - string to int with round options
 - string to float
 
@@ -1458,12 +1431,40 @@ Round Options:
 - "ceiling" - uses int above.
 
 #+BEGIN_SRC
-v1 = convert(5.6, "int", "round")
-v3 = convert(333, "float")
-v2 = convert("2", "int")
-v4 = convert("2.2", "int", "floor")
-v5 = convert("2.3", "float")
+#$ block \
+#$ : v1 = convert(5.6, "int", "round"); \
+#$ : v2 = convert(2.3, "int", ceiling); \
+#$ : v3 = convert(2.7, "int", "floor"); \
+#$ : v4 = convert(333, "float"); \
+#$ : v5 = convert("5.6", "int", "round"); \
+#$ : v6 = convert("2.3", "int", ceiling); \
+#$ : v7 = convert("2.7", "int", "floor"); \
+#$ : v8 = convert("333", "float"); \
+
+convert(5.6, "int", "round") => {v1}
+convert(2.3, "int", ceiling) => {v2}
+convert(2.7, "int", "floor") => {v3}
+convert(333, "float") => {v4}
+convert("5.6", "int", "round") => {v5}
+convert("2.3", "int", ceiling) => {v6}}
+convert("2.7", "int", "floor") => {v7}
+convert("333", "float") => {v8}
+#$ endblock
 #+END_SRC
+
+result:
+
+#+BEGIN_SRC
+convert(5.6, "int", "round") => 6
+convert(2.3, "int", ceiling) => 3
+convert(2.7, "int", "floor") => 2
+convert(333, "float") => 333.0
+convert("5.6", "int", "round") => 6
+convert("2.3", "int", ceiling) => 3
+convert("2.7", "int", "floor") => 2
+convert("333", "float") => 333.0
+#+END_SRC
+
 
 [[#contents][茶]]
 
