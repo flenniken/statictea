@@ -371,6 +371,25 @@ fake nextline
 
 [[#contents][茶]]
 
+* Replacement Block
+:PROPERTIES:
+:CUSTOM_ID: replacementblock
+:END:
+
+A replacement block is a group of contiguous lines in a
+template. The block contains the variable content for
+substitutions and you can repeat the block.
+
+You mark the replacment block with a nextline, block or replace
+command before it and an endblock command after it. The nextline
+block is one line and it does not have an endblock.
+
+You mark the variable content with brackets around the variables
+inside the block.
+
+You use repeating blocks to make lists and other repeating
+content.
+
 * Statements
 :PROPERTIES:
 :CUSTOM_ID: statements
@@ -395,6 +414,51 @@ commands. You can use multiple statements separated with
 semicolons. If you need more space, you can continue the line
 with the "\\" character at the end. Statements are executed from
 left to right.
+
+* Syntax
+:PROPERTIES:
+:CUSTOM_ID: syntax
+:END:
+
+A template consists of command lines and non-command lines.  The
+command lines are line oriented and they have the same
+form. There are no restrictions on the non-command lines in a
+template.
+
+Each command line is a comment to match the template type. The
+beginning comment characters are called the prefix and the
+optional ending comment characters are called the postfix. For
+example, in an html template the prefix is "<!--$" and the
+postfix is "-->". See [[#prefix-postfix][Prefix Postfix]] for more information.
+
+The prefix starts at column 1. Next comes the command name. Statements
+follow the command name, they are separated by semicolons and they may
+flow through the following lines. At the end of the line is an
+optional continuation character "\" then the optional postfix
+then the end of line, either \r\n or \n.
+
+- prefix starts at column 1
+- command
+- optional statements
+- optional \ continuation character
+- sometimes optional postfix
+- line ending \r\n or \n
+
+The following example shows a nextline command made up of two
+lines. It has three statements: a=5 b=6 and c=5.
+
+#+BEGIN_SRC
+prefix
+|     command
+|     |        statements
+|     |        |         continuation
+|     |        |         |
+|     |        |         |postfix
+|     |        |         ||  newline
+|     |        |         ||  |
+<!--$ nextline a=5; b=6; \-->
+<!--$ :        c=5        -->
+#+END_SRC
 
 [[#contents][茶]]
 
@@ -1824,10 +1888,11 @@ allowed verion of 1.20.3.
 - [[#advantages][Advantages]]
 - [[#how-it-works][How it Works]]
 - [[#commands][Commands]]
+- [[#replacementblock][Replacement Block]]
 - [[#statements][Statements]]
+- [[#syntax][Syntax]]
 - [[#variables][Variables]]
 - [[#types][Types]]
-- [[#functions][Functions]]
 - [[#run-statictea][Run StaticTea]]
 - [[#miscellaneous][Miscellaneous]]
 - [[#functions][Functions]]
