@@ -390,6 +390,15 @@ inside the block.
 You use repeating blocks to make lists and other repeating
 content.
 
+#+BEGIN_SRC
+<!--$ block -->
+This is the first line.
+A line.
+Another line.
+This is the last line.
+<!--$ endblock -->
+#+END_SRC
+
 * Statements
 :PROPERTIES:
 :CUSTOM_ID: statements
@@ -407,6 +416,7 @@ tea = "Earl Grey"
 num = 5
 t.repeat = 8
 nameLen = len(s.name)
+name = concat(substr(s.name, 0, 7), "...")
 #+END_SRC
 
 Statements are allowed on the nextline, block and replace
@@ -437,15 +447,8 @@ flow through the following lines. At the end of the line is an
 optional continuation character "\" then the optional postfix
 then the end of line, either \r\n or \n.
 
-- prefix starts at column 1
-- command
-- optional statements
-- optional \ continuation character
-- sometimes optional postfix
-- line ending \r\n or \n
-
-The following example shows a nextline command made up of two
-lines. It has three statements: a=5 b=6 and c=5.
+The following chart shows a nextline command made up of two
+lines. It has three statements: a=5, b=6 and c=5.
 
 #+BEGIN_SRC
 prefix
@@ -458,6 +461,38 @@ prefix
 |     |        |         ||  |
 <!--$ nextline a=5; b=6; \-->
 <!--$ :        c=5        -->
+#+END_SRC
+
+A space or tab is required between a command and a statement,
+otherwise you can use zero or more tabs and spaces where they are
+allowed. Space isn't allowed before the prefix, after the
+continuation or after the postfix or between the function name
+and its opening parentheses. Here are a few single line examples:
+
+#+BEGIN_SRC
+<!--$nextline-->
+<!--$ nextline -->
+<!--$ nextline a=5   -->
+<!--$ nextline a = 5 -->
+<!--$ nextline num = len(tea_list); b=3 -->
+<!--$ nextline num = len( tea_list ) ;b=3 -->
+#+END_SRC
+
+The statements may flow between lines. The following two nextline
+commands are equivalent:
+
+#+BEGIN_SRC
+<!--$ nextline com = "Bigelow Tea Company" -->
+
+<!--$ nextline com = "Big\-->
+<!--$ : elow Tea Company" -->
+#+END_SRC
+
+You separate statements with semicolons. You can have blank
+statements that do nothing.
+
+#+BEGIN_SRC
+<!--$ nextline a=1; b=2; c=3 -->
 #+END_SRC
 
 [[#contents][茶]]
