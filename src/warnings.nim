@@ -72,6 +72,7 @@ type
     wNotSameKind,          # w63
     wNotNumberOrString,    # w64
     wTwoOrThreeParameters, # w65
+    wTwoOrMoreParameters,  # w66
 
 tpubType:
   const
@@ -144,6 +145,7 @@ tpubType:
       "The two parameters are not the same type.", # wNotSameKind
       "The parameters must be numbers or strings.", # wNotNumberOrString
       "The function takes two or three parameters.", # wTwoOrThreeParameters
+      "The function takes two or more parameters.", # wTwoOrMoreParameters
     ]
 
 func getWarning*(filename: string, lineNum: int,

@@ -72,16 +72,6 @@ suite "runFunction.nim":
     let function = getFunction("notfunction")
     check not isSome(function)
 
-  test "funConcat 0":
-    var parameters: seq[Value] = @[]
-    let eValueO = some(newValue(""))
-    check testFunction("concat", parameters, eValueO = eValueO)
-
-  test "funConcat 1":
-    var parameters = @[newValue("abc")]
-    let eValueO = some(newValue("abc"))
-    check testFunction("concat", parameters, eValueO = eValueO)
-
   test "funConcat 2":
     var parameters = @[newValue("abc"), newValue(" def")]
     let eValueO = some(newValue("abc def"))
@@ -92,11 +82,27 @@ suite "runFunction.nim":
     let eValueO = some(newValue("abcdef"))
     check testFunction("concat", parameters, eValueO = eValueO)
 
-  test "funConcat not string":
+  test "funConcat 0":
     var parameters = @[newValue(5)]
     let eValueO = none(Value)
     let eErrLines = @[
-      "template.html(1): w47: Concat parameter 1 is not a string.",
+      "template.html(1): w66: The function takes two or more parameters."
+    ]
+    check testFunction("concat", parameters, eValueO = eValueO, eErrLines = eErrLines)
+
+  test "funConcat 1":
+    var parameters = @[newValue("abc")]
+    let eValueO = none(Value)
+    let eErrLines = @[
+      "template.html(1): w66: The function takes two or more parameters."
+    ]
+    check testFunction("concat", parameters, eValueO = eValueO, eErrLines = eErrLines)
+
+  test "funConcat not string":
+    var parameters = @[newValue("abc"), newValue(5)]
+    let eValueO = none(Value)
+    let eErrLines = @[
+      "template.html(1): w47: Concat parameter 2 is not a string.",
     ]
     check testFunction("concat", parameters, eValueO = eValueO, eErrLines = eErrLines)
 
