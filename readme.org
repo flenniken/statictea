@@ -399,7 +399,7 @@ This is the last line.
 <!--$ endblock -->
 #+END_SRC
 
-[[茶]]
+[[#contents][茶]]
 
 * Statements
 :PROPERTIES:
@@ -427,7 +427,7 @@ semicolons. If you need more space, you can continue the line
 with the "\\" character at the end. Statements are executed from
 left to right.
 
-[[茶]]
+[[#contents][茶]]
 
 * Syntax
 :PROPERTIES:
@@ -603,7 +603,7 @@ with "g." prefix.  They are stored in the t.global dictionary.
   - [[#tserver][t.server]] -- dictionary containing the server variables
   - [[#tshared][t.shared]] -- dictionary containing the shared variables
 
-[[茶]]
+[[#contents][茶]]
 
 *** t.content
     :PROPERTIES:
