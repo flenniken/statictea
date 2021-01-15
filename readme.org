@@ -373,7 +373,7 @@ fake nextline
 
 * Replacement Block
 :PROPERTIES:
-:CUSTOM_ID: replacementblock
+:CUSTOM_ID: replacement-block
 :END:
 
 A replacement block is a group of contiguous lines in a
@@ -398,6 +398,8 @@ Another line.
 This is the last line.
 <!--$ endblock -->
 #+END_SRC
+
+[[茶]]
 
 * Statements
 :PROPERTIES:
@@ -424,6 +426,8 @@ commands. You can use multiple statements separated with
 semicolons. If you need more space, you can continue the line
 with the "\\" character at the end. Statements are executed from
 left to right.
+
+[[茶]]
 
 * Syntax
 :PROPERTIES:
@@ -1923,7 +1927,7 @@ allowed verion of 1.20.3.
 - [[#advantages][Advantages]]
 - [[#how-it-works][How it Works]]
 - [[#commands][Commands]]
-- [[#replacementblock][Replacement Block]]
+- [[#replacement-block][Replacement Block]]
 - [[#statements][Statements]]
 - [[#syntax][Syntax]]
 - [[#variables][Variables]]
