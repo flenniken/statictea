@@ -68,7 +68,7 @@ proc testGetNumber(
   ## Return true when the statement contains the expected number. When
   ## it doesn't, show the values and expected values and return false.
 
-  var env = openEnvTest("_testGetNumber.log", "template.html")
+  var env = openEnvTest("_testGetNumber.log")
 
   let compiledMatchers = getCompiledMatchers()
   let valueAndLengthO = getNumber(env, compiledMatchers, statement, start)
@@ -88,7 +88,7 @@ proc testGetString(
   ## Return true when the statement contains the expected string. When
   ## it doesn't, show the values and expected values and return false.
 
-  var env = openEnvTest("_testGetString.log", "template.html")
+  var env = openEnvTest("_testGetString.log")
 
   let compiledMatchers = getCompiledMatchers()
   let valueAndLengthO = getString(env, compiledMatchers, statement, start)
@@ -132,7 +132,7 @@ proc testGetVariable(statement: Statement, start: Natural, nameSpace: string, va
                      eOutLines: seq[string] = @[],
                     ): bool =
 
-  var env = openEnvTest("_getVariable.log", "template.html")
+  var env = openEnvTest("_getVariable.log")
 
   var variables = getTestVariables()
   let valueO = getVariable(env, statement, variables, namespace, varName, start)
@@ -154,7 +154,7 @@ proc testGetVarOrFunctionValue(statement: Statement, start: Natural,
   ## values and compare the with the given error lines. Return true
   ## when they match.
 
-  var env = openEnvTest("_getVariable.log", "template.html")
+  var env = openEnvTest("_getVariable.log")
 
   var variables = getTestVariables()
   let compiledMatchers = getCompiledMatchers()
@@ -175,7 +175,7 @@ proc testWarnStatement(statement: Statement,
     eOutLines: seq[string] = @[]
   ): bool =
 
-  var env = openEnvTest("_getVariable.log", "template.html")
+  var env = openEnvTest("_getVariable.log")
 
   env.warnStatement(statement, warning, start, p1, p2)
 
@@ -188,7 +188,7 @@ proc testGetFunctionValue(functionName: string, statement: Statement, start: Nat
     eOutLines: seq[string] = @[]
   ): bool =
 
-  var env = openEnvTest("_testGetFunctionValue.log", "template.html")
+  var env = openEnvTest("_testGetFunctionValue.log")
 
   var variables = getTestVariables()
   let compiledMatchers = getCompiledMatchers()
@@ -210,7 +210,7 @@ proc testRunStatement(statement: Statement,
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]
   ): bool =
-  var env = openEnvTest("_runStatement.log", "template.html")
+  var env = openEnvTest("_runStatement.log")
 
   var variables = newVariables()
   let compiledMatchers = getCompiledMatchers()
@@ -704,19 +704,19 @@ suite "runCommand.nim":
 
   test "getFunctionValue nested":
     let functionName = "concat"
-    let statement = newStatement(text="""tea = concat("abc", concat("xyz"), "def") """, lineNum=16, 0)
+    let statement = newStatement(text="""tea = concat("abc", concat("xyz", "123"), "def") """, lineNum=16, 0)
     let start = 13
-    let value = Value(kind: vkString, stringv: "abcxyzdef")
-    let eValueAndLengthO = some(ValueAndLength(value: value, length: 29))
+    let value = Value(kind: vkString, stringv: "abcxyz123def")
+    let eValueAndLengthO = some(ValueAndLength(value: value, length: 36))
     check testGetFunctionValue(functionName, statement, start, eValueAndLengthO = eValueAndLengthO)
 
-  test "getFunctionValue no parameters":
-    let functionName = "concat"
-    let statement = newStatement(text="""tea = concat()""", lineNum=16, 0)
-    let start = 13
-    let value = Value(kind: vkString, stringv: "")
-    let eValueAndLengthO = some(ValueAndLength(value: value, length: 1))
-    check testGetFunctionValue(functionName, statement, start, eValueAndLengthO = eValueAndLengthO)
+  # test "getFunctionValue no parameters":
+  #   let functionName = "concat"
+  #   let statement = newStatement(text="""tea = concat()""", lineNum=16, 0)
+  #   let start = 13
+  #   let value = Value(kind: vkString, stringv: "")
+  #   let eValueAndLengthO = some(ValueAndLength(value: value, length: 1))
+  #   check testGetFunctionValue(functionName, statement, start, eValueAndLengthO = eValueAndLengthO)
 
   test "getFunctionValue missing )":
     let statement = newStatement(text="""tea = len("abc" """, lineNum=16, 0)

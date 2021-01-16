@@ -90,7 +90,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     let command = cmdLineParts[0].command
     if not (command in ["nextline", "block", "replace"]):
       # todo: show error when we get endblock before block?
-      # todo: make it an error when other commands have statements?
+      # todo: make it an error when other commands have statements.
       continue
 
     # Run the command and fill in the variables.
@@ -132,8 +132,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     while true:
       # Write out all the stored replacement block lines and make the
       # variable substitutions.
-      writeTempSegments(env, tempSegments, startLineNum, variables,
-                        env.resultStream)
+      writeTempSegments(env, tempSegments, startLineNum, variables)
       # tempSegments.echoSegments
 
       # Increment the row variable.
@@ -151,10 +150,6 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 proc processTemplate*(env: var Env, args: Args): int =
   ## Process the template and return 0 on success. It's an error when
   ## a warning messages was written.
-
-  # Add the template and result streams to the environment.
-  if not env.addExtraStreams(args):
-    return 1
 
   # The tea variables are the top level items.  All variables are tea
   # variables in the sense that they all exists somewhere in this
@@ -178,3 +173,14 @@ proc processTemplate*(env: var Env, args: Args): int =
 
   if env.warningWritten > 0:
     result = 1
+
+proc processTemplateTop*(env: var Env, args: Args): int =
+  ## Process the template and return 0 on success. It's an error when
+  ## a warning messages was written.
+
+  # Add the template and result streams to the environment.
+  if not env.addExtraStreams(args):
+    return 1
+
+  # Process the template.
+  result = processTemplate(env, args)

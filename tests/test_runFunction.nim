@@ -14,7 +14,7 @@ proc testFunction(functionName: string, parameters: seq[Value],
     eOutLines: seq[string] = @[]
   ): bool =
 
-  var env = openEnvTest("_testFunction.log", "template.html")
+  var env = openEnvTest("_testFunction.log")
   let lineNum = 1
   let functionO = getFunction(functionName)
   let function = functionO.get()
@@ -37,7 +37,7 @@ proc testRunFunction(
   ): bool =
   ## Test run a function.
 
-  var env = openEnvTest("_testRunFunction.log", "template.html")
+  var env = openEnvTest("_testRunFunction.log")
 
   var variables = getTestVariables()
   var functionO = getFunction(functionName)

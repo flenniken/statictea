@@ -69,7 +69,7 @@ proc warn*(env: var Env, lineNum: Natural, warning: Warning, p1:
   ## Write a formatted warning message to the error stream.
   var filename = env.templateFilename
   if filename == "":
-    filename = "initializing"
+    filename = "unnamed"
     assert lineNum == 0
   let message = getWarning(filename, lineNum, warning, p1, p2)
   warn(env, message)
@@ -295,6 +295,7 @@ when defined(test):
       echo line
     stream.setPosition(pos)
 
+  # todo: this does not care about line endings.
   proc readAndClose*(stream: Stream): seq[string] =
     stream.setPosition(0)
     for line in stream.lines():
@@ -307,11 +308,29 @@ when defined(test):
       result = env.resultStream.readAndClose()
       discard tryRemoveFile(env.resultFilename)
 
+  # todo: replace readCloseDelete with readCloseDelete2
   proc readCloseDelete*(env: var Env): tuple[logLine: seq[string],
       errLines: seq[string], outLines: seq[string]] =
     if env.closeErrStream and env.closeOutStream:
       result = (env.closeReadDeleteLog(100),
         env.errStream.readAndClose(), env.outStream.readAndClose())
+
+  proc readCloseDelete2*(env: var Env): tuple[
+      logLines: seq[string],
+      errLines: seq[string],
+      outLines: seq[string],
+      templateLines: seq[string],
+      resultLines: seq[string]] =
+
+    result.logLines = env.closeReadDeleteLog(100)
+    if env.closeErrStream:
+      result.errLines = env.errStream.readAndClose()
+    if env.closeOutStream:
+      result.outLines = env.outStream.readAndClose()
+    if env.closeTemplateStream:
+      result.templateLines = env.templateStream.readAndClose()
+    if env.closeResultStream:
+      result.resultLines = env.resultStream.readAndClose()
 
   proc echoLines*(logLines, errLines, outLines: seq[string]) =
     echo "=== log ==="
@@ -387,33 +406,51 @@ when defined(test):
     echo "got length: $1" % $length
     echo "  expected: $1" % $eLength
 
-  proc openEnvTest*(logFilename: string, templateFilename: string = ""): Env =
-    ## Open the log, error, and out streams. The given log file is used
-    ## for the log stream.  The error and out streams get created as a
-    ## string type streams. The templateFilename is used for warning messages.
+  proc openEnvTest*(logFilename: string, templateContent: string = ""): Env =
+    ## Open the log, error, out, template and result streams. The
+    ## given log file is used for the log stream.  The error, out,
+    ## template and result streams get created as string type
+    ## streams. The templateContent string is written to the
+    ## templateStream. The env templateFilename is set to
+    ## "template.html" and is only used for error messages.
 
     result = Env(
       errStream: newStringStream(), closeErrStream: true,
       outStream: newStringStream(), closeOutStream: true,
-      templateFilename: templateFilename,
+      templateFilename: "template.html",
     )
     openLogFile(result, logFilename)
     checkLogSize(result)
 
-  proc readCloseDeleteCompare*(env: var Env, eLogLines: seq[string] = @[],
-                               eErrLines: seq[string] = @[], eOutLines: seq[string] = @[]): bool =
+    result.templateStream = newStringStream(templateContent)
+    result.closeTemplateStream = true
+
+    result.resultStream = newStringStream()
+    result.closeResultStream = true
+
+  proc readCloseDeleteCompare*(env: var Env,
+      eLogLines: seq[string] = @[],
+      eErrLines: seq[string] = @[],
+      eOutLines: seq[string] = @[],
+      eTemplateLines: seq[string] = @[],
+      eResultLines: seq[string] = @[]
+    ): bool =
     ## Read the env streams and close and delete them. Compare the
     ## streams with the expected content. Return true when they are
     ## the same.
 
     result = true
-    let (logLines, errLines, outLines) = env.readCloseDelete()
+    let (logLines, errLines, outLines, templateLines, resultLines) = env.readCloseDelete2()
 
     if not expectedItems("logLines", logLines, eLogLines):
       result = false
     if not expectedItems("errLines", errLines, eErrLines):
       result = false
     if not expectedItems("outLines", outLines, eOutLines):
+      result = false
+    if not expectedItems("templateLines", templateLines, eTemplateLines):
+      result = false
+    if not expectedItems("resultLines", resultLines, eResultLines):
       result = false
 
   proc readCloseDeleteCompareResult*(env: var Env, eResultLines: seq[string] = @[]): bool =

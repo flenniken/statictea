@@ -299,15 +299,18 @@ func parseVarSegment*(segment: string): tuple[namespace: string, name: string] =
   result = (namespace, name)
 
 proc writeSegment(env: var Env, lineNum: Natural, variables:
-                  Variables, oneWarnTable: var HashSet[string], segment: string, stream: Stream) =
-  ## Write one segment to the given stream.
+                  Variables, oneWarnTable: var HashSet[string],
+                  segment: string, stream: Stream, log: bool) =
+  ## Write one segment to the given stream. When log is true, log the
+  ## lines instead.
 
   # Write out each type of segment.
+  var str: string
   case segment[0]:
   of '0':
-    stream.write(segment[2 .. ^2])
+    str = segment[2 .. ^2]
   of '1':
-    stream.write(segment[2 .. ^1])
+    str = segment[2 .. ^1]
   of '2':
     # Update variable content and write out the updated segment.
 
@@ -318,27 +321,52 @@ proc writeSegment(env: var Env, lineNum: Natural, variables:
     let valueO = getVariable(variables, namespace, varName)
     if isSome(valueO):
       # Write the variables value.
-      stream.write($valueO.get())
+      str = $valueO.get()
     else:
       # The variable is missing. Write the original variable name
       # text with spacing and brackets.  Warn about the missing
       # variable but only once per variable.
       if not oneWarnTable.containsOrIncl(namespace & varName):
         env.warn(lineNum, wMissingReplacementVar, namespace, varName)
-      stream.write(segment[13 .. ^2])
+      str = segment[13 .. ^2]
   else:
-    discard
+    return
+
+  if log:
+    env.log(str)
+  else:
+    stream.write(str)
 
 # todo: handle line numbers better so you know which line the missing var is on.
 
 proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
-                        lineNum: Natural, variables: Variables, stream: Stream) =
-  ## This procedure writes the updated replacement block to the result
-  ## stream.  It does it by writing all the stored segments and
-  ## updating variable segments as it goes.
+                        lineNum: Natural, variables: Variables) =
+  ## Write the updated replacement block to the result stream.  It
+  ## does it by writing all the stored segments and updating variable
+  ## segments as it goes.
 
   # Seek to the beginning of the temp file.
   tempSegments.seekToStart()
+
+  # Determine where to write the result.
+  # - "result" -- the block output goes to the result file (default)
+  # - "stderr" -- the block output goes to standard error
+  # - "log" -- the block output goes to the log file
+  # - "skip" -- the block is skipped
+  var log: bool
+  var output = getTeaVarString(variables, "output")
+  var stream: Stream
+  case output
+  of "result":
+    stream = env.resultStream
+  of "stderr":
+    stream = env.errStream
+  of "log":
+    log = true
+  of "skip":
+    return
+  else:
+    return
 
   var rLineNum = lineNum
   while true:
@@ -347,7 +375,8 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
        break # No more segments.
     if segment[0] == '1':
       inc(rLineNum)
-    writeSegment(env, rLineNum, variables, tempSegments.oneWarnTable, segment, stream)
+    writeSegment(env, rLineNum, variables, tempSegments.oneWarnTable,
+                 segment, stream, log)
 
 proc allocTempSegments*(env: var Env, lineNum: Natural): Option[TempSegments] =
   ## Create a TempSegments object. This reserves memory for a line

@@ -16,7 +16,7 @@ proc testParseCmdLine(
   ): bool =
   ## Return true on success.
 
-  var env = openEnvTest("_parseCmdLine.log", "template.html")
+  var env = openEnvTest("_parseCmdLine.log")
 
   let compiledMatchers = getCompiledMatchers()
   let linePartsO = parseCmdLine(env, compiledMatchers, line, lineNum)
@@ -59,7 +59,7 @@ proc parseCmdLineError(
   ## Test that we get an error parsing the command line. Return true
   ## when we get the expected errors.
 
-  var env = openEnvTest("_parseCmdLine.log", "template.html")
+  var env = openEnvTest("_parseCmdLine.log")
 
   let compiledMatchers = getCompiledMatchers()
   let linePartsO = parseCmdLine(env, compiledMatchers, line, lineNum)

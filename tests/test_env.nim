@@ -50,7 +50,7 @@ suite "env.nim":
     logLine = parseLine(logLines[1]).get()
     check logLine.message == testMsg2
 
-    let errMsg = getWarning("initializing", 0, wNotEnoughMemoryForLB)
+    let errMsg = getWarning("template.html", 0, wNotEnoughMemoryForLB)
     check errLines.len == 2
     check errLines[0] == errMsg
     check errLines[1] == errMsg
@@ -101,7 +101,7 @@ suite "env.nim":
     env.log(testLine2)
 
     let eErrLines = @[
-      "initializing(0): w8: Unable to open log file: ''."
+      "template.html(0): w8: Unable to open log file: ''."
     ]
     check env.readCloseDeleteCompare(eErrLines = eErrLines)
 

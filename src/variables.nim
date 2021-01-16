@@ -42,6 +42,13 @@ proc getTeaVarInt*(variables: Variables, varName: string): int64 =
   assert value.kind == vkInt
   result = value.intv
 
+proc getTeaVarString*(variables: Variables, varName: string): string =
+  ## Return the string value of one of the tea dictionary string items.
+  assert varName in ["output"]
+  let value = variables[varName]
+  assert value.kind == vkString
+  result = value.stringv
+
 proc readServerVariables*(env: var Env, args: Args): VarsDict =
   ## Read the server json.
   result = getEmptyVars()

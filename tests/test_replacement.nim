@@ -8,26 +8,18 @@ import streams
 import options
 import tempFile
 import readlines
+import collectCommand
 
-
-# todo: replace command content.
-# todo: t.output support, result, stderr, log, skip
-
-proc testTempSegments(content: string, command: string = "nextline", repeat: Natural = 1,
-    eResultLines: seq[string] = @[],
+proc testTempSegments(templateContent: string, command: string = "nextline", repeat: Natural = 1,
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
-    eOutLines: seq[string] = @[]
+    eOutLines: seq[string] = @[],
+    eResultLines: seq[string] = @[]
   ): bool =
 
-  var env = openEnvTest("_testTempSegments.log", "template.html")
-  var inStream = newStringStream(content)
-  if inStream == nil:
-    return false
-  var resultStream = newStringStream()
-  if resultStream == nil:
-    return false
-  var lineBufferO = newLineBuffer(inStream)
+  var env = openEnvTest("_testTempSegments.log", templateContent)
+
+  var lineBufferO = newLineBuffer(env.templateStream)
   if not lineBufferO.isSome:
     return false
   var lb = lineBufferO.get()
@@ -40,14 +32,11 @@ proc testTempSegments(content: string, command: string = "nextline", repeat: Nat
   for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
     storeLineSegments(env, tempSegments, compiledMatchers, line)
   # tempSegments.echoSegments()
-  writeTempSegments(env, tempSegments, lb.lineNum, variables, resultStream)
+  writeTempSegments(env, tempSegments, lb.lineNum, variables)
   closeDelete(tempSegments)
-  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-  var resultLines = readStream(resultStream)
-  if not expectedItems("resultLines", resultLines, eResultLines):
-    result = false
-
+  let eTemplateLines = splitNewLinesNoEndings(templateContent)
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines, eTemplateLines, eResultLines)
 
 proc testReplaceLine(line: string,
     eLogLines: seq[string] = @[],
@@ -56,7 +45,7 @@ proc testReplaceLine(line: string,
     eResultLines: seq[string] = @[],
   ): bool =
 
-  var env = openEnvTest("_testReplaceLine.log", "template.html")
+  var env = openEnvTest("_testReplaceLine.log")
 
   var stream = newStringStream()
   let compiledMatchers = getCompiledMatchers()
@@ -232,7 +221,7 @@ suite "processReplacementBlock":
     check parseVarSegment("2,4   ,0,4  ,{   name }") == (namespace: "", name: "name")
 
   test "TempSegments nextline":
-    let content = """
+    let templateContent = """
 replacement block
 line 2
 more text
@@ -240,25 +229,25 @@ more text
     var eResultLines = @[
       "replacement block",
     ]
-    check testTempSegments(content, command = "nextline", repeat = 1, eResultLines = eResultLines)
+    check testTempSegments(templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
 
   test "TempSegments nextline variables":
-    let content = """
+    let templateContent = """
 {s.test} {h.test}!
 """
     var eResultLines = @[
       "hello there!",
     ]
-    check testTempSegments(content, command = "nextline", repeat = 1, eResultLines = eResultLines)
+    check testTempSegments(templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
 
   test "TempSegments nextline variables":
-    let content = """
+    let templateContent = """
 {s.test} {h.test}!
 """
     var eResultLines = @[
       "hello there!",
     ]
-    check testTempSegments(content, command = "nextline", repeat = 1, eResultLines = eResultLines)
+    check testTempSegments(templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
 
 
   # s.test = "hello"
@@ -268,7 +257,7 @@ more text
   # g.aboutfive = 5.11
 
   test "TempSegments block":
-    let content = """
+    let templateContent = """
 replacement {abc} block
 {s.test} {abc}
 more text {missing}
@@ -284,11 +273,11 @@ more text {missing}
       "template.html(4): w58: The replacement variable doesn't exist: abc.",
       "template.html(6): w58: The replacement variable doesn't exist: missing.",
     ]
-    check testTempSegments(content, command = "block", repeat = 1,
+    check testTempSegments(templateContent, command = "block", repeat = 1,
       eErrLines = eErrLines, eResultLines = eResultLines)
 
   test "TempSegments maxLines":
-    let content = """
+    let templateContent = """
 one
 two
 three
@@ -318,5 +307,7 @@ twelve
     var eErrLines = @[
       "template.html(10): w60: Reached the maximum replacement block line count without finding the endblock.",
     ]
-    check testTempSegments(content, command = "block", repeat = 1,
+    check testTempSegments(templateContent, command = "block", repeat = 1,
       eErrLines = eErrLines, eResultLines = eResultLines)
+
+#todo: test t.output options.

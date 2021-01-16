@@ -23,7 +23,7 @@ proc processArgs(env: var Env, args: Args): int =
   elif args.update:
     echo "updateTemplate(args)"
   elif args.templateList.len > 0:
-    result = processTemplate(env, args)
+    result = processTemplateTop(env, args)
   else:
     env.writeOut("No template name. Use -h for help.")
 

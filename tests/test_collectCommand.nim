@@ -24,7 +24,7 @@ proc testCollectCommand(
   var cmdLines: seq[string] = @[]
   var cmdLineParts: seq[LineParts] = @[]
 
-  var env = openEnvTest("_collectCommand.log", "template.html")
+  var env = openEnvTest("_collectCommand.log")
 
   let compiledMatchers = getCompiledMatchers()
   collectCommand(env, lb, compiledMatchers, resultStream, cmdLines, cmdLineParts)
@@ -60,6 +60,17 @@ two
 three
 """
     check splitNewLines(content) == @["line one\n", "two\n", "three\n"]
+
+  test "splitNewLinesNoEndings":
+    check splitNewLinesNoEndings("").len == 0
+    check splitNewLinesNoEndings("a") == @["a"]
+    check splitNewLinesNoEndings("abc") == @["abc"]
+    check splitNewLinesNoEndings("\n") == @[""]
+    check splitNewLinesNoEndings("b\n") == @["b"]
+    check splitNewLinesNoEndings("b\nc") == @["b", "c"]
+    check splitNewLinesNoEndings("b\nlast") == @["b", "last"]
+    check splitNewLinesNoEndings("b\nc\n") == @["b", "c"]
+    check splitNewLinesNoEndings("b\nc\nd") == @["b", "c", "d"]
 
   test "one line":
     let content = "<!--$ nextline -->\n"

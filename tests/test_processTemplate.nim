@@ -4,8 +4,9 @@ import processTemplate
 import env
 import args
 import os
+import collectCommand
 
-proc testProcessTemplate(content: string = "",
+proc testProcessTemplate(templateContent: string = "",
     serverJson: string = "",
     sharedJson: string = "",
     eRc = 0,
@@ -17,15 +18,9 @@ proc testProcessTemplate(content: string = "",
   ## Test the processTemplate procedure.
 
   # Open err, out and log streams.
-  var env = openEnvTest("_testProcessTemplate.log")
+  var env = openEnvTest("_testProcessTemplate.log", templateContent)
 
   var args: Args
-
-  # Create a template file from the given template content.
-  let templateFilename = "template.html"
-  createFile(templateFilename, content)
-  defer: discard tryRemoveFile(templateFilename)
-  args.templateList = @[templateFilename]
 
   # Create the server json file.
   if serverJson != "":
@@ -39,19 +34,15 @@ proc testProcessTemplate(content: string = "",
     createFile(sharedFilename, sharedJson)
     args.sharedList = @[sharedFilename]
 
-  args.resultFilename = "result.txt"
-
   # Process the template and write out the result.
   let rc = processTemplate(env, args)
 
-  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+  # todo: we don't need to verify the template lines.
+  let eTemplateLines = splitNewLinesNoEndings(templateContent)
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines,
+    eTemplateLines = eTemplateLines, eResultLines = eResultLines)
 
   if not expectedItem("rc", rc, eRc):
-    result = false
-
-  # Read the result file.
-  let resultLines = env.readCloseDeleteResult()
-  if not expectedItems("resultLines", resultLines, eResultLines):
     result = false
 
   discard tryRemoveFile("server.json")
@@ -94,7 +85,7 @@ suite "processTemplate":
     check testProcessTemplate()
 
   test "Hello World":
-    let content = """
+    let templateContent = """
 <!--$ nextline -->
 hello {s.name}
 """
@@ -104,11 +95,11 @@ hello {s.name}
     let eResultLines = @[
       "hello world"
     ]
-    check testProcessTemplate(content = content, serverJson =
+    check testProcessTemplate(templateContent = templateContent, serverJson =
         serverJson, eResultLines = eResultLines)
 
   test "Drink Tea":
-    let content = """
+    let templateContent = """
 <!--$ nextline -->
 Drink {s.drink} -- {s.drinkType} is my favorite.
 """
@@ -121,11 +112,11 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
     let eResultLines = @[
       "Drink tea -- Earl Grey is my favorite."
     ]
-    check testProcessTemplate(content = content, serverJson =
+    check testProcessTemplate(templateContent = templateContent, serverJson =
         serverJson, eResultLines = eResultLines)
 
   test "Shared Header":
-    let content = """
+    let templateContent = """
 <!--$ replace t.content=h.header -->
 <!--$ endblock -->
 """
@@ -141,11 +132,11 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
       """<html lang="en">"""
     ]
 
-    check testProcessTemplate(content = content, sharedJson =
+    check testProcessTemplate(templateContent = templateContent, sharedJson =
         sharedJson, eResultLines = eResultLines)
 
   test "Shared Header2":
-    let content = """
+    let templateContent = """
 <!--$ replace t.content=h.header -->
 <!DOCTYPE html>
 <html lang="{s.languageCode}" dir="{s.languageDirection}">
@@ -180,12 +171,12 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
       "<meta charset=\"UTF-8\"/>",
       "<title>Teas in England</title>",
     ]
-    check testProcessTemplate(content = content, serverJson = serverJson, sharedJson =
+    check testProcessTemplate(templateContent = templateContent, serverJson = serverJson, sharedJson =
         sharedJson, eResultLines = eResultLines)
 
   test "Comment":
 
-    let content = """
+    let templateContent = """
 <!--$ # How you make tea. -->
 There are five main groups of teas:
 white, green, oolong, black, and pu'erh.
@@ -198,11 +189,11 @@ intensive steps.
       "You make Oolong Tea in five time",
       "intensive steps.",
     ]
-    check testProcessTemplate(content = content, eResultLines = eResultLines)
+    check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
 
   test "Continuation":
 
-    let content = """
+    let templateContent = """
 <!--$ nextline \-->
 <!--$ : tea = 'Earl Grey'; \-->
 <!--$ : tea2 = 'Masala chai' -->
@@ -211,11 +202,11 @@ intensive steps.
     let eResultLines = @[
       "Earl Grey, Masala chai",
     ]
-    check testProcessTemplate(content = content, eResultLines = eResultLines)
+    check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
 
   test "Invalid statement":
 
-    let content = """
+    let templateContent = """
 <!--$ nextline \-->
 <!--$ : tea = 'Earl Grey' \-->
 <!--$ : tea2 = 'Masala chai' -->
@@ -232,12 +223,12 @@ intensive steps.
       "template.html(3): w58: The replacement variable doesn't exist: tea.",
       "template.html(3): w58: The replacement variable doesn't exist: tea2.",
     ]
-    check testProcessTemplate(content = content, eRc = 1, eResultLines
+    check testProcessTemplate(templateContent = templateContent, eRc = 1, eResultLines
           = eResultLines, eErrLines = eErrLines)
 
   test "commands in a replacement block":
 
-    let content = """
+    let templateContent = """
 <!--$ block -->
 <!--$ # this is not a comment, just text -->
 fake nextline
@@ -249,11 +240,11 @@ fake nextline
       "fake nextline",
       "<!--$ nextline -->",
     ]
-    check testProcessTemplate(content = content, eResultLines = eResultLines)
+    check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
 
   test "json variables":
 
-    let content = """
+    let templateContent = """
 <!--$ block \-->
 <!--$ : serverElements = len(t.server); \-->
 <!--$ : jsonElements = len(t.shared) -->
@@ -274,11 +265,11 @@ and the shared json has {jsonElements}.
       "The server has 5 elements",
       "and the shared json has 0.",
     ]
-    check testProcessTemplate(content = content, serverJson = serverJson, eResultLines = eResultLines)
+    check testProcessTemplate(templateContent = templateContent, serverJson = serverJson, eResultLines = eResultLines)
 
 #   test "output admin var missing":
 
-#     let content = """
+#     let templateContent = """
 # <!--$ nextline \-->
 # <!--$ : t.output = if( \-->
 # <!--$ :   exists("s.admin"), "skip", \-->
@@ -292,11 +283,11 @@ and the shared json has {jsonElements}.
 #     let eResultLines = @[
 #       "template.html(45): missing admin var"
 #     ]
-#     check testProcessTemplate(content = content, eResultLines = eResultLines)
+#     check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
 
 #   test "output no output":
 
-#     let content = """
+#     let templateContent = """
 # <!--$ nextline \-->
 # <!--$ : t.output = if( \-->
 # <!--$ :   exists("s.admin"), "skip", \-->
@@ -307,11 +298,11 @@ and the shared json has {jsonElements}.
 # <!--$ :   "missing admin var") -->
 # {msg}
 # """
-#     check testProcessTemplate(content = content)
+#     check testProcessTemplate(templateContent = templateContent)
 
   test "not a command":
 
-    let content = """
+    let templateContent = """
 #$ block \
 #$ : cond1 = notfunction(4, 5); \
 #$ : cond3 = hello(5, 4)
@@ -325,11 +316,11 @@ and the shared json has {jsonElements}.
       "statement:  cond3 = hello(5, 4)",
       "                    ^",
     ]
-    check testProcessTemplate(content = content, eRc = 1, eErrLines = eErrLines)
+    check testProcessTemplate(templateContent = templateContent, eRc = 1, eErrLines = eErrLines)
 
 # test "cmp example":
 
-#     let content = """
+#     let templateContent = """
 # #$ block \
 # #$ : cond1 = cmp(4, 5); \
 # #$ : cond2 = cmp(2, 2); \
@@ -344,7 +335,7 @@ and the shared json has {jsonElements}.
 #       "cmp(2, 2) returns 0",
 #       "cmp(5, 4) returns 1",
 #     ]
-#     check testProcessTemplate(content = content, eResultLines = eResultLines)
+#     check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
 
 
 
