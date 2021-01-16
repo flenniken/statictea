@@ -302,12 +302,6 @@ when defined(test):
       result.add line
     stream.close()
 
-  proc readCloseDeleteResult*(env: var Env): seq[string] =
-    # If the result is going to stdout, read it to get the result.
-    if env.closeResultStream:
-      result = env.resultStream.readAndClose()
-      discard tryRemoveFile(env.resultFilename)
-
   # todo: replace readCloseDelete with readCloseDelete2
   proc readCloseDelete*(env: var Env): tuple[logLine: seq[string],
       errLines: seq[string], outLines: seq[string]] =
@@ -450,12 +444,6 @@ when defined(test):
       result = false
     if not expectedItems("templateLines", templateLines, eTemplateLines):
       result = false
-    if not expectedItems("resultLines", resultLines, eResultLines):
-      result = false
-
-  proc readCloseDeleteCompareResult*(env: var Env, eResultLines: seq[string] = @[]): bool =
-    result = true
-    let resultLines = env.readCloseDeleteResult()
     if not expectedItems("resultLines", resultLines, eResultLines):
       result = false
 

@@ -93,18 +93,21 @@ proc testGetString(
   let compiledMatchers = getCompiledMatchers()
   let valueAndLengthO = getString(env, compiledMatchers, statement, start)
 
-  let (logLines, errLines, outLines) = env.readCloseDelete()
-  result = true
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
   if not testSome(valueAndLengthO, eValueAndlengthO, statement.text, start):
     result = false
-  if not expectedItems("logLines", logLines, eLogLines):
-    result = false
-  if not expectedItems("outLines", outLines, eOutLines):
-    result = false
-  if not statement.text.contains("stringwithbadutf8"):
-    if not expectedItems("errLines", errLines, eErrLines):
-      result = false
+
+proc testGetStringInvalid(buffer: seq[uint8]): bool =
+  var str = newStrFromBuffer(buffer)
+  var statement = "a = 'stringwithbadutf8:$1:end'" % str
+  let expectedLine = "statement: a = 'stringwithbadutf8:$1:end'" % str
+  var eErrLines = @[
+    "template.html(1): w32: Invalid UTF-8 byte in the string.",
+    expectedLine,
+    "                                  ^",
+  ]
+  result = testGetString(newStatement(statement), 4, none(ValueAndLength), eErrLines = eErrLines)
 
 proc stripNewline(line: string): string =
   if line.len > 0 and line[^1] == '\n':
@@ -514,27 +517,33 @@ suite "runCommand.nim":
     var statement = "a = '$1'" % str
     check testGetString(newStatement(statement), 4, newStringValueAndLengthO(str, eLength))
 
-  test "getString invalid utf-8":
-    var byteBuffers: seq[seq[uint8]] = @[
-      @[0xc3u8, 0x28],
-      @[0xa0u8, 0xa1],
-      @[0xe2u8, 0x28, 0xa1],
-      @[0xe2u8, 0x82, 0x28],
-      @[0xf0u8, 0x28, 0x8c, 0xbc],
-      @[0xf0u8, 0x90, 0x28, 0xbc],
-    ]
-    var str: string
-    for ix, buffer in byteBuffers:
-      str = newStrFromBuffer(buffer)
-      var statement = "a = 'stringwithbadutf8:$1:end'" % str
-      var eErrLines = @[
-        "template.html(1): w32: Invalid UTF-8 byte in the string.",
-        "statement: a = 'stringwithbadutf8:?(?:end'",
-        "                               ^",
-      ]
-      if not testGetString(newStatement(statement), 4, none(ValueAndLength), eErrLines = eErrLines):
-        echo $ix & " failed"
-        check false
+
+    # var byteBuffers: seq[seq[uint8]] = @[
+    #   @[0xc3u8, 0x28],
+    #   @[0xa0u8, 0xa1],
+    #   @[0xe2u8, 0x28, 0xa1],
+    #   @[0xe2u8, 0x82, 0x28],
+    #   @[0xf0u8, 0x28, 0x8c, 0xbc],
+    #   @[0xf0u8, 0x90, 0x28, 0xbc],
+    # ]
+
+  test "getString invalid 2":
+    check testGetStringInvalid(@[0xc3u8, 0x28])
+
+  test "getString invalid 22":
+    check testGetStringInvalid(@[0xa0u8, 0xa1])
+
+  test "getString invalid 3":
+    check testGetStringInvalid(@[0xe2u8, 0x28, 0xa1])
+
+  test "getString invalid 33":
+    check testGetStringInvalid(@[0xe2u8, 0x82, 0x28])
+
+  test "getString invalid 4":
+    check testGetStringInvalid(@[0xf0u8, 0x28, 0x8c, 0xbc])
+
+  test "getString invalid 44":
+    check testGetStringInvalid(@[0xf0u8, 0x90, 0x28, 0xbc])
 
   test "getString not string":
     let eErrLines = @[
