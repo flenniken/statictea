@@ -8,7 +8,6 @@ import strutils
 import options
 import env
 import matches
-import collectCommand
 import vartypes
 import variables
 import tables

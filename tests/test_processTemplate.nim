@@ -4,7 +4,7 @@ import processTemplate
 import env
 import args
 import os
-import collectCommand
+import readlines
 
 proc testProcessTemplate(templateContent: string = "",
     serverJson: string = "",
@@ -77,7 +77,7 @@ suite "processTemplate":
     let filename = "template.html"
     createFile(filename, "Hello")
     defer: discard tryRemoveFile(filename)
-    let lines = readLines(filename, maximum=4)
+    let lines = readAllLines(filename)
     check lines.len == 1
     check lines[0] == "Hello"
 

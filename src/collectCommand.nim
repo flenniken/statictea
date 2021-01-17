@@ -64,31 +64,3 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
           return # No more lines
         break # Start looking for another command.
 
-when defined(test):
-  proc splitNewLines*(content: string): seq[string] =
-    ## Split lines and keep the line endings.
-    if content.len == 0:
-      return
-    var start = 0
-    var pos: int
-    for pos in 0 ..< content.len:
-      let ch = content[pos]
-      if ch == '\n':
-        result.add(content[start .. pos])
-        start = pos+1
-    if start < content.len:
-      result.add(content[start ..< content.len])
-
-  proc splitNewLinesNoEndings*(content: string): seq[string] =
-    ## Split lines without the line endings.
-    if content.len == 0:
-      return
-    var start = 0
-    var pos: int
-    for pos in 0 ..< content.len:
-      let ch = content[pos]
-      if ch == '\n':
-        result.add(content[start ..< pos])
-        start = pos+1
-    if start < content.len:
-      result.add(content[start ..< content.len])

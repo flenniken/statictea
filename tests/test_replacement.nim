@@ -8,7 +8,6 @@ import streams
 import options
 import tempFile
 import readlines
-import collectCommand
 
 proc testTempSegments(templateContent: string, command: string = "nextline", repeat: Natural = 1,
     eLogLines: seq[string] = @[],

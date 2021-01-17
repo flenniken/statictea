@@ -1,9 +1,7 @@
 import unittest
 import statictea
-import version
 import streams
 import strutils
-import options
 import env
 
 proc readAndClose(stream: Stream): seq[string] =
@@ -13,33 +11,37 @@ proc readAndClose(stream: Stream): seq[string] =
     result.add line
   stream.close()
 
+proc testMain(argv: seq[string],
+    eRc: int,
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[],
+    eResultLines: seq[string] = @[],
+  ): bool =
+  var env = openEnvTest("_logfile1.txt")
+
+  let rc = main(env, argv)
+
+  var eTemplateLines: seq[string]
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines, eTemplateLines, eResultLines)
+  if not expectedItem("rc", rc, eRc):
+    result = false
+
 suite "Test statictea.nim":
 
   test "main version":
-    let mainFilename = "statictea.nim"
-    var env = openEnvTest("_logfile1.txt")
 
-    let rc = main(env, @["-v"])
-    check rc == 0
+    let logLines = """
+2021-01-16 13:51:09.767; statictea.nim(33); ----- starting -----
+2021-01-16 13:51:09.767; statictea.nim(34); argv: @["-v"]
+2021-01-16 13:51:09.767; statictea.nim(35); version: 0.1.0
+2021-01-16 13:51:09.767; statictea.nim(56); Done
+"""
+    var eLogLines = splitNewlines(logLines)
+    let eOutLines = @["0.1.0"]
+    let argv = @["-v"]
+    check testMain(argv, 0, eOutLines = eOutLines, eLogLines = eLogLines)
 
-    let (logLines, errLines, outLines) = env.readCloseDelete()
-
-    check outLines.len == 1
-    check outLines[0] == $staticteaVersion
-
-    let expectedMessages = [
-      "----- starting -----",
-      """argv: @["-v"]""",
-      "version: 0.1.0",
-      "Done",
-    ]
-    check logLines.len >= 4
-    for line in logLines:
-      let logLineO = parseLine(line)
-      check logLineO.isSome
-      let logLine = logLineO.get()
-      check logLine.filename == mainFilename
-      check logLine.message in expectedMessages
 
   test "main help":
     let mainFilename = "statictea.nim"
@@ -58,7 +60,7 @@ NAME
 
 SYNOPSIS
 
-     statictea [-h] [-n] [-v] [-u] [-s=server.json] [-j=shared.json] 
+     statictea [-h] [-n] [-v] [-u] [-s=server.json] [-j=shared.json]
          [-t=template.html] [-p="pre post"] [-r=result.html]"""
 
     let count = 7

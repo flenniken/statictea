@@ -7,6 +7,7 @@ import times
 when defined(test):
   import options
   import regexes
+  import readlines
 
 const
   staticteaLog* = "statictea.log"                    ## \
@@ -226,6 +227,35 @@ when defined(test):
       lineNum*: Natural
       message*: string
 
+when defined(test):
+  proc splitNewLines*(content: string): seq[string] =
+    ## Split lines and keep the line endings.
+    if content.len == 0:
+      return
+    var start = 0
+    var pos: int
+    for pos in 0 ..< content.len:
+      let ch = content[pos]
+      if ch == '\n':
+        result.add(content[start .. pos])
+        start = pos+1
+    if start < content.len:
+      result.add(content[start ..< content.len])
+
+  proc splitNewLinesNoEndings*(content: string): seq[string] =
+    ## Split lines without the line endings.
+    if content.len == 0:
+      return
+    var start = 0
+    var pos: int
+    for pos in 0 ..< content.len:
+      let ch = content[pos]
+      if ch == '\n':
+        result.add(content[start ..< pos])
+        start = pos+1
+    if start < content.len:
+      result.add(content[start ..< content.len])
+
   proc parseTimeStamp*(str: string): Option[DateTime] =
     try:
       result = some(parse(str, dtFormat))
@@ -255,29 +285,29 @@ when defined(test):
     result = some(LogLine(dt: dtO.get(), filename: fileLine.filename,
       lineNum: fileLine.lineNum, message: parts[2]))
 
-  proc readLines*(filename: string, maximum: int = -1): seq[string] =
-    ## Read up to maximum lines from the given file. When maximum is
-    ## negative, read all lines.
-    var count = 0
-    if maximum == 0:
-      return
-    var max: int
-    if maximum < 0:
-      max = high(int)
-    else:
-      max = maximum
-    for line in lines(filename):
-      result.add(line)
-      inc(count)
-      if count > max:
-        break
+  # proc readLines*(filename: string, maximum: int = -1): seq[string] =
+  #   ## Read up to maximum lines from the given file. When maximum is
+  #   ## negative, read all lines.
+  #   var count = 0
+  #   if maximum == 0:
+  #     return
+  #   var max: int
+  #   if maximum < 0:
+  #     max = high(int)
+  #   else:
+  #     max = maximum
+  #   for line in lines(filename):
+  #     result.add(line)
+  #     inc(count)
+  #     if count > max:
+  #       break
 
   proc closeReadDeleteLog*(env: var Env, maximum: int = -1): seq[string] =
     # Close the log file, read its lines, then delete the file.
     if env.logFile != nil:
       env.logFile.close()
       env.logFile = nil
-      result = readLines(env.logFilename, maximum)
+      result = readAllLines(env.logFilename)
       discard tryRemoveFile(env.logFilename)
 
   proc readStream*(stream: Stream): seq[string] =
@@ -400,6 +430,16 @@ when defined(test):
     echo "got length: $1" % $length
     echo "  expected: $1" % $eLength
 
+  proc normalizeLogTime*(logLines: seq[string]): seq[string] =
+    ## Change the log lines' time to: 2021-01-16 13:51:09.767.
+
+    # 2021-01-16 13:51:09.767; test_env.nim(10); testProc called
+    # todo: do something about the line number.
+
+    let time = "2021-01-16 13:51:09.767"
+    for line in logLines:
+      result.add(time & line[time.len .. ^1])
+
   proc openEnvTest*(logFilename: string, templateContent: string = ""): Env =
     ## Open the log, error, out, template and result streams. The
     ## given log file is used for the log stream.  The error, out,
@@ -436,7 +476,8 @@ when defined(test):
     result = true
     let (logLines, errLines, outLines, templateLines, resultLines) = env.readCloseDelete2()
 
-    if not expectedItems("logLines", logLines, eLogLines):
+    let nLogLines = normalizeLogTime(logLines)
+    if not expectedItems("logLines", nLogLines, eLogLines):
       result = false
     if not expectedItems("errLines", errLines, eErrLines):
       result = false

@@ -1,17 +1,12 @@
-
 import unittest
 import env
 import typetraits
 import options
-import warnings
-import random
 import options
-import strutils
 
-let testMsg1 = "testProc called"
-let testMsg2 = "testProc done"
-
-randomize()
+proc testProc(env: var Env) =
+  env.log("testProc called")
+  env.log("testProc done")
 
 proc endsWith(line: string, str: string): bool =
   ## Return true when the given string ends the line.
@@ -21,10 +16,6 @@ proc endsWith(line: string, str: string): bool =
       return true
   return false
 
-proc testProc(env: var Env) =
-  env.log(testMsg1)
-  env.log(testMsg2)
-
 suite "env.nim":
 
   test "open close":
@@ -33,33 +24,16 @@ suite "env.nim":
     env.close()
 
   test "log":
-    let outMsg = "standard out line"
     var env = openEnvTest("_test.log")
+
     testProc(env)
-    env.writeOut(outMsg)
-    check env.warningWritten == 0
-    env.warn(0, wNotEnoughMemoryForLB)
-    check env.warningWritten == 1
-    env.warn(0, wNotEnoughMemoryForLB)
-    check env.warningWritten == 2
-    var (logLines, errLines, outLines) = env.readCloseDelete()
-    # echoLines(logLines, errLines, outLines)
-    check logLines.len == 2
-    var logLine = parseLine(logLines[0]).get()
-    check logLine.message == testMsg1
-    logLine = parseLine(logLines[1]).get()
-    check logLine.message == testMsg2
 
-    let errMsg = getWarning("template.html", 0, wNotEnoughMemoryForLB)
-    check errLines.len == 2
-    check errLines[0] == errMsg
-    check errLines[1] == errMsg
-
-    check outLines.len == 1
-    check outLines[0] == outMsg
-
-    # echoLines(logLines, errLines, outLines)
-
+    let logLines = """
+2021-01-16 13:51:09.767; test_env.nim(8); testProc called
+2021-01-16 13:51:09.767; test_env.nim(9); testProc done
+"""
+    var eLogLines = splitNewlines(logLines)
+    check env.readCloseDeleteCompare(eLogLines = eLogLines)
 
   test "endsWith":
     check endsWith("123", "") == true
@@ -73,36 +47,21 @@ suite "env.nim":
     check endsWith("123", "0123") == false
     check endsWith("", "3") == false
 
-  test "log line":
-    var env = openEnvTest("_logline.log")
-    check env.logFile != nil
-    check env.logFilename == "_logline.log"
-
-    let testLine1 = "test line 1: $1" % $rand(100)
-    env.log(testLine1)
-    let testLine2 = "test line 2: $1" % $rand(100)
-    env.log(testLine2)
-
-    var (logLines, errLines, outLines) = env.readCloseDelete()
-    # echoLines(logLines, errLines, outLines)
-    check logLines.len == 2
-    check logLines[0].endsWith(testLine1)
-    check logLines[1].endsWith(testLine2)
-
-    check env.logFile == nil
-
   test "cannot open log":
     var env = openEnvTest("")
     check env.logFile == nil
 
-    let testLine1 = "test line 1: $1" % $rand(100)
-    env.log(testLine1)
-    let testLine2 = "test line 2: $1" % $rand(100)
-    env.log(testLine2)
+    env.log("test line no log")
+    env.log("test line no log2")
 
     let eErrLines = @[
       "template.html(0): w8: Unable to open log file: ''."
     ]
+    let logLines = """
+2021-01-16 13:51:09.767; test_env.nim(61); test line 1
+2021-01-16 13:51:09.767; test_env.nim(61); test line 1
+"""
+    var eLogLines = splitNewlines(logLines)
     check env.readCloseDeleteCompare(eErrLines = eErrLines)
 
   test "parseTimeStamp":
@@ -133,3 +92,16 @@ suite "env.nim":
     check logLine.filename == "statictea.nim"
     check logLine.lineNum == 65
     check logLine.message == "version: 0.1.0"
+
+  test "normalizeLogTime":
+    let logLines = @[
+      """2022-01-16 11:32:09.111; statictea.nim(33); ----- starting -----""",
+      """2023-11-10 01:51:04.432; statictea.nim(34); argv: @["-v"]""",
+    ]
+    let eLogLines = @[
+      """2021-01-16 13:51:09.767; statictea.nim(33); ----- starting -----""",
+      """2021-01-16 13:51:09.767; statictea.nim(34); argv: @["-v"]"""
+    ]
+    let nLogLines = normalizeLogTime(logLines)
+
+    check expectedItems("logLines", nLogLines, eLogLines)

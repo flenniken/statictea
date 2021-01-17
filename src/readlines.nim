@@ -94,20 +94,38 @@ proc readline*(lb: var LineBuffer): string =
   result = line
 
 when defined(test):
-
+  # todo: rename to readAllLines.
   proc readlines*(lb: var LineBuffer): seq[string] =
+    ## Read all lines from a LineBuffer returning line endings.
     while true:
       var line = lb.readline()
       if line == "":
         break
       result.add(line)
 
-  proc readlines*(stream: Stream): seq[string] =
+  # todo: rename to readAllLines
+  proc readlines*(stream: Stream,
+    maxLineLen: int = defaultMaxLineLen,
+    bufferSize: int = defaultBufferSize,
+    filename: string = ""
+  ): seq[string] =
+    ## Read all lines from a string returning line endings.
     var lineBufferO = newLineBuffer(stream)
     if not lineBufferO.isSome:
       return
     var lb = lineBufferO.get()
     result = readLines(lb)
+
+  proc readAllLines*(filename: string,
+    maxLineLen: int = defaultMaxLineLen,
+    bufferSize: int = defaultBufferSize,
+  ): seq[string] =
+    ## Read all lines from a file returning line endings.
+    var stream = newFileStream(filename)
+    if stream == nil:
+      return
+    result = readlines(stream, maxLineLen, bufferSize, filename)
+    stream.close
 
   proc theLines*(stream: Stream): seq[string] =
     ## Read all the lines in the stream.
