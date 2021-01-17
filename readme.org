@@ -82,9 +82,6 @@ StaticTea commands:
 The nextline command targets the line following it for
 replacement. The targeted line is called the replacement block.
 
-The replacement block contains any number of variables wrapped
-with brackets.  They get replaced with the variables's value.
-
 The following example's replacement block contains two variables,
 drink and drinkType.
 
@@ -175,7 +172,7 @@ If you don't assign the t.content variable, the block content is
 used as is.  This is good for testing changes you want to make to
 the shared value.
 
-The following example uses a common header from the shared json. between templates.
+The following example uses a common header from the shared json.
 
 template:
 
@@ -204,8 +201,8 @@ work as a static template because the template is missing the
 header lines.
 
 You can fix this by adding the header lines inside the replace
-block. The inside lines do not appear in the result, just the
-data from the json variable.
+command's replacement block. The lines do not appear in the
+result, just the data from the json header variable.
 
 template:
 
@@ -284,8 +281,9 @@ result:
 :CUSTOM_ID: comment-command
 :END:
 
-You can comment templates.  Comments are line based and use the #
-character. They do not appear in the result.
+You can comment templates with the comments command.  Comments
+are line based and use the # character. They do not appear in the
+result.
 
 template:
 
@@ -385,17 +383,25 @@ command before it and an endblock command after it. The nextline
 block is one line and it does not have an endblock.
 
 You mark the variable content with brackets around the variables
-inside the block.
+inside the block. You can use any number of variables.
 
 You use repeating blocks to make lists and other repeating
 content.
 
+Here is a replacement block tea quote from "Alice in Wonderland",
+by Lewis Carroll:
+
 #+BEGIN_SRC
 <!--$ block -->
-This is the first line.
-A line.
-Another line.
-This is the last line.
+"Take some more tea," the March Hare
+said to Alice, very earnestly.
+
+"I've had nothing yet," Alice replied in an
+offended tone: "so I can't take more."
+
+"You mean you cannot take less," said
+the Hatter: "it's very easy to take
+more than nothing."
 <!--$ endblock -->
 #+END_SRC
 
