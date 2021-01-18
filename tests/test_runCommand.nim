@@ -12,6 +12,31 @@ import vartypes
 import variables
 import tables
 import warnings
+import regexes
+
+proc testSome*[T](valueAndLengthO: Option[T], eValueAndLengthO: Option[T],
+    text: string, start: Natural): bool =
+
+  if valueAndLengthO == eValueAndLengthO:
+    return true
+
+  if not isSome(eValueAndLengthO):
+    echo "Expected nothing but got something."
+    echo $valueAndLengthO
+    return false
+
+  let value = valueAndLengthO.get().value
+  let length = valueAndLengthO.get().length
+  let eValue = eValueAndLengthO.get().value
+  let eLength = eValueAndLengthO.get().length
+
+  echo "Did not get the expected value."
+  echo " text: $1" % text
+  echo "start: $1" % startPointer(start)
+  echo "got value: $1" % $value
+  echo " expected: $1" % $evalue
+  echo "got length: $1" % $length
+  echo "  expected: $1" % $eLength
 
 proc newStrFromBuffer(buffer: seq[uint8]): string =
   result = newStringOfCap(buffer.len)

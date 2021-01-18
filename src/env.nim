@@ -406,39 +406,92 @@ when defined(test):
             echo "$1       : expected: $2" % [$ix, $expectedItems[ix]]
       result = false
 
-  proc testSome*[T](valueAndLengthO: Option[T], eValueAndLengthO: Option[T],
-      text: string, start: Natural): bool =
+  proc showLines*(logLine: string, eLogLine: string, ix: int, eix: int) =
+    echo "     got: " & logLine
+    echo "          " & startPointer(ix)
+    echo "expected: " & eLogLine
+    echo "          " & startPointer(eix)
 
-    if valueAndLengthO == eValueAndLengthO:
+  proc compareLogLine*(logLine: string, eLogLine: string): Option[tuple[ix: int, eix: int]] =
+    ## Compare the two log lines, skipping variable parts. If
+    ## the expected line has a X in it, that character is skipped. If
+    ## it has a *, zero or more characters are skipped.
+    ## This simple regex is used instead of full regex so you don't
+    ## have to escape all the special regex characters.
+
+    #      got: 2020-10-01 08:21:28.618; statictea.nim(2652); version: 0.1.0"
+    #                                                            ^
+    # expected: XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(X*); verzion: X*.X*.X*"
+    #                                                          ^
+    var eix = 0
+    var ix = 0
+    let logLineLen = logLine.len
+    let eLogLineLen = eLogLine.len
+    while true:
+      if ix == logLineLen or eix == eLogLineLen:
+        if ix != logLineLen or eix != eLogLineLen:
+          return some((ix, eix))
+        return
+      var ch = logLine[ix]
+      var eCh = eLogLine[eix]
+      case eCh
+      of 'X':
+        discard
+      of '*':
+        # Get the next expected character and search for it in the
+        # current position in the log line. If there is no next
+        # expected character, we match everything to the end of the
+        # line. When the expected character is found, go back to
+        # normal matching.
+        inc(eix)
+        if eix == eLogLineLen:
+          return # Match to the end of the line.
+        eCh = eLogLine[eix]
+        var pos = find(logLine, eCh, ix)
+        if pos == -1:
+          return some((ix, eix))
+        ix = pos
+      else:
+        if ch != eCh:
+          return some((ix, eix))
+      inc(ix)
+      inc(eix)
+
+  proc compareLogLinesMatches*(logLines: seq[string], eLogLines: seq[string]): seq[int] =
+    ## Compare the two sets of log lines, skipping variable parts. If
+    ## the expected line has a X in it, that character is skipped. If
+    ## it has a *, zero or more characters are skipped.  More actual
+    ## lines may exist then expected lines. The expected lines must
+    ## appear in order but there may be other lines around them.
+    ## Return the indexes of the expected log lines that match.
+
+    var start = 0
+    for eix, eLogLine in eLogLines:
+      if start == logLines.len:
+        break
+      for ix, logLine in logLines[start .. ^1]:
+        let diffsO = compareLogLine(logLine, eLogLine)
+        if not diffsO.isSome:
+          result.add(eix)
+          start = start + ix + 1
+          break
+
+  proc showLogLinesAndExpected*(logLines: seq[string], eLogLines: seq[string], matches: seq[int]) =
+    echo "-------- logLines ---------"
+    for logLine in logLines:
+      echo "   line: " & logLine
+    echo "-------- eLogLines ---------"
+    for eix, eLogLine in eLogLines:
+      if matches.contains(eix):
+        echo "  found: " & eLogLine
+      else:
+        echo "missing: " & eLogLine
+
+  proc compareLogLines*(logLines: seq[string], eLogLines: seq[string]): bool =
+    var matches = compareLogLinesMatches(logLines, eLogLines)
+    if matches.len == eLogLines.len:
       return true
-
-    if not isSome(eValueAndLengthO):
-      echo "Expected nothing be got something."
-      echo $valueAndLengthO
-      return false
-
-    let value = valueAndLengthO.get().value
-    let length = valueAndLengthO.get().length
-    let eValue = eValueAndLengthO.get().value
-    let eLength = eValueAndLengthO.get().length
-
-    echo "Did not get the expected value."
-    echo " text: $1" % text
-    echo "start: $1" % startPointer(start)
-    echo "got value: $1" % $value
-    echo " expected: $1" % $evalue
-    echo "got length: $1" % $length
-    echo "  expected: $1" % $eLength
-
-  proc normalizeLogTime*(logLines: seq[string]): seq[string] =
-    ## Change the log lines' time to: 2021-01-16 13:51:09.767.
-
-    # 2021-01-16 13:51:09.767; test_env.nim(10); testProc called
-    # todo: do something about the line number.
-
-    let time = "2021-01-16 13:51:09.767"
-    for line in logLines:
-      result.add(time & line[time.len .. ^1])
+    showLogLinesAndExpected(logLines, eLogLines, matches)
 
   proc openEnvTest*(logFilename: string, templateContent: string = ""): Env =
     ## Open the log, error, out, template and result streams. The
@@ -472,12 +525,10 @@ when defined(test):
     ## Read the env streams and close and delete them. Compare the
     ## streams with the expected content. Return true when they are
     ## the same.
-
     result = true
     let (logLines, errLines, outLines, templateLines, resultLines) = env.readCloseDelete2()
 
-    let nLogLines = normalizeLogTime(logLines)
-    if not expectedItems("logLines", nLogLines, eLogLines):
+    if not compareLogLines(logLines, eLogLines):
       result = false
     if not expectedItems("errLines", errLines, eErrLines):
       result = false
