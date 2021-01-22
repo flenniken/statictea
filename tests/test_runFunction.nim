@@ -86,7 +86,7 @@ suite "runFunction.nim":
     var parameters = @[newValue(5)]
     let eValueO = none(Value)
     let eErrLines = @[
-      "template.html(1): w66: The function takes two or more parameters."
+      "template.html(1): w66: The function takes two or more parameters.\n"
     ]
     check testFunction("concat", parameters, eValueO = eValueO, eErrLines = eErrLines)
 
@@ -94,7 +94,7 @@ suite "runFunction.nim":
     var parameters = @[newValue("abc")]
     let eValueO = none(Value)
     let eErrLines = @[
-      "template.html(1): w66: The function takes two or more parameters."
+      "template.html(1): w66: The function takes two or more parameters.\n"
     ]
     check testFunction("concat", parameters, eValueO = eValueO, eErrLines = eErrLines)
 
@@ -102,7 +102,7 @@ suite "runFunction.nim":
     var parameters = @[newValue("abc"), newValue(5)]
     let eValueO = none(Value)
     let eErrLines = @[
-      "template.html(1): w47: Concat parameter 2 is not a string.",
+      "template.html(1): w47: Concat parameter 2 is not a string.\n",
     ]
     check testFunction("concat", parameters, eValueO = eValueO, eErrLines = eErrLines)
 
@@ -120,7 +120,7 @@ suite "runFunction.nim":
     ]
     let eValueO = none(Value)
     let eErrLines = @[
-      "template.html(16): w47: Concat parameter 2 is not a string.",
+      "template.html(16): w47: Concat parameter 2 is not a string.\n",
     ]
     check testRunFunction("concat", parameters, statement, start, eValueO, eErrLines = eErrLines)
 
@@ -153,22 +153,22 @@ suite "runFunction.nim":
     check testFunction("len", parameters, eValueO = eValueO)
 
   test "len float":
-    let eErrLines = @["template.html(1): w50: Len takes a string, list or dict parameter."]
+    let eErrLines = @["template.html(1): w50: Len takes a string, list or dict parameter.\n"]
     var parameters = @[newValue(3.4)]
     check testFunction("len", parameters, eErrLines = eErrLines)
 
   test "len int":
-    let eErrLines = @["template.html(1): w50: Len takes a string, list or dict parameter."]
+    let eErrLines = @["template.html(1): w50: Len takes a string, list or dict parameter.\n"]
     var parameters = @[newValue(3)]
     check testFunction("len", parameters, eErrLines = eErrLines)
 
   test "len nothing":
-    let eErrLines = @["template.html(1): w49: Expected one parameter."]
+    let eErrLines = @["template.html(1): w49: Expected one parameter.\n"]
     var parameters: seq[Value] = @[]
     check testFunction("len", parameters, eErrLines = eErrLines)
 
   test "len 2":
-    let eErrLines = @["template.html(1): w49: Expected one parameter."]
+    let eErrLines = @["template.html(1): w49: Expected one parameter.\n"]
     var parameters = @[newValue(3), newValue(2)]
     check testFunction("len", parameters, eErrLines = eErrLines)
 
@@ -190,7 +190,7 @@ suite "runFunction.nim":
   test "get list invalid index":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list, newValue(12)]
-    let eErrLines = @["template.html(1): w54: The list index 12 out of range."]
+    let eErrLines = @["template.html(1): w54: The list index 12 out of range.\n"]
     check testFunction("get", parameters, eErrLines = eErrLines)
 
   test "get dict item":
@@ -208,37 +208,37 @@ suite "runFunction.nim":
   test "get dict item missing":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
     var parameters = @[dict, newValue("p")]
-    let eErrLines = @["template.html(1): w56: The dictionary does not have an item with key p."]
+    let eErrLines = @["template.html(1): w56: The dictionary does not have an item with key p.\n"]
     check testFunction("get", parameters, eErrLines = eErrLines)
 
   test "get one parameter":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list]
-    let eErrLines = @["template.html(1): w52: The get function takes 2 or 3 parameters."]
+    let eErrLines = @["template.html(1): w52: The get function takes 2 or 3 parameters.\n"]
     check testFunction("get", parameters, eErrLines = eErrLines)
 
   test "get 4 parameters":
     var list = newValue([1, 2, 3, 4, 5])
     let p = newValue(1)
     var parameters = @[list, p, p, p]
-    let eErrLines = @["template.html(1): w52: The get function takes 2 or 3 parameters."]
+    let eErrLines = @["template.html(1): w52: The get function takes 2 or 3 parameters.\n"]
     check testFunction("get", parameters, eErrLines = eErrLines)
 
   test "get parameter 2 wrong type":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list, newValue("a")]
-    let eErrLines = @["template.html(1): w53: Expected an int for the second parameter, got string."]
+    let eErrLines = @["template.html(1): w53: Expected an int for the second parameter, got string.\n"]
     check testFunction("get", parameters, eErrLines = eErrLines)
 
   test "get parameter 2 wrong type dict":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
     var parameters = @[dict, newValue(3.5)]
-    let eErrLines = @["template.html(1): w55: Expected a string for the second parameter, got float."]
+    let eErrLines = @["template.html(1): w55: Expected a string for the second parameter, got float.\n"]
     check testFunction("get", parameters, eErrLines = eErrLines)
 
   test "get wrong first parameter":
     var parameters = @[newValue(2), newValue(3.5)]
-    let eErrLines = @["template.html(1): w57: Expected a list or dictionary as the first parameter."]
+    let eErrLines = @["template.html(1): w57: Expected a list or dictionary as the first parameter.\n"]
     check testFunction("get", parameters, eErrLines = eErrLines)
 
   test "cmpString":

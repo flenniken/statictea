@@ -38,7 +38,7 @@ proc testProcessTemplate(templateContent: string = "",
   let rc = processTemplate(env, args)
 
   # todo: we don't need to verify the template lines.
-  let eTemplateLines = splitNewLinesNoEndings(templateContent)
+  let eTemplateLines = splitNewLines(templateContent)
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines,
     eTemplateLines = eTemplateLines, eResultLines = eResultLines)
 
@@ -93,7 +93,7 @@ hello {s.name}
 {"name": "world"}
 """
     let eResultLines = @[
-      "hello world"
+      "hello world\n"
     ]
     check testProcessTemplate(templateContent = templateContent, serverJson =
         serverJson, eResultLines = eResultLines)
@@ -110,7 +110,7 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
 }
 """
     let eResultLines = @[
-      "Drink tea -- Earl Grey is my favorite."
+      "Drink tea -- Earl Grey is my favorite.\n"
     ]
     check testProcessTemplate(templateContent = templateContent, serverJson =
         serverJson, eResultLines = eResultLines)
@@ -127,10 +127,10 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
 }
 """
 
-    let eResultLines = @[
-      """<!doctype html>""",
-      """<html lang="en">"""
-    ]
+    let eResultLines = splitNewLines """
+<!doctype html>
+<html lang="en">
+"""
 
     check testProcessTemplate(templateContent = templateContent, sharedJson =
         sharedJson, eResultLines = eResultLines)
@@ -160,17 +160,17 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
 <html lang=\"{s.languageCode}\" dir=\"{s.languageDirection}\">
 <head>
 <meta charset=\"UTF-8\"/>
-<title>{s.title}</title>"
+<title>{s.title}</title>\n"
 }
 """
 
-    let eResultLines = @[
-      "<!DOCTYPE html>",
-      "<html lang=\"en\" dir=\"ltr\">",
-      "<head>",
-      "<meta charset=\"UTF-8\"/>",
-      "<title>Teas in England</title>",
-    ]
+    let eResultLines = splitNewLines """
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<title>Teas in England</title>
+"""
     check testProcessTemplate(templateContent = templateContent, serverJson = serverJson, sharedJson =
         sharedJson, eResultLines = eResultLines)
 
@@ -183,12 +183,12 @@ white, green, oolong, black, and pu'erh.
 You make Oolong Tea in five time
 intensive steps.
 """
-    let eResultLines = @[
-      "There are five main groups of teas:",
-      "white, green, oolong, black, and pu'erh.",
-      "You make Oolong Tea in five time",
-      "intensive steps.",
-    ]
+    let eResultLines = splitNewLines """
+There are five main groups of teas:
+white, green, oolong, black, and pu'erh.
+You make Oolong Tea in five time
+intensive steps.
+"""
     check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
 
   test "Continuation":
@@ -200,7 +200,7 @@ intensive steps.
 {tea}, {tea2}
 """
     let eResultLines = @[
-      "Earl Grey, Masala chai",
+      "Earl Grey, Masala chai\n",
     ]
     check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
 
@@ -213,16 +213,16 @@ intensive steps.
 {tea}, {tea2}
 """
     let eResultLines = @[
-      "{tea}, {tea2}"
+      "{tea}, {tea2}\n"
     ]
 
-    let eErrLines = @[
-      "template.html(1): w31: Unused text at the end of the statement.",
-      "statement: tea = 'Earl Grey' tea2 = 'Masala chai' ",
-      "                             ^",
-      "template.html(3): w58: The replacement variable doesn't exist: tea.",
-      "template.html(3): w58: The replacement variable doesn't exist: tea2.",
-    ]
+    let eErrLines = splitNewLines """
+template.html(1): w31: Unused text at the end of the statement.
+statement: tea = 'Earl Grey' tea2 = 'Masala chai'
+                             ^
+template.html(3): w58: The replacement variable doesn't exist: tea.
+template.html(3): w58: The replacement variable doesn't exist: tea2.
+"""
     check testProcessTemplate(templateContent = templateContent, eRc = 1, eResultLines
           = eResultLines, eErrLines = eErrLines)
 
@@ -235,11 +235,11 @@ fake nextline
 <!--$ nextline -->
 <!--$ endblock -->
 """
-    let eResultLines = @[
-      "<!--$ # this is not a comment, just text -->",
-      "fake nextline",
-      "<!--$ nextline -->",
-    ]
+    let eResultLines = splitNewLines """
+<!--$ # this is not a comment, just text -->
+fake nextline
+<!--$ nextline -->
+"""
     check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
 
   test "json variables":
@@ -261,10 +261,10 @@ and the shared json has {jsonElements}.
  "tea5": "Herbal"
 }
 """
-    let eResultLines = @[
-      "The server has 5 elements",
-      "and the shared json has 0.",
-    ]
+    let eResultLines = splitNewLines """
+The server has 5 elements
+and the shared json has 0.
+"""
     check testProcessTemplate(templateContent = templateContent, serverJson = serverJson, eResultLines = eResultLines)
 
 #   test "output admin var missing":
@@ -308,14 +308,14 @@ and the shared json has {jsonElements}.
 #$ : cond3 = hello(5, 4)
 #$ endblock
 """
-    let eErrLines = @[
-      "template.html(1): w51: Not a function: notfunction.",
-      "statement: cond1 = notfunction(4, 5)",
-      "                   ^",
-      "template.html(2): w51: Not a function: hello.",
-      "statement:  cond3 = hello(5, 4)",
-      "                    ^",
-    ]
+    let eErrLines = splitNewLines """
+template.html(1): w51: Not a function: notfunction.
+statement: cond1 = notfunction(4, 5)
+                   ^
+template.html(2): w51: Not a function: hello.
+statement:  cond3 = hello(5, 4)
+                    ^
+"""
     check testProcessTemplate(templateContent = templateContent, eRc = 1, eErrLines = eErrLines)
 
 # test "cmp example":

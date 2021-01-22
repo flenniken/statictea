@@ -189,11 +189,11 @@ suite "parseCmdLine.nim":
 
   test "no command error":
     let line = "<!--$ -->\n"
-    let expectedWarn = "template.html(12): w22: No command found at column 7, treating it as a non-command line."
+    let expectedWarn = "template.html(12): w22: No command found at column 7, treating it as a non-command line.\n"
 
     check parseCmdLineError(line, eErrLines = @[expectedWarn])
 
   test "no postfix error":
     let line = "<!--$ nextline \n"
-    let expectedWarn = """template.html(16): w23: The matching closing comment postfix was not found, expected: "-->"."""
+    let expectedWarn = """template.html(16): w23: The matching closing comment postfix was not found, expected: "-->".""" & "\n"
     check parseCmdLineError(line, lineNum = 16, eErrLines = @[expectedWarn])

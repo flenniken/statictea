@@ -92,17 +92,22 @@ XXXX-XX-XX XX:XX:XX.XXX; test_env.nim(X*); testProc done
     var env = openEnvTest("")
     check env.logFile == nil
 
+    let eErrLines = @[
+      "template.html(0): w8: Unable to open log file: ''.\n"
+    ]
+    check env.readCloseDeleteCompare(eErrLines = eErrLines)
+
+  test "cannot open log 2":
+    var env = openEnvTest("")
+    check env.logFile == nil
+
+    # Logging is dropped when the log file is not open.
     env.log("test line no log")
     env.log("test line no log2")
 
     let eErrLines = @[
-      "template.html(0): w8: Unable to open log file: ''."
+      "template.html(0): w8: Unable to open log file: ''.\n"
     ]
-    let logLines = """
-2021-01-16 13:51:09.767; test_env.nim(61); test line 1
-2021-01-16 13:51:09.767; test_env.nim(61); test line 1
-"""
-    var eLogLines = splitNewlines(logLines)
     check env.readCloseDeleteCompare(eErrLines = eErrLines)
 
   test "parseTimeStamp":

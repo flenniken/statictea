@@ -152,24 +152,24 @@ suite "parseCommandLine":
   # Test some error cases.
 
   test "parseCommandLine-no-filename":
-    check tpcl("-s", eErrLines = @["template.html(0): w0: No server filename. Use s=filename."])
+    check tpcl("-s", eErrLines = @["template.html(0): w0: No server filename. Use s=filename.\n"])
 
   test "parseCommandLine-no-switch":
-    check tpcl("-w", eErrLines = @["template.html(0): w1: Unknown switch: w."])
+    check tpcl("-w", eErrLines = @["template.html(0): w1: Unknown switch: w.\n"])
 
   test "parseCommandLine-no-long-switch":
-    check tpcl("--hello", eErrLines = @["template.html(0): w1: Unknown switch: hello."])
+    check tpcl("--hello", eErrLines = @["template.html(0): w1: Unknown switch: hello.\n"])
 
   test "parseCommandLine-no-arg":
-    check tpcl("bare", eErrLines = @["template.html(0): w2: Unknown argument: bare."])
+    check tpcl("bare", eErrLines = @["template.html(0): w2: Unknown argument: bare.\n"])
 
   test "parseCommandLine-no-args":
-    check tpcl("bare naked", eErrLines = @["template.html(0): w2: Unknown argument: bare.",
-    "template.html(0): w2: Unknown argument: naked."])
+    check tpcl("bare naked", eErrLines = @["template.html(0): w2: Unknown argument: bare.\n",
+    "template.html(0): w2: Unknown argument: naked.\n"])
 
   test "parseCommandLine-missing-result":
-    check tpcl("-r", eErrLines = @["template.html(0): w0: No result filename. Use r=filename."])
+    check tpcl("-r", eErrLines = @["template.html(0): w0: No result filename. Use r=filename.\n"])
 
   test "parseCommandLine-two-results":
     check tpcl("-r=result.html -r=asdf.html", resultFilename="result.html",
-         eErrLines = @["template.html(0): w3: One result file allowed, skipping: 'asdf.html'."])
+         eErrLines = @["template.html(0): w3: One result file allowed, skipping: 'asdf.html'.\n"])

@@ -127,9 +127,9 @@ proc testGetStringInvalid(buffer: seq[uint8]): bool =
   var statement = "a = 'stringwithbadutf8:$1:end'" % str
   let expectedLine = "statement: a = 'stringwithbadutf8:$1:end'" % str
   var eErrLines = @[
-    "template.html(1): w32: Invalid UTF-8 byte in the string.",
-    expectedLine,
-    "                                  ^",
+    "template.html(1): w32: Invalid UTF-8 byte in the string.\n",
+    expectedLine & "\n",
+    "                                  ^\n",
   ]
   result = testGetString(newStatement(statement), 4, none(ValueAndLength), eErrLines = eErrLines)
 
@@ -504,20 +504,20 @@ suite "runCommand.nim":
                         newIntValueAndLengthO(88, 3))
 
   test "getNumber not a number":
-    let eErrLines = @[
-      "template.html(1): w26: Invalid number.",
-      "statement: a = -abc",
-      "               ^",
-    ]
+    let eErrLines = splitNewLines """
+template.html(1): w26: Invalid number.
+statement: a = -abc
+               ^
+"""
     check testGetNumber(newStatement("a = -abc"), 4,
                         none(ValueAndLength), eErrLines = eErrLines)
 
   test "getNumberIntTooBig":
-    let eErrLines = @[
-      "template.html(1): w27: The number is too big or too small.",
-      "statement: a = 9_223_372_036_854_775_808",
-      "               ^",
-    ]
+    let eErrLines = splitNewLines """
+template.html(1): w27: The number is too big or too small.
+statement: a = 9_223_372_036_854_775_808
+               ^
+"""
     check testGetNumber(newStatement("a = 9_223_372_036_854_775_808"),
                         4, none(ValueAndLength), eErrLines = eErrLines)
 
@@ -570,11 +570,11 @@ suite "runCommand.nim":
     check testGetStringInvalid(@[0xf0u8, 0x90, 0x28, 0xbc])
 
   test "getString not string":
-    let eErrLines = @[
-      "template.html(1): w30: Invalid string.",
-      "statement: a = 'abc",
-      "               ^",
-    ]
+    let eErrLines = splitNewLines """
+template.html(1): w30: Invalid string.
+statement: a = 'abc
+               ^
+"""
     check testGetString(newStatement("a = 'abc"), 4, none(ValueAndLength), eErrLines = eErrLines)
 
   test "getVariable server":
@@ -609,19 +609,19 @@ suite "runCommand.nim":
 
   test "getVariable missing":
     let statement = newStatement("tea = s.missing", lineNum=12, start=0)
-    let eErrLines = @[
-      "template.html(12): w36: The variable 's.missing' does not exist.",
-      "statement: tea = s.missing",
-      "                 ^",
-    ]
+    let eErrLines = splitNewLines """
+template.html(12): w36: The variable 's.missing' does not exist.
+statement: tea = s.missing
+                 ^
+"""
     check testGetVariable(statement, 6, "s.", "missing", none(Value), eErrLines = eErrLines)
 
   test "getVariable invalid namespace":
-    let eErrLines = @[
-      "template.html(12): w35: The variable namespace 'd.' does not exist.",
-      "statement: tea = d.five",
-      "                 ^",
-    ]
+    let eErrLines = splitNewLines """
+template.html(12): w35: The variable namespace 'd.' does not exist.
+statement: tea = d.five
+                 ^
+"""
     let statement = newStatement(text="tea = d.five", lineNum=12, 0)
     check testGetVariable(statement, 6, "d.", "missing", none(Value), eErrLines = eErrLines)
 
@@ -653,20 +653,20 @@ suite "runCommand.nim":
 
   test "getVarOrFunctionValue not defined":
     let statement = newStatement(text="tea = a+123", lineNum=12, 0)
-    let eErrLines = @[
-      "template.html(12): w36: The variable 'a' does not exist.",
-      "statement: tea = a+123",
-      "                 ^",
-    ]
+    let eErrLines = splitNewLines """
+template.html(12): w36: The variable 'a' does not exist.
+statement: tea = a+123
+                 ^
+"""
     check testGetVarOrFunctionValue(statement, 6, none(ValueAndLength), eErrLines = eErrLines)
 
   test "getVarOrFunctionValue not defined":
     let statement = newStatement(text="tea = a123", lineNum=12, 0)
-    let eErrLines = @[
-      "template.html(12): w36: The variable 'a123' does not exist.",
-      "statement: tea = a123",
-      "                 ^",
-    ]
+    let eErrLines = splitNewLines """
+template.html(12): w36: The variable 'a123' does not exist.
+statement: tea = a123
+                 ^
+"""
     check testGetVarOrFunctionValue(statement, 6, none(ValueAndLength), eErrLines = eErrLines)
 
   test "getNewVariables":
@@ -685,37 +685,37 @@ suite "runCommand.nim":
 
   test "warnStatement":
     let statement = newStatement(text="tea = a123", lineNum=12, 0)
-    let eErrLines: seq[string] = @[
-        "template.html(12): w36: The variable 'a123' does not exist.",
-        "statement: tea = a123",
-        "                 ^",
-    ]
+    let eErrLines: seq[string] = splitNewLines """
+template.html(12): w36: The variable 'a123' does not exist.
+statement: tea = a123
+                 ^
+"""
     check testWarnStatement(statement, wVariableMissing, 6, p1="a123", eErrLines = eErrLines)
 
   test "warnStatement long":
     let statement = newStatement(text="""tea  =  concat(a123, len(hello), format(len(asdfom)), 123456778, 1243123456, "this is a long statement", 678, 899)""", lineNum=12, 0)
-    let eErrLines: seq[string] = @[
-      "template.html(12): w36: The variable 'a123' does not exist.",
-      "statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...",
-      "                          ^",
-    ]
+    let eErrLines: seq[string] = splitNewLines """
+template.html(12): w36: The variable 'a123' does not exist.
+statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
+                          ^
+"""
     check testWarnStatement(statement, wVariableMissing, 15, p1="a123", eErrLines = eErrLines)
 
   test "warnStatement long":
     let statement = newStatement(text="""tea  =  concat(a123, len(hello), format(len(asdfom)), 123456778, 1243123456, "this is a long statement", 678, test)""", lineNum=12, 0)
     let eErrLines: seq[string] = @[
-      "template.html(12): w36: The variable 'test' does not exist.",
-      """statement: ...is is a long statement", 678, test)""",
-        "                                            ^",
+      "template.html(12): w36: The variable 'test' does not exist.\n",
+      """statement: ...is is a long statement", 678, test)""" & "\n",
+        "                                            ^\n",
     ]
     check testWarnStatement(statement, wVariableMissing, 110, p1="test", eErrLines = eErrLines)
 
   test "warnStatement long2":
     let statement = newStatement(text="""tea                         =        concat(a123, len(hello), format(len(asdfom)), 123456778, num,   "this is a long statement with more on each end of the statement.", 678, test)""", lineNum=12, 0)
     let eErrLines: seq[string] = @[
-      "template.html(12): w36: The variable 'num' does not exist.",
-      """statement: ...rmat(len(asdfom)), 123456778, num,   "this is a long stateme...""",
-        "                                            ^",
+      "template.html(12): w36: The variable 'num' does not exist.\n",
+      """statement: ...rmat(len(asdfom)), 123456778, num,   "this is a long stateme...""" & "\n",
+        "                                            ^\n",
     ]
     check testWarnStatement(statement, wVariableMissing, 94, p1="num", eErrLines = eErrLines)
 
@@ -743,38 +743,30 @@ suite "runCommand.nim":
     let eValueAndLengthO = some(ValueAndLength(value: value, length: 36))
     check testGetFunctionValue(functionName, statement, start, eValueAndLengthO = eValueAndLengthO)
 
-  # test "getFunctionValue no parameters":
-  #   let functionName = "concat"
-  #   let statement = newStatement(text="""tea = concat()""", lineNum=16, 0)
-  #   let start = 13
-  #   let value = Value(kind: vkString, stringv: "")
-  #   let eValueAndLengthO = some(ValueAndLength(value: value, length: 1))
-  #   check testGetFunctionValue(functionName, statement, start, eValueAndLengthO = eValueAndLengthO)
-
   test "getFunctionValue missing )":
     let statement = newStatement(text="""tea = len("abc" """, lineNum=16, 0)
     let eErrLines = @[
-      "template.html(16): w46: Expected comma or right parentheses.",
-      """statement: tea = len("abc" """,
-        "                           ^",
+      "template.html(16): w46: Expected comma or right parentheses.\n",
+      """statement: tea = len("abc" """ & "\n",
+        "                           ^\n",
     ]
     check testGetFunctionValue("len", statement, 10, eErrLines = eErrLines)
 
   test "getFunctionValue missing quote":
     let statement = newStatement(text="""tea = len("abc) """, lineNum=16, 0)
     let eErrLines = @[
-      "template.html(16): w30: Invalid string.",
-      """statement: tea = len("abc) """,
-        "                     ^",
+      "template.html(16): w30: Invalid string.\n",
+      """statement: tea = len("abc) """ & "\n",
+        "                     ^\n",
     ]
     check testGetFunctionValue("len", statement, 10, eErrLines = eErrLines)
 
   test "getFunctionValue extra comma":
     let statement = newStatement(text="""tea = len("abc",) """, lineNum=16, 0)
     let eErrLines = @[
-      "template.html(16): w33: Expected a string, number, variable or function.",
-      """statement: tea = len("abc",) """,
-        "                           ^",
+      "template.html(16): w33: Expected a string, number, variable or function.\n",
+      """statement: tea = len("abc",) """ & "\n",
+        "                           ^\n",
     ]
     check testGetFunctionValue("len", statement, 10, eErrLines = eErrLines)
 
@@ -792,9 +784,9 @@ suite "runCommand.nim":
   test "runStatement junk at end":
     let statement = newStatement(text="""str = "testing" junk at end""", lineNum=1, 0)
     let eErrLines = @[
-      "template.html(1): w31: Unused text at the end of the statement.",
-      """statement: str = "testing" junk at end""",
-        "                           ^",
+      "template.html(1): w31: Unused text at the end of the statement.\n",
+      """statement: str = "testing" junk at end""" & "\n",
+        "                           ^\n",
     ]
     check testRunStatement(statement, eErrLines = eErrLines)
 

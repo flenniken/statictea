@@ -61,7 +61,8 @@ proc close*(env: var Env) =
     env.logFile = nil
 
 proc warn*(env: var Env, message: string) =
-  ## Write a message to the error stream.
+  ## Write a message to the error stream and increment the
+  ## environment's warning count.
   env.errStream.writeLine(message)
   inc(env.warningWritten)
 
@@ -123,7 +124,9 @@ proc checkLogSize(env: var Env) =
       env.warn(0, wBigLogFile, env.logFilename, numStr)
 
 proc openLogFile(env: var Env, logFilename: string) =
-  ## Open the log file and update the environment.
+  ## Open the log file and update the environment. If the log file
+  ## cannot be opened, a warning is output and the environment is
+  ## unchanged.
   var file: File
   if open(file, logFilename, fmAppend):
     env.logFile = file
@@ -256,11 +259,10 @@ when defined(test):
   # streams you need to read the content before closing and you need
   # to set the stream position to the start to read all the content.
 
-  # todo: this does not care about line endings.
   proc readAndClose*(stream: Stream): seq[string] =
-    stream.setPosition(0)
-    for line in stream.lines():
-      result.add line
+    ## Read and return all the lines including line endings from the
+    ## stream then close it.
+    result = readXLines(stream)
     stream.close()
 
   proc readCloseDeleteEnv*(env: var Env): tuple[
@@ -409,7 +411,6 @@ when defined(test):
       return true
     showLogLinesAndExpected(logLines, eLogLines, matches)
 
-  # todo: remove lineEndings parameter and use line endings everywhere.
   proc openEnvTest*(logFilename: string, templateContent: string = ""): Env =
     ## Return an Env object with open log, error, out, template and
     ## result streams. The given log file is used for the log stream.

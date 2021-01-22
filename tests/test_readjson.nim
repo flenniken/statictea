@@ -36,13 +36,13 @@ proc testReadJsonContent(jsonContent: string, expectedVars: VarsDict,
 suite "readjson.nim":
 
   test "readJson file not found":
-    let eErrLines = @["template.html(0): w16: File not found: missing."]
+    let eErrLines = @["template.html(0): w16: File not found: missing.\n"]
     var expectedValue = getEmptyVars()
     check testReadJsonFile("missing", expectedValue, eErrLines=eErrLines)
 
   test "readJson cannot open file":
     let eErrLines =
-      @["template.html(0): w17: Unable to open file: _cannotopen.tmp."]
+      @["template.html(0): w17: Unable to open file: _cannotopen.tmp.\n"]
     let expectedValue = getEmptyVars()
     let filename = "_cannotopen.tmp"
     defer: discard tryRemoveFile(filename)
@@ -51,12 +51,12 @@ suite "readjson.nim":
     check testReadJsonFile(filename, expectedValue, eErrLines=eErrLines)
 
   test "readJson parse error":
-    let eErrLines = @["template.html(0): w15: Unable to parse the json file. Skipping file: _readJson.json."]
+    let eErrLines = @["template.html(0): w15: Unable to parse the json file. Skipping file: _readJson.json.\n"]
     let expectedValue = getEmptyVars()
     check testReadJsonContent("{", expectedValue, eErrLines=eErrLines)
 
   test "readJson no root object":
-    let eErrLines = @["template.html(0): w14: The root json element must be an object. Skipping file: _readJson.json."]
+    let eErrLines = @["template.html(0): w14: The root json element must be an object. Skipping file: _readJson.json.\n"]
     let expectedValue = getEmptyVars()
     check testReadJsonContent("[5]", expectedValue, eErrLines=eErrLines)
 

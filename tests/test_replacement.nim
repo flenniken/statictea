@@ -34,8 +34,7 @@ proc testTempSegments(templateContent: string, command: string = "nextline", rep
   writeTempSegments(env, tempSegments, lb.lineNum, variables)
   closeDelete(tempSegments)
 
-  # todo: use lines with line endings everywhere.
-  let eTemplateLines = splitNewLinesNoEndings(templateContent)
+  let eTemplateLines = splitNewLines(templateContent)
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines, eTemplateLines, eResultLines)
 
 proc testReplaceLine(line: string,
@@ -107,13 +106,13 @@ suite "processReplacementBlock":
   test "replaceLine missing var":
     let line = "{s.missing}"
     let eResultLines = @["{s.missing}"]
-    let eErrLines = @["template.html(1): w58: The replacement variable doesn't exist: s.missing."]
+    let eErrLines = @["template.html(1): w58: The replacement variable doesn't exist: s.missing.\n"]
     check testReplaceLine(line, eErrLines = eErrLines, eResultLines = eResultLines)
 
   test "replaceLine multiple vars":
     let line = "{five}{s.missing}{h.test}"
     let eResultLines = @["5{s.missing}there"]
-    let eErrLines = @["template.html(1): w58: The replacement variable doesn't exist: s.missing."]
+    let eErrLines = @["template.html(1): w58: The replacement variable doesn't exist: s.missing.\n"]
     check testReplaceLine(line, eErrLines = eErrLines, eResultLines = eResultLines)
 
   test "replaceLine var space before":
@@ -227,7 +226,7 @@ line 2
 more text
 """
     var eResultLines = @[
-      "replacement block",
+      "replacement block\n",
     ]
     check testTempSegments(templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
 
@@ -236,7 +235,7 @@ more text
 {s.test} {h.test}!
 """
     var eResultLines = @[
-      "hello there!",
+      "hello there!\n",
     ]
     check testTempSegments(templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
 
@@ -245,7 +244,7 @@ more text
 {s.test} {h.test}!
 """
     var eResultLines = @[
-      "hello there!",
+      "hello there!\n",
     ]
     check testTempSegments(templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
 
@@ -263,16 +262,16 @@ replacement {abc} block
 more text {missing}
 <!--$ endblock -->
 """
-    var eResultLines = @[
-      "replacement {abc} block",
-      "hello {abc}",
-      "more text {missing}",
-    ]
+    var eResultLines = splitNewLines """
+replacement {abc} block
+hello {abc}
+more text {missing}
+"""
     # Note: the line number is handled at a higher level.
-    var eErrLines = @[
-      "template.html(4): w58: The replacement variable doesn't exist: abc.",
-      "template.html(6): w58: The replacement variable doesn't exist: missing.",
-    ]
+    var eErrLines = splitNewLines """
+template.html(4): w58: The replacement variable doesn't exist: abc.
+template.html(6): w58: The replacement variable doesn't exist: missing.
+"""
     check testTempSegments(templateContent, command = "block", repeat = 1,
       eErrLines = eErrLines, eResultLines = eResultLines)
 
@@ -291,23 +290,24 @@ ten
 eleven
 twelve
 """
-    var eResultLines = @[
-      "one",
-      "two",
-      "three",
-      "four",
-      "five",
-      "six",
-      "seven",
-      "eight",
-      "nine",
-      "ten",
-    ]
+    var eResultLines = splitNewLines """
+one
+two
+three
+four
+five
+six
+seven
+eight
+nine
+ten
+"""
     # Note: the line number is handled at a higher level.
     var eErrLines = @[
-      "template.html(10): w60: Reached the maximum replacement block line count without finding the endblock.",
+      "template.html(10): w60: Reached the maximum replacement block line count without finding the endblock.\n",
     ]
     check testTempSegments(templateContent, command = "block", repeat = 1,
       eErrLines = eErrLines, eResultLines = eResultLines)
+
 
 #todo: test t.output options.

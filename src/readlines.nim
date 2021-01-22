@@ -95,8 +95,10 @@ proc readline*(lb: var LineBuffer): string =
 
 when defined(test):
   proc readXLines*(lb: var LineBuffer, maxLines: Natural = high(Natural)): seq[string] =
-    ## Read all lines from a LineBuffer returning line endings but
-    ## don't read more than the maximum number of lines.
+    ## Read lines from a LineBuffer returning line endings but don't
+    ## read more than the maximum number of lines. Reading starts at
+    ## the current lb's current position and the position at the end
+    ## is ready for reading the next line.
     var count = 0
     while true:
       if count >= maxLines:
@@ -115,6 +117,7 @@ when defined(test):
   ): seq[string] =
     ## Read all lines from a stream returning line endings but don't
     ## read more than the maximum number of lines.
+    stream.setPosition(0)
     var lineBufferO = newLineBuffer(stream)
     if not lineBufferO.isSome:
       return
