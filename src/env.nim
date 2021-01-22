@@ -249,7 +249,7 @@ when defined(test):
     if env.logFile != nil:
       env.logFile.close()
       env.logFile = nil
-      result = readAllLines(env.logFilename)
+      result = readXLines(env.logFilename)
       discard tryRemoveFile(env.logFilename)
 
   # todo: this does not care about line endings.

@@ -94,9 +94,9 @@ proc readline*(lb: var LineBuffer): string =
   result = line
 
 when defined(test):
-  proc readAllLines*(lb: var LineBuffer, maxLines: Natural = high(Natural)): seq[string] =
-    ## Read all lines from a LineBuffer returning line endings. Don't
-    ## read more than the maximum number of lines.
+  proc readXLines*(lb: var LineBuffer, maxLines: Natural = high(Natural)): seq[string] =
+    ## Read all lines from a LineBuffer returning line endings but
+    ## don't read more than the maximum number of lines.
     var count = 0
     while true:
       if count >= maxLines:
@@ -107,29 +107,29 @@ when defined(test):
       result.add(line)
       inc(count)
 
-  proc readAllLines*(stream: Stream,
+  proc readXLines*(stream: Stream,
     maxLineLen: int = defaultMaxLineLen,
     bufferSize: int = defaultBufferSize,
     filename: string = "",
     maxLines: Natural = high(Natural)
   ): seq[string] =
-    ## Read all lines from a stream returning line endings. Don't read
-    ## more than the maximum number of lines.
+    ## Read all lines from a stream returning line endings but don't
+    ## read more than the maximum number of lines.
     var lineBufferO = newLineBuffer(stream)
     if not lineBufferO.isSome:
       return
     var lb = lineBufferO.get()
-    result = readAllLines(lb, maxLines)
+    result = readXLines(lb, maxLines)
 
-  proc readAllLines*(filename: string,
+  proc readXLines*(filename: string,
     maxLineLen: int = defaultMaxLineLen,
     bufferSize: int = defaultBufferSize,
     maxLines: Natural = high(Natural)
   ): seq[string] =
-    ## Read all lines from a file returning line endings. Don't read
-    ## more than the maximum number of lines.
+    ## Read all lines from a file returning line endings but don't
+    ## read more than the maximum number of lines.
     var stream = newFileStream(filename)
     if stream == nil:
       return
-    result = readAllLines(stream, maxLineLen, bufferSize, filename, maxLines)
+    result = readXLines(stream, maxLineLen, bufferSize, filename, maxLines)
     stream.close
