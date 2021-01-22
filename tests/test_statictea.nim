@@ -56,8 +56,6 @@ XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); Done
     check testMain(argv, 0, eOutLines = eOutLines, eLogLines = eLogLines)
 
   test "main help":
-    var env = openEnvTest("_logfile2.txt")
-
     let logLines = """
 XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); ----- starting -----
 XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); argv: @["-h"]
