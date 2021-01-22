@@ -95,6 +95,7 @@ proc readline*(lb: var LineBuffer): string =
 
 when defined(test):
   # todo: rename to readAllLines.
+  # todo: add maximum parameter.
   proc readlines*(lb: var LineBuffer): seq[string] =
     ## Read all lines from a LineBuffer returning line endings.
     while true:
@@ -109,7 +110,7 @@ when defined(test):
     bufferSize: int = defaultBufferSize,
     filename: string = ""
   ): seq[string] =
-    ## Read all lines from a string returning line endings.
+    ## Read all lines from a stream returning line endings.
     var lineBufferO = newLineBuffer(stream)
     if not lineBufferO.isSome:
       return

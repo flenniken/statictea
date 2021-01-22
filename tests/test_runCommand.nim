@@ -57,7 +57,7 @@ proc getCmdLineParts(line: string, lineNum: Natural = 1): Option[LineParts] =
   let compiledMatchers = getCompiledMatchers()
   result = parseCmdLine(env, compiledMatchers, line, lineNum)
 
-  discard env.readCloseDelete()
+  discard env.readCloseDeleteEnv()
 
 proc getCmdLineParts(cmdLines: seq[string]): seq[LineParts] =
   ## Return the line parts from the given lines.

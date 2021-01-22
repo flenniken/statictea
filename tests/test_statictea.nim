@@ -1,15 +1,7 @@
 import unittest
 import statictea
-import streams
 import strutils
 import env
-
-proc readAndClose(stream: Stream): seq[string] =
-  ## Read the stream's lines then close it.
-  stream.setPosition(0)
-  for line in stream.lines():
-    result.add line
-  stream.close()
 
 proc testMain(argv: seq[string],
     eRc: int,
@@ -22,7 +14,7 @@ proc testMain(argv: seq[string],
 
   let rc = main(env, argv)
 
-  let (logLines, errLines, outLines, templateLines, resultLines) = env.readCloseDelete2()
+  let (logLines, errLines, outLines, templateLines, resultLines) = env.readCloseDeleteEnv()
 
   result = true
   if not compareLogLines(logLines, eLogLines):

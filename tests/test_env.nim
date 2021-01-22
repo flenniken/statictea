@@ -2,7 +2,49 @@ import unittest
 import env
 import typetraits
 import options
-import options
+import times
+import regexes
+import strutils
+
+type
+  FileLine* = object
+    filename*: string
+    lineNum*: Natural
+
+  LogLine* = object
+    dt*: DateTime
+    filename*: string
+    lineNum*: Natural
+    message*: string
+
+proc parseTimeStamp*(str: string): Option[DateTime] =
+  try:
+    result = some(parse(str, dtFormat))
+  except TimeParseError:
+    result = none(DateTime)
+
+proc parseFileLine*(line: string): Option[FileLine] =
+  var matcher = newMatcher(r"^(.*)\(([0-9]+)\)$", 2)
+  let matchesO = getMatches(matcher, line, 0)
+  if matchesO.isSome:
+    let matches = matchesO.get()
+    let (filename, lineNumString) = matches.get2Groups()
+    let lineNum = parseUInt(lineNumString)
+    result = some(FileLine(filename: filename, lineNum: lineNum))
+
+proc parseLine*(line: string): Option[LogLine] =
+  var parts = split(line, "; ", 3)
+  if parts.len != 3:
+    return none(LogLine)
+  let dtO = parseTimeStamp(parts[0])
+  if not dtO.isSome:
+    return none(LogLine)
+  let fileLineO = parseFileLine(parts[1])
+  if not fileLineO.isSome:
+    return none(LogLine)
+  let fileLine = fileLineO.get()
+  result = some(LogLine(dt: dtO.get(), filename: fileLine.filename,
+    lineNum: fileLine.lineNum, message: parts[2]))
 
 proc testProc(env: var Env) =
   env.log("testProc called")
@@ -29,8 +71,8 @@ suite "env.nim":
     testProc(env)
 
     var eLogLines = splitNewlines("""
-XXXX-XX-XX XX:XX:XX.XXX; test_env.nim(X); testProc called
-XXXX-XX-XX XX:XX:XX.XXX; test_env.nim(X); testProc done
+XXXX-XX-XX XX:XX:XX.XXX; test_env.nim(X*); testProc called
+XXXX-XX-XX XX:XX:XX.XXX; test_env.nim(X*); testProc done
 """)
     check env.readCloseDeleteCompare(eLogLines = eLogLines)
 
@@ -91,10 +133,6 @@ XXXX-XX-XX XX:XX:XX.XXX; test_env.nim(X); testProc done
     check logLine.filename == "statictea.nim"
     check logLine.lineNum == 65
     check logLine.message == "version: 0.1.0"
-
-  # test "showLines":
-  #   showLines("abc", "abcd", 3, 3)
-  #   showLines("abcefgh", "abcdEfgh", 4, 4)
 
   test "compareLogLine":
     check not compareLogLine("", "").isSome

@@ -34,6 +34,7 @@ proc testTempSegments(templateContent: string, command: string = "nextline", rep
   writeTempSegments(env, tempSegments, lb.lineNum, variables)
   closeDelete(tempSegments)
 
+  # todo: use lines with line endings everywhere.
   let eTemplateLines = splitNewLinesNoEndings(templateContent)
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines, eTemplateLines, eResultLines)
 

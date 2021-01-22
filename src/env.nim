@@ -6,7 +6,7 @@ import args
 import times
 when defined(test):
   import options
-  import regexes
+  # import regexes
   import readlines
 
 const
@@ -16,7 +16,7 @@ const
   logWarnSize: BiggestInt = 1024 * 1024 * 1024       ## \
   ## Warn the user when the log file gets over 1 GB.
 
-  dtFormat = "yyyy-MM-dd HH:mm:ss'.'fff"             ## \
+  dtFormat* = "yyyy-MM-dd HH:mm:ss'.'fff"             ## \
   ## The date time format in local time written to the log.
 
 type
@@ -211,25 +211,9 @@ proc addExtraStreams*(env: var Env, args: Args): bool =
   result = addExtraStreams(env, templateFilename, resultFilename)
 
 when defined(test):
-  # You treat string streams different than file streams. Once you
-  # close a string stream the data is gone, so you need to read it
-  # before and you need to set the position at the start.
-
-
-  type
-    FileLine* = object
-      filename*: string
-      lineNum*: Natural
-
-    LogLine* = object
-      dt*: DateTime
-      filename*: string
-      lineNum*: Natural
-      message*: string
-
-when defined(test):
   proc splitNewLines*(content: string): seq[string] =
-    ## Split lines and keep the line endings.
+    ## Split lines and keep the line endings. Works with \n and \r\n
+    ## type endings.
     if content.len == 0:
       return
     var start = 0
@@ -242,6 +226,7 @@ when defined(test):
     if start < content.len:
       result.add(content[start ..< content.len])
 
+  # todo: remove splitNewLinesNoEndings. Use lines with line endings everywhere.
   proc splitNewLinesNoEndings*(content: string): seq[string] =
     ## Split lines without the line endings.
     if content.len == 0:
@@ -256,60 +241,18 @@ when defined(test):
     if start < content.len:
       result.add(content[start ..< content.len])
 
-  proc parseTimeStamp*(str: string): Option[DateTime] =
-    try:
-      result = some(parse(str, dtFormat))
-    except TimeParseError:
-      result = none(DateTime)
-
-  proc parseFileLine*(line: string): Option[FileLine] =
-    var matcher = newMatcher(r"^(.*)\(([0-9]+)\)$", 2)
-    let matchesO = getMatches(matcher, line, 0)
-    if matchesO.isSome:
-      let matches = matchesO.get()
-      let (filename, lineNumString) = matches.get2Groups()
-      let lineNum = parseUInt(lineNumString)
-      result = some(FileLine(filename: filename, lineNum: lineNum))
-
-  proc parseLine*(line: string): Option[LogLine] =
-    var parts = split(line, "; ", 3)
-    if parts.len != 3:
-      return none(LogLine)
-    let dtO = parseTimeStamp(parts[0])
-    if not dtO.isSome:
-      return none(LogLine)
-    let fileLineO = parseFileLine(parts[1])
-    if not fileLineO.isSome:
-      return none(LogLine)
-    let fileLine = fileLineO.get()
-    result = some(LogLine(dt: dtO.get(), filename: fileLine.filename,
-      lineNum: fileLine.lineNum, message: parts[2]))
-
-  # proc readLines*(filename: string, maximum: int = -1): seq[string] =
-  #   ## Read up to maximum lines from the given file. When maximum is
-  #   ## negative, read all lines.
-  #   var count = 0
-  #   if maximum == 0:
-  #     return
-  #   var max: int
-  #   if maximum < 0:
-  #     max = high(int)
-  #   else:
-  #     max = maximum
-  #   for line in lines(filename):
-  #     result.add(line)
-  #     inc(count)
-  #     if count > max:
-  #       break
-
-  proc closeReadDeleteLog*(env: var Env, maximum: int = -1): seq[string] =
-    # Close the log file, read its lines, then delete the file.
+  # todo: use maximum.
+  proc closeReadDeleteLog*(env: var Env, maximum: Natural = high(Natural)): seq[string] =
+    ## Close the log file, read its lines, then delete the
+    ## file. Return the lines read but don't read more than maximum
+    ## lines. Lines contain the line endings.
     if env.logFile != nil:
       env.logFile.close()
       env.logFile = nil
       result = readAllLines(env.logFilename)
       discard tryRemoveFile(env.logFilename)
 
+  # todo: this does not care about line endings.
   proc readStream*(stream: Stream): seq[string] =
     let pos = stream.getPosition()
     stream.setPosition(0)
@@ -317,6 +260,7 @@ when defined(test):
       result.add line
     stream.setPosition(pos)
 
+  # todo: this does not care about line endings.
   proc echoStream*(stream: Stream) =
     assert stream != nil
     let pos = stream.getPosition()
@@ -325,6 +269,10 @@ when defined(test):
       echo line
     stream.setPosition(pos)
 
+  # You treat string streams different than file streams. Once you
+  # close a string stream the data is gone, so you need to read it
+  # before and you need to set the position at the start.
+
   # todo: this does not care about line endings.
   proc readAndClose*(stream: Stream): seq[string] =
     stream.setPosition(0)
@@ -332,19 +280,14 @@ when defined(test):
       result.add line
     stream.close()
 
-  # todo: replace readCloseDelete with readCloseDelete2
-  proc readCloseDelete*(env: var Env): tuple[logLine: seq[string],
-      errLines: seq[string], outLines: seq[string]] =
-    if env.closeErrStream and env.closeOutStream:
-      result = (env.closeReadDeleteLog(100),
-        env.errStream.readAndClose(), env.outStream.readAndClose())
-
-  proc readCloseDelete2*(env: var Env): tuple[
+  proc readCloseDeleteEnv*(env: var Env): tuple[
       logLines: seq[string],
       errLines: seq[string],
       outLines: seq[string],
       templateLines: seq[string],
       resultLines: seq[string]] =
+    ## Read the env's streams, then close and delete them. Return the
+    ## streams content.
 
     result.logLines = env.closeReadDeleteLog(100)
     if env.closeErrStream:
@@ -355,18 +298,6 @@ when defined(test):
       result.templateLines = env.templateStream.readAndClose()
     if env.closeResultStream:
       result.resultLines = env.resultStream.readAndClose()
-
-  proc echoLines*(logLines, errLines, outLines: seq[string]) =
-    echo "=== log ==="
-    for line in logLines:
-      echo line
-    echo "=== err ==="
-    for line in errLines:
-      echo line
-    echo "=== out ==="
-    for line in outLines:
-      echo line
-    echo "==="
 
   proc expectedItem*[T](name: string, item: T, expectedItem: T): bool =
     ## Compare the item with the expected item and show them when
@@ -406,18 +337,13 @@ when defined(test):
             echo "$1       : expected: $2" % [$ix, $expectedItems[ix]]
       result = false
 
-  proc showLines*(logLine: string, eLogLine: string, ix: int, eix: int) =
-    echo "     got: " & logLine
-    echo "          " & startPointer(ix)
-    echo "expected: " & eLogLine
-    echo "          " & startPointer(eix)
-
   proc compareLogLine*(logLine: string, eLogLine: string): Option[tuple[ix: int, eix: int]] =
-    ## Compare the two log lines, skipping variable parts. If
+    ## Compare the two log lines, skipping variable parts. If they
+    ## differ, return the position in each line where they differ. If
     ## the expected line has a X in it, that character is skipped. If
-    ## it has a *, zero or more characters are skipped.
-    ## This simple regex is used instead of full regex so you don't
-    ## have to escape all the special regex characters.
+    ## it has a *, zero or more characters are skipped.  This simple
+    ## regex is used instead of full regex so you don't have to escape
+    ## all the special regex characters.
 
     #      got: 2020-10-01 08:21:28.618; statictea.nim(2652); version: 0.1.0"
     #                                                            ^
@@ -477,6 +403,8 @@ when defined(test):
           break
 
   proc showLogLinesAndExpected*(logLines: seq[string], eLogLines: seq[string], matches: seq[int]) =
+    ## Show the log lines and expected log lines. The matches list
+    ## contains the indexes of the expected log lines that match.
     echo "-------- logLines ---------"
     for logLine in logLines:
       echo "   line: " & logLine
@@ -488,17 +416,22 @@ when defined(test):
         echo "missing: " & eLogLine
 
   proc compareLogLines*(logLines: seq[string], eLogLines: seq[string]): bool =
+    ## Compare the log lines with the expected log lines and when
+    ## different show the differences. Each expected line must match
+    ## the log lines and in the correct order, but other log lines are
+    ## ignored. Expected log lines can use X and * to skip variable
+    ## content.
     var matches = compareLogLinesMatches(logLines, eLogLines)
     if matches.len == eLogLines.len:
       return true
     showLogLinesAndExpected(logLines, eLogLines, matches)
 
   proc openEnvTest*(logFilename: string, templateContent: string = ""): Env =
-    ## Open the log, error, out, template and result streams. The
-    ## given log file is used for the log stream.  The error, out,
-    ## template and result streams get created as string type
-    ## streams. The templateContent string is written to the
-    ## templateStream. The env templateFilename is set to
+    ## Return an Env object with open log, error, out, template and
+    ## result streams. The given log file is used for the log stream.
+    ## The error, out, template and result streams get created as
+    ## string type streams. The templateContent string is written to
+    ## the templateStream. The env templateFilename is set to
     ## "template.html" and is only used for error messages.
 
     result = Env(
@@ -522,11 +455,13 @@ when defined(test):
       eTemplateLines: seq[string] = @[],
       eResultLines: seq[string] = @[]
     ): bool =
-    ## Read the env streams and close and delete them. Compare the
+    ## Read the env streams then close and delete them. Compare the
     ## streams with the expected content. Return true when they are
-    ## the same.
+    ## the same. For the log lines compare verifies that all the
+    ## expected lines compare and ignores the other lines that may
+    ## exist.
     result = true
-    let (logLines, errLines, outLines, templateLines, resultLines) = env.readCloseDelete2()
+    let (logLines, errLines, outLines, templateLines, resultLines) = env.readCloseDeleteEnv()
 
     if not compareLogLines(logLines, eLogLines):
       result = false
@@ -540,6 +475,7 @@ when defined(test):
       result = false
 
   proc createFile*(filename: string, content: string) =
+    ## Create a file with the given content.
     var file = open(filename, fmWrite)
     file.write(content)
     file.close()
