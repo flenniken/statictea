@@ -1,4 +1,3 @@
-import os
 import unittest
 import readlines
 import strutils
@@ -47,38 +46,6 @@ proc readContentTest(content: string, expected: seq[string],
 
 
 suite "readlines.nim":
-
-  test "theLines stream":
-    var stream = newStringStream("testing")
-    defer: stream.close()
-    let warningLines = stream.theLines()
-    check(warningLines.len == 1)
-    check(warningLines[0] == "testing")
-
-  test "theLines stream again":
-    var stream = newStringStream()
-    defer: stream.close()
-    stream.writeLine("this is a test")
-    stream.writeLine("1 2 3")
-    let warningLines = stream.theLines()
-    check(warningLines.len == 2)
-    check(warningLines[0] == "this is a test")
-    check(warningLines[1] == "1 2 3")
-
-  test "theLines for files":
-    let filename = "_theLines.txt"
-    var fh = open(filename, fmWrite)
-    let line1 = "testme.txt line 1"
-    let line2 = "testme.txt line 2"
-    fh.writeLine(line1)
-    fh.writeLine(line2)
-    fh.close()
-    var lines = theLines(filename)
-    check lines.len == 2
-    check lines[0] == line1
-    check lines[1] == line2
-    discard tryRemoveFile(filename)
-
 
   test "setLen":
     var buffer: string
@@ -191,7 +158,7 @@ testing
     check line == "testing\n"
     check lb.getLineNum() == 3
 
-  test "readlines":
+  test "readAllLines":
     let content = """
 line one
 line two asdfadsf
@@ -201,7 +168,7 @@ and three
     var lineBufferO = newLineBuffer(inStream)
     check lineBufferO.isSome
     var lb = lineBufferO.get()
-    let theLines = readLines(lb)
+    let theLines = readAllLines(lb)
     let theLinesString = theLines.join("")
     if theLinesString != content:
       echo "---lines:"
@@ -212,14 +179,14 @@ and three
       check false
 
 
-  test "readlines stream":
+  test "readAllLines stream":
     let content = """
 line one
 line two asdfadsf
 and three
 """
     var inStream = newStringStream(content)
-    let theLines = readlines(inStream)
+    let theLines = readAllLines(inStream)
     let theLinesString = theLines.join("")
     if theLinesString != content:
       echo "---lines:"
@@ -247,13 +214,13 @@ and three
     check lineBufferO.isSome
     var lb = lineBufferO.get()
 
-    var theLines = readLines(lb)
+    var theLines = readAllLines(lb)
     check theLines.len == 3
 
-    theLines = readLines(lb)
+    theLines = readAllLines(lb)
     check theLines.len == 0
 
     lb.reset()
 
-    theLines = readLines(lb)
+    theLines = readAllLines(lb)
     check theLines.len == 3

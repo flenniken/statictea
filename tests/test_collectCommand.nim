@@ -32,7 +32,7 @@ proc testCollectCommand(
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
   resultStream.setPosition(0)
-  var resultStreamLines = readlines(resultStream)
+  var resultStreamLines = readAllLines(resultStream)
   resultStream.close()
 
   if not expectedItems("cmdLines", cmdLines, eCmdLines):

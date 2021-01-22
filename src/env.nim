@@ -269,9 +269,10 @@ when defined(test):
       echo line
     stream.setPosition(pos)
 
-  # You treat string streams different than file streams. Once you
-  # close a string stream the data is gone, so you need to read it
-  # before and you need to set the position at the start.
+  # A string stream content disappears when you close it where as a
+  # file's content still exists on disk. To work with both types of
+  # streams you need to read the content before closing and you need
+  # to set the stream position to the start to read all the content.
 
   # todo: this does not care about line endings.
   proc readAndClose*(stream: Stream): seq[string] =
@@ -426,6 +427,7 @@ when defined(test):
       return true
     showLogLinesAndExpected(logLines, eLogLines, matches)
 
+  # todo: remove lineEndings parameter and use line endings everywhere.
   proc openEnvTest*(logFilename: string, templateContent: string = ""): Env =
     ## Return an Env object with open log, error, out, template and
     ## result streams. The given log file is used for the log stream.

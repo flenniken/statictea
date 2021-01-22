@@ -94,47 +94,42 @@ proc readline*(lb: var LineBuffer): string =
   result = line
 
 when defined(test):
-  # todo: rename to readAllLines.
-  # todo: add maximum parameter.
-  proc readlines*(lb: var LineBuffer): seq[string] =
-    ## Read all lines from a LineBuffer returning line endings.
+  proc readAllLines*(lb: var LineBuffer, maxLines: Natural = high(Natural)): seq[string] =
+    ## Read all lines from a LineBuffer returning line endings. Don't
+    ## read more than the maximum number of lines.
+    var count = 0
     while true:
+      if count >= maxLines:
+        break
       var line = lb.readline()
       if line == "":
         break
       result.add(line)
+      inc(count)
 
-  # todo: rename to readAllLines
-  proc readlines*(stream: Stream,
+  proc readAllLines*(stream: Stream,
     maxLineLen: int = defaultMaxLineLen,
     bufferSize: int = defaultBufferSize,
-    filename: string = ""
+    filename: string = "",
+    maxLines: Natural = high(Natural)
   ): seq[string] =
-    ## Read all lines from a stream returning line endings.
+    ## Read all lines from a stream returning line endings. Don't read
+    ## more than the maximum number of lines.
     var lineBufferO = newLineBuffer(stream)
     if not lineBufferO.isSome:
       return
     var lb = lineBufferO.get()
-    result = readLines(lb)
+    result = readAllLines(lb, maxLines)
 
   proc readAllLines*(filename: string,
     maxLineLen: int = defaultMaxLineLen,
     bufferSize: int = defaultBufferSize,
+    maxLines: Natural = high(Natural)
   ): seq[string] =
-    ## Read all lines from a file returning line endings.
+    ## Read all lines from a file returning line endings. Don't read
+    ## more than the maximum number of lines.
     var stream = newFileStream(filename)
     if stream == nil:
       return
-    result = readlines(stream, maxLineLen, bufferSize, filename)
+    result = readAllLines(stream, maxLineLen, bufferSize, filename, maxLines)
     stream.close
-
-  proc theLines*(stream: Stream): seq[string] =
-    ## Read all the lines in the stream.
-    stream.setPosition(0)
-    for line in stream.lines():
-      result.add line
-
-  proc theLines*(filename: string): seq[string] =
-    ## Read all the lines in the file.
-    for line in lines(filename):
-      result.add line
