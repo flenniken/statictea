@@ -158,7 +158,7 @@ testing
     check line == "testing\n"
     check lb.getLineNum() == 3
 
-  test "readAllLines":
+  test "readXLines":
     let content = """
 line one
 line two asdfadsf
@@ -168,7 +168,7 @@ and three
     var lineBufferO = newLineBuffer(inStream)
     check lineBufferO.isSome
     var lb = lineBufferO.get()
-    let theLines = readAllLines(lb)
+    let theLines = readXLines(lb)
     let theLinesString = theLines.join("")
     if theLinesString != content:
       echo "---lines:"
@@ -179,14 +179,14 @@ and three
       check false
 
 
-  test "readAllLines stream":
+  test "readXLines stream":
     let content = """
 line one
 line two asdfadsf
 and three
 """
     var inStream = newStringStream(content)
-    let theLines = readAllLines(inStream)
+    let theLines = readXLines(inStream)
     let theLinesString = theLines.join("")
     if theLinesString != content:
       echo "---lines:"
@@ -214,13 +214,13 @@ and three
     check lineBufferO.isSome
     var lb = lineBufferO.get()
 
-    var theLines = readAllLines(lb)
+    var theLines = readXLines(lb)
     check theLines.len == 3
 
-    theLines = readAllLines(lb)
+    theLines = readXLines(lb)
     check theLines.len == 0
 
     lb.reset()
 
-    theLines = readAllLines(lb)
+    theLines = readXLines(lb)
     check theLines.len == 3

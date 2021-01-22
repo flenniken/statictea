@@ -241,7 +241,6 @@ when defined(test):
     if start < content.len:
       result.add(content[start ..< content.len])
 
-  # todo: use maximum.
   proc closeReadDeleteLog*(env: var Env, maximum: Natural = high(Natural)): seq[string] =
     ## Close the log file, read its lines, then delete the
     ## file. Return the lines read but don't read more than maximum
@@ -249,25 +248,8 @@ when defined(test):
     if env.logFile != nil:
       env.logFile.close()
       env.logFile = nil
-      result = readXLines(env.logFilename)
+      result = readXLines(env.logFilename, maximum)
       discard tryRemoveFile(env.logFilename)
-
-  # todo: this does not care about line endings.
-  proc readStream*(stream: Stream): seq[string] =
-    let pos = stream.getPosition()
-    stream.setPosition(0)
-    for line in stream.lines():
-      result.add line
-    stream.setPosition(pos)
-
-  # todo: this does not care about line endings.
-  proc echoStream*(stream: Stream) =
-    assert stream != nil
-    let pos = stream.getPosition()
-    stream.setPosition(0)
-    for line in stream.lines():
-      echo line
-    stream.setPosition(pos)
 
   # A string stream content disappears when you close it where as a
   # file's content still exists on disk. To work with both types of

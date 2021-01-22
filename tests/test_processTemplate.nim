@@ -77,7 +77,7 @@ suite "processTemplate":
     let filename = "template.html"
     createFile(filename, "Hello")
     defer: discard tryRemoveFile(filename)
-    let lines = readAllLines(filename)
+    let lines = readXLines(filename)
     check lines.len == 1
     check lines[0] == "Hello"
 
