@@ -67,7 +67,7 @@ StaticTea commands:
 - [[#nextline-command][nextline]] -- make substitutions in the next line
 - [[#block-command][block]] —- make substitutions in the next block of lines
 - [[#replace-command][replace]] -— replace the block with a variable
-- [[#endblock-command][endblock]] -- end of the replacement block for block or replace
+- [[#endblock-command][endblock]] -- end the replacement block for block and replace
   commands.
 - # —- [[#comment-command][comment command]]
 - : -- [[#continue-command][continue command]], used to continue a command line
@@ -388,8 +388,9 @@ inside the block. You can use any number of variables.
 You use repeating blocks to make lists and other repeating
 content.
 
-Here is a replacement block tea quote from "Alice in Wonderland",
-by Lewis Carroll:
+The next example shows a simple replacement block and it is a
+good opportunity to show a famous tea quote from "Alice in
+Wonderland", by Lewis Carroll:
 
 #+BEGIN_SRC
 <!--$ block -->
@@ -454,7 +455,7 @@ postfix is "-->". See [[#prefix-postfix][Prefix Postfix]] for more information.
 The prefix starts at column 1. Next comes the command name. Statements
 follow the command name, they are separated by semicolons and they may
 flow through the following lines. At the end of the line is an
-optional continuation character "\" then the optional postfix
+optional slash continuation character then the optional postfix
 then the end of line, either \r\n or \n.
 
 The following chart shows a nextline command made up of two
