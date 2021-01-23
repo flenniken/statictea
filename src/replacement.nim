@@ -103,7 +103,6 @@ type
     tempFile*: TempFile
     stream*: Stream
 
-# todo: delete replaceLine or use it.
 proc replaceLine*(env: var Env, compiledMatchers: CompiledMatchers,
                   variables: Variables, lineNum: int, line: string, stream: Stream) =
   ## Replace the variable content in the line and output to the given
@@ -446,17 +445,3 @@ proc newTempSegments*(env: var Env, lb: var LineBuffer, compiledMatchers: Compil
   result = allocTempSegments(env, lb.lineNum)
   if not isSome(result):
     return
-
-
-when defined(test):
-  # todo: this does not care about line endings.
-  proc echoStream*(stream: Stream) =
-    assert stream != nil
-    let pos = stream.getPosition()
-    stream.setPosition(0)
-    for line in stream.lines():
-      echo line
-    stream.setPosition(pos)
-
-  proc echoSegments*(tempSegments: TempSegments) =
-    tempSegments.lb.stream.echoStream()

@@ -38,9 +38,8 @@ proc testProcessTemplate(templateContent: string = "",
   let rc = processTemplate(env, args)
 
   # todo: we don't need to verify the template lines.
-  let eTemplateLines = splitNewLines(templateContent)
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines,
-    eTemplateLines = eTemplateLines, eResultLines = eResultLines)
+    eResultLines = eResultLines)
 
   if not expectedItem("rc", rc, eRc):
     result = false
@@ -346,4 +345,12 @@ statement:  cond3 = hello(5, 4)
 # todo: repeat of 0 with warnings to verify line number
 # todo: repeat > 0 with warnings to verify line number
 # todo: when t.content is not set for a replace block.
-# todo: the value is clipped to the maximum, see readme.
+
+
+# todo: test output to log
+# todo: test output to stderr
+# todo: test output to skip
+# todo: test output to result
+# todo: test maxLines
+# todo: test maxRepeat
+# todo: test default t.output is "result"

@@ -133,7 +133,6 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       # Write out all the stored replacement block lines and make the
       # variable substitutions.
       writeTempSegments(env, tempSegments, startLineNum, variables)
-      # tempSegments.echoSegments
 
       # Increment the row variable.
       inc(row)

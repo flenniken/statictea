@@ -30,12 +30,10 @@ proc testTempSegments(templateContent: string, command: string = "nextline", rep
   var tempSegments = tempSegmentsO.get()
   for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
     storeLineSegments(env, tempSegments, compiledMatchers, line)
-  # tempSegments.echoSegments()
   writeTempSegments(env, tempSegments, lb.lineNum, variables)
   closeDelete(tempSegments)
 
-  let eTemplateLines = splitNewLines(templateContent)
-  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines, eTemplateLines, eResultLines)
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines, eResultLines)
 
 proc testReplaceLine(line: string,
     eLogLines: seq[string] = @[],
@@ -307,6 +305,3 @@ ten
     ]
     check testTempSegments(templateContent, command = "block", repeat = 1,
       eErrLines = eErrLines, eResultLines = eResultLines)
-
-
-#todo: test t.output options.

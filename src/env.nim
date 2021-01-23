@@ -254,7 +254,6 @@ when defined(test):
       logLines: seq[string],
       errLines: seq[string],
       outLines: seq[string],
-      templateLines: seq[string],
       resultLines: seq[string]] =
     ## Read the env's streams, then close and delete them. Return the
     ## streams content.
@@ -265,7 +264,8 @@ when defined(test):
     if env.closeOutStream:
       result.outLines = env.outStream.readAndClose()
     if env.closeTemplateStream:
-      result.templateLines = env.templateStream.readAndClose()
+      env.templateStream.close()
+      env.templateStream = nil
     if env.closeResultStream:
       result.resultLines = env.resultStream.readAndClose()
 
@@ -422,7 +422,6 @@ when defined(test):
       eLogLines: seq[string] = @[],
       eErrLines: seq[string] = @[],
       eOutLines: seq[string] = @[],
-      eTemplateLines: seq[string] = @[],
       eResultLines: seq[string] = @[]
     ): bool =
     ## Read the env streams then close and delete them. Compare the
@@ -431,15 +430,13 @@ when defined(test):
     ## expected lines compare and ignores the other lines that may
     ## exist.
     result = true
-    let (logLines, errLines, outLines, templateLines, resultLines) = env.readCloseDeleteEnv()
+    let (logLines, errLines, outLines, resultLines) = env.readCloseDeleteEnv()
 
     if not compareLogLines(logLines, eLogLines):
       result = false
     if not expectedItems("errLines", errLines, eErrLines):
       result = false
     if not expectedItems("outLines", outLines, eOutLines):
-      result = false
-    if not expectedItems("templateLines", templateLines, eTemplateLines):
       result = false
     if not expectedItems("resultLines", resultLines, eResultLines):
       result = false
