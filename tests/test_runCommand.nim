@@ -49,20 +49,11 @@ proc toString(statements: seq[Statement]): string =
     lines.add "$1: $2" % [$(ix+1), $statement]
   result = join(lines, "\n")
 
-proc getCmdLineParts(line: string, lineNum: Natural = 1): Option[LineParts] =
-  ## Return the line parts from the given line.
-  # todo: remove this. Call it at a higher level.
-  var env = openEnvTest("_testRunCommand.log")
-
-  let compiledMatchers = getCompiledMatchers()
-  result = parseCmdLine(env, compiledMatchers, line, lineNum)
-
-  discard env.readCloseDeleteEnv()
-
-proc getCmdLineParts(cmdLines: seq[string]): seq[LineParts] =
+proc getCmdLineParts(env: var Env, cmdLines: seq[string]): seq[LineParts] =
   ## Return the line parts from the given lines.
   for ix, line in cmdLines:
-    let partsO = getCmdLineParts(line, lineNum = ix + 1)
+    let compiledMatchers = getCompiledMatchers()
+    let partsO = parseCmdLine(env, compiledMatchers, line, lineNum = ix + 1)
     if not partsO.isSome():
       echo "cannot get command line parts for:"
       echo "line: '$1'" % line
@@ -74,13 +65,40 @@ proc getStatements(cmdLines: seq[string], cmdLineParts: seq[LineParts]): seq[Sta
   for statement in yieldStatements(cmdLines, cmdLineParts, matchers.allSpaceTabMatcher):
     result.add(statement)
 
-proc testGetStatements(content: string): seq[Statement] =
-  ## Return a list of statements for the given multiline content.
+proc stripNewline(line: string): string =
+  if line.len > 0 and line[^1] == '\n':
+    result = line[0 .. ^2]
+  else:
+    result = line
+
+proc compareStatements(statements: seq[Statement], eContent: string): bool =
+  ## Return true when the statements match the expected statements.
+  let lines = splitNewLines(eContent)
+  for ix, statement in statements:
+    let got = $statement
+    let expected = stripNewline(lines[ix])
+    if got != expected:
+      echo "     got: $1" % got
+      echo "expected: $1" % expected
+      return false
+  return true
+
+proc testGetStatements(content: string, expected: string): bool =
+  ## Return true when the template content generates the expected statements.
+
+  var env = openEnvTest("_getStatements.txt")
   let cmdLines = splitNewLines(content)
-  let cmdLineParts = getCmdLineParts(cmdLines)
-  # for part in cmdLineParts:
-  #   echo $part
-  result = getStatements(cmdLines, cmdLineParts)
+  let cmdLineParts = getCmdLineParts(env, cmdLines)
+
+  var statements = getStatements(cmdLines, cmdLineParts)
+
+  let (logLines, errLines, outLines, templateLines, resultLines) = env.readCloseDeleteEnv()
+
+  # todo: compare any errLines here?
+
+  result = true
+  if not compareStatements(statements, expected):
+    result = false
 
 proc testGetNumber(
     statement: Statement,
@@ -132,25 +150,6 @@ proc testGetStringInvalid(buffer: seq[uint8]): bool =
     "                                  ^\n",
   ]
   result = testGetString(newStatement(statement), 4, none(ValueAndLength), eErrLines = eErrLines)
-
-proc stripNewline(line: string): string =
-  if line.len > 0 and line[^1] == '\n':
-    result = line[0 .. ^2]
-  else:
-    result = line
-
-proc compareStatements(statements: seq[Statement], eContent: string): bool =
-  ## Return true when the statements match the expected
-  ## statements.
-  let lines = splitNewLines(eContent)
-  for ix, statement in statements:
-    let got = $statement
-    let expected = stripNewline(lines[ix])
-    if got != expected:
-      echo "     got: $1" % got
-      echo "expected: $1" % expected
-      return false
-  return true
 
 proc testGetVariable(statement: Statement, start: Natural, nameSpace: string, varName: string, eValueO:
                      Option[Value] = none(Value),
@@ -295,54 +294,42 @@ suite "runCommand.nim":
     let content = """
 <!--$ nextline a = 5 -->
 """
-    let cmdLines = splitNewLines(content)
-    let cmdLineParts = getCmdLineParts(cmdLines)
-    let statements = getStatements(cmdLines, cmdLineParts)
     let expected = """
 1, 15: 'a = 5 '
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "two statements":
     let content = """
 <!--$ nextline a = 5; b = 6 -->
 """
-    let cmdLines = splitNewLines(content)
-    let cmdLineParts = getCmdLineParts(cmdLines)
-    let statements = getStatements(cmdLines, cmdLineParts)
     let expected = """
 1, 15: 'a = 5'
 1, 21: ' b = 6 '
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "three statements":
     let content = """
 <!--$ nextline a = 5; b = 6 ;c=7-->
 """
-    let cmdLines = splitNewLines(content)
-    let cmdLineParts = getCmdLineParts(cmdLines)
-    let statements = getStatements(cmdLines, cmdLineParts)
     let expected = """
 1, 15: 'a = 5'
 1, 21: ' b = 6 '
 1, 29: 'c=7'
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "two lines":
     let content = """
 <!--$ nextline a = 5; \-->
 <!--$ : asdf -->
 """
-    let cmdLines = splitNewLines(content)
-    let cmdLineParts = getCmdLineParts(cmdLines)
-    let statements = getStatements(cmdLines, cmdLineParts)
     let expected = """
 1, 15: 'a = 5'
 1, 21: ' asdf '
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "three statements split":
     let content = """
@@ -350,134 +337,121 @@ suite "runCommand.nim":
 <!--$ : "hello"; \-->
 <!--$ : c = t.len(s.header) -->
 """
-    let statements = testGetStatements(content)
     let expected = """
 1, 12: 'a = 5'
 1, 18: ' b = "hello"'
 2, 16: ' c = t.len(s.header) '
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "semicolon at the start":
     let content = """
 <!--$ nextline ;a = 5 -->
 """
-    let statements = testGetStatements(content)
     let expected = """
 1, 16: 'a = 5 '
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "double quotes":
     let content = """
 <!--$ nextline a="hi" -->
 """
-    let statements = testGetStatements(content)
     let expected = """
 1, 15: 'a="hi" '
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "double quotes with semicolon":
     let content = """
 <!--$ nextline a="h\i;" -->
 """
-    let statements = testGetStatements(content)
     let expected = """
 1, 15: 'a="h\i;" '
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "double quotes with slashed double quote":
     let content = """
 <!--$ nextline a="\"hi\"" -->
 """
-    let statements = testGetStatements(content)
     let expected = """
 1, 15: 'a="\"hi\"" '
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "double quotes with single quote":
     let content = """
 <!--$ nextline a="'hi'" -->
 """
-    let statements = testGetStatements(content)
     let expected = """
 1, 15: 'a="'hi'" '
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "single quotes":
     let content = """
 <!--$ nextline a='hi' -->
 """
-    let statements = testGetStatements(content)
     let expected = """
 1, 15: 'a='hi' '
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "single quotes with semicolon":
     let content = """
 <!--$ nextline a='hi;there' -->
 """
-    let statements = testGetStatements(content)
     let expected = """
 1, 15: 'a='hi;there' '
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "single quotes with slashed single quote":
     let content = """
 <!--$ nextline a='hi\'there' -->
 """
-    let statements = testGetStatements(content)
     let expected = """
 1, 15: 'a='hi\'there' '
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "single quotes with double quote":
     let content = """
 <!--$ nextline a='hi "there"' -->
 """
-    let statements = testGetStatements(content)
     let expected = """
 1, 15: 'a='hi "there"' '
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "semicolon at the end":
     let content = """
 <!--$ nextline a = 5;-->
 """
-    let statements = testGetStatements(content)
     let expected = """
 1, 15: 'a = 5'
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "two semicolons together":
     let content = """
 <!--$ nextline asdf;;fdsa-->
 """
-    let statements = testGetStatements(content)
     let expected = """
 1, 15: 'asdf'
 1, 21: 'fdsa'
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "white space statement":
     let content = """
 <!--$ nextline asdf; -->
 """
-    let statements = testGetStatements(content)
     let expected = """
 1, 15: 'asdf'
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "white space statement 2":
     let content = """
@@ -485,12 +459,11 @@ suite "runCommand.nim":
 <!--$ : ;   ; \-->
 <!--$ : ;x = y -->
 """
-    let statements = testGetStatements(content)
     let expected = """
 1, 15: 'asdf'
 3, 9: 'x = y '
 """
-    check compareStatements(statements, expected)
+    check testGetStatements(content, expected)
 
   test "getNumber":
     check testGetNumber(newStatement("a = 5"), 4, newIntValueAndLengthO(5, 1))
