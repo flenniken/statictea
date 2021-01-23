@@ -12,7 +12,7 @@ func countLetter(message: string, letter: char): int =
     inc(pos)
     inc(result)
 
-suite "Test warnings.nim":
+suite "warnings.nim":
 
   test "countLetter":
     check countLetter("", '1') == 0

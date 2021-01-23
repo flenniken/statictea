@@ -4,7 +4,7 @@ import unittest
 import version
 import options
 
-suite "Test version.nim":
+suite "version.nim":
 
   test "test version string":
     var matcher = newMatcher(r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$", 0)

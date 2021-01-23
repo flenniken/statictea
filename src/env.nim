@@ -229,21 +229,6 @@ when defined(test):
     if start < content.len:
       result.add(content[start ..< content.len])
 
-  # todo: remove splitNewLinesNoEndings. Use lines with line endings everywhere.
-  proc splitNewLinesNoEndings*(content: string): seq[string] =
-    ## Split lines without the line endings.
-    if content.len == 0:
-      return
-    var start = 0
-    var pos: int
-    for pos in 0 ..< content.len:
-      let ch = content[pos]
-      if ch == '\n':
-        result.add(content[start ..< pos])
-        start = pos+1
-    if start < content.len:
-      result.add(content[start ..< content.len])
-
   proc closeReadDeleteLog*(env: var Env, maximum: Natural = high(Natural)): seq[string] =
     ## Close the log file, read its lines, then delete the
     ## file. Return the lines read but don't read more than maximum

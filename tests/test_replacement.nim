@@ -60,8 +60,7 @@ proc testReplaceLine(line: string,
     echo "Line: " & line
     result = false
 
-
-suite "processReplacementBlock":
+suite "replacement":
 
   # s.test = "hello"
   # h.test = "there"

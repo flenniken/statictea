@@ -2,6 +2,7 @@ import unittest
 import statictea
 import strutils
 import env
+import version
 
 proc testMain(argv: seq[string],
     eRc: int,
@@ -9,8 +10,9 @@ proc testMain(argv: seq[string],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[],
     eResultLines: seq[string] = @[],
+    eHelpLineCount: int = -1
   ): bool =
-  var env = openEnvTest("_logfile1.txt")
+  var env = openEnvTest("_testMain.txt")
 
   let rc = main(env, argv)
 
@@ -21,21 +23,26 @@ proc testMain(argv: seq[string],
     result = false
   if not expectedItems("errLines", errLines, eErrLines):
     result = false
-  # todo: compare that the number of help lines match.
-  # if not expectedItems("outLines", outLines, eOutLines):
-  #   result = false
-  # if not expectedItems("templateLines", templateLines, eTemplateLines):
-  #   result = false
+  if eHelpLineCount != -1:
+    if not expectedItem("helpLineCount", outLines.len, eHelpLineCount):
+      result = false
+  else:
+    if not expectedItems("outLines", outLines, eOutLines):
+      result = false
   if not expectedItems("resultLines", resultLines, eResultLines):
     result = false
 
   if not expectedItem("rc", rc, eRc):
     result = false
 
-suite "Test statictea.nim":
+suite "statictea.nim":
 
   test "main version":
+    let eOutLines = @[staticteaVersion & "\n"]
+    let argv = @["-v"]
+    check testMain(argv, 0, eOutLines = eOutLines)
 
+  test "main version logging":
     let logLines = """
 XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); ----- starting -----
 XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); argv: @["-v"]
@@ -43,19 +50,10 @@ XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); version: X.X.X
 XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); Done
 """
     var eLogLines = splitNewlines(logLines)
-    let eOutLines = @["0.1.0"]
+    let eOutLines = @[staticteaVersion & "\n"]
     let argv = @["-v"]
     check testMain(argv, 0, eOutLines = eOutLines, eLogLines = eLogLines)
 
   test "main help":
-    let logLines = """
-XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); ----- starting -----
-XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); argv: @["-h"]
-XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); version: X.X.X
-XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); Done
-"""
-    var eLogLines = splitNewlines(logLines)
-    let eOutLines = @["hi"]
-
     let argv = @["-h"]
-    check testMain(argv, 0, eOutLines = eOutLines, eLogLines = eLogLines)
+    check testMain(argv, 0, eHelpLineCount = 83)

@@ -1,7 +1,7 @@
 import unittest
 import args
 
-suite "test_args.nim":
+suite "args.nim":
 
   test "empty args":
     var args: Args

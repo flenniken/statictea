@@ -61,17 +61,6 @@ three
 """
     check splitNewLines(content) == @["line one\n", "two\n", "three\n"]
 
-  test "splitNewLinesNoEndings":
-    check splitNewLinesNoEndings("").len == 0
-    check splitNewLinesNoEndings("a") == @["a"]
-    check splitNewLinesNoEndings("abc") == @["abc"]
-    check splitNewLinesNoEndings("\n") == @[""]
-    check splitNewLinesNoEndings("b\n") == @["b"]
-    check splitNewLinesNoEndings("b\nc") == @["b", "c"]
-    check splitNewLinesNoEndings("b\nlast") == @["b", "last"]
-    check splitNewLinesNoEndings("b\nc\n") == @["b", "c"]
-    check splitNewLinesNoEndings("b\nc\nd") == @["b", "c", "d"]
-
   test "one line":
     let content = "<!--$ nextline -->\n"
     let eCmdLines = @[content]
@@ -219,9 +208,6 @@ ttasdfasdf
 block
 asdf
 """
-# todo: compare the start of the error lines: template.html(2): w24:
-# Then you can change the wording without changing the tests.
-
     let warning1 = "template.html(2): w24: Missing the continuation command, " &
       "abandoning the previous command.\n"
     let warning2 = "template.html(7): w24: Missing the continuation command, " &

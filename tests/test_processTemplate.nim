@@ -209,7 +209,7 @@ intensive steps.
     let templateContent = """
 <!--$ nextline \-->
 <!--$ : tea = 'Earl Grey' \-->
-<!--$ : tea2 = 'Masala chai' -->
+<!--$ : tea2 = 'Masala chai'-->
 {tea}, {tea2}
 """
     let eResultLines = @[
