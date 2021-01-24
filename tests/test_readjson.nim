@@ -6,6 +6,7 @@ import readjson
 import os
 import json
 import options
+import strutils
 
 proc testReadJsonFile(filename: string, expectedVars: VarsDict,
     eLogLines: seq[string] = @[],
@@ -179,11 +180,53 @@ suite "readjson.nim":
 
     check testReadJsonContent(content, expectedValue)
 
+  test "long string":
+    let string256 = "123456789 123456789 123456789 123456789 123456789 " &
+                 "123456789 123456789 123456789 123456789 123456789 " &
+                 "123456789 123456789 123456789 123456789 123456789 " &
+                 "123456789 123456789 123456789 123456789 123456789 " &
+                 "123456789 123456789 123456789 123456789 123456789 123456"
+    let content = """
+{
+  "longString": "$1"
+}
+""" % [string256]
+    var expectedValue = getEmptyVars()
+    expectedValue["longString"] = Value(kind: vkString, stringv: string256)
+    check testReadJsonContent(content, expectedValue)
+
+  test "longer string":
+
+    let teaParty = """
+CHAPTER VII.
+A Mad Tea-Party
+
+There was a table set out under a tree in front of the house, and the
+March Hare and the Hatter were having tea at it: a Dormouse was
+sitting between them, fast asleep, and the other two were using it as
+a cushion, resting their elbows on it, and talking over its
+head. “Very uncomfortable for the Dormouse,” thought Alice; “only, as
+it’s asleep, I suppose it doesn’t mind.”
+
+The table was a large one, but the three were all crowded together at
+one corner of it: “No room! No room!” they cried out when they saw
+Alice coming. “There’s plenty of room!” said Alice indignantly, and
+she sat down in a large arm-chair at one end of the table.
+"""
+
+    let content = """
+{
+  "longString": "$1"
+}
+""" % [teaParty]
+    var expectedValue = getEmptyVars()
+    expectedValue["longString"] = Value(kind: vkString, stringv: teaParty)
+    check testReadJsonContent(content, expectedValue)
+
 # todo: test depth limit
 # todo: test multiple json files
 # todo: test long variable names
 # todo: test variables dots
-# todo: test long strings
 # todo: test big ints
 # todo: test big floats
 # todo: test scientific notation floats

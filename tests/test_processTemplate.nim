@@ -37,7 +37,6 @@ proc testProcessTemplate(templateContent: string = "",
   # Process the template and write out the result.
   let rc = processTemplate(env, args)
 
-  # todo: we don't need to verify the template lines.
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines,
     eResultLines = eResultLines)
 
