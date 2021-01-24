@@ -207,6 +207,11 @@ proc warnStatement*(env: var Env, statement: Statement, warning:
     fragment = extraStart & statement.text[startPos ..< endPos] & extraEnd
     pointerPos = start.int - startPos + extraStart.len
 
-  env.warn(statement.lineNum, warning, p1, p2)
-  env.warn("statement: $1" % fragment)
-  env.warn("           $1" % startColumn(pointerPos))
+  var message = """
+$1
+statement: $2
+           $3""" % [
+    getWarning(env.templateFilename, statement.lineNum, warning, p1, p2),
+               fragment, startColumn(pointerPos)
+  ]
+  env.warn(message)

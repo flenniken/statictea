@@ -267,6 +267,7 @@ more text {missing}
     # Note: the line number is handled at a higher level.
     var eErrLines = splitNewLines """
 template.html(4): w58: The replacement variable doesn't exist: abc.
+template.html(5): w58: The replacement variable doesn't exist: abc.
 template.html(6): w58: The replacement variable doesn't exist: missing.
 """
     check testTempSegments(templateContent, command = "block", repeat = 1,

@@ -10,7 +10,6 @@ import variables
 import streams
 import variables
 import tempFile
-import sets
 import parseNumber
 import strformat
 import strutils
@@ -97,7 +96,6 @@ type
   TempSegments* = object
     tempFile*: TempFile
     lb*: LineBuffer
-    oneWarnTable*: HashSet[string]
 
   TempFileStream* = object
     tempFile*: TempFile
@@ -298,8 +296,7 @@ func parseVarSegment*(segment: string): tuple[namespace: string, name: string] =
   result = (namespace, name)
 
 proc writeSegment(env: var Env, lineNum: Natural, variables:
-                  Variables, oneWarnTable: var HashSet[string],
-                  segment: string, stream: Stream, log: bool) =
+    Variables, segment: string, stream: Stream, log: bool) =
   ## Write one segment to the given stream. When log is true, log the
   ## lines instead.
 
@@ -325,8 +322,7 @@ proc writeSegment(env: var Env, lineNum: Natural, variables:
       # The variable is missing. Write the original variable name
       # text with spacing and brackets.  Warn about the missing
       # variable but only once per variable.
-      if not oneWarnTable.containsOrIncl(namespace & varName):
-        env.warn(lineNum, wMissingReplacementVar, namespace, varName)
+      env.warn(lineNum, wMissingReplacementVar, namespace, varName)
       str = segment[13 .. ^2]
   else:
     return
@@ -373,8 +369,7 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
        break # No more segments.
     if segment[0] == '1':
       inc(rLineNum)
-    writeSegment(env, rLineNum, variables, tempSegments.oneWarnTable,
-                 segment, stream, log)
+    writeSegment(env, rLineNum, variables, segment, stream, log)
 
 proc allocTempSegments*(env: var Env, lineNum: Natural): Option[TempSegments] =
   ## Create a TempSegments object. This reserves memory for a line

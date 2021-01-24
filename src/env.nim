@@ -4,6 +4,7 @@ import os
 import strutils
 import args
 import times
+import sets
 when defined(test):
   import options
   # import regexes
@@ -42,6 +43,8 @@ type
 
     # Count of warnings written.
     warningWritten*: Natural
+    # All unique messages written.
+    oneWarnTable*: HashSet[string]
 
 proc close*(env: var Env) =
   if env.closeErrStream:
@@ -61,9 +64,12 @@ proc close*(env: var Env) =
     env.logFile = nil
 
 proc warn*(env: var Env, message: string) =
-  ## Write a message to the error stream and increment the
-  ## environment's warning count.
-  env.errStream.writeLine(message)
+  ## Write a message to the error stream, suppressing duplicates and
+  ## increment the environment's warning written count.
+  if not env.oneWarnTable.containsOrIncl(message):
+    env.errStream.writeLine(message)
+  # else:
+  #   env.errStream.writeLine("dup: " & message)
   inc(env.warningWritten)
 
 proc warn*(env: var Env, lineNum: Natural, warning: Warning, p1:

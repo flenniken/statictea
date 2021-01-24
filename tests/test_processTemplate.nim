@@ -361,7 +361,7 @@ line two: {var}
 <!--$ endblock -->
 after
 """
-    let serverJson = """{"nums": [5, 6, 7]}"""
+    let serverJson = """{"nums": [5, 6]}"""
 
     let eResultLines = splitNewLines """
 before
@@ -371,7 +371,7 @@ line two: 5
 line one test replacement block.
 line two: 6
 line one test replacement block.
-line two: 7
+line two: {var}
 line one test replacement block.
 line two: {var}
 line one test replacement block.
@@ -379,18 +379,14 @@ line two: {var}
 after
 """
 
-# todo: how do repeating warnings work?  The warning on line 5 is shown once but the errors on 3 get repeated.
-
     let eErrLines = splitNewLines """
-template.html(3): w54: The list index 3 out of range.
+template.html(3): w54: The list index 2 out of range.
 template.html(3): w48: Invalid statement, skipping it.
 statement:  var = get(s.nums, t.row)
                       ^
 template.html(5): w58: The replacement variable doesn't exist: var.
+template.html(3): w54: The list index 3 out of range.
 template.html(3): w54: The list index 4 out of range.
-template.html(3): w48: Invalid statement, skipping it.
-statement:  var = get(s.nums, t.row)
-                      ^
 """
     check testProcessTemplate(templateContent = templateContent, eRc = 1,
       serverJson = serverJson, eResultLines = eResultLines, eErrLines = eErrLines)
