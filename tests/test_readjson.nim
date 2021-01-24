@@ -224,7 +224,6 @@ she sat down in a large arm-chair at one end of the table.
     check testReadJsonContent(content, expectedValue)
 
 # todo: test depth limit
-# todo: test multiple json files
 # todo: test long variable names
 # todo: test variables dots
 # todo: test big ints

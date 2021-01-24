@@ -229,6 +229,12 @@ when defined(test):
     if start < content.len:
       result.add(content[start ..< content.len])
 
+  proc echoNewline*(str: string) =
+    ## Print a line to the screen and display the line endings as \n
+    ## or \r\n.
+    var newstr = str.replace("\r\n", r"\r\n")
+    echo newstr.replace("\n", r"\n")
+
   proc closeReadDeleteLog*(env: var Env, maximum: Natural = high(Natural)): seq[string] =
     ## Close the log file, read its lines, then delete the
     ## file. Return the lines read but don't read more than maximum
@@ -277,8 +283,8 @@ when defined(test):
       result = true
     else:
       echo "$1" % name
-      echo "     got: $1" % $item
-      echo "expected: $1" % $expectedItem
+      echoNewline "     got: $1" % $item
+      echoNewline "expected: $1" % $expectedItem
       result = false
 
   proc expectedItems*[T](name: string, items: seq[T], expectedItems:
@@ -292,19 +298,19 @@ when defined(test):
       if items.len != expectedItems.len:
         echo "~~~~~~~~~~ $1 ($2)~~~~~~~~~~~:" % [name, $items.len]
         for item in items:
-          echo $item
+          echoNewline $item
         echo "~~~~~~ expected $1 ($2)~~~~~~:" % [name, $expectedItems.len]
         for item in expectedItems:
-          echo $item
+          echoNewline $item
       else:
         echo "~~~~~~~~~~ $1 ~~~~~~~~~~~:" % name
         for ix in 0 ..< items.len:
           if items[ix] == expectedItems[ix]:
-            echo "$1 (same):      got: $2" % [$ix, $items[ix]]
-            echo "$1 (same): expected: $2" % [$ix, $expectedItems[ix]]
+            echoNewline "$1 (same):      got: $2" % [$ix, $items[ix]]
+            echoNewline "$1 (same): expected: $2" % [$ix, $expectedItems[ix]]
           else:
-            echo "$1       :      got: $2" % [$ix, $items[ix]]
-            echo "$1       : expected: $2" % [$ix, $expectedItems[ix]]
+            echoNewline "$1       :      got: $2" % [$ix, $items[ix]]
+            echoNewline "$1       : expected: $2" % [$ix, $expectedItems[ix]]
       result = false
 
   proc compareLogLine*(logLine: string, eLogLine: string): Option[tuple[ix: int, eix: int]] =
@@ -377,13 +383,13 @@ when defined(test):
     ## contains the indexes of the expected log lines that match.
     echo "-------- logLines ---------"
     for logLine in logLines:
-      echo "   line: " & logLine
+      echoNewLine "   line: " & logLine
     echo "-------- eLogLines ---------"
     for eix, eLogLine in eLogLines:
       if matches.contains(eix):
-        echo "  found: " & eLogLine
+        echoNewLine "  found: " & eLogLine
       else:
-        echo "missing: " & eLogLine
+        echoNewLine "missing: " & eLogLine
 
   proc compareLogLines*(logLines: seq[string], eLogLines: seq[string]): bool =
     ## Compare the log lines with the expected log lines and when

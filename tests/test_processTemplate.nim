@@ -218,8 +218,8 @@ intensive steps.
 template.html(1): w31: Unused text at the end of the statement.
 statement: tea = 'Earl Grey' tea2 = 'Masala chai'
                              ^
-template.html(3): w58: The replacement variable doesn't exist: tea.
-template.html(3): w58: The replacement variable doesn't exist: tea2.
+template.html(4): w58: The replacement variable doesn't exist: tea.
+template.html(4): w58: The replacement variable doesn't exist: tea2.
 """
     check testProcessTemplate(templateContent = templateContent, eRc = 1, eResultLines
           = eResultLines, eErrLines = eErrLines)
@@ -335,16 +335,72 @@ statement:  cond3 = hello(5, 4)
 #     ]
 #     check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
 
+  test "repeat of 0":
+    let templateContent = """
+before
+<!--$ block t.repeat = 0 -->
+My test block
+with a few lines
+of text.
+<!--$ endblock -->
+after
+"""
+    let eResultLines = splitNewLines """
+before
+after
+"""
+    check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
+
+  test "repeat with warning":
+    let templateContent = """
+before
+asdf
+<!--$ block t.repeat = 5; var = get(s.nums, t.row)-->
+line one test replacement block.
+line two: {var}
+<!--$ endblock -->
+after
+"""
+    let serverJson = """{"nums": [5, 6, 7]}"""
+
+    let eResultLines = splitNewLines """
+before
+asdf
+line one test replacement block.
+line two: 5
+line one test replacement block.
+line two: 6
+line one test replacement block.
+line two: 7
+line one test replacement block.
+line two: {var}
+line one test replacement block.
+line two: {var}
+after
+"""
+
+# todo: how do repeating warnings work?  The warning on line 5 is shown once but the errors on 3 get repeated.
+
+    let eErrLines = splitNewLines """
+template.html(3): w54: The list index 3 out of range.
+template.html(3): w48: Invalid statement, skipping it.
+statement:  var = get(s.nums, t.row)
+                      ^
+template.html(5): w58: The replacement variable doesn't exist: var.
+template.html(3): w54: The list index 4 out of range.
+template.html(3): w48: Invalid statement, skipping it.
+statement:  var = get(s.nums, t.row)
+                      ^
+"""
+    check testProcessTemplate(templateContent = templateContent, eRc = 1,
+      serverJson = serverJson, eResultLines = eResultLines, eErrLines = eErrLines)
 
 
-
-
-# todo: readme examples
-# todo: repeat of 0
 # todo: repeat of 0 with warnings to verify line number
 # todo: repeat > 0 with warnings to verify line number
 # todo: when t.content is not set for a replace block.
 
+# todo: readme examples
 
 # todo: test output to log
 # todo: test output to stderr

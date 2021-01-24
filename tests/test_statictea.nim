@@ -57,3 +57,5 @@ XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); Done
   test "main help":
     let argv = @["-h"]
     check testMain(argv, 0, eHelpLineCount = 83)
+
+# todo: test multiple json files

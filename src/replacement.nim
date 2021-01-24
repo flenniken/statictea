@@ -336,13 +336,12 @@ proc writeSegment(env: var Env, lineNum: Natural, variables:
   else:
     stream.write(str)
 
-# todo: handle line numbers better so you know which line the missing var is on.
-
 proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
                         lineNum: Natural, variables: Variables) =
   ## Write the updated replacement block to the result stream.  It
   ## does it by writing all the stored segments and updating variable
-  ## segments as it goes.
+  ## segments as it goes. The lineNum is the beginning line of the
+  ## replacement block.
 
   # Seek to the beginning of the temp file.
   tempSegments.seekToStart()

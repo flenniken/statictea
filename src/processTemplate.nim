@@ -107,7 +107,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       continue
 
     # Create a new TempSegments object for storing segments.
-    var startLineNum = lb.lineNum
+    var startLineNum = lb.lineNum + 1
     var tempSegmentsO = newTempSegments(env, lb, compiledMatchers, command, repeat, variables)
     if not isSome(tempSegmentsO):
       break # Cannot create temp file or allocate memory, quit.
