@@ -42,12 +42,14 @@ Segment types:
 * 0 string segment without ending newline
 * 1 string segment with ending newline
 * 2 variable segment
+* 3 string segment that ends a line without a newline
 
-For the example replacement block with three lines:
+For the example replacement block:
 
 This is a test { s.name } line\n
 Second line {h.tea}  \r\n
 third {variable} test\n
+forth line
 
 It gets saved to the temp file as shown below. The underscores show
 ending spaces. Each line ends with a newline that's not shown.
@@ -61,8 +63,9 @@ ending spaces. Each line ends with a newline that's not shown.
 0,third_
 2,1   ,0,8  ,{variable}
 1, test
+3, forth line
 
-A string segment starts with 0 or 1, followed by a comma then the line
+A string segment starts with 0, 1, 2, 3, followed by a comma then the line
 text. For 0 segments you write to the result file the text starting at
 index 2 to the end minus 1 so the newline isn't written.  For 1
 segments you write from index 2 to the end. This preserves line
@@ -94,6 +97,7 @@ const
 
 type
   TempSegments* = object
+    ## A temporary file to store the parsed replacement block.
     tempFile*: TempFile
     lb*: LineBuffer
 
@@ -191,6 +195,9 @@ proc stringSegment*(line: string, start: Natural, finish: Natural): string =
   else:
     if line[finish-1] == '\n':
       result = "1,$1" % [line[start .. finish-1]]
+    elif line.len == finish:
+      # End of the line but no newline.
+      result = "3,$1\n" % [line[start .. finish-1]]
     else:
       result = "0,$1\n" % [line[start .. finish-1]]
 
@@ -295,20 +302,21 @@ func parseVarSegment*(segment: string): tuple[namespace: string, name: string] =
   let name = segment[namePos ..< namePos + nameLen]
   result = (namespace, name)
 
-proc writeSegment(env: var Env, lineNum: Natural, variables:
-    Variables, segment: string, stream: Stream, log: bool) =
-  ## Write one segment to the given stream. When log is true, log the
-  ## lines instead.
+proc getSegmentString(env: var Env, lineNum: Natural, variables: Variables, segment: string): tuple[kind: int, str: string] =
+  ## Return the segment's type and string with the variables
+  ## substituted. If a variable is missing, write a warning message
+  ## and return the string as is.
 
-  # Write out each type of segment.
-  var str: string
+  # Handle each type of segment.
   case segment[0]:
   of '0':
-    str = segment[2 .. ^2]
+    # String segment without ending newline.
+    result = (0, segment[2 .. ^2])
   of '1':
-    str = segment[2 .. ^1]
+    # String segment with ending newline.
+    result = (1, segment[2 .. ^1])
   of '2':
-    # Update variable content and write out the updated segment.
+    # Variable segment. Subsitute the variable content, if possible.
 
     # Get the variable name.
     let (namespace, varName) = parseVarSegment(segment)
@@ -317,20 +325,18 @@ proc writeSegment(env: var Env, lineNum: Natural, variables:
     let valueO = getVariable(variables, namespace, varName)
     if isSome(valueO):
       # Write the variables value.
-      str = $valueO.get()
+      result = (2, $valueO.get())
     else:
       # The variable is missing. Write the original variable name
-      # text with spacing and brackets.  Warn about the missing
-      # variable but only once per variable.
+      # text with spacing and brackets.
       env.warn(lineNum, wMissingReplacementVar, namespace, varName)
-      str = segment[13 .. ^2]
+      result = (2, segment[13 .. ^2])
+  of '3':
+    # String segment ending the line without ending newline.
+    result = (3, segment[2 .. ^2])
   else:
-    return
-
-  if log:
-    env.log(str)
-  else:
-    stream.write(str)
+    # Invalid segment type.
+    raiseAssert("Invalid segment type.")
 
 proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
                         lineNum: Natural, variables: Variables) =
@@ -362,14 +368,34 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
   else:
     return
 
+  # * 0 string segment without ending newline
+  # * 1 string segment with ending newline
+  # * 2 variable segment
+  # * 3 string segment that ends a line without a newline
+
+  # Write the segments.
   var rLineNum = lineNum
+  var line: string
   while true:
     let segment = readNextSegment(env, tempSegments)
     if segment == "":
        break # No more segments.
+
+    # Increment the line number when the segment ends with a newline.
     if segment[0] == '1':
       inc(rLineNum)
-    writeSegment(env, rLineNum, variables, segment, stream, log)
+
+    let (kind, segString) = getSegmentString(env, rLineNum, variables, segment)
+    assert kind in [0, 1, 2, 3]
+
+    line.add(segString)
+
+    if kind == 1 or kind == 3:
+      if log:
+        env.log(line)
+      else:
+        stream.write(line)
+      line = ""
 
 proc allocTempSegments*(env: var Env, lineNum: Natural): Option[TempSegments] =
   ## Create a TempSegments object. This reserves memory for a line

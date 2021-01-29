@@ -391,9 +391,21 @@ template.html(3): w54: The list index 4 out of range.
     check testProcessTemplate(templateContent = templateContent, eRc = 1,
       serverJson = serverJson, eResultLines = eResultLines, eErrLines = eErrLines)
 
+  test "output to log":
+    let templateContent = """
+<!--$ nextline t.output = "log" -->
+hello {s.name}
+"""
+    let serverJson = """
+{"name": "world"}
+"""
+    let eLogLines = splitNewLines """
+XXXX-XX-XX XX:XX:XX.XXX; replacement.nim(X*); hello world
+"""
+    check testProcessTemplate(templateContent = templateContent, serverJson =
+        serverJson, eLogLines = eLogLines)
 
-# todo: repeat of 0 with warnings to verify line number
-# todo: repeat > 0 with warnings to verify line number
+
 # todo: when t.content is not set for a replace block.
 
 # todo: readme examples

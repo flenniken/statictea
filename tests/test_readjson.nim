@@ -222,14 +222,3 @@ she sat down in a large arm-chair at one end of the table.
     var expectedValue = getEmptyVars()
     expectedValue["longString"] = Value(kind: vkString, stringv: teaParty)
     check testReadJsonContent(content, expectedValue)
-
-# todo: test depth limit
-# todo: test long variable names
-# todo: test variables dots
-# todo: test big ints
-# todo: test big floats
-# todo: test scientific notation floats
-# todo: test duplicate variables
-# todo: test long lists
-# todo: test long dicts
-# todo: test list with different types of values

@@ -442,9 +442,9 @@ left to right.
 :END:
 
 A template consists of command lines and non-command lines.  The
-command lines are line oriented and they have the same
-form. There are no restrictions on the non-command lines in a
-template.
+command lines are line oriented and they have the same form and
+they are limited to 1024 bytes. There are no restrictions on the
+non-command lines in a template.
 
 Each command line is a comment to match the template type. The
 beginning comment characters are called the prefix and the
@@ -1107,8 +1107,6 @@ Miscellaneous topics:
 - [[#prefix-postfix][Prefix Postfix]]
 - [[#encoding-and-line-endings][Encoding and Line Endings]]
 - [[#log-file][Log File]]
-- [[#limits][Limits]]
-- [[#system-defaults][System Defaults]]
 
 ** Warning Messages
 :PROPERTIES:
@@ -1138,7 +1136,7 @@ example messages:
 - tea.html(243): w36: The variable 'teaMaster' does not exist.
 - tea.html(3044): w47: Concat parameter 45 is not a string."
 
-Statement errors generate multiline messages, for example:
+Statement errors generate multi-line messages, for example:
 
 #+BEGIN_SRC
 template.html(16): w33: Expected a string, number, variable or function.
@@ -1251,7 +1249,8 @@ warning: the admin variable is missing
  Templates are utf-8 encoded.  Two line endings are supported on
  all platforms: LF, and CR/LF.  Line endings are preserved.  The
  template syntax only uses ascii except unicode characters are used
- in quoted strings.
+ in quoted strings. The maximum command line length is 1024
+ bytes, there is no limit on non-command lines.
 
  [[#contents][茶]]
 
@@ -1266,74 +1265,6 @@ warning: the admin variable is missing
  appended to the file and it grows without bounds. Make sure to
  setup log rotation. When the file size exceeds 1 GB a warning
  message is generated.
-
- [[#contents][茶]]
-
-** Limits
- :PROPERTIES:
-   :CUSTOM_ID: limits
-   :END:
-
- There is no limit on the size of the template. However there are
- several limits on variables and commands.
-
- Having limits may seem restrictive but there are many reasons for
- them.
-
- - It catches common mistakes, like missing the end block.
- - The limits tells how to best use the program.
- - It's easier to test the limits and verify the warning messages.
- - It's easier to optimize the code when the limits are defined.
-
- You can override the t.maxLine and t.maxRepeat limits but not
- others. Here are the limits:
-
- - t.maxLines -- number of lines before the end block
-   command. Useful when you forget to end the block. You can
-   override this with bigger or smaller values.  Default 10.
- - t.maxRepeat -- maximum number of times to repeat a block.
- - Maximum command line length -- 1024 characters.
- - Maximum variable name length -- 64 characters, 66 including
-   option prefix.
-
- [[#contents][茶]]
-
-** System Defaults
-:PROPERTIES:
-   :CUSTOM_ID: system-defaults
-   :END:
-
-You can use the system variables in a replacement block to see
-their default values. The following example shows the default
-values of some of the system variables.
-
-template:
-
-#+BEGIN_SRC
-<!--$ block -->
-Defaults:
-  t.local = {t.local}
-  t.global = {t.global}
-  t.maxLines = {t.maxLines}
-  t.maxRepeat = {t.maxRepeat}
-  t.output = {t.output}
-  t.repeat = {t.repeat}
-  t.server = {t.server}
-<!--$ endblock -->
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-Defaults:
-  t.local = {}
-  t.global = {}
-  t.maxLines = 10
-  t.maxRepeat = 100
-  t.output = "result"
-  t.repeat = 1
-  t.server = {}
-#+END_SRC
 
  [[#contents][茶]]
 

@@ -137,26 +137,21 @@ suite "replacement":
     check not fileExists(tempFile.filename)
 
   test "stringSegment":
-    check stringSegment("a", 0, 1) == "0,a\n"
+    check stringSegment("a", 0, 1) == "3,a\n"
     check stringSegment("\n", 0, 1) == "1,\n"
-    check stringSegment("ab", 0, 2) == "0,ab\n"
+    check stringSegment("ab", 0, 2) == "3,ab\n"
     check stringSegment("a\n", 0, 2) == "1,a\n"
 
     check stringSegment("ab", 0, 1) == "0,a\n"
     check stringSegment("a\n", 0, 1) == "0,a\n"
 
-    check stringSegment("ab", 1, 2) == "0,b\n"
+    check stringSegment("ab", 1, 2) == "3,b\n"
     check stringSegment("a\n", 1, 2) == "1,\n"
 
     check stringSegment("test\n", 0, 2) == "0,te\n"
     check stringSegment("test\n", 1, 3) == "0,es\n"
     check stringSegment("test\n", 2, 4) == "0,st\n"
     check stringSegment("test\n", 3, 5) == "1,t\n"
-
-    check stringSegment("", 0, 0) == "0,\n"
-    check stringSegment("test", 4, 5) == "0,\n"
-    check stringSegment("test", 3, 3) == "0,\n"
-    check stringSegment("test", 3, 2) == "0,\n"
 
   test "varSegment":
     check varSegment("{a}", 1, 0, 1)     == "2,1   ,0,1  ,{a}\n"
@@ -168,16 +163,12 @@ suite "replacement":
   test "lineToSegments":
     let compiledMatchers = getCompiledMatchers()
     check expectedItems("segments", lineToSegments(compiledMatchers, "test\n"), @["1,test\n"])
-    check expectedItems("segments", lineToSegments(compiledMatchers, "test"), @["0,test\n"])
+    check expectedItems("segments", lineToSegments(compiledMatchers, "test"), @["3,test\n"])
     check expectedItems("segments", lineToSegments(compiledMatchers, "te{1st"), @[
       "0,te{\n",
-      "0,1st\n",
+      "3,1st\n",
     ])
-    check expectedItems("segments", lineToSegments(compiledMatchers, "te{st "), @["0,te{st \n"])
-    check expectedItems("segments", lineToSegments(compiledMatchers, "te{st 123"), @[
-      "0,te{st \n",
-      "0,123\n",
-    ])
+    check expectedItems("segments", lineToSegments(compiledMatchers, "te{st "), @["3,te{st \n"])
     check expectedItems("segments", lineToSegments(compiledMatchers, "{var}"), @["2,1   ,0,3  ,{var}\n"])
     check expectedItems("segments", lineToSegments(compiledMatchers, "test\n"), @["1,test\n"])
     check expectedItems("segments", lineToSegments(compiledMatchers, "{var}\n"), @["2,1   ,0,3  ,{var}\n", "1,\n"])
