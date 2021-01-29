@@ -14,6 +14,27 @@ import parseNumber
 import strformat
 import strutils
 
+# You can convert a string to an enum:
+# parseEnum[SegmentType]("variable") => enum variable
+
+# You can convert an int to an enum:
+# SegmentType(intValue) => enum value
+
+# You can convert an enum to an int:
+# ord(variable) => int value
+
+# You can convert an enum to a string:
+# $variable => "variable"
+
+type
+  SegmentType = enum
+    ## Segment types.
+    middle,   # String segment in the middle of the line.
+    newline,  # String segment with ending newline that ends a line.
+    variable, # Variable segment in the middle.
+    endline   # String segment that ends a line without a newline.
+    endVariable # Variable segment that ends a line without a newline.
+
 #[
 
 The replacement block may consist of many lines and it may repeat many
@@ -187,23 +208,37 @@ proc readNextSegment*(env: var Env, tempSegments: var TempSegments): string =
   result = tempSegments.lb.readline()
 
 proc stringSegment*(line: string, start: Natural, finish: Natural): string =
-  ## Return the string segment.
-  if start >= line.len or start < 0 or
-     finish > line.len or finish <= 0 or
-     finish - start <= 0:
-    result = "0,\n"
-  else:
+  ## Return the string segment. The line contains the segment starting at
+  ## the given position and ending at finish position in the line (1
+  ## after). If the start and finish are at the end, output a endline segment.
+
+  let length = finish - start
+
+  assert length > 0
+  assert start + length <= line.len
+
+  var ending = "\n"
+  var segmentType: SegmentType
+
+  if finish == line.len:
+    # At end of line.
     if line[finish-1] == '\n':
-      result = "1,$1" % [line[start .. finish-1]]
-    elif line.len == finish:
-      # End of the line but no newline.
-      result = "3,$1\n" % [line[start .. finish-1]]
+      segmentType = newline
+      ending = ""
     else:
-      result = "0,$1\n" % [line[start .. finish-1]]
+      segmentType = endline
+  else:
+    segmentType = middle
+
+  result = "$1,$2$3" % [$ord(segmentType), line[start ..< finish], ending]
 
 proc varSegment*(bracketedVar: string, namespacePos: Natural,
-                namespaceLen: Natural, varNameLen: Natural): string =
-  ## Return a variable segment.
+                 namespaceLen: Natural, varNameLen: Natural, atEnd: bool): string =
+  ## Return a variable segment. The bracketedVar is a string starting
+  ## with { and ending with } that has a variable inside with optional
+  ## whitespace around the variable, i.e. "{ s.name }". The atEnd
+  ## parameter is true when the bracketedVar ends the line without an
+  ## ending newline.
   assert namespacePos <= 9999
   assert namespaceLen == 2 or namespaceLen == 0
   assert varNameLen <= 256
@@ -216,7 +251,12 @@ proc varSegment*(bracketedVar: string, namespacePos: Natural,
   # | |    | |   bracketedVar
   # | |    | |   |
   # 2,2   ,2,4  ,{ s.name }
-  result.add("2,{namespacePos:<4},{namespaceLen},{varNameLen:<3},{bracketedVar}\n".fmt)
+  var segmentValue: string
+  if atEnd:
+    segmentValue = $ord(endVariable)
+  else:
+    segmentValue = $ord(variable)
+  result.add("{segmentValue},{namespacePos:<4},{namespaceLen},{varNameLen:<3},{bracketedVar}\n".fmt)
 
 proc lineToSegments*(compiledMatchers: CompiledMatchers, line: string): seq[string] =
   ## Convert a line to a list of segments.
@@ -273,8 +313,9 @@ proc lineToSegments*(compiledMatchers: CompiledMatchers, line: string): seq[stri
     nextPos = start + variable.length + 2
     let bracketedVar = line[start ..< nextPos]
     let namespacePos = whitespace.len + 1
-    result.add(varSegment(bracketedVar, namespacePos, nameSpace.len, varName.len))
-
+    let atEnd = (nextPos >= line.len)
+    let varSeg = varSegment(bracketedVar, namespacePos, nameSpace.len, varName.len, atEnd)
+    result.add(varSeg)
     pos = nextPos
 
 proc storeLineSegments*(env: var Env, tempSegments: TempSegments,
@@ -302,7 +343,8 @@ func parseVarSegment*(segment: string): tuple[namespace: string, name: string] =
   let name = segment[namePos ..< namePos + nameLen]
   result = (namespace, name)
 
-proc getSegmentString(env: var Env, lineNum: Natural, variables: Variables, segment: string): tuple[kind: int, str: string] =
+proc getSegmentString(env: var Env, lineNum: Natural, variables: Variables, segment: string):
+    tuple[kind: SegmentType, str: string] =
   ## Return the segment's type and string with the variables
   ## substituted. If a variable is missing, write a warning message
   ## and return the string as is.
@@ -310,12 +352,21 @@ proc getSegmentString(env: var Env, lineNum: Natural, variables: Variables, segm
   # Handle each type of segment.
   case segment[0]:
   of '0':
+    assert ord(middle) == 0
     # String segment without ending newline.
-    result = (0, segment[2 .. ^2])
+    result = (middle, segment[2 .. ^2])
   of '1':
+    assert ord(newline) == 1
     # String segment with ending newline.
-    result = (1, segment[2 .. ^1])
-  of '2':
+    result = (newline, segment[2 .. ^1])
+  of '2', '4':
+    var kind: SegmentType
+    if segment[0] == '2':
+      kind = variable
+    else:
+      kind = endVariable
+    assert ord(variable) == 2
+    assert ord(endVariable) == 4
     # Variable segment. Subsitute the variable content, if possible.
 
     # Get the variable name.
@@ -325,15 +376,16 @@ proc getSegmentString(env: var Env, lineNum: Natural, variables: Variables, segm
     let valueO = getVariable(variables, namespace, varName)
     if isSome(valueO):
       # Write the variables value.
-      result = (2, $valueO.get())
+      result = (kind, $valueO.get())
     else:
       # The variable is missing. Write the original variable name
       # text with spacing and brackets.
       env.warn(lineNum, wMissingReplacementVar, namespace, varName)
-      result = (2, segment[13 .. ^2])
+      result = (kind, segment[13 .. ^2])
   of '3':
+    assert ord(endline) == 3
     # String segment ending the line without ending newline.
-    result = (3, segment[2 .. ^2])
+    result = (endline, segment[2 .. ^2])
   else:
     # Invalid segment type.
     raiseAssert("Invalid segment type.")
@@ -349,29 +401,24 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
   tempSegments.seekToStart()
 
   # Determine where to write the result.
-  # - "result" -- the block output goes to the result file (default)
-  # - "stderr" -- the block output goes to standard error
-  # - "log" -- the block output goes to the log file
-  # - "skip" -- the block is skipped
   var log: bool
   var output = getTeaVarString(variables, "output")
   var stream: Stream
   case output
   of "result":
+    # The block output goes to the result file (default).
     stream = env.resultStream
   of "stderr":
+    # The block output goes to standard error.
     stream = env.errStream
   of "log":
+    # The block output goes to the log file.
     log = true
-  of "skip":
-    return
+  # of "skip":
+  #   # The block is skipped.
+  #   return
   else:
     return
-
-  # * 0 string segment without ending newline
-  # * 1 string segment with ending newline
-  # * 2 variable segment
-  # * 3 string segment that ends a line without a newline
 
   # Write the segments.
   var rLineNum = lineNum
@@ -382,15 +429,15 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
        break # No more segments.
 
     # Increment the line number when the segment ends with a newline.
+    assert ord(newline) == 1
     if segment[0] == '1':
       inc(rLineNum)
 
     let (kind, segString) = getSegmentString(env, rLineNum, variables, segment)
-    assert kind in [0, 1, 2, 3]
 
     line.add(segString)
 
-    if kind == 1 or kind == 3:
+    if kind == newline or kind == endline or kind == endVariable:
       if log:
         env.log(line)
       else:

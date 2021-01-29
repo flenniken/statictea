@@ -154,11 +154,17 @@ suite "replacement":
     check stringSegment("test\n", 3, 5) == "1,t\n"
 
   test "varSegment":
-    check varSegment("{a}", 1, 0, 1)     == "2,1   ,0,1  ,{a}\n"
-    check varSegment("{ a }", 2, 0, 1)   == "2,2   ,0,1  ,{ a }\n"
-    check varSegment("{ abc }", 2, 0, 3) == "2,2   ,0,3  ,{ abc }\n"
-    check varSegment("{t.a}", 1, 2, 1)   == "2,1   ,2,1  ,{t.a}\n"
-    check varSegment("{t.ab}", 1, 2, 2)  == "2,1   ,2,2  ,{t.ab}\n"
+    check varSegment("{a}", 1, 0, 1, false)     == "2,1   ,0,1  ,{a}\n"
+    check varSegment("{ a }", 2, 0, 1, false)   == "2,2   ,0,1  ,{ a }\n"
+    check varSegment("{ abc }", 2, 0, 3, false) == "2,2   ,0,3  ,{ abc }\n"
+    check varSegment("{t.a}", 1, 2, 1, false)   == "2,1   ,2,1  ,{t.a}\n"
+    check varSegment("{t.ab}", 1, 2, 2, false)  == "2,1   ,2,2  ,{t.ab}\n"
+
+    check varSegment("{a}", 1, 0, 1, true)     == "4,1   ,0,1  ,{a}\n"
+    check varSegment("{ a }", 2, 0, 1, true)   == "4,2   ,0,1  ,{ a }\n"
+    check varSegment("{ abc }", 2, 0, 3, true) == "4,2   ,0,3  ,{ abc }\n"
+    check varSegment("{t.a}", 1, 2, 1, true)   == "4,1   ,2,1  ,{t.a}\n"
+    check varSegment("{t.ab}", 1, 2, 2, true)  == "4,1   ,2,2  ,{t.ab}\n"
 
   test "lineToSegments":
     let compiledMatchers = getCompiledMatchers()
@@ -169,7 +175,7 @@ suite "replacement":
       "3,1st\n",
     ])
     check expectedItems("segments", lineToSegments(compiledMatchers, "te{st "), @["3,te{st \n"])
-    check expectedItems("segments", lineToSegments(compiledMatchers, "{var}"), @["2,1   ,0,3  ,{var}\n"])
+    check expectedItems("segments", lineToSegments(compiledMatchers, "{var}"), @["4,1   ,0,3  ,{var}\n"])
     check expectedItems("segments", lineToSegments(compiledMatchers, "test\n"), @["1,test\n"])
     check expectedItems("segments", lineToSegments(compiledMatchers, "{var}\n"), @["2,1   ,0,3  ,{var}\n", "1,\n"])
 
@@ -177,6 +183,13 @@ suite "replacement":
       "0,before\n",
       "2,1   ,0,3  ,{var}\n",
       "1,after\n",
+    ])
+
+    check expectedItems("segments", lineToSegments(compiledMatchers, "before{var}after{endingvar}"), @[
+      "0,before\n",
+      "2,1   ,0,3  ,{var}\n",
+      "0,after\n",
+      "4,1   ,0,9  ,{endingvar}\n",
     ])
 
     check expectedItems("segments", lineToSegments(compiledMatchers, "before {s.name} after {h.header}{ a }end\n"), @[
@@ -234,6 +247,11 @@ more text
     var eResultLines = @[
       "hello there!\n",
     ]
+    check testTempSegments(templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
+
+  test "TempSegments nextline variables 2":
+    let templateContent = "{s.test} {h.test}"
+    var eResultLines = @["hello there"]
     check testTempSegments(templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
 
 
