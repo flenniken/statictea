@@ -20,6 +20,9 @@ import strutils
 # You can convert an int to an enum:
 # SegmentType(intValue) => enum value
 
+# You can convert a character to an enum.
+# let segmentType = SegmentType(ord(segment[0]) - 0x30)
+
 # You can convert an enum to an int:
 # ord(variable) => int value
 
@@ -64,6 +67,7 @@ Segment types:
 * 1 string segment with ending newline
 * 2 variable segment
 * 3 string segment that ends a line without a newline
+* 4 variable segment that ends a line without a newline
 
 For the example replacement block:
 
@@ -349,24 +353,18 @@ proc getSegmentString(env: var Env, lineNum: Natural, variables: Variables, segm
   ## substituted. If a variable is missing, write a warning message
   ## and return the string as is.
 
+  # Get the segment type from the first character of the segment.
+  let segmentType = SegmentType(ord(segment[0]) - 0x30)
+
   # Handle each type of segment.
-  case segment[0]:
-  of '0':
-    assert ord(middle) == 0
+  case segmentType:
+  of middle:
     # String segment without ending newline.
     result = (middle, segment[2 .. ^2])
-  of '1':
-    assert ord(newline) == 1
+  of newline:
     # String segment with ending newline.
     result = (newline, segment[2 .. ^1])
-  of '2', '4':
-    var kind: SegmentType
-    if segment[0] == '2':
-      kind = variable
-    else:
-      kind = endVariable
-    assert ord(variable) == 2
-    assert ord(endVariable) == 4
+  of variable, endVariable:
     # Variable segment. Subsitute the variable content, if possible.
 
     # Get the variable name.
@@ -376,19 +374,15 @@ proc getSegmentString(env: var Env, lineNum: Natural, variables: Variables, segm
     let valueO = getVariable(variables, namespace, varName)
     if isSome(valueO):
       # Write the variables value.
-      result = (kind, $valueO.get())
+      result = (segmentType, $valueO.get())
     else:
       # The variable is missing. Write the original variable name
       # text with spacing and brackets.
       env.warn(lineNum, wMissingReplacementVar, namespace, varName)
-      result = (kind, segment[13 .. ^2])
-  of '3':
-    assert ord(endline) == 3
+      result = (segmentType, segment[13 .. ^2])
+  of endline:
     # String segment ending the line without ending newline.
     result = (endline, segment[2 .. ^2])
-  else:
-    # Invalid segment type.
-    raiseAssert("Invalid segment type.")
 
 proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
                         lineNum: Natural, variables: Variables) =
@@ -437,6 +431,7 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
 
     line.add(segString)
 
+    # Write out completed lines.
     if kind == newline or kind == endline or kind == endVariable:
       if log:
         env.log(line)
