@@ -13,25 +13,11 @@ import tempFile
 import parseNumber
 import strformat
 import strutils
-
-# You can convert a string to an enum:
-# parseEnum[SegmentType]("variable") => enum variable
-
-# You can convert an int to an enum:
-# SegmentType(intValue) => enum value
-
-# You can convert a character to an enum.
-# let segmentType = SegmentType(ord(segment[0]) - 0x30)
-
-# You can convert an enum to an int:
-# ord(variable) => int value
-
-# You can convert an enum to a string:
-# $variable => "variable"
+import tpub
 
 type
   SegmentType = enum
-    ## Segment types.
+    ## A replacement block line is divided into segments of these types.
     middle,   # String segment in the middle of the line.
     newline,  # String segment with ending newline that ends a line.
     variable, # Variable segment in the middle.
@@ -40,8 +26,8 @@ type
 
 #[
 
-The replacement block may consist of many lines and it may repeat many
-times.
+The replacement block may consist of many lines and the block may
+repeat many times.
 
 If the block only repeats once, you can make one pass through the file
 reading the lines and making variable replacements as you go.
@@ -57,9 +43,8 @@ stream.
 What we do is read the lines from the template, compile them and store
 them in a temp file in a format that is easy to write out.
 
-The temp file consites of three types of lines called segments. One
-type for strings without and an ending newline, one for strings with a
-newline and one type for variables.
+The temp file consists of parts of lines called segments. There are
+segments for strings and segments for variables.
 
 Segment types:
 
@@ -90,7 +75,7 @@ ending spaces. Each line ends with a newline that's not shown.
 1, test
 3, forth line
 
-A string segment starts with 0, 1, 2, 3, followed by a comma then the line
+A string segment starts with segment type number, followed by a comma then the line
 text. For 0 segments you write to the result file the text starting at
 index 2 to the end minus 1 so the newline isn't written.  For 1
 segments you write from index 2 to the end. This preserves line
@@ -100,6 +85,8 @@ The variable segments start with some numbers telling where the
 variable namespace and name are in the segment. The variable segment
 numbers are left aligned and padded with spaces so the text part
 always starts at index 13.
+
+Variable Segments:
 
 * first number is 2
 
@@ -117,21 +104,21 @@ always starts at index 13.
 ]#
 
 const
-  replacementBufferSize* = 2*1024 # Space reserved for the replacement block line buffer.
-  maxLineLen* = defaultMaxLineLen + 20 # 20 more than a template line for the segment prefix info.
+  replacementBufferSize = 2*1024 # Space reserved for the replacement block line buffer.
+  maxLineLen = defaultMaxLineLen + 20 # 20 more than a template line for the segment prefix info.
 
 type
-  TempSegments* = object
+  TempSegments = object
     ## A temporary file to store the parsed replacement block.
-    tempFile*: TempFile
-    lb*: LineBuffer
+    tempFile: TempFile
+    lb: LineBuffer
 
-  TempFileStream* = object
+  TempFileStream = object
     tempFile*: TempFile
     stream*: Stream
 
-proc replaceLine*(env: var Env, compiledMatchers: CompiledMatchers,
-                  variables: Variables, lineNum: int, line: string, stream: Stream) =
+proc replaceLine(env: var Env, compiledMatchers: CompiledMatchers,
+                  variables: Variables, lineNum: int, line: string, stream: Stream) {.tpub.} =
   ## Replace the variable content in the line and output to the given
   ## stream.
   var pos = 0
@@ -181,7 +168,7 @@ proc replaceLine*(env: var Env, compiledMatchers: CompiledMatchers,
 
     pos = pos + beforeVar.length + variable.length + 1
 
-proc getTempFileStream*(): Option[TempFileStream] =
+proc getTempFileStream(): Option[TempFileStream] {.tpub.} =
   ## Get a temporary file and an associated stream.
 
   # Get a temp file.
@@ -201,17 +188,17 @@ proc closeDelete*(tempSegments: TempSegments) =
   ## Close the TempSegments and delete its backing temporary file.
   tempSegments.tempFile.closeDelete()
 
-proc seekToStart*(tempSegments: var TempSegments) =
+proc seekToStart(tempSegments: var TempSegments) =
   ## Seek to the start of the TempSegments file so you can read the
   ## same segments again with readNextSegment.
   tempSegments.lb.reset()
 
-proc readNextSegment*(env: var Env, tempSegments: var TempSegments): string =
+proc readNextSegment(env: var Env, tempSegments: var TempSegments): string =
   ## Read the next segment from TempSegments. Return "" when there are
   ## no more segments.
   result = tempSegments.lb.readline()
 
-proc stringSegment*(line: string, start: Natural, finish: Natural): string =
+proc stringSegment(line: string, start: Natural, finish: Natural): string {.tpub.} =
   ## Return the string segment. The line contains the segment starting at
   ## the given position and ending at finish position in the line (1
   ## after). If the start and finish are at the end, output a endline segment.
@@ -236,8 +223,8 @@ proc stringSegment*(line: string, start: Natural, finish: Natural): string =
 
   result = "$1,$2$3" % [$ord(segmentType), line[start ..< finish], ending]
 
-proc varSegment*(bracketedVar: string, namespacePos: Natural,
-                 namespaceLen: Natural, varNameLen: Natural, atEnd: bool): string =
+proc varSegment(bracketedVar: string, namespacePos: Natural,
+                 namespaceLen: Natural, varNameLen: Natural, atEnd: bool): string {.tpub.} =
   ## Return a variable segment. The bracketedVar is a string starting
   ## with { and ending with } that has a variable inside with optional
   ## whitespace around the variable, i.e. "{ s.name }". The atEnd
@@ -262,7 +249,7 @@ proc varSegment*(bracketedVar: string, namespacePos: Natural,
     segmentValue = $ord(variable)
   result.add("{segmentValue},{namespacePos:<4},{namespaceLen},{varNameLen:<3},{bracketedVar}\n".fmt)
 
-proc lineToSegments*(compiledMatchers: CompiledMatchers, line: string): seq[string] =
+proc lineToSegments(compiledMatchers: CompiledMatchers, line: string): seq[string] {.tpub.} =
   ## Convert a line to a list of segments.
 
   var pos = 0
@@ -329,8 +316,8 @@ proc storeLineSegments*(env: var Env, tempSegments: TempSegments,
   for segment in segments:
     tempSegments.tempFile.file.write(segment)
 
-func parseVarSegment*(segment: string): tuple[namespace: string, name: string] =
-  ## Parse a variable type segment and return the variable's namespace
+func parseVarSegment(segment: string): tuple[namespace: string, name: string] {.tpub.} =
+  ## P`arse a variable type segment and return the variable's namespace
   ## and name.
 
   # Example variable segments:
@@ -439,7 +426,7 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
         stream.write(line)
       line = ""
 
-proc allocTempSegments*(env: var Env, lineNum: Natural): Option[TempSegments] =
+proc allocTempSegments(env: var Env, lineNum: Natural): Option[TempSegments] {.tpub.} =
   ## Create a TempSegments object. This reserves memory for a line
   ## buffer and creates a backing temp file. Call the closeDelete
   ## procedure when done to free the memory and to close and delete
