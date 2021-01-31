@@ -1,3 +1,16 @@
+##[
+
+Methods to handle the replacement block lines.
+
+newTempSegments
+yieldReplacementLine
+storeLineSegments
+writeTempSegments
+closeDelete
+
+]##
+
+
 import regexes
 import env
 import vartypes
@@ -133,10 +146,6 @@ proc getTempFileStream(): Option[TempFileStream] {.tpub.} =
     return
   result = some(TempFileStream(tempFile: tempFile, stream: stream))
 
-proc closeDelete*(tempSegments: TempSegments) =
-  ## Close the TempSegments and delete its backing temporary file.
-  tempSegments.tempFile.closeDelete()
-
 proc seekToStart(tempSegments: var TempSegments) =
   ## Seek to the start of the TempSegments file so you can read the
   ## same segments again with readNextSegment.
@@ -257,13 +266,6 @@ proc lineToSegments(compiledMatchers: CompiledMatchers, line: string): seq[strin
     let varSeg = varSegment(bracketedVar, namespacePos, nameSpace.len, varName.len, atEnd)
     result.add(varSeg)
     pos = nextPos
-
-proc storeLineSegments*(env: var Env, tempSegments: TempSegments,
-                        compiledMatchers: Compiledmatchers, line: string) =
-  ## Divide the line into segments and write them to the TempSegments' temp file.
-  let segments = lineToSegments(compiledMatchers, line)
-  for segment in segments:
-    tempSegments.tempFile.file.write(segment)
 
 func parseVarSegment(segment: string): tuple[namespace: string, name: string] {.tpub.} =
   ## P`arse a variable type segment and return the variable's namespace
@@ -400,6 +402,17 @@ proc allocTempSegments(env: var Env, lineNum: Natural): Option[TempSegments] {.t
     return
 
   result = some(TempSegments(tempFile: tempFile, lb: lineBufferO.get()))
+
+proc closeDelete*(tempSegments: TempSegments) =
+  ## Close the TempSegments and delete its backing temporary file.
+  tempSegments.tempFile.closeDelete()
+
+proc storeLineSegments*(env: var Env, tempSegments: TempSegments,
+                        compiledMatchers: Compiledmatchers, line: string) =
+  ## Divide the line into segments and write them to the TempSegments' temp file.
+  let segments = lineToSegments(compiledMatchers, line)
+  for segment in segments:
+    tempSegments.tempFile.file.write(segment)
 
 iterator yieldReplacementLine*(env: var Env, variables: Variables, command: string, lb: var
     LineBuffer, compiledMatchers: Compiledmatchers): string =

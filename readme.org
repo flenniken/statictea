@@ -45,8 +45,8 @@ You can share common template fragments between templates.
 :END:
 
 You pass unformatted variable content from the server as json.
-You format the content with commands to create new variables that
-substitute text in the template.
+You format the content with template commands to create new
+variables that substitue text in the template.
 
 You define replacement blocks by surrounding them with commands
 and you target replacement variables inside the block by wrapping
@@ -344,10 +344,10 @@ Earl Grey, Masala chai
 :CUSTOM_ID: endblock-command
 :END:
 
-The endblock command ends the block and replace commands. Only
-the endblock command ends them. All text until the endblock is
-part of the replacement block. This includes lines that look like
-commands. For example:
+The endblock command ends the replacement block for the block and
+replace commands. Only the endblock command ends them. All text
+until the endblock is part of the replacement block. This
+includes lines that look like commands. For example:
 
 template:
 
@@ -672,22 +672,22 @@ with "g." prefix.  They are stored in the t.global dictionary.
     :CUSTOM_ID: tmaxlines
     :END:
 
- The t.maxLines variable determines the maximum lines in a
- replacement block.
+The t.maxLines variable determines the maximum lines in a
+replacement block.
 
- StaticTea reads lines looking for the endblock.  By default, if
- it is not found in 10 lines, the 10 lines are used for the block
- and a warning is output. This catches the case where you forget
- the endblock command.
+StaticTea reads lines looking for the endblock.  By default, if
+it is not found in 10 lines, the 10 lines are used for the block
+and a warning is output. This catches the case where you forget
+the endblock command.
 
- You can increase this value to support blocks with more lines by
- setting the t.maxLines system variable.
+You can increase this value to support blocks with more lines by
+setting the t.maxLines system variable.
 
- #+BEGIN_SRC
- <!--$ block t.maxLines=20 -->
- #+END_SRC
+#+BEGIN_SRC
+<!--$ block t.maxLines=20 -->
+#+END_SRC
 
- [[#contents][茶]]
+[[#contents][茶]]
 
 *** t.output
     :PROPERTIES:
@@ -894,7 +894,7 @@ template.html(45): missing admin var
     :END:
 
 The t.row variable contains the current row number for blocks
-that repeat. The row numbers start at 0 and increases.  You use it
+that repeat. The row numbers start at 0 and increase.  You use it
 to format lists and other repeating content in the template.
 
 Here is an example using the row variable.  In the example the
@@ -970,7 +970,8 @@ StaticTea variable types:
 :CUSTOM_ID: string
 :END:
 
-You define a string with single or double quotes and use them in
+A string is an immutable sequence of characters. You define a
+string with single or double quotes and use them in
 statements. You encode strings as unicode utf-8.  Invalid utf-8
 sequences generate a warning and the statement is skipped.
 
@@ -1039,7 +1040,9 @@ Example floats:
 :CUSTOM_ID: dictionary
 :END:
 
-You access dictionary items with the get function and you define them in the
+A dictionary is a key value store with fast lookup. It maps a
+string key to a value which can be any type.  You access
+dictionary items with the get function and you define them in the
 json files.
 
 [[#contents][茶]]
@@ -1049,8 +1052,9 @@ json files.
 :CUSTOM_ID: list
 :END:
 
-Like dictionaires, you access list items with the get function and you
-define them in the json files.
+A list contains a sequence of values of any type.  You lookup
+list elements with the get function and you define them in the
+json files.
 
 [[#contents][茶]]
 
@@ -1067,6 +1071,7 @@ is generated.
 - If you don't specify the result argument, the result goes to standard out.
 - If you specify "stdin" for the template, the template comes
   from stdin.
+- Return code is 0 when no warning messages are output.
 
 The example below shows a typical invocation which specifies four
 file arguments, the server json, the shared json, the template
@@ -1144,7 +1149,8 @@ statement: tea = len("abc",)
                            ^
 #+END_SRC
 
-The statictea return code is 0 when no message gets
+
+Statictea returns success (return code 0) when no message gets
 output to standard error, else it returns 1.
 
 Example of running statictea when a variable is missing:
@@ -1228,8 +1234,8 @@ warning: the admin variable is missing
  prepost values, the defaults no longer exist so you have control
  of which prefixes get used.
 
- You separate the prefix from the postfix with one space and the
- postfix is optional.
+ You specify the prepost option with the prefix separated from
+ the postfix with one space and the postfix is optional.
 
  examples:
 
@@ -1259,14 +1265,14 @@ warning: the admin variable is missing
    :CUSTOM_ID: log-file
    :END:
 
- The log file contains timing, memory usage and low priority
- warnings. The log file, statictea.log, is created in the current
- folder (system default log location?).  Log information is
- appended to the file and it grows without bounds. Make sure to
- setup log rotation. When the file size exceeds 1 GB a warning
- message is generated.
+The log file contains information about processing your
+template. Template commands can also write to the log file.
 
- [[#contents][茶]]
+Log information is appended to the file and it grows without
+bounds.  When the file size exceeds 1 GB, a warning message is
+generated each time a template is processed.
+
+[[#contents][茶]]
 
 * Functions
 :PROPERTIES:
@@ -1274,24 +1280,28 @@ warning: the admin variable is missing
 :ORDERED:  t
 :END:
 
-You use a function in a statement to generate a value. You either
-assign the value to a variable or you pass it to another function.
+You call a function to generate a value that you assign to a
+variable or pass to another function.
 
-Functions can take zero or more parameters and return a
-value. Some functions have optional parameters.
+You pass parameters to functions. the number and type of
+parameters depend on the function which is documented with the
+function. Some functions have optional parameters.
+
+New functions get added over time. the function documentation
+tells which version it appears so you know which version of
+statictea to require.
 
 List of functions:
 
-- [[#case][case()]] -- generalized if function
+- [[#case][case()]] -- multiple condition handling
 - [[#cmp][cmp()]] -- spaceship compare function <=>
 - [[#concat][concat()]] -- concatenate strings
-- [[#convert][convert()]] -- convert variable to a different type
-- [[#currency][currency()]] -- format currency
+- [[#convert][convert()]] -- convert variable type
 - [[#exists][exists()]] -- whether a variables exists
 - [[#find][find()]] -- find a substring in a string
 - [[#format][format()]] -- format a string or a number
 - [[#get][get()]] -- get an element from a list or dictionary
-- [[#if][if()]] -- if function
+- [[#if][if()]] -- handles two conditions
 - [[#len][len()]] -- length of string, list or dictionary
 - [[#lineNumber][lineNumber()]] -- the current line number
 - [[#quotehtml][quoteHtml]] -- replace html special characters
@@ -1308,18 +1318,15 @@ List of functions:
 :CUSTOM_ID: case
 :END:
 
-The case function is a generalized if statement.  You use it to
-preform different actions depending on a condition.
+The case function returns a value based on a conditional value.
 
 It requires at least two parameters, the condition and the "else"
-case.
-
-The rest of the parameters you specify in pairs, the first is the
-case value and the second is the return value when the condition
-matches that case.
+case. The rest of the parameters you specify in pairs, the first
+is the case value and the second is the return value when the
+condition matches that case.
 
 When none of the cases match the condition, the else case is
-used.
+returned.
 
 For the example below the abbr variable is set to an abbreviation
 depending on the type of tea.
@@ -1402,7 +1409,7 @@ cmp("abc", "ABC") returns 0
 
 Here is another example using cmp to "ellipsize" a string when it
 gets long. The following example ellipsizes when a name is longer
-than 10 bytes.
+than 10 characters.
 
 #+BEGIN_SRC
 <!--$ # If the name is longer than 10 characters, -->
@@ -1535,15 +1542,6 @@ result:
 exists("a") => 1
 exists("b") => 0
 #+END_SRC
-
-[[#contents][茶]]
-
-** currency()
-:PROPERTIES:
-:CUSTOM_ID: currency
-:END:
-
-The currency function formats numbers as currency.
 
 [[#contents][茶]]
 
