@@ -23,8 +23,8 @@ const
 type
   Env* = object
     # These get set at the start.
-    errStream*: Stream
-    outStream*: Stream
+    errStream*: Stream # stderr
+    outStream*: Stream # stdout
     logFile*: File
     logFilename*: string
 
@@ -39,7 +39,7 @@ type
     templateFilename*: string
     templateStream*: Stream
     resultFilename*: string
-    resultStream*: Stream
+    resultStream*: Stream # The result stream may be stdout.
 
     # Count of warnings written.
     warningWritten*: Natural

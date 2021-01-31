@@ -324,7 +324,7 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
 
 proc assignTeaVariable*(env: var Env, statement: Statement, variables:
                        var Variables, varName: string, value: Value,
-                           start: Natural) =
+                           varPos: Natural, valuePos: Natural) =
   ## Assign the given tea variable with the given value.  Show
   ## warnings when it's not possible to make the assignment.
 
@@ -334,34 +334,34 @@ proc assignTeaVariable*(env: var Env, statement: Statement, variables:
       if value.kind == vkInt and value.intv >= 0:
         variables[varName] = value
       else:
-        env.warnStatement(statement, wInvalidMaxCount, start)
+        env.warnStatement(statement, wInvalidMaxCount, valuePos)
     of "content":
       # Content must be a string.
       if value.kind == vkString:
         variables[varName] = value
       else:
-        env.warnStatement(statement, wInvalidTeaContent, start)
+        env.warnStatement(statement, wInvalidTeaContent, valuePos)
     of "output":
       # Output must be a string of "result", etc.
       if value.kind == vkString:
         if value.stringv in outputValues:
           variables[varName] = value
           return
-      env.warnStatement(statement, wInvalidOutputValue, start, $value)
+      env.warnStatement(statement, wInvalidOutputValue, valuePos, $value)
     of "repeat":
       # Repeat is an integer >= 0 and <= t.maxRepeat.
       if value.kind == vkInt and value.intv >= 0 and
          value.intv <= variables["maxRepeat"].intv:
         variables[varName] = value
       else:
-        env.warnStatement(statement, wInvalidMaxRepeat, start, $value)
+        env.warnStatement(statement, wInvalidMaxRepeat, valuePos, $value)
     of "server", "shared", "local", "global", "row":
-      env.warnStatement(statement, wReadOnlyTeaVar, start, varName)
+      env.warnStatement(statement, wReadOnlyTeaVar, varPos, varName)
     else:
-      env.warnStatement(statement, wInvalidTeaVar, start, varName)
+      env.warnStatement(statement, wInvalidTeaVar, varPos, varName)
 
 proc runStatement*(env: var Env, statement: Statement,
-    compiledMatchers: Compiledmatchers, variables: Variables): Option[SpaceNameValue] =
+                   compiledMatchers: Compiledmatchers, variables: var Variables) =
   ## Run one statement. Return the variable namespace, name and value.
 
   # Get the variable name. Match the surrounding white space.
@@ -395,14 +395,7 @@ proc runStatement*(env: var Env, statement: Statement,
     env.warnStatement(statement, wTextAfterValue, pos)
     return
 
-  result = some(newSpaceNameValue(nameSpace, varName, value))
-
-proc assignVariable(env: var Env, statement: Statement, variables: var
-                    Variables, spaceNameValue: SpaceNameValue) =
-  ## Assign the variable to its dictionary.
-  let nameSpace = spaceNameValue.nameSpace
-  let varName = spaceNameValue.varName
-  let value = spaceNameValue.value
+  # Assign the variable to its dictionary.
   case nameSpace:
     of "":
       variables["local"].dictv[varName] = value
@@ -410,7 +403,7 @@ proc assignVariable(env: var Env, statement: Statement, variables: var
       variables["global"].dictv[varName] = value
     of "t.":
       assignTeaVariable(env, statement, variables,
-          varName, value, 0)
+        varName, value, 0, variable.length + equalSign.length)
     of "s.", "h.":
       env.warnStatement(statement, wReadOnlyDictionary, 0)
     else:
@@ -428,13 +421,9 @@ proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
   # Loop over the statements and run each one.
   for statement in yieldStatements(cmdLines, cmdLineParts,
       compiledMatchers.allSpaceTabMatcher):
-    # Run the statement.  When there is a statement error, no
-    # nameValue is returned and we skip the statement.
-    let spaceNameValue = runStatement(env, statement, compiledMatchers,
-                                  variables)
-    # Assign the variable to its dictionary.
-    if spaceNameValue.isSome():
-      assignVariable(env, statement, variables, spaceNameValue.get())
+    # Run the statement and assign the return value to the variable.
+    # When there is a statement error, the statement is skipped.
+    runStatement(env, statement, compiledMatchers, variables)
 
 
 when defined(test):

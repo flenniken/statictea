@@ -149,12 +149,12 @@ proc testGetStringInvalid(buffer: seq[uint8]): bool =
   ]
   result = testGetString(newStatement(statement), 4, none(ValueAndLength), eErrLines = eErrLines)
 
-proc testGetVariable(statement: Statement, start: Natural, nameSpace: string, varName: string, eValueO:
-                     Option[Value] = none(Value),
-                     eLogLines: seq[string] = @[],
-                     eErrLines: seq[string] = @[],
-                     eOutLines: seq[string] = @[],
-                    ): bool =
+proc testGetVariable(statement: Statement, start: Natural, nameSpace: string, varName: string,
+    evvv: Option[Value],
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[],
+  ): bool =
 
   var env = openEnvTest("_getVariable.log")
 
@@ -163,7 +163,7 @@ proc testGetVariable(statement: Statement, start: Natural, nameSpace: string, va
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-  if not expectedItem("value", valueO, eValueO):
+  if not expectedItem("value", valueO, evvv):
     result = false
 
 proc testGetVarOrFunctionValue(statement: Statement, start: Natural,
@@ -228,8 +228,8 @@ proc testGetFunctionValue(functionName: string, statement: Statement, start: Nat
   if not expectedItem("valueAndLength", valueAndLengthO, eValueAndLengthO):
     result = false
 
-proc testRunStatement(statement: Statement,
-    eSpaceNameValueO = none(SpaceNameValue),
+proc testRunStatement(statement: Statement, nameSpace: string = "", varName: string = "",
+    eValueO: Option[Value] = none(Value),
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]
@@ -238,11 +238,12 @@ proc testRunStatement(statement: Statement,
 
   var variables = newVariables()
   let compiledMatchers = getCompiledMatchers()
-  let spaceNameValueO = runStatement(env, statement, compiledMatchers, variables)
+  runStatement(env, statement, compiledMatchers, variables)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-  if not expectedItem("SpaceNameValue", spaceNameValueO, eSpaceNameValueO):
+  let valueO = getVariable(variables, namespace, varName)
+  if not expectedItem("value", valueO, eValueO):
     result = false
 
 suite "runCommand.nim":
@@ -741,16 +742,32 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     ]
     check testGetFunctionValue("len", statement, 10, eErrLines = eErrLines)
 
+  test "getVariables 2":
+    var variables = getTestVariables()
+    let valueO = getVariable(variables, "s.", "test")
+    check expectedItem("valueO", valueO, some(newValue("hello")))
 
   test "runStatement":
     let statement = newStatement(text="""t.repeat = 4 """, lineNum=1, 0)
-    let eSpaceNameValueO = some(newSpaceNameValue("t.", "repeat", newValue(4)))
-    check testRunStatement(statement, eSpaceNameValueO)
+    check testRunStatement(statement, "t.", "repeat", some(newValue(4)))
 
   test "runStatement string":
     let statement = newStatement(text="""str = "testing" """, lineNum=1, 0)
-    let eSpaceNameValueO = some(newSpaceNameValue("", "str", newValue("testing")))
-    check testRunStatement(statement, eSpaceNameValueO)
+    check testRunStatement(statement, "", "str", some(newValue("testing")))
+
+  test "runStatement set log":
+    let statement = newStatement(text="""t.output = "log" """, lineNum=1, 0)
+    check testRunStatement(statement, "t.", "output", eValueO = some(newValue("log")))
+
+  test "set invalid output":
+    let statement = newStatement(text="t.output = 'notvalidv'", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w41: Invalid t.output value, use: "result", "stderr", "log", or "skip".
+statement: t.output = 'notvalidv'
+                      ^
+"""
+    check testRunStatement(statement, "t.", "output", eErrLines = eErrLines,
+                           eValueO = some(newValue("result")))
 
   test "runStatement junk at end":
     let statement = newStatement(text="""str = "testing" junk at end""", lineNum=1, 0)
@@ -761,7 +778,74 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     ]
     check testRunStatement(statement, eErrLines = eErrLines)
 
-  test "getVariables 2":
-    var variables = getTestVariables()
-    let valueO = getVariable(variables, "s.", "test")
-    check expectedItem("valueO", valueO, some(newValue("hello")))
+  test "does not start with var":
+    let statement = newStatement(text="123 = 343", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w29: Statement does not start with a variable name.
+statement: 123 = 343
+           ^
+"""
+    check testRunStatement(statement, eErrLines = eErrLines)
+
+  test "no equal sign":
+    let statement = newStatement(text="var 343", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w34: Invalid variable or missing equal sign.
+statement: var 343
+           ^
+"""
+    check testRunStatement(statement, eErrLines = eErrLines)
+
+  test "read only var":
+    let statement = newStatement(text="t.server = 343", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w39: You cannot change the server tea variable.
+statement: t.server = 343
+           ^
+"""
+    check testRunStatement(statement, eErrLines = eErrLines)
+
+  test "invalid namespace":
+    let statement = newStatement(text="e.server = 343", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w35: The variable namespace 'e.' does not exist.
+statement: e.server = 343
+           ^
+"""
+    check testRunStatement(statement, eErrLines = eErrLines)
+
+  test "invalid maxLines":
+    let statement = newStatement(text="t.maxLines = 'hello'", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w42: Invalid max count, it must be an integer >= 0.
+statement: t.maxLines = 'hello'
+                        ^
+"""
+    check testRunStatement(statement, eErrLines = eErrLines)
+
+  test "content must be a string":
+    let statement = newStatement(text="t.content = 3.45", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w43: Invalid t.content, it must be a string.
+statement: t.content = 3.45
+                       ^
+"""
+    check testRunStatement(statement, eErrLines = eErrLines)
+
+  test "invalid repeat":
+    let statement = newStatement(text="t.repeat = 3.45", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w44: Invalid t.repeat, it must be an integer >= 0 and <= t.maxRepeat.
+statement: t.repeat = 3.45
+                      ^
+"""
+    check testRunStatement(statement, eErrLines = eErrLines)
+
+  test "invalid tea var":
+    let statement = newStatement(text="t.asdf = 3.45", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w40: Invalid tea variable: asdf.
+statement: t.asdf = 3.45
+           ^
+"""
+    check testRunStatement(statement, eErrLines = eErrLines)

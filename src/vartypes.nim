@@ -54,12 +54,6 @@ type
     value*: Value
     length*: Natural
 
-  SpaceNameValue* = object
-    ## A variable's  namespace, name and value.
-    nameSpace*: string
-    varName*: string
-    value*: Value
-
 proc newValue*(str: string): Value =
   result = Value(kind: vkString, stringv: str)
 
@@ -81,9 +75,6 @@ proc newValue*(value: Value): Value =
 
 proc newVarsDict*(): VarsDict =
   return result
-
-proc newSpaceNameValue*(namespace: string, varName: string, value: Value): SpaceNameValue =
-  result = SpaceNameValue(namespace: namespace, varName: varName, value: value)
 
 when defined(test):
   proc newValue*[T](list: openArray[T]): Value =

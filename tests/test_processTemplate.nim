@@ -405,15 +405,107 @@ XXXX-XX-XX XX:XX:XX.XXX; replacement.nim(X*); hello world
     check testProcessTemplate(templateContent = templateContent, serverJson =
         serverJson, eLogLines = eLogLines)
 
+  test "output to stderr":
+    let templateContent = """
+<!--$ nextline t.output = "stderr" -->
+Hello {s.name}!
+"""
+    let serverJson = """
+{"name": "World"}
+"""
+    let eErrLines = splitNewLines """
+Hello World!
+"""
+    check testProcessTemplate(templateContent = templateContent, serverJson =
+        serverJson, eErrLines = eErrLines)
+
+  test "output to result":
+    let templateContent = """
+<!--$ nextline t.output = "result" -->
+Hello {s.name}!
+"""
+    let serverJson = """
+{"name": "World"}
+"""
+    let eResultLines = splitNewLines """
+Hello World!
+"""
+    check testProcessTemplate(templateContent = templateContent, serverJson =
+        serverJson, eResultLines = eResultLines)
+
+  test "output to skip":
+    let templateContent = """
+<!--$ nextline t.output = "skip" -->
+Hello {s.name}!
+"""
+    let serverJson = """
+{"name": "World"}
+"""
+    check testProcessTemplate(templateContent = templateContent, serverJson =
+        serverJson)
+
+  test "output to something":
+    let templateContent = """
+<!--$ nextline t.output = "something"-->
+Hello {s.name}!
+"""
+    let serverJson = """
+{"name": "World"}
+"""
+
+    let eResultLines = splitNewLines """
+Hello World!
+"""
+
+    let eErrLines = splitNewLines """
+template.html(1): w41: Invalid t.output value, use: "result", "stderr", "log", or "skip".
+statement: t.output = "something"
+                      ^
+"""
+    check testProcessTemplate(templateContent = templateContent, serverJson =
+        serverJson, eErrLines = eErrLines, eResultLines = eResultLines, eRc = 1)
+
+  test "assign to server":
+    let templateContent = """
+<!--$ nextline t.server = "something"-->
+Hello {s.name}!
+"""
+    let serverJson = """
+{"name": "World"}
+"""
+    let eResultLines = splitNewLines """
+Hello World!
+"""
+    let eErrLines = splitNewLines """
+template.html(1): w39: You cannot change the server tea variable.
+statement: t.server = "something"
+           ^
+"""
+    check testProcessTemplate(templateContent = templateContent, serverJson =
+        serverJson, eErrLines = eErrLines, eResultLines = eResultLines, eRc = 1)
+
+  test "invalid namespace":
+    let templateContent = """
+<!--$ nextline y.var = "something"-->
+Hello {s.name}!
+"""
+    let serverJson = """
+{"name": "World"}
+"""
+    let eResultLines = splitNewLines """
+Hello World!
+"""
+    let eErrLines = splitNewLines """
+template.html(1): w35: The variable namespace 'y.' does not exist.
+statement: y.var = "something"
+           ^
+"""
+    check testProcessTemplate(templateContent = templateContent, serverJson =
+        serverJson, eErrLines = eErrLines, eResultLines = eResultLines, eRc = 1)
+
+
 
 # todo: when t.content is not set for a replace block.
-
 # todo: readme examples
-
-# todo: test output to log
-# todo: test output to stderr
-# todo: test output to skip
-# todo: test output to result
 # todo: test maxLines
 # todo: test maxRepeat
-# todo: test default t.output is "result"
