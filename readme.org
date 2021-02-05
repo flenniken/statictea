@@ -1,5 +1,4 @@
-#+TITLE: StaticTea
-* A template processor and language. :notoc:
+#+TITLE: StaticTea: A template processor and language.
 
 StaticTea combines a template with data to produce a result.
 
@@ -168,9 +167,9 @@ templates and it has the special property that you can
 automatically update the replacement block to keep it in sync
 with the variable.
 
-If you don't assign the t.content variable, the block content is
-used as is.  This is good for testing changes you want to make to
-the shared value.
+If you don't assign the t.content variable, a warning is
+generated, and the command behaves like a block command.  This is
+good for testing changes you want to make to the shared value.
 
 The following example uses a common header from the shared json.
 
@@ -281,7 +280,7 @@ result:
 :CUSTOM_ID: comment-command
 :END:
 
-You can comment templates with the comments command.  Comments
+You can comment templates with the comment command.  Comments
 are line based and use the # character. They do not appear in the
 result.
 
@@ -536,7 +535,7 @@ You pass variables to the template in json files.
 
 The variables are defined by the top level dictionary items. Each
 items's key is the name of a variable and the items's value is
-the variables's value.
+the variables' value.
 
 There are two types of json files, the server json and the shared
 json. The server file populates the t.server dictionary and the
@@ -552,10 +551,6 @@ The json null values get converted to the 0. Json True and False
 get converted to 1 and 0.
 
 You cannot change the json variables.
-
-The server variables are stored in the t.server dictionary.
-
-The shared variables are stored in the t.shared dictionary.
 
 To give full control of the presentation to the template
 designers, the server json shouldn't contain any presentation
@@ -1029,7 +1024,7 @@ Example floats:
 #+BEGIN_SRC
 3.14159
 24.95
-.123
+0.123
 -34.0
 #+END_SRC
 
@@ -1329,7 +1324,7 @@ When none of the cases match the condition, the else case is
 returned.
 
 For the example below the abbr variable is set to an abbreviation
-depending on the type of tea.
+depending on the type of tea. Added in version 0.1.0.
 
 template:
 
@@ -1429,7 +1424,7 @@ than 10 characters.
 
 The concat function concatenates strings. You can specify two or
 more string parameters. The following example also shows using
-the "#$" prefix:
+the "#$" prefix. Added in version 0.1.0.
 
 #+BEGIN_SRC
 #$ block \
@@ -1460,7 +1455,7 @@ string to float. It takes two or three parameters. The first
 parameter is the variable to convert, the second parameter is the
 type name to convert to, and the third parameter tells how to
 convert.  If the variable to convert is a string, it must look
-like a number.
+like a number. Added in version 0.1.0.
 
 Note: if you want to convert a number to a string, use the format
 function.
@@ -1523,7 +1518,7 @@ convert("333", "float") => 333.0
 
 The exists function takes one string parameter which is the name
 of a variable. It returns 1 when a variable exists, else it
-returns 0.
+returns 0. Added in version 0.1.0.
 
 template:
 
@@ -1552,7 +1547,7 @@ exists("b") => 0
 
 The find function searches a string for a substring and returns
 its position when found. When not found it returns -1. Positions
-start at 0.
+start at 0. Added in version 0.1.0.
 
 template:
 
@@ -1581,7 +1576,7 @@ dictionary to use. The second is the key name for dictionaries or
 the index for lists. The third optional parameter is the default
 value when the item doesn't exist. If you don't specify the
 default, a warning is generated when the item doesn't exist and
-the statement is skipped.
+the statement is skipped. Added in version 0.1.0.
 
 #+BEGIN_SRC
 var = get(t.server, "tea", "Earl Grey")
@@ -1600,7 +1595,7 @@ You use the if function to select a value based on a condition.
 The if function has three parameters. The first parameter is the
 condition value (1 or not 1), the second is the true case (1 case) and the
 third is the else case (not 1 case).  When the condition value is 1, the second
-parameter is returned, else the third parameter is returned.
+parameter is returned, else the third parameter is returned. Added in version 0.1.0.
 
 The following example uses the template system to show how it
 works.
@@ -1639,6 +1634,7 @@ The format function is a powerful way to format your
 variables. You can left, right or center the variable.  You can
 specify the number of digits after the decimal point and other
 things. For all the details see: https://nim-lang.org/docs/strformat.html.
+Added in version 0.1.0.
 
 template:
 
@@ -1713,7 +1709,7 @@ The server json dictionary has 1 elements.
 :CUSTOM_ID: lineNumber
 :END:
 
-Return the line in the template where the function is called.
+Return the line in the template where the function is called. Added in version 0.1.0.
 
 [[#contents][茶]]
 
@@ -1722,7 +1718,7 @@ Return the line in the template where the function is called.
 :CUSTOM_ID: quoteHtml
 :END:
 
-The quoteHtml replaces special html characters with equivalents.
+The quoteHtml replaces special html characters with equivalents. Added in version 0.1.0.
 
 [[#contents][茶]]
 
@@ -1732,7 +1728,7 @@ The quoteHtml replaces special html characters with equivalents.
 :END:
 
 The sizes function formats a number as a number of bytes, KB, MB,
-GB, etc.
+GB, etc. Added in version 0.1.0.
 
 [[#contents][茶]]
 
@@ -1746,7 +1742,7 @@ indexes. The first parameter is the string to operate on, the
 second is the starting index of the substring to extract and the
 third is the ending index (one past it). The third parameter is
 optional and defaults to one past the end of the string. The end
-minus the start is equal to the length of the substring.
+minus the start is equal to the length of the substring. Added in version 0.1.0.
 
 Showing the indexes under Earl Grey helps to understand how the
 function works.
@@ -1778,7 +1774,7 @@ sub1 = Grey, sub2 = Earl
 :CUSTOM_ID: time
 :END:
 
-The time function formats date and time values.
+The time function formats date and time values. Added in version 0.1.0.
 
 [[#contents][茶]]
 
@@ -1793,6 +1789,8 @@ parameter:
 - "basename" -- returns the name without any path information,
   which is the default.
 - "passed" -- returns the template name passed to statictea.
+
+Added in version 0.1.0.
 
 [[#contents][茶]]
 
@@ -1819,6 +1817,8 @@ You can use the function multiple times for fine grain checking.
 StaticTea uses [[https://semver.org/][Semantic Versioning]] with the added restrictions
 that each version component is limited to three digits and all
 components have at least one digit.
+
+Added in version 0.1.0.
 
 Below is typical useage:
 

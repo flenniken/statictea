@@ -849,3 +849,11 @@ statement: t.asdf = 3.45
            ^
 """
     check testRunStatement(statement, eErrLines = eErrLines)
+
+# todo: test that a warning is generated when the item doesn't exist.
+# todo: test prepost when user specified.
+# todo: test the maximum variable length of 64, 66 including the optional prefix.
+# todo: test endblock by itself.
+# todo: use "import std/strutils to include system modules
+# todo: update to the latest nim version
+# 
