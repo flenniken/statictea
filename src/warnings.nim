@@ -50,7 +50,7 @@ type
     wInvalidOutputValue,   # w41
     wInvalidMaxCount,      # w42
     wInvalidTeaContent,    # w43
-    wInvalidMaxRepeat,     # w44
+    wInvalidRepeat,        # w44
     wInvalidPrepost,       # w45
     wMissingCommaParen,    # w46
     wExpectedStrings,      # w47
@@ -73,6 +73,8 @@ type
     wNotNumberOrString,    # w64
     wTwoOrThreeParameters, # w65
     wTwoOrMoreParameters,  # w66
+    wInvalidMaxRepeat,     # w67
+    wContentNotSet,        # w68
 
 tpubType:
   const
@@ -123,7 +125,7 @@ tpubType:
       """Invalid t.output value, use: "result", "stderr", "log", or "skip".""", # wInvalidOutputValue
       "Invalid max count, it must be an integer >= 0.", # wInvalidMaxCount
       "Invalid t.content, it must be a string.", # wInvalidTeaContent
-      "Invalid t.repeat, it must be an integer >= 0 and <= t.maxRepeat.", # wInvalidMaxRepeat
+      "Invalid t.repeat, it must be an integer >= 0 and <= t.maxRepeat.", # wInvalidRepeat
       "Invalid prepost: $1.", # wInvalidPrepost
       "Expected comma or right parentheses.", # wMissingCommaParen
       "Concat parameter $1 is not a string.", # wExpectedStrings
@@ -146,6 +148,8 @@ tpubType:
       "The parameters must be numbers or strings.", # wNotNumberOrString
       "The function takes two or three parameters.", # wTwoOrThreeParameters
       "The function takes two or more parameters.", # wTwoOrMoreParameters
+      "The t.maxRepeat variable must be an integer >= t.repeat.", # wInvalidMaxRepeat
+      "The t.content variable is not set for the replace command, treating it like the block command.", # wContentNotSet
     ]
 
 func getWarning*(filename: string, lineNum: int,

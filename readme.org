@@ -259,7 +259,7 @@ shared json:
 <html lang=\"{s.languageCode}\" dir=\"{s.languageDirection}\">
 <head>
 <meta charset=\"UTF-8\"/>
-<title>{s.title}</title>"
+<title>{s.title}</title>\n"
 }
 #+END_SRC
 
@@ -727,161 +727,165 @@ template.html(45): missing admin var
     :CUSTOM_ID: trepeat
     :END:
 
- The t.repeat variable is a number that tells how many times to
- repeat the block.
+The t.repeat variable is a number that tells how many times to
+repeat the block.
 
- You use the t.row variable to customize each block.  Each time
- the block repeats the local variables get recalculated.
+You use the t.row variable to customize each block.  Each time
+the block repeats the local variables get recalculated.
 
- By default the block is output once. A value of zero means don't
- show the block at all.
+By default the block is output once. A value of zero means don't
+show the block at all.
 
- For the following example, the number of items in tea_list is
- assigned to the t.repeat variable which outputs the block five
- times.
+You cannot assign a number bigger than t.maxRepeat to
+t.repeat. You can set t.maxRepeat to anything you want, the
+default is 100.
 
- template:
+For the following example, the number of items in tea_list is
+assigned to the t.repeat variable which outputs the block five
+times.
 
- #+BEGIN_SRC
- <!--$ nextline t.repeat = len(s.tea_list); \-->
- <!--$ : tea = get(s.tea_list, t.row) -->
-  * {tea}
- #+END_SRC
+template:
 
- server json:
+#+BEGIN_SRC
+<!--$ nextline t.repeat = len(s.tea_list); \-->
+<!--$ : tea = get(s.tea_list, t.row) -->
+* {tea}
+#+END_SRC
 
- #+BEGIN_SRC
- {
- "tea_list": [
-    "Black",
-    "Green",
-    "Oolong",
-    "Sencha",
-    "Herbal"
-  ]
- }
- #+END_SRC
+server json:
 
- result:
+#+BEGIN_SRC
+{
+"tea_list": [
+  "Black",
+  "Green",
+  "Oolong",
+  "Sencha",
+  "Herbal"
+]
+}
+#+END_SRC
 
- #+BEGIN_SRC
-  * Black
-  * Green
-  * Oolong
-  * Sencha
-  * Herbal
- #+END_SRC
+result:
 
- The following example builds an html select list of tea companies
- with the Twinings company selected and it shows how to access
- values from dictionaries.
+#+BEGIN_SRC
+* Black
+* Green
+* Oolong
+* Sencha
+* Herbal
+#+END_SRC
 
- template:
+The following example builds an html select list of tea companies
+with the Twinings company selected and it shows how to access
+values from dictionaries.
 
- #+BEGIN_SRC
- <h3>Tea Companies</h3>
- <select>
- <!--$ nextline t.repeat=len(s.companyList); \-->
- <!--$ : d = get(s.companyList, t.row); \-->
- <!--$ : company = get(d, "company"); \-->
- <!--$ : selected = get(d, "selected", 0); \-->
- <!--$ : current=if(selected, ' selected="selected"', "") -->
-  <option{current}>{company}</option>
- </select>
- #+END_SRC
+template:
 
- server json:
+#+BEGIN_SRC
+<h3>Tea Companies</h3>
+<select>
+<!--$ nextline t.repeat=len(s.companyList); \-->
+<!--$ : d = get(s.companyList, t.row); \-->
+<!--$ : company = get(d, "company"); \-->
+<!--$ : selected = get(d, "selected", 0); \-->
+<!--$ : current=if(selected, ' selected="selected"', "") -->
+<option{current}>{company}</option>
+</select>
+#+END_SRC
 
- #+BEGIN_SRC
- {
- "companyList": [
-    {"company": "Lipton"},
-    {"company": "Tetley"},
-    {"company": "Twinings, "selected": 1},
-    {"company": "American Tea Room"},
-    {"company": "Argo Tea"},
-    {"company": "Bigelow Tea Company"}
-  ]
- }
- #+END_SRC
+server json:
 
- result:
+#+BEGIN_SRC
+{
+"companyList": [
+  {"company": "Lipton"},
+  {"company": "Tetley"},
+  {"company": "Twinings", "selected": 1},
+  {"company": "American Tea Room"},
+  {"company": "Argo Tea"},
+  {"company": "Bigelow Tea Company"}
+]
+}
+#+END_SRC
 
- #+BEGIN_SRC
- <h3>Tea Companies</h3>
- <select>
-  <option>Lipton</option>
-  <option>Tetley</option>
-  <option>selected="selected">Twinings</option>
-  <option>Argo Tea</option>
-  <option>American Tea Room</option>
-  <option>Bigelow Tea Company</option>
- </select>
- #+END_SRC
+result:
 
- Setting t.repeat to 0 is good for building test lists.
+#+BEGIN_SRC
+<h3>Tea Companies</h3>
+<select>
+<option>Lipton</option>
+<option>Tetley</option>
+<option>selected="selected">Twinings</option>
+<option>Argo Tea</option>
+<option>American Tea Room</option>
+<option>Bigelow Tea Company</option>
+</select>
+#+END_SRC
 
- When you view the following template fragment in a browser it
- shows one item in the list.
+Setting t.repeat to 0 is good for building test lists.
 
- template:
+When you view the following template fragment in a browser it
+shows one item in the list.
 
- #+BEGIN_SRC
- <h3>Tea</h3>
- <ul>
- <!--$ nextline t.repeat = len(s.teaList); \-->
- <!--$ : tea = get(s.teaList, t.row) -->
-  <li>{tea}</li>
- </ul>
- #+END_SRC
+template:
 
- To create a static page that has more products for better testing
- you could use the repeat variable like this:
+#+BEGIN_SRC
+<h3>Tea</h3>
+<ul>
+<!--$ nextline t.repeat = len(s.teaList); \-->
+<!--$ : tea = get(s.teaList, t.row) -->
+<li>{tea}</li>
+</ul>
+#+END_SRC
 
- template:
+To create a static page that has more products for better testing
+you could use the repeat variable like this:
 
- #+BEGIN_SRC
- <h3>Tea</h3>
- <ul>
- <!--$ nextline t.repeat = len(s.teaList) \-->
- <!--$ : tea = get(s.teaList, t.row) -->
-  <li>{tea}</li>
- <!--$ block t.repeat = 0 -->
-  <li>Black</li>
-  <li>Green</li>
-  <li>Oolong</li>
-  <li>Sencha</li>
-  <li>Herbal</li>
- <!--$ endblock -->
- </ul>
- #+END_SRC
+template:
 
- server json:
+#+BEGIN_SRC
+<h3>Tea</h3>
+<ul>
+<!--$ nextline t.repeat = len(s.teaList); \-->
+<!--$ : tea = get(s.teaList, t.row) -->
+<li>{tea}</li>
+<!--$ block t.repeat = 0 -->
+<li>Black</li>
+<li>Green</li>
+<li>Oolong</li>
+<li>Sencha</li>
+<li>Herbal</li>
+<!--$ endblock -->
+</ul>
+#+END_SRC
 
- #+BEGIN_SRC
- {
-  "teaList": [
-    "Chamomile",
-    "Chrysanthemum",
-    "White",
-    "Puer"
-  ]
- }
- #+END_SRC
+server json:
 
- result:
+#+BEGIN_SRC
+{
+"teaList": [
+  "Chamomile",
+  "Chrysanthemum",
+  "White",
+  "Puer"
+]
+}
+#+END_SRC
 
- #+BEGIN_SRC
- <h3>Tea</h3>
- <ul>
-  <li>Chamomile</li>
-  <li>Chrysanthemum</li>
-  <li>White</li>
-  <li>Puer</li>
- </ul>
- #+END_SRC
+result:
 
- [[#contents][茶]]
+#+BEGIN_SRC
+<h3>Tea</h3>
+<ul>
+<li>Chamomile</li>
+<li>Chrysanthemum</li>
+<li>White</li>
+<li>Puer</li>
+</ul>
+#+END_SRC
+
+[[#contents][茶]]
 
 *** t.row
     :PROPERTIES:
@@ -1170,7 +1174,7 @@ server json:
 stderr:
 
 #+BEGIN_SRC
-template.html(2): w1: Unknown server variable: s.teaMaster
+template.html(3): w58: The replacement variable doesn't exist: s.teaMaster.
 #+END_SRC
 
 result:

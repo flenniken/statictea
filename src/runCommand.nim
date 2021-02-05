@@ -329,12 +329,18 @@ proc assignTeaVariable*(env: var Env, statement: Statement, variables:
   ## warnings when it's not possible to make the assignment.
 
   case varName:
-    of "maxLines", "maxRepeat":
-      # The maxLines and maxRepeat variables must be an integer >= 0.
+    of "maxLines":
+      # The maxLines variable must be an integer >= 0.
       if value.kind == vkInt and value.intv >= 0:
         variables[varName] = value
       else:
         env.warnStatement(statement, wInvalidMaxCount, valuePos)
+    of "maxRepeat":
+      # The maxRepeat variable must be an integer >= t.repeat.
+      if value.kind == vkInt and value.intv >= variables["repeat"].intv:
+        variables[varName] = value
+      else:
+        env.warnStatement(statement, wInvalidMaxRepeat, valuePos)
     of "content":
       # Content must be a string.
       if value.kind == vkString:
@@ -354,7 +360,7 @@ proc assignTeaVariable*(env: var Env, statement: Statement, variables:
          value.intv <= variables["maxRepeat"].intv:
         variables[varName] = value
       else:
-        env.warnStatement(statement, wInvalidMaxRepeat, valuePos, $value)
+        env.warnStatement(statement, wInvalidRepeat, valuePos, $value)
     of "server", "shared", "local", "global", "row":
       env.warnStatement(statement, wReadOnlyTeaVar, varPos, varName)
     else:

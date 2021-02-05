@@ -434,7 +434,8 @@ when defined(test):
       eLogLines: seq[string] = @[],
       eErrLines: seq[string] = @[],
       eOutLines: seq[string] = @[],
-      eResultLines: seq[string] = @[]
+      eResultLines: seq[string] = @[],
+      showLog: bool = false
     ): bool =
     ## Read the env streams then close and delete them. Compare the
     ## streams with the expected content. Return true when they are
@@ -443,6 +444,11 @@ when defined(test):
     ## exist.
     result = true
     let (logLines, errLines, outLines, resultLines) = env.readCloseDeleteEnv()
+
+    if showLog:
+      echo "------- log lines:"
+      echo logLines
+      echo "-------"
 
     if not compareLogLines(logLines, eLogLines):
       result = false

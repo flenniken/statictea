@@ -64,6 +64,8 @@ proc readJson*(env: var Env, filename: string, vars: var VarsDict) =
   try:
     rootNode = parseJson(stream, filename)
   except:
+    let message =  getCurrentExceptionMsg()
+    env.log(message)
     env.warn(0, wJsonParseError, filename)
     return
 

@@ -100,6 +100,10 @@ proc processTemplateLines(env: var Env, variables: var Variables,
                variables)
     let repeat = getTeaVarInt(variables, "repeat")
 
+    # Show a warning when the replace command does not have t.content set.
+    if command == "replace" and not variables.contains("content"):
+      env.warn(lb.lineNum, wContentNotSet)
+
     # If repeat is 0, read the replacement lines and discard them.
     if repeat == 0:
       for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):

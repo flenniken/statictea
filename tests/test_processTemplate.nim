@@ -13,7 +13,8 @@ proc testProcessTemplate(templateContent: string = "",
     eResultLines: seq[string] = @[],
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
-    eOutLines: seq[string] = @[]
+    eOutLines: seq[string] = @[],
+    showLog: bool = false
   ): bool =
   ## Test the processTemplate procedure.
 
@@ -38,7 +39,7 @@ proc testProcessTemplate(templateContent: string = "",
   let rc = processTemplate(env, args)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines,
-    eResultLines = eResultLines)
+    eResultLines = eResultLines, showLog = showLog)
 
   if not expectedItem("rc", rc, eRc):
     result = false
@@ -113,7 +114,7 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
     check testProcessTemplate(templateContent = templateContent, serverJson =
         serverJson, eResultLines = eResultLines)
 
-  test "Shared Header":
+  test "readme shared header":
     let templateContent = """
 <!--$ replace t.content=h.header -->
 <!--$ endblock -->
@@ -133,7 +134,7 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
     check testProcessTemplate(templateContent = templateContent, sharedJson =
         sharedJson, eResultLines = eResultLines)
 
-  test "Shared Header2":
+  test "readme shared header 2":
     let templateContent = """
 <!--$ replace t.content=h.header -->
 <!DOCTYPE html>
@@ -172,7 +173,49 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
     check testProcessTemplate(templateContent = templateContent, serverJson = serverJson, sharedJson =
         sharedJson, eResultLines = eResultLines)
 
-  test "Comment":
+
+  test "readme shared header 3":
+
+
+    let templateContent = """
+<!--$ replace t.content=h.header -->
+<!DOCTYPE html>
+<html lang="{s.languageCode}" dir="{s.languageDirection}">
+<head>
+<meta charset="UTF-8"/>
+<title>{s.title}</title>
+<--$ endblock -->
+"""
+
+    let serverJson = """
+{
+"languageCode": "en",
+"languageDirection": "ltr",
+"title": "Teas in England"
+}
+"""
+
+    let sharedJson = """
+{
+  "header": "<!DOCTYPE html>
+<html lang=\"{s.languageCode}\" dir=\"{s.languageDirection}\">
+<head>
+<meta charset=\"UTF-8\"/>
+<title>{s.title}</title>\n"
+}
+"""
+
+    let eResultLines = splitNewLines """
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<title>Teas in England</title>
+"""
+    check testProcessTemplate(templateContent = templateContent, serverJson = serverJson, sharedJson =
+        sharedJson, eResultLines = eResultLines)
+
+  test "readme comment":
 
     let templateContent = """
 <!--$ # How you make tea. -->
@@ -189,7 +232,7 @@ intensive steps.
 """
     check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
 
-  test "Continuation":
+  test "readme continuation":
 
     let templateContent = """
 <!--$ nextline \-->
@@ -224,7 +267,7 @@ template.html(4): w58: The replacement variable doesn't exist: tea2.
     check testProcessTemplate(templateContent = templateContent, eRc = 1, eResultLines
           = eResultLines, eErrLines = eErrLines)
 
-  test "commands in a replacement block":
+  test "readme commands in a replacement block":
 
     let templateContent = """
 <!--$ block -->
@@ -503,9 +546,273 @@ statement: y.var = "something"
     check testProcessTemplate(templateContent = templateContent, serverJson =
         serverJson, eErrLines = eErrLines, eResultLines = eResultLines, eRc = 1)
 
+  test "assign repeat more than maxRepeat":
+    # Test that you cannot assign t.repeat more than maxRepeat.
+    let templateContent = """
+<!--$ nextline t.repeat = 200-->
+{t.row}
+"""
+    let eResultLines = splitNewLines """
+0
+"""
+    let eErrLines = splitNewLines """
+template.html(1): w44: Invalid t.repeat, it must be an integer >= 0 and <= t.maxRepeat.
+statement: t.repeat = 200
+                      ^
+"""
+    check testProcessTemplate(templateContent = templateContent,
+        eErrLines = eErrLines, eResultLines = eResultLines, eRc = 1)
+
+  test "assign maxRepeat less than repeat":
+    # Test that you cannot assign t.maxRepeat less than repeat.
+    let templateContent = """
+<!--$ nextline t.repeat = 4; t.maxRepeat=3-->
+{t.row}
+"""
+    let eResultLines = splitNewLines """
+0
+1
+2
+3
+"""
+    let eErrLines = splitNewLines """
+template.html(1): w67: The t.maxRepeat variable must be an integer >= t.repeat.
+statement:  t.maxRepeat=3
+                        ^
+"""
+    check testProcessTemplate(templateContent = templateContent,
+        eErrLines = eErrLines, eResultLines = eResultLines, eRc = 1)
+
+  test "content not set for replace block":
+    let templateContent = """
+<!--$ replace -->
+Replace command with t.content set
+should behave like a block command with
+a warning message.
+<!--$ endblock -->
+"""
+    let eResultLines = splitNewLines """
+Replace command with t.content set
+should behave like a block command with
+a warning message.
+"""
+    let eErrLines = splitNewLines """
+template.html(1): w68: The t.content variable is not set for the replace command, treating it like the block command.
+"""
+    check testProcessTemplate(templateContent = templateContent,
+        eErrLines = eErrLines, eResultLines = eResultLines, eRc = 1)
 
 
-# todo: when t.content is not set for a replace block.
-# todo: readme examples
-# todo: test maxLines
-# todo: test maxRepeat
+  test "readme join tea party":
+    let templateContent = """
+<!--$ block -->
+Join our tea party on
+{s.weekday} at {s.name}'s
+house at {s.time}.
+<!--$ endblock -->
+"""
+
+    let serverJson = """
+{
+  "weekday": "Friday",
+  "name": "John",
+  "time": "5:00 pm"
+}
+"""
+
+    let eResultLines = splitNewLines """
+Join our tea party on
+Friday at John's
+house at 5:00 pm.
+"""
+    check testProcessTemplate(templateContent = templateContent,
+        serverJson = serverJson, eResultLines = eResultLines, eRc = 0)
+
+# todo: need some functions defined before this works.
+#   test "readme do your own warnings":
+#     let templateContent = """
+# <!--$ nextline \-->
+# <!--$ : t.output = if( \-->
+# <!--$ :   exists("s.admin"), "skip", \-->
+# <!--$ :   "stderr"); \-->
+# <!--$ : msg = concat( \-->
+# <!--$ :   template(), "(", \-->
+# <!--$ :   getLineNumber(), ")", \-->
+# <!--$ :   "missing admin var") -->
+# {msg}
+# """
+
+#     let eResultLines = splitNewLines """
+# template.html(45): missing admin var
+# """
+#     check testProcessTemplate(templateContent = templateContent,
+#         eResultLines = eResultLines, eRc = 0)
+
+  test "readme repeat example":
+    let templateContent = """
+<!--$ nextline t.repeat = len(s.tea_list); \-->
+<!--$ : tea = get(s.tea_list, t.row) -->
+* {tea}
+"""
+
+    let serverJson = """
+{
+"tea_list": [
+  "Black",
+  "Green",
+  "Oolong",
+  "Sencha",
+  "Herbal"
+]
+}
+"""
+
+    let eResultLines = splitNewLines """
+* Black
+* Green
+* Oolong
+* Sencha
+* Herbal
+"""
+    check testProcessTemplate(templateContent = templateContent,
+        serverJson = serverJson, eResultLines = eResultLines, eRc = 0)
+
+# todo: need if statement
+#   test "readme repeat example 2":
+#     let templateContent = """
+# <h3>Tea Companies</h3>
+# <select>
+# <!--$ nextline t.repeat=len(s.companyList); \-->
+# <!--$ : d = get(s.companyList, t.row); \-->
+# <!--$ : company = get(d, "company"); \-->
+# <!--$ : selected = get(d, "selected", 0); \-->
+# <!--$ : current=if(selected, ' selected="selected"', "") -->
+# <option{current}>{company}</option>
+# </select>
+# """
+
+#     let serverJson = """
+# {
+# "companyList": [
+#   {"company": "Lipton"},
+#   {"company": "Tetley"},
+#   {"company": "Twinings", "selected": 1},
+#   {"company": "American Tea Room"},
+#   {"company": "Argo Tea"},
+#   {"company": "Bigelow Tea Company"}
+# ]
+# }
+# """
+
+#     let eResultLines = splitNewLines """
+# <h3>Tea Companies</h3>
+# <select>
+# <option>Lipton</option>
+# <option>Tetley</option>
+# <option>selected="selected">Twinings</option>
+# <option>Argo Tea</option>
+# <option>American Tea Room</option>
+# <option>Bigelow Tea Company</option>
+# </select>
+# """
+#     check testProcessTemplate(templateContent = templateContent,
+#       serverJson = serverJson, eResultLines = eResultLines, eRc = 0, showLog = true)
+
+
+# todo: test json parsing errors. Tell to look in the log file?
+
+  test "readme repeat = 0":
+    let templateContent = """
+<h3>Tea</h3>
+<ul>
+<!--$ nextline t.repeat = len(s.teaList); \-->
+<!--$ : tea = get(s.teaList, t.row) -->
+<li>{tea}</li>
+<!--$ block t.repeat = 0 -->
+<li>Black</li>
+<li>Green</li>
+<li>Oolong</li>
+<li>Sencha</li>
+<li>Herbal</li>
+<!--$ endblock -->
+</ul>
+"""
+
+    let serverJson = """
+{
+"teaList": [
+  "Chamomile",
+  "Chrysanthemum",
+  "White",
+  "Puer"
+]
+}
+"""
+
+    let eResultLines = splitNewLines """
+<h3>Tea</h3>
+<ul>
+<li>Chamomile</li>
+<li>Chrysanthemum</li>
+<li>White</li>
+<li>Puer</li>
+</ul>
+"""
+    check testProcessTemplate(templateContent = templateContent,
+        serverJson = serverJson, eResultLines = eResultLines, eRc = 0)
+
+
+# todo: need add function
+#   test "readme row example":
+#     let templateContent = """
+# <!--$ nextline t.repeat=len(s.companies); \-->
+# <!--$ : company = get(s.companies, t.row); \-->
+# <!--$ : num = add(t.row, 1) -->
+# <li id="r{t.row}>{num}. {company}</li>
+# """
+
+#     let serverJson = """
+# {
+#   "companies": [
+#     "Mighty Leaf Tea",
+#     "Numi Organic Tea",
+#     "Peet's Coffee & Tea",
+#     "Red Diamond"
+#   ]
+# }
+# """
+
+#     let eResultLines = splitNewLines """
+# <li id="r0">1. Mighty Leaf Tea</li>
+# <li id="r1">2. Numi Organic Tea</li>
+# <li id="r2">3. Peet's Coffee & Tea</li>
+# <li id="r3">4. Red Diamond</li>
+# """
+#     check testProcessTemplate(templateContent = templateContent,
+#         serverJson = serverJson, eResultLines = eResultLines, eRc = 0)
+
+  test "readme undefined variable":
+    let templateContent = """
+<!--$ block -->
+You're a {s.webmaster},
+I'm a {s.teaMaster}!
+<!--$ endblock -->
+"""
+
+    let serverJson = """
+{
+ "webmaster": "html wizard"
+}
+"""
+
+    let eErrLines = splitNewLines """
+template.html(3): w58: The replacement variable doesn't exist: s.teaMaster.
+"""
+
+    let eResultLines = splitNewLines """
+You're a html wizard,
+I'm a {s.teaMaster}!
+"""
+
+    check testProcessTemplate(templateContent = templateContent, eErrLines = eErrLines,
+      serverJson = serverJson, eResultLines = eResultLines, eRc = 1)
