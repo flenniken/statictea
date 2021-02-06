@@ -1292,6 +1292,7 @@ statictea to require.
 
 List of functions:
 
+- [[#add][add()]] -- add numbers
 - [[#case][case()]] -- multiple condition handling
 - [[#cmp][cmp()]] -- spaceship compare function <=>
 - [[#concat][concat()]] -- concatenate strings
@@ -1311,6 +1312,21 @@ List of functions:
 - [[#version][version()]] -- the current version and version checker
 
 [[#contents][茶]]
+
+** add()
+:PROPERTIES:
+:CUSTOM_ID: add
+:END:
+
+The add function returns the sum of its two or more
+parameters. The parameters must be all integers or all floats.  A
+warning is generated on overflow and the statement is skipped.
+
+Added in version 0.1.0.
+
+#+BEGIN_SRC
+num = add(t.row(), 1)
+#+END_SRC
 
 ** case()
 :PROPERTIES:
@@ -1594,12 +1610,15 @@ var = get(t.server, 0, "Earl Grey")
 :CUSTOM_ID: if
 :END:
 
-You use the if function to select a value based on a condition.
+You use the if function to return a value based on a condition.
+It has three parameters, the condition, the true case and the
+false case.
 
-The if function has three parameters. The first parameter is the
-condition value (1 or not 1), the second is the true case (1 case) and the
-third is the else case (not 1 case).  When the condition value is 1, the second
-parameter is returned, else the third parameter is returned. Added in version 0.1.0.
+1. Condition is an integer.
+2. True case, is the value returned when condition is 1.
+3. Else case, is the value returned when condition is not 1.
+
+Added in version 0.1.0.
 
 The following example uses the template system to show how it
 works.

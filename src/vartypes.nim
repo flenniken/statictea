@@ -60,6 +60,9 @@ proc newValue*(str: string): Value =
 proc newValue*(num: int): Value =
   result = Value(kind: vkInt, intv: num)
 
+proc newValue*(num: int64): Value =
+  result = Value(kind: vkInt, intv: num)
+
 proc newValue*(num: float): Value =
   result = Value(kind: vkFloat, floatv: num)
 

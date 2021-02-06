@@ -44,13 +44,17 @@ proc get_test_module_cmd(filename: string, release = false): string =
   # -f, --forceBuild:on|off   force rebuilding of all modules
   # -p, --path:PATH           add path to search paths
   # -r, --run                 run the compiled program with given arguments
+  # --gc:orc
+
+  # I turned on gs:orc because "n t" started erroring out. Too many unit tests maybe.
+  # [GC] cannot register global variable; too many global variables
 
   var rel: string
   if release:
     rel = "-d:release "
   else:
     rel = ""
-  result = "nim c -f --verbosity:0 -d:test $2--hints:off -r -p:src --out:bin/tests/$1 tests/$1" % [filename, rel]
+  result = "nim c -f --gc:orc --verbosity:0 -d:test $2--hints:off -r -p:src --out:bin/tests/$1 tests/$1" % [filename, rel]
 
 
 # Tasks below
@@ -107,7 +111,7 @@ task docs1, "\tBuild docs for one module.":
   open_in_browser("docs/html/loggers.html")
 
 task tt, "\tCompile and run t.nim":
-  let cmd = "nim c -r --hints:off --outdir:bin/tests/ src/t.nim"
+  let cmd = "nim c -r --gc:orc --hints:off --outdir:bin/tests/ src/t.nim"
   echo cmd
   exec cmd
 

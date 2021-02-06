@@ -286,3 +286,74 @@ suite "runFunction.nim":
     check testCmpFun("ABC", "abc", true, expected = 0)
     check testCmpFun("abc", "ABD", true, expected = -1)
     check testCmpFun("ABD", "abc", true, expected = 1)
+
+  test "if function true":
+    var parameters = @[newValue(1), newValue("true"), newValue("false")]
+    let eValueO = some(newValue("true"))
+    check testFunction("if", parameters, eValueO = eValueO)
+
+  test "if function false":
+    var parameters = @[newValue(33), newValue("true"), newValue("false")]
+    let eValueO = some(newValue("false"))
+    check testFunction("if", parameters, eValueO = eValueO)
+
+  test "if wrong condition type":
+    var parameters = @[newValue(3.4), newValue("true"), newValue("false")]
+    let eErrLines = @["template.html(1): w70: The parameter must be an integer.\n"]
+    check testFunction("if", parameters, eErrLines = eErrLines)
+
+  test "if wrong number of parameters":
+    var parameters = @[newValue(2), newValue("false")]
+    let eErrLines = @["template.html(1): w69: Expected three parameters.\n"]
+    check testFunction("if", parameters, eErrLines = eErrLines)
+
+  test "add function 2 int parameters":
+    var parameters = @[newValue(1), newValue(2)]
+    let eValueO = some(newValue(3))
+    check testFunction("add", parameters, eValueO = eValueO)
+
+  test "add function 3 int parameters":
+    var parameters = @[newValue(1), newValue(2), newValue(3)]
+    let eValueO = some(newValue(6))
+    check testFunction("add", parameters, eValueO = eValueO)
+
+  test "add function 2 float parameters":
+    var parameters = @[newValue(2.0), newValue(3.5)]
+    let eValueO = some(newValue(5.5))
+    check testFunction("add", parameters, eValueO = eValueO)
+
+  test "add wrong number of parameters":
+    var parameters = @[newValue(2)]
+    let eErrLines = @["template.html(1): w66: The function takes two or more parameters.\n"]
+    check testFunction("add", parameters, eErrLines = eErrLines)
+
+  test "add wrong type of parameters":
+    var parameters = @[newValue("hi"), newValue(4)]
+    let eErrLines = @["template.html(1): w71: The parameters must be all integers or all floats.\n"]
+    check testFunction("add", parameters, eErrLines = eErrLines)
+
+  test "add wrong type of parameters 2":
+    var parameters = @[newValue(4), newValue("hi")]
+    let eErrLines = @["template.html(1): w71: The parameters must be all integers or all floats.\n"]
+    check testFunction("add", parameters, eErrLines = eErrLines)
+
+  test "add wrong type of parameters 3":
+    var parameters = @[newValue(4), newValue(1.3)]
+    let eErrLines = @["template.html(1): w71: The parameters must be all integers or all floats.\n"]
+    check testFunction("add", parameters, eErrLines = eErrLines)
+
+  test "add int64 overflow":
+    var parameters = @[newValue(high(int64)), newValue(1)]
+    let eErrLines = @["template.html(1): w72: Overflow or underflow.\n"]
+    check testFunction("add", parameters, eErrLines = eErrLines)
+
+  test "add int64 underflow":
+    var parameters = @[newValue(low(int64)), newValue(-1)]
+    let eErrLines = @["template.html(1): w72: Overflow or underflow.\n"]
+    check testFunction("add", parameters, eErrLines = eErrLines)
+
+  test "add float64 overflow":
+    var big = 1.7976931348623158e+308
+    var parameters = @[newValue(big), newValue(big)]
+    let eErrLines = @["template.html(1): w72: Overflow or underflow.\n"]
+    check testFunction("add", parameters, eErrLines = eErrLines)

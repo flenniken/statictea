@@ -75,6 +75,10 @@ type
     wTwoOrMoreParameters,  # w66
     wInvalidMaxRepeat,     # w67
     wContentNotSet,        # w68
+    wThreeParameters,      # w69
+    wExpectedInteger,      # w70
+    wAllIntOrFloat,        # w71
+    wOverflow,             # w72
 
 tpubType:
   const
@@ -150,6 +154,10 @@ tpubType:
       "The function takes two or more parameters.", # wTwoOrMoreParameters
       "The t.maxRepeat variable must be an integer >= t.repeat.", # wInvalidMaxRepeat
       "The t.content variable is not set for the replace command, treating it like the block command.", # wContentNotSet
+      "Expected three parameters.", # wThreeParameters
+      "The parameter must be an integer.", # wExpectedInteger
+      "The parameters must be all integers or all floats.", # wAllIntOrFloat
+      "Overflow or underflow.", # wOverflow
     ]
 
 func getWarning*(filename: string, lineNum: int,

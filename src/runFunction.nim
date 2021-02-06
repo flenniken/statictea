@@ -149,12 +149,77 @@ proc funGet*(env: var Env, lineNum: Natural, parameters:
     else:
       env.warn(lineNum, wExpectedListOrDict)
 
+proc funIf*(env: var Env, lineNum: Natural, parameters:
+               seq[Value]): Option[Value] =
+  ## You use the if function to return a value based on a condition.
+  ## It has three parameters, the condition, the true case and the
+  ## false case.
+  ##
+  ## 1. Condition is an integer.
+  ## 2. True case, is the value returned when condition is 1.
+  ## 3. Else case, is the value returned when condition is not 1.
+  ##
+  ## Added in version 0.1.0.
+
+  if parameters.len() != 3:
+    env.warn(lineNum, wThreeParameters)
+    return
+
+  let condition = parameters[0]
+  if condition.kind != vkInt:
+    env.warn(lineNum, wExpectedInteger)
+    return
+
+  if condition.intv == 1:
+    result = some(parameters[1])
+  else:
+    result = some(parameters[2])
+
+{.push overflowChecks: on, floatChecks: on.}
+
+proc funAdd*(env: var Env, lineNum: Natural, parameters:
+    seq[Value]): Option[Value] =
+  ## The add function returns the sum of its two or more
+  ## parameters. The parameters must be all integers or all floats.  A
+  ## warning is generated on overflow and the statement is skipped.
+  ##
+  ## Added in version 0.1.0.
+
+  if parameters.len() < 2:
+    env.warn(lineNum, wTwoOrMoreParameters)
+    return
+
+  let first = parameters[0]
+  if first.kind != vkInt and first.kind != vkFloat:
+    env.warn(lineNum, wAllIntOrFloat)
+    return
+
+  for value in parameters[1..^1]:
+    if value.kind != first.kind:
+      env.warn(lineNum, wAllIntOrFloat)
+      return
+
+    try:
+      if first.kind == vkInt:
+        first.intv = first.intv + value.intv
+      else:
+        first.floatv = first.floatv + value.floatv
+    except:
+      env.warn(lineNum, wOverflow)
+      return
+
+  result = some(first)
+
+{.pop.}
+
 const
   functionsList = [
     ("len", funLen),
     ("concat", funConcat),
     ("get", funGet),
     ("cmp", funCmp),
+    ("if", funIf),
+    ("add", funAdd),
   ]
 
 proc getFunction*(functionName: string): Option[FunctionPtr] =

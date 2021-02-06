@@ -110,7 +110,7 @@ proc handleWord(env: var Env, switch: string, word: string, value: string,
       else:
         prepostList.add(prepost)
   else:
-    env.warn(0, wUnknownSwitch, $switch)
+    env.warn(0, wUnknownSwitch, switch)
 
 
 proc parseCommandLine*(env: var Env, argv: seq[string]): Args =
