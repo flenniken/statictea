@@ -255,6 +255,65 @@ proc funExists*(env: var Env, lineNum: Natural, parameters:
     num = 1
   result = some(newValue(num))
 
+proc funCase*(env: var Env, lineNum: Natural, parameters:
+    seq[Value]): Option[Value] =
+  ## The case function returns a value from multiple choices.
+  ##
+  ## It requires at least four parameters, the main condition, the
+  ## "else" value and a case pair. You can have any number of case
+  ## pairs.
+  ##
+  ## The first parameter of a case pair is the case condition and the
+  ## second is the return value when that condition matches the main
+  ## condition.
+  ##
+  ## When none of the cases match the main condition, the "else" value
+  ## is returned.  The conditions must be all strings or all ints and
+  ## the return values any be any type.
+  ##
+  ## The function compares the conditions left to right and returns
+  ## when it finds the first match.
+  ##
+  ## -p1: The main condition value.
+  ## -p2: The "else" value.
+  ##
+  ## -p3: The first case condition.
+  ## -p4: Return value when p3 equals p1.
+  ## ...
+  ## -pnc: The last case condition.
+  ## -pnv: Return value when pnc equals p1.
+  ##
+  ## Added in version 0.1.0.
+
+  # At least four parameters and an even number of them.
+  if parameters.len() < 4 or parameters.len() mod 2 == 1:
+    env.warn(lineNum, wFourParameters)
+    return
+
+  let mainCondition = parameters[0]
+  if mainCondition.kind != vkString and mainCondition.kind != vkInt:
+    env.warn(lineNum, wInvalidMainType)
+    return
+
+  # Make sure each condition type matches the main condition. We do
+  # this before comparing to catch lurking error edge cases.
+  for ix in countUp(2, parameters.len-1, 2):
+    var condition = parameters[ix]
+    if condition.kind != mainCondition.kind:
+      env.warn(lineNum, wInvalidCondition)
+      return
+
+  for ix in countUp(2, parameters.len-1, 2):
+    var condition = parameters[ix]
+    if condition.kind == vkString:
+      if condition.stringv == mainCondition.stringv:
+        return some(parameters[ix+1])
+    else:
+      if condition.intv == mainCondition.intv:
+        return some(parameters[ix+1])
+
+  return some(parameters[1])
+
 const
   functionsList = [
     ("len", funLen),
@@ -264,11 +323,15 @@ const
     ("if", funIf),
     ("add", funAdd),
     ("exists", funExists),
+    ("case", funCase),
   ]
+
+# todo: add function to get the list of functions? or check whether one exists?
 
 proc getFunction*(functionName: string): Option[FunctionPtr] =
   ## Return the function pointer for the given function name.
 
+  # Build a table of functions.
   if functions.len == 0:
     for item in functionsList:
       var (name, fun) = item

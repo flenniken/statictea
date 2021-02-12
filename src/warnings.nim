@@ -82,6 +82,9 @@ type
     wExpectedString,       # w73
     wInvalidIndex,         # w74
     wExpectedDictionary,   # w75
+    wFourParameters,       # w76
+    wInvalidMainType,      # w77
+    wInvalidCondition,     # w78
 
 tpubType:
   const
@@ -164,6 +167,9 @@ tpubType:
       "The parameter must be a string.", # wExpectedString
       "Index values must greater than or equal to 0, got: $1.", # wInvalidIndex
       "The parameter must be a dictionary.", # wExpectedDictionary
+      "The case function takes an even number of parameters and at least four.", # wFourParameters
+      "The main condition type must an int or string.", # wInvalidMainType
+      "The case condition type must match the main condition.", # wInvalidCondition
     ]
 
 func getWarning*(filename: string, lineNum: int,

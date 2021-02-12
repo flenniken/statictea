@@ -1,4 +1,5 @@
-#+TITLE: StaticTea: A template processor and language.
+#+TITLE: StaticTea
+A template processor and language.
 
 StaticTea combines a template with data to produce a result.
 
@@ -1333,18 +1334,36 @@ num = add(t.row(), 1)
 :CUSTOM_ID: case
 :END:
 
-The case function returns a value based on a conditional value.
+The case function returns a value from multiple choices.
 
-It requires at least two parameters, the condition and the "else"
-case. The rest of the parameters you specify in pairs, the first
-is the case value and the second is the return value when the
-condition matches that case.
+It requires at least four parameters, the main condition, the
+"else" value and a case pair. You can have any number of case
+pairs.
 
-When none of the cases match the condition, the else case is
-returned.
+The first parameter of a case pair is the case condition and the
+second is the return value when that condition matches the main
+condition.
+
+When none of the cases match the main condition, the "else" value
+is returned.  The conditions must be all strings or all ints and
+the return values any be any type.
+
+The function compares the conditions left to right and returns
+when it finds the first match.
+
+-p1: The main condition value.
+-p2: The "else" value.
+
+-p3: The first case condition.
+-p4: Return value when p3 equals p1.
+...
+-pnc: The last case condition.
+-pnv: Return value when pnc equals p1.
+
+Added in version 0.1.0.
 
 For the example below the abbr variable is set to an abbreviation
-depending on the type of tea. Added in version 0.1.0.
+depending on the type of tea.
 
 template:
 

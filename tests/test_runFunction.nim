@@ -387,3 +387,78 @@ suite "runFunction.nim":
     var parameters = @[dict, newValue(0)]
     let eErrLines = @["template.html(1): w73: The parameter must be a string.\n"]
     check testFunction("exists", parameters, eErrLines = eErrLines)
+
+  test "case int":
+    var parameters = @[newValue(5), newValue("else"), newValue(5), newValue("value")]
+    let eValueO = some(newValue("value"))
+    check testFunction("case", parameters, eValueO = eValueO)
+
+  test "case int else":
+    var parameters = @[newValue(5), newValue("else"), newValue(6), newValue("value")]
+    let eValueO = some(newValue("else"))
+    check testFunction("case", parameters, eValueO = eValueO)
+
+  test "case string":
+    var parameters = @[newValue("test"), newValue("else"), newValue("test"), newValue("value")]
+    let eValueO = some(newValue("value"))
+    check testFunction("case", parameters, eValueO = eValueO)
+
+  test "case string else":
+    var parameters = @[newValue("test"), newValue("else"), newValue("asdf"), newValue("value")]
+    let eValueO = some(newValue("else"))
+    check testFunction("case", parameters, eValueO = eValueO)
+
+  test "case int 6":
+    var parameters = @[newValue(6), newValue("else"), newValue(5), newValue("v5"), newValue(6), newValue("v6")]
+    let eValueO = some(newValue("v6"))
+    check testFunction("case", parameters, eValueO = eValueO)
+
+  test "case int 12":
+    var parameters = @[newValue(9), newValue("else"),
+                       newValue(5), newValue("v5"),
+                       newValue(6), newValue("v6"),
+                       newValue(7), newValue("v7"),
+                       newValue(8), newValue("v8"),
+                       newValue(9), newValue("v9"),
+    ]
+    let eValueO = some(newValue("v9"))
+    check testFunction("case", parameters, eValueO = eValueO)
+
+  test "case dup":
+    var parameters = @[newValue(5), newValue("else"),
+                       newValue(5), newValue(8),
+                       newValue(5), newValue(9),
+    ]
+    let eValueO = some(newValue(8))
+    check testFunction("case", parameters, eValueO = eValueO)
+
+  test "case not enough parameters":
+    var parameters = @[newValue(5), newValue("else"),
+                       newValue(5),
+    ]
+    let eErrLines = @["template.html(1): w76: The case function takes an even number of parameters and at least four.\n"]
+    check testFunction("case", parameters, eErrLines = eErrLines)
+
+  test "case odd number of parameters":
+    var parameters = @[newValue(5), newValue("else"),
+                       newValue(5), newValue(8),
+                       newValue(5),
+    ]
+    let eErrLines = @["template.html(1): w76: The case function takes an even number of parameters and at least four.\n"]
+    check testFunction("case", parameters, eErrLines = eErrLines)
+
+  test "case invalid main condition":
+    var parameters = @[newValue(3.5), newValue("else"),
+                       newValue(5), newValue(8),
+                       newValue(5), newValue(9),
+    ]
+    let eErrLines = @["template.html(1): w77: The main condition type must an int or string.\n"]
+    check testFunction("case", parameters, eErrLines = eErrLines)
+
+  test "case invalid condition":
+    var parameters = @[newValue(5), newValue("else"),
+                       newValue(5), newValue(8),
+                       newValue(3.5), newValue(9),
+    ]
+    let eErrLines = @["template.html(1): w78: The case condition type must match the main condition.\n"]
+    check testFunction("case", parameters, eErrLines = eErrLines)
