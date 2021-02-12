@@ -1351,14 +1351,14 @@ the return values any be any type.
 The function compares the conditions left to right and returns
 when it finds the first match.
 
--p1: The main condition value.
--p2: The "else" value.
+- p1: The main condition value.
+- p2: The "else" value.
 
--p3: The first case condition.
--p4: Return value when p3 equals p1.
-...
--pnc: The last case condition.
--pnv: Return value when pnc equals p1.
+- p3: The first case condition.
+- p4: Return value when p3 equals p1.
+
+- pnc: The last case condition.
+- pnv: Return value when pnc equals p1.
 
 Added in version 0.1.0.
 
@@ -1618,9 +1618,15 @@ the element doesn't exist.
 If you don't specify the default, a warning is generated when the
 element doesn't exist and the statement is skipped.
 
--p1: dictionary or list
--p2: string or int
--p3: optional, any type
+- p1: Dictionary to use.
+- p2: Key of the element to return.
+- p3: Optional value returned when the key is missing.
+
+or
+
+- p1: List to use.
+- p2: Index to the element to return.
+- p3: Optional value returned when the index is too big.
 
 Added in version 0.1.0.
 
