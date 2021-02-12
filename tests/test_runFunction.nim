@@ -180,11 +180,7 @@ suite "runFunction.nim":
   test "get list default":
     var list = newValue([1, 2, 3, 4, 5])
     var hi = newValue("hi")
-    # Index below.
-    var parameters = @[list, newValue(-1), hi]
-    check testFunction("get", parameters, eValueO = some(hi))
-    # Index above.
-    parameters = @[list, newValue(5), newValue(100)]
+    var parameters = @[list, newValue(5), newValue(100)]
     check testFunction("get", parameters, eValueO = some(newValue(100)))
 
   test "get list invalid index":
@@ -239,6 +235,12 @@ suite "runFunction.nim":
   test "get wrong first parameter":
     var parameters = @[newValue(2), newValue(3.5)]
     let eErrLines = @["template.html(1): w57: Expected a list or dictionary as the first parameter.\n"]
+    check testFunction("get", parameters, eErrLines = eErrLines)
+
+  test "get invalid index":
+    var list = newValue([1, 2, 3, 4, 5])
+    var parameters = @[list, newValue(-1)]
+    let eErrLines = @["template.html(1): w74: Index values must greater than or equal to 0, got: -1.\n"]
     check testFunction("get", parameters, eErrLines = eErrLines)
 
   test "cmpString":
@@ -357,3 +359,31 @@ suite "runFunction.nim":
     var parameters = @[newValue(big), newValue(big)]
     let eErrLines = @["template.html(1): w72: Overflow or underflow.\n"]
     check testFunction("add", parameters, eErrLines = eErrLines)
+
+  test "exists 1":
+    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
+    var parameters = @[dict, newValue("b")]
+    let eValueO = some(newValue(1))
+    check testFunction("exists", parameters, eValueO = eValueO)
+
+  test "exists 0":
+    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
+    var parameters = @[dict, newValue("z")]
+    let eValueO = some(newValue(0))
+    check testFunction("exists", parameters, eValueO = eValueO)
+
+  test "exists wrong number of parameters":
+    var parameters = @[newValue("z")]
+    let eErrLines = @["template.html(1): w62: The function takes two parameters.\n"]
+    check testFunction("exists", parameters, eErrLines = eErrLines)
+
+  test "exists not dict":
+    var parameters = @[newValue("z"), newValue("a")]
+    let eErrLines = @["template.html(1): w75: The parameter must be a dictionary.\n"]
+    check testFunction("exists", parameters, eErrLines = eErrLines)
+
+  test "exists not string":
+    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
+    var parameters = @[dict, newValue(0)]
+    let eErrLines = @["template.html(1): w73: The parameter must be a string.\n"]
+    check testFunction("exists", parameters, eErrLines = eErrLines)

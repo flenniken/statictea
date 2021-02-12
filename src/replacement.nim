@@ -268,7 +268,7 @@ proc lineToSegments(compiledMatchers: CompiledMatchers, line: string): seq[strin
     pos = nextPos
 
 func parseVarSegment(segment: string): tuple[namespace: string, name: string] {.tpub.} =
-  ## P`arse a variable type segment and return the variable's namespace
+  ## Parse a variable type segment and return the variable's namespace
   ## and name.
 
   # Example variable segments:

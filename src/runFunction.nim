@@ -112,10 +112,20 @@ proc funLen*(env: var Env, lineNum: Natural, parameters:
 
 proc funGet*(env: var Env, lineNum: Natural, parameters:
                seq[Value]): Option[Value] =
-  ## Get an item from a list or dictionary. The first parameter is the
-  ## list or dictionary. The second parameter is the list index or the
-  ## dictionary key. The third optional parameter is the value to use
-  ## when the item doesn't exists.  Added in version 0.1.0.
+  ## You use the get function to return a list or dictionary element.
+  ## You pass two or three parameters, the first is the dictionary or
+  ## list to use, the second is the dictionary key name or the list
+  ## index, and the third optional parameter is the default value when
+  ## the element doesn't exist.
+  ##
+  ## If you don't specify the default, a warning is generated when the
+  ## element doesn't exist and the statement is skipped.
+  ##
+  ## -p1: dictionary or list
+  ## -p2: string or int
+  ## -p3: optional, any type
+  ##
+  ## Added in version 0.1.0.
 
   if parameters.len() < 2 or parameters.len() > 3:
     env.warn(lineNum, wGetTakes2or3Params)
@@ -129,7 +139,10 @@ proc funGet*(env: var Env, lineNum: Natural, parameters:
         env.warn(lineNum, wExpectedIntFor2, $p2.kind)
         return
       var index = p2.intv
-      if index < 0 or index >= container.listv.len:
+      if index < 0:
+        env.warn(lineNum, wInvalidIndex, $index)
+        return
+      if index >= container.listv.len:
         if parameters.len == 3:
           return some(newValue(parameters[2]))
         env.warn(lineNum, wMissingListItem, $index)
@@ -212,6 +225,36 @@ proc funAdd*(env: var Env, lineNum: Natural, parameters:
 
 {.pop.}
 
+proc funExists*(env: var Env, lineNum: Natural, parameters:
+    seq[Value]): Option[Value] =
+  ## Return 1 when a variable exists in the given dictionary, else
+  ## return 0. The first parameter is the dictionary to check and the
+  ## second parameter is the name of the variable.
+  ##
+  ## -p1: dictionary: The dictionary to use.
+  ## -p2: string: The name (key) to use.
+  ##
+  ## Added in version 0.1.0.
+
+  if parameters.len() != 2:
+    env.warn(lineNum, wTwoParameters)
+    return
+
+  let container = parameters[0]
+  if container.kind != vkDict:
+    env.warn(lineNum, wExpectedDictionary)
+    return
+
+  let key = parameters[1]
+  if key.kind != vkString:
+    env.warn(lineNum, wExpectedString)
+    return
+
+  var num: int
+  if key.stringv in container.dictv:
+    num = 1
+  result = some(newValue(num))
+
 const
   functionsList = [
     ("len", funLen),
@@ -220,6 +263,7 @@ const
     ("cmp", funCmp),
     ("if", funIf),
     ("add", funAdd),
+    ("exists", funExists),
   ]
 
 proc getFunction*(functionName: string): Option[FunctionPtr] =

@@ -79,6 +79,9 @@ type
     wExpectedInteger,      # w70
     wAllIntOrFloat,        # w71
     wOverflow,             # w72
+    wExpectedString,       # w73
+    wInvalidIndex,         # w74
+    wExpectedDictionary,   # w75
 
 tpubType:
   const
@@ -158,6 +161,9 @@ tpubType:
       "The parameter must be an integer.", # wExpectedInteger
       "The parameters must be all integers or all floats.", # wAllIntOrFloat
       "Overflow or underflow.", # wOverflow
+      "The parameter must be a string.", # wExpectedString
+      "Index values must greater than or equal to 0, got: $1.", # wInvalidIndex
+      "The parameter must be a dictionary.", # wExpectedDictionary
     ]
 
 func getWarning*(filename: string, lineNum: int,

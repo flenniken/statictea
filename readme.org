@@ -749,7 +749,7 @@ template:
 #+BEGIN_SRC
 <!--$ nextline t.repeat = len(s.tea_list); \-->
 <!--$ : tea = get(s.tea_list, t.row) -->
-* {tea}
+ * {tea}
 #+END_SRC
 
 server json:
@@ -769,11 +769,11 @@ server json:
 result:
 
 #+BEGIN_SRC
-* Black
-* Green
-* Oolong
-* Sencha
-* Herbal
+ * Black
+ * Green
+ * Oolong
+ * Sencha
+ * Herbal
 #+END_SRC
 
 The following example builds an html select list of tea companies
@@ -1590,17 +1590,25 @@ result:
 :CUSTOM_ID: get
 :END:
 
-You use the get function to access list or dictionary
-values. It takes two or three parameters. The first is the list or
-dictionary to use. The second is the key name for dictionaries or
-the index for lists. The third optional parameter is the default
-value when the item doesn't exist. If you don't specify the
-default, a warning is generated when the item doesn't exist and
-the statement is skipped. Added in version 0.1.0.
+You use the get function to return a list or dictionary element.
+You pass two or three parameters, the first is the dictionary or
+list to use, the second is the dictionary key name or the list
+index, and the third optional parameter is the default value when
+the element doesn't exist.
+
+If you don't specify the default, a warning is generated when the
+element doesn't exist and the statement is skipped.
+
+-p1: dictionary or list
+-p2: string or int
+-p3: optional, any type
+
+Added in version 0.1.0.
 
 #+BEGIN_SRC
+var = get(t.server, "tea")
 var = get(t.server, "tea", "Earl Grey")
-var = get(t.server, 0, "Earl Grey")
+var = get(s.companyList, 3, "Unknown")
 #+END_SRC
 
 [[#contents][茶]]
