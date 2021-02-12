@@ -1329,6 +1329,8 @@ Added in version 0.1.0.
 num = add(t.row(), 1)
 #+END_SRC
 
+[[茶]]
+
 ** case()
 :PROPERTIES:
 :CUSTOM_ID: case
@@ -1353,10 +1355,10 @@ when it finds the first match.
 
 - p1: The main condition value.
 - p2: The "else" value.
-
+-
 - p3: The first case condition.
 - p4: Return value when p3 equals p1.
-
+- ...
 - pnc: The last case condition.
 - pnv: Return value when pnc equals p1.
 
