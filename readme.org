@@ -1355,7 +1355,7 @@ when it finds the first match.
 
 - p1: The main condition value.
 - p2: The "else" value.
--
+- -
 - p3: The first case condition.
 - p4: Return value when p3 equals p1.
 - ...
