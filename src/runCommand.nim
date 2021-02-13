@@ -186,6 +186,7 @@ proc getFunctionValue*(env: var Env, compiledMatchers:
   ## be pointing at the first parameter.
 
   var parameters: seq[Value] = @[]
+  var parameterStarts: seq[Natural] = @[]
   var pos = start
 
   # If we get a right parentheses, there are no parameters.
@@ -202,6 +203,8 @@ proc getFunctionValue*(env: var Env, compiledMatchers:
         return
 
       parameters.add(valueAndLengthO.get().value)
+      parameterStarts.add(pos)
+
       pos = pos + valueAndLengthO.get().length
 
       # Get the comma or right parentheses and white space following the value.
@@ -220,7 +223,7 @@ proc getFunctionValue*(env: var Env, compiledMatchers:
   let funResult = function(parameters)
   if funResult.kind == frWarning:
     env.warn(statement.lineNum, funResult.warning, funResult.p1, funResult.p2)
-    env.warnStatement(statement, wInvalidStatement, start)
+    env.warnStatement(statement, wInvalidStatement, parameterStarts[funResult.parameter])
     return
 
   result = some(ValueAndLength(value: funResult.value, length: pos-start))

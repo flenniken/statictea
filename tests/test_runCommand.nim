@@ -857,7 +857,17 @@ statement: t.asdf = 3.45
 template.html(1): w78: The case condition type must match the main condition type.
 template.html(1): w48: Invalid statement, skipping it.
 statement: result = case(1, 'else', 2, 22, 'abc', 33)
-                         ^
+                                           ^
+"""
+    check testRunStatement(statement, eErrLines = eErrLines)
+
+  test "parameter error position":
+    let statement = newStatement(text="result = case(1, len(concat('a', 'b')), 2, 22, 'abc', 33)", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w78: The case condition type must match the main condition type.
+template.html(1): w48: Invalid statement, skipping it.
+statement: result = case(1, len(concat('a', 'b')), 2, 22, 'abc', 33)
+                                                          ^
 """
     check testRunStatement(statement, eErrLines = eErrLines)
 
