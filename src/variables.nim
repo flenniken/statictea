@@ -5,6 +5,7 @@ import vartypes
 import readjson
 import tables
 import options
+import version
 
 type
   Variables* = VarsDict
@@ -81,6 +82,7 @@ proc newVariables*(server: VarsDict = newVarsDict(), shared: VarsDict = newVarsD
   result["shared"] = newValue(shared)
   result["global"] = newValue(varsDict)
   result["row"] = newValue(0)
+  result["version"] = newValue(staticteaVersion)
   resetVariables(result)
 
 when defined(test):

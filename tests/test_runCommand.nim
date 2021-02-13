@@ -13,6 +13,7 @@ import variables
 import tables
 import warnings
 import regexes
+import version
 
 proc testSome*[T](valueAndLengthO: Option[T], eValueAndLengthO: Option[T],
     text: string, start: Natural): bool =
@@ -654,6 +655,7 @@ statement: tea = a123
     check variables["row"] == Value(kind: vkInt, intv: 0)
     check variables["server"].dictv.len == 0
     check variables["shared"].dictv.len == 0
+    check variables["version"] == Value(kind: vkString, stringv: staticteaVersion)
 
   test "warnStatement":
     let statement = newStatement(text="tea = a123", lineNum=12, 0)
@@ -870,6 +872,29 @@ statement: result = case(1, len(concat('a', 'b')), 2, 22, 'abc', 33)
                                                           ^
 """
     check testRunStatement(statement, eErrLines = eErrLines)
+
+
+  test "assignTeaVariable version":
+    let statement = newStatement(text="""t.version = "1.2.3"""", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w39: You cannot change the version tea variable.
+statement: t.version = "1.2.3"
+           ^
+"""
+    check testRunStatement(statement, eErrLines = eErrLines)
+
+  test "assignTeaVariable missing":
+    let statement = newStatement(text="""t.missing = "1.2.3"""", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w40: Invalid tea variable: missing.
+statement: t.missing = "1.2.3"
+           ^
+"""
+    check testRunStatement(statement, eErrLines = eErrLines)
+
+  test "assignTeaVariable content":
+    let statement = newStatement(text="""t.content = "1.2.3"""", lineNum=1, 0)
+    check testRunStatement(statement)
 
 
 # todo: test that a warning is generated when the item doesn't exist.

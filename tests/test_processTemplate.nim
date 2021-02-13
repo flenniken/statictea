@@ -5,6 +5,8 @@ import env
 import args
 import os
 import readlines
+import version
+import strutils
 
 proc testProcessTemplate(templateContent: string = "",
     serverJson: string = "",
@@ -426,7 +428,7 @@ after
 template.html(3): w54: The list index 2 out of range.
 template.html(3): w48: Invalid statement, skipping it.
 statement:  var = get(s.nums, t.row)
-                      ^
+                              ^
 template.html(5): w58: The replacement variable doesn't exist: var.
 template.html(3): w54: The list index 3 out of range.
 template.html(3): w54: The list index 4 out of range.
@@ -816,3 +818,13 @@ I'm a {s.teaMaster}!
 
     check testProcessTemplate(templateContent = templateContent, eErrLines = eErrLines,
       serverJson = serverJson, eResultLines = eResultLines, eRc = 1)
+
+  test "show version number":
+    let templateContent = """
+<!--$ nextline -->
+statictea version number: {t.version}
+"""
+    let eResultLines = @[
+      "statictea version number: 0.1.0\n" % staticteaVersion
+    ]
+    check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)

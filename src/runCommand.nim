@@ -365,7 +365,7 @@ proc assignTeaVariable*(env: var Env, statement: Statement, variables:
         variables[varName] = value
       else:
         env.warnStatement(statement, wInvalidRepeat, valuePos, $value)
-    of "server", "shared", "local", "global", "row":
+    of "server", "shared", "local", "global", "row", "version":
       env.warnStatement(statement, wReadOnlyTeaVar, varPos, varName)
     else:
       env.warnStatement(statement, wInvalidTeaVar, varPos, varName)
