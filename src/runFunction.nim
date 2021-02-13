@@ -1,6 +1,5 @@
 ## Run a function.
 
-import env
 import vartypes
 import options
 import warnings
@@ -9,7 +8,7 @@ import unicode
 import strutils
 
 type
-  FunctionPtr* = proc (env: var Env, lineNum: Natural, parameters: seq[Value]): FunResult
+  FunctionPtr* = proc (parameters: seq[Value]): FunResult
 
   FunResultKind* = enum
     frValue,
@@ -25,7 +24,6 @@ type
         parameter*: Natural ## Index of problem parameter.
         p1*: string         ## Extra warning info.
         p2*: string         ## Extra warning info.
-
 
 var functions: Table[string, FunctionPtr]
 
@@ -84,8 +82,7 @@ proc cmpString*(a, b: string, ignoreCase: bool = false): int =
   else:
     result = 0
 
-proc funCmp*(env: var Env, lineNum: Natural, parameters:
-               seq[Value]): FunResult =
+proc funCmp*(parameters: seq[Value]): FunResult =
   ## The cmp function compares two variables, either numbers or
   ## strings (both the same type), and returns whether the first
   ## parameter is less than, equal to or greater than the second
@@ -118,8 +115,7 @@ proc funCmp*(env: var Env, lineNum: Natural, parameters:
       return
   result = newFunResult(newValue(ret))
 
-proc funConcat*(env: var Env, lineNum: Natural, parameters:
-               seq[Value]): FunResult =
+proc funConcat*(parameters: seq[Value]): FunResult =
   ## Concatentate the string parameters. You pass 2 or more string
   ## parameters.  Added in version 0.1.0.
   var str = ""
@@ -133,8 +129,7 @@ proc funConcat*(env: var Env, lineNum: Natural, parameters:
     str.add(value.stringv)
   result = newFunResult(newValue(str))
 
-proc funLen*(env: var Env, lineNum: Natural, parameters:
-               seq[Value]): FunResult =
+proc funLen*(parameters: seq[Value]): FunResult =
   ## The len function takes one parameter and returns the number of
   ## characters in a string (not bytes), the number of elements in a
   ## list or the number of elements in a dictionary.  Added in version
@@ -156,8 +151,7 @@ proc funLen*(env: var Env, lineNum: Natural, parameters:
       return
   result = newFunResult(retValue)
 
-proc funGet*(env: var Env, lineNum: Natural, parameters:
-               seq[Value]): FunResult =
+proc funGet*(parameters: seq[Value]): FunResult =
   ## You use the get function to return a list or dictionary element.
   ## You pass two or three parameters, the first is the dictionary or
   ## list to use, the second is the dictionary key name or the list
@@ -203,8 +197,7 @@ proc funGet*(env: var Env, lineNum: Natural, parameters:
     else:
       return newFunResultWarn(wExpectedListOrDict, 0)
 
-proc funIf*(env: var Env, lineNum: Natural, parameters:
-               seq[Value]): FunResult =
+proc funIf*(parameters: seq[Value]): FunResult =
   ## You use the if function to return a value based on a condition.
   ## It has three parameters, the condition, the true case and the
   ## false case.
@@ -231,8 +224,7 @@ proc funIf*(env: var Env, lineNum: Natural, parameters:
 
 {.push overflowChecks: on, floatChecks: on.}
 
-proc funAdd*(env: var Env, lineNum: Natural, parameters:
-    seq[Value]): FunResult =
+proc funAdd*(parameters: seq[Value]): FunResult =
   ## The add function returns the sum of its two or more
   ## parameters. The parameters must be all integers or all floats.  A
   ## warning is generated on overflow and the statement is skipped.
@@ -266,8 +258,7 @@ proc funAdd*(env: var Env, lineNum: Natural, parameters:
 
 {.pop.}
 
-proc funExists*(env: var Env, lineNum: Natural, parameters:
-    seq[Value]): FunResult =
+proc funExists*(parameters: seq[Value]): FunResult =
   ## Return 1 when a variable exists in the given dictionary, else
   ## return 0. The first parameter is the dictionary to check and the
   ## second parameter is the name of the variable.
@@ -296,8 +287,7 @@ proc funExists*(env: var Env, lineNum: Natural, parameters:
     num = 1
   result = newFunResult(newValue(num))
 
-proc funCase*(env: var Env, lineNum: Natural, parameters:
-    seq[Value]): FunResult =
+proc funCase*(parameters: seq[Value]): FunResult =
   ## The case function returns a value from multiple choices.
   ##
   ## It requires at least four parameters, the main condition, the

@@ -169,7 +169,7 @@ tpubType:
       "The parameter must be a dictionary.", # wExpectedDictionary
       "The case function takes an even number of parameters and at least four.", # wFourParameters
       "The main condition type must an int or string.", # wInvalidMainType
-      "The case condition type must match the main condition.", # wInvalidCondition
+      "The case condition type must match the main condition type.", # wInvalidCondition
     ]
 
 func getWarning*(filename: string, lineNum: int,

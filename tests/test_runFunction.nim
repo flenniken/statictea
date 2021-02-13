@@ -19,7 +19,7 @@ proc testFunction(functionName: string, parameters: seq[Value],
   let functionO = getFunction(functionName)
   let function = functionO.get()
 
-  let funResult = function(env, lineNum, parameters)
+  let funResult = function(parameters)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 

@@ -854,10 +854,10 @@ statement: t.asdf = 3.45
   test "invalid case condition":
     let statement = newStatement(text="result = case(1, 'else', 2, 22, 'abc', 33)", lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w78: The case condition type must match the main condition.
+template.html(1): w78: The case condition type must match the main condition type.
 template.html(1): w48: Invalid statement, skipping it.
 statement: result = case(1, 'else', 2, 22, 'abc', 33)
-                                           ^
+                         ^
 """
     check testRunStatement(statement, eErrLines = eErrLines)
 

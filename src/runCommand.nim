@@ -217,9 +217,9 @@ proc getFunctionValue*(env: var Env, compiledMatchers:
         break
 
   # Run the function.
-  let funResult = function(env, statement.lineNum, parameters)
+  let funResult = function(parameters)
   if funResult.kind == frWarning:
-    env.warnStatement(statement, funResult.warning, start)
+    env.warn(statement.lineNum, funResult.warning, funResult.p1, funResult.p2)
     env.warnStatement(statement, wInvalidStatement, start)
     return
 
