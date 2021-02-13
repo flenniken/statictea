@@ -29,7 +29,7 @@ type
 
 var functions: Table[string, FunctionPtr]
 
-proc newFunResultWarn*(warning: Warning, parameter: Natural,
+proc newFunResultWarn*(warning: Warning, parameter: Natural = 0,
       p1: string = "", p2: string = ""): FunResult =
   result = FunResult(kind: frWarning, warning: warning,
              parameter: parameter, p1: p1, p2: p2)
@@ -128,7 +128,7 @@ proc funConcat*(env: var Env, lineNum: Natural, parameters:
     return
   for ix, value in parameters:
     if value.kind != vkString:
-      result = newFunResultWarn(wExpectedStrings, 0, $(ix+1))
+      result = newFunResultWarn(wExpectedString, ix)
       return
     str.add(value.stringv)
   result = newFunResult(newValue(str))
@@ -181,25 +181,25 @@ proc funGet*(env: var Env, lineNum: Natural, parameters:
     of vkList:
       let p2 = parameters[1]
       if p2.kind != vkInt:
-        return newFunResultWarn(wExpectedIntFor2, 0, $p2.kind)
+        return newFunResultWarn(wExpectedIntFor2, 1, $p2.kind)
       var index = p2.intv
       if index < 0:
-        return newFunResultWarn(wInvalidIndex, 0, $index)
+        return newFunResultWarn(wInvalidIndex, 1, $index)
       if index >= container.listv.len:
         if parameters.len == 3:
           return newFunResult(parameters[2])
-        return newFunResultWarn(wMissingListItem, 0, $index)
+        return newFunResultWarn(wMissingListItem, 1, $index)
       return newFunResult(newValue(container.listv[index]))
     of vkDict:
       let p2 = parameters[1]
       if p2.kind != vkString:
-        return newFunResultWarn(wExpectedStringFor2, 0, $p2.kind)
+        return newFunResultWarn(wExpectedStringFor2, 1, $p2.kind)
       var key = p2.stringv
       if key in container.dictv:
         return newFunResult(container.dictv[key])
       if parameters.len == 3:
         return newFunResult(newValue(parameters[2]))
-      return newFunResultWarn(wMissingDictItem, 0, key)
+      return newFunResultWarn(wMissingDictItem, 1, key)
     else:
       return newFunResultWarn(wExpectedListOrDict, 0)
 
@@ -248,7 +248,7 @@ proc funAdd*(env: var Env, lineNum: Natural, parameters:
     result = newFunResultWarn(wAllIntOrFloat, 0)
     return
 
-  for value in parameters[1..^1]:
+  for ix, value in parameters[1..^1]:
     if value.kind != first.kind:
       result = newFunResultWarn(wAllIntOrFloat, 0)
       return
@@ -259,7 +259,7 @@ proc funAdd*(env: var Env, lineNum: Natural, parameters:
       else:
         first.floatv = first.floatv + value.floatv
     except:
-      result = newFunResultWarn(wOverflow, 0)
+      result = newFunResultWarn(wOverflow, ix)
       return
 
   result = newFunResult(first)
@@ -288,7 +288,7 @@ proc funExists*(env: var Env, lineNum: Natural, parameters:
 
   let key = parameters[1]
   if key.kind != vkString:
-    result = newFunResultWarn(wExpectedString, 0)
+    result = newFunResultWarn(wExpectedString, 1)
     return
 
   var num: int

@@ -53,7 +53,7 @@ type
     wInvalidRepeat,        # w44
     wInvalidPrepost,       # w45
     wMissingCommaParen,    # w46
-    wExpectedStrings,      # w47
+    wExpectedString,       # w47
     wInvalidStatement,     # w48
     wOneParameter,         # w49
     wStringListDict,       # w50
@@ -79,7 +79,7 @@ type
     wExpectedInteger,      # w70
     wAllIntOrFloat,        # w71
     wOverflow,             # w72
-    wExpectedString,       # w73
+    wUnused,               # w73
     wInvalidIndex,         # w74
     wExpectedDictionary,   # w75
     wFourParameters,       # w76
@@ -138,7 +138,7 @@ tpubType:
       "Invalid t.repeat, it must be an integer >= 0 and <= t.maxRepeat.", # wInvalidRepeat
       "Invalid prepost: $1.", # wInvalidPrepost
       "Expected comma or right parentheses.", # wMissingCommaParen
-      "Concat parameter $1 is not a string.", # wExpectedStrings
+      "Expected a string.", # wExpectedString
       "Invalid statement, skipping it.", # wInvalidStatement
       "Expected one parameter.", # wOneParameter
       "Len takes a string, list or dict parameter.", # wStringListDict

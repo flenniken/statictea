@@ -49,37 +49,37 @@ suite "runFunction.nim":
   test "funConcat 2":
     var parameters = @[newValue("abc"), newValue(" def")]
     let eFunResult = newFunResult(newValue("abc def"))
-    check testFunction("concat", parameters, eFunResult = eFunResult)
+    check testFunction("concat", parameters, eFunResult)
 
   test "funConcat 3":
     var parameters = @[newValue("abc"), newValue(""), newValue("def")]
     let eFunResult = newFunResult(newValue("abcdef"))
-    check testFunction("concat", parameters, eFunResult = eFunResult)
+    check testFunction("concat", parameters, eFunResult)
 
   test "funConcat 0":
     var parameters = @[newValue(5)]
-    let eFunResult = newFunResultWarn(wTwoOrMoreParameters, 0)
+    let eFunResult = newFunResultWarn(wTwoOrMoreParameters)
     check testFunction("concat", parameters, eFunResult)
 
   test "funConcat 1":
     var parameters = @[newValue("abc")]
-    let eFunResult = newFunResultWarn(wTwoOrMoreParameters, 0)
+    let eFunResult = newFunResultWarn(wTwoOrMoreParameters)
     check testFunction("concat", parameters, eFunResult)
 
   test "funConcat not string":
     var parameters = @[newValue("abc"), newValue(5)]
-    let eFunResult = newFunResultWarn(wExpectedStrings, 0, "2")
+    let eFunResult = newFunResultWarn(wExpectedString, 1)
     check testFunction("concat", parameters, eFunResult)
 
   test "runFunction":
     let parameters = @[newValue("Hello"), newValue(" World")]
     let eFunResult = newFunResult(newValue("Hello World"))
-    check testFunction("concat", parameters, eFunResult = eFunResult)
+    check testFunction("concat", parameters, eFunResult)
 
   test "len string":
     var parameters = @[newValue("abc")]
     let eFunResult = newFunResult(newValue(3))
-    check testFunction("len", parameters, eFunResult = eFunResult)
+    check testFunction("len", parameters, eFunResult)
 
   test "len unicode string":
     # The byte length is different than the number of unicode characters.
@@ -87,41 +87,41 @@ suite "runFunction.nim":
     check str.len == 8
     var parameters = @[newValue(str)]
     let eFunResult = newFunResult(newValue(6))
-    check testFunction("len", parameters, eFunResult = eFunResult)
+    check testFunction("len", parameters, eFunResult)
 
   test "len list":
     var parameters = @[newValue([5, 3])]
     let eFunResult = newFunResult(newValue(2))
-    check testFunction("len", parameters, eFunResult = eFunResult)
+    check testFunction("len", parameters, eFunResult)
 
   test "len dict":
     var parameters = @[newValue([("a", 5), ("b", 3)])]
     let eFunResult = newFunResult(newValue(2))
-    check testFunction("len", parameters, eFunResult = eFunResult)
+    check testFunction("len", parameters, eFunResult)
 
   test "len strings":
     var parameters = @[newValue(["5", "3", "hi"])]
     let eFunResult = newFunResult(newValue(3))
-    check testFunction("len", parameters, eFunResult = eFunResult)
+    check testFunction("len", parameters, eFunResult)
 
   test "len float":
     var parameters = @[newValue(3.4)]
-    let eFunResult = newFunResultWarn(wStringListDict, 0)
+    let eFunResult = newFunResultWarn(wStringListDict)
     check testFunction("len", parameters, eFunResult)
 
   test "len int":
     var parameters = @[newValue(3)]
-    let eFunResult = newFunResultWarn(wStringListDict, 0)
+    let eFunResult = newFunResultWarn(wStringListDict)
     check testFunction("len", parameters, eFunResult)
 
   test "len nothing":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(wOneParameter, 0)
+    let eFunResult = newFunResultWarn(wOneParameter)
     check testFunction("len", parameters, eFunResult)
 
   test "len 2":
     var parameters = @[newValue(3), newValue(2)]
-    let eFunResult = newFunResultWarn(wOneParameter, 0)
+    let eFunResult = newFunResultWarn(wOneParameter)
     check testFunction("len", parameters, eFunResult)
 
   test "get list item":
@@ -139,14 +139,14 @@ suite "runFunction.nim":
   test "get list invalid index":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list, newValue(12)]
-    let eFunResult = newFunResultWarn(wMissingListItem, 0, "12")
+    let eFunResult = newFunResultWarn(wMissingListItem, 1, "12")
     check testFunction("get", parameters, eFunResult)
 
   test "get dict item":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
     var parameters = @[dict, newValue("b")]
     let eFunResult = newFunResult(newValue(2))
-    check testFunction("get", parameters, eFunResult = eFunResult)
+    check testFunction("get", parameters, eFunResult)
 
   test "get dict default":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
@@ -157,43 +157,43 @@ suite "runFunction.nim":
   test "get dict item missing":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
     var parameters = @[dict, newValue("p")]
-    let eFunResult = newFunResultWarn(wMissingDictItem, 0, "p")
+    let eFunResult = newFunResultWarn(wMissingDictItem, 1, "p")
     check testFunction("get", parameters, eFunResult)
 
   test "get one parameter":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list]
-    let eFunResult = newFunResultWarn(wGetTakes2or3Params, 0)
+    let eFunResult = newFunResultWarn(wGetTakes2or3Params)
     check testFunction("get", parameters, eFunResult)
 
   test "get 4 parameters":
     var list = newValue([1, 2, 3, 4, 5])
     let p = newValue(1)
     var parameters = @[list, p, p, p]
-    let eFunResult = newFunResultWarn(wGetTakes2or3Params, 0)
+    let eFunResult = newFunResultWarn(wGetTakes2or3Params)
     check testFunction("get", parameters, eFunResult)
 
   test "get parameter 2 wrong type":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list, newValue("a")]
-    let eFunResult = newFunResultWarn(wExpectedIntFor2, 0, "string")
+    let eFunResult = newFunResultWarn(wExpectedIntFor2, 1, "string")
     check testFunction("get", parameters, eFunResult)
 
   test "get parameter 2 wrong type dict":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
     var parameters = @[dict, newValue(3.5)]
-    let eFunResult = newFunResultWarn(wExpectedStringFor2, 0, "float")
+    let eFunResult = newFunResultWarn(wExpectedStringFor2, 1, "float")
     check testFunction("get", parameters, eFunResult)
 
   test "get wrong first parameter":
     var parameters = @[newValue(2), newValue(3.5)]
-    let eFunResult = newFunResultWarn(wExpectedListOrDict, 0)
+    let eFunResult = newFunResultWarn(wExpectedListOrDict)
     check testFunction("get", parameters, eFunResult)
 
   test "get invalid index":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list, newValue(-1)]
-    let eFunResult = newFunResultWarn(wInvalidIndex, 0, "-1")
+    let eFunResult = newFunResultWarn(wInvalidIndex, 1, "-1")
     check testFunction("get", parameters, eFunResult)
 
   test "cmpString":
@@ -245,56 +245,56 @@ suite "runFunction.nim":
   test "if function true":
     var parameters = @[newValue(1), newValue("true"), newValue("false")]
     let eFunResult = newFunResult(newValue("true"))
-    check testFunction("if", parameters, eFunResult = eFunResult)
+    check testFunction("if", parameters, eFunResult)
 
   test "if function false":
     var parameters = @[newValue(33), newValue("true"), newValue("false")]
     let eFunResult = newFunResult(newValue("false"))
-    check testFunction("if", parameters, eFunResult = eFunResult)
+    check testFunction("if", parameters, eFunResult)
 
   test "if wrong condition type":
     var parameters = @[newValue(3.4), newValue("true"), newValue("false")]
-    let eFunResult = newFunResultWarn(wExpectedInteger, 0)
+    let eFunResult = newFunResultWarn(wExpectedInteger)
     check testFunction("if", parameters, eFunResult)
 
   test "if wrong number of parameters":
     var parameters = @[newValue(2), newValue("false")]
-    let eFunResult = newFunResultWarn(wThreeParameters, 0)
+    let eFunResult = newFunResultWarn(wThreeParameters)
     check testFunction("if", parameters, eFunResult)
 
   test "add function 2 int parameters":
     var parameters = @[newValue(1), newValue(2)]
     let eFunResult = newFunResult(newValue(3))
-    check testFunction("add", parameters, eFunResult = eFunResult)
+    check testFunction("add", parameters, eFunResult)
 
   test "add function 3 int parameters":
     var parameters = @[newValue(1), newValue(2), newValue(3)]
     let eFunResult = newFunResult(newValue(6))
-    check testFunction("add", parameters, eFunResult = eFunResult)
+    check testFunction("add", parameters, eFunResult)
 
   test "add function 2 float parameters":
     var parameters = @[newValue(2.0), newValue(3.5)]
     let eFunResult = newFunResult(newValue(5.5))
-    check testFunction("add", parameters, eFunResult = eFunResult)
+    check testFunction("add", parameters, eFunResult)
 
   test "add wrong number of parameters":
     var parameters = @[newValue(2)]
-    let eFunResult = newFunResultWarn(wTwoOrMoreParameters, 0)
+    let eFunResult = newFunResultWarn(wTwoOrMoreParameters)
     check testFunction("add", parameters, eFunResult)
 
   test "add wrong type of parameters":
     var parameters = @[newValue("hi"), newValue(4)]
-    let eFunResult = newFunResultWarn(wAllIntOrFloat, 0)
+    let eFunResult = newFunResultWarn(wAllIntOrFloat)
     check testFunction("add", parameters, eFunResult)
 
   test "add wrong type of parameters 2":
     var parameters = @[newValue(4), newValue("hi")]
-    let eFunResult = newFunResultWarn(wAllIntOrFloat, 0)
+    let eFunResult = newFunResultWarn(wAllIntOrFloat)
     check testFunction("add", parameters, eFunResult)
 
   test "add wrong type of parameters 3":
     var parameters = @[newValue(4), newValue(1.3)]
-    let eFunResult = newFunResultWarn(wAllIntOrFloat, 0)
+    let eFunResult = newFunResultWarn(wAllIntOrFloat)
     check testFunction("add", parameters, eFunResult)
 
   test "add int64 overflow":
@@ -317,28 +317,28 @@ suite "runFunction.nim":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
     var parameters = @[dict, newValue("b")]
     let eFunResult = newFunResult(newValue(1))
-    check testFunction("exists", parameters, eFunResult = eFunResult)
+    check testFunction("exists", parameters, eFunResult)
 
   test "exists 0":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
     var parameters = @[dict, newValue("z")]
     let eFunResult = newFunResult(newValue(0))
-    check testFunction("exists", parameters, eFunResult = eFunResult)
+    check testFunction("exists", parameters, eFunResult)
 
   test "exists wrong number of parameters":
     var parameters = @[newValue("z")]
-    let eFunResult = newFunResultWarn(wTwoParameters, 0)
+    let eFunResult = newFunResultWarn(wTwoParameters)
     check testFunction("exists", parameters, eFunResult)
 
   test "exists not dict":
     var parameters = @[newValue("z"), newValue("a")]
-    let eFunResult = newFunResultWarn(wExpectedDictionary, 0)
+    let eFunResult = newFunResultWarn(wExpectedDictionary)
     check testFunction("exists", parameters, eFunResult)
 
   test "exists not string":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
     var parameters = @[dict, newValue(0)]
-    let eFunResult = newFunResultWarn(wExpectedString, 0)
+    let eFunResult = newFunResultWarn(wExpectedString, 1)
     check testFunction("exists", parameters, eFunResult)
 
   test "case int":
@@ -389,7 +389,7 @@ suite "runFunction.nim":
     var parameters = @[newValue(5), newValue("else"),
                        newValue(5),
     ]
-    let eFunResult = newFunResultWarn(wFourParameters, 0)
+    let eFunResult = newFunResultWarn(wFourParameters)
     check testFunction("case", parameters, eFunResult)
 
   test "case odd number of parameters":
@@ -397,7 +397,7 @@ suite "runFunction.nim":
                        newValue(5), newValue(8),
                        newValue(5),
     ]
-    let eFunResult = newFunResultWarn(wFourParameters, 0)
+    let eFunResult = newFunResultWarn(wFourParameters)
     check testFunction("case", parameters, eFunResult)
 
   test "case invalid main condition":
@@ -405,7 +405,7 @@ suite "runFunction.nim":
                        newValue(5), newValue(8),
                        newValue(5), newValue(9),
     ]
-    let eFunResult = newFunResultWarn(wInvalidMainType, 0)
+    let eFunResult = newFunResultWarn(wInvalidMainType)
     check testFunction("case", parameters, eFunResult)
 
   test "case invalid condition":
