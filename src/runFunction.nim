@@ -6,11 +6,58 @@ import options
 import warnings
 import tables
 import unicode
+import strutils
 
 type
-  FunctionPtr* = proc (env: var Env, lineNum: Natural, parameters: seq[Value]): Option[Value]
+  FunctionPtr* = proc (env: var Env, lineNum: Natural, parameters: seq[Value]): FunResult
+
+  FunResultKind* = enum
+    frValue,
+    frWarning
+
+  FunResult* = ref FunResultObj
+  FunResultObj* {.acyclic.} = object
+    case kind*: FunResultKind
+      of frValue:
+        value*: Value       ## Return value of the function.
+      of frWarning:
+        warning*: Warning   ## Warning message id.
+        parameter*: Natural ## Index of problem parameter.
+        p1*: string         ## Extra warning info.
+        p2*: string         ## Extra warning info.
+
 
 var functions: Table[string, FunctionPtr]
+
+proc newFunResultWarn*(warning: Warning, parameter: Natural,
+      p1: string = "", p2: string = ""): FunResult =
+  result = FunResult(kind: frWarning, warning: warning,
+             parameter: parameter, p1: p1, p2: p2)
+
+proc newFunResult*(value: Value): FunResult =
+  result = FunResult(kind: frValue, value: value)
+
+proc `==`*(funResult1: FunResult, funResult2: FunResult): bool =
+  if funResult1.kind == funResult2.kind:
+    case funResult1.kind:
+      of frValue:
+        result = funResult1.value == funResult2.value
+      else:
+        if funResult1.warning == funResult2.warning and
+           funResult1.parameter == funResult2.parameter and
+           funResult1.p1 == funResult2.p1 and
+           funResult1.p2 == funResult2.p2:
+          result = true
+
+func `$`*(funResult: FunResult): string =
+  ## A string representation of FunResult.
+  case funResult.kind
+  of frValue:
+    result = $funResult.value
+  else:
+    result = "warning: $1: $2 $3 $4" % [
+      $funResult.warning, $funResult.parameter, funResult.p1, funResult.p2
+    ]
 
 proc cmpString*(a, b: string, ignoreCase: bool = false): int =
   ## Compares two UTF-8 strings and returns 0 when equal, 1 when a > b
@@ -38,7 +85,7 @@ proc cmpString*(a, b: string, ignoreCase: bool = false): int =
     result = 0
 
 proc funCmp*(env: var Env, lineNum: Natural, parameters:
-               seq[Value]): Option[Value] =
+               seq[Value]): FunResult =
   ## The cmp function compares two variables, either numbers or
   ## strings (both the same type), and returns whether the first
   ## parameter is less than, equal to or greater than the second
@@ -46,12 +93,12 @@ proc funCmp*(env: var Env, lineNum: Natural, parameters:
   ## than. The optional third parameter compares strings case
   ## insensitive when it is 1. Added in version 0.1.0.
   if parameters.len() < 2 or parameters.len() > 3:
-    env.warn(lineNum, wTwoOrThreeParameters)
+    result = newFunResultWarn(wTwoOrThreeParameters, 0)
     return
   let value1 = parameters[0]
   let value2 = parameters[1]
   if value1.kind != value2.kind:
-    env.warn(lineNum, wNotSameKind)
+    result = newFunResultWarn(wNotSameKind, 0)
     return
   var ret: int
   case value1.kind
@@ -67,34 +114,33 @@ proc funCmp*(env: var Env, lineNum: Natural, parameters:
     of vkFloat:
       ret = cmp(value1.floatv, value2.floatv)
     else:
-      env.warn(lineNum, wNotNumberOrString)
+      result = newFunResultWarn(wNotNumberOrString, 0)
       return
-  result = some(newValue(ret))
-
+  result = newFunResult(newValue(ret))
 
 proc funConcat*(env: var Env, lineNum: Natural, parameters:
-               seq[Value]): Option[Value] =
+               seq[Value]): FunResult =
   ## Concatentate the string parameters. You pass 2 or more string
   ## parameters.  Added in version 0.1.0.
   var str = ""
   if parameters.len() < 2:
-    env.warn(lineNum, wTwoOrMoreParameters)
+    result = newFunResultWarn(wTwoOrMoreParameters, 0)
     return
   for ix, value in parameters:
     if value.kind != vkString:
-      env.warn(lineNum, wExpectedStrings, $(ix+1))
+      result = newFunResultWarn(wExpectedStrings, 0, $(ix+1))
       return
     str.add(value.stringv)
-  result = some(newValue(str))
+  result = newFunResult(newValue(str))
 
 proc funLen*(env: var Env, lineNum: Natural, parameters:
-               seq[Value]): Option[Value] =
+               seq[Value]): FunResult =
   ## The len function takes one parameter and returns the number of
   ## characters in a string (not bytes), the number of elements in a
   ## list or the number of elements in a dictionary.  Added in version
   ## 0.1.0.
   if parameters.len() != 1:
-    env.warn(lineNum, wOneParameter)
+    result = newFunResultWarn(wOneParameter, 0)
     return
   var retValue: Value
   let value = parameters[0]
@@ -106,12 +152,12 @@ proc funLen*(env: var Env, lineNum: Natural, parameters:
     of vkDict:
       retValue = newValue(value.dictv.len)
     else:
-      env.warn(lineNum, wStringListDict)
+      result = newFunResultWarn(wStringListDict, 0)
       return
-  result = some(retValue)
+  result = newFunResult(retValue)
 
 proc funGet*(env: var Env, lineNum: Natural, parameters:
-               seq[Value]): Option[Value] =
+               seq[Value]): FunResult =
   ## You use the get function to return a list or dictionary element.
   ## You pass two or three parameters, the first is the dictionary or
   ## list to use, the second is the dictionary key name or the list
@@ -128,42 +174,37 @@ proc funGet*(env: var Env, lineNum: Natural, parameters:
   ## Added in version 0.1.0.
 
   if parameters.len() < 2 or parameters.len() > 3:
-    env.warn(lineNum, wGetTakes2or3Params)
-    return
+    return newFunResultWarn(wGetTakes2or3Params, 0)
 
   let container = parameters[0]
   case container.kind
     of vkList:
       let p2 = parameters[1]
       if p2.kind != vkInt:
-        env.warn(lineNum, wExpectedIntFor2, $p2.kind)
-        return
+        return newFunResultWarn(wExpectedIntFor2, 0, $p2.kind)
       var index = p2.intv
       if index < 0:
-        env.warn(lineNum, wInvalidIndex, $index)
-        return
+        return newFunResultWarn(wInvalidIndex, 0, $index)
       if index >= container.listv.len:
         if parameters.len == 3:
-          return some(newValue(parameters[2]))
-        env.warn(lineNum, wMissingListItem, $index)
-        return
-      return some(newValue(container.listv[index]))
+          return newFunResult(parameters[2])
+        return newFunResultWarn(wMissingListItem, 0, $index)
+      return newFunResult(newValue(container.listv[index]))
     of vkDict:
       let p2 = parameters[1]
       if p2.kind != vkString:
-        env.warn(lineNum, wExpectedStringFor2, $p2.kind)
-        return
+        return newFunResultWarn(wExpectedStringFor2, 0, $p2.kind)
       var key = p2.stringv
       if key in container.dictv:
-        return some(container.dictv[key])
+        return newFunResult(container.dictv[key])
       if parameters.len == 3:
-        return some(newValue(parameters[2]))
-      env.warn(lineNum, wMissingDictItem, $key)
+        return newFunResult(newValue(parameters[2]))
+      return newFunResultWarn(wMissingDictItem, 0, key)
     else:
-      env.warn(lineNum, wExpectedListOrDict)
+      return newFunResultWarn(wExpectedListOrDict, 0)
 
 proc funIf*(env: var Env, lineNum: Natural, parameters:
-               seq[Value]): Option[Value] =
+               seq[Value]): FunResult =
   ## You use the if function to return a value based on a condition.
   ## It has three parameters, the condition, the true case and the
   ## false case.
@@ -175,23 +216,23 @@ proc funIf*(env: var Env, lineNum: Natural, parameters:
   ## Added in version 0.1.0.
 
   if parameters.len() != 3:
-    env.warn(lineNum, wThreeParameters)
+    result = newFunResultWarn(wThreeParameters, 0)
     return
 
   let condition = parameters[0]
   if condition.kind != vkInt:
-    env.warn(lineNum, wExpectedInteger)
+    result = newFunResultWarn(wExpectedInteger, 0)
     return
 
   if condition.intv == 1:
-    result = some(parameters[1])
+    result = newFunResult(parameters[1])
   else:
-    result = some(parameters[2])
+    result = newFunResult(parameters[2])
 
 {.push overflowChecks: on, floatChecks: on.}
 
 proc funAdd*(env: var Env, lineNum: Natural, parameters:
-    seq[Value]): Option[Value] =
+    seq[Value]): FunResult =
   ## The add function returns the sum of its two or more
   ## parameters. The parameters must be all integers or all floats.  A
   ## warning is generated on overflow and the statement is skipped.
@@ -199,17 +240,17 @@ proc funAdd*(env: var Env, lineNum: Natural, parameters:
   ## Added in version 0.1.0.
 
   if parameters.len() < 2:
-    env.warn(lineNum, wTwoOrMoreParameters)
+    result = newFunResultWarn(wTwoOrMoreParameters, 0)
     return
 
   let first = parameters[0]
   if first.kind != vkInt and first.kind != vkFloat:
-    env.warn(lineNum, wAllIntOrFloat)
+    result = newFunResultWarn(wAllIntOrFloat, 0)
     return
 
   for value in parameters[1..^1]:
     if value.kind != first.kind:
-      env.warn(lineNum, wAllIntOrFloat)
+      result = newFunResultWarn(wAllIntOrFloat, 0)
       return
 
     try:
@@ -218,15 +259,15 @@ proc funAdd*(env: var Env, lineNum: Natural, parameters:
       else:
         first.floatv = first.floatv + value.floatv
     except:
-      env.warn(lineNum, wOverflow)
+      result = newFunResultWarn(wOverflow, 0)
       return
 
-  result = some(first)
+  result = newFunResult(first)
 
 {.pop.}
 
 proc funExists*(env: var Env, lineNum: Natural, parameters:
-    seq[Value]): Option[Value] =
+    seq[Value]): FunResult =
   ## Return 1 when a variable exists in the given dictionary, else
   ## return 0. The first parameter is the dictionary to check and the
   ## second parameter is the name of the variable.
@@ -237,26 +278,26 @@ proc funExists*(env: var Env, lineNum: Natural, parameters:
   ## Added in version 0.1.0.
 
   if parameters.len() != 2:
-    env.warn(lineNum, wTwoParameters)
+    result = newFunResultWarn(wTwoParameters, 0)
     return
 
   let container = parameters[0]
   if container.kind != vkDict:
-    env.warn(lineNum, wExpectedDictionary)
+    result = newFunResultWarn(wExpectedDictionary, 0)
     return
 
   let key = parameters[1]
   if key.kind != vkString:
-    env.warn(lineNum, wExpectedString)
+    result = newFunResultWarn(wExpectedString, 0)
     return
 
   var num: int
   if key.stringv in container.dictv:
     num = 1
-  result = some(newValue(num))
+  result = newFunResult(newValue(num))
 
 proc funCase*(env: var Env, lineNum: Natural, parameters:
-    seq[Value]): Option[Value] =
+    seq[Value]): FunResult =
   ## The case function returns a value from multiple choices.
   ##
   ## It requires at least four parameters, the main condition, the
@@ -287,12 +328,12 @@ proc funCase*(env: var Env, lineNum: Natural, parameters:
 
   # At least four parameters and an even number of them.
   if parameters.len() < 4 or parameters.len() mod 2 == 1:
-    env.warn(lineNum, wFourParameters)
+    result = newFunResultWarn(wFourParameters, 0)
     return
 
   let mainCondition = parameters[0]
   if mainCondition.kind != vkString and mainCondition.kind != vkInt:
-    env.warn(lineNum, wInvalidMainType)
+    result = newFunResultWarn(wInvalidMainType, 0)
     return
 
   # Make sure each condition type matches the main condition. We do
@@ -300,19 +341,22 @@ proc funCase*(env: var Env, lineNum: Natural, parameters:
   for ix in countUp(2, parameters.len-1, 2):
     var condition = parameters[ix]
     if condition.kind != mainCondition.kind:
-      env.warn(lineNum, wInvalidCondition)
+      result = newFunResultWarn(wInvalidCondition, ix)
       return
 
+  var ixRet = 1
   for ix in countUp(2, parameters.len-1, 2):
     var condition = parameters[ix]
     if condition.kind == vkString:
       if condition.stringv == mainCondition.stringv:
-        return some(parameters[ix+1])
+        ixRet = ix+1
+        break
     else:
       if condition.intv == mainCondition.intv:
-        return some(parameters[ix+1])
+        ixRet = ix+1
+        break
 
-  return some(parameters[1])
+  result = newFunResult(parameters[ixRet])
 
 const
   functionsList = [

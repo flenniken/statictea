@@ -217,12 +217,13 @@ proc getFunctionValue*(env: var Env, compiledMatchers:
         break
 
   # Run the function.
-  let valueO = function(env, statement.lineNum, parameters)
-  if not isSome(valueO):
+  let funResult = function(env, statement.lineNum, parameters)
+  if funResult.kind == frWarning:
+    env.warnStatement(statement, funResult.warning, start)
     env.warnStatement(statement, wInvalidStatement, start)
     return
 
-  result = some(ValueAndLength(value: valueO.get(), length: pos-start))
+  result = some(ValueAndLength(value: funResult.value, length: pos-start))
 
 proc getVariable*(env: var Env, statement: Statement, variables:
                   Variables, nameSpace: string, varName: string,

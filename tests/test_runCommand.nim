@@ -850,6 +850,18 @@ statement: t.asdf = 3.45
 """
     check testRunStatement(statement, eErrLines = eErrLines)
 
+
+  test "invalid case condition":
+    let statement = newStatement(text="result = case(1, 'else', 2, 22, 'abc', 33)", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w78: The case condition type must match the main condition.
+template.html(1): w48: Invalid statement, skipping it.
+statement: result = case(1, 'else', 2, 22, 'abc', 33)
+                                           ^
+"""
+    check testRunStatement(statement, eErrLines = eErrLines)
+
+
 # todo: test that a warning is generated when the item doesn't exist.
 # todo: test prepost when user specified.
 # todo: test the maximum variable length of 64, 66 including the optional prefix.
