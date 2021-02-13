@@ -358,6 +358,16 @@ const
     ("add", funAdd),
     ("exists", funExists),
     ("case", funCase),
+# convert
+# find
+# format
+# lineNumber
+# quotehtml
+# sizes
+# substr
+# time
+# template
+# version
   ]
 
 # todo: add function to get the list of functions? or check whether one exists?

@@ -584,27 +584,27 @@ Like local variables, you create global variables with template
 statements.  All blocks have access to them.  You access them
 with "g." prefix.  They are stored in the t.global dictionary.
 
-
-  [[#contents][茶]]
+[[#contents][茶]]
 
 ** Tea Variables
-    :PROPERTIES:
+:PROPERTIES:
     :CUSTOM_ID: tea-variables
     :END:
 
-  The built in tea variables are prefixed with "t." and they
-  control how the replacement block works.
+The built in tea variables are prefixed with "t." and they
+control how the replacement block works.
 
-  - [[#tcontent][t.content]] -- content of the replace block
-  - [[#tlocal][t.local]] -- dictionary containing the current block's local variables.
-  - [[#tglobal][t.global]] -- dictionary containing the global variables.
-  - [[#tmaxrepeat][t.maxRepeat]] -- maximum number of times to repeat the block
-  - [[#tmaxlines][t.maxLines]] -- maximum number of replacementblock lines (lines before endblock)
-  - [[#toutput][t.output]] -- where the block output goes
-  - [[#trepeat][t.repeat]] -- controls how many times the block repeats
-  - [[#trow][t.row]] -- the current row number of a repeating block
-  - [[#tserver][t.server]] -- dictionary containing the server variables
-  - [[#tshared][t.shared]] -- dictionary containing the shared variables
+- [[#tcontent][t.content]] -- content of the replace block
+- [[#tlocal][t.local]] -- dictionary containing the current block's local variables.
+- [[#tglobal][t.global]] -- dictionary containing the global variables.
+- [[#tmaxrepeat][t.maxRepeat]] -- maximum number of times to repeat the block
+- [[#tmaxlines][t.maxLines]] -- maximum number of replacementblock lines (lines before endblock)
+- [[#toutput][t.output]] -- where the block output goes
+- [[#trepeat][t.repeat]] -- controls how many times the block repeats
+- [[#trow][t.row]] -- the current row number of a repeating block
+- [[#tserver][t.server]] -- dictionary containing the server variables
+- [[#tshared][t.shared]] -- dictionary containing the shared variables
+- [[#tversion][t.version]] -- the StaticTea version number
 
 [[#contents][茶]]
 
@@ -621,8 +621,10 @@ with "g." prefix.  They are stored in the t.global dictionary.
  for testing changes you want to make to the shared value and the
  warning reminds you to set the variable when done.
 
- The variable only applies to the replace command. See the [[#replace-command][replace
- command]] section for an example.
+ The variable only applies to the replace command. See the
+ [[#replace-command][replace command]] section for an example.
+
+ Added in version 0.1.0.
 
  [[#contents][茶]]
 
@@ -634,6 +636,8 @@ with "g." prefix.  They are stored in the t.global dictionary.
  The t.local variable is the dictionary of local variables for the
  current command.
 
+ Added in version 0.1.0.
+
  [[#contents][茶]]
 
 *** t.global
@@ -642,6 +646,8 @@ with "g." prefix.  They are stored in the t.global dictionary.
     :END:
 
  The t.global variable is the dictionary of the global variables.
+
+ Added in version 0.1.0.
 
  [[#contents][茶]]
 
@@ -661,6 +667,7 @@ with "g." prefix.  They are stored in the t.global dictionary.
 
  You can increase this t.maxRepeat to repeat more times.
 
+ Added in version 0.1.0.
  [[#contents][茶]]
 
 *** t.maxLines
@@ -679,6 +686,8 @@ the endblock command.
 You can increase this value to support blocks with more lines by
 setting the t.maxLines system variable.
 
+Added in version 0.1.0.
+
 #+BEGIN_SRC
 <!--$ block t.maxLines=20 -->
 #+END_SRC
@@ -686,7 +695,7 @@ setting the t.maxLines system variable.
 [[#contents][茶]]
 
 *** t.output
-    :PROPERTIES:
+:PROPERTIES:
     :CUSTOM_ID: toutput
     :END:
 
@@ -698,6 +707,8 @@ statictea.
 - "stderr" -- the block output goes to standard error
 - "log" -- the block output goes to the log file
 - "skip" -- the block is skipped
+
+Added in version 0.1.0.
 
 You can use the stderr option to write your own warning messages.
 
@@ -740,6 +751,8 @@ show the block at all.
 You cannot assign a number bigger than t.maxRepeat to
 t.repeat. You can set t.maxRepeat to anything you want, the
 default is 100.
+
+Added in version 0.1.0.
 
 For the following example, the number of items in tea_list is
 assigned to the t.repeat variable which outputs the block five
@@ -897,6 +910,8 @@ The t.row variable contains the current row number for blocks
 that repeat. The row numbers start at 0 and increase.  You use it
 to format lists and other repeating content in the template.
 
+Added in version 0.1.0.
+
 Here is an example using the row variable.  In the example the
 row number is used in three places.
 
@@ -931,24 +946,39 @@ result:
   <li id="r3">4. Red Diamond</li>
 #+END_SRC
 
-
  [[#contents][茶]]
 
 *** t.server
-    :PROPERTIES:
+:PROPERTIES:
     :CUSTOM_ID: tserver
     :END:
 
- The t.server variable is a dictionary containing the server json variables.
+The t.server variable is a dictionary containing the server json variables.
+
+Added in version 0.1.0.
 
 *** t.shared
-    :PROPERTIES:
+:PROPERTIES:
     :CUSTOM_ID: tshared
     :END:
 
- The t.shared variable is a dictionary containing the shared json variables
+The t.shared variable is a dictionary containing the shared json variables
 
- [[#contents][茶]]
+Added in version 0.1.0.
+
+[[#contents][茶]]
+
+*** t.version
+:PROPERTIES:
+:CUSTOM_ID: tversion
+:END:
+
+The t.version variable contains the current version number of
+StaticTea. See the [[#cmpversion][cmpVersion]] function for more information.
+
+Added in version 0.1.0.
+
+[[#contents][茶]]
 
 * Types
 :PROPERTIES:
@@ -1296,6 +1326,7 @@ List of functions:
 - [[#add][add()]] -- add numbers
 - [[#case][case()]] -- multiple condition handling
 - [[#cmp][cmp()]] -- spaceship compare function <=>
+- [[#cmpversion][cmpVersion()]] -- compare StaticTea version numbers
 - [[#concat][concat()]] -- concatenate strings
 - [[#convert][convert()]] -- convert variable type
 - [[#exists][exists()]] -- whether a variables exists
@@ -1310,7 +1341,6 @@ List of functions:
 - [[#substr][substr()]] -- extract a substring from a string by indexes
 - [[#time][time()]] -- format the date and time.
 - [[#template][template()]] -- the filename of the current template
-- [[#version][version()]] -- the current version and version checker
 
 [[#contents][茶]]
 
@@ -1454,6 +1484,55 @@ than 10 characters.
 <!--$ : cmp = cmp(len(s.name), 10);              \-->
 <!--$ : name = case(cmd, s.name                  \-->
 <!--$ : 1, concat(substr(s.name, 0, 7), "..."))   -->
+#+END_SRC
+
+[[#contents][茶]]
+
+** cmpVersion()
+:PROPERTIES:
+:CUSTOM_ID: cmpversion
+:END:
+
+The cmpVersion function compares two StaticTea type version
+numbers and returns whether the first parameter is less than,
+equal to or greater than the second parameter. It returns -1 for
+less, 0 for equal and 1 for greater than.
+
+StaticTea uses [[https://semver.org/][Semantic Versioning]] with the added restrictions
+that each version component is has one to three digits (no
+letters).
+
+Added in version 0.1.0.
+
+Example valid StaticTea version numbers:
+
+#+BEGIN_SRC
+1.0.2
+12.1.333
+3.10.5
+3.9.65
+#+END_SRC
+
+Example invalid StaticTea version numbers:
+
+#+BEGIN_SRC
+2
+1.4
+1.4.3a
+2.33.4567
+1.0.0beta
+#+END_SRC
+
+The example below generates a warning when the running version of
+StaticTea is less than 1.0.2.
+
+template:
+
+#+BEGIN_SRC
+#$ nexline req = "1.0.2"; \
+#$ : t.output = case(cmpVersion(t.version, req), \
+#$ : 'skip', -1, 'stderr')
+Version {req} or above is required.
 #+END_SRC
 
 [[#contents][茶]]
@@ -1849,62 +1928,6 @@ parameter:
 - "passed" -- returns the template name passed to statictea.
 
 Added in version 0.1.0.
-
-[[#contents][茶]]
-
-** version()
-:PROPERTIES:
-:CUSTOM_ID: version
-:END:
-
-You use the version function to get the current version of
-StaticTea or to verify that the version you are running works
-with your template.
-
-The version function takes 0, 1 or 2 parameters. The first parameter
-is the minimum version supported and the second parameter is the
-maximum version supported.
-
-The default minimum is 0.0.0 and the default maximum is anything.
-
-If the current version is below the minimum or above the maximum,
-the function outputs a message to standard error.
-
-You can use the function multiple times for fine grain checking.
-
-StaticTea uses [[https://semver.org/][Semantic Versioning]] with the added restrictions
-that each version component is limited to three digits and all
-components have at least one digit.
-
-Added in version 0.1.0.
-
-Below is typical useage:
-
-template:
-
-#+BEGIN_SRC
-<--$ nextline version=version("1.20.3", "3.4.005") -->
-<-- StaticTea current version is: {version}. -->
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-<-- StaticTea current version is: 1.9.0. -->
-#+END_SRC
-
-If the current version is not between the min and max, a message
-is output to standard error.  Example messages:
-
-stdout:
-
-#+BEGIN_SRC
-tea.html(45): w22: The current version 4.0.2 is greater than the maximum
-allowed verion of 3.4.005.
-
-tea.html(45): w23: The current version 1.0.0 is less than the minumum
-allowed verion of 1.20.3.
-#+END_SRC
 
 [[#contents][茶]]
 
