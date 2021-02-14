@@ -85,6 +85,7 @@ type
     wFourParameters,       # w76
     wInvalidMainType,      # w77
     wInvalidCondition,     # w78
+    wInvalidVersion,       # w79
 
 tpubType:
   const
@@ -170,6 +171,7 @@ tpubType:
       "The case function takes an even number of parameters and at least four.", # wFourParameters
       "The main condition type must an int or string.", # wInvalidMainType
       "The case condition type must match the main condition type.", # wInvalidCondition
+      "Invalid StaticTea version string.", # wInvalidVersion
     ]
 
 func getWarning*(filename: string, lineNum: int,

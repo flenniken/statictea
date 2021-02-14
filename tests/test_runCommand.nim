@@ -896,6 +896,50 @@ statement: t.missing = "1.2.3"
     let statement = newStatement(text="""t.content = "1.2.3"""", lineNum=1, 0)
     check testRunStatement(statement)
 
+  test "parseVersion":
+    check parseVersion("1.2.3") == some((1, 2, 3))
+    check parseVersion("111.222.333") == some((111, 222, 333))
+
+  test "cmpVersion equal":
+    let statement = newStatement(text="cmp = cmpVersion('1.2.3', '1.2.3')", lineNum=1, 0)
+    check testRunStatement(statement, varName = "cmp", eValueO = some(newValue(0)))
+
+  test "cmpVersion less":
+    let statement = newStatement(text="cmp = cmpVersion('1.2.2', '1.2.3')", lineNum=1, 0)
+    check testRunStatement(statement, varName = "cmp", eValueO = some(newValue(-1)))
+
+  test "cmpVersion greater":
+    let statement = newStatement(text="cmp = cmpVersion('1.2.4', '1.2.3')", lineNum=1, 0)
+    check testRunStatement(statement, varName = "cmp", eValueO = some(newValue(1)))
+
+  test "cmpVersion less 2":
+    let statement = newStatement(text="cmp = cmpVersion('1.22.3', '2.1.0')", lineNum=1, 0)
+    check testRunStatement(statement, varName = "cmp", eValueO = some(newValue(-1)))
+
+  test "cmpVersion less 3":
+    let statement = newStatement(text="cmp = cmpVersion('2.22.3', '2.44.0')", lineNum=1, 0)
+    check testRunStatement(statement, varName = "cmp", eValueO = some(newValue(-1)))
+
+  test "cmpVersion two parameters":
+    let statement = newStatement(text="cmp = cmpVersion('1.2.3')", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w62: The function takes two parameters.
+template.html(1): w48: Invalid statement, skipping it.
+statement: cmp = cmpVersion('1.2.3')
+                            ^
+"""
+    check testRunStatement(statement, eErrLines = eErrLines)
+
+  test "cmpVersion strings":
+    let statement = newStatement(text="cmp = cmpVersion('1.2.3', 3.5)", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w47: Expected a string.
+template.html(1): w48: Invalid statement, skipping it.
+statement: cmp = cmpVersion('1.2.3', 3.5)
+                                     ^
+"""
+    check testRunStatement(statement, eErrLines = eErrLines)
+
 
 # todo: test that a warning is generated when the item doesn't exist.
 # todo: test prepost when user specified.

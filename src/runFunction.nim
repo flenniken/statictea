@@ -6,6 +6,8 @@ import warnings
 import tables
 import unicode
 import strutils
+import regexes
+import parseNumber
 
 type
   FunctionPtr* = proc (parameters: seq[Value]): FunResult
@@ -348,6 +350,54 @@ proc funCase*(parameters: seq[Value]): FunResult =
 
   result = newFunResult(parameters[ixRet])
 
+proc parseVersion*(version: string): Option[(int, int, int)] =
+  let versionMatcher = newMatcher(r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$", 3)
+  let matches2O = getMatches(versionMatcher, version, 0)
+  if not matches2O.isSome:
+    return
+  let (g1, g2, g3) = matches2O.get().get3Groups()
+  var g1IntPosO = parseInteger(g1)
+  var g2IntPosO = parseInteger(g2)
+  var g3IntPosO = parseInteger(g3)
+  result = some((int(g1IntPosO.get().integer), int(g2IntPosO.get().integer), int(g3IntPosO.get().integer)))
+
+proc funCmpVersion*(parameters: seq[Value]): FunResult =
+  ## The cmpVersion function compares two StaticTea type version
+  ## numbers and returns whether the first parameter is less than,
+  ## equal to or greater than the second parameter. It returns -1 for
+  ## less, 0 for equal and 1 for greater than.
+  ##
+  ## StaticTea uses [[https://semver.org/][Semantic Versioning]] with
+  ## the added restrictions that each version component is has one to
+  ## three digits (no letters).
+  ##
+  ## Added in version 0.1.0.
+  if parameters.len() != 2:
+    result = newFunResultWarn(wTwoParameters)
+    return
+
+  var parts: seq[(int, int, int)]
+  for ix in 0 .. 1:
+    if parameters[ix].kind != vkString:
+      result = newFunResultWarn(wExpectedString, ix)
+      return
+    let tupleO = parseVersion(parameters[ix].stringv)
+    if not tupleO.isSome:
+      result = newFunResultWarn(wInvalidVersion, ix)
+      return
+    parts.add(tupleO.get())
+
+  let (oneV1, twoV1, threeV1) = parts[0]
+  let (oneV2, twoV2, threeV2) = parts[1]
+
+  var ret = cmp(oneV1, oneV2)
+  if ret == 0:
+    ret = cmp(twoV1, twoV2)
+    if ret == 0:
+      ret = cmp(threeV1, threeV2)
+
+  result = newFunResult(newValue(ret))
+
 const
   functionsList = [
     ("len", funLen),
@@ -358,6 +408,7 @@ const
     ("add", funAdd),
     ("exists", funExists),
     ("case", funCase),
+    ("cmpVersion", funCmpVersion),
 # convert
 # find
 # format
@@ -367,7 +418,6 @@ const
 # substr
 # time
 # template
-# version
   ]
 
 # todo: add function to get the list of functions? or check whether one exists?
