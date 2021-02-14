@@ -1328,9 +1328,10 @@ List of functions:
 - [[#cmp][cmp()]] -- spaceship compare function <=>
 - [[#cmpversion][cmpVersion()]] -- compare StaticTea version numbers
 - [[#concat][concat()]] -- concatenate strings
-- [[#convert][convert()]] -- convert variable type
+- [[#int][int()]] -- convert a float or float number string to an int
 - [[#exists][exists()]] -- whether a variables exists
 - [[#find][find()]] -- find a substring in a string
+- [[#float][float()]] -- convert an int or int number string to a float
 - [[#format][format()]] -- format a string or a number
 - [[#get][get()]] -- get an element from a list or dictionary
 - [[#if][if()]] -- handles two conditions
@@ -1499,8 +1500,8 @@ equal to or greater than the second parameter. It returns -1 for
 less, 0 for equal and 1 for greater than.
 
 StaticTea uses [[https://semver.org/][Semantic Versioning]] with the added restrictions
-that each version component is has one to three digits (no
-letters).
+that each version component has one to three digits and no
+letters.
 
 Added in version 0.1.0.
 
@@ -1564,70 +1565,39 @@ concat("Tea", " ",  "Time") => 'Tea Time'
 
 [[#contents][茶]]
 
-** convert()
+** int()
 :PROPERTIES:
-:CUSTOM_ID: convert
+:CUSTOM_ID: int
 :END:
 
-The convert function converts variables from one type to
-another. From int to float, float to int, string to int and
-string to float. It takes two or three parameters. The first
-parameter is the variable to convert, the second parameter is the
-type name to convert to, and the third parameter tells how to
-convert.  If the variable to convert is a string, it must look
-like a number. Added in version 0.1.0.
+The int function converts a float or a float number string to an
+int.
 
-Note: if you want to convert a number to a string, use the format
-function.
+-p1: value to convert, float or float number string
+-p2: round options
 
-Conversion Combinations:
+Round options:
 
-- int to float
-- float to int, with round options
-- string to int with round options
-- string to float
+- "round" - nearest integer or, above for the middle case
+- "floor" - integer below (to the left on number line)
+- "ceiling" - integer above (to the right on number line)
+- "truncate" - remove decimals
 
-Round Options:
+Added in version 0.1.0.
 
-- "round" - rounds to the nearest int, when equal rounds up.
-- "floor" - uses int below.
-- "ceiling" - uses int above.
+Examples:
 
 #+BEGIN_SRC
-#$ block \
-#$ : v1 = convert(5.6, "int", "round"); \
-#$ : v2 = convert(2.3, "int", ceiling); \
-#$ : v3 = convert(2.7, "int", "floor"); \
-#$ : v4 = convert(333, "float"); \
-#$ : v5 = convert("5.6", "int", "round"); \
-#$ : v6 = convert("2.3", "int", ceiling); \
-#$ : v7 = convert("2.7", "int", "floor"); \
-#$ : v8 = convert("333", "float"); \
-
-convert(5.6, "int", "round") => {v1}
-convert(2.3, "int", ceiling) => {v2}
-convert(2.7, "int", "floor") => {v3}
-convert(333, "float") => {v4}
-convert("5.6", "int", "round") => {v5}
-convert("2.3", "int", ceiling) => {v6}}
-convert("2.7", "int", "floor") => {v7}
-convert("333", "float") => {v8}
-#$ endblock
+int(2.34, "round") => 2
+int(-2.34, "round") => -2
+int(4.57, "floor") => 4
+int(-4.57, "floor") => -5
+int(6.3, "ceiling") => 7
+int(-6.3, "ceiling") => -6
+int(6.3456, "truncate") => 6
+int(-6.3456, "truncate") => -6
+int("2.34", "round") => 2
 #+END_SRC
-
-result:
-
-#+BEGIN_SRC
-convert(5.6, "int", "round") => 6
-convert(2.3, "int", ceiling) => 3
-convert(2.7, "int", "floor") => 2
-convert(333, "float") => 333.0
-convert("5.6", "int", "round") => 6
-convert("2.3", "int", ceiling) => 3
-convert("2.7", "int", "floor") => 2
-convert("333", "float") => 333.0
-#+END_SRC
-
 
 [[#contents][茶]]
 
@@ -1636,16 +1606,21 @@ convert("333", "float") => 333.0
 :CUSTOM_ID: exists
 :END:
 
-The exists function takes one string parameter which is the name
-of a variable. It returns 1 when a variable exists, else it
-returns 0. Added in version 0.1.0.
+Return 1 when a variable exists in the given dictionary, else
+return 0. The first parameter is the dictionary to check and the
+second parameter is the name of the variable to find.
+
+-p1: dictionary: The dictionary to use.
+-p2: string: The name (key) to find.
+
+Added in version 0.1.0.
 
 template:
 
 #+BEGIN_SRC
 <--$ block a = "apple"; \-->
-<--$ : ax = exists("a"); \-->
-<--$ : bx = exists("b") -->
+<--$ : ax = exists(t.local, "a"); \-->
+<--$ : bx = exists(t.local, "b") -->
 exists("a") => {ax}
 exists("b") => {bx}
 <--$ endblock -->
@@ -1729,8 +1704,8 @@ It has three parameters, the condition, the true case and the
 false case.
 
 1. Condition is an integer.
-2. True case, is the value returned when condition is 1.
-3. Else case, is the value returned when condition is not 1.
+2. True case is the value returned when condition is 1.
+3. Else case is the value returned when condition is not 1.
 
 Added in version 0.1.0.
 
@@ -1761,6 +1736,21 @@ if(8, 'dog', 'cat') -> cat
 #+END_SRC
 
 [[#contents][茶]]
+
+** float()
+:PROPERTIES:
+:CUSTOM_ID: float
+:END:
+
+The float function converts an int or an int number string to a
+float.
+
+Added in version 0.1.0.
+
+Note: if you want to convert a number to a string, use the format
+function.
+
+[[茶]]
 
 ** format()
 :PROPERTIES:
@@ -1874,8 +1864,8 @@ GB, etc. Added in version 0.1.0.
 :CUSTOM_ID: substr
 :END:
 
-The substr function extracts a substring from a string by
-indexes. The first parameter is the string to operate on, the
+The substr function extracts a substring from a string.
+The first parameter is the string to operate on, the
 second is the starting index of the substring to extract and the
 third is the ending index (one past it). The third parameter is
 optional and defaults to one past the end of the string. The end
@@ -1925,7 +1915,8 @@ parameter:
 
 - "basename" -- returns the name without any path information,
   which is the default.
-- "passed" -- returns the template name passed to statictea.
+- "passed" -- returns the template name as passed to statictea on
+  the command line.
 
 Added in version 0.1.0.
 

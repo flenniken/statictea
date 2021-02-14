@@ -86,6 +86,9 @@ type
     wInvalidMainType,      # w77
     wInvalidCondition,     # w78
     wInvalidVersion,       # w79
+    wIntOrStringNumber,    # w80
+    wFloatOrStringNumber,  # w81
+    wExpectedRoundOption,  # w82
 
 tpubType:
   const
@@ -172,6 +175,9 @@ tpubType:
       "The main condition type must an int or string.", # wInvalidMainType
       "The case condition type must match the main condition type.", # wInvalidCondition
       "Invalid StaticTea version string.", # wInvalidVersion
+      "Expected int or int number string.", # wIntOrStringNumber
+      "Expected a float or float number string.", # wFloatOrStringNumber
+      "Expected round, floor, ceiling or truncate.", # wExpectedRoundOption
     ]
 
 func getWarning*(filename: string, lineNum: int,

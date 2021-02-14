@@ -8,6 +8,8 @@ import unicode
 import strutils
 import regexes
 import parseNumber
+import math
+import matches
 
 type
   FunctionPtr* = proc (parameters: seq[Value]): FunResult
@@ -92,12 +94,12 @@ proc funCmp*(parameters: seq[Value]): FunResult =
   ## than. The optional third parameter compares strings case
   ## insensitive when it is 1. Added in version 0.1.0.
   if parameters.len() < 2 or parameters.len() > 3:
-    result = newFunResultWarn(wTwoOrThreeParameters, 0)
+    result = newFunResultWarn(wTwoOrThreeParameters)
     return
   let value1 = parameters[0]
   let value2 = parameters[1]
   if value1.kind != value2.kind:
-    result = newFunResultWarn(wNotSameKind, 0)
+    result = newFunResultWarn(wNotSameKind)
     return
   var ret: int
   case value1.kind
@@ -113,7 +115,7 @@ proc funCmp*(parameters: seq[Value]): FunResult =
     of vkFloat:
       ret = cmp(value1.floatv, value2.floatv)
     else:
-      result = newFunResultWarn(wNotNumberOrString, 0)
+      result = newFunResultWarn(wNotNumberOrString)
       return
   result = newFunResult(newValue(ret))
 
@@ -122,7 +124,7 @@ proc funConcat*(parameters: seq[Value]): FunResult =
   ## parameters.  Added in version 0.1.0.
   var str = ""
   if parameters.len() < 2:
-    result = newFunResultWarn(wTwoOrMoreParameters, 0)
+    result = newFunResultWarn(wTwoOrMoreParameters)
     return
   for ix, value in parameters:
     if value.kind != vkString:
@@ -137,7 +139,7 @@ proc funLen*(parameters: seq[Value]): FunResult =
   ## list or the number of elements in a dictionary.  Added in version
   ## 0.1.0.
   if parameters.len() != 1:
-    result = newFunResultWarn(wOneParameter, 0)
+    result = newFunResultWarn(wOneParameter)
     return
   var retValue: Value
   let value = parameters[0]
@@ -149,7 +151,7 @@ proc funLen*(parameters: seq[Value]): FunResult =
     of vkDict:
       retValue = newValue(value.dictv.len)
     else:
-      result = newFunResultWarn(wStringListDict, 0)
+      result = newFunResultWarn(wStringListDict)
       return
   result = newFunResult(retValue)
 
@@ -170,7 +172,7 @@ proc funGet*(parameters: seq[Value]): FunResult =
   ## Added in version 0.1.0.
 
   if parameters.len() < 2 or parameters.len() > 3:
-    return newFunResultWarn(wGetTakes2or3Params, 0)
+    return newFunResultWarn(wGetTakes2or3Params)
 
   let container = parameters[0]
   case container.kind
@@ -197,7 +199,7 @@ proc funGet*(parameters: seq[Value]): FunResult =
         return newFunResult(newValue(parameters[2]))
       return newFunResultWarn(wMissingDictItem, 1, key)
     else:
-      return newFunResultWarn(wExpectedListOrDict, 0)
+      return newFunResultWarn(wExpectedListOrDict)
 
 proc funIf*(parameters: seq[Value]): FunResult =
   ## You use the if function to return a value based on a condition.
@@ -211,12 +213,12 @@ proc funIf*(parameters: seq[Value]): FunResult =
   ## Added in version 0.1.0.
 
   if parameters.len() != 3:
-    result = newFunResultWarn(wThreeParameters, 0)
+    result = newFunResultWarn(wThreeParameters)
     return
 
   let condition = parameters[0]
   if condition.kind != vkInt:
-    result = newFunResultWarn(wExpectedInteger, 0)
+    result = newFunResultWarn(wExpectedInteger)
     return
 
   if condition.intv == 1:
@@ -234,17 +236,17 @@ proc funAdd*(parameters: seq[Value]): FunResult =
   ## Added in version 0.1.0.
 
   if parameters.len() < 2:
-    result = newFunResultWarn(wTwoOrMoreParameters, 0)
+    result = newFunResultWarn(wTwoOrMoreParameters)
     return
 
   let first = parameters[0]
   if first.kind != vkInt and first.kind != vkFloat:
-    result = newFunResultWarn(wAllIntOrFloat, 0)
+    result = newFunResultWarn(wAllIntOrFloat)
     return
 
   for ix, value in parameters[1..^1]:
     if value.kind != first.kind:
-      result = newFunResultWarn(wAllIntOrFloat, 0)
+      result = newFunResultWarn(wAllIntOrFloat)
       return
 
     try:
@@ -271,12 +273,12 @@ proc funExists*(parameters: seq[Value]): FunResult =
   ## Added in version 0.1.0.
 
   if parameters.len() != 2:
-    result = newFunResultWarn(wTwoParameters, 0)
+    result = newFunResultWarn(wTwoParameters)
     return
 
   let container = parameters[0]
   if container.kind != vkDict:
-    result = newFunResultWarn(wExpectedDictionary, 0)
+    result = newFunResultWarn(wExpectedDictionary)
     return
 
   let key = parameters[1]
@@ -320,12 +322,12 @@ proc funCase*(parameters: seq[Value]): FunResult =
 
   # At least four parameters and an even number of them.
   if parameters.len() < 4 or parameters.len() mod 2 == 1:
-    result = newFunResultWarn(wFourParameters, 0)
+    result = newFunResultWarn(wFourParameters)
     return
 
   let mainCondition = parameters[0]
   if mainCondition.kind != vkString and mainCondition.kind != vkInt:
-    result = newFunResultWarn(wInvalidMainType, 0)
+    result = newFunResultWarn(wInvalidMainType)
     return
 
   # Make sure each condition type matches the main condition. We do
@@ -398,6 +400,124 @@ proc funCmpVersion*(parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(ret))
 
+proc funFloat*(parameters: seq[Value]): FunResult =
+  ## The float function converts an int or an int number string to a
+  ## float.
+  ##
+  ## Added in version 0.1.0.
+  ##
+  ## Note: if you want to convert a number to a string, use the format
+  ## function.
+
+  if parameters.len() != 1:
+    return newFunResultWarn(wOneParameter)
+  var p1 = parameters[0]
+  case p1.kind:
+    of vkInt:
+      # From int to float
+      result = newFunResult(newValue(float(p1.intv)))
+    of vkString:
+      # From int number string to float.
+
+      # Check that it is an int number string.
+      let compiledMatchers = getCompiledMatchers()
+      var matchesO = compiledMatchers.numberMatcher.getMatches(
+        p1.stringv, 0)
+      if not matchesO.isSome:
+        return newFunResultWarn(wIntOrStringNumber)
+      let matches = matchesO.get()
+      let decimalPoint = matches.getGroup()
+      if decimalPoint == ".":
+        return newFunResultWarn(wIntOrStringNumber)
+
+      let intPosO = parseInteger(p1.stringv)
+      if not intPosO.isSome:
+        return newFunResultWarn(wNumberOverFlow)
+
+      result = newFunResult(newValue(float(intPosO.get().integer)))
+    else:
+      return newFunResultWarn(wIntOrStringNumber)
+
+# todo: use int64 instead of BiggestInt everywhere.
+
+proc funInt*(parameters: seq[Value]): FunResult =
+  ## The int function converts a float or a float number string to an
+  ## int.
+  ##
+  ## -p1: value to convert, float or float number string
+  ## -p2: round options
+  ##
+  ## Round options:
+  ## - "round" - nearest integer or, above for the middle case
+  ## - "floor" - integer below (to the left on number line)
+  ## - "ceiling" - integer above (to the right on number line)
+  ## - "truncate" - remove decimals
+  ##
+  ## int(2.34, "round") => 2
+  ## int(-2.34, "round") => -2
+  ##
+  ## int(4.57, "floor") => 4
+  ## int(-4.57, "floor") => -5
+  ##
+  ## int(6.3, "ceiling") => 7
+  ## int(-6.3, "ceiling") => -6
+  ##
+  ## int(6.3456, "truncate") => 6
+  ## int(-6.3456, "truncate") => -6
+  ##
+  ## Added in version 0.1.0.
+
+  if parameters.len() != 2:
+    return newFunResultWarn(wTwoParameters)
+  var p1 = parameters[0]
+  var p2 = parameters[1]
+  var num: float64
+
+  case p1.kind:
+    of vkFloat:
+      # From float to int.
+      num = p1.floatv
+    of vkString:
+      # From float number string to int.
+
+      # Make sure it is a float number string.
+      let compiledMatchers = getCompiledMatchers()
+      var matchesO = compiledMatchers.numberMatcher.getMatches(
+        p1.stringv, 0)
+      if not matchesO.isSome:
+        return newFunResultWarn(wFloatOrStringNumber)
+      let matches = matchesO.get()
+      let decimalPoint = matches.getGroup()
+      if decimalPoint != "." or matches.length != len(p1.stringv):
+        return newFunResultWarn(wFloatOrStringNumber)
+
+      let floatPosO = parseFloat64(p1.stringv)
+      if not floatPosO.isSome:
+        return newFunResultWarn(wFloatOrStringNumber)
+      num = floatPosO.get().number
+
+    else:
+      return newFunResultWarn(wFloatOrStringNumber)
+
+  if num > float(high(int64)) or num < float(low(int64)):
+    return newFunResultWarn(wNumberOverFlow)
+
+  if p2.kind != vkString:
+    return newFunResultWarn(wExpectedRoundOption, 1)
+  var ret: int64
+  case p2.stringv:
+    of "round":
+      ret = int(round(num))
+    of "ceiling":
+      ret = int(ceil(num))
+    of "floor":
+      ret = int(floor(num))
+    of "truncate":
+      ret = int(trunc(num))
+    else:
+      return newFunResultWarn(wExpectedRoundOption, 1)
+  result = newFunResult(newValue(ret))
+
 const
   functionsList = [
     ("len", funLen),
@@ -409,7 +529,8 @@ const
     ("exists", funExists),
     ("case", funCase),
     ("cmpVersion", funCmpVersion),
-# convert
+    ("int", funInt),
+    ("float", funFloat),
 # find
 # format
 # lineNumber

@@ -30,6 +30,9 @@ proc parseFloat64*(str: string, start: Natural = 0): Option[FloatPos] =
   if length > 0:
     result = some(FloatPos(number: number, length: length))
 
+# todo: use int64 instead of BiggestInt everywhere.
+assert sizeof[BiggestInt] == sizeof[int64]
+
 proc parseInteger*(s: string, start: Natural = 0): Option[IntPos] =
   ## Parse the string and return the integer and number of characters
   ## processed. Nothing is returned when the integer is out of range

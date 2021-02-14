@@ -299,18 +299,18 @@ suite "runFunction.nim":
 
   test "add int64 overflow":
     var parameters = @[newValue(high(int64)), newValue(1)]
-    let eFunResult = newFunResultWarn(wOverflow, 0)
+    let eFunResult = newFunResultWarn(wOverflow)
     check testFunction("add", parameters, eFunResult)
 
   test "add int64 underflow":
     var parameters = @[newValue(low(int64)), newValue(-1)]
-    let eFunResult = newFunResultWarn(wOverflow, 0)
+    let eFunResult = newFunResultWarn(wOverflow)
     check testFunction("add", parameters, eFunResult)
 
   test "add float64 overflow":
     var big = 1.7976931348623158e+308
     var parameters = @[newValue(big), newValue(big)]
-    let eFunResult = newFunResultWarn(wOverflow, 0)
+    let eFunResult = newFunResultWarn(wOverflow)
     check testFunction("add", parameters, eFunResult)
 
   test "exists 1":
@@ -415,3 +415,101 @@ suite "runFunction.nim":
     ]
     let eFunResult = newFunResultWarn(wInvalidCondition, 4)
     check testFunction("case", parameters, eFunResult)
+
+  test "to int happy":
+    let testCases = [
+      (newValue(2.34), "round", 2),
+      (newValue(-2.34), "round", -2),
+      (newValue(4.57), "floor", 4),
+      (newValue(-4.57), "floor", -5),
+      (newValue(6.3), "ceiling", 7),
+      (newValue(-6.3), "ceiling", -6),
+      (newValue(6.3456), "truncate", 6),
+      (newValue(-6.3456), "truncate", -6),
+
+      (newValue("2.34"), "round", 2),
+      (newValue("-2.34"), "round", -2),
+      (newValue("4.57"), "floor", 4),
+      (newValue("-4.57"), "floor", -5),
+      (newValue("6.3"), "ceiling", 7),
+      (newValue("-6.3"), "ceiling", -6),
+      (newValue("6.3456"), "truncate", 6),
+      (newValue("-6.3456"), "truncate", -6),
+    ]
+    for oneCase in testCases:
+      var parameters = @[oneCase[0], newValue(oneCase[1])]
+      let eFunResult = newFunResult(newValue(oneCase[2]))
+      if not testFunction("int", parameters, eFunResult = eFunResult):
+        echo $oneCase
+        fail
+
+  test "to int: wrong number of parameters":
+    var parameters = @[newValue(4.57)]
+    let eFunResult = newFunResultWarn(wTwoParameters)
+    check testFunction("int", parameters, eFunResult = eFunResult)
+
+  test "to int: not a float number string":
+    var parameters = @[newValue("hello"), newValue("round")]
+    let eFunResult = newFunResultWarn(wFloatOrStringNumber)
+    check testFunction("int", parameters, eFunResult = eFunResult)
+
+  test "to int: not a float number string 2":
+    var parameters = @[newValue("4.57k"), newValue("round")]
+    let eFunResult = newFunResultWarn(wFloatOrStringNumber)
+    check testFunction("int", parameters, eFunResult = eFunResult)
+
+  test "to int: not a float":
+    var parameters = @[newValue(3), newValue("round")]
+    let eFunResult = newFunResultWarn(wFloatOrStringNumber)
+    check testFunction("int", parameters, eFunResult = eFunResult)
+
+  test "to int: not round option":
+    var parameters = @[newValue(3.4), newValue(5)]
+    let eFunResult = newFunResultWarn(wExpectedRoundOption, 1)
+    check testFunction("int", parameters, eFunResult = eFunResult)
+
+  test "to int: not a float":
+    var parameters = @[newValue(3.5), newValue("rounder")]
+    let eFunResult = newFunResultWarn(wExpectedRoundOption, 1)
+    check testFunction("int", parameters, eFunResult = eFunResult)
+
+  test "to int: to big":
+    var parameters = @[newValue(3.5e300), newValue("round")]
+    let eFunResult = newFunResultWarn(wNumberOverFlow)
+    check testFunction("int", parameters, eFunResult = eFunResult)
+
+  test "to int: to small":
+    var parameters = @[newValue(-3.5e300), newValue("round")]
+    let eFunResult = newFunResultWarn(wNumberOverFlow)
+    check testFunction("int", parameters, eFunResult = eFunResult)
+
+
+  test "to float":
+    var parameters = @[newValue(3)]
+    let eFunResult = newFunResult(newValue(3.0))
+    check testFunction("float", parameters, eFunResult = eFunResult)
+
+  test "to float minus":
+    var parameters = @[newValue(-3)]
+    let eFunResult = newFunResult(newValue(-3.0))
+    check testFunction("float", parameters, eFunResult = eFunResult)
+
+  test "to float from string":
+    var parameters = @[newValue("-3")]
+    let eFunResult = newFunResult(newValue(-3.0))
+    check testFunction("float", parameters, eFunResult = eFunResult)
+
+  test "to float wrong number parameters":
+    var parameters = @[newValue(4), newValue(3)]
+    let eFunResult = newFunResultWarn(wOneParameter)
+    check testFunction("float", parameters, eFunResult = eFunResult)
+
+  test "to float warning":
+    var parameters = @[newValue("abc")]
+    let eFunResult = newFunResultWarn(wIntOrStringNumber)
+    check testFunction("float", parameters, eFunResult = eFunResult)
+
+  test "to float not int":
+    var parameters = @[newValue("4.6")]
+    let eFunResult = newFunResultWarn(wIntOrStringNumber)
+    check testFunction("float", parameters, eFunResult = eFunResult)
