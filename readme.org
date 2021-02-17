@@ -417,7 +417,12 @@ You format server content in variables you create in statements.
 
 A statement is an expression consisting of a variable, an equal
 sign, and a right hand side. The right hand side is either
-another variable, a string, a number or a function. Here are some
+another variable, a string, a number or a function.
+
+All operations are done with functions except the equal
+operator. Looping is done at the command level with t.repeat.
+
+Here are some
 examples:
 
 #+BEGIN_SRC
@@ -1310,12 +1315,9 @@ generated each time a template is processed.
 :ORDERED:  t
 :END:
 
-You call a function to generate a value that you assign to a
-variable or pass to another function.
-
-You pass parameters to functions. the number and type of
-parameters depend on the function which is documented with the
-function. Some functions have optional parameters.
+Functions allow you to format variables for presentation.  They
+return a value that you either assign to a variable or pass to
+another function.
 
 New functions get added over time. the function documentation
 tells which version it appears so you know which version of
@@ -1331,7 +1333,7 @@ List of functions:
 - [[#int][int()]] -- convert a float or float number string to an int
 - [[#exists][exists()]] -- whether a variables exists
 - [[#find][find()]] -- find a substring in a string
-- [[#float][float()]] -- convert an int or int number string to a float
+- [[#floatfun][float()]] -- convert an int or int number string to a float
 - [[#format][format()]] -- format a string or a number
 - [[#get][get()]] -- get an element from a list or dictionary
 - [[#if][if()]] -- handles two conditions
@@ -1360,7 +1362,7 @@ Added in version 0.1.0.
 num = add(t.row(), 1)
 #+END_SRC
 
-[[茶]]
+[[#contents][茶]]
 
 ** case()
 :PROPERTIES:
@@ -1565,42 +1567,6 @@ concat("Tea", " ",  "Time") => 'Tea Time'
 
 [[#contents][茶]]
 
-** int()
-:PROPERTIES:
-:CUSTOM_ID: int
-:END:
-
-The int function converts a float or a float number string to an
-int.
-
--p1: value to convert, float or float number string
--p2: round options
-
-Round options:
-
-- "round" - nearest integer or, above for the middle case
-- "floor" - integer below (to the left on number line)
-- "ceiling" - integer above (to the right on number line)
-- "truncate" - remove decimals
-
-Added in version 0.1.0.
-
-Examples:
-
-#+BEGIN_SRC
-int(2.34, "round") => 2
-int(-2.34, "round") => -2
-int(4.57, "floor") => 4
-int(-4.57, "floor") => -5
-int(6.3, "ceiling") => 7
-int(-6.3, "ceiling") => -6
-int(6.3456, "truncate") => 6
-int(-6.3456, "truncate") => -6
-int("2.34", "round") => 2
-#+END_SRC
-
-[[#contents][茶]]
-
 ** exists()
 :PROPERTIES:
 :CUSTOM_ID: exists
@@ -1656,6 +1622,55 @@ result:
 
 #+BEGIN_SRC
 4
+#+END_SRC
+
+[[#contents][茶]]
+
+** float()
+:PROPERTIES:
+:CUSTOM_ID: floatfun
+:END:
+
+The float function converts an int or an number string to a
+float.
+
+Added in version 0.1.0.
+
+Note: if you want to convert a number to a string, use the format
+function.
+
+[[#contents][茶]]
+
+** format()
+:PROPERTIES:
+:CUSTOM_ID: format
+:END:
+
+The format function is a powerful way to format your
+variables. You can left, right or center the variable.  You can
+specify the number of digits after the decimal point and other
+things. For all the details see: https://nim-lang.org/docs/strformat.html.
+Added in version 0.1.0.
+
+template:
+
+#+BEGIN_SRC
+<--$ nextline cost=format(".2f", s.cost)-->
+Kathleen spent ${cost} on tea for Steve's birthday.
+#+END_SRC
+
+server json:
+
+#+BEGIN_SRC
+{
+  "cost": 52.436789
+}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+Kathleen spent $52.44 on tea for Steve's birthday.
 #+END_SRC
 
 [[#contents][茶]]
@@ -1737,51 +1752,41 @@ if(8, 'dog', 'cat') -> cat
 
 [[#contents][茶]]
 
-** float()
+** int()
 :PROPERTIES:
-:CUSTOM_ID: float
+:CUSTOM_ID: int
 :END:
 
-The float function converts an int or an int number string to a
-float.
+The int function converts a float or a number string to an
+int.
+
+- p1: value to convert, float or float number string
+- p2: optional round options. "round" is the default.
+
+Round options:
+
+- "round" - nearest integer
+- "floor" - integer below (to the left on number line)
+- "ceiling" - integer above (to the right on number line)
+- "truncate" - remove decimals
 
 Added in version 0.1.0.
 
-Note: if you want to convert a number to a string, use the format
-function.
-
-[[茶]]
-
-** format()
-:PROPERTIES:
-:CUSTOM_ID: format
-:END:
-
-The format function is a powerful way to format your
-variables. You can left, right or center the variable.  You can
-specify the number of digits after the decimal point and other
-things. For all the details see: https://nim-lang.org/docs/strformat.html.
-Added in version 0.1.0.
-
-template:
+Examples:
 
 #+BEGIN_SRC
-<--$ nextline cost=format(".2f", s.cost)-->
-Kathleen spent ${cost} on tea for Steve's birthday.
-#+END_SRC
-
-server json:
-
-#+BEGIN_SRC
-{
-  "cost": 52.436789
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-Kathleen spent $52.44 on tea for Steve's birthday.
+int("2") => 2
+int("2.34") => 2
+int(2.34, "round") => 2
+int(-2.34, "round") => -2
+int(6.5, "round") => 7
+int(-6.5, "round") => -7
+int(4.57, "floor") => 4
+int(-4.57, "floor") => -5
+int(6.3, "ceiling") => 7
+int(-6.3, "ceiling") => -6
+int(6.3456, "truncate") => 6
+int(-6.3456, "truncate") => -6
 #+END_SRC
 
 [[#contents][茶]]
@@ -1902,6 +1907,10 @@ sub1 = Grey, sub2 = Earl
 :END:
 
 The time function formats date and time values. Added in version 0.1.0.
+
+#+BEGIN_SRC
+time("2021-02-15T20:47:33Z", "%Y") => 2021
+#+END_SRC
 
 [[#contents][茶]]
 

@@ -18,6 +18,7 @@ type
     frValue,
     frWarning
 
+  # todo: remove ref, just use object?
   FunResult* = ref FunResultObj
   FunResultObj* {.acyclic.} = object
     case kind*: FunResultKind
@@ -417,9 +418,8 @@ proc funFloat*(parameters: seq[Value]): FunResult =
       # From int to float
       result = newFunResult(newValue(float(p1.intv)))
     of vkString:
-      # From int number string to float.
+      # From number string to float.
 
-      # Check that it is an int number string.
       let compiledMatchers = getCompiledMatchers()
       var matchesO = compiledMatchers.numberMatcher.getMatches(
         p1.stringv, 0)
@@ -541,6 +541,8 @@ const
 # template
   ]
 
+# todo: now function
+# todo: duration function
 # todo: add function to get the list of functions? or check whether one exists?
 
 proc getFunction*(functionName: string): Option[FunctionPtr] =
