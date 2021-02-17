@@ -18,9 +18,7 @@ type
     frValue,
     frWarning
 
-  # todo: remove ref, just use object?
-  FunResult* = ref FunResultObj
-  FunResultObj* {.acyclic.} = object
+  FunResult* = object
     case kind*: FunResultKind
       of frValue:
         value*: Value       ## Return value of the function.
@@ -428,59 +426,47 @@ proc funFloat*(parameters: seq[Value]): FunResult =
       let matches = matchesO.get()
       let decimalPoint = matches.getGroup()
       if decimalPoint == ".":
-        return newFunResultWarn(wIntOrStringNumber)
-
-      let intPosO = parseInteger(p1.stringv)
-      if not intPosO.isSome:
-        return newFunResultWarn(wNumberOverFlow)
-
-      result = newFunResult(newValue(float(intPosO.get().integer)))
+        let floatPosO = parseFloat64(p1.stringv)
+        if not floatPosO.isSome:
+          return newFunResultWarn(wNumberOverFlow)
+        result = newFunResult(newValue(floatPosO.get().number))
+      else:
+        let intPosO = parseInteger(p1.stringv)
+        if not intPosO.isSome:
+          return newFunResultWarn(wNumberOverFlow)
+        result = newFunResult(newValue(float(intPosO.get().integer)))
     else:
       return newFunResultWarn(wIntOrStringNumber)
 
 # todo: use int64 instead of BiggestInt everywhere.
 
 proc funInt*(parameters: seq[Value]): FunResult =
-  ## The int function converts a float or a float number string to an
+  ## The int function converts a float or a number string to an
   ## int.
   ##
-  ## -p1: value to convert, float or float number string
-  ## -p2: round options
+  ## - p1: value to convert, float or float number string
+  ## - p2: optional round options. "round" is the default.
   ##
   ## Round options:
-  ## - "round" - nearest integer or, above for the middle case
+  ##
+  ## - "round" - nearest integer
   ## - "floor" - integer below (to the left on number line)
   ## - "ceiling" - integer above (to the right on number line)
   ## - "truncate" - remove decimals
   ##
-  ## int(2.34, "round") => 2
-  ## int(-2.34, "round") => -2
-  ##
-  ## int(4.57, "floor") => 4
-  ## int(-4.57, "floor") => -5
-  ##
-  ## int(6.3, "ceiling") => 7
-  ## int(-6.3, "ceiling") => -6
-  ##
-  ## int(6.3456, "truncate") => 6
-  ## int(-6.3456, "truncate") => -6
-  ##
   ## Added in version 0.1.0.
 
-  if parameters.len() != 2:
-    return newFunResultWarn(wTwoParameters)
+  if parameters.len() < 1 or parameters.len() > 2:
+    return newFunResultWarn(wOneOrTwoParameters)
   var p1 = parameters[0]
-  var p2 = parameters[1]
   var num: float64
 
-  case p1.kind:
+  case p1.kind
     of vkFloat:
       # From float to int.
       num = p1.floatv
     of vkString:
-      # From float number string to int.
-
-      # Make sure it is a float number string.
+      # From number string to int.
       let compiledMatchers = getCompiledMatchers()
       var matchesO = compiledMatchers.numberMatcher.getMatches(
         p1.stringv, 0)
@@ -488,24 +474,35 @@ proc funInt*(parameters: seq[Value]): FunResult =
         return newFunResultWarn(wFloatOrStringNumber)
       let matches = matchesO.get()
       let decimalPoint = matches.getGroup()
-      if decimalPoint != "." or matches.length != len(p1.stringv):
-        return newFunResultWarn(wFloatOrStringNumber)
-
-      let floatPosO = parseFloat64(p1.stringv)
-      if not floatPosO.isSome:
-        return newFunResultWarn(wFloatOrStringNumber)
-      num = floatPosO.get().number
-
+      if decimalPoint == ".":
+        # Float number string to int.
+        let floatPosO = parseFloat64(p1.stringv)
+        if not floatPosO.isSome:
+          return newFunResultWarn(wFloatOrStringNumber)
+        num = floatPosO.get().number
+      else:
+        # Int number string to int.
+        let intPosO = parseInteger(p1.stringv)
+        if not intPosO.isSome:
+          return newFunResultWarn(wNumberOverFlow)
+        return newFunResult(newValue(intPosO.get().integer))
     else:
       return newFunResultWarn(wFloatOrStringNumber)
 
   if num > float(high(int64)) or num < float(low(int64)):
     return newFunResultWarn(wNumberOverFlow)
 
-  if p2.kind != vkString:
-    return newFunResultWarn(wExpectedRoundOption, 1)
+  var option: string
+  if parameters.len() == 2:
+    let p2 = parameters[1]
+    if p2.kind != vkString:
+      return newFunResultWarn(wExpectedRoundOption, 1)
+    option = p2.stringv
+  else:
+    option = "round"
+
   var ret: int64
-  case p2.stringv:
+  case option
     of "round":
       ret = int(round(num))
     of "ceiling":

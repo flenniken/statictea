@@ -435,6 +435,9 @@ suite "runFunction.nim":
       (newValue("-6.3"), "ceiling", -6),
       (newValue("6.3456"), "truncate", 6),
       (newValue("-6.3456"), "truncate", -6),
+
+      (newValue("2"), "round", 2),
+      (newValue("-2"), "round", -2),
     ]
     for oneCase in testCases:
       var parameters = @[oneCase[0], newValue(oneCase[1])]
@@ -443,18 +446,18 @@ suite "runFunction.nim":
         echo $oneCase
         fail
 
-  test "to int: wrong number of parameters":
+  test "to int: default":
     var parameters = @[newValue(4.57)]
-    let eFunResult = newFunResultWarn(wTwoParameters)
+    let eFunResult = newFunResult(newValue(5))
     check testFunction("int", parameters, eFunResult = eFunResult)
 
-  test "to int: not a float number string":
+  test "to int: wrong number of parameters":
+    var parameters = @[newValue(4.57), newValue(1), newValue(2)]
+    let eFunResult = newFunResultWarn(wOneOrTwoParameters)
+    check testFunction("int", parameters, eFunResult = eFunResult)
+
+  test "to int: not a number string":
     var parameters = @[newValue("hello"), newValue("round")]
-    let eFunResult = newFunResultWarn(wFloatOrStringNumber)
-    check testFunction("int", parameters, eFunResult = eFunResult)
-
-  test "to int: not a float number string 2":
-    var parameters = @[newValue("4.57k"), newValue("round")]
     let eFunResult = newFunResultWarn(wFloatOrStringNumber)
     check testFunction("int", parameters, eFunResult = eFunResult)
 
@@ -499,6 +502,11 @@ suite "runFunction.nim":
     let eFunResult = newFunResult(newValue(-3.0))
     check testFunction("float", parameters, eFunResult = eFunResult)
 
+  test "to float from string 2":
+    var parameters = @[newValue("-3.5")]
+    let eFunResult = newFunResult(newValue(-3.5))
+    check testFunction("float", parameters, eFunResult = eFunResult)
+
   test "to float wrong number parameters":
     var parameters = @[newValue(4), newValue(3)]
     let eFunResult = newFunResultWarn(wOneParameter)
@@ -506,10 +514,5 @@ suite "runFunction.nim":
 
   test "to float warning":
     var parameters = @[newValue("abc")]
-    let eFunResult = newFunResultWarn(wIntOrStringNumber)
-    check testFunction("float", parameters, eFunResult = eFunResult)
-
-  test "to float not int":
-    var parameters = @[newValue("4.6")]
     let eFunResult = newFunResultWarn(wIntOrStringNumber)
     check testFunction("float", parameters, eFunResult = eFunResult)

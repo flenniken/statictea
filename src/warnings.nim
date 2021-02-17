@@ -89,6 +89,7 @@ type
     wIntOrStringNumber,    # w80
     wFloatOrStringNumber,  # w81
     wExpectedRoundOption,  # w82
+    wOneOrTwoParameters,   # w83
 
 tpubType:
   const
@@ -178,6 +179,7 @@ tpubType:
       "Expected int or int number string.", # wIntOrStringNumber
       "Expected a float or float number string.", # wFloatOrStringNumber
       "Expected round, floor, ceiling or truncate.", # wExpectedRoundOption
+      "The function takes one or two parameters.", # wOneOrTwoParameters
     ]
 
 func getWarning*(filename: string, lineNum: int,
