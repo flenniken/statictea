@@ -538,6 +538,7 @@ const
 # template
   ]
 
+# todo: encoding html attributes, body, javascript, css, json, etc.
 # todo: now function
 # todo: duration function
 # todo: add function to get the list of functions? or check whether one exists?
