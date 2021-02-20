@@ -177,7 +177,7 @@ The following example uses a common header from the shared json.
 template:
 
 #+BEGIN_SRC
-<!--$ replace t.content="h.header" -->
+<!--$ replace t.content=h.header -->
 <!--$ endblock -->
 #+END_SRC
 
@@ -207,7 +207,7 @@ result, just the data from the json header variable.
 template:
 
 #+BEGIN_SRC
-<!--$ replace t.content="h.header" -->
+<!--$ replace t.content=h.header -->
 <!doctype html>
 <html lang="en">
 <!--$ endblock -—>
@@ -232,7 +232,7 @@ another html header example:
 template:
 
 #+BEGIN_SRC
-<!--$ replace t.content="h.header" -->
+<!--$ replace t.content=h.header -->
 <!DOCTYPE html>
 <html lang="{s.languageCode}" dir="{s.languageDirection}">
 <head>
@@ -624,7 +624,7 @@ You assign it the name of the variable as a string, not the
 variables value. For example:
 
 #+BEGIN_SRC
-t.content = "h.header"
+t.content = h.header
 #+END_SRC
 
 It's done this way so the --update option knows the name of the
@@ -1311,20 +1311,40 @@ allowed in quoted strings. The maximum command line length is
 :CUSTOM_ID: update-option
 :END:
 
-The --update option updates the json file with the current
-content of the replacement blocks. It scans the template for each
-replacement block and writes it to the associated variable in the
-json file.
+The --update option updates the template's replace blocks to
+match their t.content text.  The text normally comes from the
+shared template files but it doesn't have to.
 
-The t.content values tells which variables to update.
-
-The content is merged into the json file, other existing json
-data is untouched. You can update one json file and it is
-specified on the command line.
+You use this to keep the template blocks in sync with the shared
+content so you can work with them was static pages.
 
 #+BEGIN_SRC
-statictea --update shared.json \
-   --template mytea.html
+statictea \
+  --server server.json \
+  --shared shared.json \
+  --template template.html \
+  --update
+#+END_SRC
+
+** Update Json :noexport:
+:PROPERTIES:
+:CUSTOM_ID: update-json
+:END:
+
+The --updateJson option updates a json file with the current
+content of the template's replacement blocks. It's the reverse of
+the --update option.
+
+The content is merged into the json file, other existing json
+data is untouched.  The name of each block of data comes from the
+block's t.content variable name.  The variable name is made up if
+needed.
+
+You specify the json file to update on the command line.
+
+#+BEGIN_SRC
+statictea --updateJson shared.json
+  --template mytea.html
 #+END_SRC
 
 [[#contents][茶]]
