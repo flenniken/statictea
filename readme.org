@@ -1326,27 +1326,6 @@ statictea \
   --update
 #+END_SRC
 
-** Update Json :noexport:
-:PROPERTIES:
-:CUSTOM_ID: update-json
-:END:
-
-The --updateJson option updates a json file with the current
-content of the template's replacement blocks. It's the reverse of
-the --update option.
-
-The content is merged into the json file, other existing json
-data is untouched.  The name of each block of data comes from the
-block's t.content variable name.  The variable name is made up if
-needed.
-
-You specify the json file to update on the command line.
-
-#+BEGIN_SRC
-statictea --updateJson shared.json
-  --template mytea.html
-#+END_SRC
-
 [[#contents][茶]]
 
 ** Log File
