@@ -1316,7 +1316,7 @@ match their t.content text.  The text normally comes from the
 shared template files but it doesn't have to.
 
 You use this to keep the template blocks in sync with the shared
-content so you can work with them was static pages.
+content so you can work with them as static pages.
 
 #+BEGIN_SRC
 statictea \

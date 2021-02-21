@@ -21,7 +21,7 @@ proc processArgs(env: var Env, args: Args): int =
     env.writeOut(staticteaVersion)
     result = 0
   elif args.update:
-    echo "updateTemplate(args)"
+    result = updateTemplateTop(env, args)
   elif args.templateList.len > 0:
     result = processTemplateTop(env, args)
   else:

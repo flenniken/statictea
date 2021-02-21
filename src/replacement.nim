@@ -416,7 +416,8 @@ proc storeLineSegments*(env: var Env, tempSegments: TempSegments,
 
 iterator yieldReplacementLine*(env: var Env, variables: Variables, command: string, lb: var
     LineBuffer, compiledMatchers: Compiledmatchers): string =
-  ## Yield all the replacement block lines.
+  ## Yield all the replacement block lines and the endblock line
+  ## too. When no endblock line return "" as the last line.
 
   var maxLines = getTeaVarInt(variables, "maxLines")
 
@@ -425,22 +426,26 @@ iterator yieldReplacementLine*(env: var Env, variables: Variables, command: stri
   while true:
     # For the nextline command, read and process one line.
     if command == "nextline" and count >= 1:
+      yield("")
       break
 
     # Stop when we reach the maximum line count for a replacement block.
     if count >= maxLines:
       env.warn(lb.lineNum, wExceededMaxLine)
+      yield("")
       break
 
     # Read the next template replacement block line.
     let line = lb.readline()
     if line == "":
+      yield("")
       break # No more lines.
 
     # Look for an endblock command and stop when found.
     var linePartsO = parseCmdLine(env, compiledMatchers, line, lb.lineNum)
     if linePartsO.isSome:
       if linePartsO.get().command == "endblock":
+        yield(line)
         break # done, found endblock
 
     yield(line)

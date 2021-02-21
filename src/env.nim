@@ -219,6 +219,30 @@ proc addExtraStreams*(env: var Env, args: Args): bool =
 
   result = addExtraStreams(env, templateFilename, resultFilename)
 
+# todo: test the case where the template file is the same as the result file.
+
+proc addExtraStreamsForUpdate*(env: var Env, args: Args): bool =
+  ## For the update case, add the template and result streams to the
+  ## environment. Return true on success.
+
+  # Get the template filename.
+  assert args.templateList.len > 0
+  if args.templateList.len > 1:
+    let skipping = join(args.templateList[1..^1], ", ")
+    env.warn(0, wOneTemplateAllowed, skipping)
+  let templateFilename = args.templateList[0]
+
+  # Create a temp file for the result.  Rename it to the template
+  # filename at the end.
+  # todo: create a temp file.
+
+  # Write the updated template to standard out.
+  let resultFilename = ""
+
+  # todo: determine what to do with args.resultFilename
+
+  result = addExtraStreams(env, templateFilename, resultFilename)
+
 when defined(test):
   proc splitNewLines*(content: string): seq[string] =
     ## Split lines and keep the line endings. Works with \n and \r\n

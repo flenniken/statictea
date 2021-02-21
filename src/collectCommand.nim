@@ -6,7 +6,7 @@ import options
 import parseCmdLine
 import warnings
 
-proc dumpCmdLines(resultStream: Stream, cmdLines: var seq[string],
+proc dumpCmdLines*(resultStream: Stream, cmdLines: var seq[string],
                   cmdLineParts: var seq[LineParts], line: string) =
   ## Write the stored command lines and the current line to the result
   ## stream and empty the stored commands.

@@ -49,6 +49,47 @@ proc testProcessTemplate(templateContent: string = "",
   discard tryRemoveFile("server.json")
   discard tryRemoveFile("shared.json")
 
+proc testUpdateTemplate(templateContent: string = "",
+    serverJson: string = "",
+    sharedJson: string = "",
+    eRc = 0,
+    eResultLines: seq[string] = @[],
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[],
+    showLog: bool = false
+  ): bool =
+  ## Test the updateTemplate procedure.
+
+  # Open err, out and log streams.
+  var env = openEnvTest("_testUpdateTemplate.log", templateContent)
+
+  var args: Args
+
+  # Create the server json file.
+  if serverJson != "":
+    let serverFilename = "server.json"
+    createFile(serverFilename, serverJson)
+    args.serverList = @[serverFilename]
+
+  # Create the shared json file.
+  if sharedJson != "":
+    let sharedFilename = "shared.json"
+    createFile(sharedFilename, sharedJson)
+    args.sharedList = @[sharedFilename]
+
+  # Update the template and write out the result.
+  let rc = updateTemplate(env, args)
+
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines,
+    eResultLines = eResultLines, showLog = showLog)
+
+  if not expectedItem("rc", rc, eRc):
+    result = false
+
+  discard tryRemoveFile("server.json")
+  discard tryRemoveFile("shared.json")
+
 proc testYieldcontentline(content: string, eLines: seq[string] = @[]): bool =
   var lines = newSeq[string]()
   for line in yieldContentLine(content):
@@ -828,3 +869,51 @@ statictea version number: {t.version}
       "statictea version number: 0.1.0\n" % staticteaVersion
     ]
     check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
+
+  test "update empty template":
+    let templateContent = ""
+    let eResultLines: seq[string] = @[]
+    check testUpdateTemplate(templateContent = templateContent, eResultLines = eResultLines)
+
+  test "update one line no lf":
+    let templateContent = "hi there"
+    let eResultLines = splitNewLines templateContent
+    check testUpdateTemplate(templateContent = templateContent, eResultLines = eResultLines)
+
+  test "update one line with lf":
+    let templateContent = """
+hi there
+"""
+    let eResultLines = splitNewLines templateContent
+    check testUpdateTemplate(templateContent = templateContent, eResultLines = eResultLines)
+
+  test "update multiple plain lines":
+    let templateContent = """
+hi there
+update me
+nothing special
+here
+"""
+    let eResultLines = splitNewLines templateContent
+    check testUpdateTemplate(templateContent = templateContent, eResultLines = eResultLines)
+
+  test "update nextline":
+    let templateContent = """
+line
+<!--$ nextline -->
+replacement block
+ending line
+"""
+    let eResultLines = splitNewLines templateContent
+    check testUpdateTemplate(templateContent = templateContent, eResultLines = eResultLines)
+
+  test "update block":
+    let templateContent = """
+line
+<!--$ block -->
+replacement block
+<!--$ endblock -->
+ending line
+"""
+    let eResultLines = splitNewLines templateContent
+    check testUpdateTemplate(templateContent = templateContent, eResultLines = eResultLines)

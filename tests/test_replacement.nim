@@ -27,8 +27,11 @@ proc testTempSegments(templateContent: string, command: string = "nextline", rep
   if not isSome(tempSegmentsO):
     return false
   var tempSegments = tempSegmentsO.get()
+  var previousLine = ""
   for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
-    storeLineSegments(env, tempSegments, compiledMatchers, line)
+    if previousLine != "":
+      storeLineSegments(env, tempSegments, compiledMatchers, previousLine)
+    previousLine = line
   writeTempSegments(env, tempSegments, lb.lineNum, variables)
   closeDelete(tempSegments)
 
