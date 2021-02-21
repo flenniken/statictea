@@ -917,3 +917,137 @@ ending line
 """
     let eResultLines = splitNewLines templateContent
     check testUpdateTemplate(templateContent = templateContent, eResultLines = eResultLines)
+
+  test "update replace":
+    let sharedJson = """
+{
+ "header": "<html>\n"
+}
+"""
+    let templateContent = """
+line
+<!--$ replace t.content = h.header -->
+replacement block
+<!--$ endblock -->
+ending line
+"""
+    let eResultLines = splitNewLines """
+line
+<!--$ replace t.content = h.header -->
+<html>
+<!--$ endblock -->
+ending line
+"""
+    check testUpdateTemplate(templateContent = templateContent, sharedJson = sharedJson,
+                                               eResultLines = eResultLines)
+
+  test "update replace":
+    let sharedJson = """
+{
+ "header": "<html>\n"
+}
+"""
+    let templateContent = """
+line
+<!--$ replace t.content = h.header -->
+replacement block
+<!--$ endblock -->
+ending line
+"""
+    let eResultLines = splitNewLines """
+line
+<!--$ replace t.content = h.header -->
+<html>
+<!--$ endblock -->
+ending line
+"""
+    check testUpdateTemplate(templateContent = templateContent, sharedJson = sharedJson,
+                                               eResultLines = eResultLines)
+
+  test "update replace two lines":
+
+    let sharedJson = """
+{
+  "header": "<!doctype html>\n<html lang=\"en\">\n"
+}
+"""
+    let templateContent = """
+line
+<!--$ replace t.content = h.header -->
+replacement block
+asdf
+asdfasdf
+<!--$ endblock -->
+ending line
+"""
+    let eResultLines = splitNewLines """
+line
+<!--$ replace t.content = h.header -->
+<!doctype html>
+<html lang="en">
+<!--$ endblock -->
+ending line
+"""
+    check testUpdateTemplate(templateContent = templateContent, sharedJson = sharedJson,
+                                               eResultLines = eResultLines)
+
+  test "update replace multiple commands":
+
+    let sharedJson = """
+{
+  "header": "<!doctype html>\n<html lang=\"en\">\n"
+}
+"""
+    let templateContent = """
+<!--$ nextline \-->
+<!--$ : a = "b" \-->
+<!--$ : b = "c" -->
+{a}, {b}
+<!--$ replace t.content = h.header -->
+replacement block
+asdf
+asdfasdf
+<!--$ endblock -->
+<!--$ nextline -->
+asdfasdfsdff
+<!-- # last line -->
+"""
+    let eResultLines = splitNewLines """
+<!--$ nextline \-->
+<!--$ : a = "b" \-->
+<!--$ : b = "c" -->
+{a}, {b}
+<!--$ replace t.content = h.header -->
+<!doctype html>
+<html lang="en">
+<!--$ endblock -->
+<!--$ nextline -->
+asdfasdfsdff
+<!-- # last line -->
+"""
+    check testUpdateTemplate(templateContent = templateContent, sharedJson = sharedJson,
+                                               eResultLines = eResultLines)
+
+  test "update no content":
+    let templateContent = """
+line
+<!--$ replace  -->
+replacement block
+asdf
+asdfasdf
+<!--$ endblock -->
+ending line
+"""
+    let eResultLines = splitNewLines templateContent
+    let eErrLines = splitNewLines """
+template.html(2): w68: The t.content variable is not set for the replace command, treating it like the block command.
+"""
+    check testUpdateTemplate(templateContent = templateContent,
+      eResultLines = eResultLines, eErrLines = eErrLines, eRc = 1)
+
+# todo: test content that does not end with a newline.
+# todo: test literal strings with \n etc. in them.  Are these supported?
+# todo: test with no result file.
+# todo: test that the template file gets updated
+# todo: test that there is an error when the user specifies a result file.
+# todo: support result file equal the template file?
