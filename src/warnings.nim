@@ -90,6 +90,7 @@ type
     wFloatOrStringNumber,  # w81
     wExpectedRoundOption,  # w82
     wOneOrTwoParameters,   # w83
+    wMissingNewLineContent, # w84
 
 tpubType:
   const
@@ -180,6 +181,7 @@ tpubType:
       "Expected a float or float number string.", # wFloatOrStringNumber
       "Expected round, floor, ceiling or truncate.", # wExpectedRoundOption
       "The function takes one or two parameters.", # wOneOrTwoParameters
+      "The t.content does not end with a newline, adding one.", # wMissingNewLineContent
     ]
 
 func getWarning*(filename: string, lineNum: int,

@@ -1045,6 +1045,25 @@ template.html(2): w68: The t.content variable is not set for the replace command
     check testUpdateTemplate(templateContent = templateContent,
       eResultLines = eResultLines, eErrLines = eErrLines, eRc = 1)
 
+  test "update content no newline":
+    let templateContent = """
+<!--$ replace t.content = "no newline" -->
+replacement block
+asdf
+asdfasdf
+<!--$ endblock -->
+"""
+    let eResultLines = splitNewLines """
+<!--$ replace t.content = "no newline" -->
+no newline
+<!--$ endblock -->
+"""
+    let eErrLines = splitNewLines """
+template.html(5): w84: The t.content does not end with a newline, adding one.
+"""
+    check testUpdateTemplate(templateContent = templateContent,
+      eResultLines = eResultLines, eErrLines = eErrLines, eRc = 1)
+
 # todo: test content that does not end with a newline.
 # todo: test literal strings with \n etc. in them.  Are these supported?
 # todo: test with no result file.
