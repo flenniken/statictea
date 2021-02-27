@@ -14,6 +14,7 @@ import vartypes
 import tables
 import replacement
 import streams
+import os
 
 #[
 
@@ -293,9 +294,29 @@ proc updateTemplateTop*(env: var Env, args: Args): int =
   ## Update the template and return 0 on success. It's an error when
   ## a warning messages was written.
 
-  # Add the template and result streams to the environment.
+  # Add the template and result streams to the environment. Result
+  # file is either a temp file or standard out.
   if not env.addExtraStreamsForUpdate(args):
     return 1
 
   # Update the template.
   result = updateTemplate(env, args)
+
+  # When the template is coming from a file, update it from the temp
+  # file.
+  if env.templateFilename != "":
+
+    # Close the template and result files.
+    env.templateStream.close()
+    env.templateStream = nil
+    env.resultStream.close()
+    env.resultStream = nil
+
+    # Rename the temp file overwriting the template file.
+    try:
+      moveFile(env.resultFilename, env.templateFilename)
+    except OSError:
+      env.warn(0, wUnableToRenameTemp)
+      # Delete the temp file.
+      discard tryRemoveFile(env.resultFilename)
+      result = 1

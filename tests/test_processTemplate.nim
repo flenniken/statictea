@@ -20,7 +20,7 @@ proc testProcessTemplate(templateContent: string = "",
   ): bool =
   ## Test the processTemplate procedure.
 
-  # Open err, out and log streams.
+  # Open err, out, template and log streams.
   var env = openEnvTest("_testProcessTemplate.log", templateContent)
 
   var args: Args
@@ -57,9 +57,10 @@ proc testUpdateTemplate(templateContent: string = "",
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[],
+    eTemplateLines: seq[string] = @[],
     showLog: bool = false
   ): bool =
-  ## Test the updateTemplate procedure.
+  ## Test the updateTemplate path.
 
   # Open err, out and log streams.
   var env = openEnvTest("_testUpdateTemplate.log", templateContent)
@@ -82,7 +83,7 @@ proc testUpdateTemplate(templateContent: string = "",
   let rc = updateTemplate(env, args)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines,
-    eResultLines = eResultLines, showLog = showLog)
+    eResultLines = eResultLines, eTemplateLines = eTemplateLines, showLog = showLog)
 
   if not expectedItem("rc", rc, eRc):
     result = false
@@ -1064,7 +1065,6 @@ template.html(5): w84: The t.content does not end with a newline, adding one.
     check testUpdateTemplate(templateContent = templateContent,
       eResultLines = eResultLines, eErrLines = eErrLines, eRc = 1)
 
-# todo: test content that does not end with a newline.
 # todo: test literal strings with \n etc. in them.  Are these supported?
 # todo: test with no result file.
 # todo: test that the template file gets updated

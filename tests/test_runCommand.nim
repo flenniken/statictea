@@ -93,7 +93,7 @@ proc testGetStatements(content: string, expected: string): bool =
 
   var statements = getStatements(cmdLines, cmdLineParts)
 
-  let (logLines, errLines, outLines, resultLines) = env.readCloseDeleteEnv()
+  let (logLines, errLines, outLines, resultLines, templateLines) = env.readCloseDeleteEnv()
 
   result = true
   if not compareStatements(statements, expected):

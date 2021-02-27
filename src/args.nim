@@ -15,6 +15,8 @@ type
     prepostList*: seq[Prepost]
     resultFilename*: string
 
+# todo: support or remove nolog option.
+
 func `$`*(args: Args): string =
   ## A string representation of Args.
   result = """

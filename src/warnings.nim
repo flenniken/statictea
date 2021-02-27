@@ -91,6 +91,9 @@ type
     wExpectedRoundOption,  # w82
     wOneOrTwoParameters,   # w83
     wMissingNewLineContent, # w84
+    wResultFileNotAllowed, # w85
+    wUnableToOpenTempFile, # w86
+    wUnableToRenameTemp,   # w87
 
 tpubType:
   const
@@ -182,6 +185,9 @@ tpubType:
       "Expected round, floor, ceiling or truncate.", # wExpectedRoundOption
       "The function takes one or two parameters.", # wOneOrTwoParameters
       "The t.content does not end with a newline, adding one.", # wMissingNewLineContent
+      "The update option overwrites the template, no result file allowed.", # wResultFileNotAllowed
+      "Unable to open temporary file.", # wUnableToOpenTempFile
+      "Unable to rename temporary file over template file.", # wUnableToRenameTemp
     ]
 
 func getWarning*(filename: string, lineNum: int,

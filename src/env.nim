@@ -5,6 +5,7 @@ import strutils
 import args
 import times
 import sets
+import tempfile
 when defined(test):
   import options
   # import regexes
@@ -220,10 +221,19 @@ proc addExtraStreams*(env: var Env, args: Args): bool =
   result = addExtraStreams(env, templateFilename, resultFilename)
 
 # todo: test the case where the template file is the same as the result file.
+# todo: test where a resultFilename is specified with update.
+# todo: test update with two template filenames.
+# todo: test with template of "stdin" when update is specified.
+# todo: test update when the template is readonly.j
 
 proc addExtraStreamsForUpdate*(env: var Env, args: Args): bool =
   ## For the update case, add the template and result streams to the
   ## environment. Return true on success.
+
+  # Warn and exit when a resultFilename is specified.
+  if args.resultFilename != "":
+    env.warn(0, wResultFileNotAllowed)
+    return false
 
   # Get the template filename.
   assert args.templateList.len > 0
@@ -232,18 +242,29 @@ proc addExtraStreamsForUpdate*(env: var Env, args: Args): bool =
     env.warn(0, wOneTemplateAllowed, skipping)
   let templateFilename = args.templateList[0]
 
-  # Create a temp file for the result.  Rename it to the template
-  # filename at the end.
-  # todo: create a temp file.
-
-  # Write the updated template to standard out.
-  let resultFilename = ""
-
-  # todo: determine what to do with args.resultFilename
+  # If you specify "stdin" for the template, the template comes from
+  # stdin and the output goes to standard out.
+  var resultFilename: string
+  if templateFilename != "stdin":
+    # Create a temp file for the result.  Rename it to the template
+    # filename at the end.
+    var tempFileO = openTempFile()
+    if not tempFileO.isSome():
+      env.warn(0, wUnableToOpenTempFile)
+      return false
+    var tempFile = tempFileO.get()
+    tempFile.file.close()
+    resultFilename = tempFile.filename
 
   result = addExtraStreams(env, templateFilename, resultFilename)
 
 when defined(test):
+  proc createFile*(filename: string, content: string) =
+    ## Create a file with the given content.
+    var file = open(filename, fmWrite)
+    file.write(content)
+    file.close()
+
   proc splitNewLines*(content: string): seq[string] =
     ## Split lines and keep the line endings. Works with \n and \r\n
     ## type endings.
@@ -290,7 +311,8 @@ when defined(test):
       logLines: seq[string],
       errLines: seq[string],
       outLines: seq[string],
-      resultLines: seq[string]] =
+      resultLines: seq[string],
+      templateLines: seq[string]] =
     ## Read the env's streams, then close and delete them. Return the
     ## streams content.
 
@@ -299,11 +321,12 @@ when defined(test):
       result.errLines = env.errStream.readAndClose()
     if env.closeOutStream:
       result.outLines = env.outStream.readAndClose()
-    if env.closeTemplateStream:
-      env.templateStream.close()
-      env.templateStream = nil
     if env.closeResultStream:
       result.resultLines = env.resultStream.readAndClose()
+    if env.closeTemplateStream:
+      result.templateLines = env.templateStream.readAndClose()
+      discard tryRemoveFile(env.templateFilename)
+
 
   proc expectedItem*[T](name: string, item: T, expectedItem: T): bool =
     ## Compare the item with the expected item and show them when
@@ -434,22 +457,25 @@ when defined(test):
 
   proc openEnvTest*(logFilename: string, templateContent: string = ""): Env =
     ## Return an Env object with open log, error, out, template and
-    ## result streams. The given log file is used for the log stream.
-    ## The error, out, template and result streams get created as
-    ## string type streams. The templateContent string is written to
-    ## the templateStream. The env templateFilename is set to
-    ## "template.html" and is only used for error messages.
+    ## result streams. The given log file is used for the log
+    ## stream. A template file is created from the template content.
+    ## The error, out, and result streams get created as string type
+    ## streams.
+
+    var templateFilename = "template.html"
+    createFile(templateFilename, templateContent)
+    let templateStream = newFileStream(templateFilename, fmRead)
+    assert templateStream != nil
 
     result = Env(
       errStream: newStringStream(), closeErrStream: true,
       outStream: newStringStream(), closeOutStream: true,
-      templateFilename: "template.html",
+      templateFilename: templateFilename,
+      templateStream: templateStream,
+      closeTemplateStream: true,
     )
     openLogFile(result, logFilename)
     checkLogSize(result)
-
-    result.templateStream = newStringStream(templateContent)
-    result.closeTemplateStream = true
 
     result.resultStream = newStringStream()
     result.closeResultStream = true
@@ -459,15 +485,17 @@ when defined(test):
       eErrLines: seq[string] = @[],
       eOutLines: seq[string] = @[],
       eResultLines: seq[string] = @[],
+      eTemplateLines: seq[string] = @[],
       showLog: bool = false
     ): bool =
     ## Read the env streams then close and delete them. Compare the
     ## streams with the expected content. Return true when they are
     ## the same. For the log lines compare verifies that all the
     ## expected lines compare and ignores the other lines that may
-    ## exist.
+    ## exist. The template lines are ignored when eTemplateLines is
+    ## not set.
     result = true
-    let (logLines, errLines, outLines, resultLines) = env.readCloseDeleteEnv()
+    let (logLines, errLines, outLines, resultLines, templateLines) = env.readCloseDeleteEnv()
 
     if showLog:
       echo "------- log lines:"
@@ -483,8 +511,9 @@ when defined(test):
     if not expectedItems("resultLines", resultLines, eResultLines):
       result = false
 
-  proc createFile*(filename: string, content: string) =
-    ## Create a file with the given content.
-    var file = open(filename, fmWrite)
-    file.write(content)
-    file.close()
+    if eTemplateLines.len > 0:
+      if not expectedItems("templateLines", templateLines, eTemplateLines):
+        result = false
+
+# todo: checkLogSize(result) won't work for remote logging over the network.
+# todo: test stdin for a template.
