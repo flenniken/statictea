@@ -180,3 +180,5 @@ awk '{printf "include %s\n", $0}' > tests/testall.nim
   let cmd = get_test_module_cmd("testall.nim")
   exec cmd
   exec "rm tests/testall.nim"
+  # Make sure it builds with test undefined.
+  exec "nimble build"

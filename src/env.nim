@@ -6,8 +6,8 @@ import args
 import times
 import sets
 import tempfile
+import options
 when defined(test):
-  import options
   # import regexes
   import readlines
 
