@@ -210,6 +210,8 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
       for line in yieldContentLine(content):
         env.resultStream.write(line)
 
+      # If the content does not end with a newline, add one and output
+      # a warning.
       if content.len > 0 and content[^1] != '\n':
         env.warn(lb.lineNum, wMissingNewLineContent)
         env.resultStream.write('\n')

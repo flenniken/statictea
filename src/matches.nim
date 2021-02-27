@@ -224,6 +224,10 @@ proc getCompiledMatchers*(prepostTable: PrepostTable): CompiledMatchers =
   result.leftBracketMatcher = getLeftBracketMatcher()
   result.tabSpaceMatcher = getTabSpaceMatcher()
 
+proc getCompiledMatchers*(): CompiledMatchers =
+  ## Get the compiled matchers using the default prepost items.
+  result = getCompiledMatchers(getDefaultPrepostTable())
+
 when defined(test):
   proc checkGetLastPart*(matcher: Matcher, line: string, expectedStart: Natural,
       expected: seq[string], expectedLength: Natural): bool =
@@ -231,7 +235,3 @@ when defined(test):
     result = checkMatches(matchesO, matcher, line, expectedStart,
       expected, expectedLength)
 
-  proc getCompiledMatchers*(): CompiledMatchers =
-    ## Get the compile matchers for testing.  It uses the default
-    ## prepost items.
-    result = getCompiledMatchers(getDefaultPrepostTable())

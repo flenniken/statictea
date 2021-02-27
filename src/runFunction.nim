@@ -411,13 +411,12 @@ proc funFloat*(parameters: seq[Value]): FunResult =
   if parameters.len() != 1:
     return newFunResultWarn(wOneParameter)
   var p1 = parameters[0]
-  case p1.kind:
+  case p1.kind
     of vkInt:
       # From int to float
       result = newFunResult(newValue(float(p1.intv)))
     of vkString:
       # From number string to float.
-
       let compiledMatchers = getCompiledMatchers()
       var matchesO = compiledMatchers.numberMatcher.getMatches(
         p1.stringv, 0)

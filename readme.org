@@ -215,19 +215,11 @@ template:
 
 The template replacement block may get out of sync with the
 variable.  You can update the replacement block to match the
-variable with the update option.
-
-The following example updates the mytea.html template's
-replacement blocks to match their variables in the shared.json
-file:
-
-#+BEGIN_SRC
-statictea --update shared.json \
-   --template mytea.html
-#+END_SRC
+variable with the update option.  See [[#update-option][Update Option]] for an
+example.
 
 The shared variable may contain replacement content too.  Here is
-another html header example:
+an example of that:
 
 template:
 
@@ -572,7 +564,7 @@ common template fragments and other presentation needs.
    :END:
 
 You create local variables with template statements.  They are
-local to the block where they are defined.  They are processed
+local to the command where they are defined.  They are processed
 from left to right.  There is no prefix for local variables. They
 are stored in the t.local dictionary. The local variables are
 cleared and recalculated for each repeated block.
@@ -585,7 +577,7 @@ cleared and recalculated for each repeated block.
     :END:
 
 Like local variables, you create global variables with template
-statements.  All blocks have access to them.  You access them
+statements.  All commands have access to them.  You access them
 with "g." prefix.  They are stored in the t.global dictionary.
 
 [[#contents][茶]]
@@ -599,7 +591,7 @@ The built in tea variables are prefixed with "t." and they
 control how the replacement block works.
 
 - [[#tcontent][t.content]] -- content of the replace block
-- [[#tlocal][t.local]] -- dictionary containing the current block's local variables.
+- [[#tlocal][t.local]] -- dictionary containing the current command's local variables.
 - [[#tglobal][t.global]] -- dictionary containing the global variables.
 - [[#tmaxrepeat][t.maxRepeat]] -- maximum number of times to repeat the block
 - [[#tmaxlines][t.maxLines]] -- maximum number of replacement block lines (lines before endblock)
@@ -620,16 +612,12 @@ control how the replacement block works.
 The t.content variable determines the content used for the
 whole replace block.
 
-You assign it the name of the variable as a string, not the
-variables value. For example:
-
 #+BEGIN_SRC
 t.content = h.header
 #+END_SRC
 
-It's done this way so the --update option knows the name of the
-variable to update in the json file. See [[#update-option][Update Option]] for more
-information.
+You use [[#update-option][Update Option]] to keep the block in sync with the
+variable.
 
 When the t.content is not set, the command behaves like a block
 command except a warning message is output. This is good for
@@ -638,8 +626,6 @@ warning reminds you to set the variable when you're done testing.
 
 The variable only applies to the replace command. See the
 [[#replace-command][replace command]] section for an example.
-
-Added in version 0.1.0.
 
 [[#contents][茶]]
 
@@ -651,8 +637,6 @@ Added in version 0.1.0.
 The t.local variable is the dictionary of local variables for the
 current command.
 
-Added in version 0.1.0.
-
 [[#contents][茶]]
 
 *** t.global
@@ -662,8 +646,6 @@ Added in version 0.1.0.
 
 The t.global variable is the dictionary of the global variables.
 
-Added in version 0.1.0.
-
 [[#contents][茶]]
 
 *** t.maxRepeat
@@ -671,7 +653,7 @@ Added in version 0.1.0.
   :CUSTOM_ID: tmaxrepeat
   :END:
 
-The t.maxRepeat variable determines the maxiumum times a block
+The t.maxRepeat variable determines the maximum times a block
 can repeat.  The default is 100. You cannot assign a number to
 t.repeat bigger than maxRepeat. A warning message is generated
 when you try.
@@ -682,7 +664,6 @@ expected range of blocks.
 
 You can increase this t.maxRepeat to repeat more times.
 
-Added in version 0.1.0.
 [[#contents][茶]]
 
 *** t.maxLines
@@ -701,8 +682,6 @@ the endblock command.
 You can increase this value to support blocks with more lines by
 setting the t.maxLines system variable.
 
-Added in version 0.1.0.
-
 #+BEGIN_SRC
 <!--$ block t.maxLines=20 -->
 #+END_SRC
@@ -715,15 +694,12 @@ Added in version 0.1.0.
     :END:
 
 The t.output variable determines where the block output goes.  By
-default it goes to the result file specified when you run
-statictea.
+default it goes to the result file.
 
 - "result" -- the block output goes to the result file (default)
 - "stderr" -- the block output goes to standard error
 - "log" -- the block output goes to the log file
 - "skip" -- the block is skipped
-
-Added in version 0.1.0.
 
 You can use the stderr option to write your own warning messages.
 
@@ -766,8 +742,6 @@ show the block at all.
 You cannot assign a number bigger than t.maxRepeat to
 t.repeat. You can set t.maxRepeat to anything you want, the
 default is 100.
-
-Added in version 0.1.0.
 
 For the following example, the number of items in tea_list is
 assigned to the t.repeat variable which outputs the block five
@@ -925,8 +899,6 @@ The t.row variable contains the current row number for blocks
 that repeat. The row numbers start at 0 and increase.  You use it
 to format lists and other repeating content in the template.
 
-Added in version 0.1.0.
-
 Here is an example using the row variable.  In the example the
 row number is used in three places.
 
@@ -970,16 +942,12 @@ result:
 
 The t.server variable is a dictionary containing the server json variables.
 
-Added in version 0.1.0.
-
 *** t.shared
 :PROPERTIES:
     :CUSTOM_ID: tshared
     :END:
 
 The t.shared variable is a dictionary containing the shared json variables
-
-Added in version 0.1.0.
 
 [[#contents][茶]]
 
@@ -990,8 +958,6 @@ Added in version 0.1.0.
 
 The t.version variable contains the current version number of
 StaticTea. See the [[#cmpversion][cmpVersion]] function for more information.
-
-Added in version 0.1.0.
 
 [[#contents][茶]]
 
@@ -1385,9 +1351,9 @@ List of functions:
 :CUSTOM_ID: add
 :END:
 
-The add function returns the sum of its two or more
-parameters. The parameters must be all integers or all floats.  A
-warning is generated on overflow and the statement is skipped.
+The add function returns the sum of its parameters. The
+parameters must be all integers or all floats.  A warning is
+generated on overflow and the statement is skipped.
 
 Added in version 0.1.0.
 
@@ -1874,7 +1840,8 @@ The server json dictionary has 1 elements.
 :CUSTOM_ID: lineNumber
 :END:
 
-Return the line in the template where the function is called. Added in version 0.1.0.
+Return the line in the template where the function is called. See
+[[#warning-messages][Warning Messages]] for an example. Added in version 0.1.0.
 
 [[#contents][茶]]
 
