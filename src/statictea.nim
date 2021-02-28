@@ -27,7 +27,7 @@ proc processArgs(env: var Env, args: Args): int =
   elif args.templateList.len > 0:
     result = processTemplateTop(env, args)
   else:
-    env.writeOut("No template name. Use -h for help.")
+    env.warn(0, wNoTemplateName)
 
 proc main(env: var Env, argv: seq[string]): int {.tpub.} =
   ## Run statictea. Return 0 when no warning messages were written.

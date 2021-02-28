@@ -127,7 +127,7 @@ suite "processTemplate":
   test "processTemplate empty":
     check testProcessTemplate()
 
-  test "Hello World":
+  test "readme Hello World":
     let templateContent = """
 <!--$ nextline -->
 hello {s.name}
@@ -141,7 +141,7 @@ hello {s.name}
     check testProcessTemplate(templateContent = templateContent, serverJson =
         serverJson, eResultLines = eResultLines)
 
-  test "Drink Tea":
+  test "readme Drink Tea":
     let templateContent = """
 <!--$ nextline -->
 Drink {s.drink} -- {s.drinkType} is my favorite.

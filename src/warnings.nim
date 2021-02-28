@@ -94,6 +94,7 @@ type
     wResultFileNotAllowed, # w85
     wUnableToOpenTempFile, # w86
     wUnableToRenameTemp,   # w87
+    wNoTemplateName,       # w88
 
 tpubType:
   const
@@ -188,6 +189,7 @@ tpubType:
       "The update option overwrites the template, no result file allowed.", # wResultFileNotAllowed
       "Unable to open temporary file.", # wUnableToOpenTempFile
       "Unable to rename temporary file over template file.", # wUnableToRenameTemp
+      "No template name. Use -h for help.", # wNoTemplateName
     ]
 
 func getWarning*(filename: string, lineNum: int,
