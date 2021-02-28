@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Run tests from the command line.
+# cd ~/code/statictea
+# src/test
+#
+# * Add a new test command line to the testcommands.txt file.
+# * Add test files to the testfiles folder.
+
+# Run from the static tea folder.
+if [[ "$(pwd)" != "/Users/steve/code/statictea" ]]; then
+  echo "run from statictea folder"
+  echo "src/test"
+  exit 1
+fi
+
+# Test commands run from the testfiles folder.
+cd testfiles
+
+# Run each line in the testcommands.txt file.
+while read -r cmd
+do
+  # Skip lines that start with #.
+  if [[ $cmd == \#* ]]; then
+    continue
+  fi
+
+  echo "$cmd"
+  eval "$cmd"
+  if [ $? != 0 ]; then
+    echo "cmd failed"
+  fi
+done < "../src/testcommands.txt"
+exit 0 # success

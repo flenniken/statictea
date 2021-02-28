@@ -1,0 +1,2 @@
+hello.html(2): w58: The replacement variable doesn't exist: s.name.
+hello {s.name}

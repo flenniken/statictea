@@ -1,0 +1,5 @@
+../statictea -s=hello.json -t=hello.html >t.txt; cmp t.txt hello.expected
+../statictea -s=hello.json -t=stdin <hello.html >t.txt; cmp t.txt hello.expected
+# comment
+../statictea -t=hello.html >t.txt 2>&1; cmp t.txt missing.expected
+../statictea -t=hello.html >t.txt 2>/dev/null; cmp t.txt missing2.expected
