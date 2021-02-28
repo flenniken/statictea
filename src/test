@@ -18,6 +18,7 @@ fi
 cd testfiles
 
 # Run each line in the testcommands.txt file.
+rc=0 # success
 while read -r cmd
 do
   # Skip lines that start with #.
@@ -28,7 +29,8 @@ do
   echo "$cmd"
   eval "$cmd"
   if [ $? != 0 ]; then
-    echo "cmd failed"
+    echo "Error: cmd failed."
+    rc=1
   fi
 done < "../src/testcommands.txt"
-exit 0 # success
+exit $rc

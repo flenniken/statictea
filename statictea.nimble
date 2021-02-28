@@ -182,3 +182,5 @@ awk '{printf "include %s\n", $0}' > tests/testall.nim
   exec "rm tests/testall.nim"
   # Make sure it builds with test undefined.
   exec "nimble build"
+  # Run the command line tests.
+  exec "src/test"
