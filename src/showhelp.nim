@@ -23,23 +23,6 @@ DESCRIPTION
 
              Show this help text then exit.
 
-     -n, --nolog
-             Turn off logging to statictea.log.
-
-     -v, --version
-
-             Show the version number then exit.
-
-     -s=filename, --server=filename
-
-             Read a json file and store it in the server
-             dictionary. You can specify zero or more files.
-
-     -j=filename, --shared=filename
-
-             Read a json file and store it in the shared
-             dictionary. You can specify zero or more files.
-
      -t=filename, --template=filename
 
              The template file to process. Use the name "stdin" to
@@ -50,16 +33,35 @@ DESCRIPTION
              The name of the file to create for the results. If not
              specified, the result goes to standard out.
 
+     -s=filename, --server=filename
+
+             Read a json file and store it in the server
+             dictionary. You can specify zero or more server options.
+
+     -j=filename, --shared=filename
+
+             Read a json file and store it in the shared
+             dictionary. You can specify zero or more shared options.
+
      -p="prefix postfix", --prepost="prefix postfix"
 
-             Add prefix, postfix comment styles for use in the
-             template. You can specify zero or more. Separate prefix
+             Add a prefix, postfix comment style for use in the
+             template. You can specify zero or options. Separate prefix
              from postfix with a space. The postfix is optional.
 
      -u, --update
 
              Update the template's replace blocks to syncronize them
              with the json data.
+
+     -l[=filename], --log[=filename]
+
+             Turn on logging and optionally specify the filename. When
+             no filename is specified, use "/var/log/statictea.log".
+
+     -v, --version
+
+             Show the version number then exit.
 
 EXAMPES
      Typical usage:

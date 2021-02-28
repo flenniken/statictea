@@ -11,10 +11,10 @@ import showhelp
 import version
 import tpub
 import env
-when not defined(Test):
-  import os
+import os
 
-# todo: put the log in the standard log location, ie /var/log.
+# todo: log the return code
+# todo: log how many warnings were output.
 
 proc processArgs(env: var Env, args: Args): int =
   if args.help:
@@ -32,17 +32,20 @@ proc processArgs(env: var Env, args: Args): int =
 proc main(env: var Env, argv: seq[string]): int {.tpub.} =
   ## Run statictea. Return 0 when no warning messages were written.
 
-  env.log("----- starting -----")
-  env.log("argv: $1" % $argv)
+  # Parse the command line options.
+  let args = parseCommandLine(env, argv)
+
+  # Add the log file to the environment when it is turned on.
+  if args.log:
+    env.setupLogging(args.logFilename)
+
+  env.log("Starting: argv: $1" % $argv)
   env.log("version: " & staticteaVersion)
 
   # Setup control-c monitoring so ctrl-c stops the program.
   proc controlCHandler() {.noconv.} =
     quit 0
   setControlCHook(controlCHandler)
-
-  # Process the command line args.
-  let args = parseCommandLine(env, argv)
 
   try:
     result = processArgs(env, args)
@@ -57,14 +60,10 @@ proc main(env: var Env, argv: seq[string]): int {.tpub.} =
       env.warn(0, wStackTrace, getCurrentException().getStackTrace())
   env.log("Done")
 
-when isMainModule:
-  var rc: int
-  try:
-    var env = openEnv()
-    rc = main(env, commandLineParams())
-    env.close()
-  except:
-    echo getCurrentExceptionMsg()
-    rc = 1
+proc run(): int =
+  var env = openEnv()
+  result = main(env, commandLineParams())
+  env.close()
 
-  quit(if rc == 0: QuitSuccess else: QuitFailure)
+when isMainModule:
+  quit(if run() == 0: QuitSuccess else: QuitFailure)

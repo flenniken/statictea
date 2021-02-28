@@ -1102,13 +1102,15 @@ The StaticTea command line options:
 - version -- outputs the version number.
 - server -- the server json file(s), you can specify multiple.
 - shared -- the shared json file(s), you can specify multiple.
-- template -- the template file, or "stdin".
+- template -- the template file, or "stdin" for input from
+  standard input.
 - result -- the result file, or standard out when not specified.
 - update -- update the template replace blocks. See the
   [[#replace-command][Replace Command]].
 - prepost -- add a command prefix and postfix, you can specify
   multiple. When you specify values, the defaults are no longer
   used. See the [[#prefix-postfix][Prefix Postfix]] section.
+- log - log to a file, see [[#log-file][Log File]] section.
 
 [[#contents][茶]]
 
@@ -1302,9 +1304,16 @@ statictea \
 The log file contains information about processing your
 template. Template commands can also write to the log file.
 
-Log information is appended to the file and it grows without
-bounds.  When the file size exceeds 1 GB, a warning message is
-generated each time a template is processed.
+Log information is appended to the file.  When the file size
+exceeds 1 GB, a warning message is generated each time a template
+is processed.
+
+Logging is off by default. You turn it on with the --log option.
+You can specify the log filename.  If you don't specify a
+filename, "statictea.log" in the system log directory is used.
+
+- Mac: ~/Library/lib/statictea.log
+- Other: ~/statictea.log
 
 [[#contents][茶]]
 

@@ -12,7 +12,7 @@ proc testMain(argv: seq[string],
     eResultLines: seq[string] = @[],
     eHelpLineCount: int = -1
   ): bool =
-  var env = openEnvTest("_testMain.txt")
+  var env = openEnvTest("_testMain")
 
   let rc = main(env, argv)
 
@@ -24,7 +24,8 @@ proc testMain(argv: seq[string],
   if not expectedItems("errLines", errLines, eErrLines):
     result = false
   if eHelpLineCount != -1:
-    if not expectedItem("helpLineCount", outLines.len, eHelpLineCount):
+    if outLines.len < eHelpLineCount:
+      echo "helpLineCount: expected at least $1 lines, got $2" % [$eHelpLineCount, $outLines.len]
       result = false
   else:
     if not expectedItems("outLines", outLines, eOutLines):
@@ -44,8 +45,7 @@ suite "statictea.nim":
 
   test "main version logging":
     let logLines = """
-XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); ----- starting -----
-XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); argv: @["-v"]
+XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); Starting: argv: @["-v"]
 XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); version: X.X.X
 XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); Done
 """
@@ -56,6 +56,6 @@ XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); Done
 
   test "main help":
     let argv = @["-h"]
-    check testMain(argv, 0, eHelpLineCount = 83)
+    check testMain(argv, 0, eHelpLineCount = 60)
 
 # todo: test multiple json files

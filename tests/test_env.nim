@@ -62,8 +62,8 @@ suite "env.nim":
 
   test "open close":
     var env = openEnv()
-    check env.logFilename == "statictea.log"
     env.close()
+    check env.logFilename == ""
 
   test "log":
     var env = openEnvTest("_test.log")

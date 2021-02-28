@@ -10,7 +10,9 @@ proc tpcl(
     version: bool=false,
     help: bool=false,
     update: bool=false,
+    log: bool=false,
     resultFilename: string = "",
+    logFilename: string = "",
     serverList: seq[string] = @[],
     sharedList: seq[string] = @[],
     templateList: seq[string] = @[],
@@ -32,6 +34,8 @@ proc tpcl(
     result = false
   if not expectedItem("update", args.update, update):
     result = false
+  if not expectedItem("log", args.log, log):
+    result = false
   if not expectedItem("serverList", args.serverList, serverList):
     result = false
   if not expectedItem("sharedList", args.sharedList, sharedList):
@@ -39,6 +43,8 @@ proc tpcl(
   if not expectedItem("templateList", args.templateList, templateList):
     result = false
   if not expectedItem("resultFilename", args.resultFilename, resultFilename):
+    result = false
+  if not expectedItem("logFilename", args.logFilename, logFilename):
     result = false
   if not expectedItems("prepostList", args.prepostList, prepostList):
     result = false
@@ -122,6 +128,12 @@ suite "parseCommandLine":
 
   test "parseCommandLine-result":
     check tpcl("--result=result.html", resultFilename = "result.html")
+
+  test "parseCommandLine-log":
+    check tpcl("-l", log = true)
+
+  test "parseCommandLine-log with filename":
+    check tpcl("--log=statictea.log", log = true, logFilename = "statictea.log")
 
   test "parseCommandLine-happy-path":
     check tpcl("-s=server.json -j=shared.json -t=tea.html -r=result.html",

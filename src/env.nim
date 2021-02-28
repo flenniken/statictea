@@ -11,10 +11,14 @@ when defined(test):
   # import regexes
   import readlines
 
-const
-  staticteaLog* = "statictea.log"                    ## \
-  ## Name of the default statictea log file.
+# todo: os.sameFile(path1, path2: string) returns whether the to paths refer to the same file.
+## Name of the default statictea log file.
+when hostOS == "macosx":
+  let staticteaLog* = expandTilde("~/Library/Logs/statictea.log")
+else:
+  let staticteaLog* = expandTilde("~/statictea.log")
 
+const
   logWarnSize: BiggestInt = 1024 * 1024 * 1024       ## \
   ## Warn the user when the log file gets over 1 GB.
 
@@ -141,17 +145,29 @@ proc openLogFile(env: var Env, logFilename: string) =
   else:
     env.warn(0, wUnableToOpenLogFile, logFilename)
 
-proc openEnv*(logFilename: string = staticteaLog,
+proc openEnv*(logFilename: string = "",
                   warnSize: BiggestInt = logWarnSize): Env =
-  ## Open and return the environment containing the standard error,
-  ## standard out and the log file as streams.
+  ## Open and return the environment containing standard error and
+  ## standard out as streams.
 
   result = Env(
     errStream: newFileStream(stderr),
     outStream: newFileStream(stdout),
   )
-  openLogFile(result, logFilename)
-  checkLogSize(result)
+
+proc setupLogging*(env: var Env, logFilename: string = "",
+                  warnSize: BiggestInt = logWarnSize) =
+  ## Turn on logging for the environment using the specified log file.
+
+  # When no log filename, use the default.
+  var filename: string
+  if logFilename == "":
+    filename = staticteaLog
+  else:
+    filename = logFilename
+
+  openLogFile(env, filename)
+  checkLogSize(env)
 
 proc addExtraStreams*(env: var Env, templateFilename: string,
                       resultFilename: string): bool =
@@ -514,6 +530,3 @@ when defined(test):
     if eTemplateLines.len > 0:
       if not expectedItems("templateLines", templateLines, eTemplateLines):
         result = false
-
-# todo: checkLogSize(result) won't work for remote logging over the network.
-# todo: test stdin for a template.

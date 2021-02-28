@@ -17,6 +17,7 @@ const
     ('j', "shared"),
     ('t', "template"),
     ('r', "result"),
+    ('l', "log"),
     ('u', "update"),
     ('p', "prepost"),
   ]
@@ -70,8 +71,8 @@ proc parsePrepost(str: string): (Prepost, string) {.tpub.} =
 
 
 proc handleWord(env: var Env, switch: string, word: string, value: string,
-    help: var bool, version: var bool, update: var bool,
-    resultFilename: var string,
+    help: var bool, version: var bool, update: var bool, log: var bool,
+    resultFilename: var string, logFilename: var string,
     filenames: var array[4, seq[string]], prepostList: var seq[Prepost]) =
   ## Handle one switch and return its value.  Switch is the key from
   ## the command line, either a word or a letter.  Word is the long
@@ -96,6 +97,9 @@ proc handleWord(env: var Env, switch: string, word: string, value: string,
       env.warn(0, wOneResultAllowed, value)
     else:
       resultFilename = value
+  elif word == "log":
+    log = true
+    logFilename = value
   elif word == "prepost":
     # prepost is a string with a space dividing the prefix from the
     # postfix. The postfix is optional. -p="<--$ -->" or -p="#$"
@@ -119,9 +123,11 @@ proc parseCommandLine*(env: var Env, argv: seq[string]): Args =
   var help: bool = false
   var version: bool = false
   var update: bool = false
+  var log: bool = false
   var filenames: array[4, seq[string]]
   var optParser = initOptParser(argv)
   var resultFilename: string
+  var logFilename: string
   var prepostList: seq[Prepost]
 
   # Iterate over all arguments passed to the command line.
@@ -134,12 +140,12 @@ proc parseCommandLine*(env: var Env, argv: seq[string]): Args =
           if word == "":
             env.warn(0, wUnknownSwitch, $letter)
           else:
-            handleWord(env, $letter, word, value, help, version, update,
-                 resultFilename, filenames, prepostList)
+            handleWord(env, $letter, word, value, help, version, update, log,
+              resultFilename, logFilename, filenames, prepostList)
 
       of CmdLineKind.cmdLongOption:
-        handleWord(env, key, key, value, help, version, update,
-                   resultFilename, filenames, prepostList)
+        handleWord(env, key, key, value, help, version, update, log,
+                   resultFilename, logFilename, filenames, prepostList)
 
       of CmdLineKind.cmdArgument:
         env.warn(0, wUnknownArg, key)
@@ -150,11 +156,16 @@ proc parseCommandLine*(env: var Env, argv: seq[string]): Args =
   result.help = help
   result.version = version
   result.update = update
+  result.log = log
   result.serverList = filenames[0]
   result.sharedList = filenames[1]
   result.templateList = filenames[2]
   result.resultFilename = resultFilename
+  result.logFilename = logFilename
   result.prepostList = prepostList
+
+
+# todo: what to do about filenames in multiple places?  result = template = log, etc?
 
 when defined(test):
   proc parseCommandLine*(env: var Env, cmdLine: string = ""): Args =

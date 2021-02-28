@@ -25,11 +25,18 @@ do
   if [[ $cmd == \#* ]]; then
     continue
   fi
+  # Skip blank lines.
+  if [[ $cmd == "" ]]; then
+    continue
+  fi
 
   echo "$cmd"
   eval "$cmd"
   if [ $? != 0 ]; then
     echo "Error: cmd failed."
+    echo
+    cat t.txt
+    echo
     rc=1
   fi
 done < "../src/testcommands.txt"
