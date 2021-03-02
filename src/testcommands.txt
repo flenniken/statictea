@@ -1,16 +1,16 @@
 # Readme hello world
-../statictea -s=hello.json -t=hello.html >t.txt 2>&1; cmp t.txt hello.expected
+../bin/statictea -s=hello.json -t=hello.html >t.txt 2>&1; cmp t.txt hello.expected
 
 # Template from stdin.
-../statictea -s=hello.json -t=stdin <hello.html >t.txt; cmp t.txt hello.expected
+../bin/statictea -s=hello.json -t=stdin <hello.html >t.txt; cmp t.txt hello.expected
 
 # Missing replacement variable.
-../statictea -t=hello.html >t.txt 2>&1; cmp t.txt missing.expected
+../bin/statictea -t=hello.html >t.txt 2>&1; cmp t.txt missing.expected
 
 # Test warnings go to stdout.
-../statictea -t=hello.html >t.txt 2>/dev/null; cmp t.txt missing2.expected
+../bin/statictea -t=hello.html >t.txt 2>/dev/null; cmp t.txt missing2.expected
 
 # Test logging.
-../statictea -l -s=hello.json -t=hello.html >t.txt 2>&1; cmp t.txt hello.expected
+../bin/statictea -l -s=hello.json -t=hello.html >t.txt 2>&1; cmp t.txt hello.expected
 
 # todo: Test log file location on mac and linux.
