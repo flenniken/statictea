@@ -213,11 +213,6 @@ template:
 <!--$ endblock -—>
 #+END_SRC
 
-The template replacement block may get out of sync with the
-variable.  You can update the replacement block to match the
-variable with the update option.  See [[#update-option][Update Option]] for an
-example.
-
 The shared variable may contain replacement content too.  Here is
 an example of that:
 
@@ -1271,6 +1266,11 @@ all platforms: LF, and CR/LF.  Line endings are preserved.  The
 template syntax only uses ascii except unicode characters are
 allowed in quoted strings. The maximum command line length is
 1024 bytes, there is no limit on non-command lines.
+
+Since line endings are preserved and there are no encoding or
+line length restrictions on non-command lines, you can make
+templates out of binary or mixed binary and text files like EPS
+or PDF files.
 
 [[#contents][茶]]
 
