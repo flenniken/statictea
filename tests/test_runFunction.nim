@@ -15,7 +15,6 @@ proc testFunction(functionName: string, parameters: seq[Value],
   ): bool =
 
   var env = openEnvTest("_testFunction.log")
-  let lineNum = 1
   let functionO = getFunction(functionName)
   let function = functionO.get()
 

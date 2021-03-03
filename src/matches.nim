@@ -43,14 +43,6 @@ type
     leftBracketMatcher*: Matcher
     tabSpaceMatcher*: Matcher
 
-iterator combine(list1: openArray[Prepost], list2: openArray[
-    Prepost]): Prepost =
-  ## Iterate through list1 then list2.
-  for prepost in list1:
-    yield(prepost)
-  for prepost in list2:
-    yield(prepost)
-
 proc getDefaultPrepostTable*(): PrepostTable =
   ## Return the default prepost table.
   result = initOrderedTable[string, string]()

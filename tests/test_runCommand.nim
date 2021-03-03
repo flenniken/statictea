@@ -44,12 +44,6 @@ proc newStrFromBuffer(buffer: seq[uint8]): string =
   for ix in 0 ..< buffer.len:
     result.add((char)buffer[ix])
 
-proc toString(statements: seq[Statement]): string =
-  var lines: seq[string]
-  for ix, statement in statements:
-    lines.add "$1: $2" % [$(ix+1), $statement]
-  result = join(lines, "\n")
-
 proc getCmdLineParts(env: var Env, cmdLines: seq[string]): seq[LineParts] =
   ## Return the line parts from the given lines.
   for ix, line in cmdLines:
@@ -93,7 +87,7 @@ proc testGetStatements(content: string, expected: string): bool =
 
   var statements = getStatements(cmdLines, cmdLineParts)
 
-  let (logLines, errLines, outLines, resultLines, templateLines) = env.readCloseDeleteEnv()
+  discard env.readCloseDeleteEnv()
 
   result = true
   if not compareStatements(statements, expected):
@@ -140,10 +134,10 @@ proc testGetString(
     result = false
 
 proc testGetStringInvalid(buffer: seq[uint8]): bool =
-  var str = newStrFromBuffer(buffer)
-  var statement = "a = 'stringwithbadutf8:$1:end'" % str
+  let str = newStrFromBuffer(buffer)
+  let statement = "a = 'stringwithbadutf8:$1:end'" % str
   let expectedLine = "statement: a = 'stringwithbadutf8:$1:end'" % str
-  var eErrLines = @[
+  let eErrLines = @[
     "template.html(1): w32: Invalid UTF-8 byte in the string.\n",
     expectedLine & "\n",
     "                                  ^\n",
@@ -151,7 +145,7 @@ proc testGetStringInvalid(buffer: seq[uint8]): bool =
   result = testGetString(newStatement(statement), 4, none(ValueAndLength), eErrLines = eErrLines)
 
 proc testGetVariable(statement: Statement, start: Natural, nameSpace: string, varName: string,
-    evvv: Option[Value],
+    eValueO: Option[Value],
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[],
@@ -164,7 +158,7 @@ proc testGetVariable(statement: Statement, start: Natural, nameSpace: string, va
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-  if not expectedItem("value", valueO, evvv):
+  if not expectedItem("value", valueO, eValueO):
     result = false
 
 proc testGetVarOrFunctionValue(statement: Statement, start: Natural,
@@ -506,23 +500,11 @@ statement: a = 9_223_372_036_854_775_808
       @[0xe2u8, 0x82, 0xa1],
       @[0xf0u8, 0x90, 0x8c, 0xbc],
     ]
-    var str: string
-    var eLength: int
     for buffer in byteBuffers:
-      str = newStrFromBuffer(buffer)
-      eLength = buffer.len + 2
-    var statement = "a = '$1'" % str
-    check testGetString(newStatement(statement), 4, newStringValueAndLengthO(str, eLength))
-
-
-    # var byteBuffers: seq[seq[uint8]] = @[
-    #   @[0xc3u8, 0x28],
-    #   @[0xa0u8, 0xa1],
-    #   @[0xe2u8, 0x28, 0xa1],
-    #   @[0xe2u8, 0x82, 0x28],
-    #   @[0xf0u8, 0x28, 0x8c, 0xbc],
-    #   @[0xf0u8, 0x90, 0x28, 0xbc],
-    # ]
+      let str = newStrFromBuffer(buffer)
+      let eLength = buffer.len + 2
+      let statement = "a = '$1'" % str
+      check testGetString(newStatement(statement), 4, newStringValueAndLengthO(str, eLength))
 
   test "getString invalid 2":
     check testGetStringInvalid(@[0xc3u8, 0x28])

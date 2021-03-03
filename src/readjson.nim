@@ -14,10 +14,14 @@ import options
 var depth_limit = 3
 
 func getEmptyVars*(): VarsDict =
+  ## Return an empty variable dictionary.
   result = initOrderedTable[string, Value]()
 
 proc jsonToValue(jsonNode: JsonNode, depth: int = 0): Option[Value] {.tpub.} =
   if depth > depth_limit:
+    # todo: test the depth limit.
+    # todo: display warning when limit exceeded.
+    # todo: document the depth limit.
     return none(Value)
   var value: Value
   case jsonNode.kind

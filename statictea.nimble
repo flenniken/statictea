@@ -34,6 +34,7 @@ proc get_test_module_cmd(filename: string, release = false): string =
   # -p, --path:PATH           add path to search paths
   # -r, --run                 run the compiled program with given arguments
   # --gc:orc
+  # --hint
 
   # I turned on gs:orc because "n t" started erroring out. Too many unit tests maybe.
   # [GC] cannot register global variable; too many global variables
@@ -44,11 +45,11 @@ proc get_test_module_cmd(filename: string, release = false): string =
     rel = "-d:release "
   else:
     rel = ""
-  result = "nim c -f --gc:orc --verbosity:0 -d:test $1 -r -p:src --out:bin/tmp/$2 tests/$3" % [
+  result = "nim c -f --gc:orc --verbosity:0 --hint[Performance]:off --hint[XCannotRaiseY]:off -d:test $1 -r -p:src --out:bin/tmp/$2 tests/$3" % [
     rel, binName, filename]
 
 proc build_release() =
-  var cmd = "nim c --gc:orc -d:release --out:bin/ src/statictea"
+  var cmd = "nim c --gc:orc --hint[Performance]:off --hint[Conf]:off --hint[Link]: off -d:release --out:bin/ src/statictea"
   echo cmd
   exec cmd
   cmd = "strip bin/statictea"
@@ -92,9 +93,22 @@ proc open_in_browser(filename: string) =
   ## Open the given file in a browser if the system has an open command.
   exec "(hash open 2>/dev/null && open $1) || echo 'open $1'" % filename
 
-task docs1, "\tBuild docs for one module.":
-  doc_module("loggers")
-  open_in_browser("docs/html/loggers.html")
+task docs, "\tCreate md doc for a source file.":
+  var filename = "readjson.nim"
+  var jsonName = "readjson.json"
+  var cmd = "nim jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
+  echo cmd
+  exec cmd
+  exec "bin/statictea -s=docs/json/$1 -t=docs/template.md -r=docs/readjson.md" % [jsonName]
+  exec "less docs/readjson.md"
+
+task json, "\tDisplay json for a source file.":
+  var filename = "readjson.nim"
+  var jsonName = "readjson.json"
+  var cmd = "nim jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
+  echo cmd
+  exec cmd
+  exec "cat docs/json/$1 | jq | less" % [jsonName]
 
 task tt, "\tCompile and run t.nim":
   let cmd = "nim c -r --gc:orc --hints:off --outdir:bin/tests/ src/t.nim"

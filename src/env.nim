@@ -287,7 +287,6 @@ when defined(test):
     if content.len == 0:
       return
     var start = 0
-    var pos: int
     for pos in 0 ..< content.len:
       let ch = content[pos]
       if ch == '\n':

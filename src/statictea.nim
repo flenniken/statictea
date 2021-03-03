@@ -11,7 +11,8 @@ import showhelp
 import version
 import tpub
 import env
-import os
+when isMainModule:
+  import os
 
 # todo: log the return code
 # todo: log how many warnings were output.
@@ -60,10 +61,10 @@ proc main(env: var Env, argv: seq[string]): int {.tpub.} =
       env.warn(0, wStackTrace, getCurrentException().getStackTrace())
   env.log("Done")
 
-proc run(): int =
-  var env = openEnv()
-  result = main(env, commandLineParams())
-  env.close()
-
 when isMainModule:
+  proc run(): int =
+    var env = openEnv()
+    result = main(env, commandLineParams())
+    env.close()
+
   quit(if run() == 0: QuitSuccess else: QuitFailure)

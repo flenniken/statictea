@@ -528,11 +528,11 @@ const
     ("int", funInt),
     ("float", funFloat),
 # find
+# substr
 # format
 # lineNumber
 # quotehtml
 # sizes
-# substr
 # time
 # template
   ]

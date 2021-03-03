@@ -7,7 +7,6 @@ import options
 proc testParseInteger(str: string, expectedInteger: BiggestInt, expectedLength: int,
                       start: Natural = 0): bool =
   # Return true when the string parses as expected.
-  var integer: BiggestInt
   var intPosO = parseInteger(str, start)
   if not isSome(intPosO):
     echo "Did not find an integer for:"
@@ -34,7 +33,6 @@ proc testParseIntegerError(str: string, start: Natural = 0): bool =
 proc testParseFloat(str: string, expectedFloat: BiggestFloat, expectedLength: int,
                       start: Natural = 0): bool =
   # Return true when the string parses as expected.
-  var number: BiggestFloat
   var floatPosO = parseFloat64(str, start)
   if not isSome(floatPosO):
     echo "Did not find a float for:"

@@ -1,12 +1,13 @@
 ## Parse the command line and return the arguments.
 
 import parseopt
-import strutils
 import tpub
 import re
 import args
 import warnings
 import env
+when defined(test):
+  import strutils
 
 const
   fileLists = ["server", "shared", "template"]
@@ -37,15 +38,15 @@ func letterToWord(letter: char): string {.tpub.} =
   return ""
 
 
-func `$`(sequence: seq[string]): string =
-  result = sequence.join(", ")
+# func `$`(sequence: seq[string]): string =
+#   result = sequence.join(", ")
 
-
-func `$`(prepostList: seq[Prepost]): string {.tpub.} =
-  var parts: seq[string]
-  for pp in prepostList:
-    parts.add("($1, $2)" % [pp.pre, pp.post])
-  result = parts.join(", ")
+when defined(test):
+  func `$`(prepostList: seq[Prepost]): string {.tpub.} =
+    var parts: seq[string]
+    for pp in prepostList:
+      parts.add("($1, $2)" % [pp.pre, pp.post])
+    result = parts.join(", ")
 
 
 # \x21-\x7F is ascii without spaces or control characters.

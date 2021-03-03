@@ -18,7 +18,6 @@ proc readContentTest(content: string, expected: seq[string],
   check lineBufferO.isSome
 
   var lines: seq[string]
-  var asciiValues: seq[bool]
   while true:
     var line = lineBufferO.get().readline()
     if line == "":

@@ -50,7 +50,6 @@ suite "replacement":
     check isSome(tempFileStreamO)
     let tempFileStream = tempFileStreamO.get()
     let tempFile = tempFileStream.tempFile
-    let stream = tempFileStream.stream
     tempFile.closeDelete()
     check not fileExists(tempFile.filename)
 

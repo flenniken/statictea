@@ -49,10 +49,10 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
 
         line = lb.readline()
         if line != "":
-          linePartsO = parseCmdLine(env, compiledMatchers,
+          let lPartsO = parseCmdLine(env, compiledMatchers,
               line, lb.lineNum)
-          if linePartsO.isSome:
-            lineParts = linePartsO.get()
+          if lPartsO.isSome:
+            lineParts = lPartsO.get()
             if lineParts.command == ":":
               continue # Got command line, continue looking for more.
 

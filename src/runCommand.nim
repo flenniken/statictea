@@ -45,10 +45,6 @@ statement 3 starts at line 3, position 7.
 ]#
 
 
-proc warn(message: string) =
-  echo "replace with the real warning"
-  echo message
-
 iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
     seq[LineParts], allSpaceTabMatcher: Matcher): Statement {.tpub.} =
   ## Iterate through the command's statements.  Statements are
@@ -80,7 +76,7 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
       if state == State.start:
         if ch == ';':
           if notEmptyOrSpaces(allSpaceTabMatcher, text):
-            yield Statement(text: text, lineNum: lineNum, start: start)
+            yield newStatement(text, lineNum, start)
           text.setLen(0)
           lineNum = lp.lineNum
           start = pos + 1 # After the semicolon.
@@ -150,7 +146,6 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
 
   # The decimal point determines whether the number is an integer or
   # float.
-  var value: Value
   let matches = matchesO.get()
   let decimalPoint = matches.getGroup()
   if decimalPoint == ".":
@@ -265,7 +260,7 @@ proc getVarOrFunctionValue*(env: var Env, compiledMatchers:
   assert variableO.isSome
 
   let variable = variableO.get()
-  let (whitespace, nameSpace, varName) = variable.get3Groups()
+  let (_, nameSpace, varName) = variable.get3Groups()
   if nameSpace == "":
     # We have a variable or a function.
     let parenthesesO = getMatches(compiledMatchers.leftParenthesesMatcher,
@@ -380,7 +375,7 @@ proc runStatement*(env: var Env, statement: Statement,
     env.warnStatement(statement, wMissingStatementVar, 0)
     return
   let variable = variableO.get()
-  let (whitespace, nameSpace, varName) = variable.get3Groups()
+  let (_, nameSpace, varName) = variable.get3Groups()
 
   # Get the equal sign and following whitespace.
   let equalSignO = getMatches(compiledMatchers.equalSignMatcher,

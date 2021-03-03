@@ -16,7 +16,7 @@ proc testMain(argv: seq[string],
 
   let rc = main(env, argv)
 
-  let (logLines, errLines, outLines, resultLines, templateLines) = env.readCloseDeleteEnv()
+  let (logLines, errLines, outLines, resultLines, _) = env.readCloseDeleteEnv()
 
   result = true
   if not compareLogLines(logLines, eLogLines):

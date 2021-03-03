@@ -53,7 +53,6 @@ unchanged.
 iterator yieldContentLine*(content: string): string =
   ## Yield one content line at a time and keep the line endings.
   var start = 0
-  var pos: int
   for pos in 0 ..< content.len:
     let ch = content[pos]
     if ch == '\n':
