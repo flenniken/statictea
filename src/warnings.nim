@@ -95,6 +95,8 @@ type
     wUnableToOpenTempFile, # w86
     wUnableToRenameTemp,   # w87
     wNoTemplateName,       # w88
+    wInvalidPosition,      # w89
+    wEndLessThenStart,     # w90
 
 tpubType:
   const
@@ -190,6 +192,8 @@ tpubType:
       "Unable to open temporary file.", # wUnableToOpenTempFile
       "Unable to rename temporary file over template file.", # wUnableToRenameTemp
       "No template name. Use -h for help.", # wNoTemplateName
+      "Invalid position: got $1.", # wInvalidPosition
+      "The end position is less that the start position.", # wEndLessThenStart
     ]
 
 func getWarning*(filename: string, lineNum: int,

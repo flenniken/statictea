@@ -515,3 +515,65 @@ suite "runFunction.nim":
     var parameters = @[newValue("abc")]
     let eFunResult = newFunResultWarn(wIntOrStringNumber)
     check testFunction("float", parameters, eFunResult = eFunResult)
+
+  test "find":
+    var parameters = @[newValue("Tea time at 4:00."), newValue("time")]
+    let eFunResult = newFunResult(newValue(4))
+    check testFunction("find", parameters, eFunResult = eFunResult)
+
+  test "find start":
+    var parameters = @[newValue("Tea time at 4:00."), newValue("Tea")]
+    let eFunResult = newFunResult(newValue(0))
+    check testFunction("find", parameters, eFunResult = eFunResult)
+
+  test "find end":
+    var parameters = @[newValue("Tea time at 4:00."), newValue("00.")]
+    let eFunResult = newFunResult(newValue(14))
+    check testFunction("find", parameters, eFunResult = eFunResult)
+
+  test "find missing":
+    var parameters = @[newValue("Tea time at 4:00."), newValue("party")]
+    let eFunResult = newFunResult(newValue(-1))
+    check testFunction("find", parameters, eFunResult = eFunResult)
+
+  test "find missing 1":
+    var parameters = @[newValue("Tea time at 4:00."), newValue("aTea")]
+    let eFunResult = newFunResult(newValue(-1))
+    check testFunction("find", parameters, eFunResult = eFunResult)
+
+  test "find missing 2":
+    var parameters = @[newValue("Tea time at 4:00."), newValue(".r")]
+    let eFunResult = newFunResult(newValue(-1))
+    check testFunction("find", parameters, eFunResult = eFunResult)
+
+  test "find bigger":
+    var parameters = @[newValue("big"), newValue("bigger")]
+    let eFunResult = newFunResult(newValue(-1))
+    check testFunction("find", parameters, eFunResult = eFunResult)
+
+  test "find 1 parameter":
+    var parameters = @[newValue("big")]
+    let eFunResult = newFunResultWarn(wTwoParameters)
+    check testFunction("find", parameters, eFunResult = eFunResult)
+
+  test "find 1 not string":
+    var parameters = @[newValue(1), newValue("bigger")]
+    let eFunResult = newFunResultWarn(wExpectedString)
+    check testFunction("find", parameters, eFunResult = eFunResult)
+
+  test "find 2 not string":
+    var parameters = @[newValue("at"), newValue(4.5)]
+    let eFunResult = newFunResultWarn(wExpectedString, 1)
+    check testFunction("find", parameters, eFunResult = eFunResult)
+
+  test "substr Grey":
+    var parameters = @[newValue("Earl Grey"), newValue(5)]
+    let eFunResult = newFunResult(newValue("Grey"))
+    check testFunction("substr", parameters, eFunResult = eFunResult)
+
+  test "substr Earl":
+    var parameters = @[newValue("Earl Grey"), newValue(0), newValue(4)]
+    let eFunResult = newFunResult(newValue("Earl"))
+    check testFunction("substr", parameters, eFunResult = eFunResult)
+
+  # todo: continue testing substr.

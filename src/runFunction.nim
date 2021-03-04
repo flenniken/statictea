@@ -514,6 +514,73 @@ proc funInt*(parameters: seq[Value]): FunResult =
       return newFunResultWarn(wExpectedRoundOption, 1)
   result = newFunResult(newValue(ret))
 
+proc funFind*(parameters: seq[Value]): FunResult =
+  # The find function searches a string for a substring and returns
+  # its position when found. The first parameter is the string and
+  # the second is the substring. When not found it returns -1. Positions
+  # start at 0. Added in version 0.1.0.
+
+  if parameters.len() != 2:
+    result = newFunResultWarn(wTwoParameters, 0)
+    return
+
+  for ix, parameter in parameters:
+    if parameter.kind != vkString:
+      result = newFunResultWarn(wExpectedString, ix)
+      return
+
+  let pos = find(parameters[0].stringv, parameters[1].stringv)
+  result = newFunResult(newValue(pos))
+
+proc funSubstr*(parameters: seq[Value]): FunResult =
+  # The substr function extracts a substring from a string.  The first
+  # parameter is the string, the second is the substring's starting
+  # position and the third is one past the end. The first position is
+  # 0.
+
+  # This kind of positioning is called a half-open range that
+  # includes the first position but not the second. For example,
+  # [3, 7) includes 3, 4, 5, 6. The end minus the start is equal to
+  # the length of the substring.
+
+  # The third parameter is optional and defaults to one past the end
+  # of the string. Added in version 0.1.0.
+
+  if parameters.len < 2 or parameters.len > 3:
+    result = newFunResultWarn(wTwoOrThreeParameters)
+    return
+
+  if parameters[0].kind != vkString:
+    result = newFunResultWarn(wExpectedString, 0)
+    return
+  let str = parameters[0].stringv
+
+  if parameters[1].kind != vkInt:
+    result = newFunResultWarn(wExpectedInteger, 1)
+    return
+  let start = int(parameters[1].intv)
+
+  var finish: int
+  if parameters.len == 3:
+    if parameters[2].kind != vkInt:
+      result = newFunResultWarn(wExpectedInteger, 2)
+      return
+    finish = int(parameters[2].intv)
+  else:
+    finish = str.len
+
+  if start < 0:
+    result = newFunResultWarn(wInvalidPosition, 1, $start)
+    return
+  if finish > str.len:
+    result = newFunResultWarn(wInvalidPosition, 2, $finish)
+    return
+  if finish < start:
+    result = newFunResultWarn(wEndLessThenStart, 2)
+    return
+
+  result = newFunResult(newValue(str[start .. finish-1]))
+
 const
   functionsList = [
     ("len", funLen),
@@ -527,8 +594,10 @@ const
     ("cmpVersion", funCmpVersion),
     ("int", funInt),
     ("float", funFloat),
-# find
-# substr
+    ("find", funFind),
+    ("substr", funSubstr),
+#
+#
 # format
 # lineNumber
 # quotehtml
