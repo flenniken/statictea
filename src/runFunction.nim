@@ -514,6 +514,8 @@ proc funInt*(parameters: seq[Value]): FunResult =
       return newFunResultWarn(wExpectedRoundOption, 1)
   result = newFunResult(newValue(ret))
 
+# todo: add a third parameter to find to use when the sub-string is not found.
+
 proc funFind*(parameters: seq[Value]): FunResult =
   # The find function searches a string for a substring and returns
   # its position when found. The first parameter is the string and

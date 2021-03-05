@@ -44,6 +44,7 @@ statement 3 starts at line 3, position 7.
 
 ]#
 
+# todo: test slash characters in strings.
 
 iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
     seq[LineParts], allSpaceTabMatcher: Matcher): Statement {.tpub.} =
