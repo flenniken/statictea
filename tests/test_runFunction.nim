@@ -551,6 +551,21 @@ suite "runFunction.nim":
     let eFunResult = newFunResult(newValue(-1))
     check testFunction("find", parameters, eFunResult = eFunResult)
 
+  test "find nothing":
+    var parameters = @[newValue("big"), newValue("")]
+    let eFunResult = newFunResult(newValue(0))
+    check testFunction("find", parameters, eFunResult = eFunResult)
+
+  test "find from nothing":
+    var parameters = @[newValue(""), newValue("")]
+    let eFunResult = newFunResult(newValue(0))
+    check testFunction("find", parameters, eFunResult = eFunResult)
+
+  test "find from nothing 2":
+    var parameters = @[newValue(""), newValue("2")]
+    let eFunResult = newFunResult(newValue(-1))
+    check testFunction("find", parameters, eFunResult = eFunResult)
+
   test "find 1 parameter":
     var parameters = @[newValue("big")]
     let eFunResult = newFunResultWarn(wTwoParameters)
@@ -576,4 +591,42 @@ suite "runFunction.nim":
     let eFunResult = newFunResult(newValue("Earl"))
     check testFunction("substr", parameters, eFunResult = eFunResult)
 
-  # todo: continue testing substr.
+  test "substr 1 parameter":
+    var parameters = @[newValue("big")]
+    let eFunResult = newFunResultWarn(wTwoOrThreeParameters)
+    check testFunction("substr", parameters, eFunResult = eFunResult)
+
+  test "substr 1 not string":
+    var parameters = @[newValue(4), newValue(4)]
+    let eFunResult = newFunResultWarn(wExpectedString, 0)
+    check testFunction("substr", parameters, eFunResult = eFunResult)
+
+  test "substr 2 not int":
+    var parameters = @[newValue("tasdf"), newValue("dsa")]
+    let eFunResult = newFunResultWarn(wExpectedInteger, 1)
+    check testFunction("substr", parameters, eFunResult = eFunResult)
+
+  test "substr 3 not int":
+    var parameters = @[newValue("tasdf"), newValue(0), newValue("tasdf")]
+    let eFunResult = newFunResultWarn(wExpectedInteger, 2)
+    check testFunction("substr", parameters, eFunResult = eFunResult)
+
+  test "substr start < 0":
+    var parameters = @[newValue("tasdf"), newValue(-2), newValue(0)]
+    let eFunResult = newFunResultWarn(wInvalidPosition, 1, "-2")
+    check testFunction("substr", parameters, eFunResult = eFunResult)
+
+  test "substr finish > len":
+    var parameters = @[newValue("tasdf"), newValue(0), newValue(10)]
+    let eFunResult = newFunResultWarn(wInvalidPosition, 2, "10")
+    check testFunction("substr", parameters, eFunResult = eFunResult)
+
+  test "substr finish < start":
+    var parameters = @[newValue("tasdf"), newValue(3), newValue(2)]
+    let eFunResult = newFunResultWarn(wEndLessThenStart, 2)
+    check testFunction("substr", parameters, eFunResult = eFunResult)
+
+  test "substr nothing":
+    var parameters = @[newValue("tasdf"), newValue(3), newValue(3)]
+    let eFunResult = newFunResult(newValue(""))
+    check testFunction("substr", parameters, eFunResult = eFunResult)
