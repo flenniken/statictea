@@ -22,6 +22,13 @@ proc get_test_filenames(): seq[string] =
   for filename in list:
     result.add(lastPathPart(filename))
 
+proc get_source_filenames(): seq[string] =
+  ## Return the list of the nim source files in the src folder.
+  result = @[]
+  var list = listFiles("src")
+  for filename in list:
+    result.add(lastPathPart(filename))
+
 proc get_test_module_cmd(filename: string, release = false): string =
   ## Return the command line to test one module.
 
@@ -55,71 +62,41 @@ proc build_release() =
   cmd = "strip bin/statictea"
   exec cmd
 
-# Tasks below
-
-task b, "\tBuild the statictea exe.":
-  build_release()
-
-task tree, "\tShow the project directory tree.":
-  exec "tree -I '*.nims|*.bin' | less"
-
-# task testallslow, "\tRun tests":
-#   let test_filenames = get_test_filenames()
-#   for filename in test_filenames:
-#     if filename == "testall.nim":
-#       continue
-#     let cmd = get_test_module_cmd(filename)
-#     exec cmd
-
-task test, "\tRun one test: test name":
-  let count = system.paramCount()+1
-  let name = system.paramStr(count-1)
-  if name == "showtest":
-     echo "Specify part of the test name."
-     return
-  let test_filenames = get_test_filenames()
-  for filename in test_filenames:
-    if name in filename:
-      let cmd = get_test_module_cmd(filename)
-      echo cmd
-      exec cmd
-
 proc doc_module(name: string) =
   let cmd = "nim doc --hints:off -d:test --index:on --out:docs/html/$1.html src/$1.nim" % [name]
   echo cmd
   exec cmd
 
 proc open_in_browser(filename: string) =
-  ## Open the given file in a browser if the system has an open command.
-  exec "(hash open 2>/dev/null && open $1) || echo 'open $1'" % filename
+  ## Open the given file in a browser if the system has an open
+  ## command and the file exists.
+  if fileExists(filename):
+    exec "(hash open 2>/dev/null && open $1) || echo 'open $1'" % filename
 
-task docs, "\tCreate md doc for a source file.":
-  var filename = "readjson.nim"
-  var jsonName = "readjson.json"
-  var cmd = "nim jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
-  echo cmd
-  exec cmd
-  exec "bin/statictea -s=docs/json/$1 -t=docs/template.md -r=docs/readjson.md" % [jsonName]
-  exec "less docs/readjson.md"
+proc getDirName(host: string): string =
+  ## Return the host dir name given the nim hostOS name.
+  ## Current possible host values: "windows", "macosx", "linux", "netbsd",
+  ## "freebsd", "openbsd", "solaris", "aix", "haiku", "standalone".
 
-task json, "\tDisplay json for a source file.":
-  var filename = "readjson.nim"
-  var jsonName = "readjson.json"
-  var cmd = "nim jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
-  echo cmd
-  exec cmd
-  exec "cat docs/json/$1 | jq | less" % [jsonName]
+  if host == "macosx":
+    result = "mac"
+  elif host == "linux":
+    result = "linux"
+  elif host == "windows":
+    result = "win"
+  else:
+    assert false, "add a new platform"
 
-task tt, "\tCompile and run t.nim":
-  let cmd = "nim c -r --gc:orc --hints:off --outdir:bin/tests/ src/t.nim"
-  echo cmd
-  exec cmd
+proc isPyEnvActive(): bool =
+  if system.getEnv("VIRTUAL_ENV", "") == "":
+    result = false
+  else:
+    result = true
 
-task args, "\tshow command line arguments":
-  let count = system.paramCount()+1
-  echo "argument count: $1" % $count
-  for i in 0..count-1:
-    echo "$1: $2" % [$i, system.paramStr(i)]
+# Tasks below
+
+task n, "\tShow available tasks.":
+  exec "nimble tasks"
 
 task t, "\tRun all tests at once.":
   # Create a file that includes all the test files.
@@ -134,3 +111,104 @@ awk '{printf "include %s\n", $0}' > tests/testall.nim
   build_release()
   # Run the command line tests.
   exec "src/test"
+
+task test, "\tRun tests; specify part of test name":
+  let count = system.paramCount()+1
+  let name = system.paramStr(count-1)
+  let test_filenames = get_test_filenames()
+  for filename in test_filenames:
+    if name in filename:
+      let cmd = get_test_module_cmd(filename)
+      echo cmd
+      exec cmd
+
+task b, "\tBuild the statictea exe.":
+  build_release()
+
+task docs, "\tCreate reStructuredtext docs; specify part of source file name.":
+  if not isPyEnvActive():
+    echo "Run pythonenv task first to setup the environment."
+    return
+  let count = system.paramCount()+1
+  let name = system.paramStr(count-1)
+  let filenames = get_source_filenames()
+  for filename in filenames:
+    if name in filename:
+      var jsonName = changeFileExt(filename, "json")
+      var cmd = "nim jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
+      echo cmd
+      echo ""
+      exec cmd
+      echo ""
+      var rstName = changeFileExt(filename, "rst")
+      cmd = "bin/statictea -s=docs/json/$1 -t=docs/template.rst -r=docs/$2" % [jsonName, rstName]
+      echo cmd
+      exec cmd
+      var htmlName = changeFileExt(filename, "html")
+      # cmd = "nim rst2html --hints:off --out:docs/html/$1 docs/$2" % [htmlName, rstName]
+      var dirName = getDirName(hostOS)
+      exec "rm docs/html/$1" % htmlName
+      exec "env/$1/staticteaenv/bin/rst2html5.py docs/$2 docs/html/$3 | less" % [
+        dirName, rstName, htmlName]
+      echo cmd
+      exec cmd
+      open_in_browser(r"docs/html/$1" % htmlName)
+
+task json, "\tDisplay doc json for a source file.":
+  let count = system.paramCount()+1
+  let name = system.paramStr(count-1)
+  let filenames = get_source_filenames()
+  for filename in filenames:
+    if name in filename:
+      var jsonName = changeFileExt(filename, "json")
+      var cmd = "nim jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
+      echo cmd
+      exec cmd
+      exec "cat docs/json/$1 | jq | less" % [jsonName]
+
+task tt, "\tCompile and run t.nim":
+  let cmd = "nim c -r --gc:orc --hints:off --outdir:bin/tests/ src/t.nim"
+  echo cmd
+  exec cmd
+
+task tree, "\tShow the project directory tree.":
+  exec "tree -I '*.nims|*.bin' | less"
+
+# task args, "\tshow command line arguments":
+#   let count = system.paramCount()+1
+#   echo "argument count: $1" % $count
+#   for i in 0..count-1:
+#     echo "$1: $2" % [$i, system.paramStr(i)]
+
+
+task pythonenv, "Create and activate a python virtual env.":
+  var dirName = getDirName(hostOS)
+  let virtualEnv = "env/$1/staticteaenv" % dirName
+  if system.dirExists(virtualEnv):
+    # Activate the existing virtual environment, if not already
+    # active.
+    if system.getEnv("VIRTUAL_ENV", "") == "":
+      var cmd = "source $1/bin/activate" % [virtualEnv]
+      echo "manually run:"
+      echo cmd
+  else:
+    # Create the virtual environment, activate and install necessary
+    # packages.
+    echo "Creating virtual environment: $1" % [virtualEnv]
+    var cmd = "python3 -m venv $1" % [virtualEnv]
+    echo cmd
+    exec cmd
+    cmd = """
+source $1/bin/activate; \
+pip3 install wheel; \
+pip3 install docutils
+""" % [virtualEnv]
+    echo cmd
+    exec cmd
+
+task rst2html5, "Show docutil's rst2html5 help file.":
+  if not isPyEnvActive():
+    echo "Run pythonenv task first to setup the environment."
+  else:
+    var dirName = getDirName(hostOS)
+    exec "env/$1/staticteaenv/bin/rst2html5.py -h | less" % [dirName]

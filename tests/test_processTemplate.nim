@@ -302,7 +302,7 @@ intensive steps.
     ]
 
     let eErrLines = splitNewLines """
-template.html(1): w31: Unused text at the end of the statement.
+template.html(1): w31: Unused text at the end of the statement. Missing semicolon?
 statement: tea = 'Earl Grey' tea2 = 'Masala chai'
                              ^
 template.html(4): w58: The replacement variable doesn't exist: tea.

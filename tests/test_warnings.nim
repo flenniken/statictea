@@ -44,8 +44,8 @@ suite "warnings.nim":
         echo "The following message does not start with a capital letter."
         echo message
         check isUpperAscii(message[0]) == true
-      if not (message[^1] == '.'):
-        echo "The following message does not end with a period."
+      if not (message[^1] == '.' or message[^1] == '?' ):
+        echo "The following message does not end with a period or question mark."
         echo message
         check message[^1] == '.'
       let count = message.countLetter('$')

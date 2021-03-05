@@ -37,6 +37,9 @@ You can change the look without changing the server.
 
 You can share common template fragments between templates.
 
+In a general sense Statictea is a program and language for
+formatting json.
+
 [[#contents][茶]]
 
 * How it Works
@@ -1905,14 +1908,14 @@ template:
 #+BEGIN_SRC
 <--$ nextline \-->
 <--$ : sub1 = substr("Earl Grey", 5) \-->
-<--$ : sub2 = substr("Earl Grey", 0, 4) -->
+<--$ : sub2 = substr("Earl Grey", 0, 6) -->
 sub1 = {sub1}, sub2 = {sub2}
 #+END_SRC
 
 result:
 
 #+BEGIN_SRC
-sub1 = Grey, sub2 = Earl
+sub1 = Grey, sub2 = Earl G
 #+END_SRC
 
 [[#contents][茶]]

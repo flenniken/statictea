@@ -1,6 +1,6 @@
 ## StaticTea
 ## A template processor and language.
-## See https://github.com/flenniken/statictea
+## See httpss://github.com/flenniken/statictea
 
 import parseCommandLine
 import strutils
@@ -16,6 +16,10 @@ when isMainModule:
 
 # todo: log the return code
 # todo: log how many warnings were output.
+# todo: invalid statement skipping it -- remove this line
+# todo: create new dictionary with a function.
+# todo: create new list with a function.
+# todo: add a third option for the find function which is the value to return when not found.
 
 proc processArgs(env: var Env, args: Args): int =
   if args.help:

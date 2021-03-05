@@ -134,7 +134,7 @@ tpubType:
       "Not enough memory for the line buffer.", # wNotEnoughMemoryForLB
       "Statement does not start with a variable name.", # wMissingStatementVar
       "Invalid string.", # wNotString
-      "Unused text at the end of the statement.", # wTextAfterValue
+      "Unused text at the end of the statement. Missing semicolon?", # wTextAfterValue
       "Invalid UTF-8 byte in the string.", # wInvalidUtf8
       "Expected a string, number, variable or function.", # wInvalidRightHandSide
       "Invalid variable or missing equal sign.", # wInvalidVariable

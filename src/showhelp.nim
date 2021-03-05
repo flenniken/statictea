@@ -1,7 +1,7 @@
 ## Show help on the command line.
 import env
 
-proc getHelp(): string =
+func getHelp(): string =
   result = """
 NAME
 
@@ -90,5 +90,6 @@ SEE ALSO
 """
 
 proc showHelp*(env: var Env): int =
+  ## Display the help text.
   env.writeOut(getHelp())
   result = 0

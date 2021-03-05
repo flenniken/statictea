@@ -756,7 +756,7 @@ statement: t.output = 'notvalidv'
   test "runStatement junk at end":
     let statement = newStatement(text="""str = "testing" junk at end""", lineNum=1, 0)
     let eErrLines = @[
-      "template.html(1): w31: Unused text at the end of the statement.\n",
+      "template.html(1): w31: Unused text at the end of the statement. Missing semicolon?\n",
       """statement: str = "testing" junk at end""" & "\n",
         "                           ^\n",
     ]
