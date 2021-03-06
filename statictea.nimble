@@ -156,7 +156,7 @@ task docs, "\tCreate reStructuredtext docs; specify part of source file name.":
       var htmlName = changeFileExt(filename, "html")
       if useDocUtils:
         var dirName = getDirName(hostOS)
-        exec "rm docs/html/$1" % htmlName
+        exec "rm -f docs/html/$1" % htmlName
         exec "env/$1/staticteaenv/bin/rst2html5.py docs/$2 docs/html/$3 | less" % [
           dirName, rstName, htmlName]
       else:

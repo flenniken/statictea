@@ -97,6 +97,7 @@ type
     wNoTemplateName,       # w88
     wInvalidPosition,      # w89
     wEndLessThenStart,     # w90
+    wSubstringNotFound,    # w91
 
 tpubType:
   const
@@ -194,6 +195,7 @@ tpubType:
       "No template name. Use -h for help.", # wNoTemplateName
       "Invalid position: got $1.", # wInvalidPosition
       "The end position is less that the start position.", # wEndLessThenStart
+      "The substring was not found and no default parameter.", # wSubstringNotFound
     ]
 
 func getWarning*(filename: string, lineNum: int,

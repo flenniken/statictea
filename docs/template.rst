@@ -3,7 +3,7 @@
 #$ # Title
 #$ block \
 #$ : equals = '=================================================================================='; \
-#$ : title = substr(s.orig, add(4, find(s.orig, 'src/'))); \
+#$ : title = substr(s.orig, add(4, find(s.orig, 'src/', -4))); \
 #$ : titleOverline = substr(equals, 0, len(title))
 {titleOverline}
 {title}
@@ -14,17 +14,19 @@
 #$ nextline
 {s.moduleDescription}
 
-#$ # Index to types and functions.
 Index:
 ------
 
+#$ # Index to types and functions.
 #$ nextline \
 #$ : t.repeat = len(s.entries); \
 #$ : entry = get(s.entries, t.row, t.shared); \
 #$ : name = get(entry, "name", ""); \
 #$ : description = get(entry, "description", ""); \
-#$ : short = substr(description, 0, add(find(description, '.'), 1))
-* {name}_ -- {short}
+#$ : skType = get(entry, "type", ""); \
+#$ : type = case(skType, "", "skType", "type: "); \
+#$ : short = substr(description, 0, add(find(description, '.', -1), 1))
+* {type}{name}_ -- {short}
 
 #$ # Function and type descriptions.
 #$ block \
@@ -35,7 +37,7 @@ Index:
 #$ : nameUnderline = substr(dashes, 0, add(1, len(name))); \
 #$ : description = get(entry, "description", ""); \
 #$ : code = get(entry, "code", ""); \
-#$ : pos = find(code, "{"); pos = case(pos, pos, -1, len(code)); \
+#$ : pos = find(code, "{", len(code)); \
 #$ : signature = substr(code, 0, pos); \
 #$ : t.maxLines = 100
 .. _{name}:

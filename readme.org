@@ -1618,22 +1618,19 @@ exists("b") => 0
 :END:
 
 The find function searches a string for a substring and returns
-its position when found. The first parameter is the string and
-the second is the substring. When not found it returns -1. Positions
-start at 0. Added in version 0.1.0.
-
-template:
-
-#+BEGIN_SRC
-<--$ nextline \-->
-<--$ pos = find("Tea time at 4:00.", "time") -->
-{pos}
-#+END_SRC
-
-result:
+its position when found. The first parameter is the string and the
+second is the substring. The third optional parameter is returned
+when the substring is not found.  A warning is generated when the
+substring is missing and no third parameter. Positions start at
+0. Added in version 0.1.0.
 
 #+BEGIN_SRC
-4
+msg = "Tea time at 3:30."
+find(msg, "Tea") => 0
+find(msg, "time") => 4
+find(msg, "party", -1) => -1
+find(msg, "party", len(msg)) => 17
+find(msg, "party", 0) => 0
 #+END_SRC
 
 [[#contents][茶]]

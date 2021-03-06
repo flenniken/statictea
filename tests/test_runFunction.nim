@@ -532,23 +532,13 @@ suite "runFunction.nim":
     check testFunction("find", parameters, eFunResult = eFunResult)
 
   test "find missing":
-    var parameters = @[newValue("Tea time at 4:00."), newValue("party")]
-    let eFunResult = newFunResult(newValue(-1))
-    check testFunction("find", parameters, eFunResult = eFunResult)
-
-  test "find missing 1":
-    var parameters = @[newValue("Tea time at 4:00."), newValue("aTea")]
-    let eFunResult = newFunResult(newValue(-1))
-    check testFunction("find", parameters, eFunResult = eFunResult)
-
-  test "find missing 2":
-    var parameters = @[newValue("Tea time at 4:00."), newValue(".r")]
-    let eFunResult = newFunResult(newValue(-1))
+    var parameters = @[newValue("Tea time at 4:00."), newValue("party"), newValue("3:00")]
+    let eFunResult = newFunResult(newValue("3:00"))
     check testFunction("find", parameters, eFunResult = eFunResult)
 
   test "find bigger":
-    var parameters = @[newValue("big"), newValue("bigger")]
-    let eFunResult = newFunResult(newValue(-1))
+    var parameters = @[newValue("big"), newValue("bigger"), newValue("smaller")]
+    let eFunResult = newFunResult(newValue("smaller"))
     check testFunction("find", parameters, eFunResult = eFunResult)
 
   test "find nothing":
@@ -562,13 +552,18 @@ suite "runFunction.nim":
     check testFunction("find", parameters, eFunResult = eFunResult)
 
   test "find from nothing 2":
-    var parameters = @[newValue(""), newValue("2")]
-    let eFunResult = newFunResult(newValue(-1))
+    var parameters = @[newValue(""), newValue("2"), newValue(0)]
+    let eFunResult = newFunResult(newValue(0))
+    check testFunction("find", parameters, eFunResult = eFunResult)
+
+  test "find missing no default":
+    var parameters = @[newValue("Tea time at 4:00."), newValue("aTea")]
+    let eFunResult = newFunResultWarn(wSubstringNotFound, 1)
     check testFunction("find", parameters, eFunResult = eFunResult)
 
   test "find 1 parameter":
     var parameters = @[newValue("big")]
-    let eFunResult = newFunResultWarn(wTwoParameters)
+    let eFunResult = newFunResultWarn(wTwoOrThreeParameters)
     check testFunction("find", parameters, eFunResult = eFunResult)
 
   test "find 1 not string":

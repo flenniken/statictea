@@ -1,4 +1,4 @@
-## Run a function.
+## The module contains all the built in functions.
 
 import vartypes
 import options
@@ -13,12 +13,16 @@ import matches
 
 type
   FunctionPtr* = proc (parameters: seq[Value]): FunResult
+    ## Signature of a statictea function. It takes any number of values
+    ## and returns a value or a warning message.
 
   FunResultKind* = enum
+    ## The kind of a FunResult object, either a value or warning.
     frValue,
     frWarning
 
   FunResult* = object
+    ## Functions return a FunResult object.
     case kind*: FunResultKind
       of frValue:
         value*: Value       ## Return value of the function.
@@ -28,17 +32,21 @@ type
         p1*: string         ## Extra warning info.
         p2*: string         ## Extra warning info.
 
+# A table of the built in functions.
 var functions: Table[string, FunctionPtr]
 
 proc newFunResultWarn*(warning: Warning, parameter: Natural = 0,
       p1: string = "", p2: string = ""): FunResult =
+  ## Create a FunResult containing a warning message.
   result = FunResult(kind: frWarning, warning: warning,
              parameter: parameter, p1: p1, p2: p2)
 
 proc newFunResult*(value: Value): FunResult =
+  ## Create a FunResult containing a return value.
   result = FunResult(kind: frValue, value: value)
 
 proc `==`*(funResult1: FunResult, funResult2: FunResult): bool =
+  ## Compare two FunResult objects and return true when equal.
   if funResult1.kind == funResult2.kind:
     case funResult1.kind:
       of frValue:
@@ -51,7 +59,7 @@ proc `==`*(funResult1: FunResult, funResult2: FunResult): bool =
           result = true
 
 func `$`*(funResult: FunResult): string =
-  ## A string representation of FunResult.
+  ## Return a string representation of a FunResult object.
   case funResult.kind
   of frValue:
     result = $funResult.value
@@ -61,8 +69,8 @@ func `$`*(funResult: FunResult): string =
     ]
 
 proc cmpString*(a, b: string, ignoreCase: bool = false): int =
-  ## Compares two UTF-8 strings and returns 0 when equal, 1 when a > b
-  ## and -1 when a < b. Optionally Ignore case.
+  ## Compares two UTF-8 strings. Returns 0 when equal, 1 when a is
+  ## greater than b and -1 when a less than b. Optionally Ignore case.
   var i = 0
   var j = 0
   var ar, br: Rune
@@ -86,12 +94,12 @@ proc cmpString*(a, b: string, ignoreCase: bool = false): int =
     result = 0
 
 proc funCmp*(parameters: seq[Value]): FunResult =
-  ## The cmp function compares two variables, either numbers or
-  ## strings (both the same type), and returns whether the first
-  ## parameter is less than, equal to or greater than the second
-  ## parameter. It returns -1 for less, 0 for equal and 1 for greater
-  ## than. The optional third parameter compares strings case
-  ## insensitive when it is 1. Added in version 0.1.0.
+  ## Compare two values.  The values are either numbers or strings
+  ## (both the same type), and it returns whether the first parameter
+  ## is less than, equal to or greater than the second parameter. It
+  ## returns -1 for less, 0 for equal and 1 for greater than. The
+  ## optional third parameter compares strings case insensitive when
+  ## it is 1. Added in version 0.1.0.
   if parameters.len() < 2 or parameters.len() > 3:
     result = newFunResultWarn(wTwoOrThreeParameters)
     return
@@ -119,8 +127,7 @@ proc funCmp*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(ret))
 
 proc funConcat*(parameters: seq[Value]): FunResult =
-  ## Concatentate the string parameters. You pass 2 or more string
-  ## parameters.  Added in version 0.1.0.
+  ## Concatentate two or more strings.  Added in version 0.1.0.
   var str = ""
   if parameters.len() < 2:
     result = newFunResultWarn(wTwoOrMoreParameters)
@@ -133,10 +140,10 @@ proc funConcat*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(str))
 
 proc funLen*(parameters: seq[Value]): FunResult =
-  ## The len function takes one parameter and returns the number of
-  ## characters in a string (not bytes), the number of elements in a
-  ## list or the number of elements in a dictionary.  Added in version
-  ## 0.1.0.
+  ## Return the len of a value. It takes one parameter and
+  ## returns the number of characters in a string (not bytes), the
+  ## number of elements in a list or the number of elements in a
+  ## dictionary.  Added in version 0.1.0.
   if parameters.len() != 1:
     result = newFunResultWarn(wOneParameter)
     return
@@ -155,14 +162,13 @@ proc funLen*(parameters: seq[Value]): FunResult =
   result = newFunResult(retValue)
 
 proc funGet*(parameters: seq[Value]): FunResult =
-  ## You use the get function to return a list or dictionary element.
-  ## You pass two or three parameters, the first is the dictionary or
-  ## list to use, the second is the dictionary key name or the list
-  ## index, and the third optional parameter is the default value when
-  ## the element doesn't exist.
-  ##
-  ## If you don't specify the default, a warning is generated when the
-  ## element doesn't exist and the statement is skipped.
+  ## Return a value contained in a list or dictionary. You pass two or
+  ## three parameters, the first is the dictionary or list to use, the
+  ## second is the dictionary's key name or the list index, and the
+  ## third optional parameter is the default value when the element
+  ## doesn't exist. If you don't specify the default, a warning is
+  ## generated when the element doesn't exist and the statement is
+  ## skipped.
   ##
   ## -p1: dictionary or list
   ## -p2: string or int
@@ -200,6 +206,7 @@ proc funGet*(parameters: seq[Value]): FunResult =
     else:
       return newFunResultWarn(wExpectedListOrDict)
 
+# todo: remove the if.  Use case instead.
 proc funIf*(parameters: seq[Value]): FunResult =
   ## You use the if function to return a value based on a condition.
   ## It has three parameters, the condition, the true case and the
@@ -228,10 +235,8 @@ proc funIf*(parameters: seq[Value]): FunResult =
 {.push overflowChecks: on, floatChecks: on.}
 
 proc funAdd*(parameters: seq[Value]): FunResult =
-  ## The add function returns the sum of its two or more
-  ## parameters. The parameters must be all integers or all floats.  A
-  ## warning is generated on overflow and the statement is skipped.
-  ##
+  ## Return the sum of two or more values.  The parameters must be all
+  ## integers or all floats.  A warning is generated on overflow.
   ## Added in version 0.1.0.
 
   if parameters.len() < 2:
@@ -262,7 +267,7 @@ proc funAdd*(parameters: seq[Value]): FunResult =
 {.pop.}
 
 proc funExists*(parameters: seq[Value]): FunResult =
-  ## Return 1 when a variable exists in the given dictionary, else
+  ## Return 1 when a variable exists in a dictionary, else
   ## return 0. The first parameter is the dictionary to check and the
   ## second parameter is the name of the variable.
   ##
@@ -290,12 +295,11 @@ proc funExists*(parameters: seq[Value]): FunResult =
     num = 1
   result = newFunResult(newValue(num))
 
+# todo: For the case function move the default to the last parameter.
 proc funCase*(parameters: seq[Value]): FunResult =
-  ## The case function returns a value from multiple choices.
-  ##
-  ## It requires at least four parameters, the main condition, the
-  ## "else" value and a case pair. You can have any number of case
-  ## pairs.
+  ## The case function returns a value from multiple choices. It
+  ## requires at least four parameters, the main condition, the "else"
+  ## value and a case pair. You can have any number of case pairs.
   ##
   ## The first parameter of a case pair is the case condition and the
   ## second is the return value when that condition matches the main
@@ -352,6 +356,7 @@ proc funCase*(parameters: seq[Value]): FunResult =
   result = newFunResult(parameters[ixRet])
 
 proc parseVersion*(version: string): Option[(int, int, int)] =
+  ## Parse a Statictea version number and return its three components.
   let versionMatcher = newMatcher(r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$", 3)
   let matches2O = getMatches(versionMatcher, version, 0)
   if not matches2O.isSome:
@@ -363,10 +368,10 @@ proc parseVersion*(version: string): Option[(int, int, int)] =
   result = some((int(g1IntPosO.get().integer), int(g2IntPosO.get().integer), int(g3IntPosO.get().integer)))
 
 proc funCmpVersion*(parameters: seq[Value]): FunResult =
-  ## The cmpVersion function compares two StaticTea type version
-  ## numbers and returns whether the first parameter is less than,
-  ## equal to or greater than the second parameter. It returns -1 for
-  ## less, 0 for equal and 1 for greater than.
+  ## Compare two StaticTea type version numbers. Return whether the
+  ## first parameter is less than, equal to or greater than the second
+  ## parameter. It returns -1 for less, 0 for equal and 1 for greater
+  ## than.
   ##
   ## StaticTea uses [[https://semver.org/][Semantic Versioning]] with
   ## the added restrictions that each version component is has one to
@@ -400,8 +405,7 @@ proc funCmpVersion*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(ret))
 
 proc funFloat*(parameters: seq[Value]): FunResult =
-  ## The float function converts an int or an int number string to a
-  ## float.
+  ## Convert an int or an int number string to a float.
   ##
   ## Added in version 0.1.0.
   ##
@@ -440,8 +444,7 @@ proc funFloat*(parameters: seq[Value]): FunResult =
 # todo: use int64 instead of BiggestInt everywhere.
 
 proc funInt*(parameters: seq[Value]): FunResult =
-  ## The int function converts a float or a number string to an
-  ## int.
+  ## Convert a float or a number string to an int.
   ##
   ## - p1: value to convert, float or float number string
   ## - p2: optional round options. "round" is the default.
@@ -514,39 +517,53 @@ proc funInt*(parameters: seq[Value]): FunResult =
       return newFunResultWarn(wExpectedRoundOption, 1)
   result = newFunResult(newValue(ret))
 
-# todo: add a third parameter to find to use when the sub-string is not found.
-
 proc funFind*(parameters: seq[Value]): FunResult =
-  # The find function searches a string for a substring and returns
-  # its position when found. The first parameter is the string and
-  # the second is the substring. When not found it returns -1. Positions
-  # start at 0. Added in version 0.1.0.
+  ## Find a substring in a string and return its position when
+  ## found. The first parameter is the string and the second is the
+  ## substring. The third optional parameter is returned when the
+  ## substring is not found.  A warning is generated when the
+  ## substring is missing and no third parameter. Positions start at
+  ## 0. Added in version 0.1.0.
+  ##
+  ## #+BEGIN_SRC
+  ## msg = "Tea time at 3:30."
+  ## find(msg, "Tea") => 0
+  ## find(msg, "time") => 4
+  ## find(msg, "party", -1) => -1
+  ## find(msg, "party", len(msg)) => 17
+  ## find(msg, "party", 0) => 0
+  ## #+END_SRC
 
-  if parameters.len() != 2:
-    result = newFunResultWarn(wTwoParameters, 0)
+  if parameters.len() < 2 or parameters.len() > 3:
+    result = newFunResultWarn(wTwoOrThreeParameters, 0)
     return
 
-  for ix, parameter in parameters:
+  for ix, parameter in parameters[0 .. 1]:
     if parameter.kind != vkString:
       result = newFunResultWarn(wExpectedString, ix)
       return
 
   let pos = find(parameters[0].stringv, parameters[1].stringv)
-  result = newFunResult(newValue(pos))
+  if pos == -1:
+    if parameters.len == 3:
+      result = newFunResult(parameters[2])
+    else:
+      result = newFunResultWarn(wSubstringNotFound, 1)
+  else:
+    result = newFunResult(newValue(pos))
 
+# todo: add examples for all functions.
 proc funSubstr*(parameters: seq[Value]): FunResult =
-  # The substr function extracts a substring from a string.  The first
-  # parameter is the string, the second is the substring's starting
-  # position and the third is one past the end. The first position is
-  # 0.
-
-  # This kind of positioning is called a half-open range that
-  # includes the first position but not the second. For example,
-  # [3, 7) includes 3, 4, 5, 6. The end minus the start is equal to
-  # the length of the substring.
-
-  # The third parameter is optional and defaults to one past the end
-  # of the string. Added in version 0.1.0.
+  ## Extract a substring from a string.  The first parameter is the
+  ## string, the second is the substring's starting position and the
+  ## third is one past the end. The first position is 0. The third
+  ## parameter is optional and defaults to one past the end of the
+  ## string. Added in version 0.1.0.
+  ##
+  ## This kind of positioning is called a half-open range that
+  ## includes the first position but not the second. For example,
+  ## [3, 7) includes 3, 4, 5, 6. The end minus the start is equal to
+  ## the length of the substring.
 
   if parameters.len < 2 or parameters.len > 3:
     result = newFunResultWarn(wTwoOrThreeParameters)
@@ -614,7 +631,7 @@ const
 # todo: add function to get the list of functions? or check whether one exists?
 
 proc getFunction*(functionName: string): Option[FunctionPtr] =
-  ## Return the function pointer for the given function name.
+  ## Look up a function by its name.
 
   # Build a table of functions.
   if functions.len == 0:
