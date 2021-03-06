@@ -11,6 +11,9 @@ bin           = @["bin/statictea"]
 
 requires "nim >= 1.4.4"
 
+const
+  useDocUtils = true
+
 # The nimscript module is imported by default. It contains functions
 # you can call in your nimble file.
 # https://nim-lang.org/0.11.3/nimscript.html
@@ -141,15 +144,23 @@ task docs, "\tCreate reStructuredtext docs; specify part of source file name.":
       exec cmd
       echo ""
       var rstName = changeFileExt(filename, "rst")
-      cmd = "bin/statictea -s=docs/json/$1 -t=docs/template.rst -r=docs/$2" % [jsonName, rstName]
+
+      # Add useDocUtils to the shared.json file for use by the template.
+      let sharedJson = "{\"useDocUtils\": $1}\n" % [$useDocUtils]
+      writeFile("docs/shared.json", sharedJson)
+
+      cmd = "bin/statictea -s=docs/json/$1 -j=docs/shared.json -t=docs/template.rst -r=docs/$2" % [
+        jsonName, rstName]
       echo cmd
       exec cmd
       var htmlName = changeFileExt(filename, "html")
-      # cmd = "nim rst2html --hints:off --out:docs/html/$1 docs/$2" % [htmlName, rstName]
-      var dirName = getDirName(hostOS)
-      exec "rm docs/html/$1" % htmlName
-      exec "env/$1/staticteaenv/bin/rst2html5.py docs/$2 docs/html/$3 | less" % [
-        dirName, rstName, htmlName]
+      if useDocUtils:
+        var dirName = getDirName(hostOS)
+        exec "rm docs/html/$1" % htmlName
+        exec "env/$1/staticteaenv/bin/rst2html5.py docs/$2 docs/html/$3 | less" % [
+          dirName, rstName, htmlName]
+      else:
+        cmd = "nim rst2html --hints:off --out:docs/html/$1 docs/$2" % [htmlName, rstName]
       echo cmd
       exec cmd
       open_in_browser(r"docs/html/$1" % htmlName)

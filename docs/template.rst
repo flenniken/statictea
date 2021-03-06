@@ -1,7 +1,6 @@
-.. Statictea template to generate reStructuredTest from nim doc comments.
+#$ # Statictea template to generate reStructuredTest from nim doc comments.
 
-.. Title
-
+#$ # Title
 #$ block \
 #$ : equals = '=================================================================================='; \
 #$ : title = substr(s.orig, add(4, find(s.orig, 'src/'))); \
@@ -11,13 +10,11 @@
 {titleOverline}
 #$ endblock
 
-.. Description
-
+#$ # Module description.
 #$ nextline
 {s.moduleDescription}
 
-.. Index
-
+#$ # Index to types and functions.
 Index:
 ------
 
@@ -29,6 +26,7 @@ Index:
 #$ : short = substr(description, 0, add(find(description, '.'), 1))
 * {name}_ -- {short}
 
+#$ # Function and type descriptions.
 #$ block \
 #$ : t.repeat = len(s.entries); \
 #$ : dashes = '----------------------------------------------------------------------------------'; \
@@ -49,6 +47,17 @@ Index:
 
 .. code::
 
-  {signature}
+ {signature}
 
 #$ endblock
+#$ # The code block above has code in the json with two space
+#$ # indenting on multiple lines.  Indenting the first line two spaces
+#$ # makes all the lines line up. If you indent it one space, you can
+#$ # see the indentation. You need to indent at least one space.
+
+#$ # Use the class directive when using docutils. Nim rst2html
+#$ # doesn't support it.
+#$ nextline t.output = if(h.useDocUtils, "result", "skip")
+.. class:: align-center
+
+Document produced from nim doc comments and formatted with Statictea.

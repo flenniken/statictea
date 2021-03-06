@@ -598,8 +598,8 @@ const
     ("float", funFloat),
     ("find", funFind),
     ("substr", funSubstr),
-#
-#
+# replace -- search and replace
+# regex matching
 # format
 # lineNumber
 # quotehtml

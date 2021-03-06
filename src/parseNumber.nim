@@ -1,18 +1,22 @@
-## The version.nim file defines the version numbers of statictea and its
-## required components.
+## Parse a number string and return a float or integer and the number
+## of characters processed.
 
 import options
 import parseUtils
 
+# todo: use int64 instead of BiggestInt everywhere.
+assert sizeof[BiggestInt] == sizeof[int64]
+
 type
   IntPos* = object
+    ## Integer and its text length.
     integer*: BiggestInt
     length*: int
 
   FloatPos* = object
+    ## Float and its text length.
     number*: float64
     length*: int
-
 
 proc parseFloat64*(str: string, start: Natural = 0): Option[FloatPos] =
   ## Parse the string and return the 64 bit float number and the
@@ -29,9 +33,6 @@ proc parseFloat64*(str: string, start: Natural = 0): Option[FloatPos] =
   let length = parseBiggestFloat(str, number, start)
   if length > 0:
     result = some(FloatPos(number: number, length: length))
-
-# todo: use int64 instead of BiggestInt everywhere.
-assert sizeof[BiggestInt] == sizeof[int64]
 
 proc parseInteger*(s: string, start: Natural = 0): Option[IntPos] =
   ## Parse the string and return the integer and number of characters
