@@ -37,7 +37,9 @@ var functions: Table[string, FunctionPtr]
 
 proc newFunResultWarn*(warning: Warning, parameter: Natural = 0,
       p1: string = "", p2: string = ""): FunResult =
-  ## Create a FunResult containing a warning message.
+  ## Create a FunResult containing a warning message. The parameter is
+  ## the index of the problem parameter, or 0. Both p1 and p2 are the
+  ## optional strings that go with the warning message.
   result = FunResult(kind: frWarning, warning: warning,
              parameter: parameter, p1: p1, p2: p2)
 
@@ -295,31 +297,30 @@ proc funExists*(parameters: seq[Value]): FunResult =
     num = 1
   result = newFunResult(newValue(num))
 
-# todo: For the case function move the default to the last parameter.
 proc funCase*(parameters: seq[Value]): FunResult =
   ## The case function returns a value from multiple choices. It
-  ## requires at least four parameters, the main condition, the "else"
-  ## value and a case pair. You can have any number of case pairs.
+  ## requires at least four parameters, the main condition a case pair
+  ## and the else condition. You can have any number of case pairs
+  ## with the else case at the end.
   ##
-  ## The first parameter of a case pair is the case condition and the
+  ## The first parameter of a case pair is the condition and the
   ## second is the return value when that condition matches the main
   ## condition.
   ##
   ## When none of the cases match the main condition, the "else" value
-  ## is returned.  The conditions must be all strings or all ints and
-  ## the return values any be any type.
+  ## is returned.  All the conditions must be the same type, either
+  ## strings or ints and the return values any be any type.
   ##
   ## The function compares the conditions left to right and returns
-  ## when it finds the first match.
+  ## the first match.
   ##
-  ## -p1: The main condition value.
-  ## -p2: The "else" value.
-  ##
-  ## -p3: The first case condition.
-  ## -p4: Return value when p3 equals p1.
+  ## -p1c: The main condition value.
+  ## -p2c: The first case condition value.
+  ## -p3v: The return value when p1 equals p2.
   ## ...
   ## -pnc: The last case condition.
-  ## -pnv: Return value when pnc equals p1.
+  ## -pnv: The return value when p1 equals pnc.
+  ## -plastv: The "else" value returned when nothing matches.
   ##
   ## Added in version 0.1.0.
 
@@ -335,14 +336,14 @@ proc funCase*(parameters: seq[Value]): FunResult =
 
   # Make sure each condition type matches the main condition. We do
   # this before comparing to catch lurking error edge cases.
-  for ix in countUp(2, parameters.len-1, 2):
+  for ix in countUp(1, parameters.len-2, 2):
     var condition = parameters[ix]
     if condition.kind != mainCondition.kind:
       result = newFunResultWarn(wInvalidCondition, ix)
       return
 
-  var ixRet = 1
-  for ix in countUp(2, parameters.len-1, 2):
+  var ixRet = parameters.len-1
+  for ix in countUp(1, parameters.len-2, 2):
     var condition = parameters[ix]
     if condition.kind == vkString:
       if condition.stringv == mainCondition.stringv:
@@ -373,11 +374,13 @@ proc funCmpVersion*(parameters: seq[Value]): FunResult =
   ## parameter. It returns -1 for less, 0 for equal and 1 for greater
   ## than.
   ##
-  ## StaticTea uses [[https://semver.org/][Semantic Versioning]] with
-  ## the added restrictions that each version component is has one to
-  ## three digits (no letters).
+  ## StaticTea uses `Semantic Versioning`_ with the added restriction
+  ## that each version component has one to three digits (no letters).
   ##
   ## Added in version 0.1.0.
+  ##
+  ## .. _`Semantic Versioning`: https://semver.org/
+
   if parameters.len() != 2:
     result = newFunResultWarn(wTwoParameters)
     return

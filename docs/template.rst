@@ -1,5 +1,17 @@
 #$ # Statictea template to generate reStructuredTest from nim doc comments.
-
+#$ #
+#$ # todo: Make the type names in code sections into links that
+#$ # point at their description.
+#$ # Replace the types found in the code section with their name
+#$ # followed by an underscore to make then into links. The link
+#$ # destinations already exist.
+#$ # Need way to make a dictionary. Put it in t.global.
+#$ # Need way to replace the names. Names without getting part
+#$ # of a word.  Names with a space after them or names at the end of
+#$ # a line.
+#$ # todo: matches.html. Need a way to handle two procedures
+#$ # named the same.
+#$ #
 #$ # Title
 #$ block \
 #$ : equals = '=================================================================================='; \
@@ -24,7 +36,7 @@ Index:
 #$ : name = get(entry, "name", ""); \
 #$ : description = get(entry, "description", ""); \
 #$ : skType = get(entry, "type", ""); \
-#$ : type = case(skType, "", "skType", "type: "); \
+#$ : type = case(skType, "skType", "type: ", ""); \
 #$ : short = substr(description, 0, add(find(description, '.', -1), 1))
 * {type}{name}_ -- {short}
 
@@ -56,7 +68,8 @@ Index:
 #$ # indenting on multiple lines.  Indenting the first line two spaces
 #$ # makes all the lines line up. If you indent it one space, you can
 #$ # see the indentation. You need to indent at least one space.
-
+#$ # Fix by adding spaces to the beginning of lines, except the first.
+#$ #
 #$ # Use the class directive when using docutils. Nim rst2html
 #$ # doesn't support it.
 #$ nextline t.output = if(h.useDocUtils, "result", "skip")

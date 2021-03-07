@@ -253,8 +253,8 @@ proc getCompiledMatchers(args: Args): CompiledMatchers =
   result = getCompiledMatchers(prepostTable)
 
 proc processTemplate*(env: var Env, args: Args): int =
-  ## Process the template and return 0 on success. It's an error when
-  ## a warning messages was written.
+  ## Process the template and return 0 on success. Return 1 if a
+  ## warning messages was written while processing the template.
 
   var variables = getStartingVariables(env, args)
   var compiledMatchers = getCompiledMatchers(args)
@@ -266,8 +266,8 @@ proc processTemplate*(env: var Env, args: Args): int =
     result = 1
 
 proc updateTemplate*(env: var Env, args: Args): int =
-  ## Update the template and return 0 on success. It's an error when
-  ## a warning messages was written.
+  ## Update the template and return 0 on success. Return 1 if a
+  ## warning messages was written while processing the template.
 
   var variables = getStartingVariables(env, args)
   var compiledMatchers = getCompiledMatchers(args)
@@ -279,8 +279,8 @@ proc updateTemplate*(env: var Env, args: Args): int =
     result = 1
 
 proc processTemplateTop*(env: var Env, args: Args): int =
-  ## Process the template and return 0 on success. It's an error when
-  ## a warning messages was written.
+  ## Process the template and return 0 on success. This calls
+  ## processTemplate.
 
   # Add the template and result streams to the environment.
   if not env.addExtraStreams(args):
@@ -290,8 +290,8 @@ proc processTemplateTop*(env: var Env, args: Args): int =
   result = processTemplate(env, args)
 
 proc updateTemplateTop*(env: var Env, args: Args): int =
-  ## Update the template and return 0 on success. It's an error when
-  ## a warning messages was written.
+  ## Update the template and return 0 on success. This calls
+  ## updateTemplate.
 
   # Add the template and result streams to the environment. Result
   # file is either a temp file or standard out.

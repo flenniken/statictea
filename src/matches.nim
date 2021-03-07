@@ -7,6 +7,7 @@ import options
 
 const
   predefinedPrepost: array[6, Prepost] = [
+    ## Predefined prefixes and postfixes.
     ("<!--$", "-->"),
     ("#$", ""),
     (";$", ""),
@@ -16,6 +17,7 @@ const
   ]
 
   commands: array[7, string] = [
+    ## Statictea commands.
     "nextline",
     "block",
     "replace",
@@ -27,8 +29,10 @@ const
 
 type
   PrepostTable* = OrderedTable[string, string]
+    ## The prefix postfix pairs stored in an ordered dictionary.
 
   CompiledMatchers* = object
+    ## The precompiled regular expressions used for parsing lines.
     prepostTable*: PrepostTable
     prefixMatcher*: Matcher
     commandMatcher*: Matcher
@@ -44,16 +48,16 @@ type
     tabSpaceMatcher*: Matcher
 
 proc getDefaultPrepostTable*(): PrepostTable =
-  ## Return the default prepost table.
+  ## Return the default ordered table that maps prefixes to postfixes.
   result = initOrderedTable[string, string]()
   for prepost in predefinedPrepost:
     assert prepost.pre != ""
     result[prepost.pre] = prepost.post
 
 proc getUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
-  ## Return an ordered table that maps prefixes to postfixes. The
-  ## given prepostList contains optional prefixes and postfixes from
-  ## the user on the command line.
+  ## Return the user's ordered table that maps prefixes to
+  ## postfixes. This is used when the user specifies prefixes on the
+  ## command line. No defaults in this table.
   assert prepostList.len > 0
   result = initOrderedTable[string, string]()
   for prepost in prepostList:
@@ -71,13 +75,14 @@ proc getPrefixMatcher*(prepostTable: PrepostTable): Matcher =
   result = newMatcher(r"^($1)\s*" % terms.join("|"), 1)
 
 proc getCommandMatcher*(): Matcher =
-  ## Match a command. The group contains the command matched.
+  ## Return a matcher for matching a command. The group contains the command matched.
   result = newMatcher(r"($1)" % commands.join("|"), 1)
 
 proc getLastPartMatcher*(postfix: string): Matcher =
-  ## Get the matcher that matches the optional continuation slash, the
-  ## optional postfix and the line endings. The postfix used is
-  ## remembered in the matcher object returned.
+  ## Retun a matcher that matches the last part of the line.  It
+  ## matches the optional continuation slash, the optional postfix and
+  ## the line endings. The postfix used is remembered in the matcher
+  ## object returned.
   # Note: nim sets the regex anchor option.
   var pattern: string
   if postfix == "":
@@ -87,7 +92,7 @@ proc getLastPartMatcher*(postfix: string): Matcher =
   result = newMatcher(pattern, 2, arg1 = postfix)
 
 proc getLastPart*(matcher: Matcher, line: string): Option[Matches] =
-  ## Return the optional slash and line endings.
+  ## Return the optional slash and line endings from the line.
 
   # Start checking 3 characters before the end to account for the
   # optional slash, cr and linefeed. If the line is too short, return
@@ -117,7 +122,7 @@ proc getAllSpaceTabMatcher*(): Matcher =
   result = newMatcher(r"^[ \t]*$", 0)
 
 proc getTabSpaceMatcher*(): Matcher =
-  ## Match one or more tabs and spaces.
+  ## Return a matcher that matches one or more tabs and spaces.
   result = newMatcher(r"[ \t]+", 0)
 
 proc notEmptyOrSpaces*(allSpaceTabMatcher: Matcher, text: string): bool =
@@ -128,8 +133,9 @@ proc notEmptyOrSpaces*(allSpaceTabMatcher: Matcher, text: string): bool =
       result = true
 
 proc getVariableMatcher*(): Matcher =
-  ## Match a variable and surrounding whitespace. Return the leading
-  ## whitespace, the namespace and the variable name.
+  ## Return a matcher that matches a variable and surrounding
+  ## whitespace. Return the leading whitespace, the namespace and the
+  ## variable name.
   ##
   ## A variable starts with an optional prefix followed by a required
   ## variable name. The prefix is a lowercase letter followed by a
@@ -145,28 +151,28 @@ proc getVariableMatcher*(): Matcher =
   result = newMatcher(r"(\s*)([a-z]\.){0,1}([a-zA-Z][a-zA-Z0-9_]{0,63})\s*", 3)
 
 proc getEqualSignMatcher*(): Matcher =
-  ## Match an equal sign and the optional following white space.
+  ## Return a matcher that matches an equal sign and the optional following white space.
   # Note: nim sets the regex anchor option.
   result = newMatcher(r"(=)\s*", 1)
 
 proc getLeftParenthesesMatcher*(): Matcher =
-  ## Match a left parentheses and the optional following white space.
+  ## Return a matcher that matches a left parentheses and the optional following white space.
   # Note: nim sets the regex anchor option.
   result = newMatcher(r"\(\s*", 0)
 
 proc getCommaParenthesesMatcher*(): Matcher =
-  ## Match a comma or right parentheses and the optional following
+  ## Return a matcher that matches a comma or right parentheses and the optional following
   ## white space. One group containing either the comma or right paren.
   # Note: nim sets the regex anchor option.
   result = newMatcher(r"([,)])\s*", 1)
 
 proc getRightParenthesesMatcher*(): Matcher =
-  ## Match a right parentheses and the optional following white space.
+  ## Return a matcher that matches a right parentheses and the optional following white space.
   # Note: nim sets the regex anchor option.
   result = newMatcher(r"\)\s*", 0)
 
 proc getNumberMatcher*(): Matcher =
-  ## Match a number and the optional trailing whitespace. Return the
+  ## Return a matcher that matches a number and the optional trailing whitespace. Return the
   ## optional decimal point that tells whether the number is a float
   ## or integer.
   ##
@@ -178,7 +184,7 @@ proc getNumberMatcher*(): Matcher =
   result = newMatcher(r"-{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*\s*", 1)
 
 proc getStringMatcher*(): Matcher =
-  ## Match a string.
+  ## Return a matcher that matches a string.
 
   # A string is inside quotes, either single or double quotes. The
   # optional white space after the string is matched too. There are

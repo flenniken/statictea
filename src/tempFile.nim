@@ -1,3 +1,5 @@
+## Handle temporary files.
+
 import os
 import random
 import strutils
@@ -9,6 +11,7 @@ randomize()
 
 type
   TempFile* = object
+    ## Temporary filename and file object.
     filename*: string
     file*: File
 

@@ -13,6 +13,7 @@ requires "nim >= 1.4.4"
 
 const
   useDocUtils = true
+  showHtml = true
 
 # The nimscript module is imported by default. It contains functions
 # you can call in your nimble file.
@@ -116,9 +117,15 @@ awk '{printf "include %s\n", $0}' > tests/testall.nim
   exec "src/test"
 
 task test, "\tRun tests; specify part of test name":
+  ## Run one or more tests.  You specify part of the test name and all
+  ## tests that match are run. If you don't specify a name, all are
+  ## run. Task "t" is faster to run them all.
   let count = system.paramCount()+1
+  # The name is either part of a name or "test" when not
+  # specified. Test happens to match all test files.
   let name = system.paramStr(count-1)
   let test_filenames = get_test_filenames()
+  return
   for filename in test_filenames:
     if name in filename:
       let cmd = get_test_module_cmd(filename)
@@ -129,14 +136,17 @@ task b, "\tBuild the statictea exe.":
   build_release()
 
 task docs, "\tCreate reStructuredtext docs; specify part of source file name.":
-  if not isPyEnvActive():
-    echo "Run pythonenv task first to setup the environment."
+  if showHtml and not isPyEnvActive():
+    echo "Run the pythonenv task to setup the python environment."
+    # The python environment is used to make html files so you can
+    # proof the documentation before committing.
     return
   let count = system.paramCount()+1
+  # Name is part of a source file name, or "docs" when not specified.
   let name = system.paramStr(count-1)
   let filenames = get_source_filenames()
   for filename in filenames:
-    if name in filename:
+    if name in filename or (name == "docs" and filename.endsWith(".nim")):
       var jsonName = changeFileExt(filename, "json")
       var cmd = "nim jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
       echo cmd
@@ -153,17 +163,18 @@ task docs, "\tCreate reStructuredtext docs; specify part of source file name.":
         jsonName, rstName]
       echo cmd
       exec cmd
-      var htmlName = changeFileExt(filename, "html")
-      if useDocUtils:
-        var dirName = getDirName(hostOS)
-        exec "rm -f docs/html/$1" % htmlName
-        exec "env/$1/staticteaenv/bin/rst2html5.py docs/$2 docs/html/$3 | less" % [
-          dirName, rstName, htmlName]
-      else:
-        cmd = "nim rst2html --hints:off --out:docs/html/$1 docs/$2" % [htmlName, rstName]
-      echo cmd
-      exec cmd
-      open_in_browser(r"docs/html/$1" % htmlName)
+      if showHtml:
+        var htmlName = changeFileExt(filename, "html")
+        if useDocUtils:
+          var dirName = getDirName(hostOS)
+          exec "rm -f docs/html/$1" % htmlName
+          exec "env/$1/staticteaenv/bin/rst2html5.py docs/$2 docs/html/$3 | less" % [
+            dirName, rstName, htmlName]
+        else:
+          cmd = "nim rst2html --hints:off --out:docs/html/$1 docs/$2" % [htmlName, rstName]
+        echo cmd
+        exec cmd
+        open_in_browser(r"docs/html/$1" % htmlName)
 
 task json, "\tDisplay doc json for a source file.":
   let count = system.paramCount()+1
@@ -193,6 +204,9 @@ task tree, "\tShow the project directory tree.":
 
 
 task pythonenv, "Create and activate a python virtual env.":
+  # The python environment is used to make html files from the doc
+  # commands for proofing it before committing.
+
   var dirName = getDirName(hostOS)
   let virtualEnv = "env/$1/staticteaenv" % dirName
   if system.dirExists(virtualEnv):

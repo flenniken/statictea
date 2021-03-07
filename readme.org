@@ -1380,31 +1380,29 @@ num = add(t.row(), 1)
 :CUSTOM_ID: case
 :END:
 
-The case function returns a value from multiple choices.
+The case function returns a value from multiple choices. It
+requires at least four parameters, the main condition a case pair
+and the else condition. You can have any number of case pairs
+with the else case at the end.
 
-It requires at least four parameters, the main condition, the
-"else" value and a case pair. You can have any number of case
-pairs.
-
-The first parameter of a case pair is the case condition and the
+The first parameter of a case pair is the condition and the
 second is the return value when that condition matches the main
 condition.
 
 When none of the cases match the main condition, the "else" value
-is returned.  The conditions must be all strings or all ints and
-the return values can be any type.
+is returned.  All the conditions must be the same type, either
+strings or ints and the return values any be any type.
 
 The function compares the conditions left to right and returns
-when it finds the first match.
+the first match.
 
-- p1: The main condition value.
-- p2: The "else" value.
-- -
-- p3: The first case condition.
-- p4: Return value when p3 equals p1.
-- ...
-- pnc: The last case condition.
-- pnv: Return value when pnc equals p1.
+-p1c: The main condition value.
+-p2c: The first case condition value.
+-p3v: The return value when p1 equals p2.
+...
+-pnc: The last case condition.
+-pnv: The return value when p1 equals pnc.
+-plastv: The "else" value returned when nothing matches.
 
 Added in version 0.1.0.
 

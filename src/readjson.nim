@@ -14,10 +14,11 @@ import options
 var depth_limit = 3
 
 func getEmptyVars*(): VarsDict =
-  ## Return an empty variable dictionary.
+  ## Create and return an empty variable dictionary.
   result = initOrderedTable[string, Value]()
 
 proc jsonToValue(jsonNode: JsonNode, depth: int = 0): Option[Value] {.tpub.} =
+  ## Convert a json value to a statictea value.
   if depth > depth_limit:
     # todo: test the depth limit.
     # todo: display warning when limit exceeded.
@@ -52,7 +53,7 @@ proc jsonToValue(jsonNode: JsonNode, depth: int = 0): Option[Value] {.tpub.} =
   result = some(value)
 
 proc readJson*(env: var Env, filename: string, vars: var VarsDict) =
-  ## Read a json file and add the variables to the vars dictionary.
+  ## Read a json file and add the variables to a dictionary.
 
   if not fileExists(filename):
     env.warn(0, wFileNotFound, filename)
