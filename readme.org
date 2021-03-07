@@ -1494,7 +1494,7 @@ than 10 characters.
 <!--$ # clip it to 7 and add "...".               -->
 <!--$ nextline                                   \-->
 <!--$ : cmp = cmp(len(s.name), 10);              \-->
-<!--$ : name = case(cmd, s.name                  \-->
+<!--$ : name = case(cmp, s.name                  \-->
 <!--$ : 1, concat(substr(s.name, 0, 7), "..."))   -->
 #+END_SRC
 
