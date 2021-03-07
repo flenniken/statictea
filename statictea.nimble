@@ -125,7 +125,6 @@ task test, "\tRun tests; specify part of test name":
   # specified. Test happens to match all test files.
   let name = system.paramStr(count-1)
   let test_filenames = get_test_filenames()
-  return
   for filename in test_filenames:
     if name in filename:
       let cmd = get_test_module_cmd(filename)

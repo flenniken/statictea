@@ -643,3 +643,48 @@ suite "runFunction.nim":
     var parameters = @[newValue("tasdf"), newValue(3), newValue(3)]
     let eFunResult = newFunResult(newValue(""))
     check testFunction("substr", parameters, eFunResult = eFunResult)
+
+  test "dup":
+    var parameters = @[newValue("-"), newValue(5)]
+    let eFunResult = newFunResult(newValue("-----"))
+    check testFunction("dup", parameters, eFunResult = eFunResult)
+
+  test "dup 0":
+    var parameters = @[newValue("-"), newValue(0)]
+    let eFunResult = newFunResult(newValue(""))
+    check testFunction("dup", parameters, eFunResult = eFunResult)
+
+  test "dup 1":
+    var parameters = @[newValue("abc"), newValue(1)]
+    let eFunResult = newFunResult(newValue("abc"))
+    check testFunction("dup", parameters, eFunResult = eFunResult)
+
+  test "dup multiple":
+    var parameters = @[newValue("123456789 "), newValue(2)]
+    let eFunResult = newFunResult(newValue("123456789 123456789 "))
+    check testFunction("dup", parameters, eFunResult = eFunResult)
+
+  test "dup 1 parameter":
+    var parameters = @[newValue("abc")]
+    let eFunResult = newFunResultWarn(wTwoParameters, 0)
+    check testFunction("dup", parameters, eFunResult = eFunResult)
+
+  test "dup not valid string":
+    var parameters = @[newValue(4.3), newValue(2)]
+    let eFunResult = newFunResultWarn(wExpectedString, 0)
+    check testFunction("dup", parameters, eFunResult = eFunResult)
+
+  test "dup not valid count":
+    var parameters = @[newValue("="), newValue("=")]
+    let eFunResult = newFunResultWarn(wInvalidMaxCount, 1)
+    check testFunction("dup", parameters, eFunResult = eFunResult)
+
+  test "dup negative count":
+    var parameters = @[newValue("="), newValue(-9)]
+    let eFunResult = newFunResultWarn(wInvalidMaxCount, 1)
+    check testFunction("dup", parameters, eFunResult = eFunResult)
+
+  test "dup too long":
+    var parameters = @[newValue("="), newValue(123_333)]
+    let eFunResult = newFunResultWarn(wDupStringTooLong, 1, "123333")
+    check testFunction("dup", parameters, eFunResult = eFunResult)

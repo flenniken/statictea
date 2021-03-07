@@ -14,9 +14,8 @@
 #$ #
 #$ # Title
 #$ block \
-#$ : equals = '=================================================================================='; \
 #$ : title = substr(s.orig, add(4, find(s.orig, 'src/', -4))); \
-#$ : titleOverline = substr(equals, 0, len(title))
+#$ : titleOverline = dup("=", len(title))
 {titleOverline}
 {title}
 {titleOverline}
@@ -43,10 +42,9 @@ Index:
 #$ # Function and type descriptions.
 #$ block \
 #$ : t.repeat = len(s.entries); \
-#$ : dashes = '----------------------------------------------------------------------------------'; \
 #$ : entry = get(s.entries, t.row, t.shared); \
 #$ : name = get(entry, "name", ""); \
-#$ : nameUnderline = substr(dashes, 0, add(1, len(name))); \
+#$ : nameUnderline = dup("-", len(name)); \
 #$ : description = get(entry, "description", ""); \
 #$ : code = get(entry, "code", ""); \
 #$ : pos = find(code, "{", len(code)); \

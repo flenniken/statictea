@@ -98,6 +98,7 @@ type
     wInvalidPosition,      # w89
     wEndLessThenStart,     # w90
     wSubstringNotFound,    # w91
+    wDupStringTooLong,     # w92
 
 tpubType:
   const
@@ -146,7 +147,7 @@ tpubType:
       "You cannot change the $1 tea variable.", # wReadOnlyTeaVar
       "Invalid tea variable: $1.", # wInvalidTeaVar
       """Invalid t.output value, use: "result", "stderr", "log", or "skip".""", # wInvalidOutputValue
-      "Invalid max count, it must be an integer >= 0.", # wInvalidMaxCount
+      "Invalid count. It must be a positive integer.", # wInvalidMaxCount
       "Invalid t.content, it must be a string.", # wInvalidTeaContent
       "Invalid t.repeat, it must be an integer >= 0 and <= t.maxRepeat.", # wInvalidRepeat
       "Invalid prepost: $1.", # wInvalidPrepost
@@ -196,6 +197,7 @@ tpubType:
       "Invalid position: got $1.", # wInvalidPosition
       "The end position is less that the start position.", # wEndLessThenStart
       "The substring was not found and no default parameter.", # wSubstringNotFound
+      "The resulting duplicated string must be under 1024 characters, got: $1.", # wDupStringTooLong
     ]
 
 func getWarning*(filename: string, lineNum: int,

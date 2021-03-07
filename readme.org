@@ -1341,6 +1341,7 @@ List of functions:
 - [[#cmp][cmp()]] -- spaceship compare function <=>
 - [[#cmpversion][cmpVersion()]] -- compare StaticTea version numbers
 - [[#concat][concat()]] -- concatenate strings
+- [[#dup][dup()]] -- duplicate string
 - [[#int][int()]] -- convert a float or number string to an int
 - [[#exists][exists()]] -- whether a variables exists
 - [[#find][find()]] -- find a substring in a string
@@ -1794,6 +1795,22 @@ int(6.3, "ceiling") => 7
 int(-6.3, "ceiling") => -6
 int(6.3456, "truncate") => 6
 int(-6.3456, "truncate") => -6
+#+END_SRC
+
+[[#contents][茶]]
+
+** dup()
+:PROPERTIES:
+:CUSTOM_ID: dup
+:END:
+
+Duplicate a string. The first parameter is the string to dup and
+the second parameter is the number of times to duplicate it.
+Added in version 0.1.0.
+
+#+BEGIN_SRC
+dup("=", 5) => "====="
+dup("ab", 3) => "ababab"
 #+END_SRC
 
 [[#contents][茶]]

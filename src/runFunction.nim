@@ -603,6 +603,36 @@ proc funSubstr*(parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(str[start .. finish-1]))
 
+proc funDup*(parameters: seq[Value]): FunResult =
+  ## Duplicate a string. The first parameter is the string to dup and
+  ## the second parameter is the number of times to duplicate it.
+  ## Added in version 0.1.0.
+
+  if parameters.len() != 2:
+    result = newFunResultWarn(wTwoParameters)
+    return
+
+  if parameters[0].kind != vkString:
+    result = newFunResultWarn(wExpectedString, 0)
+    return
+  let pattern = parameters[0].stringv
+
+  if parameters[1].kind != vkInt or parameters[1].intv < 0:
+    result = newFunResultWarn(wInvalidMaxCount, 1)
+    return
+  let count = parameters[1].intv
+
+  # Result must be less than 1024 characters.
+  let length = count * pattern.len
+  if length > 1024:
+    result = newFunResultWarn(wDupStringTooLong, 1, $length)
+    return
+
+  var str = newStringOfCap(length)
+  for ix in countUp(1, int(count)):
+    str.add(pattern)
+  result = newFunResult(newValue(str))
+
 const
   functionsList = [
     ("len", funLen),
@@ -618,6 +648,7 @@ const
     ("float", funFloat),
     ("find", funFind),
     ("substr", funSubstr),
+    ("dup", funDup),
 # replace -- search and replace
 # regex matching
 # format

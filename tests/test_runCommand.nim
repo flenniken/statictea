@@ -801,7 +801,7 @@ statement: e.server = 343
   test "invalid maxLines":
     let statement = newStatement(text="t.maxLines = 'hello'", lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w42: Invalid max count, it must be an integer >= 0.
+template.html(1): w42: Invalid count. It must be a positive integer.
 statement: t.maxLines = 'hello'
                         ^
 """
