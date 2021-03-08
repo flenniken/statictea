@@ -657,6 +657,7 @@ const
 # sizes
 # time
 # template
+# unquote json:  &quot;t.&quot; => "t."
   ]
 
 # todo: encoding html attributes, body, javascript, css, json, etc.

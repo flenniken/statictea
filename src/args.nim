@@ -1,10 +1,13 @@
-## Command line arguments.
+## Args object for holding command line arguments.
+
 import strutils
 
 type
   Prepost* = tuple[pre: string, post: string]
+    ## One prefix and its associated postfix.
 
   Args* = object
+    ## Object to hold all the command line arguments.
     help*: bool
     version*: bool
     update*: bool
@@ -17,7 +20,7 @@ type
     logFilename*: string
 
 func `$`*(args: Args): string =
-  ## A string representation of Args.
+  ## Return a string representation of the Args object.
   result = """
 Args:
 help=$1, version=$2, update=$3, log=$10

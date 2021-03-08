@@ -136,17 +136,16 @@ proc getVariableMatcher*(): Matcher =
   ## Return a matcher that matches a variable and surrounding
   ## whitespace. Return the leading whitespace, the namespace and the
   ## variable name.
-  ##
+  ## blank
   ## A variable starts with an optional prefix followed by a required
   ## variable name. The prefix is a lowercase letter followed by a
   ## period. The variable name starts with a letter followed by
   ## letter, digits and underscores. The variable name length is 1 to
   ## 64 characters. Variables are ascii.
-  ##
+  ## blank
   ## The match stops on the first non matching character. You need to
   ## check the next character to see whether it makes sense in the
   ## statement, for example, "t." matches and returns "t".
-  ## "{ t.repeat #" matches.
   # Note: nim sets the regex anchor option.
   result = newMatcher(r"(\s*)([a-z]\.){0,1}([a-zA-Z][a-zA-Z0-9_]{0,63})\s*", 3)
 
@@ -175,7 +174,7 @@ proc getNumberMatcher*(): Matcher =
   ## Return a matcher that matches a number and the optional trailing whitespace. Return the
   ## optional decimal point that tells whether the number is a float
   ## or integer.
-  ##
+  ## blank
   ## A number starts with an optional minus sign, followed by a digit,
   ## followed by digits, underscores or a decimal point. Only one
   ## decimal point is allowed and underscores are skipped.  Note: nim

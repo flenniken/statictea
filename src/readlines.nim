@@ -6,29 +6,33 @@ import streams
 import options
 
 const
-  minMaxLineLen* = 8
-  maxMaxLineLen* = 8*1024
-  defaultMaxLineLen* = 1024
-  defaultBufferSize* = 16*1024
+  minMaxLineLen* = 8           ## The minimum line length supported.
+  maxMaxLineLen* = 8*1024      ## The maximum line length supported.
+  defaultMaxLineLen* = 1024    ## The maximum line length.
+  defaultBufferSize* = 16*1024 ## The buffer size for reading lines.
 
 type
   LineBuffer* = object
-    stream*: Stream
-    maxLineLen*: int
-    bufferSize*: int
+    ## Object to hold information about the state of the line buffer.
+    stream*: Stream   ## Stream containing lines to read processed sequentially.
+    maxLineLen*: int  ## The maximum line length.
+    bufferSize*: int  ## The buffer size for reading lines.
     lineNum*: int     ## The current line number in the file starting at 1.
     pos*: int         ## Current byte position in the buffer.
     charsRead*: int   ## Number of bytes of chars in the buffer.
     buffer*: string   ## Memory pre-allocated for the buffer.
-    filename*: string ## Optional. The stream's filename.
+    filename*: string ## The optional stream's filename.
 
 proc getLineNum*(lineBuffer: LineBuffer): int =
+  ## Return the current line number.
   result = lineBuffer.lineNum
 
 proc getMaxLineLen*(lineBuffer: LineBuffer): int =
+  ## Return the maximum line length.
   result = lineBuffer.maxLineLen
 
 proc getFilename*(lineBuffer: LineBuffer): string =
+  ## Return the filename of the stream, if there is one.
   result = lineBuffer.filename
 
 proc newLineBuffer*(stream: Stream, maxLineLen: int = defaultMaxLineLen,
@@ -62,7 +66,7 @@ proc reset*(lb: var LineBuffer) =
 proc readline*(lb: var LineBuffer): string =
   ## Return a line from the LineBuffer. Reading starts from
   ## the current position in the stream and advances the amount read.
-  ##
+  ## blank
   ## A line end is defined by either a crlf or lf and they get
   ## returned with the line bytes. A line is returned when the line
   ## ending is found, when the streams runs out of bytes or when the

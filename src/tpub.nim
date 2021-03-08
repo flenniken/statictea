@@ -1,41 +1,31 @@
-
-## The tpub module implements the {.tpub.} macro pragma used to make
-## procedures public when testing so you can test them in external
-## test files. When the test option is off, the macros do nothing.
+## The tpub macro pragma makes private routines public for testing.
+## This allows you to test private procedures in external test
+## files. When the test option is off, the macros do nothing.
 
 import macros
 
 macro tpub*(x: untyped): untyped =
-  ## Exports a proc when in test mode so it can be tested in an
-  ## external module.
-  ##
-  ## Usage:
-  ##
-  ## .. code-block:: nim
-  ##   import tpub
-  ##   proc myProcToTest(value:int): string {.tpub.} =
-  ##     ...
-  ##
+  ## Exports a procedure or function when in test mode so it can be
+  ## tested in an external module.
+  ## blank
+  ## indent2 proc myProcToTest(value:int): string {.tpub.} =
   expectKind(x, RoutineNodes)
   when defined(test):
     x.name = newTree(nnkPostfix, ident"*", name(x))
   result = x
 
-
 macro tpubType*(x: untyped): untyped =
   ## Exports a type when in test mode so it can be tested in an
   ## external module.
-  ##
+  ## blank
   ## Here is an example that makes the type "SectionInfo" public in
   ## test mode:
-  ##
-  ## .. code-block:: nim
-  ##   import tpub
-  ##   tpubType:
-  ##     type
-  ##       SectionInfo = object
-  ##         name*: string
-  ##
+  ## blank
+  ## indent2 import tpub
+  ## indent2 tpubType:
+  ## indent2   type
+  ## indent2     SectionInfo = object
+  ## indent2       name*: string
   # echo "treeRepr = ", treeRepr(x)
   when defined(test):
     if x.kind == nnkStmtList:

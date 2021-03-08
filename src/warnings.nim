@@ -1,4 +1,4 @@
-## Table of warning messages.
+## The warning messages.
 
 import tpub
 import strutils
@@ -6,6 +6,7 @@ import strutils
 # Add new warnings to the bottom so the warning numbers never change.
 type
   Warning* = enum
+    ## Numbers for all the warnings.
     wNoFilename,           # w0
     wUnknownSwitch,        # w1
     wUnknownArg,           # w2

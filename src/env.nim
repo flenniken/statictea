@@ -1,3 +1,5 @@
+## Environment holding the input and output streams.
+
 import streams
 import warnings
 import os
@@ -8,25 +10,26 @@ import sets
 import tempfile
 import options
 when defined(test):
-  # import regexes
   import readlines
 
 # todo: os.sameFile(path1, path2: string) returns whether the to paths refer to the same file.
-## Name of the default statictea log file.
 when hostOS == "macosx":
   let staticteaLog* = expandTilde("~/Library/Logs/statictea.log")
+    ## Name of the default statictea log file when logging.
 else:
   let staticteaLog* = expandTilde("~/statictea.log")
+    ## Name of the default statictea log file when logging.
 
 const
-  logWarnSize: BiggestInt = 1024 * 1024 * 1024       ## \
-  ## Warn the user when the log file gets over 1 GB.
+  logWarnSize: BiggestInt = 1024 * 1024 * 1024
+    ## Warn the user when the log file gets over 1 GB.
 
-  dtFormat* = "yyyy-MM-dd HH:mm:ss'.'fff"             ## \
-  ## The date time format in local time written to the log.
+  dtFormat* = "yyyy-MM-dd HH:mm:ss'.'fff"
+    ## The date time format in local time written to the log.
 
 type
   Env* = object
+    ## Object holding the input and output streams.
     # These get set at the start.
     errStream*: Stream # stderr
     outStream*: Stream # stdout
@@ -52,6 +55,7 @@ type
     oneWarnTable*: HashSet[string]
 
 proc close*(env: var Env) =
+  ## Close the environment streams.
   if env.closeErrStream:
     env.errStream.close()
     env.errStream = nil
@@ -70,7 +74,7 @@ proc close*(env: var Env) =
 
 proc warn*(env: var Env, message: string) =
   ## Write a message to the error stream, suppressing duplicates and
-  ## increment the environment's warning written count.
+  ## incrementing the environment's warning written count.
   if not env.oneWarnTable.containsOrIncl(message):
     env.errStream.writeLine(message)
   # else:
@@ -88,6 +92,7 @@ proc warn*(env: var Env, lineNum: Natural, warning: Warning, p1:
   warn(env, message)
 
 func formatDateTime*(dt: DateTime): string =
+  ## Return a formatted time stamp for the log.
   result = dt.format(dtFormat)
 
 func formatLine*(filename: string, lineNum: int, message: string, dt = now()):

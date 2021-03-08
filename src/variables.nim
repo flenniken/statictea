@@ -9,6 +9,7 @@ import version
 
 type
   Variables* = VarsDict
+    ## Dictionary holding variables.
 
 proc getNamespaceDict*(variables: Variables, nameSpace: string): Option[VarsDict] =
   ## Get the dictionary for the given namespace.
