@@ -1,3 +1,13 @@
+##[
+Parse a template command line.
+ix0
+We have two types of command lines.  We distingush them using
+different names CmdLine and CommandLine.
+ix0
+ix0 * CmdLine -- is a line in a Statictea template commands.
+ix0 * CommandLine -- is a line at a terminal for system commands.
+]##
+
 import options
 import tables
 import env
@@ -5,18 +15,9 @@ import regexes
 import warnings
 import matches
 
-#[
-
-We have two command lines.  We distingush them using different names
-CmdLine and CommandLine.
-
-* CmdLine -- is a line in the template for statictea commands.
-* CommandLine -- is a line at a terminal for system commands.
-
-]#
-
 type
   LineParts* = object
+    ## The parsed components of a line.
     prefix*: string
     command*: string
     middleStart*: Natural
@@ -27,16 +28,15 @@ type
     lineNum*: Natural
 
 proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
-    line: string, lineNum: Natural):
-    Option[LineParts] =
+    line: string, lineNum: Natural): Option[LineParts] =
   ## Parse the line and return its parts when it is a command. Return
   ## quickly when not a command line.
 
-  # prefix   command     middleStart  continuation
-  # |        |           |            |postfix
-  # |        |           |            ||  ending
-  # |        |           |            ||  |
-  # <!--$    nextline    a = 5        \-->\n
+  # ix0 prefix   command     middleStart  continuation
+  # ix0 |        |           |            |postfix
+  # ix0 |        |           |            ||  ending
+  # ix0 |        |           |            ||  |
+  # ix0 <!--$    nextline    a = 5        \-->\n
 
   var lineParts: LineParts
   let cm = compiledMatchers

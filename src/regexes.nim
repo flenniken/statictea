@@ -42,15 +42,17 @@ when defined(test):
 
 type
   Matches* = object
+    ## Holds the result of a match.
     groups*: seq[string]
     length*: Natural
     start*: Natural
 
   Matcher* = object
-    pattern*: string
-    numGroups*: Natural
-    regex: Regex
-    arg1*: string
+    ## A compiled regular expression.
+    pattern*: string    ## The regular expression pattern.
+    numGroups*: Natural ## The number of groups in the pattern.
+    regex: Regex        ## The compiled regex.
+    arg1*: string       ## The arg1 parameter of newMatcher.
 
 proc newMatcher*(pattern: string, numGroups: Natural,
     arg1: string = ""): Matcher =

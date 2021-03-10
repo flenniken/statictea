@@ -13,12 +13,6 @@ when defined(test):
   import readlines
 
 # todo: os.sameFile(path1, path2: string) returns whether the to paths refer to the same file.
-when hostOS == "macosx":
-  let staticteaLog* = expandTilde("~/Library/Logs/statictea.log")
-    ## Name of the default statictea log file when logging.
-else:
-  let staticteaLog* = expandTilde("~/statictea.log")
-    ## Name of the default statictea log file when logging.
 
 const
   logWarnSize: BiggestInt = 1024 * 1024 * 1024
@@ -27,12 +21,19 @@ const
   dtFormat* = "yyyy-MM-dd HH:mm:ss'.'fff"
     ## The date time format in local time written to the log.
 
+when hostOS == "macosx":
+  let staticteaLog* = expandTilde("~/Library/Logs/statictea.log")
+    ## Name of the default statictea log file when logging.
+else:
+  let staticteaLog* = expandTilde("~/statictea.log")
+    ## Name of the default statictea log file when logging.
+
 type
   Env* = object
     ## Object holding the input and output streams.
     # These get set at the start.
-    errStream*: Stream # stderr
-    outStream*: Stream # stdout
+    errStream*: Stream ## stderr
+    outStream*: Stream ## stdout
     logFile*: File
     logFilename*: string
 
@@ -47,12 +48,13 @@ type
     templateFilename*: string
     templateStream*: Stream
     resultFilename*: string
-    resultStream*: Stream # The result stream may be stdout.
+    resultStream*: Stream
+      ## The result stream may be stdout.
 
-    # Count of warnings written.
     warningWritten*: Natural
-    # All unique messages written.
+      ## Count of warnings written.
     oneWarnTable*: HashSet[string]
+      ## All unique messages written.
 
 proc close*(env: var Env) =
   ## Close the environment streams.
@@ -73,8 +75,8 @@ proc close*(env: var Env) =
     env.logFile = nil
 
 proc warn*(env: var Env, message: string) =
-  ## Write a message to the error stream, suppressing duplicates and
-  ## incrementing the environment's warning written count.
+  ## Write a message to the error stream. Duplicates are suppressed and
+  ## the environment's warning count is incremented.
   if not env.oneWarnTable.containsOrIncl(message):
     env.errStream.writeLine(message)
   # else:

@@ -49,7 +49,7 @@ Index:
 #$ :   ""); \
 #$ : short = substr(description, 0, add(find(description, '.', -1), 1))
 
-* {type}{name}_ -- {short}
+* {type}{name}__ -- {short}
 #$ endblock
 
 #$ # Function and type descriptions.
@@ -63,7 +63,7 @@ Index:
 #$ : pos = find(code, "{", len(code)); \
 #$ : signature = substr(code, 0, pos); \
 #$ : t.maxLines = 100
-.. _{name}:
+.. __:
 
 {name}
 {nameUnderline}

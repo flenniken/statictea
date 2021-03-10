@@ -252,8 +252,9 @@ proc getVarOrFunctionValue*(env: var Env, compiledMatchers:
            Compiledmatchers, statement: Statement,
            start: Natural, variables: Variables): Option[ValueAndLength] =
   ## Return the statement's right hand side value and the length
-  ## matched when the right hand side is a variable or a function. The
-  ## right hand side starts at the index specified by start.
+  ## matched. The right hand side must be a variable or a
+  ## function. The right hand side starts at the index specified by
+  ## start.
 
   # Get the variable or function name. Match the surrounding white space.
   let variableO = getMatches(compiledMatchers.variableMatcher,

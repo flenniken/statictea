@@ -1,4 +1,4 @@
-## Parse the command line and return the arguments.
+## Parse the Statictea command line and return the arguments.
 
 import parseopt
 import tpub

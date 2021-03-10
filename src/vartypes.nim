@@ -7,11 +7,14 @@ import warnings
 
 const
   outputValues* = ["result", "stderr", "log", "skip"]
+    ## Tea output variable values.
 
 type
   VarsDict* = OrderedTable[string, Value]
+    ## Variables dictionary type.
 
   ValueKind* = enum
+    ## The type of Variables.
     vkString,
     vkInt,
     vkFloat,
@@ -19,7 +22,9 @@ type
     vkList
 
   Value* = ref ValueObj
+    ## Variable value reference.
   ValueObj* {.acyclic.} = object
+    ## Variable object.
     case kind*: ValueKind
     of vkString:
       stringv*: string
@@ -35,12 +40,12 @@ type
   Statement* = object
     ## A Statement object stores the statement text and where it
     ## starts in the template file.
-    ##
-    ## * lineNum -- Line number starting at 1 where the statement
-    ##              starts.
-    ## * start -- Column position starting at 1 where the statement
-    ##            starts on the line.
-    ## * text -- The statement text.
+    ## ix0
+    ## ix0 * lineNum -- Line number starting at 1 where the statement
+    ## ix0             starts.
+    ## ix0 * start -- Column position starting at 1 where the statement
+    ## ix0           starts on the line.
+    ## ix0 * text -- The statement text.
     lineNum*: Natural
     start*: Natural
     text*: string
@@ -55,21 +60,23 @@ type
     length*: Natural
 
 proc newValue*(str: string): Value =
+  ## Create a string value.
   result = Value(kind: vkString, stringv: str)
 
-proc newValue*(num: int): Value =
-  result = Value(kind: vkInt, intv: num)
-
-proc newValue*(num: int64): Value =
+proc newValue*(num: int | int64): Value =
+  ## Create an integer value.
   result = Value(kind: vkInt, intv: num)
 
 proc newValue*(num: float): Value =
+  ## Create a float value.
   result = Value(kind: vkFloat, floatv: num)
 
 proc newValue*(valueList: seq[Value]): Value =
+  ## Create a list value.
   result = Value(kind: vkList, listv: valueList)
 
 proc newValue*(varsDict: VarsDict): Value =
+  ## Create a dictionary value.
   result = Value(kind: vkDict, dictv: varsDict)
 
 proc newValue*(value: Value): Value =
@@ -77,6 +84,7 @@ proc newValue*(value: Value): Value =
   result = value
 
 proc newVarsDict*(): VarsDict =
+  ## Create variables dictionary.
   return result
 
 when defined(test):
@@ -97,6 +105,7 @@ when defined(test):
     result = Value(kind: vkDict, dictv: varsTable)
 
 proc `==`*(value1: Value, value2: Value): bool =
+  ## Return true when two values are equal.
   if value1.kind == value2.kind:
     case value1.kind:
       of vkString:
@@ -111,8 +120,8 @@ proc `==`*(value1: Value, value2: Value): bool =
         result = value1.listv == value2.listv
 
 func `$`*(value: Value): string =
-  ## A string representation of Value. This is used to convert values
-  ## to strings in replacement blocks.
+  ## Return a string representation of Value. This is used to convert
+  ## values to strings in replacement blocks.
   case value.kind
   of vkString:
     result = value.stringv
@@ -132,7 +141,7 @@ func `$`*(value: Value): string =
       result = "[...]"
 
 func `$`*(kind: ValueKind): string =
-  ## A string representation of a value's type.
+  ## Return a string representation of a value's type.
   case kind
   of vkString:
     result = "string"
@@ -146,7 +155,7 @@ func `$`*(kind: ValueKind): string =
     result = "list"
 
 func `$`*(s: Statement): string =
-  ## A string representation of a Statement.
+  ## Retrun a string representation of a Statement.
   result = "$1, $2: '$3'" % [$s.lineNum, $s.start, s.text]
 
 func `==`*(s1: Statement, s2: Statement): bool =
@@ -157,11 +166,12 @@ func `==`*(s1: Statement, s2: Statement): bool =
 
 func newStatement*(text: string, lineNum: Natural = 1,
     start: Natural = 1): Statement =
+  ## Create a new statement.
   result = Statement(lineNum: lineNum, start: start, text: text)
 
 proc startColumn*(start: Natural): string =
-  ## Return a string containing the number of spaces and symbols to
-  ## point at the line start value used under the statement line.
+  ## Return enough spaces to point at the warning column.  Used under
+  ## the statement line.
   for ix in 0..<start:
     result.add(' ')
   result.add("^")

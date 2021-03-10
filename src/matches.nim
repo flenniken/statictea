@@ -79,7 +79,7 @@ proc getCommandMatcher*(): Matcher =
   result = newMatcher(r"($1)" % commands.join("|"), 1)
 
 proc getLastPartMatcher*(postfix: string): Matcher =
-  ## Retun a matcher that matches the last part of the line.  It
+  ## Return a matcher that matches the last part of the line.  It
   ## matches the optional continuation slash, the optional postfix and
   ## the line endings. The postfix used is remembered in the matcher
   ## object returned.
