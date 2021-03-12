@@ -4,7 +4,7 @@ ix0
 We have two types of command lines.  We distingush them using
 different names CmdLine and CommandLine.
 ix0
-ix0 * CmdLine -- is a line in a Statictea template commands.
+ix0 * CmdLine -- is a line in a StaticTea template commands.
 ix0 * CommandLine -- is a line at a terminal for system commands.
 ]##
 

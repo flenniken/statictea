@@ -9,7 +9,7 @@ suite "matches.nim":
 
   test "prepost table":
     var prepostTable = getDefaultPrepostTable()
-    check prepostTable.len == 6
+    check prepostTable.len == 7
     for prefix, postfix in prepostTable.pairs:
       check prefix.len > 0
       # echo "$1 nextline $2" % [prefix, postfix]
@@ -24,6 +24,7 @@ suite "matches.nim":
     check checkMatcher(prefixMatcher, "//$ nextline", 0, @["//$"], 4)
     check checkMatcher(prefixMatcher, "/*$ nextline */", 0, @["/*$"], 4)
     check checkMatcher(prefixMatcher, "&lt;!--$ nextline --&gt;", 0, @["&lt;!--$"], 9)
+    check checkMatcher(prefixMatcher, "$$ nextline", 0, @["$$"], 3)
     check checkMatcher(prefixMatcher, "<!--$ : -->", 0, @["<!--$"], 6)
     check checkMatcher(prefixMatcher, "<!--$         nextline -->", 0, @["<!--$"], 14)
     check checkMatcher(prefixMatcher, "<!--$\tnextline -->", 0, @["<!--$"], 6)
@@ -40,6 +41,7 @@ suite "matches.nim":
     check checkMatcher(prefixMatcher, "#$\n", 0, @["#$"], 3)
     check checkMatcher(prefixMatcher, "<!--$", 0, @["<!--$"], 5)
     check checkMatcher(prefixMatcher, "<!--$ ", 0, @["<!--$"], 6)
+    check checkMatcher(prefixMatcher, "$$ ", 0, @["$$"], 3)
 
     check not prefixMatcher.getMatches("<--$ nextline -->", 0).isSome
 

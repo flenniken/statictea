@@ -1,4 +1,4 @@
-## Parse the Statictea command line and return the arguments.
+## Parse the StaticTea command line and return the arguments.
 
 import parseopt
 import tpub

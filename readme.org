@@ -37,7 +37,7 @@ You can change the look without changing the server.
 
 You can share common template fragments between templates.
 
-In a general sense Statictea is a program and language for
+In a general sense StaticTea is a program and language for
 formatting json.
 
 [[#contents][茶]]
@@ -1162,7 +1162,7 @@ statement: tea = len("abc",)
 #+END_SRC
 
 
-Statictea returns success (return code 0) when no message gets
+StaticTea returns success (return code 0) when no message gets
 output to standard error, else it returns 1.
 
 Example of running statictea when a variable is missing:
@@ -1232,6 +1232,9 @@ when you create your own. The convention is to add a $ as the
 last character of the prefix and only use $ with StaticTea
 commands and space for normal comments.
 
+Some file types, like markdown, don't support comments, for
+them use $$.
+
 Built in Prefixes:
 
 - html: <!--$ and -->
@@ -1240,6 +1243,7 @@ Built in Prefixes:
 - config files: ;$
 - C++: //$
 - C language: ​/\star$ and \star​/
+- markdown: $$
 
 You can define other comment types on the command line using the
 prepost option one or more times. When you specify your own
@@ -1557,15 +1561,15 @@ Version {req} or above is required.
 
 The concat function concatenates strings. You can specify two or
 more string parameters. The following example also shows using
-the "#$" prefix. Added in version 0.1.0.
+the "$$" prefix. Added in version 0.1.0.
 
 #+BEGIN_SRC
-#$ block \
-#$ : x3 = concat("Tea", "Time"); \
-#$ : x4 = concat("Tea", " ",  "Time")
+$$ block \
+$$ : x3 = concat("Tea", "Time"); \
+$$ : x4 = concat("Tea", " ",  "Time")
 concat("Tea", "Time") => '{x3}'
 concat("Tea", " ",  "Time") => '{x4}'
-#$ endblock
+$$ endblock
 #+END_SRC
 
 Result:

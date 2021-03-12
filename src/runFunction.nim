@@ -357,7 +357,7 @@ proc funCase*(parameters: seq[Value]): FunResult =
   result = newFunResult(parameters[ixRet])
 
 proc parseVersion*(version: string): Option[(int, int, int)] =
-  ## Parse a Statictea version number and return its three components.
+  ## Parse a StaticTea version number and return its three components.
   let versionMatcher = newMatcher(r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$", 3)
   let matches2O = getMatches(versionMatcher, version, 0)
   if not matches2O.isSome:

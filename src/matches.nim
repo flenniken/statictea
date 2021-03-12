@@ -6,7 +6,7 @@ import tables
 import options
 
 const
-  predefinedPrepost: array[6, Prepost] = [
+  predefinedPrepost: array[7, Prepost] = [
     ## Predefined prefixes and postfixes.
     ("<!--$", "-->"),
     ("#$", ""),
@@ -14,10 +14,11 @@ const
     ("//$", ""),
     ("/*$", "*/"),
     ("&lt;!--$", "--&gt;"),
+    ("$$", ""),
   ]
 
   commands: array[7, string] = [
-    ## Statictea commands.
+    ## StaticTea commands.
     "nextline",
     "block",
     "replace",
