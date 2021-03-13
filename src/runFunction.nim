@@ -297,39 +297,36 @@ proc funExists*(parameters: seq[Value]): FunResult =
     num = 1
   result = newFunResult(newValue(num))
 
-# todo: allow conditions to be ints and strings.
-# todo: let the else case be optional.
-
 proc funCase*(parameters: seq[Value]): FunResult =
-  ## The case function returns a value from multiple choices. It
-  ## requires at least four parameters, the main condition a case pair
-  ## and the else condition. You can have any number of case pairs
-  ## with the else case at the end.
+  ## The case function returns a value from multiple choices. It takes
+  ## a main condition, any number of case pairs then an optional else
+  ## value.
   ##
   ## The first parameter of a case pair is the condition and the
   ## second is the return value when that condition matches the main
   ## condition.
   ##
   ## When none of the cases match the main condition, the "else" value
-  ## is returned.  All the conditions must be the same type, either
-  ## strings or ints and the return values any be any type.
+  ## is returned. If none match and the else is missing, a warning is
+  ## generated and the statement is skipped. The conditions must be
+  ## integers or strings. The return values any be any type.
   ##
   ## The function compares the conditions left to right and returns
   ## the first match.
   ##
-  ## -p1c: The main condition value.
-  ## -p2c: The first case condition value.
-  ## -p3v: The return value when p1 equals p2.
+  ## -p1: The main condition value.
+  ## -p2: Case condition.
+  ## -p3: Case value.
   ## ...
-  ## -pnc: The last case condition.
-  ## -pnv: The return value when p1 equals pnc.
-  ## -plastv: The "else" value returned when nothing matches.
+  ## -pn-2: The last case condition.
+  ## -pn-1: The case value.
+  ## -pn: The optional "else" value returned when nothing matches.
   ##
   ## Added in version 0.1.0.
 
-  # At least four parameters and an even number of them.
-  if parameters.len() < 4 or parameters.len() mod 2 == 1:
-    result = newFunResultWarn(wFourParameters)
+  # At least 3 parameters.
+  if parameters.len() < 3:
+    result = newFunResultWarn(wThreeOrMoreParameters)
     return
 
   let mainCondition = parameters[0]
@@ -337,27 +334,38 @@ proc funCase*(parameters: seq[Value]): FunResult =
     result = newFunResultWarn(wInvalidMainType)
     return
 
-  # Make sure each condition type matches the main condition. We do
-  # this before comparing to catch lurking error edge cases.
+  # Make sure each condition is an int or string. We do this before
+  # comparing to catch lurking error edge cases.
   for ix in countUp(1, parameters.len-2, 2):
     var condition = parameters[ix]
-    if condition.kind != mainCondition.kind:
+    if not [vkString, vkInt].contains(condition.kind):
       result = newFunResultWarn(wInvalidCondition, ix)
       return
 
-  var ixRet = parameters.len-1
   for ix in countUp(1, parameters.len-2, 2):
     var condition = parameters[ix]
+    if condition.kind != mainCondition.kind:
+      continue
     if condition.kind == vkString:
       if condition.stringv == mainCondition.stringv:
-        ixRet = ix+1
-        break
+        return newFunResult(parameters[ix+1])
     else:
       if condition.intv == mainCondition.intv:
-        ixRet = ix+1
-        break
+        return newFunResult(parameters[ix+1])
 
-  result = newFunResult(parameters[ixRet])
+  # m c v e
+  # m c v c v e
+  # m c v
+  # m c v c v
+  # 0 1 2 3 4 5
+  # 1 2 3 4 5 6
+  # even contains the else condition
+  # odd doesn't have an else condition
+  if parameters.len mod 2 == 1:
+    return newFunResultWarn(wMissingElse, 0)
+
+  # Return the else case.
+  result = newFunResult(parameters[parameters.len-1])
 
 proc parseVersion*(version: string): Option[(int, int, int)] =
   ## Parse a StaticTea version number and return its three components.

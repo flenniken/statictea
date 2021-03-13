@@ -83,7 +83,7 @@ type
     wUnused,               # w73
     wInvalidIndex,         # w74
     wExpectedDictionary,   # w75
-    wFourParameters,       # w76
+    wThreeOrMoreParameters,# w76
     wInvalidMainType,      # w77
     wInvalidCondition,     # w78
     wInvalidVersion,       # w79
@@ -101,6 +101,7 @@ type
     wSubstringNotFound,    # w91
     wDupStringTooLong,     # w92
     wPairParameters,       # w93
+    wMissingElse,          # w94
 
 tpubType:
   const
@@ -183,9 +184,9 @@ tpubType:
       "The parameter must be a string.", # wExpectedString
       "Index values must greater than or equal to 0, got: $1.", # wInvalidIndex
       "The parameter must be a dictionary.", # wExpectedDictionary
-      "The case function takes an even number of parameters and at least four.", # wFourParameters
+      "The case function takes at least 3 parameters.", # wThreeOrMoreParameters
       "The main condition type must an int or string.", # wInvalidMainType
-      "The case condition type must match the main condition type.", # wInvalidCondition
+      "The case condition must be an int or string.", # wInvalidCondition
       "Invalid StaticTea version string.", # wInvalidVersion
       "Expected int or int number string.", # wIntOrStringNumber
       "Expected a float or float number string.", # wFloatOrStringNumber
@@ -201,6 +202,7 @@ tpubType:
       "The substring was not found and no default parameter.", # wSubstringNotFound
       "The resulting duplicated string must be under 1024 characters, got: $1.", # wDupStringTooLong
       "Specify parameters in pairs.", # wPairParameters
+      "None of the case conditions match and no else case.", # wMissingElse
     ]
 
 func getWarning*(filename: string, lineNum: int,

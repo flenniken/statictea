@@ -835,23 +835,24 @@ statement: t.asdf = 3.45
     check testRunStatement(statement, eErrLines = eErrLines)
 
 
-  test "invalid case condition":
-    let statement = newStatement(text="result = case(1, 2, 22, 'abc', 33, 'else')", lineNum=1, 0)
+  test "invalid missing needed else":
+    let statement = newStatement(text="result = case(1, 2, 22, 'abc', 33)", lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w78: The case condition type must match the main condition type.
+template.html(1): w94: None of the case conditions match and no else case.
 template.html(1): w48: Invalid statement, skipping it.
-statement: result = case(1, 2, 22, 'abc', 33, 'else')
-                                   ^
+statement: result = case(1, 2, 22, 'abc', 33)
+                         ^
 """
     check testRunStatement(statement, eErrLines = eErrLines)
 
   test "parameter error position":
-    let statement = newStatement(text="result = case(1, 2, 22, 'abc', 33, len(concat('a', 'b')))", lineNum=1, 0)
+    let text = "result = case(33, 2, 22, 'abc', 11, len(concat('a')))"
+    let statement = newStatement(text, lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w78: The case condition type must match the main condition type.
+template.html(1): w66: The function takes two or more parameters.
 template.html(1): w48: Invalid statement, skipping it.
-statement: result = case(1, 2, 22, 'abc', 33, len(concat('a', 'b')))
-                                   ^
+statement: result = case(33, 2, 22, 'abc', 11, len(concat('a')))
+                                                          ^
 """
     check testRunStatement(statement, eErrLines = eErrLines)
 

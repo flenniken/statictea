@@ -1425,29 +1425,29 @@ num = add(t.row(), 1)
 :CUSTOM_ID: case
 :END:
 
-The case function returns a value from multiple choices. It
-requires at least four parameters, the main condition a case pair
-and the else condition. You can have any number of case pairs
-with the else case at the end.
+The case function returns a value from multiple choices. It takes
+a main condition, any number of case pairs then an optional else
+value.
 
 The first parameter of a case pair is the condition and the
 second is the return value when that condition matches the main
 condition.
 
 When none of the cases match the main condition, the "else" value
-is returned.  All the conditions must be either strings or ints
-and the return values any be any type.
+is returned. If none match and the else is missing, a warning is
+generated and the statement is skipped. The conditions must be
+integers or strings. The return values any be any type.
 
 The function compares the conditions left to right and returns
 the first match.
 
--p1c: The main condition value.
--p2c: The first case condition value.
--p3v: The return value when p1 equals p2.
+-p1: The main condition value.
+-p2: Case condition.
+-p3: Case value.
 ...
--pnc: The last case condition.
--pnv: The return value when p1 equals pnc.
--plastv: The "else" value returned when nothing matches.
+-pn-2: The last case condition.
+-pn-1: The case value.
+-pn: The optional "else" value returned when nothing matches.
 
 Added in version 0.1.0.
 
@@ -1457,12 +1457,13 @@ depending on the type of tea.
 template:
 
 #+BEGIN_SRC
-<--$ nextline \-->
-<--$ : abbr = case( \-->
-<--$ : s.tea, "unknown",  \-->
-<--$ : 'Darjeeling', "Darj",  \-->
-<--$ : "Earl Gray", "EG") -->
-The abbreviation for {s.tea} is {s.abbr}.
+$$ nextline
+$$ : abbr = case(s.tea,
+$$ :   'Darjeeling', "Darj",
+$$ :   "Earl Gray", "EG",
+$$ :   "Unknown"
+$$ : )
+The abbr. for {s.tea} is {s.abbr}.
 #+END_SRC
 
 server json:
@@ -1476,7 +1477,7 @@ server json:
 result:
 
 #+BEGIN_SRC
-The abbreviation for Darjeeling is Darj.
+The abbr. for Darjeeling is Darj.
 #+END_SRC
 
 The if statement is shorthand for a simple case:

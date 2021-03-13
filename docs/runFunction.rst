@@ -236,22 +236,22 @@ funCase
 
  proc funCase(parameters: seq[Value]): FunResult 
 
-<p>The case function returns a value from multiple choices. It requires at least four parameters, the main condition a case pair and the else condition. You can have any number of case pairs with the else case at the end.</p>
+<p>The case function returns a value from multiple choices. It takes a main condition, any number of case pairs then an optional else value.</p>
 <p>The first parameter of a case pair is the condition and the second is the return value when that condition matches the main condition.</p>
-<p>When none of the cases match the main condition, the &quot;else&quot; value is returned.  All the conditions must be the same type, either strings or ints and the return values any be any type.</p>
+<p>When none of the cases match the main condition, the &quot;else&quot; value is returned. If none match and the else is missing, a warning is generated and the statement is skipped. The conditions must be integers or strings. The return values any be any type.</p>
 <p>The function compares the conditions left to right and returns the first match.</p>
-<table frame="void"><tr><th align="left">-p1c: The main condition value.</th><td align="left"></td>
+<table frame="void"><tr><th align="left">-p1: The main condition value.</th><td align="left"></td>
 </tr>
-<tr><th align="left">-p2c: The first case condition value.</th><td align="left"></td>
+<tr><th align="left">-p2: Case condition.</th><td align="left"></td>
 </tr>
-<tr><th align="left">-p3v: The return value when p1 equals p2.</th><td align="left"></td>
+<tr><th align="left">-p3: Case value.</th><td align="left"></td>
 </tr>
 </table><p>...</p>
-<table frame="void"><tr><th align="left">-pnc: The last case condition.</th><td align="left"></td>
+<table frame="void"><tr><th align="left">-pn-2: The last case condition.</th><td align="left"></td>
 </tr>
-<tr><th align="left">-pnv: The return value when p1 equals pnc.</th><td align="left"></td>
+<tr><th align="left">-pn-1: The case value.</th><td align="left"></td>
 </tr>
-<tr><th align="left">-plastv: The &quot;else&quot; value returned when nothing matches.</th><td align="left"></td>
+<tr><th align="left">-pn: The optional &quot;else&quot; value returned when nothing matches.</th><td align="left"></td>
 </tr>
 </table><p>Added in version 0.1.0.</p>
 

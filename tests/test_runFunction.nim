@@ -389,19 +389,28 @@ suite "runFunction.nim":
     let eFunResult = newFunResult(newValue(8))
     check testFunction("case", parameters, eFunResult = eFunResult)
 
-  test "case not enough parameters":
-    var parameters = @[newValue(5), newValue(5), newValue("else")]
-    let eFunResult = newFunResultWarn(wFourParameters)
+  test "case match with no else":
+    var parameters = @[newValue(5), newValue(5), newValue("five")]
+    let eFunResult = newFunResult(newValue("five"))
     check testFunction("case", parameters, eFunResult)
 
-  test "case odd number of parameters":
+  test "case no match with no else":
+    var parameters = @[newValue(5), newValue(1), newValue("five")]
+    let eFunResult = newFunResultWarn(wMissingElse)
+    check testFunction("case", parameters, eFunResult)
+
+  test "case no match with no else 2":
+    var parameters = @[newValue(5), newValue(1), newValue("five"), newValue(2), newValue("asdf")]
+    let eFunResult = newFunResultWarn(wMissingElse)
+    check testFunction("case", parameters, eFunResult)
+
+  test "case multiple matches":
     var parameters = @[
       newValue(5),
       newValue(5), newValue(8),
-      newValue(5),
-      newValue("else")
+      newValue(5), newValue("eight"),
     ]
-    let eFunResult = newFunResultWarn(wFourParameters)
+    let eFunResult = newFunResult(newValue(8))
     check testFunction("case", parameters, eFunResult)
 
   test "case invalid main condition":
@@ -424,14 +433,23 @@ suite "runFunction.nim":
     let eFunResult = newFunResultWarn(wInvalidCondition, 3)
     check testFunction("case", parameters, eFunResult)
 
-  test "case invalid condition":
+  test "case case different type":
     var parameters = @[
       newValue(1),
-      newValue(2), newValue(22),
       newValue("abc"), newValue(33),
+      newValue(1), newValue(22),
       newValue("else")
     ]
-    let eFunResult = newFunResultWarn(wInvalidCondition, 3)
+    let eFunResult = newFunResult(newValue(22))
+    check testFunction("case", parameters, eFunResult)
+
+  test "case optional else":
+    var parameters = @[
+      newValue(1),
+      newValue("abc"), newValue(33),
+      newValue(1), newValue(22),
+    ]
+    let eFunResult = newFunResult(newValue(22))
     check testFunction("case", parameters, eFunResult)
 
   test "to int happy":
