@@ -2,57 +2,34 @@
 runFunction.nim
 ===============
 
-The module contains all the built in functions.
+This module contains all the built in functions.
 
 Index:
 ------
-
 * type: FunctionPtr__ -- Signature of a statictea function.
-
 * type: FunResultKind__ -- The kind of a FunResult object, either a value or warning.
-
 * type: FunResult__ -- Functions return a FunResult object.
-
 * newFunResultWarn__ -- Create a FunResult containing a warning message.
-
 * newFunResult__ -- Create a FunResult containing a return value.
-
 * `==`__ -- Compare two FunResult objects and return true when equal.
-
 * `$`__ -- Return a string representation of a FunResult object.
-
 * cmpString__ -- Compares two UTF-8 strings.
-
 * funCmp__ -- Compare two values.
-
 * funConcat__ -- Concatentate two or more strings.
-
 * funLen__ -- Return the len of a value.
-
 * funGet__ -- Return a value contained in a list or dictionary.
-
 * funIf__ -- You use the if function to return a value based on a condition.
-
 * funAdd__ -- Return the sum of two or more values.
-
 * funExists__ -- Return 1 when a variable exists in a dictionary, else return 0.
-
 * funCase__ -- <p>The case function returns a value from multiple choices.
-
-* parseVersion__ -- Parse a Statictea version number and return its three components.
-
+* parseVersion__ -- Parse a StaticTea version number and return its three components.
 * funCmpVersion__ -- <p>Compare two StaticTea type version numbers.
-
 * funFloat__ -- <p>Convert an int or an int number string to a float.
-
 * funInt__ -- Convert a float or a number string to an int.
-
 * funFind__ -- <p>Find a substring in a string and return its position when found.
-
 * funSubstr__ -- <p>Extract a substring from a string.
-
 * funDup__ -- Duplicate a string.
-
+* funDict__ -- <p>Create a dictionary from a list of key, value pairs.
 * getFunction__ -- Look up a function by its name.
 
 .. __:
@@ -288,7 +265,7 @@ parseVersion
 
  proc parseVersion(version: string): Option[(int, int, int)] 
 
-Parse a Statictea version number and return its three components.
+Parse a StaticTea version number and return its three components.
 
 .. __:
 
@@ -379,6 +356,19 @@ Duplicate a string. The first parameter is the string to dup and the second para
 
 .. __:
 
+funDict
+-------
+
+.. code::
+
+ proc funDict(parameters: seq[Value]): FunResult 
+
+<p>Create a dictionary from a list of key, value pairs. You can specify as many pair as you want. The keys must be strings and the values and be any type. Added in version 0.1.0.</p>
+<p>dict(&quot;a&quot;, 5) =&gt; {&quot;a&quot;: 5} dict(&quot;a&quot;, 5, &quot;b&quot;, 33, &quot;c&quot;, 0) =&gt; {&quot;a&quot;: 5, &quot;b&quot;: 33, &quot;c&quot;: 0}} </p>
+
+
+.. __:
+
 getFunction
 -----------
 
@@ -388,6 +378,8 @@ getFunction
 
 Look up a function by its name.
 
+
+
 .. class:: align-center
 
-Document produced from nim doc comments and formatted with Statictea.
+Document produced from nim doc comments and formatted with StaticTea.

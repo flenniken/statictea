@@ -1,4 +1,4 @@
-## The module contains all the built in functions.
+## This module contains all the built in functions.
 
 import vartypes
 import options
@@ -633,6 +633,32 @@ proc funDup*(parameters: seq[Value]): FunResult =
     str.add(pattern)
   result = newFunResult(newValue(str))
 
+proc funDict*(parameters: seq[Value]): FunResult =
+  ## Create a dictionary from a list of key, value pairs. You can
+  ## specify as many pair as you want. The keys must be strings and
+  ## the values and be any type. Added in version 0.1.0.
+  ##
+  ## dict("a", 5) => {"a": 5}
+  ## dict("a", 5, "b", 33, "c", 0) => {"a": 5, "b": 33, "c": 0}}
+  ##
+
+  var dict: VarsDict
+  if parameters.len == 0:
+    return newFunResult(newValue(dict))
+
+  # The parameters come in pairs.
+  if parameters.len mod 2 == 1:
+    return newFunResultWarn(wPairParameters, 0)
+
+  for ix in countUp(0, parameters.len-2, 2):
+    var key = parameters[ix]
+    if key.kind != vkString:
+      return newFunResultWarn(wExpectedString, ix)
+    var value = parameters[ix+1]
+    dict[key.stringv] = value
+
+  result = newFunResult(newValue(dict))
+
 const
   functionsList = [
     ("len", funLen),
@@ -649,6 +675,7 @@ const
     ("find", funFind),
     ("substr", funSubstr),
     ("dup", funDup),
+    ("dict", funDict),
 # replace -- search and replace
 # regex matching
 # format

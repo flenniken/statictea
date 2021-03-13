@@ -6,6 +6,7 @@ import env
 import vartypes
 import runFunction
 import warnings
+import tables
 
 proc testFunction(functionName: string, parameters: seq[Value],
     eFunResult: FunResult,
@@ -688,3 +689,39 @@ suite "runFunction.nim":
     var parameters = @[newValue("="), newValue(123_333)]
     let eFunResult = newFunResultWarn(wDupStringTooLong, 1, "123333")
     check testFunction("dup", parameters, eFunResult = eFunResult)
+
+  test "dict":
+    var parameters: seq[Value] = @[]
+    var dict: VarsDict
+    let eFunResult = newFunResult(newValue(dict))
+    check testFunction("dict", parameters, eFunResult = eFunResult)
+
+  test "dict 1 item":
+    var parameters = @[newValue("a"), newValue(5)]
+    var dict: VarsDict
+    dict["a"] = newValue(5)
+    let eFunResult = newFunResult(newValue(dict))
+    check testFunction("dict", parameters, eFunResult = eFunResult)
+
+  test "dict 2 items":
+    var parameters = @[newValue("a"), newValue(5), newValue("b"), newValue("str")]
+    var dict: VarsDict
+    dict["a"] = newValue(5)
+    dict["b"] = newValue("str")
+    let eFunResult = newFunResult(newValue(dict))
+    check testFunction("dict", parameters, eFunResult = eFunResult)
+
+  test "dict 1 parameter":
+    var parameters = @[newValue("a")]
+    let eFunResult = newFunResultWarn(wPairParameters, 0)
+    check testFunction("dict", parameters, eFunResult = eFunResult)
+
+  test "dict 3 parameter":
+    var parameters = @[newValue("a")]
+    let eFunResult = newFunResultWarn(wPairParameters, 0)
+    check testFunction("dict", parameters, eFunResult = eFunResult)
+
+  test "dict not string key":
+    var parameters = @[newValue("key"), newValue(1), newValue(2), newValue(1)]
+    let eFunResult = newFunResultWarn(wExpectedString, 2)
+    check testFunction("dict", parameters, eFunResult = eFunResult)

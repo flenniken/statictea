@@ -969,7 +969,7 @@ StaticTea variable types:
 - [[#string][string]]
 - [[#integer][integer]]
 - [[#float][float]]
-- [[#dictionary][dictionary]]
+- [[#dict][dict]]
 - [[#list][list]]
 
 [[#contents][茶]]
@@ -1044,15 +1044,66 @@ Example floats:
 
 [[#contents][茶]]
 
-** Dictionary
+** Dict
 :PROPERTIES:
-:CUSTOM_ID: dictionary
+:CUSTOM_ID: dict
 :END:
 
-A dictionary is a key value store with fast lookup. It maps a
-string key to a value which can be any type.  You access
-dictionary items with the get function and you define them in the
-json files.
+The dict type, short for dictionary, is a key value store with
+fast lookup. It maps a string key to a value which can be any
+type.
+
+You access dictionary items with variable names or with the get
+function.  You create them in the json files, with the dict
+function, or from other dictionaries using map or filter
+functions.
+
+In Json files dictionaries are known as json objects. Json calls
+the object items name/value pairs and we call them key/value
+pairs. StaticTea preserves the order of the elements and the last
+duplicate wins.
+
+In the following json data, the overall data is a dictionary and
+the d element is a dictionary.  The d dictionary has two key/value
+pairs, ("x", 100) and ("y", 200).
+
+server json:
+
+#+BEGIN_SRC
+{
+  "a": 1,
+  "b": 2,
+  "d": {
+    "x": 100,
+    "y": 200
+  }
+}
+#+END_SRC
+
+If a key has valid variable syntax, you can access the it as a
+variable, for the json example above, you can access as:
+
+#+BEGIN_SRC
+s.a => 1
+s.b => 2
+s.d => dict("x", 100, "y", 200)
+s.d.x => 100
+s.d.y => 200
+#+END_SRC
+
+Or you access the elements with the get function. The get
+function has an optional default parameter and it works with keys
+that don't look like variables.  Examples:
+
+#+BEGIN_SRC
+get(t.server, "a") => 1
+get(t.server, "b") => 2
+get(t.server, "d") => dict("x", 100, "y", 200)
+
+d = get(t.server, "d")
+get(d, "x") => 100
+get(d, "y") => 200
+#+END_SRC
 
 [[#contents][茶]]
 
@@ -1345,6 +1396,7 @@ List of functions:
 - [[#cmp][cmp()]] -- spaceship compare function <=>
 - [[#cmpversion][cmpVersion()]] -- compare StaticTea version numbers
 - [[#concat][concat()]] -- concatenate strings
+- [[#dictfun][dict()]] -- create a dictionary
 - [[#dup][dup()]] -- duplicate string
 - [[#int][int()]] -- convert a float or number string to an int
 - [[#exists][exists()]] -- whether a variables exists
@@ -1799,6 +1851,22 @@ int(6.3, "ceiling") => 7
 int(-6.3, "ceiling") => -6
 int(6.3456, "truncate") => 6
 int(-6.3456, "truncate") => -6
+#+END_SRC
+
+[[#contents][茶]]
+
+** dict()
+:PROPERTIES:
+:CUSTOM_ID: dictfun
+:END:
+
+Create a dictionary from a list of key, value pairs. You can
+specify as many pair as you want. The keys must be strings and
+the values and be any type. Added in version 0.1.0.
+
+#+BEGIN_SRC
+dict("a", 5) => {"a": 5}
+dict("a", 5, "b", 33, "c", 0) => {"a": 5, "b": 33, "c": 0}}
 #+END_SRC
 
 [[#contents][茶]]

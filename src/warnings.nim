@@ -100,6 +100,7 @@ type
     wEndLessThenStart,     # w90
     wSubstringNotFound,    # w91
     wDupStringTooLong,     # w92
+    wPairParameters,       # w93
 
 tpubType:
   const
@@ -199,6 +200,7 @@ tpubType:
       "The end position is less that the start position.", # wEndLessThenStart
       "The substring was not found and no default parameter.", # wSubstringNotFound
       "The resulting duplicated string must be under 1024 characters, got: $1.", # wDupStringTooLong
+      "Specify parameters in pairs.", # wPairParameters
     ]
 
 func getWarning*(filename: string, lineNum: int,

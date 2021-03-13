@@ -11,6 +11,9 @@ import os
 import json
 import options
 
+# todo: test the the order is preserved.
+# todo: test that the last duplicate wins.
+
 var depth_limit = 3
 
 func getEmptyVars*(): VarsDict =
