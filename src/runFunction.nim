@@ -297,6 +297,9 @@ proc funExists*(parameters: seq[Value]): FunResult =
     num = 1
   result = newFunResult(newValue(num))
 
+# todo: allow conditions to be ints and strings.
+# todo: let the else case be optional.
+
 proc funCase*(parameters: seq[Value]): FunResult =
   ## The case function returns a value from multiple choices. It
   ## requires at least four parameters, the main condition a case pair
