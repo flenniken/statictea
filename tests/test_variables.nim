@@ -23,3 +23,42 @@ suite "variables.nim":
   # test "echoVariables":
   #   var variables = getTestVariables()
   #   echoVariables(variables)
+
+  test "newVariables":
+    var emptyVarsDict: VarsDict
+    var variables = newVariables(emptyVarsDict, emptyVarsDict)
+    # echoVariables(variables)
+    check variables.len == 6
+    check "server" in variables
+    check "shared" in variables
+    check "local" in variables
+    check "global" in variables
+    check "row" in variables
+    check "version" in variables
+    check variables["row"] == newValue(0)
+
+  test "getTeaVarString":
+    var emptyVarsDict: VarsDict
+    var variables = newVariables(emptyVarsDict, emptyVarsDict)
+    check getTeaVarString(variables, "output") == "result"
+
+  test "getTeaVarInt":
+    var emptyVarsDict: VarsDict
+    var variables = newVariables(emptyVarsDict, emptyVarsDict)
+    check getTeaVarInt(variables, "row") == 0
+    check getTeaVarInt(variables, "repeat") == 1
+    check getTeaVarInt(variables, "maxLines") == 10
+    check getTeaVarInt(variables, "maxRepeat") == 100
+
+  test "resetVariables":
+    var emptyVarsDict: VarsDict
+    var variables = newVariables(emptyVarsDict, emptyVarsDict)
+    resetVariables(variables)
+    check variables.len == 6
+    check "server" in variables
+    check "shared" in variables
+    check "local" in variables
+    check "global" in variables
+    check "row" in variables
+    check "version" in variables
+    check variables["row"] == newValue(0)

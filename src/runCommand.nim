@@ -323,50 +323,6 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
   # let valueAndLength = result.get()
   # env.warnStatement(statement, wStackTrace, start+valueAndLength.length,  "leave getValue")
 
-proc assignTeaVariable*(env: var Env, statement: Statement, variables:
-                       var Variables, varName: string, value: Value,
-                           varPos: Natural, valuePos: Natural) =
-  ## Assign the given tea variable with the given value.  Show
-  ## warnings when it's not possible to make the assignment.
-
-  case varName:
-    of "maxLines":
-      # The maxLines variable must be an integer >= 0.
-      if value.kind == vkInt and value.intv >= 0:
-        variables[varName] = value
-      else:
-        env.warnStatement(statement, wInvalidMaxCount, valuePos)
-    of "maxRepeat":
-      # The maxRepeat variable must be an integer >= t.repeat.
-      if value.kind == vkInt and value.intv >= variables["repeat"].intv:
-        variables[varName] = value
-      else:
-        env.warnStatement(statement, wInvalidMaxRepeat, valuePos)
-    of "content":
-      # Content must be a string.
-      if value.kind == vkString:
-        variables[varName] = value
-      else:
-        env.warnStatement(statement, wInvalidTeaContent, valuePos)
-    of "output":
-      # Output must be a string of "result", etc.
-      if value.kind == vkString:
-        if value.stringv in outputValues:
-          variables[varName] = value
-          return
-      env.warnStatement(statement, wInvalidOutputValue, valuePos, $value)
-    of "repeat":
-      # Repeat is an integer >= 0 and <= t.maxRepeat.
-      if value.kind == vkInt and value.intv >= 0 and
-         value.intv <= variables["maxRepeat"].intv:
-        variables[varName] = value
-      else:
-        env.warnStatement(statement, wInvalidRepeat, valuePos, $value)
-    of "server", "shared", "local", "global", "row", "version":
-      env.warnStatement(statement, wReadOnlyTeaVar, varPos, varName)
-    else:
-      env.warnStatement(statement, wInvalidTeaVar, varPos, varName)
-
 proc runStatement*(env: var Env, statement: Statement,
                    compiledMatchers: Compiledmatchers, variables: var Variables) =
   ## Run one statement. Return the variable namespace, name and value.
@@ -402,19 +358,9 @@ proc runStatement*(env: var Env, statement: Statement,
     env.warnStatement(statement, wTextAfterValue, pos)
     return
 
-  # Assign the variable to its dictionary.
-  case nameSpace:
-    of "":
-      variables["local"].dictv[varName] = value
-    of "g.":
-      variables["global"].dictv[varName] = value
-    of "t.":
-      assignTeaVariable(env, statement, variables,
-        varName, value, 0, variable.length + equalSign.length)
-    of "s.", "h.":
-      env.warnStatement(statement, wReadOnlyDictionary, 0)
-    else:
-      env.warnStatement(statement, wInvalidNameSpace, 0, nameSpace)
+  # Assign the variable to its dictionary or show a warning message.
+  let afterEqualLength = variable.length + equalSign.length
+  assignVariable(env, statement, variables, nameSpace, varName, value, afterEqualLength)
 
 proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
                  seq[LineParts], compiledMatchers: CompiledMatchers,

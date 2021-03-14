@@ -231,7 +231,8 @@ proc testRunStatement(statement: Statement, nameSpace: string = "", varName: str
   ): bool =
   var env = openEnvTest("_runStatement.log")
 
-  var variables = newVariables()
+  var emptyVarsDict: VarsDict
+  var variables = newVariables(emptyVarsDict, emptyVarsDict)
   let compiledMatchers = getCompiledMatchers()
   runStatement(env, statement, compiledMatchers, variables)
 
@@ -625,15 +626,12 @@ statement: tea = a123
     check testGetVarOrFunctionValue(statement, 6, none(ValueAndLength), eErrLines = eErrLines)
 
   test "getNewVariables":
-    var variables = newVariables()
+    var emptyVarsDict: VarsDict
+    var variables = newVariables(emptyVarsDict, emptyVarsDict)
     # echoVariables(variables)
     check variables.contains("content") == false
     check variables["local"].dictv.len == 0
     check variables["global"].dictv.len == 0
-    check variables["output"] == Value(kind: vkString, stringv: "result")
-    check variables["maxRepeat"] == Value(kind: vkInt, intv: 100)
-    check variables["maxLines"] == Value(kind: vkInt, intv: 10)
-    check variables["repeat"] == Value(kind: vkInt, intv: 1)
     check variables["row"] == Value(kind: vkInt, intv: 0)
     check variables["server"].dictv.len == 0
     check variables["shared"].dictv.len == 0
@@ -750,8 +748,9 @@ template.html(1): w41: Invalid t.output value, use: "result", "stderr", "log", o
 statement: t.output = 'notvalidv'
                       ^
 """
+    # The expected value is none, because it doesn't exist yet.
     check testRunStatement(statement, "t.", "output", eErrLines = eErrLines,
-                           eValueO = some(newValue("result")))
+                           eValueO = none(Value))
 
   test "runStatement junk at end":
     let statement = newStatement(text="""str = "testing" junk at end""", lineNum=1, 0)
