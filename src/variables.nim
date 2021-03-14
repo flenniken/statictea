@@ -12,6 +12,24 @@ type
   Variables* = VarsDict
     ## Dictionary holding variables.
 
+  VariableData* = object
+    nameSpace*: string
+    varName*: string
+    value*: Value
+
+  WarningDataPos* = object
+    warningData*: WarningData
+    firstPos*: bool
+
+proc newVariableData*(nameSpace: string, varName: string, value: Value): VariableData =
+  result = VariableData(nameSpace: nameSpace, varName: varName, value: value)
+
+proc newWarningDataPos*(warning: Warning, p1: string = "", p2: string = "",
+    firstPos: bool = true): WarningDataPos =
+  ## Create a WarningDataPos containing the warning information.
+  let warningData = WarningData(warning: warning, p1: p1, p2: p2)
+  result = WarningDataPos(warningData: warningData, firstPos: firstPos)
+
 proc getNamespaceDict*(variables: Variables, nameSpace: string): Option[VarsDict] =
   ## Get the dictionary for the given namespace.
   case nameSpace:
@@ -142,11 +160,46 @@ when defined(test):
     for k, v in variables["global"].dictv.pairs():
       echo k, ": ", $v
 
-proc assignTeaVariable*(env: var Env, statement: Statement, variables:
-                       var Variables, varName: string, value: Value,
-                           varPos: Natural, valuePos: Natural) =
-  ## Assign the given tea variable with the given value.  Show
-  ## warnings when it's not possible to make the assignment.
+proc validateTeaVariable*(variables: Variables, varName: string, value: Value): Option[WarningDataPos] =
+  ## Validate the setting the tea variable with the given
+  ## value. Return a warning if it is invalid, else return none.
+
+  case varName:
+    of "maxLines":
+      # The maxLines variable must be an integer >= 0.
+      if value.kind == vkInt and value.intv >= 0:
+        return
+      result = some(newWarningDataPos(wInvalidMaxCount, firstPos = false))
+    of "maxRepeat":
+      # The maxRepeat variable must be an integer >= t.repeat.
+      if value.kind == vkInt and value.intv >= getTeaVarInt(variables, "repeat"):
+        return
+      result = some(newWarningDataPos(wInvalidMaxRepeat, firstPos = false))
+    of "content":
+      # Content must be a string.
+      if value.kind == vkString:
+        return
+      result = some(newWarningDataPos(wInvalidTeaContent, firstPos = false))
+    of "output":
+      # Output must be a string of "result", etc.
+      if value.kind == vkString:
+        if value.stringv in outputValues:
+          return
+      result = some(newWarningDataPos(wInvalidOutputValue, firstPos = false))
+    of "repeat":
+      # Repeat is an integer >= 0 and <= t.maxRepeat.
+      if value.kind == vkInt and value.intv >= 0 and
+         value.intv <= getTeaVarInt(variables, "maxRepeat"):
+        return
+      result = some(newWarningDataPos(wInvalidRepeat, firstPos = false))
+    of "server", "shared", "local", "global", "row", "version":
+      result = some(newWarningDataPos(wReadOnlyTeaVar, varName, firstPos = true))
+    else:
+      result = some(newWarningDataPos(wInvalidTeaVar, varName, firstPos = true))
+
+# todo: clean up discards below.
+proc assignTeaVariable*(variables: var Variables, varName: string, value: Value) =
+  ## Assign the given tea variable with the given value.
 
   case varName:
     of "maxLines":
@@ -154,50 +207,64 @@ proc assignTeaVariable*(env: var Env, statement: Statement, variables:
       if value.kind == vkInt and value.intv >= 0:
         variables["maxLines"] = value
       else:
-        env.warnStatement(statement, wInvalidMaxCount, valuePos)
+        discard
     of "maxRepeat":
       # The maxRepeat variable must be an integer >= t.repeat.
       if value.kind == vkInt and value.intv >= getTeaVarInt(variables, "repeat"):
         variables["maxRepeat"] = value
       else:
-        env.warnStatement(statement, wInvalidMaxRepeat, valuePos)
+        discard
     of "content":
       # Content must be a string.
       if value.kind == vkString:
         variables["content"] = value
       else:
-        env.warnStatement(statement, wInvalidTeaContent, valuePos)
+        discard
     of "output":
       # Output must be a string of "result", etc.
       if value.kind == vkString:
         if value.stringv in outputValues:
           variables["output"] = value
           return
-      env.warnStatement(statement, wInvalidOutputValue, valuePos, $value)
+      discard
     of "repeat":
       # Repeat is an integer >= 0 and <= t.maxRepeat.
       if value.kind == vkInt and value.intv >= 0 and
          value.intv <= getTeaVarInt(variables, "maxRepeat"):
         variables["repeat"] = value
       else:
-        env.warnStatement(statement, wInvalidRepeat, valuePos, $value)
+        discard
     of "server", "shared", "local", "global", "row", "version":
-      env.warnStatement(statement, wReadOnlyTeaVar, varPos, varName)
+      discard
     else:
-      env.warnStatement(statement, wInvalidTeaVar, varPos, varName)
+      discard
 
-proc assignVariable*(env: var Env, statement: Statement, variables: var Variables,
-                    nameSpace: string, varName: string, value: Value, length: Natural) =
+proc validateVariable*(variables: Variables, nameSpace: string, varName: string,
+                       value: Value): Option[WarningDataPos] =
   ## Assign the variable to its dictionary or show a warning message.
+  case nameSpace:
+    of "":
+      discard
+    of "g.":
+      discard
+    of "t.":
+      result = validateTeaVariable(variables, varName, value)
+    of "s.", "h.":
+      result = some(newWarningDataPos(wReadOnlyDictionary, firstPos = true))
+    else:
+      result = some(newWarningDataPos(wInvalidNameSpace, nameSpace, firstPos = true))
+
+proc assignVariable*(variables: var Variables, nameSpace: string,
+    varName: string, value: Value) =
+  ## Assign the variable to its dictionary.
   case nameSpace:
     of "":
       variables["local"].dictv[varName] = value
     of "g.":
       variables["global"].dictv[varName] = value
     of "t.":
-      assignTeaVariable(env, statement, variables,
-                        varName, value, 0, length)
+      assignTeaVariable(variables, varName, value)
     of "s.", "h.":
-      env.warnStatement(statement, wReadOnlyDictionary, 0)
+      discard
     else:
-      env.warnStatement(statement, wInvalidNameSpace, 0, nameSpace)
+      discard

@@ -224,7 +224,7 @@ proc testGetFunctionValue(functionName: string, statement: Statement, start: Nat
     result = false
 
 proc testRunStatement(statement: Statement, nameSpace: string = "", varName: string = "",
-    eValueO: Option[Value] = none(Value),
+    eVariableDataO: Option[VariableData] = none(VariableData),
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]
@@ -234,12 +234,11 @@ proc testRunStatement(statement: Statement, nameSpace: string = "", varName: str
   var emptyVarsDict: VarsDict
   var variables = newVariables(emptyVarsDict, emptyVarsDict)
   let compiledMatchers = getCompiledMatchers()
-  runStatement(env, statement, compiledMatchers, variables)
+  let variableDataO = runStatement(env, statement, compiledMatchers, variables)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-  let valueO = getVariable(variables, namespace, varName)
-  if not expectedItem("value", valueO, eValueO):
+  if not expectedItem("variableDataO", variableDataO, eVariableDataO):
     result = false
 
 suite "runCommand.nim":
@@ -731,15 +730,18 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "runStatement":
     let statement = newStatement(text="""t.repeat = 4 """, lineNum=1, 0)
-    check testRunStatement(statement, "t.", "repeat", some(newValue(4)))
+    check testRunStatement(statement, "t.", "repeat",
+                           some(newVariableData("t.", "repeat", newValue(4))))
 
   test "runStatement string":
     let statement = newStatement(text="""str = "testing" """, lineNum=1, 0)
-    check testRunStatement(statement, "", "str", some(newValue("testing")))
+    check testRunStatement(statement, "", "str",
+                           some(newVariableData("", "str", newValue("testing"))))
 
   test "runStatement set log":
     let statement = newStatement(text="""t.output = "log" """, lineNum=1, 0)
-    check testRunStatement(statement, "t.", "output", eValueO = some(newValue("log")))
+    check testRunStatement(statement, "t.", "output",
+                           some(newVariableData("t.", "output", newValue("log"))))
 
   test "set invalid output":
     let statement = newStatement(text="t.output = 'notvalidv'", lineNum=1, 0)
@@ -749,8 +751,7 @@ statement: t.output = 'notvalidv'
                       ^
 """
     # The expected value is none, because it doesn't exist yet.
-    check testRunStatement(statement, "t.", "output", eErrLines = eErrLines,
-                           eValueO = none(Value))
+    check testRunStatement(statement, "t.", "output", eErrLines = eErrLines)
 
   test "runStatement junk at end":
     let statement = newStatement(text="""str = "testing" junk at end""", lineNum=1, 0)
@@ -876,7 +877,7 @@ statement: t.missing = "1.2.3"
 
   test "assignTeaVariable content":
     let statement = newStatement(text="""t.content = "1.2.3"""", lineNum=1, 0)
-    check testRunStatement(statement)
+    check testRunStatement(statement, "t.", "content", some(newVariableData("t.", "content", newValue("1.2.3"))))
 
   test "parseVersion":
     check parseVersion("1.2.3") == some((1, 2, 3))
@@ -884,23 +885,26 @@ statement: t.missing = "1.2.3"
 
   test "cmpVersion equal":
     let statement = newStatement(text="cmp = cmpVersion('1.2.3', '1.2.3')", lineNum=1, 0)
-    check testRunStatement(statement, varName = "cmp", eValueO = some(newValue(0)))
+    check testRunStatement(statement, "", "cmp", some(newVariableData("", "cmp", newValue(0))))
 
   test "cmpVersion less":
     let statement = newStatement(text="cmp = cmpVersion('1.2.2', '1.2.3')", lineNum=1, 0)
-    check testRunStatement(statement, varName = "cmp", eValueO = some(newValue(-1)))
+    check testRunStatement(statement, "", "cmp", some(newVariableData("", "cmp", newValue(-1))))
 
   test "cmpVersion greater":
     let statement = newStatement(text="cmp = cmpVersion('1.2.4', '1.2.3')", lineNum=1, 0)
-    check testRunStatement(statement, varName = "cmp", eValueO = some(newValue(1)))
+    check testRunStatement(statement, "", varName = "cmp",
+                           some(newVariableData("", "cmp", newValue(1))))
 
   test "cmpVersion less 2":
     let statement = newStatement(text="cmp = cmpVersion('1.22.3', '2.1.0')", lineNum=1, 0)
-    check testRunStatement(statement, varName = "cmp", eValueO = some(newValue(-1)))
+    check testRunStatement(statement, "", varName = "cmp",
+                           some(newVariableData("", "cmp", newValue(-1))))
 
   test "cmpVersion less 3":
     let statement = newStatement(text="cmp = cmpVersion('2.22.3', '2.44.0')", lineNum=1, 0)
-    check testRunStatement(statement, varName = "cmp", eValueO = some(newValue(-1)))
+    check testRunStatement(statement, "", varName = "cmp",
+                           some(newVariableData("", "cmp", newValue(-1))))
 
   test "cmpVersion two parameters":
     let statement = newStatement(text="cmp = cmpVersion('1.2.3')", lineNum=1, 0)
@@ -929,4 +933,4 @@ statement: cmp = cmpVersion('1.2.3', 3.5)
 # todo: test endblock by itself.
 # todo: use "import std/strutils to include system modules
 # todo: update to the latest nim version
-# 
+#

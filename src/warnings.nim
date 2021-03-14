@@ -5,6 +5,11 @@ import strutils
 
 # Add new warnings to the bottom so the warning numbers never change.
 type
+  WarningData* = object
+    warning*: Warning   ## Warning message id.
+    p1*: string         ## Extra warning info.
+    p2*: string         ## Extra warning info.
+
   Warning* = enum
     ## Numbers for all the warnings.
     wNoFilename,           # w0
@@ -212,3 +217,7 @@ func getWarning*(filename: string, lineNum: int,
   let warningCode = $ord(warning)
   let message = pattern % [p1, p2]
   result = "$1($2): w$3: $4" % [filename, $lineNum, warningCode, message]
+
+proc newWarningData*(warning: Warning, p1: string = "", p2: string = ""): WarningData =
+  ## Create a WarningData containing the warning information.
+  result = WarningData(warning: warning, p1: p1, p2: p2)

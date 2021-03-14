@@ -218,7 +218,8 @@ proc getFunctionValue*(env: var Env, compiledMatchers:
   # Run the function.
   let funResult = function(parameters)
   if funResult.kind == frWarning:
-    env.warn(statement.lineNum, funResult.warning, funResult.p1, funResult.p2)
+    env.warn(statement.lineNum, funResult.warningData.warning,
+             funResult.warningData.p1, funResult.warningData.p2)
     env.warnStatement(statement, wInvalidStatement, parameterStarts[funResult.parameter])
     return
 
@@ -324,7 +325,7 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
   # env.warnStatement(statement, wStackTrace, start+valueAndLength.length,  "leave getValue")
 
 proc runStatement*(env: var Env, statement: Statement,
-                   compiledMatchers: Compiledmatchers, variables: var Variables) =
+    compiledMatchers: Compiledmatchers, variables: var Variables): Option[VariableData] =
   ## Run one statement. Return the variable namespace, name and value.
 
   # Get the variable name. Match the surrounding white space.
@@ -353,14 +354,24 @@ proc runStatement*(env: var Env, statement: Statement,
   # Check that there is not any unprocessed text following the value.
   let value = valueAndLengthO.get().value
   let length = valueAndLengthO.get().length
-  let pos = variable.length + equalSign.length + length
+  var pos = variable.length + equalSign.length + length
   if pos != statement.text.len:
     env.warnStatement(statement, wTextAfterValue, pos)
     return
 
-  # Assign the variable to its dictionary or show a warning message.
-  let afterEqualLength = variable.length + equalSign.length
-  assignVariable(env, statement, variables, nameSpace, varName, value, afterEqualLength)
+  let warningDataPosO = validateVariable(variables, nameSpace, varName, value)
+  if isSome(warningDataPosO):
+    let warningDataPos = warningDataPosO.get()
+    var warningPos: Natural
+    if warningDataPos.firstPos:
+      warningPos = 0
+    else:
+      warningPos = variable.length + equalSign.length
+    let warningData = warningDataPos.warningData
+    env.warnStatement(statement, warningData.warning, warningPos, warningData.p1, warningData.p2)
+    return
+
+  result = some(newVariableData(nameSpace, varName, value))
 
 proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
                  seq[LineParts], compiledMatchers: CompiledMatchers,
@@ -376,8 +387,10 @@ proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
       compiledMatchers.allSpaceTabMatcher):
     # Run the statement and assign the return value to the variable.
     # When there is a statement error, the statement is skipped.
-    runStatement(env, statement, compiledMatchers, variables)
-
+    let variableDataO = runStatement(env, statement, compiledMatchers, variables)
+    if isSome(variableDataO):
+      let vd = variableDataO.get()
+      assignVariable(variables, vd.nameSpace, vd.varName, vd.value)
 
 when defined(test):
   proc newIntValueAndLengthO*(number: int | int64,

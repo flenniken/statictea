@@ -27,10 +27,8 @@ type
       of frValue:
         value*: Value       ## Return value of the function.
       of frWarning:
-        warning*: Warning   ## Warning message id.
         parameter*: Natural ## Index of problem parameter.
-        p1*: string         ## Extra warning info.
-        p2*: string         ## Extra warning info.
+        warningData*: WarningData
 
 # A table of the built in functions.
 var functions: Table[string, FunctionPtr]
@@ -40,8 +38,9 @@ proc newFunResultWarn*(warning: Warning, parameter: Natural = 0,
   ## Create a FunResult containing a warning message. The parameter is
   ## the index of the problem parameter, or 0. Both p1 and p2 are the
   ## optional strings that go with the warning message.
-  result = FunResult(kind: frWarning, warning: warning,
-             parameter: parameter, p1: p1, p2: p2)
+  let warningData = newWarningData(warning, p1, p2)
+  result = FunResult(kind: frWarning, parameter: parameter,
+                     warningData: warningData)
 
 proc newFunResult*(value: Value): FunResult =
   ## Create a FunResult containing a return value.
@@ -54,10 +53,8 @@ proc `==`*(funResult1: FunResult, funResult2: FunResult): bool =
       of frValue:
         result = funResult1.value == funResult2.value
       else:
-        if funResult1.warning == funResult2.warning and
-           funResult1.parameter == funResult2.parameter and
-           funResult1.p1 == funResult2.p1 and
-           funResult1.p2 == funResult2.p2:
+        if funResult1.warningData == funResult2.warningData and
+           funResult1.parameter == funResult2.parameter:
           result = true
 
 func `$`*(funResult: FunResult): string =
@@ -67,7 +64,7 @@ func `$`*(funResult: FunResult): string =
     result = $funResult.value
   else:
     result = "warning: $1: $2 $3 $4" % [
-      $funResult.warning, $funResult.parameter, funResult.p1, funResult.p2
+      $funResult.warningData, $funResult.parameter
     ]
 
 proc cmpString*(a, b: string, ignoreCase: bool = false): int =
