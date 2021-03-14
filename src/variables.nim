@@ -1,4 +1,51 @@
 
+## -t.content -- content of the replace block.
+## -t.global -- dictionary containing the global variables.
+## -t.local -- dictionary containing the current command's local variables.
+## -t.maxLines -- maximum number of replacement block lines (lines before endblock).
+## -t.maxRepeat -- maximum number of times to repeat the block.
+## -t.output -- where the block output goes.
+## -t.repeat -- controls how many times the block repeats.
+## -t.row -- the current row number of a repeating block.
+## -t.server -- dictionary containing the server variables.
+## -t.shared -- dictionary containing the shared variables.
+## -t.version -- the StaticTea version number.
+
+##[
+Constant:
+
+t.version
+
+Dictionaries:
+
+t.global
+t.local
+t.server -- read only
+t.shared -- read only
+
+Integers:
+
+t.maxLines -- default when not set: 10
+t.maxRepeat -- default when not set: 100
+t.repeat -- default when not set: 1
+t.row -- 0 read only, automatically increments
+
+String:
+
+t.content -- default when not set: ""
+
+String enum:
+
+t.output -- default when not set: "result"
+
+- "result" -- the block output goes to the result file (default)
+- "stderr" -- the block output goes to standard error
+- "log" -- the block output goes to the log file
+- "skip" -- the block is skipped
+
+]##
+
+
 import env
 import args
 import vartypes
@@ -7,6 +54,10 @@ import tables
 import options
 import version
 import warnings
+
+const
+  outputValues* = ["result", "stderr", "log", "skip"]
+    ## Tea output variable values.
 
 type
   Variables* = VarsDict
@@ -197,7 +248,6 @@ proc validateTeaVariable*(variables: Variables, varName: string, value: Value): 
     else:
       result = some(newWarningDataPos(wInvalidTeaVar, varName, firstPos = true))
 
-# todo: clean up discards below.
 proc assignTeaVariable*(variables: var Variables, varName: string, value: Value) =
   ## Assign the given tea variable with the given value.
 
@@ -206,38 +256,24 @@ proc assignTeaVariable*(variables: var Variables, varName: string, value: Value)
       # The maxLines variable must be an integer >= 0.
       if value.kind == vkInt and value.intv >= 0:
         variables["maxLines"] = value
-      else:
-        discard
     of "maxRepeat":
       # The maxRepeat variable must be an integer >= t.repeat.
       if value.kind == vkInt and value.intv >= getTeaVarInt(variables, "repeat"):
         variables["maxRepeat"] = value
-      else:
-        discard
     of "content":
       # Content must be a string.
       if value.kind == vkString:
         variables["content"] = value
-      else:
-        discard
     of "output":
-      # Output must be a string of "result", etc.
+      # Output must be a string of "result",...
       if value.kind == vkString:
         if value.stringv in outputValues:
           variables["output"] = value
-          return
-      discard
     of "repeat":
       # Repeat is an integer >= 0 and <= t.maxRepeat.
       if value.kind == vkInt and value.intv >= 0 and
          value.intv <= getTeaVarInt(variables, "maxRepeat"):
         variables["repeat"] = value
-      else:
-        discard
-    of "server", "shared", "local", "global", "row", "version":
-      discard
-    else:
-      discard
 
 proc validateVariable*(variables: Variables, nameSpace: string, varName: string,
                        value: Value): Option[WarningDataPos] =
@@ -264,7 +300,5 @@ proc assignVariable*(variables: var Variables, nameSpace: string,
       variables["global"].dictv[varName] = value
     of "t.":
       assignTeaVariable(variables, varName, value)
-    of "s.", "h.":
-      discard
     else:
       discard

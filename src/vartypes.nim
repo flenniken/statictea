@@ -5,10 +5,6 @@ import strutils
 import env
 import warnings
 
-const
-  outputValues* = ["result", "stderr", "log", "skip"]
-    ## Tea output variable values.
-
 type
   VarsDict* = OrderedTable[string, Value]
     ## Variables dictionary type.
