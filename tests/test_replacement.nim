@@ -157,6 +157,8 @@ more text
       "hello there!\n",
     ]
     var variables = emptyVariables()
+    assignVariable(variables, "t.", "server", newValue(newVarsDict()))
+    assignVariable(variables, "t.", "shared", newValue(newVarsDict()))
     assignVariable(variables, "s.", "test", newValue("hello"))
     assignVariable(variables, "h.", "test", newValue("there"))
     check testTempSegments(variables, templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
@@ -169,6 +171,8 @@ more text
       "hello there!\n",
     ]
     var variables = emptyVariables()
+    assignVariable(variables, "t.", "server", newValue(newVarsDict()))
+    assignVariable(variables, "t.", "shared", newValue(newVarsDict()))
     assignVariable(variables, "s.", "test", newValue("hello"))
     assignVariable(variables, "h.", "test", newValue("there"))
     check testTempSegments(variables, templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
@@ -177,6 +181,8 @@ more text
     let templateContent = "{s.test} {h.test}"
     var eResultLines = @["hello there"]
     var variables = emptyVariables()
+    assignVariable(variables, "t.", "server", newValue(newVarsDict()))
+    assignVariable(variables, "t.", "shared", newValue(newVarsDict()))
     assignVariable(variables, "s.", "test", newValue("hello"))
     assignVariable(variables, "h.", "test", newValue("there"))
     check testTempSegments(variables, templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
@@ -207,6 +213,7 @@ template.html(5): w58: The replacement variable doesn't exist: abc.
 template.html(6): w58: The replacement variable doesn't exist: missing.
 """
     var variables = emptyVariables()
+    assignVariable(variables, "t.", "server", newValue(newVarsDict()))
     assignVariable(variables, "s.", "test", newValue("hello"))
     check testTempSegments(variables, templateContent, command = "block", repeat = 1,
       eErrLines = eErrLines, eResultLines = eResultLines)

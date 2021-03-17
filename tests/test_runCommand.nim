@@ -532,12 +532,14 @@ statement: a = 'abc
 
   test "getVariable server":
     var variables = emptyVariables()
+    assignVariable(variables, "t.", "server", newValue(newVarsDict()))
     assignVariable(variables, "s.", "test", newValue("hello"))
     let statement = newStatement("tea = s.test", lineNum=12, start=0)
     check testGetVariable(variables, statement, 6, "s.", "test", some(newValue("hello")))
 
   test "getVariable shared":
     var variables = emptyVariables()
+    assignVariable(variables, "t.", "shared", newValue(newVarsDict()))
     assignVariable(variables, "h.", "test", newValue("there"))
     let statement = newStatement("tea = h.test", lineNum=12, start=0)
     check testGetVariable(variables, statement, 6, "h.", "test", some(newValue("there")))
@@ -579,6 +581,7 @@ statement: tea = d.five
 
   test "getVarOrFunctionValue var2":
     var variables = emptyVariables()
+    assignVariable(variables, "t.", "server", newValue(newVarsDict()))
     assignVariable(variables, "s.", "test", newValue("hello"))
     let statement = newStatement(text="""tea = s.test """, lineNum=12, 0)
     let eValueAndLengthO = some(newValueAndLength(newValue("hello"), 7))
@@ -618,8 +621,8 @@ statement: tea = a123
     check variables["local"].dictv.len == 0
     check variables["global"].dictv.len == 0
     check variables["row"] == Value(kind: vkInt, intv: 0)
-    check variables["server"].dictv.len == 0
-    check variables["shared"].dictv.len == 0
+    check not ("server" in variables)
+    check not ("shared" in variables)
     check variables["version"] == Value(kind: vkString, stringv: staticteaVersion)
 
   test "warnStatement":
@@ -711,6 +714,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "getVariables 2":
     var variables = emptyVariables()
+    assignVariable(variables, "t.", "server", newValue(newVarsDict()))
     assignVariable(variables, "s.", "test", newValue("hello"))
     let valueO = getVariable(variables, "s.", "test")
     check expectedItem("valueO", valueO, some(newValue("hello")))
@@ -770,7 +774,7 @@ statement: var 343
   test "read only var":
     let statement = newStatement(text="t.server = 343", lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w39: You cannot change the server tea variable.
+template.html(1): w40: Invalid tea variable: server.
 statement: t.server = 343
            ^
 """

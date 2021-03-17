@@ -76,22 +76,13 @@ type
     warningData*: WarningData
     warningSide*: WarningSide
 
-# todo: add in the json variables with assignVariable. Start with server, shared missing.
-func newVariables*(server: VarsDict, shared: VarsDict): Variables =
-  ## Create the variables in their initial state and add in the json
-  ## variables.
+func emptyVariables*(): Variables =
+  ## Create an empty variables object in its initial state.
   var emptyVarsDict: VarsDict
-  result["server"] = newValue(server)
-  result["shared"] = newValue(shared)
   result["local"] = newValue(emptyVarsDict)
   result["global"] = newValue(emptyVarsDict)
   result["row"] = newValue(0)
   result["version"] = newValue(staticteaVersion)
-
-func emptyVariables*(): Variables =
-  ## Create an empty variables object in its initial state.
-  var emptyVarsDict: VarsDict
-  result = newVariables(emptyVarsDict, emptyVarsDict)
 
 func newVariableData*(nameSpace: string, varName: string, value: Value): VariableData =
   ## Create a new VariableData object.
@@ -220,9 +211,11 @@ proc assignVariable*(variables: var Variables, nameSpace: string,
     of "":
       variables["local"].dictv[varName] = value
     of "s.":
-      variables["server"].dictv[varName] = value
+      if "server" in variables:
+        variables["server"].dictv[varName] = value
     of "h.":
-      variables["shared"].dictv[varName] = value
+      if "shared" in variables:
+        variables["shared"].dictv[varName] = value
     of "g.":
       variables["global"].dictv[varName] = value
     of "t.":
@@ -248,20 +241,23 @@ proc getVariable*(variables: Variables, namespace: string, varName:
         return some(variables[varName])
     else:
       return
-  if varName in variables[dictName].dictv:
-    result = some(variables[dictName].dictv[varName])
+  if dictName in variables:
+    if varName in variables[dictName].dictv:
+      result = some(variables[dictName].dictv[varName])
 
 when defined(test):
   proc echoVariables*(variables: Variables) =
     echo "---tea variables:"
     for k, v in variables.pairs():
       echo k, ": ", $v
-    echo "---server variables:"
-    for k, v in variables["server"].dictv.pairs():
-      echo k, ": ", $v
-    echo "---shared variables:"
-    for k, v in variables["shared"].dictv.pairs():
-      echo k, ": ", $v
+    if "shared" in variables:
+      echo "---server variables:"
+      for k, v in variables["server"].dictv.pairs():
+        echo k, ": ", $v
+    if "shared" in variables:
+      echo "---shared variables:"
+      for k, v in variables["shared"].dictv.pairs():
+        echo k, ": ", $v
     echo "---local variables:"
     for k, v in variables["local"].dictv.pairs():
       echo k, ": ", $v

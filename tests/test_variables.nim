@@ -24,8 +24,6 @@ suite "variables.nim":
   test "emptyVariables":
     var variables = emptyVariables()
     # echoVariables(variables)
-    check variables["server"].dictv.len == 0
-    check variables["shared"].dictv.len == 0
     check variables["local"].dictv.len == 0
     check variables["global"].dictv.len == 0
     check variables["row"].intv == 0
@@ -49,6 +47,20 @@ suite "variables.nim":
 
   test "resetVariables":
     var variables = emptyVariables()
+    resetVariables(variables)
+    check variables.len == 4
+    check not ("server" in variables)
+    check not ("shared" in variables)
+    check "local" in variables
+    check "global" in variables
+    check "row" in variables
+    check "version" in variables
+    check variables["row"] == newValue(0)
+
+  test "resetVariables with server and shared":
+    var variables = emptyVariables()
+    assignVariable(variables, "t.", "server", newValue(newVarsDict()))
+    assignVariable(variables, "t.", "shared", newValue(newVarsDict()))
     resetVariables(variables)
     check variables.len == 6
     check "server" in variables
@@ -107,9 +119,15 @@ suite "variables.nim":
     let eWarningDataPosO = some(newWarningDataPos(wReadOnlyTeaVar, "row", warningSide = wsVarName))
     check test_validateVariable(emptyVariables(), "t.", "row", newValue(1), eWarningDataPosO)
 
+  test "validateVariable wInvalidTeaVar server":
+    let eWarningDataPosO = some(newWarningDataPos(wInvalidTeaVar, "server", warningSide = wsVarName))
+    check test_validateVariable(emptyVariables(), "t.", "server", newValue(1), eWarningDataPosO)
+
   test "validateVariable wReadOnlyTeaVar server":
     let eWarningDataPosO = some(newWarningDataPos(wReadOnlyTeaVar, "server", warningSide = wsVarName))
-    check test_validateVariable(emptyVariables(), "t.", "server", newValue(1), eWarningDataPosO)
+    var variables = emptyVariables()
+    assignVariable(variables, "t.", "server", newValue(newVarsDict()))
+    check test_validateVariable(variables, "t.", "server", newValue(1), eWarningDataPosO)
 
   test "validateVariable wReadOnlyTeaVar version":
     let eWarningDataPosO = some(newWarningDataPos(wReadOnlyTeaVar, "version", warningSide = wsVarName))

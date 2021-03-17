@@ -234,7 +234,9 @@ proc getStartingVariables(env: var Env, args: Args): Variables =
   # dictionary.
   var server = readServerVariables(env, args)
   var shared = readSharedVariables(env, args)
-  result = newVariables(server, shared)
+  result = emptyVariables()
+  assignVariable(result, "t.", "server", newValue(server))
+  assignVariable(result, "t.", "shared", newValue(shared))
 
 proc getCompiledMatchers(args: Args): CompiledMatchers =
   ## Get the compile matchers dependent on the prepost settings from
