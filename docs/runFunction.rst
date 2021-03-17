@@ -68,11 +68,9 @@ FunResult
       value*: Value          ## Return value of the function.
     
   of frWarning:
-      warning*: Warning      ## Warning message id.
       parameter*: Natural    ## Index of problem parameter.
-      p1*: string            ## Extra warning info.
-      p2*: string            ## Extra warning info.
-    
+      warningData*: WarningData
+
   
 
 Functions return a FunResult object.

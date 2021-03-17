@@ -107,6 +107,7 @@ type
     wDupStringTooLong,     # w92
     wPairParameters,       # w93
     wMissingElse,          # w94
+    wImmutableVars,        # w95
 
 tpubType:
   const
@@ -208,6 +209,7 @@ tpubType:
       "The resulting duplicated string must be under 1024 characters, got: $1.", # wDupStringTooLong
       "Specify parameters in pairs.", # wPairParameters
       "None of the case conditions match and no else case.", # wMissingElse
+      "Variable already exists, assign to a new variable.", # wImmutableVars
     ]
 
 func getWarning*(filename: string, lineNum: int,
@@ -221,3 +223,14 @@ func getWarning*(filename: string, lineNum: int,
 proc newWarningData*(warning: Warning, p1: string = "", p2: string = ""): WarningData =
   ## Create a WarningData containing the warning information.
   result = WarningData(warning: warning, p1: p1, p2: p2)
+
+func dashIfEmpty(a: string): string =
+  if a.len == 0:
+    result = "-"
+  else:
+    result = a
+
+func `$`*(warningData: WarningData): string =
+  ## Return a string representation of WarningData.
+  result = "$1($2, $3)" % [$warningData.warning,
+    dashIfEmpty(warningData.p1), dashIfEmpty(warningData.p2)]

@@ -334,7 +334,7 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
 
   # Determine where to write the result.
   var log: bool
-  var output = getTeaVarString(variables, "output")
+  var output = getTeaVarStringDefault(variables, "output")
   var stream: Stream
   case output
   of "result":
@@ -419,7 +419,7 @@ iterator yieldReplacementLine*(env: var Env, variables: Variables, command: stri
   ## Yield all the replacement block lines and the endblock line
   ## too. When no endblock line return "" as the last line.
 
-  var maxLines = getTeaVarInt(variables, "maxLines")
+  var maxLines = getTeaVarIntDefault(variables, "maxLines")
 
   var count = 0
 

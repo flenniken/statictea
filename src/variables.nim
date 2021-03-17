@@ -45,15 +45,12 @@ t.output -- default when not set: "result"
 
 ]##
 
-
-import env
-import args
 import vartypes
-import readjson
 import tables
 import options
 import version
 import warnings
+import strutils
 
 const
   outputValues* = ["result", "stderr", "log", "skip"]
@@ -64,50 +61,53 @@ type
     ## Dictionary holding variables.
 
   VariableData* = object
+    ## A variable namespace, name and value.
     nameSpace*: string
     varName*: string
     value*: Value
 
-  WarningDataPos* = object
-    warningData*: WarningData
-    firstPos*: bool
+  WarningSide* = enum
+    ## Tells which side of the assignment the warning applies to.
+    wsVarName,
+    wsValue
 
-proc newVariableData*(nameSpace: string, varName: string, value: Value): VariableData =
+  WarningDataPos* = object
+    ## A warning and the side it applies to.
+    warningData*: WarningData
+    warningSide*: WarningSide
+
+# todo: add in the json variables with assignVariable. Start with server, shared missing.
+func newVariables*(server: VarsDict, shared: VarsDict): Variables =
+  ## Create the variables in their initial state and add in the json
+  ## variables.
+  var emptyVarsDict: VarsDict
+  result["server"] = newValue(server)
+  result["shared"] = newValue(shared)
+  result["local"] = newValue(emptyVarsDict)
+  result["global"] = newValue(emptyVarsDict)
+  result["row"] = newValue(0)
+  result["version"] = newValue(staticteaVersion)
+
+func emptyVariables*(): Variables =
+  ## Create an empty variables object in its initial state.
+  var emptyVarsDict: VarsDict
+  result = newVariables(emptyVarsDict, emptyVarsDict)
+
+func newVariableData*(nameSpace: string, varName: string, value: Value): VariableData =
+  ## Create a new VariableData object.
   result = VariableData(nameSpace: nameSpace, varName: varName, value: value)
 
-proc newWarningDataPos*(warning: Warning, p1: string = "", p2: string = "",
-    firstPos: bool = true): WarningDataPos =
-  ## Create a WarningDataPos containing the warning information.
+func newWarningDataPos*(warning: Warning, p1: string = "", p2: string = "",
+    warningSide: WarningSide): WarningDataPos =
+  ## Create a WarningDataPos object containing the given warning information.
   let warningData = WarningData(warning: warning, p1: p1, p2: p2)
-  result = WarningDataPos(warningData: warningData, firstPos: firstPos)
+  result = WarningDataPos(warningData: warningData, warningSide: warningSide)
 
-proc getNamespaceDict*(variables: Variables, nameSpace: string): Option[VarsDict] =
-  ## Get the dictionary for the given namespace.
-  case nameSpace:
-    of "":
-      result = some(variables["local"].dictv)
-    of "s.":
-      result = some(variables["server"].dictv)
-    of "h.":
-      result = some(variables["shared"].dictv)
-    of "g.":
-      result = some(variables["global"].dictv)
-    of "t.":
-      result = some(variables)
-    else:
-      discard
+func `$`*(warningDataPos: WarningDataPos): string =
+  ## Return a string representation of WarningDataPos.
+  result = "$1 $2" % [$warningDataPos.warningData, $warningDataPos.warningSide]
 
-proc getVariable*(variables: Variables, namespace: string, varName:
-                  string): Option[Value] =
-  ## Look up the variable and return its value.
-
-  let dictO = getNamespaceDict(variables, namespace)
-  if isSome(dictO):
-    let dict = dictO.get()
-    if varName in dict:
-      result = some(dict[varName])
-
-proc getTeaVarInt*(variables: Variables, varName: string): int64 =
+func getTeaVarIntDefault*(variables: Variables, varName: string): int64 =
   ## Return the int value of one of the tea dictionary integer
   ## items. If the value does not exist, return its default value.
   assert varName in ["row", "repeat", "maxRepeat", "maxLines"]
@@ -128,8 +128,9 @@ proc getTeaVarInt*(variables: Variables, varName: string): int64 =
       else:
         result = 0
 
-proc getTeaVarString*(variables: Variables, varName: string): string =
-  ## Return the string value of one of the tea dictionary string items.
+func getTeaVarStringDefault*(variables: Variables, varName: string): string =
+  ## Return the string value of one of the tea dictionary string
+  ## items. If the value does not exist, return its default value.
   assert varName in ["output"]
 
   if varName in variables:
@@ -142,18 +143,6 @@ proc getTeaVarString*(variables: Variables, varName: string): string =
         result = "result"
       else:
         result = ""
-
-proc readServerVariables*(env: var Env, args: Args): VarsDict =
-  ## Read the server json.
-  result = getEmptyVars()
-  for filename in args.serverList:
-    readJson(env, filename, result)
-
-proc readSharedVariables*(env: var Env, args: Args): VarsDict =
-  ## Read the shared json.
-  result = getEmptyVars()
-  for filename in args.sharedList:
-    readJson(env, filename, result)
 
 proc resetVariables*(variables: var Variables) =
   ## Clear the local variables and reset the tea variables for running
@@ -168,32 +157,101 @@ proc resetVariables*(variables: var Variables) =
   var varsDict: VarsDict
   variables["local"] = newValue(varsDict)
 
-proc newVariables*(server: VarsDict, shared: VarsDict): Variables =
-  ## Create the "tea" variables in their initial state.
-  var emptyVarsDict: VarsDict
-  result["server"] = newValue(server)
-  result["shared"] = newValue(shared)
-  result["local"] = newValue(emptyVarsDict)
-  result["global"] = newValue(emptyVarsDict)
-  result["row"] = newValue(0)
-  result["version"] = newValue(staticteaVersion)
+func validateTeaVariable(variables: Variables, varName: string, value: Value): Option[WarningDataPos] =
+  ## Validate that it is ok to set the tea variable with the given
+  ## value. Return a warning if it is invalid and tell whether the
+  ## warning applies to the left hand side or the right hand side.
+
+  if varName in variables:
+    if varName in ["server", "shared", "local", "global", "row", "version"]:
+        return some(newWarningDataPos(wReadOnlyTeaVar, varName, warningSide = wsVarName))
+    return some(newWarningDataPos(wImmutableVars, warningSide = wsVarName))
+
+  case varName:
+    of "maxLines":
+      # The maxLines variable must be an integer >= 0.
+      if value.kind != vkInt or value.intv < 0:
+        result = some(newWarningDataPos(wInvalidMaxCount, warningSide = wsValue))
+    of "maxRepeat":
+      # The maxRepeat variable must be a positive integer >= t.repeat.
+      if value.kind != vkInt or value.intv < getTeaVarIntDefault(variables, "repeat"):
+        result = some(newWarningDataPos(wInvalidMaxRepeat, warningSide = wsValue))
+    of "content":
+      # Content must be a string.
+      if value.kind != vkString:
+        result = some(newWarningDataPos(wInvalidTeaContent, warningSide = wsValue))
+    of "output":
+      # Output must be a string of "result", etc.
+      if value.kind != vkString or not outputValues.contains(value.stringv):
+        result = some(newWarningDataPos(wInvalidOutputValue, warningSide = wsValue))
+    of "repeat":
+      # Repeat is an integer >= 0 and <= t.maxRepeat.
+      if value.kind != vkInt or value.intv < 0 or value.intv > getTeaVarIntDefault(variables, "maxRepeat"):
+        result = some(newWarningDataPos(wInvalidRepeat, warningSide = wsValue))
+    else:
+      result = some(newWarningDataPos(wInvalidTeaVar, varName, warningSide = wsVarName))
+
+func validateVariable*(variables: Variables, nameSpace: string, varName: string,
+                       value: Value): Option[WarningDataPos] =
+  ## Validate that it is ok to set the variable with the given
+  ## value. Return a warning if it is invalid and tell whether it
+  ## applies to the variable name or to the value.
+
+  var dictName: string
+  case nameSpace:
+    of "":
+      dictName = "local"
+    of "g.":
+      dictName = "global"
+    of "t.":
+      return validateTeaVariable(variables, varName, value)
+    of "s.", "h.":
+      return some(newWarningDataPos(wReadOnlyDictionary, warningSide = wsVarName))
+    else:
+      return some(newWarningDataPos(wInvalidNameSpace, nameSpace, warningSide = wsVarName))
+
+  if varName in variables[dictName].dictv:
+    return some(newWarningDataPos(wImmutableVars, warningSide = wsVarName))
+
+proc assignVariable*(variables: var Variables, nameSpace: string,
+    varName: string, value: Value) =
+  ## Assign the variable to its dictionary.
+  case nameSpace:
+    of "":
+      variables["local"].dictv[varName] = value
+    of "s.":
+      variables["server"].dictv[varName] = value
+    of "h.":
+      variables["shared"].dictv[varName] = value
+    of "g.":
+      variables["global"].dictv[varName] = value
+    of "t.":
+      variables[varName] = value
+    else:
+      discard
+
+proc getVariable*(variables: Variables, namespace: string, varName:
+                  string): Option[Value] =
+  ## Look up the variable and return its value when found.
+  var dictName: string
+  case nameSpace:
+    of "":
+      dictName = "local"
+    of "s.":
+      dictName = "server"
+    of "h.":
+      dictName = "shared"
+    of "g.":
+      dictName = "global"
+    of "t.":
+      if varName in variables:
+        return some(variables[varName])
+    else:
+      return
+  if varName in variables[dictName].dictv:
+    result = some(variables[dictName].dictv[varName])
 
 when defined(test):
-  func getTestVariables*(): Variables =
-    ## Get the variables for testing with some values filled in.
-    # s.test = "hello"
-    # h.test = "there"
-    # five = 5
-    # t.five = 5
-    # g.aboutfive = 5.11
-    var emptyVarsDict: VarsDict
-    result = newVariables(emptyVarsDict, emptyVarsDict)
-    result["server"].dictv["test"] = Value(kind: vkString, stringv: "hello")
-    result["shared"].dictv["test"] = Value(kind: vkString, stringv: "there")
-    result["local"].dictv["five"] = Value(kind: vkInt, intv: 5)
-    result["five"] = Value(kind: vkInt, intv: 5)
-    result["global"].dictv["aboutfive"] = Value(kind: vkFloat, floatv: 5.11)
-
   proc echoVariables*(variables: Variables) =
     echo "---tea variables:"
     for k, v in variables.pairs():
@@ -210,95 +268,3 @@ when defined(test):
     echo "---global variables:"
     for k, v in variables["global"].dictv.pairs():
       echo k, ": ", $v
-
-proc validateTeaVariable*(variables: Variables, varName: string, value: Value): Option[WarningDataPos] =
-  ## Validate the setting the tea variable with the given
-  ## value. Return a warning if it is invalid, else return none.
-
-  case varName:
-    of "maxLines":
-      # The maxLines variable must be an integer >= 0.
-      if value.kind == vkInt and value.intv >= 0:
-        return
-      result = some(newWarningDataPos(wInvalidMaxCount, firstPos = false))
-    of "maxRepeat":
-      # The maxRepeat variable must be an integer >= t.repeat.
-      if value.kind == vkInt and value.intv >= getTeaVarInt(variables, "repeat"):
-        return
-      result = some(newWarningDataPos(wInvalidMaxRepeat, firstPos = false))
-    of "content":
-      # Content must be a string.
-      if value.kind == vkString:
-        return
-      result = some(newWarningDataPos(wInvalidTeaContent, firstPos = false))
-    of "output":
-      # Output must be a string of "result", etc.
-      if value.kind == vkString:
-        if value.stringv in outputValues:
-          return
-      result = some(newWarningDataPos(wInvalidOutputValue, firstPos = false))
-    of "repeat":
-      # Repeat is an integer >= 0 and <= t.maxRepeat.
-      if value.kind == vkInt and value.intv >= 0 and
-         value.intv <= getTeaVarInt(variables, "maxRepeat"):
-        return
-      result = some(newWarningDataPos(wInvalidRepeat, firstPos = false))
-    of "server", "shared", "local", "global", "row", "version":
-      result = some(newWarningDataPos(wReadOnlyTeaVar, varName, firstPos = true))
-    else:
-      result = some(newWarningDataPos(wInvalidTeaVar, varName, firstPos = true))
-
-proc assignTeaVariable*(variables: var Variables, varName: string, value: Value) =
-  ## Assign the given tea variable with the given value.
-
-  case varName:
-    of "maxLines":
-      # The maxLines variable must be an integer >= 0.
-      if value.kind == vkInt and value.intv >= 0:
-        variables["maxLines"] = value
-    of "maxRepeat":
-      # The maxRepeat variable must be an integer >= t.repeat.
-      if value.kind == vkInt and value.intv >= getTeaVarInt(variables, "repeat"):
-        variables["maxRepeat"] = value
-    of "content":
-      # Content must be a string.
-      if value.kind == vkString:
-        variables["content"] = value
-    of "output":
-      # Output must be a string of "result",...
-      if value.kind == vkString:
-        if value.stringv in outputValues:
-          variables["output"] = value
-    of "repeat":
-      # Repeat is an integer >= 0 and <= t.maxRepeat.
-      if value.kind == vkInt and value.intv >= 0 and
-         value.intv <= getTeaVarInt(variables, "maxRepeat"):
-        variables["repeat"] = value
-
-proc validateVariable*(variables: Variables, nameSpace: string, varName: string,
-                       value: Value): Option[WarningDataPos] =
-  ## Assign the variable to its dictionary or show a warning message.
-  case nameSpace:
-    of "":
-      discard
-    of "g.":
-      discard
-    of "t.":
-      result = validateTeaVariable(variables, varName, value)
-    of "s.", "h.":
-      result = some(newWarningDataPos(wReadOnlyDictionary, firstPos = true))
-    else:
-      result = some(newWarningDataPos(wInvalidNameSpace, nameSpace, firstPos = true))
-
-proc assignVariable*(variables: var Variables, nameSpace: string,
-    varName: string, value: Value) =
-  ## Assign the variable to its dictionary.
-  case nameSpace:
-    of "":
-      variables["local"].dictv[varName] = value
-    of "g.":
-      variables["global"].dictv[varName] = value
-    of "t.":
-      assignTeaVariable(variables, varName, value)
-    else:
-      discard

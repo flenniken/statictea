@@ -83,6 +83,11 @@ proc newVarsDict*(): VarsDict =
   ## Create variables dictionary.
   return result
 
+proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
+  ## Create a newValueAndLength object.
+  result = ValueAndLength(value: value, length: length)
+
+
 when defined(test):
   proc newValue*[T](list: openArray[T]): Value =
     ## New list value from an array of items.

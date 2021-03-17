@@ -144,7 +144,8 @@ proc testGetStringInvalid(buffer: seq[uint8]): bool =
   ]
   result = testGetString(newStatement(statement), 4, none(ValueAndLength), eErrLines = eErrLines)
 
-proc testGetVariable(statement: Statement, start: Natural, nameSpace: string, varName: string,
+proc testGetVariable(variables: Variables, statement: Statement, start: Natural,
+    nameSpace: string, varName: string,
     eValueO: Option[Value],
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
@@ -153,7 +154,6 @@ proc testGetVariable(statement: Statement, start: Natural, nameSpace: string, va
 
   var env = openEnvTest("_getVariable.log")
 
-  var variables = getTestVariables()
   let valueO = getVariable(env, statement, variables, namespace, varName, start)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
@@ -161,7 +161,7 @@ proc testGetVariable(statement: Statement, start: Natural, nameSpace: string, va
   if not expectedItem("value", valueO, eValueO):
     result = false
 
-proc testGetVarOrFunctionValue(statement: Statement, start: Natural,
+proc testGetVarOrFunctionValue(variables: Variables, statement: Statement, start: Natural,
     eValueAndLengthO: Option[ValueAndLength] = none(ValueAndLength),
                      eLogLines: seq[string] = @[],
                      eErrLines: seq[string] = @[],
@@ -175,7 +175,6 @@ proc testGetVarOrFunctionValue(statement: Statement, start: Natural,
 
   var env = openEnvTest("_getVariable.log")
 
-  var variables = getTestVariables()
   let compiledMatchers = getCompiledMatchers()
 
   let valueAndLengthO = getVarOrFunctionValue(env, compiledMatchers,
@@ -209,7 +208,7 @@ proc testGetFunctionValue(functionName: string, statement: Statement, start: Nat
 
   var env = openEnvTest("_testGetFunctionValue.log")
 
-  var variables = getTestVariables()
+  var variables = emptyVariables()
   let compiledMatchers = getCompiledMatchers()
   var functionO = getFunction(functionName)
   if not isSome(functionO):
@@ -231,8 +230,7 @@ proc testRunStatement(statement: Statement, nameSpace: string = "", varName: str
   ): bool =
   var env = openEnvTest("_runStatement.log")
 
-  var emptyVarsDict: VarsDict
-  var variables = newVariables(emptyVarsDict, emptyVarsDict)
+  var variables = emptyVariables()
   let compiledMatchers = getCompiledMatchers()
   let variableDataO = runStatement(env, statement, compiledMatchers, variables)
 
@@ -533,78 +531,65 @@ statement: a = 'abc
     check testGetString(newStatement("a = 'abc"), 4, none(ValueAndLength), eErrLines = eErrLines)
 
   test "getVariable server":
-    # s.test = "hello"
-    # h.test = "there"
-    # five = 5
-    # t.five = 5
-    # g.aboutfive = 5.11
+    var variables = emptyVariables()
+    assignVariable(variables, "s.", "test", newValue("hello"))
     let statement = newStatement("tea = s.test", lineNum=12, start=0)
-    let value = Value(kind: vkString, stringv: "hello")
-    check testGetVariable(statement, 6, "s.", "test", some(value))
+    check testGetVariable(variables, statement, 6, "s.", "test", some(newValue("hello")))
 
   test "getVariable shared":
+    var variables = emptyVariables()
+    assignVariable(variables, "h.", "test", newValue("there"))
     let statement = newStatement("tea = h.test", lineNum=12, start=0)
-    let value = Value(kind: vkString, stringv: "there")
-    check testGetVariable(statement, 6, "h.", "test", some(value))
+    check testGetVariable(variables, statement, 6, "h.", "test", some(newValue("there")))
 
   test "getVariable local":
+    var variables = emptyVariables()
+    assignVariable(variables, "", "five", newValue(5))
     let statement = newStatement("tea = five", lineNum=12, start=0)
-    let value = Value(kind: vkInt, intv: 5)
-    check testGetVariable(statement, 6, "", "five", some(value))
-
-  test "getVariable tea":
-    let statement = newStatement("tea = t.five", lineNum=12, start=0)
-    let value = Value(kind: vkInt, intv: 5)
-    check testGetVariable(statement, 6, "t.", "five", some(value))
-
-  test "getVariable global":
-    let statement = newStatement("tea = g.aboutfive", lineNum=12, start=0)
-    let value = Value(kind: vkFloat, floatv: 5.11)
-    check testGetVariable(statement, 6, "g.", "aboutfive", some(value))
+    check testGetVariable(variables, statement, 6, "", "five", some(newValue(5)))
 
   test "getVariable missing":
+    var variables = emptyVariables()
     let statement = newStatement("tea = s.missing", lineNum=12, start=0)
     let eErrLines = splitNewLines """
 template.html(12): w36: The variable 's.missing' does not exist.
 statement: tea = s.missing
                  ^
 """
-    check testGetVariable(statement, 6, "s.", "missing", none(Value), eErrLines = eErrLines)
+    check testGetVariable(variables, statement, 6, "s.", "missing", none(Value), eErrLines = eErrLines)
 
   test "getVariable invalid namespace":
+    var variables = emptyVariables()
     let eErrLines = splitNewLines """
-template.html(12): w35: The variable namespace 'd.' does not exist.
+template.html(12): w36: The variable 'd.five' does not exist.
 statement: tea = d.five
                  ^
 """
     let statement = newStatement(text="tea = d.five", lineNum=12, 0)
-    check testGetVariable(statement, 6, "d.", "missing", none(Value), eErrLines = eErrLines)
+    check testGetVariable(variables, statement, 6, "d.", "five", none(Value), eErrLines = eErrLines)
 
   test "getVarOrFunctionValue var1":
     # Test processing the right hand side when it is a variable.
     # The rhs should return 5 and it should process 4 characters.
-
-    # s.test = "hello"
-    # h.test = "there"
-    # five = 5
-    # t.five = 5
-    # g.aboutfive = 5.11
+    var variables = emptyVariables()
+    assignVariable(variables, "", "five", newValue(5))
     let statement = newStatement(text="tea = five", lineNum=12, 0)
-    let value = Value(kind: vkInt, intv: 5)
-    let eValueAndLengthO = some(ValueAndLength(value: value, length: 4))
-    check testGetVarOrFunctionValue(statement, 6, eValueAndLengthO)
+    let eValueAndLengthO = some(newValueAndLength(newValue(5), 4))
+    check testGetVarOrFunctionValue(variables, statement, 6, eValueAndLengthO)
 
   test "getVarOrFunctionValue var2":
+    var variables = emptyVariables()
+    assignVariable(variables, "s.", "test", newValue("hello"))
     let statement = newStatement(text="""tea = s.test """, lineNum=12, 0)
-    let value = Value(kind: vkString, stringv: "hello")
-    let eValueAndLengthO = some(ValueAndLength(value: value, length: 7))
-    check testGetVarOrFunctionValue(statement, 6, eValueAndLengthO)
+    let eValueAndLengthO = some(newValueAndLength(newValue("hello"), 7))
+    check testGetVarOrFunctionValue(variables, statement, 6, eValueAndLengthO)
 
   test "getVarOrFunctionValue var2":
+    var variables = emptyVariables()
+    assignVariable(variables, "g.", "aboutfive", newValue(5.11))
     let statement = newStatement(text="""tea = g.aboutfive """, lineNum=12, 0)
-    let value = Value(kind: vkFloat, floatv: 5.11)
-    let eValueAndLengthO = some(ValueAndLength(value: value, length: 12))
-    check testGetVarOrFunctionValue(statement, 6, eValueAndLengthO)
+    let eValueAndLengthO = some(newValueAndLength(newValue(5.11), 12))
+    check testGetVarOrFunctionValue(variables, statement, 6, eValueAndLengthO)
 
   test "getVarOrFunctionValue not defined":
     let statement = newStatement(text="tea = a+123", lineNum=12, 0)
@@ -613,7 +598,8 @@ template.html(12): w36: The variable 'a' does not exist.
 statement: tea = a+123
                  ^
 """
-    check testGetVarOrFunctionValue(statement, 6, none(ValueAndLength), eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testGetVarOrFunctionValue(variables, statement, 6, none(ValueAndLength), eErrLines = eErrLines)
 
   test "getVarOrFunctionValue not defined":
     let statement = newStatement(text="tea = a123", lineNum=12, 0)
@@ -622,11 +608,11 @@ template.html(12): w36: The variable 'a123' does not exist.
 statement: tea = a123
                  ^
 """
-    check testGetVarOrFunctionValue(statement, 6, none(ValueAndLength), eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testGetVarOrFunctionValue(variables, statement, 6, none(ValueAndLength), eErrLines = eErrLines)
 
   test "getNewVariables":
-    var emptyVarsDict: VarsDict
-    var variables = newVariables(emptyVarsDict, emptyVarsDict)
+    var variables = emptyVariables()
     # echoVariables(variables)
     check variables.contains("content") == false
     check variables["local"].dictv.len == 0
@@ -724,7 +710,8 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     check testGetFunctionValue("len", statement, 10, eErrLines = eErrLines)
 
   test "getVariables 2":
-    var variables = getTestVariables()
+    var variables = emptyVariables()
+    assignVariable(variables, "s.", "test", newValue("hello"))
     let valueO = getVariable(variables, "s.", "test")
     check expectedItem("valueO", valueO, some(newValue("hello")))
 

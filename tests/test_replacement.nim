@@ -7,8 +7,9 @@ import variables
 import options
 import tempFile
 import readlines
+import varTypes
 
-proc testTempSegments(templateContent: string, command: string = "nextline", repeat: Natural = 1,
+proc testTempSegments(variables: Variables, templateContent: string, command: string = "nextline", repeat: Natural = 1,
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[],
@@ -21,7 +22,6 @@ proc testTempSegments(templateContent: string, command: string = "nextline", rep
   if not lineBufferO.isSome:
     return false
   var lb = lineBufferO.get()
-  var variables = getTestVariables()
   let compiledMatchers = getCompiledMatchers()
   var tempSegmentsO = newTempSegments(env, lb, compiledMatchers, command, repeat, variables)
   if not isSome(tempSegmentsO):
@@ -146,7 +146,8 @@ more text
     var eResultLines = @[
       "replacement block\n",
     ]
-    check testTempSegments(templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
+    var variables = emptyVariables()
+    check testTempSegments(variables, templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
 
   test "TempSegments nextline variables":
     let templateContent = """
@@ -155,7 +156,10 @@ more text
     var eResultLines = @[
       "hello there!\n",
     ]
-    check testTempSegments(templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
+    var variables = emptyVariables()
+    assignVariable(variables, "s.", "test", newValue("hello"))
+    assignVariable(variables, "h.", "test", newValue("there"))
+    check testTempSegments(variables, templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
 
   test "TempSegments nextline variables":
     let templateContent = """
@@ -164,12 +168,18 @@ more text
     var eResultLines = @[
       "hello there!\n",
     ]
-    check testTempSegments(templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
+    var variables = emptyVariables()
+    assignVariable(variables, "s.", "test", newValue("hello"))
+    assignVariable(variables, "h.", "test", newValue("there"))
+    check testTempSegments(variables, templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
 
   test "TempSegments nextline variables 2":
     let templateContent = "{s.test} {h.test}"
     var eResultLines = @["hello there"]
-    check testTempSegments(templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
+    var variables = emptyVariables()
+    assignVariable(variables, "s.", "test", newValue("hello"))
+    assignVariable(variables, "h.", "test", newValue("there"))
+    check testTempSegments(variables, templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
 
 
   # s.test = "hello"
@@ -196,7 +206,9 @@ template.html(4): w58: The replacement variable doesn't exist: abc.
 template.html(5): w58: The replacement variable doesn't exist: abc.
 template.html(6): w58: The replacement variable doesn't exist: missing.
 """
-    check testTempSegments(templateContent, command = "block", repeat = 1,
+    var variables = emptyVariables()
+    assignVariable(variables, "s.", "test", newValue("hello"))
+    check testTempSegments(variables, templateContent, command = "block", repeat = 1,
       eErrLines = eErrLines, eResultLines = eResultLines)
 
   test "TempSegments maxLines":
@@ -230,5 +242,6 @@ ten
     var eErrLines = @[
       "template.html(10): w60: Reached the maximum replacement block line count without finding the endblock.\n",
     ]
-    check testTempSegments(templateContent, command = "block", repeat = 1,
+    var variables = emptyVariables()
+    check testTempSegments(variables, templateContent, command = "block", repeat = 1,
       eErrLines = eErrLines, eResultLines = eResultLines)

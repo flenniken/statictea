@@ -10,12 +10,14 @@ import json
 import os
 import json
 import options
+import args
 
 # todo: test the the order is preserved.
 # todo: test that the last duplicate wins.
 
 var depth_limit = 3
 
+# todo: remove this, use one in variables module.
 func getEmptyVars*(): VarsDict =
   ## Create and return an empty variable dictionary.
   result = initOrderedTable[string, Value]()
@@ -85,3 +87,15 @@ proc readJson*(env: var Env, filename: string, vars: var VarsDict) =
     let valueO = jsonToValue(jnode)
     assert valueO.isSome
     vars[key] = valueO.get()
+
+proc readServerVariables*(env: var Env, args: Args): VarsDict =
+  ## Read the server json.
+  result = getEmptyVars()
+  for filename in args.serverList:
+    readJson(env, filename, result)
+
+proc readSharedVariables*(env: var Env, args: Args): VarsDict =
+  ## Read the shared json.
+  result = getEmptyVars()
+  for filename in args.sharedList:
+    readJson(env, filename, result)

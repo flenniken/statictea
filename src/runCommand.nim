@@ -6,7 +6,6 @@ import env
 import vartypes
 import options
 import parseCmdLine
-import tables
 import readLines
 import matches
 import strUtils
@@ -231,15 +230,11 @@ proc getVariable*(env: var Env, statement: Statement, variables:
   ## Look up the variable and return its value. Show an error when the
   ## variable doesn't exists.
 
-  let dictO = getNamespaceDict(variables, namespace)
-  if not isSome(dictO):
-    env.warnStatement(statement, wInvalidNameSpace, start, nameSpace)
-    return
-  let dict = dictO.get()
-  if not dict.contains(varName):
+  let value0 = getVariable(variables, nameSpace, varName)
+  if not isSome(value0):
     env.warnStatement(statement, wVariableMissing, start, nameSpace & varName)
     return
-  result = some(dict[varName])
+  result = some(value0.get())
 
 # a = len(name)
 # a = len (name)
@@ -363,7 +358,7 @@ proc runStatement*(env: var Env, statement: Statement,
   if isSome(warningDataPosO):
     let warningDataPos = warningDataPosO.get()
     var warningPos: Natural
-    if warningDataPos.firstPos:
+    if warningDataPos.warningSide == wsVarName:
       warningPos = 0
     else:
       warningPos = variable.length + equalSign.length

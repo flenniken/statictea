@@ -15,6 +15,7 @@ import tables
 import replacement
 import streams
 import os
+import readjson
 
 #[
 
@@ -96,7 +97,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     variables["row"] = newValue(row)
     runCommand(env, cmdLines, cmdLineParts, compiledMatchers,
                variables)
-    let repeat = getTeaVarInt(variables, "repeat")
+    let repeat = getTeaVarIntDefault(variables, "repeat")
 
     # Show a warning when the replace command does not have t.content set.
     if command == "replace" and not variables.contains("content"):
