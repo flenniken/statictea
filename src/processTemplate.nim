@@ -75,21 +75,26 @@ proc processTemplateLines(env: var Env, variables: var Variables,
   var lb = lineBufferO.get()
 
   # Read and process template lines.
+  var firstReplaceLine: string
   while true:
     # Read template lines and write out non-command lines. When a
     # command is found, collect its lines and return them.
     var cmdLines: seq[string] = @[]
     var cmdLineParts: seq[LineParts] = @[]
     collectCommand(env, lb, compiledMatchers, env.resultStream,
-                   cmdLines, cmdLineParts)
+                   cmdLines, cmdLineParts, firstReplaceLine)
     if cmdLines.len == 0:
       break # done, no more lines
 
-    # Run the commands that have statements and skip the others.
+    # Run the commands that are allowed statements and skip the others.
     let command = cmdLineParts[0].command
     if not (command in ["nextline", "block", "replace"]):
       # todo: show error when we get endblock before block?
       # todo: make it an error when other commands have statements.
+
+      # todo: get rid of the comment command.  Use comments inside a
+      # command.  firstReplaceLine shouldn't need to be outside the
+      # loop.
       continue
 
     # Run the command and fill in the variables.
@@ -101,16 +106,21 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
     # Show a warning when the replace command does not have t.content set.
     if command == "replace" and not variables.contains("content"):
-      env.warn(lb.lineNum, wContentNotSet)
+      # lineNum-1 because the current line number is at the first
+      # replacement line.
+      env.warn(lb.lineNum-1, wContentNotSet)
+
+    var maxLines = getTeaVarIntDefault(variables, "maxLines")
 
     # If repeat is 0, read the replacement lines and the endblock and discard them.
     if repeat == 0:
-      for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
+      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, compiledMatchers, command, maxLines):
         discard
+      firstReplaceLine = ""
       continue
 
     # Create a new TempSegments object for storing segments.
-    var startLineNum = lb.lineNum + 1
+    var startLineNum = lb.lineNum
     var tempSegmentsO = newTempSegments(env, lb, compiledMatchers, command, repeat, variables)
     if not isSome(tempSegmentsO):
       break # Cannot create temp file or allocate memory, quit.
@@ -118,7 +128,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
     if command == "replace" and variables.contains("content"):
       # Discard the replacement block lines and the endblock.
-      for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
+      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, compiledMatchers, command, maxLines):
         discard
       # Use the content as the replacement lines.
       var content = getVariable(variables, "t.", "content").get().stringv
@@ -127,11 +137,9 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     else:
       # Read the replacement lines and store their compiled segments in
       # TempSegments.  Ignore the last line, the endblock, if it exists.
-      var previousLine = ""
-      for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
-        if previousLine != "":
-          storeLineSegments(env, tempSegments, compiledMatchers, previousLine)
-        previousLine = line
+      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, compiledMatchers, command, maxLines):
+        if replaceLine.kind != rlEndblockLine:
+          storeLineSegments(env, tempSegments, compiledMatchers, replaceLine.line)
 
     # Generate t.repeat number of replacement blocks. Recalculate the
     # variables for each one.
@@ -151,6 +159,8 @@ proc processTemplateLines(env: var Env, variables: var Variables,
                  variables)
 
     closeDelete(tempSegments)
+    firstReplaceLine = ""
+
 
 proc updateTemplateLines(env: var Env, variables: var Variables,
                           compiledMatchers: CompiledMatchers) =
@@ -164,6 +174,8 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
   file then rename it at the end overwriting the original template
   file.  If the template comes from standard in, write the new
   template to standard out. ]#
+
+  var maxLines = getTeaVarIntDefault(variables, "maxLines")
 
   # Allocate a buffer for reading lines.
   var lineBufferO = newLineBuffer(env.templateStream,
@@ -179,8 +191,9 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
     # command is found, collect its lines and return them.
     var cmdLines: seq[string] = @[]
     var cmdLineParts: seq[LineParts] = @[]
+    var firstReplaceLine: string
     collectCommand(env, lb, compiledMatchers, env.resultStream,
-                   cmdLines, cmdLineParts)
+                   cmdLines, cmdLineParts, firstReplaceLine)
     if cmdLines.len == 0:
       break # done, no more lines
 
@@ -198,13 +211,15 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
 
     # Show a warning when the replace command does not have t.content set.
     if command == "replace" and not variables.contains("content"):
-      env.warn(lb.lineNum, wContentNotSet)
+      # lineNum-1 because the current line number is at the first
+      # replacement line.
+      env.warn(lb.lineNum-1, wContentNotSet)
 
     if command == "replace" and variables.contains("content"):
       # Discard the replacement block lines and save the endblock if it exists.
-      var endblock = ""
-      for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
-        endblock = line
+      var lastLine: ReplaceLine
+      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, compiledMatchers, command, maxLines):
+        lastLine = replaceLine
 
       # Write the content as the replacement lines.
       var content = getVariable(variables, "t.", "content").get().stringv
@@ -218,12 +233,12 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
         env.resultStream.write('\n')
 
       # Write out the endblock, if it exists.
-      if endblock != "":
-        env.resultStream.write(endblock)
+      if lastLine.kind == rlEndblockLine:
+        env.resultStream.write(lastLine.line)
     else:
       # Read the replacement lines and endblock and write them out.
-      for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
-        env.resultStream.write(line)
+      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, compiledMatchers, command, maxLines):
+        env.resultStream.write(replaceLine.line)
 
 proc getStartingVariables(env: var Env, args: Args): Variables =
   ## Read and return the server and shared variables and setup the

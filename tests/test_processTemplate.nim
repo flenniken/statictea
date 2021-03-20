@@ -403,6 +403,25 @@ statement:  cond3 = hello(5, 4)
 """
     check testProcessTemplate(templateContent = templateContent, eRc = 1, eErrLines = eErrLines)
 
+  test "one line content":
+
+    let templateContent = """
+#$ block
+content
+#$ endblock
+"""
+    let eResultLines = splitNewLines """
+content
+"""
+    check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
+
+  test "zero line of content":
+    let templateContent = """
+#$ block
+#$ endblock
+"""
+    check testProcessTemplate(templateContent = templateContent)
+
 # test "cmp example":
 
 #     let templateContent = """

@@ -3,39 +3,36 @@ import unittest
 import env
 import replacement
 import matches
-import variables
 import options
 import tempFile
 import readlines
-import varTypes
 
-proc testTempSegments(variables: Variables, templateContent: string, command: string = "nextline", repeat: Natural = 1,
-    eLogLines: seq[string] = @[],
+proc testYieldReplacementLine(
+    firstReplaceLine: string,
+    replaceContent: string,
+    command: string = "block",
+    maxLines: Natural = 5,
     eErrLines: seq[string] = @[],
-    eOutLines: seq[string] = @[],
-    eResultLines: seq[string] = @[]
+    eYieldLines: seq[ReplaceLine] = @[],
   ): bool =
+  ## Test the yieldReplacementLine.
 
-  var env = openEnvTest("_testTempSegments.log", templateContent)
+  var env = openEnvTest("_testTempSegments.log", replaceContent)
 
   var lineBufferO = newLineBuffer(env.templateStream)
   if not lineBufferO.isSome:
     return false
   var lb = lineBufferO.get()
   let compiledMatchers = getCompiledMatchers()
-  var tempSegmentsO = newTempSegments(env, lb, compiledMatchers, command, repeat, variables)
-  if not isSome(tempSegmentsO):
-    return false
-  var tempSegments = tempSegmentsO.get()
-  var previousLine = ""
-  for line in yieldReplacementLine(env, variables, command, lb, compiledMatchers):
-    if previousLine != "":
-      storeLineSegments(env, tempSegments, compiledMatchers, previousLine)
-    previousLine = line
-  writeTempSegments(env, tempSegments, lb.lineNum, variables)
-  closeDelete(tempSegments)
 
-  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines, eResultLines)
+  var yieldLines = newSeq[ReplaceLine]()
+  for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, compiledMatchers, command, maxLines):
+    yieldLines.add(replaceLine)
+
+  result = env.readCloseDeleteCompare(eErrLines = eErrLines)
+
+  if not expectedItem("yieldLines", yieldLines, eYieldLines):
+    result = false
 
 suite "replacement":
 
@@ -137,118 +134,117 @@ suite "replacement":
     check parseVarSegment("2,7   ,2,4  ,{      s.name }") == (namespace: "s.", name: "name")
     check parseVarSegment("2,4   ,0,4  ,{   name }") == (namespace: "", name: "name")
 
-  test "TempSegments nextline":
-    let templateContent = """
-replacement block
+  test "yieldReplacementLine nextline":
+    let firstReplaceLine = "replacement block\n"
+    let replaceContent = """
 line 2
 more text
 """
-    var eResultLines = @[
-      "replacement block\n",
+    var eYieldLines = @[
+      newReplaceLine(rlReplaceLine, firstReplaceLine)
     ]
-    var variables = emptyVariables()
-    check testTempSegments(variables, templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
+    check testYieldReplacementLine(firstReplaceLine, replaceContent, "nextline",
+      eYieldLines = eYieldLines)
 
-  test "TempSegments nextline variables":
-    let templateContent = """
-{s.test} {h.test}!
+  test "yieldReplacementLine nextline fake block":
+    let firstReplaceLine = "#$ endblock\n"
+    let replaceContent = """
+line 2
+more text
 """
-    var eResultLines = @[
-      "hello there!\n",
+    var eYieldLines = @[
+      newReplaceLine(rlReplaceLine, firstReplaceLine)
     ]
-    var variables = emptyVariables()
-    assignVariable(variables, "t.", "server", newValue(newVarsDict()))
-    assignVariable(variables, "t.", "shared", newValue(newVarsDict()))
-    assignVariable(variables, "s.", "test", newValue("hello"))
-    assignVariable(variables, "h.", "test", newValue("there"))
-    check testTempSegments(variables, templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
+    check testYieldReplacementLine(firstReplaceLine, replaceContent, "nextline",
+      eYieldLines = eYieldLines)
 
-  test "TempSegments nextline variables":
-    let templateContent = """
-{s.test} {h.test}!
-"""
-    var eResultLines = @[
-      "hello there!\n",
-    ]
-    var variables = emptyVariables()
-    assignVariable(variables, "t.", "server", newValue(newVarsDict()))
-    assignVariable(variables, "t.", "shared", newValue(newVarsDict()))
-    assignVariable(variables, "s.", "test", newValue("hello"))
-    assignVariable(variables, "h.", "test", newValue("there"))
-    check testTempSegments(variables, templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
-
-  test "TempSegments nextline variables 2":
-    let templateContent = "{s.test} {h.test}"
-    var eResultLines = @["hello there"]
-    var variables = emptyVariables()
-    assignVariable(variables, "t.", "server", newValue(newVarsDict()))
-    assignVariable(variables, "t.", "shared", newValue(newVarsDict()))
-    assignVariable(variables, "s.", "test", newValue("hello"))
-    assignVariable(variables, "h.", "test", newValue("there"))
-    check testTempSegments(variables, templateContent, command = "nextline", repeat = 1, eResultLines = eResultLines)
-
-
-  # s.test = "hello"
-  # h.test = "there"
-  # five = 5
-  # t.five = 5
-  # g.aboutfive = 5.11
-
-  test "TempSegments block":
-    let templateContent = """
-replacement {abc} block
-{s.test} {abc}
-more text {missing}
+  test "yieldReplacementLine block":
+    let firstReplaceLine = "replacement block\n"
+    let replaceContent = """
+line 2
+more text
 <!--$ endblock -->
 """
-    var eResultLines = splitNewLines """
-replacement {abc} block
-hello {abc}
-more text {missing}
-"""
-    # Note: the line number is handled at a higher level.
-    var eErrLines = splitNewLines """
-template.html(4): w58: The replacement variable doesn't exist: abc.
-template.html(5): w58: The replacement variable doesn't exist: abc.
-template.html(6): w58: The replacement variable doesn't exist: missing.
-"""
-    var variables = emptyVariables()
-    assignVariable(variables, "t.", "server", newValue(newVarsDict()))
-    assignVariable(variables, "s.", "test", newValue("hello"))
-    check testTempSegments(variables, templateContent, command = "block", repeat = 1,
-      eErrLines = eErrLines, eResultLines = eResultLines)
-
-  test "TempSegments maxLines":
-    let templateContent = """
-one
-two
-three
-four
-five
-six
-seven
-eight
-nine
-ten
-eleven
-twelve
-"""
-    var eResultLines = splitNewLines """
-one
-two
-three
-four
-five
-six
-seven
-eight
-nine
-ten
-"""
-    # Note: the line number is handled at a higher level.
-    var eErrLines = @[
-      "template.html(10): w60: Reached the maximum replacement block line count without finding the endblock.\n",
+    var eYieldLines = @[
+      newReplaceLine(rlReplaceLine, "replacement block\n"),
+      newReplaceLine(rlReplaceLine, "line 2\n"),
+      newReplaceLine(rlReplaceLine, "more text\n"),
+      newReplaceLine(rlEndblockLine, "<!--$ endblock -->\n"),
     ]
-    var variables = emptyVariables()
-    check testTempSegments(variables, templateContent, command = "block", repeat = 1,
-      eErrLines = eErrLines, eResultLines = eResultLines)
+    check testYieldReplacementLine(firstReplaceLine, replaceContent, eYieldLines = eYieldLines)
+
+  test "yieldReplacementLine exceed maxLines":
+    let firstReplaceLine = "one\n"
+    let replaceContent = """
+two
+three
+four
+five
+six
+"""
+    var eYieldLines = @[
+      newReplaceLine(rlReplaceLine, "one\n"),
+      newReplaceLine(rlReplaceLine, "two\n"),
+      newReplaceLine(rlReplaceLine, "three\n"),
+      newReplaceLine(rlReplaceLine, "four\n"),
+    ]
+    var eErrLines = @[
+      "template.html(4): w60: Reached the maximum replacement block line count without finding the endblock.\n"
+    ]
+    check testYieldReplacementLine(firstReplaceLine, replaceContent, maxLines = 4,
+      eYieldLines = eYieldLines, eErrLines = eErrLines)
+
+  test "yieldReplacementLine no more lines":
+    let firstReplaceLine = "one\n"
+    let replaceContent = """
+two
+three
+"""
+    var eYieldLines = @[
+      newReplaceLine(rlReplaceLine, "one\n"),
+      newReplaceLine(rlReplaceLine, "two\n"),
+      newReplaceLine(rlReplaceLine, "three\n"),
+    ]
+
+    check testYieldReplacementLine(firstReplaceLine, replaceContent, maxLines = 10,
+      eYieldLines = eYieldLines)
+
+  test "yieldReplacementLine endblock":
+    let firstReplaceLine = "one\n"
+    let replaceContent = """
+two
+three
+<!--$ endblock -->
+more
+lines
+"""
+    var eYieldLines = @[
+      newReplaceLine(rlReplaceLine, "one\n"),
+      newReplaceLine(rlReplaceLine, "two\n"),
+      newReplaceLine(rlReplaceLine, "three\n"),
+      newReplaceLine(rlEndblockLine, "<!--$ endblock -->\n"),
+    ]
+    check testYieldReplacementLine(firstReplaceLine, replaceContent, maxLines = 10,
+      eYieldLines = eYieldLines)
+
+  test "yieldReplacementLine no content":
+    let firstReplaceLine = "<!--$ endblock -->\n"
+    let replaceContent = """
+two
+three
+"""
+    var eYieldLines = @[
+      newReplaceLine(rlEndblockLine, firstReplaceLine),
+    ]
+    check testYieldReplacementLine(firstReplaceLine, replaceContent, maxLines = 10,
+      eYieldLines = eYieldLines)
+
+  test "yieldReplacementLine no lines":
+    let firstReplaceLine = ""
+    let replaceContent = ""
+    check testYieldReplacementLine(firstReplaceLine, replaceContent)
+
+  test "yieldReplacementLine no lines nextline":
+    let firstReplaceLine = ""
+    let replaceContent = ""
+    check testYieldReplacementLine(firstReplaceLine, replaceContent, command = "nextline")

@@ -15,7 +15,9 @@ proc testCollectCommand(
     eResultStreamLines: seq[string] = @[],
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
-    eOutLines: seq[string] = @[]): bool =
+    eOutLines: seq[string] = @[],
+    eNextLine: string = ""
+  ): bool =
 
   var inStream = newStringStream(content)
   var resultStream = newStringStream()
@@ -27,7 +29,8 @@ proc testCollectCommand(
   var env = openEnvTest("_collectCommand.log")
 
   let compiledMatchers = getCompiledMatchers()
-  collectCommand(env, lb, compiledMatchers, resultStream, cmdLines, cmdLineParts)
+  var nextLine: string
+  collectCommand(env, lb, compiledMatchers, resultStream, cmdLines, cmdLineParts, nextLine)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
@@ -40,6 +43,8 @@ proc testCollectCommand(
   if not expectedItems("cmdLineParts", cmdLineParts, eCmdLineParts):
     result = false
   if not expectedItems("resultStreamLines", resultStreamLines, eResultStreamLines):
+    result = false
+  if not expectedItem("nextLine", nextLine, eNextLine):
     result = false
 
 suite "collectCommand.nim":
@@ -120,126 +125,30 @@ the next line
     let split = splitNewLines(content)
     let eCmdLines = @[split[1]]
     let eCmdLineParts = @[newLineParts(lineNum = 2)]
+    let eNextLine = "the next line\n"
     check testCollectCommand(content, eCmdLines, eCmdLineParts,
-      eResultStreamLines = @[split[0]])
-
-  test "regular line not continuation line":
-    let content = """
-<!--$ nextline \-->
-asdf
-"""
-    let warning = "template.html(2): w24: Missing the continuation command, " &
-      "abandoning the previous command.\n"
-    check testCollectCommand(content, @[], @[],
-                      eResultStreamLines = splitNewLines(content),
-                      eErrLines = @[warning])
-
-  test "block command not continuation command":
-    let content = """
-<!--$ nextline \-->
-<!--$ block -->
-asdf
-"""
-    let warning = "template.html(2): w24: Missing the continuation command, " &
-      "abandoning the previous command.\n"
-    check testCollectCommand(content, @[], @[],
-                      eResultStreamLines = splitNewLines(content),
-                      eErrLines = @[warning])
-
-
-  test "no more lines, need continuation":
-    let content = """
-<!--$ nextline \-->
-"""
-    let warning = "template.html(1): w24: Missing the continuation command, " &
-      "abandoning the previous command.\n"
-    check testCollectCommand(content, @[], @[],
-                      eResultStreamLines = splitNewLines(content),
-                      eErrLines = @[warning])
+      eResultStreamLines = @[split[0]], eNextLine = eNextLine)
 
   test "empty file":
     let content = ""
     check testCollectCommand(content, @[], @[])
 
-
-  test "more lines after dumping":
+  test "command and non command":
     let content = """
-<!--$ nextline \-->
-<!--$ block -->
-asdf
-asdf
-ttasdfasdf
-"""
-    let warning = "template.html(2): w24: Missing the continuation command, " &
-      "abandoning the previous command.\n"
-    check testCollectCommand(content, @[], @[],
-                      eResultStreamLines = splitNewLines(content),
-                      eErrLines = @[warning])
-
-  test "another command after dumping":
-    let content = """
-<!--$ nextline \-->
-<!--$ block -->
-asdf
-asdf
-ttasdfasdf
+not a command
 <!--$ nextline -->
-block
-asdf
+<!--$ : a = len("the next line") -->
+last line {a}
+more
 """
-    let eCmdLines = @["<!--$ nextline -->\n"]
-    let eCmdLineParts = @[newLineParts(lineNum = 6)]
-    let warning = "template.html(2): w24: Missing the continuation command, " &
-      "abandoning the previous command.\n"
-    let p = splitNewLines(content)
-    let eResultStreamLines = @[p[0], p[1], p[2], p[3], p[4]]
+    let split = splitNewLines(content)
+    let eCmdLines = @[split[1], split[2]]
+    let eCmdLineParts = @[
+      newLineParts(lineNum = 2, command = "nextline", middleStart = 15, middleLen = 0),
+      newLineParts(lineNum = 3, command = ":", middleStart = 8, middleLen = 25),
+    ]
+    let eNextLine = "last line {a}\n"
     check testCollectCommand(content, eCmdLines, eCmdLineParts,
-                      eResultStreamLines = eResultStreamLines,
-                      eErrLines = @[warning])
+      eResultStreamLines = @[split[0]], eNextLine = eNextLine)
 
-  test "two warnings":
-    let content = """
-<!--$ nextline \-->
-<!--$ block -->
-asdf
-asdf
-ttasdfasdf
-<!--$ nextline \-->
-block
-asdf
-"""
-    let warning1 = "template.html(2): w24: Missing the continuation command, " &
-      "abandoning the previous command.\n"
-    let warning2 = "template.html(7): w24: Missing the continuation command, " &
-      "abandoning the previous command.\n"
-    let eResultStreamLines = splitNewLines(content)
-    check testCollectCommand(content, @[], @[],
-                      eResultStreamLines = eResultStreamLines,
-                      eErrLines = @[warning1, warning2])
 
-  test "missing continue command":
-    let content = """
-#$ block \
-#$ cond1 = cmp(4, 5); \
-#$ cond2 = cmp(2, 2); \
-#$ cond3 = cmp(5, 4)
-cmp(4, 5) returns {cond1}
-cmp(2, 2) returns {cond2}
-cmp(5, 4) returns {cond3}
-#$ endblock
-"""
-    let eErrLines = splitNewLines """
-template.html(2): w22: No command found at column 4, treating it as a non-command line.
-template.html(2): w24: Missing the continuation command, abandoning the previous command.
-template.html(3): w22: No command found at column 4, treating it as a non-command line.
-template.html(4): w22: No command found at column 4, treating it as a non-command line.
-"""
-    let eCmdLines = @["#$ endblock\n"]
-    let eCmdLineParts = @[newLineParts(prefix = "#$", command =
-        "endblock", lineNum = 8, middleStart = 11, postfix = "")]
-
-    let p = splitNewLines(content)
-    let eResultStreamLines = p[0 .. ^2]
-
-    check testCollectCommand(content, eErrLines = eErrLines, eCmdLines = eCmdLines,
-      eCmdLineParts = eCmdLineParts, eResultStreamLines = eResultStreamLines)

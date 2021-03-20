@@ -31,11 +31,29 @@ import tpub
 type
   SegmentType = enum
     ## A replacement block line is divided into segments of these types.
-    middle,   # String segment in the middle of the line.
-    newline,  # String segment with ending newline that ends a line.
-    variable, # Variable segment in the middle.
-    endline   # String segment that ends a line without a newline.
-    endVariable # Variable segment that ends a line without a newline.
+    middle,   ## String segment in the middle of the line.
+    newline,  ## String segment with ending newline that ends a line.
+    variable, ## Variable segment in the middle.
+    endline,  ## String segment that ends a line without a newline.
+    endVariable ## Variable segment that ends a line without a newline.
+
+  ReplaceLineKind* = enum
+    ## Line type returned by yieldReplacementLine.
+    rlReplaceLine, ## A replacement block line.
+    rlEndblockLine ## The endblock line.
+
+  ReplaceLine* = object
+    ## Line information returned by yieldReplacementLine.
+    kind*: ReplaceLineKind
+    line*: string
+
+func newReplaceLine*(kind: ReplaceLineKind, line: string): ReplaceLine =
+  ## Return a ReplaceLine object.
+  return ReplaceLine(kind: kind, line: line)
+
+func `$`*(replaceLine: ReplaceLine): string =
+  ## Return a string representation of a ReplaceLine.
+  result = $replaceLine.kind & ": \"" & replaceLine.line & "\""
 
 #[
 
@@ -414,42 +432,39 @@ proc storeLineSegments*(env: var Env, tempSegments: TempSegments,
   for segment in segments:
     tempSegments.tempFile.file.write(segment)
 
-iterator yieldReplacementLine*(env: var Env, variables: Variables, command: string, lb: var
-    LineBuffer, compiledMatchers: Compiledmatchers): string =
-  ## Yield all the replacement block lines and the endblock line
-  ## too. When no endblock line return "" as the last line.
+iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
+    LineBuffer, compiledMatchers: Compiledmatchers, command: string, maxLines: Natural): ReplaceLine =
+  ## Yield all the replacement block lines and the endblock line too,
+  ## if it exists.
 
-  var maxLines = getTeaVarIntDefault(variables, "maxLines")
+  if firstReplaceLine != "":
+    if command == "nextline":
+      yield(newReplaceLine(rlReplaceLine, firstReplaceLine))
+    else:
+      var count = 0
+      var line = firstReplaceLine
 
-  var count = 0
+      while true:
+        # Stop when we reach the maximum line count for a replacement block.
+        if count >= maxLines:
+          env.warn(lb.lineNum, wExceededMaxLine)
+          break
 
-  while true:
-    # For the nextline command, read and process one line.
-    if command == "nextline" and count >= 1:
-      yield("")
-      break
+        # Look for an endblock command and stop when found.
+        var linePartsO = parseCmdLine(env, compiledMatchers, line, lb.lineNum)
+        if linePartsO.isSome:
+          if linePartsO.get().command == "endblock":
+            yield(newReplaceLine(rlEndblockLine, line))
+            break # done, found endblock
 
-    # Stop when we reach the maximum line count for a replacement block.
-    if count >= maxLines:
-      env.warn(lb.lineNum, wExceededMaxLine)
-      yield("")
-      break
+        yield(newReplaceLine(rlReplaceLine, line))
 
-    # Read the next template replacement block line.
-    let line = lb.readline()
-    if line == "":
-      yield("")
-      break # No more lines.
+        # Read the next template replacement block line.
+        line = lb.readline()
+        if line == "":
+          break # No more lines.
 
-    # Look for an endblock command and stop when found.
-    var linePartsO = parseCmdLine(env, compiledMatchers, line, lb.lineNum)
-    if linePartsO.isSome:
-      if linePartsO.get().command == "endblock":
-        yield(line)
-        break # done, found endblock
-
-    yield(line)
-    count.inc
+        count.inc
 
 proc newTempSegments*(env: var Env, lb: var LineBuffer, compiledMatchers: CompiledMatchers,
     command: string, repeat: Natural, variables: Variables): Option[TempSegments] =

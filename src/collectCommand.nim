@@ -4,7 +4,6 @@ import matches
 import readlines
 import options
 import parseCmdLine
-import warnings
 
 proc dumpCmdLines*(resultStream: Stream, cmdLines: var seq[string],
                   cmdLineParts: var seq[LineParts], line: string) =
@@ -19,19 +18,24 @@ proc dumpCmdLines*(resultStream: Stream, cmdLines: var seq[string],
 
 proc collectCommand*(env: var Env, lb: var LineBuffer,
       compiledMatchers: CompiledMatchers, resultStream: Stream,
-      cmdLines: var seq[string], cmdLineParts: var seq[LineParts]) =
+      cmdLines: var seq[string], cmdLineParts: var seq[LineParts],
+      firstReplaceLine: var string
+  ) =
   ## Read template lines and write out non-command lines. When a
-  ## command is found, collect its lines in the given lists, cmdLines
-  ## and cmdLineParts, and return. When no command found, return with
+  ## command is found, collect its lines in the given lists, cmdLines,
+  ## cmdLineParts and firstReplaceLine. When no command found, return with
   ## no lines.
-
+  var line: string
   while true:
-    var line = lb.readline()
-    if line == "":
-      break # No more lines.
+    if firstReplaceLine != "":
+      line = firstReplaceLine
+      firstReplaceLine = ""
+    else:
+      line = lb.readline()
+      if line == "":
+        break # No more lines.
 
     var linePartsO = parseCmdLine(env, compiledMatchers, line, lb.lineNum)
-
     if not linePartsO.isSome:
       # Write out non-command lines.
       resultStream.write(line)
@@ -39,28 +43,30 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
       # Found command line.
       var lineParts = linePartsO.get()
 
-      # Collect all the continuation command lines.
+      cmdLines.add(line)
+      cmdLineParts.add(lineParts)
+
+      # Collect all the continuation command lines and the line after.
       while true:
-        cmdLines.add(line)
-        cmdLineParts.add(lineParts)
-
-        if not lineParts.continuation:
-          return # Return the command lines.
-
         line = lb.readline()
-        if line != "":
-          let lPartsO = parseCmdLine(env, compiledMatchers,
-              line, lb.lineNum)
-          if lPartsO.isSome:
-            lineParts = lPartsO.get()
-            if lineParts.command == ":":
-              continue # Got command line, continue looking for more.
-
-        # Show warning about missing a continuation line and that we
-        # are abandoning the command.
-        warn(env, lb.lineNum, wNoContinuationLine)
-        dumpCmdLines(resultStream, cmdLines, cmdLineParts, line)
         if line == "":
           return # No more lines
-        break # Start looking for another command.
 
+        let lPartsO = parseCmdLine(env, compiledMatchers, line, lb.lineNum)
+        if lPartsO.isSome:
+          lineParts = lPartsO.get()
+          if lineParts.command == ":":
+            cmdLines.add(line)
+            cmdLineParts.add(lineParts)
+            continue # continue looking for more command lines.
+
+        firstReplaceLine = line
+        return # return the command lines
+
+        # # Show warning about missing a continuation line and that we
+        # # are abandoning the command.
+        # warn(env, lb.lineNum, wNoContinuationLine)
+        # dumpCmdLines(resultStream, cmdLines, cmdLineParts, line)
+        # if line == "":
+        #   return # No more lines
+        # break # Start looking for another command.
