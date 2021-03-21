@@ -300,13 +300,9 @@ intensive steps.
 :CUSTOM_ID: continue-command
 :END:
 
-You can continue a long command line with the "\\" character at
-the end before the postfix. The following line must be a continue
-command.
-
-The continue command allows you to continue adding statements
-when you need more space. You can continue the continue command
-too.
+The continue command allows you to continue adding statements to
+a nextline, block and replace command. You can continue the
+continue command too.
 
 In the following example the nextline command continues on a
 second line and third line.
@@ -314,9 +310,9 @@ second line and third line.
 template:
 
 #+BEGIN_SRC
-<!--$ nextline \-->
-<!--$ : tea = 'Earl Grey'; \-->
-<!--$ : tea2 = 'Masala chai' -->
+$$ nextline
+$$ : tea = 'Earl Grey'
+$$ : tea2 = 'Masala chai'
 {tea}, {tea2}
 #+END_SRC
 
@@ -396,10 +392,11 @@ reduce and other functional language techniques. Output control
 is done with t.output.
 
 Statements are allowed on the nextline, block and replace
-commands. You can use multiple statements separated with
-semicolons. If you need more space, you can continue the line
-with the "\\" character at the end. Statements are executed from
-left to right, top to bottom.
+commands. You can use multiple statements on the same line
+separated with semicolons. If you need more space for a
+statement, you can continue the line with the "\\" character at
+the end. Statements are executed from left to right, top to
+bottom.
 
 Here are some simple statements:
 
@@ -413,7 +410,7 @@ name = concat(substr(s.name, 0, 7), "...")
 
 [[#contents][茶]]
 
-* Syntax
+* TODO Syntax
 :PROPERTIES:
 :CUSTOM_ID: syntax
 :END:
@@ -429,14 +426,15 @@ optional ending comment characters are called the postfix. For
 example, in an html template the prefix is "<!--$" and the
 postfix is "-->". See [[#prefix-postfix][Prefix Postfix]] for more information.
 
-The prefix starts at column 1. Next comes the command name. Statements
-follow the command name, they are separated by semicolons and they may
-flow through the following lines. At the end of the line is an
-optional slash continuation character then the optional postfix
-then the end of line, either \r\n or \n.
+The prefix starts at column 1. Next comes the command
+name. Statements follow the command name, they are separated by
+semicolons or newlines and they may flow through the following
+lines. At the end of the line is an optional slash continuation
+character then the optional postfix then the end of line, either
+\r\n or \n.
 
 The following chart shows a nextline command made up of two
-lines. It has three statements: a=5, b=6 and c=5.
+lines. It has three statements: a=5, b="banana" and c=5.
 
 #+BEGIN_SRC
 prefix
@@ -447,8 +445,8 @@ prefix
 |     |        |         |postfix
 |     |        |         ||  newline
 |     |        |         ||  |
-<!--$ nextline a=5; b=6; \-->
-<!--$ :        c=5        -->
+<!--$ nextline a=5;  b="b\-->
+<!--$ : anana"; c=5       -->
 #+END_SRC
 
 A space or tab is required between a command and a statement,
@@ -466,8 +464,9 @@ $$ nextline num = len(tea_list); b=3
 $$ nextline num = len( tea_list ) ;b=3
 #+END_SRC
 
-The statements may flow between lines. The following two nextline
-commands are equivalent:
+The statements may flow between lines by using the continuation
+slash character. The following two nextline commands are
+equivalent:
 
 #+BEGIN_SRC
 <!--$ nextline com = "Bigelow Tea Company" -->
@@ -476,11 +475,16 @@ commands are equivalent:
 <!--$ : elow Tea Company" -->
 #+END_SRC
 
-You separate statements with semicolons. You can have blank
-statements that do nothing.
+You separate statements with semicolons or newlines. You can have
+blank statements that do nothing. Both commands below have three
+statements: a = 1, b = 2 and c = 3.
 
 #+BEGIN_SRC
 <!--$ nextline a=1; b=2; c=3 -->
+
+$$ nextline a = 1
+$$ : b = 2
+$$ : c = 3
 #+END_SRC
 
 [[#contents][茶]]
@@ -690,14 +694,14 @@ You can use the stderr option to write your own warning messages.
 template:
 
 #+BEGIN_SRC
-<!--$ nextline \-->
-<!--$ : t.output = if( \-->
-<!--$ :   exists("s.admin"), "skip", \-->
-<!--$ :   "stderr"); \-->
-<!--$ : msg = concat( \-->
-<!--$ :   template(), "(", \-->
-<!--$ :   getLineNumber(), ")", \-->
-<!--$ :   "missing admin var") -->
+$$ nextline
+$$ : t.output = if( \
+$$ :   exists("s.admin"), "skip",
+$$ :   "stderr")
+$$ : msg = concat( \
+$$ :   template(), "(", \
+$$ :   getLineNumber(), ")", \
+$$ :   "missing admin var")
 {msg}
 #+END_SRC
 
@@ -736,7 +740,7 @@ times.
 template:
 
 #+BEGIN_SRC
-<!--$ nextline t.repeat = len(s.tea_list); \-->
+<!--$ nextline t.repeat = len(s.tea_list) -->
 <!--$ : tea = get(s.tea_list, t.row) -->
  * {tea}
 #+END_SRC
@@ -774,10 +778,10 @@ template:
 #+BEGIN_SRC
 <h3>Tea Companies</h3>
 <select>
-<!--$ nextline t.repeat=len(s.companyList); \-->
-<!--$ : d = get(s.companyList, t.row); \-->
-<!--$ : company = get(d, "company"); \-->
-<!--$ : selected = get(d, "selected", 0); \-->
+<!--$ nextline t.repeat=len(s.companyList) -->
+<!--$ : d = get(s.companyList, t.row) -->
+<!--$ : company = get(d, "company") -->
+<!--$ : selected = get(d, "selected", 0) -->
 <!--$ : current=if(selected, ' selected="selected"', "") -->
 <option{current}>{company}</option>
 </select>
@@ -822,7 +826,7 @@ template:
 #+BEGIN_SRC
 <h3>Tea</h3>
 <ul>
-<!--$ nextline t.repeat = len(s.teaList); \-->
+<!--$ nextline t.repeat = len(s.teaList)-->
 <!--$ : tea = get(s.teaList, t.row) -->
 <li>{tea}</li>
 </ul>
@@ -836,7 +840,7 @@ template:
 #+BEGIN_SRC
 <h3>Tea</h3>
 <ul>
-<!--$ nextline t.repeat = len(s.teaList); \-->
+<!--$ nextline t.repeat = len(s.teaList) -->
 <!--$ : tea = get(s.teaList, t.row) -->
 <li>{tea}</li>
 <!--$ block t.repeat = 0 -->
@@ -891,8 +895,8 @@ row number is used in three places.
 template:
 
 #+BEGIN_SRC
-<!--$ nextline t.repeat=len(s.companies); \-->
-<!--$ : company = get(s.companies, t.row); \-->
+<!--$ nextline t.repeat=len(s.companies)-->
+<!--$ : company = get(s.companies, t.row) -->
 <!--$ : num = add(t.row, 1) -->
 <li id="r{t.row}>{num}. {company}</li>
 #+END_SRC
@@ -1507,11 +1511,11 @@ insensitive when it is 1. Added in version 0.1.0.
 template:
 
 #+BEGIN_SRC
-#$ block \
-#$ : cond1 = cmp(4, 5); \
-#$ : cond2 = cmp(2, 2); \
-#$ : cond3 = cmp(5, 4); \
-#$ : cond4 = cmp("abc", "abd"); \
+#$ block
+#$ : cond1 = cmp(4, 5)
+#$ : cond2 = cmp(2, 2)
+#$ : cond3 = cmp(5, 4)
+#$ : cond4 = cmp("abc", "abd")
 #$ : cond5 = cmp("abc", "ABC", 1)
 cmp(4, 5) returns {cond1}
 cmp(2, 2) returns {cond2}
@@ -1536,12 +1540,13 @@ gets long. The following example ellipsizes when a name is longer
 than 10 characters.
 
 #+BEGIN_SRC
-<!--$ # If the name is longer than 10 characters, -->
-<!--$ # clip it to 7 and add "...".               -->
-<!--$ nextline                                   \-->
-<!--$ : cmp = cmp(len(s.name), 10);              \-->
-<!--$ : name = case(cmp, s.name                  \-->
-<!--$ : 1, concat(substr(s.name, 0, 7), "..."))   -->
+$$ # If the name is longer than 10 characters,
+$$ # clip it to 7 and add "...".
+$$ nextline
+$$ : cmp = cmp(len(s.name), 10)
+$$ : name = case(cmp, \
+$$ :   1, concat(substr(s.name, 0, 7), "...") \
+$$ :   s.name)
 #+END_SRC
 
 [[#contents][茶]]
@@ -1587,9 +1592,9 @@ StaticTea is less than 1.0.2.
 template:
 
 #+BEGIN_SRC
-#$ nexline req = "1.0.2"; \
+#$ nexline req = "1.0.2"
 #$ : t.output = case(cmpVersion(t.version, req), \
-#$ : 'skip', -1, 'stderr')
+#$ :   'skip', -1, 'stderr')
 Version {req} or above is required.
 #+END_SRC
 
@@ -1605,8 +1610,8 @@ more string parameters. The following example also shows using
 the "$$" prefix. Added in version 0.1.0.
 
 #+BEGIN_SRC
-$$ block \
-$$ : x3 = concat("Tea", "Time"); \
+$$ block
+$$ : x3 = concat("Tea", "Time")
 $$ : x4 = concat("Tea", " ",  "Time")
 concat("Tea", "Time") => '{x3}'
 concat("Tea", " ",  "Time") => '{x4}'
@@ -1639,8 +1644,8 @@ Added in version 0.1.0.
 template:
 
 #+BEGIN_SRC
-<--$ block a = "apple"; \-->
-<--$ : ax = exists(t.local, "a"); \-->
+<--$ block a = "apple" -->
+<--$ : ax = exists(t.local, "a") -->
 <--$ : bx = exists(t.local, "b") -->
 exists("a") => {ax}
 exists("b") => {bx}
@@ -1783,10 +1788,10 @@ works.
 template:
 
 #+BEGIN_SRC
-<--$ block \-->
-<--$ : var1=if(1, 'dog', 'cat'), \-->
-<--$ : var2=if(0, 'dog', 'cat'), \-->
-<--$ : var3=if(8, 'dog', 'cat'), -->
+<--$ block -->
+<--$ : var1=if(1, 'dog', 'cat') -->
+<--$ : var2=if(0, 'dog', 'cat') -->
+<--$ : var3=if(8, 'dog', 'cat') -->
 
 if(1, 'dog', 'cat') => {var1}
 if(0, 'dog', 'cat') => {var2}
@@ -1887,14 +1892,14 @@ list or the number of elements in a dictionary.  Added in version
 0.1.0.
 
 #+BEGIN_SRC
-<!--$ block \-->
-<!--$ : length = len("Tetley"); \-->
-<!--$ : listLen = len(tea_list); \-->
-<!--$ : serverLen = len(t.server) -->
-The Tetley name has {length} characters.
+$$ block
+$$ : length = len("Tetley")
+$$ : listLen = len(tea_list)
+$$ : serverLen = len(t.server)
+Tetley name has {length} characters.
 The tea list has {listlen} elements.
 The server json dictionary has {serverLen} elements.
-<!--$ endblock -->
+$$ endblock
 #+END_SRC
 
 json:
@@ -1979,9 +1984,9 @@ Earl Grey
 template:
 
 #+BEGIN_SRC
-<--$ nextline \-->
-<--$ : sub1 = substr("Earl Grey", 5) \-->
-<--$ : sub2 = substr("Earl Grey", 0, 6) -->
+$$ nextline
+$$ : sub1 = substr("Earl Grey", 5)
+$$ : sub2 = substr("Earl Grey", 0, 6)
 sub1 = {sub1}, sub2 = {sub2}
 #+END_SRC
 

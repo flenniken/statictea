@@ -2,8 +2,8 @@ $$ # StaticTea template to generate reStructuredTest from nim doc comments.
 $$ #
 $$ # Add the title. Create the title from the basename
 $$ # of the module path in s.orig.
-$$ block \
-$$ : title = substr(s.orig, add(4, find(s.orig, 'src/', -4))); \
+$$ block
+$$ : title = substr(s.orig, add(4, find(s.orig, 'src/', -4)));
 $$ : titleLine = dup("=", len(title))
 {titleLine}
 {title}
@@ -23,29 +23,29 @@ $$ #
 $$ #
 $$ #
 $$ # Index to types and functions.
-$$ nextline \
-$$ : t.repeat = len(s.entries); \
-$$ : entry = get(s.entries, t.row, dict()); \
-$$ : name = get(entry, "name", ""); \
-$$ : description = get(entry, "description", ""); \
-$$ : skType = get(entry, "type", ""); \
+$$ nextline
+$$ : t.repeat = len(s.entries)
+$$ : entry = get(s.entries, t.row, dict())
+$$ : name = get(entry, "name", "")
+$$ : description = get(entry, "description", "")
+$$ : skType = get(entry, "type", "")
 $$ : type = case(skType, "skType", \
 $$ :   "type: ", "skConst", "const: ", \
 $$ :   "skMacro", "macro: ", \
-$$ :   ""); \
+$$ :   "")
 $$ : short = substr(description, 0, add(find(description, '.', -1), 1))
 * {type}{name}__ -- {short}
 
 $$ # Function and type descriptions.
 $$ block \
-$$ : t.repeat = len(s.entries); \
-$$ : entry = get(s.entries, t.row); \
-$$ : name = get(entry, "name", ""); \
-$$ : nameUnderline = dup("-", len(name)); \
-$$ : description = get(entry, "description", ""); \
-$$ : code = get(entry, "code", ""); \
-$$ : pos = find(code, "{", len(code)); \
-$$ : signature = substr(code, 0, pos); \
+$$ : t.repeat = len(s.entries)
+$$ : entry = get(s.entries, t.row)
+$$ : name = get(entry, "name", "")
+$$ : nameUnderline = dup("-", len(name))
+$$ : description = get(entry, "description", "")
+$$ : code = get(entry, "code", "")
+$$ : pos = find(code, "{", len(code))
+$$ : signature = substr(code, 0, pos)
 $$ : t.maxLines = 100
 .. __:
 
