@@ -108,6 +108,8 @@ type
     wPairParameters,       # w93
     wMissingElse,          # w94
     wImmutableVars,        # w95
+    wExpected4Parameters,  # w96
+    wInvalidLength,        # w97
 
 tpubType:
   const
@@ -210,6 +212,8 @@ tpubType:
       "Specify parameters in pairs.", # wPairParameters
       "None of the case conditions match and no else case.", # wMissingElse
       "Variable already exists, assign to a new variable.", # wImmutableVars
+      "Expected four parameters.", # wExpected4Parameters
+      "Invalid length: $1.", # wInvalidLength
     ]
 
 func getWarning*(filename: string, lineNum: int,

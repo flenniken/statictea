@@ -1400,8 +1400,8 @@ List of functions:
 - [[#len][len()]] -- length of string, list or dictionary
 - [[#listfun][list()]] -- create a list
 - [[#lineNumber][lineNumber()]] -- the current line number
-- [[#quotehtml][quoteHtml]] -- replace html special characters
-- [[#sizes][sizes()]] -- format bytes counts, KB, MB, GB, etc.
+- [[#quotehtml][quoteHtml]] -- excape html special characters
+- [[#replace][replace()]] -- replace range with a string
 - [[#substr][substr()]] -- extract a substring from a string by indexes
 - [[#time][time()]] -- format the date and time.
 - [[#template][template()]] -- the filename of the current template
@@ -1963,13 +1963,21 @@ The quoteHtml replaces special html characters with equivalents. Added in versio
 
 [[#contents][茶]]
 
-** sizes()
+** replace()
 :PROPERTIES:
-:CUSTOM_ID: sizes
+:CUSTOM_ID: replace
 :END:
 
-The sizes function formats a number as a number of bytes, KB, MB,
-GB, etc. Added in version 0.1.0.
+Replace a part of a string (substring) with another string.
+
+The first parameter is the string, the second is the substring's
+starting position and the third is the length of the
+substring. The first position is 0.
+
+#+BEGIN_SRC
+replace("Earl Grey", 5, 4, "of Sandwich")
+  => "Earl of Sandwich"
+#+END_SRC
 
 [[#contents][茶]]
 

@@ -63,7 +63,7 @@ func `$`*(funResult: FunResult): string =
   of frValue:
     result = $funResult.value
   else:
-    result = "warning: $1: $2 $3 $4" % [
+    result = "warning: $1: $2" % [
       $funResult.warningData, $funResult.parameter
     ]
 
@@ -564,6 +564,7 @@ proc funFind*(parameters: seq[Value]): FunResult =
     result = newFunResult(newValue(pos))
 
 # todo: add examples for all functions.
+# todo: change from half-open to ix, length.
 proc funSubstr*(parameters: seq[Value]): FunResult =
   ## Extract a substring from a string.  The first parameter is the
   ## string, the second is the substring's starting position and the
@@ -677,6 +678,77 @@ proc funList*(parameters: seq[Value]): FunResult =
   ##
   result = newFunResult(newValue(parameters))
 
+proc funReplace*(parameters: seq[Value]): FunResult =
+  ## Replace a part of a string (substring) with another string.
+  ##
+  ## The first parameter is the string, the second is the substring's
+  ## starting position, starting a 0, the third is the length of the
+  ## substring and the fourth is the replacement string.
+  ##
+  ## replace("Earl Grey", 5, 4, "of Sandwich")
+  ##   => "Earl of Sandwich"
+  ## replace("123", 0, 0, "abcd") => abcd123
+  ## replace("123", 0, 1, "abcd") => abcd23
+  ## replace("123", 0, 2, "abcd") => abcd3
+  ## replace("123", 0, 3, "abcd") => abcd
+  ## replace("123", 3, 0, "abcd") => 123abcd
+  ## replace("123", 2, 1, "abcd") => 12abcd
+  ## replace("123", 1, 2, "abcd") => 1abcd
+  ## replace("123", 0, 3, "abcd") => abcd
+  ## replace("123", 1, 0, "abcd") => 1abcd23
+  ## replace("123", 1, 1, "abcd") => 1abcd3
+  ## replace("123", 1, 2, "abcd") => 1abcd
+  ## replace("", 0, 0, "abcd") => abcd
+  ## replace("", 0, 0, "abc") => abc
+  ## replace("", 0, 0, "ab") => ab
+  ## replace("", 0, 0, "a") => a
+  ## replace("", 0, 0, "") =>
+  ## replace("123", 0, 0, "") => 123
+  ## replace("123", 0, 1, "") => 23
+  ## replace("123", 0, 2, "") => 3
+  ## replace("123", 0, 3, "") =>
+
+  if parameters.len != 4:
+    result = newFunResultWarn(wExpected4Parameters)
+    return
+
+  if parameters[0].kind != vkString:
+    result = newFunResultWarn(wExpectedString, 0)
+    return
+  let str = parameters[0].stringv
+
+  if parameters[1].kind != vkInt:
+    result = newFunResultWarn(wExpectedInteger, 1)
+    return
+  let start = int(parameters[1].intv)
+
+  if start < 0 or start > str.len:
+    result = newFunResultWarn(wInvalidPosition, 1, $start)
+    return
+
+  if parameters[2].kind != vkInt:
+    result = newFunResultWarn(wExpectedInteger, 2)
+    return
+  let length = int(parameters[2].intv)
+
+  if length < 0 or start + length > str.len:
+    result = newFunResultWarn(wInvalidLength, 2, $length)
+    return
+
+  if parameters[3].kind != vkString:
+    result = newFunResultWarn(wExpectedString, 3)
+    return
+  let replaceString = parameters[3].stringv
+
+  var newString: string
+  if start > 0 and start <= str.len:
+    newString = str[0 .. start - 1]
+  newString = newString & replaceString
+  if start + length < str.len:
+    newString = newString & str[start + length .. str.len - 1]
+
+  result = newFunResult(newValue(newString))
+
 const
   functionsList = [
     ("len", funLen),
@@ -695,7 +767,7 @@ const
     ("dup", funDup),
     ("dict", funDict),
     ("list", funList),
-# replace -- search and replace
+    ("replace", funReplace),
 # regex matching
 # format
 # lineNumber

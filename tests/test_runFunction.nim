@@ -36,6 +36,12 @@ proc testCmpFun[T](a: T, b: T, caseInsensitive: bool = false, expected: int = 0)
   let eFunResult = newFunResult(newValue(expected))
   result = testFunction("cmp", parameters, eFunResult = eFunResult)
 
+proc testReplaceGood(str: string, start: int, length: int, replace: string, eResult: string): bool =
+  var parameters: seq[Value] = @[newValue(str),
+    newValue(start), newValue(length), newValue(replace)]
+  let eFunResult = newFunResult(newValue(eResult))
+  result = testFunction("replace", parameters, eFunResult = eFunResult)
+
 suite "runFunction.nim":
 
   test "getFunction":
@@ -761,3 +767,116 @@ suite "runFunction.nim":
     var list = parameters
     let eFunResult = newFunResult(newValue(list))
     check testFunction("list", parameters, eFunResult = eFunResult)
+
+  test "replace":
+    var parameters: seq[Value] = @[newValue("Earl Grey"),
+      newValue(5), newValue(4), newValue("of Sandwich")]
+    let eFunResult = newFunResult(newValue("Earl of Sandwich"))
+    check testFunction("replace", parameters, eFunResult = eFunResult)
+
+  test "replace good":
+    check testReplaceGood("123", 0, 0, "abcd", "abcd123")
+    check testReplaceGood("123", 0, 1, "abcd", "abcd23")
+    check testReplaceGood("123", 0, 2, "abcd", "abcd3")
+    check testReplaceGood("123", 0, 3, "abcd", "abcd")
+    check testReplaceGood("123", 3, 0, "abcd", "123abcd")
+    check testReplaceGood("123", 2, 1, "abcd", "12abcd")
+    check testReplaceGood("123", 1, 2, "abcd", "1abcd")
+    check testReplaceGood("123", 0, 3, "abcd", "abcd")
+    check testReplaceGood("123", 1, 0, "abcd", "1abcd23")
+    check testReplaceGood("123", 1, 1, "abcd", "1abcd3")
+    check testReplaceGood("123", 1, 2, "abcd", "1abcd")
+    check testReplaceGood("", 0, 0, "abcd", "abcd")
+    check testReplaceGood("", 0, 0, "abc", "abc")
+    check testReplaceGood("", 0, 0, "ab", "ab")
+    check testReplaceGood("", 0, 0, "a", "a")
+    check testReplaceGood("", 0, 0, "", "")
+    check testReplaceGood("123", 0, 0, "", "123")
+    check testReplaceGood("123", 0, 1, "", "23")
+    check testReplaceGood("123", 0, 2, "", "3")
+    check testReplaceGood("123", 0, 3, "", "")
+
+
+  test "replace empty str":
+    var parameters: seq[Value] = @[newValue(""),
+      newValue(0), newValue(0), newValue("of Sandwich")]
+    let eFunResult = newFunResult(newValue("of Sandwich"))
+    check testFunction("replace", parameters, eFunResult = eFunResult)
+
+  test "replace empty empty":
+    var parameters: seq[Value] = @[newValue(""),
+      newValue(0), newValue(0), newValue("")]
+    let eFunResult = newFunResult(newValue(""))
+    check testFunction("replace", parameters, eFunResult = eFunResult)
+
+  test "replace whole thing":
+    var parameters: seq[Value] = @[newValue("Earl Grey"),
+      newValue(0), newValue(9), newValue("Eat the Sandwich")]
+    let eFunResult = newFunResult(newValue("Eat the Sandwich"))
+    check testFunction("replace", parameters, eFunResult = eFunResult)
+
+  test "replace last char":
+    var parameters: seq[Value] = @[newValue("Earl Grey"),
+      newValue(8), newValue(1), newValue("of Sandwich")]
+    let eFunResult = newFunResult(newValue("Earl Greof Sandwich"))
+    check testFunction("replace", parameters, eFunResult = eFunResult)
+
+  test "replace with nothing":
+    var parameters: seq[Value] = @[newValue("Earl Grey"),
+      newValue(8), newValue(1), newValue("")]
+    let eFunResult = newFunResult(newValue("Earl Gre"))
+    check testFunction("replace", parameters, eFunResult = eFunResult)
+
+  test "replace with nothing 2":
+    var parameters: seq[Value] = @[newValue("Earl Grey"),
+      newValue(8), newValue(0), newValue("123")]
+    let eFunResult = newFunResult(newValue("Earl Gre123y"))
+    check testFunction("replace", parameters, eFunResult = eFunResult)
+
+  test "replace invalid p1":
+    var parameters: seq[Value] = @[newValue(4),
+      newValue(0), newValue(9), newValue("Eat the Sandwich")]
+    let eFunResult = newFunResultWarn(wExpectedString)
+    check testFunction("replace", parameters, eFunResult = eFunResult)
+
+  test "replace invalid p2":
+    var parameters: seq[Value] = @[newValue("Earl Grey"),
+      newValue("a"), newValue(9), newValue("Eat the Sandwich")]
+    let eFunResult = newFunResultWarn(wExpectedInteger, 1)
+    check testFunction("replace", parameters, eFunResult = eFunResult)
+
+  test "replace invalid p3":
+    var parameters: seq[Value] = @[newValue("Earl Grey"),
+      newValue(5), newValue("d"), newValue("Eat the Sandwich")]
+    let eFunResult = newFunResultWarn(wExpectedInteger, 2)
+    check testFunction("replace", parameters, eFunResult = eFunResult)
+
+  test "replace invalid p4":
+    var parameters: seq[Value] = @[newValue("Earl Grey"),
+      newValue(5), newValue(4), newValue(4.3)]
+    let eFunResult = newFunResultWarn(wExpectedString, 3)
+    check testFunction("replace", parameters, eFunResult = eFunResult)
+
+  test "replace start to small":
+    var parameters: seq[Value] = @[newValue("Earl Grey"),
+      newValue(-1), newValue(4), newValue("of Sandwich")]
+    let eFunResult = newFunResultWarn(wInvalidPosition, 1, "-1")
+    check testFunction("replace", parameters, eFunResult = eFunResult)
+
+  test "replace start too big":
+    var parameters: seq[Value] = @[newValue("Earl Grey"),
+      newValue(10), newValue(0), newValue("of Sandwich")]
+    let eFunResult = newFunResultWarn(wInvalidPosition, 1, "10")
+    check testFunction("replace", parameters, eFunResult = eFunResult)
+
+  test "replace length too small":
+    var parameters: seq[Value] = @[newValue("Earl Grey"),
+      newValue(0), newValue(-4), newValue("of Sandwich")]
+    let eFunResult = newFunResultWarn(wInvalidLength, 2, "-4")
+    check testFunction("replace", parameters, eFunResult = eFunResult)
+
+  test "replace length too big":
+    var parameters: seq[Value] = @[newValue("Earl Grey"),
+      newValue(0), newValue(10), newValue("of Sandwich")]
+    let eFunResult = newFunResultWarn(wInvalidLength, 2, "10")
+    check testFunction("replace", parameters, eFunResult = eFunResult)
