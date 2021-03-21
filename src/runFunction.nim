@@ -667,6 +667,15 @@ proc funDict*(parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(dict))
 
+proc funList*(parameters: seq[Value]): FunResult =
+  ## Create a list of values. You can specify as many variables as you
+  ## want.  Added in version 0.1.0.
+  ##
+  ## list(1, 2, 3) => [1, 2, 3]
+  ## list("a", 5, "b") => ["a", 5, "b"]
+  ##
+  result = newFunResult(newValue(parameters))
+
 const
   functionsList = [
     ("len", funLen),
@@ -684,6 +693,7 @@ const
     ("substr", funSubstr),
     ("dup", funDup),
     ("dict", funDict),
+    ("list", funList),
 # replace -- search and replace
 # regex matching
 # format

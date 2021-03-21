@@ -743,3 +743,21 @@ suite "runFunction.nim":
     var parameters = @[newValue("key"), newValue(1), newValue(2), newValue(1)]
     let eFunResult = newFunResultWarn(wExpectedString, 2)
     check testFunction("dict", parameters, eFunResult = eFunResult)
+
+  test "list empty":
+    var parameters: seq[Value] = @[]
+    var list: seq[Value]
+    let eFunResult = newFunResult(newValue(list))
+    check testFunction("list", parameters, eFunResult = eFunResult)
+
+  test "list one item":
+    var parameters: seq[Value] = @[newValue(1)]
+    var list = parameters
+    let eFunResult = newFunResult(newValue(list))
+    check testFunction("list", parameters, eFunResult = eFunResult)
+
+  test "list two kinds of items":
+    var parameters: seq[Value] = @[newValue(1), newValue("a")]
+    var list = parameters
+    let eFunResult = newFunResult(newValue(list))
+    check testFunction("list", parameters, eFunResult = eFunResult)
