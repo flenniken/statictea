@@ -279,9 +279,9 @@ intensive steps.
   test "readme continuation":
 
     let templateContent = """
-<!--$ nextline \-->
-<!--$ : tea = 'Earl Grey'; \-->
-<!--$ : tea2 = 'Masala chai' -->
+$$ nextline
+$$ : tea = 'Earl Grey'
+$$ : tea2 = 'Masala chai'
 {tea}, {tea2}
 """
     let eResultLines = @[
@@ -713,7 +713,7 @@ house at 5:00 pm.
 
   test "readme repeat example":
     let templateContent = """
-<!--$ nextline t.repeat = len(s.tea_list); \-->
+<!--$ nextline t.repeat = len(s.tea_list) -->
 <!--$ : tea = get(s.tea_list, t.row) -->
 * {tea}
 """
@@ -788,7 +788,7 @@ house at 5:00 pm.
     let templateContent = """
 <h3>Tea</h3>
 <ul>
-<!--$ nextline t.repeat = len(s.teaList); \-->
+<!--$ nextline t.repeat = len(s.teaList) -->
 <!--$ : tea = get(s.teaList, t.row) -->
 <li>{tea}</li>
 <!--$ block t.repeat = 0 -->
