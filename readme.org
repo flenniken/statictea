@@ -1398,6 +1398,7 @@ List of functions:
 - [[#get][get()]] -- get an element from a list or dictionary
 - [[#if][if()]] -- handles two conditions
 - [[#len][len()]] -- length of string, list or dictionary
+- [[#listfun][list()]] -- create a list
 - [[#lineNumber][lineNumber()]] -- the current line number
 - [[#quotehtml][quoteHtml]] -- replace html special characters
 - [[#sizes][sizes()]] -- format bytes counts, KB, MB, GB, etc.
@@ -1924,6 +1925,23 @@ The tea list has 5 elements.
 The server json dictionary has 1 elements.
 #+END_SRC
 
+[[#contents][茶]]
+
+** list()
+:PROPERTIES:
+:CUSTOM_ID: listfun
+:END:
+
+Create a list of values. You can specify as many variables as you
+want.  Added in version 0.1.0.
+
+#+BEGIN_SRC
+list(1) => [1]
+list(1, 2, 3) => [1, 2, 3]
+list("a", 5, "b") => ["a", 5, "b"]
+#+END_SRC
+
+[[#contents][
 [[#contents][茶]]
 
 ** lineNumber()

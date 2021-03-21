@@ -671,6 +671,7 @@ proc funList*(parameters: seq[Value]): FunResult =
   ## Create a list of values. You can specify as many variables as you
   ## want.  Added in version 0.1.0.
   ##
+  ## list(1) => [1]
   ## list(1, 2, 3) => [1, 2, 3]
   ## list("a", 5, "b") => ["a", 5, "b"]
   ##
