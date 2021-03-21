@@ -323,6 +323,50 @@ suite "runCommand.nim":
 """
     check testGetStatements(content, expected)
 
+  test "two lines newline":
+    let content = """
+<!--$ nextline a = 5 -->
+<!--$ : asdf -->
+"""
+#123456789 123456789 123456789
+    let expected = """
+1, 15: 'a = 5 '
+2, 8: 'asdf '
+"""
+    check testGetStatements(content, expected)
+
+  test "three lines":
+    let content = """
+$$ nextline
+$$ : a = 5
+$$ : asddasfd
+$$ : c = len("hello")
+"""
+#123456789 123456789 123456789
+    let expected = """
+2, 5: 'a = 5'
+3, 5: 'asddasfd'
+4, 5: 'c = len("hello")'
+"""
+    check testGetStatements(content, expected)
+
+  test "continuation and not":
+    let content = """
+$$ nextline 234;4546;
+$$ : a = 5;bbb = \
+$$ : concat("1", "e")
+$$ : c = len("hello")
+"""
+#123456789 123456789 123456789
+    let expected = """
+1, 12: '234'
+1, 16: '4546'
+2, 5: 'a = 5'
+2, 11: 'bbb = concat("1", "e")'
+4, 5: 'c = len("hello")'
+"""
+    check testGetStatements(content, expected)
+
   test "three statements split":
     let content = """
 <!--$ block a = 5; b = \-->

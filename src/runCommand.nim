@@ -100,6 +100,17 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
       elif state == slashdouble:
         state = double
       text.add(ch)
+
+    # A statement is terminated by the end of the line by default.
+    if not lp.continuation:
+      if notEmptyOrSpaces(allSpaceTabMatcher, text):
+        yield newStatement(text, lineNum, start)
+      # Setup variables for the next line, if there is one.
+      text.setLen(0)
+      if cmdLines.len > ix+1:
+        lineNum = lp.lineNum + 1
+        start = cmdLineParts[ix+1].middleStart
+
   if notEmptyOrSpaces(allSpaceTabMatcher, text):
     yield Statement(text: text, lineNum: lineNum, start: start)
 
