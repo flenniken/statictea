@@ -749,6 +749,58 @@ proc funReplace*(parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(newString))
 
+# proc funMatch*(parameters: seq[Value]): FunResult =
+#   ## Match a pattern in a string.
+#   ##
+#   ## The match function returns a dictionary with the results of the
+#   ## match. Added in version 0.1.0.
+#   ##
+#   ## m = match(string, pattern, start, default)
+#   ## m = match("Tea time", "Tea")
+#   ## m = match("proc a(): FunResult =", "\bFunResult\b")
+#   ## m = match("a = b99", "^([^=])\s=\s(.*)$")
+#   ##
+#   ## m = {
+#   ##   "ix": 0,
+#   ##   "str": "a = b99",
+#   ##   "g0ix": 0,
+#   ##   "g0str": "a",
+#   ##   "g1ix": 4,
+#   ##   "g1str": "b99"
+#   ## }
+#   ##
+#   ## w = replace(str, m.ix, len(m.str), "FunResult_")
+
+#   if parameters[0].kind != vkString:
+#     result = newFunResultWarn(wExpectedString, 0)
+#     return
+#   let str = parameters[0].stringv
+
+#   if parameters[1].kind != vkString:
+#     result = newFunResultWarn(wExpectedString, 1)
+#     return
+#   let pattern = parameters[1].stringv
+
+#   if parameters[2].kind != vkInt:
+#     result = newFunResultWarn(wExpectedInteger, 2)
+#     return
+#   let start = int(parameters[2].intv)
+
+#   if start < 0 or start > str.len:
+#     result = newFunResultWarn(wInvalidPosition, 1, $start)
+#     return
+
+#   # let matcher = newMatcher(pattern, numGroups)
+#   # let matchesO = getMatches(matcher, str, start)
+#   # check matchesO.isSome
+#   #
+#   # var dict: VarDic
+#   #
+#   # Matches = object
+#   #   groups: seq[string]
+#   #   length: Natural
+#   #   start: Natural
+
 const
   functionsList = [
     ("len", funLen),
@@ -768,7 +820,7 @@ const
     ("dict", funDict),
     ("list", funList),
     ("replace", funReplace),
-# regex matching
+    # ("match", funMatch),
 # format
 # lineNumber
 # quotehtml

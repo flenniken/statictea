@@ -1,6 +1,23 @@
 import regexes
 import unittest
 import options
+import tables
+import vartypes
+import env
+
+proc newMatcherDict(length: Natural, groups: varargs[string]): VarsDict =
+    result["len"] = newValue(length)
+    for ix, group in groups:
+      result["g" & $ix] = newValue(group)
+
+proc testMatchRegex(str: string, pattern: string, start: Natural = 0,
+    eVarsDictO: Option[VarsDict] = none(VarsDict)): bool =
+  ## Test matchRegex
+  let varsDictO = matchRegex(str, pattern, start)
+  if not expectedItem("varsDictO", varsDictO, eVarsDictO):
+    result = false
+  else:
+    result = true
 
 suite "regexes.nim":
   test "startPointer":
@@ -75,3 +92,51 @@ suite "regexes.nim":
 
     let matcher = newMatcher(r"(abc)", 1)
     check checkMatcher(matcher, "  abc asdfasdfdef def", 2, @["abc"], 3)
+
+  test "matchRegex":
+    let eVarsDictO = some(newMatcherDict(12, "o", "testing"))
+    check testMatchRegex("hellotesting", r".*ll(o)(testing)*", 0, eVarsDictO = eVarsDictO)
+
+  test "matchRegex one match":
+    let eVarsDictO = some(newMatcherDict(7))
+    check testMatchRegex("nomatch", ".*match", 0, eVarsDictO = eVarsDictO)
+
+  test "matchRegex one group":
+    let eVarsDictO = some(newMatcherDict(7, "match"))
+    check testMatchRegex("nomatch", ".*(match)", 0, eVarsDictO = eVarsDictO)
+
+  test "matchRegex two groups":
+    let eVarsDictO = some(newMatcherDict(8, "yes", "match"))
+    check testMatchRegex("yesmatch", "(yes)(match)", 0, eVarsDictO = eVarsDictO)
+
+  test "matchRegex 10 groups":
+    let eVarsDictO = some(newMatcherDict(10, "y", "e", "s", "m", "a", "t", "c", "h", "e", "s"))
+    check testMatchRegex("yesmatches", "(y)(e)(s)(m)(a)(t)(c)(h)(e)(s)", 0, eVarsDictO = eVarsDictO)
+
+  test "matchRegex length":
+    let eVarsDictO = some(newMatcherDict(10, "match"))
+    check testMatchRegex("   match = ", ".*(match) =", 0, eVarsDictO = eVarsDictO)
+
+  test "matchRegex start":
+    let eVarsDictO = some(newMatcherDict(7, "match"))
+    check testMatchRegex("   match = ", ".*(match) =", 3, eVarsDictO = eVarsDictO)
+
+  test "matchRegex anchor":
+    let eVarsDictO = some(newMatcherDict(5))
+    check testMatchRegex("match = asdf", "^match", 0, eVarsDictO = eVarsDictO)
+
+  test "matchRegex start anchor":
+    # This behaves this way because nim sets the anchor option.
+    check testMatchRegex(" match = asdf", "^match", 1, eVarsDictO = none(VarsDict))
+
+  test "matchRegex no match":
+    check testMatchRegex("nomatch", "he(ll)o", 0)
+    check testMatchRegex("hellotesting", "ll(o8)(testing)*", 0)
+    check testMatchRegex("nomatch", ".*match3", 0)
+    check testMatchRegex("nomattchtjj", ".*match", 0)
+    check testMatchRegex("nomatch", ".*(match) ", 0)
+    check testMatchRegex("yesmatch", "(yes)7(match)", 0)
+    check testMatchRegex("yesmatches", "(y)(s)(m)(a)(t)(c)(h)(e)(s)")
+    check testMatchRegex("   match = ", "(match) =", 0)
+    check testMatchRegex("   match = ", "(match) 7", 3)
+    check testMatchRegex(" match = asdf", "^match", 0)

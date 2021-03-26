@@ -37,8 +37,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import re
 import options
+import tables
+import vartypes
 when defined(test):
   import strutils
+
+const
+  ## The maximum number of groups allowed in the matchRegex procedure.
+  maxGroups = 10
 
 type
   Matches* = object
@@ -95,6 +101,30 @@ proc getMatches*(matcher: Matcher, line: string, start: Natural = 0):
     matches.length = length
     matches.start = start
     result = some(matches)
+
+proc matchRegex*(str: string, pattern: string, start: Natural = 0): Option[VarsDict] =
+  ## Match a pattern in a string.
+  ##
+  ## The match function returns a dictionary with the results of the
+  ## match.
+
+  var groups = newSeq[string](maxGroups)
+  let regex = re(pattern)
+  let length = matchLen(str, regex, groups, start)
+  if length != -1:
+    var dict = newVarsDict()
+    dict["len"] = newValue(length)
+
+    # Find the last non-empty group.
+    var ixList = -1
+    for ix, group in groups:
+      if group != "":
+        ixList = ix
+
+    if ixList != -1:
+      for ix in countUp(0, ixList):
+        dict["g" & $ix] = newValue(groups[ix])
+    result = some(dict)
 
 when defined(test):
   proc startPointer*(start: Natural): string =

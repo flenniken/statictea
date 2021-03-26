@@ -155,6 +155,16 @@ func `$`*(kind: ValueKind): string =
   of vkList:
     result = "list"
 
+func `$`*(varsDict: VarsDict): string =
+  ## Return a string representation of a VarsDict.
+  var list = newSeq[string]()
+  for k, v in varsDict.pairs():
+    if v.kind == vkString:
+      list.add(""""$1": "$2"""" % [k, v.stringv])
+    else:
+      list.add(""""$1": $2""" % [k, $v])
+  result = "{$1}" % [list.join(", ")]
+
 func `$`*(s: Statement): string =
   ## Retrun a string representation of a Statement.
   result = "$1, $2: '$3'" % [$s.lineNum, $s.start, s.text]
