@@ -801,6 +801,12 @@ proc funReplace*(parameters: seq[Value]): FunResult =
 #   #   length: Natural
 #   #   start: Natural
 
+# proc newMatcherDict(length: Natural, groups: varargs[string]): VarsDict =
+#     result["len"] = newValue(length)
+#     for ix, group in groups:
+#       result["g" & $ix] = newValue(group)
+
+
 const
   functionsList = [
     ("len", funLen),

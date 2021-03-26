@@ -37,10 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import re
 import options
-import tables
-import vartypes
 when defined(test):
   import strutils
+  import env
 
 const
   ## The maximum number of groups allowed in the matchRegex procedure.
@@ -102,18 +101,18 @@ proc getMatches*(matcher: Matcher, line: string, start: Natural = 0):
     matches.start = start
     result = some(matches)
 
-proc matchRegex*(str: string, pattern: string, start: Natural = 0): Option[VarsDict] =
+# todo: cache regex and pattern.
+
+proc matchRegex*(str: string, pattern: string, start: Natural = 0): Option[Matches] =
   ## Match a pattern in a string.
-  ##
-  ## The match function returns a dictionary with the results of the
-  ## match.
 
   var groups = newSeq[string](maxGroups)
   let regex = re(pattern)
   let length = matchLen(str, regex, groups, start)
   if length != -1:
-    var dict = newVarsDict()
-    dict["len"] = newValue(length)
+    var matches = Matches(length: length, groups: newSeq[string]())
+    matches.length = length
+    matches.start = start
 
     # Find the last non-empty group.
     var ixList = -1
@@ -121,10 +120,11 @@ proc matchRegex*(str: string, pattern: string, start: Natural = 0): Option[VarsD
       if group != "":
         ixList = ix
 
+    # Return the matches up to the last non-empty one.
     if ixList != -1:
       for ix in countUp(0, ixList):
-        dict["g" & $ix] = newValue(groups[ix])
-    result = some(dict)
+        matches.groups.add(groups[ix])
+    result = some(matches)
 
 when defined(test):
   proc startPointer*(start: Natural): string =
@@ -167,6 +167,8 @@ when defined(test):
       echo "  start:  $1" % startPointer(expectedStart)
       echo "pattern: '$1'" % matcher.pattern
 
+  # proc testMatchRegex*(str: string, pattern: string, start: Natural = 0,
+  #     eMatchesO: Option[Matches] = none(Matches)): bool =
   proc checkMatcher*(matcher: Matcher, line: string, start: Natural,
       expectedStrings: seq[string], expectedLength: Natural): bool =
     ## Return true when the matcher matches the line with the
@@ -190,3 +192,18 @@ when defined(test):
     echo "pattern: $1" % matcher.pattern
     for group in matches.groups:
       echo "got: '$1'" % [group]
+
+  proc testMatchRegex*(str: string, pattern: string, start: Natural = 0,
+      eMatchesO: Option[Matches] = none(Matches)): bool =
+    ## Test matchRegex
+    let matchesO = matchRegex(str, pattern, start)
+    if not expectedItem("matchesO", matchesO, eMatchesO):
+      result = false
+    else:
+      result = true
+
+  proc newMatches*(length: Natural, start: Natural, groups: varargs[string]): Matches =
+    result.length = length
+    result.start = start
+    for group in groups:
+      result.groups.add(group)

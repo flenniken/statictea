@@ -36,7 +36,6 @@ type
     ## The precompiled regular expressions used for parsing lines.
     prepostTable*: PrepostTable
     prefixMatcher*: Matcher
-    commandMatcher*: Matcher
     variableMatcher*: Matcher
     equalSignMatcher*: Matcher
     allSpaceTabMatcher*: Matcher
@@ -75,9 +74,10 @@ proc getPrefixMatcher*(prepostTable: PrepostTable): Matcher =
     terms.add(r"\Q$1\E" % prefix)
   result = newMatcher(r"^($1)\s*" % terms.join("|"), 1)
 
-proc getCommandMatcher*(): Matcher =
-  ## Return a matcher for matching a command. The group contains the command matched.
-  result = newMatcher(r"($1)" % commands.join("|"), 1)
+func matchCommand*(line: string, start: Natural = 0): Option[Matches] =
+  ## Match statictea commands.
+  let pattern = r"($1)" % commands.join("|")
+  result = matchRegex(line, pattern, start)
 
 proc getLastPartMatcher*(postfix: string): Matcher =
   ## Return a matcher that matches the last part of the line.  It
@@ -210,7 +210,6 @@ proc getCompiledMatchers*(prepostTable: PrepostTable): CompiledMatchers =
   ## CompiledMatchers object.
   result.prepostTable = prepostTable
   result.prefixMatcher = getPrefixMatcher(result.prepostTable)
-  result.commandMatcher = getCommandMatcher()
   result.variableMatcher = getVariableMatcher()
   result.allSpaceTabMatcher = getAllSpaceTabMatcher()
   result.numberMatcher = getNumberMatcher()

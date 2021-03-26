@@ -4,6 +4,16 @@ import matches
 import tables
 import options
 import regexes
+import env
+
+proc testMatchCommand(line: string, start: Natural = 0,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  ## Test MatchCommand.
+  let matchesO = matchCommand(line, start)
+  if not expectedItem("matchesO", matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
 
 suite "matches.nim":
 
@@ -59,34 +69,33 @@ suite "matches.nim":
     check prepostTable[prefix] == "post"
 
   test "command matcher":
-    var commandMatcher = getCommandMatcher()
+    check testMatchCommand("<!--$ nextline -->", 6, some(newMatches(8, 6, "nextline")))
 
-    check checkMatcher(commandMatcher, "<!--$ nextline -->", 6, @["nextline"], 8)
-    check checkMatcher(commandMatcher, "<!--$ block    -->", 6, @["block"], 5)
-    check checkMatcher(commandMatcher, "<!--$ replace  -->", 6, @["replace"], 7)
-    check checkMatcher(commandMatcher, "<!--$ endblock -->", 6, @["endblock"], 8)
-    check checkMatcher(commandMatcher, "<!--$ endreplace  -->", 6, @["endreplace"], 10)
-    check checkMatcher(commandMatcher, "<!--$ #  -->", 6, @["#"], 1)
-    check checkMatcher(commandMatcher, "<!--$ :  -->", 6, @[":"], 1)
-    check checkMatcher(commandMatcher, "  nextline ", 2, @["nextline"], 8)
+    check testMatchCommand("<!--$ block    -->", 6, some(newMatches(5, 6, "block")))
+    check testMatchCommand("<!--$ replace  -->", 6, some(newMatches(7, 6, "replace")))
+    check testMatchCommand("<!--$ endblock -->", 6, some(newMatches(8, 6, "endblock")))
+    check testMatchCommand("<!--$ endreplace  -->", 6, some(newMatches(10, 6, "endreplace")))
+    check testMatchCommand("<!--$ #  -->", 6, some(newMatches(1, 6, "#")))
+    check testMatchCommand("<!--$ :  -->", 6, some(newMatches(1, 6, ":")))
+    check testMatchCommand("  nextline ", 2, some(newMatches(8, 2, "nextline")))
 
-    check checkMatcher(commandMatcher, "<!--$nextline-->", 5, @["nextline"], 8)
-    check checkMatcher(commandMatcher, "<!--$nextline-->\n", 5, @["nextline"], 8)
-    check checkMatcher(commandMatcher, "#$nextline", 2, @["nextline"], 8)
-    check checkMatcher(commandMatcher, "#$nextline\n", 2, @["nextline"], 8)
-    check checkMatcher(commandMatcher, "#$nextline ", 2, @["nextline"], 8)
-    check checkMatcher(commandMatcher, "#$nextline  ", 2, @["nextline"], 8)
-    check checkMatcher(commandMatcher, r"#$nextline\", 2, @["nextline"], 8)
-    check checkMatcher(commandMatcher, "#$nextline\\", 2, @["nextline"], 8)
-    check checkMatcher(commandMatcher, "#$nextline\\\n", 2, @["nextline"], 8)
-    check checkMatcher(commandMatcher, "#$nextline\r\n", 2, @["nextline"], 8)
-    check checkMatcher(commandMatcher, "#$nextline\\\r\n", 2, @["nextline"], 8)
-    check checkMatcher(commandMatcher, "#$nextline \\\r\n", 2, @["nextline"], 8)
-    check checkMatcher(commandMatcher, "#$#", 2, @["#"], 1)
-    check checkMatcher(commandMatcher, "#$#a", 2, @["#"], 1)
+    check testMatchCommand("<!--$nextline-->", 5, some(newMatches(8, 5, "nextline")))
+    check testMatchCommand("<!--$nextline-->\n", 5, some(newMatches(8, 5, "nextline")))
+    check testMatchCommand("#$nextline", 2, some(newMatches(8, 2, "nextline")))
+    check testMatchCommand("#$nextline\n", 2, some(newMatches(8, 2, "nextline")))
+    check testMatchCommand("#$nextline ", 2, some(newMatches(8, 2, "nextline")))
+    check testMatchCommand("#$nextline  ", 2, some(newMatches(8, 2, "nextline")))
+    check testMatchCommand(r"#$nextline\", 2, some(newMatches(8, 2, "nextline")))
+    check testMatchCommand("#$nextline\\", 2, some(newMatches(8, 2, "nextline")))
+    check testMatchCommand("#$nextline\\\n", 2, some(newMatches(8, 2, "nextline")))
+    check testMatchCommand("#$nextline\r\n", 2, some(newMatches(8, 2, "nextline")))
+    check testMatchCommand("#$nextline\\\r\n", 2, some(newMatches(8, 2, "nextline")))
+    check testMatchCommand("#$nextline \\\r\n", 2, some(newMatches(8, 2, "nextline")))
+    check testMatchCommand("#$#", 2, some(newMatches(1, 2, "#")))
+    check testMatchCommand("#$#a", 2, some(newMatches(1, 2, "#")))
 
-    check not commandMatcher.getMatches(" nextlin", 2).isSome
-    check not commandMatcher.getMatches(" coment ", 2).isSome
+    check testMatchCommand(" nextlin", 2)
+    check testMatchCommand(" coment ", 2)
 
   test "last part matcher":
     var matcher = getLastPartMatcher("-->")

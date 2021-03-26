@@ -50,7 +50,7 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
   lineParts.prefix = prefixMatch.getGroup()
 
   # Get the command.
-  let commandMatchO = getMatches(cm.commandMatcher, line, prefixMatch.length)
+  let commandMatchO = matchCommand(line, prefixMatch.length)
   if not isSome(commandMatchO):
     env.warn(lineNum, wNoCommand, $(prefixMatch.length+1))
     return
