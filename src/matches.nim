@@ -32,20 +32,9 @@ type
   PrepostTable* = OrderedTable[string, string]
     ## The prefix postfix pairs stored in an ordered dictionary.
 
+  # todo: remove CompiledMatchers.
   CompiledMatchers* = object
-    ## The precompiled regular expressions used for parsing lines.
     prepostTable*: PrepostTable
-    prefixMatcher*: Matcher
-    variableMatcher*: Matcher
-    equalSignMatcher*: Matcher
-    allSpaceTabMatcher*: Matcher
-    numberMatcher*: Matcher
-    stringMatcher*: Matcher
-    leftParenthesesMatcher*: Matcher
-    rightParenthesesMatcher*: Matcher
-    commaParenthesesMatcher*: Matcher
-    leftBracketMatcher*: Matcher
-    tabSpaceMatcher*: Matcher
 
 proc getDefaultPrepostTable*(): PrepostTable =
   ## Return the default ordered table that maps prefixes to postfixes.
@@ -66,13 +55,12 @@ proc getUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
     assert prepost.pre != ""
     result[prepost.pre] = prepost.post
 
-proc getPrefixMatcher*(prepostTable: PrepostTable): Matcher =
-  ## Return a matcher for matching the prefixes and optional following
-  ## whitespace. The group contains the prefix found.
+proc matchPrefix*(line: string, start: Natural, prepostTable: PrepostTable): Option[Matches] =
   var terms = newSeq[string]()
   for prefix, _ in prepostTable:
     terms.add(r"\Q$1\E" % prefix)
-  result = newMatcher(r"^($1)\s*" % terms.join("|"), 1)
+  let pattern = r"^($1)\s*" % terms.join("|")
+  result = matchRegex(line, pattern, start)
 
 func matchCommand*(line: string, start: Natural = 0): Option[Matches] =
   ## Match statictea commands.
@@ -90,7 +78,7 @@ func matchLastPart*(line: string, start: Natural, postfix: string): Option[Match
     pattern = r"([\\]{0,1})\Q$1\E([\r]{0,1}\n){0,1}$" % postfix
   result = matchRegex(line, pattern, start)
 
-proc getLastPart*(matcher: Matcher, line: string): Option[Matches] =
+proc getLastPart*(line: string, postfix: string): Option[Matches] =
   ## Return the optional slash and line endings from the line.
 
   # Start checking 3 characters before the end to account for the
@@ -99,12 +87,12 @@ proc getLastPart*(matcher: Matcher, line: string): Option[Matches] =
   # anchor in the pattern does not do what I expect when the start
   # position is not 1.
 
-  var startPos = line.len - matcher.arg1.len - 3
+  var startPos = line.len - postfix.len - 3
   if startPos < 0:
     return
 
   for start in startPos..startPos+3:
-    let matchesO = getMatches(matcher, line, start)
+    let matchesO = matchLastPart(line, start, postfix)
     if matchesO.isSome:
       return matchesO
 
@@ -115,20 +103,19 @@ proc getLastPart*(matcher: Matcher, line: string): Option[Matches] =
 #   -->n
 #    -->
 
-proc getAllSpaceTabMatcher*(): Matcher =
-  ## Return a matcher that determines whether a string is all spaces
-  ## and tabs.
-  result = newMatcher(r"^[ \t]*$", 0)
+proc matchAllSpaceTab*(line: string, start: Natural): Option[Matches] =
+  let pattern = r"^[ \t]*$"
+  result = matchRegex(line, pattern, start)
 
-proc getTabSpaceMatcher*(): Matcher =
-  ## Return a matcher that matches one or more tabs and spaces.
-  result = newMatcher(r"[ \t]+", 0)
+proc matchTabSpace*(line: string, start: Natural): Option[Matches] =
+  let pattern = r"[ \t]+"
+  result = matchRegex(line, pattern, start)
 
-proc notEmptyOrSpaces*(allSpaceTabMatcher: Matcher, text: string): bool =
+proc notEmptyOrSpaces*(text: string): bool =
   ## Return true when a statement is not empty or not all whitespace.
   if text.len != 0:
-    let matches = getMatches(allSpaceTabMatcher, text)
-    if not matches.isSome:
+    let matchesO = matchAllSpaceTab(text, 0)
+    if not matchesO.isSome:
       result = true
 
 proc getVariableMatcher*(): Matcher =
@@ -148,15 +135,27 @@ proc getVariableMatcher*(): Matcher =
   # Note: nim sets the regex anchor option.
   result = newMatcher(r"(\s*)([a-z]\.){0,1}([a-zA-Z][a-zA-Z0-9_]{0,63})\s*", 3)
 
+proc matchVariable*(line: string, start: Natural): Option[Matches] =
+  let pattern = r"(\s*)([a-z]\.){0,1}([a-zA-Z][a-zA-Z0-9_]{0,63})\s*"
+  result = matchRegex(line, pattern, start)
+
 proc getEqualSignMatcher*(): Matcher =
   ## Return a matcher that matches an equal sign and the optional following white space.
   # Note: nim sets the regex anchor option.
   result = newMatcher(r"(=)\s*", 1)
 
+proc matchEqualSign*(line: string, start: Natural): Option[Matches] =
+  let pattern = r"(=)\s*"
+  result = matchRegex(line, pattern, start)
+
 proc getLeftParenthesesMatcher*(): Matcher =
   ## Return a matcher that matches a left parentheses and the optional following white space.
   # Note: nim sets the regex anchor option.
   result = newMatcher(r"\(\s*", 0)
+
+proc matchLeftParentheses*(line: string, start: Natural): Option[Matches] =
+  let pattern = r"\(\s*"
+  result = matchRegex(line, pattern, start)
 
 proc getCommaParenthesesMatcher*(): Matcher =
   ## Return a matcher that matches a comma or right parentheses and the optional following
@@ -164,10 +163,18 @@ proc getCommaParenthesesMatcher*(): Matcher =
   # Note: nim sets the regex anchor option.
   result = newMatcher(r"([,)])\s*", 1)
 
+proc matchCommaParentheses*(line: string, start: Natural): Option[Matches] =
+  let pattern = r"([,)])\s*"
+  result = matchRegex(line, pattern, start)
+
 proc getRightParenthesesMatcher*(): Matcher =
   ## Return a matcher that matches a right parentheses and the optional following white space.
   # Note: nim sets the regex anchor option.
   result = newMatcher(r"\)\s*", 0)
+
+proc matchRightParentheses*(line: string, start: Natural): Option[Matches] =
+  let pattern = r"\)\s*"
+  result = matchRegex(line, pattern, start)
 
 proc getNumberMatcher*(): Matcher =
   ## Return a matcher that matches a number and the optional trailing whitespace. Return the
@@ -181,6 +188,10 @@ proc getNumberMatcher*(): Matcher =
 
   result = newMatcher(r"-{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*\s*", 1)
 
+proc matchNumber*(line: string, start: Natural): Option[Matches] =
+  let pattern = r"-{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*\s*"
+  result = matchRegex(line, pattern, start)
+
 proc getStringMatcher*(): Matcher =
   ## Return a matcher that matches a string.
 
@@ -191,6 +202,10 @@ proc getStringMatcher*(): Matcher =
   # nim sets the regex anchor option.
 
   result = newMatcher("""'([^']*)'\s*|"([^"]*)"\s*""", 2)
+
+proc matchString*(line: string, start: Natural): Option[Matches] =
+  let pattern = """'([^']*)'\s*|"([^"]*)"\s*"""
+  result = matchRegex(line, pattern, start)
 
 proc getLeftBracketMatcher*(): Matcher =
   ## Match everything up to a left backet. The match length includes
@@ -203,30 +218,23 @@ proc getLeftBracketMatcher*(): Matcher =
   #                   ^
   result = newMatcher("[^{]*{", 0)
 
+proc matchLeftBracket*(line: string, start: Natural): Option[Matches] =
+  let pattern = "[^{]*{"
+  result = matchRegex(line, pattern, start)
+
 proc getCompiledMatchers*(prepostTable: PrepostTable): CompiledMatchers =
   ## Compile all the matchers and return them in the
   ## CompiledMatchers object.
   result.prepostTable = prepostTable
-  result.prefixMatcher = getPrefixMatcher(result.prepostTable)
-  result.variableMatcher = getVariableMatcher()
-  result.allSpaceTabMatcher = getAllSpaceTabMatcher()
-  result.numberMatcher = getNumberMatcher()
-  result.equalSignMatcher = getEqualSignMatcher()
-  result.stringMatcher = getStringMatcher()
-  result.leftParenthesesMatcher = getLeftParenthesesMatcher()
-  result.rightParenthesesMatcher = getRightParenthesesMatcher()
-  result.commaParenthesesMatcher = getCommaParenthesesMatcher()
-  result.leftBracketMatcher = getLeftBracketMatcher()
-  result.tabSpaceMatcher = getTabSpaceMatcher()
+
 
 proc getCompiledMatchers*(): CompiledMatchers =
   ## Get the compiled matchers using the default prepost items.
   result = getCompiledMatchers(getDefaultPrepostTable())
 
-when defined(test):
-  proc checkGetLastPart*(matcher: Matcher, line: string, expectedStart: Natural,
-      expected: seq[string], expectedLength: Natural): bool =
-    let matchesO = getLastPart(matcher, line)
-    result = checkMatches(matchesO, matcher, line, expectedStart,
-      expected, expectedLength)
-
+# when defined(test):
+#   proc checkGetLastPart*(matcher: Matcher, line: string, expectedStart: Natural,
+#       expected: seq[string], expectedLength: Natural): bool =
+#     let matchesO = getLastPart(matcher, line)
+#     result = checkMatches(matchesO, matcher, line, expectedStart,
+#       expected, expectedLength)

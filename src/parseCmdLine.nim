@@ -42,7 +42,7 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
   let cm = compiledMatchers
 
   # Get the prefix.
-  let prefixMatchO = getMatches(cm.prefixMatcher, line)
+  let prefixMatchO = matchPrefix(line, 0, cm.prepostTable)
   if not prefixMatchO.isSome():
     # No prefix so not a command line. No error.
     return
@@ -58,8 +58,7 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
   lineParts.command = commandMatch.getGroup()
 
   # Get the optional spaces.
-  let spaceMatchO = getMatches(cm.tabSpaceMatcher, line,
-                               prefixMatch.length + commandMatch.length)
+  let spaceMatchO = matchTabSpace(line, prefixMatch.length + commandMatch.length)
 
   # Get the expected postfix. Not all prefixes have a postfix.
   assert cm.prepostTable.hasKey(lineParts.prefix)
@@ -67,7 +66,7 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
 
   # Match the expected postfix at the end and return the optional
   # continuation and its position when it matches.
-  let lastPartO = matchLastPart(line, start, lineParts.postfix)
+  let lastPartO = getLastPart(line, lineParts.postfix)
   if not isSome(lastPartO):
     env.warn(lineNum, wNoPostfix, lineParts.postfix)
     return

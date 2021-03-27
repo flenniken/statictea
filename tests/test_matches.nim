@@ -24,6 +24,40 @@ proc testMatchLastPart(line: string, start: Natural, prefix: string,
   else:
     result = true
 
+proc testMatchAllSpaceTab(line: string, start: Natural,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = matchAllSpaceTab(line, start)
+  if not expectedItem("matchesO", matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
+
+proc testMatchTabSpace(line: string, start: Natural,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = matchTabSpace(line, start)
+  if not expectedItem("matchesO", matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
+
+proc testMatchPrefix(line: string, start: Natural,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+
+  let prepostTable = getDefaultPrepostTable()
+  let matchesO = matchPrefix(line, start, prepostTable)
+  if not expectedItem("matchesO", matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
+
+proc testLeftParentheses(line: string, start: Natural,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = matchLeftParentheses(line, start)
+  if not expectedItem("matchesO", matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
+
 suite "matches.nim":
 
   test "prepost table":
@@ -34,35 +68,34 @@ suite "matches.nim":
       # echo "$1 nextline $2" % [prefix, postfix]
     check prepostTable["<!--$"] == "-->"
 
-  test "prefixMatcher tests":
-    var prefixMatcher = getPrefixMatcher(getDefaultPrepostTable())
+  test "matchPrefix tests":
 
-    check checkMatcher(prefixMatcher, "<!--$ nextline -->", 0, @["<!--$"], 6)
-    check checkMatcher(prefixMatcher, "#$ nextline", 0, @["#$"], 3)
-    check checkMatcher(prefixMatcher, ";$ nextline", 0, @[";$"], 3)
-    check checkMatcher(prefixMatcher, "//$ nextline", 0, @["//$"], 4)
-    check checkMatcher(prefixMatcher, "/*$ nextline */", 0, @["/*$"], 4)
-    check checkMatcher(prefixMatcher, "&lt;!--$ nextline --&gt;", 0, @["&lt;!--$"], 9)
-    check checkMatcher(prefixMatcher, "$$ nextline", 0, @["$$"], 3)
-    check checkMatcher(prefixMatcher, "<!--$ : -->", 0, @["<!--$"], 6)
-    check checkMatcher(prefixMatcher, "<!--$         nextline -->", 0, @["<!--$"], 14)
-    check checkMatcher(prefixMatcher, "<!--$\tnextline -->", 0, @["<!--$"], 6)
-    check checkMatcher(prefixMatcher, "#$ nextline\n", 0, @["#$"], 3)
-    check checkMatcher(prefixMatcher, "#$ nextline   \n", 0, @["#$"], 3)
-    check checkMatcher(prefixMatcher, "#$ nextline   \\\n", 0, @["#$"], 3)
+    check testMatchPrefix("<!--$ nextline -->", 0, some(newMatches(6, 0, "<!--$")))
+    check testMatchPrefix("#$ nextline", 0, some(newMatches(3, 0, "#$")))
+    check testMatchPrefix(";$ nextline", 0, some(newMatches(3, 0, ";$")))
+    check testMatchPrefix("//$ nextline", 0, some(newMatches(4, 0, "//$")))
+    check testMatchPrefix("/*$ nextline */", 0, some(newMatches(4, 0, "/*$")))
+    check testMatchPrefix("&lt;!--$ nextline --&gt;", 0, some(newMatches(9, 0, "&lt;!--$")))
+    check testMatchPrefix("$$ nextline", 0, some(newMatches(3, 0, "$$")))
+    check testMatchPrefix("<!--$ : -->", 0, some(newMatches(6, 0, "<!--$")))
+    check testMatchPrefix("<!--$         nextline -->", 0, some(newMatches(14, 0, "<!--$")))
+    check testMatchPrefix("<!--$\tnextline -->", 0, some(newMatches(6, 0, "<!--$")))
+    check testMatchPrefix("#$ nextline\n", 0, some(newMatches(3, 0, "#$")))
+    check testMatchPrefix("#$ nextline   \n", 0, some(newMatches(3, 0, "#$")))
+    check testMatchPrefix("#$ nextline   \\\n", 0, some(newMatches(3, 0, "#$")))
 
-    check checkMatcher(prefixMatcher, "#$", 0, @["#$"], 2)
-    check checkMatcher(prefixMatcher, "#$ ", 0, @["#$"], 3)
-    check checkMatcher(prefixMatcher, "#$    ", 0, @["#$"], 6)
-    check checkMatcher(prefixMatcher, "#$nextline", 0, @["#$"], 2)
-    check checkMatcher(prefixMatcher, "#$ nextline", 0, @["#$"], 3)
-    check checkMatcher(prefixMatcher, "#$  nextline", 0, @["#$"], 4)
-    check checkMatcher(prefixMatcher, "#$\n", 0, @["#$"], 3)
-    check checkMatcher(prefixMatcher, "<!--$", 0, @["<!--$"], 5)
-    check checkMatcher(prefixMatcher, "<!--$ ", 0, @["<!--$"], 6)
-    check checkMatcher(prefixMatcher, "$$ ", 0, @["$$"], 3)
+    check testMatchPrefix("#$", 0, some(newMatches(2, 0, "#$")))
+    check testMatchPrefix("#$ ", 0, some(newMatches(3, 0, "#$")))
+    check testMatchPrefix("#$    ", 0, some(newMatches(6, 0, "#$")))
+    check testMatchPrefix("#$nextline", 0, some(newMatches(2, 0, "#$")))
+    check testMatchPrefix("#$ nextline", 0, some(newMatches(3, 0, "#$")))
+    check testMatchPrefix("#$  nextline", 0, some(newMatches(4, 0, "#$")))
+    check testMatchPrefix("#$\n", 0, some(newMatches(3, 0, "#$")))
+    check testMatchPrefix("<!--$", 0, some(newMatches(5, 0, "<!--$")))
+    check testMatchPrefix("<!--$ ", 0, some(newMatches(6, 0, "<!--$")))
+    check testMatchPrefix("$$ ", 0, some(newMatches(3, 0, "$$")))
 
-    check not prefixMatcher.getMatches("<--$ nextline -->", 0).isSome
+    check testMatchPrefix("<--$ nextline -->", 0)
 
   test "getUserPrepostTable user prefix":
     var prepostList = @[("abc", "def")]
@@ -132,30 +165,29 @@ suite "matches.nim":
     check testMatchLastPart("<!--$ nextline a\\", 16, "", some(newMatches(1, 16, r"\")))
     check testMatchLastPart("<!--$ nextline a\\\n", 16, "", some(newMatches(2, 16, r"\", "\n")))
     check testMatchLastPart("<!--$ nextline a\\\r\n", 16, "", some(newMatches(3, 16, r"\", "\r\n")))
+    check testMatchLastPart(r"#$ nextline \", 12, "", some(newMatches(1, 12, r"\")))
 
   test "get space tab":
-    let matcher = getAllSpaceTabMatcher()
-    check checkMatcher(matcher, "    ", 0, @[], 4)
-    check checkMatcher(matcher, " \t \t   ", 0, @[], 7)
-    check not matcher.getMatches("    s   ", 0).isSome
+    check testMatchAllSpaceTab("    ", 0, some(newMatches(4, 0)))
+    check testMatchAllSpaceTab(" \t \t   ", 0, some(newMatches(7, 0)))
+    check testMatchAllSpaceTab("    s   ", 0)
 
   test "get tab space":
-    let matcher = getTabSpaceMatcher()
-    check checkMatcher(matcher, " ", 0, @[], 1)
-    check checkMatcher(matcher, "\t", 0, @[], 1)
-    check checkMatcher(matcher, " \t", 0, @[], 2)
-    check checkMatcher(matcher, "\t ", 0, @[], 2)
-    check checkMatcher(matcher, " a", 0, @[], 1)
-    check checkMatcher(matcher, "  a", 0, @[], 2)
-    check checkMatcher(matcher, "  \n", 0, @[], 2)
-    check checkMatcher(matcher, "  \r", 0, @[], 2)
-    check checkMatcher(matcher, "a ", 1, @[], 1)
-    check checkMatcher(matcher, "ab   ", 2, @[], 3)
+    check testMatchTabSpace(" ", 0, some(newMatches(1, 0)))
+    check testMatchTabSpace("\t", 0, some(newMatches(1, 0)))
+    check testMatchTabSpace(" \t", 0, some(newMatches(2, 0)))
+    check testMatchTabSpace("\t ", 0, some(newMatches(2, 0)))
+    check testMatchTabSpace(" a", 0, some(newMatches(1, 0)))
+    check testMatchTabSpace("  a", 0, some(newMatches(2, 0)))
+    check testMatchTabSpace("  \n", 0, some(newMatches(2, 0)))
+    check testMatchTabSpace("  \r", 0, some(newMatches(2, 0)))
+    check testMatchTabSpace("a ", 1, some(newMatches(1, 1)))
+    check testMatchTabSpace("ab   ", 2, some(newMatches(3, 2)))
 
-    check not matcher.getMatches("a", 0).isSome
-    check not matcher.getMatches("\n", 0).isSome
-    check not matcher.getMatches("\r", 0).isSome
-    check not matcher.getMatches(" a ", 1).isSome
+    check testMatchTabSpace("a", 0)
+    check testMatchTabSpace("\n", 0)
+    check testMatchTabSpace("\r", 0)
+    check testMatchTabSpace(" a ", 1)
 
   test "get variable":
     var matcher = getVariableMatcher()
@@ -242,9 +274,9 @@ suite "matches.nim":
     check checkMatcherNot(matcher, "-.1")
     check checkMatcherNot(matcher, " 4")
 
-  test "getCompiledMatchers":
-    let compiledMatchers = getCompiledMatchers()
-    check checkMatcher(compiledMatchers.numberMatcher, "a = 5", 4, @[""], 1)
+  test "matchNumber":
+    check matchNumber("a = 5", 4) == some(newMatches(1, 4))
+    check matchNumber("a = 5.3", 4) == some(newMatches(3, 4, "."))
 
   test "getStringMatcher":
     var matcher = getStringMatcher()
@@ -278,16 +310,15 @@ suite "matches.nim":
     check checkMatcherNot(matcher, ".")
 
   test "getLeftParenthesesMatcher":
-    var matcher = getLeftParenthesesMatcher()
-    check checkMatcher(matcher, "(", 0, @[], 1)
-    check checkMatcher(matcher, "( ", 0, @[], 2)
-    check checkMatcher(matcher, "( 5", 0, @[], 2)
-    check checkMatcher(matcher, "( 'abc'", 0, @[], 2)
+    check testLeftParentheses("(", 0, some(newMatches(1, 0)))
+    check testLeftParentheses("( ", 0, some(newMatches(2, 0)))
+    check testLeftParentheses("( 5", 0, some(newMatches(2, 0)))
+    check testLeftParentheses("( 'abc'", 0, some(newMatches(2, 0)))
 
-    check checkMatcherNot(matcher, ", (", 0)
-    check checkMatcherNot(matcher, "2(", 0)
-    check checkMatcherNot(matcher, "abc(", 0)
-    check checkMatcherNot(matcher, " (", 0)
+    check testLeftParentheses(", (", 0)
+    check testLeftParentheses("2(", 0)
+    check testLeftParentheses("abc(", 0)
+    check testLeftParentheses(" (", 0)
 
   test "getCommaParenthesesMatcher":
     var matcher = getCommaParenthesesMatcher()

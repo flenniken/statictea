@@ -240,8 +240,7 @@ proc lineToSegments(compiledMatchers: CompiledMatchers, line: string): seq[strin
     if pos >= line.len:
       break
     # Get the text before the variable including the left bracket.
-    let beforeVarO = getMatches(compiledMatchers.leftBracketMatcher,
-                                line, pos)
+    let beforeVarO = matchLeftBracket(line, pos)
     if not beforeVarO.isSome:
       # No variable, output the rest of the line as is.
       result.add(stringSegment(line, pos, line.len))
@@ -249,8 +248,7 @@ proc lineToSegments(compiledMatchers: CompiledMatchers, line: string): seq[strin
     let beforeVar = beforeVarO.get()
 
     # Match the variable. It matches leading and trailing whitespace.
-    let variableO = getMatches(compiledMatchers.variableMatcher,
-                                line, pos + beforeVar.length)
+    let variableO = matchVariable(line, pos + beforeVar.length)
     if not variableO.isSome:
       # Found left bracket but no variable, output what we have.
       nextPos = pos + beforeVar.length

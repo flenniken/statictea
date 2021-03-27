@@ -72,15 +72,31 @@ proc newMatcher*(pattern: string, numGroups: Natural,
 
 proc getGroup*(matches: Matches): string =
   ## Get the group when there is only one in matches.
-  result = matches.groups[0]
+  if matches.groups.len > 0:
+    result = matches.groups[0]
 
 proc get2Groups*(matches: Matches): (string, string) =
   ## Get the two groups when there are two groups in matches.
-  result = (matches.groups[0], matches.groups[1])
+  var one: string
+  var two: string
+  if matches.groups.len > 0:
+    one = matches.groups[0]
+  if matches.groups.len > 1:
+    two = matches.groups[1]
+  result = (one, two)
 
 proc get3Groups*(matches: Matches): (string, string, string) =
   ## Get the three groups when there are three groups in matches.
-  result = (matches.groups[0], matches.groups[1], matches.groups[2])
+  var one: string
+  var two: string
+  var three: string
+  if matches.groups.len > 0:
+    one = matches.groups[0]
+  if matches.groups.len > 1:
+    two = matches.groups[1]
+  if matches.groups.len > 2:
+    three = matches.groups[2]
+  result = (one, two, three)
 
 proc getMatches*(matcher: Matcher, line: string, start: Natural = 0):
                Option[Matches] =

@@ -46,7 +46,7 @@ statement 3 starts at line 3, position 7.
 # todo: test slash characters in strings.
 
 iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
-    seq[LineParts], allSpaceTabMatcher: Matcher): Statement {.tpub.} =
+    seq[LineParts]): Statement {.tpub.} =
   ## Iterate through the command's statements.  Statements are
   ## separated by semicolons and are not empty or all spaces.
 
@@ -75,7 +75,7 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
       let ch = line[pos]
       if state == State.start:
         if ch == ';':
-          if notEmptyOrSpaces(allSpaceTabMatcher, text):
+          if notEmptyOrSpaces(text):
             yield newStatement(text, lineNum, start)
           text.setLen(0)
           lineNum = lp.lineNum
@@ -103,7 +103,7 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
 
     # A statement is terminated by the end of the line by default.
     if not lp.continuation:
-      if notEmptyOrSpaces(allSpaceTabMatcher, text):
+      if notEmptyOrSpaces(text):
         yield newStatement(text, lineNum, start)
       # Setup variables for the next line, if there is one.
       text.setLen(0)
@@ -111,7 +111,7 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
         lineNum = lp.lineNum + 1
         start = cmdLineParts[ix+1].middleStart
 
-  if notEmptyOrSpaces(allSpaceTabMatcher, text):
+  if notEmptyOrSpaces(text):
     yield Statement(text: text, lineNum: lineNum, start: start)
 
 proc getString*(env: var Env, compiledMatchers: Compiledmatchers,
@@ -122,8 +122,7 @@ proc getString*(env: var Env, compiledMatchers: Compiledmatchers,
   ## after the last quote.
 
   # Check that we have a statictea string.
-  var matchesO = compiledMatchers.stringMatcher.getMatches(
-    statement.text, start)
+  var matchesO = matchString(statement.text, start)
   if not matchesO.isSome:
     env.warnStatement(statement, wNotString, start)
     return
@@ -149,8 +148,7 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
   ## number because it starts with a digit or minus sign.
 
   # Check that we have a statictea number.
-  var matchesO = compiledMatchers.numberMatcher.getMatches(
-    statement.text, start)
+  var matchesO = matchNumber(statement.text, start)
   if not matchesO.isSome:
     env.warnStatement(statement, wNotNumber, start)
     return
@@ -196,8 +194,7 @@ proc getFunctionValue*(env: var Env, compiledMatchers:
   var pos = start
 
   # If we get a right parentheses, there are no parameters.
-  let rightParenO = getMatches(compiledMatchers.rightParenthesesMatcher,
-                              statement.text, pos)
+  let rightParenO = matchRightParentheses(statement.text, pos)
   if rightParenO.isSome:
     pos = pos + rightParenO.get().length
   else:
@@ -214,8 +211,7 @@ proc getFunctionValue*(env: var Env, compiledMatchers:
       pos = pos + valueAndLengthO.get().length
 
       # Get the comma or right parentheses and white space following the value.
-      let commaParenO = getMatches(compiledMatchers.commaParenthesesMatcher,
-                                  statement.text, pos)
+      let commaParenO = matchCommaParentheses(statement.text, pos)
       if not commaParenO.isSome:
         env.warnStatement(statement, wMissingCommaParen, pos)
         return
@@ -264,16 +260,14 @@ proc getVarOrFunctionValue*(env: var Env, compiledMatchers:
   ## start.
 
   # Get the variable or function name. Match the surrounding white space.
-  let variableO = getMatches(compiledMatchers.variableMatcher,
-                             statement.text, start)
+  let variableO = matchVariable(statement.text, start)
   assert variableO.isSome
 
   let variable = variableO.get()
   let (_, nameSpace, varName) = variable.get3Groups()
   if nameSpace == "":
     # We have a variable or a function.
-    let parenthesesO = getMatches(compiledMatchers.leftParenthesesMatcher,
-                                statement.text, start+variable.length)
+    let parenthesesO = matchLeftParentheses(statement.text, start+variable.length)
     if parenthesesO.isSome:
       # We have a function, run it.
 
@@ -335,7 +329,7 @@ proc runStatement*(env: var Env, statement: Statement,
   ## Run one statement. Return the variable namespace, name and value.
 
   # Get the variable name. Match the surrounding white space.
-  let variableO = getMatches(compiledMatchers.variableMatcher, statement.text)
+  let variableO = matchVariable(statement.text, 0)
   if not variableO.isSome:
     env.warnStatement(statement, wMissingStatementVar, 0)
     return
@@ -343,8 +337,7 @@ proc runStatement*(env: var Env, statement: Statement,
   let (_, nameSpace, varName) = variable.get3Groups()
 
   # Get the equal sign and following whitespace.
-  let equalSignO = getMatches(compiledMatchers.equalSignMatcher,
-                              statement.text, variable.length)
+  let equalSignO = matchEqualSign(statement.text, variable.length)
   if not equalSignO.isSome:
     env.warnStatement(statement, wInvalidVariable, 0)
     return
@@ -389,8 +382,7 @@ proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
   resetVariables(variables)
 
   # Loop over the statements and run each one.
-  for statement in yieldStatements(cmdLines, cmdLineParts,
-      compiledMatchers.allSpaceTabMatcher):
+  for statement in yieldStatements(cmdLines, cmdLineParts):
     # Run the statement and assign the return value to the variable.
     # When there is a statement error, the statement is skipped.
     let variableDataO = runStatement(env, statement, compiledMatchers, variables)
