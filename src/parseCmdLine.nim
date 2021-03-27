@@ -67,8 +67,7 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
 
   # Match the expected postfix at the end and return the optional
   # continuation and its position when it matches.
-  var lastPartMatcher = getLastPartMatcher(lineParts.postfix)
-  let lastPartO = getLastPart(lastPartMatcher, line)
+  let lastPartO = matchLastPart(line, start, lineParts.postfix)
   if not isSome(lastPartO):
     env.warn(lineNum, wNoPostfix, lineParts.postfix)
     return

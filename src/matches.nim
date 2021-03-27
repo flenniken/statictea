@@ -79,18 +79,16 @@ func matchCommand*(line: string, start: Natural = 0): Option[Matches] =
   let pattern = r"($1)" % commands.join("|")
   result = matchRegex(line, pattern, start)
 
-proc getLastPartMatcher*(postfix: string): Matcher =
-  ## Return a matcher that matches the last part of the line.  It
-  ## matches the optional continuation slash, the optional postfix and
-  ## the line endings. The postfix used is remembered in the matcher
-  ## object returned.
-  # Note: nim sets the regex anchor option.
+func matchLastPart*(line: string, start: Natural, postfix: string): Option[Matches] =
+  ## Match the last part of a command line.  It matches the optional
+  ## continuation slash, the optional postfix and the line
+  ## endings.
   var pattern: string
   if postfix == "":
     pattern = r"([\\]{0,1})([\r]{0,1}\n){0,1}$"
   else:
     pattern = r"([\\]{0,1})\Q$1\E([\r]{0,1}\n){0,1}$" % postfix
-  result = newMatcher(pattern, 2, arg1 = postfix)
+  result = matchRegex(line, pattern, start)
 
 proc getLastPart*(matcher: Matcher, line: string): Option[Matches] =
   ## Return the optional slash and line endings from the line.

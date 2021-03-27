@@ -15,6 +15,15 @@ proc testMatchCommand(line: string, start: Natural = 0,
   else:
     result = true
 
+proc testMatchLastPart(line: string, start: Natural, prefix: string,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  ## Test MatchCommand.
+  let matchesO = matchLastPart(line, start, prefix)
+  if not expectedItem("matchesO", matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
+
 suite "matches.nim":
 
   test "prepost table":
@@ -98,36 +107,31 @@ suite "matches.nim":
     check testMatchCommand(" coment ", 2)
 
   test "last part matcher":
-    var matcher = getLastPartMatcher("-->")
-
-    check checkMatcher(matcher, "<!--$ nextline -->", 15, @["", ""], 3)
-    check checkMatcher(matcher, "<!--$ nextline -->\n", 15, @["", "\n"], 4)
-    check checkMatcher(matcher, "<!--$ nextline -->\r\n", 15, @["", "\r\n"], 5)
-    check checkMatcher(matcher, r"<!--$ nextline \-->", 15, @[r"\", ""], 4)
-    check checkMatcher(matcher, "<!--$ nextline \\-->", 15, @[r"\", ""], 4)
-    check checkMatcher(matcher, "<!--$ nextline \\-->\n", 15, @[r"\", "\n"], 5)
-    check checkMatcher(matcher, "<!--$ nextline \\-->\r\n", 15, @[r"\", "\r\n"], 6)
+    check testMatchLastPart("<!--$ nextline -->", 15, "-->", some(newMatches(3, 15)))
+    check testMatchLastPart("<!--$ nextline -->\n", 15, "-->", some(newMatches(4, 15, "", "\n")))
+    check testMatchLastPart("<!--$ nextline -->\r\n", 15, "-->", some(newMatches(5, 15, "", "\r\n")))
+    check testMatchLastPart(r"<!--$ nextline \-->", 15, "-->", some(newMatches(4, 15, r"\")))
+    check testMatchLastPart("<!--$ nextline \\-->", 15, "-->", some(newMatches(4, 15, r"\")))
+    check testMatchLastPart("<!--$ nextline \\-->\n", 15, "-->", some(newMatches(5, 15, r"\", "\n")))
+    check testMatchLastPart("<!--$ nextline \\-->\r\n", 15, "-->", some(newMatches(6, 15, r"\", "\r\n")))
 
   test "getLastPart":
-    var matcher = getLastPartMatcher("-->")
-
-    check checkGetLastPart(matcher, "<!--$ nextline -->", 15, @["", ""], 3)
-    check checkGetLastPart(matcher, "<!--$ nextline -->\n", 15, @["", "\n"], 4)
-    check checkGetLastPart(matcher, "<!--$ nextline -->\r\n", 15, @["", "\r\n"], 5)
-    check checkGetLastPart(matcher, r"<!--$ nextline \-->", 15, @[r"\", ""], 4)
-    check checkGetLastPart(matcher, "<!--$ nextline \\-->", 15, @[r"\", ""], 4)
-    check checkGetLastPart(matcher, "<!--$ nextline \\-->\n", 15, @[r"\", "\n"], 5)
-    check checkGetLastPart(matcher, "<!--$ nextline \\-->\r\n", 15, @[r"\", "\r\n"], 6)
+    check testMatchLastPart("<!--$ nextline -->", 15, "-->", some(newMatches(3, 15)))
+    check testMatchLastPart("<!--$ nextline -->\n", 15, "-->", some(newMatches(4, 15, "", "\n")))
+    check testMatchLastPart("<!--$ nextline -->\r\n", 15, "-->", some(newMatches(5, 15, "", "\r\n")))
+    check testMatchLastPart(r"<!--$ nextline \-->", 15, "-->", some(newMatches(4, 15, r"\")))
+    check testMatchLastPart("<!--$ nextline \\-->", 15, "-->", some(newMatches(4, 15, r"\")))
+    check testMatchLastPart("<!--$ nextline \\-->\n", 15, "-->", some(newMatches(5, 15, r"\", "\n")))
+    check testMatchLastPart("<!--$ nextline \\-->\r\n", 15, "-->", some(newMatches(6, 15, r"\", "\r\n")))
 
   test "getLastPart blank postfix":
-    var matcher = getLastPartMatcher("")
-    check checkGetLastPart(matcher, "<!--$ nextline a", 16, @["", ""], 0)
-    check checkGetLastPart(matcher, "<!--$ nextline a\n", 16, @["", "\n"], 1)
-    check checkGetLastPart(matcher, "<!--$ nextline a\r\n", 16, @["", "\r\n"], 2)
-    check checkGetLastPart(matcher, r"<!--$ nextline a\", 16, @[r"\", ""], 1)
-    check checkGetLastPart(matcher, "<!--$ nextline a\\", 16, @[r"\", ""], 1)
-    check checkGetLastPart(matcher, "<!--$ nextline a\\\n", 16, @[r"\", "\n"], 2)
-    check checkGetLastPart(matcher, "<!--$ nextline a\\\r\n", 16, @[r"\", "\r\n"], 3)
+    check testMatchLastPart("<!--$ nextline a", 16, "", some(newMatches(0, 16)))
+    check testMatchLastPart("<!--$ nextline a\n", 16, "", some(newMatches(1, 16, "", "\n")))
+    check testMatchLastPart("<!--$ nextline a\r\n", 16, "", some(newMatches(2, 16, "", "\r\n")))
+    check testMatchLastPart(r"<!--$ nextline a\", 16, "", some(newMatches(1, 16, r"\")))
+    check testMatchLastPart("<!--$ nextline a\\", 16, "", some(newMatches(1, 16, r"\")))
+    check testMatchLastPart("<!--$ nextline a\\\n", 16, "", some(newMatches(2, 16, r"\", "\n")))
+    check testMatchLastPart("<!--$ nextline a\\\r\n", 16, "", some(newMatches(3, 16, r"\", "\r\n")))
 
   test "get space tab":
     let matcher = getAllSpaceTabMatcher()
