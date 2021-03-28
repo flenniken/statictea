@@ -1,7 +1,7 @@
 #+TITLE: StaticTea
 A template processor and language.
 
-StaticTea combines a template with data to produce a result.
+StaticTea combines a template with json data to produce a result.
 
 Example hello world template:
 
@@ -49,7 +49,7 @@ formatting json.
 
 You pass unformatted variable content from the server as json.
 You format the content with template commands to create new
-variables that substitue text in the template.
+variables that substitute text in the template.
 
 You define replacement blocks by surrounding them with commands
 and you target replacement variables inside the block by wrapping
@@ -360,7 +360,7 @@ fake nextline
 :END:
 
 A replacement block is a group of contiguous lines in a template
-between a command and its endblock or in the nextline case, the
+between a command and its endblock or in the nextline case the
 block is one line.
 
 The block contains the any number of bracketed variables for
@@ -1106,7 +1106,7 @@ get(d, "y") => 200
 
 A list contains a sequence of values of any type.  You lookup
 list elements with the get function and you define them in the
-json files.
+json files or with the list function.
 
 [[#contents][茶]]
 
@@ -1668,11 +1668,11 @@ exists("b") => 0
 :END:
 
 The find function searches a string for a substring and returns
-its position when found. The first parameter is the string and the
-second is the substring. The third optional parameter is returned
-when the substring is not found.  A warning is generated when the
-substring is missing and no third parameter. Positions start at
-0. Added in version 0.1.0.
+its position when found. The first parameter is the string and
+the second is the substring. The third optional parameter is
+returned when the substring is not found.  A warning is generated
+when the substring is missing and no third parameter. Positions
+start at 0. Added in version 0.1.0.
 
 #+BEGIN_SRC
 msg = "Tea time at 3:30."
@@ -1971,12 +1971,15 @@ The quoteHtml replaces special html characters with equivalents. Added in versio
 Replace a part of a string (substring) with another string.
 
 The first parameter is the string, the second is the substring's
-starting position and the third is the length of the
-substring. The first position is 0.
+starting position and the third is the length of the substring
+and the forth is the string to replace.
+
+You can use replace to insert or append to a string.
 
 #+BEGIN_SRC
 replace("Earl Grey", 5, 4, "of Sandwich")
   => "Earl of Sandwich"
+replace("abc", 3, 0, "123") => "abc123"
 #+END_SRC
 
 [[#contents][茶]]
