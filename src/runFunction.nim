@@ -366,8 +366,8 @@ proc funCase*(parameters: seq[Value]): FunResult =
 
 proc parseVersion*(version: string): Option[(int, int, int)] =
   ## Parse a StaticTea version number and return its three components.
-  let versionMatcher = newMatcher(r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$", 3)
-  let matches2O = getMatches(versionMatcher, version, 0)
+  # todo: add matchVersion to matches.nim.
+  let matches2O = matchRegex(version, r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$", 0)
   if not matches2O.isSome:
     return
   let (g1, g2, g3) = matches2O.get().get3Groups()
@@ -786,8 +786,7 @@ proc funReplace*(parameters: seq[Value]): FunResult =
 #     result = newFunResultWarn(wInvalidPosition, 1, $start)
 #     return
 
-#   # let matcher = newMatcher(pattern, numGroups)
-#   # let matchesO = getMatches(matcher, str, start)
+#   # let matchesO = matchRegex(matcher, str, pattern, start)
 #   # check matchesO.isSome
 #   #
 #   # var dict: VarDic

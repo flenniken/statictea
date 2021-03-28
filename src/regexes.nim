@@ -51,24 +51,25 @@ type
     groups*: seq[string]
     length*: Natural
     start*: Natural
+  # todo: remove start from Matches?
 
-  Matcher* = object
-    ## A compiled regular expression.
-    pattern*: string    ## The regular expression pattern.
-    numGroups*: Natural ## The number of groups in the pattern.
-    regex: Regex        ## The compiled regex.
-    arg1*: string       ## The arg1 parameter of newMatcher.
+  # Matcher* = object
+  #   ## A compiled regular expression.
+  #   pattern*: string    ## The regular expression pattern.
+  #   numGroups*: Natural ## The number of groups in the pattern.
+  #   regex: Regex        ## The compiled regex.
+  #   arg1*: string       ## The arg1 parameter of newMatcher.
 
-proc newMatcher*(pattern: string, numGroups: Natural,
-    arg1: string = ""): Matcher =
-  ## Return a new matcher.  The regular expression pattern is
-  ## compiled.  The numGroups is the number of groups defined in the
-  ## pattern.  Note: all patterns are anchored. This makes a
-  ## difference when matching and the start point is not 0.
-  result.pattern = pattern
-  result.regex = re(pattern)
-  result.numGroups = numGroups
-  result.arg1 = arg1
+# proc newMatcher*(pattern: string, numGroups: Natural,
+#     arg1: string = ""): Matcher =
+#   ## Return a new matcher.  The regular expression pattern is
+#   ## compiled.  The numGroups is the number of groups defined in the
+#   ## pattern.  Note: all patterns are anchored. This makes a
+#   ## difference when matching and the start point is not 0.
+#   result.pattern = pattern
+#   result.regex = re(pattern)
+#   result.numGroups = numGroups
+#   result.arg1 = arg1
 
 proc getGroup*(matches: Matches): string =
   ## Get the group when there is only one in matches.
@@ -98,24 +99,8 @@ proc get3Groups*(matches: Matches): (string, string, string) =
     three = matches.groups[2]
   result = (one, two, three)
 
-proc getMatches*(matcher: Matcher, line: string, start: Natural = 0):
-               Option[Matches] =
-  ## Match the line with the matcher pattern starting at the "start"
-  ## index in the line.  Return the matches object containing the
-  ## matching groups and the length of the match.
+# todo: is there a good way to replace the get groups method with one?
 
-  var matches: Matches
-  var groups = newSeq[string](matcher.numGroups)
-  var length: int
-  if matcher.numGroups == 0:
-    length = matchLen(line, matcher.regex, start)
-  else:
-    length = matchLen(line, matcher.regex, groups, start)
-  if length != -1:
-    matches.groups = groups
-    matches.length = length
-    matches.start = start
-    result = some(matches)
 
 # todo: cache regex and pattern.
 
@@ -143,82 +128,22 @@ proc matchRegex*(str: string, pattern: string, start: Natural = 0): Option[Match
     result = some(matches)
 
 when defined(test):
-  proc startPointer*(start: Natural): string =
-    ## Return a string containing the number of spaces and symbols to
-    ## point at the line start value. Display it under the line.
-    if start > 100:
-      result.add("$1" % $start)
-    else:
-      for ix in 0..<start:
-        result.add(' ')
-      result.add("^$1" % $start)
-
-  proc checkMatches*(matchesO: Option[Matches], matcher: Matcher, line: string,
-      expectedStart: Natural, expectedStrings: seq[string],
-      expectedLength: Natural): bool =
-    ## Return true when the matchesO object has the expected content,
-    ## else return false. When false, show the expected text and the
-    ## the actual text.
-
-    if matchesO.isSome:
-      var matches = matchesO.get()
-      if matches.groups != expectedStrings or matches.length !=
-          expectedLength or
-         matches.start != expectedStart:
-        echo "---Unexpected match---"
-        echo "   line: $1" % [line]
-        echo "  start: $1" % startPointer(matches.start)
-        echo "pattern: $1" % matcher.pattern
-        echo "expectedLength: $1, got: $2" % [$expectedLength, $matches.length]
-        echo "expectedStart: $1, got: $2" % [$expectedStart, $matches.start]
-        for group in expectedStrings:
-          echo "expected: '$1'" % [group]
-        for group in matches.groups:
-          echo "     got: '$1'" % [group]
-      else:
-        result = true
-    else:
-      echo "---No match---"
-      echo "   line: '$1'" % [line]
-      echo "  start:  $1" % startPointer(expectedStart)
-      echo "pattern: '$1'" % matcher.pattern
-
-  # proc testMatchRegex*(str: string, pattern: string, start: Natural = 0,
-  #     eMatchesO: Option[Matches] = none(Matches)): bool =
-  proc checkMatcher*(matcher: Matcher, line: string, start: Natural,
-      expectedStrings: seq[string], expectedLength: Natural): bool =
-    ## Return true when the matcher matches the line with the
-    ## expected outcome, else return false.
-    let matchesO = getMatches(matcher, line, start)
-    result = checkMatches(matchesO, matcher, line, start,
-                          expectedStrings, expectedLength)
-
-  proc checkMatcherNot*(matcher: Matcher, line: string,
-      start: Natural = 0): bool =
-    ## Return true when the matcher does not match.
-
-    var matchesO = matcher.getMatches(line, start)
-    if not matchesO.isSome:
-      return true
-    var matches = matchesO.get()
-
-    echo "---Found unexpected match---"
-    echo "   line: $1" % [line]
-    echo "  start: $1" % startPointer(matches.start)
-    echo "pattern: $1" % matcher.pattern
-    for group in matches.groups:
-      echo "got: '$1'" % [group]
-
   proc testMatchRegex*(str: string, pattern: string, start: Natural = 0,
       eMatchesO: Option[Matches] = none(Matches)): bool =
     ## Test matchRegex
     let matchesO = matchRegex(str, pattern, start)
-    if not expectedItem("matchesO", matchesO, eMatchesO):
+    var header = """
+line: "$1"
+start: $2
+pattern: $3""" % [str, $start, pattern]
+    if not expectedItem(header, matchesO, eMatchesO):
       result = false
+      echo ""
     else:
       result = true
 
   proc newMatches*(length: Natural, start: Natural, groups: varargs[string]): Matches =
+    ## Return a Matches object.
     result.length = length
     result.start = start
     for group in groups:

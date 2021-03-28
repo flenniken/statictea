@@ -15,6 +15,16 @@ import warnings
 import regexes
 import version
 
+proc startPointer*(start: Natural): string =
+  ## Return a string containing the number of spaces and symbols to
+  ## point at the line start value. Display it under the line.
+  if start > 100:
+    result.add("$1" % $start)
+  else:
+    for ix in 0..<start:
+      result.add(' ')
+    result.add("^$1" % $start)
+
 proc testSome*[T](valueAndLengthO: Option[T], eValueAndLengthO: Option[T],
     text: string, start: Natural): bool =
 
@@ -959,6 +969,13 @@ statement: cmp = cmpVersion('1.2.3', 3.5)
                                      ^
 """
     check testRunStatement(statement, eErrLines = eErrLines)
+
+  test "startPointer":
+    check startPointer(0) == "^0"
+    check startPointer(1) == " ^1"
+    check startPointer(2) == "  ^2"
+    check startPointer(101) == "101"
+
 
 
 # todo: test that a warning is generated when the item doesn't exist.

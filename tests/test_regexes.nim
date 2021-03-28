@@ -3,66 +3,48 @@ import unittest
 import options
 
 suite "regexes.nim":
-  test "startPointer":
-    check startPointer(0) == "^0"
-    check startPointer(1) == " ^1"
-    check startPointer(2) == "  ^2"
-    check startPointer(101) == "101"
-
-  test "checkMatcher":
-    # Uncomment to test output for cases the don't match.
-
-    # var abcMatcher = newMatcher(r"(abc)\s+", 1)
-    # check checkMatcher(abcMatcher, " abc   def", 0, @["abc"], 6)
-    # check checkMatcher(abcMatcher, "abc   def", 0, @["abe"], 6)
-    # check checkMatcher(abcMatcher, "abc   def", 0, @["abc"], 7)
-    # var matcher = newMatcher(r"(abc)(\s+)", 2)
-    # check checkMatcher(matcher, "abc   def", 0, @["abc", "1"], 7)
-    # check checkMatcher(matcher, "abc   def", 3, @["abc", "1"], 7)
-    discard
-
   test "no groups":
-    var versionMatcher = newMatcher(r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$", 0)
-    check checkMatcher(versionMatcher, "0.1.0", 0, @[], 5)
-    check checkMatcher(versionMatcher, "0.12.345", 0, @[], 8)
-    check checkMatcher(versionMatcher, "999.888.777", 0, @[], 11)
+    let pattern = r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"
+    check testMatchRegex("0.1.0", pattern, 0, some(newMatches(5, 0)))
+    check testMatchRegex("0.12.345", pattern, 0, some(newMatches(8, 0)))
+    check testMatchRegex("999.888.777", pattern, 0, some(newMatches(11, 0)))
 
   test "no match":
-    var matcher = newMatcher(r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$", 0)
-    check not getMatches(matcher, "0.1", 0).isSome
-    check not getMatches(matcher, "0.1.3456", 0).isSome
-    check not getMatches(matcher, "0.1.a", 0).isSome
+    let pattern = r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"
+    check testMatchRegex("0.1", pattern, 0)
+    check testMatchRegex("0.1.3456", pattern, 0)
+    check testMatchRegex("0.1.a", pattern, 0)
 
-  test "getMatches1":
-    let matcher = newMatcher(r".*abc$", 0)
-    check checkMatcher(matcher, "123 abc", 0, @[], 7)
+  test "one simple match":
+    let pattern = r".*abc$"
+    check testMatchRegex("123 abc", pattern, 0, some(newMatches(7, 0)))
 
-  test "getMatches no match":
-    let matcher = newMatcher(r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$", 3)
-    check not getMatches(matcher, "b.67.8").isSome
+  test "no match":
+    let pattern = r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$"
+    check testMatchRegex("b.67.8", pattern)
 
   test "one group":
-    let matcher = newMatcher(r"^.*(def)$", 1)
-    let matchesO = getMatches(matcher, "  abc asdfasdfdef def", 0)
+    let pattern = r"^.*(def)$"
+    let matchesO = matchRegex("  abc asdfasdfdef def", pattern, 0)
     check matchesO.isSome
     let one = matchesO.get().getGroup()
     check one == "def"
 
   test "two groups":
-    let matcher = newMatcher(r"(abc).*(def)$", 2)
-    check checkMatcher(matcher, "  abc asdfasdfdef def", 2, @["abc", "def"], 19)
+    let pattern = r"(abc).*(def)$"
+    check testMatchRegex("  abc asdfasdfdef def", pattern, 2, some(newMatches(19, 2, "abc", "def")))
 
-    let matchesO = getMatches(matcher, "  abc asdfasdfdef def", 2)
+    let matchesO = matchRegex("  abc asdfasdfdef def", pattern, 2)
     check matchesO.isSome
     let (one, two) = matchesO.get().get2Groups()
     check one == "abc"
     check two == "def"
 
   test "three groups":
-    let versionMatcher = newMatcher(r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$", 3)
-    check checkMatcher(versionMatcher, "999.888.777", 0, @["999", "888", "777"], 11)
-    check checkMatcher(versionMatcher, "5.67.8", 0, @["5", "67", "8"], 6)
-    let matchesO = getMatches(versionMatcher, "5.67.8", 0)
+    let pattern = r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$"
+    check testMatchRegex("999.888.777", pattern, 0, some(newMatches(11, 0, "999", "888", "777")))
+    check testMatchRegex("5.67.8", pattern, 0, some(newMatches(6, 0, "5", "67", "8")))
+    let matchesO = matchRegex("5.67.8", pattern, 0)
     check matchesO.isSome
     let (one, two, three) = matchesO.get().get3Groups()
     check one == "5"
@@ -73,53 +55,47 @@ suite "regexes.nim":
     # Using ^ to anchor doesn't work as I expect when start is not 0.
     # let matcher = newMatcher(r"^(abc)", 1)
 
-    let matcher = newMatcher(r"(abc)", 1)
-    check checkMatcher(matcher, "  abc asdfasdfdef def", 2, @["abc"], 3)
+    let pattern = r"(abc)"
+    check testMatchRegex("  abc asdfasdfdef def", pattern, 2, some(newMatches(3, 2, "abc")))
 
   test "matchRegex":
-    let eMatchesO = some(newMatches(12, 0, "o", "testing"))
-    check testMatchRegex("hellotesting", r".*ll(o)(testing)*", 0, eMatchesO = eMatchesO)
+    let pattern = r".*ll(o)(testing)*"
+    check testMatchRegex("hellotesting", pattern, 0, some(newMatches(12, 0, "o", "testing")))
 
   test "matchRegex one match":
-    let eMatchesO = some(newMatches(7, 0))
-    check testMatchRegex("nomatch", ".*match", 0, eMatchesO = eMatchesO)
+    check testMatchRegex("nomatch", ".*match", 0, some(newMatches(7, 0)))
 
   test "matchRegex one group":
-    let eMatchesO = some(newMatches(7, 0, "match"))
-    check testMatchRegex("nomatch", ".*(match)", 0, eMatchesO = eMatchesO)
+    check testMatchRegex("nomatch", ".*(match)", 0, some(newMatches(7, 0, "match")))
 
   test "matchRegex two groups":
-    let eMatchesO = some(newMatches(8, 0, "yes", "match"))
-    check testMatchRegex("yesmatch", "(yes)(match)", 0, eMatchesO = eMatchesO)
+    check testMatchRegex("yesmatch", "(yes)(match)", 0, some(newMatches(8, 0, "yes", "match")))
 
   test "matchRegex 10 groups":
     let eMatchesO = some(newMatches(10, 0, "y", "e", "s", "m", "a", "t", "c", "h", "e", "s"))
-    check testMatchRegex("yesmatches", "(y)(e)(s)(m)(a)(t)(c)(h)(e)(s)", 0, eMatchesO = eMatchesO)
+    check testMatchRegex("yesmatches", "(y)(e)(s)(m)(a)(t)(c)(h)(e)(s)", 0, eMatchesO)
 
   test "matchRegex length":
-    let eMatchesO = some(newMatches(10, 0, "match"))
-    check testMatchRegex("   match = ", ".*(match) =", 0, eMatchesO = eMatchesO)
+    check testMatchRegex("   match = ", ".*(match) =", 0, some(newMatches(10, 0, "match")))
 
   test "matchRegex start":
-    let eMatchesO = some(newMatches(7, 3, "match"))
-    check testMatchRegex("   match = ", ".*(match) =", 3, eMatchesO = eMatchesO)
+    check testMatchRegex("   match = ", ".*(match) =", 3, some(newMatches(7, 3, "match")))
 
   test "matchRegex anchor":
-    let eMatchesO = some(newMatches(5, 0))
-    check testMatchRegex("match = asdf", "^match", 0, eMatchesO = eMatchesO)
+    check testMatchRegex("match = asdf", "^match", 0, some(newMatches(5, 0)))
 
   test "matchRegex start anchor":
     # This doesn't match because nim sets the anchor option.
     check testMatchRegex(" match = asdf", "^match", 1)
 
   test "matchRegex no match":
-    check testMatchRegex("nomatch", "he(ll)o", 0)
-    check testMatchRegex("hellotesting", "ll(o8)(testing)*", 0)
-    check testMatchRegex("nomatch", ".*match3", 0)
-    check testMatchRegex("nomattchtjj", ".*match", 0)
-    check testMatchRegex("nomatch", ".*(match) ", 0)
-    check testMatchRegex("yesmatch", "(yes)7(match)", 0)
+    check testMatchRegex("nomatch", "he(ll)o")
+    check testMatchRegex("hellotesting", "ll(o8)(testing)*")
+    check testMatchRegex("nomatch", ".*match3")
+    check testMatchRegex("nomattchtjj", ".*match")
+    check testMatchRegex("nomatch", ".*(match) ")
+    check testMatchRegex("yesmatch", "(yes)7(match)")
     check testMatchRegex("yesmatches", "(y)(s)(m)(a)(t)(c)(h)(e)(s)")
-    check testMatchRegex("   match = ", "(match) =", 0)
+    check testMatchRegex("   match = ", "(match) =")
     check testMatchRegex("   match = ", "(match) 7", 3)
-    check testMatchRegex(" match = asdf", "^match", 0)
+    check testMatchRegex(" match = asdf", "^match")

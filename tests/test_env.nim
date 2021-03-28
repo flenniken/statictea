@@ -24,8 +24,7 @@ proc parseTimeStamp*(str: string): Option[DateTime] =
     result = none(DateTime)
 
 proc parseFileLine*(line: string): Option[FileLine] =
-  var matcher = newMatcher(r"^(.*)\(([0-9]+)\)$", 2)
-  let matchesO = getMatches(matcher, line, 0)
+  let matchesO = matchRegex(line, r"^(.*)\(([0-9]+)\)$", 0)
   if matchesO.isSome:
     let matches = matchesO.get()
     let (filename, lineNumString) = matches.get2Groups()
