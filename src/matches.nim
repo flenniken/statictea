@@ -1,3 +1,4 @@
+## Procedures for regular expression matching.
 
 import strutils
 import args
@@ -52,6 +53,7 @@ proc makeUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
     result[prepost.pre] = prepost.post
 
 proc matchPrefix*(line: string, start: Natural, prepostTable: PrepostTable): Option[Matches] =
+  ## Match lines that start with one of the current prefixes.
   var terms = newSeq[string]()
   for prefix, _ in prepostTable:
     terms.add(r"\Q$1\E" % prefix)
@@ -131,18 +133,22 @@ proc matchVariable*(line: string, start: Natural): Option[Matches] =
   result = matchPatternCached(line, pattern, start)
 
 proc matchEqualSign*(line: string, start: Natural): Option[Matches] =
+  ## Match an equal sign and the optional trailing whitespace.
   let pattern = r"(=)\s*"
   result = matchPatternCached(line, pattern, start)
 
 proc matchLeftParentheses*(line: string, start: Natural): Option[Matches] =
+  ## Match a left parenthese and the optional trailing whitespace.
   let pattern = r"\(\s*"
   result = matchPatternCached(line, pattern, start)
 
 proc matchCommaParentheses*(line: string, start: Natural): Option[Matches] =
+  ## Match a comma or right parentheses and the optional trailing whitespace.
   let pattern = r"([,)])\s*"
   result = matchPatternCached(line, pattern, start)
 
 proc matchRightParentheses*(line: string, start: Natural): Option[Matches] =
+  ## Match a right parentheses and the optional trailing whitespace.
   let pattern = r"\)\s*"
   result = matchPatternCached(line, pattern, start)
 
@@ -159,7 +165,7 @@ proc matchNumber*(line: string, start: Natural): Option[Matches] =
   result = matchPatternCached(line, pattern, start)
 
 proc matchString*(line: string, start: Natural): Option[Matches] =
-  ## Return a matcher that matches a string.
+  ## Return a matcher that matches a quoted string.
 
   # A string is inside quotes, either single or double quotes. The
   # optional white space after the string is matched too. There are
@@ -187,4 +193,4 @@ proc matchFileLine*(line: string, start: Natural): Option[Matches] =
 
 func matchVersion*(line: string, start: Natural = 0): Option[Matches] =
   let pattern = r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$"
-  result = matchPattern(line, pattern, start)
+  result = matchPatternCached(line, pattern, start)
