@@ -198,3 +198,7 @@ proc getCompiledMatchers*(): CompiledMatchers =
 proc matchFileLine*(line: string, start: Natural): Option[Matches] =
   let pattern = r"^(.*)\(([0-9]+)\)$"
   result = matchPatternCached(line, pattern, start)
+
+func matchVersion*(line: string, start: Natural = 0): Option[Matches] =
+  let pattern = r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$"
+  result = matchPattern(line, pattern, start)

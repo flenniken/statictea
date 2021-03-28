@@ -364,14 +364,8 @@ func funCase*(parameters: seq[Value]): FunResult =
   # Return the else case.
   result = newFunResult(parameters[parameters.len-1])
 
-func matchVersion*(line: string, start: Natural): Option[Matches] =
-  let pattern = r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$"
-  result = matchRegex(line, pattern, start)
-
 func parseVersion*(version: string): Option[(int, int, int)] =
   ## Parse a StaticTea version number and return its three components.
-  # todo: add matchVersion to matches.nim.
-
   let matchesO = matchVersion(version, 0)
   if not matchesO.isSome:
     return
@@ -791,7 +785,7 @@ func funReplace*(parameters: seq[Value]): FunResult =
 #     result = newFunResultWarn(wInvalidPosition, 1, $start)
 #     return
 
-#   # let matchesO = matchRegex(matcher, str, pattern, start)
+#   # let matchesO = matchPattern(str, pattern, start)
 #   # check matchesO.isSome
 #   #
 #   # var dict: VarDic

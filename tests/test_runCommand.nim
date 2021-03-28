@@ -12,7 +12,6 @@ import vartypes
 import variables
 import tables
 import warnings
-import regexes
 import version
 
 proc startPointer*(start: Natural): string =

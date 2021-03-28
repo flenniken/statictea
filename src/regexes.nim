@@ -39,7 +39,7 @@ when defined(test):
   import env
 
 const
-  ## The maximum number of groups supported in the matchRegex procedure.
+  ## The maximum number of groups supported in the matchPattern procedure.
   maxGroups = 10
 
 type
@@ -84,8 +84,7 @@ func get3Groups*(matches: Matches): (string, string, string) =
     three = matches.groups[2]
   result = (one, two, three)
 
-# todo: rename matchRegex2 to matchRegex
-func matchRegex2*(str: string, regex: Regex, start: Natural = 0): Option[Matches] =
+func matchRegex*(str: string, regex: Regex, start: Natural = 0): Option[Matches] =
   ## Match a pattern in a string.
 
   var groups = newSeq[string](maxGroups)
@@ -121,21 +120,19 @@ proc matchPatternCached*(str: string, pattern: string, start: Natural = 0): Opti
   # else:
   #   regex = re(pattern)
   #   compliledPatterns[pattern] = regex
-  # result = matchRegex2(str, regex, start)
+  # result = matchRegex(str, regex, start)
 
-  result = matchRegex2(str, re(pattern), start)
+  result = matchRegex(str, re(pattern), start)
 
-
-# todo: rename matchRegex to matchPattern
-func matchRegex*(str: string, pattern: string, start: Natural = 0): Option[Matches] =
+func matchPattern*(str: string, pattern: string, start: Natural = 0): Option[Matches] =
   ## Match a pattern in a string.
-  result = matchRegex2(str, re(pattern), start)
+  result = matchRegex(str, re(pattern), start)
 
 when defined(test):
-  proc testMatchRegex*(str: string, pattern: string, start: Natural = 0,
+  proc testMatchPattern*(str: string, pattern: string, start: Natural = 0,
       eMatchesO: Option[Matches] = none(Matches)): bool =
-    ## Test matchRegex
-    let matchesO = matchRegex(str, pattern, start)
+    ## Test matchPattern
+    let matchesO = matchPattern(str, pattern, start)
     var header = """
 line: "$1"
 start: $2

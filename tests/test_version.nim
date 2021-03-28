@@ -1,5 +1,4 @@
 
-import regexes
 import unittest
 import version
 import options
@@ -7,7 +6,7 @@ import options
 suite "version.nim":
 
   test "test version string":
-    let matchesO = matchRegex(staticteaVersion, r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$", 0)
+    let matchesO = matchVersion(staticteaVersion)
     if not matchesO.isSome:
-      echo "Invalid version number: " & staticteaVersion
+      echo "Invalid StaticTea version number: " & staticteaVersion
       fail
