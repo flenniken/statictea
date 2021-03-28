@@ -44,7 +44,7 @@ proc testMatchTabSpace(line: string, start: Natural,
 proc testMatchPrefix(line: string, start: Natural,
     eMatchesO: Option[Matches] = none(Matches)): bool =
 
-  let prepostTable = getDefaultPrepostTable()
+  let prepostTable = makeDefaultPrepostTable()
   let matchesO = matchPrefix(line, start, prepostTable)
   if not expectedItem("matchesO", matchesO, eMatchesO):
     result = false
@@ -110,7 +110,7 @@ proc testMatchLeftBracket(line: string, start: Natural = 0,
 suite "matches.nim":
 
   test "prepost table":
-    var prepostTable = getDefaultPrepostTable()
+    var prepostTable = makeDefaultPrepostTable()
     check prepostTable.len == 7
     for prefix, postfix in prepostTable.pairs:
       check prefix.len > 0
@@ -145,16 +145,16 @@ suite "matches.nim":
 
     check testMatchPrefix("<--$ nextline -->", 0)
 
-  test "getUserPrepostTable user prefix":
+  test "makeUserPrepostTable user prefix":
     var prepostList = @[("abc", "def")]
-    var prepostTable = getUserPrepostTable(prepostList)
+    var prepostTable = makeUserPrepostTable(prepostList)
     check prepostTable.len == 1
     check prepostTable["abc"] == "def"
 
   test "long prefix":
     let prefix = "this is a very long prefix nextline post"
     var prepostList = @[(prefix, "post")]
-    var prepostTable = getUserPrepostTable(prepostList)
+    var prepostTable = makeUserPrepostTable(prepostList)
     check prepostTable.len == 1
     check prepostTable[prefix] == "post"
 

@@ -28,9 +28,9 @@ proc testCollectCommand(
 
   var env = openEnvTest("_collectCommand.log")
 
-  let compiledMatchers = getCompiledMatchers()
+  let prepostTable = getPrepostTable()
   var nextLine: string
-  collectCommand(env, lb, compiledMatchers, resultStream, cmdLines, cmdLineParts, nextLine)
+  collectCommand(env, lb, prepostTable, resultStream, cmdLines, cmdLineParts, nextLine)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 

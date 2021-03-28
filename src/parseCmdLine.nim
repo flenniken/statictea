@@ -27,7 +27,7 @@ type
     ending*: string
     lineNum*: Natural
 
-proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
+proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
     line: string, lineNum: Natural): Option[LineParts] =
   ## Parse the line and return its parts when it is a command. Return
   ## quickly when not a command line.
@@ -39,10 +39,9 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
   # ix0 <!--$    nextline    a = 5        \-->\n
 
   var lineParts: LineParts
-  let cm = compiledMatchers
 
   # Get the prefix.
-  let prefixMatchO = matchPrefix(line, 0, cm.prepostTable)
+  let prefixMatchO = matchPrefix(line, 0, prepostTable)
   if not prefixMatchO.isSome():
     # No prefix so not a command line. No error.
     return
@@ -61,8 +60,8 @@ proc parseCmdLine*(env: var Env, compiledMatchers: CompiledMatchers,
   let spaceMatchO = matchTabSpace(line, prefixMatch.length + commandMatch.length)
 
   # Get the expected postfix. Not all prefixes have a postfix.
-  assert cm.prepostTable.hasKey(lineParts.prefix)
-  lineParts.postfix = cm.prepostTable[lineParts.prefix]
+  assert prepostTable.hasKey(lineParts.prefix)
+  lineParts.postfix = prepostTable[lineParts.prefix]
 
   # Match the expected postfix at the end and return the optional
   # continuation and its position when it matches.

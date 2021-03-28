@@ -18,8 +18,8 @@ proc testParseCmdLine(
 
   var env = openEnvTest("_parseCmdLine.log")
 
-  let compiledMatchers = getCompiledMatchers()
-  let linePartsO = parseCmdLine(env, compiledMatchers, line, lineNum)
+  let prepostTable = getPrepostTable()
+  let linePartsO = parseCmdLine(env, prepostTable, line, lineNum)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
@@ -61,8 +61,8 @@ proc parseCmdLineError(
 
   var env = openEnvTest("_parseCmdLine.log")
 
-  let compiledMatchers = getCompiledMatchers()
-  let linePartsO = parseCmdLine(env, compiledMatchers, line, lineNum)
+  let prepostTable = getPrepostTable()
+  let linePartsO = parseCmdLine(env, prepostTable, line, lineNum)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 

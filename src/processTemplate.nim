@@ -63,7 +63,7 @@ iterator yieldContentLine*(content: string): string =
     yield(content[start ..< content.len])
 
 proc processTemplateLines(env: var Env, variables: var Variables,
-                          compiledMatchers: CompiledMatchers) =
+                          prepostTable: PrepostTable) =
   ## Process the given template file.
 
   # Allocate a buffer for reading lines.
@@ -81,7 +81,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     # command is found, collect its lines and return them.
     var cmdLines: seq[string] = @[]
     var cmdLineParts: seq[LineParts] = @[]
-    collectCommand(env, lb, compiledMatchers, env.resultStream,
+    collectCommand(env, lb, prepostTable, env.resultStream,
                    cmdLines, cmdLineParts, firstReplaceLine)
     if cmdLines.len == 0:
       break # done, no more lines
@@ -100,7 +100,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     # Run the command and fill in the variables.
     var row = 0
     variables["row"] = newValue(row)
-    runCommand(env, cmdLines, cmdLineParts, compiledMatchers,
+    runCommand(env, cmdLines, cmdLineParts, prepostTable,
                variables)
     let repeat = getTeaVarIntDefault(variables, "repeat")
 
@@ -114,32 +114,32 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
     # If repeat is 0, read the replacement lines and the endblock and discard them.
     if repeat == 0:
-      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, compiledMatchers, command, maxLines):
+      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, prepostTable, command, maxLines):
         discard
       firstReplaceLine = ""
       continue
 
     # Create a new TempSegments object for storing segments.
     var startLineNum = lb.lineNum
-    var tempSegmentsO = newTempSegments(env, lb, compiledMatchers, command, repeat, variables)
+    var tempSegmentsO = newTempSegments(env, lb, prepostTable, command, repeat, variables)
     if not isSome(tempSegmentsO):
       break # Cannot create temp file or allocate memory, quit.
     var tempSegments = tempSegmentsO.get()
 
     if command == "replace" and variables.contains("content"):
       # Discard the replacement block lines and the endblock.
-      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, compiledMatchers, command, maxLines):
+      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, prepostTable, command, maxLines):
         discard
       # Use the content as the replacement lines.
       var content = getVariable(variables, "t.", "content").get().stringv
       for line in yieldContentLine(content):
-        storeLineSegments(env, tempSegments, compiledMatchers, line)
+        storeLineSegments(env, tempSegments, prepostTable, line)
     else:
       # Read the replacement lines and store their compiled segments in
       # TempSegments.  Ignore the last line, the endblock, if it exists.
-      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, compiledMatchers, command, maxLines):
+      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, prepostTable, command, maxLines):
         if replaceLine.kind != rlEndblockLine:
-          storeLineSegments(env, tempSegments, compiledMatchers, replaceLine.line)
+          storeLineSegments(env, tempSegments, prepostTable, replaceLine.line)
 
     # Generate t.repeat number of replacement blocks. Recalculate the
     # variables for each one.
@@ -155,7 +155,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       variables["row"] = newValue(row)
 
       # Run the command and fill in the variables.
-      runCommand(env, cmdLines, cmdLineParts, compiledMatchers,
+      runCommand(env, cmdLines, cmdLineParts, prepostTable,
                  variables)
 
     closeDelete(tempSegments)
@@ -163,7 +163,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
 
 proc updateTemplateLines(env: var Env, variables: var Variables,
-                          compiledMatchers: CompiledMatchers) =
+                          prepostTable: PrepostTable) =
   ## Update the given template file.
 
   #[ Read template lines and write them out. Read command lines and
@@ -192,7 +192,7 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
     var cmdLines: seq[string] = @[]
     var cmdLineParts: seq[LineParts] = @[]
     var firstReplaceLine: string
-    collectCommand(env, lb, compiledMatchers, env.resultStream,
+    collectCommand(env, lb, prepostTable, env.resultStream,
                    cmdLines, cmdLineParts, firstReplaceLine)
     if cmdLines.len == 0:
       break # done, no more lines
@@ -203,7 +203,7 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
       # Run the command and fill in the variables.
       var row = 0
       variables["row"] = newValue(row)
-      runCommand(env, cmdLines, cmdLineParts, compiledMatchers,
+      runCommand(env, cmdLines, cmdLineParts, prepostTable,
                  variables)
 
     # Write out the command lines.
@@ -218,7 +218,7 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
     if command == "replace" and variables.contains("content"):
       # Discard the replacement block lines and save the endblock if it exists.
       var lastLine: ReplaceLine
-      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, compiledMatchers, command, maxLines):
+      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, prepostTable, command, maxLines):
         lastLine = replaceLine
 
       # Write the content as the replacement lines.
@@ -237,7 +237,7 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
         env.resultStream.write(lastLine.line)
     else:
       # Read the replacement lines and endblock and write them out.
-      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, compiledMatchers, command, maxLines):
+      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, prepostTable, command, maxLines):
         env.resultStream.write(replaceLine.line)
 
 proc getStartingVariables(env: var Env, args: Args): Variables =
@@ -253,32 +253,28 @@ proc getStartingVariables(env: var Env, args: Args): Variables =
   assignVariable(result, "t.", "server", newValue(server))
   assignVariable(result, "t.", "shared", newValue(shared))
 
-proc getCompiledMatchers(args: Args): CompiledMatchers =
-  ## Get the compile matchers dependent on the prepost settings from
-  ## the user.
+proc getPrepostTable(args: Args): PrepostTable =
+  ## Get the the prepost settings from the user or use the default
+  ## ones.
 
   # Get the prepost table, either the user specified one or the
   # default one. The defaults are not used when the user specifies
   # them, so that they have complete control over the preposts used.
-  var prepostTable: PrepostTable
   if args.prepostList.len > 0:
     # The prepostList has been validated already.
-    prepostTable = getUserPrepostTable(args.prepostList)
+    result = makeUserPrepostTable(args.prepostList)
   else:
-    prepostTable = getDefaultPrepostTable()
-
-  # Get all the compiled regular expression matchers.
-  result = getCompiledMatchers(prepostTable)
+    result = makeDefaultPrepostTable()
 
 proc processTemplate*(env: var Env, args: Args): int =
   ## Process the template and return 0 on success. Return 1 if a
   ## warning messages was written while processing the template.
 
   var variables = getStartingVariables(env, args)
-  var compiledMatchers = getCompiledMatchers(args)
+  var prepostTable = getPrepostTable(args)
 
   # Process the template.
-  processTemplateLines(env, variables, compiledMatchers)
+  processTemplateLines(env, variables, prepostTable)
 
   if env.warningWritten > 0:
     result = 1
@@ -288,10 +284,10 @@ proc updateTemplate*(env: var Env, args: Args): int =
   ## warning messages was written while processing the template.
 
   var variables = getStartingVariables(env, args)
-  var compiledMatchers = getCompiledMatchers(args)
+  var prepostTable = getPrepostTable(args)
 
   # Process the template.
-  updateTemplateLines(env, variables, compiledMatchers)
+  updateTemplateLines(env, variables, prepostTable)
 
   if env.warningWritten > 0:
     result = 1

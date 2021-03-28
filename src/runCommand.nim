@@ -114,7 +114,7 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
   if notEmptyOrSpaces(text):
     yield Statement(text: text, lineNum: lineNum, start: start)
 
-proc getString*(env: var Env, compiledMatchers: Compiledmatchers,
+proc getString*(env: var Env, prepostTable: PrepostTable,
     statement: Statement, start: Natural): Option[ValueAndLength] =
   ## Return a literal string value and the length of the match.  The
   ## start parameter is the index of the first quote in the statement
@@ -142,7 +142,7 @@ proc getString*(env: var Env, compiledMatchers: Compiledmatchers,
   let value = Value(kind: vkString, stringv: str)
   result = some(ValueAndLength(value: value, length: matches.length))
 
-proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
+proc getNumber*(env: var Env, prepostTable: PrepostTable,
     statement: Statement, start: Natural): Option[ValueAndLength] =
   ## Return the literal number value from the statement. We expect a
   ## number because it starts with a digit or minus sign.
@@ -179,12 +179,12 @@ proc getNumber*(env: var Env, compiledMatchers: Compiledmatchers,
     result = some(ValueAndLength(value: value, length: matches.length))
 
 # Forward reference needed because we call getValue recursively.
-proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
+proc getValue(env: var Env, prepostTable: PrepostTable,
               statement: Statement, start: Natural, variables:
                 Variables): Option[ValueAndLength]
 
-proc getFunctionValue*(env: var Env, compiledMatchers:
-    Compiledmatchers, function: FunctionPtr, statement:
+proc getFunctionValue*(env: var Env, prepostTable:
+    PrepostTable, function: FunctionPtr, statement:
     Statement, start: Natural, variables: Variables): Option[ValueAndLength] =
   ## Collect the function parameter values then call it. Start should
   ## be pointing at the first parameter.
@@ -200,7 +200,7 @@ proc getFunctionValue*(env: var Env, compiledMatchers:
   else:
     while true:
       # Get the parameter's value.
-      let valueAndLengthO = getValue(env, compiledMatchers, statement,
+      let valueAndLengthO = getValue(env, prepostTable, statement,
                                      pos, variables)
       if not valueAndLengthO.isSome:
         return
@@ -251,8 +251,8 @@ proc getVariable*(env: var Env, statement: Statement, variables:
 # A function name looks like a variable without the namespace part and
 # it is followed by a (.
 
-proc getVarOrFunctionValue*(env: var Env, compiledMatchers:
-           Compiledmatchers, statement: Statement,
+proc getVarOrFunctionValue*(env: var Env, prepostTable:
+           PrepostTable, statement: Statement,
            start: Natural, variables: Variables): Option[ValueAndLength] =
   ## Return the statement's right hand side value and the length
   ## matched. The right hand side must be a variable or a
@@ -277,7 +277,7 @@ proc getVarOrFunctionValue*(env: var Env, compiledMatchers:
         return
       var function = functionO.get()
       let parentheses = parenthesesO.get()
-      let funValueLengthO = getFunctionValue(env, compiledMatchers, function, statement,
+      let funValueLengthO = getFunctionValue(env, prepostTable, function, statement,
                               start+variable.length+parentheses.length, variables)
       if not isSome(funValueLengthO):
         return
@@ -292,7 +292,7 @@ proc getVarOrFunctionValue*(env: var Env, compiledMatchers:
   if isSome(valueO):
     result = some(ValueAndLength(value: valueO.get(), length: variable.length))
 
-proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
+proc getValue(env: var Env, prepostTable: PrepostTable,
               statement: Statement, start: Natural, variables:
                 Variables): Option[ValueAndLength] =
   ## Return the statements right hand side value and the length
@@ -312,11 +312,11 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
   let char = statement.text[start]
 
   if char == '\'' or char == '"':
-    result = getString(env, compiledMatchers, statement, start)
+    result = getString(env, prepostTable, statement, start)
   elif char in {'0' .. '9', '-'}:
-    result = getNumber(env, compiledMatchers, statement, start)
+    result = getNumber(env, prepostTable, statement, start)
   elif isLowerAscii(char) or isUpperAscii(char):
-    result = getVarOrFunctionValue(env, compiledMatchers, statement,
+    result = getVarOrFunctionValue(env, prepostTable, statement,
                                    start, variables)
   else:
     env.warnStatement(statement, wInvalidRightHandSide, start)
@@ -325,7 +325,7 @@ proc getValue(env: var Env, compiledMatchers: Compiledmatchers,
   # env.warnStatement(statement, wStackTrace, start+valueAndLength.length,  "leave getValue")
 
 proc runStatement*(env: var Env, statement: Statement,
-    compiledMatchers: Compiledmatchers, variables: var Variables): Option[VariableData] =
+    prepostTable: PrepostTable, variables: var Variables): Option[VariableData] =
   ## Run one statement. Return the variable namespace, name and value.
 
   # Get the variable name. Match the surrounding white space.
@@ -344,7 +344,7 @@ proc runStatement*(env: var Env, statement: Statement,
   let equalSign = equalSignO.get()
 
   # Get the right hand side value.
-  let valueAndLengthO = getValue(env, compiledMatchers, statement,
+  let valueAndLengthO = getValue(env, prepostTable, statement,
                                  variable.length + equalSign.length,
                                  variables)
   if not valueAndLengthO.isSome:
@@ -373,7 +373,7 @@ proc runStatement*(env: var Env, statement: Statement,
   result = some(newVariableData(nameSpace, varName, value))
 
 proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
-                 seq[LineParts], compiledMatchers: CompiledMatchers,
+                 seq[LineParts], prepostTable: PrepostTable,
                  variables: var Variables) =
   ## Run a command and fill in the variables dictionaries.
 
@@ -385,7 +385,7 @@ proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
   for statement in yieldStatements(cmdLines, cmdLineParts):
     # Run the statement and assign the return value to the variable.
     # When there is a statement error, the statement is skipped.
-    let variableDataO = runStatement(env, statement, compiledMatchers, variables)
+    let variableDataO = runStatement(env, statement, prepostTable, variables)
     if isSome(variableDataO):
       let vd = variableDataO.get()
       assignVariable(variables, vd.nameSpace, vd.varName, vd.value)

@@ -56,8 +56,8 @@ proc newStrFromBuffer(buffer: seq[uint8]): string =
 proc getCmdLineParts(env: var Env, cmdLines: seq[string]): seq[LineParts] =
   ## Return the line parts from the given lines.
   for ix, line in cmdLines:
-    let compiledMatchers = getCompiledMatchers()
-    let partsO = parseCmdLine(env, compiledMatchers, line, lineNum = ix + 1)
+    let prepostTable = getPrepostTable()
+    let partsO = parseCmdLine(env, prepostTable, line, lineNum = ix + 1)
     if not partsO.isSome():
       echo "cannot get command line parts for:"
       echo "line: '$1'" % line
@@ -113,8 +113,8 @@ proc testGetNumber(
 
   var env = openEnvTest("_testGetNumber.log")
 
-  let compiledMatchers = getCompiledMatchers()
-  let valueAndLengthO = getNumber(env, compiledMatchers, statement, start)
+  let prepostTable = getPrepostTable()
+  let valueAndLengthO = getNumber(env, prepostTable, statement, start)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
@@ -133,8 +133,8 @@ proc testGetString(
 
   var env = openEnvTest("_testGetString.log")
 
-  let compiledMatchers = getCompiledMatchers()
-  let valueAndLengthO = getString(env, compiledMatchers, statement, start)
+  let prepostTable = getPrepostTable()
+  let valueAndLengthO = getString(env, prepostTable, statement, start)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
@@ -183,9 +183,9 @@ proc testGetVarOrFunctionValue(variables: Variables, statement: Statement, start
 
   var env = openEnvTest("_getVariable.log")
 
-  let compiledMatchers = getCompiledMatchers()
+  let prepostTable = getPrepostTable()
 
-  let valueAndLengthO = getVarOrFunctionValue(env, compiledMatchers,
+  let valueAndLengthO = getVarOrFunctionValue(env, prepostTable,
                                               statement, start,
                                               variables)
 
@@ -217,12 +217,12 @@ proc testGetFunctionValue(functionName: string, statement: Statement, start: Nat
   var env = openEnvTest("_testGetFunctionValue.log")
 
   var variables = emptyVariables()
-  let compiledMatchers = getCompiledMatchers()
+  let prepostTable = getPrepostTable()
   var functionO = getFunction(functionName)
   if not isSome(functionO):
     return false
   let function = functionO.get()
-  let valueAndLengthO = getFunctionValue(env, compiledMatchers,
+  let valueAndLengthO = getFunctionValue(env, prepostTable,
                           function, statement, start, variables)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
@@ -239,8 +239,8 @@ proc testRunStatement(statement: Statement, nameSpace: string = "", varName: str
   var env = openEnvTest("_runStatement.log")
 
   var variables = emptyVariables()
-  let compiledMatchers = getCompiledMatchers()
-  let variableDataO = runStatement(env, statement, compiledMatchers, variables)
+  let prepostTable = getPrepostTable()
+  let variableDataO = runStatement(env, statement, prepostTable, variables)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 

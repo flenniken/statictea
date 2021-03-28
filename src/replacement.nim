@@ -225,7 +225,7 @@ proc varSegment(bracketedVar: string, namespacePos: Natural,
     segmentValue = $ord(variable)
   result.add("{segmentValue},{namespacePos:<4},{namespaceLen},{varNameLen:<3},{bracketedVar}\n".fmt)
 
-proc lineToSegments(compiledMatchers: CompiledMatchers, line: string): seq[string] {.tpub.} =
+proc lineToSegments(prepostTable: PrepostTable, line: string): seq[string] {.tpub.} =
   ## Convert a line to a list of segments.
 
   var pos = 0
@@ -424,14 +424,14 @@ proc closeDelete*(tempSegments: TempSegments) =
   tempSegments.tempFile.closeDelete()
 
 proc storeLineSegments*(env: var Env, tempSegments: TempSegments,
-                        compiledMatchers: Compiledmatchers, line: string) =
+                        prepostTable: PrepostTable, line: string) =
   ## Divide the line into segments and write them to the TempSegments' temp file.
-  let segments = lineToSegments(compiledMatchers, line)
+  let segments = lineToSegments(prepostTable, line)
   for segment in segments:
     tempSegments.tempFile.file.write(segment)
 
 iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
-    LineBuffer, compiledMatchers: Compiledmatchers, command: string, maxLines: Natural): ReplaceLine =
+    LineBuffer, prepostTable: PrepostTable, command: string, maxLines: Natural): ReplaceLine =
   ## Yield all the replacement block lines and the endblock line too,
   ## if it exists.
 
@@ -449,7 +449,7 @@ iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
           break
 
         # Look for an endblock command and stop when found.
-        var linePartsO = parseCmdLine(env, compiledMatchers, line, lb.lineNum)
+        var linePartsO = parseCmdLine(env, prepostTable, line, lb.lineNum)
         if linePartsO.isSome:
           if linePartsO.get().command == "endblock":
             yield(newReplaceLine(rlEndblockLine, line))
@@ -464,7 +464,7 @@ iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
 
         count.inc
 
-proc newTempSegments*(env: var Env, lb: var LineBuffer, compiledMatchers: CompiledMatchers,
+proc newTempSegments*(env: var Env, lb: var LineBuffer, prepostTable: PrepostTable,
     command: string, repeat: Natural, variables: Variables): Option[TempSegments] =
   ## Read replacement block lines and return a TempSegments object
   ## containing the compiled block. Call writeTempSegments to write

@@ -32,18 +32,14 @@ type
   PrepostTable* = OrderedTable[string, string]
     ## The prefix postfix pairs stored in an ordered dictionary.
 
-  # todo: remove CompiledMatchers.
-  CompiledMatchers* = object
-    prepostTable*: PrepostTable
-
-proc getDefaultPrepostTable*(): PrepostTable =
+proc makeDefaultPrepostTable*(): PrepostTable =
   ## Return the default ordered table that maps prefixes to postfixes.
   result = initOrderedTable[string, string]()
   for prepost in predefinedPrepost:
     assert prepost.pre != ""
     result[prepost.pre] = prepost.post
 
-proc getUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
+proc makeUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
   ## Return the user's ordered table that maps prefixes to
   ## postfixes. This is used when the user specifies prefixes on the
   ## command line. No defaults in this table.
@@ -185,15 +181,12 @@ proc matchLeftBracket*(line: string, start: Natural): Option[Matches] =
   let pattern = "[^{]*{"
   result = matchPatternCached(line, pattern, start)
 
-#todo: remove getCompiledMatchers
-proc getCompiledMatchers*(prepostTable: PrepostTable): CompiledMatchers =
-  ## Compile all the matchers and return them in the
-  ## CompiledMatchers object.
-  result.prepostTable = prepostTable
+proc getPrepostTable*(prepostTable: PrepostTable): PrepostTable =
+  result = prepostTable
 
-proc getCompiledMatchers*(): CompiledMatchers =
+proc getPrepostTable*(): PrepostTable =
   ## Get the compiled matchers using the default prepost items.
-  result = getCompiledMatchers(getDefaultPrepostTable())
+  result = makeDefaultPrepostTable()
 
 proc matchFileLine*(line: string, start: Natural): Option[Matches] =
   let pattern = r"^(.*)\(([0-9]+)\)$"

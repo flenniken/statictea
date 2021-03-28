@@ -17,7 +17,7 @@ proc dumpCmdLines*(resultStream: Stream, cmdLines: var seq[string],
   cmdLineParts.setlen(0)
 
 proc collectCommand*(env: var Env, lb: var LineBuffer,
-      compiledMatchers: CompiledMatchers, resultStream: Stream,
+      prepostTable: PrepostTable, resultStream: Stream,
       cmdLines: var seq[string], cmdLineParts: var seq[LineParts],
       firstReplaceLine: var string
   ) =
@@ -35,7 +35,7 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
       if line == "":
         break # No more lines.
 
-    var linePartsO = parseCmdLine(env, compiledMatchers, line, lb.lineNum)
+    var linePartsO = parseCmdLine(env, prepostTable, line, lb.lineNum)
     if not linePartsO.isSome:
       # Write out non-command lines.
       resultStream.write(line)
@@ -52,7 +52,7 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
         if line == "":
           return # No more lines
 
-        let lPartsO = parseCmdLine(env, compiledMatchers, line, lb.lineNum)
+        let lPartsO = parseCmdLine(env, prepostTable, line, lb.lineNum)
         if lPartsO.isSome:
           lineParts = lPartsO.get()
           if lineParts.command == ":":
