@@ -60,14 +60,14 @@ proc matchPrefix*(line: string, start: Natural, prepostTable: PrepostTable): Opt
   for prefix, _ in prepostTable:
     terms.add(r"\Q$1\E" % prefix)
   let pattern = r"^($1)\s*" % terms.join("|")
-  result = matchRegex(line, pattern, start)
+  result = matchPatternCached(line, pattern, start)
 
-func matchCommand*(line: string, start: Natural = 0): Option[Matches] =
+proc matchCommand*(line: string, start: Natural = 0): Option[Matches] =
   ## Match statictea commands.
   let pattern = r"($1)" % commands.join("|")
-  result = matchRegex(line, pattern, start)
+  result = matchPatternCached(line, pattern, start)
 
-func matchLastPart*(line: string, start: Natural, postfix: string): Option[Matches] =
+proc matchLastPart*(line: string, start: Natural, postfix: string): Option[Matches] =
   ## Match the last part of a command line.  It matches the optional
   ## continuation slash, the optional postfix and the line
   ## endings.
@@ -76,7 +76,7 @@ func matchLastPart*(line: string, start: Natural, postfix: string): Option[Match
     pattern = r"([\\]{0,1})([\r]{0,1}\n){0,1}$"
   else:
     pattern = r"([\\]{0,1})\Q$1\E([\r]{0,1}\n){0,1}$" % postfix
-  result = matchRegex(line, pattern, start)
+  result = matchPatternCached(line, pattern, start)
 
 proc getLastPart*(line: string, postfix: string): Option[Matches] =
   ## Return the optional slash and line endings from the line.
@@ -105,11 +105,11 @@ proc getLastPart*(line: string, postfix: string): Option[Matches] =
 
 proc matchAllSpaceTab*(line: string, start: Natural): Option[Matches] =
   let pattern = r"^[ \t]*$"
-  result = matchRegex(line, pattern, start)
+  result = matchPatternCached(line, pattern, start)
 
 proc matchTabSpace*(line: string, start: Natural): Option[Matches] =
   let pattern = r"[ \t]+"
-  result = matchRegex(line, pattern, start)
+  result = matchPatternCached(line, pattern, start)
 
 proc notEmptyOrSpaces*(text: string): bool =
   ## Return true when a statement is not empty or not all whitespace.
@@ -132,23 +132,23 @@ proc matchVariable*(line: string, start: Natural): Option[Matches] =
   ## check the next character to see whether it makes sense in the
   ## statement, for example, "t." matches and returns "t".
   let pattern = r"(\s*)([a-z]\.){0,1}([a-zA-Z][a-zA-Z0-9_]{0,63})\s*"
-  result = matchRegex(line, pattern, start)
+  result = matchPatternCached(line, pattern, start)
 
 proc matchEqualSign*(line: string, start: Natural): Option[Matches] =
   let pattern = r"(=)\s*"
-  result = matchRegex(line, pattern, start)
+  result = matchPatternCached(line, pattern, start)
 
 proc matchLeftParentheses*(line: string, start: Natural): Option[Matches] =
   let pattern = r"\(\s*"
-  result = matchRegex(line, pattern, start)
+  result = matchPatternCached(line, pattern, start)
 
 proc matchCommaParentheses*(line: string, start: Natural): Option[Matches] =
   let pattern = r"([,)])\s*"
-  result = matchRegex(line, pattern, start)
+  result = matchPatternCached(line, pattern, start)
 
 proc matchRightParentheses*(line: string, start: Natural): Option[Matches] =
   let pattern = r"\)\s*"
-  result = matchRegex(line, pattern, start)
+  result = matchPatternCached(line, pattern, start)
 
 proc matchNumber*(line: string, start: Natural): Option[Matches] =
   ## Return a matcher that matches a number and the optional trailing whitespace. Return the
@@ -160,7 +160,7 @@ proc matchNumber*(line: string, start: Natural): Option[Matches] =
   ## decimal point is allowed and underscores are skipped.  Note: nim
   ## sets the regex anchor option.
   let pattern = r"-{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*\s*"
-  result = matchRegex(line, pattern, start)
+  result = matchPatternCached(line, pattern, start)
 
 proc matchString*(line: string, start: Natural): Option[Matches] =
   ## Return a matcher that matches a string.
@@ -171,7 +171,7 @@ proc matchString*(line: string, start: Natural): Option[Matches] =
   # is for single quotes and the second is for double quotes. Note:
   # nim sets the regex anchor option.
   let pattern = """'([^']*)'\s*|"([^"]*)"\s*"""
-  result = matchRegex(line, pattern, start)
+  result = matchPatternCached(line, pattern, start)
 
 proc matchLeftBracket*(line: string, start: Natural): Option[Matches] =
   ## Match everything up to a left backet. The match length includes
@@ -183,7 +183,7 @@ proc matchLeftBracket*(line: string, start: Natural): Option[Matches] =
   # text on the line {variable} more text {variable2} asdf
   #                   ^
   let pattern = "[^{]*{"
-  result = matchRegex(line, pattern, start)
+  result = matchPatternCached(line, pattern, start)
 
 #todo: remove getCompiledMatchers
 proc getCompiledMatchers*(prepostTable: PrepostTable): CompiledMatchers =
@@ -194,3 +194,7 @@ proc getCompiledMatchers*(prepostTable: PrepostTable): CompiledMatchers =
 proc getCompiledMatchers*(): CompiledMatchers =
   ## Get the compiled matchers using the default prepost items.
   result = getCompiledMatchers(getDefaultPrepostTable())
+
+proc matchFileLine*(line: string, start: Natural): Option[Matches] =
+  let pattern = r"^(.*)\(([0-9]+)\)$"
+  result = matchPatternCached(line, pattern, start)

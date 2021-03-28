@@ -12,7 +12,7 @@ import math
 import matches
 
 type
-  FunctionPtr* = proc (parameters: seq[Value]): FunResult
+  FunctionPtr* = proc (parameters: seq[Value]): FunResult {.noSideEffect.}
     ## Signature of a statictea function. It takes any number of values
     ## and returns a value or a warning message.
 
@@ -33,7 +33,7 @@ type
 # A table of the built in functions.
 var functions: Table[string, FunctionPtr]
 
-proc newFunResultWarn*(warning: Warning, parameter: Natural = 0,
+func newFunResultWarn*(warning: Warning, parameter: Natural = 0,
       p1: string = "", p2: string = ""): FunResult =
   ## Create a FunResult containing a warning message. The parameter is
   ## the index of the problem parameter, or 0. Both p1 and p2 are the
@@ -42,11 +42,11 @@ proc newFunResultWarn*(warning: Warning, parameter: Natural = 0,
   result = FunResult(kind: frWarning, parameter: parameter,
                      warningData: warningData)
 
-proc newFunResult*(value: Value): FunResult =
+func newFunResult*(value: Value): FunResult =
   ## Create a FunResult containing a return value.
   result = FunResult(kind: frValue, value: value)
 
-proc `==`*(funResult1: FunResult, funResult2: FunResult): bool =
+func `==`*(funResult1: FunResult, funResult2: FunResult): bool =
   ## Compare two FunResult objects and return true when equal.
   if funResult1.kind == funResult2.kind:
     case funResult1.kind:
@@ -67,7 +67,7 @@ func `$`*(funResult: FunResult): string =
       $funResult.warningData, $funResult.parameter
     ]
 
-proc cmpString*(a, b: string, ignoreCase: bool = false): int =
+func cmpString*(a, b: string, ignoreCase: bool = false): int =
   ## Compares two UTF-8 strings. Returns 0 when equal, 1 when a is
   ## greater than b and -1 when a less than b. Optionally Ignore case.
   var i = 0
@@ -92,7 +92,7 @@ proc cmpString*(a, b: string, ignoreCase: bool = false): int =
   else:
     result = 0
 
-proc funCmp*(parameters: seq[Value]): FunResult =
+func funCmp*(parameters: seq[Value]): FunResult =
   ## Compare two values.  The values are either numbers or strings
   ## (both the same type), and it returns whether the first parameter
   ## is less than, equal to or greater than the second parameter. It
@@ -125,7 +125,7 @@ proc funCmp*(parameters: seq[Value]): FunResult =
       return
   result = newFunResult(newValue(ret))
 
-proc funConcat*(parameters: seq[Value]): FunResult =
+func funConcat*(parameters: seq[Value]): FunResult =
   ## Concatentate two or more strings.  Added in version 0.1.0.
   var str = ""
   if parameters.len() < 2:
@@ -138,7 +138,7 @@ proc funConcat*(parameters: seq[Value]): FunResult =
     str.add(value.stringv)
   result = newFunResult(newValue(str))
 
-proc funLen*(parameters: seq[Value]): FunResult =
+func funLen*(parameters: seq[Value]): FunResult =
   ## Return the len of a value. It takes one parameter and
   ## returns the number of characters in a string (not bytes), the
   ## number of elements in a list or the number of elements in a
@@ -160,7 +160,7 @@ proc funLen*(parameters: seq[Value]): FunResult =
       return
   result = newFunResult(retValue)
 
-proc funGet*(parameters: seq[Value]): FunResult =
+func funGet*(parameters: seq[Value]): FunResult =
   ## Return a value contained in a list or dictionary. You pass two or
   ## three parameters, the first is the dictionary or list to use, the
   ## second is the dictionary's key name or the list index, and the
@@ -206,7 +206,7 @@ proc funGet*(parameters: seq[Value]): FunResult =
       return newFunResultWarn(wExpectedListOrDict)
 
 # todo: remove the if.  Use case instead.
-proc funIf*(parameters: seq[Value]): FunResult =
+func funIf*(parameters: seq[Value]): FunResult =
   ## You use the if function to return a value based on a condition.
   ## It has three parameters, the condition, the true case and the
   ## false case.
@@ -233,7 +233,7 @@ proc funIf*(parameters: seq[Value]): FunResult =
 
 {.push overflowChecks: on, floatChecks: on.}
 
-proc funAdd*(parameters: seq[Value]): FunResult =
+func funAdd*(parameters: seq[Value]): FunResult =
   ## Return the sum of two or more values.  The parameters must be all
   ## integers or all floats.  A warning is generated on overflow.
   ## Added in version 0.1.0.
@@ -265,7 +265,7 @@ proc funAdd*(parameters: seq[Value]): FunResult =
 
 {.pop.}
 
-proc funExists*(parameters: seq[Value]): FunResult =
+func funExists*(parameters: seq[Value]): FunResult =
   ## Return 1 when a variable exists in a dictionary, else
   ## return 0. The first parameter is the dictionary to check and the
   ## second parameter is the name of the variable.
@@ -294,7 +294,7 @@ proc funExists*(parameters: seq[Value]): FunResult =
     num = 1
   result = newFunResult(newValue(num))
 
-proc funCase*(parameters: seq[Value]): FunResult =
+func funCase*(parameters: seq[Value]): FunResult =
   ## The case function returns a value from multiple choices. It takes
   ## a main condition, any number of case pairs then an optional else
   ## value.
@@ -364,19 +364,24 @@ proc funCase*(parameters: seq[Value]): FunResult =
   # Return the else case.
   result = newFunResult(parameters[parameters.len-1])
 
-proc parseVersion*(version: string): Option[(int, int, int)] =
+func matchVersion*(line: string, start: Natural): Option[Matches] =
+  let pattern = r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$"
+  result = matchRegex(line, pattern, start)
+
+func parseVersion*(version: string): Option[(int, int, int)] =
   ## Parse a StaticTea version number and return its three components.
   # todo: add matchVersion to matches.nim.
-  let matches2O = matchRegex(version, r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$", 0)
-  if not matches2O.isSome:
+
+  let matchesO = matchVersion(version, 0)
+  if not matchesO.isSome:
     return
-  let (g1, g2, g3) = matches2O.get().get3Groups()
+  let (g1, g2, g3) = matchesO.get().get3Groups()
   var g1IntPosO = parseInteger(g1)
   var g2IntPosO = parseInteger(g2)
   var g3IntPosO = parseInteger(g3)
   result = some((int(g1IntPosO.get().integer), int(g2IntPosO.get().integer), int(g3IntPosO.get().integer)))
 
-proc funCmpVersion*(parameters: seq[Value]): FunResult =
+func funCmpVersion*(parameters: seq[Value]): FunResult =
   ## Compare two StaticTea type version numbers. Return whether the
   ## first parameter is less than, equal to or greater than the second
   ## parameter. It returns -1 for less, 0 for equal and 1 for greater
@@ -415,7 +420,7 @@ proc funCmpVersion*(parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(ret))
 
-proc funFloat*(parameters: seq[Value]): FunResult =
+func funFloat*(parameters: seq[Value]): FunResult =
   ## Convert an int or an int number string to a float.
   ##
   ## Added in version 0.1.0.
@@ -452,7 +457,7 @@ proc funFloat*(parameters: seq[Value]): FunResult =
 
 # todo: use int64 instead of BiggestInt everywhere.
 
-proc funInt*(parameters: seq[Value]): FunResult =
+func funInt*(parameters: seq[Value]): FunResult =
   ## Convert a float or a number string to an int.
   ##
   ## - p1: value to convert, float or float number string
@@ -524,7 +529,7 @@ proc funInt*(parameters: seq[Value]): FunResult =
       return newFunResultWarn(wExpectedRoundOption, 1)
   result = newFunResult(newValue(ret))
 
-proc funFind*(parameters: seq[Value]): FunResult =
+func funFind*(parameters: seq[Value]): FunResult =
   ## Find a substring in a string and return its position when
   ## found. The first parameter is the string and the second is the
   ## substring. The third optional parameter is returned when the
@@ -561,7 +566,7 @@ proc funFind*(parameters: seq[Value]): FunResult =
 
 # todo: add examples for all functions.
 # todo: change from half-open to ix, length.
-proc funSubstr*(parameters: seq[Value]): FunResult =
+func funSubstr*(parameters: seq[Value]): FunResult =
   ## Extract a substring from a string.  The first parameter is the
   ## string, the second is the substring's starting position and the
   ## third is one past the end. The first position is 0. The third
@@ -608,7 +613,7 @@ proc funSubstr*(parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(str[start .. finish-1]))
 
-proc funDup*(parameters: seq[Value]): FunResult =
+func funDup*(parameters: seq[Value]): FunResult =
   ## Duplicate a string. The first parameter is the string to dup and
   ## the second parameter is the number of times to duplicate it.
   ## Added in version 0.1.0.
@@ -638,7 +643,7 @@ proc funDup*(parameters: seq[Value]): FunResult =
     str.add(pattern)
   result = newFunResult(newValue(str))
 
-proc funDict*(parameters: seq[Value]): FunResult =
+func funDict*(parameters: seq[Value]): FunResult =
   ## Create a dictionary from a list of key, value pairs. You can
   ## specify as many pair as you want. The keys must be strings and
   ## the values and be any type. Added in version 0.1.0.
@@ -664,7 +669,7 @@ proc funDict*(parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(dict))
 
-proc funList*(parameters: seq[Value]): FunResult =
+func funList*(parameters: seq[Value]): FunResult =
   ## Create a list of values. You can specify as many variables as you
   ## want.  Added in version 0.1.0.
   ##
@@ -674,7 +679,7 @@ proc funList*(parameters: seq[Value]): FunResult =
   ##
   result = newFunResult(newValue(parameters))
 
-proc funReplace*(parameters: seq[Value]): FunResult =
+func funReplace*(parameters: seq[Value]): FunResult =
   ## Replace a part of a string (substring) with another string.
   ##
   ## The first parameter is the string, the second is the substring's
@@ -848,3 +853,9 @@ proc getFunction*(functionName: string): Option[FunctionPtr] =
   var function = functions.getOrDefault(functionName)
   if function != nil:
     result = some(function)
+
+
+# /Users/steve/code/statictea/src/runFunction.nim(815, 5)
+# Error: type mismatch:
+#   got      <(string, proc (parameters: seq[Value]): FunResult{.locks: <unknown>.})> but
+#   expected '(string, proc (parameters: seq[Value]): FunResult{.noSideEffect, gcsafe, locks: 0.})'
