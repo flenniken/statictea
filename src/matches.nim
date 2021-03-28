@@ -118,65 +118,39 @@ proc notEmptyOrSpaces*(text: string): bool =
     if not matchesO.isSome:
       result = true
 
-proc getVariableMatcher*(): Matcher =
-  ## Return a matcher that matches a variable and surrounding
-  ## whitespace. Return the leading whitespace, the namespace and the
-  ## variable name.
-  ## blank
+proc matchVariable*(line: string, start: Natural): Option[Matches] =
+  ## Matches a variable and surrounding whitespace. Return the leading
+  ## whitespace, the namespace and the variable name.
+  ##
   ## A variable starts with an optional prefix followed by a required
   ## variable name. The prefix is a lowercase letter followed by a
   ## period. The variable name starts with a letter followed by
   ## letter, digits and underscores. The variable name length is 1 to
   ## 64 characters. Variables are ascii.
-  ## blank
+  ##
   ## The match stops on the first non matching character. You need to
   ## check the next character to see whether it makes sense in the
   ## statement, for example, "t." matches and returns "t".
-  # Note: nim sets the regex anchor option.
-  result = newMatcher(r"(\s*)([a-z]\.){0,1}([a-zA-Z][a-zA-Z0-9_]{0,63})\s*", 3)
-
-proc matchVariable*(line: string, start: Natural): Option[Matches] =
   let pattern = r"(\s*)([a-z]\.){0,1}([a-zA-Z][a-zA-Z0-9_]{0,63})\s*"
   result = matchRegex(line, pattern, start)
-
-proc getEqualSignMatcher*(): Matcher =
-  ## Return a matcher that matches an equal sign and the optional following white space.
-  # Note: nim sets the regex anchor option.
-  result = newMatcher(r"(=)\s*", 1)
 
 proc matchEqualSign*(line: string, start: Natural): Option[Matches] =
   let pattern = r"(=)\s*"
   result = matchRegex(line, pattern, start)
 
-proc getLeftParenthesesMatcher*(): Matcher =
-  ## Return a matcher that matches a left parentheses and the optional following white space.
-  # Note: nim sets the regex anchor option.
-  result = newMatcher(r"\(\s*", 0)
-
 proc matchLeftParentheses*(line: string, start: Natural): Option[Matches] =
   let pattern = r"\(\s*"
   result = matchRegex(line, pattern, start)
-
-proc getCommaParenthesesMatcher*(): Matcher =
-  ## Return a matcher that matches a comma or right parentheses and the optional following
-  ## white space. One group containing either the comma or right paren.
-  # Note: nim sets the regex anchor option.
-  result = newMatcher(r"([,)])\s*", 1)
 
 proc matchCommaParentheses*(line: string, start: Natural): Option[Matches] =
   let pattern = r"([,)])\s*"
   result = matchRegex(line, pattern, start)
 
-proc getRightParenthesesMatcher*(): Matcher =
-  ## Return a matcher that matches a right parentheses and the optional following white space.
-  # Note: nim sets the regex anchor option.
-  result = newMatcher(r"\)\s*", 0)
-
 proc matchRightParentheses*(line: string, start: Natural): Option[Matches] =
   let pattern = r"\)\s*"
   result = matchRegex(line, pattern, start)
 
-proc getNumberMatcher*(): Matcher =
+proc matchNumber*(line: string, start: Natural): Option[Matches] =
   ## Return a matcher that matches a number and the optional trailing whitespace. Return the
   ## optional decimal point that tells whether the number is a float
   ## or integer.
@@ -185,14 +159,10 @@ proc getNumberMatcher*(): Matcher =
   ## followed by digits, underscores or a decimal point. Only one
   ## decimal point is allowed and underscores are skipped.  Note: nim
   ## sets the regex anchor option.
-
-  result = newMatcher(r"-{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*\s*", 1)
-
-proc matchNumber*(line: string, start: Natural): Option[Matches] =
   let pattern = r"-{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*\s*"
   result = matchRegex(line, pattern, start)
 
-proc getStringMatcher*(): Matcher =
+proc matchString*(line: string, start: Natural): Option[Matches] =
   ## Return a matcher that matches a string.
 
   # A string is inside quotes, either single or double quotes. The
@@ -200,14 +170,10 @@ proc getStringMatcher*(): Matcher =
   # two returned groups and only one will contain anything. The first
   # is for single quotes and the second is for double quotes. Note:
   # nim sets the regex anchor option.
-
-  result = newMatcher("""'([^']*)'\s*|"([^"]*)"\s*""", 2)
-
-proc matchString*(line: string, start: Natural): Option[Matches] =
   let pattern = """'([^']*)'\s*|"([^"]*)"\s*"""
   result = matchRegex(line, pattern, start)
 
-proc getLeftBracketMatcher*(): Matcher =
+proc matchLeftBracket*(line: string, start: Natural): Option[Matches] =
   ## Match everything up to a left backet. The match length includes
   ## the bracket.
 
@@ -216,25 +182,15 @@ proc getLeftBracketMatcher*(): Matcher =
 
   # text on the line {variable} more text {variable2} asdf
   #                   ^
-  result = newMatcher("[^{]*{", 0)
-
-proc matchLeftBracket*(line: string, start: Natural): Option[Matches] =
   let pattern = "[^{]*{"
   result = matchRegex(line, pattern, start)
 
+#todo: remove getCompiledMatchers
 proc getCompiledMatchers*(prepostTable: PrepostTable): CompiledMatchers =
   ## Compile all the matchers and return them in the
   ## CompiledMatchers object.
   result.prepostTable = prepostTable
 
-
 proc getCompiledMatchers*(): CompiledMatchers =
   ## Get the compiled matchers using the default prepost items.
   result = getCompiledMatchers(getDefaultPrepostTable())
-
-# when defined(test):
-#   proc checkGetLastPart*(matcher: Matcher, line: string, expectedStart: Natural,
-#       expected: seq[string], expectedLength: Natural): bool =
-#     let matchesO = getLastPart(matcher, line)
-#     result = checkMatches(matchesO, matcher, line, expectedStart,
-#       expected, expectedLength)

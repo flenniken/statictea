@@ -5,6 +5,7 @@ import tables
 import options
 import regexes
 import env
+import strutils
 
 proc testMatchCommand(line: string, start: Natural = 0,
     eMatchesO: Option[Matches] = none(Matches)): bool =
@@ -58,6 +59,54 @@ proc testLeftParentheses(line: string, start: Natural,
   else:
     result = true
 
+proc testMatchVariable(line: string, start: Natural,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = matchVariable(line, start)
+  if not expectedItem("matchesO: $1" % [line], matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
+
+proc testMatchString(line: string, start: Natural = 0,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = matchString(line, start)
+  if not expectedItem("matchesO", matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
+
+proc testMatchEqualSign(line: string, start: Natural,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = matchEqualSign(line, start)
+  if not expectedItem("matchesO", matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
+
+proc testMatchNumber(line: string, start: Natural = 0,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = matchNumber(line, start)
+  if not expectedItem("matchesO", matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
+
+proc testMatchCommaParentheses(line: string, start: Natural = 0,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = matchCommaParentheses(line, start)
+  if not expectedItem("matchesO", matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
+
+proc testMatchLeftBracket(line: string, start: Natural = 0,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = matchLeftBracket(line, start)
+  if not expectedItem("matchesO", matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
+
 suite "matches.nim":
 
   test "prepost table":
@@ -68,8 +117,7 @@ suite "matches.nim":
       # echo "$1 nextline $2" % [prefix, postfix]
     check prepostTable["<!--$"] == "-->"
 
-  test "matchPrefix tests":
-
+  test "matchPrefix":
     check testMatchPrefix("<!--$ nextline -->", 0, some(newMatches(6, 0, "<!--$")))
     check testMatchPrefix("#$ nextline", 0, some(newMatches(3, 0, "#$")))
     check testMatchPrefix(";$ nextline", 0, some(newMatches(3, 0, ";$")))
@@ -110,7 +158,7 @@ suite "matches.nim":
     check prepostTable.len == 1
     check prepostTable[prefix] == "post"
 
-  test "command matcher":
+  test "matchCommand":
     check testMatchCommand("<!--$ nextline -->", 6, some(newMatches(8, 6, "nextline")))
 
     check testMatchCommand("<!--$ block    -->", 6, some(newMatches(5, 6, "block")))
@@ -139,7 +187,7 @@ suite "matches.nim":
     check testMatchCommand(" nextlin", 2)
     check testMatchCommand(" coment ", 2)
 
-  test "last part matcher":
+  test "matchLastPart":
     check testMatchLastPart("<!--$ nextline -->", 15, "-->", some(newMatches(3, 15)))
     check testMatchLastPart("<!--$ nextline -->\n", 15, "-->", some(newMatches(4, 15, "", "\n")))
     check testMatchLastPart("<!--$ nextline -->\r\n", 15, "-->", some(newMatches(5, 15, "", "\r\n")))
@@ -148,7 +196,6 @@ suite "matches.nim":
     check testMatchLastPart("<!--$ nextline \\-->\n", 15, "-->", some(newMatches(5, 15, r"\", "\n")))
     check testMatchLastPart("<!--$ nextline \\-->\r\n", 15, "-->", some(newMatches(6, 15, r"\", "\r\n")))
 
-  test "getLastPart":
     check testMatchLastPart("<!--$ nextline -->", 15, "-->", some(newMatches(3, 15)))
     check testMatchLastPart("<!--$ nextline -->\n", 15, "-->", some(newMatches(4, 15, "", "\n")))
     check testMatchLastPart("<!--$ nextline -->\r\n", 15, "-->", some(newMatches(5, 15, "", "\r\n")))
@@ -157,7 +204,6 @@ suite "matches.nim":
     check testMatchLastPart("<!--$ nextline \\-->\n", 15, "-->", some(newMatches(5, 15, r"\", "\n")))
     check testMatchLastPart("<!--$ nextline \\-->\r\n", 15, "-->", some(newMatches(6, 15, r"\", "\r\n")))
 
-  test "getLastPart blank postfix":
     check testMatchLastPart("<!--$ nextline a", 16, "", some(newMatches(0, 16)))
     check testMatchLastPart("<!--$ nextline a\n", 16, "", some(newMatches(1, 16, "", "\n")))
     check testMatchLastPart("<!--$ nextline a\r\n", 16, "", some(newMatches(2, 16, "", "\r\n")))
@@ -167,12 +213,12 @@ suite "matches.nim":
     check testMatchLastPart("<!--$ nextline a\\\r\n", 16, "", some(newMatches(3, 16, r"\", "\r\n")))
     check testMatchLastPart(r"#$ nextline \", 12, "", some(newMatches(1, 12, r"\")))
 
-  test "get space tab":
+  test "matchAllSpaceTab":
     check testMatchAllSpaceTab("    ", 0, some(newMatches(4, 0)))
     check testMatchAllSpaceTab(" \t \t   ", 0, some(newMatches(7, 0)))
     check testMatchAllSpaceTab("    s   ", 0)
 
-  test "get tab space":
+  test "matchTabSpace":
     check testMatchTabSpace(" ", 0, some(newMatches(1, 0)))
     check testMatchTabSpace("\t", 0, some(newMatches(1, 0)))
     check testMatchTabSpace(" \t", 0, some(newMatches(2, 0)))
@@ -189,127 +235,115 @@ suite "matches.nim":
     check testMatchTabSpace("\r", 0)
     check testMatchTabSpace(" a ", 1)
 
-  test "get variable":
-    var matcher = getVariableMatcher()
-    check checkMatcher(matcher, "a = 5", 0, @["", "", "a"], 2)
-    check checkMatcher(matcher, " a = 5 ", 0, @[" ", "", "a"], 3)
-    check checkMatcher(matcher, "t.a = 5", 0, @["", "t.", "a"], 4)
-    check checkMatcher(matcher, "abc = 5", 0, @["", "", "abc"], 4)
-    check checkMatcher(matcher, "   a = 5", 0, @["   ", "", "a"], 5)
-    check checkMatcher(matcher, "aBcD_t = 5", 0, @["", "", "aBcD_t"], 7)
-    check checkMatcher(matcher, "t.server = 5", 0, @["", "t.", "server"], 9)
-    check checkMatcher(matcher, "t.server =", 0, @["", "t.", "server"], 9)
-    check checkMatcher(matcher, "   a =    5", 0, @["   ", "", "a"], 5)
+  test "matchVariable":
+    check testMatchVariable("a = 5", 0, some(newMatches(2, 0, "", "", "a")))
+    check testMatchVariable(" a = 5 ", 0, some(newMatches(3, 0, " ", "", "a")))
+    check testMatchVariable("t.a = 5", 0, some(newMatches(4, 0, "", "t.", "a")))
+    check testMatchVariable("abc = 5", 0, some(newMatches(4, 0, "", "", "abc")))
+    check testMatchVariable("   a = 5", 0, some(newMatches(5, 0, "   ", "", "a")))
+    check testMatchVariable("aBcD_t = 5", 0, some(newMatches(7, 0, "", "", "aBcD_t")))
+    check testMatchVariable("t.server = 5", 0, some(newMatches(9, 0, "", "t.", "server")))
+    check testMatchVariable("t.server =", 0, some(newMatches(9, 0, "", "t.", "server")))
+    check testMatchVariable("   a =    5", 0, some(newMatches(5, 0, "   ", "", "a")))
     let longVar = "a23456789_123456789_123456789_123456789_123456789_123456789_1234"
-    check checkMatcher(matcher, longVar, 0, @["", "", longVar], longVar.len)
-    check checkMatcher(matcher, longVar & " = 5", 0, @["", "", longVar],
-                                          longVar.len + 1)
+    check testMatchVariable(longVar, 0, some(newMatches(64, 0, "", "", longVar)))
+    check testMatchVariable(longVar & " = 5", 0, some(newMatches(65, 0, "", "", longVar)))
+    check testMatchVariable(" t." & longVar & " = 5", 0, some(newMatches(68, 0, " ", "t.", longVar)))
 
     # These start with a variable but are not valid statements.
-    check checkMatcher(matcher, "t. =", 0, @["", "", "t"], 1)
-    check checkMatcher(matcher, "tt.a =", 0, @["", "", "tt"], 2)
-    check checkMatcher(matcher, "abc() =", 0, @["", "", "abc"], 3)
-    check checkMatcher(matcher, "abc", 0, @["", "", "abc"], 3)
-    check checkMatcher(matcher, "t.1a", 0, @["", "", "t"], 1)
+    check testMatchVariable("t. =", 0, some(newMatches(1, 0, "", "", "t")))
+    check testMatchVariable("tt.a =", 0, some(newMatches(2, 0, "", "", "tt")))
+    check testMatchVariable("abc() =", 0, some(newMatches(3, 0, "", "", "abc")))
+    check testMatchVariable("abc", 0, some(newMatches(3, 0, "", "", "abc")))
+    check testMatchVariable("t.1a", 0, some(newMatches(1, 0, "", "", "t")))
     # It matches up to 64 characters.
     let tooLong = "a23456789_123456789_123456789_123456789_123456789_123456789_12345"
-    check checkMatcher(matcher, tooLong, 0, @["", "", longVar], longVar.len)
+    check testMatchVariable(tooLong, 0, some(newMatches(64, 0, "", "", longVar)))
 
-    check checkMatcherNot(matcher, ".a =", 0)
-    check checkMatcherNot(matcher, "_a =", 0)
-    check checkMatcherNot(matcher, "*a =", 0)
-    check checkMatcherNot(matcher, "34r =", 0)
-    check checkMatcherNot(matcher, "  2 =", 0)
-    check checkMatcherNot(matcher, ". =", 0)
+    check testMatchVariable(".a =", 0)
+    check testMatchVariable("_a =", 0)
+    check testMatchVariable("*a =", 0)
+    check testMatchVariable("34r =", 0)
+    check testMatchVariable("  2 =", 0)
+    check testMatchVariable(". =", 0)
 
-  test "get equal sign":
-    var matcher = getEqualSignMatcher()
-    check checkMatcher(matcher, "=5", 0, @["="], 1)
-    check checkMatcher(matcher, "= 5", 0, @["="], 2)
+  test "matchEqualSign":
+    check testMatchEqualSign("=5", 0, some(newMatches(1, 0, "=")))
+    check testMatchEqualSign("= 5", 0, some(newMatches(2, 0, "=")))
 
     # Starts with equal sign but not valid statement.
-    check checkMatcher(matcher, "==5", 0, @["="], 1)
+    check testMatchEqualSign("==5", 0, some(newMatches(1, 0, "=")))
 
-    check checkMatcherNot(matcher, " =", 0)
-    check checkMatcherNot(matcher, "2=", 0)
-    check checkMatcherNot(matcher, "a", 0)
+    check testMatchEqualSign(" =", 0)
+    check testMatchEqualSign("2=", 0)
+    check testMatchEqualSign("a", 0)
 
-  test "getNumberMatcher":
-    var matcher = getNumberMatcher()
-    check checkMatcher(matcher, "5", start = 0, expectedStrings = @[""], expectedLength = 1)
-    check checkMatcher(matcher, "-5", 0, @[""], 2)
-    check checkMatcher(matcher, "-5.", 0, @["."], 3)
-    check checkMatcher(matcher, "-5.6", 0, @["."], 4)
-    check checkMatcher(matcher, "56789.654321", 0, @["."], 12)
-    check checkMatcher(matcher, "4 ", 0, @[""], 2)
-    check checkMatcher(matcher, "4_123_456.0 ", 0, @["."], 12)
-    check checkMatcher(matcher, "4_123_456 ", 0, @[""], 10)
+  test "matchNumber":
+    check testMatchNumber("5", 0, some(newMatches(1, 0)))
+    check testMatchNumber("-5", 0, some(newMatches(2, 0)))
+    check testMatchNumber("-5.", 0, some(newMatches(3, 0, ".")))
+    check testMatchNumber("-5.6", 0, some(newMatches(4, 0, ".")))
+    check testMatchNumber("56789.654321", 0, some(newMatches(12, 0, ".")))
+    check testMatchNumber("4 ", 0, some(newMatches(2, 0)))
+    check testMatchNumber("4_123_456.0 ", 0, some(newMatches(12, 0, ".")))
+    check testMatchNumber("4_123_456 ", 0, some(newMatches(10, 0)))
 
-  test "getNumberMatcher with start":
-    var matcher = getNumberMatcher()
-    check checkMatcher(matcher, "a = 5", 4, @[""], 1)
-    check checkMatcher(matcher, "a = 5 ", 4, @[""], 2)
-    check checkMatcher(matcher, "a = -5.2", 4, @["."], 4)
-    check checkMatcher(matcher, "a = 0.2", 4, @["."], 3)
-    check checkMatcher(matcher, "a = 0.2   ", 4, @["."], 6)
+  test "matchNumber with start":
+    check testMatchNumber("a = 5", 4, some(newMatches(1, 4)))
+    check testMatchNumber("a = 5 ", 4, some(newMatches(2, 4)))
+    check testMatchNumber("a = -5.2", 4, some(newMatches(4, 4, ".")))
+    check testMatchNumber("a = 0.2", 4, some(newMatches(3, 4, ".")))
+    check testMatchNumber("a = 0.2   ", 4, some(newMatches(6, 4, ".")))
 
     # Starts with a number but not a valid statement.
-    check checkMatcher(matcher, "5a", 0, @[""], 1)
-    check checkMatcher(matcher, "5.5.", 0, @["."], 3)
-    check checkMatcher(matcher, "5.5.6", 0, @["."], 3)
+    check testMatchNumber("5a", 0, some(newMatches(1, 0)))
+    check testMatchNumber("5.5.", 0, some(newMatches(3, 0, ".")))
+    check testMatchNumber("5.5.6", 0, some(newMatches(3, 0, ".")))
 
-  test "getNumberMatcherNot":
-    var matcher = getNumberMatcher()
-    check checkMatcherNot(matcher, "a = 5 abc")
-    check checkMatcherNot(matcher, "a = -5.2abc")
-    check checkMatcherNot(matcher, "abc")
-    check checkMatcherNot(matcher, "")
-    check checkMatcherNot(matcher, ".")
-    check checkMatcherNot(matcher, "+") # no plus signs
-    check checkMatcherNot(matcher, "-")
-    check checkMatcherNot(matcher, "_")
-    check checkMatcherNot(matcher, "_4")
-    check checkMatcherNot(matcher, "-a")
-    check checkMatcherNot(matcher, ".1") # need a leading digit
-    check checkMatcherNot(matcher, "-.1")
-    check checkMatcherNot(matcher, " 4")
+  test "matchNumber not number":
+    check testMatchNumber("a = 5 abc")
+    check testMatchNumber("a = -5.2abc")
+    check testMatchNumber("abc")
+    check testMatchNumber("")
+    check testMatchNumber(".")
+    check testMatchNumber("+") # no plus signs
+    check testMatchNumber("-")
+    check testMatchNumber("_")
+    check testMatchNumber("_4")
+    check testMatchNumber("-a")
+    check testMatchNumber(".1") # need a leading digit
+    check testMatchNumber("-.1")
+    check testMatchNumber(" 4")
 
   test "matchNumber":
     check matchNumber("a = 5", 4) == some(newMatches(1, 4))
     check matchNumber("a = 5.3", 4) == some(newMatches(3, 4, "."))
 
-  test "getStringMatcher":
-    var matcher = getStringMatcher()
-    check checkMatcher(matcher, "'hi'", start = 0, expectedStrings = @["hi", ""], expectedLength = 4)
-    check checkMatcher(matcher, "'1234'", 0, @["1234", ""], 6)
-    check checkMatcher(matcher, "'abc def' ", 0, @["abc def", ""], 10)
-    check checkMatcher(matcher, """"string"""", 0, @["", "string"], 8)
-    check checkMatcher(matcher, """"string"  """, 0, @["", "string"], 10)
-    check checkMatcher(matcher, """'12"4'""", 0, @["12\"4", ""], 6)
-    check checkMatcher(matcher, """"12'4"  """, 0, @["", "12'4"], 8)
+  test "matchString":
+    check testMatchString("'hi'", 0, some(newMatches(4, 0, "hi")))
+    check testMatchString("'1234'", 0, some(newMatches(6, 0, "1234")))
+    check testMatchString("'abc def' ", 0, some(newMatches(10, 0, "abc def")))
+    check testMatchString(""""string"""", 0, some(newMatches(8, 0, "", "string")))
+    check testMatchString(""""string"  """, 0, some(newMatches(10, 0, "", "string")))
+    check testMatchString("""'12"4'""", 0, some(newMatches(6, 0, "12\"4")))
+    check testMatchString(""""12'4"  """, 0, some(newMatches(8, 0, "", "12'4")))
 
-  test "getStringMatcher with start":
-    var matcher = getStringMatcher()
-    check checkMatcher(matcher, "a = 'hello'", 4, @["hello", ""], 7)
-    check checkMatcher(matcher, "a = '   4 '  ", 4, @["   4 ", ""], 9)
-    check checkMatcher(matcher, """a = "hello" """, 4, @["", "hello"], 8)
-    check checkMatcher(matcher, """a = 'hel"lo' """, 4, @["hel\"lo", ""], 9)
-    check checkMatcher(matcher, """a = "it's true"  """, 4, @["", "it's true"], 13)
+    check testMatchString("a = 'hello'", 4, some(newMatches(7, 4, "hello")))
+    check testMatchString("a = '   4 '  ", 4, some(newMatches(9, 4, "   4 ")))
+    check testMatchString("""a = "hello" """, 4, some(newMatches(8, 4, "", "hello")))
+    check testMatchString("""a = 'hel"lo' """, 4, some(newMatches(9, 4, "hel\"lo")))
+    check testMatchString("""a = "it's true"  """, 4, some(newMatches(13, 4, "", "it's true")))
 
-  test "getStringMatcher extra text after":
-    var matcher = getStringMatcher()
-    check checkMatcher(matcher, "tea = 'Earl Grey' tea2 = 'Masala chai'", 6,
-                       @["Earl Grey", ""], 12)
+    check testMatchString("tea = 'Earl Grey' tea2 = 'Masala chai'", 6,
+                       some(newMatches(12, 6, "Earl Grey")))
 
-  test "getStringMatcherNot":
-    var matcher = getStringMatcher()
-    check checkMatcherNot(matcher, "a = 'b' abc")
-    check checkMatcherNot(matcher, "a = 'abc")
-    check checkMatcherNot(matcher, """'a"bc """)
-    check checkMatcherNot(matcher, "")
-    check checkMatcherNot(matcher, ".")
+    check testMatchString("a = 'b' abc")
+    check testMatchString("a = 'abc")
+    check testMatchString("""'a"bc """)
+    check testMatchString("")
+    check testMatchString(".")
 
-  test "getLeftParenthesesMatcher":
+  test "matchLeftParentheses":
     check testLeftParentheses("(", 0, some(newMatches(1, 0)))
     check testLeftParentheses("( ", 0, some(newMatches(2, 0)))
     check testLeftParentheses("( 5", 0, some(newMatches(2, 0)))
@@ -320,24 +354,22 @@ suite "matches.nim":
     check testLeftParentheses("abc(", 0)
     check testLeftParentheses(" (", 0)
 
-  test "getCommaParenthesesMatcher":
-    var matcher = getCommaParenthesesMatcher()
-    check checkMatcher(matcher, ",", 0, @[","], 1)
-    check checkMatcher(matcher, ")", 0, @[")"], 1)
-    check checkMatcher(matcher, ", ", 0, @[","], 2)
-    check checkMatcher(matcher, ") 5", 0, @[")"], 2)
+  test "matchCommaParentheses":
+    check testMatchCommaParentheses(",", 0, some(newMatches(1, 0, ",")))
+    check testMatchCommaParentheses(")", 0, some(newMatches(1, 0, ")")))
+    check testMatchCommaParentheses(", ", 0, some(newMatches(2, 0, ",")))
+    check testMatchCommaParentheses(") 5", 0, some(newMatches(2, 0, ")")))
 
-    check checkMatcherNot(matcher, "( )", 0)
-    check checkMatcherNot(matcher, "2,", 0)
-    check checkMatcherNot(matcher, "abc)", 0)
-    check checkMatcherNot(matcher, " ,", 0)
+    check testMatchCommaParentheses("( )", 0)
+    check testMatchCommaParentheses("2,", 0)
+    check testMatchCommaParentheses("abc)", 0)
+    check testMatchCommaParentheses(" ,", 0)
 
-  test "getLeftBracketMatcher":
-    var matcher = getLeftBracketMatcher()
-    check checkMatcher(matcher, "{", 0, @[], 1)
-    check checkMatcher(matcher, "{t}", 0, @[], 1)
-    check checkMatcher(matcher, "asdf{tea}fdsa\r\n", 0, @[], 5)
+  test "matchLeftBracket":
+    check testMatchLeftBracket("{", 0, some(newMatches(1, 0)))
+    check testMatchLeftBracket("{t}", 0, some(newMatches(1, 0)))
+    check testMatchLeftBracket("asdf{tea}fdsa\r\n", 0, some(newMatches(5, 0)))
 
-    check checkMatcherNot(matcher, "", 0)
-    check checkMatcherNot(matcher, "a", 0)
-    check checkMatcherNot(matcher, "asdf", 0)
+    check testMatchLeftBracket("", 0)
+    check testMatchLeftBracket("a", 0)
+    check testMatchLeftBracket("asdf", 0)

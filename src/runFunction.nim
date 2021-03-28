@@ -432,7 +432,6 @@ proc funFloat*(parameters: seq[Value]): FunResult =
       result = newFunResult(newValue(float(p1.intv)))
     of vkString:
       # From number string to float.
-      let compiledMatchers = getCompiledMatchers()
       var matchesO = matchNumber(p1.stringv, 0)
       if not matchesO.isSome:
         return newFunResultWarn(wIntOrStringNumber)
@@ -479,7 +478,6 @@ proc funInt*(parameters: seq[Value]): FunResult =
       num = p1.floatv
     of vkString:
       # From number string to int.
-      let compiledMatchers = getCompiledMatchers()
       var matchesO = matchNumber(p1.stringv, 0)
       if not matchesO.isSome:
         return newFunResultWarn(wFloatOrStringNumber)
