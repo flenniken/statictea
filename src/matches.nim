@@ -181,13 +181,6 @@ proc matchLeftBracket*(line: string, start: Natural): Option[Matches] =
   let pattern = "[^{]*{"
   result = matchPatternCached(line, pattern, start)
 
-proc getPrepostTable*(prepostTable: PrepostTable): PrepostTable =
-  result = prepostTable
-
-proc getPrepostTable*(): PrepostTable =
-  ## Get the compiled matchers using the default prepost items.
-  result = makeDefaultPrepostTable()
-
 proc matchFileLine*(line: string, start: Natural): Option[Matches] =
   let pattern = r"^(.*)\(([0-9]+)\)$"
   result = matchPatternCached(line, pattern, start)

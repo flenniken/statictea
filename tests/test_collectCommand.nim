@@ -28,7 +28,7 @@ proc testCollectCommand(
 
   var env = openEnvTest("_collectCommand.log")
 
-  let prepostTable = getPrepostTable()
+  let prepostTable = makeDefaultPrepostTable()
   var nextLine: string
   collectCommand(env, lb, prepostTable, resultStream, cmdLines, cmdLineParts, nextLine)
 

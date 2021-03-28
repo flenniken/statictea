@@ -23,7 +23,7 @@ proc testYieldReplacementLine(
   if not lineBufferO.isSome:
     return false
   var lb = lineBufferO.get()
-  let prepostTable = getPrepostTable()
+  let prepostTable = makeDefaultPrepostTable()
 
   var yieldLines = newSeq[ReplaceLine]()
   for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, prepostTable, command, maxLines):
@@ -81,7 +81,7 @@ suite "replacement":
     check varSegment("{t.ab}", 1, 2, 2, true)  == "4,1   ,2,2  ,{t.ab}\n"
 
   test "lineToSegments":
-    let prepostTable = getPrepostTable()
+    let prepostTable = makeDefaultPrepostTable()
     check expectedItems("segments", lineToSegments(prepostTable, "test\n"), @["1,test\n"])
     check expectedItems("segments", lineToSegments(prepostTable, "test"), @["3,test\n"])
     check expectedItems("segments", lineToSegments(prepostTable, "te{1st"), @[

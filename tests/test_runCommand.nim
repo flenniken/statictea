@@ -56,7 +56,7 @@ proc newStrFromBuffer(buffer: seq[uint8]): string =
 proc getCmdLineParts(env: var Env, cmdLines: seq[string]): seq[LineParts] =
   ## Return the line parts from the given lines.
   for ix, line in cmdLines:
-    let prepostTable = getPrepostTable()
+    let prepostTable = makeDefaultPrepostTable()
     let partsO = parseCmdLine(env, prepostTable, line, lineNum = ix + 1)
     if not partsO.isSome():
       echo "cannot get command line parts for:"
@@ -113,7 +113,7 @@ proc testGetNumber(
 
   var env = openEnvTest("_testGetNumber.log")
 
-  let prepostTable = getPrepostTable()
+  let prepostTable = makeDefaultPrepostTable()
   let valueAndLengthO = getNumber(env, prepostTable, statement, start)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
@@ -133,7 +133,7 @@ proc testGetString(
 
   var env = openEnvTest("_testGetString.log")
 
-  let prepostTable = getPrepostTable()
+  let prepostTable = makeDefaultPrepostTable()
   let valueAndLengthO = getString(env, prepostTable, statement, start)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
@@ -183,7 +183,7 @@ proc testGetVarOrFunctionValue(variables: Variables, statement: Statement, start
 
   var env = openEnvTest("_getVariable.log")
 
-  let prepostTable = getPrepostTable()
+  let prepostTable = makeDefaultPrepostTable()
 
   let valueAndLengthO = getVarOrFunctionValue(env, prepostTable,
                                               statement, start,
@@ -217,7 +217,7 @@ proc testGetFunctionValue(functionName: string, statement: Statement, start: Nat
   var env = openEnvTest("_testGetFunctionValue.log")
 
   var variables = emptyVariables()
-  let prepostTable = getPrepostTable()
+  let prepostTable = makeDefaultPrepostTable()
   var functionO = getFunction(functionName)
   if not isSome(functionO):
     return false
@@ -239,7 +239,7 @@ proc testRunStatement(statement: Statement, nameSpace: string = "", varName: str
   var env = openEnvTest("_runStatement.log")
 
   var variables = emptyVariables()
-  let prepostTable = getPrepostTable()
+  let prepostTable = makeDefaultPrepostTable()
   let variableDataO = runStatement(env, statement, prepostTable, variables)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
