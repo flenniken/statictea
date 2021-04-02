@@ -80,6 +80,14 @@ suite "readjson.nim":
     check value.stringv == "string"
     check $value == "string"
 
+  test "jsonToValue quote":
+    let str = "this has \"quotes\" in it"
+    let jsonNode = newJString(str)
+    let option = jsonToValue(jsonNode)
+    let value = option.get()
+    check value.stringv == str
+    check $value == str
+
   test "jsonToValue float":
     let jsonNode = newJFloat(1.5)
     let option = jsonToValue(jsonNode)
@@ -221,4 +229,15 @@ she sat down in a large arm-chair at one end of the table.
 """ % [teaParty]
     var expectedValue = getEmptyVars()
     expectedValue["longString"] = Value(kind: vkString, stringv: teaParty)
+    check testReadJsonContent(content, expectedValue)
+
+  test "quoted strings":
+    let content = """
+{
+  "str": "this is \"quoted\""
+}
+"""
+    var expectedValue = getEmptyVars()
+    expectedValue["str"] = Value(kind: vkString, stringv: """this is "quoted"""")
+
     check testReadJsonContent(content, expectedValue)
