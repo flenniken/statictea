@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import re
 import options
-# import tables
 when defined(test):
   import strutils
   import env
@@ -48,9 +47,6 @@ type
     groups*: seq[string]
     length*: Natural
     start*: Natural
-
-# var compliledPatterns = initTable[string, Regex]()
-#   ## A cache of compiled regex patterns, mapping a pattern to Regex.
 
 func getGroup*(matches: Matches): string =
   ## Get the first group in matches if it exists, else return "".
@@ -85,7 +81,7 @@ func get3Groups*(matches: Matches): (string, string, string) =
   result = (one, two, three)
 
 func matchRegex*(str: string, regex: Regex, start: Natural = 0): Option[Matches] =
-  ## Match a pattern in a string.
+  ## Match a regular expression pattern in a string.
 
   var groups = newSeq[string](maxGroups)
   let length = matchLen(str, regex, groups, start)
@@ -107,7 +103,8 @@ func matchRegex*(str: string, regex: Regex, start: Natural = 0): Option[Matches]
     result = some(matches)
 
 proc matchPatternCached*(str: string, pattern: string, start: Natural = 0): Option[Matches] =
-  ## Match a pattern in a string. Cache the compiled pattern.
+  ## Match a pattern in a string. Cache the compiled regular
+  ## expression pattern.
 
   # When the following is uncommented, runFunction starts
   # complaining. Even though it doesn't use this procedure.
@@ -125,7 +122,7 @@ proc matchPatternCached*(str: string, pattern: string, start: Natural = 0): Opti
   result = matchRegex(str, re(pattern), start)
 
 func matchPattern*(str: string, pattern: string, start: Natural = 0): Option[Matches] =
-  ## Match a pattern in a string.
+  ## Match a regular expression pattern in a string.
   result = matchRegex(str, re(pattern), start)
 
 when defined(test):

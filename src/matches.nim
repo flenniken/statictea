@@ -43,7 +43,7 @@ proc makeDefaultPrepostTable*(): PrepostTable =
 proc makeUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
   ## Return the user's ordered table that maps prefixes to
   ## postfixes. This is used when the user specifies prefixes on the
-  ## command line. No defaults in this table.
+  ## command line and it does not contain any defaults.
   assert prepostList.len > 0
   result = initOrderedTable[string, string]()
   for prepost in prepostList:
@@ -53,7 +53,8 @@ proc makeUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
     result[prepost.pre] = prepost.post
 
 proc matchPrefix*(line: string, start: Natural, prepostTable: PrepostTable): Option[Matches] =
-  ## Match lines that start with one of the current prefixes.
+  ## Match lines that start with one of the prefixes in the given
+  ## table.
   var terms = newSeq[string]()
   for prefix, _ in prepostTable:
     terms.add(r"\Q$1\E" % prefix)
@@ -67,7 +68,7 @@ proc matchCommand*(line: string, start: Natural = 0): Option[Matches] =
 
 proc matchLastPart*(line: string, start: Natural, postfix: string): Option[Matches] =
   ## Match the last part of a command line.  It matches the optional
-  ## continuation slash, the optional postfix and the line
+  ## continuation slash, the optional postfix and the optional line
   ## endings.
   var pattern: string
   if postfix == "":
@@ -102,10 +103,12 @@ proc getLastPart*(line: string, postfix: string): Option[Matches] =
 #    -->
 
 proc matchAllSpaceTab*(line: string, start: Natural): Option[Matches] =
+  ## Match a line of all spaces or tabs.
   let pattern = r"^[ \t]*$"
   result = matchPatternCached(line, pattern, start)
 
 proc matchTabSpace*(line: string, start: Natural): Option[Matches] =
+  ## Match one or more spaces or tabs.
   let pattern = r"[ \t]+"
   result = matchPatternCached(line, pattern, start)
 
@@ -123,12 +126,13 @@ proc matchVariable*(line: string, start: Natural): Option[Matches] =
   ## A variable starts with an optional prefix followed by a required
   ## variable name. The prefix is a lowercase letter followed by a
   ## period. The variable name starts with a letter followed by
-  ## letter, digits and underscores. The variable name length is 1 to
-  ## 64 characters. Variables are ascii.
+  ## letters, digits and underscores. The variable name length is 1 to
+  ## 64 characters.
   ##
   ## The match stops on the first non matching character. You need to
   ## check the next character to see whether it makes sense in the
-  ## statement, for example, "t." matches and returns "t".
+  ## statement, for example, "t." matches and returns "t" but there is
+  ## no variable name.
   let pattern = r"(\s*)([a-z]\.){0,1}([a-zA-Z][a-zA-Z0-9_]{0,63})\s*"
   result = matchPatternCached(line, pattern, start)
 
@@ -153,25 +157,21 @@ proc matchRightParentheses*(line: string, start: Natural): Option[Matches] =
   result = matchPatternCached(line, pattern, start)
 
 proc matchNumber*(line: string, start: Natural): Option[Matches] =
-  ## Return a matcher that matches a number and the optional trailing whitespace. Return the
+  ## Match a number and the optional trailing whitespace. Return the
   ## optional decimal point that tells whether the number is a float
   ## or integer.
-  ## blank
+  ##
   ## A number starts with an optional minus sign, followed by a digit,
   ## followed by digits, underscores or a decimal point. Only one
-  ## decimal point is allowed and underscores are skipped.  Note: nim
-  ## sets the regex anchor option.
+  ## decimal point is allowed and underscores are skipped.
   let pattern = r"-{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*\s*"
   result = matchPatternCached(line, pattern, start)
 
 proc matchString*(line: string, start: Natural): Option[Matches] =
-  ## Return a matcher that matches a quoted string.
-
-  # A string is inside quotes, either single or double quotes. The
-  # optional white space after the string is matched too. There are
-  # two returned groups and only one will contain anything. The first
-  # is for single quotes and the second is for double quotes. Note:
-  # nim sets the regex anchor option.
+  ## Match a string inside either single or double quotes.  The
+  ## optional white space after the string is matched too. There are
+  ## two returned groups and only one will contain anything. The first
+  ## is for single quotes and the second is for double quotes.
   let pattern = """'([^']*)'\s*|"([^"]*)"\s*"""
   result = matchPatternCached(line, pattern, start)
 
@@ -179,18 +179,19 @@ proc matchLeftBracket*(line: string, start: Natural): Option[Matches] =
   ## Match everything up to a left backet. The match length includes
   ## the bracket.
 
-  # A replacement variable is inside brackets.  Note: nim sets the
-  # regex anchor option.
-
+  # A replacement variable is inside brackets.
   # text on the line {variable} more text {variable2} asdf
   #                   ^
   let pattern = "[^{]*{"
   result = matchPatternCached(line, pattern, start)
 
 proc matchFileLine*(line: string, start: Natural): Option[Matches] =
+  ## Match a file and line number like: filename(234).
   let pattern = r"^(.*)\(([0-9]+)\)$"
   result = matchPatternCached(line, pattern, start)
 
 func matchVersion*(line: string, start: Natural = 0): Option[Matches] =
+  ## Match a StaticTea version number.  It has three components each
+  ## with one to three digits: i.e. 1.2.3, 123.456.789, 0.1.0,... .
   let pattern = r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$"
   result = matchPatternCached(line, pattern, start)
