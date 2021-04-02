@@ -8,7 +8,7 @@ import options
 
 const
   predefinedPrepost: array[7, Prepost] = [
-    ## Predefined prefixes and postfixes.
+    ## The predefined prefixes and postfixes.
     ("<!--$", "-->"),
     ("#$", ""),
     (";$", ""),
@@ -19,7 +19,7 @@ const
   ]
 
   commands: array[7, string] = [
-    ## StaticTea commands.
+    ## The StaticTea commands.
     "nextline",
     "block",
     "replace",
@@ -133,13 +133,13 @@ proc notEmptyOrSpaces*(text: string): bool =
 proc matchVariable*(line: string, start: Natural = 0): Option[Matches] =
   ## Matches a variable and surrounding whitespace. Return the leading
   ## whitespace, the namespace and the variable name.
-  ##
+  ## @
   ## A variable starts with an optional prefix followed by a required
   ## variable name. The prefix is a lowercase letter followed by a
   ## period. The variable name starts with a letter followed by
   ## letters, digits and underscores. The variable name length is 1 to
   ## 64 characters.
-  ##
+  ## @
   ## The match stops on the first non matching character. You need to
   ## check the next character to see whether it makes sense in the
   ## statement, for example, "t." matches and returns "t" but there is
