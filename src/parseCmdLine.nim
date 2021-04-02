@@ -41,7 +41,7 @@ proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
   var lineParts: LineParts
 
   # Get the prefix.
-  let prefixMatchO = matchPrefix(line, 0, prepostTable)
+  let prefixMatchO = matchPrefix(line, prepostTable)
   if not prefixMatchO.isSome():
     # No prefix so not a command line. No error.
     return

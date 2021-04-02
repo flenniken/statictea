@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import re
 import options
+import tables
 when defined(test):
   import strutils
   import env
@@ -40,6 +41,9 @@ when defined(test):
 const
   ## The maximum number of groups supported in the matchPattern procedure.
   maxGroups = 10
+
+var compliledPatterns = initTable[string, Regex]()
+  ## A cache of compiled regex patterns, mapping a pattern to Regex.
 
 type
   Matches* = object
@@ -106,20 +110,15 @@ proc matchPatternCached*(str: string, pattern: string, start: Natural = 0): Opti
   ## Match a pattern in a string. Cache the compiled regular
   ## expression pattern.
 
-  # When the following is uncommented, runFunction starts
-  # complaining. Even though it doesn't use this procedure.
-
-  # # Get the cached regex for the pattern or compile it and add it to
-  # # the cache.
-  # var regex: Regex
-  # if pattern in compliledPatterns:
-  #   regex = compliledPatterns[pattern]
-  # else:
-  #   regex = re(pattern)
-  #   compliledPatterns[pattern] = regex
-  # result = matchRegex(str, regex, start)
-
-  result = matchRegex(str, re(pattern), start)
+  # Get the cached regex for the pattern or compile it and add it to
+  # the cache.
+  var regex: Regex
+  if pattern in compliledPatterns:
+    regex = compliledPatterns[pattern]
+  else:
+    regex = re(pattern)
+    compliledPatterns[pattern] = regex
+  result = matchRegex(str, regex, start)
 
 func matchPattern*(str: string, pattern: string, start: Natural = 0): Option[Matches] =
   ## Match a regular expression pattern in a string.

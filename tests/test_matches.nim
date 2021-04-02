@@ -16,10 +16,10 @@ proc testMatchCommand(line: string, start: Natural = 0,
   else:
     result = true
 
-proc testMatchLastPart(line: string, start: Natural, prefix: string,
+proc testMatchLastPart(line: string, start: Natural, postfix: string,
     eMatchesO: Option[Matches] = none(Matches)): bool =
   ## Test MatchCommand.
-  let matchesO = matchLastPart(line, start, prefix)
+  let matchesO = matchLastPart(line, postfix, start)
   if not expectedItem("matchesO", matchesO, eMatchesO):
     result = false
   else:
@@ -45,7 +45,7 @@ proc testMatchPrefix(line: string, start: Natural,
     eMatchesO: Option[Matches] = none(Matches)): bool =
 
   let prepostTable = makeDefaultPrepostTable()
-  let matchesO = matchPrefix(line, start, prepostTable)
+  let matchesO = matchPrefix(line, prepostTable, start)
   if not expectedItem("matchesO", matchesO, eMatchesO):
     result = false
   else:
@@ -373,3 +373,9 @@ suite "matches.nim":
     check testMatchLeftBracket("", 0)
     check testMatchLeftBracket("a", 0)
     check testMatchLeftBracket("asdf", 0)
+
+  test "matchNumberNotCached":
+    var matchO = matchNumberNotCached("123", 0)
+    check matchO.isSome
+    matchO = matchNumberNotCached("asdf", 0)
+    check not matchO.isSome

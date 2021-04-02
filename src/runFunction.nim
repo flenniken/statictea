@@ -366,7 +366,7 @@ func funCase*(parameters: seq[Value]): FunResult =
 
 func parseVersion*(version: string): Option[(int, int, int)] =
   ## Parse a StaticTea version number and return its three components.
-  let matchesO = matchVersion(version, 0)
+  let matchesO = matchVersionNotCached(version, 0)
   if not matchesO.isSome:
     return
   let (g1, g2, g3) = matchesO.get().get3Groups()
@@ -431,7 +431,7 @@ func funFloat*(parameters: seq[Value]): FunResult =
       result = newFunResult(newValue(float(p1.intv)))
     of vkString:
       # From number string to float.
-      var matchesO = matchNumber(p1.stringv, 0)
+      var matchesO = matchNumberNotCached(p1.stringv)
       if not matchesO.isSome:
         return newFunResultWarn(wIntOrStringNumber)
       let matches = matchesO.get()
@@ -477,7 +477,7 @@ func funInt*(parameters: seq[Value]): FunResult =
       num = p1.floatv
     of vkString:
       # From number string to int.
-      var matchesO = matchNumber(p1.stringv, 0)
+      var matchesO = matchNumberNotCached(p1.stringv, 0)
       if not matchesO.isSome:
         return newFunResultWarn(wFloatOrStringNumber)
       let matches = matchesO.get()
