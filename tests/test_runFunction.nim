@@ -42,6 +42,15 @@ proc testReplaceGood(str: string, start: int, length: int, replace: string, eRes
   let eFunResult = newFunResult(newValue(eResult))
   result = testFunction("replace", parameters, eFunResult = eFunResult)
 
+proc testReplaceReGood(strs: varargs[string]): bool =
+  if strs.len < 2:
+    return false
+  var parameters: seq[Value]
+  for ix in countUp(0, strs.len-2, 1):
+    parameters.add(newValue(strs[ix]))
+  let eFunResult = newFunResult(newValue(strs[strs.len-1]))
+  result = testFunction("replaceRe", parameters, eFunResult = eFunResult)
+
 suite "runFunction.nim":
 
   test "getFunction":
@@ -880,3 +889,28 @@ suite "runFunction.nim":
       newValue(0), newValue(10), newValue("of Sandwich")]
     let eFunResult = newFunResultWarn(wInvalidLength, 2, "10")
     check testFunction("replace", parameters, eFunResult = eFunResult)
+
+  test "replaceRe good":
+    check testReplaceReGood("abc123abc", "abc", "456", "456123456")
+    check testReplaceReGood("testFunResulthere FunResult FunResult", r"\bFunResult\b", "FunResult_",
+                            "testFunResulthere FunResult_ FunResult_")
+    check testReplaceReGood("abc123abc", "^abc", "456", "456123abc")
+    check testReplaceReGood("abc123abc", "abc$", "456", "abc123456")
+    check testReplaceReGood("abc123abc", "abc", "", "123")
+    check testReplaceReGood("abc123abc", "a", "", "bc123bc")
+    check testReplaceReGood("", "", "", "")
+    check testReplaceReGood("", "a", "", "")
+    check testReplaceReGood("b", "a", "", "b")
+    check testReplaceReGood("", "a", "b", "")
+    check testReplaceReGood("abc123abc", "a", "x", "b", "y", "xyc123xyc")
+    check testReplaceReGood("abc123abc", "a", "x", "b", "y", "c", "z", "xyz123xyz")
+
+  test "replaceRe not enough parameters":
+    var parameters: seq[Value] = @[newValue("Earl Grey"), newValue("")]
+    let eFunResult = newFunResultWarn(wThreeOrMoreParameters, 0)
+    check testFunction("replaceRe", parameters, eFunResult = eFunResult)
+
+  test "replaceRe not right number of parameters":
+    var parameters: seq[Value] = @[newValue("Earl Grey"), newValue("a"), newValue("b"), newValue("c")]
+    let eFunResult = newFunResultWarn(wMissingReplacement, 0)
+    check testFunction("replaceRe", parameters, eFunResult = eFunResult)

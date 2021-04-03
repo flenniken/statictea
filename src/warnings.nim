@@ -110,6 +110,7 @@ type
     wImmutableVars,        # w95
     wExpected4Parameters,  # w96
     wInvalidLength,        # w97
+    wMissingReplacement,   # w98
 
 tpubType:
   const
@@ -192,7 +193,7 @@ tpubType:
       "The parameter must be a string.", # wExpectedString
       "Index values must greater than or equal to 0, got: $1.", # wInvalidIndex
       "The parameter must be a dictionary.", # wExpectedDictionary
-      "The case function takes at least 3 parameters.", # wThreeOrMoreParameters
+      "The function takes at least 3 parameters.", # wThreeOrMoreParameters
       "The main condition type must an int or string.", # wInvalidMainType
       "The case condition must be an int or string.", # wInvalidCondition
       "Invalid StaticTea version string.", # wInvalidVersion
@@ -214,6 +215,7 @@ tpubType:
       "Variable already exists, assign to a new variable.", # wImmutableVars
       "Expected four parameters.", # wExpected4Parameters
       "Invalid length: $1.", # wInvalidLength
+      "Invalid number of parameters, the pattern and replacement come in pairs.", # wMissingReplacement
     ]
 
 func getWarning*(filename: string, lineNum: int,
