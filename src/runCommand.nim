@@ -325,7 +325,7 @@ proc getValue(env: var Env, prepostTable: PrepostTable,
   # env.warnStatement(statement, wStackTrace, start+valueAndLength.length,  "leave getValue")
 
 proc runStatement*(env: var Env, statement: Statement,
-    prepostTable: PrepostTable, variables: var Variables): Option[VariableData] =
+    prepostTable: PrepostTable, variables: Variables): Option[VariableData] =
   ## Run one statement. Return the variable namespace, name and value.
 
   # Get the variable name. Match the surrounding white space.

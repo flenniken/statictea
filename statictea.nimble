@@ -155,7 +155,11 @@ task docs, "\tCreate reStructuredtext docs; specify part of source file name.":
       var rstName = changeFileExt(filename, "rst")
 
       # Add useDocUtils to the shared.json file for use by the template.
-      let sharedJson = "{\"useDocUtils\": $1}\n" % [$useDocUtils]
+      let sharedJson = """{
+"useDocUtils": $1,
+"newline": "\n"
+}
+""" % [$useDocUtils]
       writeFile("docs/shared.json", sharedJson)
 
       cmd = "bin/statictea -s=docs/json/$1 -j=docs/shared.json -t=docs/template.rst -r=docs/$2" % [

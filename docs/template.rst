@@ -29,34 +29,36 @@ $$ : entry = get(s.entries, t.row, dict())
 $$ : name = get(entry, "name", "")
 $$ : description = get(entry, "description", "")
 $$ : skType = get(entry, "type", "")
-$$ : type = case(skType, "skType", \
-$$ :   "type: ", "skConst", "const: ", \
+$$ : type = case(skType, \
+$$ :   "skType", "type: ", \
+$$ :   "skConst", "const: ", \
 $$ :   "skMacro", "macro: ", \
 $$ :   "")
 $$ : short = substr(description, 0, add(find(description, '.', -1), 1))
-* {type}{name}__ -- {short}
+* {type}{name}_ -- {short}
 
 $$ # Function and type descriptions.
 $$ block \
 $$ : t.repeat = len(s.entries)
 $$ : entry = get(s.entries, t.row)
 $$ : name = get(entry, "name", "")
-$$ : nameUnderline = dup("-", len(name))
-$$ : description = get(entry, "description", "")
+$$ : nameUnderline = dup("-", add(len(name), 4))
+$$ : desc = get(entry, "description", "")
+$$ : description = replaceRe(desc, " @:", h.newline)
 $$ : code = get(entry, "code", "")
 $$ : pos = find(code, "{", len(code))
 $$ : signature = substr(code, 0, pos)
 $$ : t.maxLines = 100
-.. __:
+.. _{name}:
 
 {name}
 {nameUnderline}
 
+{description}
+
 .. code::
 
  {signature}
-
-{description}
 
 $$ endblock
 

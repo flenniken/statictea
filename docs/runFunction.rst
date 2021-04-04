@@ -6,59 +6,64 @@ This module contains all the built in functions.
 
 Index:
 ------
-* type: FunctionPtr__ -- Signature of a statictea function.
-* type: FunResultKind__ -- The kind of a FunResult object, either a value or warning.
-* type: FunResult__ -- Functions return a FunResult object.
-* newFunResultWarn__ -- Create a FunResult containing a warning message.
-* newFunResult__ -- Create a FunResult containing a return value.
-* `==`__ -- Compare two FunResult objects and return true when equal.
-* `$`__ -- Return a string representation of a FunResult object.
-* cmpString__ -- Compares two UTF-8 strings.
-* funCmp__ -- Compare two values.
-* funConcat__ -- Concatentate two or more strings.
-* funLen__ -- Return the len of a value.
-* funGet__ -- Return a value contained in a list or dictionary.
-* funIf__ -- You use the if function to return a value based on a condition.
-* funAdd__ -- Return the sum of two or more values.
-* funExists__ -- Return 1 when a variable exists in a dictionary, else return 0.
-* funCase__ -- <p>The case function returns a value from multiple choices.
-* parseVersion__ -- Parse a StaticTea version number and return its three components.
-* funCmpVersion__ -- <p>Compare two StaticTea type version numbers.
-* funFloat__ -- <p>Convert an int or an int number string to a float.
-* funInt__ -- Convert a float or a number string to an int.
-* funFind__ -- <p>Find a substring in a string and return its position when found.
-* funSubstr__ -- <p>Extract a substring from a string.
-* funDup__ -- Duplicate a string.
-* funDict__ -- <p>Create a dictionary from a list of key, value pairs.
-* getFunction__ -- Look up a function by its name.
+* type: FunctionPtr_ -- Signature of a statictea function.
+* type: FunResultKind_ -- The kind of a FunResult object, either a value or warning.
+* type: FunResult_ -- Contains the result of calling a function, either a value or a warning.
+* newFunResultWarn_ -- Return a new FunResult object containing a warning, the index of the problem parameter, and the two optional strings that go with the warning.
+* newFunResult_ -- Return a new FunResult object containing a value.
+* `==`_ -- Compare two FunResult objects and return true when equal.
+* `$`_ -- Return a string representation of a FunResult object.
+* cmpString_ -- Compares two UTF-8 strings.
+* funCmp_ -- Compare two values.
+* funConcat_ -- Concatentate two or more strings.
+* funLen_ -- Return the len of a value.
+* funGet_ -- Return a value contained in a list or dictionary.
+* funIf_ -- You use the if function to return a value based on a condition.
+* funAdd_ -- Return the sum of two or more values.
+* funExists_ -- Return 1 when a variable exists in a dictionary, else return 0.
+* funCase_ -- <p>The case function returns a value from multiple choices.
+* parseVersion_ -- Parse a StaticTea version number and return its three components.
+* funCmpVersion_ -- <p>Compare two StaticTea type version numbers.
+* funFloat_ -- <p>Convert an int or an int number string to a float.
+* funInt_ -- Convert a float or a number string to an int.
+* funFind_ -- <p>Find a substring in a string and return its position when found.
+* funSubstr_ -- <p>Extract a substring from a string.
+* funDup_ -- Duplicate a string.
+* funDict_ -- <p>Create a dictionary from a list of key, value pairs.
+* funList_ -- <p>Create a list of values.
+* funReplace_ -- <p>Replace a part of a string (substring) with another string.
+* funReplaceRe_ -- <p>Replace multiple parts of a string defined by regular expressions with replacement strings.
+* getFunction_ -- Look up a function by its name.
 
-.. __:
+.. _FunctionPtr:
 
 FunctionPtr
------------
-
-.. code::
-
- FunctionPtr = proc (parameters: seq[Value]): FunResult
+---------------
 
 Signature of a statictea function. It takes any number of values and returns a value or a warning message.
 
-.. __:
+.. code::
+
+ FunctionPtr = proc (parameters: seq[Value]): FunResult 
+
+.. _FunResultKind:
 
 FunResultKind
--------------
+-----------------
+
+The kind of a FunResult object, either a value or warning.
 
 .. code::
 
  FunResultKind = enum
   frValue, frWarning
 
-The kind of a FunResult object, either a value or warning.
-
-.. __:
+.. _FunResult:
 
 FunResult
----------
+-------------
+
+Contains the result of calling a function, either a value or a warning.
 
 .. code::
 
@@ -73,123 +78,122 @@ FunResult
 
   
 
-Functions return a FunResult object.
-
-.. __:
+.. _newFunResultWarn:
 
 newFunResultWarn
-----------------
+--------------------
+
+Return a new FunResult object containing a warning, the index of the problem parameter, and the two optional strings that go with the warning.
 
 .. code::
 
- proc newFunResultWarn(warning: Warning; parameter: Natural = 0; p1: string = "";
+ func newFunResultWarn(warning: Warning; parameter: Natural = 0; p1: string = "";
                       p2: string = ""): FunResult 
 
-Create a FunResult containing a warning message. The parameter is the index of the problem parameter, or 0. Both p1 and p2 are the optional strings that go with the warning message.
-
-.. __:
+.. _newFunResult:
 
 newFunResult
-------------
+----------------
+
+Return a new FunResult object containing a value.
 
 .. code::
 
- proc newFunResult(value: Value): FunResult 
+ func newFunResult(value: Value): FunResult 
 
-Create a FunResult containing a return value.
-
-.. __:
+.. _`==`:
 
 `==`
-----
-
-.. code::
-
- proc `==`(funResult1: FunResult; funResult2: FunResult): bool 
+--------
 
 Compare two FunResult objects and return true when equal.
 
-.. __:
+.. code::
+
+ func `==`(r1: FunResult; r2: FunResult): bool 
+
+.. _`$`:
 
 `$`
----
+-------
+
+Return a string representation of a FunResult object.
 
 .. code::
 
  func `$`(funResult: FunResult): string 
 
-Return a string representation of a FunResult object.
-
-.. __:
+.. _cmpString:
 
 cmpString
----------
-
-.. code::
-
- proc cmpString(a, b: string; ignoreCase: bool = false): int 
+-------------
 
 Compares two UTF-8 strings. Returns 0 when equal, 1 when a is greater than b and -1 when a less than b. Optionally Ignore case.
 
-.. __:
-
-funCmp
-------
-
 .. code::
 
- proc funCmp(parameters: seq[Value]): FunResult 
+ func cmpString(a, b: string; ignoreCase: bool = false): int 
+
+.. _funCmp:
+
+funCmp
+----------
 
 Compare two values.  The values are either numbers or strings (both the same type), and it returns whether the first parameter is less than, equal to or greater than the second parameter. It returns -1 for less, 0 for equal and 1 for greater than. The optional third parameter compares strings case insensitive when it is 1. Added in version 0.1.0.
 
-.. __:
-
-funConcat
----------
-
 .. code::
 
- proc funConcat(parameters: seq[Value]): FunResult 
+ func funCmp(parameters: seq[Value]): FunResult 
+
+.. _funConcat:
+
+funConcat
+-------------
 
 Concatentate two or more strings.  Added in version 0.1.0.
 
-.. __:
-
-funLen
-------
-
 .. code::
 
- proc funLen(parameters: seq[Value]): FunResult 
+ func funConcat(parameters: seq[Value]): FunResult 
+
+.. _funLen:
+
+funLen
+----------
 
 Return the len of a value. It takes one parameter and returns the number of characters in a string (not bytes), the number of elements in a list or the number of elements in a dictionary.  Added in version 0.1.0.
 
-.. __:
+.. code::
+
+ func funLen(parameters: seq[Value]): FunResult 
+
+.. _funGet:
 
 funGet
-------
+----------
+
+Return a value contained in a list or dictionary. You pass two or three parameters, the first is the dictionary or list to use, the second is the dictionary's key name or the list index, and the third optional parameter is the default value when the element doesn't exist. If you don't specify the default, a warning is generated when the element doesn't exist and the statement is skipped. Added in version 0.1.0.
+
+Get Dictionary Item:
+
+- p1: dictionary to search
+- p2: variable (key name) to find
+- p3: default value returned when key is missing
+
+Get List Item:
+
+- p1: list to use
+- p2: index of item in the list
+- p3: default value returned when index is too big
 
 .. code::
 
- proc funGet(parameters: seq[Value]): FunResult 
+ func funGet(parameters: seq[Value]): FunResult 
 
-Return a value contained in a list or dictionary. You pass two or three parameters, the first is the dictionary or list to use, the second is the dictionary's key name or the list index, and the third optional parameter is the default value when the element doesn't exist. If you don't specify the default, a warning is generated when the element doesn't exist and the statement is skipped.<table frame="void"><tr><th align="left">-p1: dictionary or list</th><td align="left"></td>
-</tr>
-<tr><th align="left">-p2: string or int</th><td align="left"></td>
-</tr>
-<tr><th align="left">-p3: optional, any type</th><td align="left"></td>
-</tr>
-</table><p>Added in version 0.1.0.</p>
-
-
-.. __:
+.. _funIf:
 
 funIf
------
-
-.. code::
-
- proc funIf(parameters: seq[Value]): FunResult 
+---------
 
 You use the if function to return a value based on a condition. It has three parameters, the condition, the true case and the false case.<ol class="simple"><li>Condition is an integer.</li>
 <li>True case, is the value returned when condition is 1.</li>
@@ -198,25 +202,25 @@ You use the if function to return a value based on a condition. It has three par
 <p>Added in version 0.1.0.</p>
 
 
-.. __:
-
-funAdd
-------
-
 .. code::
 
- proc funAdd(parameters: seq[Value]): FunResult 
+ func funIf(parameters: seq[Value]): FunResult 
+
+.. _funAdd:
+
+funAdd
+----------
 
 Return the sum of two or more values.  The parameters must be all integers or all floats.  A warning is generated on overflow. Added in version 0.1.0.
 
-.. __:
-
-funExists
----------
-
 .. code::
 
- proc funExists(parameters: seq[Value]): FunResult 
+ func funAdd(parameters: seq[Value]): FunResult 
+
+.. _funExists:
+
+funExists
+-------------
 
 Return 1 when a variable exists in a dictionary, else return 0. The first parameter is the dictionary to check and the second parameter is the name of the variable.<table frame="void"><tr><th align="left">-p1: dictionary: The dictionary to use.</th><td align="left"></td>
 </tr>
@@ -225,14 +229,14 @@ Return 1 when a variable exists in a dictionary, else return 0. The first parame
 </table><p>Added in version 0.1.0.</p>
 
 
-.. __:
-
-funCase
--------
-
 .. code::
 
- proc funCase(parameters: seq[Value]): FunResult 
+ func funExists(parameters: seq[Value]): FunResult 
+
+.. _funCase:
+
+funCase
+-----------
 
 <p>The case function returns a value from multiple choices. It takes a main condition, any number of case pairs then an optional else value.</p>
 <p>The first parameter of a case pair is the condition and the second is the return value when that condition matches the main condition.</p>
@@ -254,53 +258,53 @@ funCase
 </table><p>Added in version 0.1.0.</p>
 
 
-.. __:
-
-parseVersion
-------------
-
 .. code::
 
- proc parseVersion(version: string): Option[(int, int, int)] 
+ func funCase(parameters: seq[Value]): FunResult 
+
+.. _parseVersion:
+
+parseVersion
+----------------
 
 Parse a StaticTea version number and return its three components.
 
-.. __:
-
-funCmpVersion
--------------
-
 .. code::
 
- proc funCmpVersion(parameters: seq[Value]): FunResult 
+ func parseVersion(version: string): Option[(int, int, int)] 
+
+.. _funCmpVersion:
+
+funCmpVersion
+-----------------
 
 <p>Compare two StaticTea type version numbers. Return whether the first parameter is less than, equal to or greater than the second parameter. It returns -1 for less, 0 for equal and 1 for greater than.</p>
 <p>StaticTea uses <a class="reference external" href="https://semver.org/">Semantic Versioning</a> with the added restriction that each version component has one to three digits (no letters).</p>
 <p>Added in version 0.1.0.</p>
 
 
-.. __:
-
-funFloat
---------
-
 .. code::
 
- proc funFloat(parameters: seq[Value]): FunResult 
+ func funCmpVersion(parameters: seq[Value]): FunResult 
+
+.. _funFloat:
+
+funFloat
+------------
 
 <p>Convert an int or an int number string to a float.</p>
 <p>Added in version 0.1.0.</p>
 <p>Note: if you want to convert a number to a string, use the format function.</p>
 
 
-.. __:
-
-funInt
-------
-
 .. code::
 
- proc funInt(parameters: seq[Value]): FunResult 
+ func funFloat(parameters: seq[Value]): FunResult 
+
+.. _funInt:
+
+funInt
+----------
 
 Convert a float or a number string to an int.<ul class="simple"><li>p1: value to convert, float or float number string</li>
 <li>p2: optional round options. &quot;round&quot; is the default.</li>
@@ -314,67 +318,120 @@ Convert a float or a number string to an int.<ul class="simple"><li>p1: value to
 <p>Added in version 0.1.0.</p>
 
 
-.. __:
-
-funFind
--------
-
 .. code::
 
- proc funFind(parameters: seq[Value]): FunResult 
+ func funInt(parameters: seq[Value]): FunResult 
+
+.. _funFind:
+
+funFind
+-----------
 
 <p>Find a substring in a string and return its position when found. The first parameter is the string and the second is the substring. The third optional parameter is returned when the substring is not found.  A warning is generated when the substring is missing and no third parameter. Positions start at</p>
 <p>0. Added in version 0.1.0.</p>
 <p>#+BEGIN_SRC msg = &quot;Tea time at 3:30.&quot; find(msg, &quot;Tea&quot;) =&gt; 0 find(msg, &quot;time&quot;) =&gt; 4 find(msg, &quot;party&quot;, -1) =&gt; -1 find(msg, &quot;party&quot;, len(msg)) =&gt; 17 find(msg, &quot;party&quot;, 0) =&gt; 0 #+END_SRC</p>
 
 
-.. __:
-
-funSubstr
----------
-
 .. code::
 
- proc funSubstr(parameters: seq[Value]): FunResult 
+ func funFind(parameters: seq[Value]): FunResult 
+
+.. _funSubstr:
+
+funSubstr
+-------------
 
 <p>Extract a substring from a string.  The first parameter is the string, the second is the substring's starting position and the third is one past the end. The first position is 0. The third parameter is optional and defaults to one past the end of the string. Added in version 0.1.0.</p>
 <p>This kind of positioning is called a half-open range that includes the first position but not the second. For example, [3, 7) includes 3, 4, 5, 6. The end minus the start is equal to the length of the substring.</p>
 
 
-.. __:
-
-funDup
-------
-
 .. code::
 
- proc funDup(parameters: seq[Value]): FunResult 
+ func funSubstr(parameters: seq[Value]): FunResult 
+
+.. _funDup:
+
+funDup
+----------
 
 Duplicate a string. The first parameter is the string to dup and the second parameter is the number of times to duplicate it. Added in version 0.1.0.
 
-.. __:
-
-funDict
--------
-
 .. code::
 
- proc funDict(parameters: seq[Value]): FunResult 
+ func funDup(parameters: seq[Value]): FunResult 
+
+.. _funDict:
+
+funDict
+-----------
 
 <p>Create a dictionary from a list of key, value pairs. You can specify as many pair as you want. The keys must be strings and the values and be any type. Added in version 0.1.0.</p>
 <p>dict(&quot;a&quot;, 5) =&gt; {&quot;a&quot;: 5} dict(&quot;a&quot;, 5, &quot;b&quot;, 33, &quot;c&quot;, 0) =&gt; {&quot;a&quot;: 5, &quot;b&quot;: 33, &quot;c&quot;: 0}} </p>
 
 
-.. __:
+.. code::
+
+ func funDict(parameters: seq[Value]): FunResult 
+
+.. _funList:
+
+funList
+-----------
+
+<p>Create a list of values. You can specify as many variables as you want.  Added in version 0.1.0.</p>
+<p>list(1) =&gt; [1] list(1, 2, 3) =&gt; [1, 2, 3] list(&quot;a&quot;, 5, &quot;b&quot;) =&gt; [&quot;a&quot;, 5, &quot;b&quot;] </p>
+
+
+.. code::
+
+ func funList(parameters: seq[Value]): FunResult 
+
+.. _funReplace:
+
+funReplace
+--------------
+
+<p>Replace a part of a string (substring) with another string.</p>
+<p>The first parameter is the string, the second is the substring's starting position, starting a 0, the third is the length of the substring and the fourth is the replacement string.</p>
+<dl class="docutils"><dt>replace(&quot;Earl Grey&quot;, 5, 4, &quot;of Sandwich&quot;)</dt>
+<dd>=&gt; &quot;Earl of Sandwich&quot;</dd>
+</dl>
+<p>replace(&quot;123&quot;, 0, 0, &quot;abcd&quot;) =&gt; abcd123 replace(&quot;123&quot;, 0, 1, &quot;abcd&quot;) =&gt; abcd23 replace(&quot;123&quot;, 0, 2, &quot;abcd&quot;) =&gt; abcd3 replace(&quot;123&quot;, 0, 3, &quot;abcd&quot;) =&gt; abcd replace(&quot;123&quot;, 3, 0, &quot;abcd&quot;) =&gt; 123abcd replace(&quot;123&quot;, 2, 1, &quot;abcd&quot;) =&gt; 12abcd replace(&quot;123&quot;, 1, 2, &quot;abcd&quot;) =&gt; 1abcd replace(&quot;123&quot;, 0, 3, &quot;abcd&quot;) =&gt; abcd replace(&quot;123&quot;, 1, 0, &quot;abcd&quot;) =&gt; 1abcd23 replace(&quot;123&quot;, 1, 1, &quot;abcd&quot;) =&gt; 1abcd3 replace(&quot;123&quot;, 1, 2, &quot;abcd&quot;) =&gt; 1abcd replace(&quot;&quot;, 0, 0, &quot;abcd&quot;) =&gt; abcd replace(&quot;&quot;, 0, 0, &quot;abc&quot;) =&gt; abc replace(&quot;&quot;, 0, 0, &quot;ab&quot;) =&gt; ab replace(&quot;&quot;, 0, 0, &quot;a&quot;) =&gt; a replace(&quot;&quot;, 0, 0, &quot;&quot;) =&gt; replace(&quot;123&quot;, 0, 0, &quot;&quot;) =&gt; 123 replace(&quot;123&quot;, 0, 1, &quot;&quot;) =&gt; 23 replace(&quot;123&quot;, 0, 2, &quot;&quot;) =&gt; 3 replace(&quot;123&quot;, 0, 3, &quot;&quot;) =&gt;</p>
+
+
+.. code::
+
+ func funReplace(parameters: seq[Value]): FunResult 
+
+.. _funReplaceRe:
+
+funReplaceRe
+----------------
+
+<p>Replace multiple parts of a string defined by regular expressions with replacement strings.</p>
+<p>The basic case uses one replacement pattern. It takes three parameters, the first parameter is the string to work on, the second is the regular expression pattern, and the fourth is the replacement string.</p>
+<p>In general you can have multiple sets of patterns and associated replacements. You add each pair of parameters at the end.</p>
+<dl class="docutils"><dt>replaceRe(&quot;abcdefabc&quot;, &quot;abc&quot;, &quot;456&quot;)</dt>
+<dd>=&gt; &quot;456def456&quot;</dd>
+<dt>replaceRe(&quot;abcdefabc&quot;, &quot;abc&quot;, &quot;456&quot;, &quot;def&quot;, &quot;&quot;)</dt>
+<dd>=&gt; &quot;456456&quot;</dd>
+</dl>
+
+
+.. code::
+
+ func funReplaceRe(parameters: seq[Value]): FunResult 
+
+.. _getFunction:
 
 getFunction
------------
+---------------
+
+Look up a function by its name.
 
 .. code::
 
  proc getFunction(functionName: string): Option[FunctionPtr] 
-
-Look up a function by its name.
 
 
 

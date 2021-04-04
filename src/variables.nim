@@ -209,7 +209,8 @@ func validateVariable*(variables: Variables, nameSpace: string, varName: string,
 
 proc assignVariable*(variables: var Variables, nameSpace: string,
     varName: string, value: Value) =
-  ## Assign the variable to its dictionary.
+  ## Assign the variable (nameSpace, varName, value) to the given
+  ## variables container.
   case nameSpace:
     of "":
       variables["local"].dictv[varName] = value

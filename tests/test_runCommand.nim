@@ -230,7 +230,7 @@ proc testGetFunctionValue(functionName: string, statement: Statement, start: Nat
   if not expectedItem("valueAndLength", valueAndLengthO, eValueAndLengthO):
     result = false
 
-proc testRunStatement(statement: Statement, nameSpace: string = "", varName: string = "",
+proc testRunStatement(statement: Statement, variables: Variables,
     eVariableDataO: Option[VariableData] = none(VariableData),
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
@@ -238,7 +238,6 @@ proc testRunStatement(statement: Statement, nameSpace: string = "", varName: str
   ): bool =
   var env = openEnvTest("_runStatement.log")
 
-  var variables = emptyVariables()
   let prepostTable = makeDefaultPrepostTable()
   let variableDataO = runStatement(env, statement, prepostTable, variables)
 
@@ -773,17 +772,27 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "runStatement":
     let statement = newStatement(text="""t.repeat = 4 """, lineNum=1, 0)
-    check testRunStatement(statement, "t.", "repeat",
+    var variables = emptyVariables()
+    # assignVariable(variables, "t.", "server", newValue(newVarsDict()))
+    check testRunStatement(statement, variables,
                            some(newVariableData("t.", "repeat", newValue(4))))
 
   test "runStatement string":
     let statement = newStatement(text="""str = "testing" """, lineNum=1, 0)
-    check testRunStatement(statement, "", "str",
-                           some(newVariableData("", "str", newValue("testing"))))
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables,
+      eVariableDataO = some(newVariableData("", "str", newValue("testing"))))
+
+  # test "runStatement nested":
+  #   let statement = newStatement(text="""signature = replaceRe(substr(code, 0, pos), "\bFunResult\b", "RunResult_")""", lineNum=1, 0)
+  #   var variables = emptyVariables()
+  #   check testRunStatement(statement, variables,
+  #     eVariableDataO = some(newVariableData("", "signature", newValue("asdf"))))
 
   test "runStatement set log":
     let statement = newStatement(text="""t.output = "log" """, lineNum=1, 0)
-    check testRunStatement(statement, "t.", "output",
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables,
                            some(newVariableData("t.", "output", newValue("log"))))
 
   test "set invalid output":
@@ -794,7 +803,8 @@ statement: t.output = 'notvalidv'
                       ^
 """
     # The expected value is none, because it doesn't exist yet.
-    check testRunStatement(statement, "t.", "output", eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "runStatement junk at end":
     let statement = newStatement(text="""str = "testing" junk at end""", lineNum=1, 0)
@@ -803,7 +813,8 @@ statement: t.output = 'notvalidv'
       """statement: str = "testing" junk at end""" & "\n",
         "                           ^\n",
     ]
-    check testRunStatement(statement, eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "does not start with var":
     let statement = newStatement(text="123 = 343", lineNum=1, 0)
@@ -812,7 +823,8 @@ template.html(1): w29: Statement does not start with a variable name.
 statement: 123 = 343
            ^
 """
-    check testRunStatement(statement, eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "no equal sign":
     let statement = newStatement(text="var 343", lineNum=1, 0)
@@ -821,7 +833,8 @@ template.html(1): w34: Invalid variable or missing equal sign.
 statement: var 343
            ^
 """
-    check testRunStatement(statement, eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "read only var":
     let statement = newStatement(text="t.server = 343", lineNum=1, 0)
@@ -830,7 +843,8 @@ template.html(1): w40: Invalid tea variable: server.
 statement: t.server = 343
            ^
 """
-    check testRunStatement(statement, eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "invalid namespace":
     let statement = newStatement(text="e.server = 343", lineNum=1, 0)
@@ -839,7 +853,8 @@ template.html(1): w35: The variable namespace 'e.' does not exist.
 statement: e.server = 343
            ^
 """
-    check testRunStatement(statement, eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "invalid maxLines":
     let statement = newStatement(text="t.maxLines = 'hello'", lineNum=1, 0)
@@ -848,7 +863,8 @@ template.html(1): w42: Invalid count. It must be a positive integer.
 statement: t.maxLines = 'hello'
                         ^
 """
-    check testRunStatement(statement, eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "content must be a string":
     let statement = newStatement(text="t.content = 3.45", lineNum=1, 0)
@@ -857,7 +873,8 @@ template.html(1): w43: Invalid t.content, it must be a string.
 statement: t.content = 3.45
                        ^
 """
-    check testRunStatement(statement, eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "invalid repeat":
     let statement = newStatement(text="t.repeat = 3.45", lineNum=1, 0)
@@ -866,7 +883,8 @@ template.html(1): w44: Invalid t.repeat, it must be an integer >= 0 and <= t.max
 statement: t.repeat = 3.45
                       ^
 """
-    check testRunStatement(statement, eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "invalid tea var":
     let statement = newStatement(text="t.asdf = 3.45", lineNum=1, 0)
@@ -875,7 +893,8 @@ template.html(1): w40: Invalid tea variable: asdf.
 statement: t.asdf = 3.45
            ^
 """
-    check testRunStatement(statement, eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
 
   test "invalid missing needed else":
@@ -886,7 +905,8 @@ template.html(1): w48: Invalid statement, skipping it.
 statement: result = case(1, 2, 22, 'abc', 33)
                          ^
 """
-    check testRunStatement(statement, eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "parameter error position":
     let text = "result = case(33, 2, 22, 'abc', 11, len(concat('a')))"
@@ -897,7 +917,8 @@ template.html(1): w48: Invalid statement, skipping it.
 statement: result = case(33, 2, 22, 'abc', 11, len(concat('a')))
                                                           ^
 """
-    check testRunStatement(statement, eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
 
   test "assignTeaVariable version":
@@ -907,7 +928,8 @@ template.html(1): w39: You cannot change the version tea variable.
 statement: t.version = "1.2.3"
            ^
 """
-    check testRunStatement(statement, eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "assignTeaVariable missing":
     let statement = newStatement(text="""t.missing = "1.2.3"""", lineNum=1, 0)
@@ -916,11 +938,13 @@ template.html(1): w40: Invalid tea variable: missing.
 statement: t.missing = "1.2.3"
            ^
 """
-    check testRunStatement(statement, eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "assignTeaVariable content":
     let statement = newStatement(text="""t.content = "1.2.3"""", lineNum=1, 0)
-    check testRunStatement(statement, "t.", "content", some(newVariableData("t.", "content", newValue("1.2.3"))))
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, some(newVariableData("t.", "content", newValue("1.2.3"))))
 
   test "parseVersion":
     check parseVersion("1.2.3") == some((1, 2, 3))
@@ -928,25 +952,30 @@ statement: t.missing = "1.2.3"
 
   test "cmpVersion equal":
     let statement = newStatement(text="cmp = cmpVersion('1.2.3', '1.2.3')", lineNum=1, 0)
-    check testRunStatement(statement, "", "cmp", some(newVariableData("", "cmp", newValue(0))))
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, some(newVariableData("", "cmp", newValue(0))))
 
   test "cmpVersion less":
     let statement = newStatement(text="cmp = cmpVersion('1.2.2', '1.2.3')", lineNum=1, 0)
-    check testRunStatement(statement, "", "cmp", some(newVariableData("", "cmp", newValue(-1))))
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, some(newVariableData("", "cmp", newValue(-1))))
 
   test "cmpVersion greater":
     let statement = newStatement(text="cmp = cmpVersion('1.2.4', '1.2.3')", lineNum=1, 0)
-    check testRunStatement(statement, "", varName = "cmp",
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables,
                            some(newVariableData("", "cmp", newValue(1))))
 
   test "cmpVersion less 2":
     let statement = newStatement(text="cmp = cmpVersion('1.22.3', '2.1.0')", lineNum=1, 0)
-    check testRunStatement(statement, "", varName = "cmp",
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables,
                            some(newVariableData("", "cmp", newValue(-1))))
 
   test "cmpVersion less 3":
     let statement = newStatement(text="cmp = cmpVersion('2.22.3', '2.44.0')", lineNum=1, 0)
-    check testRunStatement(statement, "", varName = "cmp",
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables,
                            some(newVariableData("", "cmp", newValue(-1))))
 
   test "cmpVersion two parameters":
@@ -957,7 +986,8 @@ template.html(1): w48: Invalid statement, skipping it.
 statement: cmp = cmpVersion('1.2.3')
                             ^
 """
-    check testRunStatement(statement, eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "cmpVersion strings":
     let statement = newStatement(text="cmp = cmpVersion('1.2.3', 3.5)", lineNum=1, 0)
@@ -967,7 +997,8 @@ template.html(1): w48: Invalid statement, skipping it.
 statement: cmp = cmpVersion('1.2.3', 3.5)
                                      ^
 """
-    check testRunStatement(statement, eErrLines = eErrLines)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "startPointer":
     check startPointer(0) == "^0"

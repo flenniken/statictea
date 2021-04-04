@@ -23,7 +23,8 @@ type
     frWarning
 
   FunResult* = object
-    ## Functions return a FunResult object.
+    ## Contains the result of calling a function, either a value or a
+    ## warning.
     case kind*: FunResultKind
       of frValue:
         value*: Value       ## Return value of the function.
@@ -36,26 +37,26 @@ var functions: Table[string, FunctionPtr]
 
 func newFunResultWarn*(warning: Warning, parameter: Natural = 0,
       p1: string = "", p2: string = ""): FunResult =
-  ## Create a FunResult containing a warning message. The parameter is
-  ## the index of the problem parameter, or 0. Both p1 and p2 are the
-  ## optional strings that go with the warning message.
+  ## Return a new FunResult object containing a warning, the index of
+  ## the problem parameter, and the two optional strings that go with
+  ## the warning.
   let warningData = newWarningData(warning, p1, p2)
   result = FunResult(kind: frWarning, parameter: parameter,
                      warningData: warningData)
 
 func newFunResult*(value: Value): FunResult =
-  ## Create a FunResult containing a return value.
+  ## Return a new FunResult object containing a value.
   result = FunResult(kind: frValue, value: value)
 
-func `==`*(funResult1: FunResult, funResult2: FunResult): bool =
+func `==`*(r1: FunResult, r2: FunResult): bool =
   ## Compare two FunResult objects and return true when equal.
-  if funResult1.kind == funResult2.kind:
-    case funResult1.kind:
+  if r1.kind == r2.kind:
+    case r1.kind:
       of frValue:
-        result = funResult1.value == funResult2.value
+        result = r1.value == r2.value
       else:
-        if funResult1.warningData == funResult2.warningData and
-           funResult1.parameter == funResult2.parameter:
+        if r1.warningData == r2.warningData and
+           r1.parameter == r2.parameter:
           result = true
 
 func `$`*(funResult: FunResult): string =
@@ -168,13 +169,19 @@ func funGet*(parameters: seq[Value]): FunResult =
   ## third optional parameter is the default value when the element
   ## doesn't exist. If you don't specify the default, a warning is
   ## generated when the element doesn't exist and the statement is
-  ## skipped.
-  ##
-  ## -p1: dictionary or list
-  ## -p2: string or int
-  ## -p3: optional, any type
-  ##
-  ## Added in version 0.1.0.
+  ## skipped. Added in version 0.1.0.
+  ## @:
+  ## @:Get Dictionary Item:
+  ## @:
+  ## @:- p1: dictionary to search
+  ## @:- p2: variable (key name) to find
+  ## @:- p3: default value returned when key is missing
+  ## @:
+  ## @:Get List Item:
+  ## @:
+  ## @:- p1: list to use
+  ## @:- p2: index of item in the list
+  ## @:- p3: default value returned when index is too big
 
   if parameters.len() < 2 or parameters.len() > 3:
     return newFunResultWarn(wGetTakes2or3Params)
