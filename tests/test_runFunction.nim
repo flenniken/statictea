@@ -904,6 +904,10 @@ suite "runFunction.nim":
     check testReplaceReGood("", "a", "b", "")
     check testReplaceReGood("abc123abc", "a", "x", "b", "y", "xyc123xyc")
     check testReplaceReGood("abc123abc", "a", "x", "b", "y", "c", "z", "xyz123xyz")
+    check testReplaceReGood(" @:- p1\n @: 222", " @:[ ]*", "", "- p1\n222")
+    check testReplaceReGood("value one @: @: ... @: @:- pn-2", "[ ]*@:[ ]*", "X", "value oneXX...XX- pn-2")
+    let text = ":linkTargetBegin:Semantic Versioning:linkTargetEnd://semver.org/"
+    check testReplaceReGood(text, ":linkTargetBegin:", ".. _`", ":linkTargetEnd:", "`: https", ".. _`Semantic Versioning`: https//semver.org/")
 
   test "replaceRe not enough parameters":
     var parameters: seq[Value] = @[newValue("Earl Grey"), newValue("")]

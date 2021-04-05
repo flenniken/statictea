@@ -37,7 +37,7 @@ var functions: Table[string, FunctionPtr]
 
 func newFunResultWarn*(warning: Warning, parameter: Natural = 0,
       p1: string = "", p2: string = ""): FunResult =
-  ## Return a new FunResult object containing a warning, the index of
+  ## Return a new FunResult object. It contains a warning, the index of
   ## the problem parameter, and the two optional strings that go with
   ## the warning.
   let warningData = newWarningData(warning, p1, p2)
@@ -175,13 +175,13 @@ func funGet*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:- p1: dictionary to search
   ## @:- p2: variable (key name) to find
-  ## @:- p3: default value returned when key is missing
+  ## @:- p3: optional default value returned when key is missing
   ## @:
   ## @:Get List Item:
   ## @:
   ## @:- p1: list to use
   ## @:- p2: index of item in the list
-  ## @:- p3: default value returned when index is too big
+  ## @:- p3: optional default value returned when index is too big
 
   if parameters.len() < 2 or parameters.len() > 3:
     return newFunResultWarn(wGetTakes2or3Params)
@@ -217,13 +217,11 @@ func funGet*(parameters: seq[Value]): FunResult =
 func funIf*(parameters: seq[Value]): FunResult =
   ## You use the if function to return a value based on a condition.
   ## It has three parameters, the condition, the true case and the
-  ## false case.
-  ##
-  ## 1. Condition is an integer.
-  ## 2. True case, is the value returned when condition is 1.
-  ## 3. Else case, is the value returned when condition is not 1.
-  ##
-  ## Added in version 0.1.0.
+  ## false case. Added in version 0.1.0.
+  ## @:
+  ## @:- p1: the integer condition
+  ## @:- p2: true case: the value returned when condition is 1
+  ## @:- p3: else case: the value returned when condition is not 1.
 
   if parameters.len() != 3:
     result = newFunResultWarn(wThreeParameters)
@@ -274,14 +272,12 @@ func funAdd*(parameters: seq[Value]): FunResult =
 {.pop.}
 
 func funExists*(parameters: seq[Value]): FunResult =
-  ## Return 1 when a variable exists in a dictionary, else
-  ## return 0. The first parameter is the dictionary to check and the
-  ## second parameter is the name of the variable.
-  ##
-  ## -p1: dictionary: The dictionary to use.
-  ## -p2: string: The name (key) to use.
-  ##
-  ## Added in version 0.1.0.
+  ## Return 1 when a variable exists in a dictionary, else return
+  ## @:0. The first parameter is the dictionary to check and the second
+  ## @:parameter is the name of the variable. Added in version 0.1.0.
+  ## @:
+  ## @:- p1: dictionary: the dictionary containing the variable
+  ## @:- p2: string: the variable name (key name) to look for
 
   if parameters.len() != 2:
     result = newFunResultWarn(wTwoParameters)
@@ -306,28 +302,27 @@ func funCase*(parameters: seq[Value]): FunResult =
   ## The case function returns a value from multiple choices. It takes
   ## a main condition, any number of case pairs then an optional else
   ## value.
-  ##
-  ## The first parameter of a case pair is the condition and the
+  ## @:
+  ## @:The first parameter of a case pair is the condition and the
   ## second is the return value when that condition matches the main
-  ## condition.
-  ##
-  ## When none of the cases match the main condition, the "else" value
-  ## is returned. If none match and the else is missing, a warning is
-  ## generated and the statement is skipped. The conditions must be
-  ## integers or strings. The return values any be any type.
-  ##
-  ## The function compares the conditions left to right and returns
-  ## the first match.
-  ##
-  ## -p1: The main condition value.
-  ## -p2: Case condition.
-  ## -p3: Case value.
-  ## ...
-  ## -pn-2: The last case condition.
-  ## -pn-1: The case value.
-  ## -pn: The optional "else" value returned when nothing matches.
-  ##
+  ## condition. The function compares the conditions left to right and
+  ## returns the first match.
+  ## @:
+  ## @:When none of the cases match the main condition, the "else"
+  ## value is returned. If none match and the else is missing, a
+  ## warning is generated and the statement is skipped. The conditions
+  ## must be integers or strings. The return values can be any type.
   ## Added in version 0.1.0.
+  ## @:
+  ## @:- p1: the main condition value
+  ## @:- p2: the first case condition
+  ## @:- p3: the first case value
+  ## @:
+  ## @:- ...
+  ## @:
+  ## @:- pn-2: the last case condition
+  ## @:- pn-1: the last case value
+  ## @:- pn: the optional "else" value returned when nothing matches
 
   # At least 3 parameters.
   if parameters.len() < 3:
@@ -388,13 +383,12 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
   ## first parameter is less than, equal to or greater than the second
   ## parameter. It returns -1 for less, 0 for equal and 1 for greater
   ## than.
-  ##
-  ## StaticTea uses `Semantic Versioning`_ with the added restriction
-  ## that each version component has one to three digits (no letters).
-  ##
-  ## Added in version 0.1.0.
-  ##
-  ## .. _`Semantic Versioning`: https://semver.org/
+  ## @:
+  ## @:StaticTea uses :linkTextBegin:Semantic Versioning:linkTextEnd:
+  ## with the added restriction that each version component has one
+  ## to three digits (no letters). Added in version 0.1.0.
+  ## @:
+  ## @: :linkTargetBegin:Semantic Versioning:linkTargetEnd://semver.org/
 
   if parameters.len() != 2:
     result = newFunResultWarn(wTwoParameters)
@@ -423,12 +417,12 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(ret))
 
 func funFloat*(parameters: seq[Value]): FunResult =
-  ## Convert an int or an int number string to a float.
-  ##
-  ## Added in version 0.1.0.
-  ##
-  ## Note: if you want to convert a number to a string, use the format
-  ## function.
+  ## Convert an int or an int number string to a float.  Added in
+  ## version 0.1.0.
+  ## @:
+  ## @:.. note::
+  ## @:  If you want to convert a number to a string, use the format
+  ## @:  function.
 
   if parameters.len() != 1:
     return newFunResultWarn(wOneParameter)
@@ -460,19 +454,18 @@ func funFloat*(parameters: seq[Value]): FunResult =
 # todo: use int64 instead of BiggestInt everywhere.
 
 func funInt*(parameters: seq[Value]): FunResult =
-  ## Convert a float or a number string to an int.
-  ##
-  ## - p1: value to convert, float or float number string
-  ## - p2: optional round options. "round" is the default.
-  ##
-  ## Round options:
-  ##
-  ## - "round" - nearest integer
-  ## - "floor" - integer below (to the left on number line)
-  ## - "ceiling" - integer above (to the right on number line)
-  ## - "truncate" - remove decimals
-  ##
-  ## Added in version 0.1.0.
+  ## Convert a float or a number string to an int. Added in version
+  ## 0.1.0.
+  ## @:
+  ## @:- p1: value to convert, float or float number string
+  ## @:- p2: optional round options. "round" is the default.
+  ## @:
+  ## @:Round options:
+  ## @:
+  ## @:- "round" - nearest integer
+  ## @:- "floor" - integer below (to the left on number line)
+  ## @:- "ceiling" - integer above (to the right on number line)
+  ## @:- "truncate" - remove decimals
 
   if parameters.len() < 1 or parameters.len() > 2:
     return newFunResultWarn(wOneOrTwoParameters)
@@ -537,16 +530,16 @@ func funFind*(parameters: seq[Value]): FunResult =
   ## substring. The third optional parameter is returned when the
   ## substring is not found.  A warning is generated when the
   ## substring is missing and no third parameter. Positions start at
-  ## 0. Added in version 0.1.0.
-  ##
-  ## #+BEGIN_SRC
-  ## msg = "Tea time at 3:30."
-  ## find(msg, "Tea") => 0
-  ## find(msg, "time") => 4
-  ## find(msg, "party", -1) => -1
-  ## find(msg, "party", len(msg)) => 17
-  ## find(msg, "party", 0) => 0
-  ## #+END_SRC
+  ## @:0. Added in version 0.1.0.
+  ## @:
+  ## @:.. code::
+  ## @:
+  ## @:  msg = "Tea time at 3:30."
+  ## @:  find(msg, "Tea") => 0
+  ## @:  find(msg, "time") => 4
+  ## @:  find(msg, "party", -1) => -1
+  ## @:  find(msg, "party", len(msg)) => 17
+  ## @:  find(msg, "party", 0) => 0
 
   if parameters.len() < 2 or parameters.len() > 3:
     result = newFunResultWarn(wTwoOrThreeParameters, 0)
@@ -567,15 +560,14 @@ func funFind*(parameters: seq[Value]): FunResult =
     result = newFunResult(newValue(pos))
 
 # todo: add examples for all functions.
-# todo: change from half-open to ix, length.
 func funSubstr*(parameters: seq[Value]): FunResult =
   ## Extract a substring from a string.  The first parameter is the
   ## string, the second is the substring's starting position and the
   ## third is one past the end. The first position is 0. The third
   ## parameter is optional and defaults to one past the end of the
   ## string. Added in version 0.1.0.
-  ##
-  ## This kind of positioning is called a half-open range that
+  ## @:
+  ## @:This kind of positioning is called a half-open range that
   ## includes the first position but not the second. For example,
   ## [3, 7) includes 3, 4, 5, 6. The end minus the start is equal to
   ## the length of the substring.
@@ -649,10 +641,11 @@ func funDict*(parameters: seq[Value]): FunResult =
   ## Create a dictionary from a list of key, value pairs. You can
   ## specify as many pair as you want. The keys must be strings and
   ## the values and be any type. Added in version 0.1.0.
-  ##
-  ## dict("a", 5) => {"a": 5}
-  ## dict("a", 5, "b", 33, "c", 0) => {"a": 5, "b": 33, "c": 0}}
-  ##
+  ## @:
+  ## @:.. code::
+  ## @:
+  ## @:dict("a", 5) => {"a": 5}
+  ## @:dict("a", 5, "b", 33, "c", 0) => {"a": 5, "b": 33, "c": 0}}
 
   var dict: VarsDict
   if parameters.len == 0:
@@ -674,42 +667,46 @@ func funDict*(parameters: seq[Value]): FunResult =
 func funList*(parameters: seq[Value]): FunResult =
   ## Create a list of values. You can specify as many variables as you
   ## want.  Added in version 0.1.0.
-  ##
-  ## list(1) => [1]
-  ## list(1, 2, 3) => [1, 2, 3]
-  ## list("a", 5, "b") => ["a", 5, "b"]
-  ##
+  ## @:
+  ## @:.. code::
+  ## @:
+  ## @:  list(1) => [1]
+  ## @:  list(1, 2, 3) => [1, 2, 3]
+  ## @:  list("a", 5, "b") => ["a", 5, "b"]
+
   result = newFunResult(newValue(parameters))
 
 func funReplace*(parameters: seq[Value]): FunResult =
   ## Replace a part of a string (substring) with another string.
-  ##
-  ## The first parameter is the string, the second is the substring's
+  ## @:
+  ## @:The first parameter is the string, the second is the substring's
   ## starting position, starting a 0, the third is the length of the
   ## substring and the fourth is the replacement string.
-  ##
-  ## replace("Earl Grey", 5, 4, "of Sandwich")
-  ##   => "Earl of Sandwich"
-  ## replace("123", 0, 0, "abcd") => abcd123
-  ## replace("123", 0, 1, "abcd") => abcd23
-  ## replace("123", 0, 2, "abcd") => abcd3
-  ## replace("123", 0, 3, "abcd") => abcd
-  ## replace("123", 3, 0, "abcd") => 123abcd
-  ## replace("123", 2, 1, "abcd") => 12abcd
-  ## replace("123", 1, 2, "abcd") => 1abcd
-  ## replace("123", 0, 3, "abcd") => abcd
-  ## replace("123", 1, 0, "abcd") => 1abcd23
-  ## replace("123", 1, 1, "abcd") => 1abcd3
-  ## replace("123", 1, 2, "abcd") => 1abcd
-  ## replace("", 0, 0, "abcd") => abcd
-  ## replace("", 0, 0, "abc") => abc
-  ## replace("", 0, 0, "ab") => ab
-  ## replace("", 0, 0, "a") => a
-  ## replace("", 0, 0, "") =>
-  ## replace("123", 0, 0, "") => 123
-  ## replace("123", 0, 1, "") => 23
-  ## replace("123", 0, 2, "") => 3
-  ## replace("123", 0, 3, "") =>
+  ## @:
+  ## @:.. code::
+  ## @:
+  ## @:  replace("Earl Grey", 5, 4, "of Sandwich")
+  ## @:    => "Earl of Sandwich"
+  ## @:replace("123", 0, 0, "abcd") => abcd123
+  ## @:replace("123", 0, 1, "abcd") => abcd23
+  ## @:replace("123", 0, 2, "abcd") => abcd3
+  ## @:replace("123", 0, 3, "abcd") => abcd
+  ## @:replace("123", 3, 0, "abcd") => 123abcd
+  ## @:replace("123", 2, 1, "abcd") => 12abcd
+  ## @:replace("123", 1, 2, "abcd") => 1abcd
+  ## @:replace("123", 0, 3, "abcd") => abcd
+  ## @:replace("123", 1, 0, "abcd") => 1abcd23
+  ## @:replace("123", 1, 1, "abcd") => 1abcd3
+  ## @:replace("123", 1, 2, "abcd") => 1abcd
+  ## @:replace("", 0, 0, "abcd") => abcd
+  ## @:replace("", 0, 0, "abc") => abc
+  ## @:replace("", 0, 0, "ab") => ab
+  ## @:replace("", 0, 0, "a") => a
+  ## @:replace("", 0, 0, "") =>
+  ## @:replace("123", 0, 0, "") => 123
+  ## @:replace("123", 0, 1, "") => 23
+  ## @:replace("123", 0, 2, "") => 3
+  ## @:replace("123", 0, 3, "") =>
 
   if parameters.len != 4:
     result = newFunResultWarn(wExpected4Parameters)
@@ -811,19 +808,21 @@ func funReplace*(parameters: seq[Value]): FunResult =
 func funReplaceRe*(parameters: seq[Value]): FunResult =
   ## Replace multiple parts of a string defined by regular
   ## expressions with replacement strings.
-  ##
-  ## The basic case uses one replacement pattern. It takes three
-  ## parameters, the first parameter is the string to work on, the
-  ## second is the regular expression pattern, and the fourth is the
-  ## replacement string.
-  ##
-  ## In general you can have multiple sets of patterns and associated
-  ## replacements. You add each pair of parameters at the end.
-  ##
-  ## replaceRe("abcdefabc", "abc", "456")
-  ##   => "456def456"
-  ## replaceRe("abcdefabc", "abc", "456", "def", "")
-  ##   => "456456"
+  ## @:
+  ## @:The basic case uses one replacement pattern. It takes three
+  ## @:parameters, the first parameter is the string to work on, the
+  ## @:second is the regular expression pattern, and the fourth is the
+  ## @:replacement string.
+  ## @:
+  ## @:In general you can have multiple sets of patterns and associated
+  ## @:replacements. You add each pair of parameters at the end.
+  ## @:
+  ## @:.. code::
+  ## @:
+  ## @:  replaceRe("abcdefabc", "abc", "456")
+  ## @:    => "456def456"
+  ## @:  replaceRe("abcdefabc", "abc", "456", "def", "")
+  ## @:    => "456456"
 
   if parameters.len < 3:
     result = newFunResultWarn(wThreeOrMoreParameters)

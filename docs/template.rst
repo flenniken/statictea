@@ -44,7 +44,16 @@ $$ : entry = get(s.entries, t.row)
 $$ : name = get(entry, "name", "")
 $$ : nameUnderline = dup("-", add(len(name), 4))
 $$ : desc = get(entry, "description", "")
-$$ : description = replaceRe(desc, " @:", h.newline)
+$$ : description = replaceRe(desc, \
+$$ :   "[ ]*@:", h.newline, \
+$$ :   "&quot;", '"', \
+$$ :   "&gt;", '>', \
+$$ :   "&lt;", '<', \
+$$ :   "&amp;", '&', \
+$$ :   ":linkTextBegin:", '`', \
+$$ :   ":linkTextEnd:", '`_', \
+$$ :   ":linkTargetBegin:", '.. _`', \
+$$ :   ":linkTargetEnd:", '`: https:')
 $$ : code = get(entry, "code", "")
 $$ : pos = find(code, "{", len(code))
 $$ : signature = substr(code, 0, pos)
