@@ -1,20 +1,20 @@
-$$ # StaticTea template to generate reStructuredTest from nim doc comments.
+$$ # StaticTea template for generating reStructuredTest from nim doc comments.
 $$ #
-$$ # Add the title. Create the title from the basename
+$$ # Add the title created from the basename
 $$ # of the module path in s.orig.
 $$ block
 $$ : title = substr(s.orig, add(4, find(s.orig, 'src/', -4)));
-$$ : titleLine = dup("=", len(title))
-{titleLine}
+$$ : titleUnderline = dup("=", len(title))
+{titleUnderline}
 {title}
-{titleLine}
+{titleUnderline}
 $$ endblock
 
 $$ # Module description.
 $$ nextline
 {s.moduleDescription}
 
-$$ # Show the index when there are entries.
+$$ # Show the index label when there are entries.
 $$ block t.output = case(len(s.entries), 0, 'skip', 'result')
 Index:
 ------
@@ -38,11 +38,11 @@ $$ : short = substr(description, 0, add(find(description, '.', -1), 1))
 * {type}{name}_ -- {short}
 
 $$ # Function and type descriptions.
-$$ block \
+$$ block
 $$ : t.repeat = len(s.entries)
 $$ : entry = get(s.entries, t.row)
 $$ : name = get(entry, "name", "")
-$$ : nameUnderline = dup("-", add(len(name), 4))
+$$ : nameUnderline = dup("-", len(name))
 $$ : desc = get(entry, "description", "")
 $$ : description = replaceRe(desc, \
 $$ :   "[ ]*@:", h.newline, \
@@ -81,4 +81,4 @@ $$ # adding spaces to the beginning of lines, except the first.
 $$ # Center the bottom line.
 .. class:: align-center
 
-Document produced from nim doc comments and formatted with StaticTea.
+= StaticTea reStructuredText template for nim doc comments. =

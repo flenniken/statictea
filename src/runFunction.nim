@@ -1,4 +1,4 @@
-## This module contains all the built in functions.
+## Module containing StaticTea functions.
 
 import vartypes
 import options
@@ -353,14 +353,16 @@ func funCase*(parameters: seq[Value]): FunResult =
       if condition.intv == mainCondition.intv:
         return newFunResult(parameters[ix+1])
 
+  # Possible parameter patterns:
   # m c v e
   # m c v c v e
   # m c v
   # m c v c v
   # 0 1 2 3 4 5
   # 1 2 3 4 5 6
-  # even contains the else condition
-  # odd doesn't have an else condition
+  # Even number of parameters contains the else condition.
+  # Odd doesn't have an else condition.
+
   if parameters.len mod 2 == 1:
     return newFunResultWarn(wMissingElse, 0)
 
@@ -421,8 +423,7 @@ func funFloat*(parameters: seq[Value]): FunResult =
   ## version 0.1.0.
   ## @:
   ## @:.. note::
-  ## @:  If you want to convert a number to a string, use the format
-  ## @:  function.
+  ## @:  Use the format function to convert a number to a string.
 
   if parameters.len() != 1:
     return newFunResultWarn(wOneParameter)
@@ -535,6 +536,7 @@ func funFind*(parameters: seq[Value]): FunResult =
   ## @:.. code::
   ## @:
   ## @:  msg = "Tea time at 3:30."
+  ## @:         0123456789 1234567
   ## @:  find(msg, "Tea") => 0
   ## @:  find(msg, "time") => 4
   ## @:  find(msg, "party", -1) => -1
@@ -639,13 +641,14 @@ func funDup*(parameters: seq[Value]): FunResult =
 
 func funDict*(parameters: seq[Value]): FunResult =
   ## Create a dictionary from a list of key, value pairs. You can
-  ## specify as many pair as you want. The keys must be strings and
-  ## the values and be any type. Added in version 0.1.0.
+  ## specify as many pairs as you want. The keys must be strings and
+  ## the values can be any type. Added in version 0.1.0.
   ## @:
   ## @:.. code::
   ## @:
-  ## @:dict("a", 5) => {"a": 5}
-  ## @:dict("a", 5, "b", 33, "c", 0) => {"a": 5, "b": 33, "c": 0}}
+  ## @:  dict("a", 5) => {"a": 5}
+  ## @:  dict("a", 5, "b", 33, "c", 0) =>
+  ## @:      {"a": 5, "b": 33, "c": 0}
 
   var dict: VarsDict
   if parameters.len == 0:
@@ -687,26 +690,26 @@ func funReplace*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:  replace("Earl Grey", 5, 4, "of Sandwich")
   ## @:    => "Earl of Sandwich"
-  ## @:replace("123", 0, 0, "abcd") => abcd123
-  ## @:replace("123", 0, 1, "abcd") => abcd23
-  ## @:replace("123", 0, 2, "abcd") => abcd3
-  ## @:replace("123", 0, 3, "abcd") => abcd
-  ## @:replace("123", 3, 0, "abcd") => 123abcd
-  ## @:replace("123", 2, 1, "abcd") => 12abcd
-  ## @:replace("123", 1, 2, "abcd") => 1abcd
-  ## @:replace("123", 0, 3, "abcd") => abcd
-  ## @:replace("123", 1, 0, "abcd") => 1abcd23
-  ## @:replace("123", 1, 1, "abcd") => 1abcd3
-  ## @:replace("123", 1, 2, "abcd") => 1abcd
-  ## @:replace("", 0, 0, "abcd") => abcd
-  ## @:replace("", 0, 0, "abc") => abc
-  ## @:replace("", 0, 0, "ab") => ab
-  ## @:replace("", 0, 0, "a") => a
-  ## @:replace("", 0, 0, "") =>
-  ## @:replace("123", 0, 0, "") => 123
-  ## @:replace("123", 0, 1, "") => 23
-  ## @:replace("123", 0, 2, "") => 3
-  ## @:replace("123", 0, 3, "") =>
+  ## @:  replace("123", 0, 0, "abcd") => abcd123
+  ## @:  replace("123", 0, 1, "abcd") => abcd23
+  ## @:  replace("123", 0, 2, "abcd") => abcd3
+  ## @:  replace("123", 0, 3, "abcd") => abcd
+  ## @:  replace("123", 3, 0, "abcd") => 123abcd
+  ## @:  replace("123", 2, 1, "abcd") => 12abcd
+  ## @:  replace("123", 1, 2, "abcd") => 1abcd
+  ## @:  replace("123", 0, 3, "abcd") => abcd
+  ## @:  replace("123", 1, 0, "abcd") => 1abcd23
+  ## @:  replace("123", 1, 1, "abcd") => 1abcd3
+  ## @:  replace("123", 1, 2, "abcd") => 1abcd
+  ## @:  replace("", 0, 0, "abcd") => abcd
+  ## @:  replace("", 0, 0, "abc") => abc
+  ## @:  replace("", 0, 0, "ab") => ab
+  ## @:  replace("", 0, 0, "a") => a
+  ## @:  replace("", 0, 0, "") =>
+  ## @:  replace("123", 0, 0, "") => 123
+  ## @:  replace("123", 0, 1, "") => 23
+  ## @:  replace("123", 0, 2, "") => 3
+  ## @:  replace("123", 0, 3, "") =>
 
   if parameters.len != 4:
     result = newFunResultWarn(wExpected4Parameters)
@@ -863,19 +866,7 @@ const
     ("list", funList),
     ("replace", funReplace),
     ("replaceRe", funReplaceRe),
-# format
-# lineNumber
-# quotehtml
-# sizes
-# time
-# template
-# unquote json:  &quot;t.&quot; => "t."
   ]
-
-# todo: encoding html attributes, body, javascript, css, json, etc.
-# todo: now function
-# todo: duration function
-# todo: add function to get the list of functions? or check whether one exists?
 
 proc getFunction*(functionName: string): Option[FunctionPtr] =
   ## Look up a function by its name.
@@ -889,9 +880,3 @@ proc getFunction*(functionName: string): Option[FunctionPtr] =
   var function = functions.getOrDefault(functionName)
   if function != nil:
     result = some(function)
-
-
-# /Users/steve/code/statictea/src/runFunction.nim(815, 5)
-# Error: type mismatch:
-#   got      <(string, proc (parameters: seq[Value]): FunResult{.locks: <unknown>.})> but
-#   expected '(string, proc (parameters: seq[Value]): FunResult{.noSideEffect, gcsafe, locks: 0.})'

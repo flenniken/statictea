@@ -2,7 +2,7 @@
 runFunction.nim
 ===============
 
-This module contains all the built in functions.
+Module containing StaticTea functions.
 
 Index:
 ------
@@ -38,7 +38,7 @@ Index:
 .. _FunctionPtr:
 
 FunctionPtr
----------------
+-----------
 
 Signature of a statictea function. It takes any number of values and returns a value or a warning message.
 
@@ -49,7 +49,7 @@ Signature of a statictea function. It takes any number of values and returns a v
 .. _FunResultKind:
 
 FunResultKind
------------------
+-------------
 
 The kind of a FunResult object, either a value or warning.
 
@@ -61,7 +61,7 @@ The kind of a FunResult object, either a value or warning.
 .. _FunResult:
 
 FunResult
--------------
+---------
 
 Contains the result of calling a function, either a value or a warning.
 
@@ -81,7 +81,7 @@ Contains the result of calling a function, either a value or a warning.
 .. _newFunResultWarn:
 
 newFunResultWarn
---------------------
+----------------
 
 Return a new FunResult object. It contains a warning, the index of the problem parameter, and the two optional strings that go with the warning.
 
@@ -93,7 +93,7 @@ Return a new FunResult object. It contains a warning, the index of the problem p
 .. _newFunResult:
 
 newFunResult
-----------------
+------------
 
 Return a new FunResult object containing a value.
 
@@ -104,7 +104,7 @@ Return a new FunResult object containing a value.
 .. _`==`:
 
 `==`
---------
+----
 
 Compare two FunResult objects and return true when equal.
 
@@ -115,7 +115,7 @@ Compare two FunResult objects and return true when equal.
 .. _`$`:
 
 `$`
--------
+---
 
 Return a string representation of a FunResult object.
 
@@ -126,7 +126,7 @@ Return a string representation of a FunResult object.
 .. _cmpString:
 
 cmpString
--------------
+---------
 
 Compares two UTF-8 strings. Returns 0 when equal, 1 when a is greater than b and -1 when a less than b. Optionally Ignore case.
 
@@ -137,7 +137,7 @@ Compares two UTF-8 strings. Returns 0 when equal, 1 when a is greater than b and
 .. _funCmp:
 
 funCmp
-----------
+------
 
 Compare two values.  The values are either numbers or strings (both the same type), and it returns whether the first parameter is less than, equal to or greater than the second parameter. It returns -1 for less, 0 for equal and 1 for greater than. The optional third parameter compares strings case insensitive when it is 1. Added in version 0.1.0.
 
@@ -148,7 +148,7 @@ Compare two values.  The values are either numbers or strings (both the same typ
 .. _funConcat:
 
 funConcat
--------------
+---------
 
 Concatentate two or more strings.  Added in version 0.1.0.
 
@@ -159,7 +159,7 @@ Concatentate two or more strings.  Added in version 0.1.0.
 .. _funLen:
 
 funLen
-----------
+------
 
 Return the len of a value. It takes one parameter and returns the number of characters in a string (not bytes), the number of elements in a list or the number of elements in a dictionary.  Added in version 0.1.0.
 
@@ -170,7 +170,7 @@ Return the len of a value. It takes one parameter and returns the number of char
 .. _funGet:
 
 funGet
-----------
+------
 
 Return a value contained in a list or dictionary. You pass two or three parameters, the first is the dictionary or list to use, the second is the dictionary's key name or the list index, and the third optional parameter is the default value when the element doesn't exist. If you don't specify the default, a warning is generated when the element doesn't exist and the statement is skipped. Added in version 0.1.0.
 
@@ -193,7 +193,7 @@ Get List Item:
 .. _funIf:
 
 funIf
----------
+-----
 
 You use the if function to return a value based on a condition. It has three parameters, the condition, the true case and the false case. Added in version 0.1.0.
 
@@ -208,7 +208,7 @@ You use the if function to return a value based on a condition. It has three par
 .. _funAdd:
 
 funAdd
-----------
+------
 
 Return the sum of two or more values.  The parameters must be all integers or all floats.  A warning is generated on overflow. Added in version 0.1.0.
 
@@ -219,7 +219,7 @@ Return the sum of two or more values.  The parameters must be all integers or al
 .. _funExists:
 
 funExists
--------------
+---------
 
 Return 1 when a variable exists in a dictionary, else return
 0. The first parameter is the dictionary to check and the second
@@ -235,7 +235,7 @@ parameter is the name of the variable. Added in version 0.1.0.
 .. _funCase:
 
 funCase
------------
+-------
 
 The case function returns a value from multiple choices. It takes a main condition, any number of case pairs then an optional else value.
 
@@ -260,7 +260,7 @@ When none of the cases match the main condition, the "else" value is returned. I
 .. _parseVersion:
 
 parseVersion
-----------------
+------------
 
 Parse a StaticTea version number and return its three components.
 
@@ -271,7 +271,7 @@ Parse a StaticTea version number and return its three components.
 .. _funCmpVersion:
 
 funCmpVersion
------------------
+-------------
 
 Compare two StaticTea type version numbers. Return whether the first parameter is less than, equal to or greater than the second parameter. It returns -1 for less, 0 for equal and 1 for greater than.
 
@@ -286,13 +286,12 @@ StaticTea uses `Semantic Versioning`_ with the added restriction that each versi
 .. _funFloat:
 
 funFloat
-------------
+--------
 
 Convert an int or an int number string to a float.  Added in version 0.1.0.
 
 .. note::
-  If you want to convert a number to a string, use the format
-  function.
+  Use the format function to convert a number to a string.
 
 .. code::
 
@@ -301,7 +300,7 @@ Convert an int or an int number string to a float.  Added in version 0.1.0.
 .. _funInt:
 
 funInt
-----------
+------
 
 Convert a float or a number string to an int. Added in version 0.1.0.
 
@@ -322,7 +321,7 @@ Round options:
 .. _funFind:
 
 funFind
------------
+-------
 
 Find a substring in a string and return its position when found. The first parameter is the string and the second is the substring. The third optional parameter is returned when the substring is not found.  A warning is generated when the substring is missing and no third parameter. Positions start at
 0. Added in version 0.1.0.
@@ -330,6 +329,7 @@ Find a substring in a string and return its position when found. The first param
 .. code::
 
   msg = "Tea time at 3:30."
+         0123456789 1234567
   find(msg, "Tea") => 0
   find(msg, "time") => 4
   find(msg, "party", -1) => -1
@@ -343,7 +343,7 @@ Find a substring in a string and return its position when found. The first param
 .. _funSubstr:
 
 funSubstr
--------------
+---------
 
 Extract a substring from a string.  The first parameter is the string, the second is the substring's starting position and the third is one past the end. The first position is 0. The third parameter is optional and defaults to one past the end of the string. Added in version 0.1.0.
 
@@ -356,7 +356,7 @@ This kind of positioning is called a half-open range that includes the first pos
 .. _funDup:
 
 funDup
-----------
+------
 
 Duplicate a string. The first parameter is the string to dup and the second parameter is the number of times to duplicate it. Added in version 0.1.0.
 
@@ -367,14 +367,15 @@ Duplicate a string. The first parameter is the string to dup and the second para
 .. _funDict:
 
 funDict
------------
+-------
 
-Create a dictionary from a list of key, value pairs. You can specify as many pair as you want. The keys must be strings and the values and be any type. Added in version 0.1.0.
+Create a dictionary from a list of key, value pairs. You can specify as many pairs as you want. The keys must be strings and the values can be any type. Added in version 0.1.0.
 
 .. code::
 
-dict("a", 5) => {"a": 5}
-dict("a", 5, "b", 33, "c", 0) => {"a": 5, "b": 33, "c": 0}}
+  dict("a", 5) => {"a": 5}
+  dict("a", 5, "b", 33, "c", 0) =>
+      {"a": 5, "b": 33, "c": 0}
 
 .. code::
 
@@ -383,7 +384,7 @@ dict("a", 5, "b", 33, "c", 0) => {"a": 5, "b": 33, "c": 0}}
 .. _funList:
 
 funList
------------
+-------
 
 Create a list of values. You can specify as many variables as you want.  Added in version 0.1.0.
 
@@ -400,7 +401,7 @@ Create a list of values. You can specify as many variables as you want.  Added i
 .. _funReplace:
 
 funReplace
---------------
+----------
 
 Replace a part of a string (substring) with another string.
 
@@ -410,26 +411,26 @@ The first parameter is the string, the second is the substring's starting positi
 
   replace("Earl Grey", 5, 4, "of Sandwich")
     => "Earl of Sandwich"
-replace("123", 0, 0, "abcd") => abcd123
-replace("123", 0, 1, "abcd") => abcd23
-replace("123", 0, 2, "abcd") => abcd3
-replace("123", 0, 3, "abcd") => abcd
-replace("123", 3, 0, "abcd") => 123abcd
-replace("123", 2, 1, "abcd") => 12abcd
-replace("123", 1, 2, "abcd") => 1abcd
-replace("123", 0, 3, "abcd") => abcd
-replace("123", 1, 0, "abcd") => 1abcd23
-replace("123", 1, 1, "abcd") => 1abcd3
-replace("123", 1, 2, "abcd") => 1abcd
-replace("", 0, 0, "abcd") => abcd
-replace("", 0, 0, "abc") => abc
-replace("", 0, 0, "ab") => ab
-replace("", 0, 0, "a") => a
-replace("", 0, 0, "") =>
-replace("123", 0, 0, "") => 123
-replace("123", 0, 1, "") => 23
-replace("123", 0, 2, "") => 3
-replace("123", 0, 3, "") =>
+  replace("123", 0, 0, "abcd") => abcd123
+  replace("123", 0, 1, "abcd") => abcd23
+  replace("123", 0, 2, "abcd") => abcd3
+  replace("123", 0, 3, "abcd") => abcd
+  replace("123", 3, 0, "abcd") => 123abcd
+  replace("123", 2, 1, "abcd") => 12abcd
+  replace("123", 1, 2, "abcd") => 1abcd
+  replace("123", 0, 3, "abcd") => abcd
+  replace("123", 1, 0, "abcd") => 1abcd23
+  replace("123", 1, 1, "abcd") => 1abcd3
+  replace("123", 1, 2, "abcd") => 1abcd
+  replace("", 0, 0, "abcd") => abcd
+  replace("", 0, 0, "abc") => abc
+  replace("", 0, 0, "ab") => ab
+  replace("", 0, 0, "a") => a
+  replace("", 0, 0, "") =>
+  replace("123", 0, 0, "") => 123
+  replace("123", 0, 1, "") => 23
+  replace("123", 0, 2, "") => 3
+  replace("123", 0, 3, "") =>
 
 .. code::
 
@@ -438,7 +439,7 @@ replace("123", 0, 3, "") =>
 .. _funReplaceRe:
 
 funReplaceRe
-----------------
+------------
 
 Replace multiple parts of a string defined by regular expressions with replacement strings.
 
@@ -464,7 +465,7 @@ replacements. You add each pair of parameters at the end.
 .. _getFunction:
 
 getFunction
----------------
+-----------
 
 Look up a function by its name.
 
@@ -476,4 +477,4 @@ Look up a function by its name.
 
 .. class:: align-center
 
-Document produced from nim doc comments and formatted with StaticTea.
+= StaticTea reStructuredText template for nim doc comments. =
