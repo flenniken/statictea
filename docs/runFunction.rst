@@ -1,3 +1,4 @@
+
 ===============
 runFunction.nim
 ===============
@@ -451,11 +452,17 @@ replacement string.
 In general you can have multiple sets of patterns and associated
 replacements. You add each pair of parameters at the end.
 
+If the second parameter is a list, the patterns and
+replacements come from it.
+
 .. code::
 
   replaceRe("abcdefabc", "abc", "456")
     => "456def456"
   replaceRe("abcdefabc", "abc", "456", "def", "")
+    => "456456"
+  l = list("abc", "456", "def", "")
+  replaceRe("abcdefabc", l))
     => "456456"
 
 .. code::

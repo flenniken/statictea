@@ -1,60 +1,6 @@
-##[
+## Methods to handle the replacement block lines.
 
-Methods to handle the replacement block lines.
-
-newTempSegments
-yieldReplacementLine
-storeLineSegments
-writeTempSegments
-closeDelete
-
-]##
-
-
-import regexes
-import env
-import vartypes
-import options
-import parseCmdLine
-import readLines
-import matches
-import warnings
-import variables
-import streams
-import variables
-import tempFile
-import parseNumber
-import strformat
-import strutils
-import tpub
-
-type
-  SegmentType = enum
-    ## A replacement block line is divided into segments of these types.
-    middle,   ## String segment in the middle of the line.
-    newline,  ## String segment with ending newline that ends a line.
-    variable, ## Variable segment in the middle.
-    endline,  ## String segment that ends a line without a newline.
-    endVariable ## Variable segment that ends a line without a newline.
-
-  ReplaceLineKind* = enum
-    ## Line type returned by yieldReplacementLine.
-    rlReplaceLine, ## A replacement block line.
-    rlEndblockLine ## The endblock line.
-
-  ReplaceLine* = object
-    ## Line information returned by yieldReplacementLine.
-    kind*: ReplaceLineKind
-    line*: string
-
-func newReplaceLine*(kind: ReplaceLineKind, line: string): ReplaceLine =
-  ## Return a ReplaceLine object.
-  return ReplaceLine(kind: kind, line: line)
-
-func `$`*(replaceLine: ReplaceLine): string =
-  ## Return a string representation of a ReplaceLine.
-  result = $replaceLine.kind & ": \"" & replaceLine.line & "\""
-
+# todo: turn this into a doc comment:
 #[
 
 The replacement block may consist of many lines and the block may
@@ -134,9 +80,55 @@ Variable Segments:
 
 ]#
 
+import regexes
+import env
+import vartypes
+import options
+import parseCmdLine
+import readLines
+import matches
+import warnings
+import variables
+import streams
+import variables
+import tempFile
+import parseNumber
+import strformat
+import strutils
+import tpub
+
+type
+  SegmentType = enum
+    ## A replacement block line is divided into segments of these types.
+    middle,   ## String segment in the middle of the line.
+    newline,  ## String segment with ending newline that ends a line.
+    variable, ## Variable segment in the middle.
+    endline,  ## String segment that ends a line without a newline.
+    endVariable ## Variable segment that ends a line without a newline.
+
+  ReplaceLineKind* = enum
+    ## Line type returned by yieldReplacementLine.
+    rlReplaceLine, ## A replacement block line.
+    rlEndblockLine ## The endblock line.
+
+  ReplaceLine* = object
+    ## Line information returned by yieldReplacementLine.
+    kind*: ReplaceLineKind
+    line*: string
+
+func newReplaceLine*(kind: ReplaceLineKind, line: string): ReplaceLine =
+  ## Return a ReplaceLine object.
+  return ReplaceLine(kind: kind, line: line)
+
+func `$`*(replaceLine: ReplaceLine): string =
+  ## Return a string representation of a ReplaceLine.
+  result = $replaceLine.kind & ": \"" & replaceLine.line & "\""
+
 const
-  replacementBufferSize = 2*1024 # Space reserved for the replacement block line buffer.
-  maxLineLen = defaultMaxLineLen + 20 # 20 more than a template line for the segment prefix info.
+  replacementBufferSize = 2*1024
+    ## Space reserved for the replacement block line buffer.
+  maxLineLen = defaultMaxLineLen + 20
+    ## 20 more than a template line for the segment prefix info.
 
 type
   TempSegments = object
@@ -145,11 +137,12 @@ type
     lb: LineBuffer
 
   TempFileStream = object
+    ## Temporary file and associated stream.
     tempFile*: TempFile
     stream*: Stream
 
 proc getTempFileStream(): Option[TempFileStream] {.tpub.} =
-  ## Get a temporary file and an associated stream.
+  ## Create a stream from a temporary file and return both.
 
   # Get a temp file.
   let tempFileO = openTempFile()
@@ -287,7 +280,7 @@ func parseVarSegment(segment: string): tuple[namespace: string, name: string] {.
   ## Parse a variable type segment and return the variable's namespace
   ## and name.
 
-  # Example variable segments:
+  # Example variable segments showing limits:
   # 2,1024,2,256,{ s.name }
   # 2,2   ,2,4  ,{ s.name }
   # 0123456789 123456789 0123456789

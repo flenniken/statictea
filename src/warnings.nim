@@ -6,12 +6,13 @@ import strutils
 # Add new warnings to the bottom so the warning numbers never change.
 type
   WarningData* = object
+    ## Warning number and optional extra strings.
     warning*: Warning   ## Warning message id.
     p1*: string         ## Extra warning info.
     p2*: string         ## Extra warning info.
 
   Warning* = enum
-    ## Numbers for all the warnings.
+    ## Warning numbers.
     wNoFilename,           # w0
     wUnknownSwitch,        # w1
     wUnknownArg,           # w2
@@ -111,6 +112,7 @@ type
     wExpected4Parameters,  # w96
     wInvalidLength,        # w97
     wMissingReplacement,   # w98
+    wExpectedList,         # w99
 
 tpubType:
   const
@@ -216,18 +218,19 @@ tpubType:
       "Expected four parameters.", # wExpected4Parameters
       "Invalid length: $1.", # wInvalidLength
       "Invalid number of parameters, the pattern and replacement come in pairs.", # wMissingReplacement
+      "Expected a list.", # wExpectedList
     ]
 
 func getWarning*(filename: string, lineNum: int,
     warning: Warning, p1: string = "", p2: string = ""): string =
-  ## Return the formatted warning line.
+  ## Return a formatted warning line.
   let pattern = warningsList[warning]
   let warningCode = $ord(warning)
   let message = pattern % [p1, p2]
   result = "$1($2): w$3: $4" % [filename, $lineNum, warningCode, message]
 
 proc newWarningData*(warning: Warning, p1: string = "", p2: string = ""): WarningData =
-  ## Create a WarningData containing the warning information.
+  ## Create a WarningData object containing the warning information.
   result = WarningData(warning: warning, p1: p1, p2: p2)
 
 func dashIfEmpty(a: string): string =

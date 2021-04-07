@@ -51,6 +51,13 @@ proc testReplaceReGood(strs: varargs[string]): bool =
   let eFunResult = newFunResult(newValue(strs[strs.len-1]))
   result = testFunction("replaceRe", parameters, eFunResult = eFunResult)
 
+proc testReplaceReGoodList(str: string, list: Value, eString: string): bool =
+  let eFunResult = newFunResult(newValue(eString))
+  var parameters: seq[Value]
+  parameters.add(newValue(str))
+  parameters.add(newValue(list))
+  result = testFunction("replaceRe", parameters, eFunResult = eFunResult)
+
 suite "runFunction.nim":
 
   test "getFunction":
@@ -909,12 +916,21 @@ suite "runFunction.nim":
     let text = ":linkTargetBegin:Semantic Versioning:linkTargetEnd://semver.org/"
     check testReplaceReGood(text, ":linkTargetBegin:", ".. _`", ":linkTargetEnd:", "`: https", ".. _`Semantic Versioning`: https//semver.org/")
 
+  test "replaceRe good list":
+    check testReplaceReGoodList("abc123abc", newVarList("abc", "456"), "456123456")
+    check testReplaceReGoodList("abc123abc", newVarList("a", "x", "b", "y", "c", "z"), "xyz123xyz")
+
   test "replaceRe not enough parameters":
-    var parameters: seq[Value] = @[newValue("Earl Grey"), newValue("")]
-    let eFunResult = newFunResultWarn(wThreeOrMoreParameters, 0)
+    var parameters: seq[Value] = @[newValue("Earl Grey")]
+    let eFunResult = newFunResultWarn(wTwoOrMoreParameters, 0)
     check testFunction("replaceRe", parameters, eFunResult = eFunResult)
 
   test "replaceRe not right number of parameters":
     var parameters: seq[Value] = @[newValue("Earl Grey"), newValue("a"), newValue("b"), newValue("c")]
+    let eFunResult = newFunResultWarn(wMissingReplacement, 0)
+    check testFunction("replaceRe", parameters, eFunResult = eFunResult)
+
+  test "replaceRe list wrong number of parameters":
+    var parameters: seq[Value] = @[newValue("Earl Grey"), newVarList("a", "b", "c")]
     let eFunResult = newFunResultWarn(wMissingReplacement, 0)
     check testFunction("replaceRe", parameters, eFunResult = eFunResult)

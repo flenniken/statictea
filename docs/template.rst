@@ -1,5 +1,18 @@
 $$ # StaticTea template for generating reStructuredTest from nim doc comments.
 $$ #
+$$ # Define replacement patterns for the descriptions.
+$$ nextline
+$$ : g.patterns = list( \
+$$ :   "[ ]*@:", h.newline, \
+$$ :   "&quot;", '"', \
+$$ :   "&gt;", '>', \
+$$ :   "&lt;", '<', \
+$$ :   "&amp;", '&', \
+$$ :   ":linkTextBegin:", '`', \
+$$ :   ":linkTextEnd:", '`_', \
+$$ :   ":linkTargetBegin:", '.. _`', \
+$$ :   ":linkTargetEnd:", '`: https:')
+
 $$ # Add the title created from the basename
 $$ # of the module path in s.orig.
 $$ block
@@ -12,7 +25,8 @@ $$ endblock
 
 $$ # Module description.
 $$ nextline
-{s.moduleDescription}
+$$ : description = replaceRe(s.moduleDescription, g.patterns)
+{description}
 
 $$ # Show the index label when there are entries.
 $$ block t.output = case(len(s.entries), 0, 'skip', 'result')
@@ -44,16 +58,7 @@ $$ : entry = get(s.entries, t.row)
 $$ : name = get(entry, "name", "")
 $$ : nameUnderline = dup("-", len(name))
 $$ : desc = get(entry, "description", "")
-$$ : description = replaceRe(desc, \
-$$ :   "[ ]*@:", h.newline, \
-$$ :   "&quot;", '"', \
-$$ :   "&gt;", '>', \
-$$ :   "&lt;", '<', \
-$$ :   "&amp;", '&', \
-$$ :   ":linkTextBegin:", '`', \
-$$ :   ":linkTextEnd:", '`_', \
-$$ :   ":linkTargetBegin:", '.. _`', \
-$$ :   ":linkTargetEnd:", '`: https:')
+$$ : description = replaceRe(desc, g.patterns)
 $$ : code = get(entry, "code", "")
 $$ : pos = find(code, "{", len(code))
 $$ : signature = substr(code, 0, pos)

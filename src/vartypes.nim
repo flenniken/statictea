@@ -55,6 +55,9 @@ type
     value*: Value
     length*: Natural
 
+#todo: reStructureText duplicate links with duplicate procedure names.
+#todo: use double underscore links as a workaround.
+
 proc newValue*(str: string): Value =
   ## Create a string value.
   result = Value(kind: vkString, stringv: str)
@@ -78,6 +81,13 @@ proc newValue*(varsDict: VarsDict): Value =
 proc newValue*(value: Value): Value =
   ## Copy the given value.
   result = value
+
+proc newVarList*(strs: varargs[string]): Value =
+  ## Return a list value from string parameters.
+  var valueList: seq[Value]
+  for str in strs:
+    valueList.add(newValue(str))
+  result = newValue(valueList)
 
 proc newVarsDict*(): VarsDict =
   ## Create variables dictionary.

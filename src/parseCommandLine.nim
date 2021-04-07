@@ -23,20 +23,17 @@ const
     ('p', "prepost"),
   ]
 
-
 func fileListIndex(word: string): int {.tpub.} =
   for ix, w in fileLists:
     if w == word:
       return ix
   return -1
 
-
 func letterToWord(letter: char): string {.tpub.} =
   for tup in switches:
     if tup[0] == letter:
       return tup[1]
   return ""
-
 
 # func `$`(sequence: seq[string]): string =
 #   result = sequence.join(", ")
@@ -48,18 +45,19 @@ when defined(test):
       parts.add("($1, $2)" % [pp.pre, pp.post])
     result = parts.join(", ")
 
-
 # \x21-\x7F is ascii without spaces or control characters.
 let prepostRegex = re"^\s*([\x21-\x7F]+)\s*([\x21-\x7F]*)\s*(.*)$"
 
 proc parsePrepost(str: string): (Prepost, string) {.tpub.} =
   ## Parse a prepost string. Return the Prepost object and another
   ## string with any extra unmatched characters.
-
-  ## ""             => ("", ""), ""
-  ## "<--$"         => ("<--$", ""), ""
-  ## "<--$ -->"     => ("<--$", "-->"), ""
-  ## "<--$ --> abc" => ("<--$", "-->"), "abc"
+  ## @:
+  ## @:.. code::
+  ## @:
+  ## @:  ""             => ("", ""), ""
+  ## @:  "<--$"         => ("<--$", ""), ""
+  ## @:  "<--$ -->"     => ("<--$", "-->"), ""
+  ## @:  "<--$ --> abc" => ("<--$", "-->"), "abc"
 
   var matches: array[3, string]
   if match(str, prepostRegex, matches):
@@ -164,7 +162,6 @@ proc parseCommandLine*(env: var Env, argv: seq[string]): Args =
   result.resultFilename = resultFilename
   result.logFilename = logFilename
   result.prepostList = prepostList
-
 
 # todo: what to do about filenames in multiple places?  result = template = log, etc?
 

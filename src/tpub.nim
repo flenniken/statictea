@@ -7,8 +7,13 @@ import macros
 macro tpub*(x: untyped): untyped =
   ## Exports a procedure or function when in test mode so it can be
   ## tested in an external module.
-  ## blank
-  ## indent2 proc myProcToTest(value:int): string {.tpub.} =
+  ## @:
+  ## @:Here is an example that makes myProcToTest public in
+  ## @:test mode:
+  ## @:
+  ## @:.. code::
+  ## @:
+  ## @:  proc myProcToTest(value:int): string {.tpub.} =
   expectKind(x, RoutineNodes)
   when defined(test):
     x.name = newTree(nnkPostfix, ident"*", name(x))
@@ -17,15 +22,17 @@ macro tpub*(x: untyped): untyped =
 macro tpubType*(x: untyped): untyped =
   ## Exports a type when in test mode so it can be tested in an
   ## external module.
-  ## blank
-  ## Here is an example that makes the type "SectionInfo" public in
-  ## test mode:
-  ## blank
-  ## indent2 import tpub
-  ## indent2 tpubType:
-  ## indent2   type
-  ## indent2     SectionInfo = object
-  ## indent2       name*: string
+  ## @:
+  ## @:Here is an example that makes the type "SectionInfo" public in
+  ## @:test mode:
+  ## @:
+  ## @:.. code::
+  ## @:
+  ## @:  import tpub
+  ## @:  tpubType:
+  ## @:    type
+  ## @:      SectionInfo = object
+  ## @:        name*: string
   # echo "treeRepr = ", treeRepr(x)
   when defined(test):
     if x.kind == nnkStmtList:

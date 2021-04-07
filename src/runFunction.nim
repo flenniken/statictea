@@ -820,30 +820,45 @@ func funReplaceRe*(parameters: seq[Value]): FunResult =
   ## @:In general you can have multiple sets of patterns and associated
   ## @:replacements. You add each pair of parameters at the end.
   ## @:
+  ## @:If the second parameter is a list, the patterns and
+  ## @:replacements come from it.
+  ## @:
   ## @:.. code::
   ## @:
   ## @:  replaceRe("abcdefabc", "abc", "456")
   ## @:    => "456def456"
   ## @:  replaceRe("abcdefabc", "abc", "456", "def", "")
   ## @:    => "456456"
+  ## @:  l = list("abc", "456", "def", "")
+  ## @:  replaceRe("abcdefabc", l))
+  ## @:    => "456456"
 
-  if parameters.len < 3:
-    result = newFunResultWarn(wThreeOrMoreParameters)
+  if parameters.len < 2:
+    result = newFunResultWarn(wTwoOrMoreParameters)
     return
-  if parameters.len mod 2 != 1:
-    return newFunResultWarn(wMissingReplacement, 0)
-
-  for ix, parameter in parameters:
-    if parameter.kind != vkString:
-      return newFunResultWarn(wExpectedString, ix)
-
-  var subs = newSeq[tuple[pattern: Regex, repl: string]]()
+  if parameters[0].kind != vkString:
+    return newFunResultWarn(wExpectedString, 0)
   let str = parameters[0].stringv
-  for ix in countUp(1, parameters.len-1, 2):
-    subs.add((re(parameters[ix].stringv), parameters[ix+1].stringv))
+
+  var theList: seq[Value]
+  if parameters.len == 2:
+    if parameters[1].kind != vkList:
+      return newFunResultWarn(wExpectedList, 1)
+    theList = parameters[1].listv
+  else:
+    theList = parameters[1..parameters.len-1]
+
+  if theList.len mod 2 != 0:
+    return newFunResultWarn(wMissingReplacement, 0)
+  for ix, value in theList:
+    if value.kind != vkString:
+      return newFunResultWarn(wExpectedString, ix+1)
+
+  var subs: seq[tuple[pattern: Regex, repl: string]]
+  for ix in countUp(0, theList.len-1, 2):
+    subs.add((re(theList[ix].stringv), theList[ix+1].stringv))
 
   let resultString = multiReplace(str, subs)
-
   result = newFunResult(newValue(resultString))
 
 const

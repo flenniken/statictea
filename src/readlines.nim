@@ -66,13 +66,15 @@ proc reset*(lb: var LineBuffer) =
 proc readline*(lb: var LineBuffer): string =
   ## Return a line from the LineBuffer. Reading starts from
   ## the current position in the stream and advances the amount read.
-  ## blank
-  ## A line end is defined by either a crlf or lf and they get
+  ## @:
+  ## @:A line end is defined by either a crlf or lf and they get
   ## returned with the line bytes. A line is returned when the line
   ## ending is found, when the streams runs out of bytes or when the
-  ## maximum line length is reached. You cannot tell whether the
-  ## line was truncated or not without reading the next line. When no
-  ## more data exists in the stream, an empty string is returned.
+  ## maximum line length is reached.
+  ## @:
+  ## @:You cannot tell whether the line was truncated or not without
+  ## reading the next line. When no more data exists in the stream, an
+  ## empty string is returned.
 
   if lb.stream == nil:
     return
