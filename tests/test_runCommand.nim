@@ -1000,6 +1000,26 @@ statement: cmp = cmpVersion('1.2.3', 3.5)
     var variables = emptyVariables()
     check testRunStatement(statement, variables, eErrLines = eErrLines)
 
+  test "incomplete function":
+    let statement = newStatement(text="a = len('asdf'", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w46: Expected comma or right parentheses.
+statement: a = len('asdf'
+                         ^
+"""
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
+
+  test "incomplete function 2":
+    let statement = newStatement(text="a = len(case(5,", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w33: Expected a string, number, variable or function.
+statement: a = len(case(5,
+                          ^
+"""
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
+
   test "startPointer":
     check startPointer(0) == "^0"
     check startPointer(1) == " ^1"

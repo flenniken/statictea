@@ -48,7 +48,8 @@ statement 3 starts at line 3, position 7.
 iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
     seq[LineParts]): Statement {.tpub.} =
   ## Iterate through the command's statements.  Statements are
-  ## separated by semicolons and are not empty or all spaces.
+  ## separated by semicolons or newlines and are not empty or all
+  ## spaces.
 
   # To find the semicolons that separate statements we use a finite
   # state machine.  In the start state we output a statement when a
@@ -307,7 +308,9 @@ proc getValue(env: var Env, prepostTable: PrepostTable,
 
   # env.warnStatement(statement, wStackTrace, start,  "enter getValue")
 
-  assert start < statement.text.len
+  if start >= statement.text.len:
+    env.warnStatement(statement, wInvalidRightHandSide, start)
+    return
 
   let char = statement.text[start]
 

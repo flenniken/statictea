@@ -1084,6 +1084,30 @@ template.html(5): w84: The t.content does not end with a newline, adding one.
     check testUpdateTemplate(templateContent = templateContent,
       eResultLines = eResultLines, eErrLines = eErrLines, eRc = 1)
 
+  test "missing slash":
+    let templateContent = """
+$$ nextline
+$$ : len = len(case(5,
+$$ :  5, "five", "one"))
+{len}
+"""
+    let eResultLines = splitNewLines """
+{len}
+"""
+    let eErrLines = splitNewLines """
+template.html(2): w33: Expected a string, number, variable or function.
+statement: len = len(case(5,
+                            ^
+template.html(3): w29: Statement does not start with a variable name.
+statement: 5, "five", "one"))
+           ^
+template.html(4): w58: The replacement variable doesn't exist: len.
+"""
+    check testProcessTemplate(templateContent = templateContent, eErrLines = eErrLines,
+      eResultLines = eResultLines, eRc = 1)
+
+
+
 # todo: test literal strings with \n etc. in them.  Are these supported?
 # todo: test with no result file.
 # todo: test that the template file gets updated
