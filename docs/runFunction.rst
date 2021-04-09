@@ -7,36 +7,36 @@ Module containing StaticTea functions.
 
 Index:
 ------
-* type: FunctionPtr_ -- Signature of a statictea function.
-* type: FunResultKind_ -- The kind of a FunResult object, either a value or warning.
-* type: FunResult_ -- Contains the result of calling a function, either a value or a warning.
-* newFunResultWarn_ -- Return a new FunResult object.
-* newFunResult_ -- Return a new FunResult object containing a value.
-* `==`_ -- Compare two FunResult objects and return true when equal.
-* `$`_ -- Return a string representation of a FunResult object.
-* cmpString_ -- Compares two UTF-8 strings.
-* funCmp_ -- Compare two values.
-* funConcat_ -- Concatentate two or more strings.
-* funLen_ -- Return the len of a value.
-* funGet_ -- Return a value contained in a list or dictionary.
-* funIf_ -- You use the if function to return a value based on a condition.
-* funAdd_ -- Return the sum of two or more values.
-* funExists_ -- Return 1 when a variable exists in a dictionary, else return @:0.
-* funCase_ -- The case function returns a value from multiple choices.
-* parseVersion_ -- Parse a StaticTea version number and return its three components.
-* funCmpVersion_ -- Compare two StaticTea type version numbers.
-* funFloat_ -- Convert an int or an int number string to a float.
-* funInt_ -- Convert a float or a number string to an int.
-* funFind_ -- Find a substring in a string and return its position when found.
-* funSubstr_ -- Extract a substring from a string.
-* funDup_ -- Duplicate a string.
-* funDict_ -- Create a dictionary from a list of key, value pairs.
-* funList_ -- Create a list of values.
-* funReplace_ -- Replace a part of a string (substring) with another string.
-* funReplaceRe_ -- Replace multiple parts of a string defined by regular expressions with replacement strings.
-* getFunction_ -- Look up a function by its name.
+* type: FunctionPtr__ -- Signature of a statictea function.
+* type: FunResultKind__ -- The kind of a FunResult object, either a value or warning.
+* type: FunResult__ -- Contains the result of calling a function, either a value or a warning.
+* newFunResultWarn__ -- Return a new FunResult object.
+* newFunResult__ -- Return a new FunResult object containing a value.
+* `==`__ -- Compare two FunResult objects and return true when equal.
+* `$`__ -- Return a string representation of a FunResult object.
+* cmpString__ -- Compares two UTF-8 strings.
+* funCmp__ -- Compare two values.
+* funConcat__ -- Concatentate two or more strings.
+* funLen__ -- Return the len of a value.
+* funGet__ -- Return a value contained in a list or dictionary.
+* funIf__ -- You use the if function to return a value based on a condition.
+* funAdd__ -- Return the sum of two or more values.
+* funExists__ -- Return 1 when a variable exists in a dictionary, else return @:0.
+* funCase__ -- The case function returns a value from multiple choices.
+* parseVersion__ -- Parse a StaticTea version number and return its three components.
+* funCmpVersion__ -- Compare two StaticTea type version numbers.
+* funFloat__ -- Convert an int or an int number string to a float.
+* funInt__ -- Convert a float or a number string to an int.
+* funFind__ -- Find a substring in a string and return its position when found.
+* funSubstr__ -- Extract a substring from a string.
+* funDup__ -- Duplicate a string.
+* funDict__ -- Create a dictionary from a list of key, value pairs.
+* funList__ -- Create a list of values.
+* funReplace__ -- Replace a part of a string (substring) with another string.
+* funReplaceRe__ -- Replace multiple parts of a string defined by regular expressions with replacement strings.
+* getFunction__ -- Look up a function by its name.
 
-.. _FunctionPtr:
+.. __:
 
 FunctionPtr
 -----------
@@ -47,7 +47,7 @@ Signature of a statictea function. It takes any number of values and returns a v
 
  FunctionPtr = proc (parameters: seq[Value]): FunResult 
 
-.. _FunResultKind:
+.. __:
 
 FunResultKind
 -------------
@@ -59,7 +59,7 @@ The kind of a FunResult object, either a value or warning.
  FunResultKind = enum
   frValue, frWarning
 
-.. _FunResult:
+.. __:
 
 FunResult
 ---------
@@ -79,7 +79,7 @@ Contains the result of calling a function, either a value or a warning.
 
   
 
-.. _newFunResultWarn:
+.. __:
 
 newFunResultWarn
 ----------------
@@ -91,7 +91,7 @@ Return a new FunResult object. It contains a warning, the index of the problem p
  func newFunResultWarn(warning: Warning; parameter: Natural = 0; p1: string = "";
                       p2: string = ""): FunResult 
 
-.. _newFunResult:
+.. __:
 
 newFunResult
 ------------
@@ -102,7 +102,7 @@ Return a new FunResult object containing a value.
 
  func newFunResult(value: Value): FunResult 
 
-.. _`==`:
+.. __:
 
 `==`
 ----
@@ -113,7 +113,7 @@ Compare two FunResult objects and return true when equal.
 
  func `==`(r1: FunResult; r2: FunResult): bool 
 
-.. _`$`:
+.. __:
 
 `$`
 ---
@@ -124,7 +124,7 @@ Return a string representation of a FunResult object.
 
  func `$`(funResult: FunResult): string 
 
-.. _cmpString:
+.. __:
 
 cmpString
 ---------
@@ -135,7 +135,7 @@ Compares two UTF-8 strings. Returns 0 when equal, 1 when a is greater than b and
 
  func cmpString(a, b: string; ignoreCase: bool = false): int 
 
-.. _funCmp:
+.. __:
 
 funCmp
 ------
@@ -146,7 +146,7 @@ Compare two values.  The values are either numbers or strings (both the same typ
 
  func funCmp(parameters: seq[Value]): FunResult 
 
-.. _funConcat:
+.. __:
 
 funConcat
 ---------
@@ -157,7 +157,7 @@ Concatentate two or more strings.  Added in version 0.1.0.
 
  func funConcat(parameters: seq[Value]): FunResult 
 
-.. _funLen:
+.. __:
 
 funLen
 ------
@@ -168,7 +168,7 @@ Return the len of a value. It takes one parameter and returns the number of char
 
  func funLen(parameters: seq[Value]): FunResult 
 
-.. _funGet:
+.. __:
 
 funGet
 ------
@@ -191,7 +191,7 @@ Get List Item:
 
  func funGet(parameters: seq[Value]): FunResult 
 
-.. _funIf:
+.. __:
 
 funIf
 -----
@@ -206,7 +206,7 @@ You use the if function to return a value based on a condition. It has three par
 
  func funIf(parameters: seq[Value]): FunResult 
 
-.. _funAdd:
+.. __:
 
 funAdd
 ------
@@ -217,7 +217,7 @@ Return the sum of two or more values.  The parameters must be all integers or al
 
  func funAdd(parameters: seq[Value]): FunResult 
 
-.. _funExists:
+.. __:
 
 funExists
 ---------
@@ -233,7 +233,7 @@ parameter is the name of the variable. Added in version 0.1.0.
 
  func funExists(parameters: seq[Value]): FunResult 
 
-.. _funCase:
+.. __:
 
 funCase
 -------
@@ -258,7 +258,7 @@ When none of the cases match the main condition, the "else" value is returned. I
 
  func funCase(parameters: seq[Value]): FunResult 
 
-.. _parseVersion:
+.. __:
 
 parseVersion
 ------------
@@ -269,7 +269,7 @@ Parse a StaticTea version number and return its three components.
 
  func parseVersion(version: string): Option[(int, int, int)] 
 
-.. _funCmpVersion:
+.. __:
 
 funCmpVersion
 -------------
@@ -284,7 +284,7 @@ StaticTea uses `Semantic Versioning`_ with the added restriction that each versi
 
  func funCmpVersion(parameters: seq[Value]): FunResult 
 
-.. _funFloat:
+.. __:
 
 funFloat
 --------
@@ -298,7 +298,7 @@ Convert an int or an int number string to a float.  Added in version 0.1.0.
 
  func funFloat(parameters: seq[Value]): FunResult 
 
-.. _funInt:
+.. __:
 
 funInt
 ------
@@ -319,7 +319,7 @@ Round options:
 
  func funInt(parameters: seq[Value]): FunResult 
 
-.. _funFind:
+.. __:
 
 funFind
 -------
@@ -341,7 +341,7 @@ Find a substring in a string and return its position when found. The first param
 
  func funFind(parameters: seq[Value]): FunResult 
 
-.. _funSubstr:
+.. __:
 
 funSubstr
 ---------
@@ -354,7 +354,7 @@ This kind of positioning is called a half-open range that includes the first pos
 
  func funSubstr(parameters: seq[Value]): FunResult 
 
-.. _funDup:
+.. __:
 
 funDup
 ------
@@ -365,7 +365,7 @@ Duplicate a string. The first parameter is the string to dup and the second para
 
  func funDup(parameters: seq[Value]): FunResult 
 
-.. _funDict:
+.. __:
 
 funDict
 -------
@@ -382,7 +382,7 @@ Create a dictionary from a list of key, value pairs. You can specify as many pai
 
  func funDict(parameters: seq[Value]): FunResult 
 
-.. _funList:
+.. __:
 
 funList
 -------
@@ -399,7 +399,7 @@ Create a list of values. You can specify as many variables as you want.  Added i
 
  func funList(parameters: seq[Value]): FunResult 
 
-.. _funReplace:
+.. __:
 
 funReplace
 ----------
@@ -437,7 +437,7 @@ The first parameter is the string, the second is the substring's starting positi
 
  func funReplace(parameters: seq[Value]): FunResult 
 
-.. _funReplaceRe:
+.. __:
 
 funReplaceRe
 ------------
@@ -469,7 +469,7 @@ replacements come from it.
 
  func funReplaceRe(parameters: seq[Value]): FunResult 
 
-.. _getFunction:
+.. __:
 
 getFunction
 -----------

@@ -49,7 +49,7 @@ $$ :   "skConst", "const: ", \
 $$ :   "skMacro", "macro: ", \
 $$ :   "")
 $$ : short = substr(description, 0, add(find(description, '.', -1), 1))
-* {type}{name}_ -- {short}
+* {type}{name}__ -- {short}
 
 $$ # Function and type descriptions.
 $$ block
@@ -63,7 +63,7 @@ $$ : code = get(entry, "code", "")
 $$ : pos = find(code, "{", len(code))
 $$ : signature = substr(code, 0, pos)
 $$ : t.maxLines = 100
-.. _{name}:
+.. __:
 
 {name}
 {nameUnderline}
