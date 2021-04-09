@@ -1,12 +1,19 @@
 
-===============
-runFunction.nim
-===============
+.. raw:: html
+
+  <style>.greenish {color:#5e8f60}</style>
+  <style>.code {border: 1px solid #cce0e3;border-radius:6px;margin-left: 0px}</style>
+
+.. role:: greenish
+
+===========================
+:greenish:`runFunction.nim`
+===========================
 
 Module containing StaticTea functions.
 
-Index:
-------
+:greenish:`Index:`
+------------------
 * type: FunctionPtr__ -- Signature of a statictea function.
 * type: FunResultKind__ -- The kind of a FunResult object, either a value or warning.
 * type: FunResult__ -- Contains the result of calling a function, either a value or a warning.
@@ -315,6 +322,23 @@ Round options:
 - "ceiling" - integer above (to the right on number line)
 - "truncate" - remove decimals
 
+Examples:
+
+.. code::
+
+  int("2") => 2
+  int("2.34") => 2
+  int(2.34, "round") => 2
+  int(-2.34, "round") => -2
+  int(6.5, "round") => 7
+  int(-6.5, "round") => -7
+  int(4.57, "floor") => 4
+  int(-4.57, "floor") => -5
+  int(6.3, "ceiling") => 7
+  int(-6.3, "ceiling") => -6
+  int(6.3456, "truncate") => 6
+  int(-6.3456, "truncate") => -6
+
 .. code::
 
  func funInt(parameters: seq[Value]): FunResult 
@@ -482,6 +506,13 @@ Look up a function by its name.
 
 
 
+
+----
+
 .. class:: align-center
 
-= StaticTea reStructuredText template for nim doc comments. =
+:greenish:`StaticTea reStructuredText template for nim doc comments.`
+
+.. class:: align-center
+
+⦿

@@ -1394,17 +1394,13 @@ List of functions:
 - [[#exists][exists()]] -- whether a variables exists
 - [[#find][find()]] -- find a substring in a string
 - [[#floatfun][float()]] -- convert an int or number string to a float
-- [[#format][format()]] -- format a string or a number
 - [[#get][get()]] -- get an element from a list or dictionary
 - [[#if][if()]] -- handles two conditions
 - [[#len][len()]] -- length of string, list or dictionary
 - [[#listfun][list()]] -- create a list
-- [[#lineNumber][lineNumber()]] -- the current line number
-- [[#quotehtml][quoteHtml]] -- excape html special characters
 - [[#replace][replace()]] -- replace range with a string
+- [[#replaceRe][replaceRe()]] -- replace regular expressions patterns in a string
 - [[#substr][substr()]] -- extract a substring from a string by indexes
-- [[#time][time()]] -- format the date and time.
-- [[#template][template()]] -- the filename of the current template
 
 [[#contents][茶]]
 
@@ -1700,40 +1696,6 @@ function.
 
 [[#contents][茶]]
 
-** format()
-:PROPERTIES:
-:CUSTOM_ID: format
-:END:
-
-The format function is a powerful way to format your
-variables. You can left, right or center the variable.  You can
-specify the number of digits after the decimal point and other
-things. For all the details see: https://nim-lang.org/docs/strformat.html.
-Added in version 0.1.0.
-
-template:
-
-#+BEGIN_SRC
-<--$ nextline cost=format(".2f", s.cost)-->
-Kathleen spent ${cost} on tea for Steve's birthday.
-#+END_SRC
-
-server json:
-
-#+BEGIN_SRC
-{
-  "cost": 52.436789
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-Kathleen spent $52.44 on tea for Steve's birthday.
-#+END_SRC
-
-[[#contents][茶]]
-
 ** get()
 :PROPERTIES:
 :CUSTOM_ID: get
@@ -1944,25 +1906,6 @@ list("a", 5, "b") => ["a", 5, "b"]
 [[#contents][
 [[#contents][茶]]
 
-** lineNumber()
-:PROPERTIES:
-:CUSTOM_ID: lineNumber
-:END:
-
-Return the line in the template where the function is called. See
-[[#warning-messages][Warning Messages]] for an example. Added in version 0.1.0.
-
-[[#contents][茶]]
-
-** quoteHtml()
-:PROPERTIES:
-:CUSTOM_ID: quoteHtml
-:END:
-
-The quoteHtml replaces special html characters with equivalents. Added in version 0.1.0.
-
-[[#contents][茶]]
-
 ** replace()
 :PROPERTIES:
 :CUSTOM_ID: replace
@@ -1980,6 +1923,34 @@ You can use replace to insert or append to a string.
 replace("Earl Grey", 5, 4, "of Sandwich")
   => "Earl of Sandwich"
 replace("abc", 3, 0, "123") => "abc123"
+#+END_SRC
+
+[[#contents][茶]]
+
+** replaceRe()
+:PROPERTIES:
+:CUSTOM_ID: replaceRe
+:END:
+
+Replace multiple parts of a string defined by regular
+expressions with replacement strings.
+
+The basic case takes three parameters, the string to work on, the
+regular expression pattern, and the replacement string.
+
+In general you can have multiple sets of patterns and
+replacements. You add each pair of parameters at the end.  If the
+second parameter is a list, the patterns and replacements come
+from it.
+
+#+BEGIN_SRC
+replaceRe("abcdefabc", "abc", "456")
+  => "456def456"
+replaceRe("abcdefabc", "abc", "456", "def", "")
+  => "456456"
+l = list("abc", "456", "def", "")
+replaceRe("abcdefabc", l))
+  => "456456"
 #+END_SRC
 
 [[#contents][茶]]
@@ -2024,36 +1995,6 @@ result:
 #+BEGIN_SRC
 sub1 = Grey, sub2 = Earl G
 #+END_SRC
-
-[[#contents][茶]]
-
-** time()
-:PROPERTIES:
-:CUSTOM_ID: time
-:END:
-
-The time function formats date and time values. Added in version 0.1.0.
-
-#+BEGIN_SRC
-time("2021-02-15T20:47:33Z", "%Y") => 2021
-#+END_SRC
-
-[[#contents][茶]]
-
-** template()
-:PROPERTIES:
-:CUSTOM_ID: template
-:END:
-
-Return the template filename. It takes one optional string
-parameter:
-
-- "basename" -- returns the name without any path information,
-  which is the default.
-- "passed" -- returns the template name as passed to statictea on
-  the command line.
-
-Added in version 0.1.0.
 
 [[#contents][茶]]
 

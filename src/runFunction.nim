@@ -467,6 +467,23 @@ func funInt*(parameters: seq[Value]): FunResult =
   ## @:- "floor" - integer below (to the left on number line)
   ## @:- "ceiling" - integer above (to the right on number line)
   ## @:- "truncate" - remove decimals
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:.. code::
+  ## @:
+  ## @:  int("2") => 2
+  ## @:  int("2.34") => 2
+  ## @:  int(2.34, "round") => 2
+  ## @:  int(-2.34, "round") => -2
+  ## @:  int(6.5, "round") => 7
+  ## @:  int(-6.5, "round") => -7
+  ## @:  int(4.57, "floor") => 4
+  ## @:  int(-4.57, "floor") => -5
+  ## @:  int(6.3, "ceiling") => 7
+  ## @:  int(-6.3, "ceiling") => -6
+  ## @:  int(6.3456, "truncate") => 6
+  ## @:  int(-6.3456, "truncate") => -6
 
   if parameters.len() < 1 or parameters.len() > 2:
     return newFunResultWarn(wOneOrTwoParameters)

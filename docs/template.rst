@@ -1,7 +1,8 @@
 $$ # StaticTea template for generating reStructuredTest from nim doc comments.
 $$ #
 $$ # Define replacement patterns for the descriptions.
-$$ nextline
+$$ block
+$$ : t.maxLines = 20
 $$ : g.patterns = list( \
 $$ :   "[ ]*@:", h.newline, \
 $$ :   "&quot;", '"', \
@@ -13,13 +14,21 @@ $$ :   ":linkTextEnd:", '`_', \
 $$ :   ":linkTargetBegin:", '.. _`', \
 $$ :   ":linkTargetEnd:", '`: https:')
 
+.. raw:: html
+
+  <style>.greenish {color:#5e8f60}</style>
+  <style>.code {border: 1px solid #cce0e3;border-radius:6px;margin-left: 0px}</style>
+
+.. role:: greenish
+
+$$ endblock
 $$ # Add the title created from the basename
 $$ # of the module path in s.orig.
 $$ block
 $$ : title = substr(s.orig, add(4, find(s.orig, 'src/', -4)));
-$$ : titleUnderline = dup("=", len(title))
+$$ : titleUnderline = dup("=", add(len(title), len(':greenish:``')))
 {titleUnderline}
-{title}
+:greenish:`{title}`
 {titleUnderline}
 $$ endblock
 
@@ -30,8 +39,8 @@ $$ : description = replaceRe(s.moduleDescription, g.patterns)
 
 $$ # Show the index label when there are entries.
 $$ block t.output = case(len(s.entries), 0, 'skip', 'result')
-Index:
-------
+:greenish:`Index:`
+------------------
 $$ endblock
 $$ #
 $$ #
@@ -83,7 +92,14 @@ $$ # no indentation. If you indent it one space, you can see the
 $$ # indentation. You need to indent at least one space. Fix by
 $$ # adding spaces to the beginning of lines, except the first.
 
-$$ # Center the bottom line.
+$$ # Center the bottom lines.
+
+----
+
 .. class:: align-center
 
-= StaticTea reStructuredText template for nim doc comments. =
+:greenish:`StaticTea reStructuredText template for nim doc comments.`
+
+.. class:: align-center
+
+⦿
