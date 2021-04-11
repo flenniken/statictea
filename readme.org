@@ -1402,8 +1402,9 @@ List of functions:
 - [[#replaceRe][replaceRe()]] -- replace regular expressions patterns in a string
 - [[#substr][substr()]] -- extract a substring from a string by indexes
 
+Testing:
 
-- [[docs/runFunction.md][Functions]] -- Nim function doc comments.
+- [[docs/runFunction.md#user-content-a8][cmp()]] -- spaceship compare function <=>
 - [[docs/runFunction.md#user-content-a11][get()]] -- get an element from a list or dictionary
 - [[docs/runFunction.md#user-content-a12][if()]] -- handles two conditions
 
