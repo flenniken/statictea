@@ -100,7 +100,7 @@ func funCmp*(parameters: seq[Value]): FunResult =
   ## is less than, equal to or greater than the second parameter. It
   ## returns -1 for less, 0 for equal and 1 for greater than. The
   ## optional third parameter compares strings case insensitive when
-  ## it is 1. Added in version 0.1.0.
+  ## it is 1.
   ## @:
   ## @:Compare numbers:
   ## @:
@@ -153,7 +153,19 @@ func funCmp*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(ret))
 
 func funConcat*(parameters: seq[Value]): FunResult =
-  ## Concatentate two or more strings.  Added in version 0.1.0.
+  ## Concatentate two or more strings.
+  ## @:
+  ## @:* p1: string
+  ## @:* p2: string
+  ## @:* ...
+  ## @:* pn: string
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:concat("tea", " time") => "tea time"
+  ## @:concat("a", "b", "c", "d") => "abcd"
+  ## @:~~~
   var str = ""
   if parameters.len() < 2:
     result = newFunResultWarn(wTwoOrMoreParameters)
@@ -169,7 +181,17 @@ func funLen*(parameters: seq[Value]): FunResult =
   ## Return the len of a value. It takes one parameter and
   ## returns the number of characters in a string (not bytes), the
   ## number of elements in a list or the number of elements in a
-  ## dictionary.  Added in version 0.1.0.
+  ## dictionary.
+  ## @:
+  ## @:* p1: string, list or dict
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:len("tea") => 3
+  ## @:len(list(4, 1)) => 2
+  ## @:len(dict('a', 4)) => 1
+  ## @:~~~
   if parameters.len() != 1:
     result = newFunResultWarn(wOneParameter)
     return
@@ -194,7 +216,7 @@ func funGet*(parameters: seq[Value]): FunResult =
   ## third optional parameter is the default value when the element
   ## doesn't exist. If you don't specify the default, a warning is
   ## generated when the element doesn't exist and the statement is
-  ## skipped. Added in version 0.1.0.
+  ## skipped.
   ## @:
   ## @:Get Dictionary Item:
   ## @:
@@ -207,6 +229,18 @@ func funGet*(parameters: seq[Value]): FunResult =
   ## @:* p1: list to use
   ## @:* p2: index of item in the list
   ## @:* p3: optional default value returned when index is too big
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:d = dict("tea", "Earl Grey")
+  ## @:get(d, 'tea') => "Earl Grey"
+  ## @:get(d, 'coffee', 'Tea') => "Tea"
+  ## @:
+  ## @:l = list(4, 'a', 10)
+  ## @:get(l, 2) => 10
+  ## @:get(l, 3, 99) => 99
+  ## @:~~~
 
   if parameters.len() < 2 or parameters.len() > 3:
     return newFunResultWarn(wGetTakes2or3Params)
@@ -242,11 +276,19 @@ func funGet*(parameters: seq[Value]): FunResult =
 func funIf*(parameters: seq[Value]): FunResult =
   ## You use the if function to return a value based on a condition.
   ## It has three parameters, the condition, the true case and the
-  ## false case. Added in version 0.1.0.
+  ## false case.
   ## @:
-  ## @:* p1: the integer condition
+  ## @:* p1: integer condition
   ## @:* p2: true case: the value returned when condition is 1
   ## @:* p3: else case: the value returned when condition is not 1.
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:if(1, 'tea', 'beer') => "tea"
+  ## @:if(0, 'tea', 'beer') => "beer"
+  ## @:if(4, 'tea', 'beer') => "beer"
+  ## @:~~~
 
   if parameters.len() != 3:
     result = newFunResultWarn(wThreeParameters)
@@ -267,7 +309,30 @@ func funIf*(parameters: seq[Value]): FunResult =
 func funAdd*(parameters: seq[Value]): FunResult =
   ## Return the sum of two or more values.  The parameters must be all
   ## integers or all floats.  A warning is generated on overflow.
-  ## Added in version 0.1.0.
+  ## @:
+  ## @:Integer case:
+  ## @:
+  ## @:* p1: int
+  ## @:* p2: int
+  ## @:* ...
+  ## @:* pn: int
+  ## @:
+  ## @:Float case:
+  ## @:
+  ## @:* p1: float
+  ## @:* p2: float
+  ## @:* ...
+  ## @:* pn: float
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:add(1, 2) => 3
+  ## @:add(1, 2, 3) => 6
+  ## @:
+  ## @:add(1.5, 2.3) => 3.8
+  ## @:add(1.1, 2.2, 3.3) => 6.6
+  ## @:~~~
 
   if parameters.len() < 2:
     result = newFunResultWarn(wTwoOrMoreParameters)
@@ -299,10 +364,18 @@ func funAdd*(parameters: seq[Value]): FunResult =
 func funExists*(parameters: seq[Value]): FunResult =
   ## Return 1 when a variable exists in a dictionary, else return
   ## @@0. The first parameter is the dictionary to check and the second
-  ## parameter is the name of the variable. Added in version 0.1.0.
+  ## parameter is the name of the variable.
   ## @:
-  ## @:* p1: dictionary: the dictionary containing the variable
-  ## @:* p2: string: the variable name (key name) to look for
+  ## @:* p1: dictionary
+  ## @:* p2: string: variable name (key name)
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:d = dict("tea", "Earl")
+  ## @:exists(d, "tea") => 1
+  ## @:exists(d, "coffee") => 0
+  ## @:~~~
 
   if parameters.len() != 2:
     result = newFunResultWarn(wTwoParameters)
@@ -337,7 +410,6 @@ func funCase*(parameters: seq[Value]): FunResult =
   ## value is returned. If none match and the else is missing, a
   ## warning is generated and the statement is skipped. The conditions
   ## must be integers or strings. The return values can be any type.
-  ## Added in version 0.1.0.
   ## @:
   ## @:* p1: the main condition value
   ## @:* p2: the first case condition
@@ -346,6 +418,18 @@ func funCase*(parameters: seq[Value]): FunResult =
   ## @:* pn-2: the last case condition
   ## @:* pn-1: the last case value
   ## @:* pn: the optional "else" value returned when nothing matches
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:case(8, 8, "tea", "water") => "tea"
+  ## @:case(8, 3, "tea", "water") => "water"
+  ## @:case(8,
+  ## @:  1, "tea", \\
+  ## @:  2, "water", \\
+  ## @:  3, "wine", \\
+  ## @:  "beer") => "beer"
+  ## @:~~~
 
   # At least 3 parameters.
   if parameters.len() < 3:
@@ -411,7 +495,18 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
   ## @:
   ## StaticTea uses @|Semantic Versioning|@(https@@://semver.org/)
   ## with the added restriction that each version component has one
-  ## to three digits (no letters). Added in version 0.1.0.
+  ## to three digits (no letters).
+  ## @:
+  ## @:* p1: version number string
+  ## @:* p2: version number string
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:cmpVersion("1.2.5", "1.1.8") => -1
+  ## @:cmpVersion("1.2.5", "1.3.0") => 1
+  ## @:cmpVersion("1.2.5", "1.2.5") => 1
+  ## @:~~~
 
   if parameters.len() != 2:
     result = newFunResultWarn(wTwoParameters)
@@ -440,10 +535,18 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(ret))
 
 func funFloat*(parameters: seq[Value]): FunResult =
-  ## Convert an int or an int number string to a float.  Added in
-  ## version 0.1.0.
+  ## Convert an int or an int number string to a float.
   ## @:
   ## Note: Use the format function to convert a number to a string.
+  ## @:
+  ## @:* p1: int or int string
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:float(2) => 2.0
+  ## @:float("33") => 33.0
+  ## @:~~~
 
   if parameters.len() != 1:
     return newFunResultWarn(wOneParameter)
@@ -475,11 +578,10 @@ func funFloat*(parameters: seq[Value]): FunResult =
 # todo: use int64 instead of BiggestInt everywhere.
 
 func funInt*(parameters: seq[Value]): FunResult =
-  ## Convert a float or a number string to an int. Added in version
-  ## @@0.1.0.
+  ## Convert a float or a number string to an int.
   ## @:
-  ## @:* p1: value to convert, float or float number string
-  ## @:* p2: optional round options. "round" is the default.
+  ## @:* p1: float or float number string
+  ## @:* p2: optional round option. "round" is the default.
   ## @:
   ## @:Round options:
   ## @:
@@ -568,16 +670,17 @@ func funFind*(parameters: seq[Value]): FunResult =
   ## substring. The third optional parameter is returned when the
   ## substring is not found.  A warning is generated when the
   ## substring is missing and no third parameter. Positions start at
-  ## @00. Added in version 0.1.0.
+  ## @@0.
   ## @:
-  ## ~~~
-  ## msg = "Tea time at 3:30."
-  ## 0123456789 1234567
-  ## find(msg, "Tea") = 0
-  ## find(msg, "time") = 4
-  ## find(msg, "party", -1) = -1
-  ## find(msg, "party", len(msg)) = 17
-  ## find(msg, "party", 0) = 0
+  ## @:~~~
+  ## @:#      0123456789 1234567
+  ## @:msg = "Tea time at 3:30."
+  ## @:find(msg, "Tea") = 0
+  ## @:find(msg, "time") = 4
+  ## @:find(msg, "me") = 6
+  ## @:find(msg, "party", -1) = -1
+  ## @:find(msg, "party", len(msg)) = 17
+  ## @:find(msg, "party", 0) = 0
   ## @:~~~
 
   if parameters.len() < 2 or parameters.len() > 3:
@@ -598,18 +701,28 @@ func funFind*(parameters: seq[Value]): FunResult =
   else:
     result = newFunResult(newValue(pos))
 
-# todo: add examples for all functions.
 func funSubstr*(parameters: seq[Value]): FunResult =
   ## Extract a substring from a string.  The first parameter is the
   ## string, the second is the substring's starting position and the
   ## third is one past the end. The first position is 0. The third
   ## parameter is optional and defaults to one past the end of the
-  ## string. Added in version 0.1.0.
+  ## string.
   ## @:
   ## This kind of positioning is called a half-open range that
   ## includes the first position but not the second. For example,
   ## [3, 7) includes 3, 4, 5, 6. The end minus the start is equal to
   ## the length of the substring.
+  ## @:
+  ## @:* p1: string
+  ## @:* p2: start index
+  ## @:* p3: optional: end index (one past end)
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:substr("Earl Grey", 0, 4) => "Earl"
+  ## @:substr("Earl Grey", 5) => => "Grey"
+  ## @:~~~
 
   if parameters.len < 2 or parameters.len > 3:
     result = newFunResultWarn(wTwoOrThreeParameters)
@@ -649,7 +762,16 @@ func funSubstr*(parameters: seq[Value]): FunResult =
 func funDup*(parameters: seq[Value]): FunResult =
   ## Duplicate a string. The first parameter is the string to dup and
   ## the second parameter is the number of times to duplicate it.
-  ## Added in version 0.1.0.
+  ## @:
+  ## @:* p1: string to duplicate
+  ## @:* p2: number of times to repeat
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:dup("=", 3) => "==="
+  ## @:substr("abc", 2) => => "abcabc"
+  ## @:~~~
 
   if parameters.len() != 2:
     result = newFunResultWarn(wTwoParameters)
@@ -679,12 +801,20 @@ func funDup*(parameters: seq[Value]): FunResult =
 func funDict*(parameters: seq[Value]): FunResult =
   ## Create a dictionary from a list of key, value pairs. You can
   ## specify as many pairs as you want. The keys must be strings and
-  ## the values can be any type. Added in version 0.1.0.
+  ## the values can be any type.
+  ## @:
+  ## @:* p1: string key
+  ## @:* p2: value
+  ## @:* ...
+  ## @:* pn-1: string key
+  ## @:* pn: value
+  ## @:
+  ## @:Examples:
   ## @:
   ## @:~~~
   ## @:dict("a", 5) => {"a": 5}
   ## @:dict("a", 5, "b", 33, "c", 0) =>
-  ## @:    {"a": 5, "b": 33, "c": 0}
+  ## @:  {"a": 5, "b": 33, "c": 0}
   ## @:~~~
 
   var dict: VarsDict
@@ -706,9 +836,18 @@ func funDict*(parameters: seq[Value]): FunResult =
 
 func funList*(parameters: seq[Value]): FunResult =
   ## Create a list of values. You can specify as many variables as you
-  ## want.  Added in version 0.1.0.
+  ## want.
+  ## @:
+  ## @:* p1: value
+  ## @:* p2: value
+  ## @:* p3: value
+  ## @:* ...
+  ## @:* pn: value
+  ## @:
+  ## @:Examples:
   ## @:
   ## @:~~~
+  ## @:list() => []
   ## @:list(1) => [1]
   ## @:list(1, 2, 3) => [1, 2, 3]
   ## @:list("a", 5, "b") => ["a", 5, "b"]
@@ -718,10 +857,18 @@ func funList*(parameters: seq[Value]): FunResult =
 
 func funReplace*(parameters: seq[Value]): FunResult =
   ## Replace a part of a string (substring) with another string.
+  ## You can use it to insert and append to a string as well.
   ## @:
   ## The first parameter is the string, the second is the substring's
   ## starting position, starting a 0, the third is the length of the
   ## substring and the fourth is the replacement string.
+  ## @:
+  ## @:* p1: string to replace
+  ## @:* p2: substring start index
+  ## @:* p3: substring length
+  ## @:* p4: replacement string
+  ## @:
+  ## @:Examples:
   ## @:
   ## @:~~~
   ## @:replace("Earl Grey", 5, 4, "of Sandwich")
@@ -793,7 +940,7 @@ func funReplace*(parameters: seq[Value]): FunResult =
 #   ## Match a pattern in a string.
 #   ##
 #   ## The match function returns a dictionary with the results of the
-#   ## match. Added in version 0.1.0.
+#   ## match.
 #   ##
 #   ## m = match(string, pattern, start, default)
 #   ## m = match("Tea time", "Tea")
@@ -851,7 +998,7 @@ func funReplaceRe*(parameters: seq[Value]): FunResult =
   ## @:
   ## The basic case uses one replacement pattern. It takes three
   ## parameters, the first parameter is the string to work on, the
-  ## second is the regular expression pattern, and the fourth is the
+  ## second is the regular expression pattern, and the third is the
   ## replacement string.
   ## @:
   ## In general you can have multiple sets of patterns and associated
@@ -859,6 +1006,24 @@ func funReplaceRe*(parameters: seq[Value]): FunResult =
   ## @:
   ## If the second parameter is a list, the patterns and
   ## replacements come from it.
+  ## @:
+  ## @:Case one:
+  ## @:
+  ## @:* p1: string to replace
+  ## @:* p2: pattern 1
+  ## @:* p3: replacement string 1
+  ## @:* p4: optional: pattern 2
+  ## @:* p5: optional: replacement string 2
+  ## @:* ...
+  ## @:* pn-1: optional: pattern n
+  ## @:* pn: optional: replacement string n
+  ## @:
+  ## @:Case two:
+  ## @:
+  ## @:* p1: string to replace
+  ## @:* p2: list of pattern and replacement pairs
+  ## @:
+  ## @:Examples:
   ## @:
   ## @:~~~
   ## @:replaceRe("abcdefabc", "abc", "456")
