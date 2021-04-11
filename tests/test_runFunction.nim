@@ -916,6 +916,10 @@ suite "runFunction.nim":
     let text = ":linkTargetBegin:Semantic Versioning:linkTargetEnd://semver.org/"
     check testReplaceReGood(text, ":linkTargetBegin:", ".. _`", ":linkTargetEnd:", "`: https", ".. _`Semantic Versioning`: https//semver.org/")
 
+    let textMd = "## @:StaticTea uses @|Semantic Versioning|@(https@:://semver.org/)"
+    let eTextMd = "##\nStaticTea uses [Semantic Versioning](https://semver.org/)"
+    check testReplaceReGood(textMd, "@::", ":", r"@\|", "[", r"\|@", "]", "[ ]*@:", "\n", eTextMd)
+
   test "replaceRe good list":
     check testReplaceReGoodList("abc123abc", newVarList("abc", "456"), "456123456")
     check testReplaceReGoodList("abc123abc", newVarList("a", "x", "b", "y", "c", "z"), "xyz123xyz")
