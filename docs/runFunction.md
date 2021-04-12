@@ -41,6 +41,8 @@ Signature of a statictea function. It takes any number of values and returns a v
 FunctionPtr = proc (parameters: seq[Value]): FunResult 
 ```
 
+[source](blob/master/src/runFunction.nim#L16)
+
 # <a id="a1"></a>FunResultKind
 
 The kind of a FunResult object, either a value or warning.
@@ -49,6 +51,8 @@ The kind of a FunResult object, either a value or warning.
 FunResultKind = enum
   frValue, frWarning
 ```
+
+[source](blob/master/src/runFunction.nim#L20)
 
 # <a id="a2"></a>FunResult
 
@@ -67,6 +71,8 @@ FunResult = object
 
 ```
 
+[source](blob/master/src/runFunction.nim#L25)
+
 # <a id="a3"></a>newFunResultWarn
 
 Return a new FunResult object. It contains a warning, the index of the problem parameter, and the two optional strings that go with the warning.
@@ -76,6 +82,8 @@ func newFunResultWarn(warning: Warning; parameter: Natural = 0; p1: string = "";
                       p2: string = ""): FunResult 
 ```
 
+[source](blob/master/src/runFunction.nim#L38)
+
 # <a id="a4"></a>newFunResult
 
 Return a new FunResult object containing a value.
@@ -83,6 +91,8 @@ Return a new FunResult object containing a value.
 ```nim
 func newFunResult(value: Value): FunResult 
 ```
+
+[source](blob/master/src/runFunction.nim#L47)
 
 # <a id="a5"></a>`==`
 
@@ -92,6 +102,8 @@ Compare two FunResult objects and return true when equal.
 func `==`(r1: FunResult; r2: FunResult): bool 
 ```
 
+[source](blob/master/src/runFunction.nim#L51)
+
 # <a id="a6"></a>`$`
 
 Return a string representation of a FunResult object.
@@ -100,6 +112,8 @@ Return a string representation of a FunResult object.
 func `$`(funResult: FunResult): string 
 ```
 
+[source](blob/master/src/runFunction.nim#L62)
+
 # <a id="a7"></a>cmpString
 
 Compares two UTF-8 strings. Returns 0 when equal, 1 when a is greater than b and -1 when a less than b. Optionally Ignore case.
@@ -107,6 +121,8 @@ Compares two UTF-8 strings. Returns 0 when equal, 1 when a is greater than b and
 ```nim
 func cmpString(a, b: string; ignoreCase: bool = false): int 
 ```
+
+[source](blob/master/src/runFunction.nim#L72)
 
 # <a id="a8"></a>funCmp
 
@@ -140,6 +156,8 @@ cmp("Tea", "tea", 1) => 0
 func funCmp(parameters: seq[Value]): FunResult 
 ```
 
+[source](blob/master/src/runFunction.nim#L97)
+
 # <a id="a9"></a>funConcat
 
 Concatentate two or more strings.
@@ -160,6 +178,8 @@ concat("a", "b", "c", "d") => "abcd"
 func funConcat(parameters: seq[Value]): FunResult 
 ```
 
+[source](blob/master/src/runFunction.nim#L155)
+
 # <a id="a10"></a>funLen
 
 Return the len of a value. It takes one parameter and returns the number of characters in a string (not bytes), the number of elements in a list or the number of elements in a dictionary.
@@ -177,6 +197,8 @@ len(dict('a', 4)) => 1
 ```nim
 func funLen(parameters: seq[Value]): FunResult 
 ```
+
+[source](blob/master/src/runFunction.nim#L180)
 
 # <a id="a11"></a>funGet
 
@@ -210,6 +232,8 @@ get(l, 3, 99) => 99
 func funGet(parameters: seq[Value]): FunResult 
 ```
 
+[source](blob/master/src/runFunction.nim#L212)
+
 # <a id="a12"></a>funIf
 
 You use the if function to return a value based on a condition. It has three parameters, the condition, the true case and the false case.
@@ -229,6 +253,8 @@ if(4, 'tea', 'beer') => "beer"
 ```nim
 func funIf(parameters: seq[Value]): FunResult 
 ```
+
+[source](blob/master/src/runFunction.nim#L276)
 
 # <a id="a13"></a>funAdd
 
@@ -262,6 +288,8 @@ add(1.1, 2.2, 3.3) => 6.6
 func funAdd(parameters: seq[Value]): FunResult 
 ```
 
+[source](blob/master/src/runFunction.nim#L309)
+
 # <a id="a14"></a>funExists
 
 Return 1 when a variable exists in a dictionary, else return 0. The first parameter is the dictionary to check and the second parameter is the name of the variable.
@@ -280,6 +308,8 @@ exists(d, "coffee") => 0
 ```nim
 func funExists(parameters: seq[Value]): FunResult 
 ```
+
+[source](blob/master/src/runFunction.nim#L364)
 
 # <a id="a15"></a>funCase
 
@@ -311,6 +341,8 @@ case(8,
 func funCase(parameters: seq[Value]): FunResult 
 ```
 
+[source](blob/master/src/runFunction.nim#L399)
+
 # <a id="a16"></a>parseVersion
 
 Parse a StaticTea version number and return its three components.
@@ -318,6 +350,8 @@ Parse a StaticTea version number and return its three components.
 ```nim
 func parseVersion(version: string): Option[(int, int, int)] 
 ```
+
+[source](blob/master/src/runFunction.nim#L479)
 
 # <a id="a17"></a>funCmpVersion
 
@@ -339,6 +373,8 @@ cmpVersion("1.2.5", "1.2.5") => 1
 func funCmpVersion(parameters: seq[Value]): FunResult 
 ```
 
+[source](blob/master/src/runFunction.nim#L490)
+
 # <a id="a18"></a>funFloat
 
 Convert an int or an int number string to a float.
@@ -356,6 +392,8 @@ float("33") => 33.0
 ```nim
 func funFloat(parameters: seq[Value]): FunResult 
 ```
+
+[source](blob/master/src/runFunction.nim#L537)
 
 # <a id="a19"></a>funInt
 
@@ -392,6 +430,8 @@ int(-6.3456, "truncate") => -6
 func funInt(parameters: seq[Value]): FunResult 
 ```
 
+[source](blob/master/src/runFunction.nim#L580)
+
 # <a id="a20"></a>funFind
 
 Find a substring in a string and return its position when found. The first parameter is the string and the second is the substring. The third optional parameter is returned when the substring is not found.  A warning is generated when the substring is missing and no third parameter. Positions start at 0.
@@ -410,6 +450,8 @@ find(msg, "party", 0) = 0
 ```nim
 func funFind(parameters: seq[Value]): FunResult 
 ```
+
+[source](blob/master/src/runFunction.nim#L667)
 
 # <a id="a21"></a>funSubstr
 
@@ -431,6 +473,8 @@ substr("Earl Grey", 5) => => "Grey"
 func funSubstr(parameters: seq[Value]): FunResult 
 ```
 
+[source](blob/master/src/runFunction.nim#L704)
+
 # <a id="a22"></a>funDup
 
 Duplicate a string. The first parameter is the string to dup and the second parameter is the number of times to duplicate it.
@@ -448,6 +492,8 @@ substr("abc", 2) => => "abcabc"
 ```nim
 func funDup(parameters: seq[Value]): FunResult 
 ```
+
+[source](blob/master/src/runFunction.nim#L762)
 
 # <a id="a23"></a>funDict
 
@@ -471,6 +517,8 @@ dict("a", 5, "b", 33, "c", 0) =>
 func funDict(parameters: seq[Value]): FunResult 
 ```
 
+[source](blob/master/src/runFunction.nim#L801)
+
 # <a id="a24"></a>funList
 
 Create a list of values. You can specify as many variables as you want.
@@ -493,6 +541,8 @@ list("a", 5, "b") => ["a", 5, "b"]
 ```nim
 func funList(parameters: seq[Value]): FunResult 
 ```
+
+[source](blob/master/src/runFunction.nim#L837)
 
 # <a id="a25"></a>funReplace
 
@@ -535,6 +585,8 @@ replace("123", 0, 3, "") =>
 func funReplace(parameters: seq[Value]): FunResult 
 ```
 
+[source](blob/master/src/runFunction.nim#L858)
+
 # <a id="a26"></a>funReplaceRe
 
 Replace multiple parts of a string defined by regular expressions with replacement strings.
@@ -574,6 +626,8 @@ replaceRe("abcdefabc", l))
 func funReplaceRe(parameters: seq[Value]): FunResult 
 ```
 
+[source](blob/master/src/runFunction.nim#L995)
+
 # <a id="a27"></a>getFunction
 
 Look up a function by its name.
@@ -581,6 +635,8 @@ Look up a function by its name.
 ```nim
 proc getFunction(functionName: string): Option[FunctionPtr] 
 ```
+
+[source](blob/master/src/runFunction.nim#L1088)
 
 
 ---

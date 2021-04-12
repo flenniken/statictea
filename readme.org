@@ -1910,7 +1910,6 @@ list(1, 2, 3) => [1, 2, 3]
 list("a", 5, "b") => ["a", 5, "b"]
 #+END_SRC
 
-[[#contents][
 [[#contents][茶]]
 
 ** replace()

@@ -13,13 +13,13 @@ $$ :   "&gt;", '>', \
 $$ :   "&lt;", '<', \
 $$ :   "&amp;", '&', \
 $$ :   "httpss", 'https')
+$$ : g.moduleName = substr(s.orig, add(4, find(s.orig, 'src/', -4)));
 $$ endblock
 $$ #
 $$ # Add the title created from the basename
 $$ # of the module path in s.orig.
 $$ nextline
-$$ : title = substr(s.orig, add(4, find(s.orig, 'src/', -4)));
-# {title}
+# {g.moduleName}
 
 $$ # Module description.
 $$ nextline
@@ -59,6 +59,7 @@ $$ : co = get(entry, "code", "")
 $$ : code = replaceRe(co, "[ ]*$", "")
 $$ : pos = find(code, "{", len(code))
 $$ : signature = substr(code, 0, pos)
+$$ : line = get(entry, "line", "0")
 $$ : t.maxLines = 100
 # <a id="a{t.row}"></a>{name}
 
@@ -67,6 +68,8 @@ $$ : t.maxLines = 100
 ```nim
 {signature}
 ```
+
+[source](blob/master/src/{g.moduleName}#L{line})
 
 $$ endblock
 
