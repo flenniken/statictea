@@ -41,7 +41,7 @@ Signature of a statictea function. It takes any number of values and returns a v
 FunctionPtr = proc (parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L16)
+[source](../src/runFunction.nim#L16)
 
 # <a id="a1"></a>FunResultKind
 
@@ -52,7 +52,7 @@ FunResultKind = enum
   frValue, frWarning
 ```
 
-[source](blob/master/src/runFunction.nim#L20)
+[source](../src/runFunction.nim#L20)
 
 # <a id="a2"></a>FunResult
 
@@ -71,7 +71,7 @@ FunResult = object
 
 ```
 
-[source](blob/master/src/runFunction.nim#L25)
+[source](../src/runFunction.nim#L25)
 
 # <a id="a3"></a>newFunResultWarn
 
@@ -82,7 +82,7 @@ func newFunResultWarn(warning: Warning; parameter: Natural = 0; p1: string = "";
                       p2: string = ""): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L38)
+[source](../src/runFunction.nim#L38)
 
 # <a id="a4"></a>newFunResult
 
@@ -92,7 +92,7 @@ Return a new FunResult object containing a value.
 func newFunResult(value: Value): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L47)
+[source](../src/runFunction.nim#L47)
 
 # <a id="a5"></a>`==`
 
@@ -102,7 +102,7 @@ Compare two FunResult objects and return true when equal.
 func `==`(r1: FunResult; r2: FunResult): bool 
 ```
 
-[source](blob/master/src/runFunction.nim#L51)
+[source](../src/runFunction.nim#L51)
 
 # <a id="a6"></a>`$`
 
@@ -112,7 +112,7 @@ Return a string representation of a FunResult object.
 func `$`(funResult: FunResult): string 
 ```
 
-[source](blob/master/src/runFunction.nim#L62)
+[source](../src/runFunction.nim#L62)
 
 # <a id="a7"></a>cmpString
 
@@ -122,7 +122,7 @@ Compares two UTF-8 strings. Returns 0 when equal, 1 when a is greater than b and
 func cmpString(a, b: string; ignoreCase: bool = false): int 
 ```
 
-[source](blob/master/src/runFunction.nim#L72)
+[source](../src/runFunction.nim#L72)
 
 # <a id="a8"></a>funCmp
 
@@ -156,7 +156,7 @@ cmp("Tea", "tea", 1) => 0
 func funCmp(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L97)
+[source](../src/runFunction.nim#L97)
 
 # <a id="a9"></a>funConcat
 
@@ -178,7 +178,7 @@ concat("a", "b", "c", "d") => "abcd"
 func funConcat(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L155)
+[source](../src/runFunction.nim#L155)
 
 # <a id="a10"></a>funLen
 
@@ -198,7 +198,7 @@ len(dict('a', 4)) => 1
 func funLen(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L180)
+[source](../src/runFunction.nim#L180)
 
 # <a id="a11"></a>funGet
 
@@ -232,7 +232,7 @@ get(l, 3, 99) => 99
 func funGet(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L212)
+[source](../src/runFunction.nim#L212)
 
 # <a id="a12"></a>funIf
 
@@ -254,7 +254,7 @@ if(4, 'tea', 'beer') => "beer"
 func funIf(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L276)
+[source](../src/runFunction.nim#L276)
 
 # <a id="a13"></a>funAdd
 
@@ -288,7 +288,7 @@ add(1.1, 2.2, 3.3) => 6.6
 func funAdd(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L309)
+[source](../src/runFunction.nim#L309)
 
 # <a id="a14"></a>funExists
 
@@ -309,7 +309,7 @@ exists(d, "coffee") => 0
 func funExists(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L364)
+[source](../src/runFunction.nim#L364)
 
 # <a id="a15"></a>funCase
 
@@ -341,7 +341,7 @@ case(8,
 func funCase(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L399)
+[source](../src/runFunction.nim#L399)
 
 # <a id="a16"></a>parseVersion
 
@@ -351,7 +351,7 @@ Parse a StaticTea version number and return its three components.
 func parseVersion(version: string): Option[(int, int, int)] 
 ```
 
-[source](blob/master/src/runFunction.nim#L479)
+[source](../src/runFunction.nim#L479)
 
 # <a id="a17"></a>funCmpVersion
 
@@ -373,7 +373,7 @@ cmpVersion("1.2.5", "1.2.5") => 1
 func funCmpVersion(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L490)
+[source](../src/runFunction.nim#L490)
 
 # <a id="a18"></a>funFloat
 
@@ -393,7 +393,7 @@ float("33") => 33.0
 func funFloat(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L537)
+[source](../src/runFunction.nim#L537)
 
 # <a id="a19"></a>funInt
 
@@ -430,7 +430,7 @@ int(-6.3456, "truncate") => -6
 func funInt(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L580)
+[source](../src/runFunction.nim#L580)
 
 # <a id="a20"></a>funFind
 
@@ -451,7 +451,7 @@ find(msg, "party", 0) = 0
 func funFind(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L667)
+[source](../src/runFunction.nim#L667)
 
 # <a id="a21"></a>funSubstr
 
@@ -473,7 +473,7 @@ substr("Earl Grey", 5) => => "Grey"
 func funSubstr(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L704)
+[source](../src/runFunction.nim#L704)
 
 # <a id="a22"></a>funDup
 
@@ -493,7 +493,7 @@ substr("abc", 2) => => "abcabc"
 func funDup(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L762)
+[source](../src/runFunction.nim#L762)
 
 # <a id="a23"></a>funDict
 
@@ -517,7 +517,7 @@ dict("a", 5, "b", 33, "c", 0) =>
 func funDict(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L801)
+[source](../src/runFunction.nim#L801)
 
 # <a id="a24"></a>funList
 
@@ -542,7 +542,7 @@ list("a", 5, "b") => ["a", 5, "b"]
 func funList(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L837)
+[source](../src/runFunction.nim#L837)
 
 # <a id="a25"></a>funReplace
 
@@ -585,7 +585,7 @@ replace("123", 0, 3, "") =>
 func funReplace(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L858)
+[source](../src/runFunction.nim#L858)
 
 # <a id="a26"></a>funReplaceRe
 
@@ -626,7 +626,7 @@ replaceRe("abcdefabc", l))
 func funReplaceRe(parameters: seq[Value]): FunResult 
 ```
 
-[source](blob/master/src/runFunction.nim#L995)
+[source](../src/runFunction.nim#L995)
 
 # <a id="a27"></a>getFunction
 
@@ -636,7 +636,7 @@ Look up a function by its name.
 proc getFunction(functionName: string): Option[FunctionPtr] 
 ```
 
-[source](blob/master/src/runFunction.nim#L1088)
+[source](../src/runFunction.nim#L1088)
 
 
 ---

@@ -69,7 +69,7 @@ $$ : t.maxLines = 100
 {signature}
 ```
 
-[source](blob/master/src/{g.moduleName}#L{line})
+[source](../src/{g.moduleName}#L{line})
 
 $$ endblock
 
