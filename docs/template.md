@@ -3,14 +3,14 @@ $$ #
 $$ # Define replacement patterns to remove formatting from the descriptions.
 $$ block
 $$ : t.maxLines = 20
-$$ : g.patterns = list( \
-$$ :   "@@", '', \
-$$ :   "@\|", '[', \
-$$ :   "\|@", ']', \
-$$ :   "[ ]*@:", h.newline, \
-$$ :   "&quot;", '"', \
-$$ :   "&gt;", '>', \
-$$ :   "&lt;", '<', \
+$$ : g.patterns = list( +
+$$ :   "@@", '', +
+$$ :   "@\|", '[', +
+$$ :   "\|@", ']', +
+$$ :   "[ ]*@:", h.newline, +
+$$ :   "&quot;", '"', +
+$$ :   "&gt;", '>', +
+$$ :   "&lt;", '<', +
 $$ :   "&amp;", '&')
 $$ : g.moduleName = substr(s.orig, add(4, find(s.orig, 'src/', -4)));
 $$ endblock
@@ -38,10 +38,10 @@ $$ : entry = get(s.entries, t.row, dict())
 $$ : name = get(entry, "name", "")
 $$ : description = get(entry, "description", "")
 $$ : skType = get(entry, "type", "")
-$$ : type = case(skType, \
-$$ :   "skType", "type: ", \
-$$ :   "skConst", "const: ", \
-$$ :   "skMacro", "macro: ", \
+$$ : type = case(skType, +
+$$ :   "skType", "type: ", +
+$$ :   "skConst", "const: ", +
+$$ :   "skMacro", "macro: ", +
 $$ :   "")
 $$ : short = substr(description, 0, add(find(description, '.', -1), 1))
 * {type}[{name}](#user-content-a{t.row}) &mdash; {short}

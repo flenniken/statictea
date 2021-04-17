@@ -79,17 +79,17 @@ proc matchCommand*(line: string, start: Natural = 0): Option[Matches] =
 
 proc matchLastPart*(line: string, postfix: string, start: Natural = 0): Option[Matches] =
   ## Match the last part of a command line.  It matches the optional
-  ## continuation slash, the optional postfix and the optional line
-  ## endings.
+  ## continuation plus character, the optional postfix and the
+  ## optional line endings.
   var pattern: string
   if postfix == "":
-    pattern = r"([\\]{0,1})([\r]{0,1}\n){0,1}$"
+    pattern = r"([+]{0,1})([\r]{0,1}\n){0,1}$"
   else:
-    pattern = r"([\\]{0,1})\Q$1\E([\r]{0,1}\n){0,1}$" % postfix
+    pattern = r"([+]{0,1})\Q$1\E([\r]{0,1}\n){0,1}$" % postfix
   result = matchPatternCached(line, pattern, start)
 
 proc getLastPart*(line: string, postfix: string): Option[Matches] =
-  ## Return the optional slash and line endings from the line.
+  ## Return the optional plus and line endings from the line.
 
   # Start checking 3 characters before the end to account for the
   # optional slash, cr and linefeed. If the line is too short, return
@@ -99,8 +99,8 @@ proc getLastPart*(line: string, postfix: string): Option[Matches] =
   #
   # 123456
   # 0123456
-  # \-->rn
-  #  \-->n
+  # +-->rn
+  #  +-->n
   #   -->n
   #    -->
 

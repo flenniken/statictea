@@ -394,7 +394,7 @@ is done with t.output.
 Statements are allowed on the nextline, block and replace
 commands. You can use multiple statements on the same line
 separated with semicolons. If you need more space for a
-statement, you can continue the line with the "\\" character at
+statement, you can continue the line with the "+" character at
 the end. Statements are executed from left to right, top to
 bottom.
 
@@ -445,7 +445,7 @@ prefix
 |     |        |         |postfix
 |     |        |         ||  newline
 |     |        |         ||  |
-<!--$ nextline a=5;  b="b\-->
+<!--$ nextline a=5;  b="b+-->
 <!--$ : anana"; c=5       -->
 #+END_SRC
 
@@ -471,7 +471,7 @@ equivalent:
 #+BEGIN_SRC
 <!--$ nextline com = "Bigelow Tea Company" -->
 
-<!--$ nextline com = "Big\-->
+<!--$ nextline com = "Big+-->
 <!--$ : elow Tea Company" -->
 #+END_SRC
 
@@ -695,12 +695,12 @@ template:
 
 #+BEGIN_SRC
 $$ nextline
-$$ : t.output = if( \
+$$ : t.output = if( +
 $$ :   exists("s.admin"), "skip",
 $$ :   "stderr")
-$$ : msg = concat( \
-$$ :   template(), "(", \
-$$ :   getLineNumber(), ")", \
+$$ : msg = concat( +
+$$ :   template(), "(", +
+$$ :   getLineNumber(), ")", +
 $$ :   "missing admin var")
 {msg}
 #+END_SRC
@@ -1248,7 +1248,7 @@ missing. When it is not missing nothing gets output.
 template:
 
 #+BEGIN_SRC
-<--$ nextline t.output = if( \-->
+<--$ nextline t.output = if( +-->
 <--$ : exists("admin"), "skip", "stderr") -->
 warning: the admin variable is missing
 #+END_SRC
@@ -1548,8 +1548,8 @@ $$ # If the name is longer than 10 characters,
 $$ # clip it to 7 and add "...".
 $$ nextline
 $$ : cmp = cmp(len(s.name), 10)
-$$ : name = case(cmp, \
-$$ :   1, concat(substr(s.name, 0, 7), "...") \
+$$ : name = case(cmp, +
+$$ :   1, concat(substr(s.name, 0, 7), "...") +
 $$ :   s.name)
 #+END_SRC
 
@@ -1597,7 +1597,7 @@ template:
 
 #+BEGIN_SRC
 #$ nexline req = "1.0.2"
-#$ : t.output = case(cmpVersion(t.version, req), \
+#$ : t.output = case(cmpVersion(t.version, req), +
 #$ :   'skip', -1, 'stderr')
 Version {req} or above is required.
 #+END_SRC

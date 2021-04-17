@@ -74,7 +74,7 @@ three
 
   test "two lines":
     let content = """
-<!--$ nextline \-->
+<!--$ nextline +-->
 <!--$ : -->
 """
     let eCmdLines = splitNewLines(content)
@@ -86,8 +86,8 @@ three
 
   test "three lines":
     let content = """
-<!--$ nextline \-->
-<!--$ : a=5 \-->
+<!--$ nextline +-->
+<!--$ : a=5 +-->
 <!--$ : var = "hello" -->
 """
     let eCmdLines = splitNewLines(content)

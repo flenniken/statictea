@@ -292,8 +292,8 @@ $$ : tea2 = 'Masala chai'
   test "Invalid statement":
 
     let templateContent = """
-<!--$ nextline \-->
-<!--$ : tea = 'Earl Grey' \-->
+<!--$ nextline +-->
+<!--$ : tea = 'Earl Grey' +-->
 <!--$ : tea2 = 'Masala chai'-->
 {tea}, {tea2}
 """
@@ -330,8 +330,8 @@ fake nextline
   test "json variables":
 
     let templateContent = """
-<!--$ block \-->
-<!--$ : serverElements = len(t.server); \-->
+<!--$ block +-->
+<!--$ : serverElements = len(t.server); +-->
 <!--$ : jsonElements = len(t.shared) -->
 The server has {serverElements} elements
 and the shared json has {jsonElements}.
@@ -355,13 +355,13 @@ and the shared json has 0.
 #   test "output admin var missing":
 
 #     let templateContent = """
-# <!--$ nextline \-->
-# <!--$ : t.output = if( \-->
-# <!--$ :   exists("s.admin"), "skip", \-->
-# <!--$ :   "stderr"); \-->
-# <!--$ : msg = concat( \-->
-# <!--$ :   template(), "(", \-->
-# <!--$ :   getLineNumber(), ")", \-->
+# <!--$ nextline +-->
+# <!--$ : t.output = if( +-->
+# <!--$ :   exists("s.admin"), "skip", +-->
+# <!--$ :   "stderr"); +-->
+# <!--$ : msg = concat( +-->
+# <!--$ :   template(), "(", +-->
+# <!--$ :   getLineNumber(), ")", +-->
 # <!--$ :   "missing admin var") -->
 # {msg}
 # """
@@ -373,13 +373,13 @@ and the shared json has 0.
 #   test "output no output":
 
 #     let templateContent = """
-# <!--$ nextline \-->
-# <!--$ : t.output = if( \-->
-# <!--$ :   exists("s.admin"), "skip", \-->
-# <!--$ :   "stderr"); \-->
-# <!--$ : msg = concat( \-->
-# <!--$ :   template(), "(", \-->
-# <!--$ :   getLineNumber(), ")", \-->
+# <!--$ nextline +-->
+# <!--$ : t.output = if( +-->
+# <!--$ :   exists("s.admin"), "skip", +-->
+# <!--$ :   "stderr"); +-->
+# <!--$ : msg = concat( +-->
+# <!--$ :   template(), "(", +-->
+# <!--$ :   getLineNumber(), ")", +-->
 # <!--$ :   "missing admin var") -->
 # {msg}
 # """
@@ -388,8 +388,8 @@ and the shared json has 0.
   test "not a command":
 
     let templateContent = """
-#$ block \
-#$ : cond1 = notfunction(4, 5); \
+#$ block +
+#$ : cond1 = notfunction(4, 5); +
 #$ : cond3 = hello(5, 4)
 #$ endblock
 """
@@ -425,9 +425,9 @@ content
 # test "cmp example":
 
 #     let templateContent = """
-# #$ block \
-# #$ : cond1 = cmp(4, 5); \
-# #$ : cond2 = cmp(2, 2); \
+# #$ block +
+# #$ : cond1 = cmp(4, 5); +
+# #$ : cond2 = cmp(2, 2); +
 # #$ : cond3 = cmp(5, 4)
 # cmp(4, 5) returns {cond1}
 # cmp(2, 2) returns {cond2}
@@ -694,13 +694,13 @@ house at 5:00 pm.
 # todo: need some functions defined before this works.
 #   test "readme do your own warnings":
 #     let templateContent = """
-# <!--$ nextline \-->
-# <!--$ : t.output = if( \-->
-# <!--$ :   exists("s.admin"), "skip", \-->
-# <!--$ :   "stderr"); \-->
-# <!--$ : msg = concat( \-->
-# <!--$ :   template(), "(", \-->
-# <!--$ :   getLineNumber(), ")", \-->
+# <!--$ nextline +-->
+# <!--$ : t.output = if( +-->
+# <!--$ :   exists("s.admin"), "skip", +-->
+# <!--$ :   "stderr"); +-->
+# <!--$ : msg = concat( +-->
+# <!--$ :   template(), "(", +-->
+# <!--$ :   getLineNumber(), ")", +-->
 # <!--$ :   "missing admin var") -->
 # {msg}
 # """
@@ -745,10 +745,10 @@ house at 5:00 pm.
 #     let templateContent = """
 # <h3>Tea Companies</h3>
 # <select>
-# <!--$ nextline t.repeat=len(s.companyList); \-->
-# <!--$ : d = get(s.companyList, t.row); \-->
-# <!--$ : company = get(d, "company"); \-->
-# <!--$ : selected = get(d, "selected", 0); \-->
+# <!--$ nextline t.repeat=len(s.companyList); +-->
+# <!--$ : d = get(s.companyList, t.row); +-->
+# <!--$ : company = get(d, "company"); +-->
+# <!--$ : selected = get(d, "selected", 0); +-->
 # <!--$ : current=if(selected, ' selected="selected"', "") -->
 # <option{current}>{company}</option>
 # </select>
@@ -828,8 +828,8 @@ house at 5:00 pm.
 # todo: need add function
 #   test "readme row example":
 #     let templateContent = """
-# <!--$ nextline t.repeat=len(s.companies); \-->
-# <!--$ : company = get(s.companies, t.row); \-->
+# <!--$ nextline t.repeat=len(s.companies); +-->
+# <!--$ : company = get(s.companies, t.row); +-->
 # <!--$ : num = add(t.row, 1) -->
 # <li id="r{t.row}>{num}. {company}</li>
 # """
@@ -1019,8 +1019,8 @@ ending line
 }
 """
     let templateContent = """
-<!--$ nextline \-->
-<!--$ : a = "b" \-->
+<!--$ nextline +-->
+<!--$ : a = "b" +-->
 <!--$ : b = "c" -->
 {a}, {b}
 <!--$ replace t.content = h.header -->
@@ -1033,8 +1033,8 @@ asdfasdfsdff
 <!-- # last line -->
 """
     let eResultLines = splitNewLines """
-<!--$ nextline \-->
-<!--$ : a = "b" \-->
+<!--$ nextline +-->
+<!--$ : a = "b" +-->
 <!--$ : b = "c" -->
 {a}, {b}
 <!--$ replace t.content = h.header -->

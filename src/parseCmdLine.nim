@@ -36,7 +36,7 @@ proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
   # ix0 |        |           |            |postfix
   # ix0 |        |           |            ||  ending
   # ix0 |        |           |            ||  |
-  # ix0 <!--$    nextline    a = 5        \-->\n
+  # ix0 <!--$    nextline    a = 5        +-->\n
 
   var lineParts: LineParts
 

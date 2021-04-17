@@ -321,7 +321,7 @@ suite "runCommand.nim":
 
   test "two lines":
     let content = """
-<!--$ nextline a = 5; \-->
+<!--$ nextline a = 5; +-->
 <!--$ : asdf -->
 """
     let expected = """
@@ -360,7 +360,7 @@ $$ : c = len("hello")
   test "continuation and not":
     let content = """
 $$ nextline 234;4546;
-$$ : a = 5;bbb = \
+$$ : a = 5;bbb = +
 $$ : concat("1", "e")
 $$ : c = len("hello")
 """
@@ -376,8 +376,8 @@ $$ : c = len("hello")
 
   test "three statements split":
     let content = """
-<!--$ block a = 5; b = \-->
-<!--$ : "hello"; \-->
+<!--$ block a = 5; b = +-->
+<!--$ : "hello"; +-->
 <!--$ : c = t.len(s.header) -->
 """
     let expected = """
@@ -498,8 +498,8 @@ $$ : c = len("hello")
 
   test "white space statement 2":
     let content = """
-<!--$ nextline asdf; \-->
-<!--$ : ;   ; \-->
+<!--$ nextline asdf; +-->
+<!--$ : ;   ; +-->
 <!--$ : ;x = y -->
 """
     let expected = """

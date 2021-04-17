@@ -3,15 +3,15 @@ $$ #
 $$ # Define replacement patterns for the descriptions.
 $$ block
 $$ : t.maxLines = 20
-$$ : g.patterns = list( \
-$$ :   "[ ]*@:", h.newline, \
-$$ :   "&quot;", '"', \
-$$ :   "&gt;", '>', \
-$$ :   "&lt;", '<', \
-$$ :   "&amp;", '&', \
-$$ :   ":linkTextBegin:", '`', \
-$$ :   ":linkTextEnd:", '`_', \
-$$ :   ":linkTargetBegin:", '.. _`', \
+$$ : g.patterns = list( +
+$$ :   "[ ]*@:", h.newline, +
+$$ :   "&quot;", '"', +
+$$ :   "&gt;", '>', +
+$$ :   "&lt;", '<', +
+$$ :   "&amp;", '&', +
+$$ :   ":linkTextBegin:", '`', +
+$$ :   ":linkTextEnd:", '`_', +
+$$ :   ":linkTargetBegin:", '.. _`', +
 $$ :   ":linkTargetEnd:", '`: https:')
 
 .. raw:: html
@@ -52,10 +52,10 @@ $$ : entry = get(s.entries, t.row, dict())
 $$ : name = get(entry, "name", "")
 $$ : description = get(entry, "description", "")
 $$ : skType = get(entry, "type", "")
-$$ : type = case(skType, \
-$$ :   "skType", "type: ", \
-$$ :   "skConst", "const: ", \
-$$ :   "skMacro", "macro: ", \
+$$ : type = case(skType, +
+$$ :   "skType", "type: ", +
+$$ :   "skConst", "const: ", +
+$$ :   "skMacro", "macro: ", +
 $$ :   "")
 $$ : short = substr(description, 0, add(find(description, '.', -1), 1))
 * {type}{name}__ -- {short}
