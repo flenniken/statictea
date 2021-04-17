@@ -1,6 +1,5 @@
 ## StaticTea
 ## A template processor and language.
-## See httpss://github.com/flenniken/statictea
 
 import parseCommandLine
 import strutils

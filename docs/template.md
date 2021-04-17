@@ -11,8 +11,7 @@ $$ :   "[ ]*@:", h.newline, \
 $$ :   "&quot;", '"', \
 $$ :   "&gt;", '>', \
 $$ :   "&lt;", '<', \
-$$ :   "&amp;", '&', \
-$$ :   "httpss", 'https')
+$$ :   "&amp;", '&')
 $$ : g.moduleName = substr(s.orig, add(4, find(s.orig, 'src/', -4)));
 $$ endblock
 $$ #
