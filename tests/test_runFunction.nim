@@ -25,6 +25,28 @@ proc testFunction(functionName: string, parameters: seq[Value],
 
   if not expectedItem("funResult", funResult, eFunResult):
     result = false
+    if funResult.kind == frValue and funResult.value.kind == vkDict:
+      echo "got:"
+      for k, v in funResult.value.dictv.pairs:
+        echo "  $1: '$2'" % [k, $v]
+    if eFunResult.kind == frValue and eFunResult.value.kind == vkDict:
+      echo "expected:"
+      for k, v in eFunResult.value.dictv.pairs:
+        echo "  $1: '$2'" % [k, $v]
+
+proc testPathGood(path, filename, basename, ext, dir: string, separator = ""): bool =
+    var parameters = @[newValue(path)]
+    var dict: VarsDict
+    dict["filename"] = newValue(filename)
+    dict["basename"] = newValue(basename)
+    dict["ext"] = newValue(ext)
+    dict["dir"] = newValue(dir)
+    let eFunResult = newFunResult(newValue(dict))
+    if separator.len > 0:
+      parameters.add(newValue(separator))
+      result = testFunction("path", parameters, eFunResult = eFunResult)
+    else:
+      result = testFunction("path", parameters, eFunResult = eFunResult)
 
 proc testCmpFun[T](a: T, b: T, caseInsensitive: bool = false, expected: int = 0): bool =
   ## Test the cmpFun
@@ -938,3 +960,49 @@ suite "runFunction.nim":
     var parameters: seq[Value] = @[newValue("Earl Grey"), newVarList("a", "b", "c")]
     let eFunResult = newFunResultWarn(wMissingReplacement, 0)
     check testFunction("replaceRe", parameters, eFunResult = eFunResult)
+
+  test "path":
+    check testPathGood("dir/basename.ext", "basename.ext", "basename", ".ext", "dir/")
+    check testPathGood("", "", "", "", "")
+    check testPathGood("/", "", "", "", "/")
+    check testPathGood("f", "f", "f", "", "")
+    check testPathGood(".", ".", "", ".", "")
+    check testPathGood("/f", "f", "f", "", "/")
+    check testPathGood("f/", "", "", "", "f/")
+    check testPathGood("/.", ".", "", ".", "/")
+    check testPathGood("./", "", "", "", "./")
+    check testPathGood("/f/", "", "", "", "/f/")
+    check testPathGood("/f/t", "t", "t", "", "/f/")
+    check testPathGood("/f/.", ".", "", ".", "/f/")
+    check testPathGood("/f/.e", ".e", "", ".e", "/f/")
+    check testPathGood("/f/t.n", "t.n", "t", ".n", "/f/")
+    check testPathGood("/full/path/image.jpg", "image.jpg", "image", ".jpg", "/full/path/")
+    check testPathGood("/full/path/", "", "", "", "/full/path/")
+    check testPathGood("/full/noext", "noext", "noext", "", "/full/")
+    check testPathGood("/full/path.img/f.png", "f.png", "f", ".png", "/full/path.img/")
+    check testPathGood("filename", "filename", "filename", "", "")
+    check testPathGood("/var", "var", "var", "", "/")
+
+  test "path with separator":
+    check testPathGood("dir/basename.ext", "basename.ext", "basename", ".ext", "dir/", "/")
+    check testPathGood(r"dir\basename.ext", "basename.ext", "basename", ".ext", r"dir\", r"\")
+
+  test "path: wrong number of parameters":
+    var parameters: seq[Value] = @[newValue("Earl Grey"), newValue("a"), newValue("a")]
+    let eFunResult = newFunResultWarn(wOneOrTwoParameters, 0)
+    check testFunction("path", parameters, eFunResult = eFunResult)
+
+  test "path: wrong kind p1":
+    var parameters: seq[Value] = @[newValue(12)]
+    let eFunResult = newFunResultWarn(wExpectedString, 0)
+    check testFunction("path", parameters, eFunResult = eFunResult)
+
+  test "path: wrong kind p2":
+    var parameters: seq[Value] = @[newValue("filename"), newValue(12)]
+    let eFunResult = newFunResultWarn(wExpectedString, 1)
+    check testFunction("path", parameters, eFunResult = eFunResult)
+
+  test "path: wrong kind separator":
+    var parameters: seq[Value] = @[newValue("filename"), newValue("a")]
+    let eFunResult = newFunResultWarn(wExpectedSeparator, 1)
+    check testFunction("path", parameters, eFunResult = eFunResult)

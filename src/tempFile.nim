@@ -1,4 +1,4 @@
-## Handle temporary files.
+## Temporary file methods.
 
 import os
 import random

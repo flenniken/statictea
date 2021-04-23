@@ -5,6 +5,7 @@ import options
 import times
 import regexes
 import strutils
+import matches
 
 type
   FileLine* = object
@@ -49,13 +50,14 @@ proc testProc(env: var Env) =
   env.log("testProc called")
   env.log("testProc done")
 
-proc endsWith(line: string, str: string): bool =
-  ## Return true when the given string ends the line.
-  let strlen = str.len
-  if line.len >= strlen:
-    if line[^strlen..^1] == str:
-      return true
-  return false
+# Already exist
+# proc endsWith(line: string, str: string): bool =
+#   ## Return true when the line ends with str.
+#   let strlen = str.len
+#   if line.len >= strlen:
+#     if line[^strlen..^1] == str:
+#       return true
+#   return false
 
 suite "env.nim":
 

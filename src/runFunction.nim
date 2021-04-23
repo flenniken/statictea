@@ -1,4 +1,5 @@
-## Module containing StaticTea functions.
+## StaticTea functions.  The StaticTea language functions start with
+## "fun".
 
 import vartypes
 import options
@@ -11,6 +12,7 @@ import parseNumber
 import math
 import matches
 import re
+import os
 
 type
   FunctionPtr* = proc (parameters: seq[Value]): FunResult {.noSideEffect.}
@@ -1063,6 +1065,78 @@ func funReplaceRe*(parameters: seq[Value]): FunResult =
   let resultString = multiReplace(str, subs)
   result = newFunResult(newValue(resultString))
 
+func funPath*(parameters: seq[Value]): FunResult =
+  ## Split a file path into pieces. Return a dictionary with the
+  ## filename, basename, extension and directory.
+  ##
+  ## You pass a path string and the optional path separator. When no
+  ## separator, the current system separator is used.
+  ## @:
+  ## @:* p1: path string
+  ## @:* p2: optional separator string, "/" or "\".
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:path("src/runFunction.nim") => {
+  ## @:  "filename": "runFunction.nim",
+  ## @:  "basename": "runFunction",
+  ## @:  "ext": ".nim",
+  ## @:  "dir": "src/",
+  ## @:}
+  ## @:~~~
+
+  if parameters.len < 1 or parameters.len > 2:
+    return newFunResultWarn(wOneOrTwoParameters, 0)
+
+  if parameters[0].kind != vkString:
+    return newFunResultWarn(wExpectedString, 0)
+  let path = parameters[0].stringv
+
+  var separator: char
+  if parameters.len > 1:
+    let p1 = parameters[1]
+    if p1.kind != vkString:
+      return newFunResultWarn(wExpectedString, 1)
+    case p1.stringv
+    of "/":
+      separator = '/'
+    of "\\":
+      separator = '\\'
+    else:
+      return newFunResultWarn(wExpectedSeparator, 1)
+  else:
+    separator = os.DirSep
+
+  var dir: string
+  var filename: string
+  var basename: string
+  var ext: string
+  let pos = rfind(path, separator)
+  if pos == -1:
+    filename = path
+  else:
+    dir = path[0 .. pos]
+    if pos+1 < path.len:
+      filename = path[pos+1 .. ^1]
+
+  if filename.len > 0:
+    let dotPos = rfind(filename, '.')
+    if dotPos != -1:
+      ext = filename[dotPos .. ^1]
+      if dotPos > 0:
+        basename = filename[0 .. dotPos - 1]
+    else:
+      basename = filename
+
+  var dict: VarsDict
+  dict["filename"] = newValue(filename)
+  dict["basename"] = newValue(basename)
+  dict["ext"] = newValue(ext)
+  dict["dir"] = newValue(dir)
+
+  result = newFunResult(newValue(dict))
+
 const
   functionsList = [
     ("len", funLen),
@@ -1083,6 +1157,7 @@ const
     ("list", funList),
     ("replace", funReplace),
     ("replaceRe", funReplaceRe),
+    ("path", funPath),
   ]
 
 proc getFunction*(functionName: string): Option[FunctionPtr] =

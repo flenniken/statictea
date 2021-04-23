@@ -1,11 +1,14 @@
 #!/bin/bash
 
-# Run tests from the command line.
+# Run statictea tests from the command line.
+#
 # cd ~/code/statictea
 # src/test
 #
 # * Add a new test command line to the testcommands.txt file.
 # * Add test files to the testfiles folder.
+
+# todo: move this to the tests folder
 
 # Run from the static tea folder.
 if [[ "$(pwd)" != "/Users/steve/code/statictea" ]]; then

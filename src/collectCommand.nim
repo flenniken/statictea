@@ -1,3 +1,5 @@
+## Collect template command lines.
+
 import env
 import streams
 import matches

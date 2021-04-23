@@ -1,4 +1,4 @@
-## Support perl regular expression matching.
+## Perl regular expression matching.
 
 # The notice below is there because this module includes the re module.
 #[

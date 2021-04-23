@@ -113,6 +113,7 @@ type
     wInvalidLength,        # w97
     wMissingReplacement,   # w98
     wExpectedList,         # w99
+    wExpectedSeparator,    # w100
 
 tpubType:
   const
@@ -219,6 +220,7 @@ tpubType:
       "Invalid length: $1.", # wInvalidLength
       "Invalid number of parameters, the pattern and replacement come in pairs.", # wMissingReplacement
       "Expected a list.", # wExpectedList
+      "Expected / or \\.", # wExpectedSeparator
     ]
 
 func getWarning*(filename: string, lineNum: int,

@@ -1,4 +1,4 @@
-## Methods to handle the replacement block lines.
+## Handle the replacement block lines.
 
 # todo: turn this into a doc comment:
 #[

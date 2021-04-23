@@ -1,3 +1,4 @@
+## Private module for experimenting.
 
 import re
 

@@ -1,51 +1,49 @@
-##[
-@: Module for variables.
-@:
-@: Here are the tea variables:
-@:
-@: - t.content -- content of the replace block.
-@: - t.global -- dictionary containing the global variables.
-@: - t.local -- dictionary containing the current command's local variables.
-@: - t.maxLines -- maximum number of replacement block lines (lines before endblock).
-@: - t.maxRepeat -- maximum number of times to repeat the block.
-@: - t.output -- where the block output goes.
-@: - t.repeat -- controls how many times the block repeats.
-@: - t.row -- the current row number of a repeating block.
-@: - t.server -- dictionary containing the server json variables.
-@: - t.shared -- dictionary containing the shared json variables.
-@: - t.version -- the StaticTea version number.
-@:
-@: Here are the tea variables grouped by type:
-@:
-@: Constant:
-@:
-@: - t.version
-@:
-@: Dictionaries:
-@:
-@: - t.global
-@: - t.local
-@: - t.server -- read only
-@: - t.shared -- read only
-@:
-@: Integers:
-@:
-@: - t.maxLines -- default when not set: 10
-@: - t.maxRepeat -- default when not set: 100
-@: - t.repeat -- default when not set: 1
-@: - t.row -- 0 read only, automatically increments
-@:
-@: String:
-@:
-@: - t.content -- default when not set: ""
-@:
-@: String enum t.output:
-@:
-@: - "result" -- the block output goes to the result file (default)
-@: - "stderr" -- the block output goes to standard error
-@: - "log" -- the block output goes to the log file
-@: - "skip" -- the block is skipped
-]##
+## Language variable methods.
+## @:
+## @: Here are the tea variables:
+## @:
+## @: - t.content -- content of the replace block.
+## @: - t.global -- dictionary containing the global variables.
+## @: - t.local -- dictionary containing the current command's local variables.
+## @: - t.maxLines -- maximum number of replacement block lines (lines before endblock).
+## @: - t.maxRepeat -- maximum number of times to repeat the block.
+## @: - t.output -- where the block output goes.
+## @: - t.repeat -- controls how many times the block repeats.
+## @: - t.row -- the current row number of a repeating block.
+## @: - t.server -- dictionary containing the server json variables.
+## @: - t.shared -- dictionary containing the shared json variables.
+## @: - t.version -- the StaticTea version number.
+## @:
+## @: Here are the tea variables grouped by type:
+## @:
+## @: Constant:
+## @:
+## @: - t.version
+## @:
+## @: Dictionaries:
+## @:
+## @: - t.global
+## @: - t.local
+## @: - t.server -- read only
+## @: - t.shared -- read only
+## @:
+## @: Integers:
+## @:
+## @: - t.maxLines -- default when not set: 10
+## @: - t.maxRepeat -- default when not set: 100
+## @: - t.repeat -- default when not set: 1
+## @: - t.row -- 0 read only, automatically increments
+## @:
+## @: String:
+## @:
+## @: - t.content -- default when not set: ""
+## @:
+## @: String enum t.output:
+## @:
+## @: - "result" -- the block output goes to the result file (default)
+## @: - "stderr" -- the block output goes to standard error
+## @: - "log" -- the block output goes to the log file
+## @: - "skip" -- the block is skipped
 
 import vartypes
 import tables

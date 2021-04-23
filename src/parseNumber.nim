@@ -1,4 +1,4 @@
-## Parse a number string and return a float or integer and the number
+## Parse an int or float number string.  Return the number and number
 ## of characters processed.
 
 import options

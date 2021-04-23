@@ -1,12 +1,10 @@
-##[
-Parse a template command line.
-@:
-@:We have two types of command lines.  We distingush them using
-different names CmdLine and CommandLine.
-@:
-@:* CmdLine -- is a line in a StaticTea template commands.
-@:* CommandLine -- is a line at a terminal for system commands.
-]##
+## Parse a template command line.
+## @:
+## @:We have two types of command lines.  We distingush them using
+## different names CmdLine and CommandLine.
+## @:
+## @:* CmdLine -- is a line in a StaticTea template commands.
+## @:* CommandLine -- is a line at a terminal for system commands.
 
 import options
 import tables

@@ -1,5 +1,4 @@
-## StaticTea
-## A template processor and language.
+## StaticTea; A template processor and language.
 
 import parseCommandLine
 import strutils

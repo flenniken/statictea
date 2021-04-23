@@ -1,5 +1,6 @@
 import os
 import strutils
+import json
 include src/version
 
 version       = staticteaVersion
@@ -26,12 +27,16 @@ proc get_test_filenames(): seq[string] =
   for filename in list:
     result.add(lastPathPart(filename))
 
-proc get_source_filenames(): seq[string] =
+proc get_source_filenames(path: bool = false): seq[string] =
   ## Return the list of the nim source files in the src folder.
   result = @[]
   var list = listFiles("src")
   for filename in list:
-    result.add(lastPathPart(filename))
+    if filename.endsWith(".nim"):
+      if path:
+        result.add(filename)
+      else:
+        result.add(lastPathPart(filename))
 
 proc get_test_module_cmd(filename: string, release = false): string =
   ## Return the command line to test one module.
@@ -97,6 +102,67 @@ proc isPyEnvActive(): bool =
   else:
     result = true
 
+proc readModuleDescription(filename: string): string =
+  ## Return the module doc comment at the top of the file.
+  let text = slurp(filename)
+
+  # Collect the doc comments at the beginning of the file.
+  var lines = newSeq[string]()
+  for line in text.splitLines():
+    if line.startsWith("##"):
+      lines.add(line[2 .. ^1])
+    else:
+      break
+
+  # Determine the minimum number of spaces used with the doc comment.
+  var minSpaces = 1024
+  for line in lines:
+    for ix in 0 .. line.len - 1:
+      if line[ix] != ' ':
+        if ix < minSpaces:
+          minSpaces = ix
+        break
+
+  # Trim off the minimum leading spaces.
+  var trimmedLines = newSeq[string]()
+  for line in lines:
+    # trimmedLines.add($minSpaces & ":" & line)
+    trimmedLines.add(line[minSpaces .. ^1])
+
+  result = trimmedLines.join("\n")
+
+proc jsonQuote(str: string): string =
+  ## Escape json string.
+  result = escapeJsonUnquoted(str)
+
+proc indexJson(): string =
+  ## Generate json for the doc comment index of all the source files.
+
+  let filenames = get_source_filenames(path = true)
+
+  # Extract the source module descriptions.
+  var descriptions = newSeq[string]()
+  for filename in filenames:
+    descriptions.add(readModuleDescription(filename))
+
+  # Generate the index json.
+  var modules = newSeq[string]()
+  for ix, filename in filenames:
+    modules.add("""
+  {
+    "filename": "$1",
+    "description": "$2"
+  }""" % [filename, jsonQuote(descriptions[ix])])
+
+  result = """
+{
+  "modules": [
+$1
+  ]
+}
+""" % [join(modules, ",\n")]
+
+
 # Tasks below
 
 task n, "\tShow available tasks.":
@@ -145,7 +211,7 @@ task docs, "\tCreate markdown docs; specify part of source file name.":
   let name = system.paramStr(count-1)
   let filenames = get_source_filenames()
   for filename in filenames:
-    if name in filename or (name == "docs" and filename.endsWith(".nim")):
+    if name in filename or name == "docs":
       var jsonName = changeFileExt(filename, "json")
       var cmd = "nim jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
       echo cmd
@@ -186,7 +252,7 @@ task docsre, "\tCreate reStructuredtext docs; specify part of source file name."
   let name = system.paramStr(count-1)
   let filenames = get_source_filenames()
   for filename in filenames:
-    if name in filename or (name == "docs" and filename.endsWith(".nim")):
+    if name in filename or name == "docs":
       var jsonName = changeFileExt(filename, "json")
       var cmd = "nim jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
       echo cmd
@@ -231,6 +297,21 @@ task json, "\tDisplay doc json for a source file.":
       echo cmd
       exec cmd
       exec "cat docs/json/$1 | jq | less" % [jsonName]
+
+task jsonix, "\tDisplay the source doc json for the module index.":
+  var json = indexJson()
+  writeFile("docs/index.json", json)
+  # exec "jq < docs/index.json"
+  exec "less docs/index.json"
+
+task docsix, "\tDisplay the doc comment index to the source files":
+  var json = indexJson()
+  writeFile("docs/index.json", json)
+  var cmd = "bin/statictea -s=docs/index.json -t=docs/indexTemplate.md -r=docs/index.md"
+  echo cmd
+  exec cmd
+  # Use grip to view your markdown document in a browser.
+  # grip docs/runFunction.md > /dev/null 2>&1 &
 
 task tt, "\tCompile and run t.nim":
   let cmd = "nim c -r --gc:orc --hints:off --outdir:bin/tests/ src/t.nim"

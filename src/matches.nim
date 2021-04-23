@@ -1,4 +1,4 @@
-## Procedures for regular expression matching.
+## Regular expression matching methods.
 
 import strutils
 import args
