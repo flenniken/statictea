@@ -1,3 +1,5 @@
+[Home](https://github.com/flenniken/statictea/)
+
 # runFunction.nim
 
 StaticTea functions.  The StaticTea language functions start with "fun".
@@ -31,17 +33,18 @@ StaticTea functions.  The StaticTea language functions start with "fun".
 * [funList](#user-content-a24) &mdash; Create a list of values.
 * [funReplace](#user-content-a25) &mdash; Replace a part of a string (substring) with another string.
 * [funReplaceRe](#user-content-a26) &mdash; Replace multiple parts of a string defined by regular expressions with replacement strings.
-* [getFunction](#user-content-a27) &mdash; Look up a function by its name.
+* [funPath](#user-content-a27) &mdash; <p>Split a file path into pieces.
+* [getFunction](#user-content-a28) &mdash; Look up a function by its name.
 
 # <a id="a0"></a>FunctionPtr
 
 Signature of a statictea function. It takes any number of values and returns a value or a warning message.
 
 ```nim
-FunctionPtr = proc (parameters: seq[Value]): FunResult 
+FunctionPtr = proc (parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L17)
+[source](../src/runFunction.nim#L18)
 
 # <a id="a1"></a>FunResultKind
 
@@ -52,7 +55,7 @@ FunResultKind = enum
   frValue, frWarning
 ```
 
-[source](../src/runFunction.nim#L21)
+[source](../src/runFunction.nim#L22)
 
 # <a id="a2"></a>FunResult
 
@@ -71,7 +74,7 @@ FunResult = object
 
 ```
 
-[source](../src/runFunction.nim#L26)
+[source](../src/runFunction.nim#L27)
 
 # <a id="a3"></a>newFunResultWarn
 
@@ -79,50 +82,50 @@ Return a new FunResult object. It contains a warning, the index of the problem p
 
 ```nim
 func newFunResultWarn(warning: Warning; parameter: Natural = 0; p1: string = "";
-                      p2: string = ""): FunResult 
+                      p2: string = ""): FunResult
 ```
 
-[source](../src/runFunction.nim#L39)
+[source](../src/runFunction.nim#L40)
 
 # <a id="a4"></a>newFunResult
 
 Return a new FunResult object containing a value.
 
 ```nim
-func newFunResult(value: Value): FunResult 
+func newFunResult(value: Value): FunResult
 ```
 
-[source](../src/runFunction.nim#L48)
+[source](../src/runFunction.nim#L49)
 
 # <a id="a5"></a>`==`
 
 Compare two FunResult objects and return true when equal.
 
 ```nim
-func `==`(r1: FunResult; r2: FunResult): bool 
+func `==`(r1: FunResult; r2: FunResult): bool
 ```
 
-[source](../src/runFunction.nim#L52)
+[source](../src/runFunction.nim#L53)
 
 # <a id="a6"></a>`$`
 
 Return a string representation of a FunResult object.
 
 ```nim
-func `$`(funResult: FunResult): string 
+func `$`(funResult: FunResult): string
 ```
 
-[source](../src/runFunction.nim#L63)
+[source](../src/runFunction.nim#L64)
 
 # <a id="a7"></a>cmpString
 
 Compares two UTF-8 strings. Returns 0 when equal, 1 when a is greater than b and -1 when a less than b. Optionally Ignore case.
 
 ```nim
-func cmpString(a, b: string; ignoreCase: bool = false): int 
+func cmpString(a, b: string; ignoreCase: bool = false): int
 ```
 
-[source](../src/runFunction.nim#L73)
+[source](../src/runFunction.nim#L74)
 
 # <a id="a8"></a>funCmp
 
@@ -153,10 +156,10 @@ cmp("Tea", "tea", 1) => 0
 ~~~
 
 ```nim
-func funCmp(parameters: seq[Value]): FunResult 
+func funCmp(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L98)
+[source](../src/runFunction.nim#L99)
 
 # <a id="a9"></a>funConcat
 
@@ -175,10 +178,10 @@ concat("a", "b", "c", "d") => "abcd"
 ~~~
 
 ```nim
-func funConcat(parameters: seq[Value]): FunResult 
+func funConcat(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L156)
+[source](../src/runFunction.nim#L157)
 
 # <a id="a10"></a>funLen
 
@@ -195,10 +198,10 @@ len(dict('a', 4)) => 1
 ~~~
 
 ```nim
-func funLen(parameters: seq[Value]): FunResult 
+func funLen(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L181)
+[source](../src/runFunction.nim#L182)
 
 # <a id="a11"></a>funGet
 
@@ -229,10 +232,10 @@ get(l, 3, 99) => 99
 ~~~
 
 ```nim
-func funGet(parameters: seq[Value]): FunResult 
+func funGet(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L213)
+[source](../src/runFunction.nim#L214)
 
 # <a id="a12"></a>funIf
 
@@ -251,10 +254,10 @@ if(4, 'tea', 'beer') => "beer"
 ~~~
 
 ```nim
-func funIf(parameters: seq[Value]): FunResult 
+func funIf(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L277)
+[source](../src/runFunction.nim#L278)
 
 # <a id="a13"></a>funAdd
 
@@ -285,10 +288,10 @@ add(1.1, 2.2, 3.3) => 6.6
 ~~~
 
 ```nim
-func funAdd(parameters: seq[Value]): FunResult 
+func funAdd(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L310)
+[source](../src/runFunction.nim#L311)
 
 # <a id="a14"></a>funExists
 
@@ -306,10 +309,10 @@ exists(d, "coffee") => 0
 ~~~
 
 ```nim
-func funExists(parameters: seq[Value]): FunResult 
+func funExists(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L365)
+[source](../src/runFunction.nim#L366)
 
 # <a id="a15"></a>funCase
 
@@ -338,20 +341,20 @@ case(8,
 ~~~
 
 ```nim
-func funCase(parameters: seq[Value]): FunResult 
+func funCase(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L400)
+[source](../src/runFunction.nim#L401)
 
 # <a id="a16"></a>parseVersion
 
 Parse a StaticTea version number and return its three components.
 
 ```nim
-func parseVersion(version: string): Option[(int, int, int)] 
+func parseVersion(version: string): Option[(int, int, int)]
 ```
 
-[source](../src/runFunction.nim#L480)
+[source](../src/runFunction.nim#L481)
 
 # <a id="a17"></a>funCmpVersion
 
@@ -370,10 +373,10 @@ cmpVersion("1.2.5", "1.2.5") => 1
 ~~~
 
 ```nim
-func funCmpVersion(parameters: seq[Value]): FunResult 
+func funCmpVersion(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L491)
+[source](../src/runFunction.nim#L492)
 
 # <a id="a18"></a>funFloat
 
@@ -390,10 +393,10 @@ float("33") => 33.0
 ~~~
 
 ```nim
-func funFloat(parameters: seq[Value]): FunResult 
+func funFloat(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L538)
+[source](../src/runFunction.nim#L539)
 
 # <a id="a19"></a>funInt
 
@@ -427,10 +430,10 @@ int(-6.3456, "truncate") => -6
 ~~~
 
 ```nim
-func funInt(parameters: seq[Value]): FunResult 
+func funInt(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L581)
+[source](../src/runFunction.nim#L582)
 
 # <a id="a20"></a>funFind
 
@@ -448,10 +451,10 @@ find(msg, "party", 0) = 0
 ~~~
 
 ```nim
-func funFind(parameters: seq[Value]): FunResult 
+func funFind(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L668)
+[source](../src/runFunction.nim#L669)
 
 # <a id="a21"></a>funSubstr
 
@@ -470,10 +473,10 @@ substr("Earl Grey", 5) => => "Grey"
 ~~~
 
 ```nim
-func funSubstr(parameters: seq[Value]): FunResult 
+func funSubstr(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L705)
+[source](../src/runFunction.nim#L706)
 
 # <a id="a22"></a>funDup
 
@@ -490,10 +493,10 @@ substr("abc", 2) => => "abcabc"
 ~~~
 
 ```nim
-func funDup(parameters: seq[Value]): FunResult 
+func funDup(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L763)
+[source](../src/runFunction.nim#L764)
 
 # <a id="a23"></a>funDict
 
@@ -514,10 +517,10 @@ dict("a", 5, "b", 33, "c", 0) =>
 ~~~
 
 ```nim
-func funDict(parameters: seq[Value]): FunResult 
+func funDict(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L802)
+[source](../src/runFunction.nim#L803)
 
 # <a id="a24"></a>funList
 
@@ -539,10 +542,10 @@ list("a", 5, "b") => ["a", 5, "b"]
 ~~~
 
 ```nim
-func funList(parameters: seq[Value]): FunResult 
+func funList(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L838)
+[source](../src/runFunction.nim#L839)
 
 # <a id="a25"></a>funReplace
 
@@ -582,10 +585,10 @@ replace("123", 0, 3, "") =>
 ~~~
 
 ```nim
-func funReplace(parameters: seq[Value]): FunResult 
+func funReplace(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L859)
+[source](../src/runFunction.nim#L860)
 
 # <a id="a26"></a>funReplaceRe
 
@@ -623,20 +626,46 @@ replaceRe("abcdefabc", l))
 ~~~
 
 ```nim
-func funReplaceRe(parameters: seq[Value]): FunResult 
+func funReplaceRe(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L996)
+[source](../src/runFunction.nim#L997)
 
-# <a id="a27"></a>getFunction
+# <a id="a27"></a>funPath
+
+<p>Split a file path into pieces. Return a dictionary with the filename, basename, extension and directory.</p>
+<p>You pass a path string and the optional path separator. When no separator, the current system separator is used.
+
+* p1: path string
+* p2: optional separator string, "/" or "".
+
+Examples:
+
+~~~
+path("src/runFunction.nim") => {
+  "filename": "runFunction.nim",
+  "basename": "runFunction",
+  "ext": ".nim",
+  "dir": "src/",
+}
+~~~</p>
+
+
+```nim
+func funPath(parameters: seq[Value]): FunResult
+```
+
+[source](../src/runFunction.nim#L1068)
+
+# <a id="a28"></a>getFunction
 
 Look up a function by its name.
 
 ```nim
-proc getFunction(functionName: string): Option[FunctionPtr] 
+proc getFunction(functionName: string): Option[FunctionPtr]
 ```
 
-[source](../src/runFunction.nim#L1089)
+[source](../src/runFunction.nim#L1163)
 
 
 ---

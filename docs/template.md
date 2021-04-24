@@ -15,6 +15,8 @@ $$ :   "&amp;", '&')
 $$ : g.moduleName = substr(s.orig, add(4, find(s.orig, 'src/', -4)));
 $$ endblock
 $$ #
+[Home](https://github.com/flenniken/statictea/)
+
 $$ # Add the title created from the basename
 $$ # of the module path in s.orig.
 $$ nextline
@@ -56,7 +58,7 @@ $$ : desc = get(entry, "description", "")
 $$ : description = replaceRe(desc, g.patterns)
 $$ : co = get(entry, "code", "")
 $$ : code = replaceRe(co, "[ ]*$", "")
-$$ : pos = find(code, "{", len(code))
+$$ : pos = find(code, " {", len(code))
 $$ : signature = substr(code, 0, pos)
 $$ : line = get(entry, "line", "0")
 $$ : t.maxLines = 100

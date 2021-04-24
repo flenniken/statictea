@@ -225,12 +225,15 @@ task docs, "\tCreate markdown docs; specify part of source file name.":
 "newline": "\n"
 }
 """
-      writeFile("docs/shared.json", sharedJson)
+      let sharedFilename = "docs/shared.json"
+      writeFile(sharedFilename, sharedJson)
 
       cmd = "bin/statictea -s=docs/json/$1 -j=docs/shared.json -t=docs/template.md -r=docs/$2" % [
         jsonName, mdName]
       echo cmd
       exec cmd
+      exec "rm " & sharedFilename
+      # discard tryRemoveFile(sharedFilename)
       if false: # showHtml:
         var htmlName = changeFileExt(filename, "html")
         var dirName = getDirName(hostOS)
@@ -267,12 +270,15 @@ task docsre, "\tCreate reStructuredtext docs; specify part of source file name."
 "newline": "\n"
 }
 """ % [$useDocUtils]
-      writeFile("docs/shared.json", sharedJson)
+      let sharedFilename = "docs/shared.json"
+      writeFile(sharedFilename, sharedJson)
 
       cmd = "bin/statictea -s=docs/json/$1 -j=docs/shared.json -t=docs/template.rst -r=docs/$2" % [
         jsonName, rstName]
       echo cmd
       exec cmd
+      exec "rm " & sharedFilename
+      # discard tryRemoveFile(sharedFilename)
       if showHtml:
         var htmlName = changeFileExt(filename, "html")
         if useDocUtils:
@@ -306,12 +312,20 @@ task jsonix, "\tDisplay the source doc json for the module index.":
 
 task docsix, "\tDisplay the doc comment index to the source files":
   var json = indexJson()
-  writeFile("docs/index.json", json)
+  var jsonFilename = "docs/index.json"
+  writeFile(jsonFilename, json)
   var cmd = "bin/statictea -s=docs/index.json -t=docs/indexTemplate.md -r=docs/index.md"
   echo cmd
   exec cmd
-  # Use grip to view your markdown document in a browser.
-  # grip docs/runFunction.md > /dev/null 2>&1 &
+  exec "rm " & jsonFilename
+  # discard tryRemoveFile(jsonFilename)
+  echo """
+Launch grip if it's not running. Then switch to your browser to view the file at:
+
+grip --quiet docs/index.md &
+
+http://localhost:6419/docs/index.md
+"""
 
 task tt, "\tCompile and run t.nim":
   let cmd = "nim c -r --gc:orc --hints:off --outdir:bin/tests/ src/t.nim"

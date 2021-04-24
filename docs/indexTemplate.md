@@ -1,5 +1,7 @@
 $$ # StaticTea template for generating a markdown index for the source files.
 $$ #
+[Home](https://github.com/flenniken/statictea/)
+
 # StaticTea Module Index
 
 $$ # Index to types and functions.
