@@ -68,17 +68,17 @@ suite "replacement":
     check stringSegment("test\n", 3, 5) == "1,t\n"
 
   test "varSegment":
-    check varSegment("{a}", 1, 0, 1, false)     == "2,1   ,0,1  ,{a}\n"
-    check varSegment("{ a }", 2, 0, 1, false)   == "2,2   ,0,1  ,{ a }\n"
-    check varSegment("{ abc }", 2, 0, 3, false) == "2,2   ,0,3  ,{ abc }\n"
-    check varSegment("{t.a}", 1, 2, 1, false)   == "2,1   ,2,1  ,{t.a}\n"
-    check varSegment("{t.ab}", 1, 2, 2, false)  == "2,1   ,2,2  ,{t.ab}\n"
+    check varSegment("{a}", 1, 1, false)     == "2,1   ,1   ,{a}\n"
+    check varSegment("{ a }", 2, 1, false)   == "2,2   ,1   ,{ a }\n"
+    check varSegment("{ abc }", 2, 3, false) == "2,2   ,3   ,{ abc }\n"
+    check varSegment("{t.a}", 1, 3, false)   == "2,1   ,3   ,{t.a}\n"
+    check varSegment("{t.ab}", 1, 4, false)  == "2,1   ,4   ,{t.ab}\n"
 
-    check varSegment("{a}", 1, 0, 1, true)     == "4,1   ,0,1  ,{a}\n"
-    check varSegment("{ a }", 2, 0, 1, true)   == "4,2   ,0,1  ,{ a }\n"
-    check varSegment("{ abc }", 2, 0, 3, true) == "4,2   ,0,3  ,{ abc }\n"
-    check varSegment("{t.a}", 1, 2, 1, true)   == "4,1   ,2,1  ,{t.a}\n"
-    check varSegment("{t.ab}", 1, 2, 2, true)  == "4,1   ,2,2  ,{t.ab}\n"
+    check varSegment("{a}", 1, 1, true)     == "4,1   ,1   ,{a}\n"
+    check varSegment("{ a }", 2, 1, true)   == "4,2   ,1   ,{ a }\n"
+    check varSegment("{ abc }", 2, 3, true) == "4,2   ,3   ,{ abc }\n"
+    check varSegment("{t.a}", 1, 3, true)   == "4,1   ,3   ,{t.a}\n"
+    check varSegment("{t.ab}", 1, 4, true)  == "4,1   ,4   ,{t.ab}\n"
 
   test "lineToSegments":
     let prepostTable = makeDefaultPrepostTable()
@@ -89,50 +89,50 @@ suite "replacement":
       "3,1st\n",
     ])
     check expectedItems("segments", lineToSegments(prepostTable, "te{st "), @["3,te{st \n"])
-    check expectedItems("segments", lineToSegments(prepostTable, "{var}"), @["4,1   ,0,3  ,{var}\n"])
+    check expectedItems("segments", lineToSegments(prepostTable, "{var}"), @["4,1   ,3   ,{var}\n"])
     check expectedItems("segments", lineToSegments(prepostTable, "test\n"), @["1,test\n"])
-    check expectedItems("segments", lineToSegments(prepostTable, "{var}\n"), @["2,1   ,0,3  ,{var}\n", "1,\n"])
+    check expectedItems("segments", lineToSegments(prepostTable, "{var}\n"), @["2,1   ,3   ,{var}\n", "1,\n"])
 
     check expectedItems("segments", lineToSegments(prepostTable, "before{var}after\n"), @[
       "0,before\n",
-      "2,1   ,0,3  ,{var}\n",
+      "2,1   ,3   ,{var}\n",
       "1,after\n",
     ])
 
     check expectedItems("segments", lineToSegments(prepostTable, "before{var}after{endingvar}"), @[
       "0,before\n",
-      "2,1   ,0,3  ,{var}\n",
+      "2,1   ,3   ,{var}\n",
       "0,after\n",
-      "4,1   ,0,9  ,{endingvar}\n",
+      "4,1   ,9   ,{endingvar}\n",
     ])
 
     check expectedItems("segments", lineToSegments(prepostTable, "before {s.name} after {h.header}{ a }end\n"), @[
       "0,before \n",
-      "2,1   ,2,4  ,{s.name}\n",
+      "2,1   ,6   ,{s.name}\n",
       "0, after \n",
-      "2,1   ,2,6  ,{h.header}\n",
-      "2,2   ,0,1  ,{ a }\n",
+      "2,1   ,8   ,{h.header}\n",
+      "2,2   ,1   ,{ a }\n",
       "1,end\n",
     ])
 
     check expectedItems("segments", lineToSegments(prepostTable,
       "{  t.row}before {s.name} after {h.header}{ a }end\n"), @[
-        "2,3   ,2,3  ,{  t.row}\n",
+        "2,3   ,5   ,{  t.row}\n",
         "0,before \n",
-        "2,1   ,2,4  ,{s.name}\n",
+        "2,1   ,6   ,{s.name}\n",
         "0, after \n",
-        "2,1   ,2,6  ,{h.header}\n",
-        "2,2   ,0,1  ,{ a }\n",
+        "2,1   ,8   ,{h.header}\n",
+        "2,2   ,1   ,{ a }\n",
         "1,end\n",
       ])
 
   test "parseVarSegment":
-    check parseVarSegment("2,1   ,0,1  ,{n}") == (namespace: "", name: "n")
-    check parseVarSegment("2,1   ,2,1  ,{t.n}") == (namespace: "t.", name: "n")
-    check parseVarSegment("2,2   ,2,4  ,{ s.name }") == (namespace: "s.", name: "name")
-    check parseVarSegment("2,2   ,2,4  ,{ s.name    }") == (namespace: "s.", name: "name")
-    check parseVarSegment("2,7   ,2,4  ,{      s.name }") == (namespace: "s.", name: "name")
-    check parseVarSegment("2,4   ,0,4  ,{   name }") == (namespace: "", name: "name")
+    check parseVarSegment("2,1   ,1   ,{n}") == "n"
+    check parseVarSegment("2,1   ,3   ,{t.n}") == "t.n"
+    check parseVarSegment("2,2   ,6   ,{ s.name }") == "s.name"
+    check parseVarSegment("2,2   ,6   ,{ s.name    }") == "s.name"
+    check parseVarSegment("2,7   ,6   ,{      s.name }") == "s.name"
+    check parseVarSegment("2,4   ,4   ,{   name }") == "name"
 
   test "yieldReplacementLine nextline":
     let firstReplaceLine = "replacement block\n"

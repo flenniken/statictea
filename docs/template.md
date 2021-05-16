@@ -37,27 +37,23 @@ $$ # Index to types and functions.
 $$ nextline
 $$ : t.repeat = len(s.entries)
 $$ : entry = get(s.entries, t.row, dict())
-$$ : name = get(entry, "name", "")
-$$ : description = get(entry, "description", "")
-$$ : skType = get(entry, "type", "")
-$$ : type = case(skType, +
+$$ : type = case(entry.type, +
 $$ :   "skType", "type: ", +
 $$ :   "skConst", "const: ", +
 $$ :   "skMacro", "macro: ", +
 $$ :   "")
-$$ : short = substr(description, 0, add(find(description, '.', -1), 1))
-* {type}[{name}](#user-content-a{t.row}) &mdash; {short}
+$$ : desc = entry.description
+$$ : short = substr(desc, 0, add(find(desc, '.', -1), 1))
+* {type}[{entry.name}](#user-content-a{t.row}) &mdash; {short}
 
 $$ # Function and type descriptions.
 $$ block
 $$ : t.repeat = len(s.entries)
 $$ : entry = get(s.entries, t.row)
-$$ : name = get(entry, "name", "")
+$$ : name = entry.name
 $$ : nameUnderline = dup("-", len(name))
-$$ : desc = get(entry, "description", "")
-$$ : description = replaceRe(desc, g.patterns)
-$$ : co = get(entry, "code", "")
-$$ : code = replaceRe(co, "[ ]*$", "")
+$$ : description = replaceRe(entry.description, g.patterns)
+$$ : code = replaceRe(entry.code, "[ ]*$", "")
 $$ : pos = find(code, " {", len(code))
 $$ : signature = substr(code, 0, pos)
 $$ : line = get(entry, "line", "0")

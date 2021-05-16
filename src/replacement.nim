@@ -1,84 +1,90 @@
 ## Handle the replacement block lines.
 
-# todo: turn this into a doc comment:
-#[
-
-The replacement block may consist of many lines and the block may
-repeat many times.
-
-If the block only repeats once, you can make one pass through the file
-reading the lines and making variable replacements as you go.
-
-To support multiple repeating blocks you could read all the lines into
-memory but that requires too much memory for big blocks with long
-lines.
-
-You could make multiple passes over the block, once for each repeat by
-seeking back in the template. However, that doesn't work for the stdin
-stream.
-
-What we do is read the lines from the template, compile them and store
-them in a temp file in a format that is easy to write out.
-
-The temp file consists of parts of lines called segments. There are
-segments for strings and segments for variables.
-
-Segment types:
-
-* 0 string segment without ending newline
-* 1 string segment with ending newline
-* 2 variable segment
-* 3 string segment that ends a line without a newline
-* 4 variable segment that ends a line without a newline
-
-For the example replacement block:
-
-This is a test { s.name } line\n
-Second line {h.tea}  \r\n
-third {variable} test\n
-forth line
-
-It gets saved to the temp file as shown below. The underscores show
-ending spaces. Each line ends with a newline that's not shown.
-
-0,This is a test_
-2,2   ,2,4  ,{ s.name }
-1, line
-0,Second line_
-2,1   ,2,3  ,{h.tea}
-1,  \r
-0,third_
-2,1   ,0,8  ,{variable}
-1, test
-3, forth line
-
-A string segment starts with segment type number, followed by a comma then the line
-text. For 0 segments you write to the result file the text starting at
-index 2 to the end minus 1 so the newline isn't written.  For 1
-segments you write from index 2 to the end. This preserves line
-ending, both cr lf and lf.
-
-The variable segments start with some numbers telling where the
-variable namespace and name are in the segment. The variable segment
-numbers are left aligned and padded with spaces so the text part
-always starts at index 13.
-
-Variable Segments:
-
-* first number is 2
-
-* second number is the index where the namespace starts. There are
-  four digits reserved for it to account for the maximum line length
-  of about 1k. A variable can have a lot of padding. {      var      }.
-
-* The third number is the length of the namespace, either 2 or 0.
-  It's 0 when there is no namespace.
-
-* The fourth number is the length of the variable name. There are 3
-  digits reserved for it since a variable's maximum length is 256
-  ascii characters.
-
-]#
+# The replacement block may consist of many lines and the block may
+# repeat many times.
+# @
+# If the block only repeats once, you can make one pass through the file
+# reading the lines and making variable replacements as you go.
+# @
+# To support multiple repeating blocks you could read all the lines into
+# memory but that requires too much memory for big blocks with long
+# lines.
+# @
+# You could make multiple passes over the block, once for each repeat by
+# seeking back in the template. However, that doesn't work for the stdin
+# stream.
+# @
+# What we do is read the lines from the template, compile them and store
+# them in a temp file in a format that is easy to write out.
+# @
+# The temp file consists of parts of lines called segments. There are
+# segments for strings and segments for variables.
+# @
+# Segment types:
+# @
+# * 0 string segment without ending newline
+# * 1 string segment with ending newline
+# * 2 variable segment
+# * 3 string segment that ends a line without a newline
+# * 4 variable segment that ends a line without a newline
+# @
+# For the example replacement block:
+# @
+# Test segments
+# {s.tea}
+# This is a test { s.name } line\n
+# Second line {h.tea}  \r\n
+# third {variable} test\n
+# @
+# It gets saved to the temp file as shown below. The underscores show
+# ending spaces. Each line ends with a newline that's not shown.
+# @
+# 1,Test segments
+# 3,1   ,5   ,{s.tea}
+# 0,This is a test_
+# 2,2   ,6   ,{ s.name }
+# 1, line
+# 0,Second line_
+# 2,1   ,5   ,{h.tea}
+# 1,  \r
+# 0,third_
+# 2,1   ,8   ,{variable}
+# 1, test
+# @
+# A string segment starts with the segment type number 0 or 1. A type
+# 1 segment means the template text ends with a new line and a type 0
+# segment means the template text does not end with a new line.  After
+# the type digit is a comma followed the string from the line followed
+# by a newline.
+# @
+# All segments end with a newline, whether it exists in the template
+# or not. If a template line uses cr/lf, the segment will end with
+# cr/lf. The segment number tells you whether to write out the ending
+# newline or not to the result file. The template line endings are
+# preserved in the result.
+# @
+# Segment text is utf8. The bracketed variables are ascii but the
+# strings are utf8 encoded.
+# @
+# A variable segment, type 2 and 3 are similar to the string segments
+# that type 2 does not end with a new line and 3 does.  The variable
+# segment contains the bracketed variable as it exists in the
+# replacement block with the brackets and leading and trailing white
+# if any, i.e., "{ t.row }".  The segment starts with two numbers
+# telling where the variable dotNameStr starts and its length. The variable
+# segment numbers are left aligned and padded with spaces so the
+# bracketed text part always starts at the same index.
+# @
+# Variable Segments:
+# @
+# * first number is 2 or 3.
+# @
+# * second number is the index where the variable starts. There are
+#   four digits reserved for it to account for the maximum line length
+#   of about 1k. A variable can have a lot of padding. {      var      }.
+# @
+# * The third number is the length of the variable dotNameStr. There are 4
+#   digits reserved for it since a variable's maximum length is about 1k.
 
 import regexes
 import env
@@ -192,31 +198,31 @@ proc stringSegment(line: string, start: Natural, finish: Natural): string {.tpub
 
   result = "$1,$2$3" % [$ord(segmentType), line[start ..< finish], ending]
 
-proc varSegment(bracketedVar: string, namespacePos: Natural,
-                 namespaceLen: Natural, varNameLen: Natural, atEnd: bool): string {.tpub.} =
+# todo: don't allow spaces around the dotNameStr inside the brackets?
+
+proc varSegment(bracketedVar: string, dotNameStrPos: Natural,
+                 dotNameStrLen: Natural, atEnd: bool): string {.tpub.} =
   ## Return a variable segment. The bracketedVar is a string starting
   ## with { and ending with } that has a variable inside with optional
   ## whitespace around the variable, i.e. "{ s.name }". The atEnd
   ## parameter is true when the bracketedVar ends the line without an
   ## ending newline.
-  assert namespacePos <= 9999
-  assert namespaceLen == 2 or namespaceLen == 0
-  assert varNameLen <= 256
+  assert dotNameStrPos <= 9999
+  assert dotNameStrLen <= 9999
   assert bracketedVar.len > 2
   assert bracketedVar[0] == '{'
   assert bracketedVar[^1] == '}'
-  # 2,namespacePos
-  # | |    namespaceLen
-  # | |    | varNameLen
-  # | |    | |   bracketedVar
-  # | |    | |   |
-  # 2,2   ,2,4  ,{ s.name }
+  # 2,dotNameStrPos
+  # | |    dotNameStrLen
+  # | |    |    bracketedVar
+  # | |    |    |
+  # 2,2   ,6   ,{ s.name }
   var segmentValue: string
   if atEnd:
     segmentValue = $ord(endVariable)
   else:
     segmentValue = $ord(variable)
-  result.add("{segmentValue},{namespacePos:<4},{namespaceLen},{varNameLen:<3},{bracketedVar}\n".fmt)
+  result.add("{segmentValue},{dotNameStrPos:<4},{dotNameStrLen:<4},{bracketedVar}\n".fmt)
 
 proc lineToSegments(prepostTable: PrepostTable, line: string): seq[string] {.tpub.} =
   ## Convert a line to a list of segments.
@@ -241,17 +247,18 @@ proc lineToSegments(prepostTable: PrepostTable, line: string): seq[string] {.tpu
     let beforeVar = beforeVarO.get()
 
     # Match the variable. It matches leading and trailing whitespace.
-    let variableO = matchVariable(line, pos + beforeVar.length)
-    if not variableO.isSome:
+    let matches0 = matchDotNames(line, pos + beforeVar.length)
+    if not matches0.isSome:
       # Found left bracket but no variable, output what we have.
       nextPos = pos + beforeVar.length
       result.add(stringSegment(line, pos, nextPos))
       pos = nextPos
       continue
-    let variable = variableO.get()
+    let matches = matches0.get()
+    let (whitespace, dotNameStr) = matches.get2Groups()
 
     # Check that the variable ends with a right bracket.
-    nextPos = pos + beforeVar.length + variable.length
+    nextPos = pos + beforeVar.length + matches.length
     if nextPos >= line.len or line[nextPos] != '}':
       # No closing bracket, so not it's not a variable, output what we
       # have.
@@ -267,32 +274,25 @@ proc lineToSegments(prepostTable: PrepostTable, line: string): seq[string] {.tpu
       result.add(stringSegment(line, pos, start))
 
     # Write out the variable including the left and right brackets.
-    let (whitespace, nameSpace, varName) = variable.get3Groups()
-    nextPos = start + variable.length + 2
+    nextPos = start + matches.length + 2
     let bracketedVar = line[start ..< nextPos]
-    let namespacePos = whitespace.len + 1
+    let dotNameStrPos = whitespace.len + 1
     let atEnd = (nextPos >= line.len)
-    let varSeg = varSegment(bracketedVar, namespacePos, nameSpace.len, varName.len, atEnd)
+    let varSeg = varSegment(bracketedVar, dotNameStrPos, dotNameStr.len, atEnd)
     result.add(varSeg)
     pos = nextPos
 
-func parseVarSegment(segment: string): tuple[namespace: string, name: string] {.tpub.} =
-  ## Parse a variable type segment and return the variable's namespace
-  ## and name.
+func parseVarSegment(segment: string): string {.tpub.} =
+  ## Parse a variable type segment and return the dotNameStr.
 
   # Example variable segments showing limits:
-  # 2,1024,2,256,{ s.name }
-  # 2,2   ,2,4  ,{ s.name }
+  # 2,1024,1024,{ s.name }
+  # 2,2   ,6   ,{ s.name }
   # 0123456789 123456789 0123456789
 
-  let namespacePos = parseInteger(segment, 2).get().integer + 13
-  let namespaceLen = if segment[7] == '2': 2 else: 0
-  let namePos = namespacePos + namespaceLen
-  let nameLen = parseInteger(segment, 9).get().integer
-
-  let namespace = segment[namespacePos ..< namePos]
-  let name = segment[namePos ..< namePos + nameLen]
-  result = (namespace, name)
+  let dotNameStrPos = parseInteger(segment, 2).get().integer + 12
+  let dotNameStrLen = parseInteger(segment, 7).get().integer
+  result = segment[dotNameStrPos ..< dotNameStrPos + dotNameStrLen]
 
 proc getSegmentString(env: var Env, lineNum: Natural, variables: Variables, segment: string):
     tuple[kind: SegmentType, str: string] =
@@ -315,18 +315,19 @@ proc getSegmentString(env: var Env, lineNum: Natural, variables: Variables, segm
     # Variable segment. Subsitute the variable content, if possible.
 
     # Get the variable name.
-    let (namespace, varName) = parseVarSegment(segment)
+    let dotNameStr = parseVarSegment(segment)
 
     # Look up the variable's value.
-    let valueO = getVariable(variables, namespace, varName)
-    if isSome(valueO):
-      # Write the variables value.
-      result = (segmentType, $valueO.get())
+    let valueOrWarning = getVariable(variables, dotNameStr)
+    if valueOrWarning.kind == vwValue:
+      # Convert the variable to a string.
+      let valueStr = shortValueToString(valueOrWarning.value)
+      result = (segmentType, valueStr)
     else:
       # The variable is missing. Write the original variable name
       # text with spacing and brackets.
-      env.warn(lineNum, wMissingReplacementVar, namespace, varName)
-      result = (segmentType, segment[13 .. ^2])
+      env.warn(lineNum, wMissingReplacementVar, dotNameStr)
+      result = (segmentType, segment[12 .. ^2])
   of endline:
     # String segment ending the line without ending newline.
     result = (endline, segment[2 .. ^2])

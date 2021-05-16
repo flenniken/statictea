@@ -114,6 +114,10 @@ type
     wMissingReplacement,   # w98
     wExpectedList,         # w99
     wExpectedSeparator,    # w100
+    wReservedNameSpaces,   # w101
+    wMissingVarName,       # w102
+    wNotDict,              # w103
+    wMissingDict,          # w104
 
 tpubType:
   const
@@ -221,6 +225,10 @@ tpubType:
       "Invalid number of parameters, the pattern and replacement come in pairs.", # wMissingReplacement
       "Expected a list.", # wExpectedList
       "Expected / or \\.", # wExpectedSeparator
+      "The variables f, g, h, l, s and t are reserved variable names.", # wReservedNameSpaces
+      "Name, $1, doesn't exist in the parent dictionary.", # wMissingVarName
+      "Name, $1, is not a dictionary.", # wNotDict
+      "The dictionary $1 doesn't exist.", # wMissingDict
     ]
 
 func getWarning*(filename: string, lineNum: int,
@@ -245,3 +253,8 @@ func `$`*(warningData: WarningData): string =
   ## Return a string representation of WarningData.
   result = "$1($2, $3)" % [$warningData.warning,
     dashIfEmpty(warningData.p1), dashIfEmpty(warningData.p2)]
+
+func `==`*(w1: WarningData, w2: WarningData): bool =
+  ## Return true when the two WarningData are equal.
+  if w1.warning == w2.warning and w1.p1 == w2.p1 and w1.p2 == w2.p2:
+    result = true

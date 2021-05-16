@@ -131,7 +131,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, prepostTable, command, maxLines):
         discard
       # Use the content as the replacement lines.
-      var content = getVariable(variables, "t.", "content").get().stringv
+      var content = getVariable(variables, "t.content").value.stringv
       for line in yieldContentLine(content):
         storeLineSegments(env, tempSegments, prepostTable, line)
     else:
@@ -222,7 +222,8 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
         lastLine = replaceLine
 
       # Write the content as the replacement lines.
-      var content = getVariable(variables, "t.", "content").get().stringv
+      var valueOrWarning = getVariable(variables, "t.content")
+      var content = valueOrWarning.value.stringv
       for line in yieldContentLine(content):
         env.resultStream.write(line)
 
@@ -247,11 +248,9 @@ proc getStartingVariables(env: var Env, args: Args): Variables =
   # The tea variables are the top level items.  All variables are tea
   # variables in the sense that they all exists somewhere in this
   # dictionary.
-  var server = readServerVariables(env, args)
-  var shared = readSharedVariables(env, args)
-  result = emptyVariables()
-  assignVariable(result, "t.", "server", newValue(server))
-  assignVariable(result, "t.", "shared", newValue(shared))
+  var serverVarDict = readServerVariables(env, args)
+  var sharedVarDict = readSharedVariables(env, args)
+  result = emptyVariables(serverVarDict, sharedVarDict)
 
 proc getPrepostTable(args: Args): PrepostTable =
   ## Get the the prepost settings from the user or use the default

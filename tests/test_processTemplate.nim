@@ -331,8 +331,8 @@ fake nextline
 
     let templateContent = """
 <!--$ block +-->
-<!--$ : serverElements = len(t.server); +-->
-<!--$ : jsonElements = len(t.shared) -->
+<!--$ : serverElements = len(t.s); +-->
+<!--$ : jsonElements = len(t.h) -->
 The server has {serverElements} elements
 and the shared json has {jsonElements}.
 <!--$ endblock -->
@@ -566,7 +566,7 @@ Hello World!
     let eErrLines = splitNewLines """
 template.html(1): w41: Invalid t.output value, use: "result", "stderr", "log", or "skip".
 statement: t.output = "something"
-                      ^
+           ^
 """
     check testProcessTemplate(templateContent = templateContent, serverJson =
         serverJson, eErrLines = eErrLines, eResultLines = eResultLines, eRc = 1)
@@ -583,7 +583,7 @@ Hello {s.name}!
 Hello World!
 """
     let eErrLines = splitNewLines """
-template.html(1): w39: You cannot change the server tea variable.
+template.html(1): w40: Invalid tea variable: server.
 statement: t.server = "something"
            ^
 """
@@ -602,7 +602,7 @@ Hello {s.name}!
 Hello World!
 """
     let eErrLines = splitNewLines """
-template.html(1): w35: The variable namespace 'y.' does not exist.
+template.html(1): w102: Name, y, doesn't exist in the parent dictionary.
 statement: y.var = "something"
            ^
 """
@@ -621,13 +621,15 @@ statement: y.var = "something"
     let eErrLines = splitNewLines """
 template.html(1): w44: Invalid t.repeat, it must be an integer >= 0 and <= t.maxRepeat.
 statement: t.repeat = 200
-                      ^
+           ^
 """
     check testProcessTemplate(templateContent = templateContent,
         eErrLines = eErrLines, eResultLines = eResultLines, eRc = 1)
 
   test "assign maxRepeat less than repeat":
     # Test that you cannot assign t.maxRepeat less than repeat.
+
+    # todo: remove semicolon support. separate statements with newlines only.
     let templateContent = """
 <!--$ nextline t.repeat = 4; t.maxRepeat=3-->
 {t.row}
@@ -641,8 +643,9 @@ statement: t.repeat = 200
     let eErrLines = splitNewLines """
 template.html(1): w67: The t.maxRepeat variable must be an integer >= t.repeat.
 statement:  t.maxRepeat=3
-                        ^
+           ^
 """
+    # todo: why is the arrow above off by one space?
     check testProcessTemplate(templateContent = templateContent,
         eErrLines = eErrLines, eResultLines = eResultLines, eRc = 1)
 

@@ -2,12 +2,14 @@
 
 import tables
 import strutils
+import json
 import env
 import warnings
 
 type
-  VarsDict* = OrderedTable[string, Value]
-    ## Variables dictionary type.
+  VarsDict* = OrderedTableRef[string, Value]
+    ## Variables dictionary type. This is a ref type. Create a new
+    ## VarsDict with newVarsDict procedure.
 
   ValueKind* = enum
     ## The type of Variables.
@@ -19,7 +21,8 @@ type
 
   Value* = ref ValueObj
     ## Variable value reference.
-  ValueObj* {.acyclic.} = object
+
+  ValueObj {.acyclic.} = object
     ## Variable object.
     case kind*: ValueKind
     of vkString:
@@ -33,30 +36,22 @@ type
     of vkList:
       listv*: seq[Value]
 
-  Statement* = object
-    ## A Statement object stores the statement text and where it
-    ## starts in the template file.
-    ## ix0
-    ## ix0 * lineNum -- Line number starting at 1 where the statement
-    ## ix0             starts.
-    ## ix0 * start -- Column position starting at 1 where the statement
-    ## ix0           starts on the line.
-    ## ix0 * text -- The statement text.
-    lineNum*: Natural
-    start*: Natural
-    text*: string
+  ValueOrWarningKind* = enum
+    ## The kind of a ValueOrWarning object, either a value or warning.
+    vwValue,
+    vwWarning
 
-  ValueAndLength* = object
-    ## A value and the length of the matching text in the statement.
-    ## For the example statement: "var = 567 ". The value 567 starts
-    ## index 6 and the matching length is 4 because it includes the
-    ## trailing spaces. For example "id = row( 3 )" the value is 3 and
-    ## the length is 2.
-    value*: Value
-    length*: Natural
+  ValueOrWarning* = object
+    ## Holds a value or a warning.
+    case kind*: ValueOrWarningKind
+      of vwValue:
+        value*: Value
+      of vwWarning:
+        warningData*: WarningData
 
-#todo: reStructureText duplicate links with duplicate procedure names.
-#todo: use double underscore links as a workaround.
+proc newVarsDict*(): VarsDict =
+  ## Create a new empty variables dictionary. VarsDict is a ref type.
+  result = newOrderedTable[string, Value]()
 
 proc newValue*(str: string): Value =
   ## Create a string value.
@@ -75,62 +70,118 @@ proc newValue*(valueList: seq[Value]): Value =
   result = Value(kind: vkList, listv: valueList)
 
 proc newValue*(varsDict: VarsDict): Value =
-  ## Create a dictionary value.
+  ## Create a dictionary value from a VarsDict.
   result = Value(kind: vkDict, dictv: varsDict)
 
 proc newValue*(value: Value): Value =
-  ## Copy the given value.
+  ## New value from an existing value. Since values are ref types, the
+  ## new value is an alias to the same value.
   result = value
 
-proc newVarList*(strs: varargs[string]): Value =
-  ## Return a list value from string parameters.
+proc newValue*[T](list: openArray[T]): Value =
+  ## New list value from an array of items of the same kind.
+  ## @
+  ## let listValue = newValue([1, 2, 3])
+  ## let listValue = newValue(["a", "b", "c"])
+  ## let listValue = newValue([newValue(1), newValue("b")])
   var valueList: seq[Value]
-  for str in strs:
-    valueList.add(newValue(str))
+  for num in list:
+    valueList.add(newValue(num))
+  result = Value(kind: vkList, listv: valueList)
+
+proc newValue*[T](dictPairs: openArray[(string, T)]): Value =
+  ## New dict value from an array of pairs where the pairs are the
+  ## same type.
+  ##
+  ## let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
+  ## let dictValue = newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)])
+  ## let dictValue = newValue([("a", newValue(1.1)), ("b", newValue("a"))])
+  var varsTable = newVarsDict()
+  for tup in dictPairs:
+    let (a, b) = tup
+    let value = newValue(b)
+    varsTable[a] = value
+  result = Value(kind: vkDict, dictv: varsTable)
+
+proc newEmptyListValue*(): Value =
+  ## Return an empty list value.
+  var valueList: seq[Value]
   result = newValue(valueList)
 
-proc newVarsDict*(): VarsDict =
-  ## Create variables dictionary.
-  return result
-
-proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
-  ## Create a newValueAndLength object.
-  result = ValueAndLength(value: value, length: length)
-
+proc newEmtpyDictValue*(): Value =
+  ## Create a dictionary value from a VarsDict.
+  result = newValue(newVarsDict())
 
 when defined(test):
-  proc newValue*[T](list: openArray[T]): Value =
-    ## New list value from an array of items.
+  proc newListValue*[T](args: varargs[T]): Value =
+    ## Return a list value from any number of parameters of the same
+    ## type. For an empty list use newEmptyListValue.
+    ## @
+    ## let strings = newListValue("a", "b", "c")
+    ## let intList = newListValue(1, 2)
+    ## let intList = newListValue(newValue(1), newValue("a"))
     var valueList: seq[Value]
-    for num in list:
-      valueList.add(newValue(num))
-    result = Value(kind: vkList, listv: valueList)
+    for arg in args:
+      valueList.add(newValue(arg))
+    result = newValue(valueList)
 
-  proc newValue*[T](dictPairs: openArray[(string, T)]): Value =
-    ## New dict value from an array of pairs.
-    var varsTable: VarsDict
-    for tup in dictPairs:
+  proc newDictValue*[T](args: varargs[(string, T)]): Value =
+    ## New dict value from any number of pairs where the pairs are the
+    ## same type.
+    ## @
+    ## let dictValue = newValue(("a", 1), ("b", 2), ("c", 3))
+    ## let dictValue = newValue(("a", 1.1), ("b", 2.2), ("c", 3.3))
+    ## let dictValue = newValue(("a", newValue(1.1)), ("b", newValue("a")))
+    ##
+    ## See newValue that takes an array.
+    var varsDict = newVarsDict()
+    for tup in args:
       let (a, b) = tup
       let value = newValue(b)
-      varsTable[a] = value
-    result = Value(kind: vkDict, dictv: varsTable)
+      varsDict[a] = value
+    result = newValue(varsDict)
 
-proc `==`*(value1: Value, value2: Value): bool =
-  ## Return true when two values are equal.
-  if value1.kind == value2.kind:
-    case value1.kind:
-      of vkString:
-        result = value1.stringv == value2.stringv
-      of vkInt:
-        result = value1.intv == value2.intv
-      of vkFloat:
-        result = value1.floatv == value2.floatv
-      of vkDict:
-        result = value1.dictv == value2.dictv
-      of vkList:
-        result = value1.listv == value2.listv
+# todo: move the toString methods to their own module.
+# Recursive prototype.
+func valueToString*(value: Value): string
+
+func dictToString*(value: Value): string =
+  ## Return a string representation of a dict Value in JSON format.
+  result.add("{")
+  var insideLines: seq[string]
+  for k, v in value.dictv.pairs:
+    insideLines.add("$1:$2" % [escapeJson(k), valueToString(v)])
+  result.add(insideLines.join(","))
+  result.add("}")
+
+func listToString*(value: Value): string =
+  ## Return a string representation of a list Value in JSON format.
+  result.add("[")
+  var insideLines: seq[string]
+  for item in value.listv:
+    insideLines.add(valueToString(item))
+  result.add(insideLines.join(","))
+  result.add("]")
+
+func valueToString*(value: Value): string =
+  ## Return a string representation of a Value in JSON format.
+  case value.kind:
+    of vkDict:
+      result.add(dictToString(value))
+    of vkList:
+      result.add(listToString(value))
+    of vkString:
+      result.add(escapeJson(value.stringv))
+    of vkInt:
+      result.add($value.intv)
+    of vkFloat:
+      result.add($value.floatv)
 
 func `$`*(value: Value): string =
+  ## Return a string representation of a Value.
+  result = valueToString(value)
+
+func shortValueToString*(value: Value): string =
   ## Return a string representation of Value. This is used to convert
   ## values to strings in replacement blocks.
   case value.kind
@@ -165,25 +216,80 @@ func `$`*(kind: ValueKind): string =
   of vkList:
     result = "list"
 
-func `$`*(varsDict: VarsDict): string =
+proc `$`*(varsDict: VarsDict): string =
   ## Return a string representation of a VarsDict.
-  var list = newSeq[string]()
-  for k, v in varsDict.pairs():
-    if v.kind == vkString:
-      list.add(""""$1": "$2"""" % [k, v.stringv])
+  result = valueToString(newValue(varsDict))
+
+proc `==`*(value1: Value, value2: Value): bool =
+  ## Return true when two values are equal.
+  if value1.kind == value2.kind:
+    case value1.kind:
+      of vkString:
+        result = value1.stringv == value2.stringv
+      of vkInt:
+        result = value1.intv == value2.intv
+      of vkFloat:
+        result = value1.floatv == value2.floatv
+      of vkDict:
+        result = value1.dictv == value2.dictv
+      of vkList:
+        result = value1.listv == value2.listv
+
+
+func newValueOrWarning*(value: Value): ValueOrWarning =
+  ## Return a new ValueOrWarning object containing a value.
+  result = ValueOrWarning(kind: vwValue, value: value)
+
+func newValueOrWarning*(warning: Warning, p1: string = "",
+    p2: string = ""): ValueOrWarning =
+  ## Return a new ValueOrWarning object containing a warning.
+  let warningData = newWarningData(warning, p1, p2)
+  result = ValueOrWarning(kind: vwWarning, warningData: warningData)
+
+func newValueOrWarning*(warningData: WarningData): ValueOrWarning =
+  ## Return a new ValueOrWarning object containing a warning.
+  result = ValueOrWarning(kind: vwWarning, warningData: warningData)
+
+func `==`*(vw1: ValueOrWarning, vw2: ValueOrWarning): bool =
+  ## Compare two ValueOrWarning objects and return true when equal.
+  if vw1.kind == vw2.kind:
+    if vw1.kind == vwValue:
+      result = vw1.value == vw2.value
     else:
-      list.add(""""$1": $2""" % [k, $v])
-  result = "{$1}" % [list.join(", ")]
+      result = vw1.warningData == vw2.warningData
 
-func `$`*(s: Statement): string =
-  ## Retrun a string representation of a Statement.
-  result = "$1, $2: '$3'" % [$s.lineNum, $s.start, s.text]
+func `$`*(vw: ValueOrWarning): string =
+  ## Return a string representation of a ValueOrWarning object.
+  if vw.kind == vwValue:
+    result = $vw.value
+  else:
+    result = $vw.warningData
 
-func `==`*(s1: Statement, s2: Statement): bool =
-  ## Return true when the two statements are equal.
-  if s1.lineNum == s2.lineNum and s1.start == s2.start and
-      s1.text == s2.text:
-    result = true
+# todo: move statement types and methods to another file.
+
+type
+  Statement* = object
+    ## A Statement object stores the statement text and where it
+    ## starts in the template file.
+    ## @
+    ## @ * lineNum -- Line number starting at 1 where the statement
+    ## @              starts.
+    ## @ * start -- Column position starting at 1 where the statement
+    ## @            starts on the line.
+    ## @ * text -- The statement text.
+    lineNum*: Natural
+    start*: Natural
+    text*: string
+
+  # todo: move ValueAndLength to another file.
+  ValueAndLength* = object
+    ## A value and the length of the matching text in the statement.
+    ## For the example statement: "var = 567 ". The value 567 starts
+    ## at index 6 and the matching length is 4 because it includes the
+    ## trailing space. For example "id = row(3 )" the value is 3 and
+    ## the length is 2.
+    value*: Value
+    length*: Natural
 
 func newStatement*(text: string, lineNum: Natural = 1,
     start: Natural = 1): Statement =
@@ -240,3 +346,17 @@ statement: $2
                fragment, startColumn(pointerPos)
   ]
   env.warn(message)
+
+func `==`*(s1: Statement, s2: Statement): bool =
+  ## Return true when the two statements are equal.
+  if s1.lineNum == s2.lineNum and s1.start == s2.start and
+      s1.text == s2.text:
+    result = true
+
+func `$`*(s: Statement): string =
+  ## Retrun a string representation of a Statement.
+  result = "$1, $2: '$3'" % [$s.lineNum, $s.start, s.text]
+
+proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
+  ## Create a newValueAndLength object.
+  result = ValueAndLength(value: value, length: length)

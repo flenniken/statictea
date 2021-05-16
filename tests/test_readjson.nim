@@ -7,64 +7,39 @@ import os
 import json
 import options
 import strutils
-
-proc testReadJsonFile(filename: string, expectedVars: VarsDict,
-    eLogLines: seq[string] = @[],
-    eErrLines: seq[string] = @[],
-    eOutLines: seq[string] = @[] ): bool =
-
-  var env = openEnvTest("_readJson.log")
-
-  var vars = getEmptyVars()
-  readJson(env, filename, vars)
-
-  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
-  if not expectedItem("vars", vars, expectedVars):
-    result = false
-
-
-proc testReadJsonContent(jsonContent: string, expectedVars: VarsDict,
-    eLogLines: seq[string] = @[],
-    eErrLines: seq[string] = @[],
-    eOutLines: seq[string] = @[] ): bool =
-
-  var filename = "_readJson.json"
-  createFile(filename, jsonContent)
-  defer: discard tryRemoveFile(filename)
-  result = testReadJsonFile(filename, expectedVars, eLogLines,
-                   eErrLines, eOutLines)
+import warnings
 
 suite "readjson.nim":
 
   test "readJson file not found":
-    let eErrLines = @["template.html(0): w16: File not found: missing.\n"]
-    var expectedValue = getEmptyVars()
-    check testReadJsonFile("missing", expectedValue, eErrLines=eErrLines)
+    let filename = "missing"
+    var valueOrWarning = readJson(filename)
+    check valueOrWarning == newValueOrWarning(wFileNotFound, filename)
 
   test "readJson cannot open file":
-    let eErrLines =
-      @["template.html(0): w17: Unable to open file: _cannotopen.tmp.\n"]
-    let expectedValue = getEmptyVars()
     let filename = "_cannotopen.tmp"
-    defer: discard tryRemoveFile(filename)
     createFile(filename, "temp")
+    defer: discard tryRemoveFile(filename)
     setFilePermissions(filename, {fpUserWrite, fpGroupWrite})
-    check testReadJsonFile(filename, expectedValue, eErrLines=eErrLines)
+    var valueOrWarning = readJson(filename)
+    check valueOrWarning == newValueOrWarning(wUnableToOpenFile, filename)
 
   test "readJson parse error":
-    let eErrLines = @["template.html(0): w15: Unable to parse the json file. Skipping file: _readJson.json.\n"]
-    let expectedValue = getEmptyVars()
-    check testReadJsonContent("{", expectedValue, eErrLines=eErrLines)
+    let content = "{"
+    var valueOrWarning = readJsonContent(content)
+    check valueOrWarning == newValueOrWarning(wJsonParseError)
 
   test "readJson no root object":
-    let eErrLines = @["template.html(0): w14: The root json element must be an object. Skipping file: _readJson.json.\n"]
-    let expectedValue = getEmptyVars()
-    check testReadJsonContent("[5]", expectedValue, eErrLines=eErrLines)
+    let content = "[5]"
+    var valueOrWarning = readJsonContent(content)
+    check valueOrWarning == newValueOrWarning(wInvalidJsonRoot)
 
   test "readJson a=5":
-    var expectedValue = getEmptyVars()
-    expectedValue["a"] = Value(kind: vkInt, intv: 5)
-    check testReadJsonContent("""{"a": 5}""", expectedValue)
+    let content = """{"a":5}"""
+    let valueOrWarning = readJsonContent(content)
+    check valueOrWarning.kind == vwValue
+    let str = dictToString(valueOrWarning.value)
+    check expectedItem("json", str, content)
 
   test "jsonToValue int":
     let jsonNode = newJInt(5)
@@ -78,7 +53,7 @@ suite "readjson.nim":
     let option = jsonToValue(jsonNode)
     let value = option.get()
     check value.stringv == "string"
-    check $value == "string"
+    check $value == """"string""""
 
   test "jsonToValue quote":
     let str = "this has \"quotes\" in it"
@@ -86,7 +61,7 @@ suite "readjson.nim":
     let option = jsonToValue(jsonNode)
     let value = option.get()
     check value.stringv == str
-    check $value == str
+    check $value == """"this has \"quotes\" in it""""
 
   test "jsonToValue float":
     let jsonNode = newJFloat(1.5)
@@ -128,7 +103,7 @@ suite "readjson.nim":
     let option = jsonToValue(jsonNode)
     let value = option.get()
     check value.listv.len == 1
-    check $value == "[...]"
+    check $value == "[0]"
 
   test "jsonToValue list items":
     var jsonNode = newJArray()
@@ -155,8 +130,7 @@ suite "readjson.nim":
     let option = jsonToValue(jsonNode)
     let value = option.get()
     check value.listv.len == 4
-    # check $value == "[5, 6, [8], 7]"
-    check $value == "[...]"
+    check $value == "[5,6,[8],7]"
 
   test "empty dict":
     var jsonNode = newJObject()
@@ -175,18 +149,11 @@ suite "readjson.nim":
     {"tea": "Puer"}
   ]
 }"""
-    var expectedValue = getEmptyVars()
-    var listValues: seq[Value]
-    let teaList = ["Chamomile", "Chrysanthemum", "White", "Puer"]
-    for tea in teaList:
-      let value = Value(kind: vkString, stringv: tea)
-      var dv: VarsDict
-      dv["tea"] = value
-      let listValue = Value(kind: vkDict, dictv: dv)
-      listValues.add(listValue)
-    expectedValue["teaList"] = Value(kind: vkList, listv: listValues)
-
-    check testReadJsonContent(content, expectedValue)
+    let eStr = """{"teaList":[{"tea":"Chamomile"},{"tea":"Chrysanthemum"},{"tea":"White"},{"tea":"Puer"}]}"""
+    let valueOrWarning = readJsonContent(content)
+    check valueOrWarning.kind == vwValue
+    let str = dictToString(valueOrWarning.value)
+    check expectedItem("read json", str, eStr)
 
   test "long string":
     let string256 = "123456789 123456789 123456789 123456789 123456789 " &
@@ -199,12 +166,13 @@ suite "readjson.nim":
   "longString": "$1"
 }
 """ % [string256]
-    var expectedValue = getEmptyVars()
-    expectedValue["longString"] = Value(kind: vkString, stringv: string256)
-    check testReadJsonContent(content, expectedValue)
+    let eStr = """{"longString":"123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456"}"""
+    let valueOrWarning = readJsonContent(content)
+    check valueOrWarning.kind == vwValue
+    let str = dictToString(valueOrWarning.value)
+    check expectedItem("read json", str, eStr)
 
   test "longer string":
-
     let teaParty = """
 CHAPTER VII.
 A Mad Tea-Party
@@ -227,9 +195,11 @@ she sat down in a large arm-chair at one end of the table.
   "longString": "$1"
 }
 """ % [teaParty]
-    var expectedValue = getEmptyVars()
-    expectedValue["longString"] = Value(kind: vkString, stringv: teaParty)
-    check testReadJsonContent(content, expectedValue)
+    let eStr = """{"longString":"CHAPTER VII.\nA Mad Tea-Party\n\nThere was a table set out under a tree in front of the house, and the\nMarch Hare and the Hatter were having tea at it: a Dormouse was\nsitting between them, fast asleep, and the other two were using it as\na cushion, resting their elbows on it, and talking over its\nhead. “Very uncomfortable for the Dormouse,” thought Alice; “only, as\nit’s asleep, I suppose it doesn’t mind.”\n\nThe table was a large one, but the three were all crowded together at\none corner of it: “No room! No room!” they cried out when they saw\nAlice coming. “There’s plenty of room!” said Alice indignantly, and\nshe sat down in a large arm-chair at one end of the table.\n"}"""
+    let valueOrWarning = readJsonContent(content)
+    check valueOrWarning.kind == vwValue
+    let str = dictToString(valueOrWarning.value)
+    check expectedItem("read json", str, eStr)
 
   test "quoted strings":
     let content = """
@@ -237,7 +207,24 @@ she sat down in a large arm-chair at one end of the table.
   "str": "this is \"quoted\""
 }
 """
-    var expectedValue = getEmptyVars()
-    expectedValue["str"] = Value(kind: vkString, stringv: """this is "quoted"""")
+    let eStr = """{"str":"this is \"quoted\""}"""
+    let valueOrWarning = readJsonContent(content)
+    check valueOrWarning.kind == vwValue
+    let str = dictToString(valueOrWarning.value)
+    check expectedItem("read json", str, eStr)
 
-    check testReadJsonContent(content, expectedValue)
+  test "read json mix":
+    let content = """
+{
+  "d": {
+    "a": 45,
+    "b": "banana",
+    "f": 2.5,
+  },
+  "list": [1, 2, 3]
+}"""
+    let eStr = """{"d":{"a":45,"b":"banana","f":2.5},"list":[1,2,3]}"""
+    var valueOrWarning = readJsonContent(content)
+    check valueOrWarning.kind == vwValue
+    var str = dictToString(valueOrWarning.value)
+    check expectedItem("read json mix", str, eStr)

@@ -145,3 +145,10 @@ pattern: $3""" % [str, $start, pattern]
     result.start = start
     for group in groups:
       result.groups.add(group)
+
+  proc newMatches*(length: Natural, start: Natural, groups: seq[string]): Matches =
+    ## Return a Matches object.
+    result.length = length
+    result.start = start
+    for group in groups:
+      result.groups.add(group)

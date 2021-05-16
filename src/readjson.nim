@@ -11,16 +11,13 @@ import os
 import json
 import options
 import args
+import vartypes
 
 # todo: test the the order is preserved.
 # todo: test that the last duplicate wins.
 
+# todo: increase the depth limit and document it. Make it a parameter?
 var depth_limit = 3
-
-# todo: remove this, use one in variables module.
-func getEmptyVars*(): VarsDict =
-  ## Create and return an empty variable dictionary.
-  result = initOrderedTable[string, Value]()
 
 proc jsonToValue(jsonNode: JsonNode, depth: int = 0): Option[Value] {.tpub.} =
   ## Convert a json value to a statictea value.
@@ -42,12 +39,12 @@ proc jsonToValue(jsonNode: JsonNode, depth: int = 0): Option[Value] {.tpub.} =
   of JString:
     value = Value(kind: vkString, stringv: jsonNode.getStr())
   of JObject:
-    var objectVars = getEmptyVars()
+    var dict = newVarsDict()
     for key, jnode in jsonNode:
       let option = jsonToValue(jnode, depth + 1)
       if option.isSome():
-        objectVars[key] = option.get()
-    value = Value(kind: vkDict, dictv: objectVars)
+        dict[key] = option.get()
+    value = Value(kind: vkDict, dictv: dict)
   of JArray:
     var listVars: seq[Value]
     for jnode in jsonNode:
@@ -57,45 +54,72 @@ proc jsonToValue(jsonNode: JsonNode, depth: int = 0): Option[Value] {.tpub.} =
     value = Value(kind: vkList, listv: listVars)
   result = some(value)
 
-proc readJson*(env: var Env, filename: string, vars: var VarsDict) =
-  ## Read a json file and add the variables to a dictionary.
+proc readJsonContent*(stream: Stream, filename: string = ""): ValueOrWarning =
+  ## Read a json stream and return the variables.  If there is an
+  ## error, return a warning. The filename is used in warning
+  ## messages.
 
-  if not fileExists(filename):
-    env.warn(0, wFileNotFound, filename)
-    return
-
-  var stream: Stream
-  stream = newFileStream(filename)
   if stream == nil:
-    env.warn(0, wUnableToOpenFile, filename)
-    return
+    return newValueOrWarning(wUnableToOpenFile, filename)
 
   var rootNode: JsonNode
   try:
     rootNode = parseJson(stream, filename)
   except:
-    let message =  getCurrentExceptionMsg()
-    env.log(message)
-    env.warn(0, wJsonParseError, filename)
-    return
+    return newValueOrWarning(wJsonParseError, filename)
 
+  # todo: allow any kind of object?
   if rootNode.kind != JObject:
-    env.warn(0, wInvalidJsonRoot, filename)
-    return
+    return newValueOrWarning(wInvalidJsonRoot, filename)
 
+  var dict = newVarsDict()
   for key, jnode in rootNode:
     let valueO = jsonToValue(jnode)
     assert valueO.isSome
-    vars[key] = valueO.get()
+    dict[key] = valueO.get()
+
+  result = newValueOrWarning(newValue(dict))
+
+proc readJsonContent*(content: string, filename: string = ""): ValueOrWarning =
+  ## Read a json string and return the variables.  If there is an
+  ## error, return a warning. The filename is used in warning
+  ## messages.
+  var stream = newStringStream(content)
+  result = readJsonContent(stream, filename)
+
+proc readJson*(filename: string): ValueOrWarning =
+  ## Read a json string and return the variables.  If there is an
+  ## error, return a warning. The filename is used in warning
+  ## messages.
+
+  if not fileExists(filename):
+    return newValueOrWarning(wFileNotFound, filename)
+
+  var stream: Stream
+  stream = newFileStream(filename)
+  if stream == nil:
+    return newValueOrWarning(wUnableToOpenFile, filename)
+
+  result = readJsonContent(stream, filename)
+
+proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
+  ## Read the json files and return the variables in one
+  ## dictionary. The last file wins on duplicates.
+
+  result = newVarsDict()
+  for filename in filenames:
+    let valueOrWarning = readJson(filename)
+    if valueOrWarning.kind == vwWarning:
+      env.warn(0, valueOrWarning.warningData)
+    else:
+      # Merge in the variables.
+      for k, v in valueOrWarning.value.dictv.pairs:
+        result[k] = v
 
 proc readServerVariables*(env: var Env, args: Args): VarsDict =
   ## Read the server json.
-  result = getEmptyVars()
-  for filename in args.serverList:
-    readJson(env, filename, result)
+  result = readJsonFiles(env, args.serverList)
 
 proc readSharedVariables*(env: var Env, args: Args): VarsDict =
   ## Read the shared json.
-  result = getEmptyVars()
-  for filename in args.sharedList:
-    readJson(env, filename, result)
+  result = readJsonFiles(env, args.sharedList)

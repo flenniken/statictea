@@ -201,11 +201,6 @@ task b, "\tBuild the statictea exe.":
   build_release()
 
 task docs, "\tCreate markdown docs; specify part of source file name.":
-  if showHtml and not isPyEnvActive():
-    echo "Run the pythonenv task to setup the python environment."
-    # The python environment is used to make html files so you can
-    # proof the documentation before committing.
-    return
   let count = system.paramCount()+1
   # Name is part of a source file name, or "docs" when not specified.
   let name = system.paramStr(count-1)
@@ -213,11 +208,11 @@ task docs, "\tCreate markdown docs; specify part of source file name.":
   for filename in filenames:
     if name in filename or name == "docs":
       var jsonName = changeFileExt(filename, "json")
-      var cmd = "nim jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
-      echo cmd
-      echo ""
+      var cmd = "nim --hint[Conf]:off --hint[SuccessX]:off jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
+      echo "Export nim json doc comments..."
       exec cmd
       echo ""
+      echo "Generate markdown from statictea template..."
       var mdName = changeFileExt(filename, "md")
 
       # Create a shared.json file for use by the template.
@@ -230,19 +225,9 @@ task docs, "\tCreate markdown docs; specify part of source file name.":
 
       cmd = "bin/statictea -s=docs/json/$1 -j=docs/shared.json -t=docs/template.md -r=docs/$2" % [
         jsonName, mdName]
-      echo cmd
+      # echo cmd
       exec cmd
       exec "rm " & sharedFilename
-      # discard tryRemoveFile(sharedFilename)
-      if false: # showHtml:
-        var htmlName = changeFileExt(filename, "html")
-        var dirName = getDirName(hostOS)
-        exec "rm -f docs/html/$1" % htmlName
-        exec "env/$1/staticteaenv/bin/rst2html5.py docs/$2 docs/html/$3 | less" % [
-          dirName, mdName, htmlName]
-        echo cmd
-        exec cmd
-        open_in_browser(r"docs/html/$1" % htmlName)
 
 task docsre, "\tCreate reStructuredtext docs; specify part of source file name.":
   if showHtml and not isPyEnvActive():

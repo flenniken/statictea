@@ -93,6 +93,10 @@ proc warn*(env: var Env, lineNum: Natural, warning: Warning, p1:
   let message = getWarning(filename, lineNum, warning, p1, p2)
   warn(env, message)
 
+proc warn*(env: var Env, lineNum: Natural, warningData: WarningData) =
+  ## Write a formatted warning message to the error stream.
+  warn(env, lineNum, warningData.warning, warningData.p1, warningData.p2)
+
 func formatDateTime*(dt: DateTime): string =
   ## Return a formatted time stamp for the log.
   result = dt.format(dtFormat)

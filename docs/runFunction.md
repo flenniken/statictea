@@ -2,7 +2,7 @@
 
 # runFunction.nim
 
-StaticTea functions.  The StaticTea language functions start with "fun".
+The module contains the StaticTea functions and supporting types. The StaticTea language functions start with "fun", for example, "funCmp" function implements the StaticTea "cmp" function.
 
 # Index
 
@@ -44,7 +44,7 @@ Signature of a statictea function. It takes any number of values and returns a v
 FunctionPtr = proc (parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L18)
+[source](../src/runFunction.nim#L19)
 
 # <a id="a1"></a>FunResultKind
 
@@ -55,7 +55,7 @@ FunResultKind = enum
   frValue, frWarning
 ```
 
-[source](../src/runFunction.nim#L22)
+[source](../src/runFunction.nim#L23)
 
 # <a id="a2"></a>FunResult
 
@@ -74,7 +74,7 @@ FunResult = object
 
 ```
 
-[source](../src/runFunction.nim#L27)
+[source](../src/runFunction.nim#L28)
 
 # <a id="a3"></a>newFunResultWarn
 
@@ -85,7 +85,7 @@ func newFunResultWarn(warning: Warning; parameter: Natural = 0; p1: string = "";
                       p2: string = ""): FunResult
 ```
 
-[source](../src/runFunction.nim#L40)
+[source](../src/runFunction.nim#L41)
 
 # <a id="a4"></a>newFunResult
 
@@ -95,7 +95,7 @@ Return a new FunResult object containing a value.
 func newFunResult(value: Value): FunResult
 ```
 
-[source](../src/runFunction.nim#L49)
+[source](../src/runFunction.nim#L50)
 
 # <a id="a5"></a>`==`
 
@@ -105,7 +105,7 @@ Compare two FunResult objects and return true when equal.
 func `==`(r1: FunResult; r2: FunResult): bool
 ```
 
-[source](../src/runFunction.nim#L53)
+[source](../src/runFunction.nim#L54)
 
 # <a id="a6"></a>`$`
 
@@ -115,7 +115,7 @@ Return a string representation of a FunResult object.
 func `$`(funResult: FunResult): string
 ```
 
-[source](../src/runFunction.nim#L64)
+[source](../src/runFunction.nim#L65)
 
 # <a id="a7"></a>cmpString
 
@@ -125,7 +125,7 @@ Compares two UTF-8 strings. Returns 0 when equal, 1 when a is greater than b and
 func cmpString(a, b: string; ignoreCase: bool = false): int
 ```
 
-[source](../src/runFunction.nim#L74)
+[source](../src/runFunction.nim#L75)
 
 # <a id="a8"></a>funCmp
 
@@ -159,7 +159,7 @@ cmp("Tea", "tea", 1) => 0
 func funCmp(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L99)
+[source](../src/runFunction.nim#L100)
 
 # <a id="a9"></a>funConcat
 
@@ -181,7 +181,7 @@ concat("a", "b", "c", "d") => "abcd"
 func funConcat(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L157)
+[source](../src/runFunction.nim#L158)
 
 # <a id="a10"></a>funLen
 
@@ -201,7 +201,7 @@ len(dict('a', 4)) => 1
 func funLen(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L182)
+[source](../src/runFunction.nim#L183)
 
 # <a id="a11"></a>funGet
 
@@ -235,7 +235,7 @@ get(l, 3, 99) => 99
 func funGet(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L214)
+[source](../src/runFunction.nim#L215)
 
 # <a id="a12"></a>funIf
 
@@ -257,7 +257,7 @@ if(4, 'tea', 'beer') => "beer"
 func funIf(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L278)
+[source](../src/runFunction.nim#L279)
 
 # <a id="a13"></a>funAdd
 
@@ -291,7 +291,7 @@ add(1.1, 2.2, 3.3) => 6.6
 func funAdd(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L311)
+[source](../src/runFunction.nim#L312)
 
 # <a id="a14"></a>funExists
 
@@ -312,7 +312,7 @@ exists(d, "coffee") => 0
 func funExists(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L366)
+[source](../src/runFunction.nim#L367)
 
 # <a id="a15"></a>funCase
 
@@ -344,7 +344,7 @@ case(8,
 func funCase(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L401)
+[source](../src/runFunction.nim#L402)
 
 # <a id="a16"></a>parseVersion
 
@@ -354,7 +354,7 @@ Parse a StaticTea version number and return its three components.
 func parseVersion(version: string): Option[(int, int, int)]
 ```
 
-[source](../src/runFunction.nim#L481)
+[source](../src/runFunction.nim#L482)
 
 # <a id="a17"></a>funCmpVersion
 
@@ -376,7 +376,7 @@ cmpVersion("1.2.5", "1.2.5") => 1
 func funCmpVersion(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L492)
+[source](../src/runFunction.nim#L493)
 
 # <a id="a18"></a>funFloat
 
@@ -396,7 +396,7 @@ float("33") => 33.0
 func funFloat(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L539)
+[source](../src/runFunction.nim#L540)
 
 # <a id="a19"></a>funInt
 
@@ -433,7 +433,7 @@ int(-6.3456, "truncate") => -6
 func funInt(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L582)
+[source](../src/runFunction.nim#L583)
 
 # <a id="a20"></a>funFind
 
@@ -454,7 +454,7 @@ find(msg, "party", 0) = 0
 func funFind(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L669)
+[source](../src/runFunction.nim#L670)
 
 # <a id="a21"></a>funSubstr
 
@@ -476,7 +476,7 @@ substr("Earl Grey", 5) => => "Grey"
 func funSubstr(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L706)
+[source](../src/runFunction.nim#L707)
 
 # <a id="a22"></a>funDup
 
@@ -496,7 +496,7 @@ substr("abc", 2) => => "abcabc"
 func funDup(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L764)
+[source](../src/runFunction.nim#L765)
 
 # <a id="a23"></a>funDict
 
@@ -520,7 +520,7 @@ dict("a", 5, "b", 33, "c", 0) =>
 func funDict(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L803)
+[source](../src/runFunction.nim#L804)
 
 # <a id="a24"></a>funList
 
@@ -545,7 +545,7 @@ list("a", 5, "b") => ["a", 5, "b"]
 func funList(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L839)
+[source](../src/runFunction.nim#L840)
 
 # <a id="a25"></a>funReplace
 
@@ -588,7 +588,7 @@ replace("123", 0, 3, "") =>
 func funReplace(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L860)
+[source](../src/runFunction.nim#L861)
 
 # <a id="a26"></a>funReplaceRe
 
@@ -629,7 +629,7 @@ replaceRe("abcdefabc", l))
 func funReplaceRe(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L997)
+[source](../src/runFunction.nim#L998)
 
 # <a id="a27"></a>funPath
 
@@ -655,7 +655,7 @@ path("src/runFunction.nim") => {
 func funPath(parameters: seq[Value]): FunResult
 ```
 
-[source](../src/runFunction.nim#L1068)
+[source](../src/runFunction.nim#L1069)
 
 # <a id="a28"></a>getFunction
 
@@ -665,7 +665,7 @@ Look up a function by its name.
 proc getFunction(functionName: string): Option[FunctionPtr]
 ```
 
-[source](../src/runFunction.nim#L1163)
+[source](../src/runFunction.nim#L1164)
 
 
 ---

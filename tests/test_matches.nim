@@ -59,9 +59,9 @@ proc testLeftParentheses(line: string, start: Natural,
   else:
     result = true
 
-proc testMatchVariable(line: string, start: Natural,
+proc testMatchDotNames(line: string, start: Natural,
     eMatchesO: Option[Matches] = none(Matches)): bool =
-  let matchesO = matchVariable(line, start)
+  let matchesO = matchDotNames(line, start)
   if not expectedItem("matchesO: $1" % [line], matchesO, eMatchesO):
     result = false
   else:
@@ -236,36 +236,36 @@ suite "matches.nim":
     check testMatchTabSpace(" a ", 1)
 
   test "matchVariable":
-    check testMatchVariable("a = 5", 0, some(newMatches(2, 0, "", "", "a")))
-    check testMatchVariable(" a = 5 ", 0, some(newMatches(3, 0, " ", "", "a")))
-    check testMatchVariable("t.a = 5", 0, some(newMatches(4, 0, "", "t.", "a")))
-    check testMatchVariable("abc = 5", 0, some(newMatches(4, 0, "", "", "abc")))
-    check testMatchVariable("   a = 5", 0, some(newMatches(5, 0, "   ", "", "a")))
-    check testMatchVariable("aBcD_t = 5", 0, some(newMatches(7, 0, "", "", "aBcD_t")))
-    check testMatchVariable("t.server = 5", 0, some(newMatches(9, 0, "", "t.", "server")))
-    check testMatchVariable("t.server =", 0, some(newMatches(9, 0, "", "t.", "server")))
-    check testMatchVariable("   a =    5", 0, some(newMatches(5, 0, "   ", "", "a")))
+    check testMatchDotNames("a = 5", 0, some(newMatches(2, 0, "", "a")))
+    check testMatchDotNames(" a = 5 ", 0, some(newMatches(3, 0, " ", "a")))
+    check testMatchDotNames("t.a = 5", 0, some(newMatches(4, 0, "", "t.a")))
+    check testMatchDotNames("abc = 5", 0, some(newMatches(4, 0, "", "abc")))
+    check testMatchDotNames("   a = 5", 0, some(newMatches(5, 0, "   ", "a")))
+    check testMatchDotNames("aBcD_t = 5", 0, some(newMatches(7, 0, "", "aBcD_t")))
+    check testMatchDotNames("t.server = 5", 0, some(newMatches(9, 0, "", "t.server")))
+    check testMatchDotNames("t.server =", 0, some(newMatches(9, 0, "", "t.server")))
+    check testMatchDotNames("   a =    5", 0, some(newMatches(5, 0, "   ", "a")))
     let longVar = "a23456789_123456789_123456789_123456789_123456789_123456789_1234"
-    check testMatchVariable(longVar, 0, some(newMatches(64, 0, "", "", longVar)))
-    check testMatchVariable(longVar & " = 5", 0, some(newMatches(65, 0, "", "", longVar)))
-    check testMatchVariable(" t." & longVar & " = 5", 0, some(newMatches(68, 0, " ", "t.", longVar)))
+    check testMatchDotNames(longVar, 0, some(newMatches(64, 0, "", longVar)))
+    check testMatchDotNames(longVar & " = 5", 0, some(newMatches(65, 0, "", longVar)))
+    check testMatchDotNames(" t." & longVar & " = 5", 0, some(newMatches(68, 0, " ", "t." & longVar)))
 
     # These start with a variable but are not valid statements.
-    check testMatchVariable("t. =", 0, some(newMatches(1, 0, "", "", "t")))
-    check testMatchVariable("tt.a =", 0, some(newMatches(2, 0, "", "", "tt")))
-    check testMatchVariable("abc() =", 0, some(newMatches(3, 0, "", "", "abc")))
-    check testMatchVariable("abc", 0, some(newMatches(3, 0, "", "", "abc")))
-    check testMatchVariable("t.1a", 0, some(newMatches(1, 0, "", "", "t")))
+    check testMatchDotNames("t. =", 0, some(newMatches(1, 0, "", "t")))
+    check testMatchDotNames("tt.a =", 0, some(newMatches(5, 0, "", "tt.a")))
+    check testMatchDotNames("abc() =", 0, some(newMatches(3, 0, "", "abc")))
+    check testMatchDotNames("abc", 0, some(newMatches(3, 0, "", "abc")))
+    check testMatchDotNames("t.1a", 0, some(newMatches(1, 0, "", "t")))
     # It matches up to 64 characters.
     let tooLong = "a23456789_123456789_123456789_123456789_123456789_123456789_12345"
-    check testMatchVariable(tooLong, 0, some(newMatches(64, 0, "", "", longVar)))
+    check testMatchDotNames(tooLong, 0, some(newMatches(64, 0, "", longVar)))
 
-    check testMatchVariable(".a =", 0)
-    check testMatchVariable("_a =", 0)
-    check testMatchVariable("*a =", 0)
-    check testMatchVariable("34r =", 0)
-    check testMatchVariable("  2 =", 0)
-    check testMatchVariable(". =", 0)
+    check testMatchDotNames(".a =", 0)
+    check testMatchDotNames("_a =", 0)
+    check testMatchDotNames("*a =", 0)
+    check testMatchDotNames("34r =", 0)
+    check testMatchDotNames("  2 =", 0)
+    check testMatchDotNames(". =", 0)
 
   test "matchEqualSign":
     check testMatchEqualSign("=5", 0, some(newMatches(1, 0, "=")))
@@ -379,3 +379,50 @@ suite "matches.nim":
     check matchO.isSome
     matchO = matchNumberNotCached("asdf", 0)
     check not matchO.isSome
+
+  test "matchDotNames":
+    check testMatchDotNames("t.maxLines = 5", 0, some(newMatches(11, 0, "", "t.maxLines")))
+
+    check testMatchDotNames("a", 0, some(newMatches(1, 0, "", "a")))
+    check testMatchDotNames("a.b", 0, some(newMatches(3, 0, "", "a.b")))
+    check testMatchDotNames("a.b.c", 0, some(newMatches(5, 0, "", "a.b.c")))
+    check testMatchDotNames("a.b.c.d", 0, some(newMatches(7, 0, "", "a.b.c.d")))
+    check testMatchDotNames("a.b.c.d.e", 0, some(newMatches(9, 0, "", "a.b.c.d.e")))
+    check testMatchDotNames("a.b.c.d.e.f", 0, some(newMatches(9, 0, "", "a.b.c.d.e")))
+
+    check testMatchDotNames("a.b.", 0, some(newMatches(3, 0, "", "a.b")))
+    check testMatchDotNames("a..b", 0, some(newMatches(1, 0, "", "a")))
+
+    check testMatchDotNames("  a", 0, some(newMatches(3, 0, "  ", "a")))
+    check testMatchDotNames("  a.bb", 0, some(newMatches(6, 0, "  ", "a.bb")))
+
+    check testMatchDotNames("  a ", 0, some(newMatches(4, 0, "  ", "a")))
+    check testMatchDotNames("  a  ", 0, some(newMatches(5, 0, "  ", "a")))
+    check testMatchDotNames("  a.", 0, some(newMatches(3, 0, "  ", "a")))
+    check testMatchDotNames("  a=", 0, some(newMatches(3, 0, "  ", "a")))
+    check testMatchDotNames(" var = 5", 0, some(newMatches(5, 0, " ", "var")))
+
+    check testMatchDotNames(" s.aZ_4 = b", 0, some(newMatches(8, 0, " ", "s.aZ_4")))
+    check testMatchDotNames(" s.Ab_4 = b", 0, some(newMatches(8, 0, " ", "s.Ab_4")))
+    check testMatchDotNames("a0123456789 = b", 0, some(newMatches(12, 0, "", "a0123456789")))
+
+    let longName = "a23456789_123456789_123456789_123456789_123456789_123456789_1234"
+    let statement = "$1= 333" % [longName]
+    check testMatchDotNames(statement, 0, some(newMatches(64, 0, "", longName)))
+
+    let statement2 = "$1e = 333" % [longName]
+    check testMatchDotNames(statement2, 0, some(newMatches(64, 0, "", longName)))
+
+    let twoVars = "$1.$1" % [longName]
+    check testMatchDotNames(twoVars, 0, some(newMatches(129, 0, "", twoVars)))
+
+  test "matchDotNames no match":
+    check testMatchDotNames("", 0)
+    check testMatchDotNames(" ", 0)
+    check testMatchDotNames("  ", 0)
+    check testMatchDotNames("4", 0)
+    check testMatchDotNames("_", 0)
+    check testMatchDotNames("_a", 0)
+    check testMatchDotNames(".", 0)
+    check testMatchDotNames(".a", 0)
+    check testMatchDotNames(".a.b", 0)

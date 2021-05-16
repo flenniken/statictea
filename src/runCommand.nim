@@ -232,26 +232,6 @@ proc getFunctionValue*(env: var Env, prepostTable:
 
   result = some(ValueAndLength(value: funResult.value, length: pos-start))
 
-proc getVariable*(env: var Env, statement: Statement, variables:
-                  Variables, nameSpace: string, varName: string,
-                  start: Natural): Option[Value] =
-  ## Look up the variable and return its value. Show an error when the
-  ## variable doesn't exists.
-
-  let value0 = getVariable(variables, nameSpace, varName)
-  if not isSome(value0):
-    env.warnStatement(statement, wVariableMissing, start, nameSpace & varName)
-    return
-  result = some(value0.get())
-
-# a = len(name)
-# a = len (name)
-# a = concat(name, " ", asdf)
-# a = concat(upper(name), " ", asdf)
-
-# A function name looks like a variable without the namespace part and
-# it is followed by a (.
-
 proc getVarOrFunctionValue*(env: var Env, prepostTable:
            PrepostTable, statement: Statement,
            start: Natural, variables: Variables): Option[ValueAndLength] =
@@ -261,37 +241,41 @@ proc getVarOrFunctionValue*(env: var Env, prepostTable:
   ## start.
 
   # Get the variable or function name. Match the surrounding white space.
-  let variableO = matchVariable(statement.text, start)
-  assert variableO.isSome
+  let matches0 = matchDotNames(statement.text, start)
+  assert matches0.isSome
+  let matches = matches0.get()
+  let (_, dotNameStr) = matches.get2Groups()
 
-  let variable = variableO.get()
-  let (_, nameSpace, varName) = variable.get3Groups()
-  if nameSpace == "":
-    # We have a variable or a function.
-    let parenthesesO = matchLeftParentheses(statement.text, start+variable.length)
-    if parenthesesO.isSome:
-      # We have a function, run it.
+  # todo: add an optional left parentheses in the matchDotNames procedures.
 
-      var functionO = getFunction(varName)
-      if not isSome(functionO):
-        env.warnStatement(statement, wInvalidFunction, start, varName)
-        return
-      var function = functionO.get()
-      let parentheses = parenthesesO.get()
-      let funValueLengthO = getFunctionValue(env, prepostTable, function, statement,
-                              start+variable.length+parentheses.length, variables)
-      if not isSome(funValueLengthO):
-        return
-      let funValueLength = funValueLengthO.get()
-      return some(ValueAndLength(value: funValueLength.value,
-        length: variable.length+parentheses.length+funValueLength.length))
+  # Look for a function. A function name looks like a variable
+  # followed by a (.
+  let parenthesesO = matchLeftParentheses(statement.text, start+matches.length)
+  if parenthesesO.isSome:
+    # We have a function, run it and return its value.
 
-  # We have a variable, look it up and return its value.  Show a
-  # warning when the variable doesn't exist.
-  let valueO = getVariable(env, statement, variables, nameSpace,
-                           varName, start)
-  if isSome(valueO):
-    result = some(ValueAndLength(value: valueO.get(), length: variable.length))
+    var functionO = getFunction(dotNameStr)
+    if not isSome(functionO):
+      env.warnStatement(statement, wInvalidFunction, start, dotNameStr)
+      return
+    var function = functionO.get()
+    let parentheses = parenthesesO.get()
+    let funValueLengthO = getFunctionValue(env, prepostTable, function, statement,
+                            start+matches.length+parentheses.length, variables)
+    if not isSome(funValueLengthO):
+      return
+    let funValueLength = funValueLengthO.get()
+    result = some(ValueAndLength(value: funValueLength.value,
+      length: matches.length+parentheses.length+funValueLength.length))
+  else:
+    # We have a variable, look it up and return its value.  Show a
+    # warning when the variable doesn't exist.
+    let valueOrWarning = getVariable(variables, dotNameStr)
+    if valueOrWarning.kind == vwWarning:
+      # todo: show the correct error message. 
+      env.warnStatement(statement, wVariableMissing, start, dotNameStr)
+      return
+    result = some(newValueAndLength(valueOrWarning.value, matches.length))
 
 proc getValue(env: var Env, prepostTable: PrepostTable,
               statement: Statement, start: Natural, variables:
@@ -324,23 +308,21 @@ proc getValue(env: var Env, prepostTable: PrepostTable,
   else:
     env.warnStatement(statement, wInvalidRightHandSide, start)
 
-  # let valueAndLength = result.get()
-  # env.warnStatement(statement, wStackTrace, start+valueAndLength.length,  "leave getValue")
-
 proc runStatement*(env: var Env, statement: Statement,
-    prepostTable: PrepostTable, variables: Variables): Option[VariableData] =
-  ## Run one statement. Return the variable namespace, name and value.
+    prepostTable: PrepostTable, variables: var Variables): Option[VariableData] =
+  ## Run one statement and assign a variable. Return the variable dot
+  ## name string and value.
 
-  # Get the variable name. Match the surrounding white space.
-  let variableO = matchVariable(statement.text, 0)
-  if not variableO.isSome:
+  # Get the variable dot name string and match the surrounding white space.
+  let dotNameMatchesO = matchDotNames(statement.text, 0)
+  if not isSome(dotNameMatchesO):
     env.warnStatement(statement, wMissingStatementVar, 0)
     return
-  let variable = variableO.get()
-  let (_, nameSpace, varName) = variable.get3Groups()
+  let dotNameMatches = dotNameMatchesO.get()
+  let (_, dotNameStr) = dotNameMatches.get2Groups()
 
   # Get the equal sign and following whitespace.
-  let equalSignO = matchEqualSign(statement.text, variable.length)
+  let equalSignO = matchEqualSign(statement.text, dotNameMatches.length)
   if not equalSignO.isSome:
     env.warnStatement(statement, wInvalidVariable, 0)
     return
@@ -348,7 +330,7 @@ proc runStatement*(env: var Env, statement: Statement,
 
   # Get the right hand side value.
   let valueAndLengthO = getValue(env, prepostTable, statement,
-                                 variable.length + equalSign.length,
+                                 dotNameMatches.length + equalSign.length,
                                  variables)
   if not valueAndLengthO.isSome:
     return
@@ -356,25 +338,21 @@ proc runStatement*(env: var Env, statement: Statement,
   # Check that there is not any unprocessed text following the value.
   let value = valueAndLengthO.get().value
   let length = valueAndLengthO.get().length
-  var pos = variable.length + equalSign.length + length
+  var pos = dotNameMatches.length + equalSign.length + length
   if pos != statement.text.len:
     env.warnStatement(statement, wTextAfterValue, pos)
     return
 
-  let warningDataPosO = validateVariable(variables, nameSpace, varName, value)
-  if isSome(warningDataPosO):
-    let warningDataPos = warningDataPosO.get()
-    var warningPos: Natural
-    if warningDataPos.warningSide == wsVarName:
-      warningPos = 0
-    else:
-      warningPos = variable.length + equalSign.length
-    let warningData = warningDataPos.warningData
-    env.warnStatement(statement, warningData.warning, warningPos, warningData.p1, warningData.p2)
+  # Assign the variable if possible.
+  let warningDataO = assignVariable(variables, dotNameStr, value)
+  if isSome(warningDataO):
+    let warningData = warningDataO.get()
+    env.warnStatement(statement, warningData.warning, 0, warningData.p1, warningData.p2)
     return
 
-  result = some(newVariableData(nameSpace, varName, value))
-
+  # Return the variable and value for testing.
+  result = some(newVariableData(dotNameStr, value))
+  
 proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
                  seq[LineParts], prepostTable: PrepostTable,
                  variables: var Variables) =
@@ -386,12 +364,9 @@ proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
 
   # Loop over the statements and run each one.
   for statement in yieldStatements(cmdLines, cmdLineParts):
-    # Run the statement and assign the return value to the variable.
-    # When there is a statement error, the statement is skipped.
-    let variableDataO = runStatement(env, statement, prepostTable, variables)
-    if isSome(variableDataO):
-      let vd = variableDataO.get()
-      assignVariable(variables, vd.nameSpace, vd.varName, vd.value)
+    # Run the statement and assign a variable.  When there is a
+    # statement error, the statement is skipped.
+    discard runStatement(env, statement, prepostTable, variables)
 
 when defined(test):
   proc newIntValueAndLengthO*(number: int | int64,

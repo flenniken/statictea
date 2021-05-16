@@ -1,5 +1,6 @@
-## StaticTea functions.  The StaticTea language functions start with
-## "fun".
+## The module contains the StaticTea functions and supporting types.
+## The StaticTea language functions start with "fun", for example,
+## "funCmp" function implements the StaticTea "cmp" function.
 
 import vartypes
 import options
@@ -819,7 +820,7 @@ func funDict*(parameters: seq[Value]): FunResult =
   ## @:  {"a": 5, "b": 33, "c": 0}
   ## @:~~~
 
-  var dict: VarsDict
+  var dict = newVarsDict()
   if parameters.len == 0:
     return newFunResult(newValue(dict))
 
@@ -1129,7 +1130,7 @@ func funPath*(parameters: seq[Value]): FunResult =
     else:
       basename = filename
 
-  var dict: VarsDict
+  var dict = newVarsDict()
   dict["filename"] = newValue(filename)
   dict["basename"] = newValue(basename)
   dict["ext"] = newValue(ext)

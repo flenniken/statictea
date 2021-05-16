@@ -36,7 +36,7 @@ proc testFunction(functionName: string, parameters: seq[Value],
 
 proc testPathGood(path, filename, basename, ext, dir: string, separator = ""): bool =
     var parameters = @[newValue(path)]
-    var dict: VarsDict
+    var dict = newVarsDict()
     dict["filename"] = newValue(filename)
     dict["basename"] = newValue(basename)
     dict["ext"] = newValue(ext)
@@ -75,9 +75,7 @@ proc testReplaceReGood(strs: varargs[string]): bool =
 
 proc testReplaceReGoodList(str: string, list: Value, eString: string): bool =
   let eFunResult = newFunResult(newValue(eString))
-  var parameters: seq[Value]
-  parameters.add(newValue(str))
-  parameters.add(newValue(list))
+  var parameters = @[newValue(str), list]
   result = testFunction("replaceRe", parameters, eFunResult = eFunResult)
 
 suite "runFunction.nim":
@@ -91,12 +89,12 @@ suite "runFunction.nim":
     check not isSome(function)
 
   test "funConcat 2":
-    var parameters = @[newValue("abc"), newValue(" def")]
+    var parameters = newValue(["abc", " def"]).listv
     let eFunResult = newFunResult(newValue("abc def"))
     check testFunction("concat", parameters, eFunResult)
 
   test "funConcat 3":
-    var parameters = @[newValue("abc"), newValue(""), newValue("def")]
+    var parameters = newValue(["abc","", "def"]).listv
     let eFunResult = newFunResult(newValue("abcdef"))
     check testFunction("concat", parameters, eFunResult)
 
@@ -116,12 +114,12 @@ suite "runFunction.nim":
     check testFunction("concat", parameters, eFunResult)
 
   test "runFunction":
-    let parameters = @[newValue("Hello"), newValue(" World")]
+    var parameters = newValue(["Hello", " World"]).listv
     let eFunResult = newFunResult(newValue("Hello World"))
     check testFunction("concat", parameters, eFunResult)
 
   test "len string":
-    var parameters = @[newValue("abc")]
+    var parameters = newValue(["abc"]).listv
     let eFunResult = newFunResult(newValue(3))
     check testFunction("len", parameters, eFunResult)
 
@@ -129,22 +127,25 @@ suite "runFunction.nim":
     # The byte length is different than the number of unicode characters.
     let str = "añyóng"
     check str.len == 8
-    var parameters = @[newValue(str)]
+    var parameters = newValue([str]).listv
     let eFunResult = newFunResult(newValue(6))
     check testFunction("len", parameters, eFunResult)
 
   test "len list":
-    var parameters = @[newValue([5, 3])]
+    var list = newValue([5, 3]).listv
+    var parameters = @[newValue(list)]
     let eFunResult = newFunResult(newValue(2))
     check testFunction("len", parameters, eFunResult)
 
   test "len dict":
-    var parameters = @[newValue([("a", 5), ("b", 3)])]
+    var dict = newValue([("a", 5), ("b", 5)]).dictv
+    var parameters = @[newValue(dict)]
     let eFunResult = newFunResult(newValue(2))
     check testFunction("len", parameters, eFunResult)
 
   test "len strings":
-    var parameters = @[newValue(["5", "3", "hi"])]
+    var list = newValue(["5", "3", "hi"])
+    var parameters = @[newValue(list)]
     let eFunResult = newFunResult(newValue(3))
     check testFunction("len", parameters, eFunResult)
 
@@ -164,7 +165,7 @@ suite "runFunction.nim":
     check testFunction("len", parameters, eFunResult)
 
   test "len 2":
-    var parameters = @[newValue(3), newValue(2)]
+    var parameters = newValue([3, 2]).listv
     let eFunResult = newFunResultWarn(wOneParameter)
     check testFunction("len", parameters, eFunResult)
 
@@ -230,7 +231,7 @@ suite "runFunction.nim":
     check testFunction("get", parameters, eFunResult)
 
   test "get wrong first parameter":
-    var parameters = @[newValue(2), newValue(3.5)]
+    var parameters = newValue([2, 3]).listv
     let eFunResult = newFunResultWarn(wExpectedListOrDict)
     check testFunction("get", parameters, eFunResult)
 
@@ -401,7 +402,7 @@ suite "runFunction.nim":
     check testFunction("case", parameters, eFunResult = eFunResult)
 
   test "case string else":
-    var parameters = @[newValue("test"), newValue("asdf"), newValue("value"), newValue("else")]
+    var parameters = newValue(["test", "asdf", "value", "else"]).listv
     let eFunResult = newFunResult(newValue("else"))
     check testFunction("case", parameters, eFunResult = eFunResult)
 
@@ -439,12 +440,19 @@ suite "runFunction.nim":
     check testFunction("case", parameters, eFunResult)
 
   test "case no match with no else":
-    var parameters = @[newValue(5), newValue(1), newValue("five")]
+    var parameters = @[
+      newValue(5),
+      newValue(1), newValue("five")
+    ]
     let eFunResult = newFunResultWarn(wMissingElse)
     check testFunction("case", parameters, eFunResult)
 
   test "case no match with no else 2":
-    var parameters = @[newValue(5), newValue(1), newValue("five"), newValue(2), newValue("asdf")]
+    var parameters = @[
+      newValue(5),
+      newValue(1), newValue("five"),
+      newValue(2), newValue("asdf"),
+    ]
     let eFunResult = newFunResultWarn(wMissingElse)
     check testFunction("case", parameters, eFunResult)
 
@@ -613,12 +621,12 @@ suite "runFunction.nim":
     check testFunction("find", parameters, eFunResult = eFunResult)
 
   test "find missing":
-    var parameters = @[newValue("Tea time at 4:00."), newValue("party"), newValue("3:00")]
+    var parameters = newValue(["Tea time at 4:00.", "party", "3:00"]).listv
     let eFunResult = newFunResult(newValue("3:00"))
     check testFunction("find", parameters, eFunResult = eFunResult)
 
   test "find bigger":
-    var parameters = @[newValue("big"), newValue("bigger"), newValue("smaller")]
+    var parameters = newValue(["big", "bigger", "smaller"]).listv
     let eFunResult = newFunResult(newValue("smaller"))
     check testFunction("find", parameters, eFunResult = eFunResult)
 
@@ -754,23 +762,19 @@ suite "runFunction.nim":
 
   test "dict":
     var parameters: seq[Value] = @[]
-    var dict: VarsDict
-    let eFunResult = newFunResult(newValue(dict))
+    let eFunResult = newFunResult(newEmtpyDictValue())
     check testFunction("dict", parameters, eFunResult = eFunResult)
 
   test "dict 1 item":
     var parameters = @[newValue("a"), newValue(5)]
-    var dict: VarsDict
-    dict["a"] = newValue(5)
-    let eFunResult = newFunResult(newValue(dict))
+    var dict = newValue([("a", 5)])
+    let eFunResult = newFunResult(dict)
     check testFunction("dict", parameters, eFunResult = eFunResult)
 
   test "dict 2 items":
-    var parameters = @[newValue("a"), newValue(5), newValue("b"), newValue("str")]
-    var dict: VarsDict
-    dict["a"] = newValue(5)
-    dict["b"] = newValue("str")
-    let eFunResult = newFunResult(newValue(dict))
+    var parameters = @[newValue("a"), newValue(5), newValue("b"), newValue(3)]
+    let dict = newValue([("a", 5), ("b", 3)])
+    let eFunResult = newFunResult(dict)
     check testFunction("dict", parameters, eFunResult = eFunResult)
 
   test "dict 1 parameter":
@@ -833,7 +837,6 @@ suite "runFunction.nim":
     check testReplaceGood("123", 0, 1, "", "23")
     check testReplaceGood("123", 0, 2, "", "3")
     check testReplaceGood("123", 0, 3, "", "")
-
 
   test "replace empty str":
     var parameters: seq[Value] = @[newValue(""),
@@ -943,8 +946,9 @@ suite "runFunction.nim":
     check testReplaceReGood(textMd, "@::", ":", r"@\|", "[", r"\|@", "]", "[ ]*@:", "\n", eTextMd)
 
   test "replaceRe good list":
-    check testReplaceReGoodList("abc123abc", newVarList("abc", "456"), "456123456")
-    check testReplaceReGoodList("abc123abc", newVarList("a", "x", "b", "y", "c", "z"), "xyz123xyz")
+    check testReplaceReGoodList("abc123abc", newValue(["abc", "456"]), "456123456")
+    check testReplaceReGoodList("abc123abc", newValue(["a", "x", "b", "y", "c", "z"]),
+                                "xyz123xyz")
 
   test "replaceRe not enough parameters":
     var parameters: seq[Value] = @[newValue("Earl Grey")]
@@ -957,7 +961,7 @@ suite "runFunction.nim":
     check testFunction("replaceRe", parameters, eFunResult = eFunResult)
 
   test "replaceRe list wrong number of parameters":
-    var parameters: seq[Value] = @[newValue("Earl Grey"), newVarList("a", "b", "c")]
+    var parameters: seq[Value] = @[newValue("Earl Grey"), newValue(["a", "b", "c"])]
     let eFunResult = newFunResultWarn(wMissingReplacement, 0)
     check testFunction("replaceRe", parameters, eFunResult = eFunResult)
 
