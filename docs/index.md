@@ -2,7 +2,7 @@
 
 # StaticTea Module Index
 
-* [runFunction.nim](runFunction.md) &mdash; StaticTea functions.
+* [runFunction.nim](runFunction.md) &mdash; This module contains the StaticTea functions and supporting types.
 * [parseNumber.nim](parseNumber.md) &mdash; Parse an int or float number string.
 * [regexes.nim](regexes.md) &mdash; Perl regular expression matching.
 * [parseCmdLine.nim](parseCmdLine.md) &mdash; Parse a template command line.

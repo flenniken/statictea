@@ -1,5 +1,5 @@
-## The module contains the StaticTea functions and supporting types.
-## The StaticTea language functions start with "fun", for example,
+## This module contains the StaticTea functions and supporting types.
+## The StaticTea language functions start with "fun", for example, the
 ## "funCmp" function implements the StaticTea "cmp" function.
 
 import vartypes

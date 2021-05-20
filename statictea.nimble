@@ -182,9 +182,9 @@ awk '{printf "include %s\n", $0}' > tests/testall.nim
   # Run the command line tests.
   exec "src/test"
 
-task test, "\tRun tests; specify part of test name":
-  ## Run one or more tests.  You specify part of the test name and all
-  ## tests that match are run. If you don't specify a name, all are
+task test, "\tRun tests; specify part of test filename.":
+  ## Run one or more tests.  You specify part of the test filename and all
+  ## files that match are run. If you don't specify a name, all are
   ## run. Task "t" is faster to run them all.
   let count = system.paramCount()+1
   # The name is either part of a name or "test" when not
@@ -200,7 +200,7 @@ task test, "\tRun tests; specify part of test name":
 task b, "\tBuild the statictea exe.":
   build_release()
 
-task docs, "\tCreate markdown docs; specify part of source file name.":
+task docs, "\tCreate markdown docs; specify part of source filename.":
   let count = system.paramCount()+1
   # Name is part of a source file name, or "docs" when not specified.
   let name = system.paramStr(count-1)
@@ -228,87 +228,52 @@ task docs, "\tCreate markdown docs; specify part of source file name.":
       # echo cmd
       exec cmd
       exec "rm " & sharedFilename
+      echo "Generated docs/$1" % [mdName]
 
-task docsre, "\tCreate reStructuredtext docs; specify part of source file name.":
-  if showHtml and not isPyEnvActive():
-    echo "Run the pythonenv task to setup the python environment."
-    # The python environment is used to make html files so you can
-    # proof the documentation before committing.
-    return
-  let count = system.paramCount()+1
-  # Name is part of a source file name, or "docs" when not specified.
-  let name = system.paramStr(count-1)
-  let filenames = get_source_filenames()
-  for filename in filenames:
-    if name in filename or name == "docs":
-      var jsonName = changeFileExt(filename, "json")
-      var cmd = "nim jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
-      echo cmd
-      echo ""
-      exec cmd
-      echo ""
-      var rstName = changeFileExt(filename, "rst")
-
-      # Add useDocUtils to the shared.json file for use by the template.
-      let sharedJson = """{
-"useDocUtils": $1,
-"newline": "\n"
-}
-""" % [$useDocUtils]
-      let sharedFilename = "docs/shared.json"
-      writeFile(sharedFilename, sharedJson)
-
-      cmd = "bin/statictea -s=docs/json/$1 -j=docs/shared.json -t=docs/template.rst -r=docs/$2" % [
-        jsonName, rstName]
-      echo cmd
-      exec cmd
-      exec "rm " & sharedFilename
-      # discard tryRemoveFile(sharedFilename)
-      if showHtml:
-        var htmlName = changeFileExt(filename, "html")
-        if useDocUtils:
-          var dirName = getDirName(hostOS)
-          exec "rm -f docs/html/$1" % htmlName
-          exec "env/$1/staticteaenv/bin/rst2html5.py docs/$2 docs/html/$3 | less" % [
-            dirName, rstName, htmlName]
-        else:
-          cmd = "nim rst2html --hints:off --out:docs/html/$1 docs/$2" % [htmlName, rstName]
-        echo cmd
-        exec cmd
-        open_in_browser(r"docs/html/$1" % htmlName)
-
-task json, "\tDisplay doc json for a source file.":
+task json, "\tDisplay nim's doc json for a source file; specify part of name.":
   let count = system.paramCount()+1
   let name = system.paramStr(count-1)
   let filenames = get_source_filenames()
   for filename in filenames:
     if name in filename:
       var jsonName = changeFileExt(filename, "json")
-      var cmd = "nim jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
-      echo cmd
+      var cmd = "nim --hints:off jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
+      # echo cmd
       exec cmd
-      exec "cat docs/json/$1 | jq | less" % [jsonName]
+      let path = "docs/json/$1" % [jsonName]
+      let text = slurp(path)
+      for line in text.splitLines():
+        echo line
+      # echo "Generated docs/json/$1" % [jsonName]
+      # echo "jq < docs/json/$1" % [jsonName]
+      # echo "less docs/json/$1" % [jsonName]
 
-task jsonix, "\tDisplay the source doc json for the module index.":
+task jsonix, "\tDisplay the module index json for the source files.":
   var json = indexJson()
   writeFile("docs/index.json", json)
-  # exec "jq < docs/index.json"
-  exec "less docs/index.json"
+  for line in json.splitLines():
+    echo line
 
 task docsix, "\tDisplay the doc comment index to the source files":
+
+  # Create the index json file.
+  echo "Create index json."
   var json = indexJson()
   var jsonFilename = "docs/index.json"
   writeFile(jsonFilename, json)
-  var cmd = "bin/statictea -s=docs/index.json -t=docs/indexTemplate.md -r=docs/index.md"
-  echo cmd
+
+  # Process the index template and create the index.md file.
+  echo "Create the index.md file"
+  var cmd = "bin/statictea -s=$1 -t=docs/indexTemplate.md -r=docs/index.md" % [jsonFilename]
+  # echo cmd
   exec cmd
-  exec "rm " & jsonFilename
-  # discard tryRemoveFile(jsonFilename)
+
+  rmFile(jsonFilename)
+  echo "Generated docs/index.md"
   echo """
-Launch grip if it's not running. Then switch to your browser to view the file at:
+The grip app is good for viewing gitlab markdown.
 
 grip --quiet docs/index.md &
-
 http://localhost:6419/docs/index.md
 """
 

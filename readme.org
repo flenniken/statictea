@@ -1283,6 +1283,7 @@ Built in Prefixes:
 - html: <!--$ and -->
 - html: &lt;!--$ and --&gt; for textarea elements
 - bash: #$
+- org mode: # $
 - config files: ;$
 - C++: //$
 - C language: ​/\star$ and \star​/
@@ -1294,14 +1295,17 @@ prepost values, the defaults no longer exist so you have control
 of which prefixes get used.
 
 You specify the prepost option with the prefix separated from
-the postfix with one space and the postfix is optional.
+the postfix with a comma and the postfix is optional.
+
+todo: change prefix postfix separator from space to comma.
 
 examples:
 
 #+BEGIN_SRC
---prepost="@$ |"
---prepost="[comment$ ]"
---prepost="#[$ ]#"
+--prepost="@$,|"
+--prepost="[comment$,]"
+--prepost="#[$,]#"
+--prepost="# $,"
 #+END_SRC
 
 [[#contents][茶]]

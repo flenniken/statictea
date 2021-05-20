@@ -1,0 +1,80 @@
+# $ # StaticTea template for generating the function doc section for the readme.
+
+* good morning
+
+# $ #
+# $ # Define replacement patterns to remove formatting from the descriptions.
+# $ block
+# $ : t.maxLines = 20
+# $ : g.patterns = list( +
+# $ :   "@@", '', +
+# $ :   "@\|", '[', +
+# $ :   "\|@", ']', +
+# $ :   "[ ]*@:", h.newline, +
+# $ :   "&quot;", '"', +
+# $ :   "&gt;", '>', +
+# $ :   "&lt;", '<', +
+# $ :   "&amp;", '&')
+# $ endblock
+# $ #
+* Functions
+:PROPERTIES:
+:CUSTOM_ID: functions
+:ORDERED:  t
+:END:
+
+Functions allow you to format variables for presentation.  They
+return a value that you assign to a variable or pass to another
+function.
+
+The function sections below were extracted from the nim source
+code with a StaticTea template.
+
+New functions get added over time. the function documentation
+tells which version it appears so you know which version of
+statictea to require.
+
+List of functions:
+
+# $ # Generate the function index.
+# $ nextline
+# $ : t.repeat = len(s.entries)
+# $ : entry = get(s.entries, t.row, dict())
+# $ : t.output = case(entry.type, +
+# $ :   "skFunc", "result", +
+# $ :   "skType", "skip", +
+# $ :   "skConst", "skip", +
+# $ :   "skMacro", "skip", +
+# $ :   "")
+# $ : desc = entry.description
+# $ : shortFuncDesc = substr(desc, 0, add(find(desc, '.', -1), 1))
+- [[#{funcName][funcName()]] -- {shortFuncDesc}
+
+# $ # Generate the function sections.
+# $ block
+# $ : t.repeat = len(s.entries)
+# $ : entry = get(s.entries, t.row)
+# $ : t.output = case(entry.type, +
+# $ :   "skFunc", "result", +
+# $ :   "skType", "skip", +
+# $ :   "skConst", "skip", +
+# $ :   "skMacro", "skip", +
+# $ :   "")
+# $ : name = entry.name
+# $ : description = replaceRe(entry.description, g.patterns)
+[[#contents][茶]]
+
+** {funcName}()
+:PROPERTIES:
+:CUSTOM_ID: {funcName}
+:END:
+
+{description}
+
+# $ endblock
+
+# $ # todo: Change the doc comments so we can mark the example sections like
+# $ # org mode supports.
+# $ # #+BEGIN_SRC
+# $ # num = add(t.row(), 1)
+# $ # #+END_SRC
