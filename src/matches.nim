@@ -9,13 +9,13 @@ import options
 const
   predefinedPrepost: array[7, Prepost] = [
     ## The predefined prefixes and postfixes.
-    ("<!--$", "-->"),
-    ("#$", ""),
-    (";$", ""),
-    ("//$", ""),
-    ("/*$", "*/"),
-    ("&lt;!--$", "--&gt;"),
-    ("$$", ""),
+    newPrepost("<!--$", "-->"),
+    newPrepost("#$", ""),
+    newPrepost(";$", ""),
+    newPrepost("//$", ""),
+    newPrepost("/*$", "*/"),
+    newPrepost("&lt;!--$", "--&gt;"),
+    newPrepost("$$", ""),
   ]
 
   commands: array[7, string] = [
@@ -48,8 +48,8 @@ proc makeDefaultPrepostTable*(): PrepostTable =
   ## Return the default ordered table that maps prefixes to postfixes.
   result = initOrderedTable[string, string]()
   for prepost in predefinedPrepost:
-    assert prepost.pre != ""
-    result[prepost.pre] = prepost.post
+    assert prepost.prefix != ""
+    result[prepost.prefix] = prepost.postfix
 
 proc makeUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
   ## Return the user's ordered table that maps prefixes to
@@ -60,8 +60,8 @@ proc makeUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
   for prepost in prepostList:
     # The prefix and postfix values have been validated by the command line
     # processing procedure parsePrepost.
-    assert prepost.pre != ""
-    result[prepost.pre] = prepost.post
+    assert prepost.prefix != ""
+    result[prepost.prefix] = prepost.postfix
 
 proc matchPrefix*(line: string, prepostTable: PrepostTable, start: Natural = 0): Option[Matches] =
   ## Match lines that start with one of the prefixes in the given
@@ -154,13 +154,13 @@ proc matchNumber*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a number and the optional trailing whitespace. Return the
   ## optional decimal point that tells whether the number is a float
   ## or integer.
-  matchPatternCached(line, numberPattern, start)
+  result = matchPatternCached(line, numberPattern, start)
 
 func matchNumberNotCached*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a number and the optional trailing whitespace. Return the
   ## optional decimal point that tells whether the number is a float
   ## or integer.
-  matchPattern(line, numberPattern, start)
+  result = matchPattern(line, numberPattern, start)
 
 proc matchString*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a string inside either single or double quotes.  The
@@ -187,11 +187,11 @@ proc matchFileLine*(line: string, start: Natural = 0): Option[Matches] =
 
 proc matchVersion*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a StaticTea version number.
-  matchPatternCached(line, versionPattern, start)
+  result = matchPatternCached(line, versionPattern, start)
 
 func matchVersionNotCached*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a StaticTea version number.
-  matchPattern(line, versionPattern, start)
+  result = matchPattern(line, versionPattern, start)
 
 proc matchDotNames*(line: string, start: Natural = 0): Option[Matches] =
   ## Matches variable dot names and surrounding whitespace. Return the

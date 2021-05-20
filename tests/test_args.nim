@@ -21,14 +21,14 @@ logFilename: """""
     args.help = true
     args.serverList = @["one.json", "two.json"]
     args.resultFilename = "result.html"
-    args.prepostList = @[("#", "@"), ("begin", "end")]
+    args.prepostList = @[newPrepost("#", "@"), newPrepost("begin", "end")]
     let expected = """
 Args:
 help=true, version=false, update=false, log=false
 serverList: [one.json, two.json]
 sharedList: []
 templateList: []
-prepostList: [(pre: "#", post: "@"), (pre: "begin", post: "end")]
+prepostList: [(prefix: "#", postfix: "@"), (prefix: "begin", postfix: "end")]
 resultFilename: "result.html"
 logFilename: """""
     check $args == expected

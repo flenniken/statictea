@@ -1294,18 +1294,20 @@ prepost option one or more times. When you specify your own
 prepost values, the defaults no longer exist so you have control
 of which prefixes get used.
 
-You specify the prepost option with the prefix separated from
-the postfix with a comma and the postfix is optional.
-
-todo: change prefix postfix separator from space to comma.
+You specify the prepost option with the prefix separated from the
+postfix with a comma and the postfix is optional,
+"prefix[,postfix]". A prefix and postfix contain 1 to 20 ascii
+characters including spaces but without control characters or
+commas.
 
 examples:
 
 #+BEGIN_SRC
+--prepost="pre$,post"
+--prepost="a$,b"
 --prepost="@$,|"
---prepost="[comment$,]"
 --prepost="#[$,]#"
---prepost="# $,"
+--prepost="# $"
 #+END_SRC
 
 [[#contents][茶]]
@@ -1411,7 +1413,6 @@ Testing:
 - [[docs/runFunction.md#user-content-a8][cmp()]] -- spaceship compare function <=>
 - [[docs/runFunction.md#user-content-a11][get()]] -- get an element from a list or dictionary
 - [[docs/runFunction.md#user-content-a12][if()]] -- handles two conditions
-
 
 [[#contents][茶]]
 

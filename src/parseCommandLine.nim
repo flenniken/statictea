@@ -2,10 +2,11 @@
 
 import parseopt
 import tpub
-import re
 import args
 import warnings
 import env
+import options
+import regexes
 when defined(test):
   import strutils
 
@@ -42,32 +43,19 @@ when defined(test):
   func `$`(prepostList: seq[Prepost]): string {.tpub.} =
     var parts: seq[string]
     for pp in prepostList:
-      parts.add("($1, $2)" % [pp.pre, pp.post])
+      parts.add("($1, $2)" % [pp.prefix, pp.postfix])
     result = parts.join(", ")
 
-# \x21-\x7F is ascii without spaces or control characters.
-let prepostRegex = re"^\s*([\x21-\x7F]+)\s*([\x21-\x7F]*)\s*(.*)$"
-
-proc parsePrepost(str: string): (Prepost, string) {.tpub.} =
-  ## Parse a prepost string. Return the Prepost object and another
-  ## string with any extra unmatched characters.
-  ## @:
-  ## @:.. code::
-  ## @:
-  ## @:  ""             => ("", ""), ""
-  ## @:  "<--$"         => ("<--$", ""), ""
-  ## @:  "<--$ -->"     => ("<--$", "-->"), ""
-  ## @:  "<--$ --> abc" => ("<--$", "-->"), "abc"
-
-  var matches: array[3, string]
-  if match(str, prepostRegex, matches):
-    let prefix = matches[0]
-    let postfix = matches[1]
-    let extra = matches[2]
-    result = ((prefix, postfix), extra)
-  else:
-    result = (("", ""), "")
-
+proc parsePrepost(str: string): Option[Prepost] {.tpub.} =
+  ## Match a prefix followed by an optional postfix, prefix[,postfix].
+  ## Each part contains 1 to 20 ascii characters including spaces but
+  ## without control characters or commas.
+  let pattern = "([\x20-\x2b\x2d-\x7F]{1,20})(?:,([\x20-\x2b\x2d-\x7F]{1,20})){0,1}$"
+  let matchesO = matchPattern(str, pattern)
+  if matchesO.isSome:
+    let matches = matchesO.get()
+    let (prefix, postfix) = matches.get2Groups()
+    result = some(newPrepost(prefix, postfix))
 
 proc handleWord(env: var Env, switch: string, word: string, value: string,
     help: var bool, version: var bool, update: var bool, log: var bool,
@@ -105,13 +93,11 @@ proc handleWord(env: var Env, switch: string, word: string, value: string,
     if value == "":
       env.warn(0, wNoPrepostValue, $switch)
     else:
-      let (prepost, extra) = parsePrepost(value)
-      if extra != "":
-        env.warn(0, wSkippingExtraPrepost, extra)
-      if prepost.pre == "":
+      let prepostO = parsePrepost(value)
+      if not prepostO.isSome:
         env.warn(0, wInvalidPrepost, value)
       else:
-        prepostList.add(prepost)
+        prepostList.add(prepostO.get())
   else:
     env.warn(0, wUnknownSwitch, switch)
 

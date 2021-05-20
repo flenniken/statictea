@@ -4,6 +4,13 @@ import unittest
 import args
 import parseCommandLine
 import env
+import options
+import strutils
+
+proc newStrFromBuffer(buffer: openArray[uint8]): string =
+  result = newStringOfCap(buffer.len)
+  for ix in 0 ..< buffer.len:
+    result.add((char)buffer[ix])
 
 proc tpcl(
     cmdLine: string,
@@ -49,6 +56,24 @@ proc tpcl(
   if not expectedItems("prepostList", args.prepostList, prepostList):
     result = false
 
+proc testParsePrepostGood(str: string, ePrefix: string, ePostfix: string = ""): bool =
+  let prepostO = parsePrepost(str)
+  if not isSome(prepostO):
+    echo "'$1' is not a valid prepost." % str
+    return false
+  result = true
+  let prepost = prepostO.get()
+  if not expectedItem("prefix", prepost.prefix, ePrefix):
+    result = false
+  if not expectedItem("postfix", prepost.postfix, ePostfix):
+    result = false
+
+proc testParsePrepostBad(str: string): bool =
+  let prepostO = parsePrepost(str)
+  if isSome(prepostO):
+    echo "'$1' is a valid prepost." % str
+    return false
+  result = true
 
 suite "parseCommandLine":
 
@@ -72,32 +97,40 @@ suite "parseCommandLine":
   test "prepost string representation":
     var prepostList: seq[Prepost]
 
-    prepostList = @[("#$", "")]
+    prepostList = @[newPrepost("#$", "")]
     check($prepostList == "(#$, )")
 
-    prepostList = @[("<--$", "-->")]
+    prepostList = @[newPrepost("<--$", "-->")]
     check($prepostList == "(<--$, -->)")
 
-    prepostList = @[("<--$", "-->"), ("#$", "")]
+    prepostList = @[newPrepost("<--$", "-->"), newPrepost("#$", "")]
     check($prepostList == "(<--$, -->), (#$, )")
 
   test "parsePrepost":
-    check(parsePrepost("") == (("", ""), ""))
-    check(parsePrepost("<--$") == (("<--$", ""), ""))
-    check(parsePrepost("<--$ -->") == (("<--$", "-->"), ""))
-    check(parsePrepost("<--$ --> extra") == (("<--$", "-->"), "extra"))
-    check(parsePrepost("<--$ -->   extra  ") == (("<--$", "-->"), "extra  "))
-    check(parsePrepost("a") == (("a", ""), ""))
-    check(parsePrepost("a b") == (("a", "b"), ""))
-    check(parsePrepost("a b c") == (("a", "b"), "c"))
-    check(parsePrepost("   a b") == (("a", "b"), ""))
-    check(parsePrepost("   a  ") == (("a", ""), ""))
-    check(parsePrepost("     ") == (("", ""), ""))
-    check(parsePrepost("a\n b\n") == (("a", "b"), ""))
-    check(parsePrepost("nextline block") == (("nextline", "block"), ""))
-    check(parsePrepost("\x19a b") == (("", ""), ""))
-    check(parsePrepost("a b\x00y") == (("a", "b"), "\x00y"))
-    check(parsePrepost("a \x00y") == (("a", ""), "\x00y"))
+    check testParsePrepostGood("a,b", "a", ePostfix = "b")
+    check testParsePrepostGood("a,b", "a", "b")
+    check testParsePrepostGood("a", "a", "")
+    check testParsePrepostGood("<--$,-->", "<--$", "-->")
+    check testParsePrepostGood("$$", "$$", "")
+    check testParsePrepostGood("1234567890123456789$,2234567890123456789$",
+                               "1234567890123456789$", "2234567890123456789$")
+    check testParsePrepostGood("# ", "# ", "")
+    check testParsePrepostGood(" ", " ", "")
+    check testParsePrepostGood("  ", "  ", "")
+    check testParsePrepostGood("   ", "   ", "")
+    check testParsePrepostGood("   ,   ", "   ", "   ")
+
+  test "testParsePrepostBad":
+    check testParsePrepostBad("")
+    check testParsePrepostBad(",")
+    check testParsePrepostBad("a,")
+    check testParsePrepostBad(",asdf")
+    check testParsePrepostBad("a,b,")
+    check testParsePrepostBad("123456789 123456789 1,b")
+    check testParsePrepostBad("b,123456789 123456789 1")
+    check testParsePrepostBad("añyóng")
+    check testParsePrepostBad(newStrFromBuffer([0x08u8, 0x12]))
+    check testParsePrepostBad(newStrFromBuffer([0x31u8, 0x2c, 0x12]))
 
   test "parseCommandLine-v":
     check tpcl("-v", version=true)
@@ -159,7 +192,7 @@ suite "parseCommandLine":
   #   check tpcl("-r=\"name with spaces result.html\"", resultFilename = "name with spaces result.html")
 
   test "parseCommandLine-prepost":
-    check tpcl("--prepost=<--$", prepostList = @[("<--$", "")])
+    check tpcl("--prepost=<--$", prepostList = @[newPrepost("<--$", "")])
 
   # Test some error cases.
 

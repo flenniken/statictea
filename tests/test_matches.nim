@@ -6,6 +6,7 @@ import options
 import regexes
 import env
 import strutils
+import args
 
 proc testMatchCommand(line: string, start: Natural = 0,
     eMatchesO: Option[Matches] = none(Matches)): bool =
@@ -146,14 +147,14 @@ suite "matches.nim":
     check testMatchPrefix("<--$ nextline -->", 0)
 
   test "makeUserPrepostTable user prefix":
-    var prepostList = @[("abc", "def")]
+    var prepostList = @[newPrepost("abc", "def")]
     var prepostTable = makeUserPrepostTable(prepostList)
     check prepostTable.len == 1
     check prepostTable["abc"] == "def"
 
   test "long prefix":
     let prefix = "this is a very long prefix nextline post"
-    var prepostList = @[(prefix, "post")]
+    var prepostList = @[newPrepost(prefix, "post")]
     var prepostTable = makeUserPrepostTable(prepostList)
     check prepostTable.len == 1
     check prepostTable[prefix] == "post"
