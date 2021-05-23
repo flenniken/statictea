@@ -1049,3 +1049,53 @@ suite "runFunction.nim":
     var parameters: seq[Value] = @[newValue(2)]
     let eFunResult = newFunResultWarn(wExpectedString, 0)
     check testFunction("lower", parameters, eFunResult = eFunResult)
+
+  test "keys empty":
+    let dictValue = newEmtpyDictValue()
+    let listValue = newEmptyListValue()
+    check testFunction("keys", @[dictValue], newFunResult(listValue))
+
+  test "keys one":
+    let dictValue = newValue([("a", 1)])
+    let listValue = newValue(["a"])
+    check testFunction("keys", @[dictValue], newFunResult(listValue))
+
+  test "keys three":
+    let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
+    let listValue = newValue(["a", "b", "c"])
+    check testFunction("keys", @[dictValue], newFunResult(listValue))
+
+  test "keys: wrong number of parameters":
+    var parameters: seq[Value] = @[]
+    let eFunResult = newFunResultWarn(wOneParameter, 0)
+    check testFunction("keys", parameters, eFunResult = eFunResult)
+
+  test "keys: wrong kind of parameter":
+    var parameters: seq[Value] = @[newValue(2)]
+    let eFunResult = newFunResultWarn(wExpectedDictionary, 0)
+    check testFunction("keys", parameters, eFunResult = eFunResult)
+
+  test "values empty":
+    let dictValue = newEmtpyDictValue()
+    let listValue = newEmptyListValue()
+    check testFunction("values", @[dictValue], newFunResult(listValue))
+
+  test "values one":
+    let dictValue = newValue([("a", 1)])
+    let listValue = newValue([1])
+    check testFunction("values", @[dictValue], newFunResult(listValue))
+
+  test "values three":
+    let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
+    let listValue = newValue([1, 2, 3])
+    check testFunction("values", @[dictValue], newFunResult(listValue))
+
+  test "values: wrong number of parameters":
+    var parameters: seq[Value] = @[]
+    let eFunResult = newFunResultWarn(wOneParameter, 0)
+    check testFunction("values", parameters, eFunResult = eFunResult)
+
+  test "values: wrong kind of parameter":
+    var parameters: seq[Value] = @[newValue(2)]
+    let eFunResult = newFunResultWarn(wExpectedDictionary, 0)
+    check testFunction("values", parameters, eFunResult = eFunResult)

@@ -109,12 +109,14 @@ func funCmp*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:* p1: number
   ## @:* p2: number
+  ## @:* return: -1, 0, 1
   ## @:
   ## @:Compare strings:
   ## @:
   ## @:* p1: string
   ## @:* p2: string
   ## @:* p3: optional: 1 for case insensitive
+  ## @:* return: -1, 0, 1
   ## @:
   ## @:Examples:
   ## @:
@@ -162,6 +164,7 @@ func funConcat*(parameters: seq[Value]): FunResult =
   ## @:* p2: string
   ## @:* ...
   ## @:* pn: string
+  ## @:* return: string
   ## @:
   ## @:Examples:
   ## @:
@@ -187,6 +190,7 @@ func funLen*(parameters: seq[Value]): FunResult =
   ## elements in a dictionary.
   ## @:
   ## @:* p1: string, list or dict
+  ## @:* return: int
   ## @:
   ## @:Examples:
   ## @:
@@ -232,6 +236,7 @@ func funGet*(parameters: seq[Value]): FunResult =
   ## @:* p1: list to use
   ## @:* p2: index of item in the list
   ## @:* p3: optional default value returned when index is too big
+  ## @:* return: any value
   ## @:
   ## @:Examples:
   ## @:
@@ -283,6 +288,7 @@ func funIf*(parameters: seq[Value]): FunResult =
   ## @:* p1: integer condition
   ## @:* p2: true case: the value returned when condition is 1
   ## @:* p3: else case: the value returned when condition is not 1.
+  ## @:* return: any value
   ## @:
   ## @:Examples:
   ## @:
@@ -318,6 +324,7 @@ func funAdd*(parameters: seq[Value]): FunResult =
   ## @:* p2: int
   ## @:* ...
   ## @:* pn: int
+  ## @:* return: int
   ## @:
   ## @:Float case:
   ## @:
@@ -325,6 +332,7 @@ func funAdd*(parameters: seq[Value]): FunResult =
   ## @:* p2: float
   ## @:* ...
   ## @:* pn: float
+  ## @:* return: float
   ## @:
   ## @:Examples:
   ## @:
@@ -370,6 +378,7 @@ func funExists*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:* p1: dictionary
   ## @:* p2: string: variable name (key name)
+  ## @:* return: 0 or 1
   ## @:
   ## @:Examples:
   ## @:
@@ -420,6 +429,7 @@ func funCase*(parameters: seq[Value]): FunResult =
   ## @:* pn-2: the last case condition
   ## @:* pn-1: the last case value
   ## @:* pn: the optional "else" value returned when nothing matches
+  ## @:* return: any value
   ## @:
   ## @:Examples:
   ## @:
@@ -501,6 +511,7 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:* p1: version number string
   ## @:* p2: version number string
+  ## @:* return: -1, 0, 1
   ## @:
   ## @:Examples:
   ## @:
@@ -542,6 +553,7 @@ func funFloat*(parameters: seq[Value]): FunResult =
   ## Note: Use the format function to convert a number to a string.
   ## @:
   ## @:* p1: int or int string
+  ## @:* return: float
   ## @:
   ## @:Examples:
   ## @:
@@ -584,6 +596,7 @@ func funInt*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:* p1: float or float number string
   ## @:* p2: optional round option. "round" is the default.
+  ## @:* return: int
   ## @:
   ## @:Round options:
   ## @:
@@ -673,6 +686,10 @@ func funFind*(parameters: seq[Value]): FunResult =
   ## substring is not found.  A warning is generated when the
   ## substring is missing and no third parameter. Positions start at
   ## @@0.
+  ## @:* p1: string to work on
+  ## @:* p2: substring to find
+  ## @:* p3: optional return value when not found
+  ## @:* return: int
   ## @:
   ## @:~~~
   ## @:       0123456789 1234567
@@ -718,6 +735,7 @@ func funSubstr*(parameters: seq[Value]): FunResult =
   ## @:* p1: string
   ## @:* p2: start index
   ## @:* p3: optional: end index (one past end)
+  ## @:* return: string
   ## @:
   ## @:Examples:
   ## @:
@@ -767,6 +785,7 @@ func funDup*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:* p1: string to duplicate
   ## @:* p2: number of times to repeat
+  ## @:* return: string
   ## @:
   ## @:Examples:
   ## @:
@@ -810,6 +829,7 @@ func funDict*(parameters: seq[Value]): FunResult =
   ## @:* ...
   ## @:* pn-1: string key
   ## @:* pn: value
+  ## @:* return: dict
   ## @:
   ## @:Examples:
   ## @:
@@ -845,6 +865,7 @@ func funList*(parameters: seq[Value]): FunResult =
   ## @:* p3: value
   ## @:* ...
   ## @:* pn: value
+  ## @:* return: list
   ## @:
   ## @:Examples:
   ## @:
@@ -869,6 +890,7 @@ func funReplace*(parameters: seq[Value]): FunResult =
   ## @:* p2: substring start index
   ## @:* p3: substring length
   ## @:* p4: replacement string
+  ## @:* return: string
   ## @:
   ## @:Examples:
   ## @:
@@ -1020,11 +1042,13 @@ func funReplaceRe*(parameters: seq[Value]): FunResult =
   ## @:* ...
   ## @:* pn-1: optional: pattern n
   ## @:* pn: optional: replacement string n
+  ## @:* return: string
   ## @:
   ## @:Case two:
   ## @:
   ## @:* p1: string to replace
   ## @:* p2: list of pattern and replacement pairs
+  ## @:* return: string
   ## @:
   ## @:Examples:
   ## @:
@@ -1075,6 +1099,7 @@ func funPath*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:* p1: path string
   ## @:* p2: optional separator string, "/" or "\".
+  ## @:* return: dict
   ## @:
   ## @:Examples:
   ## @:
@@ -1142,6 +1167,7 @@ func funLower*(parameters: seq[Value]): FunResult =
   ## Lowercase a string.
   ## @:
   ## @:* p1: string to lowercase
+  ## @:* return: string
   ## @:
   ## @:Examples:
   ## @:
@@ -1157,6 +1183,58 @@ func funLower*(parameters: seq[Value]): FunResult =
 
   let str = parameters[0].stringv
   result = newFunResult(newValue(toLower(str)))
+
+func funKeys*(parameters: seq[Value]): FunResult =
+  ## Return the keys of a dictionary.
+  ## @:
+  ## @:* p1: dictionary
+  ## @:* return: list
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:d = dict("a", 1, "b", 2, "c", 3) =>
+  ## @:keys(d) => ["a", "b", "c"]
+  ## @:~~~~
+
+  if parameters.len() != 1:
+    return newFunResultWarn(wOneParameter)
+
+  if parameters[0].kind != vkDict:
+    return newFunResultWarn(wExpectedDictionary, 0)
+
+  let dict = parameters[0].dictv
+  var theList: seq[string]
+  for key, value in dict.pairs():
+    theList.add(key)
+
+  result = newFunResult(newValue(theList))
+
+func funValues*(parameters: seq[Value]): FunResult =
+  ## Return the values of a dictionary.
+  ## @:
+  ## @:* p1: dictionary
+  ## @:* return: list
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:d = dict("a", "apple", "b", 2, "c", 3) =>
+  ## @:keys(d) => ["apple", 2, 3]
+  ## @:~~~~
+
+  if parameters.len() != 1:
+    return newFunResultWarn(wOneParameter)
+
+  if parameters[0].kind != vkDict:
+    return newFunResultWarn(wExpectedDictionary, 0)
+
+  let dict = parameters[0].dictv
+  var theList: seq[Value]
+  for key, value in dict.pairs():
+    theList.add(value)
+
+  result = newFunResult(newValue(theList))
 
 const
   functionsList = [
@@ -1180,6 +1258,8 @@ const
     ("replaceRe", funReplaceRe),
     ("path", funPath),
     ("lower", funLower),
+    ("keys", funKeys),
+    ("values", funValues),
   ]
 
 proc getFunction*(functionName: string): Option[FunctionPtr] =
