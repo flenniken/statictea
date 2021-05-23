@@ -5,6 +5,8 @@
 # cd ~/code/statictea
 # src/test
 #
+# To add a new test do the following:
+#
 # * Add a new test command line to the testcommands.txt file.
 # * Add test files to the testfiles folder.
 

@@ -120,6 +120,9 @@ suite "parseCommandLine":
     check testParsePrepostGood("   ", "   ", "")
     check testParsePrepostGood("   ,   ", "   ", "   ")
 
+  test "testOrgModePrefix":
+    check testParsePrepostGood("# $", "# $", "")
+
   test "testParsePrepostBad":
     check testParsePrepostBad("")
     check testParsePrepostBad(",")
@@ -193,6 +196,12 @@ suite "parseCommandLine":
 
   test "parseCommandLine-prepost":
     check tpcl("--prepost=<--$", prepostList = @[newPrepost("<--$", "")])
+
+  # The test code splits args by spaces. The following "# $" becomes
+  # two args "#" and "$".
+  # See the external tests.
+  # test "parseCommandLine org mode prefix":
+  #   check tpcl("--prepost=# $", prepostList = @[newPrepost("# $", "")])
 
   # Test some error cases.
 

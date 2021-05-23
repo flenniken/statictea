@@ -663,7 +663,7 @@ The t.maxLines variable determines the maximum lines in a
 replacement block.
 
 StaticTea reads lines looking for the endblock.  By default, if
-it is not found in 10 lines, the 10 lines are used for the block
+it is not found in 50 lines, the 50 lines are used for the block
 and a warning is output. This catches the case where you forget
 the endblock command.
 
@@ -671,7 +671,7 @@ You can increase this value to support blocks with more lines by
 setting the t.maxLines system variable.
 
 #+BEGIN_SRC
-<!--$ block t.maxLines=20 -->
+<!--$ block t.maxLines=200 -->
 #+END_SRC
 
 [[#contents][茶]]

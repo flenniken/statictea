@@ -945,6 +945,19 @@ suite "runFunction.nim":
     let eTextMd = "##\nStaticTea uses [Semantic Versioning](https://semver.org/)"
     check testReplaceReGood(textMd, "@::", ":", r"@\|", "[", r"\|@", "]", "[ ]*@:", "\n", eTextMd)
 
+  test "replaceRe lower case":
+    check testReplaceReGood("funReplace", "fun(.*)", "$1Fun", "ReplaceFun")
+
+  test "replaceRe *":
+    check testReplaceReGood("* test", r"^\*", "-", "- test")
+    check testReplaceReGood("* test", "^\\*", "-", "- test")
+    check testReplaceReGood("@:* test", "@:\\*", "-", "- test")
+    check testReplaceReGood("""* "round""", "\\* \"", "- \"", "- \"round")
+
+  # todo: runtime error. catch all these type of runtime errors in replace.
+  # test "replaceRe error":
+  #   check testReplaceReGood("* test", r"^*", "-", "- test")
+
   test "replaceRe good list":
     check testReplaceReGoodList("abc123abc", newValue(["abc", "456"]), "456123456")
     check testReplaceReGoodList("abc123abc", newValue(["a", "x", "b", "y", "c", "z"]),

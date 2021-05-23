@@ -14,3 +14,6 @@
 ../bin/statictea -l -s=hello.json -t=hello.html >t.txt 2>&1; cmp t.txt hello.expected
 
 # todo: Test log file location on mac and linux.
+
+# Test org mode prefix.
+../bin/statictea -p="# $" -t=orgmode.org >t.txt 2>&1; cmp t.txt orgmode.expected

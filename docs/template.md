@@ -12,13 +12,12 @@ $$ :   "&quot;", '"', +
 $$ :   "&gt;", '>', +
 $$ :   "&lt;", '<', +
 $$ :   "&amp;", '&')
-$$ : g.moduleName = substr(s.orig, add(4, find(s.orig, 'src/', -4)));
+$$ : path = path(s.orig)
+$$ : g.moduleName = path.filename
 $$ endblock
 $$ #
 [Home](https://github.com/flenniken/statictea/)
 
-$$ # Add the title created from the basename
-$$ # of the module path in s.orig.
 $$ nextline
 # {g.moduleName}
 

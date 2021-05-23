@@ -30,7 +30,7 @@
 ## @:
 ## @: Integers:
 ## @:
-## @: - t.maxLines -- default when not set: 10
+## @: - t.maxLines -- default when not set: 50
 ## @: - t.maxRepeat -- default when not set: 100
 ## @: - t.repeat -- default when not set: 1
 ## @: - t.row -- 0 read only, automatically increments
@@ -180,7 +180,7 @@ func getTeaVarIntDefault*(variables: Variables, varName: string): int64 =
       of "repeat":
         result = 1
       of "maxLines":
-        result = 10
+        result = 50
       of "maxRepeat":
         result = 100
       else:

@@ -277,6 +277,36 @@ grip --quiet docs/index.md &
 http://localhost:6419/docs/index.md
 """
 
+task readmeFun, "Create readme function section":
+  let count = system.paramCount()+1
+
+  echo "Export nim runFunctions json doc comments..."
+  let filename = "runFunction.nim"
+  var jsonName = changeFileExt(filename, "json")
+  var cmd = "nim --hint[Conf]:off --hint[SuccessX]:off jsondoc --out:docs/json/$1 src/$2" %
+    [jsonName, filename]
+  exec cmd
+  echo "Generated docs/json/$1" % [jsonName]
+
+
+  # Create a shared.json file for use by the template.
+  let sharedJson = """{
+"newline": "\n"
+}
+"""
+  let sharedFilename = "docs/shared.json"
+  writeFile(sharedFilename, sharedJson)
+
+  echo "Generate readme function section from template..."
+  let templateName = "readmeFuncTemp.org"
+  var orgName = changeFileExt(filename, "org")
+  cmd = "bin/statictea -l -s=docs/json/$1 -j=docs/shared.json -t=docs/$2 -r=docs/$3" %
+     [jsonName, templateName, orgName]
+  # echo cmd
+  exec cmd
+  exec "rm " & sharedFilename
+  echo "Generated docs/$1" % [orgName]
+
 task tt, "\tCompile and run t.nim":
   let cmd = "nim c -r --gc:orc --hints:off --outdir:bin/tests/ src/t.nim"
   echo cmd

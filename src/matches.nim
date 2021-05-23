@@ -7,7 +7,7 @@ import tables
 import options
 
 const
-  predefinedPrepost: array[7, Prepost] = [
+  predefinedPrepost: array[8, Prepost] = [
     ## The predefined prefixes and postfixes.
     newPrepost("<!--$", "-->"),
     newPrepost("#$", ""),
@@ -16,6 +16,7 @@ const
     newPrepost("/*$", "*/"),
     newPrepost("&lt;!--$", "--&gt;"),
     newPrepost("$$", ""),
+    newPrepost("# $", ""),
   ]
 
   commands: array[7, string] = [

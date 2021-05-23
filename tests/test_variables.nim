@@ -114,7 +114,7 @@ suite "variables.nim":
     var variables = emptyVariables()
     check getTeaVarIntDefault(variables, "row") == 0
     check getTeaVarIntDefault(variables, "repeat") == 1
-    check getTeaVarIntDefault(variables, "maxLines") == 10
+    check getTeaVarIntDefault(variables, "maxLines") == 50
     check getTeaVarIntDefault(variables, "maxRepeat") == 100
 
   test "resetVariables":

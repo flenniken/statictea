@@ -33,7 +33,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funList](#user-content-a24) &mdash; Create a list of values.
 * [funReplace](#user-content-a25) &mdash; Replace a part of a string (substring) with another string.
 * [funReplaceRe](#user-content-a26) &mdash; Replace multiple parts of a string defined by regular expressions with replacement strings.
-* [funPath](#user-content-a27) &mdash; <p>Split a file path into pieces.
+* [funPath](#user-content-a27) &mdash; Split a file path into pieces.
 * [getFunction](#user-content-a28) &mdash; Look up a function by its name.
 
 # <a id="a0"></a>FunctionPtr
@@ -633,8 +633,10 @@ func funReplaceRe(parameters: seq[Value]): FunResult
 
 # <a id="a27"></a>funPath
 
-<p>Split a file path into pieces. Return a dictionary with the filename, basename, extension and directory.</p>
-<p>You pass a path string and the optional path separator. When no separator, the current system separator is used.
+Split a file path into pieces. Return a dictionary with the filename, basename, extension and directory.
+
+You pass a path string and the optional path separator. When no
+separator, the current system separator is used.
 
 * p1: path string
 * p2: optional separator string, "/" or "".
@@ -648,8 +650,7 @@ path("src/runFunction.nim") => {
   "ext": ".nim",
   "dir": "src/",
 }
-~~~</p>
-
+~~~
 
 ```nim
 func funPath(parameters: seq[Value]): FunResult

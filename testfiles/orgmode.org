@@ -1,0 +1,6 @@
+# $ # Testing the org mode prefix.
+
+# $ nextline name = "org mode"
+hello {name}
+
+# Normal org mode comment.

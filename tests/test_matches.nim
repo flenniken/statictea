@@ -112,7 +112,7 @@ suite "matches.nim":
 
   test "prepost table":
     var prepostTable = makeDefaultPrepostTable()
-    check prepostTable.len == 7
+    check prepostTable.len == 8
     for prefix, postfix in prepostTable.pairs:
       check prefix.len > 0
       # echo "$1 nextline $2" % [prefix, postfix]

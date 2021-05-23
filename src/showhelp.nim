@@ -10,7 +10,7 @@ NAME
 SYNOPSIS
 
      statictea [-h] [-n] [-v] [-u] [-s=server.json] [-j=shared.json] 
-         [-t=template.html] [-p="pre post"] [-r=result.html]
+         [-t=template.html] [-p="prefix[,postfix]"] [-r=result.html]
 
 DESCRIPTION
 
@@ -43,11 +43,11 @@ DESCRIPTION
              Read a json file and store it in the shared
              dictionary. You can specify zero or more shared options.
 
-     -p="prefix postfix", --prepost="prefix postfix"
+     -p="prefix,postfix", --prepost="prefix,postfix"
 
              Add a prefix, postfix comment style for use in the
-             template. You can specify zero or options. Separate prefix
-             from postfix with a space. The postfix is optional.
+             template. You can specify zero or more. Separate prefix
+             from postfix with a comma. The postfix is optional.
 
      -u, --update
 
