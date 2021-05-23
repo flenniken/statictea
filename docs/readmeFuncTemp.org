@@ -2,15 +2,12 @@
 
 * StaticTea Template
 
-** TODO Lower case function names.
-** TODO Use "# $" for the prefix.
 ** TODO Sort the functions alphabetically.
-** TODO Increase t.maxLines to 50?
 
+# $ # Define replacement patterns to format the descriptions or
+# $ # org mode.
 # $ #
-# $ # Define replacement patterns to remove formatting from the descriptions.
 # $ block
-# $ : t.maxLines = 20
 # $ : g.patterns = list( +
 # $ :   '~~~~', '#+END_SRC', +
 # $ :   '~~~', '#+BEGIN_SRC', +
@@ -35,16 +32,17 @@ Functions allow you to format variables for presentation.  They
 return a value that you assign to a variable or pass to another
 function.
 
-The function sections below were extracted from the nim source
-code with a StaticTea template.
-
 New functions get added over time. the function documentation
-tells which version it appears so you know which version of
+tells which version it appeared so you know which version of
 statictea to require.
+
+The function sections below were extracted from the nim source
+code with a StaticTea template and formatted for org mode.
 
 List of functions:
 
 # $ # Generate the function index.
+# $ #
 # $ nextline
 # $ : t.repeat = len(s.entries)
 # $ : entry = get(s.entries, t.row, dict())
@@ -52,7 +50,8 @@ List of functions:
 # $ : pos = find(entry.name, "fun", -1)
 # $ : skip2 = case(pos, 0, 0, 1)
 # $ : t.output = case(add(skip, skip2), 0, "result", "skip")
-# $ : name = case(pos, 0, substr(entry.name, 3), "")
+# $ : capName = case(pos, 0, substr(entry.name, 3), entry.name)
+# $ : name = concat(lower(substr(capName, 0, 1)), substr(capName, 1))
 # $ : desc = replaceRe(entry.description, g.patterns)
 # $ : shortFuncDesc = substr(desc, 0, add(find(desc, '.', -1), 1))
 - [[#{name}][{name}()]] -- {shortFuncDesc}
@@ -65,7 +64,8 @@ List of functions:
 # $ : pos = find(entry.name, "fun", -1)
 # $ : skip2 = case(pos, 0, 0, 1)
 # $ : t.output = case(add(skip, skip2), 0, "result", "skip")
-# $ : name = case(pos, 0, substr(entry.name, 3), "")
+# $ : capName = case(pos, 0, substr(entry.name, 3), entry.name)
+# $ : name = concat(lower(substr(capName, 0, 1)), substr(capName, 1))
 # $ : description = replaceRe(entry.description, g.patterns)
 [[#contents][茶]]
 

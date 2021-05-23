@@ -78,6 +78,11 @@ proc testReplaceReGoodList(str: string, list: Value, eString: string): bool =
   var parameters = @[newValue(str), list]
   result = testFunction("replaceRe", parameters, eFunResult = eFunResult)
 
+proc testLower(str: string, eStr: string): bool =
+    var parameters = @[newValue(str)]
+    let eFunResult = newFunResult(newValue(eStr))
+    result = testFunction("lower", parameters, eFunResult = eFunResult)
+
 suite "runFunction.nim":
 
   test "getFunction":
@@ -1023,3 +1028,24 @@ suite "runFunction.nim":
     var parameters: seq[Value] = @[newValue("filename"), newValue("a")]
     let eFunResult = newFunResultWarn(wExpectedSeparator, 1)
     check testFunction("path", parameters, eFunResult = eFunResult)
+
+  test "lower":
+    check testLower("", "")
+    check testLower("T", "t")
+    check testLower("Tea", "tea")
+    check testLower("t", "t")
+    check testLower("TEA", "tea")
+
+    # Ā is letter 256, A with macron, Latvian, Unicode (hex) 0100
+    # ā is the same, lower-case, 0101
+    check testLower("TEĀ", "teā")
+
+  test "lower: wrong number of parameters":
+    var parameters: seq[Value] = @[]
+    let eFunResult = newFunResultWarn(wOneParameter, 0)
+    check testFunction("lower", parameters, eFunResult = eFunResult)
+
+  test "lower: wrong kind of parameter":
+    var parameters: seq[Value] = @[newValue(2)]
+    let eFunResult = newFunResultWarn(wExpectedString, 0)
+    check testFunction("lower", parameters, eFunResult = eFunResult)

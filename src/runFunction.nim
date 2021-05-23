@@ -1138,6 +1138,26 @@ func funPath*(parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(dict))
 
+func funLower*(parameters: seq[Value]): FunResult =
+  ## Lowercase a string.
+  ## @:
+  ## @:* p1: string to lowercase
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:lower("Tea") => "tea"
+  ## @:~~~~
+
+  if parameters.len() != 1:
+    return newFunResultWarn(wOneParameter)
+
+  if parameters[0].kind != vkString:
+    return newFunResultWarn(wExpectedString, 0)
+
+  let str = parameters[0].stringv
+  result = newFunResult(newValue(toLower(str)))
+
 const
   functionsList = [
     ("len", funLen),
@@ -1159,6 +1179,7 @@ const
     ("replace", funReplace),
     ("replaceRe", funReplaceRe),
     ("path", funPath),
+    ("lower", funLower),
   ]
 
 proc getFunction*(functionName: string): Option[FunctionPtr] =
