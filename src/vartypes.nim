@@ -108,7 +108,7 @@ proc newEmptyListValue*(): Value =
   var valueList: seq[Value]
   result = newValue(valueList)
 
-proc newEmtpyDictValue*(): Value =
+proc newEmptyDictValue*(): Value =
   ## Create a dictionary value from a VarsDict.
   result = newValue(newVarsDict())
 

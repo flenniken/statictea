@@ -14,6 +14,7 @@ import math
 import matches
 import re
 import os
+import algorithm
 
 type
   FunctionPtr* = proc (parameters: seq[Value]): FunResult {.noSideEffect.}
@@ -72,9 +73,10 @@ func `$`*(funResult: FunResult): string =
       $funResult.warningData, $funResult.parameter
     ]
 
-func cmpString*(a, b: string, ignoreCase: bool = false): int =
-  ## Compares two UTF-8 strings. Returns 0 when equal, 1 when a is
-  ## greater than b and -1 when a less than b. Optionally Ignore case.
+func cmpString*(a, b: string, caseInsensitive: bool = false): int =
+  ## Compares two utf8 strings a and b.  When a equals b return 0,
+  ## when a is greater than b return 1 and when a is less than b
+  ## return -1. Optionally Ignore case.
   var i = 0
   var j = 0
   var ar, br: Rune
@@ -82,7 +84,7 @@ func cmpString*(a, b: string, ignoreCase: bool = false): int =
   while i < a.len and j < b.len:
     fastRuneAt(a, i, ar)
     fastRuneAt(b, j, br)
-    if ignoreCase:
+    if caseInsensitive:
       ar = toLower(ar)
       br = toLower(br)
     ret = int(ar) - int(br)
@@ -96,6 +98,27 @@ func cmpString*(a, b: string, ignoreCase: bool = false): int =
     result = 1
   else:
     result = 0
+
+func cmpValue*(a, b: Value, caseInsensitive: bool = false): int =
+  ## Compares two values a and b.  When a equals b return 0, when a is
+  ## greater than b return 1 and when a is less than b return -1.
+  ## The values must be the same kind and either int, float or string.
+
+  case a.kind
+    of vkString:
+      result = cmpString(a.stringv, b.stringv, caseInsensitive)
+    of vkInt:
+      result = cmp(a.intv, b.intv)
+    of vkFloat:
+      result = cmp(a.floatv, b.floatv)
+    else:
+      result = 0
+
+func cmpTwoValues*(a, b: Value): int =
+  ## Compares two values a and b.  When a equals b return 0, when a is
+  ## greater than b return 1 and when a is less than b return -1.
+  ## The values must be the same kind and either int, float or string.
+  result = cmpValue(a, b, false)
 
 func funCmp*(parameters: seq[Value]): FunResult =
   ## Compare two values.  The values are either numbers or strings
@@ -131,30 +154,38 @@ func funCmp*(parameters: seq[Value]): FunResult =
   ## @:cmp("Tea", "tea", 1) => 0
   ## @:~~~~
 
+  # Check there are 2 or 3 parameters.
   if parameters.len() < 2 or parameters.len() > 3:
-    result = newFunResultWarn(wTwoOrThreeParameters)
-    return
+    return newFunResultWarn(wTwoOrThreeParameters)
+
+  # Check the two values are the same kind.
   let value1 = parameters[0]
   let value2 = parameters[1]
   if value1.kind != value2.kind:
-    result = newFunResultWarn(wNotSameKind)
-    return
-  var ret: int
+    return newFunResultWarn(wNotSameKind)
+
+  # Check the two values are int, float or string.
   case value1.kind
-    of vkString:
-      var caseInsensitive: bool
-      if parameters.len() == 3:
-        let value3 = parameters[2]
-        if value3.kind == vkInt and value3.intv == 1:
-          caseInsensitive = true
-      ret = cmpString(value1.stringv, value2.stringv, caseInsensitive)
-    of vkInt:
-      ret = cmp(value1.intv, value2.intv)
-    of vkFloat:
-      ret = cmp(value1.floatv, value2.floatv)
+  of vkInt, vkFloat, vkString:
+    discard
+  else:
+    return newFunResultWarn(wIntFloatString)
+
+  # Get the optional case insensitive and check it is 0 or 1.
+  var caseInsensitive = false
+  if parameters.len() == 3:
+    let value3 = parameters[2]
+    if value3.kind != vkInt:
+        return newFunResultWarn(wNotZeroOne, 2)
+    case value3.intv:
+    of 0:
+      caseInsensitive = false
+    of 1:
+      caseInsensitive = true
     else:
-      result = newFunResultWarn(wNotNumberOrString)
-      return
+      return newFunResultWarn(wNotZeroOne, 2)
+
+  let ret = cmpValue(value1, value2, caseInsensitive)
   result = newFunResult(newValue(ret))
 
 func funConcat*(parameters: seq[Value]): FunResult =
@@ -1193,7 +1224,7 @@ func funKeys*(parameters: seq[Value]): FunResult =
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:d = dict("a", 1, "b", 2, "c", 3) =>
+  ## @:d = dict("a", 1, "b", 2, "c", 3)
   ## @:keys(d) => ["a", "b", "c"]
   ## @:~~~~
 
@@ -1219,7 +1250,7 @@ func funValues*(parameters: seq[Value]): FunResult =
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:d = dict("a", "apple", "b", 2, "c", 3) =>
+  ## @:d = dict("a", "apple", "b", 2, "c", 3)
   ## @:keys(d) => ["apple", 2, 3]
   ## @:~~~~
 
@@ -1235,6 +1266,58 @@ func funValues*(parameters: seq[Value]): FunResult =
     theList.add(value)
 
   result = newFunResult(newValue(theList))
+
+func funSort*(parameters: seq[Value]): FunResult =
+  ## Sort a list of strings, ints or floats.
+  ## @:
+  ## @:* p1: list
+  ## @:* p2: optional: "ascending", "descending"
+  ## @:* return: list
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:l = list(4, 3, 5, 5, 2, 4)
+  ## @:sort(l) => [2, 3, 4, 4, 5, 5]
+  ## @:sort(l, "descending") => [5, 5, 4, 4, 3, 2]
+  ## @:~~~~
+
+  if parameters.len() < 1 or parameters.len() > 2:
+    return newFunResultWarn(wOneOrTwoParameters)
+
+  if parameters[0].kind != vkList:
+    return newFunResultWarn(wExpectedList, 0)
+  let list = parameters[0].listv
+
+  var sortOrder = Ascending
+  if parameters.len() > 1:
+    if parameters[1].kind != vkString:
+      return newFunResultWarn(wExpectedSortOrder, 1)
+    case parameters[1].stringv:
+      of "ascending":
+        sortOrder = Ascending
+      of "descending":
+        sortOrder = Descending
+      else:
+        return newFunResultWarn(wExpectedSortOrder, 1)
+
+  if list.len == 0:
+    return newFunResult(newEmptyListValue())
+
+  # Verify the values are all ints, all floats or all strings.
+  let theKind = list[0].kind
+  case theKind:
+    of vkInt, vkFloat, vkString:
+      discard
+    else:
+      return newFunResultWarn(wAllNotIntFloatString, 0)
+
+  for value in list:
+    if value.kind != theKind:
+      return newFunResultWarn(wNotSameKind, 0)
+
+  let newList = sorted(list, cmpTwoValues, sortOrder)
+  result = newFunResult(newValue(newList))
 
 const
   functionsList = [
@@ -1260,6 +1343,7 @@ const
     ("lower", funLower),
     ("keys", funKeys),
     ("values", funValues),
+    ("sort", funSort),
   ]
 
 proc getFunction*(functionName: string): Option[FunctionPtr] =

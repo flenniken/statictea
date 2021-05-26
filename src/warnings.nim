@@ -118,6 +118,10 @@ type
     wMissingVarName,       # w102
     wNotDict,              # w103
     wMissingDict,          # w104
+    wExpectedSortOrder,    # w105
+    wAllNotIntFloatString, # w106
+    wIntFloatString,       # w107
+    wNotZeroOne,           # w108
 
 tpubType:
   const
@@ -229,6 +233,10 @@ tpubType:
       "Name, $1, doesn't exist in the parent dictionary.", # wMissingVarName
       "Name, $1, is not a dictionary.", # wNotDict
       "The dictionary $1 doesn't exist.", # wMissingDict
+      "Expected the sort order, 'ascending' or 'descending'.", # wExpectedSortOrder
+      "The list values must be all ints, all floats or all strings.", # wAllNotIntFloatString
+      "The values must be integers, floats or strings.", # wIntFloatString
+      "The parameter must be 0 or 1.", # wNotZeroOne
     ]
 
 func getWarning*(filename: string, lineNum: int,

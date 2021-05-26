@@ -264,6 +264,7 @@ suite "runFunction.nim":
     check cmpString("a", "a", true) == 0
     check cmpString("abc", "abc", true) == 0
     check cmpString("abc", "ABC", true) == 0
+    check cmpString("ABC", "abc", true) == 0
     check cmpString("aBc", "Abd", true) == -1
     check cmpString("Abd", "aBc", true) == 1
 
@@ -286,11 +287,37 @@ suite "runFunction.nim":
 
   test "cmp strings case insensitive":
     check testCmpFun("abc", "abc", true, expected = 0)
+    check testCmpFun("ABC", "abc", true, expected = 0)
+    check testCmpFun("abc", "ABC", true, expected = 0)
     check testCmpFun("abc", "abd", true, expected = -1)
     check testCmpFun("abd", "abc", true, expected = 1)
-    check testCmpFun("ABC", "abc", true, expected = 0)
     check testCmpFun("abc", "ABD", true, expected = -1)
     check testCmpFun("ABD", "abc", true, expected = 1)
+
+  test "cmp wrong number parameters":
+    var parameters = @[newValue(4)]
+    let eFunResult = newFunResultWarn(wTwoOrThreeParameters)
+    check testFunction("cmp", parameters, eFunResult)
+
+  test "cmp not same kind":
+    var parameters = @[newValue(4), newValue(4.2)]
+    let eFunResult = newFunResultWarn(wNotSameKind)
+    check testFunction("cmp", parameters, eFunResult)
+
+  test "cmp not int, float or string":
+    var parameters = @[newEmptyDictValue(), newEmptyDictValue()]
+    let eFunResult = newFunResultWarn(wIntFloatString)
+    check testFunction("cmp", parameters, eFunResult)
+
+  test "cmp case insensitive wrong type":
+    var parameters = @[newValue(2), newValue(22), newValue("a")]
+    let eFunResult = newFunResultWarn(wNotZeroOne, 2)
+    check testFunction("cmp", parameters, eFunResult)
+
+  test "cmp case insensitive not 0 or 1":
+    var parameters = @[newValue(2), newValue(22), newValue(2)]
+    let eFunResult = newFunResultWarn(wNotZeroOne, 2)
+    check testFunction("cmp", parameters, eFunResult)
 
   test "if function true":
     var parameters = @[newValue(1), newValue("true"), newValue("false")]
@@ -767,7 +794,7 @@ suite "runFunction.nim":
 
   test "dict":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResult(newEmtpyDictValue())
+    let eFunResult = newFunResult(newEmptyDictValue())
     check testFunction("dict", parameters, eFunResult = eFunResult)
 
   test "dict 1 item":
@@ -1051,7 +1078,7 @@ suite "runFunction.nim":
     check testFunction("lower", parameters, eFunResult = eFunResult)
 
   test "keys empty":
-    let dictValue = newEmtpyDictValue()
+    let dictValue = newEmptyDictValue()
     let listValue = newEmptyListValue()
     check testFunction("keys", @[dictValue], newFunResult(listValue))
 
@@ -1076,7 +1103,7 @@ suite "runFunction.nim":
     check testFunction("keys", parameters, eFunResult = eFunResult)
 
   test "values empty":
-    let dictValue = newEmtpyDictValue()
+    let dictValue = newEmptyDictValue()
     let listValue = newEmptyListValue()
     check testFunction("values", @[dictValue], newFunResult(listValue))
 
@@ -1099,3 +1126,82 @@ suite "runFunction.nim":
     var parameters: seq[Value] = @[newValue(2)]
     let eFunResult = newFunResultWarn(wExpectedDictionary, 0)
     check testFunction("values", parameters, eFunResult = eFunResult)
+
+  test "sort empty":
+    let emptyList = newEmptyListValue()
+    check testFunction("sort", @[emptyList], newFunResult(emptyList))
+
+  test "sort one":
+    let list = newValue([1])
+    check testFunction("sort", @[list], newFunResult(list))
+
+  test "sort two":
+    let list = newValue([2, 1])
+    let eList = newValue([1, 2])
+    check testFunction("sort", @[list], newFunResult(eList))
+
+  test "sort ascending":
+    let list = newValue([2, 1])
+    let eList = newValue([1, 2])
+    check testFunction("sort", @[list, newValue("ascending")], newFunResult(eList))
+
+  test "sort descending":
+    let list = newValue([1, 2])
+    let eList = newValue([2, 1])
+    check testFunction("sort", @[list, newValue("descending")], newFunResult(eList))
+
+  test "sort descending":
+    let list = newValue([2, 3, 4, 4, 5, 5])
+    let eList = newValue([5, 5, 4, 4, 3, 2])
+    check testFunction("sort", @[list, newValue("descending")], newFunResult(eList))
+
+  test "sort floats":
+    let list = newValue([2.4, 1.6])
+    let eList = newValue([1.6, 2.4])
+    check testFunction("sort", @[list], newFunResult(eList))
+
+  test "sort strings":
+    let list = newValue(["abc", "b", "aaa"])
+    let eList = newValue(["aaa", "abc", "b"])
+    check testFunction("sort", @[list], newFunResult(eList))
+
+  test "sort strings case":
+    let list = newValue(["A", "a", "b", "B"])
+    let eList = newValue(["A", "B", "a", "b"])
+    check testFunction("sort", @[list], newFunResult(eList))
+
+  test "sort: wrong number of parameters":
+    var parameters: seq[Value] = @[]
+    let eFunResult = newFunResultWarn(wOneOrTwoParameters, 0)
+    check testFunction("sort", parameters, eFunResult = eFunResult)
+
+  test "sort: not list":
+    var parameters: seq[Value] = @[newValue(0)]
+    let eFunResult = newFunResultWarn(wExpectedList, 0)
+    check testFunction("sort", parameters, eFunResult = eFunResult)
+
+  test "sort: sort order string":
+    var parameters: seq[Value] = @[newEmptyListValue(), newValue(22)]
+    let eFunResult = newFunResultWarn(wExpectedSortOrder, 1)
+    check testFunction("sort", parameters, eFunResult = eFunResult)
+
+  test "sort: sort order spelling":
+    var parameters: seq[Value] = @[newEmptyListValue(), newValue("asc")]
+    let eFunResult = newFunResultWarn(wExpectedSortOrder, 1)
+    check testFunction("sort", parameters, eFunResult = eFunResult)
+
+  test "sort: sort order spelling":
+    var parameters: seq[Value] = @[newEmptyListValue(), newValue("asc")]
+    let eFunResult = newFunResultWarn(wExpectedSortOrder, 1)
+    check testFunction("sort", parameters, eFunResult = eFunResult)
+
+  test "sort: not same kind":
+    var parameters: seq[Value] = @[newValue([newValue(1), newValue(2.2)])]
+    let eFunResult = newFunResultWarn(wNotSameKind, 0)
+    check testFunction("sort", parameters, eFunResult = eFunResult)
+
+  test "sort: not int, float, or string":
+    let list = newValue([newEmptyListValue()])
+    var parameters: seq[Value] = @[list]
+    let eFunResult = newFunResultWarn(wAllNotIntFloatString, 0)
+    check testFunction("sort", parameters, eFunResult = eFunResult)
