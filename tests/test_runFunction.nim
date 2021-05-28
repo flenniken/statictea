@@ -1205,3 +1205,10 @@ suite "runFunction.nim":
     var parameters: seq[Value] = @[list]
     let eFunResult = newFunResultWarn(wAllNotIntFloatString, 0)
     check testFunction("sort", parameters, eFunResult = eFunResult)
+
+  test "sort: dict":
+    let dict = newValue([("a", 2)])
+    let list = newValue([dict, dict, dict])
+    var parameters: seq[Value] = @[list]
+    let eFunResult = newFunResultWarn(wAllNotIntFloatString, 0)
+    check testFunction("sort", parameters, eFunResult = eFunResult)

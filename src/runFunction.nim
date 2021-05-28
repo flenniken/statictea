@@ -215,7 +215,7 @@ func funConcat*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(str))
 
 func funLen*(parameters: seq[Value]): FunResult =
-  ## Return the len of a string, list or dict value. It takes one
+  ## Length of a string, list or dict value. It takes one
   ## parameter and returns the number of characters in a string (not
   ## bytes), the number of elements in a list or the number of
   ## elements in a dictionary.
@@ -248,7 +248,7 @@ func funLen*(parameters: seq[Value]): FunResult =
   result = newFunResult(retValue)
 
 func funGet*(parameters: seq[Value]): FunResult =
-  ## Return a value in a list or dictionary. You pass two or three
+  ## Get a value from a list or dictionary. You pass two or three
   ## parameters. The first is the dictionary or list to use, the
   ## second is the dictionary's key name or the list index, and the
   ## third optional parameter is the default value when the element
@@ -346,8 +346,8 @@ func funIf*(parameters: seq[Value]): FunResult =
 {.push overflowChecks: on, floatChecks: on.}
 
 func funAdd*(parameters: seq[Value]): FunResult =
-  ## Return the sum of two or more values.  The parameters must be all
-  ## integers or all floats.  A warning is generated on overflow.
+  ## Add two or more numbers.  The parameters must be all integers or
+  ## all floats.  A warning is generated on overflow.
   ## @:
   ## @:Integer case:
   ## @:
@@ -403,9 +403,9 @@ func funAdd*(parameters: seq[Value]): FunResult =
 {.pop.}
 
 func funExists*(parameters: seq[Value]): FunResult =
-  ## Return 1 when a variable exists in a dictionary, else return
-  ## @@0. The first parameter is the dictionary to check and the second
-  ## parameter is the name of the variable.
+  ## Determine whether a variable exists in a dictionary.  The first
+  ## parameter is the dictionary to check and the second parameter is
+  ## the name of the variable.
   ## @:
   ## @:* p1: dictionary
   ## @:* p2: string: variable name (key name)
@@ -439,9 +439,8 @@ func funExists*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(num))
 
 func funCase*(parameters: seq[Value]): FunResult =
-  ## The case function returns a value from multiple choices. It takes
-  ## a main condition, any number of case pairs then an optional else
-  ## value.
+  ## Return a value from multiple choices. It takes a main condition,
+  ## any number of case pairs then an optional else value.
   ## @:
   ## The first parameter of a case pair is the condition and the
   ## second is the return value when that condition matches the main
@@ -531,8 +530,8 @@ func parseVersion*(version: string): Option[(int, int, int)] =
   result = some((int(g1IntPosO.get().integer), int(g2IntPosO.get().integer), int(g3IntPosO.get().integer)))
 
 func funCmpVersion*(parameters: seq[Value]): FunResult =
-  ## Compare two StaticTea type version numbers. Return whether the
-  ## first parameter is less than, equal to or greater than the second
+  ## Compare two StaticTea version numbers. Return whether the first
+  ## parameter is less than, equal to or greater than the second
   ## parameter. It returns -1 for less, 0 for equal and 1 for greater
   ## than.
   ## @:
@@ -623,7 +622,7 @@ func funFloat*(parameters: seq[Value]): FunResult =
 # todo: use int64 instead of BiggestInt everywhere.
 
 func funInt*(parameters: seq[Value]): FunResult =
-  ## Convert a float or a number string to an int.
+  ## Convert a float or a float number string to an int.
   ## @:
   ## @:* p1: float or float number string
   ## @:* p2: optional round option. "round" is the default.
@@ -752,17 +751,15 @@ func funFind*(parameters: seq[Value]): FunResult =
     result = newFunResult(newValue(pos))
 
 func funSubstr*(parameters: seq[Value]): FunResult =
-  ## Extract a substring from a string.  The first parameter is the
-  ## string, the second is the substring's starting position and the
-  ## third is one past the end. The first position is 0. The third
-  ## parameter is optional and defaults to one past the end of the
+  ## Extract a substring from a string by its position. You pass the
+  ## string, the substring's start index then its end index+1.
+  ## The end index is optional and defaults to the end of the
   ## string.
-  ## @:
-  ## This kind of positioning is called a half-open range that
-  ## includes the first position but not the second. For example,
-  ## [3, 7) includes 3, 4, 5, 6. The end minus the start is equal to
-  ## the length of the substring.
-  ## @:
+  ##
+  ## The range is half-open which includes the start position but not
+  ## the end position. For example, [3, 7) includes 3, 4, 5, 6. The
+  ## end minus the start is equal to the length of the substring.
+  ##
   ## @:* p1: string
   ## @:* p2: start index
   ## @:* p3: optional: end index (one past end)
@@ -910,8 +907,8 @@ func funList*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(parameters))
 
 func funReplace*(parameters: seq[Value]): FunResult =
-  ## Replace a part of a string (substring) with another string.
-  ## You can use it to insert and append to a string as well.
+  ## Replace a part of a string with another string.  You can use it
+  ## to insert and append to a string as well.
   ## @:
   ## The first parameter is the string, the second is the substring's
   ## starting position, starting a 0, the third is the length of the
@@ -1216,7 +1213,7 @@ func funLower*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(toLower(str)))
 
 func funKeys*(parameters: seq[Value]): FunResult =
-  ## Return the keys of a dictionary.
+  ## Create a list from the keys in a dictionary.
   ## @:
   ## @:* p1: dictionary
   ## @:* return: list
@@ -1226,6 +1223,7 @@ func funKeys*(parameters: seq[Value]): FunResult =
   ## @:~~~
   ## @:d = dict("a", 1, "b", 2, "c", 3)
   ## @:keys(d) => ["a", "b", "c"]
+  ## @:values(d) => ["apple", 2, 3]
   ## @:~~~~
 
   if parameters.len() != 1:
@@ -1242,7 +1240,7 @@ func funKeys*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(theList))
 
 func funValues*(parameters: seq[Value]): FunResult =
-  ## Return the values of a dictionary.
+  ## Create a list from the values in a dictionary.
   ## @:
   ## @:* p1: dictionary
   ## @:* return: list
@@ -1251,7 +1249,8 @@ func funValues*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:~~~
   ## @:d = dict("a", "apple", "b", 2, "c", 3)
-  ## @:keys(d) => ["apple", 2, 3]
+  ## @:keys(d) => ["a", "b", "c"]
+  ## @:values(d) => ["apple", 2, 3]
   ## @:~~~~
 
   if parameters.len() != 1:
@@ -1268,11 +1267,24 @@ func funValues*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(theList))
 
 func funSort*(parameters: seq[Value]): FunResult =
-  ## Sort a list of strings, ints or floats.
+  ## Sort a list of values of the same type.
+  ## @:
+  ## When sorting strings the third parameter tells whether to compare
+  ## case sensitive.
+  ## @:
+  ## When sorting lists the sub lists are compared by their first
+  ## element. The first elements must exist, be the same type and be
+  ## an int, float or string.
+  ## @:
+  ## When sorting dictionaries the third parameter specifies the key
+  ## used to compare them.  The dictionaries key values must be the
+  ## same type and be an int, float or string.
   ## @:
   ## @:* p1: list
   ## @:* p2: optional: "ascending", "descending"
-  ## @:* return: list
+  ## @:* p3: optional: "sensitive", "insensitive" for strings, default "sensitive".
+  ## @:* p3: required: sort key for dicts
+  ## @:* return: sorted list
   ## @:
   ## @:Examples:
   ## @:
@@ -1280,6 +1292,21 @@ func funSort*(parameters: seq[Value]): FunResult =
   ## @:l = list(4, 3, 5, 5, 2, 4)
   ## @:sort(l) => [2, 3, 4, 4, 5, 5]
   ## @:sort(l, "descending") => [5, 5, 4, 4, 3, 2]
+  ## @:
+  ## @:strs = list('T', 'e', 'a')
+  ## @:sort(strs) => ['T', 'a', 'e']
+  ## @:sort(strs, "ascending", "insensitive") => ['a', 'e', 'T']
+  ## @:
+  ## @:l1 = list(4, 3, 1)
+  ## @:l2 = list(2, 3, 0)
+  ## @:listOfList = list(l1, l2)
+  ## @:sort(listOfList) => [l2, l1]
+  ## @:
+  ## @:d1 = dict('name', 'Earl Gray', 'weight', 1.2)
+  ## @:d2 = dict('name', 'Tea Pot', 'weight', 3.5)
+  ## @:dicts = list(d1, d2)
+  ## @:sort(dicts, "ascending", 'weight') => [d1, d2]
+  ## @:sort(dicts, "descending", 'name') => [d2, d1]
   ## @:~~~~
 
   if parameters.len() < 1 or parameters.len() > 2:
