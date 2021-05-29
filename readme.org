@@ -410,7 +410,7 @@ name = concat(substr(s.name, 0, 7), "...")
 
 [[#contents][茶]]
 
-* TODO Syntax
+* Syntax
 :PROPERTIES:
 :CUSTOM_ID: syntax
 :END:
@@ -1380,39 +1380,37 @@ filename, "statictea.log" in the system log directory is used.
 :END:
 
 Functions allow you to format variables for presentation.  They
-return a value that you either assign to a variable or pass to
-another function.
+return a value that you assign to a variable or pass to another
+function.
 
-New functions get added over time. the function documentation
-tells which version it appears so you know which version of
-statictea to require.
+This section was extracted from the nim source code with a
+StaticTea template and formatted for this readme.
 
 List of functions:
 
-- [[#add][add()]] -- add numbers
-- [[#case][case()]] -- multiple condition handling
-- [[#cmp][cmp()]] -- spaceship compare function <=>
-- [[#cmpversion][cmpVersion()]] -- compare StaticTea version numbers
-- [[#concat][concat()]] -- concatenate strings
-- [[#dictfun][dict()]] -- create a dictionary
-- [[#dup][dup()]] -- duplicate string
-- [[#int][int()]] -- convert a float or number string to an int
-- [[#exists][exists()]] -- whether a variables exists
-- [[#find][find()]] -- find a substring in a string
-- [[#floatfun][float()]] -- convert an int or number string to a float
-- [[#get][get()]] -- get an element from a list or dictionary
-- [[#if][if()]] -- handles two conditions
-- [[#len][len()]] -- length of string, list or dictionary
-- [[#listfun][list()]] -- create a list
-- [[#replace][replace()]] -- replace range with a string
-- [[#replaceRe][replaceRe()]] -- replace regular expressions patterns in a string
-- [[#substr][substr()]] -- extract a substring from a string by indexes
-
-Testing:
-
-- [[docs/runFunction.md#user-content-a8][cmp()]] -- spaceship compare function <=>
-- [[docs/runFunction.md#user-content-a11][get()]] -- get an element from a list or dictionary
-- [[docs/runFunction.md#user-content-a12][if()]] -- handles two conditions
+- [[#add][add()]] -- Add two or more numbers.
+- [[#case][case()]] -- Return a value from multiple choices.
+- [[#cmp][cmp()]] -- Compare two values.
+- [[#cmpVersion][cmpVersion()]] -- Compare two StaticTea version numbers.
+- [[#concat][concat()]] -- Concatentate two or more strings.
+- [[#dict][dict()]] -- Create a dictionary from a list of key, value pairs.
+- [[#dup][dup()]] -- Duplicate a string.
+- [[#exists][exists()]] -- Determine whether a key exists in a dictionary.
+- [[#find][find()]] -- Find the position of a substring in a string.
+- [[#float][float()]] -- Create a float from an int or an int number string.
+- [[#get][get()]] -- Get a value from a list or dictionary.
+- [[#if][if()]] -- Return a value based on a condition.
+- [[#int][int()]] -- Create an int from a float or a float number string.
+- [[#keys][keys()]] -- Create a list from the keys in a dictionary.
+- [[#len][len()]] -- Length of a string, list or dictionary.
+- [[#list][list()]] -- Create a list of values.
+- [[#lower][lower()]] -- Lowercase a string.
+- [[#path][path()]] -- Split a file path into pieces.
+- [[#replace][replace()]] -- Replace a substring by its position.
+- [[#replaceRe][replaceRe()]] -- Replace multiple parts of a string using regular expressions.
+- [[#sort][sort()]] -- Sort a list of values of the same type.
+- [[#substr][substr()]] -- Extract a substring from a string by its position.
+- [[#values][values()]] -- Create a list of the values in a dictionary.
 
 [[#contents][茶]]
 
@@ -1421,14 +1419,33 @@ Testing:
 :CUSTOM_ID: add
 :END:
 
-The add function returns the sum of its parameters. The
-parameters must be all integers or all floats.  A warning is
-generated on overflow and the statement is skipped.
+Add two or more numbers.  The parameters must be all integers or
+all floats.  A warning is generated on overflow.
 
-Added in version 0.1.0.
+Integer case:
+
+- p1: int
+- p2: int
+- ...
+- pn: int
+- return: int
+
+Float case:
+
+- p1: float
+- p2: float
+- ...
+- pn: float
+- return: float
+
+Examples:
 
 #+BEGIN_SRC
-num = add(t.row(), 1)
+add(1, 2) => 3
+add(1, 2, 3) => 6
+
+add(1.5, 2.3) => 3.8
+add(1.1, 2.2, 3.3) => 6.6
 #+END_SRC
 
 [[#contents][茶]]
@@ -1438,69 +1455,38 @@ num = add(t.row(), 1)
 :CUSTOM_ID: case
 :END:
 
-The case function returns a value from multiple choices. It takes
-a main condition, any number of case pairs then an optional else
-value.
+Return a value from multiple choices. It takes a main condition,
+any number of case pairs then an optional else value.
 
 The first parameter of a case pair is the condition and the
 second is the return value when that condition matches the main
-condition.
+condition. The function compares the conditions left to right and
+returns the first match.
 
-When none of the cases match the main condition, the "else" value
-is returned. If none match and the else is missing, a warning is
-generated and the statement is skipped. The conditions must be
-integers or strings. The return values any be any type.
+When none of the cases match the main condition, the "else"
+value is returned. If none match and the else is missing, a
+warning is generated and the statement is skipped. The conditions
+must be integers or strings. The return values can be any type.
 
-The function compares the conditions left to right and returns
-the first match.
+- p1: the main condition value
+- p2: the first case condition
+- p3: the first case value
+- ...
+- pn-2: the last case condition
+- pn-1: the last case value
+- pn: the optional "else" value returned when nothing matches
+- return: any value
 
--p1: The main condition value.
--p2: Case condition.
--p3: Case value.
-...
--pn-2: The last case condition.
--pn-1: The case value.
--pn: The optional "else" value returned when nothing matches.
-
-Added in version 0.1.0.
-
-For the example below the abbr variable is set to an abbreviation
-depending on the type of tea.
-
-template:
+Examples:
 
 #+BEGIN_SRC
-$$ nextline
-$$ : abbr = case(s.tea,
-$$ :   'Darjeeling', "Darj",
-$$ :   "Earl Gray", "EG",
-$$ :   "Unknown"
-$$ : )
-The abbr. for {s.tea} is {s.abbr}.
-#+END_SRC
-
-server json:
-
-#+BEGIN_SRC
-{
-  "tea": "Darjeeling"
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-The abbr. for Darjeeling is Darj.
-#+END_SRC
-
-The if statement is shorthand for a simple case:
-
-#+BEGIN_SRC
-if(cond, v1, v2)
-#+END_SRC
-is equivalent to:
-#+BEGIN_SRC
-case(cond, v2, 1, v1)
+case(8, 8, "tea", "water") => "tea"
+case(8, 3, "tea", "water") => "water"
+case(8,
+  1, "tea", +
+  2, "water", +
+  3, "wine", +
+  "beer") => "beer"
 #+END_SRC
 
 [[#contents][茶]]
@@ -1510,101 +1496,60 @@ case(cond, v2, 1, v1)
 :CUSTOM_ID: cmp
 :END:
 
-The cmp function compares two variables, either numbers or
-strings (both the same type), and returns whether the first
-parameter is less than, equal to or greater than the second
-parameter. It returns -1 for less, 0 for equal and 1 for greater
-than. The optional third parameter compares strings case
-insensitive when it is 1. Added in version 0.1.0.
+Compare two values. Returns -1 for less, 0 for equal and 1 for
+greater than.  The values are either int, float or string (both the
+same type) The default compares strings case sensitive.
 
-template:
+Compare numbers:
 
-#+BEGIN_SRC
-#$ block
-#$ : cond1 = cmp(4, 5)
-#$ : cond2 = cmp(2, 2)
-#$ : cond3 = cmp(5, 4)
-#$ : cond4 = cmp("abc", "abd")
-#$ : cond5 = cmp("abc", "ABC", 1)
-cmp(4, 5) returns {cond1}
-cmp(2, 2) returns {cond2}
-cmp(5, 4) returns {cond3}
-cmp("abc", "abd") returns {cond4}
-cmp("abc", "ABC") returns {cond5}
-#$ endblock
-#+END_SRC
+- p1: number
+- p2: number
+- return: -1, 0, 1
 
-result:
+Compare strings:
+
+- p1: string
+- p2: string
+- p3: optional: 1 for case insensitive
+- return: -1, 0, 1
+
+Examples:
 
 #+BEGIN_SRC
-cmp(4, 5) returns -1
-cmp(2, 2) returns 0
-cmp(5, 4) returns 1
-cmp("abc", "abd") returns -1
-cmp("abc", "ABC") returns 0
-#+END_SRC
+cmp(7, 9) => -1
+cmp(8, 8) => 0
+cmp(9, 2) => 1
 
-Here is another example using cmp to "ellipsize" a string when it
-gets long. The following example ellipsizes when a name is longer
-than 10 characters.
-
-#+BEGIN_SRC
-$$ # If the name is longer than 10 characters,
-$$ # clip it to 7 and add "...".
-$$ nextline
-$$ : cmp = cmp(len(s.name), 10)
-$$ : name = case(cmp, +
-$$ :   1, concat(substr(s.name, 0, 7), "...") +
-$$ :   s.name)
+cmp("coffee", "tea") => -1
+cmp("tea", "tea") => 0
+cmp("Tea", "tea") => 1
+cmp("Tea", "tea", 1) => 0
 #+END_SRC
 
 [[#contents][茶]]
 
 ** cmpVersion()
 :PROPERTIES:
-:CUSTOM_ID: cmpversion
+:CUSTOM_ID: cmpVersion
 :END:
 
-The cmpVersion function compares two StaticTea type version
-numbers and returns whether the first parameter is less than,
-equal to or greater than the second parameter. It returns -1 for
-less, 0 for equal and 1 for greater than.
+Compare two StaticTea version numbers. Returns -1 for less, 0 for
+equal and 1 for greater than.
 
-StaticTea uses [[https://semver.org/][Semantic Versioning]] with the added restrictions
-that each version component has one to three digits and no
-letters.
+StaticTea uses [Semantic Versioning](https://semver.org/)
+with the added restriction that each version component has one
+to three digits (no letters).
 
-Added in version 0.1.0.
+- p1: version number string
+- p2: version number string
+- return: -1, 0, 1
 
-Example valid StaticTea version numbers:
-
-#+BEGIN_SRC
-1.0.2
-12.1.333
-3.10.5
-3.9.65
-#+END_SRC
-
-Example invalid StaticTea version numbers:
+Examples:
 
 #+BEGIN_SRC
-2
-1.4
-1.4.3a
-2.33.4567
-1.0.0beta
-#+END_SRC
-
-The example below generates a warning when the running version of
-StaticTea is less than 1.0.2.
-
-template:
-
-#+BEGIN_SRC
-#$ nexline req = "1.0.2"
-#$ : t.output = case(cmpVersion(t.version, req), +
-#$ :   'skip', -1, 'stderr')
-Version {req} or above is required.
+cmpVersion("1.2.5", "1.1.8") => -1
+cmpVersion("1.2.5", "1.3.0") => 1
+cmpVersion("1.2.5", "1.2.5") => 1
 #+END_SRC
 
 [[#contents][茶]]
@@ -1614,24 +1559,65 @@ Version {req} or above is required.
 :CUSTOM_ID: concat
 :END:
 
-The concat function concatenates strings. You can specify two or
-more string parameters. The following example also shows using
-the "$$" prefix. Added in version 0.1.0.
+Concatentate two or more strings.
+
+- p1: string
+- p2: string
+- ...
+- pn: string
+- return: string
+
+Examples:
 
 #+BEGIN_SRC
-$$ block
-$$ : x3 = concat("Tea", "Time")
-$$ : x4 = concat("Tea", " ",  "Time")
-concat("Tea", "Time") => '{x3}'
-concat("Tea", " ",  "Time") => '{x4}'
-$$ endblock
+concat("tea", " time") => "tea time"
+concat("a", "b", "c", "d") => "abcd"
 #+END_SRC
 
-Result:
+[[#contents][茶]]
+
+** dict()
+:PROPERTIES:
+:CUSTOM_ID: dict
+:END:
+
+Create a dictionary from a list of key, value pairs.  The keys
+must be strings and the values can be any type.
+
+- p1: key string
+- p2: value
+- ...
+- pn-1: key string
+- pn: value
+- return: dict
+
+Examples:
 
 #+BEGIN_SRC
-concat("Tea", "Time") => 'TeaTime'
-concat("Tea", " ",  "Time") => 'Tea Time'
+dict("a", 5) => {"a": 5}
+dict("a", 5, "b", 33, "c", 0) =>
+  {"a": 5, "b": 33, "c": 0}
+#+END_SRC
+
+[[#contents][茶]]
+
+** dup()
+:PROPERTIES:
+:CUSTOM_ID: dup
+:END:
+
+Duplicate a string. The first parameter is the string to dup and
+the second parameter is the number of times to duplicate it.
+
+- p1: string to duplicate
+- p2: number of times to repeat
+- return: string
+
+Examples:
+
+#+BEGIN_SRC
+dup("=", 3) => "==="
+substr("abc", 2) => "abcabc"
 #+END_SRC
 
 [[#contents][茶]]
@@ -1641,31 +1627,18 @@ concat("Tea", " ",  "Time") => 'Tea Time'
 :CUSTOM_ID: exists
 :END:
 
-Return 1 when a variable exists in the given dictionary, else
-return 0. The first parameter is the dictionary to check and the
-second parameter is the name of the variable to find.
+Determine whether a key exists in a dictionary.
 
--p1: dictionary: The dictionary to use.
--p2: string: The name (key) to find.
+- p1: dictionary
+- p2: key string
+- return: 0 or 1
 
-Added in version 0.1.0.
-
-template:
+Examples:
 
 #+BEGIN_SRC
-<--$ block a = "apple" -->
-<--$ : ax = exists(t.local, "a") -->
-<--$ : bx = exists(t.local, "b") -->
-exists("a") => {ax}
-exists("b") => {bx}
-<--$ endblock -->
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-exists("a") => 1
-exists("b") => 0
+d = dict("tea", "Earl")
+exists(d, "tea") => 1
+exists(d, "coffee") => 0
 #+END_SRC
 
 [[#contents][茶]]
@@ -1675,36 +1648,46 @@ exists("b") => 0
 :CUSTOM_ID: find
 :END:
 
-The find function searches a string for a substring and returns
-its index position when found. The first parameter is the string
-and the second is the substring. The third optional parameter is
-returned when the substring is not found.  A warning is generated
-when the substring is missing and no third parameter.  Added in
-version 0.1.0.
+Find the position of a substring in a string.  When the substring
+is not found you can return a default value.  A warning is
+generated when the substring is missing and you don't specify a
+default value.
+
+
+- p1: string
+- p2: substring
+- p3: optional default value
+- return: the index of substring or p3
 
 #+BEGIN_SRC
+       0123456789 1234567
 msg = "Tea time at 3:30."
-find(msg, "Tea") => 0
-find(msg, "time") => 4
-find(msg, "party", -1) => -1
-find(msg, "party", len(msg)) => 17
-find(msg, "party", 0) => 0
+find(msg, "Tea") = 0
+find(msg, "time") = 4
+find(msg, "me") = 6
+find(msg, "party", -1) = -1
+find(msg, "party", len(msg)) = 17
+find(msg, "party", 0) = 0
 #+END_SRC
 
 [[#contents][茶]]
 
 ** float()
 :PROPERTIES:
-:CUSTOM_ID: floatfun
+:CUSTOM_ID: float
 :END:
 
-The float function converts an int or a number string to a
-float.
+Create a float from an int or an int number string.
 
-Added in version 0.1.0.
+- p1: int or int string
+- return: float
 
-Note: if you want to convert a number to a string, use the format
-function.
+Examples:
+
+#+BEGIN_SRC
+float(2) => 2.0
+float("33") => 33.0
+#+END_SRC
 
 [[#contents][茶]]
 
@@ -1713,31 +1696,40 @@ function.
 :CUSTOM_ID: get
 :END:
 
-You use the get function to return a list or dictionary element.
-You pass two or three parameters, the first is the dictionary or
-list to use, the second is the dictionary key name or the list
-index, and the third optional parameter is the default value when
-the element doesn't exist.
+Get a value from a list or dictionary.  You can specify a default
+value to return when the value doesn't exist, if you don't, a
+warning is generated when the element doesn't exist.
 
-If you don't specify the default, a warning is generated when the
-element doesn't exist and the statement is skipped.
+Note: for dictionary lookup you can use dot notation for many
+cases.
 
-- p1: Dictionary to use.
-- p2: Key of the element to return.
-- p3: Optional value returned when the key is missing.
+Dictionary case:
 
-or
+- p1: dictionary
+- p2: key string
+- p3: optional default value returned when key is missing
+- return: value
 
-- p1: List to use.
-- p2: Index to the element to return.
-- p3: Optional value returned when the index is too big.
+List case:
 
-Added in version 0.1.0.
+- p1: list
+- p2: index of item
+- p3: optional default value returned when index is too big
+- return: value
+
+Examples:
 
 #+BEGIN_SRC
-var = get(t.server, "tea")
-var = get(t.server, "tea", "Earl Grey")
-var = get(s.companyList, 3, "Unknown")
+d = dict("tea", "Earl Grey")
+get(d, 'tea') => "Earl Grey"
+get(d, 'coffee', 'Tea') => "Tea"
+
+l = list(4, 'a', 10)
+get(l, 2) => 10
+get(l, 3, 99) => 99
+
+d = dict("tea", "Earl Grey")
+d.tea => "Earl Grey"
 #+END_SRC
 
 [[#contents][茶]]
@@ -1747,40 +1739,19 @@ var = get(s.companyList, 3, "Unknown")
 :CUSTOM_ID: if
 :END:
 
-You use the if function to return a value based on a condition.
-It has three parameters, the condition, the true case and the
-false case.
+Return a value based on a condition.
 
-1. Condition is an integer.
-2. True case is the value returned when condition is 1.
-3. Else case is the value returned when condition is not 1.
+- p1: int condition
+- p2: true case: the value returned when condition is 1
+- p3: else case: the value returned when condition is not 1.
+- return: p2 or p3
 
-Added in version 0.1.0.
-
-The following example uses the template system to show how it
-works.
-
-template:
+Examples:
 
 #+BEGIN_SRC
-<--$ block -->
-<--$ : var1=if(1, 'dog', 'cat') -->
-<--$ : var2=if(0, 'dog', 'cat') -->
-<--$ : var3=if(8, 'dog', 'cat') -->
-
-if(1, 'dog', 'cat') => {var1}
-if(0, 'dog', 'cat') => {var2}
-if(8, 'dog', 'cat') => {var3}
-<--$ endblock -->
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-
-if(1, 'dog', 'cat') -> dog
-if(0, 'dog', 'cat') -> cat
-if(8, 'dog', 'cat') -> cat
+if(1, 'tea', 'beer') => "tea"
+if(0, 'tea', 'beer') => "beer"
+if(4, 'tea', 'beer') => "beer"
 #+END_SRC
 
 [[#contents][茶]]
@@ -1790,11 +1761,11 @@ if(8, 'dog', 'cat') -> cat
 :CUSTOM_ID: int
 :END:
 
-The int function converts a float or a number string to an
-int.
+Create an int from a float or a float number string.
 
-- p1: value to convert, float or number string
-- p2: optional round option, "round" is the default.
+- p1: float or float number string
+- p2: optional round option. "round" is the default.
+- return: int
 
 Round options:
 
@@ -1802,8 +1773,6 @@ Round options:
 - "floor" - integer below (to the left on number line)
 - "ceiling" - integer above (to the right on number line)
 - "truncate" - remove decimals
-
-Added in version 0.1.0.
 
 Examples:
 
@@ -1824,34 +1793,22 @@ int(-6.3456, "truncate") => -6
 
 [[#contents][茶]]
 
-** dict()
+** keys()
 :PROPERTIES:
-:CUSTOM_ID: dictfun
+:CUSTOM_ID: keys
 :END:
 
-Create a dictionary from a list of key, value pairs. You can
-specify as many pair as you want. The keys must be strings and
-the values and be any type. Added in version 0.1.0.
+Create a list from the keys in a dictionary.
+
+- p1: dictionary
+- return: list
+
+Examples:
 
 #+BEGIN_SRC
-dict("a", 5) => {"a": 5}
-dict("a", 5, "b", 33, "c", 0) => {"a": 5, "b": 33, "c": 0}}
-#+END_SRC
-
-[[#contents][茶]]
-
-** dup()
-:PROPERTIES:
-:CUSTOM_ID: dup
-:END:
-
-Duplicate a string. The first parameter is the string to dup and
-the second parameter is the number of times to duplicate it.
-Added in version 0.1.0.
-
-#+BEGIN_SRC
-dup("=", 5) => "====="
-dup("ab", 3) => "ababab"
+d = dict("a", 1, "b", 2, "c", 3)
+keys(d) => ["a", "b", "c"]
+values(d) => ["apple", 2, 3]
 #+END_SRC
 
 [[#contents][茶]]
@@ -1861,58 +1818,97 @@ dup("ab", 3) => "ababab"
 :CUSTOM_ID: len
 :END:
 
-The len function takes one parameter and returns the number of
-characters in a string (not bytes), the number of elements in a
-list or the number of elements in a dictionary.  Added in version
-0.1.0.
+Length of a string, list or dictionary. For strings it returns
+the number of characters, not bytes. For lists and dictionaries
+it return the number of elements.
+
+- p1: string, list or dict
+- return: int
+
+Examples:
 
 #+BEGIN_SRC
-$$ block
-$$ : length = len("Tetley")
-$$ : listLen = len(tea_list)
-$$ : serverLen = len(t.server)
-Tetley name has {length} characters.
-The tea list has {listlen} elements.
-The server json dictionary has {serverLen} elements.
-$$ endblock
-#+END_SRC
-
-json:
-
-#+BEGIN_SRC
-{
-"tea_list": [
-    {"tea": "Black"},
-    {"tea": "Green"},
-    {"tea": "Oolong"},
-    {"tea": "Sencha"},
-    {"tea": "Herbal"}
-  ]
-}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-The Tetley name has 6 characters.
-The tea list has 5 elements.
-The server json dictionary has 1 elements.
+len("tea") => 3
+len(list(4, 1)) => 2
+len(dict('a', 4)) => 1
 #+END_SRC
 
 [[#contents][茶]]
 
 ** list()
 :PROPERTIES:
-:CUSTOM_ID: listfun
+:CUSTOM_ID: list
 :END:
 
-Create a list of values. You can specify as many variables as you
-want.  Added in version 0.1.0.
+Create a list of values.
+
+- p1: value
+- p2: value
+- p3: value
+- ...
+- pn: value
+- return: list
+
+Examples:
 
 #+BEGIN_SRC
+list() => []
 list(1) => [1]
 list(1, 2, 3) => [1, 2, 3]
 list("a", 5, "b") => ["a", 5, "b"]
+#+END_SRC
+
+[[#contents][茶]]
+
+** lower()
+:PROPERTIES:
+:CUSTOM_ID: lower
+:END:
+
+Lowercase a string.
+
+- p1: string
+- return: lowercase string
+
+Examples:
+
+#+BEGIN_SRC
+lower("Tea") => "tea"
+#+END_SRC
+
+[[#contents][茶]]
+
+** path()
+:PROPERTIES:
+:CUSTOM_ID: path
+:END:
+
+Split a file path into pieces. Return a dictionary with the
+filename, basename, extension and directory.
+
+You pass a path string and the optional path separator. When no
+separator, the current system separator is used.
+
+- p1: path string
+- p2: optional separator string, "/" or "\".
+- return: dict
+
+Examples:
+
+#+BEGIN_SRC
+path("src/runFunction.nim") => {
+  "filename": "runFunction.nim",
+  "basename": "runFunction",
+  "ext": ".nim",
+  "dir": "src/",
+}
+
+path("src\runFunction.nim", "\") => {
+  "filename": "runFunction.nim",
+  "basename": "runFunction",
+  "ext": ".nim",
+  "dir": "src\",
+}
 #+END_SRC
 
 [[#contents][茶]]
@@ -1922,18 +1918,41 @@ list("a", 5, "b") => ["a", 5, "b"]
 :CUSTOM_ID: replace
 :END:
 
-Replace a part of a string (substring) with another string.
+Replace a substring by its position.  You specify the substring
+position and the string to take its place.  You can use it to
+insert and append to a string as well.
 
-The first parameter is the string, the second is the substring's
-starting index position and the third is the length of the
-substring and the forth is the string to replace.
+- p1: string
+- p2: start index of substring
+- p3: length of substring
+- p4: replacement substring
+- return: string
 
-You can use replace to insert or append to a string.
+Examples:
 
 #+BEGIN_SRC
 replace("Earl Grey", 5, 4, "of Sandwich")
   => "Earl of Sandwich"
-replace("abc", 3, 0, "123") => "abc123"
+replace("123", 0, 0, "abcd") => abcd123
+replace("123", 0, 1, "abcd") => abcd23
+replace("123", 0, 2, "abcd") => abcd3
+replace("123", 0, 3, "abcd") => abcd
+replace("123", 3, 0, "abcd") => 123abcd
+replace("123", 2, 1, "abcd") => 12abcd
+replace("123", 1, 2, "abcd") => 1abcd
+replace("123", 0, 3, "abcd") => abcd
+replace("123", 1, 0, "abcd") => 1abcd23
+replace("123", 1, 1, "abcd") => 1abcd3
+replace("123", 1, 2, "abcd") => 1abcd
+replace("", 0, 0, "abcd") => abcd
+replace("", 0, 0, "abc") => abc
+replace("", 0, 0, "ab") => ab
+replace("", 0, 0, "a") => a
+replace("", 0, 0, "") =>
+replace("123", 0, 0, "") => 123
+replace("123", 0, 1, "") => 23
+replace("123", 0, 2, "") => 3
+replace("123", 0, 3, "") =>
 #+END_SRC
 
 [[#contents][茶]]
@@ -1943,16 +1962,31 @@ replace("abc", 3, 0, "123") => "abc123"
 :CUSTOM_ID: replaceRe
 :END:
 
-Replace multiple parts of a string defined by regular
-expressions with replacement strings.
+Replace multiple parts of a string using regular expressions.
 
-The basic case takes three parameters, the string to work on, the
-regular expression pattern, and the replacement string.
+You specify one or more pairs of a regex patterns and its string
+replacement. The pairs can be specified as parameters to the
+function or they can be part of a list.
 
-In general you can have multiple sets of patterns and
-replacements. You add each pair of parameters at the end.  If the
-second parameter is a list, the patterns and replacements come
-from it.
+Muliple parameters case:
+
+- p1: string to replace
+- p2: pattern 1
+- p3: replacement string 1
+- p4: optional: pattern 2
+- p5: optional: replacement string 2
+- ...
+- pn-1: optional: pattern n
+- pn: optional: replacement string n
+- return: string
+
+List case:
+
+- p1: string to replace
+- p2: list of pattern and replacement pairs
+- return: string
+
+Examples:
 
 #+BEGIN_SRC
 replaceRe("abcdefabc", "abc", "456")
@@ -1966,46 +2000,118 @@ replaceRe("abcdefabc", l))
 
 [[#contents][茶]]
 
+** sort()
+:PROPERTIES:
+:CUSTOM_ID: sort
+:END:
+
+Sort a list of values of the same type.
+
+When sorting strings you have the option to compare case
+sensitive or insensitive.
+
+When sorting lists the lists are compared by their first
+element. The first elements must exist, be the same type and be
+an int, float or string. You have the option of comparing strings
+case insensitive.
+
+Dictionaries are compared by the value of one of their keys.  The
+key values must exist, be the same type and be an int, float or
+string. You have the option of comparing strings case
+insensitive.
+
+int, float case:
+
+- p1: list of ints or list of floats
+- p2: optional: "ascending", "descending"
+- return: sorted list
+
+string or list case:
+
+- p1: list of strings or list of lists
+- p2: optional: "ascending", "descending"
+- p3: optional: default "sensitive", "insensitive"
+- return: sorted list
+
+dictionary case:
+
+- p1: list of dictionaries
+- p2: "ascending", "descending"
+- p3: "sensitive", "insensitive"
+- p4: key string
+- return: sorted list
+
+Examples:
+
+#+BEGIN_SRC
+l = list(4, 3, 5, 5, 2, 4)
+sort(l) => [2, 3, 4, 4, 5, 5]
+sort(l, "descending") => [5, 5, 4, 4, 3, 2]
+
+strs = list('T', 'e', 'a')
+sort(strs) => ['T', 'a', 'e']
+sort(strs, "ascending", "sensitive") => ['T', 'a', 'e']
+sort(strs, "ascending", "insensitive") => ['a', 'e', 'T']
+
+l1 = list(4, 3, 1)
+l2 = list(2, 3, 0)
+listOfList = list(l1, l2)
+sort(listOfList) => [l2, l1]
+
+d1 = dict('name', 'Earl Gray', 'weight', 1.2)
+d2 = dict('name', 'Tea Pot', 'weight', 3.5)
+dicts = list(d1, d2)
+sort(dicts, "ascending", "sensitive", 'weight') => [d1, d2]
+sort(dicts, "descending", "sensitive", 'name') => [d2, d1]
+#+END_SRC
+
+[[#contents][茶]]
+
 ** substr()
 :PROPERTIES:
 :CUSTOM_ID: substr
 :END:
 
-The substr function extracts a substring from a string. It takes
-two or three parameters, the string, the substring's starting
-index and the end position (one past the end).  The third
-parameter is optional and defaults to one past the end of the
-string. Added in version 0.1.0.
+Extract a substring from a string by its position. You pass the
+string, the substring's start index then its end index+1.
+The end index is optional and defaults to the end of the
+string.
 
-This kind of positioning is called a half-open range that
-includes the first position but not the second. For example,
-[3, 7) includes 3, 4, 5, 6. The end minus the start is equal to
-the length of the substring.
+The range is half-open which includes the start position but not
+the end position. For example, [3, 7) includes 3, 4, 5, 6. The
+end minus the start is equal to the length of the substring.
 
-Showing the indexes under Earl Grey helps to understand how the
-function works.
+- p1: string
+- p2: start index
+- p3: optional: end index (one past end)
+- return: string
 
-#+BEGIN_SRC
-Earl Grey
-0123456789
-#+END_SRC
-
-template:
+Examples:
 
 #+BEGIN_SRC
-$$ nextline
-$$ : sub1 = substr("Earl Grey", 5)
-$$ : sub2 = substr("Earl Grey", 0, 6)
-sub1 = {sub1}, sub2 = {sub2}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-sub1 = Grey, sub2 = Earl G
+substr("Earl Grey", 0, 4) => "Earl"
+substr("Earl Grey", 5) => => "Grey"
 #+END_SRC
 
 [[#contents][茶]]
+
+** values()
+:PROPERTIES:
+:CUSTOM_ID: values
+:END:
+
+Create a list of the values in a dictionary.
+
+- p1: dictionary
+- return: list
+
+Examples:
+
+#+BEGIN_SRC
+d = dict("a", "apple", "b", 2, "c", 3)
+keys(d) => ["a", "b", "c"]
+values(d) => ["apple", 2, 3]
+#+END_SRC
 
 * Contents :notoc:
 :PROPERTIES:

@@ -2,8 +2,6 @@
 
 * StaticTea Template
 
-** TODO Sort the functions alphabetically.
-
 # $ # Define replacement patterns to format the descriptions or
 # $ # org mode.
 # $ #
@@ -20,6 +18,7 @@
 # $ :   "&gt;", '>', +
 # $ :   "&lt;", '<', +
 # $ :   "&amp;", '&')
+# $ : g.entries = sort(s.entries, "ascending", "sensitive", "name")
 # $ endblock
 # $ #
 * Functions
@@ -32,20 +31,16 @@ Functions allow you to format variables for presentation.  They
 return a value that you assign to a variable or pass to another
 function.
 
-New functions get added over time. the function documentation
-tells which version it appeared so you know which version of
-statictea to require.
-
-The function sections below were extracted from the nim source
-code with a StaticTea template and formatted for org mode.
+This section was extracted from the nim source code with a
+StaticTea template and formatted for this readme.
 
 List of functions:
 
 # $ # Generate the function index.
 # $ #
 # $ nextline
-# $ : t.repeat = len(s.entries)
-# $ : entry = get(s.entries, t.row, dict())
+# $ : t.repeat = len(g.entries)
+# $ : entry = get(g.entries, t.row, dict())
 # $ : skip = case(entry.type, "skFunc", 0, 1)
 # $ : pos = find(entry.name, "fun", -1)
 # $ : skip2 = case(pos, 0, 0, 1)
@@ -58,8 +53,8 @@ List of functions:
 
 # $ # Generate the function sections.
 # $ block
-# $ : t.repeat = len(s.entries)
-# $ : entry = get(s.entries, t.row, dict())
+# $ : t.repeat = len(g.entries)
+# $ : entry = get(g.entries, t.row, dict())
 # $ : skip = case(entry.type, "skFunc", 0, 1)
 # $ : pos = find(entry.name, "fun", -1)
 # $ : skip2 = case(pos, 0, 0, 1)

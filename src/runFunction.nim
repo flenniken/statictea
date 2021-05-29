@@ -115,12 +115,9 @@ func cmpBaseValues*(a, b: Value, insensitive: bool = false): int =
       result = 0
 
 func funCmp*(parameters: seq[Value]): FunResult =
-  ## Compare two values.  The values are either numbers or strings
-  ## (both the same type), and it returns whether the first parameter
-  ## is less than, equal to or greater than the second parameter. It
-  ## returns -1 for less, 0 for equal and 1 for greater than. The
-  ## optional third parameter compares strings case insensitive when
-  ## it is 1.
+  ## Compare two values. Returns -1 for less, 0 for equal and 1 for
+  ## @:greater than.  The values are either int, float or string (both the
+  ## @:same type) The default compares strings case sensitive.
   ## @:
   ## @:Compare numbers:
   ## @:
@@ -209,10 +206,9 @@ func funConcat*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(str))
 
 func funLen*(parameters: seq[Value]): FunResult =
-  ## Length of a string, list or dict value. It takes one
-  ## parameter and returns the number of characters in a string (not
-  ## bytes), the number of elements in a list or the number of
-  ## elements in a dictionary.
+  ## Length of a string, list or dictionary. For strings it returns
+  ## @:the number of characters, not bytes. For lists and dictionaries
+  ## @:it return the number of elements.
   ## @:
   ## @:* p1: string, list or dict
   ## @:* return: int
@@ -242,26 +238,26 @@ func funLen*(parameters: seq[Value]): FunResult =
   result = newFunResult(retValue)
 
 func funGet*(parameters: seq[Value]): FunResult =
-  ## Get a value from a list or dictionary. You pass two or three
-  ## parameters. The first is the dictionary or list to use, the
-  ## second is the dictionary's key name or the list index, and the
-  ## third optional parameter is the default value when the element
-  ## doesn't exist. If you don't specify the default, a warning is
-  ## generated when the element doesn't exist and the statement is
-  ## skipped.
+  ## Get a value from a list or dictionary.  You can specify a default
+  ## @:value to return when the value doesn't exist, if you don't, a
+  ## @:warning is generated when the element doesn't exist.
   ## @:
-  ## @:Get Dictionary Item:
+  ## @:Note: for dictionary lookup you can use dot notation for many
+  ## @:cases.
   ## @:
-  ## @:* p1: dictionary to search
-  ## @:* p2: variable (key name) to find
+  ## @:Dictionary case:
+  ## @:
+  ## @:* p1: dictionary
+  ## @:* p2: key string
   ## @:* p3: optional default value returned when key is missing
+  ## @:* return: value
   ## @:
-  ## @:Get List Item:
+  ## @:List case:
   ## @:
-  ## @:* p1: list to use
-  ## @:* p2: index of item in the list
+  ## @:* p1: list
+  ## @:* p2: index of item
   ## @:* p3: optional default value returned when index is too big
-  ## @:* return: any value
+  ## @:* return: value
   ## @:
   ## @:Examples:
   ## @:
@@ -273,6 +269,9 @@ func funGet*(parameters: seq[Value]): FunResult =
   ## @:l = list(4, 'a', 10)
   ## @:get(l, 2) => 10
   ## @:get(l, 3, 99) => 99
+  ## @:
+  ## @:d = dict("tea", "Earl Grey")
+  ## @:d.tea => "Earl Grey"
   ## @:~~~~
 
   if parameters.len() < 2 or parameters.len() > 3:
@@ -307,13 +306,12 @@ func funGet*(parameters: seq[Value]): FunResult =
 
 # todo: remove the if.  Use case instead.
 func funIf*(parameters: seq[Value]): FunResult =
-  ## Return a value based on a condition.  You pass three parameters,
-  ## the condition, the true case and the false case.
+  ## Return a value based on a condition.
   ## @:
-  ## @:* p1: integer condition
+  ## @:* p1: int condition
   ## @:* p2: true case: the value returned when condition is 1
   ## @:* p3: else case: the value returned when condition is not 1.
-  ## @:* return: any value
+  ## @:* return: p2 or p3
   ## @:
   ## @:Examples:
   ## @:
@@ -341,7 +339,7 @@ func funIf*(parameters: seq[Value]): FunResult =
 
 func funAdd*(parameters: seq[Value]): FunResult =
   ## Add two or more numbers.  The parameters must be all integers or
-  ## all floats.  A warning is generated on overflow.
+  ## @:all floats.  A warning is generated on overflow.
   ## @:
   ## @:Integer case:
   ## @:
@@ -397,12 +395,10 @@ func funAdd*(parameters: seq[Value]): FunResult =
 {.pop.}
 
 func funExists*(parameters: seq[Value]): FunResult =
-  ## Determine whether a variable exists in a dictionary.  The first
-  ## parameter is the dictionary to check and the second parameter is
-  ## the name of the variable.
+  ## Determine whether a key exists in a dictionary.
   ## @:
   ## @:* p1: dictionary
-  ## @:* p2: string: variable name (key name)
+  ## @:* p2: key string
   ## @:* return: 0 or 1
   ## @:
   ## @:Examples:
@@ -434,17 +430,17 @@ func funExists*(parameters: seq[Value]): FunResult =
 
 func funCase*(parameters: seq[Value]): FunResult =
   ## Return a value from multiple choices. It takes a main condition,
-  ## any number of case pairs then an optional else value.
+  ## @:any number of case pairs then an optional else value.
   ## @:
-  ## The first parameter of a case pair is the condition and the
-  ## second is the return value when that condition matches the main
-  ## condition. The function compares the conditions left to right and
-  ## returns the first match.
+  ## @:The first parameter of a case pair is the condition and the
+  ## @:second is the return value when that condition matches the main
+  ## @:condition. The function compares the conditions left to right and
+  ## @:returns the first match.
   ## @:
-  ## When none of the cases match the main condition, the "else"
-  ## value is returned. If none match and the else is missing, a
-  ## warning is generated and the statement is skipped. The conditions
-  ## must be integers or strings. The return values can be any type.
+  ## @:When none of the cases match the main condition, the "else"
+  ## @:value is returned. If none match and the else is missing, a
+  ## @:warning is generated and the statement is skipped. The conditions
+  ## @:must be integers or strings. The return values can be any type.
   ## @:
   ## @:* p1: the main condition value
   ## @:* p2: the first case condition
@@ -461,9 +457,9 @@ func funCase*(parameters: seq[Value]): FunResult =
   ## @:case(8, 8, "tea", "water") => "tea"
   ## @:case(8, 3, "tea", "water") => "water"
   ## @:case(8,
-  ## @:  1, "tea", \\
-  ## @:  2, "water", \\
-  ## @:  3, "wine", \\
+  ## @:  1, "tea", +
+  ## @:  2, "water", +
+  ## @:  3, "wine", +
   ## @:  "beer") => "beer"
   ## @:~~~~
 
@@ -524,14 +520,12 @@ func parseVersion*(version: string): Option[(int, int, int)] =
   result = some((int(g1IntPosO.get().integer), int(g2IntPosO.get().integer), int(g3IntPosO.get().integer)))
 
 func funCmpVersion*(parameters: seq[Value]): FunResult =
-  ## Compare two StaticTea version numbers. Return whether the first
-  ## parameter is less than, equal to or greater than the second
-  ## parameter. It returns -1 for less, 0 for equal and 1 for greater
-  ## than.
+  ## Compare two StaticTea version numbers. Returns -1 for less, 0 for
+  ## @:equal and 1 for greater than.
   ## @:
-  ## StaticTea uses @|Semantic Versioning|@(https@@://semver.org/)
-  ## with the added restriction that each version component has one
-  ## to three digits (no letters).
+  ## @:StaticTea uses @|Semantic Versioning|@(https@@://semver.org/)
+  ## @:with the added restriction that each version component has one
+  ## @:to three digits (no letters).
   ## @:
   ## @:* p1: version number string
   ## @:* p2: version number string
@@ -572,9 +566,7 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(ret))
 
 func funFloat*(parameters: seq[Value]): FunResult =
-  ## Convert an int or an int number string to a float.
-  ## @:
-  ## Note: Use the format function to convert a number to a string.
+  ## Create a float from an int or an int number string.
   ## @:
   ## @:* p1: int or int string
   ## @:* return: float
@@ -616,7 +608,7 @@ func funFloat*(parameters: seq[Value]): FunResult =
 # todo: use int64 instead of BiggestInt everywhere.
 
 func funInt*(parameters: seq[Value]): FunResult =
-  ## Convert a float or a float number string to an int.
+  ## Create an int from a float or a float number string.
   ## @:
   ## @:* p1: float or float number string
   ## @:* p2: optional round option. "round" is the default.
@@ -704,16 +696,16 @@ func funInt*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(ret))
 
 func funFind*(parameters: seq[Value]): FunResult =
-  ## Find a substring in a string and return its starting position.
-  ## The first parameter is the string and the second is the
-  ## substring. The third optional parameter is returned when the
-  ## substring is not found.  A warning is generated when the
-  ## substring is missing and no third parameter. Positions start at
-  ## @@0.
-  ## @:* p1: string to work on
-  ## @:* p2: substring to find
-  ## @:* p3: optional return value when not found
-  ## @:* return: int
+  ## Find the position of a substring in a string.  When the substring
+  ## @:is not found you can return a default value.  A warning is
+  ## @:generated when the substring is missing and you don't specify a
+  ## @:default value.
+  ## @:
+  ## @:
+  ## @:* p1: string
+  ## @:* p2: substring
+  ## @:* p3: optional default value
+  ## @:* return: the index of substring or p3
   ## @:
   ## @:~~~
   ## @:       0123456789 1234567
@@ -746,14 +738,14 @@ func funFind*(parameters: seq[Value]): FunResult =
 
 func funSubstr*(parameters: seq[Value]): FunResult =
   ## Extract a substring from a string by its position. You pass the
-  ## string, the substring's start index then its end index+1.
-  ## The end index is optional and defaults to the end of the
-  ## string.
-  ##
-  ## The range is half-open which includes the start position but not
-  ## the end position. For example, [3, 7) includes 3, 4, 5, 6. The
-  ## end minus the start is equal to the length of the substring.
-  ##
+  ## @:string, the substring's start index then its end index+1.
+  ## @:The end index is optional and defaults to the end of the
+  ## @:string.
+  ## @:
+  ## @:The range is half-open which includes the start position but not
+  ## @:the end position. For example, [3, 7) includes 3, 4, 5, 6. The
+  ## @:end minus the start is equal to the length of the substring.
+  ## @:
   ## @:* p1: string
   ## @:* p2: start index
   ## @:* p3: optional: end index (one past end)
@@ -803,7 +795,7 @@ func funSubstr*(parameters: seq[Value]): FunResult =
 
 func funDup*(parameters: seq[Value]): FunResult =
   ## Duplicate a string. The first parameter is the string to dup and
-  ## the second parameter is the number of times to duplicate it.
+  ## @:the second parameter is the number of times to duplicate it.
   ## @:
   ## @:* p1: string to duplicate
   ## @:* p2: number of times to repeat
@@ -813,7 +805,7 @@ func funDup*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:~~~
   ## @:dup("=", 3) => "==="
-  ## @:substr("abc", 2) => => "abcabc"
+  ## @:substr("abc", 2) => "abcabc"
   ## @:~~~~
 
   if parameters.len() != 2:
@@ -842,14 +834,13 @@ func funDup*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(str))
 
 func funDict*(parameters: seq[Value]): FunResult =
-  ## Create a dictionary from a list of key, value pairs. You can
-  ## specify as many pairs as you want. The keys must be strings and
-  ## the values can be any type.
+  ## Create a dictionary from a list of key, value pairs.  The keys
+  ## @:must be strings and the values can be any type.
   ## @:
-  ## @:* p1: string key
+  ## @:* p1: key string
   ## @:* p2: value
   ## @:* ...
-  ## @:* pn-1: string key
+  ## @:* pn-1: key string
   ## @:* pn: value
   ## @:* return: dict
   ## @:
@@ -879,8 +870,7 @@ func funDict*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(dict))
 
 func funList*(parameters: seq[Value]): FunResult =
-  ## Create a list of values. You can specify as many variables as you
-  ## want.
+  ## Create a list of values.
   ## @:
   ## @:* p1: value
   ## @:* p2: value
@@ -901,17 +891,14 @@ func funList*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(parameters))
 
 func funReplace*(parameters: seq[Value]): FunResult =
-  ## Replace a part of a string with another string.  You can use it
-  ## to insert and append to a string as well.
+  ## Replace a substring by its position.  You specify the substring
+  ## @:position and the string to take its place.  You can use it to
+  ## @:insert and append to a string as well.
   ## @:
-  ## The first parameter is the string, the second is the substring's
-  ## starting position, starting a 0, the third is the length of the
-  ## substring and the fourth is the replacement string.
-  ## @:
-  ## @:* p1: string to replace
-  ## @:* p2: substring start index
-  ## @:* p3: substring length
-  ## @:* p4: replacement string
+  ## @:* p1: string
+  ## @:* p2: start index of substring
+  ## @:* p3: length of substring
+  ## @:* p4: replacement substring
   ## @:* return: string
   ## @:
   ## @:Examples:
@@ -1040,21 +1027,13 @@ func funReplace*(parameters: seq[Value]): FunResult =
 
 # todo: add another parameter for regex flags.
 func funReplaceRe*(parameters: seq[Value]): FunResult =
-  ## Replace multiple parts of a string defined by regular
-  ## expressions.
+  ## Replace multiple parts of a string using regular expressions.
   ## @:
-  ## The basic use case replaces one part of the string. It takes
-  ## three parameters, the first parameter is the string to work on,
-  ## the second is the regular expression pattern, and the third is
-  ## the replacement string.
+  ## @:You specify one or more pairs of a regex patterns and its string
+  ## @:replacement. The pairs can be specified as parameters to the
+  ## @:function or they can be part of a list.
   ## @:
-  ## In general you can have multiple sets of patterns and associated
-  ## replacements. You add each pair of parameters at the end.
-  ## @:
-  ## If the second parameter is a list, the patterns and
-  ## replacements come from it.
-  ## @:
-  ## @:Case one:
+  ## @:Muliple parameters case:
   ## @:
   ## @:* p1: string to replace
   ## @:* p2: pattern 1
@@ -1066,7 +1045,7 @@ func funReplaceRe*(parameters: seq[Value]): FunResult =
   ## @:* pn: optional: replacement string n
   ## @:* return: string
   ## @:
-  ## @:Case two:
+  ## @:List case:
   ## @:
   ## @:* p1: string to replace
   ## @:* p2: list of pattern and replacement pairs
@@ -1114,13 +1093,13 @@ func funReplaceRe*(parameters: seq[Value]): FunResult =
 
 func funPath*(parameters: seq[Value]): FunResult =
   ## Split a file path into pieces. Return a dictionary with the
-  ## filename, basename, extension and directory.
+  ## @:filename, basename, extension and directory.
   ## @:
   ## @:You pass a path string and the optional path separator. When no
   ## @:separator, the current system separator is used.
   ## @:
   ## @:* p1: path string
-  ## @:* p2: optional separator string, "/" or "\".
+  ## @:* p2: optional separator string, "/" or "\\".
   ## @:* return: dict
   ## @:
   ## @:Examples:
@@ -1131,6 +1110,13 @@ func funPath*(parameters: seq[Value]): FunResult =
   ## @:  "basename": "runFunction",
   ## @:  "ext": ".nim",
   ## @:  "dir": "src/",
+  ## @:}
+  ## @:
+  ## @:path("src\\runFunction.nim", "\\") => {
+  ## @:  "filename": "runFunction.nim",
+  ## @:  "basename": "runFunction",
+  ## @:  "ext": ".nim",
+  ## @:  "dir": "src\\",
   ## @:}
   ## @:~~~~
 
@@ -1188,8 +1174,8 @@ func funPath*(parameters: seq[Value]): FunResult =
 func funLower*(parameters: seq[Value]): FunResult =
   ## Lowercase a string.
   ## @:
-  ## @:* p1: string to lowercase
-  ## @:* return: string
+  ## @:* p1: string
+  ## @:* return: lowercase string
   ## @:
   ## @:Examples:
   ## @:
@@ -1234,7 +1220,7 @@ func funKeys*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(theList))
 
 func funValues*(parameters: seq[Value]): FunResult =
-  ## Create a list from the values in a dictionary.
+  ## Create a list of the values in a dictionary.
   ## @:
   ## @:* p1: dictionary
   ## @:* return: list
@@ -1263,21 +1249,38 @@ func funValues*(parameters: seq[Value]): FunResult =
 func funSort*(parameters: seq[Value]): FunResult =
   ## Sort a list of values of the same type.
   ## @:
-  ## When sorting strings the third parameter tells whether to compare
-  ## case sensitive.
+  ## @:When sorting strings you have the option to compare case
+  ## @:sensitive or insensitive.
   ## @:
-  ## When sorting lists the sub lists are compared by their first
-  ## element. The first elements must exist, be the same type and be
-  ## an int, float or string.
+  ## @:When sorting lists the lists are compared by their first
+  ## @:element. The first elements must exist, be the same type and be
+  ## @:an int, float or string. You have the option of comparing strings
+  ## @:case insensitive.
   ## @:
-  ## When sorting dictionaries the third parameter specifies the key
-  ## used to compare them.  The dictionaries key values must be the
-  ## same type and be an int, float or string.
+  ## @:Dictionaries are compared by the value of one of their keys.  The
+  ## @:key values must exist, be the same type and be an int, float or
+  ## @:string. You have the option of comparing strings case
+  ## @:insensitive.
   ## @:
-  ## @:* p1: list
+  ## @:int, float case:
+  ## @:
+  ## @:* p1: list of ints or list of floats
   ## @:* p2: optional: "ascending", "descending"
-  ## @:* p3: optional: "sensitive", "insensitive" for strings, default "sensitive".
-  ## @:* p3: required: sort key for dicts
+  ## @:* return: sorted list
+  ## @:
+  ## @:string or list case:
+  ## @:
+  ## @:* p1: list of strings or list of lists
+  ## @:* p2: optional: "ascending", "descending"
+  ## @:* p3: optional: default "sensitive", "insensitive"
+  ## @:* return: sorted list
+  ## @:
+  ## @:dictionary case:
+  ## @:
+  ## @:* p1: list of dictionaries
+  ## @:* p2: "ascending", "descending"
+  ## @:* p3: "sensitive", "insensitive"
+  ## @:* p4: key string
   ## @:* return: sorted list
   ## @:
   ## @:Examples:
@@ -1289,6 +1292,7 @@ func funSort*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:strs = list('T', 'e', 'a')
   ## @:sort(strs) => ['T', 'a', 'e']
+  ## @:sort(strs, "ascending", "sensitive") => ['T', 'a', 'e']
   ## @:sort(strs, "ascending", "insensitive") => ['a', 'e', 'T']
   ## @:
   ## @:l1 = list(4, 3, 1)
@@ -1299,19 +1303,23 @@ func funSort*(parameters: seq[Value]): FunResult =
   ## @:d1 = dict('name', 'Earl Gray', 'weight', 1.2)
   ## @:d2 = dict('name', 'Tea Pot', 'weight', 3.5)
   ## @:dicts = list(d1, d2)
-  ## @:sort(dicts, "ascending", 'weight') => [d1, d2]
-  ## @:sort(dicts, "descending", 'name') => [d2, d1]
+  ## @:sort(dicts, "ascending", "sensitive", 'weight') => [d1, d2]
+  ## @:sort(dicts, "descending", "sensitive", 'name') => [d2, d1]
   ## @:~~~~
 
-  if parameters.len() < 1 or parameters.len() > 3:
-    return newFunResultWarn(wOneToThreeParameters)
+  if parameters.len() < 1 or parameters.len() > 4:
+    return newFunResultWarn(wOneToFourParameters)
 
   if parameters[0].kind != vkList:
     return newFunResultWarn(wExpectedList, 0)
   let list = parameters[0].listv
 
+  if list.len == 0:
+    return newFunResult(newEmptyListValue())
+  let listKind = list[0].kind
+
   var sortOrder = Ascending
-  if parameters.len() > 1:
+  if parameters.len() >= 2:
     if parameters[1].kind != vkString:
       return newFunResultWarn(wExpectedSortOrder, 1)
     case parameters[1].stringv:
@@ -1322,41 +1330,38 @@ func funSort*(parameters: seq[Value]): FunResult =
       else:
         return newFunResultWarn(wExpectedSortOrder, 1)
 
-  if list.len == 0:
-    return newFunResult(newEmptyListValue())
-
-  let listKind = list[0].kind
-  var key = ""
   var insensitive = false
-  if listKind == vkDict:
-    if parameters.len() < 3:
-      return newFunResultWarn(wExpectedKey, 2)
-    key = parameters[2].stringv
-  elif listKind == vkString:
-    if parameters.len() > 2:
-      if parameters[2].kind != vkString:
+  if parameters.len() >= 3:
+    if parameters[2].kind != vkString:
+      return newFunResultWarn(wExpectedSensitivity, 2)
+    case parameters[2].stringv:
+      of "sensitive":
+        insensitive = false
+      of "insensitive":
+        insensitive = true
+      else:
         return newFunResultWarn(wExpectedSensitivity, 2)
-      case parameters[2].stringv:
-        of "sensitive":
-          insensitive = false
-        of "insensitive":
-          insensitive = true
-        else:
-          return newFunResultWarn(wExpectedSensitivity, 2)
 
-  # Verify the all the values are the same type.
+  var key = ""
+  if listKind == vkDict:
+    if parameters.len() < 4:
+      return newFunResultWarn(wExpectedKey, 3)
+    key = parameters[3].stringv
+
+  # Get the type of the first item.
   let firstItem = list[0]
-  var firstKeyValueKind = vkString
   var firstListValueKind = vkString
-  if firstItem.kind == vkDict:
+  var firstKeyValueKind = vkString
+  if listKind == vkDict:
     if not (key in firstItem.dictv):
       return newFunResultWarn(wDictKeyMissing, 0)
     firstKeyValueKind = firstItem.dictv[key].kind
-  elif firstItem.kind == vkList:
+  elif listKind == vkList:
     if firstItem.listv.len == 0:
       return newFunResultWarn(wSubListsEmpty, 0)
     firstListValueKind = firstItem.listv[0].kind
 
+  # Verify the all the values are the same type.
   for value in list:
     if value.kind != listKind:
       return newFunResultWarn(wNotSameKind, 0)
@@ -1384,9 +1389,9 @@ func funSort*(parameters: seq[Value]): FunResult =
     of vkString, vkInt, vkFloat:
       result = cmpBaseValues(a, b, insensitive)
     of vkList:
-      result = cmpBaseValues(a.listv[0], b.listv[0])
+      result = cmpBaseValues(a.listv[0], b.listv[0], insensitive)
     of vkDict:
-      result = cmpBaseValues(a.dictv[key], b.dictv[key])
+      result = cmpBaseValues(a.dictv[key], b.dictv[key], insensitive)
 
   let newList = sorted(list, sortCmpValues, sortOrder)
   result = newFunResult(newValue(newList))
