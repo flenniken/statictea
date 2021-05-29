@@ -73,7 +73,7 @@ func `$`*(funResult: FunResult): string =
       $funResult.warningData, $funResult.parameter
     ]
 
-func cmpString*(a, b: string, caseInsensitive: bool = false): int =
+func cmpString*(a, b: string, insensitive: bool = false): int =
   ## Compares two utf8 strings a and b.  When a equals b return 0,
   ## when a is greater than b return 1 and when a is less than b
   ## return -1. Optionally Ignore case.
@@ -84,7 +84,7 @@ func cmpString*(a, b: string, caseInsensitive: bool = false): int =
   while i < a.len and j < b.len:
     fastRuneAt(a, i, ar)
     fastRuneAt(b, j, br)
-    if caseInsensitive:
+    if insensitive:
       ar = toLower(ar)
       br = toLower(br)
     ret = int(ar) - int(br)
@@ -99,26 +99,20 @@ func cmpString*(a, b: string, caseInsensitive: bool = false): int =
   else:
     result = 0
 
-func cmpValue*(a, b: Value, caseInsensitive: bool = false): int =
+func cmpBaseValues*(a, b: Value, insensitive: bool = false): int =
   ## Compares two values a and b.  When a equals b return 0, when a is
   ## greater than b return 1 and when a is less than b return -1.
   ## The values must be the same kind and either int, float or string.
 
   case a.kind
     of vkString:
-      result = cmpString(a.stringv, b.stringv, caseInsensitive)
+      result = cmpString(a.stringv, b.stringv, insensitive)
     of vkInt:
       result = cmp(a.intv, b.intv)
     of vkFloat:
       result = cmp(a.floatv, b.floatv)
     else:
       result = 0
-
-func cmpTwoValues*(a, b: Value): int =
-  ## Compares two values a and b.  When a equals b return 0, when a is
-  ## greater than b return 1 and when a is less than b return -1.
-  ## The values must be the same kind and either int, float or string.
-  result = cmpValue(a, b, false)
 
 func funCmp*(parameters: seq[Value]): FunResult =
   ## Compare two values.  The values are either numbers or strings
@@ -172,20 +166,20 @@ func funCmp*(parameters: seq[Value]): FunResult =
     return newFunResultWarn(wIntFloatString)
 
   # Get the optional case insensitive and check it is 0 or 1.
-  var caseInsensitive = false
+  var insensitive = false
   if parameters.len() == 3:
     let value3 = parameters[2]
     if value3.kind != vkInt:
         return newFunResultWarn(wNotZeroOne, 2)
     case value3.intv:
     of 0:
-      caseInsensitive = false
+      insensitive = false
     of 1:
-      caseInsensitive = true
+      insensitive = true
     else:
       return newFunResultWarn(wNotZeroOne, 2)
 
-  let ret = cmpValue(value1, value2, caseInsensitive)
+  let ret = cmpBaseValues(value1, value2, insensitive)
   result = newFunResult(newValue(ret))
 
 func funConcat*(parameters: seq[Value]): FunResult =
@@ -1309,8 +1303,8 @@ func funSort*(parameters: seq[Value]): FunResult =
   ## @:sort(dicts, "descending", 'name') => [d2, d1]
   ## @:~~~~
 
-  if parameters.len() < 1 or parameters.len() > 2:
-    return newFunResultWarn(wOneOrTwoParameters)
+  if parameters.len() < 1 or parameters.len() > 3:
+    return newFunResultWarn(wOneToThreeParameters)
 
   if parameters[0].kind != vkList:
     return newFunResultWarn(wExpectedList, 0)
@@ -1331,19 +1325,70 @@ func funSort*(parameters: seq[Value]): FunResult =
   if list.len == 0:
     return newFunResult(newEmptyListValue())
 
-  # Verify the values are all ints, all floats or all strings.
-  let theKind = list[0].kind
-  case theKind:
-    of vkInt, vkFloat, vkString:
-      discard
-    else:
-      return newFunResultWarn(wAllNotIntFloatString, 0)
+  let listKind = list[0].kind
+  var key = ""
+  var insensitive = false
+  if listKind == vkDict:
+    if parameters.len() < 3:
+      return newFunResultWarn(wExpectedKey, 2)
+    key = parameters[2].stringv
+  elif listKind == vkString:
+    if parameters.len() > 2:
+      if parameters[2].kind != vkString:
+        return newFunResultWarn(wExpectedSensitivity, 2)
+      case parameters[2].stringv:
+        of "sensitive":
+          insensitive = false
+        of "insensitive":
+          insensitive = true
+        else:
+          return newFunResultWarn(wExpectedSensitivity, 2)
+
+  # Verify the all the values are the same type.
+  let firstItem = list[0]
+  var firstKeyValueKind = vkString
+  var firstListValueKind = vkString
+  if firstItem.kind == vkDict:
+    if not (key in firstItem.dictv):
+      return newFunResultWarn(wDictKeyMissing, 0)
+    firstKeyValueKind = firstItem.dictv[key].kind
+  elif firstItem.kind == vkList:
+    if firstItem.listv.len == 0:
+      return newFunResultWarn(wSubListsEmpty, 0)
+    firstListValueKind = firstItem.listv[0].kind
 
   for value in list:
-    if value.kind != theKind:
+    if value.kind != listKind:
       return newFunResultWarn(wNotSameKind, 0)
+    case listKind:
+      of vkList:
+        if value.listv.len == 0:
+          # A sublist is empty.
+          return newFunResultWarn(wSubListsEmpty, 0)
+        if value.listv[0].kind != firstListValueKind:
+          # The first item in the sublists are different types.
+          return newFunResultWarn(wSubListsDiffTypes, 0)
+      of vkDict:
+        if not (key in value.dictv):
+          # A dictionary is missing the sort key.
+          return newFunResultWarn(wDictKeyMissing, 0)
+        var keyValue = value.dictv[key]
+        if keyValue.kind != firstKeyValueKind:
+          # The sort key values are different types.
+          return newFunResultWarn(wKeyValueKindDiff, 0)
+      else:
+        discard
 
-  let newList = sorted(list, cmpTwoValues, sortOrder)
+  func sortCmpValues(a, b: Value): int =
+    case listKind
+    of vkString, vkInt, vkFloat:
+      result = cmpBaseValues(a, b, insensitive)
+    of vkList:
+      result = cmpBaseValues(a.listv[0], b.listv[0])
+    of vkDict:
+      result = cmpBaseValues(a.dictv[key], b.dictv[key])
+
+  let newList = sorted(list, sortCmpValues, sortOrder)
   result = newFunResult(newValue(newList))
 
 const

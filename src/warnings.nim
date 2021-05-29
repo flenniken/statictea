@@ -122,6 +122,13 @@ type
     wAllNotIntFloatString, # w106
     wIntFloatString,       # w107
     wNotZeroOne,           # w108
+    wOneToThreeParameters, # w109
+    wExpectedSensitivity,  # w110
+    wExpectedKey,          # w111
+    wDictKeyMissing,       # w112
+    wKeyValueKindDiff,     # w113
+    wSubListsEmpty,        # w114
+    wSubListsDiffTypes,    # w115
 
 tpubType:
   const
@@ -237,6 +244,14 @@ tpubType:
       "The list values must be all ints, all floats or all strings.", # wAllNotIntFloatString
       "The values must be integers, floats or strings.", # wIntFloatString
       "The parameter must be 0 or 1.", # wNotZeroOne
+      "The function takes one to three parameters.", # wOneToThreeParameters
+      "Expected the sensitive or unsensitive.", # wExpectedSensitivity
+      "Expected the dictionary sort key.", # wExpectedKey
+      "A dictionary is missing the sort key.", # wDictKeyMissing
+      "The sort key values are different types.", # wKeyValueKindDiff
+      "A sublist is empty.", # wSubListsEmpty
+      "The first item in the sublists are different types.", # wSubListsDiffTypes
+
     ]
 
 func getWarning*(filename: string, lineNum: int,
