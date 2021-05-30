@@ -387,9 +387,7 @@ another variable, a string, a number or a function.
 
 All operations are done with functions except the equal
 operator. Looping is done at the replacement block level with
-t.repeat and t.row. Flow of control is done with map, filter,
-reduce and other functional language techniques. Output control
-is done with t.output.
+t.repeat and t.row. Output control is done with t.output.
 
 Statements are allowed on the nextline, block and replace
 commands. You can use multiple statements on the same line
@@ -465,7 +463,7 @@ $$ nextline num = len( tea_list ) ;b=3
 #+END_SRC
 
 The statements may flow between lines by using the continuation
-slash character. The following two nextline commands are
+plus character. The following two nextline commands are
 equivalent:
 
 #+BEGIN_SRC
@@ -503,11 +501,11 @@ variable, a warning is generated and the statement is skipped.
 
 Here are the prefixes and sections for each one.
 
-- s. -- [[#json-variables][Server Json Variables]]
-- h. -- [[#json-variables][Shared Json Variables]]
--    -- [[#local-variables][Local Variables]]
-- g. -- [[#global-variables][Global Variables]]
-- t. -- [[#tea-variables][Tea Variables]]
+- s -- [[#json-variables][Server Json Variables]]
+- h -- [[#json-variables][Shared Json Variables]]
+- l -- [[#local-variables][Local Variables]]
+- g -- [[#global-variables][Global Variables]]
+- t -- [[#tea-variables][Tea Variables]]
 
 [[#contents][茶]]
 
@@ -523,8 +521,8 @@ item's key is the name of a variable and the item's value is
 the variables' value.
 
 There are two types of json files, the server json and the shared
-json. The server file populates the t.server dictionary and the
-shared file populates the t.shared dictionary.
+json. The server file populates the s dictionary and the
+shared file populates the h dictionary.
 
 You can use multiple server and shared json files by specifying
 multiple files on the command line. The files are processed
@@ -553,9 +551,10 @@ common template fragments and other presentation needs.
 
 You create local variables with template statements.  They are
 local to the command where they are defined.  They are processed
-from left to right.  There is no prefix for local variables. They
-are stored in the t.local dictionary. The local variables are
-cleared and recalculated for each repeated block.
+from left to right.  You do not have to specify a prefix for
+local variables but you can use l. They are stored in the l
+dictionary. The local variables are cleared and recalculated for
+each repeated block.
 
 [[#contents][茶]]
 
@@ -565,8 +564,8 @@ cleared and recalculated for each repeated block.
     :END:
 
 Like local variables, you create global variables with template
-statements.  All commands have access to them.  You access them
-with "g." prefix.  They are stored in the t.global dictionary.
+statements.  All commands have access to them and they are stored
+in the g dictionary.
 
 [[#contents][茶]]
 
@@ -575,19 +574,17 @@ with "g." prefix.  They are stored in the t.global dictionary.
     :CUSTOM_ID: tea-variables
     :END:
 
-The built in tea variables are prefixed with "t." and they
+The built-in tea variables are prefixed with "t." and they
 control how the replacement block works.
 
+Tea variables:
+
 - [[#tcontent][t.content]] -- content of the replace block
-- [[#tlocal][t.local]] -- dictionary containing the current command's local variables.
-- [[#tglobal][t.global]] -- dictionary containing the global variables.
 - [[#tmaxrepeat][t.maxRepeat]] -- maximum number of times to repeat the block
 - [[#tmaxlines][t.maxLines]] -- maximum number of replacement block lines (lines before endblock)
 - [[#toutput][t.output]] -- where the block output goes
 - [[#trepeat][t.repeat]] -- controls how many times the block repeats
-- [[#trow][t.row]] -- the current row number of a repeating block
-- [[#tserver][t.server]] -- dictionary containing the server variables
-- [[#tshared][t.shared]] -- dictionary containing the shared variables
+- [[#trow][t.row]] -- the current index number of a repeating block
 - [[#tversion][t.version]] -- the StaticTea version number
 
 [[#contents][茶]]
@@ -617,40 +614,19 @@ The variable only applies to the replace command. See the
 
 [[#contents][茶]]
 
-*** t.local
-:PROPERTIES:
-:CUSTOM_ID: tlocal
-:END:
-
-The t.local variable is the dictionary of local variables for the
-current command.
-
-[[#contents][茶]]
-
-*** t.global
-    :PROPERTIES:
-    :CUSTOM_ID: tglobal
-    :END:
-
-The t.global variable is the dictionary of the global variables.
-
-[[#contents][茶]]
-
 *** t.maxRepeat
   :PROPERTIES:
   :CUSTOM_ID: tmaxrepeat
   :END:
 
-The t.maxRepeat variable determines the maximum times a block
-can repeat.  The default is 100. You cannot assign a number to
-t.repeat bigger than maxRepeat. A warning message is generated
-when you try.
+The t.maxRepeat variable determines the maximum times a block can
+repeat.  The default is 100. You can increase it to repeat more
+times. You cannot assign a number to t.repeat bigger than
+maxRepeat.
 
 It prevents the case where you mistakenly assign a giant number,
 and it allows you to design your template to work well for the
 expected range of blocks.
-
-You can increase this t.maxRepeat to repeat more times.
 
 [[#contents][茶]]
 
@@ -780,10 +756,9 @@ template:
 <select>
 <!--$ nextline t.repeat=len(s.companyList) -->
 <!--$ : d = get(s.companyList, t.row) -->
-<!--$ : company = get(d, "company") -->
-<!--$ : selected = get(d, "selected", 0) -->
+<!--$ : selected = get(d.company, "selected", 0) -->
 <!--$ : current=if(selected, ' selected="selected"', "") -->
-<option{current}>{company}</option>
+<option{current}>{d.company}</option>
 </select>
 #+END_SRC
 
@@ -922,22 +897,6 @@ result:
   <li id="r2">3. Peet's Coffee & Tea</li>
   <li id="r3">4. Red Diamond</li>
 #+END_SRC
-
- [[#contents][茶]]
-
-*** t.server
-:PROPERTIES:
-    :CUSTOM_ID: tserver
-    :END:
-
-The t.server variable is a dictionary containing the server json variables.
-
-*** t.shared
-:PROPERTIES:
-    :CUSTOM_ID: tshared
-    :END:
-
-The t.shared variable is a dictionary containing the shared json variables
 
 [[#contents][茶]]
 
@@ -1088,11 +1047,11 @@ function has an optional default parameter and it works with keys
 that don't look like variables.  Examples:
 
 #+BEGIN_SRC
-get(t.server, "a") => 1
-get(t.server, "b") => 2
-get(t.server, "d") => dict("x", 100, "y", 200)
+get(s, "a") => 1
+get(s, "b") => 2
+get(s, "d") => dict("x", 100, "y", 200)
 
-d = get(t.server, "d")
+d = get(s, "d")
 get(d, "x") => 100
 get(d, "y") => 200
 #+END_SRC
