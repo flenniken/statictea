@@ -89,11 +89,10 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     # Run the commands that are allowed statements and skip the others.
     let command = cmdLineParts[0].command
     if not (command in ["nextline", "block", "replace"]):
-      # todo: show error when we get endblock before block?
       # todo: make it an error when other commands have statements.
 
-      # todo: get rid of the comment command.  Use comments inside a
-      # command.  firstReplaceLine shouldn't need to be outside the
+      # todo: Allow comments inside a command
+      # todo: firstReplaceLine shouldn't need to be outside the
       # loop.
       continue
 

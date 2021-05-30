@@ -61,6 +61,9 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
             cmdLines.add(line)
             cmdLineParts.add(lineParts)
             continue # continue looking for more command lines.
+          elif lineParts.command == "#":
+            # Skip comments.
+            continue
 
         firstReplaceLine = line
         return # return the command lines

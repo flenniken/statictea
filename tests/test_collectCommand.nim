@@ -99,6 +99,51 @@ three
     ]
     check testCollectCommand(content, eCmdLines, eCmdLineParts)
 
+  test "three lines and comments":
+    let content = """
+<!--$ nextline +-->
+<!--$ : a=5 +-->
+<!--$ # this is a comment -->
+<!--$ : var = "hello" -->
+"""
+    let eContent = """
+<!--$ nextline +-->
+<!--$ : a=5 +-->
+<!--$ : var = "hello" -->
+"""
+    let eCmdLines = splitNewLines(eContent)
+    let eCmdLineParts = @[
+      newLineParts(continuation = true),
+      newLineParts(lineNum = 2, command = ":", middleStart = 8,
+        middleLen = 4, continuation = true),
+      newLineParts(lineNum = 4, command = ":", middleStart = 8, middleLen = 14)
+    ]
+    check testCollectCommand(content, eCmdLines, eCmdLineParts)
+
+  test "comments":
+    let content = """
+<!--$ nextline +-->
+<!--$ # comment with plus +-->
+<!--$ # -->
+<!--$ : a=5 +-->
+<!--$ # comment in middle -->
+<!--$ : var = "hello" -->
+<!--$ # comment at end-->
+"""
+    let eContent = """
+<!--$ nextline +-->
+<!--$ : a=5 +-->
+<!--$ : var = "hello" -->
+"""
+    let eCmdLines = splitNewLines(eContent)
+    let eCmdLineParts = @[
+      newLineParts(continuation = true),
+      newLineParts(lineNum = 4, command = ":", middleStart = 8,
+        middleLen = 4, continuation = true),
+      newLineParts(lineNum = 6, command = ":", middleStart = 8, middleLen = 14)
+    ]
+    check testCollectCommand(content, eCmdLines, eCmdLineParts)
+
   test "non command":
     let content = "not a command\n"
     let eCmdLines: seq[string] = @[]
