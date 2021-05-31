@@ -117,7 +117,7 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
 
 proc getString*(env: var Env, prepostTable: PrepostTable,
     statement: Statement, start: Natural): Option[ValueAndLength] =
-  ## Return a literal string value and the length of the match.  The
+  ## Return a literal string value and match length from a statement. The
   ## start parameter is the index of the first quote in the statement
   ## and the return length includes optional trailing white space
   ## after the last quote.
@@ -145,8 +145,8 @@ proc getString*(env: var Env, prepostTable: PrepostTable,
 
 proc getNumber*(env: var Env, prepostTable: PrepostTable,
     statement: Statement, start: Natural): Option[ValueAndLength] =
-  ## Return the literal number value from the statement. We expect a
-  ## number because it starts with a digit or minus sign.
+  ## Return the literal number value and match length from the
+  ## statement. The start index points at a digit or minus sign.
 
   # Check that we have a statictea number.
   var matchesO = matchNumber(statement.text, start)

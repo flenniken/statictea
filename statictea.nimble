@@ -61,7 +61,7 @@ proc get_test_module_cmd(filename: string, release = false): string =
     rel = "-d:release "
   else:
     rel = ""
-  result = "nim c -f --gc:orc --verbosity:0 --hint[Performance]:off --hint[XCannotRaiseY]:off -d:test $1 -r -p:src --out:bin/tmp/$2 tests/$3" % [
+  result = "nim c -f --gc:orc --verbosity:0 --hint[Performance]:off --hint[XCannotRaiseY]:off -d:test $1 -r -p:src --out:bin/$2 tests/$3" % [
     rel, binName, filename]
 
 proc build_release() =
@@ -176,7 +176,8 @@ awk '{printf "include %s\n", $0}' > tests/testall.nim
 """
   let cmd = get_test_module_cmd("testall.nim")
   exec cmd
-  exec "rm tests/testall.nim"
+  rmFile("tests/testall.nim")
+
   # Make sure it builds with test undefined.
   build_release()
   # Run the command line tests.
@@ -202,33 +203,41 @@ task b, "\tBuild the statictea exe.":
 
 task docs, "\tCreate markdown docs; specify part of source filename.":
   let count = system.paramCount()+1
-  # Name is part of a source file name, or "docs" when not specified.
   let name = system.paramStr(count-1)
   let filenames = get_source_filenames()
   for filename in filenames:
+    # Name is part of a source file name, or "docs" when not specified.
     if name in filename or name == "docs":
-      var jsonName = changeFileExt(filename, "json")
-      var cmd = "nim --hint[Conf]:off --hint[SuccessX]:off jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
-      echo "Export nim json doc comments..."
+
+      # Create json doc comments from the source file.
+      var jsonName = "docs/$1" % [changeFileExt(filename, "json")]
+      var cmd = "nim --hint[Conf]:off --hint[SuccessX]:off jsondoc --out:$1 src/$2" % [jsonName, filename]
+      echo "Create $1 from nim json doc comments." % [jsonName]
       exec cmd
       echo ""
-      echo "Generate markdown from statictea template..."
-      var mdName = changeFileExt(filename, "md")
 
       # Create a shared.json file for use by the template.
-      let sharedJson = """{
-"newline": "\n"
-}
-"""
+      let sharedJson = """{"newline": "\n"}"""
       let sharedFilename = "docs/shared.json"
       writeFile(sharedFilename, sharedJson)
 
-      cmd = "bin/statictea -s=docs/json/$1 -j=docs/shared.json -t=docs/template.md -r=docs/$2" % [
-        jsonName, mdName]
-      # echo cmd
-      exec cmd
-      exec "rm " & sharedFilename
-      echo "Generated docs/$1" % [mdName]
+      # Create markdown from the json comments using a statictea template.
+      var mdName = "docs/$1" % [changeFileExt(filename, "md")]
+      echo "Generate $1" % [mdName]
+      let part1 = "bin/statictea -j=docs/shared.json -t=templates/template.md "
+      let part2 = "-s=$1 -r=$2" % [jsonName, mdName]
+      exec part1 & part2
+
+      # Remove the temporary files.
+      rmFile(sharedFilename)
+      echo "Remove $1" % [jsonName]
+      rmFile(jsonName)
+
+  echo """
+The grip app is good for viewing gitlab markdown.
+  grip --quiet docs/index.md &
+  http://localhost:6419/index.md
+"""
 
 task json, "\tDisplay nim's doc json for a source file; specify part of name.":
   let count = system.paramCount()+1
@@ -236,25 +245,24 @@ task json, "\tDisplay nim's doc json for a source file; specify part of name.":
   let filenames = get_source_filenames()
   for filename in filenames:
     if name in filename:
-      var jsonName = changeFileExt(filename, "json")
-      var cmd = "nim --hints:off jsondoc --out:docs/json/$1 src/$2" % [jsonName, filename]
+      var jsonName = joinPath("docs", changeFileExt(filename, "json"))
+      var cmd = "nim --hints:off jsondoc --out:$1 src/$2" % [jsonName, filename]
       # echo cmd
       exec cmd
-      let path = "docs/json/$1" % [jsonName]
-      let text = slurp(path)
+      let text = slurp(jsonName)
       for line in text.splitLines():
         echo line
-      # echo "Generated docs/json/$1" % [jsonName]
-      # echo "jq < docs/json/$1" % [jsonName]
-      # echo "less docs/json/$1" % [jsonName]
+      break
+  # The jq command is good for viewing the output.
+  # n json | jq | less
 
 task jsonix, "\tDisplay the module index json for the source files.":
   var json = indexJson()
-  writeFile("docs/index.json", json)
+  # writeFile("docs/index.json", json)
   for line in json.splitLines():
     echo line
 
-task docsix, "\tDisplay the doc comment index to the source files":
+task docsix, "\tDisplay the doc comment index to the source files.":
 
   # Create the index json file.
   echo "Create index json."
@@ -264,51 +272,47 @@ task docsix, "\tDisplay the doc comment index to the source files":
 
   # Process the index template and create the index.md file.
   echo "Create the index.md file"
-  var cmd = "bin/statictea -s=$1 -t=docs/indexTemplate.md -r=docs/index.md" %
+  var cmd = "bin/statictea -s=$1 -t=templates/indexTemplate.md -r=docs/index.md" %
     [jsonFilename]
-  # echo cmd
   exec cmd
 
   rmFile(jsonFilename)
   echo "Generated docs/index.md"
   echo """
 The grip app is good for viewing gitlab markdown.
-
   grip --quiet docs/index.md &
   http://localhost:6419/index.md
 """
 
-task readmeFun, "Create readme function section":
+task readmefun, "Create readme function section.":
   let count = system.paramCount()+1
 
   echo "Export nim runFunctions json doc comments..."
   let filename = "runFunction.nim"
-  var jsonName = changeFileExt(filename, "json")
-  var cmd = "nim --hint[Conf]:off --hint[SuccessX]:off jsondoc --out:docs/json/$1 src/$2" %
+  var jsonName = joinPath("docs", changeFileExt(filename, "json"))
+  var cmd = "nim --hint[Conf]:off --hint[SuccessX]:off jsondoc --out:$1 src/$2" %
     [jsonName, filename]
   exec cmd
-  echo "Generated docs/json/$1" % [jsonName]
-
+  echo "Generated $1" % [jsonName]
 
   # Create a shared.json file for use by the template.
-  let sharedJson = """{
-"newline": "\n"
-}
-"""
+  let sharedJson = """{"newline": "\n"}"""
   let sharedFilename = "docs/shared.json"
   writeFile(sharedFilename, sharedJson)
 
   echo "Generate readme function section from template..."
-  let templateName = "readmeFuncTemp.org"
-  var orgName = changeFileExt(filename, "org")
-  cmd = "bin/statictea -l -s=docs/json/$1 -j=docs/shared.json -t=docs/$2 -r=docs/$3" %
+  let templateName = joinPath("templates", "readmeFuncTemp.org")
+  var orgName = joinPath("docs", changeFileExt(filename, "org"))
+  cmd = "bin/statictea -l -s=$1 -j=docs/shared.json -t=$2 -r=$3" %
      [jsonName, templateName, orgName]
   # echo cmd
   exec cmd
-  exec "rm " & sharedFilename
-  echo "Generated docs/$1" % [orgName]
 
-task tt, "\tCompile and run t.nim":
+  rmFile(sharedFilename)
+  rmFile(jsonName)
+  echo "Generated $1" % [orgName]
+
+task tt, "\tCompile and run t.nim.":
   let cmd = "nim c -r --gc:orc --hints:off --outdir:bin/tests/ src/t.nim"
   echo cmd
   exec cmd
@@ -322,38 +326,37 @@ task tree, "\tShow the project directory tree.":
 #   for i in 0..count-1:
 #     echo "$1: $2" % [$i, system.paramStr(i)]
 
+# task pythonenv, "Create and activate a python virtual env.":
+#   # The python environment is used to make html files from the doc
+#   # commands for proofing it before committing.
 
-task pythonenv, "Create and activate a python virtual env.":
-  # The python environment is used to make html files from the doc
-  # commands for proofing it before committing.
+#   var dirName = getDirName(hostOS)
+#   let virtualEnv = "env/$1/staticteaenv" % dirName
+#   if system.dirExists(virtualEnv):
+#     # Activate the existing virtual environment, if not already
+#     # active.
+#     if system.getEnv("VIRTUAL_ENV", "") == "":
+#       var cmd = "source $1/bin/activate" % [virtualEnv]
+#       echo "manually run:"
+#       echo cmd
+#   else:
+#     # Create the virtual environment, activate and install necessary
+#     # packages.
+#     echo "Creating virtual environment: $1" % [virtualEnv]
+#     var cmd = "python3 -m venv $1" % [virtualEnv]
+#     echo cmd
+#     exec cmd
+#     cmd = """
+# source $1/bin/activate; \
+# pip3 install wheel; \
+# pip3 install docutils
+# """ % [virtualEnv]
+#     echo cmd
+#     exec cmd
 
-  var dirName = getDirName(hostOS)
-  let virtualEnv = "env/$1/staticteaenv" % dirName
-  if system.dirExists(virtualEnv):
-    # Activate the existing virtual environment, if not already
-    # active.
-    if system.getEnv("VIRTUAL_ENV", "") == "":
-      var cmd = "source $1/bin/activate" % [virtualEnv]
-      echo "manually run:"
-      echo cmd
-  else:
-    # Create the virtual environment, activate and install necessary
-    # packages.
-    echo "Creating virtual environment: $1" % [virtualEnv]
-    var cmd = "python3 -m venv $1" % [virtualEnv]
-    echo cmd
-    exec cmd
-    cmd = """
-source $1/bin/activate; \
-pip3 install wheel; \
-pip3 install docutils
-""" % [virtualEnv]
-    echo cmd
-    exec cmd
-
-task rst2html5, "Show docutil's rst2html5 help file.":
-  if not isPyEnvActive():
-    echo "Run pythonenv task first to setup the environment."
-  else:
-    var dirName = getDirName(hostOS)
-    exec "env/$1/staticteaenv/bin/rst2html5.py -h | less" % [dirName]
+# task rst2html5, "Show docutil's rst2html5 help file.":
+#   if not isPyEnvActive():
+#     echo "Run pythonenv task first to setup the environment."
+#   else:
+#     var dirName = getDirName(hostOS)
+#     exec "env/$1/staticteaenv/bin/rst2html5.py -h | less" % [dirName]
