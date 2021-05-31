@@ -641,10 +641,7 @@ replacement block.
 StaticTea reads lines looking for the endblock.  By default, if
 it is not found in 50 lines, the 50 lines are used for the block
 and a warning is output. This catches the case where you forget
-the endblock command.
-
-You can increase this value to support blocks with more lines by
-setting the t.maxLines system variable.
+the endblock command. You can increase or decrease the value.
 
 #+BEGIN_SRC
 <!--$ block t.maxLines=200 -->

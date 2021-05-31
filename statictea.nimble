@@ -258,13 +258,14 @@ task docsix, "\tDisplay the doc comment index to the source files":
 
   # Create the index json file.
   echo "Create index json."
-  var json = indexJson()
   var jsonFilename = "docs/index.json"
+  var json = indexJson()
   writeFile(jsonFilename, json)
 
   # Process the index template and create the index.md file.
   echo "Create the index.md file"
-  var cmd = "bin/statictea -s=$1 -t=docs/indexTemplate.md -r=docs/index.md" % [jsonFilename]
+  var cmd = "bin/statictea -s=$1 -t=docs/indexTemplate.md -r=docs/index.md" %
+    [jsonFilename]
   # echo cmd
   exec cmd
 
@@ -273,8 +274,8 @@ task docsix, "\tDisplay the doc comment index to the source files":
   echo """
 The grip app is good for viewing gitlab markdown.
 
-grip --quiet docs/index.md &
-http://localhost:6419/docs/index.md
+  grip --quiet docs/index.md &
+  http://localhost:6419/index.md
 """
 
 task readmeFun, "Create readme function section":
