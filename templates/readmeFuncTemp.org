@@ -19,7 +19,7 @@
 # $ :   "&lt;", '<', +
 # $ :   "&amp;", '&')
 # $ #
-# $ # Sort the entries alphabetically by thier name.
+# $ # Sort the entries alphabetically by their name.
 # $ : g.entries = sort(s.entries, "ascending", "sensitive", "name")
 # $ endblock
 * Functions

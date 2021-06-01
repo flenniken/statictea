@@ -61,6 +61,8 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
             cmdLines.add(line)
             cmdLineParts.add(lineParts)
             continue # continue looking for more command lines.
+          # todo: remove this, it is a fake comment.  Support comments in statements.
+          # $$ : # comment.
           elif lineParts.command == "#":
             # Skip comments.
             continue

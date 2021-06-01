@@ -12,23 +12,19 @@ bin           = @["bin/statictea"]
 
 requires "nim >= 1.4.4"
 
-const
-  useDocUtils = true
-  showHtml = true
-
 # The nimscript module is imported by default. It contains functions
 # you can call in your nimble file.
 # https://nim-lang.org/0.11.3/nimscript.html
 
 proc get_test_filenames(): seq[string] =
-  ## Return the list of the nim files in the tests folder.
+  ## Return the basename of the nim files in the tests folder.
   result = @[]
   var list = listFiles("tests")
   for filename in list:
     result.add(lastPathPart(filename))
 
 proc get_source_filenames(path: bool = false): seq[string] =
-  ## Return the list of the nim source files in the src folder.
+  ## Return the basename of the nim source files in the src folder.
   result = @[]
   var list = listFiles("src")
   for filename in list:
@@ -39,7 +35,7 @@ proc get_source_filenames(path: bool = false): seq[string] =
         result.add(lastPathPart(filename))
 
 proc get_test_module_cmd(filename: string, release = false): string =
-  ## Return the command line to test one module.
+  ## Return the command line to test the given nim file.
 
   # You can add -f to force a recompile of imported modules, good for
   # testing "imported but not used" warnings.
@@ -61,31 +57,25 @@ proc get_test_module_cmd(filename: string, release = false): string =
     rel = "-d:release "
   else:
     rel = ""
-  result = "nim c -f --gc:orc --verbosity:0 --hint[Performance]:off --hint[XCannotRaiseY]:off -d:test $1 -r -p:src --out:bin/$2 tests/$3" % [
-    rel, binName, filename]
+  let part1 = "nim c -f --gc:orc --verbosity:0 --hint[Performance]:off "
+  let part2 = "--hint[XCannotRaiseY]:off -d:test "
+  let part3 = "$1 -r -p:src --out:bin/$2 tests/$3" % [rel, binName, filename]
+  result = part1 & part2 & part3
 
 proc build_release() =
+  ## Build the release version of statictea.
   var cmd = "nim c --gc:orc --hint[Performance]:off --hint[Conf]:off --hint[Link]: off -d:release --out:bin/ src/statictea"
   echo cmd
   exec cmd
   cmd = "strip bin/statictea"
   exec cmd
 
-proc doc_module(name: string) =
-  let cmd = "nim doc --hints:off -d:test --index:on --out:docs/html/$1.html src/$1.nim" % [name]
-  echo cmd
-  exec cmd
-
-proc open_in_browser(filename: string) =
-  ## Open the given file in a browser if the system has an open
-  ## command and the file exists.
-  if fileExists(filename):
-    exec "(hash open 2>/dev/null && open $1) || echo 'open $1'" % filename
-
 proc getDirName(host: string): string =
-  ## Return the host dir name given the nim hostOS name.
-  ## Current possible host values: "windows", "macosx", "linux", "netbsd",
-  ## "freebsd", "openbsd", "solaris", "aix", "haiku", "standalone".
+  ## Return a directory name corresponding to the given nim hostOS
+  ## name.  The name is good for storing host specific files, for
+  ## example in the bin and env folders.  Current possible host
+  ## values: "windows", "macosx", "linux", "netbsd", "freebsd",
+  ## "openbsd", "solaris", "aix", "haiku", "standalone".
 
   if host == "macosx":
     result = "mac"
@@ -95,12 +85,6 @@ proc getDirName(host: string): string =
     result = "win"
   else:
     assert false, "add a new platform"
-
-proc isPyEnvActive(): bool =
-  if system.getEnv("VIRTUAL_ENV", "") == "":
-    result = false
-  else:
-    result = true
 
 proc readModuleDescription(filename: string): string =
   ## Return the module doc comment at the top of the file.
@@ -320,43 +304,7 @@ task tt, "\tCompile and run t.nim.":
 task tree, "\tShow the project directory tree.":
   exec "tree -I '*.nims|*.bin' | less"
 
-# task args, "\tshow command line arguments":
-#   let count = system.paramCount()+1
-#   echo "argument count: $1" % $count
-#   for i in 0..count-1:
-#     echo "$1: $2" % [$i, system.paramStr(i)]
-
-# task pythonenv, "Create and activate a python virtual env.":
-#   # The python environment is used to make html files from the doc
-#   # commands for proofing it before committing.
-
-#   var dirName = getDirName(hostOS)
-#   let virtualEnv = "env/$1/staticteaenv" % dirName
-#   if system.dirExists(virtualEnv):
-#     # Activate the existing virtual environment, if not already
-#     # active.
-#     if system.getEnv("VIRTUAL_ENV", "") == "":
-#       var cmd = "source $1/bin/activate" % [virtualEnv]
-#       echo "manually run:"
-#       echo cmd
-#   else:
-#     # Create the virtual environment, activate and install necessary
-#     # packages.
-#     echo "Creating virtual environment: $1" % [virtualEnv]
-#     var cmd = "python3 -m venv $1" % [virtualEnv]
-#     echo cmd
-#     exec cmd
-#     cmd = """
-# source $1/bin/activate; \
-# pip3 install wheel; \
-# pip3 install docutils
-# """ % [virtualEnv]
-#     echo cmd
-#     exec cmd
-
-# task rst2html5, "Show docutil's rst2html5 help file.":
-#   if not isPyEnvActive():
-#     echo "Run pythonenv task first to setup the environment."
-#   else:
-#     var dirName = getDirName(hostOS)
-#     exec "env/$1/staticteaenv/bin/rst2html5.py -h | less" % [dirName]
+task args, "\tshow command line arguments":
+  let count = system.paramCount()+1
+  for i in 0..count-1:
+    echo "$1: $2" % [$(i+1), system.paramStr(i)]
