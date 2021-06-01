@@ -277,7 +277,7 @@ result.
 template:
 
 #+BEGIN_SRC
-<!--$ # How you make tea. -->
+<!--$ # The main tea groups. -->
 There are five main groups of teas:
 white, green, oolong, black, and pu'erh.
 You make Oolong Tea in five time
@@ -427,7 +427,7 @@ postfix is "-->". See [[#prefix-postfix][Prefix Postfix]] for more information.
 The prefix starts at column 1. Next comes the command
 name. Statements follow the command name, they are separated by
 semicolons or newlines and they may flow through the following
-lines. At the end of the line is an optional slash continuation
+lines. At the end of the line is an optional plus continuation
 character then the optional postfix then the end of line, either
 \r\n or \n.
 
@@ -495,7 +495,7 @@ $$ : c = 3
 You use variables to create formatted content for a block and to
 control how a command works. You create them in json files or in
 template statements. Internally one dictionary exists for each of
-the five types of variables, you access them with different
+the five types of variables. You access them with different
 prefixes. All variables are immutable.  If you try to change a
 variable, a warning is generated and the statement is skipped.
 
@@ -574,8 +574,8 @@ in the g dictionary.
     :CUSTOM_ID: tea-variables
     :END:
 
-The built-in tea variables are prefixed with "t." and they
-control how the replacement block works.
+The tea variables control how the replacement block works.
+They are are stored in the t dictionary.
 
 Tea variables:
 
@@ -601,10 +601,10 @@ whole replace block.
 t.content = h.header
 #+END_SRC
 
-You use [[#update-option][Update Option]] to keep the block in sync with the
-variable.
+You use [[#update-option][Update Option]] to keep the template's blocks in sync with
+their variables.
 
-When the t.content is not set, the command behaves like a block
+When t.content is not set, the command behaves like a block
 command except a warning message is output. This is good for
 testing changes you want to make to the shared value and the
 warning reminds you to set the variable when you're done testing.
@@ -1029,7 +1029,8 @@ server json:
 #+END_SRC
 
 If a key has valid variable syntax, you can access the it as a
-variable, for the json example above, you can access as:
+variable using dot notation. For the json example above, you can
+access the data as:
 
 #+BEGIN_SRC
 s.a => 1
@@ -1051,7 +1052,12 @@ get(s, "d") => dict("x", 100, "y", 200)
 d = get(s, "d")
 get(d, "x") => 100
 get(d, "y") => 200
+
+get(s, "c", 3) => 3
 #+END_SRC
+
+You use the dict function to create a literal dictionary and the
+list function to create a literal list.
 
 [[#contents][茶]]
 
@@ -1076,10 +1082,11 @@ file to process along with the json data files and a result file
 is generated.
 
 - Warning messages go to standard error.
-- If you don't specify the result argument, the result goes to standard out.
+- If you don't specify the result file, the result goes to standard out.
 - If you specify "stdin" for the template, the template comes
   from stdin.
-- Return code is 0 when no warning messages are output.
+- StaticTea returns success, return code 0, when there are no
+  warning messages, else it returns 1.
 
 The example below shows a typical invocation which specifies four
 file arguments, the server json, the shared json, the template
@@ -1160,9 +1167,8 @@ statement: tea = len("abc",)
                            ^
 #+END_SRC
 
-
-StaticTea returns success (return code 0) when no message gets
-output to standard error, else it returns 1.
+Static returns success, return code 0, when there are no
+warning messages, else it returns 1.
 
 Example of running statictea when a variable is missing:
 
