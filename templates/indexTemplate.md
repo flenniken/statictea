@@ -9,14 +9,13 @@ $$ nextline
 $$ : g.modules = sort(s.modules, "ascending", "sensitive", "filename")
 
 $$ # Output module names and a short descrition.
+$$ # Use the description's first sentence to describe the module.
 $$ nextline
 $$ : t.repeat = len(g.modules)
 $$ : entry = get(g.modules, t.row, dict())
 $$ : fullPath = get(entry, "filename", "")
 $$ : path = path(fullPath, "/")
 $$ : mdName = concat(path.basename, ".md")
-$$ #
-$$ # Use the description's first sentence to describe the module.
 $$ : description = get(entry, "description", "")
 $$ : short = substr(description, 0, add(find(description, '.', -1), 1))
 * [{path.filename}]({mdName}) &mdash; {short}

@@ -109,16 +109,16 @@ three
     let eContent = """
 <!--$ nextline +-->
 <!--$ : a=5 +-->
-<!--$ : var = "hello" -->
 """
+    let eNextLine = "<!--$ # this is a comment -->\n"
+
     let eCmdLines = splitNewLines(eContent)
     let eCmdLineParts = @[
       newLineParts(continuation = true),
       newLineParts(lineNum = 2, command = ":", middleStart = 8,
         middleLen = 4, continuation = true),
-      newLineParts(lineNum = 4, command = ":", middleStart = 8, middleLen = 14)
     ]
-    check testCollectCommand(content, eCmdLines, eCmdLineParts)
+    check testCollectCommand(content, eCmdLines, eCmdLineParts, eNextLine = eNextLine)
 
   test "comments":
     let content = """
@@ -132,17 +132,14 @@ three
 """
     let eContent = """
 <!--$ nextline +-->
-<!--$ : a=5 +-->
-<!--$ : var = "hello" -->
 """
     let eCmdLines = splitNewLines(eContent)
     let eCmdLineParts = @[
-      newLineParts(continuation = true),
-      newLineParts(lineNum = 4, command = ":", middleStart = 8,
-        middleLen = 4, continuation = true),
-      newLineParts(lineNum = 6, command = ":", middleStart = 8, middleLen = 14)
+      newLineParts(lineNum = 1, command = "nextline", middleStart = 15,
+        middleLen = 0, continuation = true),
     ]
-    check testCollectCommand(content, eCmdLines, eCmdLineParts)
+    let eNextLine = "<!--$ # comment with plus +-->\n"
+    check testCollectCommand(content, eCmdLines, eCmdLineParts, eNextLine=eNextLine)
 
   test "non command":
     let content = "not a command\n"

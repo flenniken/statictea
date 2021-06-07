@@ -4,6 +4,7 @@
 
 # $ # Define replacement patterns to format the descriptions or
 # $ # org mode.
+# $ # Sort the entries alphabetically by their name.
 # $ #
 # $ block
 # $ : g.patterns = list( +
@@ -18,8 +19,6 @@
 # $ :   "&gt;", '>', +
 # $ :   "&lt;", '<', +
 # $ :   "&amp;", '&')
-# $ #
-# $ # Sort the entries alphabetically by their name.
 # $ : g.entries = sort(s.entries, "ascending", "sensitive", "name")
 # $ endblock
 * Functions
@@ -38,22 +37,19 @@ StaticTea template and formatted for this readme.
 List of functions:
 
 # $ # Generate the function index.
+# $ # Show the function entries and skip the others.
+# $ # Change the function names, i.e, funReplaceRe to replaceRe.
+# $ # Show the description's first sentence.
 # $ #
 # $ nextline
 # $ : t.repeat = len(g.entries)
 # $ : entry = get(g.entries, t.row, dict())
-# $ #
-# $ # Show the function entries and skip the others.
 # $ : skip = case(entry.type, "skFunc", 0, 1)
 # $ : pos = find(entry.name, "fun", -1)
 # $ : skip2 = case(pos, 0, 0, 1)
 # $ : t.output = case(add(skip, skip2), 0, "result", "skip")
-# $ #
-# $ # Change the function names, i.e, funReplaceRe to replaceRe.
 # $ : capName = case(pos, 0, substr(entry.name, 3), entry.name)
 # $ : name = concat(lower(substr(capName, 0, 1)), substr(capName, 1))
-# $ #
-# $ # Show the description's first sentence.
 # $ : desc = replaceRe(entry.description, g.patterns)
 # $ : shortFuncDesc = substr(desc, 0, add(find(desc, '.', -1), 1))
 - [[#{name}][{name}()]] -- {shortFuncDesc}

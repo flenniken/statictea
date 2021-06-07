@@ -55,25 +55,14 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
           return # No more lines
 
         let lPartsO = parseCmdLine(env, prepostTable, line, lb.lineNum)
+        # Skip everything except the continue command. Other lines
+        # that look like commands are part of the replacement block.
         if lPartsO.isSome:
           lineParts = lPartsO.get()
           if lineParts.command == ":":
             cmdLines.add(line)
             cmdLineParts.add(lineParts)
             continue # continue looking for more command lines.
-          # todo: remove this, it is a fake comment.  Support comments in statements.
-          # $$ : # comment.
-          elif lineParts.command == "#":
-            # Skip comments.
-            continue
 
         firstReplaceLine = line
         return # return the command lines
-
-        # # Show warning about missing a continuation line and that we
-        # # are abandoning the command.
-        # warn(env, lb.lineNum, wNoContinuationLine)
-        # dumpCmdLines(resultStream, cmdLines, cmdLineParts, line)
-        # if line == "":
-        #   return # No more lines
-        # break # Start looking for another command.
