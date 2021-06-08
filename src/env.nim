@@ -23,14 +23,15 @@ const
 
 when hostOS == "macosx":
   let staticteaLog* = expandTilde("~/Library/Logs/statictea.log")
-    ## Name of the default statictea log file when logging.
+    ## Name of the default statictea log file when logging on the Mac.
 else:
   let staticteaLog* = expandTilde("~/statictea.log")
-    ## Name of the default statictea log file when logging.
+    ## Name of the default statictea log file when logging not on the
+    ## Mac.
 
 type
   Env* = object
-    ## Object holding the input and output streams.
+    ## Env holds the input and output streams.
     # These get set at the start.
     errStream*: Stream ## stderr
     outStream*: Stream ## stdout
@@ -44,12 +45,11 @@ type
     closeResultStream*: bool
 
     # The following streams get set after parsing the command line
-    # options.
+    # options.  The result stream may be stdout.
     templateFilename*: string
     templateStream*: Stream
     resultFilename*: string
     resultStream*: Stream
-      ## The result stream may be stdout.
 
     warningWritten*: Natural
       ## Count of warnings written.

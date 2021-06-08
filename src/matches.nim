@@ -196,27 +196,29 @@ func matchVersionNotCached*(line: string, start: Natural = 0): Option[Matches] =
 
 proc matchDotNames*(line: string, start: Natural = 0): Option[Matches] =
   ## Matches variable dot names and surrounding whitespace. Return the
-  ## leading whitespace and dot names as one string like:: "a.b.c.d".
-  ## This is used to match functions too. They look like a variable
-  ## followed by an open parentheses.
-  ## @ 
-  ## A dot name is a list of variable names separated by dots.
-  ## You can have 1 to 5 variable names in a dot name.
-  ## @
-  ## A variable name starts with a letter followed by letters, digits
-  ## and underscores limited to a total of 64 characters.
-  ## @
-  ## The match stops on the first non matching character. You need to
-  ## check the next character to see whether it makes sense in the
-  ## statement, for example, "t." matches and returns "t" but it is a
-  ## syntax error.
-  ## 
-  ## Return two groups, the leading whitespace and the dotNames. The
-  ## length returned includes the optional trailing whitespace.
-  ##
-  ## let dotNamesO = matchDotNames(line, start)
-  ## if dotNamesO.isSome:
-  ##   let (leadingSpaces, dotNameStr) = dotNamesO.get()
+  ## @:leading whitespace and dot names as one string like "a.b.c.d".
+  ## @:This is used to match functions too. They look like a variable
+  ## @:followed by an open parentheses.
+  ## @:
+  ## @:A dot name is a list of variable names separated by dots.
+  ## @:You can have 1 to 5 variable names in a dot name.
+  ## @:
+  ## @:A variable name starts with a letter followed by letters, digits
+  ## @:and underscores limited to a total of 64 characters.
+  ## @:
+  ## @:The match stops on the first non matching character. You need to
+  ## @:check the next character to see whether it makes sense in the
+  ## @:statement, for example, "t." matches and returns "t" but it is a
+  ## @:syntax error.
+  ## @:
+  ## @:Return two groups, the leading whitespace and the dotNames. The
+  ## @:length returned includes the optional trailing whitespace.
+  ## @:
+  ## @:~~~
+  ## @:let dotNamesO = matchDotNames(line, start)
+  ## @:if dotNamesO.isSome:
+  ## @:  let (leadingSpaces, dotNameStr) = dotNamesO.get()
+  ## @:~~~~
 
   let name = r"[a-zA-Z][a-zA-Z0-9_]{0,63}"
   let pattern = r"(\s*)((?:$1)(?:\.$1){0,4})\s*" % [name]

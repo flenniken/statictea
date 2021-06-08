@@ -28,7 +28,7 @@ proc get_source_filenames(path: bool = false): seq[string] =
   result = @[]
   var list = listFiles("src")
   for filename in list:
-    if filename.endsWith(".nim"):
+    if filename.endsWith(".nim") and lastPathPart(filename) != "t.nim":
       if path:
         result.add(filename)
       else:
@@ -192,7 +192,6 @@ task docs, "\tCreate markdown docs; specify part of source filename.":
   for filename in filenames:
     # Name is part of a source file name, or "docs" when not specified.
     if name in filename or name == "docs":
-
       # Create json doc comments from the source file.
       var jsonName = "docs/$1" % [changeFileExt(filename, "json")]
       var cmd = "nim --hint[Conf]:off --hint[SuccessX]:off jsondoc --out:$1 src/$2" % [jsonName, filename]

@@ -9,24 +9,24 @@ assert sizeof[BiggestInt] == sizeof[int64]
 
 type
   IntPos* = object
-    ## Integer and its text length.
+    ## Integer and characters processed.
     integer*: BiggestInt
     length*: int
 
   FloatPos* = object
-    ## Float and its text length.
+    ## Float and characters processed.
     number*: float64
     length*: int
 
 proc parseFloat64*(str: string, start: Natural = 0): Option[FloatPos] =
   ## Parse the string and return the 64 bit float number and the
-  ## number of characters processed. Nothing is returned when the
-  ## float is out of range or the str is not a float number.
-  ## Processing stops at the first non-number character.
-
-  ## A float number starts with an optional minus sign, followed by a
-  ## digit, followed by digits, underscores or a decimal point. Only
-  ## one decimal point is allowed and underscores are skipped.
+  ## @:number of characters processed. Nothing is returned when the
+  ## @:float is out of range or the str is not a float number.
+  ## @:Processing stops at the first non-number character.
+  ## @:
+  ## @:A float number starts with an optional minus sign, followed by a
+  ## @:digit, followed by digits, underscores or a decimal point. Only
+  ## @:one decimal point is allowed and underscores are skipped.
 
   assert sizeof[BiggestFloat] == sizeof[float64]
   var number: BiggestFloat
@@ -36,12 +36,12 @@ proc parseFloat64*(str: string, start: Natural = 0): Option[FloatPos] =
 
 proc parseInteger*(s: string, start: Natural = 0): Option[IntPos] =
   ## Parse the string and return the integer and number of characters
-  ## processed. Nothing is returned when the integer is out of range
-  ## or the str is not a number.
-
-  ## An integer starts with an optional minus sign, followed by a
-  ## digit, followed by digits or underscores. The underscores are
-  ## skipped. Processing stops at the first non-number character.
+  ## @:processed. Nothing is returned when the integer is out of range
+  ## @:or the str is not a number.
+  ## @:
+  ## @:An integer starts with an optional minus sign, followed by a
+  ## @:digit, followed by digits or underscores. The underscores are
+  ## @:skipped. Processing stops at the first non-number character.
 
   var
     sign: BiggestInt = -1

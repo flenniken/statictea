@@ -1,9 +1,7 @@
-## Parse a template command line.
+## Parse a template command line. We have two types of command lines,
+## @:CmdLine and CommandLine.
 ## @:
-## @:We have two types of command lines.  We distingush them using
-## different names CmdLine and CommandLine.
-## @:
-## @:* CmdLine -- is a line in a StaticTea template commands.
+## @:* CmdLine -- is a command line in a StaticTea template.
 ## @:* CommandLine -- is a line at a terminal for system commands.
 
 import options
@@ -15,7 +13,7 @@ import matches
 
 type
   LineParts* = object
-    ## The parsed components of a line.
+    ## LineParts holds parsed components of a line.
     prefix*: string
     command*: string
     middleStart*: Natural

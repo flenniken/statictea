@@ -16,7 +16,7 @@ $$ : path = path(s.orig)
 $$ : g.moduleName = path.filename
 $$ endblock
 $$ #
-[Home](https://github.com/flenniken/statictea/)
+[StaticTea Modules](/)
 
 $$ nextline
 # {g.moduleName}
@@ -41,23 +41,23 @@ $$ :   "skType", "type: ", +
 $$ :   "skConst", "const: ", +
 $$ :   "skMacro", "macro: ", +
 $$ :   "")
-$$ : desc = entry.description
-$$ : short = substr(desc, 0, add(find(desc, '.', -1), 1))
+$$ : desc = get(entry, "description", "")
+$$ : sentence = substr(desc, 0, add(find(desc, '.', -1), 1))
+$$ : short = replaceRe(sentence, g.patterns)
 * {type}[{entry.name}](#user-content-a{t.row}) &mdash; {short}
 
 $$ # Function and type descriptions.
 $$ block
 $$ : t.repeat = len(s.entries)
 $$ : entry = get(s.entries, t.row)
-$$ : name = entry.name
-$$ : nameUnderline = dup("-", len(name))
-$$ : description = replaceRe(entry.description, g.patterns)
+$$ : desc = get(entry, "description", "")
+$$ : description = replaceRe(desc, g.patterns)
 $$ : code = replaceRe(entry.code, "[ ]*$", "")
 $$ : pos = find(code, " {", len(code))
 $$ : signature = substr(code, 0, pos)
 $$ : line = get(entry, "line", "0")
 $$ : t.maxLines = 100
-# <a id="a{t.row}"></a>{name}
+# <a id="a{t.row}"></a>{entry.name}
 
 {description}
 
@@ -65,9 +65,10 @@ $$ : t.maxLines = 100
 {signature}
 ```
 
-[source](../src/{g.moduleName}#L{line})
 
 $$ endblock
+$$ # commented out
+$$ # [source](../src/{g.moduleName}#L{line})
 
 ---
 ⦿ StaticTea markdown template for nim doc comments. ⦿

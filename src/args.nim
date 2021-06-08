@@ -1,15 +1,15 @@
-## Args object for holding command line arguments.
+## Command line arguments.
 
 import strutils
 
 type
   Prepost* = object
-    ## One prefix and its associated postfix.
+    ## Prepost holds one prefix and its associated postfix.
     prefix*: string
     postfix*: string
 
   Args* = object
-    ## Object to hold all the command line arguments.
+    ## Args holds all the command line arguments.
     help*: bool
     version*: bool
     update*: bool
@@ -22,6 +22,7 @@ type
     logFilename*: string
 
 func newPrepost*(prefix: string, postfix: string): Prepost =
+  ## Create a new prepost object from the prefix and postfix.
   result = Prepost(prefix: prefix, postfix: postfix)
 
 func `$`*(args: Args): string =

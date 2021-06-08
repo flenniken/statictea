@@ -1,4 +1,4 @@
-## Parse the StaticTea command line and return the arguments.
+## Parse the StaticTea terminal command line and return the arguments.
 
 import parseopt
 import tpub
@@ -35,9 +35,6 @@ func letterToWord(letter: char): string {.tpub.} =
     if tup[0] == letter:
       return tup[1]
   return ""
-
-# func `$`(sequence: seq[string]): string =
-#   result = sequence.join(", ")
 
 when defined(test):
   func `$`(prepostList: seq[Prepost]): string {.tpub.} =
@@ -103,7 +100,7 @@ proc handleWord(env: var Env, switch: string, word: string, value: string,
 
 
 proc parseCommandLine*(env: var Env, argv: seq[string]): Args =
-  ## Return the command line parameters.
+  ## Return the command line arguments.
 
   var help: bool = false
   var version: bool = false
