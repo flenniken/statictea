@@ -1130,6 +1130,7 @@ Miscellaneous topics:
 - [[#encoding-and-line-endings][Encoding and Line Endings]]
 - [[#update-option][Update Option]]
 - [[#log-file][Log File]]
+- [[#module-docs][Module Docs]]
 
 ** Warning Messages
 :PROPERTIES:
@@ -1332,6 +1333,50 @@ filename, "statictea.log" in the system log directory is used.
 
 - Mac: ~/Library/lib/statictea.log
 - Other: ~/statictea.log
+
+[[#contents][茶]]
+
+** Module Docs
+:PROPERTIES:
+   :CUSTOM_ID: module-docs
+   :END:
+
+You can read module documentation in Gitlab because they are
+formatted as gitlab markdown files. Statictea created the files
+from the embedded doc comments.
+
+- [[docs/index.md][Module Index]] --- Index to the nim module documents.
+
+The statictea.nimble docs task builds the markdown files by
+running the following process:
+
+- extract the doc comments as json using nim's jsondoc comment
+- format the json as markdown using a statictea template
+
+** Unformatted Json
+
+Nim supports restructured formatted doc comments. The jsondoc
+produces html formatted json data. Our desired format is Gitlab
+markdown so having html presentation data in the json is a
+problem. It was discovered that single paragraphs are left
+unformatted, which is the basis for a workaround. You make all
+the documentation look like one paragraph. This is done by
+inserting some symbols in strategic places.
+
+** Wordaround Rules:
+
+- use @: at the beginning of lines, except the first line.
+- use ~~~ to begin a code block
+- use ~~~~ to end a code block
+- use @|, |@ and @:: to disguise a link, see example:
+
+#+BEGIN_SRC
+StaticTea uses @|Semantic Versioning|@(https@:://semver.org/)
+
+becomes:
+
+StaticTea uses [Semantic Versioning](https://semver.org/)
+#+END_SRC
 
 [[#contents][茶]]
 
