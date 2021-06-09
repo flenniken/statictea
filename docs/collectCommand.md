@@ -1,4 +1,4 @@
-[StaticTea Modules](/)
+[StaticTea Modules](./)
 
 # collectCommand.nim
 

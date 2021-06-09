@@ -3,12 +3,12 @@
 # StaticTea Modules
 
 
-* [args.nim](args.md) &mdash; Args object for holding command line arguments.
+* [args.nim](args.md) &mdash; Command line arguments.
 * [collectCommand.nim](collectCommand.md) &mdash; Collect template command lines.
 * [env.nim](env.md) &mdash; Environment holding the input and output streams.
 * [matches.nim](matches.md) &mdash; Regular expression matching methods.
 * [parseCmdLine.nim](parseCmdLine.md) &mdash; Parse a template command line.
-* [parseCommandLine.nim](parseCommandLine.md) &mdash; Parse the StaticTea command line and return the arguments.
+* [parseCommandLine.nim](parseCommandLine.md) &mdash; Parse the StaticTea terminal command line and return the arguments.
 * [parseNumber.nim](parseNumber.md) &mdash; Parse an int or float number string.
 * [processTemplate.nim](processTemplate.md) &mdash; Process the template.
 * [readjson.nim](readjson.md) &mdash; Read json files.
@@ -20,7 +20,6 @@ length.
 * [runFunction.nim](runFunction.md) &mdash; This module contains the StaticTea functions and supporting types.
 * [showhelp.nim](showhelp.md) &mdash; Show help on the command line.
 * [statictea.nim](statictea.md) &mdash; StaticTea; A template processor and language.
-* [t.nim](t.md) &mdash; Private module for experimenting.
 * [tempFile.nim](tempFile.md) &mdash; Temporary file methods.
 * [tpub.nim](tpub.md) &mdash; The tpub macro pragma makes private routines public for testing.
 * [variables.nim](variables.md) &mdash; Language variable methods.

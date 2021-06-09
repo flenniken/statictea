@@ -1,4 +1,4 @@
-[StaticTea Modules](/)
+[StaticTea Modules](./)
 
 # parseCmdLine.nim
 

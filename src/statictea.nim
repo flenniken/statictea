@@ -7,7 +7,6 @@ import args
 import warnings
 import showhelp
 import version
-import tpub
 import env
 when isMainModule:
   import os
@@ -32,7 +31,7 @@ proc processArgs(env: var Env, args: Args): int =
   else:
     env.warn(0, wNoTemplateName)
 
-proc main*(env: var Env, argv: seq[string]): int {.tpub.} =
+proc main*(env: var Env, argv: seq[string]): int =
   ## Run statictea. Return 0 when no warning messages were written.
 
   # Parse the command line options.

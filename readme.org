@@ -1368,10 +1368,10 @@ inserting some symbols in strategic places.
 - use @: at the beginning of lines, except the first line.
 - use ~~~ to begin a code block
 - use ~~~~ to end a code block
-- use @|, |@ and @:: to disguise a link, see example:
+- use @|, |@ and @@ to disguise a link, see example:
 
 #+BEGIN_SRC
-StaticTea uses @|Semantic Versioning|@(https@:://semver.org/)
+StaticTea uses @|Semantic Versioning|@(https@@://semver.org/)
 
 becomes:
 
@@ -1391,7 +1391,8 @@ return a value that you assign to a variable or pass to another
 function.
 
 This section was extracted from the nim source code with a
-StaticTea template and formatted for this readme.
+StaticTea template and formatted for this readme using the
+StaticTea template readmeFuncTemp.org.
 
 List of functions:
 

@@ -16,7 +16,7 @@ $$ : path = path(s.orig)
 $$ : g.moduleName = path.filename
 $$ endblock
 $$ #
-[StaticTea Modules](/)
+[StaticTea Modules](./)
 
 $$ nextline
 # {g.moduleName}

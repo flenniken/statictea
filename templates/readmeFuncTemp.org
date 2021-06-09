@@ -32,7 +32,8 @@ return a value that you assign to a variable or pass to another
 function.
 
 This section was extracted from the nim source code with a
-StaticTea template and formatted for this readme.
+StaticTea template and formatted for this readme using the
+StaticTea template readmeFuncTemp.org.
 
 List of functions:
 

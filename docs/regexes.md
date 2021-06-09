@@ -1,4 +1,4 @@
-[StaticTea Modules](/)
+[StaticTea Modules](./)
 
 # regexes.nim
 
@@ -7,7 +7,7 @@ Perl regular expression matching.
 # Index
 
 * type: [Matches](#user-content-a0) &mdash; Holds the result of a match.
-* [getGroup](#user-content-a1) &mdash; Get the first group in matches if it exists, else return &quot;&quot;.
+* [getGroup](#user-content-a1) &mdash; Get the first group in matches if it exists, else return "".
 * [get2Groups](#user-content-a2) &mdash; Get the first two groups in matches.
 * [get3Groups](#user-content-a3) &mdash; Get the first three groups in matches.
 * [matchRegex](#user-content-a4) &mdash; Match a regular expression pattern in a string.
