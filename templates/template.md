@@ -14,6 +14,7 @@ $$ :   "&lt;", '<', +
 $$ :   "&amp;", '&')
 $$ : path = path(s.orig)
 $$ : g.moduleName = path.filename
+$$ : g.moduleNameMd = concat(path.basename, ".md")
 $$ endblock
 $$ #
 $$ nextline
@@ -45,7 +46,7 @@ $$ :   "")
 $$ : desc = get(entry, "description", "")
 $$ : sentence = substr(desc, 0, add(find(desc, '.', -1), 1))
 $$ : short = replaceRe(sentence, g.patterns)
-* {type}[{entry.name}](#user-content-a{t.row}) &mdash; {short}
+* {type}[{entry.name}]({g.moduleNameMd}/#user-content-a{t.row}) &mdash; {short}
 
 $$ # Function and type descriptions.
 $$ block

@@ -5,40 +5,40 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [runFunction.nim](../src/runFunction.nim) &mdash; Nim source code.
 # Index
 
-* type: [FunctionPtr](#user-content-a0) &mdash; Signature of a statictea function.
-* type: [FunResultKind](#user-content-a1) &mdash; The kind of a FunResult object, either a value or warning.
-* type: [FunResult](#user-content-a2) &mdash; Contains the result of calling a function, either a value or a warning.
-* [newFunResultWarn](#user-content-a3) &mdash; Return a new FunResult object.
-* [newFunResult](#user-content-a4) &mdash; Return a new FunResult object containing a value.
-* [`==`](#user-content-a5) &mdash; Compare two FunResult objects and return true when equal.
-* [`$`](#user-content-a6) &mdash; Return a string representation of a FunResult object.
-* [cmpString](#user-content-a7) &mdash; Compares two utf8 strings a and b.
-* [cmpBaseValues](#user-content-a8) &mdash; Compares two values a and b.
-* [funCmp](#user-content-a9) &mdash; Compare two values.
-* [funConcat](#user-content-a10) &mdash; Concatentate two or more strings.
-* [funLen](#user-content-a11) &mdash; Length of a string, list or dictionary.
-* [funGet](#user-content-a12) &mdash; Get a value from a list or dictionary.
-* [funIf](#user-content-a13) &mdash; Return a value based on a condition.
-* [funAdd](#user-content-a14) &mdash; Add two or more numbers.
-* [funExists](#user-content-a15) &mdash; Determine whether a key exists in a dictionary.
-* [funCase](#user-content-a16) &mdash; Return a value from multiple choices.
-* [parseVersion](#user-content-a17) &mdash; Parse a StaticTea version number and return its three components.
-* [funCmpVersion](#user-content-a18) &mdash; Compare two StaticTea version numbers.
-* [funFloat](#user-content-a19) &mdash; Create a float from an int or an int number string.
-* [funInt](#user-content-a20) &mdash; Create an int from a float or a float number string.
-* [funFind](#user-content-a21) &mdash; Find the position of a substring in a string.
-* [funSubstr](#user-content-a22) &mdash; Extract a substring from a string by its position.
-* [funDup](#user-content-a23) &mdash; Duplicate a string.
-* [funDict](#user-content-a24) &mdash; Create a dictionary from a list of key, value pairs.
-* [funList](#user-content-a25) &mdash; Create a list of values.
-* [funReplace](#user-content-a26) &mdash; Replace a substring by its position.
-* [funReplaceRe](#user-content-a27) &mdash; Replace multiple parts of a string using regular expressions.
-* [funPath](#user-content-a28) &mdash; Split a file path into pieces.
-* [funLower](#user-content-a29) &mdash; Lowercase a string.
-* [funKeys](#user-content-a30) &mdash; Create a list from the keys in a dictionary.
-* [funValues](#user-content-a31) &mdash; Create a list of the values in a dictionary.
-* [funSort](#user-content-a32) &mdash; Sort a list of values of the same type.
-* [getFunction](#user-content-a33) &mdash; Look up a function by its name.
+* type: [FunctionPtr](runFunction.md/#user-content-a0) &mdash; Signature of a statictea function.
+* type: [FunResultKind](runFunction.md/#user-content-a1) &mdash; The kind of a FunResult object, either a value or warning.
+* type: [FunResult](runFunction.md/#user-content-a2) &mdash; Contains the result of calling a function, either a value or a warning.
+* [newFunResultWarn](runFunction.md/#user-content-a3) &mdash; Return a new FunResult object.
+* [newFunResult](runFunction.md/#user-content-a4) &mdash; Return a new FunResult object containing a value.
+* [`==`](runFunction.md/#user-content-a5) &mdash; Compare two FunResult objects and return true when equal.
+* [`$`](runFunction.md/#user-content-a6) &mdash; Return a string representation of a FunResult object.
+* [cmpString](runFunction.md/#user-content-a7) &mdash; Compares two utf8 strings a and b.
+* [cmpBaseValues](runFunction.md/#user-content-a8) &mdash; Compares two values a and b.
+* [funCmp](runFunction.md/#user-content-a9) &mdash; Compare two values.
+* [funConcat](runFunction.md/#user-content-a10) &mdash; Concatentate two or more strings.
+* [funLen](runFunction.md/#user-content-a11) &mdash; Length of a string, list or dictionary.
+* [funGet](runFunction.md/#user-content-a12) &mdash; Get a value from a list or dictionary.
+* [funIf](runFunction.md/#user-content-a13) &mdash; Return a value based on a condition.
+* [funAdd](runFunction.md/#user-content-a14) &mdash; Add two or more numbers.
+* [funExists](runFunction.md/#user-content-a15) &mdash; Determine whether a key exists in a dictionary.
+* [funCase](runFunction.md/#user-content-a16) &mdash; Return a value from multiple choices.
+* [parseVersion](runFunction.md/#user-content-a17) &mdash; Parse a StaticTea version number and return its three components.
+* [funCmpVersion](runFunction.md/#user-content-a18) &mdash; Compare two StaticTea version numbers.
+* [funFloat](runFunction.md/#user-content-a19) &mdash; Create a float from an int or an int number string.
+* [funInt](runFunction.md/#user-content-a20) &mdash; Create an int from a float or a float number string.
+* [funFind](runFunction.md/#user-content-a21) &mdash; Find the position of a substring in a string.
+* [funSubstr](runFunction.md/#user-content-a22) &mdash; Extract a substring from a string by its position.
+* [funDup](runFunction.md/#user-content-a23) &mdash; Duplicate a string.
+* [funDict](runFunction.md/#user-content-a24) &mdash; Create a dictionary from a list of key, value pairs.
+* [funList](runFunction.md/#user-content-a25) &mdash; Create a list of values.
+* [funReplace](runFunction.md/#user-content-a26) &mdash; Replace a substring by its position.
+* [funReplaceRe](runFunction.md/#user-content-a27) &mdash; Replace multiple parts of a string using regular expressions.
+* [funPath](runFunction.md/#user-content-a28) &mdash; Split a file path into pieces.
+* [funLower](runFunction.md/#user-content-a29) &mdash; Lowercase a string.
+* [funKeys](runFunction.md/#user-content-a30) &mdash; Create a list from the keys in a dictionary.
+* [funValues](runFunction.md/#user-content-a31) &mdash; Create a list of the values in a dictionary.
+* [funSort](runFunction.md/#user-content-a32) &mdash; Sort a list of values of the same type.
+* [getFunction](runFunction.md/#user-content-a33) &mdash; Look up a function by its name.
 
 # <a id="a0"></a>FunctionPtr
 
