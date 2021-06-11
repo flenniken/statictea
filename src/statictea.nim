@@ -42,7 +42,7 @@ proc main*(env: var Env, argv: seq[string]): int =
     env.setupLogging(args.logFilename)
 
   env.log("Starting: argv: $1" % $argv)
-  env.log("version: " & staticteaVersion)
+  env.log("Version: " & staticteaVersion)
 
   # Setup control-c monitoring so ctrl-c stops the program.
   proc controlCHandler() {.noconv.} =
@@ -60,12 +60,16 @@ proc main*(env: var Env, argv: seq[string]): int =
     # The stack trace is only available in the debug builds.
     when not defined(release):
       env.warn(0, wStackTrace, getCurrentException().getStackTrace())
-  env.log("Done")
 
 when isMainModule:
   proc run(): int =
     var env = openEnv()
     result = main(env, commandLineParams())
+    env.log("Warnings: $1" % [$env.warningWritten])
+    if result == 0 and env.warningWritten > 0:
+      result = 1
+    env.log("Return code: $1" % [$result])
+    env.log("Done")
     env.close()
 
   quit(if run() == 0: QuitSuccess else: QuitFailure)

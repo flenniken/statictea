@@ -46,8 +46,7 @@ suite "statictea.nim":
   test "main version logging":
     let logLines = """
 XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); Starting: argv: @["-v"]
-XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); version: X.X.X
-XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); Done
+XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); Version: X.X.X
 """
     var eLogLines = splitNewlines(logLines)
     let eOutLines = @[staticteaVersion & "\n"]

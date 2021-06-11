@@ -17,3 +17,9 @@
 
 # Test org mode prefix.
 ../bin/statictea -p="# $" -t=orgmode.org >t.txt 2>&1; cmp t.txt orgmode.expected
+
+# The return code for -l should be 1.
+../bin/statictea -l 2>/dev/null || :
+
+# The return code for -l -h should be 0.
+../bin/statictea -l -h >/dev/null && :
