@@ -3,15 +3,11 @@
 ## @: Here are the tea variables:
 ## @:
 ## @: - t.content -- content of the replace block.
-## @: - t.g -- dictionary containing the global variables.
-## @: - t.l -- dictionary containing the current command's local variables.
 ## @: - t.maxLines -- maximum number of replacement block lines (lines before endblock).
 ## @: - t.maxRepeat -- maximum number of times to repeat the block.
 ## @: - t.output -- where the block output goes.
 ## @: - t.repeat -- controls how many times the block repeats.
 ## @: - t.row -- the current row number of a repeating block.
-## @: - t.s -- dictionary containing the server json variables.
-## @: - t.h -- dictionary containing the shared json variables.
 ## @: - t.version -- the StaticTea version number.
 ## @:
 ## @: Here are the tea variables grouped by type:
@@ -22,11 +18,12 @@
 ## @:
 ## @: Dictionaries:
 ## @:
-## @: - t.g
-## @: - t.l
-## @: - t.s -- read only
-## @: - t.h -- read only
-## @: - t.f -- reserved
+## @: - t -- tea system variables
+## @: - l -- local variables
+## @: - s -- read only server json variables
+## @: - h -- read only shared json variables
+## @: - f -- reserved
+## @: - g -- global variables
 ## @:
 ## @: Integers:
 ## @:
@@ -78,17 +75,6 @@ type
     names*: seq[string]
     value*: Value
 
-  WarningSide* = enum
-    ## Tells which side of the assignment the warning applies to, the
-    ## left var side or the right value side.
-    wsVarName,
-    wsValue
-
-  WarningDataPos* = object
-    ## A warning and the side it applies to.
-    warningData*: WarningData
-    warningSide*: WarningSide
-
   ParentDictKind* = enum
     ## The kind of a ParentDict object, either a dict or warning.
     fdDict,
@@ -125,8 +111,8 @@ func `==`*(s1: ParentDict, s2: ParentDict): bool =
         result = true
 
 func newParentDictWarn*(warning: Warning, p1: string = "", p2: string = ""): ParentDict =
-  ## Return a new ParentDict warning object. It contains a warning and
-  ## the two optional strings that go with the warning.
+  ## Return a new ParentDict object of the warning kind. It contains a
+  ## warning and the two optional strings that go with the warning.
   let warningData = newWarningData(warning, p1, p2)
   result = ParentDict(kind: fdWarning, warningData: warningData)
 
@@ -154,16 +140,6 @@ func newVariableData*(dotNameStr: string, value: Value): VariableData =
   ## Create a new VariableData object.
   let names = split(dotNameStr, '.')
   result = VariableData(names: names, value: value)
-
-func newWarningDataPos*(warning: Warning, p1: string = "", p2: string = "",
-    warningSide: WarningSide): WarningDataPos =
-  ## Create a WarningDataPos object containing the given warning information.
-  let warningData = WarningData(warning: warning, p1: p1, p2: p2)
-  result = WarningDataPos(warningData: warningData, warningSide: warningSide)
-
-func `$`*(warningDataPos: WarningDataPos): string =
-  ## Return a string representation of WarningDataPos.
-  result = "$1 $2" % [$warningDataPos.warningData, $warningDataPos.warningSide]
 
 func getTeaVarIntDefault*(variables: Variables, varName: string): int64 =
   ## Return the int value of one of the tea dictionary integer

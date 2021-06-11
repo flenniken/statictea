@@ -5,15 +5,11 @@ Language variable methods.
  Here are the tea variables:
 
  - t.content -- content of the replace block.
- - t.g -- dictionary containing the global variables.
- - t.l -- dictionary containing the current command's local variables.
  - t.maxLines -- maximum number of replacement block lines (lines before endblock).
  - t.maxRepeat -- maximum number of times to repeat the block.
  - t.output -- where the block output goes.
  - t.repeat -- controls how many times the block repeats.
  - t.row -- the current row number of a repeating block.
- - t.s -- dictionary containing the server json variables.
- - t.h -- dictionary containing the shared json variables.
  - t.version -- the StaticTea version number.
 
  Here are the tea variables grouped by type:
@@ -24,11 +20,12 @@ Language variable methods.
 
  Dictionaries:
 
- - t.g
- - t.l
- - t.s -- read only
- - t.h -- read only
- - t.f -- reserved
+ - t -- tea system variables
+ - l -- local variables
+ - s -- read only server json variables
+ - h -- read only shared json variables
+ - f -- reserved
+ - g -- global variables
 
  Integers:
 
@@ -54,18 +51,14 @@ Language variable methods.
 * const: [outputValues](#outputvalues) &mdash; Tea output variable values.
 * type: [Variables](#variables) &mdash; Dictionary holding all statictea variables.
 * type: [VariableData](#variabledata) &mdash; A variable name and value.
-* type: [WarningSide](#warningside) &mdash; Tells which side of the assignment the warning applies to, the left var side or the right value side.
-* type: [WarningDataPos](#warningdatapos) &mdash; A warning and the side it applies to.
 * type: [ParentDictKind](#parentdictkind) &mdash; The kind of a ParentDict object, either a dict or warning.
 * type: [ParentDict](#parentdict) &mdash; Contains the result of calling getParentDict, either a dictionary or a warning.
 * [`$`](#`$`) &mdash; Return a string representation of ParentDict.
 * [`==`](#`==`) &mdash; Return true when the two ParentDict are equal.
-* [newParentDictWarn](#newparentdictwarn) &mdash; Return a new ParentDict warning object.
+* [newParentDictWarn](#newparentdictwarn) &mdash; Return a new ParentDict object of the warning kind.
 * [newParentDict](#newparentdict) &mdash; Return a new ParentDict object containing a dict.
 * [emptyVariables](#emptyvariables) &mdash; Create an empty variables object in its initial state.
 * [newVariableData](#newvariabledata) &mdash; Create a new VariableData object.
-* [newWarningDataPos](#newwarningdatapos) &mdash; Create a WarningDataPos object containing the given warning information.
-* [`$`](#`$`) &mdash; Return a string representation of WarningDataPos.
 * [getTeaVarIntDefault](#getteavarintdefault) &mdash; Return the int value of one of the tea dictionary integer items.
 * [getTeaVarStringDefault](#getteavarstringdefault) &mdash; Return the string value of one of the tea dictionary string items.
 * [resetVariables](#resetvariables) &mdash; Clear the local variables and reset the tea variables for running a command.
@@ -99,28 +92,6 @@ A variable name and value. The names tells where the variable is stored, i.e.: s
 VariableData = object
   names*: seq[string]
   value*: Value
-
-```
-
-
-# WarningSide
-
-Tells which side of the assignment the warning applies to, the left var side or the right value side.
-
-```nim
-WarningSide = enum
-  wsVarName, wsValue
-```
-
-
-# WarningDataPos
-
-A warning and the side it applies to.
-
-```nim
-WarningDataPos = object
-  warningData*: WarningData
-  warningSide*: WarningSide
 
 ```
 
@@ -172,7 +143,7 @@ func `==`(s1: ParentDict; s2: ParentDict): bool
 
 # newParentDictWarn
 
-Return a new ParentDict warning object. It contains a warning and the two optional strings that go with the warning.
+Return a new ParentDict object of the warning kind. It contains a warning and the two optional strings that go with the warning.
 
 ```nim
 func newParentDictWarn(warning: Warning; p1: string = ""; p2: string = ""): ParentDict
@@ -203,25 +174,6 @@ Create a new VariableData object.
 
 ```nim
 func newVariableData(dotNameStr: string; value: Value): VariableData
-```
-
-
-# newWarningDataPos
-
-Create a WarningDataPos object containing the given warning information.
-
-```nim
-func newWarningDataPos(warning: Warning; p1: string = ""; p2: string = "";
-                       warningSide: WarningSide): WarningDataPos
-```
-
-
-# `$`
-
-Return a string representation of WarningDataPos.
-
-```nim
-func `$`(warningDataPos: WarningDataPos): string
 ```
 
 
