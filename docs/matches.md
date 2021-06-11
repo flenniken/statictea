@@ -1,35 +1,34 @@
-[StaticTea Modules](/)
-
 # matches.nim
 
 Regular expression matching methods.
 
+* [matches.nim](../src/matches.nim) &mdash; Nim source code.
 # Index
 
-* type: [PrepostTable](#user-content-a0) &mdash; The prefix postfix pairs stored in an ordered dictionary.
-* [makeDefaultPrepostTable](#user-content-a1) &mdash; Return the default ordered table that maps prefixes to postfixes.
-* [makeUserPrepostTable](#user-content-a2) &mdash; Return the user's ordered table that maps prefixes to postfixes.
-* [matchPrefix](#user-content-a3) &mdash; Match lines that start with one of the prefixes in the given table.
-* [matchCommand](#user-content-a4) &mdash; Match statictea commands.
-* [matchLastPart](#user-content-a5) &mdash; Match the last part of a command line.
-* [getLastPart](#user-content-a6) &mdash; Return the optional plus and line endings from the line.
-* [matchAllSpaceTab](#user-content-a7) &mdash; Match a line of all spaces or tabs.
-* [matchTabSpace](#user-content-a8) &mdash; Match one or more spaces or tabs.
-* [notEmptyOrSpaces](#user-content-a9) &mdash; Return true when a statement is not empty or not all whitespace.
-* [matchEqualSign](#user-content-a10) &mdash; Match an equal sign and the optional trailing whitespace.
-* [matchLeftParentheses](#user-content-a11) &mdash; Match a left parenthese and the optional trailing whitespace.
-* [matchCommaParentheses](#user-content-a12) &mdash; Match a comma or right parentheses and the optional trailing whitespace.
-* [matchRightParentheses](#user-content-a13) &mdash; Match a right parentheses and the optional trailing whitespace.
-* [matchNumber](#user-content-a14) &mdash; Match a number and the optional trailing whitespace.
-* [matchNumberNotCached](#user-content-a15) &mdash; Match a number and the optional trailing whitespace.
-* [matchString](#user-content-a16) &mdash; Match a string inside either single or double quotes.
-* [matchLeftBracket](#user-content-a17) &mdash; Match everything up to a left backet.
-* [matchFileLine](#user-content-a18) &mdash; Match a file and line number like: filename(234).
-* [matchVersion](#user-content-a19) &mdash; Match a StaticTea version number.
-* [matchVersionNotCached](#user-content-a20) &mdash; Match a StaticTea version number.
-* [matchDotNames](#user-content-a21) &mdash; Matches variable dot names and surrounding whitespace.
+* type: [PrepostTable](#preposttable) &mdash; The prefix postfix pairs stored in an ordered dictionary.
+* [makeDefaultPrepostTable](#makedefaultpreposttable) &mdash; Return the default ordered table that maps prefixes to postfixes.
+* [makeUserPrepostTable](#makeuserpreposttable) &mdash; Return the user's ordered table that maps prefixes to postfixes.
+* [matchPrefix](#matchprefix) &mdash; Match lines that start with one of the prefixes in the given table.
+* [matchCommand](#matchcommand) &mdash; Match statictea commands.
+* [matchLastPart](#matchlastpart) &mdash; Match the last part of a command line.
+* [getLastPart](#getlastpart) &mdash; Return the optional plus and line endings from the line.
+* [matchAllSpaceTab](#matchallspacetab) &mdash; Match a line of all spaces or tabs.
+* [matchTabSpace](#matchtabspace) &mdash; Match one or more spaces or tabs.
+* [notEmptyOrSpaces](#notemptyorspaces) &mdash; Return true when a statement is not empty or not all whitespace.
+* [matchEqualSign](#matchequalsign) &mdash; Match an equal sign and the optional trailing whitespace.
+* [matchLeftParentheses](#matchleftparentheses) &mdash; Match a left parenthese and the optional trailing whitespace.
+* [matchCommaParentheses](#matchcommaparentheses) &mdash; Match a comma or right parentheses and the optional trailing whitespace.
+* [matchRightParentheses](#matchrightparentheses) &mdash; Match a right parentheses and the optional trailing whitespace.
+* [matchNumber](#matchnumber) &mdash; Match a number and the optional trailing whitespace.
+* [matchNumberNotCached](#matchnumbernotcached) &mdash; Match a number and the optional trailing whitespace.
+* [matchString](#matchstring) &mdash; Match a string inside either single or double quotes.
+* [matchLeftBracket](#matchleftbracket) &mdash; Match everything up to a left backet.
+* [matchFileLine](#matchfileline) &mdash; Match a file and line number like: filename(234).
+* [matchVersion](#matchversion) &mdash; Match a StaticTea version number.
+* [matchVersionNotCached](#matchversionnotcached) &mdash; Match a StaticTea version number.
+* [matchDotNames](#matchdotnames) &mdash; Matches variable dot names and surrounding whitespace.
 
-# <a id="a0"></a>PrepostTable
+# PrepostTable
 
 The prefix postfix pairs stored in an ordered dictionary.
 
@@ -38,7 +37,7 @@ PrepostTable = OrderedTable[string, string]
 ```
 
 
-# <a id="a1"></a>makeDefaultPrepostTable
+# makeDefaultPrepostTable
 
 Return the default ordered table that maps prefixes to postfixes.
 
@@ -47,7 +46,7 @@ proc makeDefaultPrepostTable(): PrepostTable
 ```
 
 
-# <a id="a2"></a>makeUserPrepostTable
+# makeUserPrepostTable
 
 Return the user's ordered table that maps prefixes to postfixes. This is used when the user specifies prefixes on the command line and it does not contain any defaults.
 
@@ -56,7 +55,7 @@ proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable
 ```
 
 
-# <a id="a3"></a>matchPrefix
+# matchPrefix
 
 Match lines that start with one of the prefixes in the given table.
 
@@ -66,7 +65,7 @@ proc matchPrefix(line: string; prepostTable: PrepostTable; start: Natural = 0): 
 ```
 
 
-# <a id="a4"></a>matchCommand
+# matchCommand
 
 Match statictea commands.
 
@@ -75,7 +74,7 @@ proc matchCommand(line: string; start: Natural = 0): Option[Matches]
 ```
 
 
-# <a id="a5"></a>matchLastPart
+# matchLastPart
 
 Match the last part of a command line.  It matches the optional continuation plus character, the optional postfix and the optional line endings.
 
@@ -85,7 +84,7 @@ proc matchLastPart(line: string; postfix: string; start: Natural = 0): Option[
 ```
 
 
-# <a id="a6"></a>getLastPart
+# getLastPart
 
 Return the optional plus and line endings from the line.
 
@@ -94,7 +93,7 @@ proc getLastPart(line: string; postfix: string): Option[Matches]
 ```
 
 
-# <a id="a7"></a>matchAllSpaceTab
+# matchAllSpaceTab
 
 Match a line of all spaces or tabs.
 
@@ -103,7 +102,7 @@ proc matchAllSpaceTab(line: string; start: Natural = 0): Option[Matches]
 ```
 
 
-# <a id="a8"></a>matchTabSpace
+# matchTabSpace
 
 Match one or more spaces or tabs.
 
@@ -112,7 +111,7 @@ proc matchTabSpace(line: string; start: Natural = 0): Option[Matches]
 ```
 
 
-# <a id="a9"></a>notEmptyOrSpaces
+# notEmptyOrSpaces
 
 Return true when a statement is not empty or not all whitespace.
 
@@ -121,7 +120,7 @@ proc notEmptyOrSpaces(text: string): bool
 ```
 
 
-# <a id="a10"></a>matchEqualSign
+# matchEqualSign
 
 Match an equal sign and the optional trailing whitespace.
 
@@ -130,7 +129,7 @@ proc matchEqualSign(line: string; start: Natural = 0): Option[Matches]
 ```
 
 
-# <a id="a11"></a>matchLeftParentheses
+# matchLeftParentheses
 
 Match a left parenthese and the optional trailing whitespace.
 
@@ -139,7 +138,7 @@ proc matchLeftParentheses(line: string; start: Natural = 0): Option[Matches]
 ```
 
 
-# <a id="a12"></a>matchCommaParentheses
+# matchCommaParentheses
 
 Match a comma or right parentheses and the optional trailing whitespace.
 
@@ -148,7 +147,7 @@ proc matchCommaParentheses(line: string; start: Natural = 0): Option[Matches]
 ```
 
 
-# <a id="a13"></a>matchRightParentheses
+# matchRightParentheses
 
 Match a right parentheses and the optional trailing whitespace.
 
@@ -157,7 +156,7 @@ proc matchRightParentheses(line: string; start: Natural = 0): Option[Matches]
 ```
 
 
-# <a id="a14"></a>matchNumber
+# matchNumber
 
 Match a number and the optional trailing whitespace. Return the optional decimal point that tells whether the number is a float or integer.
 
@@ -166,7 +165,7 @@ proc matchNumber(line: string; start: Natural = 0): Option[Matches]
 ```
 
 
-# <a id="a15"></a>matchNumberNotCached
+# matchNumberNotCached
 
 Match a number and the optional trailing whitespace. Return the optional decimal point that tells whether the number is a float or integer.
 
@@ -175,7 +174,7 @@ func matchNumberNotCached(line: string; start: Natural = 0): Option[Matches]
 ```
 
 
-# <a id="a16"></a>matchString
+# matchString
 
 Match a string inside either single or double quotes.  The optional white space after the string is matched too. There are two returned groups and only one will contain anything. The first is for single quotes and the second is for double quotes.
 
@@ -184,7 +183,7 @@ proc matchString(line: string; start: Natural = 0): Option[Matches]
 ```
 
 
-# <a id="a17"></a>matchLeftBracket
+# matchLeftBracket
 
 Match everything up to a left backet. The match length includes the bracket.
 
@@ -193,7 +192,7 @@ proc matchLeftBracket(line: string; start: Natural = 0): Option[Matches]
 ```
 
 
-# <a id="a18"></a>matchFileLine
+# matchFileLine
 
 Match a file and line number like: filename(234).
 
@@ -202,7 +201,7 @@ proc matchFileLine(line: string; start: Natural = 0): Option[Matches]
 ```
 
 
-# <a id="a19"></a>matchVersion
+# matchVersion
 
 Match a StaticTea version number.
 
@@ -211,7 +210,7 @@ proc matchVersion(line: string; start: Natural = 0): Option[Matches]
 ```
 
 
-# <a id="a20"></a>matchVersionNotCached
+# matchVersionNotCached
 
 Match a StaticTea version number.
 
@@ -220,7 +219,7 @@ func matchVersionNotCached(line: string; start: Natural = 0): Option[Matches]
 ```
 
 
-# <a id="a21"></a>matchDotNames
+# matchDotNames
 
 Matches variable dot names and surrounding whitespace. Return the
 leading whitespace and dot names as one string like "a.b.c.d".
@@ -254,4 +253,4 @@ proc matchDotNames(line: string; start: Natural = 0): Option[Matches]
 
 
 ---
-⦿ StaticTea markdown template for nim doc comments. ⦿
+⦿ Markdown page generated by [StaticTea](https://github.com/flenniken/statictea/) from nim doc comments. ⦿

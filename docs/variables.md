@@ -1,5 +1,3 @@
-[StaticTea Modules](./)
-
 # variables.nim
 
 Language variable methods.
@@ -50,31 +48,32 @@ Language variable methods.
  - "log" -- the block output goes to the log file
  - "skip" -- the block is skipped
 
+* [variables.nim](../src/variables.nim) &mdash; Nim source code.
 # Index
 
-* const: [outputValues](#user-content-a0) &mdash; Tea output variable values.
-* type: [Variables](#user-content-a1) &mdash; Dictionary holding all statictea variables.
-* type: [VariableData](#user-content-a2) &mdash; A variable name and value.
-* type: [WarningSide](#user-content-a3) &mdash; Tells which side of the assignment the warning applies to, the left var side or the right value side.
-* type: [WarningDataPos](#user-content-a4) &mdash; A warning and the side it applies to.
-* type: [ParentDictKind](#user-content-a5) &mdash; The kind of a ParentDict object, either a dict or warning.
-* type: [ParentDict](#user-content-a6) &mdash; Contains the result of calling getParentDict, either a dictionary or a warning.
-* [`$`](#user-content-a7) &mdash; Return a string representation of ParentDict.
-* [`==`](#user-content-a8) &mdash; Return true when the two ParentDict are equal.
-* [newParentDictWarn](#user-content-a9) &mdash; Return a new ParentDict warning object.
-* [newParentDict](#user-content-a10) &mdash; Return a new ParentDict object containing a dict.
-* [emptyVariables](#user-content-a11) &mdash; Create an empty variables object in its initial state.
-* [newVariableData](#user-content-a12) &mdash; Create a new VariableData object.
-* [newWarningDataPos](#user-content-a13) &mdash; Create a WarningDataPos object containing the given warning information.
-* [`$`](#user-content-a14) &mdash; Return a string representation of WarningDataPos.
-* [getTeaVarIntDefault](#user-content-a15) &mdash; Return the int value of one of the tea dictionary integer items.
-* [getTeaVarStringDefault](#user-content-a16) &mdash; Return the string value of one of the tea dictionary string items.
-* [resetVariables](#user-content-a17) &mdash; Clear the local variables and reset the tea variables for running a command.
-* [getParentDict](#user-content-a18) &mdash; Return the last component dictionary specified by the given names or, on error, return a warning.
-* [assignVariable](#user-content-a19) &mdash; Assign the variable the given value if possible, else return a warning.
-* [getVariable](#user-content-a20) &mdash; Look up the variable and return its value when found, else return a warning.
+* const: [outputValues](#outputvalues) &mdash; Tea output variable values.
+* type: [Variables](#variables) &mdash; Dictionary holding all statictea variables.
+* type: [VariableData](#variabledata) &mdash; A variable name and value.
+* type: [WarningSide](#warningside) &mdash; Tells which side of the assignment the warning applies to, the left var side or the right value side.
+* type: [WarningDataPos](#warningdatapos) &mdash; A warning and the side it applies to.
+* type: [ParentDictKind](#parentdictkind) &mdash; The kind of a ParentDict object, either a dict or warning.
+* type: [ParentDict](#parentdict) &mdash; Contains the result of calling getParentDict, either a dictionary or a warning.
+* [`$`](#`$`) &mdash; Return a string representation of ParentDict.
+* [`==`](#`==`) &mdash; Return true when the two ParentDict are equal.
+* [newParentDictWarn](#newparentdictwarn) &mdash; Return a new ParentDict warning object.
+* [newParentDict](#newparentdict) &mdash; Return a new ParentDict object containing a dict.
+* [emptyVariables](#emptyvariables) &mdash; Create an empty variables object in its initial state.
+* [newVariableData](#newvariabledata) &mdash; Create a new VariableData object.
+* [newWarningDataPos](#newwarningdatapos) &mdash; Create a WarningDataPos object containing the given warning information.
+* [`$`](#`$`) &mdash; Return a string representation of WarningDataPos.
+* [getTeaVarIntDefault](#getteavarintdefault) &mdash; Return the int value of one of the tea dictionary integer items.
+* [getTeaVarStringDefault](#getteavarstringdefault) &mdash; Return the string value of one of the tea dictionary string items.
+* [resetVariables](#resetvariables) &mdash; Clear the local variables and reset the tea variables for running a command.
+* [getParentDict](#getparentdict) &mdash; Return the last component dictionary specified by the given names or, on error, return a warning.
+* [assignVariable](#assignvariable) &mdash; Assign the variable the given value if possible, else return a warning.
+* [getVariable](#getvariable) &mdash; Look up the variable and return its value when found, else return a warning.
 
-# <a id="a0"></a>outputValues
+# outputValues
 
 Tea output variable values.
 
@@ -83,7 +82,7 @@ outputValues = ["result", "stderr", "log", "skip"]
 ```
 
 
-# <a id="a1"></a>Variables
+# Variables
 
 Dictionary holding all statictea variables.
 
@@ -92,7 +91,7 @@ Variables = VarsDict
 ```
 
 
-# <a id="a2"></a>VariableData
+# VariableData
 
 A variable name and value. The names tells where the variable is stored, i.e.: s.varName
 
@@ -104,7 +103,7 @@ VariableData = object
 ```
 
 
-# <a id="a3"></a>WarningSide
+# WarningSide
 
 Tells which side of the assignment the warning applies to, the left var side or the right value side.
 
@@ -114,7 +113,7 @@ WarningSide = enum
 ```
 
 
-# <a id="a4"></a>WarningDataPos
+# WarningDataPos
 
 A warning and the side it applies to.
 
@@ -126,7 +125,7 @@ WarningDataPos = object
 ```
 
 
-# <a id="a5"></a>ParentDictKind
+# ParentDictKind
 
 The kind of a ParentDict object, either a dict or warning.
 
@@ -136,7 +135,7 @@ ParentDictKind = enum
 ```
 
 
-# <a id="a6"></a>ParentDict
+# ParentDict
 
 Contains the result of calling getParentDict, either a dictionary or a warning.
 
@@ -153,7 +152,7 @@ ParentDict = object
 ```
 
 
-# <a id="a7"></a>`$`
+# `$`
 
 Return a string representation of ParentDict.
 
@@ -162,7 +161,7 @@ func `$`(parentDict: ParentDict): string
 ```
 
 
-# <a id="a8"></a>`==`
+# `==`
 
 Return true when the two ParentDict are equal.
 
@@ -171,7 +170,7 @@ func `==`(s1: ParentDict; s2: ParentDict): bool
 ```
 
 
-# <a id="a9"></a>newParentDictWarn
+# newParentDictWarn
 
 Return a new ParentDict warning object. It contains a warning and the two optional strings that go with the warning.
 
@@ -180,7 +179,7 @@ func newParentDictWarn(warning: Warning; p1: string = ""; p2: string = ""): Pare
 ```
 
 
-# <a id="a10"></a>newParentDict
+# newParentDict
 
 Return a new ParentDict object containing a dict.
 
@@ -189,7 +188,7 @@ func newParentDict(dict: VarsDict): ParentDict
 ```
 
 
-# <a id="a11"></a>emptyVariables
+# emptyVariables
 
 Create an empty variables object in its initial state.
 
@@ -198,7 +197,7 @@ func emptyVariables(server: VarsDict = nil; shared: VarsDict = nil): Variables
 ```
 
 
-# <a id="a12"></a>newVariableData
+# newVariableData
 
 Create a new VariableData object.
 
@@ -207,7 +206,7 @@ func newVariableData(dotNameStr: string; value: Value): VariableData
 ```
 
 
-# <a id="a13"></a>newWarningDataPos
+# newWarningDataPos
 
 Create a WarningDataPos object containing the given warning information.
 
@@ -217,7 +216,7 @@ func newWarningDataPos(warning: Warning; p1: string = ""; p2: string = "";
 ```
 
 
-# <a id="a14"></a>`$`
+# `$`
 
 Return a string representation of WarningDataPos.
 
@@ -226,7 +225,7 @@ func `$`(warningDataPos: WarningDataPos): string
 ```
 
 
-# <a id="a15"></a>getTeaVarIntDefault
+# getTeaVarIntDefault
 
 Return the int value of one of the tea dictionary integer items. If the value does not exist, return its default value.
 
@@ -235,7 +234,7 @@ func getTeaVarIntDefault(variables: Variables; varName: string): int64
 ```
 
 
-# <a id="a16"></a>getTeaVarStringDefault
+# getTeaVarStringDefault
 
 Return the string value of one of the tea dictionary string items. If the value does not exist, return its default value.
 
@@ -244,7 +243,7 @@ func getTeaVarStringDefault(variables: Variables; varName: string): string
 ```
 
 
-# <a id="a17"></a>resetVariables
+# resetVariables
 
 Clear the local variables and reset the tea variables for running a command.
 
@@ -253,7 +252,7 @@ proc resetVariables(variables: var Variables)
 ```
 
 
-# <a id="a18"></a>getParentDict
+# getParentDict
 
 Return the last component dictionary specified by the given names or, on error, return a warning.  The sequence [a, b, c, d] corresponds to the dot name string "a.b.c.d" and the c dictionary is the result.
 
@@ -262,7 +261,7 @@ proc getParentDict(variables: Variables; names: seq[string]): ParentDict
 ```
 
 
-# <a id="a19"></a>assignVariable
+# assignVariable
 
 Assign the variable the given value if possible, else return a warning.
 
@@ -272,7 +271,7 @@ proc assignVariable(variables: var Variables; dotNameStr: string; value: Value):
 ```
 
 
-# <a id="a20"></a>getVariable
+# getVariable
 
 Look up the variable and return its value when found, else return a warning.
 
@@ -283,4 +282,4 @@ proc getVariable(variables: Variables; dotNameStr: string): ValueOrWarning
 
 
 ---
-⦿ StaticTea markdown template for nim doc comments. ⦿
+⦿ Markdown page generated by [StaticTea](https://github.com/flenniken/statictea/) from nim doc comments. ⦿
