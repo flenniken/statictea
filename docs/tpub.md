@@ -5,19 +5,22 @@ The tpub macro pragma makes private routines public for testing. This allows you
 * [tpub.nim](../src/tpub.nim) &mdash; Nim source code.
 # Index
 
-* macro: [tpub](#tpub) &mdash; Exports a procedure or function when in test mode so it can be tested in an external module.
-* macro: [tpubType](#tpubtype) &mdash; Exports a type when in test mode so it can be tested in an external module.
+* macro: [tpub](#tpub) &mdash; Exports a procedure or function when in test mode so it can be
+tested in an external module.
+* macro: [tpubType](#tpubtype) &mdash; Exports a type when in test mode so it can be tested in an
+external module.
 
 # tpub
 
-Exports a procedure or function when in test mode so it can be tested in an external module.
+Exports a procedure or function when in test mode so it can be
+tested in an external module.
 
 Here is an example that makes myProcToTest public in
 test mode:
 
-.. code::
-
-  proc myProcToTest(value:int): string {.tpub.} =
+~~~
+proc myProcToTest(value:int): string {.tpub.} =
+~~~~
 
 ```nim
 macro tpub(x: untyped): untyped
@@ -26,18 +29,19 @@ macro tpub(x: untyped): untyped
 
 # tpubType
 
-Exports a type when in test mode so it can be tested in an external module.
+Exports a type when in test mode so it can be tested in an
+external module.
 
 Here is an example that makes the type "SectionInfo" public in
 test mode:
 
-.. code::
-
-  import tpub
-  tpubType:
-    type
-      SectionInfo = object
-        name*: string
+~~~
+import tpub
+tpubType:
+  type
+    SectionInfo = object
+      name*: string
+~~~~
 
 ```nim
 macro tpubType(x: untyped): untyped
