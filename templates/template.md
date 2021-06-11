@@ -14,7 +14,6 @@ $$ :   "&lt;", '<', +
 $$ :   "&amp;", '&')
 $$ : path = path(s.orig)
 $$ : g.moduleName = path.filename
-$$ : g.moduleNameMd = concat(path.basename, ".md")
 $$ endblock
 $$ #
 $$ nextline
@@ -46,7 +45,8 @@ $$ :   "")
 $$ : desc = get(entry, "description", "")
 $$ : sentence = substr(desc, 0, add(find(desc, '.', -1), 1))
 $$ : short = replaceRe(sentence, g.patterns)
-* {type}[{entry.name}]({g.moduleNameMd}/#user-content-a{t.row}) &mdash; {short}
+$$ : lowercaseName = lower(entry.name)
+* {type}[{entry.name}](#{lowercaseName}) &mdash; {short}
 
 $$ # Function and type descriptions.
 $$ block
@@ -59,7 +59,7 @@ $$ : pos = find(code, " {", len(code))
 $$ : signature = substr(code, 0, pos)
 $$ : line = get(entry, "line", "0")
 $$ : t.maxLines = 100
-# <a id="a{t.row}"></a>{entry.name}
+# {entry.name}
 
 {description}
 

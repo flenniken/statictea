@@ -5,42 +5,42 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [runFunction.nim](../src/runFunction.nim) &mdash; Nim source code.
 # Index
 
-* type: [FunctionPtr](runFunction.md/#user-content-a0) &mdash; Signature of a statictea function.
-* type: [FunResultKind](runFunction.md/#user-content-a1) &mdash; The kind of a FunResult object, either a value or warning.
-* type: [FunResult](runFunction.md/#user-content-a2) &mdash; Contains the result of calling a function, either a value or a warning.
-* [newFunResultWarn](runFunction.md/#user-content-a3) &mdash; Return a new FunResult object.
-* [newFunResult](runFunction.md/#user-content-a4) &mdash; Return a new FunResult object containing a value.
-* [`==`](runFunction.md/#user-content-a5) &mdash; Compare two FunResult objects and return true when equal.
-* [`$`](runFunction.md/#user-content-a6) &mdash; Return a string representation of a FunResult object.
-* [cmpString](runFunction.md/#user-content-a7) &mdash; Compares two utf8 strings a and b.
-* [cmpBaseValues](runFunction.md/#user-content-a8) &mdash; Compares two values a and b.
-* [funCmp](runFunction.md/#user-content-a9) &mdash; Compare two values.
-* [funConcat](runFunction.md/#user-content-a10) &mdash; Concatentate two or more strings.
-* [funLen](runFunction.md/#user-content-a11) &mdash; Length of a string, list or dictionary.
-* [funGet](runFunction.md/#user-content-a12) &mdash; Get a value from a list or dictionary.
-* [funIf](runFunction.md/#user-content-a13) &mdash; Return a value based on a condition.
-* [funAdd](runFunction.md/#user-content-a14) &mdash; Add two or more numbers.
-* [funExists](runFunction.md/#user-content-a15) &mdash; Determine whether a key exists in a dictionary.
-* [funCase](runFunction.md/#user-content-a16) &mdash; Return a value from multiple choices.
-* [parseVersion](runFunction.md/#user-content-a17) &mdash; Parse a StaticTea version number and return its three components.
-* [funCmpVersion](runFunction.md/#user-content-a18) &mdash; Compare two StaticTea version numbers.
-* [funFloat](runFunction.md/#user-content-a19) &mdash; Create a float from an int or an int number string.
-* [funInt](runFunction.md/#user-content-a20) &mdash; Create an int from a float or a float number string.
-* [funFind](runFunction.md/#user-content-a21) &mdash; Find the position of a substring in a string.
-* [funSubstr](runFunction.md/#user-content-a22) &mdash; Extract a substring from a string by its position.
-* [funDup](runFunction.md/#user-content-a23) &mdash; Duplicate a string.
-* [funDict](runFunction.md/#user-content-a24) &mdash; Create a dictionary from a list of key, value pairs.
-* [funList](runFunction.md/#user-content-a25) &mdash; Create a list of values.
-* [funReplace](runFunction.md/#user-content-a26) &mdash; Replace a substring by its position.
-* [funReplaceRe](runFunction.md/#user-content-a27) &mdash; Replace multiple parts of a string using regular expressions.
-* [funPath](runFunction.md/#user-content-a28) &mdash; Split a file path into pieces.
-* [funLower](runFunction.md/#user-content-a29) &mdash; Lowercase a string.
-* [funKeys](runFunction.md/#user-content-a30) &mdash; Create a list from the keys in a dictionary.
-* [funValues](runFunction.md/#user-content-a31) &mdash; Create a list of the values in a dictionary.
-* [funSort](runFunction.md/#user-content-a32) &mdash; Sort a list of values of the same type.
-* [getFunction](runFunction.md/#user-content-a33) &mdash; Look up a function by its name.
+* type: [FunctionPtr](#functionptr) &mdash; Signature of a statictea function.
+* type: [FunResultKind](#funresultkind) &mdash; The kind of a FunResult object, either a value or warning.
+* type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a warning.
+* [newFunResultWarn](#newfunresultwarn) &mdash; Return a new FunResult object.
+* [newFunResult](#newfunresult) &mdash; Return a new FunResult object containing a value.
+* [`==`](#`==`) &mdash; Compare two FunResult objects and return true when equal.
+* [`$`](#`$`) &mdash; Return a string representation of a FunResult object.
+* [cmpString](#cmpstring) &mdash; Compares two utf8 strings a and b.
+* [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
+* [funCmp](#funcmp) &mdash; Compare two values.
+* [funConcat](#funconcat) &mdash; Concatentate two or more strings.
+* [funLen](#funlen) &mdash; Length of a string, list or dictionary.
+* [funGet](#funget) &mdash; Get a value from a list or dictionary.
+* [funIf](#funif) &mdash; Return a value based on a condition.
+* [funAdd](#funadd) &mdash; Add two or more numbers.
+* [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
+* [funCase](#funcase) &mdash; Return a value from multiple choices.
+* [parseVersion](#parseversion) &mdash; Parse a StaticTea version number and return its three components.
+* [funCmpVersion](#funcmpversion) &mdash; Compare two StaticTea version numbers.
+* [funFloat](#funfloat) &mdash; Create a float from an int or an int number string.
+* [funInt](#funint) &mdash; Create an int from a float or a float number string.
+* [funFind](#funfind) &mdash; Find the position of a substring in a string.
+* [funSubstr](#funsubstr) &mdash; Extract a substring from a string by its position.
+* [funDup](#fundup) &mdash; Duplicate a string.
+* [funDict](#fundict) &mdash; Create a dictionary from a list of key, value pairs.
+* [funList](#funlist) &mdash; Create a list of values.
+* [funReplace](#funreplace) &mdash; Replace a substring by its position.
+* [funReplaceRe](#funreplacere) &mdash; Replace multiple parts of a string using regular expressions.
+* [funPath](#funpath) &mdash; Split a file path into pieces.
+* [funLower](#funlower) &mdash; Lowercase a string.
+* [funKeys](#funkeys) &mdash; Create a list from the keys in a dictionary.
+* [funValues](#funvalues) &mdash; Create a list of the values in a dictionary.
+* [funSort](#funsort) &mdash; Sort a list of values of the same type.
+* [getFunction](#getfunction) &mdash; Look up a function by its name.
 
-# <a id="a0"></a>FunctionPtr
+# FunctionPtr
 
 Signature of a statictea function. It takes any number of values and returns a value or a warning message.
 
@@ -49,7 +49,7 @@ FunctionPtr = proc (parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a1"></a>FunResultKind
+# FunResultKind
 
 The kind of a FunResult object, either a value or warning.
 
@@ -59,7 +59,7 @@ FunResultKind = enum
 ```
 
 
-# <a id="a2"></a>FunResult
+# FunResult
 
 Contains the result of calling a function, either a value or a warning.
 
@@ -77,7 +77,7 @@ FunResult = object
 ```
 
 
-# <a id="a3"></a>newFunResultWarn
+# newFunResultWarn
 
 Return a new FunResult object. It contains a warning, the index of the problem parameter, and the two optional strings that go with the warning.
 
@@ -87,7 +87,7 @@ func newFunResultWarn(warning: Warning; parameter: Natural = 0; p1: string = "";
 ```
 
 
-# <a id="a4"></a>newFunResult
+# newFunResult
 
 Return a new FunResult object containing a value.
 
@@ -96,7 +96,7 @@ func newFunResult(value: Value): FunResult
 ```
 
 
-# <a id="a5"></a>`==`
+# `==`
 
 Compare two FunResult objects and return true when equal.
 
@@ -105,7 +105,7 @@ func `==`(r1: FunResult; r2: FunResult): bool
 ```
 
 
-# <a id="a6"></a>`$`
+# `$`
 
 Return a string representation of a FunResult object.
 
@@ -114,7 +114,7 @@ func `$`(funResult: FunResult): string
 ```
 
 
-# <a id="a7"></a>cmpString
+# cmpString
 
 Compares two utf8 strings a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. Optionally Ignore case.
 
@@ -123,7 +123,7 @@ func cmpString(a, b: string; insensitive: bool = false): int
 ```
 
 
-# <a id="a8"></a>cmpBaseValues
+# cmpBaseValues
 
 Compares two values a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. The values must be the same kind and either int, float or string.
 
@@ -132,7 +132,7 @@ func cmpBaseValues(a, b: Value; insensitive: bool = false): int
 ```
 
 
-# <a id="a9"></a>funCmp
+# funCmp
 
 Compare two values. Returns -1 for less, 0 for equal and 1 for
 greater than.  The values are either int, float or string (both the
@@ -169,7 +169,7 @@ func funCmp(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a10"></a>funConcat
+# funConcat
 
 Concatentate two or more strings.
 
@@ -191,7 +191,7 @@ func funConcat(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a11"></a>funLen
+# funLen
 
 Length of a string, list or dictionary. For strings it returns
 the number of characters, not bytes. For lists and dictionaries
@@ -213,7 +213,7 @@ func funLen(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a12"></a>funGet
+# funGet
 
 Get a value from a list or dictionary.  You can specify a default
 value to return when the value doesn't exist, if you don't, a
@@ -256,7 +256,7 @@ func funGet(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a13"></a>funIf
+# funIf
 
 Return a value based on a condition.
 
@@ -278,7 +278,7 @@ func funIf(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a14"></a>funAdd
+# funAdd
 
 Add two or more numbers.  The parameters must be all integers or
 all floats.  A warning is generated on overflow.
@@ -314,7 +314,7 @@ func funAdd(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a15"></a>funExists
+# funExists
 
 Determine whether a key exists in a dictionary.
 
@@ -335,7 +335,7 @@ func funExists(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a16"></a>funCase
+# funCase
 
 Return a value from multiple choices. It takes a main condition,
 any number of case pairs then an optional else value.
@@ -376,7 +376,7 @@ func funCase(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a17"></a>parseVersion
+# parseVersion
 
 Parse a StaticTea version number and return its three components.
 
@@ -385,7 +385,7 @@ func parseVersion(version: string): Option[(int, int, int)]
 ```
 
 
-# <a id="a18"></a>funCmpVersion
+# funCmpVersion
 
 Compare two StaticTea version numbers. Returns -1 for less, 0 for
 equal and 1 for greater than.
@@ -411,7 +411,7 @@ func funCmpVersion(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a19"></a>funFloat
+# funFloat
 
 Create a float from an int or an int number string.
 
@@ -430,7 +430,7 @@ func funFloat(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a20"></a>funInt
+# funInt
 
 Create an int from a float or a float number string.
 
@@ -467,7 +467,7 @@ func funInt(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a21"></a>funFind
+# funFind
 
 Find the position of a substring in a string.  When the substring
 is not found you can return a default value.  A warning is
@@ -496,7 +496,7 @@ func funFind(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a22"></a>funSubstr
+# funSubstr
 
 Extract a substring from a string by its position. You pass the
 string, the substring's start index then its end index+1.
@@ -524,7 +524,7 @@ func funSubstr(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a23"></a>funDup
+# funDup
 
 Duplicate a string. The first parameter is the string to dup and
 the second parameter is the number of times to duplicate it.
@@ -545,7 +545,7 @@ func funDup(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a24"></a>funDict
+# funDict
 
 Create a dictionary from a list of key, value pairs.  The keys
 must be strings and the values can be any type.
@@ -570,7 +570,7 @@ func funDict(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a25"></a>funList
+# funList
 
 Create a list of values.
 
@@ -595,7 +595,7 @@ func funList(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a26"></a>funReplace
+# funReplace
 
 Replace a substring by its position.  You specify the substring
 position and the string to take its place.  You can use it to
@@ -639,7 +639,7 @@ func funReplace(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a27"></a>funReplaceRe
+# funReplaceRe
 
 Replace multiple parts of a string using regular expressions.
 
@@ -682,7 +682,7 @@ func funReplaceRe(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a28"></a>funPath
+# funPath
 
 Split a file path into pieces. Return a dictionary with the
 filename, basename, extension and directory.
@@ -717,7 +717,7 @@ func funPath(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a29"></a>funLower
+# funLower
 
 Lowercase a string.
 
@@ -735,7 +735,7 @@ func funLower(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a30"></a>funKeys
+# funKeys
 
 Create a list from the keys in a dictionary.
 
@@ -755,7 +755,7 @@ func funKeys(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a31"></a>funValues
+# funValues
 
 Create a list of the values in a dictionary.
 
@@ -775,7 +775,7 @@ func funValues(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a32"></a>funSort
+# funSort
 
 Sort a list of values of the same type.
 
@@ -842,7 +842,7 @@ func funSort(parameters: seq[Value]): FunResult
 ```
 
 
-# <a id="a33"></a>getFunction
+# getFunction
 
 Look up a function by its name.
 
