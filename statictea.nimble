@@ -207,7 +207,7 @@ task docs, "\tCreate markdown docs; specify part of source filename.":
       # Create markdown from the json comments using a statictea template.
       var mdName = "docs/$1" % [changeFileExt(filename, "md")]
       echo "Generate $1" % [mdName]
-      let part1 = "bin/statictea -j=docs/shared.json -t=templates/template.md "
+      let part1 = "bin/statictea -j=docs/shared.json -t=templates/nimModule.md "
       let part2 = "-s=$1 -r=$2" % [jsonName, mdName]
       exec part1 & part2
 
@@ -255,7 +255,7 @@ task docsix, "\tDisplay the doc comment index to the source files.":
 
   # Process the index template and create the index.md file.
   echo "Create the index.md file"
-  var cmd = "bin/statictea -s=$1 -t=templates/indexTemplate.md -r=docs/index.md" %
+  var cmd = "bin/statictea -s=$1 -t=templates/nimModuleIndex.md -r=docs/index.md" %
     [jsonFilename]
   exec cmd
 
@@ -284,7 +284,7 @@ task readmefun, "Create readme function section.":
   writeFile(sharedFilename, sharedJson)
 
   echo "Generate readme function section from template..."
-  let templateName = joinPath("templates", "readmeFuncTemp.org")
+  let templateName = joinPath("templates", "readmeFuncSection.org")
   var orgName = joinPath("docs", changeFileExt(filename, "org"))
   cmd = "bin/statictea -l -s=$1 -j=docs/shared.json -t=$2 -r=$3" %
      [jsonName, templateName, orgName]
