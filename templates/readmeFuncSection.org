@@ -1,7 +1,5 @@
 # $ # StaticTea template for generating the function doc section for the readme.
 
-* StaticTea Template
-
 # $ # Define replacement patterns to format the descriptions or
 # $ # org mode.
 # $ # Sort the entries alphabetically by their name.
@@ -21,22 +19,7 @@
 # $ :   "&amp;", '&')
 # $ : g.entries = sort(s.entries, "ascending", "sensitive", "name")
 # $ endblock
-* Functions
-:PROPERTIES:
-:CUSTOM_ID: functions
-:ORDERED:  t
-:END:
-
-Functions allow you to format variables for presentation.  They
-return a value that you assign to a variable or pass to another
-function.
-
-This section was extracted from the nim source code with a
-StaticTea template and formatted for this readme using the
-StaticTea template readmeFuncTemp.org.
-
-List of functions:
-
+# $ #
 # $ # Generate the function index.
 # $ # Show the function entries and skip the others.
 # $ # Change the function names, i.e, funReplaceRe to replaceRe.

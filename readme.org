@@ -1390,11 +1390,11 @@ Functions allow you to format variables for presentation.  They
 return a value that you assign to a variable or pass to another
 function.
 
-This section was extracted from the nim source code with a
-StaticTea template and formatted for this readme using the
-StaticTea template readmeFuncTemp.org.
+This section was extracted from the nim source code formatted for
+this readme using the StaticTea template [[templates/readmeFuncSection.org][readmeFuncSection.org]].
 
 List of functions:
+# Dynamic Content Begins
 
 - [[#add][add()]] -- Add two or more numbers.
 - [[#case][case()]] -- Return a value from multiple choices.
@@ -2120,6 +2120,7 @@ d = dict("a", "apple", "b", 2, "c", 3)
 keys(d) => ["a", "b", "c"]
 values(d) => ["apple", 2, 3]
 #+END_SRC
+# Dynamic Content Ends
 
 * Contents :notoc:
 :PROPERTIES:
