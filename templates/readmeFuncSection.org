@@ -1,5 +1,4 @@
 # $ # StaticTea template for generating the function doc section for the readme.
-
 # $ # Define replacement patterns to format the descriptions or
 # $ # org mode.
 # $ # Sort the entries alphabetically by their name.
@@ -37,7 +36,6 @@
 # $ : desc = replaceRe(entry.description, g.patterns)
 # $ : shortFuncDesc = substr(desc, 0, add(find(desc, '.', -1), 1))
 - [[#{name}][{name}()]] -- {shortFuncDesc}
-
 # $ # Generate the function sections.
 # $ block
 # $ : t.repeat = len(g.entries)
@@ -49,6 +47,7 @@
 # $ : capName = case(pos, 0, substr(entry.name, 3), entry.name)
 # $ : name = concat(lower(substr(capName, 0, 1)), substr(capName, 1))
 # $ : description = replaceRe(entry.description, g.patterns)
+
 [[#contents][茶]]
 
 ** {name}()
@@ -57,5 +56,4 @@
 :END:
 
 {description}
-
 # $ endblock

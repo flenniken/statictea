@@ -1394,8 +1394,8 @@ This section was extracted from the nim source code formatted for
 this readme using the StaticTea template [[templates/readmeFuncSection.org][readmeFuncSection.org]].
 
 List of functions:
-# Dynamic Content Begins
 
+# Dynamic Content Begins
 - [[#add][add()]] -- Add two or more numbers.
 - [[#case][case()]] -- Return a value from multiple choices.
 - [[#cmp][cmp()]] -- Compare two values.
@@ -2120,8 +2120,8 @@ d = dict("a", "apple", "b", 2, "c", 3)
 keys(d) => ["a", "b", "c"]
 values(d) => ["apple", 2, 3]
 #+END_SRC
-# Dynamic Content Ends
 
+# Dynamic Content Ends
 * Contents :notoc:
 :PROPERTIES:
 :CUSTOM_ID: contents

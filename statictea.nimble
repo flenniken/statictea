@@ -146,6 +146,45 @@ $1
 }
 """ % [join(modules, ",\n")]
 
+proc insertFile(filename: string, startLine: string, endLine: string,
+                sectionFilename: string) =
+  ## Insert sectionFilename into filename replacing the existing
+  ## section of the file marked with start and end lines.
+  let mainText = slurp(filename)
+  let sectionText = slurp(sectionFilename)
+
+  # We use a finite state machine. When in the start state we output
+  # filename lines. When the startLine is found, we insert the section
+  # file. Then we transition to the skip state where we skip lines
+  # until the endline is found. Then we transition to the end state
+  # and output the rest of the filename lines.
+
+  type
+    State = enum
+      ## Finite state machine states.
+      start, skip, finish
+
+  var foundStartLine = false
+  var state = State.start
+  var lines = newSeq[string]()
+  for line in mainText.splitLines():
+    if state == State.start:
+      lines.add(line)
+      if line == startLine:
+        foundStartLine = true
+        for insertLine in sectionText.splitLines():
+          lines.add(insertLine)
+        state = State.skip
+    elif state == State.skip:
+      if line == endLine:
+        lines.add(line)
+        state = State.finish
+    elif state == State.finish:
+      lines.add(line)
+  if not foundStartLine:
+    echo "did not find start line"
+  else:
+    writeFile(filename, lines.join("\n"))
 
 # Tasks below
 
@@ -285,15 +324,20 @@ task readmefun, "Create readme function section.":
 
   echo "Generate readme function section from template..."
   let templateName = joinPath("templates", "readmeFuncSection.org")
-  var orgName = joinPath("docs", changeFileExt(filename, "org"))
+  let sectionFile = joinPath("docs", "readmeFuncs.org")
   cmd = "bin/statictea -l -s=$1 -j=docs/shared.json -t=$2 -r=$3" %
-     [jsonName, templateName, orgName]
+     [jsonName, templateName, sectionFile]
   # echo cmd
   exec cmd
 
   rmFile(sharedFilename)
   rmFile(jsonName)
-  echo "Generated $1" % [orgName]
+
+  insertFile("readme.org", "# Dynamic Content Begins",
+    "# Dynamic Content Ends", sectionFile)
+
+  rmFile(sectionFile)
+  echo "Updated readme.org"
 
 task tt, "\tCompile and run t.nim.":
   let cmd = "nim c -r --gc:orc --hints:off --outdir:bin/tests/ src/t.nim"

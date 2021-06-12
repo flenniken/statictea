@@ -629,7 +629,6 @@ statement: t.repeat = 200
   test "assign maxRepeat less than repeat":
     # Test that you cannot assign t.maxRepeat less than repeat.
 
-    # todo: remove semicolon support. separate statements with newlines only.
     let templateContent = """
 <!--$ nextline t.repeat = 4; t.maxRepeat=3-->
 {t.row}
@@ -1109,6 +1108,25 @@ template.html(4): w58: The replacement variable doesn't exist: len.
     check testProcessTemplate(templateContent = templateContent, eErrLines = eErrLines,
       eResultLines = eResultLines, eRc = 1)
 
+
+  test "ending blank lines":
+    let templateContent = """
+hello
+$$ block t.repeat = 2
+$$ : tea = "Black"
+
+* {tea}
+$$ endblock
+"""
+    let eResultLines = splitNewLines """
+hello
+
+* Black
+
+* Black
+"""
+    check testProcessTemplate(templateContent = templateContent,
+        eResultLines = eResultLines, eRc = 0)
 
 
 # todo: test literal strings with \n etc. in them.  Are these supported?
