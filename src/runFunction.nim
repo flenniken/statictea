@@ -536,7 +536,7 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
   ## @:~~~
   ## @:cmpVersion("1.2.5", "1.1.8") => -1
   ## @:cmpVersion("1.2.5", "1.3.0") => 1
-  ## @:cmpVersion("1.2.5", "1.2.5") => 1
+  ## @:cmpVersion("1.2.5", "1.2.5") => 0
   ## @:~~~~
 
   if parameters.len() != 2:

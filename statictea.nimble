@@ -336,7 +336,9 @@ task readmefun, "Create readme function section.":
   insertFile("readme.org", "# Dynamic Content Begins",
     "# Dynamic Content Ends", sectionFile)
 
-  rmFile(sectionFile)
+  echo "Generated sectionFile: " & sectionFile
+  # rmFile(sectionFile)
+
   echo "Updated readme.org"
 
 task tt, "\tCompile and run t.nim.":
