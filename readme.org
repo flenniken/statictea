@@ -1363,11 +1363,21 @@ created the markdown files from the embedded doc comments.
 
 - [[docs/index.md][Module Index]] --- Index to the nim module documents.
 
-The statictea.nimble docs task builds the markdown files by
-running the following process:
+Build Module Index:
 
-1. extract the doc comments as json using nim's jsondoc command
-2. format the json as markdown using a statictea template
+The nimble *docsix* task builds the module index markdown file by running
+the following process:
+
+1. create a json file from the doc comments at the top of all the source files
+2. format the json as markdown using the [[https://raw.githubusercontent.com/flenniken/statictea/master/templates/nimModuleIndex.md][nimModuleIndex.md]] statictea template
+
+Build Module Docs:
+
+The nimble *docs* task builds the modules markdown files by running
+the following process for each module:
+
+1. create a json file of a module docs using nim's jsondoc command
+2. format the json as markdown using the [[https://raw.githubusercontent.com/flenniken/statictea/master/templates/nimModule.md][nimModule.md]] statictea template
 
 ** HTML Formatted Json
 :PROPERTIES:
@@ -1460,6 +1470,7 @@ List of functions:
 - [[#find][find()]] -- Find the position of a substring in a string.
 - [[#float][float()]] -- Create a float from an int or an int number string.
 - [[#get][get()]] -- Get a value from a list or dictionary.
+- [[#githubAnchor][githubAnchor()]] -- Create a Github markdown anchor name given a heading name.
 - [[#if][if()]] -- Return a value based on a condition.
 - [[#int][int()]] -- Create an int from a float or a float number string.
 - [[#keys][keys()]] -- Create a list from the keys in a dictionary.
@@ -1471,7 +1482,7 @@ List of functions:
 - [[#replaceRe][replaceRe()]] -- Replace multiple parts of a string using regular expressions.
 - [[#sort][sort()]] -- Sort a list of values of the same type.
 - [[#substr][substr()]] -- Extract a substring from a string by its position.
-- [[#values][values()]] -- Create a list of the values in a dictionary.
+- [[#values][values()]] -- Create a list of the values in the specified dictionary.
 
 [[#contents][茶]]
 
@@ -1597,7 +1608,7 @@ cmp("Tea", "tea", 1) => 0
 Compare two StaticTea version numbers. Returns -1 for less, 0 for
 equal and 1 for greater than.
 
-StaticTea uses [Semantic Versioning](https://semver.org/)
+StaticTea uses [[Semantic Versioning][https://semver.org/]]
 with the added restriction that each version component has one
 to three digits (no letters).
 
@@ -1791,6 +1802,33 @@ get(l, 3, 99) => 99
 
 d = dict("tea", "Earl Grey")
 d.tea => "Earl Grey"
+#+END_SRC
+
+[[#contents][茶]]
+
+** githubAnchor()
+:PROPERTIES:
+:CUSTOM_ID: githubAnchor
+:END:
+
+Create a Github markdown anchor name given a heading name.  If
+you have duplicate heading names, the anchor name returned only
+works for the first. Use it for Github markdown internal links.
+
+- p1: heading name
+- return: anchor name
+
+Examples:
+
+#+BEGIN_SRC
+githubAnchor("MyHeading") => "myheading"
+githubAnchor("Eary Gray") => "eary-gray"
+githubAnchor("$Eary-Gray#") => "eary-gray"
+
+$$ : anchor = githubAnchor(entry.name)
+- {type}[{entry.name}](#{anchor}) &mdash; {short}
+...
+# {entry.name}
 #+END_SRC
 
 [[#contents][茶]]
@@ -2059,6 +2097,9 @@ replaceRe("abcdefabc", l))
   => "456456"
 #+END_SRC
 
+For developing and debugging regular expressions see the
+website: https://regex101.com/
+
 [[#contents][茶]]
 
 ** sort()
@@ -2161,7 +2202,7 @@ substr("Earl Grey", 5) => => "Grey"
 :CUSTOM_ID: values
 :END:
 
-Create a list of the values in a dictionary.
+Create a list of the values in the specified dictionary.
 
 - p1: dictionary
 - return: list

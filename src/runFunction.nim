@@ -523,7 +523,7 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
   ## Compare two StaticTea version numbers. Returns -1 for less, 0 for
   ## @:equal and 1 for greater than.
   ## @:
-  ## @:StaticTea uses @|Semantic Versioning|@(https@@://semver.org/)
+  ## @:StaticTea uses @|@|Semantic Versioning]@|https@@://semver.org/]]
   ## @:with the added restriction that each version component has one
   ## @:to three digits (no letters).
   ## @:
@@ -1421,6 +1421,12 @@ func funGithubAnchor*(parameters: seq[Value]): FunResult =
   ## @:...
   ## @:# {entry.name}
   ## @:~~~~
+
+  # You can test how well it matches github's algorithm by
+  # inspecting the html code it generates.  Inspect the headings.
+  #
+  # The code that creates the anchors is here:
+  # https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/toc_filter.rb
 
   if parameters.len() != 1:
     return newFunResultWarn(wOneParameter)

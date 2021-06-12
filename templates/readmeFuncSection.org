@@ -1,7 +1,9 @@
-# $ # StaticTea template for generating the function doc section for the readme.
-# $ # Define replacement patterns to format the descriptions or
-# $ # org mode.
-# $ # Sort the entries alphabetically by their name.
+# $ # StaticTea template for generating the function doc section
+# $ # for the readme.
+# $ #
+# $ # Define replacement patterns that formats the descriptions
+# $ # for org mode. Sort the entries alphabetically by their
+# $ # name.
 # $ #
 # $ block
 # $ : g.patterns = list( +
@@ -20,9 +22,11 @@
 # $ endblock
 # $ #
 # $ # Generate the function index.
-# $ # Show the function entries and skip the others.
-# $ # Change the function names, i.e, funReplaceRe to replaceRe.
-# $ # Show the description's first sentence.
+# $ #
+# $ # Show the function entries and skip the others.  Change the
+# $ # function names from nim names to StaticTea names, i.e,
+# $ # funReplaceRe to replaceRe.  Show the description's first
+# $ # sentence.
 # $ #
 # $ nextline
 # $ : t.repeat = len(g.entries)
@@ -36,7 +40,9 @@
 # $ : desc = replaceRe(entry.description, g.patterns)
 # $ : shortFuncDesc = substr(desc, 0, add(find(desc, '.', -1), 1))
 - [[#{name}][{name}()]] -- {shortFuncDesc}
+# $ #
 # $ # Generate the function sections.
+# $ #
 # $ block
 # $ : t.repeat = len(g.entries)
 # $ : entry = get(g.entries, t.row, dict())

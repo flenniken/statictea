@@ -284,7 +284,7 @@ task jsonix, "\tDisplay the module index json for the source files.":
   for line in json.splitLines():
     echo line
 
-task docsix, "\tDisplay the doc comment index to the source files.":
+task docsix, "\tGenerate the nim module index to the source files.":
 
   # Create the index json file.
   echo "Create index json."

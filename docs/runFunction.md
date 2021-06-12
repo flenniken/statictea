@@ -391,7 +391,7 @@ func parseVersion(version: string): Option[(int, int, int)]
 Compare two StaticTea version numbers. Returns -1 for less, 0 for
 equal and 1 for greater than.
 
-StaticTea uses [Semantic Versioning](https://semver.org/)
+StaticTea uses [[Semantic Versioning][https://semver.org/]]
 with the added restriction that each version component has one
 to three digits (no letters).
 

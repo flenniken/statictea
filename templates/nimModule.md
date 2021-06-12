@@ -2,7 +2,6 @@ $$ # StaticTea template for generating markdown documents from nim doc comments.
 $$ #
 $$ # Define replacement patterns to remove formatting from the descriptions.
 $$ block
-$$ : t.maxLines = 20
 $$ : g.patterns = list( +
 $$ :   "@@", '', +
 $$ :   "@\|", '[', +
@@ -58,7 +57,6 @@ $$ : code = replaceRe(entry.code, "[ ]*$", "")
 $$ : pos = find(code, " {", len(code))
 $$ : signature = substr(code, 0, pos)
 $$ : line = get(entry, "line", "0")
-$$ : t.maxLines = 100
 # {entry.name}
 
 {description}

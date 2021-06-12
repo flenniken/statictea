@@ -1306,6 +1306,7 @@ suite "runFunction.nim":
     # (= Twelve boxing fighters hunted Eva across the dike of Sylt)
     check testAnchor(str, eStr)
 
+
   test "githubAnchor: wrong number of parameters":
     var parameters: seq[Value] = @[]
     let eFunResult = newFunResultWarn(wOneParameter, 0)
