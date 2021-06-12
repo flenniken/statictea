@@ -23,3 +23,6 @@
 
 # The return code for -l -h should be 0.
 ../bin/statictea -l -h >/dev/null && :
+
+# Test readmefun ending line case.
+../bin/statictea -t=endline.org >t.txt 2>&1; cmp t.txt endline.expected

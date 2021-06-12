@@ -1,0 +1,12 @@
+# $ block name = "endline"
+# $ : t.repeat = 2
+# $ : description = "looking for extra newlines"
+** {name}()
+:PROPERTIES:
+:CUSTOM_ID: {name}
+:END:
+
+{description}
+# $ endblock
+------------
+
