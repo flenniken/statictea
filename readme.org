@@ -1131,6 +1131,7 @@ Miscellaneous topics:
 - [[#update-option][Update Option]]
 - [[#log-file][Log File]]
 - [[#module-docs][Module Docs]]
+- [[#nimble-tasks][Nimble Tasks]]
 
 ** Warning Messages
 :PROPERTIES:
@@ -1380,6 +1381,48 @@ StaticTea uses [Semantic Versioning](https://semver.org/)
 
 [[#contents][茶]]
 
+** Nimble Tasks
+:PROPERTIES:
+   :CUSTOM_ID: nimble-tasks
+   :END:
+
+You can run commands to build, test, make docs etc. using nimble
+task commands. From the statictea folder run the n task to see
+the available tasks.
+
+#+BEGIN_SRC
+cd ~/code/statictea
+alias n='nimble --quite'
+n n
+#+END_SRC
+
+Here is the output:
+
+#+BEGIN_SRC
+n           Show available tasks.
+t           Run all tests at once.
+test        Run tests; specify part of test filename.
+b           Build the statictea exe.
+docs        Create markdown docs; specify part of source filename.
+json        Display nim's doc json for a source file; specify part of name.
+jsonix      Display the module index json for the source files.
+docsix      Display the doc comment index to the source files.
+readmefun   Create readme function section.
+tt          Compile and run t.nim.
+tree        Show the project directory tree.
+args        show command line arguments
+#+END_SRC
+
+- [[docs/index.md][Module Index]] --- Index to the nim module documents.
+
+The statictea.nimble docs task builds the markdown files by
+running the following process:
+
+- extract the doc comments as json using nim's jsondoc comment
+- format the json as markdown using a statictea template
+
+[[#contents][茶]]
+
 * Functions
 :PROPERTIES:
 :CUSTOM_ID: functions
@@ -1391,7 +1434,8 @@ return a value that you assign to a variable or pass to another
 function.
 
 This section was extracted from the nim source code formatted for
-this readme using the StaticTea template [[templates/readmeFuncSection.org][readmeFuncSection.org]].
+this readme using the StaticTea template
+[[templates/readmeFuncSection.org][readmeFuncSection.org]]. See the readmefun nimble task.
 
 List of functions:
 
