@@ -1392,7 +1392,7 @@ the available tasks.
 
 #+BEGIN_SRC
 cd ~/code/statictea
-alias n='nimble --quite'
+alias n='nimble --silent'
 n n
 #+END_SRC
 
