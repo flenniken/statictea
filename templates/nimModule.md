@@ -45,8 +45,8 @@ $$ :   "")
 $$ : desc = get(entry, "description", "")
 $$ : sentence = substr(desc, 0, add(find(desc, '.', -1), 1))
 $$ : short = replaceRe(sentence, g.patterns)
-$$ : lowercaseName = lower(entry.name)
-* {type}[{entry.name}](#{lowercaseName}) &mdash; {short}
+$$ : anchor = githubAnchor(entry.name)
+* {type}[{entry.name}](#{anchor}) &mdash; {short}
 
 $$ # Function and type descriptions.
 $$ block

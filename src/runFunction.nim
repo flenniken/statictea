@@ -76,7 +76,7 @@ func `$`*(funResult: FunResult): string =
 func cmpString*(a, b: string, insensitive: bool = false): int =
   ## Compares two utf8 strings a and b.  When a equals b return 0,
   ## when a is greater than b return 1 and when a is less than b
-  ## return -1. Optionally Ignore case.
+  ## return -1. Optionally ignore case.
   var i = 0
   var j = 0
   var ar, br: Rune
@@ -1062,6 +1062,9 @@ func funReplaceRe*(parameters: seq[Value]): FunResult =
   ## @:replaceRe("abcdefabc", l))
   ## @:  => "456456"
   ## @:~~~~
+  ## @:
+  ## @:For developing and debugging regular expressions see the
+  ## @:website: https@@://regex101.com/
 
   if parameters.len < 2:
     result = newFunResultWarn(wTwoOrMoreParameters)
@@ -1220,7 +1223,7 @@ func funKeys*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(theList))
 
 func funValues*(parameters: seq[Value]): FunResult =
-  ## Create a list of the values in a dictionary.
+  ## Create a list of the values in the specified dictionary.
   ## @:
   ## @:* p1: dictionary
   ## @:* return: list
@@ -1396,6 +1399,56 @@ func funSort*(parameters: seq[Value]): FunResult =
   let newList = sorted(list, sortCmpValues, sortOrder)
   result = newFunResult(newValue(newList))
 
+# todo: pass a list of names to githubAnchor and return a list of anchor names.
+
+func funGithubAnchor*(parameters: seq[Value]): FunResult =
+  ## Create a Github markdown anchor name given a heading name.  If
+  ## @:you have duplicate heading names, the anchor name returned only
+  ## @:works for the first. Use it for Github markdown internal links.
+  ## @:
+  ## @:* p1: heading name
+  ## @:* return: anchor name
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:githubAnchor("MyHeading") => "myheading"
+  ## @:githubAnchor("Eary Gray") => "eary-gray"
+  ## @:githubAnchor("$Eary-Gray#") => "eary-gray"
+  ## @:
+  ## @:$$ : anchor = githubAnchor(entry.name)
+  ## @:* {type}@|{entry.name}](#{anchor}) &mdash; {short}
+  ## @:...
+  ## @:# {entry.name}
+  ## @:~~~~
+
+  if parameters.len() != 1:
+    return newFunResultWarn(wOneParameter)
+
+  if parameters[0].kind != vkString:
+    return newFunResultWarn(wExpectedString)
+  var name = parameters[0].stringv
+
+  # Rules:
+  # * lowercase letters
+  # * change whitespace to hyphens
+  # * allow ascii digits or hyphens
+  # * drop other characters
+
+  var anchorRunes = newSeq[Rune]()
+  for rune in runes(name):
+    if isAlpha(rune): # letters
+      anchorRunes.add(toLower(rune))
+    elif isWhiteSpace(rune):
+      anchorRunes.add(toRunes("-")[0])
+    elif rune.uint32 < 128: # ascii
+      let ch = toUTF8(rune)[0]
+      if isDigit(ch) or ch == '-':
+        anchorRunes.add(rune)
+
+  let anchorName = $anchorRunes
+  result = newFunResult(newValue(anchorName))
+
 const
   functionsList = [
     ("len", funLen),
@@ -1421,6 +1474,7 @@ const
     ("keys", funKeys),
     ("values", funValues),
     ("sort", funSort),
+    ("githubAnchor", funGithubAnchor),
   ]
 
 proc getFunction*(functionName: string): Option[FunctionPtr] =

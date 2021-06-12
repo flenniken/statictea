@@ -166,6 +166,8 @@ proc openEnv*(logFilename: string = "",
     outStream: newFileStream(stdout),
   )
 
+# todo: test specifying the log filename.
+
 proc setupLogging*(env: var Env, logFilename: string = "",
                   warnSize: BiggestInt = logWarnSize) =
   ## Turn on logging for the environment using the specified log file.

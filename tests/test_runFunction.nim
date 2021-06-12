@@ -8,6 +8,9 @@ import runFunction
 import warnings
 import tables
 
+# Unicode strings in multiple languages good for test cases.
+# https://www.cl.cam.ac.uk/~mgk25/ucs/examples/quickbrown.txt
+
 proc testFunction(functionName: string, parameters: seq[Value],
     eFunResult: FunResult,
     eLogLines: seq[string] = @[],
@@ -82,6 +85,11 @@ proc testLower(str: string, eStr: string): bool =
     var parameters = @[newValue(str)]
     let eFunResult = newFunResult(newValue(eStr))
     result = testFunction("lower", parameters, eFunResult)
+
+proc testAnchor(str: string, eStr: string): bool =
+    var parameters = @[newValue(str)]
+    let eFunResult = newFunResult(newValue(eStr))
+    result = testFunction("githubAnchor", parameters, eFunResult)
 
 suite "runFunction.nim":
 
@@ -1280,3 +1288,30 @@ suite "runFunction.nim":
     var parameters = @[list, newValue("ascending"), newValue("sensitive"), newValue("a")]
     let eFunResult = newFunResultWarn(wKeyValueKindDiff, 0)
     check testFunction("sort", parameters, eFunResult)
+
+  test "githubAnchor":
+    check testAnchor("", "")
+    check testAnchor("T", "t")
+    check testAnchor("Tea", "tea")
+    check testAnchor("t", "t")
+    check testAnchor("TEA", "tea")
+    check testAnchor("$", "")
+    check testAnchor("==", "")
+    check testAnchor("Eary Gray", "eary-gray")
+    check testAnchor("Eary-Gray", "eary-gray")
+    check testAnchor("1234567890", "1234567890")
+    check testAnchor("_1!2@3#4%5^6&7*8(9)0", "1234567890")
+    let str = "Zwölf Boxkämpfer jagten Eva quer über den Sylter Deich"
+    let eStr = "zwölf-boxkämpfer-jagten-eva-quer-über-den-sylter-deich"
+    # (= Twelve boxing fighters hunted Eva across the dike of Sylt)
+    check testAnchor(str, eStr)
+
+  test "githubAnchor: wrong number of parameters":
+    var parameters: seq[Value] = @[]
+    let eFunResult = newFunResultWarn(wOneParameter, 0)
+    check testFunction("githubAnchor", parameters, eFunResult)
+
+  test "githubAnchor: wrong kind of parameter":
+    var parameters: seq[Value] = @[newValue(2)]
+    let eFunResult = newFunResultWarn(wExpectedString, 0)
+    check testFunction("githubAnchor", parameters, eFunResult)

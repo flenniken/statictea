@@ -8,7 +8,7 @@ Handle the replacement block lines.
 * type: [ReplaceLineKind](#replacelinekind) &mdash; Line type returned by yieldReplacementLine.
 * type: [ReplaceLine](#replaceline) &mdash; Line information returned by yieldReplacementLine.
 * [newReplaceLine](#newreplaceline) &mdash; Return a ReplaceLine object.
-* [`$`](#`$`) &mdash; Return a string representation of a ReplaceLine.
+* [`$`](#) &mdash; Return a string representation of a ReplaceLine.
 * [writeTempSegments](#writetempsegments) &mdash; Write the updated replacement block to the result stream.
 * [closeDelete](#closedelete) &mdash; Close the TempSegments and delete its backing temporary file.
 * [storeLineSegments](#storelinesegments) &mdash; Divide the line into segments and write them to the TempSegments' temp file.

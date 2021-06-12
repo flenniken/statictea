@@ -10,8 +10,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a warning.
 * [newFunResultWarn](#newfunresultwarn) &mdash; Return a new FunResult object.
 * [newFunResult](#newfunresult) &mdash; Return a new FunResult object containing a value.
-* [`==`](#`==`) &mdash; Compare two FunResult objects and return true when equal.
-* [`$`](#`$`) &mdash; Return a string representation of a FunResult object.
+* [`==`](#) &mdash; Compare two FunResult objects and return true when equal.
+* [`$`](#) &mdash; Return a string representation of a FunResult object.
 * [cmpString](#cmpstring) &mdash; Compares two utf8 strings a and b.
 * [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
 * [funCmp](#funcmp) &mdash; Compare two values.
@@ -36,8 +36,9 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funPath](#funpath) &mdash; Split a file path into pieces.
 * [funLower](#funlower) &mdash; Lowercase a string.
 * [funKeys](#funkeys) &mdash; Create a list from the keys in a dictionary.
-* [funValues](#funvalues) &mdash; Create a list of the values in a dictionary.
+* [funValues](#funvalues) &mdash; Create a list of the values in the specified dictionary.
 * [funSort](#funsort) &mdash; Sort a list of values of the same type.
+* [funGithubAnchor](#fungithubanchor) &mdash; Create a Github markdown anchor name given a heading name.
 * [getFunction](#getfunction) &mdash; Look up a function by its name.
 
 # FunctionPtr
@@ -116,7 +117,7 @@ func `$`(funResult: FunResult): string
 
 # cmpString
 
-Compares two utf8 strings a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. Optionally Ignore case.
+Compares two utf8 strings a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. Optionally ignore case.
 
 ```nim
 func cmpString(a, b: string; insensitive: bool = false): int
@@ -677,6 +678,9 @@ replaceRe("abcdefabc", l))
   => "456456"
 ~~~~
 
+For developing and debugging regular expressions see the
+website: https://regex101.com/
+
 ```nim
 func funReplaceRe(parameters: seq[Value]): FunResult
 ```
@@ -757,7 +761,7 @@ func funKeys(parameters: seq[Value]): FunResult
 
 # funValues
 
-Create a list of the values in a dictionary.
+Create a list of the values in the specified dictionary.
 
 * p1: dictionary
 * return: list
@@ -839,6 +843,33 @@ sort(dicts, "descending", "sensitive", 'name') => [d2, d1]
 
 ```nim
 func funSort(parameters: seq[Value]): FunResult
+```
+
+
+# funGithubAnchor
+
+Create a Github markdown anchor name given a heading name.  If
+you have duplicate heading names, the anchor name returned only
+works for the first. Use it for Github markdown internal links.
+
+* p1: heading name
+* return: anchor name
+
+Examples:
+
+~~~
+githubAnchor("MyHeading") => "myheading"
+githubAnchor("Eary Gray") => "eary-gray"
+githubAnchor("$Eary-Gray#") => "eary-gray"
+
+$$ : anchor = githubAnchor(entry.name)
+* {type}[{entry.name}](#{anchor}) &mdash; {short}
+...
+# {entry.name}
+~~~~
+
+```nim
+func funGithubAnchor(parameters: seq[Value]): FunResult
 ```
 
 

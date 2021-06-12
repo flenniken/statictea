@@ -9,8 +9,8 @@ The warning messages.
 * type: [Warning](#warning) &mdash; Warning numbers.
 * [getWarning](#getwarning) &mdash; Return a formatted warning line.
 * [newWarningData](#newwarningdata) &mdash; Create a WarningData object containing the warning information.
-* [`$`](#`$`) &mdash; Return a string representation of WarningData.
-* [`==`](#`==`) &mdash; Return true when the two WarningData are equal.
+* [`$`](#) &mdash; Return a string representation of WarningData.
+* [`==`](#) &mdash; Return true when the two WarningData are equal.
 
 # WarningData
 

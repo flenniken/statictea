@@ -53,8 +53,8 @@ Language variable methods.
 * type: [VariableData](#variabledata) &mdash; A variable name and value.
 * type: [ParentDictKind](#parentdictkind) &mdash; The kind of a ParentDict object, either a dict or warning.
 * type: [ParentDict](#parentdict) &mdash; Contains the result of calling getParentDict, either a dictionary or a warning.
-* [`$`](#`$`) &mdash; Return a string representation of ParentDict.
-* [`==`](#`==`) &mdash; Return true when the two ParentDict are equal.
+* [`$`](#) &mdash; Return a string representation of ParentDict.
+* [`==`](#) &mdash; Return true when the two ParentDict are equal.
 * [newParentDictWarn](#newparentdictwarn) &mdash; Return a new ParentDict object of the warning kind.
 * [newParentDict](#newparentdict) &mdash; Return a new ParentDict object containing a dict.
 * [emptyVariables](#emptyvariables) &mdash; Create an empty variables object in its initial state.

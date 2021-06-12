@@ -494,12 +494,18 @@ $$ : c = 3
 
 You use variables to create formatted content for a block and to
 control how a command works. You create them in json files or in
-template statements. Internally one dictionary exists for each of
-the five types of variables. You access them with different
-prefixes. All variables are immutable.  If you try to change a
-variable, a warning is generated and the statement is skipped.
+template statements.
 
-Here are the prefixes and sections for each one.
+All variables are immutable.  You can assign a new value to a
+dictionary but you cannot change an existing value. If you try to
+change a variable, a warning is generated and the statement is
+skipped.
+
+Local variables and tea variables (except row) are cleared after
+processing each replacement block.
+
+One dictionary exists for each of the five types of
+variables. You access them with different prefixes.
 
 - s -- [[#json-variables][Server Json Variables]]
 - h -- [[#json-variables][Shared Json Variables]]
@@ -533,14 +539,13 @@ one.
 The json null values get converted to the 0. Json True and False
 get converted to 1 and 0.
 
-You cannot change the json variables.
-
 To give full control of the presentation to the template
 designers, the server json shouldn't contain any presentation
 data.
 
-The shared json is created by the template designer for sharing
-common template fragments and other presentation needs.
+The shared json is created and maintained by the template
+designer for sharing common template fragments and other
+presentation needs.
 
 [[#contents][茶]]
 
@@ -550,11 +555,10 @@ common template fragments and other presentation needs.
    :END:
 
 You create local variables with template statements.  They are
-local to the command where they are defined.  They are processed
-from left to right.  You do not have to specify a prefix for
-local variables but you can use l. They are stored in the l
-dictionary. The local variables are cleared and recalculated for
-each repeated block.
+local to the command where they are defined. You do not have to
+specify a prefix for local variables but you can use l. They are
+stored in the l dictionary. The local variables are cleared and
+recalculated for each repeated block.
 
 [[#contents][茶]]
 
@@ -1003,8 +1007,7 @@ type.
 
 You access dictionary items with variable names or with the get
 function.  You create them in the json files, with the dict
-function, or from other dictionaries using map or filter
-functions.
+function.
 
 In Json files dictionaries are known as json objects. Json calls
 the object items name/value pairs and we call them key/value
@@ -1028,7 +1031,7 @@ server json:
 }
 #+END_SRC
 
-If a key has valid variable syntax, you can access the it as a
+If a key has valid variable syntax, you can access it as a
 variable using dot notation. For the json example above, you can
 access the data as:
 
@@ -1056,9 +1059,6 @@ get(d, "y") => 200
 get(s, "c", 3) => 3
 #+END_SRC
 
-You use the dict function to create a literal dictionary and the
-list function to create a literal list.
-
 [[#contents][茶]]
 
 ** List
@@ -1066,9 +1066,22 @@ list function to create a literal list.
 :CUSTOM_ID: list
 :END:
 
-A list contains a sequence of values of any type.  You lookup
-list elements with the get function and you define them in the
-json files or with the list function.
+A list contains a sequence of values of any type.  You create
+lists in json files or in templates with the list function. You
+lookup list elements by their index using the get function.
+
+#+BEGIN_SRC
+list() => []
+list(1) => [1]
+list(1, 2, 3) => [1, 2, 3]
+list("a", 5, "b") => ["a", 5, "b"]
+
+l = list(1, 3.3, "a")
+get(l, 0) => 1
+get(l, 1) => 3.3
+git(l, 2) => "a"
+git(l, 3, 99) => 99
+#+END_SRC
 
 [[#contents][茶]]
 
@@ -1131,6 +1144,7 @@ Miscellaneous topics:
 - [[#update-option][Update Option]]
 - [[#log-file][Log File]]
 - [[#module-docs][Module Docs]]
+- [[#html-formatted-json][HTML Formatted Json]]
 - [[#nimble-tasks][Nimble Tasks]]
 
 ** Warning Messages
@@ -1329,8 +1343,9 @@ exceeds 1 GB, a warning message is generated each time a template
 is processed.
 
 Logging is off by default. You turn it on with the --log option.
-You can specify the log filename.  If you don't specify a
-filename, "statictea.log" in the system log directory is used.
+You can specify the log file full path.  If you don't specify a
+filename, "statictea.log" is used. The log location depends on
+the platform:
 
 - Mac: ~/Library/lib/statictea.log
 - Other: ~/statictea.log
@@ -1342,29 +1357,34 @@ filename, "statictea.log" in the system log directory is used.
    :CUSTOM_ID: module-docs
    :END:
 
-You can read module documentation in Gitlab because they are
-formatted as gitlab markdown files. Statictea created the files
-from the embedded doc comments.
+You can read the StaticTea source code documentation in Gitlab
+because it is formatted as gitlab markdown. Statictea
+created the markdown files from the embedded doc comments.
 
 - [[docs/index.md][Module Index]] --- Index to the nim module documents.
 
 The statictea.nimble docs task builds the markdown files by
 running the following process:
 
-- extract the doc comments as json using nim's jsondoc comment
-- format the json as markdown using a statictea template
+1. extract the doc comments as json using nim's jsondoc command
+2. format the json as markdown using a statictea template
 
-** Unformatted Json
+** HTML Formatted Json
+:PROPERTIES:
+   :CUSTOM_ID: html-formatted-json
+   :END:
 
-Nim supports restructured formatted doc comments. The jsondoc
-produces html formatted json data. Our desired format is Gitlab
-markdown so having html presentation data in the json is a
-problem. It was discovered that single paragraphs are left
-unformatted, which is the basis for a workaround. You make all
-the documentation look like one paragraph. This is done by
-inserting some symbols in strategic places.
+The nim jsondoc command produces html formatted json data.  Our
+desired final format is Gitlab markdown so having html
+presentation data in the json is a problem.
 
-** Wordaround Rules:
+It was discovered that single paragraph comments are left
+unformatted.  This is the basis for a workaround. You make all
+the documentation look like one paragraph by inserting some
+symbols in strategic places, then the json data does not contain
+html formatting.
+
+Workaround Rules:
 
 - use @: at the beginning of lines, except the first line.
 - use ~~~ to begin a code block
@@ -1372,11 +1392,8 @@ inserting some symbols in strategic places.
 - use @|, |@ and @@ to disguise a link, see example:
 
 #+BEGIN_SRC
-StaticTea uses @|Semantic Versioning|@(https@@://semver.org/)
-
-becomes:
-
-StaticTea uses [Semantic Versioning](https://semver.org/)
+[Semantic Versioning](https://semver.org/)
+@|Semantic Versioning|@(https@@://semver.org/)
 #+END_SRC
 
 [[#contents][茶]]
@@ -1413,14 +1430,6 @@ tree        Show the project directory tree.
 args        show command line arguments
 #+END_SRC
 
-- [[docs/index.md][Module Index]] --- Index to the nim module documents.
-
-The statictea.nimble docs task builds the markdown files by
-running the following process:
-
-- extract the doc comments as json using nim's jsondoc comment
-- format the json as markdown using a statictea template
-
 [[#contents][茶]]
 
 * Functions
@@ -1433,9 +1442,9 @@ Functions allow you to format variables for presentation.  They
 return a value that you assign to a variable or pass to another
 function.
 
-This section was extracted from the nim source code formatted for
-this readme using the StaticTea template
-[[templates/readmeFuncSection.org][readmeFuncSection.org]]. See the readmefun nimble task.
+This section was created from the nim source code by running the
+readmefun nimble task which uses the StaticTea template
+[[templates/readmeFuncSection.org][readmeFuncSection.org]].
 
 List of functions:
 

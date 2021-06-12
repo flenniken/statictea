@@ -24,23 +24,23 @@ StaticTea variable types.
 * [dictToString](#dicttostring) &mdash; Return a string representation of a dict Value in JSON format.
 * [listToString](#listtostring) &mdash; Return a string representation of a list Value in JSON format.
 * [valueToString](#valuetostring) &mdash; Return a string representation of a Value in JSON format.
-* [`$`](#`$`) &mdash; Return a string representation of a Value.
+* [`$`](#) &mdash; Return a string representation of a Value.
 * [shortValueToString](#shortvaluetostring) &mdash; Return a string representation of Value.
-* [`$`](#`$`) &mdash; Return a string representation of a value's type.
-* [`$`](#`$`) &mdash; Return a string representation of a VarsDict.
-* [`==`](#`==`) &mdash; Return true when two values are equal.
+* [`$`](#) &mdash; Return a string representation of a value's type.
+* [`$`](#) &mdash; Return a string representation of a VarsDict.
+* [`==`](#) &mdash; Return true when two values are equal.
 * [newValueOrWarning](#newvalueorwarning) &mdash; Return a new ValueOrWarning object containing a value.
 * [newValueOrWarning](#newvalueorwarning) &mdash; Return a new ValueOrWarning object containing a warning.
 * [newValueOrWarning](#newvalueorwarning) &mdash; Return a new ValueOrWarning object containing a warning.
-* [`==`](#`==`) &mdash; Compare two ValueOrWarning objects and return true when equal.
-* [`$`](#`$`) &mdash; Return a string representation of a ValueOrWarning object.
+* [`==`](#) &mdash; Compare two ValueOrWarning objects and return true when equal.
+* [`$`](#) &mdash; Return a string representation of a ValueOrWarning object.
 * type: [Statement](#statement) &mdash; A Statement object stores the statement text and where it starts in the template file.
 * type: [ValueAndLength](#valueandlength) &mdash; A value and the length of the matching text in the statement.
 * [newStatement](#newstatement) &mdash; Create a new statement.
 * [startColumn](#startcolumn) &mdash; Return enough spaces to point at the warning column.
 * [warnStatement](#warnstatement) &mdash; Warn about an invalid statement.
-* [`==`](#`==`) &mdash; Return true when the two statements are equal.
-* [`$`](#`$`) &mdash; Retrun a string representation of a Statement.
+* [`==`](#) &mdash; Return true when the two statements are equal.
+* [`$`](#) &mdash; Retrun a string representation of a Statement.
 * [newValueAndLength](#newvalueandlength) &mdash; Create a newValueAndLength object.
 
 # VarsDict

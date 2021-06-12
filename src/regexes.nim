@@ -69,6 +69,8 @@ func get2Groups*(matches: Matches): (string, string) =
   result = (one, two)
 
 # todo: is there a good way to replace the get groups method with one?
+# todo: add optional parameter to specify regex flags.
+# todo: where is the perl online source?
 
 func get3Groups*(matches: Matches): (string, string, string) =
   ## Get the first three groups in matches. If one of the groups doesn't
