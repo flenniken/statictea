@@ -17,40 +17,6 @@ import streams
 import os
 import readjson
 
-#[
-
-<--$ nextline -->\n
-<--$ nextline \-->\n
-<--$ nextline a = 5 \-->\n
-<--$ nextline a = 5; b = \-->\n
-<--$ : 20 \-->\n
-
-Each line has a command. The current line continues when it has a
-slash at the end. The continue line starts with a : command.  It may
-continue too. The last line doesn't have a slash. If an error is
-found, a warning is written, and the lines get written as is, as if
-they weren't command lines.
-
-<!--$ nextline a = 5 \-->\n
-<!--$ : a = 5 \-->\n
-<!--$ : b = 6 \-->\n
-<!--$ : c = 7  -->\n
-
-There are three line types: cmd lines, replacement block lines and
-other lines.
-
-Cmd lines start with a prefix, and they may continue on multiple
-lines.
-
-Replacement block lines follow cmd lines. One line for the nextline
-command and one or more lines for replace and block commands.
-
-Other lines, not cmd or block lines, get echoed to the output file
-unchanged.
-
-]#
-
-
 iterator yieldContentLine*(content: string): string =
   ## Yield one content line at a time and keep the line endings.
   var start = 0
@@ -74,8 +40,10 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     return
   var lb = lineBufferO.get()
 
-  # Read and process template lines.
+  # todo: firstReplaceLine shouldn't need to be outside the loop.
   var firstReplaceLine: string
+
+  # Read and process template lines.
   while true:
     # Read template lines and write out non-command lines. When a
     # command is found, collect its lines and return them.
@@ -89,11 +57,6 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     # Run the commands that are allowed statements and skip the others.
     let command = cmdLineParts[0].command
     if not (command in ["nextline", "block", "replace"]):
-      # todo: make it an error when other commands have statements.
-
-      # todo: Allow comments inside a command
-      # todo: firstReplaceLine shouldn't need to be outside the
-      # loop.
       continue
 
     # Run the command and fill in the variables.
@@ -103,7 +66,8 @@ proc processTemplateLines(env: var Env, variables: var Variables,
                variables)
     let repeat = getTeaVarIntDefault(variables, "repeat")
 
-    # Show a warning when the replace command does not have t.content set.
+    # Show a warning when the replace command does not have t.content
+    # set.
     if command == "replace" and not variables.contains("content"):
       # lineNum-1 because the current line number is at the first
       # replacement line.
@@ -111,23 +75,27 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
     var maxLines = getTeaVarIntDefault(variables, "maxLines")
 
-    # If repeat is 0, read the replacement lines and the endblock and discard them.
+    # If repeat is 0, read the replacement lines and the endblock and
+    # discard them.
     if repeat == 0:
-      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, prepostTable, command, maxLines):
+      for replaceLine in yieldReplacementLine(env,
+          firstReplaceLine, lb, prepostTable, command, maxLines):
         discard
       firstReplaceLine = ""
       continue
 
     # Create a new TempSegments object for storing segments.
     var startLineNum = lb.lineNum
-    var tempSegmentsO = newTempSegments(env, lb, prepostTable, command, repeat, variables)
+    var tempSegmentsO = newTempSegments(env, lb, prepostTable,
+                                        command, repeat, variables)
     if not isSome(tempSegmentsO):
       break # Cannot create temp file or allocate memory, quit.
     var tempSegments = tempSegmentsO.get()
 
     if command == "replace" and variables.contains("content"):
       # Discard the replacement block lines and the endblock.
-      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, prepostTable, command, maxLines):
+      for replaceLine in yieldReplacementLine(env, firstReplaceLine,
+          lb, prepostTable, command, maxLines):
         discard
       # Use the content as the replacement lines.
       var content = getVariable(variables, "t.content").value.stringv
@@ -136,7 +104,8 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     else:
       # Read the replacement lines and store their compiled segments in
       # TempSegments.  Ignore the last line, the endblock, if it exists.
-      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, prepostTable, command, maxLines):
+      for replaceLine in yieldReplacementLine(env,
+          firstReplaceLine, lb, prepostTable, command, maxLines):
         if replaceLine.kind != rlEndblockLine:
           storeLineSegments(env, tempSegments, prepostTable, replaceLine.line)
 
@@ -159,7 +128,6 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
     closeDelete(tempSegments)
     firstReplaceLine = ""
-
 
 proc updateTemplateLines(env: var Env, variables: var Variables,
                           prepostTable: PrepostTable) =
@@ -217,7 +185,8 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
     if command == "replace" and variables.contains("content"):
       # Discard the replacement block lines and save the endblock if it exists.
       var lastLine: ReplaceLine
-      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, prepostTable, command, maxLines):
+      for replaceLine in yieldReplacementLine(env,
+          firstReplaceLine, lb, prepostTable, command, maxLines):
         lastLine = replaceLine
 
       # Write the content as the replacement lines.
@@ -237,7 +206,8 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
         env.resultStream.write(lastLine.line)
     else:
       # Read the replacement lines and endblock and write them out.
-      for replaceLine in yieldReplacementLine(env, firstReplaceLine, lb, prepostTable, command, maxLines):
+      for replaceLine in yieldReplacementLine(env,
+          firstReplaceLine, lb, prepostTable, command, maxLines):
         env.resultStream.write(replaceLine.line)
 
 proc getStartingVariables(env: var Env, args: Args): Variables =
@@ -291,8 +261,8 @@ proc updateTemplate*(env: var Env, args: Args): int =
     result = 1
 
 proc processTemplateTop*(env: var Env, args: Args): int =
-  ## Process the template and return 0 on success. This calls
-  ## processTemplate.
+  ## Setup the environment streams then process the template and
+  ## return 0 on success.
 
   # Add the template and result streams to the environment.
   if not env.addExtraStreams(args):
