@@ -1,12 +1,12 @@
 
-import unittest
+import std/unittest
+import std/os
+import std/strutils
 import processTemplate
 import env
 import args
-import os
 import readlines
 import version
-import strutils
 
 proc testProcessTemplate(templateContent: string = "",
     serverJson: string = "",

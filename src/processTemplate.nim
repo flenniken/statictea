@@ -1,20 +1,20 @@
 ## Process the template.
 
+import std/streams
+import std/os
+import std/options
+import std/tables
 import args
 import warnings
 import env
 import matches
 import readlines
-import options
 import parseCmdLine
 import collectCommand
 import runCommand
 import variables
 import vartypes
-import tables
 import replacement
-import streams
-import os
 import readjson
 
 iterator yieldContentLine*(content: string): string =

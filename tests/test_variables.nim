@@ -1,12 +1,12 @@
 
-import unittest
-import options
+import std/unittest
+import std/options
+import std/strutils
+import std/tables
 import variables
-import tables
 import vartypes
 import env
 import warnings
-import strutils
 import readjson
 
 proc testGetParentDict(variables: Variables, dotNameStr: string, eParentDict: ParentDict): bool =

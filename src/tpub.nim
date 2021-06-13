@@ -2,7 +2,7 @@
 ## This allows you to test private procedures in external test
 ## files. When the test option is off, the macros do nothing.
 
-import macros
+import std/macros
 
 macro tpub*(x: untyped): untyped =
   ## Exports a procedure or function when in test mode so it can be

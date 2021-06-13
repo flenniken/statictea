@@ -1,6 +1,6 @@
-import unittest
+import std/unittest
+import std/tables
 import vartypes
-import tables
 
 suite "vartypes":
 

@@ -1,7 +1,6 @@
-
-import unittest
+import std/unittest
+import std/options
 import version
-import options
 
 suite "version.nim":
 

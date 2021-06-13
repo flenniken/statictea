@@ -2,19 +2,19 @@
 ## The StaticTea language functions start with "fun", for example, the
 ## "funCmp" function implements the StaticTea "cmp" function.
 
-import vartypes
-import options
+import std/options
+import std/tables
+import std/unicode
+import std/strutils
+import std/math
+import std/re
+import std/os
+import std/algorithm
 import warnings
-import tables
-import unicode
-import strutils
+import vartypes
 import regexes
 import parseNumber
-import math
 import matches
-import re
-import os
-import algorithm
 
 type
   FunctionPtr* = proc (parameters: seq[Value]): FunResult {.noSideEffect.}

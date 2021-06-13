@@ -1,16 +1,16 @@
 
-import unittest
-import options
+import std/unittest
+import std/options
+import std/strutils
+import std/options
+import std/tables
 import runCommand
 import runFunction
 import parseCmdLine
-import strutils
-import options
 import env
 import matches
 import vartypes
 import variables
-import tables
 import warnings
 import version
 

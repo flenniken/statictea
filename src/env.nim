@@ -1,13 +1,13 @@
 ## Environment holding the input and output streams.
 
-import streams
+import std/streams
+import std/os
+import std/times
+import std/options
+import std/strutils
+import tempFile
 import warnings
-import os
-import strutils
 import args
-import times
-import tempfile
-import options
 when defined(test):
   import readlines
 

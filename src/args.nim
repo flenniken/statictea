@@ -1,6 +1,6 @@
 ## Command line arguments.
 
-import strutils
+import std/strutils
 
 type
   Prepost* = object

@@ -1,11 +1,11 @@
 ## Test parseCommandLine.nim
 
-import unittest
+import std/unittest
+import std/options
+import std/strutils
 import args
 import parseCommandLine
 import env
-import options
-import strutils
 
 proc newStrFromBuffer(buffer: openArray[uint8]): string =
   result = newStringOfCap(buffer.len)

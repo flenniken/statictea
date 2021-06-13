@@ -1,7 +1,7 @@
 ## The warning messages.
 
+import std/strutils
 import tpub
-import strutils
 
 # Add new warnings to the bottom so the warning numbers never change.
 type

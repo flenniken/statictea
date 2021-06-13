@@ -1,8 +1,8 @@
 ## Parse an int or float number string.  Return the number and number
 ## of characters processed.
 
-import options
-import parseUtils
+import std/options
+import std/parseUtils
 
 # todo: use int64 instead of BiggestInt everywhere.
 assert sizeof[BiggestInt] == sizeof[int64]

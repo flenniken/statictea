@@ -1,11 +1,11 @@
 
-import unittest
+import std/unittest
+import std/strutils
+import std/tables
+import std/options
 import matches
-import tables
-import options
 import regexes
 import env
-import strutils
 import args
 
 proc testMatchCommand(line: string, start: Natural = 0,

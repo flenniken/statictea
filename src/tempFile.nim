@@ -1,10 +1,10 @@
 ## Temporary file methods.
 
-import os
-import random
-import strutils
-import options
-import posix
+import std/os
+import std/random
+import std/strutils
+import std/options
+import std/posix
 
 # Used with the rand procedure.
 randomize()

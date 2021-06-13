@@ -1,10 +1,10 @@
-import unittest
+import std/unittest
+import std/strutils
+import std/typetraits
+import std/options
+import std/times
 import env
-import typetraits
-import options
-import times
 import regexes
-import strutils
 import matches
 
 type

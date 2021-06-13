@@ -2,8 +2,8 @@
 ## length. The returned lines contain the line ending, either crlf or
 ## lf.
 
-import streams
-import options
+import std/streams
+import std/options
 
 const
   minMaxLineLen* = 8           ## The minimum line length supported.

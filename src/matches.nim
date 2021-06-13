@@ -1,10 +1,10 @@
 ## Regular expression matching methods.
 
-import strutils
+import std/strutils
+import std/tables
+import std/options
 import args
 import regexes
-import tables
-import options
 
 const
   predefinedPrepost: array[8, Prepost] = [

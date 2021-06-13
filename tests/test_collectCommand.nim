@@ -1,12 +1,12 @@
-import unittest
+import std/options
+import std/streams
+import std/strutils
+import std/unittest
 import env
-import streams
 import matches
 import readlines
-import options
 import parseCmdLine
 import collectCommand
-import strutils
 
 proc testCollectCommand(
     content: string,

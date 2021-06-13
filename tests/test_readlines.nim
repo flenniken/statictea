@@ -1,10 +1,9 @@
-import unittest
+import std/streams
+import std/options
+import std/unittest
+import std/strutils
 import readlines
-import strutils
-import streams
-import options
 import tempFile
-import options
 
 proc readContentTest(content: string, expected: seq[string],
     maxLineLen: int = defaultMaxLineLen,

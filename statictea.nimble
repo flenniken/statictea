@@ -1,6 +1,6 @@
-import os
-import strutils
-import json
+import std/os
+import std/strutils
+import std/json
 include src/version
 
 version       = staticteaVersion

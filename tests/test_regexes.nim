@@ -1,6 +1,6 @@
+import std/unittest
+import std/options
 import regexes
-import unittest
-import options
 
 suite "regexes.nim":
   test "no groups":

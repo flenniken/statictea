@@ -1,14 +1,14 @@
 ## Parse the StaticTea terminal command line and return the arguments.
 
-import parseopt
+import std/parseopt
+import std/options
 import tpub
 import args
 import warnings
 import env
-import options
 import regexes
 when defined(test):
-  import strutils
+  import std/strutils
 
 const
   fileLists = ["server", "shared", "template"]

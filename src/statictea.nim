@@ -1,7 +1,7 @@
 ## StaticTea; A template processor and language.
 
+import std/strutils
 import parseCommandLine
-import strutils
 import processTemplate
 import args
 import warnings
@@ -9,7 +9,7 @@ import showhelp
 import version
 import env
 when isMainModule:
-  import os
+  import std/os
 
 # todo: add a third option for the find function which is the value to return when not found.
 

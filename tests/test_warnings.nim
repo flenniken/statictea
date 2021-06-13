@@ -1,6 +1,6 @@
-import unittest
+import std/unittest
+import std/strUtils
 import warnings
-import strUtils
 
 func countLetter(message: string, letter: char): int =
   ## Count the number of letters in the given string.

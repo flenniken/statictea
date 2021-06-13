@@ -1,17 +1,15 @@
 ## Read json files.
 
+import std/streams
+import std/os
+import std/options
+import std/json
+import std/tables
 import warnings
 import env
-import tables
 import tpub
-import streams
 import vartypes
-import json
-import os
-import json
-import options
 import args
-import vartypes
 
 # todo: test the the order is preserved.
 # todo: test that the last duplicate wins.

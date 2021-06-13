@@ -1,17 +1,17 @@
 ## Run a command.
 
+import std/options
+import std/unicode
+import std/strUtils
+import parseCmdLine
+import readLines
+import matches
 import tpub
 import regexes
 import env
 import vartypes
-import options
-import parseCmdLine
-import readLines
-import matches
-import strUtils
 import warnings
 import parseNumber
-import unicode
 import variables
 import runFunction
 

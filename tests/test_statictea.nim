@@ -1,6 +1,6 @@
-import unittest
+import std/unittest
+import std/strutils
 import statictea
-import strutils
 import env
 import version
 

@@ -1,9 +1,9 @@
-import os
-import unittest
+import std/os
+import std/unittest
+import std/options
 import env
 import replacement
 import matches
-import options
 import tempFile
 import readlines
 

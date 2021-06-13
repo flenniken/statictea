@@ -4,8 +4,8 @@
 ## @:* CmdLine -- is a command line in a StaticTea template.
 ## @:* CommandLine -- is a line at a terminal for system commands.
 
-import options
-import tables
+import std/options
+import std/tables
 import env
 import regexes
 import warnings

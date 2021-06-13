@@ -1,12 +1,12 @@
-import unittest
-import options
-import strutils
-import options
+import std/unittest
+import std/options
+import std/strutils
+import std/options
+import std/tables
 import env
 import vartypes
 import runFunction
 import warnings
-import tables
 
 # Unicode strings in multiple languages good for test cases.
 # https://www.cl.cam.ac.uk/~mgk25/ucs/examples/quickbrown.txt

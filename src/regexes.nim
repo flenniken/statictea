@@ -31,11 +31,11 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]#
 
-import re
-import options
-import tables
+import std/re
+import std/options
+import std/tables
 when defined(test):
-  import strutils
+  import std/strutils
   import env
 
 const

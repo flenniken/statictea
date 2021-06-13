@@ -1,12 +1,12 @@
-import unittest
+import std/unittest
+import std/os
+import std/json
+import std/options
+import std/strutils
+import std/tables
 import env
 import vartypes
-import tables
 import readjson
-import os
-import json
-import options
-import strutils
 import warnings
 
 suite "readjson.nim":

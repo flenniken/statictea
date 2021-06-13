@@ -2,43 +2,43 @@
 
 # The replacement block may consist of many lines and the block may
 # repeat many times.
-# @
+#
 # If the block only repeats once, you can make one pass through the file
 # reading the lines and making variable replacements as you go.
-# @
+#
 # To support multiple repeating blocks you could read all the lines into
 # memory but that requires too much memory for big blocks with long
 # lines.
-# @
+#
 # You could make multiple passes over the block, once for each repeat by
 # seeking back in the template. However, that doesn't work for the stdin
 # stream.
-# @
+#
 # What we do is read the lines from the template, compile them and store
 # them in a temp file in a format that is easy to write out.
-# @
+#
 # The temp file consists of parts of lines called segments. There are
 # segments for strings and segments for variables.
-# @
+#
 # Segment types:
-# @
+#
 # * 0 string segment without ending newline
 # * 1 string segment with ending newline
 # * 2 variable segment
 # * 3 string segment that ends a line without a newline
 # * 4 variable segment that ends a line without a newline
-# @
+#
 # For the example replacement block:
-# @
+#
 # Test segments
 # {s.tea}
 # This is a test { s.name } line\n
 # Second line {h.tea}  \r\n
 # third {variable} test\n
-# @
+#
 # It gets saved to the temp file as shown below. The underscores show
 # ending spaces. Each line ends with a newline that's not shown.
-# @
+#
 # 1,Test segments
 # 3,1   ,5   ,{s.tea}
 # 0,This is a test_
@@ -50,22 +50,22 @@
 # 0,third_
 # 2,1   ,8   ,{variable}
 # 1, test
-# @
+#
 # A string segment starts with the segment type number 0 or 1. A type
 # 1 segment means the template text ends with a new line and a type 0
 # segment means the template text does not end with a new line.  After
 # the type digit is a comma followed the string from the line followed
 # by a newline.
-# @
+#
 # All segments end with a newline, whether it exists in the template
 # or not. If a template line uses cr/lf, the segment will end with
 # cr/lf. The segment number tells you whether to write out the ending
 # newline or not to the result file. The template line endings are
 # preserved in the result.
-# @
+#
 # Segment text is utf8. The bracketed variables are ascii but the
 # strings are utf8 encoded.
-# @
+#
 # A variable segment, type 2 and 3 are similar to the string segments
 # that type 2 does not end with a new line and 3 does.  The variable
 # segment contains the bracketed variable as it exists in the
@@ -74,33 +74,32 @@
 # telling where the variable dotNameStr starts and its length. The variable
 # segment numbers are left aligned and padded with spaces so the
 # bracketed text part always starts at the same index.
-# @
+#
 # Variable Segments:
-# @
+#
 # * first number is 2 or 3.
-# @
+#
 # * second number is the index where the variable starts. There are
 #   four digits reserved for it to account for the maximum line length
 #   of about 1k. A variable can have a lot of padding. {      var      }.
-# @
+#
 # * The third number is the length of the variable dotNameStr. There are 4
 #   digits reserved for it since a variable's maximum length is about 1k.
 
+import std/options
+import std/streams
+import std/strformat
+import std/strutils
 import regexes
 import env
 import vartypes
-import options
 import parseCmdLine
 import readLines
 import matches
 import warnings
 import variables
-import streams
-import variables
 import tempFile
 import parseNumber
-import strformat
-import strutils
 import tpub
 
 type

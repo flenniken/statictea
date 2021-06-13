@@ -1,10 +1,10 @@
 ## Collect template command lines.
 
+import std/streams
+import std/options
 import env
-import streams
 import matches
 import readlines
-import options
 import parseCmdLine
 
 proc dumpCmdLines*(resultStream: Stream, cmdLines: var seq[string],

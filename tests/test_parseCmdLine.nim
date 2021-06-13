@@ -1,10 +1,10 @@
 
-import unittest
+import std/unittest
+import std/options
+import std/strutils
 import parseCmdLine
 import env
 import matches
-import options
-import strutils
 
 proc testParseCmdLine(
     line: string,

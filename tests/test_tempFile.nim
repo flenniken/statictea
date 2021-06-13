@@ -1,7 +1,7 @@
-import unittest
+import std/unittest
+import std/os
+import std/options
 import tempFile
-import os
-import options
 
 suite "tempFile.nim":
 

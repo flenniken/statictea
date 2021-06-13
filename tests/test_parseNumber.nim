@@ -1,8 +1,8 @@
 
-import unittest
+import std/unittest
+import std/options
+import std/strutils
 import parseNumber
-import strutils
-import options
 
 proc testParseInteger(str: string, expectedInteger: BiggestInt, expectedLength: int,
                       start: Natural = 0): bool =

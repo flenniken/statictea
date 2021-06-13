@@ -53,12 +53,12 @@
 # We implement the name spaces by storing them all in the same
 # variables dictionary to make it easy to pass around.
 
+import std/strutils
+import std/options
+import std/tables
 import vartypes
-import tables
-import options
 import version
 import warnings
-import strutils
 
 const
   outputValues* = ["result", "stderr", "log", "skip"]

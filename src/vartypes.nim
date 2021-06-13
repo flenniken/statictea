@@ -1,8 +1,8 @@
 ## StaticTea variable types.
 
-import tables
-import strutils
-import json
+import std/strutils
+import std/tables
+import std/json
 import env
 import warnings
 
