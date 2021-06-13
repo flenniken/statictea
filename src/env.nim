@@ -6,7 +6,6 @@ import os
 import strutils
 import args
 import times
-import sets
 import tempfile
 import options
 when defined(test):
@@ -20,6 +19,9 @@ const
 
   dtFormat* = "yyyy-MM-dd HH:mm:ss'.'fff"
     ## The date time format in local time written to the log.
+
+  maxWarningsWritten = 50
+    ## The maximum of warning messages to show.
 
 when hostOS == "macosx":
   let staticteaLog* = expandTilde("~/Library/Logs/statictea.log")
@@ -53,8 +55,6 @@ type
 
     warningWritten*: Natural
       ## Count of warnings written.
-    oneWarnTable*: HashSet[string]
-      ## All unique messages written.
 
 proc close*(env: var Env) =
   ## Close the environment streams.
@@ -74,24 +74,31 @@ proc close*(env: var Env) =
     env.logFile.close()
     env.logFile = nil
 
-proc warn*(env: var Env, message: string) =
-  ## Write a message to the error stream. Duplicates are suppressed and
-  ## the environment's warning count is incremented.
-  if not env.oneWarnTable.containsOrIncl(message):
-    env.errStream.writeLine(message)
-  # else:
-  #   env.errStream.writeLine("dup: " & message)
+proc outputWarning*(env: var Env, message: string) =
+  ## Write a message to the error stream and increment the warning
+  ## count.
+  env.errStream.writeLine(message)
   inc(env.warningWritten)
 
 proc warn*(env: var Env, lineNum: Natural, warning: Warning, p1:
            string = "", p2: string = "") =
   ## Write a formatted warning message to the error stream.
+
+  if env.warningWritten >= maxWarningsWritten:
+    return
+
   var filename = env.templateFilename
   if filename == "":
     filename = "unnamed"
     assert lineNum == 0
+
   let message = getWarning(filename, lineNum, warning, p1, p2)
-  warn(env, message)
+  outputWarning(env, message)
+
+  if env.warningWritten == maxWarningsWritten:
+    # Reached the maximum number of warnings, suppressing the rest.
+    let message = getWarning(filename, lineNum, kMaxWarnings)
+    outputWarning(env, message)
 
 proc warn*(env: var Env, lineNum: Natural, warningData: WarningData) =
   ## Write a formatted warning message to the error stream.

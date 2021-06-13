@@ -225,9 +225,10 @@ proc getFunctionValue*(env: var Env, prepostTable:
   # Run the function.
   let funResult = function(parameters)
   if funResult.kind == frWarning:
-    env.warn(statement.lineNum, funResult.warningData.warning,
-             funResult.warningData.p1, funResult.warningData.p2)
-    env.warnStatement(statement, wInvalidStatement, parameterStarts[funResult.parameter])
+    env.warnStatement(statement, funResult.warningData.warning,
+      parameterStarts[funResult.parameter],
+      funResult.warningData.p1,
+      funResult.warningData.p2)
     return
 
   result = some(ValueAndLength(value: funResult.value, length: pos-start))

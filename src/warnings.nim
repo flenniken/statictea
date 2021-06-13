@@ -129,6 +129,7 @@ type
     wKeyValueKindDiff,     # w113
     wSubListsEmpty,        # w114
     wSubListsDiffTypes,    # w115
+    kMaxWarnings,          # w116
 
 tpubType:
   const
@@ -251,7 +252,7 @@ tpubType:
       "The sort key values are different types.", # wKeyValueKindDiff
       "A sublist is empty.", # wSubListsEmpty
       "The first item in the sublists are different types.", # wSubListsDiffTypes
-
+      "Reached the maximum number of warnings, suppressing the rest.", #kMaxWarnings
     ]
 
 func getWarning*(filename: string, lineNum: int,

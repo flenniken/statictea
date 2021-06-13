@@ -487,12 +487,17 @@ after
 
     let eErrLines = splitNewLines """
 template.html(3): w54: The list index 2 out of range.
-template.html(3): w48: Invalid statement, skipping it.
 statement:  var = get(s.nums, t.row)
                               ^
 template.html(5): w58: The replacement variable doesn't exist: var.
 template.html(3): w54: The list index 3 out of range.
+statement:  var = get(s.nums, t.row)
+                              ^
+template.html(5): w58: The replacement variable doesn't exist: var.
 template.html(3): w54: The list index 4 out of range.
+statement:  var = get(s.nums, t.row)
+                              ^
+template.html(5): w58: The replacement variable doesn't exist: var.
 """
     check testProcessTemplate(templateContent = templateContent, eRc = 1,
       serverJson = serverJson, eResultLines = eResultLines, eErrLines = eErrLines)
@@ -630,7 +635,7 @@ statement: t.repeat = 200
     # Test that you cannot assign t.maxRepeat less than repeat.
 
     let templateContent = """
-<!--$ nextline t.repeat = 4; t.maxRepeat=3-->
+<!--$ nextline t.repeat = 4;     t.maxRepeat=3-->
 {t.row}
 """
     let eResultLines = splitNewLines """
@@ -641,10 +646,20 @@ statement: t.repeat = 200
 """
     let eErrLines = splitNewLines """
 template.html(1): w67: The t.maxRepeat variable must be an integer >= t.repeat.
-statement:  t.maxRepeat=3
+statement:      t.maxRepeat=3
+           ^
+template.html(1): w67: The t.maxRepeat variable must be an integer >= t.repeat.
+statement:      t.maxRepeat=3
+           ^
+template.html(1): w67: The t.maxRepeat variable must be an integer >= t.repeat.
+statement:      t.maxRepeat=3
+           ^
+template.html(1): w67: The t.maxRepeat variable must be an integer >= t.repeat.
+statement:      t.maxRepeat=3
            ^
 """
-    # todo: why is the arrow above off by one space?
+    # todo: it might be better if the arrow pointed at the first non-whitespace character.
+    # todo: or strip leading and trailing whitespace from statements?
     check testProcessTemplate(templateContent = templateContent,
         eErrLines = eErrLines, eResultLines = eResultLines, eRc = 1)
 

@@ -343,9 +343,10 @@ $1
 statement: $2
            $3""" % [
     getWarning(env.templateFilename, statement.lineNum, warning, p1, p2),
-               fragment, startColumn(pointerPos)
+    fragment,
+    startColumn(pointerPos)
   ]
-  env.warn(message)
+  env.outputWarning(message)
 
 func `==`*(s1: Statement, s2: Statement): bool =
   ## Return true when the two statements are equal.

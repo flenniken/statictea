@@ -11,11 +11,6 @@ import env
 when isMainModule:
   import os
 
-# todo: log the return code
-# todo: log how many warnings were output.
-# todo: invalid statement skipping it -- remove this line
-# todo: create new dictionary with a function.
-# todo: create new list with a function.
 # todo: add a third option for the find function which is the value to return when not found.
 
 proc processArgs(env: var Env, args: Args): int =

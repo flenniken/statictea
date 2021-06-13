@@ -826,7 +826,6 @@ statement: t.asdf = 3.45
     let statement = newStatement(text="result = case(1, 2, 22, 'abc', 33)", lineNum=1, 0)
     let eErrLines = splitNewLines """
 template.html(1): w94: None of the case conditions match and no else case.
-template.html(1): w48: Invalid statement, skipping it.
 statement: result = case(1, 2, 22, 'abc', 33)
                          ^
 """
@@ -838,7 +837,6 @@ statement: result = case(1, 2, 22, 'abc', 33)
     let statement = newStatement(text, lineNum=1, 0)
     let eErrLines = splitNewLines """
 template.html(1): w66: The function takes two or more parameters.
-template.html(1): w48: Invalid statement, skipping it.
 statement: result = case(33, 2, 22, 'abc', 11, len(concat('a')))
                                                           ^
 """
@@ -907,7 +905,6 @@ statement: t.missing = "1.2.3"
     let statement = newStatement(text="cmp = cmpVersion('1.2.3')", lineNum=1, 0)
     let eErrLines = splitNewLines """
 template.html(1): w62: The function takes two parameters.
-template.html(1): w48: Invalid statement, skipping it.
 statement: cmp = cmpVersion('1.2.3')
                             ^
 """
@@ -918,7 +915,6 @@ statement: cmp = cmpVersion('1.2.3')
     let statement = newStatement(text="cmp = cmpVersion('1.2.3', 3.5)", lineNum=1, 0)
     let eErrLines = splitNewLines """
 template.html(1): w47: Expected a string.
-template.html(1): w48: Invalid statement, skipping it.
 statement: cmp = cmpVersion('1.2.3', 3.5)
                                      ^
 """
