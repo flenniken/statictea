@@ -1,5 +1,4 @@
 import std/unittest
-import dot
 
 suite "version.nim":
 

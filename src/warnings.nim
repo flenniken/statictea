@@ -1,7 +1,6 @@
 ## The warning messages.
 
 import std/strutils
-import tpub
 
 # Add new warnings to the bottom so the warning numbers never change.
 type
@@ -131,11 +130,10 @@ type
     wSubListsDiffTypes,    # w115
     kMaxWarnings,          # w116
 
-tpubType:
-  const
+const
     # The list of warnings. Add new messages to the bottom and do not
     # reorder the messages.
-    warningsList: array[low(Warning)..high(Warning), string] = [
+    warningsList*: array[low(Warning)..high(Warning), string] = [
       "No $1 filename. Use $2=filename.", # wNoFilename
       "Unknown switch: $1.", # wUnknownSwitch
       "Unknown argument: $1.", # wUnknownArg

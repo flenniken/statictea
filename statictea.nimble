@@ -234,16 +234,21 @@ proc createDependencyGraph() =
   # Create a new dot file without the nim runtime modules.
   var dotText = "digraph statictea {\n"
   # Add color the node's background and link them to their docs.
+  # https://www.graphviz.org/doc/info/colors.html
   for name in sourceNames:
     let url = "URL=\"$1.md\"" % name
     let tooltip = "tooltip=\"$1.md\"" % name
-    var fillColor: string
+    var extra: string
+    var allNodes = "fontsize=24"
     if sourceNamesDict[name] > 0:
-      # https://www.graphviz.org/doc/info/colors.html
-      fillColor = "fillcolor=bisque3, style=filled"
+      extra = "fillcolor=bisque3, style=filled"
     else:
-      fillColor = "fillcolor=aquamarine, style=filled"
-    let attrs = fmt"{name} [{fillColor}, {url}, {tooltip}];" & "\n"
+      extra = "shape=doubleoctagon, fillcolor=aquamarine, style=filled"
+    var attrs: string
+    if name == "statictea":
+      attrs = fmt"{name} [{allNodes}, shape=invhouse, {extra}, {url}, {tooltip}];" & "\n"
+    else:
+      attrs = fmt"{name} [{allNodes}, {extra}, {url}, {tooltip}];" & "\n"
     dotText.add(attrs)
   # Generate the connections between the nodes.
   for dependency in dependencies:
