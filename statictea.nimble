@@ -1,7 +1,10 @@
 import std/os
 import std/strutils
 import std/json
+import std/nre
+import std/strformat
 include src/version
+include src/dot
 
 version       = staticteaVersion
 author        = "Steve Flenniken"
@@ -23,16 +26,19 @@ proc get_test_filenames(): seq[string] =
   for filename in list:
     result.add(lastPathPart(filename))
 
-proc get_source_filenames(path: bool = false): seq[string] =
+proc get_source_filenames(path: bool = false, noExt: bool = false): seq[string] =
   ## Return the basename of the nim source files in the src folder.
+  let excludeFilenames = ["t.nim", "dot.nim"]
   result = @[]
   var list = listFiles("src")
   for filename in list:
-    if filename.endsWith(".nim") and lastPathPart(filename) != "t.nim":
-      if path:
-        result.add(filename)
-      else:
-        result.add(lastPathPart(filename))
+    if filename.endsWith(".nim") and not (lastPathPart(filename) in excludeFilenames):
+      var name = filename
+      if noExt:
+        name = name[0 .. ^5]
+      if not path:
+        name = lastPathPart(name)
+      result.add(name)
 
 proc get_test_module_cmd(filename: string, release = false): string =
   ## Return the command line to test the given nim file.
@@ -185,6 +191,72 @@ proc insertFile(filename: string, startLine: string, endLine: string,
     echo "did not find start line"
   else:
     writeFile(filename, lines.join("\n"))
+
+proc readDotFile*(dotFilename: string): seq[Dependency] =
+  ## Read a dot file and return a sequence of left and right
+  ## values. Skip the first and last line.
+  let text = slurp(dotFilename)
+  for line in text.splitLines():
+    let dependencyO = parseDotLine(line)
+    if dependencyO.isSome():
+      result.add(dependencyO.get())
+
+proc createDependencyGraph() =
+  ## Create a dependency dot file from statictea.nim and everything it
+  ## references. Run "man dot" for information about the dot format
+  ## and formatting options.
+
+  # See the following example which has links on each node.
+  # https://graphviz.org/Gallery/directed/go-package.html
+
+  exec "nim --hints:off genDepend src/statictea.nim"
+  echo "Generated src/statictea.dot"
+  rmFile("src/statictea.png")
+  rmFile("statictea.deps")
+
+  # Create a dictionary of all the source filenames.
+  let sourceNames = get_source_filenames(noExt = true)
+  var sourceNamesDict = initTable[string, int]()
+  for name in sourceNames:
+    sourceNamesDict[name] = 0
+
+  # Read the dot file into a sequence of left and right values.
+  let dotFilename = "src/statictea.dot"
+  let dependencies = readDotFile(dotFilename)
+
+  # Count the number of modules the source file imports.
+  for dependency in dependencies:
+    let left = dependency.left
+    if left in sourceNamesDict and dependency.right in sourceNamesDict:
+      var count = sourceNamesDict[left] + 1
+      sourceNamesDict[left] = count
+
+  # Create a new dot file without the nim runtime modules.
+  var dotText = "digraph statictea {\n"
+  # Add color the node's background and link them to their docs.
+  for name in sourceNames:
+    let url = "URL=\"$1.md\"" % name
+    let tooltip = "tooltip=\"$1.md\"" % name
+    var fillColor: string
+    if sourceNamesDict[name] > 0:
+      # https://www.graphviz.org/doc/info/colors.html
+      fillColor = "fillcolor=bisque3, style=filled"
+    else:
+      fillColor = "fillcolor=aquamarine, style=filled"
+    let attrs = fmt"{name} [{fillColor}, {url}, {tooltip}];" & "\n"
+    dotText.add(attrs)
+  # Generate the connections between the nodes.
+  for dependency in dependencies:
+    if dependency.left in sourceNamesDict and dependency.right in sourceNamesDict:
+      dotText.add("$1 -> \"$2\";\n" % [dependency.left, dependency.right])
+  dotText.add("}\n")
+
+  # Create an svg file from the new dot file.
+  let dotDotFilename = "src/dot.dot"
+  writeFile(dotDotFilename, dotText)
+  echo "Generated $1" % dotDotFilename
+  exec "dot -Tsvg src/dot.dot -o docs/staticteadep.svg"
+  echo "Generated docs/staticteadep.svg"
 
 # Tasks below
 
@@ -353,3 +425,9 @@ task args, "\tshow command line arguments":
   let count = system.paramCount()+1
   for i in 0..count-1:
     echo "$1: $2" % [$(i+1), system.paramStr(i)]
+
+task dot, "\tCreate the dependency graph of the StaticTea source.":
+  createDependencyGraph()
+  # exec "open -a Firefox http://localhost:6419/staticteadep.svg"
+  echo "View the svg file in your browser:"
+  echo "http://localhost:6419/staticteadep.svg"

@@ -1,6 +1,5 @@
 import std/unittest
-import std/options
-import version
+import dot
 
 suite "version.nim":
 

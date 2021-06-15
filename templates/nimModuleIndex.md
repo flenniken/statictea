@@ -8,6 +8,8 @@ $$ # Sort the index by filenames alphabetically.
 $$ nextline
 $$ : g.modules = sort(s.modules, "ascending", "sensitive", "filename")
 
+* [Module Dependencies](staticteadep.svg) &mdash; Dependency graph with links to module docs.
+
 $$ # Output module names and a short descrition.
 $$ # Use the description's first sentence to describe the module.
 $$ nextline
