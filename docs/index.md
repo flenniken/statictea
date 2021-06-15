@@ -3,11 +3,10 @@
 StaticTea nim source code documentation.
 
 
-* [Module Dependencies](staticteadep.svg) &mdash; Dependency graph with links to module docs.
+![Module Dependencies](staticteadep.svg)
 
 * [args.nim](args.md) &mdash; Command line arguments.
 * [collectCommand.nim](collectCommand.md) &mdash; Collect template command lines.
-* [dot.nim](dot.md) &mdash; Parse dot files.
 * [env.nim](env.md) &mdash; Environment holding the input and output streams.
 * [matches.nim](matches.md) &mdash; Regular expression matching methods.
 * [parseCmdLine.nim](parseCmdLine.md) &mdash; Parse a template command line.
