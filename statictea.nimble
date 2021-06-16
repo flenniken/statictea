@@ -435,13 +435,12 @@ task tt, "\tCompile and run t.nim.":
 task tree, "\tShow the project directory tree.":
   exec "tree -I '*.nims|*.bin' | less"
 
-task args, "\tshow command line arguments":
+task args, "\tShow command line arguments.":
   let count = system.paramCount()+1
   for i in 0..count-1:
     echo "$1: $2" % [$(i+1), system.paramStr(i)]
 
-task dot, "\tCreate the dependency graph of the StaticTea source.":
+task dot, "\tCreate a dependency graph of the StaticTea source.":
   createDependencyGraph()
-  # exec "open -a Firefox http://localhost:6419/staticteadep.svg"
   echo "View the svg file in your browser:"
   echo "http://localhost:6419/staticteadep.svg"
