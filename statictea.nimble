@@ -233,10 +233,10 @@ proc createDependencyGraph() =
 
   # Create a new dot file without the nim runtime modules.
   var dotText = """digraph statictea {
-size="14,8";
-ratio=1;
+  ratio=.5;
 """
-  # fontsize=36;
+  # size="14,14"";  
+  # size="14,8";
 
   # https://en.wikipedia.org/wiki/DOT_(graph_description_language)
   
@@ -246,13 +246,13 @@ ratio=1;
     let url = "URL=\"$1.md\"" % name
     let tooltip = "tooltip=\"$1.md\"" % name
     var extra: string
-    var allNodes = ""
+    var allNodes = "fontsize=24;"
     if sourceNamesDict[name] > 0:
       # tree trunk
-      extra = "fillcolor=burlywood1, style=filled"
+      extra = "fillcolor=palegoldenrod, style=filled"
     else:
       # tree leaves
-      extra = "shape=doubleoctagon, fillcolor=aquamarine, style=filled"
+      extra = "shape=doubleoctagon, fillcolor=palegreen, style=filled"
     var attrs: string
     if name == "statictea":
       attrs = fmt"{name} [{allNodes} shape=invhouse, {extra}, {url}, {tooltip}];" & "\n"
