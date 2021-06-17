@@ -9,7 +9,7 @@ Environment holding the input and output streams.
 * [staticteaLog](#statictealog) &mdash; Name of the default statictea log file when logging on the Mac.
 * type: [Env](#env) &mdash; Env holds the input and output streams.
 * [close](#close) &mdash; Close the environment streams.
-* [warn](#warn) &mdash; Write a message to the error stream.
+* [outputWarning](#outputwarning) &mdash; Write a message to the error stream and increment the warning count.
 * [warn](#warn) &mdash; Write a formatted warning message to the error stream.
 * [warn](#warn) &mdash; Write a formatted warning message to the error stream.
 * [formatDateTime](#formatdatetime) &mdash; Return a formatted time stamp for the log.
@@ -60,7 +60,6 @@ Env = object
   resultFilename*: string
   resultStream*: Stream
   warningWritten*: Natural   ## Count of warnings written.
-  oneWarnTable*: HashSet[string] ## All unique messages written.
 
 ```
 
@@ -74,12 +73,12 @@ proc close(env: var Env)
 ```
 
 
-# warn
+# outputWarning
 
-Write a message to the error stream. Duplicates are suppressed and the environment's warning count is incremented.
+Write a message to the error stream and increment the warning count.
 
 ```nim
-proc warn(env: var Env; message: string)
+proc outputWarning(env: var Env; message: string)
 ```
 
 

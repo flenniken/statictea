@@ -523,7 +523,7 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
   ## Compare two StaticTea version numbers. Returns -1 for less, 0 for
   ## @:equal and 1 for greater than.
   ## @:
-  ## @:StaticTea uses @|@|https@@://semver.org/]@|Semantic Versioning]]]
+  ## @:StaticTea uses @|@|https@@://semver.org/]@|Semantic Versioning]]
   ## @:with the added restriction that each version component has one
   ## @:to three digits (no letters).
   ## @:

@@ -2,8 +2,7 @@
 # $ # for the readme.
 # $ #
 # $ # Define replacement patterns that formats the descriptions
-# $ # for org mode. Sort the entries alphabetically by their
-# $ # name.
+# $ # for org mode. Sort the entries by their name.
 # $ #
 # $ block
 # $ : g.patterns = list( +

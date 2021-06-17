@@ -8,7 +8,7 @@ Process the template.
 * [yieldContentLine](#yieldcontentline) &mdash; Yield one content line at a time and keep the line endings.
 * [processTemplate](#processtemplate) &mdash; Process the template and return 0 on success.
 * [updateTemplate](#updatetemplate) &mdash; Update the template and return 0 on success.
-* [processTemplateTop](#processtemplatetop) &mdash; Process the template and return 0 on success.
+* [processTemplateTop](#processtemplatetop) &mdash; Setup the environment streams then process the template and return 0 on success.
 * [updateTemplateTop](#updatetemplatetop) &mdash; Update the template and return 0 on success.
 
 # yieldContentLine
@@ -40,7 +40,7 @@ proc updateTemplate(env: var Env; args: Args): int
 
 # processTemplateTop
 
-Process the template and return 0 on success. This calls processTemplate.
+Setup the environment streams then process the template and return 0 on success.
 
 ```nim
 proc processTemplateTop(env: var Env; args: Args): int

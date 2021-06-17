@@ -56,7 +56,6 @@ $$ : description = replaceRe(desc, g.patterns)
 $$ : code = replaceRe(entry.code, "[ ]*$", "")
 $$ : pos = find(code, " {", len(code))
 $$ : signature = substr(code, 0, pos)
-$$ : line = get(entry, "line", "0")
 # {entry.name}
 
 {description}

@@ -4,11 +4,11 @@ $$ #
 
 StaticTea nim source code documentation.
 
-$$ # Sort the index by filenames alphabetically.
+$$ # Sort the index by filenames.
 $$ nextline
 $$ : g.modules = sort(s.modules, "ascending", "sensitive", "filename")
 
-![Module Dependencies](staticteadep.svg)
+[![Module Dependencies](staticteadep.svg)](#)
 
 $$ # Output module names and a short descrition.
 $$ # Use the description's first sentence to describe the module.

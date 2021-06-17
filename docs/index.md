@@ -3,7 +3,7 @@
 StaticTea nim source code documentation.
 
 
-![Module Dependencies](staticteadep.svg)
+[![Module Dependencies](staticteadep.svg)](#)
 
 * [args.nim](args.md) &mdash; Command line arguments.
 * [collectCommand.nim](collectCommand.md) &mdash; Collect template command lines.

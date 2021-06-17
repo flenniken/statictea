@@ -244,9 +244,9 @@ d = dict("tea", "Earl Grey")
 get(d, 'tea') => "Earl Grey"
 get(d, 'coffee', 'Tea') => "Tea"
 
-l = list(4, 'a', 10)
-get(l, 2) => 10
-get(l, 3, 99) => 99
+list = list(4, 'a', 10)
+get(list, 2) => 10
+get(list, 3, 99) => 99
 
 d = dict("tea", "Earl Grey")
 d.tea => "Earl Grey"
@@ -391,7 +391,7 @@ func parseVersion(version: string): Option[(int, int, int)]
 Compare two StaticTea version numbers. Returns -1 for less, 0 for
 equal and 1 for greater than.
 
-StaticTea uses [[Semantic Versioning][https://semver.org/]]
+StaticTea uses [[https://semver.org/][Semantic Versioning]]
 with the added restriction that each version component has one
 to three digits (no letters).
 
@@ -404,7 +404,7 @@ Examples:
 ~~~
 cmpVersion("1.2.5", "1.1.8") => -1
 cmpVersion("1.2.5", "1.3.0") => 1
-cmpVersion("1.2.5", "1.2.5") => 1
+cmpVersion("1.2.5", "1.2.5") => 0
 ~~~~
 
 ```nim
@@ -673,8 +673,8 @@ replaceRe("abcdefabc", "abc", "456")
   => "456def456"
 replaceRe("abcdefabc", "abc", "456", "def", "")
   => "456456"
-l = list("abc", "456", "def", "")
-replaceRe("abcdefabc", l))
+list = list("abc", "456", "def", "")
+replaceRe("abcdefabc", list))
   => "456456"
 ~~~~
 
@@ -820,9 +820,9 @@ dictionary case:
 Examples:
 
 ~~~
-l = list(4, 3, 5, 5, 2, 4)
-sort(l) => [2, 3, 4, 4, 5, 5]
-sort(l, "descending") => [5, 5, 4, 4, 3, 2]
+list = list(4, 3, 5, 5, 2, 4)
+sort(list) => [2, 3, 4, 4, 5, 5]
+sort(list, "descending") => [5, 5, 4, 4, 3, 2]
 
 strs = list('T', 'e', 'a')
 sort(strs) => ['T', 'a', 'e']
