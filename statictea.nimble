@@ -27,7 +27,9 @@ proc get_test_filenames(): seq[string] =
     result.add(lastPathPart(filename))
 
 proc get_source_filenames(path: bool = false, noExt: bool = false): seq[string] =
-  ## Return the basename of the nim source files in the src folder.
+  ## Return the basename of the nim source files in the src
+  ## folder. You have the option to include the path or file
+  ## extension.
   let excludeFilenames = ["t.nim", "dot.nim"]
   result = @[]
   var list = listFiles("src")
@@ -70,7 +72,10 @@ proc get_test_module_cmd(filename: string, release = false): string =
 
 proc build_release() =
   ## Build the release version of statictea.
-  var cmd = "nim c --gc:orc --hint[Performance]:off --hint[Conf]:off --hint[Link]: off -d:release --out:bin/ src/statictea"
+  let part1 = "nim c --gc:orc --hint[Performance]:off "
+  let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
+  let part3 = "--out:bin/ src/statictea"
+  var cmd = part1 & part2 & part3
   echo cmd
   exec cmd
   cmd = "strip bin/statictea"
@@ -122,7 +127,7 @@ proc readModuleDescription(filename: string): string =
   result = trimmedLines.join("\n")
 
 proc jsonQuote(str: string): string =
-  ## Escape json string.
+  ## Escape the specified json string.
   result = escapeJsonUnquoted(str)
 
 proc indexJson(): string =
@@ -206,8 +211,14 @@ proc createDependencyGraph() =
   ## references. Run "man dot" for information about the dot format
   ## and formatting options.
 
+  # Introduction to the dot language.
+  # https://en.wikipedia.org/wiki/DOT_(graph_description_language)
+
   # See the following example which has links on each node.
   # https://graphviz.org/Gallery/directed/go-package.html
+
+  # Add color the node's background and link them to their docs.
+  # https://www.graphviz.org/doc/info/colors.html
 
   exec "nim --hints:off genDepend src/statictea.nim"
   echo "Generated src/statictea.dot"
@@ -231,17 +242,14 @@ proc createDependencyGraph() =
       var count = sourceNamesDict[left] + 1
       sourceNamesDict[left] = count
 
-  # Create a new dot file without the nim runtime modules.
+  # Create a new dot file without the nim runtime modules. Format the
+  # nodes and edges.
   var dotText = """digraph statictea {
   ratio=.5;
+  size="10";
 """
-  # size="14,14"";  
   # size="14,8";
 
-  # https://en.wikipedia.org/wiki/DOT_(graph_description_language)
-  
-  # Add color the node's background and link them to their docs.
-  # https://www.graphviz.org/doc/info/colors.html
   for name in sourceNames:
     let url = "URL=\"$1.md\"" % name
     let tooltip = "tooltip=\"$1.md\"" % name
@@ -347,30 +355,7 @@ The grip app is good for viewing gitlab markdown.
   http://localhost:6419/index.md
 """
 
-task json, "\tDisplay nim's doc json for a source file; specify part of name.":
-  let count = system.paramCount()+1
-  let name = system.paramStr(count-1)
-  let filenames = get_source_filenames()
-  for filename in filenames:
-    if name in filename:
-      var jsonName = joinPath("docs", changeFileExt(filename, "json"))
-      var cmd = "nim --hints:off jsondoc --out:$1 src/$2" % [jsonName, filename]
-      # echo cmd
-      exec cmd
-      let text = slurp(jsonName)
-      for line in text.splitLines():
-        echo line
-      break
-  # The jq command is good for viewing the output.
-  # n json | jq | less
-
-task jsonix, "\tDisplay the module index json for the source files.":
-  var json = indexJson()
-  # writeFile("docs/index.json", json)
-  for line in json.splitLines():
-    echo line
-
-task docsix, "\tGenerate the nim module index to the source files.":
+task docsix, "\tCreate markdown docs index.":
 
   # Create the index json file.
   echo "Create index json."
@@ -391,6 +376,29 @@ The grip app is good for viewing gitlab markdown.
   grip --quiet docs/index.md &
   http://localhost:6419/index.md
 """
+
+task json, "\tDisplay markdown docs json; specify part of name.":
+  let count = system.paramCount()+1
+  let name = system.paramStr(count-1)
+  let filenames = get_source_filenames()
+  for filename in filenames:
+    if name in filename:
+      var jsonName = joinPath("docs", changeFileExt(filename, "json"))
+      var cmd = "nim --hints:off jsondoc --out:$1 src/$2" % [jsonName, filename]
+      # echo cmd
+      exec cmd
+      let text = slurp(jsonName)
+      for line in text.splitLines():
+        echo line
+      break
+  # The jq command is good for viewing the output.
+  # n json | jq | less
+
+task jsonix, "\tDisplay markdown docs index json.":
+  var json = indexJson()
+  # writeFile("docs/index.json", json)
+  for line in json.splitLines():
+    echo line
 
 task readmefun, "Create readme function section.":
   let count = system.paramCount()+1
@@ -427,6 +435,19 @@ task readmefun, "Create readme function section.":
 
   echo "Updated readme.org"
 
+task dot, "\tCreate a dependency graph of the StaticTea source.":
+  createDependencyGraph()
+
+  echo """
+
+The grip app is good for viewing gitlab markdown.
+  grip --quiet docs/index.md &
+  http://localhost:6419/index.md
+
+View the svg file in your browser:
+  http://localhost:6419/staticteadep.svg
+"""
+
 task tt, "\tCompile and run t.nim.":
   let cmd = "nim c -r --gc:orc --hints:off --outdir:bin/tests/ src/t.nim"
   echo cmd
@@ -439,8 +460,3 @@ task args, "\tShow command line arguments.":
   let count = system.paramCount()+1
   for i in 0..count-1:
     echo "$1: $2" % [$(i+1), system.paramStr(i)]
-
-task dot, "\tCreate a dependency graph of the StaticTea source.":
-  createDependencyGraph()
-  echo "View the svg file in your browser:"
-  echo "http://localhost:6419/staticteadep.svg"
