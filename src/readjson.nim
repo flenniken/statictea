@@ -6,10 +6,8 @@ import std/options
 import std/json
 import std/tables
 import warnings
-import env
 import tpub
 import vartypes
-import args
 
 # todo: test the the order is preserved.
 # todo: test that the last duplicate wins.
@@ -85,7 +83,7 @@ proc readJsonContent*(content: string, filename: string = ""): ValueOrWarning =
   var stream = newStringStream(content)
   result = readJsonContent(stream, filename)
 
-proc readJson*(filename: string): ValueOrWarning =
+proc readJsonFile*(filename: string): ValueOrWarning =
   ## Read a json string and return the variables.  If there is an
   ## error, return a warning. The filename is used in warning
   ## messages.
@@ -100,24 +98,18 @@ proc readJson*(filename: string): ValueOrWarning =
 
   result = readJsonContent(stream, filename)
 
-proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
+proc readJsonFiles*(filenames: seq[string]): ValueOrWarning =
   ## Read the json files and return the variables in one
   ## dictionary. The last file wins on duplicates.
 
-  result = newVarsDict()
+  var varsDict = newVarsDict()
   for filename in filenames:
-    let valueOrWarning = readJson(filename)
+    let valueOrWarning = readJsonFile(filename)
     if valueOrWarning.kind == vwWarning:
-      env.warn(0, valueOrWarning.warningData)
-    else:
-      # Merge in the variables.
-      for k, v in valueOrWarning.value.dictv.pairs:
-        result[k] = v
+      return valueOrWarning
 
-proc readServerVariables*(env: var Env, args: Args): VarsDict =
-  ## Read the server json.
-  result = readJsonFiles(env, args.serverList)
+    # Merge in the variables.
+    for k, v in valueOrWarning.value.dictv.pairs:
+      varsDict[k] = v
 
-proc readSharedVariables*(env: var Env, args: Args): VarsDict =
-  ## Read the shared json.
-  result = readJsonFiles(env, args.sharedList)
+  result = newValueOrWarning(newValue(varsDict))

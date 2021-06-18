@@ -217,8 +217,23 @@ proc getStartingVariables(env: var Env, args: Args): Variables =
   # The tea variables are the top level items.  All variables are tea
   # variables in the sense that they all exists somewhere in this
   # dictionary.
-  var serverVarDict = readServerVariables(env, args)
-  var sharedVarDict = readSharedVariables(env, args)
+
+  var serverVarDict: VarsDict
+  let valueOrWarningS = readJsonFiles(args.serverList)
+  if valueOrWarningS.kind == vwWarning:
+    env.warn(0, valueOrWarningS.warningData)
+    serverVarDict = newVarsDict()
+  else:
+    serverVarDict = valueOrWarningS.value.dictv
+
+  var sharedVarDict: VarsDict
+  let valueOrWarningH = readJsonFiles(args.sharedList)
+  if valueOrWarningH.kind == vwWarning:
+    env.warn(0, valueOrWarningH.warningData)
+    sharedVarDict = newVarsDict()
+  else:
+    sharedVarDict = valueOrWarningH.value.dictv
+
   result = emptyVariables(serverVarDict, sharedVarDict)
 
 proc getPrepostTable(args: Args): PrepostTable =

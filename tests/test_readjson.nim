@@ -11,30 +11,30 @@ import warnings
 
 suite "readjson.nim":
 
-  test "readJson file not found":
+  test "readJsonFile file not found":
     let filename = "missing"
-    var valueOrWarning = readJson(filename)
+    var valueOrWarning = readJsonFile(filename)
     check valueOrWarning == newValueOrWarning(wFileNotFound, filename)
 
-  test "readJson cannot open file":
+  test "readJsonFile cannot open file":
     let filename = "_cannotopen.tmp"
     createFile(filename, "temp")
     defer: discard tryRemoveFile(filename)
     setFilePermissions(filename, {fpUserWrite, fpGroupWrite})
-    var valueOrWarning = readJson(filename)
+    var valueOrWarning = readJsonFile(filename)
     check valueOrWarning == newValueOrWarning(wUnableToOpenFile, filename)
 
-  test "readJson parse error":
+  test "readJsonFile parse error":
     let content = "{"
     var valueOrWarning = readJsonContent(content)
     check valueOrWarning == newValueOrWarning(wJsonParseError)
 
-  test "readJson no root object":
+  test "readJsonFile no root object":
     let content = "[5]"
     var valueOrWarning = readJsonContent(content)
     check valueOrWarning == newValueOrWarning(wInvalidJsonRoot)
 
-  test "readJson a=5":
+  test "readJsonFile a=5":
     let content = """{"a":5}"""
     let valueOrWarning = readJsonContent(content)
     check valueOrWarning.kind == vwValue
