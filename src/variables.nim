@@ -59,6 +59,7 @@ import std/tables
 import vartypes
 import version
 import warnings
+import tostring
 
 const
   outputValues* = ["result", "stderr", "log", "skip"]

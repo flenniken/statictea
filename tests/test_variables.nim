@@ -8,6 +8,7 @@ import vartypes
 import env
 import warnings
 import readjson
+import tostring
 
 proc testGetParentDict(variables: Variables, dotNameStr: string, eParentDict: ParentDict): bool =
   var names = split(dotNameStr, '.')

@@ -20,6 +20,28 @@ type
     ## Finite state machine states for finding statements.
     start, double, single, slashdouble, slashsingle
 
+  Statement* = object
+    ## A Statement object stores the statement text and where it
+    ## starts in the template file.
+    ## @
+    ## @ * lineNum -- Line number starting at 1 where the statement
+    ## @              starts.
+    ## @ * start -- Column position starting at 1 where the statement
+    ## @            starts on the line.
+    ## @ * text -- The statement text.
+    lineNum*: Natural
+    start*: Natural
+    text*: string
+
+  ValueAndLength* = object
+    ## A value and the length of the matching text in the statement.
+    ## For the example statement: "var = 567 ". The value 567 starts
+    ## at index 6 and the matching length is 4 because it includes the
+    ## trailing space. For example "id = row(3 )" the value is 3 and
+    ## the length is 2.
+    value*: Value
+    length*: Natural
+
 #[
 
 When an error is detected on a statement, the error message tells the
@@ -44,6 +66,80 @@ statement 3 starts at line 3, position 7.
 ]#
 
 # todo: test slash characters in strings.
+
+
+func newStatement*(text: string, lineNum: Natural = 1,
+    start: Natural = 1): Statement =
+  ## Create a new statement.
+  result = Statement(lineNum: lineNum, start: start, text: text)
+
+proc startColumn*(start: Natural): string =
+  ## Return enough spaces to point at the warning column.  Used under
+  ## the statement line.
+  for ix in 0..<start:
+    result.add(' ')
+  result.add("^")
+
+proc warnStatement*(env: var Env, statement: Statement, warning:
+                    Warning, start: Natural, p1: string = "", p2:
+                                         string = "") =
+  ## Warn about an invalid statement. Show and tell the statement with
+  ## the problem.  Start is the position in the statement where the
+  ## problem starts. If the statement is long, trim it around the
+  ## problem area.
+
+  var fragment: string
+  var extraStart = ""
+  var extraEnd = ""
+  let fragmentMax = 60
+  let halfFragment = fragmentMax div 2
+  var startPos: int
+  var endPos: int
+  var pointerPos: int
+  if statement.text.len <= fragmentMax:
+    fragment = statement.text
+    startPos = start
+    pointerPos = start
+  else:
+    startPos = start.int - halfFragment
+    if startPos < 0:
+      startPos = 0
+    else:
+      extraStart = "..."
+
+    endPos = startPos + fragmentMax
+    if endPos > statement.text.len:
+      endPos = statement.text.len
+    else:
+      extraEnd = "..."
+    fragment = extraStart & statement.text[startPos ..< endPos] & extraEnd
+    pointerPos = start.int - startPos + extraStart.len
+
+  var message = """
+$1
+statement: $2
+           $3""" % [
+    getWarning(env.templateFilename, statement.lineNum, warning, p1, p2),
+    fragment,
+    startColumn(pointerPos)
+  ]
+  env.outputWarning(message)
+
+func `==`*(s1: Statement, s2: Statement): bool =
+  ## Return true when the two statements are equal.
+  if s1.lineNum == s2.lineNum and s1.start == s2.start and
+      s1.text == s2.text:
+    result = true
+
+func `$`*(s: Statement): string =
+  ## Retrun a string representation of a Statement.
+  result = "$1, $2: '$3'" % [$s.lineNum, $s.start, s.text]
+
+proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
+  ## Create a newValueAndLength object.
+  result = ValueAndLength(value: value, length: length)
+
+
 
 iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
     seq[LineParts]): Statement {.tpub.} =

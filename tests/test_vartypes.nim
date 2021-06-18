@@ -1,14 +1,9 @@
 import std/unittest
 import std/tables
 import vartypes
+import tostring
 
 suite "vartypes":
-
-  test "startColumn":
-    check startColumn(0) == "^"
-    check startColumn(1) == " ^"
-    check startColumn(2) == "  ^"
-    check startColumn(3) == "   ^"
 
   test "newValue string":
     let testString = "string"
@@ -84,15 +79,6 @@ suite "vartypes":
     check $emptyDictValue == "{}"
     check shortValueToString(emptyDictValue) == "{}"
 
-  test "newListValue":
-    check $newListValue("a", "b", "c") == """["a","b","c"]"""
-    check $newListValue(1, 2, 3) == "[1,2,3]"
-    let listValue = newListValue(newValue(1), newValue("a"))
-    check $listValue == """[1,"a"]"""
-
-  # test "newListValue emtpy":
-  #   check $newListValue() = "[]"
-
   test "newEmptyListValue":
     var listValue = newEmptyListValue()
     check listValue.listv.len == 0
@@ -154,15 +140,7 @@ suite "vartypes":
     check $newValue([1, 2, 3]) == "[1,2,3]"
     check $newValue(["a", "b", "c"]) == """["a","b","c"]"""
 
-    check $newListValue(1, 2, 3) == "[1,2,3]"
-    check $newListValue("a", "b", "c") == """["a","b","c"]"""
-    check $newListValue(newValue(1), newValue("b")) == """[1,"b"]"""
-
   test "newValue dict":
     check $newValue([("a", 1), ("b", 2), ("c", 3)]) == """{"a":1,"b":2,"c":3}"""
     check $newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)]) == """{"a":1.1,"b":2.2,"c":3.3}"""
     check $newValue([("a", newValue(1)), ("b", newValue("c"))]) == """{"a":1,"b":"c"}"""
-
-    check $newDictValue(("a", 1), ("b", 2), ("c", 3)) == """{"a":1,"b":2,"c":3}"""
-    check $newDictValue(("a", 1.1), ("b", 2.2), ("c", 3.3)) == """{"a":1.1,"b":2.2,"c":3.3}"""
-    check $newDictValue(("a", newValue(1)), ("b", newValue("c"))) == """{"a":1,"b":"c"}"""

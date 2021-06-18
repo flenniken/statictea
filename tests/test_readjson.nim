@@ -8,6 +8,7 @@ import env
 import vartypes
 import readjson
 import warnings
+import tostring
 
 suite "readjson.nim":
 

@@ -15,6 +15,7 @@ import vartypes
 import regexes
 import parseNumber
 import matches
+import tostring
 
 type
   FunctionPtr* = proc (parameters: seq[Value]): FunResult {.noSideEffect.}

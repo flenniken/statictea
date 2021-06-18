@@ -7,6 +7,7 @@ import env
 import vartypes
 import runFunction
 import warnings
+import tostring
 
 # Unicode strings in multiple languages good for test cases.
 # https://www.cl.cam.ac.uk/~mgk25/ucs/examples/quickbrown.txt

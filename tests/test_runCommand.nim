@@ -947,6 +947,11 @@ statement: a = len(case(5,
     check startPointer(2) == "  ^2"
     check startPointer(101) == "101"
 
+  test "startColumn":
+    check startColumn(0) == "^"
+    check startColumn(1) == " ^"
+    check startColumn(2) == "  ^"
+    check startColumn(3) == "   ^"
 
 
 # todo: test that a warning is generated when the item doesn't exist.
