@@ -5,12 +5,100 @@ Run a command.
 * [runCommand.nim](../src/runCommand.nim) &mdash; Nim source code.
 # Index
 
+* type: [Statement](#statement) &mdash; A Statement object stores the statement text and where it starts in the template file.
+* type: [ValueAndLength](#valueandlength) &mdash; A value and the length of the matching text in the statement.
+* [newStatement](#newstatement) &mdash; Create a new statement.
+* [startColumn](#startcolumn) &mdash; Return enough spaces to point at the warning column.
+* [warnStatement](#warnstatement) &mdash; Warn about an invalid statement.
+* [`==`](#) &mdash; Return true when the two statements are equal.
+* [`$`](#) &mdash; Retrun a string representation of a Statement.
+* [newValueAndLength](#newvalueandlength) &mdash; Create a newValueAndLength object.
 * [getString](#getstring) &mdash; Return a literal string value and match length from a statement.
 * [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
 * [getFunctionValue](#getfunctionvalue) &mdash; Collect the function parameter values then call it.
 * [getVarOrFunctionValue](#getvarorfunctionvalue) &mdash; Return the statement's right hand side value and the length matched.
 * [runStatement](#runstatement) &mdash; Run one statement and assign a variable.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
+
+# Statement
+
+A Statement object stores the statement text and where it starts in the template file. @ @ * lineNum -- Line number starting at 1 where the statement @              starts. @ * start -- Column position starting at 1 where the statement @            starts on the line. @ * text -- The statement text.
+
+```nim
+Statement = object
+  lineNum*: Natural
+  start*: Natural
+  text*: string
+
+```
+
+
+# ValueAndLength
+
+A value and the length of the matching text in the statement. For the example statement: "var = 567 ". The value 567 starts at index 6 and the matching length is 4 because it includes the trailing space. For example "id = row(3 )" the value is 3 and the length is 2.
+
+```nim
+ValueAndLength = object
+  value*: Value
+  length*: Natural
+
+```
+
+
+# newStatement
+
+Create a new statement.
+
+```nim
+func newStatement(text: string; lineNum: Natural = 1; start: Natural = 1): Statement
+```
+
+
+# startColumn
+
+Return enough spaces to point at the warning column.  Used under the statement line.
+
+```nim
+proc startColumn(start: Natural): string
+```
+
+
+# warnStatement
+
+Warn about an invalid statement. Show and tell the statement with the problem.  Start is the position in the statement where the problem starts. If the statement is long, trim it around the problem area.
+
+```nim
+proc warnStatement(env: var Env; statement: Statement; warning: Warning;
+                   start: Natural; p1: string = ""; p2: string = "")
+```
+
+
+# `==`
+
+Return true when the two statements are equal.
+
+```nim
+func `==`(s1: Statement; s2: Statement): bool
+```
+
+
+# `$`
+
+Retrun a string representation of a Statement.
+
+```nim
+func `$`(s: Statement): string
+```
+
+
+# newValueAndLength
+
+Create a newValueAndLength object.
+
+```nim
+proc newValueAndLength(value: Value; length: Natural): ValueAndLength
+```
+
 
 # getString
 

@@ -5,7 +5,7 @@ import parseCommandLine
 import processTemplate
 import args
 import warnings
-import showhelp
+import gethelp
 import version
 import env
 when isMainModule:
@@ -15,7 +15,8 @@ when isMainModule:
 
 proc processArgs(env: var Env, args: Args): int =
   if args.help:
-    result = showHelp(env)
+    env.writeOut(getHelp())
+    result = 0
   elif args.version:
     env.writeOut(staticteaVersion)
     result = 0

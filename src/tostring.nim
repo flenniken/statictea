@@ -1,3 +1,5 @@
+## Value types to string methods.
+
 import std/strutils
 import std/tables
 import std/json
@@ -39,12 +41,8 @@ func valueToString*(value: Value): string =
     of vkFloat:
       result.add($value.floatv)
 
-func `$`*(value: Value): string =
-  ## Return a string representation of a Value.
-  result = valueToString(value)
-
 func shortValueToString*(value: Value): string =
-  ## Return a string representation of Value. This is used to convert
+  ## Return a short string representation of Value. This is used to convert
   ## values to strings in replacement blocks.
   case value.kind
   of vkString:
@@ -63,6 +61,10 @@ func shortValueToString*(value: Value): string =
       result = "[]"
     else:
       result = "[...]"
+
+func `$`*(value: Value): string =
+  ## Return a string representation of a Value.
+  result = valueToString(value)
 
 proc `$`*(varsDict: VarsDict): string =
   ## Return a string representation of a VarsDict.

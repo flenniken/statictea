@@ -1,7 +1,7 @@
-## Show help on the command line.
-import env
+## Get the command line help message.
 
-func getHelp(): string =
+func getHelp*(): string =
+  ## Get the command line help message.
   result = """
 NAME
 
@@ -88,8 +88,3 @@ EXAMPES
 SEE ALSO
      For more information see https://github.com/flenniken/statictea
 """
-
-proc showHelp*(env: var Env): int =
-  ## Display the help text.
-  env.writeOut(getHelp())
-  result = 0

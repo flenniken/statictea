@@ -7,10 +7,8 @@ Read json files.
 
 * [readJsonContent](#readjsoncontent) &mdash; Read a json stream and return the variables.
 * [readJsonContent](#readjsoncontent) &mdash; Read a json string and return the variables.
-* [readJson](#readjson) &mdash; Read a json string and return the variables.
+* [readJsonFile](#readjsonfile) &mdash; Read a json string and return the variables.
 * [readJsonFiles](#readjsonfiles) &mdash; Read the json files and return the variables in one dictionary.
-* [readServerVariables](#readservervariables) &mdash; Read the server json.
-* [readSharedVariables](#readsharedvariables) &mdash; Read the shared json.
 
 # readJsonContent
 
@@ -30,12 +28,12 @@ proc readJsonContent(content: string; filename: string = ""): ValueOrWarning
 ```
 
 
-# readJson
+# readJsonFile
 
 Read a json string and return the variables.  If there is an error, return a warning. The filename is used in warning messages.
 
 ```nim
-proc readJson(filename: string): ValueOrWarning
+proc readJsonFile(filename: string): ValueOrWarning
 ```
 
 
@@ -44,25 +42,7 @@ proc readJson(filename: string): ValueOrWarning
 Read the json files and return the variables in one dictionary. The last file wins on duplicates.
 
 ```nim
-proc readJsonFiles(env: var Env; filenames: seq[string]): VarsDict
-```
-
-
-# readServerVariables
-
-Read the server json.
-
-```nim
-proc readServerVariables(env: var Env; args: Args): VarsDict
-```
-
-
-# readSharedVariables
-
-Read the shared json.
-
-```nim
-proc readSharedVariables(env: var Env; args: Args): VarsDict
+proc readJsonFiles(filenames: seq[string]): ValueOrWarning
 ```
 
 

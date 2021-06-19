@@ -21,27 +21,12 @@ StaticTea variable types.
 * [newValue](#newvalue) &mdash; <p>New dict value from an array of pairs where the pairs are the same type (may be Value type).
 * [newEmptyListValue](#newemptylistvalue) &mdash; Return an empty list value.
 * [newEmptyDictValue](#newemptydictvalue) &mdash; Create a dictionary value from a VarsDict.
-* [dictToString](#dicttostring) &mdash; Return a string representation of a dict Value in JSON format.
-* [listToString](#listtostring) &mdash; Return a string representation of a list Value in JSON format.
-* [valueToString](#valuetostring) &mdash; Return a string representation of a Value in JSON format.
-* [`$`](#) &mdash; Return a string representation of a Value.
-* [shortValueToString](#shortvaluetostring) &mdash; Return a string representation of Value.
-* [`$`](#) &mdash; Return a string representation of a value's type.
-* [`$`](#) &mdash; Return a string representation of a VarsDict.
 * [`==`](#) &mdash; Return true when two values are equal.
 * [newValueOrWarning](#newvalueorwarning) &mdash; Return a new ValueOrWarning object containing a value.
 * [newValueOrWarning](#newvalueorwarning) &mdash; Return a new ValueOrWarning object containing a warning.
 * [newValueOrWarning](#newvalueorwarning) &mdash; Return a new ValueOrWarning object containing a warning.
 * [`==`](#) &mdash; Compare two ValueOrWarning objects and return true when equal.
-* [`$`](#) &mdash; Return a string representation of a ValueOrWarning object.
-* type: [Statement](#statement) &mdash; A Statement object stores the statement text and where it starts in the template file.
-* type: [ValueAndLength](#valueandlength) &mdash; A value and the length of the matching text in the statement.
-* [newStatement](#newstatement) &mdash; Create a new statement.
-* [startColumn](#startcolumn) &mdash; Return enough spaces to point at the warning column.
-* [warnStatement](#warnstatement) &mdash; Warn about an invalid statement.
-* [`==`](#) &mdash; Return true when the two statements are equal.
-* [`$`](#) &mdash; Retrun a string representation of a Statement.
-* [newValueAndLength](#newvalueandlength) &mdash; Create a newValueAndLength object.
+* [`$`](#) &mdash; Return a string representation of a value's type.
 
 # VarsDict
 
@@ -199,69 +184,6 @@ proc newEmptyDictValue(): Value
 ```
 
 
-# dictToString
-
-Return a string representation of a dict Value in JSON format.
-
-```nim
-func dictToString(value: Value): string
-```
-
-
-# listToString
-
-Return a string representation of a list Value in JSON format.
-
-```nim
-func listToString(value: Value): string
-```
-
-
-# valueToString
-
-Return a string representation of a Value in JSON format.
-
-```nim
-func valueToString(value: Value): string
-```
-
-
-# `$`
-
-Return a string representation of a Value.
-
-```nim
-func `$`(value: Value): string
-```
-
-
-# shortValueToString
-
-Return a string representation of Value. This is used to convert values to strings in replacement blocks.
-
-```nim
-func shortValueToString(value: Value): string
-```
-
-
-# `$`
-
-Return a string representation of a value's type.
-
-```nim
-func `$`(kind: ValueKind): string
-```
-
-
-# `$`
-
-Return a string representation of a VarsDict.
-
-```nim
-proc `$`(varsDict: VarsDict): string
-```
-
-
 # `==`
 
 Return true when two values are equal.
@@ -309,90 +231,10 @@ func `==`(vw1: ValueOrWarning; vw2: ValueOrWarning): bool
 
 # `$`
 
-Return a string representation of a ValueOrWarning object.
+Return a string representation of a value's type.
 
 ```nim
-func `$`(vw: ValueOrWarning): string
-```
-
-
-# Statement
-
-A Statement object stores the statement text and where it starts in the template file. @ @ * lineNum -- Line number starting at 1 where the statement @              starts. @ * start -- Column position starting at 1 where the statement @            starts on the line. @ * text -- The statement text.
-
-```nim
-Statement = object
-  lineNum*: Natural
-  start*: Natural
-  text*: string
-
-```
-
-
-# ValueAndLength
-
-A value and the length of the matching text in the statement. For the example statement: "var = 567 ". The value 567 starts at index 6 and the matching length is 4 because it includes the trailing space. For example "id = row(3 )" the value is 3 and the length is 2.
-
-```nim
-ValueAndLength = object
-  value*: Value
-  length*: Natural
-
-```
-
-
-# newStatement
-
-Create a new statement.
-
-```nim
-func newStatement(text: string; lineNum: Natural = 1; start: Natural = 1): Statement
-```
-
-
-# startColumn
-
-Return enough spaces to point at the warning column.  Used under the statement line.
-
-```nim
-proc startColumn(start: Natural): string
-```
-
-
-# warnStatement
-
-Warn about an invalid statement. Show and tell the statement with the problem.  Start is the position in the statement where the problem starts. If the statement is long, trim it around the problem area.
-
-```nim
-proc warnStatement(env: var Env; statement: Statement; warning: Warning;
-                   start: Natural; p1: string = ""; p2: string = "")
-```
-
-
-# `==`
-
-Return true when the two statements are equal.
-
-```nim
-func `==`(s1: Statement; s2: Statement): bool
-```
-
-
-# `$`
-
-Retrun a string representation of a Statement.
-
-```nim
-func `$`(s: Statement): string
-```
-
-
-# newValueAndLength
-
-Create a newValueAndLength object.
-
-```nim
-proc newValueAndLength(value: Value; length: Natural): ValueAndLength
+func `$`(kind: ValueKind): string
 ```
 
 
