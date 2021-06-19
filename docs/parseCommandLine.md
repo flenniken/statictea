@@ -5,14 +5,53 @@ Parse the StaticTea terminal command line and return the arguments.
 * [parseCommandLine.nim](../src/parseCommandLine.nim) &mdash; Nim source code.
 # Index
 
-* [parseCommandLine](#parsecommandline) &mdash; Return the command line arguments.
+* type: [ArgsOrWarningKind](#argsorwarningkind) &mdash; The kind of a ArgsOrWarning object, either args or warning.
+* type: [ArgsOrWarning](#argsorwarning) &mdash; Holds args or a warning.
+* [parseCommandLine](#parsecommandline) &mdash; Return the command line arguments or a warning.
+* [`$`](#) &mdash; Return a string representation of a ArgsOrWarning object.
+
+# ArgsOrWarningKind
+
+The kind of a ArgsOrWarning object, either args or warning.
+
+```nim
+ArgsOrWarningKind = enum
+  awArgs, awWarning
+```
+
+
+# ArgsOrWarning
+
+Holds args or a warning.
+
+```nim
+ArgsOrWarning = object
+  case kind*: ArgsOrWarningKind
+  of awArgs:
+      args*: Args
+
+  of awWarning:
+      warningData*: WarningData
+
+
+```
+
 
 # parseCommandLine
 
-Return the command line arguments.
+Return the command line arguments or a warning. Processing stops on the first warning.
 
 ```nim
-proc parseCommandLine(env: var Env; argv: seq[string]): Args
+proc parseCommandLine(argv: seq[string]): ArgsOrWarning
+```
+
+
+# `$`
+
+Return a string representation of a ArgsOrWarning object.
+
+```nim
+func `$`(aw: ArgsOrWarning): string
 ```
 
 

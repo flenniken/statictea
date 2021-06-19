@@ -6,11 +6,27 @@ import std/strutils
 import args
 import parseCommandLine
 import env
+import warnings
+
+func `$`(prepostList: seq[Prepost]): string =
+  var parts: seq[string]
+  for pp in prepostList:
+    parts.add("($1, $2)" % [pp.prefix, pp.postfix])
+  result = parts.join(", ")
 
 proc newStrFromBuffer(buffer: openArray[uint8]): string =
   result = newStringOfCap(buffer.len)
   for ix in 0 ..< buffer.len:
     result.add((char)buffer[ix])
+
+proc parseWarning(cmdline: string, eWarningData: WarningData): bool =
+  result = true
+  let argsOrWarning = parseCommandLine(cmdLine)
+  if argsOrWarning.kind != awWarning:
+    echo "Did not get a warning."
+    result = false
+  elif not expectedItem("warningData", argsOrWarning.warningData, eWarningData):
+    result = false
 
 proc tpcl(
     cmdLine: string,
@@ -29,12 +45,14 @@ proc tpcl(
     eOutLines: seq[string] = @[],
       ): bool =
 
-  var env = openEnvTest("_parseCommandLine.log")
+  let argsOrWarning = parseCommandLine(cmdLine)
+  if argsOrWarning.kind != awArgs:
+    echo "Unexpected warning:"
+    echo $argsOrWarning
+    return false
+  let args = argsOrWarning.args
 
-  let args = parseCommandLine(env, cmdLine)
-
-  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
-
+  result = true
   if not expectedItem("help", args.help, help):
     result = false
   if not expectedItem("version", args.version, version):
@@ -206,24 +224,20 @@ suite "parseCommandLine":
   # Test some error cases.
 
   test "parseCommandLine-no-filename":
-    check tpcl("-s", eErrLines = @["template.html(0): w0: No server filename. Use s=filename.\n"])
+    check parseWarning("-s", newWarningData(wNoFilename, "server", "s"))
 
   test "parseCommandLine-no-switch":
-    check tpcl("-w", eErrLines = @["template.html(0): w1: Unknown switch: w.\n"])
+    check parseWarning("-w", newWarningData(wUnknownSwitch, "w"))
 
   test "parseCommandLine-no-long-switch":
-    check tpcl("--hello", eErrLines = @["template.html(0): w1: Unknown switch: hello.\n"])
+    check parseWarning("--hello", newWarningData(wUnknownSwitch, "hello"))
 
   test "parseCommandLine-no-arg":
-    check tpcl("bare", eErrLines = @["template.html(0): w2: Unknown argument: bare.\n"])
-
-  test "parseCommandLine-no-args":
-    check tpcl("bare naked", eErrLines = @["template.html(0): w2: Unknown argument: bare.\n",
-    "template.html(0): w2: Unknown argument: naked.\n"])
+    check parseWarning("bare", newWarningData(wUnknownArg, "bare"))
 
   test "parseCommandLine-missing-result":
-    check tpcl("-r", eErrLines = @["template.html(0): w0: No result filename. Use r=filename.\n"])
+    check parseWarning("-r", newWarningData(wNoFilename, "result", "r"))
 
   test "parseCommandLine-two-results":
-    check tpcl("-r=result.html -r=asdf.html", resultFilename="result.html",
-         eErrLines = @["template.html(0): w3: One result file allowed, skipping: 'asdf.html'.\n"])
+    check parseWarning("-r=result.html -r=asdf.html",
+      newWarningData(wOneResultAllowed, "asdf.html"))

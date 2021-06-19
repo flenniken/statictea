@@ -31,7 +31,11 @@ proc main*(env: var Env, argv: seq[string]): int =
   ## Run statictea. Return 0 when no warning messages were written.
 
   # Parse the command line options.
-  let args = parseCommandLine(env, argv)
+  let argsOrWarning = parseCommandLine(argv)
+  if argsOrWarning.kind == awWarning:
+    env.warn(0, argsOrWarning.warningData)
+    return 1
+  let args = argsOrWarning.args
 
   # Add the log file to the environment when it is turned on.
   if args.log:

@@ -5,7 +5,6 @@ import std/options
 import tpub
 import args
 import warnings
-import env
 import regexes
 when defined(test):
   import std/strutils
@@ -24,6 +23,34 @@ const
     ('p', "prepost"),
   ]
 
+type
+  ArgsOrWarningKind* = enum
+    ## The kind of a ArgsOrWarning object, either args or warning.
+    awArgs,
+    awWarning
+
+  ArgsOrWarning* = object
+    ## Holds args or a warning.
+    case kind*: ArgsOrWarningKind
+      of awArgs:
+        args*: Args
+      of awWarning:
+        warningData*: WarningData
+
+func newArgsOrWarning(args: Args): ArgsOrWarning =
+  ## Return a new ArgsOrWarning object containing args.
+  result = ArgsOrWarning(kind: awArgs, args: args)
+
+func newArgsOrWarning(warning: Warning, p1: string = "",
+    p2: string = ""): ArgsOrWarning =
+  ## Return a new ArgsOrWarning object containing a warning.
+  let warningData = newWarningData(warning, p1, p2)
+  result = ArgsOrWarning(kind: awWarning, warningData: warningData)
+
+func newArgsOrWarning(warningData: WarningData): ArgsOrWarning =
+  ## Return a new ArgsOrWarning object containing a warning.
+  result = ArgsOrWarning(kind: awWarning, warningData: warningData)
+
 func fileListIndex(word: string): int {.tpub.} =
   for ix, w in fileLists:
     if w == word:
@@ -36,13 +63,6 @@ func letterToWord(letter: char): string {.tpub.} =
       return tup[1]
   return ""
 
-when defined(test):
-  func `$`(prepostList: seq[Prepost]): string {.tpub.} =
-    var parts: seq[string]
-    for pp in prepostList:
-      parts.add("($1, $2)" % [pp.prefix, pp.postfix])
-    result = parts.join(", ")
-
 proc parsePrepost(str: string): Option[Prepost] {.tpub.} =
   ## Match a prefix followed by an optional postfix, prefix[,postfix].
   ## Each part contains 1 to 20 ascii characters including spaces but
@@ -54,10 +74,11 @@ proc parsePrepost(str: string): Option[Prepost] {.tpub.} =
     let (prefix, postfix) = matches.get2Groups()
     result = some(newPrepost(prefix, postfix))
 
-proc handleWord(env: var Env, switch: string, word: string, value: string,
+proc handleWord(switch: string, word: string, value: string,
     help: var bool, version: var bool, update: var bool, log: var bool,
     resultFilename: var string, logFilename: var string,
-    filenames: var array[4, seq[string]], prepostList: var seq[Prepost]) =
+    filenames: var array[4, seq[string]], prepostList: var seq[Prepost]):
+    Option[WarningData] =
   ## Handle one switch and return its value.  Switch is the key from
   ## the command line, either a word or a letter.  Word is the long
   ## form of the switch.
@@ -65,7 +86,7 @@ proc handleWord(env: var Env, switch: string, word: string, value: string,
   let listIndex = fileListIndex(word)
   if listIndex != -1:
     if value == "":
-      env.warn(0, wNoFilename, word, $switch)
+      return some(newWarningData(wNoFilename, word, $switch))
     else:
       filenames[listIndex].add(value)
   elif word == "help":
@@ -76,9 +97,9 @@ proc handleWord(env: var Env, switch: string, word: string, value: string,
     update = true
   elif word == "result":
     if value == "":
-      env.warn(0, wNoFilename, word, $switch)
+      return some(newWarningData(wNoFilename, word, $switch))
     elif resultFilename != "":
-      env.warn(0, wOneResultAllowed, value)
+      return some(newWarningData(wOneResultAllowed, value))
     else:
       resultFilename = value
   elif word == "log":
@@ -88,20 +109,21 @@ proc handleWord(env: var Env, switch: string, word: string, value: string,
     # prepost is a string with a space dividing the prefix from the
     # postfix. The postfix is optional. -p="<--$ -->" or -p="#$"
     if value == "":
-      env.warn(0, wNoPrepostValue, $switch)
+      return some(newWarningData(wNoPrepostValue, $switch))
     else:
       let prepostO = parsePrepost(value)
       if not prepostO.isSome:
-        env.warn(0, wInvalidPrepost, value)
+        return some(newWarningData(wInvalidPrepost, value))
       else:
         prepostList.add(prepostO.get())
   else:
-    env.warn(0, wUnknownSwitch, switch)
+    return some(newWarningData(wUnknownSwitch, switch))
 
+proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
+  ## Return the command line arguments or a warning. Processing stops
+  ## on the first warning.
 
-proc parseCommandLine*(env: var Env, argv: seq[string]): Args =
-  ## Return the command line arguments.
-
+  var args: Args
   var help: bool = false
   var version: bool = false
   var update: bool = false
@@ -120,35 +142,49 @@ proc parseCommandLine*(env: var Env, argv: seq[string]): Args =
           let letter = key[ix]
           let word = letterToWord(letter)
           if word == "":
-            env.warn(0, wUnknownSwitch, $letter)
+            return newArgsOrWarning(wUnknownSwitch, $letter)
           else:
-            handleWord(env, $letter, word, value, help, version, update, log,
-              resultFilename, logFilename, filenames, prepostList)
+            let warningDataO = handleWord($letter, word, value,
+              help, version, update, log, resultFilename, logFilename,
+              filenames, prepostList)
+            if warningDataO.isSome():
+              return newArgsOrWarning(warningDataO.get())
 
       of CmdLineKind.cmdLongOption:
-        handleWord(env, key, key, value, help, version, update, log,
+        let warningDataO = handleWord(key, key, value, help, version, update, log,
                    resultFilename, logFilename, filenames, prepostList)
+        if warningDataO.isSome():
+          return newArgsOrWarning(warningDataO.get())
 
       of CmdLineKind.cmdArgument:
-        env.warn(0, wUnknownArg, key)
+        return newArgsOrWarning(wUnknownArg, key)
 
       of CmdLineKind.cmdEnd:
         discard
 
-  result.help = help
-  result.version = version
-  result.update = update
-  result.log = log
-  result.serverList = filenames[0]
-  result.sharedList = filenames[1]
-  result.templateList = filenames[2]
-  result.resultFilename = resultFilename
-  result.logFilename = logFilename
-  result.prepostList = prepostList
+  args.help = help
+  args.version = version
+  args.update = update
+  args.log = log
+  args.serverList = filenames[0]
+  args.sharedList = filenames[1]
+  args.templateList = filenames[2]
+  args.resultFilename = resultFilename
+  args.logFilename = logFilename
+  args.prepostList = prepostList
+
+  result = newArgsOrWarning(args)
+
+func `$`*(aw: ArgsOrWarning): string =
+  ## Return a string representation of a ArgsOrWarning object.
+  if aw.kind == awArgs:
+    result = $aw.args
+  else:
+    result = $aw.warningData
 
 # todo: what to do about filenames in multiple places?  result = template = log, etc?
 
 when defined(test):
-  proc parseCommandLine*(env: var Env, cmdLine: string = ""): Args =
+  proc parseCommandLine*(cmdLine: string = ""): ArgsOrWarning =
     let argv = cmdLine.splitWhitespace()
-    result = parseCommandLine(env, argv)
+    result = parseCommandLine(argv)
