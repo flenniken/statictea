@@ -27,17 +27,17 @@ suite "readjson.nim":
 
   test "readJsonFile parse error":
     let content = "{"
-    var valueOrWarning = readJsonContent(content)
+    var valueOrWarning = readJsonString(content)
     check valueOrWarning == newValueOrWarning(wJsonParseError)
 
   test "readJsonFile no root object":
     let content = "[5]"
-    var valueOrWarning = readJsonContent(content)
+    var valueOrWarning = readJsonString(content)
     check valueOrWarning == newValueOrWarning(wInvalidJsonRoot)
 
   test "readJsonFile a=5":
     let content = """{"a":5}"""
-    let valueOrWarning = readJsonContent(content)
+    let valueOrWarning = readJsonString(content)
     check valueOrWarning.kind == vwValue
     let str = dictToString(valueOrWarning.value)
     check expectedItem("json", str, content)
@@ -151,7 +151,7 @@ suite "readjson.nim":
   ]
 }"""
     let eStr = """{"teaList":[{"tea":"Chamomile"},{"tea":"Chrysanthemum"},{"tea":"White"},{"tea":"Puer"}]}"""
-    let valueOrWarning = readJsonContent(content)
+    let valueOrWarning = readJsonString(content)
     check valueOrWarning.kind == vwValue
     let str = dictToString(valueOrWarning.value)
     check expectedItem("read json", str, eStr)
@@ -168,7 +168,7 @@ suite "readjson.nim":
 }
 """ % [string256]
     let eStr = """{"longString":"123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456"}"""
-    let valueOrWarning = readJsonContent(content)
+    let valueOrWarning = readJsonString(content)
     check valueOrWarning.kind == vwValue
     let str = dictToString(valueOrWarning.value)
     check expectedItem("read json", str, eStr)
@@ -197,7 +197,7 @@ she sat down in a large arm-chair at one end of the table.
 }
 """ % [teaParty]
     let eStr = """{"longString":"CHAPTER VII.\nA Mad Tea-Party\n\nThere was a table set out under a tree in front of the house, and the\nMarch Hare and the Hatter were having tea at it: a Dormouse was\nsitting between them, fast asleep, and the other two were using it as\na cushion, resting their elbows on it, and talking over its\nhead. “Very uncomfortable for the Dormouse,” thought Alice; “only, as\nit’s asleep, I suppose it doesn’t mind.”\n\nThe table was a large one, but the three were all crowded together at\none corner of it: “No room! No room!” they cried out when they saw\nAlice coming. “There’s plenty of room!” said Alice indignantly, and\nshe sat down in a large arm-chair at one end of the table.\n"}"""
-    let valueOrWarning = readJsonContent(content)
+    let valueOrWarning = readJsonString(content)
     check valueOrWarning.kind == vwValue
     let str = dictToString(valueOrWarning.value)
     check expectedItem("read json", str, eStr)
@@ -209,7 +209,7 @@ she sat down in a large arm-chair at one end of the table.
 }
 """
     let eStr = """{"str":"this is \"quoted\""}"""
-    let valueOrWarning = readJsonContent(content)
+    let valueOrWarning = readJsonString(content)
     check valueOrWarning.kind == vwValue
     let str = dictToString(valueOrWarning.value)
     check expectedItem("read json", str, eStr)
@@ -225,7 +225,7 @@ she sat down in a large arm-chair at one end of the table.
   "list": [1, 2, 3]
 }"""
     let eStr = """{"d":{"a":45,"b":"banana","f":2.5},"list":[1,2,3]}"""
-    var valueOrWarning = readJsonContent(content)
+    var valueOrWarning = readJsonString(content)
     check valueOrWarning.kind == vwValue
     var str = dictToString(valueOrWarning.value)
     check expectedItem("read json mix", str, eStr)

@@ -1,4 +1,4 @@
-## Read json files.
+## Read json content.
 
 import std/streams
 import std/os
@@ -10,9 +10,7 @@ import tpub
 import vartypes
 
 # todo: test the the order is preserved.
-# todo: test that the last duplicate wins.
 
-# todo: increase the depth limit and document it. Make it a parameter?
 var depth_limit = 3
 
 proc jsonToValue(jsonNode: JsonNode, depth: int = 0): Option[Value] {.tpub.} =
@@ -29,8 +27,10 @@ proc jsonToValue(jsonNode: JsonNode, depth: int = 0): Option[Value] {.tpub.} =
   of JBool:
     value = Value(kind: vkInt, intv: if jsonNode.getBool(): 1 else: 0)
   of JInt:
+    # todo: range check int to 64 bit.
     value = Value(kind: vkInt, intv: jsonNode.getInt())
   of JFloat:
+    # todo: range check float to 64 bit.
     value = Value(kind: vkFloat, floatv: jsonNode.getFloat())
   of JString:
     value = Value(kind: vkString, stringv: jsonNode.getStr())
@@ -50,7 +50,7 @@ proc jsonToValue(jsonNode: JsonNode, depth: int = 0): Option[Value] {.tpub.} =
     value = Value(kind: vkList, listv: listVars)
   result = some(value)
 
-proc readJsonContent*(stream: Stream, filename: string = ""): ValueOrWarning =
+proc readJsonStream*(stream: Stream, filename: string = ""): ValueOrWarning =
   ## Read a json stream and return the variables.  If there is an
   ## error, return a warning. The filename is used in warning
   ## messages.
@@ -64,7 +64,7 @@ proc readJsonContent*(stream: Stream, filename: string = ""): ValueOrWarning =
   except:
     return newValueOrWarning(wJsonParseError, filename)
 
-  # todo: allow any kind of object?
+  # todo: allow any kind of object.
   if rootNode.kind != JObject:
     return newValueOrWarning(wInvalidJsonRoot, filename)
 
@@ -76,17 +76,16 @@ proc readJsonContent*(stream: Stream, filename: string = ""): ValueOrWarning =
 
   result = newValueOrWarning(newValue(dict))
 
-proc readJsonContent*(content: string, filename: string = ""): ValueOrWarning =
+proc readJsonString*(content: string, filename: string = ""): ValueOrWarning =
   ## Read a json string and return the variables.  If there is an
   ## error, return a warning. The filename is used in warning
   ## messages.
   var stream = newStringStream(content)
-  result = readJsonContent(stream, filename)
+  result = readJsonStream(stream, filename)
 
 proc readJsonFile*(filename: string): ValueOrWarning =
-  ## Read a json string and return the variables.  If there is an
-  ## error, return a warning. The filename is used in warning
-  ## messages.
+  ## Read a json file and return the variables.  If there is an
+  ## error, return a warning.
 
   if not fileExists(filename):
     return newValueOrWarning(wFileNotFound, filename)
@@ -96,11 +95,12 @@ proc readJsonFile*(filename: string): ValueOrWarning =
   if stream == nil:
     return newValueOrWarning(wUnableToOpenFile, filename)
 
-  result = readJsonContent(stream, filename)
+  result = readJsonStream(stream, filename)
 
 proc readJsonFiles*(filenames: seq[string]): ValueOrWarning =
-  ## Read the json files and return the variables in one
-  ## dictionary. The last file wins on duplicates.
+  ## Read json files and return the variables. If there is an error,
+  ## return a warning. A duplicate variable is skipped and it
+  ## generates a warning.
 
   var varsDict = newVarsDict()
   for filename in filenames:
@@ -112,4 +112,5 @@ proc readJsonFiles*(filenames: seq[string]): ValueOrWarning =
     for k, v in valueOrWarning.value.dictv.pairs:
       varsDict[k] = v
 
+  # todo: geneate a warning on duplicate variables.
   result = newValueOrWarning(newValue(varsDict))

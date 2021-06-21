@@ -1,36 +1,36 @@
 # readjson.nim
 
-Read json files.
+Read json content.
 
 * [readjson.nim](../src/readjson.nim) &mdash; Nim source code.
 # Index
 
-* [readJsonContent](#readjsoncontent) &mdash; Read a json stream and return the variables.
-* [readJsonContent](#readjsoncontent) &mdash; Read a json string and return the variables.
-* [readJsonFile](#readjsonfile) &mdash; Read a json string and return the variables.
-* [readJsonFiles](#readjsonfiles) &mdash; Read the json files and return the variables in one dictionary.
+* [readJsonStream](#readjsonstream) &mdash; Read a json stream and return the variables.
+* [readJsonString](#readjsonstring) &mdash; Read a json string and return the variables.
+* [readJsonFile](#readjsonfile) &mdash; Read a json file and return the variables.
+* [readJsonFiles](#readjsonfiles) &mdash; Read json files and return the variables.
 
-# readJsonContent
+# readJsonStream
 
 Read a json stream and return the variables.  If there is an error, return a warning. The filename is used in warning messages.
 
 ```nim
-proc readJsonContent(stream: Stream; filename: string = ""): ValueOrWarning
+proc readJsonStream(stream: Stream; filename: string = ""): ValueOrWarning
 ```
 
 
-# readJsonContent
+# readJsonString
 
 Read a json string and return the variables.  If there is an error, return a warning. The filename is used in warning messages.
 
 ```nim
-proc readJsonContent(content: string; filename: string = ""): ValueOrWarning
+proc readJsonString(content: string; filename: string = ""): ValueOrWarning
 ```
 
 
 # readJsonFile
 
-Read a json string and return the variables.  If there is an error, return a warning. The filename is used in warning messages.
+Read a json file and return the variables.  If there is an error, return a warning.
 
 ```nim
 proc readJsonFile(filename: string): ValueOrWarning
@@ -39,7 +39,7 @@ proc readJsonFile(filename: string): ValueOrWarning
 
 # readJsonFiles
 
-Read the json files and return the variables in one dictionary. The last file wins on duplicates.
+Read json files and return the variables. If there is an error, return a warning. A duplicate variable is skipped and it generates a warning.
 
 ```nim
 proc readJsonFiles(filenames: seq[string]): ValueOrWarning

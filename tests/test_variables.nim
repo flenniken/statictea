@@ -75,7 +75,7 @@ suite "variables.nim":
   }
 }
 """
-    var valueOrWarning = readJsonContent(content)
+    var valueOrWarning = readJsonString(content)
     check valueOrWarning.kind == vwValue
     # var str = dictToString(valueOrWarning.value)
     # echo str
@@ -149,7 +149,7 @@ suite "variables.nim":
  "version": 10
 }
 """
-    var valueOrWarning = readJsonContent(variablesJson)
+    var valueOrWarning = readJsonString(variablesJson)
     check valueOrWarning.kind == vwValue
     var variables = valueOrWarning.value.dictv
     let beforeJson = valueToString(valueOrWarning.value)
@@ -161,7 +161,7 @@ suite "variables.nim":
   test "resetVariables with server":
     # Make sure the server variables are untouched after reset.
     let server = """{"a": 2}"""
-    var valueOrWarning = readJsonContent(server)
+    var valueOrWarning = readJsonString(server)
     check valueOrWarning.kind == vwValue
     var variables = emptyVariables()
     variables["s"] = valueOrWarning.value
@@ -171,7 +171,7 @@ suite "variables.nim":
   test "resetVariables with shared":
     # Make sure the shared variables are untouched after reset.
     let shared = """{"a": 2}"""
-    var valueOrWarning = readJsonContent(shared)
+    var valueOrWarning = readJsonString(shared)
     check valueOrWarning.kind == vwValue
     var variables = emptyVariables()
     variables["h"] = valueOrWarning.value
@@ -181,7 +181,7 @@ suite "variables.nim":
   test "resetVariables with global":
     # Make sure the global variables are untouched after reset.
     let global = """{"a": 2}"""
-    var valueOrWarning = readJsonContent(global)
+    var valueOrWarning = readJsonString(global)
     check valueOrWarning.kind == vwValue
     var variables = emptyVariables()
     variables["g"] = valueOrWarning.value
