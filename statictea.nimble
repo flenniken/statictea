@@ -3,6 +3,7 @@ import std/strutils
 import std/json
 import std/nre
 import std/strformat
+import std/sets
 include src/version
 include src/dot
 
@@ -280,6 +281,75 @@ proc createDependencyGraph() =
   exec "dot -Tsvg src/dot.dot -o docs/staticteadep.svg"
   echo "Generated docs/staticteadep.svg"
 
+proc createDependencyGraph2() =
+  ## Create a dependency dot file from the StaticTea source. Show the
+  ## the nim system modules on the left and the StaticTea modules on
+  ## the right.
+
+  # Create a dot file of all the import dependencies.
+  exec "nim --hints:off genDepend src/statictea.nim"
+  echo "Generated src/statictea.dot"
+  rmFile("src/statictea.png")
+  rmFile("statictea.deps")
+
+  # Create a dictionary of all the statictea source filenames.
+  let sourceNames = get_source_filenames(noExt = true)
+  var sourceNamesSet = toHashSet(sourceNames)
+
+  # Read the dot file into a sequence of left and right values.
+  let dotFilename = "src/statictea.dot"
+  let dotDepends = readDotFile(dotFilename)
+
+  # Switch the dependencies so the nim system modules are on the left
+  # and the statictea modules are on the right.
+  var dependencies: seq[Dependency]
+  for dependency in dotDepends:
+    let left = dependency.right
+    let right = dependency.left
+    if not (left in sourceNamesSet) and (right in sourceNamesSet):
+      dependencies.add(newDependency(left, right))
+
+  # Count the number of modules the left module imports.
+  var nameCount = initTable[string, int]()
+  for dependency in dependencies:
+    let left = dependency.left
+    var count: int
+    if left in nameCount:
+      count = nameCount[left] + 1
+    else:
+      count = 1
+    nameCount[left] = count
+
+  # Create a dot file with formatting.
+  var dotText = """digraph statictea {
+  ratio=.5;
+  size="10";
+"""
+  for dependency in dependencies:
+    let left = dependency.left
+    var extra: string
+    if nameCount[left] == 1:
+      # tree leaves
+      extra = "shape=doubleoctagon, fillcolor=palegreen, style=filled"
+    let attrs = fmt"{left} [fontsize=24; {extra}];" & "\n"
+    dotText.add(attrs)
+    dotText.add("$1 -> \"$2\";\n" % [dependency.left, dependency.right])
+  dotText.add("}\n")
+
+  # Create an svg file from the new dot file.
+  let dotDotFilename = "src/dot2.dot"
+  writeFile(dotDotFilename, dotText)
+  echo "Generated $1" % dotDotFilename
+  exec "dot -Tsvg src/dot2.dot -o docs/staticteadep2.svg"
+  echo "Generated docs/staticteadep2.svg"
+
+proc echoGrip() =
+  echo """
+The grip app is good for viewing gitlab markdown.
+  grip --quiet docs/index.md &
+  http://localhost:6419/index.md
+"""
+
 # Tasks below
 
 task n, "\tShow available tasks.":
@@ -349,11 +419,7 @@ task docs, "\tCreate markdown docs; specify part of source filename.":
       echo "Remove $1" % [jsonName]
       rmFile(jsonName)
 
-  echo """
-The grip app is good for viewing gitlab markdown.
-  grip --quiet docs/index.md &
-  http://localhost:6419/index.md
-"""
+  echoGrip()
 
 task docsix, "\tCreate markdown docs index.":
 
@@ -371,11 +437,7 @@ task docsix, "\tCreate markdown docs index.":
 
   rmFile(jsonFilename)
   echo "Generated docs/index.md"
-  echo """
-The grip app is good for viewing gitlab markdown.
-  grip --quiet docs/index.md &
-  http://localhost:6419/index.md
-"""
+  echoGrip()
 
 task json, "\tDisplay markdown docs json; specify part of name.":
   let count = system.paramCount()+1
@@ -438,14 +500,21 @@ task readmefun, "Create readme function section.":
 task dot, "\tCreate a dependency graph of the StaticTea source.":
   createDependencyGraph()
 
+  echoGrip()
   echo """
-
-The grip app is good for viewing gitlab markdown.
-  grip --quiet docs/index.md &
-  http://localhost:6419/index.md
 
 View the svg file in your browser:
   http://localhost:6419/staticteadep.svg
+"""
+
+task dot2, "\tCreate a dependency graph system modules used by StaticTea.":
+  createDependencyGraph2()
+
+  echoGrip()
+  echo """
+
+View the svg file in your browser:
+  http://localhost:6419/staticteadep2.svg
 """
 
 task tt, "\tCompile and run t.nim.":

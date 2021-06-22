@@ -74,6 +74,7 @@ func `$`*(funResult: FunResult): string =
       $funResult.warningData, $funResult.parameter
     ]
 
+# todo: create a utf8 module for this.
 func cmpString*(a, b: string, insensitive: bool = false): int =
   ## Compares two utf8 strings a and b.  When a equals b return 0,
   ## when a is greater than b return 1 and when a is less than b
@@ -1088,6 +1089,7 @@ func funReplaceRe*(parameters: seq[Value]): FunResult =
     if value.kind != vkString:
       return newFunResultWarn(wExpectedString, ix+1)
 
+  # todo: make function and move to regexes.
   var subs: seq[tuple[pattern: Regex, repl: string]]
   for ix in countUp(0, theList.len-1, 2):
     subs.add((re(theList[ix].stringv), theList[ix+1].stringv))

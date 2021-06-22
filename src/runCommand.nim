@@ -230,6 +230,7 @@ proc getString*(env: var Env, prepostTable: PrepostTable,
   let (s1, s2) = matches.get2Groups()
   var str = if (s1 == ""): s2 else: s1
 
+  # todo: move this to a utf8 module?
   # Validate the utf-8 bytes.
   var pos = validateUtf8(str)
   if pos != -1:
