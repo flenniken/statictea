@@ -287,17 +287,16 @@ proc createDependencyGraph2() =
   ## the right.
 
   # Create a dot file of all the import dependencies.
+  let dotFilename = "src/statictea.dot"
   exec "nim --hints:off genDepend src/statictea.nim"
-  echo "Generated src/statictea.dot"
+  echo fmt"Generated {dotFilename}"
   rmFile("src/statictea.png")
   rmFile("statictea.deps")
 
-  # Create a dictionary of all the statictea source filenames.
-  let sourceNames = get_source_filenames(noExt = true)
-  var sourceNamesSet = toHashSet(sourceNames)
+  # Create a hash set of all the statictea source filenames.
+  var sourceNamesSet = toHashSet(get_source_filenames(noExt = true))
 
   # Read the dot file into a sequence of left and right values.
-  let dotFilename = "src/statictea.dot"
   let dotDepends = readDotFile(dotFilename)
 
   # Switch the dependencies so the nim system modules are on the left
@@ -309,7 +308,7 @@ proc createDependencyGraph2() =
     if not (left in sourceNamesSet) and (right in sourceNamesSet):
       dependencies.add(newDependency(left, right))
 
-  # Count the number of modules the left module imports.
+  # Count the number of modules the left module references.
   var nameCount = initTable[string, int]()
   for dependency in dependencies:
     let left = dependency.left
@@ -323,29 +322,35 @@ proc createDependencyGraph2() =
   # Create a dot file with formatting.
   var dotText = """digraph statictea {
   rankdir=LR;
-  ratio=.5;
-  size="10";
+  ranksep="4";
 """
   for dependency in dependencies:
     let left = dependency.left
-    var extra: string
+    var nodetAttrs: string
+    var lineAttrs: string
     if nameCount[left] == 1:
       # tree leaves
-      extra = "shape=doubleoctagon, fillcolor=palegreen, style=filled"
-    let attrs = fmt"{left} [fontsize=24; {extra}];" & "\n"
+      nodetAttrs = "shape=doubleoctagon, fillcolor=palegreen, style=filled"
+    elif nameCount[left] == 2:
+      nodetAttrs = "color=red;"
+      lineAttrs = "color=red;"
+    let attrs = fmt"{left} [fontsize=24; {nodetAttrs}];" & "\n"
     dotText.add(attrs)
-    dotText.add("$1 -> \"$2\";\n" % [dependency.left, dependency.right])
+    dotText.add("$1 -> \"$2\" [$3];\n" % [dependency.left, dependency.right, lineAttrs])
+    # dotText.add(fmt"""{dependency.left} -> "{dependency.right}" [{lineAttrs}];""" & "\n")
   dotText.add("}\n")
 
   # Create an svg file from the new dot file.
-  let dotDotFilename = "src/dot2.dot"
-  writeFile(dotDotFilename, dotText)
-  echo "Generated $1" % dotDotFilename
-  exec "dot -Tsvg src/dot2.dot -o docs/staticteadep2.svg"
-  echo "Generated docs/staticteadep2.svg"
+  let src_dot2_dot = "src/dot2.dot"
+  writeFile(src_dot2_dot, dotText)
+  echo fmt"Generated {src_dot2_dot}"
+  let staticteadep2_svg = "docs/staticteadep2.svg"
+  exec fmt"dot -Tsvg {src_dot2_dot} -o {staticteadep2_svg}"
+  echo fmt"Generated {staticteadep2_svg}"
 
 proc echoGrip() =
   echo """
+
 The grip app is good for viewing gitlab markdown.
   grip --quiet docs/index.md &
   http://localhost:6419/index.md
@@ -513,7 +518,6 @@ task dot2, "\tCreate a dependency graph system modules used by StaticTea.":
 
   echoGrip()
   echo """
-
 View the svg file in your browser:
   http://localhost:6419/staticteadep2.svg
 """
