@@ -52,6 +52,12 @@ type
     length*: Natural
     start*: Natural
 
+  Replacement* = object
+    ## Holds the regular expression and replacement for the replaceMany
+    ## function.
+    pattern*: string
+    sub*: string
+
 func getGroup*(matches: Matches): string =
   ## Get the first group in matches if it exists, else return "".
   if matches.groups.len > 0:
@@ -71,6 +77,7 @@ func get2Groups*(matches: Matches): (string, string) =
 # todo: is there a good way to replace the get groups method with one?
 # todo: add optional parameter to specify regex flags.
 # todo: where is the perl online source?
+# todo: add another parameter for regex flags.
 
 func get3Groups*(matches: Matches): (string, string, string) =
   ## Get the first three groups in matches. If one of the groups doesn't
@@ -125,6 +132,18 @@ proc matchPatternCached*(str: string, pattern: string, start: Natural = 0): Opti
 func matchPattern*(str: string, pattern: string, start: Natural = 0): Option[Matches] =
   ## Match a regular expression pattern in a string.
   result = matchRegex(str, re(pattern), start)
+
+func newReplacement*(pattern: string, sub: string): Replacement =
+  ## Create a new Replacement object.
+  result = Replacement(pattern: pattern, sub: sub)
+
+proc replaceMany*(str: string, replacements: seq[Replacement]): string =
+  ## Replace the patterns in the string with their replacements.
+  
+  var subs: seq[tuple[pattern: Regex, repl: string]]
+  for r in replacements:
+    subs.add((re(r.pattern), r.sub))
+  result = multiReplace(str, subs)
 
 when defined(test):
   proc testMatchPattern*(str: string, pattern: string, start: Natural = 0,

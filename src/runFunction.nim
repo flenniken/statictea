@@ -7,7 +7,6 @@ import std/tables
 import std/unicode
 import std/strutils
 import std/math
-import std/re
 import std/os
 import std/algorithm
 import warnings
@@ -306,7 +305,7 @@ func funGet*(parameters: seq[Value]): FunResult =
     else:
       return newFunResultWarn(wExpectedListOrDict)
 
-# todo: remove the if.  Use case instead.
+# todo: remove the if.  Use case instead. Rename case to if?
 func funIf*(parameters: seq[Value]): FunResult =
   ## Return a value based on a condition.
   ## @:
@@ -1027,7 +1026,6 @@ func funReplace*(parameters: seq[Value]): FunResult =
 #     for ix, group in groups:
 #       result["g" & $ix] = newValue(group)
 
-# todo: add another parameter for regex flags.
 func funReplaceRe*(parameters: seq[Value]): FunResult =
   ## Replace multiple parts of a string using regular expressions.
   ## @:
@@ -1089,12 +1087,11 @@ func funReplaceRe*(parameters: seq[Value]): FunResult =
     if value.kind != vkString:
       return newFunResultWarn(wExpectedString, ix+1)
 
-  # todo: make function and move to regexes.
-  var subs: seq[tuple[pattern: Regex, repl: string]]
+  var replacements: seq[Replacement]
   for ix in countUp(0, theList.len-1, 2):
-    subs.add((re(theList[ix].stringv), theList[ix+1].stringv))
+    replacements.add(newReplacement(theList[ix].stringv, theList[ix+1].stringv))
+  let resultString = replaceMany(str, replacements)
 
-  let resultString = multiReplace(str, subs)
   result = newFunResult(newValue(resultString))
 
 func funPath*(parameters: seq[Value]): FunResult =
