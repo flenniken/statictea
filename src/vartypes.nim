@@ -1,7 +1,6 @@
 ## StaticTea variable types.
 
 import std/tables
-import std/json
 import warnings
 
 type

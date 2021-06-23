@@ -4,7 +4,6 @@
 
 import std/options
 import std/tables
-import std/unicode
 import std/strutils
 import std/math
 import std/os
@@ -15,6 +14,7 @@ import regexes
 import parseNumber
 import matches
 import tostring
+import unicodes
 
 type
   FunctionPtr* = proc (parameters: seq[Value]): FunResult {.noSideEffect.}
@@ -72,33 +72,6 @@ func `$`*(funResult: FunResult): string =
     result = "warning: $1: $2" % [
       $funResult.warningData, $funResult.parameter
     ]
-
-# todo: create a utf8 module for this.
-func cmpString*(a, b: string, insensitive: bool = false): int =
-  ## Compares two utf8 strings a and b.  When a equals b return 0,
-  ## when a is greater than b return 1 and when a is less than b
-  ## return -1. Optionally ignore case.
-  var i = 0
-  var j = 0
-  var ar, br: Rune
-  var ret: int
-  while i < a.len and j < b.len:
-    fastRuneAt(a, i, ar)
-    fastRuneAt(b, j, br)
-    if insensitive:
-      ar = toLower(ar)
-      br = toLower(br)
-    ret = int(ar) - int(br)
-    if ret != 0:
-      break
-  if ret == 0:
-    ret = a.len - b.len
-  if ret < 0:
-    result = -1
-  elif ret > 0:
-    result = 1
-  else:
-    result = 0
 
 func cmpBaseValues*(a, b: Value, insensitive: bool = false): int =
   ## Compares two values a and b.  When a equals b return 0, when a is
@@ -228,7 +201,7 @@ func funLen*(parameters: seq[Value]): FunResult =
   let value = parameters[0]
   case value.kind
     of vkString:
-      retValue = newValue(runeLen(value.stringv))
+      retValue = newValue(stringLen(value.stringv))
     of vkList:
       retValue = newValue(value.listv.len)
     of vkDict:
@@ -1435,24 +1408,7 @@ func funGithubAnchor*(parameters: seq[Value]): FunResult =
     return newFunResultWarn(wExpectedString)
   var name = parameters[0].stringv
 
-  # Rules:
-  # * lowercase letters
-  # * change whitespace to hyphens
-  # * allow ascii digits or hyphens
-  # * drop other characters
-
-  var anchorRunes = newSeq[Rune]()
-  for rune in runes(name):
-    if isAlpha(rune): # letters
-      anchorRunes.add(toLower(rune))
-    elif isWhiteSpace(rune):
-      anchorRunes.add(toRunes("-")[0])
-    elif rune.uint32 < 128: # ascii
-      let ch = toUTF8(rune)[0]
-      if isDigit(ch) or ch == '-':
-        anchorRunes.add(rune)
-
-  let anchorName = $anchorRunes
+  let anchorName = githubAnchor(name)
   result = newFunResult(newValue(anchorName))
 
 const

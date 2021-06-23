@@ -1,7 +1,6 @@
 ## Run a command.
 
 import std/options
-import std/unicode
 import std/strUtils
 import parseCmdLine
 import readLines
@@ -14,6 +13,7 @@ import warnings
 import parseNumber
 import variables
 import runFunction
+import unicodes
 
 type
   State = enum
@@ -230,11 +230,10 @@ proc getString*(env: var Env, prepostTable: PrepostTable,
   let (s1, s2) = matches.get2Groups()
   var str = if (s1 == ""): s2 else: s1
 
-  # todo: move this to a utf8 module?
   # Validate the utf-8 bytes.
-  var pos = validateUtf8(str)
-  if pos != -1:
-    env.warnStatement(statement, wInvalidUtf8, start + pos + 1)
+  var posO = firstInvalidUtf8(str)
+  if posO.isSome:
+    env.warnStatement(statement, wInvalidUtf8, start + posO.get() + 1)
     return
 
   let value = Value(kind: vkString, stringv: str)

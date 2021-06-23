@@ -13,6 +13,7 @@ import vartypes
 import variables
 import warnings
 import version
+import tostring
 
 proc startPointer*(start: Natural): string =
   ## Return a string containing the number of spaces and symbols to
