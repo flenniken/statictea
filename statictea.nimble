@@ -322,6 +322,7 @@ proc createDependencyGraph2() =
 
   # Create a dot file with formatting.
   var dotText = """digraph statictea {
+  rankdir=LR;
   ratio=.5;
   size="10";
 """
