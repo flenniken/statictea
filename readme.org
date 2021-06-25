@@ -301,8 +301,7 @@ intensive steps.
 :END:
 
 The continue command allows you to continue adding statements to
-a nextline, block and replace command. You can continue the
-continue command too.
+a nextline, block and replace command.
 
 In the following example the nextline command continues on a
 second line and third line.
@@ -919,7 +918,7 @@ StaticTea. See the [[#cmpversion][cmpVersion]] function for more information.
 StaticTea variable types:
 
 - [[#string][string]]
-- [[#integer][integer]]
+- [[#integer][int]]
 - [[#float][float]]
 - [[#dict][dict]]
 - [[#list][list]]
@@ -958,12 +957,12 @@ result:
 
 [[#contents][茶]]
 
-** Integer
+** Int
 :PROPERTIES:
 :CUSTOM_ID: integer
 :END:
 
-An integer is a 64 bit signed number.  Plus signs are not used
+An int is a 64 bit signed integer.  Plus signs are not used
 with numbers.
 
 Example numbers:
@@ -1006,7 +1005,7 @@ fast lookup. It maps a string key to a value which can be any
 type.
 
 You access dictionary items with variable names or with the get
-function.  You create them in the json files, with the dict
+function.  You create them in the json files or with the dict
 function.
 
 In Json files dictionaries are known as json objects. Json calls
@@ -1379,6 +1378,8 @@ the following process for each module:
 1. create a json file of a module docs using nim's jsondoc command
 2. format the json as markdown using the [[templates/nimModule.md][nimModule.md]] statictea template
 
+[[#contents][茶]]
+
 ** HTML Formatted Json
 :PROPERTIES:
    :CUSTOM_ID: html-formatted-json
@@ -1431,14 +1432,15 @@ t           Run all tests at once.
 test        Run tests; specify part of test filename.
 b           Build the statictea exe.
 docs        Create markdown docs; specify part of source filename.
-json        Display nim's doc json for a source file; specify part of name.
-jsonix      Display the module index json for the source files.
-docsix      Display the doc comment index to the source files.
+docsix      Create markdown docs index.
+json        Display markdown docs json; specify part of name.
+jsonix      Display markdown docs index json.
 readmefun   Create readme function section.
+dot         Create a dependency graph of the StaticTea source.
+dot2        Create a dependency graph system modules used by StaticTea.
 tt          Compile and run t.nim.
 tree        Show the project directory tree.
 args        Show command line arguments.
-dot         Create a dependency graph of the StaticTea source.
 #+END_SRC
 
 [[#contents][茶]]
