@@ -208,9 +208,11 @@ proc readDotFile*(dotFilename: string): seq[Dependency] =
       result.add(dependencyO.get())
 
 proc createDependencyGraph() =
-  ## Create a dependency dot file from statictea.nim and everything it
-  ## references. Run "man dot" for information about the dot format
-  ## and formatting options.
+  ## Create a dependency dot file from statictea.nim modules showing
+  ## the module import dependencies.
+
+  # Run "man dot" for information about the dot format
+  # and formatting options.
 
   # Introduction to the dot language.
   # https://en.wikipedia.org/wiki/DOT_(graph_description_language)
@@ -221,8 +223,9 @@ proc createDependencyGraph() =
   # Add color the node's background and link them to their docs.
   # https://www.graphviz.org/doc/info/colors.html
 
+  let dotFilename = "src/statictea.dot"
   exec "nim --hints:off genDepend src/statictea.nim"
-  echo "Generated src/statictea.dot"
+  echo fmt"Generated {dotFilename}"
   rmFile("src/statictea.png")
   rmFile("statictea.deps")
 
@@ -233,7 +236,6 @@ proc createDependencyGraph() =
     sourceNamesDict[name] = 0
 
   # Read the dot file into a sequence of left and right values.
-  let dotFilename = "src/statictea.dot"
   let dependencies = readDotFile(dotFilename)
 
   # Count the number of modules the source file imports.
@@ -252,8 +254,8 @@ proc createDependencyGraph() =
   # size="14,8";
 
   for name in sourceNames:
-    let url = "URL=\"$1.md\"" % name
-    let tooltip = "tooltip=\"$1.md\"" % name
+    let url = fmt"""URL="{name}.md""""
+    let tooltip = fmt"""tooltip="{name}.md""""
     var extra: string
     var allNodes = "fontsize=24;"
     if sourceNamesDict[name] > 0:
@@ -271,7 +273,7 @@ proc createDependencyGraph() =
   # Generate the connections between the nodes.
   for dependency in dependencies:
     if dependency.left in sourceNamesDict and dependency.right in sourceNamesDict:
-      dotText.add("$1 -> \"$2\";\n" % [dependency.left, dependency.right])
+      dotText.add(fmt"""{dependency.left} -> "{dependency.right}";""" & "\n")
   dotText.add("}\n")
 
   # Create an svg file from the new dot file.
