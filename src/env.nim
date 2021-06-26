@@ -28,7 +28,7 @@ when hostOS == "macosx":
     ## Name of the default statictea log file when logging on the Mac.
 else:
   let staticteaLog* = expandTilde("~/statictea.log")
-    ## Name of the default statictea log file when logging not on the
+    ## Name of the default statictea log file when not logging on the
     ## Mac.
 
 type
@@ -260,7 +260,7 @@ proc addExtraStreams*(env: var Env, args: Args): bool =
 # todo: test where a resultFilename is specified with update.
 # todo: test update with two template filenames.
 # todo: test with template of "stdin" when update is specified.
-# todo: test update when the template is readonly.j
+# todo: test update when the template is readonly.
 
 proc addExtraStreamsForUpdate*(env: var Env, args: Args): bool =
   ## For the update case, add the template and result streams to the

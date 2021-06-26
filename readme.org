@@ -1427,7 +1427,8 @@ n n
 Here is the output:
 
 #+BEGIN_SRC
-n           Show available tasks.
+n           continue command too.
+Show available tasks.
 t           Run all tests at once.
 test        Run tests; specify part of test filename.
 b           Build the statictea exe.

@@ -11,8 +11,6 @@ import env
 when isMainModule:
   import std/os
 
-# todo: add a third option for the find function which is the value to return when not found.
-
 proc processArgs(env: var Env, args: Args): int =
   if args.help:
     env.writeOut(getHelp())

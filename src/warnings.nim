@@ -7,8 +7,8 @@ type
   WarningData* = object
     ## Warning number and optional extra strings.
     warning*: Warning   ## Warning message id.
-    p1*: string         ## Extra warning info.
-    p2*: string         ## Extra warning info.
+    p1*: string         ## Optional warning info.
+    p2*: string         ## Optional warning info.
 
   Warning* = enum
     ## Warning numbers.

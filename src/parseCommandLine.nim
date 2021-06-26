@@ -6,8 +6,6 @@ import tpub
 import args
 import warnings
 import regexes
-when defined(test):
-  import std/strutils
 
 const
   fileLists = ["server", "shared", "template"]
@@ -183,8 +181,3 @@ func `$`*(aw: ArgsOrWarning): string =
     result = $aw.warningData
 
 # todo: what to do about filenames in multiple places?  result = template = log, etc?
-
-when defined(test):
-  proc parseCommandLine*(cmdLine: string = ""): ArgsOrWarning =
-    let argv = cmdLine.splitWhitespace()
-    result = parseCommandLine(argv)

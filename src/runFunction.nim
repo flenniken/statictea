@@ -48,6 +48,11 @@ func newFunResultWarn*(warning: Warning, parameter: Natural = 0,
   result = FunResult(kind: frWarning, parameter: parameter,
                      warningData: warningData)
 
+func newFunResultWarn*(warningData: Warningdata, parameter: Natural = 0): FunResult =
+  ## Return a new FunResult object containing a warning.
+  result = FunResult(kind: frWarning, parameter: parameter,
+                     warningData: warningData)
+
 func newFunResult*(value: Value): FunResult =
   ## Return a new FunResult object containing a value.
   result = FunResult(kind: frValue, value: value)
@@ -72,6 +77,29 @@ func `$`*(funResult: FunResult): string =
     result = "warning: $1: $2" % [
       $funResult.warningData, $funResult.parameter
     ]
+
+
+func checkParameters(signature: string, parameters: seq[Value]): Option[FunResult] =
+  ## Check that the parameters match the signature for number of
+  ## parameters and their types. Return a FunResult object containing
+  ## a warning when the signature does not match.
+  if parameters.len() != 1:
+    return some(newFunResultWarn(wOneParameter))
+
+  if parameters[0].kind != vkString:
+    return some(newFunResultWarn(wExpectedString))
+
+template tCheckParameters(signature: string, parameters: seq[Value]) =
+  let warnResultO = checkParameters(signature, parameters)
+  if warnResultO.isSome:
+    return warnResultO.get()
+
+template tSetParameterNames(signature: string, parameters: seq[Value]) =
+  let name {.inject.} = parameters[0].stringv
+
+template tCheckParametersSetNames(signature: string, parameters: seq[Value]) =
+  tCheckParameters(signature, parameters)
+  tSetParameterNames(signature, parameters)
 
 func cmpBaseValues*(a, b: Value, insensitive: bool = false): int =
   ## Compares two values a and b.  When a equals b return 0, when a is
@@ -1372,8 +1400,6 @@ func funSort*(parameters: seq[Value]): FunResult =
   let newList = sorted(list, sortCmpValues, sortOrder)
   result = newFunResult(newValue(newList))
 
-# todo: pass a list of names to githubAnchor and return a list of anchor names.
-
 func funGithubAnchor*(parameters: seq[Value]): FunResult =
   ## Create a Github markdown anchor name given a heading name.  If
   ## @:you have duplicate heading names, the anchor name returned only
@@ -1395,18 +1421,7 @@ func funGithubAnchor*(parameters: seq[Value]): FunResult =
   ## @:# {entry.name}
   ## @:~~~~
 
-  # You can test how well it matches github's algorithm by
-  # inspecting the html code it generates.  Inspect the headings.
-  #
-  # The code that creates the anchors is here:
-  # https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/toc_filter.rb
-
-  if parameters.len() != 1:
-    return newFunResultWarn(wOneParameter)
-
-  if parameters[0].kind != vkString:
-    return newFunResultWarn(wExpectedString)
-  var name = parameters[0].stringv
+  tCheckParametersSetNames("(name: string) string", parameters)
 
   let anchorName = githubAnchor(name)
   result = newFunResult(newValue(anchorName))
@@ -1438,6 +1453,8 @@ const
     ("sort", funSort),
     ("githubAnchor", funGithubAnchor),
   ]
+
+# todo: add function where you specify a list of names and it returns a list of anchor names.
 
 proc getFunction*(functionName: string): Option[FunctionPtr] =
   ## Look up a function by its name.

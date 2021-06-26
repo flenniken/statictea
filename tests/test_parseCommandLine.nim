@@ -8,6 +8,10 @@ import parseCommandLine
 import env
 import warnings
 
+proc parseCommandLine*(cmdLine: string = ""): ArgsOrWarning =
+  let argv = cmdLine.splitWhitespace()
+  result = parseCommandLine(argv)
+
 func `$`(prepostList: seq[Prepost]): string =
   var parts: seq[string]
   for pp in prepostList:

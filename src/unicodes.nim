@@ -44,6 +44,13 @@ func stringLen*(str: string): Natural =
 
 func githubAnchor*(name: string): string =
   ## Convert the name to a github anchor name.
+
+  # You can test how well it matches github's algorithm by
+  # inspecting the html code it generates.  Inspect the headings.
+  #
+  # The code that creates the anchors is here:
+  # https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/toc_filter.rb
+  #
   # Rules:
   # * lowercase letters
   # * change whitespace to hyphens
