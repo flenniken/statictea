@@ -25,6 +25,7 @@ proc testFunction(functionName: string, parameters: seq[Value],
 
   let funResult = function(parameters)
 
+  # todo: remove env.
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
   if not expectedItem("funResult", funResult, eFunResult):
