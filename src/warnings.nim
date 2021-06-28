@@ -129,6 +129,8 @@ type
     wSubListsEmpty,        # w114
     wSubListsDiffTypes,    # w115
     kMaxWarnings,          # w116
+    kInvalidSignature,     # w117
+    kInvalidParamType,     # w118
 
 const
     # The list of warnings. Add new messages to the bottom and do not
@@ -250,7 +252,9 @@ const
       "The sort key values are different types.", # wKeyValueKindDiff
       "A sublist is empty.", # wSubListsEmpty
       "The first item in the sublists are different types.", # wSubListsDiffTypes
-      "Reached the maximum number of warnings, suppressing the rest.", #kMaxWarnings
+      "Reached the maximum number of warnings, suppressing the rest.", # kMaxWarnings
+      "Invalid signature string.", # kInvalidSignature
+      "Invalid parameter type.", # kInvalidParamType
     ]
 
 func getWarning*(filename: string, lineNum: int,
