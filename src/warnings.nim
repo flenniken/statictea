@@ -131,6 +131,10 @@ type
     kMaxWarnings,          # w116
     kInvalidSignature,     # w117
     kInvalidParamType,     # w118
+    kNotEnoughArgs,        # w119
+    kWrongType,            # w120
+    kNoVarargArgs,         # w121
+    kNotEnoughVarargs,     # w122
 
 const
     # The list of warnings. Add new messages to the bottom and do not
@@ -255,6 +259,10 @@ const
       "Reached the maximum number of warnings, suppressing the rest.", # kMaxWarnings
       "Invalid signature string.", # kInvalidSignature
       "Invalid parameter type.", # kInvalidParamType
+      "Not enough parameters, expected $1 got $2.", # kNotEnoughArgs
+      "Wrong parameter type, expected $1 got $2.", # kWrongType
+      "The required vararg parameter has no arguments.", # kNoVarargArgs
+      "Expected $1 varargs got $2.", # kNotEnoughVarargs
     ]
 
 func getWarning*(filename: string, lineNum: int,

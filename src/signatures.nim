@@ -1,40 +1,82 @@
 ## Statictea function signatures and parameter checking.
 
+import std/tables
 import vartypes
 import funtypes
 import options
 import warnings
-import regexes
+# import regexes
 import strformat
 import strutils
+# import tostring
+
+#[
+
+We prefer the term parameter to mean information that is passed to a
+function. However, inside a function we use parameter for the
+variables in the function signature and argument as the values sent to
+the function when called.
+
+]#
+
+const
+  singleCodes = {'i', 'f', 's', 'l', 'd', 'a'}
+  varargCodes = {'I', 'F', 'S', 'L', 'D', 'A'}
 
 type
-  ParamType* = enum
-    ## The parameter types.
-    ptInt = "int",
-    ptFloat = "float",
-    ptString = "string",
-    ptList = "list",
-    ptDict = "dict",
-    ptAny = "any"
+  ParamType* = char
+    # Parameter type, one character of ifsldaIFSLDA.
 
   Param* = object
-    ## Holds parameter attributes.
+    ## Holds attributes for one parameter.
     name*: string
-      ## The name of the parmeter. "result" is use for the function's
-      ## return parameter.
+      ## The name of the parameter.
     paramTypes*: seq[ParamType]
-      ## Varargs can have multiple types.
+      ## The type of the parameter(s). Varargs can have multiple types.
     optional*: bool
+      ## Whether this is an optional parameter.
     varargs*: bool
+      ## Whether this is a varargs parameter.
+    returnType*: bool
+      ## Whether this is a return parameter.
 
-func newParam*(name: string, optional: bool, varargs: bool,
+type
+  ShortName* = object
+    ## Object to hold the state for ShortName.next.
+    ix: int
+
+func newParam*(name: string, optional: bool, varargs: bool, returnType: bool,
     paramTypes: seq[Paramtype]): Param =
+  ## Create a new Param object.
   result = Param(name: name, optional: optional, varargs: varargs,
-                 paramTypes: paramTypes)
+                 returnType: returnType, paramTypes: paramTypes)
+
+func isSignatureCodeValid*(signatureCode: string): bool =
+  ## Return true when the signature code is valid.
+  # todo: create regex to validate a signature code.
+  result = true
+
+func paramTypeString*(paramType: ParamType): string =
+  ## Return a string representation of a ParamType object.
+  case toLowerAscii(paramType):
+  of 'i':
+    result = "int"
+  of 'f':
+    result = "float"
+  of 's':
+    result = "string"
+  of 'l':
+    result = "list"
+  of 'd':
+    result = "dict"
+  of 'a':
+    result = "any"
+  else:
+    assert false, "Invalid paramType."
+    discard
 
 func `$`*(param: Param): string =
-  ## Return a string representation of a Param's type.
+  ## Return a string representation of a Param object.
   var optional: string
   if param.optional:
     optional = "optional "
@@ -42,256 +84,237 @@ func `$`*(param: Param): string =
     optional = ""
   if param.varargs:
     # name: varargs(int, string)
-    let paramTypes = join(param.paramTypes, ", ")
+    var types: seq[string]
+    for paramType in param.paramTypes:
+      types.add(paramTypeString(paramType))
+    let paramTypes = join(types, ", ")
     result = fmt"{param.name}: {optional}varargs({paramTypes})"
+  elif param.returnType:
+    result = paramTypeString(param.paramTypes[0])
   else:
     # name: int
-    result = fmt"{param.name}: {optional}{param.paramTypes[0]}"
+    let typeString = paramTypeString(param.paramTypes[0])
+    result = fmt"{param.name}: {optional}{typeString}"
 
-func codeToParamType*(code: char): ParamType =
-  case code:
+func sameType*(paramType: ParamType, valueKind: ValueKind): bool =
+  ## Check whether the param type is the same type or compatible with
+  ## the value.
+
+  case toLowerAscii(paramType):
+    of 'a':
+      return true
     of 'i':
-      result = ptInt
+      if valueKind == vkInt:
+        return true
     of 'f':
-      result = ptFloat
+      if valueKind == vkFloat:
+        return true
     of 's':
-      result = ptString
+      if valueKind == vkString:
+        return true
     of 'l':
-      result = ptList
+      if valueKind == vkList:
+        return true
     of 'd':
-      result = ptDict
+      if valueKind == vkDict:
+        return true
     else:
-      result = ptAny
+      assert false, "Invalid paramType"
+      discard
 
-proc matchInsideAndReturn*(line: string): Option[Matches] =
-  ## Match a signature like: (a: int, b: int) int.  Return two groups:
-  ## "a: int, b: int" and "int"
-  let pattern = r"^\(([^\)]*)\)\s(.*)"
-  result = matchPatternCached(line, pattern)
+func parmsToSignature*(params: seq[Param]): string =
+  var inside: string
+  if params.len > 1:
+    inside = join(params[0 .. params.len-2], ", ")
+  let returnType = $params[params.len-1]
+  result = fmt"({inside}) {returnType}"
 
-proc matchParamName*(line: string): Option[Matches] =
-  let pattern = r"^[a-zA-Z][a-zA-Z0-9_]{0,63}$"
-  result = matchPatternCached(line, pattern)
+# These are for working with signature strings.
+# proc matchInsideAndReturn*(line: string): Option[Matches] =
+#   ## Match a signature like: (a: int, b: int) int.  Return two groups:
+#   ## "a: int, b: int" and "int"
+#   let pattern = r"^\(([^\)]*)\)\s(.*)"
+#   result = matchPatternCached(line, pattern)
 
-# func parseSignature*(signature: string): Option[seq[Param]] =
-#   ## Parse the function signature and return a list of Param objects
-#   ## containing the parameter details.
+# proc matchParamName*(line: string): Option[Matches] =
+#   let pattern = r"^[a-zA-Z][a-zA-Z0-9_]{0,63}$"
+#   result = matchPatternCached(line, pattern)
 
-#   # add: (nums: varargs(int)): int
-#   # add: (nums: varargs(float)): float
-#   # cmp: (a: int, b: int) int
-#   # cmp: (a: float, b: float) int
-#   # cmp: (a: string , b: string, insensitive: optional int) int
-#   # dup: (str: string, count: int) string
-#   # dict: (varargs[string, any]) dict
-#   # case: (mainCondition: int, cases: vararg[int, any], default: optional any) any
+# func getParameters*(parameters: seq[Value], start: int, count: int): Option[seq[Value]] =
+#   ## Return the number of parameters specified by count starting at
+#   ## start index, if there are enough left.
+#   if start < 0 or count <= 0 or start + count > parameters.len:
+#     return
+#   result = some(parameters[start .. start + count - 1])
 
-#   var matchO = matchInsideAndReturn(signature)
-#   if not matchO.isSome():
-#     return some(newFunResultWarn(kInvalidSignature))
+proc next*(letterName: var ShortName): string =
+  ## Get the next unique single letter name. It returns names a, b, c,
+  ## ..., z then repeats a0, b0, c0,....
 
-#   result = seq[Param]
-#   let match = matchO.get()
-#   let (inside, returnTypeString) = match.get2Groups()
-#   let insideParts = inside.split(',')
-#   for insidePart in insideParts:
-#     let leftRight = insidePart.split(':')
-#     if leftRight.len != 2:
-#       return some(newFunResultWarn(kInvalidSignature))
-
-#     let left = leftRight[0].strip()
-#     let right = leftRight[1].strip()
-
-#     var name0 = matchParamName(left)
-#     if not name0.isSome():
-#       return some(newFunResultWarn(kInvalidSignature))
-#     let name = nameO.get()
-
-#     var rightMatchO = matchParamRight(left)
-#     if not rightMatchO.isSome():
-#       return some(newFunResultWarn(kInvalidSignature))
-#     let rightMatch = rightMatchO.get()
-#     let (optionalString, paramTypeString, varargsString) = rightMatch
-#     var optional: bool
-#     if optionalString == "optional":
-#       optional = true
-#     var paramType: Paramtype
-#     case paramTypeString:
-#       of "int":
-#         paramType = ptInt
-#       of "float":
-#         paramType = ptFloat
-#       of "string":
-#         paramType = ptString
-#       of "list":
-#         paramType = ptList
-#       of "dict":
-#         paramType = ptDict
-#       of "any":
-#         paramType = ptAny
-#       else:
-#         return some(newFunResultWarn(kInvalidParamType))
-
-#     let parm = newParam(paramType, name, value, optional, varargsTypes)
-#     result.add(parm)
-
-
-func checkParameters*(signature: string, parameters: seq[Value]): Option[FunResult] =
-  ## Check that the parameters match the signature for number of
-  ## parameters and their types. Return a FunResult object containing
-  ## a warning when the signature does not match.
-  if parameters.len() != 1:
-    return some(newFunResultWarn(wOneParameter))
-
-  if parameters[0].kind != vkString:
-    return some(newFunResultWarn(wExpectedString))
-
-func getParameters*(parameters: seq[Value], start: int, count: int): Option[seq[Value]] =
-  ## Return the number of parameters specified by count starting at
-  ## start index, if there are enough left.
-  if start < 0 or count <= 0 or start + count > parameters.len:
-    return
-  result = some(parameters[start .. start + count - 1])
-
-func charDigit*(digit: char): int =
-  ## Return the integer value of the digit type character, i.e
-  ## '1' -> 1. Return 0 when not a digit.
-  result = int(digit) - int('0')
-  if result < 0 or result > 9:
-    result = 0
-
-type
-  Names* = object
-    ix*: int
-
-proc getNextName*(names: var Names): string =
   let letters = "abcdefghijklmnopqurstuvwxyz"
-  if names.ix > letters.len - 1:
-    return ""
-  result = $letters[names.ix]
-  inc(names.ix)
+  var num = 0
+  var numString: string
+  if letterName.ix > letters.len - 1:
+    letterName.ix = 0
+  if num > 0:
+    numString = $num
+  result = $letters[letterName.ix] & numString
+  inc(letterName.ix)
 
 iterator yieldParam*(signatureCode: string): Option[Param] =
-  ## Yield each code from the given signature code.
-  var names = Names()
-  var ix = 0
+  ## Yield one Param object for each code in the specified signature
+  ## code.
+  assert signatureCode.len > 0
+
+  let returnCode = signatureCode[signatureCode.len-1]
+  var letterName = ShortName()
   var optional: bool
-  while ix < signatureCode.len:
+  var ix = 0
+
+  while ix < signatureCode.len - 1:
     var code = signatureCode[ix]
-    case code:
-      of 'i', 'f', 's', 'l', 'd', 'a':
-        yield(some(newParam(getNextName(names), optional, false,
-                            @[codeToParamType(code)])))
+    if code in singleCodes:
+      yield(some(newParam(letterName.next(), optional, false, false,
+                          @[code])))
+      inc(ix)
+    elif code == 'o':
+      optional = true
+      inc(ix)
+    elif code in varargCodes:
+      # Collect the varargs group of types. Since varargs are last
+      # collect to the end.
+      var paramTypes: seq[ParamType]
+      while ix < signatureCode.len - 1:
+        var code = signatureCode[ix]
+        assert code in varargCodes
+        paramTypes.add(code)
         inc(ix)
-        optional = false
-      of 'o':
-        optional = true
-        inc(ix)
-      of 'r':
-        inc(ix)
-        var count = charDigit(signatureCode[ix])
-        if count == 0:
-          break
-        inc(ix)
-        var paramTypes: seq[ParamType]
-        for _ in countup(1, count):
-          paramTypes.add(codeToParamType(signatureCode[ix]))
-          inc(ix)
-        yield(some(newParam(getNextName(names), optional, true, paramTypes)))
-      else:
-        break
+      yield(some(newParam(letterName.next(), optional, true, false, paramTypes)))
+      break # done
+    else:
+      assert false, "Invalid signature code: " & $code
+      break
 
-  # signature code string:
-  # i: int
-  # f: float
-  # s: string
-  # n: function
-  # d: dict
-  # l: list
-  # o: next parameter is optional
-  # rx: repeat the following x parameters
-  # a: any
-  # return type last
-  # add_r1ii
-  # add_r1ff
-  # case-ir2iaoai
-  # cmp-iii
-  # cmp-ffi
-  # cmp-ssi
+  # Return the return parameter.
+  yield(some(newParam("result", false, false, true, @[returnCode])))
 
-#   # todo: Remove the result type from the signature code.
+func signatureCodeToParams*(signatureCode: string): Option[seq[Param]] =
+  ## Convert the signature code to a list of Param objects.
+  var params: seq[Param]
+  for paramO in yieldParam(signatureCode):
+    if not paramO.isSome:
+      return none(seq[Param])
+    params.add(paramO.get())
+  result = some(params)
 
-#   # states: start, single, optional, repeat
-#   var state: string
-#   if signature.len == 0:
-#     if parameters.len != 0
-#       return some(newFunResultWarn(wExpectedNoParameters))
+func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
+  ## Create a dictionary of the parameters. The parameter names are
+  ## the dictionary keys.  Varargs parameters turn into a list.
+  ## Return a FunResult object containing the dictionary or a warning
+  ## when the parameters to not match the signature.  The last
+  ## signature param is for the return type.
 
-#   int ix = 0
-#   for ch in signature:
+  # debugEcho "----------- params: " & $params
 
-#     if state == "start":
-#       case ch:
-#         of 'i', 'f', 's', 'l', 'd':
-#           state = "single"
-#         of 'o':
-#           state = "optional"
-#           continue
-#         of 'r':
-#           state = "varargs"
-#           continue
-#         else:
-#           return some(newFunResultWarn(wInvalidSignatureCode))
+  var map = newVarsDict()
 
-#     case state:
-#     of "single":
-#       if ix >= parameters.len:
-#         return some(newFunResultWarn(wMissingParameter))
-#       let value = parameters[ix]
-#       inc(ix)
+  # Determine the number of required parameters and whether the
+  # signature contains an optional or varargs last element.
+  var gotVarargs: bool
+  var gotOptional: bool
+  var requiredParams: int
+  if params.len >= 2:
+    let lastParamIx = params.len - 2
+    gotVarargs = params[lastParamIx].varargs
+    gotOptional = params[lastParamIx].optional
+    if gotOptional:
+      requiredParams = lastParamIx
+    elif gotVarargs:
+      # Require varargs, need at least one group.
+      requiredParams = lastParamIx + params[lastParamIx].paramTypes.len
+    else:
+      requiredParams = params.len - 1
+  else:
+    # No parameters case.
+    gotVarargs = false
+    gotOptional = false
+    requiredParams = 0
 
-#       case ch:
-#         of 'i', 'f', 's', 'l', 'd':
-#           let funResultWarnO = checkParameter(ch, value)
-#           if funResultWarnO.isSome:
-#             return funResultWarnO
-#         of 'a':
-#           discard
-#         of 'o':
-#           state = "optional"
-#         of 'r':
-#           state = "repeat"
-#         else:
-#           return some(newFunResultWarn(wInvalidSignatureCode))
+  # debugEcho "----------- gotVarargs: " & $gotVarargs
+  # debugEcho "----------- gotOptional: " & $gotOptional
+  # debugEcho "----------- params.len: " & $params.len
+  # debugEcho "----------- requiredParams: " & $requiredParams
 
-#     of "optional":
-#       if ix >= parameters.len:
-#         # The optional parameter was not specified. The optional
-#         # parameter comes last so we're done.
-#         return
-#       state = "single"
+  # Check there are enough parameters.
+  if args.len < requiredParams:
+    # Not enough parameters, expected {requiredParams} got {args.len}."
+    return newFunResultWarn(kNotEnoughArgs, 0, $requiredParams, $args.len)
 
-#     of "repeat":
-#       # Get the repeat count.
-#       count = int(ch) - int('0')
-#       if count < 0 or count > 9:
-#         return some(newFunResultWarn(wInvalidSignatureCode))
-#       # Get the types of the repeat group.
-#       var group: seq[char] = @[]
-#       for groupIx in 0 .. count-1:
-#         group.add(signature[groupIx+asdf])
-#       # Rrepeat looking for group parameter items.
-#       return
+  # Loop through the parameters except the vararg ones.
+  var lastIx: int
+  if gotVarargs:
+    lastIx = requiredParams - 2
+  else:
+    lastIx = requiredParams - 1
+  # debugEcho "----------- lastIx: " & $lastIx
 
+  for ix in countUp(0, lastIx):
+    var param = params[ix]
+    var arg = args[ix]
+    # debugEcho "----------- ix: " & $ix
+    # debugEcho "----------- param: " & $param
+    # debugEcho "----------- arg: " & $arg
 
-template tCheckParameters*(signature: string, parameters: seq[Value]) =
-  let warnResultO = checkParameters(signature, parameters)
-  if warnResultO.isSome:
-    return warnResultO.get()
+    # Check the parameter is the correct type.
+    if not sameType(param.paramTypes[0], arg.kind):
+      let expected = paramTypeString(param.paramTypes[0])
+      let got = $arg.kind
+      # Wrong parameter type, expected {expected} got {got}.
+      return newFunResultWarn(kWrongType, ix, $expected, $got)
 
-template tSetParameterNames*(signature: string, parameters: seq[Value]) =
-  let name {.inject.} = parameters[0].stringv
+    # debugEcho "----------- param.name: " & param.name
+    map[param.name] = arg
 
-template tCheckParametersSetNames*(signature: string, parameters: seq[Value]) =
-  tCheckParameters(signature, parameters)
-  tSetParameterNames(signature, parameters)
+  # Handle the vararg element.
+  if gotVarargs:
+    let varargIx = lastIx + 1
+    let varargParam = params[varargIx]
+    var varargNum = varargParam.paramTypes.len
+    var varargList: seq[Value]
+    var argsLeft = args.len - requiredParams
+
+    if not gotOptional and argsLeft == 0:
+      # The required vararg parameter has no arguments.
+      return newFunResultWarn(kNoVarargArgs, varargIx)
+
+    # Collect the remaining parameters into a list.
+    while argsLeft > 0:
+
+      # Check there are enough parameters for the vararg group.
+      if argsLeft < varargNum:
+        # Expected {varargNum} varargs got {argsLeft}.
+        return newFunResultWarn(kNotEnoughVarargs, 0, $varargNum, $argsLeft)
+
+      for ix in countUp(0, varargNum - 1):
+        var arg = args[varargIx + ix]
+        var paramType = varargParam.paramTypes[ix]
+
+        if not sameType(paramType, arg.kind):
+          let expected = paramTypeString(paramType)
+          let got = $arg.kind
+          # Wrong parameter type, expected {expected} got {got}.
+          return newFunResultWarn(kWrongType, varargIx + ix, $expected, $got)
+
+        dec(argsLeft)
+        varargList.add(arg)
+
+    map[varargParam.name] = newValue(varargList)
+
+  result = newFunResult(newValue(map))
+
+# template tCheckParameters*(signatureCode: string, parameters: seq[Value]) =
+#   ## Verify the parameter types match the signature. Return a warning
+#   ## when they do not match.
+#   let warnResultO = checkParameters(signatureCode, parameters)
+#   if warnResultO.isSome:
+#     return warnResultO.get()
