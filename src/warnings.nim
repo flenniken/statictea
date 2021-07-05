@@ -135,6 +135,7 @@ type
     kWrongType,            # w120
     kNoVarargArgs,         # w121
     kNotEnoughVarargs,     # w122
+    kTooManyArgs,          # w123
 
 const
     # The list of warnings. Add new messages to the bottom and do not
@@ -263,6 +264,7 @@ const
       "Wrong parameter type, expected $1 got $2.", # kWrongType
       "The required vararg parameter has no arguments.", # kNoVarargArgs
       "Expected $1 varargs got $2.", # kNotEnoughVarargs
+      "Too many arguments, expected {requiredParams} got {args.len}.", # kTooManyArgs
     ]
 
 func getWarning*(filename: string, lineNum: int,

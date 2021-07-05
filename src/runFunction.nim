@@ -1340,8 +1340,14 @@ func funGithubAnchor*(parameters: seq[Value]): FunResult =
   ## @:# {entry.name}
   ## @:~~~~
 
-  tCheckParametersSetNames("(name: string) string", parameters)
-
+  # tCheckParametersSetNames("(name: string) string", parameters)
+  let paramsO = signatureCodeToParams("ss")
+  let funResult = mapParameters(paramsO.get(), parameters)
+  if funResult.kind == frWarning:
+    return funResult
+  let mapValue = funResult.value
+  let map = mapValue.dictv
+  let name = map["a"].stringv
   let anchorName = githubAnchor(name)
   result = newFunResult(newValue(anchorName))
 

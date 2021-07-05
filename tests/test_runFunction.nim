@@ -8,6 +8,7 @@ import vartypes
 import runFunction
 import warnings
 import tostring
+import funtypes
 
 # Unicode strings in multiple languages good for test cases.
 # https://www.cl.cam.ac.uk/~mgk25/ucs/examples/quickbrown.txt
@@ -1286,13 +1287,12 @@ suite "runFunction.nim":
     # (= Twelve boxing fighters hunted Eva across the dike of Sylt)
     check testAnchor(str, eStr)
 
-
   test "githubAnchor: wrong number of parameters":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(wOneParameter, 0)
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1", "0")
     check testFunction("githubAnchor", parameters, eFunResult)
 
   test "githubAnchor: wrong kind of parameter":
     var parameters: seq[Value] = @[newValue(2)]
-    let eFunResult = newFunResultWarn(wExpectedString, 0)
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
     check testFunction("githubAnchor", parameters, eFunResult)

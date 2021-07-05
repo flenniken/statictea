@@ -223,22 +223,38 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
   var gotVarargs: bool
   var gotOptional: bool
   var requiredParams: int
+  var loopParams: int
   if params.len >= 2:
     let lastParamIx = params.len - 2
     gotVarargs = params[lastParamIx].varargs
     gotOptional = params[lastParamIx].optional
     if gotOptional:
-      requiredParams = lastParamIx
-    elif gotVarargs:
-      # Require varargs, need at least one group.
-      requiredParams = lastParamIx + params[lastParamIx].paramTypes.len
+      if gotVarargs:
+        requiredParams = lastParamIx - 1
+        if args.len > lastParamIx:
+          loopParams = lastParamIx
+        else:
+          loopParams = lastParamIx
+      else:
+        requiredParams = lastParamIx
+        if args.len > lastParamIx:
+          loopParams = lastParamIx + 1
+        else:
+          loopParams = lastParamIx
     else:
-      requiredParams = params.len - 1
+      if gotVarargs:
+        # Require varargs, need at least one group.
+        requiredParams = lastParamIx + params[lastParamIx].paramTypes.len
+        loopParams = params.len - 2
+      else:
+        requiredParams = params.len - 1
+        loopParams = params.len - 1
   else:
     # No parameters case.
     gotVarargs = false
     gotOptional = false
     requiredParams = 0
+    loopParams = 0
 
   # debugEcho "----------- gotVarargs: " & $gotVarargs
   # debugEcho "----------- gotOptional: " & $gotOptional
@@ -250,15 +266,19 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
     # Not enough parameters, expected {requiredParams} got {args.len}."
     return newFunResultWarn(kNotEnoughArgs, 0, $requiredParams, $args.len)
 
-  # Loop through the parameters except the vararg ones.
-  var lastIx: int
-  if gotVarargs:
-    lastIx = requiredParams - 2
-  else:
-    lastIx = requiredParams - 1
-  # debugEcho "----------- lastIx: " & $lastIx
+  # Check there are not too many parameters.
+  if not gotVarargs:
+    var limit: int
+    if gotOptional:
+      limit = requiredParams + 1
+    else:
+      limit = requiredParams
+    if args.len > limit:
+      # Too many parameters, expected {requiredParams} got {args.len}."
+      return newFunResultWarn(kTooManyArgs, 0, $requiredParams, $args.len)
 
-  for ix in countUp(0, lastIx):
+  # Loop through the parameters except the vararg ones.
+  for ix in countUp(0, loopParams - 1):
     var param = params[ix]
     var arg = args[ix]
     # debugEcho "----------- ix: " & $ix
@@ -277,38 +297,46 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
 
   # Handle the vararg element.
   if gotVarargs:
-    let varargIx = lastIx + 1
+    var varargIx = loopParams
+    # debugEcho "----------- varargIx: " & $varargIx
+    var argsLeft = args.len - varargIx
+    # debugEcho "----------- argsLeft: " & $argsLeft
     let varargParam = params[varargIx]
+    # debugEcho "----------- varargParam: " & $varargParam
     var varargNum = varargParam.paramTypes.len
-    var varargList: seq[Value]
-    var argsLeft = args.len - requiredParams
+    # debugEcho "----------- varargNum: " & $varargNum
 
-    if not gotOptional and argsLeft == 0:
-      # The required vararg parameter has no arguments.
-      return newFunResultWarn(kNoVarargArgs, varargIx)
+    # if argsLeft == 0 and not gotOptional:
+    #   # The required vararg parameter has no arguments.
+    #   return newFunResultWarn(kNoVarargArgs, varargIx)
 
-    # Collect the remaining parameters into a list.
-    while argsLeft > 0:
+    if argsLeft > 0:
+      var varargList: seq[Value]
 
-      # Check there are enough parameters for the vararg group.
-      if argsLeft < varargNum:
-        # Expected {varargNum} varargs got {argsLeft}.
-        return newFunResultWarn(kNotEnoughVarargs, 0, $varargNum, $argsLeft)
+      # Collect the remaining parameters into a list.
+      while argsLeft > 0:
 
-      for ix in countUp(0, varargNum - 1):
-        var arg = args[varargIx + ix]
-        var paramType = varargParam.paramTypes[ix]
+        # Check there are enough parameters for the vararg group.
+        if argsLeft < varargNum:
+          # Expected {varargNum} varargs got {argsLeft}.
+          return newFunResultWarn(kNotEnoughVarargs, 0, $varargNum, $argsLeft)
 
-        if not sameType(paramType, arg.kind):
-          let expected = paramTypeString(paramType)
-          let got = $arg.kind
-          # Wrong parameter type, expected {expected} got {got}.
-          return newFunResultWarn(kWrongType, varargIx + ix, $expected, $got)
+        for ix in countUp(0, varargNum - 1):
+          var arg = args[varargIx + ix]
+          var paramType = varargParam.paramTypes[ix]
 
-        dec(argsLeft)
-        varargList.add(arg)
+          if not sameType(paramType, arg.kind):
+            let expected = paramTypeString(paramType)
+            let got = $arg.kind
+            # Wrong parameter type, expected {expected} got {got}.
+            return newFunResultWarn(kWrongType, varargIx + ix, $expected, $got)
 
-    map[varargParam.name] = newValue(varargList)
+          dec(argsLeft)
+          varargList.add(arg)
+
+        varargIx = varargIx + varargNum
+
+      map[varargParam.name] = newValue(varargList)
 
   result = newFunResult(newValue(map))
 

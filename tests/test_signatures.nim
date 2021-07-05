@@ -5,6 +5,7 @@ import vartypes
 import funtypes
 import options
 import tostring
+import warnings
 
 proc testSignatureCodeToParams(signatureCode: string, expected: string): bool =
   var params0 = signatureCodeToParams(signatureCode)
@@ -23,8 +24,26 @@ proc testMapParametersOk(signatureCode: string, args: seq[Value],
     return false
   let funResult = mapParameters(paramsO.get(), args)
   if not expectedItem("mapParameters", funResult.kind, frValue):
+    echo "warning: " & $funResult
     return false
   if not expectedItem("mapParameters", valueToString(funResult.value), eMapJson):
+    echo "signatureCode: " & signatureCode
+    return false
+  result = true
+
+proc testMapParametersW(signatureCode: string, args: seq[Value],
+    eParameter: int, warning: Warning, p1: string = "", p2: string = ""): bool =
+
+  var paramsO = signatureCodeToParams(signatureCode)
+  if not paramsO.isSome:
+    echo "Invalid signature: " & signatureCode
+    return false
+  let funResult = mapParameters(paramsO.get(), args)
+  if not expectedItem("mapParameters", funResult.kind, frWarning):
+    echo "no warning: " & $funResult
+    return false
+  let eFunResultWarn = newFunResultWarn(warning, eParameter, p1, p2)
+  if not expectedItem("mapParameters", funResult, eFunResultWarn):
     echo "signatureCode: " & signatureCode
     return false
   result = true
@@ -93,6 +112,20 @@ suite "signatures.nim":
     check testSignatureCodeToParams("sIs", "(a: string, b: varargs(int)) string")
     check testSignatureCodeToParams("soIs", "(a: string, b: optional varargs(int)) string")
 
+  test "signatureCodeToParams multiple varargs":
+    check testSignatureCodeToParams("IIi", "(a: varargs(int, int)) int")
+    check testSignatureCodeToParams("ISi", "(a: varargs(int, string)) int")
+    check testSignatureCodeToParams("IFSi", "(a: varargs(int, float, string)) int")
+
+  test "signatureCodeToParams optional multiple varargs":
+    check testSignatureCodeToParams("oIIi", "(a: optional varargs(int, int)) int")
+    check testSignatureCodeToParams("oISi", "(a: optional varargs(int, string)) int")
+    check testSignatureCodeToParams("oIFSi", "(a: optional varargs(int, float, string)) int")
+
+  test "signatureCodeToParams all":
+    let e = "(a: int, b: string, c: float, d: optional varargs(int, int)) int"
+    check testSignatureCodeToParams("isfoIIi", e)
+
   test "Single Param representation":
     check testParamStringSingle("hello", 'i', false, "hello: int")
     check testParamStringSingle("hello", 'i', true, "hello: optional int")
@@ -132,58 +165,146 @@ suite "signatures.nim":
     check testYieldParam("iIAi", @["a: int", "b: varargs(int, any)", "int"])
     check testYieldParam("ioIAFi", @["a: int", "b: optional varargs(int, any, float)", "int"])
 
-  test "mapParameters ok":
+  test "mapParameters i":
+    var parameters: seq[Value] = @[]
+    check testMapParametersOk("i", parameters, "{}")
+
+  test "mapParameters ii":
     var parameters = @[newValue(1)]
     check testMapParametersOk("ii", parameters, """{"a":1}""")
 
+  test "mapParameters iii":
+    var parameters = @[newValue(1), newValue(2)]
+    check testMapParametersOk("iii", parameters, """{"a":1,"b":2}""")
 
-  # test "checkParameters ss":
-  #   # let funResultO = checkParameters("(name: string) string", parameters)
-  #   var parameters = @[newValue("hello")]
-  #   check testCheckParametersOk("ss", parameters)
+  test "mapParameters ifsldi":
+    let listValue = newValue([1, 2, 3])
+    let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
+    var parameters = @[newValue(1), newValue(2.2), newValue("tea"),
+                       listValue, dictValue]
+    let expected = """{"a":1,"b":2.2,"c":"tea","d":[1,2,3],"e":{"a":1,"b":2,"c":3}}"""
+    check testMapParametersOk("ifsldi", parameters, expected)
 
-  # test "checkParameters ii":
-  #   var parameters = @[newValue(3)]
-  #   check testCheckParametersOk("ii", parameters)
+  test "mapParameters oii":
+    var parameters: seq[Value] = @[newValue(1)]
+    check testMapParametersOk("oii", parameters, """{"a":1}""")
 
-  # test "checkParameters Is":
-  #   var parameters = @[newValue(1), newValue(2), newValue(3)]
-  #   check testCheckParametersOk("Is", parameters)
+  test "mapParameters ioii":
+    var parameters: seq[Value] = @[newValue(1),newValue(2)]
+    check testMapParametersOk("ioii", parameters, """{"a":1,"b":2}""")
 
-  # test "checkParameters IFs":
-  #   var parameters = @[newValue(1), newValue(1.1), newValue(2), newValue(2.2)]
-  #   check testCheckParametersOk("IFs", parameters)
+  test "mapParameters oii":
+    var parameters: seq[Value] = @[]
+    check testMapParametersOk("oii", parameters, """{}""")
 
-  # test "checkParameters dlIFs":
-  #   var parameters = @[newValue(1), newValue(1.1), newValue(2), newValue(2.2)]
-  #   check testCheckParametersOk("ifIFs", parameters)
+  test "mapParameters ioii":
+    var parameters: seq[Value] = @[newValue(1)]
+    check testMapParametersOk("ioii", parameters, """{"a":1}""")
 
-  # test "checkParameters oii":
-  #   var parameters = @[newValue(1)]
-  #   check testCheckParametersOk("oii", parameters)
+  test "mapParameters Ii":
+    var parameters: seq[Value] = @[newValue(1)]
+    check testMapParametersOk("Ii", parameters, """{"a":[1]}""")
 
-  # test "checkParameters optional missing":
-  #   var parameters: seq[Value] = @[]
-  #   check testCheckParametersOk("oii", parameters)
+  test "mapParameters IIi":
+    var parameters: seq[Value] = @[newValue(1),newValue(2)]
+    check testMapParametersOk("IIi", parameters, """{"a":[1,2]}""")
 
-  # test "checkParameters optional missing 2":
-  #   var parameters = @[newValue(2.2)]
-  #   check testCheckParametersOk("aoii", parameters)
+  test "mapParameters IIFi":
+    var parameters: seq[Value] = @[newValue(1),newValue(2),newValue(3.3)]
+    check testMapParametersOk("IIFi", parameters, """{"a":[1,2,3.3]}""")
 
-  # test "checkParameters Is":
-  #   let parameters = @[newValue(1)]
-  #   check testCheckParametersOk("Is", parameters)
+  test "mapParameters iIi":
+    var parameters: seq[Value] = @[newValue(1),newValue(2)]
+    check testMapParametersOk("iIi", parameters, """{"a":1,"b":[2]}""")
 
-  # test "checkParameters Is 2":
-  #   let parameters = @[newValue(1), newValue(2), newValue(3), newValue(4)]
-  #   for ix in countUp(0, 3):
-  #     var p = parameters[0 .. ix]
-  #     echo "p = " & $p
-  #     check testCheckParametersOk("Is", p)
+  test "mapParameters iIi":
+    var parameters: seq[Value] = @[newValue(1),newValue(2),newValue(3)]
+    check testMapParametersOk("iIi", parameters, """{"a":1,"b":[2,3]}""")
 
-  # test "checkParameters oIs":
-  #   let parameters = @[newValue(1), newValue(2), newValue(3), newValue(4)]
-  #   for ix in countUp(-1, 3):
-  #     var p = parameters[0 .. ix]
-  #     # echo "p = " & $p
-  #     check testCheckParametersOk("oIs", p)
+    parameters = @[newValue(1),newValue(2),newValue(3),newValue(4)]
+    check testMapParametersOk("iIi", parameters, """{"a":1,"b":[2,3,4]}""")
+
+  test "mapParameters SIi":
+    var parameters = @[newValue("tea"),newValue(1),newValue("water"),newValue(2)]
+    check testMapParametersOk("SIi", parameters, """{"a":["tea",1,"water",2]}""")
+
+  test "mapParameters iSIi":
+    var parameters = @[newValue(1), newValue("tea"), newValue(1),
+                       newValue("water"), newValue(2)]
+    check testMapParametersOk("iSIi", parameters, """{"a":1,"b":["tea",1,"water",2]}""")
+
+  test "mapParameters oIi":
+    var parameters: seq[Value] = @[]
+    check testMapParametersOk("oIi", parameters, """{}""")
+
+  test "mapParameters oIi":
+    var parameters: seq[Value] = @[newValue(1)]
+    check testMapParametersOk("oIi", parameters, """{"a":[1]}""")
+
+    parameters = @[newValue(1), newValue(2)]
+    check testMapParametersOk("oIi", parameters, """{"a":[1,2]}""")
+
+  test "mapParameters oIFi":
+    var parameters: seq[Value] = @[]
+    check testMapParametersOk("oIFi", parameters, """{}""")
+
+    parameters = @[newValue(1), newValue(2.2)]
+    check testMapParametersOk("oIFi", parameters, """{"a":[1,2.2]}""")
+
+    parameters = @[newValue(1), newValue(2.2), newValue(3), newValue(4.4)]
+    check testMapParametersOk("oIFi", parameters, """{"a":[1,2.2,3,4.4]}""")
+
+  test "mapParameters ioIFi":
+    var parameters = @[newValue(1)]
+    check testMapParametersOk("ioIFi", parameters, """{"a":1}""")
+
+    parameters = @[newValue(1),newValue(1),newValue(2.2)]
+    check testMapParametersOk("ioIFi", parameters, """{"a":1,"b":[1,2.2]}""")
+
+  test "mapParameters not enough args":
+    var parameters: seq[Value] = @[]
+    check testMapParametersW("ii", parameters, 0, kNotEnoughArgs, "1", "0")
+    check testMapParametersW("Ii", parameters, 0, kNotEnoughArgs, "1", "0")
+
+    parameters = @[newValue(1)]
+    check testMapParametersW("iii", parameters, 0, kNotEnoughArgs, "2", "1")
+    check testMapParametersW("iIi", parameters, 0, kNotEnoughArgs, "2", "1")
+
+    parameters = @[newValue(1)]
+    check testMapParametersW("IFi", parameters, 0, kNotEnoughArgs, "2", "1")
+
+    parameters = @[newValue(1), newValue(1)]
+    check testMapParametersW("iIFi", parameters, 0, kNotEnoughArgs, "3", "2")
+
+    parameters = @[newValue(1), newValue(1)]
+    check testMapParametersW("iiIFSi", parameters, 0, kNotEnoughArgs, "5", "2")
+
+    parameters = @[newValue(1), newValue(1), newValue(1)]
+    check testMapParametersW("iiIFSi", parameters, 0, kNotEnoughArgs, "5", "3")
+
+    parameters = @[newValue(1), newValue(1), newValue(1), newValue(1.1)]
+    check testMapParametersW("iiIFSi", parameters, 0, kNotEnoughArgs, "5", "4")
+
+  test "mapParameters too many args":
+    var parameters = @[newValue(1), newValue(2)]
+    check testMapParametersW("ii", parameters, 0, kTooManyArgs, "1", "2")
+
+    parameters = @[newValue(1), newValue(2), newValue(3)]
+    check testMapParametersW("iii", parameters, 0, kTooManyArgs, "2", "3")
+
+  test "mapParameters wrong kind":
+    var parameters = @[newValue(1)]
+    check testMapParametersW("fi", parameters, 0, kWrongType, "float", "int")
+    check testMapParametersW("Fi", parameters, 0, kWrongType, "float", "int")
+
+    parameters = @[newValue(1), newValue(2)]
+    check testMapParametersW("ifi", parameters, 1, kWrongType, "float", "int")
+    check testMapParametersW("IFi", parameters, 1, kWrongType, "float", "int")
+
+    parameters = @[newValue(1)]
+    check testMapParametersW("ofi", parameters, 0, kWrongType, "float", "int")
+    check testMapParametersW("oFi", parameters, 0, kWrongType, "float", "int")
+
+    parameters = @[newValue(1), newValue(2)]
+    check testMapParametersW("oifi", parameters, 1, kWrongType, "float", "int")
+    check testMapParametersW("oIFi", parameters, 1, kWrongType, "float", "int")
