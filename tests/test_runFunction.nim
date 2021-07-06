@@ -1027,17 +1027,17 @@ suite "runFunction.nim":
 
   test "path: wrong number of parameters":
     var parameters: seq[Value] = @[newValue("Earl Grey"), newValue("a"), newValue("a")]
-    let eFunResult = newFunResultWarn(wOneOrTwoParameters, 0)
+    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1", "3")
     check testFunction("path", parameters, eFunResult)
 
   test "path: wrong kind p1":
     var parameters: seq[Value] = @[newValue(12)]
-    let eFunResult = newFunResultWarn(wExpectedString, 0)
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
     check testFunction("path", parameters, eFunResult)
 
   test "path: wrong kind p2":
     var parameters: seq[Value] = @[newValue("filename"), newValue(12)]
-    let eFunResult = newFunResultWarn(wExpectedString, 1)
+    let eFunResult = newFunResultWarn(kWrongType, 1, "string", "int")
     check testFunction("path", parameters, eFunResult)
 
   test "path: wrong kind separator":
@@ -1058,12 +1058,12 @@ suite "runFunction.nim":
 
   test "lower: wrong number of parameters":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(wOneParameter, 0)
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1", "0")
     check testFunction("lower", parameters, eFunResult)
 
   test "lower: wrong kind of parameter":
     var parameters: seq[Value] = @[newValue(2)]
-    let eFunResult = newFunResultWarn(wExpectedString, 0)
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
     check testFunction("lower", parameters, eFunResult)
 
   test "keys empty":
@@ -1083,12 +1083,12 @@ suite "runFunction.nim":
 
   test "keys: wrong number of parameters":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(wOneParameter, 0)
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1", "0")
     check testFunction("keys", parameters, eFunResult)
 
   test "keys: wrong kind of parameter":
     var parameters: seq[Value] = @[newValue(2)]
-    let eFunResult = newFunResultWarn(wExpectedDictionary, 0)
+    let eFunResult = newFunResultWarn(kWrongType, 0, "dict", "int")
     check testFunction("keys", parameters, eFunResult)
 
   test "values empty":

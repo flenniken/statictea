@@ -20,6 +20,16 @@ import funtypes
 # Table of the built in functions.
 var functions: Table[string, FunctionPtr]
 
+# template tSetParameterNames*(signature: string, parameters: seq[Value]) =
+#   let name {.inject.} = parameters[0].stringv
+
+template tMapParameters(signatureCode: string) =
+  let paramsO = signatureCodeToParams(signatureCode)
+  let funResult = mapParameters(paramsO.get(), parameters)
+  if funResult.kind == frWarning:
+    return funResult
+  let map {.inject.} = funResult.value.dictv
+
 func cmpBaseValues*(a, b: Value, insensitive: bool = false): int =
   ## Compares two values a and b.  When a equals b return 0, when a is
   ## greater than b return 1 and when a is less than b return -1.
@@ -1018,12 +1028,12 @@ func funPath*(parameters: seq[Value]): FunResult =
   ## Split a file path into pieces. Return a dictionary with the
   ## @:filename, basename, extension and directory.
   ## @:
-  ## @:You pass a path string and the optional path separator. When no
-  ## @:separator, the current system separator is used.
+  ## @:You pass a path string and the optional path separator, "/" or
+  ## @:"\\". When no separator, the current system separator is used.
   ## @:
-  ## @:* p1: path string
-  ## @:* p2: optional separator string, "/" or "\\".
-  ## @:* return: dict
+  ## @:~~~
+  ## @:path(filename: string, optional separator: string) dict
+  ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
@@ -1043,19 +1053,12 @@ func funPath*(parameters: seq[Value]): FunResult =
   ## @:}
   ## @:~~~~
 
-  if parameters.len < 1 or parameters.len > 2:
-    return newFunResultWarn(wOneOrTwoParameters, 0)
-
-  if parameters[0].kind != vkString:
-    return newFunResultWarn(wExpectedString, 0)
-  let path = parameters[0].stringv
+  tMapParameters("sosd")
+  let path = map["a"].stringv
 
   var separator: char
-  if parameters.len > 1:
-    let p1 = parameters[1]
-    if p1.kind != vkString:
-      return newFunResultWarn(wExpectedString, 1)
-    case p1.stringv
+  if "b" in map:
+    case map["b"].stringv
     of "/":
       separator = '/'
     of "\\":
@@ -1097,29 +1100,27 @@ func funPath*(parameters: seq[Value]): FunResult =
 func funLower*(parameters: seq[Value]): FunResult =
   ## Lowercase a string.
   ## @:
-  ## @:* p1: string
-  ## @:* return: lowercase string
+  ## @:~~~
+  ## @:lower(str: string) string
+  ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
   ## @:lower("Tea") => "tea"
+  ## @:lower("TEA") => "tea"
   ## @:~~~~
 
-  if parameters.len() != 1:
-    return newFunResultWarn(wOneParameter)
-
-  if parameters[0].kind != vkString:
-    return newFunResultWarn(wExpectedString, 0)
-
-  let str = parameters[0].stringv
+  tMapParameters("ss")
+  let str = map["a"].stringv
   result = newFunResult(newValue(toLower(str)))
 
 func funKeys*(parameters: seq[Value]): FunResult =
   ## Create a list from the keys in a dictionary.
   ## @:
-  ## @:* p1: dictionary
-  ## @:* return: list
+  ## @:~~~
+  ## @:keys(dictionary: dict) list
+  ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
@@ -1129,13 +1130,9 @@ func funKeys*(parameters: seq[Value]): FunResult =
   ## @:values(d) => ["apple", 2, 3]
   ## @:~~~~
 
-  if parameters.len() != 1:
-    return newFunResultWarn(wOneParameter)
+  tMapParameters("dl")
+  let dict = map["a"].dictv
 
-  if parameters[0].kind != vkDict:
-    return newFunResultWarn(wExpectedDictionary, 0)
-
-  let dict = parameters[0].dictv
   var theList: seq[string]
   for key, value in dict.pairs():
     theList.add(key)
@@ -1145,8 +1142,9 @@ func funKeys*(parameters: seq[Value]): FunResult =
 func funValues*(parameters: seq[Value]): FunResult =
   ## Create a list of the values in the specified dictionary.
   ## @:
-  ## @:* p1: dictionary
-  ## @:* return: list
+  ## @:~~~
+  ## @:values(dictionary: dict) list
+  ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
@@ -1156,11 +1154,7 @@ func funValues*(parameters: seq[Value]): FunResult =
   ## @:values(d) => ["apple", 2, 3]
   ## @:~~~~
 
-  let paramsO = signatureCodeToParams("dl")
-  let funResult = mapParameters(paramsO.get(), parameters)
-  if funResult.kind == frWarning:
-    return funResult
-  let map = funResult.value.dictv
+  tMapParameters("dl")
   let dict = map["a"].dictv
   
   var theList: seq[Value]
@@ -1345,11 +1339,7 @@ func funGithubAnchor*(parameters: seq[Value]): FunResult =
   ## @:# {entry.name}
   ## @:~~~~
 
-  let paramsO = signatureCodeToParams("ss")
-  let funResult = mapParameters(paramsO.get(), parameters)
-  if funResult.kind == frWarning:
-    return funResult
-  let map = funResult.value.dictv
+  tMapParameters("ss")
 
   let name = map["a"].stringv
   let anchorName = githubAnchor(name)
