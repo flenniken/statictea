@@ -48,14 +48,6 @@ proc testMapParametersW(signatureCode: string, args: seq[Value],
     return false
   result = true
 
-proc testYieldParam(signatureCode: string, eStrings: seq[string]): bool =
-  var strings: seq[string]
-  for paramO in yieldParam(signatureCode):
-    if not paramO.isSome:
-      return false
-    strings.add($paramO.get())
-  result = expectedItems("yieldParam", strings, eStrings)
-
 proc testParamStringSingle(name: string, paramType: ParamType, optional: bool,
                      eString: string): bool =
   ## Test single arg cases.
@@ -145,25 +137,6 @@ suite "signatures.nim":
     check shortName.next() == "b"
     check shortName.next() == "c"
     check shortName.next() == "d"
-
-  test "yieldParam":
-    check testYieldParam("i", @["int"])
-    check testYieldParam("ii", @["a: int", "int"])
-    check testYieldParam("ifslda",
-      @["a: int", "b: float", "c: string", "d: list", "e: dict", "any"])
-    check testYieldParam("oii", @["a: optional int", "int"])
-
-  test "yieldParam varargs":
-    check testYieldParam("Is", @["a: varargs(int)", "string"])
-    check testYieldParam("oIs", @["a: optional varargs(int)", "string"])
-    check testYieldParam("IFs", @["a: varargs(int, float)", "string"])
-    check testYieldParam("SAs", @["a: varargs(string, any)", "string"])
-    check testYieldParam("oSAs", @["a: optional varargs(string, any)", "string"])
-    check testYieldParam("SAIs", @["a: varargs(string, any, int)", "string"])
-
-  test "yieldParam multiple":
-    check testYieldParam("iIAi", @["a: int", "b: varargs(int, any)", "int"])
-    check testYieldParam("ioIAFi", @["a: int", "b: optional varargs(int, any, float)", "int"])
 
   test "mapParameters i":
     var parameters: seq[Value] = @[]

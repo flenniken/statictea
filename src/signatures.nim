@@ -5,10 +5,8 @@ import vartypes
 import funtypes
 import options
 import warnings
-# import regexes
 import strformat
 import strutils
-# import tostring
 
 #[
 
@@ -161,10 +159,9 @@ proc next*(letterName: var ShortName): string =
   result = $letters[letterName.ix] & numString
   inc(letterName.ix)
 
-iterator yieldParam*(signatureCode: string): Option[Param] =
-  ## Yield one Param object for each code in the specified signature
-  ## code.
-  assert signatureCode.len > 0
+func signatureCodeToParams*(signatureCode: string): Option[seq[Param]] =
+  ## Convert the signature code to a list of Param objects.
+  var params: seq[Param]
 
   let returnCode = signatureCode[signatureCode.len-1]
   var letterName = ShortName()
@@ -174,8 +171,7 @@ iterator yieldParam*(signatureCode: string): Option[Param] =
   while ix < signatureCode.len - 1:
     var code = signatureCode[ix]
     if code in singleCodes:
-      yield(some(newParam(letterName.next(), optional, false, false,
-                          @[code])))
+      params.add(newParam(letterName.next(), optional, false, false, @[code]))
       inc(ix)
     elif code == 'o':
       optional = true
@@ -189,22 +185,14 @@ iterator yieldParam*(signatureCode: string): Option[Param] =
         assert code in varargCodes
         paramTypes.add(code)
         inc(ix)
-      yield(some(newParam(letterName.next(), optional, true, false, paramTypes)))
+      params.add(newParam(letterName.next(), optional, true, false, paramTypes))
       break # done
     else:
-      assert false, "Invalid signature code: " & $code
-      break
+      # Invalid signature code.
+      return
 
   # Return the return parameter.
-  yield(some(newParam("result", false, false, true, @[returnCode])))
-
-func signatureCodeToParams*(signatureCode: string): Option[seq[Param]] =
-  ## Convert the signature code to a list of Param objects.
-  var params: seq[Param]
-  for paramO in yieldParam(signatureCode):
-    if not paramO.isSome:
-      return none(seq[Param])
-    params.add(paramO.get())
+  params.add(newParam("result", false, false, true, @[returnCode]))
   result = some(params)
 
 func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
@@ -213,8 +201,6 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
   ## Return a FunResult object containing the dictionary or a warning
   ## when the parameters to not match the signature.  The last
   ## signature param is for the return type.
-
-  # debugEcho "----------- params: " & $params
 
   var map = newVarsDict()
 
@@ -256,11 +242,6 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
     requiredParams = 0
     loopParams = 0
 
-  # debugEcho "----------- gotVarargs: " & $gotVarargs
-  # debugEcho "----------- gotOptional: " & $gotOptional
-  # debugEcho "----------- params.len: " & $params.len
-  # debugEcho "----------- requiredParams: " & $requiredParams
-
   # Check there are enough parameters.
   if args.len < requiredParams:
     # Not enough parameters, expected {requiredParams} got {args.len}."
@@ -281,9 +262,6 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
   for ix in countUp(0, loopParams - 1):
     var param = params[ix]
     var arg = args[ix]
-    # debugEcho "----------- ix: " & $ix
-    # debugEcho "----------- param: " & $param
-    # debugEcho "----------- arg: " & $arg
 
     # Check the parameter is the correct type.
     if not sameType(param.paramTypes[0], arg.kind):
@@ -292,23 +270,14 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
       # Wrong parameter type, expected {expected} got {got}.
       return newFunResultWarn(kWrongType, ix, $expected, $got)
 
-    # debugEcho "----------- param.name: " & param.name
     map[param.name] = arg
 
   # Handle the vararg element.
   if gotVarargs:
     var varargIx = loopParams
-    # debugEcho "----------- varargIx: " & $varargIx
     var argsLeft = args.len - varargIx
-    # debugEcho "----------- argsLeft: " & $argsLeft
     let varargParam = params[varargIx]
-    # debugEcho "----------- varargParam: " & $varargParam
     var varargNum = varargParam.paramTypes.len
-    # debugEcho "----------- varargNum: " & $varargNum
-
-    # if argsLeft == 0 and not gotOptional:
-    #   # The required vararg parameter has no arguments.
-    #   return newFunResultWarn(kNoVarargArgs, varargIx)
 
     if argsLeft > 0:
       var varargList: seq[Value]
@@ -339,10 +308,3 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
       map[varargParam.name] = newValue(varargList)
 
   result = newFunResult(newValue(map))
-
-# template tCheckParameters*(signatureCode: string, parameters: seq[Value]) =
-#   ## Verify the parameter types match the signature. Return a warning
-#   ## when they do not match.
-#   let warnResultO = checkParameters(signatureCode, parameters)
-#   if warnResultO.isSome:
-#     return warnResultO.get()
