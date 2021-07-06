@@ -1108,12 +1108,12 @@ suite "runFunction.nim":
 
   test "values: wrong number of parameters":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(wOneParameter, 0)
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1", "0")
     check testFunction("values", parameters, eFunResult)
 
   test "values: wrong kind of parameter":
     var parameters: seq[Value] = @[newValue(2)]
-    let eFunResult = newFunResultWarn(wExpectedDictionary, 0)
+    let eFunResult = newFunResultWarn(kWrongType, 0, "dict", "int")
     check testFunction("values", parameters, eFunResult)
 
   test "sort empty":

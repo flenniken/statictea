@@ -1156,13 +1156,13 @@ func funValues*(parameters: seq[Value]): FunResult =
   ## @:values(d) => ["apple", 2, 3]
   ## @:~~~~
 
-  if parameters.len() != 1:
-    return newFunResultWarn(wOneParameter)
-
-  if parameters[0].kind != vkDict:
-    return newFunResultWarn(wExpectedDictionary, 0)
-
-  let dict = parameters[0].dictv
+  let paramsO = signatureCodeToParams("dl")
+  let funResult = mapParameters(paramsO.get(), parameters)
+  if funResult.kind == frWarning:
+    return funResult
+  let map = funResult.value.dictv
+  let dict = map["a"].dictv
+  
   var theList: seq[Value]
   for key, value in dict.pairs():
     theList.add(value)
@@ -1324,8 +1324,9 @@ func funGithubAnchor*(parameters: seq[Value]): FunResult =
   ## @:you have duplicate heading names, the anchor name returned only
   ## @:works for the first. Use it for Github markdown internal links.
   ## @:
-  ## @:* p1: heading name
-  ## @:* return: anchor name
+  ## @:~~~
+  ## @:githubAnchor(name: string) string
+  ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
@@ -1333,20 +1334,23 @@ func funGithubAnchor*(parameters: seq[Value]): FunResult =
   ## @:githubAnchor("MyHeading") => "myheading"
   ## @:githubAnchor("Eary Gray") => "eary-gray"
   ## @:githubAnchor("$Eary-Gray#") => "eary-gray"
+  ## @:~~~~
   ## @:
+  ## @:Example in a markdown template:
+  ## @:
+  ## @:~~~
   ## @:$$ : anchor = githubAnchor(entry.name)
   ## @:* {type}@|{entry.name}](#{anchor}) &mdash; {short}
   ## @:...
   ## @:# {entry.name}
   ## @:~~~~
 
-  # tCheckParametersSetNames("(name: string) string", parameters)
   let paramsO = signatureCodeToParams("ss")
   let funResult = mapParameters(paramsO.get(), parameters)
   if funResult.kind == frWarning:
     return funResult
-  let mapValue = funResult.value
-  let map = mapValue.dictv
+  let map = funResult.value.dictv
+
   let name = map["a"].stringv
   let anchorName = githubAnchor(name)
   result = newFunResult(newValue(anchorName))

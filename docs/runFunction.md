@@ -761,8 +761,9 @@ Create a Github markdown anchor name given a heading name.  If
 you have duplicate heading names, the anchor name returned only
 works for the first. Use it for Github markdown internal links.
 
-* p1: heading name
-* return: anchor name
+~~~
+githubAnchor(name: string) string
+~~~~
 
 Examples:
 
@@ -770,7 +771,11 @@ Examples:
 githubAnchor("MyHeading") => "myheading"
 githubAnchor("Eary Gray") => "eary-gray"
 githubAnchor("$Eary-Gray#") => "eary-gray"
+~~~~
 
+Example in a markdown template:
+
+~~~
 $$ : anchor = githubAnchor(entry.name)
 * {type}[{entry.name}](#{anchor}) &mdash; {short}
 ...
