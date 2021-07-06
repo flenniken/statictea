@@ -1182,7 +1182,7 @@ statement: tea = len("abc",)
                            ^
 #+END_SRC
 
-Static returns success, return code 0, when there are no
+Statictea returns success, return code 0, when there are no
 warning messages, else it returns 1.
 
 Example of running statictea when a variable is missing:
@@ -1427,8 +1427,7 @@ n n
 Here is the output:
 
 #+BEGIN_SRC
-n           continue command too.
-Show available tasks.
+n           Show available tasks.
 t           Run all tests at once.
 test        Run tests; specify part of test filename.
 b           Build the statictea exe.

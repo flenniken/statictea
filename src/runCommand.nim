@@ -84,10 +84,8 @@ proc startColumn*(start: Natural): string =
 proc warnStatement*(env: var Env, statement: Statement, warning:
                     Warning, start: Natural, p1: string = "", p2:
                                          string = "") =
-  ## Warn about an invalid statement. Show and tell the statement with
-  ## the problem.  Start is the position in the statement where the
-  ## problem starts. If the statement is long, trim it around the
-  ## problem area.
+  ## Show an invalid statement with a pointer pointing at the start of
+  ## the problem. Long statemetns are trimmed around the problem area.
 
   var fragment: string
   var extraStart = ""
@@ -133,7 +131,7 @@ func `==`*(s1: Statement, s2: Statement): bool =
     result = true
 
 func `$`*(s: Statement): string =
-  ## Retrun a string representation of a Statement.
+  ## Return a string representation of a Statement.
   result = "$1, $2: '$3'" % [$s.lineNum, $s.start, s.text]
 
 proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
@@ -210,7 +208,7 @@ iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
         start = cmdLineParts[ix+1].middleStart
 
   if notEmptyOrSpaces(text):
-    yield Statement(text: text, lineNum: lineNum, start: start)
+    yield newStatement(text, lineNum, start)
 
 proc getString*(env: var Env, prepostTable: PrepostTable,
     statement: Statement, start: Natural): Option[ValueAndLength] =

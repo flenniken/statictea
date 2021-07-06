@@ -59,14 +59,14 @@ Object to hold information about the state of the line buffer.
 
 ```nim
 LineBuffer = object
-  stream*: Stream            ## Stream containing lines to read processed sequentially.
-  maxLineLen*: int           ## The maximum line length.
-  bufferSize*: int           ## The buffer size for reading lines.
-  lineNum*: int              ## The current line number in the file starting at 1.
-  pos*: int                  ## Current byte position in the buffer.
-  charsRead*: int            ## Number of bytes of chars in the buffer.
-  buffer*: string            ## Memory pre-allocated for the buffer.
-  filename*: string          ## The optional stream's filename.
+  stream: Stream             ## Stream containing lines to read processed sequentially.
+  maxLineLen: int            ## The maximum line length.
+  bufferSize: int            ## The buffer size for reading lines.
+  lineNum: int               ## The current line number in the file starting at 1.
+  pos: int                   ## Current byte position in the buffer.
+  charsRead: int             ## Number of bytes of chars in the buffer.
+  buffer: string             ## Memory pre-allocated for the buffer.
+  filename: string           ## The optional stream's filename.
 
 ```
 
@@ -122,7 +122,7 @@ proc reset(lb: var LineBuffer)
 
 Return a line from the LineBuffer. Reading starts from the current position in the stream and advances the amount read.
 
-A line end is defined by either a crlf or lf and they get returned with the line bytes. A line is returned when the line ending is found, when the streams runs out of bytes or when the maximum line length is reached.
+A line end is defined by either a crlf or lf and they get returned with the line bytes. A line is returned when the line ending is found, when the stream runs out of bytes or when the maximum line length is reached.
 
 You cannot tell whether the line was truncated or not without reading the next line. When no more data exists in the stream, an empty string is returned.
 

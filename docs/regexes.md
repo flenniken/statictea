@@ -6,12 +6,15 @@ Perl regular expression matching.
 # Index
 
 * type: [Matches](#matches) &mdash; Holds the result of a match.
+* type: [Replacement](#replacement) &mdash; Holds the regular expression and replacement for the replaceMany function.
 * [getGroup](#getgroup) &mdash; Get the first group in matches if it exists, else return "".
 * [get2Groups](#get2groups) &mdash; Get the first two groups in matches.
 * [get3Groups](#get3groups) &mdash; Get the first three groups in matches.
 * [matchRegex](#matchregex) &mdash; Match a regular expression pattern in a string.
-* [matchPatternCached](#matchpatterncached) &mdash; Match a pattern in a string.
+* [matchPatternCached](#matchpatterncached) &mdash; Match a pattern in a string and cache the compiled regular expression pattern.
 * [matchPattern](#matchpattern) &mdash; Match a regular expression pattern in a string.
+* [newReplacement](#newreplacement) &mdash; Create a new Replacement object.
+* [replaceMany](#replacemany) &mdash; Replace the patterns in the string with their replacements.
 
 # Matches
 
@@ -22,6 +25,18 @@ Matches = object
   groups*: seq[string]
   length*: Natural
   start*: Natural
+
+```
+
+
+# Replacement
+
+Holds the regular expression and replacement for the replaceMany function.
+
+```nim
+Replacement = object
+  pattern*: string
+  sub*: string
 
 ```
 
@@ -64,7 +79,7 @@ func matchRegex(str: string; regex: Regex; start: Natural = 0): Option[Matches]
 
 # matchPatternCached
 
-Match a pattern in a string. Cache the compiled regular expression pattern.
+Match a pattern in a string and cache the compiled regular expression pattern.
 
 ```nim
 proc matchPatternCached(str: string; pattern: string; start: Natural = 0): Option[
@@ -79,6 +94,24 @@ Match a regular expression pattern in a string.
 ```nim
 func matchPattern(str: string; pattern: string; start: Natural = 0): Option[
     Matches]
+```
+
+
+# newReplacement
+
+Create a new Replacement object.
+
+```nim
+func newReplacement(pattern: string; sub: string): Replacement
+```
+
+
+# replaceMany
+
+Replace the patterns in the string with their replacements.
+
+```nim
+proc replaceMany(str: string; replacements: seq[Replacement]): string
 ```
 
 

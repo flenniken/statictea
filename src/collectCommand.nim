@@ -37,7 +37,7 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
       if line == "":
         break # No more lines.
 
-    var linePartsO = parseCmdLine(env, prepostTable, line, lb.lineNum)
+    var linePartsO = parseCmdLine(env, prepostTable, line, lb.getLineNum())
     if not linePartsO.isSome:
       # Write out non-command lines.
       resultStream.write(line)
@@ -54,7 +54,7 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
         if line == "":
           return # No more lines
 
-        let lPartsO = parseCmdLine(env, prepostTable, line, lb.lineNum)
+        let lPartsO = parseCmdLine(env, prepostTable, line, lb.getLineNum())
         # Skip everything except the continue command. Other lines
         # that look like commands are part of the replacement block.
         if lPartsO.isSome:

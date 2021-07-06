@@ -5,14 +5,6 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [runFunction.nim](../src/runFunction.nim) &mdash; Nim source code.
 # Index
 
-* type: [FunctionPtr](#functionptr) &mdash; Signature of a statictea function.
-* type: [FunResultKind](#funresultkind) &mdash; The kind of a FunResult object, either a value or warning.
-* type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a warning.
-* [newFunResultWarn](#newfunresultwarn) &mdash; Return a new FunResult object.
-* [newFunResult](#newfunresult) &mdash; Return a new FunResult object containing a value.
-* [`==`](#) &mdash; Compare two FunResult objects and return true when equal.
-* [`$`](#) &mdash; Return a string representation of a FunResult object.
-* [cmpString](#cmpstring) &mdash; Compares two utf8 strings a and b.
 * [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
 * [funCmp](#funcmp) &mdash; Compare two values.
 * [funConcat](#funconcat) &mdash; Concatentate two or more strings.
@@ -40,89 +32,6 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funSort](#funsort) &mdash; Sort a list of values of the same type.
 * [funGithubAnchor](#fungithubanchor) &mdash; Create a Github markdown anchor name given a heading name.
 * [getFunction](#getfunction) &mdash; Look up a function by its name.
-
-# FunctionPtr
-
-Signature of a statictea function. It takes any number of values and returns a value or a warning message.
-
-```nim
-FunctionPtr = proc (parameters: seq[Value]): FunResult
-```
-
-
-# FunResultKind
-
-The kind of a FunResult object, either a value or warning.
-
-```nim
-FunResultKind = enum
-  frValue, frWarning
-```
-
-
-# FunResult
-
-Contains the result of calling a function, either a value or a warning.
-
-```nim
-FunResult = object
-  case kind*: FunResultKind
-  of frValue:
-      value*: Value          ## Return value of the function.
-    
-  of frWarning:
-      parameter*: Natural    ## Index of problem parameter.
-      warningData*: WarningData
-
-
-```
-
-
-# newFunResultWarn
-
-Return a new FunResult object. It contains a warning, the index of the problem parameter, and the two optional strings that go with the warning.
-
-```nim
-func newFunResultWarn(warning: Warning; parameter: Natural = 0; p1: string = "";
-                      p2: string = ""): FunResult
-```
-
-
-# newFunResult
-
-Return a new FunResult object containing a value.
-
-```nim
-func newFunResult(value: Value): FunResult
-```
-
-
-# `==`
-
-Compare two FunResult objects and return true when equal.
-
-```nim
-func `==`(r1: FunResult; r2: FunResult): bool
-```
-
-
-# `$`
-
-Return a string representation of a FunResult object.
-
-```nim
-func `$`(funResult: FunResult): string
-```
-
-
-# cmpString
-
-Compares two utf8 strings a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. Optionally ignore case.
-
-```nim
-func cmpString(a, b: string; insensitive: bool = false): int
-```
-
 
 # cmpBaseValues
 

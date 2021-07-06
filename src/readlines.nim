@@ -14,14 +14,14 @@ const
 type
   LineBuffer* = object
     ## Object to hold information about the state of the line buffer.
-    stream*: Stream   ## Stream containing lines to read processed sequentially.
-    maxLineLen*: int  ## The maximum line length.
-    bufferSize*: int  ## The buffer size for reading lines.
-    lineNum*: int     ## The current line number in the file starting at 1.
-    pos*: int         ## Current byte position in the buffer.
-    charsRead*: int   ## Number of bytes of chars in the buffer.
-    buffer*: string   ## Memory pre-allocated for the buffer.
-    filename*: string ## The optional stream's filename.
+    stream: Stream   ## Stream containing lines to read processed sequentially.
+    maxLineLen: int  ## The maximum line length.
+    bufferSize: int  ## The buffer size for reading lines.
+    lineNum: int     ## The current line number in the file starting at 1.
+    pos: int         ## Current byte position in the buffer.
+    charsRead: int   ## Number of bytes of chars in the buffer.
+    buffer: string   ## Memory pre-allocated for the buffer.
+    filename: string ## The optional stream's filename.
 
 proc getLineNum*(lineBuffer: LineBuffer): int =
   ## Return the current line number.
@@ -69,7 +69,7 @@ proc readline*(lb: var LineBuffer): string =
   ## @:
   ## @:A line end is defined by either a crlf or lf and they get
   ## returned with the line bytes. A line is returned when the line
-  ## ending is found, when the streams runs out of bytes or when the
+  ## ending is found, when the stream runs out of bytes or when the
   ## maximum line length is reached.
   ## @:
   ## @:You cannot tell whether the line was truncated or not without

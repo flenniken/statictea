@@ -71,7 +71,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     if command == "replace" and not variables.contains("content"):
       # lineNum-1 because the current line number is at the first
       # replacement line.
-      env.warn(lb.lineNum-1, wContentNotSet)
+      env.warn(lb.getLineNum()-1, wContentNotSet)
 
     var maxLines = getTeaVarIntDefault(variables, "maxLines")
 
@@ -85,7 +85,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       continue
 
     # Create a new TempSegments object for storing segments.
-    var startLineNum = lb.lineNum
+    var startLineNum = lb.getLineNum()
     var tempSegmentsO = newTempSegments(env, lb, prepostTable,
                                         command, repeat, variables)
     if not isSome(tempSegmentsO):
@@ -180,7 +180,7 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
     if command == "replace" and not variables.contains("content"):
       # lineNum-1 because the current line number is at the first
       # replacement line.
-      env.warn(lb.lineNum-1, wContentNotSet)
+      env.warn(lb.getLineNum()-1, wContentNotSet)
 
     if command == "replace" and variables.contains("content"):
       # Discard the replacement block lines and save the endblock if it exists.
@@ -198,7 +198,7 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
       # If the content does not end with a newline, add one and output
       # a warning.
       if content.len > 0 and content[^1] != '\n':
-        env.warn(lb.lineNum, wMissingNewLineContent)
+        env.warn(lb.getLineNum(), wMissingNewLineContent)
         env.resultStream.write('\n')
 
       # Write out the endblock, if it exists.

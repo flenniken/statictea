@@ -439,11 +439,11 @@ iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
       while true:
         # Stop when we reach the maximum line count for a replacement block.
         if count >= maxLines:
-          env.warn(lb.lineNum, wExceededMaxLine)
+          env.warn(lb.getLineNum(), wExceededMaxLine)
           break
 
         # Look for an endblock command and stop when found.
-        var linePartsO = parseCmdLine(env, prepostTable, line, lb.lineNum)
+        var linePartsO = parseCmdLine(env, prepostTable, line, lb.getLineNum())
         if linePartsO.isSome:
           if linePartsO.get().command == "endblock":
             yield(newReplaceLine(rlEndblockLine, line))
@@ -465,6 +465,6 @@ proc newTempSegments*(env: var Env, lb: var LineBuffer, prepostTable: PrepostTab
   ## out the segments. Call closeDelete to close and delete the
   ## associated temp file.
 
-  result = allocTempSegments(env, lb.lineNum)
+  result = allocTempSegments(env, lb.getLineNum())
   if not isSome(result):
     return

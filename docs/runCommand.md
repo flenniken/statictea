@@ -10,9 +10,9 @@ starts in the template file.
 * type: [ValueAndLength](#valueandlength) &mdash; A value and the length of the matching text in the statement.
 * [newStatement](#newstatement) &mdash; Create a new statement.
 * [startColumn](#startcolumn) &mdash; Return enough spaces to point at the warning column.
-* [warnStatement](#warnstatement) &mdash; Warn about an invalid statement.
+* [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
 * [`==`](#) &mdash; Return true when the two statements are equal.
-* [`$`](#) &mdash; Retrun a string representation of a Statement.
+* [`$`](#) &mdash; Return a string representation of a Statement.
 * [newValueAndLength](#newvalueandlength) &mdash; Create a newValueAndLength object.
 * [getString](#getstring) &mdash; Return a literal string value and match length from a statement.
 * [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
@@ -73,7 +73,7 @@ proc startColumn(start: Natural): string
 
 # warnStatement
 
-Warn about an invalid statement. Show and tell the statement with the problem.  Start is the position in the statement where the problem starts. If the statement is long, trim it around the problem area.
+Show an invalid statement with a pointer pointing at the start of the problem. Long statemetns are trimmed around the problem area.
 
 ```nim
 proc warnStatement(env: var Env; statement: Statement; warning: Warning;
@@ -92,7 +92,7 @@ func `==`(s1: Statement; s2: Statement): bool
 
 # `$`
 
-Retrun a string representation of a Statement.
+Return a string representation of a Statement.
 
 ```nim
 func `$`(s: Statement): string

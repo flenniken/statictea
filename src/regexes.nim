@@ -116,7 +116,7 @@ func matchRegex*(str: string, regex: Regex, start: Natural = 0): Option[Matches]
     result = some(matches)
 
 proc matchPatternCached*(str: string, pattern: string, start: Natural = 0): Option[Matches] =
-  ## Match a pattern in a string. Cache the compiled regular
+  ## Match a pattern in a string and cache the compiled regular
   ## expression pattern.
 
   # Get the cached regex for the pattern or compile it and add it to

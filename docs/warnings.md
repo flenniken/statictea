@@ -20,8 +20,8 @@ Warning number and optional extra strings.
 ```nim
 WarningData = object
   warning*: Warning          ## Warning message id.
-  p1*: string                ## Extra warning info.
-  p2*: string                ## Extra warning info.
+  p1*: string                ## Optional warning info.
+  p2*: string                ## Optional warning info.
 
 ```
 
@@ -62,7 +62,8 @@ Warning = enum
   wMissingDict, wExpectedSortOrder, wAllNotIntFloatString, wIntFloatString,
   wNotZeroOne, wOneToFourParameters, wExpectedSensitivity, wExpectedKey,
   wDictKeyMissing, wKeyValueKindDiff, wSubListsEmpty, wSubListsDiffTypes,
-  kMaxWarnings
+  kMaxWarnings, kInvalidSignature, kInvalidParamType, kNotEnoughArgs,
+  kWrongType, kNoVarargArgs, kNotEnoughVarargs, kTooManyArgs
 ```
 
 
@@ -163,7 +164,13 @@ warningsList: array[low(Warning) .. high(Warning), string] = [
     "A dictionary is missing the sort key.",
     "The sort key values are different types.", "A sublist is empty.",
     "The first item in the sublists are different types.",
-    "Reached the maximum number of warnings, suppressing the rest."]
+    "Reached the maximum number of warnings, suppressing the rest.",
+    "Invalid signature string.", "Invalid parameter type.",
+    "Not enough parameters, expected $1 got $2.",
+    "Wrong parameter type, expected $1 got $2.",
+    "The required vararg parameter has no arguments.",
+    "Expected $1 varargs got $2.",
+    "Too many arguments, expected
 ```
 
 
