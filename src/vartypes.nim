@@ -77,10 +77,12 @@ proc newValue*(value: Value): Value =
 
 proc newValue*[T](list: openArray[T]): Value =
   ## New list value from an array of items of the same kind.
-  ## @
-  ## let listValue = newValue([1, 2, 3])
-  ## let listValue = newValue(["a", "b", "c"])
-  ## let listValue = newValue([newValue(1), newValue("b")])
+  ## @:
+  ## @:~~~
+  ## @:let listValue = newValue([1, 2, 3])
+  ## @:let listValue = newValue(["a", "b", "c"])
+  ## @:let listValue = newValue([newValue(1), newValue("b")])
+  ## @:~~~~
   var valueList: seq[Value]
   for num in list:
     valueList.add(newValue(num))

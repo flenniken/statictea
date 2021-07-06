@@ -23,13 +23,13 @@ type
 
   Statement* = object
     ## A Statement object stores the statement text and where it
-    ## @ starts in the template file.
-    ## @
-    ## @ * lineNum -- Line number starting at 1 where the statement
-    ## @              starts.
-    ## @ * start -- Column position starting at 1 where the statement
-    ## @            starts on the line.
-    ## @ * text -- The statement text.
+    ## @:starts in the template file.
+    ## @:
+    ## @:* lineNum -- Line number starting at 1 where the statement
+    ## @:             starts.
+    ## @:* start -- Column position starting at 1 where the statement
+    ## @:           starts on the line.
+    ## @:* text -- The statement text.
     lineNum*: Natural
     start*: Natural
     text*: string

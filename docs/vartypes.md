@@ -148,7 +148,13 @@ proc newValue(value: Value): Value
 
 # newValue
 
-New list value from an array of items of the same kind. @ let listValue = newValue([1, 2, 3]) let listValue = newValue(["a", "b", "c"]) let listValue = newValue([newValue(1), newValue("b")])
+New list value from an array of items of the same kind.
+
+~~~
+let listValue = newValue([1, 2, 3])
+let listValue = newValue(["a", "b", "c"])
+let listValue = newValue([newValue(1), newValue("b")])
+~~~~
 
 ```nim
 proc newValue[T](list: openArray[T]): Value

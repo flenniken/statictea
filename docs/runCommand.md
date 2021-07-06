@@ -5,7 +5,8 @@ Run a command.
 * [runCommand.nim](../src/runCommand.nim) &mdash; Nim source code.
 # Index
 
-* type: [Statement](#statement) &mdash; A Statement object stores the statement text and where it starts in the template file.
+* type: [Statement](#statement) &mdash; A Statement object stores the statement text and where it
+starts in the template file.
 * type: [ValueAndLength](#valueandlength) &mdash; A value and the length of the matching text in the statement.
 * [newStatement](#newstatement) &mdash; Create a new statement.
 * [startColumn](#startcolumn) &mdash; Return enough spaces to point at the warning column.
@@ -22,7 +23,14 @@ Run a command.
 
 # Statement
 
-A Statement object stores the statement text and where it starts in the template file. @ @ * lineNum -- Line number starting at 1 where the statement @              starts. @ * start -- Column position starting at 1 where the statement @            starts on the line. @ * text -- The statement text.
+A Statement object stores the statement text and where it
+starts in the template file.
+
+* lineNum -- Line number starting at 1 where the statement
+             starts.
+* start -- Column position starting at 1 where the statement
+           starts on the line.
+* text -- The statement text.
 
 ```nim
 Statement = object
