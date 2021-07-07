@@ -698,22 +698,22 @@ suite "runFunction.nim":
 
   test "substr 1 parameter":
     var parameters = @[newValue("big")]
-    let eFunResult = newFunResultWarn(wTwoOrThreeParameters)
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "1")
     check testFunction("substr", parameters, eFunResult)
 
   test "substr 1 not string":
     var parameters = @[newValue(4), newValue(4)]
-    let eFunResult = newFunResultWarn(wExpectedString, 0)
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
     check testFunction("substr", parameters, eFunResult)
 
   test "substr 2 not int":
     var parameters = @[newValue("tasdf"), newValue("dsa")]
-    let eFunResult = newFunResultWarn(wExpectedInteger, 1)
+    let eFunResult = newFunResultWarn(kWrongType, 1, "int", "string")
     check testFunction("substr", parameters, eFunResult)
 
   test "substr 3 not int":
     var parameters = @[newValue("tasdf"), newValue(0), newValue("tasdf")]
-    let eFunResult = newFunResultWarn(wExpectedInteger, 2)
+    let eFunResult = newFunResultWarn(kWrongType, 2, "int", "string")
     check testFunction("substr", parameters, eFunResult)
 
   test "substr start < 0":
@@ -758,17 +758,17 @@ suite "runFunction.nim":
 
   test "dup 1 parameter":
     var parameters = @[newValue("abc")]
-    let eFunResult = newFunResultWarn(wTwoParameters, 0)
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "1")
     check testFunction("dup", parameters, eFunResult)
 
   test "dup not valid string":
     var parameters = @[newValue(4.3), newValue(2)]
-    let eFunResult = newFunResultWarn(wExpectedString, 0)
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "float")
     check testFunction("dup", parameters, eFunResult)
 
   test "dup not valid count":
     var parameters = @[newValue("="), newValue("=")]
-    let eFunResult = newFunResultWarn(wInvalidMaxCount, 1)
+    let eFunResult = newFunResultWarn(kWrongType, 1, "int", "string")
     check testFunction("dup", parameters, eFunResult)
 
   test "dup negative count":
@@ -800,17 +800,17 @@ suite "runFunction.nim":
 
   test "dict 1 parameter":
     var parameters = @[newValue("a")]
-    let eFunResult = newFunResultWarn(wPairParameters, 0)
+    let eFunResult = newFunResultWarn(kNotEnoughVarargs, 0, "2", "1")
     check testFunction("dict", parameters, eFunResult)
 
   test "dict 3 parameter":
     var parameters = @[newValue("a")]
-    let eFunResult = newFunResultWarn(wPairParameters, 0)
+    let eFunResult = newFunResultWarn(kNotEnoughVarargs, 0, "2", "1")
     check testFunction("dict", parameters, eFunResult)
 
   test "dict not string key":
     var parameters = @[newValue("key"), newValue(1), newValue(2), newValue(1)]
-    let eFunResult = newFunResultWarn(wExpectedString, 2)
+    let eFunResult = newFunResultWarn(kWrongType, 2, "string", "int")
     check testFunction("dict", parameters, eFunResult)
 
   test "list empty":
@@ -898,25 +898,25 @@ suite "runFunction.nim":
   test "replace invalid p1":
     var parameters: seq[Value] = @[newValue(4),
       newValue(0), newValue(9), newValue("Eat the Sandwich")]
-    let eFunResult = newFunResultWarn(wExpectedString)
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
     check testFunction("replace", parameters, eFunResult)
 
   test "replace invalid p2":
     var parameters: seq[Value] = @[newValue("Earl Grey"),
       newValue("a"), newValue(9), newValue("Eat the Sandwich")]
-    let eFunResult = newFunResultWarn(wExpectedInteger, 1)
+    let eFunResult = newFunResultWarn(kWrongType, 1, "int", "string")
     check testFunction("replace", parameters, eFunResult)
 
   test "replace invalid p3":
     var parameters: seq[Value] = @[newValue("Earl Grey"),
       newValue(5), newValue("d"), newValue("Eat the Sandwich")]
-    let eFunResult = newFunResultWarn(wExpectedInteger, 2)
+    let eFunResult = newFunResultWarn(kWrongType, 2, "int", "string")
     check testFunction("replace", parameters, eFunResult)
 
   test "replace invalid p4":
     var parameters: seq[Value] = @[newValue("Earl Grey"),
       newValue(5), newValue(4), newValue(4.3)]
-    let eFunResult = newFunResultWarn(wExpectedString, 3)
+    let eFunResult = newFunResultWarn(kWrongType, 3, "string", "float")
     check testFunction("replace", parameters, eFunResult)
 
   test "replace start to small":

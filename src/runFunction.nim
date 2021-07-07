@@ -677,50 +677,33 @@ func funSubstr*(parameters: seq[Value]): FunResult =
   ## @:the end position. For example, [3, 7) includes 3, 4, 5, 6. The
   ## @:end minus the start is equal to the length of the substring.
   ## @:
-  ## @:* p1: string
-  ## @:* p2: start index
-  ## @:* p3: optional: end index (one past end)
-  ## @:* return: string
+  ## @:~~~
+  ## @:substr(str: string, start: int, optional end: int) string
+  ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
   ## @:substr("Earl Grey", 0, 4) => "Earl"
-  ## @:substr("Earl Grey", 5) => => "Grey"
+  ## @:substr("Earl Grey", 5) => "Grey"
   ## @:~~~~
 
-  if parameters.len < 2 or parameters.len > 3:
-    result = newFunResultWarn(wTwoOrThreeParameters)
-    return
+  tMapParameters("siois")
 
-  if parameters[0].kind != vkString:
-    result = newFunResultWarn(wExpectedString, 0)
-    return
-  let str = parameters[0].stringv
-
-  if parameters[1].kind != vkInt:
-    result = newFunResultWarn(wExpectedInteger, 1)
-    return
-  let start = int(parameters[1].intv)
-
-  var finish: int
-  if parameters.len == 3:
-    if parameters[2].kind != vkInt:
-      result = newFunResultWarn(wExpectedInteger, 2)
-      return
-    finish = int(parameters[2].intv)
+  let str = map["a"].stringv
+  let start = map["b"].intv
+  var finish: int64
+  if "c" in map:
+    finish = map["c"].intv
   else:
     finish = str.len
 
   if start < 0:
-    result = newFunResultWarn(wInvalidPosition, 1, $start)
-    return
+    return newFunResultWarn(wInvalidPosition, 1, $start)
   if finish > str.len:
-    result = newFunResultWarn(wInvalidPosition, 2, $finish)
-    return
+    return newFunResultWarn(wInvalidPosition, 2, $finish)
   if finish < start:
-    result = newFunResultWarn(wEndLessThenStart, 2)
-    return
+    return newFunResultWarn(wEndLessThenStart, 2)
 
   result = newFunResult(newValue(str[start .. finish-1]))
 
@@ -728,30 +711,25 @@ func funDup*(parameters: seq[Value]): FunResult =
   ## Duplicate a string. The first parameter is the string to dup and
   ## @:the second parameter is the number of times to duplicate it.
   ## @:
-  ## @:* p1: string to duplicate
-  ## @:* p2: number of times to repeat
-  ## @:* return: string
+  ## @:~~~
+  ## @:dup(pattern: string, count: int) string
+  ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
   ## @:dup("=", 3) => "==="
-  ## @:substr("abc", 2) => "abcabc"
+  ## @:dup("abc", 2) => "abcabc"
   ## @:~~~~
 
-  if parameters.len() != 2:
-    result = newFunResultWarn(wTwoParameters)
-    return
+  tMapParameters("sis")
 
-  if parameters[0].kind != vkString:
-    result = newFunResultWarn(wExpectedString, 0)
-    return
-  let pattern = parameters[0].stringv
+  let pattern = map["a"].stringv
+  let count = map["b"].intv
 
-  if parameters[1].kind != vkInt or parameters[1].intv < 0:
+  if count < 0:
     result = newFunResultWarn(wInvalidMaxCount, 1)
     return
-  let count = parameters[1].intv
 
   # Result must be less than 1024 characters.
   let length = count * pattern.len
@@ -768,47 +746,38 @@ func funDict*(parameters: seq[Value]): FunResult =
   ## Create a dictionary from a list of key, value pairs.  The keys
   ## @:must be strings and the values can be any type.
   ## @:
-  ## @:* p1: key string
-  ## @:* p2: value
-  ## @:* ...
-  ## @:* pn-1: key string
-  ## @:* pn: value
-  ## @:* return: dict
+  ## @:~~~
+  ## @:dict(pairs: optional varargs(string, any)) dict
+  ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
+  ## @:dict() => {}
   ## @:dict("a", 5) => {"a": 5}
   ## @:dict("a", 5, "b", 33, "c", 0) =>
   ## @:  {"a": 5, "b": 33, "c": 0}
   ## @:~~~~
 
+  tMapParameters("oSAd")
+
   var dict = newVarsDict()
-  if parameters.len == 0:
-    return newFunResult(newValue(dict))
 
-  # The parameters come in pairs.
-  if parameters.len mod 2 == 1:
-    return newFunResultWarn(wPairParameters, 0)
-
-  for ix in countUp(0, parameters.len-2, 2):
-    var key = parameters[ix]
-    if key.kind != vkString:
-      return newFunResultWarn(wExpectedString, ix)
-    var value = parameters[ix+1]
-    dict[key.stringv] = value
+  if "a" in map:
+    let pairs = map["a"].listv
+    for ix in countUp(0, pairs.len-2, 2):
+      var key = pairs[ix]
+      var value = pairs[ix+1]
+      dict[key.stringv] = value
 
   result = newFunResult(newValue(dict))
 
 func funList*(parameters: seq[Value]): FunResult =
   ## Create a list of values.
   ## @:
-  ## @:* p1: value
-  ## @:* p2: value
-  ## @:* p3: value
-  ## @:* ...
-  ## @:* pn: value
-  ## @:* return: list
+  ## @:~~~
+  ## @:list(items: optional varargs(any)) list
+  ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
@@ -826,11 +795,14 @@ func funReplace*(parameters: seq[Value]): FunResult =
   ## @:position and the string to take its place.  You can use it to
   ## @:insert and append to a string as well.
   ## @:
-  ## @:* p1: string
-  ## @:* p2: start index of substring
-  ## @:* p3: length of substring
-  ## @:* p4: replacement substring
-  ## @:* return: string
+  ## @:~~~
+  ## @:replace(str: string, start: int, length: int, replacement: string) string
+  ## @:~~~~
+  ## @:
+  ## @:* str: string
+  ## @:* start: substring start index
+  ## @:* length: substring length
+  ## @:* replacement: substring replacement
   ## @:
   ## @:Examples:
   ## @:
@@ -859,42 +831,25 @@ func funReplace*(parameters: seq[Value]): FunResult =
   ## @:replace("123", 0, 3, "") =>
   ## @:~~~~
 
-  if parameters.len != 4:
-    result = newFunResultWarn(wExpected4Parameters)
-    return
+  tMapParameters("siiss")
 
-  if parameters[0].kind != vkString:
-    result = newFunResultWarn(wExpectedString, 0)
-    return
-  let str = parameters[0].stringv
-
-  if parameters[1].kind != vkInt:
-    result = newFunResultWarn(wExpectedInteger, 1)
-    return
-  let start = int(parameters[1].intv)
+  let str = map["a"].stringv
+  let start = map["b"].intv
+  let length = map["c"].intv
+  let replacement = map["d"].stringv
 
   if start < 0 or start > str.len:
     result = newFunResultWarn(wInvalidPosition, 1, $start)
     return
 
-  if parameters[2].kind != vkInt:
-    result = newFunResultWarn(wExpectedInteger, 2)
-    return
-  let length = int(parameters[2].intv)
-
   if length < 0 or start + length > str.len:
     result = newFunResultWarn(wInvalidLength, 2, $length)
     return
 
-  if parameters[3].kind != vkString:
-    result = newFunResultWarn(wExpectedString, 3)
-    return
-  let replaceString = parameters[3].stringv
-
   var newString: string
   if start > 0 and start <= str.len:
     newString = str[0 .. start - 1]
-  newString = newString & replaceString
+  newString = newString & replacement
   if start + length < str.len:
     newString = newString & str[start + length .. str.len - 1]
 
