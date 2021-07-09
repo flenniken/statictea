@@ -45,10 +45,18 @@ func cmpBaseValues*(a, b: Value, insensitive: bool = false): int =
     else:
       result = 0
 
+# todo: use string for optional string case.  Either "sensitive" or "insensitive".
 func funCmp*(parameters: seq[Value]): FunResult =
   ## Compare two values. Returns -1 for less, 0 for equal and 1 for
-  ## @:greater than.  The values are either int, float or string (both the
-  ## @:same type) The default compares strings case sensitive.
+  ## @:greater than.  The values are either int, float or string (both
+  ## @:the same type) The default compares strings case sensitive, use 1
+  ## @:for case insensitive.
+  ## @:
+  ## @:~~~
+  ## @:cmp(a: int, b: int) int
+  ## @:cmp(a: float, b: float) int
+  ## @:cmp(a: string, b: string, optional insensitive: int) int
+  ## @:~~~~
   ## @:
   ## @:Compare numbers:
   ## @:
@@ -113,11 +121,9 @@ func funCmp*(parameters: seq[Value]): FunResult =
 func funConcat*(parameters: seq[Value]): FunResult =
   ## Concatentate two or more strings.
   ## @:
-  ## @:* p1: string
-  ## @:* p2: string
-  ## @:* ...
-  ## @:* pn: string
-  ## @:* return: string
+  ## @:~~~
+  ## @:concat(strs: varargs(string)) string
+  ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
@@ -125,21 +131,24 @@ func funConcat*(parameters: seq[Value]): FunResult =
   ## @:concat("tea", " time") => "tea time"
   ## @:concat("a", "b", "c", "d") => "abcd"
   ## @:~~~~
-  var str = ""
-  if parameters.len() < 2:
-    result = newFunResultWarn(wTwoOrMoreParameters)
-    return
-  for ix, value in parameters:
-    if value.kind != vkString:
-      result = newFunResultWarn(wExpectedString, ix)
-      return
-    str.add(value.stringv)
-  result = newFunResult(newValue(str))
+
+  tMapParameters("Ss")
+  let strs = map["a"].listv
+  var returnString: string
+  for value in strs:
+    returnString.add(value.stringv)
+  result = newFunResult(newValue(returnString))
 
 func funLen*(parameters: seq[Value]): FunResult =
   ## Length of a string, list or dictionary. For strings it returns
   ## @:the number of characters, not bytes. For lists and dictionaries
-  ## @:it return the number of elements.
+  ## @:it returns the number of elements.
+  ## @:
+  ## @:~~~
+  ## @:len(str: string) int
+  ## @:len(list: list) int
+  ## @:len(dictionary: dict) int
+  ## @:~~~~
   ## @:
   ## @:* p1: string, list or dict
   ## @:* return: int
@@ -169,19 +178,23 @@ func funLen*(parameters: seq[Value]): FunResult =
   result = newFunResult(retValue)
 
 func funGet*(parameters: seq[Value]): FunResult =
-  ## Get a value from a list or dictionary.  You can specify a default
-  ## @:value to return when the value doesn't exist, if you don't, a
-  ## @:warning is generated when the element doesn't exist.
+  ## Get a value from a list or dictionary.
+  ## @:
+  ## @:For a list you specify the index of the item you want to get. If
+  ## @:the index is too big, the default value is returned, if
+  ## @:specified, else a warning is generated.
+  ## @:
+  ## @:For a dictionary you specify the key of the item you want to
+  ## @:get. If the key doesn't exist, the default value is returned, if
+  ## @:specified, else a warning is generated.
+  ## @:
+  ## @:~~~
+  ## @:get(list: list, index: int, optional default: any) any
+  ## @:get(dictionary: dict, key: string, optional default: any) any
+  ## @:~~~~
   ## @:
   ## @:Note: for dictionary lookup you can use dot notation for many
   ## @:cases.
-  ## @:
-  ## @:Dictionary case:
-  ## @:
-  ## @:* p1: dictionary
-  ## @:* p2: key string
-  ## @:* p3: optional default value returned when key is missing
-  ## @:* return: value
   ## @:
   ## @:List case:
   ## @:
@@ -190,16 +203,23 @@ func funGet*(parameters: seq[Value]): FunResult =
   ## @:* p3: optional default value returned when index is too big
   ## @:* return: value
   ## @:
+  ## @:Dictionary case:
+  ## @:
+  ## @:* p1: dictionary
+  ## @:* p2: key string
+  ## @:* p3: optional default value returned when key is missing
+  ## @:* return: value
+  ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:d = dict("tea", "Earl Grey")
-  ## @:get(d, 'tea') => "Earl Grey"
-  ## @:get(d, 'coffee', 'Tea') => "Tea"
-  ## @:
   ## @:list = list(4, 'a', 10)
   ## @:get(list, 2) => 10
   ## @:get(list, 3, 99) => 99
+  ## @:
+  ## @:d = dict("tea", "Earl Grey")
+  ## @:get(d, 'tea') => "Earl Grey"
+  ## @:get(d, 'coffee', 'Tea') => "Tea"
   ## @:
   ## @:d = dict("tea", "Earl Grey")
   ## @:d.tea => "Earl Grey"
@@ -235,14 +255,13 @@ func funGet*(parameters: seq[Value]): FunResult =
     else:
       return newFunResultWarn(wExpectedListOrDict)
 
-# todo: remove the if.  Use case instead. Rename case to if?
 func funIf*(parameters: seq[Value]): FunResult =
-  ## Return a value based on a condition.
+  ## Return a value when the condition is 1 and another value when the
+  ## @:condition is not 1.
   ## @:
-  ## @:* p1: int condition
-  ## @:* p2: true case: the value returned when condition is 1
-  ## @:* p3: else case: the value returned when condition is not 1.
-  ## @:* return: p2 or p3
+  ## @:~~~
+  ## @:if(condition: int, oneCase: any, notOne: any) any
+  ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
@@ -252,25 +271,26 @@ func funIf*(parameters: seq[Value]): FunResult =
   ## @:if(4, 'tea', 'beer') => "beer"
   ## @:~~~~
 
-  if parameters.len() != 3:
-    result = newFunResultWarn(wThreeParameters)
-    return
+  tMapParameters("iaaa")
+  let condition = map["a"].intv
+  let oneCase = map["b"]
+  let notOne = map["c"]
 
-  let condition = parameters[0]
-  if condition.kind != vkInt:
-    result = newFunResultWarn(wExpectedInteger)
-    return
-
-  if condition.intv == 1:
-    result = newFunResult(parameters[1])
+  if condition == 1:
+    result = newFunResult(oneCase)
   else:
-    result = newFunResult(parameters[2])
+    result = newFunResult(notOne)
 
 {.push overflowChecks: on, floatChecks: on.}
 
 func funAdd*(parameters: seq[Value]): FunResult =
   ## Add two or more numbers.  The parameters must be all integers or
   ## @:all floats.  A warning is generated on overflow.
+  ## @:
+  ## @:~~~
+  ## @:add(numbers: varargs(int)) int
+  ## @:add(numbers: varargs(float)) float
+  ## @:~~~~
   ## @:
   ## @:Integer case:
   ## @:
@@ -326,11 +346,12 @@ func funAdd*(parameters: seq[Value]): FunResult =
 {.pop.}
 
 func funExists*(parameters: seq[Value]): FunResult =
-  ## Determine whether a key exists in a dictionary.
+  ## Determine whether a key exists in a dictionary. Return 1 when it
+  ## exists, else 0.
   ## @:
-  ## @:* p1: dictionary
-  ## @:* p2: key string
-  ## @:* return: 0 or 1
+  ## @:~~~
+  ## @:exists(dictionary: dict, key: string) int
+  ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
@@ -340,24 +361,14 @@ func funExists*(parameters: seq[Value]): FunResult =
   ## @:exists(d, "coffee") => 0
   ## @:~~~~
 
-  if parameters.len() != 2:
-    result = newFunResultWarn(wTwoParameters)
-    return
+  tMapParameters("dsi")
+  let dictionary = map["a"].dictv
+  let key = map["b"].stringv
 
-  let container = parameters[0]
-  if container.kind != vkDict:
-    result = newFunResultWarn(wExpectedDictionary)
-    return
-
-  let key = parameters[1]
-  if key.kind != vkString:
-    result = newFunResultWarn(wExpectedString, 1)
-    return
-
-  var num: int
-  if key.stringv in container.dictv:
-    num = 1
-  result = newFunResult(newValue(num))
+  var ret: int
+  if key in dictionary:
+    ret = 1
+  result = newFunResult(newValue(ret))
 
 func funCase*(parameters: seq[Value]): FunResult =
   ## Return a value from multiple choices. It takes a main condition,
@@ -372,6 +383,11 @@ func funCase*(parameters: seq[Value]): FunResult =
   ## @:value is returned. If none match and the else is missing, a
   ## @:warning is generated and the statement is skipped. The conditions
   ## @:must be integers or strings. The return values can be any type.
+  ## @:
+  ## @:~~~
+  ## @:case(condition: int, else: any, varargs(int, any) any
+  ## @:case(condition: string, else: any, varargs(string, any) any
+  ## @:~~~~
   ## @:
   ## @:* p1: the main condition value
   ## @:* p2: the first case condition
@@ -454,13 +470,13 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
   ## Compare two StaticTea version numbers. Returns -1 for less, 0 for
   ## @:equal and 1 for greater than.
   ## @:
+  ## @:~~~
+  ## @:cmpVersion(versionA: string, versionB: string) int
+  ## @:~~~~
+  ## @:
   ## @:StaticTea uses @|@|https@@://semver.org/]@|Semantic Versioning]]
   ## @:with the added restriction that each version component has one
   ## @:to three digits (no letters).
-  ## @:
-  ## @:* p1: version number string
-  ## @:* p2: version number string
-  ## @:* return: -1, 0, 1
   ## @:
   ## @:Examples:
   ## @:
@@ -470,23 +486,20 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
   ## @:cmpVersion("1.2.5", "1.2.5") => 0
   ## @:~~~~
 
-  if parameters.len() != 2:
-    result = newFunResultWarn(wTwoParameters)
-    return
+  tMapParameters("ssi")
 
-  var parts: seq[(int, int, int)]
-  for ix in 0 .. 1:
-    if parameters[ix].kind != vkString:
-      result = newFunResultWarn(wExpectedString, ix)
-      return
-    let tupleO = parseVersion(parameters[ix].stringv)
-    if not tupleO.isSome:
-      result = newFunResultWarn(wInvalidVersion, ix)
-      return
-    parts.add(tupleO.get())
+  let versionA = map["a"].stringv
+  let versionB = map["b"].stringv
 
-  let (oneV1, twoV1, threeV1) = parts[0]
-  let (oneV2, twoV2, threeV2) = parts[1]
+  let aTupleO = parseVersion(versionA)
+  if not aTupleO.isSome:
+    return newFunResultWarn(wInvalidVersion, 0)
+  let (oneV1, twoV1, threeV1) = aTupleO.get()
+
+  let bTupleO = parseVersion(versionB)
+  if not bTupleO.isSome:
+    return newFunResultWarn(wInvalidVersion, 1)
+  let (oneV2, twoV2, threeV2) = bTupleO.get()
 
   var ret = cmp(oneV1, oneV2)
   if ret == 0:
@@ -498,6 +511,11 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
 
 func funFloat*(parameters: seq[Value]): FunResult =
   ## Create a float from an int or an int number string.
+  ## @:
+  ## @:~~~
+  ## @:float(num: int) float
+  ## @:float(numString: string) float
+  ## @:~~~~
   ## @:
   ## @:* p1: int or int string
   ## @:* return: float
@@ -541,9 +559,10 @@ func funFloat*(parameters: seq[Value]): FunResult =
 func funInt*(parameters: seq[Value]): FunResult =
   ## Create an int from a float or a float number string.
   ## @:
-  ## @:* p1: float or float number string
-  ## @:* p2: optional round option. "round" is the default.
-  ## @:* return: int
+  ## @:~~~
+  ## @:int(num: float, optional roundOption: string) int
+  ## @:int(numString: string, optional roundOption: string) int
+  ## @:~~~~
   ## @:
   ## @:Round options:
   ## @:
@@ -627,16 +646,16 @@ func funInt*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(ret))
 
 func funFind*(parameters: seq[Value]): FunResult =
-  ## Find the position of a substring in a string.  When the substring
-  ## @:is not found you can return a default value.  A warning is
-  ## @:generated when the substring is missing and you don't specify a
-  ## @:default value.
+  ## Return the position of a substring in a string.  When the
+  ## @:substring is not found you can return a default value.  A warning
+  ## @:is generated when the substring is missing and you don't specify
+  ## @:a default value.
   ## @:
+  ## @:~~~
+  ## @:find(str: string, substring: string, optional default: any) any
+  ## @:~~~~
   ## @:
-  ## @:* p1: string
-  ## @:* p2: substring
-  ## @:* p3: optional default value
-  ## @:* return: the index of substring or p3
+  ## @:Examples:
   ## @:
   ## @:~~~
   ## @:       0123456789 1234567
@@ -649,19 +668,15 @@ func funFind*(parameters: seq[Value]): FunResult =
   ## @:find(msg, "party", 0) = 0
   ## @:~~~~
 
-  if parameters.len() < 2 or parameters.len() > 3:
-    result = newFunResultWarn(wTwoOrThreeParameters, 0)
-    return
+  tMapParameters("ssoaa")
 
-  for ix, parameter in parameters[0 .. 1]:
-    if parameter.kind != vkString:
-      result = newFunResultWarn(wExpectedString, ix)
-      return
+  let str = map["a"].stringv
+  let substring = map["b"].stringv
 
-  let pos = find(parameters[0].stringv, parameters[1].stringv)
+  let pos = find(str, substring)
   if pos == -1:
-    if parameters.len == 3:
-      result = newFunResult(parameters[2])
+    if "c" in map:
+      result = newFunResult(map["c"])
     else:
       result = newFunResultWarn(wSubstringNotFound, 1)
   else:
@@ -918,6 +933,11 @@ func funReplaceRe*(parameters: seq[Value]): FunResult =
   ## @:replacement. The pairs can be specified as parameters to the
   ## @:function or they can be part of a list.
   ## @:
+  ## @:~~~
+  ## @:replaceRe(str: string, pairs: varargs(string, string) string
+  ## @:replaceRe(str: string, pairs: list) string
+  ## @:~~~~
+  ## @:
   ## @:Muliple parameters case:
   ## @:
   ## @:* p1: string to replace
@@ -1111,7 +1131,7 @@ func funValues*(parameters: seq[Value]): FunResult =
 
   tMapParameters("dl")
   let dict = map["a"].dictv
-  
+
   var theList: seq[Value]
   for key, value in dict.pairs():
     theList.add(value)
@@ -1121,18 +1141,26 @@ func funValues*(parameters: seq[Value]): FunResult =
 func funSort*(parameters: seq[Value]): FunResult =
   ## Sort a list of values of the same type.
   ## @:
+  ## @:You have the option of sorting ascending or descending.
+  ## @:
   ## @:When sorting strings you have the option to compare case
   ## @:sensitive or insensitive.
   ## @:
-  ## @:When sorting lists the lists are compared by their first
-  ## @:element. The first elements must exist, be the same type and be
-  ## @:an int, float or string. You have the option of comparing strings
-  ## @:case insensitive.
+  ## @:When sorting lists, you specify which index to compare by, index
+  ## @:0 is the default.  The compare index value must exist in each list, be
+  ## @:the same type and be an int, float or string.
   ## @:
-  ## @:Dictionaries are compared by the value of one of their keys.  The
-  ## @:key values must exist, be the same type and be an int, float or
-  ## @:string. You have the option of comparing strings case
-  ## @:insensitive.
+  ## @:When sorting dictionaries, you specify which key to compare by.
+  ## @:The key value must exist in each dictionary, be the same type and
+  ## @:be an int, float or string.
+  ## @:
+  ## @:~~~
+  ## @:sort(ints: list, optional order: string) list
+  ## @:sort(floats: list, optional order: string) list
+  ## @:sort(strings: list, order: string, optional case: string) list
+  ## @:sort(lists: list, order: string, case: string, index: int) list
+  ## @:sort(dicts: list, order: string, case: string, key: string) list
+  ## @:~~~~
   ## @:
   ## @:int, float case:
   ## @:

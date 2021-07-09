@@ -320,10 +320,13 @@ proc getFunctionValue*(env: var Env, prepostTable:
   # Run the function.
   let funResult = function(parameters)
   if funResult.kind == frWarning:
+    var warningPos: int
+    if funResult.parameter < parameterStarts.len:
+      warningPos = parameterStarts[funResult.parameter]
+    else:
+      warningPos = start
     env.warnStatement(statement, funResult.warningData.warning,
-      parameterStarts[funResult.parameter],
-      funResult.warningData.p1,
-      funResult.warningData.p2)
+      warningPos, funResult.warningData.p1, funResult.warningData.p2)
     return
 
   result = some(ValueAndLength(value: funResult.value, length: pos-start))
@@ -368,7 +371,7 @@ proc getVarOrFunctionValue*(env: var Env, prepostTable:
     # warning when the variable doesn't exist.
     let valueOrWarning = getVariable(variables, dotNameStr)
     if valueOrWarning.kind == vwWarning:
-      # todo: show the correct error message. 
+      # todo: show the correct error message.
       env.warnStatement(statement, wVariableMissing, start, dotNameStr)
       return
     result = some(newValueAndLength(valueOrWarning.value, matches.length))
@@ -448,7 +451,7 @@ proc runStatement*(env: var Env, statement: Statement,
 
   # Return the variable and value for testing.
   result = some(newVariableData(dotNameStr, value))
-  
+
 proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
                  seq[LineParts], prepostTable: PrepostTable,
                  variables: var Variables) =

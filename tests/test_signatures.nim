@@ -238,6 +238,7 @@ suite "signatures.nim":
     var parameters: seq[Value] = @[]
     check testMapParametersW("ii", parameters, 0, kNotEnoughArgs, "1", "0")
     check testMapParametersW("Ii", parameters, 0, kNotEnoughArgs, "1", "0")
+    check testMapParametersW("Ss", parameters, 0, kNotEnoughArgs, "1", "0")
 
     parameters = @[newValue(1)]
     check testMapParametersW("iii", parameters, 0, kNotEnoughArgs, "2", "1")

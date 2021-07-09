@@ -1470,11 +1470,12 @@ List of functions:
 - [[#dict][dict()]] -- Create a dictionary from a list of key, value pairs.
 - [[#dup][dup()]] -- Duplicate a string.
 - [[#exists][exists()]] -- Determine whether a key exists in a dictionary.
-- [[#find][find()]] -- Find the position of a substring in a string.
+- [[#find][find()]] -- Return the position of a substring in a string.
 - [[#float][float()]] -- Create a float from an int or an int number string.
 - [[#get][get()]] -- Get a value from a list or dictionary.
 - [[#githubAnchor][githubAnchor()]] -- Create a Github markdown anchor name given a heading name.
-- [[#if][if()]] -- Return a value based on a condition.
+- [[#if][if()]] -- Return a value when the condition is 1 and another value when the
+condition is not 1.
 - [[#int][int()]] -- Create an int from a float or a float number string.
 - [[#keys][keys()]] -- Create a list from the keys in a dictionary.
 - [[#len][len()]] -- Length of a string, list or dictionary.
@@ -1496,6 +1497,11 @@ List of functions:
 
 Add two or more numbers.  The parameters must be all integers or
 all floats.  A warning is generated on overflow.
+
+#+BEGIN_SRC
+add(numbers: varargs(int)) int
+add(numbers: varargs(float)) float
+#+END_SRC
 
 Integer case:
 
@@ -1543,6 +1549,11 @@ value is returned. If none match and the else is missing, a
 warning is generated and the statement is skipped. The conditions
 must be integers or strings. The return values can be any type.
 
+#+BEGIN_SRC
+case(condition: int, else: any, varargs(int, any) any
+case(condition: string, else: any, varargs(string, any) any
+#+END_SRC
+
 - p1: the main condition value
 - p2: the first case condition
 - p3: the first case value
@@ -1572,8 +1583,15 @@ case(8,
 :END:
 
 Compare two values. Returns -1 for less, 0 for equal and 1 for
-greater than.  The values are either int, float or string (both the
-same type) The default compares strings case sensitive.
+greater than.  The values are either int, float or string (both
+the same type) The default compares strings case sensitive, use 1
+for case insensitive.
+
+#+BEGIN_SRC
+cmp(a: int, b: int) int
+cmp(a: float, b: float) int
+cmp(a: string, b: string, optional insensitive: int) int
+#+END_SRC
 
 Compare numbers:
 
@@ -1611,13 +1629,13 @@ cmp("Tea", "tea", 1) => 0
 Compare two StaticTea version numbers. Returns -1 for less, 0 for
 equal and 1 for greater than.
 
+#+BEGIN_SRC
+cmpVersion(versionA: string, versionB: string) int
+#+END_SRC
+
 StaticTea uses [[https://semver.org/][Semantic Versioning]]
 with the added restriction that each version component has one
 to three digits (no letters).
-
-- p1: version number string
-- p2: version number string
-- return: -1, 0, 1
 
 Examples:
 
@@ -1636,11 +1654,9 @@ cmpVersion("1.2.5", "1.2.5") => 0
 
 Concatentate two or more strings.
 
-- p1: string
-- p2: string
-- ...
-- pn: string
-- return: string
+#+BEGIN_SRC
+concat(strs: varargs(string)) string
+#+END_SRC
 
 Examples:
 
@@ -1700,11 +1716,11 @@ dup("abc", 2) => "abcabc"
 :CUSTOM_ID: exists
 :END:
 
-Determine whether a key exists in a dictionary.
+Determine whether a key exists in a dictionary. Return 1 when it exists, else 0.
 
-- p1: dictionary
-- p2: key string
-- return: 0 or 1
+#+BEGIN_SRC
+exists(dictionary: dict, key: string) int
+#+END_SRC
 
 Examples:
 
@@ -1721,16 +1737,16 @@ exists(d, "coffee") => 0
 :CUSTOM_ID: find
 :END:
 
-Find the position of a substring in a string.  When the substring
-is not found you can return a default value.  A warning is
-generated when the substring is missing and you don't specify a
-default value.
+Return the position of a substring in a string.  When the
+substring is not found you can return a default value.  A warning
+is generated when the substring is missing and you don't specify
+a default value.
 
+#+BEGIN_SRC
+find(str: string, substring: string, optional default: any) any
+#+END_SRC
 
-- p1: string
-- p2: substring
-- p3: optional default value
-- return: the index of substring or p3
+Examples:
 
 #+BEGIN_SRC
        0123456789 1234567
@@ -1752,6 +1768,11 @@ find(msg, "party", 0) = 0
 
 Create a float from an int or an int number string.
 
+#+BEGIN_SRC
+float(num: int) float
+float(numString: string) float
+#+END_SRC
+
 - p1: int or int string
 - return: float
 
@@ -1769,19 +1790,23 @@ float("33") => 33.0
 :CUSTOM_ID: get
 :END:
 
-Get a value from a list or dictionary.  You can specify a default
-value to return when the value doesn't exist, if you don't, a
-warning is generated when the element doesn't exist.
+Get a value from a list or dictionary.
+
+For a list you specify the index of the item you want to get. If
+the index is too big, the default value is returned, if
+specified, else a warning is generated.
+
+For a dictionary you specify the key of the item you want to
+get. If the key doesn't exist, the default value is returned, if
+specified, else a warning is generated.
+
+#+BEGIN_SRC
+get(list: list, index: int, optional default: any) any
+get(dictionary: dict, key: string, optional default: any) any
+#+END_SRC
 
 Note: for dictionary lookup you can use dot notation for many
 cases.
-
-Dictionary case:
-
-- p1: dictionary
-- p2: key string
-- p3: optional default value returned when key is missing
-- return: value
 
 List case:
 
@@ -1790,16 +1815,23 @@ List case:
 - p3: optional default value returned when index is too big
 - return: value
 
+Dictionary case:
+
+- p1: dictionary
+- p2: key string
+- p3: optional default value returned when key is missing
+- return: value
+
 Examples:
 
 #+BEGIN_SRC
-d = dict("tea", "Earl Grey")
-get(d, 'tea') => "Earl Grey"
-get(d, 'coffee', 'Tea') => "Tea"
-
 list = list(4, 'a', 10)
 get(list, 2) => 10
 get(list, 3, 99) => 99
+
+d = dict("tea", "Earl Grey")
+get(d, 'tea') => "Earl Grey"
+get(d, 'coffee', 'Tea') => "Tea"
 
 d = dict("tea", "Earl Grey")
 d.tea => "Earl Grey"
@@ -1844,12 +1876,12 @@ $$ : anchor = githubAnchor(entry.name)
 :CUSTOM_ID: if
 :END:
 
-Return a value based on a condition.
+Return a value when the condition is 1 and another value when the
+condition is not 1.
 
-- p1: int condition
-- p2: true case: the value returned when condition is 1
-- p3: else case: the value returned when condition is not 1.
-- return: p2 or p3
+#+BEGIN_SRC
+if(condition: int, oneCase: any, notOne: any) any
+#+END_SRC
 
 Examples:
 
@@ -1868,9 +1900,10 @@ if(4, 'tea', 'beer') => "beer"
 
 Create an int from a float or a float number string.
 
-- p1: float or float number string
-- p2: optional round option. "round" is the default.
-- return: int
+#+BEGIN_SRC
+int(num: float, optional roundOption: string) int
+int(numString: string, optional roundOption: string) int
+#+END_SRC
 
 Round options:
 
@@ -1926,7 +1959,13 @@ values(d) => ["apple", 2, 3]
 
 Length of a string, list or dictionary. For strings it returns
 the number of characters, not bytes. For lists and dictionaries
-it return the number of elements.
+it returns the number of elements.
+
+#+BEGIN_SRC
+len(str: string) int
+len(list: list) int
+len(dictionary: dict) int
+#+END_SRC
 
 - p1: string, list or dict
 - return: int
@@ -2076,6 +2115,11 @@ You specify one or more pairs of a regex patterns and its string
 replacement. The pairs can be specified as parameters to the
 function or they can be part of a list.
 
+#+BEGIN_SRC
+replaceRe(str: string, pairs: varargs(string, string) string
+replaceRe(str: string, pairs: list) string
+#+END_SRC
+
 Muliple parameters case:
 
 - p1: string to replace
@@ -2118,18 +2162,26 @@ website: https://regex101.com/
 
 Sort a list of values of the same type.
 
+You have the option of sorting ascending or descending.
+
 When sorting strings you have the option to compare case
 sensitive or insensitive.
 
-When sorting lists the lists are compared by their first
-element. The first elements must exist, be the same type and be
-an int, float or string. You have the option of comparing strings
-case insensitive.
+When sorting lists, you specify which index to compare by, index
+0 is the default.  The compare index value must exist in each list, be
+the same type and be an int, float or string.
 
-Dictionaries are compared by the value of one of their keys.  The
-key values must exist, be the same type and be an int, float or
-string. You have the option of comparing strings case
-insensitive.
+When sorting dictionaries, you specify which key to compare by.
+The key value must exist in each dictionary, be the same type and
+be an int, float or string.
+
+#+BEGIN_SRC
+sort(ints: list, optional order: string) list
+sort(floats: list, optional order: string) list
+sort(strings: list, order: string, optional case: string) list
+sort(lists: list, order: string, case: string, index: int) list
+sort(dicts: list, order: string, case: string, key: string) list
+#+END_SRC
 
 int, float case:
 

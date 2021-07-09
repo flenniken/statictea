@@ -64,6 +64,11 @@ proc testCmpFun[T](a: T, b: T, caseInsensitive: bool = false, expected: int = 0)
   let eFunResult = newFunResult(newValue(expected))
   result = testFunction("cmp", parameters, eFunResult)
 
+proc testCmpVersionGood(versionA: string, versionB: string, eResult: int): bool =
+  var parameters = @[newValue(versionA), newValue(versionB)]
+  let eFunResult = newFunResult(newValue(eResult))
+  result = testFunction("cmpVersion", parameters, eFunResult)
+
 proc testReplaceGood(str: string, start: int, length: int, replace: string, eResult: string): bool =
   var parameters: seq[Value] = @[newValue(str),
     newValue(start), newValue(length), newValue(replace)]
@@ -104,34 +109,29 @@ suite "runFunction.nim":
     let function = getFunction("notfunction")
     check not isSome(function)
 
-  test "funConcat 2":
-    var parameters = newValue(["abc", " def"]).listv
-    let eFunResult = newFunResult(newValue("abc def"))
+  test "concat 1 string":
+    var parameters = newValue(["abc"]).listv
+    let eFunResult = newFunResult(newValue("abc"))
     check testFunction("concat", parameters, eFunResult)
 
-  test "funConcat 3":
+  test "concat hello world":
+    var parameters = newValue(["Hello", " World"]).listv
+    let eFunResult = newFunResult(newValue("Hello World"))
+    check testFunction("concat", parameters, eFunResult)
+
+  test "concat empty string":
     var parameters = newValue(["abc","", "def"]).listv
     let eFunResult = newFunResult(newValue("abcdef"))
     check testFunction("concat", parameters, eFunResult)
 
-  test "funConcat 0":
-    var parameters = @[newValue(5)]
-    let eFunResult = newFunResultWarn(wTwoOrMoreParameters)
+  test "concat many":
+    var parameters = newValue(["a", "b", "c", "d", "e", "f"]).listv
+    let eFunResult = newFunResult(newValue("abcdef"))
     check testFunction("concat", parameters, eFunResult)
 
-  test "funConcat 1":
-    var parameters = @[newValue("abc")]
-    let eFunResult = newFunResultWarn(wTwoOrMoreParameters)
-    check testFunction("concat", parameters, eFunResult)
-
-  test "funConcat not string":
-    var parameters = @[newValue("abc"), newValue(5)]
-    let eFunResult = newFunResultWarn(wExpectedString, 1)
-    check testFunction("concat", parameters, eFunResult)
-
-  test "runFunction":
-    var parameters = newValue(["Hello", " World"]).listv
-    let eFunResult = newFunResult(newValue("Hello World"))
+  test "concat nothing":
+    var parameters: seq[Value]
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1", "0")
     check testFunction("concat", parameters, eFunResult)
 
   test "len string":
@@ -308,40 +308,15 @@ suite "runFunction.nim":
     let eFunResult = newFunResultWarn(wNotZeroOne, 2)
     check testFunction("cmp", parameters, eFunResult)
 
-  test "if function true":
+  test "if function 1":
     var parameters = @[newValue(1), newValue("true"), newValue("false")]
     let eFunResult = newFunResult(newValue("true"))
     check testFunction("if", parameters, eFunResult)
 
-  test "if function false":
+  test "if function not 1":
     var parameters = @[newValue(33), newValue("true"), newValue("false")]
     let eFunResult = newFunResult(newValue("false"))
     check testFunction("if", parameters, eFunResult)
-
-  test "if wrong condition type":
-    var parameters = @[newValue(3.4), newValue("true"), newValue("false")]
-    let eFunResult = newFunResultWarn(wExpectedInteger)
-    check testFunction("if", parameters, eFunResult)
-
-  test "if wrong number of parameters":
-    var parameters = @[newValue(2), newValue("false")]
-    let eFunResult = newFunResultWarn(wThreeParameters)
-    check testFunction("if", parameters, eFunResult)
-
-  test "add function 2 int parameters":
-    var parameters = @[newValue(1), newValue(2)]
-    let eFunResult = newFunResult(newValue(3))
-    check testFunction("add", parameters, eFunResult)
-
-  test "add function 3 int parameters":
-    var parameters = @[newValue(1), newValue(2), newValue(3)]
-    let eFunResult = newFunResult(newValue(6))
-    check testFunction("add", parameters, eFunResult)
-
-  test "add function 2 float parameters":
-    var parameters = @[newValue(2.0), newValue(3.5)]
-    let eFunResult = newFunResult(newValue(5.5))
-    check testFunction("add", parameters, eFunResult)
 
   test "add wrong number of parameters":
     var parameters = @[newValue(2)]
@@ -389,22 +364,6 @@ suite "runFunction.nim":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
     var parameters = @[dict, newValue("z")]
     let eFunResult = newFunResult(newValue(0))
-    check testFunction("exists", parameters, eFunResult)
-
-  test "exists wrong number of parameters":
-    var parameters = @[newValue("z")]
-    let eFunResult = newFunResultWarn(wTwoParameters)
-    check testFunction("exists", parameters, eFunResult)
-
-  test "exists not dict":
-    var parameters = @[newValue("z"), newValue("a")]
-    let eFunResult = newFunResultWarn(wExpectedDictionary)
-    check testFunction("exists", parameters, eFunResult)
-
-  test "exists not string":
-    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
-    var parameters = @[dict, newValue(0)]
-    let eFunResult = newFunResultWarn(wExpectedString, 1)
     check testFunction("exists", parameters, eFunResult)
 
   test "case int":
@@ -673,17 +632,17 @@ suite "runFunction.nim":
 
   test "find 1 parameter":
     var parameters = @[newValue("big")]
-    let eFunResult = newFunResultWarn(wTwoOrThreeParameters)
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "1")
     check testFunction("find", parameters, eFunResult)
 
   test "find 1 not string":
     var parameters = @[newValue(1), newValue("bigger")]
-    let eFunResult = newFunResultWarn(wExpectedString)
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
     check testFunction("find", parameters, eFunResult)
 
   test "find 2 not string":
     var parameters = @[newValue("at"), newValue(4.5)]
-    let eFunResult = newFunResultWarn(wExpectedString, 1)
+    let eFunResult = newFunResultWarn(kWrongType, 1, "string", "float")
     check testFunction("find", parameters, eFunResult)
 
   test "substr Grey":
@@ -1296,3 +1255,48 @@ suite "runFunction.nim":
     var parameters: seq[Value] = @[newValue(2)]
     let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
     check testFunction("githubAnchor", parameters, eFunResult)
+
+  test "cmdVersion":
+    check testCmpVersionGood("0.0.0", "0.0.0", 0)
+    check testCmpVersionGood("0.0.0", "0.0.1", -1)
+    check testCmpVersionGood("0.0.1", "0.0.0", 1)
+
+    check testCmpVersionGood("1.2.3", "1.2.3", 0)
+    check testCmpVersionGood("1.2.3", "1.4.3", -1)
+    check testCmpVersionGood("1.2.3", "1.1.3", 1)
+
+    check testCmpVersionGood("555.444.666", "555.444.666", 0)
+    check testCmpVersionGood("555.444.666", "555.444.667", -1)
+    check testCmpVersionGood("555.444.666", "555.444.665", 1)
+
+    check testCmpVersionGood("555.444.666", "555.444.666", 0)
+    check testCmpVersionGood("555.443.666", "555.444.777", -1)
+    check testCmpVersionGood("555.445.666", "555.444.111", 1)
+
+    check testCmpVersionGood("1.56.2", "1.56.2", 0)
+    check testCmpVersionGood("1.56.2", "2.0.0", -1)
+    check testCmpVersionGood("1.56.2", "1.1.1", 1)
+
+    check testCmpVersionGood("000.000.000", "0.0.0", 0)
+    check testCmpVersionGood("00.00.00", "0.0.0", 0)
+    check testCmpVersionGood("0.00.000", "0.0.0", 0)
+
+  test "cmdVersion: two few parameters":
+    let parameters = @[newValue("1.2.3")]
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "1")
+    check testFunction("cmpVersion", parameters, eFunResult)
+
+  test "cmdVersion: two many parameters":
+    let parameters = @[newValue("1.2.3"), newValue("1.2.3"), newValue("1.2.3")]
+    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "2", "3")
+    check testFunction("cmpVersion", parameters, eFunResult)
+
+  test "cmdVersion: invalid version a":
+    let parameters = @[newValue("1.2.3a"), newValue("1.2.3")]
+    let eFunResult = newFunResultWarn(wInvalidVersion, 0)
+    check testFunction("cmpVersion", parameters, eFunResult)
+
+  test "cmdVersion: invalid version b":
+    let parameters = @[newValue("1.2.3"), newValue("1.2.3b")]
+    let eFunResult = newFunResultWarn(wInvalidVersion, 1)
+    check testFunction("cmpVersion", parameters, eFunResult)

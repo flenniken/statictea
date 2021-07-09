@@ -834,11 +834,11 @@ statement: result = case(1, 2, 22, 'abc', 33)
     check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "parameter error position":
-    let text = "result = case(33, 2, 22, 'abc', 11, len(concat('a')))"
+    let text = "result = case(33, 2, 22, 'abc', 11, len(concat()))"
     let statement = newStatement(text, lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w66: The function takes two or more parameters.
-statement: result = case(33, 2, 22, 'abc', 11, len(concat('a')))
+template.html(1): w119: Not enough parameters, expected 1 got 0.
+statement: result = case(33, 2, 22, 'abc', 11, len(concat()))
                                                           ^
 """
     var variables = emptyVariables()
@@ -905,7 +905,7 @@ statement: t.missing = "1.2.3"
   test "cmpVersion two parameters":
     let statement = newStatement(text="cmp = cmpVersion('1.2.3')", lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w62: The function takes two parameters.
+template.html(1): w119: Not enough parameters, expected 2 got 1.
 statement: cmp = cmpVersion('1.2.3')
                             ^
 """
@@ -915,7 +915,7 @@ statement: cmp = cmpVersion('1.2.3')
   test "cmpVersion strings":
     let statement = newStatement(text="cmp = cmpVersion('1.2.3', 3.5)", lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w47: Expected a string.
+template.html(1): w120: Wrong parameter type, expected string got float.
 statement: cmp = cmpVersion('1.2.3', 3.5)
                                      ^
 """

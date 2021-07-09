@@ -10,7 +10,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funConcat](#funconcat) &mdash; Concatentate two or more strings.
 * [funLen](#funlen) &mdash; Length of a string, list or dictionary.
 * [funGet](#funget) &mdash; Get a value from a list or dictionary.
-* [funIf](#funif) &mdash; Return a value based on a condition.
+* [funIf](#funif) &mdash; Return a value when the condition is 1 and another value when the
+condition is not 1.
 * [funAdd](#funadd) &mdash; Add two or more numbers.
 * [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
 * [funCase](#funcase) &mdash; Return a value from multiple choices.
@@ -18,7 +19,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funCmpVersion](#funcmpversion) &mdash; Compare two StaticTea version numbers.
 * [funFloat](#funfloat) &mdash; Create a float from an int or an int number string.
 * [funInt](#funint) &mdash; Create an int from a float or a float number string.
-* [funFind](#funfind) &mdash; Find the position of a substring in a string.
+* [funFind](#funfind) &mdash; Return the position of a substring in a string.
 * [funSubstr](#funsubstr) &mdash; Extract a substring from a string by its position.
 * [funDup](#fundup) &mdash; Duplicate a string.
 * [funDict](#fundict) &mdash; Create a dictionary from a list of key, value pairs.
@@ -45,8 +46,15 @@ func cmpBaseValues(a, b: Value; insensitive: bool = false): int
 # funCmp
 
 Compare two values. Returns -1 for less, 0 for equal and 1 for
-greater than.  The values are either int, float or string (both the
-same type) The default compares strings case sensitive.
+greater than.  The values are either int, float or string (both
+the same type) The default compares strings case sensitive, use 1
+for case insensitive.
+
+~~~
+cmp(a: int, b: int) int
+cmp(a: float, b: float) int
+cmp(a: string, b: string, optional insensitive: int) int
+~~~~
 
 Compare numbers:
 
@@ -83,11 +91,9 @@ func funCmp(parameters: seq[Value]): FunResult
 
 Concatentate two or more strings.
 
-* p1: string
-* p2: string
-* ...
-* pn: string
-* return: string
+~~~
+concat(strs: varargs(string)) string
+~~~~
 
 Examples:
 
@@ -105,7 +111,13 @@ func funConcat(parameters: seq[Value]): FunResult
 
 Length of a string, list or dictionary. For strings it returns
 the number of characters, not bytes. For lists and dictionaries
-it return the number of elements.
+it returns the number of elements.
+
+~~~
+len(str: string) int
+len(list: list) int
+len(dictionary: dict) int
+~~~~
 
 * p1: string, list or dict
 * return: int
@@ -125,19 +137,23 @@ func funLen(parameters: seq[Value]): FunResult
 
 # funGet
 
-Get a value from a list or dictionary.  You can specify a default
-value to return when the value doesn't exist, if you don't, a
-warning is generated when the element doesn't exist.
+Get a value from a list or dictionary.
+
+For a list you specify the index of the item you want to get. If
+the index is too big, the default value is returned, if
+specified, else a warning is generated.
+
+For a dictionary you specify the key of the item you want to
+get. If the key doesn't exist, the default value is returned, if
+specified, else a warning is generated.
+
+~~~
+get(list: list, index: int, optional default: any) any
+get(dictionary: dict, key: string, optional default: any) any
+~~~~
 
 Note: for dictionary lookup you can use dot notation for many
 cases.
-
-Dictionary case:
-
-* p1: dictionary
-* p2: key string
-* p3: optional default value returned when key is missing
-* return: value
 
 List case:
 
@@ -146,16 +162,23 @@ List case:
 * p3: optional default value returned when index is too big
 * return: value
 
+Dictionary case:
+
+* p1: dictionary
+* p2: key string
+* p3: optional default value returned when key is missing
+* return: value
+
 Examples:
 
 ~~~
-d = dict("tea", "Earl Grey")
-get(d, 'tea') => "Earl Grey"
-get(d, 'coffee', 'Tea') => "Tea"
-
 list = list(4, 'a', 10)
 get(list, 2) => 10
 get(list, 3, 99) => 99
+
+d = dict("tea", "Earl Grey")
+get(d, 'tea') => "Earl Grey"
+get(d, 'coffee', 'Tea') => "Tea"
 
 d = dict("tea", "Earl Grey")
 d.tea => "Earl Grey"
@@ -168,12 +191,12 @@ func funGet(parameters: seq[Value]): FunResult
 
 # funIf
 
-Return a value based on a condition.
+Return a value when the condition is 1 and another value when the
+condition is not 1.
 
-* p1: int condition
-* p2: true case: the value returned when condition is 1
-* p3: else case: the value returned when condition is not 1.
-* return: p2 or p3
+~~~
+if(condition: int, oneCase: any, notOne: any) any
+~~~~
 
 Examples:
 
@@ -192,6 +215,11 @@ func funIf(parameters: seq[Value]): FunResult
 
 Add two or more numbers.  The parameters must be all integers or
 all floats.  A warning is generated on overflow.
+
+~~~
+add(numbers: varargs(int)) int
+add(numbers: varargs(float)) float
+~~~~
 
 Integer case:
 
@@ -226,11 +254,11 @@ func funAdd(parameters: seq[Value]): FunResult
 
 # funExists
 
-Determine whether a key exists in a dictionary.
+Determine whether a key exists in a dictionary. Return 1 when it exists, else 0.
 
-* p1: dictionary
-* p2: key string
-* return: 0 or 1
+~~~
+exists(dictionary: dict, key: string) int
+~~~~
 
 Examples:
 
@@ -259,6 +287,11 @@ When none of the cases match the main condition, the "else"
 value is returned. If none match and the else is missing, a
 warning is generated and the statement is skipped. The conditions
 must be integers or strings. The return values can be any type.
+
+~~~
+case(condition: int, else: any, varargs(int, any) any
+case(condition: string, else: any, varargs(string, any) any
+~~~~
 
 * p1: the main condition value
 * p2: the first case condition
@@ -300,13 +333,13 @@ func parseVersion(version: string): Option[(int, int, int)]
 Compare two StaticTea version numbers. Returns -1 for less, 0 for
 equal and 1 for greater than.
 
+~~~
+cmpVersion(versionA: string, versionB: string) int
+~~~~
+
 StaticTea uses [[https://semver.org/][Semantic Versioning]]
 with the added restriction that each version component has one
 to three digits (no letters).
-
-* p1: version number string
-* p2: version number string
-* return: -1, 0, 1
 
 Examples:
 
@@ -324,6 +357,11 @@ func funCmpVersion(parameters: seq[Value]): FunResult
 # funFloat
 
 Create a float from an int or an int number string.
+
+~~~
+float(num: int) float
+float(numString: string) float
+~~~~
 
 * p1: int or int string
 * return: float
@@ -344,9 +382,10 @@ func funFloat(parameters: seq[Value]): FunResult
 
 Create an int from a float or a float number string.
 
-* p1: float or float number string
-* p2: optional round option. "round" is the default.
-* return: int
+~~~
+int(num: float, optional roundOption: string) int
+int(numString: string, optional roundOption: string) int
+~~~~
 
 Round options:
 
@@ -379,16 +418,16 @@ func funInt(parameters: seq[Value]): FunResult
 
 # funFind
 
-Find the position of a substring in a string.  When the substring
-is not found you can return a default value.  A warning is
-generated when the substring is missing and you don't specify a
-default value.
+Return the position of a substring in a string.  When the
+substring is not found you can return a default value.  A warning
+is generated when the substring is missing and you don't specify
+a default value.
 
+~~~
+find(str: string, substring: string, optional default: any) any
+~~~~
 
-* p1: string
-* p2: substring
-* p3: optional default value
-* return: the index of substring or p3
+Examples:
 
 ~~~
        0123456789 1234567
@@ -417,16 +456,15 @@ The range is half-open which includes the start position but not
 the end position. For example, [3, 7) includes 3, 4, 5, 6. The
 end minus the start is equal to the length of the substring.
 
-* p1: string
-* p2: start index
-* p3: optional: end index (one past end)
-* return: string
+~~~
+substr(str: string, start: int, optional end: int) string
+~~~~
 
 Examples:
 
 ~~~
 substr("Earl Grey", 0, 4) => "Earl"
-substr("Earl Grey", 5) => => "Grey"
+substr("Earl Grey", 5) => "Grey"
 ~~~~
 
 ```nim
@@ -439,15 +477,15 @@ func funSubstr(parameters: seq[Value]): FunResult
 Duplicate a string. The first parameter is the string to dup and
 the second parameter is the number of times to duplicate it.
 
-* p1: string to duplicate
-* p2: number of times to repeat
-* return: string
+~~~
+dup(pattern: string, count: int) string
+~~~~
 
 Examples:
 
 ~~~
 dup("=", 3) => "==="
-substr("abc", 2) => "abcabc"
+dup("abc", 2) => "abcabc"
 ~~~~
 
 ```nim
@@ -460,16 +498,14 @@ func funDup(parameters: seq[Value]): FunResult
 Create a dictionary from a list of key, value pairs.  The keys
 must be strings and the values can be any type.
 
-* p1: key string
-* p2: value
-* ...
-* pn-1: key string
-* pn: value
-* return: dict
+~~~
+dict(pairs: optional varargs(string, any)) dict
+~~~~
 
 Examples:
 
 ~~~
+dict() => {}
 dict("a", 5) => {"a": 5}
 dict("a", 5, "b", 33, "c", 0) =>
   {"a": 5, "b": 33, "c": 0}
@@ -484,12 +520,9 @@ func funDict(parameters: seq[Value]): FunResult
 
 Create a list of values.
 
-* p1: value
-* p2: value
-* p3: value
-* ...
-* pn: value
-* return: list
+~~~
+list(items: optional varargs(any)) list
+~~~~
 
 Examples:
 
@@ -511,11 +544,14 @@ Replace a substring by its position.  You specify the substring
 position and the string to take its place.  You can use it to
 insert and append to a string as well.
 
-* p1: string
-* p2: start index of substring
-* p3: length of substring
-* p4: replacement substring
-* return: string
+~~~
+replace(str: string, start: int, length: int, replacement: string) string
+~~~~
+
+* str: string
+* start: substring start index
+* length: substring length
+* replacement: substring replacement
 
 Examples:
 
@@ -556,6 +592,11 @@ Replace multiple parts of a string using regular expressions.
 You specify one or more pairs of a regex patterns and its string
 replacement. The pairs can be specified as parameters to the
 function or they can be part of a list.
+
+~~~
+replaceRe(str: string, pairs: varargs(string, string) string
+replaceRe(str: string, pairs: list) string
+~~~~
 
 Muliple parameters case:
 
@@ -600,12 +641,12 @@ func funReplaceRe(parameters: seq[Value]): FunResult
 Split a file path into pieces. Return a dictionary with the
 filename, basename, extension and directory.
 
-You pass a path string and the optional path separator. When no
-separator, the current system separator is used.
+You pass a path string and the optional path separator, "/" or
+"\". When no separator, the current system separator is used.
 
-* p1: path string
-* p2: optional separator string, "/" or "\".
-* return: dict
+~~~
+path(filename: string, optional separator: string) dict
+~~~~
 
 Examples:
 
@@ -634,13 +675,15 @@ func funPath(parameters: seq[Value]): FunResult
 
 Lowercase a string.
 
-* p1: string
-* return: lowercase string
+~~~
+lower(str: string) string
+~~~~
 
 Examples:
 
 ~~~
 lower("Tea") => "tea"
+lower("TEA") => "tea"
 ~~~~
 
 ```nim
@@ -652,8 +695,9 @@ func funLower(parameters: seq[Value]): FunResult
 
 Create a list from the keys in a dictionary.
 
-* p1: dictionary
-* return: list
+~~~
+keys(dictionary: dict) list
+~~~~
 
 Examples:
 
@@ -672,8 +716,9 @@ func funKeys(parameters: seq[Value]): FunResult
 
 Create a list of the values in the specified dictionary.
 
-* p1: dictionary
-* return: list
+~~~
+values(dictionary: dict) list
+~~~~
 
 Examples:
 
@@ -692,18 +737,26 @@ func funValues(parameters: seq[Value]): FunResult
 
 Sort a list of values of the same type.
 
+You have the option of sorting ascending or descending.
+
 When sorting strings you have the option to compare case
 sensitive or insensitive.
 
-When sorting lists the lists are compared by their first
-element. The first elements must exist, be the same type and be
-an int, float or string. You have the option of comparing strings
-case insensitive.
+When sorting lists, you specify which index to compare by, index
+0 is the default.  The compare index value must exist in each list, be
+the same type and be an int, float or string.
 
-Dictionaries are compared by the value of one of their keys.  The
-key values must exist, be the same type and be an int, float or
-string. You have the option of comparing strings case
-insensitive.
+When sorting dictionaries, you specify which key to compare by.
+The key value must exist in each dictionary, be the same type and
+be an int, float or string.
+
+~~~
+sort(ints: list, optional order: string) list
+sort(floats: list, optional order: string) list
+sort(strings: list, order: string, optional case: string) list
+sort(lists: list, order: string, case: string, index: int) list
+sort(dicts: list, order: string, case: string, key: string) list
+~~~~
 
 int, float case:
 
