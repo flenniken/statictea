@@ -17,8 +17,24 @@ import unicodes
 import signatures
 import funtypes
 
-# Table of the built in functions.
-var functions: Table[string, FunctionPtr]
+type
+  FunctionSpec* = object
+    ## The name of a function, its signature code and pointer to the
+    ## code.
+    name: string
+    signatureCode: string
+    functionPtr: FunctionPtr
+
+# Table of the built in functions. Each function name can have
+# multiple versions with different signatures.
+var functions: Table[string, seq[FunctionSpec]]
+
+func newFunctionSpec(name: string, signatureCode: string,
+                 functionPtr: FunctionPtr): FunctionSpec =
+  ## Create a new FunctionSpec object.
+  result = FunctionSpec(name: name, signatureCode: signatureCode,
+                    functionPtr: functionPtr)
+
 
 # template tSetParameterNames*(signature: string, parameters: seq[Value]) =
 #   let name {.inject.} = parameters[0].stringv
@@ -1197,8 +1213,8 @@ func funSort*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:l1 = list(4, 3, 1)
   ## @:l2 = list(2, 3, 0)
-  ## @:listOfList = list(l1, l2)
-  ## @:sort(listOfList) => [l2, l1]
+  ## @:listOfLists = list(l1, l2)
+  ## @:sort(listOfLists) => [l2, l1]
   ## @:
   ## @:d1 = dict('name', 'Earl Gray', 'weight', 1.2)
   ## @:d2 = dict('name', 'Tea Pot', 'weight', 3.5)
@@ -1296,6 +1312,9 @@ func funSort*(parameters: seq[Value]): FunResult =
   let newList = sorted(list, sortCmpValues, sortOrder)
   result = newFunResult(newValue(newList))
 
+# todo: add function where you specify a list of names and it returns
+# a list of anchor names.
+
 func funGithubAnchor*(parameters: seq[Value]): FunResult =
   ## Create a Github markdown anchor name given a heading name.  If
   ## @:you have duplicate heading names, the anchor name returned only
@@ -1330,43 +1349,62 @@ func funGithubAnchor*(parameters: seq[Value]): FunResult =
 
 const
   functionsList = [
-    ("len", funLen),
-    ("concat", funConcat),
-    ("get", funGet),
-    ("cmp", funCmp),
-    ("if", funIf),
-    ("add", funAdd),
-    ("exists", funExists),
-    ("case", funCase),
-    ("cmpVersion", funCmpVersion),
-    ("int", funInt),
-    ("float", funFloat),
-    ("find", funFind),
-    ("substr", funSubstr),
-    ("dup", funDup),
-    ("dict", funDict),
-    ("list", funList),
-    ("replace", funReplace),
-    ("replaceRe", funReplaceRe),
-    ("path", funPath),
-    ("lower", funLower),
-    ("keys", funKeys),
-    ("values", funValues),
-    ("sort", funSort),
-    ("githubAnchor", funGithubAnchor),
+    ("len", funLen, "si"),
+    ("len", funLen, "li"),
+    ("len", funLen, "di"),
+    ("concat", funConcat, "Ss"),
+    ("get", funGet, "lioaa"),
+    ("get", funGet, "dsoaa"),
+    ("cmp", funCmp, "iii"),
+    ("cmp", funCmp, "ffi"),
+    ("cmp", funCmp, "ssoii"),
+    ("if", funIf, "iaaa"),
+    ("add", funAdd, "Ii"),
+    ("add", funAdd, "Fi"),
+    ("exists", funExists, "dsi"),
+    ("case", funCase, "iaIAa"),
+    ("case", funCase, "saSAa"),
+    ("cmpVersion", funCmpVersion, "ssi"),
+    ("int", funInt, "fosi"),
+    ("int", funInt, "sosi"),
+    ("float", funFloat, "if"),
+    ("float", funFloat, "sf"),
+    ("find", funFind, "ssoaa"),
+    ("substr", funSubstr, "siois"),
+    ("dup", funDup, "sis"),
+    ("dict", funDict, "oSAd"),
+    ("list", funList, "oAl"),
+    ("replace", funReplace, "siiss"),
+    ("replaceRe", funReplaceRe, "sSSs"),
+    ("replaceRe", funReplaceRe, "sls"),
+    ("path", funPath, "sosd"),
+    ("lower", funLower, "ss"),
+    ("keys", funKeys, "dl"),
+    ("values", funValues, "dl"),
+    ("sort", funSort, "losl"),
+    ("sort", funSort, "lsosl"),
+    ("sort", funSort, "lssosl"),
+    ("githubAnchor", funGithubAnchor, "ss"),
   ]
 
-# todo: add function where you specify a list of names and it returns a list of anchor names.
+func createFunctionTable*(): Table[string, seq[FunctionSpec]] =
+  ## Create a table of all the built in functions.
+  for (name, functionPtr, signature) in functionsList:
+    var nameList = result.getOrDefault(name)
+    nameList.add(newFunctionSpec(name, signature, functionPtr))
+    result[name] = nameList
+
+proc getFunctionList*(name: string): seq[FunctionSpec] =
+  ## Return the functions with the given name.
+
+  if functions.len == 0:
+    functions = createFunctionTable()
+
+  result = functions.getOrDefault(name)
 
 proc getFunction*(functionName: string): Option[FunctionPtr] =
   ## Look up a function by its name.
-
-  # Build a table of functions.
-  if functions.len == 0:
-    for item in functionsList:
-      var (name, fun) = item
-      functions[name] = fun
-
-  var function = functions.getOrDefault(functionName)
-  if function != nil:
-    result = some(function)
+  let nameList = getFunctionList(functionName)
+  if nameList.len > 0:
+    let functionSpec = nameList[0]
+    result = some(functionSpec.functionPtr)

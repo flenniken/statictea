@@ -1300,3 +1300,10 @@ suite "runFunction.nim":
     let parameters = @[newValue("1.2.3"), newValue("1.2.3b")]
     let eFunResult = newFunResultWarn(wInvalidVersion, 1)
     check testFunction("cmpVersion", parameters, eFunResult)
+
+  # test "createFunctionTable":
+  #   let table = createFunctionTable()
+  #   for name, nameList in table.pairs():
+  #     for spec in nameList:
+  #       check name == spec.name
+  #       echo "$1: $2" % [name, spec.signatureCode]
