@@ -5,6 +5,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [runFunction.nim](../src/runFunction.nim) &mdash; Nim source code.
 # Index
 
+* type: [FunctionSpec](#functionspec) &mdash; The name of a function, its signature code and pointer to the code.
 * [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
 * [funCmp](#funcmp) &mdash; Compare two values.
 * [funConcat](#funconcat) &mdash; Concatentate two or more strings.
@@ -32,7 +33,22 @@ condition is not 1.
 * [funValues](#funvalues) &mdash; Create a list of the values in the specified dictionary.
 * [funSort](#funsort) &mdash; Sort a list of values of the same type.
 * [funGithubAnchor](#fungithubanchor) &mdash; Create a Github markdown anchor name given a heading name.
+* [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
+* [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Look up a function by its name.
+
+# FunctionSpec
+
+The name of a function, its signature code and pointer to the code.
+
+```nim
+FunctionSpec = object
+  name: string
+  signatureCode: string
+  functionPtr: FunctionPtr
+
+```
+
 
 # cmpBaseValues
 
@@ -793,8 +809,8 @@ sort(strs, "ascending", "insensitive") => ['a', 'e', 'T']
 
 l1 = list(4, 3, 1)
 l2 = list(2, 3, 0)
-listOfList = list(l1, l2)
-sort(listOfList) => [l2, l1]
+listOfLists = list(l1, l2)
+sort(listOfLists) => [l2, l1]
 
 d1 = dict('name', 'Earl Gray', 'weight', 1.2)
 d2 = dict('name', 'Tea Pot', 'weight', 3.5)
@@ -837,6 +853,24 @@ $$ : anchor = githubAnchor(entry.name)
 
 ```nim
 func funGithubAnchor(parameters: seq[Value]): FunResult
+```
+
+
+# createFunctionTable
+
+Create a table of all the built in functions.
+
+```nim
+func createFunctionTable(): Table[string, seq[FunctionSpec]]
+```
+
+
+# getFunctionList
+
+Return the functions with the given name.
+
+```nim
+proc getFunctionList(name: string): seq[FunctionSpec]
 ```
 
 

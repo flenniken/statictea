@@ -8,23 +8,26 @@ StaticTea nim source code documentation.
 * [args.nim](args.md) &mdash; Command line arguments.
 * [collectCommand.nim](collectCommand.md) &mdash; Collect template command lines.
 * [env.nim](env.md) &mdash; Environment holding the input and output streams.
+* [funtypes.nim](funtypes.md) &mdash; Statictea function types and supporting routines.
 * [gethelp.nim](gethelp.md) &mdash; Get the command line help message.
 * [matches.nim](matches.md) &mdash; Regular expression matching methods.
 * [parseCmdLine.nim](parseCmdLine.md) &mdash; Parse a template command line.
 * [parseCommandLine.nim](parseCommandLine.md) &mdash; Parse the StaticTea terminal command line and return the arguments.
 * [parseNumber.nim](parseNumber.md) &mdash; Parse an int or float number string.
 * [processTemplate.nim](processTemplate.md) &mdash; Process the template.
-* [readjson.nim](readjson.md) &mdash; Read json files.
+* [readjson.nim](readjson.md) &mdash; Read json content.
 * [readlines.nim](readlines.md) &mdash; Read lines from a stream without exceeding the maximum line
 length.
 * [regexes.nim](regexes.md) &mdash; Perl regular expression matching.
 * [replacement.nim](replacement.md) &mdash; Handle the replacement block lines.
 * [runCommand.nim](runCommand.md) &mdash; Run a command.
 * [runFunction.nim](runFunction.md) &mdash; This module contains the StaticTea functions and supporting types.
+* [signatures.nim](signatures.md) &mdash; Statictea function signatures and parameter checking.
 * [statictea.nim](statictea.md) &mdash; StaticTea; A template processor and language.
 * [tempFile.nim](tempFile.md) &mdash; Temporary file methods.
 * [tostring.nim](tostring.md) &mdash; Value types to string methods.
 * [tpub.nim](tpub.md) &mdash; The tpub macro pragma makes private routines public for testing.
+* [unicodes.nim](unicodes.md) &mdash; Functions that deal with Unicode.
 * [variables.nim](variables.md) &mdash; Language variable methods.
 * [vartypes.nim](vartypes.md) &mdash; StaticTea variable types.
 * [version.nim](version.md) &mdash; The current StaticTea version number.
