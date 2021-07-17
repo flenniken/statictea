@@ -1,3 +1,4 @@
+
 ## This module contains the StaticTea functions and supporting types.
 ## The StaticTea language functions start with "fun", for example, the
 ## "funCmp" function implements the StaticTea "cmp" function.
@@ -388,88 +389,55 @@ func funExists*(parameters: seq[Value]): FunResult =
 
 func funCase*(parameters: seq[Value]): FunResult =
   ## Return a value from multiple choices. It takes a main condition,
-  ## @:any number of case pairs then an optional else value.
+  ## @:any number of case pairs and an optional else value.
   ## @:
   ## @:The first parameter of a case pair is the condition and the
   ## @:second is the return value when that condition matches the main
   ## @:condition. The function compares the conditions left to right and
   ## @:returns the first match.
   ## @:
-  ## @:When none of the cases match the main condition, the "else"
-  ## @:value is returned. If none match and the else is missing, a
-  ## @:warning is generated and the statement is skipped. The conditions
-  ## @:must be integers or strings. The return values can be any type.
+  ## @:When none of the cases match the main condition, the "else" value
+  ## @:is returned.  The conditions must be integers or strings. The
+  ## @:return values can be any type.
   ## @:
   ## @:~~~
-  ## @:case(condition: int, else: any, varargs(int, any) any
-  ## @:case(condition: string, else: any, varargs(string, any) any
+  ## @:case(condition: int, else: any, pairs: varargs(int, any) any
+  ## @:case(condition: string, else: any, pairs: varargs(string, any) any
   ## @:~~~~
-  ## @:
-  ## @:* p1: the main condition value
-  ## @:* p2: the first case condition
-  ## @:* p3: the first case value
-  ## @:* ...
-  ## @:* pn-2: the last case condition
-  ## @:* pn-1: the last case value
-  ## @:* pn: the optional "else" value returned when nothing matches
-  ## @:* return: any value
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:case(8, 8, "tea", "water") => "tea"
-  ## @:case(8, 3, "tea", "water") => "water"
-  ## @:case(8,
+  ## @:case(8, "water", 8, "tea") => "tea"
+  ## @:case(8, "water", 3, "tea") => "water"
+  ## @:case(8, "beer", +
   ## @:  1, "tea", +
   ## @:  2, "water", +
-  ## @:  3, "wine", +
-  ## @:  "beer") => "beer"
+  ## @:  3, "wine") => "beer"
   ## @:~~~~
 
-  # At least 3 parameters.
-  if parameters.len() < 3:
-    result = newFunResultWarn(wThreeOrMoreParameters)
-    return
+  if parameters.len == 0:
+    return newFunResultWarn(wAtLeast4Parameters)
+  var signatureCode: string
+  if parameters[0].kind == vkString:
+    signatureCode = "saSAa"
+  else:
+    signatureCode = "iaIAa"
+  tMapParameters(signatureCode)
 
-  let mainCondition = parameters[0]
-  if mainCondition.kind != vkString and mainCondition.kind != vkInt:
-    result = newFunResultWarn(wInvalidMainType)
-    return
+  let mainCondition = map["a"]
+  let elseCase = map["b"]
+  let cases = map["c"].listv
 
-  # Make sure each condition is an int or string. We do this before
-  # comparing to catch lurking error edge cases.
-  for ix in countUp(1, parameters.len-2, 2):
-    var condition = parameters[ix]
-    if not [vkString, vkInt].contains(condition.kind):
-      result = newFunResultWarn(wInvalidCondition, ix)
-      return
+  for ix in countUp(0, cases.len-1, 2):
+    let condition = cases[ix]
 
-  for ix in countUp(1, parameters.len-2, 2):
-    var condition = parameters[ix]
-    if condition.kind != mainCondition.kind:
-      continue
-    if condition.kind == vkString:
-      if condition.stringv == mainCondition.stringv:
-        return newFunResult(parameters[ix+1])
-    else:
-      if condition.intv == mainCondition.intv:
-        return newFunResult(parameters[ix+1])
-
-  # Possible parameter patterns:
-  # m c v e
-  # m c v c v e
-  # m c v
-  # m c v c v
-  # 0 1 2 3 4 5
-  # 1 2 3 4 5 6
-  # Even number of parameters contains the else condition.
-  # Odd doesn't have an else condition.
-
-  if parameters.len mod 2 == 1:
-    return newFunResultWarn(wMissingElse, 0)
+    if condition == mainCondition:
+      let value = cases[ix+1]
+      return newFunResult(value)
 
   # Return the else case.
-  result = newFunResult(parameters[parameters.len-1])
+  result = newFunResult(elseCase)
 
 func parseVersion*(version: string): Option[(int, int, int)] =
   ## Parse a StaticTea version number and return its three components.

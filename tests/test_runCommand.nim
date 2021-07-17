@@ -823,12 +823,12 @@ statement: t.asdf = 3.45
     check testRunStatement(statement, variables, eErrLines = eErrLines)
 
 
-  test "invalid missing needed else":
-    let statement = newStatement(text="result = case(1, 2, 22, 'abc', 33)", lineNum=1, 0)
+  test "invalid missing needed vararg parameter":
+    let statement = newStatement(text="result = case(1, 'else', 2, 'two', 3)", lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w94: None of the case conditions match and no else case.
-statement: result = case(1, 2, 22, 'abc', 33)
-                         ^
+template.html(1): w122: Missing vararg parameter, expected groups of 2 got 1.
+statement: result = case(1, 'else', 2, 'two', 3)
+                                              ^
 """
     var variables = emptyVariables()
     check testRunStatement(statement, variables, eErrLines = eErrLines)

@@ -114,6 +114,9 @@ suite "signatures.nim":
     check testSignatureCodeToParams("oISi", "(a: optional varargs(int, string)) int")
     check testSignatureCodeToParams("oIFSi", "(a: optional varargs(int, float, string)) int")
 
+  test "signatureCodeToParams saSaa":
+    check testSignatureCodeToParams("saSa", "(a: string, b: any, c: varargs(string)) any")
+
   test "signatureCodeToParams all":
     let e = "(a: int, b: string, c: float, d: optional varargs(int, int)) int"
     check testSignatureCodeToParams("isfoIIi", e)
@@ -258,6 +261,30 @@ suite "signatures.nim":
 
     parameters = @[newValue(1), newValue(1), newValue(1), newValue(1.1)]
     check testMapParametersW("iiIFSi", parameters, 0, kNotEnoughArgs, "5", "4")
+
+  test "mapParameters not enough varargs":
+    var parameters: seq[Value] = @[]
+    check testMapParametersW("IIa", parameters, 0, kNotEnoughArgs, "2", "0")
+    parameters = @[newValue(1)]
+    check testMapParametersW("IIa", parameters, 0, kNotEnoughArgs, "2", "1")
+    parameters = @[newValue(1), newValue(2), newValue(3)]
+    check testMapParametersW("IIa", parameters, 2, kNotEnoughVarargs, "2", "1")
+
+  test "mapParameters not enough varargs 3":
+    var parameters: seq[Value] = @[]
+    check testMapParametersW("IIIa", parameters, 0, kNotEnoughArgs, "3", "0")
+
+    parameters = @[newValue(1)]
+    check testMapParametersW("IIIa", parameters, 0, kNotEnoughArgs, "3", "1")
+
+    parameters = @[newValue(1), newValue(2)]
+    check testMapParametersW("IIIa", parameters, 0, kNotEnoughArgs, "3", "2")
+
+    parameters = @[newValue(1), newValue(2), newValue(3), newValue(4)]
+    check testMapParametersW("IIIa", parameters, 3, kNotEnoughVarargs, "3", "1")
+
+    parameters = @[newValue(1), newValue(2), newValue(3), newValue(4), newValue(5)]
+    check testMapParametersW("IIIa", parameters, 3, kNotEnoughVarargs, "3", "2")
 
   test "mapParameters too many args":
     var parameters = @[newValue(1), newValue(2)]

@@ -288,7 +288,7 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
         # Check there are enough parameters for the vararg group.
         if argsLeft < varargNum:
           # Expected {varargNum} varargs got {argsLeft}.
-          return newFunResultWarn(kNotEnoughVarargs, 0, $varargNum, $argsLeft)
+          return newFunResultWarn(kNotEnoughVarargs, varargIx, $varargNum, $argsLeft)
 
         for ix in countUp(0, varargNum - 1):
           var arg = args[varargIx + ix]

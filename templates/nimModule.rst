@@ -38,7 +38,7 @@ $$ : description = replaceRe(s.moduleDescription, g.patterns)
 {description}
 
 $$ # Show the index label when there are entries.
-$$ block t.output = case(len(s.entries), 0, 'skip', 'result')
+$$ block t.output = case(len(s.entries), 'result', 0, 'skip')
 :greenish:`Index:`
 ------------------
 $$ endblock
@@ -52,11 +52,10 @@ $$ : entry = get(s.entries, t.row, dict())
 $$ : name = get(entry, "name", "")
 $$ : description = get(entry, "description", "")
 $$ : skType = get(entry, "type", "")
-$$ : type = case(skType, +
+$$ : type = case(skType, "", +
 $$ :   "skType", "type: ", +
 $$ :   "skConst", "const: ", +
-$$ :   "skMacro", "macro: ", +
-$$ :   "")
+$$ :   "skMacro", "macro: ")
 $$ : short = substr(description, 0, add(find(description, '.', -1), 1))
 * {type}{name}__ -- {short}
 

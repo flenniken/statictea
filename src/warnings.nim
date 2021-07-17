@@ -121,7 +121,7 @@ type
     wAllNotIntFloatString, # w106
     wIntFloatString,       # w107
     wNotZeroOne,           # w108
-    wOneToFourParameters, # w109
+    wOneToFourParameters,  # w109
     wExpectedSensitivity,  # w110
     wExpectedKey,          # w111
     wDictKeyMissing,       # w112
@@ -136,7 +136,7 @@ type
     kNoVarargArgs,         # w121
     kNotEnoughVarargs,     # w122
     kTooManyArgs,          # w123
-
+    wAtLeast4Parameters,   # w124
 const
     # The list of warnings. Add new messages to the bottom and do not
     # reorder the messages.
@@ -263,8 +263,9 @@ const
       "Not enough parameters, expected $1 got $2.", # kNotEnoughArgs
       "Wrong parameter type, expected $1 got $2.", # kWrongType
       "The required vararg parameter has no arguments.", # kNoVarargArgs
-      "Expected $1 varargs got $2.", # kNotEnoughVarargs
+      "Missing vararg parameter, expected groups of 2 got 1.", # kNotEnoughVarargs
       "Too many arguments, expected {requiredParams} got {args.len}.", # kTooManyArgs
+      "Expected at least four parameters.", # wAtLeast4Parameters
     ]
 
 func getWarning*(filename: string, lineNum: int,

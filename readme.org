@@ -1537,42 +1537,31 @@ add(1.1, 2.2, 3.3) => 6.6
 :END:
 
 Return a value from multiple choices. It takes a main condition,
-any number of case pairs then an optional else value.
+any number of case pairs and an optional else value.
 
 The first parameter of a case pair is the condition and the
 second is the return value when that condition matches the main
 condition. The function compares the conditions left to right and
 returns the first match.
 
-When none of the cases match the main condition, the "else"
-value is returned. If none match and the else is missing, a
-warning is generated and the statement is skipped. The conditions
-must be integers or strings. The return values can be any type.
+When none of the cases match the main condition, the "else" value
+is returned.  The conditions must be integers or strings. The
+return values can be any type.
 
 #+BEGIN_SRC
-case(condition: int, else: any, varargs(int, any) any
-case(condition: string, else: any, varargs(string, any) any
+case(condition: int, else: any, pairs: varargs(int, any) any
+case(condition: string, else: any, pairs: varargs(string, any) any
 #+END_SRC
-
-- p1: the main condition value
-- p2: the first case condition
-- p3: the first case value
-- ...
-- pn-2: the last case condition
-- pn-1: the last case value
-- pn: the optional "else" value returned when nothing matches
-- return: any value
 
 Examples:
 
 #+BEGIN_SRC
-case(8, 8, "tea", "water") => "tea"
-case(8, 3, "tea", "water") => "water"
-case(8,
+case(8, "water", 8, "tea") => "tea"
+case(8, "water", 3, "tea") => "water"
+case(8, "beer", +
   1, "tea", +
   2, "water", +
-  3, "wine", +
-  "beer") => "beer"
+  3, "wine") => "beer"
 #+END_SRC
 
 [[#contents][茶]]
