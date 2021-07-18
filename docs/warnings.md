@@ -63,7 +63,8 @@ Warning = enum
   wNotZeroOne, wOneToFourParameters, wExpectedSensitivity, wExpectedKey,
   wDictKeyMissing, wKeyValueKindDiff, wSubListsEmpty, wSubListsDiffTypes,
   kMaxWarnings, kInvalidSignature, kInvalidParamType, kNotEnoughArgs,
-  kWrongType, kNoVarargArgs, kNotEnoughVarargs, kTooManyArgs
+  kWrongType, kNoVarargArgs, kNotEnoughVarargs, kTooManyArgs,
+  wAtLeast4Parameters
 ```
 
 
@@ -169,7 +170,7 @@ warningsList: array[low(Warning) .. high(Warning), string] = [
     "Not enough parameters, expected $1 got $2.",
     "Wrong parameter type, expected $1 got $2.",
     "The required vararg parameter has no arguments.",
-    "Expected $1 varargs got $2.",
+    "Missing vararg parameter, expected groups of 2 got 1.",
     "Too many arguments, expected
 ```
 

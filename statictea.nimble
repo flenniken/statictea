@@ -358,51 +358,30 @@ The grip app is good for viewing gitlab markdown.
   http://localhost:6419/index.md
 """
 
-# Tasks below
+proc taskDocsIx() =
+  ## Create the index json file.
 
-task n, "\tShow available tasks.":
-  exec "nimble tasks"
+  echo "Create index json."
+  var jsonFilename = "docs/index.json"
+  var json = indexJson()
+  writeFile(jsonFilename, json)
 
-task t, "\tRun all tests at once.":
-  # Create a file that includes all the test files.
-  exec """
-ls -1 tests | grep -v testall | sed 's/\.nim//' |
-awk '{printf "include %s\n", $0}' > tests/testall.nim
-"""
-  let cmd = get_test_module_cmd("testall.nim")
+  # Process the index template and create the index.md file.
+  echo "Create the index.md file"
+  var cmd = "bin/statictea -s=$1 -t=templates/nimModuleIndex.md -r=docs/index.md" %
+    [jsonFilename]
   exec cmd
-  rmFile("tests/testall.nim")
 
-  # Make sure it builds with test undefined.
-  build_release()
-  # Run the command line tests.
-  exec "src/test"
+  rmFile(jsonFilename)
+  echo "Generated docs/index.md"
+  # echoGrip()
 
-task test, "\tRun tests; specify part of test filename.":
-  ## Run one or more tests.  You specify part of the test filename and all
-  ## files that match are run. If you don't specify a name, all are
-  ## run. Task "t" is faster to run them all.
-  let count = system.paramCount()+1
-  # The name is either part of a name or "test" when not
-  # specified. Test happens to match all test files.
-  let name = system.paramStr(count-1)
-  let test_filenames = get_test_filenames()
-  for filename in test_filenames:
-    if name in filename:
-      let cmd = get_test_module_cmd(filename)
-      echo cmd
-      exec cmd
-
-task b, "\tBuild the statictea exe.":
-  build_release()
-
-task docs, "\tCreate markdown docs; specify part of source filename.":
-  let count = system.paramCount()+1
-  let name = system.paramStr(count-1)
+proc taskDocs(namePart: string) =
+  ## Create one or more markdown docs; specify part of source filename.":
   let filenames = get_source_filenames()
   for filename in filenames:
     # Name is part of a source file name, or "docs" when not specified.
-    if name in filename or name == "docs":
+    if namePart in filename or namePart == "docs":
       # Create json doc comments from the source file.
       var jsonName = "docs/$1" % [changeFileExt(filename, "json")]
       var cmd = "nim --hint[Conf]:off --hint[SuccessX]:off jsondoc --out:$1 src/$2" % [jsonName, filename]
@@ -429,25 +408,93 @@ task docs, "\tCreate markdown docs; specify part of source filename.":
 
   echoGrip()
 
-task docsix, "\tCreate markdown docs index.":
+proc taskReadMeFun() =
+  ## Create the readme function section from the runFunctions.nim
+  ## file.
 
-  # Create the index json file.
-  echo "Create index json."
-  var jsonFilename = "docs/index.json"
-  var json = indexJson()
-  writeFile(jsonFilename, json)
-
-  # Process the index template and create the index.md file.
-  echo "Create the index.md file"
-  var cmd = "bin/statictea -s=$1 -t=templates/nimModuleIndex.md -r=docs/index.md" %
-    [jsonFilename]
+  let filename = "runFunction.nim"
+  var jsonName = joinPath("docs", changeFileExt(filename, "json"))
+  var cmd = "nim --hint[Conf]:off --hint[SuccessX]:off jsondoc --out:$1 src/$2" %
+    [jsonName, filename]
   exec cmd
+  echo ""
+  echo "Exported runFunctions.nim json doc comments: $1" % [jsonName]
 
-  rmFile(jsonFilename)
-  echo "Generated docs/index.md"
-  echoGrip()
+  # Create a shared.json file for use by the template.
+  let sharedJson = """{"newline": "\n"}"""
+  let sharedFilename = "docs/shared.json"
+  writeFile(sharedFilename, sharedJson)
 
-task json, "\tDisplay markdown docs json; specify part of name.":
+  let templateName = joinPath("templates", "readmeFuncSection.org")
+  let sectionFile = joinPath("docs", "readmeFuncs.org")
+  cmd = "bin/statictea -l -s=$1 -j=docs/shared.json -t=$2 -r=$3" %
+     [jsonName, templateName, sectionFile]
+  # echo cmd
+  exec cmd
+  echo "Generated readme function section file: " & sectionFile
+
+  rmFile(sharedFilename)
+  rmFile(jsonName)
+
+  insertFile("readme.org", "# Dynamic Content Begins",
+    "# Dynamic Content Ends", sectionFile)
+  echo "Merged function section into readme.org."
+
+  # rmFile(sectionFile)
+
+# Tasks below
+
+task n, "\tShow available tasks.":
+  exec "nimble tasks"
+
+task t, "\tRun all tests at once.":
+  # Create a file that includes all the test files.
+  exec """
+ls -1 tests | grep -v testall | sed 's/\.nim//' |
+awk '{printf "include %s\n", $0}' > tests/testall.nim
+"""
+  let cmd = get_test_module_cmd("testall.nim")
+  exec cmd
+  rmFile("tests/testall.nim")
+
+  # Make sure it builds with test undefined.
+  build_release()
+  # Run the command line tests.
+  exec "src/test"
+
+task test, "\tRun one or more tests; specify part of test filename.":
+  ## Run one or more tests.  You specify part of the test filename and all
+  ## files that match are run. If you don't specify a name, all are
+  ## run. Task "t" is faster to run them all.
+  let count = system.paramCount()+1
+  # The name is either part of a name or "test" when not
+  # specified. Test happens to match all test files.
+  let name = system.paramStr(count-1)
+  let test_filenames = get_test_filenames()
+  for filename in test_filenames:
+    if name in filename:
+      let cmd = get_test_module_cmd(filename)
+      echo cmd
+      exec cmd
+
+task b, "\tBuild the statictea exe.":
+  build_release()
+
+task docsall, "\tCreate all the docs, docsix, docs, readmefun, dot.":
+  taskDocsIx()
+  taskDocs("")
+  taskReadMeFun()
+  createDependencyGraph()
+
+task docs, "\tCreate one or more markdown docs; specify part of source filename.":
+  let count = system.paramCount()+1
+  let namePart = system.paramStr(count-1)
+  taskDocs(namePart)
+
+task docsix, "\tCreate markdown docs index.":
+  taskDocsIx()
+
+task json, "\tDisplay one or more source file's json doc comments; specify part of name.":
   let count = system.paramCount()+1
   let name = system.paramStr(count-1)
   let filenames = get_source_filenames()
@@ -470,40 +517,8 @@ task jsonix, "\tDisplay markdown docs index json.":
   for line in json.splitLines():
     echo line
 
-task readmefun, "Create readme function section.":
-  let count = system.paramCount()+1
-
-  echo "Export nim runFunctions json doc comments..."
-  let filename = "runFunction.nim"
-  var jsonName = joinPath("docs", changeFileExt(filename, "json"))
-  var cmd = "nim --hint[Conf]:off --hint[SuccessX]:off jsondoc --out:$1 src/$2" %
-    [jsonName, filename]
-  exec cmd
-  echo "Generated $1" % [jsonName]
-
-  # Create a shared.json file for use by the template.
-  let sharedJson = """{"newline": "\n"}"""
-  let sharedFilename = "docs/shared.json"
-  writeFile(sharedFilename, sharedJson)
-
-  echo "Generate readme function section from template..."
-  let templateName = joinPath("templates", "readmeFuncSection.org")
-  let sectionFile = joinPath("docs", "readmeFuncs.org")
-  cmd = "bin/statictea -l -s=$1 -j=docs/shared.json -t=$2 -r=$3" %
-     [jsonName, templateName, sectionFile]
-  # echo cmd
-  exec cmd
-
-  rmFile(sharedFilename)
-  rmFile(jsonName)
-
-  insertFile("readme.org", "# Dynamic Content Begins",
-    "# Dynamic Content Ends", sectionFile)
-
-  echo "Generated sectionFile: " & sectionFile
-  # rmFile(sectionFile)
-
-  echo "Updated readme.org"
+task readmefun, "Create the readme function section.":
+  taskReadMeFun()
 
 task dot, "\tCreate a dependency graph of the StaticTea source.":
   createDependencyGraph()
@@ -515,7 +530,7 @@ View the svg file in your browser:
   http://localhost:6419/staticteadep.svg
 """
 
-task dot2, "\tCreate a dependency graph system modules used by StaticTea.":
+task dot2, "\tCreate a dependency graph of the system modules used by StaticTea.":
   createDependencyGraph2()
 
   echoGrip()
