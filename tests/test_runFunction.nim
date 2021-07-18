@@ -680,6 +680,11 @@ suite "runFunction.nim":
     let eFunResult = newFunResult(newValue("123456789 123456789 "))
     check testFunction("dup", parameters, eFunResult)
 
+  test "dup nothing":
+    var parameters = @[newValue(""), newValue(1)]
+    let eFunResult = newFunResult(newValue(""))
+    check testFunction("dup", parameters, eFunResult)
+
   test "dup 1 parameter":
     var parameters = @[newValue("abc")]
     let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "1")

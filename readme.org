@@ -917,17 +917,17 @@ StaticTea. See the [[#cmpversion][cmpVersion]] function for more information.
 
 StaticTea variable types:
 
-- [[#string][string]]
-- [[#integer][int]]
-- [[#float][float]]
-- [[#dict][dict]]
-- [[#list][list]]
+- [[#string-type][string]]
+- [[#int-type][int]]
+- [[#float-type][float]]
+- [[#dict-type][dict]]
+- [[#list-type][list]]
 
 [[#contents][茶]]
 
 ** String
 :PROPERTIES:
-:CUSTOM_ID: string
+:CUSTOM_ID: string-type
 :END:
 
 A string is an immutable sequence of characters. You define a
@@ -959,7 +959,7 @@ result:
 
 ** Int
 :PROPERTIES:
-:CUSTOM_ID: integer
+:CUSTOM_ID: int-type
 :END:
 
 An int is a 64 bit signed integer.  Plus signs are not used
@@ -978,7 +978,7 @@ Example numbers:
 
 ** Float
 :PROPERTIES:
-:CUSTOM_ID: float
+:CUSTOM_ID: float-type
 :END:
 
 A float is a 64 bit real number, it has a decimal point and
@@ -1062,7 +1062,7 @@ get(s, "c", 3) => 3
 
 ** List
 :PROPERTIES:
-:CUSTOM_ID: list
+:CUSTOM_ID: list-type
 :END:
 
 A list contains a sequence of values of any type.  You create
@@ -1160,8 +1160,7 @@ doesn't exist, the bracketed variable remains as is in the
 result, and a message is output to standard error. There are many
 other potential warnings.
 
-It’s good style to change your template or json to be free of
-messages.
+It’s good style to change your template to be free of messages.
 
 Each warning message shows the file and line number where the
 problem happened.
@@ -1174,7 +1173,8 @@ example messages:
 - tea.html(243): w36: The variable 'teaMaster' does not exist.
 - tea.html(3044): w47: Concat parameter 45 is not a string."
 
-Statement errors generate multi-line messages, for example:
+Statement errors generate multi-line messages showing the
+statement and problem location, for example:
 
 #+BEGIN_SRC
 template.html(16): w33: Expected a string, number, variable or function.
@@ -1427,20 +1427,21 @@ n n
 Here is the output:
 
 #+BEGIN_SRC
-n           Show available tasks.
-t           Run all tests at once.
-test        Run tests; specify part of test filename.
-b           Build the statictea exe.
-docs        Create markdown docs; specify part of source filename.
-docsix      Create markdown docs index.
-json        Display markdown docs json; specify part of name.
-jsonix      Display markdown docs index json.
-readmefun   Create readme function section.
-dot         Create a dependency graph of the StaticTea source.
-dot2        Create a dependency graph system modules used by StaticTea.
-tt          Compile and run t.nim.
-tree        Show the project directory tree.
-args        Show command line arguments.
+n         Show available tasks.
+t         Run all tests at once.
+test      Run one or more tests; specify part of test filename.
+b         Build the statictea exe.
+docsall   Create all the docs, docsix, docs, readmefun, dot.
+docs      Create one or more markdown docs; specify part of source filename.
+docsix    Create markdown docs index.
+json      Display one or more source file's json doc comments; specify part of name.
+jsonix    Display markdown docs index json.
+readmefun Create the readme function section.
+dot       Create a dependency graph of the StaticTea source.
+dot2      Create a dependency graph of the system modules used by StaticTea.
+tt        Compile and run t.nim.
+tree      Show the project directory tree.
+args      Show command line arguments.
 #+END_SRC
 
 [[#contents][茶]]
@@ -1549,8 +1550,8 @@ is returned.  The conditions must be integers or strings. The
 return values can be any type.
 
 #+BEGIN_SRC
-case(condition: int, else: any, pairs: varargs(int, any) any
-case(condition: string, else: any, pairs: varargs(string, any) any
+case(condition: int, elseCase: any, pairs: varargs(int, any) any
+case(condition: string, elseCase: any, pairs: varargs(string, any) any
 #+END_SRC
 
 Examples:
@@ -1696,6 +1697,7 @@ Examples:
 #+BEGIN_SRC
 dup("=", 3) => "==="
 dup("abc", 2) => "abcabc"
+dup("", 3) => ""
 #+END_SRC
 
 [[#contents][茶]]
@@ -1794,8 +1796,8 @@ get(list: list, index: int, optional default: any) any
 get(dictionary: dict, key: string, optional default: any) any
 #+END_SRC
 
-Note: for dictionary lookup you can use dot notation for many
-cases.
+Note: For dictionary lookup you can use dot notation. It's the
+same as get without the default.
 
 List case:
 
@@ -2019,8 +2021,9 @@ lower("TEA") => "tea"
 Split a file path into pieces. Return a dictionary with the
 filename, basename, extension and directory.
 
-You pass a path string and the optional path separator, "/" or
-"\". When no separator, the current system separator is used.
+You pass a path string and the optional path separator, forward
+slash or or backwards slash. When no separator, the current
+system separator is used.
 
 #+BEGIN_SRC
 path(filename: string, optional separator: string) dict
@@ -2227,7 +2230,7 @@ sort(dicts, "descending", "sensitive", 'name') => [d2, d1]
 Extract a substring from a string by its position. You pass the
 string, the substring's start index then its end index+1.
 The end index is optional and defaults to the end of the
-string.
+string+1.
 
 The range is half-open which includes the start position but not
 the end position. For example, [3, 7) includes 3, 4, 5, 6. The

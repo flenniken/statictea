@@ -168,8 +168,8 @@ get(list: list, index: int, optional default: any) any
 get(dictionary: dict, key: string, optional default: any) any
 ~~~~
 
-Note: for dictionary lookup you can use dot notation for many
-cases.
+Note: For dictionary lookup you can use dot notation. It's the
+same as get without the default.
 
 List case:
 
@@ -304,8 +304,8 @@ is returned.  The conditions must be integers or strings. The
 return values can be any type.
 
 ~~~
-case(condition: int, else: any, pairs: varargs(int, any) any
-case(condition: string, else: any, pairs: varargs(string, any) any
+case(condition: int, elseCase: any, pairs: varargs(int, any) any
+case(condition: string, elseCase: any, pairs: varargs(string, any) any
 ~~~~
 
 Examples:
@@ -455,7 +455,7 @@ func funFind(parameters: seq[Value]): FunResult
 Extract a substring from a string by its position. You pass the
 string, the substring's start index then its end index+1.
 The end index is optional and defaults to the end of the
-string.
+string+1.
 
 The range is half-open which includes the start position but not
 the end position. For example, [3, 7) includes 3, 4, 5, 6. The
@@ -491,6 +491,7 @@ Examples:
 ~~~
 dup("=", 3) => "==="
 dup("abc", 2) => "abcabc"
+dup("", 3) => ""
 ~~~~
 
 ```nim
@@ -646,8 +647,9 @@ func funReplaceRe(parameters: seq[Value]): FunResult
 Split a file path into pieces. Return a dictionary with the
 filename, basename, extension and directory.
 
-You pass a path string and the optional path separator, "/" or
-"\". When no separator, the current system separator is used.
+You pass a path string and the optional path separator, forward
+slash or or backwards slash. When no separator, the current
+system separator is used.
 
 ~~~
 path(filename: string, optional separator: string) dict
