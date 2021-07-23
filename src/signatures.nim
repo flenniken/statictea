@@ -21,6 +21,8 @@ const
   singleCodes = {'i', 'f', 's', 'l', 'd', 'a'}
   varargCodes = {'I', 'F', 'S', 'L', 'D', 'A'}
 
+# todo: support list types, li, lf, ls, ll, ld, la.
+
 type
   ParamType* = char
     # Parameter type, one character of ifsldaIFSLDA.
@@ -49,10 +51,18 @@ func newParam*(name: string, optional: bool, varargs: bool, returnType: bool,
   result = Param(name: name, optional: optional, varargs: varargs,
                  returnType: returnType, paramTypes: paramTypes)
 
-func isSignatureCodeValid*(signatureCode: string): bool =
-  ## Return true when the signature code is valid.
-  # todo: create regex to validate a signature code.
-  result = true
+func kindToParamType*(kind: ValueKind): ParamType =
+    case kind:
+      of vkInt:
+        result = 'i'
+      of vkFloat:
+        result = 'f'
+      of vkString:
+        result = 's'
+      of vkList:
+        result = 'l'
+      of vkDict:
+        result = 'd'
 
 func paramTypeString*(paramType: ParamType): string =
   ## Return a string representation of a ParamType object.

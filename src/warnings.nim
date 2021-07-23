@@ -192,7 +192,7 @@ const
       "Invalid statement, skipping it.", # wInvalidStatement
       "Expected one parameter.", # wOneParameter
       "Len takes a string, list or dict parameter.", # wStringListDict
-      "Not a function: $1.", # wInvalidFunction
+      "The function does not exist: $1.", # wInvalidFunction
       "The get function takes 2 or 3 parameters.", # wGetTakes2or3Params
       "Expected an int for the second parameter, got $1.", # wExpectedIntFor2
       "The list index $1 out of range.", # wMissingListItem

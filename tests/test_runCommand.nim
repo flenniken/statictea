@@ -202,12 +202,8 @@ proc testGetFunctionValue(functionName: string, statement: Statement, start: Nat
 
   var variables = emptyVariables()
   let prepostTable = makeDefaultPrepostTable()
-  var functionO = getFunction(functionName)
-  if not isSome(functionO):
-    return false
-  let function = functionO.get()
   let valueAndLengthO = getFunctionValue(env, prepostTable,
-                          function, statement, start, variables)
+                          functionName, statement, start, variables)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 

@@ -280,7 +280,7 @@ proc getValue(env: var Env, prepostTable: PrepostTable,
                 Variables): Option[ValueAndLength]
 
 proc getFunctionValue*(env: var Env, prepostTable:
-    PrepostTable, function: FunctionPtr, statement:
+    PrepostTable, functionName: string, statement:
     Statement, start: Natural, variables: Variables): Option[ValueAndLength] =
   ## Collect the function parameter values then call it. Start should
   ## be pointing at the first parameter.
@@ -317,8 +317,16 @@ proc getFunctionValue*(env: var Env, prepostTable:
       if symbol == ")":
         break
 
-  # Run the function.
-  let funResult = function(parameters)
+  # Lookup the function.
+  let functionSpecO = getFunction(functionName, parameters)
+  if not isSome(functionSpecO):
+    # The function doesn't exist: name
+    env.warnStatement(statement, wInvalidFunction, start, functionName)
+    return
+  let functionSpec = functionSpecO.get()
+
+  # Call the function.
+  let funResult = functionSpec.functionPtr(parameters)
   if funResult.kind == frWarning:
     var warningPos: int
     if funResult.parameter < parameterStarts.len:
@@ -348,18 +356,19 @@ proc getVarOrFunctionValue*(env: var Env, prepostTable:
   # todo: add an optional left parentheses in the matchDotNames procedures.
 
   # Look for a function. A function name looks like a variable
-  # followed by a (.
+  # followed by a left parentheses.
   let parenthesesO = matchLeftParentheses(statement.text, start+matches.length)
   if parenthesesO.isSome:
     # We have a function, run it and return its value.
 
-    var functionO = getFunction(dotNameStr)
-    if not isSome(functionO):
-      env.warnStatement(statement, wInvalidFunction, start, dotNameStr)
+    # todo: you cannot call a function with a dotname: a.b.len(). support this?
+    var functionName = dotNameStr
+
+    if not isFunctionName(functionName):
+      env.warnStatement(statement, wInvalidFunction, start, functionName)
       return
-    var function = functionO.get()
     let parentheses = parenthesesO.get()
-    let funValueLengthO = getFunctionValue(env, prepostTable, function, statement,
+    let funValueLengthO = getFunctionValue(env, prepostTable, functionName, statement,
                             start+matches.length+parentheses.length, variables)
     if not isSome(funValueLengthO):
       return

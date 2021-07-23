@@ -18,29 +18,20 @@ import unicodes
 import signatures
 import funtypes
 
-type
-  FunctionSpec* = object
-    ## The name of a function, its signature code and pointer to the
-    ## code.
-    name: string
-    signatureCode: string
-    functionPtr: FunctionPtr
-
 # Table of the built in functions. Each function name can have
 # multiple versions with different signatures.
 var functions: Table[string, seq[FunctionSpec]]
 
-func newFunctionSpec(name: string, signatureCode: string,
-                 functionPtr: FunctionPtr): FunctionSpec =
+func newFunctionSpec(name: string, functionPtr: FunctionPtr,
+    signatureCode: string): FunctionSpec =
   ## Create a new FunctionSpec object.
-  result = FunctionSpec(name: name, signatureCode: signatureCode,
-                    functionPtr: functionPtr)
+  result = FunctionSpec(name: name, functionPtr: functionPtr,
+                        signatureCode: signatureCode)
 
-
-# template tSetParameterNames*(signature: string, parameters: seq[Value]) =
-#   let name {.inject.} = parameters[0].stringv
-
+# todo: add a parameters argument so it is clearer how the template operates.
 template tMapParameters(signatureCode: string) =
+  ## Template that checks the signatureCode against the parameters and
+  ## sets the map dictionary variable.
   let paramsO = signatureCodeToParams(signatureCode)
   let funResult = mapParameters(paramsO.get(), parameters)
   if funResult.kind == frWarning:
@@ -62,31 +53,15 @@ func cmpBaseValues*(a, b: Value, insensitive: bool = false): int =
     else:
       result = 0
 
-# todo: use string for optional string case.  Either "sensitive" or "insensitive".
-func funCmp*(parameters: seq[Value]): FunResult =
-  ## Compare two values. Returns -1 for less, 0 for equal and 1 for
-  ## @:greater than.  The values are either int, float or string (both
-  ## @:the same type) The default compares strings case sensitive, use 1
-  ## @:for case insensitive.
+# todo: cmp: support list and dict compares? Maybe similar to how sort compares.
+
+func funCmp_iii*(parameters: seq[Value]): FunResult =
+  ## @:Compare two ints. Returns -1 for less, 0 for equal and 1 for
+  ## @: greater than.
   ## @:
   ## @:~~~
   ## @:cmp(a: int, b: int) int
-  ## @:cmp(a: float, b: float) int
-  ## @:cmp(a: string, b: string, optional insensitive: int) int
   ## @:~~~~
-  ## @:
-  ## @:Compare numbers:
-  ## @:
-  ## @:* p1: number
-  ## @:* p2: number
-  ## @:* return: -1, 0, 1
-  ## @:
-  ## @:Compare strings:
-  ## @:
-  ## @:* p1: string
-  ## @:* p2: string
-  ## @:* p3: optional: 1 for case insensitive
-  ## @:* return: -1, 0, 1
   ## @:
   ## @:Examples:
   ## @:
@@ -94,37 +69,63 @@ func funCmp*(parameters: seq[Value]): FunResult =
   ## @:cmp(7, 9) => -1
   ## @:cmp(8, 8) => 0
   ## @:cmp(9, 2) => 1
+  ## @:~~~~
+
+  tMapParameters("iii")
+  let a = map["a"].intv
+  let b = map["b"].intv
+  result = newFunResult(newValue(cmp(a, b)))
+
+func funCmp_ffi*(parameters: seq[Value]): FunResult =
+  ## @:Compare two floats. Returns -1 for less, 0 for
+  ## @:equal and 1 for greater than.
   ## @:
+  ## @:~~~
+  ## @:cmp(a: float, b: float) int
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:cmp(7.8, 9.1) => -1
+  ## @:cmp(8.4, 8.4) => 0
+  ## @:cmp(9.3, 2.2) => 1
+  ## @:~~~~
+
+  tMapParameters("ffi")
+  let a = map["a"].floatv
+  let b = map["b"].floatv
+  result = newFunResult(newValue(cmp(a, b)))
+
+func funCmp_ssoii*(parameters: seq[Value]): FunResult =
+  ## @:Compare two strings. Returns -1 for less, 0 for equal and 1 for
+  ## @:greater than.
+  ## @:
+  ## @:You have the option to compare case insensitive. Case sensitive
+  ## @:is the default.
+  ## @:
+  ## @:~~~
+  ## @:cmp(a: string, b: string, optional insensitive: int) int
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
   ## @:cmp("coffee", "tea") => -1
   ## @:cmp("tea", "tea") => 0
   ## @:cmp("Tea", "tea") => 1
+  ## @:cmp("Tea", "tea", 0) => 1
   ## @:cmp("Tea", "tea", 1) => 0
   ## @:~~~~
 
-  # Check there are 2 or 3 parameters.
-  if parameters.len() < 2 or parameters.len() > 3:
-    return newFunResultWarn(wTwoOrThreeParameters)
-
-  # Check the two values are the same kind.
-  let value1 = parameters[0]
-  let value2 = parameters[1]
-  if value1.kind != value2.kind:
-    return newFunResultWarn(wNotSameKind)
-
-  # Check the two values are int, float or string.
-  case value1.kind
-  of vkInt, vkFloat, vkString:
-    discard
-  else:
-    return newFunResultWarn(wIntFloatString)
+  tMapParameters("ssoii")
+  let a = map["a"].stringv
+  let b = map["b"].stringv
 
   # Get the optional case insensitive and check it is 0 or 1.
   var insensitive = false
-  if parameters.len() == 3:
-    let value3 = parameters[2]
-    if value3.kind != vkInt:
-        return newFunResultWarn(wNotZeroOne, 2)
-    case value3.intv:
+  if "c" in map:
+    case map["c"].intv:
     of 0:
       insensitive = false
     of 1:
@@ -132,7 +133,7 @@ func funCmp*(parameters: seq[Value]): FunResult =
     else:
       return newFunResultWarn(wNotZeroOne, 2)
 
-  let ret = cmpBaseValues(value1, value2, insensitive)
+  let ret = cmpString(a, b, insensitive)
   result = newFunResult(newValue(ret))
 
 func funConcat*(parameters: seq[Value]): FunResult =
@@ -167,16 +168,15 @@ func funLen*(parameters: seq[Value]): FunResult =
   ## @:len(dictionary: dict) int
   ## @:~~~~
   ## @:
-  ## @:* p1: string, list or dict
-  ## @:* return: int
-  ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
   ## @:len("tea") => 3
+  ## @:len("añyóng") => 6
   ## @:len(list(4, 1)) => 2
   ## @:len(dict('a', 4)) => 1
   ## @:~~~~
+
   if parameters.len() != 1:
     result = newFunResultWarn(wOneParameter)
     return
@@ -198,7 +198,7 @@ func funGet*(parameters: seq[Value]): FunResult =
   ## Get a value from a list or dictionary.
   ## @:
   ## @:For a list you specify the index of the item you want to get. If
-  ## @:the index is too big, the default value is returned, if
+  ## @:the index is too big, the default value is returned if
   ## @:specified, else a warning is generated.
   ## @:
   ## @:For a dictionary you specify the key of the item you want to
@@ -213,20 +213,6 @@ func funGet*(parameters: seq[Value]): FunResult =
   ## @:Note: For dictionary lookup you can use dot notation. It's the
   ## @:same as get without the default.
   ## @:
-  ## @:List case:
-  ## @:
-  ## @:* p1: list
-  ## @:* p2: index of item
-  ## @:* p3: optional default value returned when index is too big
-  ## @:* return: value
-  ## @:
-  ## @:Dictionary case:
-  ## @:
-  ## @:* p1: dictionary
-  ## @:* p2: key string
-  ## @:* p3: optional default value returned when key is missing
-  ## @:* return: value
-  ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
@@ -238,6 +224,7 @@ func funGet*(parameters: seq[Value]): FunResult =
   ## @:get(d, 'tea') => "Earl Grey"
   ## @:get(d, 'coffee', 'Tea') => "Tea"
   ## @:
+  ## @:Using dot notation:
   ## @:d = dict("tea", "Earl Grey")
   ## @:d.tea => "Earl Grey"
   ## @:~~~~
@@ -1325,9 +1312,9 @@ const
     ("concat", funConcat, "Ss"),
     ("get", funGet, "lioaa"),
     ("get", funGet, "dsoaa"),
-    ("cmp", funCmp, "iii"),
-    ("cmp", funCmp, "ffi"),
-    ("cmp", funCmp, "ssoii"),
+    ("cmp", funCmp_iii, "iii"),
+    ("cmp", funCmp_ffi, "ffi"),
+    ("cmp", funCmp_ssoii, "ssoii"),
     ("if", funIf, "iaaa"),
     ("add", funAdd, "Ii"),
     ("add", funAdd, "Fi"),
@@ -1360,9 +1347,9 @@ const
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =
   ## Create a table of all the built in functions.
   for (name, functionPtr, signature) in functionsList:
-    var nameList = result.getOrDefault(name)
-    nameList.add(newFunctionSpec(name, signature, functionPtr))
-    result[name] = nameList
+    var functionSpecList = result.getOrDefault(name)
+    functionSpecList.add(newFunctionSpec(name, functionPtr, signature))
+    result[name] = functionSpecList
 
 proc getFunctionList*(name: string): seq[FunctionSpec] =
   ## Return the functions with the given name.
@@ -1372,9 +1359,25 @@ proc getFunctionList*(name: string): seq[FunctionSpec] =
 
   result = functions.getOrDefault(name)
 
-proc getFunction*(functionName: string): Option[FunctionPtr] =
-  ## Look up a function by its name.
-  let nameList = getFunctionList(functionName)
-  if nameList.len > 0:
-    let functionSpec = nameList[0]
-    result = some(functionSpec.functionPtr)
+proc getFunction*(functionName: string, parameters: seq[Value]): Option[FunctionSpec] =
+  ## Find the function with the given name and return a pointer to it.
+  ## If there are multiple functions with the name, return the one
+  ## that matches the parameters, if none match, return the first one.
+  let functionSpecList = getFunctionList(functionName)
+  if functionSpecList.len > 1:
+    # Find the function that matches the parameters.
+    for functionSpec in functionSpecList:
+      let paramsO = signatureCodeToParams(functionSpec.signatureCode)
+      let funResult = mapParameters(paramsO.get(), parameters)
+      if funResult.kind != frWarning:
+        return some(functionSpec)
+    # None match, return the first function.
+  if functionSpecList.len != 0:
+    let functionSpec = functionSpecList[0]
+    result = some(functionSpec)
+
+proc isFunctionName*(functionName: string): bool =
+  ## Return true the function exists.
+  let functionSpecList = getFunctionList(functionName)
+  if functionSpecList.len > 0:
+    result = true

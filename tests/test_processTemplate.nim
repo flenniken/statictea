@@ -394,10 +394,10 @@ and the shared json has 0.
 #$ endblock
 """
     let eErrLines = splitNewLines """
-template.html(1): w51: Not a function: notfunction.
+template.html(1): w51: The function does not exist: notfunction.
 statement: cond1 = notfunction(4, 5)
                    ^
-template.html(2): w51: Not a function: hello.
+template.html(2): w51: The function does not exist: hello.
 statement:  cond3 = hello(5, 4)
                     ^
 """

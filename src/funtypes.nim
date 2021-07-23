@@ -5,6 +5,8 @@ import warnings
 import tostring
 import strutils
 
+# todo: rename "parameters" to "arguments"?
+
 type
   FunctionPtr* = proc (parameters: seq[Value]): FunResult {.noSideEffect.}
     ## Signature of a statictea function. It takes any number of values
@@ -14,6 +16,13 @@ type
     ## The kind of a FunResult object, either a value or warning.
     frValue,
     frWarning
+
+  FunctionSpec* = object
+    ## The name of a function, a pointer to the code, and its signature
+    ## code.
+    name*: string
+    functionPtr*: FunctionPtr
+    signatureCode*: string
 
   FunResult* = object
     ## Contains the result of calling a function, either a value or a
