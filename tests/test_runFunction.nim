@@ -197,22 +197,22 @@ suite "runFunction.nim":
 
   test "len float":
     var parameters = @[newValue(3.4)]
-    let eFunResult = newFunResultWarn(wStringListDict)
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "float")
     check testFunction("len", parameters, eFunResult)
 
   test "len int":
     var parameters = @[newValue(3)]
-    let eFunResult = newFunResultWarn(wStringListDict)
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
     check testFunction("len", parameters, eFunResult)
 
   test "len nothing":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(wOneParameter)
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1", "0")
     check testFunction("len", parameters, eFunResult)
 
   test "len 2":
     var parameters = newValue([3, 2]).listv
-    let eFunResult = newFunResultWarn(wOneParameter)
+    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1", "2")
     check testFunction("len", parameters, eFunResult)
 
   test "get list item":
@@ -254,31 +254,40 @@ suite "runFunction.nim":
   test "get one parameter":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list]
-    let eFunResult = newFunResultWarn(wGetTakes2or3Params)
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "1")
     check testFunction("get", parameters, eFunResult)
 
   test "get 4 parameters":
     var list = newValue([1, 2, 3, 4, 5])
     let p = newValue(1)
     var parameters = @[list, p, p, p]
-    let eFunResult = newFunResultWarn(wGetTakes2or3Params)
+    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "2", "4")
     check testFunction("get", parameters, eFunResult)
 
   test "get parameter 2 wrong type":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list, newValue("a")]
-    let eFunResult = newFunResultWarn(wExpectedIntFor2, 1, "string")
+    let eFunResult = newFunResultWarn(kWrongType, 1, "int", "string")
     check testFunction("get", parameters, eFunResult)
 
-  test "get parameter 2 wrong type dict":
-    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
-    var parameters = @[dict, newValue(3.5)]
-    let eFunResult = newFunResultWarn(wExpectedStringFor2, 1, "float")
-    check testFunction("get", parameters, eFunResult)
+  # todo: should we show the possible signatures like nim does? This
+  # one expects a list for the first parameter be it's the default
+  # when none match. Or pick the dict function instead.
+  # test "get parameter 2 wrong type dict":
+  #   var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
+  #   var parameters = @[dict, newValue(3.5)]
+  #   let eFunResult = newFunResultWarn(kWrongType, 1, "float")
+  #   check testFunction("get", parameters, eFunResult)
 
   test "get wrong first parameter":
-    var parameters = newValue([2, 3]).listv
-    let eFunResult = newFunResultWarn(wExpectedListOrDict)
+    var parameters = @[newValue(2), newValue(2)]
+    let eFunResult = newFunResultWarn(kWrongType, 0, "list", "int")
+    check testFunction("get", parameters, eFunResult)
+
+  test "get wrong second parameter":
+    var list = newValue([1, 2, 3, 4, 5])
+    var parameters = @[list, newValue("a")]
+    let eFunResult = newFunResultWarn(kWrongType, 1, "int", "string")
     check testFunction("get", parameters, eFunResult)
 
   test "get invalid index":

@@ -157,15 +157,11 @@ func funConcat*(parameters: seq[Value]): FunResult =
     returnString.add(value.stringv)
   result = newFunResult(newValue(returnString))
 
-func funLen*(parameters: seq[Value]): FunResult =
-  ## Length of a string, list or dictionary. For strings it returns
-  ## @:the number of characters, not bytes. For lists and dictionaries
-  ## @:it returns the number of elements.
+func funLen_si*(parameters: seq[Value]): FunResult =
+  ## Return the length of a string in characters, not bytes.
   ## @:
   ## @:~~~
   ## @:len(str: string) int
-  ## @:len(list: list) int
-  ## @:len(dictionary: dict) int
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -173,40 +169,86 @@ func funLen*(parameters: seq[Value]): FunResult =
   ## @:~~~
   ## @:len("tea") => 3
   ## @:len("añyóng") => 6
-  ## @:len(list(4, 1)) => 2
-  ## @:len(dict('a', 4)) => 1
   ## @:~~~~
 
-  if parameters.len() != 1:
-    result = newFunResultWarn(wOneParameter)
-    return
-  var retValue: Value
-  let value = parameters[0]
-  case value.kind
-    of vkString:
-      retValue = newValue(stringLen(value.stringv))
-    of vkList:
-      retValue = newValue(value.listv.len)
-    of vkDict:
-      retValue = newValue(value.dictv.len)
-    else:
-      result = newFunResultWarn(wStringListDict)
-      return
-  result = newFunResult(retValue)
+  tMapParameters("si")
+  let str = map["a"].stringv
+  result = newFunResult(newValue(stringLen(str)))
 
-func funGet*(parameters: seq[Value]): FunResult =
-  ## Get a value from a list or dictionary.
+func funLen_li*(parameters: seq[Value]): FunResult =
+  ## Return the number of elements in a list.
   ## @:
-  ## @:For a list you specify the index of the item you want to get. If
-  ## @:the index is too big, the default value is returned if
-  ## @:specified, else a warning is generated.
+  ## @:~~~
+  ## @:len(list: list) int
+  ## @:~~~~
   ## @:
-  ## @:For a dictionary you specify the key of the item you want to
-  ## @:get. If the key doesn't exist, the default value is returned, if
-  ## @:specified, else a warning is generated.
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:len(list()) => 0
+  ## @:len(list(1)) => 1
+  ## @:len(list(4, 5)) => 2
+  ## @:~~~~
+
+  tMapParameters("li")
+  let list = map["a"].listv
+  result = newFunResult(newValue(list.len))
+
+func funLen_di*(parameters: seq[Value]): FunResult =
+  ## Return the number of elements in a dictionary.
+  ## @:
+  ## @:~~~
+  ## @:len(dictionary: dict) int
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:len(dict()) => 0
+  ## @:len(dict('a', 4)) => 1
+  ## @:len(dict('a', 4, 'b', 3)) => 2
+  ## @:~~~~
+
+  tMapParameters("di")
+  let dict = map["a"].dictv
+  result = newFunResult(newValue(dict.len))
+
+func funGet_lioaa*(parameters: seq[Value]): FunResult =
+  ## Return a value from a list by its index.  If the index is too
+  ## @:big, the default value is returned when specified, else a warning
+  ## @:is generated.
   ## @:
   ## @:~~~
   ## @:get(list: list, index: int, optional default: any) any
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:list = list(4, 'a', 10)
+  ## @:get(list, 2) => 10
+  ## @:get(list, 3, 99) => 99
+  ## @:~~~~
+
+  tMapParameters("lioaa")
+  let list = map["a"].listv
+  let index = map["b"].intv
+
+  if index < 0:
+    result = newFunResultWarn(wInvalidIndex, 1, $index)
+  elif index < list.len:
+    result = newFunResult(newValue(list[index]))
+  elif "c" in map:
+    result = newFunResult(map["c"])
+  else:
+    result = newFunResultWarn(wMissingListItem, 1, $index)
+
+func funGet_dsoaa*(parameters: seq[Value]): FunResult =
+  ## Return a value in a dictionary by key.  If the key doesn't
+  ## @:exist, the default value is returned, if specified, else a
+  ## @:warning is generated.
+  ## @:
+  ## @:~~~
   ## @:get(dictionary: dict, key: string, optional default: any) any
   ## @:~~~~
   ## @:
@@ -216,10 +258,6 @@ func funGet*(parameters: seq[Value]): FunResult =
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:list = list(4, 'a', 10)
-  ## @:get(list, 2) => 10
-  ## @:get(list, 3, 99) => 99
-  ## @:
   ## @:d = dict("tea", "Earl Grey")
   ## @:get(d, 'tea') => "Earl Grey"
   ## @:get(d, 'coffee', 'Tea') => "Tea"
@@ -229,35 +267,16 @@ func funGet*(parameters: seq[Value]): FunResult =
   ## @:d.tea => "Earl Grey"
   ## @:~~~~
 
-  if parameters.len() < 2 or parameters.len() > 3:
-    return newFunResultWarn(wGetTakes2or3Params)
+  tMapParameters("dsoaa")
+  let dict = map["a"].dictv
+  let key = map["b"].stringv
 
-  let container = parameters[0]
-  case container.kind
-    of vkList:
-      let p2 = parameters[1]
-      if p2.kind != vkInt:
-        return newFunResultWarn(wExpectedIntFor2, 1, $p2.kind)
-      var index = p2.intv
-      if index < 0:
-        return newFunResultWarn(wInvalidIndex, 1, $index)
-      if index >= container.listv.len:
-        if parameters.len == 3:
-          return newFunResult(parameters[2])
-        return newFunResultWarn(wMissingListItem, 1, $index)
-      return newFunResult(newValue(container.listv[index]))
-    of vkDict:
-      let p2 = parameters[1]
-      if p2.kind != vkString:
-        return newFunResultWarn(wExpectedStringFor2, 1, $p2.kind)
-      var key = p2.stringv
-      if key in container.dictv:
-        return newFunResult(container.dictv[key])
-      if parameters.len == 3:
-        return newFunResult(newValue(parameters[2]))
-      return newFunResultWarn(wMissingDictItem, 1, key)
-    else:
-      return newFunResultWarn(wExpectedListOrDict)
+  if key in dict:
+    result = newFunResult(dict[key])
+  elif "c" in map:
+    result = newFunResult(map["c"])
+  else:
+    result = newFunResultWarn(wMissingDictItem, 1, key)
 
 func funIf*(parameters: seq[Value]): FunResult =
   ## Return a value when the condition is 1 and another value when the
@@ -1306,12 +1325,12 @@ func funGithubAnchor*(parameters: seq[Value]): FunResult =
 
 const
   functionsList = [
-    ("len", funLen, "si"),
-    ("len", funLen, "li"),
-    ("len", funLen, "di"),
+    ("len", funLen_si, "si"),
+    ("len", funLen_li, "li"),
+    ("len", funLen_di, "di"),
     ("concat", funConcat, "Ss"),
-    ("get", funGet, "lioaa"),
-    ("get", funGet, "dsoaa"),
+    ("get", funGet_lioaa, "lioaa"),
+    ("get", funGet_dsoaa, "dsoaa"),
     ("cmp", funCmp_iii, "iii"),
     ("cmp", funCmp_ffi, "ffi"),
     ("cmp", funCmp_ssoii, "ssoii"),
