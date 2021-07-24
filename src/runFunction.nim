@@ -306,65 +306,55 @@ func funIf*(parameters: seq[Value]): FunResult =
 
 {.push overflowChecks: on, floatChecks: on.}
 
-func funAdd*(parameters: seq[Value]): FunResult =
-  ## Add two or more numbers.  The parameters must be all integers or
-  ## @:all floats.  A warning is generated on overflow.
+func funAdd_Ii*(parameters: seq[Value]): FunResult =
+  ## Add integers. A warning is generated on overflow.
   ## @:
   ## @:~~~
   ## @:add(numbers: varargs(int)) int
-  ## @:add(numbers: varargs(float)) float
   ## @:~~~~
-  ## @:
-  ## @:Integer case:
-  ## @:
-  ## @:* p1: int
-  ## @:* p2: int
-  ## @:* ...
-  ## @:* pn: int
-  ## @:* return: int
-  ## @:
-  ## @:Float case:
-  ## @:
-  ## @:* p1: float
-  ## @:* p2: float
-  ## @:* ...
-  ## @:* pn: float
-  ## @:* return: float
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
+  ## @:add(1) => 1
   ## @:add(1, 2) => 3
   ## @:add(1, 2, 3) => 6
+  ## @:~~~~
+
+  tMapParameters("Ii")
+  let list = map["a"].listv
+  var total = 0i64
+  try:
+    for num in list:
+      total = total + num.intv
+    result = newFunResult(newValue(total))
+  except:
+    result = newFunResultWarn(wOverflow)
+
+func funAdd_Fi*(parameters: seq[Value]): FunResult =
+  ## Add floats. A warning is generated on overflow.
   ## @:
+  ## @:~~~
+  ## @:add(numbers: varargs(float)) float
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:add(1.5) => 1.5
   ## @:add(1.5, 2.3) => 3.8
   ## @:add(1.1, 2.2, 3.3) => 6.6
   ## @:~~~~
 
-  if parameters.len() < 2:
-    result = newFunResultWarn(wTwoOrMoreParameters)
-    return
-
-  let first = parameters[0]
-  if first.kind != vkInt and first.kind != vkFloat:
-    result = newFunResultWarn(wAllIntOrFloat)
-    return
-
-  for ix, value in parameters[1..^1]:
-    if value.kind != first.kind:
-      result = newFunResultWarn(wAllIntOrFloat)
-      return
-
-    try:
-      if first.kind == vkInt:
-        first.intv = first.intv + value.intv
-      else:
-        first.floatv = first.floatv + value.floatv
-    except:
-      result = newFunResultWarn(wOverflow, ix)
-      return
-
-  result = newFunResult(first)
+  tMapParameters("Fi")
+  let list = map["a"].listv
+  var total = 0.0
+  try:
+    for num in list:
+      total = total + num.floatv
+    result = newFunResult(newValue(total))
+  except:
+    result = newFunResultWarn(wOverflow)
 
 {.pop.}
 
@@ -1335,8 +1325,8 @@ const
     ("cmp", funCmp_ffi, "ffi"),
     ("cmp", funCmp_ssoii, "ssoii"),
     ("if", funIf, "iaaa"),
-    ("add", funAdd, "Ii"),
-    ("add", funAdd, "Fi"),
+    ("add", funAdd_Ii, "Ii"),
+    ("add", funAdd_Fi, "Fi"),
     ("exists", funExists, "dsi"),
     ("case", funCase, "iaIAa"),
     ("case", funCase, "saSAa"),

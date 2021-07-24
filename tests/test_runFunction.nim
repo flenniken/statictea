@@ -357,24 +357,59 @@ suite "runFunction.nim":
     let eFunResult = newFunResult(newValue("false"))
     check testFunction("if", parameters, eFunResult)
 
-  test "add wrong number of parameters":
-    var parameters = @[newValue(2)]
-    let eFunResult = newFunResultWarn(wTwoOrMoreParameters)
+  test "add 1":
+    var parameters = @[newValue(1)]
+    let eFunResult = newFunResult(newValue(1))
     check testFunction("add", parameters, eFunResult)
 
-  test "add wrong type of parameters":
+  test "add 1 + 2":
+    var parameters = @[newValue(1), newValue(2)]
+    let eFunResult = newFunResult(newValue(3))
+    check testFunction("add", parameters, eFunResult)
+
+  test "add 1 + 2 + 3":
+    var parameters = @[newValue(1), newValue(2), newValue(3)]
+    let eFunResult = newFunResult(newValue(6))
+    check testFunction("add", parameters, eFunResult)
+
+  test "add 1 + 2 - 4":
+    var parameters = @[newValue(1), newValue(2), newValue(-4)]
+    let eFunResult = newFunResult(newValue(-1))
+    check testFunction("add", parameters, eFunResult)
+
+  test "add 1.5":
+    var parameters = @[newValue(1.5)]
+    let eFunResult = newFunResult(newValue(1.5))
+    check testFunction("add", parameters, eFunResult)
+
+  test "add 1.5 + 2.3":
+    var parameters = @[newValue(1.5), newValue(2.3)]
+    let eFunResult = newFunResult(newValue(3.8))
+    check testFunction("add", parameters, eFunResult)
+
+  test "add 1.1 + 2.2 + 3.3":
+    var parameters = @[newValue(1.1), newValue(2.2), newValue(3.3)]
+    let eFunResult = newFunResult(newValue(6.6))
+    check testFunction("add", parameters, eFunResult)
+
+  test "add no parameters":
+    var parameters: seq[Value] = @[]
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1", "0")
+    check testFunction("add", parameters, eFunResult)
+
+  test "add string and int":
     var parameters = @[newValue("hi"), newValue(4)]
-    let eFunResult = newFunResultWarn(wAllIntOrFloat)
+    let eFunResult = newFunResultWarn(kWrongType, 0, "int", "string")
     check testFunction("add", parameters, eFunResult)
 
-  test "add wrong type of parameters 2":
+  test "add int and string":
     var parameters = @[newValue(4), newValue("hi")]
-    let eFunResult = newFunResultWarn(wAllIntOrFloat)
+    let eFunResult = newFunResultWarn(kWrongType, 1, "int", "string")
     check testFunction("add", parameters, eFunResult)
 
-  test "add wrong type of parameters 3":
+  test "add int and float":
     var parameters = @[newValue(4), newValue(1.3)]
-    let eFunResult = newFunResultWarn(wAllIntOrFloat)
+    let eFunResult = newFunResultWarn(kWrongType, 1, "int", "float")
     check testFunction("add", parameters, eFunResult)
 
   test "add int64 overflow":
