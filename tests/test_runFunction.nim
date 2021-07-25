@@ -110,6 +110,12 @@ proc testGetFunctionExists(name: string, parameters: seq[Value],
   if not expectedItem("eSignatureCode", functionSpec.signatureCode, eSignatureCode):
     result = false
 
+proc testIntOk(num: Value, option: string, eIntNum: int): bool =
+  var parameters = @[newValue(num), newValue(option)]
+  let eFunResult = newFunResult(newValue(eIntNum))
+  if testFunction("int", parameters, eFunResult):
+    result = true
+
 suite "runFunction.nim":
 
   test "getFunction missing":
@@ -523,72 +529,67 @@ suite "runFunction.nim":
     let eFunResult = newFunResultWarn(kWrongType, 2, "int", "string")
     check testFunction("case", parameters, eFunResult)
 
-  test "to int happy":
-    let testCases = [
-      (newValue(2.34), "round", 2),
-      (newValue(-2.34), "round", -2),
-      (newValue(4.57), "floor", 4),
-      (newValue(-4.57), "floor", -5),
-      (newValue(6.3), "ceiling", 7),
-      (newValue(-6.3), "ceiling", -6),
-      (newValue(6.3456), "truncate", 6),
-      (newValue(-6.3456), "truncate", -6),
+  test "int() float to int":
+    check testIntOk(newValue(2.34), "round", 2)
+    check testIntOk(newValue(-2.34), "round", -2)
+    check testIntOk(newValue(4.57), "floor", 4)
+    check testIntOk(newValue(-4.57), "floor", -5)
+    check testIntOk(newValue(6.3), "ceiling", 7)
+    check testIntOk(newValue(-6.3), "ceiling", -6)
+    check testIntOk(newValue(6.3456), "truncate", 6)
+    check testIntOk(newValue(-6.3456), "truncate", -6)
 
-      (newValue("2.34"), "round", 2),
-      (newValue("-2.34"), "round", -2),
-      (newValue("4.57"), "floor", 4),
-      (newValue("-4.57"), "floor", -5),
-      (newValue("6.3"), "ceiling", 7),
-      (newValue("-6.3"), "ceiling", -6),
-      (newValue("6.3456"), "truncate", 6),
-      (newValue("-6.3456"), "truncate", -6),
+  test "int() float number string to int":
+    check testIntOk(newValue("2.34"), "round", 2)
+    check testIntOk(newValue("-2.34"), "round", -2)
+    check testIntOk(newValue("4.57"), "floor", 4)
+    check testIntOk(newValue("-4.57"), "floor", -5)
+    check testIntOk(newValue("6.3"), "ceiling", 7)
+    check testIntOk(newValue("-6.3"), "ceiling", -6)
+    check testIntOk(newValue("6.3456"), "truncate", 6)
+    check testIntOk(newValue("-6.3456"), "truncate", -6)
 
-      (newValue("2"), "round", 2),
-      (newValue("-2"), "round", -2),
-    ]
-    for oneCase in testCases:
-      var parameters = @[oneCase[0], newValue(oneCase[1])]
-      let eFunResult = newFunResult(newValue(oneCase[2]))
-      if not testFunction("int", parameters, eFunResult):
-        echo $oneCase
-        fail
+  test "int() int number string to int":
+    check testIntOk(newValue("2"), "round", 2)
+    check testIntOk(newValue("-2"), "round", -2)
 
-  test "to int: default":
+  test "int(): default":
     var parameters = @[newValue(4.57)]
     let eFunResult = newFunResult(newValue(5))
     check testFunction("int", parameters, eFunResult)
 
-  test "to int: wrong number of parameters":
+  test "int(): wrong number of parameters":
     var parameters = @[newValue(4.57), newValue(1), newValue(2)]
-    let eFunResult = newFunResultWarn(wOneOrTwoParameters)
+    # todo: kTooManyArgs: expected 1 or 2, got 3
+    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1", "3")
     check testFunction("int", parameters, eFunResult)
 
-  test "to int: not a number string":
+  test "int(): not a number string":
     var parameters = @[newValue("hello"), newValue("round")]
     let eFunResult = newFunResultWarn(wFloatOrStringNumber)
     check testFunction("int", parameters, eFunResult)
 
-  test "to int: not a float":
+  test "int(): not a float":
     var parameters = @[newValue(3), newValue("round")]
-    let eFunResult = newFunResultWarn(wFloatOrStringNumber)
+    let eFunResult = newFunResultWarn(kWrongType, 0, "float", "int")
     check testFunction("int", parameters, eFunResult)
 
-  test "to int: not round option":
+  test "int(): not round option":
     var parameters = @[newValue(3.4), newValue(5)]
-    let eFunResult = newFunResultWarn(wExpectedRoundOption, 1)
+    let eFunResult = newFunResultWarn(kWrongType, 1, "string", "int")
     check testFunction("int", parameters, eFunResult)
 
-  test "to int: not a float":
+  test "int(): not a float":
     var parameters = @[newValue(3.5), newValue("rounder")]
     let eFunResult = newFunResultWarn(wExpectedRoundOption, 1)
     check testFunction("int", parameters, eFunResult)
 
-  test "to int: to big":
+  test "int(): to big":
     var parameters = @[newValue(3.5e300), newValue("round")]
     let eFunResult = newFunResultWarn(wNumberOverFlow)
     check testFunction("int", parameters, eFunResult)
 
-  test "to int: to small":
+  test "int(): to small":
     var parameters = @[newValue(-3.5e300), newValue("round")]
     let eFunResult = newFunResultWarn(wNumberOverFlow)
     check testFunction("int", parameters, eFunResult)

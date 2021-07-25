@@ -574,78 +574,16 @@ func funFloat*(parameters: seq[Value]): FunResult =
 
 # todo: use int64 instead of BiggestInt everywhere.
 
-func funInt*(parameters: seq[Value]): FunResult =
-  ## Create an int from a float or a float number string.
-  ## @:
-  ## @:~~~
-  ## @:int(num: float, optional roundOption: string) int
-  ## @:int(numString: string, optional roundOption: string) int
-  ## @:~~~~
-  ## @:
-  ## @:Round options:
-  ## @:
-  ## @:* "round" - nearest integer
-  ## @:* "floor" - integer below (to the left on number line)
-  ## @:* "ceiling" - integer above (to the right on number line)
-  ## @:* "truncate" - remove decimals
-  ## @:
-  ## @:Examples:
-  ## @:
-  ## @:~~~
-  ## @:int("2") => 2
-  ## @:int("2.34") => 2
-  ## @:int(2.34, "round") => 2
-  ## @:int(-2.34, "round") => -2
-  ## @:int(6.5, "round") => 7
-  ## @:int(-6.5, "round") => -7
-  ## @:int(4.57, "floor") => 4
-  ## @:int(-4.57, "floor") => -5
-  ## @:int(6.3, "ceiling") => 7
-  ## @:int(-6.3, "ceiling") => -6
-  ## @:int(6.3456, "truncate") => 6
-  ## @:int(-6.3456, "truncate") => -6
-  ## @:~~~~
-
-  if parameters.len() < 1 or parameters.len() > 2:
-    return newFunResultWarn(wOneOrTwoParameters)
-  var p1 = parameters[0]
-  var num: float64
-
-  case p1.kind
-    of vkFloat:
-      # From float to int.
-      num = p1.floatv
-    of vkString:
-      # From number string to int.
-      var matchesO = matchNumberNotCached(p1.stringv, 0)
-      if not matchesO.isSome:
-        return newFunResultWarn(wFloatOrStringNumber)
-      let matches = matchesO.get()
-      let decimalPoint = matches.getGroup()
-      if decimalPoint == ".":
-        # Float number string to int.
-        let floatPosO = parseFloat64(p1.stringv)
-        if not floatPosO.isSome:
-          return newFunResultWarn(wFloatOrStringNumber)
-        num = floatPosO.get().number
-      else:
-        # Int number string to int.
-        let intPosO = parseInteger(p1.stringv)
-        if not intPosO.isSome:
-          return newFunResultWarn(wNumberOverFlow)
-        return newFunResult(newValue(intPosO.get().integer))
-    else:
-      return newFunResultWarn(wFloatOrStringNumber)
-
+func convertFloatToInt(num: float, map: VarsDict): FunResult =
+  ## Convert float to an integer. The map contains the optional round
+  ## options as "b".
   if num > float(high(int64)) or num < float(low(int64)):
     return newFunResultWarn(wNumberOverFlow)
+  # todo: test rounding up to an invalid int (out of range).
 
   var option: string
-  if parameters.len() == 2:
-    let p2 = parameters[1]
-    if p2.kind != vkString:
-      return newFunResultWarn(wExpectedRoundOption, 1)
-    option = p2.stringv
+  if "b" in map:
+    option = map["b"].stringv
   else:
     option = "round"
 
@@ -662,6 +600,99 @@ func funInt*(parameters: seq[Value]): FunResult =
     else:
       return newFunResultWarn(wExpectedRoundOption, 1)
   result = newFunResult(newValue(ret))
+
+func funInt_fosi*(parameters: seq[Value]): FunResult =
+  ## Create an int from a float.
+  ## @:
+  ## @:~~~
+  ## @:int(num: float, optional roundOption: string) int
+  ## @:~~~~
+  ## @:
+  ## @:Round options:
+  ## @:
+  ## @:* "round" - nearest integer, the default.
+  ## @:* "floor" - integer below (to the left on number line)
+  ## @:* "ceiling" - integer above (to the right on number line)
+  ## @:* "truncate" - remove decimals
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:int(2.34) => 2
+  ## @:int(2.34, "round") => 2
+  ## @:int(-2.34, "round") => -2
+  ## @:int(6.5, "round") => 7
+  ## @:int(-6.5, "round") => -7
+  ## @:int(4.57, "floor") => 4
+  ## @:int(-4.57, "floor") => -5
+  ## @:int(6.3, "ceiling") => 7
+  ## @:int(-6.3, "ceiling") => -6
+  ## @:int(6.3456, "truncate") => 6
+  ## @:int(-6.3456, "truncate") => -6
+  ## @:~~~~
+
+  tMapParameters("fosi")
+  let num = map["a"].floatv
+
+  result = convertFloatToInt(num, map)
+
+func funInt_sosi*(parameters: seq[Value]): FunResult =
+  ## Create an int from a number string.
+  ## @:
+  ## @:~~~
+  ## @:int(numString: string, optional roundOption: string) int
+  ## @:~~~~
+  ## @:
+  ## @:Round options:
+  ## @:
+  ## @:* "round" - nearest integer, the default
+  ## @:* "floor" - integer below (to the left on number line)
+  ## @:* "ceiling" - integer above (to the right on number line)
+  ## @:* "truncate" - remove decimals
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:int("2") => 2
+  ## @:int("2.34") => 2
+  ## @:int("-2.34", "round") => -2
+  ## @:int("6.5", "round") => 7
+  ## @:int("-6.5", "round") => -7
+  ## @:int("4.57", "floor") => 4
+  ## @:int("-4.57", "floor") => -5
+  ## @:int("6.3", "ceiling") => 7
+  ## @:int("-6.3", "ceiling") => -6
+  ## @:int("6.3456", "truncate") => 6
+  ## @:int("-6.3456", "truncate") => -6
+  ## @:~~~~
+
+  tMapParameters("sosi")
+  let numString = map["a"].stringv
+
+  # Convert the number string to a float or int.
+  var num: float64
+  var matchesO = matchNumberNotCached(numString, 0)
+  if not matchesO.isSome:
+    # todo: update warning. Not number string.
+    return newFunResultWarn(wFloatOrStringNumber)
+  let matches = matchesO.get()
+  let decimalPoint = matches.getGroup()
+  if decimalPoint == ".":
+    # Float number string to float.
+    let floatPosO = parseFloat64(numString)
+    if not floatPosO.isSome:
+      return newFunResultWarn(wFloatOrStringNumber)
+    num = floatPosO.get().number
+
+    # Float number to int.
+    result = convertFloatToInt(num, map)
+  else:
+    # Int number string to int.
+    let intPosO = parseInteger(numString)
+    if not intPosO.isSome:
+      result = newFunResultWarn(wNumberOverFlow)
+    else:
+      result = newFunResult(newValue(intPosO.get().integer))
 
 func funFind*(parameters: seq[Value]): FunResult =
   ## Return the position of a substring in a string.  When the
@@ -1369,8 +1400,8 @@ const
     ("case", funCase_iaIAa, "iaIAa"),
     ("case", funCase_saSAa, "saSAa"),
     ("cmpVersion", funCmpVersion, "ssi"),
-    ("int", funInt, "fosi"),
-    ("int", funInt, "sosi"),
+    ("int", funInt_fosi, "fosi"),
+    ("int", funInt_sosi, "sosi"),
     ("float", funFloat, "if"),
     ("float", funFloat, "sf"),
     ("find", funFind, "ssoaa"),
