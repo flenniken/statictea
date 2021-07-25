@@ -53,7 +53,36 @@ func cmpBaseValues*(a, b: Value, insensitive: bool = false): int =
     else:
       result = 0
 
+func numberStringToNum(numString: string): FunResult =
+  ## Convert the number string to a float or int, if possible.
+
+  var matchesO = matchNumberNotCached(numString, 0)
+  if not matchesO.isSome:
+    return newFunResultWarn(wExpectedNumberString)
+  let matches = matchesO.get()
+  let decimalPoint = matches.getGroup()
+
+  if decimalPoint == ".":
+    # Float number string to float.
+    let floatPosO = parseFloat64(numString)
+    if floatPosO.isSome:
+      result = newFunResult(newValue(floatPosO.get().number))
+    else:
+      result = newFunResultWarn(wExpectedNumberString)
+  else:
+    # Int number string to int.
+    let intPosO = parseInteger(numString)
+    if intPosO.isSome:
+      result = newFunResult(newValue(intPosO.get().integer))
+    else:
+      result = newFunResultWarn(wExpectedNumberString)
+
+
+
 # todo: cmp: support list and dict compares? Maybe similar to how sort compares.
+
+
+
 
 func funCmp_iii*(parameters: seq[Value]): FunResult =
   ## @:Compare two ints. Returns -1 for less, 0 for equal and 1 for
@@ -527,50 +556,49 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(ret))
 
-func funFloat*(parameters: seq[Value]): FunResult =
-  ## Create a float from an int or an int number string.
+func funFloat_if*(parameters: seq[Value]): FunResult =
+  ## Create a float from an int.
   ## @:
   ## @:~~~
   ## @:float(num: int) float
-  ## @:float(numString: string) float
   ## @:~~~~
-  ## @:
-  ## @:* p1: int or int string
-  ## @:* return: float
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
   ## @:float(2) => 2.0
+  ## @:float(-33) => -33.0
+  ## @:~~~~
+  tMapParameters("if")
+  let num = map["a"].intv
+  result = newFunResult(newValue(float(num)))
+
+func funFloat_sf*(parameters: seq[Value]): FunResult =
+  ## Create a float from a number string.
+  ## @:
+  ## @:~~~
+  ## @:float(numString: string) float
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:float("2") => 2.0
+  ## @:float("2.4") => 2.4
   ## @:float("33") => 33.0
   ## @:~~~~
+  tMapParameters("sf")
+  let numString = map["a"].stringv
 
-  if parameters.len() != 1:
-    return newFunResultWarn(wOneParameter)
-  var p1 = parameters[0]
-  case p1.kind
-    of vkInt:
-      # From int to float
-      result = newFunResult(newValue(float(p1.intv)))
-    of vkString:
-      # From number string to float.
-      var matchesO = matchNumberNotCached(p1.stringv)
-      if not matchesO.isSome:
-        return newFunResultWarn(wIntOrStringNumber)
-      let matches = matchesO.get()
-      let decimalPoint = matches.getGroup()
-      if decimalPoint == ".":
-        let floatPosO = parseFloat64(p1.stringv)
-        if not floatPosO.isSome:
-          return newFunResultWarn(wNumberOverFlow)
-        result = newFunResult(newValue(floatPosO.get().number))
-      else:
-        let intPosO = parseInteger(p1.stringv)
-        if not intPosO.isSome:
-          return newFunResultWarn(wNumberOverFlow)
-        result = newFunResult(newValue(float(intPosO.get().integer)))
-    else:
-      return newFunResultWarn(wIntOrStringNumber)
+  let funResult = numberStringToNum(numString)
+  if funResult.kind == frWarning:
+    return funResult
+
+  if funResult.value.kind == vkFloat:
+    result = funResult
+  else:
+    result = newFunResult(newValue(float(funResult.value.intv)))
+
 
 # todo: use int64 instead of BiggestInt everywhere.
 
@@ -669,30 +697,14 @@ func funInt_sosi*(parameters: seq[Value]): FunResult =
   tMapParameters("sosi")
   let numString = map["a"].stringv
 
-  # Convert the number string to a float or int.
-  var num: float64
-  var matchesO = matchNumberNotCached(numString, 0)
-  if not matchesO.isSome:
-    # todo: update warning. Not number string.
-    return newFunResultWarn(wFloatOrStringNumber)
-  let matches = matchesO.get()
-  let decimalPoint = matches.getGroup()
-  if decimalPoint == ".":
-    # Float number string to float.
-    let floatPosO = parseFloat64(numString)
-    if not floatPosO.isSome:
-      return newFunResultWarn(wFloatOrStringNumber)
-    num = floatPosO.get().number
+  let funResult = numberStringToNum(numString)
+  if funResult.kind == frWarning:
+    return funResult
 
-    # Float number to int.
-    result = convertFloatToInt(num, map)
+  if funResult.value.kind == vkFloat:
+    result = convertFloatToInt(funResult.value.floatv, map)
   else:
-    # Int number string to int.
-    let intPosO = parseInteger(numString)
-    if not intPosO.isSome:
-      result = newFunResultWarn(wNumberOverFlow)
-    else:
-      result = newFunResult(newValue(intPosO.get().integer))
+    result = funResult
 
 func funFind*(parameters: seq[Value]): FunResult =
   ## Return the position of a substring in a string.  When the
@@ -1402,8 +1414,8 @@ const
     ("cmpVersion", funCmpVersion, "ssi"),
     ("int", funInt_fosi, "fosi"),
     ("int", funInt_sosi, "sosi"),
-    ("float", funFloat, "if"),
-    ("float", funFloat, "sf"),
+    ("float", funFloat_if, "if"),
+    ("float", funFloat_sf, "sf"),
     ("find", funFind, "ssoaa"),
     ("substr", funSubstr, "siois"),
     ("dup", funDup, "sis"),

@@ -137,6 +137,8 @@ type
     kNotEnoughVarargs,     # w122
     kTooManyArgs,          # w123
     wAtLeast4Parameters,   # w124
+    wExpectedNumberString, # w125
+
 const
     # The list of warnings. Add new messages to the bottom and do not
     # reorder the messages.
@@ -266,6 +268,7 @@ const
       "Missing vararg parameter, expected groups of 2 got 1.", # kNotEnoughVarargs
       "Too many arguments, expected {requiredParams} got {args.len}.", # kTooManyArgs
       "Expected at least four parameters.", # wAtLeast4Parameters
+      "Expected number string.", # wExpectedNumberString
     ]
 
 func getWarning*(filename: string, lineNum: int,

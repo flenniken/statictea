@@ -566,7 +566,7 @@ suite "runFunction.nim":
 
   test "int(): not a number string":
     var parameters = @[newValue("hello"), newValue("round")]
-    let eFunResult = newFunResultWarn(wFloatOrStringNumber)
+    let eFunResult = newFunResultWarn(wExpectedNumberString)
     check testFunction("int", parameters, eFunResult)
 
   test "int(): not a float":
@@ -617,12 +617,12 @@ suite "runFunction.nim":
 
   test "to float wrong number parameters":
     var parameters = @[newValue(4), newValue(3)]
-    let eFunResult = newFunResultWarn(wOneParameter)
+    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1", "2")
     check testFunction("float", parameters, eFunResult)
 
   test "to float warning":
     var parameters = @[newValue("abc")]
-    let eFunResult = newFunResultWarn(wIntOrStringNumber)
+    let eFunResult = newFunResultWarn(wExpectedNumberString)
     check testFunction("float", parameters, eFunResult)
 
   test "find":
