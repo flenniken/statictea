@@ -990,17 +990,17 @@ suite "runFunction.nim":
 
   test "replaceRe not enough parameters":
     var parameters: seq[Value] = @[newValue("Earl Grey")]
-    let eFunResult = newFunResultWarn(wTwoOrMoreParameters, 0)
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "3", "1")
     check testFunction("replaceRe", parameters, eFunResult)
 
   test "replaceRe not right number of parameters":
     var parameters: seq[Value] = @[newValue("Earl Grey"), newValue("a"), newValue("b"), newValue("c")]
-    let eFunResult = newFunResultWarn(wMissingReplacement, 0)
+    let eFunResult = newFunResultWarn(kNotEnoughVarargs, 3, "2", "1")
     check testFunction("replaceRe", parameters, eFunResult)
 
   test "replaceRe list wrong number of parameters":
     var parameters: seq[Value] = @[newValue("Earl Grey"), newValue(["a", "b", "c"])]
-    let eFunResult = newFunResultWarn(wMissingReplacement, 0)
+    let eFunResult = newFunResultWarn(wPairParameters, 1)
     check testFunction("replaceRe", parameters, eFunResult)
 
   test "path":

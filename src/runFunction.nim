@@ -988,35 +988,31 @@ func funReplace*(parameters: seq[Value]): FunResult =
 #     for ix, group in groups:
 #       result["g" & $ix] = newValue(group)
 
-func funReplaceRe*(parameters: seq[Value]): FunResult =
+func replaceReMap(map: VarsDict): FunResult =
+  ## Replace multiple parts of a string using regular expressions.
+  ## The map parameteter has the target string in a and the pairs in
+  ## b.
+
+  let str = map["a"].stringv
+  let list = map["b"].listv
+
+  var replacements: seq[Replacement]
+  for ix in countUp(0, list.len-1, 2):
+    replacements.add(newReplacement(list[ix].stringv, list[ix+1].stringv))
+
+  let resultString = replaceMany(str, replacements)
+  result = newFunResult(newValue(resultString))
+
+
+func funReplaceRe_sSSs*(parameters: seq[Value]): FunResult =
   ## Replace multiple parts of a string using regular expressions.
   ## @:
   ## @:You specify one or more pairs of a regex patterns and its string
-  ## @:replacement. The pairs can be specified as parameters to the
-  ## @:function or they can be part of a list.
+  ## @:replacement.
   ## @:
   ## @:~~~
   ## @:replaceRe(str: string, pairs: varargs(string, string) string
-  ## @:replaceRe(str: string, pairs: list) string
   ## @:~~~~
-  ## @:
-  ## @:Muliple parameters case:
-  ## @:
-  ## @:* p1: string to replace
-  ## @:* p2: pattern 1
-  ## @:* p3: replacement string 1
-  ## @:* p4: optional: pattern 2
-  ## @:* p5: optional: replacement string 2
-  ## @:* ...
-  ## @:* pn-1: optional: pattern n
-  ## @:* pn: optional: replacement string n
-  ## @:* return: string
-  ## @:
-  ## @:List case:
-  ## @:
-  ## @:* p1: string to replace
-  ## @:* p2: list of pattern and replacement pairs
-  ## @:* return: string
   ## @:
   ## @:Examples:
   ## @:
@@ -1025,6 +1021,27 @@ func funReplaceRe*(parameters: seq[Value]): FunResult =
   ## @:  => "456def456"
   ## @:replaceRe("abcdefabc", "abc", "456", "def", "")
   ## @:  => "456456"
+  ## @:~~~~
+  ## @:
+  ## @:For developing and debugging regular expressions see the
+  ## @:website: https@@://regex101.com/
+
+  tMapParameters("sSSs")
+  replaceReMap(map)
+
+func funReplaceRe_sls*(parameters: seq[Value]): FunResult =
+  ## Replace multiple parts of a string using regular expressions.
+  ## @:
+  ## @:You specify one or more pairs of a regex patterns and its string
+  ## @:replacement.
+  ## @:
+  ## @:~~~
+  ## @:replaceRe(str: string, pairs: list) string
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
   ## @:list = list("abc", "456", "def", "")
   ## @:replaceRe("abcdefabc", list))
   ## @:  => "456456"
@@ -1033,33 +1050,15 @@ func funReplaceRe*(parameters: seq[Value]): FunResult =
   ## @:For developing and debugging regular expressions see the
   ## @:website: https@@://regex101.com/
 
-  if parameters.len < 2:
-    result = newFunResultWarn(wTwoOrMoreParameters)
-    return
-  if parameters[0].kind != vkString:
-    return newFunResultWarn(wExpectedString, 0)
-  let str = parameters[0].stringv
-
-  var theList: seq[Value]
-  if parameters.len == 2:
-    if parameters[1].kind != vkList:
-      return newFunResultWarn(wExpectedList, 1)
-    theList = parameters[1].listv
-  else:
-    theList = parameters[1..parameters.len-1]
-
-  if theList.len mod 2 != 0:
-    return newFunResultWarn(wMissingReplacement, 0)
-  for ix, value in theList:
+  tMapParameters("sls")
+  let list = map["b"].listv
+  if list.len mod 2 != 0:
+    return newFunResultWarn(wPairParameters, 1)
+  for ix, value in list:
     if value.kind != vkString:
-      return newFunResultWarn(wExpectedString, ix+1)
+      return newFunResultWarn(wExpectedString, ix)
 
-  var replacements: seq[Replacement]
-  for ix in countUp(0, theList.len-1, 2):
-    replacements.add(newReplacement(theList[ix].stringv, theList[ix+1].stringv))
-  let resultString = replaceMany(str, replacements)
-
-  result = newFunResult(newValue(resultString))
+  replaceReMap(map)
 
 func funPath*(parameters: seq[Value]): FunResult =
   ## Split a file path into pieces. Return a dictionary with the
@@ -1093,7 +1092,6 @@ func funPath*(parameters: seq[Value]): FunResult =
 
   tMapParameters("sosd")
   let path = map["a"].stringv
-
   var separator: char
   if "b" in map:
     case map["b"].stringv
@@ -1171,11 +1169,11 @@ func funKeys*(parameters: seq[Value]): FunResult =
   tMapParameters("dl")
   let dict = map["a"].dictv
 
-  var theList: seq[string]
+  var list: seq[string]
   for key, value in dict.pairs():
-    theList.add(key)
+    list.add(key)
 
-  result = newFunResult(newValue(theList))
+  result = newFunResult(newValue(list))
 
 func funValues*(parameters: seq[Value]): FunResult =
   ## Create a list of the values in the specified dictionary.
@@ -1195,11 +1193,11 @@ func funValues*(parameters: seq[Value]): FunResult =
   tMapParameters("dl")
   let dict = map["a"].dictv
 
-  var theList: seq[Value]
+  var list: seq[Value]
   for key, value in dict.pairs():
-    theList.add(value)
+    list.add(value)
 
-  result = newFunResult(newValue(theList))
+  result = newFunResult(newValue(list))
 
 func funSort*(parameters: seq[Value]): FunResult =
   ## Sort a list of values of the same type.
@@ -1422,8 +1420,8 @@ const
     ("dict", funDict, "oSAd"),
     ("list", funList, "oAl"),
     ("replace", funReplace, "siiss"),
-    ("replaceRe", funReplaceRe, "sSSs"),
-    ("replaceRe", funReplaceRe, "sls"),
+    ("replaceRe", funReplaceRe_sSSs, "sSSs"),
+    ("replaceRe", funReplaceRe_sls, "sls"),
     ("path", funPath, "sosd"),
     ("lower", funLower, "ss"),
     ("keys", funKeys, "dl"),
