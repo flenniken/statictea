@@ -383,44 +383,10 @@ func funExists*(parameters: seq[Value]): FunResult =
     ret = 1
   result = newFunResult(newValue(ret))
 
-func funCase*(parameters: seq[Value]): FunResult =
-  ## Return a value from multiple choices. It takes a main condition,
-  ## @:any number of case pairs and an optional else value.
-  ## @:
-  ## @:The first parameter of a case pair is the condition and the
-  ## @:second is the return value when that condition matches the main
-  ## @:condition. The function compares the conditions left to right and
-  ## @:returns the first match.
-  ## @:
-  ## @:When none of the cases match the main condition, the "else" value
-  ## @:is returned.  The conditions must be integers or strings. The
-  ## @:return values can be any type.
-  ## @:
-  ## @:~~~
-  ## @:case(condition: int, elseCase: any, pairs: varargs(int, any) any
-  ## @:case(condition: string, elseCase: any, pairs: varargs(string, any) any
-  ## @:~~~~
-  ## @:
-  ## @:Examples:
-  ## @:
-  ## @:~~~
-  ## @:case(8, "water", 8, "tea") => "tea"
-  ## @:case(8, "water", 3, "tea") => "water"
-  ## @:case(8, "beer", +
-  ## @:  1, "tea", +
-  ## @:  2, "water", +
-  ## @:  3, "wine") => "beer"
-  ## @:~~~~
-
-  if parameters.len == 0:
-    return newFunResultWarn(wAtLeast4Parameters)
-  var signatureCode: string
-  if parameters[0].kind == vkString:
-    signatureCode = "saSAa"
-  else:
-    signatureCode = "iaIAa"
-  tMapParameters(signatureCode)
-
+func getCase(map: VarsDict): FunResult =
+  ## Return the matching case value or the default when none
+  ## match. The map dictionary contains the parameters to the case
+  ## functions.
   let mainCondition = map["a"]
   let elseCase = map["b"]
   let cases = map["c"].listv
@@ -434,6 +400,78 @@ func funCase*(parameters: seq[Value]): FunResult =
 
   # Return the else case.
   result = newFunResult(elseCase)
+
+# todo: add two functions using a list with a default case at the end.
+# case(condition: int, pairs: list, optional default: any) any
+# case(condition: string, pairs: list, optional default: any) any
+
+func funCase_iaIAa*(parameters: seq[Value]): FunResult =
+  ## Return a value from multiple choices. It takes a main condition,
+  ## @:an integer, any number of case pairs and an optional else value.
+  ## @:
+  ## @:The first element of a case pair is the condition and the
+  ## @:second is the return value when that condition matches the main
+  ## @:condition. The function compares the conditions left to right and
+  ## @:returns the first match.
+  ## @:
+  ## @:When none of the cases match the main condition, the "else"
+  ## @:value is returned.  The conditions must be integers. The return
+  ## @:values can be any type.
+  ## @:
+  ## @:~~~
+  ## @:case(condition: int, elseCase: any, pairs: varargs(int, any)) any
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:cond = 8
+  ## @:case(cond, "water", 8, "tea") => "tea"
+  ## @:case(cond, "water", 3, "tea") => "water"
+  ## @:case(cond, "beer", +
+  ## @:  1, "tea", +
+  ## @:  2, "water", +
+  ## @:  3, "wine") => "beer"
+  ## @:~~~~
+
+  # todo remove the else case.
+
+  tMapParameters("iaIAa")
+  result = getCase(map)
+
+func funCase_saSAa*(parameters: seq[Value]): FunResult =
+  ## Return a value from multiple choices. It takes a main condition,
+  ## @:a string, any number of case pairs and an optional else value.
+  ## @:
+  ## @:The first element of a case pair is the condition and the
+  ## @:second is the return value when that condition matches the main
+  ## @:condition. The function compares the conditions left to right and
+  ## @:returns the first match.
+  ## @:
+  ## @:When none of the cases match the main condition, the "else"
+  ## @:value is returned.  The conditions must be strings. The return
+  ## @:values can be any type.
+  ## @:
+  ## @:~~~
+  ## @:case(condition: string, elseCase: any, pairs: varargs(int, any)) any
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:cond = "tea"
+  ## @:case(cond, "water", 8, "tea") => "tea"
+  ## @:case(cond, "water", 3, "tea") => "water"
+  ## @:case(cond, "beer", +
+  ## @:  1, "tea", +
+  ## @:  2, "water", +
+  ## @:  3, "wine") => "beer"
+  ## @:~~~~
+
+  # todo: remove else case
+
+  tMapParameters("saSAa")
+  result = getCase(map)
 
 func parseVersion*(version: string): Option[(int, int, int)] =
   ## Parse a StaticTea version number and return its three components.
@@ -1328,8 +1366,8 @@ const
     ("add", funAdd_Ii, "Ii"),
     ("add", funAdd_Fi, "Fi"),
     ("exists", funExists, "dsi"),
-    ("case", funCase, "iaIAa"),
-    ("case", funCase, "saSAa"),
+    ("case", funCase_iaIAa, "iaIAa"),
+    ("case", funCase_saSAa, "saSAa"),
     ("cmpVersion", funCmpVersion, "ssi"),
     ("int", funInt, "fosi"),
     ("int", funInt, "sosi"),
@@ -1381,6 +1419,9 @@ proc getFunction*(functionName: string, parameters: seq[Value]): Option[Function
       if funResult.kind != frWarning:
         return some(functionSpec)
     # None match, return the first function.
+
+    # todo: return the function that made if farthest through
+    # mapParameters by looking for the biggest parameter index value.
   if functionSpecList.len != 0:
     let functionSpec = functionSpecList[0]
     result = some(functionSpec)
