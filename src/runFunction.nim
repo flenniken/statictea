@@ -80,11 +80,8 @@ func numberStringToNum(numString: string): FunResult =
 
 # todo: cmp: support list and dict compares? Maybe similar to how sort compares.
 
-
-
-
 func funCmp_iii*(parameters: seq[Value]): FunResult =
-  ## @:Compare two ints. Returns -1 for less, 0 for equal and 1 for
+  ## Compare two ints. Returns -1 for less, 0 for equal and 1 for
   ## @: greater than.
   ## @:
   ## @:~~~
@@ -105,7 +102,7 @@ func funCmp_iii*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cmp(a, b)))
 
 func funCmp_ffi*(parameters: seq[Value]): FunResult =
-  ## @:Compare two floats. Returns -1 for less, 0 for
+  ## Compare two floats. Returns -1 for less, 0 for
   ## @:equal and 1 for greater than.
   ## @:
   ## @:~~~
@@ -126,7 +123,7 @@ func funCmp_ffi*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cmp(a, b)))
 
 func funCmp_ssoii*(parameters: seq[Value]): FunResult =
-  ## @:Compare two strings. Returns -1 for less, 0 for equal and 1 for
+  ## Compare two strings. Returns -1 for less, 0 for equal and 1 for
   ## @:greater than.
   ## @:
   ## @:You have the option to compare case insensitive. Case sensitive
@@ -1387,9 +1384,11 @@ func funSort_lsssl*(parameters: seq[Value]): FunResult =
 # a list of anchor names.
 
 func funGithubAnchor*(parameters: seq[Value]): FunResult =
-  ## Create a Github markdown anchor name given a heading name.  If
-  ## @:you have duplicate heading names, the anchor name returned only
-  ## @:works for the first. Use it for Github markdown internal links.
+  ## Create a Github markdown anchor name given a heading name. Use it
+  ## @:for Github markdown internal links. If you have duplicate heading
+  ## @:names, the anchor name returned only works for the first. Some
+  ## @:characters like underscored are removed so you can get duplicates
+  ## @:in some cases.
   ## @:
   ## @:~~~
   ## @:githubAnchor(name: string) string

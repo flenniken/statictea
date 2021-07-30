@@ -6,31 +6,28 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 # Index
 
 * [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
-* [funCmp_iii](#funcmpiii) &mdash; 
-Compare two ints.
-* [funCmp_ffi](#funcmpffi) &mdash; 
-Compare two floats.
-* [funCmp_ssoii](#funcmpssoii) &mdash; 
-Compare two strings.
+* [funCmp_iii](#funcmp_iii) &mdash; Compare two ints.
+* [funCmp_ffi](#funcmp_ffi) &mdash; Compare two floats.
+* [funCmp_ssoii](#funcmp_ssoii) &mdash; Compare two strings.
 * [funConcat](#funconcat) &mdash; Concatentate two or more strings.
-* [funLen_si](#funlensi) &mdash; Length of a string in characters, not bytes.
-* [funLen_li](#funlenli) &mdash; Number of elements in a list.
-* [funLen_di](#funlendi) &mdash; Number of elements in a dictionary.
-* [funGet_lioaa](#fungetlioaa) &mdash; Get list value by its index.
-* [funGet_dsoaa](#fungetdsoaa) &mdash; Get a dictionary value by its key.
+* [funLen_si](#funlen_si) &mdash; Length of a string in characters, not bytes.
+* [funLen_li](#funlen_li) &mdash; Number of elements in a list.
+* [funLen_di](#funlen_di) &mdash; Number of elements in a dictionary.
+* [funGet_lioaa](#funget_lioaa) &mdash; Get list value by its index.
+* [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
 * [funIf](#funif) &mdash; If the condition is 1 return one value, else return another
 value.
-* [funAdd_Ii](#funaddii) &mdash; Add integers.
-* [funAdd_Fi](#funaddfi) &mdash; Add floats.
+* [funAdd_Ii](#funadd_ii) &mdash; Add integers.
+* [funAdd_Fi](#funadd_fi) &mdash; Add floats.
 * [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
-* [funCase_iaIAa](#funcaseiaiaa) &mdash; Compare integer cases and return the matching value.
-* [funCase_saSAa](#funcasesasaa) &mdash; Compare string cases and return the matching value.
+* [funCase_iaIAa](#funcase_iaiaa) &mdash; Compare integer cases and return the matching value.
+* [funCase_saSAa](#funcase_sasaa) &mdash; Compare string cases and return the matching value.
 * [parseVersion](#parseversion) &mdash; Parse a StaticTea version number and return its three components.
 * [funCmpVersion](#funcmpversion) &mdash; Compare two StaticTea version numbers.
-* [funFloat_if](#funfloatif) &mdash; Create a float from an int.
-* [funFloat_sf](#funfloatsf) &mdash; Create a float from a number string.
-* [funInt_fosi](#funintfosi) &mdash; Create an int from a float.
-* [funInt_sosi](#funintsosi) &mdash; Create an int from a number string.
+* [funFloat_if](#funfloat_if) &mdash; Create a float from an int.
+* [funFloat_sf](#funfloat_sf) &mdash; Create a float from a number string.
+* [funInt_fosi](#funint_fosi) &mdash; Create an int from a float.
+* [funInt_sosi](#funint_sosi) &mdash; Create an int from a number string.
 * [funFind](#funfind) &mdash; Find the position of a substring in a string.
 * [funSubstr](#funsubstr) &mdash; Extract a substring from a string by its position.
 * [funDup](#fundup) &mdash; Duplicate a string x times.
@@ -38,15 +35,15 @@ value.
 * [funList](#funlist) &mdash; Create a list of values.
 * [funReplace](#funreplace) &mdash; Replace a substring specified by its position and length with
 another string.
-* [funReplaceRe_sSSs](#funreplaceressss) &mdash; Replace multiple parts of a string using regular expressions.
-* [funReplaceRe_sls](#funreplaceresls) &mdash; Replace multiple parts of a string using regular expressions.
+* [funReplaceRe_sSSs](#funreplacere_ssss) &mdash; Replace multiple parts of a string using regular expressions.
+* [funReplaceRe_sls](#funreplacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
 * [funPath](#funpath) &mdash; Split a file path into pieces.
 * [funLower](#funlower) &mdash; Lowercase a string.
 * [funKeys](#funkeys) &mdash; Create a list from the keys in a dictionary.
 * [funValues](#funvalues) &mdash; Create a list out of the values in the specified dictionary.
-* [funSort_lsosl](#funsortlsosl) &mdash; Sort a list of values of the same type.
-* [funSort_lssil](#funsortlssil) &mdash; Sort a list of lists.
-* [funSort_lsssl](#funsortlsssl) &mdash; Sort a list of dictionaries.
+* [funSort_lsosl](#funsort_lsosl) &mdash; Sort a list of values of the same type.
+* [funSort_lssil](#funsort_lssil) &mdash; Sort a list of lists.
+* [funSort_lsssl](#funsort_lsssl) &mdash; Sort a list of dictionaries.
 * [funGithubAnchor](#fungithubanchor) &mdash; Create a Github markdown anchor name given a heading name.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
@@ -63,7 +60,6 @@ func cmpBaseValues(a, b: Value; insensitive: bool = false): int
 
 
 # funCmp_iii
-
 
 Compare two ints. Returns -1 for less, 0 for equal and 1 for
  greater than.
@@ -87,7 +83,6 @@ func funCmp_iii(parameters: seq[Value]): FunResult
 
 # funCmp_ffi
 
-
 Compare two floats. Returns -1 for less, 0 for
 equal and 1 for greater than.
 
@@ -109,7 +104,6 @@ func funCmp_ffi(parameters: seq[Value]): FunResult
 
 
 # funCmp_ssoii
-
 
 Compare two strings. Returns -1 for less, 0 for equal and 1 for
 greater than.
@@ -1001,9 +995,11 @@ func funSort_lsssl(parameters: seq[Value]): FunResult
 
 # funGithubAnchor
 
-Create a Github markdown anchor name given a heading name.  If
-you have duplicate heading names, the anchor name returned only
-works for the first. Use it for Github markdown internal links.
+Create a Github markdown anchor name given a heading name. Use it
+for Github markdown internal links. If you have duplicate heading
+names, the anchor name returned only works for the first. Some
+characters like underscored are removed so you can get duplicates
+in some cases.
 
 ~~~
 githubAnchor(name: string) string

@@ -1,4 +1,5 @@
-$$ # StaticTea template for generating markdown documents from nim doc comments.
+$$ # StaticTea template for generating markdown documents from nim
+$$ # modules with doc comments.
 $$ #
 $$ # Define replacement patterns to remove formatting from the descriptions.
 $$ block

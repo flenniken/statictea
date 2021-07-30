@@ -1316,6 +1316,7 @@ suite "runFunction.nim":
 
   test "githubAnchor":
     check testAnchor("", "")
+    check testAnchor("a_b", "a_b")
     check testAnchor("T", "t")
     check testAnchor("Tea", "tea")
     check testAnchor("t", "t")
@@ -1325,11 +1326,15 @@ suite "runFunction.nim":
     check testAnchor("Eary Gray", "eary-gray")
     check testAnchor("Eary-Gray", "eary-gray")
     check testAnchor("1234567890", "1234567890")
-    check testAnchor("_1!2@3#4%5^6&7*8(9)0", "1234567890")
+    check testAnchor("1!2@3#4%5^6&7*8(9)0", "1234567890")
     let str = "Zwölf Boxkämpfer jagten Eva quer über den Sylter Deich"
     let eStr = "zwölf-boxkämpfer-jagten-eva-quer-über-den-sylter-deich"
     # (= Twelve boxing fighters hunted Eva across the dike of Sylt)
     check testAnchor(str, eStr)
+
+  test "githubAnchor signatures":
+    check testAnchor("funSort_lsssl", "funsort_lsssl")
+    check testAnchor("sort_lsssl", "sort_lsssl")
 
   test "githubAnchor: wrong number of parameters":
     var parameters: seq[Value] = @[]

@@ -55,7 +55,7 @@ func githubAnchor*(name: string): string =
   # * lowercase letters
   # * change whitespace to hyphens
   # * allow ascii digits or hyphens
-  # * drop other characters
+  # * drop punctuation characters, not [a-zA-Z0-9_]
 
   var anchorRunes = newSeq[Rune]()
   for rune in runes(name):
@@ -65,6 +65,6 @@ func githubAnchor*(name: string): string =
       anchorRunes.add(toRunes("-")[0])
     elif rune.uint32 < 128: # ascii
       let ch = toUTF8(rune)[0]
-      if isDigit(ch) or ch == '-':
+      if isDigit(ch) or ch == '-' or ch == '_':
         anchorRunes.add(rune)
   result = $anchorRunes
