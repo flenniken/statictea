@@ -24,7 +24,7 @@
 # $ #
 # $ # Show the function entries and skip the others.  Change the
 # $ # function names from nim names to StaticTea names, i.e,
-# $ # funReplaceRe to replaceRe.  Show the description's first
+# $ # funConcat to concat.  Show the description's first
 # $ # sentence.
 # $ #
 # $ nextline
@@ -32,13 +32,14 @@
 # $ : entry = get(g.entries, t.row, dict())
 # $ : skip = case(entry.type, 1, "skFunc", 0)
 # $ : pos = find(entry.name, "fun", -1)
+# $ : underscorePos = find(entry.name, "_", len(entry.name))
 # $ : skip2 = case(pos, 1, 0, 0)
 # $ : t.output = case(add(skip, skip2), "skip", 0, "result")
-# $ : capName = case(pos, entry.name, 0, substr(entry.name, 3))
+# $ : capName = case(pos, entry.name, 0, substr(entry.name, 3, underscorePos))
 # $ : name = concat(lower(substr(capName, 0, 1)), substr(capName, 1))
 # $ : desc = replaceRe(entry.description, g.patterns)
 # $ : shortFuncDesc = substr(desc, 0, add(find(desc, '.', -1), 1))
-- [[#{name}][{name}()]] -- {shortFuncDesc}
+- [[#{entry.name}][{name}()]] -- {shortFuncDesc}
 # $ #
 # $ # Generate the function sections.
 # $ #
@@ -47,9 +48,11 @@
 # $ : entry = get(g.entries, t.row, dict())
 # $ : skip = case(entry.type, 1, "skFunc", 0)
 # $ : pos = find(entry.name, "fun", -1)
+# $ : underscorePos = find(entry.name, "_", len(entry.name))
 # $ : skip2 = case(pos, 1, 0, 0)
 # $ : t.output = case(add(skip, skip2), "skip", 0, "result")
-# $ : capName = case(pos, entry.name, 0, substr(entry.name, 3))
+# $ : capName = case(pos, entry.name, 0, +
+# $ :   substr(entry.name, 3, underscorePos))
 # $ : name = concat(lower(substr(capName, 0, 1)), substr(capName, 1))
 # $ : description = replaceRe(entry.description, g.patterns)
 
@@ -57,7 +60,7 @@
 
 ** {name}()
 :PROPERTIES:
-:CUSTOM_ID: {name}
+:CUSTOM_ID: {entry.name}
 :END:
 
 {description}

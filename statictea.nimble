@@ -425,6 +425,7 @@ proc taskReadMeFun() =
   let sharedFilename = "docs/shared.json"
   writeFile(sharedFilename, sharedJson)
 
+  # Create the readme function section org file.
   let templateName = joinPath("templates", "readmeFuncSection.org")
   let sectionFile = joinPath("docs", "readmeFuncs.org")
   cmd = "bin/statictea -l -s=$1 -j=docs/shared.json -t=$2 -r=$3" %
@@ -436,6 +437,7 @@ proc taskReadMeFun() =
   rmFile(sharedFilename)
   rmFile(jsonName)
 
+  # Insert the function section into the readme.
   insertFile("readme.org", "# Dynamic Content Begins",
     "# Dynamic Content Ends", sectionFile)
   echo "Merged function section into readme.org."
