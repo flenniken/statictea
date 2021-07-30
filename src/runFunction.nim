@@ -186,7 +186,7 @@ func funConcat*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(returnString))
 
 func funLen_si*(parameters: seq[Value]): FunResult =
-  ## Return the length of a string in characters, not bytes.
+  ## Length of a string in characters, not bytes.
   ## @:
   ## @:~~~
   ## @:len(str: string) int
@@ -204,7 +204,7 @@ func funLen_si*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(stringLen(str)))
 
 func funLen_li*(parameters: seq[Value]): FunResult =
-  ## Return the number of elements in a list.
+  ## Number of elements in a list.
   ## @:
   ## @:~~~
   ## @:len(list: list) int
@@ -223,7 +223,7 @@ func funLen_li*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(list.len))
 
 func funLen_di*(parameters: seq[Value]): FunResult =
-  ## Return the number of elements in a dictionary.
+  ## Number of elements in a dictionary.
   ## @:
   ## @:~~~
   ## @:len(dictionary: dict) int
@@ -242,9 +242,9 @@ func funLen_di*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(dict.len))
 
 func funGet_lioaa*(parameters: seq[Value]): FunResult =
-  ## Return a value from a list by its index.  If the index is too
-  ## @:big, the default value is returned when specified, else a warning
-  ## @:is generated.
+  ## Get list value by its index.  If the index is too big, the
+  ## @:default value is returned when specified, else a warning is
+  ## @:generated.
   ## @:
   ## @:~~~
   ## @:get(list: list, index: int, optional default: any) any
@@ -272,9 +272,9 @@ func funGet_lioaa*(parameters: seq[Value]): FunResult =
     result = newFunResultWarn(wMissingListItem, 1, $index)
 
 func funGet_dsoaa*(parameters: seq[Value]): FunResult =
-  ## Return a value in a dictionary by key.  If the key doesn't
-  ## @:exist, the default value is returned, if specified, else a
-  ## @:warning is generated.
+  ## Get a dictionary value by its key.  If the key doesn't exist, the
+  ## @:default value is returned if specified, else a warning is
+  ## @:generated.
   ## @:
   ## @:~~~
   ## @:get(dictionary: dict, key: string, optional default: any) any
@@ -307,8 +307,8 @@ func funGet_dsoaa*(parameters: seq[Value]): FunResult =
     result = newFunResultWarn(wMissingDictItem, 1, key)
 
 func funIf*(parameters: seq[Value]): FunResult =
-  ## Return a value when the condition is 1 and another value when the
-  ## @:condition is not 1.
+  ## If the condition is 1 return one value, else return another
+  ## @:value.
   ## @:
   ## @:~~~
   ## @:if(condition: int, oneCase: any, notOne: any) any
@@ -434,8 +434,9 @@ func getCase(map: VarsDict): FunResult =
 # case(condition: string, pairs: list, optional default: any) any
 
 func funCase_iaIAa*(parameters: seq[Value]): FunResult =
-  ## Return a value from multiple choices. It takes a main condition,
-  ## @:an integer, any number of case pairs and an optional else value.
+  ## Compare integer cases and return the matching value.  It takes a
+  ## @:main integer condition, an else value and any number of case
+  ## @:pairs.
   ## @:
   ## @:The first element of a case pair is the condition and the
   ## @:second is the return value when that condition matches the main
@@ -468,8 +469,9 @@ func funCase_iaIAa*(parameters: seq[Value]): FunResult =
   result = getCase(map)
 
 func funCase_saSAa*(parameters: seq[Value]): FunResult =
-  ## Return a value from multiple choices. It takes a main condition,
-  ## @:a string, any number of case pairs and an optional else value.
+  ## Compare string cases and return the matching value.  It takes a
+  ## @:main condition (a string), an else value and any number of case
+  ## @:pairs.
   ## @:
   ## @:The first element of a case pair is the condition and the
   ## @:second is the return value when that condition matches the main
@@ -706,10 +708,10 @@ func funInt_sosi*(parameters: seq[Value]): FunResult =
     result = funResult
 
 func funFind*(parameters: seq[Value]): FunResult =
-  ## Return the position of a substring in a string.  When the
-  ## @:substring is not found you can return a default value.  A warning
-  ## @:is generated when the substring is missing and you don't specify
-  ## @:a default value.
+  ## Find the position of a substring in a string.  When the substring
+  ## @:is not found you can return a default value.  A warning is
+  ## @:generated when the substring is missing and you don't specify a
+  ## @:default value.
   ## @:
   ## @:~~~
   ## @:find(str: string, substring: string, optional default: any) any
@@ -783,8 +785,8 @@ func funSubstr*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(str[start .. finish-1]))
 
 func funDup*(parameters: seq[Value]): FunResult =
-  ## Duplicate a string. The first parameter is the string to dup and
-  ## @:the second parameter is the number of times to duplicate it.
+  ## Duplicate a string x times.  The result is a new string built by
+  ## @:concatenating the string to itself the specified number of times.
   ## @:
   ## @:~~~
   ## @:dup(pattern: string, count: int) string
@@ -867,9 +869,9 @@ func funList*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(parameters))
 
 func funReplace*(parameters: seq[Value]): FunResult =
-  ## Replace a substring by its position.  You specify the substring
-  ## @:position and the string to take its place.  You can use it to
-  ## @:insert and append to a string as well.
+  ## Replace a substring specified by its position and length with
+  ## @:another string.  You can use the function to insert and append to
+  ## @:a string as well.
   ## @:
   ## @:~~~
   ## @:replace(str: string, start: int, length: int, replacement: string) string
@@ -1006,8 +1008,8 @@ func replaceReMap(map: VarsDict): FunResult =
 func funReplaceRe_sSSs*(parameters: seq[Value]): FunResult =
   ## Replace multiple parts of a string using regular expressions.
   ## @:
-  ## @:You specify one or more pairs of a regex patterns and its string
-  ## @:replacement.
+  ## @:You specify one or more pairs of a regex patterns and their string
+  ## @:replacements.
   ## @:
   ## @:~~~
   ## @:replaceRe(str: string, pairs: varargs(string, string) string
@@ -1175,7 +1177,7 @@ func funKeys*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(list))
 
 func funValues*(parameters: seq[Value]): FunResult =
-  ## Create a list of the values in the specified dictionary.
+  ## Create a list out of the values in the specified dictionary.
   ## @:
   ## @:~~~
   ## @:values(dictionary: dict) list
@@ -1492,7 +1494,7 @@ proc getFunction*(functionName: string, parameters: seq[Value]): Option[Function
     result = some(functionSpec)
 
 proc isFunctionName*(functionName: string): bool =
-  ## Return true the function exists.
+  ## Return true when the function exists.
   let functionSpecList = getFunctionList(functionName)
   if functionSpecList.len > 0:
     result = true

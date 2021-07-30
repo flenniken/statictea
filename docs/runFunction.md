@@ -13,36 +13,37 @@ Compare two floats.
 * [funCmp_ssoii](#funcmpssoii) &mdash; 
 Compare two strings.
 * [funConcat](#funconcat) &mdash; Concatentate two or more strings.
-* [funLen_si](#funlensi) &mdash; Return the length of a string in characters, not bytes.
-* [funLen_li](#funlenli) &mdash; Return the number of elements in a list.
-* [funLen_di](#funlendi) &mdash; Return the number of elements in a dictionary.
-* [funGet_lioaa](#fungetlioaa) &mdash; Return a value from a list by its index.
-* [funGet_dsoaa](#fungetdsoaa) &mdash; Return a value in a dictionary by key.
-* [funIf](#funif) &mdash; Return a value when the condition is 1 and another value when the
-condition is not 1.
+* [funLen_si](#funlensi) &mdash; Length of a string in characters, not bytes.
+* [funLen_li](#funlenli) &mdash; Number of elements in a list.
+* [funLen_di](#funlendi) &mdash; Number of elements in a dictionary.
+* [funGet_lioaa](#fungetlioaa) &mdash; Get list value by its index.
+* [funGet_dsoaa](#fungetdsoaa) &mdash; Get a dictionary value by its key.
+* [funIf](#funif) &mdash; If the condition is 1 return one value, else return another
+value.
 * [funAdd_Ii](#funaddii) &mdash; Add integers.
 * [funAdd_Fi](#funaddfi) &mdash; Add floats.
 * [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
-* [funCase_iaIAa](#funcaseiaiaa) &mdash; Return a value from multiple choices.
-* [funCase_saSAa](#funcasesasaa) &mdash; Return a value from multiple choices.
+* [funCase_iaIAa](#funcaseiaiaa) &mdash; Compare integer cases and return the matching value.
+* [funCase_saSAa](#funcasesasaa) &mdash; Compare string cases and return the matching value.
 * [parseVersion](#parseversion) &mdash; Parse a StaticTea version number and return its three components.
 * [funCmpVersion](#funcmpversion) &mdash; Compare two StaticTea version numbers.
 * [funFloat_if](#funfloatif) &mdash; Create a float from an int.
 * [funFloat_sf](#funfloatsf) &mdash; Create a float from a number string.
 * [funInt_fosi](#funintfosi) &mdash; Create an int from a float.
 * [funInt_sosi](#funintsosi) &mdash; Create an int from a number string.
-* [funFind](#funfind) &mdash; Return the position of a substring in a string.
+* [funFind](#funfind) &mdash; Find the position of a substring in a string.
 * [funSubstr](#funsubstr) &mdash; Extract a substring from a string by its position.
-* [funDup](#fundup) &mdash; Duplicate a string.
+* [funDup](#fundup) &mdash; Duplicate a string x times.
 * [funDict](#fundict) &mdash; Create a dictionary from a list of key, value pairs.
 * [funList](#funlist) &mdash; Create a list of values.
-* [funReplace](#funreplace) &mdash; Replace a substring by its position.
+* [funReplace](#funreplace) &mdash; Replace a substring specified by its position and length with
+another string.
 * [funReplaceRe_sSSs](#funreplaceressss) &mdash; Replace multiple parts of a string using regular expressions.
 * [funReplaceRe_sls](#funreplaceresls) &mdash; Replace multiple parts of a string using regular expressions.
 * [funPath](#funpath) &mdash; Split a file path into pieces.
 * [funLower](#funlower) &mdash; Lowercase a string.
 * [funKeys](#funkeys) &mdash; Create a list from the keys in a dictionary.
-* [funValues](#funvalues) &mdash; Create a list of the values in the specified dictionary.
+* [funValues](#funvalues) &mdash; Create a list out of the values in the specified dictionary.
 * [funSort_lsosl](#funsortlsosl) &mdash; Sort a list of values of the same type.
 * [funSort_lssil](#funsortlssil) &mdash; Sort a list of lists.
 * [funSort_lsssl](#funsortlsssl) &mdash; Sort a list of dictionaries.
@@ -50,7 +51,7 @@ condition is not 1.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
-* [isFunctionName](#isfunctionname) &mdash; Return true the function exists.
+* [isFunctionName](#isfunctionname) &mdash; Return true when the function exists.
 
 # cmpBaseValues
 
@@ -157,7 +158,7 @@ func funConcat(parameters: seq[Value]): FunResult
 
 # funLen_si
 
-Return the length of a string in characters, not bytes.
+Length of a string in characters, not bytes.
 
 ~~~
 len(str: string) int
@@ -177,7 +178,7 @@ func funLen_si(parameters: seq[Value]): FunResult
 
 # funLen_li
 
-Return the number of elements in a list.
+Number of elements in a list.
 
 ~~~
 len(list: list) int
@@ -198,7 +199,7 @@ func funLen_li(parameters: seq[Value]): FunResult
 
 # funLen_di
 
-Return the number of elements in a dictionary.
+Number of elements in a dictionary.
 
 ~~~
 len(dictionary: dict) int
@@ -219,9 +220,9 @@ func funLen_di(parameters: seq[Value]): FunResult
 
 # funGet_lioaa
 
-Return a value from a list by its index.  If the index is too
-big, the default value is returned when specified, else a warning
-is generated.
+Get list value by its index.  If the index is too big, the
+default value is returned when specified, else a warning is
+generated.
 
 ~~~
 get(list: list, index: int, optional default: any) any
@@ -242,9 +243,9 @@ func funGet_lioaa(parameters: seq[Value]): FunResult
 
 # funGet_dsoaa
 
-Return a value in a dictionary by key.  If the key doesn't
-exist, the default value is returned, if specified, else a
-warning is generated.
+Get a dictionary value by its key.  If the key doesn't exist, the
+default value is returned if specified, else a warning is
+generated.
 
 ~~~
 get(dictionary: dict, key: string, optional default: any) any
@@ -272,8 +273,8 @@ func funGet_dsoaa(parameters: seq[Value]): FunResult
 
 # funIf
 
-Return a value when the condition is 1 and another value when the
-condition is not 1.
+If the condition is 1 return one value, else return another
+value.
 
 ~~~
 if(condition: int, oneCase: any, notOne: any) any
@@ -357,8 +358,9 @@ func funExists(parameters: seq[Value]): FunResult
 
 # funCase_iaIAa
 
-Return a value from multiple choices. It takes a main condition,
-an integer, any number of case pairs and an optional else value.
+Compare integer cases and return the matching value.  It takes a
+main integer condition, an else value and any number of case
+pairs.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -392,8 +394,9 @@ func funCase_iaIAa(parameters: seq[Value]): FunResult
 
 # funCase_saSAa
 
-Return a value from multiple choices. It takes a main condition,
-a string, any number of case pairs and an optional else value.
+Compare string cases and return the matching value.  It takes a
+main condition (a string), an else value and any number of case
+pairs.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -575,10 +578,10 @@ func funInt_sosi(parameters: seq[Value]): FunResult
 
 # funFind
 
-Return the position of a substring in a string.  When the
-substring is not found you can return a default value.  A warning
-is generated when the substring is missing and you don't specify
-a default value.
+Find the position of a substring in a string.  When the substring
+is not found you can return a default value.  A warning is
+generated when the substring is missing and you don't specify a
+default value.
 
 ~~~
 find(str: string, substring: string, optional default: any) any
@@ -631,8 +634,8 @@ func funSubstr(parameters: seq[Value]): FunResult
 
 # funDup
 
-Duplicate a string. The first parameter is the string to dup and
-the second parameter is the number of times to duplicate it.
+Duplicate a string x times.  The result is a new string built by
+concatenating the string to itself the specified number of times.
 
 ~~~
 dup(pattern: string, count: int) string
@@ -698,9 +701,9 @@ func funList(parameters: seq[Value]): FunResult
 
 # funReplace
 
-Replace a substring by its position.  You specify the substring
-position and the string to take its place.  You can use it to
-insert and append to a string as well.
+Replace a substring specified by its position and length with
+another string.  You can use the function to insert and append to
+a string as well.
 
 ~~~
 replace(str: string, start: int, length: int, replacement: string) string
@@ -747,8 +750,8 @@ func funReplace(parameters: seq[Value]): FunResult
 
 Replace multiple parts of a string using regular expressions.
 
-You specify one or more pairs of a regex patterns and its string
-replacement.
+You specify one or more pairs of a regex patterns and their string
+replacements.
 
 ~~~
 replaceRe(str: string, pairs: varargs(string, string) string
@@ -877,7 +880,7 @@ func funKeys(parameters: seq[Value]): FunResult
 
 # funValues
 
-Create a list of the values in the specified dictionary.
+Create a list out of the values in the specified dictionary.
 
 ~~~
 values(dictionary: dict) list
@@ -1058,7 +1061,7 @@ proc getFunction(functionName: string; parameters: seq[Value]): Option[
 
 # isFunctionName
 
-Return true the function exists.
+Return true when the function exists.
 
 ```nim
 proc isFunctionName(functionName: string): bool
