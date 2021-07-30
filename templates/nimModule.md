@@ -28,7 +28,7 @@ $$ : description = replaceRe(s.moduleDescription, g.patterns)
 $$ endblock
 $$ #
 $$ # Show the index label when there are entries.
-$$ nextline t.output = case(len(s.entries), 'result', 0, 'skip')
+$$ nextline t.output = case(len(s.entries), list(0, 'skip'), 'result')
 # Index
 
 $$ #
@@ -37,10 +37,11 @@ $$ # Index to types and functions.
 $$ nextline
 $$ : t.repeat = len(s.entries)
 $$ : entry = get(s.entries, t.row, dict())
-$$ : type = case(entry.type, "", +
+$$ : cases = list( +
 $$ :   "skType", "type: ", +
 $$ :   "skConst", "const: ", +
 $$ :   "skMacro", "macro: ")
+$$ : type = case(entry.type, cases, "")
 $$ : desc = get(entry, "description", "")
 $$ : sentence = substr(desc, 0, add(find(desc, '.', -1), 1))
 $$ : short = replaceRe(sentence, g.patterns)

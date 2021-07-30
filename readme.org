@@ -1465,8 +1465,8 @@ List of functions:
 # Dynamic Content Begins
 - [[#funAdd_Fi][add()]] -- Add floats.
 - [[#funAdd_Ii][add()]] -- Add integers.
-- [[#funCase_iaIAa][case()]] -- Compare integer cases and return the matching value.
-- [[#funCase_saSAa][case()]] -- Compare string cases and return the matching value.
+- [[#funCase_iloaa][case()]] -- Compare integer cases and return the matching value.
+- [[#funCase_sloaa][case()]] -- Compare string cases and return the matching value.
 - [[#funCmpVersion][cmpVersion()]] -- Compare two StaticTea version numbers.
 - [[#funCmp_ffi][cmp()]] -- Compare two floats.
 - [[#funCmp_iii][cmp()]] -- Compare two ints.
@@ -1548,72 +1548,71 @@ add(1, 2, 3) => 6
 
 ** case()
 :PROPERTIES:
-:CUSTOM_ID: funCase_iaIAa
+:CUSTOM_ID: funCase_iloaa
 :END:
 
 Compare integer cases and return the matching value.  It takes a
-main integer condition, an else value and any number of case
-pairs.
+main integer condition, a list of case pairs and an optional
+value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
 condition. The function compares the conditions left to right and
 returns the first match.
 
-When none of the cases match the main condition, the "else"
-value is returned.  The conditions must be integers. The return
-values can be any type.
+When none of the cases match the main condition, the default
+value is returned if it is specified, otherwise a warning is
+generated.  The conditions must be integers. The return values
+can be any type.
 
 #+BEGIN_SRC
-case(condition: int, elseCase: any, pairs: varargs(int, any)) any
+case(condition: int, pairs: list, optional default: any) any
 #+END_SRC
 
 Examples:
 
 #+BEGIN_SRC
-cond = 8
-case(cond, "water", 8, "tea") => "tea"
-case(cond, "water", 3, "tea") => "water"
-case(cond, "beer", +
-  1, "tea", +
-  2, "water", +
-  3, "wine") => "beer"
+cases = list(0, "tea", 1, "water", 2, "beer")
+case(0, cases) => "tea"
+case(1, cases) => "water"
+case(2, cases) => "beer"
+case(2, cases, "wine") => "beer"
+case(3, cases, "wine") => "wine"
 #+END_SRC
 
 [[#contents][茶]]
 
 ** case()
 :PROPERTIES:
-:CUSTOM_ID: funCase_saSAa
+:CUSTOM_ID: funCase_sloaa
 :END:
 
 Compare string cases and return the matching value.  It takes a
-main condition (a string), an else value and any number of case
-pairs.
+main string condition, a list of case pairs and an optional
+value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
 condition. The function compares the conditions left to right and
 returns the first match.
 
-When none of the cases match the main condition, the "else"
-value is returned.  The conditions must be strings. The return
-values can be any type.
+When none of the cases match the main condition, the default
+value is returned if it is specified, otherwise a warning is
+generated.  The conditions must be strings. The return values
+can be any type.
 
 #+BEGIN_SRC
-case(condition: string, elseCase: any, pairs: varargs(int, any)) any
+case(condition: string, pairs: list, optional default: any) any
 #+END_SRC
 
 Examples:
 
 #+BEGIN_SRC
-cond = "tea"
-case(cond, "water", 8, "tea") => "tea"
-case(cond, "water", 3, "tea") => "water"
-case(cond, "beer", +
-  1, "tea", +
-  2, "water", +
-  3, "wine") => "beer"
+cases = list("tea", 15, "water", 2.3, "beer", "cold")
+case("tea", cases) => 15
+case("water", cases) => 2.3
+case("beer", cases) => "cold"
+case("bunch", cases, "other") => "other"
 #+END_SRC
 
 [[#contents][茶]]

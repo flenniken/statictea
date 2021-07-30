@@ -64,7 +64,7 @@ Warning = enum
   wDictKeyMissing, wKeyValueKindDiff, wSubListsEmpty, wSubListsDiffTypes,
   kMaxWarnings, kInvalidSignature, kInvalidParamType, kNotEnoughArgs,
   kWrongType, kNoVarargArgs, kNotEnoughVarargs, kTooManyArgs,
-  wAtLeast4Parameters, wExpectedNumberString
+  wAtLeast4Parameters, wExpectedNumberString, wCaseTypeMismatch, wNotEvenCases
 ```
 
 

@@ -20,8 +20,8 @@ value.
 * [funAdd_Ii](#funadd_ii) &mdash; Add integers.
 * [funAdd_Fi](#funadd_fi) &mdash; Add floats.
 * [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
-* [funCase_iaIAa](#funcase_iaiaa) &mdash; Compare integer cases and return the matching value.
-* [funCase_saSAa](#funcase_sasaa) &mdash; Compare string cases and return the matching value.
+* [funCase_iloaa](#funcase_iloaa) &mdash; Compare integer cases and return the matching value.
+* [funCase_sloaa](#funcase_sloaa) &mdash; Compare string cases and return the matching value.
 * [parseVersion](#parseversion) &mdash; Parse a StaticTea version number and return its three components.
 * [funCmpVersion](#funcmpversion) &mdash; Compare two StaticTea version numbers.
 * [funFloat_if](#funfloat_if) &mdash; Create a float from an int.
@@ -350,75 +350,74 @@ func funExists(parameters: seq[Value]): FunResult
 ```
 
 
-# funCase_iaIAa
+# funCase_iloaa
 
 Compare integer cases and return the matching value.  It takes a
-main integer condition, an else value and any number of case
-pairs.
+main integer condition, a list of case pairs and an optional
+value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
 condition. The function compares the conditions left to right and
 returns the first match.
 
-When none of the cases match the main condition, the "else"
-value is returned.  The conditions must be integers. The return
-values can be any type.
+When none of the cases match the main condition, the default
+value is returned if it is specified, otherwise a warning is
+generated.  The conditions must be integers. The return values
+can be any type.
 
 ~~~
-case(condition: int, elseCase: any, pairs: varargs(int, any)) any
+case(condition: int, pairs: list, optional default: any) any
 ~~~~
 
 Examples:
 
 ~~~
-cond = 8
-case(cond, "water", 8, "tea") => "tea"
-case(cond, "water", 3, "tea") => "water"
-case(cond, "beer", +
-  1, "tea", +
-  2, "water", +
-  3, "wine") => "beer"
+cases = list(0, "tea", 1, "water", 2, "beer")
+case(0, cases) => "tea"
+case(1, cases) => "water"
+case(2, cases) => "beer"
+case(2, cases, "wine") => "beer"
+case(3, cases, "wine") => "wine"
 ~~~~
 
 ```nim
-func funCase_iaIAa(parameters: seq[Value]): FunResult
+func funCase_iloaa(parameters: seq[Value]): FunResult
 ```
 
 
-# funCase_saSAa
+# funCase_sloaa
 
 Compare string cases and return the matching value.  It takes a
-main condition (a string), an else value and any number of case
-pairs.
+main string condition, a list of case pairs and an optional
+value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
 condition. The function compares the conditions left to right and
 returns the first match.
 
-When none of the cases match the main condition, the "else"
-value is returned.  The conditions must be strings. The return
-values can be any type.
+When none of the cases match the main condition, the default
+value is returned if it is specified, otherwise a warning is
+generated.  The conditions must be strings. The return values
+can be any type.
 
 ~~~
-case(condition: string, elseCase: any, pairs: varargs(int, any)) any
+case(condition: string, pairs: list, optional default: any) any
 ~~~~
 
 Examples:
 
 ~~~
-cond = "tea"
-case(cond, "water", 8, "tea") => "tea"
-case(cond, "water", 3, "tea") => "water"
-case(cond, "beer", +
-  1, "tea", +
-  2, "water", +
-  3, "wine") => "beer"
+cases = list("tea", 15, "water", 2.3, "beer", "cold")
+case("tea", cases) => 15
+case("water", cases) => 2.3
+case("beer", cases) => "cold"
+case("bunch", cases, "other") => "other"
 ~~~~
 
 ```nim
-func funCase_saSAa(parameters: seq[Value]): FunResult
+func funCase_sloaa(parameters: seq[Value]): FunResult
 ```
 
 
