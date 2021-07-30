@@ -412,92 +412,94 @@ func getCase(map: VarsDict): FunResult =
   ## Return the matching case value or the default when none
   ## match. The map dictionary contains the parameters to the case
   ## functions.
-  let mainCondition = map["a"]
-  let elseCase = map["b"]
-  let cases = map["c"].listv
 
-  for ix in countUp(0, cases.len-1, 2):
-    let condition = cases[ix]
+  let mainCondition = map["a"]
+  let cases = map["b"]
+
+  let caseList = cases.listv
+  if caseList.len mod 2 != 0:
+    # Expected an even number of cases, got $1.
+    return newFunResultWarn(wNotEvenCases, 1, $caseList.len)
+
+  for ix in countUp(0, caseList.len-1, 2):
+    let condition = caseList[ix]
+    if mainCondition.kind != condition.kind:
+      # A case condition is not the same type as the main condition.
+     return newFunResultWarn(wCaseTypeMismatch)
 
     if condition == mainCondition:
-      let value = cases[ix+1]
+      let value = caseList[ix+1]
       return newFunResult(value)
 
-  # Return the else case.
-  result = newFunResult(elseCase)
+  # Return the else case if it exists.
+  if "c" in map:
+    result = newFunResult(map["c"])
+  else:
+     result = newFunResultWarn(wMissingElse, 2)
 
-# todo: add two functions using a list with a default case at the end.
-# case(condition: int, pairs: list, optional default: any) any
-# case(condition: string, pairs: list, optional default: any) any
-
-func funCase_iaIAa*(parameters: seq[Value]): FunResult =
+func funCase_iloaa*(parameters: seq[Value]): FunResult =
   ## Compare integer cases and return the matching value.  It takes a
-  ## @:main integer condition, an else value and any number of case
-  ## @:pairs.
+  ## @:main integer condition, a list of case pairs and an optional
+  ## @:value when none of the cases match.
   ## @:
   ## @:The first element of a case pair is the condition and the
   ## @:second is the return value when that condition matches the main
   ## @:condition. The function compares the conditions left to right and
   ## @:returns the first match.
   ## @:
-  ## @:When none of the cases match the main condition, the "else"
-  ## @:value is returned.  The conditions must be integers. The return
-  ## @:values can be any type.
+  ## @:When none of the cases match the main condition, the default
+  ## @:value is returned if it is specified, otherwise a warning is
+  ## @:generated.  The conditions must be integers. The return values
+  ## @:can be any type.
   ## @:
   ## @:~~~
-  ## @:case(condition: int, elseCase: any, pairs: varargs(int, any)) any
+  ## @:case(condition: int, pairs: list, optional default: any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:cond = 8
-  ## @:case(cond, "water", 8, "tea") => "tea"
-  ## @:case(cond, "water", 3, "tea") => "water"
-  ## @:case(cond, "beer", +
-  ## @:  1, "tea", +
-  ## @:  2, "water", +
-  ## @:  3, "wine") => "beer"
+  ## @:cases = list(0, "tea", 1, "water", 2, "beer")
+  ## @:case(0, cases) => "tea"
+  ## @:case(1, cases) => "water"
+  ## @:case(2, cases) => "beer"
+  ## @:case(2, cases, "wine") => "beer"
+  ## @:case(3, cases, "wine") => "wine"
   ## @:~~~~
 
-  # todo remove the else case.
-
-  tMapParameters("iaIAa")
+  tMapParameters("iloaa")
   result = getCase(map)
 
-func funCase_saSAa*(parameters: seq[Value]): FunResult =
+func funCase_sloaa*(parameters: seq[Value]): FunResult =
   ## Compare string cases and return the matching value.  It takes a
-  ## @:main condition (a string), an else value and any number of case
-  ## @:pairs.
+  ## @:main string condition, a list of case pairs and an optional
+  ## @:value when none of the cases match.
   ## @:
   ## @:The first element of a case pair is the condition and the
   ## @:second is the return value when that condition matches the main
   ## @:condition. The function compares the conditions left to right and
   ## @:returns the first match.
   ## @:
-  ## @:When none of the cases match the main condition, the "else"
-  ## @:value is returned.  The conditions must be strings. The return
-  ## @:values can be any type.
+  ## @:When none of the cases match the main condition, the default
+  ## @:value is returned if it is specified, otherwise a warning is
+  ## @:generated.  The conditions must be strings. The return values
+  ## @:can be any type.
   ## @:
   ## @:~~~
-  ## @:case(condition: string, elseCase: any, pairs: varargs(int, any)) any
+  ## @:case(condition: string, pairs: list, optional default: any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:cond = "tea"
-  ## @:case(cond, "water", 8, "tea") => "tea"
-  ## @:case(cond, "water", 3, "tea") => "water"
-  ## @:case(cond, "beer", +
-  ## @:  1, "tea", +
-  ## @:  2, "water", +
-  ## @:  3, "wine") => "beer"
+  ## @:cases = list("tea", 15, "water", 2.3, "beer", "cold")
+  ## @:case("tea", cases) => 15
+  ## @:case("water", cases) => 2.3
+  ## @:case("beer", cases) => "cold"
+  ## @:case("bunch", cases, "other") => "other"
   ## @:~~~~
 
-  # todo: remove else case
-
-  tMapParameters("saSAa")
+  tMapParameters("sloaa")
   result = getCase(map)
 
 func parseVersion*(version: string): Option[(int, int, int)] =
@@ -1432,8 +1434,8 @@ const
     ("add", funAdd_Ii, "Ii"),
     ("add", funAdd_Fi, "Fi"),
     ("exists", funExists, "dsi"),
-    ("case", funCase_iaIAa, "iaIAa"),
-    ("case", funCase_saSAa, "saSAa"),
+    ("case", funCase_iloaa, "iloaa"),
+    ("case", funCase_sloaa, "sloaa"),
     ("cmpVersion", funCmpVersion, "ssi"),
     ("int", funInt_fosi, "fosi"),
     ("int", funInt_sosi, "sosi"),

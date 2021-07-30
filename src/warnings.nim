@@ -138,6 +138,8 @@ type
     kTooManyArgs,          # w123
     wAtLeast4Parameters,   # w124
     wExpectedNumberString, # w125
+    wCaseTypeMismatch,     # w126
+    wNotEvenCases,         # w127
 
 const
     # The list of warnings. Add new messages to the bottom and do not
@@ -269,6 +271,8 @@ const
       "Too many arguments, expected {requiredParams} got {args.len}.", # kTooManyArgs
       "Expected at least four parameters.", # wAtLeast4Parameters
       "Expected number string.", # wExpectedNumberString
+      "A case condition is not the same type as the main condition.", # wCaseTypeMismatch
+      "Expected an even number of cases, got $1 list items.", # wNotEvenCases
     ]
 
 func getWarning*(filename: string, lineNum: int,

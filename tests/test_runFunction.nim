@@ -447,86 +447,93 @@ suite "runFunction.nim":
     check testFunction("exists", parameters, eFunResult)
 
   test "case int":
-    var parameters = @[newValue(5), newValue("else"), newValue(5), newValue("value")]
-    let eFunResult = newFunResult(newValue("value"))
-    check testFunction("case", parameters, eFunResult)
-
-  test "case int else":
-    var parameters = @[newValue(5), newValue("else"), newValue(6), newValue("value")]
-    let eFunResult = newFunResult(newValue("else"))
-    check testFunction("case", parameters, eFunResult)
-
-  test "case string":
-    var parameters = @[newValue("test"), newValue("else"), newValue("test"), newValue("value")]
-    let eFunResult = newFunResult(newValue("value"))
-    check testFunction("case", parameters, eFunResult)
-
-  test "case string else":
-    var parameters = newValue(["test", "else", "asdf", "value"]).listv
-    let eFunResult = newFunResult(newValue("else"))
-    check testFunction("case", parameters, eFunResult)
-
-  test "case int 6":
-    var parameters = @[newValue(6), newValue("else"), newValue(5), newValue("v5"), newValue(6), newValue("v6")]
-    let eFunResult = newFunResult(newValue("v6"))
-    check testFunction("case", parameters, eFunResult)
-
-  test "case int 12":
-    var parameters = @[
-      newValue(9), newValue("else"),
+    var cases = newValue([
       newValue(5), newValue("v5"),
       newValue(6), newValue("v6"),
       newValue(7), newValue("v7"),
       newValue(8), newValue("v8"),
       newValue(9), newValue("v9"),
-    ]
-    let eFunResult = newFunResult(newValue("v9"))
+    ])
+    var parameters = @[newValue(5), cases]
+    var eFunResult = newFunResult(newValue("v5"))
     check testFunction("case", parameters, eFunResult)
 
-  test "case dup":
-    var parameters = @[
-      newValue(5),
-      newValue("else"),
-      newValue(5), newValue(8),
-      newValue(5), newValue(9),
-    ]
-    let eFunResult = newFunResult(newValue(8))
+  test "case int using else":
+    var cases = newValue([
+      newValue(5), newValue("v5"),
+    ])
+    var parameters = @[newValue(11), cases, newValue("else")]
+    let eFunResult = newFunResult(newValue("else"))
+    check testFunction("case", parameters, eFunResult)
+
+  test "case empty list":
+    let cases = newEmptyListValue()
+    var parameters = @[newValue(11), cases, newValue("else")]
+    let eFunResult = newFunResult(newValue("else"))
+    check testFunction("case", parameters, eFunResult)
+
+  test "case int else needed":
+    var cases = newValue([
+      newValue(5), newValue("v5"),
+    ])
+    var parameters = @[newValue(11), cases]
+    let eFunResult = newFunResultWarn(wMissingElse, 2)
+    check testFunction("case", parameters, eFunResult)
+
+  test "case string":
+    var cases = newValue([
+      newValue("5"), newValue("v5"),
+      newValue("9"), newValue("v9"),
+    ])
+    var parameters = @[newValue("5"), cases]
+    var eFunResult = newFunResult(newValue("v5"))
     check testFunction("case", parameters, eFunResult)
 
   test "case multiple matches":
-    var parameters = @[
-      newValue(5), newValue("else"),
-      newValue(5), newValue(8),
-      newValue(5), newValue("eight"),
-    ]
-    let eFunResult = newFunResult(newValue(8))
+    var cases = newValue([
+      newValue("3"), newValue("3"),
+      newValue("5"), newValue("first5"),
+      newValue("7"), newValue("v7"),
+      newValue("5"), newValue("second5"),
+      newValue("9"), newValue("v9"),
+    ])
+    var parameters = @[newValue("5"), cases]
+    let eFunResult = newFunResult(newValue("first5"))
     check testFunction("case", parameters, eFunResult)
 
   test "case invalid main condition":
-    var parameters = @[
-      newValue(3.5), newValue("else"),
-      newValue(5), newValue(8),
-      newValue(5), newValue(9),
-    ]
+    var cases = newValue([
+      newValue(7), newValue("v7"),
+    ])
+    var parameters = @[newValue(1.2), cases]
     let eFunResult = newFunResultWarn(kWrongType, 0, "int", "float")
     check testFunction("case", parameters, eFunResult)
 
   test "case invalid condition":
-    var parameters = @[
-      newValue(5), newValue("else"),
-      newValue(5), newValue(8),
+    var cases = newValue([
       newValue(3.5), newValue(9),
-    ]
-    let eFunResult = newFunResultWarn(kWrongType, 4, "int", "float")
+      newValue(5), newValue(8),
+    ])
+    var parameters = @[newValue(5), cases]
+    let eFunResult = newFunResultWarn(wCaseTypeMismatch)
     check testFunction("case", parameters, eFunResult)
 
-  test "case case different type":
-    var parameters = @[
-      newValue(1), newValue("else"),
-      newValue("abc"), newValue(33),
-      newValue(1), newValue(22),
-    ]
-    let eFunResult = newFunResultWarn(kWrongType, 2, "int", "string")
+  test "case main case different type":
+    var cases = newValue([
+      newValue(5), newValue(5),
+      newValue(9), newValue(9),
+    ])
+    var parameters = @[newValue("a"), cases]
+    let eFunResult = newFunResultWarn(wCaseTypeMismatch)
+    check testFunction("case", parameters, eFunResult)
+
+  test "case odd number of case items":
+    var cases = newValue([
+      newValue(5), newValue(5),
+      newValue(9),
+    ])
+    var parameters = @[newValue(5), cases]
+    let eFunResult = newFunResultWarn(wNotEvenCases, 1, "3")
     check testFunction("case", parameters, eFunResult)
 
   test "int() float to int":
