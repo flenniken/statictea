@@ -64,7 +64,7 @@ Warning = enum
   wDictKeyMissing, wKeyValueKindDiff, wSubListsEmpty, wSubListsDiffTypes,
   kMaxWarnings, kInvalidSignature, kInvalidParamType, kNotEnoughArgs,
   kWrongType, kNoVarargArgs, kNotEnoughVarargs, kTooManyArgs,
-  wAtLeast4Parameters
+  wAtLeast4Parameters, wExpectedNumberString
 ```
 
 
@@ -112,7 +112,8 @@ warningsList: array[low(Warning) .. high(Warning), string] = [
     "Invalid prepost: $1.", "Expected comma or right parentheses.",
     "Expected a string.", "Invalid statement, skipping it.",
     "Expected one parameter.", "Len takes a string, list or dict parameter.",
-    "Not a function: $1.", "The get function takes 2 or 3 parameters.",
+    "The function does not exist: $1.",
+    "The get function takes 2 or 3 parameters.",
     "Expected an int for the second parameter, got $1.",
     "The list index $1 out of range.",
     "Expected a string for the second parameter, got $1.",

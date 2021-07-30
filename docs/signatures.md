@@ -9,7 +9,7 @@ Statictea function signatures and parameter checking.
 * type: [Param](#param) &mdash; Holds attributes for one parameter.
 * type: [ShortName](#shortname) &mdash; Object to hold the state for ShortName.
 * [newParam](#newparam) &mdash; Create a new Param object.
-* [isSignatureCodeValid](#issignaturecodevalid) &mdash; Return true when the signature code is valid.
+* [kindToParamType](#kindtoparamtype) &mdash; 
 * [paramTypeString](#paramtypestring) &mdash; Return a string representation of a ParamType object.
 * [`$`](#) &mdash; Return a string representation of a Param object.
 * [sameType](#sametype) &mdash; Check whether the param type is the same type or compatible with the value.
@@ -63,12 +63,12 @@ func newParam(name: string; optional: bool; varargs: bool; returnType: bool;
 ```
 
 
-# isSignatureCodeValid
+# kindToParamType
 
-Return true when the signature code is valid.
+
 
 ```nim
-func isSignatureCodeValid(signatureCode: string): bool
+func kindToParamType(kind: ValueKind): ParamType
 ```
 
 

@@ -7,6 +7,7 @@ Statictea function types and supporting routines.
 
 * type: [FunctionPtr](#functionptr) &mdash; Signature of a statictea function.
 * type: [FunResultKind](#funresultkind) &mdash; The kind of a FunResult object, either a value or warning.
+* type: [FunctionSpec](#functionspec) &mdash; The name of a function, a pointer to the code, and its signature code.
 * type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a warning.
 * [newFunResultWarn](#newfunresultwarn) &mdash; Return a new FunResult object.
 * [newFunResultWarn](#newfunresultwarn) &mdash; Return a new FunResult object containing a warning.
@@ -30,6 +31,19 @@ The kind of a FunResult object, either a value or warning.
 ```nim
 FunResultKind = enum
   frValue, frWarning
+```
+
+
+# FunctionSpec
+
+The name of a function, a pointer to the code, and its signature code.
+
+```nim
+FunctionSpec = object
+  name*: string
+  functionPtr*: FunctionPtr
+  signatureCode*: string
+
 ```
 
 

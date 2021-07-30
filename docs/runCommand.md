@@ -134,7 +134,7 @@ Collect the function parameter values then call it. Start should be pointing at 
 
 ```nim
 proc getFunctionValue(env: var Env; prepostTable: PrepostTable;
-                      function: FunctionPtr; statement: Statement;
+                      functionName: string; statement: Statement;
                       start: Natural; variables: Variables): Option[
     ValueAndLength]
 ```

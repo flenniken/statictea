@@ -309,3 +309,25 @@ suite "signatures.nim":
     parameters = @[newValue(1), newValue(2)]
     check testMapParametersW("oifi", parameters, 1, kWrongType, "float", "int")
     check testMapParametersW("oIFi", parameters, 1, kWrongType, "float", "int")
+
+  test "mapParameters sort int, float, string":
+    var parameters = @[newEmptyListValue(), newValue("ascending")]
+    check testMapParametersOk("lsosl", parameters, """{"a":[],"b":"ascending"}""")
+
+    parameters = @[newEmptyListValue(), newValue("ascending"), newValue("insensitive")]
+    check testMapParametersOk("lsosl", parameters,
+      """{"a":[],"b":"ascending","c":"insensitive"}""")
+
+  test "mapParameters sort lists":
+    var parameters = @[
+      newEmptyListValue(), newValue("ascending"), newValue("insensitive"), newValue(0)
+    ]
+    check testMapParametersOk("lssil", parameters,
+      """{"a":[],"b":"ascending","c":"insensitive","d":0}""")
+
+  test "mapParameters sort dictionaries":
+    var parameters = @[
+      newEmptyListValue(), newValue("ascending"), newValue("insensitive"), newValue("key")
+    ]
+    check testMapParametersOk("lsssl", parameters,
+      """{"a":[],"b":"ascending","c":"insensitive","d":"key"}""")

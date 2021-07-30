@@ -5,50 +5,52 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [runFunction.nim](../src/runFunction.nim) &mdash; Nim source code.
 # Index
 
-* type: [FunctionSpec](#functionspec) &mdash; The name of a function, its signature code and pointer to the code.
 * [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
-* [funCmp](#funcmp) &mdash; Compare two values.
+* [funCmp_iii](#funcmpiii) &mdash; 
+Compare two ints.
+* [funCmp_ffi](#funcmpffi) &mdash; 
+Compare two floats.
+* [funCmp_ssoii](#funcmpssoii) &mdash; 
+Compare two strings.
 * [funConcat](#funconcat) &mdash; Concatentate two or more strings.
-* [funLen](#funlen) &mdash; Length of a string, list or dictionary.
-* [funGet](#funget) &mdash; Get a value from a list or dictionary.
+* [funLen_si](#funlensi) &mdash; Return the length of a string in characters, not bytes.
+* [funLen_li](#funlenli) &mdash; Return the number of elements in a list.
+* [funLen_di](#funlendi) &mdash; Return the number of elements in a dictionary.
+* [funGet_lioaa](#fungetlioaa) &mdash; Return a value from a list by its index.
+* [funGet_dsoaa](#fungetdsoaa) &mdash; Return a value in a dictionary by key.
 * [funIf](#funif) &mdash; Return a value when the condition is 1 and another value when the
 condition is not 1.
-* [funAdd](#funadd) &mdash; Add two or more numbers.
+* [funAdd_Ii](#funaddii) &mdash; Add integers.
+* [funAdd_Fi](#funaddfi) &mdash; Add floats.
 * [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
-* [funCase](#funcase) &mdash; Return a value from multiple choices.
+* [funCase_iaIAa](#funcaseiaiaa) &mdash; Return a value from multiple choices.
+* [funCase_saSAa](#funcasesasaa) &mdash; Return a value from multiple choices.
 * [parseVersion](#parseversion) &mdash; Parse a StaticTea version number and return its three components.
 * [funCmpVersion](#funcmpversion) &mdash; Compare two StaticTea version numbers.
-* [funFloat](#funfloat) &mdash; Create a float from an int or an int number string.
-* [funInt](#funint) &mdash; Create an int from a float or a float number string.
+* [funFloat_if](#funfloatif) &mdash; Create a float from an int.
+* [funFloat_sf](#funfloatsf) &mdash; Create a float from a number string.
+* [funInt_fosi](#funintfosi) &mdash; Create an int from a float.
+* [funInt_sosi](#funintsosi) &mdash; Create an int from a number string.
 * [funFind](#funfind) &mdash; Return the position of a substring in a string.
 * [funSubstr](#funsubstr) &mdash; Extract a substring from a string by its position.
 * [funDup](#fundup) &mdash; Duplicate a string.
 * [funDict](#fundict) &mdash; Create a dictionary from a list of key, value pairs.
 * [funList](#funlist) &mdash; Create a list of values.
 * [funReplace](#funreplace) &mdash; Replace a substring by its position.
-* [funReplaceRe](#funreplacere) &mdash; Replace multiple parts of a string using regular expressions.
+* [funReplaceRe_sSSs](#funreplaceressss) &mdash; Replace multiple parts of a string using regular expressions.
+* [funReplaceRe_sls](#funreplaceresls) &mdash; Replace multiple parts of a string using regular expressions.
 * [funPath](#funpath) &mdash; Split a file path into pieces.
 * [funLower](#funlower) &mdash; Lowercase a string.
 * [funKeys](#funkeys) &mdash; Create a list from the keys in a dictionary.
 * [funValues](#funvalues) &mdash; Create a list of the values in the specified dictionary.
-* [funSort](#funsort) &mdash; Sort a list of values of the same type.
+* [funSort_lsosl](#funsortlsosl) &mdash; Sort a list of values of the same type.
+* [funSort_lssil](#funsortlssil) &mdash; Sort a list of lists.
+* [funSort_lsssl](#funsortlsssl) &mdash; Sort a list of dictionaries.
 * [funGithubAnchor](#fungithubanchor) &mdash; Create a Github markdown anchor name given a heading name.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
-* [getFunction](#getfunction) &mdash; Look up a function by its name.
-
-# FunctionSpec
-
-The name of a function, its signature code and pointer to the code.
-
-```nim
-FunctionSpec = object
-  name: string
-  signatureCode: string
-  functionPtr: FunctionPtr
-
-```
-
+* [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
+* [isFunctionName](#isfunctionname) &mdash; Return true the function exists.
 
 # cmpBaseValues
 
@@ -59,31 +61,15 @@ func cmpBaseValues(a, b: Value; insensitive: bool = false): int
 ```
 
 
-# funCmp
+# funCmp_iii
 
-Compare two values. Returns -1 for less, 0 for equal and 1 for
-greater than.  The values are either int, float or string (both
-the same type) The default compares strings case sensitive, use 1
-for case insensitive.
+
+Compare two ints. Returns -1 for less, 0 for equal and 1 for
+ greater than.
 
 ~~~
 cmp(a: int, b: int) int
-cmp(a: float, b: float) int
-cmp(a: string, b: string, optional insensitive: int) int
 ~~~~
-
-Compare numbers:
-
-* p1: number
-* p2: number
-* return: -1, 0, 1
-
-Compare strings:
-
-* p1: string
-* p2: string
-* p3: optional: 1 for case insensitive
-* return: -1, 0, 1
 
 Examples:
 
@@ -91,15 +77,61 @@ Examples:
 cmp(7, 9) => -1
 cmp(8, 8) => 0
 cmp(9, 2) => 1
+~~~~
 
+```nim
+func funCmp_iii(parameters: seq[Value]): FunResult
+```
+
+
+# funCmp_ffi
+
+
+Compare two floats. Returns -1 for less, 0 for
+equal and 1 for greater than.
+
+~~~
+cmp(a: float, b: float) int
+~~~~
+
+Examples:
+
+~~~
+cmp(7.8, 9.1) => -1
+cmp(8.4, 8.4) => 0
+cmp(9.3, 2.2) => 1
+~~~~
+
+```nim
+func funCmp_ffi(parameters: seq[Value]): FunResult
+```
+
+
+# funCmp_ssoii
+
+
+Compare two strings. Returns -1 for less, 0 for equal and 1 for
+greater than.
+
+You have the option to compare case insensitive. Case sensitive
+is the default.
+
+~~~
+cmp(a: string, b: string, optional insensitive: int) int
+~~~~
+
+Examples:
+
+~~~
 cmp("coffee", "tea") => -1
 cmp("tea", "tea") => 0
 cmp("Tea", "tea") => 1
+cmp("Tea", "tea", 0) => 1
 cmp("Tea", "tea", 1) => 0
 ~~~~
 
 ```nim
-func funCmp(parameters: seq[Value]): FunResult
+func funCmp_ssoii(parameters: seq[Value]): FunResult
 ```
 
 
@@ -123,67 +155,77 @@ func funConcat(parameters: seq[Value]): FunResult
 ```
 
 
-# funLen
+# funLen_si
 
-Length of a string, list or dictionary. For strings it returns
-the number of characters, not bytes. For lists and dictionaries
-it returns the number of elements.
+Return the length of a string in characters, not bytes.
 
 ~~~
 len(str: string) int
-len(list: list) int
-len(dictionary: dict) int
 ~~~~
-
-* p1: string, list or dict
-* return: int
 
 Examples:
 
 ~~~
 len("tea") => 3
-len(list(4, 1)) => 2
-len(dict('a', 4)) => 1
+len("añyóng") => 6
 ~~~~
 
 ```nim
-func funLen(parameters: seq[Value]): FunResult
+func funLen_si(parameters: seq[Value]): FunResult
 ```
 
 
-# funGet
+# funLen_li
 
-Get a value from a list or dictionary.
+Return the number of elements in a list.
 
-For a list you specify the index of the item you want to get. If
-the index is too big, the default value is returned, if
-specified, else a warning is generated.
+~~~
+len(list: list) int
+~~~~
 
-For a dictionary you specify the key of the item you want to
-get. If the key doesn't exist, the default value is returned, if
-specified, else a warning is generated.
+Examples:
+
+~~~
+len(list()) => 0
+len(list(1)) => 1
+len(list(4, 5)) => 2
+~~~~
+
+```nim
+func funLen_li(parameters: seq[Value]): FunResult
+```
+
+
+# funLen_di
+
+Return the number of elements in a dictionary.
+
+~~~
+len(dictionary: dict) int
+~~~~
+
+Examples:
+
+~~~
+len(dict()) => 0
+len(dict('a', 4)) => 1
+len(dict('a', 4, 'b', 3)) => 2
+~~~~
+
+```nim
+func funLen_di(parameters: seq[Value]): FunResult
+```
+
+
+# funGet_lioaa
+
+Return a value from a list by its index.  If the index is too
+big, the default value is returned when specified, else a warning
+is generated.
 
 ~~~
 get(list: list, index: int, optional default: any) any
-get(dictionary: dict, key: string, optional default: any) any
 ~~~~
-
-Note: For dictionary lookup you can use dot notation. It's the
-same as get without the default.
-
-List case:
-
-* p1: list
-* p2: index of item
-* p3: optional default value returned when index is too big
-* return: value
-
-Dictionary case:
-
-* p1: dictionary
-* p2: key string
-* p3: optional default value returned when key is missing
-* return: value
 
 Examples:
 
@@ -191,17 +233,40 @@ Examples:
 list = list(4, 'a', 10)
 get(list, 2) => 10
 get(list, 3, 99) => 99
+~~~~
 
+```nim
+func funGet_lioaa(parameters: seq[Value]): FunResult
+```
+
+
+# funGet_dsoaa
+
+Return a value in a dictionary by key.  If the key doesn't
+exist, the default value is returned, if specified, else a
+warning is generated.
+
+~~~
+get(dictionary: dict, key: string, optional default: any) any
+~~~~
+
+Note: For dictionary lookup you can use dot notation. It's the
+same as get without the default.
+
+Examples:
+
+~~~
 d = dict("tea", "Earl Grey")
 get(d, 'tea') => "Earl Grey"
 get(d, 'coffee', 'Tea') => "Tea"
 
+Using dot notation:
 d = dict("tea", "Earl Grey")
 d.tea => "Earl Grey"
 ~~~~
 
 ```nim
-func funGet(parameters: seq[Value]): FunResult
+func funGet_dsoaa(parameters: seq[Value]): FunResult
 ```
 
 
@@ -227,44 +292,45 @@ func funIf(parameters: seq[Value]): FunResult
 ```
 
 
-# funAdd
+# funAdd_Ii
 
-Add two or more numbers.  The parameters must be all integers or
-all floats.  A warning is generated on overflow.
+Add integers. A warning is generated on overflow.
 
 ~~~
 add(numbers: varargs(int)) int
-add(numbers: varargs(float)) float
 ~~~~
-
-Integer case:
-
-* p1: int
-* p2: int
-* ...
-* pn: int
-* return: int
-
-Float case:
-
-* p1: float
-* p2: float
-* ...
-* pn: float
-* return: float
 
 Examples:
 
 ~~~
+add(1) => 1
 add(1, 2) => 3
 add(1, 2, 3) => 6
+~~~~
 
+```nim
+func funAdd_Ii(parameters: seq[Value]): FunResult
+```
+
+
+# funAdd_Fi
+
+Add floats. A warning is generated on overflow.
+
+~~~
+add(numbers: varargs(float)) float
+~~~~
+
+Examples:
+
+~~~
+add(1.5) => 1.5
 add(1.5, 2.3) => 3.8
 add(1.1, 2.2, 3.3) => 6.6
 ~~~~
 
 ```nim
-func funAdd(parameters: seq[Value]): FunResult
+func funAdd_Fi(parameters: seq[Value]): FunResult
 ```
 
 
@@ -289,38 +355,73 @@ func funExists(parameters: seq[Value]): FunResult
 ```
 
 
-# funCase
+# funCase_iaIAa
 
 Return a value from multiple choices. It takes a main condition,
-any number of case pairs and an optional else value.
+an integer, any number of case pairs and an optional else value.
 
-The first parameter of a case pair is the condition and the
+The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
 condition. The function compares the conditions left to right and
 returns the first match.
 
-When none of the cases match the main condition, the "else" value
-is returned.  The conditions must be integers or strings. The
-return values can be any type.
+When none of the cases match the main condition, the "else"
+value is returned.  The conditions must be integers. The return
+values can be any type.
 
 ~~~
-case(condition: int, elseCase: any, pairs: varargs(int, any) any
-case(condition: string, elseCase: any, pairs: varargs(string, any) any
+case(condition: int, elseCase: any, pairs: varargs(int, any)) any
 ~~~~
 
 Examples:
 
 ~~~
-case(8, "water", 8, "tea") => "tea"
-case(8, "water", 3, "tea") => "water"
-case(8, "beer", +
+cond = 8
+case(cond, "water", 8, "tea") => "tea"
+case(cond, "water", 3, "tea") => "water"
+case(cond, "beer", +
   1, "tea", +
   2, "water", +
   3, "wine") => "beer"
 ~~~~
 
 ```nim
-func funCase(parameters: seq[Value]): FunResult
+func funCase_iaIAa(parameters: seq[Value]): FunResult
+```
+
+
+# funCase_saSAa
+
+Return a value from multiple choices. It takes a main condition,
+a string, any number of case pairs and an optional else value.
+
+The first element of a case pair is the condition and the
+second is the return value when that condition matches the main
+condition. The function compares the conditions left to right and
+returns the first match.
+
+When none of the cases match the main condition, the "else"
+value is returned.  The conditions must be strings. The return
+values can be any type.
+
+~~~
+case(condition: string, elseCase: any, pairs: varargs(int, any)) any
+~~~~
+
+Examples:
+
+~~~
+cond = "tea"
+case(cond, "water", 8, "tea") => "tea"
+case(cond, "water", 3, "tea") => "water"
+case(cond, "beer", +
+  1, "tea", +
+  2, "water", +
+  3, "wine") => "beer"
+~~~~
+
+```nim
+func funCase_saSAa(parameters: seq[Value]): FunResult
 ```
 
 
@@ -359,42 +460,58 @@ func funCmpVersion(parameters: seq[Value]): FunResult
 ```
 
 
-# funFloat
+# funFloat_if
 
-Create a float from an int or an int number string.
+Create a float from an int.
 
 ~~~
 float(num: int) float
-float(numString: string) float
 ~~~~
-
-* p1: int or int string
-* return: float
 
 Examples:
 
 ~~~
 float(2) => 2.0
+float(-33) => -33.0
+~~~~
+
+```nim
+func funFloat_if(parameters: seq[Value]): FunResult
+```
+
+
+# funFloat_sf
+
+Create a float from a number string.
+
+~~~
+float(numString: string) float
+~~~~
+
+Examples:
+
+~~~
+float("2") => 2.0
+float("2.4") => 2.4
 float("33") => 33.0
 ~~~~
 
 ```nim
-func funFloat(parameters: seq[Value]): FunResult
+func funFloat_sf(parameters: seq[Value]): FunResult
 ```
 
 
-# funInt
+# funInt_fosi
 
-Create an int from a float or a float number string.
+Create an int from a float.
 
 ~~~
 int(num: float, optional roundOption: string) int
-int(numString: string, optional roundOption: string) int
 ~~~~
 
 Round options:
 
-* "round" - nearest integer
+* "round" - nearest integer, the default.
 * "floor" - integer below (to the left on number line)
 * "ceiling" - integer above (to the right on number line)
 * "truncate" - remove decimals
@@ -402,8 +519,7 @@ Round options:
 Examples:
 
 ~~~
-int("2") => 2
-int("2.34") => 2
+int(2.34) => 2
 int(2.34, "round") => 2
 int(-2.34, "round") => -2
 int(6.5, "round") => 7
@@ -417,7 +533,43 @@ int(-6.3456, "truncate") => -6
 ~~~~
 
 ```nim
-func funInt(parameters: seq[Value]): FunResult
+func funInt_fosi(parameters: seq[Value]): FunResult
+```
+
+
+# funInt_sosi
+
+Create an int from a number string.
+
+~~~
+int(numString: string, optional roundOption: string) int
+~~~~
+
+Round options:
+
+* "round" - nearest integer, the default
+* "floor" - integer below (to the left on number line)
+* "ceiling" - integer above (to the right on number line)
+* "truncate" - remove decimals
+
+Examples:
+
+~~~
+int("2") => 2
+int("2.34") => 2
+int("-2.34", "round") => -2
+int("6.5", "round") => 7
+int("-6.5", "round") => -7
+int("4.57", "floor") => 4
+int("-4.57", "floor") => -5
+int("6.3", "ceiling") => 7
+int("-6.3", "ceiling") => -6
+int("6.3456", "truncate") => 6
+int("-6.3456", "truncate") => -6
+~~~~
+
+```nim
+func funInt_sosi(parameters: seq[Value]): FunResult
 ```
 
 
@@ -591,36 +743,16 @@ func funReplace(parameters: seq[Value]): FunResult
 ```
 
 
-# funReplaceRe
+# funReplaceRe_sSSs
 
 Replace multiple parts of a string using regular expressions.
 
 You specify one or more pairs of a regex patterns and its string
-replacement. The pairs can be specified as parameters to the
-function or they can be part of a list.
+replacement.
 
 ~~~
 replaceRe(str: string, pairs: varargs(string, string) string
-replaceRe(str: string, pairs: list) string
 ~~~~
-
-Muliple parameters case:
-
-* p1: string to replace
-* p2: pattern 1
-* p3: replacement string 1
-* p4: optional: pattern 2
-* p5: optional: replacement string 2
-* ...
-* pn-1: optional: pattern n
-* pn: optional: replacement string n
-* return: string
-
-List case:
-
-* p1: string to replace
-* p2: list of pattern and replacement pairs
-* return: string
 
 Examples:
 
@@ -629,6 +761,30 @@ replaceRe("abcdefabc", "abc", "456")
   => "456def456"
 replaceRe("abcdefabc", "abc", "456", "def", "")
   => "456456"
+~~~~
+
+For developing and debugging regular expressions see the
+website: https://regex101.com/
+
+```nim
+func funReplaceRe_sSSs(parameters: seq[Value]): FunResult
+```
+
+
+# funReplaceRe_sls
+
+Replace multiple parts of a string using regular expressions.
+
+You specify one or more pairs of a regex patterns and its string
+replacement.
+
+~~~
+replaceRe(str: string, pairs: list) string
+~~~~
+
+Examples:
+
+~~~
 list = list("abc", "456", "def", "")
 replaceRe("abcdefabc", list))
   => "456456"
@@ -638,7 +794,7 @@ For developing and debugging regular expressions see the
 website: https://regex101.com/
 
 ```nim
-func funReplaceRe(parameters: seq[Value]): FunResult
+func funReplaceRe_sls(parameters: seq[Value]): FunResult
 ```
 
 
@@ -740,69 +896,94 @@ func funValues(parameters: seq[Value]): FunResult
 ```
 
 
-# funSort
+# funSort_lsosl
 
-Sort a list of values of the same type.
+Sort a list of values of the same type.  The values are ints,
+floats or strings.
 
-You have the option of sorting ascending or descending.
+You specify the sort order, "ascending" or "descending".
 
-When sorting strings you have the option to compare case
-sensitive or insensitive.
-
-When sorting lists, you specify which index to compare by, index
-0 is the default.  The compare index value must exist in each list, be
-the same type and be an int, float or string.
-
-When sorting dictionaries, you specify which key to compare by.
-The key value must exist in each dictionary, be the same type and
-be an int, float or string.
+You have the option of sorting strings case "insensitive". Case
+"sensitive" is the default.
 
 ~~~
-sort(ints: list, optional order: string) list
-sort(floats: list, optional order: string) list
-sort(strings: list, order: string, optional case: string) list
-sort(lists: list, order: string, case: string, index: int) list
-sort(dicts: list, order: string, case: string, key: string) list
+sort(values: list, order: string, optional insensitive: string) list
 ~~~~
-
-int, float case:
-
-* p1: list of ints or list of floats
-* p2: optional: "ascending", "descending"
-* return: sorted list
-
-string or list case:
-
-* p1: list of strings or list of lists
-* p2: optional: "ascending", "descending"
-* p3: optional: default "sensitive", "insensitive"
-* return: sorted list
-
-dictionary case:
-
-* p1: list of dictionaries
-* p2: "ascending", "descending"
-* p3: "sensitive", "insensitive"
-* p4: key string
-* return: sorted list
 
 Examples:
 
 ~~~
-list = list(4, 3, 5, 5, 2, 4)
-sort(list) => [2, 3, 4, 4, 5, 5]
+ints = list(4, 3, 5, 5, 2, 4)
+sort(list, "ascending") => [2, 3, 4, 4, 5, 5]
 sort(list, "descending") => [5, 5, 4, 4, 3, 2]
 
+floats = list(4.4, 3.1, 5.9)
+sort(floats, "ascending") => [3.1, 4.4, 5.9]
+sort(floats, "descending") => [5.9, 4.4, 3.1]
+
 strs = list('T', 'e', 'a')
-sort(strs) => ['T', 'a', 'e']
+sort(strs, "ascending") => ['T', 'a', 'e']
 sort(strs, "ascending", "sensitive") => ['T', 'a', 'e']
 sort(strs, "ascending", "insensitive") => ['a', 'e', 'T']
+~~~~
 
+```nim
+func funSort_lsosl(parameters: seq[Value]): FunResult
+```
+
+
+# funSort_lssil
+
+Sort a list of lists.
+
+You specify the sort order, "ascending" or "descending".
+
+You specify how to sort strings either case "sensitive" or
+"insensitive".
+
+You specify which index to compare by.  The compare index value
+must exist in each list, be the same type and be an int, float or
+string.
+
+~~~
+sort(lists: list, order: string, case: string, index: int) list
+~~~~
+
+Examples:
+
+~~~
 l1 = list(4, 3, 1)
-l2 = list(2, 3, 0)
+l2 = list(2, 3, 4)
 listOfLists = list(l1, l2)
-sort(listOfLists) => [l2, l1]
+sort(listOfLists, "ascending", "sensitive", 0) => [l2, l1]
+sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
+~~~~
 
+```nim
+func funSort_lssil(parameters: seq[Value]): FunResult
+```
+
+
+# funSort_lsssl
+
+Sort a list of dictionaries.
+
+You specify the sort order, "ascending" or "descending".
+
+You specify how to sort strings either case "sensitive" or
+"insensitive".
+
+You specify the compare key.  The key value must exist
+in each dictionary, be the same type and be an int, float or
+string.
+
+~~~
+sort(dicts: list, order: string, case: string, key: string) list
+~~~~
+
+Examples:
+
+~~~
 d1 = dict('name', 'Earl Gray', 'weight', 1.2)
 d2 = dict('name', 'Tea Pot', 'weight', 3.5)
 dicts = list(d1, d2)
@@ -811,7 +992,7 @@ sort(dicts, "descending", "sensitive", 'name') => [d2, d1]
 ~~~~
 
 ```nim
-func funSort(parameters: seq[Value]): FunResult
+func funSort_lsssl(parameters: seq[Value]): FunResult
 ```
 
 
@@ -867,10 +1048,20 @@ proc getFunctionList(name: string): seq[FunctionSpec]
 
 # getFunction
 
-Look up a function by its name.
+Find the function with the given name and return a pointer to it. If there are multiple functions with the name, return the one that matches the parameters, if none match, return the first one.
 
 ```nim
-proc getFunction(functionName: string): Option[FunctionPtr]
+proc getFunction(functionName: string; parameters: seq[Value]): Option[
+    FunctionSpec]
+```
+
+
+# isFunctionName
+
+Return true the function exists.
+
+```nim
+proc isFunctionName(functionName: string): bool
 ```
 
 

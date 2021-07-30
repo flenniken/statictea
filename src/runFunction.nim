@@ -1,4 +1,3 @@
-
 ## This module contains the StaticTea functions and supporting types.
 ## The StaticTea language functions start with "fun", for example, the
 ## "funCmp" function implements the StaticTea "cmp" function.
@@ -1199,103 +1198,31 @@ func funValues*(parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(list))
 
-func funSort*(parameters: seq[Value]): FunResult =
+func generalSort(map: VarsDict): FunResult =
   ## Sort a list of values of the same type.
-  ## @:
-  ## @:You have the option of sorting ascending or descending.
-  ## @:
-  ## @:When sorting strings you have the option to compare case
-  ## @:sensitive or insensitive.
-  ## @:
-  ## @:When sorting lists, you specify which index to compare by, index
-  ## @:0 is the default.  The compare index value must exist in each list, be
-  ## @:the same type and be an int, float or string.
-  ## @:
-  ## @:When sorting dictionaries, you specify which key to compare by.
-  ## @:The key value must exist in each dictionary, be the same type and
-  ## @:be an int, float or string.
-  ## @:
-  ## @:~~~
-  ## @:sort(ints: list, optional order: string) list
-  ## @:sort(floats: list, optional order: string) list
-  ## @:sort(strings: list, order: string, optional case: string) list
-  ## @:sort(lists: list, order: string, case: string, index: int) list
-  ## @:sort(dicts: list, order: string, case: string, key: string) list
-  ## @:~~~~
-  ## @:
-  ## @:int, float case:
-  ## @:
-  ## @:* p1: list of ints or list of floats
-  ## @:* p2: optional: "ascending", "descending"
-  ## @:* return: sorted list
-  ## @:
-  ## @:string or list case:
-  ## @:
-  ## @:* p1: list of strings or list of lists
-  ## @:* p2: optional: "ascending", "descending"
-  ## @:* p3: optional: default "sensitive", "insensitive"
-  ## @:* return: sorted list
-  ## @:
-  ## @:dictionary case:
-  ## @:
-  ## @:* p1: list of dictionaries
-  ## @:* p2: "ascending", "descending"
-  ## @:* p3: "sensitive", "insensitive"
-  ## @:* p4: key string
-  ## @:* return: sorted list
-  ## @:
-  ## @:Examples:
-  ## @:
-  ## @:~~~
-  ## @:list = list(4, 3, 5, 5, 2, 4)
-  ## @:sort(list) => [2, 3, 4, 4, 5, 5]
-  ## @:sort(list, "descending") => [5, 5, 4, 4, 3, 2]
-  ## @:
-  ## @:strs = list('T', 'e', 'a')
-  ## @:sort(strs) => ['T', 'a', 'e']
-  ## @:sort(strs, "ascending", "sensitive") => ['T', 'a', 'e']
-  ## @:sort(strs, "ascending", "insensitive") => ['a', 'e', 'T']
-  ## @:
-  ## @:l1 = list(4, 3, 1)
-  ## @:l2 = list(2, 3, 0)
-  ## @:listOfLists = list(l1, l2)
-  ## @:sort(listOfLists) => [l2, l1]
-  ## @:
-  ## @:d1 = dict('name', 'Earl Gray', 'weight', 1.2)
-  ## @:d2 = dict('name', 'Tea Pot', 'weight', 3.5)
-  ## @:dicts = list(d1, d2)
-  ## @:sort(dicts, "ascending", "sensitive", 'weight') => [d1, d2]
-  ## @:sort(dicts, "descending", "sensitive", 'name') => [d2, d1]
-  ## @:~~~~
 
-  if parameters.len() < 1 or parameters.len() > 4:
-    return newFunResultWarn(wOneToFourParameters)
-
-  if parameters[0].kind != vkList:
-    return newFunResultWarn(wExpectedList, 0)
-  let list = parameters[0].listv
+  let list = map["a"].listv
 
   if list.len == 0:
     return newFunResult(newEmptyListValue())
+
   let listKind = list[0].kind
 
-  var sortOrder = Ascending
-  if parameters.len() >= 2:
-    if parameters[1].kind != vkString:
-      return newFunResultWarn(wExpectedSortOrder, 1)
-    case parameters[1].stringv:
+  var sortOrder: SortOrder
+  if "b" in map:
+    case map["b"].stringv:
       of "ascending":
         sortOrder = Ascending
       of "descending":
         sortOrder = Descending
       else:
         return newFunResultWarn(wExpectedSortOrder, 1)
+  else:
+    sortOrder = Ascending
 
   var insensitive = false
-  if parameters.len() >= 3:
-    if parameters[2].kind != vkString:
-      return newFunResultWarn(wExpectedSensitivity, 2)
-    case parameters[2].stringv:
+  if "c" in map:
+    case map["c"].stringv:
       of "sensitive":
         insensitive = false
       of "insensitive":
@@ -1303,11 +1230,17 @@ func funSort*(parameters: seq[Value]): FunResult =
       else:
         return newFunResultWarn(wExpectedSensitivity, 2)
 
-  var key = ""
-  if listKind == vkDict:
-    if parameters.len() < 4:
-      return newFunResultWarn(wExpectedKey, 3)
-    key = parameters[3].stringv
+  var index = 0i64
+  var key: string
+  if "d" in map:
+    let value = map["d"]
+    case value.kind:
+      of vkInt:
+        index = value.intv
+      of vkString:
+        key = value.stringv
+      else:
+        discard
 
   # Get the type of the first item.
   let firstItem = list[0]
@@ -1356,6 +1289,97 @@ func funSort*(parameters: seq[Value]): FunResult =
 
   let newList = sorted(list, sortCmpValues, sortOrder)
   result = newFunResult(newValue(newList))
+
+func funSort_lsosl*(parameters: seq[Value]): FunResult =
+  ## Sort a list of values of the same type.  The values are ints,
+  ## @:floats or strings.
+  ## @:
+  ## @:You specify the sort order, "ascending" or "descending".
+  ## @:
+  ## @:You have the option of sorting strings case "insensitive". Case
+  ## @:"sensitive" is the default.
+  ## @:
+  ## @:~~~
+  ## @:sort(values: list, order: string, optional insensitive: string) list
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:ints = list(4, 3, 5, 5, 2, 4)
+  ## @:sort(list, "ascending") => [2, 3, 4, 4, 5, 5]
+  ## @:sort(list, "descending") => [5, 5, 4, 4, 3, 2]
+  ## @:
+  ## @:floats = list(4.4, 3.1, 5.9)
+  ## @:sort(floats, "ascending") => [3.1, 4.4, 5.9]
+  ## @:sort(floats, "descending") => [5.9, 4.4, 3.1]
+  ## @:
+  ## @:strs = list('T', 'e', 'a')
+  ## @:sort(strs, "ascending") => ['T', 'a', 'e']
+  ## @:sort(strs, "ascending", "sensitive") => ['T', 'a', 'e']
+  ## @:sort(strs, "ascending", "insensitive") => ['a', 'e', 'T']
+  ## @:~~~~
+
+  tMapParameters("lsosl")
+  result = generalSort(map)
+
+func funSort_lssil*(parameters: seq[Value]): FunResult =
+  ## Sort a list of lists.
+  ## @:
+  ## @:You specify the sort order, "ascending" or "descending".
+  ## @:
+  ## @:You specify how to sort strings either case "sensitive" or
+  ## @:"insensitive".
+  ## @:
+  ## @:You specify which index to compare by.  The compare index value
+  ## @:must exist in each list, be the same type and be an int, float or
+  ## @:string.
+  ## @:
+  ## @:~~~
+  ## @:sort(lists: list, order: string, case: string, index: int) list
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:l1 = list(4, 3, 1)
+  ## @:l2 = list(2, 3, 4)
+  ## @:listOfLists = list(l1, l2)
+  ## @:sort(listOfLists, "ascending", "sensitive", 0) => [l2, l1]
+  ## @:sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
+  ## @:~~~~
+
+  tMapParameters("lssil")
+  result = generalSort(map)
+
+func funSort_lsssl*(parameters: seq[Value]): FunResult =
+  ## Sort a list of dictionaries.
+  ## @:
+  ## @:You specify the sort order, "ascending" or "descending".
+  ## @:
+  ## @:You specify how to sort strings either case "sensitive" or
+  ## @:"insensitive".
+  ## @:
+  ## @:You specify the compare key.  The key value must exist
+  ## @:in each dictionary, be the same type and be an int, float or
+  ## @:string.
+  ## @:
+  ## @:~~~
+  ## @:sort(dicts: list, order: string, case: string, key: string) list
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:d1 = dict('name', 'Earl Gray', 'weight', 1.2)
+  ## @:d2 = dict('name', 'Tea Pot', 'weight', 3.5)
+  ## @:dicts = list(d1, d2)
+  ## @:sort(dicts, "ascending", "sensitive", 'weight') => [d1, d2]
+  ## @:sort(dicts, "descending", "sensitive", 'name') => [d2, d1]
+  ## @:~~~~
+
+  tMapParameters("lsssl")
+  result = generalSort(map)
 
 # todo: add function where you specify a list of names and it returns
 # a list of anchor names.
@@ -1426,9 +1450,9 @@ const
     ("lower", funLower, "ss"),
     ("keys", funKeys, "dl"),
     ("values", funValues, "dl"),
-    ("sort", funSort, "losl"),
-    ("sort", funSort, "lsosl"),
-    ("sort", funSort, "lssosl"),
+    ("sort", funSort_lsosl, "lsosl"),
+    ("sort", funSort_lssil, "lssil"),
+    ("sort", funSort_lsssl, "lsssl"),
     ("githubAnchor", funGithubAnchor, "ss"),
   ]
 

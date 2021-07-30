@@ -1122,32 +1122,48 @@ suite "runFunction.nim":
 
   test "sort empty":
     let emptyList = newEmptyListValue()
-    check testFunction("sort", @[emptyList], newFunResult(emptyList))
+    check testFunction("sort", @[
+      emptyList,
+      newValue("ascending"),
+      newValue("insensitive"),
+    ], newFunResult(emptyList))
+
+    check testFunction("sort", @[
+      emptyList,
+      newValue("ascending"),
+    ], newFunResult(emptyList))
+
+  test "sort empty lists":
+    let emptyList = newEmptyListValue()
+    check testFunction("sort", @[
+      emptyList,
+      newValue("ascending"),
+      newValue("insensitive"),
+      newValue(0)
+    ], newFunResult(emptyList))
+
+  test "sort empty dicts":
+    let emptyList = newEmptyListValue()
     check testFunction("sort", @[
       emptyList,
       newValue("descending"),
       newValue("insensitive"),
-      newValue("dummyKey")
+      newValue("key")
     ], newFunResult(emptyList))
 
   test "sort one":
     let list = newValue([1])
-    check testFunction("sort", @[list], newFunResult(list))
+    check testFunction("sort", @[list, newValue("ascending")], newFunResult(list))
 
   test "sort two":
     let list = newValue([2, 1])
     let eList = newValue([1, 2])
-    check testFunction("sort", @[list], newFunResult(eList))
+    check testFunction("sort", @[list, newValue("ascending")], newFunResult(eList))
 
   test "sort ascending":
     let list = newValue([2, 1])
     let eList = newValue([1, 2])
     check testFunction("sort", @[list, newValue("ascending")], newFunResult(eList))
-
-  test "sort descending":
-    let list = newValue([1, 2])
-    let eList = newValue([2, 1])
-    check testFunction("sort", @[list, newValue("descending")], newFunResult(eList))
 
   test "sort descending":
     let list = newValue([2, 3, 4, 4, 5, 5])
@@ -1157,17 +1173,17 @@ suite "runFunction.nim":
   test "sort floats":
     let list = newValue([2.4, 1.6])
     let eList = newValue([1.6, 2.4])
-    check testFunction("sort", @[list], newFunResult(eList))
+    check testFunction("sort", @[list, newValue("ascending")], newFunResult(eList))
 
   test "sort strings":
     let list = newValue(["abc", "b", "aaa"])
     let eList = newValue(["aaa", "abc", "b"])
-    check testFunction("sort", @[list], newFunResult(eList))
+    check testFunction("sort", @[list, newValue("ascending")], newFunResult(eList))
 
   test "sort strings case sensitive":
     let list = newValue(["A", "a", "b", "B"])
     let eList = newValue(["A", "B", "a", "b"])
-    check testFunction("sort", @[list], newFunResult(eList))
+    check testFunction("sort", @[list, newValue("ascending")], newFunResult(eList))
 
   test "sort strings case insensitive":
     # Sort is order preserving.
@@ -1180,9 +1196,13 @@ suite "runFunction.nim":
     let l2 = newValue([2, 3, 0])
     let list = newValue([l1, l2])
     let eList = newValue([l2, l1])
-    check testFunction("sort", @[list, newValue("ascending")], newFunResult(eList))
+    check testFunction("sort", @[
+      list, newValue("ascending"), newValue("insensitive")
+    ], newFunResult(eList))
     let eList2 = newValue([l1, l2])
-    check testFunction("sort", @[list, newValue("descending")], newFunResult(eList2))
+    check testFunction("sort", @[
+      list, newValue("descending"), newValue("insensitive")
+    ], newFunResult(eList2))
 
   test "sort dicts":
     var d1 = newValue([
@@ -1197,38 +1217,44 @@ suite "runFunction.nim":
     let list = newValue([d1, d2])
     let eList2 = newValue([d2, d1])
 
-    check testFunction("sort", @[list, newValue("ascending"),
-      newValue("sensitive"), newValue("weight")], newFunResult(list))
+    check testFunction("sort", @[
+      list, newValue("ascending"), newValue("sensitive"), newValue("weight")
+    ], newFunResult(list))
 
-    check testFunction("sort", @[list, newValue("ascending"),
-      newValue("sensitive"), newValue("name")], newFunResult(list))
+    check testFunction("sort", @[
+      list, newValue("ascending"), newValue("sensitive"), newValue("name")
+    ], newFunResult(list))
 
-    check testFunction("sort", @[list, newValue("descending"),
-      newValue("sensitive"), newValue("name")], newFunResult(eList2))
+    check testFunction("sort", @[
+      list, newValue("descending"), newValue("sensitive"), newValue("name")
+    ], newFunResult(eList2))
 
-    check testFunction("sort", @[list, newValue("descending"),
-      newValue("sensitive"), newValue("weight")], newFunResult(eList2))
+    check testFunction("sort", @[
+      list, newValue("descending"), newValue("sensitive"), newValue("weight")
+    ], newFunResult(eList2))
 
-    check testFunction("sort", @[list, newValue("descending"),
-      newValue("sensitive"), newValue("weight")], newFunResult(eList2))
+    check testFunction("sort", @[
+      list, newValue("descending"), newValue("sensitive"), newValue("weight")
+    ], newFunResult(eList2))
 
-    check testFunction("sort", @[list, newValue("descending"),
-      newValue("insensitive"), newValue("name")], newFunResult(eList2))
+    check testFunction("sort", @[
+      list, newValue("descending"), newValue("insensitive"), newValue("name")
+    ], newFunResult(eList2))
 
   test "sort: wrong number of parameters":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(wOneToFourParameters, 0)
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "0")
     check testFunction("sort", parameters, eFunResult)
 
   test "sort: not list":
-    var parameters: seq[Value] = @[newValue(0)]
-    let eFunResult = newFunResultWarn(wExpectedList, 0)
+    var parameters: seq[Value] = @[newValue(0), newValue("ascending")]
+    let eFunResult = newFunResultWarn(kWrongType, 0, "list", "int")
     check testFunction("sort", parameters, eFunResult)
 
   test "sort: invalid order":
     let list = newValue([1])
     var parameters: seq[Value] = @[list, newValue(22)]
-    let eFunResult = newFunResultWarn(wExpectedSortOrder, 1)
+    let eFunResult = newFunResultWarn(kWrongType, 1, "string", "int")
     check testFunction("sort", parameters, eFunResult)
 
   test "sort: invalid order spelling":
@@ -1238,31 +1264,40 @@ suite "runFunction.nim":
     check testFunction("sort", parameters, eFunResult)
 
   test "sort: values not same kind":
-    var parameters: seq[Value] = @[newValue([newValue(1), newValue(2.2)])]
+    var parameters: seq[Value] = @[
+      newValue([newValue(1), newValue(2.2)]),
+      newValue("ascending"),
+    ]
     let eFunResult = newFunResultWarn(wNotSameKind, 0)
-    check testFunction("sort", parameters, eFunResult)
-
-  test "sort: first dict missing key":
-    let dict = newValue([("a", 2)])
-    let list = newValue([dict, dict, dict])
-    var parameters: seq[Value] = @[list]
-    let eFunResult = newFunResultWarn(wExpectedKey, 3)
     check testFunction("sort", parameters, eFunResult)
 
   test "sort: invalid sensitive option":
     let list = newValue(["abc", "b", "aaa"])
-    var parameters: seq[Value] = @[list, newValue("ascending"), newValue(2.2)]
-    let eFunResult = newFunResultWarn(wExpectedSensitivity, 2)
+    var parameters: seq[Value] = @[list,
+      newValue("ascending"),
+      newValue(2.2),
+    ]
+    var eFunResult = newFunResultWarn(kWrongType, 2, "string", "float")
     check testFunction("sort", parameters, eFunResult)
 
-    parameters = @[list, newValue("ascending"), newValue("t")]
+    parameters = @[
+      list,
+      newValue("ascending"),
+      newValue("t")
+    ]
+    eFunResult = newFunResultWarn(wExpectedSensitivity, 2)
     check testFunction("sort", parameters, eFunResult)
 
   test "sort: none first dict key missing":
     let d1 = newValue([("a", 2), ("b", 3)])
     let d2 = newValue([("a3", 2), ("b3", 3)])
     let list = newValue([d1, d2])
-    var parameters = @[list, newValue("ascending"), newValue("sensitive"), newValue("a")]
+    var parameters = @[
+      list,
+      newValue("ascending"),
+      newValue("sensitive"),
+      newValue("a")
+    ]
     let eFunResult = newFunResultWarn(wDictKeyMissing, 0)
     check testFunction("sort", parameters, eFunResult)
 
@@ -1270,7 +1305,12 @@ suite "runFunction.nim":
     let d1 = newValue([("a", 2), ("b", 3)])
     let d2 = newValue([("a", 2.2), ("b", 3.3)])
     let list = newValue([d1, d2])
-    var parameters = @[list, newValue("ascending"), newValue("sensitive"), newValue("a")]
+    var parameters = @[
+      list,
+      newValue("ascending"),
+      newValue("sensitive"),
+      newValue("a")
+    ]
     let eFunResult = newFunResultWarn(wKeyValueKindDiff, 0)
     check testFunction("sort", parameters, eFunResult)
 

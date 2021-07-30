@@ -1463,103 +1463,119 @@ readmefun nimble task which uses the StaticTea template
 List of functions:
 
 # Dynamic Content Begins
-- [[#add][add()]] -- Add two or more numbers.
-- [[#case][case()]] -- Return a value from multiple choices.
-- [[#cmp][cmp()]] -- Compare two values.
+- [[#add_Fi][add_Fi()]] -- Add floats.
+- [[#add_Ii][add_Ii()]] -- Add integers.
+- [[#case_iaIAa][case_iaIAa()]] -- Return a value from multiple choices.
+- [[#case_saSAa][case_saSAa()]] -- Return a value from multiple choices.
 - [[#cmpVersion][cmpVersion()]] -- Compare two StaticTea version numbers.
+- [[#cmp_ffi][cmp_ffi()]] -- 
+Compare two floats.
+- [[#cmp_iii][cmp_iii()]] -- 
+Compare two ints.
+- [[#cmp_ssoii][cmp_ssoii()]] -- 
+Compare two strings.
 - [[#concat][concat()]] -- Concatentate two or more strings.
 - [[#dict][dict()]] -- Create a dictionary from a list of key, value pairs.
 - [[#dup][dup()]] -- Duplicate a string.
 - [[#exists][exists()]] -- Determine whether a key exists in a dictionary.
 - [[#find][find()]] -- Return the position of a substring in a string.
-- [[#float][float()]] -- Create a float from an int or an int number string.
-- [[#get][get()]] -- Get a value from a list or dictionary.
+- [[#float_if][float_if()]] -- Create a float from an int.
+- [[#float_sf][float_sf()]] -- Create a float from a number string.
+- [[#get_dsoaa][get_dsoaa()]] -- Return a value in a dictionary by key.
+- [[#get_lioaa][get_lioaa()]] -- Return a value from a list by its index.
 - [[#githubAnchor][githubAnchor()]] -- Create a Github markdown anchor name given a heading name.
 - [[#if][if()]] -- Return a value when the condition is 1 and another value when the
 condition is not 1.
-- [[#int][int()]] -- Create an int from a float or a float number string.
+- [[#int_fosi][int_fosi()]] -- Create an int from a float.
+- [[#int_sosi][int_sosi()]] -- Create an int from a number string.
 - [[#keys][keys()]] -- Create a list from the keys in a dictionary.
-- [[#len][len()]] -- Length of a string, list or dictionary.
+- [[#len_di][len_di()]] -- Return the number of elements in a dictionary.
+- [[#len_li][len_li()]] -- Return the number of elements in a list.
+- [[#len_si][len_si()]] -- Return the length of a string in characters, not bytes.
 - [[#list][list()]] -- Create a list of values.
 - [[#lower][lower()]] -- Lowercase a string.
 - [[#path][path()]] -- Split a file path into pieces.
 - [[#replace][replace()]] -- Replace a substring by its position.
-- [[#replaceRe][replaceRe()]] -- Replace multiple parts of a string using regular expressions.
-- [[#sort][sort()]] -- Sort a list of values of the same type.
+- [[#replaceRe_sSSs][replaceRe_sSSs()]] -- Replace multiple parts of a string using regular expressions.
+- [[#replaceRe_sls][replaceRe_sls()]] -- Replace multiple parts of a string using regular expressions.
+- [[#sort_lsosl][sort_lsosl()]] -- Sort a list of values of the same type.
+- [[#sort_lssil][sort_lssil()]] -- Sort a list of lists.
+- [[#sort_lsssl][sort_lsssl()]] -- Sort a list of dictionaries.
 - [[#substr][substr()]] -- Extract a substring from a string by its position.
 - [[#values][values()]] -- Create a list of the values in the specified dictionary.
 
 [[#contents][茶]]
 
-** add()
+** add_Fi()
 :PROPERTIES:
-:CUSTOM_ID: add
+:CUSTOM_ID: add_Fi
 :END:
 
-Add two or more numbers.  The parameters must be all integers or
-all floats.  A warning is generated on overflow.
+Add floats. A warning is generated on overflow.
 
 #+BEGIN_SRC
-add(numbers: varargs(int)) int
 add(numbers: varargs(float)) float
 #+END_SRC
-
-Integer case:
-
-- p1: int
-- p2: int
-- ...
-- pn: int
-- return: int
-
-Float case:
-
-- p1: float
-- p2: float
-- ...
-- pn: float
-- return: float
 
 Examples:
 
 #+BEGIN_SRC
-add(1, 2) => 3
-add(1, 2, 3) => 6
-
+add(1.5) => 1.5
 add(1.5, 2.3) => 3.8
 add(1.1, 2.2, 3.3) => 6.6
 #+END_SRC
 
 [[#contents][茶]]
 
-** case()
+** add_Ii()
 :PROPERTIES:
-:CUSTOM_ID: case
+:CUSTOM_ID: add_Ii
 :END:
 
-Return a value from multiple choices. It takes a main condition,
-any number of case pairs and an optional else value.
-
-The first parameter of a case pair is the condition and the
-second is the return value when that condition matches the main
-condition. The function compares the conditions left to right and
-returns the first match.
-
-When none of the cases match the main condition, the "else" value
-is returned.  The conditions must be integers or strings. The
-return values can be any type.
+Add integers. A warning is generated on overflow.
 
 #+BEGIN_SRC
-case(condition: int, elseCase: any, pairs: varargs(int, any) any
-case(condition: string, elseCase: any, pairs: varargs(string, any) any
+add(numbers: varargs(int)) int
 #+END_SRC
 
 Examples:
 
 #+BEGIN_SRC
-case(8, "water", 8, "tea") => "tea"
-case(8, "water", 3, "tea") => "water"
-case(8, "beer", +
+add(1) => 1
+add(1, 2) => 3
+add(1, 2, 3) => 6
+#+END_SRC
+
+[[#contents][茶]]
+
+** case_iaIAa()
+:PROPERTIES:
+:CUSTOM_ID: case_iaIAa
+:END:
+
+Return a value from multiple choices. It takes a main condition,
+an integer, any number of case pairs and an optional else value.
+
+The first element of a case pair is the condition and the
+second is the return value when that condition matches the main
+condition. The function compares the conditions left to right and
+returns the first match.
+
+When none of the cases match the main condition, the "else"
+value is returned.  The conditions must be integers. The return
+values can be any type.
+
+#+BEGIN_SRC
+case(condition: int, elseCase: any, pairs: varargs(int, any)) any
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+cond = 8
+case(cond, "water", 8, "tea") => "tea"
+case(cond, "water", 3, "tea") => "water"
+case(cond, "beer", +
   1, "tea", +
   2, "water", +
   3, "wine") => "beer"
@@ -1567,46 +1583,37 @@ case(8, "beer", +
 
 [[#contents][茶]]
 
-** cmp()
+** case_saSAa()
 :PROPERTIES:
-:CUSTOM_ID: cmp
+:CUSTOM_ID: case_saSAa
 :END:
 
-Compare two values. Returns -1 for less, 0 for equal and 1 for
-greater than.  The values are either int, float or string (both
-the same type) The default compares strings case sensitive, use 1
-for case insensitive.
+Return a value from multiple choices. It takes a main condition,
+a string, any number of case pairs and an optional else value.
+
+The first element of a case pair is the condition and the
+second is the return value when that condition matches the main
+condition. The function compares the conditions left to right and
+returns the first match.
+
+When none of the cases match the main condition, the "else"
+value is returned.  The conditions must be strings. The return
+values can be any type.
 
 #+BEGIN_SRC
-cmp(a: int, b: int) int
-cmp(a: float, b: float) int
-cmp(a: string, b: string, optional insensitive: int) int
+case(condition: string, elseCase: any, pairs: varargs(int, any)) any
 #+END_SRC
-
-Compare numbers:
-
-- p1: number
-- p2: number
-- return: -1, 0, 1
-
-Compare strings:
-
-- p1: string
-- p2: string
-- p3: optional: 1 for case insensitive
-- return: -1, 0, 1
 
 Examples:
 
 #+BEGIN_SRC
-cmp(7, 9) => -1
-cmp(8, 8) => 0
-cmp(9, 2) => 1
-
-cmp("coffee", "tea") => -1
-cmp("tea", "tea") => 0
-cmp("Tea", "tea") => 1
-cmp("Tea", "tea", 1) => 0
+cond = "tea"
+case(cond, "water", 8, "tea") => "tea"
+case(cond, "water", 3, "tea") => "water"
+case(cond, "beer", +
+  1, "tea", +
+  2, "water", +
+  3, "wine") => "beer"
 #+END_SRC
 
 [[#contents][茶]]
@@ -1633,6 +1640,80 @@ Examples:
 cmpVersion("1.2.5", "1.1.8") => -1
 cmpVersion("1.2.5", "1.3.0") => 1
 cmpVersion("1.2.5", "1.2.5") => 0
+#+END_SRC
+
+[[#contents][茶]]
+
+** cmp_ffi()
+:PROPERTIES:
+:CUSTOM_ID: cmp_ffi
+:END:
+
+
+Compare two floats. Returns -1 for less, 0 for
+equal and 1 for greater than.
+
+#+BEGIN_SRC
+cmp(a: float, b: float) int
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+cmp(7.8, 9.1) => -1
+cmp(8.4, 8.4) => 0
+cmp(9.3, 2.2) => 1
+#+END_SRC
+
+[[#contents][茶]]
+
+** cmp_iii()
+:PROPERTIES:
+:CUSTOM_ID: cmp_iii
+:END:
+
+
+Compare two ints. Returns -1 for less, 0 for equal and 1 for
+ greater than.
+
+#+BEGIN_SRC
+cmp(a: int, b: int) int
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+cmp(7, 9) => -1
+cmp(8, 8) => 0
+cmp(9, 2) => 1
+#+END_SRC
+
+[[#contents][茶]]
+
+** cmp_ssoii()
+:PROPERTIES:
+:CUSTOM_ID: cmp_ssoii
+:END:
+
+
+Compare two strings. Returns -1 for less, 0 for equal and 1 for
+greater than.
+
+You have the option to compare case insensitive. Case sensitive
+is the default.
+
+#+BEGIN_SRC
+cmp(a: string, b: string, optional insensitive: int) int
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+cmp("coffee", "tea") => -1
+cmp("tea", "tea") => 0
+cmp("Tea", "tea") => 1
+cmp("Tea", "tea", 0) => 1
+cmp("Tea", "tea", 1) => 0
 #+END_SRC
 
 [[#contents][茶]]
@@ -1752,66 +1833,89 @@ find(msg, "party", 0) = 0
 
 [[#contents][茶]]
 
-** float()
+** float_if()
 :PROPERTIES:
-:CUSTOM_ID: float
+:CUSTOM_ID: float_if
 :END:
 
-Create a float from an int or an int number string.
+Create a float from an int.
 
 #+BEGIN_SRC
 float(num: int) float
-float(numString: string) float
 #+END_SRC
-
-- p1: int or int string
-- return: float
 
 Examples:
 
 #+BEGIN_SRC
 float(2) => 2.0
+float(-33) => -33.0
+#+END_SRC
+
+[[#contents][茶]]
+
+** float_sf()
+:PROPERTIES:
+:CUSTOM_ID: float_sf
+:END:
+
+Create a float from a number string.
+
+#+BEGIN_SRC
+float(numString: string) float
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+float("2") => 2.0
+float("2.4") => 2.4
 float("33") => 33.0
 #+END_SRC
 
 [[#contents][茶]]
 
-** get()
+** get_dsoaa()
 :PROPERTIES:
-:CUSTOM_ID: get
+:CUSTOM_ID: get_dsoaa
 :END:
 
-Get a value from a list or dictionary.
-
-For a list you specify the index of the item you want to get. If
-the index is too big, the default value is returned, if
-specified, else a warning is generated.
-
-For a dictionary you specify the key of the item you want to
-get. If the key doesn't exist, the default value is returned, if
-specified, else a warning is generated.
+Return a value in a dictionary by key.  If the key doesn't
+exist, the default value is returned, if specified, else a
+warning is generated.
 
 #+BEGIN_SRC
-get(list: list, index: int, optional default: any) any
 get(dictionary: dict, key: string, optional default: any) any
 #+END_SRC
 
 Note: For dictionary lookup you can use dot notation. It's the
 same as get without the default.
 
-List case:
+Examples:
 
-- p1: list
-- p2: index of item
-- p3: optional default value returned when index is too big
-- return: value
+#+BEGIN_SRC
+d = dict("tea", "Earl Grey")
+get(d, 'tea') => "Earl Grey"
+get(d, 'coffee', 'Tea') => "Tea"
 
-Dictionary case:
+Using dot notation:
+d = dict("tea", "Earl Grey")
+d.tea => "Earl Grey"
+#+END_SRC
 
-- p1: dictionary
-- p2: key string
-- p3: optional default value returned when key is missing
-- return: value
+[[#contents][茶]]
+
+** get_lioaa()
+:PROPERTIES:
+:CUSTOM_ID: get_lioaa
+:END:
+
+Return a value from a list by its index.  If the index is too
+big, the default value is returned when specified, else a warning
+is generated.
+
+#+BEGIN_SRC
+get(list: list, index: int, optional default: any) any
+#+END_SRC
 
 Examples:
 
@@ -1819,13 +1923,6 @@ Examples:
 list = list(4, 'a', 10)
 get(list, 2) => 10
 get(list, 3, 99) => 99
-
-d = dict("tea", "Earl Grey")
-get(d, 'tea') => "Earl Grey"
-get(d, 'coffee', 'Tea') => "Tea"
-
-d = dict("tea", "Earl Grey")
-d.tea => "Earl Grey"
 #+END_SRC
 
 [[#contents][茶]]
@@ -1884,21 +1981,20 @@ if(4, 'tea', 'beer') => "beer"
 
 [[#contents][茶]]
 
-** int()
+** int_fosi()
 :PROPERTIES:
-:CUSTOM_ID: int
+:CUSTOM_ID: int_fosi
 :END:
 
-Create an int from a float or a float number string.
+Create an int from a float.
 
 #+BEGIN_SRC
 int(num: float, optional roundOption: string) int
-int(numString: string, optional roundOption: string) int
 #+END_SRC
 
 Round options:
 
-- "round" - nearest integer
+- "round" - nearest integer, the default.
 - "floor" - integer below (to the left on number line)
 - "ceiling" - integer above (to the right on number line)
 - "truncate" - remove decimals
@@ -1906,8 +2002,7 @@ Round options:
 Examples:
 
 #+BEGIN_SRC
-int("2") => 2
-int("2.34") => 2
+int(2.34) => 2
 int(2.34, "round") => 2
 int(-2.34, "round") => -2
 int(6.5, "round") => 7
@@ -1918,6 +2013,42 @@ int(6.3, "ceiling") => 7
 int(-6.3, "ceiling") => -6
 int(6.3456, "truncate") => 6
 int(-6.3456, "truncate") => -6
+#+END_SRC
+
+[[#contents][茶]]
+
+** int_sosi()
+:PROPERTIES:
+:CUSTOM_ID: int_sosi
+:END:
+
+Create an int from a number string.
+
+#+BEGIN_SRC
+int(numString: string, optional roundOption: string) int
+#+END_SRC
+
+Round options:
+
+- "round" - nearest integer, the default
+- "floor" - integer below (to the left on number line)
+- "ceiling" - integer above (to the right on number line)
+- "truncate" - remove decimals
+
+Examples:
+
+#+BEGIN_SRC
+int("2") => 2
+int("2.34") => 2
+int("-2.34", "round") => -2
+int("6.5", "round") => 7
+int("-6.5", "round") => -7
+int("4.57", "floor") => 4
+int("-4.57", "floor") => -5
+int("6.3", "ceiling") => 7
+int("-6.3", "ceiling") => -6
+int("6.3456", "truncate") => 6
+int("-6.3456", "truncate") => -6
 #+END_SRC
 
 [[#contents][茶]]
@@ -1943,30 +2074,64 @@ values(d) => ["apple", 2, 3]
 
 [[#contents][茶]]
 
-** len()
+** len_di()
 :PROPERTIES:
-:CUSTOM_ID: len
+:CUSTOM_ID: len_di
 :END:
 
-Length of a string, list or dictionary. For strings it returns
-the number of characters, not bytes. For lists and dictionaries
-it returns the number of elements.
+Return the number of elements in a dictionary.
 
 #+BEGIN_SRC
-len(str: string) int
-len(list: list) int
 len(dictionary: dict) int
 #+END_SRC
 
-- p1: string, list or dict
-- return: int
+Examples:
+
+#+BEGIN_SRC
+len(dict()) => 0
+len(dict('a', 4)) => 1
+len(dict('a', 4, 'b', 3)) => 2
+#+END_SRC
+
+[[#contents][茶]]
+
+** len_li()
+:PROPERTIES:
+:CUSTOM_ID: len_li
+:END:
+
+Return the number of elements in a list.
+
+#+BEGIN_SRC
+len(list: list) int
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+len(list()) => 0
+len(list(1)) => 1
+len(list(4, 5)) => 2
+#+END_SRC
+
+[[#contents][茶]]
+
+** len_si()
+:PROPERTIES:
+:CUSTOM_ID: len_si
+:END:
+
+Return the length of a string in characters, not bytes.
+
+#+BEGIN_SRC
+len(str: string) int
+#+END_SRC
 
 Examples:
 
 #+BEGIN_SRC
 len("tea") => 3
-len(list(4, 1)) => 2
-len(dict('a', 4)) => 1
+len("añyóng") => 6
 #+END_SRC
 
 [[#contents][茶]]
@@ -2096,39 +2261,19 @@ replace("123", 0, 3, "") =>
 
 [[#contents][茶]]
 
-** replaceRe()
+** replaceRe_sSSs()
 :PROPERTIES:
-:CUSTOM_ID: replaceRe
+:CUSTOM_ID: replaceRe_sSSs
 :END:
 
 Replace multiple parts of a string using regular expressions.
 
 You specify one or more pairs of a regex patterns and its string
-replacement. The pairs can be specified as parameters to the
-function or they can be part of a list.
+replacement.
 
 #+BEGIN_SRC
 replaceRe(str: string, pairs: varargs(string, string) string
-replaceRe(str: string, pairs: list) string
 #+END_SRC
-
-Muliple parameters case:
-
-- p1: string to replace
-- p2: pattern 1
-- p3: replacement string 1
-- p4: optional: pattern 2
-- p5: optional: replacement string 2
-- ...
-- pn-1: optional: pattern n
-- pn: optional: replacement string n
-- return: string
-
-List case:
-
-- p1: string to replace
-- p2: list of pattern and replacement pairs
-- return: string
 
 Examples:
 
@@ -2137,6 +2282,30 @@ replaceRe("abcdefabc", "abc", "456")
   => "456def456"
 replaceRe("abcdefabc", "abc", "456", "def", "")
   => "456456"
+#+END_SRC
+
+For developing and debugging regular expressions see the
+website: https://regex101.com/
+
+[[#contents][茶]]
+
+** replaceRe_sls()
+:PROPERTIES:
+:CUSTOM_ID: replaceRe_sls
+:END:
+
+Replace multiple parts of a string using regular expressions.
+
+You specify one or more pairs of a regex patterns and its string
+replacement.
+
+#+BEGIN_SRC
+replaceRe(str: string, pairs: list) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
 list = list("abc", "456", "def", "")
 replaceRe("abcdefabc", list))
   => "456456"
@@ -2147,72 +2316,97 @@ website: https://regex101.com/
 
 [[#contents][茶]]
 
-** sort()
+** sort_lsosl()
 :PROPERTIES:
-:CUSTOM_ID: sort
+:CUSTOM_ID: sort_lsosl
 :END:
 
-Sort a list of values of the same type.
+Sort a list of values of the same type.  The values are ints,
+floats or strings.
 
-You have the option of sorting ascending or descending.
+You specify the sort order, "ascending" or "descending".
 
-When sorting strings you have the option to compare case
-sensitive or insensitive.
-
-When sorting lists, you specify which index to compare by, index
-0 is the default.  The compare index value must exist in each list, be
-the same type and be an int, float or string.
-
-When sorting dictionaries, you specify which key to compare by.
-The key value must exist in each dictionary, be the same type and
-be an int, float or string.
+You have the option of sorting strings case "insensitive". Case
+"sensitive" is the default.
 
 #+BEGIN_SRC
-sort(ints: list, optional order: string) list
-sort(floats: list, optional order: string) list
-sort(strings: list, order: string, optional case: string) list
-sort(lists: list, order: string, case: string, index: int) list
-sort(dicts: list, order: string, case: string, key: string) list
+sort(values: list, order: string, optional insensitive: string) list
 #+END_SRC
-
-int, float case:
-
-- p1: list of ints or list of floats
-- p2: optional: "ascending", "descending"
-- return: sorted list
-
-string or list case:
-
-- p1: list of strings or list of lists
-- p2: optional: "ascending", "descending"
-- p3: optional: default "sensitive", "insensitive"
-- return: sorted list
-
-dictionary case:
-
-- p1: list of dictionaries
-- p2: "ascending", "descending"
-- p3: "sensitive", "insensitive"
-- p4: key string
-- return: sorted list
 
 Examples:
 
 #+BEGIN_SRC
-list = list(4, 3, 5, 5, 2, 4)
-sort(list) => [2, 3, 4, 4, 5, 5]
+ints = list(4, 3, 5, 5, 2, 4)
+sort(list, "ascending") => [2, 3, 4, 4, 5, 5]
 sort(list, "descending") => [5, 5, 4, 4, 3, 2]
 
+floats = list(4.4, 3.1, 5.9)
+sort(floats, "ascending") => [3.1, 4.4, 5.9]
+sort(floats, "descending") => [5.9, 4.4, 3.1]
+
 strs = list('T', 'e', 'a')
-sort(strs) => ['T', 'a', 'e']
+sort(strs, "ascending") => ['T', 'a', 'e']
 sort(strs, "ascending", "sensitive") => ['T', 'a', 'e']
 sort(strs, "ascending", "insensitive") => ['a', 'e', 'T']
+#+END_SRC
 
+[[#contents][茶]]
+
+** sort_lssil()
+:PROPERTIES:
+:CUSTOM_ID: sort_lssil
+:END:
+
+Sort a list of lists.
+
+You specify the sort order, "ascending" or "descending".
+
+You specify how to sort strings either case "sensitive" or
+"insensitive".
+
+You specify which index to compare by.  The compare index value
+must exist in each list, be the same type and be an int, float or
+string.
+
+#+BEGIN_SRC
+sort(lists: list, order: string, case: string, index: int) list
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
 l1 = list(4, 3, 1)
-l2 = list(2, 3, 0)
+l2 = list(2, 3, 4)
 listOfLists = list(l1, l2)
-sort(listOfLists) => [l2, l1]
+sort(listOfLists, "ascending", "sensitive", 0) => [l2, l1]
+sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
+#+END_SRC
 
+[[#contents][茶]]
+
+** sort_lsssl()
+:PROPERTIES:
+:CUSTOM_ID: sort_lsssl
+:END:
+
+Sort a list of dictionaries.
+
+You specify the sort order, "ascending" or "descending".
+
+You specify how to sort strings either case "sensitive" or
+"insensitive".
+
+You specify the compare key.  The key value must exist
+in each dictionary, be the same type and be an int, float or
+string.
+
+#+BEGIN_SRC
+sort(dicts: list, order: string, case: string, key: string) list
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
 d1 = dict('name', 'Earl Gray', 'weight', 1.2)
 d2 = dict('name', 'Tea Pot', 'weight', 3.5)
 dicts = list(d1, d2)
