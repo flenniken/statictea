@@ -276,14 +276,15 @@ suite "runFunction.nim":
     let eFunResult = newFunResultWarn(kWrongType, 1, "int", "string")
     check testFunction("get", parameters, eFunResult)
 
-  # todo: should we show the possible signatures like nim does? This
-  # one expects a list for the first parameter be it's the default
-  # when none match. Or pick the dict function instead.
-  # test "get parameter 2 wrong type dict":
-  #   var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
-  #   var parameters = @[dict, newValue(3.5)]
-  #   let eFunResult = newFunResultWarn(kWrongType, 1, "float")
-  #   check testFunction("get", parameters, eFunResult)
+  test "get warning about best matching get":
+    # Test the warning is about the function that makes it through the
+    # most number of parameters. The second get function has a dict as
+    # the first parameter so the warning should be about the wrong
+    # second parameter.
+    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
+    var parameters = @[dict, newValue(3.5)]
+    let eFunResult = newFunResultWarn(kWrongType, 1, "string", "float")
+    check testFunction("get", parameters, eFunResult)
 
   test "get wrong first parameter":
     var parameters = @[newValue(2), newValue(2)]

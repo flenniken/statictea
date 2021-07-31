@@ -1486,20 +1486,26 @@ proc getFunction*(functionName: string, parameters: seq[Value]): Option[Function
   ## If there are multiple functions with the name, return the one
   ## that matches the parameters, if none match, return the first one.
   let functionSpecList = getFunctionList(functionName)
-  if functionSpecList.len > 1:
+  if functionSpecList.len == 1:
+    result = some(functionSpecList[0])
+  elif functionSpecList.len > 1:
     # Find the function that matches the parameters.
+    var maxDistance = 0
+    var maxFunctionSpec = functionSpecList[0]
     for functionSpec in functionSpecList:
       let paramsO = signatureCodeToParams(functionSpec.signatureCode)
       let funResult = mapParameters(paramsO.get(), parameters)
       if funResult.kind != frWarning:
+        # Parameters good, return the function.
         return some(functionSpec)
-    # None match, return the first function.
+      if funResult.parameter > maxDistance:
+        maxDistance = funResult.parameter
+        maxFunctionSpec = functionSpec
+    # Return the function that made if farthest through its
+    # mapParameters.
+    result = some(maxFunctionSpec)
 
-    # todo: return the function that made if farthest through
-    # mapParameters by looking for the biggest parameter index value.
-  if functionSpecList.len != 0:
-    let functionSpec = functionSpecList[0]
-    result = some(functionSpec)
+# todo: should we show the possible signatures like nim does?
 
 proc isFunctionName*(functionName: string): bool =
   ## Return true when the function exists.
