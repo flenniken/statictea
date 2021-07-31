@@ -20,14 +20,11 @@ proc testFunction(functionName: string, parameters: seq[Value],
     eOutLines: seq[string] = @[]
   ): bool =
 
-  var env = openEnvTest("_testFunction.log")
   let functionSpecO = getFunction(functionName, parameters)
   let functionSpec = functionSpecO.get()
   let funResult = functionSpec.functionPtr(parameters)
 
-  # todo: remove env.
-  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
-
+  result = true
   if not expectedItem("funResult", funResult, eFunResult):
     result = false
     if funResult.kind == frValue and funResult.value.kind == vkDict:
@@ -568,7 +565,6 @@ suite "runFunction.nim":
 
   test "int(): wrong number of parameters":
     var parameters = @[newValue(4.57), newValue(1), newValue(2)]
-    # todo: kTooManyArgs: expected 1 or 2, got 3
     let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1", "3")
     check testFunction("int", parameters, eFunResult)
 

@@ -268,7 +268,7 @@ const
       "Wrong parameter type, expected $1 got $2.", # kWrongType
       "The required vararg parameter has no arguments.", # kNoVarargArgs
       "Missing vararg parameter, expected groups of 2 got 1.", # kNotEnoughVarargs
-      "Too many arguments, expected {requiredParams} got {args.len}.", # kTooManyArgs
+      "Too many arguments, expected at most {requiredParams} got {args.len}.", # kTooManyArgs
       "Expected at least four parameters.", # wAtLeast4Parameters
       "Expected number string.", # wExpectedNumberString
       "A case condition is not the same type as the main condition.", # wCaseTypeMismatch
