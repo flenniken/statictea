@@ -580,7 +580,7 @@ in the g dictionary.
     :END:
 
 The tea variables control how the replacement block works.
-They are are stored in the t dictionary.
+They are stored in the t dictionary.
 
 Tea variables:
 
@@ -588,7 +588,7 @@ Tea variables:
 - [[#tmaxrepeat][t.maxRepeat]] -- maximum number of times to repeat the block
 - [[#tmaxlines][t.maxLines]] -- maximum number of replacement block lines (lines before endblock)
 - [[#toutput][t.output]] -- where the block output goes
-- [[#trepeat][t.repeat]] -- controls how many times the block repeats
+- [[#trepeat][t.repeat]] -- how many times the block repeats
 - [[#trow][t.row]] -- the current index number of a repeating block
 - [[#tversion][t.version]] -- the StaticTea version number
 
@@ -919,17 +919,17 @@ StaticTea. See the [[#cmpversion][cmpVersion]] function for more information.
 
 StaticTea variable types:
 
-- [[#string-type][string]]
-- [[#int-type][int]]
-- [[#float-type][float]]
-- [[#dict-type][dict]]
-- [[#list-type][list]]
+- [[#string][string]]
+- [[#int][int]]
+- [[#float][float]]
+- [[#dict][dict]]
+- [[#list][list]]
 
 [[#contents][茶]]
 
 ** String
 :PROPERTIES:
-:CUSTOM_ID: string-type
+:CUSTOM_ID: string
 :END:
 
 A string is an immutable sequence of characters. You define a
@@ -1008,7 +1008,8 @@ type.
 
 You access dictionary items with variable names or with the get
 function.  You create them in the json files or with the dict
-function.
+function. The dictionary order is determined by the order of
+items when it is created.
 
 In Json files dictionaries are known as json objects. Json calls
 the object items name/value pairs and we call them key/value
@@ -1032,9 +1033,8 @@ server json:
 }
 #+END_SRC
 
-If a key has valid variable syntax, you can access it as a
-variable using dot notation. For the json example above, you can
-access the data as:
+If the key is a valid variable name, you can access it using dot
+notation. For the json example above, you can access the data as:
 
 #+BEGIN_SRC
 s.a => 1
@@ -1376,7 +1376,7 @@ following process:
 The nimble *docs* task builds the module markdown files by running
 the following process for each module:
 
-1. create a json file of a module docs using nim's jsondoc command
+1. create a json file of a module's docs using nim's jsondoc command
 2. format the json as markdown using the [[templates/nimModule.md][nimModule.md]] statictea template
 
 [[#contents][茶]]
@@ -1480,7 +1480,7 @@ List of functions:
 - [[#float][float()]] -- Create a float from an int.
 - [[#float][float()]] -- Create a float from a number string.
 - [[#get][get()]] -- Get a dictionary value by its key.
-- [[#get][get()]] -- Get list value by its index.
+- [[#get][get()]] -- Get a list value by its index.
 - [[#githubAnchor][githubAnchor()]] -- Create a Github markdown anchor name given a heading name.
 - [[#if][if()]] -- If the condition is 1 return one value, else return another value.
 - [[#int][int()]] -- Create an int from a float.
@@ -1909,7 +1909,7 @@ d.tea => "Earl Grey"
 :CUSTOM_ID: get
 :END:
 
-Get list value by its index.  If the index is too big, the
+Get a list value by its index.  If the index is too big, the
 default value is returned when specified, else a warning is
 generated.
 

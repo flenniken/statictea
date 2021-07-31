@@ -240,7 +240,7 @@ func funLen_di*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(dict.len))
 
 func funGet_lioaa*(parameters: seq[Value]): FunResult =
-  ## Get list value by its index.  If the index is too big, the
+  ## Get a list value by its index.  If the index is too big, the
   ## @:default value is returned when specified, else a warning is
   ## @:generated.
   ## @:

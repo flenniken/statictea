@@ -13,7 +13,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funLen_si](#funlen_si) &mdash; Length of a string in characters, not bytes.
 * [funLen_li](#funlen_li) &mdash; Number of elements in a list.
 * [funLen_di](#funlen_di) &mdash; Number of elements in a dictionary.
-* [funGet_lioaa](#funget_lioaa) &mdash; Get list value by its index.
+* [funGet_lioaa](#funget_lioaa) &mdash; Get a list value by its index.
 * [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
 * [funIf](#funif) &mdash; If the condition is 1 return one value, else return another value.
 * [funAdd_Ii](#funadd_ii) &mdash; Add integers.
@@ -213,7 +213,7 @@ func funLen_di(parameters: seq[Value]): FunResult
 
 # funGet_lioaa
 
-Get list value by its index.  If the index is too big, the
+Get a list value by its index.  If the index is too big, the
 default value is returned when specified, else a warning is
 generated.
 

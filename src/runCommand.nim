@@ -85,7 +85,7 @@ proc warnStatement*(env: var Env, statement: Statement, warning:
                     Warning, start: Natural, p1: string = "", p2:
                                          string = "") =
   ## Show an invalid statement with a pointer pointing at the start of
-  ## the problem. Long statemetns are trimmed around the problem area.
+  ## the problem. Long statements are trimmed around the problem area.
 
   var fragment: string
   var extraStart = ""

@@ -73,7 +73,7 @@ proc startColumn(start: Natural): string
 
 # warnStatement
 
-Show an invalid statement with a pointer pointing at the start of the problem. Long statemetns are trimmed around the problem area.
+Show an invalid statement with a pointer pointing at the start of the problem. Long statements are trimmed around the problem area.
 
 ```nim
 proc warnStatement(env: var Env; statement: Statement; warning: Warning;
