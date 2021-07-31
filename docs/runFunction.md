@@ -9,14 +9,13 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funCmp_iii](#funcmp_iii) &mdash; Compare two ints.
 * [funCmp_ffi](#funcmp_ffi) &mdash; Compare two floats.
 * [funCmp_ssoii](#funcmp_ssoii) &mdash; Compare two strings.
-* [funConcat](#funconcat) &mdash; Concatentate two or more strings.
+* [funConcat](#funconcat) &mdash; Concatentate strings.
 * [funLen_si](#funlen_si) &mdash; Length of a string in characters, not bytes.
 * [funLen_li](#funlen_li) &mdash; Number of elements in a list.
 * [funLen_di](#funlen_di) &mdash; Number of elements in a dictionary.
 * [funGet_lioaa](#funget_lioaa) &mdash; Get list value by its index.
 * [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
-* [funIf](#funif) &mdash; If the condition is 1 return one value, else return another
-value.
+* [funIf](#funif) &mdash; If the condition is 1 return one value, else return another value.
 * [funAdd_Ii](#funadd_ii) &mdash; Add integers.
 * [funAdd_Fi](#funadd_fi) &mdash; Add floats.
 * [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
@@ -33,11 +32,10 @@ value.
 * [funDup](#fundup) &mdash; Duplicate a string x times.
 * [funDict](#fundict) &mdash; Create a dictionary from a list of key, value pairs.
 * [funList](#funlist) &mdash; Create a list of values.
-* [funReplace](#funreplace) &mdash; Replace a substring specified by its position and length with
-another string.
+* [funReplace](#funreplace) &mdash; Replace a substring specified by its position and length with another string.
 * [funReplaceRe_sSSs](#funreplacere_ssss) &mdash; Replace multiple parts of a string using regular expressions.
 * [funReplaceRe_sls](#funreplacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
-* [funPath](#funpath) &mdash; Split a file path into pieces.
+* [funPath](#funpath) &mdash; Split a file path into its component pieces.
 * [funLower](#funlower) &mdash; Lowercase a string.
 * [funKeys](#funkeys) &mdash; Create a list from the keys in a dictionary.
 * [funValues](#funvalues) &mdash; Create a list out of the values in the specified dictionary.
@@ -132,7 +130,7 @@ func funCmp_ssoii(parameters: seq[Value]): FunResult
 
 # funConcat
 
-Concatentate two or more strings.
+Concatentate strings.
 
 ~~~
 concat(strs: varargs(string)) string
@@ -143,6 +141,7 @@ Examples:
 ~~~
 concat("tea", " time") => "tea time"
 concat("a", "b", "c", "d") => "abcd"
+concat("a") => "a"
 ~~~~
 
 ```nim
@@ -254,8 +253,10 @@ Examples:
 d = dict("tea", "Earl Grey")
 get(d, 'tea') => "Earl Grey"
 get(d, 'coffee', 'Tea') => "Tea"
+~~~~
 
 Using dot notation:
+~~~
 d = dict("tea", "Earl Grey")
 d.tea => "Earl Grey"
 ~~~~
@@ -267,8 +268,7 @@ func funGet_dsoaa(parameters: seq[Value]): FunResult
 
 # funIf
 
-If the condition is 1 return one value, else return another
-value.
+If the condition is 1 return one value, else return another value.
 
 ~~~
 if(condition: int, oneCase: any, notOne: any) any
@@ -638,6 +638,8 @@ Examples:
 
 ~~~
 dup("=", 3) => "==="
+dup("abc", 0) => ""
+dup("abc", 1) => "abc"
 dup("abc", 2) => "abcabc"
 dup("", 3) => ""
 ~~~~
@@ -694,8 +696,7 @@ func funList(parameters: seq[Value]): FunResult
 
 # funReplace
 
-Replace a substring specified by its position and length with
-another string.  You can use the function to insert and append to
+Replace a substring specified by its position and length with another string.  You can use the function to insert and append to
 a string as well.
 
 ~~~
@@ -796,8 +797,8 @@ func funReplaceRe_sls(parameters: seq[Value]): FunResult
 
 # funPath
 
-Split a file path into pieces. Return a dictionary with the
-filename, basename, extension and directory.
+Split a file path into its component pieces. Return a dictionary
+with the filename, basename, extension and directory.
 
 You pass a path string and the optional path separator, forward
 slash or or backwards slash. When no separator, the current
@@ -843,6 +844,7 @@ Examples:
 ~~~
 lower("Tea") => "tea"
 lower("TEA") => "tea"
+lower("TEĀ") => "teā"
 ~~~~
 
 ```nim
@@ -996,9 +998,9 @@ func funSort_lsssl(parameters: seq[Value]): FunResult
 
 Create a Github markdown anchor name given a heading name. Use it
 for Github markdown internal links. If you have duplicate heading
-names, the anchor name returned only works for the first. Some
-characters like underscored are removed so you can get duplicates
-in some cases.
+names, the anchor name returned only works for the
+first. Punctuation characters are removed so you can get
+duplicates in some cases.
 
 ~~~
 githubAnchor(name: string) string

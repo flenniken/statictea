@@ -60,12 +60,13 @@ template type.
 
 [[#contents][茶]]
 
-* Commands
+* StaticTea Commands
 :PROPERTIES:
 :CUSTOM_ID: commands
 :END:
 
-StaticTea commands:
+A command marks replacement content in the template and it
+provides a place for your code statements.
 
 - [[#nextline-command][nextline]] -- make substitutions in the next line
 - [[#block-command][block]] —- make substitutions in the next block of lines
@@ -359,7 +360,7 @@ fake nextline
 :END:
 
 A replacement block is a group of contiguous lines in a template
-between a command and its endblock or in the nextline case the
+between a command and its endblock. For the nextline case the
 block is one line.
 
 The block contains the any number of bracketed variables for
@@ -378,7 +379,8 @@ repeated block.
 :CUSTOM_ID: statements
 :END:
 
-You format server content in variables you create in statements.
+You format server content with variables you create in
+statements.
 
 A statement is an expression consisting of a variable, an equal
 sign, and a right hand side. The right hand side is either
@@ -477,7 +479,7 @@ blank statements that do nothing. Both commands below have three
 statements: a = 1, b = 2 and c = 3.
 
 #+BEGIN_SRC
-<!--$ nextline a=1; b=2; c=3 -->
+$$ nextline a=1; b=2; c=3
 
 $$ nextline a = 1
 $$ : b = 2
@@ -784,7 +786,7 @@ result:
 <select>
 <option>Lipton</option>
 <option>Tetley</option>
-<option>selected="selected">Twinings</option>
+<option selected="selected">Twinings</option>
 <option>Argo Tea</option>
 <option>American Tea Room</option>
 <option>Bigelow Tea Company</option>
@@ -865,7 +867,7 @@ that repeat. The row numbers start at 0 and increase.  You use it
 to format lists and other repeating content in the template.
 
 Here is an example using the row variable.  In the example the
-row number is used in three places.
+row is used in three places.
 
 template:
 
@@ -1297,8 +1299,8 @@ examples:
 Templates are utf-8 encoded.  Two line endings are supported on
 all platforms: LF, and CR/LF.  Line endings are preserved.  The
 template syntax only uses ascii except unicode characters are
-allowed in quoted strings. The maximum command line length is
-1024 bytes, there is no limit on non-command lines.
+allowed in strings. The maximum command line length is 1024
+bytes, there is no limit on non-command lines.
 
 Since line endings are preserved and there are no encoding or
 line length restrictions on non-command lines, you can make
@@ -1357,22 +1359,21 @@ the platform:
    :END:
 
 You can read the StaticTea source code documentation in Gitlab
-because it is formatted as gitlab markdown. Statictea
-created the markdown files from the embedded doc comments.
+because it is formatted as gitlab markdown. Statictea created the
+markdown files from the source code's embedded doc comments.
 
-- [[docs/index.md][Module Index]] --- Index to the nim module documents.
+- [[docs/index.md][StaticTea Source Docs]] --- Index to the
+  source code documents.
 
-Build Module Index:
-
-The nimble *docsix* task builds the module index markdown file by running
-the following process:
+The nimble *docsix* task builds the module index by running the
+following process:
 
 1. create a json file from the doc comments at the top of all the source files
-2. format the json as markdown using the [[templates/nimModuleIndex.md][nimModuleIndex.md]] statictea template
+2. format the json as markdown using the
+   [[templates/nimModuleIndex.md][nimModuleIndex.md]] statictea
+   template. Click the link then "View Raw".
 
-Build Module Docs:
-
-The nimble *docs* task builds the modules markdown files by running
+The nimble *docs* task builds the module markdown files by running
 the following process for each module:
 
 1. create a json file of a module docs using nim's jsondoc command
@@ -1463,50 +1464,48 @@ readmefun nimble task which uses the StaticTea template
 List of functions:
 
 # Dynamic Content Begins
-- [[#funAdd_Fi][add()]] -- Add floats.
-- [[#funAdd_Ii][add()]] -- Add integers.
-- [[#funCase_iloaa][case()]] -- Compare integer cases and return the matching value.
-- [[#funCase_sloaa][case()]] -- Compare string cases and return the matching value.
-- [[#funCmpVersion][cmpVersion()]] -- Compare two StaticTea version numbers.
-- [[#funCmp_ffi][cmp()]] -- Compare two floats.
-- [[#funCmp_iii][cmp()]] -- Compare two ints.
-- [[#funCmp_ssoii][cmp()]] -- Compare two strings.
-- [[#funConcat][concat()]] -- Concatentate two or more strings.
-- [[#funDict][dict()]] -- Create a dictionary from a list of key, value pairs.
-- [[#funDup][dup()]] -- Duplicate a string x times.
-- [[#funExists][exists()]] -- Determine whether a key exists in a dictionary.
-- [[#funFind][find()]] -- Find the position of a substring in a string.
-- [[#funFloat_if][float()]] -- Create a float from an int.
-- [[#funFloat_sf][float()]] -- Create a float from a number string.
-- [[#funGet_dsoaa][get()]] -- Get a dictionary value by its key.
-- [[#funGet_lioaa][get()]] -- Get list value by its index.
-- [[#funGithubAnchor][githubAnchor()]] -- Create a Github markdown anchor name given a heading name.
-- [[#funIf][if()]] -- If the condition is 1 return one value, else return another
-value.
-- [[#funInt_fosi][int()]] -- Create an int from a float.
-- [[#funInt_sosi][int()]] -- Create an int from a number string.
-- [[#funKeys][keys()]] -- Create a list from the keys in a dictionary.
-- [[#funLen_di][len()]] -- Number of elements in a dictionary.
-- [[#funLen_li][len()]] -- Number of elements in a list.
-- [[#funLen_si][len()]] -- Length of a string in characters, not bytes.
-- [[#funList][list()]] -- Create a list of values.
-- [[#funLower][lower()]] -- Lowercase a string.
-- [[#funPath][path()]] -- Split a file path into pieces.
-- [[#funReplace][replace()]] -- Replace a substring specified by its position and length with
-another string.
-- [[#funReplaceRe_sSSs][replaceRe()]] -- Replace multiple parts of a string using regular expressions.
-- [[#funReplaceRe_sls][replaceRe()]] -- Replace multiple parts of a string using regular expressions.
-- [[#funSort_lsosl][sort()]] -- Sort a list of values of the same type.
-- [[#funSort_lssil][sort()]] -- Sort a list of lists.
-- [[#funSort_lsssl][sort()]] -- Sort a list of dictionaries.
-- [[#funSubstr][substr()]] -- Extract a substring from a string by its position.
-- [[#funValues][values()]] -- Create a list out of the values in the specified dictionary.
+- [[#add][add()]] -- Add floats.
+- [[#add][add()]] -- Add integers.
+- [[#case][case()]] -- Compare integer cases and return the matching value.
+- [[#case][case()]] -- Compare string cases and return the matching value.
+- [[#cmpVersion][cmpVersion()]] -- Compare two StaticTea version numbers.
+- [[#cmp][cmp()]] -- Compare two floats.
+- [[#cmp][cmp()]] -- Compare two ints.
+- [[#cmp][cmp()]] -- Compare two strings.
+- [[#concat][concat()]] -- Concatentate strings.
+- [[#dict][dict()]] -- Create a dictionary from a list of key, value pairs.
+- [[#dup][dup()]] -- Duplicate a string x times.
+- [[#exists][exists()]] -- Determine whether a key exists in a dictionary.
+- [[#find][find()]] -- Find the position of a substring in a string.
+- [[#float][float()]] -- Create a float from an int.
+- [[#float][float()]] -- Create a float from a number string.
+- [[#get][get()]] -- Get a dictionary value by its key.
+- [[#get][get()]] -- Get list value by its index.
+- [[#githubAnchor][githubAnchor()]] -- Create a Github markdown anchor name given a heading name.
+- [[#if][if()]] -- If the condition is 1 return one value, else return another value.
+- [[#int][int()]] -- Create an int from a float.
+- [[#int][int()]] -- Create an int from a number string.
+- [[#keys][keys()]] -- Create a list from the keys in a dictionary.
+- [[#len][len()]] -- Number of elements in a dictionary.
+- [[#len][len()]] -- Number of elements in a list.
+- [[#len][len()]] -- Length of a string in characters, not bytes.
+- [[#list][list()]] -- Create a list of values.
+- [[#lower][lower()]] -- Lowercase a string.
+- [[#path][path()]] -- Split a file path into its component pieces.
+- [[#replace][replace()]] -- Replace a substring specified by its position and length with another string.
+- [[#replaceRe][replaceRe()]] -- Replace multiple parts of a string using regular expressions.
+- [[#replaceRe][replaceRe()]] -- Replace multiple parts of a string using regular expressions.
+- [[#sort][sort()]] -- Sort a list of values of the same type.
+- [[#sort][sort()]] -- Sort a list of lists.
+- [[#sort][sort()]] -- Sort a list of dictionaries.
+- [[#substr][substr()]] -- Extract a substring from a string by its position.
+- [[#values][values()]] -- Create a list out of the values in the specified dictionary.
 
 [[#contents][茶]]
 
 ** add()
 :PROPERTIES:
-:CUSTOM_ID: funAdd_Fi
+:CUSTOM_ID: add
 :END:
 
 Add floats. A warning is generated on overflow.
@@ -1527,7 +1526,7 @@ add(1.1, 2.2, 3.3) => 6.6
 
 ** add()
 :PROPERTIES:
-:CUSTOM_ID: funAdd_Ii
+:CUSTOM_ID: add
 :END:
 
 Add integers. A warning is generated on overflow.
@@ -1548,7 +1547,7 @@ add(1, 2, 3) => 6
 
 ** case()
 :PROPERTIES:
-:CUSTOM_ID: funCase_iloaa
+:CUSTOM_ID: case
 :END:
 
 Compare integer cases and return the matching value.  It takes a
@@ -1584,7 +1583,7 @@ case(3, cases, "wine") => "wine"
 
 ** case()
 :PROPERTIES:
-:CUSTOM_ID: funCase_sloaa
+:CUSTOM_ID: case
 :END:
 
 Compare string cases and return the matching value.  It takes a
@@ -1619,7 +1618,7 @@ case("bunch", cases, "other") => "other"
 
 ** cmpVersion()
 :PROPERTIES:
-:CUSTOM_ID: funCmpVersion
+:CUSTOM_ID: cmpVersion
 :END:
 
 Compare two StaticTea version numbers. Returns -1 for less, 0 for
@@ -1645,7 +1644,7 @@ cmpVersion("1.2.5", "1.2.5") => 0
 
 ** cmp()
 :PROPERTIES:
-:CUSTOM_ID: funCmp_ffi
+:CUSTOM_ID: cmp
 :END:
 
 Compare two floats. Returns -1 for less, 0 for
@@ -1667,7 +1666,7 @@ cmp(9.3, 2.2) => 1
 
 ** cmp()
 :PROPERTIES:
-:CUSTOM_ID: funCmp_iii
+:CUSTOM_ID: cmp
 :END:
 
 Compare two ints. Returns -1 for less, 0 for equal and 1 for
@@ -1689,7 +1688,7 @@ cmp(9, 2) => 1
 
 ** cmp()
 :PROPERTIES:
-:CUSTOM_ID: funCmp_ssoii
+:CUSTOM_ID: cmp
 :END:
 
 Compare two strings. Returns -1 for less, 0 for equal and 1 for
@@ -1716,10 +1715,10 @@ cmp("Tea", "tea", 1) => 0
 
 ** concat()
 :PROPERTIES:
-:CUSTOM_ID: funConcat
+:CUSTOM_ID: concat
 :END:
 
-Concatentate two or more strings.
+Concatentate strings.
 
 #+BEGIN_SRC
 concat(strs: varargs(string)) string
@@ -1730,13 +1729,14 @@ Examples:
 #+BEGIN_SRC
 concat("tea", " time") => "tea time"
 concat("a", "b", "c", "d") => "abcd"
+concat("a") => "a"
 #+END_SRC
 
 [[#contents][茶]]
 
 ** dict()
 :PROPERTIES:
-:CUSTOM_ID: funDict
+:CUSTOM_ID: dict
 :END:
 
 Create a dictionary from a list of key, value pairs.  The keys
@@ -1759,7 +1759,7 @@ dict("a", 5, "b", 33, "c", 0) =>
 
 ** dup()
 :PROPERTIES:
-:CUSTOM_ID: funDup
+:CUSTOM_ID: dup
 :END:
 
 Duplicate a string x times.  The result is a new string built by
@@ -1773,6 +1773,8 @@ Examples:
 
 #+BEGIN_SRC
 dup("=", 3) => "==="
+dup("abc", 0) => ""
+dup("abc", 1) => "abc"
 dup("abc", 2) => "abcabc"
 dup("", 3) => ""
 #+END_SRC
@@ -1781,7 +1783,7 @@ dup("", 3) => ""
 
 ** exists()
 :PROPERTIES:
-:CUSTOM_ID: funExists
+:CUSTOM_ID: exists
 :END:
 
 Determine whether a key exists in a dictionary. Return 1 when it exists, else 0.
@@ -1802,7 +1804,7 @@ exists(d, "coffee") => 0
 
 ** find()
 :PROPERTIES:
-:CUSTOM_ID: funFind
+:CUSTOM_ID: find
 :END:
 
 Find the position of a substring in a string.  When the substring
@@ -1831,7 +1833,7 @@ find(msg, "party", 0) = 0
 
 ** float()
 :PROPERTIES:
-:CUSTOM_ID: funFloat_if
+:CUSTOM_ID: float
 :END:
 
 Create a float from an int.
@@ -1851,7 +1853,7 @@ float(-33) => -33.0
 
 ** float()
 :PROPERTIES:
-:CUSTOM_ID: funFloat_sf
+:CUSTOM_ID: float
 :END:
 
 Create a float from a number string.
@@ -1872,7 +1874,7 @@ float("33") => 33.0
 
 ** get()
 :PROPERTIES:
-:CUSTOM_ID: funGet_dsoaa
+:CUSTOM_ID: get
 :END:
 
 Get a dictionary value by its key.  If the key doesn't exist, the
@@ -1892,8 +1894,10 @@ Examples:
 d = dict("tea", "Earl Grey")
 get(d, 'tea') => "Earl Grey"
 get(d, 'coffee', 'Tea') => "Tea"
+#+END_SRC
 
 Using dot notation:
+#+BEGIN_SRC
 d = dict("tea", "Earl Grey")
 d.tea => "Earl Grey"
 #+END_SRC
@@ -1902,7 +1906,7 @@ d.tea => "Earl Grey"
 
 ** get()
 :PROPERTIES:
-:CUSTOM_ID: funGet_lioaa
+:CUSTOM_ID: get
 :END:
 
 Get list value by its index.  If the index is too big, the
@@ -1925,14 +1929,14 @@ get(list, 3, 99) => 99
 
 ** githubAnchor()
 :PROPERTIES:
-:CUSTOM_ID: funGithubAnchor
+:CUSTOM_ID: githubAnchor
 :END:
 
 Create a Github markdown anchor name given a heading name. Use it
 for Github markdown internal links. If you have duplicate heading
-names, the anchor name returned only works for the first. Some
-characters like underscored are removed so you can get duplicates
-in some cases.
+names, the anchor name returned only works for the
+first. Punctuation characters are removed so you can get
+duplicates in some cases.
 
 #+BEGIN_SRC
 githubAnchor(name: string) string
@@ -1959,11 +1963,10 @@ $$ : anchor = githubAnchor(entry.name)
 
 ** if()
 :PROPERTIES:
-:CUSTOM_ID: funIf
+:CUSTOM_ID: if
 :END:
 
-If the condition is 1 return one value, else return another
-value.
+If the condition is 1 return one value, else return another value.
 
 #+BEGIN_SRC
 if(condition: int, oneCase: any, notOne: any) any
@@ -1981,7 +1984,7 @@ if(4, 'tea', 'beer') => "beer"
 
 ** int()
 :PROPERTIES:
-:CUSTOM_ID: funInt_fosi
+:CUSTOM_ID: int
 :END:
 
 Create an int from a float.
@@ -2017,7 +2020,7 @@ int(-6.3456, "truncate") => -6
 
 ** int()
 :PROPERTIES:
-:CUSTOM_ID: funInt_sosi
+:CUSTOM_ID: int
 :END:
 
 Create an int from a number string.
@@ -2053,7 +2056,7 @@ int("-6.3456", "truncate") => -6
 
 ** keys()
 :PROPERTIES:
-:CUSTOM_ID: funKeys
+:CUSTOM_ID: keys
 :END:
 
 Create a list from the keys in a dictionary.
@@ -2074,7 +2077,7 @@ values(d) => ["apple", 2, 3]
 
 ** len()
 :PROPERTIES:
-:CUSTOM_ID: funLen_di
+:CUSTOM_ID: len
 :END:
 
 Number of elements in a dictionary.
@@ -2095,7 +2098,7 @@ len(dict('a', 4, 'b', 3)) => 2
 
 ** len()
 :PROPERTIES:
-:CUSTOM_ID: funLen_li
+:CUSTOM_ID: len
 :END:
 
 Number of elements in a list.
@@ -2116,7 +2119,7 @@ len(list(4, 5)) => 2
 
 ** len()
 :PROPERTIES:
-:CUSTOM_ID: funLen_si
+:CUSTOM_ID: len
 :END:
 
 Length of a string in characters, not bytes.
@@ -2136,7 +2139,7 @@ len("añyóng") => 6
 
 ** list()
 :PROPERTIES:
-:CUSTOM_ID: funList
+:CUSTOM_ID: list
 :END:
 
 Create a list of values.
@@ -2158,7 +2161,7 @@ list("a", 5, "b") => ["a", 5, "b"]
 
 ** lower()
 :PROPERTIES:
-:CUSTOM_ID: funLower
+:CUSTOM_ID: lower
 :END:
 
 Lowercase a string.
@@ -2172,17 +2175,18 @@ Examples:
 #+BEGIN_SRC
 lower("Tea") => "tea"
 lower("TEA") => "tea"
+lower("TEĀ") => "teā"
 #+END_SRC
 
 [[#contents][茶]]
 
 ** path()
 :PROPERTIES:
-:CUSTOM_ID: funPath
+:CUSTOM_ID: path
 :END:
 
-Split a file path into pieces. Return a dictionary with the
-filename, basename, extension and directory.
+Split a file path into its component pieces. Return a dictionary
+with the filename, basename, extension and directory.
 
 You pass a path string and the optional path separator, forward
 slash or or backwards slash. When no separator, the current
@@ -2214,11 +2218,10 @@ path("src\runFunction.nim", "\") => {
 
 ** replace()
 :PROPERTIES:
-:CUSTOM_ID: funReplace
+:CUSTOM_ID: replace
 :END:
 
-Replace a substring specified by its position and length with
-another string.  You can use the function to insert and append to
+Replace a substring specified by its position and length with another string.  You can use the function to insert and append to
 a string as well.
 
 #+BEGIN_SRC
@@ -2261,7 +2264,7 @@ replace("123", 0, 3, "") =>
 
 ** replaceRe()
 :PROPERTIES:
-:CUSTOM_ID: funReplaceRe_sSSs
+:CUSTOM_ID: replaceRe
 :END:
 
 Replace multiple parts of a string using regular expressions.
@@ -2289,7 +2292,7 @@ website: https://regex101.com/
 
 ** replaceRe()
 :PROPERTIES:
-:CUSTOM_ID: funReplaceRe_sls
+:CUSTOM_ID: replaceRe
 :END:
 
 Replace multiple parts of a string using regular expressions.
@@ -2316,7 +2319,7 @@ website: https://regex101.com/
 
 ** sort()
 :PROPERTIES:
-:CUSTOM_ID: funSort_lsosl
+:CUSTOM_ID: sort
 :END:
 
 Sort a list of values of the same type.  The values are ints,
@@ -2352,7 +2355,7 @@ sort(strs, "ascending", "insensitive") => ['a', 'e', 'T']
 
 ** sort()
 :PROPERTIES:
-:CUSTOM_ID: funSort_lssil
+:CUSTOM_ID: sort
 :END:
 
 Sort a list of lists.
@@ -2384,7 +2387,7 @@ sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
 
 ** sort()
 :PROPERTIES:
-:CUSTOM_ID: funSort_lsssl
+:CUSTOM_ID: sort
 :END:
 
 Sort a list of dictionaries.
@@ -2416,7 +2419,7 @@ sort(dicts, "descending", "sensitive", 'name') => [d2, d1]
 
 ** substr()
 :PROPERTIES:
-:CUSTOM_ID: funSubstr
+:CUSTOM_ID: substr
 :END:
 
 Extract a substring from a string by its position. You pass the
@@ -2443,7 +2446,7 @@ substr("Earl Grey", 5) => "Grey"
 
 ** values()
 :PROPERTIES:
-:CUSTOM_ID: funValues
+:CUSTOM_ID: values
 :END:
 
 Create a list out of the values in the specified dictionary.

@@ -39,7 +39,7 @@
 # $ : name = concat(lower(substr(capName, 0, 1)), substr(capName, 1))
 # $ : desc = replaceRe(entry.description, g.patterns)
 # $ : shortFuncDesc = substr(desc, 0, add(find(desc, '.', -1), 1))
-- [[#{entry.name}][{name}()]] -- {shortFuncDesc}
+- [[#{name}][{name}()]] -- {shortFuncDesc}
 # $ #
 # $ # Generate the function sections.
 # $ #
@@ -59,7 +59,7 @@
 
 ** {name}()
 :PROPERTIES:
-:CUSTOM_ID: {entry.name}
+:CUSTOM_ID: {name}
 :END:
 
 {description}

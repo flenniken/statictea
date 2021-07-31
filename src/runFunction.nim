@@ -162,7 +162,7 @@ func funCmp_ssoii*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(ret))
 
 func funConcat*(parameters: seq[Value]): FunResult =
-  ## Concatentate two or more strings.
+  ## Concatentate strings.
   ## @:
   ## @:~~~
   ## @:concat(strs: varargs(string)) string
@@ -173,6 +173,7 @@ func funConcat*(parameters: seq[Value]): FunResult =
   ## @:~~~
   ## @:concat("tea", " time") => "tea time"
   ## @:concat("a", "b", "c", "d") => "abcd"
+  ## @:concat("a") => "a"
   ## @:~~~~
 
   tMapParameters("Ss")
@@ -286,8 +287,10 @@ func funGet_dsoaa*(parameters: seq[Value]): FunResult =
   ## @:d = dict("tea", "Earl Grey")
   ## @:get(d, 'tea') => "Earl Grey"
   ## @:get(d, 'coffee', 'Tea') => "Tea"
+  ## @:~~~~
   ## @:
   ## @:Using dot notation:
+  ## @:~~~
   ## @:d = dict("tea", "Earl Grey")
   ## @:d.tea => "Earl Grey"
   ## @:~~~~
@@ -305,7 +308,7 @@ func funGet_dsoaa*(parameters: seq[Value]): FunResult =
 
 func funIf*(parameters: seq[Value]): FunResult =
   ## If the condition is 1 return one value, else return another
-  ## @:value.
+  ## value.
   ## @:
   ## @:~~~
   ## @:if(condition: int, oneCase: any, notOne: any) any
@@ -743,6 +746,7 @@ func funFind*(parameters: seq[Value]): FunResult =
   else:
     result = newFunResult(newValue(pos))
 
+# todo: for substr use length instead of end position.
 func funSubstr*(parameters: seq[Value]): FunResult =
   ## Extract a substring from a string by its position. You pass the
   ## @:string, the substring's start index then its end index+1.
@@ -795,6 +799,8 @@ func funDup*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:~~~
   ## @:dup("=", 3) => "==="
+  ## @:dup("abc", 0) => ""
+  ## @:dup("abc", 1) => "abc"
   ## @:dup("abc", 2) => "abcabc"
   ## @:dup("", 3) => ""
   ## @:~~~~
@@ -869,7 +875,7 @@ func funList*(parameters: seq[Value]): FunResult =
 
 func funReplace*(parameters: seq[Value]): FunResult =
   ## Replace a substring specified by its position and length with
-  ## @:another string.  You can use the function to insert and append to
+  ## another string.  You can use the function to insert and append to
   ## @:a string as well.
   ## @:
   ## @:~~~
@@ -1061,8 +1067,8 @@ func funReplaceRe_sls*(parameters: seq[Value]): FunResult =
   replaceReMap(map)
 
 func funPath*(parameters: seq[Value]): FunResult =
-  ## Split a file path into pieces. Return a dictionary with the
-  ## @:filename, basename, extension and directory.
+  ## Split a file path into its component pieces. Return a dictionary
+  ## @:with the filename, basename, extension and directory.
   ## @:
   ## @:You pass a path string and the optional path separator, forward
   ## @:slash or or backwards slash. When no separator, the current
@@ -1145,6 +1151,7 @@ func funLower*(parameters: seq[Value]): FunResult =
   ## @:~~~
   ## @:lower("Tea") => "tea"
   ## @:lower("TEA") => "tea"
+  ## @:lower("TEĀ") => "teā"
   ## @:~~~~
 
   tMapParameters("ss")
@@ -1388,9 +1395,9 @@ func funSort_lsssl*(parameters: seq[Value]): FunResult =
 func funGithubAnchor*(parameters: seq[Value]): FunResult =
   ## Create a Github markdown anchor name given a heading name. Use it
   ## @:for Github markdown internal links. If you have duplicate heading
-  ## @:names, the anchor name returned only works for the first. Some
-  ## @:characters like underscored are removed so you can get duplicates
-  ## @:in some cases.
+  ## @:names, the anchor name returned only works for the
+  ## @:first. Punctuation characters are removed so you can get
+  ## @:duplicates in some cases.
   ## @:
   ## @:~~~
   ## @:githubAnchor(name: string) string
