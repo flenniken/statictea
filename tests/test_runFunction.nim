@@ -1350,6 +1350,25 @@ suite "runFunction.nim":
     let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
     check testFunction("githubAnchor", parameters, eFunResult)
 
+  test "githubAnchor list":
+    let list = newValue(["Tea", "Water", "tea"])
+    let expected = newValue(["tea", "water", "tea-2"])
+    let parameters = @[list]
+    let eFunResult = newFunResult(expected)
+    check testFunction("githubAnchor", parameters, eFunResult)
+
+  test "githubAnchor wrong list item":
+    let list = newValue([newValue("Tea"), newValue(5)])
+    let parameters = @[list]
+    let eFunResult = newFunResultWarn(wNotAllStrings, 0)
+    check testFunction("githubAnchor", parameters, eFunResult)
+
+  test "githubAnchor empty list":
+    let emptyList = newEmptyListValue()
+    let parameters = @[emptyList]
+    let eFunResult = newFunResult(emptyList)
+    check testFunction("githubAnchor", parameters, eFunResult)
+
   test "cmdVersion":
     check testCmpVersionGood("0.0.0", "0.0.0", 0)
     check testCmpVersionGood("0.0.0", "0.0.1", -1)
@@ -1394,6 +1413,7 @@ suite "runFunction.nim":
     let parameters = @[newValue("1.2.3"), newValue("1.2.3b")]
     let eFunResult = newFunResultWarn(wInvalidVersion, 1)
     check testFunction("cmpVersion", parameters, eFunResult)
+
 
   # test "createFunctionTable":
   #   let table = createFunctionTable()

@@ -951,7 +951,6 @@ statement: a = len(case(5,
     check startColumn(2) == "  ^"
     check startColumn(3) == "   ^"
 
-
 # todo: test that a warning is generated when the item doesn't exist.
 # todo: test prepost when user specified.
 # todo: test the maximum variable length of 64, 66 including the optional prefix.

@@ -27,7 +27,6 @@ func newFunctionSpec(name: string, functionPtr: FunctionPtr,
   result = FunctionSpec(name: name, functionPtr: functionPtr,
                         signatureCode: signatureCode)
 
-# todo: add a parameters argument so it is clearer how the template operates.
 template tMapParameters(signatureCode: string) =
   ## Template that checks the signatureCode against the parameters and
   ## sets the map dictionary variable.
@@ -75,10 +74,6 @@ func numberStringToNum(numString: string): FunResult =
       result = newFunResult(newValue(intPosO.get().integer))
     else:
       result = newFunResultWarn(wExpectedNumberString)
-
-
-
-# todo: cmp: support list and dict compares? Maybe similar to how sort compares.
 
 func funCmp_iii*(parameters: seq[Value]): FunResult =
   ## Compare two ints. Returns -1 for less, 0 for equal and 1 for
@@ -610,7 +605,6 @@ func convertFloatToInt(num: float, map: VarsDict): FunResult =
   ## options as "b".
   if num > float(high(int64)) or num < float(low(int64)):
     return newFunResultWarn(wNumberOverFlow)
-  # todo: test rounding up to an invalid int (out of range).
 
   var option: string
   if "b" in map:
@@ -746,7 +740,6 @@ func funFind*(parameters: seq[Value]): FunResult =
   else:
     result = newFunResult(newValue(pos))
 
-# todo: for substr use length instead of end position.
 func funSubstr*(parameters: seq[Value]): FunResult =
   ## Extract a substring from a string by its position. You pass the
   ## @:string, the substring's start index then its end index+1.
@@ -764,8 +757,8 @@ func funSubstr*(parameters: seq[Value]): FunResult =
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:substr("Earl Grey", 0, 4) => "Earl"
-  ## @:substr("Earl Grey", 5) => "Grey"
+  ## @:substr("Earl Grey", 1, 4) => "arl"
+  ## @:substr("Earl Grey", 6) => "rey"
   ## @:~~~~
 
   tMapParameters("siois")
@@ -1392,7 +1385,7 @@ func funSort_lsssl*(parameters: seq[Value]): FunResult =
 # todo: add function where you specify a list of names and it returns
 # a list of anchor names.
 
-func funGithubAnchor*(parameters: seq[Value]): FunResult =
+func funGithubAnchor_ss*(parameters: seq[Value]): FunResult =
   ## Create a Github markdown anchor name given a heading name. Use it
   ## @:for Github markdown internal links. If you have duplicate heading
   ## @:names, the anchor name returned only works for the
@@ -1425,6 +1418,47 @@ func funGithubAnchor*(parameters: seq[Value]): FunResult =
   let name = map["a"].stringv
   let anchorName = githubAnchor(name)
   result = newFunResult(newValue(anchorName))
+
+func funGithubAnchor_ll*(parameters: seq[Value]): FunResult =
+  ## Create Github markdown anchor names given a list of heading
+  ## @:names. Use it for Github markdown internal links. It handles
+  ## @:duplicate heading names.
+  ## @:
+  ## @:~~~
+  ## @:githubAnchor(names: list) list
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:list = list("Tea", "Water", "Tea")
+  ## @:githubAnchor(list) =>
+  ## @:  ["tea", "water", "tea-1"]
+  ## @:~~~~
+
+  tMapParameters("ll")
+
+  let list = map["a"].listv
+
+  # Add dash num postfix to the anchor name for dups.  Names is a
+  # mapping from the anchor name to the number of times it is used.
+  var names = newOrderedTable[string, int]()
+  var anchorNames: seq[string]
+  for name in list:
+    if name.kind != vkString:
+      return newFunResultWarn(wNotAllStrings, 0)
+
+    let anchorName = githubAnchor(name.stringv)
+    var count: int
+    if anchorName in names:
+      count = names[anchorName] + 1
+      anchorNames.add("$1-$2" % [anchorName, $count])
+    else:
+      count = 1
+      anchorNames.add(anchorName)
+    names[anchorName] = count
+
+  result = newFunResult(newValue(anchorNames))
 
 const
   functionsList = [
@@ -1463,7 +1497,8 @@ const
     ("sort", funSort_lsosl, "lsosl"),
     ("sort", funSort_lssil, "lssil"),
     ("sort", funSort_lsssl, "lsssl"),
-    ("githubAnchor", funGithubAnchor, "ss"),
+    ("githubAnchor", funGithubAnchor_ss, "ss"),
+    ("githubAnchor", funGithubAnchor_ll, "ll"),
   ]
 
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =
@@ -1504,8 +1539,6 @@ proc getFunction*(functionName: string, parameters: seq[Value]): Option[Function
     # Return the function that made if farthest through its
     # mapParameters.
     result = some(maxFunctionSpec)
-
-# todo: should we show the possible signatures like nim does?
 
 proc isFunctionName*(functionName: string): bool =
   ## Return true when the function exists.

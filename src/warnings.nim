@@ -140,6 +140,7 @@ type
     wExpectedNumberString, # w125
     wCaseTypeMismatch,     # w126
     wNotEvenCases,         # w127
+    wNotAllStrings,        # w128
 
 const
     # The list of warnings. Add new messages to the bottom and do not
@@ -273,6 +274,7 @@ const
       "Expected number string.", # wExpectedNumberString
       "A case condition is not the same type as the main condition.", # wCaseTypeMismatch
       "Expected an even number of cases, got $1 list items.", # wNotEvenCases
+      "The list values must be all strings.", # wNotAllStrings
     ]
 
 func getWarning*(filename: string, lineNum: int,
