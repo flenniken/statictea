@@ -65,6 +65,11 @@ suite "variables.nim":
     check testGetParentDict(variables, "h.test", newParentDict(variables["h"].dictv))
     check testGetParentDict(variables, "t.row", newParentDict(variables))
 
+  test "getParentDict with list":
+    var variables = emptyVariables()
+    variables["teas"] = newEmptyListValue()
+    check testGetParentDict(variables, "teas", newParentDict(variables["l"].dictv))
+
   test "getParentDict nested":
     let content = """
 {
@@ -226,8 +231,16 @@ suite "variables.nim":
     check testAssignVariable(variables, "g.five", newValue(1))
     check testAssignVariable(variables, "g.five", newValue(2), eWarningDataO)
 
+  test "assignVariable tea vars":
+    ## Set tea variables then try to change them.
+    var variables = emptyVariables()
+    let eWarningDataO = some(newWarningData(wTeaVariableExists))
+
     check testAssignVariable(variables, "t.maxLines", newValue(1))
     check testAssignVariable(variables, "t.maxLines", newValue(2), eWarningDataO)
+
+    check testAssignVariable(variables, "t.output", newValue("stderr"))
+    check testAssignVariable(variables, "t.output", newValue("result"), eWarningDataO)
 
   test "assignVariable wReadOnlyTeaVar row":
     let eWarningDataO = some(newWarningData(wReadOnlyTeaVar, "row"))
@@ -284,3 +297,15 @@ suite "variables.nim":
   test "assignVariable invalid tea var":
     let eWarningDataO = some(newWarningData(wInvalidTeaVar, "oops"))
     check testAssignVariable("t.oops", newValue(1), eWarningDataO)
+
+  test "append to a list":
+    var variables = emptyVariables()
+    var warningDataO = assignVariable(variables, "teas", newEmptyListValue())
+    check not warningDataO.isSome
+    warningDataO = assignVariable(variables, "teas", newValue(5))
+    check not warningDataO.isSome
+    warningDataO = assignVariable(variables, "teas", newValue(6))
+    check not warningDataO.isSome
+    warningDataO = assignVariable(variables, "teas", newValue(7))
+    check not warningDataO.isSome
+    check $variables["l"] == """{"teas":[5,6,7]}"""

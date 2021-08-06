@@ -42,7 +42,9 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funSort_lsosl](#funsort_lsosl) &mdash; Sort a list of values of the same type.
 * [funSort_lssil](#funsort_lssil) &mdash; Sort a list of lists.
 * [funSort_lsssl](#funsort_lsssl) &mdash; Sort a list of dictionaries.
-* [funGithubAnchor](#fungithubanchor) &mdash; Create a Github markdown anchor name given a heading name.
+* [funGithubAnchor_ss](#fungithubanchor_ss) &mdash; Create a Github markdown anchor name given a heading name.
+* [funGithubAnchor_ll](#fungithubanchor_ll) &mdash; Create Github markdown anchor names given a list of heading
+names.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -616,8 +618,8 @@ substr(str: string, start: int, optional end: int) string
 Examples:
 
 ~~~
-substr("Earl Grey", 0, 4) => "Earl"
-substr("Earl Grey", 5) => "Grey"
+substr("Earl Grey", 1, 4) => "arl"
+substr("Earl Grey", 6) => "rey"
 ~~~~
 
 ```nim
@@ -994,7 +996,7 @@ func funSort_lsssl(parameters: seq[Value]): FunResult
 ```
 
 
-# funGithubAnchor
+# funGithubAnchor_ss
 
 Create a Github markdown anchor name given a heading name. Use it
 for Github markdown internal links. If you have duplicate heading
@@ -1024,7 +1026,30 @@ $$ : anchor = githubAnchor(entry.name)
 ~~~~
 
 ```nim
-func funGithubAnchor(parameters: seq[Value]): FunResult
+func funGithubAnchor_ss(parameters: seq[Value]): FunResult
+```
+
+
+# funGithubAnchor_ll
+
+Create Github markdown anchor names given a list of heading
+names. Use it for Github markdown internal links. It handles
+duplicate heading names.
+
+~~~
+githubAnchor(names: list) list
+~~~~
+
+Examples:
+
+~~~
+list = list("Tea", "Water", "Tea")
+githubAnchor(list) =>
+  ["tea", "water", "tea-1"]
+~~~~
+
+```nim
+func funGithubAnchor_ll(parameters: seq[Value]): FunResult
 ```
 
 

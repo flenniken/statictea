@@ -393,6 +393,9 @@ suite "matches.nim":
 
     check testMatchDotNames("a.b.", 0, some(newMatches(3, 0, "", "a.b")))
     check testMatchDotNames("a..b", 0, some(newMatches(1, 0, "", "a")))
+    check testMatchDotNames("a#", 0, some(newMatches(1, 0, "", "a")))
+    check testMatchDotNames("a#  ", 0, some(newMatches(1, 0, "", "a")))
+    check testMatchDotNames("a$", 0, some(newMatches(1, 0, "", "a")))
 
     check testMatchDotNames("  a", 0, some(newMatches(3, 0, "  ", "a")))
     check testMatchDotNames("  a.bb", 0, some(newMatches(6, 0, "  ", "a.bb")))

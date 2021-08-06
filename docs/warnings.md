@@ -64,7 +64,8 @@ Warning = enum
   wDictKeyMissing, wKeyValueKindDiff, wSubListsEmpty, wSubListsDiffTypes,
   kMaxWarnings, kInvalidSignature, kInvalidParamType, kNotEnoughArgs,
   kWrongType, kNoVarargArgs, kNotEnoughVarargs, kTooManyArgs,
-  wAtLeast4Parameters, wExpectedNumberString, wCaseTypeMismatch, wNotEvenCases
+  wAtLeast4Parameters, wExpectedNumberString, wCaseTypeMismatch, wNotEvenCases,
+  wNotAllStrings, wTeaVariableExists
 ```
 
 
@@ -148,8 +149,7 @@ warningsList: array[low(Warning) .. high(Warning), string] = [
     "The substring was not found and no default parameter.",
     "The resulting duplicated string must be under 1024 characters, got: $1.",
     "Specify parameters in pairs.",
-    "None of the case conditions match and no else case.",
-    "Variable already exists, assign to a new variable.",
+    "None of the case conditions match and no else case.", "You cannot assign to an existing variable except when appending to a list.",
     "Expected four parameters.", "Invalid length: $1.",
     "Invalid number of parameters, the pattern and replacement come in pairs.",
     "Expected a list.", "Expected / or \\.",
@@ -172,7 +172,7 @@ warningsList: array[low(Warning) .. high(Warning), string] = [
     "Wrong parameter type, expected $1 got $2.",
     "The required vararg parameter has no arguments.",
     "Missing vararg parameter, expected groups of 2 got 1.",
-    "Too many arguments, expected
+    "Too many arguments, expected at most
 ```
 
 

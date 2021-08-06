@@ -939,6 +939,16 @@ statement: a = len(case(5,
     var variables = emptyVariables()
     check testRunStatement(statement, variables, eErrLines = eErrLines)
 
+  test "dot name":
+    let statement = newStatement(text="a# = 5", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w34: Invalid variable or missing equal sign.
+statement: a# = 5
+           ^
+"""
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
+
   test "startPointer":
     check startPointer(0) == "^0"
     check startPointer(1) == " ^1"

@@ -1382,9 +1382,6 @@ func funSort_lsssl*(parameters: seq[Value]): FunResult =
   tMapParameters("lsssl")
   result = generalSort(map)
 
-# todo: add function where you specify a list of names and it returns
-# a list of anchor names.
-
 func funGithubAnchor_ss*(parameters: seq[Value]): FunResult =
   ## Create a Github markdown anchor name given a heading name. Use it
   ## @:for Github markdown internal links. If you have duplicate heading

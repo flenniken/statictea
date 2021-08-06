@@ -497,13 +497,22 @@ You use variables to create formatted content for a block and to
 control how a command works. You create them in json files or in
 template statements.
 
-All variables are immutable.  You can assign a new value to a
-dictionary but you cannot change an existing value. If you try to
-change a variable, a warning is generated and the statement is
-skipped.
-
 Local variables and tea variables (except row) are cleared after
 processing each replacement block.
+
+You can assign a new variable to a list or dictionary but you
+cannot change an existing variable.
+
+You append to a list by assigning a value to it. This allows
+creation of dynamic lists at runtime. For example, a teas
+variable is created with "black" and "green" values:
+
+#+BEGIN_SRC
+teas = list()
+teas = "black"
+teas = "green"
+teas => ["black", "green"]
+#+END_SRC
 
 One dictionary exists for each of the five types of
 variables. You access them with different prefixes.
@@ -1481,6 +1490,8 @@ List of functions:
 - [[#float][float()]] -- Create a float from a number string.
 - [[#get][get()]] -- Get a dictionary value by its key.
 - [[#get][get()]] -- Get a list value by its index.
+- [[#githubAnchor][githubAnchor()]] -- Create Github markdown anchor names given a list of heading
+names.
 - [[#githubAnchor][githubAnchor()]] -- Create a Github markdown anchor name given a heading name.
 - [[#if][if()]] -- If the condition is 1 return one value, else return another value.
 - [[#int][int()]] -- Create an int from a float.
@@ -1923,6 +1934,29 @@ Examples:
 list = list(4, 'a', 10)
 get(list, 2) => 10
 get(list, 3, 99) => 99
+#+END_SRC
+
+[[#contents][茶]]
+
+** githubAnchor()
+:PROPERTIES:
+:CUSTOM_ID: githubAnchor
+:END:
+
+Create Github markdown anchor names given a list of heading
+names. Use it for Github markdown internal links. It handles
+duplicate heading names.
+
+#+BEGIN_SRC
+githubAnchor(names: list) list
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+list = list("Tea", "Water", "Tea")
+githubAnchor(list) =>
+  ["tea", "water", "tea-1"]
 #+END_SRC
 
 [[#contents][茶]]
@@ -2438,8 +2472,8 @@ substr(str: string, start: int, optional end: int) string
 Examples:
 
 #+BEGIN_SRC
-substr("Earl Grey", 0, 4) => "Earl"
-substr("Earl Grey", 5) => "Grey"
+substr("Earl Grey", 1, 4) => "arl"
+substr("Earl Grey", 6) => "rey"
 #+END_SRC
 
 [[#contents][茶]]

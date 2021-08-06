@@ -266,7 +266,8 @@ func assignTeaVariable(variables: var Variables, dotNameStr: string, value: Valu
         return some(newWarningData(wInvalidTeaVar, varName))
     if varName in ["row", "version"]:
         return some(newWarningData(wReadOnlyTeaVar, varName))
-    return some(newWarningData(wImmutableVars))
+    # You cannot reassign a tea variable.
+    return some(newWarningData(wTeaVariableExists))
 
   case varName:
     of "maxLines":
@@ -313,11 +314,20 @@ proc assignVariable*(variables: var Variables, dotNameStr: string,
   if parentDict.kind == fdWarning:
     return some(parentDict.warningData)
 
-  # All variables are immutable.
-  let varName = names[^1]
-  if varName in parentDict.dict:
-    return some(newWarningData(wImmutableVars))
-  parentDict.dict[varName] = value
+  # If the last item is a list, append to it, else append to the
+  # parent dictionary.
+  let lastName = names[^1]
+  if lastName in parentDict.dict:
+    let lastItem = parentDict.dict[lastName]
+    if lastItem.kind != vkList:
+      # You cannot assign to an existing variable except when appending to a list.
+      return some(newWarningData(wImmutableVars))
+
+    # Append the value to the list item.
+    lastItem.listv.add(value)
+  else:
+    # Append the value to the dictionary.
+    parentDict.dict[lastName] = value
 
 proc getVariable*(variables: Variables, dotNameStr: string): ValueOrWarning =
   ## Look up the variable and return its value when found, else return
