@@ -26,7 +26,6 @@ proc myProcToTest(value:int): string {.tpub.} =
 macro tpub(x: untyped): untyped
 ```
 
-
 # tpubType
 
 Exports a type when in test mode so it can be tested in an
@@ -46,7 +45,6 @@ tpubType:
 ```nim
 macro tpubType(x: untyped): untyped
 ```
-
 
 
 ---

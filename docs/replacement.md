@@ -25,7 +25,6 @@ ReplaceLineKind = enum
   rlEndblockLine             ## The endblock line.
 ```
 
-
 # ReplaceLine
 
 Line information returned by yieldReplacementLine.
@@ -37,7 +36,6 @@ ReplaceLine = object
 
 ```
 
-
 # newReplaceLine
 
 Return a ReplaceLine object.
@@ -46,7 +44,6 @@ Return a ReplaceLine object.
 func newReplaceLine(kind: ReplaceLineKind; line: string): ReplaceLine
 ```
 
-
 # `$`
 
 Return a string representation of a ReplaceLine.
@@ -54,7 +51,6 @@ Return a string representation of a ReplaceLine.
 ```nim
 func `$`(replaceLine: ReplaceLine): string
 ```
-
 
 # writeTempSegments
 
@@ -65,7 +61,6 @@ proc writeTempSegments(env: var Env; tempSegments: var TempSegments;
                        lineNum: Natural; variables: Variables)
 ```
 
-
 # closeDelete
 
 Close the TempSegments and delete its backing temporary file.
@@ -73,7 +68,6 @@ Close the TempSegments and delete its backing temporary file.
 ```nim
 proc closeDelete(tempSegments: TempSegments)
 ```
-
 
 # storeLineSegments
 
@@ -83,7 +77,6 @@ Divide the line into segments and write them to the TempSegments' temp file.
 proc storeLineSegments(env: var Env; tempSegments: TempSegments;
                        prepostTable: PrepostTable; line: string)
 ```
-
 
 # yieldReplacementLine
 
@@ -95,7 +88,6 @@ iterator yieldReplacementLine(env: var Env; firstReplaceLine: string;
                               command: string; maxLines: Natural): ReplaceLine
 ```
 
-
 # newTempSegments
 
 Read replacement block lines and return a TempSegments object containing the compiled block. Call writeTempSegments to write out the segments. Call closeDelete to close and delete the associated temp file.
@@ -105,7 +97,6 @@ proc newTempSegments(env: var Env; lb: var LineBuffer;
                      prepostTable: PrepostTable; command: string;
                      repeat: Natural; variables: Variables): Option[TempSegments]
 ```
-
 
 
 ---

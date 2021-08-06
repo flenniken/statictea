@@ -1352,7 +1352,7 @@ suite "runFunction.nim":
 
   test "githubAnchor list":
     let list = newValue(["Tea", "Water", "tea"])
-    let expected = newValue(["tea", "water", "tea-2"])
+    let expected = newValue(["tea", "water", "tea-1"])
     let parameters = @[list]
     let eFunResult = newFunResult(expected)
     check testFunction("githubAnchor", parameters, eFunResult)

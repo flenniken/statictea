@@ -21,7 +21,6 @@ TempFile = object
 
 ```
 
-
 # openTempFile
 
 Create and open an empty file in the temp directory open for read write. When no error, return TempFile containing the file and filename.
@@ -29,7 +28,6 @@ Create and open an empty file in the temp directory open for read write. When no
 ```nim
 proc openTempFile(): Option[TempFile]
 ```
-
 
 # truncate
 
@@ -39,7 +37,6 @@ Close the temp file, truncate it, then open it again.
 proc truncate(tempFile: var TempFile)
 ```
 
-
 # closeDelete
 
 Close and delete the temp file.
@@ -47,7 +44,6 @@ Close and delete the temp file.
 ```nim
 proc closeDelete(tempFile: TempFile)
 ```
-
 
 
 ---

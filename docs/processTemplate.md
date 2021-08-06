@@ -19,7 +19,6 @@ Yield one content line at a time and keep the line endings.
 iterator yieldContentLine(content: string): string
 ```
 
-
 # processTemplate
 
 Process the template and return 0 on success. Return 1 if a warning messages was written while processing the template.
@@ -27,7 +26,6 @@ Process the template and return 0 on success. Return 1 if a warning messages was
 ```nim
 proc processTemplate(env: var Env; args: Args): int
 ```
-
 
 # updateTemplate
 
@@ -37,7 +35,6 @@ Update the template and return 0 on success. Return 1 if a warning messages was 
 proc updateTemplate(env: var Env; args: Args): int
 ```
 
-
 # processTemplateTop
 
 Setup the environment streams then process the template and return 0 on success.
@@ -46,7 +43,6 @@ Setup the environment streams then process the template and return 0 on success.
 proc processTemplateTop(env: var Env; args: Args): int
 ```
 
-
 # updateTemplateTop
 
 Update the template and return 0 on success. This calls updateTemplate.
@@ -54,7 +50,6 @@ Update the template and return 0 on success. This calls updateTemplate.
 ```nim
 proc updateTemplateTop(env: var Env; args: Args): int
 ```
-
 
 
 ---

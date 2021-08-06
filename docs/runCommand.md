@@ -12,7 +12,7 @@ starts in the template file.
 * [startColumn](#startcolumn) &mdash; Return enough spaces to point at the warning column.
 * [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
 * [`==`](#) &mdash; Return true when the two statements are equal.
-* [`$`](#) &mdash; Return a string representation of a Statement.
+* [`$`](#-1) &mdash; Return a string representation of a Statement.
 * [newValueAndLength](#newvalueandlength) &mdash; Create a newValueAndLength object.
 * [getString](#getstring) &mdash; Return a literal string value and match length from a statement.
 * [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
@@ -40,7 +40,6 @@ Statement = object
 
 ```
 
-
 # ValueAndLength
 
 A value and the length of the matching text in the statement. For the example statement: "var = 567 ". The value 567 starts at index 6 and the matching length is 4 because it includes the trailing space. For example "id = row(3 )" the value is 3 and the length is 2.
@@ -52,7 +51,6 @@ ValueAndLength = object
 
 ```
 
-
 # newStatement
 
 Create a new statement.
@@ -61,7 +59,6 @@ Create a new statement.
 func newStatement(text: string; lineNum: Natural = 1; start: Natural = 1): Statement
 ```
 
-
 # startColumn
 
 Return enough spaces to point at the warning column.  Used under the statement line.
@@ -69,7 +66,6 @@ Return enough spaces to point at the warning column.  Used under the statement l
 ```nim
 proc startColumn(start: Natural): string
 ```
-
 
 # warnStatement
 
@@ -80,7 +76,6 @@ proc warnStatement(env: var Env; statement: Statement; warning: Warning;
                    start: Natural; p1: string = ""; p2: string = "")
 ```
 
-
 # `==`
 
 Return true when the two statements are equal.
@@ -88,7 +83,6 @@ Return true when the two statements are equal.
 ```nim
 func `==`(s1: Statement; s2: Statement): bool
 ```
-
 
 # `$`
 
@@ -98,7 +92,6 @@ Return a string representation of a Statement.
 func `$`(s: Statement): string
 ```
 
-
 # newValueAndLength
 
 Create a newValueAndLength object.
@@ -106,7 +99,6 @@ Create a newValueAndLength object.
 ```nim
 proc newValueAndLength(value: Value; length: Natural): ValueAndLength
 ```
-
 
 # getString
 
@@ -117,7 +109,6 @@ proc getString(env: var Env; prepostTable: PrepostTable; statement: Statement;
                start: Natural): Option[ValueAndLength]
 ```
 
-
 # getNumber
 
 Return the literal number value and match length from the statement. The start index points at a digit or minus sign.
@@ -126,7 +117,6 @@ Return the literal number value and match length from the statement. The start i
 proc getNumber(env: var Env; prepostTable: PrepostTable; statement: Statement;
                start: Natural): Option[ValueAndLength]
 ```
-
 
 # getFunctionValue
 
@@ -139,7 +129,6 @@ proc getFunctionValue(env: var Env; prepostTable: PrepostTable;
     ValueAndLength]
 ```
 
-
 # getVarOrFunctionValue
 
 Return the statement's right hand side value and the length matched. The right hand side must be a variable or a function. The right hand side starts at the index specified by start.
@@ -149,7 +138,6 @@ proc getVarOrFunctionValue(env: var Env; prepostTable: PrepostTable;
                            statement: Statement; start: Natural;
                            variables: Variables): Option[ValueAndLength]
 ```
-
 
 # runStatement
 
@@ -161,7 +149,6 @@ proc runStatement(env: var Env; statement: Statement;
     VariableData]
 ```
 
-
 # runCommand
 
 Run a command and fill in the variables dictionaries.
@@ -171,7 +158,6 @@ proc runCommand(env: var Env; cmdLines: seq[string];
                 cmdLineParts: seq[LineParts]; prepostTable: PrepostTable;
                 variables: var Variables)
 ```
-
 
 
 ---

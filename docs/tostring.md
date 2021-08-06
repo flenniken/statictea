@@ -10,8 +10,8 @@ Value types to string methods.
 * [valueToString](#valuetostring) &mdash; Return a string representation of a Value in JSON format.
 * [shortValueToString](#shortvaluetostring) &mdash; Return a short string representation of Value.
 * [`$`](#) &mdash; Return a string representation of a Value.
-* [`$`](#) &mdash; Return a string representation of a VarsDict.
-* [`$`](#) &mdash; Return a string representation of a ValueOrWarning object.
+* [`$`](#-1) &mdash; Return a string representation of a VarsDict.
+* [`$`](#-2) &mdash; Return a string representation of a ValueOrWarning object.
 
 # dictToString
 
@@ -21,7 +21,6 @@ Return a string representation of a dict Value in JSON format.
 func dictToString(value: Value): string
 ```
 
-
 # listToString
 
 Return a string representation of a list Value in JSON format.
@@ -29,7 +28,6 @@ Return a string representation of a list Value in JSON format.
 ```nim
 func listToString(value: Value): string
 ```
-
 
 # valueToString
 
@@ -39,7 +37,6 @@ Return a string representation of a Value in JSON format.
 func valueToString(value: Value): string
 ```
 
-
 # shortValueToString
 
 Return a short string representation of Value. This is used to convert values to strings in replacement blocks.
@@ -47,7 +44,6 @@ Return a short string representation of Value. This is used to convert values to
 ```nim
 func shortValueToString(value: Value): string
 ```
-
 
 # `$`
 
@@ -57,7 +53,6 @@ Return a string representation of a Value.
 func `$`(value: Value): string
 ```
 
-
 # `$`
 
 Return a string representation of a VarsDict.
@@ -66,7 +61,6 @@ Return a string representation of a VarsDict.
 proc `$`(varsDict: VarsDict): string
 ```
 
-
 # `$`
 
 Return a string representation of a ValueOrWarning object.
@@ -74,7 +68,6 @@ Return a string representation of a ValueOrWarning object.
 ```nim
 func `$`(vw: ValueOrWarning): string
 ```
-
 
 
 ---

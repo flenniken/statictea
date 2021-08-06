@@ -36,7 +36,6 @@ The prefix postfix pairs stored in an ordered dictionary.
 PrepostTable = OrderedTable[string, string]
 ```
 
-
 # makeDefaultPrepostTable
 
 Return the default ordered table that maps prefixes to postfixes.
@@ -45,7 +44,6 @@ Return the default ordered table that maps prefixes to postfixes.
 proc makeDefaultPrepostTable(): PrepostTable
 ```
 
-
 # makeUserPrepostTable
 
 Return the user's ordered table that maps prefixes to postfixes. This is used when the user specifies prefixes on the command line and it does not contain any defaults.
@@ -53,7 +51,6 @@ Return the user's ordered table that maps prefixes to postfixes. This is used wh
 ```nim
 proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable
 ```
-
 
 # matchPrefix
 
@@ -64,7 +61,6 @@ proc matchPrefix(line: string; prepostTable: PrepostTable; start: Natural = 0): 
     Matches]
 ```
 
-
 # matchCommand
 
 Match statictea commands.
@@ -72,7 +68,6 @@ Match statictea commands.
 ```nim
 proc matchCommand(line: string; start: Natural = 0): Option[Matches]
 ```
-
 
 # matchLastPart
 
@@ -83,7 +78,6 @@ proc matchLastPart(line: string; postfix: string; start: Natural = 0): Option[
     Matches]
 ```
 
-
 # getLastPart
 
 Return the optional plus and line endings from the line.
@@ -91,7 +85,6 @@ Return the optional plus and line endings from the line.
 ```nim
 proc getLastPart(line: string; postfix: string): Option[Matches]
 ```
-
 
 # matchAllSpaceTab
 
@@ -101,7 +94,6 @@ Match a line of all spaces or tabs.
 proc matchAllSpaceTab(line: string; start: Natural = 0): Option[Matches]
 ```
 
-
 # matchTabSpace
 
 Match one or more spaces or tabs.
@@ -109,7 +101,6 @@ Match one or more spaces or tabs.
 ```nim
 proc matchTabSpace(line: string; start: Natural = 0): Option[Matches]
 ```
-
 
 # notEmptyOrSpaces
 
@@ -119,7 +110,6 @@ Return true when a statement is not empty or not all whitespace.
 proc notEmptyOrSpaces(text: string): bool
 ```
 
-
 # matchEqualSign
 
 Match an equal sign and the optional trailing whitespace.
@@ -127,7 +117,6 @@ Match an equal sign and the optional trailing whitespace.
 ```nim
 proc matchEqualSign(line: string; start: Natural = 0): Option[Matches]
 ```
-
 
 # matchLeftParentheses
 
@@ -137,7 +126,6 @@ Match a left parenthese and the optional trailing whitespace.
 proc matchLeftParentheses(line: string; start: Natural = 0): Option[Matches]
 ```
 
-
 # matchCommaParentheses
 
 Match a comma or right parentheses and the optional trailing whitespace.
@@ -145,7 +133,6 @@ Match a comma or right parentheses and the optional trailing whitespace.
 ```nim
 proc matchCommaParentheses(line: string; start: Natural = 0): Option[Matches]
 ```
-
 
 # matchRightParentheses
 
@@ -155,7 +142,6 @@ Match a right parentheses and the optional trailing whitespace.
 proc matchRightParentheses(line: string; start: Natural = 0): Option[Matches]
 ```
 
-
 # matchNumber
 
 Match a number and the optional trailing whitespace. Return the optional decimal point that tells whether the number is a float or integer.
@@ -163,7 +149,6 @@ Match a number and the optional trailing whitespace. Return the optional decimal
 ```nim
 proc matchNumber(line: string; start: Natural = 0): Option[Matches]
 ```
-
 
 # matchNumberNotCached
 
@@ -173,7 +158,6 @@ Match a number and the optional trailing whitespace. Return the optional decimal
 func matchNumberNotCached(line: string; start: Natural = 0): Option[Matches]
 ```
 
-
 # matchString
 
 Match a string inside either single or double quotes.  The optional white space after the string is matched too. There are two returned groups and only one will contain anything. The first is for single quotes and the second is for double quotes.
@@ -181,7 +165,6 @@ Match a string inside either single or double quotes.  The optional white space 
 ```nim
 proc matchString(line: string; start: Natural = 0): Option[Matches]
 ```
-
 
 # matchLeftBracket
 
@@ -191,7 +174,6 @@ Match everything up to a left backet. The match length includes the bracket.
 proc matchLeftBracket(line: string; start: Natural = 0): Option[Matches]
 ```
 
-
 # matchFileLine
 
 Match a file and line number like: filename(234).
@@ -199,7 +181,6 @@ Match a file and line number like: filename(234).
 ```nim
 proc matchFileLine(line: string; start: Natural = 0): Option[Matches]
 ```
-
 
 # matchVersion
 
@@ -209,7 +190,6 @@ Match a StaticTea version number.
 proc matchVersion(line: string; start: Natural = 0): Option[Matches]
 ```
 
-
 # matchVersionNotCached
 
 Match a StaticTea version number.
@@ -217,7 +197,6 @@ Match a StaticTea version number.
 ```nim
 func matchVersionNotCached(line: string; start: Natural = 0): Option[Matches]
 ```
-
 
 # matchDotNames
 
@@ -249,7 +228,6 @@ if dotNamesO.isSome:
 ```nim
 proc matchDotNames(line: string; start: Natural = 0): Option[Matches]
 ```
-
 
 
 ---

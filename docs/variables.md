@@ -54,7 +54,7 @@ Language variable methods.
 * type: [ParentDictKind](#parentdictkind) &mdash; The kind of a ParentDict object, either a dict or warning.
 * type: [ParentDict](#parentdict) &mdash; Contains the result of calling getParentDict, either a dictionary or a warning.
 * [`$`](#) &mdash; Return a string representation of ParentDict.
-* [`==`](#) &mdash; Return true when the two ParentDict are equal.
+* [`==`](#-1) &mdash; Return true when the two ParentDict are equal.
 * [newParentDictWarn](#newparentdictwarn) &mdash; Return a new ParentDict object of the warning kind.
 * [newParentDict](#newparentdict) &mdash; Return a new ParentDict object containing a dict.
 * [emptyVariables](#emptyvariables) &mdash; Create an empty variables object in its initial state.
@@ -74,7 +74,6 @@ Tea output variable values.
 outputValues = ["result", "stderr", "log", "skip"]
 ```
 
-
 # Variables
 
 Dictionary holding all statictea variables.
@@ -82,7 +81,6 @@ Dictionary holding all statictea variables.
 ```nim
 Variables = VarsDict
 ```
-
 
 # VariableData
 
@@ -95,7 +93,6 @@ VariableData = object
 
 ```
 
-
 # ParentDictKind
 
 The kind of a ParentDict object, either a dict or warning.
@@ -104,7 +101,6 @@ The kind of a ParentDict object, either a dict or warning.
 ParentDictKind = enum
   fdDict, fdWarning
 ```
-
 
 # ParentDict
 
@@ -122,7 +118,6 @@ ParentDict = object
 
 ```
 
-
 # `$`
 
 Return a string representation of ParentDict.
@@ -130,7 +125,6 @@ Return a string representation of ParentDict.
 ```nim
 func `$`(parentDict: ParentDict): string
 ```
-
 
 # `==`
 
@@ -140,7 +134,6 @@ Return true when the two ParentDict are equal.
 func `==`(s1: ParentDict; s2: ParentDict): bool
 ```
 
-
 # newParentDictWarn
 
 Return a new ParentDict object of the warning kind. It contains a warning and the two optional strings that go with the warning.
@@ -148,7 +141,6 @@ Return a new ParentDict object of the warning kind. It contains a warning and th
 ```nim
 func newParentDictWarn(warning: Warning; p1: string = ""; p2: string = ""): ParentDict
 ```
-
 
 # newParentDict
 
@@ -158,7 +150,6 @@ Return a new ParentDict object containing a dict.
 func newParentDict(dict: VarsDict): ParentDict
 ```
 
-
 # emptyVariables
 
 Create an empty variables object in its initial state.
@@ -166,7 +157,6 @@ Create an empty variables object in its initial state.
 ```nim
 func emptyVariables(server: VarsDict = nil; shared: VarsDict = nil): Variables
 ```
-
 
 # newVariableData
 
@@ -176,7 +166,6 @@ Create a new VariableData object.
 func newVariableData(dotNameStr: string; value: Value): VariableData
 ```
 
-
 # getTeaVarIntDefault
 
 Return the int value of one of the tea dictionary integer items. If the value does not exist, return its default value.
@@ -184,7 +173,6 @@ Return the int value of one of the tea dictionary integer items. If the value do
 ```nim
 func getTeaVarIntDefault(variables: Variables; varName: string): int64
 ```
-
 
 # getTeaVarStringDefault
 
@@ -194,7 +182,6 @@ Return the string value of one of the tea dictionary string items. If the value 
 func getTeaVarStringDefault(variables: Variables; varName: string): string
 ```
 
-
 # resetVariables
 
 Clear the local variables and reset the tea variables for running a command.
@@ -203,7 +190,6 @@ Clear the local variables and reset the tea variables for running a command.
 proc resetVariables(variables: var Variables)
 ```
 
-
 # getParentDict
 
 Return the last component dictionary specified by the given names or, on error, return a warning.  The sequence [a, b, c, d] corresponds to the dot name string "a.b.c.d" and the c dictionary is the result.
@@ -211,7 +197,6 @@ Return the last component dictionary specified by the given names or, on error, 
 ```nim
 proc getParentDict(variables: Variables; names: seq[string]): ParentDict
 ```
-
 
 # assignVariable
 
@@ -222,7 +207,6 @@ proc assignVariable(variables: var Variables; dotNameStr: string; value: Value):
     WarningData]
 ```
 
-
 # getVariable
 
 Look up the variable and return its value when found, else return a warning.
@@ -230,7 +214,6 @@ Look up the variable and return its value when found, else return a warning.
 ```nim
 proc getVariable(variables: Variables; dotNameStr: string): ValueOrWarning
 ```
-
 
 
 ---

@@ -58,7 +58,6 @@ Compares two values a and b.  When a equals b return 0, when a is greater than b
 func cmpBaseValues(a, b: Value; insensitive: bool = false): int
 ```
 
-
 # funCmp_iii
 
 Compare two ints. Returns -1 for less, 0 for equal and 1 for
@@ -80,7 +79,6 @@ cmp(9, 2) => 1
 func funCmp_iii(parameters: seq[Value]): FunResult
 ```
 
-
 # funCmp_ffi
 
 Compare two floats. Returns -1 for less, 0 for
@@ -101,7 +99,6 @@ cmp(9.3, 2.2) => 1
 ```nim
 func funCmp_ffi(parameters: seq[Value]): FunResult
 ```
-
 
 # funCmp_ssoii
 
@@ -129,7 +126,6 @@ cmp("Tea", "tea", 1) => 0
 func funCmp_ssoii(parameters: seq[Value]): FunResult
 ```
 
-
 # funConcat
 
 Concatentate strings.
@@ -150,7 +146,6 @@ concat("a") => "a"
 func funConcat(parameters: seq[Value]): FunResult
 ```
 
-
 # funLen_si
 
 Length of a string in characters, not bytes.
@@ -169,7 +164,6 @@ len("añyóng") => 6
 ```nim
 func funLen_si(parameters: seq[Value]): FunResult
 ```
-
 
 # funLen_li
 
@@ -191,7 +185,6 @@ len(list(4, 5)) => 2
 func funLen_li(parameters: seq[Value]): FunResult
 ```
 
-
 # funLen_di
 
 Number of elements in a dictionary.
@@ -211,7 +204,6 @@ len(dict('a', 4, 'b', 3)) => 2
 ```nim
 func funLen_di(parameters: seq[Value]): FunResult
 ```
-
 
 # funGet_lioaa
 
@@ -234,7 +226,6 @@ get(list, 3, 99) => 99
 ```nim
 func funGet_lioaa(parameters: seq[Value]): FunResult
 ```
-
 
 # funGet_dsoaa
 
@@ -267,7 +258,6 @@ d.tea => "Earl Grey"
 func funGet_dsoaa(parameters: seq[Value]): FunResult
 ```
 
-
 # funIf
 
 If the condition is 1 return one value, else return another value.
@@ -287,7 +277,6 @@ if(4, 'tea', 'beer') => "beer"
 ```nim
 func funIf(parameters: seq[Value]): FunResult
 ```
-
 
 # funAdd_Ii
 
@@ -309,7 +298,6 @@ add(1, 2, 3) => 6
 func funAdd_Ii(parameters: seq[Value]): FunResult
 ```
 
-
 # funAdd_Fi
 
 Add floats. A warning is generated on overflow.
@@ -330,7 +318,6 @@ add(1.1, 2.2, 3.3) => 6.6
 func funAdd_Fi(parameters: seq[Value]): FunResult
 ```
 
-
 # funExists
 
 Determine whether a key exists in a dictionary. Return 1 when it exists, else 0.
@@ -350,7 +337,6 @@ exists(d, "coffee") => 0
 ```nim
 func funExists(parameters: seq[Value]): FunResult
 ```
-
 
 # funCase_iloaa
 
@@ -387,7 +373,6 @@ case(3, cases, "wine") => "wine"
 func funCase_iloaa(parameters: seq[Value]): FunResult
 ```
 
-
 # funCase_sloaa
 
 Compare string cases and return the matching value.  It takes a
@@ -422,7 +407,6 @@ case("bunch", cases, "other") => "other"
 func funCase_sloaa(parameters: seq[Value]): FunResult
 ```
 
-
 # parseVersion
 
 Parse a StaticTea version number and return its three components.
@@ -430,7 +414,6 @@ Parse a StaticTea version number and return its three components.
 ```nim
 func parseVersion(version: string): Option[(int, int, int)]
 ```
-
 
 # funCmpVersion
 
@@ -457,7 +440,6 @@ cmpVersion("1.2.5", "1.2.5") => 0
 func funCmpVersion(parameters: seq[Value]): FunResult
 ```
 
-
 # funFloat_if
 
 Create a float from an int.
@@ -476,7 +458,6 @@ float(-33) => -33.0
 ```nim
 func funFloat_if(parameters: seq[Value]): FunResult
 ```
-
 
 # funFloat_sf
 
@@ -497,7 +478,6 @@ float("33") => 33.0
 ```nim
 func funFloat_sf(parameters: seq[Value]): FunResult
 ```
-
 
 # funInt_fosi
 
@@ -534,7 +514,6 @@ int(-6.3456, "truncate") => -6
 func funInt_fosi(parameters: seq[Value]): FunResult
 ```
 
-
 # funInt_sosi
 
 Create an int from a number string.
@@ -570,7 +549,6 @@ int("-6.3456", "truncate") => -6
 func funInt_sosi(parameters: seq[Value]): FunResult
 ```
 
-
 # funFind
 
 Find the position of a substring in a string.  When the substring
@@ -599,7 +577,6 @@ find(msg, "party", 0) = 0
 func funFind(parameters: seq[Value]): FunResult
 ```
 
-
 # funSubstr
 
 Extract a substring from a string by its position. You pass the
@@ -626,7 +603,6 @@ substr("Earl Grey", 6) => "rey"
 func funSubstr(parameters: seq[Value]): FunResult
 ```
 
-
 # funDup
 
 Duplicate a string x times.  The result is a new string built by
@@ -650,7 +626,6 @@ dup("", 3) => ""
 func funDup(parameters: seq[Value]): FunResult
 ```
 
-
 # funDict
 
 Create a dictionary from a list of key, value pairs.  The keys
@@ -673,7 +648,6 @@ dict("a", 5, "b", 33, "c", 0) =>
 func funDict(parameters: seq[Value]): FunResult
 ```
 
-
 # funList
 
 Create a list of values.
@@ -694,7 +668,6 @@ list("a", 5, "b") => ["a", 5, "b"]
 ```nim
 func funList(parameters: seq[Value]): FunResult
 ```
-
 
 # funReplace
 
@@ -741,7 +714,6 @@ replace("123", 0, 3, "") =>
 func funReplace(parameters: seq[Value]): FunResult
 ```
 
-
 # funReplaceRe_sSSs
 
 Replace multiple parts of a string using regular expressions.
@@ -769,7 +741,6 @@ website: https://regex101.com/
 func funReplaceRe_sSSs(parameters: seq[Value]): FunResult
 ```
 
-
 # funReplaceRe_sls
 
 Replace multiple parts of a string using regular expressions.
@@ -795,7 +766,6 @@ website: https://regex101.com/
 ```nim
 func funReplaceRe_sls(parameters: seq[Value]): FunResult
 ```
-
 
 # funPath
 
@@ -832,7 +802,6 @@ path("src\runFunction.nim", "\") => {
 func funPath(parameters: seq[Value]): FunResult
 ```
 
-
 # funLower
 
 Lowercase a string.
@@ -852,7 +821,6 @@ lower("TEĀ") => "teā"
 ```nim
 func funLower(parameters: seq[Value]): FunResult
 ```
-
 
 # funKeys
 
@@ -874,7 +842,6 @@ values(d) => ["apple", 2, 3]
 func funKeys(parameters: seq[Value]): FunResult
 ```
 
-
 # funValues
 
 Create a list out of the values in the specified dictionary.
@@ -894,7 +861,6 @@ values(d) => ["apple", 2, 3]
 ```nim
 func funValues(parameters: seq[Value]): FunResult
 ```
-
 
 # funSort_lsosl
 
@@ -931,7 +897,6 @@ sort(strs, "ascending", "insensitive") => ['a', 'e', 'T']
 func funSort_lsosl(parameters: seq[Value]): FunResult
 ```
 
-
 # funSort_lssil
 
 Sort a list of lists.
@@ -963,7 +928,6 @@ sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
 func funSort_lssil(parameters: seq[Value]): FunResult
 ```
 
-
 # funSort_lsssl
 
 Sort a list of dictionaries.
@@ -994,7 +958,6 @@ sort(dicts, "descending", "sensitive", 'name') => [d2, d1]
 ```nim
 func funSort_lsssl(parameters: seq[Value]): FunResult
 ```
-
 
 # funGithubAnchor_ss
 
@@ -1029,7 +992,6 @@ $$ : anchor = githubAnchor(entry.name)
 func funGithubAnchor_ss(parameters: seq[Value]): FunResult
 ```
 
-
 # funGithubAnchor_ll
 
 Create Github markdown anchor names given a list of heading
@@ -1052,7 +1014,6 @@ githubAnchor(list) =>
 func funGithubAnchor_ll(parameters: seq[Value]): FunResult
 ```
 
-
 # createFunctionTable
 
 Create a table of all the built in functions.
@@ -1061,7 +1022,6 @@ Create a table of all the built in functions.
 func createFunctionTable(): Table[string, seq[FunctionSpec]]
 ```
 
-
 # getFunctionList
 
 Return the functions with the given name.
@@ -1069,7 +1029,6 @@ Return the functions with the given name.
 ```nim
 proc getFunctionList(name: string): seq[FunctionSpec]
 ```
-
 
 # getFunction
 
@@ -1080,7 +1039,6 @@ proc getFunction(functionName: string; parameters: seq[Value]): Option[
     FunctionSpec]
 ```
 
-
 # isFunctionName
 
 Return true when the function exists.
@@ -1088,7 +1046,6 @@ Return true when the function exists.
 ```nim
 proc isFunctionName(functionName: string): bool
 ```
-
 
 
 ---

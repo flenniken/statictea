@@ -28,7 +28,6 @@ Matches = object
 
 ```
 
-
 # Replacement
 
 Holds the regular expression and replacement for the replaceMany function.
@@ -40,7 +39,6 @@ Replacement = object
 
 ```
 
-
 # getGroup
 
 Get the first group in matches if it exists, else return "".
@@ -48,7 +46,6 @@ Get the first group in matches if it exists, else return "".
 ```nim
 func getGroup(matches: Matches): string
 ```
-
 
 # get2Groups
 
@@ -58,7 +55,6 @@ Get the first two groups in matches. If one of the groups doesn't exist, "" is r
 func get2Groups(matches: Matches): (string, string)
 ```
 
-
 # get3Groups
 
 Get the first three groups in matches. If one of the groups doesn't exist, "" is returned for it.
@@ -67,7 +63,6 @@ Get the first three groups in matches. If one of the groups doesn't exist, "" is
 func get3Groups(matches: Matches): (string, string, string)
 ```
 
-
 # matchRegex
 
 Match a regular expression pattern in a string.
@@ -75,7 +70,6 @@ Match a regular expression pattern in a string.
 ```nim
 func matchRegex(str: string; regex: Regex; start: Natural = 0): Option[Matches]
 ```
-
 
 # matchPatternCached
 
@@ -86,7 +80,6 @@ proc matchPatternCached(str: string; pattern: string; start: Natural = 0): Optio
     Matches]
 ```
 
-
 # matchPattern
 
 Match a regular expression pattern in a string.
@@ -96,7 +89,6 @@ func matchPattern(str: string; pattern: string; start: Natural = 0): Option[
     Matches]
 ```
 
-
 # newReplacement
 
 Create a new Replacement object.
@@ -105,7 +97,6 @@ Create a new Replacement object.
 func newReplacement(pattern: string; sub: string): Replacement
 ```
 
-
 # replaceMany
 
 Replace the patterns in the string with their replacements.
@@ -113,7 +104,6 @@ Replace the patterns in the string with their replacements.
 ```nim
 proc replaceMany(str: string; replacements: seq[Replacement]): string
 ```
-
 
 
 ---

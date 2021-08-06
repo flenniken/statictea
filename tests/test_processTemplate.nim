@@ -1143,6 +1143,46 @@ hello
     check testProcessTemplate(templateContent = templateContent,
         eResultLines = eResultLines, eRc = 0)
 
+  test "overwrite global variable":
+    let templateContent = """
+$$ block
+$$ : t.repeat = 2
+$$ : g.var = t.row
+{g.var}
+$$ endblock
+"""
+    let eResultLines = splitNewLines """
+0
+0
+"""
+    let eErrLines = splitNewLines """
+template.html(3): w95: You cannot assign to an existing variable except when appending to a list.
+statement: g.var = t.row
+           ^
+"""
+    check testProcessTemplate(templateContent = templateContent, eErrLines = eErrLines,
+      eResultLines = eResultLines, eRc = 1)
+
+  test "overwrite global list variable":
+    # todo: what should we do about this behavior, nothing?
+    let templateContent = """
+$$ block
+$$ : t.repeat = 4
+$$ : g.var = list()
+$$ : g.var = t.row
+$$ : num = get(g.var, t.row)
+{num}
+$$ endblock
+"""
+    let eResultLines = splitNewLines """
+0
+[]
+1
+[]
+"""
+    check testProcessTemplate(templateContent = templateContent,
+      eResultLines = eResultLines, eRc = 0)
+
 
 # todo: test literal strings with \n etc. in them.  Are these supported?
 # todo: test with no result file.

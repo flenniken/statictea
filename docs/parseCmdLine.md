@@ -29,7 +29,6 @@ LineParts = object
 
 ```
 
-
 # parseCmdLine
 
 Parse the line and return its parts when it is a command. Return quickly when not a command line.
@@ -38,7 +37,6 @@ Parse the line and return its parts when it is a command. Return quickly when no
 proc parseCmdLine(env: var Env; prepostTable: PrepostTable; line: string;
                   lineNum: Natural): Option[LineParts]
 ```
-
 
 
 ---

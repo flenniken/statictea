@@ -11,7 +11,7 @@ The warning messages.
 * [getWarning](#getwarning) &mdash; Return a formatted warning line.
 * [newWarningData](#newwarningdata) &mdash; Create a WarningData object containing the warning information.
 * [`$`](#) &mdash; Return a string representation of WarningData.
-* [`==`](#) &mdash; Return true when the two WarningData are equal.
+* [`==`](#-1) &mdash; Return true when the two WarningData are equal.
 
 # WarningData
 
@@ -24,7 +24,6 @@ WarningData = object
   p2*: string                ## Optional warning info.
 
 ```
-
 
 # Warning
 
@@ -67,7 +66,6 @@ Warning = enum
   wAtLeast4Parameters, wExpectedNumberString, wCaseTypeMismatch, wNotEvenCases,
   wNotAllStrings, wTeaVariableExists
 ```
-
 
 # warningsList
 
@@ -175,7 +173,6 @@ warningsList: array[low(Warning) .. high(Warning), string] = [
     "Too many arguments, expected at most
 ```
 
-
 # getWarning
 
 Return a formatted warning line.
@@ -185,7 +182,6 @@ func getWarning(filename: string; lineNum: int; warning: Warning;
                 p1: string = ""; p2: string = ""): string
 ```
 
-
 # newWarningData
 
 Create a WarningData object containing the warning information.
@@ -193,7 +189,6 @@ Create a WarningData object containing the warning information.
 ```nim
 proc newWarningData(warning: Warning; p1: string = ""; p2: string = ""): WarningData
 ```
-
 
 # `$`
 
@@ -203,7 +198,6 @@ Return a string representation of WarningData.
 func `$`(warningData: WarningData): string
 ```
 
-
 # `==`
 
 Return true when the two WarningData are equal.
@@ -211,7 +205,6 @@ Return true when the two WarningData are equal.
 ```nim
 func `==`(w1: WarningData; w2: WarningData): bool
 ```
-
 
 
 ---

@@ -21,7 +21,6 @@ Prepost = object
 
 ```
 
-
 # Args
 
 Args holds all the command line arguments.
@@ -41,7 +40,6 @@ Args = object
 
 ```
 
-
 # newPrepost
 
 Create a new prepost object from the prefix and postfix.
@@ -50,7 +48,6 @@ Create a new prepost object from the prefix and postfix.
 func newPrepost(prefix: string; postfix: string): Prepost
 ```
 
-
 # `$`
 
 Return a string representation of the Args object.
@@ -58,7 +55,6 @@ Return a string representation of the Args object.
 ```nim
 func `$`(args: Args): string
 ```
-
 
 
 ---

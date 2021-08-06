@@ -309,3 +309,14 @@ suite "variables.nim":
     warningDataO = assignVariable(variables, "teas", newValue(7))
     check not warningDataO.isSome
     check $variables["l"] == """{"teas":[5,6,7]}"""
+
+  test "append list to a list":
+    var variables = emptyVariables()
+    var warningDataO = assignVariable(variables, "teas", newEmptyListValue())
+    check not warningDataO.isSome
+    warningDataO = assignVariable(variables, "teas", newEmptyListValue())
+    check not warningDataO.isSome
+    warningDataO = assignVariable(variables, "teas", newEmptyListValue())
+    check not warningDataO.isSome
+    check $variables["l"] == """{"teas":[[],[]]}"""
+

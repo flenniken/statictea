@@ -19,7 +19,6 @@ ArgsOrWarningKind = enum
   awArgs, awWarning
 ```
 
-
 # ArgsOrWarning
 
 Holds args or a warning.
@@ -36,7 +35,6 @@ ArgsOrWarning = object
 
 ```
 
-
 # parseCommandLine
 
 Return the command line arguments or a warning. Processing stops on the first warning.
@@ -45,7 +43,6 @@ Return the command line arguments or a warning. Processing stops on the first wa
 proc parseCommandLine(argv: seq[string]): ArgsOrWarning
 ```
 
-
 # `$`
 
 Return a string representation of a ArgsOrWarning object.
@@ -53,7 +50,6 @@ Return a string representation of a ArgsOrWarning object.
 ```nim
 func `$`(aw: ArgsOrWarning): string
 ```
-
 
 
 ---

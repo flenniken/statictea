@@ -25,7 +25,6 @@ The minimum line length supported.
 minMaxLineLen = 8
 ```
 
-
 # maxMaxLineLen
 
 The maximum line length supported.
@@ -33,7 +32,6 @@ The maximum line length supported.
 ```nim
 maxMaxLineLen = 8192
 ```
-
 
 # defaultMaxLineLen
 
@@ -43,7 +41,6 @@ The maximum line length.
 defaultMaxLineLen = 1024
 ```
 
-
 # defaultBufferSize
 
 The buffer size for reading lines.
@@ -51,7 +48,6 @@ The buffer size for reading lines.
 ```nim
 defaultBufferSize = 16384
 ```
-
 
 # LineBuffer
 
@@ -70,7 +66,6 @@ LineBuffer = object
 
 ```
 
-
 # getLineNum
 
 Return the current line number.
@@ -78,7 +73,6 @@ Return the current line number.
 ```nim
 proc getLineNum(lineBuffer: LineBuffer): int
 ```
-
 
 # getMaxLineLen
 
@@ -88,7 +82,6 @@ Return the maximum line length.
 proc getMaxLineLen(lineBuffer: LineBuffer): int
 ```
 
-
 # getFilename
 
 Return the filename of the stream, if there is one.
@@ -96,7 +89,6 @@ Return the filename of the stream, if there is one.
 ```nim
 proc getFilename(lineBuffer: LineBuffer): string
 ```
-
 
 # newLineBuffer
 
@@ -108,7 +100,6 @@ proc newLineBuffer(stream: Stream; maxLineLen: int = defaultMaxLineLen;
     LineBuffer]
 ```
 
-
 # reset
 
 Clear the buffer.
@@ -116,7 +107,6 @@ Clear the buffer.
 ```nim
 proc reset(lb: var LineBuffer)
 ```
-
 
 # readline
 
@@ -129,7 +119,6 @@ You cannot tell whether the line was truncated or not without reading the next l
 ```nim
 proc readline(lb: var LineBuffer): string
 ```
-
 
 
 ---

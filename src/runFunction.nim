@@ -1449,7 +1449,7 @@ func funGithubAnchor_ll*(parameters: seq[Value]): FunResult =
     var count: int
     if anchorName in names:
       count = names[anchorName] + 1
-      anchorNames.add("$1-$2" % [anchorName, $count])
+      anchorNames.add("$1-$2" % [anchorName, $(count-1)])
     else:
       count = 1
       anchorNames.add(anchorName)

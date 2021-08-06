@@ -14,6 +14,47 @@ $$ :   "&lt;", '<', +
 $$ :   "&amp;", '&')
 $$ : path = path(s.orig)
 $$ : g.moduleName = path.filename
+$$ : g.entries = list()
+$$ endblock
+$$ #
+$$ #
+$$ # Create a list of all the heading names.
+$$ block
+$$ : g.names = list()
+$$ endblock
+$$ block
+$$ : t.repeat = len(s.entries)
+$$ : entry = get(s.entries, t.row)
+$$ : g.names = entry.name
+$$ endblock
+$$ #
+$$ #
+$$ # Create github anchors for all the heading names.
+$$ block
+$$ : g.anchors = githubAnchor(g.names)
+$$ endblock
+$$ #
+$$ #
+$$ # Reformat the entries list and store it in g.entries.
+$$ block
+$$ : t.repeat = len(s.entries)
+$$ : entry = get(s.entries, t.row, dict())
+$$ : newEntry = dict()
+$$ : newEntry.name = entry.name
+$$ : cases = list( +
+$$ :   "skType", "type: ", +
+$$ :   "skConst", "const: ", +
+$$ :   "skMacro", "macro: ")
+$$ : newEntry.type = case(entry.type, cases, "")
+$$ : desc = get(entry, "description", "")
+$$ : sentence = substr(desc, 0, add(find(desc, '.', -1), 1))
+$$ : newEntry.short = replaceRe(sentence, g.patterns)
+$$ : newEntry.description = replaceRe(desc, g.patterns)
+$$ : code = replaceRe(entry.code, "[ ]*$", "")
+$$ : pos = find(code, " {", len(code))
+$$ : newEntry.signature = substr(code, 0, pos)
+$$ : newEntry.anchor = get(g.anchors, t.row)
+$$ : g.entries = newEntry
 $$ endblock
 $$ #
 $$ nextline
@@ -21,50 +62,39 @@ $$ nextline
 
 $$ # Module description.
 $$ block
-$$ : description = replaceRe(s.moduleDescription, g.patterns)
-{description}
+$$ : modDescription = replaceRe(s.moduleDescription, g.patterns)
+{modDescription}
 
 * [{g.moduleName}](../src/{g.moduleName}) &mdash; Nim source code.
 $$ endblock
 $$ #
+$$ #
 $$ # Show the index label when there are entries.
-$$ nextline t.output = case(len(s.entries), list(0, 'skip'), 'result')
+$$ nextline
+$$ : t.output = case(len(g.entries), list(0, 'skip'), 'result')
 # Index
 
 $$ #
 $$ #
-$$ # Index to types and functions.
+$$ # Create the index.
 $$ nextline
-$$ : t.repeat = len(s.entries)
-$$ : entry = get(s.entries, t.row, dict())
-$$ : cases = list( +
-$$ :   "skType", "type: ", +
-$$ :   "skConst", "const: ", +
-$$ :   "skMacro", "macro: ")
-$$ : type = case(entry.type, cases, "")
-$$ : desc = get(entry, "description", "")
-$$ : sentence = substr(desc, 0, add(find(desc, '.', -1), 1))
-$$ : short = replaceRe(sentence, g.patterns)
-$$ : anchor = githubAnchor(entry.name)
-* {type}[{entry.name}](#{anchor}) &mdash; {short}
+$$ : t.repeat = len(g.entries)
+$$ : entry = get(g.entries, t.row)
+* {entry.type}[{entry.name}](#{entry.anchor}) &mdash; {entry.short}
 
-$$ # Function and type descriptions.
+$$ #
+$$ #
+$$ # Create the function sections.
 $$ block
-$$ : t.repeat = len(s.entries)
-$$ : entry = get(s.entries, t.row)
-$$ : desc = get(entry, "description", "")
-$$ : description = replaceRe(desc, g.patterns)
-$$ : code = replaceRe(entry.code, "[ ]*$", "")
-$$ : pos = find(code, " {", len(code))
-$$ : signature = substr(code, 0, pos)
+$$ : t.repeat = len(g.entries)
+$$ : entry = get(g.entries, t.row)
 # {entry.name}
 
-{description}
+{entry.description}
 
 ```nim
-{signature}
+{entry.signature}
 ```
-
 
 $$ endblock
 

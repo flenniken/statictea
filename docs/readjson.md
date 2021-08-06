@@ -18,7 +18,6 @@ Read a json stream and return the variables.  If there is an error, return a war
 proc readJsonStream(stream: Stream; filename: string = ""): ValueOrWarning
 ```
 
-
 # readJsonString
 
 Read a json string and return the variables.  If there is an error, return a warning. The filename is used in warning messages.
@@ -26,7 +25,6 @@ Read a json string and return the variables.  If there is an error, return a war
 ```nim
 proc readJsonString(content: string; filename: string = ""): ValueOrWarning
 ```
-
 
 # readJsonFile
 
@@ -36,7 +34,6 @@ Read a json file and return the variables.  If there is an error, return a warni
 proc readJsonFile(filename: string): ValueOrWarning
 ```
 
-
 # readJsonFiles
 
 Read json files and return the variables. If there is an error, return a warning. A duplicate variable is skipped and it generates a warning.
@@ -44,7 +41,6 @@ Read json files and return the variables. If there is an error, return a warning
 ```nim
 proc readJsonFiles(filenames: seq[string]): ValueOrWarning
 ```
-
 
 
 ---

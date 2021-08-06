@@ -36,15 +36,16 @@ type
 
 func newFunResultWarn*(warning: Warning, parameter: Natural = 0,
       p1: string = "", p2: string = ""): FunResult =
-  ## Return a new FunResult object. It contains a warning, the index of
-  ## the problem parameter, and the two optional strings that go with
-  ## the warning.
+  ## Return a new FunResult object containing a warning. It takes a
+  ## warning, the index of the problem parameter, and the two optional
+  ## strings that go with the warning.
   let warningData = newWarningData(warning, p1, p2)
   result = FunResult(kind: frWarning, parameter: parameter,
                      warningData: warningData)
 
 func newFunResultWarn*(warningData: Warningdata, parameter: Natural = 0): FunResult =
-  ## Return a new FunResult object containing a warning.
+  ## Return a new FunResult object containing a warning created from a
+  ## WarningData object.
   result = FunResult(kind: frWarning, parameter: parameter,
                      warningData: warningData)
 

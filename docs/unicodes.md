@@ -18,7 +18,6 @@ Compares two utf8 strings a and b.  When a equals b return 0, when a is greater 
 func cmpString(a, b: string; insensitive: bool = false): int
 ```
 
-
 # firstInvalidUtf8
 
 Return the position of the first invalid utf-8 byte in the string if any.
@@ -26,7 +25,6 @@ Return the position of the first invalid utf-8 byte in the string if any.
 ```nim
 func firstInvalidUtf8(str: string): Option[int]
 ```
-
 
 # stringLen
 
@@ -36,7 +34,6 @@ Return the number of unicode characters in the string (not bytes).
 func stringLen(str: string): Natural
 ```
 
-
 # githubAnchor
 
 Convert the name to a github anchor name.
@@ -44,7 +41,6 @@ Convert the name to a github anchor name.
 ```nim
 func githubAnchor(name: string): string
 ```
-
 
 
 ---

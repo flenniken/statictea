@@ -26,7 +26,6 @@ Statictea function signatures and parameter checking.
 ParamType = char
 ```
 
-
 # Param
 
 Holds attributes for one parameter.
@@ -41,7 +40,6 @@ Param = object
 
 ```
 
-
 # ShortName
 
 Object to hold the state for ShortName.next.
@@ -52,7 +50,6 @@ ShortName = object
 
 ```
 
-
 # newParam
 
 Create a new Param object.
@@ -62,7 +59,6 @@ func newParam(name: string; optional: bool; varargs: bool; returnType: bool;
               paramTypes: seq[ParamType]): Param
 ```
 
-
 # kindToParamType
 
 
@@ -70,7 +66,6 @@ func newParam(name: string; optional: bool; varargs: bool; returnType: bool;
 ```nim
 func kindToParamType(kind: ValueKind): ParamType
 ```
-
 
 # paramTypeString
 
@@ -80,7 +75,6 @@ Return a string representation of a ParamType object.
 func paramTypeString(paramType: ParamType): string
 ```
 
-
 # `$`
 
 Return a string representation of a Param object.
@@ -88,7 +82,6 @@ Return a string representation of a Param object.
 ```nim
 func `$`(param: Param): string
 ```
-
 
 # sameType
 
@@ -98,7 +91,6 @@ Check whether the param type is the same type or compatible with the value.
 func sameType(paramType: ParamType; valueKind: ValueKind): bool
 ```
 
-
 # parmsToSignature
 
 
@@ -106,7 +98,6 @@ func sameType(paramType: ParamType; valueKind: ValueKind): bool
 ```nim
 func parmsToSignature(params: seq[Param]): string
 ```
-
 
 # next
 
@@ -116,7 +107,6 @@ Get the next unique single letter name. It returns names a, b, c, ..., z then re
 proc next(letterName: var ShortName): string
 ```
 
-
 # signatureCodeToParams
 
 Convert the signature code to a list of Param objects.
@@ -125,7 +115,6 @@ Convert the signature code to a list of Param objects.
 func signatureCodeToParams(signatureCode: string): Option[seq[Param]]
 ```
 
-
 # mapParameters
 
 Create a dictionary of the parameters. The parameter names are the dictionary keys.  Varargs parameters turn into a list. Return a FunResult object containing the dictionary or a warning when the parameters to not match the signature.  The last signature param is for the return type.
@@ -133,7 +122,6 @@ Create a dictionary of the parameters. The parameter names are the dictionary ke
 ```nim
 func mapParameters(params: seq[Param]; args: seq[Value]): FunResult
 ```
-
 
 
 ---

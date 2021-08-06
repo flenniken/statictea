@@ -12,21 +12,21 @@ StaticTea variable types.
 * type: [ValueOrWarning](#valueorwarning) &mdash; Holds a value or a warning.
 * [newVarsDict](#newvarsdict) &mdash; Create a new empty variables dictionary.
 * [newValue](#newvalue) &mdash; Create a string value.
-* [newValue](#newvalue) &mdash; Create an integer value.
-* [newValue](#newvalue) &mdash; Create a float value.
-* [newValue](#newvalue) &mdash; Create a list value.
-* [newValue](#newvalue) &mdash; Create a dictionary value from a VarsDict.
-* [newValue](#newvalue) &mdash; New value from an existing value.
-* [newValue](#newvalue) &mdash; New list value from an array of items of the same kind.
-* [newValue](#newvalue) &mdash; <p>New dict value from an array of pairs where the pairs are the same type (may be Value type).
+* [newValue](#newvalue-1) &mdash; Create an integer value.
+* [newValue](#newvalue-2) &mdash; Create a float value.
+* [newValue](#newvalue-3) &mdash; Create a list value.
+* [newValue](#newvalue-4) &mdash; Create a dictionary value from a VarsDict.
+* [newValue](#newvalue-5) &mdash; New value from an existing value.
+* [newValue](#newvalue-6) &mdash; New list value from an array of items of the same kind.
+* [newValue](#newvalue-7) &mdash; <p>New dict value from an array of pairs where the pairs are the same type (may be Value type).
 * [newEmptyListValue](#newemptylistvalue) &mdash; Return an empty list value.
 * [newEmptyDictValue](#newemptydictvalue) &mdash; Create a dictionary value from a VarsDict.
 * [`==`](#) &mdash; Return true when two values are equal.
 * [newValueOrWarning](#newvalueorwarning) &mdash; Return a new ValueOrWarning object containing a value.
-* [newValueOrWarning](#newvalueorwarning) &mdash; Return a new ValueOrWarning object containing a warning.
-* [newValueOrWarning](#newvalueorwarning) &mdash; Return a new ValueOrWarning object containing a warning.
-* [`==`](#) &mdash; Compare two ValueOrWarning objects and return true when equal.
-* [`$`](#) &mdash; Return a string representation of a value's type.
+* [newValueOrWarning](#newvalueorwarning-1) &mdash; Return a new ValueOrWarning object containing a warning.
+* [newValueOrWarning](#newvalueorwarning-2) &mdash; Return a new ValueOrWarning object containing a warning.
+* [`==`](#-1) &mdash; Compare two ValueOrWarning objects and return true when equal.
+* [`$`](#-2) &mdash; Return a string representation of a value's type.
 
 # VarsDict
 
@@ -35,7 +35,6 @@ Variables dictionary type. This is a ref type. Create a new VarsDict with newVar
 ```nim
 VarsDict = OrderedTableRef[string, Value]
 ```
-
 
 # ValueKind
 
@@ -46,7 +45,6 @@ ValueKind = enum
   vkString, vkInt, vkFloat, vkDict, vkList
 ```
 
-
 # Value
 
 Variable value reference.
@@ -54,7 +52,6 @@ Variable value reference.
 ```nim
 Value = ref ValueObj
 ```
-
 
 # ValueOrWarningKind
 
@@ -64,7 +61,6 @@ The kind of a ValueOrWarning object, either a value or warning.
 ValueOrWarningKind = enum
   vwValue, vwWarning
 ```
-
 
 # ValueOrWarning
 
@@ -82,7 +78,6 @@ ValueOrWarning = object
 
 ```
 
-
 # newVarsDict
 
 Create a new empty variables dictionary. VarsDict is a ref type.
@@ -90,7 +85,6 @@ Create a new empty variables dictionary. VarsDict is a ref type.
 ```nim
 proc newVarsDict(): VarsDict
 ```
-
 
 # newValue
 
@@ -100,7 +94,6 @@ Create a string value.
 proc newValue(str: string): Value
 ```
 
-
 # newValue
 
 Create an integer value.
@@ -108,7 +101,6 @@ Create an integer value.
 ```nim
 proc newValue(num: int | int64): Value
 ```
-
 
 # newValue
 
@@ -118,7 +110,6 @@ Create a float value.
 proc newValue(num: float): Value
 ```
 
-
 # newValue
 
 Create a list value.
@@ -126,7 +117,6 @@ Create a list value.
 ```nim
 proc newValue(valueList: seq[Value]): Value
 ```
-
 
 # newValue
 
@@ -136,7 +126,6 @@ Create a dictionary value from a VarsDict.
 proc newValue(varsDict: VarsDict): Value
 ```
 
-
 # newValue
 
 New value from an existing value. Since values are ref types, the new value is an alias to the same value.
@@ -144,7 +133,6 @@ New value from an existing value. Since values are ref types, the new value is a
 ```nim
 proc newValue(value: Value): Value
 ```
-
 
 # newValue
 
@@ -160,7 +148,6 @@ let listValue = newValue([newValue(1), newValue("b")])
 proc newValue[T](list: openArray[T]): Value
 ```
 
-
 # newValue
 
 <p>New dict value from an array of pairs where the pairs are the same type (may be Value type).</p>
@@ -171,7 +158,6 @@ proc newValue[T](list: openArray[T]): Value
 proc newValue[T](dictPairs: openArray[(string, T)]): Value
 ```
 
-
 # newEmptyListValue
 
 Return an empty list value.
@@ -179,7 +165,6 @@ Return an empty list value.
 ```nim
 proc newEmptyListValue(): Value
 ```
-
 
 # newEmptyDictValue
 
@@ -189,7 +174,6 @@ Create a dictionary value from a VarsDict.
 proc newEmptyDictValue(): Value
 ```
 
-
 # `==`
 
 Return true when two values are equal.
@@ -197,7 +181,6 @@ Return true when two values are equal.
 ```nim
 proc `==`(value1: Value; value2: Value): bool
 ```
-
 
 # newValueOrWarning
 
@@ -207,7 +190,6 @@ Return a new ValueOrWarning object containing a value.
 func newValueOrWarning(value: Value): ValueOrWarning
 ```
 
-
 # newValueOrWarning
 
 Return a new ValueOrWarning object containing a warning.
@@ -215,7 +197,6 @@ Return a new ValueOrWarning object containing a warning.
 ```nim
 func newValueOrWarning(warning: Warning; p1: string = ""; p2: string = ""): ValueOrWarning
 ```
-
 
 # newValueOrWarning
 
@@ -225,7 +206,6 @@ Return a new ValueOrWarning object containing a warning.
 func newValueOrWarning(warningData: WarningData): ValueOrWarning
 ```
 
-
 # `==`
 
 Compare two ValueOrWarning objects and return true when equal.
@@ -234,7 +214,6 @@ Compare two ValueOrWarning objects and return true when equal.
 func `==`(vw1: ValueOrWarning; vw2: ValueOrWarning): bool
 ```
 
-
 # `$`
 
 Return a string representation of a value's type.
@@ -242,7 +221,6 @@ Return a string representation of a value's type.
 ```nim
 func `$`(kind: ValueKind): string
 ```
-
 
 
 ---

@@ -11,7 +11,7 @@ Environment holding the input and output streams.
 * [close](#close) &mdash; Close the environment streams.
 * [outputWarning](#outputwarning) &mdash; Write a message to the error stream and increment the warning count.
 * [warn](#warn) &mdash; Write a formatted warning message to the error stream.
-* [warn](#warn) &mdash; Write a formatted warning message to the error stream.
+* [warn](#warn-1) &mdash; Write a formatted warning message to the error stream.
 * [formatDateTime](#formatdatetime) &mdash; Return a formatted time stamp for the log.
 * [formatLine](#formatline) &mdash; Return a formatted log line.
 * [logLine](#logline) &mdash; Append a message to the log file.
@@ -20,7 +20,7 @@ Environment holding the input and output streams.
 * [openEnv](#openenv) &mdash; Open and return the environment containing standard error and standard out as streams.
 * [setupLogging](#setuplogging) &mdash; Turn on logging for the environment using the specified log file.
 * [addExtraStreams](#addextrastreams) &mdash; Add the template and result streams to the environment.
-* [addExtraStreams](#addextrastreams) &mdash; Add the template and result streams to the environment.
+* [addExtraStreams](#addextrastreams-1) &mdash; Add the template and result streams to the environment.
 * [addExtraStreamsForUpdate](#addextrastreamsforupdate) &mdash; For the update case, add the template and result streams to the environment.
 
 # dtFormat
@@ -31,7 +31,6 @@ The date time format in local time written to the log.
 dtFormat = "yyyy-MM-dd HH:mm:ss\'.\'fff"
 ```
 
-
 # staticteaLog
 
 Name of the default statictea log file when logging on the Mac.
@@ -39,7 +38,6 @@ Name of the default statictea log file when logging on the Mac.
 ```nim
 staticteaLog = expandTilde("~/Library/Logs/statictea.log")
 ```
-
 
 # Env
 
@@ -63,7 +61,6 @@ Env = object
 
 ```
 
-
 # close
 
 Close the environment streams.
@@ -72,7 +69,6 @@ Close the environment streams.
 proc close(env: var Env)
 ```
 
-
 # outputWarning
 
 Write a message to the error stream and increment the warning count.
@@ -80,7 +76,6 @@ Write a message to the error stream and increment the warning count.
 ```nim
 proc outputWarning(env: var Env; message: string)
 ```
-
 
 # warn
 
@@ -91,7 +86,6 @@ proc warn(env: var Env; lineNum: Natural; warning: Warning; p1: string = "";
           p2: string = "")
 ```
 
-
 # warn
 
 Write a formatted warning message to the error stream.
@@ -99,7 +93,6 @@ Write a formatted warning message to the error stream.
 ```nim
 proc warn(env: var Env; lineNum: Natural; warningData: WarningData)
 ```
-
 
 # formatDateTime
 
@@ -109,7 +102,6 @@ Return a formatted time stamp for the log.
 func formatDateTime(dt: DateTime): string
 ```
 
-
 # formatLine
 
 Return a formatted log line.
@@ -117,7 +109,6 @@ Return a formatted log line.
 ```nim
 func formatLine(filename: string; lineNum: int; message: string; dt = now()): string
 ```
-
 
 # logLine
 
@@ -127,7 +118,6 @@ Append a message to the log file. If there is an error writing, close the log. D
 proc logLine(env: var Env; filename: string; lineNum: int; message: string)
 ```
 
-
 # log
 
 Append the message to the log file. The current file and line becomes part of the message.
@@ -135,7 +125,6 @@ Append the message to the log file. The current file and line becomes part of th
 ```nim
 template log(env: var Env; message: string)
 ```
-
 
 # writeOut
 
@@ -145,7 +134,6 @@ Write a message to the output stream.
 proc writeOut(env: var Env; message: string)
 ```
 
-
 # openEnv
 
 Open and return the environment containing standard error and standard out as streams.
@@ -153,7 +141,6 @@ Open and return the environment containing standard error and standard out as st
 ```nim
 proc openEnv(logFilename: string = ""; warnSize: BiggestInt = logWarnSize): Env
 ```
-
 
 # setupLogging
 
@@ -164,7 +151,6 @@ proc setupLogging(env: var Env; logFilename: string = "";
                   warnSize: BiggestInt = logWarnSize)
 ```
 
-
 # addExtraStreams
 
 Add the template and result streams to the environment. Return true on success.
@@ -174,7 +160,6 @@ proc addExtraStreams(env: var Env; templateFilename: string;
                      resultFilename: string): bool
 ```
 
-
 # addExtraStreams
 
 Add the template and result streams to the environment. Return true on success.
@@ -183,7 +168,6 @@ Add the template and result streams to the environment. Return true on success.
 proc addExtraStreams(env: var Env; args: Args): bool
 ```
 
-
 # addExtraStreamsForUpdate
 
 For the update case, add the template and result streams to the environment. Return true on success.
@@ -191,7 +175,6 @@ For the update case, add the template and result streams to the environment. Ret
 ```nim
 proc addExtraStreamsForUpdate(env: var Env; args: Args): bool
 ```
-
 
 
 ---

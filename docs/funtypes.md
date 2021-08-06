@@ -9,11 +9,11 @@ Statictea function types and supporting routines.
 * type: [FunResultKind](#funresultkind) &mdash; The kind of a FunResult object, either a value or warning.
 * type: [FunctionSpec](#functionspec) &mdash; The name of a function, a pointer to the code, and its signature code.
 * type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a warning.
-* [newFunResultWarn](#newfunresultwarn) &mdash; Return a new FunResult object.
 * [newFunResultWarn](#newfunresultwarn) &mdash; Return a new FunResult object containing a warning.
+* [newFunResultWarn](#newfunresultwarn-1) &mdash; Return a new FunResult object containing a warning created from a WarningData object.
 * [newFunResult](#newfunresult) &mdash; Return a new FunResult object containing a value.
 * [`==`](#) &mdash; Compare two FunResult objects and return true when equal.
-* [`$`](#) &mdash; Return a string representation of a FunResult object.
+* [`$`](#-1) &mdash; Return a string representation of a FunResult object.
 
 # FunctionPtr
 
@@ -23,7 +23,6 @@ Signature of a statictea function. It takes any number of values and returns a v
 FunctionPtr = proc (parameters: seq[Value]): FunResult
 ```
 
-
 # FunResultKind
 
 The kind of a FunResult object, either a value or warning.
@@ -32,7 +31,6 @@ The kind of a FunResult object, either a value or warning.
 FunResultKind = enum
   frValue, frWarning
 ```
-
 
 # FunctionSpec
 
@@ -45,7 +43,6 @@ FunctionSpec = object
   signatureCode*: string
 
 ```
-
 
 # FunResult
 
@@ -64,25 +61,22 @@ FunResult = object
 
 ```
 
-
 # newFunResultWarn
 
-Return a new FunResult object. It contains a warning, the index of the problem parameter, and the two optional strings that go with the warning.
+Return a new FunResult object containing a warning. It takes a warning, the index of the problem parameter, and the two optional strings that go with the warning.
 
 ```nim
 func newFunResultWarn(warning: Warning; parameter: Natural = 0; p1: string = "";
                       p2: string = ""): FunResult
 ```
 
-
 # newFunResultWarn
 
-Return a new FunResult object containing a warning.
+Return a new FunResult object containing a warning created from a WarningData object.
 
 ```nim
 func newFunResultWarn(warningData: WarningData; parameter: Natural = 0): FunResult
 ```
-
 
 # newFunResult
 
@@ -92,7 +86,6 @@ Return a new FunResult object containing a value.
 func newFunResult(value: Value): FunResult
 ```
 
-
 # `==`
 
 Compare two FunResult objects and return true when equal.
@@ -101,7 +94,6 @@ Compare two FunResult objects and return true when equal.
 func `==`(r1: FunResult; r2: FunResult): bool
 ```
 
-
 # `$`
 
 Return a string representation of a FunResult object.
@@ -109,7 +101,6 @@ Return a string representation of a FunResult object.
 ```nim
 func `$`(funResult: FunResult): string
 ```
-
 
 
 ---

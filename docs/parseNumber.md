@@ -23,7 +23,6 @@ IntPos = object
 
 ```
 
-
 # FloatPos
 
 Float and characters processed.
@@ -34,7 +33,6 @@ FloatPos = object
   length*: int
 
 ```
-
 
 # parseFloat64
 
@@ -51,7 +49,6 @@ one decimal point is allowed and underscores are skipped.
 proc parseFloat64(str: string; start: Natural = 0): Option[FloatPos]
 ```
 
-
 # parseInteger
 
 Parse the string and return the integer and number of characters
@@ -65,7 +62,6 @@ skipped. Processing stops at the first non-number character.
 ```nim
 proc parseInteger(s: string; start: Natural = 0): Option[IntPos]
 ```
-
 
 
 ---
