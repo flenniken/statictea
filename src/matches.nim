@@ -132,8 +132,9 @@ proc notEmptyOrSpaces*(text: string): bool =
       result = true
 
 proc matchEqualSign*(line: string, start: Natural = 0): Option[Matches] =
-  ## Match an equal sign and the optional trailing whitespace.
-  let pattern = r"(=)\s*"
+  ## Match an equal sign or "&=" and the optional trailing
+  ## whitespace. Return the operator in the group, "=" or "&=".
+  let pattern = r"(&{0,1}=)\s*"
   result = matchPatternCached(line, pattern, start)
 
 proc matchLeftParentheses*(line: string, start: Natural = 0): Option[Matches] =

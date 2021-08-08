@@ -452,7 +452,7 @@ proc runStatement*(env: var Env, statement: Statement,
     return
 
   # Assign the variable if possible.
-  let warningDataO = assignVariable(variables, dotNameStr, value)
+  let warningDataO = assignVariable(variables, dotNameStr, value, equalSign.getGroup())
   if isSome(warningDataO):
     let warningData = warningDataO.get()
     env.warnStatement(statement, warningData.warning, 0, warningData.p1, warningData.p2)

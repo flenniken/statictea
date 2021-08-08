@@ -300,23 +300,26 @@ suite "variables.nim":
 
   test "append to a list":
     var variables = emptyVariables()
-    var warningDataO = assignVariable(variables, "teas", newEmptyListValue())
+    var warningDataO = assignVariable(variables, "teas", newValue(5), "&=")
     check not warningDataO.isSome
-    warningDataO = assignVariable(variables, "teas", newValue(5))
+    warningDataO = assignVariable(variables, "teas", newValue(6), "&=")
     check not warningDataO.isSome
-    warningDataO = assignVariable(variables, "teas", newValue(6))
-    check not warningDataO.isSome
-    warningDataO = assignVariable(variables, "teas", newValue(7))
+    warningDataO = assignVariable(variables, "teas", newValue(7), "&=")
     check not warningDataO.isSome
     check $variables["l"] == """{"teas":[5,6,7]}"""
 
   test "append list to a list":
     var variables = emptyVariables()
-    var warningDataO = assignVariable(variables, "teas", newEmptyListValue())
+    var warningDataO = assignVariable(variables, "teas", newEmptyListValue(), "&=")
     check not warningDataO.isSome
-    warningDataO = assignVariable(variables, "teas", newEmptyListValue())
-    check not warningDataO.isSome
-    warningDataO = assignVariable(variables, "teas", newEmptyListValue())
+    warningDataO = assignVariable(variables, "teas", newEmptyListValue(), "&=")
     check not warningDataO.isSome
     check $variables["l"] == """{"teas":[[],[]]}"""
 
+  test "append to a non-list":
+    var variables = emptyVariables()
+    var warningDataO = assignVariable(variables, "a", newValue(5))
+    check not warningDataO.isSome
+    let eWarningDataO = some(newWarningData(wAppendToList, "int"))
+    warningDataO = assignVariable(variables, "a", newValue(6), "&=")
+    check warningDataO == eWarningDataO

@@ -142,6 +142,8 @@ type
     wNotEvenCases,         # w127
     wNotAllStrings,        # w128
     wTeaVariableExists,    # w129
+    wAppendToList,         # w130
+    wAppendToTeaVar,       # w131
 
 const
     # The list of warnings. Add new messages to the bottom and do not
@@ -242,7 +244,7 @@ const
       "The resulting duplicated string must be under 1024 characters, got: $1.", # wDupStringTooLong
       "Specify parameters in pairs.", # wPairParameters
       "None of the case conditions match and no else case.", # wMissingElse
-      "You cannot assign to an existing variable except when appending to a list.", # wImmutableVars
+      "You cannot assign to an existing variable.", # wImmutableVars
       "Expected four parameters.", # wExpected4Parameters
       "Invalid length: $1.", # wInvalidLength
       "Invalid number of parameters, the pattern and replacement come in pairs.", # wMissingReplacement
@@ -277,6 +279,8 @@ const
       "Expected an even number of cases, got $1 list items.", # wNotEvenCases
       "The list values must be all strings.", # wNotAllStrings
       "You cannot reassign a tea variable.", # wTeaVariableExists
+      "You can only append to a list, got $1.", # wAppendToList
+      "You cannot append to a tea variable.", # wAppendToTeaVar
     ]
 
 func getWarning*(filename: string, lineNum: int,

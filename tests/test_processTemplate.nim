@@ -1156,29 +1156,25 @@ $$ endblock
 0
 """
     let eErrLines = splitNewLines """
-template.html(3): w95: You cannot assign to an existing variable except when appending to a list.
+template.html(3): w95: You cannot assign to an existing variable.
 statement: g.var = t.row
            ^
 """
     check testProcessTemplate(templateContent = templateContent, eErrLines = eErrLines,
       eResultLines = eResultLines, eRc = 1)
 
-  test "overwrite global list variable":
-    # todo: what should we do about this behavior, nothing?
+  test "append to a list":
     let templateContent = """
 $$ block
-$$ : t.repeat = 4
-$$ : g.var = list()
-$$ : g.var = t.row
-$$ : num = get(g.var, t.row)
-{num}
+$$ : teas &= "black"
+$$ : teas &= "green"
+$$ : a = get(teas, 0)
+$$ : b = get(teas, 1)
+teas => ["{a}","{b}"]
 $$ endblock
 """
     let eResultLines = splitNewLines """
-0
-[]
-1
-[]
+teas => ["black","green"]
 """
     check testProcessTemplate(templateContent = templateContent,
       eResultLines = eResultLines, eRc = 0)

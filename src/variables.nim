@@ -248,8 +248,8 @@ proc getParentDict*(variables: Variables, names: seq[string]): ParentDict =
 
   result = newParentDict(parentDict)
 
-func assignTeaVariable(variables: var Variables, dotNameStr: string, value: Value):
-     Option[WarningData] =
+func assignTeaVariable(variables: var Variables, dotNameStr: string,
+    value: Value, operator: string = "="): Option[WarningData] =
   ## Assign a tea variable if possible, else return a warning.
 
   assert dotNameStr.len > 0
@@ -294,10 +294,14 @@ func assignTeaVariable(variables: var Variables, dotNameStr: string, value: Valu
     else:
       return some(newWarningData(wInvalidTeaVar, varName))
 
+  # You cannot append to a tea variable.
+  if operator == "&=":
+    return some(newWarningData(wAppendToTeaVar))
+
   variables[varName] = value
 
 proc assignVariable*(variables: var Variables, dotNameStr: string,
-    value: Value): Option[WarningData] =
+    value: Value, operator: string = "="): Option[WarningData] =
   ## Assign the variable the given value if possible, else return a
   ## warning.
   assert dotNameStr.len > 0
@@ -305,7 +309,7 @@ proc assignVariable*(variables: var Variables, dotNameStr: string,
   let names = split(dotNameStr, '.')
   let nameSpace = names[0]
   if nameSpace == "t":
-    return assignTeaVariable(variables, dotNameStr, value)
+    return assignTeaVariable(variables, dotNameStr, value, operator)
 
   if nameSpace in ["s", "h"]:
     return some(newWarningData(wReadOnlyDictionary))
@@ -314,20 +318,29 @@ proc assignVariable*(variables: var Variables, dotNameStr: string,
   if parentDict.kind == fdWarning:
     return some(parentDict.warningData)
 
-  # If the last item is a list, append to it, else append to the
-  # parent dictionary.
   let lastName = names[^1]
-  if lastName in parentDict.dict:
+  if operator == "=":
+    # Assign the value to the dictionary.
+    if lastName in parentDict.dict:
+      return some(newWarningData(wImmutableVars))
+    parentDict.dict[lastName] = value
+
+  else:
+    assert operator == "&="
+
+    # Append to a list, or create then append.
+
+    # If the variable doesn't exists, create an empty list.
+    if not (lastName in parentDict.dict):
+      parentDict.dict[lastName] = newEmptyListValue()
+
     let lastItem = parentDict.dict[lastName]
     if lastItem.kind != vkList:
-      # You cannot assign to an existing variable except when appending to a list.
-      return some(newWarningData(wImmutableVars))
+      # You can only append to a list, got $1.
+      return some(newWarningData(wAppendToList, $lastItem.kind))
 
-    # Append the value to the list item.
+    # Append the value to the list.
     lastItem.listv.add(value)
-  else:
-    # Append the value to the dictionary.
-    parentDict.dict[lastName] = value
 
 proc getVariable*(variables: Variables, dotNameStr: string): ValueOrWarning =
   ## Look up the variable and return its value when found, else return

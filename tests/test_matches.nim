@@ -271,13 +271,16 @@ suite "matches.nim":
   test "matchEqualSign":
     check testMatchEqualSign("=5", 0, some(newMatches(1, 0, "=")))
     check testMatchEqualSign("= 5", 0, some(newMatches(2, 0, "=")))
+    check testMatchEqualSign("&=5", 0, some(newMatches(2, 0, "&=")))
+    check testMatchEqualSign("&= 5", 0, some(newMatches(3, 0, "&=")))
 
-    # Starts with equal sign but not valid statement.
     check testMatchEqualSign("==5", 0, some(newMatches(1, 0, "=")))
+    check testMatchEqualSign("&=&5", 0, some(newMatches(2, 0, "&=")))
 
     check testMatchEqualSign(" =", 0)
     check testMatchEqualSign("2=", 0)
     check testMatchEqualSign("a", 0)
+    check testMatchEqualSign("&", 0)
 
   test "matchNumber":
     check testMatchNumber("5", 0, some(newMatches(1, 0)))
