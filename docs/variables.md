@@ -203,8 +203,8 @@ proc getParentDict(variables: Variables; names: seq[string]): ParentDict
 Assign the variable the given value if possible, else return a warning.
 
 ```nim
-proc assignVariable(variables: var Variables; dotNameStr: string; value: Value): Option[
-    WarningData]
+proc assignVariable(variables: var Variables; dotNameStr: string; value: Value;
+                    operator: string = "="): Option[WarningData]
 ```
 
 # getVariable

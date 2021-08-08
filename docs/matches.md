@@ -15,7 +15,7 @@ Regular expression matching methods.
 * [matchAllSpaceTab](#matchallspacetab) &mdash; Match a line of all spaces or tabs.
 * [matchTabSpace](#matchtabspace) &mdash; Match one or more spaces or tabs.
 * [notEmptyOrSpaces](#notemptyorspaces) &mdash; Return true when a statement is not empty or not all whitespace.
-* [matchEqualSign](#matchequalsign) &mdash; Match an equal sign and the optional trailing whitespace.
+* [matchEqualSign](#matchequalsign) &mdash; Match an equal sign or "&=" and the optional trailing whitespace.
 * [matchLeftParentheses](#matchleftparentheses) &mdash; Match a left parenthese and the optional trailing whitespace.
 * [matchCommaParentheses](#matchcommaparentheses) &mdash; Match a comma or right parentheses and the optional trailing whitespace.
 * [matchRightParentheses](#matchrightparentheses) &mdash; Match a right parentheses and the optional trailing whitespace.
@@ -112,7 +112,7 @@ proc notEmptyOrSpaces(text: string): bool
 
 # matchEqualSign
 
-Match an equal sign and the optional trailing whitespace.
+Match an equal sign or "&=" and the optional trailing whitespace. Return the operator in the group, "=" or "&=".
 
 ```nim
 proc matchEqualSign(line: string; start: Natural = 0): Option[Matches]

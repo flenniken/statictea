@@ -1,7 +1,16 @@
 $$ # StaticTea template for generating markdown documents from nim
 $$ # modules with doc comments.
 $$ #
+$$ # Create a list of all the heading names.
+$$ #
+$$ block
+$$ : t.repeat = len(s.entries)
+$$ : entry = get(s.entries, t.row)
+$$ : g.names &= entry.name
+$$ endblock
+$$ #
 $$ # Define replacement patterns to remove formatting from the descriptions.
+$$ #
 $$ block
 $$ : g.patterns = list( +
 $$ :   "@@", '', +
@@ -14,35 +23,17 @@ $$ :   "&lt;", '<', +
 $$ :   "&amp;", '&')
 $$ : path = path(s.orig)
 $$ : g.moduleName = path.filename
-$$ : g.entries = list()
-$$ endblock
-$$ #
-$$ #
-$$ # Create a list of all the heading names.
-$$ block
-$$ : g.names = list()
-$$ endblock
-$$ block
-$$ : t.repeat = len(s.entries)
-$$ : entry = get(s.entries, t.row)
-$$ : g.names = entry.name
-$$ endblock
-$$ #
-$$ #
-$$ # Create github anchors for all the heading names.
-$$ block
 $$ : g.anchors = githubAnchor(g.names)
 $$ endblock
 $$ #
-$$ #
 $$ # Reformat the entries list and store it in g.entries.
+$$ #
 $$ block
 $$ : t.repeat = len(s.entries)
 $$ : entry = get(s.entries, t.row, dict())
 $$ : newEntry = dict()
 $$ : newEntry.name = entry.name
-$$ : cases = list( +
-$$ :   "skType", "type: ", +
+$$ : cases = list("skType", "type: ", +
 $$ :   "skConst", "const: ", +
 $$ :   "skMacro", "macro: ")
 $$ : newEntry.type = case(entry.type, cases, "")
@@ -54,37 +45,37 @@ $$ : code = replaceRe(entry.code, "[ ]*$", "")
 $$ : pos = find(code, " {", len(code))
 $$ : newEntry.signature = substr(code, 0, pos)
 $$ : newEntry.anchor = get(g.anchors, t.row)
-$$ : g.entries = newEntry
+$$ : g.entries &= newEntry
 $$ endblock
 $$ #
-$$ nextline
-# {g.moduleName}
-
-$$ # Module description.
+$$ # Module section.
+$$ #
 $$ block
 $$ : modDescription = replaceRe(s.moduleDescription, g.patterns)
+# {g.moduleName}
+
 {modDescription}
 
 * [{g.moduleName}](../src/{g.moduleName}) &mdash; Nim source code.
 $$ endblock
 $$ #
-$$ #
 $$ # Show the index label when there are entries.
+$$ #
 $$ nextline
-$$ : t.output = case(len(g.entries), list(0, 'skip'), 'result')
+$$ : t.repeat = case(len(g.entries), list(0, 0), 1)
 # Index
 
 $$ #
-$$ #
 $$ # Create the index.
+$$ #
 $$ nextline
 $$ : t.repeat = len(g.entries)
 $$ : entry = get(g.entries, t.row)
 * {entry.type}[{entry.name}](#{entry.anchor}) &mdash; {entry.short}
 
 $$ #
-$$ #
 $$ # Create the function sections.
+$$ #
 $$ block
 $$ : t.repeat = len(g.entries)
 $$ : entry = get(g.entries, t.row)
