@@ -60,13 +60,10 @@ template type.
 
 [[#contents][茶]]
 
-* StaticTea Commands
-:PROPERTIES:
-:CUSTOM_ID: commands
-:END:
+* Commands
 
-A command marks replacement content in the template and it
-provides a place for your code statements.
+A StaticTea command marks replacement content in the template and
+it provides a place for your code statements.
 
 - [[#nextline-command][nextline]] -- make substitutions in the next line
 - [[#block-command][block]] —- make substitutions in the next block of lines
@@ -386,8 +383,8 @@ A statement is an expression consisting of a variable, an equal
 sign, and a right hand side. The right hand side is either
 another variable, a string, a number or a function.
 
-All operations are done with functions except the equal
-operator. Looping is done at the replacement block level with
+All operations are done with functions except the two equal
+operators. Looping is done at the replacement block level with
 t.repeat and t.row. Output control is done with t.output.
 
 Statements are allowed on the nextline, block and replace
@@ -1011,14 +1008,15 @@ Example floats:
 :CUSTOM_ID: dict-type
 :END:
 
-The dict type, short for dictionary, is a key value store with
+The dict type is an ordered key value store with
 fast lookup. It maps a string key to a value which can be any
-type.
+type. The dict is ordered by insertion order.
+
+You create a dict in a json file or with the dict function. You
+append to them when you create new variables.
 
 You access dictionary items with variable names or with the get
-function.  You create them in the json files or with the dict
-function. The dictionary order is determined by the order of
-items when it is created.
+function.
 
 In Json files dictionaries are known as json objects. Json calls
 the object items name/value pairs and we call them key/value
@@ -1076,21 +1074,45 @@ get(s, "c", 3) => 3
 :CUSTOM_ID: list-type
 :END:
 
-A list contains a sequence of values of any type.  You create
-lists in json files or in templates with the list function. You
-lookup list elements by their index using the get function.
+A list contains a sequence of values of any type.
+
+You can create a list with the list function:
 
 #+BEGIN_SRC
 list() => []
 list(1) => [1]
 list(1, 2, 3) => [1, 2, 3]
 list("a", 5, "b") => ["a", 5, "b"]
+#+END_SRC
 
+You can append to a list by assigning a value to a variable with
+the &= operator.  It will create the list if it doesn't exist. In
+the example below, the first line creates the list variable then
+assign "black" to it.  The second line appends "green":
+
+#+BEGIN_SRC
+teas &= "black"
+teas &= "green"
+teas => ["black", "green"]
+#+END_SRC
+
+The next example creates a g.names list from names contained in a
+list of dictionaries:
+
+$$ block
+$$ : t.repeat = len(s.entries)
+$$ : entry = get(s.entries, t.row)
+$$ : g.names &= entry.name
+$$ endblock
+
+You can access list elements with the get function:
+
+#+BEGIN_SRC
 list = list(1, 3.3, "a")
 get(list, 0) => 1
 get(list, 1) => 3.3
-git(list, 2) => "a"
-git(list, 3, 99) => 99
+get(list, 2) => "a"
+get(list, 3, 99) => 99
 #+END_SRC
 
 [[#contents][茶]]
@@ -1490,9 +1512,8 @@ List of functions:
 - [[#float][float()]] -- Create a float from a number string.
 - [[#get][get()]] -- Get a dictionary value by its key.
 - [[#get][get()]] -- Get a list value by its index.
-- [[#githubAnchor][githubAnchor()]] -- Create Github markdown anchor names given a list of heading
-names.
-- [[#githubAnchor][githubAnchor()]] -- Create a Github markdown anchor name given a heading name.
+- [[#githubAnchor][githubAnchor()]] -- Create Github anchor names from heading names.
+- [[#githubAnchor][githubAnchor()]] -- Create a Github anchor name from a heading name.
 - [[#if][if()]] -- If the condition is 1 return one value, else return another value.
 - [[#int][int()]] -- Create an int from a float.
 - [[#int][int()]] -- Create an int from a number string.
@@ -1646,8 +1667,8 @@ to three digits (no letters).
 Examples:
 
 #+BEGIN_SRC
-cmpVersion("1.2.5", "1.1.8") => -1
-cmpVersion("1.2.5", "1.3.0") => 1
+cmpVersion("1.2.5", "1.1.8") => 1
+cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
 #+END_SRC
 
@@ -1943,9 +1964,8 @@ get(list, 3, 99) => 99
 :CUSTOM_ID: githubAnchor
 :END:
 
-Create Github markdown anchor names given a list of heading
-names. Use it for Github markdown internal links. It handles
-duplicate heading names.
+Create Github anchor names from heading names. Use it for Github
+markdown internal links. It handles duplicate heading names.
 
 #+BEGIN_SRC
 githubAnchor(names: list) list
@@ -1966,8 +1986,8 @@ githubAnchor(list) =>
 :CUSTOM_ID: githubAnchor
 :END:
 
-Create a Github markdown anchor name given a heading name. Use it
-for Github markdown internal links. If you have duplicate heading
+Create a Github anchor name from a heading name. Use it for
+Github markdown internal links. If you have duplicate heading
 names, the anchor name returned only works for the
 first. Punctuation characters are removed so you can get
 duplicates in some cases.
@@ -2496,6 +2516,7 @@ d = dict("a", "apple", "b", 2, "c", 3)
 keys(d) => ["a", "b", "c"]
 values(d) => ["apple", 2, 3]
 #+END_SRC
+
 
 # Dynamic Content Ends
 * Contents :notoc:

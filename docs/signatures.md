@@ -7,13 +7,13 @@ Statictea function signatures and parameter checking.
 
 * type: [ParamType](#paramtype) &mdash; 
 * type: [Param](#param) &mdash; Holds attributes for one parameter.
-* type: [ShortName](#shortname) &mdash; Object to hold the state for ShortName.
+* type: [ShortName](#shortname) &mdash; Object to hold the state for the "next" function.
 * [newParam](#newparam) &mdash; Create a new Param object.
-* [kindToParamType](#kindtoparamtype) &mdash; 
+* [kindToParamType](#kindtoparamtype) &mdash; Convert a value type to a parameter type.
 * [paramTypeString](#paramtypestring) &mdash; Return a string representation of a ParamType object.
 * [`$`](#) &mdash; Return a string representation of a Param object.
 * [sameType](#sametype) &mdash; Check whether the param type is the same type or compatible with the value.
-* [parmsToSignature](#parmstosignature) &mdash; 
+* [parmsToSignature](#parmstosignature) &mdash; Create a signature from a list of Params.
 * [next](#next) &mdash; Get the next unique single letter name.
 * [signatureCodeToParams](#signaturecodetoparams) &mdash; Convert the signature code to a list of Param objects.
 * [mapParameters](#mapparameters) &mdash; Create a dictionary of the parameters.
@@ -34,15 +34,15 @@ Holds attributes for one parameter.
 Param = object
   name*: string              ## The name of the parameter.
   paramTypes*: seq[ParamType] ## The type of the parameter(s). Varargs can have multiple types.
-  optional*: bool            ## Whether this is an optional parameter.
-  varargs*: bool             ## Whether this is a varargs parameter.
-  returnType*: bool          ## Whether this is a return parameter.
+  optional*: bool            ## This is an optional parameter.
+  varargs*: bool             ## This is a varargs parameter.
+  returnType*: bool          ## This is a return parameter.
 
 ```
 
 # ShortName
 
-Object to hold the state for ShortName.next.
+Object to hold the state for the "next" function.
 
 ```nim
 ShortName = object
@@ -61,7 +61,7 @@ func newParam(name: string; optional: bool; varargs: bool; returnType: bool;
 
 # kindToParamType
 
-
+Convert a value type to a parameter type.
 
 ```nim
 func kindToParamType(kind: ValueKind): ParamType
@@ -93,7 +93,7 @@ func sameType(paramType: ParamType; valueKind: ValueKind): bool
 
 # parmsToSignature
 
-
+Create a signature from a list of Params.
 
 ```nim
 func parmsToSignature(params: seq[Param]): string

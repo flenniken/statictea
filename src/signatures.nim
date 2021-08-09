@@ -34,15 +34,15 @@ type
     paramTypes*: seq[ParamType]
       ## The type of the parameter(s). Varargs can have multiple types.
     optional*: bool
-      ## Whether this is an optional parameter.
+      ## This is an optional parameter.
     varargs*: bool
-      ## Whether this is a varargs parameter.
+      ## This is a varargs parameter.
     returnType*: bool
-      ## Whether this is a return parameter.
+      ## This is a return parameter.
 
 type
   ShortName* = object
-    ## Object to hold the state for ShortName.next.
+    ## Object to hold the state for the "next" function.
     ix: int
 
 func newParam*(name: string, optional: bool, varargs: bool, returnType: bool,
@@ -52,17 +52,18 @@ func newParam*(name: string, optional: bool, varargs: bool, returnType: bool,
                  returnType: returnType, paramTypes: paramTypes)
 
 func kindToParamType*(kind: ValueKind): ParamType =
-    case kind:
-      of vkInt:
-        result = 'i'
-      of vkFloat:
-        result = 'f'
-      of vkString:
-        result = 's'
-      of vkList:
-        result = 'l'
-      of vkDict:
-        result = 'd'
+  ## Convert a value type to a parameter type.
+  case kind:
+    of vkInt:
+      result = 'i'
+    of vkFloat:
+      result = 'f'
+    of vkString:
+      result = 's'
+    of vkList:
+      result = 'l'
+    of vkDict:
+      result = 'd'
 
 func paramTypeString*(paramType: ParamType): string =
   ## Return a string representation of a ParamType object.
@@ -131,6 +132,7 @@ func sameType*(paramType: ParamType, valueKind: ValueKind): bool =
       discard
 
 func parmsToSignature*(params: seq[Param]): string =
+  ## Create a signature from a list of Params.
   var inside: string
   if params.len > 1:
     inside = join(params[0 .. params.len-2], ", ")

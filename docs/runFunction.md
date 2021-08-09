@@ -42,9 +42,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funSort_lsosl](#funsort_lsosl) &mdash; Sort a list of values of the same type.
 * [funSort_lssil](#funsort_lssil) &mdash; Sort a list of lists.
 * [funSort_lsssl](#funsort_lsssl) &mdash; Sort a list of dictionaries.
-* [funGithubAnchor_ss](#fungithubanchor_ss) &mdash; Create a Github markdown anchor name given a heading name.
-* [funGithubAnchor_ll](#fungithubanchor_ll) &mdash; Create Github markdown anchor names given a list of heading
-names.
+* [funGithubAnchor_ss](#fungithubanchor_ss) &mdash; Create a Github anchor name from a heading name.
+* [funGithubAnchor_ll](#fungithubanchor_ll) &mdash; Create Github anchor names from heading names.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -431,8 +430,8 @@ to three digits (no letters).
 Examples:
 
 ~~~
-cmpVersion("1.2.5", "1.1.8") => -1
-cmpVersion("1.2.5", "1.3.0") => 1
+cmpVersion("1.2.5", "1.1.8") => 1
+cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
 ~~~~
 
@@ -961,8 +960,8 @@ func funSort_lsssl(parameters: seq[Value]): FunResult
 
 # funGithubAnchor_ss
 
-Create a Github markdown anchor name given a heading name. Use it
-for Github markdown internal links. If you have duplicate heading
+Create a Github anchor name from a heading name. Use it for
+Github markdown internal links. If you have duplicate heading
 names, the anchor name returned only works for the
 first. Punctuation characters are removed so you can get
 duplicates in some cases.
@@ -994,9 +993,8 @@ func funGithubAnchor_ss(parameters: seq[Value]): FunResult
 
 # funGithubAnchor_ll
 
-Create Github markdown anchor names given a list of heading
-names. Use it for Github markdown internal links. It handles
-duplicate heading names.
+Create Github anchor names from heading names. Use it for Github
+markdown internal links. It handles duplicate heading names.
 
 ~~~
 githubAnchor(names: list) list

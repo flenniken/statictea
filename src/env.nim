@@ -20,7 +20,7 @@ const
   dtFormat* = "yyyy-MM-dd HH:mm:ss'.'fff"
     ## The date time format in local time written to the log.
 
-  maxWarningsWritten = 50
+  maxWarningsWritten = 10
     ## The maximum of warning messages to show.
 
 when hostOS == "macosx":

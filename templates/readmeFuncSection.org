@@ -1,8 +1,7 @@
 # $ # StaticTea template for generating the function doc section
 # $ # for the readme.
 # $ #
-# $ # Define replacement patterns that formats the descriptions
-# $ # for org mode. Sort the entries by their name.
+# $ #
 # $ #
 # $ block
 # $ : g.patterns = list( +
@@ -17,50 +16,51 @@
 # $ :   "&gt;", '>', +
 # $ :   "&lt;", '<', +
 # $ :   "&amp;", '&')
-# $ : g.entries = sort(s.entries, "ascending", "sensitive", "name")
+# $ : g.sortedEntries = sort(s.entries, "ascending", "sensitive", "name")
 # $ endblock
 # $ #
-# $ # Generate the function index.
-# $ #
-# $ # Show the function entries and skip the others.  Change the
-# $ # function names from nim names to StaticTea names, i.e,
-# $ # funConcat to concat.  Show the description's first
-# $ # sentence.
-# $ #
-# $ nextline
-# $ : t.repeat = len(g.entries)
-# $ : entry = get(g.entries, t.row, dict())
+# $ block
+# $ : t.repeat = len(g.sortedEntries)
+# $ : entry = get(g.sortedEntries, t.row, dict())
 # $ : skip = case(entry.type, list("skFunc", 0), 1)
 # $ : pos = find(entry.name, "fun", -1)
-# $ : underscorePos = find(entry.name, "_", len(entry.name))
 # $ : skip2 = case(pos, list(0, 0), 1)
-# $ : t.output = case(add(skip, skip2), list(0, "result"), "skip")
+# $ : underscorePos = find(entry.name, "_", len(entry.name))
 # $ : capName = case(pos, list(0, substr(entry.name, 3, underscorePos)), entry.name)
 # $ : name = concat(lower(substr(capName, 0, 1)), substr(capName, 1))
 # $ : desc = replaceRe(entry.description, g.patterns)
 # $ : shortFuncDesc = substr(desc, 0, add(find(desc, '.', -1), 1))
-- [[#{name}][{name}()]] -- {shortFuncDesc}
+# $ : description = replaceRe(entry.description, g.patterns)
+# $ : newEntry = dict()
+# $ : newEntry.name = name
+# $ : newEntry.shortFuncDesc = shortFuncDesc
+# $ : newEntry.description = description
+# $ : newEntry.output = case(add(skip, skip2), list(0, "result"), "skip")
+# $ : g.entries &= newEntry
+# $ endblock
+# $ #
+# $ #
+# $ #
+# $ nextline
+# $ : t.repeat = len(g.entries)
+# $ : entry = get(g.entries, t.row)
+# $ : t.output = entry.output
+- [[#{entry.name}][{entry.name}()]] -- {entry.shortFuncDesc}
+
 # $ #
 # $ # Generate the function sections.
 # $ #
 # $ block
 # $ : t.repeat = len(g.entries)
-# $ : entry = get(g.entries, t.row, dict())
-# $ : skip = case(entry.type, list("skFunc", 0), 1)
-# $ : pos = find(entry.name, "fun", -1)
-# $ : underscorePos = find(entry.name, "_", len(entry.name))
-# $ : skip2 = case(pos, list(0, 0), 1)
-# $ : t.output = case(add(skip, skip2), list(0, "result"), "skip")
-# $ : capName = case(pos, list(0, substr(entry.name, 3, underscorePos)), entry.name)
-# $ : name = concat(lower(substr(capName, 0, 1)), substr(capName, 1))
-# $ : description = replaceRe(entry.description, g.patterns)
-
+# $ : entry = get(g.entries, t.row)
+# $ : t.output = entry.output
 [[#contents][茶]]
 
-** {name}()
+** {entry.name}()
 :PROPERTIES:
-:CUSTOM_ID: {name}
+:CUSTOM_ID: {entry.name}
 :END:
 
-{description}
+{entry.description}
+
 # $ endblock

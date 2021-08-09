@@ -526,8 +526,8 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:cmpVersion("1.2.5", "1.1.8") => -1
-  ## @:cmpVersion("1.2.5", "1.3.0") => 1
+  ## @:cmpVersion("1.2.5", "1.1.8") => 1
+  ## @:cmpVersion("1.2.5", "1.3.0") => -1
   ## @:cmpVersion("1.2.5", "1.2.5") => 0
   ## @:~~~~
 
@@ -1383,8 +1383,8 @@ func funSort_lsssl*(parameters: seq[Value]): FunResult =
   result = generalSort(map)
 
 func funGithubAnchor_ss*(parameters: seq[Value]): FunResult =
-  ## Create a Github markdown anchor name given a heading name. Use it
-  ## @:for Github markdown internal links. If you have duplicate heading
+  ## Create a Github anchor name from a heading name. Use it for
+  ## @:Github markdown internal links. If you have duplicate heading
   ## @:names, the anchor name returned only works for the
   ## @:first. Punctuation characters are removed so you can get
   ## @:duplicates in some cases.
@@ -1417,9 +1417,8 @@ func funGithubAnchor_ss*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(anchorName))
 
 func funGithubAnchor_ll*(parameters: seq[Value]): FunResult =
-  ## Create Github markdown anchor names given a list of heading
-  ## @:names. Use it for Github markdown internal links. It handles
-  ## @:duplicate heading names.
+  ## Create Github anchor names from heading names. Use it for Github
+  ## @:markdown internal links. It handles duplicate heading names.
   ## @:
   ## @:~~~
   ## @:githubAnchor(names: list) list
