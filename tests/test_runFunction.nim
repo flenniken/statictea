@@ -1414,6 +1414,15 @@ suite "runFunction.nim":
     let eFunResult = newFunResultWarn(wInvalidVersion, 1)
     check testFunction("cmpVersion", parameters, eFunResult)
 
+  test "type":
+    check testFunction("type", @[newValue(1)], newFunResult(newValue("int")))
+    check testFunction("type", @[newValue(3.14159)], newFunResult(newValue("float")))
+    check testFunction("type", @[newValue("Tea")], newFunResult(newValue("string")))
+    let list = newValue(["Tea", "Water", "tea"])
+    check testFunction("type", @[list], newFunResult(newValue("list")))
+    var dict = newVarsDict()
+    dict["a"] = newValue(1)
+    check testFunction("type", @[newValue(dict)], newFunResult(newValue("dict")))
 
   # test "createFunctionTable":
   #   let table = createFunctionTable()

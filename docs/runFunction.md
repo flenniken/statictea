@@ -44,6 +44,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funSort_lsssl](#funsort_lsssl) &mdash; Sort a list of dictionaries.
 * [funGithubAnchor_ss](#fungithubanchor_ss) &mdash; Create a Github anchor name from a heading name.
 * [funGithubAnchor_ll](#fungithubanchor_ll) &mdash; Create Github anchor names from heading names.
+* [funType_as](#funtype_as) &mdash; Return the parameter type, one of: int, float, string, list,
+dict.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -1010,6 +1012,29 @@ githubAnchor(list) =>
 
 ```nim
 func funGithubAnchor_ll(parameters: seq[Value]): FunResult
+```
+
+# funType_as
+
+Return the parameter type, one of: int, float, string, list,
+dict.
+
+~~~
+type(variable: any) string
+~~~~
+
+Examples:
+
+~~~
+type(2) => "int"
+type(3.14159) => "float"
+type("Tea") => "string"
+type(list(1,2)) => "list"
+type(dict("a", 1, "b", 2)) => "dict"
+~~~~
+
+```nim
+func funType_as(parameters: seq[Value]): FunResult
 ```
 
 # createFunctionTable

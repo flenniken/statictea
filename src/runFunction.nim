@@ -1456,6 +1456,42 @@ func funGithubAnchor_ll*(parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(anchorNames))
 
+func funType_as*(parameters: seq[Value]): FunResult =
+  ## Return the parameter type, one of: int, float, string, list,
+  ## dict.
+  ## @:
+  ## @:~~~
+  ## @:type(variable: any) string
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:type(2) => "int"
+  ## @:type(3.14159) => "float"
+  ## @:type("Tea") => "string"
+  ## @:type(list(1,2)) => "list"
+  ## @:type(dict("a", 1, "b", 2)) => "dict"
+  ## @:~~~~
+
+  tMapParameters("as")
+
+  var ret: string
+  let kind = map["a"].kind
+  case kind:
+    of vkInt:
+      ret = "int"
+    of vkFloat:
+      ret = "float"
+    of vkString:
+      ret = "string"
+    of vkList:
+      ret = "list"
+    of vkDict:
+      ret = "dict"
+
+  result = newFunResult(newValue(ret))
+
 const
   functionsList = [
     ("len", funLen_si, "si"),
@@ -1495,6 +1531,7 @@ const
     ("sort", funSort_lsssl, "lsssl"),
     ("githubAnchor", funGithubAnchor_ss, "ss"),
     ("githubAnchor", funGithubAnchor_ll, "ll"),
+    ("type", funType_as, "as"),
   ]
 
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =

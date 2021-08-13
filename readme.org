@@ -1531,6 +1531,7 @@ List of functions:
 - [[#sort][sort()]] -- Sort a list of lists.
 - [[#sort][sort()]] -- Sort a list of dictionaries.
 - [[#substr][substr()]] -- Extract a substring from a string by its position.
+- [[#type][type()]] -- Return the parameter type, one of: int, float, string, list, dict.
 - [[#values][values()]] -- Create a list out of the values in the specified dictionary.
 
 [[#contents][茶]]
@@ -2494,6 +2495,29 @@ Examples:
 #+BEGIN_SRC
 substr("Earl Grey", 1, 4) => "arl"
 substr("Earl Grey", 6) => "rey"
+#+END_SRC
+
+[[#contents][茶]]
+
+** type()
+:PROPERTIES:
+:CUSTOM_ID: type
+:END:
+
+Return the parameter type, one of: int, float, string, list, dict.
+
+#+BEGIN_SRC
+type(variable: any) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+type(2) => "int"
+type(3.14159) => "float"
+type("Tea") => "string"
+type(list(1,2)) => "list"
+type(dict("a", 1, "b", 2)) => "dict"
 #+END_SRC
 
 [[#contents][茶]]
