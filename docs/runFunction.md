@@ -44,8 +44,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funSort_lsssl](#funsort_lsssl) &mdash; Sort a list of dictionaries.
 * [funGithubAnchor_ss](#fungithubanchor_ss) &mdash; Create a Github anchor name from a heading name.
 * [funGithubAnchor_ll](#fungithubanchor_ll) &mdash; Create Github anchor names from heading names.
-* [funType_as](#funtype_as) &mdash; Return the parameter type, one of: int, float, string, list,
-dict.
+* [funType_as](#funtype_as) &mdash; Return the parameter type, one of: int, float, string, list, dict.
+* [funJoinPath](#funjoinpath) &mdash; Join the path components with a path separator.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -1016,8 +1016,7 @@ func funGithubAnchor_ll(parameters: seq[Value]): FunResult
 
 # funType_as
 
-Return the parameter type, one of: int, float, string, list,
-dict.
+Return the parameter type, one of: int, float, string, list, dict.
 
 ~~~
 type(variable: any) string
@@ -1035,6 +1034,48 @@ type(dict("a", 1, "b", 2)) => "dict"
 
 ```nim
 func funType_as(parameters: seq[Value]): FunResult
+```
+
+# funJoinPath
+
+Join the path components with a path separator.
+
+You pass a list of components to join. For the second optional
+parameter you specify the separator to use, either "/", "" or
+"". If you specify "" or leave off the parameter, the current
+platform separator is used.
+
+If the separator already exists between components, a new one is
+not added.
+
+~~~
+joinPath(components: list, optional separator: string) string
+~~~~
+
+Examples:
+
+~~~
+joinPath(list("images", "tea")) =>
+  "images/tea"
+
+joinPath(list("images", "tea"), "/") =>
+  "images/tea"
+
+joinPath(list("images", "tea"), "\") =>
+  "images\tea"
+
+joinPath(list("images/", "tea") =>
+  "images/tea"
+
+joinPath(list("", "tea")) =>
+  "/tea"
+
+joinPath(list("/", "tea")) =>
+  "/tea"
+~~~~
+
+```nim
+func funJoinPath(parameters: seq[Value]): FunResult
 ```
 
 # createFunctionTable

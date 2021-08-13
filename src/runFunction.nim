@@ -1492,6 +1492,71 @@ func funType_as*(parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(ret))
 
+func funJoinPath*(parameters: seq[Value]): FunResult =
+  ## Join the path components with a path separator.
+  ## @:
+  ## @:You pass a list of components to join. For the second optional
+  ## @:parameter you specify the separator to use, either "/", "\" or
+  ## @:"". If you specify "" or leave off the parameter, the current
+  ## @:platform separator is used.
+  ## @:
+  ## @:If the separator already exists between components, a new one is
+  ## @:not added.
+  ## @:
+  ## @:~~~
+  ## @:joinPath(components: list, optional separator: string) string
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:joinPath(list("images", "tea")) =>
+  ## @:  "images/tea"
+  ## @:
+  ## @:joinPath(list("images", "tea"), "/") =>
+  ## @:  "images/tea"
+  ## @:
+  ## @:joinPath(list("images", "tea"), "\\") =>
+  ## @:  "images\\tea"
+  ## @:
+  ## @:joinPath(list("images/", "tea") =>
+  ## @:  "images/tea"
+  ## @:
+  ## @:joinPath(list("", "tea")) =>
+  ## @:  "/tea"
+  ## @:
+  ## @:joinPath(list("/", "tea")) =>
+  ## @:  "/tea"
+  ## @:~~~~
+
+  tMapParameters("loss")
+
+  var separator = os.DirSep
+  if "b" in map:
+    case map["b"].stringv:
+      of "/":
+        separator = '/'
+      of "\\":
+        separator = '\\'
+      of "":
+        discard
+      else:
+        # Invalid separator
+        return newFunResultWarn(wExpectedSeparator, 0)
+
+  var ret: string
+  for value in map["a"].listv:
+    var component = value.stringv
+    if component == "":
+      component.add(separator)
+    # Add the separator between components if there isn't already
+    # one between them.
+    if not (ret == "" or ret.endsWith(separator) or
+        component.startsWith(separator)):
+      ret.add(separator)
+    ret.add(component)
+  result = newFunResult(newValue(ret))
+
 const
   functionsList = [
     ("len", funLen_si, "si"),
@@ -1532,6 +1597,7 @@ const
     ("githubAnchor", funGithubAnchor_ss, "ss"),
     ("githubAnchor", funGithubAnchor_ll, "ll"),
     ("type", funType_as, "as"),
+    ("joinPath", funJoinPath, "soSs"),
   ]
 
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =

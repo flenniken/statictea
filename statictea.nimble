@@ -474,7 +474,7 @@ task test, "\tRun one or more tests; specify part of test filename.":
   let name = system.paramStr(count-1)
   let test_filenames = get_test_filenames()
   for filename in test_filenames:
-    if name in filename:
+    if name.toLower in filename.toLower:
       let cmd = get_test_module_cmd(filename)
       echo cmd
       exec cmd

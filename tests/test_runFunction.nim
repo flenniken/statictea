@@ -1424,6 +1424,83 @@ suite "runFunction.nim":
     dict["a"] = newValue(1)
     check testFunction("type", @[newValue(dict)], newFunResult(newValue("dict")))
 
+  test "joinPath":
+    # let list = newValue(["Tea", "Water", "tea"])
+
+    check testFunction("joinPath", @[newEmptyListValue()],
+      newFunResult(newValue("")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue("tea")])
+      ], newFunResult(newValue("tea")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue("images"), newValue("tea")])
+      ], newFunResult(newValue("images/tea")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue("images"), newValue("tea")]), newValue("/")
+      ], newFunResult(newValue("images/tea")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue("images"), newValue("tea")]), newValue(r"\")
+      ], newFunResult(newValue(r"images\tea")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue("images/"), newValue("tea")])
+      ], newFunResult(newValue("images/tea")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue("images"), newValue("/tea")])
+      ], newFunResult(newValue("images/tea")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue("images/green"), newValue("tea")])
+      ], newFunResult(newValue("images/green/tea")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue(""), newValue("tea")])
+      ], newFunResult(newValue("/tea")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue(""), newValue("tea"), newValue("")])
+      ], newFunResult(newValue("/tea/")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue("/"), newValue("tea"), newValue("/")])
+      ], newFunResult(newValue("/tea/")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue("/tea/")])
+      ], newFunResult(newValue("/tea/")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue("/")])
+      ], newFunResult(newValue("/")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue("/images"), newValue("tea")])
+      ], newFunResult(newValue("/images/tea")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue("/var/"), newValue("log/tea")])
+      ], newFunResult(newValue("/var/log/tea")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue("/var/"), newValue("log/tea/")])
+      ], newFunResult(newValue("/var/log/tea/")))
+
+    check testFunction("joinPath", @[
+        newValue([newValue("/var/"), newValue("/log/tea/")])
+      ], newFunResult(newValue("/var//log/tea/")))
+
+  test "joinPath invalid separator":
+    let parameters = @[newEmptyListValue(), newValue("h")]
+    let eFunResult = newFunResultWarn(wExpectedSeparator, 0)
+    check testFunction("joinPath", parameters, eFunResult)
+
+
+
   # test "createFunctionTable":
   #   let table = createFunctionTable()
   #   for name, nameList in table.pairs():
