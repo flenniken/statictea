@@ -209,7 +209,7 @@ func funLen_di(parameters: seq[Value]): FunResult
 
 # funGet_lioaa
 
-Get a list value by its index.  If the index is too big, the
+Get a list value by its index.  If the index is invalid, the
 default value is returned when specified, else a warning is
 generated.
 

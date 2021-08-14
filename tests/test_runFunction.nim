@@ -297,7 +297,13 @@ suite "runFunction.nim":
   test "get invalid index":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list, newValue(-1)]
-    let eFunResult = newFunResultWarn(wInvalidIndex, 1, "-1")
+    let eFunResult = newFunResultWarn(wMissingListItem, 1, "-1")
+    check testFunction("get", parameters, eFunResult)
+
+  test "get invalid index with default":
+    var list = newValue([1, 2, 3, 4, 5])
+    var parameters = @[list, newValue(-1), newValue("hi")]
+    let eFunResult = newFunResult(newValue("hi"))
     check testFunction("get", parameters, eFunResult)
 
   test "cmp ints":

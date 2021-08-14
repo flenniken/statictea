@@ -235,7 +235,7 @@ func funLen_di*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(dict.len))
 
 func funGet_lioaa*(parameters: seq[Value]): FunResult =
-  ## Get a list value by its index.  If the index is too big, the
+  ## Get a list value by its index.  If the index is invalid, the
   ## @:default value is returned when specified, else a warning is
   ## @:generated.
   ## @:
@@ -255,9 +255,7 @@ func funGet_lioaa*(parameters: seq[Value]): FunResult =
   let list = map["a"].listv
   let index = map["b"].intv
 
-  if index < 0:
-    result = newFunResultWarn(wInvalidIndex, 1, $index)
-  elif index < list.len:
+  if index >= 0 and index < list.len:
     result = newFunResult(newValue(list[index]))
   elif "c" in map:
     result = newFunResult(map["c"])
