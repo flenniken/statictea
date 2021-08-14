@@ -291,9 +291,8 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
     let varargParam = params[varargIx]
     var varargNum = varargParam.paramTypes.len
 
+    var varargList: seq[Value]
     if argsLeft > 0:
-      var varargList: seq[Value]
-
       # Collect the remaining parameters into a list.
       while argsLeft > 0:
 
@@ -317,6 +316,6 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
 
         varargIx = varargIx + varargNum
 
-      map[varargParam.name] = newValue(varargList)
+    map[varargParam.name] = newValue(varargList)
 
   result = newFunResult(newValue(map))

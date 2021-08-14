@@ -1499,6 +1499,19 @@ suite "runFunction.nim":
     let eFunResult = newFunResultWarn(wExpectedSeparator, 0)
     check testFunction("joinPath", parameters, eFunResult)
 
+  test "joinPath varargs empty":
+    check testFunction("joinPath", @[],
+      newFunResult(newValue("")))
+
+  test "joinPath varargs":
+    check testFunction("joinPath", @[
+        newValue("tea")
+      ], newFunResult(newValue("tea")))
+
+    check testFunction("joinPath", @[
+        newValue("images"), newValue("tea")
+      ], newFunResult(newValue("images/tea")))
+
 
 
   # test "createFunctionTable":

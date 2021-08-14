@@ -211,7 +211,7 @@ suite "signatures.nim":
 
   test "mapParameters oIi":
     var parameters: seq[Value] = @[]
-    check testMapParametersOk("oIi", parameters, """{}""")
+    check testMapParametersOk("oIi", parameters, """{"a":[]}""")
 
   test "mapParameters oIi":
     var parameters: seq[Value] = @[newValue(1)]
@@ -222,7 +222,7 @@ suite "signatures.nim":
 
   test "mapParameters oIFi":
     var parameters: seq[Value] = @[]
-    check testMapParametersOk("oIFi", parameters, """{}""")
+    check testMapParametersOk("oIFi", parameters, """{"a":[]}""")
 
     parameters = @[newValue(1), newValue(2.2)]
     check testMapParametersOk("oIFi", parameters, """{"a":[1,2.2]}""")
@@ -232,7 +232,7 @@ suite "signatures.nim":
 
   test "mapParameters ioIFi":
     var parameters = @[newValue(1)]
-    check testMapParametersOk("ioIFi", parameters, """{"a":1}""")
+    check testMapParametersOk("ioIFi", parameters, """{"a":1,"b":[]}""")
 
     parameters = @[newValue(1),newValue(1),newValue(2.2)]
     check testMapParametersOk("ioIFi", parameters, """{"a":1,"b":[1,2.2]}""")
@@ -331,3 +331,11 @@ suite "signatures.nim":
     ]
     check testMapParametersOk("lsssl", parameters,
       """{"a":[],"b":"ascending","c":"insensitive","d":"key"}""")
+
+  test "mapParameters oSs":
+    var parameters: seq[Value] = @[]
+    check testMapParametersOk("oSs", parameters, """{"a":[]}""")
+
+  test "mapParameters loss":
+    var parameters: seq[Value] = @[newEmptyListValue()]
+    check testMapParametersOk("loss", parameters, """{"a":[]}""")

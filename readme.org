@@ -1518,6 +1518,7 @@ List of functions:
 - [[#int][int()]] -- Create an int from a float.
 - [[#int][int()]] -- Create an int from a number string.
 - [[#joinPath][joinPath()]] -- Join the path components with a path separator.
+- [[#joinPath][joinPath()]] -- Join the path components with the platform path separator.
 - [[#keys][keys()]] -- Create a list from the keys in a dictionary.
 - [[#len][len()]] -- Number of elements in a dictionary.
 - [[#len][len()]] -- Number of elements in a list.
@@ -2122,8 +2123,9 @@ parameter you specify the separator to use, either "/", "" or
 "". If you specify "" or leave off the parameter, the current
 platform separator is used.
 
-If the separator already exists between components, a new one is
-not added.
+If the separator already exists between components, a new one
+is not added. If a component is "", the platform separator is
+used for it.
 
 #+BEGIN_SRC
 joinPath(components: list, optional separator: string) string
@@ -2149,6 +2151,33 @@ joinPath(list("", "tea")) =>
 
 joinPath(list("/", "tea")) =>
   "/tea"
+#+END_SRC
+
+[[#contents][茶]]
+
+** joinPath()
+:PROPERTIES:
+:CUSTOM_ID: joinPath
+:END:
+
+Join the path components with the platform path separator.
+
+If the separator already exists between components, a new one
+is not added. If a component is "", the platform separator is
+used for it.
+
+#+BEGIN_SRC
+joinPath(components: optional vararg(string)) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+joinPath("images", "tea")) =>
+  "images/tea"
+
+joinPath("images/", "tea") =>
+  "images/tea"
 #+END_SRC
 
 [[#contents][茶]]

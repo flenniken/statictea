@@ -1492,7 +1492,36 @@ func funType_as*(parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(ret))
 
-func funJoinPath*(parameters: seq[Value]): FunResult =
+func joinPathList(map: VarsDict): FunResult =
+  ## Join path components.
+
+  var separator = os.DirSep
+  if "b" in map:
+    case map["b"].stringv:
+      of "/":
+        separator = '/'
+      of "\\":
+        separator = '\\'
+      of "":
+        discard
+      else:
+        # Invalid separator
+        return newFunResultWarn(wExpectedSeparator, 0)
+
+  var ret: string
+  for value in map["a"].listv:
+    var component = value.stringv
+    if component == "":
+      component.add(separator)
+    # Add the separator between components if there isn't already
+    # one between them.
+    if not (ret == "" or ret.endsWith(separator) or
+        component.startsWith(separator)):
+      ret.add(separator)
+    ret.add(component)
+  result = newFunResult(newValue(ret))
+
+func funJoinPath_loss*(parameters: seq[Value]): FunResult =
   ## Join the path components with a path separator.
   ## @:
   ## @:You pass a list of components to join. For the second optional
@@ -1500,8 +1529,9 @@ func funJoinPath*(parameters: seq[Value]): FunResult =
   ## @:"". If you specify "" or leave off the parameter, the current
   ## @:platform separator is used.
   ## @:
-  ## @:If the separator already exists between components, a new one is
-  ## @:not added.
+  ## @:If the separator already exists between components, a new one
+  ## @:is not added. If a component is "", the platform separator is
+  ## @:used for it.
   ## @:
   ## @:~~~
   ## @:joinPath(components: list, optional separator: string) string
@@ -1530,32 +1560,31 @@ func funJoinPath*(parameters: seq[Value]): FunResult =
   ## @:~~~~
 
   tMapParameters("loss")
+  result = joinPathList(map)
 
-  var separator = os.DirSep
-  if "b" in map:
-    case map["b"].stringv:
-      of "/":
-        separator = '/'
-      of "\\":
-        separator = '\\'
-      of "":
-        discard
-      else:
-        # Invalid separator
-        return newFunResultWarn(wExpectedSeparator, 0)
+func funJoinPath_oSs*(parameters: seq[Value]): FunResult =
+  ## Join the path components with the platform path separator.
+  ## @:
+  ## @:If the separator already exists between components, a new one
+  ## @:is not added. If a component is "", the platform separator is
+  ## @:used for it.
+  ## @:
+  ## @:~~~
+  ## @:joinPath(components: optional vararg(string)) string
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:joinPath("images", "tea")) =>
+  ## @:  "images/tea"
+  ## @:
+  ## @:joinPath("images/", "tea") =>
+  ## @:  "images/tea"
+  ## @:~~~~
 
-  var ret: string
-  for value in map["a"].listv:
-    var component = value.stringv
-    if component == "":
-      component.add(separator)
-    # Add the separator between components if there isn't already
-    # one between them.
-    if not (ret == "" or ret.endsWith(separator) or
-        component.startsWith(separator)):
-      ret.add(separator)
-    ret.add(component)
-  result = newFunResult(newValue(ret))
+  tMapParameters("oSs")
+  result = joinPathList(map)
 
 const
   functionsList = [
@@ -1597,7 +1626,8 @@ const
     ("githubAnchor", funGithubAnchor_ss, "ss"),
     ("githubAnchor", funGithubAnchor_ll, "ll"),
     ("type", funType_as, "as"),
-    ("joinPath", funJoinPath, "soSs"),
+    ("joinPath", funJoinPath_loss, "loss"),
+    ("joinPath", funJoinPath_oSs, "oSs"),
   ]
 
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =

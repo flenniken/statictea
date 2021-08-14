@@ -45,7 +45,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funGithubAnchor_ss](#fungithubanchor_ss) &mdash; Create a Github anchor name from a heading name.
 * [funGithubAnchor_ll](#fungithubanchor_ll) &mdash; Create Github anchor names from heading names.
 * [funType_as](#funtype_as) &mdash; Return the parameter type, one of: int, float, string, list, dict.
-* [funJoinPath](#funjoinpath) &mdash; Join the path components with a path separator.
+* [funJoinPath_loss](#funjoinpath_loss) &mdash; Join the path components with a path separator.
+* [funJoinPath_oSs](#funjoinpath_oss) &mdash; Join the path components with the platform path separator.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -1036,7 +1037,7 @@ type(dict("a", 1, "b", 2)) => "dict"
 func funType_as(parameters: seq[Value]): FunResult
 ```
 
-# funJoinPath
+# funJoinPath_loss
 
 Join the path components with a path separator.
 
@@ -1045,8 +1046,9 @@ parameter you specify the separator to use, either "/", "" or
 "". If you specify "" or leave off the parameter, the current
 platform separator is used.
 
-If the separator already exists between components, a new one is
-not added.
+If the separator already exists between components, a new one
+is not added. If a component is "", the platform separator is
+used for it.
 
 ~~~
 joinPath(components: list, optional separator: string) string
@@ -1075,7 +1077,33 @@ joinPath(list("/", "tea")) =>
 ~~~~
 
 ```nim
-func funJoinPath(parameters: seq[Value]): FunResult
+func funJoinPath_loss(parameters: seq[Value]): FunResult
+```
+
+# funJoinPath_oSs
+
+Join the path components with the platform path separator.
+
+If the separator already exists between components, a new one
+is not added. If a component is "", the platform separator is
+used for it.
+
+~~~
+joinPath(components: optional vararg(string)) string
+~~~~
+
+Examples:
+
+~~~
+joinPath("images", "tea")) =>
+  "images/tea"
+
+joinPath("images/", "tea") =>
+  "images/tea"
+~~~~
+
+```nim
+func funJoinPath_oSs(parameters: seq[Value]): FunResult
 ```
 
 # createFunctionTable
