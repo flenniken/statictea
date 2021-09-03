@@ -179,7 +179,7 @@ func funConcat*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(returnString))
 
 func funLen_si*(parameters: seq[Value]): FunResult =
-  ## Length of a string in characters, not bytes.
+  ## Number of characters in a string.
   ## @:
   ## @:~~~
   ## @:len(str: string) int
@@ -300,11 +300,11 @@ func funGet_dsoaa*(parameters: seq[Value]): FunResult =
     result = newFunResultWarn(wMissingDictItem, 1, key)
 
 func funIf*(parameters: seq[Value]): FunResult =
-  ## If the condition is 1 return one value, else return another
-  ## value.
+  ## If the condition is true return a value, else return another
+  ## value. False is 0 and true is not 0.
   ## @:
   ## @:~~~
-  ## @:if(condition: int, oneCase: any, notOne: any) any
+  ## @:if(condition: int, true: any, false: any) any
   ## @:~~~~
   ## @:
   ## @:Examples:

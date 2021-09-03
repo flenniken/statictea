@@ -68,10 +68,9 @@ it provides a place for your code statements.
 - [[#nextline-command][nextline]] -- make substitutions in the next line
 - [[#block-command][block]] —- make substitutions in the next block of lines
 - [[#replace-command][replace]] -— replace the block with a variable
-- [[#endblock-command][endblock]] -- end the replacement block for block and replace
-  commands.
-- # —- [[#comment-command][comment command]]
-- : -- [[#continue-command][continue command]], used to continue a command line
+- [[#endblock-command][endblock]] -- end the block and replace commands
+- # ([[#comment-command][comment]]) -- code comment
+- : ([[#continue-command][continue]]) -- continue a command
 
 [[#contents][茶]]
 
@@ -299,7 +298,7 @@ intensive steps.
 :END:
 
 The continue command allows you to continue adding statements to
-a nextline, block and replace command.
+a nextline, block and replace commands.
 
 In the following example the nextline command continues on a
 second line and third line.
@@ -497,19 +496,8 @@ template statements.
 Local variables and tea variables (except row) are cleared after
 processing each replacement block.
 
-You can assign a new variable to a list or dictionary but you
+You can append a new variable to a list or dictionary but you
 cannot change an existing variable.
-
-You append to a list by assigning a value to it. This allows
-creation of dynamic lists at runtime. For example, a teas
-variable is created with "black" and "green" values:
-
-#+BEGIN_SRC
-teas = list()
-teas = "black"
-teas = "green"
-teas => ["black", "green"]
-#+END_SRC
 
 One dictionary exists for each of the five types of
 variables. You access them with different prefixes.
@@ -539,9 +527,7 @@ shared file populates the h dictionary.
 
 You can use multiple server and shared json files by specifying
 multiple files on the command line. The files are processed
-left to right which is important when there are duplicate
-variables since the last one processed overwrites the previous
-one.
+left to right.
 
 The json null values get converted to the 0. Json True and False
 get converted to 1 and 0.
@@ -708,28 +694,6 @@ default it goes to the result file.
 - "log" -- the block output goes to the log file
 - "skip" -- the block is skipped
 
-You can use the stderr option to write your own warning messages.
-
-template:
-
-#+BEGIN_SRC
-$$ nextline
-$$ : t.output = if( +
-$$ :   exists("s.admin"), "skip",
-$$ :   "stderr")
-$$ : msg = concat( +
-$$ :   template(), "(", +
-$$ :   getLineNumber(), ")", +
-$$ :   "missing admin var")
-{msg}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-template.html(45): missing admin var
-#+END_SRC
-
 [[#contents][茶]]
 
 *** t.repeat
@@ -737,8 +701,8 @@ template.html(45): missing admin var
     :CUSTOM_ID: trepeat
     :END:
 
-The t.repeat variable is a number that tells how many times to
-repeat the block. A value of zero means don't show the block at
+The t.repeat variable is an integer that tells how many times to
+repeat the block. A value of 0 means don't show the block at
 all. The t.repeat variable defaults to 1 so by default the block
 is output once.
 
@@ -976,7 +940,7 @@ StaticTea variable types:
 A string is an immutable sequence of characters. You define a
 string with single or double quotes and use them in
 statements. You encode strings as unicode utf-8.  Invalid utf-8
-sequences generate a warning and the statement is skipped.
+sequences generate a warning.
 
 example strings:
 
@@ -1055,10 +1019,9 @@ function.
 
 In Json files dictionaries are known as json objects. Json calls
 the object items name/value pairs and we call them key/value
-pairs. StaticTea preserves the order of the elements and the last
-duplicate wins.
+pairs. StaticTea preserves the order of the elements.
 
-In the following json data, the overall data is a dictionary and
+In the following json data, the container element is a dictionary and
 the d element is a dictionary.  The d dictionary has two key/value
 pairs, ("x", 100) and ("y", 200).
 
@@ -1134,11 +1097,13 @@ teas => ["black", "green"]
 The next example creates a g.names list from names contained in a
 list of dictionaries:
 
+#+BEGIN_SRC
 $$ block
 $$ : t.repeat = len(s.entries)
 $$ : entry = get(s.entries, t.row)
 $$ : g.names &= entry.name
 $$ endblock
+#+END_SRC
 
 You can access list elements with the get function:
 
@@ -1285,19 +1250,6 @@ You're a html wizard,
 I'm a {s.teaMaster}!
 #+END_SRC
 
-You can write your own warning messages using the system t.output
-set to stderr. In the following example a warning message is
-written to standard error when the server admin variable is
-missing. When it is not missing nothing gets output.
-
-template:
-
-#+BEGIN_SRC
-<--$ nextline t.output = if( +-->
-<--$ : exists("admin"), "skip", "stderr") -->
-warning: the admin variable is missing
-#+END_SRC
-
 [[#contents][茶]]
 
 ** Prefix Postfix
@@ -1307,7 +1259,7 @@ warning: the admin variable is missing
 
 You make the template commands look like comments tailored for
 your template file type. This allows you to edit the template
-using its native editor and run other native tools.  For example,
+using its native editors and run other native tools.  For example,
 you can edit a StaticTea html template with an html editor and
 validate it online with w3.org's validator.
 
@@ -1364,9 +1316,9 @@ examples:
 
 Templates are utf-8 encoded.  Two line endings are supported on
 all platforms: LF, and CR/LF.  Line endings are preserved.  The
-template syntax only uses ascii except unicode characters are
-allowed in strings. The maximum command line length is 1024
-bytes, there is no limit on non-command lines.
+template syntax only uses ascii except unicode characters in
+strings. The maximum command line length is 1024 bytes. There is
+no limit on non-command lines.
 
 Since line endings are preserved and there are no encoding or
 line length restrictions on non-command lines, you can make
@@ -1380,12 +1332,14 @@ or PDF files.
 :CUSTOM_ID: update-option
 :END:
 
-The --update option updates the template's replace blocks to
+The update option updates the template's replace blocks to
 match their t.content text.  The text normally comes from the
 shared template files but it doesn't have to.
 
 You use this to keep the template blocks in sync with the shared
 content so you can work with them as static pages.
+
+The following example shows a typical invocation:
 
 #+BEGIN_SRC
 statictea \
@@ -1402,14 +1356,14 @@ statictea \
    :CUSTOM_ID: log-file
    :END:
 
-The log file contains information about processing your
-template. Template commands can also write to the log file.
+Statictea write statistics to the log file.  Template commands
+can also write to the log file.
 
 Log information is appended to the file.  When the file size
 exceeds 1 GB, a warning message is generated each time a template
 is processed.
 
-Logging is off by default. You turn it on with the --log option.
+Logging is off by default. You turn it on with the log option.
 You can specify the log file full path.  If you don't specify a
 filename, "statictea.log" is used. The log location depends on
 the platform:
@@ -1456,11 +1410,11 @@ The nim jsondoc command produces html formatted json data.  Our
 desired final format is Gitlab markdown so having html
 presentation data in the json is a problem.
 
-It was discovered that single paragraph comments are left
-unformatted.  This is the basis for a workaround. You make all
-the documentation look like one paragraph by inserting some
-symbols in strategic places, then the json data does not contain
-html formatting.
+It was discovered that single paragraph comments are unformatted.
+This is the basis for a workaround. You make all the
+documentation look like one paragraph by inserting some symbols
+in strategic places, then the json data does not contain html
+formatting.
 
 Workaround Rules:
 
@@ -1549,7 +1503,7 @@ List of functions:
 - [[#get][get()]] -- Get a list value by its index.
 - [[#githubAnchor][githubAnchor()]] -- Create Github anchor names from heading names.
 - [[#githubAnchor][githubAnchor()]] -- Create a Github anchor name from a heading name.
-- [[#if][if()]] -- If the condition is 1 return one value, else return another value.
+- [[#if][if()]] -- If the condition is true return a value, else return another value.
 - [[#int][int()]] -- Create an int from a float.
 - [[#int][int()]] -- Create an int from a number string.
 - [[#joinPath][joinPath()]] -- Join the path components with a path separator.
@@ -1557,7 +1511,7 @@ List of functions:
 - [[#keys][keys()]] -- Create a list from the keys in a dictionary.
 - [[#len][len()]] -- Number of elements in a dictionary.
 - [[#len][len()]] -- Number of elements in a list.
-- [[#len][len()]] -- Length of a string in characters, not bytes.
+- [[#len][len()]] -- Number of characters in a string.
 - [[#list][list()]] -- Create a list of values.
 - [[#lower][lower()]] -- Lowercase a string.
 - [[#path][path()]] -- Split a file path into its component pieces.
@@ -2058,10 +2012,10 @@ $$ : anchor = githubAnchor(entry.name)
 :CUSTOM_ID: if
 :END:
 
-If the condition is 1 return one value, else return another value.
+If the condition is true return a value, else return another value. False is 0 and true is not 0.
 
 #+BEGIN_SRC
-if(condition: int, oneCase: any, notOne: any) any
+if(condition: int, true: any, false: any) any
 #+END_SRC
 
 Examples:
@@ -2285,7 +2239,7 @@ len(list(4, 5)) => 2
 :CUSTOM_ID: len
 :END:
 
-Length of a string in characters, not bytes.
+Number of characters in a string.
 
 #+BEGIN_SRC
 len(str: string) int
