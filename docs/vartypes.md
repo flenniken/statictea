@@ -13,12 +13,13 @@ StaticTea variable types.
 * [newVarsDict](#newvarsdict) &mdash; Create a new empty variables dictionary.
 * [newValue](#newvalue) &mdash; Create a string value.
 * [newValue](#newvalue-1) &mdash; Create an integer value.
-* [newValue](#newvalue-2) &mdash; Create a float value.
-* [newValue](#newvalue-3) &mdash; Create a list value.
-* [newValue](#newvalue-4) &mdash; Create a dictionary value from a VarsDict.
-* [newValue](#newvalue-5) &mdash; New value from an existing value.
-* [newValue](#newvalue-6) &mdash; New list value from an array of items of the same kind.
-* [newValue](#newvalue-7) &mdash; <p>New dict value from an array of pairs where the pairs are the same type (may be Value type).
+* [newValue](#newvalue-2) &mdash; Create an integer value from a bool.
+* [newValue](#newvalue-3) &mdash; Create a float value.
+* [newValue](#newvalue-4) &mdash; Create a list value.
+* [newValue](#newvalue-5) &mdash; Create a dictionary value from a VarsDict.
+* [newValue](#newvalue-6) &mdash; New value from an existing value.
+* [newValue](#newvalue-7) &mdash; New list value from an array of items of the same kind.
+* [newValue](#newvalue-8) &mdash; New dict value from an array of pairs where the pairs are the same type (may be Value type).
 * [newEmptyListValue](#newemptylistvalue) &mdash; Return an empty list value.
 * [newEmptyDictValue](#newemptydictvalue) &mdash; Create a dictionary value from a VarsDict.
 * [`==`](#) &mdash; Return true when two values are equal.
@@ -30,7 +31,8 @@ StaticTea variable types.
 
 # VarsDict
 
-Variables dictionary type. This is a ref type. Create a new VarsDict with newVarsDict procedure.
+Variables dictionary type. This is a ref type. Create a new
+VarsDict with newVarsDict procedure.
 
 ```nim
 VarsDict = OrderedTableRef[string, Value]
@@ -104,6 +106,14 @@ proc newValue(num: int | int64): Value
 
 # newValue
 
+Create an integer value from a bool.
+
+```nim
+proc newValue(a: bool): Value
+```
+
+# newValue
+
 Create a float value.
 
 ```nim
@@ -128,7 +138,8 @@ proc newValue(varsDict: VarsDict): Value
 
 # newValue
 
-New value from an existing value. Since values are ref types, the new value is an alias to the same value.
+New value from an existing value. Since values are ref types, the
+new value is an alias to the same value.
 
 ```nim
 proc newValue(value: Value): Value
@@ -150,9 +161,11 @@ proc newValue[T](list: openArray[T]): Value
 
 # newValue
 
-<p>New dict value from an array of pairs where the pairs are the same type (may be Value type).</p>
-<p>let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)]) let dictValue = newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)]) let dictValue = newValue([("a", newValue(1.1)), ("b", newValue("a"))])</p>
+New dict value from an array of pairs where the pairs are the same type (may be Value type).
 
+ let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
+ let dictValue = newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)])
+ let dictValue = newValue([("a", newValue(1.1)), ("b", newValue("a"))])
 
 ```nim
 proc newValue[T](dictPairs: openArray[(string, T)]): Value

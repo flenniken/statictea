@@ -155,7 +155,8 @@ func newParentDict(dict: VarsDict): ParentDict
 Create an empty variables object in its initial state.
 
 ```nim
-func emptyVariables(server: VarsDict = nil; shared: VarsDict = nil): Variables
+func emptyVariables(server: VarsDict = nil; shared: VarsDict = nil;
+                    args: VarsDict = nil): Variables
 ```
 
 # newVariableData

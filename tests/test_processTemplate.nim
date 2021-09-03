@@ -7,6 +7,12 @@ import env
 import args
 import readlines
 import version
+import tostring
+
+proc testGetTeaArgs(args: Args, eJson: string): bool =
+  let value = getTeaArgs(args)
+  let valueStr = $value
+  result = expectedItem("getTeaArgs", valueStr, eJson)
 
 proc testProcessTemplate(templateContent: string = "",
     serverJson: string = "",
@@ -1178,6 +1184,37 @@ teas => ["black","green"]
 """
     check testProcessTemplate(templateContent = templateContent,
       eResultLines = eResultLines, eRc = 0)
+
+  test "getTeaArgs empty":
+    var args: Args
+    check testGetTeaArgs(args, """{"help":0,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":""}""")
+
+  test "getTeaArgs help":
+    var args: Args
+    args.help = true
+    check testGetTeaArgs(args, """{"help":1,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":""}""")
+
+  test "getTeaArgs serverList":
+    var args: Args
+    args.serverList = @["server.html", "server2.html"]
+    check testGetTeaArgs(args, """{"help":0,"version":0,"update":0,"log":0,"serverList":["server.html","server2.html"],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":""}""")
+
+  test "getTeaArgs logFilename":
+    var args: Args
+    args.logFilename = "mylog.txt"
+    check testGetTeaArgs(args, """{"help":0,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":"mylog.txt"}""")
+
+  test "getTeaArgs logFilename":
+    var args: Args
+    args.serverList = @["server.json"]
+    args.sharedList = @["shared.json"]
+    args.templateList = @["template.html"]
+    args.resultFilename = "result.html"
+    check testGetTeaArgs(args, """{"help":0,"version":0,"update":0,"log":0,"serverList":["server.json"],"sharedList":["shared.json"],"resultFilename":"result.html","templateList":["template.html"],"logFilename":""}""")
+
+
+
+
 
 
 # todo: test literal strings with \n etc. in them.  Are these supported?

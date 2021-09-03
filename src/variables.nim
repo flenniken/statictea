@@ -121,7 +121,8 @@ func newParentDict*(dict: VarsDict): ParentDict =
   ## Return a new ParentDict object containing a dict.
   result = ParentDict(kind: fdDict, dict: dict)
 
-func emptyVariables*(server: VarsDict = nil, shared: VarsDict = nil): Variables =
+func emptyVariables*(server: VarsDict = nil, shared: VarsDict = nil,
+    args: VarsDict = nil): Variables =
   ## Create an empty variables object in its initial state.
   result = newVarsDict()
   if server == nil:
@@ -135,6 +136,10 @@ func emptyVariables*(server: VarsDict = nil, shared: VarsDict = nil): Variables 
   result["l"] = newValue(newVarsDict())
   result["g"] = newValue(newVarsDict())
   result["row"] = newValue(0)
+  if args == nil:
+    result["args"] = newValue(newVarsDict())
+  else:
+    result["args"] = newValue(args)
   result["version"] = newValue(staticteaVersion)
 
 func newVariableData*(dotNameStr: string, value: Value): VariableData =

@@ -6,7 +6,7 @@ import warnings
 type
   VarsDict* = OrderedTableRef[string, Value]
     ## Variables dictionary type. This is a ref type. Create a new
-    ## VarsDict with newVarsDict procedure.
+    ## @:VarsDict with newVarsDict procedure.
 
   ValueKind* = enum
     ## The type of Variables.
@@ -58,6 +58,15 @@ proc newValue*(num: int | int64): Value =
   ## Create an integer value.
   result = Value(kind: vkInt, intv: num)
 
+proc newValue*(a: bool): Value =
+  ## Create an integer value from a bool.
+  var num: int64
+  if a:
+    num = 1
+  else:
+    num = 0
+  result = Value(kind: vkInt, intv: num)
+
 proc newValue*(num: float): Value =
   ## Create a float value.
   result = Value(kind: vkFloat, floatv: num)
@@ -72,7 +81,7 @@ proc newValue*(varsDict: VarsDict): Value =
 
 proc newValue*(value: Value): Value =
   ## New value from an existing value. Since values are ref types, the
-  ## new value is an alias to the same value.
+  ## @:new value is an alias to the same value.
   result = value
 
 proc newValue*[T](list: openArray[T]): Value =
@@ -91,10 +100,10 @@ proc newValue*[T](list: openArray[T]): Value =
 proc newValue*[T](dictPairs: openArray[(string, T)]): Value =
   ## New dict value from an array of pairs where the pairs are the
   ## same type (may be Value type).
-  ##
-  ## let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
-  ## let dictValue = newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)])
-  ## let dictValue = newValue([("a", newValue(1.1)), ("b", newValue("a"))])
+  ## @:
+  ## @: let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
+  ## @: let dictValue = newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)])
+  ## @: let dictValue = newValue([("a", newValue(1.1)), ("b", newValue("a"))])
   var varsTable = newVarsDict()
   for tup in dictPairs:
     let (a, b) = tup

@@ -210,6 +210,20 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
           firstReplaceLine, lb, prepostTable, command, maxLines):
         env.resultStream.write(replaceLine.line)
 
+func getTeaArgs*(args: Args): Value =
+  ## Create the t.args dictionary from the statictea arguments.
+  var varsDict = newVarsDict()
+  varsDict["help"] = newValue(args.help)
+  varsDict["version"] = newValue(args.version)
+  varsDict["update"] = newValue(args.update)
+  varsDict["log"] = newValue(args.log)
+  varsDict["serverList"] = newValue(args.serverList)
+  varsDict["sharedList"] = newValue(args.sharedList)
+  varsDict["resultFilename"] = newValue(args.resultFilename)
+  varsDict["templateList"] = newValue(args.templateList)
+  varsDict["logFilename"] = newValue(args.logFilename)
+  result = newValue(varsDict)
+
 proc getStartingVariables(env: var Env, args: Args): Variables =
   ## Read and return the server and shared variables and setup the
   ## initial tea variables.
@@ -234,7 +248,9 @@ proc getStartingVariables(env: var Env, args: Args): Variables =
   else:
     sharedVarDict = valueOrWarningH.value.dictv
 
-  result = emptyVariables(serverVarDict, sharedVarDict)
+  var argsVarDict = getTeaArgs(args).dictv
+
+  result = emptyVariables(serverVarDict, sharedVarDict, argsVarDict)
 
 proc getPrepostTable(args: Args): PrepostTable =
   ## Get the the prepost settings from the user or use the default

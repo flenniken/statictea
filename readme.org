@@ -590,6 +590,7 @@ They are stored in the t dictionary.
 
 Tea variables:
 
+- [[#targs][t.args]] -- arguments passed on the command line
 - [[#tcontent][t.content]] -- content of the replace block
 - [[#tmaxrepeat][t.maxRepeat]] -- maximum number of times to repeat the block
 - [[#tmaxlines][t.maxLines]] -- maximum number of replacement block lines (lines before endblock)
@@ -597,6 +598,40 @@ Tea variables:
 - [[#trepeat][t.repeat]] -- how many times the block repeats
 - [[#trow][t.row]] -- the current index number of a repeating block
 - [[#tversion][t.version]] -- the StaticTea version number
+
+[[#contents][茶]]
+
+*** t.args
+    :PROPERTIES:
+    :CUSTOM_ID: targs
+    :END:
+
+The t.args variable contains the arguments passed to
+statictea on the command line.
+
+For example using the command line below results in a t.args
+value shown:
+
+#+BEGIN_SRC
+statictea \
+  --server server.json \
+  --shared shared.json \
+  --template template.html \
+  --result result.html
+
+t.args =>
+{
+  "help": 0,
+  "version": 0,
+  "update": 0,
+  "log": 0,
+  "serverList": ["server.json"],
+  "sharedList": ["shared.json"],
+  "resultFilename": "result.html",
+  "templateList": ["template.html"],
+  "logFilename": ""
+}
+#+END_SRC
 
 [[#contents][茶]]
 

@@ -6,6 +6,7 @@ Process the template.
 # Index
 
 * [yieldContentLine](#yieldcontentline) &mdash; Yield one content line at a time and keep the line endings.
+* [getTeaArgs](#getteaargs) &mdash; Create the t.
 * [processTemplate](#processtemplate) &mdash; Process the template and return 0 on success.
 * [updateTemplate](#updatetemplate) &mdash; Update the template and return 0 on success.
 * [processTemplateTop](#processtemplatetop) &mdash; Setup the environment streams then process the template and return 0 on success.
@@ -17,6 +18,14 @@ Yield one content line at a time and keep the line endings.
 
 ```nim
 iterator yieldContentLine(content: string): string
+```
+
+# getTeaArgs
+
+Create the t.args dictionary from the statictea arguments.
+
+```nim
+func getTeaArgs(args: Args): Value
 ```
 
 # processTemplate

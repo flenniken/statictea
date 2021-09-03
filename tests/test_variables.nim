@@ -126,14 +126,16 @@ suite "variables.nim":
   test "resetVariables":
     var variables = emptyVariables()
     resetVariables(variables)
-    check variables.len == 6
+    check variables.len == 7
     check "s" in variables
     check "h" in variables
     check "l" in variables
     check "g" in variables
     check "row" in variables
+    check "args" in variables
     check "version" in variables
     check variables["row"] == newValue(0)
+    check variables["args"] == newEmptyDictValue()
 
   test "resetVariables untouched":
     # Make sure the some variables are untouched after reset.
