@@ -553,3 +553,14 @@ task args, "\tShow command line arguments.":
   let count = system.paramCount()+1
   for i in 0..count-1:
     echo "$1: $2" % [$(i+1), system.paramStr(i)]
+
+task br, "\tBuild the statictea test runner.":
+  let part1 = "nim c --gc:orc --hint[Performance]:off "
+  let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
+  let part3 = "--out:bin/ src/runner"
+  var cmd = part1 & part2 & part3
+  echo cmd
+  exec cmd
+  cmd = "strip bin/runner"
+  exec cmd
+
