@@ -444,6 +444,16 @@ proc taskReadMeFun() =
 
   # rmFile(sectionFile)
 
+proc build_runner() =
+  let part1 = "nim c --gc:orc --hint[Performance]:off "
+  let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
+  let part3 = "--out:bin/ src/runner"
+  var cmd = part1 & part2 & part3
+  echo cmd
+  exec cmd
+  cmd = "strip bin/runner"
+  exec cmd
+
 # Tasks below
 
 task n, "\tShow available tasks.":
@@ -463,6 +473,10 @@ awk '{printf "include %s\n", $0}' > tests/testall.nim
   build_release()
   # Run the command line tests.
   exec "src/test"
+
+  # Build runner
+  build_runner()
+
 
 task test, "\tRun one or more tests; specify part of test filename.":
   ## Run one or more tests.  You specify part of the test filename and all
@@ -555,12 +569,4 @@ task args, "\tShow command line arguments.":
     echo "$1: $2" % [$(i+1), system.paramStr(i)]
 
 task br, "\tBuild the statictea test runner.":
-  let part1 = "nim c --gc:orc --hint[Performance]:off "
-  let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
-  let part3 = "--out:bin/ src/runner"
-  var cmd = part1 & part2 & part3
-  echo cmd
-  exec cmd
-  cmd = "strip bin/runner"
-  exec cmd
-
+  build_runner()

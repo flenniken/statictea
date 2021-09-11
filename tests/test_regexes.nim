@@ -99,3 +99,10 @@ suite "regexes.nim":
     check testMatchPattern("   match = ", "(match) =")
     check testMatchPattern("   match = ", "(match) 7", 3)
     check testMatchPattern(" match = asdf", "^match")
+
+  test "matchPattern exception":
+    # The pattern has unmatched parentheses which generates an
+    # expection in the compilePattern method.
+    let pattern = r"^----------file: ([^\s]*)\s(\([^)]\)\s*$"
+    let matchesO = matchPattern("line", pattern, 0)
+    check matchesO.isSome == false

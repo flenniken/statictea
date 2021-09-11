@@ -3,7 +3,7 @@ import std/os
 import std/strutils
 import runner
 
-proc parseRunnerCommandLine*(cmdLine: string = ""): OpResult[Args] =
+proc parseRunnerCommandLine*(cmdLine: string = ""): OpResult[RunnerArgs] =
   let argv = cmdLine.splitWhitespace()
   result = parseRunnerCommandLine(argv)
 
@@ -134,8 +134,60 @@ suite "runner.nim":
     check fileOp.kind == opMessage
     # echo fileOp.message
     check fileOp.message.startsWith("Unable to create the file:")
-    
+
     # Remove the temp dir.
     setFilePermissions(folder, {fpUserRead, fpGroupRead, fpUserWrite})
     removeDir(folder)
     check dirExists(folder) == false
+
+  test "parseRunnerFileLine name":
+    let fileLineOp = parseRunnerFileLine("----------file: name.html")
+    check fileLineOp.isValue
+    check fileLineOp.value.filename == "name.html"
+    check fileLineOp.value.noLastEnding == false
+
+  test "parseRunnerFileLine name with spaces":
+    let fileLineOp = parseRunnerFileLine("----------file:    name.html  ")
+    check fileLineOp.isValue
+    check fileLineOp.value.filename == "name.html"
+    check fileLineOp.value.noLastEnding == false
+
+  test "parseRunnerFileLine name and noLastEnding":
+    let fileLineOp = parseRunnerFileLine("----------file: name.html noLastEnding")
+    check fileLineOp.isValue
+    check fileLineOp.value.filename == "name.html"
+    check fileLineOp.value.noLastEnding == true
+
+  test "parseRunnerFileLine name and noLastEnding":
+    let fileLineOp = parseRunnerFileLine("----------file:   name.html   noLastEnding  ")
+    check fileLineOp.isValue
+    check fileLineOp.value.filename == "name.html"
+    check fileLineOp.value.noLastEnding == true
+
+  test "parseRunnerFileLine error":
+    let fileLineOp = parseRunnerFileLine("----------file:name.html")
+    check fileLineOp.isMessage
+    check fileLineOp.message == "Invalid file line: ----------file:name.html"
+
+  test "parseExpectedLine error":
+    let expectedLineOp = parseExpectedLine("----------file:name.html")
+    check expectedLineOp.isMessage
+    check expectedLineOp.message == "Invalid expected line: ----------file:name.html"
+
+  test "parseExpectedLine happy path":
+    let expectedLineOp = parseExpectedLine("----------expected: file1 == file2")
+    check expectedLineOp.isValue
+    check expectedLineOp.value.filename1 == "file1"
+    check expectedLineOp.value.filename2 == "file2"
+
+  test "parseExpectedLine spaces":
+    let expectedLineOp = parseExpectedLine("----------expected:   file1   ==   file2  ")
+    check expectedLineOp.isValue
+    check expectedLineOp.value.filename1 == "file1"
+    check expectedLineOp.value.filename2 == "file2"
+
+
+
+  # test "runFilename":
+  #   let args = newRunnerArgs(filename = "hello.stf")
+  #   rcAndMessageOp = runFilename(args)

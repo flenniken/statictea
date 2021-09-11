@@ -115,6 +115,13 @@ func matchRegex*(str: string, regex: Regex, start: Natural = 0): Option[Matches]
         matches.groups.add(groups[ix])
     result = some(matches)
 
+func compilePattern(pattern: string): Option[Regex] =
+  try:
+    let regex = re(pattern)
+    result = some(regex)
+  except:
+    result = none(Regex)
+
 proc matchPatternCached*(str: string, pattern: string, start: Natural = 0): Option[Matches] =
   ## Match a pattern in a string and cache the compiled regular
   ## expression pattern.
@@ -125,13 +132,19 @@ proc matchPatternCached*(str: string, pattern: string, start: Natural = 0): Opti
   if pattern in compliledPatterns:
     regex = compliledPatterns[pattern]
   else:
-    regex = re(pattern)
+    let regexO = compilePattern(pattern)
+    if not regexO.isSome:
+      return
+    regex = regexO.get()
     compliledPatterns[pattern] = regex
   result = matchRegex(str, regex, start)
 
 func matchPattern*(str: string, pattern: string, start: Natural = 0): Option[Matches] =
   ## Match a regular expression pattern in a string.
-  result = matchRegex(str, re(pattern), start)
+  let regexO = compilePattern(pattern)
+  if not regexO.isSome:
+    return
+  result = matchRegex(str, regexO.get(), start)
 
 func newReplacement*(pattern: string, sub: string): Replacement =
   ## Create a new Replacement object.
@@ -139,10 +152,15 @@ func newReplacement*(pattern: string, sub: string): Replacement =
 
 proc replaceMany*(str: string, replacements: seq[Replacement]): string =
   ## Replace the patterns in the string with their replacements.
-  
+
   var subs: seq[tuple[pattern: Regex, repl: string]]
   for r in replacements:
-    subs.add((re(r.pattern), r.sub))
+    let regexO = compilePattern(r.pattern)
+    # todo: handle error case
+    # if not regexO.isSome:
+    #   return
+    let regex = regexO.get()
+    subs.add((regex, r.sub))
   result = multiReplace(str, subs)
 
 when defined(test):

@@ -6,6 +6,7 @@ import std/options
 import std/parseopt
 import std/streams
 import readlines
+import regexes
 when isMainModule:
   import std/os
 
@@ -19,8 +20,8 @@ const
   staticteaTestFile = "statictea test file 0.0.0"
 
 type
-  Args* = object
-    ## Args holds the command line arguments.
+  RunnerArgs* = object
+    ## RunnerArgs holds the command line arguments.
     help*: bool
     version*: bool
     filename*: string
@@ -31,15 +32,16 @@ type
     rc*: int
     message*: string
 
-  FileLine* = object
-    ## FileLine holds the parseFileLine result.
+  RunnerFileLine* = object
+    ## RunnerFileLine holds the parseRunnerFileLine result.
     filename*: string
-    noLastLine*: bool
+    noLastEnding*: bool
 
   ExpectedLine* = object
-    ## FileLine holds the parseExpectedLine result.
-    expectedName*: string
-    gotName*: string
+    ## ExpectedLine holds the names of two files that are expected to
+    ## be equal.
+    filename1*: string
+    filename2*: string
 
   OpResultKind* = enum
     ## The kind of a OpResult object, either a value or message.
@@ -54,6 +56,9 @@ type
         value*: T
       of opMessage:
         message*: string
+
+func newRunnerArgs*(help = false, version = false, filename = "", directory = ""): RunnerArgs =
+  result = RunnerArgs(help: help, version: version, filename: filename, directory: directory)
 
 func isMessage*(opResult: OpResult): bool =
   if opResult.kind == opMessage:
@@ -71,11 +76,11 @@ func isValue*(opResult: OpResult): bool =
 #   ## Return a new OpResult object containing a value.
 #   result = OpResult(kind: opValue, value: T)
 
-func newFileLine*(filename: string, noLastLine: bool): FileLine =
-  result = FileLine(filename: filename, noLastLine: noLastLine)
+func newRunnerFileLine*(filename: string, noLastEnding: bool): RunnerFileLine =
+  result = RunnerFileLine(filename: filename, noLastEnding: noLastEnding)
 
-func newExpectedLine*(expectedName: string, gotName: string): ExpectedLine =
-  result = ExpectedLine(expectedName: expectedName, gotName: gotName)
+func newExpectedLine*(filename1: string, filename2: string): ExpectedLine =
+  result = ExpectedLine(filename1: filename1, filename2: filename2)
 
 proc writeErr*(message: string) =
   ## Write a message to stderr.
@@ -171,11 +176,11 @@ proc handleWord(switch: string, word: string, value: string,
   else:
     return OpResult[string](kind: opMessage, message: "Unknown switch.")
 
-proc parseRunnerCommandLine*(argv: seq[string]): OpResult[Args] =
+proc parseRunnerCommandLine*(argv: seq[string]): OpResult[RunnerArgs] =
   ## Return the command line arguments or a message when there is a
   ## problem.
 
-  var args: Args
+  var args: RunnerArgs
   var help: bool = false
   var version: bool = false
   var filename: string
@@ -191,20 +196,20 @@ proc parseRunnerCommandLine*(argv: seq[string]): OpResult[Args] =
           let letter = key[ix]
           let wordOp = letterToWord(letter)
           if wordOp.isMessage:
-            return OpResult[Args](kind: opMessage, message: wordOp.message)
+            return OpResult[RunnerArgs](kind: opMessage, message: wordOp.message)
           let messageOp = handleWord($letter, wordOp.value, value,
             help, version, filename, directory)
           if messageOp.isMessage:
-            return OpResult[Args](kind: opMessage, message: messageOp.message)
+            return OpResult[RunnerArgs](kind: opMessage, message: messageOp.message)
 
       of CmdLineKind.cmdLongOption:
         let messageOp = handleWord(key, key, value, help, version,
                    filename, directory)
         if messageOp.isMessage:
-          return OpResult[Args](kind: opMessage, message: messageOp.message)
+          return OpResult[RunnerArgs](kind: opMessage, message: messageOp.message)
 
       of CmdLineKind.cmdArgument:
-        return OpResult[Args](kind: opMessage, message: "Unknown switch: $1" % [key])
+        return OpResult[RunnerArgs](kind: opMessage, message: "Unknown switch: $1" % [key])
 
       of CmdLineKind.cmdEnd:
         discard
@@ -214,20 +219,36 @@ proc parseRunnerCommandLine*(argv: seq[string]): OpResult[Args] =
   args.filename = filename
   args.directory = directory
 
-  result = OpResult[Args](kind: opValue, value: args)
+  result = OpResult[RunnerArgs](kind: opValue, value: args)
 
-proc parseFileLine(line: string): OpResult[FileLine] =
-  return OpResult[FileLine](kind: opMessage, message: "not implemented")
-  # var filename = ""
-  # var noLastLine = false
-  # result = some(newFileLine(filename, noLastLine))
-  # result = some(newExpectedLine(expectedName, gotName))
+proc parseRunnerFileLine*(line: string): OpResult[RunnerFileLine] =
 
-proc parseExpectedLine(line: string): OpResult[ExpectedLine] =
-  return OpResult[ExpectedLine](kind: opMessage, message: "not implemented")
-  # var expectedName = ""
-  # var gotName = ""
-  # result = some(newExpectedLine(expectedName, gotName))
+  #----------file: hello.html noLastEnding
+  let pattern = r"^----------file:\s+([^\s]+)(?:\s+(noLastEnding)){0,1}\s*$"
+  let matchesO = matchPatternCached(line, pattern, 0)
+  if not matchesO.isSome:
+    return OpResult[RunnerFileLine](kind: opMessage, message: "Invalid file line: $1" % [line])
+
+  let matches = matchesO.get()
+  let (filename, attr) = matches.get2Groups()
+  var noLastEnding = false
+  if attr == "noLastEnding":
+    noLastEnding = true
+  let fileLine = newRunnerFileLine(filename, noLastEnding)
+  return OpResult[RunnerFileLine](kind: opValue, value: fileLine)
+
+proc parseExpectedLine*(line: string): OpResult[ExpectedLine] =
+  #----------expected: stdout.expected == stdout
+  let pattern = r"^----------expected:\s+([^\s]+)\s*==\s*([^\s]+)\s*$"
+  let matchesO = matchPatternCached(line, pattern, 0)
+  if not matchesO.isSome:
+    return OpResult[ExpectedLine](kind: opMessage,
+      message: "Invalid expected line: $1" % [line])
+
+  let matches = matchesO.get()
+  let (filename1, filename2) = matches.get2Groups()
+  let expectedLine = newExpectedLine(filename1, filename2)
+  return OpResult[ExpectedLine](kind: opValue, value: expectedLine)
 
 proc openNewFile*(folder: string, filename: string): OpResult[File] =
   ## Create a new file in the given folder and return an open File
@@ -245,11 +266,12 @@ proc openNewFile*(folder: string, filename: string): OpResult[File] =
   result = OpResult[File](kind: opValue, value: file)
 
 proc createSectionFile(lb: var LineBuffer, folder: string, filename: string,
-                noLastLine: bool): OpResult[string] =
+                noLastEnding: bool): OpResult[string] =
   ## Create a file in the given folder by reading lines in the line buffer until
   ## "----------" is found or the end of the file. Return the last
   ## line.
 
+  # Create a file in the given folder.
   var fileOp = openNewFile(folder, filename)
   if fileOp.isMessage:
     return OpResult[string](kind: opMessage, message: fileOp.message)
@@ -257,6 +279,9 @@ proc createSectionFile(lb: var LineBuffer, folder: string, filename: string,
   defer:
     file.close()
 
+  # todo: define the section marker at the top of the file instead of using ----------?
+
+  # Write lines until the next section.
   var line: string
   while true:
     line = readlines.readline(lb)
@@ -302,7 +327,6 @@ proc runFilename(filename: string): OpResult[RcAndMessage] =
   var line = readlines.readline(lb)
   if line == "":
     return OpResult[RcAndMessage](kind: opMessage, message: "Emtpy file: $1" % filename)
-
   if not line.startsWith(staticteaTestFile):
     let message = """File type not supported.
 expected: $1
@@ -312,22 +336,25 @@ got: $2
 
   var haveLine = false
   while true:
+    # Read a line if we don't already have it.
     if not haveLine:
-      line = lb.readline()
+      line = readlines.readline(lb)
+    else:
+      haveLine = false
     if line == "":
       break # No more lines.
     if line.startsWith("#"):
       continue
     if line.startsWith("----------file:"):
-      let fileLineOp = parseFileLine(line)
+      let fileLineOp = parseRunnerFileLine(line)
       if fileLineOp.isMessage:
         return OpResult[RcAndMessage](kind: opMessage, message: fileLineOp.message)
       let fileLine = fileLineOp.value
-      let lastLineOp = createSectionFile(lb, tempDirName, fileLine.filename, fileLine.noLastLine)
+      let lastLineOp = createSectionFile(lb, tempDirName, fileLine.filename, fileLine.noLastEnding)
       if lastLineOp.isMessage:
         return OpResult[RcAndMessage](kind: opMessage, message: lastLineOp.message)
       line = lastLineOp.value
-      haveLine = false
+      haveLine = true
       continue
 
     if line.startsWith("----------expected:"):
@@ -336,9 +363,11 @@ got: $2
       if expectedLineOp.isMessage:
         return OpResult[RcAndMessage](kind: opMessage, message: expectedLineOp.message)
       writeOut("expected")
+
     if line.startsWith("----------command line"):
       # Remember the command line
       writeOut("command line")
+
     if line.startsWith("----------return code"):
       writeOut("return code")
 
@@ -353,16 +382,16 @@ got: $2
   let rcAndMessage = RcAndMessage(rc: 0, message: "")
   result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
 
-proc runDirectory(dir: string): OpResult[RcAndMessage] =
+proc runDirectory*(dir: string): OpResult[RcAndMessage] =
   result = OpResult[RcAndMessage](kind: opMessage, message: "runDirectory: not implemented")
 
-proc runFilename(args: Args): OpResult[RcAndMessage] =
+proc runFilename*(args: RunnerArgs): OpResult[RcAndMessage] =
   result = runFilename(args.filename)
 
-proc runDirectory(args: Args): OpResult[RcAndMessage] =
+proc runDirectory(args: RunnerArgs): OpResult[RcAndMessage] =
   result = runDirectory(args.directory)
 
-proc processArgs(args: Args): OpResult[RcAndMessage] =
+proc processRunnerArgs(args: RunnerArgs): OpResult[RcAndMessage] =
   ## Process the arguments and return a return code or message.
 
   if args.help:
@@ -394,7 +423,7 @@ proc main*(argv: seq[string]): OpResult[RcAndMessage] =
   setControlCHook(controlCHandler)
 
   try:
-    result = processArgs(args)
+    result = processRunnerArgs(args)
   except:
     var message = "Unexpected exception: $1" % [getCurrentExceptionMsg()]
     # The stack trace is only available in the debug builds.
