@@ -77,7 +77,6 @@ func get2Groups*(matches: Matches): (string, string) =
 # todo: is there a good way to replace the get groups method with one?
 # todo: add optional parameter to specify regex flags.
 # todo: where is the perl online source?
-# todo: add another parameter for regex flags.
 
 func get3Groups*(matches: Matches): (string, string, string) =
   ## Get the first three groups in matches. If one of the groups doesn't
@@ -92,6 +91,24 @@ func get3Groups*(matches: Matches): (string, string, string) =
   if matches.groups.len > 2:
     three = matches.groups[2]
   result = (one, two, three)
+
+func getGroups*(matches: Matches, groupCount: Natural): seq[string] =
+  ## Return the number of groups specified. If one of the groups doesn't
+  ## exist, "" is returned for it.
+
+  var count: Natural
+  if groupCount > maxGroups:
+    count = maxGroups
+  else:
+    count = groupCount
+
+  var groups = newSeqOfCap[string](count)
+  for ix in countUp(0, count-1):
+    if ix < matches.groups.len:
+      groups.add(matches.groups[ix])
+    else:
+      groups.add("")
+  result = groups
 
 func matchRegex*(str: string, regex: Regex, start: Natural = 0): Option[Matches] =
   ## Match a regular expression pattern in a string.

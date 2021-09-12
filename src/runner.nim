@@ -37,6 +37,8 @@ type
     ## RunFileLine holds the parseRunFileLine result.
     filename*: string
     noLastEnding*: bool
+    command*: bool
+    nonZeroReturn*: bool
 
   RunExpectedLine* = object
     ## RunExpectedLine holds the names of two files that are expected to
@@ -77,8 +79,10 @@ func isValue*(opResult: OpResult): bool =
 #   ## Return a new OpResult object containing a value.
 #   result = OpResult(kind: opValue, value: T)
 
-func newRunFileLine*(filename: string, noLastEnding: bool): RunFileLine =
-  result = RunFileLine(filename: filename, noLastEnding: noLastEnding)
+func newRunFileLine*(filename: string, noLastEnding: bool, command:
+                     bool, nonZeroReturn: bool): RunFileLine =
+  result = RunFileLine(filename: filename, noLastEnding: noLastEnding,
+                       command: command, nonZeroReturn: nonZeroReturn)
 
 func newRunExpectedLine*(filename1: string, filename2: string): RunExpectedLine =
   result = RunExpectedLine(filename1: filename1, filename2: filename2)
@@ -157,7 +161,7 @@ The file lines go here.
 The "expected" line tells which files should be compared after running
 the test script. Example:
 
---- expected: filename1 == filename2
+--- expected filename1 == filename2
 
 # comment line
 
@@ -284,25 +288,34 @@ proc parseRunCommandLine*(argv: seq[string]): OpResult[RunArgs] =
 
   result = OpResult[RunArgs](kind: opValue, value: args)
 
-proc parseRunFileLine*(line: string): OpResult[RunFileLine] =
+func makeBool(item: string): bool =
+  if item != "":
+    result = true
+  else:
+    result = false
 
-  #----------file: hello.html noLastEnding
-  let pattern = r"^----------file:\s+([^\s]+)(?:\s+(noLastEnding)){0,1}\s*$"
+proc parseRunFileLine*(line: string): OpResult[RunFileLine] =
+  ## The optional elements must be specified in order.
+  #----------file hello.html [noLastEnding] [command] [nonZeroReturn]
+  let pattern = r"^[- ]*file[ ]+([^ ]+)(?:[ ]+(noLastEnding)){0,1}(?:[ ]+(command)){0,1}(?:[ ]+(nonZeroReturn)){0,1}[- ]*$"
+
   let matchesO = matchPatternCached(line, pattern, 0)
   if not matchesO.isSome:
     return OpResult[RunFileLine](kind: opMessage, message: "Invalid file line: $1" % [line])
 
   let matches = matchesO.get()
-  let (filename, attr) = matches.get2Groups()
-  var noLastEnding = false
-  if attr == "noLastEnding":
-    noLastEnding = true
-  let fileLine = newRunFileLine(filename, noLastEnding)
+  let groups = matches.getGroups(4)
+  let filename = groups[0]
+  let noLastEnding = makeBool(groups[1])
+  let command = makeBool(groups[2])
+  let nonZeroReturn = makeBool(groups[3])
+
+  let fileLine = newRunFileLine(filename, noLastEnding, command, nonZeroReturn)
   return OpResult[RunFileLine](kind: opValue, value: fileLine)
 
 proc parseRunExpectedLine*(line: string): OpResult[RunExpectedLine] =
-  #----------expected: stdout.expected == stdout
-  let pattern = r"^----------expected:\s+([^\s]+)\s*==\s*([^\s]+)\s*$"
+  #----------expected stdout.expected == stdout
+  let pattern = r"^[- ]*expected[ ]+([^ ]+)[ ]*==[ ]*([^ ]+)[- ]*$"
   let matchesO = matchPatternCached(line, pattern, 0)
   if not matchesO.isSome:
     return OpResult[RunExpectedLine](kind: opMessage,

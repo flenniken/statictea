@@ -133,7 +133,7 @@ suite "runner.nim":
     let fileOp = openNewFile(folder, filename)
     check fileOp.kind == opMessage
     # echo fileOp.message
-    check fileOp.message.startsWith("Unable to create the file:")
+    check fileOp.message.startsWith("Unable to create the file")
 
     # Remove the temp dir.
     setFilePermissions(folder, {fpUserRead, fpGroupRead, fpUserWrite})
@@ -141,50 +141,93 @@ suite "runner.nim":
     check dirExists(folder) == false
 
   test "parseRunFileLine name":
-    let fileLineOp = parseRunFileLine("----------file: name.html")
+    let fileLineOp = parseRunFileLine("file name.html")
+    check fileLineOp.isValue
+    check fileLineOp.value.filename == "name.html"
+    check fileLineOp.value.noLastEnding == false
+
+  test "parseRunFileLine ---name":
+    let fileLineOp = parseRunFileLine("--- file name.html ---")
     check fileLineOp.isValue
     check fileLineOp.value.filename == "name.html"
     check fileLineOp.value.noLastEnding == false
 
   test "parseRunFileLine name with spaces":
-    let fileLineOp = parseRunFileLine("----------file:    name.html  ")
+    let fileLineOp = parseRunFileLine("----  ---- -- file    name.html  ")
     check fileLineOp.isValue
     check fileLineOp.value.filename == "name.html"
     check fileLineOp.value.noLastEnding == false
 
   test "parseRunFileLine name and noLastEnding":
-    let fileLineOp = parseRunFileLine("----------file: name.html noLastEnding")
+    let fileLineOp = parseRunFileLine("----------file name.html noLastEnding")
     check fileLineOp.isValue
     check fileLineOp.value.filename == "name.html"
     check fileLineOp.value.noLastEnding == true
 
   test "parseRunFileLine name and noLastEnding":
-    let fileLineOp = parseRunFileLine("----------file:   name.html   noLastEnding  ")
+    let fileLineOp = parseRunFileLine("----------file   name.html   noLastEnding  ")
     check fileLineOp.isValue
     check fileLineOp.value.filename == "name.html"
     check fileLineOp.value.noLastEnding == true
 
-  test "parseRunFileLine error":
-    let fileLineOp = parseRunFileLine("----------file:name.html")
-    check fileLineOp.isMessage
-    check fileLineOp.message == "Invalid file line: ----------file:name.html"
+  test "parseRunFileLine name noLastEnding command":
+    let fileLineOp = parseRunFileLine("file name.html noLastEnding command")
+    check fileLineOp.isValue
+    check fileLineOp.value.filename == "name.html"
+    check fileLineOp.value.noLastEnding == true
+    check fileLineOp.value.command == true
+    check fileLineOp.value.nonZeroReturn == false
 
-  test "parseRunExpectedLine error":
-    let runExpectedLineOp = parseRunExpectedLine("----------file:name.html")
-    check runExpectedLineOp.isMessage
-    check runExpectedLineOp.message == "Invalid expected line: ----------file:name.html"
+  test "parseRunFileLine name noLastEnding command nonZeroReturn":
+    let fileLineOp = parseRunFileLine("file name.html noLastEnding command nonZeroReturn")
+    check fileLineOp.isValue
+    check fileLineOp.value.filename == "name.html"
+    check fileLineOp.value.noLastEnding == true
+    check fileLineOp.value.command == true
+    check fileLineOp.value.nonZeroReturn == true
+
+  test "parseRunFileLine name command nonZeroReturn":
+    let fileLineOp = parseRunFileLine("file name.html command nonZeroReturn")
+    check fileLineOp.isValue
+    check fileLineOp.value.filename == "name.html"
+    check fileLineOp.value.noLastEnding == false
+    check fileLineOp.value.command == true
+    check fileLineOp.value.nonZeroReturn == true
+
+  test "parseRunFileLine name command ":
+    let fileLineOp = parseRunFileLine("file name.html command")
+    check fileLineOp.isValue
+    check fileLineOp.value.filename == "name.html"
+    check fileLineOp.value.noLastEnding == false
+    check fileLineOp.value.command == true
+    check fileLineOp.value.nonZeroReturn == false
+
+  test "parseRunFileLine error":
+    let fileLineOp = parseRunFileLine("----------filename.html")
+    check fileLineOp.isMessage
+    check fileLineOp.message == "Invalid file line: ----------filename.html"
 
   test "parseRunExpectedLine happy path":
-    let runExpectedLineOp = parseRunExpectedLine("----------expected: file1 == file2")
+    let runExpectedLineOp = parseRunExpectedLine("expected file1 == file2")
     check runExpectedLineOp.isValue
     check runExpectedLineOp.value.filename1 == "file1"
     check runExpectedLineOp.value.filename2 == "file2"
 
   test "parseRunExpectedLine spaces":
-    let runExpectedLineOp = parseRunExpectedLine("----------expected:   file1   ==   file2  ")
+    let runExpectedLineOp = parseRunExpectedLine("------ expected   file1   ==  file2 --")
     check runExpectedLineOp.isValue
     check runExpectedLineOp.value.filename1 == "file1"
     check runExpectedLineOp.value.filename2 == "file2"
+
+  test "parseRunExpectedLine error":
+    let runExpectedLineOp = parseRunExpectedLine("----------filename.html")
+    check runExpectedLineOp.isMessage
+    check runExpectedLineOp.message == "Invalid expected line: ----------filename.html"
+
+  test "parseRunExpectedLine missing file":
+    let runExpectedLineOp = parseRunExpectedLine("expected file1")
+    check runExpectedLineOp.isMessage
+    check runExpectedLineOp.message == "Invalid expected line: expected file1"
 
 
 

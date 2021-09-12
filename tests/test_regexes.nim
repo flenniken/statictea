@@ -51,6 +51,38 @@ suite "regexes.nim":
     check two == "67"
     check three == "8"
 
+  test "getGroups":
+    let pattern = r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$"
+    check testMatchPattern("999.888.777", pattern, 0, some(newMatches(11, 0, "999", "888", "777")))
+    check testMatchPattern("5.67.8", pattern, 0, some(newMatches(6, 0, "5", "67", "8")))
+    let matchesO = matchPattern("5.67.8", pattern, 0)
+    check matchesO.isSome
+
+    var groups = matchesO.get().getGroups(0)
+    check groups.len == 0
+
+    groups = matchesO.get().getGroups(1)
+    check groups.len == 1
+    check groups[0] == "5"
+
+    groups = matchesO.get().getGroups(2)
+    check groups.len == 2
+    check groups[0] == "5"
+    check groups[1] == "67"
+
+    groups = matchesO.get().getGroups(3)
+    check groups.len == 3
+    check groups[0] == "5"
+    check groups[1] == "67"
+    check groups[2] == "8"
+
+    groups = matchesO.get().getGroups(4)
+    check groups.len == 4
+    check groups[0] == "5"
+    check groups[1] == "67"
+    check groups[2] == "8"
+    check groups[3] == ""
+
   test "start not zero":
     # Using ^ to anchor doesn't work as I expect when start is not 0.
     # let matcher = newMatcher(r"^(abc)", 1)
