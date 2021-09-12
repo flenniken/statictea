@@ -3,6 +3,12 @@ import std/os
 import std/strutils
 import runner
 
+proc createFile*(filename: string, content: string) =
+  ## Create a file with the given content.
+  var file = open(filename, fmWrite)
+  file.write(content)
+  file.close()
+
 proc parseRunCommandLine*(cmdLine: string = ""): OpResult[RunArgs] =
   let argv = cmdLine.splitWhitespace()
   result = parseRunCommandLine(argv)
@@ -61,6 +67,18 @@ suite "runner.nim":
       check args.filename == ""
       check args.directory == ""
 
+  test "parseRunCommandLine -l":
+    let cmdLines = ["-l", "--leaveTempDir"]
+    for cmdLine in cmdLines:
+      let argsOp = parseRunCommandLine(cmdLine)
+      check argsOp.kind == opValue
+      let args = argsOp.value
+      check args.help == false
+      check args.version == false
+      check args.filename == ""
+      check args.directory == ""
+      check args.leaveTempDir == true
+
   test "parseRunCommandLine -v":
     let cmdLines = ["-v", "--version"]
     for cmdLine in cmdLines:
@@ -69,6 +87,7 @@ suite "runner.nim":
       let args = argsOp.value
       check args.help == false
       check args.version == true
+      check args.leaveTempDir == false
       check args.filename == ""
       check args.directory == ""
 
@@ -100,6 +119,18 @@ suite "runner.nim":
       let argsOp = parseRunCommandLine(cmdLine)
       check argsOp.kind == opMessage
       check argsOp.message == "Missing filename. Use -f=filename"
+
+  test "parseRunCommandLine -f file -l":
+    let cmdLines = ["-l -f=name", "--filename=name --leaveTempDir"]
+    for cmdLine in cmdLines:
+      let argsOp = parseRunCommandLine(cmdLine)
+      check argsOp.kind == opValue
+      let args = argsOp.value
+      check args.help == false
+      check args.version == false
+      check args.leaveTempDir == true
+      check args.filename == "name"
+      check args.directory == ""
 
   test "parseRunCommandLine -d file":
     let cmdLines = ["-d testfolder", "--directory testfolder"]
@@ -229,8 +260,66 @@ suite "runner.nim":
     check runExpectedLineOp.isMessage
     check runExpectedLineOp.message == "Invalid expected line: expected file1"
 
+  test "runFilename missing file":
+    let args = newRunArgs()
+    let rcAndMessageOp = runFilename(args)
+    check rcAndMessageOp.isMessage
+    check rcAndMessageOp.message == "File not found: ''."
 
+  test "runFilename empty.stf":
+    let filename = "testfiles/empty.stf"
+    createFile(filename, "")
+    let args = newRunArgs(filename = filename)
+    let rcAndMessageOp = runFilename(args)
+    check rcAndMessageOp.isMessage
+    check rcAndMessageOp.message == "Empty file: 'testfiles/empty.stf'."
 
-  # test "runFilename":
-  #   let args = newRunArgs(filename = "hello.stf")
-  #   rcAndMessageOp = runFilename(args)
+  test "runFilename not stf":
+    let filename = "testfiles/empty.stf"
+    createFile(filename, "not a stf file")
+    let args = newRunArgs(filename = filename)
+    let rcAndMessageOp = runFilename(args)
+    check rcAndMessageOp.isMessage
+    let message = """File type not supported.
+expected: id: stf file version 0.0.0
+got: not a stf file
+"""
+    check rcAndMessageOp.message == message
+
+  test "runFilename do nothing":
+    let filename = "testfiles/empty.stf"
+    let content = """
+id: stf file version 0.0.0
+"""
+    createFile(filename, content)
+    let args = newRunArgs(filename = filename)
+    let rcAndMessageOp = runFilename(args)
+    check rcAndMessageOp.value == newRcAndMessage(0, "")
+
+  test "runFilename comments":
+    let filename = "testfiles/comments.stf"
+    let content = """
+id: stf file version 0.0.0
+# This is a do nothing file with comments.
+# Comments have # as the first character of
+# the line.
+"""
+    createFile(filename, content)
+    let args = newRunArgs(filename = filename)
+    let rcAndMessageOp = runFilename(args)
+    check rcAndMessageOp.value == newRcAndMessage(0, "")
+
+#   test "runFilename make file":
+#     let filename = "testfiles/onefile.stf"
+#     let content = """
+# id: stf file version 0.0.0
+# # This stf creates a file, that's all.
+# --- file afile.txt
+# contents of
+# the file
+# --- endfile
+# """
+#     createFile(filename, content)
+#     let args = newRunArgs(filename = filename, leaveTempDir = true)
+#     let rcAndMessageOp = runFilename(args)
+#     check rcAndMessageOp.value == newRcAndMessage(0, "")

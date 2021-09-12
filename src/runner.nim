@@ -16,6 +16,7 @@ const
     ('v', "version"),
     ('f', "filename"),
     ('d', "directory"),
+    ('l', "leaveTempDir"),
   ]
   runnerId = "id: stf file version 0.0.0"
     ## The first line of the stf file.
@@ -25,6 +26,7 @@ type
     ## RunArgs holds the command line arguments.
     help*: bool
     version*: bool
+    leaveTempDir*: bool
     filename*: string
     directory*: string
 
@@ -60,8 +62,13 @@ type
       of opMessage:
         message*: string
 
-func newRunArgs*(help = false, version = false, filename = "", directory = ""): RunArgs =
-  result = RunArgs(help: help, version: version, filename: filename, directory: directory)
+func newRunArgs*(help = false, version = false, leaveTempDir = false,
+                                         filename = "", directory = ""): RunArgs =
+  result = RunArgs(help: help, version: version, leaveTempDir:
+    leaveTempDir, filename: filename, directory: directory)
+
+func newRcAndMessage*(rc: int, message: string): RcAndMessage =
+  result = RcAndMessage(rc: rc, message: message)
 
 func isMessage*(opResult: OpResult): bool =
   if opResult.kind == opMessage:
@@ -102,7 +109,17 @@ proc createFolder*(folder: string): OpResult[RcAndMessage] =
     let rcAndMessage = RcAndMessage(rc: 0, message: "")
     result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
   except OSError:
-    let message = "OS error when trying to create the directory: $1" % folder
+    let message = "OS error when trying to create the directory: '$1'" % folder
+    result = OpResult[RcAndMessage](kind: opMessage, message: message)
+
+proc deleteFolder*(folder: string): OpResult[RcAndMessage] =
+  ## Delete a folder with the given name.
+  try:
+    removeDir(folder)
+    let rcAndMessage = RcAndMessage(rc: 0, message: "")
+    result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
+  except OSError:
+    let message = "OS error when trying to remove the directory: '$1'" % folder
     result = OpResult[RcAndMessage](kind: opMessage, message: message)
 
 proc getHelp(): string =
@@ -219,7 +236,7 @@ func letterToWord(letter: char): OpResult[string] =
 
 # todo: make an object for the return value.
 proc handleWord(switch: string, word: string, value: string,
-    help: var bool, version: var bool, filename: var string,
+    help: var bool, version: var bool, leaveTempDir: var bool, filename: var string,
     directory: var string): OpResult[string] =
 
   ## Handle one switch and return its value.  Switch is the key from
@@ -240,6 +257,8 @@ proc handleWord(switch: string, word: string, value: string,
     help = true
   elif word == "version":
     version = true
+  elif word == "leaveTempDir":
+    leaveTempDir = true
   else:
     return OpResult[string](kind: opMessage, message: "Unknown switch.")
 
@@ -250,6 +269,7 @@ proc parseRunCommandLine*(argv: seq[string]): OpResult[RunArgs] =
   var args: RunArgs
   var help: bool = false
   var version: bool = false
+  var leaveTempDir: bool = false
   var filename: string
   var directory: string
 
@@ -265,12 +285,12 @@ proc parseRunCommandLine*(argv: seq[string]): OpResult[RunArgs] =
           if wordOp.isMessage:
             return OpResult[RunArgs](kind: opMessage, message: wordOp.message)
           let messageOp = handleWord($letter, wordOp.value, value,
-            help, version, filename, directory)
+                                     help, version, leaveTempDir, filename, directory)
           if messageOp.isMessage:
             return OpResult[RunArgs](kind: opMessage, message: messageOp.message)
 
       of CmdLineKind.cmdLongOption:
-        let messageOp = handleWord(key, key, value, help, version,
+        let messageOp = handleWord(key, key, value, help, version, leaveTempDir,
                    filename, directory)
         if messageOp.isMessage:
           return OpResult[RunArgs](kind: opMessage, message: messageOp.message)
@@ -285,6 +305,7 @@ proc parseRunCommandLine*(argv: seq[string]): OpResult[RunArgs] =
   args.version = version
   args.filename = filename
   args.directory = directory
+  args.leaveTempDir = leaveTempDir
 
   result = OpResult[RunArgs](kind: opValue, value: args)
 
@@ -377,23 +398,25 @@ proc runFilename(filename: string): OpResult[RcAndMessage] =
   var commandLine: string
 
   if not fileExists(filename):
-    return OpResult[RcAndMessage](kind: opMessage, message: "File not found: $1" % [filename])
+    return OpResult[RcAndMessage](kind: opMessage, message: "File not found: '$1'." % [filename])
 
   # Open the file for reading.
   let stream = newFileStream(filename, fmRead)
   if stream == nil:
-    return OpResult[RcAndMessage](kind: opMessage, message: "Unable to open file: $1" % [filename])
+    return OpResult[RcAndMessage](kind: opMessage, message: "Unable to open file: '$1'." % [filename])
   defer:
     stream.close()
 
   # Create a temp folder next to the file.
   let tempDirName = filename & ".tempdir"
   if dirExists(tempDirName):
-    let message = "The temp dir already exists. Delete it and try again. $1" % tempDirName
+    let message = "The temp dir already exists. Delete it and try again. '$1'" % tempDirName
     return OpResult[RcAndMessage](kind: opMessage, message: message)
   let rcAndMessageOp = createFolder(tempDirName)
   if rcAndMessageOp.isMessage:
     return rcAndMessageOp
+  defer:
+    discard deleteFolder(tempDirName)
 
   # Allocate a buffer for reading lines.
   var lineBufferO = newLineBuffer(stream, filename = filename)
@@ -405,7 +428,7 @@ proc runFilename(filename: string): OpResult[RcAndMessage] =
   # and version number.
   var line = readlines.readline(lb)
   if line == "":
-    return OpResult[RcAndMessage](kind: opMessage, message: "Emtpy file: $1" % filename)
+    return OpResult[RcAndMessage](kind: opMessage, message: "Empty file: '$1'." % filename)
   if not line.startsWith(runnerId):
     let message = """File type not supported.
 expected: $1
