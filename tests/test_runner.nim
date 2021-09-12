@@ -3,9 +3,9 @@ import std/os
 import std/strutils
 import runner
 
-proc parseRunnerCommandLine*(cmdLine: string = ""): OpResult[RunnerArgs] =
+proc parseRunCommandLine*(cmdLine: string = ""): OpResult[RunArgs] =
   let argv = cmdLine.splitWhitespace()
-  result = parseRunnerCommandLine(argv)
+  result = parseRunCommandLine(argv)
 
 suite "runner.nim":
 
@@ -50,10 +50,10 @@ suite "runner.nim":
     removeDir(parentFolder)
     check dirExists(parentFolder) == false
 
-  test "parseRunnerCommandLine -h":
+  test "parseRunCommandLine -h":
     let cmdLines = ["-h", "--help"]
     for cmdLine in cmdLines:
-      let argsOp = parseRunnerCommandLine(cmdLine)
+      let argsOp = parseRunCommandLine(cmdLine)
       check argsOp.kind == opValue
       let args = argsOp.value
       check args.help == true
@@ -61,10 +61,10 @@ suite "runner.nim":
       check args.filename == ""
       check args.directory == ""
 
-  test "parseRunnerCommandLine -v":
+  test "parseRunCommandLine -v":
     let cmdLines = ["-v", "--version"]
     for cmdLine in cmdLines:
-      let argsOp = parseRunnerCommandLine(cmdLine)
+      let argsOp = parseRunCommandLine(cmdLine)
       check argsOp.kind == opValue
       let args = argsOp.value
       check args.help == false
@@ -72,10 +72,10 @@ suite "runner.nim":
       check args.filename == ""
       check args.directory == ""
 
-  test "parseRunnerCommandLine -f":
+  test "parseRunCommandLine -f":
     let cmdLines = ["-f=hello.stf", "--filename=hello.stf"]
     for cmdLine in cmdLines:
-      let argsOp = parseRunnerCommandLine(cmdLine)
+      let argsOp = parseRunCommandLine(cmdLine)
       check argsOp.kind == opValue
       let args = argsOp.value
       check args.help == false
@@ -83,10 +83,10 @@ suite "runner.nim":
       check args.filename == "hello.stf"
       check args.directory == ""
 
-  test "parseRunnerCommandLine -d":
+  test "parseRunCommandLine -d":
     let cmdLines = ["-d=testfolder", "--directory=testfolder"]
     for cmdLine in cmdLines:
-      let argsOp = parseRunnerCommandLine(cmdLine)
+      let argsOp = parseRunCommandLine(cmdLine)
       check argsOp.kind == opValue
       let args = argsOp.value
       check args.help == false
@@ -94,17 +94,17 @@ suite "runner.nim":
       check args.filename == ""
       check args.directory == "testfolder"
 
-  test "parseRunnerCommandLine -f file":
+  test "parseRunCommandLine -f file":
     let cmdLines = ["-f testfolder", "--filename testfolder"]
     for cmdLine in cmdLines:
-      let argsOp = parseRunnerCommandLine(cmdLine)
+      let argsOp = parseRunCommandLine(cmdLine)
       check argsOp.kind == opMessage
       check argsOp.message == "Missing filename. Use -f=filename"
 
-  test "parseRunnerCommandLine -d file":
+  test "parseRunCommandLine -d file":
     let cmdLines = ["-d testfolder", "--directory testfolder"]
     for cmdLine in cmdLines:
-      let argsOp = parseRunnerCommandLine(cmdLine)
+      let argsOp = parseRunCommandLine(cmdLine)
       check argsOp.kind == opMessage
       check argsOp.message == "Missing directory name. Use -d=directory"
 
@@ -140,54 +140,54 @@ suite "runner.nim":
     removeDir(folder)
     check dirExists(folder) == false
 
-  test "parseRunnerFileLine name":
-    let fileLineOp = parseRunnerFileLine("----------file: name.html")
+  test "parseRunFileLine name":
+    let fileLineOp = parseRunFileLine("----------file: name.html")
     check fileLineOp.isValue
     check fileLineOp.value.filename == "name.html"
     check fileLineOp.value.noLastEnding == false
 
-  test "parseRunnerFileLine name with spaces":
-    let fileLineOp = parseRunnerFileLine("----------file:    name.html  ")
+  test "parseRunFileLine name with spaces":
+    let fileLineOp = parseRunFileLine("----------file:    name.html  ")
     check fileLineOp.isValue
     check fileLineOp.value.filename == "name.html"
     check fileLineOp.value.noLastEnding == false
 
-  test "parseRunnerFileLine name and noLastEnding":
-    let fileLineOp = parseRunnerFileLine("----------file: name.html noLastEnding")
+  test "parseRunFileLine name and noLastEnding":
+    let fileLineOp = parseRunFileLine("----------file: name.html noLastEnding")
     check fileLineOp.isValue
     check fileLineOp.value.filename == "name.html"
     check fileLineOp.value.noLastEnding == true
 
-  test "parseRunnerFileLine name and noLastEnding":
-    let fileLineOp = parseRunnerFileLine("----------file:   name.html   noLastEnding  ")
+  test "parseRunFileLine name and noLastEnding":
+    let fileLineOp = parseRunFileLine("----------file:   name.html   noLastEnding  ")
     check fileLineOp.isValue
     check fileLineOp.value.filename == "name.html"
     check fileLineOp.value.noLastEnding == true
 
-  test "parseRunnerFileLine error":
-    let fileLineOp = parseRunnerFileLine("----------file:name.html")
+  test "parseRunFileLine error":
+    let fileLineOp = parseRunFileLine("----------file:name.html")
     check fileLineOp.isMessage
     check fileLineOp.message == "Invalid file line: ----------file:name.html"
 
-  test "parseExpectedLine error":
-    let expectedLineOp = parseExpectedLine("----------file:name.html")
-    check expectedLineOp.isMessage
-    check expectedLineOp.message == "Invalid expected line: ----------file:name.html"
+  test "parseRunExpectedLine error":
+    let runExpectedLineOp = parseRunExpectedLine("----------file:name.html")
+    check runExpectedLineOp.isMessage
+    check runExpectedLineOp.message == "Invalid expected line: ----------file:name.html"
 
-  test "parseExpectedLine happy path":
-    let expectedLineOp = parseExpectedLine("----------expected: file1 == file2")
-    check expectedLineOp.isValue
-    check expectedLineOp.value.filename1 == "file1"
-    check expectedLineOp.value.filename2 == "file2"
+  test "parseRunExpectedLine happy path":
+    let runExpectedLineOp = parseRunExpectedLine("----------expected: file1 == file2")
+    check runExpectedLineOp.isValue
+    check runExpectedLineOp.value.filename1 == "file1"
+    check runExpectedLineOp.value.filename2 == "file2"
 
-  test "parseExpectedLine spaces":
-    let expectedLineOp = parseExpectedLine("----------expected:   file1   ==   file2  ")
-    check expectedLineOp.isValue
-    check expectedLineOp.value.filename1 == "file1"
-    check expectedLineOp.value.filename2 == "file2"
+  test "parseRunExpectedLine spaces":
+    let runExpectedLineOp = parseRunExpectedLine("----------expected:   file1   ==   file2  ")
+    check runExpectedLineOp.isValue
+    check runExpectedLineOp.value.filename1 == "file1"
+    check runExpectedLineOp.value.filename2 == "file2"
 
 
 
   # test "runFilename":
-  #   let args = newRunnerArgs(filename = "hello.stf")
+  #   let args = newRunArgs(filename = "hello.stf")
   #   rcAndMessageOp = runFilename(args)

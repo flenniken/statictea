@@ -1,4 +1,4 @@
-## Run a statictea combined test file.
+## Run a stf (single test file) file.
 
 import std/strutils
 import std/os
@@ -17,11 +17,12 @@ const
     ('f', "filename"),
     ('d', "directory"),
   ]
-  staticteaTestFile = "statictea test file 0.0.0"
+  runnerId = "id: stf file version 0.0.0"
+    ## The first line of the stf file.
 
 type
-  RunnerArgs* = object
-    ## RunnerArgs holds the command line arguments.
+  RunArgs* = object
+    ## RunArgs holds the command line arguments.
     help*: bool
     version*: bool
     filename*: string
@@ -32,13 +33,13 @@ type
     rc*: int
     message*: string
 
-  RunnerFileLine* = object
-    ## RunnerFileLine holds the parseRunnerFileLine result.
+  RunFileLine* = object
+    ## RunFileLine holds the parseRunFileLine result.
     filename*: string
     noLastEnding*: bool
 
-  ExpectedLine* = object
-    ## ExpectedLine holds the names of two files that are expected to
+  RunExpectedLine* = object
+    ## RunExpectedLine holds the names of two files that are expected to
     ## be equal.
     filename1*: string
     filename2*: string
@@ -57,8 +58,8 @@ type
       of opMessage:
         message*: string
 
-func newRunnerArgs*(help = false, version = false, filename = "", directory = ""): RunnerArgs =
-  result = RunnerArgs(help: help, version: version, filename: filename, directory: directory)
+func newRunArgs*(help = false, version = false, filename = "", directory = ""): RunArgs =
+  result = RunArgs(help: help, version: version, filename: filename, directory: directory)
 
 func isMessage*(opResult: OpResult): bool =
   if opResult.kind == opMessage:
@@ -76,11 +77,11 @@ func isValue*(opResult: OpResult): bool =
 #   ## Return a new OpResult object containing a value.
 #   result = OpResult(kind: opValue, value: T)
 
-func newRunnerFileLine*(filename: string, noLastEnding: bool): RunnerFileLine =
-  result = RunnerFileLine(filename: filename, noLastEnding: noLastEnding)
+func newRunFileLine*(filename: string, noLastEnding: bool): RunFileLine =
+  result = RunFileLine(filename: filename, noLastEnding: noLastEnding)
 
-func newExpectedLine*(filename1: string, filename2: string): ExpectedLine =
-  result = ExpectedLine(filename1: filename1, filename2: filename2)
+func newRunExpectedLine*(filename1: string, filename2: string): RunExpectedLine =
+  result = RunExpectedLine(filename1: filename1, filename2: filename2)
 
 proc writeErr*(message: string) =
   ## Write a message to stderr.
@@ -102,46 +103,108 @@ proc createFolder*(folder: string): OpResult[RcAndMessage] =
 
 proc getHelp(): string =
   result = """
+Run a test specified by a stf test file or run all the stf test files
+contained in a folder.
 
-Run a StaticTea combined test file or run all test files in a
-directory.
+The stf test file contains instructions for creating files needed to
+preform the test. It creates the temp files in a temp folder next to the
+test file. After creating the files it runs one of them to preform the
+test. Then it compares files to see whether the test passed or not.
 
-runner [-h] [-v] [-f filename] [-d directory]
+runner [-h] [-v] [-f=filename] [-d=directory]
 
-The test runner runs test files in a folder.  Each file describes
-multiple files that make up a test.  The runner creates the files in a
-temp folder then runs a command line using those files. It then
-compare the output to the expected output.
 
-The runner creates files with an ending newline unless you specify
-noLastEnding.
+There are four types of command lines in an stf file.  Elements on a
+command line can use multiple spaces or tabs to separate commonents
+and commands can use any number of dashes at the beginning and end of
+the line.  The stf command lines are:
 
-The line endings are preserved.
+* id
+* file
+* endfile
+* expected
 
-The following test file instructs the runner to create two files,
-hello.html and hello.json then run a statictea command with them. Then
-it compares standard out with the expected output
+# Id Line
 
-~~~
-statictea test runner 0.0.0
+The id line is the first line of the file and identifies it as a stf
+file and tells its version. The leading and trailing spaces and dashes
+are optional. Example line:
+
+--- id: stf file version 0.0.0 ---
+
+# File and Endfile Lines
+
+The file and endfile lines bracket the lines used for a new file. You
+specify the name of the file, whether to use line ending on the last
+line, whether this file is a test script to run and whether the test
+script returns 0 or non-zero return code. Example:
+
+--- file filename [noLastEnding] [command] [nonZeroReturn] ---
+The file lines go here.
+The file lines go here.
+The file lines go here.
+--- endfile
+
+* filename -- the name of the file to create. You cannot use spaces in
+  the name.
+* noLastEnding -- create the file with a newline on the last line.
+* command -- this file is the test script to run.
+* nonZeroReturn -- used with "command" and tells whether the script is
+  expected to return a non-zero return code value.
+
+# expected line
+
+The "expected" line tells which files should be compared after running
+the test script. Example:
+
+--- expected: filename1 == filename2
+
+# comment line
+
+You can add comments. Comment lines start with # as the first
+character of the line.  Blank lines are ignored except in file blocks.
+
+# Example
+
+The following example stf file instructs the runner to create the
+files : cmd.sh, hello.html, hello.json, stdout-expected and
+stderr-expected then it runs cmd.sh looking for a 0 return code. Then
+it compares the files "stdout" with "stdout.expected" and "stderr"
+with "stderr.expected".
+
+--- id: runner file version 0.0.0
 # Hello World Example
-----------file: hello.html (noLastEnding)
+
+# Create the script to run.
+----- file cmd.sh command -----
+../bin/statictea -t=hello.html -s=hello.json >stdout 2>stderr
+----- endfile -----------------
+
+# Create the hello.html template file without an ending newline.
+--- file hello.html noLastEnding
 $$ nextline
 $$ hello {name}
-----------file: hello.json
+--- endfile
+
+--- file hello.json
 {"name": "world"}
-----------file: stdout.expected (noLastEnding)
+--- endfile
+
+# Create a file with the expected output.
+--- file stdout.expected noLastEnding
 hello world
-----------file: stderr.expected
-----------command line
-../bin/statictea -s=hello.json -t=hello.html >stdout 2>stderr
-----------expected: stdout.expected == stdout
-----------expected: stderr.expected == stderr
-----------return code: 0
-~~~
+--- endfile
 
+# No standard error output is expected, create an empty file.
+--- file stderr.expected
+--- endfile
 
+# Compare these files.
+--- expected stdout.expected == stdout
+--- expected stderr.expected == stderr
 """
+
+# todo: allow a space instead of an equal sign on the command line. "-f filename"
 
 func letterToWord(letter: char): OpResult[string] =
   for tup in switches:
@@ -176,11 +239,11 @@ proc handleWord(switch: string, word: string, value: string,
   else:
     return OpResult[string](kind: opMessage, message: "Unknown switch.")
 
-proc parseRunnerCommandLine*(argv: seq[string]): OpResult[RunnerArgs] =
+proc parseRunCommandLine*(argv: seq[string]): OpResult[RunArgs] =
   ## Return the command line arguments or a message when there is a
   ## problem.
 
-  var args: RunnerArgs
+  var args: RunArgs
   var help: bool = false
   var version: bool = false
   var filename: string
@@ -196,20 +259,20 @@ proc parseRunnerCommandLine*(argv: seq[string]): OpResult[RunnerArgs] =
           let letter = key[ix]
           let wordOp = letterToWord(letter)
           if wordOp.isMessage:
-            return OpResult[RunnerArgs](kind: opMessage, message: wordOp.message)
+            return OpResult[RunArgs](kind: opMessage, message: wordOp.message)
           let messageOp = handleWord($letter, wordOp.value, value,
             help, version, filename, directory)
           if messageOp.isMessage:
-            return OpResult[RunnerArgs](kind: opMessage, message: messageOp.message)
+            return OpResult[RunArgs](kind: opMessage, message: messageOp.message)
 
       of CmdLineKind.cmdLongOption:
         let messageOp = handleWord(key, key, value, help, version,
                    filename, directory)
         if messageOp.isMessage:
-          return OpResult[RunnerArgs](kind: opMessage, message: messageOp.message)
+          return OpResult[RunArgs](kind: opMessage, message: messageOp.message)
 
       of CmdLineKind.cmdArgument:
-        return OpResult[RunnerArgs](kind: opMessage, message: "Unknown switch: $1" % [key])
+        return OpResult[RunArgs](kind: opMessage, message: "Unknown switch: $1" % [key])
 
       of CmdLineKind.cmdEnd:
         discard
@@ -219,36 +282,36 @@ proc parseRunnerCommandLine*(argv: seq[string]): OpResult[RunnerArgs] =
   args.filename = filename
   args.directory = directory
 
-  result = OpResult[RunnerArgs](kind: opValue, value: args)
+  result = OpResult[RunArgs](kind: opValue, value: args)
 
-proc parseRunnerFileLine*(line: string): OpResult[RunnerFileLine] =
+proc parseRunFileLine*(line: string): OpResult[RunFileLine] =
 
   #----------file: hello.html noLastEnding
   let pattern = r"^----------file:\s+([^\s]+)(?:\s+(noLastEnding)){0,1}\s*$"
   let matchesO = matchPatternCached(line, pattern, 0)
   if not matchesO.isSome:
-    return OpResult[RunnerFileLine](kind: opMessage, message: "Invalid file line: $1" % [line])
+    return OpResult[RunFileLine](kind: opMessage, message: "Invalid file line: $1" % [line])
 
   let matches = matchesO.get()
   let (filename, attr) = matches.get2Groups()
   var noLastEnding = false
   if attr == "noLastEnding":
     noLastEnding = true
-  let fileLine = newRunnerFileLine(filename, noLastEnding)
-  return OpResult[RunnerFileLine](kind: opValue, value: fileLine)
+  let fileLine = newRunFileLine(filename, noLastEnding)
+  return OpResult[RunFileLine](kind: opValue, value: fileLine)
 
-proc parseExpectedLine*(line: string): OpResult[ExpectedLine] =
+proc parseRunExpectedLine*(line: string): OpResult[RunExpectedLine] =
   #----------expected: stdout.expected == stdout
   let pattern = r"^----------expected:\s+([^\s]+)\s*==\s*([^\s]+)\s*$"
   let matchesO = matchPatternCached(line, pattern, 0)
   if not matchesO.isSome:
-    return OpResult[ExpectedLine](kind: opMessage,
+    return OpResult[RunExpectedLine](kind: opMessage,
       message: "Invalid expected line: $1" % [line])
 
   let matches = matchesO.get()
   let (filename1, filename2) = matches.get2Groups()
-  let expectedLine = newExpectedLine(filename1, filename2)
-  return OpResult[ExpectedLine](kind: opValue, value: expectedLine)
+  let expectedEqual = newRunExpectedLine(filename1, filename2)
+  return OpResult[RunExpectedLine](kind: opValue, value: expectedEqual)
 
 proc openNewFile*(folder: string, filename: string): OpResult[File] =
   ## Create a new file in the given folder and return an open File
@@ -297,6 +360,9 @@ proc createSectionFile(lb: var LineBuffer, folder: string, filename: string,
 proc runFilename(filename: string): OpResult[RcAndMessage] =
   ## Run a test file and return 0 when successful, else return a message.
 
+  var expectedEqualFiles = newSeq[RunExpectedLine]()
+  var commandLine: string
+
   if not fileExists(filename):
     return OpResult[RcAndMessage](kind: opMessage, message: "File not found: $1" % [filename])
 
@@ -327,11 +393,11 @@ proc runFilename(filename: string): OpResult[RcAndMessage] =
   var line = readlines.readline(lb)
   if line == "":
     return OpResult[RcAndMessage](kind: opMessage, message: "Emtpy file: $1" % filename)
-  if not line.startsWith(staticteaTestFile):
+  if not line.startsWith(runnerId):
     let message = """File type not supported.
 expected: $1
 got: $2
-""" % [staticteaTestFile, line]
+""" % [runnerId, line]
     return OpResult[RcAndMessage](kind: opMessage, message: message)
 
   var haveLine = false
@@ -346,7 +412,7 @@ got: $2
     if line.startsWith("#"):
       continue
     if line.startsWith("----------file:"):
-      let fileLineOp = parseRunnerFileLine(line)
+      let fileLineOp = parseRunFileLine(line)
       if fileLineOp.isMessage:
         return OpResult[RcAndMessage](kind: opMessage, message: fileLineOp.message)
       let fileLine = fileLineOp.value
@@ -359,12 +425,13 @@ got: $2
 
     if line.startsWith("----------expected:"):
       # Remember the expected filenames to compare.
-      let expectedLineOp = parseExpectedLine(line)
-      if expectedLineOp.isMessage:
-        return OpResult[RcAndMessage](kind: opMessage, message: expectedLineOp.message)
-      writeOut("expected")
+      let expectedEqualOp = parseRunExpectedLine(line)
+      if expectedEqualOp.isMessage:
+        return OpResult[RcAndMessage](kind: opMessage, message: expectedEqualOp.message)
+      expectedEqualFiles.add(expectedEqualOp.value)
 
     if line.startsWith("----------command line"):
+      commandLine = readlines.readline(lb)
       # Remember the command line
       writeOut("command line")
 
@@ -385,20 +452,20 @@ got: $2
 proc runDirectory*(dir: string): OpResult[RcAndMessage] =
   result = OpResult[RcAndMessage](kind: opMessage, message: "runDirectory: not implemented")
 
-proc runFilename*(args: RunnerArgs): OpResult[RcAndMessage] =
+proc runFilename*(args: RunArgs): OpResult[RcAndMessage] =
   result = runFilename(args.filename)
 
-proc runDirectory(args: RunnerArgs): OpResult[RcAndMessage] =
+proc runDirectory(args: RunArgs): OpResult[RcAndMessage] =
   result = runDirectory(args.directory)
 
-proc processRunnerArgs(args: RunnerArgs): OpResult[RcAndMessage] =
+proc processRunArgs(args: RunArgs): OpResult[RcAndMessage] =
   ## Process the arguments and return a return code or message.
 
   if args.help:
     let rcAndMessage = RcAndMessage(rc: 0, message: getHelp())
     result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
   elif args.version:
-    let rcAndMessage = RcAndMessage(rc: 0, message: staticteaTestFile)
+    let rcAndMessage = RcAndMessage(rc: 0, message: runnerId)
     result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
   elif args.filename != "":
     result = runFilename(args)
@@ -411,19 +478,20 @@ proc processRunnerArgs(args: RunnerArgs): OpResult[RcAndMessage] =
 proc main*(argv: seq[string]): OpResult[RcAndMessage] =
   ## Run statictea tests files. Return a rc and message.
 
-  # Parse the command line options.
-  let argsOp = parseRunnerCommandLine(argv)
-  if not argsOp.isMessage:
-    return OpResult[RcAndMessage](kind: opMessage, message: argsOp.message)
-  let args = argsOp.value
-
   # Setup control-c monitoring so ctrl-c stops the program.
   proc controlCHandler() {.noconv.} =
     quit 0
   setControlCHook(controlCHandler)
 
   try:
-    result = processRunnerArgs(args)
+    # Parse the command line options.
+    let argsOp = parseRunCommandLine(argv)
+    if argsOp.isMessage:
+      return OpResult[RcAndMessage](kind: opMessage, message: argsOp.message)
+    let args = argsOp.value
+
+    # Run.
+    result = processRunArgs(args)
   except:
     var message = "Unexpected exception: $1" % [getCurrentExceptionMsg()]
     # The stack trace is only available in the debug builds.
