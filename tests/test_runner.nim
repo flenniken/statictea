@@ -18,6 +18,25 @@ suite "runner.nim":
   test "main version":
     check 1 == 1
 
+  test "getCmd":
+    check getCmd("asdfasdf") == "other"
+    check getCmd("#") == "#"
+    check getCmd("\n") == ""
+    check getCmd("\r\n") == ""
+    check getCmd("id") == "id"
+    check getCmd("file") == "file"
+    check getCmd("endfile") == "endfile"
+    check getCmd("expected") == "expected"
+
+  test "getCmd2":
+    check getCmd("# comment") == "#"
+    check getCmd("dd\n") == "other"
+    check getCmd(" \r\n") == "other"
+    check getCmd("--- id ") == "id"
+    check getCmd(" --- file ") == "file"
+    check getCmd("- - -endfile") == "endfile"
+    check getCmd("--  --  --expected") == "expected"
+
   test "createFolder":
     let tempDirName = "createFolderTest"
     let rcAndMessageOp = createFolder(tempDirName)
@@ -177,6 +196,12 @@ suite "runner.nim":
     check fileLineOp.value.filename == "name.html"
     check fileLineOp.value.noLastEnding == false
 
+  test "parseRunFileLine name newline":
+    let fileLineOp = parseRunFileLine("file name.html\n")
+    check fileLineOp.isValue
+    check fileLineOp.value.filename == "name.html"
+    check fileLineOp.value.noLastEnding == false
+
   test "parseRunFileLine ---name":
     let fileLineOp = parseRunFileLine("--- file name.html ---")
     check fileLineOp.isValue
@@ -273,33 +298,38 @@ suite "runner.nim":
     let rcAndMessageOp = runFilename(args)
     check rcAndMessageOp.isMessage
     check rcAndMessageOp.message == "Empty file: 'testfiles/empty.stf'."
+    discard tryRemoveFile(filename)
 
   test "runFilename not stf":
-    let filename = "testfiles/empty.stf"
+    let filename = "testfiles/not-stf.stf"
     createFile(filename, "not a stf file")
     let args = newRunArgs(filename = filename)
     let rcAndMessageOp = runFilename(args)
     check rcAndMessageOp.isMessage
     let message = """File type not supported.
-expected: id: stf file version 0.0.0
+expected: id stf file version 0.0.0
 got: not a stf file
 """
     check rcAndMessageOp.message == message
+    check dirExists(filename & ".tempdir") == false
+    discard tryRemoveFile(filename)
 
   test "runFilename do nothing":
-    let filename = "testfiles/empty.stf"
+    let filename = "testfiles/do-nothing.stf"
     let content = """
-id: stf file version 0.0.0
+id stf file version 0.0.0
 """
     createFile(filename, content)
     let args = newRunArgs(filename = filename)
     let rcAndMessageOp = runFilename(args)
     check rcAndMessageOp.value == newRcAndMessage(0, "")
+    check dirExists(filename & ".tempdir") == false
+    discard tryRemoveFile(filename)
 
   test "runFilename comments":
     let filename = "testfiles/comments.stf"
     let content = """
-id: stf file version 0.0.0
+id stf file version 0.0.0
 # This is a do nothing file with comments.
 # Comments have # as the first character of
 # the line.
@@ -308,18 +338,140 @@ id: stf file version 0.0.0
     let args = newRunArgs(filename = filename)
     let rcAndMessageOp = runFilename(args)
     check rcAndMessageOp.value == newRcAndMessage(0, "")
+    check dirExists(filename & ".tempdir") == false
+    discard tryRemoveFile(filename)
 
-#   test "runFilename make file":
-#     let filename = "testfiles/onefile.stf"
-#     let content = """
-# id: stf file version 0.0.0
-# # This stf creates a file, that's all.
-# --- file afile.txt
-# contents of
-# the file
-# --- endfile
-# """
-#     createFile(filename, content)
-#     let args = newRunArgs(filename = filename, leaveTempDir = true)
-#     let rcAndMessageOp = runFilename(args)
-#     check rcAndMessageOp.value == newRcAndMessage(0, "")
+  test "runFilename leave":
+    let filename = "testfiles/leave.stf"
+    let tempdir = filename & ".tempdir"
+    removeDir(tempdir)
+    let content = """
+id stf file version 0.0.0
+"""
+    createFile(filename, content)
+    let args = newRunArgs(filename = filename, leaveTempDir = true)
+    let rcAndMessageOp = runFilename(args)
+    if rcAndMessageOp.isMessage:
+      echo rcAndMessageOp.message
+    check rcAndMessageOp.value == newRcAndMessage(0, "")
+    check dirExists(tempdir) == true
+    removeDir(tempdir)
+    check dirExists(tempdir) == false
+    discard tryRemoveFile(filename)
+
+  test "make file":
+    let filename = "testfiles/onefile.stf"
+    let tempdir = filename & ".tempdir"
+    removeDir(tempdir)
+    let content = """
+id stf file version 0.0.0
+# This stf creates a file, that's all.
+--- file afile.txt
+contents of
+the file
+--- endfile
+"""
+    createFile(filename, content)
+    let args = newRunArgs(filename = filename, leaveTempDir = true)
+    let rcAndMessageOp = runFilename(args)
+    check rcAndMessageOp.value == newRcAndMessage(0, "")
+
+    check dirExists(tempdir) == true
+    let afile = joinPath(tempdir, "afile.txt")
+    check fileExists(afile)
+    let afileContent = readFile(afile)
+    check afileContent == """
+contents of
+the file
+"""
+    removeDir(tempdir)
+    discard tryRemoveFile(filename)
+
+  test "make two files":
+    let filename = "testfiles/twofiles.stf"
+    let tempdir = filename & ".tempdir"
+    removeDir(tempdir)
+    let content = """
+id stf file version 0.0.0
+# This stf creates files.
+
+--- file afile.txt
+contents of
+the file
+--- endfile
+
+--- file bfile.txt
+contents of b
+the second file
+--- endfile
+
+"""
+    createFile(filename, content)
+    let args = newRunArgs(filename = filename, leaveTempDir = true)
+    let rcAndMessageOp = runFilename(args)
+    check rcAndMessageOp.value == newRcAndMessage(0, "")
+
+    check dirExists(tempdir) == true
+    let afile = joinPath(tempdir, "afile.txt")
+    check fileExists(afile)
+    let bfile = joinPath(tempdir, "bfile.txt")
+    check fileExists(bfile)
+    let afileContent = readFile(afile)
+    check afileContent == """
+contents of
+the file
+"""
+    let bfileContent = readFile(bfile)
+    check bfileContent == """
+contents of b
+the second file
+"""
+    removeDir(tempdir)
+    discard tryRemoveFile(filename)
+
+  test "make empty file":
+    let filename = "testfiles/emptyfile.stf"
+    let tempdir = filename & ".tempdir"
+    removeDir(tempdir)
+    let content = """
+id stf file version 0.0.0
+# This stf creates an empty file.
+--- file emptyfile.txt
+--- endfile
+"""
+    createFile(filename, content)
+    let args = newRunArgs(filename = filename, leaveTempDir = true)
+    let rcAndMessageOp = runFilename(args)
+    check rcAndMessageOp.value == newRcAndMessage(0, "")
+
+    check dirExists(tempdir) == true
+    let emptyfile = joinPath(tempdir, "emptyfile.txt")
+    check fileExists(emptyfile)
+    check getFileSize(emptyfile) == 0
+    removeDir(tempdir)
+    discard tryRemoveFile(filename)
+
+  test "missing endfile":
+    let filename = "testfiles/missingendfile.stf"
+    let tempdir = filename & ".tempdir"
+    removeDir(tempdir)
+    let content = """
+id stf file version 0.0.0
+# This stf creates an empty file.
+--- file missingfile.txt
+testing
+1
+2
+3
+"""
+    createFile(filename, content)
+    let args = newRunArgs(filename = filename, leaveTempDir = true)
+    let rcAndMessageOp = runFilename(args)
+    check rcAndMessageOp.isMessage
+    check rcAndMessageOp.message == "The endfile line was missing."
+
+    check dirExists(tempdir) == true
+    let emptyfile = joinPath(tempdir, "missingfile")
+    check fileExists(emptyfile) == false
+    removeDir(tempdir)
+    discard tryRemoveFile(filename)
