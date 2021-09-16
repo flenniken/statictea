@@ -51,8 +51,8 @@ type
   DirAndFiles* = object
     ## DirAndFiles holds the result of the makeDirAndFiles
     ## procedure.
-    runExpectedLines: seq[RunExpectedLine]
-    runFileLines: seq[RunFileLine]
+    runExpectedLines*: seq[RunExpectedLine]
+    runFileLines*: seq[RunFileLine]
 
   OpResultKind* = enum
     ## The kind of a OpResult object, either a value or message.
@@ -84,14 +84,6 @@ func isValue*(opResult: OpResult): bool =
   if opResult.kind == opValue:
     result = true
 
-# func newOpResultMessage*[T](message: string): OpResult =
-#   ## Return a new OpResult object containing a message.
-#   result = OpResult(kind: opMessage, message: message)
-
-# func newOpResultValue*[T](value: T): OpResult =
-#   ## Return a new OpResult object containing a value.
-#   result = OpResult(kind: opValue, value: T)
-
 func newRunFileLine*(filename: string, noLastEnding: bool, command:
     bool, nonZeroReturn: bool): RunFileLine =
   result = RunFileLine(filename: filename, noLastEnding: noLastEnding,
@@ -104,6 +96,34 @@ func newDirAndFiles*(runExpectedLines: seq[RunExpectedLine],
     runFileLines: seq[RunFileLine]): DirAndFiles =
   result = DirAndFiles(runExpectedLines: runExpectedLines,
     runFileLines: runFileLines)
+
+func `$`*(r: RunExpectedLine): string =
+  ## Return a string representation of a RunExpectedLine.
+
+  result = "expected $1 == $2" % [r.filename1, r.filename2]
+
+func `$`*(r: RunFileLine): string =
+  ## Return a string representation of a RunFileLine.
+
+  var noLastEnding: string
+  if r.noLastEnding:
+    noLastEnding = "noLastEnding"
+  else:
+    noLastEnding = ""
+
+  var command: string
+  if r.command:
+    command = "command"
+  else:
+    command = ""
+
+  var nonZeroReturn: string
+  if r.nonZeroReturn:
+    nonZeroReturn = "nonZeroReturn"
+  else:
+    nonZeroReturn = ""
+
+  result = "file $1 $2 $3 $4" % [r.filename, noLastEnding, command, nonZeroReturn]
 
 proc writeErr*(message: string) =
   ## Write a message to stderr.
@@ -408,14 +428,15 @@ proc createSectionFile(lb: var LineBuffer, folder: string, filename: string,
   if fileOp.isMessage:
     return OpResult[RcAndMessage](kind: opMessage, message: fileOp.message)
   var file = fileOp.value
-  defer:
-    file.close()
 
   # Write lines until the next endfile is found.
   var line: string
   while true:
     line = readlines.readline(lb)
     if line == "":
+      file.close()
+      let path = joinPath(folder, filename)
+      discard tryRemoveFile(path)
       return OpResult[RcAndMessage](kind: opMessage,
         message: "The endfile line was missing.")
     let cmd = getCmd(line)
@@ -424,11 +445,11 @@ proc createSectionFile(lb: var LineBuffer, folder: string, filename: string,
     # Write the line to the file.
     file.write(line)
 
+  file.close()
   let rcAndMessage = RcAndMessage(rc: 0, message: "")
   result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
 
-
-proc makeDirAndFiles(filename: string): OpResult[DirAndFiles] =
+proc makeDirAndFiles*(filename: string): OpResult[DirAndFiles] =
   ## Read the stf file and create its temp folder and files. Return the
   ## file lines and expected lines.
 
