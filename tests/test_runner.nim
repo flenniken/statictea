@@ -50,20 +50,20 @@ proc testMakeDirAndFiles(filename: string, content: string,
     let got = dirAndFilesOp.value
     if expected != got:
 
-      # runExpectedLines: seq[RunExpectedLine]
+      # compareLines: seq[CompareLine]
       # runFileLines: seq[RunFileLine]
 
-      if expected.runExpectedLines == got.runExpectedLines:
-        echo "same runExpectedLines"
+      if expected.compareLines == got.compareLines:
+        echo "same compareLines"
       else:
-        echo "runExpectedLines:"
-        for ix in countUp(0, max(expected.runExpectedLines.len, got.runExpectedLines.len)-1):
+        echo "compareLines:"
+        for ix in countUp(0, max(expected.compareLines.len, got.compareLines.len)-1):
           var eLine = ""
-          if ix < expected.runExpectedLines.len:
-            eLine = $expected.runExpectedLines[ix]
+          if ix < expected.compareLines.len:
+            eLine = $expected.compareLines[ix]
           var gLine = ""
-          if ix < got.runExpectedLines.len:
-            gLine = $got.runExpectedLines[ix]
+          if ix < got.compareLines.len:
+            gLine = $got.compareLines[ix]
 
           echo " $1 expected: $2" % [$ix, eLine]
           echo " $1      got: $2" % [$ix, gLine]
@@ -400,25 +400,25 @@ suite "runner.nim":
     check fileLineOp.isMessage
     check fileLineOp.message == "Invalid file line: ----------filename.html"
 
-  test "parseRunExpectedLine happy path":
-    let runExpectedLineOp = parseRunExpectedLine("expected file1 == file2")
+  test "parseCompareLine happy path":
+    let runExpectedLineOp = parseCompareLine("expected file1 == file2")
     check runExpectedLineOp.isValue
     check runExpectedLineOp.value.filename1 == "file1"
     check runExpectedLineOp.value.filename2 == "file2"
 
-  test "parseRunExpectedLine spaces":
-    let runExpectedLineOp = parseRunExpectedLine("------ expected   file1   ==  file2 --")
+  test "parseCompareLine spaces":
+    let runExpectedLineOp = parseCompareLine("------ expected   file1   ==  file2 --")
     check runExpectedLineOp.isValue
     check runExpectedLineOp.value.filename1 == "file1"
     check runExpectedLineOp.value.filename2 == "file2"
 
-  test "parseRunExpectedLine error":
-    let runExpectedLineOp = parseRunExpectedLine("----------filename.html")
+  test "parseCompareLine error":
+    let runExpectedLineOp = parseCompareLine("----------filename.html")
     check runExpectedLineOp.isMessage
     check runExpectedLineOp.message == "Invalid expected line: ----------filename.html"
 
-  test "parseRunExpectedLine missing file":
-    let runExpectedLineOp = parseRunExpectedLine("expected file1")
+  test "parseCompareLine missing file":
+    let runExpectedLineOp = parseCompareLine("expected file1")
     check runExpectedLineOp.isMessage
     check runExpectedLineOp.message == "Invalid expected line: expected file1"
 
@@ -438,7 +438,7 @@ Invalid stf file first line:
 expected: id stf file version 0.0.0
      got: not a stf file"""
     let expected = OpResult[DirAndFiles](kind: opMessage, message: message)
-    # let a = newRunExpectedLine("filea", "emptyfile.txt")
+    # let a = newCompareLine("filea", "emptyfile.txt")
     # let b = newRunFileLine("afile.txt", false, false, false)
     # let dirAndFiles = newDirAndFiles(@[], @[])
     # let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
@@ -454,7 +454,7 @@ id stf file version 0.0.0
 """
     # let message = "File type not supported."
     # let expected = OpResult[DirAndFiles](kind: opMessage, message: message)
-    # let a = newRunExpectedLine("filea", "emptyfile.txt")
+    # let a = newCompareLine("filea", "emptyfile.txt")
     # let b = newRunFileLine("afile.txt", false, false, false)
     let dirAndFiles = newDirAndFiles(@[], @[])
     let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
@@ -471,7 +471,7 @@ id stf file version 0.0.0
 # Comments have # as the first character of
 # the line.
 """
-    # let a = newRunExpectedLine("filea", "emptyfile.txt")
+    # let a = newCompareLine("filea", "emptyfile.txt")
     # let b = newRunFileLine("afile.txt", false, false, false)
     let dirAndFiles = newDirAndFiles(@[], @[])
     let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
@@ -490,7 +490,7 @@ contents of
 the file
 --- endfile
 """
-    # let a = newRunExpectedLine("filea", "emptyfile.txt")
+    # let a = newCompareLine("filea", "emptyfile.txt")
     let b = newRunFileLine("afile.txt", false, false, false)
     let dirAndFiles = newDirAndFiles(@[], @[b])
     let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
@@ -516,7 +516,7 @@ the second file
 --- endfile
 
 """
-    # let a = newRunExpectedLine("afile.txt", "bfile.txt")
+    # let a = newCompareLine("afile.txt", "bfile.txt")
     let b = newRunFileLine("afile.txt", false, false, false)
     let c = newRunFileLine("bfile.txt", false, false, false)
     let dirAndFiles = newDirAndFiles(@[], @[b, c])
@@ -543,7 +543,7 @@ id stf file version 0.0.0
 --- file emptyfile.txt
 --- endfile
 """
-    # let a = newRunExpectedLine("filea", "emptyfile.txt")
+    # let a = newCompareLine("filea", "emptyfile.txt")
     let b = newRunFileLine("emptyfile.txt", false, false, false)
     let dirAndFiles = newDirAndFiles(@[], @[b])
     let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
@@ -644,8 +644,8 @@ id stf file version 0.0.0
 ------ expected file3.txt == file4.txt ------
 
 """
-    let a = newRunExpectedLine("file1.txt", "file2.txt")
-    let b = newRunExpectedLine("file3.txt", "file4.txt")
+    let a = newCompareLine("file1.txt", "file2.txt")
+    let b = newCompareLine("file3.txt", "file4.txt")
     let dirAndFiles = newDirAndFiles(@[a, b], @[])
     let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
@@ -685,9 +685,9 @@ hello world
 --- expected stdout.expected == stdout
 --- expected stderr.expected == stderr
 """
-    # todo: rename RunExpectedLine CompareLine
-    let a = newRunExpectedLine("stdout.expected", "stdout")
-    let b = newRunExpectedLine("stderr.expected", "stderr")
+    # todo: rename CompareLine CompareLine
+    let a = newCompareLine("stdout.expected", "stdout")
+    let b = newCompareLine("stderr.expected", "stderr")
     let f1 = newRunFileLine("cmd.sh", true, true, false)
     let f2 = newRunFileLine("hello.html", true, false, false)
     let f3 = newRunFileLine("hello.json", false, false, false)

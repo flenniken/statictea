@@ -42,8 +42,8 @@ type
     command*: bool
     nonZeroReturn*: bool
 
-  RunExpectedLine* = object
-    ## RunExpectedLine holds the names of two files that are expected to
+  CompareLine* = object
+    ## CompareLine holds the names of two files that are expected to
     ## be equal.
     filename1*: string
     filename2*: string
@@ -51,7 +51,7 @@ type
   DirAndFiles* = object
     ## DirAndFiles holds the result of the makeDirAndFiles
     ## procedure.
-    runExpectedLines*: seq[RunExpectedLine]
+    compareLines*: seq[CompareLine]
     runFileLines*: seq[RunFileLine]
 
   OpResultKind* = enum
@@ -89,16 +89,16 @@ func newRunFileLine*(filename: string, noLastEnding: bool, command:
   result = RunFileLine(filename: filename, noLastEnding: noLastEnding,
     command: command, nonZeroReturn: nonZeroReturn)
 
-func newRunExpectedLine*(filename1: string, filename2: string): RunExpectedLine =
-  result = RunExpectedLine(filename1: filename1, filename2: filename2)
+func newCompareLine*(filename1: string, filename2: string): CompareLine =
+  result = CompareLine(filename1: filename1, filename2: filename2)
 
-func newDirAndFiles*(runExpectedLines: seq[RunExpectedLine],
+func newDirAndFiles*(compareLines: seq[CompareLine],
     runFileLines: seq[RunFileLine]): DirAndFiles =
-  result = DirAndFiles(runExpectedLines: runExpectedLines,
+  result = DirAndFiles(compareLines: compareLines,
     runFileLines: runFileLines)
 
-func `$`*(r: RunExpectedLine): string =
-  ## Return a string representation of a RunExpectedLine.
+func `$`*(r: CompareLine): string =
+  ## Return a string representation of a CompareLine.
 
   result = "expected $1 == $2" % [r.filename1, r.filename2]
 
@@ -375,18 +375,18 @@ proc parseRunFileLine*(line: string): OpResult[RunFileLine] =
   let fileLine = newRunFileLine(filename, noLastEnding, command, nonZeroReturn)
   return OpResult[RunFileLine](kind: opValue, value: fileLine)
 
-proc parseRunExpectedLine*(line: string): OpResult[RunExpectedLine] =
+proc parseCompareLine*(line: string): OpResult[CompareLine] =
   #----------expected stdout.expected == stdout
   let pattern = r"^[- ]*expected[ ]+([^\s]+)[ ]*==[ ]*([^\s]+)[-\s]*$"
   let matchesO = matchPatternCached(line, pattern, 0)
   if not matchesO.isSome:
-    return OpResult[RunExpectedLine](kind: opMessage,
+    return OpResult[CompareLine](kind: opMessage,
       message: "Invalid expected line: $1" % [line])
 
   let matches = matchesO.get()
   let (filename1, filename2) = matches.get2Groups()
-  let expectedEqual = newRunExpectedLine(filename1, filename2)
-  return OpResult[RunExpectedLine](kind: opValue, value: expectedEqual)
+  let expectedEqual = newCompareLine(filename1, filename2)
+  return OpResult[CompareLine](kind: opValue, value: expectedEqual)
 
 proc openNewFile*(folder: string, filename: string): OpResult[File] =
   ## Create a new file in the given folder and return an open File
@@ -470,7 +470,7 @@ proc makeDirAndFiles*(filename: string): OpResult[DirAndFiles] =
   ## Read the stf file and create its temp folder and files. Return the
   ## file lines and expected lines.
 
-  var runExpectedLines = newSeq[RunExpectedLine]()
+  var compareLines = newSeq[CompareLine]()
   var runFileLines = newSeq[RunFileLine]()
 
   if not fileExists(filename):
@@ -536,16 +536,16 @@ expected: $1
 
     of "expected":
       # Remember the expected filenames to compare.
-      let expectedEqualOp = parseRunExpectedLine(line)
+      let expectedEqualOp = parseCompareLine(line)
       if expectedEqualOp.isMessage:
         return OpResult[DirAndFiles](kind: opMessage,
           message: expectedEqualOp.message)
-      runExpectedLines.add(expectedEqualOp.value)
+      compareLines.add(expectedEqualOp.value)
     else:
       let message = "Unknown line: '$1'." % stripLineEnding(line)
       return OpResult[DirAndFiles](kind: opMessage, message: message)
 
-  let dirAndFiles = newDirAndFiles(runExpectedLines, runFileLines)
+  let dirAndFiles = newDirAndFiles(compareLines, runFileLines)
   result = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
 
 proc runDirectory*(dir: string): OpResult[RcAndMessage] =
@@ -557,6 +557,9 @@ proc runFilename*(args: RunArgs): OpResult[RcAndMessage] =
   if dirAndFilesOp.isMessage:
     result = OpResult[RcAndMessage](kind: opMessage,
       message: dirAndFilesOp.message)
+  # let dirAndFiles = dirAndFilesOp.value
+
+  # runCommands(dirAndFiles.
 
   # Remove the temp folder unless leave is specified.
   if not args.leaveTempDir:
