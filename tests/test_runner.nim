@@ -81,14 +81,17 @@ proc testMakeDirAndFiles(filename: string, content: string,
           if ix < got.runFileLines.len:
             gLine = $got.runFileLines[ix]
 
-          echo "$1 expected: $2" % [$(ix+1), eLine]
-          echo "$1      got: $2" % [$(ix+1), gLine]
+          if eLine == gLine:
+            echo "$1     same: $2" % [$(ix+1), eLine]
+          else:
+            echo "$1 expected: $2" % [$(ix+1), eLine]
+            echo "$1      got: $2" % [$(ix+1), gLine]
 
       result = false
   else:
     if expectedDirAndFilesOp.message != dirAndFilesOp.message:
-      echo "expected message: " & expectedDirAndFilesOp.message
-      echo "     got message: " & dirAndFilesOp.message
+      echo "expected message: '$1'" % expectedDirAndFilesOp.message
+      echo "     got message: '$1'" % dirAndFilesOp.message
       result = false
 
 proc removeFileAndTempdir(filename: string) =
@@ -128,7 +131,11 @@ proc testDir(filename: string, nameAndContentList: seq[NameAndContent]): bool =
     else:
       let gotContent = readFile(path)
       if gotContent != content:
-        echo "unexpected content for file: " & path
+        let (_, basename) = splitPath(path)
+        echo "expected $1:" % basename
+        echo content
+        echo "     got $1:" % basename
+        echo gotContent
         result = false
 
   for kind, path in walkDir(tempdir):
@@ -139,6 +146,8 @@ proc testDir(filename: string, nameAndContentList: seq[NameAndContent]): bool =
       echo "found extra file in temp dir: " & basename
       result = false
 
+  if result == false:
+    echo "========="
   removeFileAndTempdir(filename)
 
 suite "runner.nim":
@@ -413,46 +422,46 @@ suite "runner.nim":
     check runExpectedLineOp.isMessage
     check runExpectedLineOp.message == "Invalid expected line: expected file1"
 
-  test "runFilename missing file":
-    let args = newRunArgs()
-    let rcAndMessageOp = runFilename(args)
-    check rcAndMessageOp.isMessage
-    check rcAndMessageOp.message == "File not found: ''."
-
   test "runFilename empty.stf":
     let filename = "testfiles/empty.stf"
-    createFile(filename, "")
-    let args = newRunArgs(filename = filename)
-    let rcAndMessageOp = runFilename(args)
-    check rcAndMessageOp.isMessage
-    check rcAndMessageOp.message == "Empty file: 'testfiles/empty.stf'."
-    discard tryRemoveFile(filename)
+    let content = ""
+    let message = "Empty file: 'testfiles/empty.stf'."
+    let expected = OpResult[DirAndFiles](kind: opMessage, message: message)
+    check testMakeDirAndFiles(filename, content, expected)
+    check testDir(filename, @[])
 
   test "runFilename not stf":
-    let filename = "testfiles/not-stf.stf"
-    createFile(filename, "not a stf file")
-    let args = newRunArgs(filename = filename)
-    let rcAndMessageOp = runFilename(args)
-    check rcAndMessageOp.isMessage
-    let message = """File type not supported.
+    let filename = "testfiles/not.stf"
+    let content = "not a stf file"
+    let message = """
+Invalid stf file first line:
 expected: id stf file version 0.0.0
-got: not a stf file
-"""
-    check rcAndMessageOp.message == message
-    check dirExists(filename & ".tempdir") == false
-    discard tryRemoveFile(filename)
+     got: not a stf file"""
+    let expected = OpResult[DirAndFiles](kind: opMessage, message: message)
+    # let a = newRunExpectedLine("filea", "emptyfile.txt")
+    # let b = newRunFileLine("afile.txt", false, false, false)
+    # let dirAndFiles = newDirAndFiles(@[], @[])
+    # let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
+    check testMakeDirAndFiles(filename, content, expected)
+
+    # let e = newNameAndContent("afile.txt", "contents of\nthe file\n")
+    check testDir(filename, @[])
 
   test "runFilename do nothing":
     let filename = "testfiles/do-nothing.stf"
     let content = """
 id stf file version 0.0.0
 """
-    createFile(filename, content)
-    let args = newRunArgs(filename = filename)
-    let rcAndMessageOp = runFilename(args)
-    check rcAndMessageOp.value == newRcAndMessage(0, "")
-    check dirExists(filename & ".tempdir") == false
-    discard tryRemoveFile(filename)
+    # let message = "File type not supported."
+    # let expected = OpResult[DirAndFiles](kind: opMessage, message: message)
+    # let a = newRunExpectedLine("filea", "emptyfile.txt")
+    # let b = newRunFileLine("afile.txt", false, false, false)
+    let dirAndFiles = newDirAndFiles(@[], @[])
+    let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
+    check testMakeDirAndFiles(filename, content, expected)
+
+    # let e = newNameAndContent("afile.txt", "contents of\nthe file\n")
+    check testDir(filename, @[])
 
   test "runFilename comments":
     let filename = "testfiles/comments.stf"
@@ -462,35 +471,17 @@ id stf file version 0.0.0
 # Comments have # as the first character of
 # the line.
 """
-    createFile(filename, content)
-    let args = newRunArgs(filename = filename)
-    let rcAndMessageOp = runFilename(args)
-    check rcAndMessageOp.value == newRcAndMessage(0, "")
-    check dirExists(filename & ".tempdir") == false
-    discard tryRemoveFile(filename)
+    # let a = newRunExpectedLine("filea", "emptyfile.txt")
+    # let b = newRunFileLine("afile.txt", false, false, false)
+    let dirAndFiles = newDirAndFiles(@[], @[])
+    let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
+    check testMakeDirAndFiles(filename, content, expected)
 
-  test "runFilename leave":
-    let filename = "testfiles/leave.stf"
-    let tempdir = filename & ".tempdir"
-    removeDir(tempdir)
-    let content = """
-id stf file version 0.0.0
-"""
-    createFile(filename, content)
-    let args = newRunArgs(filename = filename, leaveTempDir = true)
-    let rcAndMessageOp = runFilename(args)
-    if rcAndMessageOp.isMessage:
-      echo rcAndMessageOp.message
-    check rcAndMessageOp.value == newRcAndMessage(0, "")
-    check dirExists(tempdir) == true
-    removeDir(tempdir)
-    check dirExists(tempdir) == false
-    discard tryRemoveFile(filename)
+    # let e = newNameAndContent("afile.txt", "contents of\nthe file\n")
+    check testDir(filename, @[])
 
   test "make file":
     let filename = "testfiles/onefile.stf"
-    let tempdir = filename & ".tempdir"
-    removeDir(tempdir)
     let content = """
 id stf file version 0.0.0
 # This stf creates a file, that's all.
@@ -499,21 +490,14 @@ contents of
 the file
 --- endfile
 """
-    createFile(filename, content)
-    let args = newRunArgs(filename = filename, leaveTempDir = true)
-    let rcAndMessageOp = runFilename(args)
-    check rcAndMessageOp.value == newRcAndMessage(0, "")
+    # let a = newRunExpectedLine("filea", "emptyfile.txt")
+    let b = newRunFileLine("afile.txt", false, false, false)
+    let dirAndFiles = newDirAndFiles(@[], @[b])
+    let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
+    check testMakeDirAndFiles(filename, content, expected)
 
-    check dirExists(tempdir) == true
-    let afile = joinPath(tempdir, "afile.txt")
-    check fileExists(afile)
-    let afileContent = readFile(afile)
-    check afileContent == """
-contents of
-the file
-"""
-    removeDir(tempdir)
-    discard tryRemoveFile(filename)
+    let e = newNameAndContent("afile.txt", "contents of\nthe file\n")
+    check testDir(filename, @[e])
 
   test "make two files":
     let filename = "testfiles/twofiles.stf"
@@ -585,3 +569,147 @@ testing
     check testMakeDirAndFiles(filename, content, expected)
 
     check testDir(filename, @[])
+
+  test "unknown line":
+    let filename = "testfiles/unknownline.stf"
+    let content = """
+id stf file version 0.0.0
+# This stf hand an unknown line.
+what's this?
+"""
+    let message = "Unknown line: 'what's this?'."
+    let expected = OpResult[DirAndFiles](kind: opMessage, message: message)
+    check testMakeDirAndFiles(filename, content, expected)
+    check testDir(filename, @[])
+
+  # --- file filename [noLastEnding] [command] [nonZeroReturn] ---
+
+  test "noLastEnding":
+    let filename = "testfiles/noLastEnding.stf"
+    let content = """
+id stf file version 0.0.0
+# This stf creates a file with no ending newline.
+--- file afile.txt noLastEnding
+contents of the file
+--- endfile
+"""
+    let r = newRunFileLine("afile.txt", true, false, false)
+    let dirAndFiles = newDirAndFiles(@[], @[r])
+    let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
+    check testMakeDirAndFiles(filename, content, expected)
+
+    let c = newNameAndContent("afile.txt", "contents of the file")
+    check testDir(filename, @[c])
+
+  test "command":
+    let filename = "testfiles/command.stf"
+    let content = """
+id stf file version 0.0.0
+# This stf creates a file with a command.
+--- file afile.txt noLastEnding command
+ls
+--- endfile
+"""
+    let r = newRunFileLine("afile.txt", true, true, false)
+    let dirAndFiles = newDirAndFiles(@[], @[r])
+    let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
+    check testMakeDirAndFiles(filename, content, expected)
+
+    let c = newNameAndContent("afile.txt", "ls")
+    check testDir(filename, @[c])
+
+  test "command nonZeroReturn":
+    let filename = "testfiles/nonZeroReturn.stf"
+    let content = """
+id stf file version 0.0.0
+# This stf creates a file with a command with a nonZeroReturn.
+--- file afile.txt noLastEnding command nonZeroReturn
+ls
+--- endfile
+"""
+    let r = newRunFileLine("afile.txt", true, true, true)
+    let dirAndFiles = newDirAndFiles(@[], @[r])
+    let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
+    check testMakeDirAndFiles(filename, content, expected)
+
+    let c = newNameAndContent("afile.txt", "ls")
+    check testDir(filename, @[c])
+
+  test "file compare lines":
+    let filename = "testfiles/filecomparelines.stf"
+    let content = """
+id stf file version 0.0.0
+
+------ expected file1.txt == file2.txt ------
+------ expected file3.txt == file4.txt ------
+
+"""
+    let a = newRunExpectedLine("file1.txt", "file2.txt")
+    let b = newRunExpectedLine("file3.txt", "file4.txt")
+    let dirAndFiles = newDirAndFiles(@[a, b], @[])
+    let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
+    check testMakeDirAndFiles(filename, content, expected)
+    check testDir(filename, @[])
+
+  test "help example":
+    let filename = "testfiles/helpexample.stf"
+    let content = """
+id stf file version 0.0.0
+# Hello World Example
+
+# Create the script to run.
+----- file cmd.sh noLastEnding command -----
+../bin/statictea -t=hello.html -s=hello.json >stdout 2>stderr
+----- endfile -----------------
+
+# Create the hello.html template file without an ending newline.
+--- file hello.html noLastEnding
+$$ nextline
+$$ hello {name}
+--- endfile
+
+--- file hello.json
+{"name": "world"}
+--- endfile
+
+# Create a file with the expected output.
+--- file stdout.expected noLastEnding
+hello world
+--- endfile
+
+# No standard error output is expected, create an empty file.
+--- file stderr.expected
+--- endfile
+
+# Compare these files.
+--- expected stdout.expected == stdout
+--- expected stderr.expected == stderr
+"""
+    # todo: rename RunExpectedLine CompareLine
+    let a = newRunExpectedLine("stdout.expected", "stdout")
+    let b = newRunExpectedLine("stderr.expected", "stderr")
+    let f1 = newRunFileLine("cmd.sh", true, true, false)
+    let f2 = newRunFileLine("hello.html", true, false, false)
+    let f3 = newRunFileLine("hello.json", false, false, false)
+    let f4 = newRunFileLine("stdout.expected", true, false, false)
+    let f5 = newRunFileLine("stderr.expected", false, false, false)
+
+    let dirAndFiles = newDirAndFiles(@[a, b], @[f1, f2, f3, f4, f5])
+    let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
+    check testMakeDirAndFiles(filename, content, expected)
+    let cmdSh = """
+../bin/statictea -t=hello.html -s=hello.json >stdout 2>stderr"""
+    let d1 = newNameAndContent("cmd.sh", cmdSh)
+
+    let helloHtml = """
+$$ nextline
+$$ hello {name}"""
+    let d2 = newNameAndContent("hello.html", helloHtml)
+
+    let helloJson = """
+{"name": "world"}
+"""
+    let d3 = newNameAndContent("hello.json", helloJson)
+    let d4 = newNameAndContent("stdout.expected", "hello world")
+    let d5 = newNameAndContent("stderr.expected", "")
+    check testDir(filename, @[d1, d2, d3, d4, d5])

@@ -133,6 +133,9 @@ proc writeOut*(message: string) =
   ## Write a message to stdout.
   stdout.writeLine(message)
 
+func stripLineEnding(line: string): string =
+  result = line.strip(chars={'\n', '\r'}, trailing = true)
+
 proc createFolder*(folder: string): OpResult[RcAndMessage] =
   ## Create a folder with the given name.
   try:
@@ -227,11 +230,11 @@ stderr-expected then it runs cmd.sh looking for a 0 return code. Then
 it compares the files "stdout" with "stdout.expected" and "stderr"
 with "stderr.expected".
 
---- id: runner file version 0.0.0
+id stf file version 0.0.0
 # Hello World Example
 
 # Create the script to run.
------ file cmd.sh command -----
+----- file cmd.sh noLastEnding command -----
 ../bin/statictea -t=hello.html -s=hello.json >stdout 2>stderr
 ----- endfile -----------------
 
@@ -418,12 +421,15 @@ proc getCmd*(line: string): string =
       let matches = matchesO.get()
       result = matches.getGroup()
 
-proc createSectionFile(lb: var LineBuffer, folder: string, filename: string,
-    noLastEnding: bool): OpResult[RcAndMessage] =
+proc createSectionFile(lb: var LineBuffer, folder: string,
+    runFileLine: RunFileLine): OpResult[RcAndMessage] =
   ## Create a file in the given folder by reading lines in the line buffer until
   ## "endfile" is found.
 
   # Create a file in the given folder.
+  let filename = runFileLine.filename
+  let noLastEnding = runFileLine.noLastEnding
+
   var fileOp = openNewFile(folder, filename)
   if fileOp.isMessage:
     return OpResult[RcAndMessage](kind: opMessage, message: fileOp.message)
@@ -431,6 +437,8 @@ proc createSectionFile(lb: var LineBuffer, folder: string, filename: string,
 
   # Write lines until the next endfile is found.
   var line: string
+  var previousLine: string
+  var firstLine = true
   while true:
     line = readlines.readline(lb)
     if line == "":
@@ -442,8 +450,17 @@ proc createSectionFile(lb: var LineBuffer, folder: string, filename: string,
     let cmd = getCmd(line)
     if cmd == "endfile":
       break # Done
-    # Write the line to the file.
-    file.write(line)
+
+    # Write the previous line to the file.
+    if not firstLine:
+      file.write(previousLine)
+    previousLine = line
+    firstLine = false
+
+  # Write the last line.
+  if noLastEnding:
+    previousLine = previousLine.stripLineEnding()
+  file.write(previousLine)
 
   file.close()
   let rcAndMessage = RcAndMessage(rc: 0, message: "")
@@ -491,10 +508,9 @@ proc makeDirAndFiles*(filename: string): OpResult[DirAndFiles] =
     return OpResult[DirAndFiles](kind: opMessage,
       message: "Empty file: '$1'." % filename)
   if not line.startsWith(runnerId):
-    let message = """File type not supported.
+    let message = """Invalid stf file first line:
 expected: $1
-got: $2
-""" % [runnerId, line]
+     got: $2""" % [runnerId, line]
     return OpResult[DirAndFiles](kind: opMessage, message: message)
 
   while true:
@@ -513,8 +529,7 @@ got: $2
           message: fileLineOp.message)
       let fileLine = fileLineOp.value
       runFileLines.add(fileLine)
-      let rcAndMessage = createSectionFile(lb, tempDirName,
-        fileLine.filename, fileLine.noLastEnding)
+      let rcAndMessage = createSectionFile(lb, tempDirName, fileLine)
       if rcAndMessage.isMessage:
         return OpResult[DirAndFiles](kind: opMessage,
           message: rcAndMessage.message)
@@ -527,8 +542,8 @@ got: $2
           message: expectedEqualOp.message)
       runExpectedLines.add(expectedEqualOp.value)
     else:
-      return OpResult[DirAndFiles](kind: opMessage,
-        message: "Unknown line: '$1'." % line)
+      let message = "Unknown line: '$1'." % stripLineEnding(line)
+      return OpResult[DirAndFiles](kind: opMessage, message: message)
 
   let dirAndFiles = newDirAndFiles(runExpectedLines, runFileLines)
   result = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
