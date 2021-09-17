@@ -2,6 +2,7 @@
 
 import std/strutils
 import std/os
+import std/osproc
 import std/options
 import std/parseopt
 import std/streams
@@ -84,8 +85,8 @@ func isValue*(opResult: OpResult): bool =
   if opResult.kind == opValue:
     result = true
 
-func newRunFileLine*(filename: string, noLastEnding: bool, command:
-    bool, nonZeroReturn: bool): RunFileLine =
+func newRunFileLine*(filename: string, noLastEnding = false, command = false,
+    nonZeroReturn = false): RunFileLine =
   result = RunFileLine(filename: filename, noLastEnding: noLastEnding,
     command: command, nonZeroReturn: nonZeroReturn)
 
@@ -552,14 +553,43 @@ proc runDirectory*(dir: string): OpResult[RcAndMessage] =
   result = OpResult[RcAndMessage](kind: opMessage,
     message: "runDirectory: not implemented")
 
+proc runCommands*(folder: string, runFileLines: seq[RunFileLine]): OpResult[RcAndMessage] =
+  ## Run the command and return it's return code. One command file
+  ## supported.
+
+  var rc = 0
+  for runFileLine in runFileLines:
+    if runFileLine.command:
+      # Make the file executable.
+      setFilePermissions(runFileLine.filename, {fpUserExec, fpUserRead, fpUserWrite})
+
+      echo "running file: $1" % runFileLine.filename
+      let path = joinPath(folder, runFileLine.filename)
+      rc = execCmd(path)
+      echo "rc = " & $rc
+
+  # result = OpResult[RcAndMessage](kind: opMessage,
+  #   message: "not implemented")
+
+  let rcAndMessage = RcAndMessage(rc: rc, message: "")
+  result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
+
 proc runFilename*(args: RunArgs): OpResult[RcAndMessage] =
   let dirAndFilesOp = makeDirAndFiles(args.filename)
   if dirAndFilesOp.isMessage:
     result = OpResult[RcAndMessage](kind: opMessage,
       message: dirAndFilesOp.message)
-  # let dirAndFiles = dirAndFilesOp.value
+  let dirAndFiles = dirAndFilesOp.value
 
-  # runCommands(dirAndFiles.
+  # Run the command files.
+  let folder = args.filename & ".tempdir"
+  let rc = runCommands(folder, dirAndFiles.runFileLines)
+  if rc.isMessage:
+    result = OpResult[RcAndMessage](kind: opMessage,
+      message: rc.message)
+  else:
+    let rcAndMessage = RcAndMessage(rc: 0, message: getHelp())
+    result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
 
   # Remove the temp folder unless leave is specified.
   if not args.leaveTempDir:

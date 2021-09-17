@@ -491,7 +491,7 @@ the file
 --- endfile
 """
     # let a = newCompareLine("filea", "emptyfile.txt")
-    let b = newRunFileLine("afile.txt", false, false, false)
+    let b = newRunFileLine("afile.txt")
     let dirAndFiles = newDirAndFiles(@[], @[b])
     let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
@@ -517,8 +517,8 @@ the second file
 
 """
     # let a = newCompareLine("afile.txt", "bfile.txt")
-    let b = newRunFileLine("afile.txt", false, false, false)
-    let c = newRunFileLine("bfile.txt", false, false, false)
+    let b = newRunFileLine("afile.txt")
+    let c = newRunFileLine("bfile.txt")
     let dirAndFiles = newDirAndFiles(@[], @[b, c])
     let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
@@ -544,7 +544,7 @@ id stf file version 0.0.0
 --- endfile
 """
     # let a = newCompareLine("filea", "emptyfile.txt")
-    let b = newRunFileLine("emptyfile.txt", false, false, false)
+    let b = newRunFileLine("emptyfile.txt")
     let dirAndFiles = newDirAndFiles(@[], @[b])
     let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
@@ -593,7 +593,7 @@ id stf file version 0.0.0
 contents of the file
 --- endfile
 """
-    let r = newRunFileLine("afile.txt", true, false, false)
+    let r = newRunFileLine("afile.txt", noLastEnding = true)
     let dirAndFiles = newDirAndFiles(@[], @[r])
     let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
@@ -610,7 +610,7 @@ id stf file version 0.0.0
 ls
 --- endfile
 """
-    let r = newRunFileLine("afile.txt", true, true, false)
+    let r = newRunFileLine("afile.txt", command = true, noLastEnding = true)
     let dirAndFiles = newDirAndFiles(@[], @[r])
     let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
@@ -688,11 +688,11 @@ hello world
     # todo: rename CompareLine CompareLine
     let a = newCompareLine("stdout.expected", "stdout")
     let b = newCompareLine("stderr.expected", "stderr")
-    let f1 = newRunFileLine("cmd.sh", true, true, false)
-    let f2 = newRunFileLine("hello.html", true, false, false)
-    let f3 = newRunFileLine("hello.json", false, false, false)
-    let f4 = newRunFileLine("stdout.expected", true, false, false)
-    let f5 = newRunFileLine("stderr.expected", false, false, false)
+    let f1 = newRunFileLine("cmd.sh", command = true, noLastEnding = true)
+    let f2 = newRunFileLine("hello.html", noLastEnding = true)
+    let f3 = newRunFileLine("hello.json")
+    let f4 = newRunFileLine("stdout.expected", noLastEnding = true)
+    let f5 = newRunFileLine("stderr.expected")
 
     let dirAndFiles = newDirAndFiles(@[a, b], @[f1, f2, f3, f4, f5])
     let expected = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
@@ -713,3 +713,13 @@ $$ hello {name}"""
     let d4 = newNameAndContent("stdout.expected", "hello world")
     let d5 = newNameAndContent("stderr.expected", "")
     check testDir(filename, @[d1, d2, d3, d4, d5])
+
+  test "runCommands":
+    let content = """
+#! /bin/bash
+ls -l
+"""
+    createFile("cmd.sh", content)
+    let r = newRunFileLine("cmd.sh", command = true)
+    let runFileLines = @[r]
+    discard runCommands(".", runFileLines)
