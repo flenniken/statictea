@@ -553,23 +553,54 @@ proc runDirectory*(dir: string): OpResult[RcAndMessage] =
   result = OpResult[RcAndMessage](kind: opMessage,
     message: "runDirectory: not implemented")
 
-proc runCommands*(folder: string, runFileLines: seq[RunFileLine]): OpResult[RcAndMessage] =
-  ## Run the command and return it's return code. One command file
-  ## supported.
+proc runCommand*(folder: string, filename: string): int =
+  ## Run a command file and return it's return code.
+
+  let oldDir = getCurrentDir()
+
+  # Set the working directory to the folder.
+  assert(dirExists(folder))
+  setCurrentDir(folder)
+
+  # Make the file executable.
+  setFilePermissions(filename, {fpUserExec, fpUserRead, fpUserWrite})
+
+  # Run the file and return the return code.
+  result = execCmd(filename)
+
+  setCurrentDir(oldDir)
+
+proc runCommands*(folder: string, runFileLines: seq[RunFileLine]):
+    OpResult[RcAndMessage] =
+  ## Run the commands.
+
+  # Set the working directory to the folder.
+  assert(dirExists(folder))
+  let oldDir = getCurrentDir()
+  setCurrentDir(folder)
 
   var rc = 0
+
+  # Run each command file.
   for runFileLine in runFileLines:
     if runFileLine.command:
       # Make the file executable.
       setFilePermissions(runFileLine.filename, {fpUserExec, fpUserRead, fpUserWrite})
 
-      echo "running file: $1" % runFileLine.filename
-      let path = joinPath(folder, runFileLine.filename)
-      rc = execCmd(path)
-      echo "rc = " & $rc
+      # Run the file and return the return code.
+      let localFile = "./" & runFileLine.filename
+      let cmdRc = execCmd(localFile)
 
-  # result = OpResult[RcAndMessage](kind: opMessage,
-  #   message: "not implemented")
+      if runFileLine.nonZeroReturn:
+        if cmdRc == 0:
+          echo "Command file: $1 generated unexpected return code 0." % runFileLine.filename
+          rc = 1
+      elif cmdRc != 0:
+        echo "Command file: $1 generated unexpected non-zero return code." %
+          runFileLine.filename
+        rc = 1
+
+  setCurrentDir(oldDir)
 
   let rcAndMessage = RcAndMessage(rc: rc, message: "")
   result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
@@ -583,13 +614,13 @@ proc runFilename*(args: RunArgs): OpResult[RcAndMessage] =
 
   # Run the command files.
   let folder = args.filename & ".tempdir"
-  let rc = runCommands(folder, dirAndFiles.runFileLines)
-  if rc.isMessage:
-    result = OpResult[RcAndMessage](kind: opMessage,
-      message: rc.message)
-  else:
-    let rcAndMessage = RcAndMessage(rc: 0, message: getHelp())
-    result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
+  let rcAndMessageOp = runCommands(folder, dirAndFiles.runFileLines)
+  if rcAndMessageOp.isMessage:
+    return rcAndMessageOp
+  # let rcAndMessage = rcAndMessageOp.value
+
+
+
 
   # Remove the temp folder unless leave is specified.
   if not args.leaveTempDir:

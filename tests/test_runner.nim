@@ -715,11 +715,25 @@ $$ hello {name}"""
     check testDir(filename, @[d1, d2, d3, d4, d5])
 
   test "runCommands":
-    let content = """
-#! /bin/bash
-ls -l
-"""
-    createFile("cmd.sh", content)
-    let r = newRunFileLine("cmd.sh", command = true)
+
+    let folder = "testfiles"
+    let cmdFilename = "cmd.sh"
+    let path = joinPath(folder, cmdFilename)
+    createFile(path, "echo 'hello there' >t.txt")
+
+    let r = newRunFileLine(cmdFilename, command = true, nonZeroReturn = false)
     let runFileLines = @[r]
-    discard runCommands(".", runFileLines)
+    let rcAndMessageOp = runCommands(folder, runFileLines)
+
+    check rcAndMessageOp.kind == opValue
+    let rcAndMessage = rcAndMessageOp.value
+    check rcAndMessage.rc == 0
+    check rcAndMessage.message == ""
+
+    # The current working directory is set to the testfiles folder.
+    # t.txt file should appear in the folder.
+    let tPath = joinPath(folder, "t.txt")
+    check fileExists(tPath)
+
+    discard tryRemoveFile(tPath)
+    discard tryRemoveFile(path)
