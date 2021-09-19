@@ -14,6 +14,30 @@ proc parseRunCommandLine*(cmdLine: string = ""): OpResult[RunArgs] =
   let argv = cmdLine.splitWhitespace()
   result = parseRunCommandLine(argv)
 
+proc showCompareLines*[T](expectedLines: seq[T], gotLines: seq[T],
+    showSame = false, stopOnFirstDiff = false): bool =
+  ## Compare two sets of lines and show the differences.  If no
+  ## differences, return true.
+
+  result = true
+  for ix in countUp(0, max(expectedLines.len, gotLines.len)-1):
+    var eLine = ""
+    if ix < expectedLines.len:
+      eLine = $expectedLines[ix]
+    var gLine = ""
+    if ix < gotLines.len:
+      gLine = $gotLines[ix]
+
+    var lineNum = $(ix+1)
+    if eLine == gLine:
+      if showSame:
+        echo "$1     same: '$2'" % [lineNum, eLine]
+    else:
+      echo "$1 expected: '$2'" % [lineNum, eLine]
+      echo "$1      got: '$2'" % [lineNum, gLine]
+      result = false
+      if stopOnFirstDiff:
+        break
 
 proc testMakeDirAndFiles(filename: string, content: string,
     expectedDirAndFilesOp: OpResult[DirAndFiles]): bool =
@@ -57,35 +81,13 @@ proc testMakeDirAndFiles(filename: string, content: string,
         echo "same compareLines"
       else:
         echo "compareLines:"
-        for ix in countUp(0, max(expected.compareLines.len, got.compareLines.len)-1):
-          var eLine = ""
-          if ix < expected.compareLines.len:
-            eLine = $expected.compareLines[ix]
-          var gLine = ""
-          if ix < got.compareLines.len:
-            gLine = $got.compareLines[ix]
-
-          echo " $1 expected: $2" % [$ix, eLine]
-          echo " $1      got: $2" % [$ix, gLine]
+        discard showCompareLines(expected.compareLines, got.compareLines)
 
       if expected.runFileLines == got.runFileLines:
         echo "same runFileLines"
       else:
         echo "runFileLines:"
-        for ix in countUp(0, max(expected.runFileLines.len, got.runFileLines.len)-1):
-
-          var eLine = ""
-          if ix < expected.runFileLines.len:
-            eLine = $expected.runFileLines[ix]
-          var gLine = ""
-          if ix < got.runFileLines.len:
-            gLine = $got.runFileLines[ix]
-
-          if eLine == gLine:
-            echo "$1     same: $2" % [$(ix+1), eLine]
-          else:
-            echo "$1 expected: $2" % [$(ix+1), eLine]
-            echo "$1      got: $2" % [$(ix+1), gLine]
+        discard showCompareLines(expected.runFileLines, got.runFileLines)
 
       result = false
   else:
@@ -149,6 +151,63 @@ proc testDir(filename: string, nameAndContentList: seq[NameAndContent]): bool =
   if result == false:
     echo "========="
   removeFileAndTempdir(filename)
+
+proc testCompareFilesEqual(content1: string, content2: string): bool =
+
+  let f1 = "f1.txt"
+  let f2 = "f2.txt"
+
+  createFile(f1, content1)
+  createFile(f2, content2)
+
+  result = true
+  let rcAndMessageOp = compareFiles(f1, f2)
+  if rcAndMessageOp.isValue:
+    if rcAndMessageOp.value.rc != 0:
+      echo "expected rc: 0, got: " & $rcAndMessageOp.value.rc
+      result = false
+    if rcAndMessageOp.value.message != "":
+      echo "expected message: '', got:"
+      echo rcAndMessageOp.value.message
+      echo "---"
+      result = false
+  else:
+    echo "got: " & rcAndMessageOp.message
+    result = false
+
+  discard tryRemoveFile(f1)
+  discard tryRemoveFile(f2)
+
+proc testCompareFilesDifferent(content1: string, content2: string, expected: string): bool =
+
+  let f1 = "f1.txt"
+  let f2 = "f2.txt"
+
+  createFile(f1, content1)
+  createFile(f2, content2)
+
+  result = true
+  let rcAndMessageOp = compareFiles(f1, f2)
+  if rcAndMessageOp.isValue:
+    if rcAndMessageOp.value.rc == 0:
+      echo "expected non-zero rc, got: " & $rcAndMessageOp.value.rc
+      result = false
+    if expected != rcAndMessageOp.value.message:
+      var lines = splitLines(rcAndMessageOp.value.message)
+      var expectedLines = splitLines(expected)
+      discard showCompareLines(lines, expectedLines)
+      result = false
+  else:
+    if expected != rcAndMessageOp.message:
+      echo "expected: " & expected
+      echo "     got: " & rcAndMessageOp.message
+      result = false
+    else:
+      echo "same"
+
+  discard tryRemoveFile(f1)
+  discard tryRemoveFile(f2)
+
 
 suite "runner.nim":
 
@@ -737,3 +796,66 @@ $$ hello {name}"""
 
     discard tryRemoveFile(tPath)
     discard tryRemoveFile(path)
+
+  test "compareFiles":
+    check testCompareFilesEqual("test file", "test file")
+    check testCompareFilesEqual("", "")
+    check testCompareFilesEqual("""
+""","""
+""")
+    check testCompareFilesEqual("""
+multi line file
+test
+123 5
+""","""
+multi line file
+test
+123 5
+""")
+
+  test "compareFiles different 1":
+    let f1 = """
+test file
+"""
+    let f2 = """
+hello there
+"""
+    let expected = """
+The files f1.txt and f2.txt differ on line 1:
+1: test file
+1: hello there"""
+    check testCompareFilesDifferent(f1, f2, expected)
+
+  test "compareFiles different 2":
+    let expected = """
+The files f1.txt and f2.txt differ on line 2:
+2: different line
+2: wow we"""
+
+    let f1 = """
+test line
+different line
+"""
+    let f2 = """
+test line
+wow we
+"""
+    check testCompareFilesDifferent(f1, f2, expected)
+
+  test "compareFiles different 3":
+    let expected = """
+The files f1.txt and f2.txt differ on line 2:
+2: third line
+2: something else"""
+
+    let f1 = """
+test line
+third line
+more
+"""
+    let f2 = """
+test line
+something else
+more
+"""
+    check testCompareFilesDifferent(f1, f2, expected)

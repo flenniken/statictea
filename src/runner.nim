@@ -605,33 +605,6 @@ proc runCommands*(folder: string, runFileLines: seq[RunFileLine]):
   let rcAndMessage = RcAndMessage(rc: rc, message: "")
   result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
 
-# proc compareFiles*(folder: string, compareLines: seq[CompareLine]):
-#     OpResult[RcAndMessage] =
-#   ## Compare files.
-
-#   for compareLine in compareLines:
-#     if runFileLine.command:
-#       # Make the file executable.
-#       setFilePermissions(runFileLine.filename, {fpUserExec, fpUserRead, fpUserWrite})
-
-#       # Run the file and return the return code.
-#       let localFile = "./" & runFileLine.filename
-#       let cmdRc = execCmd(localFile)
-
-#       if runFileLine.nonZeroReturn:
-#         if cmdRc == 0:
-#           echo "Command file: $1 generated unexpected return code 0." % runFileLine.filename
-#           rc = 1
-#       elif cmdRc != 0:
-#         echo "Command file: $1 generated unexpected non-zero return code." %
-#           runFileLine.filename
-#         rc = 1
-
-#   setCurrentDir(oldDir)
-
-#   let rcAndMessage = RcAndMessage(rc: rc, message: "")
-#   result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
-
 proc openLineBuffer*(filename: string): OpResult[LineBuffer] =
   ## Open a file for reading lines. Return a LineBuffer object.  Close
   ## the line buffer stream when done.
@@ -641,12 +614,11 @@ proc openLineBuffer*(filename: string): OpResult[LineBuffer] =
   if stream == nil:
     return OpResult[LineBuffer](kind: opMessage,
       message: "Unable to open file: '$1'." % [filename])
-  defer:
-    stream.close()
 
   # Allocate a buffer for reading lines.
   var lbO = newLineBuffer(stream, filename = filename)
   if not lbO.isSome():
+    stream.close()
     return OpResult[LineBuffer](kind: opMessage,
       message: "Unable to allocate a line buffer.")
 
@@ -663,7 +635,8 @@ proc compareFiles*(filename1: string, filename2: string): OpResult[RcAndMessage]
       message: op1.message)
   var lb1 = op1.value
   defer:
-    lb1.getStream().close()
+    if lb1.getStream() != nil:
+      lb1.getStream().close()
 
   let op2 = openLineBuffer(filename2)
   if op2.isMessage:
@@ -671,25 +644,26 @@ proc compareFiles*(filename1: string, filename2: string): OpResult[RcAndMessage]
       message: op1.message)
   var lb2 = op2.value
   defer:
-    lb2.getStream().close()
+    if lb2.getStream() != nil:
+      lb2.getStream().close()
 
   var rc = 0
   var message = ""
-  while true:
-    var line1 = readlines.readline(lb1)
-    var line2 = readlines.readline(lb2)
-    if line1 != line2:
-      # The two files are different.
-      rc = 1
-      message = """
-The files differ on line $1.
-$2: $3
-$4: $5
-""" % [$lb1.getLineNum(), filename1, line1, filename2, line2]
-      break;
+  if filename1 != filename2:
+    while true:
+      var line1 = readlines.readline(lb1)
+      var line2 = readlines.readline(lb2)
+      if line1 != line2:
+        # The two files are different.
+        rc = 1
+        message = """
+The files $2 and $4 differ on line $1:
+$1: $3
+$1: $5""" % [$(lb1.getLineNum()), filename1, line1.stripLineEnding(), filename2, line2.stripLineEnding()]
+        break;
 
-    if line1 == "":
-      break # done
+      if line1 == "":
+        break # done
 
   let rcAndMessage = RcAndMessage(rc: rc, message: message)
   result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
@@ -697,7 +671,6 @@ $4: $5
 proc compareFileSets*(folder: string, compareLines: seq[CompareLine]):
     OpResult[RcAndMessage] =
   ## Compare file sets and return rc=0 when they are all the same.
-
 
   var rc = 0
   for compareLine in compareLines:
