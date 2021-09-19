@@ -35,6 +35,10 @@ proc getFilename*(lineBuffer: LineBuffer): string =
   ## Return the filename of the stream, if there is one.
   result = lineBuffer.filename
 
+proc getStream*(lineBuffer: LineBuffer): Stream =
+  ## Return the associated stream.
+  result = lineBuffer.stream
+
 proc newLineBuffer*(stream: Stream, maxLineLen: int = defaultMaxLineLen,
     bufferSize: int = defaultBufferSize, filename: string = ""): Option[LineBuffer] =
   ## Return a new LineBuffer for the given stream.

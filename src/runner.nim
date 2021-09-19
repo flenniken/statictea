@@ -605,22 +605,154 @@ proc runCommands*(folder: string, runFileLines: seq[RunFileLine]):
   let rcAndMessage = RcAndMessage(rc: rc, message: "")
   result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
 
-proc runFilename*(args: RunArgs): OpResult[RcAndMessage] =
-  let dirAndFilesOp = makeDirAndFiles(args.filename)
+# proc compareFiles*(folder: string, compareLines: seq[CompareLine]):
+#     OpResult[RcAndMessage] =
+#   ## Compare files.
+
+#   for compareLine in compareLines:
+#     if runFileLine.command:
+#       # Make the file executable.
+#       setFilePermissions(runFileLine.filename, {fpUserExec, fpUserRead, fpUserWrite})
+
+#       # Run the file and return the return code.
+#       let localFile = "./" & runFileLine.filename
+#       let cmdRc = execCmd(localFile)
+
+#       if runFileLine.nonZeroReturn:
+#         if cmdRc == 0:
+#           echo "Command file: $1 generated unexpected return code 0." % runFileLine.filename
+#           rc = 1
+#       elif cmdRc != 0:
+#         echo "Command file: $1 generated unexpected non-zero return code." %
+#           runFileLine.filename
+#         rc = 1
+
+#   setCurrentDir(oldDir)
+
+#   let rcAndMessage = RcAndMessage(rc: rc, message: "")
+#   result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
+
+proc openLineBuffer*(filename: string): OpResult[LineBuffer] =
+  ## Open a file for reading lines. Return a LineBuffer object.  Close
+  ## the line buffer stream when done.
+
+  # Open the file for reading.
+  let stream = newFileStream(filename, fmRead)
+  if stream == nil:
+    return OpResult[LineBuffer](kind: opMessage,
+      message: "Unable to open file: '$1'." % [filename])
+  defer:
+    stream.close()
+
+  # Allocate a buffer for reading lines.
+  var lbO = newLineBuffer(stream, filename = filename)
+  if not lbO.isSome():
+    return OpResult[LineBuffer](kind: opMessage,
+      message: "Unable to allocate a line buffer.")
+
+  result = OpResult[LineBuffer](kind: opValue, value: lbO.get())
+
+proc compareFiles*(filename1: string, filename2: string): OpResult[RcAndMessage] =
+  ## Compare two files. When they are equal, return rc=0 and
+  ## message="". When they differ return rc=1 and message = the first
+  ## line difference. On error return an error message.
+
+  let op1 = openLineBuffer(filename1)
+  if op1.isMessage:
+    return OpResult[RcAndMessage](kind: opMessage,
+      message: op1.message)
+  var lb1 = op1.value
+  defer:
+    lb1.getStream().close()
+
+  let op2 = openLineBuffer(filename2)
+  if op2.isMessage:
+    return OpResult[RcAndMessage](kind: opMessage,
+      message: op1.message)
+  var lb2 = op2.value
+  defer:
+    lb2.getStream().close()
+
+  var rc = 0
+  var message = ""
+  while true:
+    var line1 = readlines.readline(lb1)
+    var line2 = readlines.readline(lb2)
+    if line1 != line2:
+      # The two files are different.
+      rc = 1
+      message = """
+The files differ on line $1.
+$2: $3
+$4: $5
+""" % [$lb1.getLineNum(), filename1, line1, filename2, line2]
+      break;
+
+    if line1 == "":
+      break # done
+
+  let rcAndMessage = RcAndMessage(rc: rc, message: message)
+  result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
+
+proc compareFileSets*(folder: string, compareLines: seq[CompareLine]):
+    OpResult[RcAndMessage] =
+  ## Compare file sets and return rc=0 when they are all the same.
+
+
+  var rc = 0
+  for compareLine in compareLines:
+    var path1 = joinPath(folder, compareLine.filename1)
+    var path2 = joinPath(folder, compareLine.filename2)
+
+    # Compare the two files.
+    let rcAndMessageOp = compareFiles(path1, path2)
+
+    if rcAndMessageOp.isMessage:
+      # Show the error.
+     echo rcAndMessageOp.message
+     rc = 1
+    else:
+      let rcAndMessage = rcAndMessageOp.value
+      if rcAndMessage.rc != 0:
+        # Show this first different line.
+        echo rcAndMessage.message
+        rc = 1
+
+  let rcAndMessage = RcAndMessage(rc: rc, message: "")
+  result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
+
+proc runStfFilename*(filename: string): OpResult[RcAndMessage] =
+  ## Run the stf and report the result. Return rc=0 message="" when it
+  ## passes.
+
+  # Create the temp folder and files inside it.
+  let dirAndFilesOp = makeDirAndFiles(filename)
   if dirAndFilesOp.isMessage:
     result = OpResult[RcAndMessage](kind: opMessage,
       message: dirAndFilesOp.message)
   let dirAndFiles = dirAndFilesOp.value
 
+  let folder = filename & ".tempdir"
+
   # Run the command files.
-  let folder = args.filename & ".tempdir"
-  let rcAndMessageOp = runCommands(folder, dirAndFiles.runFileLines)
+  var rcAndMessageOp = runCommands(folder, dirAndFiles.runFileLines)
   if rcAndMessageOp.isMessage:
     return rcAndMessageOp
-  # let rcAndMessage = rcAndMessageOp.value
+  result = rcAndMessageOp
 
+  # Compare the files.
+  rcAndMessageOp = compareFileSets(folder, dirAndFiles.compareLines)
+  if rcAndMessageOp.isMessage:
+    return rcAndMessageOp
+  var rcAndMessage = rcAndMessageOp.value
+  if rcAndMessage.rc != 0:
+    result = rcAndMessageOp
 
+proc runFilename*(args: RunArgs): OpResult[RcAndMessage] =
+  ## Run the stf and report the result. Return rc=0 message="" when it
+  ## passes.
 
+  result = runStfFilename(args.filename)
 
   # Remove the temp folder unless leave is specified.
   if not args.leaveTempDir:
