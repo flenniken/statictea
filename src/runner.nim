@@ -493,8 +493,6 @@ proc makeDirAndFiles*(filename: string): OpResult[DirAndFiles] =
     return OpResult[DirAndFiles](kind: opMessage,
       message: "File not found: '$1'." % [filename])
 
-  echo "Running: " & filename
-
   # Open the file for reading.
   let stream = newFileStream(filename, fmRead)
   if stream == nil:
@@ -565,10 +563,6 @@ expected: $1
 
   let dirAndFiles = newDirAndFiles(compareLines, runFileLines)
   result = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
-
-proc runDirectory*(dir: string): OpResult[RcAndMessage] =
-  result = OpResult[RcAndMessage](kind: opMessage,
-    message: "runDirectory: not implemented")
 
 proc runCommand*(folder: string, filename: string): int =
   ## Run a command file and return it's return code.
@@ -743,22 +737,53 @@ proc runStfFilename*(filename: string): OpResult[RcAndMessage] =
   if rcAndMessage.rc != 0:
     result = rcAndMessageOp
 
-proc runFilename*(args: RunArgs): OpResult[RcAndMessage] =
+proc runFilename*(filename: string, leaveTempDir: bool): OpResult[RcAndMessage] =
   ## Run the stf and report the result. Return rc=0 message="" when it
   ## passes.
 
-  result = runStfFilename(args.filename)
+  result = runStfFilename(filename)
   if not result.isMessage:
     # Remove the temp folder unless leave is specified.
-    let tempDir = args.filename & ".tempdir"
-    if args.leaveTempDir:
+    let tempDir = filename & ".tempdir"
+    if leaveTempDir:
       echo "Leaving temp dir: " & tempDir
     else:
-      if fileExists(args.filename):
+      if fileExists(filename):
         discard deleteFolder(tempDir)
 
+proc runFilename*(args: RunArgs): OpResult[RcAndMessage] =
+  result = runFilename(args.filename, args.leaveTempDir)
+
+proc runDirectory*(dir: string, leaveTempDir: bool): OpResult[RcAndMessage] =
+  ## Run all the stf files in the specified directory.
+
+  if not dirExists(dir):
+    let message = "The dir does not exist: " & dir
+    return OpResult[RcAndMessage](kind: opMessage,
+      message: message)
+
+  var count = 0
+  var passedCount = 0
+  var rc = 0
+  for kind, path in walkDir(dir):
+    if path.endsWith(".stf"):
+      let (_, basename) = splitPath(path)
+      echo "Running: " & basename
+      let rcAndMessageOp = runFilename(path, leaveTempDir)
+      if rcAndMessageOp.isMessage:
+        return rcAndMessageOp
+      if rcAndMessageOp.value.rc == 0:
+        inc(passedCount)
+      else:
+        rc = 1
+      inc(count)
+
+  let message = "Of $1 test files, $2 passed." % [$count, $passedCount]
+  let rcAndMessage = RcAndMessage(rc: rc, message: message)
+  result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
+
 proc runDirectory(args: RunArgs): OpResult[RcAndMessage] =
-  result = runDirectory(args.directory)
+  result = runDirectory(args.directory, args.leaveTempDir)
 
 proc processRunArgs(args: RunArgs): OpResult[RcAndMessage] =
   ## Process the arguments and return a return code or message.

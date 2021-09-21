@@ -1,0 +1,26 @@
+id stf file version 0.0.0
+
+# Missing replacement variable.
+
+--- file cmd.sh command nonZeroReturn
+$statictearoot/bin/statictea -t=template.md >stdout 2>stderr
+--- endfile
+
+--- expected stdout.expected == stdout
+--- expected stderr.expected == stderr
+
+--- file template.md
+$$ nextline
+hello {s.name}
+--- endfile
+
+--- file stdout.expected
+hello {s.name}
+--- endfile
+
+--- file stderr.expected
+template.md(2): w58: The replacement variable doesn't exist: s.name.
+--- endfile
+
+
+
