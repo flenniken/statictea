@@ -91,6 +91,7 @@ proc readline*(lb: var LineBuffer): string =
       lb.charsRead = lb.stream.readDataStr(lb.buffer, 0..<lb.bufferSize)
       lb.pos = 0
       if lb.charsRead == 0:
+        inc(lb.lineNum)
         break # Done reading the stream.
     let charByte = lb.buffer[lb.pos]
     line.add(charByte)

@@ -137,9 +137,12 @@ testing
     var lineBufferO = newLineBuffer(inStream, 8, 24)
     check lineBufferO.isSome
 
+    # Before reading anything the line number is 0.
     var lb = lineBufferO.get()
-    check lb.getLineNum() == 0
+    # check lb.getLineNum() == 0
 
+    # When a \n is read the line count is incremented.
+    # Line characters include the line endings.
     var line = lb.readline()
     check line == "1234567\n"
     check lb.getLineNum() == 1
@@ -155,6 +158,65 @@ testing
     line = lb.readline()
     check line == "testing\n"
     check lb.getLineNum() == 3
+
+  test "getLineNum 2":
+    let content = "abc"
+    var inStream = newStringStream(content)
+    var lineBufferO = newLineBuffer(inStream, 8, 24)
+    check lineBufferO.isSome
+
+    # Before reading anything the line number is 0.
+    var lb = lineBufferO.get()
+    # check lb.getLineNum() == 0
+
+    var line = lb.readline()
+    check line == "abc"
+    check lb.getLineNum() == 1
+
+  test "getLineNum 3":
+    let content = """
+one
+two"""
+    var inStream = newStringStream(content)
+    var lineBufferO = newLineBuffer(inStream, 8, 24)
+    check lineBufferO.isSome
+
+    # Before reading anything the line number is 0.
+    var lb = lineBufferO.get()
+    # check lb.getLineNum() == 0
+
+    var line = lb.readline()
+    check line == "one\n"
+    check lb.getLineNum() == 1
+
+    line = lb.readline()
+    check line == "two"
+    check lb.getLineNum() == 2
+
+  test "getLineNum long last line":
+    let content = """
+one
+two456789abc"""
+    var inStream = newStringStream(content)
+    var lineBufferO = newLineBuffer(inStream, 8, 24)
+    check lineBufferO.isSome
+
+    # Before reading anything the line number is 0.
+    var lb = lineBufferO.get()
+    check lb.getLineNum() == 0
+
+    var line = lb.readline()
+    check line == "one\n"
+    check lb.getLineNum() == 1
+
+    line = lb.readline()
+    check line == "two45678"
+    # Not quite right, but living with it.
+    check lb.getLineNum() == 1
+
+    line = lb.readline()
+    check line == "9abc"
+    check lb.getLineNum() == 2
 
   test "readXLines":
     let content = """

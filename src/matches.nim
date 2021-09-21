@@ -19,8 +19,8 @@ const
     newPrepost("# $", ""),
   ]
 
+  ## The StaticTea commands.
   commands: array[7, string] = [
-    ## The StaticTea commands.
     "nextline",
     "block",
     "replace",

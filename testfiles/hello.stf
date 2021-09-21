@@ -1,16 +1,25 @@
-statictea test runner 0.0.0
+id stf file version 0.0.0
 # Hello World Example
-----------file: hello.html (noLastEnding)
-$$ nextline
+---file hello.html noLastEnding ---
+<!--$ nextline -->
 $$ hello {name}
-----------file: hello.json
+--- endfile ----------------------
+
+--- file hello.json ---
 {"name": "world"}
-----------file: stdout.expected (noLastEnding)
+--- endfile -----------
+
+---file stdout.expected noLastEnding
 hello world
-----------file: stderr.expected
-----------command line
-../bin/statictea -s=hello.json -t=hello.html >stdout 2>stderr
-----------expected: stdout.expected == stdout
-----------expected: stderr.expected == stderr
-----------return code: 0
+--- endfile
+
+---file stderr.expected
+---endfile
+
+---file cmd.sh command
+$statictearoot/bin/statictea -s=hello.json -t=hello.html >stdout 2>stderr
+---endfile
+
+---expected stdout.expected == stdout
+---expected stderr.expected == stderr
 

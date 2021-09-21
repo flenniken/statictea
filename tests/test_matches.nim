@@ -161,6 +161,7 @@ suite "matches.nim":
 
   test "matchCommand":
     check testMatchCommand("<!--$ nextline -->", 6, some(newMatches(8, 6, "nextline")))
+    check testMatchCommand("$$ nextline", 3, some(newMatches(8, 3, "nextline")))
 
     check testMatchCommand("<!--$ block    -->", 6, some(newMatches(5, 6, "block")))
     check testMatchCommand("<!--$ replace  -->", 6, some(newMatches(7, 6, "replace")))

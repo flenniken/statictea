@@ -162,26 +162,35 @@ proc deleteFolder*(folder: string): OpResult[RcAndMessage] =
 
 proc getHelp(): string =
   result = """
-Run a test specified by a stf test file or run all the stf test files
-contained in a folder.
+Run a single test file (stf) or run all stf files in a folder.
 
-The stf test file contains instructions for creating files needed to
-preform the test. It creates the temp files in a temp folder next to the
-test file. After creating the files it runs one of them to preform the
-test. Then it compares files to see whether the test passed or not.
+The runner reads a stf file, creates multiple small files in a test
+folder, then runs a command and verifies the correct output.
 
-runner [-h] [-v] [-f=filename] [-d=directory]
+# Usage
 
+runner [-h] [-v] [-l] [-f=filename] [-d=directory]
 
-There are four types of command lines in an stf file.  Elements on a
-command line can use multiple spaces or tabs to separate commonents
-and commands can use any number of dashes at the beginning and end of
-the line.  The stf command lines are:
+-h --help          Show this help message.
+-v --version       Show the version number.
+-l --leaveTempDir  Leave the temp folder.
+-f --filename      Run the stf file.
+-d --directory     Run the stf files in the directory.
+
+# The STF File Format
+
+The stf (single test file) is a text file made up of command lines,
+comments and lines used to create small files.  There are four types
+of command lines in an stf file:
 
 * id
 * file
 * endfile
 * expected
+
+You can use use multiple spaces or tabs between command line
+elements. The beginning and end of the command line can use dashes as
+well as spaces or tabs.  The stf command lines are:
 
 # Id Line
 
@@ -193,10 +202,16 @@ are optional. Example line:
 
 # File and Endfile Lines
 
-The file and endfile lines bracket the lines used for a new file. You
-specify the name of the file, whether to use line ending on the last
-line, whether this file is a test script to run and whether the test
-script returns 0 or non-zero return code. Example:
+You use the file and endfile lines to create small test files.  They
+bracket the lines of a file that gets created. You specify the name of
+the file, whether to use line ending on the last line, whether this
+file is a test script to run and whether the test script returns 0 or
+non-zero return code.
+
+The temp folder is created in the same folder as the stf file. The
+small files get created in the temp folder.
+
+Example:
 
 --- file filename [noLastEnding] [command] [nonZeroReturn] ---
 The file lines go here.
@@ -206,8 +221,8 @@ The file lines go here.
 
 * filename -- the name of the file to create. You cannot use spaces in
   the name.
-* noLastEnding -- create the file with a newline on the last line.
-* command -- this file is the test script to run.
+* noLastEnding -- create the file without a newline on the last line.
+* command -- marks a file as a test script to run.
 * nonZeroReturn -- used with "command" and tells whether the script is
   expected to return a non-zero return code value.
 
@@ -223,7 +238,7 @@ the test script. Example:
 You can add comments. Comment lines start with # as the first
 character of the line.  Blank lines are ignored except in file blocks.
 
-# Example
+# Example STF File
 
 The following example stf file instructs the runner to create the
 files : cmd.sh, hello.html, hello.json, stdout-expected and
@@ -655,11 +670,13 @@ proc compareFiles*(filename1: string, filename2: string): OpResult[RcAndMessage]
       var line2 = readlines.readline(lb2)
       if line1 != line2:
         # The two files are different.
+        let (_, f1) = splitPath(filename1)
+        let (_, f2) = splitPath(filename2)
         rc = 1
         message = """
 The files $2 and $4 differ on line $1:
 $1: $3
-$1: $5""" % [$(lb1.getLineNum()), filename1, line1.stripLineEnding(), filename2, line2.stripLineEnding()]
+$1: $5""" % [$(lb1.getLineNum()), f1, line1.stripLineEnding(), f2, line2.stripLineEnding()]
         break;
 
       if line1 == "":
@@ -701,7 +718,7 @@ proc runStfFilename*(filename: string): OpResult[RcAndMessage] =
   # Create the temp folder and files inside it.
   let dirAndFilesOp = makeDirAndFiles(filename)
   if dirAndFilesOp.isMessage:
-    result = OpResult[RcAndMessage](kind: opMessage,
+    return OpResult[RcAndMessage](kind: opMessage,
       message: dirAndFilesOp.message)
   let dirAndFiles = dirAndFilesOp.value
 
@@ -726,11 +743,14 @@ proc runFilename*(args: RunArgs): OpResult[RcAndMessage] =
   ## passes.
 
   result = runStfFilename(args.filename)
-
-  # Remove the temp folder unless leave is specified.
-  if not args.leaveTempDir:
-    if fileExists(args.filename):
-      discard deleteFolder(args.filename & ".tempdir")
+  if not result.isMessage:
+    # Remove the temp folder unless leave is specified.
+    let tempDir = args.filename & ".tempdir"
+    if args.leaveTempDir:
+      echo "Leaving temp dir: " & tempDir
+    else:
+      if fileExists(args.filename):
+        discard deleteFolder(tempDir)
 
 proc runDirectory(args: RunArgs): OpResult[RcAndMessage] =
   result = runDirectory(args.directory)
@@ -786,5 +806,5 @@ when isMainModule:
   else:
     let rcAndMessage = rcAndMessageOp.value
     if rcAndMessage.message != "":
-      writeErr(rcAndMessage.message)
+      writeOut(rcAndMessage.message)
     quit(rcAndMessage.rc)
