@@ -454,6 +454,15 @@ proc build_runner() =
   cmd = "strip bin/runner"
   exec cmd
 
+proc runRunner() =
+  # Make sure statictearoot environment variable is defined.
+  let root = getEnv("statictearoot")
+  if root == "":
+    echo "Error: Define the statictearoot environment variable."
+    exec "exit 1"
+
+  exec "bin/runner -f=testfiles/hello.stf"
+
 # Tasks below
 
 task n, "\tShow available tasks.":
@@ -471,12 +480,14 @@ awk '{printf "include %s\n", $0}' > tests/testall.nim
 
   # Make sure it builds with test undefined.
   build_release()
-  # Run the command line tests.
-  exec "src/test"
 
   # Build runner
   build_runner()
 
+  runRunner()
+
+  # Run the command line tests.
+  exec "src/test"
 
 task test, "\tRun one or more tests; specify part of test filename.":
   ## Run one or more tests.  You specify part of the test filename and all
@@ -570,3 +581,6 @@ task args, "\tShow command line arguments.":
 
 task br, "\tBuild the statictea test runner.":
   build_runner()
+
+task runner, "\tRun stf tests.":
+  runRunner()

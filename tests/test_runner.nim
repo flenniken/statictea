@@ -821,16 +821,18 @@ test file
 hello there
 """
     let expected = """
-The files f1.txt and f2.txt differ on line 1:
-1: test file
-1: hello there"""
+Files differ on line 1:
+f1.txt: (test file)
+f2.txt: (hello there)
+"""
     check testCompareFilesDifferent(f1, f2, expected)
 
   test "compareFiles different 2":
     let expected = """
-The files f1.txt and f2.txt differ on line 2:
-2: different line
-2: wow we"""
+Files differ on line 2:
+f1.txt: (different line)
+f2.txt: (wow we)
+"""
 
     let f1 = """
 test line
@@ -844,9 +846,10 @@ wow we
 
   test "compareFiles different 3":
     let expected = """
-The files f1.txt and f2.txt differ on line 2:
-2: third line
-2: something else"""
+Files differ on line 2:
+f1.txt: (third line)
+f2.txt: (something else)
+"""
 
     let f1 = """
 test line

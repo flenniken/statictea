@@ -493,6 +493,8 @@ proc makeDirAndFiles*(filename: string): OpResult[DirAndFiles] =
     return OpResult[DirAndFiles](kind: opMessage,
       message: "File not found: '$1'." % [filename])
 
+  echo "Running: " & filename
+
   # Open the file for reading.
   let stream = newFileStream(filename, fmRead)
   if stream == nil:
@@ -608,11 +610,13 @@ proc runCommands*(folder: string, runFileLines: seq[RunFileLine]):
 
       if runFileLine.nonZeroReturn:
         if cmdRc == 0:
-          echo "Command file: $1 generated unexpected return code 0." % runFileLine.filename
+          echo "$1 generated an unexpected return code of 0." % runFileLine.filename
+          echo ""
           rc = 1
       elif cmdRc != 0:
-        echo "Command file: $1 generated unexpected non-zero return code." %
+        echo "$1 generated a non-zero return code." %
           runFileLine.filename
+        echo ""
         rc = 1
 
   setCurrentDir(oldDir)
@@ -673,10 +677,11 @@ proc compareFiles*(filename1: string, filename2: string): OpResult[RcAndMessage]
         let (_, f1) = splitPath(filename1)
         let (_, f2) = splitPath(filename2)
         rc = 1
+        let width = max(f1.len, f2.len)
         message = """
-The files $2 and $4 differ on line $1:
-$1: $3
-$1: $5""" % [$(lb1.getLineNum()), f1, line1.stripLineEnding(), f2, line2.stripLineEnding()]
+Files differ on line $1:
+$2: ($3)
+$4: ($5)""" % [$(lb1.getLineNum()), align(f1, width), line1.stripLineEnding(), align(f2, width), line2.stripLineEnding()] & "\n"
         break;
 
       if line1 == "":
