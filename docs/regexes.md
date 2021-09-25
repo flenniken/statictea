@@ -10,6 +10,7 @@ Perl regular expression matching.
 * [getGroup](#getgroup) &mdash; Get the first group in matches if it exists, else return "".
 * [get2Groups](#get2groups) &mdash; Get the first two groups in matches.
 * [get3Groups](#get3groups) &mdash; Get the first three groups in matches.
+* [getGroups](#getgroups) &mdash; Return the number of groups specified.
 * [matchRegex](#matchregex) &mdash; Match a regular expression pattern in a string.
 * [matchPatternCached](#matchpatterncached) &mdash; Match a pattern in a string and cache the compiled regular expression pattern.
 * [matchPattern](#matchpattern) &mdash; Match a regular expression pattern in a string.
@@ -61,6 +62,14 @@ Get the first three groups in matches. If one of the groups doesn't exist, "" is
 
 ```nim
 func get3Groups(matches: Matches): (string, string, string)
+```
+
+# getGroups
+
+Return the number of groups specified. If one of the groups doesn't exist, "" is returned for it.
+
+```nim
+func getGroups(matches: Matches; groupCount: Natural): seq[string]
 ```
 
 # matchRegex

@@ -13,6 +13,7 @@ Read lines from a stream without exceeding the maximum line length. The returned
 * [getLineNum](#getlinenum) &mdash; Return the current line number.
 * [getMaxLineLen](#getmaxlinelen) &mdash; Return the maximum line length.
 * [getFilename](#getfilename) &mdash; Return the filename of the stream, if there is one.
+* [getStream](#getstream) &mdash; Return the associated stream.
 * [newLineBuffer](#newlinebuffer) &mdash; Return a new LineBuffer for the given stream.
 * [reset](#reset) &mdash; Clear the buffer.
 * [readline](#readline) &mdash; Return a line from the LineBuffer.
@@ -88,6 +89,14 @@ Return the filename of the stream, if there is one.
 
 ```nim
 proc getFilename(lineBuffer: LineBuffer): string
+```
+
+# getStream
+
+Return the associated stream.
+
+```nim
+proc getStream(lineBuffer: LineBuffer): Stream
 ```
 
 # newLineBuffer

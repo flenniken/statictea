@@ -10,12 +10,12 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funCmp_ffi](#funcmp_ffi) &mdash; Compare two floats.
 * [funCmp_ssoii](#funcmp_ssoii) &mdash; Compare two strings.
 * [funConcat](#funconcat) &mdash; Concatentate strings.
-* [funLen_si](#funlen_si) &mdash; Length of a string in characters, not bytes.
+* [funLen_si](#funlen_si) &mdash; Number of characters in a string.
 * [funLen_li](#funlen_li) &mdash; Number of elements in a list.
 * [funLen_di](#funlen_di) &mdash; Number of elements in a dictionary.
 * [funGet_lioaa](#funget_lioaa) &mdash; Get a list value by its index.
 * [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
-* [funIf](#funif) &mdash; If the condition is 1 return one value, else return another value.
+* [funIf](#funif) &mdash; If the condition is true return a value, else return another value.
 * [funAdd_Ii](#funadd_ii) &mdash; Add integers.
 * [funAdd_Fi](#funadd_fi) &mdash; Add floats.
 * [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
@@ -150,7 +150,7 @@ func funConcat(parameters: seq[Value]): FunResult
 
 # funLen_si
 
-Length of a string in characters, not bytes.
+Number of characters in a string.
 
 ~~~
 len(str: string) int
@@ -262,10 +262,10 @@ func funGet_dsoaa(parameters: seq[Value]): FunResult
 
 # funIf
 
-If the condition is 1 return one value, else return another value.
+If the condition is true return a value, else return another value. False is 0 and true is not 0.
 
 ~~~
-if(condition: int, oneCase: any, notOne: any) any
+if(condition: int, true: any, false: any) any
 ~~~~
 
 Examples:

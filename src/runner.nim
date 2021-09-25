@@ -1,4 +1,4 @@
-## Run a stf (single test file) file.
+## Standalone command to run Single Test File (stf) files.
 
 import std/strutils
 import std/os
@@ -33,8 +33,8 @@ type
 
   RcAndMessage* = object
     ## RcAndMessage holds a return code and message.
-    rc*: int
-    message*: string
+    rc*: int ## return code, 0 success.
+    message*: string ## message. A non-empty message gets displayed.
 
   RunFileLine* = object
     ## RunFileLine holds the parseRunFileLine result.
@@ -62,7 +62,9 @@ type
 
   OpResult*[T] = object
     ## Contains either a value or a message string. The default is a
-    ## value.
+    ## value. It's similar to the Option type but instead of returning
+    ## nothing, you return a message that tells why you cannot return
+    ## the value.
     case kind*: OpResultKind
       of opValue:
         value*: T
@@ -71,40 +73,46 @@ type
 
 func newRunArgs*(help = false, version = false, leaveTempDir = false,
     filename = "", directory = ""): RunArgs =
+  ## Create a new RunArgs object.
   result = RunArgs(help: help, version: version,
     leaveTempDir: leaveTempDir, filename: filename, directory: directory)
 
 func newRcAndMessage*(rc: int, message: string): RcAndMessage =
+  ## Create a new RcAndMessage object.
   result = RcAndMessage(rc: rc, message: message)
 
 func isMessage*(opResult: OpResult): bool =
+  ## Return true when the OpResult is a message.
   if opResult.kind == opMessage:
     result = true
 
 func isValue*(opResult: OpResult): bool =
+  ## Return true when the OpResult is a value.
   if opResult.kind == opValue:
     result = true
 
 func newRunFileLine*(filename: string, noLastEnding = false, command = false,
     nonZeroReturn = false): RunFileLine =
+  ## Create a new RunFileLine object.
   result = RunFileLine(filename: filename, noLastEnding: noLastEnding,
     command: command, nonZeroReturn: nonZeroReturn)
 
 func newCompareLine*(filename1: string, filename2: string): CompareLine =
+  ## Create a new CompareLine object.
   result = CompareLine(filename1: filename1, filename2: filename2)
 
 func newDirAndFiles*(compareLines: seq[CompareLine],
     runFileLines: seq[RunFileLine]): DirAndFiles =
+  ## Create a new DirAndFiles object.
   result = DirAndFiles(compareLines: compareLines,
     runFileLines: runFileLines)
 
 func `$`*(r: CompareLine): string =
-  ## Return a string representation of a CompareLine.
-
+  ## Return a string representation of a CompareLine object.
   result = "expected $1 == $2" % [r.filename1, r.filename2]
 
 func `$`*(r: RunFileLine): string =
-  ## Return a string representation of a RunFileLine.
+  ## Return a string representation of a RunFileLine object.
 
   var noLastEnding: string
   if r.noLastEnding:
@@ -135,6 +143,7 @@ proc writeOut*(message: string) =
   stdout.writeLine(message)
 
 func stripLineEnding(line: string): string =
+  ## Strip line endings from a string.
   result = line.strip(chars={'\n', '\r'}, trailing = true)
 
 proc createFolder*(folder: string): OpResult[RcAndMessage] =
@@ -161,6 +170,7 @@ proc deleteFolder*(folder: string): OpResult[RcAndMessage] =
     result = OpResult[RcAndMessage](kind: opMessage, message: message)
 
 proc getHelp(): string =
+  ## Return the help message and usage text.
   result = """
 Run a single test file (stf) or run all stf files in a folder.
 
@@ -311,7 +321,6 @@ func letterToWord(letter: char): OpResult[string] =
 proc handleWord(switch: string, word: string, value: string,
     help: var bool, version: var bool, leaveTempDir: var bool, filename: var string,
     directory: var string): OpResult[string] =
-
   ## Handle one switch and return its value.  Switch is the key from
   ## the command line, either a word or a letter.  Word is the long
   ## form of the switch.
@@ -386,13 +395,15 @@ proc parseRunCommandLine*(argv: seq[string]): OpResult[RunArgs] =
   result = OpResult[RunArgs](kind: opValue, value: args)
 
 func makeBool(item: string): bool =
+  ## Return true when the string is not empty, else return false.
   if item != "":
     result = true
   else:
     result = false
 
 proc parseRunFileLine*(line: string): OpResult[RunFileLine] =
-  ## The optional elements must be specified in order.
+  ## Parse a file command line.
+  # The optional elements must be specified in order.
   #----------file hello.html [noLastEnding] [command] [nonZeroReturn]
   let pattern = r"^[- ]*file[ ]+([^\s]+)(?:[ ]+(noLastEnding)){0,1}(?:[ ]+(command)){0,1}(?:[ ]+(nonZeroReturn)){0,1}[-\s]*$"
 
@@ -412,6 +423,7 @@ proc parseRunFileLine*(line: string): OpResult[RunFileLine] =
   return OpResult[RunFileLine](kind: opValue, value: fileLine)
 
 proc parseCompareLine*(line: string): OpResult[CompareLine] =
+  ## Parse an expected line.
   #----------expected stdout.expected == stdout
   let pattern = r"^[- ]*expected[ ]+([^\s]+)[ ]*==[ ]*([^\s]+)[-\s]*$"
   let matchesO = matchPatternCached(line, pattern, 0)
@@ -441,7 +453,8 @@ proc openNewFile*(folder: string, filename: string): OpResult[File] =
   result = OpResult[File](kind: opValue, value: file)
 
 proc getCmd*(line: string): string =
-  ## Return the type of line.
+  ## Return the type of line, either: #, "", id, file, expected or
+  ## endfile.
   if line.startswith("#"):
     result = "#"
   elif line == "\n":
@@ -585,7 +598,7 @@ expected: $1
   result = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
 
 proc runCommand*(folder: string, filename: string): int =
-  ## Run a command file and return it's return code.
+  ## Run a command file and return its return code.
 
   let oldDir = getCurrentDir()
 
@@ -772,6 +785,7 @@ proc runFilename*(filename: string, leaveTempDir: bool): OpResult[RcAndMessage] 
         discard deleteFolder(tempDir)
 
 proc runFilename*(args: RunArgs): OpResult[RcAndMessage] =
+  ## Run a stf file.
   result = runFilename(args.filename, args.leaveTempDir)
 
 proc runDirectory*(dir: string, leaveTempDir: bool): OpResult[RcAndMessage] =
@@ -804,6 +818,7 @@ proc runDirectory*(dir: string, leaveTempDir: bool): OpResult[RcAndMessage] =
   result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
 
 proc runDirectory(args: RunArgs): OpResult[RcAndMessage] =
+  ## Run all stf files in a directory.
   result = runDirectory(args.directory, args.leaveTempDir)
 
 proc processRunArgs(args: RunArgs): OpResult[RcAndMessage] =
@@ -825,7 +840,7 @@ proc processRunArgs(args: RunArgs): OpResult[RcAndMessage] =
     result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
 
 proc main*(argv: seq[string]): OpResult[RcAndMessage] =
-  ## Run statictea tests files. Return a rc and message.
+  ## Run stf test files. Return a rc and message.
 
   # Setup control-c monitoring so ctrl-c stops the program.
   proc controlCHandler() {.noconv.} =
@@ -852,9 +867,12 @@ proc main*(argv: seq[string]): OpResult[RcAndMessage] =
 when isMainModule:
   let rcAndMessageOp = main(commandLineParams())
   if rcAndMessageOp.isMessage:
+    # Error path. Write the message to stderr.
     writeErr(rcAndMessageOp.message)
     quit(QuitFailure)
   else:
+    # Success path. Display non-empty messages and set the return
+    # code.
     let rcAndMessage = rcAndMessageOp.value
     if rcAndMessage.message != "":
       writeOut(rcAndMessage.message)

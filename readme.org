@@ -1178,6 +1178,7 @@ Miscellaneous topics:
 - [[#module-docs][Module Docs]]
 - [[#html-formatted-json][HTML Formatted Json]]
 - [[#nimble-tasks][Nimble Tasks]]
+- [[#stf-runner][Stf Runner]]
 
 ** Warning Messages
 :PROPERTIES:
@@ -1436,8 +1437,8 @@ Workaround Rules:
    :END:
 
 You can run commands to build, test, make docs etc. using nimble
-task commands. From the statictea folder run the n task to see
-the available tasks.
+task commands. Run them from the statictea root folder. The n
+task lists the available tasks. Create an alias for nimble.
 
 #+BEGIN_SRC
 cd ~/code/statictea
@@ -1448,22 +1449,40 @@ n n
 Here is the output:
 
 #+BEGIN_SRC
-n         Show available tasks.
-t         Run all tests at once.
-test      Run one or more tests; specify part of test filename.
-b         Build the statictea exe.
-docsall   Create all the docs, docsix, docs, readmefun, dot.
-docs      Create one or more markdown docs; specify part of source filename.
-docsix    Create markdown docs index.
-json      Display one or more source file's json doc comments; specify part of name.
-jsonix    Display markdown docs index json.
-readmefun Create the readme function section.
-dot       Create a dependency graph of the StaticTea source.
-dot2      Create a dependency graph of the system modules used by StaticTea.
-tt        Compile and run t.nim.
-tree      Show the project directory tree.
-args      Show command line arguments.
+n        	  Show available tasks.
+t        	  Run all tests at once.
+test       	Run one or more tests; specify part of test filename.
+b          	Build the statictea exe.
+docsall    	Create all the docs, docsix, docs, readmefun, dot.
+docs       	Create one or more markdown docs; specify part of source filename.
+docsix     	Create markdown docs index.
+json       	Display one or more source file's json doc comments; specify part of name.
+jsonix     	Display markdown docs index json.
+readmefun   Create the readme function section.
+dot        	Create a dependency graph of the StaticTea source.
+dot2       	Create a dependency graph of the system modules used by StaticTea.
+tt        	Compile and run t.nim.
+tree       	Show the project directory tree.
+args       	Show command line arguments.
+br        	Build the test runner.
+runner     	Run stf tests.
+stf        	List testfiles tests.
 #+END_SRC
+
+[[#contents][茶]]
+
+** Stf Runner
+:PROPERTIES:
+   :CUSTOM_ID: stf-runner
+   :END:
+
+The statictea testfiles folder contains Single Test File (stf)
+files used to test statictea features. The runner command runs
+all the stf files.  There are nimble tasks for these:
+
+- br -- build the stf runner application
+- stf -- list the stf descriptions
+- runner -- run the tests
 
 [[#contents][茶]]
 
