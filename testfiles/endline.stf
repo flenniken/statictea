@@ -1,6 +1,6 @@
 id stf file version 0.0.0
 
-# Test readmefun ending line case.
+## Test there are no extra lines for the readmefun case.
 
 --- file cmd.sh command
 $statictearoot/bin/statictea -p="# $" -t=endline.org >stdout 2>stderr
@@ -17,8 +17,8 @@ $statictearoot/bin/statictea -p="# $" -t=endline.org >stdout 2>stderr
 
 {description}
 # $ endblock
-------------
-endfile
+===
+--- endfile
 
 --- file stdout.expected
 ** endline()
@@ -33,8 +33,8 @@ looking for extra newlines
 :END:
 
 looking for extra newlines
-------------
-endfile
+===
+--- endfile
 
 --- file stderr.expected
 --- endfile

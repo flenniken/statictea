@@ -455,12 +455,18 @@ proc build_runner() =
   exec cmd
 
 proc runRunner() =
+  ## Run the stf files in the testfiles folder.
+  
   # Make sure statictearoot environment variable is defined.
-  let root = getEnv("statictearoot")
+  var root = getEnv("statictearoot")
   if root == "":
-    echo "Error: Define the statictearoot environment variable."
-    exec "exit 1"
+    putEnv("statictearoot", "/Users/steve/code/statictea")
+    root = getEnv("statictearoot")
+    if root == "":
+      echo "Error: Define the statictearoot environment variable."
+      exec "exit 1"
 
+  # Run the stf files.
   exec "bin/runner -d=testfiles"
 
 # Tasks below
@@ -577,8 +583,11 @@ task args, "\tShow command line arguments.":
   for i in 0..count-1:
     echo "$1: $2" % [$(i+1), system.paramStr(i)]
 
-task br, "\tBuild the statictea test runner.":
+task br, "\tBuild the test runner.":
   build_runner()
 
 task runner, "\tRun stf tests.":
   runRunner()
+
+task stf, "\tList testfiles tests.":
+  exec """find testfiles -name \*.stf | xargs grep "##" | cut -c 11- |sed 's/## /\t/'"""

@@ -1,6 +1,6 @@
 id stf file version 0.0.0
 
-# Template from stdin.
+## Test a template coming from stdin.
 
 --- file cmd.sh command
 $statictearoot/bin/statictea -s=hello.json -t=stdin <hello.html >stdout 2>stderr
