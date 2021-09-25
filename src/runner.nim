@@ -504,8 +504,8 @@ proc makeDirAndFiles*(filename: string): OpResult[DirAndFiles] =
   # Create a temp folder next to the file.
   let tempDirName = filename & ".tempdir"
   if dirExists(tempDirName):
-    let message = "The temp dir already exists. Delete it and try again. '$1'" % tempDirName
-    return OpResult[DirAndFiles](kind: opMessage, message: message)
+    removeDir(tempDirName)
+
   let rcAndMessageOp = createFolder(tempDirName)
   if rcAndMessageOp.isMessage:
     return OpResult[DirAndFiles](kind: opMessage, message: rcAndMessageOp.message)
@@ -778,7 +778,8 @@ proc runDirectory*(dir: string, leaveTempDir: bool): OpResult[RcAndMessage] =
         rc = 1
       inc(count)
 
-  let message = "Of $1 test files, $2 passed." % [$count, $passedCount]
+  let message = "$1 passed, $2 failed\n" % [
+    $passedCount, $(count - passedCount)]
   let rcAndMessage = RcAndMessage(rc: rc, message: message)
   result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
 

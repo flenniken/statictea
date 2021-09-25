@@ -1,0 +1,18 @@
+id stf file version 0.0.0
+
+# The return code for -l should be 1.
+
+--- file cmd.sh command nonZeroReturn
+$statictearoot/bin/statictea >stdout 2>stderr
+--- endfile
+
+--- file stderr.expected
+unnamed(0): w88: No template name. Use -h for help.
+--- endfile
+
+--- file stdout.expected
+--- endfile
+
+--- expected stdout.expected == stdout
+--- expected stderr.expected == stderr
+

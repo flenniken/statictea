@@ -1,0 +1,13 @@
+id stf file version 0.0.0
+
+# The return code for -l -h should be 0.
+
+-file cmd.sh command
+$statictearoot/bin/statictea -l -h >stdout 2>stderr
+-endfile
+
+-file stderr.expected
+-endfile
+
+-expected stderr.expected == stderr
+

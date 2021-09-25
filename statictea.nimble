@@ -461,7 +461,7 @@ proc runRunner() =
     echo "Error: Define the statictearoot environment variable."
     exec "exit 1"
 
-  exec "bin/runner -f=testfiles/hello.stf"
+  exec "bin/runner -d=testfiles"
 
 # Tasks below
 
@@ -481,13 +481,11 @@ awk '{printf "include %s\n", $0}' > tests/testall.nim
   # Make sure it builds with test undefined.
   build_release()
 
-  # Build runner
+  # Build runner.
   build_runner()
 
+  # Run the stf tests.
   runRunner()
-
-  # Run the command line tests.
-  exec "src/test"
 
 task test, "\tRun one or more tests; specify part of test filename.":
   ## Run one or more tests.  You specify part of the test filename and all
