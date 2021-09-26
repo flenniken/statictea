@@ -1,0 +1,25 @@
+id stf file version 0.0.0
+
+## Test the continue readme example.
+
+--- file cmd.sh command
+$statictearoot/bin/statictea -t=comment.html >stdout 2>stderr
+--- endfile
+
+--- file comment.html
+$$ nextline
+$$ : tea = 'Earl Grey'
+$$ : tea2 = 'Masala chai'
+{tea}, {tea2}
+--- endfile
+
+--- file stdout.expected
+Earl Grey, Masala chai
+--- endfile
+
+--- file stderr.expected
+--- endfile
+
+--- expected stdout.expected == stdout
+--- expected stderr.expected == stderr
+

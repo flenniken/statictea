@@ -1,0 +1,30 @@
+id stf file version 0.0.0
+
+## Test the first replace readme example.
+
+--- file cmd.sh command
+$statictearoot/bin/statictea -j=replace.json -t=replace.html >stdout 2>stderr
+--- endfile
+
+--- file replace.html
+<!--$ replace t.content=h.header -->
+<!--$ endblock -->
+--- endfile
+
+--- file replace.json
+{
+  "header": "<!doctype html>\n<html lang=\"en\">\n"
+}
+--- endfile
+
+--- file stdout.expected
+<!doctype html>
+<html lang="en">
+--- endfile
+
+--- file stderr.expected
+--- endfile
+
+--- expected stdout.expected == stdout
+--- expected stderr.expected == stderr
+

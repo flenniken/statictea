@@ -1,0 +1,29 @@
+id stf file version 0.0.0
+
+## Test the comment readme example.
+
+--- file cmd.sh command
+$statictearoot/bin/statictea -t=hello.html >stdout 2>stderr
+--- endfile
+
+--- file hello.html noLastEnding
+<!--$ # The main tea groups. -->
+There are five main groups of teas:
+white, green, oolong, black, and pu'erh.
+You make Oolong Tea in five time
+intensive steps.
+--- endfile
+
+--- file stdout.expected noLastEnding
+There are five main groups of teas:
+white, green, oolong, black, and pu'erh.
+You make Oolong Tea in five time
+intensive steps.
+--- endfile
+
+--- file stderr.expected
+--- endfile
+
+--- expected stdout.expected == stdout
+--- expected stderr.expected == stderr
+
