@@ -107,6 +107,13 @@ func newDirAndFiles*(compareLines: seq[CompareLine],
   result = DirAndFiles(compareLines: compareLines,
     runFileLines: runFileLines)
 
+func `$`*(opResult: OpResult): string =
+  ## Return a string representation of an OpResult object.
+  if opResult.kind == opValue:
+    result = "opValue"
+  else:
+    result = "opMessage"
+
 func `$`*(r: CompareLine): string =
   ## Return a string representation of a CompareLine object.
   result = "expected $1 == $2" % [r.filename1, r.filename2]
@@ -687,7 +694,7 @@ proc compareFiles*(filename1: string, filename2: string): OpResult[RcAndMessage]
   let op2 = openLineBuffer(filename2)
   if op2.isMessage:
     return OpResult[RcAndMessage](kind: opMessage,
-      message: op1.message)
+      message: op2.message)
   var lb2 = op2.value
   defer:
     if lb2.getStream() != nil:

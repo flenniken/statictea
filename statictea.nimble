@@ -20,6 +20,9 @@ requires "nim >= 1.4.4"
 # you can call in your nimble file.
 # https://nim-lang.org/0.11.3/nimscript.html
 
+proc exit() =
+  discard staticExec "exit 1"
+
 proc get_test_filenames(): seq[string] =
   ## Return the basename of the nim files in the tests folder.
   result = @[]
@@ -454,20 +457,51 @@ proc build_runner() =
   cmd = "strip bin/runner"
   exec cmd
 
-proc runRunner() =
-  ## Run the stf files in the testfiles folder.
-  
-  # Make sure statictearoot environment variable is defined.
+proc defineStaticteaRoot() =
+  ## Make sure statictearoot environment variable is defined.
   var root = getEnv("statictearoot")
   if root == "":
     putEnv("statictearoot", "/Users/steve/code/statictea")
     root = getEnv("statictearoot")
     if root == "":
       echo "Error: Define the statictearoot environment variable."
-      exec "exit 1"
+      exit()
+
+proc runRunnerFolder() =
+  ## Run the stf files in the testfiles folder.
+
+  defineStaticteaRoot()
 
   # Run the stf files.
-  exec "bin/runner -d=testfiles"
+  let result = staticExec "bin/runner -d=testfiles"
+  echo result
+
+proc runRunStf() =
+  defineStaticteaRoot()
+
+  # Get the name of the stf to run.
+  let count = system.paramCount()+1
+  var name = system.paramStr(count-1)
+  var (folder, basename) = splitPath(name)
+  if folder != "":
+    echo "Specify the basename of a stf test to run."
+    exit()
+  if not basename.endsWith(".stf"):
+    basename = basename & ".stf"
+  var filename = joinPath("testfiles", basename)
+  if not fileExists(filename):
+    echo "The stf file isn't in the testfiles folder: $1" % filename
+    exit()
+
+  # Run a stf file.
+  let cmd = "bin/runner -f=$1" % filename
+  echo cmd
+  let result = staticExec cmd
+  if result == "":
+    echo "success"
+  else:
+    echo result
+
 
 # Tasks below
 
@@ -491,7 +525,7 @@ awk '{printf "include %s\n", $0}' > tests/testall.nim
   build_runner()
 
   # Run the stf tests.
-  runRunner()
+  runRunnerFolder()
 
 task test, "\tRun one or more tests; specify part of test filename.":
   ## Run one or more tests.  You specify part of the test filename and all
@@ -583,11 +617,31 @@ task args, "\tShow command line arguments.":
   for i in 0..count-1:
     echo "$1: $2" % [$(i+1), system.paramStr(i)]
 
-task br, "\tBuild the test runner.":
+task br, "\tBuild the stf test runner.":
   build_runner()
 
-task runner, "\tRun stf tests.":
-  runRunner()
+task runstf, "\tRun a stf test in testfiles. Specify the basename without an extension.":
+  runRunStf()
 
-task stf, "\tList testfiles tests.":
+task runall, "\tRun all stf tests in the testfiles folder.":
+  runRunnerFolder()
+
+task stf, "\tList stf tests descriptions.":
   exec """find testfiles -name \*.stf | xargs grep "##" | cut -c 11- |sed 's/## /\t/'"""
+
+task newstf, "\tCreate new stf as a starting point for a new test.":
+  let count = system.paramCount()+1
+  var name = system.paramStr(count-1)
+  if name == "newstf":
+    echo "Specify a name for a new stf test in the testfiles folder."
+  else:
+    var (_, basename) = splitPath(name)
+    if not basename.endsWith(".stf"):
+      basename = basename & ".stf"
+    var filename = joinPath("testfiles", basename)
+    if fileExists(filename):
+      echo "File already exists: $1" % filename
+    else:
+      let cmd = "cp testfiles/template.stf $1" % filename
+      echo cmd
+      exec cmd

@@ -1441,8 +1441,8 @@ task commands. Run them from the statictea root folder. The n
 task lists the available tasks. Create an alias for nimble.
 
 #+BEGIN_SRC
-cd ~/code/statictea
 alias n='nimble --silent'
+cd ~/code/statictea
 n n
 #+END_SRC
 
@@ -1483,6 +1483,8 @@ all the stf files.  There are nimble tasks for these:
 - br -- build the stf runner application
 - stf -- list the stf descriptions
 - runner -- run the tests
+
+See the runner help message for help creating stf files.
 
 [[#contents][茶]]
 

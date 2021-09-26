@@ -19,8 +19,9 @@ Standalone command to run Single Test File (stf) files.
 * [newRunFileLine](#newrunfileline) &mdash; Create a new RunFileLine object.
 * [newCompareLine](#newcompareline) &mdash; Create a new CompareLine object.
 * [newDirAndFiles](#newdirandfiles) &mdash; Create a new DirAndFiles object.
-* [`$`](#) &mdash; Return a string representation of a CompareLine object.
-* [`$`](#-1) &mdash; Return a string representation of a RunFileLine object.
+* [`$`](#) &mdash; Return a string representation of an OpResult object.
+* [`$`](#-1) &mdash; Return a string representation of a CompareLine object.
+* [`$`](#-2) &mdash; Return a string representation of a RunFileLine object.
 * [writeErr](#writeerr) &mdash; Write a message to stderr.
 * [writeOut](#writeout) &mdash; Write a message to stdout.
 * [createFolder](#createfolder) &mdash; Create a folder with the given name.
@@ -184,6 +185,14 @@ Create a new DirAndFiles object.
 ```nim
 func newDirAndFiles(compareLines: seq[CompareLine];
                     runFileLines: seq[RunFileLine]): DirAndFiles
+```
+
+# `$`
+
+Return a string representation of an OpResult object.
+
+```nim
+func `$`(opResult: OpResult): string
 ```
 
 # `$`

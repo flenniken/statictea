@@ -1,0 +1,45 @@
+id stf file version 0.0.0
+
+## Test stardard invocation used for new stf test template.
+
+# file line attributes: noLastEnding command nonZeroReturn
+
+--- file cmd.sh command
+$statictearoot/bin/statictea -s=server.json -j=shared.json \
+  -t=template.html -r=result.html >stdout 2>stderr
+--- endfile
+
+--- file template.html
+<!--$ block -->
+hello {s.name}, hello {h.name}
+<!--$ endblock -->
+--- endfile
+
+--- file server.json
+{
+  "name": "server",
+  "type": "json"
+}
+--- endfile
+
+--- file shared.json
+{
+  "name": "shared",
+  "type": "json"
+}
+--- endfile
+
+--- file result.expected
+hello server, hello shared
+--- endfile
+
+--- file stdout.expected
+--- endfile
+
+--- file stderr.expected
+--- endfile
+
+--- expected result.expected == result.html
+--- expected stdout.expected == stdout
+--- expected stderr.expected == stderr
+
