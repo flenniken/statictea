@@ -682,47 +682,83 @@ proc compareFiles*(filename1: string, filename2: string): OpResult[RcAndMessage]
   ## message="". When they differ return rc=1 and message = the first
   ## line difference. On error return an error message.
 
-  let op1 = openLineBuffer(filename1)
-  if op1.isMessage:
-    return OpResult[RcAndMessage](kind: opMessage,
-      message: op1.message)
-  var lb1 = op1.value
-  defer:
-    if lb1.getStream() != nil:
-      lb1.getStream().close()
-
-  let op2 = openLineBuffer(filename2)
-  if op2.isMessage:
-    return OpResult[RcAndMessage](kind: opMessage,
-      message: op2.message)
-  var lb2 = op2.value
-  defer:
-    if lb2.getStream() != nil:
-      lb2.getStream().close()
-
+  let content1 = readFile(filename1)
+  let content2 = readFile(filename2)
   var rc = 0
-  var message = ""
-  if filename1 != filename2:
-    while true:
-      var line1 = readlines.readline(lb1)
-      var line2 = readlines.readline(lb2)
-      if line1 != line2:
-        # The two files are different.
-        let (_, f1) = splitPath(filename1)
-        let (_, f2) = splitPath(filename2)
-        rc = 1
-        let width = max(f1.len, f2.len)
-        message = """
-Files differ on line $1:
-$2: ($3)
-$4: ($5)""" % [$(lb1.getLineNum()), align(f1, width), line1.stripLineEnding(), align(f2, width), line2.stripLineEnding()] & "\n"
-        break;
+  if content1 != content2:
+    let (_, basename1) = splitPath(filename1)
+    let (_, basename2) = splitPath(filename2)
 
-      if line1 == "":
-        break # done
+    echo "$1:" % [basename1]
+    if content1 == "":
+      echo "  empty"
+    else:
+      echo content1
+    echo "$1:" % [basename2]
+    if content2 == "":
+      echo "  empty"
+    else:
+      echo content2
+    echo "_-_-_-"
+    rc = 1
+  let rcAndMessage = RcAndMessage(rc: rc, message: "")
+  return OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
 
-  let rcAndMessage = RcAndMessage(rc: rc, message: message)
-  result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
+
+
+#   let size1 = getFileSize(filename1)
+#   let size2 = getFileSize(filename2)
+
+#   if size1 == 0 and size2 != 0 or
+#      size1 != 0 and size2 == 0:
+#     if size1 != 0:
+#       echo "show filename1"
+#     else:
+#       echo "show filename2"
+#     let rcAndMessage = RcAndMessage(rc: 1, message: "")
+#     return OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
+
+#   let op1 = openLineBuffer(filename1)
+#   if op1.isMessage:
+#     return OpResult[RcAndMessage](kind: opMessage,
+#       message: op1.message)
+#   var lb1 = op1.value
+#   defer:
+#     if lb1.getStream() != nil:
+#       lb1.getStream().close()
+
+#   let op2 = openLineBuffer(filename2)
+#   if op2.isMessage:
+#     return OpResult[RcAndMessage](kind: opMessage,
+#       message: op2.message)
+#   var lb2 = op2.value
+#   defer:
+#     if lb2.getStream() != nil:
+#       lb2.getStream().close()
+
+#   var rc = 0
+#   var message = ""
+#   if filename1 != filename2:
+#     while true:
+#       var line1 = readlines.readline(lb1)
+#       var line2 = readlines.readline(lb2)
+#       if line1 != line2:
+#         # The two files are different.
+#         let (_, f1) = splitPath(filename1)
+#         let (_, f2) = splitPath(filename2)
+#         rc = 1
+#         let width = max(f1.len, f2.len)
+#         message = """
+# Files differ on line $1.
+#   $2: $3
+#   $4: $5""" % [$(lb1.getLineNum()), align(f1, width), line1.stripLineEnding(), align(f2, width), line2.stripLineEnding()]
+#         break;
+
+#       if line1 == "":
+#         break # done
+
+#   let rcAndMessage = RcAndMessage(rc: rc, message: message)
+#   result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
 
 proc compareFileSets*(folder: string, compareLines: seq[CompareLine]):
     OpResult[RcAndMessage] =

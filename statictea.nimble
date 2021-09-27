@@ -21,7 +21,7 @@ requires "nim >= 1.4.4"
 # https://nim-lang.org/0.11.3/nimscript.html
 
 proc exit() =
-  discard staticExec "exit 1"
+  exec "exit 1"
 
 proc get_test_filenames(): seq[string] =
   ## Return the basename of the nim files in the tests folder.
@@ -74,10 +74,11 @@ proc get_test_module_cmd(filename: string, release = false): string =
   let part3 = "$1 -r -p:src --out:bin/$2 tests/$3" % [rel, binName, filename]
   result = part1 & part2 & part3
 
-proc build_release() =
+proc buildRelease() =
   ## Build the release version of statictea.
   let part1 = "nim c --gc:orc --hint[Performance]:off "
-  let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
+  # let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
+  let part2 = "--hint[Conf]:off --hint[Link]: off  "
   let part3 = "--out:bin/ src/statictea"
   var cmd = part1 & part2 & part3
   echo cmd
@@ -447,7 +448,7 @@ proc taskReadMeFun() =
 
   # rmFile(sectionFile)
 
-proc build_runner() =
+proc buildRunner() =
   let part1 = "nim c --gc:orc --hint[Performance]:off "
   let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
   let part3 = "--out:bin/ src/runner"
@@ -483,7 +484,7 @@ proc runRunStf() =
   let count = system.paramCount()+1
   var name = system.paramStr(count-1)
   var (folder, basename) = splitPath(name)
-  if folder != "":
+  if folder != "" or basename == "runt":
     echo "Specify the basename of a stf test to run."
     exit()
   if not basename.endsWith(".stf"):
@@ -502,6 +503,12 @@ proc runRunStf() =
   else:
     echo result
 
+proc runRunStfMain() =
+  try:
+    runRunStf()
+  except:
+    echo ""
+    discard
 
 # Tasks below
 
@@ -519,10 +526,10 @@ awk '{printf "include %s\n", $0}' > tests/testall.nim
   rmFile("tests/testall.nim")
 
   # Make sure it builds with test undefined.
-  build_release()
+  buildRelease()
 
   # Build runner.
-  build_runner()
+  buildRunner()
 
   # Run the stf tests.
   runRunnerFolder()
@@ -543,7 +550,7 @@ task test, "\tRun one or more tests; specify part of test filename.":
       exec cmd
 
 task b, "\tBuild the statictea exe.":
-  build_release()
+  buildRelease()
 
 task docsall, "\tCreate all the docs, docsix, docs, readmefun, dot.":
   taskDocsIx()
@@ -618,10 +625,10 @@ task args, "\tShow command line arguments.":
     echo "$1: $2" % [$(i+1), system.paramStr(i)]
 
 task br, "\tBuild the stf test runner.":
-  build_runner()
+  buildRunner()
 
-task runstf, "\tRun a stf test in testfiles. Specify the basename without an extension.":
-  runRunStf()
+task runt, "\tRun a stf test in testfiles. Specify the filename.":
+  runRunStfMain()
 
 task runall, "\tRun all stf tests in the testfiles folder.":
   runRunnerFolder()

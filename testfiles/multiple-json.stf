@@ -1,37 +1,44 @@
 id stf file version 0.0.0
 
-## Test standard invocation used for new stf test template.
+## Test multiple json files.
+
 
 # file line attributes: noLastEnding command nonZeroReturn
 
 --- file cmd.sh command
-$statictearoot/bin/statictea -s=server.json -j=shared.json \
+$statictearoot/bin/statictea -s=server.json -j=j1.json -j=j2.json \
   -t=template.html -r=result.html >stdout 2>stderr
 --- endfile
 
 --- file template.html
 <!--$ block -->
-hello {s.name}, hello {h.name}
+hello {s.data}, hello {h.data1}, hello {h.data2}
 <!--$ endblock -->
 --- endfile
 
 --- file server.json
 {
-  "name": "server",
-  "type": "json"
+  "data": "server.json"
 }
 --- endfile
 
---- file shared.json
+--- file j1.json
 {
-  "name": "shared",
-  "type": "json"
+  "data1": "j1.json"
 }
 --- endfile
 
---- file result.expected
-hello server, hello shared
---- endfile
+file j2.json
+{
+  "data2": "j2.json"
+}
+endfile
+
+
+-file result.expected
+hello server.json, hello j1.json, hello j2.json
+-endfile
+
 
 --- file stdout.expected
 --- endfile

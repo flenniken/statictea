@@ -1,0 +1,53 @@
+id stf file version 0.0.0
+
+## Test updating a template with the update option.
+
+--- file cmd.sh command
+$statictearoot/bin/statictea -u -j=shared.json -t=template.html >stdout 2>stderr
+--- endfile
+
+--- file template.html
+<!-- The header. -->
+<!--$ block t.content = h.header -->
+<!--$ endblock -->
+
+<!--The menu. -->
+<!--$ block t.content = h.menu -->
+<!--$ endblock -->
+
+<!-- The footer. -->
+<!--$ block t.content = h.footer -->
+<!--$ endblock -->
+--- endfile
+
+--- file shared.json
+{
+  "header": "=== header ===",
+  "menu": "pick an option",
+  "footer": "=== footer ==="
+}
+--- endfile
+
+--- file template.expected
+<!-- The header. -->
+<!--$ block t.content = h.header -->
+<!--$ endblock -->
+
+<!--The menu. -->
+<!--$ block t.content = h.menu -->
+<!--$ endblock -->
+
+<!-- The footer. -->
+<!--$ block t.content = h.footer -->
+<!--$ endblock -->
+--- endfile
+
+--- file stdout.expected
+--- endfile
+
+--- file stderr.expected
+--- endfile
+
+--- expected template.expected == template.html
+--- expected stdout.expected == stdout
+--- expected stderr.expected == stderr
