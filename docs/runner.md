@@ -35,6 +35,9 @@ Standalone command to run Single Test File (stf) files.
 * [runCommand](#runcommand) &mdash; Run a command file and return its return code.
 * [runCommands](#runcommands) &mdash; Run the commands.
 * [openLineBuffer](#openlinebuffer) &mdash; Open a file for reading lines.
+* [showTabsAndLineEndings](#showtabsandlineendings) &mdash; Return a new string with the tab and line endings visible.
+* [dup](#dup) &mdash; 
+* [linesSideBySide](#linessidebyside) &mdash; Show the two sets of lines side by side.
 * [compareFiles](#comparefiles) &mdash; Compare two files.
 * [compareFileSets](#comparefilesets) &mdash; Compare file sets and return rc=0 when they are all the same.
 * [runStfFilename](#runstffilename) &mdash; Run the stf and report the result.
@@ -316,12 +319,37 @@ Open a file for reading lines. Return a LineBuffer object.  Close the line buffe
 proc openLineBuffer(filename: string): OpResult[LineBuffer]
 ```
 
-# compareFiles
+# showTabsAndLineEndings
 
-Compare two files. When they are equal, return rc=0 and message="". When they differ return rc=1 and message = the first line difference. On error return an error message.
+Return a new string with the tab and line endings visible.
 
 ```nim
-proc compareFiles(filename1: string; filename2: string): OpResult[RcAndMessage]
+func showTabsAndLineEndings(str: string): string
+```
+
+# dup
+
+
+
+```nim
+proc dup(pattern: string; count: Natural): string
+```
+
+# linesSideBySide
+
+Show the two sets of lines side by side.
+
+```nim
+proc linesSideBySide(expectedContent: string; gotContent: string): string
+```
+
+# compareFiles
+
+Compare two files. When they are equal, return rc=0 and message="". When they differ return rc=1 and message where the message shows the differences. On error return an error message.
+
+```nim
+proc compareFiles(expectedFilename: string; gotFilename: string): OpResult[
+    RcAndMessage]
 ```
 
 # compareFileSets

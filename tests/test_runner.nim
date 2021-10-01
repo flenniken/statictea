@@ -193,9 +193,9 @@ proc testCompareFilesDifferent(content1: string, content2: string, expected: str
       echo "expected non-zero rc, got: " & $rcAndMessageOp.value.rc
       result = false
     if expected != rcAndMessageOp.value.message:
-      echo "expected:"
+      echo "expected-----------"
       echo expected
-      echo "     got:"
+      echo "     got-----------"
       echo rcAndMessageOp.value.message
       result = false
   else:
@@ -942,7 +942,7 @@ more
 f1.txt=expected
 f2.txt=got
       same: test line␊
-2 expected: third line   ␊
+2 expected: third line␊
 2      got: something else␊
       same: more␊"""
     check testCompareFilesDifferent(f1, f2, expected)
@@ -980,3 +980,8 @@ something else
 more
 """
     check testCompareFilesDifferent(f1, f2, expected)
+
+  test "compareFiles no file":
+    let rcAndMessageOp = compareFiles("f1", "f2")
+    check rcAndMessageOp.isMessage
+    check rcAndMessageOp.message == "cannot open: f1"

@@ -302,6 +302,8 @@ proc processTemplateTop*(env: var Env, args: Args): int =
   # Process the template.
   result = processTemplate(env, args)
 
+# todo: using t.content on a block command? show message?
+
 proc updateTemplateTop*(env: var Env, args: Args): int =
   ## Update the template and return 0 on success. This calls
   ## updateTemplate.

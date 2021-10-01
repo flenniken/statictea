@@ -111,9 +111,9 @@ func newDirAndFiles*(compareLines: seq[CompareLine],
 func `$`*(opResult: OpResult): string =
   ## Return a string representation of an OpResult object.
   if opResult.kind == opValue:
-    result = "opValue"
+    result = "opValue: $1" % $opResult.value
   else:
-    result = "opMessage"
+    result = "opMessage: $1" % opResult.message
 
 func `$`*(r: CompareLine): string =
   ## Return a string representation of a CompareLine object.
@@ -730,13 +730,31 @@ proc linesSideBySide*(expectedContent: string, gotContent: string): string =
 
   result = lines.join("\n")
 
+proc readFileContent(filename: string): OpResult[string] =
+  try:
+    let content = readFile(filename)
+    result = OpResult[string](kind: opValue, value: content)
+  except:
+    return OpResult[string](kind: opMessage,
+      message: getCurrentExceptionMsg())
+
 proc compareFiles*(expectedFilename: string, gotFilename: string): OpResult[RcAndMessage] =
   ## Compare two files. When they are equal, return rc=0 and
   ## message="". When they differ return rc=1 and message where the
   ## message shows the differences. On error return an error message.
 
-  let expectedContent = readFile(expectedFilename)
-  let gotContent = readFile(gotFilename)
+  let expectedContentOp = readFileContent(expectedFilename)
+  if expectedContentOp.isMessage:
+    return OpResult[RcAndMessage](kind: opMessage,
+      message: expectedContentOp.message)
+  let expectedContent = expectedContentOp.value
+
+  let gotContentOp = readFileContent(gotFilename)
+  if gotContentOp.isMessage:
+    return OpResult[RcAndMessage](kind: opMessage,
+      message: gotContentOp.message)
+  let gotContent = gotContentOp.value
+
   var rc = 0
   var message: string
   if expectedContent != gotContent:

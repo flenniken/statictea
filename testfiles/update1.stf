@@ -1,0 +1,40 @@
+id stf file version 0.0.0
+
+## Update the replace block in a template.
+
+--- file cmd.sh command
+$statictearoot/bin/statictea -u -j=shared.json -t=template.html >stdout 2>stderr
+--- endfile
+
+--- file shared.json
+{
+ "header": "<html>\n"
+}
+--- endfile
+
+--- file template.html
+line
+<!--$ replace t.content = h.header -->
+replacement block
+<!--$ endblock -->
+ending line
+--- endfile
+
+--- file newtemplate
+line
+<!--$ replace t.content = h.header -->
+<html>
+<!--$ endblock -->
+ending line
+--- endfile
+
+--- file stdout.expected
+--- endfile
+
+--- file stderr.expected
+--- endfile
+
+--- expected newtemplate == template.html
+--- expected stdout.expected == stdout
+--- expected stderr.expected == stderr
+

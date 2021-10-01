@@ -7,37 +7,37 @@ $statictearoot/bin/statictea -u -j=shared.json -t=template.html >stdout 2>stderr
 --- endfile
 
 --- file template.html
-<!--$ block t.content = h.header -->
+<!--$ replace t.content = h.header -->
 this is where the header goes
 <!--$ endblock -->
 
-<!--$ block t.content = h.menu -->
+<!--$ replace t.content = h.menu -->
 the menu goes here
 <!--$ endblock -->
 
-<!--$ block t.content = h.footer -->
+<!--$ replace t.content = h.footer -->
 footer location
 <!--$ endblock -->
 --- endfile
 
 --- file shared.json
 {
-  "header": "=== header ===",
-  "menu": "pick an option",
-  "footer": "=== footer ==="
+  "header": "=== header ===\n",
+  "menu": "pick an option\n",
+  "footer": "=== footer ===\n"
 }
 --- endfile
 
 --- file template.expected
-<!--$ block t.content = h.header -->
+<!--$ replace t.content = h.header -->
 === header ===
 <!--$ endblock -->
 
-<!--$ block t.content = h.menu -->
+<!--$ replace t.content = h.menu -->
 pick an option
 <!--$ endblock -->
 
-<!--$ block t.content = h.footer -->
+<!--$ replace t.content = h.footer -->
 === footer ===
 <!--$ endblock -->
 --- endfile
