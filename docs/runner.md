@@ -7,15 +7,15 @@ Standalone command to run Single Test File (stf) files.
 
 * type: [RunArgs](#runargs) &mdash; RunArgs holds the command line arguments.
 * type: [RcAndMessage](#rcandmessage) &mdash; RcAndMessage holds a return code and message.
-* type: [RunFileLine](#runfileline) &mdash; RunFileLine holds the parseRunFileLine result.
-* type: [CompareLine](#compareline) &mdash; CompareLine holds the names of two files that are expected to be equal.
+* type: [RunFileLine](#runfileline) &mdash; RunFileLine holds the file line options.
+* type: [CompareLine](#compareline) &mdash; CompareLine holds the expected line options.
 * type: [DirAndFiles](#dirandfiles) &mdash; DirAndFiles holds the result of the makeDirAndFiles procedure.
-* type: [OpResultKind](#opresultkind) &mdash; The kind of a OpResult object, either a value or message.
+* type: [OpResultKind](#opresultkind) &mdash; The kind of OpResult object, either a value or message.
 * type: [OpResult](#opresult) &mdash; Contains either a value or a message string.
 * [newRunArgs](#newrunargs) &mdash; Create a new RunArgs object.
 * [newRcAndMessage](#newrcandmessage) &mdash; Create a new RcAndMessage object.
-* [isMessage](#ismessage) &mdash; Return true when the OpResult is a message.
-* [isValue](#isvalue) &mdash; Return true when the OpResult is a value.
+* [isMessage](#ismessage) &mdash; Return true when the OpResult object contains a message.
+* [isValue](#isvalue) &mdash; Return true when the OpResult object contains a value.
 * [newRunFileLine](#newrunfileline) &mdash; Create a new RunFileLine object.
 * [newCompareLine](#newcompareline) &mdash; Create a new CompareLine object.
 * [newDirAndFiles](#newdirandfiles) &mdash; Create a new DirAndFiles object.
@@ -26,9 +26,9 @@ Standalone command to run Single Test File (stf) files.
 * [writeOut](#writeout) &mdash; Write a message to stdout.
 * [createFolder](#createfolder) &mdash; Create a folder with the given name.
 * [deleteFolder](#deletefolder) &mdash; Delete a folder with the given name.
-* [parseRunCommandLine](#parseruncommandline) &mdash; Return the command line arguments or a message when there is a problem.
+* [parseRunCommandLine](#parseruncommandline) &mdash; Parse the command line arguments.
 * [parseRunFileLine](#parserunfileline) &mdash; Parse a file command line.
-* [parseCompareLine](#parsecompareline) &mdash; Parse an expected line.
+* [parseExpectedLine](#parseexpectedline) &mdash; Parse an expected line.
 * [openNewFile](#opennewfile) &mdash; Create a new file in the given folder and return an open File object.
 * [getCmd](#getcmd) &mdash; Return the type of line, either: #, "", id, file, expected or endfile.
 * [makeDirAndFiles](#makedirandfiles) &mdash; Read the stf file and create its temp folder and files.
@@ -36,7 +36,7 @@ Standalone command to run Single Test File (stf) files.
 * [runCommands](#runcommands) &mdash; Run the commands.
 * [openLineBuffer](#openlinebuffer) &mdash; Open a file for reading lines.
 * [showTabsAndLineEndings](#showtabsandlineendings) &mdash; Return a new string with the tab and line endings visible.
-* [dup](#dup) &mdash; 
+* [dup](#dup) &mdash; Duplicate the pattern count times limited to 1024 characters.
 * [linesSideBySide](#linessidebyside) &mdash; Show the two sets of lines side by side.
 * [compareFiles](#comparefiles) &mdash; Compare two files.
 * [compareFileSets](#comparefilesets) &mdash; Compare file sets and return rc=0 when they are all the same.
@@ -73,7 +73,7 @@ RcAndMessage = object
 
 # RunFileLine
 
-RunFileLine holds the parseRunFileLine result.
+RunFileLine holds the file line options.
 
 ```nim
 RunFileLine = object
@@ -86,7 +86,7 @@ RunFileLine = object
 
 # CompareLine
 
-CompareLine holds the names of two files that are expected to be equal.
+CompareLine holds the expected line options.
 
 ```nim
 CompareLine = object
@@ -108,7 +108,7 @@ DirAndFiles = object
 
 # OpResultKind
 
-The kind of a OpResult object, either a value or message.
+The kind of OpResult object, either a value or message.
 
 ```nim
 OpResultKind = enum
@@ -150,7 +150,7 @@ func newRcAndMessage(rc: int; message: string): RcAndMessage
 
 # isMessage
 
-Return true when the OpResult is a message.
+Return true when the OpResult object contains a message.
 
 ```nim
 func isMessage(opResult: OpResult): bool
@@ -158,7 +158,7 @@ func isMessage(opResult: OpResult): bool
 
 # isValue
 
-Return true when the OpResult is a value.
+Return true when the OpResult object contains a value.
 
 ```nim
 func isValue(opResult: OpResult): bool
@@ -248,7 +248,7 @@ proc deleteFolder(folder: string): OpResult[RcAndMessage]
 
 # parseRunCommandLine
 
-Return the command line arguments or a message when there is a problem.
+Parse the command line arguments.
 
 ```nim
 proc parseRunCommandLine(argv: seq[string]): OpResult[RunArgs]
@@ -262,12 +262,12 @@ Parse a file command line.
 proc parseRunFileLine(line: string): OpResult[RunFileLine]
 ```
 
-# parseCompareLine
+# parseExpectedLine
 
 Parse an expected line.
 
 ```nim
-proc parseCompareLine(line: string): OpResult[CompareLine]
+proc parseExpectedLine(line: string): OpResult[CompareLine]
 ```
 
 # openNewFile
@@ -329,7 +329,7 @@ func showTabsAndLineEndings(str: string): string
 
 # dup
 
-
+Duplicate the pattern count times limited to 1024 characters.
 
 ```nim
 proc dup(pattern: string; count: Natural): string

@@ -223,6 +223,30 @@ proc testLinesSideBySide(content1: string, content2: string,
   else:
     result = true
 
+proc testParseRunFileLine(line: string, eRunFileLine: RunFileLine): bool =
+  ## Test parseRunFileLine where it is expected to pass.
+  let runFileLineOp = parseRunFileLine(line)
+  if runFileLineOp.isMessage:
+    echo runFileLineOp.message
+    return false
+  if runFileLineOp.value != eRunFileLine:
+    echo "expected: " & $eRunFileLine
+    echo "     got: " & $runFileLineOp.value
+    return false
+  result = true
+
+proc testParseExpectedLine(line: string, eCompareLine: CompareLine): bool =
+  ## Test parseExpectedLine where it is expected to pass.
+  let compareLineOp = parseExpectedLine(line)
+  if compareLineOp.isMessage:
+    echo compareLineOp.message
+    return false
+  if compareLineOp.value != eCompareLine:
+    echo "expected: " & $eCompareLine
+    echo "     got: " & $compareLineOp.value
+    return false
+  result = true
+
 suite "runner.nim":
 
   test "main version":
@@ -401,97 +425,90 @@ suite "runner.nim":
     check dirExists(folder) == false
 
   test "parseRunFileLine name":
-    let fileLineOp = parseRunFileLine("file name.html")
-    check fileLineOp.isValue
-    check fileLineOp.value.filename == "name.html"
-    check fileLineOp.value.noLastEnding == false
+    let line = "file name.html"
+    let eRunFileLine = newRunFileLine("name.html")
+    check testParseRunFileLine(line, eRunFileLine)
+
+  test "parseRunFileLine tabs":
+    let line = "--\t -- file \t name.html --\t-- --"
+    let eRunFileLine = newRunFileLine("name.html")
+    check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine name newline":
-    let fileLineOp = parseRunFileLine("file name.html\n")
-    check fileLineOp.isValue
-    check fileLineOp.value.filename == "name.html"
-    check fileLineOp.value.noLastEnding == false
+    let line = "file name.html\n"
+    let eRunFileLine = newRunFileLine("name.html")
+    check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine ---name":
-    let fileLineOp = parseRunFileLine("--- file name.html ---")
-    check fileLineOp.isValue
-    check fileLineOp.value.filename == "name.html"
-    check fileLineOp.value.noLastEnding == false
+    let line = "--- file name.html ---"
+    let eRunFileLine = newRunFileLine("name.html")
+    check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine name with spaces":
-    let fileLineOp = parseRunFileLine("----  ---- -- file    name.html  ")
-    check fileLineOp.isValue
-    check fileLineOp.value.filename == "name.html"
-    check fileLineOp.value.noLastEnding == false
+    let line = "----  ---- -- file    name.html  "
+    let eRunFileLine = newRunFileLine("name.html")
+    check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine name and noLastEnding":
-    let fileLineOp = parseRunFileLine("----------file name.html noLastEnding")
-    check fileLineOp.isValue
-    check fileLineOp.value.filename == "name.html"
-    check fileLineOp.value.noLastEnding == true
+    let line = "----------file name.html noLastEnding"
+    let eRunFileLine = newRunFileLine("name.html", noLastEnding = true)
+    check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine name and noLastEnding":
-    let fileLineOp = parseRunFileLine("----------file   name.html   noLastEnding  ")
-    check fileLineOp.isValue
-    check fileLineOp.value.filename == "name.html"
-    check fileLineOp.value.noLastEnding == true
+    let line = "----------file   name.html   noLastEnding  "
+    let eRunFileLine = newRunFileLine("name.html", noLastEnding = true)
+    check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine name noLastEnding command":
-    let fileLineOp = parseRunFileLine("file name.html noLastEnding command")
-    check fileLineOp.isValue
-    check fileLineOp.value.filename == "name.html"
-    check fileLineOp.value.noLastEnding == true
-    check fileLineOp.value.command == true
-    check fileLineOp.value.nonZeroReturn == false
+    let line = "file name.html noLastEnding command"
+    let eRunFileLine = newRunFileLine("name.html", noLastEnding =
+      true, command = true)
+    check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine name noLastEnding command nonZeroReturn":
-    let fileLineOp = parseRunFileLine("file name.html noLastEnding command nonZeroReturn")
-    check fileLineOp.isValue
-    check fileLineOp.value.filename == "name.html"
-    check fileLineOp.value.noLastEnding == true
-    check fileLineOp.value.command == true
-    check fileLineOp.value.nonZeroReturn == true
+    let line = "file name.html noLastEnding command nonZeroReturn"
+    let eRunFileLine = newRunFileLine("name.html", noLastEnding =
+      true, command = true, nonZeroReturn = true)
+    check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine name command nonZeroReturn":
-    let fileLineOp = parseRunFileLine("file name.html command nonZeroReturn")
-    check fileLineOp.isValue
-    check fileLineOp.value.filename == "name.html"
-    check fileLineOp.value.noLastEnding == false
-    check fileLineOp.value.command == true
-    check fileLineOp.value.nonZeroReturn == true
+    let line = "file name.html command nonZeroReturn"
+    let eRunFileLine = newRunFileLine("name.html", command = true,
+      nonZeroReturn = true)
+    check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine name command ":
-    let fileLineOp = parseRunFileLine("file name.html command")
-    check fileLineOp.isValue
-    check fileLineOp.value.filename == "name.html"
-    check fileLineOp.value.noLastEnding == false
-    check fileLineOp.value.command == true
-    check fileLineOp.value.nonZeroReturn == false
+    let line = "file name.html command"
+    let eRunFileLine = newRunFileLine("name.html", command = true)
+    check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine error":
     let fileLineOp = parseRunFileLine("----------filename.html")
     check fileLineOp.isMessage
     check fileLineOp.message == "Invalid file line: ----------filename.html"
 
-  test "parseCompareLine happy path":
-    let runExpectedLineOp = parseCompareLine("expected file1 == file2")
-    check runExpectedLineOp.isValue
-    check runExpectedLineOp.value.filename1 == "file1"
-    check runExpectedLineOp.value.filename2 == "file2"
+  test "parseExpectedLine happy path":
+    let line = "expected file1 == file2"
+    let eCompareLine = newCompareLine("file1", "file2")
+    check testParseExpectedLine(line, eCompareLine)
 
-  test "parseCompareLine spaces":
-    let runExpectedLineOp = parseCompareLine("------ expected   file1   ==  file2 --")
-    check runExpectedLineOp.isValue
-    check runExpectedLineOp.value.filename1 == "file1"
-    check runExpectedLineOp.value.filename2 == "file2"
+  test "parseExpectedLine spaces":
+    let line = "------ expected   file1   ==  file2 --"
+    let eCompareLine = newCompareLine("file1", "file2")
+    check testParseExpectedLine(line, eCompareLine)
 
-  test "parseCompareLine error":
-    let runExpectedLineOp = parseCompareLine("----------filename.html")
+  test "parseExpectedLine tabs":
+    let line = "---\t--- expected \t  file1 \t  ==  \t file2 \t--"
+    let eCompareLine = newCompareLine("file1", "file2")
+    check testParseExpectedLine(line, eCompareLine)
+
+  test "parseExpectedLine error":
+    let runExpectedLineOp = parseExpectedLine("----------filename.html")
     check runExpectedLineOp.isMessage
     check runExpectedLineOp.message == "Invalid expected line: ----------filename.html"
 
-  test "parseCompareLine missing file":
-    let runExpectedLineOp = parseCompareLine("expected file1")
+  test "parseExpectedLine missing file":
+    let runExpectedLineOp = parseExpectedLine("expected file1")
     check runExpectedLineOp.isMessage
     check runExpectedLineOp.message == "Invalid expected line: expected file1"
 

@@ -38,15 +38,14 @@ type
     message*: string ## message. A non-empty message gets displayed.
 
   RunFileLine* = object
-    ## RunFileLine holds the parseRunFileLine result.
+    ## RunFileLine holds the file line options.
     filename*: string
     noLastEnding*: bool
     command*: bool
     nonZeroReturn*: bool
 
   CompareLine* = object
-    ## CompareLine holds the names of two files that are expected to
-    ## be equal.
+    ## CompareLine holds the expected line options.
     filename1*: string
     filename2*: string
 
@@ -57,7 +56,7 @@ type
     runFileLines*: seq[RunFileLine]
 
   OpResultKind* = enum
-    ## The kind of a OpResult object, either a value or message.
+    ## The kind of OpResult object, either a value or message.
     opValue,
     opMessage
 
@@ -83,12 +82,12 @@ func newRcAndMessage*(rc: int, message: string): RcAndMessage =
   result = RcAndMessage(rc: rc, message: message)
 
 func isMessage*(opResult: OpResult): bool =
-  ## Return true when the OpResult is a message.
+  ## Return true when the OpResult object contains a message.
   if opResult.kind == opMessage:
     result = true
 
 func isValue*(opResult: OpResult): bool =
-  ## Return true when the OpResult is a value.
+  ## Return true when the OpResult object contains a value.
   if opResult.kind == opValue:
     result = true
 
@@ -325,46 +324,37 @@ func letterToWord(letter: char): OpResult[string] =
   let message = "Unknown switch: $1" % $letter
   result = OpResult[string](kind: opMessage, message: message)
 
-# todo: make an object for the return value.
-proc handleWord(switch: string, word: string, value: string,
-    help: var bool, version: var bool, leaveTempDir: var bool, filename: var string,
-    directory: var string): OpResult[string] =
-  ## Handle one switch and return its value.  Switch is the key from
-  ## the command line, either a word or a letter.  Word is the long
-  ## form of the switch.
+proc handleOption(switch: string, word: string, value: string,
+    runArgs: var RunArgs): OpResult[string] =
+  ## Fill in the RunArgs object with a value from the command line.
+  ## Switch is the key from the command line, either a word or a
+  ## letter.  Word is the long form of the switch.
 
   if word == "filename":
     if value == "":
       return OpResult[string](kind: opMessage,
         message: "Missing filename. Use -f=filename")
     else:
-      filename = value
+      runArgs.filename = value
   elif word == "directory":
     if value == "":
       return OpResult[string](kind: opMessage,
         message: "Missing directory name. Use -d=directory")
     else:
-      directory = value
+      runArgs.directory = value
   elif word == "help":
-    help = true
+    runArgs.help = true
   elif word == "version":
-    version = true
+    runArgs.version = true
   elif word == "leaveTempDir":
-    leaveTempDir = true
+    runArgs.leaveTempDir = true
   else:
     return OpResult[string](kind: opMessage, message: "Unknown switch.")
 
 proc parseRunCommandLine*(argv: seq[string]): OpResult[RunArgs] =
-  ## Return the command line arguments or a message when there is a
-  ## problem.
+  ## Parse the command line arguments.
 
   var args: RunArgs
-  var help: bool = false
-  var version: bool = false
-  var leaveTempDir: bool = false
-  var filename: string
-  var directory: string
-
   var optParser = initOptParser(argv)
 
   # Iterate over all arguments passed to the command line.
@@ -376,14 +366,12 @@ proc parseRunCommandLine*(argv: seq[string]): OpResult[RunArgs] =
           let wordOp = letterToWord(letter)
           if wordOp.isMessage:
             return OpResult[RunArgs](kind: opMessage, message: wordOp.message)
-          let messageOp = handleWord($letter, wordOp.value, value,
-            help, version, leaveTempDir, filename, directory)
+          let messageOp = handleOption($letter, wordOp.value, value, args)
           if messageOp.isMessage:
             return OpResult[RunArgs](kind: opMessage, message: messageOp.message)
 
       of CmdLineKind.cmdLongOption:
-        let messageOp = handleWord(key, key, value, help, version, leaveTempDir,
-          filename, directory)
+        let messageOp = handleOption(key, key, value, args)
         if messageOp.isMessage:
           return OpResult[RunArgs](kind: opMessage, message: messageOp.message)
 
@@ -393,12 +381,6 @@ proc parseRunCommandLine*(argv: seq[string]): OpResult[RunArgs] =
 
       of CmdLineKind.cmdEnd:
         discard
-
-  args.help = help
-  args.version = version
-  args.filename = filename
-  args.directory = directory
-  args.leaveTempDir = leaveTempDir
 
   result = OpResult[RunArgs](kind: opValue, value: args)
 
@@ -413,7 +395,7 @@ proc parseRunFileLine*(line: string): OpResult[RunFileLine] =
   ## Parse a file command line.
   # The optional elements must be specified in order.
   #----------file hello.html [noLastEnding] [command] [nonZeroReturn]
-  let pattern = r"^[- ]*file[ ]+([^\s]+)(?:[ ]+(noLastEnding)){0,1}(?:[ ]+(command)){0,1}(?:[ ]+(nonZeroReturn)){0,1}[-\s]*$"
+  let pattern = r"^[-\s]*file[\s]+([^\s]+)(?:[\s]+(noLastEnding)){0,1}(?:[\s]+(command)){0,1}(?:[\s]+(nonZeroReturn)){0,1}[-\s]*$"
 
   let matchesO = matchPatternCached(line, pattern, 0)
   if not matchesO.isSome:
@@ -430,10 +412,10 @@ proc parseRunFileLine*(line: string): OpResult[RunFileLine] =
   let fileLine = newRunFileLine(filename, noLastEnding, command, nonZeroReturn)
   return OpResult[RunFileLine](kind: opValue, value: fileLine)
 
-proc parseCompareLine*(line: string): OpResult[CompareLine] =
+proc parseExpectedLine*(line: string): OpResult[CompareLine] =
   ## Parse an expected line.
   #----------expected stdout.expected == stdout
-  let pattern = r"^[- ]*expected[ ]+([^\s]+)[ ]*==[ ]*([^\s]+)[-\s]*$"
+  let pattern = r"^[-\s]*expected[\s]+([^\s]+)[\s]*==[\s]*([^\s]+)[-\s]*$"
   let matchesO = matchPatternCached(line, pattern, 0)
   if not matchesO.isSome:
     return OpResult[CompareLine](kind: opMessage,
@@ -593,7 +575,7 @@ expected: $1
 
     of "expected":
       # Remember the expected filenames to compare.
-      let expectedEqualOp = parseCompareLine(line)
+      let expectedEqualOp = parseExpectedLine(line)
       if expectedEqualOp.isMessage:
         return OpResult[DirAndFiles](kind: opMessage,
           message: expectedEqualOp.message)
@@ -691,6 +673,7 @@ func showTabsAndLineEndings*(str: string): string =
   result = $visibleRunes
 
 proc dup*(pattern: string, count: Natural): string =
+  ## Duplicate the pattern count times limited to 1024 characters.
   if count < 1:
     return
   let length = count * pattern.len
@@ -731,6 +714,7 @@ proc linesSideBySide*(expectedContent: string, gotContent: string): string =
   result = lines.join("\n")
 
 proc readFileContent(filename: string): OpResult[string] =
+  ## Read the file.
   try:
     let content = readFile(filename)
     result = OpResult[string](kind: opValue, value: content)
@@ -786,7 +770,8 @@ $2=got
 
 proc compareFileSets*(folder: string, compareLines: seq[CompareLine]):
     OpResult[RcAndMessage] =
-  ## Compare file sets and return rc=0 when they are all the same.
+  ## Compare file sets and show the differences. When they are all the
+  ## same return rc=0.
 
   var rc = 0
   for compareLine in compareLines:
@@ -811,8 +796,7 @@ proc compareFileSets*(folder: string, compareLines: seq[CompareLine]):
   result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
 
 proc runStfFilename*(filename: string): OpResult[RcAndMessage] =
-  ## Run the stf and report the result. Return rc=0 message="" when it
-  ## passes.
+  ## Run the stf file and leave the temp dir.
 
   # Create the temp folder and files inside it.
   let dirAndFilesOp = makeDirAndFiles(filename)
@@ -838,8 +822,7 @@ proc runStfFilename*(filename: string): OpResult[RcAndMessage] =
     result = rcAndMessageOp
 
 proc runFilename*(filename: string, leaveTempDir: bool): OpResult[RcAndMessage] =
-  ## Run the stf and report the result. Return rc=0 message="" when it
-  ## passes.
+  ## Run the stf file and optionally leave the temp dir.
 
   result = runStfFilename(filename)
   if not result.isMessage:
@@ -852,7 +835,7 @@ proc runFilename*(filename: string, leaveTempDir: bool): OpResult[RcAndMessage] 
         discard deleteFolder(tempDir)
 
 proc runFilename*(args: RunArgs): OpResult[RcAndMessage] =
-  ## Run a stf file.
+  ## Run a stf file specified by a RunArgs object.
   result = runFilename(args.filename, args.leaveTempDir)
 
 proc runDirectory*(dir: string, leaveTempDir: bool): OpResult[RcAndMessage] =

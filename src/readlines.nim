@@ -20,7 +20,7 @@ type
     lineNum: int     ## The current line number in the file starting at 1.
     pos: int         ## Current byte position in the buffer.
     charsRead: int   ## Number of bytes of chars in the buffer.
-    buffer: string   ## Memory pre-allocated for the buffer.
+    buffer: string   ## Memory allocated for the buffer.
     filename: string ## The optional stream's filename.
 
 proc getLineNum*(lineBuffer: LineBuffer): int =
@@ -56,7 +56,10 @@ proc newLineBuffer*(stream: Stream, maxLineLen: int = defaultMaxLineLen,
   lb.bufferSize = bufferSize
   lb.charsRead = 0
   lb.pos = 0
+
+  # Allocate the buffer.
   lb.buffer.setLen(bufferSize)
+
   lb.filename = filename
 
   result = some(lb)
