@@ -168,56 +168,71 @@ proc deleteFolder*(folder: string): string =
 proc getHelp(): string =
   ## Return the help message and usage text.
   result = """
+# Runner
+
 Run a single test file (stf) or run all stf files in a folder.
 
 The runner reads a stf file, creates multiple small files in a test
 folder, runs commands then verifies the correct output.
 
-# Usage
+## Usage
 
 runner [-h] [-v] [-l] [-f=filename] [-d=directory]
 
--h --help          Show this help message.
--v --version       Show the version number.
--l --leaveTempDir  Leave the temp folder.
--f --filename      Run the stf file.
--d --directory     Run the stf files in the directory.
+* -h --help          Show this help message.
+* -v --version       Show the version number.
+* -l --leaveTempDir  Leave the temp folder.
+* -f --filename      Run the stf file.
+* -d --directory     Run the stf files in the directory.
+
+## Processing Order
 
 The stf file processing order:
 
-* temp folder created with the name of the stf file with “. tempdir”
-  appended
+* temp folder created
 * files created in the tempdir
-* commands run and the return codes checked
-* file compares run
+* commands run
+* files compared
 * temp folder removed
 
-Runner returns 0 when all the tests pass. When running multiple it
-displays each test run and tells how many passed and failed.
+The temp folder is created in the same folder as the stf using the stf
+name with ".tempdir" append.
 
 Normally the temp folder is removed after running, the -l option
 leaves it. If the temp folder exists, it is deleted then recreated.
 
-# Stf File Format
+Runner returns 0 when all the tests pass. When running multiple it
+displays each test run and tells how many passed and failed.
 
-The Single Test File format is a text file made up of five
-single line commands.
+## Stf File Format
 
-1. comment and blank lines
-2. file
-3. endfile
-4. expected
-5. id
+The Single Test File format is a text file made up of single line
+commands:
+
+1. id
+2. comment and blank lines
+3. file
+4. endfile
+5. expected
 
 You can add spaces, tabs and dashes at the beginning and end of the
 command lines, except the id and comment lines.
 
-# Comment Command
+### Id Command
+
+The first line of the stf file identifies it as a stf file.  The id
+ends with the version number. Here is the id:
+
+~~~
+id stf file version 0.0.0
+~~~
+
+### Comment Command
 
 Comments start with # as the first character of the line. Blank lines
 are ignored.
 
-# File Command
+### File Command
 
 The file command is used to create a file. It begins with “file”
 followed by the filename then some optional attributes.  The general
@@ -227,26 +242,32 @@ form is:
 file filename [noLineEnding] [command] [nonZeroReturn]
 ~~~
 
-* filename - the name of the file to create. It is created in them temp
-  folder named after the stf file with “.tempdir” appended. No spaces
-  in the name.
+File Options:
 
-* command — the file is run. All files are created before running
-  commands. The working directory is the temp folder where all the
-  files are.  The commands are run in the order specified in the file.
+* *filename* - the name of the file to create.
 
-* noLineEnding — the file is created without an ending newline.
+The file is created in the temp folder. No spaces in the name.
 
-* nonZeroReturn — the command is expected to return a non-zero return
-  code when run.
+* *command* — marks this file to be run.
 
-# Endfile Command
+All files are created before the commands run. The file is run in the
+temp folder as the working directory. The commands are run in the
+order specified in the file.
+
+* *nonZeroReturn* — non-zero return code.
+
+Normally the runner fails when a command returns a non-zero return
+code.  With nonZeroReturn set, it fails when it returns zero.
+
+* *noLineEnding* — create the file without an ending newline.
+
+### Endfile Command
 
 The endfile command line follows a file line and it brackets the lines
 of the file to be created. All these lines go in the file, even ones
 that look like commands.
 
-# Expected Command
+### Expected Command
 
 The expected line compares files. You specify two files that should be
 equal.  The compares are run after running the commands.
@@ -255,33 +276,23 @@ equal.  The compares are run after running the commands.
 expected filename1 == filename2
 ~~~
 
-# Id Command
-
-The first line of the stf file identifies it as a stf file.  The id
-ends with the version number.
-
-~~~
-id stf file version 0.0.0
-~~~
-
-# Example Stf File
+## Example Stf File
 
 The following example stf file instructs the runner to create the
-files : cmd.sh, hello.html, hello.json, stdout-expected and
-stderr-expected.  It then runs cmd.sh looking for a 0 return code. Then
-it compares the files "stdout" with "stdout.expected" and "stderr"
-with "stderr.expected".
+files cmd.sh, hello.html, hello.json, stdout-expected and
+stderr-expected.  It then runs cmd.sh looking for a 0 return
+code. Then it compares the output files with their expected output.
 
 ~~~
 id stf file version 0.0.0
 # Hello World Example
 
 # Create the cmd.sh script.
------ file cmd.sh command -----
+--- file cmd.sh command
 ../bin/statictea -t=hello.html -s=hello.json >stdout 2>stderr
------ endfile -----
+--- endfile
 
-# Create the hello.html template file without an ending newline.
+# Create hello.html without an ending newline.
 --- file hello.html noLastEnding
 $$ nextline
 $$ hello {name}
@@ -296,7 +307,7 @@ $$ hello {name}
 hello world
 --- endfile
 
-# No standard error output is expected, create an empty file.
+# No standard error output is expected.
 --- file stderr.expected
 --- endfile
 

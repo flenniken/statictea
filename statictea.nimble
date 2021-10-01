@@ -652,3 +652,9 @@ task newstf, "\tCreate new stf as a starting point for a new test.":
       let cmd = "cp testfiles/template.stf $1" % filename
       echo cmd
       exec cmd
+
+task runhelp, "\tShow the runner help text with glow.":
+  exec "bin/runner -h | glow -"
+
+task helpme, "\tShow the statictea help text.":
+  exec "bin/statictea -h | less"
