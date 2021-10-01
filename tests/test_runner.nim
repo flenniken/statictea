@@ -161,18 +161,15 @@ proc testCompareFilesEqual(content1: string, content2: string): bool =
   createFile(f2, content2)
 
   result = true
-  let rcAndMessageOp = compareFiles(f1, f2)
-  if rcAndMessageOp.isValue:
-    if rcAndMessageOp.value.rc != 0:
-      echo "expected rc: 0, got: " & $rcAndMessageOp.value.rc
-      result = false
-    if rcAndMessageOp.value.message != "":
+  let stringOp = compareFiles(f1, f2)
+  if stringOp.isValue:
+    if stringOp.value != "":
       echo "expected message: '', got:"
-      echo rcAndMessageOp.value.message
+      echo stringOp.value
       echo "---"
       result = false
   else:
-    echo "got: " & rcAndMessageOp.message
+    echo "got: " & stringOp.message
     result = false
 
   discard tryRemoveFile(f1)
@@ -187,24 +184,22 @@ proc testCompareFilesDifferent(content1: string, content2: string, expected: str
   createFile(f2, content2)
 
   result = true
-  let rcAndMessageOp = compareFiles(f1, f2)
-  if rcAndMessageOp.isValue:
-    if rcAndMessageOp.value.rc == 0:
-      echo "expected non-zero rc, got: " & $rcAndMessageOp.value.rc
+  let stringOp = compareFiles(f1, f2)
+  if stringOp.isMessage:
+    # Unable to compare the files.
+    if expected != stringOp.message:
+      echo "Unable to compare the files."
+      echo "expected: " & expected
+      echo "     got: " & stringOp.message
       result = false
-    if expected != rcAndMessageOp.value.message:
+  else:
+    # Able to compare and differences in the value.
+    if expected != stringOp.value:
       echo "expected-----------"
       echo expected
       echo "     got-----------"
-      echo rcAndMessageOp.value.message
+      echo stringOp.value
       result = false
-  else:
-    if expected != rcAndMessageOp.message:
-      echo "expected: " & expected
-      echo "     got: " & rcAndMessageOp.message
-      result = false
-    else:
-      echo "same"
 
   discard tryRemoveFile(f1)
   discard tryRemoveFile(f2)
@@ -273,14 +268,11 @@ suite "runner.nim":
 
   test "createFolder":
     let tempDirName = "createFolderTest"
-    let rcAndMessageOp = createFolder(tempDirName)
+    let message = createFolder(tempDirName)
+    check message == ""
     check dirExists(tempDirName)
     removeDir(tempDirName)
     check dirExists(tempDirName) == false
-    check rcAndMessageOp.kind == opValue
-    let rcAndMessage = rcAndMessageOp.value
-    check rcAndMessage.rc == 0
-    check rcAndMessage.message == ""
 
   test "createFolder error":
     # Try to create a folder in a readonly folder.
@@ -296,13 +288,9 @@ suite "runner.nim":
 
     # Try to create a folder in the readonly folder.
     let dirName = joinPath(parentFolder, "createFolderTest")
-    let rcAndMessageOp = createFolder(dirName)
-
-    # Check for the expected error.
+    let message = createFolder(dirName)
+    check message != ""
     check dirExists(dirName) == false
-    check rcAndMessageOp.kind == opMessage
-    check rcAndMessageOp.message != ""
-    # echo rcAndMessageOp.message
 
     # Remove the temp dir.
     setFilePermissions(parentFolder, {fpUserRead, fpGroupRead, fpUserWrite})
@@ -813,12 +801,10 @@ $$ hello {name}"""
 
     let r = newRunFileLine(cmdFilename, command = true, nonZeroReturn = false)
     let runFileLines = @[r]
-    let rcAndMessageOp = runCommands(folder, runFileLines)
+    let rcOp = runCommands(folder, runFileLines)
 
-    check rcAndMessageOp.kind == opValue
-    let rcAndMessage = rcAndMessageOp.value
-    check rcAndMessage.rc == 0
-    check rcAndMessage.message == ""
+    check rcOp.kind == opValue
+    check rcOp.value == 0
 
     # The current working directory is set to the testfiles folder.
     # t.txt file should appear in the folder.
@@ -999,6 +985,6 @@ more
     check testCompareFilesDifferent(f1, f2, expected)
 
   test "compareFiles no file":
-    let rcAndMessageOp = compareFiles("f1", "f2")
-    check rcAndMessageOp.isMessage
-    check rcAndMessageOp.message == "cannot open: f1"
+    let rcOp = compareFiles("f1", "f2")
+    check rcOp.isMessage
+    check rcOp.message == "cannot open: f1"
