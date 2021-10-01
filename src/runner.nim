@@ -6,6 +6,7 @@ import std/osproc
 import std/options
 import std/parseopt
 import std/streams
+import std/unicode
 import readlines
 import regexes
 when isMainModule:
@@ -677,88 +678,93 @@ proc openLineBuffer*(filename: string): OpResult[LineBuffer] =
 
   result = OpResult[LineBuffer](kind: opValue, value: lbO.get())
 
-proc compareFiles*(filename1: string, filename2: string): OpResult[RcAndMessage] =
+func showTabsAndLineEndings*(str: string): string =
+  ## Return a new string with the tab and line endings visible.
+
+  var visibleRunes = newSeq[Rune]()
+  for rune in runes(str):
+    var num = uint(rune)
+    # Show a special glyph for tab, carrage return and line feed.
+    if num == 9 or num == 10 or num == 13:
+      num = 0x00002400 + num
+    visibleRunes.add(Rune(num))
+  result = $visibleRunes
+
+proc dup*(pattern: string, count: Natural): string =
+  if count < 1:
+    return
+  let length = count * pattern.len
+  if length > 1024:
+    return
+  result = newStringOfCap(length)
+  for ix in countUp(1, int(count)):
+    result.add(pattern)
+
+proc linesSideBySide*(expectedContent: string, gotContent: string): string =
+  ## Show the two sets of lines side by side.
+
+  if expectedContent == "" and gotContent == "":
+     return "both empty"
+
+  let expected = splitNewLines(expectedContent)
+  let got = splitNewLines(gotContent)
+
+  var show = showTabsAndLineEndings
+
+  var lines: seq[string]
+  for ix in countUp(0, max(expected.len, got.len)-1):
+    var eLine = ""
+    if ix < expected.len:
+      eLine = $expected[ix]
+
+    var gLine = ""
+    if ix < got.len:
+      gLine = $got[ix]
+
+    var lineNum = $(ix+1)
+    if eLine == gLine:
+      lines.add("$1     same: $2" % [dup(" ", lineNum.len), show(eLine)])
+    else:
+      lines.add("$1 expected: $2" % [lineNum, show(eLine)])
+      lines.add("$1      got: $2" % [lineNum, show(gLine)])
+
+  result = lines.join("\n")
+
+proc compareFiles*(expectedFilename: string, gotFilename: string): OpResult[RcAndMessage] =
   ## Compare two files. When they are equal, return rc=0 and
-  ## message="". When they differ return rc=1 and message = the first
-  ## line difference. On error return an error message.
+  ## message="". When they differ return rc=1 and message where the
+  ## message shows the differences. On error return an error message.
 
-  let content1 = readFile(filename1)
-  let content2 = readFile(filename2)
+  let expectedContent = readFile(expectedFilename)
+  let gotContent = readFile(gotFilename)
   var rc = 0
-  if content1 != content2:
-    let (_, basename1) = splitPath(filename1)
-    let (_, basename2) = splitPath(filename2)
+  var message: string
+  if expectedContent != gotContent:
+    let (_, expBasename) = splitPath(expectedFilename)
+    let (_, gotBasename) = splitPath(gotFilename)
 
-    echo "$1:" % [basename1]
-    if content1 == "":
-      echo "  empty"
+    if expectedContent == "" or gotContent == "":
+      if expectedContent == "":
+        message = """
+$1=empty
+$2=below
+""" % [expBasename, gotBasename]
+        message = message & gotContent
+      else:
+        message = """
+$1=below
+$2=empty
+""" % [expBasename, gotBasename]
+        message = message & expectedContent
     else:
-      echo content1
-    echo "$1:" % [basename2]
-    if content2 == "":
-      echo "  empty"
-    else:
-      echo content2
-    echo "_-_-_-"
+      message = """
+$1=expected
+$2=got
+""" % [expBasename, gotBasename]
+      message = message & linesSideBySide(expectedContent, gotContent)
     rc = 1
-  let rcAndMessage = RcAndMessage(rc: rc, message: "")
+  let rcAndMessage = RcAndMessage(rc: rc, message: message)
   return OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
-
-
-
-#   let size1 = getFileSize(filename1)
-#   let size2 = getFileSize(filename2)
-
-#   if size1 == 0 and size2 != 0 or
-#      size1 != 0 and size2 == 0:
-#     if size1 != 0:
-#       echo "show filename1"
-#     else:
-#       echo "show filename2"
-#     let rcAndMessage = RcAndMessage(rc: 1, message: "")
-#     return OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
-
-#   let op1 = openLineBuffer(filename1)
-#   if op1.isMessage:
-#     return OpResult[RcAndMessage](kind: opMessage,
-#       message: op1.message)
-#   var lb1 = op1.value
-#   defer:
-#     if lb1.getStream() != nil:
-#       lb1.getStream().close()
-
-#   let op2 = openLineBuffer(filename2)
-#   if op2.isMessage:
-#     return OpResult[RcAndMessage](kind: opMessage,
-#       message: op2.message)
-#   var lb2 = op2.value
-#   defer:
-#     if lb2.getStream() != nil:
-#       lb2.getStream().close()
-
-#   var rc = 0
-#   var message = ""
-#   if filename1 != filename2:
-#     while true:
-#       var line1 = readlines.readline(lb1)
-#       var line2 = readlines.readline(lb2)
-#       if line1 != line2:
-#         # The two files are different.
-#         let (_, f1) = splitPath(filename1)
-#         let (_, f2) = splitPath(filename2)
-#         rc = 1
-#         let width = max(f1.len, f2.len)
-#         message = """
-# Files differ on line $1.
-#   $2: $3
-#   $4: $5""" % [$(lb1.getLineNum()), align(f1, width), line1.stripLineEnding(), align(f2, width), line2.stripLineEnding()]
-#         break;
-
-#       if line1 == "":
-#         break # done
-
-#   let rcAndMessage = RcAndMessage(rc: rc, message: message)
-#   result = OpResult[RcAndMessage](kind: opValue, value: rcAndMessage)
 
 proc compareFileSets*(folder: string, compareLines: seq[CompareLine]):
     OpResult[RcAndMessage] =
@@ -774,12 +780,12 @@ proc compareFileSets*(folder: string, compareLines: seq[CompareLine]):
 
     if rcAndMessageOp.isMessage:
       # Show the error.
-     echo rcAndMessageOp.message
-     rc = 1
+      echo rcAndMessageOp.message
+      rc = 1
     else:
       let rcAndMessage = rcAndMessageOp.value
       if rcAndMessage.rc != 0:
-        # Show this first different line.
+        # Show the differences.
         echo rcAndMessage.message
         rc = 1
 

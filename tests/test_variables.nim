@@ -55,7 +55,6 @@ suite "variables.nim":
     check variables["h"].dictv.len == 0
     check variables["row"].intv == 0
     check variables["version"].kind == vkString
-    echo "emptyVariables done"
 
   test "getParentDict":
     var variables = emptyVariables()

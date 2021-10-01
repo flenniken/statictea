@@ -193,9 +193,10 @@ proc testCompareFilesDifferent(content1: string, content2: string, expected: str
       echo "expected non-zero rc, got: " & $rcAndMessageOp.value.rc
       result = false
     if expected != rcAndMessageOp.value.message:
-      var lines = splitLines(rcAndMessageOp.value.message)
-      var expectedLines = splitLines(expected)
-      discard showCompareLines(lines, expectedLines)
+      echo "expected:"
+      echo expected
+      echo "     got:"
+      echo rcAndMessageOp.value.message
       result = false
   else:
     if expected != rcAndMessageOp.message:
@@ -208,6 +209,19 @@ proc testCompareFilesDifferent(content1: string, content2: string, expected: str
   discard tryRemoveFile(f1)
   discard tryRemoveFile(f2)
 
+proc testLinesSideBySide(content1: string, content2: string,
+    expected: string): bool =
+  ## Test linesSideBySide.
+
+  let str = linesSideBySide(content1, content2)
+  if str != expected:
+    echo "got:"
+    echo str
+    echo "expected:"
+    echo expected
+    result = false
+  else:
+    result = true
 
 suite "runner.nim":
 
@@ -797,6 +811,75 @@ $$ hello {name}"""
     discard tryRemoveFile(tPath)
     discard tryRemoveFile(path)
 
+  test "showTabsAndLineEndings":
+    check showTabsAndLineEndings("asdf") == "asdf"
+    check showTabsAndLineEndings("asdf\n") == "asdf␊"
+    check showTabsAndLineEndings("asdf\r\n") == "asdf␍␊"
+    check showTabsAndLineEndings("	asdf") == "␉asdf"
+    check showTabsAndLineEndings(" 	 asdf") == " ␉ asdf"
+
+  test "showTabsAndLineEndings others":
+    check showTabsAndLineEndings("abc\0def") == "abc\x00def"
+    check showTabsAndLineEndings("abc\1def") == "abc\x01def"
+    check showTabsAndLineEndings("abc\2def") == "abc\x02def"
+    check showTabsAndLineEndings("abc\3def") == "abc\x03def"
+    check showTabsAndLineEndings("abc\4def") == "abc\x04def"
+    check showTabsAndLineEndings("abc\5def") == "abc\x05def"
+    check showTabsAndLineEndings("abc\6def") == "abc\x06def"
+    check showTabsAndLineEndings("abc\7def") == "abc\x07def"
+
+  test "linesSideBySide empty":
+    let content1 = ""
+    let content2 = ""
+    let expected = "both empty"
+    check testLinesSideBySide(content1, content2, expected)
+
+  test "linesSideBySide1":
+    let content1 = """
+my expected line
+"""
+    let content2 = """
+what I got
+"""
+    let expected = """
+1 expected: my expected line␊
+1      got: what I got␊"""
+    check testLinesSideBySide(content1, content2, expected)
+
+  test "linesSideBySide2":
+    let content1 = """
+my expected line
+my second line
+"""
+    let content2 = """
+my expected line
+what I got
+"""
+    let expected = """
+      same: my expected line␊
+2 expected: my second line␊
+2      got: what I got␊"""
+    check testLinesSideBySide(content1, content2, expected)
+
+  test "linesSideBySide3":
+    let content1 = """
+my expected line
+middle
+my last line
+"""
+    let content2 = """
+my expected line
+  the center
+my last line
+"""
+    let expected = """
+      same: my expected line␊
+2 expected: middle␊
+2      got:   the center␊
+      same: my last line␊"""
+    check testLinesSideBySide(content1, content2, expected)
+
+
   test "compareFiles":
     check testCompareFilesEqual("test file", "test file")
     check testCompareFilesEqual("", "")
@@ -821,19 +904,13 @@ test file
 hello there
 """
     let expected = """
-Files differ on line 1:
-f1.txt: (test file)
-f2.txt: (hello there)
-"""
+f1.txt=expected
+f2.txt=got
+1 expected: test file␊
+1      got: hello there␊"""
     check testCompareFilesDifferent(f1, f2, expected)
 
   test "compareFiles different 2":
-    let expected = """
-Files differ on line 2:
-f1.txt: (different line)
-f2.txt: (wow we)
-"""
-
     let f1 = """
 test line
 different line
@@ -842,21 +919,62 @@ different line
 test line
 wow we
 """
+    let expected = """
+f1.txt=expected
+f2.txt=got
+      same: test line␊
+2 expected: different line␊
+2      got: wow we␊"""
     check testCompareFilesDifferent(f1, f2, expected)
 
   test "compareFiles different 3":
-    let expected = """
-Files differ on line 2:
-f1.txt: (third line)
-f2.txt: (something else)
-"""
-
     let f1 = """
 test line
 third line
 more
 """
     let f2 = """
+test line
+something else
+more
+"""
+    let expected = """
+f1.txt=expected
+f2.txt=got
+      same: test line␊
+2 expected: third line   ␊
+2      got: something else␊
+      same: more␊"""
+    check testCompareFilesDifferent(f1, f2, expected)
+
+  test "compareFiles different 4":
+    let f1 = """
+"""
+    let f2 = """
+test line
+something else
+more
+"""
+    let expected = """
+f1.txt=empty
+f2.txt=below
+test line
+something else
+more
+"""
+    check testCompareFilesDifferent(f1, f2, expected)
+
+  test "compareFiles different 5":
+    let f1 = """
+test line
+something else
+more
+"""
+    let f2 = """
+"""
+    let expected = """
+f1.txt=below
+f2.txt=empty
 test line
 something else
 more

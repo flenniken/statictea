@@ -1,6 +1,6 @@
 id stf file version 0.0.0
 
-## Test the nextline readme example.
+## The nextline readme example.
 
 --- file cmd.sh command
 $statictearoot/bin/statictea -s=nextline.json -t=nextline.html >stdout 2>stderr

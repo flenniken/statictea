@@ -1,6 +1,6 @@
 id stf file version 0.0.0
 
-## Test the comment readme example.
+## The comment readme example.
 
 --- file cmd.sh command
 $statictearoot/bin/statictea -t=hello.html >stdout 2>stderr

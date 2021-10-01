@@ -104,6 +104,20 @@ proc readline*(lb: var LineBuffer): string =
 
   result = line
 
+func splitNewLines*(content: string): seq[string] =
+  ## Split lines and keep the line endings. Works with \n and \r\n
+  ## type endings.
+  if content.len == 0:
+    return
+  var start = 0
+  for pos in 0 ..< content.len:
+    let ch = content[pos]
+    if ch == '\n':
+      result.add(content[start .. pos])
+      start = pos+1
+  if start < content.len:
+    result.add(content[start ..< content.len])
+
 when defined(test):
   proc readXLines*(lb: var LineBuffer, maxLines: Natural = high(Natural)): seq[string] =
     ## Read lines from a LineBuffer returning line endings but don't

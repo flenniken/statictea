@@ -1,6 +1,6 @@
 id stf file version 0.0.0
 
-## Test the block readme example.
+## The block readme example.
 
 --- file cmd.sh command
 $statictearoot/bin/statictea -s=block.json -t=block.html >stdout 2>stderr

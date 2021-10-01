@@ -1,6 +1,6 @@
 id stf file version 0.0.0
 
-## Test the message when the replacement variable is missing.
+## Replacement variable is missing.
 
 --- file cmd.sh command nonZeroReturn
 $statictearoot/bin/statictea -t=template.md >stdout 2>stderr

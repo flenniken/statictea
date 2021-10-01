@@ -1,6 +1,6 @@
 id stf file version 0.0.0
 
-## Test the first replace readme example.
+## The first replace readme example.
 
 --- file cmd.sh command
 $statictearoot/bin/statictea -j=replace.json -t=replace.html >stdout 2>stderr

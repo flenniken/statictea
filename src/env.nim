@@ -65,11 +65,13 @@ proc close*(env: var Env) =
     env.outStream.close()
     env.outStream = nil
   if env.closeTemplateStream:
-    env.templateStream.close()
-    env.templateStream = nil
+    if env.templateStream != nil:
+      env.templateStream.close()
+      env.templateStream = nil
   if env.closeResultStream:
-    env.resultStream.close()
-    env.resultStream = nil
+    if env.resultStream != nil:
+      env.resultStream.close()
+      env.resultStream = nil
   if env.logFile != nil:
     env.logFile.close()
     env.logFile = nil
@@ -300,20 +302,6 @@ when defined(test):
     var file = open(filename, fmWrite)
     file.write(content)
     file.close()
-
-  proc splitNewLines*(content: string): seq[string] =
-    ## Split lines and keep the line endings. Works with \n and \r\n
-    ## type endings.
-    if content.len == 0:
-      return
-    var start = 0
-    for pos in 0 ..< content.len:
-      let ch = content[pos]
-      if ch == '\n':
-        result.add(content[start .. pos])
-        start = pos+1
-    if start < content.len:
-      result.add(content[start ..< content.len])
 
   proc echoNewline*(str: string) =
     ## Print a line to the screen and display the line endings as \n
