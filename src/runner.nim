@@ -7,6 +7,7 @@ import std/options
 import std/parseopt
 import std/streams
 import std/unicode
+import strformat
 import readlines
 import regexes
 when isMainModule:
@@ -48,15 +49,14 @@ type
     filename2*: string
 
   DirAndFiles* = object
-    ## DirAndFiles holds the result of the makeDirAndFiles
-    ## procedure.
+    ## DirAndFiles holds the file and compare lines of the stf file.
     compareLines*: seq[CompareLine]
     runFileLines*: seq[RunFileLine]
 
   OpResultKind* = enum
     ## The kind of OpResult object, either a value or message.
-    opValue,
-    opMessage
+    opValueKind,
+    opMessageKind
 
   OpResult*[T] = object
     ## Contains either a value or a message string. The default is a
@@ -64,26 +64,26 @@ type
     ## nothing, you return a message that tells why you cannot return
     ## the value.
     case kind*: OpResultKind
-      of opValue:
+      of opValueKind:
         value*: T
-      of opMessage:
+      of opMessageKind:
         message*: string
+
+func isMessage*(opResult: OpResult): bool =
+  ## Return true when the OpResult object contains a message.
+  if opResult.kind == opMessageKind:
+    result = true
+
+func isValue*(opResult: OpResult): bool =
+  ## Return true when the OpResult object contains a value.
+  if opResult.kind == opValueKind:
+    result = true
 
 func newRunArgs*(help = false, version = false, leaveTempDir = false,
     filename = "", directory = ""): RunArgs =
   ## Create a new RunArgs object.
   result = RunArgs(help: help, version: version,
     leaveTempDir: leaveTempDir, filename: filename, directory: directory)
-
-func isMessage*(opResult: OpResult): bool =
-  ## Return true when the OpResult object contains a message.
-  if opResult.kind == opMessage:
-    result = true
-
-func isValue*(opResult: OpResult): bool =
-  ## Return true when the OpResult object contains a value.
-  if opResult.kind == opValue:
-    result = true
 
 func newRunFileLine*(filename: string, noLastEnding = false, command = false,
     nonZeroReturn = false): RunFileLine =
@@ -103,10 +103,10 @@ func newDirAndFiles*(compareLines: seq[CompareLine],
 
 func `$`*(opResult: OpResult): string =
   ## Return a string representation of an OpResult object.
-  if opResult.kind == opValue:
-    result = "opValue: $1" % $opResult.value
+  if opResult.kind == opValueKind:
+    result = "opValueKind: $1" % $opResult.value
   else:
-    result = "opMessage: $1" % opResult.message
+    result = "opMessageKind: $1" % opResult.message
 
 func `$`*(r: CompareLine): string =
   ## Return a string representation of a CompareLine object.
@@ -117,53 +117,45 @@ func `$`*(r: RunFileLine): string =
 
   var noLastEnding: string
   if r.noLastEnding:
-    noLastEnding = "noLastEnding"
-  else:
-    noLastEnding = ""
+    noLastEnding = " noLastEnding"
 
   var command: string
   if r.command:
-    command = "command"
-  else:
-    command = ""
+    command = " command"
 
   var nonZeroReturn: string
   if r.nonZeroReturn:
-    nonZeroReturn = "nonZeroReturn"
-  else:
-    nonZeroReturn = ""
+    nonZeroReturn = " nonZeroReturn"
 
-  result = "file $1 $2 $3 $4" % [r.filename, noLastEnding, command, nonZeroReturn]
+  result = fmt"file {r.filename}{noLastEnding}{command}{nonZeroReturn}"
 
 proc writeErr*(message: string) =
   ## Write a message to stderr.
   stderr.writeLine(message)
 
-proc writeOut*(message: string) =
-  ## Write a message to stdout.
-  stdout.writeLine(message)
+# proc writeOut*(message: string) =
+#   ## Write a message to stdout.
+#   stdout.writeLine(message)
 
 func stripLineEnding(line: string): string =
   ## Strip line endings from a string.
   result = line.strip(chars={'\n', '\r'}, trailing = true)
 
 proc createFolder*(folder: string): string =
-  ## Create a folder with the given name and return "". When there is
-  ## an error return message telling why.
+  ## Create a folder with the given name. When the folder cannot be
+  ## created return a message telling why, else return "".
   try:
     createDir(folder)
   except OSError:
     result = getCurrentExceptionMsg()
-    # result = "OS error when trying to create the directory: '$1'" % folder
 
 proc deleteFolder*(folder: string): string =
-  ## Delete the folder with the given name and return "". When there is
-  ## an error return message telling why.
+  ## Delete a folder with the given name. When the folder cannot be
+  ## deleted return a message telling why, else return "".
   try:
     removeDir(folder)
   except OSError:
     result = getCurrentExceptionMsg()
-    # result = "OS error when trying to remove the directory: '$1'" % folder
 
 proc getHelp(): string =
   ## Return the help message and usage text.
@@ -318,11 +310,12 @@ hello world
 """
 
 func letterToWord(letter: char): OpResult[string] =
-  for tup in switches:
-    if tup[0] == letter:
-      return OpResult[string](kind: opValue, value: tup[1])
+  ## Convert the one letter switch to its long form.
+  for (ch, word) in switches:
+    if ch == letter:
+      return OpResult[string](kind: opValueKind, value: word)
   let message = "Unknown switch: $1" % $letter
-  result = OpResult[string](kind: opMessage, message: message)
+  result = OpResult[string](kind: opMessageKind, message: message)
 
 proc handleOption(switch: string, word: string, value: string,
     runArgs: var RunArgs): OpResult[string] =
@@ -332,13 +325,13 @@ proc handleOption(switch: string, word: string, value: string,
 
   if word == "filename":
     if value == "":
-      return OpResult[string](kind: opMessage,
+      return OpResult[string](kind: opMessageKind,
         message: "Missing filename. Use -f=filename")
     else:
       runArgs.filename = value
   elif word == "directory":
     if value == "":
-      return OpResult[string](kind: opMessage,
+      return OpResult[string](kind: opMessageKind,
         message: "Missing directory name. Use -d=directory")
     else:
       runArgs.directory = value
@@ -349,7 +342,7 @@ proc handleOption(switch: string, word: string, value: string,
   elif word == "leaveTempDir":
     runArgs.leaveTempDir = true
   else:
-    return OpResult[string](kind: opMessage, message: "Unknown switch.")
+    return OpResult[string](kind: opMessageKind, message: "Unknown switch.")
 
 proc parseRunCommandLine*(argv: seq[string]): OpResult[RunArgs] =
   ## Parse the command line arguments.
@@ -365,41 +358,41 @@ proc parseRunCommandLine*(argv: seq[string]): OpResult[RunArgs] =
           let letter = key[ix]
           let wordOp = letterToWord(letter)
           if wordOp.isMessage:
-            return OpResult[RunArgs](kind: opMessage, message: wordOp.message)
+            return OpResult[RunArgs](kind: opMessageKind, message: wordOp.message)
           let messageOp = handleOption($letter, wordOp.value, value, args)
           if messageOp.isMessage:
-            return OpResult[RunArgs](kind: opMessage, message: messageOp.message)
+            return OpResult[RunArgs](kind: opMessageKind, message: messageOp.message)
 
       of CmdLineKind.cmdLongOption:
         let messageOp = handleOption(key, key, value, args)
         if messageOp.isMessage:
-          return OpResult[RunArgs](kind: opMessage, message: messageOp.message)
+          return OpResult[RunArgs](kind: opMessageKind, message: messageOp.message)
 
       of CmdLineKind.cmdArgument:
-        return OpResult[RunArgs](kind: opMessage,
+        return OpResult[RunArgs](kind: opMessageKind,
           message: "Unknown switch: $1" % [key])
 
       of CmdLineKind.cmdEnd:
         discard
 
-  result = OpResult[RunArgs](kind: opValue, value: args)
+  result = OpResult[RunArgs](kind: opValueKind, value: args)
 
-func makeBool(item: string): bool =
-  ## Return true when the string is not empty, else return false.
-  if item != "":
-    result = true
-  else:
+func makeBool*(item: string): bool =
+  ## Return false when the string is empty, else return true.
+  if item == "":
     result = false
+  else:
+    result = true
 
 proc parseRunFileLine*(line: string): OpResult[RunFileLine] =
   ## Parse a file command line.
-  # The optional elements must be specified in order.
-  #----------file hello.html [noLastEnding] [command] [nonZeroReturn]
-  let pattern = r"^[-\s]*file[\s]+([^\s]+)(?:[\s]+(noLastEnding)){0,1}(?:[\s]+(command)){0,1}(?:[\s]+(nonZeroReturn)){0,1}[-\s]*$"
+  # todo: The optional elements must be specified in order.
+  # --- file hello.html noLastEnding command nonZeroReturn
+  let pattern = r"^[-\s]*file[-\s]+([^-\s]+)(?:[-\s]+(noLastEnding)){0,1}(?:[-\s]+(command)){0,1}(?:[-\s]+(nonZeroReturn)){0,1}[-\s]*$"
 
   let matchesO = matchPatternCached(line, pattern, 0)
   if not matchesO.isSome:
-    return OpResult[RunFileLine](kind: opMessage,
+    return OpResult[RunFileLine](kind: opMessageKind,
       message: "Invalid file line: $1" % [line])
 
   let matches = matchesO.get()
@@ -410,21 +403,21 @@ proc parseRunFileLine*(line: string): OpResult[RunFileLine] =
   let nonZeroReturn = makeBool(groups[3])
 
   let fileLine = newRunFileLine(filename, noLastEnding, command, nonZeroReturn)
-  return OpResult[RunFileLine](kind: opValue, value: fileLine)
+  return OpResult[RunFileLine](kind: opValueKind, value: fileLine)
 
 proc parseExpectedLine*(line: string): OpResult[CompareLine] =
   ## Parse an expected line.
-  #----------expected stdout.expected == stdout
-  let pattern = r"^[-\s]*expected[\s]+([^\s]+)[\s]*==[\s]*([^\s]+)[-\s]*$"
+  #--- expected stdout.expected == stdout
+  let pattern = r"^[-\s]*expected[-\s]+([^-\s]+)[-\s]*==[-\s]*([^-\s]+)[-\s]*$"
   let matchesO = matchPatternCached(line, pattern, 0)
   if not matchesO.isSome:
-    return OpResult[CompareLine](kind: opMessage,
+    return OpResult[CompareLine](kind: opMessageKind,
       message: "Invalid expected line: $1" % [line])
 
   let matches = matchesO.get()
   let (filename1, filename2) = matches.get2Groups()
   let expectedEqual = newCompareLine(filename1, filename2)
-  return OpResult[CompareLine](kind: opValue, value: expectedEqual)
+  return OpResult[CompareLine](kind: opValueKind, value: expectedEqual)
 
 proc openNewFile*(folder: string, filename: string): OpResult[File] =
   ## Create a new file in the given folder and return an open File
@@ -432,21 +425,22 @@ proc openNewFile*(folder: string, filename: string): OpResult[File] =
 
   var path = joinPath(folder, filename)
   if fileExists(path):
-    return OpResult[File](kind: opMessage,
+    return OpResult[File](kind: opMessageKind,
       message: "File already exists: $1" % [path])
 
   var file: File
   if not open(file, path, fmWrite):
     let message = "Unable to create the file: $1" % [path]
-    return OpResult[File](kind: opMessage, message: message)
+    return OpResult[File](kind: opMessageKind, message: message)
 
-  result = OpResult[File](kind: opValue, value: file)
+  result = OpResult[File](kind: opValueKind, value: file)
 
 proc getCmd*(line: string): string =
-  ## Return the type of line, either: #, "", id, file, expected or
-  ## endfile.
+  ## Return the type of line, either: #, "", id, file, expected,
+  ## endfile or other.
   if line.startswith("#"):
     result = "#"
+  # todo ignore pure whitespace lines.
   elif line == "\n":
     result = ""
   elif line == "\r\n":
@@ -462,14 +456,13 @@ proc getCmd*(line: string): string =
 
 proc createSectionFile(lb: var LineBuffer, folder: string,
     runFileLine: RunFileLine): string =
-  ## Create a file in the given folder by reading lines in the line
-  ## buffer until "endfile" is found. Return a message when the file
-  ## cannot be created.
+  ## Create a file from lines in the stf file starting at the current
+  ## position until the endfile line is found.  Return a message when
+  ## the file cannot be created, else return "".
 
-  # Create a file in the given folder.
+  # Open a new file in the given folder.
   let filename = runFileLine.filename
   let noLastEnding = runFileLine.noLastEnding
-
   var fileOp = openNewFile(folder, filename)
   if fileOp.isMessage:
     return fileOp.message
@@ -482,6 +475,7 @@ proc createSectionFile(lb: var LineBuffer, folder: string,
   while true:
     line = readlines.readline(lb)
     if line == "":
+      # The end file was missing. Close and delete the new file.
       file.close()
       let path = joinPath(folder, filename)
       discard tryRemoveFile(path)
@@ -501,6 +495,7 @@ proc createSectionFile(lb: var LineBuffer, folder: string,
     previousLine = previousLine.stripLineEnding()
   file.write(previousLine)
 
+  # Close the new file.
   file.close()
 
 proc makeDirAndFiles*(filename: string): OpResult[DirAndFiles] =
@@ -510,31 +505,32 @@ proc makeDirAndFiles*(filename: string): OpResult[DirAndFiles] =
   var compareLines = newSeq[CompareLine]()
   var runFileLines = newSeq[RunFileLine]()
 
+  # Make sure the file exists.
   if not fileExists(filename):
-    return OpResult[DirAndFiles](kind: opMessage,
+    return OpResult[DirAndFiles](kind: opMessageKind,
       message: "File not found: '$1'." % [filename])
 
   # Open the file for reading.
   let stream = newFileStream(filename, fmRead)
   if stream == nil:
-    return OpResult[DirAndFiles](kind: opMessage,
+    return OpResult[DirAndFiles](kind: opMessageKind,
       message: "Unable to open file: '$1'." % [filename])
   defer:
     stream.close()
 
-  # Create a temp folder next to the file.
+  # Create a temp folder next to the stf file. Remove it first if it
+  # already exists.
   let tempDirName = filename & ".tempdir"
   if dirExists(tempDirName):
     removeDir(tempDirName)
-
   let message = createFolder(tempDirName)
   if message != "":
-    return OpResult[DirAndFiles](kind: opMessage, message: message)
+    return OpResult[DirAndFiles](kind: opMessageKind, message: message)
 
   # Allocate a buffer for reading lines.
   var lineBufferO = newLineBuffer(stream, filename = filename)
   if not lineBufferO.isSome():
-    return OpResult[DirAndFiles](kind: opMessage,
+    return OpResult[DirAndFiles](kind: opMessageKind,
       message: "Unable to allocate a line buffer.")
   var lb = lineBufferO.get()
 
@@ -542,16 +538,16 @@ proc makeDirAndFiles*(filename: string): OpResult[DirAndFiles] =
   # and version number.
   var line = readlines.readline(lb)
   if line == "":
-    return OpResult[DirAndFiles](kind: opMessage,
+    return OpResult[DirAndFiles](kind: opMessageKind,
       message: "Empty file: '$1'." % filename)
   if not line.startsWith(runnerId):
     let message = """Invalid stf file first line:
 expected: $1
      got: $2""" % [runnerId, line]
-    return OpResult[DirAndFiles](kind: opMessage, message: message)
+    return OpResult[DirAndFiles](kind: opMessageKind, message: message)
 
   while true:
-    # Read a line if we don't already have it.
+    # Read a line from the stf file.
     line = readlines.readline(lb)
     if line == "":
       break # No more lines.
@@ -560,50 +556,35 @@ expected: $1
     of "#", "":
       discard
     of "file":
+      # Create a new file.
       let fileLineOp = parseRunFileLine(line)
       if fileLineOp.isMessage:
-        return OpResult[DirAndFiles](kind: opMessage,
+        return OpResult[DirAndFiles](kind: opMessageKind,
           message: fileLineOp.message)
       let fileLine = fileLineOp.value
       runFileLines.add(fileLine)
       let message = createSectionFile(lb, tempDirName, fileLine)
       if message != "":
-        return OpResult[DirAndFiles](kind: opMessage, message: message)
+        return OpResult[DirAndFiles](kind: opMessageKind, message: message)
 
     of "expected":
       # Remember the expected filenames to compare.
       let expectedEqualOp = parseExpectedLine(line)
       if expectedEqualOp.isMessage:
-        return OpResult[DirAndFiles](kind: opMessage,
+        return OpResult[DirAndFiles](kind: opMessageKind,
           message: expectedEqualOp.message)
       compareLines.add(expectedEqualOp.value)
     else:
       let message = "Unknown line: '$1'." % stripLineEnding(line)
-      return OpResult[DirAndFiles](kind: opMessage, message: message)
+      return OpResult[DirAndFiles](kind: opMessageKind, message: message)
 
   let dirAndFiles = newDirAndFiles(compareLines, runFileLines)
-  result = OpResult[DirAndFiles](kind: opValue, value: dirAndFiles)
-
-proc runCommand*(folder: string, filename: string): int =
-  ## Run a command file and return its return code.
-
-  let oldDir = getCurrentDir()
-
-  # Set the working directory to the folder.
-  assert(dirExists(folder))
-  setCurrentDir(folder)
-
-  # Make the file executable.
-  setFilePermissions(filename, {fpUserExec, fpUserRead, fpUserWrite})
-
-  # Run the file and return the return code.
-  result = execCmd(filename)
-
-  setCurrentDir(oldDir)
+  result = OpResult[DirAndFiles](kind: opValueKind, value: dirAndFiles)
 
 proc runCommands*(folder: string, runFileLines: seq[RunFileLine]):
     OpResult[Rc] =
-  ## Run the commands.
+  ## Run the command files and return 0 when they all returned their
+  ## expected return code.
 
   # Set the working directory to the folder.
   assert(dirExists(folder))
@@ -622,6 +603,7 @@ proc runCommands*(folder: string, runFileLines: seq[RunFileLine]):
       let localFile = "./" & runFileLine.filename
       let cmdRc = execCmd(localFile)
 
+      # Check the return code.
       if runFileLine.nonZeroReturn:
         if cmdRc == 0:
           echo "$1 generated an unexpected return code of 0." % runFileLine.filename
@@ -635,26 +617,7 @@ proc runCommands*(folder: string, runFileLines: seq[RunFileLine]):
 
   setCurrentDir(oldDir)
 
-  result = OpResult[Rc](kind: opValue, value: rc)
-
-proc openLineBuffer*(filename: string): OpResult[LineBuffer] =
-  ## Open a file for reading lines. Return a LineBuffer object.  Close
-  ## the line buffer stream when done.
-
-  # Open the file for reading.
-  let stream = newFileStream(filename, fmRead)
-  if stream == nil:
-    return OpResult[LineBuffer](kind: opMessage,
-      message: "Unable to open file: '$1'." % [filename])
-
-  # Allocate a buffer for reading lines.
-  var lbO = newLineBuffer(stream, filename = filename)
-  if not lbO.isSome():
-    stream.close()
-    return OpResult[LineBuffer](kind: opMessage,
-      message: "Unable to allocate a line buffer.")
-
-  result = OpResult[LineBuffer](kind: opValue, value: lbO.get())
+  result = OpResult[Rc](kind: opValueKind, value: rc)
 
 func showTabsAndLineEndings*(str: string): string =
   ## Return a new string with the tab and line endings visible.
@@ -669,7 +632,8 @@ func showTabsAndLineEndings*(str: string): string =
   result = $visibleRunes
 
 proc dup*(pattern: string, count: Natural): string =
-  ## Duplicate the pattern count times limited to 1024 characters.
+  ## Duplicate the pattern count times. Return "" when the result
+  ## would be longer than 1024 characters.
   if count < 1:
     return
   let length = count * pattern.len
@@ -710,30 +674,33 @@ proc linesSideBySide*(expectedContent: string, gotContent: string): string =
   result = lines.join("\n")
 
 proc readFileContent(filename: string): OpResult[string] =
-  ## Read the file.
+  ## Read the file and return the content as a string.
   try:
     let content = readFile(filename)
-    result = OpResult[string](kind: opValue, value: content)
+    result = OpResult[string](kind: opValueKind, value: content)
   except:
-    return OpResult[string](kind: opMessage,
+    return OpResult[string](kind: opMessageKind,
       message: getCurrentExceptionMsg())
 
 proc compareFiles*(expectedFilename: string, gotFilename: string): OpResult[string] =
   ## Compare two files and return the differences. When they are equal
   ## return "".
 
+  # Read the "expected" file.
   let expectedContentOp = readFileContent(expectedFilename)
   if expectedContentOp.isMessage:
-    return OpResult[string](kind: opMessage,
+    return OpResult[string](kind: opMessageKind,
       message: expectedContentOp.message)
   let expectedContent = expectedContentOp.value
 
+  # Read the "got" file.
   let gotContentOp = readFileContent(gotFilename)
   if gotContentOp.isMessage:
-    return OpResult[string](kind: opMessage,
+    return OpResult[string](kind: opMessageKind,
       message: gotContentOp.message)
   let gotContent = gotContentOp.value
 
+  # If the files are different, show the differences.
   var message: string
   if expectedContent != gotContent:
     let (_, expBasename) = splitPath(expectedFilename)
@@ -758,12 +725,12 @@ $1=expected
 $2=got
 """ % [expBasename, gotBasename]
       message = message & linesSideBySide(expectedContent, gotContent)
-  return OpResult[string](kind: opValue, value: message)
+  return OpResult[string](kind: opValueKind, value: message)
 
 proc compareFileSets*(folder: string, compareLines: seq[CompareLine]):
     OpResult[Rc] =
-  ## Compare file sets and show the differences. When they are all the
-  ## same return rc=0.
+  ## Compare multiple pairs of files and show the differences. When
+  ## they are all the same return 0.
 
   var rc = 0
   for compareLine in compareLines:
@@ -778,22 +745,22 @@ proc compareFileSets*(folder: string, compareLines: seq[CompareLine]):
       echo stringOp.message
       rc = 1
     else:
+      # Show the differences, if any.
       let differences = stringOp.value
       if differences != "":
-        # Show the differences.
         echo differences
         rc = 1
 
-  result = OpResult[Rc](kind: opValue, value: rc)
+  result = OpResult[Rc](kind: opValueKind, value: rc)
 
 proc runStfFilename*(filename: string): OpResult[Rc] =
-  ## Run the stf file and leave the temp dir. Rc = 0 means the tests
-  ## passed.
+  ## Run the stf file and leave the temp dir. Return 0 when all the
+  ## tests passed.
 
   # Create the temp folder and files inside it.
   let dirAndFilesOp = makeDirAndFiles(filename)
   if dirAndFilesOp.isMessage:
-    return OpResult[Rc](kind: opMessage, message: dirAndFilesOp.message)
+    return OpResult[Rc](kind: opMessageKind, message: dirAndFilesOp.message)
   let dirAndFiles = dirAndFilesOp.value
 
   let folder = filename & ".tempdir"
@@ -812,34 +779,31 @@ proc runStfFilename*(filename: string): OpResult[Rc] =
     result = rcOp
 
 proc runFilename*(filename: string, leaveTempDir: bool): OpResult[Rc] =
-  ## Run the stf file and show whether it passed or not. Optionally
-  ## leave the temp dir.
+  ## Run the stf file and optionally leave the temp dir. Return 0 when
+  ## all the tests pass.
 
   result = runStfFilename(filename)
-  if result.isMessage:
-    # Test failed.
-    discard
-  else:
-    # Test passed.
 
-    # Remove the temp folder unless leave is specified.
-    let tempDir = filename & ".tempdir"
-    if leaveTempDir:
-      echo "Leaving temp dir: " & tempDir
-    else:
-      if fileExists(filename):
-        discard deleteFolder(tempDir)
+  # Remove the temp folder unless leave is specified.
+  let tempDir = filename & ".tempdir"
+  if leaveTempDir:
+    echo "Leaving temp dir: " & tempDir
+  else:
+    if fileExists(filename):
+      discard deleteFolder(tempDir)
 
 proc runFilename*(args: RunArgs): OpResult[Rc] =
-  ## Run a stf file specified by a RunArgs object.
+  ## Run a stf file specified by a RunArgs object. Return 0 when it
+  ## passes.
   result = runFilename(args.filename, args.leaveTempDir)
 
 proc runDirectory*(dir: string, leaveTempDir: bool): OpResult[Rc] =
-  ## Run all the stf files in the specified directory.
+  ## Run all the stf files in the specified directory. Return 0 when
+  ## they all pass. Show progess and count of passed and failed.
 
   if not dirExists(dir):
     let message = "The dir does not exist: " & dir
-    return OpResult[Rc](kind: opMessage, message: message)
+    return OpResult[Rc](kind: opMessageKind, message: message)
 
   var count = 0
   var passedCount = 0
@@ -859,31 +823,32 @@ proc runDirectory*(dir: string, leaveTempDir: bool): OpResult[Rc] =
 
   echo "$1 passed, $2 failed\n" % [
     $passedCount, $(count - passedCount)]
-  result = OpResult[Rc](kind: opValue, value: rc)
+  result = OpResult[Rc](kind: opValueKind, value: rc)
 
 proc runDirectory(args: RunArgs): OpResult[Rc] =
-  ## Run all stf files in a directory.
+  ## Run all stf files in a directory. Return 0 when all pass.
   result = runDirectory(args.directory, args.leaveTempDir)
 
 proc processRunArgs(args: RunArgs): OpResult[Rc] =
-  ## Process the arguments specified on the command line.
+  ## Run what was specified on the command line. Return 0 when
+  ## successful.
 
   if args.help:
     echo getHelp()
-    result = OpResult[Rc](kind: opValue, value: 0)
+    result = OpResult[Rc](kind: opValueKind, value: 0)
   elif args.version:
     echo runnerId
-    result = OpResult[Rc](kind: opValue, value: 0)
+    result = OpResult[Rc](kind: opValueKind, value: 0)
   elif args.filename != "":
     result = runFilename(args)
   elif args.directory != "":
     result = runDirectory(args)
   else:
     echo "Missing argments, use -h for help."
-    result = OpResult[Rc](kind: opValue, value: 1)
+    result = OpResult[Rc](kind: opValueKind, value: 1)
 
 proc main*(argv: seq[string]): OpResult[Rc] =
-  ## Run stf test files.
+  ## Run stf test files. Return 0 when successful.
 
   # Setup control-c monitoring so ctrl-c stops the program.
   proc controlCHandler() {.noconv.} =
@@ -894,7 +859,7 @@ proc main*(argv: seq[string]): OpResult[Rc] =
     # Parse the command line options.
     let argsOp = parseRunCommandLine(argv)
     if argsOp.isMessage:
-      return OpResult[Rc](kind: opMessage, message: argsOp.message)
+      return OpResult[Rc](kind: opMessageKind, message: argsOp.message)
     let args = argsOp.value
 
     # Run.
@@ -904,7 +869,7 @@ proc main*(argv: seq[string]): OpResult[Rc] =
     # The stack trace is only available in the debug builds.
     when not defined(release):
       message = message & "\n" & getCurrentException().getStackTrace()
-    result = OpResult[Rc](kind: opMessage, message: message)
+    result = OpResult[Rc](kind: opMessageKind, message: message)
 
 when isMainModule:
   let rcOp = main(commandLineParams())
