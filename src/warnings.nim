@@ -144,6 +144,7 @@ type
     wTeaVariableExists,    # w129
     wAppendToList,         # w130
     wAppendToTeaVar,       # w131
+    wDuplicateVar,         # w132
 
 const
     # The list of warnings. Add new messages to the bottom and do not
@@ -281,6 +282,7 @@ const
       "You cannot reassign a tea variable.", # wTeaVariableExists
       "You can only append to a list, got $1.", # wAppendToList
       "You cannot append to a tea variable.", # wAppendToTeaVar
+      "Duplicate json variable '$1' skipped.", # wDuplicateVar
     ]
 
 func getWarning*(filename: string, lineNum: int,

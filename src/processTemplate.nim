@@ -224,6 +224,25 @@ func getTeaArgs*(args: Args): Value =
   varsDict["logFilename"] = newValue(args.logFilename)
   result = newValue(varsDict)
 
+proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
+  ## Read json files and return a variable dictionary.  Skip a
+  ## duplicate variable and generate a warning.
+
+  var varsDict = newVarsDict()
+  for filename in filenames:
+    let valueOrWarning = readJsonFile(filename)
+    if valueOrWarning.kind == vwWarning:
+      env.warn(0, valueOrWarning.warningData)
+    else:
+      # Merge in the variables.
+      for k, v in valueOrWarning.value.dictv.pairs:
+        if k in varsDict:
+          # Skip the duplicates
+          env.warn(0, wDuplicateVar, k)
+        else:
+          varsDict[k] = v
+  result = varsDict
+
 proc getStartingVariables(env: var Env, args: Args): Variables =
   ## Read and return the server and shared variables and setup the
   ## initial tea variables.
@@ -232,22 +251,8 @@ proc getStartingVariables(env: var Env, args: Args): Variables =
   # variables in the sense that they all exists somewhere in this
   # dictionary.
 
-  var serverVarDict: VarsDict
-  let valueOrWarningS = readJsonFiles(args.serverList)
-  if valueOrWarningS.kind == vwWarning:
-    env.warn(0, valueOrWarningS.warningData)
-    serverVarDict = newVarsDict()
-  else:
-    serverVarDict = valueOrWarningS.value.dictv
-
-  var sharedVarDict: VarsDict
-  let valueOrWarningH = readJsonFiles(args.sharedList)
-  if valueOrWarningH.kind == vwWarning:
-    env.warn(0, valueOrWarningH.warningData)
-    sharedVarDict = newVarsDict()
-  else:
-    sharedVarDict = valueOrWarningH.value.dictv
-
+  var serverVarDict = readJsonFiles(env, args.serverList)
+  var sharedVarDict = readJsonFiles(env, args.sharedList)
   var argsVarDict = getTeaArgs(args).dictv
 
   result = emptyVariables(serverVarDict, sharedVarDict, argsVarDict)

@@ -96,21 +96,3 @@ proc readJsonFile*(filename: string): ValueOrWarning =
     return newValueOrWarning(wUnableToOpenFile, filename)
 
   result = readJsonStream(stream, filename)
-
-proc readJsonFiles*(filenames: seq[string]): ValueOrWarning =
-  ## Read json files and return the variables. If there is an error,
-  ## return a warning. A duplicate variable is skipped and it
-  ## generates a warning.
-
-  var varsDict = newVarsDict()
-  for filename in filenames:
-    let valueOrWarning = readJsonFile(filename)
-    if valueOrWarning.kind == vwWarning:
-      return valueOrWarning
-
-    # Merge in the variables.
-    for k, v in valueOrWarning.value.dictv.pairs:
-      varsDict[k] = v
-
-  # todo: geneate a warning on duplicate variables.
-  result = newValueOrWarning(newValue(varsDict))
