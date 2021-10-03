@@ -1179,6 +1179,7 @@ Miscellaneous topics:
 - [[#html-formatted-json][HTML Formatted Json]]
 - [[#nimble-tasks][Nimble Tasks]]
 - [[#stf-runner][Stf Runner]]
+- [[#example-templates][Example Templates]]
 
 ** Warning Messages
 :PROPERTIES:
@@ -1465,8 +1466,12 @@ tt        	Compile and run t.nim.
 tree       	Show the project directory tree.
 args       	Show command line arguments.
 br        	Build the test runner.
-runner     	Run stf tests.
-stf        	List testfiles tests.
+runt        Run a stf test in testfiles. Specify the filename.
+runall      Run all stf tests in the testfiles folder.
+stf         List stf tests descriptions.
+newstf      Create new stf as a starting point for a new test.
+runhelp     Show the runner help text with glow.
+helpme      Show the statictea help text.
 #+END_SRC
 
 [[#contents][茶]]
@@ -1485,6 +1490,18 @@ all the stf files.  There are nimble tasks for these:
 - runner -- run the tests
 
 See the runner help message for help creating stf files.
+
+[[#contents][茶]]
+
+** Example Templates
+:PROPERTIES:
+   :CUSTOM_ID: example-templates
+   :END:
+
+You can examine simple self contained statictea templates
+in the testfiles folder.
+
+The [[#module-docs][Module Docs]] section has more complex examples.
 
 [[#contents][茶]]
 

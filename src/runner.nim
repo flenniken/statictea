@@ -154,7 +154,7 @@ proc createFolder*(folder: string): string =
   ## created return a message telling why, else return "".
   try:
     createDir(folder)
-  except OSError:
+  except:
     result = getCurrentExceptionMsg()
 
 proc deleteFolder*(folder: string): string =
@@ -162,7 +162,7 @@ proc deleteFolder*(folder: string): string =
   ## deleted return a message telling why, else return "".
   try:
     removeDir(folder)
-  except OSError:
+  except:
     result = getCurrentExceptionMsg()
 
 proc getHelp(): string =
@@ -326,19 +326,20 @@ func letterToWord(letter: char): OpResult[string] =
   result = opMessage[string](message)
 
 proc handleOption(switch: string, word: string, value: string,
-    runArgs: var RunArgs): OpResult[string] =
+    runArgs: var RunArgs): string =
   ## Fill in the RunArgs object with a value from the command line.
   ## Switch is the key from the command line, either a word or a
-  ## letter.  Word is the long form of the switch.
+  ## letter.  Word is the long form of the switch. If the option
+  ## cannot be handle, return a message telling why, else return "".
 
   if word == "filename":
     if value == "":
-      return opMessage[string]("Missing filename. Use -f=filename")
+      return "Missing filename. Use -f=filename"
     else:
       runArgs.filename = value
   elif word == "directory":
     if value == "":
-      return opMessage[string]("Missing directory name. Use -d=directory")
+      return "Missing directory name. Use -d=directory"
     else:
       runArgs.directory = value
   elif word == "help":
@@ -348,7 +349,7 @@ proc handleOption(switch: string, word: string, value: string,
   elif word == "leaveTempDir":
     runArgs.leaveTempDir = true
   else:
-    return opMessage[string]("Unknown switch.")
+    return "Unknown switch."
 
 proc parseRunCommandLine*(argv: seq[string]): OpResult[RunArgs] =
   ## Parse the command line arguments.
@@ -365,14 +366,14 @@ proc parseRunCommandLine*(argv: seq[string]): OpResult[RunArgs] =
           let wordOp = letterToWord(letter)
           if wordOp.isMessage:
             return opMessage[RunArgs](wordOp.message)
-          let messageOp = handleOption($letter, wordOp.value, value, args)
-          if messageOp.isMessage:
-            return opMessage[RunArgs](messageOp.message)
+          let message = handleOption($letter, wordOp.value, value, args)
+          if message != "":
+            return opMessage[RunArgs](message)
 
       of CmdLineKind.cmdLongOption:
-        let messageOp = handleOption(key, key, value, args)
-        if messageOp.isMessage:
-          return opMessage[RunArgs](messageOp.message)
+        let message = handleOption(key, key, value, args)
+        if message != "":
+          return opMessage[RunArgs](message)
 
       of CmdLineKind.cmdArgument:
         return opMessage[RunArgs]("Unknown switch: $1" % [key])
@@ -675,7 +676,7 @@ proc readFileContent(filename: string): OpResult[string] =
     let content = readFile(filename)
     result = opValue[string](content)
   except:
-    return opMessage[string](getCurrentExceptionMsg())
+    result = opMessage[string](getCurrentExceptionMsg())
 
 proc compareFiles*(expectedFilename: string, gotFilename: string): OpResult[string] =
   ## Compare two files and return the differences. When they are equal
