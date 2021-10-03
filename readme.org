@@ -22,6 +22,10 @@ The result:
 hello world
 #+END_SRC
 
+:PROPERTIES:
+:testfile: testfiles/hello.stf
+:END:
+
 [[#contents][茶]] (contents at the bottom)
 
 * Advantages
@@ -77,6 +81,7 @@ it provides a place for your code statements.
 ** Nextline Command
 :PROPERTIES:
 :CUSTOM_ID: nextline-command
+:testfile: testfiles/nextline.stf
 :END:
 
 The nextline command targets the line following it for
@@ -112,6 +117,7 @@ Drink tea -- Earl Grey is my favorite.
 ** Block Command
 :PROPERTIES:
 :CUSTOM_ID: block-command
+:testfile: testfiles/block.stf
 :END:
 
 The block command targets multiple lines for replacement. The
@@ -155,6 +161,9 @@ house at 5:00 pm.
 ** Replace Command
 :PROPERTIES:
 :CUSTOM_ID: replace-command
+:testfile: testfiles/replace.stf
+:testfile2: testfiles/replace2.stf
+:testfile3: testfiles/replace3.stf
 :END:
 
 The replace command's replacement block gets replaced with the
@@ -265,6 +274,7 @@ result:
 ** Comment Command
 :PROPERTIES:
 :CUSTOM_ID: comment-command
+:testfile: testfiles/comment.stf
 :END:
 
 You can comment templates with the comment command.  Comments
@@ -295,6 +305,7 @@ intensive steps.
 ** Continue Command
 :PROPERTIES:
 :CUSTOM_ID: continue-command
+:testfile: testfiles/continue.stf
 :END:
 
 The continue command allows you to continue adding statements to
@@ -323,6 +334,7 @@ Earl Grey, Masala chai
 ** Endblock Command
 :PROPERTIES:
 :CUSTOM_ID: endblock-command
+:testfile: testfiles/endblock.stf
 :END:
 
 The endblock command ends the replacement block for the block and
@@ -373,6 +385,7 @@ repeated block.
 * Statements
 :PROPERTIES:
 :CUSTOM_ID: statements
+:testfile: testfiles/statements.stf
 :END:
 
 You format server content with variables you create in
@@ -398,7 +411,7 @@ Here are some simple statements:
 #+BEGIN_SRC
 tea = "Earl Grey"
 num = 5
-t.repeat = 8
+t.repeat = 2
 nameLen = len(s.name)
 name = concat(substr(s.name, 0, 7), "...")
 #+END_SRC
@@ -408,6 +421,7 @@ name = concat(substr(s.name, 0, 7), "...")
 * Syntax
 :PROPERTIES:
 :CUSTOM_ID: syntax
+:testfile: testfiles/syntax.stf
 :END:
 
 A template consists of command lines and non-command lines.  The
@@ -428,20 +442,24 @@ lines. At the end of the line is an optional plus continuation
 character then the optional postfix then the end of line, either
 \r\n or \n.
 
-The following chart shows a nextline command made up of two
-lines. It has three statements: a=5, b="banana" and c=5.
+The chart below shows a nextline command with three continuation
+commands and three statements: a = 5, b = "tea" and c = "The Earl
+of Grey".
 
 #+BEGIN_SRC
 prefix
 |     command
-|     |        statements
+|     |        statement
 |     |        |         continuation
 |     |        |         |
 |     |        |         |postfix
-|     |        |         ||  newline
-|     |        |         ||  |
-<!--$ nextline a=5;  b="b+-->
-<!--$ : anana"; c=5       -->
+|     | +------+         ||  newline
+|     | |      |         ||  |
+<!--$ nextline a = 5      -->
+<!--$ : b = "tea"         -->
+<!--$ : c = "The Earl of +-->
+<!--$ : Grey"             -->
+
 #+END_SRC
 
 A space or tab is required between a command and a statement,
@@ -455,8 +473,8 @@ $$nextline
 $$ nextline
 $$ nextline a=5
 $$ nextline a = 5
-$$ nextline num = len(tea_list); b=3
-$$ nextline num = len( tea_list ) ;b=3
+$$ nextline num = len(s.tea_list)
+$$ nextline num = len( s.tea_list )
 #+END_SRC
 
 The statements may flow between lines by using the continuation
@@ -470,16 +488,12 @@ equivalent:
 <!--$ : elow Tea Company" -->
 #+END_SRC
 
-You separate statements with semicolons or newlines. You can have
-blank statements that do nothing. Both commands below have three
-statements: a = 1, b = 2 and c = 3.
+You can have blank statements that do nothing.
 
 #+BEGIN_SRC
-$$ nextline a=1; b=2; c=3
-
-$$ nextline a = 1
-$$ : b = 2
-$$ : c = 3
+$$ nextline
+$$ :
+$$ : a = 5
 #+END_SRC
 
 [[#contents][茶]]
@@ -513,6 +527,7 @@ variables. You access them with different prefixes.
 ** Json Variables
 :PROPERTIES:
 :CUSTOM_ID: json-variables
+:testfile: testfiles/truefalsenull.stf
 :END:
 
 You pass variables to the template in json files.
@@ -543,9 +558,10 @@ presentation needs.
 [[#contents][茶]]
 
 ** Local Variables
-   :PROPERTIES:
-   :CUSTOM_ID: local-variables
-   :END:
+:PROPERTIES:
+:CUSTOM_ID: local-variables
+:testfile: testfiles/localvars.stf
+:END:
 
 You create local variables with template statements.  They are
 local to the command where they are defined. You do not have to
@@ -556,9 +572,10 @@ recalculated for each repeated block.
 [[#contents][茶]]
 
 ** Global Variables
-    :PROPERTIES:
-    :CUSTOM_ID: global-variables
-    :END:
+:PROPERTIES:
+:CUSTOM_ID: global-variables
+:testfile: testfiles/globalvars.stf
+:END:
 
 Like local variables, you create global variables with template
 statements.  All commands have access to them and they are stored
@@ -588,9 +605,10 @@ Tea variables:
 [[#contents][茶]]
 
 *** t.args
-    :PROPERTIES:
-    :CUSTOM_ID: targs
-    :END:
+:PROPERTIES:
+:CUSTOM_ID: targs
+:testfile: testfiles/targs.stf
+:END:
 
 The t.args variable contains the arguments passed to
 statictea on the command line.

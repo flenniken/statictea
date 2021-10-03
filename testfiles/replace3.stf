@@ -1,0 +1,55 @@
+id stf file version 0.0.0
+
+## Test standard readme replace example 3.
+
+--- file cmd.sh command
+$statictearoot/bin/statictea -s=server.json -j=shared.json \
+  -t=template.html -r=result.html >stdout 2>stderr
+--- endfile
+
+--- file template.html
+<!--$ replace t.content=h.header -->
+<!DOCTYPE html>
+<html lang="{s.languageCode}" dir="{s.languageDirection}">
+<head>
+<meta charset="UTF-8"/>
+<title>{s.title}</title>
+<--$ endblock -->
+--- endfile
+
+--- file server.json
+{
+"languageCode": "en",
+"languageDirection": "ltr",
+"title": "Teas in England"
+}
+--- endfile
+
+--- file shared.json
+{
+  "header": "<!DOCTYPE html>
+<html lang=\"{s.languageCode}\" dir=\"{s.languageDirection}\">
+<head>
+<meta charset=\"UTF-8\"/>
+<title>{s.title}</title>\n"
+}
+--- endfile
+
+--- file result.expected
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<title>Teas in England</title>
+--- endfile
+
+--- file stdout.expected
+--- endfile
+
+--- file stderr.expected
+--- endfile
+
+--- expected result.expected == result.html
+--- expected stdout.expected == stdout
+--- expected stderr.expected == stderr
+

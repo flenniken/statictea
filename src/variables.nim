@@ -60,6 +60,7 @@ import vartypes
 import version
 import warnings
 import tostring
+import args
 
 const
   outputValues* = ["result", "stderr", "log", "skip"]
@@ -212,8 +213,9 @@ proc getParentDict*(variables: Variables, names: seq[string]): ParentDict =
     if names.len == 1:
       # t by itself is a special case we don't allow.
       return newParentDictWarn(wReservedNameSpaces)
+    if names.len == 3 and names[1] == "args":
+      return newParentDict(variables["args"].dictv)
     if names.len != 2:
-      # All tea variables have two components.
       # todo: pass in dotNameStr instead of sequence everywhere?
       let dotNameStr = names.join(".")
       return newParentDictWarn(wInvalidTeaVar, dotNameStr)
@@ -360,3 +362,17 @@ proc getVariable*(variables: Variables, dotNameStr: string): ValueOrWarning =
     return newValueOrWarning(wMissingVarName, varName)
 
   result = newValueOrWarning(parentDict.dict[varName])
+
+func getTeaArgs*(args: Args): Value =
+  ## Create the t.args dictionary from the statictea arguments.
+  var varsDict = newVarsDict()
+  varsDict["help"] = newValue(args.help)
+  varsDict["version"] = newValue(args.version)
+  varsDict["update"] = newValue(args.update)
+  varsDict["log"] = newValue(args.log)
+  varsDict["serverList"] = newValue(args.serverList)
+  varsDict["sharedList"] = newValue(args.sharedList)
+  varsDict["resultFilename"] = newValue(args.resultFilename)
+  varsDict["templateList"] = newValue(args.templateList)
+  varsDict["logFilename"] = newValue(args.logFilename)
+  result = newValue(varsDict)

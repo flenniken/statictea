@@ -1,0 +1,50 @@
+id stf file version 0.0.0
+
+## Test readme statements.
+
+--- file cmd.sh command
+$statictearoot/bin/statictea -s=server.json \
+  -t=template.html -r=result.html >stdout 2>stderr
+--- endfile
+
+--- file template.html
+$$ block
+$$ : tea = "Earl Grey"
+$$ : num = 5
+$$ : t.repeat = 2
+$$ : nameLen = len(s.name)
+$$ : name = concat(substr(s.name, 0, 7), "...")
+tea => {tea}
+num => {num}
+nameLen => {nameLen}
+name => {name}
+$$ endblock
+--- endfile
+
+--- file server.json
+{
+  "name": "server json file",
+}
+--- endfile
+
+--- file result.expected
+tea => Earl Grey
+num => 5
+nameLen => 16
+name => server ...
+tea => Earl Grey
+num => 5
+nameLen => 16
+name => server ...
+--- endfile
+
+--- file stdout.expected
+--- endfile
+
+--- file stderr.expected
+--- endfile
+
+--- expected result.expected == result.html
+--- expected stdout.expected == stdout
+--- expected stderr.expected == stderr
+

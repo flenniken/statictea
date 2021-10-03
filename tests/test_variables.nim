@@ -9,6 +9,7 @@ import env
 import warnings
 import readjson
 import tostring
+import args
 
 proc testGetParentDict(variables: Variables, dotNameStr: string, eParentDict: ParentDict): bool =
   var names = split(dotNameStr, '.')
@@ -49,12 +50,14 @@ suite "variables.nim":
     check "h" in variables
     check "row" in variables
     check "version" in variables
+    check "args" in variables
     check variables["l"].dictv.len == 0
     check variables["g"].dictv.len == 0
     check variables["s"].dictv.len == 0
     check variables["h"].dictv.len == 0
     check variables["row"].intv == 0
     check variables["version"].kind == vkString
+    check variables["args"].dictv.len == 0
 
   test "getParentDict":
     var variables = emptyVariables()
@@ -135,6 +138,15 @@ suite "variables.nim":
     check "version" in variables
     check variables["row"] == newValue(0)
     check variables["args"] == newEmptyDictValue()
+
+  test "get t.args.help":
+    var args: Args
+    var argsVarDict = getTeaArgs(args).dictv
+    var variables = emptyVariables(args = argsVarDict)
+    echo "variables = " & $variables
+    check getVariable(variables, "t.args.help") == newValueOrWarning(newValue(0))
+
+
 
   test "resetVariables untouched":
     # Make sure the some variables are untouched after reset.

@@ -8,6 +8,7 @@ import args
 import readlines
 import version
 import tostring
+import variables
 
 proc testGetTeaArgs(args: Args, eJson: string): bool =
   let value = getTeaArgs(args)
@@ -1213,6 +1214,31 @@ teas => ["black","green"]
     check testGetTeaArgs(args, """{"help":0,"version":0,"update":0,"log":0,"serverList":["server.json"],"sharedList":["shared.json"],"resultFilename":"result.html","templateList":["template.html"],"logFilename":""}""")
 
 
+
+  test "t variables":
+    let templateContent = """
+$$ block
+$$ : args = t.args
+$$ : help = get(args, "help")
+$$ : help2 = args.help
+$$ : help3 = t.args.help
+help => {help}
+help2 => {help2}
+help3 => {help3}
+$$ endblock
+"""
+    let serverJson = """
+{
+}
+"""
+
+    let eResultLines = splitNewLines """
+help => 0
+help2 => 0
+help3 => 0
+"""
+    check testProcessTemplate(templateContent = templateContent,
+        serverJson = serverJson, eResultLines = eResultLines, eRc = 0)
 
 
 

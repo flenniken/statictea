@@ -1,0 +1,99 @@
+id stf file version 0.0.0
+
+## Test readme syntax section.
+
+--- file cmd.sh command
+$statictearoot/bin/statictea -s=server.json \
+  -t=template.html -r=result.html >stdout 2>stderr
+--- endfile
+
+--- file template.html
+prefix
+|     command
+|     |        statement
+|     |        |         continuation
+|     |        |         |
+|     |        |         |postfix
+|     | +------+         ||  newline
+|     | |      |         ||  |
+
+
+<!--$ nextline a = 5      -->
+<!--$ : b = "tea"         -->
+<!--$ : c = "The Earl of +-->
+<!--$ : Grey"             -->
+a = {a}, b = "{b}", c = "{c}"
+
+$$nextline
+blank1
+$$ nextline
+blank2
+$$ nextline a=5
+a => {a}
+$$ nextline a = 5
+a => {a}
+$$ nextline num = len(s.tea_list)
+num => {3}
+$$ nextline num = len( s.tea_list )
+num => {3}
+
+<!--$ nextline com = "Bigelow Tea Company" -->
+com => {com}
+<!--$ nextline com = "Big+-->
+<!--$ : elow Tea Company" -->
+com => {com}
+
+$$ nextline
+$$ :
+$$ : a = 5
+a => {a}
+--- endfile
+
+--- file server.json
+{
+"tea_list": [
+  "Black",
+  "Green",
+  "Oolong",
+  "Sencha",
+  "Herbal"
+]
+}
+--- endfile
+
+--- file result.expected
+prefix
+|     command
+|     |        statement
+|     |        |         continuation
+|     |        |         |
+|     |        |         |postfix
+|     | +------+         ||  newline
+|     | |      |         ||  |
+
+
+a = 5, b = "tea", c = "The Earl of Grey"
+
+blank1
+blank2
+a => 5
+a => 5
+num => {3}
+num => {3}
+
+com => Bigelow Tea Company
+com => Bigelow Tea Company
+
+a => 5
+--- endfile
+
+--- file stdout.expected
+--- endfile
+
+--- file stderr.expected
+--- endfile
+
+--- expected result.expected == result.html
+--- expected stdout.expected == stdout
+--- expected stderr.expected == stderr
+
