@@ -628,7 +628,7 @@ func showTabsAndLineEndings*(str: string): string =
     visibleRunes.add(Rune(num))
   result = $visibleRunes
 
-proc dup*(pattern: string, count: Natural): string =
+proc dup(pattern: string, count: Natural): string =
   ## Duplicate the pattern count times. Return "" when the result
   ## would be longer than 1024 characters.
   if count < 1:
@@ -721,7 +721,7 @@ $2=got
       message = message & linesSideBySide(expectedContent, gotContent)
   return OpResult[string](kind: okValue, value: message)
 
-proc compareFileSets*(folder: string, compareLines: seq[CompareLine]):
+proc compareFileSets(folder: string, compareLines: seq[CompareLine]):
     OpResult[Rc] =
   ## Compare multiple pairs of files and show the differences. When
   ## they are all the same return 0.
@@ -772,7 +772,7 @@ proc runStfFilename*(filename: string): OpResult[Rc] =
   if rcOp.value != 0:
     result = rcOp
 
-proc runFilename*(filename: string, leaveTempDir: bool): OpResult[Rc] =
+proc runFilename(filename: string, leaveTempDir: bool): OpResult[Rc] =
   ## Run the stf file and optionally leave the temp dir. Return 0 when
   ## all the tests pass.
 
@@ -786,12 +786,12 @@ proc runFilename*(filename: string, leaveTempDir: bool): OpResult[Rc] =
     if fileExists(filename):
       discard deleteFolder(tempDir)
 
-proc runFilename*(args: RunArgs): OpResult[Rc] =
+proc runFilename(args: RunArgs): OpResult[Rc] =
   ## Run a stf file specified by a RunArgs object. Return 0 when it
   ## passes.
   result = runFilename(args.filename, args.leaveTempDir)
 
-proc runDirectory*(dir: string, leaveTempDir: bool): OpResult[Rc] =
+proc runDirectory(dir: string, leaveTempDir: bool): OpResult[Rc] =
   ## Run all the stf files in the specified directory. Return 0 when
   ## they all pass. Show progess and count of passed and failed.
 
@@ -841,7 +841,7 @@ proc processRunArgs(args: RunArgs): OpResult[Rc] =
     echo "Missing argments, use -h for help."
     result = OpResult[Rc](kind: okValue, value: 1)
 
-proc main*(argv: seq[string]): OpResult[Rc] =
+proc main(argv: seq[string]): OpResult[Rc] =
   ## Run stf test files. Return 0 when successful.
 
   # Setup control-c monitoring so ctrl-c stops the program.

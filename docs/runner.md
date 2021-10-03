@@ -6,16 +6,15 @@ Standalone command to run Single Test File (stf) files.
 # Index
 
 * type: [RunArgs](#runargs) &mdash; RunArgs holds the command line arguments.
-* type: [RcAndMessage](#rcandmessage) &mdash; RcAndMessage holds a return code and message.
+* type: [Rc](#rc) &mdash; Rc holds a return code where 0 is success.
 * type: [RunFileLine](#runfileline) &mdash; RunFileLine holds the file line options.
 * type: [CompareLine](#compareline) &mdash; CompareLine holds the expected line options.
-* type: [DirAndFiles](#dirandfiles) &mdash; DirAndFiles holds the result of the makeDirAndFiles procedure.
+* type: [DirAndFiles](#dirandfiles) &mdash; DirAndFiles holds the file and compare lines of the stf file.
 * type: [OpResultKind](#opresultkind) &mdash; The kind of OpResult object, either a value or message.
 * type: [OpResult](#opresult) &mdash; Contains either a value or a message string.
-* [newRunArgs](#newrunargs) &mdash; Create a new RunArgs object.
-* [newRcAndMessage](#newrcandmessage) &mdash; Create a new RcAndMessage object.
 * [isMessage](#ismessage) &mdash; Return true when the OpResult object contains a message.
 * [isValue](#isvalue) &mdash; Return true when the OpResult object contains a value.
+* [newRunArgs](#newrunargs) &mdash; Create a new RunArgs object.
 * [newRunFileLine](#newrunfileline) &mdash; Create a new RunFileLine object.
 * [newCompareLine](#newcompareline) &mdash; Create a new CompareLine object.
 * [newDirAndFiles](#newdirandfiles) &mdash; Create a new DirAndFiles object.
@@ -23,28 +22,20 @@ Standalone command to run Single Test File (stf) files.
 * [`$`](#-1) &mdash; Return a string representation of a CompareLine object.
 * [`$`](#-2) &mdash; Return a string representation of a RunFileLine object.
 * [writeErr](#writeerr) &mdash; Write a message to stderr.
-* [writeOut](#writeout) &mdash; Write a message to stdout.
 * [createFolder](#createfolder) &mdash; Create a folder with the given name.
 * [deleteFolder](#deletefolder) &mdash; Delete a folder with the given name.
 * [parseRunCommandLine](#parseruncommandline) &mdash; Parse the command line arguments.
+* [makeBool](#makebool) &mdash; Return false when the string is empty, else return true.
 * [parseRunFileLine](#parserunfileline) &mdash; Parse a file command line.
 * [parseExpectedLine](#parseexpectedline) &mdash; Parse an expected line.
 * [openNewFile](#opennewfile) &mdash; Create a new file in the given folder and return an open File object.
-* [getCmd](#getcmd) &mdash; Return the type of line, either: #, "", id, file, expected or endfile.
+* [getCmd](#getcmd) &mdash; Return the type of line, either: #, "", id, file, expected, endfile or other.
 * [makeDirAndFiles](#makedirandfiles) &mdash; Read the stf file and create its temp folder and files.
-* [runCommand](#runcommand) &mdash; Run a command file and return its return code.
-* [runCommands](#runcommands) &mdash; Run the commands.
-* [openLineBuffer](#openlinebuffer) &mdash; Open a file for reading lines.
+* [runCommands](#runcommands) &mdash; Run the command files and return 0 when they all returned their expected return code.
 * [showTabsAndLineEndings](#showtabsandlineendings) &mdash; Return a new string with the tab and line endings visible.
-* [dup](#dup) &mdash; Duplicate the pattern count times limited to 1024 characters.
 * [linesSideBySide](#linessidebyside) &mdash; Show the two sets of lines side by side.
-* [compareFiles](#comparefiles) &mdash; Compare two files.
-* [compareFileSets](#comparefilesets) &mdash; Compare file sets and return rc=0 when they are all the same.
-* [runStfFilename](#runstffilename) &mdash; Run the stf and report the result.
-* [runFilename](#runfilename) &mdash; Run the stf and report the result.
-* [runFilename](#runfilename-1) &mdash; Run a stf file.
-* [runDirectory](#rundirectory) &mdash; Run all the stf files in the specified directory.
-* [main](#main) &mdash; Run stf test files.
+* [compareFiles](#comparefiles) &mdash; Compare two files and return the differences.
+* [runStfFilename](#runstffilename) &mdash; Run the stf file and leave the temp dir.
 
 # RunArgs
 
@@ -60,15 +51,12 @@ RunArgs = object
 
 ```
 
-# RcAndMessage
+# Rc
 
-RcAndMessage holds a return code and message.
+Rc holds a return code where 0 is success.
 
 ```nim
-RcAndMessage = object
-  rc*: int                   ## return code, 0 success.
-  message*: string           ## message. A non-empty message gets displayed.
-
+Rc = int
 ```
 
 # RunFileLine
@@ -97,7 +85,7 @@ CompareLine = object
 
 # DirAndFiles
 
-DirAndFiles holds the result of the makeDirAndFiles procedure.
+DirAndFiles holds the file and compare lines of the stf file.
 
 ```nim
 DirAndFiles = object
@@ -112,7 +100,7 @@ The kind of OpResult object, either a value or message.
 
 ```nim
 OpResultKind = enum
-  opValue, opMessage
+  okValue, okMessage
 ```
 
 # OpResult
@@ -122,30 +110,13 @@ Contains either a value or a message string. The default is a value. It's simila
 ```nim
 OpResult[T] = object
   case kind*: OpResultKind
-  of opValue:
+  of okValue:
       value*: T
 
-  of opMessage:
+  of okMessage:
       message*: string
 
 
-```
-
-# newRunArgs
-
-Create a new RunArgs object.
-
-```nim
-func newRunArgs(help = false; version = false; leaveTempDir = false;
-                filename = ""; directory = ""): RunArgs
-```
-
-# newRcAndMessage
-
-Create a new RcAndMessage object.
-
-```nim
-func newRcAndMessage(rc: int; message: string): RcAndMessage
 ```
 
 # isMessage
@@ -162,6 +133,15 @@ Return true when the OpResult object contains a value.
 
 ```nim
 func isValue(opResult: OpResult): bool
+```
+
+# newRunArgs
+
+Create a new RunArgs object.
+
+```nim
+func newRunArgs(help = false; version = false; leaveTempDir = false;
+                filename = ""; directory = ""): RunArgs
 ```
 
 # newRunFileLine
@@ -222,28 +202,20 @@ Write a message to stderr.
 proc writeErr(message: string)
 ```
 
-# writeOut
-
-Write a message to stdout.
-
-```nim
-proc writeOut(message: string)
-```
-
 # createFolder
 
-Create a folder with the given name.
+Create a folder with the given name. When the folder cannot be created return a message telling why, else return "".
 
 ```nim
-proc createFolder(folder: string): OpResult[RcAndMessage]
+proc createFolder(folder: string): string
 ```
 
 # deleteFolder
 
-Delete a folder with the given name.
+Delete a folder with the given name. When the folder cannot be deleted return a message telling why, else return "".
 
 ```nim
-proc deleteFolder(folder: string): OpResult[RcAndMessage]
+proc deleteFolder(folder: string): string
 ```
 
 # parseRunCommandLine
@@ -252,6 +224,14 @@ Parse the command line arguments.
 
 ```nim
 proc parseRunCommandLine(argv: seq[string]): OpResult[RunArgs]
+```
+
+# makeBool
+
+Return false when the string is empty, else return true.
+
+```nim
+func makeBool(item: string): bool
 ```
 
 # parseRunFileLine
@@ -280,7 +260,7 @@ proc openNewFile(folder: string; filename: string): OpResult[File]
 
 # getCmd
 
-Return the type of line, either: #, "", id, file, expected or endfile.
+Return the type of line, either: #, "", id, file, expected, endfile or other.
 
 ```nim
 proc getCmd(line: string): string
@@ -294,29 +274,12 @@ Read the stf file and create its temp folder and files. Return the file lines an
 proc makeDirAndFiles(filename: string): OpResult[DirAndFiles]
 ```
 
-# runCommand
-
-Run a command file and return its return code.
-
-```nim
-proc runCommand(folder: string; filename: string): int
-```
-
 # runCommands
 
-Run the commands.
+Run the command files and return 0 when they all returned their expected return code.
 
 ```nim
-proc runCommands(folder: string; runFileLines: seq[RunFileLine]): OpResult[
-    RcAndMessage]
-```
-
-# openLineBuffer
-
-Open a file for reading lines. Return a LineBuffer object.  Close the line buffer stream when done.
-
-```nim
-proc openLineBuffer(filename: string): OpResult[LineBuffer]
+proc runCommands(folder: string; runFileLines: seq[RunFileLine]): OpResult[Rc]
 ```
 
 # showTabsAndLineEndings
@@ -325,14 +288,6 @@ Return a new string with the tab and line endings visible.
 
 ```nim
 func showTabsAndLineEndings(str: string): string
-```
-
-# dup
-
-Duplicate the pattern count times limited to 1024 characters.
-
-```nim
-proc dup(pattern: string; count: Natural): string
 ```
 
 # linesSideBySide
@@ -345,60 +300,19 @@ proc linesSideBySide(expectedContent: string; gotContent: string): string
 
 # compareFiles
 
-Compare two files. When they are equal, return rc=0 and message="". When they differ return rc=1 and message where the message shows the differences. On error return an error message.
+Compare two files and return the differences. When they are equal return "".
 
 ```nim
 proc compareFiles(expectedFilename: string; gotFilename: string): OpResult[
-    RcAndMessage]
-```
-
-# compareFileSets
-
-Compare file sets and return rc=0 when they are all the same.
-
-```nim
-proc compareFileSets(folder: string; compareLines: seq[CompareLine]): OpResult[
-    RcAndMessage]
+    string]
 ```
 
 # runStfFilename
 
-Run the stf and report the result. Return rc=0 message="" when it passes.
+Run the stf file and leave the temp dir. Return 0 when all the tests passed.
 
 ```nim
-proc runStfFilename(filename: string): OpResult[RcAndMessage]
-```
-
-# runFilename
-
-Run the stf and report the result. Return rc=0 message="" when it passes.
-
-```nim
-proc runFilename(filename: string; leaveTempDir: bool): OpResult[RcAndMessage]
-```
-
-# runFilename
-
-Run a stf file.
-
-```nim
-proc runFilename(args: RunArgs): OpResult[RcAndMessage]
-```
-
-# runDirectory
-
-Run all the stf files in the specified directory.
-
-```nim
-proc runDirectory(dir: string; leaveTempDir: bool): OpResult[RcAndMessage]
-```
-
-# main
-
-Run stf test files. Return a rc and message.
-
-```nim
-proc main(argv: seq[string]): OpResult[RcAndMessage]
+proc runStfFilename(filename: string): OpResult[Rc]
 ```
 
 
