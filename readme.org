@@ -1451,21 +1451,21 @@ Here is the output:
 
 #+BEGIN_SRC
 n        	  Show available tasks.
-t        	  Run all tests at once.
-test       	Run one or more tests; specify part of test filename.
-b          	Build the statictea exe.
-docsall    	Create all the docs, docsix, docs, readmefun, dot.
-docs       	Create one or more markdown docs; specify part of source filename.
-docsix     	Create markdown docs index.
-json       	Display one or more source file's json doc comments; specify part of name.
-jsonix     	Display markdown docs index json.
+t           Run all tests at once.
+test        Run one or more tests; specify part of test filename.
+b           Build the statictea exe.
+docsall     Create all the docs, docsix, docs, readmefun, dot.
+docs        Create one or more markdown docs; specify part of source filename.
+docsix      Create markdown docs index.
+json        Display one or more source file's json doc comments; specify part of name.
+jsonix      Display markdown docs index json.
 readmefun   Create the readme function section.
-dot        	Create a dependency graph of the StaticTea source.
-dot2       	Create a dependency graph of the system modules used by StaticTea.
-tt        	Compile and run t.nim.
-tree       	Show the project directory tree.
-args       	Show command line arguments.
-br        	Build the test runner.
+dot         Create a dependency graph of the StaticTea source.
+dot2        Create a dependency graph of the system modules used by StaticTea.
+tt          Compile and run t.nim.
+tree        Show the project directory tree.
+args        Show command line arguments.
+br          Build the test runner.
 runt        Run a stf test in testfiles. Specify the filename.
 runall      Run all stf tests in the testfiles folder.
 stf         List stf tests descriptions.
