@@ -11,7 +11,7 @@ proc createFile*(filename: string, content: string) =
   file.close()
 
 proc parseRunCommandLine*(cmdLine: string = ""): OpResult[RunArgs] =
-  let argv = cmdLine.splitWhitespace()
+  let argv = strutils.splitWhitespace(cmdLine)
   result = parseRunCommandLine(argv)
 
 proc showCompareLines*[T](expectedLines: seq[T], gotLines: seq[T],

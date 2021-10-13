@@ -14,6 +14,7 @@ import variables
 import warnings
 import version
 import tostring
+import readlines
 
 proc startPointer*(start: Natural): string =
   ## Return a string containing the number of spaces and symbols to
@@ -275,6 +276,15 @@ suite "runCommand.nim":
 """
     let expected = """
 1, 15: 'a = 5 '
+"""
+    check testGetStatements(content, expected)
+
+  test "one statement string":
+    let content = """
+<!--$ nextline a = "tea" -->
+"""
+    let expected = """
+1, 15: 'a = "tea" '
 """
     check testGetStatements(content, expected)
 
@@ -960,6 +970,13 @@ statement: a# = 5
     check startColumn(1) == " ^"
     check startColumn(2) == "  ^"
     check startColumn(3) == "   ^"
+
+  test "one quote":
+    let statement = newStatement(text="""  quote = "\""   """, lineNum=1, 0)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables,
+                           some(newVariableData("quote", newValue("\\\""))))
+
 
 # todo: test that a warning is generated when the item doesn't exist.
 # todo: test prepost when user specified.

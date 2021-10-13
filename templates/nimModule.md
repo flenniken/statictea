@@ -13,14 +13,14 @@ $$ # Define replacement patterns to remove formatting from the descriptions.
 $$ #
 $$ block
 $$ : g.patterns = list( +
-$$ :   "@@", '', +
-$$ :   "@\|", '[', +
-$$ :   "\|@", ']', +
+$$ :   "@@", "", +
+$$ :   "@\|", "[", +
+$$ :   "\|@", "]", +
 $$ :   "[ ]*@:", h.newline, +
-$$ :   "&quot;", '"', +
-$$ :   "&gt;", '>', +
-$$ :   "&lt;", '<', +
-$$ :   "&amp;", '&')
+$$ :   "&quot;", "\"", +
+$$ :   "&gt;", ">", +
+$$ :   "&lt;", "<", +
+$$ :   "&amp;", "&")
 $$ : path = path(s.orig)
 $$ : g.moduleName = path.filename
 $$ : g.anchors = githubAnchor(g.names)
@@ -38,7 +38,7 @@ $$ :   "skConst", "const: ", +
 $$ :   "skMacro", "macro: ")
 $$ : newEntry.type = case(entry.type, cases, "")
 $$ : desc = get(entry, "description", "")
-$$ : sentence = substr(desc, 0, add(find(desc, '.', -1), 1))
+$$ : sentence = substr(desc, 0, add(find(desc, ".", -1), 1))
 $$ : newEntry.short = replaceRe(sentence, g.patterns)
 $$ : newEntry.description = replaceRe(desc, g.patterns)
 $$ : code = replaceRe(entry.code, "[ ]*$", "")

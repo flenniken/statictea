@@ -15,12 +15,14 @@ import variables
 import funtypes
 import runFunction
 import unicodes
+import readjson
 
 type
   State = enum
     ## Finite state machine states for finding statements.
     start, double, single, slashdouble, slashsingle
 
+  # todo: what is the maximum statement length?
   Statement* = object
     ## A Statement object stores the statement text and where it
     ## @:starts in the template file.
@@ -65,8 +67,6 @@ statement 2 starts at line 1, position 18.
 statement 3 starts at line 3, position 7.
 
 ]#
-
-# todo: test slash characters in strings.
 
 
 func newStatement*(text: string, lineNum: Natural = 1,
@@ -217,6 +217,41 @@ proc getString*(env: var Env, prepostTable: PrepostTable,
   ## and the return length includes optional trailing white space
   ## after the last quote.
 
+
+proc parseJsonStr*(text: string, start: Natural): Option[ValueAndLength] =
+  ## Parse the json string. Return the string value and the ending
+  ## position which includes trailing whitespace.
+
+  # Create a stream out of the string.
+  var stream = newStringStream(text)
+  if stream == nil:
+    return
+  defer:
+    stream.close()
+  stream.seek(start)
+
+  # Parse the string which removes escaping.
+  var jsonNode: JsonNode
+  try:
+    jsonNode = parseJson(stream)
+  except:
+    return
+  var pos = stream.getPosition()
+
+  # todo: skip trailing whitespace.
+  
+  # Return the string value.
+  if jsonNode.kind != JString:
+    return
+
+  let value = newValue(jsonNode.getStr())
+  result = some(newValueAndLength(value, pos - start))
+
+
+
+
+
+
   # Check that we have a statictea string.
   var matchesO = matchString(statement.text, start)
   if not matchesO.isSome:
@@ -227,16 +262,24 @@ proc getString*(env: var Env, prepostTable: PrepostTable,
   # quotes were used, s2 double.
   let matches = matchesO.get()
   let (s1, s2) = matches.get2Groups()
-  var str = if (s1 == ""): s2 else: s1
+  let str = if (s1 == ""): s2 else: s1
+
+  # Parse the json string and remove escaping.
+  let valueAndLengthO = parseJsonStr(str)
+  if not valueAndLengthO.isSome:
+    env.warnStatement(statement, wNotString, start)
+    return
+  let valueAndLength = valueAndLengthO.get()
+  let literal = valueAndLength.value.stringv
 
   # Validate the utf-8 bytes.
-  var posO = firstInvalidUtf8(str)
+  var posO = firstInvalidUtf8(literal)
   if posO.isSome:
     env.warnStatement(statement, wInvalidUtf8, start + posO.get() + 1)
     return
 
-  let value = Value(kind: vkString, stringv: str)
-  result = some(ValueAndLength(value: value, length: matches.length))
+  let value = Value(kind: vkString, stringv: literal)
+  result = some(ValueAndLength(value: value, length: valueAndLength.length))
 
 proc getNumber*(env: var Env, prepostTable: PrepostTable,
     statement: Statement, start: Natural): Option[ValueAndLength] =

@@ -967,6 +967,12 @@ example strings:
 - "You can store black teas longer than green teas."
 - "100"
 
+Strings follow the same escaping rules as json strings.
+
+- "ending newline\n"
+- "tab \t in the middle"
+- 'Unicode tea character "茶" is "\u8336"'
+
 example usage:
 
 #+BEGIN_SRC
