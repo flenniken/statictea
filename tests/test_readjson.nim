@@ -4,6 +4,7 @@ import std/json
 import std/options
 import std/strutils
 import std/tables
+import std/strformat
 import env
 import vartypes
 import readjson
@@ -48,6 +49,46 @@ import unicode
 #     return false
 
 #   return true
+
+proc testUnescapePopularChar(popular: char, eChar: char): bool =
+  let ch = unescapePopularChar(popular)
+  let got = int(ch)
+  let expected = int(eChar)
+  if ch != eChar:
+    echo fmt"expected value: {expected:#X}"
+    echo fmt"     got value: {got:#X}"
+    result = false
+  else:
+    result = true
+
+# proc testParsePopularCharsOk(str: string, start: Natural, eParsed: string): bool =
+
+
+
+#   var pos = start
+#   var parsed = ""
+#   let message = parsePopularChars(str, pos, parsed)
+#   if message != "":
+#     echo "Error parsing:"
+#     echo str
+#     echo "Error message:"
+#     echo message
+#     return false
+#   let ePos = start + 1
+#   if pos != ePos or parsed != eParsed:
+#     echo "Unexpected parsing result:"
+#     if parsed == eParsed:
+#       echo "     same: " & parsed
+#     else:
+#       echo " expected: " & eParsed
+#       echo "      got: " & parsed
+#     if pos == ePos:
+#       echo " same pos: " & $pos
+#     else:
+#       echo " expected pos: " & $ePos
+#       echo "      got pos: " & $pos
+#     return false
+#   result = true
 
 suite "readjson.nim":
 
@@ -305,10 +346,18 @@ she sat down in a large arm-chair at one end of the table.
 
   # # todo: test error cases for parseJsonStr
 
-  test "parsePopularChars":
-    var pos: Natural = 3
-    var parsed = ""
-    check parsePopularChars(r"he\tllo", pos, parsed) == ""
-    check pos == 4
-    check parsed == "he\tllo"
-    
+  test "unescapePopularChar":
+    # nr"t\bf/
+    check testUnescapePopularChar('n', '\n')
+    check testUnescapePopularChar('r', '\r')
+    check testUnescapePopularChar('"', '"')
+    check testUnescapePopularChar('t', '\t')
+    check testUnescapePopularChar('\\', '\\')
+    check testUnescapePopularChar('b', '\b')
+    check testUnescapePopularChar('f', '\f')
+    check testUnescapePopularChar('/', '/')
+
+  test "unescapePopularChar error":
+    check unescapePopularChar('a') == char(0)
+    check unescapePopularChar('\'') == char(0)
+

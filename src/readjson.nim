@@ -111,9 +111,14 @@ func newStringPos*(str: string, pos: Natural, message = ""): StringPos =
 # Json spec:
 # https://datatracker.ietf.org/doc/html/rfc8259
 
+proc unescapePopularChar*(popular: char): char =
+  ## Unescape the popular char and return its value. If the char is
+  ## not a popular char, return 0.
+
 # Popular characters and their escape values:
 #
-# escape, char, name, unicode value
+# character  name          uncode
+#
 # 0x22  "  quotation mark  U+0022
 # 0x5C  \  reverse solidus U+005C
 # 0x2F  /  solidus         U+002F
@@ -123,33 +128,27 @@ func newStringPos*(str: string, pos: Natural, message = ""): StringPos =
 # 0x72  r  carriage return U+000D
 # 0x74  t  tab             U+0009
 
-proc parsePopularChars*(text: string, pos: var Natural,
-    parsedString: var string): string =
-  ## Add the common json escape characters to the parsed string and
-  ## advance the pos and return "". On error, return a message.
-  ## Pos is pointing at the common character.
-  var code: int32
-  case text[pos]
+  # Order by popularity.
+  case popular
   of 'n':
-    code = 0x0a
+    result = char(0x0a)
   of 'r':
-    code = 0x0d
+    result = char(0x0d)
   of '"':
-    code = ord('"')
+    result = '"'
   of 't':
-    code = 0x09
+    result = char(0x09)
   of '\\':
-    code = ord('\\')
+    result = '\\'
   of 'b':
-    code = 0x08
+    result = char(0x08)
   of 'f':
-    code = 0x0c
+    result = char(0x0c)
   of '/':
-    code = ord('/')
+    result = '/'
   else:
-    return """A slash must be followed by one letter from: nr"t\bf/."""
-  parsedString.add(Rune(code))
-  inc(pos)
+    # Invalid popular character, return 0.
+    result = char(0)
 
 proc parseHexUnicode16*(text: string, pos: var Natural, num: var int32): string =
   ## Return the unicode number given a 4 character unicode escape
@@ -256,10 +255,15 @@ proc parseJsonStr*(text: string, startPos: Natural): StringPos =
       case text[pos]
       of 'u':
         message = parseHexUnicode(text, pos, parsedString)
+        if message == "":
+          break
       else:
-        message = parsePopularChars(text, pos, parsedString)
-      if message == "":
-        break
+        let ch = unescapePopularChar(text[pos])
+        if ch == char(0):
+          message = """A slash must be followed by one letter from: nr"t\bf/."""
+          break
+        parsedString.add(ch)
+        inc(pos)
       state = middle
 
   result = newStringPos(parsedString, pos, message)
