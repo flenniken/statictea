@@ -4,7 +4,7 @@ import std/strutils
 import parseCommandLine
 import processTemplate
 import args
-import warnings
+import messages
 import gethelp
 import version
 import env

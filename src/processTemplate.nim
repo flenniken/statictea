@@ -5,7 +5,7 @@ import std/os
 import std/options
 import std/tables
 import args
-import warnings
+import messages
 import env
 import matches
 import readlines

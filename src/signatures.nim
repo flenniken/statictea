@@ -4,7 +4,7 @@ import std/tables
 import vartypes
 import funtypes
 import options
-import warnings
+import messages
 import strformat
 import strutils
 

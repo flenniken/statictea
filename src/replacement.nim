@@ -96,7 +96,7 @@ import vartypes
 import parseCmdLine
 import readLines
 import matches
-import warnings
+import messages
 import variables
 import tempFile
 import parseNumber

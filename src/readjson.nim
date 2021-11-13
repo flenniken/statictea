@@ -6,9 +6,14 @@ import std/options
 import std/json
 import std/tables
 import std/unicode
-import warnings
 import tpub
 import vartypes
+import messages
+import opresultid
+import unicodes
+
+# Json spec:
+# https://datatracker.ietf.org/doc/html/rfc8259
 
 # todo: test the the order is preserved.
 
@@ -99,34 +104,36 @@ proc readJsonFile*(filename: string): ValueOrWarning =
   result = readJsonStream(stream, filename)
 
 type
-  StringPos* = object
-    str*: string
-    pos*: Natural
-    message*: string
+  ParsedString* = object
+    ## ParsedString holds the result of parsing a string literal. The
+    ## resulting parsed string and the ending string position.
+    str*: string  ## Resulting parsed string.
+    pos*: Natural ## The position after the last trailing whitespace
+                  ## or the position at the first invalid character.
+    messageId*: MessageId ## Message id is 0 when the string was
+                          ## successfully parsed, else it is the
+                          ## message id telling what went wrong.
 
-func newStringPos*(str: string, pos: Natural, message = ""): StringPos =
-  ## Create a new StringPos object.
-  result = StringPos(str: str, pos: pos, message: message)
-
-# Json spec:
-# https://datatracker.ietf.org/doc/html/rfc8259
+func newParsedString*(str: string, pos: Natural, messageId: MessageId): ParsedString =
+  ## Create a new ParsedString object.
+  result = ParsedString(str: str, pos: pos, messageId: messageId)
 
 proc unescapePopularChar*(popular: char): char =
   ## Unescape the popular char and return its value. If the char is
   ## not a popular char, return 0.
 
-# Popular characters and their escape values:
-#
-# character  name          uncode
-#
-# 0x22  "  quotation mark  U+0022
-# 0x5C  \  reverse solidus U+005C
-# 0x2F  /  solidus         U+002F
-# 0x62  b  backspace       U+0008
-# 0x66  f  form feed       U+000C
-# 0x6E  n  line feed       U+000A
-# 0x72  r  carriage return U+000D
-# 0x74  t  tab             U+0009
+  # Popular characters and their escape values:
+  #
+  # character  name    uncode
+  # --+---------------+------
+  # "  quotation mark  U+0022
+  # \  reverse solidus U+005C
+  # /  solidus         U+002F
+  # b  backspace       U+0008
+  # f  form feed       U+000C
+  # n  line feed       U+000A
+  # r  carriage return U+000D
+  # t  tab             U+0009
 
   # Order by popularity.
   case popular
@@ -150,120 +157,160 @@ proc unescapePopularChar*(popular: char): char =
     # Invalid popular character, return 0.
     result = char(0)
 
-proc parseHexUnicode16*(text: string, pos: var Natural, num: var int32): string =
+proc parseHexUnicode16*(text: string, start: Natural): OpResultId[int32] =
   ## Return the unicode number given a 4 character unicode escape
-  ## string like u1234 and advance the pos and return "". On error,
-  ## return a message.  Pos is pointing at the u.
-  const
-    errorMsg = r"A \u must be followed by 4 hex digits."
+  ## string like u1234. Start is pointing at the u. On error, return a
+  ## message id telling what went wrong.
+
+  if start + 5 > text.len:
+    return newOpResultIdId[int32](wFourHexDigits)
+
+  var pos = start
   inc(pos)
-  num = 0
-  for shift in [8, 4, 2, 0]:
-    # 0000 0000
+
+  var num = 0i32
+  for shift in [12, 8, 4, 0]:
+    # 0000 0000 0000 0000
+    #u   f    f    f    f
     let digit = text[pos]
     let digitOrd = int32(ord(digit))
     case digit
-    of char(0):
-      # Hit the ending null terminator.
-      return errorMsg
     of '0'..'9':
-      num = num or (digitOrd - int32(ord('0')) shl shift)
-    of 'a'..'z':
+      num = num or ((digitOrd - int32(ord('0'))) shl shift)
+    of 'a'..'f':
       num = num or ((digitOrd - int32(ord('a')) + 10) shl shift)
-    of 'A'..'Z':
+    of 'A'..'F':
       num = num or ((digitOrd - int32(ord('A')) + 10) shl shift)
     else:
-      return errorMsg
+      # A \u must be followed by 4 hex digits.
+      return newOpResultIdId[int32](wFourHexDigits)
     inc(pos)
+  result = newOpResultId[int32](num)
 
-proc parseHexUnicode*(text: string, pos: var Natural, parsedString: var string): string =
-  ## Add the json unicode escape characters to the parsed string and
-  ## advance the pos and return "". On error, return a message.
-  ## Pos is pointing at the u.
-  ## u1234 or u1234\u1234
+proc parseHexUnicode*(text: string, pos: var Natural): OpResultId[int32] =
+  ## Return the unicode number given a 4 or 8 character unicode escape
+  ## string like u1234 or u1234\u1234 and advance the pos. Pos is
+  ## initially pointing at the u. On error, return the message id
+  ## telling what went wrong.
 
-  var num: int32
-  let msg = parseHexUnicode16(text, pos, num)
-  if msg != "":
-    return msg
+  let numOrc = parseHexUnicode16(text, pos)
+  if numOrc.isMessageId:
+    return numOrc
+  var num = numOrc.value
+  pos += 5
 
-  # If not a surrogate pair, add the character and return.
   if (num and 0xfc00) != 0xd800:
-    parsedString.add(char(num))
-    return
+    if (num and 0xfc00) == 0xdc00:
+      # Invalid leading surrogate pair.
+      return newOpResultIdId[int32](wLowSurrogateFirst)
+    if num == 0xff or num == 0xfe or num == 0xffff or num == 0xfffe:
+      # Invalid utf-8 bytes.
+      return newOpResultIdId[int32](wInvalidUtf8)
+    # Add the character and return.
+    return newOpResultId[int32](num)
 
-  if text[pos] != '\\' or text[pos+1] != 'u':
-    return "Missing the second surrogate pair."
+  if pos + 6 > text.len or text[pos] != '\\' or text[pos+1] != 'u':
+    # Missing the second surrogate pair.
+    return newOpResultIdId[int32](wMissingSurrogatePair)
 
   inc(pos)
-  var second: int32
-  let m = parseHexUnicode16(text, pos, second)
-  if m != "":
-    return m
 
-  # Make sure second is a second surrogate pair.
+  let secondOrc = parseHexUnicode16(text, pos)
+  if secondOrc.isMessageId:
+    return secondOrc
+  var second = secondOrc.value
+  pos += 5
+
   if (second and 0xfc00) != 0xdc00:
-    return "Not matching surrogate pair."
+    # The second value is not a matching surrogate pair.
+    return newOpResultIdId[int32](wNotMatchingSurrogate)
+
+  if second == 0xDC00 or second == 0xDFFF:
+    # Invalid paired surrogate.
+    return newOpResultIdId[int32](wPairedSurrogate)
 
   num = 0x10000 + (((num - 0xd800) shl 10) or (second - 0xdc00))
-  parsedString.add(char(num))
+  result = newOpResultId[int32](num)
 
-proc parseJsonStr*(text: string, startPos: Natural): StringPos =
-  ## Parse the quoted json string literal. On success return the
-  ## string value, the ending position, and an empty message. On
-  ## failure return the string value, the ending position where
-  ## parsing stopped and a message telling what's wrong. The startPos
-  ## points one past the leading double quote.
+proc parseJsonStr*(text: string, startPos: Natural): ParsedString =
+  ## Parse the quoted json string literal. The startPos points one
+  ## past the leading double quote.  Return the parsed string value
+  ## and the ending position one past the trailing whitespace. On
+  ## failure, the ending position points at the invalid character and
+  ## the message id tells what went wrong.
+
+  assert(startPos < text.len, "startPos is greater than the text len")
+  assert(startPos >= 0, "startPos is less than 0")
 
   type
     State = enum
       ## Parsing states.
-      middle, slash
+      middle, slash, whitespace
+
+  func getChar(text: string, pos: Natural): char =
+    ## Get the char at the given position. If pos is past the end of
+    ## the text, return 0.
+    if pos < text.len:
+      result = text[pos]
+    else:
+      result = '\0'
 
   var state = middle
-  var parsedString = newStringOfCap(text.len - startPos)
+  var newStr = newStringOfCap((text.len - startPos) * 2)
   var pos = startPos
-  var message: string
 
   # Loop through the text one unicode character at a time and add to
   # the result string.
   while true:
     case state
     of middle:
-      case text[pos]:
+      # Get the text byte at pos. Return 0 when pos is past the end of
+      # the string. Zeros are allowed in strings but they must be
+      # quoted.
+      case getChar(text, pos):
+      of '\0':
+        # No ending double quote.
+        return newParsedString("", pos, wNoEndingQuote)
       of '\\':
         state = slash
         inc(pos)
       of '"':
-        # Found ending quote, done.
-        break
-      of char(0):
-        # Nim strings are null terminated and 0 must be escaped in a
-        # json string. If we get a 0, it's an error, assume we hit the
-        # terminating 0.
-        message = "No ending double quote."
+        state = whitespace
+        inc(pos)
       of char(1)..char(0x1f):
-        message = "Controls characters must be escaped."
-        break
+        # Controls characters must be escaped.
+        return newParsedString("", pos, wControlNotEscaped)
       else:
+        # Get the unicode character at pos and increment pos one past
+        # it.
+        let str = utf8CharString(text, pos)
+        if str.len == 0:
+          # Invalid utf-8 unicode character.
+          return newParsedString("", pos, wInvalidUtf8)
+
         # Add the unicode character to the result string.
-        let rune = runeAt(text, pos)
-        let str = toUtf8(rune)
-        parsedString.add(str)
-        pos += str.len
+        newStr.add(str)
     of slash:
-      case text[pos]
+      case getChar(text, pos)
       of 'u':
-        message = parseHexUnicode(text, pos, parsedString)
-        if message == "":
-          break
+        let numOrc = parseHexUnicode(text, pos)
+        if numOrc.isMessageId:
+          return newParsedString("", pos, numOrc.messageId)
+        let str = toUtf8(Rune(numOrc.value))
+        newStr.add(str)
       else:
-        let ch = unescapePopularChar(text[pos])
-        if ch == char(0):
-          message = """A slash must be followed by one letter from: nr"t\bf/."""
-          break
-        parsedString.add(ch)
+        let ch = unescapePopularChar(getChar(text, pos))
+        if ch == '\0':
+          # A slash must be followed by one letter from: nr"t\bf/.
+          return newParsedString("", pos, wNotPopular)
+        newStr.add(ch)
         inc(pos)
       state = middle
+    of whitespace:
+      case getChar(text, pos):
+      of ' ', '\t':
+        inc(pos)
+      else:
+        break
 
-  result = newStringPos(parsedString, pos, message)
+  result = newParsedString(newStr, pos, wSuccess)

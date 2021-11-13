@@ -11,6 +11,7 @@ import env
 import matches
 import vartypes
 import variables
+import messages
 import warnings
 import version
 import tostring
@@ -62,7 +63,7 @@ proc getCmdLineParts(env: var Env, cmdLines: seq[string]): seq[LineParts] =
     let partsO = parseCmdLine(env, prepostTable, line, lineNum = ix + 1)
     if not partsO.isSome():
       echo "cannot get command line parts for:"
-      echo "line: '$1'" % line
+      echo """line: "$1"""" % line
     result.add(partsO.get())
 
 proc getStatements(cmdLines: seq[string], cmdLineParts: seq[LineParts]): seq[Statement] =
@@ -145,8 +146,8 @@ proc testGetString(
 
 proc testGetStringInvalid(buffer: seq[uint8]): bool =
   let str = newStrFromBuffer(buffer)
-  let statement = "a = 'stringwithbadutf8:$1:end'" % str
-  let expectedLine = "statement: a = 'stringwithbadutf8:$1:end'" % str
+  let statement = """a = "stringwithbadutf8:$1:end"""" % str
+  let expectedLine = """statement: a = "stringwithbadutf8:$1:end"""" % str
   let eErrLines = @[
     "template.html(1): w32: Invalid UTF-8 byte in the string.\n",
     expectedLine & "\n",
@@ -238,14 +239,14 @@ suite "runCommand.nim":
 
   test "compareStatements one":
     let expected = """
-1, 1: 'a = 5'
+1, 1: "a = 5"
 """
     check compareStatements(@[newStatement("a = 5")], expected)
 
   test "compareStatements two":
     let expected = """
-1, 1: 'a = 5'
-1, 1: '  b = 235 '
+1, 1: "a = 5"
+1, 1: "  b = 235 "
 """
     check compareStatements(@[
       newStatement("a = 5"),
@@ -254,9 +255,9 @@ suite "runCommand.nim":
 
   test "compareStatements three":
     let expected = """
-1, 1: 'a = 5'
-2, 10: '  b = 235 '
-2, 20: '  c = 0'
+1, 1: "a = 5"
+2, 10: "  b = 235 "
+2, 20: "  c = 0"
 """
     check compareStatements(@[
       newStatement("a = 5"),
@@ -275,7 +276,7 @@ suite "runCommand.nim":
 <!--$ nextline a = 5 -->
 """
     let expected = """
-1, 15: 'a = 5 '
+1, 15: "a = 5 "
 """
     check testGetStatements(content, expected)
 
@@ -284,7 +285,7 @@ suite "runCommand.nim":
 <!--$ nextline a = "tea" -->
 """
     let expected = """
-1, 15: 'a = "tea" '
+1, 15: "a = "tea" "
 """
     check testGetStatements(content, expected)
 
@@ -293,8 +294,8 @@ suite "runCommand.nim":
 <!--$ nextline a = 5; b = 6 -->
 """
     let expected = """
-1, 15: 'a = 5'
-1, 21: ' b = 6 '
+1, 15: "a = 5"
+1, 21: " b = 6 "
 """
     check testGetStatements(content, expected)
 
@@ -303,9 +304,9 @@ suite "runCommand.nim":
 <!--$ nextline a = 5; b = 6 ;c=7-->
 """
     let expected = """
-1, 15: 'a = 5'
-1, 21: ' b = 6 '
-1, 29: 'c=7'
+1, 15: "a = 5"
+1, 21: " b = 6 "
+1, 29: "c=7"
 """
     check testGetStatements(content, expected)
 
@@ -315,8 +316,8 @@ suite "runCommand.nim":
 <!--$ : asdf -->
 """
     let expected = """
-1, 15: 'a = 5'
-1, 21: ' asdf '
+1, 15: "a = 5"
+1, 21: " asdf "
 """
     check testGetStatements(content, expected)
 
@@ -327,8 +328,8 @@ suite "runCommand.nim":
 """
 #123456789 123456789 123456789
     let expected = """
-1, 15: 'a = 5 '
-2, 8: 'asdf '
+1, 15: "a = 5 "
+2, 8: "asdf "
 """
     check testGetStatements(content, expected)
 
@@ -341,9 +342,9 @@ $$ : c = len("hello")
 """
 #123456789 123456789 123456789
     let expected = """
-2, 5: 'a = 5'
-3, 5: 'asddasfd'
-4, 5: 'c = len("hello")'
+2, 5: "a = 5"
+3, 5: "asddasfd"
+4, 5: "c = len("hello")"
 """
     check testGetStatements(content, expected)
 
@@ -356,11 +357,11 @@ $$ : c = len("hello")
 """
 #123456789 123456789 123456789
     let expected = """
-1, 12: '234'
-1, 16: '4546'
-2, 5: 'a = 5'
-2, 11: 'bbb = concat("1", "e")'
-4, 5: 'c = len("hello")'
+1, 12: "234"
+1, 16: "4546"
+2, 5: "a = 5"
+2, 11: "bbb = concat("1", "e")"
+4, 5: "c = len("hello")"
 """
     check testGetStatements(content, expected)
 
@@ -371,9 +372,9 @@ $$ : c = len("hello")
 <!--$ : c = t.len(s.header) -->
 """
     let expected = """
-1, 12: 'a = 5'
-1, 18: ' b = "hello"'
-2, 16: ' c = t.len(s.header) '
+1, 12: "a = 5"
+1, 18: " b = "hello""
+2, 16: " c = t.len(s.header) "
 """
     check testGetStatements(content, expected)
 
@@ -382,7 +383,7 @@ $$ : c = len("hello")
 <!--$ nextline ;a = 5 -->
 """
     let expected = """
-1, 16: 'a = 5 '
+1, 16: "a = 5 "
 """
     check testGetStatements(content, expected)
 
@@ -391,7 +392,7 @@ $$ : c = len("hello")
 <!--$ nextline a="hi" -->
 """
     let expected = """
-1, 15: 'a="hi" '
+1, 15: "a="hi" "
 """
     check testGetStatements(content, expected)
 
@@ -400,7 +401,7 @@ $$ : c = len("hello")
 <!--$ nextline a="h\i;" -->
 """
     let expected = """
-1, 15: 'a="h\i;" '
+1, 15: "a="h\i;" "
 """
     check testGetStatements(content, expected)
 
@@ -409,52 +410,52 @@ $$ : c = len("hello")
 <!--$ nextline a="\"hi\"" -->
 """
     let expected = """
-1, 15: 'a="\"hi\"" '
+1, 15: "a="\"hi\"" "
 """
     check testGetStatements(content, expected)
 
   test "double quotes with single quote":
     let content = """
-<!--$ nextline a="'hi'" -->
+<!--$ nextline a=""hi"" -->
 """
     let expected = """
-1, 15: 'a="'hi'" '
+1, 15: "a=""hi"" "
 """
     check testGetStatements(content, expected)
 
   test "single quotes":
     let content = """
-<!--$ nextline a='hi' -->
+<!--$ nextline a="hi" -->
 """
     let expected = """
-1, 15: 'a='hi' '
+1, 15: "a="hi" "
 """
     check testGetStatements(content, expected)
 
   test "single quotes with semicolon":
     let content = """
-<!--$ nextline a='hi;there' -->
+<!--$ nextline a="hi;there" -->
 """
     let expected = """
-1, 15: 'a='hi;there' '
+1, 15: "a="hi;there" "
 """
     check testGetStatements(content, expected)
 
   test "single quotes with slashed single quote":
     let content = """
-<!--$ nextline a='hi\'there' -->
+<!--$ nextline a="hi\"there" -->
 """
     let expected = """
-1, 15: 'a='hi\'there' '
+1, 15: "a="hi\"there" "
 """
     check testGetStatements(content, expected)
 
   test "single quotes with double quote":
     let content = """
-<!--$ nextline a='hi "there"' -->
+<!--$ nextline a="hi "there"" -->
 """
     let expected = """
-1, 15: 'a='hi "there"' '
+1, 15: "a="hi "there"" "
 """
     check testGetStatements(content, expected)
 
@@ -463,7 +464,7 @@ $$ : c = len("hello")
 <!--$ nextline a = 5;-->
 """
     let expected = """
-1, 15: 'a = 5'
+1, 15: "a = 5"
 """
     check testGetStatements(content, expected)
 
@@ -472,8 +473,8 @@ $$ : c = len("hello")
 <!--$ nextline asdf;;fdsa-->
 """
     let expected = """
-1, 15: 'asdf'
-1, 21: 'fdsa'
+1, 15: "asdf"
+1, 21: "fdsa"
 """
     check testGetStatements(content, expected)
 
@@ -482,7 +483,7 @@ $$ : c = len("hello")
 <!--$ nextline asdf; -->
 """
     let expected = """
-1, 15: 'asdf'
+1, 15: "asdf"
 """
     check testGetStatements(content, expected)
 
@@ -493,8 +494,8 @@ $$ : c = len("hello")
 <!--$ : ;x = y -->
 """
     let expected = """
-1, 15: 'asdf'
-3, 9: 'x = y '
+1, 15: "asdf"
+3, 9: "x = y "
 """
     check testGetStatements(content, expected)
 
@@ -528,10 +529,14 @@ statement: a = 9_223_372_036_854_775_808
                         4, none(ValueAndLength), eErrLines = eErrLines)
 
   test "getString":
-    check testGetString(newStatement("a = 'hello'"), 4, newStringValueAndLengthO("hello", 7))
-    check testGetString(newStatement("a = \"hello\""), 4, newStringValueAndLengthO("hello", 7))
-    check testGetString(newStatement("a = 'hello'  "), 4, newStringValueAndLengthO("hello", 9))
-    check testGetString(newStatement("a = \"hello\"  "), 4, newStringValueAndLengthO("hello", 9))
+    check testGetString(newStatement("""a = "hello""""), 4,
+      newStringValueAndLengthO("hello", 7))
+
+    check testGetString(newStatement("a = \"hello\""), 4,
+      newStringValueAndLengthO("hello", 7))
+
+    check testGetString(newStatement("""a = "hello"  """), 4,
+      newStringValueAndLengthO("hello", 9))
 
   test "getString valid utf-8":
     var byteBuffers: seq[seq[uint8]] = @[
@@ -542,9 +547,8 @@ statement: a = 9_223_372_036_854_775_808
     for buffer in byteBuffers:
       let str = newStrFromBuffer(buffer)
       let eLength = buffer.len + 2
-      let statement = "a = '$1'" % str
+      let statement = """a = "$1"""" % str
       check testGetString(newStatement(statement), 4, newStringValueAndLengthO(str, eLength))
-
   test "getString invalid 2":
     check testGetStringInvalid(@[0xc3u8, 0x28])
 
@@ -566,10 +570,11 @@ statement: a = 9_223_372_036_854_775_808
   test "getString not string":
     let eErrLines = splitNewLines """
 template.html(1): w30: Invalid string.
-statement: a = 'abc
+statement: a = "abc
                ^
 """
-    check testGetString(newStatement("a = 'abc"), 4, none(ValueAndLength), eErrLines = eErrLines)
+    check testGetString(newStatement("""a = "abc"""), 4,
+      none(ValueAndLength), eErrLines = eErrLines)
 
   test "getVarOrFunctionValue var1":
     # Test processing the right hand side when it is a variable.
@@ -590,7 +595,7 @@ statement: a = 'abc
   test "getVarOrFunctionValue not defined":
     let statement = newStatement(text="tea = a+123", lineNum=12, 0)
     let eErrLines = splitNewLines """
-template.html(12): w36: The variable 'a' does not exist.
+template.html(12): w36: The variable "a" does not exist.
 statement: tea = a+123
                  ^
 """
@@ -600,7 +605,7 @@ statement: tea = a+123
   test "getVarOrFunctionValue not defined":
     let statement = newStatement(text="tea = a123", lineNum=12, 0)
     let eErrLines = splitNewLines """
-template.html(12): w36: The variable 'a123' does not exist.
+template.html(12): w36: The variable "a123" does not exist.
 statement: tea = a123
                  ^
 """
@@ -620,7 +625,7 @@ statement: tea = a123
   test "warnStatement":
     let statement = newStatement(text="tea = a123", lineNum=12, 0)
     let eErrLines: seq[string] = splitNewLines """
-template.html(12): w36: The variable 'a123' does not exist.
+template.html(12): w36: The variable "a123" does not exist.
 statement: tea = a123
                  ^
 """
@@ -629,7 +634,7 @@ statement: tea = a123
   test "warnStatement long":
     let statement = newStatement(text="""tea  =  concat(a123, len(hello), format(len(asdfom)), 123456778, 1243123456, "this is a long statement", 678, 899)""", lineNum=12, 0)
     let eErrLines: seq[string] = splitNewLines """
-template.html(12): w36: The variable 'a123' does not exist.
+template.html(12): w36: The variable "a123" does not exist.
 statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
                           ^
 """
@@ -638,7 +643,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "warnStatement long":
     let statement = newStatement(text="""tea  =  concat(a123, len(hello), format(len(asdfom)), 123456778, 1243123456, "this is a long statement", 678, test)""", lineNum=12, 0)
     let eErrLines: seq[string] = @[
-      "template.html(12): w36: The variable 'test' does not exist.\n",
+      """template.html(12): w36: The variable "test" does not exist.\n""",
       """statement: ...is is a long statement", 678, test)""" & "\n",
         "                                            ^\n",
     ]
@@ -647,7 +652,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "warnStatement long2":
     let statement = newStatement(text="""tea                         =        concat(a123, len(hello), format(len(asdfom)), 123456778, num,   "this is a long statement with more on each end of the statement.", 678, test)""", lineNum=12, 0)
     let eErrLines: seq[string] = @[
-      "template.html(12): w36: The variable 'num' does not exist.\n",
+      """template.html(12): w36: The variable "num" does not exist.\n""",
       """statement: ...rmat(len(asdfom)), 123456778, num,   "this is a long stateme...""" & "\n",
         "                                            ^\n",
     ]
@@ -689,9 +694,9 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "getFunctionValue missing quote":
     let statement = newStatement(text="""tea = len("abc) """, lineNum=16, 0)
     let eErrLines = @[
-      "template.html(16): w30: Invalid string.\n",
+      "template.html(16): w139: No ending double quote.\n",
       """statement: tea = len("abc) """ & "\n",
-        "                     ^\n",
+        "                      ^\n",
     ]
     check testGetFunctionValue("len", statement, 10, eErrLines = eErrLines)
 
@@ -728,10 +733,10 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
                            some(newVariableData("t.output", newValue("log"))))
 
   test "set invalid output":
-    let statement = newStatement(text="t.output = 'notvalidv'", lineNum=1, 0)
+    let statement = newStatement(text="""t.output = "notvalidv"""", lineNum=1, 0)
     let eErrLines = splitNewLines """
 template.html(1): w41: Invalid t.output value, use: "result", "stderr", "log", or "skip".
-statement: t.output = 'notvalidv'
+statement: t.output = "notvalidv"
            ^
 """
     # The expected value is none, because it doesn't exist yet.
@@ -741,7 +746,7 @@ statement: t.output = 'notvalidv'
   test "runStatement junk at end":
     let statement = newStatement(text="""str = "testing" junk at end""", lineNum=1, 0)
     let eErrLines = @[
-      "template.html(1): w31: Unused text at the end of the statement. Missing semicolon?\n",
+      "template.html(1): w31: Unused text at the end of the statement.\n",
       """statement: str = "testing" junk at end""" & "\n",
         "                           ^\n",
     ]
@@ -789,10 +794,10 @@ statement: e.server = 343
     check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "invalid maxLines":
-    let statement = newStatement(text="t.maxLines = 'hello'", lineNum=1, 0)
+    let statement = newStatement(text="""t.maxLines = "hello"""", lineNum=1, 0)
     let eErrLines = splitNewLines """
 template.html(1): w42: Invalid count. It must be a positive integer.
-statement: t.maxLines = 'hello'
+statement: t.maxLines = "hello"
            ^
 """
     var variables = emptyVariables()
@@ -831,21 +836,21 @@ statement: t.asdf = 3.45
 
   test "invalid missing needed vararg parameter":
     let statement = newStatement(
-      text="result = dict('1', 'else', '2', 'two', '3')", lineNum=1, 0)
+      text="""result = dict("1", "else", "2", "two", "3")""", lineNum=1, 0)
     let eErrLines = splitNewLines """
 template.html(1): w122: Missing vararg parameter, expected groups of 2 got 1.
-statement: result = dict('1', 'else', '2', 'two', '3')
+statement: result = dict("1", "else", "2", "two", "3")
                                                   ^
 """
     var variables = emptyVariables()
     check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "parameter error position":
-    let text = "result = case(33, 2, 22, 'abc', 11, len(concat()))"
+    let text = """result = case(33, 2, 22, "abc", 11, len(concat()))"""
     let statement = newStatement(text, lineNum=1, 0)
     let eErrLines = splitNewLines """
 template.html(1): w119: Not enough parameters, expected 1 got 0.
-statement: result = case(33, 2, 22, 'abc', 11, len(concat()))
+statement: result = case(33, 2, 22, "abc", 11, len(concat()))
                                                           ^
 """
     var variables = emptyVariables()
@@ -883,57 +888,63 @@ statement: t.missing = "1.2.3"
     check parseVersion("111.222.333") == some((111, 222, 333))
 
   test "cmpVersion equal":
-    let statement = newStatement(text="cmp = cmpVersion('1.2.3', '1.2.3')", lineNum=1, 0)
+    let statement = newStatement(text="""cmp = cmpVersion("1.2.3", "1.2.3")""",
+      lineNum=1, 0)
     var variables = emptyVariables()
     check testRunStatement(statement, variables, some(newVariableData("cmp", newValue(0))))
 
   test "cmpVersion less":
-    let statement = newStatement(text="cmp = cmpVersion('1.2.2', '1.2.3')", lineNum=1, 0)
+    let statement = newStatement(text="""cmp = cmpVersion("1.2.2", "1.2.3")""",
+      lineNum=1, 0)
     var variables = emptyVariables()
     check testRunStatement(statement, variables, some(newVariableData("cmp", newValue(-1))))
 
   test "cmpVersion greater":
-    let statement = newStatement(text="cmp = cmpVersion('1.2.4', '1.2.3')", lineNum=1, 0)
+    let statement = newStatement(text="""cmp = cmpVersion("1.2.4", "1.2.3")""",
+      lineNum=1, 0)
     var variables = emptyVariables()
     check testRunStatement(statement, variables,
-                           some(newVariableData("cmp", newValue(1))))
+      some(newVariableData("cmp", newValue(1))))
 
   test "cmpVersion less 2":
-    let statement = newStatement(text="cmp = cmpVersion('1.22.3', '2.1.0')", lineNum=1, 0)
+    let statement = newStatement(text="""cmp = cmpVersion("1.22.3", "2.1.0")""",
+      lineNum=1, 0)
     var variables = emptyVariables()
     check testRunStatement(statement, variables,
-                           some(newVariableData("cmp", newValue(-1))))
+      some(newVariableData("cmp", newValue(-1))))
 
   test "cmpVersion less 3":
-    let statement = newStatement(text="cmp = cmpVersion('2.22.3', '2.44.0')", lineNum=1, 0)
+    let statement = newStatement(text="""cmp = cmpVersion("2.22.3", "2.44.0")""",
+      lineNum=1, 0)
     var variables = emptyVariables()
     check testRunStatement(statement, variables, some(newVariableData("cmp", newValue(-1))))
 
   test "cmpVersion two parameters":
-    let statement = newStatement(text="cmp = cmpVersion('1.2.3')", lineNum=1, 0)
+    let statement = newStatement(text="""cmp = cmpVersion("1.2.3")""", lineNum=1, 0)
     let eErrLines = splitNewLines """
 template.html(1): w119: Not enough parameters, expected 2 got 1.
-statement: cmp = cmpVersion('1.2.3')
+statement: cmp = cmpVersion("1.2.3")
                             ^
 """
     var variables = emptyVariables()
     check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "cmpVersion strings":
-    let statement = newStatement(text="cmp = cmpVersion('1.2.3', 3.5)", lineNum=1, 0)
+    let statement = newStatement(text="""cmp = cmpVersion("1.2.3", 3.5)""",
+      lineNum=1, 0)
     let eErrLines = splitNewLines """
 template.html(1): w120: Wrong parameter type, expected string got float.
-statement: cmp = cmpVersion('1.2.3', 3.5)
+statement: cmp = cmpVersion("1.2.3", 3.5)
                                      ^
 """
     var variables = emptyVariables()
     check testRunStatement(statement, variables, eErrLines = eErrLines)
 
   test "incomplete function":
-    let statement = newStatement(text="a = len('asdf'", lineNum=1, 0)
+    let statement = newStatement(text="""a = len("asdf"""", lineNum=1, 0)
     let eErrLines = splitNewLines """
 template.html(1): w46: Expected comma or right parentheses.
-statement: a = len('asdf'
+statement: a = len("asdf"
                          ^
 """
     var variables = emptyVariables()
@@ -975,7 +986,7 @@ statement: a# = 5
     let statement = newStatement(text="""  quote = "\""   """, lineNum=1, 0)
     var variables = emptyVariables()
     check testRunStatement(statement, variables,
-                           some(newVariableData("quote", newValue("\\\""))))
+                           some(newVariableData("quote", newValue("""""""))))
 
 
 # todo: test that a warning is generated when the item doesn't exist.

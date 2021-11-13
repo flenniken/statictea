@@ -58,6 +58,7 @@ import std/options
 import std/tables
 import vartypes
 import version
+import messages
 import warnings
 import tostring
 import args

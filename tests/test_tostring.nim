@@ -2,6 +2,7 @@ import std/unittest
 import std/tables
 import tostring
 import vartypes
+import messages
 import warnings
 
 suite "tostring.nim":

@@ -8,47 +8,111 @@ import std/strformat
 import env
 import vartypes
 import readjson
+import messages
 import warnings
 import tostring
-import unicode
+import unicodes
+import opresultid
 
+proc testParseHexUnicode(str: string, start: Natural, eNumber: int32, ePos: Natural): bool =
+  var pos = start
+  result = true
+  let numOrc = parseHexUnicode(str, pos)
+  if not numOrc.isValue:
+    echo "unexpected error: " & $numOrc
+    result = false
+  if numOrc.value != eNumber:
+    echo "expected num: $1" % $toHex(numOrc.value)
+    echo "     got num: $1" % $toHex(eNumber)
+    result = false
+  if ePos != pos:
+    echo "expected pos: $1" % $ePos
+    echo "     got pos: $1" % $pos
+    result = false
 
+proc testParseHexUnicodeE(str: string, start: Natural, messageId: MessageId,
+    ePos: Natural): bool =
+  result = true
+  var pos = start
+  let numOrc = parseHexUnicode(str, pos)
+  if not numOrc.isMessageId:
+    echo "did not get the expected error: " & $numOrc
+    result = false
+  if numOrc.messageId != messageId:
+    echo "expected message: $1" % getWarning("test", 0, messageId)
+    echo "     got message: $1" % getWarning("test", 0, MessageId(numOrc.messageId))
+    result = false
+  if ePos != pos:
+    echo "expected pos: $1" % $ePos
+    echo "     got pos: $1" % $pos
+    result = false
 
-# proc testParseJsonStr(text: string, strLen: Natural,
-#     expected: string, expectedLen: Natural, expectedPos: Natural): bool =
-#   # Test parseJsonStr.
+proc testParseHexUnicode16(str: string, start: Natural, eNumber: int32): bool =
+  let numOrc = parseHexUnicode16(str, start)
+  result = true
+  if not numOrc.isValue:
+    echo "unexpected error: " & $numOrc
+    result = false
+  if numOrc.value != eNumber:
+    echo "expected num: $1" % $toHex(numOrc.value)
+    echo "     got num: $1" % $toHex(eNumber)
+    result = false
 
-#   let stringPosO = parseJsonStr(text)
-#   if not stringPosO.isSome:
-#     echo "not a json string: " & text
-#     return false
-#   let stringPos = stringPosO.get()
-#   let literal = stringPos.str
-#   let pos = stringPos.pos
-  
-#   if literal != expected or pos != expectedPos:
-#     echo "expected: $1" % [expected]
-#     echo "     got: $1" % [literal]
-#     echo "expected pos: $1" % [$expectedPos]
-#     echo "     got pos: $1" % [$pos]
+proc testParseHexUnicode16E(str: string, start: Natural, messageId: MessageId): bool =
+  let numOrc = parseHexUnicode16(str, start)
+  result = true
+  if not numOrc.isMessageId:
+    echo "did not get the expected error: " & $numOrc
+    result = false
+  if numOrc.messageId != messageId:
+    echo "expected message: $1" % getWarning("test", 0, messageId)
+    echo "     got message: $1" % getWarning("test", 0, MessageId(numOrc.messageId))
+    result = false
 
-#     if runeLen(expected) == 1:
-#       echo r"expected u: \u" & toHex(int32(toRunes(expected)[0]))
-#     if runeLen(literal) == 1:
-#       echo r"     got u: \u" & toHex(int32(toRunes(literal)[0]))
-#     return false
+proc testParseJsonStr(text: string, start: Natural,
+    eStr: string, eLength: Natural): bool =
+  # Test parseJsonStr.
 
-#   if runeLen(text) != strLen:
-#     echo "wrong number of characters:"
-#     echo "     got str.len $1" % $runeLen(text)
-#     echo "expected str.len $1" % $strLen
+  let parsedString = parseJsonStr(text, start)
+  if parsedString.messageId != MessageId(0):
+    echo "Unexpected error: " & $parsedString.messageId
+    return false
+  let literal = parsedString.str
+  let length = parsedString.pos - start
 
-#   if runeLen(expected) != expectedLen:
-#     echo "     got expected.len $1" % $runeLen(expected)
-#     echo "expected expected.len $1" % $expectedLen
-#     return false
+  result = true
 
-#   return true
+  if literal != eStr:
+    echo "expected str: $1" % [eStr]
+    echo "     got str: $1" % [literal]
+    result = false
+
+  if length != eLength:
+    echo "expected length: $1" % [$eLength]
+    echo "     got length: $1" % [$length]
+    result = false
+
+  var posO = firstInvalidUtf8(literal)
+  if posO.isSome:
+    echo "Invalid utf-8 bytes starting at $1." % $posO.get()
+    result = false
+
+proc testParseJsonStrE(text: string, start: Natural,
+    eMessageId: Messageid): bool =
+  ## Test parseJsonStr for expected errors.
+
+  result = true
+
+  let parsedString = parseJsonStr(text, start)
+  if parsedString.messageId == MessageId(0):
+    echo "Unexpected value: " & $parsedString
+    return false
+
+  let messageId = parsedString.messageId
+  if messageId != eMessageId:
+    echo "expected message: $1" % [$eMessageId]
+    echo "     got message: $1" % [$messageId]
+    result = false
 
 proc testUnescapePopularChar(popular: char, eChar: char): bool =
   let ch = unescapePopularChar(popular)
@@ -310,42 +374,6 @@ she sat down in a large arm-chair at one end of the table.
     var str = dictToString(valueOrWarning.value)
     check expectedItem("read json mix", str, eStr)
 
-  # test "parseJsonStr":
-  #   check testParseJsonStr("""""""", 2, "", 0, 2)
-  #   check testParseJsonStr(""""" """, 3, "", 0, 3)
-  #   check testParseJsonStr("""  "" """, 5, "", 0, 5)
-  #   check testParseJsonStr(""""t"""", 3, "t", 1, 3)
-  #   check testParseJsonStr(""" "t" """, 5, "t", 1, 5)
-  #   check testParseJsonStr("\"tea\"", 5, "tea", 3, 5)
-  #   check testParseJsonStr(""" "tea" other """, 12, "tea", 3, 6)
-
-  # test "parseJsonStr short escape":
-  #   check testParseJsonStr(""""\b"""", 4, "\b", 1, 4)
-  #   check testParseJsonStr(""""\f"""", 4, "\f", 1, 4)
-  #   check testParseJsonStr(""""\n"""", 4, "\n", 1, 4)
-  #   check testParseJsonStr(""""\r"""", 4, "\r", 1, 4)
-  #   check testParseJsonStr(""""\t"""", 4, "\t", 1, 4)
-
-  # test "parseJsonStr escape":
-  #   check testParseJsonStr(""" "\"" """, 6, "\"", 1, 6)
-  # #   check testParseJsonStr("\\\"", 2, "\"", 1)
-  # #   check testParseJsonStr(r"\\", 2, "\\", 1)
-  # #   check testParseJsonStr(r"\/", 2, "/", 1)
-  # #   check testParseJsonStr(r"\b", 2, "\b", 1)
-  # #   check testParseJsonStr(r"\f", 2, "\f", 1)
-  # #   check testParseJsonStr(r"\n", 2, "\n", 1)
-  # #   check testParseJsonStr(r"\r", 2, "\r", 1)
-  # #   check testParseJsonStr(r"\t", 2, "\t", 1)
-
-  # # test "parseJsonStr unicode escape":
-  # #   check testParseJsonStr(r"\u0038", 6, "8", 1)
-  # #   check testParseJsonStr(r"\u03A6", 6, "Φ", 1)
-  # #   check testParseJsonStr(r"\u1E00", 6, "Ḁ", 1)
-  # #   check testParseJsonStr(r"\u8336", 6, "茶", 1)
-  # #   check testParseJsonStr(r"\uD834\uDD1E", 12, "\u{1D11E}", 1)
-
-  # # todo: test error cases for parseJsonStr
-
   test "unescapePopularChar":
     # nr"t\bf/
     check testUnescapePopularChar('n', '\n')
@@ -361,3 +389,139 @@ she sat down in a large arm-chair at one end of the table.
     check unescapePopularChar('a') == char(0)
     check unescapePopularChar('\'') == char(0)
 
+  test "parseHexUnicode16":
+    check testParseHexUnicode16("u0000", 0, 0x00)
+    check testParseHexUnicode16("u0030", 0, 0x30)
+    check testParseHexUnicode16("u1234", 0, 0x1234)
+    check testParseHexUnicode16("uffff", 0, 0xffff)
+    check testParseHexUnicode16("uABCD", 0, 0xabcd)
+    check testParseHexUnicode16("""\u0038" """, 1, 0x38)
+
+    check testParseHexUnicode16(r"abc\u0030def", 4, 0x30)
+
+  test "parseHexUnicode16 error":
+    check testParseHexUnicode16E("", 0, wFourHexDigits)
+    check testParseHexUnicode16E("u", 0, wFourHexDigits)
+    check testParseHexUnicode16E("uv", 0, wFourHexDigits)
+    check testParseHexUnicode16E("u0v", 0, wFourHexDigits)
+    check testParseHexUnicode16E("u00v", 0, wFourHexDigits)
+    check testParseHexUnicode16E("u000v", 0, wFourHexDigits)
+    check testParseHexUnicode16E("au000v", 0, wFourHexDigits)
+    check testParseHexUnicode16E("abu000v", 0, wFourHexDigits)
+
+  test "parseHexUnicode":
+    # You can generate the surrogate pair for a unicode code point.
+    # http://russellcottrell.com/greek/utilities/SurrogatePairCalculator.htm
+    check testParseHexUnicode("u0000", 0, 0, 5)
+    check testParseHexUnicode(""" "\u0038" """, 3, 0x38, 8)
+    check testParseHexUnicode(r"u0030\u0031", 0, 0x30, 5)
+    check testParseHexUnicode(r"uD841\uDF0E", 0, 0x2070E, 11) # 𠜎
+    check testParseHexUnicode(r"uD867\uDD98", 0, 0x29D98, 11) # 𩶘
+    check testParseHexUnicode(r"uD83D\uDE03", 0, 0x1F603, 11) # 😃
+
+  test "parseHexUnicode error":
+    check testParseHexUnicodeE("u000", 0, wFourHexDigits, 0)
+    check testParseHexUnicodeE(r"uD83Dabc", 0, wMissingSurrogatePair, 5)
+    check testParseHexUnicodeE(r"uD83D\tabc", 0, wMissingSurrogatePair, 5)
+    check testParseHexUnicodeE(r"uD83D\u0030", 0, wNotMatchingSurrogate, 11)
+
+    # The test cases below come from this site:
+    # https://www.w3.org/2001/06/utf-8-wrong/UTF-8-test.html
+
+    # 5.1 Single UTF-16 surrogates
+    check testParseHexUnicodeE(r"uD800x", 0, wMissingSurrogatePair, 5)
+    check testParseHexUnicodeE(r"uDb7fx", 0, wMissingSurrogatePair, 5)
+    check testParseHexUnicodeE(r"uDb80x", 0, wMissingSurrogatePair, 5)
+    check testParseHexUnicodeE(r"uDC00x", 0, wLowSurrogateFirst, 5)
+    check testParseHexUnicodeE(r"uDF80x", 0, wLowSurrogateFirst, 5)
+    check testParseHexUnicodeE(r"uDfffx", 0, wLowSurrogateFirst, 5)
+
+    # 5.2 Paired UTF-16 surrogates                                                  |
+    check testParseHexUnicodeE(r"uD800\uDC00", 0, wPairedSurrogate, 11)
+    check testParseHexUnicodeE(r"uD800\uDfff", 0, wPairedSurrogate, 11)
+    check testParseHexUnicodeE(r"uDB7F\uDC00", 0, wPairedSurrogate, 11)
+    check testParseHexUnicodeE(r"uDB7F\uDFFF", 0, wPairedSurrogate, 11)
+    check testParseHexUnicodeE(r"uDB80\uDFFF", 0, wPairedSurrogate, 11)
+    check testParseHexUnicodeE(r"uDBFF\uDC00", 0, wPairedSurrogate, 11)
+    check testParseHexUnicodeE(r"uDBFF\uDFFF", 0, wPairedSurrogate, 11)
+
+    # 3.5  Impossible bytes
+    check testParseHexUnicodeE(r"u00fe", 0, wInvalidUtf8, 5)
+    check testParseHexUnicodeE(r"u00ff", 0, wInvalidUtf8, 5)
+
+    # 5.3 Other illegal code positions
+    check testParseHexUnicodeE(r"ufffe", 0, wInvalidUtf8, 5)
+    check testParseHexUnicodeE(r"uffff", 0, wInvalidUtf8, 5)
+
+    # Not enough characters.
+    check testParseHexUnicodeE(r"uD800", 0, wMissingSurrogatePair, 5)
+    check testParseHexUnicodeE(r"uD800\", 0, wMissingSurrogatePair, 5)
+    check testParseHexUnicodeE(r"uD800\u", 0, wMissingSurrogatePair, 5)
+
+  test "parseJsonStr":
+    # Parsing starts after the start quote and ends after the
+    # whitespace after the end quote.
+    check testParseJsonStr(""""""", 0, "", 1)
+    check testParseJsonStr(""" """", 1, "", 1)
+    check testParseJsonStr(""" """"", 2, "", 1)
+    check testParseJsonStr(""" "" """, 2, "", 2)
+    check testParseJsonStr(""" ""  """, 2, "", 3)
+
+    check testParseJsonStr(""" "t" """, 2, "t", 3)
+    check testParseJsonStr(""" "tea" """, 2, "tea", 5)
+    check testParseJsonStr(""" "tea" other""", 2, "tea", 5)
+
+  test "parseJsonStr popular escape":
+    check testParseJsonStr(""" "\b" """, 2, "\b", 4)
+    check testParseJsonStr(""" "\f" """, 2, "\f", 4)
+    check testParseJsonStr(""" "\n" """, 2, "\n", 4)
+    check testParseJsonStr(""" "\r" """, 2, "\r", 4)
+    check testParseJsonStr(""" "\t" """, 2, "\t", 4)
+
+  test "parseJsonStr unicode escape":
+    check testParseJsonStr(""" "\u0038" """, 2, "8", 8)
+    check testParseJsonStr(""" "\u03A6" """, 2, "Φ", 8)
+    check testParseJsonStr(""" "\u1E00" """, 2, "Ḁ", 8)
+    check testParseJsonStr(""" "\u8336" """, 2, "茶", 8)
+    check testParseJsonStr(""" "\uD834\uDD1E" """, 2, "\u{1D11E}", 14)
+
+  test "parseJsonStr varying":
+    check testParseJsonStr(""" "\u0038 39 40 \t 50" """, 2, "8 39 40 \t 50", 20)
+    check testParseJsonStr(""" "\t\n\r\"\\ \b\f\/ \u0039 \uD83D\uDE03" """, 2,
+      "\t\n\r\"\\ \b\f/ 9 😃", 39)
+
+    check testParseJsonStr(""" "a"	""", 2, "a", 3)
+    check testParseJsonStr(""" "a"	 """, 2, "a", 4)
+
+  test "parseJsonStr error":
+    check testParseJsonStrE(""" "no ending quote """, 2, wNoEndingQuote)
+    check testParseJsonStrE(" \"\n newline not escaped \" ", 2, wControlNotEscaped)
+
+    check testParseJsonStrE(""" "\uDC00x""", 2, wLowSurrogateFirst)
+    check testParseJsonStrE(""" "\a" """, 2, wNotPopular)
+
+    let str = bytesToString([0x1u8, 0x02, 0x03, 0x04])
+    check testParseJsonStrE(str, 0, wControlNotEscaped)
+
+  test "parseJsonStr invalid utf-8":
+    var str = bytesToString([0x22u8, 0x2f, 0x22])
+    check testParseJsonStr(str, 1, "/", 2)
+
+    # String is not validated by the parse function.  It is validated
+    # afterwards.
+
+    # # 4.1  Examples of an overlong ASCII character /.
+    # str = bytesToString([0x22u8, 0xc0, 0xaf, 0x22])
+    # check testParseJsonStr(str, 1, "/", 1) # wNoEndingQuote
+
+    # str = bytesToString([0x22u8, 0xe0, 0x80, 0xaf, 0x22])
+    # check testParseJsonStr(str, 1, "/", 1) # wNoEndingQuote
+
+    # str = bytesToString([0x22u8, 0xf0, 0x80, 0x80, 0xaf, 0x22])
+    # check testParseJsonStr(str, 1, "/", 1) # wNoEndingQuote
+
+    # str = bytesToString([0x22u8, 0xf8, 0x80, 0x80, 0x80, 0xaf, 0x22])
+    # check testParseJsonStr(str, 1, "/", 1) # wNoEndingQuote
+
+    # str = bytesToString([0x22u8, 0xfc, 0x80, 0x80, 0x80, 0x80, 0xaf, 0x22])
+    # check testParseJsonStr(str, 1, "/", 1) # wNoEndingQuote

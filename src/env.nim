@@ -6,6 +6,7 @@ import std/times
 import std/options
 import std/strutils
 import tempFile
+import messages
 import warnings
 import args
 when defined(test):

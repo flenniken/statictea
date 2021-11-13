@@ -8,6 +8,7 @@ import std/strutils
 import std/math
 import std/os
 import std/algorithm
+import messages
 import warnings
 import vartypes
 import regexes

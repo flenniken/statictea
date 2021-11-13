@@ -6,6 +6,7 @@ import std/strutils
 import args
 import parseCommandLine
 import env
+import messages
 import warnings
 
 proc parseCommandLine*(cmdLine: string = ""): ArgsOrWarning =

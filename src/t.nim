@@ -12,6 +12,8 @@ echo ""
 echo "rune is a unicode character stored as specific uint32."
 echo ""
 
+for codePoint in 0..\x
+
 echo "You can make a rune from a number:"
 echo "Rune(114) => " & $Rune(114) 
 echo "Rune(ord(ch)) => " & $Rune(ord(ch)) 

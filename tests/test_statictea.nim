@@ -3,6 +3,7 @@ import std/strutils
 import statictea
 import env
 import version
+import readlines
 
 proc testMain(argv: seq[string],
     eRc: int,
@@ -48,7 +49,7 @@ suite "statictea.nim":
 XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); Starting: argv: @["-v"]
 XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); Version: X.X.X
 """
-    var eLogLines = splitNewlines(logLines)
+    var eLogLines = splitNewLines(logLines)
     let eOutLines = @[staticteaVersion & "\n"]
     let argv = @["-v"]
     check testMain(argv, 0, eOutLines = eOutLines, eLogLines = eLogLines)

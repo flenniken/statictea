@@ -9,6 +9,7 @@ import tpub
 import regexes
 import env
 import vartypes
+import messages
 import warnings
 import parseNumber
 import variables
@@ -132,7 +133,7 @@ func `==`*(s1: Statement, s2: Statement): bool =
 
 func `$`*(s: Statement): string =
   ## Return a string representation of a Statement.
-  result = "$1, $2: '$3'" % [$s.lineNum, $s.start, s.text]
+  result = """$1, $2: "$3"""" % [$s.lineNum, $s.start, s.text]
 
 proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
   ## Create a newValueAndLength object.
@@ -217,60 +218,18 @@ proc getString*(env: var Env, prepostTable: PrepostTable,
   ## and the return length includes optional trailing white space
   ## after the last quote.
 
-
-proc parseJsonStr*(text: string, start: Natural): Option[ValueAndLength] =
-  ## Parse the json string. Return the string value and the ending
-  ## position which includes trailing whitespace.
-
-  # Create a stream out of the string.
-  var stream = newStringStream(text)
-  if stream == nil:
-    return
-  defer:
-    stream.close()
-  stream.seek(start)
-
-  # Parse the string which removes escaping.
-  var jsonNode: JsonNode
-  try:
-    jsonNode = parseJson(stream)
-  except:
-    return
-  var pos = stream.getPosition()
-
-  # todo: skip trailing whitespace.
-  
-  # Return the string value.
-  if jsonNode.kind != JString:
-    return
-
-  let value = newValue(jsonNode.getStr())
-  result = some(newValueAndLength(value, pos - start))
-
-
-
-
-
-
-  # Check that we have a statictea string.
-  var matchesO = matchString(statement.text, start)
-  if not matchesO.isSome:
-    env.warnStatement(statement, wNotString, start)
-    return
-
-  # Get the string. The string is either in s1 or s2, s1 means single
-  # quotes were used, s2 double.
-  let matches = matchesO.get()
-  let (s1, s2) = matches.get2Groups()
-  let str = if (s1 == ""): s2 else: s1
+  # todo: remove unused matchString.
+  # todo: remove single quotes everywhere.
+  let str = statement.text
 
   # Parse the json string and remove escaping.
-  let valueAndLengthO = parseJsonStr(str)
-  if not valueAndLengthO.isSome:
-    env.warnStatement(statement, wNotString, start)
+  let parsedString = parseJsonStr(str, start+1)
+  if parsedString.messageId != MessageId(0):
+    env.warnStatement(statement, parsedString.messageId, start+1)
     return
-  let valueAndLength = valueAndLengthO.get()
-  let literal = valueAndLength.value.stringv
+  let valueAndLength = newValueAndLength(newValue(parsedString.str),
+    parsedString.pos - start)
+  let literal = parsedString.str
 
   # Validate the utf-8 bytes.
   var posO = firstInvalidUtf8(literal)

@@ -71,7 +71,7 @@ suite "env.nim":
 
     testProc(env)
 
-    var eLogLines = splitNewlines("""
+    var eLogLines = splitNewLines("""
 XXXX-XX-XX XX:XX:XX.XXX; test_env.nim(X*); testProc called
 XXXX-XX-XX XX:XX:XX.XXX; test_env.nim(X*); testProc done
 """)

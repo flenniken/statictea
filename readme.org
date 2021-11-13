@@ -318,8 +318,8 @@ template:
 
 #+BEGIN_SRC
 $$ nextline
-$$ : tea = 'Earl Grey'
-$$ : tea2 = 'Masala chai'
+$$ : tea = "Earl Grey"
+$$ : tea2 = "Masala chai"
 {tea}, {tea2}
 #+END_SRC
 
@@ -371,7 +371,7 @@ A replacement block is a group of contiguous lines in a template
 between a command and its endblock. For the nextline case the
 block is one line.
 
-The block contains the any number of bracketed variables for
+The block contains any number of bracketed variables for
 substitution.
 
 You can repeat the block to make lists and other repeating
@@ -400,11 +400,9 @@ operators. Looping is done at the replacement block level with
 t.repeat and t.row. Output control is done with t.output.
 
 Statements are allowed on the nextline, block and replace
-commands. You can use multiple statements on the same line
-separated with semicolons. If you need more space for a
-statement, you can continue the line with the "+" character at
-the end. Statements are executed from left to right, top to
-bottom.
+commands. If you need more space for a statement, you can
+continue the line with the "+" character at the end. Statements
+are executed from left to right, top to bottom.
 
 Here are some simple statements:
 
@@ -437,10 +435,9 @@ postfix is "-->". See [[#prefix-postfix][Prefix Postfix]] for more information.
 
 The prefix starts at column 1. Next comes the command
 name. Statements follow the command name, they are separated by
-semicolons or newlines and they may flow through the following
-lines. At the end of the line is an optional plus continuation
-character then the optional postfix then the end of line, either
-\r\n or \n.
+newlines and they may flow through the following lines. At the
+end of the line is an optional plus continuation character then
+the optional postfix then the end of line, either \r\n or \n.
 
 The chart below shows a nextline command with three continuation
 commands and three statements: a = 5, b = "tea" and c = "The Earl
@@ -507,6 +504,11 @@ You use variables to create formatted content for a block and to
 control how a command works. You create them in json files or in
 template statements.
 
+A variable begins with an ascii letter followed by letters,
+digits or underscores.  They are limited to xxx characters.  You
+can use single letters a, b, c, d, e and v, w, x, y, z. The other
+single letters are reserved.
+
 Local variables and tea variables (except row) are cleared after
 processing each replacement block.
 
@@ -514,13 +516,18 @@ You can append a new variable to a list or dictionary but you
 cannot change an existing variable.
 
 One dictionary exists for each of the five types of
-variables. You access them with different prefixes.
+variables. You access them with different one letter prefixes.
 
-- s -- [[#json-variables][Server Json Variables]]
-- h -- [[#json-variables][Shared Json Variables]]
-- l -- [[#local-variables][Local Variables]]
+- f -- Built in Functions
 - g -- [[#global-variables][Global Variables]]
+- h -- [[#json-variables][Shared Json Variables]]
+- i, j, k -- reserved
+- l -- [[#local-variables][Local Variables]]
+- m -- function variables
+- n, o, p, q, r -- reserved
+- s -- [[#json-variables][Server Json Variables]]
 - t -- [[#tea-variables][Tea Variables]]
+- u -- user defined functions
 
 [[#contents][茶]]
 
@@ -782,7 +789,7 @@ template:
 <!--$ nextline t.repeat=len(s.companyList) -->
 <!--$ : d = get(s.companyList, t.row) -->
 <!--$ : selected = get(d.company, "selected", 0) -->
-<!--$ : current=if(selected, ' selected="selected"', "") -->
+<!--$ : current=if(selected, " selected=\"selected\"", "") -->
 <option{current}>{d.company}</option>
 </select>
 #+END_SRC
@@ -960,31 +967,45 @@ string with single or double quotes and use them in
 statements. You encode strings as unicode utf-8.  Invalid utf-8
 sequences generate a warning.
 
-example strings:
+Example strings:
 
-- "this is a string"
-- 'using single quotes'
 - "You can store black teas longer than green teas."
 - "100"
 
-Strings follow the same escaping rules as json strings.
+Strings follow the same escaping rules as json strings.  You can
+escape 8 special control characters using a slash followed by a
+letter. Special escape letters:
+
+- " -> quotation mark (U+0022)
+- \ -> reverse solidus (U+005C)
+- / -> solidus (U+002F)
+- b -> backspace (U+0008)
+- f -> form feed (U+000C)
+- n -> line feed (U+000A)
+- r -> carriage return (U+000D)
+- t -> tab (U+0009)
+
+Examples with escaping:
 
 - "ending newline\n"
 - "tab \t in the middle"
-- 'Unicode tea character "茶" is "\u8336"'
+- "Mad Hatter: \"... you must have a cup of tea!\" - 'Alice In Wonderland'."
+- "Unicode tea character '茶' is '\u8336'"
+- "smiley face 😀 by escaping: \uD83D\uDE00."
 
-example usage:
-
-#+BEGIN_SRC
-<!--$ nextline tea = "Earl Grey" -->
-<h2>{tea}</h2>
-#+END_SRC
-
-result:
+You enter unicode values with \u and four hex digits or, for
+values greater the U-FFFF, you use two pairs.  The two pairs are
+called surrogate pairs.
 
 #+BEGIN_SRC
-<h2>Earl Grey</h2>
+The unicode code point U-8336 is 茶 and escaped is \u8336.
+The unicode code point U-1F600 is 😀 and escaped is \uD83D\uDE00.
 #+END_SRC
+
+You can generate the surrogate pair for a unicode code point
+using Russell Cottrell's surrogate pair calculator:
+[[http://russellcottrell.com/greek/utilities/SurrogatePairCalculator.htm][
+Surrogate Pair Calculator]].
 
 [[#contents][茶]]
 
@@ -1391,8 +1412,8 @@ is processed.
 
 Logging is off by default. You turn it on with the log option.
 You can specify the log file full path.  If you don't specify a
-filename, "statictea.log" is used. The log location depends on
-the platform:
+filename, "statictea.log" is used. The log default location
+depends on the platform:
 
 - Mac: ~/Library/lib/statictea.log
 - Other: ~/statictea.log
@@ -1404,8 +1425,8 @@ the platform:
    :CUSTOM_ID: module-docs
    :END:
 
-You can read the StaticTea source code documentation in Gitlab
-because it is formatted as gitlab markdown. Statictea created the
+You can read the StaticTea source code documentation in Github
+because it is formatted as github markdown. Statictea created the
 markdown files from the source code's embedded doc comments.
 
 - [[docs/index.md][StaticTea Source Docs]] --- Index to the
@@ -1433,7 +1454,7 @@ the following process for each module:
    :END:
 
 The nim jsondoc command produces html formatted json data.  Our
-desired final format is Gitlab markdown so having html
+desired final format is Github markdown so having html
 presentation data in the json is a problem.
 
 It was discovered that single paragraph comments are unformatted.
@@ -1474,7 +1495,7 @@ n n
 Here is the output:
 
 #+BEGIN_SRC
-n        	  Show available tasks.
+n           Show available tasks.
 t           Run all tests at once.
 test        Run one or more tests; specify part of test filename.
 b           Build the statictea exe.
@@ -1505,13 +1526,18 @@ helpme      Show the statictea help text.
    :CUSTOM_ID: stf-runner
    :END:
 
+The stf runner runs command line tests of statictea.
+
+The runner is a standalone program that can test any command line
+application.  You define a test in a stf file.  The stf file
+contains instrutions for creating test files, running them and
+for comparing them to determine whether the test passed.
+
 The statictea testfiles folder contains Single Test File (stf)
 files used to test statictea features. The runner command runs
-all the stf files.  There are nimble tasks for these:
-
-- br -- build the stf runner application
-- stf -- list the stf descriptions
-- runner -- run the tests
+all the stf files.  There are nimble tasks to run all the tests,
+to run one test, to make new tests and to list them.  See the
+nimble section above.
 
 See the runner help message for help creating stf files.
 
@@ -1978,8 +2004,8 @@ Examples:
 
 #+BEGIN_SRC
 d = dict("tea", "Earl Grey")
-get(d, 'tea') => "Earl Grey"
-get(d, 'coffee', 'Tea') => "Tea"
+get(d, "tea") => "Earl Grey"
+get(d, "coffee", "Tea") => "Tea"
 #+END_SRC
 
 Using dot notation:
@@ -2006,7 +2032,7 @@ get(list: list, index: int, optional default: any) any
 Examples:
 
 #+BEGIN_SRC
-list = list(4, 'a', 10)
+list = list(4, "a", 10)
 get(list, 2) => 10
 get(list, 3, 99) => 99
 #+END_SRC
@@ -2083,9 +2109,9 @@ if(condition: int, true: any, false: any) any
 Examples:
 
 #+BEGIN_SRC
-if(1, 'tea', 'beer') => "tea"
-if(0, 'tea', 'beer') => "beer"
-if(4, 'tea', 'beer') => "beer"
+if(1, "tea", "beer") => "tea"
+if(0, "tea", "beer") => "beer"
+if(4, "tea", "beer") => "beer"
 #+END_SRC
 
 [[#contents][茶]]
@@ -2170,7 +2196,7 @@ int("-6.3456", "truncate") => -6
 Join the path components with a path separator.
 
 You pass a list of components to join. For the second optional
-parameter you specify the separator to use, either "/", "" or
+parameter you specify the separator to use, either "/", "\\" or
 "". If you specify "" or leave off the parameter, the current
 platform separator is used.
 
@@ -2269,8 +2295,8 @@ Examples:
 
 #+BEGIN_SRC
 len(dict()) => 0
-len(dict('a', 4)) => 1
-len(dict('a', 4, 'b', 3)) => 2
+len(dict("a", 4)) => 1
+len(dict("a", 4, "b", 3)) => 2
 #+END_SRC
 
 [[#contents][茶]]
@@ -2524,10 +2550,10 @@ floats = list(4.4, 3.1, 5.9)
 sort(floats, "ascending") => [3.1, 4.4, 5.9]
 sort(floats, "descending") => [5.9, 4.4, 3.1]
 
-strs = list('T', 'e', 'a')
-sort(strs, "ascending") => ['T', 'a', 'e']
-sort(strs, "ascending", "sensitive") => ['T', 'a', 'e']
-sort(strs, "ascending", "insensitive") => ['a', 'e', 'T']
+strs = list("T", "e", "a")
+sort(strs, "ascending") => ["T", "a", "e"]
+sort(strs, "ascending", "sensitive") => ["T", "a", "e"]
+sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
 #+END_SRC
 
 [[#contents][茶]]
@@ -2587,11 +2613,11 @@ sort(dicts: list, order: string, case: string, key: string) list
 Examples:
 
 #+BEGIN_SRC
-d1 = dict('name', 'Earl Gray', 'weight', 1.2)
-d2 = dict('name', 'Tea Pot', 'weight', 3.5)
+d1 = dict("name", "Earl Gray", "weight", 1.2)
+d2 = dict("name", "Tea Pot", "weight", 3.5)
 dicts = list(d1, d2)
-sort(dicts, "ascending", "sensitive", 'weight') => [d1, d2]
-sort(dicts, "descending", "sensitive", 'name') => [d2, d1]
+sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
+sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 #+END_SRC
 
 [[#contents][茶]]

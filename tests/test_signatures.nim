@@ -5,6 +5,7 @@ import vartypes
 import funtypes
 import options
 import tostring
+import messages
 import warnings
 
 proc testSignatureCodeToParams(signatureCode: string, expected: string): bool =

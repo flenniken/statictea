@@ -4,6 +4,7 @@ import std/parseopt
 import std/options
 import tpub
 import args
+import messages
 import warnings
 import regexes
 

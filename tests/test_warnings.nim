@@ -1,5 +1,6 @@
 import std/unittest
 import std/strUtils
+import messages
 import warnings
 
 func countLetter(message: string, letter: char): int =
@@ -26,20 +27,24 @@ suite "warnings.nim":
     check countLetter("22342", '2') == 3
     check countLetter("222", '2') == 3
 
+  test "getWarning 0":
+    let warning = getWarning("starting", 0, wSuccess)
+    check warning == "starting(0): w0: Success."
+
   test "getWarning":
-    let warning = getWarning("starting", 0, wNoFilename, p1="server", p2="s")
-    check warning == "starting(0): w0: No server filename. Use s=filename."
+    let warning = getWarning("starting", 5, wNoFilename, p1="server", p2="s")
+    check warning == "starting(5): w133: No server filename. Use s=filename."
 
   test "getWarning-file-line":
     let warning = getWarning("tea.html", 23, wNoFilename, p1="server", p2="s")
-    check warning == "tea.html(23): w0: No server filename. Use s=filename."
+    check warning == "tea.html(23): w133: No server filename. Use s=filename."
 
   test "getWarning-one-p":
     let warning = getWarning("tea.html", 23, wUnknownArg, "missing")
     check warning == "tea.html(23): w2: Unknown argument: missing."
 
   test "warningsList":
-    for message in warningsList:
+    for message in Messages:
       if not isUpperAscii(message[0]):
         echo "The following message does not start with a capital letter."
         echo message
