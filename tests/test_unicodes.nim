@@ -4,35 +4,189 @@ import std/strutils
 import std/unicode
 import std/osproc
 import std/os
+import std/strformat
 import unicodes
 import regexes
 
-func parseInvalidLine(line: string): Option[(int, string)] =
-  ## Parse line "invalid at pos nnn: string".
-  let pattern = r"invalid at pos ([0-9]+): (.*)$"
+const
+  unableToOpen = "Unable to open the file: $1"
+  validStr = "valid"
+  validHexStr = "valid hex"
+  invalidStr = "invalid at "
+  invalidHexStr = "invalid hex at "
+
+type
+  HexLine = object
+    kind: string  # validHexStr or invalidHexStr
+    strPos: string
+    str: string
+    comment: string
+    message: string
+
+func newHexLine(kind, strPos, comment, str: string): HexLine =
+  result = HexLine(kind: kind, strPos: strPos, comment: comment,
+    str: str, message: "")
+
+func newHexLineMsg(kind: string, message: string): HexLine =
+  result = HexLine(kind: kind, strPos: "", comment: "", str: "", message: message)
+
+proc iconvValidateString(str: string): bool =
+  ## Validate the string using iconv. Return the position of the first
+  ## invalid byte or -1.
+
+  let filename = "tempfile.txt"
+  var file = open(filename, fmWrite)
+  file.write(str)
+  file.close()
+  result = true
+  let rc = execCmd("iconv -f UTF-8 -t UTF-8 $1" % filename)
+  if rc != 0:
+    echo "iconv returns: " & $rc
+    result = false
+  discard tryRemoveFile(filename)
+
+
+func hexToString*(hexString: string): Option[string] =
+  ## Convert the hexString to a string.
+  ## "33 34 35" -> "345"
+
+  var str: string
+  var digit = 0u8
+  var firstNimble = 0u8
+  var count = 0
+  for ch in hexString:
+    case ch
+    of ' ':
+      continue
+    of '0' .. '9':
+      digit = uint8(ord(ch) - ord('0'))
+    of 'a' .. 'f':
+      digit = uint8(ord(ch) - ord('a') + 10)
+    of 'A' .. 'F':
+      digit = uint8(ord(ch) - ord('A') + 10)
+    else:
+      # Invalid hex digit.
+      return
+    # debugEcho fmt"digit = 0x{digit:x}"
+    if count == 0:
+      firstNimble = digit
+      inc(count)
+    else:
+      let newNum = firstNimble shl 4 or digit
+      # debugEcho fmt"newNum = 0x{newNum:x}"
+      str.add(char(newNum))
+      count = 0
+  if count != 0:
+    # Hex values come in pairs and we are missing the second one.
+    return
+  result = some(str)
+
+func parseInvalidLine(line: string): HexLine =
+  ## Parse line "invalid at nnn (comment): string".
+  let pattern = r"invalid at ([0-9]+)(\s*\(.*\)){0,1}: (.*)$"
   let matchesO = matchPattern(line, pattern)
   if not matchesO.isSome:
-    return
-  let (strPos, str) = matchesO.get().get2Groups()
-  var pos: int
-  try:
-    pos = parseInt(strPos)
-  except ValueError:
-    return
-  result = some((pos, str))
+    return newHexLineMsg(invalidStr, "Invalid line.")
+  let (strPos, comment, str) = matchesO.get().get3Groups()
+  return newHexLine(invalidStr, strPos, comment, str)
+
+func parseInvalidHexLine(line: string): HexLine =
+  ## Parse line "invalid hex at nnn (comment): hexString".
+
+  let pattern = r"invalid hex at ([0-9]+)(\s*\([^:]*\)){0,1}: (.*)$"
+  let matchesO = matchPattern(line, pattern)
+  if not matchesO.isSome:
+    return newHexLineMsg(invalidHexStr, "Invalid integer position.")
+  let (strPos, comment, hexString) = matchesO.get().get3Groups()
+  let strO = hexToString(hexString)
+  if not strO.isSome:
+    return newHexLineMsg(invalidHexStr, "Invalid hex string.")
+  result = newHexLine(invalidHexStr, strPos, comment, strO.get())
+
+proc rewriteUtf8TestFile(filename: string, resultFilename: string): string =
+  ## Rewrite the given utf8 test file replacing the hexStrings with
+  ## byte strings. Convert "valid hex" and "invalid hex" lines to
+  ## "valid" and "invalid" lines. If there is an error, return a
+  ## message telling what went wrong.
+  ##
+  ## Line types:
+  ##
+  ## # comment line
+  ## <blank line>
+  ##
+  ## valid [(comment)]:: string
+  ## valid hex [(comment)]: hexString
+  ## invalid at pos [(comment)]: string
+  ## invalid hex at pos [(comment)]: hexString
+
+  if not fileExists(filename):
+    return "The file does not exist: " & filename
+
+  var resultfile: File
+  if not open(resultfile, resultFilename, fmWrite):
+    return unableToOpen % [resultFilename]
+  defer:
+    resultfile.close()
+
+  var file: File
+  if not open(file, filename, fmRead):
+    return unableToOpen % [filename]
+  defer:
+    file.close()
+
+  var str: string
+  var lineNum = 0
+
+  for line in lines(file):
+    inc(lineNum)
+    if line.len == 0:
+      resultFile.write("\n")
+      continue
+    var wroteLine = false
+    for starts in ["#", validStr, invalidStr]:
+      if line.startswith(starts):
+        resultFile.write(line)
+        resultFile.write("\n")
+        wroteLine = true
+        break
+    if wroteLine:
+      continue
+    if line.startswith(validHexStr):
+      let colonPos = line.find(':')
+      if colonPos == -1:
+        return "Line $1: Missing colon." % [$lineNum]
+      let firstPart = line[0 .. colonPos]
+      let hexString = line[colonPos .. line.len-1]
+      let strO = hexToString(hexString)
+      if not strO.isSome:
+        return "Line $1: Invalid hex string." % [$lineNum]
+      str = strO.get()
+      resultFile.write("$1 $2\n" % [firstPart, str])
+    elif line.startswith(invalidHexStr):
+      let hexLine = parseInvalidHexLine(line)
+      if hexLine.message != "":
+        return "Line $1: $2" % [$lineNum, hexLine.message]
+      resultFile.write("$1$2$3: $4\n" % [
+        invalidStr, hexLine.strPos, hexLine.comment, hexLine.str])
+    else:
+      return "Line $1: Not one of the expected lines types." % $lineNum
 
 proc testValidateUtf8String(filename: string): bool =
   ## Validate the validateUtf8String method by processing all the
   ## lines in the given file.
 
-  ## Process all the lines in the file. There are four types of
-  ## lines. The comment and blank lines are skipped.
+  ## Process all the lines in the file.  The comment and blank lines
+  ## are skipped.
   ##
   ## Line types:
-  ## # comment line\n
+  ##
+  ## # comment line
   ## <blank line>
-  ## valid: string\n
-  ## invalid at pos 0: string\n
+  ##
+  ## valid: string
+  ## valid hex: hexString
+  ## invalid at 0: string
+  ## invalid hex at 0: hexString
 
   if not fileExists(filename):
     echo "The file does not exist: " & filename
@@ -57,20 +211,40 @@ proc testValidateUtf8String(filename: string): bool =
       continue
     elif line.startswith("#"):
       continue
-    elif line.startswith("valid: "):
+    elif line.startswith(validStr):
       beValid = true
       str = line[7 .. line.len-1]
-    elif line.startswith("invalid at pos "):
-      let posStrO = parseInvalidLine(line)
-      if not posStrO.isSome:
-        echo "Line $1 invalid integer position." % [$lineNum]
+    elif line.startswith(validHexStr):
+      let hexString = line[11 .. line.len-1]
+      let strO = hexToString(hexString)
+      if not strO.isSome:
+        # Invalid hex string.
+        return
+      beValid = true
+      str = strO.get()
+    elif line.startswith(invalidStr):
+      let hexLine = parseInvalidLine(line)
+      if hexLine.message != "":
+        echo "Line $1: $2" % [$lineNum, hexLine.message]
         result = false
         continue
-      (ePos, str) = posStrO.get()
+      ePos = parseInt(hexLine.strPos)
+      str = hexLine.str
+      beValid = false
+    elif line.startswith(invalidHexStr):
+      let hexLine = parseInvalidHexLine(line)
+      if hexLine.message != "":
+        echo "Line $1: $2" % [$lineNum, hexLine.message]
+        result = false
+        continue
+      ePos = parseInt(hexLine.strPos)
+      str = hexLine.str
       beValid = false
     else:
-      echo "Line $1 not one of the four expected lines types." % $lineNum
+      echo "Line $1: not one of the expected lines types." % $lineNum
       result = false
+
+    # let pos = iconvValidateString(str)
 
     let pos = validateUtf8String(str)
 
@@ -79,7 +253,10 @@ proc testValidateUtf8String(filename: string): bool =
         echo "Line $1 is invalid but expected to be valid." % $lineNum
         result = false
     else:
-      if pos != ePos:
+      if pos == -1:
+        echo fmt"Line {lineNum}: Expected invalid string but it passed validation."
+        result = false
+      elif pos != ePos:
         echo "Line $1: expected invalid pos: $2" % [$lineNum, $ePos]
         echo "Line $1:      got invalid pos: $2" % [$lineNum, $pos]
         result = false
@@ -141,6 +318,34 @@ proc testUtf8CharStringError(text: string, start: Natural, ePos: Natural): bool 
     echo "iconv returns: " & $rc
     discard tryRemoveFile(filename)
 
+proc testParseInvalidLine(line: string, eStrPos: string = "0",
+    eComment = "", eStr = "", eMessage = ""): bool =
+
+  let hexLine = parseInvalidLine(line)
+  result = true
+  if hexLine.kind != invalidStr:
+    echo "expected kind: '$1'" % invalidStr
+    echo "     got kind: '$1'" % hexLine.kind
+    result = false
+  if hexLine.strPos != eStrPos:
+    echo "expected pos: '$1'" % eStrPos
+    echo "     got pos: '$1'" % hexLine.strPos
+    result = false
+  if hexLine.comment != eComment:
+    echo "expected comment: '$1'" % eComment
+    echo "     got comment: '$1'" % hexLine.comment
+    result = false
+  if hexLine.str != eStr:
+    echo "expected str: '$1'" % eStr
+    echo "     got str: '$1'" % hexLine.str
+    result = false
+  if hexLine.message != eMessage:
+    echo "expected message: '$1'" % eMessage
+    echo "     got message: '$1'" % hexLine.message
+    result = false
+
+
+
 suite "unicodes.nim":
 
   test "test me":
@@ -169,22 +374,23 @@ suite "unicodes.nim":
     check cmpString("Abd", "aBc", true) == 1
 
   test "parseInvalidLine":
-    check parseInvalidLine("invalid at pos 0: abc") == some((0, "abc"))
-    check parseInvalidLine("invalid at pos 2: abc") == some((2, "abc"))
-    check parseInvalidLine("invalid at pos 12: abc") == some((12, "abc"))
-    check parseInvalidLine("invalid at pos 123: abc") == some((123, "abc"))
-    check parseInvalidLine("invalid at pos 0: a") == some((0, "a"))
-    check parseInvalidLine("invalid at pos 0: \x31") == some((0, "1"))
+    check testParseInvalidLine("invalid at 0: abc", eStr = "abc")
+    check testParseInvalidLine("invalid at 2: abc", eStrPos = "2", eStr = "abc")
+    check testParseInvalidLine("invalid at 12: abc", eStrPos = "12", eStr = "abc")
+    check testParseInvalidLine("invalid at 0: a", eStr = "a")
+    check testParseInvalidLine("invalid at 0: \x31", eStr = "\x31")
 
   test "parseInvalidLine error":
-    check parseInvalidLine("invalid pos 0: abc") == none((int, string))
-    check parseInvalidLine("invalid at pos: abc") == none((int, string))
-    check parseInvalidLine("invalid at pos x: abc") == none((int, string))
+    check testParseInvalidLine("invalid pos 0: abc", eStrPos = "",
+      eMessage = "Invalid line.")
+    check testParseInvalidLine("invalid at: abc", eStrPos = "",
+      eMessage = "Invalid line.")
+    check testParseInvalidLine("invalid at x: abc", eStrPos = "",
+      eMessage = "Invalid line.")
 
   test "testValidateUtf8String":
     let filename = "testfiles/utf8tests.txt"
     check testValidateUtf8String(filename)
-    discard tryRemoveFile(filename)
 
   test "firstInvalidUtf8":
     check not firstInvalidUtf8("abc").isSome
@@ -222,9 +428,42 @@ suite "unicodes.nim":
 
   test "validateUtf8String Single UTF-16 surrogates":
     var str = bytesToString([0xedu8, 0xa0, 0x80])
-    check validateUtf8String(str) == 1
+    check validateUtf8String(str) == 0
+
+  test "hexToString":
+    check hexToString("33 34 35") == some("345")
+    check hexToString("01 14") == some("\x01\x14")
+    check hexToString("ab") == some("\xab")
+    check hexToString("cf") == some("\xcf")
+    check hexToString("FF") == some("\xff")
+    check hexToString("112233445566778899aabbccddeeff") == some(
+      "\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff")
+    check hexToString("0123456789abcdef") == some(
+      "\x01\x23\x45\x67\x89\xab\xcd\xef")
+
+  test "hexToString error":
+    check hexToString("3") == none(string)
+    check hexToString("123") == none(string)
+    check hexToString("ag") == none(string)
 
 
+  test "parseInvalidHexLine":
+    check parseInvalidHexLine("invalid hex at 0: 31") == newHexLine(
+      invalidHexStr, "0", "", "1")
+    check parseInvalidHexLine("invalid hex at 22: 31 33 35") == newHexLine(
+      invalidHexStr, "22", "", "135")
+    check parseInvalidHexLine("invalid hex at 123: 313335") == newHexLine(
+      invalidHexStr, "123", "", "135")
+    check parseInvalidHexLine("invalid hex at 0 (a comment): 31") == newHexLine(
+      invalidHexStr, "0", " (a comment)", "1")
+
+  test "parseInvalidHexLine error":
+    check parseInvalidHexLine("invalid hex at five: 2") == newHexLineMsg(
+      invalidHexStr, "Invalid integer position.")
+    check parseInvalidHexLine("invalid hex at 0: 12 3") == newHexLineMsg(
+      invalidHexStr, "Invalid hex string.")
+    check parseInvalidHexLine("invalid hex at 0: a2 g3") == newHexLineMsg(
+      invalidHexStr, "Invalid hex string.")
 
 
 
@@ -235,211 +474,5 @@ suite "unicodes.nim":
 #     check testUtf8CharString("abc", 0, "a", 1)
 #     check testUtf8CharString("abc", 1, "b", 2)
 #     check testUtf8CharString("abc", 2, "c", 3)
-
-#   # w3c has a table of unicode characters ordered by codepoint number.
-#   # https://www.w3.org/TR/xml-entity-names/bycodes.html
-
-#   # The following page you can convert the codepoint number to utf-8.
-#   # https://www.cogsci.ed.ac.uk/~richard/utf-8.cgi?input=a9&mode=hex
-
-#   test "utf8CharString U+00A9, C2 A9, COPYRIGHT SIGN":
-#     check testUtf8CharString("\u00A9", 0, "©", 2)
-
-#   test "utf8CharString U+2010, E2 80 90, HYPHEN":
-#     check testUtf8CharString("\u2010", 0, "\u2010", 3)
-
-#   test "utf8CharString U+1D49C, F0 9D 92 9C, MATHEMATICAL SCRIPT CAPITAL A":
-#     check testUtf8CharString("\u{1D49C}", 0, "\u{1D49C}", 4)
-
-#   # 2  Boundary condition test cases
-
-#   # 2.1  First possible sequence of a certain length
-
-#   test "utf8CharString first":
-#     check testUtf8CharString("\u{00000000}", 0, "\u{00000000}", 1) # 00
-#     check testUtf8CharString("\u{00000080}", 0, "\u{00000080}", 2) # C2 80
-#     check testUtf8CharString("\u{00000800}", 0, "\u{00000800}", 3) # E0 A0 80
-#     check testUtf8CharString("\u{00010000}", 0, "\u{00010000}", 4) # F0 90 80 80
-
-
-#   # 2.2  Last possible sequence of a certain length
-
-#   test "utf8CharString last of a certain length":
-#     check testUtf8CharString("\u{0000007F}", 0, "\u{0000007F}", 1) # 7F
-#     check testUtf8CharString("\u{000007FF}", 0, "\u{000007FF}", 2) # DF BF
-#     check testUtf8CharString("\u{0000FFFF}", 0, "\u{0000FFFF}", 3) # EF BF BF
-
-#   # 2.3  Other boundary conditions
-
-#   test "utf8CharString Other boundary conditions":
-#     check testUtf8CharString("\u{0000D7FF}", 0, "\u{0000D7FF}", 3) # ED 9F BF
-#     check testUtf8CharString("\u{0000E000}", 0, "\u{0000E000}", 3) # EE 80 80
-#     check testUtf8CharString("\u{0000FFFD}", 0, "\u{0000FFFD}", 3) # EF BF BD
-#     check testUtf8CharString("\u{0010FFFF}", 0, "\u{0010FFFF}", 4) # F4 8F BF BF
-
-#   # 3  Malformed sequences
-
-#   # 3.1  Unexpected continuation bytes
-
-#   # Each unexpected continuation byte should be separately signalled as a
-#   # malformed sequence of its own.
-
-#   test "utf8CharString First continuation byte 0x80 and 0xBF":
-#     discard
-#     # todo: are these errors:?
-#     # check testUtf8CharStringError("\u{80}", 0, 1) # C2 80
-#     # check testUtf8CharStringError("\u{bf}", 0, 1) # C2 BF
-
-
-# # 3.1.9  Sequence of all 64 possible continuation bytes (0x80-0xbf)
-
-# # 3.2  Lonely start characters
-
-# # 3.2.1  All 32 first bytes of 2-byte sequences (0xc0-0xdf),
-# #                              each followed by a space character
-
-# # 3.2.2  All 16 first bytes of 3-byte sequences (0xe0-0xef)
-# #        each followed by a space character
-
-# # 3.2.3  All 8 first bytes of 4-byte sequences (0xf0-0xf7),
-# #        each followed by a space character
-
-# # 3.2.4  All 4 first bytes of 5-byte sequences (0xf8-0xfb),
-# #        each followed by a space character
-
-# # 3.2.5  All 2 first bytes of 6-byte sequences (0xfc-0xfd),
-# #        each followed by a space character
-
-# # 3.3  Sequences with last continuation byte missing
-
-# # All bytes of an incomplete sequence should be signalled as a single
-# # malformed sequence, i.e., you should see only a single replacement
-# # character in each of the next 10 tests. (Characters as in section 2)
-
-# # 2-byte sequence with last byte missing (U+0000)
-# # 3-byte sequence with last byte missing (U+0000)
-# # 4-byte sequence with last byte missing (U+0000)
-# # 5-byte sequence with last byte missing (U+0000)
-# # 6-byte sequence with last byte missing (U+0000)
-# # 2-byte sequence with last byte missing (U-000007FF)
-# # 3-byte sequence with last byte missing (U-0000FFFF)
-# # 4-byte sequence with last byte missing (U-001FFFFF)
-# # 5-byte sequence with last byte missing (U-03FFFFFF)
-# # 6-byte sequence with last byte missing (U-7FFFFFFF)
-
-# # 3.4  Concatenation of incomplete sequences
-
-# # All the 10 sequences of 3.3 concatenated, you should see 10 malformed
-# # sequences being signalled:
-
-# # 3.5  Impossible bytes
-
-#   test "utf8CharString Impossible bytes":
-#     var str = bytesToString([0xFEu8])
-#     check testUtf8CharStringError(str, 0, 1) #
-
-# # fe
-# # ff
-
-# # 4.1  Examples of an overlong ASCII character
-
-# # U+002F = c0 af
-# # U+002F = e0 80 af
-# # U+002F = f0 80 80 af
-# # U+002F = f8 80 80 80 af
-# # U+002F = fc 80 80 80 80 af
-
-# # 4.2  Maximum overlong sequences
-
-# # U-0000007F = c1 bf
-# # U-000007FF = e0 9f bf
-# # U-0000FFFF = f0 8f bf bf
-# # U-001FFFFF = f8 87 bf bf bf
-# # U-03FFFFFF = fc 83 bf bf bf bf
-
-# # 4.3  Overlong representation of the NUL character
-
-# # U+0000 = c0 80
-# # U+0000 = e0 80 80
-# # U+0000 = f0 80 80 80
-# # U+0000 = f8 80 80 80 80
-# # U+0000 = fc 80 80 80 80 80
-
-# # 5.1 Single UTF-16 surrogates
-
-# # U+D800 = ed a0 80
-# # U+DB7F = ed ad bf
-# # U+DB80 = ed ae 80
-# # U+DBFF = ed af bf
-# # U+DC00 = ed b0 80
-# # U+DF80 = ed be 80
-# # U+DFFF = ed bf bf
-
-# # 5.2 Paired UTF-16 surrogates
-
-# # U+D800 U+DC00 = ed a0 80 ed b0 80
-# # U+D800 U+DFFF = ed a0 80 ed bf bf
-# # U+DB7F U+DC00 = ed ad bf ed b0 80
-# # U+DB7F U+DFFF = ed ad bf ed bf bf
-# # U+DB80 U+DC00 = ed ae 80 ed b0 80
-# # U+DB80 U+DFFF = ed ae 80 ed bf bf
-# # U+DBFF U+DC00 = ed af bf ed b0 80
-# # U+DBFF U+DFFF = ed af bf ed bf bf
-
-# # 5.3 Noncharacter code positions
-
-# # U+FFFE
-# # U+FFFF
-
-# # Other noncharacters:
-
-# # U+FDD0
-# # U+FDD1
-# # U+FDD2
-# # U+FDD3
-# # U+FDD4
-# # U+FDD5
-# # U+FDD6
-# # U+FDD7
-# # U+FDD8
-# # U+FDD9
-# # U+FDDA
-# # U+FDDB
-# # U+FDDC
-# # U+FDDD
-# # U+FDDE
-# # U+FDEF
-
-# # U+1FFFE
-# # U+2FFFE
-# # U+3FFFE
-# # U+4FFFE
-# # U+5FFFE
-# # U+6FFFE
-# # U+7FFFE
-# # U+8FFFE
-# # U+9FFFE
-# # U+AFFFE
-# # U+BFFFE
-# # U+CFFFE
-# # U+DFFFE
-# # U+EFFFE
-# # U+FFFFE
-# # U+10FFFE
-
-# # U+1FFFF
-# # U+2FFFF
-# # U+3FFFF
-# # U+4FFFF
-# # U+5FFFF
-# # U+6FFFF
-# # U+7FFFF
-# # U+8FFFF
-# # U+9FFFF
-# # U+AFFFF
-# # U+BFFFF
-# # U+CFFFF
-# # U+DFFFF
-# # U+EFFFF
-# # U+FFFFF
-# # U+10FFFF
+  test "rewriteUtf8TestFile":
+    check rewriteUtf8TestFile("testfiles/utf8tests.txt", "testfiles/utf8tests.bin") == ""

@@ -133,11 +133,8 @@ const
     12,36,12,12,12,12,12,12,12,12,12,12,
   ]
 
-proc decode(state: var uint32, codep: var uint32, sbyte: char): uint32 =
-  ## Inter part of a utf8 decoder.  Return 0 when the decoding is done
-  ## and the string is valid. Return 1 when the string is invalid,
-  ## else return the current state number. When 0 is returned, codep
-  ## is the decoded code point.
+proc decode(state: var uint32, codep: var uint32, sbyte: char) =
+  ## Interior part of a utf8 decoder. 
 
   let ctype = uint32(utf8d[uint8(sbyte)])
   if state != 0:
@@ -145,7 +142,6 @@ proc decode(state: var uint32, codep: var uint32, sbyte: char): uint32 =
   else:
     codep = (0xffu32 shr ctype) and uint32(sbyte)
   state = utf8d[256 + state + ctype]
-  result = state
 
 proc countCodePoints*(str: string, count: var int): uint32 =
   ## Update the count parameter with the number of code points in the
@@ -156,7 +152,8 @@ proc countCodePoints*(str: string, count: var int): uint32 =
 
   count = 0
   for sbyte in str:
-    if decode(state, codepoint, sbyte) == 0:
+    decode(state, codepoint, sbyte)
+    if state == 0:
       inc(count)
 
   result = state
@@ -167,7 +164,13 @@ proc validateUtf8String*(str: string): int =
 
   var codepoint: uint32 = 0
   var state: uint32 = 0
+  var utf8ByteCount = 0
   for ix, sbyte in str:
-    if decode(state, codepoint, sbyte) == 12:
-      return ix
+    decode(state, codepoint, sbyte)
+    if state == 12:
+      return ix - utf8ByteCount
+    if state == 0:
+      utf8ByteCount = 0
+    else:
+      inc(utf8ByteCount)
   result = -1
