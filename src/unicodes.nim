@@ -69,22 +69,22 @@ func githubAnchor*(name: string): string =
         anchorRunes.add(rune)
   result = $anchorRunes
 
-proc utf8CharString*(text: string, pos: var int): string =
-  ## Get the unicode character at pos and increment pos one past
-  ## it. Return a one character string. Return "" when not a utf-8
-  ## character.
-  let rune = runeAt(text, pos)
-  # echo "rune = " & $rune
-  # echo "rune = " & toHex(int32(rune))
-  if rune == Rune(0xfffd):
-    # 0xfffd replaces invalid characters but 0xfffd by itself is
-    # ok. 0xfffd in utf-8 is EFBFDB.
-    if not (text.len >= pos+2 and text[pos..pos+2] == "\xEF\xBF\xBD"):
-      # Invalid utf-8 unicode character.
-      return ""
-  result = toUtf8(rune)
+# proc utf8CharString*(text: string, pos: var int): string =
+#   ## Get the unicode character at pos and increment pos one past
+#   ## it. Return a one character string. Return "" when not a utf-8
+#   ## character.
+#   let rune = runeAt(text, pos)
+#   # echo "rune = " & $rune
+#   # echo "rune = " & toHex(int32(rune))
+#   if rune == Rune(0xfffd):
+#     # 0xfffd replaces invalid characters but 0xfffd by itself is
+#     # ok. 0xfffd in utf-8 is EFBFDB.
+#     if not (text.len >= pos+2 and text[pos..pos+2] == "\xEF\xBF\xBD"):
+#       # Invalid utf-8 unicode character.
+#       return ""
+#   result = toUtf8(rune)
 
-  pos += result.len
+#   pos += result.len
 
 proc bytesToString*(buffer: openArray[uint8|char]): string =
   ## Create a string from bytes in a buffer. A nim string is utf-8
@@ -133,26 +133,26 @@ const
     12,36,12,12,12,12,12,12,12,12,12,12,
   ]
 
-proc decode(state: var uint32, codep: var uint32, sbyte: char) =
-  ## Interior part of a utf8 decoder. 
+proc decode(state: var uint32, codep: var uint32, sByte: char) =
+  ## Interior part of a utf8 decoder.
 
-  let ctype = uint32(utf8d[uint8(sbyte)])
+  let ctype = uint32(utf8d[uint8(sByte)])
   if state != 0:
-    codep = (uint32(sbyte) and 0x3fu32) or (codep shl 6u32)
+    codep = (uint32(sByte) and 0x3fu32) or (codep shl 6u32)
   else:
-    codep = (0xffu32 shr ctype) and uint32(sbyte)
+    codep = (0xffu32 shr ctype) and uint32(sByte)
   state = utf8d[256 + state + ctype]
 
 proc countCodePoints*(str: string, count: var int): uint32 =
   ## Update the count parameter with the number of code points in the
   ## string.
 
-  var codepoint: uint32
+  var codePoint: uint32
   var state: uint32 = 0
 
   count = 0
-  for sbyte in str:
-    decode(state, codepoint, sbyte)
+  for sByte in str:
+    decode(state, codePoint, sByte)
     if state == 0:
       inc(count)
 
@@ -162,15 +162,23 @@ proc validateUtf8String*(str: string): int =
   ## Return the position of the first invalid utf-8 byte in the string
   ## else return -1.
 
-  var codepoint: uint32 = 0
+  var codePoint: uint32 = 0
   var state: uint32 = 0
-  var utf8ByteCount = 0
-  for ix, sbyte in str:
-    decode(state, codepoint, sbyte)
+  var byteCount = 0
+  var ix: int
+
+  for sByte in str:
+    decode(state, codePoint, sByte)
     if state == 12:
-      return ix - utf8ByteCount
+      break
     if state == 0:
-      utf8ByteCount = 0
+      byteCount = 0
     else:
-      inc(utf8ByteCount)
-  result = -1
+      inc(byteCount)
+    inc(ix)
+
+  if state != 0:
+    result = ix - byteCount
+    assert result >= 0
+  else:
+    result = -1

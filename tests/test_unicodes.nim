@@ -1,50 +1,42 @@
 import std/unittest
 import std/options
 import std/strutils
-import std/unicode
-import std/osproc
+# import std/unicode
+# import std/osproc
 import std/os
 import std/strformat
 import unicodes
 import regexes
 
 const
-  unableToOpen = "Unable to open the file: $1"
-  validStr = "valid"
-  validHexStr = "valid hex"
+  validStr = "valid:"
+  validHexStr = "valid hex:"
   invalidStr = "invalid at "
   invalidHexStr = "invalid hex at "
 
 type
   HexLine = object
-    kind: string  # validHexStr or invalidHexStr
-    strPos: string
-    str: string
+    pos: int
     comment: string
-    message: string
+    str: string
 
-func newHexLine(kind, strPos, comment, str: string): HexLine =
-  result = HexLine(kind: kind, strPos: strPos, comment: comment,
-    str: str, message: "")
+func newHexLine(pos: int, comment: string, str: string): HexLine =
+  result = HexLine(pos: pos, comment: comment, str: str)
 
-func newHexLineMsg(kind: string, message: string): HexLine =
-  result = HexLine(kind: kind, strPos: "", comment: "", str: "", message: message)
+# proc iconvValidateString(str: string): bool =
+#   ## Validate the string using iconv. Return the position of the first
+#   ## invalid byte or -1.
 
-proc iconvValidateString(str: string): bool =
-  ## Validate the string using iconv. Return the position of the first
-  ## invalid byte or -1.
-
-  let filename = "tempfile.txt"
-  var file = open(filename, fmWrite)
-  file.write(str)
-  file.close()
-  result = true
-  let rc = execCmd("iconv -f UTF-8 -t UTF-8 $1" % filename)
-  if rc != 0:
-    echo "iconv returns: " & $rc
-    result = false
-  discard tryRemoveFile(filename)
-
+#   let filename = "tempfile.txt"
+#   var file = open(filename, fmWrite)
+#   file.write(str)
+#   file.close()
+#   result = true
+#   let rc = execCmd("iconv -f UTF-8 -t UTF-8 $1" % filename)
+#   if rc != 0:
+#     echo "iconv returns: " & $rc
+#     result = false
+#   discard tryRemoveFile(filename)
 
 func hexToString*(hexString: string): Option[string] =
   ## Convert the hexString to a string.
@@ -81,27 +73,60 @@ func hexToString*(hexString: string): Option[string] =
     return
   result = some(str)
 
-func parseInvalidLine(line: string): HexLine =
-  ## Parse line "invalid at nnn (comment): string".
-  let pattern = r"invalid at ([0-9]+)(\s*\(.*\)){0,1}: (.*)$"
+func parseInvalidLine(line: string): Option[HexLine] =
+  ## Parse line "invalid at nnn:[comment:] string".
+  let pattern = r"invalid at ([0-9]+):([^:]*): (.*)$"
   let matchesO = matchPattern(line, pattern)
   if not matchesO.isSome:
-    return newHexLineMsg(invalidStr, "Invalid line.")
+    return
   let (strPos, comment, str) = matchesO.get().get3Groups()
-  return newHexLine(invalidStr, strPos, comment, str)
+  var pos: int
+  try:
+    pos = parseInt(strPos)
+  except ValueError:
+    return
+  return some(newHexLine(pos, comment, str))
 
-func parseInvalidHexLine(line: string): HexLine =
-  ## Parse line "invalid hex at nnn (comment): hexString".
+func parseInvalidHexLine(line: string): Option[HexLine] =
+  ## Parse line "invalid hex at nnn:[comment:] hexString".
 
-  let pattern = r"invalid hex at ([0-9]+)(\s*\([^:]*\)){0,1}: (.*)$"
+  let pattern = r"invalid hex at ([0-9]+):([^:]*): (.*)$"
   let matchesO = matchPattern(line, pattern)
   if not matchesO.isSome:
-    return newHexLineMsg(invalidHexStr, "Invalid integer position.")
+    return
   let (strPos, comment, hexString) = matchesO.get().get3Groups()
+  var pos: int
+  try:
+    pos = parseInt(strPos)
+  except ValueError:
+    return
   let strO = hexToString(hexString)
   if not strO.isSome:
-    return newHexLineMsg(invalidHexStr, "Invalid hex string.")
-  result = newHexLine(invalidHexStr, strPos, comment, strO.get())
+    return
+  result = some(newHexLine(pos, comment, strO.get()))
+
+func parseValidHexLine(line: string): Option[HexLine] =
+  ## Parse line "valid hex:[comment:] hexString".
+
+  let pattern = r"valid hex:([^:]*): (.*)$"
+  let matchesO = matchPattern(line, pattern)
+  if not matchesO.isSome:
+    return
+  let (comment, hexString) = matchesO.get().get2Groups()
+  let strO = hexToString(hexString)
+  if not strO.isSome:
+    return
+  result = some(newHexLine(-1, comment, strO.get()))
+
+func parseValidLine(line: string): Option[HexLine] =
+  ## Parse line "valid:[comment:] string".
+
+  let pattern = r"valid:([^:]*): (.*)$"
+  let matchesO = matchPattern(line, pattern)
+  if not matchesO.isSome:
+    return
+  let (comment, str) = matchesO.get().get2Groups()
+  result = some(newHexLine(-1, comment, str))
 
 proc rewriteUtf8TestFile(filename: string, resultFilename: string): string =
   ## Rewrite the given utf8 test file replacing the hexStrings with
@@ -114,7 +139,7 @@ proc rewriteUtf8TestFile(filename: string, resultFilename: string): string =
   ## # comment line
   ## <blank line>
   ##
-  ## valid [(comment)]:: string
+  ## valid [(comment)]: string
   ## valid hex [(comment)]: hexString
   ## invalid at pos [(comment)]: string
   ## invalid hex at pos [(comment)]: hexString
@@ -122,6 +147,7 @@ proc rewriteUtf8TestFile(filename: string, resultFilename: string): string =
   if not fileExists(filename):
     return "The file does not exist: " & filename
 
+  let unableToOpen = "Unable to open the file: $1"
   var resultfile: File
   if not open(resultfile, resultFilename, fmWrite):
     return unableToOpen % [resultFilename]
@@ -134,7 +160,6 @@ proc rewriteUtf8TestFile(filename: string, resultFilename: string): string =
   defer:
     file.close()
 
-  var str: string
   var lineNum = 0
 
   for line in lines(file):
@@ -142,51 +167,46 @@ proc rewriteUtf8TestFile(filename: string, resultFilename: string): string =
     if line.len == 0:
       resultFile.write("\n")
       continue
-    var wroteLine = false
-    for starts in ["#", validStr, invalidStr]:
-      if line.startswith(starts):
-        resultFile.write(line)
-        resultFile.write("\n")
-        wroteLine = true
-        break
-    if wroteLine:
-      continue
     if line.startswith(validHexStr):
-      let colonPos = line.find(':')
-      if colonPos == -1:
-        return "Line $1: Missing colon." % [$lineNum]
-      let firstPart = line[0 .. colonPos]
-      let hexString = line[colonPos .. line.len-1]
-      let strO = hexToString(hexString)
-      if not strO.isSome:
-        return "Line $1: Invalid hex string." % [$lineNum]
-      str = strO.get()
-      resultFile.write("$1 $2\n" % [firstPart, str])
+      let hexLineO = parseValidHexLine(line)
+      if not hexLineO.isSome:
+        return "Line $1: $2" % [$lineNum, "Incorrect line format."]
+      let hexLine = hexLineO.get()
+      resultFile.write("$1$2: $3\n" % [
+        validStr, hexLine.comment, hexLine.str])
+
     elif line.startswith(invalidHexStr):
-      let hexLine = parseInvalidHexLine(line)
-      if hexLine.message != "":
-        return "Line $1: $2" % [$lineNum, hexLine.message]
-      resultFile.write("$1$2$3: $4\n" % [
-        invalidStr, hexLine.strPos, hexLine.comment, hexLine.str])
+      let hexLineO = parseInvalidHexLine(line)
+      if not hexLineO.isSome:
+        return "Line $1: $2" % [$lineNum, "Incorrect line format."]
+      let hexLine = hexLineO.get()
+      resultFile.write("$1$2:$3: $4\n" % [
+        invalidStr, $hexLine.pos, hexLine.comment, hexLine.str])
+
     else:
-      return "Line $1: Not one of the expected lines types." % $lineNum
+      var wroteLine = false
+      for starts in ["#", validStr, invalidStr]:
+        if line.startswith(starts):
+          resultFile.write(line)
+          resultFile.write("\n")
+          wroteLine = true
+          break
+      if not wroteLine:
+        return "Line $1: Not one of the expected lines types." % $lineNum
 
 proc testValidateUtf8String(filename: string): bool =
   ## Validate the validateUtf8String method by processing all the
   ## lines in the given file.
 
   ## Process all the lines in the file.  The comment and blank lines
-  ## are skipped.
+  ## are skipped. Comments do not contain colons.
   ##
   ## Line types:
   ##
   ## # comment line
   ## <blank line>
-  ##
-  ## valid: string
-  ## valid hex: hexString
-  ## invalid at 0: string
-  ## invalid hex at 0: hexString
+  ## valid [comment]: string
+  ## invalid [comment]: string
 
   if not fileExists(filename):
     echo "The file does not exist: " & filename
@@ -200,11 +220,10 @@ proc testValidateUtf8String(filename: string): bool =
     file.close()
 
   var beValid: bool
-  var ePos: int
-  var str: string
   var lineNum = 0
   result = true
 
+  var hexLineO: Option[HexLine]
   for line in lines(file):
     inc(lineNum)
     if line.len == 0:
@@ -213,40 +232,22 @@ proc testValidateUtf8String(filename: string): bool =
       continue
     elif line.startswith(validStr):
       beValid = true
-      str = line[7 .. line.len-1]
-    elif line.startswith(validHexStr):
-      let hexString = line[11 .. line.len-1]
-      let strO = hexToString(hexString)
-      if not strO.isSome:
-        # Invalid hex string.
-        return
-      beValid = true
-      str = strO.get()
+      hexLineO = parseValidLine(line)
+      if not hexLineO.isSome:
+        echo "Line $1: $2" % [$lineNum, "incorrect line format."]
+        result = false
     elif line.startswith(invalidStr):
-      let hexLine = parseInvalidLine(line)
-      if hexLine.message != "":
-        echo "Line $1: $2" % [$lineNum, hexLine.message]
-        result = false
-        continue
-      ePos = parseInt(hexLine.strPos)
-      str = hexLine.str
       beValid = false
-    elif line.startswith(invalidHexStr):
-      let hexLine = parseInvalidHexLine(line)
-      if hexLine.message != "":
-        echo "Line $1: $2" % [$lineNum, hexLine.message]
+      hexLineO = parseInvalidLine(line)
+      if not hexLineO.isSome:
+        echo "Line $1: $2" % [$lineNum, "incorrect line format."]
         result = false
-        continue
-      ePos = parseInt(hexLine.strPos)
-      str = hexLine.str
-      beValid = false
     else:
       echo "Line $1: not one of the expected lines types." % $lineNum
       result = false
 
-    # let pos = iconvValidateString(str)
-
-    let pos = validateUtf8String(str)
+    let hexLine = hexLineO.get()
+    let pos = validateUtf8String(hexLine.str)
 
     if beValid:
       if pos != -1:
@@ -256,80 +257,93 @@ proc testValidateUtf8String(filename: string): bool =
       if pos == -1:
         echo fmt"Line {lineNum}: Expected invalid string but it passed validation."
         result = false
-      elif pos != ePos:
-        echo "Line $1: expected invalid pos: $2" % [$lineNum, $ePos]
+      elif pos != hexLine.pos:
+        echo "Line $1: expected invalid pos: $2" % [$lineNum, $hexLine.pos]
         echo "Line $1:      got invalid pos: $2" % [$lineNum, $pos]
         result = false
 
+# proc testUtf8CharString(text: string, start: Natural, eStr: string, ePos: Natural): bool =
+#   var pos = start
+#   let gotStr = utf8CharString(text, pos)
+#   result = true
+#   if gotStr != eStr:
+#     echo "expected: " & eStr
+#     echo "     got: " & gotStr
+#     result = false
+#   if pos != ePos:
+#     echo "expected pos: " & $ePos
+#     echo "     got pos: " & $pos
+#     result = false
 
-proc testUtf8CharString(text: string, start: Natural, eStr: string, ePos: Natural): bool =
-  var pos = start
-  let gotStr = utf8CharString(text, pos)
+#   if result == false:
+#     let rune = runeAt(text, start)
+#     echo "rune = " & $rune
+#     echo "rune hex = " & toHex(int32(rune))
+#     echo "utf-8 hex = " & toHex(toUtf8(rune))
+
+# proc testUtf8CharStringError(text: string, start: Natural, ePos: Natural): bool =
+#   var pos = start
+#   let gotStr = utf8CharString(text, pos)
+#   result = true
+#   if gotStr != "":
+#     result = false
+#   if pos != ePos:
+#     result = false
+#   if result == false:
+#     echo "expected empty string"
+#     echo ""
+#     echo "input text: " & text
+#     echo "input text as hex: " & toHex(text)
+#     echo "start pos: " & $start
+#     echo ""
+#     echo "expected pos: " & $ePos
+#     echo "     got pos: " & $pos
+#     echo ""
+#     echo "len: $1, got: '$2'" % [$gotStr.len, gotStr]
+#     echo "got as hex: " & toHex(gotStr)
+
+#     # validate the input text.
+#     var invalidPos = validateUtf8(text)
+#     if invalidPos != -1:
+#       echo "validateUtf8 reports the text is valid."
+#     else:
+#       echo "validateUtf8 reports invalid pos: " & $invalidPos
+
+#     # Run iconv on the character.
+#     let filename = "tempfile.txt"
+#     var file = open(filename, fmWrite)
+#     file.write(text[start .. text.len-1])
+#     file.close()
+#     let rc = execCmd("iconv -f UTF-8 -t UTF-8 $1" % filename)
+#     echo "iconv returns: " & $rc
+#     discard tryRemoveFile(filename)
+
+proc testParseLine(line: string, ePos: int = 0,
+    eComment = "", eStr = ""): bool =
+
   result = true
-  if gotStr != eStr:
-    echo "expected: " & eStr
-    echo "     got: " & gotStr
-    result = false
-  if pos != ePos:
-    echo "expected pos: " & $ePos
-    echo "     got pos: " & $pos
-    result = false
 
-  if result == false:
-    let rune = runeAt(text, start)
-    echo "rune = " & $rune
-    echo "rune hex = " & toHex(int32(rune))
-    echo "utf-8 hex = " & toHex(toUtf8(rune))
+  var hexLineO: Option[HexLine]
+  if line.startsWith(validStr):
+    hexLineO = parseValidLine(line)
+  elif line.startsWith(invalidStr):
+    hexLineO = parseInvalidLine(line)
+  elif line.startsWith(validHexStr):
+    hexLineO = parseValidHexLine(line)
+  elif line.startsWith(invalidHexStr):
+    hexLineO = parseInvalidHexLine(line)
+  else:
+    echo "The line doesn't start correctly."
+    return false
 
-proc testUtf8CharStringError(text: string, start: Natural, ePos: Natural): bool =
-  var pos = start
-  let gotStr = utf8CharString(text, pos)
-  result = true
-  if gotStr != "":
-    result = false
-  if pos != ePos:
-    result = false
-  if result == false:
-    echo "expected empty string"
-    echo ""
-    echo "input text: " & text
-    echo "input text as hex: " & toHex(text)
-    echo "start pos: " & $start
-    echo ""
-    echo "expected pos: " & $ePos
-    echo "     got pos: " & $pos
-    echo ""
-    echo "len: $1, got: '$2'" % [$gotStr.len, gotStr]
-    echo "got as hex: " & toHex(gotStr)
+  if not hexLineO.isSome:
+    echo "Unable to parse the line."
+    return false
 
-    # validate the input text.
-    var invalidPos = validateUtf8(text)
-    if invalidPos != -1:
-      echo "validateUtf8 reports the text is valid."
-    else:
-      echo "validateUtf8 reports invalid pos: " & $invalidPos
-
-    # Run iconv on the character.
-    let filename = "tempfile.txt"
-    var file = open(filename, fmWrite)
-    file.write(text[start .. text.len-1])
-    file.close()
-    let rc = execCmd("iconv -f UTF-8 -t UTF-8 $1" % filename)
-    echo "iconv returns: " & $rc
-    discard tryRemoveFile(filename)
-
-proc testParseInvalidLine(line: string, eStrPos: string = "0",
-    eComment = "", eStr = "", eMessage = ""): bool =
-
-  let hexLine = parseInvalidLine(line)
-  result = true
-  if hexLine.kind != invalidStr:
-    echo "expected kind: '$1'" % invalidStr
-    echo "     got kind: '$1'" % hexLine.kind
-    result = false
-  if hexLine.strPos != eStrPos:
-    echo "expected pos: '$1'" % eStrPos
-    echo "     got pos: '$1'" % hexLine.strPos
+  let hexLine = hexLineO.get()
+  if hexLine.pos != ePos:
+    echo "expected pos: '$1'" % $ePos
+    echo "     got pos: '$1'" % $hexLine.pos
     result = false
   if hexLine.comment != eComment:
     echo "expected comment: '$1'" % eComment
@@ -339,17 +353,25 @@ proc testParseInvalidLine(line: string, eStrPos: string = "0",
     echo "expected str: '$1'" % eStr
     echo "     got str: '$1'" % hexLine.str
     result = false
-  if hexLine.message != eMessage:
-    echo "expected message: '$1'" % eMessage
-    echo "     got message: '$1'" % hexLine.message
-    result = false
 
-
+proc testParseLineError(line: string): bool =
+  var hexLineO: Option[HexLine]
+  if line.startsWith(validStr):
+    hexLineO = parseValidLine(line)
+  elif line.startsWith(invalidStr):
+    hexLineO = parseInvalidLine(line)
+  elif line.startsWith(validHexStr):
+    hexLineO = parseValidHexLine(line)
+  elif line.startsWith(invalidHexStr):
+    hexLineO = parseInvalidHexLine(line)
+  else:
+    return true
+  if hexLineO.isSome:
+    echo "Parsed the line when we expected not be able to."
+    return false
+  result = true
 
 suite "unicodes.nim":
-
-  test "test me":
-    check 1 == 1
 
   test "cmpString":
     check cmpString("", "") == 0
@@ -373,63 +395,6 @@ suite "unicodes.nim":
     check cmpString("aBc", "Abd", true) == -1
     check cmpString("Abd", "aBc", true) == 1
 
-  test "parseInvalidLine":
-    check testParseInvalidLine("invalid at 0: abc", eStr = "abc")
-    check testParseInvalidLine("invalid at 2: abc", eStrPos = "2", eStr = "abc")
-    check testParseInvalidLine("invalid at 12: abc", eStrPos = "12", eStr = "abc")
-    check testParseInvalidLine("invalid at 0: a", eStr = "a")
-    check testParseInvalidLine("invalid at 0: \x31", eStr = "\x31")
-
-  test "parseInvalidLine error":
-    check testParseInvalidLine("invalid pos 0: abc", eStrPos = "",
-      eMessage = "Invalid line.")
-    check testParseInvalidLine("invalid at: abc", eStrPos = "",
-      eMessage = "Invalid line.")
-    check testParseInvalidLine("invalid at x: abc", eStrPos = "",
-      eMessage = "Invalid line.")
-
-  test "testValidateUtf8String":
-    let filename = "testfiles/utf8tests.txt"
-    check testValidateUtf8String(filename)
-
-  test "firstInvalidUtf8":
-    check not firstInvalidUtf8("abc").isSome
-
-  test "countCodePoints":
-    var count = 0
-    let ret = countCodePoints("abc", count)
-    check count == 3
-    check ret == 0
-
-  test "countCodePoints Impossible bytes FE":
-    var str = bytesToString([0xFEu8])
-    var count = 0
-    let ret = countCodePoints(str, count)
-    check ret != 0
-
-  test "countCodePoints over long ascii":
-    var str = bytesToString([0xc0u8, 0xaf])
-    var count = 0
-    let ret = countCodePoints(str, count)
-    check ret != 0
-
-  test "countCodePoints ed a0 80":
-    var str = bytesToString([0xedu8, 0xa0, 0x80])
-    var count = 0
-    let ret = countCodePoints(str, count)
-    check ret != 0
-
-  test "validateUtf8String":
-    check validateUtf8String("abc") == -1
-
-  test "validateUtf8String with fe in it":
-    var str = bytesToString(['a', 'b', 'c', char(0xFE), 'd'])
-    check validateUtf8String(str) == 3
-
-  test "validateUtf8String Single UTF-16 surrogates":
-    var str = bytesToString([0xedu8, 0xa0, 0x80])
-    check validateUtf8String(str) == 0
-
   test "hexToString":
     check hexToString("33 34 35") == some("345")
     check hexToString("01 14") == some("\x01\x14")
@@ -446,33 +411,64 @@ suite "unicodes.nim":
     check hexToString("123") == none(string)
     check hexToString("ag") == none(string)
 
+  test "parseValidLine":
+    check testParseLine("valid:: 31", -1, "", "31")
+    check testParseLine("valid: (hello): 31", -1, " (hello)", "31")
+    check testParseLine("valid: (U+2010, E2 80 90, HYPHEN): asdf",
+      -1, " (U+2010, E2 80 90, HYPHEN)", "asdf")
+    check testParseLine("valid: : 31", -1, " ", "31")
+
+  test "parseValidLineError":
+    check testParseLineError("valid::31")
+    check testParseLineError("valid::")
+    check testParseLineError("valid: 33")
+    check testParseLineError("valid fg")
+
+  test "parseInvalidLine":
+    check testParseLine("invalid at 0:: 31", 0, "", "31")
+    check testParseLine("invalid at 1: (hello): 31", 1, " (hello)", "31")
+    check testParseLine("invalid at 2: (U+2010, E2 80 90, HYPHEN): asdf",
+      2, " (U+2010, E2 80 90, HYPHEN)", "asdf")
+    check testParseLine("invalid at 0: : 31", 0, " ", "31")
+
+  test "parseInvalidLineError":
+    check testParseLineError("invalid at ss:: 31")
+    check testParseLineError("invalid at 0")
+    check testParseLineError("invalid at :abc: 33")
+    check testParseLineError("invalid at 0::")
+    check testParseLineError("invalid at 0: 55")
+
+  test "parseValidHexLine":
+    check testParseLine("valid hex: (U+00A9): C2 A9", -1, " (U+00A9)", "\xc2\xa9")
+    check testParseLine("valid hex:: 31", -1, "", "1")
+    check testParseLine("valid hex: (hello): 31", -1, " (hello)", "1")
+    check testParseLine("valid hex: (U+2010, E2 80 90, HYPHEN): E2 80 90",
+      -1, " (U+2010, E2 80 90, HYPHEN)", "\xe2\x80\x90")
+
+  test "parseValidHexLineError":
+    check testParseLineError("valid hex 31")
+    check testParseLineError("valid hex:")
+    check testParseLineError("valid hex (:: 33")
+    check testParseLineError("valid hex:: fg")
+    check testParseLineError("valid hex::00")
 
   test "parseInvalidHexLine":
-    check parseInvalidHexLine("invalid hex at 0: 31") == newHexLine(
-      invalidHexStr, "0", "", "1")
-    check parseInvalidHexLine("invalid hex at 22: 31 33 35") == newHexLine(
-      invalidHexStr, "22", "", "135")
-    check parseInvalidHexLine("invalid hex at 123: 313335") == newHexLine(
-      invalidHexStr, "123", "", "135")
-    check parseInvalidHexLine("invalid hex at 0 (a comment): 31") == newHexLine(
-      invalidHexStr, "0", " (a comment)", "1")
+    check testParseLine("invalid hex at 0:: 31", 0, "", "1")
+    check testParseLine("invalid hex at 22:: 31 33 35", 22, "", "135")
+    check testParseLine("invalid hex at 123:: 313335", 123, "", "135")
+    check testParseLine("invalid hex at 0: (a comment): 31", 0, " (a comment)", "1")
 
   test "parseInvalidHexLine error":
-    check parseInvalidHexLine("invalid hex at five: 2") == newHexLineMsg(
-      invalidHexStr, "Invalid integer position.")
-    check parseInvalidHexLine("invalid hex at 0: 12 3") == newHexLineMsg(
-      invalidHexStr, "Invalid hex string.")
-    check parseInvalidHexLine("invalid hex at 0: a2 g3") == newHexLineMsg(
-      invalidHexStr, "Invalid hex string.")
+    check testParseLineError("invalid hex at five: 2")
+    check testParseLineError("invalid hex at 0:: 12 3")
+    check testParseLineError("invalid hex at 0:: a2 g3")
+    check testParseLineError("invalid hex at 0: 44")
 
-
-
-#   test "utf8CharString abc":
-#     check testUtf8CharString("a", 0, "a", 1)
-#     check testUtf8CharString("ab", 0, "a", 1)
-#     check testUtf8CharString("ab", 1, "b", 2)
-#     check testUtf8CharString("abc", 0, "a", 1)
-#     check testUtf8CharString("abc", 1, "b", 2)
-#     check testUtf8CharString("abc", 2, "c", 3)
-  test "rewriteUtf8TestFile":
-    check rewriteUtf8TestFile("testfiles/utf8tests.txt", "testfiles/utf8tests.bin") == ""
+  test "testValidateUtf8String":
+    let filename = "testfiles/utf8testsbin.txt"
+    let msg = rewriteUtf8TestFile("testfiles/utf8tests.txt", filename)
+    if msg != "":
+      echo msg
+      fail
+    else:
+      check testValidateUtf8String(filename)

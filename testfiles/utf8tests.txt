@@ -1,0 +1,353 @@
+# Test cases for validating utf8 strings.  Each of the "valid" or
+# "invalid" lines of this file test ut8 strings.  The comment and
+# blank lines are skipped.
+#
+# Line types:
+#
+# # comment line
+# <blank line>
+#
+# valid:[comment]: string
+# valid hex:[comment]: hexString
+# invalid at pos:[comment]: string
+# invalid hex at pos:[comment]: hexString
+#
+# Code points must be in the range U+0000 to U+10FFFF.
+#
+# Bit patterns for 1 - 4 byte code points.
+# 0xxxxxxx
+# 110xxxxx 10xxxxxx
+# 1110xxxx 10xxxxxx 10xxxxxx
+# 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+#
+# 1000 8
+# 1001 9
+# 1010 a
+# 1011 b
+# 1100 c
+# 1101 d
+# 1110 e
+# 1111 f
+#
+# Wikipedia has a good explaination of utf-8.
+# https://en.wikipedia.org/wiki/UTF-8
+#
+# You can look up unicode characters by code point:
+# https://unicode.org/charts/
+#
+# You can convert from code point to utf-8 hex bytes and visa-versa:
+# https://www.cogsci.ed.ac.uk/~richard/utf-8.cgi
+#
+# Using tests from Markus Kuhn.
+# https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
+#
+# You can convert this file, utf8test.txt, to a binary file,
+# utf8test.bin. Then you can run it through other programs like
+# iconv.
+#
+# iconv --byte-subst='(%x!)' -f UTF-8 -t UTF-8 utf8tests.bin >result.txt
+
+valid:: 1
+valid:: abc
+valid:: something else
+valid: (Greek word 'kosme'): κόσμε
+
+# Two byte character.
+valid: (U+00A9, C2 A9, COPYRIGHT SIGN"): ©
+valid hex: (U+00A9): C2 A9
+
+# Three byte character.
+valid hex: (U+2010, HYPHEN): E2 80 90
+
+# Four byte character.
+valid hex: (U+1D49C): F0 9D 92 9C
+
+# 0 is a valid unicode code point.
+valid hex: (null): 00
+
+# 0 over long tests.
+
+# 110xxxxx 10xxxxxx
+# 11000000 10000000
+invalid hex at 0: (two byte 0, c0 80): c0 80
+
+# 1110xxxx 10xxxxxx 10xxxxxx =
+# 11100000 10000000 10000000 =
+invalid hex at 0: (three byte 0, E0 80 80): E0 80 80
+
+# 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+# 11110000 10000000 10000000 10000000
+invalid hex at 0: (four byte 0, F0 80 80 80): F0 80 80 80
+
+# 2  Boundary condition test cases
+# 2.1  First possible sequence of a certain length
+
+valid hex: (U-00000000, 00): 00
+valid hex: (U-00000080, c2 80): c2 80
+valid hex: (U-00000800, e0 a0 80): e0 a0 80
+valid hex: (U-00010000, f0 90 80 80): f0 90 80 80
+
+# too big
+invalid hex at 0: (U-00200000, f8 88 80 80 80): f8 88 80 80 80
+invalid hex at 0: (U-04000000, fc 84 80 80 80 80): fc 84 80 80 80 80
+
+valid: (U-00000080, c2 80): €
+
+# 2.2  Last possible sequence of a certain length
+
+valid hex: (U-0000007F, DELETE): 7F
+valid hex: (U-000007FF, DF BF): DF BF
+valid hex: (U-0000FFFF, EF BF BF): EF BF BF
+valid hex: (U-0010FFFF, F4 8F BF BF): F4 8F BF BF
+
+# too big
+invalid hex at 0: (U-001FFFFF, F7 BF BF BF): F7 BF BF BF
+invalid hex at 0: (U-03FFFFFF, F7 BF BF BF BF): F7 BF BF BF BF
+invalid hex at 0: (U-7FFFFFFF, F7 BF BF BF BF BF): F7 BF BF BF BF BF
+invalid hex at 0: (F7 BF BF BF BF BF BF): F7 BF BF BF BF BF BF
+
+# 2.3  Other boundary conditions
+
+# 1110xxxx 10xxxxxx 10xxxxxx
+# 11101111 10111111 10111111
+# EF       BF       BF
+
+valid hex: (U+FFFF): EF BF BF
+valid hex: (U+E000): EE 80 80
+valid hex: (U+FFFD, replacement character): EF BF BD
+valid hex: (U+10FFFF, biggest code point): F4 8F BF BF
+
+# 3  Malformed sequences
+
+# 3.1  Unexpected continuation bytes
+
+invalid hex at 0: (first continuation byte 80): 80
+invalid hex at 0: (last continuation byte bf): bf
+
+invalid hex at 0: (80 bf): 80 bf
+invalid hex at 0: (80 bf 80): 80 bf 80
+invalid hex at 0: (80 bf 80 bf): 80 bf 80 bf
+invalid hex at 0: (80 bf 80 bf 80): 80 bf 80 bf 80
+invalid hex at 0: (80 bf 80 bf 80 bf): 80 bf 80 bf 80 bf
+
+
+# Each unexpected continuation byte should be separately signalled as a
+# malformed sequence of its own.
+
+# 3.1.9  Sequence of all 64 possible continuation bytes (0x80-0xbf)
+
+invalid hex at 0: (80 - 8f): 8081 8283 8485 8687 8889 8a8b 8c8d 8e8f
+invalid hex at 0: (90 - 9f): 9091 9293 9495 9697 9899 9a9b 9c9d 9e9f
+invalid hex at 0: (a0 - af): a0a1 a2a3 a4a5 a6a7 a8a9 aaab acad aeaf
+invalid hex at 0: (b0 - bf): b0b1 b2b3 b4b5 b6b7 b8b9 babb bcbd bebf
+
+# 3.2  Lonely start characters
+
+# 3.2.1  All 32 first bytes of 2-byte sequences (0xc0-0xdf),
+#        each followed by a space character.
+
+invalid hex at 0: (c0 - c7): c020 c120 c220 c320 c420 c520 c620 c720
+invalid hex at 0: (c8 - cf): c820 c920 ca20 cb20 cc20 cd20 ce20 cf20
+invalid hex at 0: (d0 - d7): d020 d120 d220 d320 d420 d520 d620 d720
+invalid hex at 0: (d8 - df): d820 d920 da20 db20 dc20 dd20 de20 df20
+
+# 3.2.2  All 16 first bytes of 3-byte sequences (0xe0-0xef)
+#        each followed by a space character
+
+invalid hex at 0: (e0 - e7): e020 e120 e220 e320 e420 e520 e620 e720
+invalid hex at 0: (e8 - ef): e820 e920 ea20 eb20 ec20 ed20 ee20 ef20
+
+# 3.2.3  All 8 first bytes of 4-byte sequences (0xf0-0xf7),
+#        each followed by a space character
+
+invalid hex at 0: (f0 - f7): f020 f120 f220 f320 f420 f520 f620 f720
+
+# 3.2.4  All 4 first bytes of 5-byte sequences (0xf8-0xfb),
+#        each followed by a space character
+
+invalid hex at 0: (f8 - fb): f820 f920 fa20 fb20
+
+# 3.2.5  All 2 first bytes of 6-byte sequences (0xfc-0xfd),
+#        each followed by a space character
+
+invalid hex at 0: (fc - fd): fc20 fd20
+
+# 3.3  Sequences with last continuation byte missing
+
+# 3.3.1  2-byte sequence with last byte missing (U+0000):
+# 3.3.2  3-byte sequence with last byte missing (U+0000):
+# 3.3.3  4-byte sequence with last byte missing (U+0000):
+# 3.3.4  5-byte sequence with last byte missing (U+0000):
+# 3.3.5  6-byte sequence with last byte missing (U+0000):
+
+invalid hex at 0: (c0): c0
+invalid hex at 0: (e0 80): e0 80
+invalid hex at 0: (f0 80 80): f0 80 80
+invalid hex at 0: (f8 80 80 80): f8 80 80 80
+invalid hex at 0: (fc 80 80 80 80): fc 80 80 80 80
+
+# 3.3.6  2-byte sequence with last byte missing (U-000007FF):
+# 3.3.7  3-byte sequence with last byte missing (U-0000FFFF):
+# 3.3.8  4-byte sequence with last byte missing (U-001FFFFF):
+# 3.3.9  5-byte sequence with last byte missing (U-03FFFFFF):
+# 3.3.10 6-byte sequence with last byte missing (U-7FFFFFFF):
+
+invalid hex at 0: (U-000007FF, df): df
+invalid hex at 0: (U-0000FFFF, ef bf): ef bf
+invalid hex at 0: (U-001FFFFF, f7 bf bf): f7 bf bf
+invalid hex at 0: (U-03FFFFFF, fb bf bf bf): fb bf bf bf
+invalid hex at 0: (U-7FFFFFFF, fd bf bf bf bf): fd bf bf bf bf
+invalid hex at 3: (123 ef 80): 31 32 33 ef 80
+invalid hex at 3: (123 ef 80 f0): 31 32 33 ef 80 f0
+
+# 3.4  Concatenation of incomplete sequences
+
+# All the 10 sequences of 3.3 concatenated, you should see 10 malformed
+# sequences being signaled:
+
+invalid hex at 0:: c0e0 80f0 8080 f880 8080 fc80 8080 80df efbf f7bf bffb bfbf bffd bfbf bfbf
+
+# 3.5  Impossible bytes
+
+# Byte fe and ff cannot appear in utf-8.
+
+invalid hex at 0: (fe): fe
+invalid hex at 0: (ff): ff
+invalid hex at 3: (789 ff 77): 37 38 39 ff 37 37
+invalid hex at 3: (789 ff fe 7): 37 38 39 ff fe 37
+invalid hex at 3: (789 fe ff 7): 37 38 39 fe ff 37
+
+# # 4.1  Examples of an overlong ASCII / character.
+
+valid: (SOLIDUS): /
+valid hex: (U-002f, SOLIDUS): 2F
+invalid hex at 0: (c0 af): c0 af
+invalid hex at 0: (e0 80 af): e0 80 af
+invalid hex at 0: (f0 80 80 af): f0 80 80 af
+invalid hex at 0: (f8 80 80 80 af): f8 80 80 80 af
+invalid hex at 0: (fc 80 80 80 80 af): fc 80 80 80 80 af
+
+valid hex: (U-0800): e0 a0 80
+
+# # 4.2  Maximum overlong sequences
+
+invalid hex at 0: (U-0000007F, c1 bf): c1 bf
+invalid hex at 0: (U-000007FF, e0 9f bf): e0 9f bf
+invalid hex at 0: (U-0000FFFF, f0 8f bf bf): f0 8f bf bf
+invalid hex at 0: (U-001FFFFF, f8 87 bf bf bf): f8 87 bf bf bf
+
+# # 4.3  Overlong representation of the NUL character
+
+valid hex: (0): 00
+invalid hex at 0: (c0 80): c0 80
+invalid hex at 0: (e0 80 80): e0 80 80
+invalid hex at 0: (f0 80 80 80): f0 80 80 80
+invalid hex at 0: (f8 80 80 80 80): f8 80 80 80 80
+invalid hex at 0: (fc 80 80 80 80 80): fc 80 80 80 80 80
+
+# # 5.1 Single UTF-16 surrogates
+
+invalid hex at 0: (U+D800, ed a0 80): ed a0 80
+invalid hex at 0: (U+DB7F, ed ad bf): ed ad bf
+invalid hex at 0: (U+DB80, ed ae 80): ed ae 80
+invalid hex at 0: (U+DBFF, ed af bf): ed af bf
+invalid hex at 0: (U+DC00, ed b0 80): ed b0 80
+invalid hex at 0: (U+DF80, ed be 80): ed be 80
+invalid hex at 0: (U+DFFF, ed bf bf): ed bf bf
+
+invalid hex at 3: (U+D800, 123 ed a0 80 1): 31 32 33 ed a0 80 31
+invalid hex at 3: (U+00A9 U+D800, 1 C2 A9 ed a0 80 1): 31 C2 A9 ed a0 80 31
+
+# 5.2 Paired UTF-16 surrogates
+
+invalid hex at 0: (U+D800 U+DC00, eda0 80ed b080): ed a0 80 ed b0 80
+invalid hex at 0: (U+D800 U+DFFF, eda0 80ed bfbf): ed a0 80 ed bf bf
+invalid hex at 0: (U+DB7F U+DC00, edad bfed b080): ed ad bf ed b0 80
+invalid hex at 0: (U+DB7F U+DFFF, edad bfed bfbf): ed ad bf ed bf bf
+invalid hex at 0: (U+DB80 U+DC00, edae 80ed b080): ed ae 80 ed b0 80
+invalid hex at 0: (U+DB80 U+DFFF, edae 80ed bfbf): ed ae 80 ed bf bf
+invalid hex at 0: (U+DBFF U+DC00, edaf bfed b080): ed af bf ed b0 80
+invalid hex at 0: (U+DBFF U+DFFF, edaf bfed bfbf): ed af bf ed bf bf
+
+# # 5.3 Valid noncharacter code positions
+
+valid hex: (U+FFFE, EF BF BE): EF BF BE
+valid hex: (U+FFFF, EF BF BF): EF BF BF
+
+# # Other valid noncharacters:
+
+valid hex: (U+FDD0, EF B7 90): EF B7 90
+valid hex: (U+FDD1, EF B7 91): EF B7 91
+valid hex: (U+FDD2, EF B7 92): EF B7 92
+valid hex: (U+FDD3, EF B7 93): EF B7 93
+valid hex: (U+FDD4, EF B7 94): EF B7 94
+valid hex: (U+FDD5, EF B7 95): EF B7 95
+valid hex: (U+FDD6, EF B7 96): EF B7 96
+valid hex: (U+FDD7, EF B7 97): EF B7 97
+valid hex: (U+FDD8, EF B7 98): EF B7 98
+valid hex: (U+FDD9, EF B7 99): EF B7 99
+valid hex: (U+FDDA, EF B7 9a): EF B7 9a
+valid hex: (U+FDDB, EF B7 9b): EF B7 9b
+valid hex: (U+FDDC, EF B7 9c): EF B7 9c
+valid hex: (U+FDDD, EF B7 9d): EF B7 9d
+valid hex: (U+FDDE, EF B7 9e): EF B7 9e
+valid hex: (U+FDEF, EF B7 9f): EF B7 9f
+
+valid hex: (U+1FFFE, F0 9F BF BE): F0 9F BF BE
+valid hex: (U+2FFFE, F0 AF BF BE): F0 AF BF BE
+valid hex: (U+3FFFE, F0 BF BF BE): F0 BF BF BE
+valid hex: (U+4FFFE, F1 8F BF BE): F1 8F BF BE
+valid hex: (U+5FFFE, F1 9F BF BE): F1 9F BF BE
+valid hex: (U+6FFFE, F1 AF BF BE): F1 AF BF BE
+valid hex: (U+7FFFE, F1 BF BF BE): F1 BF BF BE
+valid hex: (U+8FFFE, F2 8F BF BE): F2 8F BF BE
+valid hex: (U+9FFFE, F2 9F BF BE): F2 9F BF BE
+valid hex: (U+AFFFE, F2 AF BF BE): F2 AF BF BE
+valid hex: (U+BFFFE, F2 BF BF BE): F2 BF BF BE
+valid hex: (U+CFFFE, F3 8F BF BE): F3 8F BF BE
+valid hex: (U+DFFFE, F3 9F BF BE): F3 9F BF BE
+valid hex: (U+EFFFE, F3 AF BF BE): F3 AF BF BE
+valid hex: (U+FFFFE, F3 BF BF BE): F3 BF BF BE
+valid hex: (U+10FFFE, F4 8F BF BE): F4 8F BF BE
+
+valid hex: (U+1FFFF, F0 9F BF BF): F0 9F BF BF
+valid hex: (U+2FFFF, F0 AF BF BF): F0 AF BF BF
+valid hex: (U+3FFFF, F0 BF BF BF): F0 BF BF BF
+valid hex: (U+4FFFF, F1 8F BF BF): F1 8F BF BF
+valid hex: (U+5FFFF, F1 9F BF BF): F1 9F BF BF
+valid hex: (U+6FFFF, F1 AF BF BF): F1 AF BF BF
+valid hex: (U+7FFFF, F1 BF BF BF): F1 BF BF BF
+valid hex: (U+8FFFF, F2 8F BF BF): F2 8F BF BF
+valid hex: (U+9FFFF, F2 9F BF BF): F2 9F BF BF
+valid hex: (U+AFFFF, F2 AF BF BF): F2 AF BF BF
+valid hex: (U+BFFFF, F2 BF BF BF): F2 BF BF BF
+valid hex: (U+CFFFF, F3 8F BF BF): F3 8F BF BF
+valid hex: (U+DFFFF, F3 9F BF BF): F3 9F BF BF
+valid hex: (U+EFFFF, F3 AF BF BF): F3 AF BF BF
+valid hex: (U+FFFFF, F3 BF BF BF): F3 BF BF BF
+valid hex: (U+10FFFF, F4 8F BF BF): F4 8F BF BF
+
+# The transition from the start state 0 to state 1 can happen
+# with bytes 80 - df, e1 - ec, ef, f5 - ff.
+
+invalid hex at 0: (80): 80
+invalid hex at 1: (81): 20 81
+invalid hex at 2: (82): 20 20 82
+invalid hex at 3: (90): 20 20 20 90
+invalid hex at 0: (a0): A0
+invalid hex at 0: (b0): B0
+invalid hex at 0: (c0): C0
+invalid hex at 0: (d0): D0
+invalid hex at 0: (df): DF
+
+# The transition from the state 2 to state 1 can happen
+# with bytes 00-7f, c0-ff.
+
+invalid hex at 0: (c2 00): c2 00
+invalid hex at 0: (c2 7f): c2 7f
+invalid hex at 0: (c2 c0): c2 c0
+invalid hex at 0: (c2 ff): c2 ff
+invalid hex at 0: (df 00): df 00
+invalid hex at 0: (df 7f): df 7f
+invalid hex at 0: (df c0): df c0
+invalid hex at 0: (df ff): df ff
