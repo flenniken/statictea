@@ -217,8 +217,6 @@ proc getString*(env: var Env, prepostTable: PrepostTable,
   ## and the return length includes optional trailing white space
   ## after the last quote.
 
-  # todo: remove unused matchString.
-  # todo: remove single quotes everywhere.
   let str = statement.text
 
   # Parse the json string and remove escaping.
@@ -401,7 +399,7 @@ proc getValue(env: var Env, prepostTable: PrepostTable,
 
   let char = statement.text[start]
 
-  if char == '\'' or char == '"':
+  if char == '"':
     result = getString(env, prepostTable, statement, start)
   elif char in {'0' .. '9', '-'}:
     result = getNumber(env, prepostTable, statement, start)

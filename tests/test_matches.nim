@@ -68,14 +68,6 @@ proc testMatchDotNames(line: string, start: Natural,
   else:
     result = true
 
-proc testMatchString(line: string, start: Natural = 0,
-    eMatchesO: Option[Matches] = none(Matches)): bool =
-  let matchesO = matchString(line, start)
-  if not expectedItem("matchesO", matchesO, eMatchesO):
-    result = false
-  else:
-    result = true
-
 proc testMatchEqualSign(line: string, start: Natural,
     eMatchesO: Option[Matches] = none(Matches)): bool =
   let matchesO = matchEqualSign(line, start)
@@ -323,30 +315,6 @@ suite "matches.nim":
   test "matchNumber":
     check matchNumber("a = 5", 4) == some(newMatches(1, 4))
     check matchNumber("a = 5.3", 4) == some(newMatches(3, 4, "."))
-
-  test "matchString":
-    check testMatchString("'hi'", 0, some(newMatches(4, 0, "hi")))
-    check testMatchString("'1234'", 0, some(newMatches(6, 0, "1234")))
-    check testMatchString("'abc def' ", 0, some(newMatches(10, 0, "abc def")))
-    check testMatchString(""""string"""", 0, some(newMatches(8, 0, "", "string")))
-    check testMatchString(""""string"  """, 0, some(newMatches(10, 0, "", "string")))
-    check testMatchString("""'12"4'""", 0, some(newMatches(6, 0, "12\"4")))
-    check testMatchString(""""12'4"  """, 0, some(newMatches(8, 0, "", "12'4")))
-
-    check testMatchString("a = 'hello'", 4, some(newMatches(7, 4, "hello")))
-    check testMatchString("a = '   4 '  ", 4, some(newMatches(9, 4, "   4 ")))
-    check testMatchString("""a = "hello" """, 4, some(newMatches(8, 4, "", "hello")))
-    check testMatchString("""a = 'hel"lo' """, 4, some(newMatches(9, 4, "hel\"lo")))
-    check testMatchString("""a = "it's true"  """, 4, some(newMatches(13, 4, "", "it's true")))
-
-    check testMatchString("tea = 'Earl Grey' tea2 = 'Masala chai'", 6,
-                       some(newMatches(12, 6, "Earl Grey")))
-
-    check testMatchString("a = 'b' abc")
-    check testMatchString("a = 'abc")
-    check testMatchString("""'a"bc """)
-    check testMatchString("")
-    check testMatchString(".")
 
   test "matchLeftParentheses":
     check testLeftParentheses("(", 0, some(newMatches(1, 0)))

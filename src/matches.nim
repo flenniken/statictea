@@ -164,14 +164,6 @@ func matchNumberNotCached*(line: string, start: Natural = 0): Option[Matches] =
   ## or integer.
   result = matchPattern(line, numberPattern, start)
 
-proc matchString*(line: string, start: Natural = 0): Option[Matches] =
-  ## Match a string inside either single or double quotes.  The
-  ## optional white space after the string is matched too. There are
-  ## two returned groups and only one will contain anything. The first
-  ## is for single quotes and the second is for double quotes.
-  let pattern = """'([^']*)'\s*|"([^"]*)"\s*"""
-  result = matchPatternCached(line, pattern, start)
-
 proc matchLeftBracket*(line: string, start: Natural = 0): Option[Matches] =
   ## Match everything up to a left backet. The match length includes
   ## the bracket.
