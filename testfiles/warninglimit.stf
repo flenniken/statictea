@@ -1,0 +1,52 @@
+id stf file version 0.0.0
+
+## Test that warnings stop after 11.
+
+# file line attributes: noLastEnding command nonZeroReturn
+
+--- file cmd.sh command nonZeroReturn
+$statictearoot/bin/statictea -t=template.html -r=result.html >stdout 2>stderr
+--- endfile
+
+--- file template.html
+$$ block
+$$ : t.repeat = 12
+{name}
+<!--$ endblock -->
+--- endfile
+
+--- file result.expected
+{name}
+{name}
+{name}
+{name}
+{name}
+{name}
+{name}
+{name}
+{name}
+{name}
+{name}
+{name}
+--- endfile
+
+--- file stdout.expected
+--- endfile
+
+--- file stderr.expected
+template.html(3): w58: The replacement variable doesn't exist: name.
+template.html(3): w58: The replacement variable doesn't exist: name.
+template.html(3): w58: The replacement variable doesn't exist: name.
+template.html(3): w58: The replacement variable doesn't exist: name.
+template.html(3): w58: The replacement variable doesn't exist: name.
+template.html(3): w58: The replacement variable doesn't exist: name.
+template.html(3): w58: The replacement variable doesn't exist: name.
+template.html(3): w58: The replacement variable doesn't exist: name.
+template.html(3): w58: The replacement variable doesn't exist: name.
+template.html(3): w58: The replacement variable doesn't exist: name.
+template.html(3): w116: Reached the maximum number of warnings, suppressing the rest.
+--- endfile
+
+--- expected result.expected == result.html
+--- expected stdout.expected == stdout
+--- expected stderr.expected == stderr
