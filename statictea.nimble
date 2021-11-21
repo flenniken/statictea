@@ -380,12 +380,30 @@ proc taskDocsIx() =
   echo "Generated docs/index.md"
   # echoGrip()
 
+proc myFileNewer(a: string, b: string): bool =
+  ## Return true when file a is newer than file b.
+  # result = getLastModificationTime(a) > getLastModificationTime(b)
+  let cmd = "echo $(($(date -r " & a & " +%s)-$(date -r " & b & " +%s)))"
+  # echo cmd
+  let diffStr = staticExec(cmd)
+  let diff = parseInt(diffStr)
+  if diff < 0:
+    result = true
+  else:
+    result = false
+
 proc taskDocs(namePart: string) =
   ## Create one or more markdown docs; specify part of source filename.":
   let filenames = get_source_filenames()
   for filename in filenames:
     # Name is part of a source file name, or "docs" when not specified.
     if namePart in filename or namePart == "docs":
+      var mdName = "docs/$1" % [changeFileExt(filename, "md")]
+
+      if myFileNewer("src/" & filename, mdName):
+        echo "Skipping unchanged $1." % filename
+        continue
+
       # Create json doc comments from the source file.
       var jsonName = "docs/$1" % [changeFileExt(filename, "json")]
       var cmd = "nim --hint[Conf]:off --hint[SuccessX]:off jsondoc --out:$1 src/$2" % [jsonName, filename]
@@ -399,7 +417,6 @@ proc taskDocs(namePart: string) =
       writeFile(sharedFilename, sharedJson)
 
       # Create markdown from the json comments using a statictea template.
-      var mdName = "docs/$1" % [changeFileExt(filename, "md")]
       echo "Generate $1" % [mdName]
       let part1 = "bin/statictea -j=docs/shared.json -t=templates/nimModule.md "
       let part2 = "-s=$1 -r=$2" % [jsonName, mdName]
@@ -557,6 +574,8 @@ task docsall, "\tCreate all the docs, docsix, docs, readmefun, dot.":
   taskDocs("")
   taskReadMeFun()
   createDependencyGraph()
+  createDependencyGraph2()
+
 
 task docs, "\tCreate one or more markdown docs; specify part of source filename.":
   let count = system.paramCount()+1
