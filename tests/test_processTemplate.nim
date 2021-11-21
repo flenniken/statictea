@@ -287,8 +287,8 @@ intensive steps.
 
     let templateContent = """
 $$ nextline
-$$ : tea = 'Earl Grey'
-$$ : tea2 = 'Masala chai'
+$$ : tea = "Earl Grey"
+$$ : tea2 = "Masala chai"
 {tea}, {tea2}
 """
     let eResultLines = @[
@@ -300,8 +300,8 @@ $$ : tea2 = 'Masala chai'
 
     let templateContent = """
 <!--$ nextline +-->
-<!--$ : tea = 'Earl Grey' +-->
-<!--$ : tea2 = 'Masala chai'-->
+<!--$ : tea = "Earl Grey" +-->
+<!--$ : tea2 = "Masala chai"-->
 {tea}, {tea2}
 """
     let eResultLines = @[
@@ -309,8 +309,8 @@ $$ : tea2 = 'Masala chai'
     ]
 
     let eErrLines = splitNewLines """
-template.html(1): w31: Unused text at the end of the statement. Missing semicolon?
-statement: tea = 'Earl Grey' tea2 = 'Masala chai'
+template.html(1): w31: Unused text at the end of the statement.
+statement: tea = "Earl Grey" tea2 = "Masala chai"
                              ^
 template.html(4): w58: The replacement variable doesn't exist: tea.
 template.html(4): w58: The replacement variable doesn't exist: tea2.

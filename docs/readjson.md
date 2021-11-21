@@ -8,7 +8,12 @@ Read json content.
 * [readJsonStream](#readjsonstream) &mdash; Read a json stream and return the variables.
 * [readJsonString](#readjsonstring) &mdash; Read a json string and return the variables.
 * [readJsonFile](#readjsonfile) &mdash; Read a json file and return the variables.
-* [readJsonFiles](#readjsonfiles) &mdash; Read json files and return the variables.
+* type: [ParsedString](#parsedstring) &mdash; ParsedString holds the result of parsing a string literal.
+* [newParsedString](#newparsedstring) &mdash; Create a new ParsedString object.
+* [unescapePopularChar](#unescapepopularchar) &mdash; Unescape the popular char and return its value.
+* [parseHexUnicode16](#parsehexunicode16) &mdash; Return the unicode number given a 4 character unicode escape string like u1234.
+* [parseHexUnicode](#parsehexunicode) &mdash; Return the unicode number given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos.
+* [parseJsonStr](#parsejsonstr) &mdash; Parse the quoted json string literal.
 
 # readJsonStream
 
@@ -34,12 +39,59 @@ Read a json file and return the variables.  If there is an error, return a warni
 proc readJsonFile(filename: string): ValueOrWarning
 ```
 
-# readJsonFiles
+# ParsedString
 
-Read json files and return the variables. If there is an error, return a warning. A duplicate variable is skipped and it generates a warning.
+ParsedString holds the result of parsing a string literal. The resulting parsed string and the ending string position.
 
 ```nim
-proc readJsonFiles(filenames: seq[string]): ValueOrWarning
+ParsedString = object
+  str*: string               ## Resulting parsed string.
+  pos*: Natural              ## The position after the last trailing whitespace
+                             ## or the position at the first invalid character.
+  messageId*: MessageId      ## Message id is 0 when the string was
+                             ## successfully parsed, else it is the
+                             ## message id telling what went wrong.
+
+```
+
+# newParsedString
+
+Create a new ParsedString object.
+
+```nim
+func newParsedString(str: string; pos: Natural; messageId: MessageId): ParsedString
+```
+
+# unescapePopularChar
+
+Unescape the popular char and return its value. If the char is not a popular char, return 0.
+
+```nim
+proc unescapePopularChar(popular: char): char
+```
+
+# parseHexUnicode16
+
+Return the unicode number given a 4 character unicode escape string like u1234. Start is pointing at the u. On error, return a message id telling what went wrong.
+
+```nim
+proc parseHexUnicode16(text: string; start: Natural): OpResultId[int32]
+```
+
+# parseHexUnicode
+
+Return the unicode number given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos. Pos is initially pointing at the u. On error, return the message id telling what went wrong and pos points at the error.
+
+```nim
+proc parseHexUnicode(text: string; pos: var Natural): OpResultId[int32]
+```
+
+# parseJsonStr
+
+Parse the quoted json string literal. The startPos points one past the leading double quote.  Return the parsed string value and the ending position one past the trailing whitespace. On failure, the ending position points at the invalid character and the message id tells what went wrong.
+
+```nim
+proc parseJsonStr(text: string; startPos: Natural): ParsedString
 ```
 
 

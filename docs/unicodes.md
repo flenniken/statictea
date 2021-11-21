@@ -6,9 +6,13 @@ Functions that deal with Unicode.
 # Index
 
 * [cmpString](#cmpstring) &mdash; Compares two utf8 strings a and b.
-* [firstInvalidUtf8](#firstinvalidutf8) &mdash; Return the position of the first invalid utf-8 byte in the string if any.
 * [stringLen](#stringlen) &mdash; Return the number of unicode characters in the string (not bytes).
 * [githubAnchor](#githubanchor) &mdash; Convert the name to a github anchor name.
+* [bytesToString](#bytestostring) &mdash; Create a string from bytes in a buffer.
+* [countCodePoints](#countcodepoints) &mdash; Update the count parameter with the number of code points in the string.
+* [validateUtf8String](#validateutf8string) &mdash; Return the position of the first invalid utf-8 byte in the string else return -1.
+* [utf8CharString](#utf8charstring) &mdash; Get the unicode character at pos.
+* [firstInvalidUtf8](#firstinvalidutf8) &mdash; Return the position of the first invalid utf-8 byte in the string if any.
 
 # cmpString
 
@@ -16,14 +20,6 @@ Compares two utf8 strings a and b.  When a equals b return 0, when a is greater 
 
 ```nim
 func cmpString(a, b: string; insensitive: bool = false): int
-```
-
-# firstInvalidUtf8
-
-Return the position of the first invalid utf-8 byte in the string if any.
-
-```nim
-func firstInvalidUtf8(str: string): Option[int]
 ```
 
 # stringLen
@@ -40,6 +36,46 @@ Convert the name to a github anchor name.
 
 ```nim
 func githubAnchor(name: string): string
+```
+
+# bytesToString
+
+Create a string from bytes in a buffer. A nim string is utf-8 incoded but it isn't validated so it is just a string of bytes.
+
+```nim
+proc bytesToString(buffer: openArray[uint8 | char]): string
+```
+
+# countCodePoints
+
+Update the count parameter with the number of code points in the string.
+
+```nim
+proc countCodePoints(str: string; count: var int): uint32
+```
+
+# validateUtf8String
+
+Return the position of the first invalid utf-8 byte in the string else return -1.
+
+```nim
+proc validateUtf8String(str: string): int
+```
+
+# utf8CharString
+
+Get the unicode character at pos.  Return a one character string. Return "" when not a utf-8 character.
+
+```nim
+proc utf8CharString(str: string; pos: Natural): string
+```
+
+# firstInvalidUtf8
+
+Return the position of the first invalid utf-8 byte in the string if any.
+
+```nim
+func firstInvalidUtf8(str: string): Option[int]
 ```
 
 

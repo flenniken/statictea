@@ -8,8 +8,8 @@ $statictearoot/bin/statictea -t=comment.html >stdout 2>stderr
 
 --- file comment.html
 $$ nextline
-$$ : tea = 'Earl Grey'
-$$ : tea2 = 'Masala chai'
+$$ : tea = "Earl Grey"
+$$ : tea2 = "Masala chai"
 {tea}, {tea2}
 --- endfile
 

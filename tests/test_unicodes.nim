@@ -16,7 +16,7 @@ const
 
 type
   HexLine = object
-    pos: int
+    pos: int  # -1 means not pos and the string is expected to be valid.
     comment: string
     str: string
 
@@ -261,6 +261,21 @@ proc testValidateUtf8String(filename: string): bool =
         echo "Line $1: expected invalid pos: $2" % [$lineNum, $hexLine.pos]
         echo "Line $1:      got invalid pos: $2" % [$lineNum, $pos]
         result = false
+
+    var bytePos = hexLine.pos
+    if bytePos == -1:
+      bytePos = 0
+    let str = utf8CharString(hexLine.str, bytePos)
+    if beValid:
+      if str == "":
+        echo "utf8CharString: Line $1 pos $2 is invalid but expected to be valid." % [
+          $bytePos, $lineNum]
+        result = false
+    else:
+      if str != "":
+        echo fmt"utf8CharString: Line {lineNum} pos {bytePos}: Expected invalid char but it passed validation."
+        result = false
+
 
 # proc testUtf8CharString(text: string, start: Natural, eStr: string, ePos: Natural): bool =
 #   var pos = start

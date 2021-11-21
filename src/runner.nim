@@ -165,9 +165,10 @@ proc deleteFolder*(folder: string): string =
   except:
     result = getCurrentExceptionMsg()
 
-proc getHelp(): string =
-  ## Return the help message and usage text.
-  result = """
+when not defined(test):
+  proc getHelp(): string =
+    ## Return the help message and usage text.
+    result = """
 # Runner
 
 Run a single test file (stf) or run all stf files in a folder.
@@ -772,98 +773,100 @@ proc runStfFilename*(filename: string): OpResult[Rc] =
   if rcOp.value != 0:
     result = rcOp
 
-proc runFilename(filename: string, leaveTempDir: bool): OpResult[Rc] =
-  ## Run the stf file and optionally leave the temp dir. Return 0 when
-  ## all the tests pass.
+when not defined(test):
 
-  result = runStfFilename(filename)
+  proc runFilename(filename: string, leaveTempDir: bool): OpResult[Rc] =
+    ## Run the stf file and optionally leave the temp dir. Return 0 when
+    ## all the tests pass.
 
-  # Remove the temp folder unless leave is specified.
-  let tempDir = filename & ".tempdir"
-  if leaveTempDir:
-    echo "Leaving temp dir: " & tempDir
-  else:
-    if fileExists(filename):
-      discard deleteFolder(tempDir)
+    result = runStfFilename(filename)
 
-proc runFilename(args: RunArgs): OpResult[Rc] =
-  ## Run a stf file specified by a RunArgs object. Return 0 when it
-  ## passes.
-  result = runFilename(args.filename, args.leaveTempDir)
+    # Remove the temp folder unless leave is specified.
+    let tempDir = filename & ".tempdir"
+    if leaveTempDir:
+      echo "Leaving temp dir: " & tempDir
+    else:
+      if fileExists(filename):
+        discard deleteFolder(tempDir)
 
-proc runDirectory(dir: string, leaveTempDir: bool): OpResult[Rc] =
-  ## Run all the stf files in the specified directory. Return 0 when
-  ## they all pass. Show progess and count of passed and failed.
+  proc runFilename(args: RunArgs): OpResult[Rc] =
+    ## Run a stf file specified by a RunArgs object. Return 0 when it
+    ## passes.
+    result = runFilename(args.filename, args.leaveTempDir)
 
-  if not dirExists(dir):
-    let message = "The dir does not exist: " & dir
-    return opMessage[Rc](message)
+  proc runDirectory(dir: string, leaveTempDir: bool): OpResult[Rc] =
+    ## Run all the stf files in the specified directory. Return 0 when
+    ## they all pass. Show progess and count of passed and failed.
 
-  var count = 0
-  var passedCount = 0
-  var rc = 0
-  for kind, path in walkDir(dir):
-    if path.endsWith(".stf"):
-      let (_, basename) = splitPath(path)
-      echo "Running: " & basename
-      let rcOp = runFilename(path, leaveTempDir)
-      if rcOp.isMessage:
-        return rcOp
-      if rcOp.value == 0:
-        inc(passedCount)
-      else:
-        rc = 1
-      inc(count)
+    if not dirExists(dir):
+      let message = "The dir does not exist: " & dir
+      return opMessage[Rc](message)
 
-  echo "$1 passed, $2 failed\n" % [
-    $passedCount, $(count - passedCount)]
-  result = OpResult[Rc](kind: okValue, value: rc)
+    var count = 0
+    var passedCount = 0
+    var rc = 0
+    for kind, path in walkDir(dir):
+      if path.endsWith(".stf"):
+        let (_, basename) = splitPath(path)
+        echo "Running: " & basename
+        let rcOp = runFilename(path, leaveTempDir)
+        if rcOp.isMessage:
+          return rcOp
+        if rcOp.value == 0:
+          inc(passedCount)
+        else:
+          rc = 1
+        inc(count)
 
-proc runDirectory(args: RunArgs): OpResult[Rc] =
-  ## Run all stf files in a directory. Return 0 when all pass.
-  result = runDirectory(args.directory, args.leaveTempDir)
+    echo "$1 passed, $2 failed\n" % [
+      $passedCount, $(count - passedCount)]
+    result = OpResult[Rc](kind: okValue, value: rc)
 
-proc processRunArgs(args: RunArgs): OpResult[Rc] =
-  ## Run what was specified on the command line. Return 0 when
-  ## successful.
+  proc runDirectory(args: RunArgs): OpResult[Rc] =
+    ## Run all stf files in a directory. Return 0 when all pass.
+    result = runDirectory(args.directory, args.leaveTempDir)
 
-  if args.help:
-    echo getHelp()
-    result = OpResult[Rc](kind: okValue, value: 0)
-  elif args.version:
-    echo runnerId
-    result = OpResult[Rc](kind: okValue, value: 0)
-  elif args.filename != "":
-    result = runFilename(args)
-  elif args.directory != "":
-    result = runDirectory(args)
-  else:
-    echo "Missing argments, use -h for help."
-    result = OpResult[Rc](kind: okValue, value: 1)
+  proc processRunArgs(args: RunArgs): OpResult[Rc] =
+    ## Run what was specified on the command line. Return 0 when
+    ## successful.
 
-proc main(argv: seq[string]): OpResult[Rc] =
-  ## Run stf test files. Return 0 when successful.
+    if args.help:
+      echo getHelp()
+      result = OpResult[Rc](kind: okValue, value: 0)
+    elif args.version:
+      echo runnerId
+      result = OpResult[Rc](kind: okValue, value: 0)
+    elif args.filename != "":
+      result = runFilename(args)
+    elif args.directory != "":
+      result = runDirectory(args)
+    else:
+      echo "Missing argments, use -h for help."
+      result = OpResult[Rc](kind: okValue, value: 1)
 
-  # Setup control-c monitoring so ctrl-c stops the program.
-  proc controlCHandler() {.noconv.} =
-    quit 0
-  setControlCHook(controlCHandler)
+  proc main(argv: seq[string]): OpResult[Rc] =
+    ## Run stf test files. Return 0 when successful.
 
-  try:
-    # Parse the command line options.
-    let argsOp = parseRunCommandLine(argv)
-    if argsOp.isMessage:
-      return opMessage[Rc](argsOp.message)
-    let args = argsOp.value
+    # Setup control-c monitoring so ctrl-c stops the program.
+    proc controlCHandler() {.noconv.} =
+      quit 0
+    setControlCHook(controlCHandler)
 
-    # Run.
-    result = processRunArgs(args)
-  except:
-    var message = "Unexpected exception: $1" % [getCurrentExceptionMsg()]
-    # The stack trace is only available in the debug builds.
-    when not defined(release):
-      message = message & "\n" & getCurrentException().getStackTrace()
-    result = opMessage[Rc](message)
+    try:
+      # Parse the command line options.
+      let argsOp = parseRunCommandLine(argv)
+      if argsOp.isMessage:
+        return opMessage[Rc](argsOp.message)
+      let args = argsOp.value
+
+      # Run.
+      result = processRunArgs(args)
+    except:
+      var message = "Unexpected exception: $1" % [getCurrentExceptionMsg()]
+      # The stack trace is only available in the debug builds.
+      when not defined(release):
+        message = message & "\n" & getCurrentException().getStackTrace()
+      result = opMessage[Rc](message)
 
 when isMainModule:
   let rcOp = main(commandLineParams())

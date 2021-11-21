@@ -22,7 +22,7 @@ $$ : fullPath = get(entry, "filename", "")
 $$ : path = path(fullPath, "/")
 $$ : mdName = concat(path.basename, ".md")
 $$ : description = get(entry, "description", "")
-$$ : short = substr(description, 0, add(find(description, '.', -1), 1))
+$$ : short = substr(description, 0, add(find(description, ".", -1), 1))
 * [{path.filename}]({mdName}) &mdash; {short}
 
 ---

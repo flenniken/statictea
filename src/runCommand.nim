@@ -15,7 +15,6 @@ import parseNumber
 import variables
 import funtypes
 import runFunction
-import unicodes
 import readjson
 
 type
@@ -225,17 +224,11 @@ proc getString*(env: var Env, prepostTable: PrepostTable,
   # Parse the json string and remove escaping.
   let parsedString = parseJsonStr(str, start+1)
   if parsedString.messageId != MessageId(0):
-    env.warnStatement(statement, parsedString.messageId, start+1)
+    env.warnStatement(statement, parsedString.messageId, parsedString.pos)
     return
   let valueAndLength = newValueAndLength(newValue(parsedString.str),
     parsedString.pos - start)
   let literal = parsedString.str
-
-  # Validate the utf-8 bytes.
-  var posO = firstInvalidUtf8(literal)
-  if posO.isSome:
-    env.warnStatement(statement, wInvalidUtf8, start + posO.get() + 1)
-    return
 
   let value = Value(kind: vkString, stringv: literal)
   result = some(ValueAndLength(value: value, length: valueAndLength.length))

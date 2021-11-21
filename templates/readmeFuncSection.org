@@ -5,17 +5,17 @@
 # $ #
 # $ block
 # $ : g.patterns = list( +
-# $ :   '~~~~', '#+END_SRC', +
-# $ :   '~~~', '#+BEGIN_SRC', +
-# $ :   '\* ', '- ', +
-# $ :   "@@", '', +
-# $ :   "@\|", '[', +
-# $ :   "\|@", ']', +
-# $ :   "[ ]*@:", h.newline, +
-# $ :   "&quot;", '"', +
-# $ :   "&gt;", '>', +
-# $ :   "&lt;", '<', +
-# $ :   "&amp;", '&')
+# $ :   "~~~~", "#+END_SRC", +
+# $ :   "~~~", "#+BEGIN_SRC", +
+# $ :   "\* ", "- ", +
+# $ :   "@@", "", +
+# $ :   "@\|", "[", +
+# $ :   "\|@", "]", +
+# $ :   "[ ]*@:", "\n", +
+# $ :   "&quot;", "\"", +
+# $ :   "&gt;", ">", +
+# $ :   "&lt;", "<", +
+# $ :   "&amp;", "&")
 # $ : g.sortedEntries = sort(s.entries, "ascending", "sensitive", "name")
 # $ endblock
 # $ #
@@ -29,7 +29,7 @@
 # $ : capName = case(pos, list(0, substr(entry.name, 3, underscorePos)), entry.name)
 # $ : name = concat(lower(substr(capName, 0, 1)), substr(capName, 1))
 # $ : desc = replaceRe(entry.description, g.patterns)
-# $ : shortFuncDesc = substr(desc, 0, add(find(desc, '.', -1), 1))
+# $ : shortFuncDesc = substr(desc, 0, add(find(desc, ".", -1), 1))
 # $ : description = replaceRe(entry.description, g.patterns)
 # $ : newEntry = dict()
 # $ : newEntry.name = name

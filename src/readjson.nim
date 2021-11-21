@@ -191,13 +191,12 @@ proc parseHexUnicode*(text: string, pos: var Natural): OpResultId[int32] =
   ## Return the unicode number given a 4 or 8 character unicode escape
   ## string like u1234 or u1234\u1234 and advance the pos. Pos is
   ## initially pointing at the u. On error, return the message id
-  ## telling what went wrong.
+  ## telling what went wrong and pos points at the error.
 
   let numOrc = parseHexUnicode16(text, pos)
   if numOrc.isMessageId:
     return numOrc
   var num = numOrc.value
-  pos += 5
 
   if (num and 0xfc00) != 0xd800:
     if (num and 0xfc00) == 0xdc00:
@@ -207,8 +206,10 @@ proc parseHexUnicode*(text: string, pos: var Natural): OpResultId[int32] =
       # Invalid utf-8 bytes.
       return newOpResultIdId[int32](wInvalidUtf8)
     # Add the character and return.
+    pos += 5
     return newOpResultId[int32](num)
 
+  pos += 5
   if pos + 6 > text.len or text[pos] != '\\' or text[pos+1] != 'u':
     # Missing the second surrogate pair.
     return newOpResultIdId[int32](wMissingSurrogatePair)
@@ -219,7 +220,6 @@ proc parseHexUnicode*(text: string, pos: var Natural): OpResultId[int32] =
   if secondOrc.isMessageId:
     return secondOrc
   var second = secondOrc.value
-  pos += 5
 
   if (second and 0xfc00) != 0xdc00:
     # The second value is not a matching surrogate pair.
@@ -229,6 +229,7 @@ proc parseHexUnicode*(text: string, pos: var Natural): OpResultId[int32] =
     # Invalid paired surrogate.
     return newOpResultIdId[int32](wPairedSurrogate)
 
+  pos += 5
   num = 0x10000 + (((num - 0xd800) shl 10) or (second - 0xdc00))
   result = newOpResultId[int32](num)
 
@@ -281,8 +282,7 @@ proc parseJsonStr*(text: string, startPos: Natural): ParsedString =
         # Controls characters must be escaped.
         return newParsedString("", pos, wControlNotEscaped)
       else:
-        # Get the unicode character at pos and increment pos one past
-        # it.
+        # Get the unicode character at pos.
         let str = utf8CharString(text, pos)
         if str.len == 0:
           # Invalid utf-8 unicode character.
@@ -290,6 +290,7 @@ proc parseJsonStr*(text: string, startPos: Natural): ParsedString =
 
         # Add the unicode character to the result string.
         newStr.add(str)
+        pos += str.len()
     of slash:
       case getChar(text, pos)
       of 'u':

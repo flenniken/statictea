@@ -65,6 +65,7 @@ Language variable methods.
 * [getParentDict](#getparentdict) &mdash; Return the last component dictionary specified by the given names or, on error, return a warning.
 * [assignVariable](#assignvariable) &mdash; Assign the variable the given value if possible, else return a warning.
 * [getVariable](#getvariable) &mdash; Look up the variable and return its value when found, else return a warning.
+* [getTeaArgs](#getteaargs) &mdash; Create the t.
 
 # outputValues
 
@@ -214,6 +215,14 @@ Look up the variable and return its value when found, else return a warning.
 
 ```nim
 proc getVariable(variables: Variables; dotNameStr: string): ValueOrWarning
+```
+
+# getTeaArgs
+
+Create the t.args dictionary from the statictea arguments.
+
+```nim
+func getTeaArgs(args: Args): Value
 ```
 
 

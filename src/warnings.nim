@@ -6,6 +6,7 @@ import messages
 
 type
   Warning* = MessageId
+    ## Warning message id.
   
   WarningData* = object
     ## Warning number and optional extra strings.

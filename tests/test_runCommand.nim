@@ -153,6 +153,7 @@ proc testGetStringInvalid(buffer: seq[uint8]): bool =
     expectedLine & "\n",
     "                                  ^\n",
   ]
+  #  statement: a = "stringwithbadutf8:$1:end
   result = testGetString(newStatement(statement), 4, none(ValueAndLength), eErrLines = eErrLines)
 
 proc testGetVarOrFunctionValue(variables: Variables, statement: Statement, start: Natural,
@@ -549,6 +550,10 @@ statement: a = 9_223_372_036_854_775_808
       let eLength = buffer.len + 2
       let statement = """a = "$1"""" % str
       check testGetString(newStatement(statement), 4, newStringValueAndLengthO(str, eLength))
+
+  test "getString invalid ff":
+    check testGetStringInvalid(@[0xffu8])
+
   test "getString invalid 2":
     check testGetStringInvalid(@[0xc3u8, 0x28])
 
@@ -569,9 +574,9 @@ statement: a = 9_223_372_036_854_775_808
 
   test "getString not string":
     let eErrLines = splitNewLines """
-template.html(1): w30: Invalid string.
+template.html(1): w139: No ending double quote.
 statement: a = "abc
-               ^
+                   ^
 """
     check testGetString(newStatement("""a = "abc"""), 4,
       none(ValueAndLength), eErrLines = eErrLines)
@@ -595,7 +600,7 @@ statement: a = "abc
   test "getVarOrFunctionValue not defined":
     let statement = newStatement(text="tea = a+123", lineNum=12, 0)
     let eErrLines = splitNewLines """
-template.html(12): w36: The variable "a" does not exist.
+template.html(12): w36: The variable 'a' does not exist.
 statement: tea = a+123
                  ^
 """
@@ -605,7 +610,7 @@ statement: tea = a+123
   test "getVarOrFunctionValue not defined":
     let statement = newStatement(text="tea = a123", lineNum=12, 0)
     let eErrLines = splitNewLines """
-template.html(12): w36: The variable "a123" does not exist.
+template.html(12): w36: The variable 'a123' does not exist.
 statement: tea = a123
                  ^
 """
@@ -625,7 +630,7 @@ statement: tea = a123
   test "warnStatement":
     let statement = newStatement(text="tea = a123", lineNum=12, 0)
     let eErrLines: seq[string] = splitNewLines """
-template.html(12): w36: The variable "a123" does not exist.
+template.html(12): w36: The variable 'a123' does not exist.
 statement: tea = a123
                  ^
 """
@@ -634,7 +639,7 @@ statement: tea = a123
   test "warnStatement long":
     let statement = newStatement(text="""tea  =  concat(a123, len(hello), format(len(asdfom)), 123456778, 1243123456, "this is a long statement", 678, 899)""", lineNum=12, 0)
     let eErrLines: seq[string] = splitNewLines """
-template.html(12): w36: The variable "a123" does not exist.
+template.html(12): w36: The variable 'a123' does not exist.
 statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
                           ^
 """
@@ -643,7 +648,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "warnStatement long":
     let statement = newStatement(text="""tea  =  concat(a123, len(hello), format(len(asdfom)), 123456778, 1243123456, "this is a long statement", 678, test)""", lineNum=12, 0)
     let eErrLines: seq[string] = @[
-      """template.html(12): w36: The variable "test" does not exist.\n""",
+      """template.html(12): w36: The variable 'test' does not exist.""" & "\n",
       """statement: ...is is a long statement", 678, test)""" & "\n",
         "                                            ^\n",
     ]
@@ -652,7 +657,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "warnStatement long2":
     let statement = newStatement(text="""tea                         =        concat(a123, len(hello), format(len(asdfom)), 123456778, num,   "this is a long statement with more on each end of the statement.", 678, test)""", lineNum=12, 0)
     let eErrLines: seq[string] = @[
-      """template.html(12): w36: The variable "num" does not exist.\n""",
+      "template.html(12): w36: The variable 'num' does not exist.\n",
       """statement: ...rmat(len(asdfom)), 123456778, num,   "this is a long stateme...""" & "\n",
         "                                            ^\n",
     ]
@@ -696,7 +701,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eErrLines = @[
       "template.html(16): w139: No ending double quote.\n",
       """statement: tea = len("abc) """ & "\n",
-        "                      ^\n",
+        "                           ^\n",
     ]
     check testGetFunctionValue("len", statement, 10, eErrLines = eErrLines)
 

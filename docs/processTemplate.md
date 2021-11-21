@@ -6,7 +6,7 @@ Process the template.
 # Index
 
 * [yieldContentLine](#yieldcontentline) &mdash; Yield one content line at a time and keep the line endings.
-* [getTeaArgs](#getteaargs) &mdash; Create the t.
+* [readJsonFiles](#readjsonfiles) &mdash; Read json files and return a variable dictionary.
 * [processTemplate](#processtemplate) &mdash; Process the template and return 0 on success.
 * [updateTemplate](#updatetemplate) &mdash; Update the template and return 0 on success.
 * [processTemplateTop](#processtemplatetop) &mdash; Setup the environment streams then process the template and return 0 on success.
@@ -20,12 +20,12 @@ Yield one content line at a time and keep the line endings.
 iterator yieldContentLine(content: string): string
 ```
 
-# getTeaArgs
+# readJsonFiles
 
-Create the t.args dictionary from the statictea arguments.
+Read json files and return a variable dictionary.  Skip a duplicate variable and generate a warning.
 
 ```nim
-func getTeaArgs(args: Args): Value
+proc readJsonFiles(env: var Env; filenames: seq[string]): VarsDict
 ```
 
 # processTemplate

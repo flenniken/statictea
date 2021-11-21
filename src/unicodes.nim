@@ -30,13 +30,6 @@ func cmpString*(a, b: string, insensitive: bool = false): int =
   else:
     result = 0
 
-func firstInvalidUtf8*(str: string): Option[int] =
-  ## Return the position of the first invalid utf-8 byte in the string
-  ## if any.
-  var pos = validateUtf8(str)
-  if pos != -1:
-    result = some(pos)
-
 func stringLen*(str: string): Natural =
   ## Return the number of unicode characters in the string (not
   ## bytes).
@@ -68,23 +61,6 @@ func githubAnchor*(name: string): string =
       if isDigit(ch) or ch == '-' or ch == '_':
         anchorRunes.add(rune)
   result = $anchorRunes
-
-# proc utf8CharString*(text: string, pos: var int): string =
-#   ## Get the unicode character at pos and increment pos one past
-#   ## it. Return a one character string. Return "" when not a utf-8
-#   ## character.
-#   let rune = runeAt(text, pos)
-#   # echo "rune = " & $rune
-#   # echo "rune = " & toHex(int32(rune))
-#   if rune == Rune(0xfffd):
-#     # 0xfffd replaces invalid characters but 0xfffd by itself is
-#     # ok. 0xfffd in utf-8 is EFBFDB.
-#     if not (text.len >= pos+2 and text[pos..pos+2] == "\xEF\xBF\xBD"):
-#       # Invalid utf-8 unicode character.
-#       return ""
-#   result = toUtf8(rune)
-
-#   pos += result.len
 
 proc bytesToString*(buffer: openArray[uint8|char]): string =
   ## Create a string from bytes in a buffer. A nim string is utf-8
@@ -182,3 +158,27 @@ proc validateUtf8String*(str: string): int =
     assert result >= 0
   else:
     result = -1
+
+proc utf8CharString*(str: string, pos: Natural): string =
+  ## Get the unicode character at pos.  Return a one character
+  ## string. Return "" when not a utf-8 character.
+  if pos > str.len - 1:
+    return
+  var codePoint: uint32
+  var state: uint32 = 0
+  for sByte in str[pos .. str.len - 1]:
+    decode(state, codePoint, sByte)
+    if state == 12:
+      return ""
+    result.add(char(sByte))
+    if state == 0:
+      return result
+  result = ""
+
+func firstInvalidUtf8*(str: string): Option[int] =
+  ## Return the position of the first invalid utf-8 byte in the string
+  ## if any.
+  var pos = validateUtf8String(str)
+  if pos != -1:
+    result = some(pos)
+

@@ -11,6 +11,11 @@ StaticTea nim source code documentation.
 * [funtypes.nim](funtypes.md) &mdash; Statictea function types and supporting routines.
 * [gethelp.nim](gethelp.md) &mdash; Get the command line help message.
 * [matches.nim](matches.md) &mdash; Regular expression matching methods.
+* [messages.nim](messages.md) &mdash; Messages IDs and associated strings.
+* [opresult.nim](opresult.md) &mdash; OpResult is similar to the Option type but instead of returning
+nothing, you return a message that tells why you cannot return the
+value.
+* [opresultid.nim](opresultid.md) &mdash; OpResultId either a value or a message id.
 * [parseCmdLine.nim](parseCmdLine.md) &mdash; Parse a template command line.
 * [parseCommandLine.nim](parseCommandLine.md) &mdash; Parse the StaticTea terminal command line and return the arguments.
 * [parseNumber.nim](parseNumber.md) &mdash; Parse an int or float number string.

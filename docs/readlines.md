@@ -63,7 +63,7 @@ LineBuffer = object
   lineNum: int               ## The current line number in the file starting at 1.
   pos: int                   ## Current byte position in the buffer.
   charsRead: int             ## Number of bytes of chars in the buffer.
-  buffer: string             ## Memory pre-allocated for the buffer.
+  buffer: string             ## Memory allocated for the buffer.
   filename: string           ## The optional stream's filename.
 
 ```
