@@ -100,7 +100,6 @@ import messages
 import variables
 import tempFile
 import parseNumber
-import tpub
 import tostring
 
 type
@@ -147,7 +146,7 @@ type
     tempFile*: TempFile
     stream*: Stream
 
-proc getTempFileStream(): Option[TempFileStream] {.tpub.} =
+proc getTempFileStream*(): Option[TempFileStream] =
   ## Create a stream from a temporary file and return both.
 
   # Get a temp file.
@@ -173,7 +172,7 @@ proc readNextSegment(env: var Env, tempSegments: var TempSegments): string =
   ## no more segments.
   result = tempSegments.lb.readline()
 
-proc stringSegment(line: string, start: Natural, finish: Natural): string {.tpub.} =
+proc stringSegment*(line: string, start: Natural, finish: Natural): string =
   ## Return the string segment. The line contains the segment starting at
   ## the given position and ending at finish position in the line (1
   ## after). If the start and finish are at the end, output a endline segment.
@@ -200,8 +199,8 @@ proc stringSegment(line: string, start: Natural, finish: Natural): string {.tpub
 
 # todo: don't allow spaces around the dotNameStr inside the brackets?
 
-proc varSegment(bracketedVar: string, dotNameStrPos: Natural,
-                 dotNameStrLen: Natural, atEnd: bool): string {.tpub.} =
+proc varSegment*(bracketedVar: string, dotNameStrPos: Natural,
+                 dotNameStrLen: Natural, atEnd: bool): string =
   ## Return a variable segment. The bracketedVar is a string starting
   ## with { and ending with } that has a variable inside with optional
   ## whitespace around the variable, i.e. "{ s.name }". The atEnd
@@ -224,7 +223,7 @@ proc varSegment(bracketedVar: string, dotNameStrPos: Natural,
     segmentValue = $ord(variable)
   result.add("{segmentValue},{dotNameStrPos:<4},{dotNameStrLen:<4},{bracketedVar}\n".fmt)
 
-proc lineToSegments(prepostTable: PrepostTable, line: string): seq[string] {.tpub.} =
+proc lineToSegments*(prepostTable: PrepostTable, line: string): seq[string] =
   ## Convert a line to a list of segments.
 
   var pos = 0
@@ -282,7 +281,7 @@ proc lineToSegments(prepostTable: PrepostTable, line: string): seq[string] {.tpu
     result.add(varSeg)
     pos = nextPos
 
-func parseVarSegment(segment: string): string {.tpub.} =
+func parseVarSegment*(segment: string): string =
   ## Parse a variable type segment and return the dotNameStr.
 
   # Example variable segments showing limits:
@@ -387,7 +386,7 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
         stream.write(line)
       line = ""
 
-proc allocTempSegments(env: var Env, lineNum: Natural): Option[TempSegments] {.tpub.} =
+proc allocTempSegments*(env: var Env, lineNum: Natural): Option[TempSegments] =
   ## Create a TempSegments object. This reserves memory for a line
   ## buffer and creates a backing temp file. Call the closeDelete
   ## procedure when done to free the memory and to close and delete

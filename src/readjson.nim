@@ -6,7 +6,6 @@ import std/options
 import std/json
 import std/tables
 import std/unicode
-import tpub
 import vartypes
 import messages
 import opresultid
@@ -19,7 +18,7 @@ import unicodes
 
 var depth_limit = 3
 
-proc jsonToValue(jsonNode: JsonNode, depth: int = 0): Option[Value] {.tpub.} =
+proc jsonToValue*(jsonNode: JsonNode, depth: int = 0): Option[Value] =
   ## Convert a json value to a statictea value.
   if depth > depth_limit:
     # todo: test the depth limit.

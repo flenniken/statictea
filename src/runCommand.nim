@@ -5,7 +5,6 @@ import std/strUtils
 import parseCmdLine
 import readLines
 import matches
-import tpub
 import regexes
 import env
 import vartypes
@@ -140,8 +139,8 @@ proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
 
 
 
-iterator yieldStatements(cmdLines: seq[string], cmdLineParts:
-    seq[LineParts]): Statement {.tpub.} =
+iterator yieldStatements*(cmdLines: seq[string], cmdLineParts:
+    seq[LineParts]): Statement =
   ## Iterate through the command's statements.  Statements are
   ## separated by semicolons or newlines and are not empty or all
   ## spaces.

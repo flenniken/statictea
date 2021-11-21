@@ -2,7 +2,6 @@
 
 import std/parseopt
 import std/options
-import tpub
 import args
 import messages
 import warnings
@@ -50,19 +49,19 @@ func newArgsOrWarning(warningData: WarningData): ArgsOrWarning =
   ## Return a new ArgsOrWarning object containing a warning.
   result = ArgsOrWarning(kind: awWarning, warningData: warningData)
 
-func fileListIndex(word: string): int {.tpub.} =
+func fileListIndex*(word: string): int =
   for ix, w in fileLists:
     if w == word:
       return ix
   return -1
 
-func letterToWord(letter: char): string {.tpub.} =
+func letterToWord*(letter: char): string =
   for tup in switches:
     if tup[0] == letter:
       return tup[1]
   return ""
 
-proc parsePrepost(str: string): Option[Prepost] {.tpub.} =
+proc parsePrepost*(str: string): Option[Prepost] =
   ## Match a prefix followed by an optional postfix, prefix[,postfix].
   ## Each part contains 1 to 20 ascii characters including spaces but
   ## without control characters or commas.

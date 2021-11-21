@@ -2,13 +2,11 @@
 
 import std/options
 import std/strutils
-import tpub
 
-tpubType:
-  type
-    Dependency* = object
-      left*: string
-      right*: string
+type
+  Dependency* = object
+    left*: string
+    right*: string
 
 proc `$`*(dep: Dependency): string =
   ## Return a string representation of a Dependency.
