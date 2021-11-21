@@ -111,7 +111,7 @@ func newReplacement(pattern: string; sub: string): Replacement
 Replace the patterns in the string with their replacements.
 
 ```nim
-proc replaceMany(str: string; replacements: seq[Replacement]): string
+proc replaceMany(str: string; replacements: seq[Replacement]): Option[string]
 ```
 
 

@@ -49,7 +49,7 @@ MessageId = enum
   wNotAllStrings, wTeaVariableExists, wAppendToList, wAppendToTeaVar,
   wDuplicateVar, wNoFilename, wFourHexDigits, wNotMatchingSurrogate,
   wMissingSurrogatePair, wNotPopular, wControlNotEscaped, wNoEndingQuote,
-  wLowSurrogateFirst, wPairedSurrogate
+  wLowSurrogateFirst, wPairedSurrogate, wReplaceMany
 ```
 
 # Messages

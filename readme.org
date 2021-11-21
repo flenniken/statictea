@@ -1,7 +1,7 @@
 #+TITLE: StaticTea
 A template processor and language.
 
-StaticTea combines a template with json data to produce a result.
+StaticTea produces a file from a template and json data.
 
 Example hello world template:
 
@@ -26,7 +26,7 @@ hello world
 :testfile: testfiles/hello.stf
 :END:
 
-[[#contents][茶]] (contents at the bottom)
+[[#contents][茶]] (table of contents at the bottom)
 
 * Advantages
 :PROPERTIES:
@@ -34,7 +34,7 @@ hello world
 :END:
 
 You can view, edit and validate your templates with its normal
-tools.  You develop templates as if they were static pages.
+tools as if they were static pages.
 
 The template designer has full control over the presentation.
 You can change the look without changing the server.
@@ -51,15 +51,16 @@ formatting json.
 :CUSTOM_ID: how-it-works
 :END:
 
-You pass unformatted variable content from the server as json.
-You format the content with template commands to create new
-variables that substitute text in the template.
+You create a template and add commands to wrap the variable
+content called the replacement block.
 
-You define replacement blocks by surrounding them with commands
-and you target replacement variables inside the block by wrapping
-them with brackets.
+In the replacement block you add variables in brackets for
+substitutions.
 
-You encode the commands as comments to match the particular
+In the commands you format the passed in json variables or you
+crate new variables for use in the replacement block.
+
+You specify the commands so the look like comments for your
 template type.
 
 [[#contents][茶]]
@@ -309,7 +310,7 @@ intensive steps.
 :END:
 
 The continue command allows you to continue adding statements to
-a nextline, block and replace commands.
+the nextline, block and replace commands.
 
 In the following example the nextline command continues on a
 second line and third line.
@@ -388,7 +389,7 @@ repeated block.
 :testfile: testfiles/statements.stf
 :END:
 
-You format server content with variables you create in
+You format server variables by creating new variables with
 statements.
 
 A statement is an expression consisting of a variable, an equal
@@ -433,11 +434,13 @@ optional ending comment characters are called the postfix. For
 example, in an html template the prefix is "<!--$" and the
 postfix is "-->". See [[#prefix-postfix][Prefix Postfix]] for more information.
 
-The prefix starts at column 1. Next comes the command
-name. Statements follow the command name, they are separated by
-newlines and they may flow through the following lines. At the
-end of the line is an optional plus continuation character then
-the optional postfix then the end of line, either \r\n or \n.
+- The prefix starts at column 1.
+- Next comes the command name.
+- An optional statement follows the command name.
+- At the end of the line is an optional plus continuation
+  character
+- then the optional postfix
+- then the end of line, either \r\n or \n.
 
 The chart below shows a nextline command with three continuation
 commands and three statements: a = 5, b = "tea" and c = "The Earl
@@ -500,14 +503,18 @@ $$ : a = 5
 :CUSTOM_ID: variables
 :END:
 
-You use variables to create formatted content for a block and to
-control how a command works. You create them in json files or in
-template statements.
+You use variables to add variable content to your template in its
+replacement blocks.
+
+You use tea variables to control where the output goes, how many
+times it repeats and other aspects controlling a command.
+
+Statictea reserves single letters f - u to refer to important
+dictionaries. Five are currently used: g, h, l, s, t.  You can
+use single letters a, b, c, d, e and v, w, x, y, z.
 
 A variable begins with an ascii letter followed by letters,
-digits or underscores.  They are limited to xxx characters.  You
-can use single letters a, b, c, d, e and v, w, x, y, z. The other
-single letters are reserved.
+digits or underscores.  They are limited to xxx characters.
 
 Local variables and tea variables (except row) are cleared after
 processing each replacement block.
@@ -518,16 +525,15 @@ cannot change an existing variable.
 One dictionary exists for each of the five types of
 variables. You access them with different one letter prefixes.
 
-- f -- Built in Functions
+- f -- Reserved
 - g -- [[#global-variables][Global Variables]]
 - h -- [[#json-variables][Shared Json Variables]]
-- i, j, k -- reserved
+- i, j, k -- Reserved
 - l -- [[#local-variables][Local Variables]]
-- m -- function variables
-- n, o, p, q, r -- reserved
+- m, n, o, p, q, r -- Reserved
 - s -- [[#json-variables][Server Json Variables]]
 - t -- [[#tea-variables][Tea Variables]]
-- u -- user defined functions
+- u -- Reserved
 
 [[#contents][茶]]
 
@@ -603,7 +609,8 @@ Tea variables:
 - [[#targs][t.args]] -- arguments passed on the command line
 - [[#tcontent][t.content]] -- content of the replace block
 - [[#tmaxrepeat][t.maxRepeat]] -- maximum number of times to repeat the block
-- [[#tmaxlines][t.maxLines]] -- maximum number of replacement block lines (lines before endblock)
+- [[#tmaxlines][t.maxLines]] -- maximum number of replacement block lines allowd
+  before the endblock
 - [[#toutput][t.output]] -- where the block output goes
 - [[#trepeat][t.repeat]] -- how many times the block repeats
 - [[#trow][t.row]] -- the current index number of a repeating block
@@ -905,7 +912,7 @@ template:
 <!--$ nextline t.repeat=len(s.companies)-->
 <!--$ : company = get(s.companies, t.row) -->
 <!--$ : num = add(t.row, 1) -->
-<li id="r{t.row}>{num}. {company}</li>
+<li id="r{t.row}">{num}. {company}</li>
 #+END_SRC
 
 server json:
@@ -962,15 +969,16 @@ StaticTea variable types:
 :CUSTOM_ID: string
 :END:
 
-A string is an immutable sequence of characters. You define a
-string with single or double quotes and use them in
-statements. You encode strings as unicode utf-8.  Invalid utf-8
-sequences generate a warning.
+A string is an immutable sequence of unicode characters. You
+define a literal string by wrapping it with double quotes.
 
-Example strings:
+The example below defines a literal string and assigns it to the
+variable str:
 
-- "You can store black teas longer than green teas."
-- "100"
+- str = "You can store black teas longer than green teas."
+
+Strings are encoded as UTF-8 and invalid UTF-8 byte sequences
+generate a warning.
 
 Strings follow the same escaping rules as json strings.  You can
 escape 8 special control characters using a slash followed by a
@@ -989,11 +997,11 @@ Examples with escaping:
 
 - "ending newline\n"
 - "tab \t in the middle"
-- "Mad Hatter: \"... you must have a cup of tea!\" - 'Alice In Wonderland'."
+- "Mad Hatterl: \\\"... you must have a cup of tea!\\\" - 'Alice In Wonderland'."
 - "Unicode tea character '茶' is '\u8336'"
 - "smiley face 😀 by escaping: \uD83D\uDE00."
 
-You enter unicode values with \u and four hex digits or, for
+You can enter any unicode values with \u and four hex digits or, for
 values greater the U-FFFF, you use two pairs.  The two pairs are
 called surrogate pairs.
 
@@ -1052,19 +1060,14 @@ Example floats:
 :CUSTOM_ID: dict-type
 :END:
 
-The dict type is an ordered key value store with
-fast lookup. It maps a string key to a value which can be any
-type. The dict is ordered by insertion order.
+The dict type is an ordered key value store with fast lookup. It
+maps a string key to a value which can be any type. The dict is
+ordered by insertion order.
 
-You create a dict in a json file or with the dict function. You
-append to them when you create new variables.
-
-You access dictionary items with variable names or with the get
+- You create a dict in a json file or with the dict function.
+- You append to a dict when you create new variables.
+- You access dict items with variable names or with the get
 function.
-
-In Json files dictionaries are known as json objects. Json calls
-the object items name/value pairs and we call them key/value
-pairs. StaticTea preserves the order of the elements.
 
 In the following json data, the container element is a dictionary and
 the d element is a dictionary.  The d dictionary has two key/value
@@ -1089,7 +1092,6 @@ notation. For the json example above, you can access the data as:
 #+BEGIN_SRC
 s.a => 1
 s.b => 2
-s.d => dict("x", 100, "y", 200)
 s.d.x => 100
 s.d.y => 200
 #+END_SRC
@@ -1106,8 +1108,6 @@ get(s, "d") => dict("x", 100, "y", 200)
 d = get(s, "d")
 get(d, "x") => 100
 get(d, "y") => 200
-
-get(s, "c", 3) => 3
 #+END_SRC
 
 [[#contents][茶]]
@@ -1740,7 +1740,7 @@ equal and 1 for greater than.
 cmpVersion(versionA: string, versionB: string) int
 #+END_SRC
 
-StaticTea uses [[https://semver.org/][Semantic Versioning]]
+StaticTea uses [|[|https://semver.org/][|Semantic Versioning]]
 with the added restriction that each version component has one
 to three digits (no letters).
 
@@ -2004,8 +2004,8 @@ Examples:
 
 #+BEGIN_SRC
 d = dict("tea", "Earl Grey")
-get(d, "tea") => "Earl Grey"
-get(d, "coffee", "Tea") => "Tea"
+get(d, 'tea') => "Earl Grey"
+get(d, 'coffee', 'Tea') => "Tea"
 #+END_SRC
 
 Using dot notation:
@@ -2032,7 +2032,7 @@ get(list: list, index: int, optional default: any) any
 Examples:
 
 #+BEGIN_SRC
-list = list(4, "a", 10)
+list = list(4, 'a', 10)
 get(list, 2) => 10
 get(list, 3, 99) => 99
 #+END_SRC
@@ -2088,7 +2088,7 @@ Example in a markdown template:
 
 #+BEGIN_SRC
 $$ : anchor = githubAnchor(entry.name)
-- {type}[{entry.name}](#{anchor}) &mdash; {short}
+- {type}[|{entry.name}](#{anchor}) &mdash; {short}
 ...
 # {entry.name}
 #+END_SRC
@@ -2109,9 +2109,9 @@ if(condition: int, true: any, false: any) any
 Examples:
 
 #+BEGIN_SRC
-if(1, "tea", "beer") => "tea"
-if(0, "tea", "beer") => "beer"
-if(4, "tea", "beer") => "beer"
+if(1, 'tea', 'beer') => "tea"
+if(0, 'tea', 'beer') => "beer"
+if(4, 'tea', 'beer') => "beer"
 #+END_SRC
 
 [[#contents][茶]]
@@ -2196,7 +2196,7 @@ int("-6.3456", "truncate") => -6
 Join the path components with a path separator.
 
 You pass a list of components to join. For the second optional
-parameter you specify the separator to use, either "/", "\\" or
+parameter you specify the separator to use, either "/", "" or
 "". If you specify "" or leave off the parameter, the current
 platform separator is used.
 
@@ -2295,8 +2295,8 @@ Examples:
 
 #+BEGIN_SRC
 len(dict()) => 0
-len(dict("a", 4)) => 1
-len(dict("a", 4, "b", 3)) => 2
+len(dict('a', 4)) => 1
+len(dict('a', 4, 'b', 3)) => 2
 #+END_SRC
 
 [[#contents][茶]]
@@ -2550,10 +2550,10 @@ floats = list(4.4, 3.1, 5.9)
 sort(floats, "ascending") => [3.1, 4.4, 5.9]
 sort(floats, "descending") => [5.9, 4.4, 3.1]
 
-strs = list("T", "e", "a")
-sort(strs, "ascending") => ["T", "a", "e"]
-sort(strs, "ascending", "sensitive") => ["T", "a", "e"]
-sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
+strs = list('T', 'e', 'a')
+sort(strs, "ascending") => ['T', 'a', 'e']
+sort(strs, "ascending", "sensitive") => ['T', 'a', 'e']
+sort(strs, "ascending", "insensitive") => ['a', 'e', 'T']
 #+END_SRC
 
 [[#contents][茶]]
@@ -2613,11 +2613,11 @@ sort(dicts: list, order: string, case: string, key: string) list
 Examples:
 
 #+BEGIN_SRC
-d1 = dict("name", "Earl Gray", "weight", 1.2)
-d2 = dict("name", "Tea Pot", "weight", 3.5)
+d1 = dict('name', 'Earl Gray', 'weight', 1.2)
+d2 = dict('name', 'Tea Pot', 'weight', 3.5)
 dicts = list(d1, d2)
-sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
-sort(dicts, "descending", "sensitive", "name") => [d2, d1]
+sort(dicts, "ascending", "sensitive", 'weight') => [d1, d2]
+sort(dicts, "descending", "sensitive", 'name') => [d2, d1]
 #+END_SRC
 
 [[#contents][茶]]

@@ -998,8 +998,11 @@ func replaceReMap(map: VarsDict): FunResult =
   for ix in countUp(0, list.len-1, 2):
     replacements.add(newReplacement(list[ix].stringv, list[ix+1].stringv))
 
-  let resultString = replaceMany(str, replacements)
-  result = newFunResult(newValue(resultString))
+  let resultStringO = replaceMany(str, replacements)
+  if not resultStringO.isSome:
+    return newFunResultWarn(wReplaceMany, 1)
+
+  result = newFunResult(newValue(resultStringO.get()))
 
 
 func funReplaceRe_sSSs*(parameters: seq[Value]): FunResult =

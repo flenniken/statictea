@@ -167,18 +167,17 @@ func newReplacement*(pattern: string, sub: string): Replacement =
   ## Create a new Replacement object.
   result = Replacement(pattern: pattern, sub: sub)
 
-proc replaceMany*(str: string, replacements: seq[Replacement]): string =
+proc replaceMany*(str: string, replacements: seq[Replacement]): Option[string] =
   ## Replace the patterns in the string with their replacements.
 
   var subs: seq[tuple[pattern: Regex, repl: string]]
   for r in replacements:
     let regexO = compilePattern(r.pattern)
-    # todo: handle error case
-    # if not regexO.isSome:
-    #   return
+    if not regexO.isSome:
+      return
     let regex = regexO.get()
     subs.add((regex, r.sub))
-  result = multiReplace(str, subs)
+  result = some(multiReplace(str, subs))
 
 when defined(test):
   proc testMatchPattern*(str: string, pattern: string, start: Natural = 0,

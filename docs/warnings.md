@@ -5,7 +5,7 @@ The warning messages.
 * [warnings.nim](../src/warnings.nim) &mdash; Nim source code.
 # Index
 
-* type: [Warning](#warning) &mdash; Message id.
+* type: [Warning](#warning) &mdash; Warning message id.
 * type: [WarningData](#warningdata) &mdash; Warning number and optional extra strings.
 * [getWarning](#getwarning) &mdash; Return a formatted warning line.
 * [newWarningData](#newwarningdata) &mdash; Create a WarningData object containing the warning information.
@@ -14,7 +14,7 @@ The warning messages.
 
 # Warning
 
-Message id.
+Warning message id.
 
 ```nim
 Warning = MessageId

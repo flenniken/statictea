@@ -1,6 +1,8 @@
 ## Messages IDs and associated strings.
 
 # Add new messages to the bottom so the message numbers never change.
+# Create new ids for each error location so different parts of the
+# code are independent.
 type
   MessageId* = enum
     ## Message numbers.
@@ -146,6 +148,7 @@ type
     wNoEndingQuote,        # w139
     wLowSurrogateFirst,    # w140
     wPairedSurrogate,      # w141
+    wReplaceMany,          # w142
 
 const
   # The list of messages. Add new messages to the bottom and do not
@@ -293,4 +296,5 @@ const
     "No ending double quote.", # wNoEndingQuote
     "You cannot use a low surrogate first in the pair.", # wLowSurrogateFirst
     "Invalid paired surrogate.", # wPairedSurrogate
+    "The replaceMany function failed.", # wReplaceMany
   ]
