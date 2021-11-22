@@ -6,6 +6,7 @@ import std/times
 import env
 import regexes
 import matches
+import readlines
 
 type
   FileLine* = object

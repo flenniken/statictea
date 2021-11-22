@@ -7,7 +7,6 @@ import env
 import vartypes
 import runFunction
 import messages
-import warnings
 import tostring
 import funtypes
 

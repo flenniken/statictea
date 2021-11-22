@@ -3,7 +3,6 @@ import std/options
 import std/strutils
 import dot
 import env
-import tempFile
 
 proc testParseDotLine(line: string, eDep: Option[Dependency]): bool =
   let depO = parseDotLine(line)

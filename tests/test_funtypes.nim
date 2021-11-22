@@ -1,7 +1,11 @@
 import std/unittest
 import funtypes
+import vartypes
+
+# todo: add some tests for funtypes
 
 suite "funtypes.nim":
 
-  test "test me":
-    check 1 == 1
+  test "newFunResult":
+    let funResult = newFunResult(newValue(1))
+    check $funResult == "1"
