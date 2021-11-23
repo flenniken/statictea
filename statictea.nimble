@@ -14,7 +14,7 @@ license       = "MIT"
 srcDir        = "src"
 bin           = @["bin/statictea"]
 
-requires "nim >= 1.4.4"
+requires "nim >= 1.4.8"
 
 # The nimscript module is imported by default. It contains functions
 # you can call in your nimble file.
@@ -67,7 +67,9 @@ proc get_test_module_cmd(filename: string, release = false): string =
     tests maybe. The error message was :"[GC] cannot register global
     variable; too many global variables"
 
-  --verbosity:0
+  --verbosity:0|1|2|3
+
+    set Nim's verbosity level (1 is default)  --verbosity:0
 
   --hint[Performance]:off
 
@@ -112,9 +114,11 @@ proc get_test_module_cmd(filename: string, release = false): string =
     rel = "-d:release "
   else:
     rel = ""
+
   let part1 = "nim c --gc:orc --verbosity:0 --hint[Performance]:off "
   let part2 = "--hint[XCannotRaiseY]:off -d:test "
   let part3 = "$1 -r -p:src --out:bin/$2 tests/$3" % [rel, binName, filename]
+
   result = part1 & part2 & part3
 
 proc buildRelease() =
@@ -605,6 +609,8 @@ task test, "\tRun one or more tests; specify part of test filename.":
   let test_filenames = get_test_filenames()
   for filename in test_filenames:
     if name.toLower in filename.toLower:
+      if filename == "testall.nim":
+        continue
       let cmd = get_test_module_cmd(filename)
       echo cmd
       exec cmd
