@@ -32,7 +32,6 @@ length.
 * [statictea.nim](statictea.md) &mdash; StaticTea; A template processor and language.
 * [tempFile.nim](tempFile.md) &mdash; Temporary file methods.
 * [tostring.nim](tostring.md) &mdash; Value types to string methods.
-* [tpub.nim](tpub.md) &mdash; The tpub macro pragma makes private routines public for testing.
 * [unicodes.nim](unicodes.md) &mdash; Functions that deal with Unicode.
 * [variables.nim](variables.md) &mdash; Language variable methods.
 * [vartypes.nim](vartypes.md) &mdash; StaticTea variable types.

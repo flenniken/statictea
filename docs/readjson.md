@@ -5,6 +5,7 @@ Read json content.
 * [readjson.nim](../src/readjson.nim) &mdash; Nim source code.
 # Index
 
+* [jsonToValue](#jsontovalue) &mdash; Convert a json value to a statictea value.
 * [readJsonStream](#readjsonstream) &mdash; Read a json stream and return the variables.
 * [readJsonString](#readjsonstring) &mdash; Read a json string and return the variables.
 * [readJsonFile](#readjsonfile) &mdash; Read a json file and return the variables.
@@ -14,6 +15,14 @@ Read json content.
 * [parseHexUnicode16](#parsehexunicode16) &mdash; Return the unicode number given a 4 character unicode escape string like u1234.
 * [parseHexUnicode](#parsehexunicode) &mdash; Return the unicode number given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos.
 * [parseJsonStr](#parsejsonstr) &mdash; Parse the quoted json string literal.
+
+# jsonToValue
+
+Convert a json value to a statictea value.
+
+```nim
+proc jsonToValue(jsonNode: JsonNode; depth: int = 0): Option[Value]
+```
 
 # readJsonStream
 

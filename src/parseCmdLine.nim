@@ -9,7 +9,6 @@ import std/tables
 import env
 import regexes
 import messages
-import messages
 import matches
 
 type

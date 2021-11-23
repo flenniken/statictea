@@ -9,7 +9,13 @@ Handle the replacement block lines.
 * type: [ReplaceLine](#replaceline) &mdash; Line information returned by yieldReplacementLine.
 * [newReplaceLine](#newreplaceline) &mdash; Return a ReplaceLine object.
 * [`$`](#) &mdash; Return a string representation of a ReplaceLine.
+* [getTempFileStream](#gettempfilestream) &mdash; Create a stream from a temporary file and return both.
+* [stringSegment](#stringsegment) &mdash; Return the string segment.
+* [varSegment](#varsegment) &mdash; Return a variable segment.
+* [lineToSegments](#linetosegments) &mdash; Convert a line to a list of segments.
+* [parseVarSegment](#parsevarsegment) &mdash; Parse a variable type segment and return the dotNameStr.
 * [writeTempSegments](#writetempsegments) &mdash; Write the updated replacement block to the result stream.
+* [allocTempSegments](#alloctempsegments) &mdash; Create a TempSegments object.
 * [closeDelete](#closedelete) &mdash; Close the TempSegments and delete its backing temporary file.
 * [storeLineSegments](#storelinesegments) &mdash; Divide the line into segments and write them to the TempSegments' temp file.
 * [yieldReplacementLine](#yieldreplacementline) &mdash; Yield all the replacement block lines and the endblock line too, if it exists.
@@ -52,6 +58,47 @@ Return a string representation of a ReplaceLine.
 func `$`(replaceLine: ReplaceLine): string
 ```
 
+# getTempFileStream
+
+Create a stream from a temporary file and return both.
+
+```nim
+proc getTempFileStream(): Option[TempFileStream]
+```
+
+# stringSegment
+
+Return the string segment. The line contains the segment starting at the given position and ending at finish position in the line (1 after). If the start and finish are at the end, output a endline segment.
+
+```nim
+proc stringSegment(line: string; start: Natural; finish: Natural): string
+```
+
+# varSegment
+
+Return a variable segment. The bracketedVar is a string starting with { and ending with } that has a variable inside with optional whitespace around the variable, i.e. "{ s.name }". The atEnd parameter is true when the bracketedVar ends the line without an ending newline.
+
+```nim
+proc varSegment(bracketedVar: string; dotNameStrPos: Natural;
+                dotNameStrLen: Natural; atEnd: bool): string
+```
+
+# lineToSegments
+
+Convert a line to a list of segments.
+
+```nim
+proc lineToSegments(prepostTable: PrepostTable; line: string): seq[string]
+```
+
+# parseVarSegment
+
+Parse a variable type segment and return the dotNameStr.
+
+```nim
+func parseVarSegment(segment: string): string
+```
+
 # writeTempSegments
 
 Write the updated replacement block to the result stream.  It does it by writing all the stored segments and updating variable segments as it goes. The lineNum is the beginning line of the replacement block.
@@ -59,6 +106,14 @@ Write the updated replacement block to the result stream.  It does it by writing
 ```nim
 proc writeTempSegments(env: var Env; tempSegments: var TempSegments;
                        lineNum: Natural; variables: Variables)
+```
+
+# allocTempSegments
+
+Create a TempSegments object. This reserves memory for a line buffer and creates a backing temp file. Call the closeDelete procedure when done to free the memory and to close and delete the file.
+
+```nim
+proc allocTempSegments(env: var Env; lineNum: Natural): Option[TempSegments]
 ```
 
 # closeDelete

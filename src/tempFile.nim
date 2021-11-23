@@ -4,7 +4,6 @@ import std/os
 import std/random
 import std/strutils
 import std/options
-import std/posix
 
 # Used with the rand procedure.
 randomize()
@@ -27,12 +26,6 @@ proc openTempFile*(): Option[TempFile] =
   except:
     return
   result = some(TempFile(file: file, filename: filename))
-
-proc truncate*(tempFile: var TempFile) =
-  ## Close the temp file, truncate it, then open it again.
-  tempFile.file.close()
-  discard truncate(tempFile.filename, 0)
-  tempFile.file = open(tempFile.filename, fmReadWrite)
 
 proc closeDelete*(tempFile: TempFile) =
   ## Close and delete the temp file.

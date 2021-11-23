@@ -14,6 +14,7 @@ starts in the template file.
 * [`==`](#) &mdash; Return true when the two statements are equal.
 * [`$`](#-1) &mdash; Return a string representation of a Statement.
 * [newValueAndLength](#newvalueandlength) &mdash; Create a newValueAndLength object.
+* [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
 * [getString](#getstring) &mdash; Return a literal string value and match length from a statement.
 * [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
 * [getFunctionValue](#getfunctionvalue) &mdash; Collect the function parameter values then call it.
@@ -98,6 +99,14 @@ Create a newValueAndLength object.
 
 ```nim
 proc newValueAndLength(value: Value; length: Natural): ValueAndLength
+```
+
+# yieldStatements
+
+Iterate through the command's statements.  Statements are separated by semicolons or newlines and are not empty or all spaces.
+
+```nim
+iterator yieldStatements(cmdLines: seq[string]; cmdLineParts: seq[LineParts]): Statement
 ```
 
 # getString

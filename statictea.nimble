@@ -49,19 +49,62 @@ proc get_source_filenames(path: bool = false, noExt: bool = false): seq[string] 
 proc get_test_module_cmd(filename: string, release = false): string =
   ## Return the command line to test the given nim file.
 
-  # You can add -f to force a recompile of imported modules, good for
-  # testing "imported but not used" warnings.
+  #[
 
-  # -d, --define:SYMBOL(:VAL)
-  #                           define a conditional symbol
-  # -f, --forceBuild:on|off   force rebuilding of all modules
-  # -p, --path:PATH           add path to search paths
-  # -r, --run                 run the compiled program with given arguments
-  # --gc:orc
-  # --hint
+  c
 
-  # I turned on gs:orc because "n t" started erroring out. Too many unit tests maybe.
-  # [GC] cannot register global variable; too many global variables
+    Compile the code.
+
+  -f, --forceBuild:on|off
+
+    Force rebuilding of all imported modules.  This is good for
+    testing "imported but not used" warnings because the only appear
+    the first time.
+
+  --gc:orc
+
+    I turned on gs:orc because "n t" started erroring out. Too many unit
+    tests maybe. The error message was :"[GC] cannot register global
+    variable; too many global variables"
+
+  --verbosity:0
+
+  --hint[Performance]:off
+
+    Turn off Performance hint messages.
+
+  --hint[XCannotRaiseY]:off
+
+    Turn off XCannotRaiseY hint messages.
+
+  -d:release
+
+    Compile for release.  It is off when running tests.
+
+  -d:test
+
+    Define the "test" symbol.  All test code is wrapped in sections
+    marked with "when defined(test):"
+
+  -r, --run
+
+    Run the compiled program with given arguments
+    The -r compiles for release.  It is off when running tests.
+
+  -p:src
+
+    The commands are run from the statictea folder.  The nim non-test source code
+    is in the src folder which is specified by -p:src so the imports can be found.
+
+  --out:bin/test_testfile.bin
+
+    The compiled test files go in the bin folder and their extension there is "bin".
+
+  tests/test_testfile.nim
+
+    The nim test files are in the tests folder.
+
+  ]#
 
   let binName = changeFileExt(filename, "bin")
   var rel: string
@@ -69,7 +112,7 @@ proc get_test_module_cmd(filename: string, release = false): string =
     rel = "-d:release "
   else:
     rel = ""
-  let part1 = "nim c -f --gc:orc --verbosity:0 --hint[Performance]:off "
+  let part1 = "nim c --gc:orc --verbosity:0 --hint[Performance]:off "
   let part2 = "--hint[XCannotRaiseY]:off -d:test "
   let part3 = "$1 -r -p:src --out:bin/$2 tests/$3" % [rel, binName, filename]
   result = part1 & part2 & part3
@@ -552,9 +595,9 @@ awk '{printf "include %s\n", $0}' > tests/testall.nim
   runRunnerFolder()
 
 task test, "\tRun one or more tests; specify part of test filename.":
-  ## Run one or more tests.  You specify part of the test filename and all
-  ## files that match are run. If you don't specify a name, all are
-  ## run. Task "t" is faster to run them all.
+  ## Run one or more tests.  You specify part of the test filename and
+  ## all files that match case insensitive are run. If you don't
+  ## specify a name, all are run. Task "t" is faster to run them all.
   let count = system.paramCount()+1
   # The name is either part of a name or "test" when not
   # specified. Test happens to match all test files.

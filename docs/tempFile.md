@@ -7,7 +7,6 @@ Temporary file methods.
 
 * type: [TempFile](#tempfile) &mdash; Temporary filename and file object.
 * [openTempFile](#opentempfile) &mdash; Create and open an empty file in the temp directory open for read write.
-* [truncate](#truncate) &mdash; Close the temp file, truncate it, then open it again.
 * [closeDelete](#closedelete) &mdash; Close and delete the temp file.
 
 # TempFile
@@ -27,14 +26,6 @@ Create and open an empty file in the temp directory open for read write. When no
 
 ```nim
 proc openTempFile(): Option[TempFile]
-```
-
-# truncate
-
-Close the temp file, truncate it, then open it again.
-
-```nim
-proc truncate(tempFile: var TempFile)
 ```
 
 # closeDelete

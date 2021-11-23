@@ -21,7 +21,6 @@ Regular expression matching methods.
 * [matchRightParentheses](#matchrightparentheses) &mdash; Match a right parentheses and the optional trailing whitespace.
 * [matchNumber](#matchnumber) &mdash; Match a number and the optional trailing whitespace.
 * [matchNumberNotCached](#matchnumbernotcached) &mdash; Match a number and the optional trailing whitespace.
-* [matchString](#matchstring) &mdash; Match a string inside either single or double quotes.
 * [matchLeftBracket](#matchleftbracket) &mdash; Match everything up to a left backet.
 * [matchFileLine](#matchfileline) &mdash; Match a file and line number like: filename(234).
 * [matchVersion](#matchversion) &mdash; Match a StaticTea version number.
@@ -156,14 +155,6 @@ Match a number and the optional trailing whitespace. Return the optional decimal
 
 ```nim
 func matchNumberNotCached(line: string; start: Natural = 0): Option[Matches]
-```
-
-# matchString
-
-Match a string inside either single or double quotes.  The optional white space after the string is matched too. There are two returned groups and only one will contain anything. The first is for single quotes and the second is for double quotes.
-
-```nim
-proc matchString(line: string; start: Natural = 0): Option[Matches]
 ```
 
 # matchLeftBracket

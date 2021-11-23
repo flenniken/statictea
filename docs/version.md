@@ -5,11 +5,11 @@ The current StaticTea version number.
 * [version.nim](../src/version.nim) &mdash; Nim source code.
 # Index
 
-* const: [staticteaVersion](#staticteaversion) &mdash; Version number.
+* const: [staticteaVersion](#staticteaversion) &mdash; Statictea version number.
 
 # staticteaVersion
 
-Version number. This version number only use digits and limits each component to 1 to 3 digits.
+Statictea version number. This version number is a subset of Semantic Versioning.  It always uses three components.  Each component uses 1 to 3 ascii digits.
 
 ```nim
 staticteaVersion = "0.1.0"
