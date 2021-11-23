@@ -11,7 +11,6 @@ suite "vartypes":
     let value = newValue(testString)
     let sameValue = newValue(testString)
     check $value == jsonString
-    check shortValueToString(value) == testString
     check value == sameValue
     check value != newValue("different string")
     check value.kind == vkString
@@ -30,7 +29,6 @@ suite "vartypes":
     let sameValue = newValue(testInt)
     let value64 = newValue((int64)5)
     check $value == jsonString
-    check shortValueToString(value) == jsonString
     check value == sameValue
     check value == value64
     check value != newValue(3)
@@ -46,7 +44,6 @@ suite "vartypes":
     let value = newValue(testFloat)
     let sameValue = newValue(testFloat)
     check $value == jsonString
-    check shortValueToString(value) == jsonString
     check value == sameValue
     check value != newValue(3.222)
     check value.kind == vkFloat
@@ -63,21 +60,6 @@ suite "vartypes":
 
     var varsDict2 = newVarsDict()
     varsDict2["string"] = newValue("a")
-
-    let jsonString = """{"string":"a","int":1,"float":5.5}"""
-    let value = newValue(varsDict)
-    let sameValue = newValue(varsDict)
-    check $value == jsonString
-    check shortValueToString(value) == "{...}"
-    check value == sameValue
-    check value != newValue(varsDict2)
-    check value.kind == vkDict
-    check $value.kind == "dict"
-
-    var emptyVarsDict = newVarsDict()
-    var emptyDictValue = newValue(emptyVarsDict)
-    check $emptyDictValue == "{}"
-    check shortValueToString(emptyDictValue) == "{}"
 
   test "newEmptyListValue":
     var listValue = newEmptyListValue()

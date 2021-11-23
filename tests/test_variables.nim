@@ -140,13 +140,13 @@ suite "variables.nim":
     check variables["row"] == newValue(0)
     check variables["args"] == newEmptyDictValue()
 
-  test "get t.args.help":
+  test "check the initial t.args":
     var args: Args
     var argsVarDict = getTeaArgs(args).dictv
     var variables = emptyVariables(args = argsVarDict)
-    echo "variables = " & $variables
-    check getVariable(variables, "t.args.help") == newValueOrWarning(newValue(0))
-
+    # echo "variables = " & $variables
+    let expected = """{"s":{},"h":{},"l":{},"g":{},"row":0,"args":{"help":0,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":""},"version":"0.1.0"}"""
+    check $variables == expected
 
 
   test "resetVariables untouched":

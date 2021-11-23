@@ -1,18 +1,16 @@
 id stf file version 0.0.0
 
-## Test t.args.
+## Test t.args with normal arguments.
 
 file cmd.sh command
 $statictearoot/bin/statictea -s=server.json -j=shared.json \
   -t=template.html -r=result.html >stdout 2>stderr
 endfile
 
-#todo: update once dictionaries and lists display.
-
 ---file---template.html---
 $$ block keys = keys(t.args)
+
 keys => {keys}
-args => {t.args}
 t.args => {t.args}
 t.args.help => {t.args.help}
 t.args.version => {t.args.version}
@@ -22,6 +20,7 @@ t.args.serverList => {t.args.serverList}
 t.args.sharedList => {t.args.sharedList}
 t.args.resultFilename => "{t.args.resultFilename}"
 t.args.logFilename => "{t.args.logFilename}"
+
 $$ endblock
 ----------------endfile---
 
@@ -37,17 +36,18 @@ file shared.json
 endfile
 
 --- file result.expected
-keys => [...]
-args => {...}
-t.args => {...}
+
+keys => ["help","version","update","log","serverList","sharedList","resultFilename","templateList","logFilename"]
+t.args => {"help":0,"version":0,"update":0,"log":0,"serverList":["server.json"],"sharedList":["shared.json"],"resultFilename":"result.html","templateList":["template.html"],"logFilename":""}
 t.args.help => 0
 t.args.version => 0
 t.args.update => 0
 t.args.log => 0
-t.args.serverList => [...]
-t.args.sharedList => [...]
+t.args.serverList => ["server.json"]
+t.args.sharedList => ["shared.json"]
 t.args.resultFilename => "result.html"
 t.args.logFilename => ""
+
 --- endfile
 
 --- file stdout.expected

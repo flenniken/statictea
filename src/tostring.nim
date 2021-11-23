@@ -41,9 +41,9 @@ func valueToString*(value: Value): string =
     of vkFloat:
       result.add($value.floatv)
 
-func shortValueToString*(value: Value): string =
-  ## Return a short string representation of Value. This is used to convert
-  ## values to strings in replacement blocks.
+func valueToStringRB*(value: Value): string =
+  ## Return th string representation of the Value for use in the
+  ## replacement blocks.
   case value.kind
   of vkString:
     result = value.stringv
@@ -52,15 +52,9 @@ func shortValueToString*(value: Value): string =
   of vkFloat:
     result = $value.floatv
   of vkDict:
-    if value.dictv.len == 0:
-      result = "{}"
-    else:
-      result = "{...}"
+    result.add(dictToString(value))
   of vkList:
-    if value.listv.len == 0:
-      result = "[]"
-    else:
-      result = "[...]"
+    result.add(listToString(value))
 
 func `$`*(value: Value): string =
   ## Return a string representation of a Value.

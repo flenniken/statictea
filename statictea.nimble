@@ -124,8 +124,7 @@ proc get_test_module_cmd(filename: string, release = false): string =
 proc buildRelease() =
   ## Build the release version of statictea.
   let part1 = "nim c --gc:orc --hint[Performance]:off "
-  # let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
-  let part2 = "--hint[Conf]:off --hint[Link]: off  "
+  let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
   let part3 = "--out:bin/ src/statictea"
   var cmd = part1 & part2 & part3
   echo cmd

@@ -320,7 +320,7 @@ proc getSegmentString(env: var Env, lineNum: Natural, variables: Variables, segm
     let valueOrWarning = getVariable(variables, dotNameStr)
     if valueOrWarning.kind == vwValue:
       # Convert the variable to a string.
-      let valueStr = shortValueToString(valueOrWarning.value)
+      let valueStr = valueToStringRB(valueOrWarning.value)
       result = (segmentType, valueStr)
     else:
       # The variable is missing. Write the original variable name
