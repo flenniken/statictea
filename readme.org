@@ -3,7 +3,7 @@ A template processor and language.
 
 StaticTea produces a file from a template and json data.
 
-Example hello world template:
+Example hello world html template:
 
 #+BEGIN_SRC
 <!--$ nextline -->
@@ -57,10 +57,10 @@ content called the replacement block.
 In the replacement block you add variables in brackets for
 substitutions.
 
-In the commands you format the passed in json variables or you
-crate new variables for use in the replacement block.
+In the commands you format your json variables or you create new
+variables for the replacement block.
 
-You specify the commands so the look like comments for your
+You specify the commands so they look like comments for your
 template type.
 
 [[#contents][茶]]
@@ -513,8 +513,8 @@ Statictea reserves single letters f - u to refer to important
 dictionaries. Five are currently used: g, h, l, s, t.  You can
 use single letters a, b, c, d, e and v, w, x, y, z.
 
-A variable begins with an ascii letter followed by letters,
-digits or underscores.  They are limited to xxx characters.
+A variable name starts with a letter followed by letters, digits
+and underscores limited to a total of 64 ascii characters.
 
 Local variables and tea variables (except row) are cleared after
 processing each replacement block.
@@ -970,15 +970,17 @@ StaticTea variable types:
 :END:
 
 A string is an immutable sequence of unicode characters. You
-define a literal string by wrapping it with double quotes.
+define a literal string with double quotes.
 
 The example below defines a literal string and assigns it to the
 variable str:
 
-- str = "You can store black teas longer than green teas."
+#+BEGIN_SRC
+str = "You can store black teas longer than green teas."
+#+END_SRC
 
-Strings are encoded as UTF-8 and invalid UTF-8 byte sequences
-generate a warning.
+Strings are encoded as UTF-8 and invalid byte sequences generate
+a warning.
 
 Strings follow the same escaping rules as json strings.  You can
 escape 8 special control characters using a slash followed by a
@@ -997,12 +999,12 @@ Examples with escaping:
 
 - "ending newline\n"
 - "tab \t in the middle"
-- "Mad Hatterl: \\\"... you must have a cup of tea!\\\" - 'Alice In Wonderland'."
+- "Mad Hatter: \\\"... you must have a cup of tea!\\\" - 'Alice In Wonderland'."
 - "Unicode tea character '茶' is '\u8336'"
 - "smiley face 😀 by escaping: \uD83D\uDE00."
 
-You can enter any unicode values with \u and four hex digits or, for
-values greater the U-FFFF, you use two pairs.  The two pairs are
+You can enter any unicode value with \u and four hex digits or, for
+values greater the U-FFFF, two pairs.  The two pairs are
 called surrogate pairs.
 
 #+BEGIN_SRC
@@ -1067,7 +1069,7 @@ ordered by insertion order.
 - You create a dict in a json file or with the dict function.
 - You append to a dict when you create new variables.
 - You access dict items with variable names or with the get
-function.
+  function.
 
 In the following json data, the container element is a dictionary and
 the d element is a dictionary.  The d dictionary has two key/value
@@ -1530,7 +1532,7 @@ The stf runner runs command line tests of statictea.
 
 The runner is a standalone program that can test any command line
 application.  You define a test in a stf file.  The stf file
-contains instrutions for creating test files, running them and
+contains instructions for creating test files, running them and
 for comparing them to determine whether the test passed.
 
 The statictea testfiles folder contains Single Test File (stf)
