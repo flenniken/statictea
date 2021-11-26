@@ -47,6 +47,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funType_as](#funtype_as) &mdash; Return the parameter type, one of: int, float, string, list, dict.
 * [funJoinPath_loss](#funjoinpath_loss) &mdash; Join the path components with a path separator.
 * [funJoinPath_oSs](#funjoinpath_oss) &mdash; Join the path components with the platform path separator.
+* [funJoin_lsois](#funjoin_lsois) &mdash; Join the list of string components with the given separator.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -1104,6 +1105,31 @@ joinPath("images/", "tea") =>
 
 ```nim
 func funJoinPath_oSs(parameters: seq[Value]): FunResult
+```
+
+# funJoin_lsois
+
+Join the list of string components with the given separator.
+An optional parameter determines whether you skip empty
+components or not.
+
+~~~
+join(strs: list, sep: string, optional skipEmpty: int) string
+~~~~
+
+Examples:
+
+~~~
+join(list("a", "b"), ", ") => "a, b"
+join(list("a"), ", ") => "a"
+join(list(""), ", ") => ""
+join(list("a", "b"), "") => "ab"
+join(list("a", "", "c"), "|") => "a||c"
+join(list("a", "", "c"), "|", 1) => "a|c"
+~~~~
+
+```nim
+func funJoin_lsois(parameters: seq[Value]): FunResult
 ```
 
 # createFunctionTable

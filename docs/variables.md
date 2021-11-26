@@ -65,6 +65,7 @@ Language variable methods.
 * [getParentDict](#getparentdict) &mdash; Return the last component dictionary specified by the given names or, on error, return a warning.
 * [assignVariable](#assignvariable) &mdash; Assign the variable the given value if possible, else return a warning.
 * [getVariable](#getvariable) &mdash; Look up the variable and return its value when found, else return a warning.
+* [argsPrepostList](#argsprepostlist) &mdash; 
 * [getTeaArgs](#getteaargs) &mdash; Create the t.
 
 # outputValues
@@ -215,6 +216,14 @@ Look up the variable and return its value when found, else return a warning.
 
 ```nim
 proc getVariable(variables: Variables; dotNameStr: string): ValueOrWarning
+```
+
+# argsPrepostList
+
+
+
+```nim
+func argsPrepostList(prepostList: seq[Prepost]): seq[seq[string]]
 ```
 
 # getTeaArgs

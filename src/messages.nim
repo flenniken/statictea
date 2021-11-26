@@ -149,6 +149,7 @@ type
     wLowSurrogateFirst,    # w140
     wPairedSurrogate,      # w141
     wReplaceMany,          # w142
+    wJoinListString,       # w143
 
 const
   # The list of messages. Add new messages to the bottom and do not
@@ -297,4 +298,5 @@ const
     "You cannot use a low surrogate first in the pair.", # wLowSurrogateFirst
     "Invalid paired surrogate.", # wPairedSurrogate
     "The replaceMany function failed.", # wReplaceMany
+    "The join list items must be strings.", # wJoinListString
   ]

@@ -1598,6 +1598,7 @@ List of functions:
 - [[#int][int()]] -- Create an int from a number string.
 - [[#joinPath][joinPath()]] -- Join the path components with a path separator.
 - [[#joinPath][joinPath()]] -- Join the path components with the platform path separator.
+- [[#join][join()]] -- Join the list of string components with the given separator.
 - [[#keys][keys()]] -- Create a list from the keys in a dictionary.
 - [[#len][len()]] -- Number of elements in a dictionary.
 - [[#len][len()]] -- Number of elements in a list.
@@ -2257,6 +2258,32 @@ joinPath("images", "tea")) =>
 
 joinPath("images/", "tea") =>
   "images/tea"
+#+END_SRC
+
+[[#contents][茶]]
+
+** join()
+:PROPERTIES:
+:CUSTOM_ID: join
+:END:
+
+Join the list of string components with the given separator.
+An optional parameter determines whether you skip empty
+components or not.
+
+#+BEGIN_SRC
+join(strs: list, sep: string, optional skipEmpty: int) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+join(list("a", "b"), ", ") => "a, b"
+join(list("a"), ", ") => "a"
+join(list(""), ", ") => ""
+join(list("a", "b"), "") => "ab"
+join(list("a", "", "c"), "|") => "a||c"
+join(list("a", "", "c"), "|", 1) => "a|c"
 #+END_SRC
 
 [[#contents][茶]]

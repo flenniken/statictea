@@ -49,7 +49,7 @@ MessageId = enum
   wNotAllStrings, wTeaVariableExists, wAppendToList, wAppendToTeaVar,
   wDuplicateVar, wNoFilename, wFourHexDigits, wNotMatchingSurrogate,
   wMissingSurrogatePair, wNotPopular, wControlNotEscaped, wNoEndingQuote,
-  wLowSurrogateFirst, wPairedSurrogate, wReplaceMany
+  wLowSurrogateFirst, wPairedSurrogate, wReplaceMany, wJoinListString
 ```
 
 # Messages
@@ -156,7 +156,24 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.",
     "Wrong parameter type, expected $1 got $2.",
     "The required vararg parameter has no arguments.",
     "Missing vararg parameter, expected groups of 2 got 1.",
-    "Too many arguments, expected at most
+    "Too many arguments, expected at most $1 got $2.",
+    "Expected at least four parameters.", "Expected number string.",
+    "A case condition is not the same type as the main condition.",
+    "Expected an even number of cases, got $1 list items.",
+    "The list values must be all strings.",
+    "You cannot reassign a tea variable.",
+    "You can only append to a list, got $1.",
+    "You cannot append to a tea variable.",
+    "Duplicate json variable \'$1\' skipped.",
+    "No $1 filename. Use $2=filename.",
+    "A \\u must be followed by 4 hex digits.",
+    "The second value is not a matching surrogate pair.",
+    "Missing the second surrogate pair.",
+    """A slash must be followed by one letter from: nr"t\bf/.""",
+    "Controls characters must be escaped.", "No ending double quote.",
+    "You cannot use a low surrogate first in the pair.",
+    "Invalid paired surrogate.", "The replaceMany function failed.",
+    "The join list items must be strings."]
 ```
 
 

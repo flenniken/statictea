@@ -1588,6 +1588,49 @@ func funJoinPath_oSs*(parameters: seq[Value]): FunResult =
   tMapParameters("oSs")
   result = joinPathList(map)
 
+func funJoin_lsois*(parameters: seq[Value]): FunResult =
+  ## Join the list of string components with the given separator.
+  ## @:An optional parameter determines whether you skip empty
+  ## @:components or not.
+  ## @:
+  ## @:~~~
+  ## @:join(strs: list, sep: string, optional skipEmpty: int) string
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:join(list("a", "b"), ", ") => "a, b"
+  ## @:join(list("a"), ", ") => "a"
+  ## @:join(list(""), ", ") => ""
+  ## @:join(list("a", "b"), "") => "ab"
+  ## @:join(list("a", "", "c"), "|") => "a||c"
+  ## @:join(list("a", "", "c"), "|", 1) => "a|c"
+  ## @:~~~~
+
+  tMapParameters("lsois")
+
+  let listv = map["a"].listv
+  let sep = map["b"].stringv
+  var skipEmpty = false
+  if "c" in map and map["c"].intv == 1:
+    skipEmpty = true
+  var ret: string
+  if listv.len == 0:
+    return newFunResult(newValue(""))
+  if listv.len > 0:
+    ret.add(listv[0].stringv)
+  for value in listv[1 .. listv.len - 1]:
+    if value.kind != vkString:
+      # The join list items must be strings.
+      return newFunResultWarn(wJoinListString, 0)
+    let str = value.stringv
+    if skipEmpty and str.len == 0:
+      continue
+    ret.add(sep)
+    ret.add(str)
+  result = newFunResult(newValue(ret))
+
 const
   functionsList = [
     ("len", funLen_si, "si"),
@@ -1630,6 +1673,7 @@ const
     ("type", funType_as, "as"),
     ("joinPath", funJoinPath_loss, "loss"),
     ("joinPath", funJoinPath_oSs, "oSs"),
+    ("join", funJoin_lsois, "lsois"),
   ]
 
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =

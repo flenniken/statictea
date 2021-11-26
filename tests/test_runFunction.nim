@@ -1526,3 +1526,46 @@ suite "runFunction.nim":
   #     for spec in nameList:
   #       check name == spec.name
   #       echo "$1: $2" % [name, spec.signatureCode]
+
+  test "join nothing":
+    let list = newEmptyListValue()
+    check testFunction("join", @[
+        newValue(list),
+        newValue("|"),
+      ], newFunResult(newValue("")))
+
+  test "join a, b":
+    let list = newValue(["a", "b"])
+    check testFunction("join", @[
+        newValue(list),
+        newValue(", "),
+      ], newFunResult(newValue("a, b")))
+
+  test "join a":
+    let list = newValue(["a"])
+    check testFunction("join", @[
+        newValue(list),
+        newValue(", "),
+      ], newFunResult(newValue("a")))
+
+  test "join ab":
+    let list = newValue(["a", "b"])
+    check testFunction("join", @[
+        newValue(list),
+        newValue(""),
+      ], newFunResult(newValue("ab")))
+
+  test "join a nothing b":
+    let list = newValue(["a", "", "b"])
+    check testFunction("join", @[
+        newValue(list),
+        newValue("|"),
+      ], newFunResult(newValue("a||b")))
+
+  test "join a nothing b skipping empty":
+    let list = newValue(["a", "", "b"])
+    check testFunction("join", @[
+        newValue(list),
+        newValue("|"),
+        newValue(1),
+      ], newFunResult(newValue("a|b")))
