@@ -1405,7 +1405,7 @@ statictea \
    :CUSTOM_ID: log-file
    :END:
 
-Statictea write statistics to the log file.  Template commands
+Statictea writes statistics to the log file.  Template commands
 can also write to the log file.
 
 Log information is appended to the file.  When the file size
@@ -1417,7 +1417,7 @@ You can specify the log file full path.  If you don't specify a
 filename, "statictea.log" is used. The log default location
 depends on the platform:
 
-- Mac: ~/Library/lib/statictea.log
+- Mac: ~/Library/log/statictea.log
 - Other: ~/statictea.log
 
 [[#contents][茶]]

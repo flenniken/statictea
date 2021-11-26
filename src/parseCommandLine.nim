@@ -104,8 +104,6 @@ proc handleWord(switch: string, word: string, value: string,
     log = true
     logFilename = value
   elif word == "prepost":
-    # prepost is a string with a space dividing the prefix from the
-    # postfix. The postfix is optional. -p="<--$ -->" or -p="#$"
     if value == "":
       return some(newWarningData(wNoPrepostValue, $switch))
     else:
@@ -170,7 +168,6 @@ proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
   args.resultFilename = resultFilename
   args.logFilename = logFilename
   args.prepostList = prepostList
-
   result = newArgsOrWarning(args)
 
 func `$`*(aw: ArgsOrWarning): string =

@@ -364,6 +364,10 @@ proc getVariable*(variables: Variables, dotNameStr: string): ValueOrWarning =
 
   result = newValueOrWarning(parentDict.dict[varName])
 
+func argsPrepostList*(prepostList: seq[Prepost]): seq[seq[string]] =
+  for prepost in prepostList:
+    result.add(@[prepost.prefix, prepost.postfix])
+
 func getTeaArgs*(args: Args): Value =
   ## Create the t.args dictionary from the statictea arguments.
   var varsDict = newVarsDict()
@@ -376,4 +380,5 @@ func getTeaArgs*(args: Args): Value =
   varsDict["resultFilename"] = newValue(args.resultFilename)
   varsDict["templateList"] = newValue(args.templateList)
   varsDict["logFilename"] = newValue(args.logFilename)
+  varsDict["prepostList"] = newValue(argsPrepostList(args.prepostList))
   result = newValue(varsDict)

@@ -142,6 +142,8 @@ suite "parseCommandLine":
     check testParsePrepostGood("  ", "  ", "")
     check testParsePrepostGood("   ", "   ", "")
     check testParsePrepostGood("   ,   ", "   ", "   ")
+    check testParsePrepostGood("[[$,]]", "[[$", "]]")
+    check testParsePrepostGood("$$", "$$")
 
   test "testOrgModePrefix":
     check testParsePrepostGood("# $", "# $", "")

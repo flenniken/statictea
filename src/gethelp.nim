@@ -78,7 +78,7 @@ EXAMPES
      --prepost option.  For example, if you want to use the c style
      comments:
 
-             statictea -p="/* */" ...
+             statictea -p='/*$,*/' ...
 
      You can specify update to syncronize your template's replace
      blocks with the json data.

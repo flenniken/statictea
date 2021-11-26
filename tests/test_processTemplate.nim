@@ -9,6 +9,8 @@ import readlines
 import version
 import tostring
 import variables
+import vartypes
+import tables
 
 proc testGetTeaArgs(args: Args, eJson: string): bool =
   let value = getTeaArgs(args)
@@ -1188,31 +1190,22 @@ teas => ["black","green"]
 
   test "getTeaArgs empty":
     var args: Args
-    check testGetTeaArgs(args, """{"help":0,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":""}""")
+    check testGetTeaArgs(args, """{"help":0,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":"","prepostList":[]}""")
 
-  test "getTeaArgs help":
-    var args: Args
-    args.help = true
-    check testGetTeaArgs(args, """{"help":1,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":""}""")
-
-  test "getTeaArgs serverList":
-    var args: Args
-    args.serverList = @["server.html", "server2.html"]
-    check testGetTeaArgs(args, """{"help":0,"version":0,"update":0,"log":0,"serverList":["server.html","server2.html"],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":""}""")
-
-  test "getTeaArgs logFilename":
-    var args: Args
-    args.logFilename = "mylog.txt"
-    check testGetTeaArgs(args, """{"help":0,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":"mylog.txt"}""")
-
-  test "getTeaArgs logFilename":
+  test "getTeaArgs multiple":
     var args: Args
     args.serverList = @["server.json"]
     args.sharedList = @["shared.json"]
     args.templateList = @["template.html"]
     args.resultFilename = "result.html"
-    check testGetTeaArgs(args, """{"help":0,"version":0,"update":0,"log":0,"serverList":["server.json"],"sharedList":["shared.json"],"resultFilename":"result.html","templateList":["template.html"],"logFilename":""}""")
-
+    let value = getTeaArgs(args)
+    let targs = value.dictv
+    let serverList = targs["serverList"]
+    let templateList = targs["templateList"]
+    let resultFilename = targs["resultFilename"]
+    check serverList == newValue(@["server.json"])
+    check resultFilename == newValue("result.html")
+    check templateList == newValue(@["template.html"])
 
 
   test "t variables":

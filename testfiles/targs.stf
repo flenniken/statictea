@@ -3,28 +3,76 @@ id stf file version 0.0.0
 ## Test t.args with normal arguments.
 
 file cmd.sh command
-$statictearoot/bin/statictea -s=server.json -j=shared.json \
+$statictearoot/bin/statictea -l -s=server.json -j=shared.json \
+  -s=server2.json -j=shared2.json \
+  -p='abc$,def' -p='$$' \
   -t=template.html -r=result.html >stdout 2>stderr
 endfile
 
 ---file---template.html---
-$$ block keys = keys(t.args)
+t.args keys:
 
-keys => {keys}
-t.args => {t.args}
-t.args.help => {t.args.help}
-t.args.version => {t.args.version}
-t.args.update => {t.args.update}
-t.args.log => {t.args.log}
-t.args.serverList => {t.args.serverList}
-t.args.sharedList => {t.args.sharedList}
-t.args.resultFilename => "{t.args.resultFilename}"
-t.args.logFilename => "{t.args.logFilename}"
+$$ nextline g.keys = keys(t.args)
+{g.keys}
 
+t.args keys:
+
+$$ nextline
+$$ : t.repeat = len(g.keys)
+$$ : num = add(t.row, 1)
+$$ : key = get(g.keys, t.row)
+  {num}: {key}
+
+t.args:
+
+$$ nextline
+{t.args}
+
+t.args:
+
+$$ nextline t.repeat = len(g.keys)
+$$ : key = get(g.keys, t.row)
+$$ : value = get(t.args, key)
+{key}: {value}
+
+## : prepostList:
+
+$$ block t.repeat = len(t.args.serverList)
+$$ : g.serverParts &= concat("--server=", get(t.args.serverList, t.row))
 $$ endblock
+$$ block t.repeat = len(t.args.serverList)
+$$ : g.sharedParts &= concat("--server=", get(t.args.sharedList, t.row))
+$$ endblock
+$$ block t.repeat = len(t.args.templateList)
+$$ : g.templateParts &= concat("--server=", get(t.args.templateList, t.row))
+$$ endblock
+$$ block t.repeat = len(t.args.prepostList)
+$$ : prepost = get(t.args.prepostList, t.row)
+$$ : prefix = get(prepost, 0)
+$$ : postfix = get(prepost, 1)
+$$ : g.prepostParts &= concat("--prepost='", prefix, "','", postfix, "'")
+$$ endblock
+
+$$ nextline
+$$ : parts &= "statictea"
+$$ : parts &= if(t.args.help, " --help", "")
+$$ : parts &= if(t.args.version, " --version", "")
+$$ : parts &= if(t.args.update, " --update", "")
+$$ : parts &= if(t.args.log, " --log", "")
+$$ :
+$$ : parts &= if(cmp(len(t.args.resultFilename), 0), +
+$$ :   concat(" --result=", t.args.resultFilename), "")
+$$ :
+$$ : parts &= if(cmp(len(t.args.logFilename), 0), +
+$$ :   concat(" --log=", t.args.logFilename), "")
+$$ :
+$$ : parts = join(g.serverParts, " ")
+$$ : parts = join(g.sharedParts, " ")
+$$ : parts = join(g.templateParts, " ")
+$$ : parts = join(g.prepostParts, " ")
+$$ : cmd = join(parts)
+{cmd}
 ----------------endfile---
-
-
 
 
 file server.json
@@ -35,19 +83,15 @@ file shared.json
 {}
 endfile
 
+file server2.json
+{}
+endfile
+
+file shared2.json
+{}
+endfile
+
 --- file result.expected
-
-keys => ["help","version","update","log","serverList","sharedList","resultFilename","templateList","logFilename"]
-t.args => {"help":0,"version":0,"update":0,"log":0,"serverList":["server.json"],"sharedList":["shared.json"],"resultFilename":"result.html","templateList":["template.html"],"logFilename":""}
-t.args.help => 0
-t.args.version => 0
-t.args.update => 0
-t.args.log => 0
-t.args.serverList => ["server.json"]
-t.args.sharedList => ["shared.json"]
-t.args.resultFilename => "result.html"
-t.args.logFilename => ""
-
 --- endfile
 
 --- file stdout.expected
@@ -59,4 +103,3 @@ t.args.logFilename => ""
 --- expected result.expected == result.html
 --- expected stdout.expected == stdout
 --- expected stderr.expected == stderr
-

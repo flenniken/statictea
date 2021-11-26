@@ -145,7 +145,7 @@ suite "variables.nim":
     var argsVarDict = getTeaArgs(args).dictv
     var variables = emptyVariables(args = argsVarDict)
     # echo "variables = " & $variables
-    let expected = """{"s":{},"h":{},"l":{},"g":{},"row":0,"args":{"help":0,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":""},"version":"0.1.0"}"""
+    let expected = """{"s":{},"h":{},"l":{},"g":{},"row":0,"args":{"help":0,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":"","prepostList":[]},"version":"0.1.0"}"""
     check $variables == expected
 
 
@@ -337,3 +337,8 @@ suite "variables.nim":
     let eWarningDataO = some(newWarningData(wAppendToList, "int"))
     warningDataO = assignVariable(variables, "a", newValue(6), "&=")
     check warningDataO == eWarningDataO
+
+  test "argsPrepostList":
+    # let prepostList = @[newPrepost("#$", "")]
+    let prepostList = @[newPrepost("abc", "def")]
+    check argsPrepostList(prepostList) == @[@["abc", "def"]]
