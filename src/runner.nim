@@ -7,11 +7,11 @@ import std/options
 import std/parseopt
 import std/streams
 import std/unicode
-import strformat
-import readlines
-import regexes
+import std/strformat
 when isMainModule:
   import std/os
+import readlines
+import regexes
 
 const
   switches = [

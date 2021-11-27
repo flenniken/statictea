@@ -13,6 +13,9 @@ Functions that deal with Unicode.
 * [validateUtf8String](#validateutf8string) &mdash; Return the position of the first invalid utf-8 byte in the string else return -1.
 * [utf8CharString](#utf8charstring) &mdash; Get the unicode character at pos.
 * [firstInvalidUtf8](#firstinvalidutf8) &mdash; Return the position of the first invalid utf-8 byte in the string if any.
+* [parseHexUnicode16](#parsehexunicode16) &mdash; Return the unicode number given a 4 character unicode escape string like u1234.
+* [parseHexUnicode](#parsehexunicode) &mdash; Return the unicode number given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos.
+* [parseHexUnicodeToString](#parsehexunicodetostring) &mdash; Return the unicode string given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos.
 
 # cmpString
 
@@ -76,6 +79,30 @@ Return the position of the first invalid utf-8 byte in the string if any.
 
 ```nim
 func firstInvalidUtf8(str: string): Option[int]
+```
+
+# parseHexUnicode16
+
+Return the unicode number given a 4 character unicode escape string like u1234. Start is pointing at the u. On error, return a message id telling what went wrong.
+
+```nim
+proc parseHexUnicode16(text: string; start: Natural): OpResultId[int32]
+```
+
+# parseHexUnicode
+
+Return the unicode number given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos. Pos is initially pointing at the u. On error, return the message id telling what went wrong and pos points at the error.
+
+```nim
+proc parseHexUnicode(text: string; pos: var Natural): OpResultId[int32]
+```
+
+# parseHexUnicodeToString
+
+Return the unicode string given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos. Pos is initially pointing at the u. On error, return the message id telling what went wrong and pos points at the error.
+
+```nim
+proc parseHexUnicodeToString(text: string; pos: var Natural): OpResultId[string]
 ```
 
 

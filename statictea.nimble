@@ -34,7 +34,7 @@ proc get_source_filenames(path: bool = false, noExt: bool = false): seq[string] 
   ## Return the basename of the nim source files in the src
   ## folder. You have the option to include the path or file
   ## extension.
-  let excludeFilenames = ["t.nim", "dot.nim"]
+  let excludeFilenames = ["t.nim", "dot.nim", "runner.nim"]
   result = @[]
   var list = listFiles("src")
   for filename in list:

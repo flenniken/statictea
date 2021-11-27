@@ -12,8 +12,6 @@ Read json content.
 * type: [ParsedString](#parsedstring) &mdash; ParsedString holds the result of parsing a string literal.
 * [newParsedString](#newparsedstring) &mdash; Create a new ParsedString object.
 * [unescapePopularChar](#unescapepopularchar) &mdash; Unescape the popular char and return its value.
-* [parseHexUnicode16](#parsehexunicode16) &mdash; Return the unicode number given a 4 character unicode escape string like u1234.
-* [parseHexUnicode](#parsehexunicode) &mdash; Return the unicode number given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos.
 * [parseJsonStr](#parsejsonstr) &mdash; Parse the quoted json string literal.
 
 # jsonToValue
@@ -77,22 +75,6 @@ Unescape the popular char and return its value. If the char is not a popular cha
 
 ```nim
 proc unescapePopularChar(popular: char): char
-```
-
-# parseHexUnicode16
-
-Return the unicode number given a 4 character unicode escape string like u1234. Start is pointing at the u. On error, return a message id telling what went wrong.
-
-```nim
-proc parseHexUnicode16(text: string; start: Natural): OpResultId[int32]
-```
-
-# parseHexUnicode
-
-Return the unicode number given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos. Pos is initially pointing at the u. On error, return the message id telling what went wrong and pos points at the error.
-
-```nim
-proc parseHexUnicode(text: string; pos: var Natural): OpResultId[int32]
 ```
 
 # parseJsonStr

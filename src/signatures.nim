@@ -5,7 +5,7 @@ import vartypes
 import funtypes
 import options
 import messages
-import strformat
+# import strformat
 import strutils
 
 #[
@@ -97,13 +97,16 @@ func `$`*(param: Param): string =
     for paramType in param.paramTypes:
       types.add(paramTypeString(paramType))
     let paramTypes = join(types, ", ")
-    result = fmt"{param.name}: {optional}varargs({paramTypes})"
+    # result = fmt"{param.name}: {optional}varargs({paramTypes})"
+    result = "$1: $2varargs($3)" % [param.name, optional, paramTypes]
+    
   elif param.returnType:
     result = paramTypeString(param.paramTypes[0])
   else:
     # name: int
     let typeString = paramTypeString(param.paramTypes[0])
-    result = fmt"{param.name}: {optional}{typeString}"
+    # result = fmt"{param.name}: {optional}{typeString}"
+    result = "$1: $2$3" % [param.name, optional, typeString]
 
 func sameType*(paramType: ParamType, valueKind: ValueKind): bool =
   ## Check whether the param type is the same type or compatible with
@@ -137,7 +140,8 @@ func parmsToSignature*(params: seq[Param]): string =
   if params.len > 1:
     inside = join(params[0 .. params.len-2], ", ")
   let returnType = $params[params.len-1]
-  result = fmt"({inside}) {returnType}"
+  # result = fmt"({inside}) {returnType}"
+  result = "($1) $2" % [inside, returnType]
 
 # These are for working with signature strings.
 # proc matchInsideAndReturn*(line: string): Option[Matches] =
