@@ -1,57 +1,14 @@
 ## Language variable methods.
-## @:
-## @: Here are the tea variables:
-## @:
-## @: - t.content -- content of the replace block.
-## @: - t.maxLines -- maximum number of replacement block lines (lines before endblock).
-## @: - t.maxRepeat -- maximum number of times to repeat the block.
-## @: - t.output -- where the block output goes.
-## @: - t.repeat -- controls how many times the block repeats.
-## @: - t.row -- the current row number of a repeating block.
-## @: - t.version -- the StaticTea version number.
-## @:
-## @: Here are the tea variables grouped by type:
-## @:
-## @: Constant:
-## @:
-## @: - t.version
-## @:
-## @: Dictionaries:
-## @:
-## @: - t -- tea system variables
-## @: - l -- local variables
-## @: - s -- read only server json variables
-## @: - h -- read only shared json variables
-## @: - f -- reserved
-## @: - g -- global variables
-## @:
-## @: Integers:
-## @:
-## @: - t.maxLines -- default when not set: 50
-## @: - t.maxRepeat -- default when not set: 100
-## @: - t.repeat -- default when not set: 1
-## @: - t.row -- 0 read only, automatically increments
-## @:
-## @: String:
-## @:
-## @: - t.content -- default when not set: ""
-## @:
-## @: String enum t.output:
-## @:
-## @: - "result" -- the block output goes to the result file (default)
-## @: - "stderr" -- the block output goes to standard error
-## @: - "log" -- the block output goes to the log file
-## @: - "skip" -- the block is skipped
 
-# The variables are stored in logically separate name spaces, g, h, s,
-# t. Since we allow local variables without a namespace, we don't
-# allow local variables called g, h, s and t so it is clear which name
-# space each variable belongs to.  It would be confusing to allow a t
-# local variable which is a dictionary then t.row would mean two
-# different things.
-#
-# We implement the name spaces by storing them all in the same
-# variables dictionary to make it easy to pass around.
+#[
+There is one dictionary to hold the logically separate dictionaries,
+g, h, s, t etc which makes passing them around easier.
+
+The language allows local variables to be specified without the l
+prefix and it allows functions to be specified without the f prefix.
+
+Dot names ie: l.d.a can be used on the left hand side of the equal sign.
+]#
 
 import std/strutils
 import std/options
@@ -69,13 +26,13 @@ const
 
 type
   Variables* = VarsDict
-    ## Dictionary holding all statictea variables.
+    ## Dictionary holding all statictea variables in multiple distinct
+    ## logical dictionaries.
 
   VariableData* = object
     ## A variable name and value. The names tells where the
     ## variable is stored, i.e.: s.varName
-    # todo: using dotNameStr instead of sequence of names?
-    names*: seq[string]
+    dotNameStr*: string
     value*: Value
 
   ParentDictKind* = enum
@@ -146,8 +103,7 @@ func emptyVariables*(server: VarsDict = nil, shared: VarsDict = nil,
 
 func newVariableData*(dotNameStr: string, value: Value): VariableData =
   ## Create a new VariableData object.
-  let names = split(dotNameStr, '.')
-  result = VariableData(names: names, value: value)
+  result = VariableData(dotNameStr: dotNameStr, value: value)
 
 func getTeaVarIntDefault*(variables: Variables, varName: string): int64 =
   ## Return the int value of one of the tea dictionary integer
@@ -198,11 +154,13 @@ proc resetVariables*(variables: var Variables) =
 
   variables["l"] = newValue(newVarsDict())
 
-proc getParentDict*(variables: Variables, names: seq[string]): ParentDict =
+proc getParentDict*(variables: Variables, dotNameStr: string): ParentDict =
   ## Return the last component dictionary specified by the given names
   ## or, on error, return a warning.  The sequence [a, b, c, d]
   ## corresponds to the dot name string "a.b.c.d" and the c dictionary
   ## is the result.
+
+  let names = split(dotNameStr, '.')
 
   assert names.len > 0
 
@@ -326,7 +284,7 @@ proc assignVariable*(variables: var Variables, dotNameStr: string,
   if nameSpace in ["s", "h"]:
     return some(newWarningData(wReadOnlyDictionary))
 
-  var parentDict = getParentDict(variables, names)
+  var parentDict = getParentDict(variables, dotNameStr)
   if parentDict.kind == fdWarning:
     return some(parentDict.warningData)
 
@@ -358,7 +316,7 @@ proc getVariable*(variables: Variables, dotNameStr: string): ValueOrWarning =
   ## Look up the variable and return its value when found, else return
   ## a warning.
   let names = split(dotNameStr, '.')
-  var parentDict = getParentDict(variables, names)
+  var parentDict = getParentDict(variables, dotNameStr)
   if parentDict.kind == fdWarning:
     return newValueOrWarning(parentDict.warningData)
 

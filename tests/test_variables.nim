@@ -13,8 +13,7 @@ import tostring
 import args
 
 proc testGetParentDict(variables: Variables, dotNameStr: string, eParentDict: ParentDict): bool =
-  var names = split(dotNameStr, '.')
-  var parentDict = getParentDict(variables, names)
+  var parentDict = getParentDict(variables, dotNameStr)
   if expectedItem("parentDict:", parentDict, eParentDict):
     result = true
 

@@ -1260,6 +1260,7 @@ e => {e}
 
 # todo: reorganize the variables dictionary so the t dictionary is a
 # sub dictionary of variables like the other top level dicts.
+# todo: you cannot access top level dicts.  a = exist(t, "row")
 
 # todo: test literal strings with \n etc. in them.  Are these supported?
 # todo: test with no result file.
