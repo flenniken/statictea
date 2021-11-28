@@ -62,6 +62,12 @@ $$ nextline
 $$ : t.maxRepeat = 1
 $$ : t.repeat = 2
 hello
+
+Set max repeat to 2 then set it to 1.
+$$ nextline
+$$ : t.maxRepeat = 2
+$$ : t.maxRepeat = 1
+hello
 --- endfile
 
 --- file result.expected
@@ -97,6 +103,9 @@ hello
 
 Set max repeat to 1 then repeat to 2.
 hello
+
+Set max repeat to 2 then set it to 1.
+hello
 --- endfile
 
 --- file stdout.expected
@@ -125,6 +134,9 @@ statement: t.maxRepeat = 1
            ^
 template.html(54): w44: The repeat value must be between 0 and t.maxRepeat.
 statement: t.repeat = 2
+           ^
+template.html(60): w129: You cannot reassign a variable.
+statement: t.maxRepeat = 1
            ^
 --- endfile
 

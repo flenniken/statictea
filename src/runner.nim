@@ -821,8 +821,11 @@ when not defined(test):
           rc = 1
         inc(count)
 
-    echo "$1 passed, $2 failed\n" % [
-      $passedCount, $(count - passedCount)]
+    if count == passedCount:
+      echo "All $1 tests passed!" % $passedCount
+    else:
+      echo "$1 passed, $2 failed\n" % [
+        $passedCount, $(count - passedCount)]
     result = OpResult[Rc](kind: okValue, value: rc)
 
   proc runDirectory(args: RunArgs): OpResult[Rc] =

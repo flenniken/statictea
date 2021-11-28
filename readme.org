@@ -1750,7 +1750,7 @@ equal and 1 for greater than.
 cmpVersion(versionA: string, versionB: string) int
 #+END_SRC
 
-StaticTea uses [|[|https://semver.org/][|Semantic Versioning]]
+StaticTea uses [[https://semver.org/][Semantic Versioning]]
 with the added restriction that each version component has one
 to three digits (no letters).
 
@@ -2098,7 +2098,7 @@ Example in a markdown template:
 
 #+BEGIN_SRC
 $$ : anchor = githubAnchor(entry.name)
-- {type}[|{entry.name}](#{anchor}) &mdash; {short}
+- {type]{{entry.name}](#{anchor}) &mdash; {short}
 ...
 # {entry.name}
 #+END_SRC

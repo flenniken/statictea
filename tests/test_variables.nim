@@ -22,8 +22,9 @@ proc testAssignVariable(variables: var Variables, dotNameStr: string, value: Val
     eWarningDataO: Option[WarningData] = none(WarningData)): bool =
   ## Assign a variable then fetch and verify it was set.
   let warningDataO = assignVariable(variables, dotNameStr, value)
+  result = true
   if not expectedItem("warningDataO", warningDataO, eWarningDataO):
-    return false
+    result = false
   if warningDataO.isSome:
     return true
   let valueOrWarning = getVariable(variables, dotNameStr)
@@ -32,7 +33,6 @@ proc testAssignVariable(variables: var Variables, dotNameStr: string, value: Val
     return false
   if not expectedItem("fetched value", valueOrWarning.value, value):
     return false
-  result = true
 
 proc testAssignVariable(dotNameStr: string, value: Value,
     eWarningDataO: Option[WarningData] = none(WarningData)): bool =
@@ -67,6 +67,8 @@ suite "variables.nim":
     check testGetParentDict(variables, "s.test", newParentDict(variables["s"].dictv))
     check testGetParentDict(variables, "h.test", newParentDict(variables["h"].dictv))
     check testGetParentDict(variables, "t.row", newParentDict(variables))
+    check testGetParentDict(variables, "l", newParentDict(variables["l"].dictv))
+    check testGetParentDict(variables, "l.a", newParentDict(variables["l"].dictv))
 
   test "getParentDict with list":
     var variables = emptyVariables()

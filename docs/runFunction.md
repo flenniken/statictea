@@ -427,7 +427,7 @@ equal and 1 for greater than.
 cmpVersion(versionA: string, versionB: string) int
 ~~~~
 
-StaticTea uses [|[|https://semver.org/][|Semantic Versioning]]
+StaticTea uses [[https://semver.org/][Semantic Versioning]]
 with the added restriction that each version component has one
 to three digits (no letters).
 
@@ -986,7 +986,7 @@ Example in a markdown template:
 
 ~~~
 $$ : anchor = githubAnchor(entry.name)
-* {type}[|{entry.name}](#{anchor}) &mdash; {short}
+* {type]{{entry.name}](#{anchor}) &mdash; {short}
 ...
 # {entry.name}
 ~~~~

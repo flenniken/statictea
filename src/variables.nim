@@ -226,17 +226,21 @@ proc getParentDict*(variables: Variables, names: seq[string]): ParentDict =
     case nameSpace:
       of "s", "h", "g":
         discard
-      of "f":
+      of "f", "i", "j", "k", "m", "n", "o", "p", "q", "r", "u":
         return newParentDictWarn(wReservedNameSpaces)
       else:
         nameSpace = "l"
         localVar = true
     assert nameSpace in variables
     if localVar:
-      parentDict = variables[nameSpace].dictv
+      parentDict = variables["l"].dictv
       if names.len == 1:
+        # l by itself.
         return newParentDict(parentDict)
-      dictNames = names[0 .. ^2]
+      if names[0] == "l":
+        dictNames = names[1 .. ^2]
+      else:
+        dictNames = names[0 .. ^2]
     else:
       parentDict = variables[nameSpace].dictv
       if names.len == 1 or names.len == 2:
@@ -358,11 +362,14 @@ proc getVariable*(variables: Variables, dotNameStr: string): ValueOrWarning =
   if parentDict.kind == fdWarning:
     return newValueOrWarning(parentDict.warningData)
 
-  let varName = names[^1]
-  if not (varName in parentDict.dict):
-    return newValueOrWarning(wMissingVarName, varName)
+  if dotNameStr == "l":
+    result = newValueOrWarning(newValue(parentDict.dict))
+  else:
+    let varName = names[^1]
+    if not (varName in parentDict.dict):
+      return newValueOrWarning(wMissingVarName, varName)
 
-  result = newValueOrWarning(parentDict.dict[varName])
+    result = newValueOrWarning(parentDict.dict[varName])
 
 func argsPrepostList*(prepostList: seq[Prepost]): seq[seq[string]] =
   for prepost in prepostList:

@@ -295,7 +295,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "A case condition is not the same type as the main condition.", ## wCaseTypeMismatch
     "Expected an even number of cases, got $1 list items.", ## wNotEvenCases
     "The list values must be all strings.", ## wNotAllStrings
-    "You cannot reassign a tea variable.", ## wTeaVariableExists
+    "You cannot reassign a variable.", ## wTeaVariableExists
     "You can only append to a list, got $1.", ## wAppendToList
     "You cannot append to a tea variable.", ## wAppendToTeaVar
     "Duplicate json variable \'$1\' skipped.", ## wDuplicateVar

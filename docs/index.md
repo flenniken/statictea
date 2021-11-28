@@ -12,7 +12,7 @@ StaticTea nim source code documentation.
 * [gethelp.nim](gethelp.md) &mdash; Get the command line help message.
 * [matches.nim](matches.md) &mdash; Regular expression matching methods.
 * [messages.nim](messages.md) &mdash; Messages IDs and associated strings.
-* [opresultid.nim](opresultid.md) &mdash; OpResultId either a value or a message id.
+* [opresultid.nim](opresultid.md) &mdash; OpResultId holds either a value or a message id.
 * [parseCmdLine.nim](parseCmdLine.md) &mdash; Parse a template command line.
 * [parseCommandLine.nim](parseCommandLine.md) &mdash; Parse the StaticTea terminal command line and return the arguments.
 * [parseNumber.nim](parseNumber.md) &mdash; Parse an int or float number string.

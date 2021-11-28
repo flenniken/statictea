@@ -1233,8 +1233,33 @@ help3 => 0
     check testProcessTemplate(templateContent = templateContent,
         serverJson = serverJson, eResultLines = eResultLines, eRc = 0)
 
+  test "access l dictionary":
+    let templateContent = """
+$$ nextline e = exists(l, "x")
+e => {e}
+"""
+    let eResultLines = @[
+      "e => 0\n"
+    ]
+    check testProcessTemplate(templateContent = templateContent,
+        eResultLines = eResultLines)
+
+  test "access l dictionary 2":
+    let templateContent = """
+$$ nextline
+$$ : x = 5
+$$ : e = exists(l, "x")
+e => {e}
+"""
+    let eResultLines = @[
+      "e => 1\n"
+    ]
+    check testProcessTemplate(templateContent = templateContent,
+        eResultLines = eResultLines)
 
 
+# todo: reorganize the variables dictionary so the t dictionary is a
+# sub dictionary of variables like the other top level dicts.
 
 # todo: test literal strings with \n etc. in them.  Are these supported?
 # todo: test with no result file.

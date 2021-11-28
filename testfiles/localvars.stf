@@ -2,10 +2,12 @@ id stf file version 0.0.0
 
 ## Test readme local variables section.
 
-# You do not have to specify a prefix for local variables but you can
-# use l.
 
-# todo: this test doesn't work!
+# You create local variables with template statements.  They are
+# local to the command where they are defined. You do not have to
+# specify a prefix for local variables but you can use l. They are
+# stored in the l dictionary. The local variables are cleared and
+# recalculated for each repeated block.
 
 --- file cmd.sh command nonZeroReturn
 $statictearoot/bin/statictea -t=template.html -r=result.html >stdout 2>stderr
@@ -29,6 +31,16 @@ a => {a}
 l.a => {l.a}
 $$ endblock
 
+# The local variables are cleared and recalculated for each repeated
+# block.
+$$ block t.repeat = 2
+$$ : before = if0(exists(l, "x"), "doesn't exist", "exists")
+$$ : x = add(t.row, 1)
+$$ : after = if0(exists(l, "x"), "doesn't exist", "exists")
+
+{x}. Before defining x it {before}.
+{x}. After defining x it {after}.
+$$ endblock
 --- endfile
 
 --- file result.expected
@@ -43,12 +55,24 @@ l.tea => {l.tea}
 a => {a}
 l.a => {l.a}
 
+# The local variables are cleared and recalculated for each repeated
+# block.
+
+1. Before defining x it doesn't exist.
+1. After defining x it exists.
+
+2. Before defining x it doesn't exist.
+2. After defining x it exists.
 --- endfile
 
 --- file stdout.expected
 --- endfile
 
 --- file stderr.expected
+template.html(12): w58: The replacement variable doesn't exist: tea.
+template.html(13): w58: The replacement variable doesn't exist: l.tea.
+template.html(14): w58: The replacement variable doesn't exist: a.
+template.html(15): w58: The replacement variable doesn't exist: l.a.
 --- endfile
 
 --- expected result.expected == result.html
