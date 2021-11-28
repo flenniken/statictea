@@ -1593,7 +1593,8 @@ List of functions:
 - [[#get][get()]] -- Get a list value by its index.
 - [[#githubAnchor][githubAnchor()]] -- Create Github anchor names from heading names.
 - [[#githubAnchor][githubAnchor()]] -- Create a Github anchor name from a heading name.
-- [[#if][if()]] -- If the condition is true return a value, else return another value.
+- [[#if0][if0()]] -- If the condition is 0, return the second parameter, else return the third.
+- [[#ifNot0][ifNot0()]] -- If the condition is not 0, return the second parameter, else return the third.
 - [[#int][int()]] -- Create an int from a float.
 - [[#int][int()]] -- Create an int from a number string.
 - [[#joinPath][joinPath()]] -- Join the path components with a path separator.
@@ -2007,8 +2008,8 @@ Examples:
 
 #+BEGIN_SRC
 d = dict("tea", "Earl Grey")
-get(d, 'tea') => "Earl Grey"
-get(d, 'coffee', 'Tea') => "Tea"
+get(d, "tea") => "Earl Grey"
+get(d, "coffee", "Tea") => "Tea"
 #+END_SRC
 
 Using dot notation:
@@ -2035,7 +2036,7 @@ get(list: list, index: int, optional default: any) any
 Examples:
 
 #+BEGIN_SRC
-list = list(4, 'a', 10)
+list = list(4, "a", 10)
 get(list, 2) => 10
 get(list, 3, 99) => 99
 #+END_SRC
@@ -2098,23 +2099,44 @@ $$ : anchor = githubAnchor(entry.name)
 
 [[#contents][茶]]
 
-** if()
+** if0()
 :PROPERTIES:
-:CUSTOM_ID: if
+:CUSTOM_ID: if0
 :END:
 
-If the condition is true return a value, else return another value. False is 0 and true is not 0.
+If the condition is 0, return the second parameter, else return the third.
 
 #+BEGIN_SRC
-if(condition: int, true: any, false: any) any
+if0(condition: int, then: any, else: any) any
 #+END_SRC
 
 Examples:
 
 #+BEGIN_SRC
-if(1, 'tea', 'beer') => "tea"
-if(0, 'tea', 'beer') => "beer"
-if(4, 'tea', 'beer') => "beer"
+if0(0, "tea", "beer") => "tea"
+if0(1, "tea", "beer") => "beer"
+if0(4, "tea", "beer") => "beer"
+#+END_SRC
+
+[[#contents][茶]]
+
+** ifNot0()
+:PROPERTIES:
+:CUSTOM_ID: ifNot0
+:END:
+
+If the condition is not 0, return the second parameter, else return the third.
+
+#+BEGIN_SRC
+ifnot0(condition: int, then: any, else: any) any
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+ifnot0(1, "tea", "beer") => "tea"
+ifnot0(4, "tea", "beer") => "tea"
+ifnot0(0, "tea", "beer") => "beer"
 #+END_SRC
 
 [[#contents][茶]]
@@ -2324,8 +2346,8 @@ Examples:
 
 #+BEGIN_SRC
 len(dict()) => 0
-len(dict('a', 4)) => 1
-len(dict('a', 4, 'b', 3)) => 2
+len(dict("a", 4)) => 1
+len(dict("a", 4, "b", 3)) => 2
 #+END_SRC
 
 [[#contents][茶]]
@@ -2579,10 +2601,10 @@ floats = list(4.4, 3.1, 5.9)
 sort(floats, "ascending") => [3.1, 4.4, 5.9]
 sort(floats, "descending") => [5.9, 4.4, 3.1]
 
-strs = list('T', 'e', 'a')
-sort(strs, "ascending") => ['T', 'a', 'e']
-sort(strs, "ascending", "sensitive") => ['T', 'a', 'e']
-sort(strs, "ascending", "insensitive") => ['a', 'e', 'T']
+strs = list("T", "e", "a")
+sort(strs, "ascending") => ["T", "a", "e"]
+sort(strs, "ascending", "sensitive") => ["T", "a", "e"]
+sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
 #+END_SRC
 
 [[#contents][茶]]
@@ -2642,11 +2664,11 @@ sort(dicts: list, order: string, case: string, key: string) list
 Examples:
 
 #+BEGIN_SRC
-d1 = dict('name', 'Earl Gray', 'weight', 1.2)
-d2 = dict('name', 'Tea Pot', 'weight', 3.5)
+d1 = dict("name", "Earl Gray", "weight", 1.2)
+d2 = dict("name", "Tea Pot", "weight", 3.5)
 dicts = list(d1, d2)
-sort(dicts, "ascending", "sensitive", 'weight') => [d1, d2]
-sort(dicts, "descending", "sensitive", 'name') => [d2, d1]
+sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
+sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 #+END_SRC
 
 [[#contents][茶]]

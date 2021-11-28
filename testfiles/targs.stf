@@ -55,16 +55,16 @@ $$ : g.prepostParts &= part
 $$ endblock
 $$ nextline
 $$ : parts &= "statictea"
-$$ : parts &= if(t.args.help, "--help", "")
-$$ : parts &= if(t.args.version, "--version", "")
-$$ : parts &= if(t.args.update, "--update", "")
-$$ : parts &= if(t.args.log, "--log", "")
+$$ : parts &= if0(t.args.help, "", "--help")
+$$ : parts &= if0(t.args.version, "", "--version")
+$$ : parts &= if0(t.args.update, "", "--update")
+$$ : parts &= if0(t.args.log, "", "--log")
 $$ :
-$$ : parts &= if(cmp(len(t.args.resultFilename), 0), +
-$$ :   concat("--result=", t.args.resultFilename), "")
+$$ : parts &= if0(len(t.args.resultFilename), "", +
+$$ :   concat("--result=", t.args.resultFilename))
 $$ :
-$$ : parts &= if(cmp(len(t.args.logFilename), 0), +
-$$ :   concat("--log=", t.args.logFilename), "")
+$$ : parts &= if0(cmp(len(t.args.logFilename), 0), "", +
+$$ :   concat("--log=", t.args.logFilename))
 $$ :
 $$ : parts &= join(g.serverParts, " ")
 $$ : parts &= join(g.sharedParts, " ")

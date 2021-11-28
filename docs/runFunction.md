@@ -15,7 +15,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funLen_di](#funlen_di) &mdash; Number of elements in a dictionary.
 * [funGet_lioaa](#funget_lioaa) &mdash; Get a list value by its index.
 * [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
-* [funIf](#funif) &mdash; If the condition is true return a value, else return another value.
+* [funIf0](#funif0) &mdash; If the condition is 0, return the second parameter, else return the third.
+* [funIfNot0](#funifnot0) &mdash; If the condition is not 0, return the second parameter, else return the third.
 * [funAdd_Ii](#funadd_ii) &mdash; Add integers.
 * [funAdd_Fi](#funadd_fi) &mdash; Add floats.
 * [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
@@ -200,8 +201,8 @@ Examples:
 
 ~~~
 len(dict()) => 0
-len(dict('a', 4)) => 1
-len(dict('a', 4, 'b', 3)) => 2
+len(dict("a", 4)) => 1
+len(dict("a", 4, "b", 3)) => 2
 ~~~~
 
 ```nim
@@ -221,7 +222,7 @@ get(list: list, index: int, optional default: any) any
 Examples:
 
 ~~~
-list = list(4, 'a', 10)
+list = list(4, "a", 10)
 get(list, 2) => 10
 get(list, 3, 99) => 99
 ~~~~
@@ -247,8 +248,8 @@ Examples:
 
 ~~~
 d = dict("tea", "Earl Grey")
-get(d, 'tea') => "Earl Grey"
-get(d, 'coffee', 'Tea') => "Tea"
+get(d, "tea") => "Earl Grey"
+get(d, "coffee", "Tea") => "Tea"
 ~~~~
 
 Using dot notation:
@@ -261,24 +262,44 @@ d.tea => "Earl Grey"
 func funGet_dsoaa(parameters: seq[Value]): FunResult
 ```
 
-# funIf
+# funIf0
 
-If the condition is true return a value, else return another value. False is 0 and true is not 0.
+If the condition is 0, return the second parameter, else return the third.
 
 ~~~
-if(condition: int, true: any, false: any) any
+if0(condition: int, then: any, else: any) any
 ~~~~
 
 Examples:
 
 ~~~
-if(1, 'tea', 'beer') => "tea"
-if(0, 'tea', 'beer') => "beer"
-if(4, 'tea', 'beer') => "beer"
+if0(0, "tea", "beer") => "tea"
+if0(1, "tea", "beer") => "beer"
+if0(4, "tea", "beer") => "beer"
 ~~~~
 
 ```nim
-func funIf(parameters: seq[Value]): FunResult
+func funIf0(parameters: seq[Value]): FunResult
+```
+
+# funIfNot0
+
+If the condition is not 0, return the second parameter, else return the third.
+
+~~~
+ifnot0(condition: int, then: any, else: any) any
+~~~~
+
+Examples:
+
+~~~
+ifnot0(1, "tea", "beer") => "tea"
+ifnot0(4, "tea", "beer") => "tea"
+ifnot0(0, "tea", "beer") => "beer"
+~~~~
+
+```nim
+func funIfNot0(parameters: seq[Value]): FunResult
 ```
 
 # funAdd_Ii
@@ -890,10 +911,10 @@ floats = list(4.4, 3.1, 5.9)
 sort(floats, "ascending") => [3.1, 4.4, 5.9]
 sort(floats, "descending") => [5.9, 4.4, 3.1]
 
-strs = list('T', 'e', 'a')
-sort(strs, "ascending") => ['T', 'a', 'e']
-sort(strs, "ascending", "sensitive") => ['T', 'a', 'e']
-sort(strs, "ascending", "insensitive") => ['a', 'e', 'T']
+strs = list("T", "e", "a")
+sort(strs, "ascending") => ["T", "a", "e"]
+sort(strs, "ascending", "sensitive") => ["T", "a", "e"]
+sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
 ~~~~
 
 ```nim
@@ -951,11 +972,11 @@ sort(dicts: list, order: string, case: string, key: string) list
 Examples:
 
 ~~~
-d1 = dict('name', 'Earl Gray', 'weight', 1.2)
-d2 = dict('name', 'Tea Pot', 'weight', 3.5)
+d1 = dict("name", "Earl Gray", "weight", 1.2)
+d2 = dict("name", "Tea Pot", "weight", 3.5)
 dicts = list(d1, d2)
-sort(dicts, "ascending", "sensitive", 'weight') => [d1, d2]
-sort(dicts, "descending", "sensitive", 'name') => [d2, d1]
+sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
+sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 ~~~~
 
 ```nim
