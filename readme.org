@@ -509,10 +509,6 @@ replacement blocks.
 You use tea variables to control where the output goes, how many
 times it repeats and other aspects controlling a command.
 
-Statictea reserves single letters f - u to refer to important
-dictionaries. Five are currently used: g, h, l, s, t.  You can
-use single letters a, b, c, d, e and v, w, x, y, z.
-
 A variable name starts with a letter followed by letters, digits
 and underscores limited to a total of 64 ascii characters.
 
@@ -522,8 +518,17 @@ processing each replacement block.
 You can append a new variable to a list or dictionary but you
 cannot change an existing variable.
 
-One dictionary exists for each of the five types of
-variables. You access them with different one letter prefixes.
+[[#contents][茶]]
+
+* Single Letter Dictionaries
+:PROPERTIES:
+:CUSTOM_ID: single-letter-dictionaries
+:END:
+
+Statictea reserves single letters variable names f - u to refer
+to important dictionaries. Five are currently used: g, h, l, s,
+t.  You can use single letters a, b, c, d, e and v, w, x, y, z
+for variable names.
 
 - f -- Reserved
 - g -- [[#global-variables][Global Variables]]
@@ -1470,11 +1475,13 @@ Workaround Rules:
 - use @: at the beginning of lines, except the first line.
 - use ~~~ to begin a code block
 - use ~~~~ to end a code block
-- use @|, |@ and @@ to disguise a link, see example:
+- use @{ for [ in an http link
+- use }@ for ] in an http link
+- use @@: for a : in an http link
 
 #+BEGIN_SRC
 [Semantic Versioning](https://semver.org/)
-@|Semantic Versioning|@(https@@://semver.org/)
+@{Semantic Versioning}@(https@@://semver.org/)
 #+END_SRC
 
 [[#contents][茶]]
@@ -2739,6 +2746,7 @@ values(d) => ["apple", 2, 3]
 - [[#statements][Statements]]
 - [[#syntax][Syntax]]
 - [[#variables][Variables]]
+- [[#single-letter-dictionaries][Single Letter Dictionaries]]
 - [[#types][Types]]
 - [[#run-statictea][Run StaticTea]]
 - [[#miscellaneous][Miscellaneous]]

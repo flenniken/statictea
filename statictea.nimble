@@ -428,6 +428,7 @@ proc taskDocsIx() =
 
 proc myFileNewer(a: string, b: string): bool =
   ## Return true when file a is newer than file b.
+  # todo: make sure a and b exist.
   # result = getLastModificationTime(a) > getLastModificationTime(b)
   let cmd = "echo $(($(date -r " & a & " +%s)-$(date -r " & b & " +%s)))"
   # echo cmd
@@ -647,8 +648,9 @@ task json, "\tDisplay one or more source file's json doc comments; specify part 
       for line in text.splitLines():
         echo line
       break
-  # The jq command is good for viewing the output.
-  # n json | jq | less
+  echo ""
+  echo "The jq command is good for viewing the output."
+  echo "n json name | jq | less"
 
 task jsonix, "\tDisplay markdown docs index json.":
   var json = indexJson()

@@ -518,7 +518,7 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
   ## @:cmpVersion(versionA: string, versionB: string) int
   ## @:~~~~
   ## @:
-  ## @:StaticTea uses @|@|https@@://semver.org/]@|Semantic Versioning]]
+  ## @:StaticTea uses @{@{https@@://semver.org/]@{Semantic Versioning]]
   ## @:with the added restriction that each version component has one
   ## @:to three digits (no letters).
   ## @:
@@ -1407,7 +1407,7 @@ func funGithubAnchor_ss*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:~~~
   ## @:$$ : anchor = githubAnchor(entry.name)
-  ## @:* {type}@|{entry.name}](#{anchor}) &mdash; {short}
+  ## @:* {type}@{{entry.name}](#{anchor}) &mdash; {short}
   ## @:...
   ## @:# {entry.name}
   ## @:~~~~

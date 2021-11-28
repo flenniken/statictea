@@ -1,7 +1,22 @@
-## OpResultId either a value or a message id. The default is a
-## value. It's similar to the Option type but instead of returning
-## nothing, you return a message id that tells why you cannot return
-## the value.
+## OpResultId holds either a value or a message id.  It's similar to
+## @:the Option type but instead of returning nothing, you return a
+## @:message id that tells why you cannot return the value.
+## @:
+## @:Example Usage:
+## @:
+## @:~~~
+## @:proc test(): OpResultId[int] =
+## @:  if problem:
+## @:    result = newOpResultIdId@{int}@(wUnknownArg)
+## @:  else:
+## @:    result = newOpResultId@{int}@(3)
+## @:
+## @:let numOr = test()
+## @:if numOr.isMessage():
+## @:  echo numOr.messageId
+## @:else:
+## @:  num = numOr.value
+## @:~~~~
 
 import messages
 
@@ -12,7 +27,7 @@ type
     orMessageId
 
   OpResultId*[T] = object
-    ## Contains either a value or a return code (rc). The default is a
+    ## Contains either a value or a message id. The default is a
     ## value.
     case kind*: OpResultIdKind
       of orValue:
