@@ -8,8 +8,7 @@ id stf file version 0.0.0
 # todo: this test doesn't work!
 
 --- file cmd.sh command nonZeroReturn
-$statictearoot/bin/statictea \
-  -t=template.html -r=result.html >stdout 2>stderr
+$statictearoot/bin/statictea -t=template.html -r=result.html >stdout 2>stderr
 --- endfile
 
 --- file template.html
@@ -34,9 +33,9 @@ $$ endblock
 
 --- file result.expected
 tea => black
-l.tea => {l.tea}
-a => {a}
-l.a => {l.a}
+l.tea => black
+a => 5
+l.a => 5
 
 # The local variables are not defined in this block.
 tea => {tea}
@@ -50,16 +49,6 @@ l.a => {l.a}
 --- endfile
 
 --- file stderr.expected
-template.html(3): w102: Name, l, doesn't exist in the parent dictionary.
-statement: l.a = 5
-           ^
-template.html(5): w58: The replacement variable doesn't exist: l.tea.
-template.html(6): w58: The replacement variable doesn't exist: a.
-template.html(7): w58: The replacement variable doesn't exist: l.a.
-template.html(12): w58: The replacement variable doesn't exist: tea.
-template.html(13): w58: The replacement variable doesn't exist: l.tea.
-template.html(14): w58: The replacement variable doesn't exist: a.
-template.html(15): w58: The replacement variable doesn't exist: l.a.
 --- endfile
 
 --- expected result.expected == result.html
