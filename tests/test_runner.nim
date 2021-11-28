@@ -965,8 +965,7 @@ f2.txt=got
     check testCompareFilesDifferent(f1, f2, expected)
 
   test "compareFiles different 4":
-    let f1 = """
-"""
+    let f1 = ""
     let f2 = """
 test line
 something else
@@ -975,10 +974,11 @@ more
     let expected = """
 f1.txt=empty
 f2.txt=below
+┌───────────────────┐
 test line
 something else
 more
-"""
+└───────────────────┘"""
     check testCompareFilesDifferent(f1, f2, expected)
 
   test "compareFiles different 5":
@@ -987,15 +987,15 @@ test line
 something else
 more
 """
-    let f2 = """
-"""
+    let f2 = ""
     let expected = """
 f1.txt=below
 f2.txt=empty
+┌───────────────────┐
 test line
 something else
 more
-"""
+└───────────────────┘"""
     check testCompareFilesDifferent(f1, f2, expected)
 
   test "compareFiles no file":

@@ -47,7 +47,7 @@ formatting json.
 [[#contents][茶]]
 
 * How it Works
-  :PROPERTIES:
+:PROPERTIES:
 :CUSTOM_ID: how-it-works
 :END:
 
@@ -631,32 +631,31 @@ For example using the command line below results in a t.args
 value shown:
 
 #+BEGIN_SRC
-statictea \
-  --server server.json \
-  --shared shared.json \
-  --template template.html \
-  --result result.html
+statictea -l -s=server.json -j=shared.json \
+  -s=server2.json -j=shared2.json \
+  -p='abc$,def' -p='$$' \
+  -t=template.html -r=result.html
 
-t.args =>
-{
-  "help": 0,
-  "version": 0,
-  "update": 0,
-  "log": 0,
-  "serverList": ["server.json"],
-  "sharedList": ["shared.json"],
-  "resultFilename": "result.html",
-  "templateList": ["template.html"],
-  "logFilename": ""
+t.args => {
+  "help":0,
+  "version":0,
+  "update":0,
+  "log":1,
+  "serverList":["server.json","server2.json"],
+  "sharedList":["shared.json","shared2.json"],
+  "resultFilename":"result.html",
+  "templateList":["template.html"],
+  "logFilename":"",
+  "prepostList":[["abc$","def"],["$$",""]]
 }
 #+END_SRC
 
 [[#contents][茶]]
 
 *** t.content
-    :PROPERTIES:
-    :CUSTOM_ID: tcontent
-    :END:
+:PROPERTIES:
+:CUSTOM_ID: tcontent
+:END:
 
 The t.content variable determines the content used for the
 whole replace block.
@@ -679,9 +678,10 @@ The variable only applies to the replace command. See the
 [[#contents][茶]]
 
 *** t.maxRepeat
-  :PROPERTIES:
-  :CUSTOM_ID: tmaxrepeat
-  :END:
+:PROPERTIES:
+:CUSTOM_ID: tmaxrepeat
+:testfile: testfiles/maxrepeat.stf
+:END:
 
 The t.maxRepeat variable determines the maximum times a block can
 repeat.  The default is 100. You can increase it to repeat more
@@ -695,9 +695,9 @@ expected range of blocks.
 [[#contents][茶]]
 
 *** t.maxLines
-    :PROPERTIES:
-    :CUSTOM_ID: tmaxlines
-    :END:
+:PROPERTIES:
+:CUSTOM_ID: tmaxlines
+:END:
 
 The t.maxLines variable determines the maximum lines in a
 replacement block.
