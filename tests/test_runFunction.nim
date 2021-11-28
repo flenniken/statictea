@@ -367,16 +367,6 @@ suite "runFunction.nim":
     let eFunResult = newFunResult(newValue("else"))
     check testFunction("if0", parameters, eFunResult)
 
-  test "ifnot0 function 0":
-    var parameters = @[newValue(0), newValue("then"), newValue("else")]
-    let eFunResult = newFunResult(newValue("else"))
-    check testFunction("ifnot0", parameters, eFunResult)
-
-  test "ifnot0 function not 0":
-    var parameters = @[newValue(33), newValue("then"), newValue("else")]
-    let eFunResult = newFunResult(newValue("then"))
-    check testFunction("ifnot0", parameters, eFunResult)
-
   test "add 1":
     var parameters = @[newValue(1)]
     let eFunResult = newFunResult(newValue(1))

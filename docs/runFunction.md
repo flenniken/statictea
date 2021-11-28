@@ -16,7 +16,6 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funGet_lioaa](#funget_lioaa) &mdash; Get a list value by its index.
 * [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
 * [funIf0](#funif0) &mdash; If the condition is 0, return the second parameter, else return the third.
-* [funIfNot0](#funifnot0) &mdash; If the condition is not 0, return the second parameter, else return the third.
 * [funAdd_Ii](#funadd_ii) &mdash; Add integers.
 * [funAdd_Fi](#funadd_fi) &mdash; Add floats.
 * [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
@@ -280,26 +279,6 @@ if0(4, "tea", "beer") => "beer"
 
 ```nim
 func funIf0(parameters: seq[Value]): FunResult
-```
-
-# funIfNot0
-
-If the condition is not 0, return the second parameter, else return the third.
-
-~~~
-ifnot0(condition: int, then: any, else: any) any
-~~~~
-
-Examples:
-
-~~~
-ifnot0(1, "tea", "beer") => "tea"
-ifnot0(4, "tea", "beer") => "tea"
-ifnot0(0, "tea", "beer") => "beer"
-~~~~
-
-```nim
-func funIfNot0(parameters: seq[Value]): FunResult
 ```
 
 # funAdd_Ii

@@ -326,32 +326,6 @@ func funIf0*(parameters: seq[Value]): FunResult =
   else:
     result = newFunResult(elseCase)
 
-func funIfNot0*(parameters: seq[Value]): FunResult =
-  ## If the condition is not 0, return the second parameter, else return
-  ## the third.
-  ## @:
-  ## @:~~~
-  ## @:ifnot0(condition: int, then: any, else: any) any
-  ## @:~~~~
-  ## @:
-  ## @:Examples:
-  ## @:
-  ## @:~~~
-  ## @:ifnot0(1, "tea", "beer") => "tea"
-  ## @:ifnot0(4, "tea", "beer") => "tea"
-  ## @:ifnot0(0, "tea", "beer") => "beer"
-  ## @:~~~~
-
-  tMapParameters("iaaa")
-  let condition = map["a"].intv
-  let thenCase = map["b"]
-  let elseCase = map["c"]
-
-  if condition != 0:
-    result = newFunResult(thenCase)
-  else:
-    result = newFunResult(elseCase)
-
 {.push overflowChecks: on, floatChecks: on.}
 
 func funAdd_Ii*(parameters: seq[Value]): FunResult =
@@ -1669,7 +1643,6 @@ const
     ("cmp", funCmp_ffi, "ffi"),
     ("cmp", funCmp_ssoii, "ssoii"),
     ("if0", funIf0, "iaaa"),
-    ("ifnot0", funIfNot0, "iaaa"),
     ("add", funAdd_Ii, "Ii"),
     ("add", funAdd_Fi, "Fi"),
     ("exists", funExists, "dsi"),
