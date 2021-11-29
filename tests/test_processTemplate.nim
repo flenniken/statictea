@@ -340,8 +340,8 @@ fake nextline
 
     let templateContent = """
 <!--$ block +-->
-<!--$ : serverElements = len(t.s); +-->
-<!--$ : jsonElements = len(t.h) -->
+<!--$ : serverElements = len(s); +-->
+<!--$ : jsonElements = len(h) -->
 The server has {serverElements} elements
 and the shared json has {jsonElements}.
 <!--$ endblock -->
@@ -987,7 +987,7 @@ ending line
     check testUpdateTemplate(templateContent = templateContent, sharedJson = sharedJson,
                                                eResultLines = eResultLines)
 
-  test "update replace":
+  test "update replace 2":
     let sharedJson = """
 {
  "header": "<html>\n"

@@ -623,9 +623,11 @@ statement: tea = a123
     check variables["g"].dictv.len == 0
     check variables["s"].dictv.len == 0
     check variables["h"].dictv.len == 0
-    check variables["row"] == Value(kind: vkInt, intv: 0)
-    check variables["version"] == Value(kind: vkString, stringv: staticteaVersion)
-    check variables.contains("content") == false
+    check variables["t"].dictv.len != 0
+    let tea = variables["t"].dictv
+    check tea["row"] == Value(kind: vkInt, intv: 0)
+    check tea["version"] == Value(kind: vkString, stringv: staticteaVersion)
+    check tea.contains("content") == false
 
   test "warnStatement":
     let statement = newStatement(text="tea = a123", lineNum=12, 0)

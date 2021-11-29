@@ -30,8 +30,8 @@ type
     ## logical dictionaries.
 
   VariableData* = object
-    ## A variable name and value. The names tells where the
-    ## variable is stored, i.e.: s.varName
+    ## A variable name and value. The dotNameStr tells where the
+    ## variable is stored, i.e.: l.d.a
     dotNameStr*: string
     value*: Value
 
@@ -41,7 +41,7 @@ type
     fdWarning
 
   ParentDict* = object
-    ## Contains the result of calling getParentDict, either a dictionary
+    ## Contains the result of calling getParentDictToAddTo, either a dictionary
     ## or a warning.
     case kind*: ParentDictKind
       of fdDict:
@@ -94,12 +94,15 @@ func emptyVariables*(server: VarsDict = nil, shared: VarsDict = nil,
     result["h"] = newValue(shared)
   result["l"] = newValue(newVarsDict())
   result["g"] = newValue(newVarsDict())
-  result["row"] = newValue(0)
+
+  var tea = newVarsDict()
+  tea["row"] = newValue(0)
+  tea["version"] = newValue(staticteaVersion)
   if args == nil:
-    result["args"] = newValue(newVarsDict())
+    tea["args"] = newValue(newVarsDict())
   else:
-    result["args"] = newValue(args)
-  result["version"] = newValue(staticteaVersion)
+    tea["args"] = newValue(args)
+  result["t"] = newValue(tea)
 
 func newVariableData*(dotNameStr: string, value: Value): VariableData =
   ## Create a new VariableData object.
@@ -109,8 +112,9 @@ func getTeaVarIntDefault*(variables: Variables, varName: string): int64 =
   ## Return the int value of one of the tea dictionary integer
   ## items. If the value does not exist, return its default value.
   assert varName in ["row", "repeat", "maxRepeat", "maxLines"]
-  if varName in variables:
-    let value = variables[varName]
+  var tea = variables["t"].dictv
+  if varName in tea:
+    let value = tea[varName]
     assert value.kind == vkInt
     result = value.intv
   else:
@@ -131,8 +135,9 @@ func getTeaVarStringDefault*(variables: Variables, varName: string): string =
   ## items. If the value does not exist, return its default value.
   assert varName in ["output"]
 
-  if varName in variables:
-    let value = variables[varName]
+  var tea = variables["t"].dictv
+  if varName in tea:
+    let value = tea[varName]
     assert value.kind == vkString
     result = value.stringv
   else:
@@ -146,65 +151,33 @@ proc resetVariables*(variables: var Variables) =
   ## Clear the local variables and reset the tea variables for running
   ## a command.
 
-  # Delete the tea variables.
+  # Delete some of the tea variables.
   let teaVars = ["content", "maxRepeat", "maxLines", "repeat", "output"]
-  for teaVar in teaVars:
-    if teaVar in variables:
-      variables.del(teaVar)
+  if "t" in variables:
+    var tea = variables["t"].dictv
+    for teaVar in teaVars:
+      if teaVar in tea:
+        tea.del(teaVar)
 
   variables["l"] = newValue(newVarsDict())
 
-proc getParentDict*(variables: Variables, dotNameStr: string): ParentDict =
+proc getParentDictToAddTo(variables: Variables, dotNameStr: string): ParentDict =
   ## Return the last component dictionary specified by the given names
-  ## or, on error, return a warning.  The sequence [a, b, c, d]
-  ## corresponds to the dot name string "a.b.c.d" and the c dictionary
-  ## is the result.
+  ## or, on error, return a warning.  For the dot name string
+  ## "a.b.c.d" and the c dictionary is the result.
 
   let names = split(dotNameStr, '.')
-
-  assert names.len > 0
+  assert names.len > 1
+  assert names[0] in ["g", "h", "l", "s"]
 
   var parentDict: VarsDict
   var dictNames: seq[string]
   var nameSpace = names[0]
 
-  if nameSpace == "t":
-    if names.len == 1:
-      # t by itself is a special case we don't allow.
-      return newParentDictWarn(wReservedNameSpaces)
-    if names.len == 3 and names[1] == "args":
-      return newParentDict(variables["args"].dictv)
-    if names.len != 2:
-      # todo: pass in dotNameStr instead of sequence everywhere?
-      let dotNameStr = names.join(".")
-      return newParentDictWarn(wInvalidTeaVar, dotNameStr)
-    return newParentDict(variables)
-  else:
-    var localVar = false
-    case nameSpace:
-      of "s", "h", "g":
-        discard
-      of "f", "i", "j", "k", "m", "n", "o", "p", "q", "r", "u":
-        return newParentDictWarn(wReservedNameSpaces)
-      else:
-        nameSpace = "l"
-        localVar = true
-    assert nameSpace in variables
-    if localVar:
-      parentDict = variables["l"].dictv
-      if names.len == 1:
-        # l by itself.
-        return newParentDict(parentDict)
-      if names[0] == "l":
-        dictNames = names[1 .. ^2]
-      else:
-        dictNames = names[0 .. ^2]
-    else:
-      parentDict = variables[nameSpace].dictv
-      if names.len == 1 or names.len == 2:
-        # Namespace f, g, h, l, s by themself or with one other subvar.
-        return newParentDict(parentDict)
-      dictNames = names[1 .. ^2]
+  parentDict = variables[nameSpace].dictv
+  if names.len == 2:
+    return newParentDict(parentDict)
+  dictNames = names[1 .. ^2]
 
   # Loop through the dictionaries looking up each sub dict.
   for name in dictNames:
@@ -225,16 +198,15 @@ func assignTeaVariable(variables: var Variables, dotNameStr: string,
   assert dotNameStr.len > 0
 
   let names = split(dotNameStr, '.')
-  if names.len != 2 or names[0] != "t":
-    return some(newWarningData(wInvalidTeaVar, dotNameStr))
+  assert names[0] == "t"
+
+  if names.len == 1:
+    return some(newWarningData(wImmutableVars))
 
   let varName = names[1]
-  if varName in variables:
-    # The model has independent namespaces, so don't expose these. Use
-    # s, h, l, g instead.
-    if varName in ["s", "h", "l", "g", "f"]:
-        return some(newWarningData(wInvalidTeaVar, varName))
-    if varName in ["row", "version"]:
+  var tea = variables["t"].dictv
+  if varName in tea:
+    if varName in ["row", "version", "args"]:
         return some(newWarningData(wReadOnlyTeaVar, varName))
     # You cannot reassign a tea variable.
     return some(newWarningData(wTeaVariableExists))
@@ -268,23 +240,46 @@ func assignTeaVariable(variables: var Variables, dotNameStr: string,
   if operator == "&=":
     return some(newWarningData(wAppendToTeaVar))
 
-  variables[varName] = value
+  tea[varName] = value
 
-proc assignVariable*(variables: var Variables, dotNameStr: string,
-    value: Value, operator: string = "="): Option[WarningData] =
+proc assignVariable*(
+    variables: var Variables,
+    dotNameStr: string,
+    value: Value,
+    operator: string = "="
+  ): Option[WarningData] =
   ## Assign the variable the given value if possible, else return a
   ## warning.
+
+  # -- You cannot overwrite an existing variable.
+  # -- You can only assign to known tea variables.
+  # -- You can assign new values to the local and global dictionaries
+  #    but not the others (except for the previous rule).
+  # -- You can append to local and global lists but not others.
+  # -- You can specify local variables without the l prefix.
+
   assert dotNameStr.len > 0
-
+  var parentDict: ParentDict
   let names = split(dotNameStr, '.')
+
   let nameSpace = names[0]
-  if nameSpace == "t":
+  case nameSpace
+  of "t":
     return assignTeaVariable(variables, dotNameStr, value, operator)
-
-  if nameSpace in ["s", "h"]:
+  of "s", "h":
+    if names.len == 1:
+      return some(newWarningData(wImmutableVars))
     return some(newWarningData(wReadOnlyDictionary))
+  of "g", "l":
+    if names.len == 1:
+      return some(newWarningData(wImmutableVars))
+    parentDict = getParentDictToAddTo(variables, dotNameStr)
+  of "f", "i", "j", "k", "m", "n", "o", "p", "q", "r", "u":
+    return some(newWarningData(wReservedNameSpaces))
+  else:
+    # It must be a local variable, add the missing l.
+    parentDict = getParentDictToAddTo(variables, "l." & dotNameStr)
 
-  var parentDict = getParentDict(variables, dotNameStr)
   if parentDict.kind == fdWarning:
     return some(parentDict.warningData)
 
@@ -294,7 +289,6 @@ proc assignVariable*(variables: var Variables, dotNameStr: string,
     if lastName in parentDict.dict:
       return some(newWarningData(wImmutableVars))
     parentDict.dict[lastName] = value
-
   else:
     assert operator == "&="
 
@@ -312,24 +306,40 @@ proc assignVariable*(variables: var Variables, dotNameStr: string,
     # Append the value to the list.
     lastItem.listv.add(value)
 
+func lookUpVar(variables: Variables, names: seq[string]): ValueOrWarning =
+  ## Return the variable when it exists.
+  var next = variables
+  var ix = 0
+  while true:
+    let name = names[ix]
+    if not (name in next):
+      return newValueOrWarning(wMissingVarName, name)
+    let value = next[name]
+    inc(ix)
+    if ix >= names.len:
+      return newValueOrWarning(value)
+    if value.kind != vkDict:
+      return newValueOrWarning(wNotDict, name)
+    next = value.dictv
+
 proc getVariable*(variables: Variables, dotNameStr: string): ValueOrWarning =
   ## Look up the variable and return its value when found, else return
   ## a warning.
-  let names = split(dotNameStr, '.')
-  var parentDict = getParentDict(variables, dotNameStr)
-  if parentDict.kind == fdWarning:
-    return newValueOrWarning(parentDict.warningData)
-
-  if dotNameStr == "l":
-    result = newValueOrWarning(newValue(parentDict.dict))
+  var names = split(dotNameStr, '.')
+  let nameSpace = names[0]
+  case nameSpace
+  of "g", "h", "l", "s", "t":
+    discard
+  of "f", "i", "j", "k", "m", "n", "o", "p", "q", "r", "u":
+    return newValueOrWarning(wReservedNameSpaces)
   else:
-    let varName = names[^1]
-    if not (varName in parentDict.dict):
-      return newValueOrWarning(wMissingVarName, varName)
+    # It must be a local variable, add the missing l.
+    names.insert("l", 0)
 
-    result = newValueOrWarning(parentDict.dict[varName])
+  result = lookUpVar(variables, names)
 
 func argsPrepostList*(prepostList: seq[Prepost]): seq[seq[string]] =
+  ## Create a prepost list of lists for t.args.
   for prepost in prepostList:
     result.add(@[prepost.prefix, prepost.postfix])
 

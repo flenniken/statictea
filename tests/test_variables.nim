@@ -12,18 +12,33 @@ import readjson
 import tostring
 import args
 
-proc testGetParentDict(variables: Variables, dotNameStr: string, eParentDict: ParentDict): bool =
-  var parentDict = getParentDict(variables, dotNameStr)
-  if expectedItem("parentDict:", parentDict, eParentDict):
-    result = true
+proc testGetVariableOk(variables: Variables, dotNameStr: string, eJson:
+    string): bool =
+  let valueOrWarning = getVariable(variables, dotNameStr)
+  result = true
+  if valueOrWarning.kind == vwWarning:
+    echo "Unable to get the variable: " & $valueOrWarning
+    return false
+  if not expectedItem("value", $valueOrWarning.value, eJson):
+    return false
+
+proc testGetVariableWarning(variables: Variables, dotNameStr: string,
+    eWarningData: WarningData): bool =
+  let valueOrWarning = getVariable(variables, dotNameStr)
+  result = true
+  if valueOrWarning.kind != vwWarning:
+    echo "Did not get a warning: " & $valueOrWarning
+    return false
+  if not expectedItem("warning", $valueOrWarning.warningData, $eWarningData):
+    return false
 
 proc testAssignVariable(variables: var Variables, dotNameStr: string, value: Value,
-    eWarningDataO: Option[WarningData] = none(WarningData)): bool =
+    eWarningDataO: Option[WarningData] = none(WarningData), operator = "="): bool =
   ## Assign a variable then fetch and verify it was set.
-  let warningDataO = assignVariable(variables, dotNameStr, value)
+  let warningDataO = assignVariable(variables, dotNameStr, value, operator)
   result = true
   if not expectedItem("warningDataO", warningDataO, eWarningDataO):
-    result = false
+    return false
   if warningDataO.isSome:
     return true
   let valueOrWarning = getVariable(variables, dotNameStr)
@@ -34,87 +49,104 @@ proc testAssignVariable(variables: var Variables, dotNameStr: string, value: Val
     return false
 
 proc testAssignVariable(dotNameStr: string, value: Value,
-    eWarningDataO: Option[WarningData] = none(WarningData)): bool =
+    eWarningDataO: Option[WarningData] = none(WarningData),
+    operator: string = "="): bool =
   ## Assign a variable then fetch and verify it was set. Start with an
   ## empty dictionary.
   var variables = emptyVariables()
-  result = testAssignVariable(variables, dotNameStr, value, eWarningDataO)
+  result = testAssignVariable(variables, dotNameStr,
+    value, eWarningDataO, operator)
 
 suite "variables.nim":
 
   test "emptyVariables":
     var variables = emptyVariables()
-    check "l" in variables
-    check "g" in variables
-    check "s" in variables
-    check "h" in variables
-    check "row" in variables
-    check "version" in variables
-    check "args" in variables
-    check variables["l"].dictv.len == 0
-    check variables["g"].dictv.len == 0
-    check variables["s"].dictv.len == 0
-    check variables["h"].dictv.len == 0
-    check variables["row"].intv == 0
-    check variables["version"].kind == vkString
-    check variables["args"].dictv.len == 0
+    # echo $variables
+    let e = """{"s":{},"h":{},"l":{},"g":{},"t":{"row":0,"version":"0.1.0","args":{}}}"""
+    check $variables == e
 
-  test "getParentDict":
+  test "getVariable":
     var variables = emptyVariables()
-    check testGetParentDict(variables, "a", newParentDict(variables["l"].dictv))
-    check testGetParentDict(variables, "g.test", newParentDict(variables["g"].dictv))
-    check testGetParentDict(variables, "s.test", newParentDict(variables["s"].dictv))
-    check testGetParentDict(variables, "h.test", newParentDict(variables["h"].dictv))
-    check testGetParentDict(variables, "t.row", newParentDict(variables))
-    check testGetParentDict(variables, "l", newParentDict(variables["l"].dictv))
-    check testGetParentDict(variables, "l.a", newParentDict(variables["l"].dictv))
+    check testGetVariableOk(variables, "t.row", "0")
+    check testGetVariableOk(variables, "t.args", "{}")
+    check testGetVariableOk(variables, "t.version", "\"0.1.0\"")
+    check testGetVariableOk(variables, "s", "{}")
+    check testGetVariableOk(variables, "h", "{}")
+    check testGetVariableOk(variables, "l", "{}")
+    check testGetVariableOk(variables, "g", "{}")
+    let eTea = """{"row":0,"version":"0.1.0","args":{}}"""
+    check testGetVariableOk(variables, "t", eTea)
 
-  test "getParentDict with list":
+  test "getVariable five":
     var variables = emptyVariables()
-    variables["teas"] = newEmptyListValue()
-    check testGetParentDict(variables, "teas", newParentDict(variables["l"].dictv))
+    variables["l"].dictv["five"] = newValue(5)
+    check testGetVariableOk(variables, "l.five", "5")
+    check testGetVariableOk(variables, "five", "5")
 
-  test "getParentDict nested":
-    let content = """
+  test "getVariable nested":
+    var variables = emptyVariables()
+    let variablesJson = """
 {
-  "one": {
-    "two": {
-      "n": "nested"
+  "a":{
+    "b":{
+      "c":{
+      }
     }
   }
-}
-"""
-    var valueOrWarning = readJsonString(content)
+}"""
+    var valueOrWarning = readJsonString(variablesJson)
     check valueOrWarning.kind == vwValue
-    # var str = dictToString(valueOrWarning.value)
-    # echo str
-    var variables = emptyVariables()
     variables["l"] = valueOrWarning.value
 
-    let local = variables["l"].dictv
-    let one = local["one"].dictv
-    let two = one["two"].dictv
-    check testGetParentDict(variables, "one", newParentDict(local))
-    check testGetParentDict(variables, "one.two", newParentDict(one))
-    check testGetParentDict(variables, "one.two.n", newParentDict(two))
+    check testGetVariableOk(variables, "l.a.b.c", "{}")
+    check testGetVariableOk(variables, "l.a.b", """{"c":{}}""")
+    check testGetVariableOk(variables, "l.a", """{"b":{"c":{}}}""")
+    check testGetVariableOk(variables, "l", """{"a":{"b":{"c":{}}}}""")
 
-  test "getParentDict warnings":
+    let wO = newWarningData(wMissingVarName, "hello")
+    check testGetVariableWarning(variables, "hello", wO)
+
+
+  test "getVariable not dict":
     var variables = emptyVariables()
-    let local = newParentDict(variables["l"].dictv)
-    let global = newParentDict(variables["g"].dictv)
-    let shared = newParentDict(variables["h"].dictv)
-    let server = newParentDict(variables["s"].dictv)
+    let variablesJson = """
+{
+  "a":{
+    "b":5
+  }
+}"""
+    var valueOrWarning = readJsonString(variablesJson)
+    check valueOrWarning.kind == vwValue
+    variables["l"] = valueOrWarning.value
 
-    check testGetParentDict(variables, "g", global)
-    check testGetParentDict(variables, "h", shared)
-    check testGetParentDict(variables, "l", local)
-    check testGetParentDict(variables, "s", server)
-    check testGetParentDict(variables, "t", newParentDictWarn(wReservedNameSpaces))
-    check testGetParentDict(variables, "f", newParentDictWarn(wReservedNameSpaces))
+    let wO = newWarningData(wNotDict, "b")
+    check testGetVariableWarning(variables, "a.b.tea", wO)
 
-    check testGetParentDict(variables, "t.a.b.c", newParentDictWarn(wInvalidTeaVar, "t.a.b.c"))
-    check testGetParentDict(variables, "t.server.a",
-                            newParentDictWarn(wInvalidTeaVar, "t.server.a"))
+  test "testGetVariableWarning wReservedNameSpaces":
+    var variables = emptyVariables()
+    let eWarningData = newWarningData(wReservedNameSpaces)
+    check testGetVariableWarning(variables, "p", eWarningData)
+
+  test "testGetVariableWarning wMissingVarName":
+    var variables = emptyVariables()
+    let eWarningData = newWarningData(wMissingVarName, "hello")
+    check testGetVariableWarning(variables, "s.hello", eWarningData)
+
+  test "testGetVariableWarning wMissingVarName 2":
+    var variables = emptyVariables()
+    let eWarningData = newWarningData(wMissingVarName, "d")
+    check testGetVariableWarning(variables, "s.d.hello", eWarningData)
+
+  test "testGetVariableWarning not dict":
+    var variables = emptyVariables()
+    let variablesJson = """{"d":"hello"}"""
+    var valueOrWarning = readJsonString(variablesJson)
+    check valueOrWarning.kind == vwValue
+    variables["s"] = valueOrWarning.value
+
+    let eWarningData = newWarningData(wNotDict, "d")
+    check testGetVariableWarning(variables, "s.d.hello", eWarningData)
+
 
   test "getTeaVarStringDefault":
     var variables = emptyVariables()
@@ -129,26 +161,24 @@ suite "variables.nim":
 
   test "resetVariables":
     var variables = emptyVariables()
+    let emptyVariables = $variables
     resetVariables(variables)
-    check variables.len == 7
-    check "s" in variables
-    check "h" in variables
-    check "l" in variables
-    check "g" in variables
-    check "row" in variables
-    check "args" in variables
-    check "version" in variables
-    check variables["row"] == newValue(0)
-    check variables["args"] == newEmptyDictValue()
+    if $variables != emptyVariables:
+      echo "expected: " & emptyVariables
+      echo "     got: " & $variables
+      fail
 
   test "check the initial t.args":
     var args: Args
     var argsVarDict = getTeaArgs(args).dictv
     var variables = emptyVariables(args = argsVarDict)
-    # echo "variables = " & $variables
-    let expected = """{"s":{},"h":{},"l":{},"g":{},"row":0,"args":{"help":0,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":"","prepostList":[]},"version":"0.1.0"}"""
-    check $variables == expected
-
+    let targs = variables["t"].dictv["args"]
+    # echo "targs = " & $targs
+    let eTargs = """{"help":0,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":"","prepostList":[]}"""
+    if $targs != eTargs:
+      echo "expected: " & eTargs
+      echo "     got: " & $targs
+      fail
 
   test "resetVariables untouched":
     # Make sure the some variables are untouched after reset.
@@ -164,9 +194,7 @@ suite "variables.nim":
     "c": 4
  },
  "l": {
- },
- "row": 5,
- "version": 10
+ }
 }
 """
     var valueOrWarning = readJsonString(variablesJson)
@@ -208,14 +236,9 @@ suite "variables.nim":
     resetVariables(variables)
     check getVariable(variables, "g.a") == newValueOrWarning(newValue(2))
 
-  test "assignVariable":
-    var variables = emptyVariables()
-    var warningDataO = assignVariable(variables, "five", newValue(5))
-    check warningDataO.isSome == false
-    # echo "variables:"
-    # echo valueToString(newValue(variables))
-
   test "assignVariable good":
+    check testAssignVariable("five", newValue(5))
+    check testAssignVariable("tfive", newValue(5))
     check testAssignVariable("g.var", newValue(1))
     check testAssignVariable("t.maxLines", newValue(20))
     check testAssignVariable("t.maxRepeat", newValue(20))
@@ -230,6 +253,23 @@ suite "variables.nim":
     let eWarningDataO = some(newWarningData(wReadOnlyDictionary))
     check testAssignVariable("s.hello", newValue(1), eWarningDataO)
     check testAssignVariable("h.hello", newValue(1), eWarningDataO)
+
+  test "assignVariable wImmutableVars":
+    let eWarningDataO = some(newWarningData(wImmutableVars))
+    check testAssignVariable("s", newValue(1), eWarningDataO)
+    check testAssignVariable("h", newValue(1), eWarningDataO)
+    check testAssignVariable("g", newValue(1), eWarningDataO)
+    check testAssignVariable("l", newValue(1), eWarningDataO)
+    check testAssignVariable("t", newValue(1), eWarningDataO)
+
+  test "assignVariable wReservedNameSpaces":
+    let eWarningDataO = some(newWarningData(wReservedNameSpaces))
+    for letterVar in ["f", "i", "j", "k", "m", "n", "o", "p", "q", "r", "u"]:
+      check testAssignVariable(letterVar, newValue(1), eWarningDataO)
+
+  test "assignVariable not wReservedNameSpaces":
+    for letterVar in ["a", "b", "c", "d", "e", "v", "w", "x", "y", "z"]:
+      check testAssignVariable(letterVar, newValue(1))
 
   test "assignVariable wMissingVarName":
     let eWarningDataO = some(newWarningData(wMissingVarName, "w"))
@@ -261,6 +301,10 @@ suite "variables.nim":
     let eWarningDataO = some(newWarningData(wReadOnlyTeaVar, "row"))
     check testAssignVariable("t.row", newValue(1), eWarningDataO)
 
+  test "assignVariable wReadOnlyTeaVar args":
+    let eWarningDataO = some(newWarningData(wReadOnlyTeaVar, "args"))
+    check testAssignVariable("t.args", newValue(1), eWarningDataO)
+
   test "assignVariable wInvalidTeaVar server":
     let eWarningDataO = some(newWarningData(wInvalidTeaVar, "s"))
     check testAssignVariable("t.s", newValue(1), eWarningDataO)
@@ -268,6 +312,10 @@ suite "variables.nim":
   test "assignVariable wReadOnlyTeaVar version":
     let eWarningDataO = some(newWarningData(wReadOnlyTeaVar, "version"))
     check testAssignVariable("t.version", newValue(1), eWarningDataO)
+
+  test "assignVariable args help":
+    let eWarningDataO = some(newWarningData(wReadOnlyTeaVar, "args"))
+    check testAssignVariable("t.args.help", newValue(1), eWarningDataO)
 
   test "assignVariable maxLines not int":
     let eWarningDataO = some(newWarningData(wInvalidMaxCount, ""))
@@ -313,6 +361,36 @@ suite "variables.nim":
     let eWarningDataO = some(newWarningData(wInvalidTeaVar, "oops"))
     check testAssignVariable("t.oops", newValue(1), eWarningDataO)
 
+  test "assignVariable append to tea":
+    let eWarningDataO = some(newWarningData(wImmutableVars))
+    check testAssignVariable("t", newValue("hello"), eWarningDataO, "&=")
+
+  test "assignVariable append to tea args":
+    let eWarningDataO = some(newWarningData(wReadOnlyTeaVar, "args"))
+    check testAssignVariable("t.args", newValue("hello"), eWarningDataO, "&=")
+    check testAssignVariable("t.args.hello", newValue("hello"), eWarningDataO, "&=")
+
+  test "assignVariable nested dict":
+    var variables = emptyVariables()
+    let variablesJson = """{"a":{"b2":"tea","b":{"c2":[],"c":{"d":"hello"}}}}"""
+    var valueOrWarning = readJsonString(variablesJson)
+    check valueOrWarning.kind == vwValue
+    variables["l"] = valueOrWarning.value
+    check testAssignVariable(variables, "l.a.b.c.tea", newValue(1))
+
+    let warning1 = some(newWarningData(wAppendToList, "dict"))
+    check testAssignVariable(variables, "l.a.b", newValue(1),
+      warning1, "&=")
+
+    let eWarningDataO = some(newWarningData(wMissingVarName, "missing"))
+    check testAssignVariable(variables, "l.a.b.missing.tea",
+                             newValue(1), eWarningDataO)
+
+    let eWarningDataO2 = some(newWarningData(wNotDict, "b2"))
+    check testAssignVariable(variables, "l.a.b2.missing.tea",
+                             newValue(1), eWarningDataO2)
+
+
   test "append to a list":
     var variables = emptyVariables()
     var warningDataO = assignVariable(variables, "teas", newValue(5), "&=")
@@ -322,6 +400,55 @@ suite "variables.nim":
     warningDataO = assignVariable(variables, "teas", newValue(7), "&=")
     check not warningDataO.isSome
     check $variables["l"] == """{"teas":[5,6,7]}"""
+
+  test "append to a list2":
+    var variables = emptyVariables()
+    let variablesJson = """
+{
+ "a1":"hello",
+ "a2":{
+  "b1": [],
+ },
+ "a3":[]
+}"""
+    var valueOrWarning = readJsonString(variablesJson)
+    check valueOrWarning.kind == vwValue
+    variables["l"] = valueOrWarning.value
+
+    var aO = assignVariable(variables, "l.teas", newValue(5), "&=")
+    check not aO.isSome
+    check $variables["l"] == """{"a1":"hello","a2":{"b1":[]},"a3":[],"teas":[5]}"""
+
+    var bO = assignVariable(variables, "teas", newValue(6), "&=")
+    check not bO.isSome
+    check $variables["l"] == """{"a1":"hello","a2":{"b1":[]},"a3":[],"teas":[5,6]}"""
+
+    var cO = assignVariable(variables, "a2.b1", newValue(7), "&=")
+    check not cO.isSome
+    check $variables["l"] == """{"a1":"hello","a2":{"b1":[7]},"a3":[],"teas":[5,6]}"""
+
+
+  test "append nested dictionary":
+    var variables = emptyVariables()
+    let variablesJson = """{"a":{}}"""
+    var valueOrWarning = readJsonString(variablesJson)
+    check valueOrWarning.kind == vwValue
+    variables["l"] = valueOrWarning.value
+
+    var aO = assignVariable(variables, "l.a.tea", newValue(5), "&=")
+    check not aO.isSome
+    check $variables["l"] == """{"a":{"tea":[5]}}"""
+
+  test "append nested dictionary2":
+    var variables = emptyVariables()
+    let variablesJson = """{"a":{"tea":2}}"""
+    var valueOrWarning = readJsonString(variablesJson)
+    check valueOrWarning.kind == vwValue
+    variables["l"] = valueOrWarning.value
+
+    var aO = assignVariable(variables, "l.a.sea", newValue(5), "&=")
+    check not aO.isSome
+    check $variables["l"] == """{"a":{"tea":2,"sea":[5]}}"""
 
   test "append list to a list":
     var variables = emptyVariables()
