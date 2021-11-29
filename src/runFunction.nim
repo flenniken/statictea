@@ -1589,9 +1589,9 @@ func funJoinPath_oSs*(parameters: seq[Value]): FunResult =
   result = joinPathList(map)
 
 func funJoin_lsois*(parameters: seq[Value]): FunResult =
-  ## Join the list of string components with the given separator.
+  ## Join a list of strings with a separator.
   ## @:An optional parameter determines whether you skip empty
-  ## @:components or not.
+  ## @:strings or not.
   ## @:
   ## @:~~~
   ## @:join(strs: list, sep: string, optional skipEmpty: int) string

@@ -47,7 +47,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funType_as](#funtype_as) &mdash; Return the parameter type, one of: int, float, string, list, dict.
 * [funJoinPath_loss](#funjoinpath_loss) &mdash; Join the path components with a path separator.
 * [funJoinPath_oSs](#funjoinpath_oss) &mdash; Join the path components with the platform path separator.
-* [funJoin_lsois](#funjoin_lsois) &mdash; Join the list of string components with the given separator.
+* [funJoin_lsois](#funjoin_lsois) &mdash; Join a list of strings with a separator.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -1109,9 +1109,9 @@ func funJoinPath_oSs(parameters: seq[Value]): FunResult
 
 # funJoin_lsois
 
-Join the list of string components with the given separator.
+Join a list of strings with a separator.
 An optional parameter determines whether you skip empty
-components or not.
+strings or not.
 
 ~~~
 join(strs: list, sep: string, optional skipEmpty: int) string

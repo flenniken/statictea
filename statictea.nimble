@@ -702,8 +702,8 @@ task runt, "\tRun a stf test in testfiles. Specify the filename.":
 task runall, "\tRun all stf tests in the testfiles folder.":
   runRunnerFolder()
 
-task stf, "\tList stf tests descriptions.":
-  exec """find testfiles -name \*.stf | xargs grep "##" | cut -c 11- | sed 's/:## / -- /' | sort"""
+task stf, "\tList stf tests with newest last.":
+  exec """ls -1tr testfiles/*.stf | xargs grep "##" | cut -c 11- | sed 's/:## / -- /'"""
 
 task newstf, "\tCreate new stf as a starting point for a new test.":
   let count = system.paramCount()+1
