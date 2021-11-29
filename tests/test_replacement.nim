@@ -187,9 +187,10 @@ six
       newReplaceLine(rlReplaceLine, "two\n"),
       newReplaceLine(rlReplaceLine, "three\n"),
       newReplaceLine(rlReplaceLine, "four\n"),
+      newReplaceLine(rlNormalLine, "five\n"),
     ]
     var eErrLines = @[
-      "template.html(4): w60: Reached the maximum replacement block line count without finding the endblock.\n"
+      "template.html(4): w60: Read t.maxLines replacement block lines without finding the endblock.\n"
     ]
     check testYieldReplacementLine(firstReplaceLine, replaceContent, maxLines = 4,
       eYieldLines = eYieldLines, eErrLines = eErrLines)

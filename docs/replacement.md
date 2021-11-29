@@ -28,7 +28,8 @@ Line type returned by yieldReplacementLine.
 ```nim
 ReplaceLineKind = enum
   rlReplaceLine,            ## A replacement block line.
-  rlEndblockLine             ## The endblock line.
+  rlEndblockLine,           ## The endblock line.
+  rlNormalLine               ## The last line when maxLines was exceeded.
 ```
 
 # ReplaceLine

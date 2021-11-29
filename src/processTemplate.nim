@@ -93,6 +93,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       break # Cannot create temp file or allocate memory, quit.
     var tempSegments = tempSegmentsO.get()
 
+    var lastLine: ReplaceLine
     if command == "replace" and tea.contains("content"):
       # Discard the replacement block lines and the endblock.
       for replaceLine in yieldReplacementLine(env, firstReplaceLine,
@@ -107,7 +108,8 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       # TempSegments.  Ignore the last line, the endblock, if it exists.
       for replaceLine in yieldReplacementLine(env,
           firstReplaceLine, lb, prepostTable, command, maxLines):
-        if replaceLine.kind != rlEndblockLine:
+        lastLine = replaceLine
+        if replaceLine.kind == rlReplaceLine:
           storeLineSegments(env, tempSegments, prepostTable, replaceLine.line)
 
     # Generate t.repeat number of replacement blocks. Recalculate the
@@ -129,6 +131,10 @@ proc processTemplateLines(env: var Env, variables: var Variables,
                  variables)
 
     closeDelete(tempSegments)
+
+    if lastLine.kind == rlNormalLine:
+      env.resultStream.write(lastLine.line)
+
     firstReplaceLine = ""
 
 proc updateTemplateLines(env: var Env, variables: var Variables,

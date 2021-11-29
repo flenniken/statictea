@@ -115,6 +115,7 @@ type
     ## Line type returned by yieldReplacementLine.
     rlReplaceLine, ## A replacement block line.
     rlEndblockLine ## The endblock line.
+    rlNormalLine ## The last line when maxLines was exceeded.
 
   ReplaceLine* = object
     ## Line information returned by yieldReplacementLine.
@@ -439,6 +440,7 @@ iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
         # Stop when we reach the maximum line count for a replacement block.
         if count >= maxLines:
           env.warn(lb.getLineNum(), wExceededMaxLine)
+          yield(newReplaceLine(rlNormalLine, line))
           break
 
         # Look for an endblock command and stop when found.

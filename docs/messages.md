@@ -226,7 +226,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Expected a list or dictionary as the first parameter.", ## wExpectedListOrDict
     "The replacement variable doesn\'t exist: $1$2.", ## wMissingReplacementVar
     "Unable to create a temporary file.", ## wNoTempFile
-    "Reached the maximum replacement block line count without finding the endblock.", ## wExceededMaxLine
+    "Read t.maxLines replacement block lines without finding the endblock.", ## wExceededMaxLine
     "No space after the command.", ## wSpaceAfterCommand
     "The function takes two parameters.", ## wTwoParameters
     "The two parameters are not the same type.", ## wNotSameKind
