@@ -213,8 +213,8 @@ func assignTeaVariable(variables: var Variables, dotNameStr: string,
 
   case varName:
     of "maxLines":
-      # The maxLines variable must be an integer >= 0.
-      if value.kind != vkInt or value.intv < 0:
+      # MaxLines must be an integer greater than 1.
+      if value.kind != vkInt or value.intv < 2:
         return some(newWarningData(wInvalidMaxCount))
     of "maxRepeat":
       # The maxRepeat variable must be a positive integer >= t.repeat.

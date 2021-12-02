@@ -7,17 +7,6 @@ import matches
 import readlines
 import parseCmdLine
 
-proc dumpCmdLines*(resultStream: Stream, cmdLines: var seq[string],
-                  cmdLineParts: var seq[LineParts], line: string) =
-  ## Write the stored command lines and the current line to the result
-  ## stream and empty the stored commands.
-  for cmdline in cmdLines:
-    resultStream.write(cmdline)
-  if line != "":
-    resultStream.write(line)
-  cmdLines.setlen(0)
-  cmdLineParts.setlen(0)
-
 proc collectCommand*(env: var Env, lb: var LineBuffer,
       prepostTable: PrepostTable, resultStream: Stream,
       cmdLines: var seq[string], cmdLineParts: var seq[LineParts],

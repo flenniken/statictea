@@ -113,6 +113,7 @@ type
 
   ReplaceLineKind* = enum
     ## Line type returned by yieldReplacementLine.
+    rlNoLine,      ## Value when not initialized.
     rlReplaceLine, ## A replacement block line.
     rlEndblockLine ## The endblock line.
     rlNormalLine ## The last line when maxLines was exceeded.
@@ -426,8 +427,7 @@ proc storeLineSegments*(env: var Env, tempSegments: TempSegments,
 
 iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
     LineBuffer, prepostTable: PrepostTable, command: string, maxLines: Natural): ReplaceLine =
-  ## Yield all the replacement block lines and the endblock line too,
-  ## if it exists.
+  ## Yield all the replacement block lines and one after.
 
   if firstReplaceLine != "":
     if command == "nextline":
@@ -437,18 +437,18 @@ iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
       var line = firstReplaceLine
 
       while true:
-        # Stop when we reach the maximum line count for a replacement block.
-        if count >= maxLines:
-          env.warn(lb.getLineNum(), wExceededMaxLine)
-          yield(newReplaceLine(rlNormalLine, line))
-          break
-
         # Look for an endblock command and stop when found.
         var linePartsO = parseCmdLine(env, prepostTable, line, lb.getLineNum())
         if linePartsO.isSome:
           if linePartsO.get().command == "endblock":
             yield(newReplaceLine(rlEndblockLine, line))
             break # done, found endblock
+
+        # Stop when we reach the maximum line count for a replacement block.
+        if count >= maxLines:
+          env.warn(lb.getLineNum(), wExceededMaxLine)
+          yield(newReplaceLine(rlNormalLine, line))
+          break
 
         yield(newReplaceLine(rlReplaceLine, line))
 

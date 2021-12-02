@@ -173,6 +173,42 @@ more text
     ]
     check testYieldReplacementLine(firstReplaceLine, replaceContent, eYieldLines = eYieldLines)
 
+  test "yieldReplacementLine block max":
+    let firstReplaceLine = "replacement block\n"
+    let replaceContent = """
+line 2
+<!--$ endblock -->
+"""
+    var eYieldLines = @[
+      newReplaceLine(rlReplaceLine, "replacement block\n"),
+      newReplaceLine(rlReplaceLine, "line 2\n"),
+      newReplaceLine(rlEndblockLine, "<!--$ endblock -->\n"),
+    ]
+    check testYieldReplacementLine(firstReplaceLine, replaceContent,
+      eYieldLines = eYieldLines, maxLines = 2)
+
+  test "yieldReplacementLine block max + 1":
+    let firstReplaceLine = "replacement block\n"
+    let replaceContent = """
+line 2
+line 3
+<!--$ endblock -->
+"""
+    var eYieldLines = @[
+      newReplaceLine(rlReplaceLine, "replacement block\n"),
+      newReplaceLine(rlReplaceLine, "line 2\n"),
+      newReplaceLine(rlNormalLine, "line 3\n"),
+    ]
+    var eErrLines = @[
+      "template.html(2): w60: Read t.maxLines replacement block lines without finding the endblock.\n"
+    ]
+
+    check testYieldReplacementLine(firstReplaceLine, replaceContent,
+      eYieldLines = eYieldLines, maxLines = 2, eErrLines = eErrLines)
+
+    check testYieldReplacementLine(firstReplaceLine, replaceContent,
+      eYieldLines = eYieldLines, maxLines = 2, eErrLines = eErrLines)
+
   test "yieldReplacementLine exceed maxLines":
     let firstReplaceLine = "one\n"
     let replaceContent = """
@@ -249,3 +285,7 @@ three
     let firstReplaceLine = ""
     let replaceContent = ""
     check testYieldReplacementLine(firstReplaceLine, replaceContent, command = "nextline")
+
+  test "replace line":
+    var replaceLine: ReplaceLine
+    check replaceLine.kind == rlNoLine

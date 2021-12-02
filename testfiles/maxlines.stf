@@ -13,14 +13,14 @@ Test t.maxLines.
 
 Set max lines to 3 and use 2 lines.
 $$ block t.maxLines = 3
-$$ : line = "line"
+$$ : line = "replacement-line"
 {line} one
 {line} two
 $$ endblock
 
 Set max lines to 3 and use 3 lines.
 $$ block t.maxLines = 3
-$$ : line = "line"
+$$ : line = "replacement-line"
 {line} one
 {line} two
 {line} three
@@ -28,7 +28,7 @@ $$ endblock
 
 Set max lines to 3 and use 4 lines.
 $$ block t.maxLines = 3
-$$ : line = "line"
+$$ : line = "replacement-line"
 {line} one
 {line} two
 {line} three
@@ -37,7 +37,7 @@ $$ endblock
 
 Set max lines to 3 and use 5 lines.
 $$ block t.maxLines = 3
-$$ : line = "line"
+$$ : line = "replacement-line"
 {line} one
 {line} two
 {line} three
@@ -47,7 +47,7 @@ $$ endblock
 
 Set max lines to 3 and use 6 lines.
 $$ block t.maxLines = 3
-$$ : line = "line"
+$$ : line = "replacement-line"
 {line} one
 {line} two
 {line} three
@@ -56,8 +56,25 @@ $$ : line = "line"
 {line} six
 $$ endblock
 
-todo: Test with t.repeat = 0.
-todo: Test with t.repeat > 1
+Set max lines to 2 and use 2 lines and repeat 2 times.
+$$ block t.maxLines = 2
+$$ : line = "replacement-line"
+$$ : t.repeat = 2
+{line} one
+{line} two
+$$ endblock
+
+Set max lines to 2, use 5 lines and repeat 0.
+$$ block t.maxLines = 2
+$$ : line = "replacement-line"
+$$ : t.repeat = 0
+{line} one
+{line} two
+{line} three
+{line} four
+{line} five
+$$ endblock
+
 todo: Test with no ending newline
 todo: Test at the bottom of the file.
 todo: Test with replace command.
@@ -66,46 +83,6 @@ end of file
 --- endfile
 
 --- file result.expected
-Test t.maxLines.
-
-Set max lines to 3 and use 2 lines.
-line one
-line two
-
-Set max lines to 3 and use 3 lines.
-line one
-line two
-line three
-$$ endblock
-
-Set max lines to 3 and use 4 lines.
-line one
-line two
-line three
-{line} four
-
-Set max lines to 3 and use 5 lines.
-line one
-line two
-line three
-{line} four
-{line} five
-
-Set max lines to 3 and use 6 lines.
-line one
-line two
-line three
-{line} four
-{line} five
-{line} six
-
-todo: Test with t.repeat = 0.
-todo: Test with t.repeat > 1
-todo: Test with no ending newline
-todo: Test at the bottom of the file.
-todo: Test with replace command.
-
-end of file
 --- endfile
 
 --- file stdout.expected

@@ -152,6 +152,8 @@ type
     wPairedSurrogate,      ## w141
     wReplaceMany,          ## w142
     wJoinListString,       ## w143
+    wBareEndblock,         ## w144
+    wBareContinue,         ## w145
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -197,7 +199,7 @@ const
     "You cannot change the $1 tea variable.", ## wReadOnlyTeaVar
     "Invalid tea variable: $1.", ## wInvalidTeaVar
     """Invalid t.output value, use: "result", "stderr", "log", or "skip".""", ## wInvalidOutputValue
-    "Invalid count. It must be a positive integer.", ## wInvalidMaxCount
+    "MaxLines must be an integer greater than 1.", ## wInvalidMaxCount
     "Invalid t.content, it must be a string.", ## wInvalidTeaContent
     "The repeat value must be between 0 and t.maxRepeat.", ## wInvalidRepeat
     "Invalid prepost: $1.", ## wInvalidPrepost
@@ -299,5 +301,7 @@ const
     "Invalid paired surrogate.", ## wPairedSurrogate
     "The replaceMany function failed.", ## wReplaceMany
     "The join list items must be strings.", ## wJoinListString
+    "The endblock command does not have a matching start command.", ## wBareEndblock
+    "The continue command is not part of a command.", ## wBareContinue
     ]
     ## The message text.

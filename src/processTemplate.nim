@@ -28,9 +28,115 @@ iterator yieldContentLine*(content: string): string =
   if start < content.len:
     yield(content[start ..< content.len])
 
+
+
+
+    # var cmdLines: seq[string] = @[]
+    # var cmdLineParts: seq[LineParts] = @[]
+
+    # Run the commands that are allowed statements and skip the others.
+    # let command = cmdLineParts[0].command
+    # if not (command in ["nextline", "block", "replace"]):
+    #   # The command was one of these: endblock, : continue, # comment.
+    #   if command == "#":
+    #     continue
+    #   var warning: MessageId
+    #   if command == "endblock":
+    #     warning = wBareEndblock
+    #   else:
+    #     warning = wBareContinue
+    #   env.warn(lb.getLineNum()-1, warning)
+    #   continue
+
+    # # Show a warning when the replace command does not have t.content
+    # # set.
+    # if command == "replace" and not tea.contains("content"):
+    #   # lineNum-1 because the current line number is at the first
+    #   # replacement line.
+    #   env.warn(lb.getLineNum()-1, wContentNotSet)
+
+    # If repeat is 0, read the replacement lines and the endblock and
+    # # discard them.
+    # if repeat == 0:
+    #   for replaceLine in yieldReplacementLine(env,
+    #       firstReplaceLine, lb, prepostTable, command, maxLines):
+    #     discard
+    #   # todo: handle the last line.
+    #   firstReplaceLine = ""
+    #   continue
+
+    # # Create a new TempSegments object for storing segments.
+    # var startLineNum = lb.getLineNum()
+    # var tempSegmentsO = newTempSegments(env, lb, prepostTable,
+    #                                     command, repeat, variables)
+    # if not isSome(tempSegmentsO):
+    #   break # Cannot create temp file or allocate memory, quit.
+    # var tempSegments = tempSegmentsO.get()
+
+    # var lastLine: ReplaceLine
+
+
+
+    #   # Read the replacement lines and the line after.
+    #   # Discard the replacement block lines and the endblock.
+    #   for replaceLine in yieldReplacementLine(env, firstReplaceLine,
+    #       lb, prepostTable, command, maxLines):
+    #     lastLine = replaceLine
+    #   # Use the content as the replacement lines.
+    #   var content = getVariable(variables, "t.content").value.stringv
+    #   for line in yieldContentLine(content):
+    #     storeLineSegments(env, tempSegments, prepostTable, line)
+    # else:
+    #   # Read the replacement lines and the line after. Store the
+    #   # replacement lines in compiled segments in TempSegments.
+    #   for replaceLine in yieldReplacementLine(env,
+    #       firstReplaceLine, lb, prepostTable, command, maxLines):
+    #     lastLine = replaceLine
+    #     if replaceLine.kind == rlReplaceLine:
+    #       storeLineSegments(env, tempSegments, prepostTable, replaceLine.line)
+
+    # # Generate t.repeat number of replacement blocks. Recalculate the
+    # # variables for each one.
+    # var tea = variables["t"].dictv
+    # while true:
+    #   # Write out all the stored replacement block lines and make the
+    #   # variable substitutions.
+    #   writeTempSegments(env, tempSegments, startLineNum, variables)
+
+    #   # Increment the row variable.
+    #   inc(row)
+    #   if row >= repeat:
+    #     break
+    #   tea["row"] = newValue(row)
+
+    #   # Run the command and fill in the variables.
+    #   runCommand(env, cmdLines, cmdLineParts, prepostTable,
+    #              variables)
+
+    # closeDelete(tempSegments)
+
+
+
+    # if lastLine.kind == rlNormalLine:
+    #   # todo: feed the line back into the collectCommand function in
+    #   # the loop instead.
+    #   env.resultStream.write(lastLine.line)
+    # # rlEndBlockLine, rlReplaceLine, rlNoLine:
+
+    # firstReplaceLine = ""
+
+
+  # var tea = variables["t"].dictv
+    # var row = 0
+    # tea["row"] = newValue(0)
+
+    # let repeat = getTeaVarIntDefault(variables, "repeat")
+    # var maxLines = getTeaVarIntDefault(variables, "maxLines")
+
+
 proc processTemplateLines(env: var Env, variables: var Variables,
                           prepostTable: PrepostTable) =
-  ## Process the given template file.
+  ## Process the given template file lines.
 
   # Allocate a buffer for reading lines.
   var lineBufferO = newLineBuffer(env.templateStream,
@@ -40,106 +146,59 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     return
   var lb = lineBufferO.get()
 
-  # todo: firstReplaceLine shouldn't need to be outside the loop.
-  var firstReplaceLine: string
-
   # Read and process template lines.
-  var tea = variables["t"].dictv
+  var extraLine: ExtraLine
   while true:
-    # Read template lines and write out non-command lines. When a
-    # command is found, collect its lines and return them.
-    var cmdLines: seq[string] = @[]
-    var cmdLineParts: seq[LineParts] = @[]
-    collectCommand(env, lb, prepostTable, env.resultStream,
-                   cmdLines, cmdLineParts, firstReplaceLine)
-    if cmdLines.len == 0:
-      break # done, no more lines
+    # Read template lines and write out non-commands lines. When a
+    # command that needs processing is found, return its lines.
+    # ExtraLine is an input and output parameter.
+    let cmdLines = collectCommand(env, lb, prepostTable, extraLine)
+    if extraLine.noMoreLines:
+      break
 
-    # Run the commands that are allowed statements and skip the others.
-    let command = cmdLineParts[0].command
-    if not (command in ["nextline", "block", "replace"]):
-      continue
+    # Run the command to fill in the variables.
+    runCommand(env, cmdLines, cmdLineParts, prepostTable, variables)
 
-    # Run the command and fill in the variables.
-    var row = 0
-    tea["row"] = newValue(row)
-    runCommand(env, cmdLines, cmdLineParts, prepostTable,
-               variables)
-    let repeat = getTeaVarIntDefault(variables, "repeat")
-
-    # Show a warning when the replace command does not have t.content
-    # set.
-    if command == "replace" and not tea.contains("content"):
-      # lineNum-1 because the current line number is at the first
-      # replacement line.
-      env.warn(lb.getLineNum()-1, wContentNotSet)
-
-    var maxLines = getTeaVarIntDefault(variables, "maxLines")
-
-    # If repeat is 0, read the replacement lines and the endblock and
-    # discard them.
-    if repeat == 0:
-      for replaceLine in yieldReplacementLine(env,
-          firstReplaceLine, lb, prepostTable, command, maxLines):
-        discard
-      firstReplaceLine = ""
-      continue
-
-    # Create a new TempSegments object for storing segments.
-    var startLineNum = lb.getLineNum()
-    var tempSegmentsO = newTempSegments(env, lb, prepostTable,
-                                        command, repeat, variables)
-    if not isSome(tempSegmentsO):
-      break # Cannot create temp file or allocate memory, quit.
-    var tempSegments = tempSegmentsO.get()
-
-    var lastLine: ReplaceLine
-    if command == "replace" and tea.contains("content"):
-      # Discard the replacement block lines and the endblock.
-      for replaceLine in yieldReplacementLine(env, firstReplaceLine,
-          lb, prepostTable, command, maxLines):
-        discard
-      # Use the content as the replacement lines.
-      var content = getVariable(variables, "t.content").value.stringv
-      for line in yieldContentLine(content):
-        storeLineSegments(env, tempSegments, prepostTable, line)
+    # Treat a replace command without content as a block command.
+    var command: string
+    if cmdLines.command == ckReplace and not tea.contains("content"):
+      # The replace command doesn't set content, treating it as a
+      # block command.
+      env.warn(0, wContentNotSet)
+      command = ckBlock
     else:
-      # Read the replacement lines and store their compiled segments in
-      # TempSegments.  Ignore the last line, the endblock, if it exists.
-      for replaceLine in yieldReplacementLine(env,
-          firstReplaceLine, lb, prepostTable, command, maxLines):
-        lastLine = replaceLine
-        if replaceLine.kind == rlReplaceLine:
-          storeLineSegments(env, tempSegments, prepostTable, replaceLine.line)
+      command = cmdLines.command
+      
+    # Fill in the replacement block. ExtraLine is an input and output
+    # parameter.
 
-    # Generate t.repeat number of replacement blocks. Recalculate the
-    # variables for each one.
-    var tea = variables["t"].dictv
-    while true:
-      # Write out all the stored replacement block lines and make the
-      # variable substitutions.
-      writeTempSegments(env, tempSegments, startLineNum, variables)
+    # note: ftc = fill type command
+    case command:
+      of ftcReplace:
+        fillReplaceCommand(extraLine)
+      of ftcBlock:
+        fillBlockCommand(extraLine)
+      of ftcNextline:
+        fillNextLineCommand(extraLine)
+    if extraLine.noMoreLines:
+      break
+        
 
-      # Increment the row variable.
-      inc(row)
-      if row >= repeat:
-        break
-      tea["row"] = newValue(row)
+proc dumpCmdLines*(resultStream: Stream, cmdLines: var seq[string],
+                  cmdLineParts: var seq[LineParts], line: string) =
+  ## Write the stored command lines and the current line to the result
+  ## stream and empty the stored commands.
+  for cmdline in cmdLines:
+    resultStream.write(cmdline)
+  if line != "":
+    resultStream.write(line)
+  cmdLines.setlen(0)
+  cmdLineParts.setlen(0)
 
-      # Run the command and fill in the variables.
-      runCommand(env, cmdLines, cmdLineParts, prepostTable,
-                 variables)
-
-    closeDelete(tempSegments)
-
-    if lastLine.kind == rlNormalLine:
-      env.resultStream.write(lastLine.line)
-
-    firstReplaceLine = ""
 
 proc updateTemplateLines(env: var Env, variables: var Variables,
                           prepostTable: PrepostTable) =
-  ## Update the given template file.
+  ## Update the given template file's replacement blocks.
 
   #[ Read template lines and write them out. Read command lines and
   write them out. Run the command to determine the t.content, then
@@ -150,8 +209,6 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
   file.  If the template comes from standard in, write the new
   template to standard out. ]#
 
-  var maxLines = getTeaVarIntDefault(variables, "maxLines")
-
   # Allocate a buffer for reading lines.
   var lineBufferO = newLineBuffer(env.templateStream,
       filename = env.templateFilename)
@@ -161,63 +218,23 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
   var lb = lineBufferO.get()
 
   # Read and process template lines.
-  var tea = variables["t"].dictv
+  var extraLine: ExtraLine
   while true:
     # Read template lines and write out non-command lines. When a
-    # command is found, collect its lines and return them.
-    var cmdLines: seq[string] = @[]
-    var cmdLineParts: seq[LineParts] = @[]
-    var firstReplaceLine: string
-    collectCommand(env, lb, prepostTable, env.resultStream,
-                   cmdLines, cmdLineParts, firstReplaceLine)
-    if cmdLines.len == 0:
-      break # done, no more lines
+    # replace command is found, collect its lines and return them.
+    # ExtraLine is an input and output parameter.
+    var cmdLines = collectReplaceCommand(env, lb, prepostTable, extraLine)
+    if cmdLines.noMoreLines:
+      break
 
-    # Run the replace commands but not the others.
-    let command = cmdLineParts[0].command
-    if command == "replace":
-      # Run the command and fill in the variables.
-      var row = 0
-      tea["row"] = newValue(row)
-      runCommand(env, cmdLines, cmdLineParts, prepostTable,
-                 variables)
+    # Run the replace command to set the content variable.
+    runCommand(env, cmdLines, prepostTable, variables)
 
-    # Write out the command lines.
-    dumpCmdLines(env.resultStream, cmdLines, cmdLineParts, "")
-
-    # Show a warning when the replace command does not have t.content set.
-    if command == "replace" and not tea.contains("content"):
-      # lineNum-1 because the current line number is at the first
-      # replacement line.
-      env.warn(lb.getLineNum()-1, wContentNotSet)
-
-    if command == "replace" and tea.contains("content"):
-      # Discard the replacement block lines and save the endblock if it exists.
-      var lastLine: ReplaceLine
-      for replaceLine in yieldReplacementLine(env,
-          firstReplaceLine, lb, prepostTable, command, maxLines):
-        lastLine = replaceLine
-
-      # Write the content as the replacement lines.
-      var valueOrWarning = getVariable(variables, "t.content")
-      var content = valueOrWarning.value.stringv
-      for line in yieldContentLine(content):
-        env.resultStream.write(line)
-
-      # If the content does not end with a newline, add one and output
-      # a warning.
-      if content.len > 0 and content[^1] != '\n':
-        env.warn(lb.getLineNum(), wMissingNewLineContent)
-        env.resultStream.write('\n')
-
-      # Write out the endblock, if it exists.
-      if lastLine.kind == rlEndblockLine:
-        env.resultStream.write(lastLine.line)
-    else:
-      # Read the replacement lines and endblock and write them out.
-      for replaceLine in yieldReplacementLine(env,
-          firstReplaceLine, lb, prepostTable, command, maxLines):
-        env.resultStream.write(replaceLine.line)
+    # Update the replacement block with lines from the content
+    # variable. ExtraLine is an input and output parameter.
+    updateReplacementBlock(extraLine)
+    if extraLine.noMoreLines:
+      break
 
 proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
   ## Read json files and return a variable dictionary.  Skip a
