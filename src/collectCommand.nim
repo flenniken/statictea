@@ -9,51 +9,60 @@ import parseCmdLine
 import messages
 
 type
+  ExtraLineKind* = enum
+    ## The ExtraLine type.
+    elkNoLine,     ## there is no line here
+    elkOutOfLines, ## no more lines in the template
+    elkNormalLine  ## we have a line of some type.
+
   ExtraLine* = object
-    ## The extra line and its type.
-    ## "" -- there is no line here
-    ## "outOflines" -- read all lines in the template
-    ## "normalLine" -- we have a line of some type.
-    kind*: string  # "outOfLines", "", "normalLine"
+    ## The extra line and its type. The line is empty except for the
+    ## elkNormalLine type.
+    kind*: ExtraLineKind
     line*: string
 
   CmdLines* = object
+    ## The collected command lines and their parts.
     lines*: seq[string]
     lineParts*: seq[LineParts]
 
-func newExtraLineNormal*(line: string): ExtraLine =
-  result = ExtraLine(kind: "normalLine", line: line)
+func newNormalLine*(line: string): ExtraLine =
+  ## Create a normal ExtraLine.
+  result = ExtraLine(kind: elkNormalLine, line: line)
 
-func newExtraLineSpecial*(kind: string): ExtraLine =
-  case kind
-  of "outOfLines", "":
-    result = ExtraLine(kind: kind, line: "")
-  else:
-    result = ExtraLine(kind: "", line: "")
+func newNoLine*(): ExtraLine =
+  ## Create a no line ExtraLine.
+  result = ExtraLine(kind: elkNoLine, line: "")
+
+func newOutOfLines*(): ExtraLine =
+  ## Create an out of lines ExtraLine.
+  result = ExtraLine(kind: elkOutOfLines, line: "")
 
 proc collectCommand*(env: var Env, lb: var LineBuffer,
       prepostTable: PrepostTable, extraLine: var ExtraLine): CmdLines =
-  ## Read template lines and write out non-commands lines. When a
-  ## command that needs processing is found, return its line and
-  ## continue lines.  On input extraLine is the first line to use.  On
-  ## exit extraLine is the line that caused the collection to stop
-  ## (the first replacement block line).
+  ## Read template lines and write out non-command lines. When a
+  ## command that needs processing is found, return its lines.  This
+  ## includes the command line and its continue lines.  On input
+  ## extraLine is the first line to use.  On exit extraLine is the
+  ## line that caused the collection to stop which is commonly the
+  ## first replacement block line.
 
-  assert extraLine.kind != "outOfLines"
+  assert extraLine.kind != elkOutOfLines
 
   var collecting = false
   while true:
     # Get the next line
     var line: string
-    if extraLine.kind == "normalLine":
+    if extraLine.kind == elkNormalLine:
       # Use the extra line.
       line = extraLine.line
-      extraLine = newExtraLineSpecial("")
+      # Mark it so we don't use it again.
+      extraLine = newNoLine()
     else:
       # Read a new line.
       line = lb.readline()
       if line == "":
-        extraLine = newExtraLineSpecial("outOfLines")
+        extraLine = newOutOfLines()
         break
 
     # Parse the line.
@@ -100,5 +109,5 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
       # lines that look like commands.
 
       # All done collecting.
-      extraLine = newExtraLineNormal(line)
+      extraLine = newNormalLine(line)
       break
