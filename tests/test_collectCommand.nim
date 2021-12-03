@@ -5,47 +5,94 @@ import std/unittest
 import env
 import matches
 import readlines
-import parseCmdLine
 import collectCommand
 
+func splitContent(content: string, startLine: Natural, numLines: Natural): seq[string] =
+  ## Split the content string at newlines and return a range of the
+  ## lines.  startLine is the index of the first line.
+  let split = splitNewLines(content)
+  let endLine = startLine + numLines - 1
+  if startLine <= endLine and endLine < split.len:
+     result.add(split[startLine .. endLine])
+
+func splitContentPick(content: string, picks: openArray[int]): seq[string] =
+  ## Split the content then return the picked lines by line index.
+  let split = splitNewLines(content)
+  for ix in picks:
+    result.add(split[ix])
+
 proc testCollectCommand(
+    inExtraLine: ExtraLine,
     content: string,
-    extraLine: ExtraLine,
-    eCmdLines: CmdLines,
-    eExtraLine: ExtraLine,
-    eResultStreamLines: seq[string] = @[],
+    eCmdStartLine: Natural,
+    eCmdNumLines: Natural,
+    eOutExtraLine: ExtraLine,
+    eResultPickedLines: openarray[int] = [],
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[],
   ): bool =
 
   var inStream = newStringStream(content)
-  var resultStream = newStringStream()
   var lineBufferO = newLineBuffer(inStream, filename="template.html")
   var lb = lineBufferO.get()
-
   var env = openEnvTest("_collectCommand.log")
-
   let prepostTable = makeDefaultPrepostTable()
-  var inOutExtraLine = extraLine
+
+  let eCmdLines = splitContent(content, eCmdStartLine, eCmdNumLines)
+  let eResultLines = splitContentPick(content, eResultPickedLines)
+  var inOutExtraLine = inExtraLine
+
   let cmdLines = collectCommand(env, lb, prepostTable, inOutExtraLine)
 
-  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines,
+    eResultLines)
 
-  resultStream.setPosition(0)
-  var resultStreamLines = readXLines(resultStream)
-  resultStream.close()
+  if not expectedItems("cmdLines.lines", cmdLines.lines, eCmdLines):
+    echo ""
+    result = false
 
-  if not expectedItems("cmdLines.lines", cmdLines.lines, eCmdLines.lines):
+  if not expectedItem("eOutExtraLine", inOutExtraLine, eOutExtraLine):
+    echo ""
     result = false
-  if not expectedItems("cmdLines.lineParts", cmdLines.lineParts, eCmdLines.lineParts):
-    result = false
-  if not expectedItems("resultStreamLines", resultStreamLines, eResultStreamLines):
-    result = false
-  if not expectedItem("ExtraLine", inOutExtraLine, eExtraLine):
-    result = false
+
 
 suite "collectCommand.nim":
+
+  test "splitContentPick":
+    let content = """
+hello
+there
+"""
+    let split = splitContentPick(content, [0])
+    require split.len == 1
+    check split[0] == "hello\n"
+
+  test "splitContent":
+    let content = "hello"
+    let eCmdLines = splitContent(content, 0, 1)
+    require eCmdLines.len == 1
+    check eCmdLines[0] == "hello"
+
+  test "splitContent 2":
+    let content = """
+hello
+there
+"""
+    let eCmdLines = splitContent(content, 0, 2)
+    require eCmdLines.len == 2
+    check eCmdLines[0] == "hello\n"
+    check eCmdLines[1] == "there\n"
+
+  test "splitContent 3":
+    let content = """
+hello
+there
+tea
+"""
+    let eCmdLines = splitContent(content, 1, 1)
+    require eCmdLines.len == 1
+    check eCmdLines[0] == "there\n"
 
   test "ExtraLine default":
     var extraLine: ExtraLine
@@ -66,133 +113,74 @@ suite "collectCommand.nim":
     check extraLine.kind == "outOfLines"
     check extraLine.line == ""
 
+  test "zero lines":
+    let inLine = newExtraLineSpecial("")
+    let content = ""
+    var eOutLine = newExtraLineSpecial("outOfLines")
+    check testCollectCommand(inLine, content, 0, 0, eOutLine)
 
-  test "one line":
+  test "one line command":
+    var inLine = newExtraLineSpecial("")
     let content = "<!--$ nextline -->\n"
-    var eCmdLines: CmdLines
-    eCmdLines.lines.add("<!--$ nextline -->\n")
-    eCmdLines.lineParts.add(newLineParts())
-    var extraLine = newExtraLineSpecial("")
-    var eExtraLine = newExtraLineSpecial("outOfLines")
-    check testCollectCommand(content, extraLine, eCmdLines, eExtraLine)
+    var eOutLine = newExtraLineSpecial("outOfLines")
+    check testCollectCommand(inLine, content, 0, 1, eOutLine)
 
-#   test "two lines":
-#     let content = """
-# <!--$ nextline +-->
-# <!--$ : -->
-# """
-#     let eCmdLines = splitNewLines(content)
-#     let eCmdLineParts = @[
-#       newLineParts(continuation = true),
-#       newLineParts(lineNum = 2, command = ":", middleStart = 8)
-#     ]
-#     check testCollectCommand(content, eCmdLines, eCmdLineParts)
+  test "two line command":
+    let inLine = newExtraLineSpecial("")
+    let content = """
+<!--$ nextline -->
+<!--$ : -->
+"""
+    let eOutLine = newExtraLineSpecial("outOfLines")
+    check testCollectCommand(inLine, content, 0, 2, eOutLine)
 
-#   test "three lines":
-#     let content = """
-# <!--$ nextline +-->
-# <!--$ : a=5 +-->
-# <!--$ : var = "hello" -->
-# """
-#     let eCmdLines = splitNewLines(content)
-#     let eCmdLineParts = @[
-#       newLineParts(continuation = true),
-#       newLineParts(lineNum = 2, command = ":", middleStart = 8,
-#         middleLen = 4, continuation = true),
-#       newLineParts(lineNum = 3, command = ":", middleStart = 8, middleLen = 14)
-#     ]
-#     check testCollectCommand(content, eCmdLines, eCmdLineParts)
+  test "three line command":
+    let inLine = newExtraLineSpecial("")
+    let content = """
+<!--$ nextline -->
+<!--$ : a=5 -->
+<!--$ : var = "hello" -->
+"""
+    var eOutLine = newExtraLineSpecial("outOfLines")
+    check testCollectCommand(inLine, content, 0, 3, eOutLine)
 
-#   test "three lines and comments":
-#     let content = """
-# <!--$ nextline +-->
-# <!--$ : a=5 +-->
-# <!--$ # this is a comment -->
-# <!--$ : var = "hello" -->
-# """
-#     let eContent = """
-# <!--$ nextline +-->
-# <!--$ : a=5 +-->
-# """
-#     let eNextLine = "<!--$ # this is a comment -->\n"
+  test "fake comment":
+    let inLine = newExtraLineSpecial("")
+    let content = """
+<!--$ nextline -->
+<!--$ : a=5 -->
+<!--$ # this is not really a comment -->
+"""
+    var eOutLine = newExtraLineNormal("<!--$ # this is not really a comment -->\n")
+    check testCollectCommand(inLine, content, 0, 2, eOutLine)
 
-#     let eCmdLines = splitNewLines(eContent)
-#     let eCmdLineParts = @[
-#       newLineParts(continuation = true),
-#       newLineParts(lineNum = 2, command = ":", middleStart = 8,
-#         middleLen = 4, continuation = true),
-#     ]
-#     check testCollectCommand(content, eCmdLines, eCmdLineParts, eNextLine = eNextLine)
+  test "one line non-command":
+    let inLine = newExtraLineSpecial("")
+    let content = "not a command\n"
+    var eOutLine = newExtraLineSpecial("outOfLines")
+    check testCollectCommand(inLine, content, 0, 0, eOutLine, [0])
 
-#   test "comments":
-#     let content = """
-# <!--$ nextline +-->
-# <!--$ # comment with plus +-->
-# <!--$ # -->
-# <!--$ : a=5 +-->
-# <!--$ # comment in middle -->
-# <!--$ : var = "hello" -->
-# <!--$ # comment at end-->
-# """
-#     let eContent = """
-# <!--$ nextline +-->
-# """
-#     let eCmdLines = splitNewLines(eContent)
-#     let eCmdLineParts = @[
-#       newLineParts(lineNum = 1, command = "nextline", middleStart = 15,
-#         middleLen = 0, continuation = true),
-#     ]
-#     let eNextLine = "<!--$ # comment with plus +-->\n"
-#     check testCollectCommand(content, eCmdLines, eCmdLineParts, eNextLine=eNextLine)
+  test "multipe line non-command":
+    let inLine = newExtraLineSpecial("")
+    let content = """
+not a command
+still not
+more stuff no newline at end
+"""
+    var eOutLine = newExtraLineSpecial("outOfLines")
+    check testCollectCommand(inLine, content, 0, 0, eOutLine, [0, 1, 2])
 
-#   test "non command":
-#     let content = "not a command\n"
-#     let eCmdLines: seq[string] = @[]
-#     let eCmdLineParts: seq[LineParts] = @[]
-#     check testCollectCommand(content, eCmdLines, eCmdLineParts,
-#       eResultStreamLines = @[content])
-
-#   test "non command 2":
-#     let content = """
-# not a command
-# still not
-# more stuff no newline at end"""
-#     let eCmdLines: seq[string] = @[]
-#     let eCmdLineParts: seq[LineParts] = @[]
-#     check testCollectCommand(content, eCmdLines, eCmdLineParts,
-#                       eResultStreamLines = splitNewLines(content))
-
-#   test "command and non command":
-#     let content = """
-# not a command
-# <!--$ nextline -->
-# the next line
-# """
-#     let split = splitNewLines(content)
-#     let eCmdLines = @[split[1]]
-#     let eCmdLineParts = @[newLineParts(lineNum = 2)]
-#     let eNextLine = "the next line\n"
-#     check testCollectCommand(content, eCmdLines, eCmdLineParts,
-#       eResultStreamLines = @[split[0]], eNextLine = eNextLine)
-
-#   test "empty file":
-#     let content = ""
-#     check testCollectCommand(content, @[], @[])
-
-#   test "command and non command":
-#     let content = """
-# not a command
-# <!--$ nextline -->
-# <!--$ : a = len("the next line") -->
-# last line {a}
-# more
-# """
-#     let split = splitNewLines(content)
-#     let eCmdLines = @[split[1], split[2]]
-#     let eCmdLineParts = @[
-#       newLineParts(lineNum = 2, command = "nextline", middleStart = 15, middleLen = 0),
-#       newLineParts(lineNum = 3, command = ":", middleStart = 8, middleLen = 25),
-#     ]
-#     let eNextLine = "last line {a}\n"
-#     check testCollectCommand(content, eCmdLines, eCmdLineParts,
-#       eResultStreamLines = @[split[0]], eNextLine = eNextLine)
+  test "comments":
+    let inLine = newExtraLineSpecial("")
+    let content = """
+stuff
+<!--$ # comment line -->
+more stuff
+<!--$ # comment line 2 -->
+more stuff
+<!--$ nextline -->
+<!--$ : var = "hello" -->
+hello
+"""
+    var eOutLine = newExtraLineNormal("hello\n")
+    check testCollectCommand(inLine, content, 5, 2, eOutLine, [0, 2, 4])
