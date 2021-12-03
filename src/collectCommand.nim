@@ -6,52 +6,99 @@ import env
 import matches
 import readlines
 import parseCmdLine
+import messages
+
+type
+  ExtraLine* = object
+    ## The extra line and its type.
+    ## "" -- there is no line here
+    ## "outOflines" -- read all lines in the template
+    ## "normalLine" -- we have a line of some type.
+    kind*: string  # "outOfLines", "", "normalLine"
+    line*: string
+
+  CmdLines* = object
+    lines*: seq[string]
+    lineParts*: seq[LineParts]
+
+func newExtraLineNormal*(line: string): ExtraLine =
+  result = ExtraLine(kind: "normalLine", line: line)
+
+func newExtraLineSpecial*(kind: string): ExtraLine =
+  case kind
+  of "outOfLines", "":
+    result = ExtraLine(kind: kind, line: "")
+  else:
+    result = ExtraLine(kind: "", line: "")
 
 proc collectCommand*(env: var Env, lb: var LineBuffer,
-      prepostTable: PrepostTable, resultStream: Stream,
-      cmdLines: var seq[string], cmdLineParts: var seq[LineParts],
-      firstReplaceLine: var string
-  ) =
-  ## Read template lines and write out non-command lines. When a
-  ## command is found, collect its lines in the given lists, cmdLines,
-  ## cmdLineParts and firstReplaceLine. When no command found, return with
-  ## no lines.
-  var line: string
+      prepostTable: PrepostTable, extraLine: var ExtraLine): CmdLines =
+  ## Read template lines and write out non-commands lines. When a
+  ## command that needs processing is found, return its line and
+  ## continue lines.  On input extraLine is the first line to use.  On
+  ## exit extraLine is the line that caused the collection to stop
+  ## (the first replacement block line).
+
+  assert extraLine.kind != "outOfLines"
+
+  var collecting = false
   while true:
-    if firstReplaceLine != "":
-      line = firstReplaceLine
-      firstReplaceLine = ""
+    # Get the next line
+    var line: string
+    if extraLine.kind == "normalLine":
+      # Use the extra line.
+      line = extraLine.line
+      extraLine = newExtraLineSpecial("")
     else:
+      # Read a new line.
       line = lb.readline()
       if line == "":
-        break # No more lines.
+        extraLine = newExtraLineSpecial("outOfLines")
+        break
 
-    var linePartsO = parseCmdLine(env, prepostTable, line, lb.getLineNum())
-    if not linePartsO.isSome:
-      # Write out non-command lines.
-      resultStream.write(line)
+    # Parse the line.
+    let linePartsO = parseCmdLine(env, prepostTable, line, lb.getLineNum())
+
+    if not collecting:
+      # If not a command, write it out and continue.
+      if not linePartsO.isSome:
+        env.resultStream.write(line)
+        continue
+
+      # Skip comment lines.
+      let lineParts = linePartsO.get()
+      if lineParts.command == "#":
+        continue
+
+      # Warn and skip the continue or endblock command.
+      if lineParts.command == ":" or lineParts.command == "endblock":
+        var warn: MessageId
+        if lineParts.command == ":":
+          warn = wBareContinue
+        else:
+          warn = wBareEndblock
+        env.warn(lb.getLineNum(), warn)
+        env.resultStream.write(line)
+        continue
+
+      # Collect the nextline, block or replace command.
+      collecting = true
+      result.lineParts.add(lineParts)
+      result.lines.add(line)
     else:
-      # Found command line.
-      var lineParts = linePartsO.get()
+      # We're in collecting mode.
 
-      cmdLines.add(line)
-      cmdLineParts.add(lineParts)
+      # Collect continue commands.
+      if linePartsO.isSome:
+        let lineParts = linePartsO.get()
+        if lineParts.command == ":":
+          result.lineParts.add(lineParts)
+          result.lines.add(line)
+          continue
 
-      # Collect all the continuation command lines and the line after.
-      while true:
-        line = lb.readline()
-        if line == "":
-          return # No more lines
+      # Any other type of line is part of the replacement block, even
+      # lines that look like commands.
 
-        let lPartsO = parseCmdLine(env, prepostTable, line, lb.getLineNum())
-        # Skip everything except the continue command. Other lines
-        # that look like commands are part of the replacement block.
-        if lPartsO.isSome:
-          lineParts = lPartsO.get()
-          if lineParts.command == ":":
-            cmdLines.add(line)
-            cmdLineParts.add(lineParts)
-            continue # continue looking for more command lines.
-
-        firstReplaceLine = line
-        return # return the command lines
+      # All done collecting.
+      extraLine = newExtraLineNormal(line)
+      break
