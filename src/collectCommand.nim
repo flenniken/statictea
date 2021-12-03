@@ -70,7 +70,7 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
       if lineParts.command == "#":
         continue
 
-      # Warn and skip the continue or endblock command.
+      # Warn about the continue or endblock commands but output them anyway.
       if lineParts.command == ":" or lineParts.command == "endblock":
         var warn: MessageId
         if lineParts.command == ":":

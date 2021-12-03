@@ -39,8 +39,9 @@ proc testCollectCommand(
   var env = openEnvTest("_collectCommand.log")
   let prepostTable = makeDefaultPrepostTable()
 
-  let eCmdLines = splitContent(content, eCmdStartLine, eCmdNumLines)
-  let eResultLines = splitContentPick(content, eResultPickedLines)
+  let totalContent = inExtraLine.line & content
+  let eCmdLines = splitContent(totalContent, eCmdStartLine, eCmdNumLines)
+  let eResultLines = splitContentPick(totalContent, eResultPickedLines)
   var inOutExtraLine = inExtraLine
 
   let cmdLines = collectCommand(env, lb, prepostTable, inOutExtraLine)
@@ -58,6 +59,15 @@ proc testCollectCommand(
 
 
 suite "collectCommand.nim":
+
+  test "append sequences":
+    let a = @[1, 2]
+    let b = @[3, 4]
+    let c = a & b
+    check c == @[1, 2, 3, 4]
+    var d = a
+    d.add(b)
+    check d == @[1, 2, 3, 4]
 
   test "splitContentPick":
     let content = """
@@ -184,3 +194,89 @@ hello
 """
     var eOutLine = newExtraLineNormal("hello\n")
     check testCollectCommand(inLine, content, 5, 2, eOutLine, [0, 2, 4])
+
+  test "simple block command":
+    let inLine = newExtraLineSpecial("")
+    let content = """
+<!--$ block -->
+replacement block
+<!--$ endblock -->
+"""
+    let eOutLine = newExtraLineNormal("replacement block\n")
+    check testCollectCommand(inLine, content, 0, 1, eOutLine)
+
+  test "simple replace command":
+    let inLine = newExtraLineSpecial("")
+    let content = """
+<!--$ replace -->
+replacement block
+<!--$ endblock -->
+"""
+    let eOutLine = newExtraLineNormal("replacement block\n")
+    check testCollectCommand(inLine, content, 0, 1, eOutLine)
+
+  test "$$ prefix":
+    let inLine = newExtraLineSpecial("")
+    let content = """
+$$ block
+replacement block
+$$ endblock
+"""
+    let eOutLine = newExtraLineNormal("replacement block\n")
+    check testCollectCommand(inLine, content, 0, 1, eOutLine)
+
+  test "no ending newline":
+    let inLine = newExtraLineSpecial("")
+    let content = """
+$$ nextline
+replacement block"""
+    let eOutLine = newExtraLineNormal("replacement block")
+    check testCollectCommand(inLine, content, 0, 1, eOutLine)
+
+  test "no replacement block":
+    let inLine = newExtraLineSpecial("")
+    let content = """
+$$ nextline"""
+    let eOutLine = newExtraLineSpecial("outOfLines")
+    check testCollectCommand(inLine, content, 0, 1, eOutLine)
+
+  test "with starting extra line":
+    let inLine = newExtraLineNormal("this is extra\n")
+    let content = """
+$$ block
+replacement block
+$$ endblock
+"""
+    let eOutLine = newExtraLineNormal("replacement block\n")
+    check testCollectCommand(inLine, content, 1, 1, eOutLine, [0])
+
+  test "bare continue command":
+    let inLine = newExtraLineSpecial("")
+    let content = """
+$$ : bare naked
+replacement block
+"""
+    let eOutLine = newExtraLineSpecial("outOfLines")
+    let eErrLines = @["template.html(1): w145: The continue command is not part of a command.\n"]
+    check testCollectCommand(inLine, content, 0, 0, eOutLine, [0, 1],
+      eErrLines = eErrLines)
+
+  test "bare endblock command":
+    let inLine = newExtraLineSpecial("")
+    let content = """
+$$ endblock
+replacement block
+"""
+    let eOutLine = newExtraLineSpecial("outOfLines")
+    let eErrLines = @[
+      "template.html(1): w144: The endblock command does not have a matching block command.\n",
+    ]
+    check testCollectCommand(inLine, content, 0, 0, eOutLine, [0, 1],
+      eErrLines = eErrLines)
+
+
+
+
+
+    # Test in extra line without newline.  What would happen for
+    # binary files.

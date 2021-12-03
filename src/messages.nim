@@ -301,7 +301,7 @@ const
     "Invalid paired surrogate.", ## wPairedSurrogate
     "The replaceMany function failed.", ## wReplaceMany
     "The join list items must be strings.", ## wJoinListString
-    "The endblock command does not have a matching start command.", ## wBareEndblock
+    "The endblock command does not have a matching block command.", ## wBareEndblock
     "The continue command is not part of a command.", ## wBareContinue
     ]
     ## The message text.
