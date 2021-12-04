@@ -16,6 +16,7 @@ import warnings
 import version
 import tostring
 import readlines
+import collectCommand
 
 proc startPointer*(start: Natural): string =
   ## Return a string containing the number of spaces and symbols to
@@ -56,9 +57,9 @@ proc newStrFromBuffer(buffer: seq[uint8]): string =
   for ix in 0 ..< buffer.len:
     result.add((char)buffer[ix])
 
-proc getCmdLineParts(env: var Env, cmdLines: seq[string]): seq[LineParts] =
+proc getCmdLineParts(env: var Env, commandLines: seq[string]): seq[LineParts] =
   ## Return the line parts from the given lines.
-  for ix, line in cmdLines:
+  for ix, line in commandLines:
     let prepostTable = makeDefaultPrepostTable()
     let partsO = parseCmdLine(env, prepostTable, line, lineNum = ix + 1)
     if not partsO.isSome():
@@ -66,9 +67,9 @@ proc getCmdLineParts(env: var Env, cmdLines: seq[string]): seq[LineParts] =
       echo """line: "$1"""" % line
     result.add(partsO.get())
 
-proc getStatements(cmdLines: seq[string], cmdLineParts: seq[LineParts]): seq[Statement] =
+proc getStatements(cmdLines: CmdLines): seq[Statement] =
   ## Return a list of statements for the given lines.
-  for statement in yieldStatements(cmdLines, cmdLineParts):
+  for statement in yieldStatements(cmdLines):
     result.add(statement)
 
 proc stripNewline(line: string): string =
@@ -93,10 +94,11 @@ proc testGetStatements(content: string, expected: string): bool =
   ## Return true when the template content generates the expected statements.
 
   var env = openEnvTest("_getStatements.txt")
-  let cmdLines = splitNewLines(content)
-  let cmdLineParts = getCmdLineParts(env, cmdLines)
+  var cmdLines: CmdLines
+  cmdLines.lines = splitNewLines(content)
+  cmdLines.lineParts = getCmdLineParts(env, cmdLines.lines)
 
-  var statements = getStatements(cmdLines, cmdLineParts)
+  var statements = getStatements(cmdLines)
 
   discard env.readCloseDeleteEnv()
 
@@ -267,9 +269,10 @@ suite "runCommand.nim":
     ], expected)
 
   test "no statements":
-    let cmdLines = @["<!--$ nextline -->\n"]
-    let cmdLineParts = @[newLineParts()]
-    let statements = getStatements(cmdLines, cmdLineParts)
+    var cmdLines: CmdLines
+    cmdLines.lines = @["<!--$ nextline -->\n"]
+    cmdLines.lineParts = @[newLineParts()]
+    let statements = getStatements(cmdLines)
     check statements.len == 0
 
   test "one statement":
@@ -803,7 +806,7 @@ statement: e.server = 343
   test "invalid maxLines":
     let statement = newStatement(text="""t.maxLines = "hello"""", lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w42: Invalid count. It must be a positive integer.
+template.html(1): w42: MaxLines must be an integer greater than 1.
 statement: t.maxLines = "hello"
            ^
 """

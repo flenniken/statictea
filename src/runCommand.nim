@@ -15,6 +15,7 @@ import variables
 import funtypes
 import runFunction
 import readjson
+import collectCommand
 
 type
   State = enum
@@ -139,8 +140,7 @@ proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
 
 
 
-iterator yieldStatements*(cmdLines: seq[string], cmdLineParts:
-    seq[LineParts]): Statement =
+iterator yieldStatements*(cmdLines: CmdLines): Statement =
   ## Iterate through the command's statements.  Statements are
   ## separated by semicolons or newlines and are not empty or all
   ## spaces.
@@ -154,18 +154,16 @@ iterator yieldStatements*(cmdLines: seq[string], cmdLineParts:
   # slash is found. The slash states transition back to their quote
   # state on the next character.
 
-  assert cmdLines.len == cmdLineParts.len
-
   var text = newStringOfCap(defaultMaxLineLen)
   var lineNum: Natural
   var start: Natural
-  if cmdLines.len > 0:
-    lineNum = cmdLineParts[0].lineNum
-    start = cmdLineParts[0].middleStart
+  if cmdLines.lines.len > 0:
+    lineNum = cmdLines.lineParts[0].lineNum
+    start = cmdLines.lineParts[0].middleStart
   var state = State.start
-  for ix in 0 ..< cmdLines.len:
-    let line = cmdLines[ix]
-    let lp = cmdLineParts[ix]
+  for ix in 0 ..< cmdLines.lines.len:
+    let line = cmdLines.lines[ix]
+    let lp = cmdLines.lineParts[ix]
     for pos in lp.middleStart ..< lp.middleStart+lp.middleLen:
       let ch = line[pos]
       if state == State.start:
@@ -202,9 +200,9 @@ iterator yieldStatements*(cmdLines: seq[string], cmdLineParts:
         yield newStatement(text, lineNum, start)
       # Setup variables for the next line, if there is one.
       text.setLen(0)
-      if cmdLines.len > ix+1:
+      if cmdLines.lines.len > ix+1:
         lineNum = lp.lineNum + 1
-        start = cmdLineParts[ix+1].middleStart
+        start = cmdLines.lineParts[ix+1].middleStart
 
   if notEmptyOrSpaces(text):
     yield newStatement(text, lineNum, start)
@@ -453,9 +451,8 @@ proc runStatement*(env: var Env, statement: Statement,
   # Return the variable and value for testing.
   result = some(newVariableData(dotNameStr, value))
 
-proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
-                 seq[LineParts], prepostTable: PrepostTable,
-                 variables: var Variables) =
+proc runCommand*(env: var Env, cmdLines: CmdLines, prepostTable: PrepostTable,
+    variables: var Variables) =
   ## Run a command and fill in the variables dictionaries.
 
   # Clear the local variables and set the tea vars to their initial
@@ -463,7 +460,7 @@ proc runCommand*(env: var Env, cmdLines: seq[string], cmdLineParts:
   resetVariables(variables)
 
   # Loop over the statements and run each one.
-  for statement in yieldStatements(cmdLines, cmdLineParts):
+  for statement in yieldStatements(cmdLines):
     # Run the statement and assign a variable.  When there is a
     # statement error, the statement is skipped.
     discard runStatement(env, statement, prepostTable, variables)

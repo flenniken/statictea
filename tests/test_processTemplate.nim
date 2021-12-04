@@ -12,6 +12,17 @@ import variables
 import vartypes
 import tables
 
+iterator yieldContentLine*(content: string): string =
+  ## Yield one content line at a time and keep the line endings.
+  var start = 0
+  for pos in 0 ..< content.len:
+    let ch = content[pos]
+    if ch == '\n':
+      yield(content[start .. pos])
+      start = pos+1
+  if start < content.len:
+    yield(content[start ..< content.len])
+
 proc testGetTeaArgs(args: Args, eJson: string): bool =
   let value = getTeaArgs(args)
   let valueStr = $value
