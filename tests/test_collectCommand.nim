@@ -32,6 +32,7 @@ proc testCollectCommand(
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[],
+    replaceOnly: bool = false,
   ): bool =
 
   var inStream = newStringStream(content)
@@ -45,7 +46,11 @@ proc testCollectCommand(
   let eResultLines = splitContentPick(totalContent, eResultPickedLines)
   var inOutExtraLine = inExtraLine
 
-  let cmdLines = collectCommand(env, lb, prepostTable, inOutExtraLine)
+  var cmdLines: CmdLines
+  if replaceOnly:
+    cmdLines = collectReplaceCommand(env, lb, prepostTable, inOutExtraLine)
+  else:
+    cmdLines = collectCommand(env, lb, prepostTable, inOutExtraLine)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines,
     eResultLines)
@@ -215,6 +220,15 @@ replacement block
     let eOutLine = newNormalLine("replacement block\n")
     check testCollectCommand(inLine, content, 0, 1, eOutLine)
 
+  test "empty block command":
+    let inLine = newNoLine()
+    let content = """
+<!--$ block -->
+<!--$ endblock -->
+"""
+    let eOutLine = newNormalLine("<!--$ endblock -->\n")
+    check testCollectCommand(inLine, content, 0, 1, eOutLine)
+
   test "simple replace command":
     let inLine = newNoLine()
     let content = """
@@ -320,4 +334,52 @@ replacement block
     let content = ""
     let eOutLine = newOutOfLines()
     check testCollectCommand(inLine, content, 0, 1, eOutLine)
+
+  test "collect replace":
+    let inLine = newNoLine()
+    let content = """
+$$ replace
+replacement block
+$$ endblock
+"""
+    let eOutLine = newNormalLine("replacement block\n")
+    check testCollectCommand(inLine, content, 0, 1, eOutLine, replaceOnly = true)
+
+  test "collect replace but not others":
+    let inLine = newNoLine()
+    let content = """
+others
+$$ nextline
+replacement block
+$$ block
+$$ endblock
+$$ replace
+replacement block
+$$ endblock
+end
+"""
+    let eOutLine = newNormalLine("replacement block\n")
+    check testCollectCommand(inLine, content, 5, 1, eOutLine, [0,1,2,3,4], replaceOnly = true)
+
+  test "collect replace out of lines":
+    let inLine = newNoLine()
+    let content = """
+$$ block
+replacement block
+$$ endblock
+"""
+    let eOutLine = newOutOfLines()
+    check testCollectCommand(inLine, content, 0, 0, eOutLine, [0,1,2], replaceOnly = true)
+
+  test "collect replace again":
+    let inLine = newNoLine()
+    let content = """
+$$ block
+replacement block
+$$ replace
+$$ replace
+$$ endblock
+"""
+    let eOutLine = newOutOfLines()
+    check testCollectCommand(inLine, content, 0, 0, eOutLine, [0,1,2,3,4], replaceOnly = true)
 

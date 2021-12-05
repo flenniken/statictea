@@ -55,6 +55,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     runCommand(env, cmdLines, prepostTable, variables)
 
     # Fill in the replacement block and return the line after it.
+    let command = cmdLines.lineParts[0].command
     fillReplacementBlock(env, lb, command, variables, inOutExtraLine)
 
 proc updateTemplateLines(env: var Env, variables: var Variables,
@@ -71,7 +72,7 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
   template to standard out. ]#
 
   # Allocate a buffer for reading lines. Return when no enough memory.
-  lb = getNewLineBuffer(env)
+  var lb = getNewLineBuffer(env)
 
   # Read and process template lines.
   var inOutExtraLine: ExtraLine
