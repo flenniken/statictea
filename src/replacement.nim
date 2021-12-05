@@ -1,91 +1,5 @@
 ## Handle the replacement block lines.
 
-# The replacement block may consist of many lines and the block may
-# repeat many times.
-#
-# If the block only repeats once, you can make one pass through the file
-# reading the lines and making variable replacements as you go.
-#
-# To support multiple repeating blocks you could read all the lines into
-# memory but that requires too much memory for big blocks with long
-# lines.
-#
-# You could make multiple passes over the block, once for each repeat by
-# seeking back in the template. However, that doesn't work for the stdin
-# stream.
-#
-# What we do is read the lines from the template, compile them and store
-# them in a temp file in a format that is easy to write out.
-#
-# The temp file consists of parts of lines called segments. There are
-# segments for strings and segments for variables.
-#
-# Segment types:
-#
-# * 0 string segment without ending newline
-# * 1 string segment with ending newline
-# * 2 variable segment
-# * 3 string segment that ends a line without a newline
-# * 4 variable segment that ends a line without a newline
-#
-# For the example replacement block:
-#
-# Test segments
-# {s.tea}
-# This is a test { s.name } line\n
-# Second line {h.tea}  \r\n
-# third {variable} test\n
-#
-# It gets saved to the temp file as shown below. The underscores show
-# ending spaces. Each line ends with a newline that's not shown.
-#
-# 1,Test segments
-# 3,1   ,5   ,{s.tea}
-# 0,This is a test_
-# 2,2   ,6   ,{ s.name }
-# 1, line
-# 0,Second line_
-# 2,1   ,5   ,{h.tea}
-# 1,  \r
-# 0,third_
-# 2,1   ,8   ,{variable}
-# 1, test
-#
-# A string segment starts with the segment type number 0 or 1. A type
-# 1 segment means the template text ends with a new line and a type 0
-# segment means the template text does not end with a new line.  After
-# the type digit is a comma followed the string from the line followed
-# by a newline.
-#
-# All segments end with a newline, whether it exists in the template
-# or not. If a template line uses cr/lf, the segment will end with
-# cr/lf. The segment number tells you whether to write out the ending
-# newline or not to the result file. The template line endings are
-# preserved in the result.
-#
-# Segment text is utf8. The bracketed variables are ascii but the
-# strings are utf8 encoded.
-#
-# A variable segment, type 2 and 3 are similar to the string segments
-# that type 2 does not end with a new line and 3 does.  The variable
-# segment contains the bracketed variable as it exists in the
-# replacement block with the brackets and leading and trailing white
-# if any, i.e., "{ t.row }".  The segment starts with two numbers
-# telling where the variable dotNameStr starts and its length. The variable
-# segment numbers are left aligned and padded with spaces so the
-# bracketed text part always starts at the same index.
-#
-# Variable Segments:
-#
-# * first number is 2 or 3.
-#
-# * second number is the index where the variable starts. There are
-#   four digits reserved for it to account for the maximum line length
-#   of about 1k. A variable can have a lot of padding. {      var      }.
-#
-# * The third number is the length of the variable dotNameStr. There are 4
-#   digits reserved for it since a variable's maximum length is about 1k.
-
 import std/options
 import std/streams
 import std/strformat
@@ -101,6 +15,86 @@ import variables
 import tempFile
 import parseNumber
 import tostring
+import collectCommand
+
+#[
+
+To support replacement blocks that consists of many lines and the
+blocks that repeat many times, we read the replacement block and
+compile it to a format that is easy to write out and store it in a
+temp file.
+
+The temporary file consists of parts of lines called segments. There
+are segments for strings and segments for variables.
+
+Segment types:
+
+* 0 string segment without ending newline
+* 1 string segment with ending newline
+* 2 variable segment
+* 3 string segment that ends a line without a newline
+* 4 variable segment that ends a line without a newline
+
+For the example replacement block:
+
+Test segments
+{s.tea}
+This is a test { s.name } line\n
+Second line {h.tea}  \r\n
+third {variable} test\n
+
+It gets saved to the temp file as shown below. The underscores show
+ending spaces. Each line ends with a newline that's not shown.
+
+1,Test segments
+3,1   ,5   ,{s.tea}
+0,This is a test_
+2,2   ,6   ,{ s.name }
+1, line
+0,Second line_
+2,1   ,5   ,{h.tea}
+1,  \r
+0,third_
+2,1   ,8   ,{variable}
+1, test
+
+A string segment starts with the segment type number 0 or 1. A type
+1 segment means the template text ends with a new line and a type 0
+segment means the template text does not end with a new line.  After
+the type digit is a comma followed the string from the line followed
+by a newline.
+
+All segments end with a newline, whether it exists in the template
+or not. If a template line uses cr/lf, the segment will end with
+cr/lf. The segment number tells you whether to write out the ending
+newline or not to the result file. The template line endings are
+preserved in the result.
+
+Segment text are bytes. The bracketed variables are ascii.
+
+A variable segment, type 2 and 3 are similar to the string segments
+that type 2 does not end with a new line and 3 does.  The variable
+segment contains the bracketed variable as it exists in the
+replacement block with the brackets and leading and trailing white if
+any, i.e., "{ t.row }".  The segment starts with two numbers telling
+where the variable dotNameStr starts and its length. The variable
+segment numbers are left aligned and padded with spaces so the
+bracketed text part always starts at the same index.
+
+Variable Segments:
+
+* first number is 2 or 3.
+
+* second number is the index where the variable starts. There are four
+ digits reserved for it to account for the maximum line length of
+ about 1k. A variable can have a lot of padding. { var }.
+
+* The third number is the length of the variable dotNameStr. There are
+ 4 digits reserved for it since a variable's maximum length is about
+ 1k.
+
+]#
+
 
 type
   SegmentType = enum
@@ -471,29 +465,6 @@ proc newTempSegments*(env: var Env, lb: var LineBuffer, prepostTable: PrepostTab
     return
 
 
-    # var cmdLines: seq[string] = @[]
-    # var cmdLineParts: seq[LineParts] = @[]
-
-    # Run the commands that are allowed statements and skip the others.
-    # let command = cmdLineParts[0].command
-    # if not (command in ["nextline", "block", "replace"]):
-    #   # The command was one of these: endblock, : continue, # comment.
-    #   if command == "#":
-    #     continue
-    #   var warning: MessageId
-    #   if command == "endblock":
-    #     warning = wBareEndblock
-    #   else:
-    #     warning = wBareContinue
-    #   env.warn(lb.getLineNum()-1, warning)
-    #   continue
-
-    # # Show a warning when the replace command does not have t.content
-    # # set.
-    # if command == "replace" and not tea.contains("content"):
-    #   # lineNum-1 because the current line number is at the first
-    #   # replacement line.
-    #   env.warn(lb.getLineNum()-1, wContentNotSet)
 
     # If repeat is 0, read the replacement lines and the endblock and
     # # discard them.
@@ -574,16 +545,21 @@ proc newTempSegments*(env: var Env, lb: var LineBuffer, prepostTable: PrepostTab
     # var maxLines = getTeaVarIntDefault(variables, "maxLines")
 
 
-proc dumpCmdLines*(resultStream: Stream, cmdLines: var seq[string],
-                  cmdLineParts: var seq[LineParts], line: string) =
-  ## Write the stored command lines and the current line to the result
-  ## stream and empty the stored commands.
-  for cmdline in cmdLines:
-    resultStream.write(cmdline)
-  if line != "":
-    resultStream.write(line)
-  cmdLines.setlen(0)
-  cmdLineParts.setlen(0)
+
+proc fileNextlineReplacementBlock*(env: Env, lb: LineBuffer,
+    variables: Variables, inOutExtraLine: var ExtraLine) =
+  ## Fill in the nextline command's replacement block and return the
+  ## line after it.
+
+proc fillReplaceReplacementBlock*(env: Env, lb: LineBuffer,
+    variables: Variables, inOutExtraLine: var ExtraLine) =
+  ## Fill in the nextline command's replacement block and return the
+  ## line after it.
+
+proc fillBlockReplacementBlock*(env: Env, lb: LineBuffer,
+    variables: Variables, inOutExtraLine: var ExtraLine) =
+  ## Fill in the nextline command's replacement block and return the
+  ## line after it.
 
 
 
@@ -593,22 +569,19 @@ proc fillReplacementBlock*(env: Env, lb: LineBuffer,
   ## Fill in the replacement block and return the line after it.
 
 
-  # Treat a replace command without content as a block command.
-  var command: string
-  if cmdLines.command == ckReplace and not tea.contains("content"):
-    # The replace command doesn't set content, treating it as a
-    # block command.
-    env.warn(0, wContentNotSet)
-    command = ckBlock
-  else:
-    command = cmdLines.command
+  # if command == "replace" and not variables["t"].dictv.contains("content"):
+  #   # The t.content variable is not set for the replace command,
+  #   # treating it like the block command."
+  #   env.warn(0, wContentNotSet)
+  #   command = "block"
 
   case command:
-    of ftcReplace:
-      fillReplaceCommand(inOutExtraLine)
-    of ftcBlock:
-      fillBlockCommand(inOutExtraLine)
-    of ftcNextline:
-      fillNextLineCommand(inOutExtraLine)
-  if inOutExtraLine.noMoreLines:
-    break
+    of "nextline":
+      fileNextlineReplacementBlock(env, lb, variables, inOutExtraLine)
+    of "replace":
+      fillReplaceReplacementBlock(env, lb, variables, inOutExtraLine)
+    of "block":
+      fillBlockReplacementBlock(env, lb, variables, inOutExtraLine)
+    else:
+      assert(command == "Unexpected command")
+      discard

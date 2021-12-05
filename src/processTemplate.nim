@@ -15,13 +15,7 @@ import runCommand
 import variables
 import vartypes
 import readjson
-# import replacement
-
-proc fillReplacementBlock*(env: Env, lb: LineBuffer,
-    command: string, variables: Variables,
-    inOutExtraLine: var ExtraLine) =
-  ## Fill in the replacement block and return the line after it.
-  # dummy do nothing temp proc.
+import replacement
 
 template getNewLineBuffer(env: Env): untyped =
   ## Get a new line buffer for the environment's template.
@@ -39,7 +33,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
                           prepostTable: PrepostTable) =
   ## Process the given template file lines.
 
-  # Allocate a buffer for reading lines. Return when no enough memory.
+  # Allocate a buffer for reading lines. Return when not enough memory.
   var lb = getNewLineBuffer(env)
 
   # Read and process template lines.
@@ -57,6 +51,11 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     # Fill in the replacement block and return the line after it.
     let command = cmdLines.lineParts[0].command
     fillReplacementBlock(env, lb, command, variables, inOutExtraLine)
+    if inOutExtraLine.kind == elkOutOfLines:
+      break
+
+proc updateReplacementBlock(inOutExtraLine: var ExtraLine) =
+  return
 
 proc updateTemplateLines(env: var Env, variables: var Variables,
     prepostTable: PrepostTable) =
@@ -81,7 +80,7 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
     # replace command is found, collect its lines and return them.
     # ExtraLine is an input and output parameter.
     var cmdLines = collectReplaceCommand(env, lb, prepostTable, inOutExtraLine)
-    if cmdLines.noMoreLines:
+    if inOutExtraLine.kind == elkOutOfLines:
       break
 
     # Run the replace command to set the content variable.
@@ -90,7 +89,7 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
     # Update the replacement block with lines from the content
     # variable. ExtraLine is an input and output parameter.
     updateReplacementBlock(inOutExtraLine)
-    if inOutExtraLine.noMoreLines:
+    if inOutExtraLine.kind == elkOutOfLines:
       break
 
 proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
