@@ -331,7 +331,7 @@ template.html(4): w58: The replacement variable doesn't exist: tea2.
     check testProcessTemplate(templateContent = templateContent, eRc = 1, eResultLines
           = eResultLines, eErrLines = eErrLines)
 
-  test "readme commands in a replacement block":
+  test "readme: commands in a replacement block":
 
     let templateContent = """
 <!--$ block -->
@@ -1419,12 +1419,12 @@ $$ endblock
       "one\n",
       "two\n",
       "three\n",
-      "$$ endblock",
+      "$$ endblock\n",
     ]
     check testProcessTemplate(templateContent = templateContent,
                               eResultLines = eResultLines, eRc = 1)
 
-  test "one less than maxLines":
+  test "one less than maxLines 2":
     let templateContent = """
 $$ block t.maxLines = 2
 one
@@ -1447,11 +1447,12 @@ last line
     let eResultLines = @[
       "one\n",
       "two\n",
+      "last line\n",
     ]
     check testProcessTemplate(templateContent = templateContent,
         eResultLines = eResultLines)
 
-  test "one more than maxLines":
+  test "one more than maxLines 4":
     let templateContent = """
 $$ block t.maxLines = 2
 one
@@ -1463,11 +1464,15 @@ $$ endblock
       "one\n",
       "two\n",
       "three\n",
-      "$$ endblock",
+      "$$ endblock\n",
     ]
-    check testProcessTemplate(templateContent = templateContent,
-      eResultLines = eResultLines, eRc = 1)
 
+    let eErrLines = @[
+      "template.html(5): w144: The endblock command does not have a matching block command.\n"
+    ]
+
+    check testProcessTemplate(templateContent = templateContent,
+      eResultLines = eResultLines, eErrLines = eErrLines, eRc = 1)
 
 # todo: test literal strings with \n etc. in them.  Are these supported?
 # todo: test with no result file.

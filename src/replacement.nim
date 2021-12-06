@@ -4,6 +4,7 @@ import std/options
 import std/streams
 import std/strformat
 import std/strutils
+import std/tables
 import regexes
 import env
 import vartypes
@@ -17,83 +18,80 @@ import parseNumber
 import tostring
 import collectCommand
 
-#[
 
-To support replacement blocks that consists of many lines and the
-blocks that repeat many times, we read the replacement block and
-compile it to a format that is easy to write out and store it in a
-temp file.
+# To support replacement blocks that consists of many lines and blocks
+# that repeat many times, we read the replacement block and compile it
+# to a format that is easy to write out and store it in a temp file.
 
-The temporary file consists of parts of lines called segments. There
-are segments for strings and segments for variables.
+# The temporary file consists of parts of lines called segments. There
+# are segments for strings and segments for variables.
 
-Segment types:
+# Segment types:
 
-* 0 string segment without ending newline
-* 1 string segment with ending newline
-* 2 variable segment
-* 3 string segment that ends a line without a newline
-* 4 variable segment that ends a line without a newline
+# * 0 string segment without ending newline
+# * 1 string segment with ending newline
+# * 2 variable segment
+# * 3 string segment that ends a line without a newline
+# * 4 variable segment that ends a line without a newline
 
-For the example replacement block:
+# For the example replacement block:
 
-Test segments
-{s.tea}
-This is a test { s.name } line\n
-Second line {h.tea}  \r\n
-third {variable} test\n
+# Test segments
+# {s.tea}
+# This is a test { s.name } line\n
+# Second line {h.tea}  \r\n
+# third {variable} test\n
 
-It gets saved to the temp file as shown below. The underscores show
-ending spaces. Each line ends with a newline that's not shown.
+# It gets saved to the temp file as shown below. The underscores show
+# ending spaces. Each line ends with a newline that's not shown.
 
-1,Test segments
-3,1   ,5   ,{s.tea}
-0,This is a test_
-2,2   ,6   ,{ s.name }
-1, line
-0,Second line_
-2,1   ,5   ,{h.tea}
-1,  \r
-0,third_
-2,1   ,8   ,{variable}
-1, test
+# 1,Test segments
+# 3,1   ,5   ,{s.tea}
+# 0,This is a test_
+# 2,2   ,6   ,{ s.name }
+# 1, line
+# 0,Second line_
+# 2,1   ,5   ,{h.tea}
+# 1,  \r
+# 0,third_
+# 2,1   ,8   ,{variable}
+# 1, test
 
-A string segment starts with the segment type number 0 or 1. A type
-1 segment means the template text ends with a new line and a type 0
-segment means the template text does not end with a new line.  After
-the type digit is a comma followed the string from the line followed
-by a newline.
+# A string segment starts with the segment type number 0 or 1. A type
+# 1 segment means the template text ends with a new line and a type 0
+# segment means the template text does not end with a new line.  After
+# the type digit is a comma followed the string from the line followed
+# by a newline.
 
-All segments end with a newline, whether it exists in the template
-or not. If a template line uses cr/lf, the segment will end with
-cr/lf. The segment number tells you whether to write out the ending
-newline or not to the result file. The template line endings are
-preserved in the result.
+# All segments end with a newline, whether it exists in the template
+# or not. If a template line uses cr/lf, the segment will end with
+# cr/lf. The segment number tells you whether to write out the ending
+# newline or not to the result file. The template line endings are
+# preserved in the result.
 
-Segment text are bytes. The bracketed variables are ascii.
+# Segment text are bytes. The bracketed variables are ascii.
 
-A variable segment, type 2 and 3 are similar to the string segments
-that type 2 does not end with a new line and 3 does.  The variable
-segment contains the bracketed variable as it exists in the
-replacement block with the brackets and leading and trailing white if
-any, i.e., "{ t.row }".  The segment starts with two numbers telling
-where the variable dotNameStr starts and its length. The variable
-segment numbers are left aligned and padded with spaces so the
-bracketed text part always starts at the same index.
+# A variable segment, type 2 and 3 are similar to the string segments
+# that type 2 does not end with a new line and 3 does.  The variable
+# segment contains the bracketed variable as it exists in the
+# replacement block with the brackets and leading and trailing white if
+# any, i.e., "{ t.row }".  The segment starts with two numbers telling
+# where the variable dotNameStr starts and its length. The variable
+# segment numbers are left aligned and padded with spaces so the
+# bracketed text part always starts at the same index.
 
-Variable Segments:
+# Variable Segments:
 
-* first number is 2 or 3.
+# * first number is 2 or 3.
 
-* second number is the index where the variable starts. There are four
- digits reserved for it to account for the maximum line length of
- about 1k. A variable can have a lot of padding. { var }.
+# * second number is the index where the variable starts. There are four
+#  digits reserved for it to account for the maximum line length of
+#  about 1k. A variable can have a lot of padding. { var }.
 
-* The third number is the length of the variable dotNameStr. There are
- 4 digits reserved for it since a variable's maximum length is about
- 1k.
+# * The third number is the length of the variable dotNameStr. There are
+#  4 digits reserved for it since a variable's maximum length is about
+#  1k.
 
-]#
 
 
 type
@@ -289,11 +287,11 @@ func parseVarSegment*(segment: string): string =
   let dotNameStrLen = parseInteger(segment, 7).get().integer
   result = segment[dotNameStrPos ..< dotNameStrPos + dotNameStrLen]
 
-proc getSegmentString(env: var Env, lineNum: Natural, variables: Variables, segment: string):
-    tuple[kind: SegmentType, str: string] =
-  ## Return the segment's type and string with the variables
-  ## substituted. If a variable is missing, write a warning message
-  ## and return the string as is.
+proc substituteSegment(env: var Env, lineNum: Natural, variables: Variables,
+    segment: string): tuple[kind: SegmentType, str: string] =
+  ## Substitute variables in a segment and return the filled in
+  ## segment and its type.  If a variable is missing, write a warning
+  ## message and return the string as is.
 
   # Get the segment type from the first character of the segment.
   let segmentType = SegmentType(ord(segment[0]) - 0x30)
@@ -370,7 +368,7 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
     if segment[0] == '1':
       inc(rLineNum)
 
-    let (kind, segString) = getSegmentString(env, rLineNum, variables, segment)
+    let (kind, segString) = substituteSegment(env, rLineNum, variables, segment)
 
     line.add(segString)
 
@@ -420,7 +418,8 @@ proc storeLineSegments*(env: var Env, tempSegments: TempSegments,
     tempSegments.tempFile.file.write(segment)
 
 iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
-    LineBuffer, prepostTable: PrepostTable, command: string, maxLines: Natural): ReplaceLine =
+    LineBuffer, prepostTable: PrepostTable, command: string,
+    maxLines: Natural): ReplaceLine =
   ## Yield all the replacement block lines and one after.
 
   if firstReplaceLine != "":
@@ -465,123 +464,157 @@ proc newTempSegments*(env: var Env, lb: var LineBuffer, prepostTable: PrepostTab
     return
 
 
+# proc writeReplacementLine(env: var Env, variables: Variables, line: string) =
+#   ## Write out the replacement block line to the location determined
+#   ## by the t.output.
 
-    # If repeat is 0, read the replacement lines and the endblock and
-    # # discard them.
-    # if repeat == 0:
-    #   for replaceLine in yieldReplacementLine(env,
-    #       firstReplaceLine, lb, prepostTable, command, maxLines):
-    #     discard
-    #   # todo: handle the last line.
-    #   firstReplaceLine = ""
-    #   continue
+#   # Determine where to write the result.
+#   var log: bool
+#   var output = getTeaVarStringDefault(variables, "output")
+#   var stream: Stream
+#   case output
+#   of "result":
+#     # The block output goes to the result file (default).
+#     stream = env.resultStream
+#   of "stderr":
+#     # The block output goes to standard error.
+#     stream = env.errStream
+#   of "log":
+#     # The block output goes to the log file.
+#     log = true
+#   # of "skip":
+#   #   # The block is skipped.
+#   #   return
+#   else:
+#     return
 
-    # # Create a new TempSegments object for storing segments.
-    # var startLineNum = lb.getLineNum()
-    # var tempSegmentsO = newTempSegments(env, lb, prepostTable,
-    #                                     command, repeat, variables)
-    # if not isSome(tempSegmentsO):
-    #   break # Cannot create temp file or allocate memory, quit.
-    # var tempSegments = tempSegmentsO.get()
+#   # Write out completed lines.
+#   if log:
+#     env.log(line)
+#   else:
+#     stream.write(line)
 
-    # var lastLine: ReplaceLine
+proc fillNextlineReplacementBlock(env: var Env, lb: LineBuffer,
+    prepostTable: PrepostTable, variables: Variables,
+    inOutExtraLine: var ExtraLine) =
+  ## Fill in the nextline command's replacement block.
 
+  # if inOutExtraLine.kind != elkNormalLine:
+  #   return
 
+  # inOutExtraLine = newNoLine()
 
-    #   # Read the replacement lines and the line after.
-    #   # Discard the replacement block lines and the endblock.
-    #   for replaceLine in yieldReplacementLine(env, firstReplaceLine,
-    #       lb, prepostTable, command, maxLines):
-    #     lastLine = replaceLine
-    #   # Use the content as the replacement lines.
-    #   var content = getVariable(variables, "t.content").value.stringv
-    #   for line in yieldContentLine(content):
-    #     storeLineSegments(env, tempSegments, prepostTable, line)
-    # else:
-    #   # Read the replacement lines and the line after. Store the
-    #   # replacement lines in compiled segments in TempSegments.
-    #   for replaceLine in yieldReplacementLine(env,
-    #       firstReplaceLine, lb, prepostTable, command, maxLines):
-    #     lastLine = replaceLine
-    #     if replaceLine.kind == rlReplaceLine:
-    #       storeLineSegments(env, tempSegments, prepostTable, replaceLine.line)
+  # let repeat = getTeaVarIntDefault(variables, "repeat")
+  # if repeat == 0:
+  #   return
 
-    # # Generate t.repeat number of replacement blocks. Recalculate the
-    # # variables for each one.
-    # var tea = variables["t"].dictv
-    # while true:
-    #   # Write out all the stored replacement block lines and make the
-    #   # variable substitutions.
-    #   writeTempSegments(env, tempSegments, startLineNum, variables)
+  # var line: string
+  # let segments = lineToSegments(prepostTable, inOutExtraLine.line)
+  # for segment in segments:
+  #   let (_, segString) = substituteSegment(env, lb.getLineNum(), variables, segment)
+  #   line.add(segString)
 
-    #   # Increment the row variable.
-    #   inc(row)
-    #   if row >= repeat:
-    #     break
-    #   tea["row"] = newValue(row)
+  # writeReplacementLine(env, variables, line)
+  # inOutExtraLine = newNoLine()
 
-    #   # Run the command and fill in the variables.
-    #   runCommand(env, cmdLines, cmdLineParts, prepostTable,
-    #              variables)
+proc fillReplaceReplacementBlock(env: var Env, lb: LineBuffer,
+    prepostTable: PrepostTable, variables: Variables,
+    inOutExtraLine: var ExtraLine) =
+  ## Fill in the replace command's replacement block and return the
+  ## line after it.
 
-    # closeDelete(tempSegments)
+proc fillBlockReplacementBlock(env: var Env, lb: LineBuffer,
+    prepostTable: PrepostTable, variables: Variables,
+    inOutExtraLine: var ExtraLine) =
+  ## Fill in the block command's replacement block and return the
+  ## line after it.
 
-
-
-    # if lastLine.kind == rlNormalLine:
-    #   # todo: feed the line back into the collectCommand function in
-    #   # the loop instead.
-    #   env.resultStream.write(lastLine.line)
-    # # rlEndBlockLine, rlReplaceLine, rlNoLine:
-
-    # firstReplaceLine = ""
+  # let repeat = getTeaVarIntDefault(variables, "repeat")
+  # var maxLines = getTeaVarIntDefault(variables, "maxLines")
 
 
+  # # If repeat is 0, read the replacement lines and the endblock and
+  # # discard them.
+  # if repeat == 0:
+  #   for replaceLine in yieldReplacementLine(env,
+  #       firstReplaceLine, lb, prepostTable, command, maxLines):
+  #     discard
+  #   # todo: handle the last line.
+  #   firstReplaceLine = ""
+  #   continue
+
+  # # Create a new TempSegments object for storing segments.
+  # var startLineNum = lb.getLineNum()
+  # var tempSegmentsO = newTempSegments(env, lb, prepostTable,
+  #                                     command, repeat, variables)
+  # if not isSome(tempSegmentsO):
+  #   break # Cannot create temp file or allocate memory, quit.
+  # var tempSegments = tempSegmentsO.get()
+
+  # var lastLine: ReplaceLine
+
+
+
+  #   # Read the replacement lines and the line after.
+  #   # Discard the replacement block lines and the endblock.
+  #   for replaceLine in yieldReplacementLine(env, firstReplaceLine,
+  #       lb, prepostTable, command, maxLines):
+  #     lastLine = replaceLine
+  #   # Use the content as the replacement lines.
+  #   var content = getVariable(variables, "t.content").value.stringv
+  #   for line in yieldContentLine(content):
+  #     storeLineSegments(env, tempSegments, prepostTable, line)
+  # else:
+  #   # Read the replacement lines and the line after. Store the
+  #   # replacement lines in compiled segments in TempSegments.
+  #   for replaceLine in yieldReplacementLine(env,
+  #       firstReplaceLine, lb, prepostTable, command, maxLines):
+  #     lastLine = replaceLine
+  #     if replaceLine.kind == rlReplaceLine:
+  #       storeLineSegments(env, tempSegments, prepostTable, replaceLine.line)
+
+  # # Generate t.repeat number of replacement blocks. Recalculate the
+  # # variables for each one.
   # var tea = variables["t"].dictv
-    # var row = 0
-    # tea["row"] = newValue(0)
+  # while true:
+  #   # Write out all the stored replacement block lines and make the
+  #   # variable substitutions.
+  #   writeTempSegments(env, tempSegments, startLineNum, variables)
 
-    # let repeat = getTeaVarIntDefault(variables, "repeat")
-    # var maxLines = getTeaVarIntDefault(variables, "maxLines")
+  #   # Increment the row variable.
+  #   inc(row)
+  #   if row >= repeat:
+  #     break
+  #   tea["row"] = newValue(row)
 
+  #   # Run the command and fill in the variables.
+  #   runCommand(env, cmdLines, cmdLineParts, prepostTable,
+  #              variables)
 
-
-proc fileNextlineReplacementBlock*(env: Env, lb: LineBuffer,
-    variables: Variables, inOutExtraLine: var ExtraLine) =
-  ## Fill in the nextline command's replacement block and return the
-  ## line after it.
-
-proc fillReplaceReplacementBlock*(env: Env, lb: LineBuffer,
-    variables: Variables, inOutExtraLine: var ExtraLine) =
-  ## Fill in the nextline command's replacement block and return the
-  ## line after it.
-
-proc fillBlockReplacementBlock*(env: Env, lb: LineBuffer,
-    variables: Variables, inOutExtraLine: var ExtraLine) =
-  ## Fill in the nextline command's replacement block and return the
-  ## line after it.
+  # closeDelete(tempSegments)
 
 
-
-proc fillReplacementBlock*(env: Env, lb: LineBuffer,
-    command: string, variables: Variables,
+proc fillReplacementBlock*(env: var Env, lb: LineBuffer, command: string,
+    prepostTable: PrepostTable, variables: Variables,
     inOutExtraLine: var ExtraLine) =
   ## Fill in the replacement block and return the line after it.
 
+  var cmd = command
+  if command == "replace":
+    let tea = variables["t"].dictv
+    if not tea.contains("content"):
+      # The t.content variable is not set for the replace command,
+      # treating it like the block command."
+      env.warn(0, wContentNotSet)
+      cmd = "block"
 
-  # if command == "replace" and not variables["t"].dictv.contains("content"):
-  #   # The t.content variable is not set for the replace command,
-  #   # treating it like the block command."
-  #   env.warn(0, wContentNotSet)
-  #   command = "block"
-
-  case command:
+  case cmd:
     of "nextline":
-      fileNextlineReplacementBlock(env, lb, variables, inOutExtraLine)
+      fillNextlineReplacementBlock(env, lb, prepostTable, variables, inOutExtraLine)
     of "replace":
-      fillReplaceReplacementBlock(env, lb, variables, inOutExtraLine)
+      fillReplaceReplacementBlock(env, lb, prepostTable, variables, inOutExtraLine)
     of "block":
-      fillBlockReplacementBlock(env, lb, variables, inOutExtraLine)
+      fillBlockReplacementBlock(env, lb, prepostTable, variables, inOutExtraLine)
     else:
-      assert(command == "Unexpected command")
+      assert(cmd == "Unexpected command")
       discard
