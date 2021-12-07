@@ -375,6 +375,9 @@ block is one line.
 The block contains any number of bracketed variables for
 substitution.
 
+Each string variable gets replaced with it value. The other
+variable types get replace with their json equivalent.
+
 You can repeat the block to make lists and other repeating
 content. You control how many times the block repeats with the
 t.repeat variable.  The t.row counts the number of times the
@@ -606,8 +609,9 @@ in the g dictionary.
     :CUSTOM_ID: tea-variables
     :END:
 
-The tea variables control how the replacement block works.
-They are stored in the t dictionary.
+The tea variables control how the replacement block works and
+they provide information about the system.  They are stored in
+the t dictionary.
 
 Tea variables:
 
@@ -801,7 +805,8 @@ template:
 <!--$ nextline t.repeat=len(s.companyList) -->
 <!--$ : d = get(s.companyList, t.row) -->
 <!--$ : selected = get(d.company, "selected", 0) -->
-<!--$ : current=if(selected, " selected=\"selected\"", "") -->
+<!--$ : current = if0(selected, "", +-->
+<!--$ :   " selected=\"selected\"") -->
 <option{current}>{d.company}</option>
 </select>
 #+END_SRC
