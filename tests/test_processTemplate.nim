@@ -1288,31 +1288,7 @@ statement: t.maxLines = 0
     check testProcessTemplate(templateContent = templateContent, eErrLines = eErrLines,
       eResultLines = eResultLines, eRc = 1)
 
-  test "one less than maxLines":
-    let templateContent = """
-$$ block t.maxLines = 2
-one
-$$ endblock
-"""
-    let eResultLines = @[
-      "one\n",
-    ]
-    check testProcessTemplate(templateContent = templateContent,
-        eResultLines = eResultLines)
 
-  test "match maxLines":
-    let templateContent = """
-$$ block t.maxLines = 2
-one
-two
-$$ endblock
-"""
-    let eResultLines = @[
-      "one\n",
-      "two\n",
-    ]
-    check testProcessTemplate(templateContent = templateContent,
-        eResultLines = eResultLines)
 
   test "more than maxLines":
     let templateContent = """
@@ -1327,132 +1303,19 @@ end of file
       "0 one\n",
       "0 two\n",
       "{t.row} three\n",
+      "$$ endblock\n",
       "end of file\n",
     ]
 
     let eErrLines = @[
       "template.html(4): w60: Read t.maxLines replacement block lines without finding the endblock.\n",
-      "template.html(5): w144: The endblock command does not have a matching start command.\n",
+      "template.html(5): w144: The endblock command does not have a matching block command.\n",
     ]
 
     check testProcessTemplate(templateContent = templateContent,
       eErrLines = eErrLines, eResultLines = eResultLines, eRc = 1)
 
-  test "one less than maxLines":
-    let templateContent = """
-$$ block t.maxLines = 2
-one
-$$ endblock
-"""
-    let eResultLines = @[
-      "one\n",
-    ]
-    check testProcessTemplate(templateContent = templateContent,
-        eResultLines = eResultLines)
-
-  test "match maxLines":
-    let templateContent = """
-$$ block t.maxLines = 2
-one
-two
-$$ endblock
-"""
-    let eResultLines = @[
-      "one\n",
-      "two\n",
-    ]
-    check testProcessTemplate(templateContent = templateContent,
-        eResultLines = eResultLines)
-
   test "one more than maxLines":
-    let templateContent = """
-$$ block t.maxLines = 2
-one
-two
-three
-$$ endblock
-"""
-    let eResultLines = @[
-      "one\n",
-      "two\n",
-      "three\n",
-      "$$ endblock",
-    ]
-    check testProcessTemplate(templateContent = templateContent,
-                              eResultLines = eResultLines, eRc = 1)
-
-  test "one less than maxLines":
-    let templateContent = """
-$$ block t.maxLines = 2
-one
-$$ endblock
-"""
-    let eResultLines = @[
-      "one\n",
-    ]
-    check testProcessTemplate(templateContent = templateContent,
-        eResultLines = eResultLines)
-
-  test "match maxLines":
-    let templateContent = """
-$$ block t.maxLines = 2
-one
-two
-$$ endblock
-"""
-    let eResultLines = @[
-      "one\n",
-      "two\n",
-    ]
-    check testProcessTemplate(templateContent = templateContent,
-        eResultLines = eResultLines)
-
-  test "one more than maxLines":
-    let templateContent = """
-$$ block t.maxLines = 2
-one
-two
-three
-$$ endblock
-"""
-    let eResultLines = @[
-      "one\n",
-      "two\n",
-      "three\n",
-      "$$ endblock\n",
-    ]
-    check testProcessTemplate(templateContent = templateContent,
-                              eResultLines = eResultLines, eRc = 1)
-
-  test "one less than maxLines 2":
-    let templateContent = """
-$$ block t.maxLines = 2
-one
-$$ endblock
-"""
-    let eResultLines = @[
-      "one\n",
-    ]
-    check testProcessTemplate(templateContent = templateContent,
-        eResultLines = eResultLines)
-
-  test "match maxLines":
-    let templateContent = """
-$$ block t.maxLines = 2
-one
-two
-$$ endblock
-last line
-"""
-    let eResultLines = @[
-      "one\n",
-      "two\n",
-      "last line\n",
-    ]
-    check testProcessTemplate(templateContent = templateContent,
-        eResultLines = eResultLines)
-
-  test "one more than maxLines 4":
     let templateContent = """
 $$ block t.maxLines = 2
 one
@@ -1468,13 +1331,40 @@ $$ endblock
     ]
 
     let eErrLines = @[
-      "template.html(5): w144: The endblock command does not have a matching block command.\n"
+      "template.html(4): w60: Read t.maxLines replacement block lines without finding the endblock.\n",
+      "template.html(5): w144: The endblock command does not have a matching block command.\n",
     ]
 
     check testProcessTemplate(templateContent = templateContent,
       eResultLines = eResultLines, eErrLines = eErrLines, eRc = 1)
 
-# todo: test literal strings with \n etc. in them.  Are these supported?
+  test "one less than maxLines":
+    let templateContent = """
+$$ block t.maxLines = 2
+one
+$$ endblock
+"""
+    let eResultLines = @[
+      "one\n",
+    ]
+    check testProcessTemplate(templateContent = templateContent,
+        eResultLines = eResultLines)
+
+  test "match maxLines":
+    let templateContent = """
+$$ block t.maxLines = 2
+one
+two
+$$ endblock
+"""
+    let eResultLines = @[
+      "one\n",
+      "two\n",
+    ]
+    check testProcessTemplate(templateContent = templateContent,
+        eResultLines = eResultLines)
+
+
 # todo: test with no result file.
 # todo: test that the template file gets updated
 # todo: test that there is an error when the user specifies a result file.
