@@ -18,8 +18,9 @@ Handle the replacement block lines.
 * [allocTempSegments](#alloctempsegments) &mdash; Create a TempSegments object.
 * [closeDelete](#closedelete) &mdash; Close the TempSegments and delete its backing temporary file.
 * [storeLineSegments](#storelinesegments) &mdash; Divide the line into segments and write them to the TempSegments' temp file.
-* [yieldReplacementLine](#yieldreplacementline) &mdash; Yield all the replacement block lines and the endblock line too, if it exists.
+* [yieldReplacementLine](#yieldreplacementline) &mdash; Yield all the replacement block lines and one after.
 * [newTempSegments](#newtempsegments) &mdash; Read replacement block lines and return a TempSegments object containing the compiled block.
+* [fillReplacementBlock](#fillreplacementblock) &mdash; Fill in the replacement block and return the line after it.
 
 # ReplaceLineKind
 
@@ -27,6 +28,7 @@ Line type returned by yieldReplacementLine.
 
 ```nim
 ReplaceLineKind = enum
+  rlNoLine,                 ## Value when not initialized.
   rlReplaceLine,            ## A replacement block line.
   rlEndblockLine,           ## The endblock line.
   rlNormalLine               ## The last line when maxLines was exceeded.
@@ -136,7 +138,7 @@ proc storeLineSegments(env: var Env; tempSegments: TempSegments;
 
 # yieldReplacementLine
 
-Yield all the replacement block lines and the endblock line too, if it exists.
+Yield all the replacement block lines and one after.
 
 ```nim
 iterator yieldReplacementLine(env: var Env; firstReplaceLine: string;
@@ -152,6 +154,16 @@ Read replacement block lines and return a TempSegments object containing the com
 proc newTempSegments(env: var Env; lb: var LineBuffer;
                      prepostTable: PrepostTable; command: string;
                      repeat: Natural; variables: Variables): Option[TempSegments]
+```
+
+# fillReplacementBlock
+
+Fill in the replacement block and return the line after it.
+
+```nim
+proc fillReplacementBlock(env: var Env; lb: LineBuffer; command: string;
+                          prepostTable: PrepostTable; variables: Variables;
+                          inOutExtraLine: var ExtraLine)
 ```
 
 

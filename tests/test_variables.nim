@@ -291,8 +291,8 @@ suite "variables.nim":
     var variables = emptyVariables()
     let eWarningDataO = some(newWarningData(wTeaVariableExists))
 
-    check testAssignVariable(variables, "t.maxLines", newValue(1))
-    check testAssignVariable(variables, "t.maxLines", newValue(2), eWarningDataO)
+    check testAssignVariable(variables, "t.maxLines", newValue(2))
+    check testAssignVariable(variables, "t.maxLines", newValue(3), eWarningDataO)
 
     check testAssignVariable(variables, "t.output", newValue("stderr"))
     check testAssignVariable(variables, "t.output", newValue("result"), eWarningDataO)

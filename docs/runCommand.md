@@ -106,7 +106,7 @@ proc newValueAndLength(value: Value; length: Natural): ValueAndLength
 Iterate through the command's statements.  Statements are separated by semicolons or newlines and are not empty or all spaces.
 
 ```nim
-iterator yieldStatements(cmdLines: seq[string]; cmdLineParts: seq[LineParts]): Statement
+iterator yieldStatements(cmdLines: CmdLines): Statement
 ```
 
 # getString
@@ -163,8 +163,7 @@ proc runStatement(env: var Env; statement: Statement;
 Run a command and fill in the variables dictionaries.
 
 ```nim
-proc runCommand(env: var Env; cmdLines: seq[string];
-                cmdLineParts: seq[LineParts]; prepostTable: PrepostTable;
+proc runCommand(env: var Env; cmdLines: CmdLines; prepostTable: PrepostTable;
                 variables: var Variables)
 ```
 
