@@ -66,16 +66,12 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     else:
       firstReplaceLine = ""
 
-    # Run the commands that are allowed statements and skip the others.
     let command = cmdLines.lineParts[0].command
-    if not (command in ["nextline", "block", "replace"]):
-      continue
 
-    # Run the command.
+    # Run the command the first time.
     var row = 0
     tea["row"] = newValue(row)
     runCommand(env, cmdLines, prepostTable, variables)
-    let repeat = getTeaVarIntDefault(variables, "repeat")
 
     # Show a warning when the replace command does not have t.content
     # set.
@@ -84,6 +80,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       # replacement line.
       env.warn(lb.getLineNum()-1, wContentNotSet)
 
+    let repeat = getTeaVarIntDefault(variables, "repeat")
     var maxLines = getTeaVarIntDefault(variables, "maxLines")
 
     # If repeat is 0, read the replacement lines and the endblock and
@@ -92,13 +89,12 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       for replaceLine in yieldReplacementLine(env,
         firstReplaceLine, lb, prepostTable, command, maxLines):
         discard
-      firstReplaceLine = ""
       continue
 
     # Create a new TempSegments object for storing segments.
     var startLineNum = lb.getLineNum()
     var tempSegmentsO = newTempSegments(env, lb, prepostTable,
-                                        command, repeat, variables)
+      command, repeat, variables)
     if not isSome(tempSegmentsO):
       break # Cannot create temp file or allocate memory, quit.
     var tempSegments = tempSegmentsO.get()
