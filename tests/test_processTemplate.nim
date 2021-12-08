@@ -531,7 +531,7 @@ hello {s.name}
 {"name": "world"}
 """
     let eLogLines = splitNewLines """
-XXXX-XX-XX XX:XX:XX.XXX; replacement.nim(X*); hello world
+XXXX-XX-XX XX:XX:XX.XXX; template.html(X*); hello world
 """
     check testProcessTemplate(templateContent = templateContent, serverJson =
         serverJson, eLogLines = eLogLines)
@@ -589,7 +589,7 @@ Hello World!
 """
 
     let eErrLines = splitNewLines """
-template.html(1): w41: Invalid t.output value, use: "result", "stderr", "log", or "skip".
+template.html(1): w41: Invalid t.output value, use: "result", "stdout", "stderr", "log", or "skip".
 statement: t.output = "something"
            ^
 """

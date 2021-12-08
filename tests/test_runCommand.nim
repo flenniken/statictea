@@ -745,7 +745,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "set invalid output":
     let statement = newStatement(text="""t.output = "notvalidv"""", lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w41: Invalid t.output value, use: "result", "stderr", "log", or "skip".
+template.html(1): w41: Invalid t.output value, use: "result", "stdout", "stderr", "log", or "skip".
 statement: t.output = "notvalidv"
            ^
 """

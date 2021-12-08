@@ -29,7 +29,7 @@ Language variable methods.
 Tea output variable values.
 
 ```nim
-outputValues = ["result", "stderr", "log", "skip"]
+outputValues = ["result", "stdout", "stderr", "log", "skip"]
 ```
 
 # Variables

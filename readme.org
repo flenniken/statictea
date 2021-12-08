@@ -730,10 +730,11 @@ the endblock command. You can increase or decrease the value.
 The t.output variable determines where the block output goes.  By
 default it goes to the result file.
 
-- "result" -- the block output goes to the result file (default)
-- "stderr" -- the block output goes to standard error
-- "log" -- the block output goes to the log file
-- "skip" -- the block is skipped
+- "result" -- to the result file (default)
+- "stdout" -- to standard out
+- "stderr" -- to standard error
+- "log" -- to the log file
+- "skip" -- to the bit bucket
 
 [[#contents][茶]]
 
@@ -1423,12 +1424,32 @@ exceeds 1 GB, a warning message is generated each time a template
 is processed.
 
 Logging is off by default. You turn it on with the log option.
-You can specify the log file full path.  If you don't specify a
-filename, "statictea.log" is used. The log default location
-depends on the platform:
+If you don't specify a filename, the log lines are written to the
+platform default location:
 
 - Mac: ~/Library/log/statictea.log
 - Other: ~/statictea.log
+
+You can specify a full path. If you don't include path
+information, the log is written to the current directory.
+
+#+BEGIN_SRC
+statictea --log=mylog.txt
+#+END_SRC
+
+When you write a replacement block to the log file, the template
+file and line of the block appear there.
+
+#+BEGIN_SRC
+2021-12-07 22:03:59.908; statictea.nim(42); Starting: argv: @["-l=log.txt", "-t=tmpl.txt", "-r=result.txt"]
+2021-12-07 22:03:59.908; statictea.nim(43); Version: 0.1.0
+2021-12-07 22:03:59.909; tmpl.txt(2); ┌─────────┐
+2021-12-07 22:03:59.909; tmpl.txt(3); │log block│
+2021-12-07 22:03:59.909; tmpl.txt(4); └─────────┘
+2021-12-07 22:03:59.910; statictea.nim(66); Warnings: 0
+2021-12-07 22:03:59.910; statictea.nim(69); Return code: 0
+2021-12-07 22:03:59.910; statictea.nim(70); Done
+#+END_SRC
 
 [[#contents][茶]]
 

@@ -112,7 +112,7 @@ func formatLine(filename: string; lineNum: int; message: string; dt = now()): st
 
 # logLine
 
-Append a message to the log file. If there is an error writing, close the log. Do nothing when the log is closed.
+Append a message to the log file. If there is an error writing, close the log. Do nothing when the log is closed. A newline is not added to the line.
 
 ```nim
 proc logLine(env: var Env; filename: string; lineNum: int; message: string)

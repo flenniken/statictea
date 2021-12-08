@@ -21,7 +21,7 @@ import tostring
 import args
 
 const
-  outputValues* = ["result", "stderr", "log", "skip"]
+  outputValues* = ["result", "stdout", "stderr", "log", "skip"]
     ## Tea output variable values.
 
 type

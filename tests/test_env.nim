@@ -48,8 +48,8 @@ proc parseLine*(line: string): Option[LogLine] =
     lineNum: fileLine.lineNum, message: parts[2]))
 
 proc testProc(env: var Env) =
-  env.log("testProc called")
-  env.log("testProc done")
+  env.log("testProc called\n")
+  env.log("testProc done\n")
 
 # Already exist
 # proc endsWith(line: string, str: string): bool =
@@ -104,8 +104,8 @@ XXXX-XX-XX XX:XX:XX.XXX; test_env.nim(X*); testProc done
     check env.logFile == nil
 
     # Logging is dropped when the log file is not open.
-    env.log("test line no log")
-    env.log("test line no log2")
+    env.log("test line no log\n")
+    env.log("test line no log2\n")
 
     let eErrLines = @[
       "template.html(0): w8: Unable to open log file: ''.\n"

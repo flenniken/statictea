@@ -119,13 +119,14 @@ func formatLine*(filename: string, lineNum: int, message: string, dt = now()):
 
 proc logLine*(env: var Env, filename: string, lineNum: int, message: string) =
   ## Append a message to the log file. If there is an error writing,
-  ## close the log. Do nothing when the log is closed.
+  ## close the log. Do nothing when the log is closed. A newline is
+  ## not added to the line.
   if env.logFile == nil:
     return
   let line = formatLine(filename, lineNum, message)
   try:
     # raise newException(IOError, "test io error")
-    env.logFile.writeLine(line)
+    env.logFile.write(line)
   except:
     env.warn(0, wUnableToWriteLogFile, filename)
     env.warn(0, wExceptionMsg, getCurrentExceptionMsg())

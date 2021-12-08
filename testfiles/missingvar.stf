@@ -12,14 +12,19 @@ $statictearoot/bin/statictea -t=template.md >stdout 2>stderr
 --- file template.md
 $$ nextline
 hello {s.name}
+$$ block
+{s.block}
+$$ endblock
 --- endfile
 
 --- file stdout.expected
 hello {s.name}
+{s.block}
 --- endfile
 
 --- file stderr.expected
 template.md(2): w58: The replacement variable doesn't exist: s.name.
+template.md(4): w58: The replacement variable doesn't exist: s.block.
 --- endfile
 
 

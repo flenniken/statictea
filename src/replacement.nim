@@ -346,6 +346,9 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
   of "stderr":
     # The block output goes to standard error.
     stream = env.errStream
+  of "stdout":
+    # The block output goes to standard out.
+    stream = env.outStream
   of "log":
     # The block output goes to the log file.
     log = true
@@ -375,7 +378,8 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
     # Write out completed lines.
     if kind == newline or kind == endline or kind == endVariable:
       if log:
-        env.log(line)
+        # todo: why is it rLineNum-1 and not rLineNum?
+        env.logLine(env.templateFilename, rLineNum-1, line)
       else:
         stream.write(line)
       line = ""

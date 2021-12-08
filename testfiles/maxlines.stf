@@ -75,10 +75,6 @@ $$ : t.repeat = 0
 {line} five
 $$ endblock
 
-todo: Test with no ending newline
-todo: Test at the bottom of the file.
-todo: Test with replace command.
-
 end of file
 --- endfile
 
@@ -128,10 +124,6 @@ Set max lines to 2, use 5 lines and repeat 0.
 {line} four
 {line} five
 $$ endblock
-
-todo: Test with no ending newline
-todo: Test at the bottom of the file.
-todo: Test with replace command.
 
 end of file
 --- endfile

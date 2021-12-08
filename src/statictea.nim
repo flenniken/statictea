@@ -39,8 +39,8 @@ proc main*(env: var Env, argv: seq[string]): int =
   if args.log:
     env.setupLogging(args.logFilename)
 
-  env.log("Starting: argv: $1" % $argv)
-  env.log("Version: " & staticteaVersion)
+  env.log("Starting: argv: $1\n" % $argv)
+  env.log("Version: $1\n" % staticteaVersion)
 
   # Setup control-c monitoring so ctrl-c stops the program.
   proc controlCHandler() {.noconv.} =
@@ -52,7 +52,7 @@ proc main*(env: var Env, argv: seq[string]): int =
   except:
     result = 1
     let msg = getCurrentExceptionMsg()
-    env.log(msg)
+    env.log(msg & "\n")
     env.warn(0, wUnexpectedException)
     env.warn(0, wExceptionMsg, msg)
     # The stack trace is only available in the debug builds.
@@ -63,11 +63,11 @@ when isMainModule:
   proc run(): int =
     var env = openEnv()
     result = main(env, commandLineParams())
-    env.log("Warnings: $1" % [$env.warningWritten])
+    env.log("Warnings: $1\n" % [$env.warningWritten])
     if result == 0 and env.warningWritten > 0:
       result = 1
-    env.log("Return code: $1" % [$result])
-    env.log("Done")
+    env.log("Return code: $1\n" % [$result])
+    env.log("Done\n")
     env.close()
 
   quit(if run() == 0: QuitSuccess else: QuitFailure)

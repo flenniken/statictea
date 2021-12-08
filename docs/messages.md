@@ -209,7 +209,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "You cannot overwrite the server or shared variables.", ## wReadOnlyDictionary
     "You cannot change the $1 tea variable.", ## wReadOnlyTeaVar
     "Invalid tea variable: $1.", ## wInvalidTeaVar
-    """Invalid t.output value, use: "result", "stderr", "log", or "skip".""", ## wInvalidOutputValue
+    """Invalid t.output value, use: "result", "stdout", "stderr", "log", or "skip".""", ## wInvalidOutputValue
     "MaxLines must be an integer greater than 1.", ## wInvalidMaxCount
     "Invalid t.content, it must be a string.", ## wInvalidTeaContent
     "The repeat value must be between 0 and t.maxRepeat.", ## wInvalidRepeat

@@ -244,6 +244,7 @@ suite "variables.nim":
     check testAssignVariable("t.maxRepeat", newValue(20))
     check testAssignVariable("t.content", newValue("asdf"))
     check testAssignVariable("t.output", newValue("stderr"))
+    check testAssignVariable("t.output", newValue("stdout"))
     check testAssignVariable("t.repeat", newValue(20))
 
   test "assignVariable warning":
