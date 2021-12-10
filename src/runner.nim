@@ -695,8 +695,10 @@ proc compareFiles*(expectedFilename: string, gotFilename: string): OpResult[stri
     return opMessage[string](gotContentOp.message)
   let gotContent = gotContentOp.value
 
-  let topBorder    = "┌───────────────────┐\n"
-  let bottomBorder = "└───────────────────┘"
+  #  ⤶ ⤷ ⤴ ⤵
+  # ⬉ ⬈ ⬊ ⬋
+  let topBorder    = "───────────────────⤵\n"
+  let bottomBorder = "───────────────────⤴"
 
   # If the files are different, show the differences.
   var message: string

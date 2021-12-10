@@ -87,4 +87,4 @@ tmpl.txt(4); └─────────┘
 --- expected stdout.expected == stdout
 --- expected stderr.expected == stderr
 --- expected log.expected == log.filtered
-# --- expected log.txt.expected == log.txt
+#--- expected log.txt.expected == log.txt
