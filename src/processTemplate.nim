@@ -107,6 +107,13 @@ proc processTemplateLines(env: var Env, variables: var Variables,
         discard
       # Use the content as the replacement lines.
       var content = getVariable(variables, "t.content").value.stringv
+
+      # If the content does not end with a newline, add one and output
+      # a warning.
+      if content == "" or content[^1] != '\n':
+        env.warn(lb.getLineNum(), wMissingNewLineContent)
+        content.add('\n')
+
       for line in yieldContentLine(content):
         storeLineSegments(env, tempSegments, prepostTable, line)
     else:

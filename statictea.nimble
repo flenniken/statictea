@@ -536,10 +536,16 @@ proc runRunnerFolder() =
   ## Run the stf files in the testfiles folder.
 
   defineStaticteaRoot()
-
-  # Run the stf files.
   let result = staticExec "bin/runner -d=testfiles"
   echo result
+
+proc get_stf_filenames(): seq[string] =
+  ## Return the basename of the stf files in the testfiles folder.
+  result = @[]
+  var list = listFiles("testfiles")
+  for filename in list:
+    if filename.endsWith(".stf"):
+      result.add(lastPathPart(filename))
 
 proc runRunStf() =
   defineStaticteaRoot()
@@ -547,25 +553,21 @@ proc runRunStf() =
   # Get the name of the stf to run.
   let count = system.paramCount()+1
   var name = system.paramStr(count-1)
-  var (folder, basename) = splitPath(name)
-  if folder != "" or basename == "runt":
-    echo "Specify the basename of a stf test to run."
-    exit()
-  if not basename.endsWith(".stf"):
-    basename = basename & ".stf"
-  var filename = joinPath("testfiles", basename)
-  if not fileExists(filename):
-    echo "The stf file isn't in the testfiles folder: $1" % filename
-    exit()
+  if name == "rt":
+    runRunnerFolder()
+    return
 
-  # Run a stf file.
-  let cmd = "bin/runner -f=$1" % filename
-  echo cmd
-  let result = staticExec cmd
-  if result == "":
-    echo "success"
-  else:
-    echo result
+  let stf_filenames = get_stf_filenames()
+  for filename in stf_filenames:
+    if name.toLower in filename.toLower:
+      # Run a stf file.
+      let cmd = "bin/runner -f=testfiles/$1" % filename
+      echo cmd
+      let result = staticExec cmd
+      if result == "":
+        echo "success"
+      else:
+        echo result
 
 proc runRunStfMain() =
   try:
@@ -696,11 +698,8 @@ task args, "\tShow command line arguments.":
 task br, "\tBuild the stf test runner.":
   buildRunner()
 
-task runt, "\tRun a stf test in testfiles. Specify the filename.":
+task rt, "\tRun one or more stf tests in testfiles; specify part of the name.":
   runRunStfMain()
-
-task runall, "\tRun all stf tests in the testfiles folder.":
-  runRunnerFolder()
 
 task stf, "\tList stf tests with newest last.":
   exec """ls -1tr testfiles/*.stf | xargs grep "##" | cut -c 11- | sed 's/:## / -- /'"""

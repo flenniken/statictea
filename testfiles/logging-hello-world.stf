@@ -34,7 +34,7 @@ hello world
 --- file stderr.expected
 --- endfile
 
---- file log.filtered.expected
+--- file log.expected
 Starting: argv: @["-l=log.txt", "-s=hello.json", "-t=hello.html"]
 Version: 0.1.0
 Warnings: 0
@@ -42,10 +42,7 @@ Return code: 0
 Done
 --- endfile
 
---- file log.txt.expected
---- endfile
-
 --- expected stdout.expected == stdout
 --- expected stderr.expected == stderr
---- expected log.filtered.expected == log.filtered
-#--- expected log.txt.expected == log.txt
+--- expected log.expected == log.filtered
+

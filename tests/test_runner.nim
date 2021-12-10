@@ -873,7 +873,7 @@ my expected line
 what I got
 """
     let expected = """
-      same: my expected line␊
+1     same: my expected line␊
 2 expected: my second line␊
 2      got: what I got␊"""
     check testLinesSideBySide(content1, content2, expected)
@@ -890,10 +890,10 @@ my expected line
 my last line
 """
     let expected = """
-      same: my expected line␊
+1     same: my expected line␊
 2 expected: middle␊
 2      got:   the center␊
-      same: my last line␊"""
+3     same: my last line␊"""
     check testLinesSideBySide(content1, content2, expected)
 
 
@@ -921,10 +921,11 @@ test file
 hello there
 """
     let expected = """
-f1.txt=expected
-f2.txt=got
+
+Difference: f1.txt (expected) != f2.txt (got)
 1 expected: test file␊
-1      got: hello there␊"""
+1      got: hello there␊
+"""
     check testCompareFilesDifferent(f1, f2, expected)
 
   test "compareFiles different 2":
@@ -937,11 +938,12 @@ test line
 wow we
 """
     let expected = """
-f1.txt=expected
-f2.txt=got
-      same: test line␊
+
+Difference: f1.txt (expected) != f2.txt (got)
+1     same: test line␊
 2 expected: different line␊
-2      got: wow we␊"""
+2      got: wow we␊
+"""
     check testCompareFilesDifferent(f1, f2, expected)
 
   test "compareFiles different 3":
@@ -956,12 +958,13 @@ something else
 more
 """
     let expected = """
-f1.txt=expected
-f2.txt=got
-      same: test line␊
+
+Difference: f1.txt (expected) != f2.txt (got)
+1     same: test line␊
 2 expected: third line␊
 2      got: something else␊
-      same: more␊"""
+3     same: more␊
+"""
     check testCompareFilesDifferent(f1, f2, expected)
 
   test "compareFiles different 4":
@@ -972,13 +975,15 @@ something else
 more
 """
     let expected = """
-f1.txt=empty
-f2.txt=below
-┌───────────────────┐
+
+Difference: f1.txt != f2.txt
+            f1.txt is empty
+f2.txt───────────────────⤵
 test line
 something else
 more
-└───────────────────┘"""
+───────────────────⤴
+"""
     check testCompareFilesDifferent(f1, f2, expected)
 
   test "compareFiles different 5":
@@ -989,13 +994,15 @@ more
 """
     let f2 = ""
     let expected = """
-f1.txt=below
-f2.txt=empty
-┌───────────────────┐
+
+Difference: f1.txt != f2.txt
+            f2.txt is empty
+f1.txt───────────────────⤵
 test line
 something else
 more
-└───────────────────┘"""
+───────────────────⤴
+"""
     check testCompareFilesDifferent(f1, f2, expected)
 
   test "compareFiles no file":

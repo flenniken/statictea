@@ -178,6 +178,8 @@ templates and it has the special property that you can keep the
 replacement block in sync with the variable, see [[#update-option][Update Option]]
 for more information.
 
+The content must end with a newline.
+
 If you don't assign the t.content variable, a warning is
 generated, and the command behaves like a block command.  This is
 good for testing changes you want to make to the shared value.
@@ -1232,7 +1234,7 @@ Miscellaneous topics:
 - [[#prefix-postfix][Prefix Postfix]]
 - [[#encoding-and-line-endings][Encoding and Line Endings]]
 - [[#update-option][Update Option]]
-- [[#log-file][Log File]]
+- [[#logging][Logging]]
 - [[#module-docs][Module Docs]]
 - [[#html-formatted-json][HTML Formatted Json]]
 - [[#nimble-tasks][Nimble Tasks]]
@@ -1411,9 +1413,9 @@ statictea \
 
 [[#contents][茶]]
 
-** Log File
+** Logging
 :PROPERTIES:
-   :CUSTOM_ID: log-file
+   :CUSTOM_ID: logging
    :END:
 
 Statictea writes statistics to the log file.  Template commands

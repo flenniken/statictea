@@ -629,17 +629,18 @@ func showTabsAndLineEndings*(str: string): string =
     visibleRunes.add(Rune(num))
   result = $visibleRunes
 
-proc dup(pattern: string, count: Natural): string =
-  ## Duplicate the pattern count times. Return "" when the result
-  ## would be longer than 1024 characters.
-  if count < 1:
-    return
-  let length = count * pattern.len
-  if length > 1024:
-    return
-  result = newStringOfCap(length)
-  for ix in countUp(1, int(count)):
-    result.add(pattern)
+when false:
+  proc dup(pattern: string, count: Natural): string =
+    ## Duplicate the pattern count times. Return "" when the result
+    ## would be longer than 1024 characters.
+    if count < 1:
+      return
+    let length = count * pattern.len
+    if length > 1024:
+      return
+    result = newStringOfCap(length)
+    for ix in countUp(1, int(count)):
+      result.add(pattern)
 
 proc linesSideBySide*(expectedContent: string, gotContent: string): string =
   ## Show the two sets of lines side by side.
@@ -664,7 +665,8 @@ proc linesSideBySide*(expectedContent: string, gotContent: string): string =
 
     var lineNum = $(ix+1)
     if eLine == gLine:
-      lines.add("$1     same: $2" % [dup(" ", lineNum.len), show(eLine)])
+      # lines.add("$1     same: $2" % [dup(" ", lineNum.len), show(eLine)])
+      lines.add("$1     same: $2" % [$lineNum, show(eLine)])
     else:
       lines.add("$1 expected: $2" % [lineNum, show(eLine)])
       lines.add("$1      got: $2" % [lineNum, show(gLine)])
@@ -700,6 +702,18 @@ proc compareFiles*(expectedFilename: string, gotFilename: string): OpResult[stri
   let topBorder    = "───────────────────⤵\n"
   let bottomBorder = "───────────────────⤴"
 
+
+# Difference: result.expected != result.txt
+#             result.expected is empty
+# result.txt───────────────────⤵
+# Log the replacement block.
+# Log the replacement block containing a variable.
+# Log the replacement block two times.
+# Log the nextline replacement block.
+# Log the replace command's replacement block.
+# ───────────────────⤴
+
+
   # If the files are different, show the differences.
   var message: string
   if expectedContent != gotContent:
@@ -709,22 +723,28 @@ proc compareFiles*(expectedFilename: string, gotFilename: string): OpResult[stri
     if expectedContent == "" or gotContent == "":
       if expectedContent == "":
         message = """
-$1=empty
-$2=below
-""" % [expBasename, gotBasename]
-        message = message & topBorder & gotContent & bottomBorder
+
+Difference: $1 != $2
+            $1 is empty
+$2$3$4$5
+""" % [expBasename, gotBasename, topBorder, gotContent, bottomBorder]
+
       else:
+
         message = """
-$1=below
-$2=empty
-""" % [expBasename, gotBasename]
-        message = message & topBorder & expectedContent & bottomBorder
+
+Difference: $1 != $2
+            $2 is empty
+$1$3$4$5
+""" % [expBasename, gotBasename, topBorder, expectedContent, bottomBorder]
+
     else:
       message = """
-$1=expected
-$2=got
-""" % [expBasename, gotBasename]
-      message = message & linesSideBySide(expectedContent, gotContent)
+
+Difference: $1 (expected) != $2 (got)
+$3
+""" % [expBasename, gotBasename, linesSideBySide(expectedContent, gotContent)]
+
   return OpResult[string](kind: okValue, value: message)
 
 proc compareFileSets(folder: string, compareLines: seq[CompareLine]):
