@@ -14,8 +14,7 @@ SYNOPSIS
 
 DESCRIPTION
 
-     Combine a template file with data from json files using template
-     commands to produce an output file.
+     Combine a template with json files to produce an output file.
 
      The following options are available:
 
