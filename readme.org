@@ -178,8 +178,6 @@ templates and it has the special property that you can keep the
 replacement block in sync with the variable, see [[#update-option][Update Option]]
 for more information.
 
-The content must end with a newline.
-
 If you don't assign the t.content variable, a warning is
 generated, and the command behaves like a block command.  This is
 good for testing changes you want to make to the shared value.
@@ -1400,6 +1398,9 @@ shared template files but it doesn't have to.
 
 You use this to keep the template blocks in sync with the shared
 content so you can work with them as static pages.
+
+If the t.content does not end with a newline, one is added so the
+endcommand starts on a new line.
 
 The following example shows a typical invocation:
 

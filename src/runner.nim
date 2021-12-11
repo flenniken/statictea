@@ -604,14 +604,13 @@ proc runCommands*(folder: string, runFileLines: seq[RunFileLine]):
       # Check the return code.
       if runFileLine.nonZeroReturn:
         if cmdRc == 0:
-          echo "$1 generated an unexpected return code of 0." % runFileLine.filename
-          echo ""
-          rc = 1
+          let message = "$1 generated an unexpected return code of 0." %
+            runFileLine.filename
+          return opMessage[Rc](message)
       elif cmdRc != 0:
-        echo "$1 generated a non-zero return code." %
+        let message =  "$1 generated a non-zero return code." %
           runFileLine.filename
-        echo ""
-        rc = 1
+        return opMessage[Rc](message)
 
   setCurrentDir(oldDir)
 

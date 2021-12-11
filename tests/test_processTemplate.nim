@@ -1115,11 +1115,8 @@ asdfasdf
 no newline
 <!--$ endblock -->
 """
-    let eErrLines = splitNewLines """
-template.html(5): w84: The t.content does not end with a newline, adding one.
-"""
     check testUpdateTemplate(templateContent = templateContent,
-      eResultLines = eResultLines, eErrLines = eErrLines, eRc = 1)
+      eResultLines = eResultLines)
 
   test "missing slash":
     let templateContent = """
