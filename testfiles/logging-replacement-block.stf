@@ -5,7 +5,7 @@ id stf file version 0.0.0
 # file line attributes: noLastEnding command nonZeroReturn
 
 --- file cmd.sh command
-$statictearoot/bin/statictea -l=log.txt -t=tmpl.txt -r=result.txt >stdout 2>stderr
+$statictea -l=log.txt -t=tmpl.txt -r=result.txt >stdout 2>stderr
 --- endfile
 
 # Remove the time prefix from the log lines then extract the template lines.

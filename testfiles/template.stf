@@ -6,7 +6,7 @@ id stf file version 0.0.0
 #   noLastEnding command nonZeroReturn
 
 --- file cmd.sh command
-../../bin/statictea \
+$statictea \
   -l=log.txt \
   -s=server.json \
   -j=shared.json \

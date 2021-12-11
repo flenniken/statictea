@@ -3,7 +3,7 @@ id stf file version 0.0.0
 ## The continue readme example.
 
 --- file cmd.sh command
-$statictearoot/bin/statictea -t=comment.html >stdout 2>stderr
+$statictea -t=comment.html >stdout 2>stderr
 --- endfile
 
 --- file comment.html

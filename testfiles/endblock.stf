@@ -3,7 +3,7 @@ id stf file version 0.0.0
 ## The endblock readme example.
 
 --- file cmd.sh command
-$statictearoot/bin/statictea -t=template.html >stdout 2>stderr
+$statictea -t=template.html >stdout 2>stderr
 --- endfile
 
 --- file template.html

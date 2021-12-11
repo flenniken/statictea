@@ -3,7 +3,7 @@ id stf file version 0.0.0
 ## The nextline readme example.
 
 --- file cmd.sh command
-$statictearoot/bin/statictea -s=nextline.json -t=nextline.html >stdout 2>stderr
+$statictea -s=nextline.json -t=nextline.html >stdout 2>stderr
 --- endfile
 
 --- file nextline.html

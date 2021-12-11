@@ -3,7 +3,7 @@ id stf file version 0.0.0
 ## Test t.args with normal arguments.
 
 file cmd.sh command
-$statictearoot/bin/statictea -l -s=server.json -j=shared.json \
+$statictea -l -s=server.json -j=shared.json \
   -s=server2.json -j=shared2.json \
   -p='abc$,def' -p='$$' \
   -t=template.html -r=result.html >stdout 2>stderr

@@ -7,7 +7,7 @@ id stf file version 0.0.0
 # the g dictionary.
 
 file cmd.sh command nonZeroReturn
-$statictearoot/bin/statictea \
+$statictea \
   -t=template.html -r=result.html >stdout 2>stderr
 endfile
 

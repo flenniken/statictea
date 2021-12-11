@@ -3,7 +3,7 @@ id stf file version 0.0.0
 ## Test the org mode prefix (# $).
 
 --- file cmd.sh command
-$statictearoot/bin/statictea -p="# $" -t=orgmode.org >stdout 2>stderr
+$statictea -p="# $" -t=orgmode.org >stdout 2>stderr
 --- endfile
 
 --- file orgmode.org

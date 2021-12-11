@@ -813,7 +813,7 @@ when not defined(test):
       if fileExists(filename):
         discard deleteFolder(tempDir)
 
-  proc runFilename(args: RunArgs): OpResult[Rc] =
+  proc runFilenameMain(args: RunArgs): OpResult[Rc] =
     ## Run a stf file specified by a RunArgs object. Return 0 when it
     ## passes.
     result = runFilename(args.filename, args.leaveTempDir)
@@ -833,6 +833,7 @@ when not defined(test):
       if path.endsWith(".stf"):
         let (_, basename) = splitPath(path)
         echo "Running: " & basename
+
         let rcOp = runFilename(path, leaveTempDir)
         if rcOp.isMessage:
           return rcOp
@@ -849,7 +850,7 @@ when not defined(test):
         $passedCount, $(count - passedCount)]
     result = OpResult[Rc](kind: okValue, value: rc)
 
-  proc runDirectory(args: RunArgs): OpResult[Rc] =
+  proc runDirectoryMain(args: RunArgs): OpResult[Rc] =
     ## Run all stf files in a directory. Return 0 when all pass.
     result = runDirectory(args.directory, args.leaveTempDir)
 
@@ -864,9 +865,9 @@ when not defined(test):
       echo runnerId
       result = OpResult[Rc](kind: okValue, value: 0)
     elif args.filename != "":
-      result = runFilename(args)
+      result = runFilenameMain(args)
     elif args.directory != "":
-      result = runDirectory(args)
+      result = runDirectoryMain(args)
     else:
       echo "Missing argments, use -h for help."
       result = OpResult[Rc](kind: okValue, value: 1)

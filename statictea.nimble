@@ -522,21 +522,12 @@ proc buildRunner() =
   cmd = "strip bin/runner"
   exec cmd
 
-proc defineStaticteaRoot() =
-  ## Make sure statictearoot environment variable is defined.
-  var root = getEnv("statictearoot")
-  if root == "":
-    putEnv("statictearoot", "/Users/steve/code/statictea")
-    root = getEnv("statictearoot")
-    if root == "":
-      echo "Error: Define the statictearoot environment variable."
-      exit()
-
 proc runRunnerFolder() =
   ## Run the stf files in the testfiles folder.
 
-  defineStaticteaRoot()
-  let result = staticExec "bin/runner -d=testfiles"
+  let cmd = "export statictea='../../bin/statictea'; bin/runner -d=testfiles"
+  echo cmd
+  let result = staticExec cmd
   echo result
 
 proc get_stf_filenames(): seq[string] =
@@ -544,12 +535,10 @@ proc get_stf_filenames(): seq[string] =
   result = @[]
   var list = listFiles("testfiles")
   for filename in list:
-    if filename.endsWith(".stf"):
+    if filename.endsWith(".stf") and not filename.startsWith(".#"):
       result.add(lastPathPart(filename))
 
 proc runRunStf() =
-  defineStaticteaRoot()
-
   # Get the name of the stf to run.
   let count = system.paramCount()+1
   var name = system.paramStr(count-1)
@@ -558,16 +547,21 @@ proc runRunStf() =
     return
 
   let stf_filenames = get_stf_filenames()
+  var failed = false
   for filename in stf_filenames:
     if name.toLower in filename.toLower:
       # Run a stf file.
-      let cmd = "bin/runner -f=testfiles/$1" % filename
+      let cmd = """
+export statictea='../../bin/statictea'; bin/runner -f=testfiles/$1""" % filename
       echo cmd
       let result = staticExec cmd
-      if result == "":
-        echo "success"
-      else:
+      if result != "":
+        failed = true
         echo result
+  if failed:
+    echo "failed"
+  else:
+    echo "success"
 
 proc runRunStfMain() =
   try:

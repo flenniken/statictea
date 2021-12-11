@@ -3,7 +3,7 @@ id stf file version 0.0.0
 ## Test with no ending newline at the bottom of the file.
 
 --- file cmd.sh command
-$statictearoot/bin/statictea -t=template.html -r=result.html >stdout 2>stderr
+$statictea -t=template.html -r=result.html >stdout 2>stderr
 --- endfile
 
 --- file template.html noLastEnding

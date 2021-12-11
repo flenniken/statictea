@@ -3,7 +3,7 @@ id stf file version 0.0.0
 ## A template coming from stdin.
 
 --- file cmd.sh command
-$statictearoot/bin/statictea -s=hello.json -t=stdin <hello.html >stdout 2>stderr
+$statictea -s=hello.json -t=stdin <hello.html >stdout 2>stderr
 --- endfile
 
 --- file hello.html
