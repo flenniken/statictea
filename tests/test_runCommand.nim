@@ -870,7 +870,7 @@ statement: result = case(33, 2, 22, "abc", 11, len(concat()))
   test "assignTeaVariable version":
     let statement = newStatement(text="""t.version = "1.2.3"""", lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w39: You cannot change the version tea variable.
+template.html(1): w39: You cannot change the t.version tea variable.
 statement: t.version = "1.2.3"
            ^
 """
