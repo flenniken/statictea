@@ -29,9 +29,9 @@ cat log.txt | cut -c 26- | grep "^tmpl.txt" >log.filtered | true
 # cat log.txt | sed 's/^.*); //' >log.filtered
 
 --- file tmpl.txt
-<!--$ block -->
+$$ block
 hello {s.name}, hello {h.name}
-<!--$ endblock -->
+$$ endblock
 --- endfile
 
 --- file server.json

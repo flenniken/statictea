@@ -211,7 +211,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Invalid tea variable: $1.", ## wInvalidTeaVar
     """Invalid t.output value, use: "result", "stdout", "stderr", "log", or "skip".""", ## wInvalidOutputValue
     "MaxLines must be an integer greater than 1.", ## wInvalidMaxCount
-    "Invalid t.content, it must be a string.", ## wInvalidTeaContent
+    "You must assign t.content a string.", ## wInvalidTeaContent
     "The repeat value must be between 0 and t.maxRepeat.", ## wInvalidRepeat
     "Invalid prepost: $1.", ## wInvalidPrepost
     "Expected comma or right parentheses.", ## wMissingCommaParen

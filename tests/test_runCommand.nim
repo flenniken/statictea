@@ -816,7 +816,7 @@ statement: t.maxLines = "hello"
   test "content must be a string":
     let statement = newStatement(text="t.content = 3.45", lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w43: Invalid t.content, it must be a string.
+template.html(1): w43: You must assign t.content a string.
 statement: t.content = 3.45
            ^
 """

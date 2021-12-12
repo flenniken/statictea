@@ -20,7 +20,6 @@ Handle the replacement block lines.
 * [storeLineSegments](#storelinesegments) &mdash; Divide the line into segments and write them to the TempSegments' temp file.
 * [yieldReplacementLine](#yieldreplacementline) &mdash; Yield all the replacement block lines and one after.
 * [newTempSegments](#newtempsegments) &mdash; Read replacement block lines and return a TempSegments object containing the compiled block.
-* [fillReplacementBlock](#fillreplacementblock) &mdash; Fill in the replacement block and return the line after it.
 
 # ReplaceLineKind
 
@@ -154,16 +153,6 @@ Read replacement block lines and return a TempSegments object containing the com
 proc newTempSegments(env: var Env; lb: var LineBuffer;
                      prepostTable: PrepostTable; command: string;
                      repeat: Natural; variables: Variables): Option[TempSegments]
-```
-
-# fillReplacementBlock
-
-Fill in the replacement block and return the line after it.
-
-```nim
-proc fillReplacementBlock(env: var Env; lb: LineBuffer; command: string;
-                          prepostTable: PrepostTable; variables: Variables;
-                          inOutExtraLine: var ExtraLine)
 ```
 
 

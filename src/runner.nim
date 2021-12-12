@@ -604,16 +604,19 @@ proc runCommands*(folder: string, runFileLines: seq[RunFileLine]):
       # Check the return code.
       if runFileLine.nonZeroReturn:
         if cmdRc == 0:
-          let message = "$1 generated an unexpected return code of 0." %
+          echo "$1 generated an unexpected return code of 0." %
             runFileLine.filename
-          return opMessage[Rc](message)
+          rc = 1
       elif cmdRc != 0:
-        let message =  "$1 generated a non-zero return code." %
+        echo "$1 generated a non-zero return code." %
           runFileLine.filename
-        return opMessage[Rc](message)
+        rc = 1
 
   setCurrentDir(oldDir)
 
+  if rc != 0:
+    return opMessage[Rc]("failed")
+    
   result = opValue[Rc](rc)
 
 func showTabsAndLineEndings*(str: string): string =
@@ -785,17 +788,17 @@ proc runStfFilename*(filename: string): OpResult[Rc] =
   let folder = filename & ".tempdir"
 
   # Run the command files.
-  var rcOp = runCommands(folder, dirAndFiles.runFileLines)
-  if rcOp.isMessage:
-    return rcOp
-  result = rcOp
+  result = runCommands(folder, dirAndFiles.runFileLines)
 
   # Compare the files.
-  rcOp = compareFileSets(folder, dirAndFiles.compareLines)
+  var rcOp = compareFileSets(folder, dirAndFiles.compareLines)
   if rcOp.isMessage:
     return rcOp
   if rcOp.value != 0:
-    result = rcOp
+    result = opMessage[Rc]("failed")
+
+# todo: fix up the error handling. Echo error messages as you go and
+# keep track of success or failure.
 
 when not defined(test):
 
