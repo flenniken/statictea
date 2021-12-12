@@ -542,18 +542,18 @@ proc runRunStf() =
   # Get the name of the stf to run.
   let count = system.paramCount()+1
   var name = system.paramStr(count-1)
-  if name == "rt":
-    runRunnerFolder()
-    return
 
   let stf_filenames = get_stf_filenames()
   var failed = false
   for filename in stf_filenames:
-    if name.toLower in filename.toLower:
+    if name == "rt" or name.toLower in filename.toLower:
       # Run a stf file.
       let cmd = """
 export statictea='../../bin/statictea'; bin/runner -f=testfiles/$1""" % filename
-      echo cmd
+      if name == "rt":
+        echo filename
+      else:
+        echo cmd
       let result = staticExec cmd
       if result != "":
         failed = true
