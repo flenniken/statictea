@@ -103,7 +103,7 @@ proc newValueAndLength(value: Value; length: Natural): ValueAndLength
 
 # yieldStatements
 
-Iterate through the command's statements.  Statements are separated by semicolons or newlines and are not empty or all spaces.
+Iterate through the command's statements.  Statements are separated by newlines and are not empty or all spaces.
 
 ```nim
 iterator yieldStatements(cmdLines: CmdLines): Statement

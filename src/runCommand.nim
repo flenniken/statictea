@@ -142,17 +142,11 @@ proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
 
 iterator yieldStatements*(cmdLines: CmdLines): Statement =
   ## Iterate through the command's statements.  Statements are
-  ## separated by semicolons or newlines and are not empty or all
-  ## spaces.
+  ## separated by newlines and are not empty or all spaces.
 
-  # To find the semicolons that separate statements we use a finite
-  # state machine.  In the start state we output a statement when a
-  # semicolon is found. We transition when a quote is found, either to
-  # a double quote state or single quote state. In one of the quote
-  # states we transition back to the start state when another quote is
-  # found of the same kind or we transition to a slash state when a
-  # slash is found. The slash states transition back to their quote
-  # state on the next character.
+  # Find the statements in the list of command lines.  Statements may
+  # continue between them. A statement continues when there is a plus
+  # sign at the end of the line.
 
   var text = newStringOfCap(defaultMaxLineLen)
   var lineNum: Natural
@@ -167,37 +161,18 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
     for pos in lp.middleStart ..< lp.middleStart+lp.middleLen:
       let ch = line[pos]
       if state == State.start:
-        if ch == ';':
-          if notEmptyOrSpaces(text):
-            yield newStatement(text, lineNum, start)
-          text.setLen(0)
-          lineNum = lp.lineNum
-          start = pos + 1 # After the semicolon.
-          continue
-        elif ch == '"':
+        if ch == '"':
           state = double
-        elif ch == '\'':
-          state = single
       elif state == double:
         if ch == '"':
           state = State.start
-        elif ch == '\\':
-          state = slashdouble
-      elif state == single:
-        if ch == '\'':
-          state = State.start
-        elif ch == '\\':
-          state = slashsingle
-      elif state == slashsingle:
-        state = single
-      elif state == slashdouble:
-        state = double
       text.add(ch)
 
-    # A statement is terminated by the end of the line by default.
+    # A statement is terminated by the end of the line without a
+    # continuation.
     if not lp.continuation:
       if notEmptyOrSpaces(text):
-        yield newStatement(text, lineNum, start)
+        yield newStatement(strip(text), lineNum, start)
       # Setup variables for the next line, if there is one.
       text.setLen(0)
       if cmdLines.lines.len > ix+1:
@@ -205,7 +180,7 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
         start = cmdLines.lineParts[ix+1].middleStart
 
   if notEmptyOrSpaces(text):
-    yield newStatement(text, lineNum, start)
+    yield newStatement(strip(text), lineNum, start)
 
 proc getString*(env: var Env, prepostTable: PrepostTable,
     statement: Statement, start: Natural): Option[ValueAndLength] =

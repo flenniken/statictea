@@ -47,6 +47,22 @@ $$ nextline
 $$ :
 $$ : a = 5
 a => {a}
+
+Continue a string.
+$$ nextline str = "abc+
+$$ : def+
+$$ : ghijk+
+$$ : lmno"
+{str}
+abcdefghijklmno
+
+Continue a string with spaces.
+$$ nextline  str  =  " a b c +
+$$ : d e f+
+$$ :  g h i j k+
+$$ :  l m n o"
+{str}
+ a b c d e f g h i j k l m n o
 --- endfile
 
 --- file server.json
@@ -85,6 +101,14 @@ com => Bigelow Tea Company
 com => Bigelow Tea Company
 
 a => 5
+
+Continue a string.
+abcdefghijklmno
+abcdefghijklmno
+
+Continue a string with spaces.
+ a b c d e f g h i j k l m n o
+ a b c d e f g h i j k l m n o
 --- endfile
 
 --- file stdout.expected

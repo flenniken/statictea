@@ -350,8 +350,8 @@ fake nextline
   test "json variables":
 
     let templateContent = """
-<!--$ block +-->
-<!--$ : serverElements = len(s); +-->
+<!--$ block -->
+<!--$ : serverElements = len(s) -->
 <!--$ : jsonElements = len(h) -->
 The server has {serverElements} elements
 and the shared json has {jsonElements}.
@@ -409,7 +409,7 @@ and the shared json has 0.
 
     let templateContent = """
 #$ block +
-#$ : cond1 = notfunction(4, 5); +
+#$ : cond1 = notfunction(4, 5)
 #$ : cond3 = hello(5, 4)
 #$ endblock
 """
@@ -417,9 +417,9 @@ and the shared json has 0.
 template.html(1): w51: The function does not exist: notfunction.
 statement: cond1 = notfunction(4, 5)
                    ^
-template.html(2): w51: The function does not exist: hello.
-statement:  cond3 = hello(5, 4)
-                    ^
+template.html(3): w51: The function does not exist: hello.
+statement: cond3 = hello(5, 4)
+                   ^
 """
     check testProcessTemplate(templateContent = templateContent, eRc = 1, eErrLines = eErrLines)
 
@@ -481,7 +481,8 @@ after
     let templateContent = """
 before
 asdf
-<!--$ block t.repeat = 5; var = get(s.nums, t.row)-->
+<!--$ block t.repeat = 5 -->
+<!--$ : var = get(s.nums, t.row)-->
 line one test replacement block.
 line two: {var}
 <!--$ endblock -->
@@ -506,18 +507,18 @@ after
 """
 
     let eErrLines = splitNewLines """
-template.html(3): w54: The list index 2 out of range.
-statement:  var = get(s.nums, t.row)
-                              ^
-template.html(5): w58: The replacement variable doesn't exist: var.
-template.html(3): w54: The list index 3 out of range.
-statement:  var = get(s.nums, t.row)
-                              ^
-template.html(5): w58: The replacement variable doesn't exist: var.
-template.html(3): w54: The list index 4 out of range.
-statement:  var = get(s.nums, t.row)
-                              ^
-template.html(5): w58: The replacement variable doesn't exist: var.
+template.html(4): w54: The list index 2 out of range.
+statement: var = get(s.nums, t.row)
+                             ^
+template.html(6): w58: The replacement variable doesn't exist: var.
+template.html(4): w54: The list index 3 out of range.
+statement: var = get(s.nums, t.row)
+                             ^
+template.html(6): w58: The replacement variable doesn't exist: var.
+template.html(4): w54: The list index 4 out of range.
+statement: var = get(s.nums, t.row)
+                             ^
+template.html(6): w58: The replacement variable doesn't exist: var.
 """
     check testProcessTemplate(templateContent = templateContent, eRc = 1,
       serverJson = serverJson, eResultLines = eResultLines, eErrLines = eErrLines)
@@ -655,7 +656,8 @@ statement: t.repeat = 200
     # Test that you cannot assign t.maxRepeat less than repeat.
 
     let templateContent = """
-<!--$ nextline t.repeat = 4;     t.maxRepeat=3-->
+<!--$ nextline t.repeat = 4 -->
+<!--$ : t.maxRepeat=3-->
 {t.row}
 """
     let eResultLines = splitNewLines """
@@ -665,17 +667,17 @@ statement: t.repeat = 200
 3
 """
     let eErrLines = splitNewLines """
-template.html(1): w67: The maxRepeat value must be greater than or equal to t.repeat.
-statement:      t.maxRepeat=3
+template.html(2): w67: The maxRepeat value must be greater than or equal to t.repeat.
+statement: t.maxRepeat=3
            ^
-template.html(1): w67: The maxRepeat value must be greater than or equal to t.repeat.
-statement:      t.maxRepeat=3
+template.html(2): w67: The maxRepeat value must be greater than or equal to t.repeat.
+statement: t.maxRepeat=3
            ^
-template.html(1): w67: The maxRepeat value must be greater than or equal to t.repeat.
-statement:      t.maxRepeat=3
+template.html(2): w67: The maxRepeat value must be greater than or equal to t.repeat.
+statement: t.maxRepeat=3
            ^
-template.html(1): w67: The maxRepeat value must be greater than or equal to t.repeat.
-statement:      t.maxRepeat=3
+template.html(2): w67: The maxRepeat value must be greater than or equal to t.repeat.
+statement: t.maxRepeat=3
            ^
 """
     # todo: it might be better if the arrow pointed at the first non-whitespace character.
@@ -1357,6 +1359,45 @@ $$ endblock
     let eResultLines = @[
       "one\n",
       "two\n",
+    ]
+    check testProcessTemplate(templateContent = templateContent,
+        eResultLines = eResultLines)
+
+  test "Continue a string":
+    let templateContent = """
+$$ block str = "This is a long+
+$$ : string."
+str => {str}
+$$ endblock
+"""
+    let eResultLines = @[
+      "str => This is a longstring.\n",
+    ]
+    check testProcessTemplate(templateContent = templateContent,
+        eResultLines = eResultLines)
+
+  test "Continue a string ending spaces":
+    let templateContent = """
+$$ block str = "This is a long   +
+$$ : string."
+str => {str}
+$$ endblock
+"""
+    let eResultLines = @[
+      "str => This is a long   string.\n",
+    ]
+    check testProcessTemplate(templateContent = templateContent,
+        eResultLines = eResultLines)
+
+  test "Continue a string leading spaces":
+    let templateContent = """
+$$ block str = "This is a long+
+$$ :    string."
+str => {str}
+$$ endblock
+"""
+    let eResultLines = @[
+      "str => This is a long   string.\n",
     ]
     check testProcessTemplate(templateContent = templateContent,
         eResultLines = eResultLines)

@@ -109,7 +109,7 @@ suite "parseCmdLine.nim":
 
   test "parseCmdLine middle 2":
     let line = "<!--$ nextline    middle part  -->\n"
-    var elps = newLineParts(middleStart = 18, middleLen = 13)
+    var elps = newLineParts(middleStart = 15, middleLen = 16)
     check testParseCmdLine(line, expectedLineParts = elps)
 
   test "parseCmdLine middle 3":

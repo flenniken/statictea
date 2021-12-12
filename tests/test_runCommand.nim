@@ -280,7 +280,7 @@ suite "runCommand.nim":
 <!--$ nextline a = 5 -->
 """
     let expected = """
-1, 15: "a = 5 "
+1, 15: "a = 5"
 """
     check testGetStatements(content, expected)
 
@@ -289,39 +289,7 @@ suite "runCommand.nim":
 <!--$ nextline a = "tea" -->
 """
     let expected = """
-1, 15: "a = "tea" "
-"""
-    check testGetStatements(content, expected)
-
-  test "two statements":
-    let content = """
-<!--$ nextline a = 5; b = 6 -->
-"""
-    let expected = """
-1, 15: "a = 5"
-1, 21: " b = 6 "
-"""
-    check testGetStatements(content, expected)
-
-  test "three statements":
-    let content = """
-<!--$ nextline a = 5; b = 6 ;c=7-->
-"""
-    let expected = """
-1, 15: "a = 5"
-1, 21: " b = 6 "
-1, 29: "c=7"
-"""
-    check testGetStatements(content, expected)
-
-  test "two lines":
-    let content = """
-<!--$ nextline a = 5; +-->
-<!--$ : asdf -->
-"""
-    let expected = """
-1, 15: "a = 5"
-1, 21: " asdf "
+1, 15: "a = "tea""
 """
     check testGetStatements(content, expected)
 
@@ -332,8 +300,8 @@ suite "runCommand.nim":
 """
 #123456789 123456789 123456789
     let expected = """
-1, 15: "a = 5 "
-2, 8: "asdf "
+1, 15: "a = 5"
+2, 8: "asdf"
 """
     check testGetStatements(content, expected)
 
@@ -352,154 +320,31 @@ $$ : c = len("hello")
 """
     check testGetStatements(content, expected)
 
-  test "continuation and not":
-    let content = """
-$$ nextline 234;4546;
-$$ : a = 5;bbb = +
-$$ : concat("1", "e")
-$$ : c = len("hello")
-"""
-#123456789 123456789 123456789
-    let expected = """
-1, 12: "234"
-1, 16: "4546"
-2, 5: "a = 5"
-2, 11: "bbb = concat("1", "e")"
-4, 5: "c = len("hello")"
-"""
-    check testGetStatements(content, expected)
-
-  test "three statements split":
-    let content = """
-<!--$ block a = 5; b = +-->
-<!--$ : "hello"; +-->
-<!--$ : c = t.len(s.header) -->
-"""
-    let expected = """
-1, 12: "a = 5"
-1, 18: " b = "hello""
-2, 16: " c = t.len(s.header) "
-"""
-    check testGetStatements(content, expected)
-
-  test "semicolon at the start":
-    let content = """
-<!--$ nextline ;a = 5 -->
-"""
-    let expected = """
-1, 16: "a = 5 "
-"""
-    check testGetStatements(content, expected)
-
   test "double quotes":
     let content = """
 <!--$ nextline a="hi" -->
 """
     let expected = """
-1, 15: "a="hi" "
+1, 15: "a="hi""
 """
     check testGetStatements(content, expected)
 
   test "double quotes with semicolon":
     let content = """
-<!--$ nextline a="h\i;" -->
+<!--$ nextline a="hi;" -->
 """
     let expected = """
-1, 15: "a="h\i;" "
+1, 15: "a="hi;""
 """
     check testGetStatements(content, expected)
 
   test "double quotes with slashed double quote":
+    # '_"hi"_'
     let content = """
-<!--$ nextline a="\"hi\"" -->
+<!--$ nextline a = "_\"hi\"_"-->
 """
     let expected = """
-1, 15: "a="\"hi\"" "
-"""
-    check testGetStatements(content, expected)
-
-  test "double quotes with single quote":
-    let content = """
-<!--$ nextline a=""hi"" -->
-"""
-    let expected = """
-1, 15: "a=""hi"" "
-"""
-    check testGetStatements(content, expected)
-
-  test "single quotes":
-    let content = """
-<!--$ nextline a="hi" -->
-"""
-    let expected = """
-1, 15: "a="hi" "
-"""
-    check testGetStatements(content, expected)
-
-  test "single quotes with semicolon":
-    let content = """
-<!--$ nextline a="hi;there" -->
-"""
-    let expected = """
-1, 15: "a="hi;there" "
-"""
-    check testGetStatements(content, expected)
-
-  test "single quotes with slashed single quote":
-    let content = """
-<!--$ nextline a="hi\"there" -->
-"""
-    let expected = """
-1, 15: "a="hi\"there" "
-"""
-    check testGetStatements(content, expected)
-
-  test "single quotes with double quote":
-    let content = """
-<!--$ nextline a="hi "there"" -->
-"""
-    let expected = """
-1, 15: "a="hi "there"" "
-"""
-    check testGetStatements(content, expected)
-
-  test "semicolon at the end":
-    let content = """
-<!--$ nextline a = 5;-->
-"""
-    let expected = """
-1, 15: "a = 5"
-"""
-    check testGetStatements(content, expected)
-
-  test "two semicolons together":
-    let content = """
-<!--$ nextline asdf;;fdsa-->
-"""
-    let expected = """
-1, 15: "asdf"
-1, 21: "fdsa"
-"""
-    check testGetStatements(content, expected)
-
-  test "white space statement":
-    let content = """
-<!--$ nextline asdf; -->
-"""
-    let expected = """
-1, 15: "asdf"
-"""
-    check testGetStatements(content, expected)
-
-  test "white space statement 2":
-    let content = """
-<!--$ nextline asdf; +-->
-<!--$ : ;   ; +-->
-<!--$ : ;x = y -->
-"""
-    let expected = """
-1, 15: "asdf"
-3, 9: "x = y "
+1, 15: "a = "_\"hi\"_""
 """
     check testGetStatements(content, expected)
 

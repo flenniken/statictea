@@ -11,13 +11,37 @@ import regexes
 import messages
 import matches
 
+# prefix command  middleStart   continuation
+# |      |        |             |postfix
+# |      |        |             ||  ending
+# |      |        |             ||  |
+# <!--$  nextline var = 5       +-->\n
+
+# $$ nextline str = "abc+\n
+# $$ : def+\n
+# $$ : ghi"\n
+# statement: 'str = "abcdefghi"\n'
+
+# There is one space after a command.  It is not part of the middle
+# part. The rest of the line including spaces up to the continuation
+# is part of the middle part. In the example below replace the dashes
+# with spaces.
+
+# $$ nextline -str = "abc-+\n
+# $$ : -def-+\n
+# $$ : -ghi"-\n
+# statement: ' str = "abc--def--ghi"-\n'
+
+# Statements are trimmed of leading and trailing spaces later.
+
+# todo: since we don't support semicolons the middle part is not needed anymore.
 type
   LineParts* = object
     ## LineParts holds parsed components of a line.
     prefix*: string
     command*: string
-    middleStart*: Natural
-    middleLen*: Natural
+    middleStart*: Natural ## One after the command.
+    middleLen*: Natural ## Length to the first ending part.
     continuation*: bool
     postfix*: string
     ending*: string
@@ -27,12 +51,6 @@ proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
     line: string, lineNum: Natural): Option[LineParts] =
   ## Parse the line and return its parts when it is a command. Return
   ## quickly when not a command line.
-
-  # ix0 prefix   command     middleStart  continuation
-  # ix0 |        |           |            |postfix
-  # ix0 |        |           |            ||  ending
-  # ix0 |        |           |            ||  |
-  # ix0 <!--$    nextline    a = 5        +-->\n
 
   var lineParts: LineParts
 
@@ -78,10 +96,13 @@ proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
   else:
     spaceLength = 0
 
-  lineParts.middleStart = prefixMatch.length + commandMatch.length + spaceLength
+  lineParts.middleStart = prefixMatch.length + commandMatch.length
+  if spaceLength > 0:
+     lineParts.middleStart += 1
   let middleLength: int = line.len - lineParts.middleStart - lastPart.length
 
   if spaceLength == 0 and middleLength > 0:
+    # No space after the command.
     env.warn(lineNum, wSpaceAfterCommand)
     return
   if middleLength > 0:

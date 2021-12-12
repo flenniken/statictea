@@ -20,8 +20,8 @@ LineParts holds parsed components of a line.
 LineParts = object
   prefix*: string
   command*: string
-  middleStart*: Natural
-  middleLen*: Natural
+  middleStart*: Natural      ## One after the command.
+  middleLen*: Natural        ## Length to the first ending part.
   continuation*: bool
   postfix*: string
   ending*: string

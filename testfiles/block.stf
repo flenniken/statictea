@@ -33,4 +33,3 @@ house at 5:00 pm.
 
 --- expected stdout.expected == stdout
 --- expected stderr.expected == stderr
-
