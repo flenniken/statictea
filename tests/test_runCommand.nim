@@ -826,7 +826,7 @@ statement: t.content = 3.45
   test "invalid repeat":
     let statement = newStatement(text="t.repeat = 3.45", lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w44: The repeat value must be between 0 and t.maxRepeat.
+template.html(1): w44: The variable t.repeat must be an integer between 0 and t.maxRepeat.
 statement: t.repeat = 3.45
            ^
 """

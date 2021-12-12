@@ -201,7 +201,7 @@ const
     """Invalid t.output value, use: "result", "stdout", "stderr", "log", or "skip".""", ## wInvalidOutputValue
     "MaxLines must be an integer greater than 1.", ## wInvalidMaxCount
     "You must assign t.content a string.", ## wInvalidTeaContent
-    "The repeat value must be between 0 and t.maxRepeat.", ## wInvalidRepeat
+    "The variable t.repeat must be an integer between 0 and t.maxRepeat.", ## wInvalidRepeat
     "Invalid prepost: $1.", ## wInvalidPrepost
     "Expected comma or right parentheses.", ## wMissingCommaParen
     "Expected a string.", ## wExpectedString
