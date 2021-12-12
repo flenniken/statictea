@@ -745,8 +745,7 @@ default it goes to the result file.
 
 The t.repeat variable is an integer that tells how many times to
 repeat the block. A value of 0 means don't show the block at
-all. The t.repeat variable defaults to 1 so by default the block
-is output once.
+all. If you don't set it, the block repeats one time.
 
 Each time the block repeats the local variables get cleared then
 recalculated.
@@ -758,15 +757,15 @@ You cannot assign a number bigger than t.maxRepeat to
 t.repeat. You can set t.maxRepeat to anything you want, the
 default is 100.
 
-For the following example, the number of items in tea_list is
+For the following example, the number of items in teaList is
 assigned to the t.repeat variable which outputs the block five
 times.
 
 template:
 
 #+BEGIN_SRC
-<!--$ nextline t.repeat = len(s.tea_list) -->
-<!--$ : tea = get(s.tea_list, t.row) -->
+<!--$ nextline t.repeat = len(s.teaList) -->
+<!--$ : tea = get(s.teaList, t.row) -->
  * {tea}
 #+END_SRC
 
@@ -774,7 +773,7 @@ server json:
 
 #+BEGIN_SRC
 {
-"tea_list": [
+"teaList": [
   "Black",
   "Green",
   "Oolong",
@@ -803,12 +802,13 @@ template:
 #+BEGIN_SRC
 <h3>Tea Companies</h3>
 <select>
-<!--$ nextline t.repeat=len(s.companyList) -->
+<!--$ block t.repeat=len(s.companyList) -->
 <!--$ : d = get(s.companyList, t.row) -->
-<!--$ : selected = get(d.company, "selected", 0) -->
+<!--$ : selected = get(d, "selected", 0) -->
 <!--$ : current = if0(selected, "", +-->
 <!--$ :   " selected=\"selected\"") -->
-<option{current}>{d.company}</option>
+  <option{current}>{d.company}</option>
+$$ endblock
 </select>
 #+END_SRC
 
@@ -832,12 +832,12 @@ result:
 #+BEGIN_SRC
 <h3>Tea Companies</h3>
 <select>
-<option>Lipton</option>
-<option>Tetley</option>
-<option selected="selected">Twinings</option>
-<option>Argo Tea</option>
-<option>American Tea Room</option>
-<option>Bigelow Tea Company</option>
+  <option>Lipton</option>
+  <option>Tetley</option>
+  <option selected="selected">Twinings</option>
+  <option>American Tea Room</option>
+  <option>Argo Tea</option>
+  <option>Bigelow Tea Company</option>
 </select>
 #+END_SRC
 
@@ -857,8 +857,25 @@ template:
 </ul>
 #+END_SRC
 
+server json:
+
+#+BEGIN_SRC
+{
+"teaList": [
+  "Black",
+  "Green",
+  "Oolong",
+  "Sencha",
+  "Herbal"
+]
+}
+#+END_SRC
+
 To create a static page that has more products for better testing
-you could use the repeat variable like this:
+you could create a test list of teas using t.repeat of 0, that appear
+when testing but not when generating the final result. In the
+following example the test list will show: {tea}, Chamomile,
+Chrysanthemum, White, and Puer.
 
 template:
 
@@ -867,28 +884,14 @@ template:
 <ul>
 <!--$ nextline t.repeat = len(s.teaList) -->
 <!--$ : tea = get(s.teaList, t.row) -->
-<li>{tea}</li>
+  <li>{tea}</li>
 <!--$ block t.repeat = 0 -->
-<li>Black</li>
-<li>Green</li>
-<li>Oolong</li>
-<li>Sencha</li>
-<li>Herbal</li>
+  <li>Chamomile</li>
+  <li>Chrysanthemum</li>
+  <li>White</li>
+  <li>Puer</li>
 <!--$ endblock -->
 </ul>
-#+END_SRC
-
-server json:
-
-#+BEGIN_SRC
-{
-"teaList": [
-  "Chamomile",
-  "Chrysanthemum",
-  "White",
-  "Puer"
-]
-}
 #+END_SRC
 
 result:
@@ -896,10 +899,11 @@ result:
 #+BEGIN_SRC
 <h3>Tea</h3>
 <ul>
-<li>Chamomile</li>
-<li>Chrysanthemum</li>
-<li>White</li>
-<li>Puer</li>
+  <li>Black</li>
+  <li>Green</li>
+  <li>Oolong</li>
+  <li>Sencha</li>
+  <li>Herbal</li>
 </ul>
 #+END_SRC
 
