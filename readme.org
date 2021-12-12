@@ -924,10 +924,12 @@ row is used in three places.
 template:
 
 #+BEGIN_SRC
+<ul>
 <!--$ nextline t.repeat=len(s.companies)-->
 <!--$ : company = get(s.companies, t.row) -->
 <!--$ : num = add(t.row, 1) -->
-<li id="r{t.row}">{num}. {company}</li>
+  <li id="r{t.row}">{num}. {company}</li>
+</ul>
 #+END_SRC
 
 server json:
@@ -946,10 +948,12 @@ server json:
 result:
 
 #+BEGIN_SRC
+<ul>
   <li id="r0">1. Mighty Leaf Tea</li>
   <li id="r1">2. Numi Organic Tea</li>
   <li id="r2">3. Peet's Coffee & Tea</li>
   <li id="r3">4. Red Diamond</li>
+</ul>
 #+END_SRC
 
 [[#contents][茶]]
