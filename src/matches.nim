@@ -20,14 +20,13 @@ const
   ]
 
   ## The StaticTea commands.
-  commands: array[7, string] = [
+  commands: array[6, string] = [
     "nextline",
     "block",
     "replace",
     "#",
     ":",
     "endblock",
-    "endreplace",
   ]
 
   numberPattern = r"-{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*\s*"

@@ -158,7 +158,6 @@ suite "matches.nim":
     check testMatchCommand("<!--$ block    -->", 6, some(newMatches(5, 6, "block")))
     check testMatchCommand("<!--$ replace  -->", 6, some(newMatches(7, 6, "replace")))
     check testMatchCommand("<!--$ endblock -->", 6, some(newMatches(8, 6, "endblock")))
-    check testMatchCommand("<!--$ endreplace  -->", 6, some(newMatches(10, 6, "endreplace")))
     check testMatchCommand("<!--$ #  -->", 6, some(newMatches(1, 6, "#")))
     check testMatchCommand("<!--$ :  -->", 6, some(newMatches(1, 6, ":")))
     check testMatchCommand("  nextline ", 2, some(newMatches(8, 2, "nextline")))
