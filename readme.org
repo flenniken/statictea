@@ -406,7 +406,7 @@ t.repeat and t.row. Output control is done with t.output.
 Statements are allowed on the nextline, block and replace
 commands. If you need more space for a statement, you can
 continue the line with the "+" character at the end. Statements
-are executed from left to right, top to bottom.
+are executed from top to bottom.
 
 Here are some simple statements:
 
@@ -515,8 +515,8 @@ times it repeats and other aspects controlling a command.
 A variable name starts with a letter followed by letters, digits
 and underscores limited to a total of 64 ascii characters.
 
-Local variables and most tea variables are cleared after
-processing each replacement block.
+Local variables and most tea variables, except row, args and
+version, are cleared after processing each replacement block.
 
 You can append a new variable to a list or dictionary but you
 cannot change an existing variable.
@@ -531,7 +531,7 @@ cannot change an existing variable.
 Statictea reserves single letters variable names f - u to refer
 to important dictionaries. Five are currently used: g, h, l, s,
 t.  You can use single letters a, b, c, d, e and v, w, x, y, z
-for variable names.
+for your variable names.
 
 - f -- Reserved
 - g -- [[#global-variables][Global Variables]]
@@ -618,7 +618,7 @@ Tea variables:
 - [[#targs][t.args]] -- arguments passed on the command line
 - [[#tcontent][t.content]] -- content of the replace block
 - [[#tmaxrepeat][t.maxRepeat]] -- maximum number of times to repeat the block
-- [[#tmaxlines][t.maxLines]] -- maximum number of replacement block lines allowd
+- [[#tmaxlines][t.maxLines]] -- maximum number of replacement block lines allowed
   before the endblock
 - [[#toutput][t.output]] -- where the block output goes
 - [[#trepeat][t.repeat]] -- how many times the block repeats
@@ -853,7 +853,7 @@ template:
 <ul>
 <!--$ nextline t.repeat = len(s.teaList)-->
 <!--$ : tea = get(s.teaList, t.row) -->
-<li>{tea}</li>
+  <li>{tea}</li>
 </ul>
 #+END_SRC
 
