@@ -326,6 +326,32 @@ func funIf0*(parameters: seq[Value]): FunResult =
   else:
     result = newFunResult(elseCase)
 
+func funIf1*(parameters: seq[Value]): FunResult =
+  ## If the condition is 1, return the second parameter, else return
+  ## the third.
+  ## @:
+  ## @:~~~
+  ## @:if1(condition: int, then: any, else: any) any
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:if1(0, "tea", "beer") => "beer"
+  ## @:if1(1, "tea", "beer") => "tea"
+  ## @:if1(4, "tea", "beer") => "beer"
+  ## @:~~~~
+
+  tMapParameters("iaaa")
+  let condition = map["a"].intv
+  let thenCase = map["b"]
+  let elseCase = map["c"]
+
+  if condition == 1:
+    result = newFunResult(thenCase)
+  else:
+    result = newFunResult(elseCase)
+
 {.push overflowChecks: on, floatChecks: on.}
 
 func funAdd_Ii*(parameters: seq[Value]): FunResult =
@@ -1674,6 +1700,7 @@ const
     ("joinPath", funJoinPath_loss, "loss"),
     ("joinPath", funJoinPath_oSs, "oSs"),
     ("join", funJoin_lsois, "lsois"),
+    ("if1", funIf1, "iaaa"),
   ]
 
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =

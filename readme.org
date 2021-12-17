@@ -805,8 +805,7 @@ template:
 <!--$ block t.repeat=len(s.companyList) -->
 <!--$ : d = get(s.companyList, t.row) -->
 <!--$ : selected = get(d, "selected", 0) -->
-<!--$ : current = if0(selected, "", +-->
-<!--$ :   " selected=\"selected\"") -->
+<!--$ : current = if1(selected, " selected=\"selected\"", "") -->
   <option{current}>{d.company}</option>
 $$ endblock
 </select>
@@ -1638,6 +1637,7 @@ List of functions:
 - [[#githubAnchor][githubAnchor()]] -- Create Github anchor names from heading names.
 - [[#githubAnchor][githubAnchor()]] -- Create a Github anchor name from a heading name.
 - [[#if0][if0()]] -- If the condition is 0, return the second parameter, else return the third.
+- [[#if1][if1()]] -- If the condition is 1, return the second parameter, else return the third.
 - [[#int][int()]] -- Create an int from a float.
 - [[#int][int()]] -- Create an int from a number string.
 - [[#joinPath][joinPath()]] -- Join the path components with a path separator.
@@ -2159,6 +2159,27 @@ Examples:
 if0(0, "tea", "beer") => "tea"
 if0(1, "tea", "beer") => "beer"
 if0(4, "tea", "beer") => "beer"
+#+END_SRC
+
+[[#contents][茶]]
+
+** if1()
+:PROPERTIES:
+:CUSTOM_ID: if1
+:END:
+
+If the condition is 1, return the second parameter, else return the third.
+
+#+BEGIN_SRC
+if1(condition: int, then: any, else: any) any
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+if1(0, "tea", "beer") => "beer"
+if1(1, "tea", "beer") => "tea"
+if1(4, "tea", "beer") => "beer"
 #+END_SRC
 
 [[#contents][茶]]
