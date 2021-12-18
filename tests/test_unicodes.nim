@@ -139,10 +139,10 @@ proc rewriteUtf8TestFile(filename: string, resultFilename: string): string =
   ## # comment line
   ## <blank line>
   ##
-  ## valid [(comment)]: string
-  ## valid hex [(comment)]: hexString
-  ## invalid at pos [(comment)]: string
-  ## invalid hex at pos [(comment)]: hexString
+  ## valid: [(comment)]: string
+  ## valid hex: [(comment)]: hexString
+  ## invalid at pos: [(comment)]: string
+  ## invalid hex at pos: [(comment)]: hexString
 
   if not fileExists(filename):
     return "The file does not exist: " & filename
@@ -205,8 +205,10 @@ proc testValidateUtf8String(filename: string): bool =
   ##
   ## # comment line
   ## <blank line>
-  ## valid [comment]: string
-  ## invalid [comment]: string
+  ## valid:[comment]: string
+  ## valid hex:[comment]: hexString
+  ## invalid at pos:[comment]: string
+  ## invalid hex at pos:[comment]: hexString
 
   if not fileExists(filename):
     echo "The file does not exist: " & filename
@@ -480,10 +482,10 @@ suite "unicodes.nim":
     check testParseLineError("invalid hex at 0: 44")
 
   test "testValidateUtf8String":
-    let filename = "testfiles/utf8testsbin.txt"
-    let msg = rewriteUtf8TestFile("testfiles/utf8tests.txt", filename)
+    let testFilename = "testfiles/utf8tests.bin"
+    let msg = rewriteUtf8TestFile("testfiles/utf8tests.txt", testFilename)
     if msg != "":
       echo msg
       fail
     else:
-      check testValidateUtf8String(filename)
+      check testValidateUtf8String(testFilename)

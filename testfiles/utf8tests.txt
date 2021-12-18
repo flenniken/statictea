@@ -1,25 +1,56 @@
-# Test cases for validating utf8 strings.  Each of the "valid" or
-# "invalid" lines of this file test ut8 strings.  The comment and
-# blank lines are skipped.
-#
+# == UTF8 Test Cases ==
+
+# This file contains test cases for validating utf8 encode strings.
+# You "compile" the file to generate the file utf8test.bin used
+# for testing utf8 decoders.
+
+# == About the File Format ==
+
+# There are two types of lines for testing, valid lines and
+# invalid lines. Both types you can specify the utf8 to test with
+# its normal encoding or by specifing it with hex digits.
+
+# The comment and blank lines are skipped.
+
 # Line types:
 #
-# # comment line
+# # <comment line>
 # <blank line>
-#
 # valid:[comment]: string
 # valid hex:[comment]: hexString
 # invalid at pos:[comment]: string
 # invalid hex at pos:[comment]: hexString
-#
+
+# == General information ==
+
 # Code points must be in the range U+0000 to U+10FFFF.
-#
-# Bit patterns for 1 - 4 byte code points.
+
+# A utf8 code point is encoded with 1 to 4 bytes.
+
+# The first utf8 characters are ascii, 0 - 7f.
+
+# Each unexpected continuation byte should be separately signalled as a
+# malformed sequence of its own.
+
+# It's common practice to replace invalid bytes with U+FFFD. You
+# replace the first invalid byte then restart at the next byte
+# and repeat if necessary.
+
+# Bit patterns for 1 - 4 byte code points:
 # 0xxxxxxx
 # 110xxxxx 10xxxxxx
 # 1110xxxx 10xxxxxx 10xxxxxx
 # 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-#
+
+# Binary to hex table:
+# 0000 0
+# 0001 1
+# 0010 2
+# 0011 3
+# 0100 4
+# 0101 5
+# 0110 6
+# 0111 7
 # 1000 8
 # 1001 9
 # 1010 a
@@ -28,24 +59,27 @@
 # 1101 d
 # 1110 e
 # 1111 f
-#
+
 # Wikipedia has a good explaination of utf-8.
 # https://en.wikipedia.org/wiki/UTF-8
-#
+
 # You can look up unicode characters by code point:
 # https://unicode.org/charts/
-#
-# You can convert from code point to utf-8 hex bytes and visa-versa:
+
+# You can convert from code point to utf-8 hex bytes and
+# visa-versa using an online app:
 # https://www.cogsci.ed.ac.uk/~richard/utf-8.cgi
-#
-# Using tests from Markus Kuhn.
+
+# This file was inspired by Markus Kuhn and uses many of his tests:
 # https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
-#
-# You can convert this file, utf8test.txt, to a binary file,
-# utf8test.bin. Then you can run it through other programs like
-# iconv.
+
+# You can convert this file, utf8tests.txt, to a binary file,
+# utf8tests.bin Then you can run it through other programs like
+# iconv. For example:
 #
 # iconv --byte-subst='(%x!)' -f UTF-8 -t UTF-8 utf8tests.bin >result.txt
+
+# == Test Cases ==
 
 valid:: 1
 valid:: abc
@@ -61,23 +95,6 @@ valid hex: (U+2010, HYPHEN): E2 80 90
 
 # Four byte character.
 valid hex: (U+1D49C): F0 9D 92 9C
-
-# 0 is a valid unicode code point.
-valid hex: (null): 00
-
-# 0 over long tests.
-
-# 110xxxxx 10xxxxxx
-# 11000000 10000000
-invalid hex at 0: (two byte 0, c0 80): c0 80
-
-# 1110xxxx 10xxxxxx 10xxxxxx =
-# 11100000 10000000 10000000 =
-invalid hex at 0: (three byte 0, E0 80 80): E0 80 80
-
-# 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-# 11110000 10000000 10000000 10000000
-invalid hex at 0: (four byte 0, F0 80 80 80): F0 80 80 80
 
 # 2  Boundary condition test cases
 # 2.1  First possible sequence of a certain length
@@ -129,10 +146,6 @@ invalid hex at 0: (80 bf 80): 80 bf 80
 invalid hex at 0: (80 bf 80 bf): 80 bf 80 bf
 invalid hex at 0: (80 bf 80 bf 80): 80 bf 80 bf 80
 invalid hex at 0: (80 bf 80 bf 80 bf): 80 bf 80 bf 80 bf
-
-
-# Each unexpected continuation byte should be separately signalled as a
-# malformed sequence of its own.
 
 # 3.1.9  Sequence of all 64 possible continuation bytes (0x80-0xbf)
 
@@ -206,7 +219,6 @@ invalid hex at 3: (123 ef 80 f0): 31 32 33 ef 80 f0
 # sequences being signaled:
 
 invalid hex at 0:: c0e0 80f0 8080 f880 8080 fc80 8080 80df efbf f7bf bffb bfbf bffd bfbf bfbf
-
 # 3.5  Impossible bytes
 
 # Byte fe and ff cannot appear in utf-8.
@@ -218,6 +230,7 @@ invalid hex at 3: (789 ff fe 7): 37 38 39 ff fe 37
 invalid hex at 3: (789 fe ff 7): 37 38 39 fe ff 37
 
 # # 4.1  Examples of an overlong ASCII / character.
+# This has been abused and is a security issue.
 
 valid: (SOLIDUS): /
 valid hex: (U-002f, SOLIDUS): 2F
@@ -235,15 +248,6 @@ invalid hex at 0: (U-0000007F, c1 bf): c1 bf
 invalid hex at 0: (U-000007FF, e0 9f bf): e0 9f bf
 invalid hex at 0: (U-0000FFFF, f0 8f bf bf): f0 8f bf bf
 invalid hex at 0: (U-001FFFFF, f8 87 bf bf bf): f8 87 bf bf bf
-
-# # 4.3  Overlong representation of the NUL character
-
-valid hex: (0): 00
-invalid hex at 0: (c0 80): c0 80
-invalid hex at 0: (e0 80 80): e0 80 80
-invalid hex at 0: (f0 80 80 80): f0 80 80 80
-invalid hex at 0: (f8 80 80 80 80): f8 80 80 80 80
-invalid hex at 0: (fc 80 80 80 80 80): fc 80 80 80 80 80
 
 # # 5.1 Single UTF-16 surrogates
 
@@ -327,7 +331,10 @@ valid hex: (U+EFFFF, F3 AF BF BF): F3 AF BF BF
 valid hex: (U+FFFFF, F3 BF BF BF): F3 BF BF BF
 valid hex: (U+10FFFF, F4 8F BF BF): F4 8F BF BF
 
-# The transition from the start state 0 to state 1 can happen
+# These tests come from looking at the utf8 finite state diagram
+# for cases that enter the error state.
+
+# The transition from the start state 0 to error state 1 can happen
 # with bytes 80 - df, e1 - ec, ef, f5 - ff.
 
 invalid hex at 0: (80): 80
@@ -351,3 +358,24 @@ invalid hex at 0: (df 00): df 00
 invalid hex at 0: (df 7f): df 7f
 invalid hex at 0: (df c0): df c0
 invalid hex at 0: (df ff): df ff
+
+# 0 is a valid unicode code point. However many programs treat it
+# as a string terminator. That's why the 0 test cases are at the
+# bottom of the file.
+valid hex: (null): 00
+
+# 0 over long tests.
+
+# 110xxxxx 10xxxxxx
+# 11000000 10000000
+invalid hex at 0: (two byte 0, c0 80): c0 80
+
+# 1110xxxx 10xxxxxx 10xxxxxx =
+# 11100000 10000000 10000000 =
+invalid hex at 0: (three byte 0, E0 80 80): E0 80 80
+
+# 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+# 11110000 10000000 10000000 10000000
+invalid hex at 0: (four byte 0, F0 80 80 80): F0 80 80 80
+
+# end of file
