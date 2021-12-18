@@ -1,5 +1,16 @@
 ## Functions that deal with Unicode.
 
+# You can make finite state machine diagrams using an online editor:
+#
+# * http://madebyevan.com/fsm/ -- simple on-line finite state machine editor
+#
+# I created a state diagram for utf8. I started from the standard
+# diagram created by Bjoern Hoehrmann and then added the error
+# state. I then edited the resulting svg file in inkscape to add the
+# legend and to drag the text labels around.
+#
+# * testfiles/utf8statemachine.svg -- utf8 finite state machine diagram.
+
 import std/unicode
 import std/options
 import std/strutils
@@ -73,23 +84,6 @@ proc bytesToString*(buffer: openArray[uint8|char]): string =
   for ix in 0 .. buffer.len-1:
     result.add((char)buffer[ix])
 
-
-# You can make finite state machine diagrams using an online editor:
-#
-# * http://madebyevan.com/fsm/ -- simple on-line finite state machine editor
-#
-# I made a diagram starting from the standard utf8 one created by
-# Bjoern Hoehrmann and added the terminal error state.  See the
-# utf8statemachine.svg file in the testfiles folder.
-#
-# * testfiles/utf8statemachine.svg -- utf8 finite state machine diagram.
-
-* a) 00 - 7f, c0 - ff
-* b) 00 - 9f, c0 - ff
-* c) 00 - 7f, a0 - ff
-* d) 00 - 8f, c0 - ff
-* e) 00 - 7f, 90 - ff
-
 # copyright notice:
 
 # http://bjoern.hoehrmann.de/utf-8/decoder/dfa/
@@ -103,7 +97,6 @@ proc bytesToString*(buffer: openArray[uint8|char]): string =
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 # end copyright notice
-
 
 const
   # The accept state is 0 and the reject state is 12.
@@ -139,25 +132,9 @@ proc decode(state: var uint32, codep: var uint32, sByte: char) =
     codep = (0xffu32 shr ctype) and uint32(sByte)
   state = utf8d[256 + state + ctype]
 
-proc countCodePoints*(str: string, count: var int): uint32 =
-  ## Update the count parameter with the number of code points in the
-  ## string.
-
-  var codePoint: uint32
-  var state: uint32 = 0
-
-  count = 0
-  for sByte in str:
-    decode(state, codePoint, sByte)
-    if state == 0:
-      inc(count)
-
-  result = state
-
 proc validateUtf8String*(str: string): int =
   ## Return the position of the first invalid utf-8 byte in the string
   ## else return -1.
-
 
   var codePoint: uint32 = 0
   var state: uint32 = 0
