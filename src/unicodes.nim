@@ -74,6 +74,23 @@ proc bytesToString*(buffer: openArray[uint8|char]): string =
     result.add((char)buffer[ix])
 
 
+# You can make finite state machine diagrams using an online editor:
+#
+# * http://madebyevan.com/fsm/ -- simple on-line finite state machine editor
+#
+# I made a diagram starting from the standard utf8 one created by
+# Bjoern Hoehrmann and added the terminal error state.  See the
+# utf8statemachine.svg file in the testfiles folder.
+#
+# * testfiles/utf8statemachine.svg -- utf8 finite state machine diagram.
+
+* a) 00 - 7f, c0 - ff
+* b) 00 - 9f, c0 - ff
+* c) 00 - 7f, a0 - ff
+* d) 00 - 8f, c0 - ff
+* e) 00 - 7f, 90 - ff
+
+# copyright notice:
 
 # http://bjoern.hoehrmann.de/utf-8/decoder/dfa/
 
@@ -85,11 +102,12 @@ proc bytesToString*(buffer: openArray[uint8|char]): string =
 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+# end copyright notice
 
-#define UTF8_ACCEPT 0
-#define UTF8_REJECT 12
 
 const
+  # The accept state is 0 and the reject state is 12.
+
   # The first part of the table maps bytes to character classes that
   # to reduce the size of the transition table and create bitmasks.
   utf8d = [
@@ -139,6 +157,7 @@ proc countCodePoints*(str: string, count: var int): uint32 =
 proc validateUtf8String*(str: string): int =
   ## Return the position of the first invalid utf-8 byte in the string
   ## else return -1.
+
 
   var codePoint: uint32 = 0
   var state: uint32 = 0
