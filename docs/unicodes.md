@@ -9,7 +9,6 @@ Functions that deal with Unicode.
 * [stringLen](#stringlen) &mdash; Return the number of unicode characters in the string (not bytes).
 * [githubAnchor](#githubanchor) &mdash; Convert the name to a github anchor name.
 * [bytesToString](#bytestostring) &mdash; Create a string from bytes in a buffer.
-* [countCodePoints](#countcodepoints) &mdash; Update the count parameter with the number of code points in the string.
 * [validateUtf8String](#validateutf8string) &mdash; Return the position of the first invalid utf-8 byte in the string else return -1.
 * [utf8CharString](#utf8charstring) &mdash; Get the unicode character at pos.
 * [firstInvalidUtf8](#firstinvalidutf8) &mdash; Return the position of the first invalid utf-8 byte in the string if any.
@@ -47,14 +46,6 @@ Create a string from bytes in a buffer. A nim string is utf-8 incoded but it isn
 
 ```nim
 proc bytesToString(buffer: openArray[uint8 | char]): string
-```
-
-# countCodePoints
-
-Update the count parameter with the number of code points in the string.
-
-```nim
-proc countCodePoints(str: string; count: var int): uint32
 ```
 
 # validateUtf8String

@@ -1,12 +1,21 @@
 import std/unittest
 import std/options
 import std/strutils
-# import std/unicode
-# import std/osproc
 import std/os
 import std/strformat
 import unicodes
 import regexes
+
+const
+  testIconv = false
+  testNim = false
+  testPython3 = false
+
+when testNim:
+  import std/unicode
+
+when testIconv or testPython3:
+  import std/osproc
 
 const
   validStr = "valid:"
@@ -14,29 +23,15 @@ const
   invalidStr = "invalid at "
   invalidHexStr = "invalid hex at "
 
+
 type
   HexLine = object
-    pos: int  # -1 means not pos and the string is expected to be valid.
+    pos: int  # -1 means no position and the string is expected to be valid.
     comment: string
     str: string
 
 func newHexLine(pos: int, comment: string, str: string): HexLine =
   result = HexLine(pos: pos, comment: comment, str: str)
-
-# proc iconvValidateString(str: string): bool =
-#   ## Validate the string using iconv. Return the position of the first
-#   ## invalid byte or -1.
-
-#   let filename = "tempfile.txt"
-#   var file = open(filename, fmWrite)
-#   file.write(str)
-#   file.close()
-#   result = true
-#   let rc = execCmd("iconv -f UTF-8 -t UTF-8 $1" % filename)
-#   if rc != 0:
-#     echo "iconv returns: " & $rc
-#     result = false
-#   discard tryRemoveFile(filename)
 
 func hexToString*(hexString: string): Option[string] =
   ## Convert the hexString to a string.
@@ -194,22 +189,16 @@ proc rewriteUtf8TestFile(filename: string, resultFilename: string): string =
       if not wroteLine:
         return "Line $1: Not one of the expected lines types." % $lineNum
 
-proc testValidateUtf8String(filename: string): bool =
-  ## Validate the validateUtf8String method by processing all the
-  ## lines in the given file.
+proc testValidateUtf8String(callback: proc(str: string): int ): bool =
+  ## Validate the validateUtf8String method by processing all the the
+  ## test cases in utf8tests.txt one by one.  The callback procedure
+  ## is called for each test case. The callback returns -1 when the
+  ## string is valid, else it is the position of the first invalid
+  ## byte.
 
-  ## Process all the lines in the file.  The comment and blank lines
-  ## are skipped. Comments do not contain colons.
-  ##
-  ## Line types:
-  ##
-  ## # comment line
-  ## <blank line>
-  ## valid:[comment]: string
-  ## valid hex:[comment]: hexString
-  ## invalid at pos:[comment]: string
-  ## invalid hex at pos:[comment]: hexString
-
+  # The utf8test.bin is created from the utftest.txt file by
+  # rewriteUtf8TestFile.
+  let filename = "testfiles/utf8tests.bin"
   if not fileExists(filename):
     echo "The file does not exist: " & filename
     return false
@@ -249,35 +238,143 @@ proc testValidateUtf8String(filename: string): bool =
       result = false
 
     let hexLine = hexLineO.get()
-    let pos = validateUtf8String(hexLine.str)
+
+    let pos = callback(hexLine.str)
 
     if beValid:
       if pos != -1:
-        echo "Line $1 is invalid but expected to be valid." % $lineNum
+        echo "Line $1 is invalid but expected to be valid. $2" % [$lineNum, hexLine.comment]
         result = false
     else:
       if pos == -1:
-        echo fmt"Line {lineNum}: Expected invalid string but it passed validation."
+        echo fmt"Line {lineNum}: Invalid string passed validation. {hexline.comment}"
         result = false
       elif pos != hexLine.pos:
-        echo "Line $1: expected invalid pos: $2" % [$lineNum, $hexLine.pos]
+        echo "Line $1: expected invalid pos: $2 $3" % [$lineNum, $hexLine.pos, $hexLine.comment]
         echo "Line $1:      got invalid pos: $2" % [$lineNum, $pos]
         result = false
 
-    var bytePos = hexLine.pos
-    if bytePos == -1:
-      bytePos = 0
-    let str = utf8CharString(hexLine.str, bytePos)
-    if beValid:
-      if str == "":
-        echo "utf8CharString: Line $1 pos $2 is invalid but expected to be valid." % [
-          $bytePos, $lineNum]
-        result = false
-    else:
-      if str != "":
-        echo fmt"utf8CharString: Line {lineNum} pos {bytePos}: Expected invalid char but it passed validation."
-        result = false
 
+
+
+
+    # var bytePos = hexLine.pos
+    # if bytePos == -1:
+    #   bytePos = 0
+    # let str = utf8CharString(hexLine.str, bytePos)
+    # if beValid:
+    #   if str == "":
+    #     echo "utf8CharString: Line $1 pos $2 is invalid but expected to be valid." % [
+    #       $bytePos, $lineNum]
+    #     result = false
+    # else:
+    #   if str != "":
+    #     echo fmt"utf8CharString: Line {lineNum} pos {bytePos}: Expected invalid char but it passed validation."
+    #     result = false
+
+when testIconv:
+  proc iconvValidateString(str: string): int =
+    ## Validate the string using iconv. Return the position of the first
+    ## invalid byte or -1.
+
+    # Write the string to a temp file.
+    let inFilename = "tempfile.txt"
+    var inFile: File
+    if not open(inFile, inFilename, fmWrite):
+      echo "Unable to open the temp file: $1" % [inFilename]
+      return 90
+    inFile.write(str)
+    inFile.close()
+    defer:
+      discard tryRemoveFile(inFilename)
+
+    # Run iconv on the in file to generate the out file.
+    let outFilename = "iconv-result.txt"
+    discard tryRemoveFile(outFilename)
+    discard execCmd("iconv --byte-subst='@' -f UTF-8 -t UTF-8 $1 >$2 2>/dev/null" % [
+      inFilename, outFilename])
+    if not fileExists(outFilename):
+      echo "Iconv did not generate a result file."
+      return 91
+    defer:
+      discard tryRemoveFile(outFilename)
+
+    # Read the output file generated by iconv into memory.
+    var outFile: File
+    if not open(outFile, outFilename, fmRead):
+      echo "Unable to open the file: $1" % [outFilename]
+      return 92
+    defer:
+      outFile.close()
+      discard tryRemoveFile(outFilename)
+    let text = readFile(outFilename)
+
+    # Return -1 when iconv considers the string valid.
+    if str == text:
+      return -1
+
+    # Find the @ sign in the output file for the position of the first
+    # invalid byte.
+    let pos = text.find('@')
+    if pos == -1:
+      # Iconv considers the string invalid but it did not mark an invalid byte.
+      echo "original: "
+      echo " decoded: "
+      return 99
+    return pos
+
+when testPython3:
+  proc pythonValidateString(str: string): int =
+    ## Validate the string using python 3. Return the position of the first
+    ## invalid byte or -1.
+
+    if str.len == 0:
+      return -1
+
+    # Write the string to a temp file.
+    let inFilename = "tempfile.txt"
+    var inFile: File
+    if not open(inFile, inFilename, fmWrite):
+      echo "Unable to open the temp file: $1" % [inFilename]
+      return 90
+    inFile.write(str)
+    inFile.close()
+    defer:
+      discard tryRemoveFile(inFilename)
+
+    # Run python on the in file to generate the out file.
+    let outFilename = "python-results.txt"
+    discard tryRemoveFile(outFilename)
+    discard execCmd("python3 testfiles/bytesToUtf8.py $1 $2" % [
+      inFilename, outFilename])
+    if not fileExists(outFilename):
+      echo "Python decode.py did not generate a result file."
+      return 91
+    defer:
+      discard tryRemoveFile(outFilename)
+
+    # Read the output file generated by python decode.py into memory.
+    var outFile: File
+    if not open(outFile, outFilename, fmRead):
+      echo "Unable to open the file: $1" % [outFilename]
+      return 92
+    defer:
+      outFile.close()
+      discard tryRemoveFile(outFilename)
+    let text = readFile(outFilename)
+
+    if text.len == 0:
+      return 0
+
+    # Find the first byte difference between the input and output.
+    for ix, ch in text:
+      if ix >= str.len or ch != str[ix]:
+        return ix
+    return -1 # valid utf8
+
+
+
+# todo: test Utf8CharString
 
 # proc testUtf8CharString(text: string, start: Natural, eStr: string, ePos: Natural): bool =
 #   var pos = start
@@ -484,8 +581,39 @@ suite "unicodes.nim":
   test "testValidateUtf8String":
     let testFilename = "testfiles/utf8tests.bin"
     let msg = rewriteUtf8TestFile("testfiles/utf8tests.txt", testFilename)
-    if msg != "":
-      echo msg
-      fail
-    else:
-      check testValidateUtf8String(testFilename)
+    check msg == ""
+
+    proc callback(str: string): int =
+      result = validateUtf8String(str)
+    check testValidateUtf8String(callback)
+
+  when testIconv:
+    test "test iconv app with utf8tests.bin":
+      # Pass the utf8 test cases to iconv.
+      let testFilename = "testfiles/utf8tests.bin"
+      let msg = rewriteUtf8TestFile("testfiles/utf8tests.txt", testFilename)
+      check msg == ""
+
+      proc callback(str: string): int =
+        result = iconvValidateString(str)
+      check testValidateUtf8String(callback)
+
+  when testNim:
+    test "testValidateUtf8":
+      let testFilename = "testfiles/utf8tests.bin"
+      let msg = rewriteUtf8TestFile("testfiles/utf8tests.txt", testFilename)
+      check msg == ""
+
+      proc callback(str: string): int =
+        result = validateUtf8(str)
+      check testValidateUtf8String(callback)
+
+  when testPython3:
+    test "test validate utf8 python":
+      let testFilename = "testfiles/utf8tests.bin"
+      let msg = rewriteUtf8TestFile("testfiles/utf8tests.txt", testFilename)
+      check msg == ""
+
+      proc callback(str: string): int =
+        result = pythonValidateString(str)
+      check testValidateUtf8String(callback)

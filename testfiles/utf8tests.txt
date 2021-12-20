@@ -1,13 +1,13 @@
-# == UTF8 Test Cases ==
+# == UTF-8 Test Cases ==
 
-# This file contains test cases for validating utf8 encode strings.
+# This file contains test cases for validating UTF-8 encoded strings.
 # You "compile" the file to generate the file utf8test.bin used
-# for testing utf8 decoders.
+# for testing UTF-8 validators and decoders.
 
 # == About the File Format ==
 
 # There are two types of lines for testing, valid lines and
-# invalid lines. Both types you can specify the utf8 to test with
+# invalid lines. Both types you can specify the UTF-8 to test with
 # its normal encoding or by specifing it with hex digits.
 
 # The comment and blank lines are skipped.
@@ -21,26 +21,22 @@
 # invalid at pos:[comment]: string
 # invalid hex at pos:[comment]: hexString
 
-# == General information ==
+# == UTF-8 Axioms and General Information ==
 
-# Code points must be in the range U+0000 to U+10FFFF.
+# The following UTF-8 facts are important for testing:
 
-# A utf8 code point is encoded with 1 to 4 bytes.
-
-# The first utf8 characters are ascii, 0 - 7f.
-
-# Each unexpected continuation byte should be separately signalled as a
-# malformed sequence of its own.
+# * Code points must be in the range U+0000 to U+10FFFF.
+# * A UTF-8 code point is encoded with 1 to 4 bytes.
+# * The first UTF-8 characters are ascii, 0 - 7f.
+# * Bit patterns for 1 - 4 byte UTF-8 code points:
+#     0xxxxxxx
+#     110xxxxx 10xxxxxx
+#     1110xxxx 10xxxxxx 10xxxxxx
+#     11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 
 # It's common practice to replace invalid bytes with U+FFFD. You
 # replace the first invalid byte then restart at the next byte
 # and repeat if necessary.
-
-# Bit patterns for 1 - 4 byte code points:
-# 0xxxxxxx
-# 110xxxxx 10xxxxxx
-# 1110xxxx 10xxxxxx 10xxxxxx
-# 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 
 # Binary to hex table:
 # 0000 0
@@ -60,24 +56,25 @@
 # 1110 e
 # 1111 f
 
-# Wikipedia has a good explaination of utf-8.
+# Wikipedia has a good explaination of UTF-8:
 # https://en.wikipedia.org/wiki/UTF-8
 
 # You can look up unicode characters by code point:
 # https://unicode.org/charts/
 
-# You can convert from code point to utf-8 hex bytes and
+# You can convert from code point to UTF-8 hex bytes and
 # visa-versa using an online app:
-# https://www.cogsci.ed.ac.uk/~richard/utf-8.cgi
+# https://www.cogsci.ed.ac.uk/~richard/UTF-8.cgi
 
-# This file was inspired by Markus Kuhn and uses many of his tests:
+# This file was inspired by Markus Kuhn and uses many of his test
+# cases:
 # https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
 
 # You can convert this file, utf8tests.txt, to a binary file,
 # utf8tests.bin Then you can run it through other programs like
 # iconv. For example:
 #
-# iconv --byte-subst='(%x!)' -f UTF-8 -t UTF-8 utf8tests.bin >result.txt
+# iconv --byte-subst='(%x!)' -f UTF-8 -t UTF-8 testfiles/utf8tests.bin -o result.txt
 
 # == Test Cases ==
 
@@ -117,11 +114,13 @@ valid hex: (U-000007FF, DF BF): DF BF
 valid hex: (U-0000FFFF, EF BF BF): EF BF BF
 valid hex: (U-0010FFFF, F4 8F BF BF): F4 8F BF BF
 
+invalid hex at 0: (F7 BF BF): F7 BF BF
+
 # too big
-invalid hex at 0: (U-001FFFFF, F7 BF BF BF): F7 BF BF BF
-invalid hex at 0: (U-03FFFFFF, F7 BF BF BF BF): F7 BF BF BF BF
-invalid hex at 0: (U-7FFFFFFF, F7 BF BF BF BF BF): F7 BF BF BF BF BF
-invalid hex at 0: (F7 BF BF BF BF BF BF): F7 BF BF BF BF BF BF
+invalid hex at 0: (too big U-001FFFFF, F7 BF BF BF): F7 BF BF BF
+invalid hex at 0: (too big U-03FFFFFF, F7 BF BF BF BF): F7 BF BF BF BF
+invalid hex at 0: (too big U-7FFFFFFF, F7 BF BF BF BF BF): F7 BF BF BF BF BF
+invalid hex at 0: (too big             F7 BF BF BF BF BF BF): F7 BF BF BF BF BF BF
 
 # 2.3  Other boundary conditions
 
@@ -149,41 +148,58 @@ invalid hex at 0: (80 bf 80 bf 80 bf): 80 bf 80 bf 80 bf
 
 # 3.1.9  Sequence of all 64 possible continuation bytes (0x80-0xbf)
 
-invalid hex at 0: (80 - 8f): 8081 8283 8485 8687 8889 8a8b 8c8d 8e8f
-invalid hex at 0: (90 - 9f): 9091 9293 9495 9697 9899 9a9b 9c9d 9e9f
-invalid hex at 0: (a0 - af): a0a1 a2a3 a4a5 a6a7 a8a9 aaab acad aeaf
-invalid hex at 0: (b0 - bf): b0b1 b2b3 b4b5 b6b7 b8b9 babb bcbd bebf
+invalid hex at 0: (80 - 87): 8081 8283 8485 8687
+invalid hex at 0: (88 - 8f): 8889 8a8b 8c8d 8e8f
+invalid hex at 0: (90 - 97): 9091 9293 9495 9697
+invalid hex at 0: (98 - 9f): 9899 9a9b 9c9d 9e9f
+invalid hex at 0: (a0 - a7): a0a1 a2a3 a4a5 a6a7
+invalid hex at 0: (a8 - af): a8a9 aaab acad aeaf
+invalid hex at 0: (b0 - b7): b0b1 b2b3 b4b5 b6b7
+invalid hex at 0: (b8 - bf): b8b9 babb bcbd bebf
 
 # 3.2  Lonely start characters
 
 # 3.2.1  All 32 first bytes of 2-byte sequences (0xc0-0xdf),
 #        each followed by a space character.
 
-invalid hex at 0: (c0 - c7): c020 c120 c220 c320 c420 c520 c620 c720
-invalid hex at 0: (c8 - cf): c820 c920 ca20 cb20 cc20 cd20 ce20 cf20
-invalid hex at 0: (d0 - d7): d020 d120 d220 d320 d420 d520 d620 d720
-invalid hex at 0: (d8 - df): d820 d920 da20 db20 dc20 dd20 de20 df20
+invalid hex at 0: (c0 - c3): c020 c120 c220 c320
+invalid hex at 0: (c4 - c7): c420 c520 c620 c720
+invalid hex at 0: (c8 - cb): c820 c920 ca20 cb20
+invalid hex at 0: (cc - cf): cc20 cd20 ce20 cf20
+invalid hex at 0: (d0 - d3): d020 d120 d220 d320
+invalid hex at 0: (d4 - d7): d420 d520 d620 d720
+invalid hex at 0: (d8 - db): d820 d920 da20 db20
+invalid hex at 0: (dc - df): dc20 dd20 de20 df20
 
 # 3.2.2  All 16 first bytes of 3-byte sequences (0xe0-0xef)
 #        each followed by a space character
 
-invalid hex at 0: (e0 - e7): e020 e120 e220 e320 e420 e520 e620 e720
-invalid hex at 0: (e8 - ef): e820 e920 ea20 eb20 ec20 ed20 ee20 ef20
+invalid hex at 0: (e0 - e3): e020 e120 e220 e320
+invalid hex at 0: (e4 - e7): e420 e520 e620 e720
+invalid hex at 0: (e8 - eb): e820 e920 ea20 eb20
+invalid hex at 0: (ec - ef): ec20 ed20 ee20 ef20
 
 # 3.2.3  All 8 first bytes of 4-byte sequences (0xf0-0xf7),
 #        each followed by a space character
 
-invalid hex at 0: (f0 - f7): f020 f120 f220 f320 f420 f520 f620 f720
+invalid hex at 0: (f0 - f1): f020 f120
+invalid hex at 0: (f2 - f3): f220 f320
+invalid hex at 0: (f4 - f5): f420 f520
+invalid hex at 0: (f6 - f7): f620 f720
 
 # 3.2.4  All 4 first bytes of 5-byte sequences (0xf8-0xfb),
 #        each followed by a space character
 
-invalid hex at 0: (f8 - fb): f820 f920 fa20 fb20
+invalid hex at 0: (f8): f820
+invalid hex at 0: (f9): f920
+invalid hex at 0: (fa): fa20
+invalid hex at 0: (fb): fb20
 
 # 3.2.5  All 2 first bytes of 6-byte sequences (0xfc-0xfd),
-#        each followed by a space character
+#        each followed by a space character.
 
-invalid hex at 0: (fc - fd): fc20 fd20
+invalid hex at 0: (fc): fc20
+invalid hex at 0: (fd): fd20
 
 # 3.3  Sequences with last continuation byte missing
 
@@ -219,59 +235,65 @@ invalid hex at 3: (123 ef 80 f0): 31 32 33 ef 80 f0
 # sequences being signaled:
 
 invalid hex at 0:: c0e0 80f0 8080 f880 8080 fc80 8080 80df efbf f7bf bffb bfbf bffd bfbf bfbf
+
 # 3.5  Impossible bytes
 
-# Byte fe and ff cannot appear in utf-8.
+# Byte fe and ff cannot appear in UTF-8.
 
+invalid hex at 0: (80): 80
+invalid hex at 0: (81): 81
 invalid hex at 0: (fe): fe
 invalid hex at 0: (ff): ff
-invalid hex at 3: (789 ff 77): 37 38 39 ff 37 37
-invalid hex at 3: (789 ff fe 7): 37 38 39 ff fe 37
-invalid hex at 3: (789 fe ff 7): 37 38 39 fe ff 37
+invalid hex at 1: (7 ff): 37 ff
+invalid hex at 2: (7 8 ff): 37 38 fe
+invalid hex at 3: (7 8 9 fe): 37 38 39 fe
 
 # # 4.1  Examples of an overlong ASCII / character.
-# This has been abused and is a security issue.
+
+# Overlong solidus has been abused before and is a potential
+# security issue.
 
 valid: (SOLIDUS): /
 valid hex: (U-002f, SOLIDUS): 2F
-invalid hex at 0: (c0 af): c0 af
-invalid hex at 0: (e0 80 af): e0 80 af
-invalid hex at 0: (f0 80 80 af): f0 80 80 af
-invalid hex at 0: (f8 80 80 80 af): f8 80 80 80 af
-invalid hex at 0: (fc 80 80 80 80 af): fc 80 80 80 80 af
+invalid hex at 0: (overlong solidus c0 af): c0 af
+invalid hex at 0: (overlong solidus e0 80 af): e0 80 af
+invalid hex at 0: (overlong solidus f0 80 80 af): f0 80 80 af
+invalid hex at 0: (overlong solidus f8 80 80 80 af): f8 80 80 80 af
+invalid hex at 0: (overlong solidus fc 80 80 80 80 af): fc 80 80 80 80 af
 
 valid hex: (U-0800): e0 a0 80
 
 # # 4.2  Maximum overlong sequences
 
-invalid hex at 0: (U-0000007F, c1 bf): c1 bf
-invalid hex at 0: (U-000007FF, e0 9f bf): e0 9f bf
-invalid hex at 0: (U-0000FFFF, f0 8f bf bf): f0 8f bf bf
-invalid hex at 0: (U-001FFFFF, f8 87 bf bf bf): f8 87 bf bf bf
+invalid hex at 0: (overlong U-0000007F, c1 bf): c1 bf
+invalid hex at 0: (overlong U-000007FF, e0 9f bf): e0 9f bf
+invalid hex at 0: (overlong U-0000FFFF, f0 8f bf bf): f0 8f bf bf
+invalid hex at 0: (overlong U-001FFFFF, f8 87 bf bf bf): f8 87 bf bf bf
 
 # # 5.1 Single UTF-16 surrogates
 
-invalid hex at 0: (U+D800, ed a0 80): ed a0 80
-invalid hex at 0: (U+DB7F, ed ad bf): ed ad bf
-invalid hex at 0: (U+DB80, ed ae 80): ed ae 80
-invalid hex at 0: (U+DBFF, ed af bf): ed af bf
-invalid hex at 0: (U+DC00, ed b0 80): ed b0 80
-invalid hex at 0: (U+DF80, ed be 80): ed be 80
-invalid hex at 0: (U+DFFF, ed bf bf): ed bf bf
+invalid hex at 0: (1 surrogate U+D800, ed a0 80): ed a0 80
+invalid hex at 0: (1 surrogate U+D800 5, ed a0 80 35): ed a0 80 35
+invalid hex at 0: (1 surrogate U+DB7F, ed ad bf): ed ad bf
+invalid hex at 0: (1 surrogate U+DB80, ed ae 80): ed ae 80
+invalid hex at 0: (1 surrogate U+DBFF, ed af bf): ed af bf
+invalid hex at 0: (1 surrogate U+DC00, ed b0 80): ed b0 80
+invalid hex at 0: (1 surrogate U+DF80, ed be 80): ed be 80
+invalid hex at 0: (1 surrogate U+DFFF, ed bf bf): ed bf bf
 
-invalid hex at 3: (U+D800, 123 ed a0 80 1): 31 32 33 ed a0 80 31
-invalid hex at 3: (U+00A9 U+D800, 1 C2 A9 ed a0 80 1): 31 C2 A9 ed a0 80 31
+invalid hex at 3: (1 surrogate U+D800, 123 ed a0 80 1): 31 32 33 ed a0 80 31
+invalid hex at 3: (1 surrogate U+00A9 U+D800, 1 C2 A9 ed a0 80 1): 31 C2 A9 ed a0 80 31
 
 # 5.2 Paired UTF-16 surrogates
 
-invalid hex at 0: (U+D800 U+DC00, eda0 80ed b080): ed a0 80 ed b0 80
-invalid hex at 0: (U+D800 U+DFFF, eda0 80ed bfbf): ed a0 80 ed bf bf
-invalid hex at 0: (U+DB7F U+DC00, edad bfed b080): ed ad bf ed b0 80
-invalid hex at 0: (U+DB7F U+DFFF, edad bfed bfbf): ed ad bf ed bf bf
-invalid hex at 0: (U+DB80 U+DC00, edae 80ed b080): ed ae 80 ed b0 80
-invalid hex at 0: (U+DB80 U+DFFF, edae 80ed bfbf): ed ae 80 ed bf bf
-invalid hex at 0: (U+DBFF U+DC00, edaf bfed b080): ed af bf ed b0 80
-invalid hex at 0: (U+DBFF U+DFFF, edaf bfed bfbf): ed af bf ed bf bf
+invalid hex at 0: (2 surrogates U+D800 U+DC00, eda0 80ed b080): ed a0 80 ed b0 80
+invalid hex at 0: (2 surrogates U+D800 U+DFFF, eda0 80ed bfbf): ed a0 80 ed bf bf
+invalid hex at 0: (2 surrogates U+DB7F U+DC00, edad bfed b080): ed ad bf ed b0 80
+invalid hex at 0: (2 surrogates U+DB7F U+DFFF, edad bfed bfbf): ed ad bf ed bf bf
+invalid hex at 0: (2 surrogates U+DB80 U+DC00, edae 80ed b080): ed ae 80 ed b0 80
+invalid hex at 0: (2 surrogates U+DB80 U+DFFF, edae 80ed bfbf): ed ae 80 ed bf bf
+invalid hex at 0: (2 surrogates U+DBFF U+DC00, edaf bfed b080): ed af bf ed b0 80
+invalid hex at 0: (2 surrogates U+DBFF U+DFFF, edaf bfed bfbf): ed af bf ed bf bf
 
 # # 5.3 Valid noncharacter code positions
 
@@ -331,25 +353,28 @@ valid hex: (U+EFFFF, F3 AF BF BF): F3 AF BF BF
 valid hex: (U+FFFFF, F3 BF BF BF): F3 BF BF BF
 valid hex: (U+10FFFF, F4 8F BF BF): F4 8F BF BF
 
-# These tests come from looking at the utf8 finite state diagram
+# These tests come from looking at the UTF-8 finite state diagram
 # for cases that enter the error state.
 
 # The transition from the start state 0 to error state 1 can happen
-# with bytes 80 - df, e1 - ec, ef, f5 - ff.
+# with bytes 80-c1, f5-ff.
+# !(00-7f, c2-df, e0, e1-ec, ed, ee-ef, f0, f1-f3, f4)
 
 invalid hex at 0: (80): 80
-invalid hex at 1: (81): 20 81
-invalid hex at 2: (82): 20 20 82
-invalid hex at 3: (90): 20 20 20 90
-invalid hex at 0: (a0): A0
-invalid hex at 0: (b0): B0
-invalid hex at 0: (c0): C0
-invalid hex at 0: (d0): D0
-invalid hex at 0: (df): DF
+invalid hex at 1: (20 80): 20 80
+invalid hex at 4: (20 21 21 23 fe 20): 20 21 21 23 fe 20
+invalid hex at 5: (20 21 21 23 24 fe): 20 21 21 23 24 fe
+invalid hex at 0: (80 20): 80 20
+invalid hex at 1: (20 80 20): 20 80 20
+invalid hex at 0: (81 20): 81 20
+invalid hex at 0: (c1 20): c1 20
+invalid hex at 0: (f5 20): f5 20
+invalid hex at 0: (ff 20): ff 20
 
 # The transition from the state 2 to state 1 can happen
 # with bytes 00-7f, c0-ff.
 
+# state 0 -> 2 -> 1
 invalid hex at 0: (c2 00): c2 00
 invalid hex at 0: (c2 7f): c2 7f
 invalid hex at 0: (c2 c0): c2 c0
@@ -359,23 +384,57 @@ invalid hex at 0: (df 7f): df 7f
 invalid hex at 0: (df c0): df c0
 invalid hex at 0: (df ff): df ff
 
-# 0 is a valid unicode code point. However many programs treat it
-# as a string terminator. That's why the 0 test cases are at the
-# bottom of the file.
+# state 0 -> 4 -> 2 -> 1
+invalid hex at 0: (e0 a0 00): e0 80 00
+invalid hex at 0: (e0 a0 7f): e0 80 7f
+invalid hex at 0: (e0 a0 c0): e0 80 c0
+invalid hex at 0: (e0 a0 ff): e0 80 ff
+
+# state 0 -> 5 -> 2 -> 1
+invalid hex at 0: (ed 80 00): ed 80 00
+invalid hex at 0: (ed 80 7f): ed 80 7f
+invalid hex at 0: (ed 80 c0): ed 80 c0
+invalid hex at 0: (ed 80 ff): ed 80 ff
+
+# state 0 -> 6 -> 3 -> 2 -> 1
+invalid hex at 0: (f0 90 80 00): f0 90 80 00
+invalid hex at 0: (f0 90 80 7f): f0 90 80 7f
+invalid hex at 0: (f0 90 80 c0): f0 90 80 c0
+invalid hex at 0: (f0 90 80 ff): f0 90 80 ff
+
+# state 0 -> 7 -> 3 -> 2 -> 1
+invalid hex at 0: (f1 80 80 00): f1 80 80 00
+invalid hex at 0: (f1 80 80 7f): f1 80 80 7f
+invalid hex at 0: (f1 80 80 c0): f1 80 80 c0
+invalid hex at 0: (f1 80 80 ff): f1 80 80 ff
+
+# state 0 -> 8 -> 3 -> 2 -> 1
+invalid hex at 0: (f4 80 80 00): f4 80 80 00
+invalid hex at 0: (f4 80 80 7f): f4 80 80 7f
+invalid hex at 0: (f4 80 80 c0): f4 80 80 c0
+invalid hex at 0: (f4 80 80 ff): f4 80 80 ff
+
+# 0 is a valid unicode code point just like ascci. However many
+# programs treat it as a string terminator. That's why the 0 test
+# cases are here at the bottom of the file.
+
 valid hex: (null): 00
 
 # 0 over long tests.
 
 # 110xxxxx 10xxxxxx
 # 11000000 10000000
-invalid hex at 0: (two byte 0, c0 80): c0 80
+invalid hex at 0: (overlong zero c0 80): c0 80
 
 # 1110xxxx 10xxxxxx 10xxxxxx =
 # 11100000 10000000 10000000 =
-invalid hex at 0: (three byte 0, E0 80 80): E0 80 80
+invalid hex at 0: (overlong zero E0 80 80): E0 80 80
 
 # 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 # 11110000 10000000 10000000 10000000
-invalid hex at 0: (four byte 0, F0 80 80 80): F0 80 80 80
+invalid hex at 0: (overlong zero F0 80 80 80): F0 80 80 80
+
+valid hex: (0 in the middle,  20 00 20): 20 00 20
+invalid hex at 3: (0 in the middle, 20 00 20 ff): 20 00 20 ff
 
 # end of file
