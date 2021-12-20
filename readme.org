@@ -22,10 +22,6 @@ The result:
 hello world
 #+END_SRC
 
-:PROPERTIES:
-:testfile: testfiles/hello.stf
-:END:
-
 [[#contents][茶]] (table of contents at the bottom)
 
 * Advantages
@@ -82,7 +78,6 @@ it provides a place for your code statements.
 ** Nextline Command
 :PROPERTIES:
 :CUSTOM_ID: nextline-command
-:testfile: testfiles/nextline.stf
 :END:
 
 The nextline command targets the line following it for
@@ -118,7 +113,6 @@ Drink tea -- Earl Grey is my favorite.
 ** Block Command
 :PROPERTIES:
 :CUSTOM_ID: block-command
-:testfile: testfiles/block.stf
 :END:
 
 The block command targets multiple lines for replacement. The
@@ -162,9 +156,6 @@ house at 5:00 pm.
 ** Replace Command
 :PROPERTIES:
 :CUSTOM_ID: replace-command
-:testfile: testfiles/replace.stf
-:testfile2: testfiles/replace2.stf
-:testfile3: testfiles/replace3.stf
 :END:
 
 The replace command's replacement block gets replaced with the
@@ -275,7 +266,6 @@ result:
 ** Comment Command
 :PROPERTIES:
 :CUSTOM_ID: comment-command
-:testfile: testfiles/comment.stf
 :END:
 
 You can comment templates with the comment command.  Comments
@@ -306,7 +296,6 @@ intensive steps.
 ** Continue Command
 :PROPERTIES:
 :CUSTOM_ID: continue-command
-:testfile: testfiles/continue.stf
 :END:
 
 The continue command allows you to continue adding statements to
@@ -335,7 +324,6 @@ Earl Grey, Masala chai
 ** Endblock Command
 :PROPERTIES:
 :CUSTOM_ID: endblock-command
-:testfile: testfiles/endblock.stf
 :END:
 
 The endblock command ends the replacement block for the block and
@@ -389,7 +377,6 @@ repeated block.
 * Statements
 :PROPERTIES:
 :CUSTOM_ID: statements
-:testfile: testfiles/statements.stf
 :END:
 
 You format server variables by creating new variables with
@@ -426,7 +413,6 @@ name = concat(substr(s.name, 0, 7), "...")
 * Syntax
 :PROPERTIES:
 :CUSTOM_ID: syntax
-:testfile: testfiles/syntax.stf
 :END:
 
 A template consists of command lines and non-command lines.  The
@@ -551,7 +537,6 @@ for your variable names.
 ** Json Variables
 :PROPERTIES:
 :CUSTOM_ID: json-variables
-:testfile: testfiles/truefalsenull.stf
 :END:
 
 You pass variables to the template in json files.
@@ -584,7 +569,6 @@ presentation needs.
 ** Local Variables
 :PROPERTIES:
 :CUSTOM_ID: local-variables
-:testfile: testfiles/localvars.stf
 :END:
 
 You create local variables with template statements.  They are
@@ -598,7 +582,6 @@ recalculated for each repeated block.
 ** Global Variables
 :PROPERTIES:
 :CUSTOM_ID: global-variables
-:testfile: testfiles/globalvars.stf
 :END:
 
 Like local variables, you create global variables with template
@@ -633,7 +616,6 @@ Tea variables:
 *** t.args
 :PROPERTIES:
 :CUSTOM_ID: targs
-:testfile: testfiles/targs.stf
 :END:
 
 The t.args variable contains the arguments passed to
@@ -692,7 +674,6 @@ The variable only applies to the replace command. See the
 *** t.maxRepeat
 :PROPERTIES:
 :CUSTOM_ID: tmaxrepeat
-:testfile: testfiles/maxrepeat.stf
 :END:
 
 The t.maxRepeat variable determines the maximum times a block can
