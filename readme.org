@@ -47,14 +47,14 @@ formatting json.
 :CUSTOM_ID: how-it-works
 :END:
 
-You create a template and add commands to wrap the variable
-content called the replacement block.
+You create a template and add commands around your variable
+content. This defines the replacement block.
 
-In the replacement block you add variables in brackets for
+In the replacement blocks you add variables in brackets for
 substitutions.
 
-In the commands you format your json variables or you create new
-variables for the replacement block.
+In the commands you format the variables for the replacement
+blocks.
 
 You specify the commands so they look like comments for your
 template type.
@@ -62,6 +62,9 @@ template type.
 [[#contents][茶]]
 
 * Commands
+:PROPERTIES:
+:CUSTOM_ID: commands
+:END:
 
 A StaticTea command marks replacement content in the template and
 it provides a place for your code statements.
@@ -70,8 +73,8 @@ it provides a place for your code statements.
 - [[#block-command][block]] —- make substitutions in the next block of lines
 - [[#replace-command][replace]] -— replace the block with a variable
 - [[#endblock-command][endblock]] -- end the block and replace commands
-- # ([[#comment-command][comment]]) -- code comment
 - : ([[#continue-command][continue]]) -- continue a command
+- # ([[#comment-command][comment]]) -- code comment
 
 [[#contents][茶]]
 
@@ -159,21 +162,7 @@ house at 5:00 pm.
 :END:
 
 The replace command's replacement block gets replaced with the
-t.content variable.
-
-The lines in the block mirror the variable so you can
-test the template as if it was a static file.
-
-The command is useful for sharing common template lines between
-templates and it has the special property that you can keep the
-replacement block in sync with the variable, see [[#update-option][Update Option]]
-for more information.
-
-If you don't assign the t.content variable, a warning is
-generated, and the command behaves like a block command.  This is
-good for testing changes you want to make to the shared value.
-
-The following example uses a common header from the shared json.
+t.content variable. Here is a simple example:
 
 template:
 
@@ -201,9 +190,23 @@ The above example generates the correct result but it doesn’t
 work as a static template because the template is missing the
 header lines.
 
-You can fix this by adding the header lines inside the replace
-command's replacement block. The lines do not appear in the
-result, just the data from the json header variable.
+You can add lines to the replace command's replacement block to
+mirror the t.content variable so you can develop and test the
+template as if it was a static file.
+
+The replace command allows you to share common template lines between
+templates and at the same time work with them as static pages.
+
+Since you are duplicating content in the replacement block, when
+you want to edit the shared text it will get out of sync. You can
+update your templates using the [[#update-option][Update Option]].
+
+If you don't assign the t.content variable, a warning is
+generated, and the command behaves like a block command.  This is
+good for testing changes you want to make to the shared value.
+
+The following example uses a common header from the shared json data
+and it mirrors it in the replacement block.
 
 template:
 
@@ -384,21 +387,8 @@ statements.
 
 A statement is an expression consisting of a variable, an equal
 sign, and a right hand side. The right hand side is either
-another variable, a string, a number or a function.
-
-All operations are done with functions except the two equal
-operators. Looping is done at the replacement block level with
-t.repeat and t.row. Output control is done with t.output.
-
-Statements are allowed on the nextline, block and replace
-commands. If you need more space for a statement, you can
-continue the line with the "+" character at the end. Statements
-are executed from top to bottom.
-
-If there is a syntax error or a function generates a warning, the
-statement is skipped.
-
-Here are some simple statements:
+another variable, a string, a number or a function. Here are a
+few example statements:
 
 #+BEGIN_SRC
 tea = "Earl Grey"
@@ -407,6 +397,49 @@ t.repeat = 2
 nameLen = len(s.name)
 name = concat(substr(s.name, 0, 7), "...")
 #+END_SRC
+
+Statements are allowed on the nextline, block, continue and
+replace commands.
+
+All operations are done with functions. For example to add 1 to
+t.row you use the add function.
+
+#+BEGIN_SRC
+num = add(t.row, 1)
+#+END_SRC
+
+Statements are executed from top to bottom. There is no
+traditional "if" statement to control statement flow.
+
+You can loop at the replacement block level and run the command's
+statements multiple times usint t.repeat, and vary the output using
+t.row. Here is an example the loops three times and outputs 1, 2, 3.
+
+template:
+
+#+BEGIN_SRC
+$$ nextline t.repeat = 3
+$$ : count = t.row
+{count}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+1
+2
+3
+#+END_SRC
+
+There is no traditional "print" function. You print the
+replacement block, either to the template or to other places by
+setting the t.output variable.
+
+If there is a syntax error or a function generates a warning, the
+statement is skipped.
+
+You can continue a long statement on the next line by using a "+"
+character at the end.
 
 [[#contents][茶]]
 
@@ -426,13 +459,14 @@ optional ending comment characters are called the postfix. For
 example, in an html template the prefix is "<!--$" and the
 postfix is "-->". See [[#prefix-postfix][Prefix Postfix]] for more information.
 
-- The prefix starts at column 1.
-- Next comes the command name.
-- An optional statement follows the command name.
-- At the end of the line is an optional plus continuation
-  character
-- then the optional postfix
-- then the end of line, either \r\n or \n.
+From left to right a command line consists of:
+
+- a prefix at column 1.
+- a command name
+- an optional statement
+- an optional plus continuation character
+- an optional postfix
+- the end of line, either \r\n or \n.
 
 The chart below shows a nextline command with three continuation
 commands and three statements: a = 5, b = "tea" and c = "The Earl
@@ -504,8 +538,8 @@ times it repeats and other aspects controlling a command.
 A variable name starts with a letter followed by letters, digits
 and underscores limited to a total of 64 ascii characters.
 
-Local variables and most tea variables, except row, args and
-version, are cleared after processing each replacement block.
+Local variables and tea variables, except row, args and version,
+are cleared after processing each replacement block.
 
 You can append a new variable to a list or dictionary but you
 cannot change an existing variable.

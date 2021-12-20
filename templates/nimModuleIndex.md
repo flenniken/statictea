@@ -10,7 +10,7 @@ $$ : g.modules = sort(s.modules, "ascending", "sensitive", "filename")
 $$ endblock
 
 $$ # Show the dependency svg file. Wrap it with a do nothing link
-$$ # to prevent gitlab from showing the raw svg source when clicking on it.
+$$ # to prevent github from showing the raw svg source when clicking on it.
 [![Module Dependencies](staticteadep.svg)](#)
 
 $$ # Output module names and a short descrition.

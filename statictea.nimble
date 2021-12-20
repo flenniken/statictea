@@ -403,7 +403,7 @@ proc createDependencyGraph2() =
 proc echoGrip() =
   echo """
 
-The grip app is good for viewing gitlab markdown.
+The grip app is good for viewing github markdown.
   grip --quiet docs/index.md &
   http://localhost:6419/index.md
 """
