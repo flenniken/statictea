@@ -408,6 +408,9 @@ commands. If you need more space for a statement, you can
 continue the line with the "+" character at the end. Statements
 are executed from top to bottom.
 
+If there is a syntax error or a function generates a warning, the
+statement is skipped.
+
 Here are some simple statements:
 
 #+BEGIN_SRC
@@ -1282,6 +1285,13 @@ statement: tea = len("abc",)
                            ^
 #+END_SRC
 
+Warnings are suppressed after the first 10. When you reach the
+limit you will see the message:
+
+#+BEGIN_SRC
+You reached the maximum number of warnings, suppressing the rest.
+#+END_SRC
+
 Statictea returns success, return code 0, when there are no
 warning messages, else it returns 1.
 
@@ -1556,9 +1566,8 @@ tt          Compile and run t.nim.
 tree        Show the project directory tree.
 args        Show command line arguments.
 br          Build the test runner.
-runt        Run a stf test in testfiles. Specify the filename.
-runall      Run all stf tests in the testfiles folder.
-stf         List stf tests descriptions.
+rt        	Run one or more stf tests in testfiles; specify part of the name.
+stf        	List stf tests with newest last.
 newstf      Create new stf as a starting point for a new test.
 runhelp     Show the runner help text with glow.
 helpme      Show the statictea help text.

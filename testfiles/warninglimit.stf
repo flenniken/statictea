@@ -42,7 +42,7 @@ template.html(4): w58: The replacement variable doesn't exist: name.
 template.html(4): w58: The replacement variable doesn't exist: name.
 template.html(4): w58: The replacement variable doesn't exist: name.
 template.html(4): w58: The replacement variable doesn't exist: name.
-template.html(4): w116: Reached the maximum number of warnings, suppressing the rest.
+template.html(4): w116: You reached the maximum number of warnings, suppressing the rest.
 --- endfile
 
 --- expected result.expected == result.html

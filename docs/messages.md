@@ -284,7 +284,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The sort key values are different types.", ## wKeyValueKindDiff
     "A sublist is empty.",  ## wSubListsEmpty
     "The first item in the sublists are different types.", ## wSubListsDiffTypes
-    "Reached the maximum number of warnings, suppressing the rest.", ## kMaxWarnings
+    "You reached the maximum number of warnings, suppressing the rest.", ## kMaxWarnings
     "Invalid signature string.", ## kInvalidSignature
     "Invalid parameter type.", ## kInvalidParamType
     "Not enough parameters, expected $1 got $2.", ## kNotEnoughArgs
