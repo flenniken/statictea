@@ -34,6 +34,18 @@
      inkscape:window-y="25"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg463" />
+  <text
+     x="20.777"
+     y="40.888"
+     font-family="'Times New Roman'"
+     font-size="36px"
+     id="textMachine">UTF-8 Finite State Machine</text>
+  <text
+     x="20.777"
+     y="60.888"
+     font-family="'Times New Roman'"
+     font-size="12px"
+     id="textTimeStamp">Updated: Tue Dec 21 17:32:53 UTC 2021</text>
   <circle
      stroke="green"
      stroke-width="1"

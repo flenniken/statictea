@@ -4,12 +4,12 @@
 #
 # * http://madebyevan.com/fsm/ -- simple on-line finite state machine editor
 #
-# I created a state diagram for utf8. I started from the standard
+# I created a state diagram for UTF-8. I started from the standard
 # diagram created by Bjoern Hoehrmann and then added the error
 # state. I then edited the resulting svg file in inkscape to add the
 # legend and to drag the text labels around.
 #
-# * testfiles/utf8statemachine.svg -- utf8 finite state machine diagram.
+# * testfiles/utf8statemachine.svg -- UTF-8 finite state machine diagram.
 
 import std/unicode
 import std/options
@@ -18,7 +18,7 @@ import opresultid
 import messages
 
 func cmpString*(a, b: string, insensitive: bool = false): int =
-  ## Compares two utf8 strings a and b.  When a equals b return 0,
+  ## Compares two UTF-8 strings a and b.  When a equals b return 0,
   ## when a is greater than b return 1 and when a is less than b
   ## return -1. Optionally ignore case.
   var i = 0
@@ -76,7 +76,7 @@ func githubAnchor*(name: string): string =
   result = $anchorRunes
 
 proc bytesToString*(buffer: openArray[uint8|char]): string =
-  ## Create a string from bytes in a buffer. A nim string is utf-8
+  ## Create a string from bytes in a buffer. A nim string is UTF-8
   ## incoded but it isn't validated so it is just a string of bytes.
   if buffer.len == 0:
     return ""
@@ -123,7 +123,7 @@ const
   ]
 
 proc decode(state: var uint32, codep: var uint32, sByte: char) =
-  ## Interior part of a utf8 decoder.
+  ## Interior part of a UTF-8 decoder.
 
   let ctype = uint32(utf8d[uint8(sByte)])
   if state != 0:
@@ -133,7 +133,7 @@ proc decode(state: var uint32, codep: var uint32, sByte: char) =
   state = utf8d[256 + state + ctype]
 
 proc validateUtf8String*(str: string): int =
-  ## Return the position of the first invalid utf-8 byte in the string
+  ## Return the position of the first invalid UTF-8 byte in the string
   ## else return -1.
 
   var codePoint: uint32 = 0
@@ -157,9 +157,60 @@ proc validateUtf8String*(str: string): int =
   else:
     result = -1
 
+proc sanitizeUtf8*(str: string, skipInvalid: bool): string =
+  ## Sanitize and return the UTF-8 string. The skipInvalid parameter
+  ## determines whether to skip or replace invalid bytes.  When
+  ## replacing the U-FFFD character is used.
+
+  var replacementChar = "\uFFFD"
+  var codePoint: uint32 = 0
+  var state: uint32 = 0
+
+  # String index to the first byte of the current character.
+  var ixChar = 0
+
+  # Reserve space for the result string the same size as the input string.
+  result = newStringOfCap(str.len)
+
+  # Loop through the string bytes.
+  var ix = 0
+  while true:
+    if ix >= str.len:
+      if state != 0:
+        # We got to the end of the string but did not finish with a
+        # valid character.
+        if not skipInvalid:
+          result.add(replacementChar)
+        state = 0
+        inc(ixChar)
+        ix = ixChar
+        continue
+      break # all done
+
+    # Process the string byte.
+    let sByte = str[ix]
+    decode(state, codePoint, sByte)
+    # echo "state = " & $state
+
+    # Add the valid character to the result string.
+    if state == 0:
+      result.add(str[ixChar .. ix])
+      ixChar = ix + 1
+
+    # Handle an invalid byte sequence.
+    elif state == 12:
+      if not skipInvalid:
+        result.add(replacementChar)
+      # Reset the state machine at the next byte.
+      state = 0
+      ix = ixChar
+      inc(ixChar)
+
+    inc(ix)
+
 proc utf8CharString*(str: string, pos: Natural): string =
   ## Get the unicode character at pos.  Return a one character
-  ## string. Return "" when not a utf-8 character.
+  ## string. Return "" when not a UTF-8 character.
   if pos > str.len - 1:
     return
   var codePoint: uint32
@@ -174,7 +225,7 @@ proc utf8CharString*(str: string, pos: Natural): string =
   result = ""
 
 func firstInvalidUtf8*(str: string): Option[int] =
-  ## Return the position of the first invalid utf-8 byte in the string
+  ## Return the position of the first invalid UTF-8 byte in the string
   ## if any.
   var pos = validateUtf8String(str)
   if pos != -1:
@@ -226,7 +277,7 @@ proc parseHexUnicode*(text: string, pos: var Natural): OpResultId[int32] =
       # Invalid leading surrogate pair.
       return newOpResultIdId[int32](wLowSurrogateFirst)
     if num == 0xff or num == 0xfe or num == 0xffff or num == 0xfffe:
-      # Invalid utf-8 bytes.
+      # Invalid UTF-8 bytes.
       return newOpResultIdId[int32](wInvalidUtf8)
     # Add the character and return.
     pos += 5

@@ -256,21 +256,42 @@ proc testValidateUtf8String(callback: proc(str: string): int ): bool =
 
 
 
+proc writeValidUtf8File(inFilename: string, outFilename: string, skipInvalid: bool): int =
+  ## Read the binary file input file, which might contain invalid
+  ## UTF-8 bytes, then write valid UTF-8 bytes to the output file
+  ## either skipping the invalid bytes or replacing them with U-FFFD.
+  ##
+  ## When there is an error, display the error message to standard out
+  ## and return 1. Return 0 when successful.  The input file is
+  ## must be under 50k.
 
+  if not fileExists(inFilename):
+    echo "The input file is missing."
+    return 1
+  if getFileSize(inFilename) > 50 * 1024:
+    echo "The input file must be under 50k."
+    return 1
 
-    # var bytePos = hexLine.pos
-    # if bytePos == -1:
-    #   bytePos = 0
-    # let str = utf8CharString(hexLine.str, bytePos)
-    # if beValid:
-    #   if str == "":
-    #     echo "utf8CharString: Line $1 pos $2 is invalid but expected to be valid." % [
-    #       $bytePos, $lineNum]
-    #     result = false
-    # else:
-    #   if str != "":
-    #     echo fmt"utf8CharString: Line {lineNum} pos {bytePos}: Expected invalid char but it passed validation."
-    #     result = false
+  # Read the file into memory.
+  var inData: string
+  try:
+    inData = readFile(inFilename)
+  except:
+    echo "Unable to open and read the input file."
+    return 1
+
+  # Process the input data assuming it is UTF-8 encoded but it contains
+  # some invalid bytes. Return valid UTF-8 encoded bytes.
+  let outData = sanitizeUtf8(inData, skipInvalid)
+
+  # Write the valid UTF-8 data to the output file.
+  try:
+    writeFile(outFilename, outData)
+  except:
+    echo "Unable to open and write the output file."
+    return 1
+
+  result = 0 # success
 
 when testIconv:
   proc iconvValidateString(str: string): int =
@@ -485,6 +506,39 @@ proc testParseLineError(line: string): bool =
     return false
   result = true
 
+proc testSanitizeutf8Empty(str: string): bool =
+  ## Test that the string does not have any valid UTF-8 bytes.
+
+  result = true
+  let empty = sanitizeUtf8(str, true)
+  if empty != "":
+    echo "expected nothing, got: " & empty
+    result = false
+
+  let rchars = sanitizeUtf8(str, false)
+  if rchars.len != str.len * 3 or rchars.len mod 3 != 0:
+    echo "expected all replace characters, got: " & rchars
+    result = false
+  else:
+    # check at all the bytes are U-FFFD (EF BF BD)
+    for ix in countUp(0, rchars.len-3, 3):
+      if rchars[ix] != '\xEF' or rchars[ix+1] != '\xBF' or
+         rchars[ix+2] != '\xBD':
+        echo "expected all replace characters, got: " & rchars
+        result = false
+        break
+
+proc testSanitizeutf8(str: string, expected: string): bool =
+  ## Test that sanitizeUtf8 returns the expected string when skipping.
+
+  result = true
+  let sanitized = sanitizeUtf8(str, true)
+  if sanitized != expected:
+    echo "     got: " & sanitized
+    echo "expected: " & expected
+    result = false
+
+
 suite "unicodes.nim":
 
   test "cmpString":
@@ -617,3 +671,52 @@ suite "unicodes.nim":
       proc callback(str: string): int =
         result = pythonValidateString(str)
       check testValidateUtf8String(callback)
+
+  test "sanitizeUtf8":
+    check sanitizeUtf8("happy path", true) == "happy path"
+    check sanitizeUtf8("happy path", false) == "happy path"
+
+    check testSanitizeutf8Empty("\x80")
+    check testSanitizeutf8Empty("\xbf")
+    check testSanitizeutf8Empty("\x80\xbf")
+    check testSanitizeutf8Empty("\xf8\x88\x80\x80\x80")
+
+  test "sanitizeUtf8 all 64 possible continuation bytes":
+    # 0x80-0xbf
+    check testSanitizeutf8Empty("\x80\x81\x82\x83\x84\x85\x86\x87")
+    check testSanitizeutf8Empty("\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f")
+    check testSanitizeutf8Empty("\x90\x91\x92\x93\x94\x95\x96\x97")
+    check testSanitizeutf8Empty("\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f")
+    check testSanitizeutf8Empty("\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7")
+    check testSanitizeutf8Empty("\xa8\xa9\xaa\xab\xac\xad\xae\xaf")
+    check testSanitizeutf8Empty("\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7")
+    check testSanitizeutf8Empty("\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf")
+
+  test "32 first bytes of 2-byte sequences (0xc0-0xdf)":
+    check testSanitizeutf8("\xc0\x20\xc1\x20\xc2\x20\xc3\x20", "    ")
+    check testSanitizeutf8("\xc4\x20\xc5\x20\xc6\x20\xc7\x20", "    ")
+    check testSanitizeutf8("\xc8\x20\xc9\x20\xca\x20\xcb\x20", "    ")
+    check testSanitizeutf8("\xcc\x20\xcd\x20\xce\x20\xcf\x20", "    ")
+    check testSanitizeutf8("\xd0\x20\xd1\x20\xd2\x20\xd3\x20", "    ")
+    check testSanitizeutf8("\xd4\x20\xd5\x20\xd6\x20\xd7\x20", "    ")
+    check testSanitizeutf8("\xd8\x20\xd9\x20\xda\x20\xdb\x20", "    ")
+    check testSanitizeutf8("\xdc\x20\xdd\x20\xde\x20\xdf\x20", "    ")
+
+  test "Byte fe and ff cannot appear in UTF-8":
+
+    check testSanitizeutf8Empty("\x80")
+    check testSanitizeutf8Empty("\x81")
+    check testSanitizeutf8Empty("\xfe")
+    check testSanitizeutf8Empty("\xff")
+
+    check sanitizeutf8("\x37\xff", true) ==  "7"
+    check sanitizeutf8("\x37\xff", false) ==  "7\ufffd"
+    check sanitizeutf8("\xff56", true) ==  "56"
+    check sanitizeutf8("\xff56", false) ==  "\ufffd56"
+
+    check testSanitizeutf8("\x37\x38\xfe", "78")
+    check testSanitizeutf8("\x37\x38\x39\xfe", "789")
+
+  test "overlong solidus":
+    check testSanitizeutf8Empty("\xc0\xaf")
+    check testSanitizeutf8Empty("\xe0\x80\xaf")
