@@ -1,5 +1,5 @@
 # == UTF-8 Test Cases ==
-# Updated on Tue Dec 21 17:45:26 UTC 2021.
+# Updated on Tue Dec 21 20:13:48 UTC 2021.
 
 # This file, utf8test.txt, contains test cases for validating
 # UTF-8 encoded strings.  You "compile" the file to generate the
@@ -12,8 +12,11 @@
 # invalid lines. Both types you can specify the UTF-8 to test with
 # its normal encoding or by specifing it with hex digits.
 
-# The comment and blank lines are skipped.
-# You can add an optional comment for each test.
+# * The comment and blank lines are skipped.
+# * You can add an optional comment for each test between the colons.
+# * All tests are uniquely numbered.
+# * Existing tests are not changed.
+# * Tests may added or deleted over time.
 #
 # Line types:
 #
