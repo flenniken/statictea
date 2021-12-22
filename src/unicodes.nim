@@ -162,7 +162,9 @@ proc sanitizeUtf8*(str: string, skipInvalid: bool): string =
   ## determines whether to skip or replace invalid bytes.  When
   ## replacing the U-FFFD character is used.
 
-  var replacementChar = "\uFFFD"
+  const
+    replacementChar = "\uFFFD"
+
   var codePoint: uint32 = 0
   var state: uint32 = 0
 
