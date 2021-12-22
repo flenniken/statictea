@@ -5,14 +5,12 @@ import std/os
 import std/strformat
 import unicodes
 import regexes
+import std/unicode
 
 const
   testIconv = false
   testNim = false
   testPython3 = false
-
-when testNim:
-  import std/unicode
 
 when testIconv or testPython3:
   import std/osproc
@@ -113,6 +111,7 @@ func parseValidHexLine(line: string): Option[HexLine] =
     return
   result = some(newHexLine(-1, comment, strO.get()))
 
+# todo: parse both valid and invalid line types with one routine.
 func parseValidLine(line: string): Option[HexLine] =
   ## Parse line "valid:[comment:] string".
 
@@ -254,16 +253,13 @@ proc testValidateUtf8String(callback: proc(str: string): int ): bool =
         echo "Line $1:      got invalid pos: $2" % [$lineNum, $pos]
         result = false
 
-
-
 proc writeValidUtf8File(inFilename: string, outFilename: string, skipInvalid: bool): int =
   ## Read the binary file input file, which might contain invalid
   ## UTF-8 bytes, then write valid UTF-8 bytes to the output file
   ## either skipping the invalid bytes or replacing them with U-FFFD.
   ##
   ## When there is an error, display the error message to standard out
-  ## and return 1. Return 0 when successful.  The input file is
-  ## must be under 50k.
+  ## and return 1, else return 0.  The input file must be under 50k.
 
   if not fileExists(inFilename):
     echo "The input file is missing."
@@ -292,6 +288,136 @@ proc writeValidUtf8File(inFilename: string, outFilename: string, skipInvalid: bo
     return 1
 
   result = 0 # success
+
+
+proc sanitizeUtf8Nim*(str: string, skipInvalid: bool): string =
+  ## Sanitize and return the UTF-8 string. The skipInvalid parameter
+  ## determines whether to skip or replace invalid bytes.  When
+  ## replacing the U-FFFD character is used.
+
+  # Reserve space for the result string the same size as the input string.
+  result = newStringOfCap(str.len)
+
+  var ix = 0
+  while true:
+    if ix >= str.len:
+      break
+    var pos = validateUtf8(str[ix .. str.len - 1])
+    if pos == -1:
+      result.add(str[ix .. str.len - 1])
+      break
+    assert pos >= 0
+    var endPos = ix + pos
+    if endPos > 0:
+      result.add(str[ix .. endPos - 1])
+    if not skipInvalid:
+      result.add("\ufffd")
+    ix = endPos + 1
+
+proc writeValidUtf8FileNim(inFilename: string, outFilename: string,
+                           skipInvalid: bool): int =
+  ## Read the binary file input file, which might contain invalid
+  ## UTF-8 bytes, then write valid UTF-8 bytes to the output file
+  ## either skipping the invalid bytes or replacing them with U-FFFD.
+  ##
+  ## When there is an error, display the error message to standard out
+  ## and return 1, else return 0.  The input file must be under 50k.
+
+  if not fileExists(inFilename):
+    echo "The input file is missing."
+    return 1
+  if getFileSize(inFilename) > 50 * 1024:
+    echo "The input file must be under 50k."
+    return 1
+
+  # Read the file into memory.
+  var inData: string
+  try:
+    inData = readFile(inFilename)
+  except:
+    echo "Unable to open and read the input file."
+    return 1
+
+  # Process the input data assuming it is UTF-8 encoded but it contains
+  # some invalid bytes. Return valid UTF-8 encoded bytes.
+  let outData = sanitizeUtf8Nim(inData, skipInvalid)
+
+  # Write the valid UTF-8 data to the output file.
+  try:
+    writeFile(outFilename, outData)
+  except:
+    echo "Unable to open and write the output file."
+    return 1
+
+  result = 0 # success
+
+func hexString(str: string): string =
+  ## Convert the str bytes to hex bytes like 34 a9 ff e2.
+  var digits: seq[string]
+  for ch in str:
+    let abyte = uint8(ord(ch))
+    digits.add(fmt"{abyte:02x}")
+  result = digits.join(" ")
+
+func formatGotLine(gotLine: string): string =
+  ## Show the gotLine comment part followed by hex.
+  ##invalid at 0: 6.0 (too big U-001FFFFF, F7 BF BF BF): ????
+  ##6.0 (too big U-001FFFFF, F7 BF BF BF): xx xx xx xx
+
+  # Find the two colons.
+  let firstColon = gotLine.find(':')
+  assert firstColon >= 0
+  let start = firstColon + 2
+  assert start < gotLine.len
+  let secondColon = gotLine[start .. ^1].find(':') + start
+  assert secondColon >= start
+
+  let comment = gotLine[start .. secondColon - 1]
+  let bytesStart = secondColon + 2
+  assert bytesStart <= gotLine.len
+  let hexString = hexString(gotLine[bytesStart .. ^1])
+
+  result = fmt"{comment}: {hexString}"
+
+proc compareUtf8testFiles(expectedFilename: string, gotFilename: string): bool =
+  ## Return true when the two files are the same. When different, show
+  ## the line differences.
+
+  let expectedData = readFile(expectedFilename)
+  let gotData = readFile(gotFilename)
+
+  if expectedData.len != gotData.len:
+    result = false
+  else:
+    result = true
+
+  let expectedLines = splitLines(expectedData)
+  let gotLines = splitLines(gotData)
+
+  # Compare the file generated with the expected output line by line.
+  var ix = 0
+  while true:
+    if ix >= expectedLines.len and ix >= gotLines.len:
+      break
+
+    var expectedLine: string
+    if ix < expectedLines.len:
+      expectedLine = expectedLines[ix]
+    else:
+      expectedLine = ""
+
+    var gotLine: string
+    if ix < gotLines.len:
+      gotLine = gotLines[ix]
+    else:
+      gotLine = ""
+
+    if expectedLine != gotLine:
+      echo formatGotLine(gotLine)
+
+      result = false
+
+    inc(ix)
 
 when testIconv:
   proc iconvValidateString(str: string): int =
@@ -375,6 +501,8 @@ when testPython3:
       discard tryRemoveFile(outFilename)
 
     # Read the output file generated by python decode.py into memory.
+
+    # todo: remove this?  It look likes dup code of readFile below.
     var outFile: File
     if not open(outFile, outFilename, fmRead):
       echo "Unable to open the file: $1" % [outFilename]
@@ -382,6 +510,7 @@ when testPython3:
     defer:
       outFile.close()
       discard tryRemoveFile(outFilename)
+
     let text = readFile(outFilename)
 
     if text.len == 0:
@@ -720,3 +849,69 @@ suite "unicodes.nim":
   test "overlong solidus":
     check testSanitizeutf8Empty("\xc0\xaf")
     check testSanitizeutf8Empty("\xe0\x80\xaf")
+
+  test "writeValidUtf8File skip":
+    let rc = writeValidUtf8File("testfiles/utf8tests.bin",
+                                "testfiles/utf8tests-skip.txt", true)
+    check rc == 0
+
+  test "writeValidUtf8File fffd":
+    let rc = writeValidUtf8File("testfiles/utf8tests.bin",
+                                "testfiles/utf8tests-fffd.txt", false)
+    check rc == 0
+
+  # test "writeValidUtf8File missing":
+  #   let rc = writeValidUtf8File("missing", "asdf", true)
+  #   check rc == 1
+
+  # test "writeValidUtf8File too big":
+  #   let rc = writeValidUtf8File("bin/statictea", "asdf", true)
+  #   check rc == 1
+
+  test "testStaticTeaSanitize":
+    let expectedFilename = "testfiles/utf8tests-skip.txt"
+    let gotFilename = "tempSanitized.txt"
+    let rc = writeValidUtf8File("testfiles/utf8tests.bin", gotFilename, true)
+    check rc == 0
+
+    check compareUtf8testFiles(expectedFilename, gotFilename)
+
+    discard tryRemoveFile(gotFilename)
+
+  test "sanitizeUtf8Nim":
+    check sanitizeUtf8Nim("abc", true) == "abc"
+    check sanitizeUtf8Nim("abc", false) == "abc"
+    check sanitizeUtf8Nim("ab\xffc", true) == "abc"
+    check sanitizeUtf8Nim("\xffabc", true) == "abc"
+    check sanitizeUtf8Nim("abc\xff", true) == "abc"
+    check sanitizeUtf8Nim("\xff", true) == ""
+    check sanitizeUtf8Nim("\xff\xff\xff", true) == ""
+    check sanitizeUtf8Nim("a\xff\xffb", true) == "ab"
+    check sanitizeUtf8Nim("", true) == ""
+
+  test "writeValidUtf8FileNim":
+    let gotFilename = "tempSanitized.txt"
+    let rc = writeValidUtf8FileNim("testfiles/utf8tests.bin", gotFilename, true)
+    check rc == 0
+
+    when testNim:
+      let expectedFilename = "testfiles/utf8tests-skip.txt"
+      check compareUtf8testFiles(expectedFilename, gotFilename)
+
+    discard tryRemoveFile(gotFilename)
+
+  test "hexString":
+    check hexString("") == ""
+    check hexString("1") == "31"
+    check hexString("12") == "31 32"
+    check hexString("\x00\x12\x34\xff") == "00 12 34 ff"
+
+  test "formatGotLine":
+    let str = "invalid at 0: 6.0 (too big U-001FFFFF, F7 BF BF BF): ????"
+    let expected = "6.0 (too big U-001FFFFF, F7 BF BF BF): 3f 3f 3f 3f"
+    check formatGotLine(str) == expected
+
+  test "formatGotLine empty":
+    let str = "invalid at 0: 6.0 (too big U-001FFFFF, F7 BF BF BF): "
+    let expected = "6.0 (too big U-001FFFFF, F7 BF BF BF): "
+    check formatGotLine(str) == expected
