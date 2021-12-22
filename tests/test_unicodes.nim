@@ -9,6 +9,13 @@ import std/unicode
 import std/osproc
 
 const
+  testCases = "testfiles/utf8tests.txt"
+  binTestCases = "testfiles/utf8tests.bin"
+  expectedSkip = "testfiles/utf8tests-skip.txt"
+  expectedFffd = "testfiles/utf8tests-fffd.txt"
+
+
+const
   testIconv = false
   testNim = false
   testPython3 = false
@@ -192,9 +199,13 @@ proc testValidateUtf8String(callback: proc(str: string): int ): bool =
   ## string is valid, else it is the position of the first invalid
   ## byte.
 
+  if not fileExists(binTestCases):
+    echo "Missing test file: " & binTestCases
+    return false
+
   # The utf8test.bin is created from the utftest.txt file by
   # rewriteUtf8TestFile.
-  let filename = "testfiles/utf8tests.bin"
+  let filename = binTestCases
   if not fileExists(filename):
     echo "The file does not exist: " & filename
     return false
@@ -250,7 +261,7 @@ proc testValidateUtf8String(callback: proc(str: string): int ): bool =
         echo "Line $1:      got invalid pos: $2" % [$lineNum, $pos]
         result = false
 
-proc writeValidUtf8File(inFilename: string, outFilename: string, skipInvalid: bool): int =
+proc writeValidUtf8FileTea(inFilename: string, outFilename: string, skipInvalid: bool): int =
   ## Read the binary file input file, which might contain invalid
   ## UTF-8 bytes, then write valid UTF-8 bytes to the output file
   ## either skipping the invalid bytes or replacing them with U-FFFD.
@@ -339,7 +350,7 @@ func formatGotLine(gotLine: string): string =
 
   result = fmt"{comment}: {hexString}"
 
-proc compareUtf8testFiles(expectedFilename: string, gotFilename: string): bool =
+proc compareUtf8TestFiles(expectedFilename: string, gotFilename: string): bool =
   ## Return true when the two files are the same. When different, show
   ## the line differences.
 
@@ -657,7 +668,75 @@ proc writeValidUtf8FileIconv(inFilename: string, outFilename: string,
   else:
     result = 0
 
+proc generateExpectedFiles(): bool =
+  ## Generate the expected files from the utf8test.txt file.
 
+  discard tryRemoveFile(binTestCases)
+  discard tryRemoveFile(expectedSkip)
+  discard tryRemoveFile(expectedFffd)
+
+  # Generate the utf8test.bin file.
+  let msg = rewriteUtf8TestFile(testCases, binTestCases)
+  if msg != "":
+    echo msg
+    return false
+
+  check fileExists(binTestCases)
+
+  # Generate the two expected files from the utf8test.bin file.
+  result = true
+  var rc: int
+  rc = writeValidUtf8FileTea(binTestCases, expectedSkip, true)
+  if rc != 0:
+    result = false
+  check fileExists(expectedSkip)
+
+  rc = writeValidUtf8FileTea(binTestCases, expectedFffd, false)
+  if rc != 0:
+    result = false
+  check fileExists(expectedFffd)
+
+type
+  WriteValidUtf8File = proc (inFilename, outFilename: string, skipInvalid: bool): int
+
+proc testWriteValidUtf8File(testProc: WriteValidUtf8File): bool =
+  ## Test a WriteValidUtf8File procedure.
+
+  let binTestCases = "testfiles/utf8tests.bin"
+  let expectedSkip = "testfiles/utf8tests-skip.txt"
+  let expectedFffd = "testfiles/utf8tests-fffd.txt"
+
+  if not fileExists(binTestCases):
+    echo "Missing test file: " & binTestCases
+    return false
+
+  result = true
+
+  # Call the write procedure with skipInvalid true.
+  let gotSkipFile = "tempSkip.txt"
+  var rc = testProc(binTestCases, gotSkipFile, true)
+  if rc != 0:
+    echo "The WriteValidUtf8File procedure with skipInvalid = true failed."
+    result = false
+
+  # Compare the file generated with the expected file.
+  var passed = compareUtf8TestFiles(expectedSkip, gotSkipFile)
+  if not passed:
+    result = false
+  discard tryRemoveFile(gotSkipFile)
+
+  # Call the write procedure with skipInvalid false.
+  let gotFffdFile = "tempFffd.txt"
+  rc = testProc(binTestCases, gotFffdFile, false)
+  if rc != 0:
+    echo "The WriteValidUtf8File procedure with skipInvalid = false failed."
+    result = false
+
+  # Compare the file generated with the expected file.
+  passed = compareUtf8TestFiles(expectedFffd, gotFffdFile)
+  if not passed:
+    result = false
+  discard tryRemoveFile(gotFffdFile)
 
 
 suite "unicodes.nim":
@@ -753,36 +832,19 @@ suite "unicodes.nim":
     check testParseLineError("invalid hex at 0:: a2 g3")
     check testParseLineError("invalid hex at 0: 44")
 
-  test "rewriteUtf8TestFile":
-    let testFilename = "testfiles/utf8tests.bin"
-    let msg = rewriteUtf8TestFile("testfiles/utf8tests.txt", testFilename)
-    check msg == ""
-
   test "testValidateUtf8String":
-    let testFilename = "testfiles/utf8tests.bin"
-    let msg = rewriteUtf8TestFile("testfiles/utf8tests.txt", testFilename)
-    check msg == ""
-
     proc callback(str: string): int =
       result = validateUtf8String(str)
     check testValidateUtf8String(callback)
 
   when testNim:
     test "testValidateUtf8":
-      let testFilename = "testfiles/utf8tests.bin"
-      let msg = rewriteUtf8TestFile("testfiles/utf8tests.txt", testFilename)
-      check msg == ""
-
       proc callback(str: string): int =
         result = validateUtf8(str)
       check testValidateUtf8String(callback)
 
   when testPython3:
     test "test validate utf8 python":
-      let testFilename = "testfiles/utf8tests.bin"
-      let msg = rewriteUtf8TestFile("testfiles/utf8tests.txt", testFilename)
-      check msg == ""
-
       proc callback(str: string): int =
         result = pythonValidateString(str)
       check testValidateUtf8String(callback)
@@ -836,33 +898,8 @@ suite "unicodes.nim":
     check testSanitizeutf8Empty("\xc0\xaf")
     check testSanitizeutf8Empty("\xe0\x80\xaf")
 
-  test "writeValidUtf8File skip":
-    let rc = writeValidUtf8File("testfiles/utf8tests.bin",
-                                "testfiles/utf8tests-skip.txt", true)
-    check rc == 0
-
-  test "writeValidUtf8File fffd":
-    let rc = writeValidUtf8File("testfiles/utf8tests.bin",
-                                "testfiles/utf8tests-fffd.txt", false)
-    check rc == 0
-
-  # test "writeValidUtf8File missing":
-  #   let rc = writeValidUtf8File("missing", "asdf", true)
-  #   check rc == 1
-
-  # test "writeValidUtf8File too big":
-  #   let rc = writeValidUtf8File("bin/statictea", "asdf", true)
-  #   check rc == 1
-
-  test "testStaticTeaSanitize":
-    let expectedFilename = "testfiles/utf8tests-skip.txt"
-    let gotFilename = "teaSanitized.txt"
-    let rc = writeValidUtf8File("testfiles/utf8tests.bin", gotFilename, true)
-    check rc == 0
-
-    check compareUtf8testFiles(expectedFilename, gotFilename)
-
-    discard tryRemoveFile(gotFilename)
+  test "WriteValidUtf8FileTea":
+    check testWriteValidUtf8File(writeValidUtf8FileTea)
 
   test "sanitizeUtf8Nim":
     check sanitizeUtf8Nim("abc", true) == "abc"
@@ -882,45 +919,23 @@ suite "unicodes.nim":
     check hexString("\x00\x12\x34\xff") == "00 12 34 ff"
 
   test "formatGotLine":
-    let str = "invalid at 0: 6.0 (too big U-001FFFFF, F7 BF BF BF): ????"
-    let expected = "6.0 (too big U-001FFFFF, F7 BF BF BF): 3f 3f 3f 3f"
+    let str = "invalid at 0: 6.0, too big U-001FFFFF, <F7 BF BF BF>: "
+    let expected = "6.0, too big U-001FFFFF, <F7 BF BF BF>: "
     check formatGotLine(str) == expected
 
-  test "formatGotLine empty":
-    let str = "invalid at 0: 6.0 (too big U-001FFFFF, F7 BF BF BF): "
-    let expected = "6.0 (too big U-001FFFFF, F7 BF BF BF): "
-    check formatGotLine(str) == expected
+  when testNim:
+    test "writeValidUtf8FileNim":
+      check testWriteValidUtf8File(writeValidUtf8FileNim)
 
-  test "writeValidUtf8FileNim":
-    let gotFilename = "nimSanitized.txt"
-    let rc = writeValidUtf8FileNim("testfiles/utf8tests.bin", gotFilename, true)
-    check rc == 0
+  when testIconv:
+    test "writeValidUtf8FileIconv":
+      check testWriteValidUtf8File(writeValidUtf8FileIconv)
 
-    when testNim:
-      let expectedFilename = "testfiles/utf8tests-skip.txt"
-      check compareUtf8testFiles(expectedFilename, gotFilename)
-
-    discard tryRemoveFile(gotFilename)
-
-  test "writeValidUtf8FileIconv skip":
-    let gotFilename = "iconvSanitized.txt"
-    let rc = writeValidUtf8FileIconv("testfiles/utf8tests.bin", gotFilename, true)
-    check rc == 0
-
-    when testIconv:
-      let expectedFilename = "testfiles/utf8tests-skip.txt"
-      check compareUtf8testFiles(expectedFilename, gotFilename)
-
-    discard tryRemoveFile(gotFilename)
-
-  test "writeValidUtf8FileIconv fffd":
-    let gotFilename = "iconvFffdSanitized.txt"
-    let rc = writeValidUtf8FileIconv("testfiles/utf8tests.bin", gotFilename, false)
-    if rc != 0:
-      check rc == 0
-    else:
-      when testIconv:
-        let expectedFilename = "testfiles/utf8tests-skip.txt"
-        check compareUtf8testFiles(expectedFilename, gotFilename)
-
-    discard tryRemoveFile(gotFilename)
+  test "generateExpectedFiles":
+    # Generate the bin file when the txt file is newer or the bin file
+    # is missing.
+    if not fileExists(binTestCases) or fileNewer(testCases, binTestCases):
+        echo "generating file: " & binTestCases
+        check generateExpectedFiles()
+        echo "run the tests again"
+        fail()
