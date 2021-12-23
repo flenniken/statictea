@@ -1,5 +1,5 @@
 # == UTF-8 Test Cases ==
-# Updated on Wed Dec 22 18:52:10 UTC 2021
+# Updated on Thu Dec 23 00:19:14 UTC 2021
 
 # This file, utf8test.txt, contains test cases for validating
 # UTF-8 encoded strings.  You "compile" the file to generate the
@@ -134,7 +134,7 @@ invalid hex at 0: 9.0, <F7 BF BF>: F7 BF BF
 
 valid hex: 10.0, U+FFFF: EF BF BF
 valid hex: 10.1, U+E000: EE 80 80
-valid hex: 10.2, U+FFFD, replacement character: EF BF BD
+valid hex: 10.2, U+FFFD, replacement character, EF BF BD: EF BF BD
 valid hex: 10.3, U+10FFFF, biggest code point: F4 8F BF BF
 
 # 3  Malformed sequences

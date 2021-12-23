@@ -203,7 +203,8 @@ proc sanitizeUtf8*(str: string, skipInvalid: bool): string =
     elif state == 12:
       if not skipInvalid:
         result.add(replacementChar)
-      # Reset the state machine at the next byte.
+      # Reset the state machine at the next byte after where the
+      # character started.
       state = 0
       ix = ixChar
       inc(ixChar)

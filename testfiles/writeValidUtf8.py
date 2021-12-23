@@ -1,12 +1,15 @@
+# Read a binary file and write a utf-8 file.
+
 import sys
 import argparse
 import os
 import unittest
 
-def bytes_to_utf8(in_filename, out_filename):
+def bytes_to_utf8(in_filename, out_filename, skipInvalid):
   """
   Read the input file bytes and write it to the output file as
-  utf8 dropping invalid bytes.
+  UTF-8. When skipInvalid is true, drop the invalid bytes, else
+  replace them with U-FFFD.
   """
   # Read the input file into memory as bytes.
   if not os.path.exists(in_filename):
@@ -14,14 +17,14 @@ def bytes_to_utf8(in_filename, out_filename):
     return 0
   with open(in_filename, "rb") as fh:
     fileData = fh.read()
-  # fileData type: <class 'bytes'>
-  # print("fileData type: " + str(type(fileData)))
 
   # Decode the bytes as utf8 to produce a utf8 string. Drop the
   # invalid bytes.
-  string = fileData.decode("utf-8", 'ignore')
-  # string type: <class 'str'>
-  # print("string type: " + str(type(string)))
+  if skipInvalid:
+    option = 'ignore'
+  else:
+    option = 'replace'
+  string = fileData.decode("utf-8", option)
 
   # Write the string to the output file.
   with open(out_filename, "w") as fh:
@@ -33,9 +36,10 @@ def parse_command_line(argv):
   parameters as attributes.
   """
   parser = argparse.ArgumentParser(description="""\
-Read an input file and write it to a utf8 output file dropping invalid
-bytes.
+Read an input file and write it to a utf8 output file.
 """)
+  parser.add_argument("-s", "--skipInvalid", action="store_true", default=False,
+                       help="skip invalid bytes, else replace them with U-FFFD")
   parser.add_argument("in_filename", type=str,
                         help="the input file",
                         default=None)
@@ -113,6 +117,6 @@ if __name__ == "__main__":
 
   if 1:
     args = parse_command_line(sys.argv)
-    bytes_to_utf8(args.in_filename, args.out_filename)
+    bytes_to_utf8(args.in_filename, args.out_filename, args.skipInvalid)
   else:
     unittest.main()
