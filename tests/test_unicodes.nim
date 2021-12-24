@@ -14,16 +14,15 @@ const
   expectedSkip = "testfiles/utf8tests-skip.txt"
   expectedFffd = "testfiles/utf8tests-fffd.txt"
 
-const
   testIconv = false
   testNim = false
-  testPython3 = true
+  testPython3skip = true
+  testPython3replace = false
 
   validStr = "valid:"
   validHexStr = "valid hex:"
   invalidStr = "invalid at "
   invalidHexStr = "invalid hex at "
-
 
 type
   HexLine = object
@@ -259,6 +258,7 @@ proc testValidateUtf8String(callback: proc(str: string): int ): bool =
         echo "Line $1: expected invalid pos: $2 $3" % [$lineNum, $hexLine.pos, $hexLine.comment]
         echo "Line $1:      got invalid pos: $2" % [$lineNum, $pos]
         result = false
+
 
 proc writeValidUtf8FileTea(inFilename: string, outFilename: string, skipInvalid: bool): int =
   ## Read the binary file input file, which might contain invalid
@@ -550,70 +550,72 @@ proc fileExistsAnd50kEcho(filename: string): int =
     return 1
   result = 0
 
-proc writeValidUtf8FileNim(inFilename: string, outFilename: string,
-                           skipInvalid: bool): int =
-  ## Read the binary file input file, which might contain invalid
-  ## UTF-8 bytes, then write valid UTF-8 bytes to the output file
-  ## either skipping the invalid bytes or replacing them with U-FFFD.
-  ##
-  ## When there is an error, display the error message to standard out
-  ## and return 1, else return 0.  The input file must be under 50k.
+when testNim:
+  proc writeValidUtf8FileNim(inFilename: string, outFilename: string,
+                             skipInvalid: bool): int =
+    ## Read the binary file input file, which might contain invalid
+    ## UTF-8 bytes, then write valid UTF-8 bytes to the output file
+    ## either skipping the invalid bytes or replacing them with U-FFFD.
+    ##
+    ## When there is an error, display the error message to standard out
+    ## and return 1, else return 0.  The input file must be under 50k.
 
-  if fileExistsAnd50kEcho(inFilename) != 0:
-    return 1
+    if fileExistsAnd50kEcho(inFilename) != 0:
+      return 1
 
-  # Read the file into memory.
-  var inData: string
-  try:
-    inData = readFile(inFilename)
-  except:
-    echo "Unable to open and read the input file."
-    return 1
+    # Read the file into memory.
+    var inData: string
+    try:
+      inData = readFile(inFilename)
+    except:
+      echo "Unable to open and read the input file."
+      return 1
 
-  # Process the input data assuming it is UTF-8 encoded but it contains
-  # some invalid bytes. Return valid UTF-8 encoded bytes.
-  let outData = sanitizeUtf8Nim(inData, skipInvalid)
+    # Process the input data assuming it is UTF-8 encoded but it contains
+    # some invalid bytes. Return valid UTF-8 encoded bytes.
+    let outData = sanitizeUtf8Nim(inData, skipInvalid)
 
-  # Write the valid UTF-8 data to the output file.
-  try:
-    writeFile(outFilename, outData)
-  except:
-    echo "Unable to open and write the output file."
-    return 1
+    # Write the valid UTF-8 data to the output file.
+    try:
+      writeFile(outFilename, outData)
+    except:
+      echo "Unable to open and write the output file."
+      return 1
 
-  result = 0 # success
+    result = 0 # success
 
-proc writeValidUtf8FileIconv(inFilename: string, outFilename: string,
-                           skipInvalid: bool): int =
-  ## Read the binary file input file, which might contain invalid
-  ## UTF-8 bytes, then write valid UTF-8 bytes to the output file
-  ## either skipping the invalid bytes or replacing them with U-FFFD.
-  ##
-  ## When there is an error, display the error message to standard out
-  ## and return 1, else return 0.  The input file must be under 50k.
+when testIconv:
+  proc writeValidUtf8FileIconv(inFilename: string, outFilename: string,
+                             skipInvalid: bool): int =
+    ## Read the binary file input file, which might contain invalid
+    ## UTF-8 bytes, then write valid UTF-8 bytes to the output file
+    ## either skipping the invalid bytes or replacing them with U-FFFD.
+    ##
+    ## When there is an error, display the error message to standard out
+    ## and return 1, else return 0.  The input file must be under 50k.
 
-  ## This is the version of iconv and how to get the version number:
-  ## iconv --version | head -1
-  ## iconv (GNU libiconv 1.11)
+    ## This is the version of iconv and how to get the version number:
+    ## iconv --version | head -1
+    ## iconv (GNU libiconv 1.11)
 
-  if fileExistsAnd50kEcho(inFilename) != 0:
-    return 1
+    if fileExistsAnd50kEcho(inFilename) != 0:
+      return 1
 
-  # Run iconv on the input file to generate the output file.
-  var option: string
-  if skipInvalid:
-    option = "-c"
-  else:
-    option = "--byte-subst='(%x!)'"
-    # option = "--byte-subst='\xff\xfd'"
+    # Run iconv on the input file to generate the output file.
+    var option: string
+    if skipInvalid:
+      option = "-c"
+    else:
+      # option = "--byte-subst='(%x!)'"
+      option = "--byte-subst='\xEF\xBF\xBD'"
 
-  discard execCmd("iconv $1 -f UTF-8 -t UTF-8 $2 >$3 2>/dev/null" % [
-    option, inFilename, outFilename])
-  if not fileExists(outFilename) or getFileSize(outFilename) == 0:
-    echo "Iconv did not generate a result file."
-    result = 1
-  else:
-    result = 0
+    discard execCmd("iconv $1 -f UTF-8 -t UTF-8 $2 >$3 2>/dev/null" % [
+      option, inFilename, outFilename])
+    if not fileExists(outFilename) or getFileSize(outFilename) == 0:
+      echo "Iconv did not generate a result file."
+      result = 1
+    else:
+      result = 0
 
 proc writeValidUtf8FilePython3(inFilename: string, outFilename: string,
                            skipInvalid: bool): int =
@@ -698,13 +700,15 @@ proc testWriteValidUtf8File(testProc: WriteValidUtf8File, option: string = "both
     let gotSkipFile = "tempSkip.txt"
     rc = testProc(binTestCases, gotSkipFile, true)
     if rc != 0:
-      echo "The WriteValidUtf8File procedure with skipInvalid = true failed."
+      echo "The WriteValidUtf8File procedure with skipInvalid true failed."
       result = false
 
     # Compare the file generated with the expected file.
     passed = compareUtf8TestFiles(expectedSkip, gotSkipFile)
     if not passed:
       result = false
+      echo "WriteValidUtf8File with skipInvalid true failed, see above."
+      echo "------------------------------------------------------"
     discard tryRemoveFile(gotSkipFile)
 
   if option == "both" or option == "replace":
@@ -719,6 +723,8 @@ proc testWriteValidUtf8File(testProc: WriteValidUtf8File, option: string = "both
     passed = compareUtf8TestFiles(expectedFffd, gotFffdFile)
     if not passed:
       result = false
+      echo "WriteValidUtf8File with skipInvalid false failed, see above."
+      echo "------------------------------------------------------"
     discard tryRemoveFile(gotFffdFile)
 
 
@@ -903,17 +909,21 @@ suite "unicodes.nim":
 
   when testNim:
     test "writeValidUtf8FileNim":
-      check testWriteValidUtf8File(writeValidUtf8FileNim)
+      check testWriteValidUtf8File(writeValidUtf8FileNim, "both")
 
   when testIconv:
     test "writeValidUtf8FileIconv":
-      check testWriteValidUtf8File(writeValidUtf8FileIconv)
+      check testWriteValidUtf8File(writeValidUtf8FileIconv, "both")
 
-  when testPython3:
+  when testPython3skip:
     test "writeValidUtf8FilePython3":
       check testWriteValidUtf8File(writeValidUtf8FilePython3, "skip")
-      # todo: research how python3 replaces invalid when there are muliple bytes.
-      # 33.2, <f0 90 80 c0>: ef bf bd ef bf bd
+
+  # todo: research how python3 replaces invalid when there are muliple bytes.
+  # 33.2, <f0 90 80 c0>: ef bf bd ef bf bd
+  when testPython3replace:
+    test "writeValidUtf8FilePython3":
+      check testWriteValidUtf8File(writeValidUtf8FilePython3, "replace")
 
   test "generateExpectedFiles":
     # Generate the bin file when the txt file is newer or the bin file

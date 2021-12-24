@@ -5,20 +5,21 @@ Functions that deal with Unicode.
 * [unicodes.nim](../src/unicodes.nim) &mdash; Nim source code.
 # Index
 
-* [cmpString](#cmpstring) &mdash; Compares two utf8 strings a and b.
+* [cmpString](#cmpstring) &mdash; Compares two UTF-8 strings a and b.
 * [stringLen](#stringlen) &mdash; Return the number of unicode characters in the string (not bytes).
 * [githubAnchor](#githubanchor) &mdash; Convert the name to a github anchor name.
 * [bytesToString](#bytestostring) &mdash; Create a string from bytes in a buffer.
-* [validateUtf8String](#validateutf8string) &mdash; Return the position of the first invalid utf-8 byte in the string else return -1.
+* [validateUtf8String](#validateutf8string) &mdash; Return the position of the first invalid UTF-8 byte in the string else return -1.
+* [sanitizeUtf8](#sanitizeutf8) &mdash; Sanitize and return the UTF-8 string.
 * [utf8CharString](#utf8charstring) &mdash; Get the unicode character at pos.
-* [firstInvalidUtf8](#firstinvalidutf8) &mdash; Return the position of the first invalid utf-8 byte in the string if any.
+* [firstInvalidUtf8](#firstinvalidutf8) &mdash; Return the position of the first invalid UTF-8 byte in the string if any.
 * [parseHexUnicode16](#parsehexunicode16) &mdash; Return the unicode number given a 4 character unicode escape string like u1234.
 * [parseHexUnicode](#parsehexunicode) &mdash; Return the unicode number given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos.
 * [parseHexUnicodeToString](#parsehexunicodetostring) &mdash; Return the unicode string given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos.
 
 # cmpString
 
-Compares two utf8 strings a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. Optionally ignore case.
+Compares two UTF-8 strings a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. Optionally ignore case.
 
 ```nim
 func cmpString(a, b: string; insensitive: bool = false): int
@@ -42,7 +43,7 @@ func githubAnchor(name: string): string
 
 # bytesToString
 
-Create a string from bytes in a buffer. A nim string is utf-8 incoded but it isn't validated so it is just a string of bytes.
+Create a string from bytes in a buffer. A nim string is UTF-8 incoded but it isn't validated so it is just a string of bytes.
 
 ```nim
 proc bytesToString(buffer: openArray[uint8 | char]): string
@@ -50,15 +51,23 @@ proc bytesToString(buffer: openArray[uint8 | char]): string
 
 # validateUtf8String
 
-Return the position of the first invalid utf-8 byte in the string else return -1.
+Return the position of the first invalid UTF-8 byte in the string else return -1.
 
 ```nim
 proc validateUtf8String(str: string): int
 ```
 
+# sanitizeUtf8
+
+Sanitize and return the UTF-8 string. The skipInvalid parameter determines whether to skip or replace invalid bytes.  When replacing the U-FFFD character is used.
+
+```nim
+proc sanitizeUtf8(str: string; skipInvalid: bool): string
+```
+
 # utf8CharString
 
-Get the unicode character at pos.  Return a one character string. Return "" when not a utf-8 character.
+Get the unicode character at pos.  Return a one character string. Return "" when not a UTF-8 character.
 
 ```nim
 proc utf8CharString(str: string; pos: Natural): string
@@ -66,7 +75,7 @@ proc utf8CharString(str: string; pos: Natural): string
 
 # firstInvalidUtf8
 
-Return the position of the first invalid utf-8 byte in the string if any.
+Return the position of the first invalid UTF-8 byte in the string if any.
 
 ```nim
 func firstInvalidUtf8(str: string): Option[int]
