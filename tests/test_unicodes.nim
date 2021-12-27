@@ -14,10 +14,12 @@ const
   expectedSkip = "testfiles/utf8tests-skip.txt"
   expectedFffd = "testfiles/utf8tests-fffd.txt"
 
+  # The tests turned off do not pass.
   testIconv = false
   testNim = false
   testPython3skip = true
   testPython3replace = false
+  testNodeJs = false
 
   validStr = "valid:"
   validHexStr = "valid hex:"
@@ -647,6 +649,40 @@ proc writeValidUtf8FilePython3(inFilename: string, outFilename: string,
   else:
     result = 0
 
+
+when testNodeJs:
+  proc writeValidUtf8FileNodeJs(inFilename: string, outFilename: string,
+                             skipInvalid: bool): int =
+    ## Read the binary file input file, which might contain invalid
+    ## UTF-8 bytes, then write valid UTF-8 bytes to the output file
+    ## either skipping the invalid bytes or replacing them with U-FFFD.
+    ##
+    ## When there is an error, display the error message to standard out
+    ## and return 1, else return 0.  The input file must be under 50k.
+
+    ## This is the version of node.js and how to get the version number:
+    ## node -v
+    ## v17.2.0
+
+    if fileExistsAnd50kEcho(inFilename) != 0:
+      return 1
+
+    # Run node js  on the input file to generate the output file.
+    var option: string
+    if skipInvalid:
+      option = "skip"
+    else:
+      option = "replace"
+
+    let cmd = "node testfiles/writeValidUtf8.js $1 $2 $3"
+
+    discard execCmd(cmd % [inFilename, outFilename, option])
+    if not fileExists(outFilename) or getFileSize(outFilename) == 0:
+      echo "WriteValidUtf8.js did not generate a result file."
+      result = 1
+    else:
+      result = 0
+
 proc generateExpectedFiles(): bool =
   ## Generate the expected files from the utf8test.txt file.
 
@@ -682,10 +718,6 @@ proc testWriteValidUtf8File(testProc: WriteValidUtf8File, option: string = "both
   ## Test a WriteValidUtf8File procedure.  The option parameter
   ## determines which tests get run, pass "skip", "replace", or
   ## "both".
-
-  let binTestCases = "testfiles/utf8tests.bin"
-  let expectedSkip = "testfiles/utf8tests-skip.txt"
-  let expectedFffd = "testfiles/utf8tests-fffd.txt"
 
   if not fileExists(binTestCases):
     echo "Missing test file: " & binTestCases
@@ -924,6 +956,10 @@ suite "unicodes.nim":
   when testPython3replace:
     test "writeValidUtf8FilePython3":
       check testWriteValidUtf8File(writeValidUtf8FilePython3, "replace")
+
+  when testNodeJs:
+    test "writeValidUtf8FileNodeJs":
+      check testWriteValidUtf8File(writeValidUtf8FileNodeJs, "both")
 
   test "generateExpectedFiles":
     # Generate the bin file when the txt file is newer or the bin file
