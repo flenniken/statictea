@@ -3,7 +3,7 @@ import messages
 import opresultid
 
 type
-  MyObjTest = object
+  MyObjTest2 = object
     name: string
     size: int
 
@@ -41,8 +41,8 @@ suite "optionrc.nim":
     check $opResultId == "Message id: wUnknownArg"
 
   test "newOpResultId my obj":
-    let myObj = MyObjTest(name: "test", size: 12)
-    let opResultId = newOpResultId[MyObjTest](myObj)
+    let myObj = MyObjTest2(name: "test", size: 12)
+    let opResultId = newOpResultId[MyObjTest2](myObj)
     check opResultId.isValue == true
     check opResultId.isMessageId == false
     check opResultId.value == myObj

@@ -9,6 +9,7 @@ import vartypes
 import messages
 import opresultid
 import unicodes
+import utf8decoder
 
 # Json spec:
 # https://datatracker.ietf.org/doc/html/rfc8259

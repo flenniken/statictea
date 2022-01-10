@@ -18,6 +18,9 @@
 ## @:  num = numOr.value
 ## @:~~~~
 
+# todo: use OpResult to implement this.
+# OpResultId[T] = OpResult[T, MessageId]
+
 import messages
 
 type

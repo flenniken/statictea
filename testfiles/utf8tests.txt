@@ -18,16 +18,16 @@
 # test code checks that the output matches the text case. You can
 # specify the test case as normal text or using hex. Examples:
 #
-# 1.9.3: valid: this is test text
+# 1.9.3:valid:this is test text
 # 1.9.6: valid hex: 45 6a 31
 #
-# The replacment character is U+FFFD <EF BF BD>.
+# The replacment character is U+FFFD <EFBFBD>.
 #
 # Shorthand symbols:
 #
-# rep = EF BF BD
-# rep2 = EF BF BD  EF BF BD
-# rep3 = EF BF BD  EF BF BD  EF BF BD
+# rep = EFBFBD
+# rep2 = EFBFBD  EFBFBD
+# rep3 = EFBFBD  EFBFBD  EFBFBD
 # repx = ...
 # nothing = ""
 #
@@ -47,14 +47,14 @@
 # 6.0: invalid: F7 BF BF BF
 # 6.0:   skip expected: nothing
 # 6.0:   skip      got: F7 BF BF BF
-# 6.0:   replace expected: EF BF BD  EF BF BD  EF BF BD  EF BF BD
+# 6.0:   replace expected: EFBFBD  EFBFBD  EFBFBD  EFBFBD
 # 6.0:   replace      got: F7 BF BF BF
 #
 # Line types:
 #
 # # <comment line>
 # <blank line>
-# num : valid : string
+# num:valid:string
 # num : valid hex : hexString
 # num : invalid : hexString : hexString2 : hexString3
 #
@@ -119,17 +119,17 @@
 
 # == Test Cases ==
 
-1.0.0: valid: 1
-1.0.1: valid hex: 31
+1.0.0:valid:1
+1.0.1 : valid hex: 31
 
-1.1.0: valid: abc
+1.1.0:valid:abc
 
 # Greek word 'kosme'.
-1.2.0: valid: κόσμε
+1.2.0:valid:κόσμε
 
 # Two byte character.
 # U+00A9, COPYRIGHT SIGN, <c2 a9>
-2.0.0: valid: ©
+2.0.0:valid:©
 2.1.0: valid hex: C2 A9
 
 # Three byte character.
@@ -157,25 +157,25 @@
 
 # too big
 # too big U+001FFFFF, <F7 BF BF BF>
-6.0: invalid hex: : F7 BF BF BF : nothing: EF BF BD  EF BF BD  EF BF BD  EF BF BD
+6.0: invalid hex : F7 BF BF BF : nothing: EFBFBD  EFBFBD  EFBFBD  EFBFBD
 
 # too big U+00200000, <f8 88 80 80 80>
-6.1: invalid hex: f8 88 80 80 80: nothing: EF BF BD  EF BF BD  EF BF BD  EF BF BD  EF BF BD
+6.1: invalid hex: f8 88 80 80 80: nothing: EFBFBD  EFBFBD  EFBFBD  EFBFBD  EFBFBD
 
 # too big U+03FFFFFF, <F7 BF BF BF BF>
-6.2: invalid hex: F7 BF BF BF BF: nothing: EF BF BD  EF BF BD  EF BF BD  EF BF BD  EF BF BD
+6.2: invalid hex: F7 BF BF BF BF: nothing: EFBFBD  EFBFBD  EFBFBD  EFBFBD  EFBFBD
 
 # too big U+04000000, <fc 84 80 80 80 80>
-6.3: invalid hex: fc 84 80 80 80 80: nothing: EF BF BD  EF BF BD  EF BF BD  EF BF BD  EF BF BD  EF BF BD
+6.3: invalid hex: fc 84 80 80 80 80: nothing: EFBFBD  EFBFBD  EFBFBD  EFBFBD  EFBFBD  EFBFBD
 
 # too big U+7FFFFFFF, <F7 BF BF BF BF BF>
-6.4: invalid hex: F7 BF BF BF BF BF: nothing: EF BF BD  EF BF BD  EF BF BD  EF BF BD  EF BF BD  EF BF BD
+6.4: invalid hex: F7 BF BF BF BF BF: nothing: EFBFBD  EFBFBD  EFBFBD  EFBFBD  EFBFBD  EFBFBD
 
 # too big, <F7 BF BF BF BF BF BF>
-6.5: invalid hex: F7 BF BF BF BF BF BF: nothing: EF BF BD  EF BF BD  EF BF BD  EF BF BD  EF BF BD  EF BF BD  EF BF BD
+6.5: invalid hex: F7 BF BF BF BF BF BF: nothing: EFBFBD  EFBFBD  EFBFBD  EFBFBD  EFBFBD  EFBFBD  EFBFBD
 
 # U+00000080, <c2 80>: €
-7.0: valid: €
+7.0:valid:€
 7.1: valid hex: c2 80
 
 # 2.2  Last possible sequence of a certain length
@@ -193,7 +193,7 @@
 8.3: valid hex: F4 8F BF BF
 
 # <F7 BF BF>
-9.0: invalid hex: F7 BF BF: nothing: EF BF BD  EF BF BD  EF BF BD
+9.0: invalid hex: F7 BF BF: nothing: EFBFBD  EFBFBD  EFBFBD
 
 # 2.3  Other boundary conditions
 
@@ -207,8 +207,8 @@
 # U+E000 <EE 80 80>
 10.1: valid hex: EE 80 80
 
-# U+FFFD, replacement character, <EF BF BD>
-10.2: valid hex: EF BF BD
+# U+FFFD, replacement character, <EFBFBD>
+10.2: valid hex: EFBFBD
 
 # U+10FFFF, biggest code point: <F4 8F BF BF>
 10.3: valid hex: F4 8F BF BF
@@ -218,25 +218,26 @@
 # 3.1  Unexpected continuation bytes
 
 # first continuation byte <80>
-11.0: invalid hex: 80 : nothing: EF BF BD
+11.0: invalid hex: 80 : nothing: EFBFBD
 
 # last continuation byte <bf>
-11.1: invalid hex: bf : nothing: EF BF BD
+11.1: invalid hex: bf : nothing: EFBFBD
 
 # <80 bf>
-11.2: invalid hex: 80 bf : nothing : rep rep
+
+11.2: invalid hex: 80 bf : nothing : rep2
 
 # <80 bf 80>
-11.3: invalid hex: 80 bf 80: nothing: rep rep rep
+11.3: invalid hex: 80 bf 80: nothing: rep3
 
 # <80 bf 80 bf>
-11.4: invalid hex: 80 bf 80 bf: nothing: rep rep rep
+11.4: invalid hex: 80 bf 80 bf: nothing: rep4
 
 # <80 bf 80 bf 80>
-11.5: invalid hex: 80 bf 80 bf 80: nothing: rep rep rep rep rep
+11.5: invalid hex: 80 bf 80 bf 80: nothing: rep5
 
 # <80 bf 80 bf 80 bf>
-11.6: invalid hex: 80 bf 80 bf 80 bf: nothing: rep rep rep rep rep rep
+11.6: invalid hex: 80 bf 80 bf 80 bf: nothing: rep6
 
 # 3.1.9  Sequence of all 64 possible continuation bytes (0x80-0xbf)
 
@@ -270,86 +271,86 @@
 #        each followed by a space character.
 
 # <c0 - c3>
-13.0: invalid hex: c020 c120 c220 c320: 20 20 20 20: rep 20 rep 20 rep 20 rep 20
+13.0: invalid hex: c020 c120 c220 c320: 20 20 20 20: EFBFBD 20 EFBFBD 20 EFBFBD 20 EFBFBD 20
 
 # <c4 - c7>
-13.1: invalid hex: c420 c520 c620 c720: 20 20 20 20: rep 20 rep 20 rep 20 rep 20
+13.1: invalid hex: c420 c520 c620 c720: 20 20 20 20: EFBFBD 20 EFBFBD 20 EFBFBD 20 EFBFBD 20
 
 # <c8 - cb>
-13.2: invalid hex: c820 c920 ca20 cb20: 20 20 20 20: rep 20 rep 20 rep 20 rep 20
+13.2: invalid hex: c820 c920 ca20 cb20: 20 20 20 20: EFBFBD 20 EFBFBD 20 EFBFBD 20 EFBFBD 20
 
 # <cc - cf>
-13.3: invalid hex: cc20 cd20 ce20 cf20: 20 20 20 20: rep 20 rep 20 rep 20 rep 20
+13.3: invalid hex: cc20 cd20 ce20 cf20: 20 20 20 20: EFBFBD 20 EFBFBD 20 EFBFBD 20 EFBFBD 20
 
 # <d0 - d3>
-13.4: invalid hex: d020 d120 d220 d320: 20 20 20 20: rep 20 rep 20 rep 20 rep 20
+13.4: invalid hex: d020 d120 d220 d320: 20 20 20 20: EFBFBD 20 EFBFBD 20 EFBFBD 20 EFBFBD 20
 
 # <d4 - d7>
-13.5: invalid hex: d420 d520 d620 d720: 20 20 20 20: rep 20 rep 20 rep 20 rep 20
+13.5: invalid hex: d420 d520 d620 d720: 20 20 20 20: EFBFBD 20 EFBFBD 20 EFBFBD 20 EFBFBD 20
 
 # <d8 - db>
-13.6: invalid hex: d820 d920 da20 db20: 20 20 20 20: rep 20 rep 20 rep 20 rep 20
+13.6: invalid hex: d820 d920 da20 db20: 20 20 20 20: EFBFBD 20 EFBFBD 20 EFBFBD 20 EFBFBD 20
 
 # <dc - df>
-13.7: invalid hex: dc20 dd20 de20 df20: 20 20 20 20: rep 20 rep 20 rep 20 rep 20
+13.7: invalid hex: dc20 dd20 de20 df20: 20 20 20 20: EFBFBD 20 EFBFBD 20 EFBFBD 20 EFBFBD 20
 
 
 # 3.2.2  All 16 first bytes of 3-byte sequences (0xe0-0xef)
 #        each followed by a space character
 
 # <e0 - e3>
-14.0: invalid hex: e020 e120 e220 e320: 20 20 20 20: rep 20 rep 20 rep 20
+14.0: invalid hex: e020 e120 e220 e320: 20 20 20 20: EFBFBD 20 EFBFBD 20 EFBFBD 20 EFBFBD 20
 
 # <e4 - e7>
-14.1: invalid hex: e420 e520 e620 e720: 20 20 20 20: rep 20 rep 20 rep 20
+14.1: invalid hex: e420 e520 e620 e720: 20 20 20 20: EFBFBD 20 EFBFBD 20 EFBFBD 20 EFBFBD 20
 
 # <e8 - eb>
-14.2: invalid hex: e820 e920 ea20 eb20: 20 20 20 20: rep 20 rep 20 rep 20
+14.2: invalid hex: e820 e920 ea20 eb20: 20 20 20 20: EFBFBD 20 EFBFBD 20 EFBFBD 20 EFBFBD 20
 
 # <ec - ef>
-14.3: invalid hex: ec20 ed20 ee20 ef20: 20 20 20 20: rep 20 rep 20 rep 20
+14.3: invalid hex: ec20 ed20 ee20 ef20: 20 20 20 20: EFBFBD 20 EFBFBD 20 EFBFBD 20 EFBFBD 20
 
 
 # 3.2.3  All 8 first bytes of 4-byte sequences (0xf0-0xf7),
 #        each followed by a space character
 
 # <f0 - f1>
-15.0: invalid hex: f020 f120: 20 20: rep 20 rep 20
+15.0: invalid hex: f020 f120: 20 20: EFBFBD 20 EFBFBD 20
 
 # <f2 - f3>
-15.1: invalid hex: f220 f320: 20 20: rep 20 rep 20
+15.1: invalid hex: f220 f320: 20 20: EFBFBD 20 EFBFBD 20
 
 # <f4 - f5>
-15.2: invalid hex: f420 f520: 20 20: rep 20 rep 20
+15.2: invalid hex: f420 f520: 20 20: EFBFBD 20 EFBFBD 20
 
 # <f6 - f7>
-15.3: invalid hex: f620 f720: 20 20: rep 20 rep 20
+15.3: invalid hex: f620 f720: 20 20: EFBFBD 20 EFBFBD 20
 
 
 # 3.2.4  All 4 first bytes of 5-byte sequences (0xf8-0xfb),
 #        each followed by a space character
 
 # <f8>
-16.0: invalid hex: f820: 20: rep 20
+16.0: invalid hex: f820: 20: EFBFBD 20
 
 # <f9>
-16.1: invalid hex: f920: 20: rep 20
+16.1: invalid hex: f920: 20: EFBFBD 20
 
 # <fa>
-16.2: invalid hex: fa20: 20: rep 20
+16.2: invalid hex: fa20: 20: EFBFBD 20
 
 # <fb>
-16.3: invalid hex: fb20: 20: rep 20
+16.3: invalid hex: fb20: 20: EFBFBD 20
 
 
 # 3.2.5  All 2 first bytes of 6-byte sequences (0xfc-0xfd),
 #        each followed by a space character.
 
 # <fc>
-17.0: invalid hex: fc20: 20 : rep 20
+17.0: invalid hex: fc20: 20 : EFBFBD 20
 
 # <fd>
-17.1: invalid hex: fd20: 20 : rep 20
+17.1: invalid hex: fd20: 20 : EFBFBD 20
 
 
 # 3.3  Sequences with last continuation byte missing
@@ -398,10 +399,10 @@
 19.4: invalid hex: fd bf bf bf bf: nothing: rep5
 
 # 123 <ef 80>
-19.5: invalid hex: 31 32 33 ef 80: 31 32 33: rep2
+19.5: invalid hex: 31 32 33 ef 80: 31 32 33: 31 32 33 EFBFBD EFBFBD
 
 # 123 <ef 80 f0>
-19.6: invalid hex: 31 32 33 ef 80 f0: 31 32 33: 31 32 33 rep2
+19.6: invalid hex: 31 32 33 ef 80 f0: 31 32 33: 31 32 33 EFBFBD EFBFBD EFBFBD
 
 # 3.4  Concatenation of incomplete sequences
 
@@ -422,13 +423,13 @@
 21.3: invalid hex: ff: nothing: rep
 
 # 7 <ff>
-21.4: invalid hex: 37 ff: 37: 37 rep
+21.4: invalid hex: 37 ff: 37: 37 EFBFBD
 
 # 7 8 <ff>
-21.5: invalid hex: 37 38 fe: 37 38: 37 38 rep
+21.5: invalid hex: 37 38 fe: 37 38: 37 38 EFBFBD
 
 # 7 8 9 <fe>
-21.6: invalid hex: 37 38 39 fe: 37 38 39: 37 38 39 rep
+21.6: invalid hex: 37 38 39 fe: 37 38 39: 37 38 39 EFBFBD
 
 # # 4.1  Examples of an overlong ASCII / character.
 
@@ -436,7 +437,7 @@
 # security issue.
 
 # U+002f, SOLIDUS
-22.0: valid: /
+22.0:valid:/
 
 # U+002f, SOLIDUS <2f>
 22.1: valid hex: 2F
@@ -456,8 +457,8 @@
 # overlong solidus <fc 80 80 80 80 af>
 22.6: invalid hex: fc 80 80 80 80 af: nothing: rep6
 
-# U+0800
-22.7: valid hex: e0 a0 80: nothing: rep3
+# U+0800, <e0 a0 80>
+22.7: valid hex: e0 a0 80
 
 # # 4.2  Maximum overlong sequences
 
@@ -479,10 +480,10 @@
 24.0: invalid hex: ed a0 80: nothing: rep3
 
 # 1 surrogate U+D800, <ed a0 80> 5
-24.0.1: invalid hex: ed a0 80 35: 35: rep3 35
+24.0.1: invalid hex: ed a0 80 35: 35: EFBFBD EFBFBD EFBFBD 35
 
 # 1 surrogate U+D800, 123 <ed a0 80> 1
-24.0.2: invalid hex: 31 32 33 ed a0 80 31: 31 32 33 31: 31 32 33 rep3 31
+24.0.2: invalid hex: 31 32 33 ed a0 80 31: 31 32 33 31: 31 32 33 EFBFBD EFBFBD EFBFBD 31
 
 # 1 surrogate U+DB7F, <ed ad bf>
 24.2: invalid hex: ed ad bf: nothing: rep3
@@ -531,154 +532,154 @@
 # # 5.3 Valid noncharacter code positions
 
 # U+FFFE, <EF BF BE>
-26.0: valid hex: EF BF BE: nothing: rep3
+26.0: valid hex: EF BF BE
 
 # U+FFFF, <EF BF BF>
-26.1: valid hex: EF BF BF: nothing: rep3
+26.1: valid hex: EF BF BF
 
 # U+FDD0, <EF B7 90>
-26.2: valid hex: EF B7 90: nothing: rep3
+26.2: valid hex: EF B7 90
 
 # U+FDD1, <EF B7 91>
-26.3: valid hex: EF B7 91: nothing: rep3
+26.3: valid hex: EF B7 91
 
 # U+FDD2, <EF B7 92>
-26.4: valid hex: EF B7 92: nothing: rep3
+26.4: valid hex: EF B7 92
 
 # U+FDD3, <EF B7 93>
-26.5: valid hex: EF B7 93: nothing: rep3
+26.5: valid hex: EF B7 93
 
 # U+FDD4, <EF B7 94>
-26.6: valid hex: EF B7 94: nothing: rep3
+26.6: valid hex: EF B7 94
 
 # U+FDD5, <EF B7 95>
-26.7: valid hex: EF B7 95: nothing: rep3
+26.7: valid hex: EF B7 95
 
 # U+FDD6, <EF B7 96>
-26.8: valid hex: EF B7 96: nothing: rep3
+26.8: valid hex: EF B7 96
 
 # U+FDD7, <EF B7 97>
-26.9: valid hex: EF B7 97: nothing: rep3
+26.9: valid hex: EF B7 97
 
 # U+FDD8, <EF B7 98>
-26.10: valid hex:  EF B7 98: nothing: rep3
+26.10: valid hex: EF B7 98
 
 # U+FDD9, <EF B7 99>
-26.11: valid hex:  EF B7 99: nothing: rep3
+26.11: valid hex: EF B7 99
 
 # U+FDDA, <EF B7 9a>
-26.12: valid hex:  EF B7 9a: nothing: rep3
+26.12: valid hex: EF B7 9a
 
 # U+FDDB, <EF B7 9b>
-26.13: valid hex:  EF B7 9b: nothing: rep3
+26.13: valid hex: EF B7 9b
 
 # U+FDDC, <EF B7 9c>
-26.14: valid hex:  EF B7 9c: nothing: rep3
+26.14: valid hex: EF B7 9c
 
 # U+FDDD, <EF B7 9d>
-26.15: valid hex:  EF B7 9d: nothing: rep3
+26.15: valid hex: EF B7 9d
 
 # U+FDDE, <EF B7 9e>
-26.16: valid hex:  EF B7 9e: nothing: rep3
+26.16: valid hex: EF B7 9e
 
 # U+FDEF, <EF B7 9f>
-26.17: valid hex:  EF B7 9f: nothing: rep3
+26.17: valid hex: EF B7 9f
 
 # U+1FFFE, <F0 9F BF BE>
-27.0: valid hex: F0 9F BF BE: nothing: rep4
+27.0: valid hex: F0 9F BF BE
 
 # U+2FFFE, <F0 AF BF BE>
-27.1: valid hex: F0 AF BF BE: nothing: rep4
+27.1: valid hex: F0 AF BF BE
 
 # U+3FFFE, <F0 BF BF BE>
-27.2: valid hex: F0 BF BF BE: nothing: rep4
+27.2: valid hex: F0 BF BF BE
 
 # U+4FFFE, <F1 8F BF BE>
-27.3: valid hex: F1 8F BF BE: nothing: rep4
+27.3: valid hex: F1 8F BF BE
 
 # U+5FFFE, <F1 9F BF BE>
-27.4: valid hex: F1 9F BF BE: nothing: rep4
+27.4: valid hex: F1 9F BF BE
 
 # U+6FFFE, <F1 AF BF BE>
-27.5: valid hex: F1 AF BF BE: nothing: rep4
+27.5: valid hex: F1 AF BF BE
 
 # U+7FFFE, <F1 BF BF BE>
-27.6: valid hex: F1 BF BF BE: nothing: rep4
+27.6: valid hex: F1 BF BF BE
 
 # U+8FFFE, <F2 8F BF BE>
-27.7: valid hex: F2 8F BF BE: nothing: rep4
+27.7: valid hex: F2 8F BF BE
 
 # U+9FFFE, <F2 9F BF BE>
-27.8: valid hex: F2 9F BF BE: nothing: rep4
+27.8: valid hex: F2 9F BF BE
 
 # U+AFFFE, <F2 AF BF BE>
-27.9: valid hex: F2 AF BF BE: nothing: rep4
+27.9: valid hex: F2 AF BF BE
 
 # U+BFFFE, <F2 BF BF BE>
-27.10: valid hex: : F2 BF BF BE: nothing: rep4
+27.10: valid hex: F2 BF BF BE
 
 # U+CFFFE, <F3 8F BF BE>
-27.11: valid hex:  F3 8F BF BE: nothing: rep4
+27.11: valid hex: F3 8F BF BE
 
 # U+DFFFE, <F3 9F BF BE>
-27.12: valid hex:  F3 9F BF BE: nothing: rep4
+27.12: valid hex: F3 9F BF BE
 
 # U+EFFFE, <F3 AF BF BE>
-27.13: valid hex:  F3 AF BF BE: nothing: rep4
+27.13: valid hex: F3 AF BF BE
 
 # U+FFFFE, <F3 BF BF BE>
-27.14: valid hex:  F3 BF BF BE: nothing: rep4
+27.14: valid hex: F3 BF BF BE
 
 # U+10FFFE, <F4 8F BF BE>
-27.15: valid hex: : F4 8F BF BE: nothing: rep4
+27.15: valid hex : F4 8F BF BE
 
 # U+1FFFF, <F0 9F BF BF>
-28.0: valid hex: F0 9F BF BF: nothing: rep4
+28.0: valid hex: F0 9F BF BF
 
 # U+2FFFF, <F0 AF BF BF>
-28.1: valid hex: F0 AF BF BF: nothing: rep4
+28.1: valid hex: F0 AF BF BF
 
 # U+3FFFF, <F0 BF BF BF>
-28.2: valid hex: F0 BF BF BF: nothing: rep4
+28.2: valid hex: F0 BF BF BF
 
 # U+4FFFF, <F1 8F BF BF>
-28.3: valid hex: F1 8F BF BF: nothing: rep4
+28.3: valid hex: F1 8F BF BF
 
 # U+5FFFF, <F1 9F BF BF>
-28.4: valid hex: F1 9F BF BF: nothing: rep4
+28.4: valid hex: F1 9F BF BF
 
 # U+6FFFF, <F1 AF BF BF>
-28.5: valid hex: F1 AF BF BF: nothing: rep4
+28.5: valid hex: F1 AF BF BF
 
 # U+7FFFF, <F1 BF BF BF>
-28.6: valid hex: F1 BF BF BF: nothing: rep4
+28.6: valid hex: F1 BF BF BF
 
 # U+8FFFF, <F2 8F BF BF>
-28.7: valid hex: F2 8F BF BF: nothing: rep4
+28.7: valid hex: F2 8F BF BF
 
 # U+9FFFF, <F2 9F BF BF>
-28.8: valid hex: F2 9F BF BF: nothing: rep4
+28.8: valid hex: F2 9F BF BF
 
 # U+AFFFF, <F2 AF BF BF>
-28.9: valid hex: F2 AF BF BF: nothing: rep4
+28.9: valid hex: F2 AF BF BF
 
 # U+BFFFF, <F2 BF BF BF>
-28.10: valid hex: : F2 BF BF BF: nothing: rep4
+28.10: valid hex: F2 BF BF BF
 
 # U+CFFFF, <F3 8F BF BF>
-28.11: valid hex:  F3 8F BF BF: nothing: rep4
+28.11: valid hex: F3 8F BF BF
 
 # U+DFFFF, <F3 9F BF BF>
-28.12: valid hex:  F3 9F BF BF: nothing: rep4
+28.12: valid hex: F3 9F BF BF
 
 # U+EFFFF, <F3 AF BF BF>
-28.13: valid hex:  F3 AF BF BF: nothing: rep4
+28.13: valid hex: F3 AF BF BF
 
 # U+FFFFF, <F3 BF BF BF>
-28.14: valid hex:  F3 BF BF BF: nothing: rep4
+28.14: valid hex: F3 BF BF BF
 
 # U+10FFFF, <F4 8F BF BF>
-28.15: valid hex: F4 8F BF BF: nothing: rep4
+28.15: valid hex: F4 8F BF BF
 
 
 # These tests come from looking at the UTF-8 finite state diagram
@@ -692,31 +693,31 @@
 29.0: invalid hex: 80: nothing: rep
 
 # <20 80>
-29.1: invalid hex: 20 80: nothing: rep
+29.1: invalid hex: 20 80: 20 : 20 EFBFBD
 
 # <20 21 21 23 fe 20>
-29.2: invalid hex: 20 21 21 23 fe 20: 20 21 21 23 20: 20 21 21 23 rep 20
+29.2: invalid hex: 20 21 21 23 fe 20: 20 21 21 23 20: 20 21 21 23 EFBFBD 20
 
 # <20 21 21 23 24 fe>
-29.3: invalid hex: 20 21 21 23 24 fe: 20 21 21 23 24 : 20 21 21 23 24 rep
+29.3: invalid hex: 20 21 21 23 24 fe: 20 21 21 23 24 : 20 21 21 23 24 EFBFBD
 
 # <80 20>
-29.4: invalid hex: 80 20: 20: rep 20
+29.4: invalid hex: 80 20: 20: EFBFBD 20
 
 # <20 80 20>
-29.5: invalid hex: 20 80 20: 20 20: 20 rep 20
+29.5: invalid hex: 20 80 20: 20 20: 20 EFBFBD 20
 
 # <81 20>
-29.6: invalid hex: 81 20: 20: rep 20
+29.6: invalid hex: 81 20: 20: EFBFBD 20
 
 # <c1 20>
-29.7: invalid hex: c1 20: 20: rep 20
+29.7: invalid hex: c1 20: 20: EFBFBD 20
 
 # <f5 20>
-29.8: invalid hex: f5 20: 20: rep 20
+29.8: invalid hex: f5 20: 20: EFBFBD 20
 
 # <ff 20>
-29.9: invalid hex: ff 20: 20: rep 20
+29.9: invalid hex: ff 20: 20: EFBFBD 20
 
 
 # The transition from the state 2 to state 1 can happen
@@ -724,10 +725,10 @@
 
 # state 0 -> 2 -> 1
 # <c2 00>
-30.0: invalid hex: c2 00: 00: rep 00
+30.0: invalid hex: c2 00: 00: EFBFBD 00
 
 # <c2 7f>
-30.1: invalid hex: c2 7f: 7f: rep 7f
+30.1: invalid hex: c2 7f: 7f: EFBFBD 7f
 
 # <c2 c0>
 30.2: invalid hex: c2 c0: nothing: rep2
@@ -736,10 +737,10 @@
 30.3: invalid hex: c2 ff: nothing: rep2
 
 # <df 00>
-30.4: invalid hex: df 00: 00: rep 00
+30.4: invalid hex: df 00: 00: EFBFBD 00
 
 # <df 7f>
-30.5: invalid hex: df 7f: 7f: rep 7f
+30.5: invalid hex: df 7f: 7f: EFBFBD 7f
 
 # <df c0>
 30.6: invalid hex: df c0: nothing: rep2
@@ -750,10 +751,10 @@
 
 # state 0 -> 4 -> 2 -> 1
 # <e0 a0 00>
-31.0: invalid hex: e0 80 00: 00: rep2 00
+31.0: invalid hex: e0 80 00: 00: EFBFBD  EFBFBD  00
 
 # <e0 a0 7f>
-31.1: invalid hex: e0 80 7f: 7f: rep2 7f
+31.1: invalid hex: e0 80 7f: 7f: EFBFBD  EFBFBD  7f
 
 # <e0 a0 c0>
 31.2: invalid hex: e0 80 c0: nothing: rep3
@@ -763,10 +764,10 @@
 
 # state 0 -> 5 -> 2 -> 1
 # <ed 80 00>
-32.0: invalid hex: ed 80 00: 00: rep2 00
+32.0: invalid hex: ed 80 00: 00: EFBFBD  EFBFBD  00
 
 # <ed 80 7f>
-32.1: invalid hex: ed 80 7f: 7f: rep2 7f
+32.1: invalid hex: ed 80 7f: 7f: EFBFBD  EFBFBD 7f
 
 # <ed 80 c0>
 32.2: invalid hex: ed 80 c0: nothing: rep3
@@ -777,10 +778,10 @@
 
 # state 0 -> 6 -> 3 -> 2 -> 1
 # <f0 90 80 00>
-33.0: invalid hex: f0 90 80 00: nothing: rep4
+33.0: invalid hex: f0 90 80 00: 00: EFBFBD  EFBFBD  EFBFBD  00
 
 # <f0 90 80 7f>
-33.1: invalid hex: f0 90 80 7f: nothing: rep4
+33.1: invalid hex: f0 90 80 7f: 7f: EFBFBD  EFBFBD  EFBFBD 7f
 
 # <f0 90 80 c0>
 33.2: invalid hex: f0 90 80 c0: nothing: rep4
@@ -791,10 +792,10 @@
 
 # state 0 -> 7 -> 3 -> 2 -> 1
 # <f1 80 80 00>
-34.0: invalid hex: f1 80 80 00: 00: rep3 00
+34.0: invalid hex: f1 80 80 00: 00: EFBFBD  EFBFBD  EFBFBD  00
 
 # <f1 80 80 7f>
-34.1: invalid hex: f1 80 80 7f: 7f: rep3 7f
+34.1: invalid hex: f1 80 80 7f: 7f: EFBFBD  EFBFBD  EFBFBD  7f
 
 # <f1 80 80 c0>
 34.2: invalid hex: f1 80 80 c0: nothing: rep4
@@ -805,10 +806,10 @@
 
 # state 0 -> 8 -> 3 -> 2 -> 1
 # <f4 80 80 00>
-35.0: invalid hex: f4 80 80 00: 00: rep3 00
+35.0: invalid hex: f4 80 80 00: 00: EFBFBD  EFBFBD  EFBFBD  00
 
 # <f4 80 80 7f>
-35.1: invalid hex: f4 80 80 7f: 7f: rep3 7f
+35.1: invalid hex: f4 80 80 7f: 7f: EFBFBD  EFBFBD  EFBFBD 7f
 
 # <f4 80 80 c0>
 35.2: invalid hex: f4 80 80 c0: nothing: rep4
@@ -838,7 +839,7 @@
 37.2: invalid hex: F0 80 80 80: nothing: rep4
 
 # 0 in the middle, 20 00 35
-37.2.1: valid hex: : 20 00 35
+37.2.1: valid hex : 20 00 35
 
 # 0 in the middle, 20 00 20 <ff>
-37.3: invalid hex: 20 00 20 ff: 20 00 20 : 20 00 20 rep
+37.3: invalid hex: 20 00 20 ff: 20 00 20 : 20 00 20 EFBFBD
