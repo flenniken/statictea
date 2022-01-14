@@ -366,8 +366,8 @@ block is one line.
 The block contains any number of bracketed variables for
 substitution.
 
-Each string variable gets replaced with it value. The other
-variable types get replace with their json equivalent.
+Each string variable gets replaced with its value. The other
+variable types get replaced with their json equivalent.
 
 You can repeat the block to make lists and other repeating
 content. You control how many times the block repeats with the
@@ -412,8 +412,8 @@ Statements are executed from top to bottom. There is no
 traditional "if" statement to control statement flow.
 
 You can loop at the replacement block level and run the command's
-statements multiple times usint t.repeat, and vary the output using
-t.row. Here is an example the loops three times and outputs 1, 2, 3.
+statements multiple times using t.repeat, and vary the output using
+t.row. Here is an example that loops three times and outputs 1, 2, 3.
 
 template:
 

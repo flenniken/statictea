@@ -1,0 +1,4 @@
+bin/
+testfiles/t.txt
+docs/readmeFuncs.org
+*.dot
