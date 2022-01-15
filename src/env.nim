@@ -77,18 +77,28 @@ proc close*(env: var Env) =
     env.logFile.close()
     env.logFile = nil
 
-proc outputWarning*(env: var Env, message: string) =
+proc outputWarning*(env: var Env, lineNum: Natural, message: string) =
   ## Write a message to the error stream and increment the warning
   ## count.
+  if env.warningWritten >= maxWarningsWritten:
+    return
+
   env.errStream.writeLine(message)
   inc(env.warningWritten)
+
+  if env.warningWritten == maxWarningsWritten:
+    # Reached the maximum number of warnings, suppressing the rest.
+    var filename = env.templateFilename
+    if filename == "":
+      filename = "unnamed"
+
+    let message = getWarning(filename, lineNum, kMaxWarnings)
+    env.errStream.writeLine(message)
+    inc(env.warningWritten)
 
 proc warn*(env: var Env, lineNum: Natural, warning: Warning, p1:
            string = "", p2: string = "") =
   ## Write a formatted warning message to the error stream.
-
-  if env.warningWritten >= maxWarningsWritten:
-    return
 
   var filename = env.templateFilename
   if filename == "":
@@ -96,12 +106,7 @@ proc warn*(env: var Env, lineNum: Natural, warning: Warning, p1:
     assert lineNum == 0
 
   let message = getWarning(filename, lineNum, warning, p1, p2)
-  outputWarning(env, message)
-
-  if env.warningWritten == maxWarningsWritten:
-    # Reached the maximum number of warnings, suppressing the rest.
-    let message = getWarning(filename, lineNum, kMaxWarnings)
-    outputWarning(env, message)
+  outputWarning(env, lineNum, message)
 
 proc warn*(env: var Env, lineNum: Natural, warningData: WarningData) =
   ## Write a formatted warning message to the error stream.

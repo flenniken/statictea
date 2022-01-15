@@ -148,9 +148,7 @@ statement: t.repeat = 3
 tmpl.txt(39): w129: You cannot reassign a variable.
 statement: t.repeat = 3
            ^
-tmpl.txt(39): w129: You cannot reassign a variable.
-statement: t.repeat = 3
-           ^
+tmpl.txt(39): w116: You reached the maximum number of warnings, suppressing the rest.
 --- endfile
 
 --- file log.filtered.expected

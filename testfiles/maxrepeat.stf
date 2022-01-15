@@ -138,6 +138,7 @@ statement: t.repeat = 2
 template.html(60): w129: You cannot reassign a variable.
 statement: t.maxRepeat = 1
            ^
+template.html(60): w116: You reached the maximum number of warnings, suppressing the rest.
 --- endfile
 
 --- expected result.expected == result.html

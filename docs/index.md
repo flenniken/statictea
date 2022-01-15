@@ -11,6 +11,7 @@ StaticTea nim source code documentation.
 * [gethelp.nim](gethelp.md) &mdash; Get the command line help message.
 * [matches.nim](matches.md) &mdash; Regular expression matching methods.
 * [messages.nim](messages.md) &mdash; Messages IDs and associated strings.
+* [opresult.nim](opresult.md) &mdash; OpResult holds either a value or a message.
 * [opresultid.nim](opresultid.md) &mdash; OpResultId holds either a value or a message id.
 * [parseCmdLine.nim](parseCmdLine.md) &mdash; Parse a template command line.
 * [parseCommandLine.nim](parseCommandLine.md) &mdash; Parse the StaticTea terminal command line and return the arguments.
@@ -28,6 +29,7 @@ length.
 * [tempFile.nim](tempFile.md) &mdash; Temporary file methods.
 * [tostring.nim](tostring.md) &mdash; Value types to string methods.
 * [unicodes.nim](unicodes.md) &mdash; Functions that deal with Unicode.
+* [utf8decoder.nim](utf8decoder.md) &mdash; Functions that deal with Unicode.
 * [variables.nim](variables.md) &mdash; Language variable methods.
 * [vartypes.nim](vartypes.md) &mdash; StaticTea variable types.
 * [version.nim](version.md) &mdash; The current StaticTea version number.

@@ -122,7 +122,7 @@ statement: $2
     fragment,
     startColumn(pointerPos)
   ]
-  env.outputWarning(message)
+  env.outputWarning(statement.lineNum, message)
 
 func `==`*(s1: Statement, s2: Statement): bool =
   ## Return true when the two statements are equal.

@@ -30,21 +30,33 @@ proc get_test_filenames(): seq[string] =
   for filename in list:
     result.add(lastPathPart(filename))
 
-proc get_source_filenames(path: bool = false, noExt: bool = false): seq[string] =
-  ## Return the basename of the nim source files in the src
-  ## folder. You have the option to include the path or file
-  ## extension.
-  let excludeFilenames = ["t.nim", "dot.nim", "runner.nim"]
+proc get_dir_filenames(folder: string, extension: string, path: bool = false,
+    noExt: bool = false, excludeFilenames: seq[string] = @[]): seq[string] =
+  ## Return the basename of the source files in the given folder that
+  ## end with the given extension.  You have the option to include the
+  ## path or file extension and whether to exclude some files.
   result = @[]
-  var list = listFiles("src")
+  var list = listFiles(folder)
   for filename in list:
-    if filename.endsWith(".nim") and not (lastPathPart(filename) in excludeFilenames):
+    if filename.endsWith(extension) and not (lastPathPart(filename) in excludeFilenames):
       var name = filename
       if noExt:
         name = name[0 .. ^5]
       if not path:
         name = lastPathPart(name)
       result.add(name)
+
+proc get_source_filenames(path: bool = false, noExt: bool = false): seq[string] =
+  ## Return the basename of the nim source files in the src
+  ## folder excluding a few.
+  let excludeFilenames = @["t.nim", "dot.nim", "runner.nim"]
+  result = get_dir_filenames("src", ".nim", path = path, noExt = noExt,
+    excludeFilenames = excludeFilenames)
+
+proc get_testfile_filenames(): seq[string] =
+  ## Return the basename of the stf source files in the testfiles
+  ## folder.
+  result = get_dir_filenames("testfiles", ".stf", path = true)
 
 proc get_test_module_cmd(filename: string, release = false): string =
   ## Return the command line to test the given nim file.
@@ -152,12 +164,15 @@ proc readModuleDescription(filename: string): string =
   ## Return the module doc comment at the top of the file.
   let text = slurp(filename)
 
-  # Collect the doc comments at the beginning of the file.
+  # Collect the doc comments at the beginning of the file. Read
+  # the first block of lines starting with ##.
+  var foundDescription = false
   var lines = newSeq[string]()
   for line in text.splitLines():
     if line.startsWith("##"):
       lines.add(line[2 .. ^1])
-    else:
+      foundDescription = true
+    elif foundDescription:
       break
 
   # Determine the minimum number of spaces used with the doc comment.
@@ -181,17 +196,16 @@ proc jsonQuote(str: string): string =
   ## Escape the specified json string.
   result = escapeJsonUnquoted(str)
 
-proc indexJson(): string =
-  ## Generate json for the doc comment index of all the source files.
+proc fileIndexJson(filenames: seq[string]): string =
+  ## Generate a json string containing the name of all the files and
+  ## their doc comment descriptions.
 
-  let filenames = get_source_filenames(path = true)
-
-  # Extract the source module descriptions.
+  # Extract the source module descriptions from all the files.
   var descriptions = newSeq[string]()
   for filename in filenames:
     descriptions.add(readModuleDescription(filename))
 
-  # Generate the index json.
+  # Generate the index json with a filename and description.
   var modules = newSeq[string]()
   for ix, filename in filenames:
     modules.add("""
@@ -207,6 +221,16 @@ $1
   ]
 }
 """ % [join(modules, ",\n")]
+
+proc sourceIndexJson(): string =
+  ## Generate json for the doc comment index of all the source files.
+  let filenames = get_source_filenames(path = true)
+  result = fileIndexJson(filenames)
+
+proc testfilesIndexJson(): string =
+  ## Generate json for the doc comment index of all the stf test files.
+  let filenames = get_testfile_filenames()
+  result = fileIndexJson(filenames)
 
 proc insertFile(filename: string, startLine: string, endLine: string,
                 sectionFilename: string) =
@@ -403,9 +427,11 @@ proc createDependencyGraph2() =
 proc echoGrip() =
   echo """
 
-The grip app is good for viewing github markdown.
-  grip --quiet docs/index.md &
-  http://localhost:6419/index.md
+The grip app is good for viewing github markdown locally.
+  grip --quiet readme.org &
+  http://localhost:6419/docs/index.md
+  http://localhost:6419/testfiles/readme.md
+
 """
 
 proc taskDocsIx() =
@@ -413,7 +439,7 @@ proc taskDocsIx() =
 
   echo "Create index json."
   var jsonFilename = "docs/index.json"
-  var json = indexJson()
+  var json = sourceIndexJson()
   writeFile(jsonFilename, json)
 
   # Process the index template and create the index.md file.
@@ -426,10 +452,33 @@ proc taskDocsIx() =
   echo "Generated docs/index.md"
   # echoGrip()
 
+proc taskTestfilesReadme() =
+  ## Create a testfiles folder readme containing an index to the stf
+  ## test files.
+
+  echo "Create a json file with the name of all the stf tests an their description."
+  var jsonFilename = "testfiles.index.json"
+  var json = testfilesIndexJson()
+  writeFile(jsonFilename, json)
+
+  # Process the index template and create the index.md file.
+  echo "Create the testfiles/readme.md file"
+  var cmd = "bin/statictea -s=$1 -t=templates/testfiles.md -r=testfiles/readme.md" %
+    [jsonFilename]
+  exec cmd
+
+  rmFile(jsonFilename)
+  echo "Generated testfiles/readme.md"
+  echoGrip()
+
 proc myFileNewer(a: string, b: string): bool =
   ## Return true when file a is newer than file b.
-  # todo: make sure a and b exist.
   # result = getLastModificationTime(a) > getLastModificationTime(b)
+  for filename in [a, b]:
+    if not fileExists(filename):
+      echo "file doesn't exist: " & filename
+      return false
+
   let cmd = "echo $(($(date -r " & a & " +%s)-$(date -r " & b & " +%s)))"
   # echo cmd
   let diffStr = staticExec(cmd)
@@ -570,6 +619,33 @@ proc runRunStfMain() =
     echo ""
     discard
 
+proc sameBytes(a: string, b: string): bool =
+  ## Return true when the two files contain the same bytes.
+  let aBytes = slurp(a)
+  let bBytes = slurp(b)
+  if aBytes == bBytes:
+    result = true
+
+
+proc checkUtf8DecoderEcho() =
+  ## Check whether there is a new version of utf8decoder.nim in the
+  ## utftests repo. Return 0 when up-to-date.
+  
+  let utf8testsFolder = "../utf8tests"
+  let utf8decoder = "../utf8tests/src/utf8decoder.nim"
+  let localUtf8decoder = "src/utf8decoder.nim"
+  if not dirExists(utf8testsFolder):
+    # Ignore when the repo is missing.
+    # echo "no utf8tests repo"
+    return
+  if not fileExists(utf8decoder):
+    echo "utf8decoder.nim isn't in utftests repo anymore."
+    return
+  if not sameBytes(utf8decoder, localUtf8decoder):
+    echo "Update utf8decoder.nim"
+    echo fmt"cp {utf8decoder} {localUtf8decoder}"
+  echo "utf8decoder is up-to-date"
+
 # Tasks below
 
 task n, "\tShow available tasks.":
@@ -593,6 +669,9 @@ awk '{printf "include %s\n", $0}' > tests/testall.nim
 
   # Run the stf tests.
   runRunnerFolder()
+
+  # Make sure utf8decoder is up-to-date.
+  checkUtf8DecoderEcho()
 
 task test, "\tRun one or more tests; specify part of test filename.":
   ## Run one or more tests.  You specify part of the test filename and
@@ -649,8 +728,13 @@ task json, "\tDisplay one or more source file's json doc comments; specify part 
   echo "n json name | jq | less"
 
 task jsonix, "\tDisplay markdown docs index json.":
-  var json = indexJson()
+  var json = sourceIndexJson()
   # writeFile("docs/index.json", json)
+  for line in json.splitLines():
+    echo line
+
+task testfilesix, "\tDisplay markdown testfiles index json.":
+  var json = testfilesIndexJson()
   for line in json.splitLines():
     echo line
 
@@ -697,6 +781,9 @@ task rt, "\tRun one or more stf tests in testfiles; specify part of the name.":
 
 task stf, "\tList stf tests with newest last.":
   exec """ls -1tr testfiles/*.stf | xargs grep "##" | cut -c 11- | sed 's/:## / -- /'"""
+
+task testfilesreadme, "\tCreate testfiles readme.md.":
+  taskTestfilesReadme()
 
 task newstf, "\tCreate new stf as a starting point for a new test.":
   let count = system.paramCount()+1

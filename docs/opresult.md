@@ -1,28 +1,47 @@
 # opresult.nim
 
-OpResult is similar to the Option type but instead of returning nothing, you return a message that tells why you cannot return the value.
+OpResult holds either a value or a message.  It's similar to
+the Option type but instead of returning nothing, you return a
+message that tells why you cannot return the value.
+
+Example Usage:
+
+~~~
+proc test(): OpResult[int, string] =
+  if problem:
+    result = newOpResultMsg[int, string]("unable to do the task")
+  else:
+    result = newOpResult[int, string](3)
+
+let numOr = test()
+if numOr.isMessage():
+  echo numOr.message
+else:
+  num = numOr.value
+~~~~
 
 * [opresult.nim](../src/opresult.nim) &mdash; Nim source code.
 # Index
 
-* type: [OpResult](#opresult) &mdash; Contains either a value or a message string.
+* type: [OpResult](#opresult) &mdash; Contains either a value or a message.
 * [isMessage](#ismessage) &mdash; Return true when the OpResult object contains a message.
 * [isValue](#isvalue) &mdash; Return true when the OpResult object contains a value.
-* [opValue](#opvalue) &mdash; Create an OpResult value object.
-* [opMessage](#opmessage) &mdash; Create an OpResult message object.
+* [newOpResult](#newopresult) &mdash; Create an OpResult value object.
+* [newOpResultMsg](#newopresultmsg) &mdash; Create an OpResult message object.
+* [`$`](#) &mdash; Return a string representation of an OpResult object.
 
 # OpResult
 
-Contains either a value or a message string. The default is a value. It's similar to the Option type but instead of returning nothing, you return a message that tells why you cannot return the value.
+Contains either a value or a message. Defaults to an empty message.
 
 ```nim
-OpResult[T] = object
-  case kind: OpResultKind
-  of okValue:
+OpResult[T; T2] = object
+  case kind*: OpResultKind
+  of orValue:
       value*: T
 
-  of okMessage:
-      message*: string
+  of orMessage:
+      message*: T2
 
 
 ```
@@ -43,34 +62,28 @@ Return true when the OpResult object contains a value.
 func isValue(opResult: OpResult): bool
 ```
 
-# opValue
+# newOpResult
 
 Create an OpResult value object.
 
- The following example returns a OpResult[RunArgs] object with a
- value.
-
- ~~~
- result = opValue<a class="reference external" href="runArgs">RunArgs</a>
- ~~~~
-
 ```nim
-func opValue[T](value: T): OpResult[T]
+func newOpResult[T, T2](value: T): OpResult[T, T2]
 ```
 
-# opMessage
+# newOpResultMsg
 
 Create an OpResult message object.
 
- The following example returns a OpResult[RunArgs] object with a
- message.
+```nim
+func newOpResultMsg[T, T2](message: T2): OpResult[T, T2]
+```
 
- ~~~
- result = opMessage<a class="reference external" href=""Unknown switch: " & key">RunArgs</a>
- ~~~~
+# `$`
+
+Return a string representation of an OpResult object.
 
 ```nim
-func opMessage[T](message: string): OpResult[T]
+func `$`(optionRc: OpResult): string
 ```
 
 

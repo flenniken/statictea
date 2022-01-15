@@ -9,9 +9,6 @@ Functions that deal with Unicode.
 * [stringLen](#stringlen) &mdash; Return the number of unicode characters in the string (not bytes).
 * [githubAnchor](#githubanchor) &mdash; Convert the name to a github anchor name.
 * [bytesToString](#bytestostring) &mdash; Create a string from bytes in a buffer.
-* [validateUtf8String](#validateutf8string) &mdash; Return the position of the first invalid UTF-8 byte in the string else return -1.
-* [sanitizeUtf8](#sanitizeutf8) &mdash; Sanitize and return the UTF-8 string.
-* [utf8CharString](#utf8charstring) &mdash; Get the unicode character at pos.
 * [firstInvalidUtf8](#firstinvalidutf8) &mdash; Return the position of the first invalid UTF-8 byte in the string if any.
 * [parseHexUnicode16](#parsehexunicode16) &mdash; Return the unicode number given a 4 character unicode escape string like u1234.
 * [parseHexUnicode](#parsehexunicode) &mdash; Return the unicode number given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos.
@@ -47,30 +44,6 @@ Create a string from bytes in a buffer. A nim string is UTF-8 incoded but it isn
 
 ```nim
 proc bytesToString(buffer: openArray[uint8 | char]): string
-```
-
-# validateUtf8String
-
-Return the position of the first invalid UTF-8 byte in the string else return -1.
-
-```nim
-proc validateUtf8String(str: string): int
-```
-
-# sanitizeUtf8
-
-Sanitize and return the UTF-8 string. The skipInvalid parameter determines whether to skip or replace invalid bytes.  When replacing the U-FFFD character is used.
-
-```nim
-proc sanitizeUtf8(str: string; skipInvalid: bool): string
-```
-
-# utf8CharString
-
-Get the unicode character at pos.  Return a one character string. Return "" when not a UTF-8 character.
-
-```nim
-proc utf8CharString(str: string; pos: Natural): string
 ```
 
 # firstInvalidUtf8
