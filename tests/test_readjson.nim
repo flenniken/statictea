@@ -14,61 +14,6 @@ import tostring
 import unicodes
 import opresultid
 
-proc testParseHexUnicode(str: string, start: Natural, eNumber: int32, ePos: Natural): bool =
-  var pos = start
-  result = true
-  let numOrc = parseHexUnicode(str, pos)
-  if not numOrc.isValue:
-    echo "unexpected error: " & $numOrc
-    result = false
-  if numOrc.value != eNumber:
-    echo "expected num: $1" % $toHex(numOrc.value)
-    echo "     got num: $1" % $toHex(eNumber)
-    result = false
-  if ePos != pos:
-    echo "expected pos: $1" % $ePos
-    echo "     got pos: $1" % $pos
-    result = false
-
-proc testParseHexUnicodeE(str: string, start: Natural, messageId: MessageId,
-    ePos: Natural): bool =
-  result = true
-  var pos = start
-  let numOrc = parseHexUnicode(str, pos)
-  if not numOrc.isMessageId:
-    echo "did not get the expected error: " & $numOrc
-    result = false
-  if numOrc.messageId != messageId:
-    echo "expected message: $1" % getWarning("test", 0, messageId)
-    echo "     got message: $1" % getWarning("test", 0, MessageId(numOrc.messageId))
-    result = false
-  if ePos != pos:
-    echo "expected pos: $1" % $ePos
-    echo "     got pos: $1" % $pos
-    result = false
-
-proc testParseHexUnicode16(str: string, start: Natural, eNumber: int32): bool =
-  let numOrc = parseHexUnicode16(str, start)
-  result = true
-  if not numOrc.isValue:
-    echo "unexpected error: " & $numOrc
-    result = false
-  if numOrc.value != eNumber:
-    echo "expected num: $1" % $toHex(numOrc.value)
-    echo "     got num: $1" % $toHex(eNumber)
-    result = false
-
-proc testParseHexUnicode16E(str: string, start: Natural, messageId: MessageId): bool =
-  let numOrc = parseHexUnicode16(str, start)
-  result = true
-  if not numOrc.isMessageId:
-    echo "did not get the expected error: " & $numOrc
-    result = false
-  if numOrc.messageId != messageId:
-    echo "expected message: $1" % getWarning("test", 0, messageId)
-    echo "     got message: $1" % getWarning("test", 0, MessageId(numOrc.messageId))
-    result = false
-
 proc testParseJsonStr(text: string, start: Natural,
     eStr: string, eLength: Natural): bool =
   # Test parseJsonStr.
@@ -394,75 +339,6 @@ she sat down in a large arm-chair at one end of the table.
   test "unescapePopularChar error":
     check unescapePopularChar('a') == char(0)
     check unescapePopularChar('\'') == char(0)
-
-  test "parseHexUnicode16":
-    check testParseHexUnicode16("u0000", 0, 0x00)
-    check testParseHexUnicode16("u0030", 0, 0x30)
-    check testParseHexUnicode16("u1234", 0, 0x1234)
-    check testParseHexUnicode16("uffff", 0, 0xffff)
-    check testParseHexUnicode16("uABCD", 0, 0xabcd)
-    check testParseHexUnicode16("""\u0038" """, 1, 0x38)
-
-    check testParseHexUnicode16(r"abc\u0030def", 4, 0x30)
-
-  test "parseHexUnicode16 error":
-    check testParseHexUnicode16E("", 0, wFourHexDigits)
-    check testParseHexUnicode16E("u", 0, wFourHexDigits)
-    check testParseHexUnicode16E("uv", 0, wFourHexDigits)
-    check testParseHexUnicode16E("u0v", 0, wFourHexDigits)
-    check testParseHexUnicode16E("u00v", 0, wFourHexDigits)
-    check testParseHexUnicode16E("u000v", 0, wFourHexDigits)
-    check testParseHexUnicode16E("au000v", 0, wFourHexDigits)
-    check testParseHexUnicode16E("abu000v", 0, wFourHexDigits)
-
-  test "parseHexUnicode":
-    # You can generate the surrogate pair for a unicode code point.
-    # http://russellcottrell.com/greek/utilities/SurrogatePairCalculator.htm
-    check testParseHexUnicode("u0000", 0, 0, 5)
-    check testParseHexUnicode(""" "\u0038" """, 3, 0x38, 8)
-    check testParseHexUnicode(r"u0030\u0031", 0, 0x30, 5)
-    check testParseHexUnicode(r"uD841\uDF0E", 0, 0x2070E, 11) # 𠜎
-    check testParseHexUnicode(r"uD867\uDD98", 0, 0x29D98, 11) # 𩶘
-    check testParseHexUnicode(r"uD83D\uDE03", 0, 0x1F603, 11) # 😃
-
-  test "parseHexUnicode error":
-    check testParseHexUnicodeE("u000", 0, wFourHexDigits, 0)
-    check testParseHexUnicodeE(r"uD83Dabc", 0, wMissingSurrogatePair, 5)
-    check testParseHexUnicodeE(r"uD83D\tabc", 0, wMissingSurrogatePair, 5)
-    check testParseHexUnicodeE(r"uD83D\u0030", 0, wNotMatchingSurrogate, 6)
-
-    # The test cases below come from this site:
-    # https://www.w3.org/2001/06/utf-8-wrong/UTF-8-test.html
-
-    # 5.1 Single UTF-16 surrogates
-    check testParseHexUnicodeE(r"uD800x", 0, wMissingSurrogatePair, 5)
-    check testParseHexUnicodeE(r"uDb7fx", 0, wMissingSurrogatePair, 5)
-    check testParseHexUnicodeE(r"uDb80x", 0, wMissingSurrogatePair, 5)
-    check testParseHexUnicodeE(r"uDC00x", 0, wLowSurrogateFirst, 0)
-    check testParseHexUnicodeE(r"uDF80x", 0, wLowSurrogateFirst, 0)
-    check testParseHexUnicodeE(r"uDfffx", 0, wLowSurrogateFirst, 0)
-
-    # 5.2 Paired UTF-16 surrogates                                                  |
-    check testParseHexUnicodeE(r"uD800\uDC00", 0, wPairedSurrogate, 6)
-    check testParseHexUnicodeE(r"uD800\uDfff", 0, wPairedSurrogate, 6)
-    check testParseHexUnicodeE(r"uDB7F\uDC00", 0, wPairedSurrogate, 6)
-    check testParseHexUnicodeE(r"uDB7F\uDFFF", 0, wPairedSurrogate, 6)
-    check testParseHexUnicodeE(r"uDB80\uDFFF", 0, wPairedSurrogate, 6)
-    check testParseHexUnicodeE(r"uDBFF\uDC00", 0, wPairedSurrogate, 6)
-    check testParseHexUnicodeE(r"uDBFF\uDFFF", 0, wPairedSurrogate, 6)
-
-    # 3.5  Impossible bytes
-    check testParseHexUnicodeE(r"u00fe", 0, wInvalidUtf8, 0)
-    check testParseHexUnicodeE(r"u00ff", 0, wInvalidUtf8, 0)
-
-    # 5.3 Other illegal code positions
-    check testParseHexUnicodeE(r"ufffe", 0, wInvalidUtf8, 0)
-    check testParseHexUnicodeE(r"uffff", 0, wInvalidUtf8, 0)
-
-    # Not enough characters.
-    check testParseHexUnicodeE(r"uD800", 0, wMissingSurrogatePair, 5)
-    check testParseHexUnicodeE(r"uD800\", 0, wMissingSurrogatePair, 5)
-    check testParseHexUnicodeE(r"uD800\u", 0, wMissingSurrogatePair, 5)
 
   test "parseJsonStr":
     # Parsing starts after the start quote and ends after the
