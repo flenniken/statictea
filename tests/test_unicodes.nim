@@ -2,7 +2,7 @@ import std/unittest
 import std/strformat
 import std/strutils
 import unicodes
-import opresultid
+import opresult
 import messages
 
 func stringToHex*(str: string): string =
@@ -21,10 +21,10 @@ proc testParseHexUnicodeError(text: string, pos: Natural,
     echo "parseHexUnicode passed unexpectedly."
     return false
   result = true
-  if numOrId.messageId != eMessageId:
+  if numOrId.message != eMessageId:
     echo "got unexpected message id:"
     echo "expected: " & $eMessageId
-    echo "     got: " & $numOrId.messageId
+    echo "     got: " & $numOrId.message
     result = false
   if inOutPos != ePos:
     echo "got unexpected pos:"
@@ -37,10 +37,10 @@ proc testParseHexUnicode(text: string, pos: Natural,
     ePos: Natural, eCodePoint: int): bool =
   var inOutPos = pos
   let numOrId = parseHexUnicode(text, inOutPos)
-  if numOrId.isMessageId:
+  if numOrId.isMessage:
     echo ""
     echo "parseHexUnicode failed for: " & text
-    echo fmt"{numOrId.messageId}: {Messages[numOrId.messageId]}"
+    echo fmt"{numOrId.message}: {Messages[numOrId.message]}"
     return false
   result = true
   if numOrId.value != eCodePoint:
@@ -58,10 +58,10 @@ proc testParseHexUnicodeToString(text: string, pos: Natural,
     ePos: Natural, eString: string): bool =
   var inOutPos = pos
   let stringOrId = parseHexUnicodeToString(text, inOutPos)
-  if stringOrId.isMessageId:
+  if stringOrId.isMessage:
     echo ""
     echo "parseHexUnicodeToString failed for: " & text
-    echo fmt"{stringOrId.messageId}: {Messages[stringOrId.messageId]}"
+    echo fmt"{stringOrId.message}: {Messages[stringOrId.message]}"
     return false
   result = true
   if stringOrId.value != eString:
@@ -110,7 +110,7 @@ suite "unicodes.nim":
     check codePointToString(0x10ffff).value == "\xF4\x8F\xBF\xBF"
 
   test "codePointToString error":
-    check codePointToString(0x110000).messageId == wCodePointTooBig
+    check codePointToString(0x110000).message == wCodePointTooBig
 
   test "parseHexUnicode16":
     check parseHexUnicode16("u1234", 0).value == 0x1234
@@ -125,10 +125,10 @@ suite "unicodes.nim":
     check parseHexUnicode16("u8336", 0).value == 0x8336
 
   test "parseHexUnicode16 error":
-    check parseHexUnicode16("u123", 0).messageId == wFourHexDigits
-    check parseHexUnicode16(r"testing \u123", 9).messageId == wFourHexDigits
-    check parseHexUnicode16("u123G", 0).messageId == wFourHexDigits
-    check parseHexUnicode16("u1234", 1).messageId == wFourHexDigits
+    check parseHexUnicode16("u123", 0).message == wFourHexDigits
+    check parseHexUnicode16(r"testing \u123", 9).message == wFourHexDigits
+    check parseHexUnicode16("u123G", 0).message == wFourHexDigits
+    check parseHexUnicode16("u1234", 1).message == wFourHexDigits
 
   test "parseHexUnicode":
     check testParseHexUnicode("u0031", 0, 5, 0x31)
@@ -184,5 +184,5 @@ suite "unicodes.nim":
 
   test "parseHexUnicodeToString error":
     var pos: Natural = 1
-    check parseHexUnicodeToString(r"\uDC00 tea", pos).messageId == wLowSurrogateFirst
+    check parseHexUnicodeToString(r"\uDC00 tea", pos).message == wLowSurrogateFirst
     check pos == 1

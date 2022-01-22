@@ -70,7 +70,7 @@ proc get_test_module_cmd(filename: string, release = false): string =
   -f, --forceBuild:on|off
 
     Force rebuilding of all imported modules.  This is good for
-    testing "imported but not used" warnings because the only appear
+    testing "imported but not used" warnings because they only appear
     the first time.
 
   --gc:orc
@@ -127,7 +127,7 @@ proc get_test_module_cmd(filename: string, release = false): string =
   else:
     rel = ""
 
-  let part1 = "nim c --gc:orc --verbosity:0 --hint[Performance]:off "
+  let part1 = "nim c -f --gc:orc --verbosity:0 --hint[Performance]:off "
   let part2 = "--hint[XCannotRaiseY]:off -d:test "
   let part3 = "$1 -r -p:src --out:bin/$2 tests/$3" % [rel, binName, filename]
 

@@ -1,5 +1,6 @@
 import std/unittest
 import messages
+import opresult
 import opresultid
 
 type
@@ -8,42 +9,48 @@ type
     size: int
 
 suite "optionrc.nim":
+  test "one":
+    var opResultId: OpResult[int, MessageId]
+    check opResultId.isValue == false
+    check opResultId.isMessage == true
+    check opResultId.message == wSuccess
+    check $opResultId == "Message: wSuccess"
 
   test "OpResultId default":
     var opResultId: OpResultId[string]
-    check opResultId.isValue == true
-    check opResultId.value == ""
-    check opResultId.isMessageId == false
-    check $opResultId == "Value: "
+    check opResultId.isValue == false
+    check opResultId.isMessage == true
+    check opResultId.message == wSuccess
+    check $opResultId == "Message: wSuccess"
 
   test "OpResultId new value":
-    var opResultId = newOpResultId[string]("hello")
+    var opResultId = opValue[string]("hello")
     check opResultId.isValue == true
     check opResultId.value == "hello"
     check $opResultId == "Value: hello"
 
   test "OpResultId new message id":
-    var opResultId = newOpResultIdId[string](wSuccess)
-    check opResultId.isMessageId == true
-    check opResultId.messageId == wSuccess
-    check $opResultId == "Message id: wSuccess"
+    var opResultId = opMessage[string](wSuccess)
+    check opResultId.isMessage == true
+    check opResultId.message == wSuccess
+    check $opResultId == "Message: wSuccess"
 
   test "OpResultId new value int":
-    var opResultId = newOpResultId[int](3)
+    var opResultId = opValue[int](3)
     check opResultId.isValue == true
     check opResultId.value == 3
     check $opResultId == "Value: 3"
 
   test "OpResultId new message":
-    var opResultId = newOpResultIdId[int](wUnknownArg)
-    check opResultId.isMessageId == true
-    check opResultId.messageId == wUnknownArg
-    check $opResultId == "Message id: wUnknownArg"
+    var opResultId = opMessage[int](wUnknownArg)
+    check opResultId.isMessage == true
+    check opResultId.message == wUnknownArg
+    check $opResultId == "Message: wUnknownArg"
 
-  test "newOpResultId my obj":
+  test "opValue my obj":
     let myObj = MyObjTest2(name: "test", size: 12)
-    let opResultId = newOpResultId[MyObjTest2](myObj)
+    let opResultId = opValue[MyObjTest2](myObj)
     check opResultId.isValue == true
-    check opResultId.isMessageId == false
+    check opResultId.isMessage == false
     check opResultId.value == myObj
 

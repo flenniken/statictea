@@ -7,7 +7,7 @@ import std/json
 import std/tables
 import vartypes
 import messages
-import opresultid
+import opresult
 import unicodes
 import utf8decoder
 
@@ -218,8 +218,8 @@ proc parseJsonStr*(text: string, startPos: Natural): ParsedString =
       case getChar(text, pos)
       of 'u':
         let strOrc = parseHexUnicodeToString(text, pos)
-        if strOrc.isMessageId:
-          return newParsedString("", pos, strOrc.messageId)
+        if strOrc.isMessage:
+          return newParsedString("", pos, strOrc.message)
         newStr.add(strOrc.value)
       else:
         let ch = unescapePopularChar(getChar(text, pos))

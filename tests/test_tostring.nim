@@ -1,5 +1,5 @@
 import std/unittest
-import std/tables
+# import std/tables
 import tostring
 import vartypes
 import messages

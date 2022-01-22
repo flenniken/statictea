@@ -48,7 +48,7 @@ formatting json.
 :END:
 
 You create a template and add commands around your variable
-content. This defines the replacement block.
+content. This defines the replacement blocks.
 
 In the replacement blocks you add variables in brackets for
 substitutions.
@@ -66,7 +66,7 @@ template type.
 :CUSTOM_ID: commands
 :END:
 
-A StaticTea command marks replacement content in the template and
+A StaticTea command marks a replacement block in the template and
 it provides a place for your code statements.
 
 - [[#nextline-command][nextline]] -- make substitutions in the next line
@@ -686,7 +686,7 @@ t.args => {
 :END:
 
 The t.content variable determines the content used for the
-whole replace block.
+replace command's whole replacement block.
 
 #+BEGIN_SRC
 t.content = h.header

@@ -5,60 +5,27 @@
 ## @:Example Usage:
 ## @:
 ## @:~~~
-## @:proc test(): OpResultId[int] =
+## @:proc get_string(): OpResultId[string] =
 ## @:  if problem:
-## @:    result = newOpResultIdId@{int}@(wUnknownArg)
+## @:    result = opMessage@{string}@(wUnknownArg)
 ## @:  else:
-## @:    result = newOpResultId@{int}@(3)
+## @:    result = opValue@{string}@("string of char")
 ## @:
-## @:let numOr = test()
-## @:if numOr.isMessage():
-## @:  echo numOr.messageId
+## @:let strOr = get_string()
+## @:if strOr.isMessage():
+## @:  echo show_message(strOr.message)
 ## @:else:
-## @:  num = numOr.value
+## @:  str = strOr.value
 ## @:~~~~
 
-# todo: use OpResult to implement this.
-# OpResultId[T] = OpResult[T, MessageId]
-
 import messages
+import opresult
 
 type
-  OpResultIdKind = enum
-    ## The kind of OpResultId object, either a value or a message id.
-    orValue,
-    orMessageId
+  OpResultId*[T] = OpResult[T, MessageId]
 
-  OpResultId*[T] = object
-    ## Contains either a value or a message id. The default is a
-    ## value.
-    case kind*: OpResultIdKind
-      of orValue:
-        value*: T
-      of orMessageId:
-        messageId*: MessageId
+func opValue*[T](value: T): OpResultId[T] =
+  result = OpResult[T, MessageId](kind: orValue, value: value)
 
-func isMessageId*(opResult: OpResultId): bool =
-  ## Return true when the OpResultId object contains a message id.
-  if opResult.kind == orMessageId:
-    result = true
-
-func isValue*(opResult: OpResultId): bool =
-  ## Return true when the OpResultId object contains a value.
-  if opResult.kind == orValue:
-    result = true
-
-func newOpResultId*[T](value: T): OpResultId[T] =
-  ## Create an OpResultId value object.
-  return OpResultId[T](kind: orValue, value: value)
-
-func newOpResultIdId*[T](messageId: MessageId): OpResultId[T] =
-  ## Create an OpResultId message id object.
-  return OpResultId[T](kind: orMessageId, messageId: messageId)
-
-func `$`*(optionRc: OpResultId): string =
-  ## Return a string representation of an OpResultId object.
-  if optionRc.kind == orValue:
-    result = "Value: " & $optionRc.value
-  else:
-    result = "Message id: " & $optionRc.messageId
+func opMessage*[T](message: MessageId): OpResultId[T] =
+  result = OpResult[T, MessageId](kind: orMessage, message: message)

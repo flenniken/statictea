@@ -1,6 +1,7 @@
 import std/unittest
 import std/os
 import std/strutils
+import opresult
 import runner
 import tables
 
@@ -10,7 +11,7 @@ proc createFile*(filename: string, content: string) =
   file.write(content)
   file.close()
 
-proc parseRunCommandLine*(cmdLine: string = ""): runner.OpResult[RunArgs] =
+proc parseRunCommandLine*(cmdLine: string = ""): runner.OpResultStr[RunArgs] =
   let argv = strutils.splitWhitespace(cmdLine)
   result = parseRunCommandLine(argv)
 
@@ -43,7 +44,7 @@ proc showCompareLines*[T](expectedLines: seq[T], gotLines: seq[T],
 # todo: remove runner.OpResult and use the other one.
 
 proc testMakeDirAndFiles(filename: string, content: string,
-    expectedDirAndFilesOp: runner.OpResult[DirAndFiles]): bool =
+    expectedDirAndFilesOp: runner.OpResultStr[DirAndFiles]): bool =
   ## Test the makeDirAndFiles procedure. The filename is created with
   ## the content then the makeDirAndFiles procedure is called and then
   ## the result of comparing the result with the expected result is
@@ -56,7 +57,7 @@ proc testMakeDirAndFiles(filename: string, content: string,
   # Create the file with the given content.
   createFile(filename, content)
 
-  # proc makeDirAndFiles*(filename: string): OpResult[DirAndFiles] =
+  # proc makeDirAndFiles*(filename: string): OpResultStr[DirAndFiles] =
 
   # Call makeDirAndFiles.
   result = true
@@ -304,7 +305,7 @@ suite "runner.nim":
     let cmdLines = ["-h", "--help"]
     for cmdLine in cmdLines:
       let argsOp = parseRunCommandLine(cmdLine)
-      check argsOp.kind == okValue
+      check argsOp.isValue
       let args = argsOp.value
       check args.help == true
       check args.version == false
@@ -315,7 +316,7 @@ suite "runner.nim":
     let cmdLines = ["-l", "--leaveTempDir"]
     for cmdLine in cmdLines:
       let argsOp = parseRunCommandLine(cmdLine)
-      check argsOp.kind == okValue
+      check argsOp.isValue
       let args = argsOp.value
       check args.help == false
       check args.version == false
@@ -327,7 +328,7 @@ suite "runner.nim":
     let cmdLines = ["-v", "--version"]
     for cmdLine in cmdLines:
       let argsOp = parseRunCommandLine(cmdLine)
-      check argsOp.kind == okValue
+      check argsOp.isValue
       let args = argsOp.value
       check args.help == false
       check args.version == true
@@ -339,7 +340,7 @@ suite "runner.nim":
     let cmdLines = ["-f=hello.stf", "--filename=hello.stf"]
     for cmdLine in cmdLines:
       let argsOp = parseRunCommandLine(cmdLine)
-      check argsOp.kind == okValue
+      check argsOp.isValue
       let args = argsOp.value
       check args.help == false
       check args.version == false
@@ -350,7 +351,7 @@ suite "runner.nim":
     let cmdLines = ["-d=testfolder", "--directory=testfolder"]
     for cmdLine in cmdLines:
       let argsOp = parseRunCommandLine(cmdLine)
-      check argsOp.kind == okValue
+      check argsOp.isValue
       let args = argsOp.value
       check args.help == false
       check args.version == false
@@ -361,14 +362,14 @@ suite "runner.nim":
     let cmdLines = ["-f testfolder", "--filename testfolder"]
     for cmdLine in cmdLines:
       let argsOp = parseRunCommandLine(cmdLine)
-      check argsOp.kind == okMessage
+      check argsOp.isMessage
       check argsOp.message == "Missing filename. Use -f=filename"
 
   test "parseRunCommandLine -f file -l":
     let cmdLines = ["-l -f=name", "--filename=name --leaveTempDir"]
     for cmdLine in cmdLines:
       let argsOp = parseRunCommandLine(cmdLine)
-      check argsOp.kind == okValue
+      check argsOp.isValue
       let args = argsOp.value
       check args.help == false
       check args.version == false
@@ -380,7 +381,7 @@ suite "runner.nim":
     let cmdLines = ["-d testfolder", "--directory testfolder"]
     for cmdLine in cmdLines:
       let argsOp = parseRunCommandLine(cmdLine)
-      check argsOp.kind == okMessage
+      check argsOp.isMessage
       check argsOp.message == "Missing directory name. Use -d=directory"
 
   test "openNewFile":
@@ -388,7 +389,7 @@ suite "runner.nim":
     let folder = getTempDir()
     let filename = "openNewFile"
     let fileOp = openNewFile(folder, filename)
-    check fileOp.kind == okValue
+    check fileOp.isValue
     let file = fileOp.value
     file.write("this is a test\n")
     file.close()
@@ -406,7 +407,7 @@ suite "runner.nim":
 
     let filename = "openNewFile"
     let fileOp = openNewFile(folder, filename)
-    check fileOp.kind == okMessage
+    check fileOp.isMessage
     # echo fileOp.message
     check fileOp.message.startsWith("Unable to create the file")
 
@@ -518,7 +519,7 @@ suite "runner.nim":
     let filename = "testfiles/empty.stf"
     let content = ""
     let message = "Empty file: 'testfiles/empty.stf'."
-    let expected = runner.OpResult[DirAndFiles](kind: okMessage, message: message)
+    let expected = optMessage[DirAndFiles](message)
     check testMakeDirAndFiles(filename, content, expected)
     check testDir(filename, @[])
 
@@ -529,11 +530,11 @@ suite "runner.nim":
 Invalid stf file first line:
 expected: id stf file version 0.0.0
      got: not a stf file"""
-    let expected = runner.OpResult[DirAndFiles](kind: okMessage, message: message)
+    let expected = optMessage[DirAndFiles](message)
     # let a = newCompareLine("filea", "emptyfile.txt")
     # let b = newRunFileLine("afile.txt", false, false, false)
     # let dirAndFiles = newDirAndFiles(@[], @[])
-    # let expected = runner.OpResult[DirAndFiles](kind: okValue, value: dirAndFiles)
+    # let expected = runner.OpResultStr[DirAndFiles](kind: okValue, value: dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
 
     # let e = newNameAndContent("afile.txt", "contents of\nthe file\n")
@@ -545,11 +546,11 @@ expected: id stf file version 0.0.0
 id stf file version 0.0.0
 """
     # let message = "File type not supported."
-    # let expected = runner.OpResult[DirAndFiles](kind: okMessage, message: message)
+    # let expected = runner.OpResultStr[DirAndFiles](kind: okMessage, message: message)
     # let a = newCompareLine("filea", "emptyfile.txt")
     # let b = newRunFileLine("afile.txt", false, false, false)
     let dirAndFiles = newDirAndFiles(@[], @[])
-    let expected = runner.OpResult[DirAndFiles](kind: okValue, value: dirAndFiles)
+    let expected = optValue[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
 
     # let e = newNameAndContent("afile.txt", "contents of\nthe file\n")
@@ -566,7 +567,7 @@ id stf file version 0.0.0
     # let a = newCompareLine("filea", "emptyfile.txt")
     # let b = newRunFileLine("afile.txt", false, false, false)
     let dirAndFiles = newDirAndFiles(@[], @[])
-    let expected = runner.OpResult[DirAndFiles](kind: okValue, value: dirAndFiles)
+    let expected = optValue[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
 
     # let e = newNameAndContent("afile.txt", "contents of\nthe file\n")
@@ -585,7 +586,7 @@ the file
     # let a = newCompareLine("filea", "emptyfile.txt")
     let b = newRunFileLine("afile.txt")
     let dirAndFiles = newDirAndFiles(@[], @[b])
-    let expected = runner.OpResult[DirAndFiles](kind: okValue, value: dirAndFiles)
+    let expected = optValue[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
 
     let e = newNameAndContent("afile.txt", "contents of\nthe file\n")
@@ -612,7 +613,7 @@ the second file
     let b = newRunFileLine("afile.txt")
     let c = newRunFileLine("bfile.txt")
     let dirAndFiles = newDirAndFiles(@[], @[b, c])
-    let expected = runner.OpResult[DirAndFiles](kind: okValue, value: dirAndFiles)
+    let expected = optValue[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
 
     let expectedAFileContent = """
@@ -638,7 +639,7 @@ id stf file version 0.0.0
     # let a = newCompareLine("filea", "emptyfile.txt")
     let b = newRunFileLine("emptyfile.txt")
     let dirAndFiles = newDirAndFiles(@[], @[b])
-    let expected = runner.OpResult[DirAndFiles](kind: okValue, value: dirAndFiles)
+    let expected = optValue[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
 
     let e = newNameAndContent("emptyfile.txt", "")
@@ -657,7 +658,7 @@ testing
 """
     # todo: change message: The endfile line is missing.
     let message = "The endfile line was missing."
-    let expected = runner.OpResult[DirAndFiles](kind: okMessage, message: message)
+    let expected = optMessage[DirAndFiles](message)
     check testMakeDirAndFiles(filename, content, expected)
 
     check testDir(filename, @[])
@@ -670,7 +671,7 @@ id stf file version 0.0.0
 what's this?
 """
     let message = "Unknown line: 'what's this?'."
-    let expected = runner.OpResult[DirAndFiles](kind: okMessage, message: message)
+    let expected = optMessage[DirAndFiles](message)
     check testMakeDirAndFiles(filename, content, expected)
     check testDir(filename, @[])
 
@@ -687,7 +688,7 @@ contents of the file
 """
     let r = newRunFileLine("afile.txt", noLastEnding = true)
     let dirAndFiles = newDirAndFiles(@[], @[r])
-    let expected = runner.OpResult[DirAndFiles](kind: okValue, value: dirAndFiles)
+    let expected = optValue[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
 
     let c = newNameAndContent("afile.txt", "contents of the file")
@@ -704,7 +705,7 @@ ls
 """
     let r = newRunFileLine("afile.txt", command = true, noLastEnding = true)
     let dirAndFiles = newDirAndFiles(@[], @[r])
-    let expected = runner.OpResult[DirAndFiles](kind: okValue, value: dirAndFiles)
+    let expected = optValue[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
 
     let c = newNameAndContent("afile.txt", "ls")
@@ -721,7 +722,7 @@ ls
 """
     let r = newRunFileLine("afile.txt", true, true, true)
     let dirAndFiles = newDirAndFiles(@[], @[r])
-    let expected = runner.OpResult[DirAndFiles](kind: okValue, value: dirAndFiles)
+    let expected = optValue[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
 
     let c = newNameAndContent("afile.txt", "ls")
@@ -739,7 +740,7 @@ id stf file version 0.0.0
     let a = newCompareLine("file1.txt", "file2.txt")
     let b = newCompareLine("file3.txt", "file4.txt")
     let dirAndFiles = newDirAndFiles(@[a, b], @[])
-    let expected = runner.OpResult[DirAndFiles](kind: okValue, value: dirAndFiles)
+    let expected = optValue[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
     check testDir(filename, @[])
 
@@ -787,7 +788,7 @@ hello world
     let f5 = newRunFileLine("stderr.expected")
 
     let dirAndFiles = newDirAndFiles(@[a, b], @[f1, f2, f3, f4, f5])
-    let expected = runner.OpResult[DirAndFiles](kind: okValue, value: dirAndFiles)
+    let expected = optValue[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
     let cmdSh = """
 ../bin/statictea -t=hello.html -s=hello.json >stdout 2>stderr"""
@@ -817,7 +818,7 @@ $$ hello {name}"""
     let runFileLines = @[r]
     let rcOp = runCommands(folder, runFileLines)
 
-    check rcOp.kind == okValue
+    check rcOp.isValue
     check rcOp.value == 0
 
     # The current working directory is set to the testfiles folder.

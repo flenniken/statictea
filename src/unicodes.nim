@@ -3,6 +3,8 @@
 import std/unicode
 import std/options
 import std/strutils
+# todo: why does opresult need to be imported. Any good way around this?
+import opresult
 import opresultid
 import messages
 import utf8decoder
@@ -87,7 +89,7 @@ func parseHexUnicode16*(text: string, start: Natural): OpResultId[int] =
   ## message id telling what went wrong.
 
   if start + 5 > text.len:
-    return newOpResultIdId[int](wFourHexDigits)
+    return opMessage[int](wFourHexDigits)
 
   var pos = start
   inc(pos)
@@ -107,9 +109,9 @@ func parseHexUnicode16*(text: string, start: Natural): OpResultId[int] =
       num = num or ((digitOrd - int(ord('A')) + 10) shl shift)
     else:
       # A \u must be followed by 4 hex digits.
-      return newOpResultIdId[int](wFourHexDigits)
+      return opMessage[int](wFourHexDigits)
     inc(pos)
-  result = newOpResultId[int](num)
+  result = opValue[int](num)
 
 func parseHexUnicode*(text: string, pos: var Natural): OpResultId[int] =
   ## Return the unicode number given a 4 or 8 character unicode escape
@@ -119,7 +121,7 @@ func parseHexUnicode*(text: string, pos: var Natural): OpResultId[int] =
 
   # Get the hex value.
   let numOrc = parseHexUnicode16(text, pos)
-  if numOrc.isMessageId:
+  if numOrc.isMessage:
     return numOrc
   var num = numOrc.value
 
@@ -129,12 +131,12 @@ func parseHexUnicode*(text: string, pos: var Natural): OpResultId[int] =
   # The first 16 can be anything but a low surrogate.
   if num >= 0xDC00 and num <= 0xDFFF:
     # You cannot use a low surrogate by itself or first in a pair.
-    return newOpResultIdId[int](wLowSurrogateFirst)
+    return opMessage[int](wLowSurrogateFirst)
   pos += 5
 
   # If not a high surrogate character, return it.
   if num < 0xD800 or num > 0xDBFF:
-    return newOpResultId[int](num)
+    return opValue[int](num)
 
   # The value is a high surrogate, we needed a low surrogate to make a
   # pair.
@@ -142,23 +144,23 @@ func parseHexUnicode*(text: string, pos: var Natural): OpResultId[int] =
 
   if pos + 6 > text.len or text[pos] != '\\' or text[pos+1] != 'u':
     # Missing the low surrogate.
-    return newOpResultIdId[int](wMissingSurrogatePair)
+    return opMessage[int](wMissingSurrogatePair)
 
   inc(pos)
 
   let lowSurrogateOr = parseHexUnicode16(text, pos)
-  if lowSurrogateOr.isMessageId:
+  if lowSurrogateOr.isMessage:
     return lowSurrogateOr
   var lowSurrogate = lowSurrogateOr.value
 
   # Make sure we got a low surrogate.
   if lowSurrogate < 0xDC00 or lowSurrogate > 0xDFFF:
     # Invalid low surrogate.
-    return newOpResultIdId[int](wInvalidLowSurrogate)
+    return opMessage[int](wInvalidLowSurrogate)
 
   pos += 5
   let codePoint = 0x10000 + (((highSurrogate - 0xd800) shl 10) or (lowSurrogate - 0xdc00))
-  result = newOpResultId[int](codePoint)
+  result = opValue[int](codePoint)
 
 func codePointToString*(codePoint: int): OpResultId[string] =
   ## Convert a code point to a one character UTF-8 string.
@@ -189,9 +191,9 @@ func codePointToString*(codePoint: int): OpResultId[string] =
     str.add(chr(i and 0b11_1111 or 0b10_0000_00))
   else:
     # Code point too big.
-    return newOpResultIdId[string](wCodePointTooBig)
+    return opMessage[string](wCodePointTooBig)
 
-  result = newOpResultId[string](str)
+  result = opValue[string](str)
 
 func parseHexUnicodeToString*(text: string, pos: var Natural): OpResultId[string] =
   ## Return the unicode string given a 4 or 8 character unicode escape
@@ -200,6 +202,6 @@ func parseHexUnicodeToString*(text: string, pos: var Natural): OpResultId[string
   ## telling what went wrong and pos points at the error.
 
   let numOrc = parseHexUnicode(text, pos)
-  if numOrc.isMessageId:
-    return newOpResultIdId[string](numOrc.messageId)
+  if numOrc.isMessage:
+    return opMessage[string](numOrc.message)
   result = codePointToString(numOrc.value)
