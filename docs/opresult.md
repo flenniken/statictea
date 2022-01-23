@@ -4,31 +4,25 @@ OpResult holds either a value or a message.  It's similar to
 the Option type but instead of returning nothing, you return a
 message that tells why you cannot return the value.
 
-Example Usage:
-
-~~~
-proc test(): OpResult[int, string] =
-  if problem:
-    result = newOpResultMsg[int, string]("unable to do the task")
-  else:
-    result = newOpResult[int, string](3)
-
-let numOr = test()
-if numOr.isMessage():
-  echo numOr.message
-else:
-  num = numOr.value
-~~~~
+You use this to make particular OpResult objects. See [OpResultId](opresultid.md).
 
 * [opresult.nim](../src/opresult.nim) &mdash; Nim source code.
 # Index
 
+* type: [OpResultKind](#opresultkind) &mdash; The kind of OpResult object, either a message or a value.
 * type: [OpResult](#opresult) &mdash; Contains either a value or a message.
 * [isMessage](#ismessage) &mdash; Return true when the OpResult object contains a message.
 * [isValue](#isvalue) &mdash; Return true when the OpResult object contains a value.
-* [newOpResult](#newopresult) &mdash; Create an OpResult value object.
-* [newOpResultMsg](#newopresultmsg) &mdash; Create an OpResult message object.
 * [`$`](#) &mdash; Return a string representation of an OpResult object.
+
+# OpResultKind
+
+The kind of OpResult object, either a message or a value.
+
+```nim
+OpResultKind = enum
+  orMessage, orValue
+```
 
 # OpResult
 
@@ -62,28 +56,12 @@ Return true when the OpResult object contains a value.
 func isValue(opResult: OpResult): bool
 ```
 
-# newOpResult
-
-Create an OpResult value object.
-
-```nim
-func newOpResult[T, T2](value: T): OpResult[T, T2]
-```
-
-# newOpResultMsg
-
-Create an OpResult message object.
-
-```nim
-func newOpResultMsg[T, T2](message: T2): OpResult[T, T2]
-```
-
 # `$`
 
 Return a string representation of an OpResult object.
 
 ```nim
-func `$`(optionRc: OpResult): string
+func `$`(opResult: OpResult): string
 ```
 
 

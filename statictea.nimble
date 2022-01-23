@@ -507,20 +507,13 @@ proc taskDocs(namePart: string) =
       exec cmd
       echo ""
 
-      # Create a shared.json file for use by the template.
-      let sharedJson = """{"newline": "\n"}"""
-      let sharedFilename = "docs/shared.json"
-      writeFile(sharedFilename, sharedJson)
-
       # Create markdown from the json comments using a statictea template.
       echo "Generate $1" % [mdName]
-      let part1 = "bin/statictea -j=docs/shared.json -t=templates/nimModule.md "
+      let part1 = "bin/statictea -t=templates/nimModule.md "
       let part2 = "-s=$1 -r=$2" % [jsonName, mdName]
       exec part1 & part2
 
       # Remove the temporary files.
-      rmFile(sharedFilename)
-      echo "Remove $1" % [jsonName]
       rmFile(jsonName)
 
   echoGrip()
@@ -537,21 +530,15 @@ proc taskReadMeFun() =
   echo ""
   echo "Exported runFunctions.nim json doc comments: $1" % [jsonName]
 
-  # Create a shared.json file for use by the template.
-  let sharedJson = """{"newline": "\n"}"""
-  let sharedFilename = "docs/shared.json"
-  writeFile(sharedFilename, sharedJson)
-
   # Create the readme function section org file.
   let templateName = joinPath("templates", "readmeFuncSection.org")
   let sectionFile = joinPath("docs", "readmeFuncs.org")
-  cmd = "bin/statictea -l -s=$1 -j=docs/shared.json -t=$2 -r=$3" %
+  cmd = "bin/statictea -l -s=$1 -t=$2 -r=$3" %
      [jsonName, templateName, sectionFile]
   # echo cmd
   exec cmd
   echo "Generated readme function section file: " & sectionFile
 
-  rmFile(sharedFilename)
   rmFile(jsonName)
 
   # Insert the function section into the readme.

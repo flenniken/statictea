@@ -12,6 +12,7 @@ Functions that deal with Unicode.
 * [firstInvalidUtf8](#firstinvalidutf8) &mdash; Return the position of the first invalid UTF-8 byte in the string if any.
 * [parseHexUnicode16](#parsehexunicode16) &mdash; Return the unicode number given a 4 character unicode escape string like u1234.
 * [parseHexUnicode](#parsehexunicode) &mdash; Return the unicode number given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos.
+* [codePointToString](#codepointtostring) &mdash; Convert a code point to a one character UTF-8 string.
 * [parseHexUnicodeToString](#parsehexunicodetostring) &mdash; Return the unicode string given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos.
 
 # cmpString
@@ -43,7 +44,7 @@ func githubAnchor(name: string): string
 Create a string from bytes in a buffer. A nim string is UTF-8 incoded but it isn't validated so it is just a string of bytes.
 
 ```nim
-proc bytesToString(buffer: openArray[uint8 | char]): string
+func bytesToString(buffer: openArray[uint8 | char]): string
 ```
 
 # firstInvalidUtf8
@@ -59,7 +60,7 @@ func firstInvalidUtf8(str: string): Option[int]
 Return the unicode number given a 4 character unicode escape string like u1234. Start is pointing at the u. On error, return a message id telling what went wrong.
 
 ```nim
-proc parseHexUnicode16(text: string; start: Natural): OpResultId[int32]
+func parseHexUnicode16(text: string; start: Natural): OpResultId[int]
 ```
 
 # parseHexUnicode
@@ -67,7 +68,15 @@ proc parseHexUnicode16(text: string; start: Natural): OpResultId[int32]
 Return the unicode number given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos. Pos is initially pointing at the u. On error, return the message id telling what went wrong and pos points at the error.
 
 ```nim
-proc parseHexUnicode(text: string; pos: var Natural): OpResultId[int32]
+func parseHexUnicode(text: string; pos: var Natural): OpResultId[int]
+```
+
+# codePointToString
+
+Convert a code point to a one character UTF-8 string.
+
+```nim
+func codePointToString(codePoint: int): OpResultId[string]
 ```
 
 # parseHexUnicodeToString
@@ -75,7 +84,7 @@ proc parseHexUnicode(text: string; pos: var Natural): OpResultId[int32]
 Return the unicode string given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos. Pos is initially pointing at the u. On error, return the message id telling what went wrong and pos points at the error.
 
 ```nim
-proc parseHexUnicodeToString(text: string; pos: var Natural): OpResultId[string]
+func parseHexUnicodeToString(text: string; pos: var Natural): OpResultId[string]
 ```
 
 

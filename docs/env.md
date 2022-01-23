@@ -74,7 +74,7 @@ proc close(env: var Env)
 Write a message to the error stream and increment the warning count.
 
 ```nim
-proc outputWarning(env: var Env; message: string)
+proc outputWarning(env: var Env; lineNum: Natural; message: string)
 ```
 
 # warn

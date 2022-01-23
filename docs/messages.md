@@ -159,7 +159,9 @@ MessageId = enum
   wReplaceMany,             ## w142
   wJoinListString,          ## w143
   wBareEndblock,            ## w144
-  wBareContinue              ## w145
+  wBareContinue,            ## w145
+  wInvalidLowSurrogate,     ## w146
+  wCodePointTooBig           ## w147
 ```
 
 # Messages
@@ -304,16 +306,18 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "No $1 filename. Use $2=filename.", ## wNoFilename
     "A \\u must be followed by 4 hex digits.", ## wFourHexDigits
     "The second value is not a matching surrogate pair.", ## wNotMatchingSurrogate
-    "Missing the second surrogate pair.", ## wMissingSurrogatePair
+    "Missing the low surrogate.", ## wMissingSurrogatePair
     """A slash must be followed by one letter from: nr"t\bf/.""", ## wNotPopular
     "Controls characters must be escaped.", ## wControlNotEscaped
     "No ending double quote.", ## wNoEndingQuote
-    "You cannot use a low surrogate first in the pair.", ## wLowSurrogateFirst
+    "You cannot use a low surrogate by itself or first in a pair.", ## wLowSurrogateFirst
     "Invalid paired surrogate.", ## wPairedSurrogate
     "The replaceMany function failed.", ## wReplaceMany
     "The join list items must be strings.", ## wJoinListString
     "The endblock command does not have a matching block command.", ## wBareEndblock
-    "The continue command is not part of a command."]
+    "The continue command is not part of a command.", ## wBareContinue
+    "Invalid low surrogate.", ## wInvalidLowSurrogate
+    "Unicode code point over the limit of 10FFFF."]
 ```
 
 

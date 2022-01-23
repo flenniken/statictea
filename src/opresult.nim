@@ -2,8 +2,7 @@
 ## @:the Option type but instead of returning nothing, you return a
 ## @:message that tells why you cannot return the value.
 ## @:
-## @:You use this to make particular OpResult objects. See OpResultId.nim.
-## @:~~~~
+## @:You use this to make particular OpResult objects. See @{OpResultId}@(opresultid.md).
 
 type
   OpResultKind* = enum

@@ -4,86 +4,56 @@ OpResultId holds either a value or a message id.  It's similar to
 the Option type but instead of returning nothing, you return a
 message id that tells why you cannot return the value.
 
+For isMessage, isValue and object details see: [OpResult](opresult.md).
+
 Example Usage:
 
 ~~~
-proc test(): OpResultId[int] =
-  if problem:
-    result = newOpResultIdId[int](wUnknownArg)
-  else:
-    result = newOpResultId[int](3)
+import opresult
+import opresultid
 
-let numOr = test()
-if numOr.isMessage():
-  echo numOr.messageId
+proc get_string(): OpResultId[string] =
+  if problem:
+    result = opMessage[string](wUnknownArg)
+  else:
+    result = opValue[string]("string of char")
+
+let strOr = get_string()
+if strOr.isMessage:
+  echo show_message(strOr.message)
 else:
-  num = numOr.value
+  echo "value = " & $strOr.value
 ~~~~
 
 * [opresultid.nim](../src/opresultid.nim) &mdash; Nim source code.
 # Index
 
-* type: [OpResultId](#opresultid) &mdash; Contains either a value or a message id.
-* [isMessageId](#ismessageid) &mdash; Return true when the OpResultId object contains a message id.
-* [isValue](#isvalue) &mdash; Return true when the OpResultId object contains a value.
-* [newOpResultId](#newopresultid) &mdash; Create an OpResultId value object.
-* [newOpResultIdId](#newopresultidid) &mdash; Create an OpResultId message id object.
-* [`$`](#) &mdash; Return a string representation of an OpResultId object.
+* type: [OpResultId](#opresultid) &mdash; The OpResultId object holds a message id or a value T.
+* [opValue](#opvalue) &mdash; Create a new OpResultId object containing a value T.
+* [opMessage](#opmessage) &mdash; Create a new OpResultId object containing a message id.
 
 # OpResultId
 
-Contains either a value or a message id. The default is a value.
+The OpResultId object holds a message id or a value T.
 
 ```nim
-OpResultId[T] = object
-  case kind*: OpResultIdKind
-  of orValue:
-      value*: T
-
-  of orMessageId:
-      messageId*: MessageId
-
-
+OpResultId[T] = OpResult[T, MessageId]
 ```
 
-# isMessageId
+# opValue
 
-Return true when the OpResultId object contains a message id.
+Create a new OpResultId object containing a value T.
 
 ```nim
-func isMessageId(opResult: OpResultId): bool
+func opValue[T](value: T): OpResultId[T]
 ```
 
-# isValue
+# opMessage
 
-Return true when the OpResultId object contains a value.
-
-```nim
-func isValue(opResult: OpResultId): bool
-```
-
-# newOpResultId
-
-Create an OpResultId value object.
+Create a new OpResultId object containing a message id.
 
 ```nim
-func newOpResultId[T](value: T): OpResultId[T]
-```
-
-# newOpResultIdId
-
-Create an OpResultId message id object.
-
-```nim
-func newOpResultIdId[T](messageId: MessageId): OpResultId[T]
-```
-
-# `$`
-
-Return a string representation of an OpResultId object.
-
-```nim
-func `$`(optionRc: OpResultId): string
+func opMessage[T](message: MessageId): OpResultId[T]
 ```
 
 

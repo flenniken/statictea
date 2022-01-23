@@ -1,6 +1,6 @@
 # utf8decoder.nim
 
-Functions that deal with Unicode.
+Functions for decoding and validating UTF-8.
 
 * [utf8decoder.nim](../src/utf8decoder.nim) &mdash; Nim source code.
 # Index

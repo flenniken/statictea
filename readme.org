@@ -1222,10 +1222,10 @@ and the result.
 
 #+BEGIN_SRC
 statictea \
-  --server server.json \
-  --shared shared.json \
-  --template template.html \
-  --result result.html
+  --server=server.json \
+  --shared=shared.json \
+  --template=template.html \
+  --result=result.html
 #+END_SRC
 
 The StaticTea command line options:
@@ -1438,9 +1438,9 @@ The following example shows a typical invocation:
 
 #+BEGIN_SRC
 statictea \
-  --server server.json \
-  --shared shared.json \
-  --template template.html \
+  --server=server.json \
+  --shared=shared.json \
+  --template=template.html \
   --update
 #+END_SRC
 
@@ -1599,16 +1599,16 @@ The stf runner runs command line tests of statictea.
 
 The runner is a standalone program that can test any command line
 application.  You define a test in a stf file.  The stf file
-contains instructions for creating test files, running them and
-for comparing them to determine whether the test passed.
+contains instructions for creating files, running them and for
+comparing them to determine whether the test passed.
 
 The statictea testfiles folder contains Single Test File (stf)
 files used to test statictea features. The runner command runs
-all the stf files.  There are nimble tasks to run all the tests,
-to run one test, to make new tests and to list them.  See the
-nimble section above.
+all the stf files. See the runner help message for more
+information about stf files.
 
-See the runner help message for help creating stf files.
+There are nimble tasks to run all the tests, to run one test, to
+make a new test and to list them.  See the nimble section above.
 
 [[#contents][茶]]
 
