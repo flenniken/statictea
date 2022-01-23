@@ -127,7 +127,7 @@ proc get_test_module_cmd(filename: string, release = false): string =
   else:
     rel = ""
 
-  let part1 = "nim c -f --gc:orc --verbosity:0 --hint[Performance]:off "
+  let part1 = "nim c --gc:orc --verbosity:0 --hint[Performance]:off "
   let part2 = "--hint[XCannotRaiseY]:off -d:test "
   let part3 = "$1 -r -p:src --out:bin/$2 tests/$3" % [rel, binName, filename]
 
@@ -644,7 +644,9 @@ proc checkUtf8DecoderEcho() =
   if not sameBytes(utf8decoder, localUtf8decoder):
     echo "Update utf8decoder.nim"
     echo fmt"cp {utf8decoder} {localUtf8decoder}"
-  echo "utf8decoder is up-to-date"
+    echo "Use ^^ to copy."
+  else:
+    echo "utf8decoder is up-to-date"
 
 # Tasks below
 
