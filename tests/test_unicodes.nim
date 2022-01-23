@@ -182,7 +182,12 @@ suite "unicodes.nim":
     # check testParseHexUnicodeToString("u8336", 0, 5, "茶")
     check testParseHexUnicodeToString("u8336", 0, 5, "\xE8\x8C\xB6")
 
-  test "parseHexUnicodeToString error":
+  test "parseHexUnicodeToString wLowSurrogateFirst":
     var pos: Natural = 1
     check parseHexUnicodeToString(r"\uDC00 tea", pos).message == wLowSurrogateFirst
     check pos == 1
+
+  test "parseHexUnicodeToString missing surrogate":
+    var pos: Natural = 5
+    check parseHexUnicodeToString(r"tea \uD800", pos).message == wMissingSurrogatePair
+    check pos == 10

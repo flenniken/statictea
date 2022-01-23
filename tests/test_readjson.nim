@@ -402,21 +402,15 @@ she sat down in a large arm-chair at one end of the table.
     str = bytesToString([0x31u8, 0x32, 0x33, 0xff, uint8('"')])
     check testParseJsonStrE(str, 0, wInvalidUtf8, 3)
 
-    # String is not validated by the parse function.  It is validated
-    # afterwards.
+    # overlong ASCII solidus /.
+    str = "overlong solidus: \xe0\x80\xaf."
+    check testParseJsonStrE(str, 0, wInvalidUtf8, 18)
 
-    # # 4.1  Examples of an overlong ASCII character /.
-    # str = bytesToString([0x22u8, 0xc0, 0xaf, 0x22])
-    # check testParseJsonStr(str, 1, "/", 1) # wNoEndingQuote
+    str = """a = "no ending quote. asdf"""
+    check testParseJsonStrE(str, 5, wNoEndingQuote, 26)
 
-    # str = bytesToString([0x22u8, 0xe0, 0x80, 0xaf, 0x22])
-    # check testParseJsonStr(str, 1, "/", 1) # wNoEndingQuote
+    str = "control not escaped\x0a<-\""
+    check testParseJsonStrE(str, 0, wControlNotEscaped, 19)
 
-    # str = bytesToString([0x22u8, 0xf0, 0x80, 0x80, 0xaf, 0x22])
-    # check testParseJsonStr(str, 1, "/", 1) # wNoEndingQuote
-
-    # str = bytesToString([0x22u8, 0xf8, 0x80, 0x80, 0x80, 0xaf, 0x22])
-    # check testParseJsonStr(str, 1, "/", 1) # wNoEndingQuote
-
-    # str = bytesToString([0x22u8, 0xfc, 0x80, 0x80, 0x80, 0x80, 0xaf, 0x22])
-    # check testParseJsonStr(str, 1, "/", 1) # wNoEndingQuote
+    str = r"no popular escaped\a abc"
+    check testParseJsonStrE(str, 0, wNotPopular, 19)
