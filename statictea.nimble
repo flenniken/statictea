@@ -623,30 +623,48 @@ proc sameBytes(a: string, b: string): bool =
   ## Return true when the two files contain the same bytes.
   let aBytes = slurp(a)
   let bBytes = slurp(b)
-  if aBytes == bBytes:
-    result = true
+
+  if len(aBytes) != len(bBytes):
+    return false
+
+  for ix, aByte in aBytes:
+    var bByte = bBytes[ix]
+    if aByte != bByte:
+      return false
+
+  result = true
 
 
 proc checkUtf8DecoderEcho() =
   ## Check whether there is a new version of utf8decoder.nim in the
   ## utftests repo. Return 0 when up-to-date.
-  
+
   let utf8testsFolder = "../utf8tests"
-  let utf8decoder = "../utf8tests/src/utf8decoder.nim"
-  let localUtf8decoder = "src/utf8decoder.nim"
+
+  const remoteRelativeFiles = ["src/utf8decoder.nim", "tests/test_utf8decoder.nim"]
+  const localFiles = ["src/utf8decoder.nim", "tests/test_utf8decoder.nim"]
+  assert len(remoteRelativeFiles) == len(localFiles)
+
   if not dirExists(utf8testsFolder):
     # Ignore when the repo is missing.
-    # echo "no utf8tests repo"
+    echo fmt"missing: {utf8testsFolder}"
     return
-  if not fileExists(utf8decoder):
-    echo "utf8decoder.nim isn't in utftests repo anymore."
-    return
-  if not sameBytes(utf8decoder, localUtf8decoder):
-    echo "Update utf8decoder.nim"
-    echo fmt"cp {utf8decoder} {localUtf8decoder}"
-    echo "Use ^^ to copy."
-  else:
-    echo "utf8decoder is up-to-date"
+  var different = false
+  for ix, remoteRelative in remoteRelativeFiles:
+    let remoteFile = joinPath(utf8testsFolder, remoteRelative)
+    let localFile = localFiles[ix]
+    if not fileExists(remoteFile):
+      echo fmt"{remoteFile} isn't in utftests repo anymore."
+      return
+    if not sameBytes(remoteFile, localFile):
+      echo fmt"diff {remoteFile} {localFile}"
+      echo fmt"cp {remoteFile} {localFile}"
+      different = true
+    # else:
+    #   echo fmt"diff {remoteFile} {localFile}"
+
+  if different:
+    echo "Use ^^ to update the local copy."
 
 # Tasks below
 
@@ -809,3 +827,6 @@ task runhelp, "\tShow the runner help text with glow.":
 
 task helpme, "\tShow the statictea help text.":
   exec "bin/statictea -h | less"
+
+task remote, "\tCheck whether remote code need updating":
+  checkUtf8DecoderEcho()
