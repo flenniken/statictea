@@ -9,7 +9,6 @@ For isMessage, isValue and object details see: [OpResult](opresult.md).
 Example Usage:
 
 ~~~
-import opresult
 import opresultid
 
 proc get_string(): OpResultId[string] =

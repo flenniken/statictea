@@ -562,7 +562,7 @@ proc runRunnerFolder() =
   ## Run the stf files in the testfiles folder.
 
   let cmd = "export statictea='../../bin/statictea'; bin/runner -d=testfiles"
-  echo cmd
+  # echo cmd
   let result = staticExec cmd
   echo result
 
@@ -586,18 +586,15 @@ proc runRunStf() =
       # Run a stf file.
       let cmd = """
 export statictea='../../bin/statictea'; bin/runner -f=testfiles/$1""" % filename
-      if name == "rt":
-        echo filename
-      else:
-        echo cmd
+      echo "Running: " & filename
       let result = staticExec cmd
       if result != "":
         failed = true
         echo result
   if failed:
-    echo "failed"
+    echo "Failed"
   else:
-    echo "success"
+    echo "Success"
 
 proc runRunStfMain() =
   try:

@@ -7,7 +7,7 @@ import std/json
 import std/tables
 import vartypes
 import messages
-import opresult
+import opresultid
 import unicodes
 import utf8decoder
 

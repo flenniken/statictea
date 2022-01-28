@@ -1,6 +1,6 @@
 id stf file version 0.0.0
 
-## This stf file is used as a template by the newstf nimble task.
+## Test the string type.
 
 # Here are the file line attributes:
 #   noLastEnding command nonZeroReturn
@@ -63,6 +63,14 @@ $$ : d e f+
 $$ :  g h i"
 {str}
  a b c d e f g h i
+
+$$ nextline str = "+
+$$ : - \" -> quotation mark (U+0022)\n+
+$$ : - \\ -> reverse solidus (U+005C)\n+
+$$ : - \/ -> solidus (U+002F)\n+
+$$ : - \n -> line feed (U+000A)\n+
+$$ : - \t -> tab (U+0009)\n"
+{str}
 --- endfile
 
 --- file server.json
@@ -100,6 +108,14 @@ str2 => 'This is a long string 1       2 split between lines
 Continue a long string with spaces.
  a b c d e f g h i
  a b c d e f g h i
+
+- " -> quotation mark (U+0022)
+- \ -> reverse solidus (U+005C)
+- / -> solidus (U+002F)
+- 
+ -> line feed (U+000A)
+- 	 -> tab (U+0009)
+
 --- endfile
 
 --- file stdout.expected

@@ -3,8 +3,6 @@
 import std/unicode
 import std/options
 import std/strutils
-# todo: why does opresult need to be imported. Any good way around this?
-import opresult
 import opresultid
 import messages
 import utf8decoder

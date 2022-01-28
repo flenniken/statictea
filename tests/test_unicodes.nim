@@ -2,7 +2,7 @@ import std/unittest
 import std/strformat
 import std/strutils
 import unicodes
-import opresult
+import opresultid
 import messages
 
 func stringToHex*(str: string): string =

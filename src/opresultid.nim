@@ -7,7 +7,6 @@
 ## @:Example Usage:
 ## @:
 ## @:~~~
-## @:import opresult
 ## @:import opresultid
 ## @:
 ## @:proc get_string(): OpResultId[string] =
@@ -25,6 +24,9 @@
 
 import messages
 import opresult
+
+# Export opresult so users of this module don't need to do it.
+export opresult
 
 type
   OpResultId*[T] = OpResult[T, MessageId]
