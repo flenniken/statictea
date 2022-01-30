@@ -1,9 +1,32 @@
 import std/unittest
 import std/os
 import std/strutils
+import std/strformat
 import opresult
 import runner
 import tables
+
+proc testGetAnyLine(line: string, eAnyLine: AnyLine): bool =
+
+  let anyLineOr = getAnyLine(line)
+  if anyLineOr.isMessage:
+    echo "Error getting line:"
+    echo anyLineOr.message
+    return false
+
+  let anyLine = anyLineOr.value
+  result = true
+  if anyLine.kind != eAnyLine.kind:
+    echo "Did not get the expected line type:"
+    echo    "expected: {eAnyLine.kind}"
+    echo fmt"     got: {anyLine.kind}"
+    result = false
+
+  if $anyLine != $eAnyLine:
+    echo "Did not get the expected line:"
+    echo fmt"expected: {eAnyLine}"
+    echo fmt"     got: {anyLine}"
+    result = false
 
 proc createFile*(filename: string, content: string) =
   ## Create a file with the given content.
@@ -15,7 +38,7 @@ proc parseRunCommandLine*(cmdLine: string = ""): runner.OpResultStr[RunArgs] =
   let argv = strutils.splitWhitespace(cmdLine)
   result = parseRunCommandLine(argv)
 
-proc showCompareLines*[T](expectedLines: seq[T], gotLines: seq[T],
+proc showExpectedLines*[T](expectedLines: seq[T], gotLines: seq[T],
     showSame = false, stopOnFirstDiff = false): bool =
   ## Compare two sets of lines and show the differences.  If no
   ## differences, return true.
@@ -39,9 +62,6 @@ proc showCompareLines*[T](expectedLines: seq[T], gotLines: seq[T],
       result = false
       if stopOnFirstDiff:
         break
-
-
-# todo: remove runner.OpResult and use the other one.
 
 proc testMakeDirAndFiles(filename: string, content: string,
     expectedDirAndFilesOp: runner.OpResultStr[DirAndFiles]): bool =
@@ -78,20 +98,20 @@ proc testMakeDirAndFiles(filename: string, content: string,
     let got = dirAndFilesOp.value
     if expected != got:
 
-      # compareLines: seq[CompareLine]
+      # expectedLines: seq[ExpectedLine]
       # runFileLines: seq[RunFileLine]
 
-      if expected.compareLines == got.compareLines:
-        echo "same compareLines"
+      if expected.expectedLines == got.expectedLines:
+        echo "same expectedLines"
       else:
-        echo "compareLines:"
-        discard showCompareLines(expected.compareLines, got.compareLines)
+        echo "expectedLines:"
+        discard showExpectedLines(expected.expectedLines, got.expectedLines)
 
       if expected.runFileLines == got.runFileLines:
         echo "same runFileLines"
       else:
         echo "runFileLines:"
-        discard showCompareLines(expected.runFileLines, got.runFileLines)
+        discard showExpectedLines(expected.runFileLines, got.runFileLines)
 
       result = false
   else:
@@ -234,41 +254,79 @@ proc testParseRunFileLine(line: string, eRunFileLine: RunFileLine): bool =
     return false
   result = true
 
-proc testParseExpectedLine(line: string, eCompareLine: CompareLine): bool =
+proc testParseExpectedLine(line: string, eExpectedLine: ExpectedLine): bool =
   ## Test parseExpectedLine where it is expected to pass.
   let compareLineOp = parseExpectedLine(line)
   if compareLineOp.isMessage:
     echo compareLineOp.message
     return false
-  if compareLineOp.value != eCompareLine:
-    echo "expected: " & $eCompareLine
+  if compareLineOp.value != eExpectedLine:
+    echo "expected: " & $eExpectedLine
     echo "     got: " & $compareLineOp.value
     return false
   result = true
 
 suite "runner.nim":
 
-  test "main version":
-    check 1 == 1
+  test "isRunFileLine":
+    check isRunFileLine("### File ")
+    check isRunFileLine("## File") == false
+    check isRunFileLine("### File") == false
+    check isRunFileLine("#  File") == false
+    check isRunFileLine("#    File") == false
+    check isRunFileLine("#\tFile") == false
+    check isRunFileLine(" # File") == false
+    check isRunFileLine("# # File") == false
+    check isRunFileLine("### Expected") == false
+    check isRunFileLine("~~~") == false
 
-  test "getCmd":
-    check getCmd("asdfasdf") == "other"
-    check getCmd("#") == "#"
-    check getCmd("\n") == ""
-    check getCmd("\r\n") == ""
-    check getCmd("id") == "id"
-    check getCmd("file") == "file"
-    check getCmd("endfile") == "endfile"
-    check getCmd("expected") == "expected"
+  test "isExpectedLine":
+    check isExpectedLine("### Expected ")
+    check isExpectedLine("### Expectedd ") == false
+    check isExpectedLine("# Expected") == false
+    check isExpectedLine("## Expected") == false
+    check isExpectedLine("### File") == false
 
-  test "getCmd2":
-    check getCmd("# comment") == "#"
-    check getCmd("dd\n") == "other"
-    check getCmd(" \r\n") == "other"
-    check getCmd("--- id ") == "id"
-    check getCmd(" --- file ") == "file"
-    check getCmd("- - -endfile") == "endfile"
-    check getCmd("--  --  --expected") == "expected"
+  test "getAnyLine expected":
+    let expected = newExpectedLine("file1", "file2")
+    let eAnyLine = newAnyLineExpectedLine(expected)
+    check testGetAnyLine("### Expected file1 == file2", eAnyLine)
+
+  test "getAnyLine ~~~ block":
+    let eAnyLine = newAnyLineBlockLine("~~~")
+    check testGetAnyLine("~~~", eAnyLine)
+
+  test "getAnyLine ``` block":
+    let eAnyLine = newAnyLineBlockLine("```")
+    check testGetAnyLine("```", eAnyLine)
+
+  test "getAnyLine comment":
+    let eAnyLine = newAnyLineCommentLine("asdfasdfasdf")
+    check testGetAnyLine("asdfasdfasdf", eAnyLine)
+
+  test "id line":
+    check runnerId == "stf file, version 0.1.0"
+
+  test "getAnyLine id":
+    let eAnyLine = newAnyLineIdLine(runnerId)
+    check testGetAnyLine(runnerId, eAnyLine)
+
+  test "getAnyLine file line":
+    let eRunFileLine = newRunFileLine("server.json")
+    let eAnyLine = newAnyLineRunFileLine(eRunFileLine)
+    check testGetAnyLine("### File server.json", eAnyLine)
+
+  test "getAnyLine file line command":
+    let eRunFileLine = newRunFileLine("server.json", command = true)
+    let eAnyLine = newAnyLineRunFileLine(eRunFileLine)
+    check testGetAnyLine("### File server.json command", eAnyLine)
+
+  test "getAnyLine file line attributes":
+    let eRunFileLine = newRunFileLine("server.json", noLastEnding = true,
+       command = true, nonZeroReturn = true)
+    let eAnyLine = newAnyLineRunFileLine(eRunFileLine)
+    check testGetAnyLine("### File server.json command nonZeroReturn noLastEnding",
+      eAnyLine)
 
   test "createFolder":
     let tempDirName = "createFolderTest"
@@ -417,109 +475,87 @@ suite "runner.nim":
     check dirExists(folder) == false
 
   test "parseRunFileLine name":
-    let line = "file name.html"
-    let eRunFileLine = newRunFileLine("name.html")
-    check testParseRunFileLine(line, eRunFileLine)
-
-  test "parseRunFileLine tabs":
-    let line = "--\t -- file \t name.html --\t-- --"
-    let eRunFileLine = newRunFileLine("name.html")
+    let line = "### File afile.txt"
+    let eRunFileLine = newRunFileLine("afile.txt")
     check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine name newline":
-    let line = "file name.html\n"
-    let eRunFileLine = newRunFileLine("name.html")
-    check testParseRunFileLine(line, eRunFileLine)
-
-  test "parseRunFileLine ---name":
-    let line = "--- file name.html ---"
-    let eRunFileLine = newRunFileLine("name.html")
-    check testParseRunFileLine(line, eRunFileLine)
-
-  test "parseRunFileLine name with spaces":
-    let line = "----  ---- -- file    name.html  "
+    let line = "### File name.html\n"
     let eRunFileLine = newRunFileLine("name.html")
     check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine name and noLastEnding":
-    let line = "----------file name.html noLastEnding"
-    let eRunFileLine = newRunFileLine("name.html", noLastEnding = true)
-    check testParseRunFileLine(line, eRunFileLine)
-
-  test "parseRunFileLine name and noLastEnding":
-    let line = "----------file   name.html   noLastEnding  "
+    let line = "### File name.html noLastEnding"
     let eRunFileLine = newRunFileLine("name.html", noLastEnding = true)
     check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine name noLastEnding command":
-    let line = "file name.html noLastEnding command"
+    let line = "### File name.html noLastEnding command"
     let eRunFileLine = newRunFileLine("name.html", noLastEnding =
       true, command = true)
     check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine name noLastEnding command nonZeroReturn":
-    let line = "file name.html noLastEnding command nonZeroReturn"
+    let line = "### File name.html noLastEnding command nonZeroReturn"
     let eRunFileLine = newRunFileLine("name.html", noLastEnding =
       true, command = true, nonZeroReturn = true)
     check testParseRunFileLine(line, eRunFileLine)
 
-  test "parseRunFileLine dashes":
-    let line = "---file---name.html---noLastEnding---command---nonZeroReturn---"
+  test "parseRunFileLine unknown attribute":
+    # Ignore unknown attributes.
+    let line = "### File name.html asdf  noLastEnding command   nonZeroReturn  "
     let eRunFileLine = newRunFileLine("name.html", noLastEnding =
       true, command = true, nonZeroReturn = true)
     check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine name command nonZeroReturn":
-    let line = "file name.html command nonZeroReturn"
+    let line = "### File name.html command nonZeroReturn"
     let eRunFileLine = newRunFileLine("name.html", command = true,
       nonZeroReturn = true)
     check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine name command ":
-    let line = "file name.html command"
+    let line = "### File name.html command"
     let eRunFileLine = newRunFileLine("name.html", command = true)
     check testParseRunFileLine(line, eRunFileLine)
 
   test "parseRunFileLine error":
-    let fileLineOp = parseRunFileLine("----------filename.html")
+    let fileLineOp = parseRunFileLine("----------Filename.html")
     check fileLineOp.isMessage
-    check fileLineOp.message == "Invalid file line: ----------filename.html"
+    check fileLineOp.message == "Invalid file line: ----------Filename.html"
 
   test "parseExpectedLine happy path":
-    let line = "expected file1 == file2"
-    let eCompareLine = newCompareLine("file1", "file2")
-    check testParseExpectedLine(line, eCompareLine)
+    let line = "### Expected file1 == file2"
+    let eExpectedLine = newExpectedLine("file1", "file2")
+    check testParseExpectedLine(line, eExpectedLine)
+
+  test "parseExpectedLine 2":
+    let line = "### Expected f == g"
+    let eExpectedLine = newExpectedLine("f", "g")
+    check testParseExpectedLine(line, eExpectedLine)
 
   test "parseExpectedLine spaces":
-    let line = "------ expected   file1   ==  file2 --"
-    let eCompareLine = newCompareLine("file1", "file2")
-    check testParseExpectedLine(line, eCompareLine)
-
-  test "parseExpectedLine dashes":
-    let line = "---expected---file1---==---file2---"
-    let eCompareLine = newCompareLine("file1", "file2")
-    check testParseExpectedLine(line, eCompareLine)
-
-  test "parseExpectedLine tabs":
-    let line = "---\t--- expected \t  file1 \t  ==  \t file2 \t--"
-    let eCompareLine = newCompareLine("file1", "file2")
-    check testParseExpectedLine(line, eCompareLine)
+    let line = "### Expected   file1   ==  file2"
+    let expectedLineOp = parseExpectedLine(line)
+    check expectedLineOp.isMessage
+    let expected = "Invalid expected line: ### Expected   file1   ==  file2"
+    check expectedLineOp.message == expected
 
   test "parseExpectedLine error":
-    let runExpectedLineOp = parseExpectedLine("----------filename.html")
-    check runExpectedLineOp.isMessage
-    check runExpectedLineOp.message == "Invalid expected line: ----------filename.html"
+    let expectedLineOp = parseExpectedLine("----------filename.html")
+    check expectedLineOp.isMessage
+    check expectedLineOp.message == "Invalid expected line: ----------filename.html"
 
   test "parseExpectedLine missing file":
-    let runExpectedLineOp = parseExpectedLine("expected file1")
-    check runExpectedLineOp.isMessage
-    check runExpectedLineOp.message == "Invalid expected line: expected file1"
+    let expectedLineOp = parseExpectedLine("expected file1")
+    check expectedLineOp.isMessage
+    check expectedLineOp.message == "Invalid expected line: expected file1"
 
   test "runFilename empty.stf":
     let filename = "testfiles/empty.stf"
     let content = ""
     let message = "Empty file: 'testfiles/empty.stf'."
-    let expected = optMessage[DirAndFiles](message)
+    let expected = opMessageStr[DirAndFiles](message)
     check testMakeDirAndFiles(filename, content, expected)
     check testDir(filename, @[])
 
@@ -528,10 +564,10 @@ suite "runner.nim":
     let content = "not a stf file"
     let message = """
 Invalid stf file first line:
-expected: id stf file version 0.0.0
+expected: stf file, version 0.1.0
      got: not a stf file"""
-    let expected = optMessage[DirAndFiles](message)
-    # let a = newCompareLine("filea", "emptyfile.txt")
+    let expected = opMessageStr[DirAndFiles](message)
+    # let a = newExpectedLine("filea", "emptyfile.txt")
     # let b = newRunFileLine("afile.txt", false, false, false)
     # let dirAndFiles = newDirAndFiles(@[], @[])
     # let expected = runner.OpResultStr[DirAndFiles](kind: okValue, value: dirAndFiles)
@@ -543,31 +579,20 @@ expected: id stf file version 0.0.0
   test "runFilename do nothing":
     let filename = "testfiles/do-nothing.stf"
     let content = """
-id stf file version 0.0.0
+stf file, version 0.1.0
 """
-    # let message = "File type not supported."
-    # let expected = runner.OpResultStr[DirAndFiles](kind: okMessage, message: message)
-    # let a = newCompareLine("filea", "emptyfile.txt")
-    # let b = newRunFileLine("afile.txt", false, false, false)
-    let dirAndFiles = newDirAndFiles(@[], @[])
-    let expected = optValue[DirAndFiles](dirAndFiles)
+    let expected = opMessageStr[DirAndFiles]("No files run.")
     check testMakeDirAndFiles(filename, content, expected)
-
-    # let e = newNameAndContent("afile.txt", "contents of\nthe file\n")
     check testDir(filename, @[])
 
   test "runFilename comments":
     let filename = "testfiles/comments.stf"
     let content = """
-id stf file version 0.0.0
+stf file, version 0.1.0
 # This is a do nothing file with comments.
-# Comments have # as the first character of
-# the line.
+# Comments are non-command lines.
 """
-    # let a = newCompareLine("filea", "emptyfile.txt")
-    # let b = newRunFileLine("afile.txt", false, false, false)
-    let dirAndFiles = newDirAndFiles(@[], @[])
-    let expected = optValue[DirAndFiles](dirAndFiles)
+    let expected = opMessageStr[DirAndFiles]("No files run.")
     check testMakeDirAndFiles(filename, content, expected)
 
     # let e = newNameAndContent("afile.txt", "contents of\nthe file\n")
@@ -576,17 +601,17 @@ id stf file version 0.0.0
   test "make file":
     let filename = "testfiles/onefile.stf"
     let content = """
-id stf file version 0.0.0
+stf file, version 0.1.0
 # This stf creates a file, that's all.
---- file afile.txt
+### File afile.txt
+~~~
 contents of
 the file
---- endfile
+~~~
 """
-    # let a = newCompareLine("filea", "emptyfile.txt")
     let b = newRunFileLine("afile.txt")
     let dirAndFiles = newDirAndFiles(@[], @[b])
-    let expected = optValue[DirAndFiles](dirAndFiles)
+    let expected = opValueStr[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
 
     let e = newNameAndContent("afile.txt", "contents of\nthe file\n")
@@ -595,25 +620,28 @@ the file
   test "make two files":
     let filename = "testfiles/twofiles.stf"
     let content = """
-id stf file version 0.0.0
+stf file, version 0.1.0
 # This stf creates files.
 
---- file afile.txt
+### File afile.txt
+
+~~~
 contents of
 the file
---- endfile
+~~~
 
---- file bfile.txt
+### File bfile.txt
+~~~
 contents of b
 the second file
---- endfile
+~~~
 
 """
-    # let a = newCompareLine("afile.txt", "bfile.txt")
+    # let a = newExpectedLine("afile.txt", "bfile.txt")
     let b = newRunFileLine("afile.txt")
     let c = newRunFileLine("bfile.txt")
     let dirAndFiles = newDirAndFiles(@[], @[b, c])
-    let expected = optValue[DirAndFiles](dirAndFiles)
+    let expected = opValueStr[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
 
     let expectedAFileContent = """
@@ -631,15 +659,16 @@ the second file
   test "make empty file":
     let filename = "testfiles/emptyfile.stf"
     let content = """
-id stf file version 0.0.0
+stf file, version 0.1.0
 # This stf creates an empty file.
---- file emptyfile.txt
---- endfile
+### File emptyfile.txt
+~~~
+~~~
 """
-    # let a = newCompareLine("filea", "emptyfile.txt")
+    # let a = newExpectedLine("filea", "emptyfile.txt")
     let b = newRunFileLine("emptyfile.txt")
     let dirAndFiles = newDirAndFiles(@[], @[b])
-    let expected = optValue[DirAndFiles](dirAndFiles)
+    let expected = opValueStr[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
 
     let e = newNameAndContent("emptyfile.txt", "")
@@ -648,47 +677,34 @@ id stf file version 0.0.0
   test "missing endfile":
     let filename = "testfiles/missingendfile.stf"
     let content = """
-id stf file version 0.0.0
-# This stf creates an empty file.
---- file missingfile.txt
+stf file, version 0.1.0
+
+### File missingfile.txt
+~~~
 testing
 1
 2
 3
 """
-    # todo: change message: The endfile line is missing.
-    let message = "The endfile line was missing."
-    let expected = optMessage[DirAndFiles](message)
+    let message = "The end block line was missing."
+    let expected = opMessageStr[DirAndFiles](message)
     check testMakeDirAndFiles(filename, content, expected)
 
     check testDir(filename, @[])
-
-  test "unknown line":
-    let filename = "testfiles/unknownline.stf"
-    let content = """
-id stf file version 0.0.0
-# This stf hand an unknown line.
-what's this?
-"""
-    let message = "Unknown line: 'what's this?'."
-    let expected = optMessage[DirAndFiles](message)
-    check testMakeDirAndFiles(filename, content, expected)
-    check testDir(filename, @[])
-
-  # --- file filename [noLastEnding] [command] [nonZeroReturn] ---
 
   test "noLastEnding":
     let filename = "testfiles/noLastEnding.stf"
     let content = """
-id stf file version 0.0.0
+stf file, version 0.1.0
 # This stf creates a file with no ending newline.
---- file afile.txt noLastEnding
+### File afile.txt noLastEnding
+~~~
 contents of the file
---- endfile
+~~~
 """
     let r = newRunFileLine("afile.txt", noLastEnding = true)
     let dirAndFiles = newDirAndFiles(@[], @[r])
-    let expected = optValue[DirAndFiles](dirAndFiles)
+    let expected = opValueStr[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
 
     let c = newNameAndContent("afile.txt", "contents of the file")
@@ -697,15 +713,16 @@ contents of the file
   test "command":
     let filename = "testfiles/command.stf"
     let content = """
-id stf file version 0.0.0
+stf file, version 0.1.0
 # This stf creates a file with a command.
---- file afile.txt noLastEnding command
+### File afile.txt noLastEnding command
+~~~
 ls
---- endfile
+~~~
 """
     let r = newRunFileLine("afile.txt", command = true, noLastEnding = true)
     let dirAndFiles = newDirAndFiles(@[], @[r])
-    let expected = optValue[DirAndFiles](dirAndFiles)
+    let expected = opValueStr[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
 
     let c = newNameAndContent("afile.txt", "ls")
@@ -714,15 +731,16 @@ ls
   test "command nonZeroReturn":
     let filename = "testfiles/nonZeroReturn.stf"
     let content = """
-id stf file version 0.0.0
+stf file, version 0.1.0
 # This stf creates a file with a command with a nonZeroReturn.
---- file afile.txt noLastEnding command nonZeroReturn
+### File afile.txt noLastEnding command nonZeroReturn
+~~~
 ls
---- endfile
+~~~
 """
     let r = newRunFileLine("afile.txt", true, true, true)
     let dirAndFiles = newDirAndFiles(@[], @[r])
-    let expected = optValue[DirAndFiles](dirAndFiles)
+    let expected = opValueStr[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
 
     let c = newNameAndContent("afile.txt", "ls")
@@ -731,56 +749,66 @@ ls
   test "file compare lines":
     let filename = "testfiles/filecomparelines.stf"
     let content = """
-id stf file version 0.0.0
+stf file, version 0.1.0
 
------- expected file1.txt == file2.txt ------
------- expected file3.txt == file4.txt ------
+### File test.txt
+~~~
+~~~
+### Expected file1.txt == file2.txt
+### Expected file3.txt == file4.txt
 
 """
-    let a = newCompareLine("file1.txt", "file2.txt")
-    let b = newCompareLine("file3.txt", "file4.txt")
-    let dirAndFiles = newDirAndFiles(@[a, b], @[])
-    let expected = optValue[DirAndFiles](dirAndFiles)
+    let a = newExpectedLine("file1.txt", "file2.txt")
+    let b = newExpectedLine("file3.txt", "file4.txt")
+    let f1 = newRunFileLine("test.txt")
+    let dirAndFiles = newDirAndFiles(@[a, b], @[f1])
+    let expected = opValueStr[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
-    check testDir(filename, @[])
+    let nc = newNameAndContent("test.txt", "")
+    check testDir(filename, @[nc])
 
   test "help example":
     let filename = "testfiles/helpexample.stf"
     let content = """
-id stf file version 0.0.0
+stf file, version 0.1.0
 # Hello World Example
 
 # Create the script to run.
------ file cmd.sh noLastEnding command -----
+### File cmd.sh noLastEnding command
+~~~
 ../bin/statictea -t=hello.html -s=hello.json >stdout 2>stderr
------ endfile -----------------
+~~~
 
 # Create the hello.html template file without an ending newline.
---- file hello.html noLastEnding
+### File hello.html noLastEnding
+~~~
 $$ nextline
 $$ hello {name}
---- endfile
+~~~
 
---- file hello.json
+### File hello.json
+~~~
 {"name": "world"}
---- endfile
+~~~
 
 # Create a file with the expected output.
---- file stdout.expected noLastEnding
+### File stdout.expected noLastEnding
+~~~
 hello world
---- endfile
+~~~
 
 # No standard error output is expected, create an empty file.
---- file stderr.expected
---- endfile
+### File stderr.expected
+~~~
+~~~
 
-# Compare these files.
---- expected stdout.expected == stdout
---- expected stderr.expected == stderr
+Compare these files.
+### Expected stdout.expected == stdout
+### Expected stderr.expected == stderr
 """
-    # todo: rename CompareLine CompareLine
-    let a = newCompareLine("stdout.expected", "stdout")
-    let b = newCompareLine("stderr.expected", "stderr")
+    # todo: rename ExpectedLine ExpectedLine
+    let a = newExpectedLine("stdout.expected", "stdout")
+    let b = newExpectedLine("stderr.expected", "stderr")
     let f1 = newRunFileLine("cmd.sh", command = true, noLastEnding = true)
     let f2 = newRunFileLine("hello.html", noLastEnding = true)
     let f3 = newRunFileLine("hello.json")
@@ -788,7 +816,7 @@ hello world
     let f5 = newRunFileLine("stderr.expected")
 
     let dirAndFiles = newDirAndFiles(@[a, b], @[f1, f2, f3, f4, f5])
-    let expected = optValue[DirAndFiles](dirAndFiles)
+    let expected = opValueStr[DirAndFiles](dirAndFiles)
     check testMakeDirAndFiles(filename, content, expected)
     let cmdSh = """
 ../bin/statictea -t=hello.html -s=hello.json >stdout 2>stderr"""
@@ -1009,4 +1037,4 @@ more
   test "compareFiles no file":
     let rcOp = compareFiles("f1", "f2")
     check rcOp.isMessage
-    check rcOp.message == "cannot open: f1"
+    check rcOp.message == "Error: cannot open: f1"

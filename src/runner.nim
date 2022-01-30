@@ -22,7 +22,7 @@ const
     ('d', "directory"),
     ('l', "leaveTempDir"),
   ]
-  runnerId = "id stf file version 0.0.0"
+  runnerId* = "stf file, version 0.1.0"
     ## The first line of the stf file.
 
 type
@@ -44,23 +44,68 @@ type
     command*: bool
     nonZeroReturn*: bool
 
-  CompareLine* = object
-    ## CompareLine holds the expected line options.
+  ExpectedLine* = object
+    ## ExpectedLine holds the expected line options.
     filename1*: string
     filename2*: string
 
+  LineKind* = enum
+    ## The kind of line in a stf file.
+    lkRunFileLine,
+    lkExpectedLine,
+    lkBlockLine,
+    lkIdLine,
+    lkCommentLine
+
+  AnyLine* = object
+    ## Contains the information about one line in a stf file.
+    case kind*: LineKind
+      of lkRunFileLine:
+        runFileLine*: RunFileLine
+      of lkExpectedLine:
+        expectedLine*: ExpectedLine
+      of lkBlockLine:
+        blockLine*: string
+      of lkIdLine:
+        idLine*: string
+      of lkCommentLine:
+        commentLine*: string
+
   DirAndFiles* = object
     ## DirAndFiles holds the file and compare lines of the stf file.
-    compareLines*: seq[CompareLine]
+    expectedLines*: seq[ExpectedLine]
     runFileLines*: seq[RunFileLine]
 
   OpResultStr*[T] = OpResult[T, string]
+    ## On success return T, otherwise return a message telling what went wrong.
 
-func optValue*[T](value: T): OpResultStr[T] =
+func opValueStr*[T](value: T): OpResultStr[T] =
+  ## Return an OpResultStr with a value.
   result = OpResult[T, string](kind: orValue, value: value)
 
-func optMessage*[T](message: string): OpResultStr[T] =
+func opMessageStr*[T](message: string): OpResultStr[T] =
+  ## Return an OpResultStr with a message why the value cannot be returned.
   result = OpResult[T, string](kind: orMessage, message: message)
+
+func newAnyLineRunFileLine*(runFileLine: RunFileLine): AnyLine =
+  ## Create a new AnyLine object for a file line.
+  result = AnyLine(kind: lkRunFileLine, runFileLine: runFileLine)
+
+func newAnyLineExpectedLine*(expectedLine: ExpectedLine): AnyLine =
+  ## Create a new AnyLine object for a expected line.
+  result = AnyLine(kind: lkExpectedLine, expectedLine: expectedLine)
+
+func newAnyLineBlockLine*(blockLine: string): AnyLine =
+  ## Create a new AnyLine object for a block line.
+  result = AnyLine(kind: lkBlockLine, blockLine: blockLine)
+
+func newAnyLineCommentLine*(commentLine: string): AnyLine =
+  ## Create a new AnyLine object for a comment line.
+  result = AnyLine(kind: lkCommentLine, commentLine: commentLine)
+
+func newAnyLineIdLine*(idLine: string): AnyLine =
+  ## Create a new AnyLine object for a id line.
+  result = AnyLine(kind: lkIdLine, idLine: idLine)
 
 func newRunArgs*(help = false, version = false, leaveTempDir = false,
     filename = "", directory = ""): RunArgs =
@@ -74,18 +119,18 @@ func newRunFileLine*(filename: string, noLastEnding = false, command = false,
   result = RunFileLine(filename: filename, noLastEnding: noLastEnding,
     command: command, nonZeroReturn: nonZeroReturn)
 
-func newCompareLine*(filename1: string, filename2: string): CompareLine =
-  ## Create a new CompareLine object.
-  result = CompareLine(filename1: filename1, filename2: filename2)
+func newExpectedLine*(filename1: string, filename2: string): ExpectedLine =
+  ## Create a new ExpectedLine object.
+  result = ExpectedLine(filename1: filename1, filename2: filename2)
 
-func newDirAndFiles*(compareLines: seq[CompareLine],
+func newDirAndFiles*(expectedLines: seq[ExpectedLine],
     runFileLines: seq[RunFileLine]): DirAndFiles =
   ## Create a new DirAndFiles object.
-  result = DirAndFiles(compareLines: compareLines,
+  result = DirAndFiles(expectedLines: expectedLines,
     runFileLines: runFileLines)
 
-func `$`*(r: CompareLine): string =
-  ## Return a string representation of a CompareLine object.
+func `$`*(r: ExpectedLine): string =
+  ## Return a string representation of a ExpectedLine object.
   result = "expected $1 == $2" % [r.filename1, r.filename2]
 
 func `$`*(r: RunFileLine): string =
@@ -108,10 +153,6 @@ func `$`*(r: RunFileLine): string =
 proc writeErr*(message: string) =
   ## Write a message to stderr.
   stderr.writeLine(message)
-
-# proc writeOut*(message: string) =
-#   ## Write a message to stdout.
-#   stdout.writeLine(message)
 
 func stripLineEnding(line: string): string =
   ## Strip line endings from a string.
@@ -142,7 +183,10 @@ when not defined(test):
 Run a single test file (stf) or run all stf files in a folder.
 
 The runner reads a stf file, creates multiple small files in a test
-folder, runs commands then verifies the correct output.
+folder, runs files then verifies the files contain the correct data.
+
+A stf file is designed to look good in a markdown reader. You can use
+the .stf or .stf.md extention.
 
 ## Usage
 
@@ -152,147 +196,134 @@ runner [-h] [-v] [-l] [-f=filename] [-d=directory]
 * -v --version       Show the version number.
 * -l --leaveTempDir  Leave the temp folder.
 * -f --filename      Run the stf file.
-* -d --directory     Run the stf files in the directory.
+* -d --directory     Run the stf files (.stf or .stf.md) in the directory.
 
-## Processing Order
+## Processing Steps
 
-The stf file processing order:
+The stf file runner processes the file tasks in the following order:
 
-* temp folder created
-* files created in the tempdir
-* commands run
-* files compared
-* temp folder removed
+* create temp folder
+* create files in the temp folder
+* runs command type files
+* compares files
+* removes the temp folder
 
-The temp folder is created in the same folder as the stf using the stf
-name with ".tempdir" append.
+The temp folder is created in the same folder as the stf file using
+the stf name with ".tempdir" append.
 
-Normally the temp folder is removed after running, the -l option
-leaves it. If the temp folder exists, it is deleted then recreated.
+Normally the temp folder is removed after running. The -l option
+leaves the folder for debugging purposes. If the temp folder exists
+when running, it is deleted, then recreated, then deleted when done.
 
-Runner returns 0 when all the tests pass. When running multiple it
-displays each test run and tells how many passed and failed.
+Runner returns 0 when all the tests pass. When running multiple stf
+files, it displays each test run and tells how many passed and failed.
 
 ## Stf File Format
 
 The Single Test File format is a text file made up of single line
-commands:
+commands.
 
-1. id
-2. comment and blank lines
-3. file
-4. endfile
-5. expected
+Command line types:
 
-You can add spaces, tabs and dashes at the beginning and end of the
-command lines, except the id and comment lines.
+1. id line
+2. file lines
+3. file blocks
+4. expected lines
+5. comment lines
 
-### Id Command
+### Id Line
 
-The first line of the stf file identifies it as a stf file.  The id
-ends with the version number. Here is the id:
-
-~~~
-id stf file version 0.0.0
-~~~
-
-### Comment Command
-
-Comments start with # as the first character of the line. Blank lines
-are ignored.
-
-### File Command
-
-The file command is used to create a file. It begins with “file”
-followed by the filename then some optional attributes.  The general
-form is:
+The first line of the stf file identifies it as a stf file and tells
+the version. For example:
 
 ~~~
-file filename [noLineEnding] [command] [nonZeroReturn]
+stf file, version 0.1.0
 ~~~
 
-File Options:
+### File Line
+
+The file line is used to create a file. It starts with "### File "
+followed by the filename then some optional attributes. A line that
+starts with "### File" must be a file type line.
+
+The general form of a file line is:
+
+~~~
+### File filename [noLineEnding] [command] [nonZeroReturn]
+~~~
+
+Example file lines:
+
+~~~
+### File server.json
+### File cmd.sh command
+### File result.expected noLineEnding
+### File cmd.sh command nonZeroReturn
+### File cmd.sh command nonZeroReturn noLineEnding
+~~~
+
+File Attributes:
 
 * *filename* - the name of the file to create.
 
-The file is created in the temp folder. No spaces in the name.
+The name is required and cannot contain spaces. The file is created in
+the temp folder.
 
 * *command* — marks this file to be run.
 
-All files are created before the commands run. The file is run in the
+All files are created before any command runs. The file is run in the
 temp folder as the working directory. The commands are run in the
 order specified in the file.
 
-* *nonZeroReturn* — non-zero return code.
+* *nonZeroReturn* — the command returns non-zero on success
 
 Normally the runner fails when a command returns a non-zero return
 code.  With nonZeroReturn set, it fails when it returns zero.
 
 * *noLineEnding* — create the file without an ending newline.
 
-### Endfile Command
+### File Block Lines
 
-The endfile command line follows a file line and it brackets the lines
-of the file to be created. All these lines go in the file, even ones
-that look like commands.
+The content of a file is bracketed by markdown code blocks, either
+"~~~" or "```".  The block follows a file line. The first block found
+is used, so you can have blocks as comments too.  All content up to the
+ending code marker go in the file, even lines that look like commands.
 
-### Expected Command
+### Expected Line
 
 The expected line compares files. You specify two files that should be
-equal.  The compares are run after running the commands.
+equal.  The compares are run after running the commands. You can use
+the work "empty" for in place of a filename when you expect the file
+to be empty. A line that starts with "### Expected " must be an
+expected line.
 
 ~~~
-expected filename1 == filename2
+### Expected filename1 == filename2
 ~~~
 
-## Example Stf File
-
-The following example stf file instructs the runner to create the
-files cmd.sh, hello.html, hello.json, stdout-expected and
-stderr-expected.  It then runs cmd.sh looking for a 0 return
-code. Then it compares the output files with their expected output.
+Examples:
 
 ~~~
-id stf file version 0.0.0
-# Hello World Example
-
-# Create the cmd.sh script.
---- file cmd.sh command
-../bin/statictea -t=hello.html -s=hello.json >stdout 2>stderr
---- endfile
-
-# Create hello.html without an ending newline.
---- file hello.html noLastEnding
-$$ nextline
-$$ hello {name}
---- endfile
-
---- file hello.json
-{"name": "world"}
---- endfile
-
-# Create a file with the expected output.
---- file stdout.expected noLastEnding
-hello world
---- endfile
-
-# No standard error output is expected.
---- file stderr.expected
---- endfile
-
-# Compare these files are equal.
---- expected stdout.expected == stdout
---- expected stderr.expected == stderr
+### Expected result == result.expected
+### Expected t.txt == t.txt.expected
+### Expected t.txt == empty
 ~~~
+
+### Comments
+
+Comments are all the other lines of the file. So it is hard to make a
+syntax error.  The only possible syntax errors are with the id line,
+file lines and expected lines.
+
 """
 
 func letterToWord(letter: char): OpResultStr[string] =
   ## Convert the one letter switch to its long form.
   for (ch, word) in switches:
     if ch == letter:
-      return optValue[string](word)
+      return opValueStr[string](word)
   let message = "Unknown switch: $1" % $letter
-  result = optMessage[string](message)
+  result = opMessageStr[string](message)
 
 proc handleOption(switch: string, word: string, value: string,
     runArgs: var RunArgs): string =
@@ -334,63 +365,79 @@ proc parseRunCommandLine*(argv: seq[string]): OpResultStr[RunArgs] =
           let letter = key[ix]
           let wordOp = letterToWord(letter)
           if wordOp.isMessage:
-            return optMessage[RunArgs](wordOp.message)
+            return opMessageStr[RunArgs](wordOp.message)
           let message = handleOption($letter, wordOp.value, value, args)
           if message != "":
-            return optMessage[RunArgs](message)
+            return opMessageStr[RunArgs](message)
 
       of CmdLineKind.cmdLongOption:
         let message = handleOption(key, key, value, args)
         if message != "":
-          return optMessage[RunArgs](message)
+          return opMessageStr[RunArgs](message)
 
       of CmdLineKind.cmdArgument:
-        return optMessage[RunArgs]("Unknown switch: $1" % [key])
+        return opMessageStr[RunArgs]("Unknown switch: $1" % [key])
 
       of CmdLineKind.cmdEnd:
         discard
 
-  result = optValue[RunArgs](args)
+  result = opValueStr[RunArgs](args)
 
-func makeBool*(item: string): bool =
-  ## Return false when the string is empty, else return true.
-  if item == "":
-    result = false
-  else:
-    result = true
+proc isRunFileLine*(line: string): bool =
+  ## Return true when the line is a file line.
+  let pattern = r"^### File "
+  let matchesO = matchPatternCached(line, pattern, 0)
+  result = matchesO.isSome
+
+proc isExpectedLine*(line: string): bool =
+  ## Return true when the line is an expected line.
+  let pattern = r"^### Expected "
+  let matchesO = matchPatternCached(line, pattern, 0)
+  result = matchesO.isSome
 
 proc parseRunFileLine*(line: string): OpResultStr[RunFileLine] =
   ## Parse a file command line.
-  # todo: The optional elements must be specified in order.
-  # --- file hello.html noLastEnding command nonZeroReturn
-  let pattern = r"^[-\s]*file[-\s]+([^-\s]+)(?:[-\s]+(noLastEnding)){0,1}(?:[-\s]+(command)){0,1}(?:[-\s]+(nonZeroReturn)){0,1}[-\s]*$"
+
+  let pattern = r"^### File ([^\s]+)(.*)$"
 
   let matchesO = matchPatternCached(line, pattern, 0)
   if not matchesO.isSome:
-    return optMessage[RunFileLine]("Invalid file line: $1" % [line])
+    return opMessageStr[RunFileLine]("Invalid file line: $1" % [line])
 
   let matches = matchesO.get()
-  let groups = matches.getGroups(4)
+  let groups = matches.getGroups(2)
   let filename = groups[0]
-  let noLastEnding = makeBool(groups[1])
-  let command = makeBool(groups[2])
-  let nonZeroReturn = makeBool(groups[3])
+  let attributes = groups[1].split(" ")
 
-  let fileLine = newRunFileLine(filename, noLastEnding, command, nonZeroReturn)
-  result = optValue[RunFileLine](fileLine)
+  var noLastEnding, command, nonZeroReturn: bool
+  for attr in attributes:
+    let attribute = strutils.strip(attr, trailing = true)
+    case attribute:
+      of "noLastEnding":
+        noLastEnding = true
+      of "command":
+        command = true
+      of "nonZeroReturn":
+        nonZeroReturn = true
+      else:
+        discard
 
-proc parseExpectedLine*(line: string): OpResultStr[CompareLine] =
+  let runFileLine = newRunFileLine(filename, noLastEnding, command, nonZeroReturn)
+  result = opValueStr[RunFileLine](runFileLine)
+
+proc parseExpectedLine*(line: string): OpResultStr[ExpectedLine] =
   ## Parse an expected line.
-  #--- expected stdout.expected == stdout
-  let pattern = r"^[-\s]*expected[-\s]+([^-\s]+)[-\s]*==[-\s]*([^-\s]+)[-\s]*$"
+  # # Expected stdout.expected == stdout
+  let pattern = r"^### Expected ([^\s]+) == ([^\s]+)[\s]*$"
+
   let matchesO = matchPatternCached(line, pattern, 0)
   if not matchesO.isSome:
-    return optMessage[CompareLine]("Invalid expected line: $1" % [line])
+    return opMessageStr[ExpectedLine]("Invalid expected line: $1" % [line])
 
   let matches = matchesO.get()
   let (filename1, filename2) = matches.get2Groups()
-  let expectedEqual = newCompareLine(filename1, filename2)
-  result = optValue[CompareLine](expectedEqual)
+  let expectedEqual = newExpectedLine(filename1, filename2)
+  result = opValueStr[ExpectedLine](expectedEqual)
 
 proc openNewFile*(folder: string, filename: string): OpResultStr[File] =
   ## Create a new file in the given folder and return an open File
@@ -398,39 +445,46 @@ proc openNewFile*(folder: string, filename: string): OpResultStr[File] =
 
   var path = joinPath(folder, filename)
   if fileExists(path):
-    return optMessage[File]("File already exists: $1" % [path])
+    return opMessageStr[File]("File already exists: $1" % [path])
 
   var file: File
   if not open(file, path, fmWrite):
     let message = "Unable to create the file: $1" % [path]
-    return optMessage[File](message)
+    return opMessageStr[File](message)
 
-  result = optValue[File](file)
+  result = opValueStr[File](file)
 
-proc getCmd*(line: string): string =
-  ## Return the type of line, either: #, "", id, file, expected,
-  ## endfile or other.
-  if line.startswith("#"):
-    result = "#"
-  # todo ignore pure whitespace lines.
-  elif line == "\n":
-    result = ""
-  elif line == "\r\n":
-    result = ""
-  else:
-    let pattern = r"^[- ]*(id|file|expected|endfile)"
-    let matchesO = matchPatternCached(line, pattern, 0)
-    if not matchesO.isSome:
-      result = "other"
+proc getAnyLine*(line: string): OpResultStr[AnyLine] =
+  ## Return information about the stf line.
+
+  if line == runnerId:
+    return opValueStr(AnyLine(kind: lkIdLine, idLine: line))
+
+  if line.startsWith("~~~")  or line.startsWith("```"):
+    return opValueStr(AnyLine(kind: lkBlockLine, blockLine: line))
+
+  if isRunFileLine(line):
+    let runFileLineOp = parseRunFileLine(line)
+    if runFileLineOp.isValue:
+      return opValueStr(newAnyLineRunFileLine(runFileLineOp.value))
     else:
-      let matches = matchesO.get()
-      result = matches.getGroup()
+      return opMessageStr[AnyLine](runFileLineOp.message)
+
+  if isExpectedLine(line):
+    let expectedEqualOp = parseExpectedLine(line)
+    if expectedEqualOp.isValue:
+      return opValueStr(AnyLine(kind: lkExpectedLine, expectedLine: expectedEqualOp.value))
+    else:
+      return opMessageStr[AnyLine](expectedEqualOp.message)
+
+  result = opValueStr(AnyLine(kind: lkCommentLine, commentLine: line))
 
 proc createSectionFile(lb: var LineBuffer, folder: string,
     runFileLine: RunFileLine): string =
-  ## Create a file from lines in the stf file starting at the current
-  ## position until the endfile line is found.  Return a message when
-  ## the file cannot be created, else return "".
+  ## Create a file from lines in the stf file. Read starting at the
+  ## current position until the start block line is found, then read
+  ## the file lines until the matching end block is found.  Return a
+  ## message when the file cannot be created, else return "".
 
   # Open a new file in the given folder.
   let filename = runFileLine.filename
@@ -440,21 +494,44 @@ proc createSectionFile(lb: var LineBuffer, folder: string,
     return fileOp.message
   var file = fileOp.value
 
-  # Write lines until the next endfile is found.
+  # Look for the starting block line.
   var line: string
+  var blockLine: string
+  var lineNum = 0
+  while true:
+    line = readlines.readline(lb)
+    if line == "":
+      # The start block was missing. Close and delete the new file.
+      file.close()
+      let path = joinPath(folder, filename)
+      discard tryRemoveFile(path)
+      return "The start block line was missing."
+    inc(lineNum)
+    let anyLineOr = getAnyLine(line)
+    if anyLineOr.isMessage:
+      return fmt"{lineNum}: {anyLineOr.message}"
+    let anyLine = anyLineOr.value
+    if anyLine.kind == lkBlockLine:
+      blockLine = anyLine.blockLine
+      break
+
+  # Write lines until the next endblock line is found.
   var previousLine: string
   var firstLine = true
   while true:
     line = readlines.readline(lb)
     if line == "":
-      # The end file was missing. Close and delete the new file.
+      # The end block was missing. Close and delete the new file.
       file.close()
       let path = joinPath(folder, filename)
       discard tryRemoveFile(path)
-      return "The endfile line was missing."
-    let cmd = getCmd(line)
-    if cmd == "endfile":
-      break # Done
+      return "The end block line was missing."
+    let anyLineOr = getAnyLine(line)
+    if anyLineOr.isMessage:
+      return fmt"{lineNum}: {anyLineOr.message}"
+    let anyLine = anyLineOr.value
+    if anyLine.kind == lkBlockLine and anyLine.blockLine == blockLine:
+      break
 
     # Write the previous line to the file.
     if not firstLine:
@@ -474,17 +551,17 @@ proc makeDirAndFiles*(filename: string): OpResultStr[DirAndFiles] =
   ## Read the stf file and create its temp folder and files. Return the
   ## file lines and expected lines.
 
-  var compareLines = newSeq[CompareLine]()
+  var expectedLines = newSeq[ExpectedLine]()
   var runFileLines = newSeq[RunFileLine]()
 
   # Make sure the file exists.
   if not fileExists(filename):
-    return optMessage[DirAndFiles]("File not found: '$1'." % [filename])
+    return opMessageStr[DirAndFiles]("File not found: '$1'." % [filename])
 
   # Open the file for reading.
   let stream = newFileStream(filename, fmRead)
   if stream == nil:
-    return optMessage[DirAndFiles]("Unable to open file: '$1'." % [filename])
+    return opMessageStr[DirAndFiles]("Unable to open file: '$1'." % [filename])
   defer:
     stream.close()
 
@@ -495,57 +572,56 @@ proc makeDirAndFiles*(filename: string): OpResultStr[DirAndFiles] =
     removeDir(tempDirName)
   let message = createFolder(tempDirName)
   if message != "":
-    return optMessage[DirAndFiles](message)
+    return opMessageStr[DirAndFiles](message)
 
   # Allocate a buffer for reading lines.
   var lineBufferO = newLineBuffer(stream, filename = filename)
   if not lineBufferO.isSome():
-    return optMessage[DirAndFiles]("Unable to allocate a line buffer.")
+    return opMessageStr[DirAndFiles]("Unable to allocate a line buffer.")
   var lb = lineBufferO.get()
 
   # Check the file type is supported. The first line contains the type
   # and version number.
   var line = readlines.readline(lb)
   if line == "":
-    return optMessage[DirAndFiles]("Empty file: '$1'." % filename)
+    return opMessageStr[DirAndFiles]("Empty file: '$1'." % filename)
   if not line.startsWith(runnerId):
     let message = """Invalid stf file first line:
 expected: $1
      got: $2""" % [runnerId, line]
-    return optMessage[DirAndFiles](message)
+    return opMessageStr[DirAndFiles](message)
 
   while true:
     # Read a line from the stf file.
     line = readlines.readline(lb)
     if line == "":
       break # No more lines.
-    let cmd = getCmd(line)
-    case cmd
-    of "#", "":
-      discard
-    of "file":
+    let anyLineOr = getAnyLine(line)
+    if anyLineOr.isMessage:
+      return opMessageStr[DirAndFiles](anyLineOr.message)
+    let anyLine = anyLineOr.value
+    case anyLine.kind
+    of lkRunFileLine:
       # Create a new file.
-      let fileLineOp = parseRunFileLine(line)
-      if fileLineOp.isMessage:
-        return optMessage[DirAndFiles](fileLineOp.message)
-      let fileLine = fileLineOp.value
-      runFileLines.add(fileLine)
-      let message = createSectionFile(lb, tempDirName, fileLine)
+      let runFileLine = anyLine.runFileLine
+      runFileLines.add(runFileLine)
+      let message = createSectionFile(lb, tempDirName, runFileLine)
       if message != "":
-        return optMessage[DirAndFiles](message)
-
-    of "expected":
+        return opMessageStr[DirAndFiles](message)
+    of lkExpectedLine:
       # Remember the expected filenames to compare.
-      let expectedEqualOp = parseExpectedLine(line)
-      if expectedEqualOp.isMessage:
-        return optMessage[DirAndFiles](expectedEqualOp.message)
-      compareLines.add(expectedEqualOp.value)
+      expectedLines.add(anyLine.expectedLine)
     else:
-      let message = "Unknown line: '$1'." % stripLineEnding(line)
-      return optMessage[DirAndFiles](message)
+      discard
 
-  let dirAndFiles = newDirAndFiles(compareLines, runFileLines)
-  result = optValue[DirAndFiles](dirAndFiles)
+  if runFileLines.len == 0:
+    return opMessageStr[DirAndFiles]("No files run.")
+
+  # if expectedLines.len == 0:
+  #   return opMessageStr[DirAndFiles]("No expected lines.")
+
+  let dirAndFiles = newDirAndFiles(expectedLines, runFileLines)
+  result = opValueStr[DirAndFiles](dirAndFiles)
 
 proc runCommands*(folder: string, runFileLines: seq[RunFileLine]):
     OpResultStr[Rc] =
@@ -583,9 +659,9 @@ proc runCommands*(folder: string, runFileLines: seq[RunFileLine]):
   setCurrentDir(oldDir)
 
   if rc != 0:
-    return optMessage[Rc]("failed")
-    
-  result = optValue[Rc](rc)
+    return opMessageStr[Rc]("Failed")
+
+  result = opValueStr[Rc](rc)
 
 func showTabsAndLineEndings*(str: string): string =
   ## Return a new string with the tab and line endings visible.
@@ -647,25 +723,36 @@ proc readFileContent(filename: string): OpResultStr[string] =
   ## Read the file and return the content as a string.
   try:
     let content = readFile(filename)
-    result = optValue[string](content)
+    result = opValueStr[string](content)
   except:
-    result = optMessage[string](getCurrentExceptionMsg())
+    result = opMessageStr[string](getCurrentExceptionMsg())
 
 proc compareFiles*(expectedFilename: string, gotFilename: string): OpResultStr[string] =
   ## Compare two files and return the differences. When they are equal
   ## return "".
 
+  let (_, expBasename) = splitPath(expectedFilename)
+  let (_, gotBasename) = splitPath(gotFilename)
+
   # Read the "expected" file.
-  let expectedContentOp = readFileContent(expectedFilename)
-  if expectedContentOp.isMessage:
-    return optMessage[string](expectedContentOp.message)
-  let expectedContent = expectedContentOp.value
+  var expectedContent: string
+  if expBasename == "empty":
+    expectedContent = ""
+  else:
+    let expectedContentOp = readFileContent(expectedFilename)
+    if expectedContentOp.isMessage:
+      return opMessageStr[string]("Error: " & expectedContentOp.message)
+    expectedContent = expectedContentOp.value
 
   # Read the "got" file.
-  let gotContentOp = readFileContent(gotFilename)
-  if gotContentOp.isMessage:
-    return optMessage[string](gotContentOp.message)
-  let gotContent = gotContentOp.value
+  var gotContent: string
+  if gotBasename == "empty":
+    gotContent = ""
+  else:
+    let gotContentOp = readFileContent(gotFilename)
+    if gotContentOp.isMessage:
+      return opMessageStr[string]("Error: " & gotContentOp.message)
+    gotContent = gotContentOp.value
 
   #  ⤶ ⤷ ⤴ ⤵
   # ⬉ ⬈ ⬊ ⬋
@@ -715,17 +802,17 @@ Difference: $1 (expected) != $2 (got)
 $3
 """ % [expBasename, gotBasename, linesSideBySide(expectedContent, gotContent)]
 
-  return optValue[string](message)
+  return opValueStr[string](message)
 
-proc compareFileSets(folder: string, compareLines: seq[CompareLine]):
+proc compareFileSets(folder: string, expectedLines: seq[ExpectedLine]):
     OpResultStr[Rc] =
   ## Compare multiple pairs of files and show the differences. When
   ## they are all the same return 0.
 
   var rc = 0
-  for compareLine in compareLines:
-    var path1 = joinPath(folder, compareLine.filename1)
-    var path2 = joinPath(folder, compareLine.filename2)
+  for expectedLine in expectedLines:
+    var path1 = joinPath(folder, expectedLine.filename1)
+    var path2 = joinPath(folder, expectedLine.filename2)
 
     # Compare the two files.
     let stringOp = compareFiles(path1, path2)
@@ -741,7 +828,7 @@ proc compareFileSets(folder: string, compareLines: seq[CompareLine]):
         echo differences
         rc = 1
 
-  result = optValue[Rc](rc)
+  result = opValueStr[Rc](rc)
 
 proc runStfFilename*(filename: string): OpResultStr[Rc] =
   ## Run the stf file and leave the temp dir. Return 0 when all the
@@ -750,7 +837,7 @@ proc runStfFilename*(filename: string): OpResultStr[Rc] =
   # Create the temp folder and files inside it.
   let dirAndFilesOp = makeDirAndFiles(filename)
   if dirAndFilesOp.isMessage:
-    return optMessage[Rc](dirAndFilesOp.message)
+    return opMessageStr[Rc](dirAndFilesOp.message)
   let dirAndFiles = dirAndFilesOp.value
 
   let folder = filename & ".tempdir"
@@ -759,11 +846,11 @@ proc runStfFilename*(filename: string): OpResultStr[Rc] =
   result = runCommands(folder, dirAndFiles.runFileLines)
 
   # Compare the files.
-  var rcOp = compareFileSets(folder, dirAndFiles.compareLines)
+  var rcOp = compareFileSets(folder, dirAndFiles.expectedLines)
   if rcOp.isMessage:
     return rcOp
   if rcOp.value != 0:
-    result = optMessage[Rc]("failed")
+    result = opMessageStr[Rc]("Failed")
 
 # todo: fix up the error handling. Echo error messages as you go and
 # keep track of success or failure.
@@ -795,20 +882,21 @@ when not defined(test):
 
     if not dirExists(dir):
       let message = "The dir does not exist: " & dir
-      return optMessage[Rc](message)
+      return opMessageStr[Rc](message)
 
     var count = 0
     var passedCount = 0
     var rc = 0
     for kind, path in walkDir(dir):
-      if path.endsWith(".stf"):
+      if path.endsWith(".stf") or ".stf." in path:
         let (_, basename) = splitPath(path)
         echo "Running: " & basename
 
         let rcOp = runFilename(path, leaveTempDir)
         if rcOp.isMessage:
-          return rcOp
-        if rcOp.value == 0:
+          echo rcOp.message
+          rc = 1
+        elif rcOp.value == 0:
           inc(passedCount)
         else:
           rc = 1
@@ -817,9 +905,9 @@ when not defined(test):
     if count == passedCount:
       echo "All $1 tests passed!" % $passedCount
     else:
-      echo "$1 passed, $2 failed\n" % [
+      echo "$1 Passed, $2 Failed\n" % [
         $passedCount, $(count - passedCount)]
-    result = optValue[Rc](rc)
+    result = opValueStr[Rc](rc)
 
   proc runDirectoryMain(args: RunArgs): OpResultStr[Rc] =
     ## Run all stf files in a directory. Return 0 when all pass.
@@ -831,20 +919,21 @@ when not defined(test):
 
     if args.help:
       echo getHelp()
-      result = optValue[Rc](0)
+      result = opValueStr[Rc](0)
     elif args.version:
       echo runnerId
-      result = optValue[Rc](0)
+      result = opValueStr[Rc](0)
     elif args.filename != "":
       result = runFilenameMain(args)
     elif args.directory != "":
       result = runDirectoryMain(args)
     else:
       echo "Missing argments, use -h for help."
-      result = optValue[Rc](1)
+      result = opValueStr[Rc](1)
 
   proc main(argv: seq[string]): OpResultStr[Rc] =
-    ## Run stf test files. Return 0 when successful.
+    ## Run stf test files. Return 0 when all the tests pass and 1 when
+    ## one or more fail.
 
     # Setup control-c monitoring so ctrl-c stops the program.
     proc controlCHandler() {.noconv.} =
@@ -855,7 +944,7 @@ when not defined(test):
       # Parse the command line options.
       let argsOp = parseRunCommandLine(argv)
       if argsOp.isMessage:
-        return optMessage[Rc](argsOp.message)
+        return opMessageStr[Rc](argsOp.message)
       let args = argsOp.value
 
       # Run.
@@ -865,7 +954,7 @@ when not defined(test):
       # The stack trace is only available in the debug builds.
       when not defined(release):
         message = message & "\n" & getCurrentException().getStackTrace()
-      result = optMessage[Rc](message)
+      result = opMessageStr[Rc](message)
 
 when isMainModule:
   let rcOp = main(commandLineParams())

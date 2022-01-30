@@ -1,5 +1,7 @@
 # Test Files
 
+~~~
+
 This folder contains stf test files for statictea.
 
 * [block-readme](../testfiles/block-readme.stf) &mdash; The block readme example.

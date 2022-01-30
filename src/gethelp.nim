@@ -5,7 +5,7 @@ func getHelp*(): string =
   result = """
 NAME
 
-     statictea - combines a template with data to produce a result
+     statictea - combines a template with JSON to produce a result
 
 SYNOPSIS
 

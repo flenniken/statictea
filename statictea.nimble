@@ -571,13 +571,21 @@ proc get_stf_filenames(): seq[string] =
   result = @[]
   var list = listFiles("testfiles")
   for filename in list:
-    if filename.endsWith(".stf") and not filename.startsWith(".#"):
+    if ".stf." in filename and not filename.startsWith(".#"):
       result.add(lastPathPart(filename))
 
 proc runRunStf() =
   # Get the name of the stf to run.
   let count = system.paramCount()+1
   var name = system.paramStr(count-1)
+
+  # When the name is "rt" that means no name was specified.  Run the
+  # whole directory using the -d option.
+  if name == "rt":
+    let cmd = "export statictea='../../bin/statictea'; bin/runner -d=testfiles"
+    let result = staticExec cmd
+    echo result
+    return
 
   let stf_filenames = get_stf_filenames()
   var failed = false
@@ -783,8 +791,8 @@ task br, "\tBuild the stf test runner.":
 task rt, "\tRun one or more stf tests in testfiles; specify part of the name.":
   runRunStfMain()
 
-task stf, "\tList stf tests with newest last.":
-  exec """ls -1tr testfiles/*.stf | xargs grep "##" | cut -c 11- | sed 's/:## / -- /'"""
+# task stf, "\tList stf tests with newest last.":
+#   exec """ls -1tr testfiles/*.stf | xargs grep "##" | cut -c 11- | sed 's/:## / -- /'"""
 
 task testfilesreadme, "\tCreate testfiles readme.md.":
   taskTestfilesReadme()
@@ -793,18 +801,19 @@ task newstf, "\tCreate new stf as a starting point for a new test.":
   let count = system.paramCount()+1
   var name = system.paramStr(count-1)
   if name == "newstf":
-    echo "Specify a name for a new stf test in the testfiles folder."
+    echo "Specify a name for a new stf test file."
   else:
     var (_, basename) = splitPath(name)
-    if not basename.endsWith(".stf"):
-      basename = basename & ".stf"
-    var filename = joinPath("testfiles", basename)
-    if fileExists(filename):
-      echo "File already exists: $1" % filename
+    if not basename.endsWith(".stf.md"):
+      echo "Specify a name without an extension."
     else:
-      let cmd = "cp testfiles/template.stf $1" % filename
-      echo cmd
-      exec cmd
+      var filename = joinPath("testfiles", basename, ".stf.md")
+      if fileExists(filename):
+        echo "File already exists: $1" % filename
+      else:
+        let cmd = "cp testfiles/template.stf.md $1" % filename
+        echo cmd
+        exec cmd
 
 task runhelp, "\tShow the runner help text with glow.":
   exec "bin/runner -h | glow -"
