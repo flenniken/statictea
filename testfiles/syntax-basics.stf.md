@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## Test readme syntax section.
+# Readme Syntax
+
+Test the readme syntax section.
 
 ### File cmd.sh command
 
@@ -119,17 +121,7 @@ Continue a string with spaces.
  a b c d e f g h i j k l m n o
 ~~~
 
-### File stdout.expected
-
-~~~
-~~~
-
-### File stderr.expected
-
-~~~
-~~~
-
 ### Expected result.expected == result.html
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected stdout == empty
+### Expected stderr == empty
 

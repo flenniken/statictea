@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## Test duplicate json variables.
+# Duplicate Json Vars
+
+Test duplicate json variables.
 
 ### File cmd.sh command nonZeroReturn
 
@@ -38,18 +40,13 @@ $$ nextline
 Earl
 ~~~
 
-### File stdout.expected
-
-~~~
-~~~
-
 ### File stderr.expected
 
 ~~~
 template.html(0): w132: Duplicate json variable 'name' skipped.
 ~~~
 
-### Expected result.expected == result.html
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected result.html == result.expected
+### Expected stdout == empty
+### Expected stderr == stderr.expected
 

@@ -56,7 +56,7 @@ proc get_source_filenames(path: bool = false, noExt: bool = false): seq[string] 
 proc get_testfile_filenames(): seq[string] =
   ## Return the basename of the stf source files in the testfiles
   ## folder.
-  result = get_dir_filenames("testfiles", ".stf", path = true)
+  result = get_dir_filenames("testfiles", ".stf.md", path = true)
 
 proc get_test_module_cmd(filename: string, release = false): string =
   ## Return the command line to test the given nim file.
@@ -192,18 +192,40 @@ proc readModuleDescription(filename: string): string =
 
   result = trimmedLines.join("\n")
 
+proc readModuleDescriptionMd(filename: string): string =
+  ## Return the module doc comment at the top of the file for markdown
+  ## files.
+  let text = slurp(filename)
+
+  # Collect the doc comments at the beginning of the file. Read the
+  # first block of lines starting with a letter to the first blank
+  # line.
+
+  var foundDescription = false
+  var descriptionLines = newSeq[string]()
+  let fileLines = text.splitLines()
+  for line in fileLines[1 .. fileLines.len-1]:   # Skip the first line.
+    if foundDescription:
+      if line == "":
+        break
+      descriptionLines.add(line)
+    elif line != "" and isAlphaNumeric(line[0]):
+      foundDescription = true
+      descriptionLines.add(line)
+
+  result = descriptionLines.join("\n")
+
 proc jsonQuote(str: string): string =
   ## Escape the specified json string.
   result = escapeJsonUnquoted(str)
 
-proc fileIndexJson(filenames: seq[string]): string =
+proc fileIndexJson(filenames: seq[string], descriptions: seq[string]): string =
   ## Generate a json string containing the name of all the files and
   ## their doc comment descriptions.
 
-  # Extract the source module descriptions from all the files.
-  var descriptions = newSeq[string]()
-  for filename in filenames:
-    descriptions.add(readModuleDescription(filename))
+  if filenames.len != descriptions.len:
+    echo "Error: the number of filenames and their descriptions do not match."
+    return
 
   # Generate the index json with a filename and description.
   var modules = newSeq[string]()
@@ -225,12 +247,24 @@ $1
 proc sourceIndexJson(): string =
   ## Generate json for the doc comment index of all the source files.
   let filenames = get_source_filenames(path = true)
-  result = fileIndexJson(filenames)
+
+  # Extract the source module descriptions from all the files.
+  var descriptions = newSeq[string]()
+  for filename in filenames:
+    descriptions.add(readModuleDescription(filename))
+
+  result = fileIndexJson(filenames, descriptions)
 
 proc testfilesIndexJson(): string =
   ## Generate json for the doc comment index of all the stf test files.
   let filenames = get_testfile_filenames()
-  result = fileIndexJson(filenames)
+
+  # Extract the source module descriptions from all the files.
+  var descriptions = newSeq[string]()
+  for filename in filenames:
+    descriptions.add(readModuleDescriptionMd(filename))
+
+  result = fileIndexJson(filenames, descriptions)
 
 proc insertFile(filename: string, startLine: string, endLine: string,
                 sectionFilename: string) =

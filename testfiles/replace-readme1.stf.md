@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## The first replace readme example.
+# Readme Replace 1
+
+The first replace readme example.
 
 ### File cmd.sh command
 
@@ -30,11 +32,6 @@ $statictea -j=replace.json -t=replace.html >stdout 2>stderr
 <html lang="en">
 ~~~
 
-### File stderr.expected
-
-~~~
-~~~
-
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected stdout == stdout.expected
+### Expected stderr == empty
 

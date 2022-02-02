@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## A template coming from stdin.
+# Stdin
+
+Test a template coming from stdin.
 
 ### File cmd.sh command
 
@@ -27,11 +29,6 @@ hello {s.name}
 hello world
 ~~~
 
-### File stderr.expected
-
-~~~
-~~~
-
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected stdout == stdout.expected
+### Expected stderr == empty
 

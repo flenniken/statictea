@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## Test standard readme replace example 3.
+# Readme Replace 3
+
+Test standard readme replace example 3.
 
 ### File cmd.sh command
 
@@ -53,17 +55,7 @@ $statictea -s=server.json -j=shared.json \
 <title>Teas in England</title>
 ~~~
 
-### File stdout.expected
-
-~~~
-~~~
-
-### File stderr.expected
-
-~~~
-~~~
-
-### Expected result.expected == result.html
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected result.html == result.expected
+### Expected stdout == empty
+### Expected stderr == empty
 

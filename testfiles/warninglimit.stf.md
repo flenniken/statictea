@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## Test that warnings stop after 11.
+# Warning Limit
+
+Test that warnings stop after 11.
 
 ### File cmd.sh command nonZeroReturn
 
@@ -55,6 +57,6 @@ template.html(4): w58: The replacement variable doesn't exist: name.
 template.html(4): w116: You reached the maximum number of warnings, suppressing the rest.
 ~~~
 
-### Expected result.expected == result.html
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected result.html == result.expected
+### Expected stdout == stdout.expected
+### Expected stderr == stderr.expected

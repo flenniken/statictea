@@ -1,13 +1,14 @@
 stf file, version 0.1.0
 
-## Test readme local variables section.
+# Local Variables
 
+Test the readme local variables section.
 
-# You create local variables with template statements.  They are
-# local to the command where they are defined. You do not have to
-# specify a prefix for local variables but you can use l. They are
-# stored in the l dictionary. The local variables are cleared and
-# recalculated for each repeated block.
+You create local variables with template statements.  They are local
+to the command where they are defined. You do not have to specify a
+prefix for local variables but you can use l. They are stored in the l
+dictionary. The local variables are cleared and recalculated for each
+repeated block.
 
 ### File cmd.sh command nonZeroReturn
 
@@ -71,11 +72,6 @@ l.a => {l.a}
 2. After defining x it exists.
 ~~~
 
-### File stdout.expected
-
-~~~
-~~~
-
 ### File stderr.expected
 
 ~~~
@@ -85,7 +81,7 @@ template.html(14): w58: The replacement variable doesn't exist: a.
 template.html(15): w58: The replacement variable doesn't exist: l.a.
 ~~~
 
-### Expected result.expected == result.html
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected result.html == result.expected
+### Expected stdout == empty
+### Expected stderr == stderr.expected
 

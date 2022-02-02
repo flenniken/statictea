@@ -48,17 +48,12 @@ Use the global variable again.
 g.name => tea
 ~~~
 
-### File stdout.expected
-
-~~~
-~~~
-
 ### File stderr.expected
 
 ~~~
 template.html(3): w58: The replacement variable doesn't exist: g.name.
 ~~~
 
-### Expected result.expected == result.html
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected result.html == result.expected
+### Expected stdout == empty
+### Expected stderr == stderr.expected

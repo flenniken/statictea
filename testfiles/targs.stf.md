@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## Test t.args with normal arguments.
+# t.args
+
+Test t.args with normal arguments.
 
 ### File cmd.sh command
 
@@ -145,16 +147,6 @@ Command line from t.args:
   statictea --log --result=result.html --server=server.json --server=server2.json --server=shared.json --server=shared2.json --server=template.html --prepost='abc$,def' --prepost='$$'
 ~~~
 
-### File stdout.expected
-
-~~~
-~~~
-
-### File stderr.expected
-
-~~~
-~~~
-
-### Expected result.expected == result.html
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected result.html == result.expected
+### Expected stdout == empty
+### Expected stderr == empty

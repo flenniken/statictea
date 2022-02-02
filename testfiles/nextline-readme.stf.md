@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## The nextline readme example.
+# Readme Nextline Example
+
+The nextline readme example.
 
 ### File cmd.sh command
 
@@ -30,11 +32,6 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
 Drink tea -- Earl Grey is my favorite.
 ~~~
 
-### File stderr.expected
-
-~~~
-~~~
-
 ### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected stderr == empty
 

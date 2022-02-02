@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## Update the replace block in a template.
+# Update Replace Block
+
+Update the replace block in a template.
 
 ### File cmd.sh command
 
@@ -36,17 +38,7 @@ line
 ending line
 ~~~
 
-### File stdout.expected
-
-~~~
-~~~
-
-### File stderr.expected
-
-~~~
-~~~
-
-### Expected newtemplate == template.html
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected template.html == newtemplate
+### Expected stdout == empty
+### Expected stderr == empty
 

@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## The comment readme example.
+# Readme Command Example
+
+The readme comment example.
 
 ### File cmd.sh command
 
@@ -27,11 +29,6 @@ You make Oolong Tea in five time
 intensive steps.
 ~~~
 
-### File stderr.expected
-
-~~~
-~~~
-
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected stdout == stdout.expected
+### Expected stderr == empty
 

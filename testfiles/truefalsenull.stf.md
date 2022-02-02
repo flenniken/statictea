@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## Test json true, false and null.
+# True False Null
+
+Test json true, false and null.
 
 ### File cmd.sh command
 
@@ -36,11 +38,6 @@ false => 0
 null => 0
 ~~~
 
-### File stderr.expected
-
-~~~
-~~~
-
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected stdout == stdout.expected
+### Expected stderr == empty
 

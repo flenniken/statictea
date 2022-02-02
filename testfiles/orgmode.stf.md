@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## Test the org mode prefix (# $).
+# Org Mode Prefix
+
+Test the org mode prefix (# $).
 
 ### File cmd.sh command
 
@@ -28,11 +30,6 @@ hello org mode
 # Normal org mode comment.
 ~~~
 
-### File stderr.expected
-
-~~~
-~~~
-
 ### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected stderr == empty
 

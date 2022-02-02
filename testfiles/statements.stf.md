@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## Test readme statements.
+# Readme Statements
+
+Test readme statements section.
 
 ### File cmd.sh command
 
@@ -46,17 +48,7 @@ nameLen => 16
 name => server ...
 ~~~
 
-### File stdout.expected
-
-~~~
-~~~
-
-### File stderr.expected
-
-~~~
-~~~
-
 ### Expected result.expected == result.html
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected stdout == empty
+### Expected stderr == empty
 

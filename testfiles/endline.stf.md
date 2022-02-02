@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## Test there are no extra lines for the readmefun case.
+# ReadMeFun Extra Lines
+
+Test there are no extra lines for the readmefun case.
 
 ### File cmd.sh command
 
@@ -42,11 +44,6 @@ looking for extra newlines
 ===
 ~~~
 
-### File stderr.expected
-
-~~~
-~~~
-
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected stdout == stdout.expected
+### Expected stderr == empty
 

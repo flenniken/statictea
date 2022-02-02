@@ -1,8 +1,8 @@
 stf file, version 0.1.0
 
-## Test the t.content variable.
+# t.content
 
-# file line attributes: noLastEnding command nonZeroReturn
+Test the t.content variable.
 
 ### File cmd.sh command
 
@@ -131,17 +131,7 @@ two
 threeAfter endblock.
 ~~~
 
-### File stdout.expected
-
-~~~
-~~~
-
-### File stderr.expected
-
-~~~
-~~~
-
 ### Expected result.expected == result.html
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected empty == stdout
+### Expected empty == stderr
 

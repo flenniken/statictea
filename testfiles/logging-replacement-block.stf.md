@@ -1,8 +1,8 @@
 stf file, version 0.1.0
 
-## Test logging the replacement block.
+# Replacement Block Logging
 
-# file line attributes: noLastEnding command nonZeroReturn
+Test logging the replacement block.
 
 ### File cmd.sh command
 
@@ -10,8 +10,9 @@ stf file, version 0.1.0
 $statictea -l=log.txt -t=tmpl.txt -r=result.txt >stdout 2>stderr
 ~~~
 
-# Remove the time prefix from the log lines then extract the template lines.
 ### File log.sh command
+
+Remove the time prefix from the log lines then extract the template lines.
 
 ~~~
 cat log.txt | cut -c 26- | grep "^tmpl.txt" >log.filtered
@@ -66,16 +67,6 @@ Log the replace command's replacement block.
 
 ~~~
 
-### File stdout.expected
-
-~~~
-~~~
-
-### File stderr.expected
-
-~~~
-~~~
-
 ### File log.filtered.expected
 
 ~~~
@@ -89,13 +80,8 @@ tmpl.txt(21); nextline replacement block
 tmpl.txt(26); replace command
 ~~~
 
-### File log.txt.expected
+### Expected result.txt == result.expected
+### Expected stdout == empty
+### Expected stderr == empty
+### Expected log.filtered == log.filtered.expected
 
-~~~
-~~~
-
-### Expected result.expected == result.txt
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
-### Expected log.filtered.expected == log.filtered
-#-- expected log.txt.expected == log.txt

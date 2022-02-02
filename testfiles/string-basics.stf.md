@@ -1,12 +1,8 @@
 stf file, version 0.1.0
 
-> Test the string type.
+# String Type
 
-Here are the possible file line attributes:
-
-~~~
-noLastEnding command nonZeroReturn
-~~~
+Test the string type.
 
 ### File cmd.sh command
 

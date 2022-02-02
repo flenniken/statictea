@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## The block readme example.
+# Readme Block Example
+
+The readme block example.
 
 ### File cmd.sh command
 
@@ -36,10 +38,5 @@ Friday at John's
 house at 5:00 pm.
 ~~~
 
-### File stderr.expected
-
-~~~
-~~~
-
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected stdout == stdout.expected
+### Expected stderr == empty

@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## Test updating a template with the update option.
+# Update Template
+
+Test updating a template with the update option.
 
 ### File cmd.sh command
 
@@ -50,16 +52,6 @@ pick an option
 <!--$ endblock -->
 ~~~
 
-### File stdout.expected
-
-~~~
-~~~
-
-### File stderr.expected
-
-~~~
-~~~
-
-### Expected template.expected == template.html
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected template.html == template.expected
+### Expected stdout == empty
+### Expected stderr == empty

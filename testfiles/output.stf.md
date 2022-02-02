@@ -1,16 +1,17 @@
 stf file, version 0.1.0
 
-## Test standard invocation used for new stf test template.
+# t.output
 
-# The t.output variable determines where the block output goes.  By
-# default it goes to the result file.
+Test the t.output variable
 
-# - "result" -- to the result file (default)
-# - "stdout" -- to standard out
-# - "stderr" -- to standard error
-# - "log" -- to the log file
-# - "skip" -- to the bit bucket
+The t.output variable determines where the block output goes.  By
+default it goes to the result file.
 
+- "result" -- to the result file (default)
+- "stdout" -- to standard out
+- "stderr" -- to standard error
+- "log" -- to the log file
+- "skip" -- to the bit bucket
 
 ### File cmd.sh command
 
@@ -18,15 +19,13 @@ stf file, version 0.1.0
 $statictea -l=log.txt -t=tmpl.txt -r=result.txt >stdout 2>stderr
 ~~~
 
-
-# Remove the time prefix from the log lines then extract the template lines.
 ### File log.sh command
+
+Remove the time prefix from the log lines then extract the template lines.
 
 ~~~
 cat log.txt | cut -c 26- | grep "^tmpl.txt" >log.filtered
 ~~~
-
-
 
 ### File tmpl.txt
 
@@ -57,8 +56,6 @@ $$ block t.output = "result"
 └────────────┘
 $$ endblock
 ~~~
-
-
 
 ### File stdout.expected
 
@@ -92,13 +89,7 @@ tmpl.txt(3); │log block│
 tmpl.txt(4); └─────────┘
 ~~~
 
-### File log.txt.expected
-
-~~~
-~~~
-
-### Expected result.expected == result.txt
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
-### Expected log.filtered.expected == log.filtered
-#--- expected log.txt.expected == log.txt
+### Expected result.txt == result.expected
+### Expected stdout == stdout.expected
+### Expected stderr == stderr.expected
+### Expected log.filtered == log.filtered.expected

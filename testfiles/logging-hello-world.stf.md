@@ -1,8 +1,8 @@
 stf file, version 0.1.0
 
-## Logging with Hello World.
+# Hello World Logging
 
-# file line attributes: noLastEnding command nonZeroReturn
+Test logging with Hello World.
 
 ### File cmd.sh command
 
@@ -10,11 +10,6 @@ stf file, version 0.1.0
 $statictea -s=hello.json -t=hello.html >stdout 2>stderr
 $statictea -l=log.txt -s=hello.json -t=hello.html >stdout 2>stderr
 ~~~
-
-# Remove the time prefix from the log lines then extract the template lines.
-# cat log.txt | cut -c 26- | grep "^tmpl.txt" >log.filtered
-# Remove the time and filename prefix from the log lines.
-# cat log.txt | sed 's/^.*); //' >log.filtered
 
 ### File log.sh command
 
@@ -41,11 +36,6 @@ hello {s.name}
 hello world
 ~~~
 
-### File stderr.expected
-
-~~~
-~~~
-
 ### File log.expected
 
 ~~~
@@ -56,7 +46,7 @@ Return code: 0
 Done
 ~~~
 
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
-### Expected log.expected == log.filtered
+### Expected stdout == stdout.expected
+### Expected stderr == empty
+### Expected log.filtered == log.expected
 

@@ -1,6 +1,8 @@
 stf file, version 0.1.0
 
-## The continue readme example.
+# Continue Line
+
+The continue readme example.
 
 ### File cmd.sh command
 
@@ -23,11 +25,6 @@ $$ : tea2 = "Masala chai"
 Earl Grey, Masala chai
 ~~~
 
-### File stderr.expected
-
-~~~
-~~~
-
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected stdout == stdout.expected
+### Expected stderr == empty
 

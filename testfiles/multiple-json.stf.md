@@ -1,9 +1,8 @@
 stf file, version 0.1.0
 
-## Test multiple json files.
+# Multiple Json Files
 
-
-# file line attributes: noLastEnding command nonZeroReturn
+Test with multiple json files.
 
 ### File cmd.sh command
 
@@ -50,17 +49,7 @@ hello {s.data}, hello {h.data1}, hello {h.data2}
 hello server.json, hello j1.json, hello j2.json
 ~~~
 
-### File stdout.expected
-
-~~~
-~~~
-
-### File stderr.expected
-
-~~~
-~~~
-
-### Expected result.expected == result.html
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected result.html == result.expected
+### Expected stdout == empty
+### Expected stderr == empty
 

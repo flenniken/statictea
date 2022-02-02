@@ -1,15 +1,14 @@
 stf file, version 0.1.0
 
-## Replacement variable is missing.
+# Missing Replacement Variable
+
+Test with a missing replacement variable.
 
 ### File cmd.sh command nonZeroReturn
 
 ~~~
 $statictea -t=template.md >stdout 2>stderr
 ~~~
-
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
 
 ### File template.md
 
@@ -35,5 +34,6 @@ template.md(2): w58: The replacement variable doesn't exist: s.name.
 template.md(4): w58: The replacement variable doesn't exist: s.block.
 ~~~
 
-
+### Expected stdout == stdout.expected
+### Expected stderr == stderr.expected
 

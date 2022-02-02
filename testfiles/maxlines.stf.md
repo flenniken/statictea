@@ -1,8 +1,8 @@
 stf file, version 0.1.0
 
-## Test maxLines tea variable.
+# t.maxLines
 
-# file line attributes: noLastEnding command nonZeroReturn
+Test t.maxLines tea variable.
 
 ### File cmd.sh command nonZeroReturn
 
@@ -134,11 +134,6 @@ $$ endblock
 end of file
 ~~~
 
-### File stdout.expected
-
-~~~
-~~~
-
 ### File stderr.expected
 
 ~~~
@@ -152,6 +147,6 @@ template.html(62): w60: Read t.maxLines replacement block lines without finding 
 template.html(65): w144: The endblock command does not have a matching block command.
 ~~~
 
-### Expected result.expected == result.html
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
+### Expected result.html == result.expected
+### Expected stdout == empty
+### Expected stderr == stderr.expected
