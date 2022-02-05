@@ -536,7 +536,7 @@ You use tea variables to control where the output goes, how many
 times it repeats and other aspects controlling a command.
 
 A variable name starts with a letter followed by letters, digits
-and underscores limited to a total of 64 ascii characters.
+and underscores limited to a total of 64 ASCII characters.
 
 Local variables and tea variables, except row, args and version,
 are cleared after processing each replacement block.
@@ -1148,6 +1148,20 @@ get(d, "x") => 100
 get(d, "y") => 200
 #+END_SRC
 
+You can append to a dictionary by creating a new variable. In the
+following example the "a" and "str" elements are appended to the
+d dictionary.
+
+#+BEGIN_SRC
+d = dict()
+d.a = 5
+d.str = "black"
+d => {
+  "a": 5,
+  "str": "black"
+}
+#+END_SRC
+
 [[#contents][茶]]
 
 ** List
@@ -1385,7 +1399,7 @@ of which prefixes get used.
 
 You specify the prepost option with the prefix separated from the
 postfix with a comma and the postfix is optional,
-"prefix[,postfix]". A prefix and postfix contain 1 to 20 ascii
+"prefix[,postfix]". A prefix and postfix contain 1 to 20 ASCII
 characters including spaces but without control characters or
 commas.
 
@@ -1406,9 +1420,9 @@ examples:
 :CUSTOM_ID: encoding-and-line-endings
 :END:
 
-Templates are utf-8 encoded.  Two line endings are supported on
+Templates are UTF-8 encoded.  Two line endings are supported on
 all platforms: LF, and CR/LF.  Line endings are preserved.  The
-template syntax only uses ascii except unicode characters in
+template syntax only uses ASCII except unicode characters in
 strings. The maximum command line length is 1024 bytes. There is
 no limit on non-command lines.
 
@@ -1595,20 +1609,18 @@ helpme      Show the statictea help text.
    :CUSTOM_ID: stf-runner
    :END:
 
-The stf runner runs command line tests of statictea.
+The Single Test File (stf) runner is a standalone program used
+for testing command line applications. A stf file contains the
+test which the runner executes to determine whether the test
+passed. The stf file contains instructions for creating files,
+running files and comparing files. See the runner help message
+for more information about stf files.
 
-The runner is a standalone program that can test any command line
-application.  You define a test in a stf file.  The stf file
-contains instructions for creating files, running them and for
-comparing them to determine whether the test passed.
+The testfiles folder contains statictea stf files. The stf files
+are designed to look good in markdown readers.
 
-The statictea testfiles folder contains Single Test File (stf)
-files used to test statictea features. The runner command runs
-all the stf files. See the runner help message for more
-information about stf files.
-
-There are nimble tasks to run all the tests, to run one test, to
-make a new test and to list them.  See the nimble section above.
+- [[testfiles/readme.md][StaticTea Stf Files]] --- Index to the
+  stf files.
 
 [[#contents][茶]]
 

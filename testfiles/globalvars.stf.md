@@ -2,6 +2,8 @@ stf file, version 0.1.0
 
 # Global Variables
 
+Test global variables.
+
 Like local variables, you create global variables with template
 statements.  All commands have access to them and they are stored in
 the g dictionary.

@@ -208,7 +208,7 @@ proc parseJsonStr*(text: string, startPos: Natural): ParsedString =
         # Get the unicode character at pos.
         let str = utf8CharString(text, pos)
         if str.len == 0:
-          # Invalid utf-8 unicode character.
+          # Invalid UTF-8 unicode character.
           return newParsedString("", pos, wInvalidUtf8)
 
         # Add the unicode character to the result string.

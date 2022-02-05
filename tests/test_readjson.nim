@@ -37,7 +37,7 @@ proc testParseJsonStr(text: string, start: Natural,
 
   var posO = firstInvalidUtf8(literal)
   if posO.isSome:
-    echo "Invalid utf-8 bytes starting at $1." % $posO.get()
+    echo "Invalid UTF-8 bytes starting at $1." % $posO.get()
     result = false
 
 proc testParseJsonStrE(text: string, start: Natural,
@@ -395,7 +395,7 @@ she sat down in a large arm-chair at one end of the table.
     let str = bytesToString([0x1u8, 0x02, 0x03, 0x04])
     check testParseJsonStrE(str, 0, wControlNotEscaped, 0)
 
-  test "parseJsonStr invalid utf-8":
+  test "parseJsonStr invalid UTF-8":
     var str = bytesToString([0x22u8, 0x2f, 0x22])
     check testParseJsonStr(str, 1, "/", 2)
 

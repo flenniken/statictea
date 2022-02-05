@@ -387,7 +387,7 @@ statement: a = 9_223_372_036_854_775_808
     check testGetString(newStatement("""a = "hello"  """), 4,
       newStringValueAndLengthO("hello", 9))
 
-  test "getString valid utf-8":
+  test "getString valid UTF-8":
     var byteBuffers: seq[seq[uint8]] = @[
       @[0xc3u8, 0xb1],
       @[0xe2u8, 0x82, 0xa1],
