@@ -13,7 +13,9 @@ Functions that deal with Unicode.
 * [parseHexUnicode16](#parsehexunicode16) &mdash; Return the unicode number given a 4 character unicode escape string like u1234.
 * [parseHexUnicode](#parsehexunicode) &mdash; Return the unicode number given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos.
 * [codePointToString](#codepointtostring) &mdash; Convert a code point to a one character UTF-8 string.
+* [codePointsToString](#codepointstostring) &mdash; Convert a list of code points to a string.
 * [parseHexUnicodeToString](#parsehexunicodetostring) &mdash; Return the unicode string given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos.
+* [stringToCodePoints](#stringtocodepoints) &mdash; Return the string as a list of code points.
 
 # cmpString
 
@@ -79,12 +81,28 @@ Convert a code point to a one character UTF-8 string.
 func codePointToString(codePoint: int): OpResultId[string]
 ```
 
+# codePointsToString
+
+Convert a list of code points to a string.
+
+```nim
+func codePointsToString(codePoints: seq[int]): OpResultId[string]
+```
+
 # parseHexUnicodeToString
 
 Return the unicode string given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos. Pos is initially pointing at the u. On error, return the message id telling what went wrong and pos points at the error.
 
 ```nim
 func parseHexUnicodeToString(text: string; pos: var Natural): OpResultId[string]
+```
+
+# stringToCodePoints
+
+Return the string as a list of code points.
+
+```nim
+func stringToCodePoints(str: string): OpResultWarn[seq[int]]
 ```
 
 

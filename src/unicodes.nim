@@ -4,7 +4,9 @@ import std/unicode
 import std/options
 import std/strutils
 import opresultid
+import opresultwarn
 import messages
+import warnings
 import utf8decoder
 
 func cmpString*(a, b: string, insensitive: bool = false): int =
@@ -163,7 +165,7 @@ func parseHexUnicode*(text: string, pos: var Natural): OpResultId[int] =
 func codePointToString*(codePoint: int): OpResultId[string] =
   ## Convert a code point to a one character UTF-8 string.
   let i = codePoint
-  var str: string
+  var str = ""
   if i < 0x80:
     str.add(chr(i))
   elif i < 0x800:
@@ -172,6 +174,10 @@ func codePointToString*(codePoint: int): OpResultId[string] =
     # 10_xx_xxxx
     str.add(chr((i and 0b11_1111) or 0b10_00_0000))
   elif i < 0x1_0000:
+    # High surrogate is from D800 to DBFF
+    # Low surrogate is from DC00 to DFFF.
+    if (i >= 0xD800 and i <= 0xDBFF) or (i >= 0xDC00 and i <= 0xDFFF):
+      return opMessage[string](wUtf8Surrogate)
     # 1110_xxxx
     str.add(chr(i shr 12 or 0b1110_0000))
     # 10_xx_xxxx
@@ -193,6 +199,16 @@ func codePointToString*(codePoint: int): OpResultId[string] =
 
   result = opValue[string](str)
 
+func codePointsToString*(codePoints: seq[int]): OpResultId[string] =
+  ## Convert a list of code points to a string.
+  var str: string
+  for codePoint in codePoints:
+    let charStrOr = codePointToString(codePoint)
+    if charStrOr.isMessage:
+      return charStrOr
+    str.add(charStrOr.value)
+  result = opValue[string](str)
+
 func parseHexUnicodeToString*(text: string, pos: var Natural): OpResultId[string] =
   ## Return the unicode string given a 4 or 8 character unicode escape
   ## string like u1234 or u1234\u1234 and advance the pos. Pos is
@@ -203,3 +219,27 @@ func parseHexUnicodeToString*(text: string, pos: var Natural): OpResultId[string
   if numOrc.isMessage:
     return opMessage[string](numOrc.message)
   result = codePointToString(numOrc.value)
+
+func stringToCodePoints*(str: string): OpResultWarn[seq[int]] =
+  ## Return the string as a list of code points.
+  var codePoints = newSeq[int]()
+  var codePoint: uint32
+  var state: uint32 = 0
+  var byteCount = 0
+  var ix: int
+  for ix, sByte in str[0 .. str.len - 1]:
+    decode(state, codePoint, sByte)
+    if state == 12:
+      return opMessageW[seq[int]](newWarningData(wInvalidUtf8ByteSeq, $(ix-byteCount)))
+    if state == 0:
+      # 10FFFF is the maximum code point.
+      assert codePoint <= 0x10ffff
+      codePoints.add(int(codePoint))
+      byteCount = 0
+    else:
+      inc(byteCount)
+
+  if state != 0:
+    return opMessageW[seq[int]](newWarningData(wInvalidUtf8ByteSeq, $(ix-byteCount)))
+
+  result = opValueW[seq[int]](codePoints)

@@ -715,6 +715,11 @@ suite "runFunction.nim":
     let eFunResult = newFunResult(newValue("Earl"))
     check testFunction("substr", parameters, eFunResult)
 
+  test "substr unicode":
+    var parameters = @[newValue("añyóng"), newValue(1), newValue(2)]
+    let eFunResult = newFunResult(newValue("ñ"))
+    check testFunction("substr", parameters, eFunResult)
+
   test "substr 1 parameter":
     var parameters = @[newValue("big")]
     let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "1")

@@ -3,7 +3,76 @@ import std/strformat
 import std/strutils
 import unicodes
 import opresultid
+import opresultwarn
 import messages
+import warnings
+
+proc testCodePointToStringWarn(codePoint: int, eMessageId: MessageId): bool =
+  let opResultId = codePointToString(codePoint)
+  if opResultId.isValue:
+    echo "expected message, got value: " & $opResultId
+    return false
+  if opResultId.message != eMessageId:
+    echo "expected: " & $eMessageId
+    echo "     got: " & $opResultId.message
+    return false
+  result = true
+
+proc testCodePointsToString(codePoints: seq[int], eString: string): bool =
+  let opResultId = codePointsToString(codePoints)
+  if opResultId.isMessage:
+    echo "expected value, got message: " & $opResultId
+    return false
+  if opResultId.value != eString:
+    echo "expected: " & $eString
+    echo "     got: " & $opResultId.value
+    return false
+  result = true
+
+proc testCodePointsToStringWarn(codePoints: seq[int], eMessageId: MessageId): bool =
+  let opResultId = codePointsToString(codePoints)
+  if opResultId.isValue:
+    echo "expected message, got value: " & $opResultId
+    return false
+  if opResultId.message != eMessageId:
+    echo "expected: " & $eMessageId
+    echo "     got: " & $opResultId.message
+    return false
+  result = true
+
+proc testStringToCodePoints(str: string, eCodePoints: seq[int]): bool =
+  let opResultWarn = stringToCodePoints(str)
+  if opResultWarn.isMessage:
+    echo "expected value, got message: " & $opResultWarn
+    return false
+  if opResultWarn.value != eCodePoints:
+    echo "expected: " & $eCodePoints
+    echo "     got: " & $opResultWarn.value
+    return false
+  result = true
+
+proc testStringToCodePointsWarn(
+    str: string,
+    messageId: MessageId = wInvalidUtf8ByteSeq,
+    p1: string = "",
+    p2: string = ""): bool =
+  let opResultWarn = stringToCodePoints(str)
+  if opResultWarn.isValue:
+    echo "expected warning got value: " & $opResultWarn
+    return false
+  result = true
+  if opResultWarn.message.warning != messageId:
+    echo "expected: " & $opResultWarn.message.warning
+    echo "     got: " & $messageId
+    result = false
+  if opResultWarn.message.p1 != p1:
+    echo "expected: " & $opResultWarn.message.p1
+    echo "     got: " & $p1
+    result = false
+  if opResultWarn.message.p2 != p2:
+    echo "expected: " & $opResultWarn.message.p2
+    echo "     got: " & $p2
+    result = false
 
 func stringToHex*(str: string): string =
   ## Convert the string bytes to hex bytes like 34 a9 ff e2.
@@ -108,9 +177,21 @@ suite "unicodes.nim":
     check codePointToString(0x8336).value == "\xE8\x8C\xB6"
     check codePointToString(0x1D49C).value == "\xF0\x9D\x92\x9C"
     check codePointToString(0x10ffff).value == "\xF4\x8F\xBF\xBF"
+    check codePointToString(0xD7ff).value == "\ud7ff"
 
   test "codePointToString error":
     check codePointToString(0x110000).message == wCodePointTooBig
+
+    # High surrogate is from D800 to DBFF
+    # Low surrogate is from DC00 to DFFF.
+
+    # surrogates are not valid in UTF-8
+    check testCodePointToStringWarn(0xD800, wUtf8Surrogate)
+    check testCodePointToStringWarn(0xDB00, wUtf8Surrogate)
+    check testCodePointToStringWarn(0xDBFF, wUtf8Surrogate)
+    check testCodePointToStringWarn(0xDC00, wUtf8Surrogate)
+    check testCodePointToStringWarn(0xDC50, wUtf8Surrogate)
+    check testCodePointToStringWarn(0xDFFF, wUtf8Surrogate)
 
   test "parseHexUnicode16":
     check parseHexUnicode16("u1234", 0).value == 0x1234
@@ -191,3 +272,35 @@ suite "unicodes.nim":
     var pos: Natural = 5
     check parseHexUnicodeToString(r"tea \uD800", pos).message == wMissingSurrogatePair
     check pos == 10
+
+  test "stringToCodePoints":
+    check testStringToCodePoints("", newSeq[int]())
+    check testStringToCodePoints("x", @[ord('x')])
+    check testStringToCodePoints("ab", @[ord('a'), ord('b')])
+    check testStringToCodePoints("ab\u0080", @[ord('a'), ord('b'), 0x80])
+    check testStringToCodePoints("ab\u2010", @[ord('a'), ord('b'), 0x2010])
+    check testStringToCodePoints("\u{1D49C}", @[0x1D49C])
+    check testStringToCodePoints("\u{10ffff}", @[0x10ffff])
+    check testStringToCodePoints("añyóng", @[97, 241, 121, 243, 110, 103])
+
+  test "stringToCodePoints warnings":
+    check testStringToCodePointsWarn("\xff", p1 = "0")
+    check testStringToCodePointsWarn("a\xffb", p1 = "1")
+    check testStringToCodePointsWarn("01\xff", p1 = "2")
+    # Invalid two byte sequence <e0 80>.
+    check testStringToCodePointsWarn("01\xe0\x80", p1 = "2")
+    # Invalid three byte sequence <f0 80 80>.
+    check testStringToCodePointsWarn("01\xf0\x80\x80", p1 = "2")
+    # Invalid four byte sequence <f1 80 bf 77>
+    check testStringToCodePointsWarn("01\xf1\x80\xbf\x77", p1 = "2")
+
+  test "codePointsToString":
+    check testCodePointsToString(newSeq[int](), "")
+    check testCodePointsToString(@[0x31], "1")
+    check testCodePointsToString(@[0x31, 0x32], "12")
+    check testCodePointsToString(@[0x31, 0xff], "1\u00ff")
+
+  test "codePointsToString warning":
+    check testCodePointsToStringWarn(@[0x31, 0x110000], wCodePointTooBig)
+    check testCodePointsToStringWarn(@[0x31, 0xD800], wUtf8Surrogate)
+

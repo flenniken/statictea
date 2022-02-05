@@ -18,7 +18,7 @@ $statictea \
   -s=server.json \
   -j=shared.json \
   -t=tmpl.txt \
-  -r=result.html >stdout 2>stderr
+  -r=result >stdout 2>stderr
 ~~~
 
 Run a command over the log file that removes the time prefix then
@@ -93,7 +93,7 @@ hello server, hello shared
 
 You can use the filename "empty" for empty files.
 
-### Expected result.expected == result.html
-### Expected stdout.expected == stdout
-### Expected stderr.expected == stderr
-### Expected log.filtered.expected == log.filtered
+### Expected result == result.expected
+### Expected stdout == stdout.expected
+### Expected stderr == stderr.expected
+### Expected log.filtered == log.filtered.expected

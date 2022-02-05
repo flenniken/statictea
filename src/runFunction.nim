@@ -17,6 +17,7 @@ import matches
 import unicodes
 import signatures
 import funtypes
+import opresultwarn
 
 # Table of the built in functions. Each function name can have
 # multiple versions with different signatures.
@@ -775,6 +776,8 @@ func funSubstr*(parameters: seq[Value]): FunResult =
   ## @:the end position. For example, [3, 7) includes 3, 4, 5, 6. The
   ## @:end minus the start is equal to the length of the substring.
   ## @:
+  ## @:The index values are by unicode characters not bytes.
+  ## @:
   ## @:~~~
   ## @:substr(str: string, start: int, optional end: int) string
   ## @:~~~~
@@ -784,26 +787,37 @@ func funSubstr*(parameters: seq[Value]): FunResult =
   ## @:~~~
   ## @:substr("Earl Grey", 1, 4) => "arl"
   ## @:substr("Earl Grey", 6) => "rey"
+  ## @:substr("añyóng", 0, 3) => "añy"
   ## @:~~~~
 
   tMapParameters("siois")
 
   let str = map["a"].stringv
+  let codePointsOr = stringToCodePoints(str)
+  if codePointsOr.isMessage:
+    return newFunResultWarn(codePointsOr.message, 1)
+  let codePoints = codePointsOr.value
+    
   let start = map["b"].intv
   var finish: int64
   if "c" in map:
     finish = map["c"].intv
   else:
-    finish = str.len
+    finish = codePoints.len
 
   if start < 0:
     return newFunResultWarn(wInvalidPosition, 1, $start)
-  if finish > str.len:
+  if finish > codePoints.len:
     return newFunResultWarn(wInvalidPosition, 2, $finish)
   if finish < start:
     return newFunResultWarn(wEndLessThenStart, 2)
 
-  result = newFunResult(newValue(str[start .. finish-1]))
+  let slice = codePoints[start .. finish-1]
+  let opResultWarn = codePointsToString(slice)
+  if opResultWarn.isMessage:
+    return newFunResultWarn(opResultWarn.message, 2)
+    
+  result = newFunResult(newValue(opResultWarn.value))
 
 func funDup*(parameters: seq[Value]): FunResult =
   ## Duplicate a string x times.  The result is a new string built by

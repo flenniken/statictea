@@ -633,9 +633,7 @@ export statictea='../../bin/statictea'; bin/runner -f=testfiles/$1""" % filename
       if result != "":
         failed = true
         echo result
-  if failed:
-    echo "Failed"
-  else:
+  if not failed:
     echo "Success"
 
 proc runRunStfMain() =
@@ -838,10 +836,10 @@ task newstf, "\tCreate new stf as a starting point for a new test.":
     echo "Specify a name for a new stf test file."
   else:
     var (_, basename) = splitPath(name)
-    if not basename.endsWith(".stf.md"):
+    if "." in basename:
       echo "Specify a name without an extension."
     else:
-      var filename = joinPath("testfiles", basename, ".stf.md")
+      var filename = joinPath("testfiles", basename & ".stf.md")
       if fileExists(filename):
         echo "File already exists: $1" % filename
       else:

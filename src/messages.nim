@@ -156,6 +156,8 @@ type
     wBareContinue,         ## w145
     wInvalidLowSurrogate,  ## w146
     wCodePointTooBig,      ## w147
+    wInvalidUtf8ByteSeq,   ## w148
+    wUtf8Surrogate,        ## w149
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -307,5 +309,7 @@ const
     "The continue command is not part of a command.", ## wBareContinue
     "Invalid low surrogate.", ## wInvalidLowSurrogate
     "Unicode code point over the limit of 10FFFF.", ## wCodePointTooBig
+    "Invalid UTF-8 byte sequence at position $1.", ## wInvalidUtf8ByteSeq
+    "Unicode surrogate code points are invalid in UTF-8 strings.", ## wUtf8Surrogate
     ]
     ## The message text.

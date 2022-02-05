@@ -161,7 +161,9 @@ MessageId = enum
   wBareEndblock,            ## w144
   wBareContinue,            ## w145
   wInvalidLowSurrogate,     ## w146
-  wCodePointTooBig           ## w147
+  wCodePointTooBig,         ## w147
+  wInvalidUtf8ByteSeq,      ## w148
+  wUtf8Surrogate             ## w149
 ```
 
 # Messages
@@ -317,7 +319,9 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The endblock command does not have a matching block command.", ## wBareEndblock
     "The continue command is not part of a command.", ## wBareContinue
     "Invalid low surrogate.", ## wInvalidLowSurrogate
-    "Unicode code point over the limit of 10FFFF."]
+    "Unicode code point over the limit of 10FFFF.", ## wCodePointTooBig
+    "Invalid UTF-8 byte sequence at position $1.", ## wInvalidUtf8ByteSeq
+    "Unicode surrogate code points are invalid in UTF-8 strings."]
 ```
 
 

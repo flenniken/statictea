@@ -612,6 +612,8 @@ The range is half-open which includes the start position but not
 the end position. For example, [3, 7) includes 3, 4, 5, 6. The
 end minus the start is equal to the length of the substring.
 
+The index values are by unicode characters not bytes.
+
 ~~~
 substr(str: string, start: int, optional end: int) string
 ~~~~
@@ -621,6 +623,7 @@ Examples:
 ~~~
 substr("Earl Grey", 1, 4) => "arl"
 substr("Earl Grey", 6) => "rey"
+substr("añyóng", 0, 3) => "añy"
 ~~~~
 
 ```nim

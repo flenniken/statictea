@@ -5,9 +5,18 @@ Functions for decoding and validating UTF-8.
 * [utf8decoder.nim](../src/utf8decoder.nim) &mdash; Nim source code.
 # Index
 
+* [decode](#decode) &mdash; Interior part of a UTF-8 decoder.
 * [validateUtf8String](#validateutf8string) &mdash; Return the position of the first invalid UTF-8 byte in the string else return -1.
 * [sanitizeUtf8](#sanitizeutf8) &mdash; Sanitize and return the UTF-8 string.
 * [utf8CharString](#utf8charstring) &mdash; Get the unicode character at pos.
+
+# decode
+
+Interior part of a UTF-8 decoder.
+
+```nim
+proc decode(state: var uint32; codep: var uint32; sByte: char)
+```
 
 # validateUtf8String
 
