@@ -225,21 +225,124 @@ func stringToCodePoints*(str: string): OpResultWarn[seq[int]] =
   var codePoints = newSeq[int]()
   var codePoint: uint32
   var state: uint32 = 0
-  var byteCount = 0
+  var seqCount = 0
   var ix: int
   for ix, sByte in str[0 .. str.len - 1]:
     decode(state, codePoint, sByte)
     if state == 12:
-      return opMessageW[seq[int]](newWarningData(wInvalidUtf8ByteSeq, $(ix-byteCount)))
+      # Invalid UTF-8 byte sequence at position $1.
+      # todo use character position instead of byte positions here?
+      return opMessageW[seq[int]](newWarningData(wInvalidUtf8ByteSeq, $(ix-seqCount)))
     if state == 0:
       # 10FFFF is the maximum code point.
       assert codePoint <= 0x10ffff
       codePoints.add(int(codePoint))
-      byteCount = 0
+      seqCount = 0
     else:
-      inc(byteCount)
+      inc(seqCount)
 
   if state != 0:
-    return opMessageW[seq[int]](newWarningData(wInvalidUtf8ByteSeq, $(ix-byteCount)))
+    # Invalid UTF-8 byte sequence at position $1.
+    # todo use character position instead of byte positions here?
+    return opMessageW[seq[int]](newWarningData(wInvalidUtf8ByteSeq, $(ix-seqCount)))
 
   result = opValueW[seq[int]](codePoints)
+
+func slice*(str: string, start: Natural, finish: Natural): OpResultWarn[string] =
+  ## Extract a substring from a string by its Unicode character
+  ## position (not byte index). You pass the string, the substring's
+  ## start index, and its end index+1.
+  ##
+  ## The range is half-open which includes the start position but not
+  ## the end position. For example, [3, 7) includes 3, 4, 5, 6. The
+  ## end minus the start is equal to the length of the substring.
+
+  if finish == start:
+    return opValueW[string]("")
+  if finish < start:
+    # The end position is less than start position.
+    return opMessageW[string](newWarningData(wEndPosTooSmall))
+
+  var codePoint: uint32
+  var state: uint32 = 0
+
+  var seqCount = 0 # Number of bytes in the current sequence.
+  var charCount = 0 # Current number of Unicode characters.
+  var ixStartChar = -1 # Index to the start character.
+
+  # Loop through the string looking for the start and end characters.
+  for ix, sByte in str[0 .. str.len - 1]:
+    decode(state, codePoint, sByte)
+    if state == 12:
+      # Invalid UTF-8 byte sequence at position $1.
+      return opMessageW[string](newWarningData(wInvalidUtf8ByteSeq, $(charCount)))
+    if state == 0:
+      if charCount == start:
+        ixStartChar = ix - seqCount
+      inc(charCount)
+      if charCount == finish:
+        return opValueW[string](str[ixStartChar .. ix])
+      seqCount = 0
+    else:
+      inc(seqCount)
+
+  if state != 0:
+    # Invalid UTF-8 byte sequence at position $1.
+    return opMessageW[string](newWarningData(wInvalidUtf8ByteSeq, $(charCount)))
+
+  var messageId: MessageId
+  if charCount < start:
+    # The start position is greater then the number of characters in the string.
+    messageId = wStartPosTooBig
+  else:
+    # The end position is greater then the number of characters in the string.
+    messageId = wEndPosTooBig
+  result = opMessageW[string](newWarningData(messageId))
+
+func slice2*(str: string, start: Natural, length: int): OpResultWarn[string] =
+  ## Extract a substring from a string by its Unicode character
+  ## position (not byte index). You pass the string, the substring's
+  ## start index, and its length. If the length is negative, return all the
+  ## characters from start to the end of the string.
+
+  if length == 0:
+    return opValueW[string]("")
+
+  var codePoint: uint32
+  var state: uint32 = 0
+
+  var seqCount = 0 # Number of bytes in the current sequence.
+  var charCount = 0 # Current number of Unicode characters.
+  var ixStartChar = -1 # Index to the start character.
+
+  # Loop through the string looking for the start character.
+  for ix, sByte in str[0 .. str.len - 1]:
+    decode(state, codePoint, sByte)
+    if state == 12:
+      # Invalid UTF-8 byte sequence at position $1.
+      return opMessageW[string](newWarningData(wInvalidUtf8ByteSeq, $(charCount)))
+    if state == 0:
+      if charCount == start:
+        ixStartChar = ix - seqCount
+      inc(charCount)
+      if charCount == length:
+        return opValueW[string](str[ixStartChar .. ix])
+      seqCount = 0
+    else:
+      inc(seqCount)
+
+  if state != 0:
+    # Invalid UTF-8 byte sequence at position $1.
+    return opMessageW[string](newWarningData(wInvalidUtf8ByteSeq, $(charCount)))
+
+  var messageId: MessageId
+  if charCount < start:
+    # The start position is greater then the number of characters in the string.
+    messageId = wStartPosTooBig
+  elif length < 0:
+    # Return from start to the end of the string.
+    return opValueW[string](str[ixStartChar .. str.len - 1])
+  else:    
+    # The length is greater then the possible number of characters in the slice.
+    messageId = wLengthTooBig
+  result = opMessageW[string](newWarningData(messageId))

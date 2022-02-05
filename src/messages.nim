@@ -158,6 +158,10 @@ type
     wCodePointTooBig,      ## w147
     wInvalidUtf8ByteSeq,   ## w148
     wUtf8Surrogate,        ## w149
+    wEndPosTooSmall,       ## w150
+    wEndPosTooBig,         ## w151
+    wStartPosTooBig,       ## w152
+    wLengthTooBig,         ## w153
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -311,5 +315,9 @@ const
     "Unicode code point over the limit of 10FFFF.", ## wCodePointTooBig
     "Invalid UTF-8 byte sequence at position $1.", ## wInvalidUtf8ByteSeq
     "Unicode surrogate code points are invalid in UTF-8 strings.", ## wUtf8Surrogate
+    "The end position is less than start position.", ## wEndPosTooSmall
+    "The end position is greater then the number of characters in the string.", ## wEndPosTooBig
+    "The start position is greater then the number of characters in the string.", ## wStartPosTooBig
+    "The length is greater then the possible number of characters in the slice.", ## wLengthTooBig
     ]
     ## The message text.
