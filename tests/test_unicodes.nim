@@ -7,8 +7,8 @@ import opresultwarn
 import messages
 import warnings
 
-proc testSlice(str: string, start: Natural, finish: Natural, eString: string): bool =
-  let stringOr = slice(str, start, finish)
+proc testSlice(str: string, start: Natural, length: int, eString: string): bool =
+  let stringOr = slice(str, start, length)
   if stringOr.isMessage:
     echo "Expected value got message: " & $stringOr.message
     return false
@@ -18,8 +18,8 @@ proc testSlice(str: string, start: Natural, finish: Natural, eString: string): b
     return false
   return true
 
-proc testSliceWarn(str: string, start: Natural, finish: Natural, eWarn: WarningData): bool =
-  let stringOr = slice(str, start, finish)
+proc testSliceWarn(str: string, start: Natural, length: int, eWarn: WarningData): bool =
+  let stringOr = slice(str, start, length)
   if stringOr.isValue:
     echo "Expected message got value: " & $stringOr.value
     return false
@@ -331,30 +331,27 @@ suite "unicodes.nim":
     check testSlice("abc", 0, 1, "a")
     check testSlice("abc", 0, 2, "ab")
     check testSlice("abc", 0, 3, "abc")
+    check testSlice("abc", 0, -1, "abc")
 
-    check testSlice("abc", 1, 1, "")
-    check testSlice("abc", 1, 2, "b")
-    check testSlice("abc", 1, 3, "bc")
+    check testSlice("abc", 1, 0, "")
+    check testSlice("abc", 1, 1, "b")
+    check testSlice("abc", 1, 2, "bc")
+    check testSlice("abc", 1, -1, "bc")
 
-    check testSlice("abc", 2, 2, "")
-    check testSlice("abc", 2, 3, "c")
+    check testSlice("abc", 2, 0, "")
+    check testSlice("abc", 2, 1, "c")
+    check testSlice("abc", 2, -1, "c")
 
-    check testSlice("abc", 3, 3, "")
+    check testSlice("abc", 3, 0, "")
 
   test "slice warn":
     # wInvalidUtf8ByteSeq
-    # wEndPosTooSmall,       ## w150
-    # wEndPosTooBig,         ## w151
     # wStartPosTooBig,       ## w152
-    check testSliceWarn("abc", 1, 0, newWarningData(wEndPosTooSmall))
-    check testSliceWarn("abc", 2, 0, newWarningData(wEndPosTooSmall))
-    check testSliceWarn("abc", 2, 1, newWarningData(wEndPosTooSmall))
+    # wLengthTooBig,         ## w153
 
-    check testSliceWarn("abc", 0, 4, newWarningData(wEndPosTooBig))
-    check testSliceWarn("abc", 1, 4, newWarningData(wEndPosTooBig))
-    check testSliceWarn("abc", 2, 4, newWarningData(wEndPosTooBig))
-
-    check testStringToCodePoints("añyóng", @[97, 241, 121, 243, 110, 103])
+    check testSliceWarn("abc", 0, 4, newWarningData(wLengthTooBig))
+    check testSliceWarn("abc", 1, 3, newWarningData(wLengthTooBig))
+    check testSliceWarn("abc", 2, 2, newWarningData(wLengthTooBig))
 
   test "slice two byte":
     let str = "\xc2\xa9"
@@ -373,6 +370,14 @@ suite "unicodes.nim":
     check testSlice(str, 0, 1, "\xc2\xa9")
     check testSlice(str, 0, 2, "\xc2\xa9\xe2\x80\x90")
     check testSlice(str, 0, 3, str)
+    check testSlice(str, 0, -1, str)
+
+    check testSlice(str, 1, 1, "\xe2\x80\x90")
+    check testSlice(str, 1, 2, "\xe2\x80\x90\xF0\x9D\x92\x9C")
+    check testSlice(str, 1, -1, "\xe2\x80\x90\xF0\x9D\x92\x9C")
+
+    check testSlice(str, 2, 1, "\xF0\x9D\x92\x9C")
+    check testSlice(str, 2, -1, "\xF0\x9D\x92\x9C")
 
   test "slice before invalid":
     check testSlice("a\xff", 0, 1, "a")
@@ -380,10 +385,10 @@ suite "unicodes.nim":
   test "slice wInvalidUtf8ByteSeq":
     check testSliceWarn("\xff", 0, 1, newWarningData(wInvalidUtf8ByteSeq, "0"))
     check testSliceWarn("a\xff", 0, 2, newWarningData(wInvalidUtf8ByteSeq, "1"))
-    check testSliceWarn("a\xff", 1, 2, newWarningData(wInvalidUtf8ByteSeq, "1"))
+    check testSliceWarn("a\xff", 1, 1, newWarningData(wInvalidUtf8ByteSeq, "1"))
 
     var str = "\xc2\xa9\xe2\x80\x90\xF0\x9D\x92\x9C\xff"
-    check testSliceWarn(str, 3, 4, newWarningData(wInvalidUtf8ByteSeq, "3"))
+    check testSliceWarn(str, 3, 1, newWarningData(wInvalidUtf8ByteSeq, "3"))
 
     str = "\xc2\xa9\xe2\x80\x90\xF0\x9D\x92\xc0a"
     check testSliceWarn(str, 0, 4, newWarningData(wInvalidUtf8ByteSeq, "2"))
@@ -393,6 +398,5 @@ suite "unicodes.nim":
 
   test "slice mult-byte warn pos":
     let str = "\xc2\xa9\xe2\x80\x90\xF0\x9D\x92\x9C" # 3 unicode characters
-    check testSliceWarn(str, 2, 1, newWarningData(wEndPosTooSmall))
-    check testSliceWarn(str, 0, 5, newWarningData(wEndPosTooBig))
-    check testSliceWarn(str, 4, 5, newWarningData(wStartPosTooBig))
+    check testSliceWarn(str, 0, 4, newWarningData(wLengthTooBig))
+    check testSliceWarn(str, 4, 1, newWarningData(wStartPosTooBig))
