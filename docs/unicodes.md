@@ -16,6 +16,7 @@ Functions that deal with Unicode.
 * [codePointsToString](#codepointstostring) &mdash; Convert a list of code points to a string.
 * [parseHexUnicodeToString](#parsehexunicodetostring) &mdash; Return the unicode string given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos.
 * [stringToCodePoints](#stringtocodepoints) &mdash; Return the string as a list of code points.
+* [slice](#slice) &mdash; Extract a substring from a string by its Unicode character position (not byte index).
 
 # cmpString
 
@@ -103,6 +104,14 @@ Return the string as a list of code points.
 
 ```nim
 func stringToCodePoints(str: string): OpResultWarn[seq[int]]
+```
+
+# slice
+
+Extract a substring from a string by its Unicode character position (not byte index). You pass the string, the substring's start index, and its length. If the length is negative, return all the characters from start to the end of the string.
+
+```nim
+func slice(str: string; start: int; length: int): OpResultWarn[string]
 ```
 
 

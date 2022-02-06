@@ -38,12 +38,12 @@ $$ :   "skConst", "const: ", +
 $$ :   "skMacro", "macro: ")
 $$ : newEntry.type = case(entry.type, cases, "")
 $$ : desc = get(entry, "description", "")
-$$ : sentence = substr(desc, 0, add(find(desc, ".", -1), 1))
+$$ : sentence = slice(desc, 0, add(find(desc, ".", -1), 1))
 $$ : newEntry.short = replaceRe(sentence, g.patterns)
 $$ : newEntry.description = replaceRe(desc, g.patterns)
 $$ : code = replaceRe(entry.code, "[ ]*$", "")
 $$ : pos = find(code, " {", len(code))
-$$ : newEntry.signature = substr(code, 0, pos)
+$$ : newEntry.signature = slice(code, 0, pos)
 $$ : newEntry.anchor = get(g.anchors, t.row)
 $$ : g.entries &= newEntry
 $$ endblock

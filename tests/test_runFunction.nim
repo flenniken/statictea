@@ -21,6 +21,9 @@ proc testFunction(functionName: string, parameters: seq[Value],
   ): bool =
 
   let functionSpecO = getFunction(functionName, parameters)
+  if not functionSpecO.isSome:
+    echo "The function doesn't exist: " & functionName
+    return false
   let functionSpec = functionSpecO.get()
   let funResult = functionSpec.functionPtr(parameters)
 
@@ -705,60 +708,56 @@ suite "runFunction.nim":
     let eFunResult = newFunResultWarn(kWrongType, 1, "string", "float")
     check testFunction("find", parameters, eFunResult)
 
-  test "substr Grey":
+  test "slice Grey":
     var parameters = @[newValue("Earl Grey"), newValue(5)]
     let eFunResult = newFunResult(newValue("Grey"))
-    check testFunction("substr", parameters, eFunResult)
+    check testFunction("slice", parameters, eFunResult)
 
-  test "substr Earl":
+  test "slice Earl":
     var parameters = @[newValue("Earl Grey"), newValue(0), newValue(4)]
     let eFunResult = newFunResult(newValue("Earl"))
-    check testFunction("substr", parameters, eFunResult)
+    check testFunction("slice", parameters, eFunResult)
 
-  test "substr unicode":
-    var parameters = @[newValue("añyóng"), newValue(1), newValue(2)]
+  test "slice unicode":
+    var parameters = @[newValue("añyóng"), newValue(1), newValue(1)]
     let eFunResult = newFunResult(newValue("ñ"))
-    check testFunction("substr", parameters, eFunResult)
+    check testFunction("slice", parameters, eFunResult)
 
-  test "substr 1 parameter":
+  test "slice 1 parameter":
     var parameters = @[newValue("big")]
     let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "1")
-    check testFunction("substr", parameters, eFunResult)
+    check testFunction("slice", parameters, eFunResult)
 
-  test "substr 1 not string":
+  test "slice 1 not string":
     var parameters = @[newValue(4), newValue(4)]
     let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
-    check testFunction("substr", parameters, eFunResult)
+    check testFunction("slice", parameters, eFunResult)
 
-  test "substr 2 not int":
+  test "slice 2 not int":
     var parameters = @[newValue("tasdf"), newValue("dsa")]
     let eFunResult = newFunResultWarn(kWrongType, 1, "int", "string")
-    check testFunction("substr", parameters, eFunResult)
+    check testFunction("slice", parameters, eFunResult)
 
-  test "substr 3 not int":
+  test "slice 3 not int":
     var parameters = @[newValue("tasdf"), newValue(0), newValue("tasdf")]
     let eFunResult = newFunResultWarn(kWrongType, 2, "int", "string")
-    check testFunction("substr", parameters, eFunResult)
+    check testFunction("slice", parameters, eFunResult)
 
-  test "substr start < 0":
-    var parameters = @[newValue("tasdf"), newValue(-2), newValue(0)]
-    let eFunResult = newFunResultWarn(wInvalidPosition, 1, "-2")
-    check testFunction("substr", parameters, eFunResult)
+  test "slice start < 0":
+    var parameters = @[newValue("tasdf"), newValue(-2), newValue(1)]
+    # todo: bubble the error parameter up?
+    let eFunResult = newFunResultWarn(wStartPosTooSmall, 0)
+    check testFunction("slice", parameters, eFunResult)
 
-  test "substr finish > len":
+  test "slice length too big":
     var parameters = @[newValue("tasdf"), newValue(0), newValue(10)]
-    let eFunResult = newFunResultWarn(wInvalidPosition, 2, "10")
-    check testFunction("substr", parameters, eFunResult)
+    let eFunResult = newFunResultWarn(wLengthTooBig, 0)
+    check testFunction("slice", parameters, eFunResult)
 
-  test "substr finish < start":
-    var parameters = @[newValue("tasdf"), newValue(3), newValue(2)]
-    let eFunResult = newFunResultWarn(wEndLessThenStart, 2)
-    check testFunction("substr", parameters, eFunResult)
-
-  test "substr nothing":
-    var parameters = @[newValue("tasdf"), newValue(3), newValue(3)]
+  test "slice nothing":
+    var parameters = @[newValue("tasdf"), newValue(3), newValue(0)]
     let eFunResult = newFunResult(newValue(""))
-    check testFunction("substr", parameters, eFunResult)
+    check testFunction("slice", parameters, eFunResult)
 
   test "dup":
     var parameters = @[newValue("-"), newValue(5)]

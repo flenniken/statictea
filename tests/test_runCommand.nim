@@ -576,11 +576,6 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     check testRunStatement(statement, variables,
       eVariableDataO = some(newVariableData("str", newValue("testing"))))
 
-  # test "runStatement nested":
-  #   let statement = newStatement(text="""signature = replaceRe(substr(code, 0, pos), "\bFunResult\b", "RunResult_")""", lineNum=1, 0)
-  #   var variables = emptyVariables()
-  #   check testRunStatement(statement, variables,
-
   test "runStatement set log":
     let statement = newStatement(text="""t.output = "log" """, lineNum=1, 0)
     var variables = emptyVariables()

@@ -248,7 +248,7 @@ func stringToCodePoints*(str: string): OpResultWarn[seq[int]] =
 
   result = opValueW[seq[int]](codePoints)
 
-func slice*(str: string, start: Natural, length: int): OpResultWarn[string] =
+func slice*(str: string, start: int, length: int): OpResultWarn[string] =
   ## Extract a substring from a string by its Unicode character
   ## position (not byte index). You pass the string, the substring's
   ## start index, and its length. If the length is negative, return all the
@@ -256,6 +256,10 @@ func slice*(str: string, start: Natural, length: int): OpResultWarn[string] =
 
   if length == 0:
     return opValueW[string]("")
+
+  if start < 0:
+    # The start position is less than 0.
+    return opMessageW[string](newWarningData(wStartPosTooSmall))
 
   var codePoint: uint32
   var state: uint32 = 0

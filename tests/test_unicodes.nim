@@ -7,7 +7,7 @@ import opresultwarn
 import messages
 import warnings
 
-proc testSlice(str: string, start: Natural, length: int, eString: string): bool =
+proc testSlice(str: string, start: int, length: int, eString: string): bool =
   let stringOr = slice(str, start, length)
   if stringOr.isMessage:
     echo "Expected value got message: " & $stringOr.message
@@ -18,7 +18,7 @@ proc testSlice(str: string, start: Natural, length: int, eString: string): bool 
     return false
   return true
 
-proc testSliceWarn(str: string, start: Natural, length: int, eWarn: WarningData): bool =
+proc testSliceWarn(str: string, start: int, length: int, eWarn: WarningData): bool =
   let stringOr = slice(str, start, length)
   if stringOr.isValue:
     echo "Expected message got value: " & $stringOr.value
@@ -345,13 +345,10 @@ suite "unicodes.nim":
     check testSlice("abc", 3, 0, "")
 
   test "slice warn":
-    # wInvalidUtf8ByteSeq
-    # wStartPosTooBig,       ## w152
-    # wLengthTooBig,         ## w153
-
     check testSliceWarn("abc", 0, 4, newWarningData(wLengthTooBig))
     check testSliceWarn("abc", 1, 3, newWarningData(wLengthTooBig))
     check testSliceWarn("abc", 2, 2, newWarningData(wLengthTooBig))
+    check testSliceWarn("abc", -1, 2, newWarningData(wStartPosTooSmall))
 
   test "slice two byte":
     let str = "\xc2\xa9"

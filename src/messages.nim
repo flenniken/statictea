@@ -162,6 +162,7 @@ type
     wEndPosTooBig,         ## w151
     wStartPosTooBig,       ## w152
     wLengthTooBig,         ## w153
+    wStartPosTooSmall,     ## w154
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -319,5 +320,7 @@ const
     "The end position is greater then the number of characters in the string.", ## wEndPosTooBig
     "The start position is greater then the number of characters in the string.", ## wStartPosTooBig
     "The length is greater then the possible number of characters in the slice.", ## wLengthTooBig
+    "The start position is less than 0.", ## wStartPosTooSmall
+
     ]
     ## The message text.

@@ -23,7 +23,7 @@ $$ : fullPath = get(entry, "filename", "")
 $$ : path = path(fullPath, "/")
 $$ : mdName = concat(path.basename, ".md")
 $$ : description = get(entry, "description", "")
-$$ : short = substr(description, 0, add(find(description, ".", -1), 1))
+$$ : short = slice(description, 0, add(find(description, ".", -1), 1))
 * [{path.filename}]({mdName}) &mdash; {short}
 
 $$ # Show the module dependency svg file. Using img so we can resize

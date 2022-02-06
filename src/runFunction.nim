@@ -766,58 +766,40 @@ func funFind*(parameters: seq[Value]): FunResult =
   else:
     result = newFunResult(newValue(pos))
 
-func funSubstr*(parameters: seq[Value]): FunResult =
+func funSlice*(parameters: seq[Value]): FunResult =
   ## Extract a substring from a string by its position. You pass the
-  ## @:string, the substring's start index then its end index+1.
-  ## @:The end index is optional and defaults to the end of the
-  ## @:string+1.
+  ## @:string, the substring's start index and its length.  The length
+  ## @:is optional. When not specified, the slice returns the characters
+  ## @:from the start to the end of the string.
   ## @:
-  ## @:The range is half-open which includes the start position but not
-  ## @:the end position. For example, [3, 7) includes 3, 4, 5, 6. The
-  ## @:end minus the start is equal to the length of the substring.
-  ## @:
-  ## @:The index values are by unicode characters not bytes.
+  ## @:The start index is by unicode characters not bytes.
   ## @:
   ## @:~~~
-  ## @:substr(str: string, start: int, optional end: int) string
+  ## @:slice(str: string, start: int, optional length: int) string
   ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:substr("Earl Grey", 1, 4) => "arl"
-  ## @:substr("Earl Grey", 6) => "rey"
-  ## @:substr("añyóng", 0, 3) => "añy"
+  ## @:slice("Earl Grey", 1, 3) => "arl"
+  ## @:slice("Earl Grey", 6) => "rey"
+  ## @:slice("añyóng", 0, 3) => "añy"
   ## @:~~~~
 
   tMapParameters("siois")
 
   let str = map["a"].stringv
-  let codePointsOr = stringToCodePoints(str)
-  if codePointsOr.isMessage:
-    return newFunResultWarn(codePointsOr.message, 1)
-  let codePoints = codePointsOr.value
-    
-  let start = map["b"].intv
-  var finish: int64
+  let start = int(map["b"].intv)
+  var length: int
   if "c" in map:
-    finish = map["c"].intv
+    length = int(map["c"].intv)
   else:
-    finish = codePoints.len
+    length = -1
 
-  if start < 0:
-    return newFunResultWarn(wInvalidPosition, 1, $start)
-  if finish > codePoints.len:
-    return newFunResultWarn(wInvalidPosition, 2, $finish)
-  if finish < start:
-    return newFunResultWarn(wEndLessThenStart, 2)
-
-  let slice = codePoints[start .. finish-1]
-  let opResultWarn = codePointsToString(slice)
-  if opResultWarn.isMessage:
-    return newFunResultWarn(opResultWarn.message, 2)
-    
-  result = newFunResult(newValue(opResultWarn.value))
+  let stringOr = slice(str, start, length)
+  if stringOr.isMessage:
+    return newFunResultWarn(stringOr.message)
+  result = newFunResult(newValue(stringOr.value))
 
 func funDup*(parameters: seq[Value]): FunResult =
   ## Duplicate a string x times.  The result is a new string built by
@@ -1694,7 +1676,7 @@ const
     ("float", funFloat_if, "if"),
     ("float", funFloat_sf, "sf"),
     ("find", funFind, "ssoaa"),
-    ("substr", funSubstr, "siois"),
+    ("slice", funSlice, "siois"),
     ("dup", funDup, "sis"),
     ("dict", funDict, "oSAd"),
     ("list", funList, "oAl"),
