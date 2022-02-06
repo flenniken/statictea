@@ -12,19 +12,18 @@ import utf8decoder
 type
   Utf8ByteSeq* = object
     ## Holds one information about one UTF-8 byte sequence.
-    str*: string
     ixStartChar*: int
     ixEndChar*: int
     codePoint*: uint32
     invalid*: bool
 
-func newUtf8ByteSeq(str: string, ixStartChar: int, ixEndChar: int,
+func newUtf8ByteSeq(ixStartChar: int, ixEndChar: int,
     codePoint: uint32): Utf8ByteSeq =
-  result = Utf8ByteSeq(str: str, ixStartChar: ixStartChar,
+  result = Utf8ByteSeq(ixStartChar: ixStartChar,
     ixEndChar: ixEndChar, codePoint: codePoint, invalid: false)
 
-func newUtf8ByteSeqInvalid(str: string, ixStartChar: int, ixEndChar: int): Utf8ByteSeq =
-  result = Utf8ByteSeq(str: str, ixStartChar: ixStartChar,
+func newUtf8ByteSeqInvalid(ixStartChar: int, ixEndChar: int): Utf8ByteSeq =
+  result = Utf8ByteSeq(ixStartChar: ixStartChar,
     ixEndChar: ixEndChar, codePoint: 0, invalid: true)
 
 iterator yieldUtf8Chars*(str: string): Utf8ByteSeq =
@@ -42,17 +41,17 @@ iterator yieldUtf8Chars*(str: string): Utf8ByteSeq =
     decode(state, codePoint, sByte)
     if state == 12:
       # Invalid UTF-8 byte sequence at position {ixStartChar}.
-      yield newUtf8ByteSeqInvalid(str[ixStartChar .. ix], ixStartChar, ix)
+      yield newUtf8ByteSeqInvalid(ixStartChar, ix)
       ixStartChar = ix + 1
       state = 0
       codePoint = 0
     elif state == 0:
-      yield newUtf8ByteSeq(str[ixStartChar .. ix], ixStartChar, ix, codePoint)
+      yield newUtf8ByteSeq(ixStartChar, ix, codePoint)
       ixStartChar = ix + 1
 
   if state != 0:
     # Invalid UTF-8 byte sequence at position {ixStartChar}.
-    yield newUtf8ByteSeqInvalid(str[ixStartChar .. ix], ixStartChar, ix)
+    yield newUtf8ByteSeqInvalid(ixStartChar, ix)
 
 func cmpString*(a, b: string, insensitive: bool = false): int =
   ## Compares two UTF-8 strings a and b.  When a equals b return 0,
