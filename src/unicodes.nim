@@ -9,49 +9,36 @@ import messages
 import warnings
 import utf8decoder
 
-type
-  Utf8ByteSeq* = object
-    ## Holds one information about one UTF-8 byte sequence.
-    ixStartChar*: int
-    ixEndChar*: int
-    codePoint*: uint32
-    invalid*: bool
-
-func newUtf8ByteSeq(ixStartChar: int, ixEndChar: int,
-    codePoint: uint32): Utf8ByteSeq =
-  result = Utf8ByteSeq(ixStartChar: ixStartChar,
-    ixEndChar: ixEndChar, codePoint: codePoint, invalid: false)
-
-func newUtf8ByteSeqInvalid(ixStartChar: int, ixEndChar: int): Utf8ByteSeq =
-  result = Utf8ByteSeq(ixStartChar: ixStartChar,
-    ixEndChar: ixEndChar, codePoint: 0, invalid: true)
-
-iterator yieldUtf8Chars*(str: string): Utf8ByteSeq =
+iterator yieldUtf8Chars*(str: string, ixStartChar: var int,
+    ixEndChar: var int, codePoint: var uint32): bool =
   ## Iterate through the UTF-8 character byte sequences of the string.
+  ## @:For each character set ixStartChar, ixEndChar, and codePoint.
+  ## @:Return true when the bytes sequence is valid else return false.
+  ## @:
+  ## @:Current byte sequence: str[ixStartChar .. ixEndChar]
+  ## @:Current code point: codePoint
   ## @:
   ## @:A UTF-8 character is a one to four byte sequence.
 
-  # Index in the string to the start of the current character.
-  var ixStartChar = 0
-
-  var codePoint: uint32 = 0
+  ixStartChar = 0
+  ixEndChar = 0
+  codePoint = 0
   var state: uint32 = 0
-  var ix: int
   for ix, sByte in str:
+    ixEndChar = ix
     decode(state, codePoint, sByte)
     if state == 12:
-      # Invalid UTF-8 byte sequence at position {ixStartChar}.
-      yield newUtf8ByteSeqInvalid(ixStartChar, ix)
-      ixStartChar = ix + 1
+      yield false
       state = 0
       codePoint = 0
     elif state == 0:
-      yield newUtf8ByteSeq(ixStartChar, ix, codePoint)
-      ixStartChar = ix + 1
+      yield true
+    else:
+      continue
+    ixStartChar = ix + 1
 
   if state != 0:
-    # Invalid UTF-8 byte sequence at position {ixStartChar}.
-    yield newUtf8ByteSeqInvalid(ixStartChar, ix)
+    yield false
 
 func cmpString*(a, b: string, insensitive: bool = false): int =
   ## Compares two UTF-8 strings a and b.  When a equals b return 0,
@@ -81,8 +68,11 @@ func cmpString*(a, b: string, insensitive: bool = false): int =
 
 func stringLen*(str: string): Natural =
   ## Return the number of unicode characters in the string (not
-  ## bytes). If there are invalid byte sequences they are counted too.
-  for _ in yieldUtf8Chars(str):
+  ## bytes). If there are invalid byte sequences, they are counted too.
+  var ixStartChar: int
+  var ixEndChar: int
+  var codePoint: uint32
+  for _ in yieldUtf8Chars(str, ixStartChar, ixEndChar, codePoint):
     inc(result)
 
 func githubAnchor*(name: string): string =
@@ -263,13 +253,16 @@ func parseHexUnicodeToString*(text: string, pos: var Natural): OpResultId[string
 func stringToCodePoints*(str: string): OpResultWarn[seq[uint32]] =
   ## Return the string as a list of code points.
   var codePoints = newSeq[uint32]()
-  for utf8Chars in yieldUtf8Chars(str):
-    if utf8Chars.invalid:
-      # Invalid UTF-8 byte sequence at position {utf8Chars.ixStartChar}.
+  var ixStartChar: int
+  var ixEndChar: int
+  var codePoint: uint32
+  for valid in yieldUtf8Chars(str, ixStartChar, ixEndChar, codePoint):
+    if not valid:
+      # Invalid UTF-8 byte sequence at position {ixStartChar}.
       # todo use character position instead of byte positions here?
       return opMessageW[seq[uint32]](newWarningData(wInvalidUtf8ByteSeq,
-        $(utf8Chars.ixStartChar)))
-    codePoints.add(utf8Chars.codePoint)
+        $(ixStartChar)))
+    codePoints.add(codePoint)
   result = opValueW[seq[uint32]](codePoints)
 
 func slice*(str: string, start: int, length: int): OpResultWarn[string] =
@@ -288,16 +281,19 @@ func slice*(str: string, start: int, length: int): OpResultWarn[string] =
   var charCount = 0 # Current number of Unicode characters.
   var ixStartSlice = 0 # Index to the start of the slice.
 
-  for utf8Chars in yieldUtf8Chars(str):
-    if utf8Chars.invalid:
+  var ixStartChar: int
+  var ixEndChar: int
+  var codePoint: uint32
+  for valid in yieldUtf8Chars(str, ixStartChar, ixEndChar, codePoint):
+    if not valid:
       # Invalid UTF-8 byte sequence at position $1.
       return opMessageW[string](newWarningData(wInvalidUtf8ByteSeq, $(charCount)))
     else:
       if charCount == start:
-        ixStartSlice = utf8Chars.ixStartChar
+        ixStartSlice = ixStartChar
       inc(charCount)
       if length > 0 and charCount == start + length:
-        return opValueW[string](str[ixStartSlice .. utf8Chars.ixEndChar])
+        return opValueW[string](str[ixStartSlice .. ixEndChar])
 
   var messageId: MessageId
   if charCount < start:
