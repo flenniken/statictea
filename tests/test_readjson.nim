@@ -11,6 +11,7 @@ import readjson
 import messages
 import tostring
 import unicodes
+import utf8decoder
 
 proc testParseJsonStr(text: string, start: Natural,
     eStr: string, eLength: Natural): bool =
@@ -35,9 +36,9 @@ proc testParseJsonStr(text: string, start: Natural,
     echo "     got length: $1" % [$length]
     result = false
 
-  var posO = firstInvalidUtf8(literal)
-  if posO.isSome:
-    echo "Invalid UTF-8 bytes starting at $1." % $posO.get()
+  var pos = validateUtf8String(literal)
+  if pos != -1:
+    echo "Invalid UTF-8 bytes starting at $1." % $pos
     result = false
 
 proc testParseJsonStrE(text: string, start: Natural,

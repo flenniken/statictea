@@ -9,6 +9,51 @@ import messages
 import warnings
 import utf8decoder
 
+type
+  Utf8ByteSeq* = object
+    ## Holds one information about one UTF-8 byte sequence.
+    str*: string
+    ixStartChar*: int
+    ixEndChar*: int
+    codePoint*: uint32
+    invalid*: bool
+
+func newUtf8ByteSeq(str: string, ixStartChar: int, ixEndChar: int,
+    codePoint: uint32): Utf8ByteSeq =
+  result = Utf8ByteSeq(str: str, ixStartChar: ixStartChar,
+    ixEndChar: ixEndChar, codePoint: codePoint, invalid: false)
+
+func newUtf8ByteSeqInvalid(str: string, ixStartChar: int, ixEndChar: int): Utf8ByteSeq =
+  result = Utf8ByteSeq(str: str, ixStartChar: ixStartChar,
+    ixEndChar: ixEndChar, codePoint: 0, invalid: true)
+
+iterator yieldUtf8Chars*(str: string): Utf8ByteSeq =
+  ## Iterate through the UTF-8 character byte sequences of the string.
+  ## @:
+  ## @:A UTF-8 character is a one to four byte sequence.
+
+  # Index in the string to the start of the current character.
+  var ixStartChar = 0
+
+  var codePoint: uint32 = 0
+  var state: uint32 = 0
+  var ix: int
+  for ix, sByte in str:
+    decode(state, codePoint, sByte)
+    if state == 12:
+      # Invalid UTF-8 byte sequence at position {ixStartChar}.
+      yield newUtf8ByteSeqInvalid(str[ixStartChar .. ix], ixStartChar, ix)
+      ixStartChar = ix + 1
+      state = 0
+      codePoint = 0
+    elif state == 0:
+      yield newUtf8ByteSeq(str[ixStartChar .. ix], ixStartChar, ix, codePoint)
+      ixStartChar = ix + 1
+
+  if state != 0:
+    # Invalid UTF-8 byte sequence at position {ixStartChar}.
+    yield newUtf8ByteSeqInvalid(str[ixStartChar .. ix], ixStartChar, ix)
+
 func cmpString*(a, b: string, insensitive: bool = false): int =
   ## Compares two UTF-8 strings a and b.  When a equals b return 0,
   ## when a is greater than b return 1 and when a is less than b
@@ -37,8 +82,9 @@ func cmpString*(a, b: string, insensitive: bool = false): int =
 
 func stringLen*(str: string): Natural =
   ## Return the number of unicode characters in the string (not
-  ## bytes).
-  result = runeLen(str)
+  ## bytes). If there are invalid byte sequences they are counted too.
+  for _ in yieldUtf8Chars(str):
+    inc(result)
 
 func githubAnchor*(name: string): string =
   ## Convert the name to a github anchor name.
@@ -76,20 +122,13 @@ func bytesToString*(buffer: openArray[uint8|char]): string =
   for ix in 0 .. buffer.len-1:
     result.add((char)buffer[ix])
 
-func firstInvalidUtf8*(str: string): Option[int] =
-  ## Return the position of the first invalid UTF-8 byte in the string
-  ## if any.
-  var pos = validateUtf8String(str)
-  if pos != -1:
-    result = some(pos)
-
-func parseHexUnicode16*(text: string, start: Natural): OpResultId[int] =
+func parseHexUnicode16*(text: string, start: Natural): OpResultId[uint32] =
   ## Return the unicode number given a 4 character unicode escape
   ## string like u1234. Start is pointing at the u. On error, return a
   ## message id telling what went wrong.
 
   if start + 5 > text.len:
-    return opMessage[int](wFourHexDigits)
+    return opMessage[uint32](wFourHexDigits)
 
   var pos = start
   inc(pos)
@@ -109,15 +148,16 @@ func parseHexUnicode16*(text: string, start: Natural): OpResultId[int] =
       num = num or ((digitOrd - int(ord('A')) + 10) shl shift)
     else:
       # A \u must be followed by 4 hex digits.
-      return opMessage[int](wFourHexDigits)
+      return opMessage[uint32](wFourHexDigits)
     inc(pos)
-  result = opValue[int](num)
+  result = opValue[uint32](uint32(num))
 
-func parseHexUnicode*(text: string, pos: var Natural): OpResultId[int] =
+func parseHexUnicode*(text: string, pos: var Natural): OpResultId[uint32] =
   ## Return the unicode number given a 4 or 8 character unicode escape
-  ## string like u1234 or u1234\u1234 and advance the pos. Pos is
-  ## initially pointing at the u. On error, return the message id
-  ## telling what went wrong and pos points at the error.
+  ## string. For example like u1234 or u1234\u1234. Advance the pos
+  ## past the end of the escape string. Pos is initially pointing at
+  ## the u. On error, return the message id telling what went wrong
+  ## and pos points at the error.
 
   # Get the hex value.
   let numOrc = parseHexUnicode16(text, pos)
@@ -131,12 +171,12 @@ func parseHexUnicode*(text: string, pos: var Natural): OpResultId[int] =
   # The first 16 can be anything but a low surrogate.
   if num >= 0xDC00 and num <= 0xDFFF:
     # You cannot use a low surrogate by itself or first in a pair.
-    return opMessage[int](wLowSurrogateFirst)
+    return opMessage[uint32](wLowSurrogateFirst)
   pos += 5
 
   # If not a high surrogate character, return it.
   if num < 0xD800 or num > 0xDBFF:
-    return opValue[int](num)
+    return opValue[uint32](num)
 
   # The value is a high surrogate, we needed a low surrogate to make a
   # pair.
@@ -144,7 +184,7 @@ func parseHexUnicode*(text: string, pos: var Natural): OpResultId[int] =
 
   if pos + 6 > text.len or text[pos] != '\\' or text[pos+1] != 'u':
     # Missing the low surrogate.
-    return opMessage[int](wMissingSurrogatePair)
+    return opMessage[uint32](wMissingSurrogatePair)
 
   inc(pos)
 
@@ -156,13 +196,13 @@ func parseHexUnicode*(text: string, pos: var Natural): OpResultId[int] =
   # Make sure we got a low surrogate.
   if lowSurrogate < 0xDC00 or lowSurrogate > 0xDFFF:
     # Invalid low surrogate.
-    return opMessage[int](wInvalidLowSurrogate)
+    return opMessage[uint32](wInvalidLowSurrogate)
 
   pos += 5
   let codePoint = 0x10000 + (((highSurrogate - 0xd800) shl 10) or (lowSurrogate - 0xdc00))
-  result = opValue[int](codePoint)
+  result = opValue[uint32](codePoint)
 
-func codePointToString*(codePoint: int): OpResultId[string] =
+func codePointToString*(codePoint: uint32): OpResultId[string] =
   ## Convert a code point to a one character UTF-8 string.
   let i = codePoint
   var str = ""
@@ -199,7 +239,7 @@ func codePointToString*(codePoint: int): OpResultId[string] =
 
   result = opValue[string](str)
 
-func codePointsToString*(codePoints: seq[int]): OpResultId[string] =
+func codePointsToString*(codePoints: seq[uint32]): OpResultId[string] =
   ## Convert a list of code points to a string.
   var str: string
   for codePoint in codePoints:
@@ -210,43 +250,28 @@ func codePointsToString*(codePoints: seq[int]): OpResultId[string] =
   result = opValue[string](str)
 
 func parseHexUnicodeToString*(text: string, pos: var Natural): OpResultId[string] =
-  ## Return the unicode string given a 4 or 8 character unicode escape
-  ## string like u1234 or u1234\u1234 and advance the pos. Pos is
-  ## initially pointing at the u. On error, return the message id
-  ## telling what went wrong and pos points at the error.
+  ## Return a one character string given a 4 or 8 character unicode
+  ## escape string. For example like u1234 or u1234\u1234. Advance the
+  ## pos past the end of the escape string. Pos is initially pointing
+  ## at the u. On error, return the message id telling what went wrong
+  ## and pos points at the error.
 
   let numOrc = parseHexUnicode(text, pos)
   if numOrc.isMessage:
     return opMessage[string](numOrc.message)
   result = codePointToString(numOrc.value)
 
-func stringToCodePoints*(str: string): OpResultWarn[seq[int]] =
+func stringToCodePoints*(str: string): OpResultWarn[seq[uint32]] =
   ## Return the string as a list of code points.
-  var codePoints = newSeq[int]()
-  var codePoint: uint32
-  var state: uint32 = 0
-  var seqCount = 0
-  var ix: int
-  for ix, sByte in str[0 .. str.len - 1]:
-    decode(state, codePoint, sByte)
-    if state == 12:
-      # Invalid UTF-8 byte sequence at position $1.
+  var codePoints = newSeq[uint32]()
+  for utf8Chars in yieldUtf8Chars(str):
+    if utf8Chars.invalid:
+      # Invalid UTF-8 byte sequence at position {utf8Chars.ixStartChar}.
       # todo use character position instead of byte positions here?
-      return opMessageW[seq[int]](newWarningData(wInvalidUtf8ByteSeq, $(ix-seqCount)))
-    if state == 0:
-      # 10FFFF is the maximum code point.
-      assert codePoint <= 0x10ffff
-      codePoints.add(int(codePoint))
-      seqCount = 0
-    else:
-      inc(seqCount)
-
-  if state != 0:
-    # Invalid UTF-8 byte sequence at position $1.
-    # todo use character position instead of byte positions here?
-    return opMessageW[seq[int]](newWarningData(wInvalidUtf8ByteSeq, $(ix-seqCount)))
-
-  result = opValueW[seq[int]](codePoints)
+      return opMessageW[seq[uint32]](newWarningData(wInvalidUtf8ByteSeq,
+        $(utf8Chars.ixStartChar)))
+    codePoints.add(utf8Chars.codePoint)
+  result = opValueW[seq[uint32]](codePoints)
 
 func slice*(str: string, start: int, length: int): OpResultWarn[string] =
   ## Extract a substring from a string by its Unicode character
@@ -261,32 +286,19 @@ func slice*(str: string, start: int, length: int): OpResultWarn[string] =
     # The start position is less than 0.
     return opMessageW[string](newWarningData(wStartPosTooSmall))
 
-  var codePoint: uint32
-  var state: uint32 = 0
-
-  var seqCount = 0 # Number of bytes in the current sequence.
   var charCount = 0 # Current number of Unicode characters.
-  var ixStartChar = 0 # Index to the start character.
+  var ixStartSlice = 0 # Index to the start of the slice.
 
-  # Loop through the string looking for the start character.
-  for ix, sByte in str[0 .. str.len - 1]:
-    decode(state, codePoint, sByte)
-    if state == 12:
+  for utf8Chars in yieldUtf8Chars(str):
+    if utf8Chars.invalid:
       # Invalid UTF-8 byte sequence at position $1.
       return opMessageW[string](newWarningData(wInvalidUtf8ByteSeq, $(charCount)))
-    if state == 0:
+    else:
       if charCount == start:
-        ixStartChar = ix - seqCount
+        ixStartSlice = utf8Chars.ixStartChar
       inc(charCount)
       if length > 0 and charCount == start + length:
-        return opValueW[string](str[ixStartChar .. ix])
-      seqCount = 0
-    else:
-      inc(seqCount)
-
-  if state != 0:
-    # Invalid UTF-8 byte sequence at position $1.
-    return opMessageW[string](newWarningData(wInvalidUtf8ByteSeq, $(charCount)))
+        return opValueW[string](str[ixStartSlice .. utf8Chars.ixEndChar])
 
   var messageId: MessageId
   if charCount < start:
@@ -294,8 +306,8 @@ func slice*(str: string, start: int, length: int): OpResultWarn[string] =
     messageId = wStartPosTooBig
   elif length < 0:
     # Return from start to the end of the string.
-    return opValueW[string](str[ixStartChar .. str.len - 1])
-  else:    
+    return opValueW[string](str[ixStartSlice .. str.len - 1])
+  else:
     # The length is greater then the possible number of characters in the slice.
     messageId = wLengthTooBig
   result = opMessageW[string](newWarningData(messageId))

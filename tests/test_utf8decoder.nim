@@ -32,10 +32,8 @@ suite "utf8decoder.nim":
     check validateUtf8String("0\xff") == 1
     check validateUtf8String("01\xff") == 2
     check validateUtf8String("0\xff1") == 1
-
     check validateUtf8String("\xC2\xA9\xed\xa0\x80") == 2
     check validateUtf8String("\xC2\xA9\xed\xa0\x80\xff") == 2
-
     check validateUtf8String("\xC2\xA9\xE2\x80\x90\xF0\x9D\x92\x9C\xff") == 9
 
 

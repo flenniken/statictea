@@ -29,7 +29,7 @@ proc testSliceWarn(str: string, start: int, length: int, eWarn: WarningData): bo
     return false
   return true
 
-proc testCodePointToStringWarn(codePoint: int, eMessageId: MessageId): bool =
+proc testCodePointToStringWarn(codePoint: uint32, eMessageId: MessageId): bool =
   let opResultId = codePointToString(codePoint)
   if opResultId.isValue:
     echo "expected message, got value: " & $opResultId
@@ -40,7 +40,7 @@ proc testCodePointToStringWarn(codePoint: int, eMessageId: MessageId): bool =
     return false
   result = true
 
-proc testCodePointsToString(codePoints: seq[int], eString: string): bool =
+proc testCodePointsToString(codePoints: seq[uint32], eString: string): bool =
   let opResultId = codePointsToString(codePoints)
   if opResultId.isMessage:
     echo "expected value, got message: " & $opResultId
@@ -51,7 +51,7 @@ proc testCodePointsToString(codePoints: seq[int], eString: string): bool =
     return false
   result = true
 
-proc testCodePointsToStringWarn(codePoints: seq[int], eMessageId: MessageId): bool =
+proc testCodePointsToStringWarn(codePoints: seq[uint32], eMessageId: MessageId): bool =
   let opResultId = codePointsToString(codePoints)
   if opResultId.isValue:
     echo "expected message, got value: " & $opResultId
@@ -62,7 +62,7 @@ proc testCodePointsToStringWarn(codePoints: seq[int], eMessageId: MessageId): bo
     return false
   result = true
 
-proc testStringToCodePoints(str: string, eCodePoints: seq[int]): bool =
+proc testStringToCodePoints(str: string, eCodePoints: seq[uint32]): bool =
   let opResultWarn = stringToCodePoints(str)
   if opResultWarn.isMessage:
     echo "expected value, got message: " & $opResultWarn
@@ -125,7 +125,7 @@ proc testParseHexUnicodeError(text: string, pos: Natural,
 
 
 proc testParseHexUnicode(text: string, pos: Natural,
-    ePos: Natural, eCodePoint: int): bool =
+    ePos: Natural, eCodePoint: uint32): bool =
   var inOutPos = pos
   let numOrId = parseHexUnicode(text, inOutPos)
   if numOrId.isMessage:
@@ -296,14 +296,14 @@ suite "unicodes.nim":
     check pos == 10
 
   test "stringToCodePoints":
-    check testStringToCodePoints("", newSeq[int]())
-    check testStringToCodePoints("x", @[ord('x')])
-    check testStringToCodePoints("ab", @[ord('a'), ord('b')])
-    check testStringToCodePoints("ab\u0080", @[ord('a'), ord('b'), 0x80])
-    check testStringToCodePoints("ab\u2010", @[ord('a'), ord('b'), 0x2010])
-    check testStringToCodePoints("\u{1D49C}", @[0x1D49C])
-    check testStringToCodePoints("\u{10ffff}", @[0x10ffff])
-    check testStringToCodePoints("añyóng", @[97, 241, 121, 243, 110, 103])
+    check testStringToCodePoints("", newSeq[uint32]())
+    check testStringToCodePoints("x", @[uint32(ord('x'))])
+    check testStringToCodePoints("ab", @[uint32(ord('a')), ord('b')])
+    check testStringToCodePoints("ab\u0080", @[uint32(ord('a')), ord('b'), 0x80])
+    check testStringToCodePoints("ab\u2010", @[uint32(ord('a')), ord('b'), 0x2010])
+    check testStringToCodePoints("\u{1D49C}", @[uint32(0x1D49C)])
+    check testStringToCodePoints("\u{10ffff}", @[uint32(0x10ffff)])
+    check testStringToCodePoints("añyóng", @[uint32(97), 241, 121, 243, 110, 103])
 
   test "stringToCodePoints warnings":
     check testStringToCodePointsWarn("\xff", p1 = "0")
@@ -317,14 +317,14 @@ suite "unicodes.nim":
     check testStringToCodePointsWarn("01\xf1\x80\xbf\x77", p1 = "2")
 
   test "codePointsToString":
-    check testCodePointsToString(newSeq[int](), "")
-    check testCodePointsToString(@[0x31], "1")
-    check testCodePointsToString(@[0x31, 0x32], "12")
-    check testCodePointsToString(@[0x31, 0xff], "1\u00ff")
+    check testCodePointsToString(newSeq[uint32](), "")
+    check testCodePointsToString(@[uint32(0x31)], "1")
+    check testCodePointsToString(@[uint32(0x31), 0x32], "12")
+    check testCodePointsToString(@[uint32(0x31), 0xff], "1\u00ff")
 
   test "codePointsToString warning":
-    check testCodePointsToStringWarn(@[0x31, 0x110000], wCodePointTooBig)
-    check testCodePointsToStringWarn(@[0x31, 0xD800], wUtf8Surrogate)
+    check testCodePointsToStringWarn(@[uint32(0x31), 0x110000], wCodePointTooBig)
+    check testCodePointsToStringWarn(@[uint32(0x31), 0xD800], wUtf8Surrogate)
 
   test "slice":
     check testSlice("abc", 0, 0, "")
@@ -397,3 +397,12 @@ suite "unicodes.nim":
     let str = "\xc2\xa9\xe2\x80\x90\xF0\x9D\x92\x9C" # 3 unicode characters
     check testSliceWarn(str, 0, 4, newWarningData(wLengthTooBig))
     check testSliceWarn(str, 4, 1, newWarningData(wStartPosTooBig))
+
+  test "stringLen":
+    check stringLen("") == 0
+    check stringLen("a") == 1
+    check stringLen("ab") == 2
+    check stringLen("abc") == 3
+    let str = "\xc2\xa9\xe2\x80\x90\xF0\x9D\x92\x9C" # 3 unicode characters
+    check stringLen(str) == 3
+    check stringLen("ab\xffc") == 4 # with one invalid

@@ -5,18 +5,43 @@ Functions that deal with Unicode.
 * [unicodes.nim](../src/unicodes.nim) &mdash; Nim source code.
 # Index
 
+* type: [Utf8ByteSeq](#utf8byteseq) &mdash; Holds one information about one UTF-8 byte sequence.
+* [yieldUtf8Chars](#yieldutf8chars) &mdash; Iterate through the UTF-8 character byte sequences of the string.
 * [cmpString](#cmpstring) &mdash; Compares two UTF-8 strings a and b.
 * [stringLen](#stringlen) &mdash; Return the number of unicode characters in the string (not bytes).
 * [githubAnchor](#githubanchor) &mdash; Convert the name to a github anchor name.
 * [bytesToString](#bytestostring) &mdash; Create a string from bytes in a buffer.
-* [firstInvalidUtf8](#firstinvalidutf8) &mdash; Return the position of the first invalid UTF-8 byte in the string if any.
 * [parseHexUnicode16](#parsehexunicode16) &mdash; Return the unicode number given a 4 character unicode escape string like u1234.
-* [parseHexUnicode](#parsehexunicode) &mdash; Return the unicode number given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos.
+* [parseHexUnicode](#parsehexunicode) &mdash; Return the unicode number given a 4 or 8 character unicode escape string.
 * [codePointToString](#codepointtostring) &mdash; Convert a code point to a one character UTF-8 string.
 * [codePointsToString](#codepointstostring) &mdash; Convert a list of code points to a string.
-* [parseHexUnicodeToString](#parsehexunicodetostring) &mdash; Return the unicode string given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos.
+* [parseHexUnicodeToString](#parsehexunicodetostring) &mdash; Return a one character string given a 4 or 8 character unicode escape string.
 * [stringToCodePoints](#stringtocodepoints) &mdash; Return the string as a list of code points.
 * [slice](#slice) &mdash; Extract a substring from a string by its Unicode character position (not byte index).
+
+# Utf8ByteSeq
+
+Holds one information about one UTF-8 byte sequence.
+
+```nim
+Utf8ByteSeq = object
+  str*: string
+  ixStartChar*: int
+  ixEndChar*: int
+  codePoint*: uint32
+  invalid*: bool
+
+```
+
+# yieldUtf8Chars
+
+Iterate through the UTF-8 character byte sequences of the string.
+
+A UTF-8 character is a one to four byte sequence.
+
+```nim
+iterator yieldUtf8Chars(str: string): Utf8ByteSeq
+```
 
 # cmpString
 
@@ -28,7 +53,7 @@ func cmpString(a, b: string; insensitive: bool = false): int
 
 # stringLen
 
-Return the number of unicode characters in the string (not bytes).
+Return the number of unicode characters in the string (not bytes). If there are invalid byte sequences they are counted too.
 
 ```nim
 func stringLen(str: string): Natural
@@ -50,28 +75,20 @@ Create a string from bytes in a buffer. A nim string is UTF-8 incoded but it isn
 func bytesToString(buffer: openArray[uint8 | char]): string
 ```
 
-# firstInvalidUtf8
-
-Return the position of the first invalid UTF-8 byte in the string if any.
-
-```nim
-func firstInvalidUtf8(str: string): Option[int]
-```
-
 # parseHexUnicode16
 
 Return the unicode number given a 4 character unicode escape string like u1234. Start is pointing at the u. On error, return a message id telling what went wrong.
 
 ```nim
-func parseHexUnicode16(text: string; start: Natural): OpResultId[int]
+func parseHexUnicode16(text: string; start: Natural): OpResultId[uint32]
 ```
 
 # parseHexUnicode
 
-Return the unicode number given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos. Pos is initially pointing at the u. On error, return the message id telling what went wrong and pos points at the error.
+Return the unicode number given a 4 or 8 character unicode escape string. For example like u1234 or u1234u1234. Advance the pos past the end of the escape string. Pos is initially pointing at the u. On error, return the message id telling what went wrong and pos points at the error.
 
 ```nim
-func parseHexUnicode(text: string; pos: var Natural): OpResultId[int]
+func parseHexUnicode(text: string; pos: var Natural): OpResultId[uint32]
 ```
 
 # codePointToString
@@ -79,7 +96,7 @@ func parseHexUnicode(text: string; pos: var Natural): OpResultId[int]
 Convert a code point to a one character UTF-8 string.
 
 ```nim
-func codePointToString(codePoint: int): OpResultId[string]
+func codePointToString(codePoint: uint32): OpResultId[string]
 ```
 
 # codePointsToString
@@ -87,12 +104,12 @@ func codePointToString(codePoint: int): OpResultId[string]
 Convert a list of code points to a string.
 
 ```nim
-func codePointsToString(codePoints: seq[int]): OpResultId[string]
+func codePointsToString(codePoints: seq[uint32]): OpResultId[string]
 ```
 
 # parseHexUnicodeToString
 
-Return the unicode string given a 4 or 8 character unicode escape string like u1234 or u1234u1234 and advance the pos. Pos is initially pointing at the u. On error, return the message id telling what went wrong and pos points at the error.
+Return a one character string given a 4 or 8 character unicode escape string. For example like u1234 or u1234u1234. Advance the pos past the end of the escape string. Pos is initially pointing at the u. On error, return the message id telling what went wrong and pos points at the error.
 
 ```nim
 func parseHexUnicodeToString(text: string; pos: var Natural): OpResultId[string]
@@ -103,7 +120,7 @@ func parseHexUnicodeToString(text: string; pos: var Natural): OpResultId[string]
 Return the string as a list of code points.
 
 ```nim
-func stringToCodePoints(str: string): OpResultWarn[seq[int]]
+func stringToCodePoints(str: string): OpResultWarn[seq[uint32]]
 ```
 
 # slice
