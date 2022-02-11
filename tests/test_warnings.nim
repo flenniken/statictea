@@ -1,17 +1,17 @@
 import std/unittest
 import std/strUtils
+import std/strformat
 import messages
 import warnings
 
+
+{. hint: & "hello" .}
+
 func countLetter(message: string, letter: char): int =
-  ## Count the number of letters in the given string.
-  var pos = 0
-  while true:
-    pos = message.find(letter, pos)
-    if pos == -1:
-      break
-    inc(pos)
-    inc(result)
+  ## Count the number of times letter is used in the given string.
+  for ch in message:
+    if ch == letter:
+      inc(result)
 
 suite "warnings.nim":
 

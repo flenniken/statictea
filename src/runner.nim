@@ -46,8 +46,8 @@ type
 
   ExpectedLine* = object
     ## ExpectedLine holds the expected line options.
-    filename1*: string
-    filename2*: string
+    gotFilename*: string
+    expectedFilename*: string
 
   LineKind* = enum
     ## The kind of line in a stf file.
@@ -119,9 +119,9 @@ func newRunFileLine*(filename: string, noLastEnding = false, command = false,
   result = RunFileLine(filename: filename, noLastEnding: noLastEnding,
     command: command, nonZeroReturn: nonZeroReturn)
 
-func newExpectedLine*(filename1: string, filename2: string): ExpectedLine =
+func newExpectedLine*(gotFilename: string, expectedFilename: string): ExpectedLine =
   ## Create a new ExpectedLine object.
-  result = ExpectedLine(filename1: filename1, filename2: filename2)
+  result = ExpectedLine(gotFilename: gotFilename, expectedFilename: expectedFilename)
 
 func newDirAndFiles*(expectedLines: seq[ExpectedLine],
     runFileLines: seq[RunFileLine]): DirAndFiles =
@@ -131,7 +131,7 @@ func newDirAndFiles*(expectedLines: seq[ExpectedLine],
 
 func `$`*(r: ExpectedLine): string =
   ## Return a string representation of a ExpectedLine object.
-  result = "expected $1 == $2" % [r.filename1, r.filename2]
+  result = "expected $1 == $2" % [r.gotFilename, r.expectedFilename]
 
 func `$`*(r: RunFileLine): string =
   ## Return a string representation of a RunFileLine object.
@@ -298,7 +298,7 @@ to be empty. A line that starts with "### Expected " must be an
 expected line.
 
 ~~~
-### Expected filename1 == filename2
+### Expected gotFilename == expectedFilename
 ~~~
 
 Examples:
@@ -435,8 +435,8 @@ proc parseExpectedLine*(line: string): OpResultStr[ExpectedLine] =
     return opMessageStr[ExpectedLine]("Invalid expected line: $1" % [line])
 
   let matches = matchesO.get()
-  let (filename1, filename2) = matches.get2Groups()
-  let expectedEqual = newExpectedLine(filename1, filename2)
+  let (gotFilename, expectedFilename) = matches.get2Groups()
+  let expectedEqual = newExpectedLine(gotFilename, expectedFilename)
   result = opValueStr[ExpectedLine](expectedEqual)
 
 proc openNewFile*(folder: string, filename: string): OpResultStr[File] =
@@ -811,11 +811,11 @@ proc compareFileSets(folder: string, expectedLines: seq[ExpectedLine]):
 
   var rc = 0
   for expectedLine in expectedLines:
-    var path1 = joinPath(folder, expectedLine.filename1)
-    var path2 = joinPath(folder, expectedLine.filename2)
+    var gotPath = joinPath(folder, expectedLine.gotFilename)
+    var expectedPath = joinPath(folder, expectedLine.expectedFilename)
 
     # Compare the two files.
-    let stringOp = compareFiles(path1, path2)
+    let stringOp = compareFiles(expectedPath, gotPath)
 
     if stringOp.isMessage:
       # Show the error.

@@ -9,33 +9,42 @@ import messages
 import warnings
 import utf8decoder
 
-iterator yieldUtf8Chars*(str: string, ixStartChar: var int,
-    ixEndChar: var int, codePoint: var uint32): bool =
-  ## Iterate through the UTF-8 character byte sequences of the string.
-  ## @:For each character set ixStartChar, ixEndChar, and codePoint.
+iterator yieldUtf8Chars*(str: string, ixStartSeq: var int,
+    ixEndSeq: var int, codePoint: var uint32): bool =
+  ## Iterate through the string's UTF-8 character byte sequences.
+  ## @:For each character set ixStartSeq, ixEndSeq, and codePoint.
   ## @:Return true when the bytes sequence is valid else return false.
   ## @:
-  ## @:Current byte sequence: str[ixStartChar .. ixEndChar]
-  ## @:Current code point: codePoint
+  ## @:You can get the current byte sequence with:
+  ## @:str[ixStartSeq .. ixEndSeq]
   ## @:
   ## @:A UTF-8 character is a one to four byte sequence.
 
-  ixStartChar = 0
-  ixEndChar = 0
+  ixStartSeq = 0
+  ixEndSeq = 0
   codePoint = 0
-  var state: uint32 = 0
-  for ix, sByte in str:
-    ixEndChar = ix
-    decode(state, codePoint, sByte)
-    if state == 12:
-      yield false
-      state = 0
-      codePoint = 0
-    elif state == 0:
+  var state = 0u32
+  while true:
+    if ixEndSeq >= str.len:
+      break
+    decode(state, codePoint, str[ixEndSeq])
+
+    case state:
+    of 0:
       yield true
+      inc(ixEndSeq)
+      ixStartSeq = ixEndSeq
+    of 12:
+      if ixEndSeq > ixStartSeq:
+        # Restart at the byte that broke a multi-byte sequence.
+        dec(ixEndSeq)
+      codePoint = 0
+      yield false
+      inc(ixEndSeq)
+      ixStartSeq = ixEndSeq
+      state = 0
     else:
-      continue
-    ixStartChar = ix + 1
+      inc(ixEndSeq)
 
   if state != 0:
     yield false
@@ -69,10 +78,10 @@ func cmpString*(a, b: string, insensitive: bool = false): int =
 func stringLen*(str: string): Natural =
   ## Return the number of unicode characters in the string (not
   ## bytes). If there are invalid byte sequences, they are counted too.
-  var ixStartChar: int
-  var ixEndChar: int
+  var ixStartSeq: int
+  var ixEndSeq: int
   var codePoint: uint32
-  for _ in yieldUtf8Chars(str, ixStartChar, ixEndChar, codePoint):
+  for _ in yieldUtf8Chars(str, ixStartSeq, ixEndSeq, codePoint):
     inc(result)
 
 func githubAnchor*(name: string): string =
@@ -90,17 +99,23 @@ func githubAnchor*(name: string): string =
   # * allow ascii digits or hyphens
   # * drop punctuation characters, not [a-zA-Z0-9_]
 
-  var anchorRunes = newSeq[Rune]()
-  for rune in runes(name):
+  var ixStartSeq: int
+  var ixEndSeq: int
+  var codePoint: uint32
+  for valid in yieldUtf8Chars(name, ixStartSeq, ixEndSeq, codePoint):
+    if not valid:
+      # todo: return warning
+      break
+    let rune = Rune(codePoint)
     if isAlpha(rune): # letters
-      anchorRunes.add(toLower(rune))
+      result.add(toLower(rune))
     elif isWhiteSpace(rune):
-      anchorRunes.add(toRunes("-")[0])
+      result.add(toRunes("-")[0])
     elif rune.uint32 < 128: # ascii
-      let ch = toUTF8(rune)[0]
+      let str = name[ixStartSeq .. ixEndSeq]
+      let ch = str[0]
       if isDigit(ch) or ch == '-' or ch == '_':
-        anchorRunes.add(rune)
-  result = $anchorRunes
+        result.add(ch)
 
 func bytesToString*(buffer: openArray[uint8|char]): string =
   ## Create a string from bytes in a buffer. A nim string is UTF-8
@@ -253,25 +268,26 @@ func parseHexUnicodeToString*(text: string, pos: var Natural): OpResultId[string
 func stringToCodePoints*(str: string): OpResultWarn[seq[uint32]] =
   ## Return the string as a list of code points.
   var codePoints = newSeq[uint32]()
-  var ixStartChar: int
-  var ixEndChar: int
+  var ixStartSeq: int
+  var ixEndSeq: int
   var codePoint: uint32
-  for valid in yieldUtf8Chars(str, ixStartChar, ixEndChar, codePoint):
+  for valid in yieldUtf8Chars(str, ixStartSeq, ixEndSeq, codePoint):
     if not valid:
-      # Invalid UTF-8 byte sequence at position {ixStartChar}.
+      # Invalid UTF-8 byte sequence at position {ixStartSeq}.
       # todo use character position instead of byte positions here?
       return opMessageW[seq[uint32]](newWarningData(wInvalidUtf8ByteSeq,
-        $(ixStartChar)))
+        $(ixStartSeq)))
     codePoints.add(codePoint)
   result = opValueW[seq[uint32]](codePoints)
 
 func slice*(str: string, start: int, length: int): OpResultWarn[string] =
   ## Extract a substring from a string by its Unicode character
   ## position (not byte index). You pass the string, the substring's
-  ## start index, and its length. If the length is negative, return all the
-  ## characters from start to the end of the string.
+  ## start index, and its length. If the length is negative, return
+  ## all the characters from start to the end of the string. If the
+  ## str is "" or the length is 0, return "".
 
-  if length == 0:
+  if str.len == 0 or length == 0:
     return opValueW[string]("")
 
   if start < 0:
@@ -281,22 +297,22 @@ func slice*(str: string, start: int, length: int): OpResultWarn[string] =
   var charCount = 0 # Current number of Unicode characters.
   var ixStartSlice = 0 # Index to the start of the slice.
 
-  var ixStartChar: int
-  var ixEndChar: int
+  var ixStartSeq: int
+  var ixEndSeq: int
   var codePoint: uint32
-  for valid in yieldUtf8Chars(str, ixStartChar, ixEndChar, codePoint):
+  for valid in yieldUtf8Chars(str, ixStartSeq, ixEndSeq, codePoint):
     if not valid:
       # Invalid UTF-8 byte sequence at position $1.
       return opMessageW[string](newWarningData(wInvalidUtf8ByteSeq, $(charCount)))
     else:
       if charCount == start:
-        ixStartSlice = ixStartChar
+        ixStartSlice = ixStartSeq
       inc(charCount)
       if length > 0 and charCount == start + length:
-        return opValueW[string](str[ixStartSlice .. ixEndChar])
+        return opValueW[string](str[ixStartSlice .. ixEndSeq])
 
   var messageId: MessageId
-  if charCount < start:
+  if charCount <= start:
     # The start position is greater then the number of characters in the string.
     messageId = wStartPosTooBig
   elif length < 0:

@@ -93,6 +93,8 @@ hello server, hello shared
 
 You can use the filename "empty" for empty files.
 
+Expected gotFile == expectedFile
+
 ### Expected result == result.expected
 ### Expected stdout == stdout.expected
 ### Expected stderr == stderr.expected

@@ -26,9 +26,12 @@ proc exit() =
 proc get_test_filenames(): seq[string] =
   ## Return the basename of the nim files in the tests folder.
   result = @[]
+  let exclude = ["testall1.nim", "testall2.nim"]
   var list = listFiles("tests")
   for filename in list:
-    result.add(lastPathPart(filename))
+    let basename = lastPathPart(filename)
+    if not (basename in exclude):
+      result.add(basename)
 
 proc get_dir_filenames(folder: string, extension: string, path: bool = false,
     noExt: bool = false, excludeFilenames: seq[string] = @[]): seq[string] =
@@ -690,20 +693,41 @@ proc checkUtf8DecoderEcho() =
   if different:
     echo "Use ^^ to update the local copy."
 
+
+proc createTestAll(testAllBasename: string, filenames: seq[string]) =
+  ## Create a testall file containing the given test files.
+  var lines = newSeq[string]()
+  for filename in filenames:
+    var (_, basename) = splitPath(filename)
+    let name = basename[0 .. basename.len - 5]
+    lines.add("include " & name)
+  writeFile(joinPath("tests", testAllBasename), lines.join("\n"))
+
 # Tasks below
 
 task n, "\tShow available tasks.":
   exec "nimble tasks"
 
 task t, "\tRun all tests at once.":
+
   # Create a file that includes all the test files.
-  exec """
-ls -1 tests | grep -v testall | sed 's/\.nim//' |
-awk '{printf "include %s\n", $0}' > tests/testall.nim
-"""
-  let cmd = get_test_module_cmd("testall.nim")
-  exec cmd
-  rmFile("tests/testall.nim")
+  let test_filenames = get_test_filenames()
+
+  let splitIndex = test_filenames.len div 2
+  echo "0 .. " & $splitIndex & " .. " & $test_filenames.len
+
+  createTestAll("testall1.nim", test_filenames[0 .. splitIndex])
+  createTestAll("testall2.nim", test_filenames[splitIndex + 1 .. test_filenames.len - 1])
+
+  let cmd1 = get_test_module_cmd("testall1.nim")
+  # exec "cat tests/testall1.nim"
+  let cmd2 = get_test_module_cmd("testall2.nim")
+  echo cmd1
+  exec cmd1
+  echo cmd2
+  exec cmd2
+  rmFile("tests/testall1.nim")
+  rmFile("tests/testall2.nim")
 
   # Make sure it builds with test undefined.
   buildRelease()

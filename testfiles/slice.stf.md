@@ -31,15 +31,20 @@ $statictea \
 $$ block
 $$ : zero &= slice("", 0)
 $$ : zero &= slice("", 0, 0)
+$$ : zero &= slice("", 0, 8)
+$$ : zero &= slice("abc", 0, 0)
+$$ :
 $$ : zero &= slice("a", 0, 0)
-$$ : zero &= slice("a", 1)
 $$ : zero &= slice("a", 1, 0)
+$$ : zero &= slice("a", 4, 0)
+$$ :
 $$ : zero &= slice("ab", 0, 0)
 $$ : zero &= slice("ab", 1, 0)
 $$ : zero &= slice("ab", 2, 0)
-$$ : zero &= slice("ab", 2)
+$$ : zero &= slice("ab", 8, 0)
 zero => {zero}
 $$ endblock
+
 $$ block
 $$ : one &= slice("a", 0, 1)
 $$ : one &= slice("a", 0)
@@ -48,11 +53,13 @@ $$ : one &= slice("ab", 1, 1)
 $$ : one &= slice("ab", 1)
 one => {one}
 $$ endblock
+
 $$ block
 $$ : two &= slice("ab", 0, 2)
 $$ : two &= slice("ab", 0)
 two => {two}
 $$ endblock
+
 $$ block
 $$ : three &= slice("abcdef", 0, 3)
 $$ : three &= slice("abcdef", 1, 3)
@@ -61,13 +68,31 @@ $$ : three &= slice("abcdef", 3, 3)
 $$ : three &= slice("abcdef", 3)
 three => {three}
 $$ endblock
+
 $$ block
-$$ : uc &= slice("añyóng", 0, 1)
-$$ : uc &= slice("añyóng", 1, 1)
-$$ : uc &= slice("añyóng", 2, 1)
-$$ : uc &= slice("añyóng", 4, 1)
-$$ : uc &= slice("añyóng", 5, 1)
+$$ : str = "añyóng"
+$$ : uc &= slice(str, 0, 1)
+$$ : uc &= slice(str, 1, 1)
+$$ : uc &= slice(str, 2, 1)
+$$ : uc &= slice(str, 3, 1)
+$$ : uc &= slice(str, 4, 1)
+$$ : uc &= slice(str, 5, 1)
+{str}
 uc => {uc}
+$$ endblock
+
+$$ block
+$$ : str = "aÂâð♘☺🃞"
+$$ : a0 = slice(str, 0, 1)
+$$ : a1 = slice(str, 1, 2)
+$$ : a2 = slice(str, 2, 3)
+$$ : a3 = slice(str, 3, 3)
+$$ : a4 = slice(str, 4, 1)
+slice({str}, 0, 1) => {a0}
+slice({str}, 1, 2) => {a1}
+slice({str}, 2, 3) => {a2}
+slice({str}, 3, 3) => {a3}
+slice({str}, 4, 1) => {a4}
 $$ endblock
 
 $$ block
@@ -101,11 +126,22 @@ $$ endblock
 ### File result.expected
 
 ~~~
-zero => ["","","","a","","","","","ab"]
+zero => ["","","","","","","","","","",""]
+
 one => ["a","a","a","b","b"]
+
 two => ["ab","ab"]
+
 three => ["abc","bcd","cde","def","def"]
-uc => ["a","ñ","y","n","g"]
+
+añyóng
+uc => ["a","ñ","y","ó","n","g"]
+
+slice(aÂâð♘☺🃞, 0, 1) => a
+slice(aÂâð♘☺🃞, 1, 2) => Ââ
+slice(aÂâð♘☺🃞, 2, 3) => âð♘
+slice(aÂâð♘☺🃞, 3, 3) => ð♘☺
+slice(aÂâð♘☺🃞, 4, 1) => ♘
 
 slice("Earl Grey", 1, 3) => arl 
 slice("Earl Grey", 6) => rey
