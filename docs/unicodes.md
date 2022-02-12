@@ -5,8 +5,7 @@ Functions that deal with Unicode.
 * [unicodes.nim](../src/unicodes.nim) &mdash; Nim source code.
 # Index
 
-* type: [Utf8ByteSeq](#utf8byteseq) &mdash; Holds one information about one UTF-8 byte sequence.
-* [yieldUtf8Chars](#yieldutf8chars) &mdash; Iterate through the UTF-8 character byte sequences of the string.
+* [yieldUtf8Chars](#yieldutf8chars) &mdash; Iterate through the string's UTF-8 character byte sequences.
 * [cmpString](#cmpstring) &mdash; Compares two UTF-8 strings a and b.
 * [stringLen](#stringlen) &mdash; Return the number of unicode characters in the string (not bytes).
 * [githubAnchor](#githubanchor) &mdash; Convert the name to a github anchor name.
@@ -19,28 +18,20 @@ Functions that deal with Unicode.
 * [stringToCodePoints](#stringtocodepoints) &mdash; Return the string as a list of code points.
 * [slice](#slice) &mdash; Extract a substring from a string by its Unicode character position (not byte index).
 
-# Utf8ByteSeq
-
-Holds one information about one UTF-8 byte sequence.
-
-```nim
-Utf8ByteSeq = object
-  str*: string
-  ixStartChar*: int
-  ixEndChar*: int
-  codePoint*: uint32
-  invalid*: bool
-
-```
-
 # yieldUtf8Chars
 
-Iterate through the UTF-8 character byte sequences of the string.
+Iterate through the string's UTF-8 character byte sequences.
+For each character set ixStartSeq, ixEndSeq, and codePoint.
+Return true when the bytes sequence is valid else return false.
+
+You can get the current byte sequence with:
+str[ixStartSeq .. ixEndSeq]
 
 A UTF-8 character is a one to four byte sequence.
 
 ```nim
-iterator yieldUtf8Chars(str: string): Utf8ByteSeq
+iterator yieldUtf8Chars(str: string; ixStartSeq: var int; ixEndSeq: var int;
+                        codePoint: var uint32): bool
 ```
 
 # cmpString
@@ -53,7 +44,7 @@ func cmpString(a, b: string; insensitive: bool = false): int
 
 # stringLen
 
-Return the number of unicode characters in the string (not bytes). If there are invalid byte sequences they are counted too.
+Return the number of unicode characters in the string (not bytes). If there are invalid byte sequences, they are counted too.
 
 ```nim
 func stringLen(str: string): Natural
@@ -125,7 +116,7 @@ func stringToCodePoints(str: string): OpResultWarn[seq[uint32]]
 
 # slice
 
-Extract a substring from a string by its Unicode character position (not byte index). You pass the string, the substring's start index, and its length. If the length is negative, return all the characters from start to the end of the string.
+Extract a substring from a string by its Unicode character position (not byte index). You pass the string, the substring's start index, and its length. If the length is negative, return all the characters from start to the end of the string. If the str is "" or the length is 0, return "".
 
 ```nim
 func slice(str: string; start: int; length: int): OpResultWarn[string]

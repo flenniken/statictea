@@ -5,61 +5,61 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [runFunction.nim](../src/runFunction.nim) &mdash; Nim source code.
 # Index
 
-* [cmpBaseValues](#cmpbasevalues) &mdash; {entry.short}
-* [funCmp_iii](#funcmp_iii) &mdash; {entry.short}
-* [funCmp_ffi](#funcmp_ffi) &mdash; {entry.short}
-* [funCmp_ssoii](#funcmp_ssoii) &mdash; {entry.short}
-* [funConcat](#funconcat) &mdash; {entry.short}
-* [funLen_si](#funlen_si) &mdash; {entry.short}
-* [funLen_li](#funlen_li) &mdash; {entry.short}
-* [funLen_di](#funlen_di) &mdash; {entry.short}
-* [funGet_lioaa](#funget_lioaa) &mdash; {entry.short}
-* [funGet_dsoaa](#funget_dsoaa) &mdash; {entry.short}
-* [funIf0](#funif0) &mdash; {entry.short}
-* [funIf1](#funif1) &mdash; {entry.short}
-* [funAdd_Ii](#funadd_ii) &mdash; {entry.short}
-* [funAdd_Fi](#funadd_fi) &mdash; {entry.short}
-* [funExists](#funexists) &mdash; {entry.short}
-* [funCase_iloaa](#funcase_iloaa) &mdash; {entry.short}
-* [funCase_sloaa](#funcase_sloaa) &mdash; {entry.short}
-* [parseVersion](#parseversion) &mdash; {entry.short}
-* [funCmpVersion](#funcmpversion) &mdash; {entry.short}
-* [funFloat_if](#funfloat_if) &mdash; {entry.short}
-* [funFloat_sf](#funfloat_sf) &mdash; {entry.short}
-* [funInt_fosi](#funint_fosi) &mdash; {entry.short}
-* [funInt_sosi](#funint_sosi) &mdash; {entry.short}
-* [funFind](#funfind) &mdash; {entry.short}
-* [funSlice](#funslice) &mdash; {entry.short}
-* [funDup](#fundup) &mdash; {entry.short}
-* [funDict](#fundict) &mdash; {entry.short}
-* [funList](#funlist) &mdash; {entry.short}
-* [funReplace](#funreplace) &mdash; {entry.short}
-* [funReplaceRe_sSSs](#funreplacere_ssss) &mdash; {entry.short}
-* [funReplaceRe_sls](#funreplacere_sls) &mdash; {entry.short}
-* [funPath](#funpath) &mdash; {entry.short}
-* [funLower](#funlower) &mdash; {entry.short}
-* [funKeys](#funkeys) &mdash; {entry.short}
-* [funValues](#funvalues) &mdash; {entry.short}
-* [funSort_lsosl](#funsort_lsosl) &mdash; {entry.short}
-* [funSort_lssil](#funsort_lssil) &mdash; {entry.short}
-* [funSort_lsssl](#funsort_lsssl) &mdash; {entry.short}
-* [funGithubAnchor_ss](#fungithubanchor_ss) &mdash; {entry.short}
-* [funGithubAnchor_ll](#fungithubanchor_ll) &mdash; {entry.short}
-* [funType_as](#funtype_as) &mdash; {entry.short}
-* [funJoinPath_loss](#funjoinpath_loss) &mdash; {entry.short}
-* [funJoinPath_oSs](#funjoinpath_oss) &mdash; {entry.short}
-* [funJoin_lsois](#funjoin_lsois) &mdash; {entry.short}
-* [createFunctionTable](#createfunctiontable) &mdash; {entry.short}
-* [getFunctionList](#getfunctionlist) &mdash; {entry.short}
-* [getFunction](#getfunction) &mdash; {entry.short}
-* [isFunctionName](#isfunctionname) &mdash; {entry.short}
+* [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
+* [funCmp_iii](#funcmp_iii) &mdash; Compare two ints.
+* [funCmp_ffi](#funcmp_ffi) &mdash; Compare two floats.
+* [funCmp_ssoii](#funcmp_ssoii) &mdash; Compare two strings.
+* [funConcat](#funconcat) &mdash; Concatentate strings.
+* [funLen_si](#funlen_si) &mdash; Number of characters in a string.
+* [funLen_li](#funlen_li) &mdash; Number of elements in a list.
+* [funLen_di](#funlen_di) &mdash; Number of elements in a dictionary.
+* [funGet_lioaa](#funget_lioaa) &mdash; Get a list value by its index.
+* [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
+* [funIf0](#funif0) &mdash; If the condition is 0, return the second parameter, else return the third.
+* [funIf1](#funif1) &mdash; If the condition is 1, return the second parameter, else return the third.
+* [funAdd_Ii](#funadd_ii) &mdash; Add integers.
+* [funAdd_Fi](#funadd_fi) &mdash; Add floats.
+* [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
+* [funCase_iloaa](#funcase_iloaa) &mdash; Compare integer cases and return the matching value.
+* [funCase_sloaa](#funcase_sloaa) &mdash; Compare string cases and return the matching value.
+* [parseVersion](#parseversion) &mdash; Parse a StaticTea version number and return its three components.
+* [funCmpVersion](#funcmpversion) &mdash; Compare two StaticTea version numbers.
+* [funFloat_if](#funfloat_if) &mdash; Create a float from an int.
+* [funFloat_sf](#funfloat_sf) &mdash; Create a float from a number string.
+* [funInt_fosi](#funint_fosi) &mdash; Create an int from a float.
+* [funInt_sosi](#funint_sosi) &mdash; Create an int from a number string.
+* [funFind](#funfind) &mdash; Find the position of a substring in a string.
+* [funSlice](#funslice) &mdash; Extract a substring from a string by its position.
+* [funDup](#fundup) &mdash; Duplicate a string x times.
+* [funDict](#fundict) &mdash; Create a dictionary from a list of key, value pairs.
+* [funList](#funlist) &mdash; Create a list of values.
+* [funReplace](#funreplace) &mdash; Replace a substring specified by its position and length with another string.
+* [funReplaceRe_sSSs](#funreplacere_ssss) &mdash; Replace multiple parts of a string using regular expressions.
+* [funReplaceRe_sls](#funreplacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
+* [funPath](#funpath) &mdash; Split a file path into its component pieces.
+* [funLower](#funlower) &mdash; Lowercase a string.
+* [funKeys](#funkeys) &mdash; Create a list from the keys in a dictionary.
+* [funValues](#funvalues) &mdash; Create a list out of the values in the specified dictionary.
+* [funSort_lsosl](#funsort_lsosl) &mdash; Sort a list of values of the same type.
+* [funSort_lssil](#funsort_lssil) &mdash; Sort a list of lists.
+* [funSort_lsssl](#funsort_lsssl) &mdash; Sort a list of dictionaries.
+* [funGithubAnchor_ss](#fungithubanchor_ss) &mdash; Create a Github anchor name from a heading name.
+* [funGithubAnchor_ll](#fungithubanchor_ll) &mdash; Create Github anchor names from heading names.
+* [funType_as](#funtype_as) &mdash; Return the parameter type, one of: int, float, string, list, dict.
+* [funJoinPath_loss](#funjoinpath_loss) &mdash; Join the path components with a path separator.
+* [funJoinPath_oSs](#funjoinpath_oss) &mdash; Join the path components with the platform path separator.
+* [funJoin_lsois](#funjoin_lsois) &mdash; Join a list of strings with a separator.
+* [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
+* [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
+* [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
+* [isFunctionName](#isfunctionname) &mdash; Return true when the function exists.
 
 # cmpBaseValues
 
 Compares two values a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. The values must be the same kind and either int, float or string.
 
 ```nim
-{entry.signature}
+func cmpBaseValues(a, b: Value; insensitive: bool = false): int
 ```
 
 # funCmp_iii
@@ -80,7 +80,7 @@ cmp(9, 2) => 1
 ~~~~
 
 ```nim
-{entry.signature}
+func funCmp_iii(parameters: seq[Value]): FunResult
 ```
 
 # funCmp_ffi
@@ -101,7 +101,7 @@ cmp(9.3, 2.2) => 1
 ~~~~
 
 ```nim
-{entry.signature}
+func funCmp_ffi(parameters: seq[Value]): FunResult
 ```
 
 # funCmp_ssoii
@@ -127,7 +127,7 @@ cmp("Tea", "tea", 1) => 0
 ~~~~
 
 ```nim
-{entry.signature}
+func funCmp_ssoii(parameters: seq[Value]): FunResult
 ```
 
 # funConcat
@@ -147,7 +147,7 @@ concat("a") => "a"
 ~~~~
 
 ```nim
-{entry.signature}
+func funConcat(parameters: seq[Value]): FunResult
 ```
 
 # funLen_si
@@ -166,7 +166,7 @@ len("añyóng") => 6
 ~~~~
 
 ```nim
-{entry.signature}
+func funLen_si(parameters: seq[Value]): FunResult
 ```
 
 # funLen_li
@@ -186,7 +186,7 @@ len(list(4, 5)) => 2
 ~~~~
 
 ```nim
-{entry.signature}
+func funLen_li(parameters: seq[Value]): FunResult
 ```
 
 # funLen_di
@@ -206,7 +206,7 @@ len(dict("a", 4, "b", 3)) => 2
 ~~~~
 
 ```nim
-{entry.signature}
+func funLen_di(parameters: seq[Value]): FunResult
 ```
 
 # funGet_lioaa
@@ -228,7 +228,7 @@ get(list, 3, 99) => 99
 ~~~~
 
 ```nim
-{entry.signature}
+func funGet_lioaa(parameters: seq[Value]): FunResult
 ```
 
 # funGet_dsoaa
@@ -259,7 +259,7 @@ d.tea => "Earl Grey"
 ~~~~
 
 ```nim
-{entry.signature}
+func funGet_dsoaa(parameters: seq[Value]): FunResult
 ```
 
 # funIf0
@@ -279,7 +279,7 @@ if0(4, "tea", "beer") => "beer"
 ~~~~
 
 ```nim
-{entry.signature}
+func funIf0(parameters: seq[Value]): FunResult
 ```
 
 # funIf1
@@ -299,7 +299,7 @@ if1(4, "tea", "beer") => "beer"
 ~~~~
 
 ```nim
-{entry.signature}
+func funIf1(parameters: seq[Value]): FunResult
 ```
 
 # funAdd_Ii
@@ -319,7 +319,7 @@ add(1, 2, 3) => 6
 ~~~~
 
 ```nim
-{entry.signature}
+func funAdd_Ii(parameters: seq[Value]): FunResult
 ```
 
 # funAdd_Fi
@@ -339,7 +339,7 @@ add(1.1, 2.2, 3.3) => 6.6
 ~~~~
 
 ```nim
-{entry.signature}
+func funAdd_Fi(parameters: seq[Value]): FunResult
 ```
 
 # funExists
@@ -359,7 +359,7 @@ exists(d, "coffee") => 0
 ~~~~
 
 ```nim
-{entry.signature}
+func funExists(parameters: seq[Value]): FunResult
 ```
 
 # funCase_iloaa
@@ -394,7 +394,7 @@ case(3, cases, "wine") => "wine"
 ~~~~
 
 ```nim
-{entry.signature}
+func funCase_iloaa(parameters: seq[Value]): FunResult
 ```
 
 # funCase_sloaa
@@ -428,7 +428,7 @@ case("bunch", cases, "other") => "other"
 ~~~~
 
 ```nim
-{entry.signature}
+func funCase_sloaa(parameters: seq[Value]): FunResult
 ```
 
 # parseVersion
@@ -436,7 +436,7 @@ case("bunch", cases, "other") => "other"
 Parse a StaticTea version number and return its three components.
 
 ```nim
-{entry.signature}
+func parseVersion(version: string): Option[(int, int, int)]
 ```
 
 # funCmpVersion
@@ -461,7 +461,7 @@ cmpVersion("1.2.5", "1.2.5") => 0
 ~~~~
 
 ```nim
-{entry.signature}
+func funCmpVersion(parameters: seq[Value]): FunResult
 ```
 
 # funFloat_if
@@ -480,7 +480,7 @@ float(-33) => -33.0
 ~~~~
 
 ```nim
-{entry.signature}
+func funFloat_if(parameters: seq[Value]): FunResult
 ```
 
 # funFloat_sf
@@ -500,7 +500,7 @@ float("33") => 33.0
 ~~~~
 
 ```nim
-{entry.signature}
+func funFloat_sf(parameters: seq[Value]): FunResult
 ```
 
 # funInt_fosi
@@ -535,7 +535,7 @@ int(-6.3456, "truncate") => -6
 ~~~~
 
 ```nim
-{entry.signature}
+func funInt_fosi(parameters: seq[Value]): FunResult
 ```
 
 # funInt_sosi
@@ -570,7 +570,7 @@ int("-6.3456", "truncate") => -6
 ~~~~
 
 ```nim
-{entry.signature}
+func funInt_sosi(parameters: seq[Value]): FunResult
 ```
 
 # funFind
@@ -598,7 +598,7 @@ find(msg, "party", 0) = 0
 ~~~~
 
 ```nim
-{entry.signature}
+func funFind(parameters: seq[Value]): FunResult
 ```
 
 # funSlice
@@ -623,7 +623,7 @@ slice("añyóng", 0, 3) => "añy"
 ~~~~
 
 ```nim
-{entry.signature}
+func funSlice(parameters: seq[Value]): FunResult
 ```
 
 # funDup
@@ -646,7 +646,7 @@ dup("", 3) => ""
 ~~~~
 
 ```nim
-{entry.signature}
+func funDup(parameters: seq[Value]): FunResult
 ```
 
 # funDict
@@ -668,7 +668,7 @@ dict("a", 5, "b", 33, "c", 0) =>
 ~~~~
 
 ```nim
-{entry.signature}
+func funDict(parameters: seq[Value]): FunResult
 ```
 
 # funList
@@ -689,7 +689,7 @@ list("a", 5, "b") => ["a", 5, "b"]
 ~~~~
 
 ```nim
-{entry.signature}
+func funList(parameters: seq[Value]): FunResult
 ```
 
 # funReplace
@@ -734,7 +734,7 @@ replace("123", 0, 3, "") =>
 ~~~~
 
 ```nim
-{entry.signature}
+func funReplace(parameters: seq[Value]): FunResult
 ```
 
 # funReplaceRe_sSSs
@@ -761,7 +761,7 @@ For developing and debugging regular expressions see the
 website: https://regex101.com/
 
 ```nim
-{entry.signature}
+func funReplaceRe_sSSs(parameters: seq[Value]): FunResult
 ```
 
 # funReplaceRe_sls
@@ -787,7 +787,7 @@ For developing and debugging regular expressions see the
 website: https://regex101.com/
 
 ```nim
-{entry.signature}
+func funReplaceRe_sls(parameters: seq[Value]): FunResult
 ```
 
 # funPath
@@ -822,7 +822,7 @@ path("src\runFunction.nim", "\") => {
 ~~~~
 
 ```nim
-{entry.signature}
+func funPath(parameters: seq[Value]): FunResult
 ```
 
 # funLower
@@ -842,7 +842,7 @@ lower("TEĀ") => "teā"
 ~~~~
 
 ```nim
-{entry.signature}
+func funLower(parameters: seq[Value]): FunResult
 ```
 
 # funKeys
@@ -862,7 +862,7 @@ values(d) => ["apple", 2, 3]
 ~~~~
 
 ```nim
-{entry.signature}
+func funKeys(parameters: seq[Value]): FunResult
 ```
 
 # funValues
@@ -882,7 +882,7 @@ values(d) => ["apple", 2, 3]
 ~~~~
 
 ```nim
-{entry.signature}
+func funValues(parameters: seq[Value]): FunResult
 ```
 
 # funSort_lsosl
@@ -917,7 +917,7 @@ sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
 ~~~~
 
 ```nim
-{entry.signature}
+func funSort_lsosl(parameters: seq[Value]): FunResult
 ```
 
 # funSort_lssil
@@ -948,7 +948,7 @@ sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
 ~~~~
 
 ```nim
-{entry.signature}
+func funSort_lssil(parameters: seq[Value]): FunResult
 ```
 
 # funSort_lsssl
@@ -979,7 +979,7 @@ sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 ~~~~
 
 ```nim
-{entry.signature}
+func funSort_lsssl(parameters: seq[Value]): FunResult
 ```
 
 # funGithubAnchor_ss
@@ -1012,7 +1012,7 @@ $$ : anchor = githubAnchor(entry.name)
 ~~~~
 
 ```nim
-{entry.signature}
+func funGithubAnchor_ss(parameters: seq[Value]): FunResult
 ```
 
 # funGithubAnchor_ll
@@ -1033,7 +1033,7 @@ githubAnchor(list) =>
 ~~~~
 
 ```nim
-{entry.signature}
+func funGithubAnchor_ll(parameters: seq[Value]): FunResult
 ```
 
 # funType_as
@@ -1055,7 +1055,7 @@ type(dict("a", 1, "b", 2)) => "dict"
 ~~~~
 
 ```nim
-{entry.signature}
+func funType_as(parameters: seq[Value]): FunResult
 ```
 
 # funJoinPath_loss
@@ -1098,7 +1098,7 @@ joinPath(list("/", "tea")) =>
 ~~~~
 
 ```nim
-{entry.signature}
+func funJoinPath_loss(parameters: seq[Value]): FunResult
 ```
 
 # funJoinPath_oSs
@@ -1124,7 +1124,7 @@ joinPath("images/", "tea") =>
 ~~~~
 
 ```nim
-{entry.signature}
+func funJoinPath_oSs(parameters: seq[Value]): FunResult
 ```
 
 # funJoin_lsois
@@ -1149,7 +1149,7 @@ join(list("a", "", "c"), "|", 1) => "a|c"
 ~~~~
 
 ```nim
-{entry.signature}
+func funJoin_lsois(parameters: seq[Value]): FunResult
 ```
 
 # createFunctionTable
@@ -1157,7 +1157,7 @@ join(list("a", "", "c"), "|", 1) => "a|c"
 Create a table of all the built in functions.
 
 ```nim
-{entry.signature}
+func createFunctionTable(): Table[string, seq[FunctionSpec]]
 ```
 
 # getFunctionList
@@ -1165,7 +1165,7 @@ Create a table of all the built in functions.
 Return the functions with the given name.
 
 ```nim
-{entry.signature}
+proc getFunctionList(name: string): seq[FunctionSpec]
 ```
 
 # getFunction
@@ -1173,7 +1173,8 @@ Return the functions with the given name.
 Find the function with the given name and return a pointer to it. If there are multiple functions with the name, return the one that matches the parameters, if none match, return the first one.
 
 ```nim
-{entry.signature}
+proc getFunction(functionName: string; parameters: seq[Value]): Option[
+    FunctionSpec]
 ```
 
 # isFunctionName
@@ -1181,7 +1182,7 @@ Find the function with the given name and return a pointer to it. If there are m
 Return true when the function exists.
 
 ```nim
-{entry.signature}
+proc isFunctionName(functionName: string): bool
 ```
 
 

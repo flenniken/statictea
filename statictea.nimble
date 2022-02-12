@@ -765,6 +765,7 @@ task docsall, "\tCreate all the docs, docsix, docs, readmefun, dot.":
   taskDocsIx()
   taskDocs("")
   taskReadMeFun()
+  taskTestfilesReadme()
   createDependencyGraph()
   createDependencyGraph2()
 
@@ -850,7 +851,7 @@ task rt, "\tRun one or more stf tests in testfiles; specify part of the name.":
 # task stf, "\tList stf tests with newest last.":
 #   exec """ls -1tr testfiles/*.stf | xargs grep "##" | cut -c 11- | sed 's/:## / -- /'"""
 
-task testfilesreadme, "\tCreate testfiles readme.md.":
+task stfreadme, "\tCreate testfiles readme.md.":
   taskTestfilesReadme()
 
 task newstf, "\tCreate new stf as a starting point for a new test.":

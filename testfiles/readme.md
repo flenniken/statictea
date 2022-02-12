@@ -28,11 +28,11 @@ This folder contains stf test files for statictea.
 * [replace-readme1](../testfiles/replace-readme1.stf.md) &mdash; The first replace readme example.
 * [replace-readme2](../testfiles/replace-readme2.stf.md) &mdash; The second replace readme example.
 * [replace-readme3](../testfiles/replace-readme3.stf.md) &mdash; Test standard readme replace example 3.
+* [slice](../testfiles/slice.stf.md) &mdash; Test the slice function.
 * [statements](../testfiles/statements.stf.md) &mdash; Test readme statements section.
 * [stdin](../testfiles/stdin.stf.md) &mdash; Test a template coming from stdin.
 * [string-basics](../testfiles/string-basics.stf.md) &mdash; Test the string type.
 * [string-unicode](../testfiles/string-unicode.stf.md) &mdash; Test unicode in strings.
-* [substr](../testfiles/substr.stf.md) &mdash; Test the substr function.
 * [syntax-basics](../testfiles/syntax-basics.stf.md) &mdash; Test the readme syntax section.
 * [t-content](../testfiles/t-content.stf.md) &mdash; Test the t.content variable.
 * [t-repeat-basics](../testfiles/t-repeat-basics.stf.md) &mdash; Test the t.repeat variable.

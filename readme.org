@@ -1420,10 +1420,14 @@ examples:
 :CUSTOM_ID: encoding-and-line-endings
 :END:
 
-Templates are UTF-8 encoded.  Two line endings are supported on
-all platforms: LF, and CR/LF.  Line endings are preserved.  The
-template syntax only uses ASCII except unicode characters in
-strings. The maximum command line length is 1024 bytes. There is
+Templates are treated as a stream of bytes. The embedded
+statictea commands only use ASCII except for quoted strings which
+are UTF-8 encoded.
+
+Two line endings are supported on all platforms: LF, and CR/LF
+and they are preserved.
+
+The maximum command line length is 1024 bytes. There is
 no limit on non-command lines.
 
 Since line endings are preserved and there are no encoding or
