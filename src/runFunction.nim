@@ -159,26 +159,23 @@ func funCmp_ssoii*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(ret))
 
 func funConcat*(parameters: seq[Value]): FunResult =
-  ## Concatentate strings.
+  ## Concatentate two strings.
   ## @:
   ## @:~~~
-  ## @:concat(strs: varargs(string)) string
+  ## @:concat(a: string, b: string) string
   ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
   ## @:concat("tea", " time") => "tea time"
-  ## @:concat("a", "b", "c", "d") => "abcd"
-  ## @:concat("a") => "a"
+  ## @:concat("a", "b") => "ab"
   ## @:~~~~
 
-  tMapParameters("Ss")
-  let strs = map["a"].listv
-  var returnString: string
-  for value in strs:
-    returnString.add(value.stringv)
-  result = newFunResult(newValue(returnString))
+  tMapParameters("sss")
+  var a = map["a"].stringv
+  let b = map["b"].stringv
+  result = newFunResult(newValue(a & b))
 
 func funLen_si*(parameters: seq[Value]): FunResult =
   ## Number of characters in a string.
@@ -378,28 +375,25 @@ func funAdd_iii*(parameters: seq[Value]): FunResult =
   except:
     result = newFunResultWarn(wOverflow)
 
-func funAdd_Fi*(parameters: seq[Value]): FunResult =
-  ## Add floats. A warning is generated on overflow.
+func funAdd_fff*(parameters: seq[Value]): FunResult =
+  ## Add two floats. A warning is generated on overflow.
   ## @:
   ## @:~~~
-  ## @:add(numbers: varargs(float)) float
+  ## @:add(a: float, b: float) float
   ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:add(1.5) => 1.5
   ## @:add(1.5, 2.3) => 3.8
-  ## @:add(1.1, 2.2, 3.3) => 6.6
+  ## @:add(3.3, -2.2) => 1.1
   ## @:~~~~
 
-  tMapParameters("Fi")
-  let list = map["a"].listv
-  var total = 0.0
+  tMapParameters("fff")
+  let a = map["a"].floatv
+  let b = map["b"].floatv
   try:
-    for num in list:
-      total = total + num.floatv
-    result = newFunResult(newValue(total))
+    result = newFunResult(newValue(a + b))
   except:
     result = newFunResultWarn(wOverflow)
 
@@ -1658,7 +1652,7 @@ const
     ("len", funLen_si, "si"),
     ("len", funLen_li, "li"),
     ("len", funLen_di, "di"),
-    ("concat", funConcat, "Ss"),
+    ("concat", funConcat, "sss"),
     ("get", funGet_lioaa, "lioaa"),
     ("get", funGet_dsoaa, "dsoaa"),
     ("cmp", funCmp_iii, "iii"),
@@ -1666,7 +1660,7 @@ const
     ("cmp", funCmp_ssoii, "ssoii"),
     ("if0", funIf0, "iaaa"),
     ("add", funAdd_iii, "iii"),
-    ("add", funAdd_Fi, "Fi"),
+    ("add", funAdd_fff, "fff"),
     ("exists", funExists, "dsi"),
     ("case", funCase_iloaa, "iloaa"),
     ("case", funCase_sloaa, "sloaa"),

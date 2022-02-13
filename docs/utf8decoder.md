@@ -6,6 +6,7 @@ Functions for decoding and validating UTF-8.
 # Index
 
 * [decode](#decode) &mdash; Interior part of a UTF-8 decoder.
+* [yieldUtf8Chars](#yieldutf8chars) &mdash; Iterate through the string's UTF-8 character byte sequences.
 * [validateUtf8String](#validateutf8string) &mdash; Return the position of the first invalid UTF-8 byte in the string else return -1.
 * [sanitizeUtf8](#sanitizeutf8) &mdash; Sanitize and return the UTF-8 string.
 * [utf8CharString](#utf8charstring) &mdash; Get the unicode character at pos.
@@ -16,6 +17,22 @@ Interior part of a UTF-8 decoder.
 
 ```nim
 proc decode(state: var uint32; codep: var uint32; sByte: char)
+```
+
+# yieldUtf8Chars
+
+Iterate through the string's UTF-8 character byte sequences.
+For each character set ixStartSeq, ixEndSeq, and codePoint.
+Return true when the bytes sequence is valid else return false.
+
+You can get the current byte sequence with:
+str[ixStartSeq .. ixEndSeq]
+
+A UTF-8 character is a one to four byte sequence.
+
+```nim
+iterator yieldUtf8Chars(str: string; ixStartSeq: var int; ixEndSeq: var int;
+                        codePoint: var uint32): bool
 ```
 
 # validateUtf8String

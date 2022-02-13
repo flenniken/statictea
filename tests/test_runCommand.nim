@@ -531,10 +531,10 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "getFunctionValue nested":
     let functionName = "concat"
-    let statement = newStatement(text="""tea = concat("abc", concat("xyz", "123"), "def") """, lineNum=16, 0)
+    let statement = newStatement(text="""tea = concat("abc", concat("xyz", "123")) """, lineNum=16, 0)
     let start = 13
-    let value = Value(kind: vkString, stringv: "abcxyz123def")
-    let eValueAndLengthO = some(ValueAndLength(value: value, length: 36))
+    let value = Value(kind: vkString, stringv: "abcxyz123")
+    let eValueAndLengthO = some(ValueAndLength(value: value, length: 29))
     check testGetFunctionValue(functionName, statement, start, eValueAndLengthO = eValueAndLengthO)
 
   test "getFunctionValue missing )":
@@ -699,7 +699,7 @@ statement: result = dict("1", "else", "2", "two", "3")
     let text = """result = case(33, 2, 22, "abc", 11, len(concat()))"""
     let statement = newStatement(text, lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w119: Not enough parameters, expected 1 got 0.
+template.html(1): w119: Not enough parameters, expected 2 got 0.
 statement: result = case(33, 2, 22, "abc", 11, len(concat()))
                                                           ^
 """

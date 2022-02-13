@@ -1657,15 +1657,15 @@ readmefun nimble task which uses the StaticTea template
 List of functions:
 
 # Dynamic Content Begins
-- [[#add][add()]] -- Add floats.
-- [[#add][add()]] -- Add integers.
+- [[#add][add()]] -- Add two floats.
+- [[#add][add()]] -- Add two integers.
 - [[#case][case()]] -- Compare integer cases and return the matching value.
 - [[#case][case()]] -- Compare string cases and return the matching value.
 - [[#cmpVersion][cmpVersion()]] -- Compare two StaticTea version numbers.
 - [[#cmp][cmp()]] -- Compare two floats.
 - [[#cmp][cmp()]] -- Compare two ints.
 - [[#cmp][cmp()]] -- Compare two strings.
-- [[#concat][concat()]] -- Concatentate strings.
+- [[#concat][concat()]] -- Concatentate two strings.
 - [[#dict][dict()]] -- Create a dictionary from a list of key, value pairs.
 - [[#dup][dup()]] -- Duplicate a string x times.
 - [[#exists][exists()]] -- Determine whether a key exists in a dictionary.
@@ -1707,18 +1707,17 @@ List of functions:
 :CUSTOM_ID: add
 :END:
 
-Add floats. A warning is generated on overflow.
+Add two floats. A warning is generated on overflow.
 
 #+BEGIN_SRC
-add(numbers: varargs(float)) float
+add(a: float, b: float) float
 #+END_SRC
 
 Examples:
 
 #+BEGIN_SRC
-add(1.5) => 1.5
 add(1.5, 2.3) => 3.8
-add(1.1, 2.2, 3.3) => 6.6
+add(3.3, -2.2) => 1.1
 #+END_SRC
 
 [[#contents][茶]]
@@ -1728,18 +1727,18 @@ add(1.1, 2.2, 3.3) => 6.6
 :CUSTOM_ID: add
 :END:
 
-Add integers. A warning is generated on overflow.
+Add two integers. A warning is generated on overflow.
 
 #+BEGIN_SRC
-add(numbers: varargs(int)) int
+add(a: int, b: int)) int
 #+END_SRC
 
 Examples:
 
 #+BEGIN_SRC
-add(1) => 1
 add(1, 2) => 3
-add(1, 2, 3) => 6
+add(3, -2) => 1
+add(-2, -5) => -7
 #+END_SRC
 
 [[#contents][茶]]
@@ -1917,18 +1916,17 @@ cmp("Tea", "tea", 1) => 0
 :CUSTOM_ID: concat
 :END:
 
-Concatentate strings.
+Concatentate two strings.
 
 #+BEGIN_SRC
-concat(strs: varargs(string)) string
+concat(a: string, b: string) string
 #+END_SRC
 
 Examples:
 
 #+BEGIN_SRC
 concat("tea", " time") => "tea time"
-concat("a", "b", "c", "d") => "abcd"
-concat("a") => "a"
+concat("a", "b") => "ab"
 #+END_SRC
 
 [[#contents][茶]]

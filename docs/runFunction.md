@@ -9,7 +9,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funCmp_iii](#funcmp_iii) &mdash; Compare two ints.
 * [funCmp_ffi](#funcmp_ffi) &mdash; Compare two floats.
 * [funCmp_ssoii](#funcmp_ssoii) &mdash; Compare two strings.
-* [funConcat](#funconcat) &mdash; Concatentate strings.
+* [funConcat](#funconcat) &mdash; Concatentate two strings.
 * [funLen_si](#funlen_si) &mdash; Number of characters in a string.
 * [funLen_li](#funlen_li) &mdash; Number of elements in a list.
 * [funLen_di](#funlen_di) &mdash; Number of elements in a dictionary.
@@ -17,8 +17,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
 * [funIf0](#funif0) &mdash; If the condition is 0, return the second parameter, else return the third.
 * [funIf1](#funif1) &mdash; If the condition is 1, return the second parameter, else return the third.
-* [funAdd_Ii](#funadd_ii) &mdash; Add integers.
-* [funAdd_Fi](#funadd_fi) &mdash; Add floats.
+* [funAdd_iii](#funadd_iii) &mdash; Add two integers.
+* [funAdd_fff](#funadd_fff) &mdash; Add two floats.
 * [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
 * [funCase_iloaa](#funcase_iloaa) &mdash; Compare integer cases and return the matching value.
 * [funCase_sloaa](#funcase_sloaa) &mdash; Compare string cases and return the matching value.
@@ -132,18 +132,17 @@ func funCmp_ssoii(parameters: seq[Value]): FunResult
 
 # funConcat
 
-Concatentate strings.
+Concatentate two strings.
 
 ~~~
-concat(strs: varargs(string)) string
+concat(a: string, b: string) string
 ~~~~
 
 Examples:
 
 ~~~
 concat("tea", " time") => "tea time"
-concat("a", "b", "c", "d") => "abcd"
-concat("a") => "a"
+concat("a", "b") => "ab"
 ~~~~
 
 ```nim
@@ -302,44 +301,43 @@ if1(4, "tea", "beer") => "beer"
 func funIf1(parameters: seq[Value]): FunResult
 ```
 
-# funAdd_Ii
+# funAdd_iii
 
-Add integers. A warning is generated on overflow.
+Add two integers. A warning is generated on overflow.
 
 ~~~
-add(numbers: varargs(int)) int
+add(a: int, b: int)) int
 ~~~~
 
 Examples:
 
 ~~~
-add(1) => 1
 add(1, 2) => 3
-add(1, 2, 3) => 6
+add(3, -2) => 1
+add(-2, -5) => -7
 ~~~~
 
 ```nim
-func funAdd_Ii(parameters: seq[Value]): FunResult
+func funAdd_iii(parameters: seq[Value]): FunResult
 ```
 
-# funAdd_Fi
+# funAdd_fff
 
-Add floats. A warning is generated on overflow.
+Add two floats. A warning is generated on overflow.
 
 ~~~
-add(numbers: varargs(float)) float
+add(a: float, b: float) float
 ~~~~
 
 Examples:
 
 ~~~
-add(1.5) => 1.5
 add(1.5, 2.3) => 3.8
-add(1.1, 2.2, 3.3) => 6.6
+add(3.3, -2.2) => 1.1
 ~~~~
 
 ```nim
-func funAdd_Fi(parameters: seq[Value]): FunResult
+func funAdd_fff(parameters: seq[Value]): FunResult
 ```
 
 # funExists

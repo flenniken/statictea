@@ -5,7 +5,6 @@ Functions that deal with Unicode.
 * [unicodes.nim](../src/unicodes.nim) &mdash; Nim source code.
 # Index
 
-* [yieldUtf8Chars](#yieldutf8chars) &mdash; Iterate through the string's UTF-8 character byte sequences.
 * [cmpString](#cmpstring) &mdash; Compares two UTF-8 strings a and b.
 * [stringLen](#stringlen) &mdash; Return the number of unicode characters in the string (not bytes).
 * [githubAnchor](#githubanchor) &mdash; Convert the name to a github anchor name.
@@ -17,22 +16,6 @@ Functions that deal with Unicode.
 * [parseHexUnicodeToString](#parsehexunicodetostring) &mdash; Return a one character string given a 4 or 8 character unicode escape string.
 * [stringToCodePoints](#stringtocodepoints) &mdash; Return the string as a list of code points.
 * [slice](#slice) &mdash; Extract a substring from a string by its Unicode character position (not byte index).
-
-# yieldUtf8Chars
-
-Iterate through the string's UTF-8 character byte sequences.
-For each character set ixStartSeq, ixEndSeq, and codePoint.
-Return true when the bytes sequence is valid else return false.
-
-You can get the current byte sequence with:
-str[ixStartSeq .. ixEndSeq]
-
-A UTF-8 character is a one to four byte sequence.
-
-```nim
-iterator yieldUtf8Chars(str: string; ixStartSeq: var int; ixEndSeq: var int;
-                        codePoint: var uint32): bool
-```
 
 # cmpString
 

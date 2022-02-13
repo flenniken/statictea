@@ -125,7 +125,7 @@ suite "runFunction.nim":
 
   test "getFunction concat":
     var parameters = @[newValue(1), newValue(1)]
-    check testGetFunctionExists("concat", parameters, "Ss")
+    check testGetFunctionExists("concat", parameters, "sss")
 
   test "getFunction cmp ints":
     var parameters = @[newValue(1), newValue(1)]
@@ -145,29 +145,19 @@ suite "runFunction.nim":
     var parameters = @[newValue(1), newValue(1.0)]
     check testGetFunctionExists("cmp", parameters, "iii")
 
-  test "concat 1 string":
-    var parameters = newValue(["abc"]).listv
-    let eFunResult = newFunResult(newValue("abc"))
-    check testFunction("concat", parameters, eFunResult)
-
   test "concat hello world":
     var parameters = newValue(["Hello", " World"]).listv
     let eFunResult = newFunResult(newValue("Hello World"))
     check testFunction("concat", parameters, eFunResult)
 
   test "concat empty string":
-    var parameters = newValue(["abc","", "def"]).listv
-    let eFunResult = newFunResult(newValue("abcdef"))
-    check testFunction("concat", parameters, eFunResult)
-
-  test "concat many":
-    var parameters = newValue(["a", "b", "c", "d", "e", "f"]).listv
-    let eFunResult = newFunResult(newValue("abcdef"))
+    var parameters = newValue(["abc", ""]).listv
+    let eFunResult = newFunResult(newValue("abc"))
     check testFunction("concat", parameters, eFunResult)
 
   test "concat nothing":
     var parameters: seq[Value]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1", "0")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "0")
     check testFunction("concat", parameters, eFunResult)
 
   test "len string":
@@ -395,9 +385,9 @@ suite "runFunction.nim":
     let eFunResult = newFunResult(newValue(3.8))
     check testFunction("add", parameters, eFunResult)
 
-  test "add 1.1 + 2.2 + 3.3":
-    var parameters = @[newValue(1.1), newValue(2.2), newValue(3.3)]
-    let eFunResult = newFunResult(newValue(6.6))
+  test "add 3.3 - 2.2 = 1.1":
+    var parameters = @[newValue(3.5), newValue(-2.5)]
+    let eFunResult = newFunResult(newValue(1.0))
     check testFunction("add", parameters, eFunResult)
 
   test "add no parameters":

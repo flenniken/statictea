@@ -10,6 +10,7 @@ This folder contains stf test files for statictea.
 * [endline](../testfiles/endline.stf.md) &mdash; Test there are no extra lines for the readmefun case.
 * [globalvars](../testfiles/globalvars.stf.md) &mdash; Test global variables.
 * [hello](../testfiles/hello.stf.md) &mdash; Readme Hello World example.
+* [int-section](../testfiles/int-section.stf.md) &mdash; Test the int type.
 * [len](../testfiles/len.stf.md) &mdash; Test the len function.
 * [localvars-basics](../testfiles/localvars-basics.stf.md) &mdash; Test the readme local variables section.
 * [logging-hello-world](../testfiles/logging-hello-world.stf.md) &mdash; Test logging with Hello World.

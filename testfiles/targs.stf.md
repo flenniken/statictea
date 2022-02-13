@@ -56,7 +56,7 @@ $$ block t.repeat = len(t.args.prepostList)
 $$ : prepost = get(t.args.prepostList, t.row)
 $$ : prefix = get(prepost, 0)
 $$ : postfix = get(prepost, 1)
-$$ : part = concat("--prepost='", join(list(prefix, postfix), ",", 1), "'")
+$$ : part = concat("--prepost='", concat(join(list(prefix, postfix), ",", 1), "'"))
 $$ : g.prepostParts &= part
 $$ endblock
 $$ nextline
