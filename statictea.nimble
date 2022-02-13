@@ -703,6 +703,19 @@ proc createTestAll(testAllBasename: string, filenames: seq[string]) =
     lines.add("include " & name)
   writeFile(joinPath("tests", testAllBasename), lines.join("\n"))
 
+proc otherTests() =
+  # Make sure it builds with test undefined.
+  buildRelease()
+
+  # Build runner.
+  buildRunner()
+
+  # Run the stf tests.
+  runRunnerFolder()
+
+  # Make sure utf8decoder is up-to-date.
+  checkUtf8DecoderEcho()
+
 # Tasks below
 
 task n, "\tShow available tasks.":
@@ -729,17 +742,10 @@ task t, "\tRun all tests at once.":
   rmFile("tests/testall1.nim")
   rmFile("tests/testall2.nim")
 
-  # Make sure it builds with test undefined.
-  buildRelease()
+  otherTests()
 
-  # Build runner.
-  buildRunner()
-
-  # Run the stf tests.
-  runRunnerFolder()
-
-  # Make sure utf8decoder is up-to-date.
-  checkUtf8DecoderEcho()
+task other, "\tRun other tests and build tests.":
+  otherTests()
 
 task test, "\tRun one or more tests; specify part of test filename.":
   ## Run one or more tests.  You specify part of the test filename and

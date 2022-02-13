@@ -9,46 +9,6 @@ import messages
 import warnings
 import utf8decoder
 
-iterator yieldUtf8Chars*(str: string, ixStartSeq: var int,
-    ixEndSeq: var int, codePoint: var uint32): bool =
-  ## Iterate through the string's UTF-8 character byte sequences.
-  ## @:For each character set ixStartSeq, ixEndSeq, and codePoint.
-  ## @:Return true when the bytes sequence is valid else return false.
-  ## @:
-  ## @:You can get the current byte sequence with:
-  ## @:str[ixStartSeq .. ixEndSeq]
-  ## @:
-  ## @:A UTF-8 character is a one to four byte sequence.
-
-  ixStartSeq = 0
-  ixEndSeq = 0
-  codePoint = 0
-  var state = 0u32
-  while true:
-    if ixEndSeq >= str.len:
-      break
-    decode(state, codePoint, str[ixEndSeq])
-
-    case state:
-    of 0:
-      yield true
-      inc(ixEndSeq)
-      ixStartSeq = ixEndSeq
-    of 12:
-      if ixEndSeq > ixStartSeq:
-        # Restart at the byte that broke a multi-byte sequence.
-        dec(ixEndSeq)
-      codePoint = 0
-      yield false
-      inc(ixEndSeq)
-      ixStartSeq = ixEndSeq
-      state = 0
-    else:
-      inc(ixEndSeq)
-
-  if state != 0:
-    yield false
-
 func cmpString*(a, b: string, insensitive: bool = false): int =
   ## Compares two UTF-8 strings a and b.  When a equals b return 0,
   ## when a is greater than b return 1 and when a is less than b
