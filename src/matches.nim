@@ -165,11 +165,15 @@ func matchNumberNotCached*(line: string, start: Natural = 0): Option[Matches] =
 
 proc matchLeftBracket*(line: string, start: Natural = 0): Option[Matches] =
   ## Match everything up to a left backet. The match length includes
-  ## the bracket.
+  ## @:the bracket.
+  ## @:
+  ## @:A replacement variable is inside brackets.
+  ## @:
+  ## @:~~~
+  ## @:text on the line {variable} more text {variable2} asdf
+  ## @:                  ^
+  ## @:~~~~
 
-  # A replacement variable is inside brackets.
-  # text on the line {variable} more text {variable2} asdf
-  #                   ^
   let pattern = "[^{]*{"
   result = matchPatternCached(line, pattern, start)
 

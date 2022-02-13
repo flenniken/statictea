@@ -159,7 +159,15 @@ func matchNumberNotCached(line: string; start: Natural = 0): Option[Matches]
 
 # matchLeftBracket
 
-Match everything up to a left backet. The match length includes the bracket.
+Match everything up to a left backet. The match length includes
+the bracket.
+
+A replacement variable is inside brackets.
+
+~~~
+text on the line {variable} more text {variable2} asdf
+                  ^
+~~~~
 
 ```nim
 proc matchLeftBracket(line: string; start: Natural = 0): Option[Matches]
