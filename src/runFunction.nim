@@ -355,28 +355,26 @@ func funIf1*(parameters: seq[Value]): FunResult =
 
 {.push overflowChecks: on, floatChecks: on.}
 
-func funAdd_Ii*(parameters: seq[Value]): FunResult =
-  ## Add integers. A warning is generated on overflow.
+func funAdd_iii*(parameters: seq[Value]): FunResult =
+  ## Add two integers. A warning is generated on overflow.
   ## @:
   ## @:~~~
-  ## @:add(numbers: varargs(int)) int
+  ## @:add(a: int, b: int)) int
   ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:add(1) => 1
   ## @:add(1, 2) => 3
-  ## @:add(1, 2, 3) => 6
+  ## @:add(3, -2) => 1
+  ## @:add(-2, -5) => -7
   ## @:~~~~
 
-  tMapParameters("Ii")
-  let list = map["a"].listv
-  var total = 0i64
+  tMapParameters("iii")
+  let a = map["a"].intv
+  let b = map["b"].intv
   try:
-    for num in list:
-      total = total + num.intv
-    result = newFunResult(newValue(total))
+    result = newFunResult(newValue(a + b))
   except:
     result = newFunResultWarn(wOverflow)
 
@@ -1667,7 +1665,7 @@ const
     ("cmp", funCmp_ffi, "ffi"),
     ("cmp", funCmp_ssoii, "ssoii"),
     ("if0", funIf0, "iaaa"),
-    ("add", funAdd_Ii, "Ii"),
+    ("add", funAdd_iii, "iii"),
     ("add", funAdd_Fi, "Fi"),
     ("exists", funExists, "dsi"),
     ("case", funCase_iloaa, "iloaa"),

@@ -380,29 +380,14 @@ suite "runFunction.nim":
     let eFunResult = newFunResult(newValue("else"))
     check testFunction("if1", parameters, eFunResult)
 
-  test "add 1":
-    var parameters = @[newValue(1)]
-    let eFunResult = newFunResult(newValue(1))
-    check testFunction("add", parameters, eFunResult)
-
   test "add 1 + 2":
     var parameters = @[newValue(1), newValue(2)]
     let eFunResult = newFunResult(newValue(3))
     check testFunction("add", parameters, eFunResult)
 
-  test "add 1 + 2 + 3":
-    var parameters = @[newValue(1), newValue(2), newValue(3)]
-    let eFunResult = newFunResult(newValue(6))
-    check testFunction("add", parameters, eFunResult)
-
-  test "add 1 + 2 - 4":
-    var parameters = @[newValue(1), newValue(2), newValue(-4)]
-    let eFunResult = newFunResult(newValue(-1))
-    check testFunction("add", parameters, eFunResult)
-
-  test "add 1.5":
-    var parameters = @[newValue(1.5)]
-    let eFunResult = newFunResult(newValue(1.5))
+  test "add 1 - 4":
+    var parameters = @[newValue(1), newValue(-4)]
+    let eFunResult = newFunResult(newValue(-3))
     check testFunction("add", parameters, eFunResult)
 
   test "add 1.5 + 2.3":
@@ -417,7 +402,7 @@ suite "runFunction.nim":
 
   test "add no parameters":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1", "0")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "0")
     check testFunction("add", parameters, eFunResult)
 
   test "add string and int":
