@@ -163,6 +163,8 @@ type
     wStartPosTooBig,       ## w152
     wLengthTooBig,         ## w153
     wStartPosTooSmall,     ## w154
+    wDictRequiresEven,     ## w155
+    wDictStringKey,        ## w156
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -321,6 +323,8 @@ const
     "The start position is greater then the number of characters in the string.", ## wStartPosTooBig
     "The length is greater then the possible number of characters in the slice.", ## wLengthTooBig
     "The start position is less than 0.", ## wStartPosTooSmall
+    "Dictionaries require an even number of list items.", ## wDictRequiresEven
+    "The dictionary keys must be strings.", ## wDictStringKey
 
     ]
     ## The message text.

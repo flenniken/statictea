@@ -21,10 +21,10 @@ $$ : list0 = len(list())
 $$ : dict0 = len(dict())
 $$ : str1 = len("a")
 $$ : list1 = len(list(1))
-$$ : dict1 = len(dict("a", 1))
+$$ : dict1 = len(dict(list("a", 1)))
 $$ : str2 = len("ab")
 $$ : list2 = len(list(1, 2))
-$$ : dict2= len(dict("a", 1, "b", 1))
+$$ : dict2= len(dict(list("a", 1, "b", 1)))
 
 str0 => {str0}
 list0 => {list0}

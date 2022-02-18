@@ -784,36 +784,40 @@ suite "runFunction.nim":
     let eFunResult = newFunResultWarn(wDupStringTooLong, 1, "123333")
     check testFunction("dup", parameters, eFunResult)
 
-  test "dict":
+  test "dict()":
     var parameters: seq[Value] = @[]
     let eFunResult = newFunResult(newEmptyDictValue())
     check testFunction("dict", parameters, eFunResult)
 
-  test "dict 1 item":
-    var parameters = @[newValue("a"), newValue(5)]
+  test "dict(['a', 5])":
+    let listValue = newValue([newValue("a"), newValue(5)])
+    var parameters = @[listValue]
     var dict = newValue([("a", 5)])
     let eFunResult = newFunResult(dict)
     check testFunction("dict", parameters, eFunResult)
 
-  test "dict 2 items":
-    var parameters = @[newValue("a"), newValue(5), newValue("b"), newValue(3)]
+  test "dict(['a', 5, 'b', 3])":
+    let listValue = newValue([newValue("a"), newValue(5), newValue("b"), newValue(3)])
+    var parameters = @[listValue]
     let dict = newValue([("a", 5), ("b", 3)])
     let eFunResult = newFunResult(dict)
     check testFunction("dict", parameters, eFunResult)
 
-  test "dict 1 parameter":
-    var parameters = @[newValue("a")]
-    let eFunResult = newFunResultWarn(kNotEnoughVarargs, 0, "2", "1")
+  test "dict(['a'])":
+    var parameters = @[newValue([newValue("a")])]
+    let eFunResult = newFunResultWarn(wDictRequiresEven, 0)
     check testFunction("dict", parameters, eFunResult)
 
-  test "dict 3 parameter":
-    var parameters = @[newValue("a")]
-    let eFunResult = newFunResultWarn(kNotEnoughVarargs, 0, "2", "1")
+  test "dict(['a', 'b', 'c'])":
+    let listValue = newValue([newValue("a"), newValue("b"), newValue("c")])
+    var parameters = @[listValue]
+    let eFunResult = newFunResultWarn(wDictRequiresEven, 0)
     check testFunction("dict", parameters, eFunResult)
 
-  test "dict not string key":
-    var parameters = @[newValue("key"), newValue(1), newValue(2), newValue(1)]
-    let eFunResult = newFunResultWarn(kWrongType, 2, "string", "int")
+  test "dict(['key', 1, 2, 1])":
+    let listValue = newValue([newValue("key"), newValue(1), newValue(2), newValue(1)])
+    var parameters = @[listValue]
+    let eFunResult = newFunResultWarn(wDictStringKey, 0)
     check testFunction("dict", parameters, eFunResult)
 
   test "list empty":
@@ -947,44 +951,49 @@ suite "runFunction.nim":
     check testFunction("replace", parameters, eFunResult)
 
   test "replaceRe good":
-    check testReplaceReGood("abc123abc", "abc", "456", "456123456")
-    check testReplaceReGood("testFunResulthere FunResult FunResult", r"\bFunResult\b", "FunResult_",
-                            "testFunResulthere FunResult_ FunResult_")
-    check testReplaceReGood("abc123abc", "^abc", "456", "456123abc")
-    check testReplaceReGood("abc123abc", "abc$", "456", "abc123456")
-    check testReplaceReGood("abc123abc", "abc", "", "123")
-    check testReplaceReGood("abc123abc", "a", "", "bc123bc")
-    check testReplaceReGood("", "", "", "")
-    check testReplaceReGood("", "a", "", "")
-    check testReplaceReGood("b", "a", "", "b")
-    check testReplaceReGood("", "a", "b", "")
-    check testReplaceReGood("abc123abc", "a", "x", "b", "y", "xyc123xyc")
-    check testReplaceReGood("abc123abc", "a", "x", "b", "y", "c", "z", "xyz123xyz")
-    check testReplaceReGood(" @:- p1\n @: 222", " @:[ ]*", "", "- p1\n222")
-    check testReplaceReGood("value one @: @: ... @: @:- pn-2", "[ ]*@:[ ]*", "X", "value oneXX...XX- pn-2")
+    check testReplaceReGoodList("abc123abc", newValue(["abc", "456"]), "456123456")
+    check testReplaceReGoodList("testFunResulthere FunResult FunResult",
+      newValue([r"\bFunResult\b", "FunResult_"]),
+      "testFunResulthere FunResult_ FunResult_")
+    check testReplaceReGoodList("abc123abc", newValue(["^abc", "456"]), "456123abc")
+    check testReplaceReGoodList("abc123abc", newValue(["abc$", "456"]), "abc123456")
+    check testReplaceReGoodList("abc123abc", newValue(["abc", ""]), "123")
+    check testReplaceReGoodList("abc123abc", newValue(["a", ""]), "bc123bc")
+    check testReplaceReGoodList("", newValue(["", ""]), "")
+    check testReplaceReGoodList("", newValue(["a", ""]), "")
+    check testReplaceReGoodList("b", newValue(["a", ""]), "b")
+    check testReplaceReGoodList("", newValue(["a", "b"]), "")
+    check testReplaceReGoodList("abc123abc", newValue(["a", "x", "b", "y"]), "xyc123xyc")
+    check testReplaceReGoodList("abc123abc",
+      newValue(["a", "x", "b", "y", "c", "z"]), "xyz123xyz")
+    check testReplaceReGoodList(" @:- p1\n @: 222", newValue([" @:[ ]*", ""]), "- p1\n222")
+    check testReplaceReGoodList("value one @: @: ... @: @:- pn-2",
+      newValue(["[ ]*@:[ ]*", "X"]), "value oneXX...XX- pn-2")
     let text = ":linkTargetBegin:Semantic Versioning:linkTargetEnd://semver.org/"
-    check testReplaceReGood(text, ":linkTargetBegin:", ".. _`", ":linkTargetEnd:", "`: https", ".. _`Semantic Versioning`: https//semver.org/")
+    check testReplaceReGoodList(text, newValue([":linkTargetBegin:", ".. _`",
+      ":linkTargetEnd:", "`: https"]), ".. _`Semantic Versioning`: https//semver.org/")
 
     let textMd = "## @:StaticTea uses @{Semantic Versioning}@(https@@://semver.org/)"
     let eTextMd = "##\nStaticTea uses [Semantic Versioning](https://semver.org/)"
-    check testReplaceReGood(textMd, "@@", "", r"@{", "[", r"}@", "]", "[ ]*@:", "\n", eTextMd)
+    check testReplaceReGoodList(textMd,
+      newValue(["@@", "", r"@{", "[", r"}@", "]", "[ ]*@:", "\n"]), eTextMd)
 
   test "replaceRe brackets":
-    check testReplaceReGood("newOpResultIdId@{int}@(wUnknownArg)",
-      "@{", "[", "}@", "]", "newOpResultIdId[int](wUnknownArg)")
+    check testReplaceReGoodList("newOpResultIdId@{int}@(wUnknownArg)",
+      newValue(["@{", "[", "}@", "]"]), "newOpResultIdId[int](wUnknownArg)")
 
   test "replaceRe hide https":
-    check testReplaceReGood("https@@:/something.com",
-      "@@", "", "https:/something.com")
+    check testReplaceReGoodList("https@@:/something.com",
+      newValue(["@@", ""]), "https:/something.com")
 
   test "replaceRe lower case":
-    check testReplaceReGood("funReplace", "fun(.*)", "$1Fun", "ReplaceFun")
+    check testReplaceReGoodList("funReplace", newValue(["fun(.*)", "$1Fun"]), "ReplaceFun")
 
   test "replaceRe *":
-    check testReplaceReGood("* test", r"^\*", "-", "- test")
-    check testReplaceReGood("* test", "^\\*", "-", "- test")
-    check testReplaceReGood("@:* test", "@:\\*", "-", "- test")
-    check testReplaceReGood("""* "round""", "\\* \"", "- \"", "- \"round")
+    check testReplaceReGoodList("* test", newValue([r"^\*", "-"]), "- test")
+    check testReplaceReGoodList("* test", newValue(["^\\*", "-"]), "- test")
+    check testReplaceReGoodList("@:* test", newValue(["@:\\*", "-"]), "- test")
+    check testReplaceReGoodList("""* "round""", newValue(["\\* \"", "- \""]), "- \"round")
 
   # todo: runtime error. catch all these type of runtime errors in replace.
   # test "replaceRe error":
@@ -994,21 +1003,6 @@ suite "runFunction.nim":
     check testReplaceReGoodList("abc123abc", newValue(["abc", "456"]), "456123456")
     check testReplaceReGoodList("abc123abc", newValue(["a", "x", "b", "y", "c", "z"]),
                                 "xyz123xyz")
-
-  test "replaceRe not enough parameters":
-    var parameters: seq[Value] = @[newValue("Earl Grey")]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "3", "1")
-    check testFunction("replaceRe", parameters, eFunResult)
-
-  test "replaceRe not right number of parameters":
-    var parameters: seq[Value] = @[newValue("Earl Grey"), newValue("a"), newValue("b"), newValue("c")]
-    let eFunResult = newFunResultWarn(kNotEnoughVarargs, 3, "2", "1")
-    check testFunction("replaceRe", parameters, eFunResult)
-
-  test "replaceRe list wrong number of parameters":
-    var parameters: seq[Value] = @[newValue("Earl Grey"), newValue(["a", "b", "c"])]
-    let eFunResult = newFunResultWarn(wPairParameters, 1)
-    check testFunction("replaceRe", parameters, eFunResult)
 
   test "path":
     check testPathGood("dir/basename.ext", "basename.ext", "basename", ".ext", "dir/")

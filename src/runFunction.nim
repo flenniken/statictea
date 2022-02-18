@@ -833,31 +833,37 @@ func funDup*(parameters: seq[Value]): FunResult =
     str.add(pattern)
   result = newFunResult(newValue(str))
 
-func funDict*(parameters: seq[Value]): FunResult =
+func funDict_old*(parameters: seq[Value]): FunResult =
   ## Create a dictionary from a list of key, value pairs.  The keys
   ## @:must be strings and the values can be any type.
   ## @:
   ## @:~~~
-  ## @:dict(pairs: optional varargs(string, any)) dict
+  ## @:dict(pairs: optional list) dict
   ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
   ## @:dict() => {}
-  ## @:dict("a", 5) => {"a": 5}
-  ## @:dict("a", 5, "b", 33, "c", 0) =>
+  ## @:dict(list("a", 5)) => {"a": 5}
+  ## @:dict(list("a", 5, "b", 33, "c", 0)) =>
   ## @:  {"a": 5, "b": 33, "c": 0}
   ## @:~~~~
 
-  tMapParameters("oSAd")
+  tMapParameters("old")
 
   var dict = newVarsDict()
 
   if "a" in map:
     let pairs = map["a"].listv
+    if pairs.len mod 2 != 0:
+      # Dictionaries require an even number of list items.
+      return newFunResultWarn(wDictRequiresEven, 0)
     for ix in countUp(0, pairs.len-2, 2):
       var key = pairs[ix]
+      if key.kind != vkString:
+        # The dictionary keys must be strings.
+        return newFunResultWarn(wDictStringKey, 0)
       var value = pairs[ix+1]
       dict[key.stringv] = value
 
@@ -867,7 +873,7 @@ func funList*(parameters: seq[Value]): FunResult =
   ## Create a list of values.
   ## @:
   ## @:~~~
-  ## @:list(items: optional varargs(any)) list
+  ## @:list(...) list
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -946,62 +952,6 @@ func funReplace*(parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(newString))
 
-# proc funMatch*(parameters: seq[Value]): FunResult =
-#   ## Match a pattern in a string.
-#   ##
-#   ## The match function returns a dictionary with the results of the
-#   ## match.
-#   ##
-#   ## m = match(string, pattern, start, default)
-#   ## m = match("Tea time", "Tea")
-#   ## m = match("proc a(): FunResult =", "\bFunResult\b")
-#   ## m = match("a = b99", "^([^=])\s=\s(.*)$")
-#   ##
-#   ## m = {
-#   ##   "ix": 0,
-#   ##   "str": "a = b99",
-#   ##   "g0ix": 0,
-#   ##   "g0str": "a",
-#   ##   "g1ix": 4,
-#   ##   "g1str": "b99"
-#   ## }
-#   ##
-#   ## w = replace(str, m.ix, len(m.str), "FunResult_")
-
-#   if parameters[0].kind != vkString:
-#     result = newFunResultWarn(wExpectedString, 0)
-#     return
-#   let str = parameters[0].stringv
-
-#   if parameters[1].kind != vkString:
-#     result = newFunResultWarn(wExpectedString, 1)
-#     return
-#   let pattern = parameters[1].stringv
-
-#   if parameters[2].kind != vkInt:
-#     result = newFunResultWarn(wExpectedInteger, 2)
-#     return
-#   let start = int(parameters[2].intv)
-
-#   if start < 0 or start > str.len:
-#     result = newFunResultWarn(wInvalidPosition, 1, $start)
-#     return
-
-#   # let matchesO = matchPattern(str, pattern, start)
-#   # check matchesO.isSome
-#   #
-#   # var dict: VarDic
-#   #
-#   # Matches = object
-#   #   groups: seq[string]
-#   #   length: Natural
-#   #   start: Natural
-
-# proc newMatcherDict(length: Natural, groups: varargs[string]): VarsDict =
-#     result["len"] = newValue(length)
-#     for ix, group in groups:
-#       result["g" & $ix] = newValue(group)
-
 func replaceReMap(map: VarsDict): FunResult =
   ## Replace multiple parts of a string using regular expressions.
   ## The map parameteter has the target string in a and the pairs in
@@ -1019,32 +969,6 @@ func replaceReMap(map: VarsDict): FunResult =
     return newFunResultWarn(wReplaceMany, 1)
 
   result = newFunResult(newValue(resultStringO.get()))
-
-
-func funReplaceRe_sSSs*(parameters: seq[Value]): FunResult =
-  ## Replace multiple parts of a string using regular expressions.
-  ## @:
-  ## @:You specify one or more pairs of a regex patterns and their string
-  ## @:replacements.
-  ## @:
-  ## @:~~~
-  ## @:replaceRe(str: string, pairs: varargs(string, string) string
-  ## @:~~~~
-  ## @:
-  ## @:Examples:
-  ## @:
-  ## @:~~~
-  ## @:replaceRe("abcdefabc", "abc", "456")
-  ## @:  => "456def456"
-  ## @:replaceRe("abcdefabc", "abc", "456", "def", "")
-  ## @:  => "456456"
-  ## @:~~~~
-  ## @:
-  ## @:For developing and debugging regular expressions see the
-  ## @:website: https@@://regex101.com/
-
-  tMapParameters("sSSs")
-  replaceReMap(map)
 
 func funReplaceRe_sls*(parameters: seq[Value]): FunResult =
   ## Replace multiple parts of a string using regular expressions.
@@ -1672,10 +1596,9 @@ const
     ("find", funFind, "ssoaa"),
     ("slice", funSlice, "siois"),
     ("dup", funDup, "sis"),
-    ("dict", funDict, "oSAd"),
+    ("dict", funDict_old, "old"),
     ("list", funList, "oAl"),
     ("replace", funReplace, "siiss"),
-    ("replaceRe", funReplaceRe_sSSs, "sSSs"),
     ("replaceRe", funReplaceRe_sls, "sls"),
     ("path", funPath, "sosd"),
     ("lower", funLower, "ss"),

@@ -686,11 +686,11 @@ statement: t.asdf = 3.45
 
   test "invalid missing needed vararg parameter":
     let statement = newStatement(
-      text="""result = dict("1", "else", "2", "two", "3")""", lineNum=1, 0)
+      text="""result = dict(list("1", "else", "2", "two", "3"))""", lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w122: Missing vararg parameter, expected groups of 2 got 1.
-statement: result = dict("1", "else", "2", "two", "3")
-                                                  ^
+template.html(1): w155: Dictionaries require an even number of list items.
+statement: result = dict(list("1", "else", "2", "two", "3"))
+                         ^
 """
     var variables = emptyVariables()
     check testRunStatement(statement, variables, eErrLines = eErrLines)
