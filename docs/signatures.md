@@ -5,7 +5,6 @@ Statictea function signatures and parameter checking.
 * [signatures.nim](../src/signatures.nim) &mdash; Nim source code.
 # Index
 
-* type: [ParamType](#paramtype) &mdash; 
 * type: [Param](#param) &mdash; Holds attributes for one parameter.
 * type: [ShortName](#shortname) &mdash; Object to hold the state for the "next" function.
 * [newParam](#newparam) &mdash; Create a new Param object.
@@ -18,20 +17,17 @@ Statictea function signatures and parameter checking.
 * [signatureCodeToParams](#signaturecodetoparams) &mdash; Convert the signature code to a list of Param objects.
 * [mapParameters](#mapparameters) &mdash; Create a dictionary of the parameters.
 
-# ParamType
-
-
-
-```nim
-{entry.signature}
-```
-
 # Param
 
 Holds attributes for one parameter.
 
 ```nim
-{entry.signature}
+Param = object
+  name*: string              ## The name of the parameter.
+  paramTypes*: seq[ParamType] ## The type of the parameter.
+  optional*: bool            ## This is an optional parameter.
+  returnType*: bool          ## This is a return parameter.
+
 ```
 
 # ShortName
@@ -39,7 +35,9 @@ Holds attributes for one parameter.
 Object to hold the state for the "next" function.
 
 ```nim
-{entry.signature}
+ShortName = object
+  ix: int
+
 ```
 
 # newParam
@@ -47,7 +45,8 @@ Object to hold the state for the "next" function.
 Create a new Param object.
 
 ```nim
-{entry.signature}
+func newParam(name: string; optional: bool; returnType: bool;
+              paramTypes: seq[ParamType]): Param
 ```
 
 # kindToParamType
@@ -55,7 +54,7 @@ Create a new Param object.
 Convert a value type to a parameter type.
 
 ```nim
-{entry.signature}
+func kindToParamType(kind: ValueKind): ParamType
 ```
 
 # paramTypeString
@@ -63,7 +62,7 @@ Convert a value type to a parameter type.
 Return a string representation of a ParamType object.
 
 ```nim
-{entry.signature}
+func paramTypeString(paramType: ParamType): string
 ```
 
 # `$`
@@ -71,7 +70,7 @@ Return a string representation of a ParamType object.
 Return a string representation of a Param object.
 
 ```nim
-{entry.signature}
+func `$`(param: Param): string
 ```
 
 # sameType
@@ -79,7 +78,7 @@ Return a string representation of a Param object.
 Check whether the param type is the same type or compatible with the value.
 
 ```nim
-{entry.signature}
+func sameType(paramType: ParamType; valueKind: ValueKind): bool
 ```
 
 # parmsToSignature
@@ -87,7 +86,7 @@ Check whether the param type is the same type or compatible with the value.
 Create a signature from a list of Params.
 
 ```nim
-{entry.signature}
+func parmsToSignature(params: seq[Param]): string
 ```
 
 # next
@@ -95,7 +94,7 @@ Create a signature from a list of Params.
 Get the next unique single letter name. It returns names a, b, c, ..., z then repeats a0, b0, c0,....
 
 ```nim
-{entry.signature}
+proc next(letterName: var ShortName): string
 ```
 
 # signatureCodeToParams
@@ -103,7 +102,7 @@ Get the next unique single letter name. It returns names a, b, c, ..., z then re
 Convert the signature code to a list of Param objects.
 
 ```nim
-{entry.signature}
+func signatureCodeToParams(signatureCode: string): Option[seq[Param]]
 ```
 
 # mapParameters
@@ -111,7 +110,7 @@ Convert the signature code to a list of Param objects.
 Create a dictionary of the parameters. The parameter names are the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the parameters to not match the signature.  The last signature param is for the return type.
 
 ```nim
-{entry.signature}
+func mapParameters(params: seq[Param]; args: seq[Value]): FunResult
 ```
 
 

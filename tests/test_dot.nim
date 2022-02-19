@@ -28,8 +28,8 @@ suite "dot.nim":
     check parseDotLine("").isNone()
 
   test "parseDotLine":
-    check testParseDotLine("""one -> "two";""", some(newDependency("one", "two")))
-    check testParseDotLine("""o -> "t";""", some(newDependency("o", "t")))
+    check testParseDotLine(""""one" -> "two";""", some(newDependency("one", "two")))
+    check testParseDotLine(""""o" -> "t";""", some(newDependency("o", "t")))
 
   test "parseDotLine no left":
     check testParseDotLine("""-> "two";""", none(Dependency))

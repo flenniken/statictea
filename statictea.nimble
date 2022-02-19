@@ -78,9 +78,11 @@ proc get_test_module_cmd(filename: string, release = false): string =
 
   --gc:orc
 
-    I turned on gs:orc because "n t" started erroring out. Too many unit
-    tests maybe. The error message was :"[GC] cannot register global
-    variable; too many global variables"
+    I turned on gs:orc because "n t" started erroring out. Too many
+    unit tests maybe. The error message was :"[GC] cannot register
+    global variable; too many global variables".  I turned it off
+    because "writing to nil" error when building "n test runfun".  I
+    got rid of "n t" because it was crashing the compiler too often.
 
   --verbosity:0|1|2|3
 
@@ -130,7 +132,7 @@ proc get_test_module_cmd(filename: string, release = false): string =
   else:
     rel = ""
 
-  let part1 = "nim c --gc:orc --verbosity:0 --hint[Performance]:off "
+  let part1 = "nim c --verbosity:0 --hint[Performance]:off "
   let part2 = "--hint[XCannotRaiseY]:off -d:test "
   let part3 = "$1 -r -p:src --out:bin/$2 tests/$3" % [rel, binName, filename]
 
@@ -138,7 +140,7 @@ proc get_test_module_cmd(filename: string, release = false): string =
 
 proc buildRelease() =
   ## Build the release version of statictea.
-  let part1 = "nim c --gc:orc --hint[Performance]:off "
+  let part1 = "nim c --hint[Performance]:off "
   let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
   let part3 = "--out:bin/ src/statictea"
   var cmd = part1 & part2 & part3
@@ -340,21 +342,31 @@ proc createDependencyGraph() =
   rmFile("src/statictea.png")
   rmFile("statictea.deps")
 
-  # Create a dictionary of all the source filenames.
+  # Create a dictionary of all the source filenames and how many
+  # imports each has.
   let sourceNames = get_source_filenames(noExt = true)
   var sourceNamesDict = initTable[string, int]()
   for name in sourceNames:
     sourceNamesDict[name] = 0
+
+  # echo "sourceNamesDict keys:"
+  # for name, _ in pairs(sourceNamesDict):
+  #   echo fmt"name: {name}"
 
   # Read the dot file into a sequence of left and right values.
   let dependencies = readDotFile(dotFilename)
 
   # Count the number of modules the source file imports.
   for dependency in dependencies:
+    # echo fmt"dependency: {dependency}"
     let left = dependency.left
-    if left in sourceNamesDict and dependency.right in sourceNamesDict:
+    if sourceNamesDict.contains(left) and sourceNamesDict.contains(dependency.right):
       var count = sourceNamesDict[left] + 1
       sourceNamesDict[left] = count
+
+  # echo "module import-count"
+  # for key, value in pairs(sourceNamesDict):
+  #   echo fmt"{key}: {value}"
 
   # Create a new dot file without the nim runtime modules. Format the
   # nodes and edges.
@@ -381,6 +393,7 @@ proc createDependencyGraph() =
     else:
       attrs = fmt"{name} [{allNodes} {extra}, {url}, {tooltip}];" & "\n"
     dotText.add(attrs)
+
   # Generate the connections between the nodes.
   for dependency in dependencies:
     if dependency.left in sourceNamesDict and dependency.right in sourceNamesDict:
@@ -586,7 +599,7 @@ proc taskReadMeFun() =
   # rmFile(sectionFile)
 
 proc buildRunner() =
-  let part1 = "nim c --gc:orc --hint[Performance]:off "
+  let part1 = "nim c --hint[Performance]:off "
   let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
   let part3 = "--out:bin/ src/runner"
   var cmd = part1 & part2 & part3
@@ -693,16 +706,6 @@ proc checkUtf8DecoderEcho() =
   if different:
     echo "Use ^^ to update the local copy."
 
-
-proc createTestAll(testAllBasename: string, filenames: seq[string]) =
-  ## Create a testall file containing the given test files.
-  var lines = newSeq[string]()
-  for filename in filenames:
-    var (_, basename) = splitPath(filename)
-    let name = basename[0 .. basename.len - 5]
-    lines.add("include " & name)
-  writeFile(joinPath("tests", testAllBasename), lines.join("\n"))
-
 proc otherTests() =
   # Make sure it builds with test undefined.
   buildRelease()
@@ -721,32 +724,6 @@ proc otherTests() =
 task n, "\tShow available tasks.":
   exec "nimble tasks"
 
-task t, "\tRun all tests at once.":
-
-  # Create a file that includes all the test files.
-  let test_filenames = get_test_filenames()
-
-  let splitIndex = test_filenames.len div 2
-  echo "0 .. " & $splitIndex & " .. " & $test_filenames.len
-
-  createTestAll("testall1.nim", test_filenames[0 .. splitIndex])
-  createTestAll("testall2.nim", test_filenames[splitIndex + 1 .. test_filenames.len - 1])
-
-  let cmd1 = get_test_module_cmd("testall1.nim")
-  # exec "cat tests/testall1.nim"
-  let cmd2 = get_test_module_cmd("testall2.nim")
-  echo cmd1
-  exec cmd1
-  echo cmd2
-  exec cmd2
-  rmFile("tests/testall1.nim")
-  rmFile("tests/testall2.nim")
-
-  otherTests()
-
-task other, "\tRun other tests and build tests.":
-  otherTests()
-
 task test, "\tRun one or more tests; specify part of test filename.":
   ## Run one or more tests.  You specify part of the test filename and
   ## all files that match case insensitive are run. If you don't
@@ -763,6 +740,9 @@ task test, "\tRun one or more tests; specify part of test filename.":
       let cmd = get_test_module_cmd(filename)
       echo cmd
       exec cmd
+
+task other, "\tRun other tests and build tests.":
+  otherTests()
 
 task b, "\tBuild the statictea exe.":
   buildRelease()
@@ -836,7 +816,7 @@ View the svg file in your browser:
 """
 
 task tt, "\tCompile and run t.nim.":
-  let cmd = "nim c -r --gc:orc --hints:off --outdir:bin/tests/ src/t.nim"
+  let cmd = "nim c -r --hints:off --outdir:bin/tests/ src/t.nim"
   echo cmd
   exec cmd
 

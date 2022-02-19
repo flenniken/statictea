@@ -30,12 +30,17 @@ proc parseDotLine*(line: string): Option[Dependency] =
 
   # Example line:
   # tempFile -> "random";
-  let pos = find(line, " ")
+  # or in 1.6.2
+  # "tempFile" -> "random";
+
+  if line.len == 0 or line[0] != '"':
+    return
+  let pos = find(line, "\"", 1)
   if pos == -1:
     return
   if pos <= 0:
     return
-  let left = line[0 .. pos - 1]
+  let left = line[1 .. pos - 1]
   let pos2 = find(line, "-> \"", pos)
   if pos2 == -1:
     return
