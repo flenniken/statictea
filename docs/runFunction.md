@@ -31,10 +31,9 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funFind](#funfind) &mdash; Find the position of a substring in a string.
 * [funSlice](#funslice) &mdash; Extract a substring from a string by its position.
 * [funDup](#fundup) &mdash; Duplicate a string x times.
-* [funDict](#fundict) &mdash; Create a dictionary from a list of key, value pairs.
+* [funDict_old](#fundict_old) &mdash; Create a dictionary from a list of key, value pairs.
 * [funList](#funlist) &mdash; Create a list of values.
 * [funReplace](#funreplace) &mdash; Replace a substring specified by its position and length with another string.
-* [funReplaceRe_sSSs](#funreplacere_ssss) &mdash; Replace multiple parts of a string using regular expressions.
 * [funReplaceRe_sls](#funreplacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
 * [funPath](#funpath) &mdash; Split a file path into its component pieces.
 * [funLower](#funlower) &mdash; Lowercase a string.
@@ -47,7 +46,6 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funGithubAnchor_ll](#fungithubanchor_ll) &mdash; Create Github anchor names from heading names.
 * [funType_as](#funtype_as) &mdash; Return the parameter type, one of: int, float, string, list, dict.
 * [funJoinPath_loss](#funjoinpath_loss) &mdash; Join the path components with a path separator.
-* [funJoinPath_oSs](#funjoinpath_oss) &mdash; Join the path components with the platform path separator.
 * [funJoin_lsois](#funjoin_lsois) &mdash; Join a list of strings with a separator.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
@@ -647,26 +645,26 @@ dup("", 3) => ""
 func funDup(parameters: seq[Value]): FunResult
 ```
 
-# funDict
+# funDict_old
 
 Create a dictionary from a list of key, value pairs.  The keys
 must be strings and the values can be any type.
 
 ~~~
-dict(pairs: optional varargs(string, any)) dict
+dict(pairs: optional list) dict
 ~~~~
 
 Examples:
 
 ~~~
 dict() => {}
-dict("a", 5) => {"a": 5}
-dict("a", 5, "b", 33, "c", 0) =>
+dict(list("a", 5)) => {"a": 5}
+dict(list("a", 5, "b", 33, "c", 0)) =>
   {"a": 5, "b": 33, "c": 0}
 ~~~~
 
 ```nim
-func funDict(parameters: seq[Value]): FunResult
+func funDict_old(parameters: seq[Value]): FunResult
 ```
 
 # funList
@@ -674,7 +672,7 @@ func funDict(parameters: seq[Value]): FunResult
 Create a list of values.
 
 ~~~
-list(items: optional varargs(any)) list
+list(...) list
 ~~~~
 
 Examples:
@@ -735,39 +733,12 @@ replace("123", 0, 3, "") =>
 func funReplace(parameters: seq[Value]): FunResult
 ```
 
-# funReplaceRe_sSSs
-
-Replace multiple parts of a string using regular expressions.
-
-You specify one or more pairs of a regex patterns and their string
-replacements.
-
-~~~
-replaceRe(str: string, pairs: varargs(string, string) string
-~~~~
-
-Examples:
-
-~~~
-replaceRe("abcdefabc", "abc", "456")
-  => "456def456"
-replaceRe("abcdefabc", "abc", "456", "def", "")
-  => "456456"
-~~~~
-
-For developing and debugging regular expressions see the
-website: https://regex101.com/
-
-```nim
-func funReplaceRe_sSSs(parameters: seq[Value]): FunResult
-```
-
 # funReplaceRe_sls
 
 Replace multiple parts of a string using regular expressions.
 
-You specify one or more pairs of a regex patterns and its string
-replacement.
+You specify one or more pairs of regex patterns and their string
+replacements.
 
 ~~~
 replaceRe(str: string, pairs: list) string
@@ -1097,32 +1068,6 @@ joinPath(list("/", "tea")) =>
 
 ```nim
 func funJoinPath_loss(parameters: seq[Value]): FunResult
-```
-
-# funJoinPath_oSs
-
-Join the path components with the platform path separator.
-
-If the separator already exists between components, a new one
-is not added. If a component is "", the platform separator is
-used for it.
-
-~~~
-joinPath(components: optional vararg(string)) string
-~~~~
-
-Examples:
-
-~~~
-joinPath("images", "tea")) =>
-  "images/tea"
-
-joinPath("images/", "tea") =>
-  "images/tea"
-~~~~
-
-```nim
-func funJoinPath_oSs(parameters: seq[Value]): FunResult
 ```
 
 # funJoin_lsois

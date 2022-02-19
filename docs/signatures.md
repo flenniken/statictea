@@ -23,7 +23,7 @@ Statictea function signatures and parameter checking.
 
 
 ```nim
-ParamType = char
+{entry.signature}
 ```
 
 # Param
@@ -31,13 +31,7 @@ ParamType = char
 Holds attributes for one parameter.
 
 ```nim
-Param = object
-  name*: string              ## The name of the parameter.
-  paramTypes*: seq[ParamType] ## The type of the parameter(s). Varargs can have multiple types.
-  optional*: bool            ## This is an optional parameter.
-  varargs*: bool             ## This is a varargs parameter.
-  returnType*: bool          ## This is a return parameter.
-
+{entry.signature}
 ```
 
 # ShortName
@@ -45,9 +39,7 @@ Param = object
 Object to hold the state for the "next" function.
 
 ```nim
-ShortName = object
-  ix: int
-
+{entry.signature}
 ```
 
 # newParam
@@ -55,8 +47,7 @@ ShortName = object
 Create a new Param object.
 
 ```nim
-func newParam(name: string; optional: bool; varargs: bool; returnType: bool;
-              paramTypes: seq[ParamType]): Param
+{entry.signature}
 ```
 
 # kindToParamType
@@ -64,7 +55,7 @@ func newParam(name: string; optional: bool; varargs: bool; returnType: bool;
 Convert a value type to a parameter type.
 
 ```nim
-func kindToParamType(kind: ValueKind): ParamType
+{entry.signature}
 ```
 
 # paramTypeString
@@ -72,7 +63,7 @@ func kindToParamType(kind: ValueKind): ParamType
 Return a string representation of a ParamType object.
 
 ```nim
-func paramTypeString(paramType: ParamType): string
+{entry.signature}
 ```
 
 # `$`
@@ -80,7 +71,7 @@ func paramTypeString(paramType: ParamType): string
 Return a string representation of a Param object.
 
 ```nim
-func `$`(param: Param): string
+{entry.signature}
 ```
 
 # sameType
@@ -88,7 +79,7 @@ func `$`(param: Param): string
 Check whether the param type is the same type or compatible with the value.
 
 ```nim
-func sameType(paramType: ParamType; valueKind: ValueKind): bool
+{entry.signature}
 ```
 
 # parmsToSignature
@@ -96,7 +87,7 @@ func sameType(paramType: ParamType; valueKind: ValueKind): bool
 Create a signature from a list of Params.
 
 ```nim
-func parmsToSignature(params: seq[Param]): string
+{entry.signature}
 ```
 
 # next
@@ -104,7 +95,7 @@ func parmsToSignature(params: seq[Param]): string
 Get the next unique single letter name. It returns names a, b, c, ..., z then repeats a0, b0, c0,....
 
 ```nim
-proc next(letterName: var ShortName): string
+{entry.signature}
 ```
 
 # signatureCodeToParams
@@ -112,15 +103,15 @@ proc next(letterName: var ShortName): string
 Convert the signature code to a list of Param objects.
 
 ```nim
-func signatureCodeToParams(signatureCode: string): Option[seq[Param]]
+{entry.signature}
 ```
 
 # mapParameters
 
-Create a dictionary of the parameters. The parameter names are the dictionary keys.  Varargs parameters turn into a list. Return a FunResult object containing the dictionary or a warning when the parameters to not match the signature.  The last signature param is for the return type.
+Create a dictionary of the parameters. The parameter names are the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the parameters to not match the signature.  The last signature param is for the return type.
 
 ```nim
-func mapParameters(params: seq[Param]; args: seq[Value]): FunResult
+{entry.signature}
 ```
 
 

@@ -973,8 +973,8 @@ func replaceReMap(map: VarsDict): FunResult =
 func funReplaceRe_sls*(parameters: seq[Value]): FunResult =
   ## Replace multiple parts of a string using regular expressions.
   ## @:
-  ## @:You specify one or more pairs of a regex patterns and its string
-  ## @:replacement.
+  ## @:You specify one or more pairs of regex patterns and their string
+  ## @:replacements.
   ## @:
   ## @:~~~
   ## @:replaceRe(str: string, pairs: list) string
@@ -1504,30 +1504,6 @@ func funJoinPath_loss*(parameters: seq[Value]): FunResult =
   tMapParameters("loss")
   result = joinPathList(map)
 
-func funJoinPath_oSs*(parameters: seq[Value]): FunResult =
-  ## Join the path components with the platform path separator.
-  ## @:
-  ## @:If the separator already exists between components, a new one
-  ## @:is not added. If a component is "", the platform separator is
-  ## @:used for it.
-  ## @:
-  ## @:~~~
-  ## @:joinPath(components: optional vararg(string)) string
-  ## @:~~~~
-  ## @:
-  ## @:Examples:
-  ## @:
-  ## @:~~~
-  ## @:joinPath("images", "tea")) =>
-  ## @:  "images/tea"
-  ## @:
-  ## @:joinPath("images/", "tea") =>
-  ## @:  "images/tea"
-  ## @:~~~~
-
-  tMapParameters("oSs")
-  result = joinPathList(map)
-
 func funJoin_lsois*(parameters: seq[Value]): FunResult =
   ## Join a list of strings with a separator.
   ## @:An optional parameter determines whether you skip empty
@@ -1611,7 +1587,6 @@ const
     ("githubAnchor", funGithubAnchor_ll, "ll"),
     ("type", funType_as, "as"),
     ("joinPath", funJoinPath_loss, "loss"),
-    ("joinPath", funJoinPath_oSs, "oSs"),
     ("join", funJoin_lsois, "lsois"),
     ("if1", funIf1, "iaaa"),
   ]

@@ -19,7 +19,6 @@ the function when called.
 
 const
   singleCodes = {'i', 'f', 's', 'l', 'd', 'a'}
-  varargCodes = {'I', 'F', 'S', 'L', 'D', 'A'}
 
 # todo: support list types, li, lf, ls, ll, ld, la.
 
@@ -32,11 +31,9 @@ type
     name*: string
       ## The name of the parameter.
     paramTypes*: seq[ParamType]
-      ## The type of the parameter(s). Varargs can have multiple types.
+      ## The type of the parameter.
     optional*: bool
       ## This is an optional parameter.
-    varargs*: bool
-      ## This is a varargs parameter.
     returnType*: bool
       ## This is a return parameter.
 
@@ -45,10 +42,10 @@ type
     ## Object to hold the state for the "next" function.
     ix: int
 
-func newParam*(name: string, optional: bool, varargs: bool, returnType: bool,
+func newParam*(name: string, optional: bool, returnType: bool,
     paramTypes: seq[Paramtype]): Param =
   ## Create a new Param object.
-  result = Param(name: name, optional: optional, varargs: varargs,
+  result = Param(name: name, optional: optional,
                  returnType: returnType, paramTypes: paramTypes)
 
 func kindToParamType*(kind: ValueKind): ParamType =
@@ -91,16 +88,7 @@ func `$`*(param: Param): string =
     optional = "optional "
   else:
     optional = ""
-  if param.varargs:
-    # name: varargs(int, string)
-    var types: seq[string]
-    for paramType in param.paramTypes:
-      types.add(paramTypeString(paramType))
-    let paramTypes = join(types, ", ")
-    # result = fmt"{param.name}: {optional}varargs({paramTypes})"
-    result = "$1: $2varargs($3)" % [param.name, optional, paramTypes]
-    
-  elif param.returnType:
+  if param.returnType:
     result = paramTypeString(param.paramTypes[0])
   else:
     # name: int
@@ -187,73 +175,46 @@ func signatureCodeToParams*(signatureCode: string): Option[seq[Param]] =
   while ix < signatureCode.len - 1:
     var code = signatureCode[ix]
     if code in singleCodes:
-      params.add(newParam(letterName.next(), optional, false, false, @[code]))
+      params.add(newParam(letterName.next(), optional, false, @[code]))
       inc(ix)
     elif code == 'o':
       optional = true
       inc(ix)
-    elif code in varargCodes:
-      # Collect the varargs group of types. Since varargs are last
-      # collect to the end.
-      var paramTypes: seq[ParamType]
-      while ix < signatureCode.len - 1:
-        var code = signatureCode[ix]
-        assert code in varargCodes
-        paramTypes.add(code)
-        inc(ix)
-      params.add(newParam(letterName.next(), optional, true, false, paramTypes))
-      break # done
     else:
       # Invalid signature code.
       return
 
   # Return the return parameter.
-  params.add(newParam("result", false, false, true, @[returnCode]))
+  params.add(newParam("result", false, true, @[returnCode]))
   result = some(params)
 
 func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
   ## Create a dictionary of the parameters. The parameter names are
-  ## the dictionary keys.  Varargs parameters turn into a list.
-  ## Return a FunResult object containing the dictionary or a warning
-  ## when the parameters to not match the signature.  The last
-  ## signature param is for the return type.
+  ## the dictionary keys.  Return a FunResult object containing the
+  ## dictionary or a warning when the parameters to not match the
+  ## signature.  The last signature param is for the return type.
 
   var map = newVarsDict()
 
   # Determine the number of required parameters and whether the
-  # signature contains an optional or varargs last element.
-  var gotVarargs: bool
+  # signature contains an optional last element.
   var gotOptional: bool
   var requiredParams: int
   var loopParams: int
   if params.len >= 2:
     let lastParamIx = params.len - 2
-    gotVarargs = params[lastParamIx].varargs
     gotOptional = params[lastParamIx].optional
     if gotOptional:
-      if gotVarargs:
-        requiredParams = lastParamIx - 1
-        if args.len > lastParamIx:
-          loopParams = lastParamIx
-        else:
-          loopParams = lastParamIx
+      requiredParams = lastParamIx
+      if args.len > lastParamIx:
+        loopParams = lastParamIx + 1
       else:
-        requiredParams = lastParamIx
-        if args.len > lastParamIx:
-          loopParams = lastParamIx + 1
-        else:
-          loopParams = lastParamIx
+        loopParams = lastParamIx
     else:
-      if gotVarargs:
-        # Require varargs, need at least one group.
-        requiredParams = lastParamIx + params[lastParamIx].paramTypes.len
-        loopParams = params.len - 2
-      else:
-        requiredParams = params.len - 1
-        loopParams = params.len - 1
+      requiredParams = params.len - 1
+      loopParams = params.len - 1
   else:
     # No parameters case.
-    gotVarargs = false
     gotOptional = false
     requiredParams = 0
     loopParams = 0
@@ -264,17 +225,16 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
     return newFunResultWarn(kNotEnoughArgs, 0, $requiredParams, $args.len)
 
   # Check there are not too many parameters.
-  if not gotVarargs:
-    var limit: int
-    if gotOptional:
-      limit = requiredParams + 1
-    else:
-      limit = requiredParams
-    if args.len > limit:
-      # Too many parameters, expected {requiredParams} got {args.len}."
-      return newFunResultWarn(kTooManyArgs, 0, $requiredParams, $args.len)
+  var limit: int
+  if gotOptional:
+    limit = requiredParams + 1
+  else:
+    limit = requiredParams
+  if args.len > limit:
+    # Too many parameters, expected {requiredParams} got {args.len}."
+    return newFunResultWarn(kTooManyArgs, 0, $requiredParams, $args.len)
 
-  # Loop through the parameters except the vararg ones.
+  # Loop through the parameters.
   for ix in countUp(0, loopParams - 1):
     var param = params[ix]
     var arg = args[ix]
@@ -287,39 +247,5 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
       return newFunResultWarn(kWrongType, ix, $expected, $got)
 
     map[param.name] = arg
-
-  # Handle the vararg element.
-  if gotVarargs:
-    var varargIx = loopParams
-    var argsLeft = args.len - varargIx
-    let varargParam = params[varargIx]
-    var varargNum = varargParam.paramTypes.len
-
-    var varargList: seq[Value]
-    if argsLeft > 0:
-      # Collect the remaining parameters into a list.
-      while argsLeft > 0:
-
-        # Check there are enough parameters for the vararg group.
-        if argsLeft < varargNum:
-          # Expected {varargNum} varargs got {argsLeft}.
-          return newFunResultWarn(kNotEnoughVarargs, varargIx, $varargNum, $argsLeft)
-
-        for ix in countUp(0, varargNum - 1):
-          var arg = args[varargIx + ix]
-          var paramType = varargParam.paramTypes[ix]
-
-          if not sameType(paramType, arg.kind):
-            let expected = paramTypeString(paramType)
-            let got = $arg.kind
-            # Wrong parameter type, expected {expected} got {got}.
-            return newFunResultWarn(kWrongType, varargIx + ix, $expected, $got)
-
-          dec(argsLeft)
-          varargList.add(arg)
-
-        varargIx = varargIx + varargNum
-
-    map[varargParam.name] = newValue(varargList)
 
   result = newFunResult(newValue(map))

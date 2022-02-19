@@ -1681,7 +1681,6 @@ List of functions:
 - [[#int][int()]] -- Create an int from a float.
 - [[#int][int()]] -- Create an int from a number string.
 - [[#joinPath][joinPath()]] -- Join the path components with a path separator.
-- [[#joinPath][joinPath()]] -- Join the path components with the platform path separator.
 - [[#join][join()]] -- Join a list of strings with a separator.
 - [[#keys][keys()]] -- Create a list from the keys in a dictionary.
 - [[#len][len()]] -- Number of elements in a dictionary.
@@ -1691,7 +1690,6 @@ List of functions:
 - [[#lower][lower()]] -- Lowercase a string.
 - [[#path][path()]] -- Split a file path into its component pieces.
 - [[#replace][replace()]] -- Replace a substring specified by its position and length with another string.
-- [[#replaceRe][replaceRe()]] -- Replace multiple parts of a string using regular expressions.
 - [[#replaceRe][replaceRe()]] -- Replace multiple parts of a string using regular expressions.
 - [[#slice][slice()]] -- Extract a substring from a string by its position.
 - [[#sort][sort()]] -- Sort a list of values of the same type.
@@ -1940,15 +1938,15 @@ Create a dictionary from a list of key, value pairs.  The keys
 must be strings and the values can be any type.
 
 #+BEGIN_SRC
-dict(pairs: optional varargs(string, any)) dict
+dict(pairs: optional list) dict
 #+END_SRC
 
 Examples:
 
 #+BEGIN_SRC
 dict() => {}
-dict("a", 5) => {"a": 5}
-dict("a", 5, "b", 33, "c", 0) =>
+dict(list("a", 5)) => {"a": 5}
+dict(list("a", 5, "b", 33, "c", 0)) =>
   {"a": 5, "b": 33, "c": 0}
 #+END_SRC
 
@@ -2338,33 +2336,6 @@ joinPath(list("/", "tea")) =>
 
 [[#contents][茶]]
 
-** joinPath()
-:PROPERTIES:
-:CUSTOM_ID: joinPath
-:END:
-
-Join the path components with the platform path separator.
-
-If the separator already exists between components, a new one
-is not added. If a component is "", the platform separator is
-used for it.
-
-#+BEGIN_SRC
-joinPath(components: optional vararg(string)) string
-#+END_SRC
-
-Examples:
-
-#+BEGIN_SRC
-joinPath("images", "tea")) =>
-  "images/tea"
-
-joinPath("images/", "tea") =>
-  "images/tea"
-#+END_SRC
-
-[[#contents][茶]]
-
 ** join()
 :PROPERTIES:
 :CUSTOM_ID: join
@@ -2482,7 +2453,7 @@ len("añyóng") => 6
 Create a list of values.
 
 #+BEGIN_SRC
-list(items: optional varargs(any)) list
+list(...) list
 #+END_SRC
 
 Examples:
@@ -2606,36 +2577,8 @@ replace("123", 0, 3, "") =>
 
 Replace multiple parts of a string using regular expressions.
 
-You specify one or more pairs of a regex patterns and their string
+You specify one or more pairs of regex patterns and their string
 replacements.
-
-#+BEGIN_SRC
-replaceRe(str: string, pairs: varargs(string, string) string
-#+END_SRC
-
-Examples:
-
-#+BEGIN_SRC
-replaceRe("abcdefabc", "abc", "456")
-  => "456def456"
-replaceRe("abcdefabc", "abc", "456", "def", "")
-  => "456456"
-#+END_SRC
-
-For developing and debugging regular expressions see the
-website: https://regex101.com/
-
-[[#contents][茶]]
-
-** replaceRe()
-:PROPERTIES:
-:CUSTOM_ID: replaceRe
-:END:
-
-Replace multiple parts of a string using regular expressions.
-
-You specify one or more pairs of a regex patterns and its string
-replacement.
 
 #+BEGIN_SRC
 replaceRe(str: string, pairs: list) string

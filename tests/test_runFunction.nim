@@ -74,15 +74,6 @@ proc testReplaceGood(str: string, start: int, length: int, replace: string, eRes
   let eFunResult = newFunResult(newValue(eResult))
   result = testFunction("replace", parameters, eFunResult)
 
-proc testReplaceReGood(strs: varargs[string]): bool =
-  if strs.len < 2:
-    return false
-  var parameters: seq[Value]
-  for ix in countUp(0, strs.len-2, 1):
-    parameters.add(newValue(strs[ix]))
-  let eFunResult = newFunResult(newValue(strs[strs.len-1]))
-  result = testFunction("replaceRe", parameters, eFunResult)
-
 proc testReplaceReGoodList(str: string, list: Value, eString: string): bool =
   let eFunResult = newFunResult(newValue(eString))
   var parameters = @[newValue(str), list]
@@ -1495,28 +1486,6 @@ suite "runFunction.nim":
     let parameters = @[newEmptyListValue(), newValue("h")]
     let eFunResult = newFunResultWarn(wExpectedSeparator, 0)
     check testFunction("joinPath", parameters, eFunResult)
-
-  test "joinPath varargs empty":
-    check testFunction("joinPath", @[],
-      newFunResult(newValue("")))
-
-  test "joinPath varargs":
-    check testFunction("joinPath", @[
-        newValue("tea")
-      ], newFunResult(newValue("tea")))
-
-    check testFunction("joinPath", @[
-        newValue("images"), newValue("tea")
-      ], newFunResult(newValue("images/tea")))
-
-
-
-  # test "createFunctionTable":
-  #   let table = createFunctionTable()
-  #   for name, nameList in table.pairs():
-  #     for spec in nameList:
-  #       check name == spec.name
-  #       echo "$1: $2" % [name, spec.signatureCode]
 
   test "join nothing":
     let list = newEmptyListValue()
