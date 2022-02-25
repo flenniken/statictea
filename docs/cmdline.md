@@ -6,16 +6,16 @@ Parse the command line.
 # Index
 
 * type: [MessageId](#messageid) &mdash; Posssible message numbers returned by cmdline.
-* type: [ArgsOrMessageIdKind](#argsormessageidkind) &mdash; The kind of an ArgsOrMessageId object, either args or a message id.
+* type: [ArgsOrMessageIdKind](#argsormessageidkind) &mdash; The kind of an ArgsOrMessageId object, either args or a message.
 * type: [Args](#args) &mdash; Args holds the parsed command line arguments in an ordered dictionary.
-* type: [ArgsOrMessageId](#argsormessageid) &mdash; Contains the command line args or a message id.
-* type: [OptionType](#optiontype) &mdash; OptionType tells whether the option has an associated parameter or not and whether it is a bare parameter.
-* [newOption](#newoption) &mdash; Return a new Option object.
+* type: [ArgsOrMessageId](#argsormessageid) &mdash; Contains the command line args or a message.
+* type: [OptionType](#optiontype) &mdash; The option type.
+* [newOption](#newoption) &mdash; Create a new Option object.
 * [`$`](#) &mdash; Return a string representation of an Option object.
 * [`$`](#-1) &mdash; Return a string representation of a ArgsOrMessageId object.
 * [commandLineEcho](#commandlineecho) &mdash; Show the command line arguments.
 * [collectParams](#collectparams) &mdash; Get the command line parameters from the system and return a list.
-* [cmdLine](#cmdline) &mdash; Parse the command line options.
+* [cmdLine](#cmdline) &mdash; Parse the command line parameters.
 
 # MessageId
 
@@ -30,16 +30,16 @@ MessageId = enum
 
 # ArgsOrMessageIdKind
 
-The kind of an ArgsOrMessageId object, either args or a message id.
+The kind of an ArgsOrMessageId object, either args or a message.
 
 ```nim
 ArgsOrMessageIdKind = enum
-  clArgs, clMessageId
+  clArgs, clMessage
 ```
 
 # Args
 
-Args holds the parsed command line arguments in an ordered dictionary. The keys are the supported options found on the command line and each value is a list of associated parameters. The bare parameters use key "_bare". An option without parameters will have an empty list.
+Args holds the parsed command line arguments in an ordered dictionary. The keys are the supported options found on the command line and each value is a list of associated parameters. An option without parameters will have an empty list.
 
 ```nim
 Args = OrderedTable[string, seq[string]]
@@ -47,7 +47,7 @@ Args = OrderedTable[string, seq[string]]
 
 # ArgsOrMessageId
 
-Contains the command line args or a message id.
+Contains the command line args or a message.
 
 ```nim
 ArgsOrMessageId = object
@@ -55,7 +55,7 @@ ArgsOrMessageId = object
   of clArgs:
       args*: Args
 
-  of clMessageId:
+  of clMessage:
       messageId*: MessageId
       problemParam*: string
 
@@ -64,19 +64,19 @@ ArgsOrMessageId = object
 
 # OptionType
 
-OptionType tells whether the option has an associated parameter or not and whether it is a bare parameter.
+The option type.
 
 ```nim
 OptionType = enum
   clParameter,              ## option with a parameter
   clNoParameter,            ## option without a parameter
   clOptionalParameter,      ## option with an optional parameter
-  clBareParameter            ## bare parameter. Use '_' for the short name.
+  clBareParameter            ## no switch, just a bare parameter. Use '_' for the short name.
 ```
 
 # newOption
 
-Return a new Option object.
+Create a new Option object.
 
 ```nim
 func newOption(long: string; short: char; optionType: OptionType): Option
@@ -116,7 +116,7 @@ proc collectParams(): seq[string]
 
 # cmdLine
 
-Parse the command line options.  You pass in the dictionary of options supported. The arguments are returned or a message telling why args cannot be returned. Use collectParams() to generate parameters.
+Parse the command line parameters.  You pass in the list of supported options and the parameters to parse. The arguments found are returned. If there is a problem with the parameters, args contains a message telling the problem. Use collectParams() to generate parameters.
 
 ```nim
 func cmdLine(options: openArray[Option]; parameters: openArray[string]): ArgsOrMessageId
