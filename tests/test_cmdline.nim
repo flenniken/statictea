@@ -182,3 +182,173 @@ optional: @[]
 log: @[]
 """
 
+  test "bin/cmdline -lt":
+    let parameterSets = [
+      ["-lt"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[Option]()
+      options.add(newOption("optional", 't', clOptionalParameter))
+      options.add(newOption("log", 'l', clNoParameter))
+      let args = cmdLine(options, parameters)
+      check $args == """
+args:
+log: @[]
+optional: @[]
+"""
+
+  test "bin/cmdline clmBareTwoDashes":
+    let parameterSets = [
+      ["--", "-l", "-t"],
+      ["-t", "-l", "--"],
+      ["-t", "--", "-l"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[Option]()
+      options.add(newOption("optional", 't', clOptionalParameter))
+      options.add(newOption("log", 'l', clNoParameter))
+      let args = cmdLine(options, parameters)
+      check $args == "message: clmBareTwoDashes"
+
+  test "bin/cmdline clmInvalidShortOption":
+    let parameterSets = [
+      ["-p", "-l", "-t"],
+      ["-t", "-l", "-p"],
+      ["-t", "-p", "-l"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[Option]()
+      options.add(newOption("optional", 't', clOptionalParameter))
+      options.add(newOption("log", 'l', clNoParameter))
+      let args = cmdLine(options, parameters)
+      check $args == "message: clmInvalidShortOption for p."
+
+  test "bin/cmdline clmInvalidOption":
+    let parameterSets = [
+      ["--tea", "-l", "-t"],
+      ["-t", "-l", "--tea"],
+      ["-t", "--tea", "-l"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[Option]()
+      options.add(newOption("optional", 't', clOptionalParameter))
+      options.add(newOption("log", 'l', clNoParameter))
+      let args = cmdLine(options, parameters)
+      check $args == "message: clmInvalidOption for tea."
+
+  test "bin/cmdline clmMissingRequiredParameter":
+    let parameterSets = [
+      ["--required", "-l"],
+      ["--required", "--log"],
+      ["--log", "--required"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[Option]()
+      options.add(newOption("required", 'r', clParameter))
+      options.add(newOption("log", 'l', clNoParameter))
+      let args = cmdLine(options, parameters)
+      check $args == "message: clmMissingRequiredParameter for required."
+
+  test "bin/cmdline clmBareOneDash":
+    let parameterSets = [
+      ["--log", "-"],
+      ["-", "-l"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[Option]()
+      options.add(newOption("log", 'l', clNoParameter))
+      let args = cmdLine(options, parameters)
+      check $args == "message: clmBareOneDash"
+
+  test "bin/cmdline clmInvalidShortOption":
+    let parameterSets = [
+      ["--log", "-z"],
+      ["-z", "-l"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[Option]()
+      options.add(newOption("log", 'l', clNoParameter))
+      let args = cmdLine(options, parameters)
+      check $args == "message: clmInvalidShortOption for z."
+
+  test "bin/cmdline clmShortParamInList":
+    let parameterSets = [
+      ["-ltz"],
+      ["-zlt"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[Option]()
+      options.add(newOption("log", 'l', clNoParameter))
+      options.add(newOption("tea", 't', clNoParameter))
+      options.add(newOption("zoo", 'z', clParameter))
+      let args = cmdLine(options, parameters)
+      check $args == "message: clmShortParamInList for z."
+
+  test "bin/cmdline clmDupShortOption":
+    let parameterSets = [
+      ["-ltz"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[Option]()
+      options.add(newOption("log", 'l', clNoParameter))
+      options.add(newOption("leg", 'l', clNoParameter))
+      let args = cmdLine(options, parameters)
+      check $args == "message: clmDupShortOption for l."
+
+  test "bin/cmdline clmDupLongOption":
+    let parameterSets = [
+      ["-ltz"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[Option]()
+      options.add(newOption("tea", 'l', clNoParameter))
+      options.add(newOption("tea", 'g', clNoParameter))
+      let args = cmdLine(options, parameters)
+      check $args == "message: clmDupLongOption for tea."
+
+  test "bin/cmdline clmBareShortName":
+    let parameterSets = [
+      ["-ltz"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[Option]()
+      options.add(newOption("tea", 't', clBareParameter))
+      let args = cmdLine(options, parameters)
+      check $args == "message: clmBareShortName for t."
+
+  test "bin/cmdline clmAlphaNumericShort":
+    let parameterSets = [
+      ["-ltz"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[Option]()
+      options.add(newOption("tea", '*', clParameter))
+      let args = cmdLine(options, parameters)
+      check $args == "message: clmAlphaNumericShort for *."
+
+  test "bin/cmdline clmMissingBareParameter":
+    let parameterSets = [
+      ["-l"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[Option]()
+      options.add(newOption("tea", '_', clBareParameter))
+      options.add(newOption("log", 'l', clNoParameter))
+      let args = cmdLine(options, parameters)
+      check $args == "message: clmMissingBareParameter"
+
+  test "bin/cmdline clmMissingBareParameters":
+    let parameterSets = [
+      ["-l", "-h"],
+      ["-l", "baretea"],
+      ["baretea", "-h"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[Option]()
+      options.add(newOption("tea", '_', clBareParameter))
+      options.add(newOption("tea2", '_', clBareParameter))
+      options.add(newOption("log", 'l', clNoParameter))
+      options.add(newOption("help", 'h', clNoParameter))
+      let args = cmdLine(options, parameters)
+      check $args == "message: clmMissingBareParameter"
+

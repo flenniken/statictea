@@ -33,29 +33,27 @@ type
       ## Missing bare parameter(s).
 
   ArgsOrMessageIdKind* = enum
-    ## The kind of an ArgsOrMessageId object, either args or a message id.
+    ## The kind of an ArgsOrMessageId object, either args or a message.
     clArgs,
-    clMessageId
+    clMessage
 
   Args* = OrderedTable[string, seq[string]]
     ## Args holds the parsed command line arguments in an ordered
     ## dictionary. The keys are the supported options found on the
     ## command line and each value is a list of associated parameters.
-    ## The bare parameters use key "_bare". An option without
-    ## parameters will have an empty list.
+    ## An option without parameters will have an empty list.
 
   ArgsOrMessageId* = object
-    ## Contains the command line args or a message id.
+    ## Contains the command line args or a message.
     case kind*: ArgsOrMessageIdKind
     of clArgs:
       args*: Args
-    of clMessageId:
+    of clMessage:
       messageId*: MessageId
       problemParam*: string
 
   OptionType* = enum
-    ## OptionType tells whether the option has an associated
-    ## parameter or not and whether it is a bare parameter.
+    ## The option type.
     clParameter,
       ## option with a parameter
     clNoParameter,
@@ -63,25 +61,26 @@ type
     clOptionalParameter
       ## option with an optional parameter
     clBareParameter
-      ## bare parameter. Use '_' for the short name.
+      ## no switch, just a bare parameter. Use '_' for the short name.
 
   Option* = object
+    # An option holds its type, long name and short name.
     optionType: OptionType
     long: string
     short: char
 
 func newOption*(long: string, short: char, optionType: OptionType): Option =
-  ## Return a new Option object.
+  ## Create a new Option object.
   result = Option(long: long, short: short, optionType: optionType)
 
 func newArgsOrMessageId(args: Args): ArgsOrMessageId =
-  ## Return a new ArgsOrMessageId object containing arguments.
+  ## Create a new ArgsOrMessageId object containing arguments.
   result = ArgsOrMessageId(kind: clArgs, args: args)
 
 func newArgsOrMessageId(messageId: MessageId, problemParam = ""): ArgsOrMessageId =
-  ## Return a new ArgsOrMessageId object containing a message id and
+  ## Create a new ArgsOrMessageId object containing a message id and
   ## optionally the problem parameter.
-  result = ArgsOrMessageId(kind: clMessageId, messageId: messageId,
+  result = ArgsOrMessageId(kind: clMessage, messageId: messageId,
     problemParam: problemParam)
 
 func `$`*(a: Option): string =
@@ -101,7 +100,10 @@ func `$`*(a: ArgsOrMessageId): string =
         lines.add(fmt"{k}: {v}")
       result = lines.join("\n") & "\n"
   else:
-    result = fmt"message: {a.messageId}"
+    if a.problemParam == "":
+      result = fmt"message: {a.messageId}"
+    else:
+      result = fmt"message: {a.messageId} for {a.problemParam}."
 
 proc commandLineEcho*() =
   ## Show the command line arguments.
@@ -128,7 +130,7 @@ proc addArg(args: var Args, optionName: string) =
     args[optionName] = newSeq[string]()
 
 proc addArg(args: var Args, optionName: string, parameter: string) =
-  ## Add the given option name and parameter to the args.
+  ## Add the given option name and its parameter value to the args.
   if optionName in args:
     var parameters = args[optionName]
     parameters.add(parameter)
@@ -137,9 +139,11 @@ proc addArg(args: var Args, optionName: string, parameter: string) =
     args[optionName] = @[parameter]
 
 func cmdLine*(options: openArray[Option], parameters: openArray[string]): ArgsOrMessageId =
-  ## Parse the command line options.  You pass in the dictionary of options
-  ## supported. The arguments are returned or a message telling why
-  ## args cannot be returned. Use collectParams() to generate parameters.
+  ## Parse the command line parameters.  You pass in the list of
+  ## supported options and the parameters to parse. The arguments
+  ## found are returned. If there is a problem with the parameters,
+  ## args contains a message telling the problem. Use collectParams()
+  ## to generate parameters.
 
   # shortOptions maps a short option letter to a long option name.
   var shortOptions: OrderedTable[char, string]
@@ -161,11 +165,11 @@ func cmdLine*(options: openArray[Option], parameters: openArray[string]): ArgsOr
       bareParameterNames.add(option.long)
       if option.short != '_':
         # Use short name '_' with a bare parameter.
-        return newArgsOrMessageId(clmBareShortName)
+        return newArgsOrMessageId(clmBareShortName, $option.short)
     else:
       if not isAlphaNumeric(option.short):
         # Use alphanumeric ascii for a short option name.
-        return newArgsOrMessageId(clmAlphaNumericShort)
+        return newArgsOrMessageId(clmAlphaNumericShort, $option.short)
       if option.short in shortOptions:
         # -{option.short} is a duplicate short option name.
         return newArgsOrMessageId(clmDupShortOption, $option.short)
@@ -181,11 +185,11 @@ func cmdLine*(options: openArray[Option], parameters: openArray[string]): ArgsOr
       optionalParameter,
       multipleShortOptions,
 
-  # Loop over the parameters.
-  var ix = 0
-  var parameter: string
+  # Loop over the parameters and populate args.
   var args: Args
+  var ix = 0
   var state: State
+  var parameter: string
   var optionName: string
   while true:
     if ix >= parameters.len:
@@ -305,6 +309,8 @@ func cmdLine*(options: openArray[Option], parameters: openArray[string]): ArgsOr
     addArg(args, optionName)
      
   result = newArgsOrMessageId(args)
+
+# todo: support = too between option and paramater.  --result=tea.html, --result tea.html
 
 when isMainModule:
   # commandLineEcho()
