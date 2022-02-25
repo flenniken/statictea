@@ -5,6 +5,7 @@ StaticTea nim source code documentation.
 [![Module Dependencies](staticteadep.svg)](#)
 
 * [args.nim](args.md) &mdash; Command line arguments.
+* [cmdline.nim](cmdline.md) &mdash; Parse the command line.
 * [collectCommand.nim](collectCommand.md) &mdash; Collect template command lines.
 * [env.nim](env.md) &mdash; Environment holding the input and output streams.
 * [funtypes.nim](funtypes.md) &mdash; Statictea function types and supporting routines.

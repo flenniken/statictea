@@ -864,5 +864,14 @@ task runhelp, "\tShow the runner help text with glow.":
 task helpme, "\tShow the statictea help text.":
   exec "bin/statictea -h | less"
 
-task remote, "\tCheck whether remote code need updating":
+task remote, "\tCheck whether the remote code needs updating.":
   checkUtf8DecoderEcho()
+
+task cmdline, "\Build cmdline.":
+  let part1 = "nim c --hint[Performance]:off "
+  let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
+  let part3 = "--out:bin/ src/cmdline"
+  var cmd = part1 & part2 & part3
+  echo cmd
+  exec cmd
+  echo "Run bin/cmdline"
