@@ -310,8 +310,6 @@ func cmdLine*(options: openArray[Option], parameters: openArray[string]): ArgsOr
      
   result = newArgsOrMessageId(args)
 
-# todo: support = too between option and paramater.  --result=tea.html, --result tea.html
-
 when isMainModule:
   # commandLineEcho()
   echo fmt"let parameters = {collectParams()}"
