@@ -7,8 +7,8 @@ Test with multiple json files.
 ### File cmd.sh command
 
 ~~~
-$statictea -s=server.json -j=j1.json -j=j2.json \
-  -t=template.html -r=result.html >stdout 2>stderr
+$statictea -s server.json -j j1.json -j j2.json \
+  -t template.html -r result.html >stdout 2>stderr
 ~~~
 
 ### File template.html

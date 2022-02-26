@@ -7,8 +7,8 @@ Test readme statements section.
 ### File cmd.sh command
 
 ~~~
-$statictea -s=server.json \
-  -t=template.html -r=result.html >stdout 2>stderr
+$statictea -s server.json \
+  -t template.html -r result.html >stdout 2>stderr
 ~~~
 
 ### File template.html

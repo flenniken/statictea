@@ -7,7 +7,7 @@ Update the replace block in a template.
 ### File cmd.sh command
 
 ~~~
-$statictea -u -j=shared.json -t=template.html >stdout 2>stderr
+$statictea -u -j shared.json -t template.html >stdout 2>stderr
 ~~~
 
 ### File shared.json

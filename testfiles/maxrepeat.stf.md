@@ -7,7 +7,7 @@ Test the t.maxRepeat tea variable.
 ### File cmd.sh command nonZeroReturn
 
 ~~~
-$statictea -t=template.html -r=result.html >stdout 2>stderr
+$statictea -t template.html -r result.html >stdout 2>stderr
 ~~~
 
 ### File template.html

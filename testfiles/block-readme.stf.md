@@ -7,7 +7,7 @@ The readme block example.
 ### File cmd.sh command
 
 ~~~
-$statictea -s=block.json -t=block.html >stdout 2>stderr
+$statictea -s block.json -t block.html >stdout 2>stderr
 ~~~
 
 ### File block.html

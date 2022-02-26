@@ -8,11 +8,11 @@ Test the t.repeat variable.
 
 ~~~
 $statictea \
-  -l=log.txt \
-  -s=server.json \
-  -s=server2.json \
-  -t=tmpl.txt \
-  -r=result.html >stdout 2>stderr
+  -l log.txt \
+  -s server.json \
+  -s server2.json \
+  -t tmpl.txt \
+  -r result.html >stdout 2>stderr
 ~~~
 
 ### File log.sh command

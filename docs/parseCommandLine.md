@@ -7,10 +7,7 @@ Parse the StaticTea terminal command line and return the arguments.
 
 * type: [ArgsOrWarningKind](#argsorwarningkind) &mdash; The kind of a ArgsOrWarning object, either args or warning.
 * type: [ArgsOrWarning](#argsorwarning) &mdash; Holds args or a warning.
-* [fileListIndex](#filelistindex) &mdash; 
-* [letterToWord](#lettertoword) &mdash; 
 * [parsePrepost](#parseprepost) &mdash; Match a prefix followed by an optional postfix, prefix[,postfix].
-* [parseCommandLine](#parsecommandline) &mdash; Return the command line arguments or a warning.
 * [`$`](#) &mdash; Return a string representation of a ArgsOrWarning object.
 
 # ArgsOrWarningKind
@@ -38,36 +35,12 @@ ArgsOrWarning = object
 
 ```
 
-# fileListIndex
-
-
-
-```nim
-func fileListIndex(word: string): int
-```
-
-# letterToWord
-
-
-
-```nim
-func letterToWord(letter: char): string
-```
-
 # parsePrepost
 
 Match a prefix followed by an optional postfix, prefix[,postfix]. Each part contains 1 to 20 ascii characters including spaces but without control characters or commas.
 
 ```nim
 proc parsePrepost(str: string): Option[Prepost]
-```
-
-# parseCommandLine
-
-Return the command line arguments or a warning. Processing stops on the first warning.
-
-```nim
-proc parseCommandLine(argv: seq[string]): ArgsOrWarning
 ```
 
 # `$`

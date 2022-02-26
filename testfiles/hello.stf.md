@@ -7,7 +7,7 @@ Readme Hello World example.
 ### File cmd.sh command
 
 ~~~
-$statictea -s=hello.json -t=hello.html >stdout 2>stderr
+$statictea -s hello.json -t hello.html >stdout 2>stderr
 ~~~
 
 ### File hello.html

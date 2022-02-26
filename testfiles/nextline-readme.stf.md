@@ -7,7 +7,7 @@ The nextline readme example.
 ### File cmd.sh command
 
 ~~~
-$statictea -s=nextline.json -t=nextline.html >stdout 2>stderr
+$statictea -s nextline.json -t nextline.html >stdout 2>stderr
 ~~~
 
 ### File nextline.html

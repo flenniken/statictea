@@ -21,8 +21,8 @@ todo: test error cases. nonZeroReturn
 
 ~~~
 $statictea \
-  -t=tmpl.txt \
-  -r=result >stdout 2>stderr
+  -t tmpl.txt \
+  -r result >stdout 2>stderr
 ~~~
 
 ### File tmpl.txt

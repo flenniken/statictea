@@ -7,8 +7,8 @@ Test logging with Hello World.
 ### File cmd.sh command
 
 ~~~
-$statictea -s=hello.json -t=hello.html >stdout 2>stderr
-$statictea -l=log.txt -s=hello.json -t=hello.html >stdout 2>stderr
+$statictea -s hello.json -t hello.html >stdout 2>stderr
+$statictea -l log.txt -s hello.json -t hello.html >stdout 2>stderr
 ~~~
 
 ### File log.sh command
@@ -39,7 +39,7 @@ hello world
 ### File log.expected
 
 ~~~
-Starting: argv: @["-l=log.txt", "-s=hello.json", "-t=hello.html"]
+Starting: argv: @["-l", "log.txt", "-s", "hello.json", "-t", "hello.html"]
 Version: 0.1.0
 Warnings: 0
 Return code: 0

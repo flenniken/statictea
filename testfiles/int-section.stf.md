@@ -8,9 +8,9 @@ Test the int type.
 
 ~~~
 $statictea \
-  -s=server.json \
-  -t=tmpl.txt \
-  -r=result >stdout 2>stderr
+  -s server.json \
+  -t tmpl.txt \
+  -r result >stdout 2>stderr
 ~~~
 
 ### File tmpl.txt

@@ -494,7 +494,7 @@ proc taskDocsIx() =
 
   # Process the index template and create the index.md file.
   echo "Create the index.md file"
-  var cmd = "bin/statictea -s=$1 -t=templates/nimModuleIndex.md -r=docs/index.md" %
+  var cmd = "bin/statictea -s $1 -t templates/nimModuleIndex.md -r docs/index.md" %
     [jsonFilename]
   exec cmd
 
@@ -513,7 +513,7 @@ proc taskTestfilesReadme() =
 
   # Process the index template and create the index.md file.
   echo "Create the testfiles/readme.md file"
-  var cmd = "bin/statictea -s=$1 -t=templates/testfiles.md -r=testfiles/readme.md" %
+  var cmd = "bin/statictea -s $1 -t templates/testfiles.md -r testfiles/readme.md" %
     [jsonFilename]
   exec cmd
 
@@ -559,8 +559,8 @@ proc taskDocs(namePart: string) =
 
       # Create markdown from the json comments using a statictea template.
       echo "Generate $1" % [mdName]
-      let part1 = "bin/statictea -t=templates/nimModule.md "
-      let part2 = "-s=$1 -r=$2" % [jsonName, mdName]
+      let part1 = "bin/statictea -t templates/nimModule.md "
+      let part2 = "-s $1 -r $2" % [jsonName, mdName]
       exec part1 & part2
 
       # Remove the temporary files.
@@ -583,7 +583,7 @@ proc taskReadMeFun() =
   # Create the readme function section org file.
   let templateName = joinPath("templates", "readmeFuncSection.org")
   let sectionFile = joinPath("docs", "readmeFuncs.org")
-  cmd = "bin/statictea -l -s=$1 -t=$2 -r=$3" %
+  cmd = "bin/statictea -l -s $1 -t $2 -r $3" %
      [jsonName, templateName, sectionFile]
   # echo cmd
   exec cmd

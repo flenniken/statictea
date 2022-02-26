@@ -100,23 +100,6 @@ proc testParsePrepostBad(str: string): bool =
 
 suite "parseCommandLine":
 
-  test "fileListIndex":
-    check(fileListIndex("server") == 0)
-    check(fileListIndex("shared") == 1)
-    check(fileListIndex("template") == 2)
-    check(fileListIndex("other") == -1)
-
-  test "letterToWord":
-    check(letterToWord('s') == "server")
-    check(letterToWord('j') == "shared")
-    check(letterToWord('t') == "template")
-    check(letterToWord('r') == "result")
-    check(letterToWord('h') == "help")
-    check(letterToWord('v') == "version")
-    check(letterToWord('u') == "update")
-    check(letterToWord('p') == "prepost")
-    check(letterToWord('z') == "")
-
   test "prepost string representation":
     var prepostList: seq[Prepost]
 
@@ -167,37 +150,37 @@ suite "parseCommandLine":
     check tpcl("-h", help=true)
 
   test "parseCommandLine-t":
-    check tpcl("-t=tea.html", templateList = @["tea.html"])
+    check tpcl("-t tea.html", templateList = @["tea.html"])
 
   test "parseCommandLine-template":
-    check tpcl("--template=tea.html", templateList = @["tea.html"])
+    check tpcl("--template tea.html", templateList = @["tea.html"])
 
   test "parseCommandLine-s":
-    check tpcl("-s=server.json", serverList = @["server.json"])
+    check tpcl("-s server.json", serverList = @["server.json"])
 
   test "parseCommandLine-server":
-    check tpcl("--server=server.json", serverList = @["server.json"])
+    check tpcl("--server server.json", serverList = @["server.json"])
 
   test "parseCommandLine-j":
-    check tpcl("-j=shared.json", sharedList = @["shared.json"])
+    check tpcl("-j shared.json", sharedList = @["shared.json"])
 
   test "parseCommandLine-shared":
-    check tpcl("--shared=shared.json", sharedList = @["shared.json"])
+    check tpcl("--shared shared.json", sharedList = @["shared.json"])
 
   test "parseCommandLine-r":
-    check tpcl("-r=result.html", resultFilename = "result.html")
+    check tpcl("-r result.html", resultFilename = "result.html")
 
   test "parseCommandLine-result":
-    check tpcl("--result=result.html", resultFilename = "result.html")
+    check tpcl("--result result.html", resultFilename = "result.html")
 
   test "parseCommandLine-log":
     check tpcl("-l", log = true)
 
   test "parseCommandLine-log with filename":
-    check tpcl("--log=statictea.log", log = true, logFilename = "statictea.log")
+    check tpcl("--log statictea.log", log = true, logFilename = "statictea.log")
 
   test "parseCommandLine-happy-path":
-    check tpcl("-s=server.json -j=shared.json -t=tea.html -r=result.html",
+    check tpcl("-s server.json -j shared.json -t tea.html -r result.html",
          serverList = @["server.json"],
          sharedList = @["shared.json"],
          templateList = @["tea.html"],
@@ -205,7 +188,7 @@ suite "parseCommandLine":
     )
 
   test "parseCommandLine-multiple":
-    check tpcl("-s=server.json -s=server2.json -j=shared.json -j=shared2.json -t=tea.html -r=result.html",
+    check tpcl("-s server.json -s server2.json -j shared.json -j shared2.json -t tea.html -r result.html",
          serverList = @["server.json", "server2.json"],
          sharedList = @["shared.json", "shared2.json"],
          templateList = @["tea.html"],
@@ -220,7 +203,7 @@ suite "parseCommandLine":
   #   check tpcl("-r=\"name with spaces result.html\"", resultFilename = "name with spaces result.html")
 
   test "parseCommandLine-prepost":
-    check tpcl("--prepost=<--$", prepostList = @[newPrepost("<--$", "")])
+    check tpcl("--prepost <--$", prepostList = @[newPrepost("<--$", "")])
 
   # The test code splits args by spaces. The following "# $" becomes
   # two args "#" and "$".
@@ -231,20 +214,20 @@ suite "parseCommandLine":
   # Test some error cases.
 
   test "parseCommandLine-no-filename":
-    check parseWarning("-s", newWarningData(wNoFilename, "server", "s"))
+    check parseWarning("-s", newWarningData(wClmMissingRequiredParameter, "server"))
 
   test "parseCommandLine-no-switch":
-    check parseWarning("-w", newWarningData(wUnknownSwitch, "w"))
+    check parseWarning("-w", newWarningData(wClmInvalidShortOption, "w"))
 
   test "parseCommandLine-no-long-switch":
-    check parseWarning("--hello", newWarningData(wUnknownSwitch, "hello"))
+    check parseWarning("--hello", newWarningData(wClmInvalidOption, "hello"))
 
   test "parseCommandLine-no-arg":
-    check parseWarning("bare", newWarningData(wUnknownArg, "bare"))
+    check parseWarning("bare", newWarningData(wClmTooManyBareParameters))
 
   test "parseCommandLine-missing-result":
-    check parseWarning("-r", newWarningData(wNoFilename, "result", "r"))
+    check parseWarning("-r", newWarningData(wClmMissingRequiredParameter, "result"))
 
   test "parseCommandLine-two-results":
-    check parseWarning("-r=result.html -r=asdf.html",
-      newWarningData(wOneResultAllowed, "asdf.html"))
+    check parseWarning("-r result.html -r asdf.html",
+      newWarningData(wOneResultAllowed))

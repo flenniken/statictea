@@ -5,97 +5,97 @@ Parse the command line.
 * [cmdline.nim](../src/cmdline.nim) &mdash; Nim source code.
 # Index
 
-* type: [MessageId](#messageid) &mdash; Posssible message numbers returned by cmdline.
-* type: [ArgsOrMessageIdKind](#argsormessageidkind) &mdash; The kind of an ArgsOrMessageId object, either args or a message.
-* type: [Args](#args) &mdash; Args holds the parsed command line arguments in an ordered dictionary.
-* type: [ArgsOrMessageId](#argsormessageid) &mdash; Contains the command line args or a message.
-* type: [OptionType](#optiontype) &mdash; The option type.
-* [newOption](#newoption) &mdash; Create a new Option object.
-* [`$`](#) &mdash; Return a string representation of an Option object.
-* [`$`](#-1) &mdash; Return a string representation of a ArgsOrMessageId object.
+* type: [ClMessageId](#clmessageid) &mdash; Possible message numbers returned by cmdline.
+* type: [ArgsOrMessageKind](#argsormessagekind) &mdash; The kind of an ArgsOrMessage object, either args or a message.
+* type: [ClArgs](#clargs) &mdash; ClArgs holds the parsed command line arguments in an ordered dictionary.
+* type: [ArgsOrMessage](#argsormessage) &mdash; Contains the command line args or a message.
+* type: [ClOptionType](#cloptiontype) &mdash; The option type.
+* [newClOption](#newcloption) &mdash; Create a new ClOption object.
+* [`$`](#) &mdash; Return a string representation of an ClOption object.
+* [`$`](#-1) &mdash; Return a string representation of a ArgsOrMessage object.
 * [commandLineEcho](#commandlineecho) &mdash; Show the command line arguments.
 * [collectParams](#collectparams) &mdash; Get the command line parameters from the system and return a list.
 * [cmdLine](#cmdline) &mdash; Parse the command line parameters.
 
-# MessageId
+# ClMessageId
 
-Posssible message numbers returned by cmdline.
+Possible message numbers returned by cmdline.
 
 ```nim
-MessageId = enum
+ClMessageId = enum
   clmBareTwoDashes,         ## Two dashes must be followed by an option name.
   clmInvalidOption,         ## "--{optionName}" is not an option.
   clmMissingRequiredParameter, ## Missing
 ```
 
-# ArgsOrMessageIdKind
+# ArgsOrMessageKind
 
-The kind of an ArgsOrMessageId object, either args or a message.
+The kind of an ArgsOrMessage object, either args or a message.
 
 ```nim
-ArgsOrMessageIdKind = enum
+ArgsOrMessageKind = enum
   clArgs, clMessage
 ```
 
-# Args
+# ClArgs
 
-Args holds the parsed command line arguments in an ordered dictionary. The keys are the supported options found on the command line and each value is a list of associated parameters. An option without parameters will have an empty list.
+ClArgs holds the parsed command line arguments in an ordered dictionary. The keys are the supported options found on the command line and each value is a list of associated parameters. An option without parameters will have an empty list.
 
 ```nim
-Args = OrderedTable[string, seq[string]]
+ClArgs = OrderedTable[string, seq[string]]
 ```
 
-# ArgsOrMessageId
+# ArgsOrMessage
 
 Contains the command line args or a message.
 
 ```nim
-ArgsOrMessageId = object
-  case kind*: ArgsOrMessageIdKind
+ArgsOrMessage = object
+  case kind*: ArgsOrMessageKind
   of clArgs:
-      args*: Args
+      args*: ClArgs
 
   of clMessage:
-      messageId*: MessageId
+      messageId*: ClMessageId
       problemParam*: string
 
 
 ```
 
-# OptionType
+# ClOptionType
 
 The option type.
 
 ```nim
-OptionType = enum
+ClOptionType = enum
   clParameter,              ## option with a parameter
   clNoParameter,            ## option without a parameter
   clOptionalParameter,      ## option with an optional parameter
   clBareParameter            ## no switch, just a bare parameter. Use '_' for the short name.
 ```
 
-# newOption
+# newClOption
 
-Create a new Option object.
+Create a new ClOption object.
 
 ```nim
-func newOption(long: string; short: char; optionType: OptionType): Option
+func newClOption(long: string; short: char; optionType: ClOptionType): ClOption
 ```
 
 # `$`
 
-Return a string representation of an Option object.
+Return a string representation of an ClOption object.
 
 ```nim
-func `$`(a: Option): string
+func `$`(a: ClOption): string
 ```
 
 # `$`
 
-Return a string representation of a ArgsOrMessageId object.
+Return a string representation of a ArgsOrMessage object.
 
 ```nim
-func `$`(a: ArgsOrMessageId): string
+func `$`(a: ArgsOrMessage): string
 ```
 
 # commandLineEcho
@@ -119,7 +119,7 @@ proc collectParams(): seq[string]
 Parse the command line parameters.  You pass in the list of supported options and the parameters to parse. The arguments found are returned. If there is a problem with the parameters, args contains a message telling the problem. Use collectParams() to generate parameters.
 
 ```nim
-func cmdLine(options: openArray[Option]; parameters: openArray[string]): ArgsOrMessageId
+func cmdLine(options: openArray[ClOption]; parameters: openArray[string]): ArgsOrMessage
 ```
 
 

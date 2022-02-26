@@ -8,9 +8,9 @@ Test t.row warnings.
 
 ~~~
 $statictea \
-  -l=log.txt \
-  -t=tmpl.txt \
-  -r=result.html >stdout 2>stderr
+  -l log.txt \
+  -t tmpl.txt \
+  -r result.html >stdout 2>stderr
 ~~~
 
 ### File log.sh command

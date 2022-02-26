@@ -7,7 +7,7 @@ The continue readme example.
 ### File cmd.sh command
 
 ~~~
-$statictea -t=comment.html >stdout 2>stderr
+$statictea -t comment.html >stdout 2>stderr
 ~~~
 
 ### File comment.html

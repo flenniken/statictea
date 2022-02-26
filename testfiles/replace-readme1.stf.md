@@ -7,7 +7,7 @@ The first replace readme example.
 ### File cmd.sh command
 
 ~~~
-$statictea -j=replace.json -t=replace.html >stdout 2>stderr
+$statictea -j replace.json -t replace.html >stdout 2>stderr
 ~~~
 
 ### File replace.html

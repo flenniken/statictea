@@ -7,8 +7,8 @@ Test standard readme replace example 3.
 ### File cmd.sh command
 
 ~~~
-$statictea -s=server.json -j=shared.json \
-  -t=template.html -r=result.html >stdout 2>stderr
+$statictea -s server.json -j shared.json \
+  -t template.html -r result.html >stdout 2>stderr
 ~~~
 
 ### File template.html

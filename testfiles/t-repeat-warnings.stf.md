@@ -8,11 +8,11 @@ Test t.repeat warnings.
 
 ~~~
 $statictea \
-  -l=log.txt \
-  -s=server.json \
-  -j=shared.json \
-  -t=tmpl.txt \
-  -r=result.html >stdout 2>stderr
+  -l log.txt \
+  -s server.json \
+  -j shared.json \
+  -t tmpl.txt \
+  -r result.html >stdout 2>stderr
 ~~~
 
 ### File log.sh command

@@ -7,7 +7,7 @@ The endblock readme example.
 ### File cmd.sh command
 
 ~~~
-$statictea -t=template.html >stdout 2>stderr
+$statictea -t template.html >stdout 2>stderr
 ~~~
 
 ### File template.html

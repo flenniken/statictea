@@ -14,11 +14,11 @@ noLastEnding command nonZeroReturn
 
 ~~~
 $statictea \
-  -l=log.txt \
-  -s=server.json \
-  -j=shared.json \
-  -t=tmpl.txt \
-  -r=result >stdout 2>stderr
+  -l log.txt \
+  -s server.json \
+  -j shared.json \
+  -t tmpl.txt \
+  -r result >stdout 2>stderr
 ~~~
 
 Run a command over the log file that removes the time prefix then

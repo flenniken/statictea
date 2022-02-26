@@ -6,27 +6,27 @@ suite "cmdline.nim":
   test "test me":
     check 1 == 1
 
-  test "newOption":
-    check $newOption("help", 'h', clNoParameter) == "option: help, h, clNoParameter"
-    check $newOption("log", 'l', clParameter) == "option: log, l, clParameter"
-    check $newOption("param", 'p', clOptionalParameter) == "option: param, p, clOptionalParameter"
+  test "newClOption":
+    check $newClOption("help", 'h', clNoParameter) == "option: help, h, clNoParameter"
+    check $newClOption("log", 'l', clParameter) == "option: log, l, clParameter"
+    check $newClOption("param", 'p', clOptionalParameter) == "option: param, p, clOptionalParameter"
 
   test "cmdLine":
-    var options = newSeq[Option]()
+    var options = newSeq[ClOption]()
     let parameters = newSeq[string]()
     let args = cmdLine(options, parameters)
     check $args == "no arguments"
 
   test "cmdLine":
-    var options = newSeq[Option]()
+    var options = newSeq[ClOption]()
     let parameters = newSeq[string]()
     let args = cmdLine(options, parameters)
     check $args == "no arguments"
 
   test "bin/cmdline --help":
     let parameters = @["--help"]
-    var options = newSeq[Option]()
-    options.add(newOption("help", 'h', clNoParameter))
+    var options = newSeq[ClOption]()
+    options.add(newClOption("help", 'h', clNoParameter))
     let args = cmdLine(options, parameters)
     check $args == """
 args:
@@ -35,8 +35,8 @@ help: @[]
 
   test "bin/cmdline -h":
     let parameters = @["-h"]
-    var options = newSeq[Option]()
-    options.add(newOption("help", 'h', clNoParameter))
+    var options = newSeq[ClOption]()
+    options.add(newClOption("help", 'h', clNoParameter))
     let args = cmdLine(options, parameters)
     check $args == """
 args:
@@ -51,9 +51,9 @@ help: @[]
       ["-h", "--log"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("help", 'h', clNoParameter))
-      options.add(newOption("log", 'l', clNoParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("help", 'h', clNoParameter))
+      options.add(newClOption("log", 'l', clNoParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
@@ -67,8 +67,8 @@ log: @[]
       ["-s", "server.json"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("server", 's', clParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("server", 's', clParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
@@ -81,9 +81,9 @@ server: @["server.json"]
       ["-s", "server.json", "-j", "shared.json"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("server", 's', clParameter))
-      options.add(newOption("shared", 'j', clParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("server", 's', clParameter))
+      options.add(newClOption("shared", 'j', clParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
@@ -96,8 +96,8 @@ shared: @["shared.json"]
       "--server", "server.json",
       "--server", "second.json",
     ]
-    var options = newSeq[Option]()
-    options.add(newOption("server", 's', clParameter))
+    var options = newSeq[ClOption]()
+    options.add(newClOption("server", 's', clParameter))
     let args = cmdLine(options, parameters)
     check $args == """
 args:
@@ -109,8 +109,8 @@ server: @["server.json", "second.json"]
       ["tea.svg"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("filename", '_', clBareParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("filename", '_', clBareParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
@@ -122,9 +122,9 @@ filename: @["tea.svg"]
       ["tea.svg", "tea.svg.save"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("source", '_', clBareParameter))
-      options.add(newOption("destination", '_', clBareParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("source", '_', clBareParameter))
+      options.add(newClOption("destination", '_', clBareParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
@@ -140,8 +140,8 @@ destination: @["tea.svg.save"]
       ["--optional"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("optional", 't', clOptionalParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("optional", 't', clOptionalParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
@@ -154,9 +154,9 @@ optional: @[]
       ["--optional", "--log"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("optional", 't', clOptionalParameter))
-      options.add(newOption("log", 'l', clNoParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("optional", 't', clOptionalParameter))
+      options.add(newClOption("log", 'l', clNoParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
@@ -170,10 +170,10 @@ log: @[]
       ["tea.svg", "--optional", "--log"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("filename", '_', clBareParameter))
-      options.add(newOption("optional", 't', clOptionalParameter))
-      options.add(newOption("log", 'l', clNoParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("filename", '_', clBareParameter))
+      options.add(newClOption("optional", 't', clOptionalParameter))
+      options.add(newClOption("log", 'l', clNoParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
@@ -187,9 +187,9 @@ log: @[]
       ["-lt"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("optional", 't', clOptionalParameter))
-      options.add(newOption("log", 'l', clNoParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("optional", 't', clOptionalParameter))
+      options.add(newClOption("log", 'l', clNoParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
@@ -204,9 +204,9 @@ optional: @[]
       ["-t", "--", "-l"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("optional", 't', clOptionalParameter))
-      options.add(newOption("log", 'l', clNoParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("optional", 't', clOptionalParameter))
+      options.add(newClOption("log", 'l', clNoParameter))
       let args = cmdLine(options, parameters)
       check $args == "message: clmBareTwoDashes"
 
@@ -217,9 +217,9 @@ optional: @[]
       ["-t", "-p", "-l"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("optional", 't', clOptionalParameter))
-      options.add(newOption("log", 'l', clNoParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("optional", 't', clOptionalParameter))
+      options.add(newClOption("log", 'l', clNoParameter))
       let args = cmdLine(options, parameters)
       check $args == "message: clmInvalidShortOption for p."
 
@@ -230,9 +230,9 @@ optional: @[]
       ["-t", "--tea", "-l"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("optional", 't', clOptionalParameter))
-      options.add(newOption("log", 'l', clNoParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("optional", 't', clOptionalParameter))
+      options.add(newClOption("log", 'l', clNoParameter))
       let args = cmdLine(options, parameters)
       check $args == "message: clmInvalidOption for tea."
 
@@ -243,9 +243,9 @@ optional: @[]
       ["--log", "--required"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("required", 'r', clParameter))
-      options.add(newOption("log", 'l', clNoParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("required", 'r', clParameter))
+      options.add(newClOption("log", 'l', clNoParameter))
       let args = cmdLine(options, parameters)
       check $args == "message: clmMissingRequiredParameter for required."
 
@@ -255,8 +255,8 @@ optional: @[]
       ["-", "-l"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("log", 'l', clNoParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("log", 'l', clNoParameter))
       let args = cmdLine(options, parameters)
       check $args == "message: clmBareOneDash"
 
@@ -266,8 +266,8 @@ optional: @[]
       ["-z", "-l"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("log", 'l', clNoParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("log", 'l', clNoParameter))
       let args = cmdLine(options, parameters)
       check $args == "message: clmInvalidShortOption for z."
 
@@ -277,10 +277,10 @@ optional: @[]
       ["-zlt"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("log", 'l', clNoParameter))
-      options.add(newOption("tea", 't', clNoParameter))
-      options.add(newOption("zoo", 'z', clParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("log", 'l', clNoParameter))
+      options.add(newClOption("tea", 't', clNoParameter))
+      options.add(newClOption("zoo", 'z', clParameter))
       let args = cmdLine(options, parameters)
       check $args == "message: clmShortParamInList for z."
 
@@ -289,9 +289,9 @@ optional: @[]
       ["-ltz"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("log", 'l', clNoParameter))
-      options.add(newOption("leg", 'l', clNoParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("log", 'l', clNoParameter))
+      options.add(newClOption("leg", 'l', clNoParameter))
       let args = cmdLine(options, parameters)
       check $args == "message: clmDupShortOption for l."
 
@@ -300,9 +300,9 @@ optional: @[]
       ["-ltz"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("tea", 'l', clNoParameter))
-      options.add(newOption("tea", 'g', clNoParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("tea", 'l', clNoParameter))
+      options.add(newClOption("tea", 'g', clNoParameter))
       let args = cmdLine(options, parameters)
       check $args == "message: clmDupLongOption for tea."
 
@@ -311,8 +311,8 @@ optional: @[]
       ["-ltz"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("tea", 't', clBareParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("tea", 't', clBareParameter))
       let args = cmdLine(options, parameters)
       check $args == "message: clmBareShortName for t."
 
@@ -321,8 +321,8 @@ optional: @[]
       ["-ltz"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("tea", '*', clParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("tea", '*', clParameter))
       let args = cmdLine(options, parameters)
       check $args == "message: clmAlphaNumericShort for *."
 
@@ -331,9 +331,9 @@ optional: @[]
       ["-l"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("tea", '_', clBareParameter))
-      options.add(newOption("log", 'l', clNoParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("tea", '_', clBareParameter))
+      options.add(newClOption("log", 'l', clNoParameter))
       let args = cmdLine(options, parameters)
       check $args == "message: clmMissingBareParameter"
 
@@ -344,11 +344,20 @@ optional: @[]
       ["baretea", "-h"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[Option]()
-      options.add(newOption("tea", '_', clBareParameter))
-      options.add(newOption("tea2", '_', clBareParameter))
-      options.add(newOption("log", 'l', clNoParameter))
-      options.add(newOption("help", 'h', clNoParameter))
+      var options = newSeq[ClOption]()
+      options.add(newClOption("tea", '_', clBareParameter))
+      options.add(newClOption("tea2", '_', clBareParameter))
+      options.add(newClOption("log", 'l', clNoParameter))
+      options.add(newClOption("help", 'h', clNoParameter))
       let args = cmdLine(options, parameters)
       check $args == "message: clmMissingBareParameter"
 
+  test "bin/cmdline log with filename":
+    let parameterSets = [
+      ["--log", "statictea.log"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[ClOption]()
+      options.add(newClOption("log", 'l', clNoParameter))
+      let args = cmdLine(options, parameters)
+      check $args == "message: clmTooManyBareParameters"

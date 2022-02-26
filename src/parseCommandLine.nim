@@ -1,25 +1,14 @@
 ## Parse the StaticTea terminal command line and return the arguments.
 
-import std/parseopt
 import std/options
+import std/tables
 import args
 import messages
 import warnings
 import regexes
+import cmdline
 
-const
-  fileLists = ["server", "shared", "template"]
-  switches = [
-    ('h', "help"),
-    ('v', "version"),
-    ('s', "server"),
-    ('j', "shared"),
-    ('t', "template"),
-    ('r', "result"),
-    ('l', "log"),
-    ('u', "update"),
-    ('p', "prepost"),
-  ]
+# todo: what to do about filenames in multiple places?  result = template = log, etc?
 
 type
   ArgsOrWarningKind* = enum
@@ -39,27 +28,9 @@ func newArgsOrWarning(args: Args): ArgsOrWarning =
   ## Return a new ArgsOrWarning object containing args.
   result = ArgsOrWarning(kind: awArgs, args: args)
 
-func newArgsOrWarning(warning: Warning, p1: string = "",
-    p2: string = ""): ArgsOrWarning =
-  ## Return a new ArgsOrWarning object containing a warning.
-  let warningData = newWarningData(warning, p1, p2)
-  result = ArgsOrWarning(kind: awWarning, warningData: warningData)
-
 func newArgsOrWarning(warningData: WarningData): ArgsOrWarning =
   ## Return a new ArgsOrWarning object containing a warning.
   result = ArgsOrWarning(kind: awWarning, warningData: warningData)
-
-func fileListIndex*(word: string): int =
-  for ix, w in fileLists:
-    if w == word:
-      return ix
-  return -1
-
-func letterToWord*(letter: char): string =
-  for tup in switches:
-    if tup[0] == letter:
-      return tup[1]
-  return ""
 
 proc parsePrepost*(str: string): Option[Prepost] =
   ## Match a prefix followed by an optional postfix, prefix[,postfix].
@@ -72,104 +43,6 @@ proc parsePrepost*(str: string): Option[Prepost] =
     let (prefix, postfix) = matches.get2Groups()
     result = some(newPrepost(prefix, postfix))
 
-proc handleWord(switch: string, word: string, value: string,
-    help: var bool, version: var bool, update: var bool, log: var bool,
-    resultFilename: var string, logFilename: var string,
-    filenames: var array[4, seq[string]], prepostList: var seq[Prepost]):
-    Option[WarningData] =
-  ## Handle one switch and return its value.  Switch is the key from
-  ## the command line, either a word or a letter.  Word is the long
-  ## form of the switch.
-
-  let listIndex = fileListIndex(word)
-  if listIndex != -1:
-    if value == "":
-      return some(newWarningData(wNoFilename, word, $switch))
-    else:
-      filenames[listIndex].add(value)
-  elif word == "help":
-    help = true
-  elif word == "version":
-    version = true
-  elif word == "update":
-    update = true
-  elif word == "result":
-    if value == "":
-      return some(newWarningData(wNoFilename, word, $switch))
-    elif resultFilename != "":
-      return some(newWarningData(wOneResultAllowed, value))
-    else:
-      resultFilename = value
-  elif word == "log":
-    log = true
-    logFilename = value
-  elif word == "prepost":
-    if value == "":
-      return some(newWarningData(wNoPrepostValue, $switch))
-    else:
-      let prepostO = parsePrepost(value)
-      if not prepostO.isSome:
-        return some(newWarningData(wInvalidPrepost, value))
-      else:
-        prepostList.add(prepostO.get())
-  else:
-    return some(newWarningData(wUnknownSwitch, switch))
-
-proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
-  ## Return the command line arguments or a warning. Processing stops
-  ## on the first warning.
-
-  var args: Args
-  var help: bool = false
-  var version: bool = false
-  var update: bool = false
-  var log: bool = false
-  var filenames: array[4, seq[string]]
-  var optParser = initOptParser(argv)
-  var resultFilename: string
-  var logFilename: string
-  var prepostList: seq[Prepost]
-
-  # Iterate over all arguments passed to the command line.
-  for kind, key, value in getopt(optParser):
-    case kind
-      of CmdLineKind.cmdShortOption:
-        for ix in 0..key.len-1:
-          let letter = key[ix]
-          let word = letterToWord(letter)
-          if word == "":
-            return newArgsOrWarning(wUnknownSwitch, $letter)
-          else:
-            let warningDataO = handleWord($letter, word, value,
-              help, version, update, log, resultFilename, logFilename,
-              filenames, prepostList)
-            if warningDataO.isSome():
-              return newArgsOrWarning(warningDataO.get())
-
-      of CmdLineKind.cmdLongOption:
-        let warningDataO = handleWord(key, key, value, help, version, update, log,
-                   resultFilename, logFilename, filenames, prepostList)
-        if warningDataO.isSome():
-          return newArgsOrWarning(warningDataO.get())
-
-      of CmdLineKind.cmdArgument:
-        return newArgsOrWarning(wUnknownArg, key)
-
-      of CmdLineKind.cmdEnd:
-        discard
-
-  args.help = help
-  args.version = version
-  args.update = update
-  args.log = log
-  args.serverList = filenames[0]
-  args.sharedList = filenames[1]
-  args.templateList = filenames[2]
-  args.resultFilename = resultFilename
-  args.logFilename = logFilename
-  args.prepostList = prepostList
-  result = newArgsOrWarning(args)
-
 func `$`*(aw: ArgsOrWarning): string =
   ## Return a string representation of a ArgsOrWarning object.
   if aw.kind == awArgs:
@@ -177,4 +50,80 @@ func `$`*(aw: ArgsOrWarning): string =
   else:
     result = $aw.warningData
 
-# todo: what to do about filenames in multiple places?  result = template = log, etc?
+func mapClMessages(messageId: ClMessageId): MessageId =
+  result = MessageId(ord(messageId) + 157)
+
+
+
+
+proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
+
+  var options = newSeq[ClOption]()
+  options.add(newClOption("help", 'h', clNoParameter))
+  options.add(newClOption("version", 'v', clNoParameter))
+  options.add(newClOption("update", 'u', clNoParameter))
+
+  options.add(newClOption("log", 'l', clOptionalParameter))
+
+  options.add(newClOption("server", 's', clParameter))
+  options.add(newClOption("shared", 'j', clParameter))
+  options.add(newClOption("prepost", 'p', clParameter))
+
+  options.add(newClOption("template", 't', clParameter))
+  options.add(newClOption("result", 'r', clParameter))
+  let ArgsOrMessage = cmdLine(options, argv)
+
+  if ArgsOrMessage.kind == clMessage:
+    let messageId = mapClMessages(ArgsOrMessage.messageId)
+    let warningData = newWarningData(messageId, ArgsOrMessage.problemParam, "")
+    return newArgsOrWarning(warningData)
+
+  # Convert the clArgs to Args
+  let clArgs = ArgsOrMessage.args
+  var args: Args
+  if "help" in clArgs:
+    args.help = true
+  if "version" in clArgs:
+    args.version = true
+  if "update" in clArgs:
+    args.update = true
+
+  if "server" in clArgs:
+    args.serverList = clArgs["server"]
+  if "shared" in clArgs:
+    args.sharedList = clArgs["shared"]
+  if "prepost" in clArgs:
+    var prepostList: seq[Prepost]
+    for str in clArgs["prepost"]:
+      let prepostO = parsePrepost(str)
+      if not prepostO.isSome:
+        return newArgsOrWarning(newWarningData(wInvalidPrepost, str))
+      else:
+        prepostList.add(prepostO.get())
+    args.prepostList = prepostList
+
+  if "template" in clArgs:
+    let filenames = clArgs["template"]
+    if len(filenames) != 1:
+      return newArgsOrWarning(newWarningData(wOneTemplateAllowed))
+    args.templateList = filenames
+  # todo: handle no template filename? or is that done some where else?
+  # else:
+  #   return newArgsOrWarning(newWarningData(wNoTemplateFilename))
+
+  if "result" in clArgs:
+    let filenames = clArgs["result"]
+    if len(filenames) != 1:
+      return newArgsOrWarning(newWarningData(wOneResultAllowed))
+    args.resultFilename = filenames[0]
+
+  if "log" in clArgs:
+    let filenames = clArgs["log"]
+    if len(filenames) > 1:
+      return newArgsOrWarning(newWarningData(wOneLogAllowed))
+    if len(filenames) == 1:
+      args.logFilename = filenames[0]
+    args.log = true
+
+  result = newArgsOrWarning(args)
+    
