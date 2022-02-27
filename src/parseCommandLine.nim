@@ -50,7 +50,7 @@ func `$`*(aw: ArgsOrWarning): string =
   else:
     result = $aw.warningData
 
-func mapClMessages(messageId: ClMessageId): MessageId =
+func mapCmlMessages(messageId: CmlMessageId): MessageId =
   result = MessageId(ord(messageId) + 157)
 
 
@@ -58,43 +58,43 @@ func mapClMessages(messageId: ClMessageId): MessageId =
 
 proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
 
-  var options = newSeq[ClOption]()
-  options.add(newClOption("help", 'h', clNoParameter))
-  options.add(newClOption("version", 'v', clNoParameter))
-  options.add(newClOption("update", 'u', clNoParameter))
+  var options = newSeq[CmlOption]()
+  options.add(newCmlOption("help", 'h', cmlNoParameter))
+  options.add(newCmlOption("version", 'v', cmlNoParameter))
+  options.add(newCmlOption("update", 'u', cmlNoParameter))
 
-  options.add(newClOption("log", 'l', clOptionalParameter))
+  options.add(newCmlOption("log", 'l', cmlOptionalParameter))
 
-  options.add(newClOption("server", 's', clParameter))
-  options.add(newClOption("shared", 'j', clParameter))
-  options.add(newClOption("prepost", 'p', clParameter))
+  options.add(newCmlOption("server", 's', cmlParameter))
+  options.add(newCmlOption("shared", 'j', cmlParameter))
+  options.add(newCmlOption("prepost", 'p', cmlParameter))
 
-  options.add(newClOption("template", 't', clParameter))
-  options.add(newClOption("result", 'r', clParameter))
+  options.add(newCmlOption("template", 't', cmlParameter))
+  options.add(newCmlOption("result", 'r', cmlParameter))
   let ArgsOrMessage = cmdLine(options, argv)
 
-  if ArgsOrMessage.kind == clMessage:
-    let messageId = mapClMessages(ArgsOrMessage.messageId)
+  if ArgsOrMessage.kind == cmlMessage:
+    let messageId = mapCmlMessages(ArgsOrMessage.messageId)
     let warningData = newWarningData(messageId, ArgsOrMessage.problemParam, "")
     return newArgsOrWarning(warningData)
 
-  # Convert the clArgs to Args
-  let clArgs = ArgsOrMessage.args
+  # Convert the cmlArgs to Args
+  let cmlArgs = ArgsOrMessage.args
   var args: Args
-  if "help" in clArgs:
+  if "help" in cmlArgs:
     args.help = true
-  if "version" in clArgs:
+  if "version" in cmlArgs:
     args.version = true
-  if "update" in clArgs:
+  if "update" in cmlArgs:
     args.update = true
 
-  if "server" in clArgs:
-    args.serverList = clArgs["server"]
-  if "shared" in clArgs:
-    args.sharedList = clArgs["shared"]
-  if "prepost" in clArgs:
+  if "server" in cmlArgs:
+    args.serverList = cmlArgs["server"]
+  if "shared" in cmlArgs:
+    args.sharedList = cmlArgs["shared"]
+  if "prepost" in cmlArgs:
     var prepostList: seq[Prepost]
-    for str in clArgs["prepost"]:
+    for str in cmlArgs["prepost"]:
       let prepostO = parsePrepost(str)
       if not prepostO.isSome:
         return newArgsOrWarning(newWarningData(wInvalidPrepost, str))
@@ -102,8 +102,8 @@ proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
         prepostList.add(prepostO.get())
     args.prepostList = prepostList
 
-  if "template" in clArgs:
-    let filenames = clArgs["template"]
+  if "template" in cmlArgs:
+    let filenames = cmlArgs["template"]
     if len(filenames) != 1:
       return newArgsOrWarning(newWarningData(wOneTemplateAllowed))
     args.templateList = filenames
@@ -111,14 +111,14 @@ proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
   # else:
   #   return newArgsOrWarning(newWarningData(wNoTemplateFilename))
 
-  if "result" in clArgs:
-    let filenames = clArgs["result"]
+  if "result" in cmlArgs:
+    let filenames = cmlArgs["result"]
     if len(filenames) != 1:
       return newArgsOrWarning(newWarningData(wOneResultAllowed))
     args.resultFilename = filenames[0]
 
-  if "log" in clArgs:
-    let filenames = clArgs["log"]
+  if "log" in cmlArgs:
+    let filenames = cmlArgs["log"]
     if len(filenames) > 1:
       return newArgsOrWarning(newWarningData(wOneLogAllowed))
     if len(filenames) == 1:

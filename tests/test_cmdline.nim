@@ -1,47 +1,85 @@
 import std/unittest
+import std/tables
 import cmdline
+import strutils
+
+proc testCmdlineMessage(options: seq[CmlOption], line: string,
+    eMessageId: CmlMessageId, eProblemParam: string = ""): bool =
+  let parameters = split(line)
+  let args = cmdline(options, parameters)
+  if args.kind != cmlMessage:
+    echo "The line did not generate a message."
+    echo "got:"
+    echo $args
+    return false
+  result = true
+  if args.messageId != eMessageId:
+    echo "Did not get the expected message id:"
+    echo "expected: $1" % $eMessageId
+    echo "     got: $1" % $args.messageid
+    result = false
+
+  if args.problemParam != eProblemParam:
+    echo "Did not get the expected problem parameter:"
+    echo "expected: $1" % eProblemParam
+    echo "     got: $1" % args.problemParam
+    result = false
+
+  # if result:
+  #   echo getMessage(args.messageid, args.problemParam)
 
 suite "cmdline.nim":
 
   test "test me":
     check 1 == 1
 
-  test "newClOption":
-    check $newClOption("help", 'h', clNoParameter) == "option: help, h, clNoParameter"
-    check $newClOption("log", 'l', clParameter) == "option: log, l, clParameter"
-    check $newClOption("param", 'p', clOptionalParameter) == "option: param, p, clOptionalParameter"
+  test "messages":
+    check getMessage(cmlBareTwoDashes) == "Two dashes must be followed by an option name."
+
+  test "newCmlOption":
+    check $newCmlOption("help", 'h', cmlNoParameter) ==
+      "option: long=help, short=h, optionType=cmlNoParameter"
+
+    check $newCmlOption("log", 'l', cmlParameter) ==
+      "option: long=log, short=l, optionType=cmlParameter"
+
+    check $newCmlOption("param", 'p', cmlOptionalParameter) ==
+      "option: long=param, short=p, optionType=cmlOptionalParameter"
+
+    check $newCmlOption("param", '_', cmlBareParameter) ==
+      "option: long=param, short=_, optionType=cmlBareParameter"
 
   test "cmdLine":
-    var options = newSeq[ClOption]()
+    var options = newSeq[CmlOption]()
     let parameters = newSeq[string]()
-    let args = cmdLine(options, parameters)
-    check $args == "no arguments"
+    let argsOrMessage = cmdLine(options, parameters)
+    check argsOrMessage.kind == cmlArgs
+    check argsOrMessage.args.len == 0
 
   test "cmdLine":
-    var options = newSeq[ClOption]()
+    var options = newSeq[CmlOption]()
     let parameters = newSeq[string]()
-    let args = cmdLine(options, parameters)
-    check $args == "no arguments"
+    let argsOrMessage = cmdLine(options, parameters)
+    check argsOrMessage.kind == cmlArgs
+    check argsOrMessage.args.len == 0
 
   test "bin/cmdline --help":
     let parameters = @["--help"]
-    var options = newSeq[ClOption]()
-    options.add(newClOption("help", 'h', clNoParameter))
-    let args = cmdLine(options, parameters)
-    check $args == """
-args:
-help: @[]
-"""
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("help", 'h', cmlNoParameter))
+    let argsOrMessage = cmdLine(options, parameters)
+    check argsOrMessage.kind == cmlArgs
+    check argsOrMessage.args.len == 1
+    check argsOrMessage.args["help"].len == 0
 
   test "bin/cmdline -h":
     let parameters = @["-h"]
-    var options = newSeq[ClOption]()
-    options.add(newClOption("help", 'h', clNoParameter))
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("help", 'h', cmlNoParameter))
     let args = cmdLine(options, parameters)
     check $args == """
 args:
-help: @[]
-"""
+help: @[]"""
 
   test "bin/cmdline --help --log":
     let parameterSets = [
@@ -51,15 +89,14 @@ help: @[]
       ["-h", "--log"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("help", 'h', clNoParameter))
-      options.add(newClOption("log", 'l', clNoParameter))
+      var options = newSeq[CmlOption]()
+      options.add(newCmlOption("help", 'h', cmlNoParameter))
+      options.add(newCmlOption("log", 'l', cmlNoParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
 help: @[]
-log: @[]
-"""
+log: @[]"""
 
   test "bin/cmdline --server server.json":
     let parameterSets = [
@@ -67,13 +104,12 @@ log: @[]
       ["-s", "server.json"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("server", 's', clParameter))
+      var options = newSeq[CmlOption]()
+      options.add(newCmlOption("server", 's', cmlParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
-server: @["server.json"]
-"""
+server: @["server.json"]"""
 
   test "bin/cmdline --server server.json --shared shared.json":
     let parameterSets = [
@@ -81,56 +117,52 @@ server: @["server.json"]
       ["-s", "server.json", "-j", "shared.json"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("server", 's', clParameter))
-      options.add(newClOption("shared", 'j', clParameter))
+      var options = newSeq[CmlOption]()
+      options.add(newCmlOption("server", 's', cmlParameter))
+      options.add(newCmlOption("shared", 'j', cmlParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
 server: @["server.json"]
-shared: @["shared.json"]
-"""
+shared: @["shared.json"]"""
 
   test "bin/cmdline --server server.json --server second.json":
     let parameters = @[
       "--server", "server.json",
       "--server", "second.json",
     ]
-    var options = newSeq[ClOption]()
-    options.add(newClOption("server", 's', clParameter))
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("server", 's', cmlParameter))
     let args = cmdLine(options, parameters)
     check $args == """
 args:
-server: @["server.json", "second.json"]
-"""
+server: @["server.json", "second.json"]"""
 
   test "bin/cmdline tea.svg":
     let parameterSets = [
       ["tea.svg"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("filename", '_', clBareParameter))
+      var options = newSeq[CmlOption]()
+      options.add(newCmlOption("filename", '_', cmlBareParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
-filename: @["tea.svg"]
-"""
+filename: @["tea.svg"]"""
 
   test "bin/cmdline tea.svg tea.svg.save":
     let parameterSets = [
       ["tea.svg", "tea.svg.save"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("source", '_', clBareParameter))
-      options.add(newClOption("destination", '_', clBareParameter))
+      var options = newSeq[CmlOption]()
+      options.add(newCmlOption("source", '_', cmlBareParameter))
+      options.add(newCmlOption("destination", '_', cmlBareParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
 source: @["tea.svg"]
-destination: @["tea.svg.save"]
-"""
+destination: @["tea.svg.save"]"""
 
   # Test optional parameter.
 
@@ -140,13 +172,12 @@ destination: @["tea.svg.save"]
       ["--optional"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("optional", 't', clOptionalParameter))
+      var options = newSeq[CmlOption]()
+      options.add(newCmlOption("optional", 't', cmlOptionalParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
-optional: @[]
-"""
+optional: @[]"""
 
   test "bin/cmdline -t -l":
     let parameterSets = [
@@ -154,15 +185,14 @@ optional: @[]
       ["--optional", "--log"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("optional", 't', clOptionalParameter))
-      options.add(newClOption("log", 'l', clNoParameter))
+      var options = newSeq[CmlOption]()
+      options.add(newCmlOption("optional", 't', cmlOptionalParameter))
+      options.add(newCmlOption("log", 'l', cmlNoParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
 optional: @[]
-log: @[]
-"""
+log: @[]"""
 
   test "bin/cmdline tea.svg -t -l":
     let parameterSets = [
@@ -170,194 +200,124 @@ log: @[]
       ["tea.svg", "--optional", "--log"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("filename", '_', clBareParameter))
-      options.add(newClOption("optional", 't', clOptionalParameter))
-      options.add(newClOption("log", 'l', clNoParameter))
+      var options = newSeq[CmlOption]()
+      options.add(newCmlOption("filename", '_', cmlBareParameter))
+      options.add(newCmlOption("optional", 't', cmlOptionalParameter))
+      options.add(newCmlOption("log", 'l', cmlNoParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
 filename: @["tea.svg"]
 optional: @[]
-log: @[]
-"""
+log: @[]"""
 
   test "bin/cmdline -lt":
     let parameterSets = [
       ["-lt"],
     ]
     for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("optional", 't', clOptionalParameter))
-      options.add(newClOption("log", 'l', clNoParameter))
+      var options = newSeq[CmlOption]()
+      options.add(newCmlOption("optional", 't', cmlOptionalParameter))
+      options.add(newCmlOption("log", 'l', cmlNoParameter))
       let args = cmdLine(options, parameters)
       check $args == """
 args:
 log: @[]
-optional: @[]
-"""
+optional: @[]"""
 
-  test "bin/cmdline clmBareTwoDashes":
-    let parameterSets = [
-      ["--", "-l", "-t"],
-      ["-t", "-l", "--"],
-      ["-t", "--", "-l"],
-    ]
-    for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("optional", 't', clOptionalParameter))
-      options.add(newClOption("log", 'l', clNoParameter))
-      let args = cmdLine(options, parameters)
-      check $args == "message: clmBareTwoDashes"
+  test "bin/cmdline cmlBareTwoDashes":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("log", 'l', cmlNoParameter))
+    check testCmdlineMessage(options, "-- -l", cmlBareTwoDashes)
+    check testCmdlineMessage(options, "-l --", cmlBareTwoDashes)
 
-  test "bin/cmdline clmInvalidShortOption":
-    let parameterSets = [
-      ["-p", "-l", "-t"],
-      ["-t", "-l", "-p"],
-      ["-t", "-p", "-l"],
-    ]
-    for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("optional", 't', clOptionalParameter))
-      options.add(newClOption("log", 'l', clNoParameter))
-      let args = cmdLine(options, parameters)
-      check $args == "message: clmInvalidShortOption for p."
+  test "bin/cmdline cmlInvalidShortOption":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("log", 'l', cmlNoParameter))
+    check testCmdlineMessage(options, "-p -l -t", cmlInvalidShortOption, "p")
+    check testCmdlineMessage(options, "-l -p -t", cmlInvalidShortOption, "p")
+    check testCmdlineMessage(options, "-l -t -p", cmlInvalidShortOption, "t")
 
-  test "bin/cmdline clmInvalidOption":
-    let parameterSets = [
-      ["--tea", "-l", "-t"],
-      ["-t", "-l", "--tea"],
-      ["-t", "--tea", "-l"],
-    ]
-    for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("optional", 't', clOptionalParameter))
-      options.add(newClOption("log", 'l', clNoParameter))
-      let args = cmdLine(options, parameters)
-      check $args == "message: clmInvalidOption for tea."
+  test "bin/cmdline cmlInvalidOption":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("optional", 't', cmlOptionalParameter))
+    options.add(newCmlOption("log", 'l', cmlNoParameter))
+    check testCmdlineMessage(options, "--tea -l -t", cmlInvalidOption, "tea")
+    check testCmdlineMessage(options, "-t --tea -l", cmlInvalidOption, "tea")
+    check testCmdlineMessage(options, "-t -l --tea", cmlInvalidOption, "tea")
 
-  test "bin/cmdline clmMissingRequiredParameter":
-    let parameterSets = [
-      ["--required", "-l"],
-      ["--required", "--log"],
-      ["--log", "--required"],
-    ]
-    for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("required", 'r', clParameter))
-      options.add(newClOption("log", 'l', clNoParameter))
-      let args = cmdLine(options, parameters)
-      check $args == "message: clmMissingRequiredParameter for required."
+  test "bin/cmdline cmlMissingRequiredParameter":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("required", 'r', cmlParameter))
+    options.add(newCmlOption("log", 'l', cmlNoParameter))
+    check testCmdlineMessage(options, "--required -l", cmlMissingParameter, "required")
+    check testCmdlineMessage(options, "--required --log", cmlMissingParameter, "required")
+    check testCmdlineMessage(options, "--log --required", cmlMissingParameter, "required")
 
-  test "bin/cmdline clmBareOneDash":
-    let parameterSets = [
-      ["--log", "-"],
-      ["-", "-l"],
-    ]
-    for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("log", 'l', clNoParameter))
-      let args = cmdLine(options, parameters)
-      check $args == "message: clmBareOneDash"
+  test "bin/cmdline cmlBareOneDash":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("log", 'l', cmlNoParameter))
+    check testCmdlineMessage(options, "--log -", cmlBareOneDash)
+    check testCmdlineMessage(options, "- --log", cmlBareOneDash)
 
-  test "bin/cmdline clmInvalidShortOption":
-    let parameterSets = [
-      ["--log", "-z"],
-      ["-z", "-l"],
-    ]
-    for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("log", 'l', clNoParameter))
-      let args = cmdLine(options, parameters)
-      check $args == "message: clmInvalidShortOption for z."
+  test "bin/cmdline cmlInvalidShortOption":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("log", 'l', cmlNoParameter))
+    check testCmdlineMessage(options, "--log -z", cmlInvalidShortOption, "z")
+    check testCmdlineMessage(options, "-z --log", cmlInvalidShortOption, "z")
 
-  test "bin/cmdline clmShortParamInList":
-    let parameterSets = [
-      ["-ltz"],
-      ["-zlt"],
-    ]
-    for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("log", 'l', clNoParameter))
-      options.add(newClOption("tea", 't', clNoParameter))
-      options.add(newClOption("zoo", 'z', clParameter))
-      let args = cmdLine(options, parameters)
-      check $args == "message: clmShortParamInList for z."
+  test "bin/cmdline cmlShortParamInList":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("log", 'l', cmlNoParameter))
+    options.add(newCmlOption("tea", 't', cmlNoParameter))
+    options.add(newCmlOption("zoo", 'z', cmlParameter))
+    check testCmdlineMessage(options, "-ltz", cmlShortParamInList, "z")
+    check testCmdlineMessage(options, "-zlt", cmlShortParamInList, "z")
 
-  test "bin/cmdline clmDupShortOption":
-    let parameterSets = [
-      ["-ltz"],
-    ]
-    for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("log", 'l', clNoParameter))
-      options.add(newClOption("leg", 'l', clNoParameter))
-      let args = cmdLine(options, parameters)
-      check $args == "message: clmDupShortOption for l."
+  test "bin/cmdline cmlDupShortOption":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("log", 'l', cmlNoParameter))
+    options.add(newCmlOption("leg", 'l', cmlNoParameter))
+    check testCmdlineMessage(options, "-ltz", cmlDupShortOption, "l")
 
-  test "bin/cmdline clmDupLongOption":
-    let parameterSets = [
-      ["-ltz"],
-    ]
-    for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("tea", 'l', clNoParameter))
-      options.add(newClOption("tea", 'g', clNoParameter))
-      let args = cmdLine(options, parameters)
-      check $args == "message: clmDupLongOption for tea."
+  test "bin/cmdline cmlDupLongOption":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("tea", 'l', cmlNoParameter))
+    options.add(newCmlOption("tea", 'g', cmlNoParameter))
+    check testCmdlineMessage(options, "-l", cmlDupLongOption, "tea")
 
-  test "bin/cmdline clmBareShortName":
-    let parameterSets = [
-      ["-ltz"],
-    ]
-    for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("tea", 't', clBareParameter))
-      let args = cmdLine(options, parameters)
-      check $args == "message: clmBareShortName for t."
+  test "bin/cmdline cmlBareShortName":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("tea", 't', cmlBareParameter))
+    check testCmdlineMessage(options, "-b", cmlBareShortName, "t")
 
-  test "bin/cmdline clmAlphaNumericShort":
-    let parameterSets = [
-      ["-ltz"],
-    ]
-    for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("tea", '*', clParameter))
-      let args = cmdLine(options, parameters)
-      check $args == "message: clmAlphaNumericShort for *."
+  test "bin/cmdline cmlAlphaNumericShort":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("tea", '*', cmlParameter))
+    check testCmdlineMessage(options, "-l", cmlAlphaNumericShort, "*")
 
-  test "bin/cmdline clmMissingBareParameter":
-    let parameterSets = [
-      ["-l"],
-    ]
-    for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("tea", '_', clBareParameter))
-      options.add(newClOption("log", 'l', clNoParameter))
-      let args = cmdLine(options, parameters)
-      check $args == "message: clmMissingBareParameter"
+  test "bin/cmdline cmlMissingBareParameter":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("tea", '_', cmlBareParameter))
+    options.add(newCmlOption("log", 'l', cmlNoParameter))
+    check testCmdlineMessage(options, "-l", cmlMissingBareParameter, "tea")
 
-  test "bin/cmdline clmMissingBareParameters":
-    let parameterSets = [
-      ["-l", "-h"],
-      ["-l", "baretea"],
-      ["baretea", "-h"],
-    ]
-    for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("tea", '_', clBareParameter))
-      options.add(newClOption("tea2", '_', clBareParameter))
-      options.add(newClOption("log", 'l', clNoParameter))
-      options.add(newClOption("help", 'h', clNoParameter))
-      let args = cmdLine(options, parameters)
-      check $args == "message: clmMissingBareParameter"
+  test "bin/cmdline cmlMissingBareParameters":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("tea", '_', cmlBareParameter))
+    options.add(newCmlOption("tea2", '_', cmlBareParameter))
+    options.add(newCmlOption("log", 'l', cmlNoParameter))
+    options.add(newCmlOption("help", 'h', cmlNoParameter))
+
+    check testCmdlineMessage(options, "-l -h", cmlMissingBareParameter, "tea")
+    check testCmdlineMessage(options, "-lh -l", cmlMissingBareParameter, "tea")
+    check testCmdlineMessage(options, "--log --help", cmlMissingBareParameter, "tea")
+
+    check testCmdlineMessage(options, "-l bare", cmlMissingBareParameter, "tea2")
+    check testCmdlineMessage(options, "-lh bare", cmlMissingBareParameter, "tea2")
+    check testCmdlineMessage(options, "bare --help", cmlMissingBareParameter, "tea2")
 
   test "bin/cmdline log with filename":
-    let parameterSets = [
-      ["--log", "statictea.log"],
-    ]
-    for parameters in parameterSets:
-      var options = newSeq[ClOption]()
-      options.add(newClOption("log", 'l', clNoParameter))
-      let args = cmdLine(options, parameters)
-      check $args == "message: clmTooManyBareParameters"
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("log", 'l', cmlNoParameter))
+    check testCmdlineMessage(options, "--log statictea.log", cmlTooManyBareParameters)
