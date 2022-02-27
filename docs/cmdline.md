@@ -5,17 +5,32 @@ Parse the command line.
 * [cmdline.nim](../src/cmdline.nim) &mdash; Nim source code.
 # Index
 
+* type: [CmlMessageId](#cmlmessageid) &mdash; Possible message IDs returned by cmdline.
 * type: [ArgsOrMessageKind](#argsormessagekind) &mdash; The kind of an ArgsOrMessage object, either args or a message.
 * type: [CmlArgs](#cmlargs) &mdash; CmlArgs holds the parsed command line arguments in an ordered dictionary.
 * type: [ArgsOrMessage](#argsormessage) &mdash; Contains the command line args or a message.
 * type: [CmlOptionType](#cmloptiontype) &mdash; The option type.
-* const: [cmlMessages](#cmlmessages) &mdash; Possible message numbers returned by cmdline.
 * [newCmlOption](#newcmloption) &mdash; Create a new CmlOption object.
 * [`$`](#) &mdash; Return a string representation of an CmlOption object.
 * [`$`](#-1) &mdash; Return a string representation of a ArgsOrMessage object.
 * [commandLineEcho](#commandlineecho) &mdash; Show the command line arguments.
 * [collectParams](#collectparams) &mdash; Get the command line parameters from the system and return a list.
 * [cmdLine](#cmdline) &mdash; Parse the command line parameters.
+* [getMessage](#getmessage) &mdash; Return a message from a message id and problem parameter.
+* [`$`](#-2) &mdash; Return a string representation of an Args object.
+
+# CmlMessageId
+
+Possible message IDs returned by cmdline. The number in the name is the same as its ord value.  Since the message handling is left to the caller, it is important for these values to be stable. New values are added to the end and this is a minor version change. It is ok to leave unused values in the list and this is backward compatible. If items are removed or reordered, that is a major version change.
+
+```nim
+CmlMessageId = enum
+  cml_00_BareTwoDashes, cml_01_InvalidOption, cml_02_MissingParameter,
+  cml_03_BareOneDash, cml_04_InvalidShortOption, cml_05_ShortParamInList,
+  cml_06_DupShortOption, cml_07_DupLongOption, cml_08_BareShortName,
+  cml_09_AlphaNumericShort, cml_10_MissingBareParameter,
+  cml_11_TooManyBareParameters
+```
 
 # ArgsOrMessageKind
 
@@ -23,7 +38,7 @@ The kind of an ArgsOrMessage object, either args or a message.
 
 ```nim
 ArgsOrMessageKind = enum
-  cmlArgs, cmlMessage
+  cmlArgsKind, cmlMessageKind
 ```
 
 # CmlArgs
@@ -41,10 +56,10 @@ Contains the command line args or a message.
 ```nim
 ArgsOrMessage = object
   case kind*: ArgsOrMessageKind
-  of cmlArgs:
+  of cmlArgsKind:
       args*: CmlArgs
 
-  of cmlMessage:
+  of cmlMessageKind:
       messageId*: CmlMessageId
       problemParam*: string
 
@@ -61,24 +76,6 @@ CmlOptionType = enum
   cmlNoParameter,           ## option without a parameter
   cmlOptionalParameter,     ## option with an optional parameter
   cmlBareParameter           ## a parameter without an option
-```
-
-# cmlMessages
-
-Possible message numbers returned by cmdline.
-
-```nim
-cmlMessages: array[low(CmlMessageId) .. high(CmlMessageId), string] = [
-    "Two dashes must be followed by an option name.",
-    "The option \'--$1\' is not supported.",
-    "The option \'$1\' needs a parameter.",
-    "One dash must be followed by a short option name.",
-    "The option \'--$1\' is not supported.",
-    "The option \'-$1\' needs a parameter; use it by itself.",
-    "Duplicate short option: \'-$1\'.", "Duplicate long option: \'-$1\'.",
-    "Use the short name \'_\' with a bare parameter.",
-    "Use an alphanumeric ascii character for a short option name.",
-    "Missing bare parameter: $1.", "Extra bare parameter."]
 ```
 
 # newCmlOption
@@ -127,6 +124,22 @@ Parse the command line parameters.  You pass in the list of supported options an
 
 ```nim
 func cmdLine(options: openArray[CmlOption]; parameters: openArray[string]): ArgsOrMessage
+```
+
+# getMessage
+
+Return a message from a message id and problem parameter.
+
+```nim
+func getMessage(message: CmlMessageId; problemParam: string = ""): string
+```
+
+# `$`
+
+Return a string representation of an Args object.
+
+```nim
+func `$`(a: Args): string
 ```
 
 

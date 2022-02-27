@@ -73,7 +73,7 @@ proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
   options.add(newCmlOption("result", 'r', cmlParameter))
   let ArgsOrMessage = cmdLine(options, argv)
 
-  if ArgsOrMessage.kind == cmlMessage:
+  if ArgsOrMessage.kind == cmlMessageKind:
     let messageId = mapCmlMessages(ArgsOrMessage.messageId)
     let warningData = newWarningData(messageId, ArgsOrMessage.problemParam, "")
     return newArgsOrWarning(warningData)
@@ -126,4 +126,3 @@ proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
     args.log = true
 
   result = newArgsOrWarning(args)
-    
