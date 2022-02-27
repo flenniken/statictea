@@ -156,28 +156,43 @@ suite "parseCommandLine":
     check tpcl("--template tea.html", templateList = @["tea.html"])
 
   test "parseCommandLine-s":
-    check tpcl("-s server.json", serverList = @["server.json"])
+    check tpcl("-s server.json -t tea.html",
+      templateList = @["tea.html"],
+      serverList = @["server.json"])
 
   test "parseCommandLine-server":
-    check tpcl("--server server.json", serverList = @["server.json"])
+    check tpcl("--server server.json -t tea.html",
+      templateList = @["tea.html"],
+      serverList = @["server.json"])
 
   test "parseCommandLine-j":
-    check tpcl("-j shared.json", sharedList = @["shared.json"])
+    check tpcl("-j shared.json -t tea.html",
+      templateList = @["tea.html"],
+      sharedList = @["shared.json"])
 
   test "parseCommandLine-shared":
-    check tpcl("--shared shared.json", sharedList = @["shared.json"])
+    check tpcl("--shared shared.json -t tea.html",
+      templateList = @["tea.html"],
+      sharedList = @["shared.json"])
 
   test "parseCommandLine-r":
-    check tpcl("-r result.html", resultFilename = "result.html")
+    check tpcl("-r result.html -t tea.html",
+      templateList = @["tea.html"],
+      resultFilename = "result.html")
 
   test "parseCommandLine-result":
-    check tpcl("--result result.html", resultFilename = "result.html")
+    check tpcl("--result result.html -t tea.html",
+      templateList = @["tea.html"],
+      resultFilename = "result.html")
 
   test "parseCommandLine-log":
-    check tpcl("-l", log = true)
+    check tpcl("-l -t tea.html", log = true,
+      templateList = @["tea.html"])
 
   test "parseCommandLine-log with filename":
-    check tpcl("--log statictea.log", log = true, logFilename = "statictea.log")
+    check tpcl("--log statictea.log -t tea.html", log = true,
+      templateList = @["tea.html"],
+      logFilename = "statictea.log")
 
   test "parseCommandLine-happy-path":
     check tpcl("-s server.json -j shared.json -t tea.html -r result.html",
@@ -203,7 +218,8 @@ suite "parseCommandLine":
   #   check tpcl("-r=\"name with spaces result.html\"", resultFilename = "name with spaces result.html")
 
   test "parseCommandLine-prepost":
-    check tpcl("--prepost <--$", prepostList = @[newPrepost("<--$", "")])
+    check tpcl("--prepost <--$ -t template", templateList = @["template"],
+               prepostList = @[newPrepost("<--$", "")])
 
   # The test code splits args by spaces. The following "# $" becomes
   # two args "#" and "$".
@@ -214,20 +230,20 @@ suite "parseCommandLine":
   # Test some error cases.
 
   test "parseCommandLine-no-filename":
-    check parseWarning("-s", newWarningData(wClmMissingRequiredParameter, "server"))
+    check parseWarning("-s", newWarningData(wCmlOptionRequiresParam, "server"))
 
   test "parseCommandLine-no-switch":
-    check parseWarning("-w", newWarningData(wClmInvalidShortOption, "w"))
+    check parseWarning("-w", newWarningData(wCmlInvalidShortOption, "w"))
 
   test "parseCommandLine-no-long-switch":
-    check parseWarning("--hello", newWarningData(wClmInvalidOption, "hello"))
+    check parseWarning("--hello", newWarningData(wCmlInvalidOption, "hello"))
 
   test "parseCommandLine-no-arg":
-    check parseWarning("bare", newWarningData(wClmTooManyBareParameters))
+    check parseWarning("bare", newWarningData(wCmlTooManyBareParameters))
 
   test "parseCommandLine-missing-result":
-    check parseWarning("-r", newWarningData(wClmMissingRequiredParameter, "result"))
+    check parseWarning("-r", newWarningData(wCmlOptionRequiresParam, "result"))
 
   test "parseCommandLine-two-results":
     check parseWarning("-r result.html -r asdf.html",
-      newWarningData(wOneResultAllowed))
+      newWarningData(wCmlAlreadyHaveOneParameter, "r"))

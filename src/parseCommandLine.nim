@@ -8,8 +8,6 @@ import warnings
 import regexes
 import cmdline
 
-# todo: what to do about filenames in multiple places?  result = template = log, etc?
-
 type
   ArgsOrWarningKind* = enum
     ## The kind of a ArgsOrWarning object, either args or warning.
@@ -51,6 +49,9 @@ func `$`*(aw: ArgsOrWarning): string =
     result = $aw.warningData
 
 func mapCmlMessages(messageId: CmlMessageId): MessageId =
+  when high(CmlMessageId) != cml_12_AlreadyHaveOneParameter:
+    debugEcho "Update mapCmlMessages"
+    fail
   result = MessageId(ord(messageId) + 157)
 
 
@@ -65,12 +66,13 @@ proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
 
   options.add(newCmlOption("log", 'l', cmlOptionalParameter))
 
-  options.add(newCmlOption("server", 's', cmlParameter))
-  options.add(newCmlOption("shared", 'j', cmlParameter))
-  options.add(newCmlOption("prepost", 'p', cmlParameter))
+  options.add(newCmlOption("server", 's', cmlParameterMany))
+  options.add(newCmlOption("shared", 'j', cmlParameterMany))
+  options.add(newCmlOption("prepost", 'p', cmlParameterMany))
 
-  options.add(newCmlOption("template", 't', cmlParameter))
-  options.add(newCmlOption("result", 'r', cmlParameter))
+  # todo: template is a required parameter.
+  options.add(newCmlOption("template", 't', cmlParameter0or1))
+  options.add(newCmlOption("result", 'r', cmlParameter0or1))
   let ArgsOrMessage = cmdLine(options, argv)
 
   if ArgsOrMessage.kind == cmlMessageKind:
@@ -81,12 +83,9 @@ proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
   # Convert the cmlArgs to Args
   let cmlArgs = ArgsOrMessage.args
   var args: Args
-  if "help" in cmlArgs:
-    args.help = true
-  if "version" in cmlArgs:
-    args.version = true
-  if "update" in cmlArgs:
-    args.update = true
+  args.help = "help" in cmlArgs
+  args.version = "version" in cmlArgs
+  args.update = "update" in cmlArgs
 
   if "server" in cmlArgs:
     args.serverList = cmlArgs["server"]
@@ -104,25 +103,21 @@ proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
 
   if "template" in cmlArgs:
     let filenames = cmlArgs["template"]
-    if len(filenames) != 1:
-      return newArgsOrWarning(newWarningData(wOneTemplateAllowed))
+    assert len(filenames) == 1
     args.templateList = filenames
-  # todo: handle no template filename? or is that done some where else?
-  # else:
-  #   return newArgsOrWarning(newWarningData(wNoTemplateFilename))
 
   if "result" in cmlArgs:
     let filenames = cmlArgs["result"]
-    if len(filenames) != 1:
-      return newArgsOrWarning(newWarningData(wOneResultAllowed))
+    assert len(filenames) == 1
     args.resultFilename = filenames[0]
 
   if "log" in cmlArgs:
     let filenames = cmlArgs["log"]
-    if len(filenames) > 1:
-      return newArgsOrWarning(newWarningData(wOneLogAllowed))
+    assert len(filenames) <= 1
     if len(filenames) == 1:
       args.logFilename = filenames[0]
     args.log = true
+
+  # todo: what to do about filenames in multiple places?  result = template = log, etc?
 
   result = newArgsOrWarning(args)

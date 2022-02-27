@@ -32,27 +32,27 @@ proc compareArgs(argsOrMessage: ArgsOrMessage, eCmlArgs: CmlArgs): bool =
 proc testCmdlineMessage(options: seq[CmlOption], line: string,
     eMessageId: CmlMessageId, eProblemParam: string = ""): bool =
   let parameters = split(line)
-  let args = cmdline(options, parameters)
-  if args.kind != cmlMessageKind:
+  let argsOrMessage = cmdline(options, parameters)
+  if argsOrMessage.kind != cmlMessageKind:
     echo "The line did not generate a message."
     echo "got:"
-    echo $args
+    echo $argsOrMessage
     return false
   result = true
-  if args.messageId != eMessageId:
+  if argsOrMessage.messageId != eMessageId:
     echo "Did not get the expected message id:"
     echo "expected: $1" % $eMessageId
-    echo "     got: $1" % $args.messageid
+    echo "     got: $1" % $argsOrMessage.messageid
     result = false
 
-  if args.problemParam != eProblemParam:
+  if argsOrMessage.problemParam != eProblemParam:
     echo "Did not get the expected problem parameter:"
     echo "expected: $1" % eProblemParam
-    echo "     got: $1" % args.problemParam
+    echo "     got: $1" % argsOrMessage.problemParam
     result = false
 
   # if result:
-  #   echo getMessage(args.messageid, args.problemParam)
+  #   echo getMessage(argsOrMessage.messageid, argsOrMessage.problemParam)
 
 suite "cmdline.nim":
 
@@ -67,8 +67,8 @@ suite "cmdline.nim":
     check $newCmlOption("help", 'h', cmlNoParameter) ==
       "option: long=help, short=h, optionType=cmlNoParameter"
 
-    check $newCmlOption("log", 'l', cmlParameter) ==
-      "option: long=log, short=l, optionType=cmlParameter"
+    check $newCmlOption("log", 'l', cmlParameter0or1) ==
+      "option: long=log, short=l, optionType=cmlParameter0or1"
 
     check $newCmlOption("param", 'p', cmlOptionalParameter) ==
       "option: long=param, short=p, optionType=cmlOptionalParameter"
@@ -76,21 +76,20 @@ suite "cmdline.nim":
     check $newCmlOption("param", '_', cmlBareParameter) ==
       "option: long=param, short=_, optionType=cmlBareParameter"
 
-  test "cmdLine":
+    check $newCmlOption("once", 'o', cmlParameterOnce) ==
+      "option: long=once, short=o, optionType=cmlParameterOnce"
+
+    check $newCmlOption("many", 'm', cmlParameterMany) ==
+      "option: long=many, short=m, optionType=cmlParameterMany"
+
+  test "cmdLine no parameters":
     var options = newSeq[CmlOption]()
     let parameters = newSeq[string]()
     let argsOrMessage = cmdLine(options, parameters)
     check argsOrMessage.kind == cmlArgsKind
     check argsOrMessage.args.len == 0
 
-  test "cmdLine":
-    var options = newSeq[CmlOption]()
-    let parameters = newSeq[string]()
-    let argsOrMessage = cmdLine(options, parameters)
-    check argsOrMessage.kind == cmlArgsKind
-    check argsOrMessage.args.len == 0
-
-  test "bin/cmdline --help":
+  test "--help":
     let parameters = @["--help"]
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("help", 'h', cmlNoParameter))
@@ -99,7 +98,7 @@ suite "cmdline.nim":
     check argsOrMessage.args.len == 1
     check argsOrMessage.args["help"].len == 0
 
-  test "bin/cmdline -h":
+  test "-h":
     let parameters = @["-h"]
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("help", 'h', cmlNoParameter))
@@ -109,7 +108,7 @@ suite "cmdline.nim":
     eCmlArgs["help"] = newSeq[string]()
     check compareArgs(argsOrMessage, eCmlArgs)
 
-  test "bin/cmdline --help --log":
+  test "--help --log":
     let parameterSets = [
       ["--help", "--log"],
       ["-h", "-l"],
@@ -127,29 +126,29 @@ suite "cmdline.nim":
       eCmlArgs["log"] = newSeq[string]()
       check compareArgs(argsOrMessage, eCmlArgs)
 
-  test "bin/cmdline --server server.json":
+  test "--server server.json":
     let parameterSets = [
       ["--server", "server.json"],
       ["-s", "server.json"],
     ]
     for parameters in parameterSets:
       var options = newSeq[CmlOption]()
-      options.add(newCmlOption("server", 's', cmlParameter))
+      options.add(newCmlOption("server", 's', cmlParameterMany))
       let argsOrMessage = cmdLine(options, parameters)
 
       var eCmlArgs: CmlArgs
       eCmlArgs["server"] = @["server.json"]
       check compareArgs(argsOrMessage, eCmlArgs)
 
-  test "bin/cmdline --server server.json --shared shared.json":
+  test "--server server.json --shared shared.json":
     let parameterSets = [
       ["--server", "server.json", "--shared", "shared.json"],
       ["-s", "server.json", "-j", "shared.json"],
     ]
     for parameters in parameterSets:
       var options = newSeq[CmlOption]()
-      options.add(newCmlOption("server", 's', cmlParameter))
-      options.add(newCmlOption("shared", 'j', cmlParameter))
+      options.add(newCmlOption("server", 's', cmlParameterMany))
+      options.add(newCmlOption("shared", 'j', cmlParameterMany))
       let argsOrMessage = cmdLine(options, parameters)
 
       var eCmlArgs: CmlArgs
@@ -157,20 +156,34 @@ suite "cmdline.nim":
       eCmlArgs["shared"] = @["shared.json"]
       check compareArgs(argsOrMessage, eCmlArgs)
 
-  test "bin/cmdline --server server.json --server second.json":
+  test "--server server.json --server second.json":
     let parameters = @[
       "--server", "server.json",
       "--server", "second.json",
     ]
     var options = newSeq[CmlOption]()
-    options.add(newCmlOption("server", 's', cmlParameter))
+    options.add(newCmlOption("server", 's', cmlParameterMany))
     let argsOrMessage = cmdLine(options, parameters)
 
     var eCmlArgs: CmlArgs
     eCmlArgs["server"] = @["server.json", "second.json"]
     check compareArgs(argsOrMessage, eCmlArgs)
 
-  test "bin/cmdline tea.svg":
+  test "once":
+    let parameterSets = [
+      ["--help", "me"],
+      ["-h", "me"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[CmlOption]()
+      options.add(newCmlOption("help", 'h', cmlParameterOnce))
+      let argsOrMessage = cmdLine(options, parameters)
+
+      var eCmlArgs: CmlArgs
+      eCmlArgs["help"] = @["me"]
+      check compareArgs(argsOrMessage, eCmlArgs)
+
+  test "tea.svg":
     let parameterSets = [
       ["tea.svg"],
     ]
@@ -183,7 +196,7 @@ suite "cmdline.nim":
       eCmlArgs["filename"] = @["tea.svg"]
       check compareArgs(argsOrMessage, eCmlArgs)
 
-  test "bin/cmdline tea.svg tea.svg.save":
+  test "tea.svg tea.svg.save":
     let parameterSets = [
       ["tea.svg", "tea.svg.save"],
     ]
@@ -200,7 +213,7 @@ suite "cmdline.nim":
 
   # Test optional parameter.
 
-  test "bin/cmdline -t":
+  test "-t":
     let parameterSets = [
       ["-t"],
       ["--optional"],
@@ -214,7 +227,7 @@ suite "cmdline.nim":
       eCmlArgs["optional"] = newSeq[string]()
       check compareArgs(argsOrMessage, eCmlArgs)
 
-  test "bin/cmdline -t -l":
+  test "-t -l":
     let parameterSets = [
       ["-t", "-l"],
       ["--optional", "--log"],
@@ -230,7 +243,7 @@ suite "cmdline.nim":
       eCmlArgs["log"] = newSeq[string]()
       check compareArgs(argsOrMessage, eCmlArgs)
 
-  test "bin/cmdline tea.svg -t -l":
+  test "tea.svg -t -l":
     let parameterSets = [
       ["tea.svg", "-t", "-l"],
       ["tea.svg", "--optional", "--log"],
@@ -248,7 +261,7 @@ suite "cmdline.nim":
       eCmlArgs["log"] = newSeq[string]()
       check compareArgs(argsOrMessage, eCmlArgs)
 
-  test "bin/cmdline -lt":
+  test "-lt":
     let parameterSets = [
       ["-lt"],
     ]
@@ -263,20 +276,20 @@ suite "cmdline.nim":
       eCmlArgs["log"] = newSeq[string]()
       check compareArgs(argsOrMessage, eCmlArgs)
 
-  test "bin/cmdline cml_00_BareTwoDashes":
+  test "cml_00_BareTwoDashes":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("log", 'l', cmlNoParameter))
     check testCmdlineMessage(options, "-- -l", cml_00_BareTwoDashes)
     check testCmdlineMessage(options, "-l --", cml_00_BareTwoDashes)
 
-  test "bin/cmdline cml_04_InvalidShortOption":
+  test "cml_04_InvalidShortOption":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("log", 'l', cmlNoParameter))
     check testCmdlineMessage(options, "-p -l -t", cml_04_InvalidShortOption, "p")
     check testCmdlineMessage(options, "-l -p -t", cml_04_InvalidShortOption, "p")
     check testCmdlineMessage(options, "-l -t -p", cml_04_InvalidShortOption, "t")
 
-  test "bin/cmdline cml_01_InvalidOption":
+  test "cml_01_InvalidOption":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("optional", 't', cmlOptionalParameter))
     options.add(newCmlOption("log", 'l', cmlNoParameter))
@@ -284,92 +297,120 @@ suite "cmdline.nim":
     check testCmdlineMessage(options, "-t --tea -l", cml_01_InvalidOption, "tea")
     check testCmdlineMessage(options, "-t -l --tea", cml_01_InvalidOption, "tea")
 
-  test "bin/cmdline cml_02_MissingParameter":
+  test "cml_02_OptionRequiresParam":
     var options = newSeq[CmlOption]()
-    options.add(newCmlOption("required", 'r', cmlParameter))
+    options.add(newCmlOption("many", 'm', cmlParameterMany))
     options.add(newCmlOption("log", 'l', cmlNoParameter))
-    check testCmdlineMessage(options, "--required -l", cml_02_MissingParameter, "required")
-    check testCmdlineMessage(options, "--required --log", cml_02_MissingParameter,
-      "required")
-    check testCmdlineMessage(options, "--log --required", cml_02_MissingParameter,
-      "required")
+    options.add(newCmlOption("once", 'o', cmlParameterOnce))
 
-  test "bin/cmdline cml_03_BareOneDash":
+    check testCmdlineMessage(options, "--many -l", cml_02_OptionRequiresParam, "many")
+    check testCmdlineMessage(options, "--many --log", cml_02_OptionRequiresParam,
+      "many")
+    check testCmdlineMessage(options, "--log --many", cml_02_OptionRequiresParam,
+      "many")
+    check testCmdlineMessage(options, "--many a", cml_02_OptionRequiresParam,
+      "once")
+
+  test "cml_03_BareOneDash":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("log", 'l', cmlNoParameter))
     check testCmdlineMessage(options, "--log -", cml_03_BareOneDash)
     check testCmdlineMessage(options, "- --log", cml_03_BareOneDash)
 
-  test "bin/cmdline cml_04_InvalidShortOption":
+  test "cml_04_InvalidShortOption":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("log", 'l', cmlNoParameter))
     check testCmdlineMessage(options, "--log -z", cml_04_InvalidShortOption, "z")
     check testCmdlineMessage(options, "-z --log", cml_04_InvalidShortOption, "z")
 
-  test "bin/cmdline cml_05_ShortParamInList":
+  test "cml_05_ShortParamInList":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("log", 'l', cmlNoParameter))
     options.add(newCmlOption("tea", 't', cmlNoParameter))
-    options.add(newCmlOption("zoo", 'z', cmlParameter))
+    options.add(newCmlOption("zoo", 'z', cmlParameterMany))
     check testCmdlineMessage(options, "-ltz", cml_05_ShortParamInList, "z")
     check testCmdlineMessage(options, "-zlt", cml_05_ShortParamInList, "z")
 
-  test "bin/cmdline cml_06_DupShortOption":
+  test "cml_06_DupShortOption":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("log", 'l', cmlNoParameter))
     options.add(newCmlOption("leg", 'l', cmlNoParameter))
     check testCmdlineMessage(options, "-ltz", cml_06_DupShortOption, "l")
 
-  test "bin/cmdline cml_07_DupLongOption":
+  test "cml_07_DupLongOption":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("tea", 'l', cmlNoParameter))
     options.add(newCmlOption("tea", 'g', cmlNoParameter))
     check testCmdlineMessage(options, "-l", cml_07_DupLongOption, "tea")
 
-  test "bin/cmdline cml_08_BareShortName":
+  test "cml_08_BareShortName":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("tea", 't', cmlBareParameter))
     check testCmdlineMessage(options, "-b", cml_08_BareShortName, "t")
 
-  test "bin/cmdline cml_09_AlphaNumericShort":
+  test "cml_09_AlphaNumericShort":
     var options = newSeq[CmlOption]()
-    options.add(newCmlOption("tea", '*', cmlParameter))
+    options.add(newCmlOption("tea", '*', cmlParameterMany))
     check testCmdlineMessage(options, "-l", cml_09_AlphaNumericShort, "*")
 
-  test "bin/cmdline cml_10_MissingBareParameter":
+  test "cml_10_MissingParameter":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("tea", '_', cmlBareParameter))
     options.add(newCmlOption("log", 'l', cmlNoParameter))
-    check testCmdlineMessage(options, "-l", cml_10_MissingBareParameter, "tea")
+    check testCmdlineMessage(options, "-l", cml_10_MissingParameter, "tea")
 
-  test "bin/cmdline cml_10_MissingBareParameters":
+  test "cml_10_MissingParameters":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("tea", '_', cmlBareParameter))
     options.add(newCmlOption("tea2", '_', cmlBareParameter))
     options.add(newCmlOption("log", 'l', cmlNoParameter))
     options.add(newCmlOption("help", 'h', cmlNoParameter))
 
-    check testCmdlineMessage(options, "-l -h", cml_10_MissingBareParameter, "tea")
-    check testCmdlineMessage(options, "-lh -l", cml_10_MissingBareParameter, "tea")
-    check testCmdlineMessage(options, "--log --help", cml_10_MissingBareParameter, "tea")
+    check testCmdlineMessage(options, "-l -h", cml_10_MissingParameter, "tea")
+    check testCmdlineMessage(options, "-lh -l", cml_10_MissingParameter, "tea")
+    check testCmdlineMessage(options, "--log --help", cml_10_MissingParameter, "tea")
 
-    check testCmdlineMessage(options, "-l bare", cml_10_MissingBareParameter, "tea2")
-    check testCmdlineMessage(options, "-lh bare", cml_10_MissingBareParameter, "tea2")
-    check testCmdlineMessage(options, "bare --help", cml_10_MissingBareParameter, "tea2")
+    check testCmdlineMessage(options, "-l bare", cml_10_MissingParameter, "tea2")
+    check testCmdlineMessage(options, "-lh bare", cml_10_MissingParameter, "tea2")
+    check testCmdlineMessage(options, "bare --help", cml_10_MissingParameter, "tea2")
 
-  test "bin/cmdline cml_11_TooManyBareParameters":
+  test "cml_11_TooManyBareParameters":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("log", 'l', cmlNoParameter))
     check testCmdlineMessage(options, "--log statictea.log", cml_11_TooManyBareParameters)
 
+  test "cml_12_AlreadyHaveOneParameter":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("log", 'l', cmlParameterOnce))
+
+    check testCmdlineMessage(options, "--log statictea.log --log hello",
+      cml_12_AlreadyHaveOneParameter, "log")
+    check testCmdlineMessage(options, "-l statictea.log -l hello",
+      cml_12_AlreadyHaveOneParameter, "l")
+    check testCmdlineMessage(options, "-l statictea.log --log hello",
+      cml_12_AlreadyHaveOneParameter, "log")
+    check testCmdlineMessage(options, "--log statictea.log -l hello",
+      cml_12_AlreadyHaveOneParameter, "l")
+
+  test "cml_12_AlreadyHaveOneParameter 0 or 1":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("log", 'l', cmlParameter0or1))
+
+    check testCmdlineMessage(options, "--log statictea.log --log hello",
+      cml_12_AlreadyHaveOneParameter, "log")
+    check testCmdlineMessage(options, "-l statictea.log -l hello",
+      cml_12_AlreadyHaveOneParameter, "l")
+
   test "CmlMessageId":
     check ord(low(CmlMessageId)) == 0
-    check ord(high(CmlMessageId)) == 11
+    if ord(high(CmlMessageId)) > 14:
+      echo "time to update this test."
+      check false == true
 
     let expected = @ [
       cml_00_BareTwoDashes,
       cml_01_InvalidOption,
-      cml_02_MissingParameter,
+      cml_02_OptionRequiresParam,
       cml_03_BareOneDash,
       cml_04_InvalidShortOption,
       cml_05_ShortParamInList,
@@ -377,8 +418,9 @@ suite "cmdline.nim":
       cml_07_DupLongOption,
       cml_08_BareShortName,
       cml_09_AlphaNumericShort,
-      cml_10_MissingBareParameter,
+      cml_10_MissingParameter,
       cml_11_TooManyBareParameters,
+      cml_12_AlreadyHaveOneParameter,
     ]
 
     var ix = 0
@@ -386,3 +428,5 @@ suite "cmdline.nim":
       # echo "$1 $2" % [$ord(messageId), $messageId]
       check messageId == expected[ix]
       inc(ix)
+      if messageId == expected[expected.len - 1]:
+        break

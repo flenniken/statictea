@@ -27,6 +27,10 @@ func newPrepost*(prefix: string, postfix: string): Prepost =
 
 func `$`*(args: Args): string =
   ## Return a string representation of the Args object.
+  # todo: print out one line per field.
+  # args.help = true
+  # args.version = 0.1.0
+  # args.serverList = ["one", "two"]
   result = """
 Args:
 help=$1, version=$2, update=$3, log=$10

@@ -171,19 +171,19 @@ MessageId = enum
   wStartPosTooSmall,        ## w154
   wDictRequiresEven,        ## w155
   wDictStringKey,           ## w156
-  wClmBareTwoDashes,        ## w157
-  wClmInvalidOption,        ## w158
-  wClmMissingRequiredParameter, ## w159
-  wClmBareOneDash,          ## w160
-  wClmInvalidShortOption,   ## w161
-  wClmShortParamInList,     ## w162
-  wClmDupShortOption,       ## w163
-  wClmDupLongOption,        ## w164
-  wClmBareShortName,        ## w165
-  wClmAlphaNumericShort,    ## w166
-  wClmMissingBareParameter, ## w167
-  wClmTooManyBareParameters, ## w168
-  wNoTemplateFilename        ## w169
+  wCmlBareTwoDashes,        ## w157
+  wCmlInvalidOption,        ## w158
+  wCmlOptionRequiresParam,  ## w159
+  wCmlBareOneDash,          ## w160
+  wCmlInvalidShortOption,   ## w161
+  wCmlShortParamInList,     ## w162
+  wCmlDupShortOption,       ## w163
+  wCmlDupLongOption,        ## w164
+  wCmlBareShortName,        ## w165
+  wCmlAlphaNumericShort,    ## w166
+  wCmlMissingParameter,     ## w167
+  wCmlTooManyBareParameters, ## w168
+  wCmlAlreadyHaveOneParameter ## w169
 ```
 
 # Messages
@@ -349,19 +349,16 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The start position is less than 0.", ## wStartPosTooSmall
     "Dictionaries require an even number of list items.", ## wDictRequiresEven
     "The dictionary keys must be strings.", ## wDictStringKey
-    "Two dashes must be followed by an option name.", ## wClmBareTwoDashes
-    "The option \'--$1\' is not supported.", ## wClmInvalidOption
-    "The option \'$1\' needs a parameter.", ## wClmMissingRequiredParameter
-    "One dash must be followed by a short option name.", ## wClmBareOneDash
-    "The option \'--$1\' is not supported.", ## wClmInvalidShortOption
-    "The option \'-$1\' needs a parameter, use it by itself.", ## wClmShortParamInList
-    "Duplicate short option name: \'-$1\'.", ## wClmDupShortOption
-    "Duplicate long option name: \'-$1\'.", ## wClmDupLongOption
-    "Use the short name \'_\' with a bare parameter.", ## wClmBareShortName
-    "Use an alphanumeric ascii character for a short option name.", ## wClmAlphaNumericShort
-    "Missing bare parameter(s).", ## wClmMissingBareParameter
-    "A parameter is missing a leading switch.", ## wClmTooManyBareParameters
-    "No template filename specified."]
+    "Two dashes must be followed by an option name.",
+    "The option \'--$1\' is not supported.",
+    "The option \'$1\' requires a parameter.",
+    "One dash must be followed by a short option name.",
+    "The short option \'-$1\' is not supported.",
+    "The option \'-$1\' needs a parameter; use it by itself.",
+    "Duplicate short option: \'-$1\'.", "Duplicate long option: \'--$1\'.",
+    "Use the short name \'_\' instead of \'$1\' with a bare parameter.", "Use an alphanumeric ascii character for a short option name instead of \'$1\'.",
+    "Missing \'$1\' parameter.", "Extra bare parameter.",
+    "Already have one \'$1\' parameter."]
 ```
 
 

@@ -25,11 +25,11 @@ Possible message IDs returned by cmdline. The number in the name is the same as 
 
 ```nim
 CmlMessageId = enum
-  cml_00_BareTwoDashes, cml_01_InvalidOption, cml_02_MissingParameter,
+  cml_00_BareTwoDashes, cml_01_InvalidOption, cml_02_OptionRequiresParam,
   cml_03_BareOneDash, cml_04_InvalidShortOption, cml_05_ShortParamInList,
   cml_06_DupShortOption, cml_07_DupLongOption, cml_08_BareShortName,
-  cml_09_AlphaNumericShort, cml_10_MissingBareParameter,
-  cml_11_TooManyBareParameters
+  cml_09_AlphaNumericShort, cml_10_MissingParameter,
+  cml_11_TooManyBareParameters, cml_12_AlreadyHaveOneParameter
 ```
 
 # ArgsOrMessageKind
@@ -72,10 +72,12 @@ The option type.
 
 ```nim
 CmlOptionType = enum
-  cmlParameter,             ## option with a parameter
-  cmlNoParameter,           ## option without a parameter
-  cmlOptionalParameter,     ## option with an optional parameter
-  cmlBareParameter           ## a parameter without an option
+  cmlParameter0or1,         ## option with a parameter, 0 or 1 times.
+  cmlNoParameter,           ## option without a parameter, 0 or 1 times.
+  cmlOptionalParameter,     ## option with an optional parameter, 0 or 1 times.
+  cmlBareParameter,         ## a parameter without an option, 1 time
+  cmlParameterOnce,         ## option without a parameter, 1 time.
+  cmlParameterMany           ## option without a parameter, unlimited number of times.
 ```
 
 # newCmlOption
