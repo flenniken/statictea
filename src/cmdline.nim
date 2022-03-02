@@ -376,9 +376,26 @@ when defined(Test) or isMainModule:
 
 when isMainModule:
 
+  echo """
+This is a parsing example for a fictional command that takes several
+types of parameters.
+
+cmdline [-h] [-u name] [-l [filename]] -r leader [-s state] source destination
+* -h, --help
+* -l, --log [filename]
+* -u, --user name (you can specify multiple users).
+* -r, --leader (required)
+* -s, --state
+* source
+* destination
+"""
+  # Display the command line.
+  commandLineEcho()
+
   type
     Args = object
-      ## Args holds all the command line arguments.
+      ## Args holds all the command line arguments for the example
+      ## cmdline.
       help: bool
       log: bool
       logFilename: string
@@ -400,6 +417,7 @@ when isMainModule:
     result = lines.join("\n")
 
   func newArgs(cmlArgs: CmlArgs): Args =
+    ## Create an Args object from a CmlArgs.
     result.help = "help" in cmlArgs
     if "log" in cmlArgs:
       result.log = true
@@ -408,31 +426,9 @@ when isMainModule:
         result.logFilename = list[0]
     if "user" in cmlArgs:
       result.user = cmlArgs["user"]
-    let leaderList = cmlArgs["leader"]
-    result.leader = leaderList[0]
-    if "source" in cmlArgs:
-      let list = cmlArgs["source"]
-      result.source = list[0]
-    if "destination" in cmlArgs:
-      let list = cmlArgs["destination"]
-      result.destination = list[0]
-
-
-  echo """
-This is a parsing example for a fictional command that takes several
-types of parameters.
-
-cmdline [-h] [-u name] [-l [filename]] -r leader [-s state] source destination
-* -h, --help
-* -l, --log [filename]
-* -u, --user name (you can specify multiple users).
-* -r, --leader (required)
-* -s, --state
-* source
-* destination
-"""
-  # Display the command line.
-  commandLineEcho()
+    result.leader = cmlArgs["leader"][0]
+    result.source = cmlArgs["source"][0]
+    result.destination = cmlArgs["destination"][0]
 
   # Parse the command line.
   var options = newSeq[CmlOption]()
