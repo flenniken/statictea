@@ -1,8 +1,29 @@
 # cmdline.nim
 
-<p>Parse the command line.</p>
-<p>For an example see the bottom of the file in the isMainModule section.</p>
+Parse the command line.
 
+ Example:
+ ~~~
+ import cmdline
+
+ # Define the supported options.
+ var options = newSeq[CmlOption]()
+ options.add(newCmlOption("help", 'h', cmlStopParameter))
+ options.add(newCmlOption("log", 'l', cmlOptionalParameter))
+ ...
+
+ # Parse the command line.
+ let argsOrMessage = cmdline(options, collectParams())
+ if argsOrMessage.kind == cmlMessageKind:
+   # Display the message.
+   echo getMessage(argsOrMessage.messageId, argsOrMessage.problemParam)
+ else:
+   # Optionally post process the resulting arguments.
+   let args = newArgs(argsOrMessage.args)
+ ~~~~
+
+ For a complete example see the bottom of the file in the isMainModule
+ section.
 
 * [cmdline.nim](../src/cmdline.nim) &mdash; Nim source code.
 # Index
