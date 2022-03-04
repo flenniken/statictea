@@ -364,10 +364,7 @@ between a command and its endblock. For the nextline case the
 block is one line.
 
 The block contains any number of bracketed variables for
-substitution.
-
-Each string variable gets replaced with its value. The other
-variable types get replaced with their json equivalent.
+substitution. Each string variable gets replaced with its value.
 
 You can repeat the block to make lists and other repeating
 content. You control how many times the block repeats with the
@@ -530,13 +527,16 @@ $$ : a = 5
 :END:
 
 You use variables to add variable content to your template in its
-replacement blocks.
+replacement blocks. Each string variable gets replaced with it
+value, the other variable types get replaced with their json
+equivalent.
 
 You use tea variables to control where the output goes, how many
 times it repeats and other aspects controlling a command.
 
 A variable name starts with a letter followed by letters, digits
-and underscores limited to a total of 64 ASCII characters.
+and underscores limited to a total of 64 ASCII characters. Some
+single letters are reserved, see the next section.
 
 Local variables and tea variables, except row, args and version,
 are cleared after processing each replacement block.
@@ -546,7 +546,7 @@ cannot change an existing variable.
 
 [[#contents][茶]]
 
-* Single Letter Dictionaries
+* Single Letter Variables
 :PROPERTIES:
 :CUSTOM_ID: single-letter-dictionaries
 :END:
@@ -889,9 +889,9 @@ server json:
 #+END_SRC
 
 To create a static page that has more products for better testing
-you could create a test list of teas using t.repeat of 0, that appear
-when testing but not when generating the final result. In the
-following example the test list will show: {tea}, Chamomile,
+you could create a test list of teas using t.repeat of 0. It will
+appear when testing but not when generating the final result. In
+the following example the test list will show: {tea}, Chamomile,
 Chrysanthemum, White, and Puer.
 
 template:
@@ -1462,6 +1462,8 @@ statictea \
   --update
 #+END_SRC
 
+See the [[#replace-command][replace command]] for update examples.
+
 [[#contents][茶]]
 
 ** Logging
@@ -1616,12 +1618,14 @@ helpme      Show the statictea help text.
 The Single Test File (stf) runner is a standalone program used
 for testing command line applications. A stf file contains the
 test which the runner executes to determine whether the test
-passed. The stf file contains instructions for creating files,
-running files and comparing files. See the runner help message
-for more information about stf files.
+passed. The stf files are designed to look good in markdown
+readers.
 
-The testfiles folder contains statictea stf files. The stf files
-are designed to look good in markdown readers.
+The stf file contains instructions for creating files, running
+files and comparing files. See the runner help message for more
+information about stf files.
+
+The testfiles folder contains statictea stf files.
 
 - [[testfiles/readme.md][StaticTea Stf Files]] --- Index to the
   stf files.
@@ -1677,7 +1681,7 @@ List of functions:
 - [[#statements][Statements]]
 - [[#syntax][Syntax]]
 - [[#variables][Variables]]
-- [[#single-letter-dictionaries][Single Letter Dictionaries]]
+- [[#single-letter-dictionaries][Single Letter Variables]]
 - [[#types][Types]]
 - [[#run-statictea][Run StaticTea]]
 - [[#miscellaneous][Miscellaneous]]

@@ -386,7 +386,7 @@ func funAdd_fff*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:~~~
   ## @:add(1.5, 2.3) => 3.8
-  ## @:add(3.3, -2.2) => 1.1
+  ## @:add(3.2, -2.2) => 1.0
   ## @:~~~~
 
   tMapParameters("fff")
@@ -761,10 +761,10 @@ func funFind*(parameters: seq[Value]): FunResult =
 # todo: support slice with lists and dictionaries.
 
 func funSlice*(parameters: seq[Value]): FunResult =
-  ## Extract a substring from a string by its position. You pass the
-  ## @:string, the substring's start index and its length.  The length
-  ## @:is optional. When not specified, the slice returns the characters
-  ## @:from the start to the end of the string.
+  ## Extract a substring from a string by its position and length. You
+  ## @:pass the string, the substring's start index and its length.  The
+  ## @:length is optional. When not specified, the slice returns the
+  ## @:characters from the start to the end of the string.
   ## @:
   ## @:The start index is by unicode characters not bytes.
   ## @:
