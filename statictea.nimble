@@ -174,8 +174,8 @@ proc readModuleDescription(filename: string): string =
   var foundDescription = false
   var lines = newSeq[string]()
   for line in text.splitLines():
-    if line.startsWith("##"):
-      lines.add(line[2 .. ^1])
+    if line.startsWith("##") and line.len > 2:
+      lines.add(line[2 .. line.len - 1])
       foundDescription = true
     elif foundDescription:
       break

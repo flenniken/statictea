@@ -1,13 +1,15 @@
 # cmdline.nim
 
-Parse the command line.
+<p>Parse the command line.</p>
+<p>For an example see the bottom of the file in the isMainModule section.</p>
+
 
 * [cmdline.nim](../src/cmdline.nim) &mdash; Nim source code.
 # Index
 
+* type: [CmlArgs](#cmlargs) &mdash; CmlArgs holds the parsed command line arguments in an ordered dictionary.
 * type: [CmlMessageId](#cmlmessageid) &mdash; Possible message IDs returned by cmdline.
 * type: [ArgsOrMessageKind](#argsormessagekind) &mdash; The kind of an ArgsOrMessage object, either args or a message.
-* type: [CmlArgs](#cmlargs) &mdash; CmlArgs holds the parsed command line arguments in an ordered dictionary.
 * type: [ArgsOrMessage](#argsormessage) &mdash; Contains the command line args or a message.
 * type: [CmlOptionType](#cmloptiontype) &mdash; The option type.
 * [newCmlOption](#newcmloption) &mdash; Create a new CmlOption object.
@@ -18,6 +20,14 @@ Parse the command line.
 * [cmdLine](#cmdline) &mdash; Parse the command line parameters.
 * [getMessage](#getmessage) &mdash; Return a message from a message id and problem parameter.
 * [`$`](#-2) &mdash; Return a string representation of an Args object.
+
+# CmlArgs
+
+CmlArgs holds the parsed command line arguments in an ordered dictionary. The keys are the supported options found on the command line and each value is a list of associated parameters. An option without parameters will have an empty list.
+
+```nim
+CmlArgs = OrderedTable[string, seq[string]]
+```
 
 # CmlMessageId
 
@@ -39,14 +49,6 @@ The kind of an ArgsOrMessage object, either args or a message.
 ```nim
 ArgsOrMessageKind = enum
   cmlArgsKind, cmlMessageKind
-```
-
-# CmlArgs
-
-CmlArgs holds the parsed command line arguments in an ordered dictionary. The keys are the supported options found on the command line and each value is a list of associated parameters. An option without parameters will have an empty list.
-
-```nim
-CmlArgs = OrderedTable[string, seq[string]]
 ```
 
 # ArgsOrMessage
@@ -76,13 +78,15 @@ CmlOptionType = enum
   cmlNoParameter,           ## option without a parameter, 0 or 1 times.
   cmlOptionalParameter,     ## option with an optional parameter, 0 or 1 times.
   cmlBareParameter,         ## a parameter without an option, 1 time
-  cmlParameterOnce,         ## option without a parameter, 1 time.
-  cmlParameterMany           ## option without a parameter, unlimited number of times.
+  cmlParameterOnce,         ## option with a parameter, 1 time.
+  cmlParameterMany,         ## option with a parameter, unlimited number of times.
+  cmlStopParameter ## option without a parameter, 0 or 1 times. Stop and return
+                   ## this option by itself.
 ```
 
 # newCmlOption
 
-Create a new CmlOption object.
+Create a new CmlOption object. For no short option use a dash.
 
 ```nim
 func newCmlOption(long: string; short: char; optionType: CmlOptionType): CmlOption
@@ -122,7 +126,7 @@ proc collectParams(): seq[string]
 
 # cmdLine
 
-Parse the command line parameters.  You pass in the list of supported options and the parameters to parse. The arguments found are returned. If there is a problem with the parameters, args contains a message telling the problem. Use collectParams() to generate parameters.
+Parse the command line parameters.  You pass in the list of supported options and the parameters to parse. The arguments found are returned. If there is a problem with the parameters, args contains a message telling the problem. Use collectParams() to generate the parameters.
 
 ```nim
 func cmdLine(options: openArray[CmlOption]; parameters: openArray[string]): ArgsOrMessage

@@ -60,8 +60,8 @@ func mapCmlMessages(messageId: CmlMessageId): MessageId =
 proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
 
   var options = newSeq[CmlOption]()
-  options.add(newCmlOption("help", 'h', cmlNoParameter))
-  options.add(newCmlOption("version", 'v', cmlNoParameter))
+  options.add(newCmlOption("help", 'h', cmlStopParameter))
+  options.add(newCmlOption("version", 'v', cmlStopParameter))
   options.add(newCmlOption("update", 'u', cmlNoParameter))
 
   options.add(newCmlOption("log", 'l', cmlOptionalParameter))

@@ -276,6 +276,37 @@ suite "cmdline.nim":
       eCmlArgs["log"] = newSeq[string]()
       check compareArgs(argsOrMessage, eCmlArgs)
 
+  test "stop parameters":
+    let parameterSets = [
+      ["--help", "asdf"],
+      ["-h", "asdf"],
+      ["-v", "-h"],
+      ["-h", "-v"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[CmlOption]()
+      options.add(newCmlOption("help", 'h', cmlStopParameter))
+      options.add(newCmlOption("version", 'v', cmlNoParameter))
+      options.add(newCmlOption("required", '_', cmlBareParameter))
+      let argsOrMessage = cmdLine(options, parameters)
+
+      var eCmlArgs: CmlArgs
+      eCmlArgs["help"] = @[]
+      check compareArgs(argsOrMessage, eCmlArgs)
+
+  test "no short option":
+    let parameterSets = [
+      ["--noshort"],
+    ]
+    for parameters in parameterSets:
+      var options = newSeq[CmlOption]()
+      options.add(newCmlOption("noshort", '_', cmlNoParameter))
+      let argsOrMessage = cmdLine(options, parameters)
+
+      var eCmlArgs: CmlArgs
+      eCmlArgs["noshort"] = @[]
+      check compareArgs(argsOrMessage, eCmlArgs)
+
   test "cml_00_BareTwoDashes":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("log", 'l', cmlNoParameter))

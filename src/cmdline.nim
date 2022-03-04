@@ -1,10 +1,19 @@
 ## Parse the command line.
+##
+## For an example see the bottom of the file in the isMainModule
+## section.
 
 import std/os
 import std/tables
 import std/strutils
 
 type
+  CmlArgs* = OrderedTable[string, seq[string]]
+    ## CmlArgs holds the parsed command line arguments in an ordered
+    ## dictionary. The keys are the supported options found on the
+    ## command line and each value is a list of associated parameters.
+    ## An option without parameters will have an empty list.
+
   CmlMessageId* = enum
     ## Possible message IDs returned by cmdline. The number in the
     ## name is the same as its ord value.  Since the message handling
@@ -32,12 +41,6 @@ type
     cmlArgsKind,
     cmlMessageKind
 
-  CmlArgs* = OrderedTable[string, seq[string]]
-    ## CmlArgs holds the parsed command line arguments in an ordered
-    ## dictionary. The keys are the supported options found on the
-    ## command line and each value is a list of associated parameters.
-    ## An option without parameters will have an empty list.
-
   ArgsOrMessage* = object
     ## Contains the command line args or a message.
     case kind*: ArgsOrMessageKind
@@ -58,9 +61,12 @@ type
     cmlBareParameter
       ## a parameter without an option, 1 time
     cmlParameterOnce
-      ## option without a parameter, 1 time.
+      ## option with a parameter, 1 time.
     cmlParameterMany
-      ## option without a parameter, unlimited number of times.
+      ## option with a parameter, unlimited number of times.
+    cmlStopParameter
+      ## option without a parameter, 0 or 1 times. Stop and return
+      ## this option by itself.
 
   CmlOption* = object
     # An option holds its type, long name and short name.
@@ -69,7 +75,7 @@ type
     short: char
 
 func newCmlOption*(long: string, short: char, optionType: CmlOptionType): CmlOption =
-  ## Create a new CmlOption object.
+  ## Create a new CmlOption object. For no short option use a dash.
   result = CmlOption(long: long, short: short, optionType: optionType)
 
 func newArgsOrMessage(args: CmlArgs): ArgsOrMessage =
@@ -151,9 +157,8 @@ func cmdLine*(options: openArray[CmlOption], parameters: openArray[string]): Arg
   ## supported options and the parameters to parse. The arguments
   ## found are returned. If there is a problem with the parameters,
   ## args contains a message telling the problem. Use collectParams()
-  ## to generate parameters.
+  ## to generate the parameters.
 
-  # todo support options without a short form, use '_'.
   # shortOptions maps a short option letter to its option.
   var shortOptions: OrderedTable[char, CmlOption]
 
@@ -181,7 +186,7 @@ func cmdLine*(options: openArray[CmlOption], parameters: openArray[string]): Arg
         # _08_, Use the short name '_' instead of '$1' with a bare parameter.
         return newArgsOrMessage(cml_08_BareShortName, $option.short)
     else:
-      if not isAlphaNumeric(option.short):
+      if option.short != '_' and not isAlphaNumeric(option.short):
         # _09_, Use an alphanumeric ascii character for a short option name instead of '$1'.
         return newArgsOrMessage(cml_09_AlphaNumericShort, $option.short)
       if option.short in shortOptions:
@@ -261,6 +266,10 @@ func cmdLine*(options: openArray[CmlOption], parameters: openArray[string]): Arg
       of cmlBareParameter:
         assert(false, "got a bare parameter long option combination somehow")
         inc(ix)
+      of cmlStopParameter:
+        var stopArgs: CmlArgs
+        addArg(stopArgs, optionName)
+        return newArgsOrMessage(stopArgs)
 
     of shortOption:
       if parameter.len < 2:
@@ -297,6 +306,10 @@ func cmdLine*(options: openArray[CmlOption], parameters: openArray[string]): Arg
       of cmlBareParameter:
         assert(false, "got a bare parameter short option combination somehow")
         inc(ix)
+      of cmlStopParameter:
+        var stopArgs: CmlArgs
+        addArg(stopArgs, optionName)
+        return newArgsOrMessage(stopArgs)
 
     of needParameter:
       if parameter.startsWith("-"):
@@ -410,8 +423,8 @@ cmdline [-h] [-u name] [-l [filename]] -r leader [-s state] source destination
     lines.add("arg.help = $1" % $a.help)
     lines.add("arg.log = $1" % $a.log)
     lines.add("arg.logFilename = '$1'" % a.logFilename)
-    lines.add("arg.user = $1" % $a.user)
-    lines.add("arg.leader = $1" % $a.leader)
+    lines.add("arg.user = '$1'" % $a.user)
+    lines.add("arg.leader = '$1'" % $a.leader)
     lines.add("arg.source = '$1'" % a.source)
     lines.add("arg.destination = '$1'" % a.destination)
     result = lines.join("\n")
@@ -432,7 +445,7 @@ cmdline [-h] [-u name] [-l [filename]] -r leader [-s state] source destination
 
   # Parse the command line.
   var options = newSeq[CmlOption]()
-  options.add(newCmlOption("help", 'h', cmlNoParameter))
+  options.add(newCmlOption("help", 'h', cmlStopParameter))
   options.add(newCmlOption("log", 'l', cmlOptionalParameter))
   options.add(newCmlOption("user", 'u', cmlParameterMany))
   options.add(newCmlOption("leader", 'r', cmlParameterOnce))
