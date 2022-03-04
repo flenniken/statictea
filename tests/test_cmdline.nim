@@ -307,6 +307,15 @@ suite "cmdline.nim":
       eCmlArgs["noshort"] = @[]
       check compareArgs(argsOrMessage, eCmlArgs)
 
+  test "dup optional options":
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("log", 'l', cmlOptionalParameter))
+    # It is ok to have duplicate options that don't have parameters.
+    # check testCmdlineMessage(options, "-l -l",
+    # check testCmdlineMessage(options, "-l --log",
+    check testCmdlineMessage(options, "-l abc --log def",
+      cml_12_AlreadyHaveOneParameter, "log")
+
   test "cml_00_BareTwoDashes":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("log", 'l', cmlNoParameter))
@@ -417,11 +426,11 @@ suite "cmdline.nim":
     check testCmdlineMessage(options, "--log statictea.log --log hello",
       cml_12_AlreadyHaveOneParameter, "log")
     check testCmdlineMessage(options, "-l statictea.log -l hello",
-      cml_12_AlreadyHaveOneParameter, "l")
+      cml_12_AlreadyHaveOneParameter, "log")
     check testCmdlineMessage(options, "-l statictea.log --log hello",
       cml_12_AlreadyHaveOneParameter, "log")
     check testCmdlineMessage(options, "--log statictea.log -l hello",
-      cml_12_AlreadyHaveOneParameter, "l")
+      cml_12_AlreadyHaveOneParameter, "log")
 
   test "cml_12_AlreadyHaveOneParameter 0 or 1":
     var options = newSeq[CmlOption]()
@@ -430,7 +439,7 @@ suite "cmdline.nim":
     check testCmdlineMessage(options, "--log statictea.log --log hello",
       cml_12_AlreadyHaveOneParameter, "log")
     check testCmdlineMessage(options, "-l statictea.log -l hello",
-      cml_12_AlreadyHaveOneParameter, "l")
+      cml_12_AlreadyHaveOneParameter, "log")
 
   test "CmlMessageId":
     check ord(low(CmlMessageId)) == 0

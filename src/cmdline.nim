@@ -201,6 +201,7 @@ func cmdLine*(options: openArray[CmlOption], parameters: openArray[string]): Arg
       longOption,
       shortOption,
       needParameter,
+      processOption,
       optionalParameter,
       multipleShortOptions,
 
@@ -245,31 +246,7 @@ func cmdLine*(options: openArray[CmlOption], parameters: openArray[string]): Arg
         # _01_, The option '--$1' is not supported.
         return newArgsOrMessage(cml_01_InvalidOption, optionName)
 
-      let option = longOptions[optionName]
-      case option.optionType:
-      of cmlNoParameter:
-        state = start
-        addArg(args, optionName)
-        inc(ix)
-      of cmlOptionalParameter:
-        state = optionalParameter
-        inc(ix)
-      of cmlParameter0or1, cmlParameterOnce:
-        if args.optionCount(option.long) > 0:
-          # _12_, Already have one '$1' parameter.
-          return newArgsOrMessage(cml_12_AlreadyHaveOneParameter, $option.long)
-        state = needParameter
-        inc(ix)
-      of cmlParameterMany:
-        state = needParameter
-        inc(ix)
-      of cmlBareParameter:
-        assert(false, "got a bare parameter long option combination somehow")
-        inc(ix)
-      of cmlStopParameter:
-        var stopArgs: CmlArgs
-        addArg(stopArgs, optionName)
-        return newArgsOrMessage(stopArgs)
+      state = processOption
 
     of shortOption:
       if parameter.len < 2:
@@ -286,25 +263,29 @@ func cmdLine*(options: openArray[CmlOption], parameters: openArray[string]): Arg
 
       let option = shortOptions[shortOptionName]
       optionName = option.long
+      state = processOption
+
+    of processOption:
+      let option = longOptions[optionName]
       case option.optionType:
       of cmlNoParameter:
         state = start
         addArg(args, optionName)
         inc(ix)
-      of cmlOptionalParameter:
-        state = optionalParameter
-        inc(ix)
-      of cmlParameter0or1, cmlParameterOnce:
+      of cmlOptionalParameter, cmlParameter0or1, cmlParameterOnce:
         if args.optionCount(option.long) > 0:
           # _12_, Already have one '$1' parameter.
-          return newArgsOrMessage(cml_12_AlreadyHaveOneParameter, $option.short)
-        state = needParameter
+          return newArgsOrMessage(cml_12_AlreadyHaveOneParameter, $option.long)
+        if option.optionType == cmlOptionalParameter:
+          state = optionalParameter
+        else:
+          state = needParameter
         inc(ix)
       of cmlParameterMany:
         state = needParameter
         inc(ix)
       of cmlBareParameter:
-        assert(false, "got a bare parameter short option combination somehow")
+        assert(false, "got a bare parameter and option combination somehow")
         inc(ix)
       of cmlStopParameter:
         var stopArgs: CmlArgs
@@ -439,9 +420,12 @@ cmdline [-h] [-u name] [-l [filename]] -r leader [-s state] source destination
         result.logFilename = list[0]
     if "user" in cmlArgs:
       result.user = cmlArgs["user"]
-    result.leader = cmlArgs["leader"][0]
-    result.source = cmlArgs["source"][0]
-    result.destination = cmlArgs["destination"][0]
+    if "leader" in cmlArgs:
+      result.leader = cmlArgs["leader"][0]
+    if "source" in cmlArgs:
+      result.source = cmlArgs["source"][0]
+    if "destination" in cmlArgs:
+      result.destination = cmlArgs["destination"][0]
 
   # Parse the command line.
   var options = newSeq[CmlOption]()
