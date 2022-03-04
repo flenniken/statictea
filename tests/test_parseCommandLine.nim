@@ -246,4 +246,4 @@ suite "parseCommandLine":
 
   test "parseCommandLine-two-results":
     check parseWarning("-r result.html -r asdf.html",
-      newWarningData(wCmlAlreadyHaveOneParameter, "r"))
+      newWarningData(wCmlAlreadyHaveOneParameter, "result"))
