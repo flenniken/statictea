@@ -3,17 +3,23 @@ import args
 
 suite "args.nim":
 
+  test "prepost":
+    let prepost = newPrepost("abc", "def")
+    check $prepost == "\"abc,def\""
+
   test "empty args":
     var args: Args
     let expected = """
-Args:
-help=false, version=false, update=false, log=false
-serverList: []
-sharedList: []
-templateList: []
-prepostList: []
-resultFilename: ""
-logFilename: """""
+args.help = 0
+args.version = 0
+args.update = 0
+args.log = 0
+args.logFilename = ""
+args.resultFilename = ""
+args.serverList = []
+args.sharedList = []
+args.templateList = []
+args.prepostList = []"""
     check $args == expected
 
   test "args string":
@@ -23,14 +29,16 @@ logFilename: """""
     args.resultFilename = "result.html"
     args.prepostList = @[newPrepost("#", "@"), newPrepost("begin", "end")]
     let expected = """
-Args:
-help=true, version=false, update=false, log=false
-serverList: [one.json, two.json]
-sharedList: []
-templateList: []
-prepostList: [(prefix: "#", postfix: "@"), (prefix: "begin", postfix: "end")]
-resultFilename: "result.html"
-logFilename: """""
+args.help = 1
+args.version = 0
+args.update = 0
+args.log = 0
+args.logFilename = ""
+args.resultFilename = "result.html"
+args.serverList = ["one.json", "two.json"]
+args.sharedList = []
+args.templateList = []
+args.prepostList = ["#,@", "begin,end"]"""
     check $args == expected
 
   test "args string2":
@@ -40,14 +48,16 @@ logFilename: """""
     args.sharedList = @["shared.json"]
     args.resultFilename = "result.html"
     let expected = """
-Args:
-help=true, version=false, update=false, log=false
-serverList: [server.json, more.json]
-sharedList: [shared.json]
-templateList: []
-prepostList: []
-resultFilename: "result.html"
-logFilename: """""
+args.help = 1
+args.version = 0
+args.update = 0
+args.log = 0
+args.logFilename = ""
+args.resultFilename = "result.html"
+args.serverList = ["server.json", "more.json"]
+args.sharedList = ["shared.json"]
+args.templateList = []
+args.prepostList = []"""
     check($args == expected)
 
   test "args logging no name":
@@ -58,14 +68,16 @@ logFilename: """""
     args.sharedList = @["shared.json"]
     args.resultFilename = "result.html"
     let expected = """
-Args:
-help=true, version=false, update=false, log=true
-serverList: [server.json, more.json]
-sharedList: [shared.json]
-templateList: []
-prepostList: []
-resultFilename: "result.html"
-logFilename: """""
+args.help = 1
+args.version = 0
+args.update = 0
+args.log = 1
+args.logFilename = ""
+args.resultFilename = "result.html"
+args.serverList = ["server.json", "more.json"]
+args.sharedList = ["shared.json"]
+args.templateList = []
+args.prepostList = []"""
     check($args == expected)
 
   test "args logging with name":
@@ -77,12 +89,14 @@ logFilename: """""
     args.resultFilename = "result.html"
     args.logFilename = "statictea.log"
     let expected = """
-Args:
-help=true, version=false, update=false, log=true
-serverList: [server.json, more.json]
-sharedList: [shared.json]
-templateList: []
-prepostList: []
-resultFilename: "result.html"
-logFilename: "statictea.log""""
+args.help = 1
+args.version = 0
+args.update = 0
+args.log = 1
+args.logFilename = "statictea.log"
+args.resultFilename = "result.html"
+args.serverList = ["server.json", "more.json"]
+args.sharedList = ["shared.json"]
+args.templateList = []
+args.prepostList = []"""
     check($args == expected)

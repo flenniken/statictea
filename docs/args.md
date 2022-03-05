@@ -8,7 +8,8 @@ Command line arguments.
 * type: [Prepost](#prepost) &mdash; Prepost holds one prefix and its associated postfix.
 * type: [Args](#args) &mdash; Args holds all the command line arguments.
 * [newPrepost](#newprepost) &mdash; Create a new prepost object from the prefix and postfix.
-* [`$`](#) &mdash; Return a string representation of the Args object.
+* [`$`](#) &mdash; Return a string representation of the Prepost object.
+* [`$`](#-1) &mdash; Return a string representation of the Args object.
 
 # Prepost
 
@@ -46,6 +47,14 @@ Create a new prepost object from the prefix and postfix.
 
 ```nim
 func newPrepost(prefix: string; postfix: string): Prepost
+```
+
+# `$`
+
+Return a string representation of the Prepost object.
+
+```nim
+func `$`(p: Prepost): string
 ```
 
 # `$`
