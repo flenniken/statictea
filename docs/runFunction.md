@@ -29,7 +29,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funInt_fosi](#funint_fosi) &mdash; Create an int from a float.
 * [funInt_sosi](#funint_sosi) &mdash; Create an int from a number string.
 * [funFind](#funfind) &mdash; Find the position of a substring in a string.
-* [funSlice](#funslice) &mdash; Extract a substring from a string by its position.
+* [funSlice](#funslice) &mdash; Extract a substring from a string by its position and length.
 * [funDup](#fundup) &mdash; Duplicate a string x times.
 * [funDict_old](#fundict_old) &mdash; Create a dictionary from a list of key, value pairs.
 * [funList](#funlist) &mdash; Create a list of values.
@@ -331,7 +331,7 @@ Examples:
 
 ~~~
 add(1.5, 2.3) => 3.8
-add(3.3, -2.2) => 1.1
+add(3.2, -2.2) => 1.0
 ~~~~
 
 ```nim
@@ -599,10 +599,10 @@ func funFind(parameters: seq[Value]): FunResult
 
 # funSlice
 
-Extract a substring from a string by its position. You pass the
-string, the substring's start index and its length.  The length
-is optional. When not specified, the slice returns the characters
-from the start to the end of the string.
+Extract a substring from a string by its position and length. You
+pass the string, the substring's start index and its length.  The
+length is optional. When not specified, the slice returns the
+characters from the start to the end of the string.
 
 The start index is by unicode characters not bytes.
 

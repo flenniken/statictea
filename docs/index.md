@@ -15,7 +15,7 @@ StaticTea nim source code documentation.
 * [opresult.nim](opresult.md) &mdash; OpResult holds either a value or a message.
 * [opresultid.nim](opresultid.md) &mdash; OpResultId holds either a value or a message id.
 * [opresultwarn.nim](opresultwarn.md) &mdash; OpResultWarn holds either a value or warning data.
-* [parseCmdLine.nim](parseCmdLine.md) &mdash; Parse a template command line.
+* [parseCmdLine.nim](parseCmdLine.md) &mdash; Parse a StaticTea language command line.
 * [parseCommandLine.nim](parseCommandLine.md) &mdash; Parse the StaticTea terminal command line and return the arguments.
 * [parseNumber.nim](parseNumber.md) &mdash; Parse an int or float number string.
 * [processTemplate.nim](processTemplate.md) &mdash; Process the template.

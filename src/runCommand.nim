@@ -153,12 +153,12 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
   var start: Natural
   if cmdLines.lines.len > 0:
     lineNum = cmdLines.lineParts[0].lineNum
-    start = cmdLines.lineParts[0].middleStart
+    start = cmdLines.lineParts[0].codeStart
   var state = State.start
   for ix in 0 ..< cmdLines.lines.len:
     let line = cmdLines.lines[ix]
     let lp = cmdLines.lineParts[ix]
-    for pos in lp.middleStart ..< lp.middleStart+lp.middleLen:
+    for pos in lp.codeStart ..< lp.codeStart+lp.codeLen:
       let ch = line[pos]
       if state == State.start:
         if ch == '"':
@@ -177,7 +177,7 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
       text.setLen(0)
       if cmdLines.lines.len > ix+1:
         lineNum = lp.lineNum + 1
-        start = cmdLines.lineParts[ix+1].middleStart
+        start = cmdLines.lineParts[ix+1].codeStart
 
   if notEmptyOrSpaces(text):
     yield newStatement(strip(text), lineNum, start)

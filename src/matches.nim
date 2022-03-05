@@ -65,7 +65,7 @@ proc makeUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
 
 proc matchPrefix*(line: string, prepostTable: PrepostTable, start: Natural = 0): Option[Matches] =
   ## Match lines that start with one of the prefixes in the given
-  ## table.
+  ## table plus optional following whitespace.
   var terms = newSeq[string]()
   for prefix, _ in prepostTable:
     terms.add(r"\Q$1\E" % prefix)

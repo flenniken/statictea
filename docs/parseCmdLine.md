@@ -1,15 +1,12 @@
 # parseCmdLine.nim
 
-Parse a template command line. We have two types of command lines,
-CmdLine and CommandLine.
-
-* CmdLine -- is a command line in a StaticTea template.
-* CommandLine -- is a line at a terminal for system commands.
+Parse a StaticTea language command line.
 
 * [parseCmdLine.nim](../src/parseCmdLine.nim) &mdash; Nim source code.
 # Index
 
 * type: [LineParts](#lineparts) &mdash; LineParts holds parsed components of a line.
+* [getCodeLength](#getcodelength) &mdash; Return the length of the code in the line.
 * [parseCmdLine](#parsecmdline) &mdash; Parse the line and return its parts when it is a command.
 
 # LineParts
@@ -20,13 +17,22 @@ LineParts holds parsed components of a line.
 LineParts = object
   prefix*: string
   command*: string
-  middleStart*: Natural      ## One after the command.
-  middleLen*: Natural        ## Length to the first ending part.
+  codeStart*: Natural
+  codeLen*: Natural
+  commentLen*: Natural
   continuation*: bool
   postfix*: string
   ending*: string
   lineNum*: Natural
 
+```
+
+# getCodeLength
+
+Return the length of the code in the line.  The code starts at codeStart and cannot exceed the given length. The code ends when there is a comment, a pound sign, or the end is reached. The input length is returned on errors.
+
+```nim
+func getCodeLength(line: string; codeStart: Natural; length: Natural): Natural
 ```
 
 # parseCmdLine

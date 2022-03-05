@@ -837,7 +837,7 @@ task rt, "\tRun one or more stf tests in testfiles; specify part of the name.":
 # task stf, "\tList stf tests with newest last.":
 #   exec """ls -1tr testfiles/*.stf | xargs grep "##" | cut -c 11- | sed 's/:## / -- /'"""
 
-task stfreadme, "\tCreate testfiles readme.md.":
+task stfrm, "\tCreate testfiles readme.md.":
   taskTestfilesReadme()
 
 task newstf, "\tCreate new stf as a starting point for a new test.":
@@ -867,7 +867,7 @@ task helpme, "\tShow the statictea help text.":
 task remote, "\tCheck whether the remote code needs updating.":
   checkUtf8DecoderEcho()
 
-task cmdline, "\Build cmdline.":
+task cmdline, "\tBuild cmdline.":
   let part1 = "nim c --hint[Performance]:off "
   let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
   let part3 = "--out:bin/ src/cmdline"

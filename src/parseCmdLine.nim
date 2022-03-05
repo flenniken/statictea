@@ -1,8 +1,4 @@
-## Parse a template command line. We have two types of command lines,
-## @:CmdLine and CommandLine.
-## @:
-## @:* CmdLine -- is a command line in a StaticTea template.
-## @:* CommandLine -- is a line at a terminal for system commands.
+## Parse a StaticTea language command line.
 
 import std/options
 import std/tables
@@ -11,41 +7,68 @@ import regexes
 import messages
 import matches
 
-# prefix command  middleStart   continuation
-# |      |        |             |postfix
-# |      |        |             ||  ending
-# |      |        |             ||  |
-# <!--$  nextline var = 5       +-->\n
+# prefix command  [code]     [comment] [continuation]
+# |      |        |          |         |[postfix]
+# |      |        |          |         ||  [ending]
+# |      |        |          |         ||  |
+# <!--$  nextline var = 5    # comment +-->\n
+#      |
+#      optional spaces
+#
+# Whitespace must follow a command except on the last line of the file.
 
-# $$ nextline str = "abc+\n
-# $$ : def+\n
-# $$ : ghi"\n
-# statement: 'str = "abcdefghi"\n'
-
-# There is one space after a command.  It is not part of the middle
-# part. The rest of the line including spaces up to the continuation
-# is part of the middle part. In the example below replace the dashes
-# with spaces.
-
-# $$ nextline -str = "abc-+\n
-# $$ : -def-+\n
-# $$ : -ghi"-\n
-# statement: ' str = "abc--def--ghi"-\n'
-
-# Statements are trimmed of leading and trailing spaces later.
-
-# todo: since we don't support semicolons the middle part is not needed anymore.
 type
   LineParts* = object
     ## LineParts holds parsed components of a line.
     prefix*: string
     command*: string
-    middleStart*: Natural ## One after the command.
-    middleLen*: Natural ## Length to the first ending part.
+    codeStart*: Natural # where the code starts or 0 when codeLen is 0.
+    codeLen*: Natural
+    commentLen*: Natural
     continuation*: bool
     postfix*: string
     ending*: string
     lineNum*: Natural
+
+func getCodeLength*(line: string, codeStart: Natural, length: Natural): Natural =
+  ## Return the length of the code in the line.  The code starts at
+  ## codeStart and cannot exceed the given length. The code ends when
+  ## there is a comment, a pound sign, or the end is reached.
+  ## The input length is returned on errors.
+  type
+    State = enum
+      ## Finite state machine states.
+      start,
+      slash,
+      quoteSlash,
+      quote,
+
+  if length < 1:
+    return length
+
+  var state: State
+  for ix in countUp(codeStart, codeStart+length):
+    if ix >= line.len:
+      return length
+    let ch = line[ix]
+    case state:
+    of start:
+      if ch == '#':
+        return ix - codeStart
+      elif ch == '\\':
+        state = slash
+      elif ch == '"':
+        state = quote
+    of quote:
+      if ch == '"':
+        state = start
+      elif ch == '\\':
+        state = quoteSlash
+    of slash:
+      state = start
+    of quoteSlash:
+      state = quote
+  return length
 
 proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
     line: string, lineNum: Natural): Option[LineParts] =
@@ -54,7 +77,7 @@ proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
 
   var lineParts: LineParts
 
-  # Get the prefix.
+  # Get the prefix plus the optional following whitespace.
   let prefixMatchO = matchPrefix(line, prepostTable)
   if not prefixMatchO.isSome():
     # No prefix so not a command line. No error.
@@ -70,9 +93,6 @@ proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
   var commandMatch = commandMatchO.get()
   lineParts.command = commandMatch.getGroup()
 
-  # Get the optional spaces.
-  let spaceMatchO = matchTabSpace(line, prefixMatch.length + commandMatch.length)
-
   # Get the expected postfix. Not all prefixes have a postfix.
   assert prepostTable.hasKey(lineParts.prefix)
   lineParts.postfix = prepostTable[lineParts.prefix]
@@ -87,70 +107,48 @@ proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
   let (continuation, ending) = lastPart.get2Groups()
   lineParts.continuation = if continuation == "": false else: true
 
-  # We have a prefix, command and optional postfix.  Determine whether
-  # there is a middle part.  There must be a space after the command
-  # before the middle part starts.
-  var spaceLength: int
-  if isSome(spaceMatchO):
-    spaceLength = spaceMatchO.get().length
-  else:
-    spaceLength = 0
+  # We have a prefix, command and optional postfix.
 
-  lineParts.middleStart = prefixMatch.length + commandMatch.length
-  if spaceLength > 0:
-     lineParts.middleStart += 1
-  let middleLength: int = line.len - lineParts.middleStart - lastPart.length
+  let middleStart: int = prefixMatch.length + lineParts.command.len
+  let middleLength: int = line.len - middleStart - lastPart.length
 
-  if spaceLength == 0 and middleLength > 0:
-    # No space after the command.
-    env.warn(lineNum, wSpaceAfterCommand)
-    return
+  assert prefixMatch.length + lineParts.command.len + middleLength + lastPart.length == line.len
+
   if middleLength > 0:
-    lineParts.middleLen = middleLength
+    # Make sure there is a space after the command.
+    let spaceMatchO = matchTabSpace(line, middleStart)
+    if not isSome(spaceMatchO):
+      # No space after the command.
+      env.warn(lineNum, wSpaceAfterCommand)
+      return
+
+    let midStart = middleStart + 1
+    let midLen = middleLength - 1
+
+    lineParts.codeLen = getCodeLength(line, midStart, midLen)
+    lineParts.commentLen = midLen - lineParts.codeLen
+    if lineParts.codeLen > 0:
+      lineParts.codeStart = midStart
 
   # Line ending is required except for the last line of the file.
   lineParts.ending = ending
   lineParts.lineNum = lineNum
   result = some(lineParts)
 
-when defined(test):
-  func getEndingString*(ending: string): string =
-    if ending == "\n":
-      result = r"\n"
-    elif ending == "\r\n":
-      result = r"\r\n"
-    else:
-      result = ending
-
-  # func `$`*(lp: LineParts): string =
-  #   ## A string representation of LineParts.
-  #   var ending: string
-  #   if lp.ending == "\n":
-  #     ending = r"\n"
-  #   elif lp.ending == "\r\n":
-  #     ending = r"\r\n"
-  #   else:
-  #     ending = lp.ending
-  #   result = """
-  # LineParts:
-  # prefix: '$1'
-  # command: '$2'
-  # middle: '$3'
-  # continuation: $4
-  # ending: '$5'""" % [$lp.prefix, $lp.command, $lp.middle, $lp.continuation,
-  #                    getEndingString(lp.ending)]
-
+when defined(Test):
+  # Used in multiple test files.
   proc newLineParts*(
       prefix: string = "<!--$",
       command: string = "nextline",
-      middleStart: Natural = 15,
-      middleLen: Natural = 0,
+      codeStart: Natural = 0,
+      codeLen: Natural = 0,
+      commentLen: Natural = 0,
       continuation: bool = false,
       postfix: string = "-->",
       ending: string = "\n",
       lineNum: Natural = 1): LineParts =
     ## Return a new LineParts object. The default is: <!--$ nextline -->\n.
     result = LineParts(prefix: prefix, command: command,
-      middleStart: middleStart, middleLen: middleLen,
+      codeStart: codeStart, codeLen: codeLen, commentLen: commentLen,
       continuation: continuation, postfix: postfix,
       ending: ending, lineNum: lineNum)

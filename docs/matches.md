@@ -8,7 +8,7 @@ Regular expression matching methods.
 * type: [PrepostTable](#preposttable) &mdash; The prefix postfix pairs stored in an ordered dictionary.
 * [makeDefaultPrepostTable](#makedefaultpreposttable) &mdash; Return the default ordered table that maps prefixes to postfixes.
 * [makeUserPrepostTable](#makeuserpreposttable) &mdash; Return the user's ordered table that maps prefixes to postfixes.
-* [matchPrefix](#matchprefix) &mdash; Match lines that start with one of the prefixes in the given table.
+* [matchPrefix](#matchprefix) &mdash; Match lines that start with one of the prefixes in the given table plus optional following whitespace.
 * [matchCommand](#matchcommand) &mdash; Match statictea commands.
 * [matchLastPart](#matchlastpart) &mdash; Match the last part of a command line.
 * [getLastPart](#getlastpart) &mdash; Return the optional plus and line endings from the line.
@@ -53,7 +53,7 @@ proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable
 
 # matchPrefix
 
-Match lines that start with one of the prefixes in the given table.
+Match lines that start with one of the prefixes in the given table plus optional following whitespace.
 
 ```nim
 proc matchPrefix(line: string; prepostTable: PrepostTable; start: Natural = 0): Option[
