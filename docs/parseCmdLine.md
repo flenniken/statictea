@@ -7,17 +7,29 @@ Parse a StaticTea language command line.
 
 * type: [LineParts](#lineparts) &mdash; LineParts holds parsed components of a line.
 * [getCodeLength](#getcodelength) &mdash; Return the length of the code in the line.
-* [parseCmdLine](#parsecmdline) &mdash; Parse the line and return its parts when it is a command.
+* [parseCmdLine](#parsecmdline) &mdash; Parse the line and return its parts.
 
 # LineParts
 
 LineParts holds parsed components of a line.
 
+~~~
+prefix command  [code]   [comment] [continuation]
+|      |        |        |         |[postfix]
+|      |        |        |         ||  [ending]
+|      |        |        |         ||  |
+<!--$  nextline var = 5  # comment +-->n
+     |
+     optional spaces
+~~~~
+
+Whitespace must follow a command except on the last line of the file.
+
 ```nim
 LineParts = object
   prefix*: string
   command*: string
-  codeStart*: Natural
+  codeStart*: Natural        ## where the code starts or 0 when codeLen is 0.
   codeLen*: Natural
   commentLen*: Natural
   continuation*: bool
@@ -29,7 +41,7 @@ LineParts = object
 
 # getCodeLength
 
-Return the length of the code in the line.  The code starts at codeStart and cannot exceed the given length. The code ends when there is a comment, a pound sign, or the end is reached. The input length is returned on errors.
+Return the length of the code in the line.  The code starts at codeStart and cannot exceed the given length. The code ends when there is a comment (a pound sign), or the end is reached. The input length is returned on errors.
 
 ```nim
 func getCodeLength(line: string; codeStart: Natural; length: Natural): Natural
@@ -37,7 +49,7 @@ func getCodeLength(line: string; codeStart: Natural; length: Natural): Natural
 
 # parseCmdLine
 
-Parse the line and return its parts when it is a command. Return quickly when not a command line.
+Parse the line and return its parts. Return quickly when not a command line.
 
 ```nim
 proc parseCmdLine(env: var Env; prepostTable: PrepostTable; line: string;

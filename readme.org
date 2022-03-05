@@ -294,6 +294,10 @@ You make Oolong Tea in five time
 intensive steps.
 #+END_SRC
 
+You can also comment in statements with # to the end of the line,
+see the [[#syntax][Syntax]] section.
+
+
 [[#contents][茶]]
 
 ** Continue Command
@@ -461,9 +465,28 @@ From left to right a command line consists of:
 - a prefix at column 1.
 - a command name
 - an optional statement
+- an optional comment
 - an optional plus continuation character
 - an optional postfix
 - the end of line, either \r\n or \n.
+
+Here is another chart showing line components and where spaces
+are allowed:
+
+#+BEGIN_SRC
+prefix
+|     command  [statement]
+|     |        |   [comment]
+|     |        |   |       [continuation]
+|     |        |   |       |[postfix]
+|     |        |   |       ||  [newline]
+|     |        |   |       ||  |
+<!--$ nextline a=5 # set a +-->
+     |        |            |
+     |        |      no spaces at the end
+     |        one required space
+     optional spaces
+#+END_SRC
 
 The chart below shows a nextline command with three continuation
 commands and three statements: a = 5, b = "tea" and c = "The Earl
@@ -471,8 +494,7 @@ of Grey".
 
 #+BEGIN_SRC
 prefix
-|     command
-|     |        statement
+|     command  statement
 |     |        |         continuation
 |     |        |         |
 |     |        |         |postfix
@@ -482,22 +504,24 @@ prefix
 <!--$ : b = "tea"         -->
 <!--$ : c = "The Earl of +-->
 <!--$ : Grey"             -->
-
 #+END_SRC
 
-A space or tab is required between a command and a statement,
-otherwise you can use zero or more tabs and spaces where they are
-allowed. Space isn't allowed before the prefix, after the
-continuation or after the postfix or between the function name
-and its opening parentheses. Here are a few single line examples:
+A statement starts one space after the command. You can use more
+spaces but they are part of the statement. This is important when
+you wrap quoted strings with a continuation.
+
+Space isn't allowed before the prefix, after the continuation or
+after the postfix or between the function name and its opening
+parentheses. Here are a few single line examples:
 
 #+BEGIN_SRC
-$$nextline
 $$ nextline
 $$ nextline a=5
 $$ nextline a = 5
 $$ nextline num = len(s.tea_list)
 $$ nextline num = len( s.tea_list )
+$$nextline
+$$   nextline
 #+END_SRC
 
 The statements may flow between lines by using the continuation
@@ -517,6 +541,7 @@ You can have blank statements that do nothing.
 $$ nextline
 $$ :
 $$ : a = 5
+$$ : # comment
 #+END_SRC
 
 [[#contents][茶]]

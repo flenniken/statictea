@@ -7,22 +7,25 @@ import regexes
 import messages
 import matches
 
-# prefix command  [code]     [comment] [continuation]
-# |      |        |          |         |[postfix]
-# |      |        |          |         ||  [ending]
-# |      |        |          |         ||  |
-# <!--$  nextline var = 5    # comment +-->\n
-#      |
-#      optional spaces
-#
-# Whitespace must follow a command except on the last line of the file.
-
 type
   LineParts* = object
     ## LineParts holds parsed components of a line.
+    ## @:
+    ## @:~~~
+    ## @:prefix command  [code]   [comment] [continuation]
+    ## @:|      |        |        |         |[postfix]
+    ## @:|      |        |        |         ||  [ending]
+    ## @:|      |        |        |         ||  |
+    ## @:<!--$  nextline var = 5  # comment +-->\n
+    ## @:     |
+    ## @:     optional spaces
+    ## @:~~~~
+    ## @:
+    ## @:Whitespace must follow a command except on the last line of the file.
     prefix*: string
     command*: string
-    codeStart*: Natural # where the code starts or 0 when codeLen is 0.
+    codeStart*: Natural
+      ## where the code starts or 0 when codeLen is 0.
     codeLen*: Natural
     commentLen*: Natural
     continuation*: bool
@@ -33,7 +36,7 @@ type
 func getCodeLength*(line: string, codeStart: Natural, length: Natural): Natural =
   ## Return the length of the code in the line.  The code starts at
   ## codeStart and cannot exceed the given length. The code ends when
-  ## there is a comment, a pound sign, or the end is reached.
+  ## there is a comment (a pound sign), or the end is reached.
   ## The input length is returned on errors.
   type
     State = enum
@@ -72,8 +75,8 @@ func getCodeLength*(line: string, codeStart: Natural, length: Natural): Natural 
 
 proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
     line: string, lineNum: Natural): Option[LineParts] =
-  ## Parse the line and return its parts when it is a command. Return
-  ## quickly when not a command line.
+  ## Parse the line and return its parts. Return quickly when not a
+  ## command line.
 
   var lineParts: LineParts
 
