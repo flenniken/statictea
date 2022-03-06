@@ -1017,17 +1017,17 @@ StaticTea. See the [[#cmpversion][cmpVersion]] function for more information.
 
 StaticTea variable types:
 
-- [[#string][string]]
-- [[#int][int]]
-- [[#float][float]]
-- [[#dict][dict]]
-- [[#list][list]]
+- [[#string-type][string]]
+- [[#int-type][int]]
+- [[#float-type][float]]
+- [[#dict-type][dict]]
+- [[#list-type][list]]
 
 [[#contents][茶]]
 
 ** String
 :PROPERTIES:
-:CUSTOM_ID: string
+:CUSTOM_ID: string-type
 :END:
 
 A string is an immutable sequence of unicode characters. You
@@ -1196,13 +1196,18 @@ d => {
 
 A list contains a sequence of values of any type.
 
-You can create a list with the list function:
+You can create a list with the list function or with brackets:
 
 #+BEGIN_SRC
-list() => []
-list(1) => [1]
-list(1, 2, 3) => [1, 2, 3]
-list("a", 5, "b") => ["a", 5, "b"]
+a = list()
+a = list(1)
+a = list(1, 2, 3)
+a = list("a", 5, "b")
+
+a = []
+a = [1]
+a = [1, 2, 3]
+a = ["a", 5, "b"]
 #+END_SRC
 
 You can append to a list by assigning a value to a variable with
