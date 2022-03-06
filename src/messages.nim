@@ -180,6 +180,7 @@ type
     wCmlTooManyBareParameters,## w168
     wCmlAlreadyHaveOneParameter,## w169
 
+    wMissingCommaBracket,  ## w170
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -216,7 +217,7 @@ const
     "Invalid string.", ## wNotString
     "Unused text at the end of the statement.", ## wTextAfterValue
     "Invalid UTF-8 byte in the string.", ## wInvalidUtf8
-    "Expected a string, number, variable or function.", ## wInvalidRightHandSide
+    "Expected a string, number, variable, list or function.", ## wInvalidRightHandSide
     "Invalid variable or missing equal sign.", ## wInvalidVariable
     "The variable namespace '$1' does not exist.", ## wInvalidNameSpace
     "The variable '$1' does not exist.", ## wVariableMissing
@@ -354,6 +355,6 @@ const
     "Missing '$1' parameter.",
     "Extra bare parameter.",
     "Already have one '$1' parameter.",
-
+    "Missing comma or right bracket.", # wMissingCommaBracket
     ]
     ## The message text.

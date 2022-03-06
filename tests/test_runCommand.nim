@@ -557,7 +557,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "getFunctionValue extra comma":
     let statement = newStatement(text="""tea = len("abc",) """, lineNum=16, 0)
     let eErrLines = @[
-      "template.html(16): w33: Expected a string, number, variable or function.\n",
+      "template.html(16): w33: Expected a string, number, variable, list or function.\n",
       """statement: tea = len("abc",) """ & "\n",
         "                           ^\n",
     ]
@@ -802,7 +802,7 @@ statement: a = len("asdf"
   test "incomplete function 2":
     let statement = newStatement(text="a = len(case(5,", lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w33: Expected a string, number, variable or function.
+template.html(1): w33: Expected a string, number, variable, list or function.
 statement: a = len(case(5,
                           ^
 """
@@ -836,6 +836,58 @@ statement: a# = 5
     var variables = emptyVariables()
     check testRunStatement(statement, variables,
                            some(newVariableData("quote", newValue("""""""))))
+
+  test "literal list emtpy":
+    let statement = newStatement(text="""a = [] """, lineNum=1, 0)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables,
+      some(newVariableData("a", newEmptyListValue())))
+
+  test "literal list 1":
+    let statement = newStatement(text="""a = [1] """, lineNum=1, 0)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables,
+      some(newVariableData("a", newValue(@[1]))))
+
+  test "literal list 2":
+    let statement = newStatement(text="""a = [1,2]""", lineNum=1, 0)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables,
+      some(newVariableData("a", newValue(@[1,2]))))
+
+  test "literal list 3":
+    let statement = newStatement(text="""a = [1,2,"3"]""", lineNum=1, 0)
+    var variables = emptyVariables()
+    var eValue = newValue(@[newValue(1), newValue(2), newValue("3")])
+    check testRunStatement(statement, variables,
+      some(newVariableData("a", eValue)))
+
+  test "literal list nested":
+    let statement = newStatement(text="""a = [1,len("3")]""", lineNum=1, 0)
+    var variables = emptyVariables()
+    var eValue = newValue(@[newValue(1), newValue(1)])
+    check testRunStatement(statement, variables,
+      some(newVariableData("a", eValue)))
+
+  test "literal list err":
+    let statement = newStatement(text="a = [)", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w33: Expected a string, number, variable, list or function.
+statement: a = [)
+                ^
+"""
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
+
+  test "literal list no ]":
+    let statement = newStatement(text="a = [1,2", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w170: Missing comma or right bracket.
+statement: a = [1,2
+                   ^
+"""
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
 
 
 # todo: test that a warning is generated when the item doesn't exist.

@@ -183,7 +183,8 @@ MessageId = enum
   wCmlAlphaNumericShort,    ## w166
   wCmlMissingParameter,     ## w167
   wCmlTooManyBareParameters, ## w168
-  wCmlAlreadyHaveOneParameter ## w169
+  wCmlAlreadyHaveOneParameter, ## w169
+  wMissingCommaBracket       ## w170
 ```
 
 # Messages
@@ -225,7 +226,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Invalid string.",      ## wNotString
     "Unused text at the end of the statement.", ## wTextAfterValue
     "Invalid UTF-8 byte in the string.", ## wInvalidUtf8
-    "Expected a string, number, variable or function.", ## wInvalidRightHandSide
+    "Expected a string, number, variable, list or function.", ## wInvalidRightHandSide
     "Invalid variable or missing equal sign.", ## wInvalidVariable
     "The variable namespace \'$1\' does not exist.", ## wInvalidNameSpace
     "The variable \'$1\' does not exist.", ## wVariableMissing
@@ -358,7 +359,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Duplicate short option: \'-$1\'.", "Duplicate long option: \'--$1\'.",
     "Use the short name \'_\' instead of \'$1\' with a bare parameter.", "Use an alphanumeric ascii character for a short option name instead of \'$1\'.",
     "Missing \'$1\' parameter.", "Extra bare parameter.",
-    "Already have one \'$1\' parameter."]
+    "Already have one \'$1\' parameter.", "Missing comma or right bracket."]
 ```
 
 

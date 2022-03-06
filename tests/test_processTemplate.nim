@@ -1131,7 +1131,7 @@ $$ :  5, "five", "one"))
 {len}
 """
     let eErrLines = splitNewLines """
-template.html(2): w33: Expected a string, number, variable or function.
+template.html(2): w33: Expected a string, number, variable, list or function.
 statement: len = len(case(5,
                             ^
 template.html(3): w29: Statement does not start with a variable name.

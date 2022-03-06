@@ -17,7 +17,7 @@ starts in the template file.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
 * [getString](#getstring) &mdash; Return a literal string value and match length from a statement.
 * [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
-* [getFunctionValue](#getfunctionvalue) &mdash; Collect the function parameter values then call it.
+* [getFunctionValue](#getfunctionvalue) &mdash; Collect the function parameters then call it and return the function's value and the position after trailing whitespace.
 * [getVarOrFunctionValue](#getvarorfunctionvalue) &mdash; Return the statement's right hand side value and the length matched.
 * [runStatement](#runstatement) &mdash; Run one statement and assign a variable.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
@@ -129,18 +129,18 @@ proc getNumber(env: var Env; prepostTable: PrepostTable; statement: Statement;
 
 # getFunctionValue
 
-Collect the function parameter values then call it. Start should be pointing at the first parameter.
+Collect the function parameters then call it and return the function's value and the position after trailing whitespace. Start points at the first parameter.
 
 ```nim
 proc getFunctionValue(env: var Env; prepostTable: PrepostTable;
                       functionName: string; statement: Statement;
-                      start: Natural; variables: Variables): Option[
+                      start: Natural; variables: Variables; list = false): Option[
     ValueAndLength]
 ```
 
 # getVarOrFunctionValue
 
-Return the statement's right hand side value and the length matched. The right hand side must be a variable or a function. The right hand side starts at the index specified by start.
+Return the statement's right hand side value and the length matched. The right hand side must be a variable a function or a list. The right hand side starts at the index specified by start.
 
 ```nim
 proc getVarOrFunctionValue(env: var Env; prepostTable: PrepostTable;

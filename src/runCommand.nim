@@ -239,31 +239,39 @@ proc getNumber*(env: var Env, prepostTable: PrepostTable,
     assert intPos.length <= matches.length
     result = some(ValueAndLength(value: value, length: matches.length))
 
-# Forward reference needed because we call getValue recursively.
+# Forward reference since we call getValue recursively.
 proc getValue(env: var Env, prepostTable: PrepostTable,
               statement: Statement, start: Natural, variables:
                 Variables): Option[ValueAndLength]
 
-proc getFunctionValue*(env: var Env, prepostTable:
-    PrepostTable, functionName: string, statement:
-    Statement, start: Natural, variables: Variables): Option[ValueAndLength] =
-  ## Collect the function parameter values then call it. Start should
-  ## be pointing at the first parameter.
+# todo: why is "variables" passed in?
+proc getFunctionValue*(env: var Env,
+    prepostTable: PrepostTable,
+    functionName: string,
+    statement: Statement,
+    start: Natural,
+    variables: Variables,
+    list=false): Option[ValueAndLength] =
+  ## Collect the function parameters then call it and return the
+  ## function's value and the position after trailing whitespace.
+  ## Start points at the first parameter.
 
   var parameters: seq[Value] = @[]
   var parameterStarts: seq[Natural] = @[]
   var pos = start
 
-  # If we get a right parentheses, there are no parameters.
-  let rightParenO = matchRightParentheses(statement.text, pos)
-  if rightParenO.isSome:
-    pos = pos + rightParenO.get().length
+  # If we get a right parentheses or right bracket, there are no parameters.
+  let symbol = if list: gRightBracket else: gRightParentheses
+  let startSymbolO = matchSymbol(statement.text, symbol, pos)
+  if startSymbolO.isSome:
+    pos = pos + startSymbolO.get().length
   else:
     while true:
       # Get the parameter's value.
       let valueAndLengthO = getValue(env, prepostTable, statement,
                                      pos, variables)
       if not valueAndLengthO.isSome:
+        # Already have shown an error message.
         return
 
       parameters.add(valueAndLengthO.get().value)
@@ -271,15 +279,19 @@ proc getFunctionValue*(env: var Env, prepostTable:
 
       pos = pos + valueAndLengthO.get().length
 
-      # Get the comma or right parentheses and white space following the value.
-      let commaParenO = matchCommaParentheses(statement.text, pos)
-      if not commaParenO.isSome:
-        env.warnStatement(statement, wMissingCommaParen, pos)
+      # Get the comma or ) or ] and white space following the value.
+      let commaSymbolO = matchCommaOrSymbol(statement.text, symbol, pos)
+      if not commaSymbolO.isSome:
+        if symbol == gRightParentheses:
+          env.warnStatement(statement, wMissingCommaParen, pos)
+        else:
+          env.warnStatement(statement, wMissingCommaBracket, pos)
         return
-      let commaParen = commaParenO.get()
-      pos = pos + commaParen.length
-      let symbol = commaParen.getGroup()
-      if symbol == ")":
+      let commaSymbol = commaSymbolO.get()
+      pos = pos + commaSymbol.length
+      let foundSymbol = commaSymbol.getGroup()
+      if (foundSymbol == ")" and symbol == gRightParentheses) or
+         (foundSymbol == "]" and symbol == gRightBracket):
         break
 
   # Lookup the function.
@@ -305,12 +317,11 @@ proc getFunctionValue*(env: var Env, prepostTable:
   result = some(ValueAndLength(value: funResult.value, length: pos-start))
 
 proc getVarOrFunctionValue*(env: var Env, prepostTable:
-           PrepostTable, statement: Statement,
-           start: Natural, variables: Variables): Option[ValueAndLength] =
+    PrepostTable, statement: Statement, start: Natural,
+    variables: Variables): Option[ValueAndLength] =
   ## Return the statement's right hand side value and the length
-  ## matched. The right hand side must be a variable or a
-  ## function. The right hand side starts at the index specified by
-  ## start.
+  ## matched. The right hand side must be a variable a function or a
+  ## list. The right hand side starts at the index specified by start.
 
   # Get the variable or function name. Match the surrounding white space.
   let matches0 = matchDotNames(statement.text, start)
@@ -318,15 +329,13 @@ proc getVarOrFunctionValue*(env: var Env, prepostTable:
   let matches = matches0.get()
   let (_, dotNameStr) = matches.get2Groups()
 
-  # todo: add an optional left parentheses in the matchDotNames procedures.
-
   # Look for a function. A function name looks like a variable
-  # followed by a left parentheses.
+  # followed by a left parentheses. No space is allowed between the
+  # function name and the left parentheses.
   let parenthesesO = matchLeftParentheses(statement.text, start+matches.length)
   if parenthesesO.isSome:
     # We have a function, run it and return its value.
 
-    # todo: you cannot call a function with a dotname: a.b.len(). support this?
     var functionName = dotNameStr
 
     if not isFunctionName(functionName):
@@ -350,20 +359,35 @@ proc getVarOrFunctionValue*(env: var Env, prepostTable:
       return
     result = some(newValueAndLength(valueOrWarning.value, matches.length))
 
+proc getList(env: var Env, prepostTable: PrepostTable,
+              statement: Statement, start: Natural,
+              variables: Variables): Option[ValueAndLength] =
+  ## Return the literal list value and match length from the
+  ## statement. The start index points at [.
+
+  let funValueLengthO = getFunctionValue(env, prepostTable,
+    "list", statement, start+1, variables, true)
+  if not isSome(funValueLengthO):
+    return
+
+  let funValueLength = funValueLengthO.get()
+  result = some(ValueAndLength(value: funValueLength.value,
+    length: funValueLength.length+1))
+
 proc getValue(env: var Env, prepostTable: PrepostTable,
               statement: Statement, start: Natural, variables:
                 Variables): Option[ValueAndLength] =
-  ## Return the statements right hand side value and the length
-  ## matched. The right hand side starts at the index specified by
-  ## start.
+  ## Return the statements right hand side value and the match length.
+  ## The start parameter points at the first non-whitespace character
+  ## of the right hand side. The length includes the trailing
+  ## whitespace.
 
   # The first character of the right hand side value determines its
   # type.
   # * quote -- string
   # * digit or minus sign -- number
   # * a-zA-Z -- variable or function
-
-  # env.warnStatement(statement, wStackTrace, start,  "enter getValue")
+  # * [ -- a list
 
   if start >= statement.text.len:
     env.warnStatement(statement, wInvalidRightHandSide, start)
@@ -378,8 +402,19 @@ proc getValue(env: var Env, prepostTable: PrepostTable,
   elif isLowerAscii(char) or isUpperAscii(char):
     result = getVarOrFunctionValue(env, prepostTable, statement,
                                    start, variables)
+  elif char == '[':
+    result = getList(env, prepostTable, statement, start, variables)
   else:
     env.warnStatement(statement, wInvalidRightHandSide, start)
+
+# Call chain:
+# - runStatement
+# - getValue
+# - getVarOrFunctionValue
+# - getFunctionValue
+# - getValue
+# example: a = list(1, "2", len(b), d.a, cmp(5, len("abc")))
+# Each function matches the trailing whitespace.
 
 proc runStatement*(env: var Env, statement: Statement,
     prepostTable: PrepostTable, variables: var Variables): Option[VariableData] =
@@ -401,7 +436,7 @@ proc runStatement*(env: var Env, statement: Statement,
     return
   let equalSign = equalSignO.get()
 
-  # Get the right hand side value.
+  # Get the right hand side value and match the following whitespace.
   let valueAndLengthO = getValue(env, prepostTable, statement,
                                  dotNameMatches.length + equalSign.length,
                                  variables)

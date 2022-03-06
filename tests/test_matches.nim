@@ -92,6 +92,22 @@ proc testMatchCommaParentheses(line: string, start: Natural = 0,
   else:
     result = true
 
+proc testMatchCommaOrSymbol(line: string, symbol: GroupSymbol, start: Natural = 0,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = matchCommaOrSymbol(line, symbol, start)
+  if not expectedItem("matchesO", matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
+
+proc testMatchSymbol(line: string, symbol: GroupSymbol, start: Natural = 0,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = matchSymbol(line, symbol, start)
+  if not expectedItem("matchesO", matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
+
 proc testMatchLeftBracket(line: string, start: Natural = 0,
     eMatchesO: Option[Matches] = none(Matches)): bool =
   let matchesO = matchLeftBracket(line, start)
@@ -337,6 +353,21 @@ suite "matches.nim":
     check testMatchCommaParentheses("abc)", 0)
     check testMatchCommaParentheses(" ,", 0)
 
+  test "matchCommaOrSymbol":
+    check testMatchCommaOrSymbol(",", gRightParentheses, 0, some(newMatches(1, 0, ",")))
+    check testMatchCommaOrSymbol(")", gRightParentheses, 0, some(newMatches(1, 0, ")")))
+    check testMatchCommaOrSymbol(", ", gRightParentheses, 0, some(newMatches(2, 0, ",")))
+    check testMatchCommaOrSymbol(") 5", gRightParentheses, 0, some(newMatches(2, 0, ")")))
+
+    check testMatchCommaOrSymbol("(  ", gLeftParentheses, 0, some(newMatches(3, 0, "(")))
+    check testMatchCommaOrSymbol("[  ", gLeftBracket, 0, some(newMatches(3, 0, "[")))
+    check testMatchCommaOrSymbol("]  ", gRightBracket, 0, some(newMatches(3, 0, "]")))
+
+    check testMatchCommaOrSymbol("( )", gRightParentheses, 0)
+    check testMatchCommaOrSymbol("2,", gRightParentheses, 0)
+    check testMatchCommaOrSymbol("abc)", gRightParentheses, 0)
+    check testMatchCommaOrSymbol(" ,", gRightParentheses, 0)
+
   test "matchLeftBracket":
     check testMatchLeftBracket("{", 0, some(newMatches(1, 0)))
     check testMatchLeftBracket("{t}", 0, some(newMatches(1, 0)))
@@ -401,3 +432,20 @@ suite "matches.nim":
     check testMatchDotNames(".", 0)
     check testMatchDotNames(".a", 0)
     check testMatchDotNames(".a.b", 0)
+
+  test "matchSymbol":
+    check testMatchSymbol(")", gRightParentheses, 0, some(newMatches(1, 0)))
+    check testMatchSymbol("(", gLeftParentheses, 0, some(newMatches(1, 0)))
+    check testMatchSymbol("[", gLeftBracket, 0, some(newMatches(1, 0)))
+    check testMatchSymbol("]", gRightBracket, 0, some(newMatches(1, 0)))
+    
+    check testMatchSymbol("  )", gRightParentheses, 2, some(newMatches(1, 2)))
+    check testMatchSymbol("  (", gLeftParentheses, 2, some(newMatches(1, 2)))
+    check testMatchSymbol("  [", gLeftBracket, 2, some(newMatches(1, 2)))
+    check testMatchSymbol("  ]", gRightBracket, 2, some(newMatches(1, 2)))
+
+    check testMatchSymbol("  )   ", gRightParentheses, 2, some(newMatches(4, 2)))
+    check testMatchSymbol("  (   ", gLeftParentheses, 2, some(newMatches(4, 2)))
+    check testMatchSymbol("  [   ", gLeftBracket, 2, some(newMatches(4, 2)))
+    check testMatchSymbol("  ]   ", gRightBracket, 2, some(newMatches(4, 2)))
+

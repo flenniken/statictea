@@ -1334,7 +1334,7 @@ Statement errors generate multi-line messages showing the
 statement and problem location, for example:
 
 #+BEGIN_SRC
-template.html(16): w33: Expected a string, number, variable or function.
+template.html(16): w33: Expected a string, number, variable, list or function.
 statement: tea = len("abc",)
                            ^
 #+END_SRC

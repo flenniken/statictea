@@ -26,6 +26,8 @@ Regular expression matching methods.
 * [matchVersion](#matchversion) &mdash; Match a StaticTea version number.
 * [matchVersionNotCached](#matchversionnotcached) &mdash; Match a StaticTea version number.
 * [matchDotNames](#matchdotnames) &mdash; Matches variable dot names and surrounding whitespace.
+* [matchCommaOrSymbol](#matchcommaorsymbol) &mdash; Match a comma or the symbol and the optional trailing whitespace.
+* [matchSymbol](#matchsymbol) &mdash; Match the symbol and the optional trailing whitespace.
 
 # PrepostTable
 
@@ -226,6 +228,24 @@ if dotNamesO.isSome:
 
 ```nim
 proc matchDotNames(line: string; start: Natural = 0): Option[Matches]
+```
+
+# matchCommaOrSymbol
+
+Match a comma or the symbol and the optional trailing whitespace.
+
+```nim
+proc matchCommaOrSymbol(line: string; symbol: GroupSymbol; start: Natural = 0): Option[
+    Matches]
+```
+
+# matchSymbol
+
+Match the symbol and the optional trailing whitespace.
+
+```nim
+proc matchSymbol(line: string; symbol: GroupSymbol; start: Natural = 0): Option[
+    Matches]
 ```
 
 

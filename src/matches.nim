@@ -219,3 +219,39 @@ proc matchDotNames*(line: string, start: Natural = 0): Option[Matches] =
   let name = r"[a-zA-Z][a-zA-Z0-9_]{0,63}"
   let pattern = r"(\s*)((?:$1)(?:\.$1){0,4})\s*" % [name]
   result = matchPatternCached(line, pattern, start)
+
+type
+  GroupSymbol* = enum
+    gLeftParentheses # (
+    gRightParentheses # )
+    gLeftBracket # [
+    gRightBracket # ]
+
+proc matchCommaOrSymbol*(line: string, symbol: GroupSymbol,
+    start: Natural = 0): Option[Matches] =
+  ## Match a comma or the symbol and the optional trailing whitespace.
+  var pattern: string
+  case symbol:
+  of gLeftParentheses:
+    pattern = r"([,(])\s*"
+  of gRightParentheses:
+    pattern = r"([,\)])\s*"
+  of gLeftBracket:
+    pattern = r"([,[])\s*"
+  of gRightBracket:
+    pattern = r"([,\]])\s*"
+  result = matchPatternCached(line, pattern, start)
+
+proc matchSymbol*(line: string, symbol: GroupSymbol, start: Natural = 0): Option[Matches] =
+  ## Match the symbol and the optional trailing whitespace.
+  var pattern: string
+  case symbol:
+  of gLeftParentheses:
+    pattern = r"\(\s*"
+  of gRightParentheses:
+    pattern = r"\)\s*"
+  of gLeftBracket:
+    pattern = r"\[\s*"
+  of gRightBracket:
+    pattern = r"\]\s*"
+  result = matchPatternCached(line, pattern, start)
