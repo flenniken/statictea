@@ -1017,6 +1017,7 @@ StaticTea. See the [[#cmpversion][cmpVersion]] function for more information.
 
 StaticTea variable types:
 
+# Note: these links don't work in emacs but they work in Github.
 - [[#string][string]]
 - [[#int][int]]
 - [[#float][float]]
