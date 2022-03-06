@@ -1017,17 +1017,17 @@ StaticTea. See the [[#cmpversion][cmpVersion]] function for more information.
 
 StaticTea variable types:
 
-- [[#string-type][string]]
-- [[#int-type][int]]
-- [[#float-type][float]]
-- [[#dict-type][dict]]
-- [[#list-type][list]]
+- [[#string][string]]
+- [[#int][int]]
+- [[#float][float]]
+- [[#dict][dict]]
+- [[#list][list]]
 
 [[#contents][茶]]
 
 ** String
 :PROPERTIES:
-:CUSTOM_ID: string-type
+:CUSTOM_ID: string
 :END:
 
 A string is an immutable sequence of unicode characters. You
