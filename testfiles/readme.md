@@ -13,6 +13,7 @@ This folder contains stf test files for statictea.
 * [hello](../testfiles/hello.stf.md) &mdash; Readme Hello World example.
 * [int-section](../testfiles/int-section.stf.md) &mdash; Test the int type.
 * [len](../testfiles/len.stf.md) &mdash; Test the len function.
+* [list-literal](../testfiles/list-literal.stf.md) &mdash; Test literal lists.
 * [localvars-basics](../testfiles/localvars-basics.stf.md) &mdash; Test the readme local variables section.
 * [logging-hello-world](../testfiles/logging-hello-world.stf.md) &mdash; Test logging with Hello World.
 * [logging-replacement-block](../testfiles/logging-replacement-block.stf.md) &mdash; Test logging the replacement block.

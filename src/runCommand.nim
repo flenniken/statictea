@@ -365,14 +365,18 @@ proc getList(env: var Env, prepostTable: PrepostTable,
   ## Return the literal list value and match length from the
   ## statement. The start index points at [.
 
+  let startSymbolO = matchSymbol(statement.text, gLeftBracket, start)
+  assert startSymbolO.isSome
+  let startSymbol = startSymbolO.get()
+
   let funValueLengthO = getFunctionValue(env, prepostTable,
-    "list", statement, start+1, variables, true)
+    "list", statement, start+startSymbol.length, variables, true)
   if not isSome(funValueLengthO):
     return
 
   let funValueLength = funValueLengthO.get()
   result = some(ValueAndLength(value: funValueLength.value,
-    length: funValueLength.length+1))
+    length: funValueLength.length+startSymbol.length))
 
 proc getValue(env: var Env, prepostTable: PrepostTable,
               statement: Statement, start: Natural, variables:
@@ -441,6 +445,7 @@ proc runStatement*(env: var Env, statement: Statement,
                                  dotNameMatches.length + equalSign.length,
                                  variables)
   if not valueAndLengthO.isSome:
+    # Warning already shown.
     return
 
   # Check that there is not any unprocessed text following the value.

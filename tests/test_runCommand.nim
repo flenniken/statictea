@@ -849,6 +849,24 @@ statement: a# = 5
     check testRunStatement(statement, variables,
       some(newVariableData("a", newValue(@[1]))))
 
+  test "list space before":
+    let statement = newStatement(text="""a = [ 1]""", lineNum=1, 0)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables,
+      some(newVariableData("a", newValue(@[1]))))
+
+  test "list space after":
+    let statement = newStatement(text="""a = [1    ]""", lineNum=1, 0)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables,
+      some(newVariableData("a", newValue(@[1]))))
+
+  test "list space before and after":
+    let statement = newStatement(text="""a = [   1    ]""", lineNum=1, 0)
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables,
+      some(newVariableData("a", newValue(@[1]))))
+
   test "literal list 2":
     let statement = newStatement(text="""a = [1,2]""", lineNum=1, 0)
     var variables = emptyVariables()
@@ -885,6 +903,16 @@ statement: a = [)
 template.html(1): w170: Missing comma or right bracket.
 statement: a = [1,2
                    ^
+"""
+    var variables = emptyVariables()
+    check testRunStatement(statement, variables, eErrLines = eErrLines)
+
+  test "literal list junk after":
+    let statement = newStatement(text="a = [ 1 ] xyz", lineNum=1, 0)
+    let eErrLines = splitNewLines """
+template.html(1): w31: Unused text at the end of the statement.
+statement: a = [ 1 ] xyz
+                     ^
 """
     var variables = emptyVariables()
     check testRunStatement(statement, variables, eErrLines = eErrLines)

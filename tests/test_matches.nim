@@ -363,6 +363,8 @@ suite "matches.nim":
     check testMatchCommaOrSymbol("[  ", gLeftBracket, 0, some(newMatches(3, 0, "[")))
     check testMatchCommaOrSymbol("]  ", gRightBracket, 0, some(newMatches(3, 0, "]")))
 
+    check testMatchCommaOrSymbol("]  x", gRightBracket, 0, some(newMatches(3, 0, "]")))
+
     check testMatchCommaOrSymbol("( )", gRightParentheses, 0)
     check testMatchCommaOrSymbol("2,", gRightParentheses, 0)
     check testMatchCommaOrSymbol("abc)", gRightParentheses, 0)
