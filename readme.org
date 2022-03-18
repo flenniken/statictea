@@ -684,10 +684,10 @@ For example using the command line below results in a t.args
 value shown:
 
 #+BEGIN_SRC
-statictea -l -s=server.json -j=shared.json \
-  -s=server2.json -j=shared2.json \
-  -p='abc$,def' -p='$$' \
-  -t=template.html -r=result.html
+statictea -l -s server.json -j shared.json \
+  -s server2.json -j shared2.json \
+  -p 'abc$,def' -p '$$' \
+  -t template.html -r result.html
 
 t.args => {
   "help":0,
@@ -1267,10 +1267,10 @@ and the result.
 
 #+BEGIN_SRC
 statictea \
-  --server=server.json \
-  --shared=shared.json \
-  --template=template.html \
-  --result=result.html
+  --server server.json \
+  --shared shared.json \
+  --template template.html \
+  --result result.html
 #+END_SRC
 
 The StaticTea command line options:
@@ -1437,11 +1437,11 @@ commas.
 examples:
 
 #+BEGIN_SRC
---prepost="pre$,post"
---prepost="a$,b"
---prepost="@$,|"
---prepost="#[$,]#"
---prepost="# $"
+--prepost "pre$,post"
+--prepost "a$,b"
+--prepost "@$,|"
+--prepost "#[$,]#"
+--prepost "# $"
 #+END_SRC
 
 [[#contents][茶]]
@@ -1487,9 +1487,9 @@ The following example shows a typical invocation:
 
 #+BEGIN_SRC
 statictea \
-  --server=server.json \
-  --shared=shared.json \
-  --template=template.html \
+  --server server.json \
+  --shared shared.json \
+  --template template.html \
   --update
 #+END_SRC
 
@@ -1520,14 +1520,14 @@ You can specify a full path. If you don't include path
 information, the log is written to the current directory.
 
 #+BEGIN_SRC
-statictea --log=mylog.txt
+statictea --log mylog.txt
 #+END_SRC
 
 When you write a replacement block to the log file, the template
-file and line of the block appear there.
+file and line number of the replacement block appear there.
 
 #+BEGIN_SRC
-2021-12-07 22:03:59.908; statictea.nim(42); Starting: argv: @["-l=log.txt", "-t=tmpl.txt", "-r=result.txt"]
+2021-12-07 22:03:59.908; statictea.nim(42); Starting: argv: @["-l log.txt", "-t tmpl.txt", "-r result.txt"]
 2021-12-07 22:03:59.908; statictea.nim(43); Version: 0.1.0
 2021-12-07 22:03:59.909; tmpl.txt(2); ┌─────────┐
 2021-12-07 22:03:59.909; tmpl.txt(3); │log block│
