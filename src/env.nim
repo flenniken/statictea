@@ -254,11 +254,8 @@ proc addExtraStreams*(env: var Env, args: Args): bool =
   ## true on success.
 
   # Get the template filename.
-  assert args.templateList.len > 0
-  if args.templateList.len > 1:
-    let skipping = join(args.templateList[1..^1], ", ")
-    env.warn(0, wOneTemplateAllowed, skipping)
-  let templateFilename = args.templateList[0]
+  assert args.templateFilename != ""
+  let templateFilename = args.templateFilename
 
   # Get the result filename.
   let resultFilename = args.resultFilename
@@ -281,11 +278,8 @@ proc addExtraStreamsForUpdate*(env: var Env, args: Args): bool =
     return false
 
   # Get the template filename.
-  assert args.templateList.len > 0
-  if args.templateList.len > 1:
-    let skipping = join(args.templateList[1..^1], ", ")
-    env.warn(0, wOneTemplateAllowed, skipping)
-  let templateFilename = args.templateList[0]
+  assert args.templateFilename != ""
+  let templateFilename = args.templateFilename
 
   # If you specify "stdin" for the template, the template comes from
   # stdin and the output goes to standard out.

@@ -34,7 +34,7 @@ Args = object
   log*: bool
   serverList*: seq[string]
   sharedList*: seq[string]
-  templateList*: seq[string]
+  templateFilename*: string
   prepostList*: seq[Prepost]
   resultFilename*: string
   logFilename*: string

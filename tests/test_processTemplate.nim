@@ -1200,22 +1200,22 @@ teas => ["black","green"]
 
   test "getTeaArgs empty":
     var args: Args
-    check testGetTeaArgs(args, """{"help":0,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":"","prepostList":[]}""")
+    check testGetTeaArgs(args, """{"help":0,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateFilename":"","logFilename":"","prepostList":[]}""")
 
   test "getTeaArgs multiple":
     var args: Args
     args.serverList = @["server.json"]
     args.sharedList = @["shared.json"]
-    args.templateList = @["template.html"]
+    args.templateFilename = "template.html"
     args.resultFilename = "result.html"
     let value = getTeaArgs(args)
     let targs = value.dictv
     let serverList = targs["serverList"]
-    let templateList = targs["templateList"]
+    let templateFilename = targs["templateFilename"]
     let resultFilename = targs["resultFilename"]
     check serverList == newValue(@["server.json"])
     check resultFilename == newValue("result.html")
-    check templateList == newValue(@["template.html"])
+    check templateFilename == newValue("template.html")
 
 
   test "t variables":

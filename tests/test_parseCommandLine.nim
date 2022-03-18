@@ -43,7 +43,7 @@ proc tpcl(
     logFilename: string = "",
     serverList: seq[string] = @[],
     sharedList: seq[string] = @[],
-    templateList: seq[string] = @[],
+    templateFilename: string = "",
     prepostList: seq[Prepost]= @[],
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
@@ -70,7 +70,7 @@ proc tpcl(
     result = false
   if not expectedItem("sharedList", args.sharedList, sharedList):
     result = false
-  if not expectedItem("templateList", args.templateList, templateList):
+  if not expectedItem("templateFilename", args.templateFilename, templateFilename):
     result = false
   if not expectedItem("resultFilename", args.resultFilename, resultFilename):
     result = false
@@ -150,55 +150,55 @@ suite "parseCommandLine":
     check tpcl("-h", help=true)
 
   test "parseCommandLine-t":
-    check tpcl("-t tea.html", templateList = @["tea.html"])
+    check tpcl("-t tea.html", templateFilename = "tea.html")
 
   test "parseCommandLine-template":
-    check tpcl("--template tea.html", templateList = @["tea.html"])
+    check tpcl("--template tea.html", templateFilename = "tea.html")
 
   test "parseCommandLine-s":
     check tpcl("-s server.json -t tea.html",
-      templateList = @["tea.html"],
+      templateFilename = "tea.html",
       serverList = @["server.json"])
 
   test "parseCommandLine-server":
     check tpcl("--server server.json -t tea.html",
-      templateList = @["tea.html"],
+      templateFilename = "tea.html",
       serverList = @["server.json"])
 
   test "parseCommandLine-j":
     check tpcl("-j shared.json -t tea.html",
-      templateList = @["tea.html"],
+      templateFilename = "tea.html",
       sharedList = @["shared.json"])
 
   test "parseCommandLine-shared":
     check tpcl("--shared shared.json -t tea.html",
-      templateList = @["tea.html"],
+      templateFilename = "tea.html",
       sharedList = @["shared.json"])
 
   test "parseCommandLine-r":
     check tpcl("-r result.html -t tea.html",
-      templateList = @["tea.html"],
+      templateFilename = "tea.html",
       resultFilename = "result.html")
 
   test "parseCommandLine-result":
     check tpcl("--result result.html -t tea.html",
-      templateList = @["tea.html"],
+      templateFilename = "tea.html",
       resultFilename = "result.html")
 
   test "parseCommandLine-log":
     check tpcl("-l -t tea.html", log = true,
-      templateList = @["tea.html"])
+      templateFilename = "tea.html")
 
   test "parseCommandLine-log with filename":
     check tpcl("--log statictea.log -t tea.html", log = true,
-      templateList = @["tea.html"],
+      templateFilename = "tea.html",
       logFilename = "statictea.log")
 
   test "parseCommandLine-happy-path":
     check tpcl("-s server.json -j shared.json -t tea.html -r result.html",
          serverList = @["server.json"],
          sharedList = @["shared.json"],
-         templateList = @["tea.html"],
+         templateFilename = "tea.html",
          resultFilename = "result.html",
     )
 
@@ -206,7 +206,7 @@ suite "parseCommandLine":
     check tpcl("-s server.json -s server2.json -j shared.json -j shared2.json -t tea.html -r result.html",
          serverList = @["server.json", "server2.json"],
          sharedList = @["shared.json", "shared2.json"],
-         templateList = @["tea.html"],
+         templateFilename = "tea.html",
          resultFilename = "result.html",
     )
 
@@ -218,7 +218,7 @@ suite "parseCommandLine":
   #   check tpcl("-r=\"name with spaces result.html\"", resultFilename = "name with spaces result.html")
 
   test "parseCommandLine-prepost":
-    check tpcl("--prepost <--$ -t template", templateList = @["template"],
+    check tpcl("--prepost <--$ -t template", templateFilename = "template",
                prepostList = @[newPrepost("<--$", "")])
 
   # The test code splits args by spaces. The following "# $" becomes

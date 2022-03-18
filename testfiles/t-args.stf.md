@@ -28,7 +28,7 @@ t.args.log = {t.args.log}
 t.args.serverList = {t.args.serverList}
 t.args.sharedList = {t.args.sharedList}
 t.args.resultFilename = {t.args.resultFilename}
-t.args.templateList = {t.args.templateList}
+t.args.templateFilename = {t.args.templateFilename}
 t.args.logFilename = {t.args.logFilename}
 t.args.prepostList = {t.args.prepostList}
 $$ endblock
@@ -56,7 +56,7 @@ t.args.log = 1
 t.args.serverList = ["server.json"]
 t.args.sharedList = ["shared.json"]
 t.args.resultFilename = result
-t.args.templateList = ["tmpl.txt"]
+t.args.templateFilename = tmpl.txt
 t.args.logFilename = log.txt
 t.args.prepostList = [["$$",""],["pre$","post"]]
 ~~~

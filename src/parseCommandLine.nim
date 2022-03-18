@@ -104,7 +104,7 @@ proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
   if "template" in cmlArgs:
     let filenames = cmlArgs["template"]
     assert len(filenames) == 1
-    args.templateList = filenames
+    args.templateFilename = filenames[0]
 
   if "result" in cmlArgs:
     let filenames = cmlArgs["result"]

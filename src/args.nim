@@ -17,7 +17,7 @@ type
     serverList*: seq[string]
     sharedList*: seq[string]
     # todo: we only support one template, should be a string not a list.
-    templateList*: seq[string]
+    templateFilename*: string
     prepostList*: seq[Prepost]
     resultFilename*: string
     logFilename*: string
@@ -68,6 +68,6 @@ func `$`*(args: Args): string =
   lines.add("args.resultFilename = \"$1\"" % args.resultFilename)
   lines.add("args.serverList = $1" % toString(args.serverList))
   lines.add("args.sharedList = $1" % toString(args.sharedList))
-  lines.add("args.templateList = $1" % toString(args.templateList))
+  lines.add("args.templateFilename = \"$1\"" % args.templateFilename)
   lines.add("args.prepostList = $1" % toString(args.prepostList))
   result = join(lines, "\n")

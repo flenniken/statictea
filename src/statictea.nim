@@ -20,9 +20,10 @@ proc processArgs(env: var Env, args: Args): int =
     result = 0
   elif args.update:
     result = updateTemplateTop(env, args)
-  elif args.templateList.len > 0:
+  elif args.templateFilename != "":
     result = processTemplateTop(env, args)
   else:
+    # todo: is this possible to hit?
     env.warn(0, wNoTemplateName)
 
 proc main*(env: var Env, argv: seq[string]): int =

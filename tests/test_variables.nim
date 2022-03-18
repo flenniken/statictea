@@ -174,7 +174,7 @@ suite "variables.nim":
     var variables = emptyVariables(args = argsVarDict)
     let targs = variables["t"].dictv["args"]
     # echo "targs = " & $targs
-    let eTargs = """{"help":0,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateList":[],"logFilename":"","prepostList":[]}"""
+    let eTargs = """{"help":0,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateFilename":"","logFilename":"","prepostList":[]}"""
     if $targs != eTargs:
       echo "expected: " & eTargs
       echo "     got: " & $targs
