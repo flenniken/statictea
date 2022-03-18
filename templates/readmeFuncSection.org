@@ -4,6 +4,7 @@
 # $ #
 # $ #
 # $ block
+# $ : # Define replacement patterns to undo HTML formatting.
 # $ : g.patterns = list( +
 # $ :   "~~~~", "#+END_SRC", +
 # $ :   "~~~", "#+BEGIN_SRC", +
@@ -16,21 +17,35 @@
 # $ :   "&gt;", ">", +
 # $ :   "&lt;", "<", +
 # $ :   "&amp;", "&")
+# $ : # Sort the json entries by name.
 # $ : g.sortedEntries = sort(s.entries, "ascending", "sensitive", "name")
 # $ endblock
 # $ #
 # $ block
+# $ : # Create a list of functions to show.
 # $ : t.repeat = len(g.sortedEntries)
 # $ : entry = get(g.sortedEntries, t.row, dict())
-# $ : skip = case(entry.type, list("skFunc", 0), 1)
+# $ :
+# $ : # Use the skProc entries, skip the rest.
+# $ : skip = case(entry.type, list("skProc", 0), 1)
+# $ :
+# $ : # Use the procs that start with "fun" and skip the others.
 # $ : pos = find(entry.name, "fun", -1)
 # $ : skip2 = case(pos, list(0, 0), 1)
+# $ :
+# $ : # Remove the fun prefix and the trailing code from the name and lower case it.
+# $ : # funCmp_iii => cmp
 # $ : nameLength = add(find(entry.name, "_", len(entry.name)), -3)
 # $ : capName = case(pos, list(0, slice(entry.name, 3, nameLength)), entry.name)
 # $ : name = concat(lower(slice(capName, 0, 1)), slice(capName, 1))
+# $ :
+# $ : # Remove the HTML formatting from the description.
 # $ : desc = replaceRe(entry.description, g.patterns)
+# $ :
+# $ : # Use the first sentence for the short description.
 # $ : shortFuncDesc = slice(desc, 0, add(find(desc, ".", -1), 1))
 # $ : description = replaceRe(entry.description, g.patterns)
+# $ :
 # $ : newEntry = dict()
 # $ : newEntry.name = name
 # $ : newEntry.shortFuncDesc = shortFuncDesc

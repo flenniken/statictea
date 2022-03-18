@@ -578,18 +578,18 @@ proc taskReadMeFun() =
     [jsonName, filename]
   exec cmd
   echo ""
-  echo "Exported runFunctions.nim json doc comments: $1" % [jsonName]
+  echo "Exported runFunctions.nim json doc comments to $1" % [jsonName]
 
   # Create the readme function section org file.
   let templateName = joinPath("templates", "readmeFuncSection.org")
   let sectionFile = joinPath("docs", "readmeFuncs.org")
   cmd = "bin/statictea -l -s $1 -t $2 -r $3" %
      [jsonName, templateName, sectionFile]
-  # echo cmd
+  echo cmd
   exec cmd
-  echo "Generated readme function section file: " & sectionFile
+  echo "Generated readme function section file " & sectionFile
 
-  rmFile(jsonName)
+  # rmFile(jsonName)
 
   # Insert the function section into the readme.
   insertFile("readme.org", "# Dynamic Content Begins",

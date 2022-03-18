@@ -1430,18 +1430,21 @@ of which prefixes get used.
 
 You specify the prepost option with the prefix separated from the
 postfix with a comma and the postfix is optional,
-"prefix[,postfix]". A prefix and postfix contain 1 to 20 ASCII
+'prefix[,postfix]'. A prefix and postfix contain 1 to 20 ASCII
 characters including spaces but without control characters or
 commas.
+
+Note: It's recommended that you use single quotes so the command
+line doesn't interpret $ as an environment variable.
 
 examples:
 
 #+BEGIN_SRC
---prepost "pre$,post"
---prepost "a$,b"
---prepost "@$,|"
---prepost "#[$,]#"
---prepost "# $"
+--prepost 'pre$,post'
+--prepost 'a$,b'
+--prepost '@$,|'
+--prepost '#[$,]#'
+--prepost '# $'
 #+END_SRC
 
 [[#contents][茶]]
@@ -1692,6 +1695,1113 @@ readmefun nimble task which uses the StaticTea template
 List of functions:
 
 # Dynamic Content Begins
+- [[#add][add()]] -- Add two floats.
+- [[#add][add()]] -- Add two integers.
+- [[#case][case()]] -- Compare integer cases and return the matching value.
+- [[#case][case()]] -- Compare string cases and return the matching value.
+- [[#cmpVersion][cmpVersion()]] -- Compare two StaticTea version numbers.
+- [[#cmp][cmp()]] -- Compare two floats.
+- [[#cmp][cmp()]] -- Compare two ints.
+- [[#cmp][cmp()]] -- Compare two strings.
+- [[#concat][concat()]] -- Concatentate two strings.
+- [[#dict][dict()]] -- Create a dictionary from a list of key, value pairs.
+- [[#dup][dup()]] -- Duplicate a string x times.
+- [[#exists][exists()]] -- Determine whether a key exists in a dictionary.
+- [[#find][find()]] -- Find the position of a substring in a string.
+- [[#float][float()]] -- Create a float from an int.
+- [[#float][float()]] -- Create a float from a number string.
+- [[#get][get()]] -- Get a dictionary value by its key.
+- [[#get][get()]] -- Get a list value by its index.
+- [[#githubAnchor][githubAnchor()]] -- Create Github anchor names from heading names.
+- [[#githubAnchor][githubAnchor()]] -- Create a Github anchor name from a heading name.
+- [[#if0][if0()]] -- If the condition is 0, return the second parameter, else return the third.
+- [[#if1][if1()]] -- If the condition is 1, return the second parameter, else return the third.
+- [[#int][int()]] -- Create an int from a float.
+- [[#int][int()]] -- Create an int from a number string.
+- [[#joinPath][joinPath()]] -- Join the path components with a path separator.
+- [[#join][join()]] -- Join a list of strings with a separator.
+- [[#keys][keys()]] -- Create a list from the keys in a dictionary.
+- [[#len][len()]] -- Number of elements in a dictionary.
+- [[#len][len()]] -- Number of elements in a list.
+- [[#len][len()]] -- Number of characters in a string.
+- [[#list][list()]] -- Create a list of values.
+- [[#lower][lower()]] -- Lowercase a string.
+- [[#path][path()]] -- Split a file path into its component pieces.
+- [[#replace][replace()]] -- Replace a substring specified by its position and length with another string.
+- [[#replaceRe][replaceRe()]] -- Replace multiple parts of a string using regular expressions.
+- [[#slice][slice()]] -- Extract a substring from a string by its position and length.
+- [[#sort][sort()]] -- Sort a list of values of the same type.
+- [[#sort][sort()]] -- Sort a list of lists.
+- [[#sort][sort()]] -- Sort a list of dictionaries.
+- [[#type][type()]] -- Return the parameter type, one of: int, float, string, list, dict.
+- [[#values][values()]] -- Create a list out of the values in the specified dictionary.
+
+[[#contents][茶]]
+
+** add()
+:PROPERTIES:
+:CUSTOM_ID: add
+:END:
+
+Add two floats. A warning is generated on overflow.
+
+#+BEGIN_SRC
+add(a: float, b: float) float
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+add(1.5, 2.3) => 3.8
+add(3.2, -2.2) => 1.0
+#+END_SRC
+
+[[#contents][茶]]
+
+** add()
+:PROPERTIES:
+:CUSTOM_ID: add
+:END:
+
+Add two integers. A warning is generated on overflow.
+
+#+BEGIN_SRC
+add(a: int, b: int)) int
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+add(1, 2) => 3
+add(3, -2) => 1
+add(-2, -5) => -7
+#+END_SRC
+
+[[#contents][茶]]
+
+** case()
+:PROPERTIES:
+:CUSTOM_ID: case
+:END:
+
+Compare integer cases and return the matching value.  It takes a
+main integer condition, a list of case pairs and an optional
+value when none of the cases match.
+
+The first element of a case pair is the condition and the
+second is the return value when that condition matches the main
+condition. The function compares the conditions left to right and
+returns the first match.
+
+When none of the cases match the main condition, the default
+value is returned if it is specified, otherwise a warning is
+generated.  The conditions must be integers. The return values
+can be any type.
+
+#+BEGIN_SRC
+case(condition: int, pairs: list, optional default: any) any
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+cases = list(0, "tea", 1, "water", 2, "beer")
+case(0, cases) => "tea"
+case(1, cases) => "water"
+case(2, cases) => "beer"
+case(2, cases, "wine") => "beer"
+case(3, cases, "wine") => "wine"
+#+END_SRC
+
+[[#contents][茶]]
+
+** case()
+:PROPERTIES:
+:CUSTOM_ID: case
+:END:
+
+Compare string cases and return the matching value.  It takes a
+main string condition, a list of case pairs and an optional
+value when none of the cases match.
+
+The first element of a case pair is the condition and the
+second is the return value when that condition matches the main
+condition. The function compares the conditions left to right and
+returns the first match.
+
+When none of the cases match the main condition, the default
+value is returned if it is specified, otherwise a warning is
+generated.  The conditions must be strings. The return values
+can be any type.
+
+#+BEGIN_SRC
+case(condition: string, pairs: list, optional default: any) any
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+cases = list("tea", 15, "water", 2.3, "beer", "cold")
+case("tea", cases) => 15
+case("water", cases) => 2.3
+case("beer", cases) => "cold"
+case("bunch", cases, "other") => "other"
+#+END_SRC
+
+[[#contents][茶]]
+
+** cmpVersion()
+:PROPERTIES:
+:CUSTOM_ID: cmpVersion
+:END:
+
+Compare two StaticTea version numbers. Returns -1 for less, 0 for
+equal and 1 for greater than.
+
+#+BEGIN_SRC
+cmpVersion(versionA: string, versionB: string) int
+#+END_SRC
+
+StaticTea uses [[https://semver.org/][Semantic Versioning]]
+with the added restriction that each version component has one
+to three digits (no letters).
+
+Examples:
+
+#+BEGIN_SRC
+cmpVersion("1.2.5", "1.1.8") => 1
+cmpVersion("1.2.5", "1.3.0") => -1
+cmpVersion("1.2.5", "1.2.5") => 0
+#+END_SRC
+
+[[#contents][茶]]
+
+** cmp()
+:PROPERTIES:
+:CUSTOM_ID: cmp
+:END:
+
+Compare two floats. Returns -1 for less, 0 for
+equal and 1 for greater than.
+
+#+BEGIN_SRC
+cmp(a: float, b: float) int
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+cmp(7.8, 9.1) => -1
+cmp(8.4, 8.4) => 0
+cmp(9.3, 2.2) => 1
+#+END_SRC
+
+[[#contents][茶]]
+
+** cmp()
+:PROPERTIES:
+:CUSTOM_ID: cmp
+:END:
+
+Compare two ints. Returns -1 for less, 0 for equal and 1 for
+ greater than.
+
+#+BEGIN_SRC
+cmp(a: int, b: int) int
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+cmp(7, 9) => -1
+cmp(8, 8) => 0
+cmp(9, 2) => 1
+#+END_SRC
+
+[[#contents][茶]]
+
+** cmp()
+:PROPERTIES:
+:CUSTOM_ID: cmp
+:END:
+
+Compare two strings. Returns -1 for less, 0 for equal and 1 for
+greater than.
+
+You have the option to compare case insensitive. Case sensitive
+is the default.
+
+#+BEGIN_SRC
+cmp(a: string, b: string, optional insensitive: int) int
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+cmp("coffee", "tea") => -1
+cmp("tea", "tea") => 0
+cmp("Tea", "tea") => 1
+cmp("Tea", "tea", 0) => 1
+cmp("Tea", "tea", 1) => 0
+#+END_SRC
+
+[[#contents][茶]]
+
+** concat()
+:PROPERTIES:
+:CUSTOM_ID: concat
+:END:
+
+Concatentate two strings.
+
+#+BEGIN_SRC
+concat(a: string, b: string) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+concat("tea", " time") => "tea time"
+concat("a", "b") => "ab"
+#+END_SRC
+
+[[#contents][茶]]
+
+** dict()
+:PROPERTIES:
+:CUSTOM_ID: dict
+:END:
+
+Create a dictionary from a list of key, value pairs.  The keys
+must be strings and the values can be any type.
+
+#+BEGIN_SRC
+dict(pairs: optional list) dict
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+dict() => {}
+dict(list("a", 5)) => {"a": 5}
+dict(list("a", 5, "b", 33, "c", 0)) =>
+  {"a": 5, "b": 33, "c": 0}
+#+END_SRC
+
+[[#contents][茶]]
+
+** dup()
+:PROPERTIES:
+:CUSTOM_ID: dup
+:END:
+
+Duplicate a string x times.  The result is a new string built by
+concatenating the string to itself the specified number of times.
+
+#+BEGIN_SRC
+dup(pattern: string, count: int) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+dup("=", 3) => "==="
+dup("abc", 0) => ""
+dup("abc", 1) => "abc"
+dup("abc", 2) => "abcabc"
+dup("", 3) => ""
+#+END_SRC
+
+[[#contents][茶]]
+
+** exists()
+:PROPERTIES:
+:CUSTOM_ID: exists
+:END:
+
+Determine whether a key exists in a dictionary. Return 1 when it exists, else 0.
+
+#+BEGIN_SRC
+exists(dictionary: dict, key: string) int
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+d = dict("tea", "Earl")
+exists(d, "tea") => 1
+exists(d, "coffee") => 0
+#+END_SRC
+
+[[#contents][茶]]
+
+** find()
+:PROPERTIES:
+:CUSTOM_ID: find
+:END:
+
+Find the position of a substring in a string.  When the substring
+is not found you can return a default value.  A warning is
+generated when the substring is missing and you don't specify a
+default value.
+
+#+BEGIN_SRC
+find(str: string, substring: string, optional default: any) any
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+       0123456789 1234567
+msg = "Tea time at 3:30."
+find(msg, "Tea") = 0
+find(msg, "time") = 4
+find(msg, "me") = 6
+find(msg, "party", -1) = -1
+find(msg, "party", len(msg)) = 17
+find(msg, "party", 0) = 0
+#+END_SRC
+
+[[#contents][茶]]
+
+** float()
+:PROPERTIES:
+:CUSTOM_ID: float
+:END:
+
+Create a float from an int.
+
+#+BEGIN_SRC
+float(num: int) float
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+float(2) => 2.0
+float(-33) => -33.0
+#+END_SRC
+
+[[#contents][茶]]
+
+** float()
+:PROPERTIES:
+:CUSTOM_ID: float
+:END:
+
+Create a float from a number string.
+
+#+BEGIN_SRC
+float(numString: string) float
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+float("2") => 2.0
+float("2.4") => 2.4
+float("33") => 33.0
+#+END_SRC
+
+[[#contents][茶]]
+
+** get()
+:PROPERTIES:
+:CUSTOM_ID: get
+:END:
+
+Get a dictionary value by its key.  If the key doesn't exist, the
+default value is returned if specified, else a warning is
+generated.
+
+#+BEGIN_SRC
+get(dictionary: dict, key: string, optional default: any) any
+#+END_SRC
+
+Note: For dictionary lookup you can use dot notation. It's the
+same as get without the default.
+
+Examples:
+
+#+BEGIN_SRC
+d = dict("tea", "Earl Grey")
+get(d, "tea") => "Earl Grey"
+get(d, "coffee", "Tea") => "Tea"
+#+END_SRC
+
+Using dot notation:
+#+BEGIN_SRC
+d = dict("tea", "Earl Grey")
+d.tea => "Earl Grey"
+#+END_SRC
+
+[[#contents][茶]]
+
+** get()
+:PROPERTIES:
+:CUSTOM_ID: get
+:END:
+
+Get a list value by its index.  If the index is invalid, the
+default value is returned when specified, else a warning is
+generated.
+
+#+BEGIN_SRC
+get(list: list, index: int, optional default: any) any
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+list = list(4, "a", 10)
+get(list, 2) => 10
+get(list, 3, 99) => 99
+#+END_SRC
+
+[[#contents][茶]]
+
+** githubAnchor()
+:PROPERTIES:
+:CUSTOM_ID: githubAnchor
+:END:
+
+Create Github anchor names from heading names. Use it for Github
+markdown internal links. It handles duplicate heading names.
+
+#+BEGIN_SRC
+githubAnchor(names: list) list
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+list = list("Tea", "Water", "Tea")
+githubAnchor(list) =>
+  ["tea", "water", "tea-1"]
+#+END_SRC
+
+[[#contents][茶]]
+
+** githubAnchor()
+:PROPERTIES:
+:CUSTOM_ID: githubAnchor
+:END:
+
+Create a Github anchor name from a heading name. Use it for
+Github markdown internal links. If you have duplicate heading
+names, the anchor name returned only works for the
+first. Punctuation characters are removed so you can get
+duplicates in some cases.
+
+#+BEGIN_SRC
+githubAnchor(name: string) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+githubAnchor("MyHeading") => "myheading"
+githubAnchor("Eary Gray") => "eary-gray"
+githubAnchor("$Eary-Gray#") => "eary-gray"
+#+END_SRC
+
+Example in a markdown template:
+
+#+BEGIN_SRC
+$$ : anchor = githubAnchor(entry.name)
+- {type]{{entry.name}](#{anchor}) &mdash; {short}
+...
+# {entry.name}
+#+END_SRC
+
+[[#contents][茶]]
+
+** if0()
+:PROPERTIES:
+:CUSTOM_ID: if0
+:END:
+
+If the condition is 0, return the second parameter, else return the third.
+
+#+BEGIN_SRC
+if0(condition: int, then: any, else: any) any
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+if0(0, "tea", "beer") => "tea"
+if0(1, "tea", "beer") => "beer"
+if0(4, "tea", "beer") => "beer"
+#+END_SRC
+
+[[#contents][茶]]
+
+** if1()
+:PROPERTIES:
+:CUSTOM_ID: if1
+:END:
+
+If the condition is 1, return the second parameter, else return the third.
+
+#+BEGIN_SRC
+if1(condition: int, then: any, else: any) any
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+if1(0, "tea", "beer") => "beer"
+if1(1, "tea", "beer") => "tea"
+if1(4, "tea", "beer") => "beer"
+#+END_SRC
+
+[[#contents][茶]]
+
+** int()
+:PROPERTIES:
+:CUSTOM_ID: int
+:END:
+
+Create an int from a float.
+
+#+BEGIN_SRC
+int(num: float, optional roundOption: string) int
+#+END_SRC
+
+Round options:
+
+- "round" - nearest integer, the default.
+- "floor" - integer below (to the left on number line)
+- "ceiling" - integer above (to the right on number line)
+- "truncate" - remove decimals
+
+Examples:
+
+#+BEGIN_SRC
+int(2.34) => 2
+int(2.34, "round") => 2
+int(-2.34, "round") => -2
+int(6.5, "round") => 7
+int(-6.5, "round") => -7
+int(4.57, "floor") => 4
+int(-4.57, "floor") => -5
+int(6.3, "ceiling") => 7
+int(-6.3, "ceiling") => -6
+int(6.3456, "truncate") => 6
+int(-6.3456, "truncate") => -6
+#+END_SRC
+
+[[#contents][茶]]
+
+** int()
+:PROPERTIES:
+:CUSTOM_ID: int
+:END:
+
+Create an int from a number string.
+
+#+BEGIN_SRC
+int(numString: string, optional roundOption: string) int
+#+END_SRC
+
+Round options:
+
+- "round" - nearest integer, the default
+- "floor" - integer below (to the left on number line)
+- "ceiling" - integer above (to the right on number line)
+- "truncate" - remove decimals
+
+Examples:
+
+#+BEGIN_SRC
+int("2") => 2
+int("2.34") => 2
+int("-2.34", "round") => -2
+int("6.5", "round") => 7
+int("-6.5", "round") => -7
+int("4.57", "floor") => 4
+int("-4.57", "floor") => -5
+int("6.3", "ceiling") => 7
+int("-6.3", "ceiling") => -6
+int("6.3456", "truncate") => 6
+int("-6.3456", "truncate") => -6
+#+END_SRC
+
+[[#contents][茶]]
+
+** joinPath()
+:PROPERTIES:
+:CUSTOM_ID: joinPath
+:END:
+
+Join the path components with a path separator.
+
+You pass a list of components to join. For the second optional
+parameter you specify the separator to use, either "/", "" or
+"". If you specify "" or leave off the parameter, the current
+platform separator is used.
+
+If the separator already exists between components, a new one
+is not added. If a component is "", the platform separator is
+used for it.
+
+#+BEGIN_SRC
+joinPath(components: list, optional separator: string) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+joinPath(list("images", "tea")) =>
+  "images/tea"
+
+joinPath(list("images", "tea"), "/") =>
+  "images/tea"
+
+joinPath(list("images", "tea"), "\") =>
+  "images\tea"
+
+joinPath(list("images/", "tea") =>
+  "images/tea"
+
+joinPath(list("", "tea")) =>
+  "/tea"
+
+joinPath(list("/", "tea")) =>
+  "/tea"
+#+END_SRC
+
+[[#contents][茶]]
+
+** join()
+:PROPERTIES:
+:CUSTOM_ID: join
+:END:
+
+Join a list of strings with a separator.
+An optional parameter determines whether you skip empty
+strings or not.
+
+#+BEGIN_SRC
+join(strs: list, sep: string, optional skipEmpty: int) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+join(list("a", "b"), ", ") => "a, b"
+join(list("a"), ", ") => "a"
+join(list(""), ", ") => ""
+join(list("a", "b"), "") => "ab"
+join(list("a", "", "c"), "|") => "a||c"
+join(list("a", "", "c"), "|", 1) => "a|c"
+#+END_SRC
+
+[[#contents][茶]]
+
+** keys()
+:PROPERTIES:
+:CUSTOM_ID: keys
+:END:
+
+Create a list from the keys in a dictionary.
+
+#+BEGIN_SRC
+keys(dictionary: dict) list
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+d = dict("a", 1, "b", 2, "c", 3)
+keys(d) => ["a", "b", "c"]
+values(d) => ["apple", 2, 3]
+#+END_SRC
+
+[[#contents][茶]]
+
+** len()
+:PROPERTIES:
+:CUSTOM_ID: len
+:END:
+
+Number of elements in a dictionary.
+
+#+BEGIN_SRC
+len(dictionary: dict) int
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+len(dict()) => 0
+len(dict("a", 4)) => 1
+len(dict("a", 4, "b", 3)) => 2
+#+END_SRC
+
+[[#contents][茶]]
+
+** len()
+:PROPERTIES:
+:CUSTOM_ID: len
+:END:
+
+Number of elements in a list.
+
+#+BEGIN_SRC
+len(list: list) int
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+len(list()) => 0
+len(list(1)) => 1
+len(list(4, 5)) => 2
+#+END_SRC
+
+[[#contents][茶]]
+
+** len()
+:PROPERTIES:
+:CUSTOM_ID: len
+:END:
+
+Number of characters in a string.
+
+#+BEGIN_SRC
+len(str: string) int
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+len("tea") => 3
+len("añyóng") => 6
+#+END_SRC
+
+[[#contents][茶]]
+
+** list()
+:PROPERTIES:
+:CUSTOM_ID: list
+:END:
+
+Create a list of values.
+
+#+BEGIN_SRC
+list(...) list
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+list() => []
+list(1) => [1]
+list(1, 2, 3) => [1, 2, 3]
+list("a", 5, "b") => ["a", 5, "b"]
+#+END_SRC
+
+[[#contents][茶]]
+
+** lower()
+:PROPERTIES:
+:CUSTOM_ID: lower
+:END:
+
+Lowercase a string.
+
+#+BEGIN_SRC
+lower(str: string) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+lower("Tea") => "tea"
+lower("TEA") => "tea"
+lower("TEĀ") => "teā"
+#+END_SRC
+
+[[#contents][茶]]
+
+** path()
+:PROPERTIES:
+:CUSTOM_ID: path
+:END:
+
+Split a file path into its component pieces. Return a dictionary
+with the filename, basename, extension and directory.
+
+You pass a path string and the optional path separator, forward
+slash or or backwards slash. When no separator, the current
+system separator is used.
+
+#+BEGIN_SRC
+path(filename: string, optional separator: string) dict
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+path("src/runFunction.nim") => {
+  "filename": "runFunction.nim",
+  "basename": "runFunction",
+  "ext": ".nim",
+  "dir": "src/",
+}
+
+path("src\runFunction.nim", "\") => {
+  "filename": "runFunction.nim",
+  "basename": "runFunction",
+  "ext": ".nim",
+  "dir": "src\",
+}
+#+END_SRC
+
+[[#contents][茶]]
+
+** replace()
+:PROPERTIES:
+:CUSTOM_ID: replace
+:END:
+
+Replace a substring specified by its position and length with another string.  You can use the function to insert and append to
+a string as well.
+
+#+BEGIN_SRC
+replace(str: string, start: int, length: int, replacement: string) string
+#+END_SRC
+
+- str: string
+- start: substring start index
+- length: substring length
+- replacement: substring replacement
+
+Examples:
+
+#+BEGIN_SRC
+replace("Earl Grey", 5, 4, "of Sandwich")
+  => "Earl of Sandwich"
+replace("123", 0, 0, "abcd") => abcd123
+replace("123", 0, 1, "abcd") => abcd23
+replace("123", 0, 2, "abcd") => abcd3
+replace("123", 0, 3, "abcd") => abcd
+replace("123", 3, 0, "abcd") => 123abcd
+replace("123", 2, 1, "abcd") => 12abcd
+replace("123", 1, 2, "abcd") => 1abcd
+replace("123", 0, 3, "abcd") => abcd
+replace("123", 1, 0, "abcd") => 1abcd23
+replace("123", 1, 1, "abcd") => 1abcd3
+replace("123", 1, 2, "abcd") => 1abcd
+replace("", 0, 0, "abcd") => abcd
+replace("", 0, 0, "abc") => abc
+replace("", 0, 0, "ab") => ab
+replace("", 0, 0, "a") => a
+replace("", 0, 0, "") =>
+replace("123", 0, 0, "") => 123
+replace("123", 0, 1, "") => 23
+replace("123", 0, 2, "") => 3
+replace("123", 0, 3, "") =>
+#+END_SRC
+
+[[#contents][茶]]
+
+** replaceRe()
+:PROPERTIES:
+:CUSTOM_ID: replaceRe
+:END:
+
+Replace multiple parts of a string using regular expressions.
+
+You specify one or more pairs of regex patterns and their string
+replacements.
+
+#+BEGIN_SRC
+replaceRe(str: string, pairs: list) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+list = list("abc", "456", "def", "")
+replaceRe("abcdefabc", list))
+  => "456456"
+#+END_SRC
+
+For developing and debugging regular expressions see the
+website: https://regex101.com/
+
+[[#contents][茶]]
+
+** slice()
+:PROPERTIES:
+:CUSTOM_ID: slice
+:END:
+
+Extract a substring from a string by its position and length. You
+pass the string, the substring's start index and its length.  The
+length is optional. When not specified, the slice returns the
+characters from the start to the end of the string.
+
+The start index is by unicode characters not bytes.
+
+#+BEGIN_SRC
+slice(str: string, start: int, optional length: int) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+slice("Earl Grey", 1, 3) => "arl"
+slice("Earl Grey", 6) => "rey"
+slice("añyóng", 0, 3) => "añy"
+#+END_SRC
+
+[[#contents][茶]]
+
+** sort()
+:PROPERTIES:
+:CUSTOM_ID: sort
+:END:
+
+Sort a list of values of the same type.  The values are ints,
+floats or strings.
+
+You specify the sort order, "ascending" or "descending".
+
+You have the option of sorting strings case "insensitive". Case
+"sensitive" is the default.
+
+#+BEGIN_SRC
+sort(values: list, order: string, optional insensitive: string) list
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+ints = list(4, 3, 5, 5, 2, 4)
+sort(list, "ascending") => [2, 3, 4, 4, 5, 5]
+sort(list, "descending") => [5, 5, 4, 4, 3, 2]
+
+floats = list(4.4, 3.1, 5.9)
+sort(floats, "ascending") => [3.1, 4.4, 5.9]
+sort(floats, "descending") => [5.9, 4.4, 3.1]
+
+strs = list("T", "e", "a")
+sort(strs, "ascending") => ["T", "a", "e"]
+sort(strs, "ascending", "sensitive") => ["T", "a", "e"]
+sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
+#+END_SRC
+
+[[#contents][茶]]
+
+** sort()
+:PROPERTIES:
+:CUSTOM_ID: sort
+:END:
+
+Sort a list of lists.
+
+You specify the sort order, "ascending" or "descending".
+
+You specify how to sort strings either case "sensitive" or
+"insensitive".
+
+You specify which index to compare by.  The compare index value
+must exist in each list, be the same type and be an int, float or
+string.
+
+#+BEGIN_SRC
+sort(lists: list, order: string, case: string, index: int) list
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+l1 = list(4, 3, 1)
+l2 = list(2, 3, 4)
+listOfLists = list(l1, l2)
+sort(listOfLists, "ascending", "sensitive", 0) => [l2, l1]
+sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
+#+END_SRC
+
+[[#contents][茶]]
+
+** sort()
+:PROPERTIES:
+:CUSTOM_ID: sort
+:END:
+
+Sort a list of dictionaries.
+
+You specify the sort order, "ascending" or "descending".
+
+You specify how to sort strings either case "sensitive" or
+"insensitive".
+
+You specify the compare key.  The key value must exist
+in each dictionary, be the same type and be an int, float or
+string.
+
+#+BEGIN_SRC
+sort(dicts: list, order: string, case: string, key: string) list
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+d1 = dict("name", "Earl Gray", "weight", 1.2)
+d2 = dict("name", "Tea Pot", "weight", 3.5)
+dicts = list(d1, d2)
+sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
+sort(dicts, "descending", "sensitive", "name") => [d2, d1]
+#+END_SRC
+
+[[#contents][茶]]
+
+** type()
+:PROPERTIES:
+:CUSTOM_ID: type
+:END:
+
+Return the parameter type, one of: int, float, string, list, dict.
+
+#+BEGIN_SRC
+type(variable: any) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+type(2) => "int"
+type(3.14159) => "float"
+type("Tea") => "string"
+type(list(1,2)) => "list"
+type(dict("a", 1, "b", 2)) => "dict"
+#+END_SRC
+
+[[#contents][茶]]
+
+** values()
+:PROPERTIES:
+:CUSTOM_ID: values
+:END:
+
+Create a list out of the values in the specified dictionary.
+
+#+BEGIN_SRC
+values(dictionary: dict) list
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+d = dict("a", "apple", "b", 2, "c", 3)
+keys(d) => ["a", "b", "c"]
+values(d) => ["apple", 2, 3]
+#+END_SRC
 
 
 # Dynamic Content Ends
