@@ -23,6 +23,7 @@ $$ : fullPath = get(entry, "filename", "")
 $$ : path = path(fullPath, "/")
 $$ : mdName = concat(path.basename, ".md")
 $$ : description = get(entry, "description", "")
+$$ : # Use the first sentence for the short description.
 $$ : short = slice(description, 0, add(find(description, ".", -1), 1))
 * [{path.filename}]({mdName}) &mdash; {short}
 

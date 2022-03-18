@@ -788,7 +788,7 @@ task jsonix, "\tDisplay markdown docs index json.":
   for line in json.splitLines():
     echo line
 
-task testfilesix, "\tDisplay markdown testfiles index json.":
+task stfix, "\tDisplay markdown testfiles index json.":
   var json = testfilesIndexJson()
   for line in json.splitLines():
     echo line

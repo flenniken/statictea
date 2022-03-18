@@ -519,7 +519,7 @@ $$ nextline
 $$ nextline a=5
 $$ nextline a = 5
 $$ nextline num = len(s.tea_list)
-$$ nextline num = len( s.tea_list )
+$$ nextline  num = len( s.tea_list )
 $$nextline
 $$   nextline
 #+END_SRC
@@ -573,7 +573,7 @@ cannot change an existing variable.
 
 * Single Letter Variables
 :PROPERTIES:
-:CUSTOM_ID: single-letter-dictionaries
+:CUSTOM_ID: single-letter-variables
 :END:
 
 Statictea reserves single letters variable names f - u to refer
@@ -1594,10 +1594,18 @@ Workaround Rules:
 - use }@ for ] in an http link
 - use @@: for a : in an http link
 
+Change:
+
 #+BEGIN_SRC
 [Semantic Versioning](https://semver.org/)
+#+END_SRC
+to:
+
+#+BEGIN_SRC
 @{Semantic Versioning}@(https@@://semver.org/)
 #+END_SRC
+
+See the [[runFunction.nim][src/runFunction.nim]] file for other examples.
 
 [[#contents][茶]]
 
@@ -1608,38 +1616,40 @@ Workaround Rules:
 
 You can run commands to build, test, make docs etc. using nimble
 task commands. Run them from the statictea root folder. The n
-task lists the available tasks. Create an alias for nimble.
+task lists the available tasks.
 
 #+BEGIN_SRC
-alias n='nimble --silent'
 cd ~/code/statictea
-n n
+nimble n
 #+END_SRC
 
-Here is the output:
+Nimble Tasks:
 
 #+BEGIN_SRC
-n           Show available tasks.
-t           Run all tests at once.
-test        Run one or more tests; specify part of test filename.
-b           Build the statictea exe.
-docsall     Create all the docs, docsix, docs, readmefun, dot.
-docs        Create one or more markdown docs; specify part of source filename.
-docsix      Create markdown docs index.
-json        Display one or more source file's json doc comments; specify part of name.
-jsonix      Display markdown docs index json.
-readmefun   Create the readme function section.
-dot         Create a dependency graph of the StaticTea source.
-dot2        Create a dependency graph of the system modules used by StaticTea.
-tt          Compile and run t.nim.
-tree        Show the project directory tree.
-args        Show command line arguments.
-br          Build the test runner.
-rt        	Run one or more stf tests in testfiles; specify part of the name.
-stf        	List stf tests with newest last.
-newstf      Create new stf as a starting point for a new test.
-runhelp     Show the runner help text with glow.
-helpme      Show the statictea help text.
+n          Show available tasks.
+test       Run one or more tests; specify part of test filename.
+other      Run other tests and build tests.
+b          Build the statictea exe.
+docsall    Create all the docs, docsix, docs, readmefun, dot.
+docs       Create one or more markdown docs; specify part of source filename.
+docsix     Create markdown docs index.
+json       Display one or more source file's json doc comments; specify part of name.
+jsonix     Display markdown docs index json.
+stfix      Display markdown testfiles index json.
+readmefun  Create the readme function section.
+dot        Create a dependency graph of the StaticTea source.
+dot2       Create a dependency graph of the system modules used by StaticTea.
+tt         Compile and run t.nim.
+tree       Show the project directory tree.
+args       Show command line arguments.
+br         Build the stf test runner.
+rt         Run one or more stf tests in testfiles; specify part of the name.
+stfrm      Create testfiles readme.md.
+newstf     Create new stf as a starting point for a new test.
+runhelp    Show the runner help text with glow.
+helpme     Show the statictea help text.
+remote     Check whether the remote code needs updating.
+cmdline    Build cmdline.
 #+END_SRC
 
 [[#contents][茶]]
@@ -2822,7 +2832,7 @@ values(d) => ["apple", 2, 3]
 - [[#statements][Statements]]
 - [[#syntax][Syntax]]
 - [[#variables][Variables]]
-- [[#single-letter-dictionaries][Single Letter Variables]]
+- [[#single-letter-variables][Single Letter Variables]]
 - [[#types][Types]]
 - [[#run-statictea][Run StaticTea]]
 - [[#miscellaneous][Miscellaneous]]
