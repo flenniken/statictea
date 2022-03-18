@@ -37,6 +37,7 @@ This folder contains stf test files for statictea.
 * [string-basics](../testfiles/string-basics.stf.md) &mdash; Test the string type.
 * [string-unicode](../testfiles/string-unicode.stf.md) &mdash; Test unicode in strings.
 * [syntax-basics](../testfiles/syntax-basics.stf.md) &mdash; Test the readme syntax section.
+* [t-args](../testfiles/t-args.stf.md) &mdash; Test the t.args variable.
 * [t-content](../testfiles/t-content.stf.md) &mdash; Test the t.content variable.
 * [t-repeat-basics](../testfiles/t-repeat-basics.stf.md) &mdash; Test the t.repeat variable.
 * [t-repeat-warnings](../testfiles/t-repeat-warnings.stf.md) &mdash; Test t.repeat warnings.

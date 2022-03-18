@@ -199,7 +199,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "One result file allowed, skipping: \'$1\'.", ## wOneResultAllowed
     "Skipping extra prepost text: $1.", ## wExtraPrepostText
     "One template file allowed on the command line, skipping: $1.", ## wOneTemplateAllowed
-    "No prepost value. Use $1=\"...\".", ## wNoPrepostValue
+    "No prepost value.",    ## wNoPrepostValue
     "Skipping extra prepost text: $1.", ## wSkippingExtraPrepost
     "Unable to open log file: \'$1\'.", ## wUnableToOpenLogFile
     "One log file allowed, skipping: \'$1\'.", ## wOneLogAllowed
@@ -326,7 +326,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "You can only append to a list, got $1.", ## wAppendToList
     "You cannot append to a tea variable.", ## wAppendToTeaVar
     "Duplicate json variable \'$1\' skipped.", ## wDuplicateVar
-    "No $1 filename. Use $2=filename.", ## wNoFilename
+    "No $1 filename.",      ## wNoFilename
     "A \\u must be followed by 4 hex digits.", ## wFourHexDigits
     "The second value is not a matching surrogate pair.", ## wNotMatchingSurrogate
     "Missing the low surrogate.", ## wMissingSurrogatePair
