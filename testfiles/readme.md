@@ -41,10 +41,9 @@ This folder contains stf test files for statictea.
 * [t-content](../testfiles/t-content.stf.md) &mdash; Test the t.content variable.
 * [t-repeat-basics](../testfiles/t-repeat-basics.stf.md) &mdash; Test the t.repeat variable.
 * [t-repeat-warnings](../testfiles/t-repeat-warnings.stf.md) &mdash; Test t.repeat warnings.
-* [t-row-basics](../testfiles/t-row-basics.stf.md) &mdash; Text the t.row variable.
+* [t-row-basics](../testfiles/t-row-basics.stf.md) &mdash; Test the t.row variable.
 * [t-row-warnings](../testfiles/t-row-warnings.stf.md) &mdash; Test t.row warnings.
 * [t-version-basics](../testfiles/t-version-basics.stf.md) &mdash; Test the t.version number.
-* [targs](../testfiles/targs.stf.md) &mdash; Test t.args with normal arguments.
 * [template](../testfiles/template.stf.md) &mdash; This stf file is used as a template by the newstf nimble task.
 * [truefalsenull](../testfiles/truefalsenull.stf.md) &mdash; Test json true, false and null.
 * [update-template](../testfiles/update-template.stf.md) &mdash; Test updating a template with the update option.

@@ -364,11 +364,11 @@ fake nextline
 :END:
 
 A replacement block is a group of contiguous lines in a template
-between a command and its endblock. For the nextline case the
+between a command and its endblock. For the nextline command the
 block is one line.
 
 The block contains any number of bracketed variables for
-substitution. Each string variable gets replaced with its value.
+substitution. Each variable gets replaced with its value.
 
 You can repeat the block to make lists and other repeating
 content. You control how many times the block repeats with the
@@ -383,8 +383,7 @@ repeated block.
 :CUSTOM_ID: statements
 :END:
 
-You format server variables by creating new variables with
-statements.
+You create a new variable with a statement.
 
 A statement is an expression consisting of a variable, an equal
 sign, and a right hand side. The right hand side is either
@@ -414,22 +413,21 @@ traditional "if" statement to control statement flow.
 
 You can loop at the replacement block level and run the command's
 statements multiple times using t.repeat, and vary the output using
-t.row. Here is an example that loops three times and outputs 1, 2, 3.
+t.row. Here is an example that loops three times and outputs 0, 1, 2.
 
 template:
 
 #+BEGIN_SRC
 $$ nextline t.repeat = 3
-$$ : count = t.row
-{count}
+{t.row}
 #+END_SRC
 
 result:
 
 #+BEGIN_SRC
+0
 1
 2
-3
 #+END_SRC
 
 There is no traditional "print" function. You print the
@@ -697,7 +695,7 @@ t.args => {
   "serverList":["server.json","server2.json"],
   "sharedList":["shared.json","shared2.json"],
   "resultFilename":"result.html",
-  "templateList":["template.html"],
+  "templateFilename":"template.html",
   "logFilename":"",
   "prepostList":[["abc$","def"],["$$",""]]
 }
@@ -960,8 +958,8 @@ The t.row variable contains the current row number for blocks
 that repeat. The row numbers start at 0 and increase.  You use it
 to format lists and other repeating content in the template.
 
-Here is an example using the row variable.  In the example the
-row is used in three places.
+Here is an example using the row variable.  In the example, row
+is used in three places.
 
 template:
 
@@ -1172,6 +1170,8 @@ get(s, "d") => dict("x", 100, "y", 200)
 d = get(s, "d")
 get(d, "x") => 100
 get(d, "y") => 200
+
+get(d, "missing", 99) => 99
 #+END_SRC
 
 You can append to a dictionary by creating a new variable. In the
@@ -1275,18 +1275,22 @@ statictea \
 
 The StaticTea command line options:
 
-- help -- show options and usage documentation.
+- help -- show options and usage then quit.
 - version -- outputs the version number.
-- server -- the server json file(s), you can specify multiple.
-- shared -- the shared json file(s), you can specify multiple.
+- server -- a server json file. You can specify multiple server
+  options.
+- shared -- a shared json file. You can specify multiple shared
+  options.
 - template -- the template file, or "stdin" for input from
   standard input.
-- result -- the result file, or standard out when not specified.
+- result -- the result file. When not specified, standard out is
+  used.
 - update -- update the template replace blocks. See the
   [[#replace-command][Replace Command]].
-- prepost -- add a command prefix and postfix, you can specify
-  multiple. When you specify values, the defaults are no longer
-  used. See the [[#prefix-postfix][Prefix Postfix]] section.
+- prepost -- a command prefix and postfix. You can specify
+  multiple prepost options. When you specify a value, the
+  defaults are no longer used. See the [[#prefix-postfix][Prefix
+  Postfix]] section.
 - log - log to a file, see [[#log-file][Log File]] section.
 
 [[#contents][茶]]
@@ -1333,8 +1337,6 @@ example messages:
 - tea.html(0): w15: "Unable to parse the json file. Skipping file: test.json.
 - tea.html(45): w61: No space after the command.
 - tea.html(121): w52: The get function takes 2 or 3 parameters.
-- tea.html(243): w36: The variable 'teaMaster' does not exist.
-- tea.html(3044): w47: Concat parameter 45 is not a string."
 
 Statement errors generate multi-line messages showing the
 statement and problem location, for example:
@@ -1353,7 +1355,8 @@ You reached the maximum number of warnings, suppressing the rest.
 #+END_SRC
 
 Statictea returns success, return code 0, when there are no
-warning messages, else it returns 1.
+warning messages, else it returns 1. If you want to treat
+warnings as errors, check for the 1 return code.
 
 Example of running statictea when a variable is missing:
 
@@ -1605,7 +1608,7 @@ to:
 @{Semantic Versioning}@(https@@://semver.org/)
 #+END_SRC
 
-See the [[runFunction.nim][src/runFunction.nim]] file for other examples.
+See the [[src/runFunction.nim][runFunction.nim]] file for other examples.
 
 [[#contents][茶]]
 
