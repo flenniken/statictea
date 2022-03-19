@@ -90,7 +90,7 @@ proc varSegment(bracketedVar: string; dotNameStrPos: Natural;
 Convert a line to a list of segments.
 
 ```nim
-proc lineToSegments(prepostTable: PrepostTable; line: string): seq[string]
+proc lineToSegments(line: string): seq[string]
 ```
 
 # parseVarSegment
@@ -131,8 +131,7 @@ proc closeDelete(tempSegments: TempSegments)
 Divide the line into segments and write them to the TempSegments' temp file.
 
 ```nim
-proc storeLineSegments(env: var Env; tempSegments: TempSegments;
-                       prepostTable: PrepostTable; line: string)
+proc storeLineSegments(env: var Env; tempSegments: TempSegments; line: string)
 ```
 
 # yieldReplacementLine

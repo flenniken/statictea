@@ -81,32 +81,31 @@ suite "replacement":
     check varSegment("{t.ab}", 1, 4, true)  == "4,1   ,4   ,{t.ab}\n"
 
   test "lineToSegments":
-    let prepostTable = makeDefaultPrepostTable()
-    check expectedItems("segments", lineToSegments(prepostTable, "test\n"), @["1,test\n"])
-    check expectedItems("segments", lineToSegments(prepostTable, "test"), @["3,test\n"])
-    check expectedItems("segments", lineToSegments(prepostTable, "te{1st"), @[
+    check expectedItems("segments", lineToSegments("test\n"), @["1,test\n"])
+    check expectedItems("segments", lineToSegments("test"), @["3,test\n"])
+    check expectedItems("segments", lineToSegments("te{1st"), @[
       "0,te{\n",
       "3,1st\n",
     ])
-    check expectedItems("segments", lineToSegments(prepostTable, "te{st "), @["3,te{st \n"])
-    check expectedItems("segments", lineToSegments(prepostTable, "{var}"), @["4,1   ,3   ,{var}\n"])
-    check expectedItems("segments", lineToSegments(prepostTable, "test\n"), @["1,test\n"])
-    check expectedItems("segments", lineToSegments(prepostTable, "{var}\n"), @["2,1   ,3   ,{var}\n", "1,\n"])
+    check expectedItems("segments", lineToSegments("te{st "), @["3,te{st \n"])
+    check expectedItems("segments", lineToSegments("{var}"), @["4,1   ,3   ,{var}\n"])
+    check expectedItems("segments", lineToSegments("test\n"), @["1,test\n"])
+    check expectedItems("segments", lineToSegments("{var}\n"), @["2,1   ,3   ,{var}\n", "1,\n"])
 
-    check expectedItems("segments", lineToSegments(prepostTable, "before{var}after\n"), @[
+    check expectedItems("segments", lineToSegments("before{var}after\n"), @[
       "0,before\n",
       "2,1   ,3   ,{var}\n",
       "1,after\n",
     ])
 
-    check expectedItems("segments", lineToSegments(prepostTable, "before{var}after{endingvar}"), @[
+    check expectedItems("segments", lineToSegments("before{var}after{endingvar}"), @[
       "0,before\n",
       "2,1   ,3   ,{var}\n",
       "0,after\n",
       "4,1   ,9   ,{endingvar}\n",
     ])
 
-    check expectedItems("segments", lineToSegments(prepostTable, "before {s.name} after {h.header}{ a }end\n"), @[
+    check expectedItems("segments", lineToSegments("before {s.name} after {h.header}{ a }end\n"), @[
       "0,before \n",
       "2,1   ,6   ,{s.name}\n",
       "0, after \n",
@@ -115,7 +114,7 @@ suite "replacement":
       "1,end\n",
     ])
 
-    check expectedItems("segments", lineToSegments(prepostTable,
+    check expectedItems("segments", lineToSegments(
       "{  t.row}before {s.name} after {h.header}{ a }end\n"), @[
         "2,3   ,5   ,{  t.row}\n",
         "0,before \n",

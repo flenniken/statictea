@@ -2,7 +2,6 @@
 
 import std/options
 import std/strUtils
-import parseCmdLine
 import readLines
 import matches
 import regexes
@@ -182,8 +181,8 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
   if notEmptyOrSpaces(text):
     yield newStatement(strip(text), lineNum, start)
 
-proc getString*(env: var Env, prepostTable: PrepostTable,
-    statement: Statement, start: Natural): Option[ValueAndLength] =
+proc getString*(env: var Env, statement: Statement, start: Natural):
+    Option[ValueAndLength] =
   ## Return a literal string value and match length from a statement. The
   ## start parameter is the index of the first quote in the statement
   ## and the return length includes optional trailing white space
@@ -203,8 +202,8 @@ proc getString*(env: var Env, prepostTable: PrepostTable,
   let value = Value(kind: vkString, stringv: literal)
   result = some(ValueAndLength(value: value, length: valueAndLength.length))
 
-proc getNumber*(env: var Env, prepostTable: PrepostTable,
-    statement: Statement, start: Natural): Option[ValueAndLength] =
+proc getNumber*(env: var Env, statement: Statement, start: Natural):
+    Option[ValueAndLength] =
   ## Return the literal number value and match length from the
   ## statement. The start index points at a digit or minus sign.
 
@@ -400,9 +399,9 @@ proc getValue(env: var Env, prepostTable: PrepostTable,
   let char = statement.text[start]
 
   if char == '"':
-    result = getString(env, prepostTable, statement, start)
+    result = getString(env, statement, start)
   elif char in {'0' .. '9', '-'}:
-    result = getNumber(env, prepostTable, statement, start)
+    result = getNumber(env, statement, start)
   elif isLowerAscii(char) or isUpperAscii(char):
     result = getVarOrFunctionValue(env, prepostTable, statement,
                                    start, variables)

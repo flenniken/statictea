@@ -109,7 +109,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       var content = getVariable(variables, "t.content").value.stringv
 
       for line in yieldContentLine(content):
-        storeLineSegments(env, tempSegments, prepostTable, line)
+        storeLineSegments(env, tempSegments, line)
     else:
       # Read the replacement lines and store their compiled segments in
       # TempSegments.  Ignore the last line, the endblock, if it exists.
@@ -117,7 +117,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
           firstReplaceLine, lb, prepostTable, command, maxLines):
         lastLine = replaceLine
         if replaceLine.kind == rlReplaceLine:
-          storeLineSegments(env, tempSegments, prepostTable, replaceLine.line)
+          storeLineSegments(env, tempSegments, replaceLine.line)
 
     # Generate t.repeat number of replacement blocks. Recalculate the
     # variables for each one.

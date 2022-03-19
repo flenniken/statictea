@@ -117,8 +117,7 @@ proc testGetNumber(
 
   var env = openEnvTest("_testGetNumber.log")
 
-  let prepostTable = makeDefaultPrepostTable()
-  let valueAndLengthO = getNumber(env, prepostTable, statement, start)
+  let valueAndLengthO = getNumber(env, statement, start)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
@@ -137,8 +136,7 @@ proc testGetString(
 
   var env = openEnvTest("_testGetString.log")
 
-  let prepostTable = makeDefaultPrepostTable()
-  let valueAndLengthO = getString(env, prepostTable, statement, start)
+  let valueAndLengthO = getString(env, statement, start)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 

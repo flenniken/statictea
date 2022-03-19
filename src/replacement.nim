@@ -215,7 +215,7 @@ proc varSegment*(bracketedVar: string, dotNameStrPos: Natural,
     segmentValue = $ord(variable)
   result.add("{segmentValue},{dotNameStrPos:<4},{dotNameStrLen:<4},{bracketedVar}\n".fmt)
 
-proc lineToSegments*(prepostTable: PrepostTable, line: string): seq[string] =
+proc lineToSegments*(line: string): seq[string] =
   ## Convert a line to a list of segments.
 
   var pos = 0
@@ -412,10 +412,9 @@ proc closeDelete*(tempSegments: TempSegments) =
   ## Close the TempSegments and delete its backing temporary file.
   tempSegments.tempFile.closeDelete()
 
-proc storeLineSegments*(env: var Env, tempSegments: TempSegments,
-                        prepostTable: PrepostTable, line: string) =
+proc storeLineSegments*(env: var Env, tempSegments: TempSegments, line: string) =
   ## Divide the line into segments and write them to the TempSegments' temp file.
-  let segments = lineToSegments(prepostTable, line)
+  let segments = lineToSegments(line)
   for segment in segments:
     tempSegments.tempFile.file.write(segment)
 

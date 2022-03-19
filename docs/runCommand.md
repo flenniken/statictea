@@ -114,8 +114,8 @@ iterator yieldStatements(cmdLines: CmdLines): Statement
 Return a literal string value and match length from a statement. The start parameter is the index of the first quote in the statement and the return length includes optional trailing white space after the last quote.
 
 ```nim
-proc getString(env: var Env; prepostTable: PrepostTable; statement: Statement;
-               start: Natural): Option[ValueAndLength]
+proc getString(env: var Env; statement: Statement; start: Natural): Option[
+    ValueAndLength]
 ```
 
 # getNumber
@@ -123,8 +123,8 @@ proc getString(env: var Env; prepostTable: PrepostTable; statement: Statement;
 Return the literal number value and match length from the statement. The start index points at a digit or minus sign.
 
 ```nim
-proc getNumber(env: var Env; prepostTable: PrepostTable; statement: Statement;
-               start: Natural): Option[ValueAndLength]
+proc getNumber(env: var Env; statement: Statement; start: Natural): Option[
+    ValueAndLength]
 ```
 
 # getFunctionValue
