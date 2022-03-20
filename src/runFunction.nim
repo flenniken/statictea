@@ -1417,22 +1417,8 @@ func funType_as*(parameters: seq[Value]): FunResult =
   ## @:~~~~
 
   tMapParameters("as")
-
-  var ret: string
   let kind = map["a"].kind
-  case kind:
-    of vkInt:
-      ret = "int"
-    of vkFloat:
-      ret = "float"
-    of vkString:
-      ret = "string"
-    of vkList:
-      ret = "list"
-    of vkDict:
-      ret = "dict"
-
-  result = newFunResult(newValue(ret))
+  result = newFunResult(newValue($kind))
 
 func joinPathList(map: VarsDict): FunResult =
   ## Join path components.
