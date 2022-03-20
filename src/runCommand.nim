@@ -239,13 +239,12 @@ proc getNumber*(env: var Env, statement: Statement, start: Natural):
     result = some(ValueAndLength(value: value, length: matches.length))
 
 # Forward reference since we call getValue recursively.
-proc getValue(env: var Env, prepostTable: PrepostTable,
+proc getValue(env: var Env,
               statement: Statement, start: Natural, variables:
                 Variables): Option[ValueAndLength]
 
 # todo: why is "variables" passed in?
 proc getFunctionValue*(env: var Env,
-    prepostTable: PrepostTable,
     functionName: string,
     statement: Statement,
     start: Natural,
@@ -267,8 +266,7 @@ proc getFunctionValue*(env: var Env,
   else:
     while true:
       # Get the parameter's value.
-      let valueAndLengthO = getValue(env, prepostTable, statement,
-                                     pos, variables)
+      let valueAndLengthO = getValue(env, statement, pos, variables)
       if not valueAndLengthO.isSome:
         # Already have shown an error message.
         return
@@ -315,8 +313,7 @@ proc getFunctionValue*(env: var Env,
 
   result = some(ValueAndLength(value: funResult.value, length: pos-start))
 
-proc getVarOrFunctionValue*(env: var Env, prepostTable:
-    PrepostTable, statement: Statement, start: Natural,
+proc getVarOrFunctionValue*(env: var Env, statement: Statement, start: Natural,
     variables: Variables): Option[ValueAndLength] =
   ## Return the statement's right hand side value and the length
   ## matched. The right hand side must be a variable a function or a
@@ -341,7 +338,7 @@ proc getVarOrFunctionValue*(env: var Env, prepostTable:
       env.warnStatement(statement, wInvalidFunction, start, functionName)
       return
     let parentheses = parenthesesO.get()
-    let funValueLengthO = getFunctionValue(env, prepostTable, functionName, statement,
+    let funValueLengthO = getFunctionValue(env, functionName, statement,
                             start+matches.length+parentheses.length, variables)
     if not isSome(funValueLengthO):
       return
@@ -358,9 +355,8 @@ proc getVarOrFunctionValue*(env: var Env, prepostTable:
       return
     result = some(newValueAndLength(valueOrWarning.value, matches.length))
 
-proc getList(env: var Env, prepostTable: PrepostTable,
-              statement: Statement, start: Natural,
-              variables: Variables): Option[ValueAndLength] =
+proc getList(env: var Env, statement: Statement, start: Natural,
+    variables: Variables): Option[ValueAndLength] =
   ## Return the literal list value and match length from the
   ## statement. The start index points at [.
 
@@ -368,8 +364,8 @@ proc getList(env: var Env, prepostTable: PrepostTable,
   assert startSymbolO.isSome
   let startSymbol = startSymbolO.get()
 
-  let funValueLengthO = getFunctionValue(env, prepostTable,
-    "list", statement, start+startSymbol.length, variables, true)
+  let funValueLengthO = getFunctionValue(env, "list", statement,
+    start+startSymbol.length, variables, true)
   if not isSome(funValueLengthO):
     return
 
@@ -377,9 +373,8 @@ proc getList(env: var Env, prepostTable: PrepostTable,
   result = some(ValueAndLength(value: funValueLength.value,
     length: funValueLength.length+startSymbol.length))
 
-proc getValue(env: var Env, prepostTable: PrepostTable,
-              statement: Statement, start: Natural, variables:
-                Variables): Option[ValueAndLength] =
+proc getValue(env: var Env, statement: Statement, start: Natural, variables:
+    Variables): Option[ValueAndLength] =
   ## Return the statements right hand side value and the match length.
   ## The start parameter points at the first non-whitespace character
   ## of the right hand side. The length includes the trailing
@@ -403,10 +398,9 @@ proc getValue(env: var Env, prepostTable: PrepostTable,
   elif char in {'0' .. '9', '-'}:
     result = getNumber(env, statement, start)
   elif isLowerAscii(char) or isUpperAscii(char):
-    result = getVarOrFunctionValue(env, prepostTable, statement,
-                                   start, variables)
+    result = getVarOrFunctionValue(env, statement, start, variables)
   elif char == '[':
-    result = getList(env, prepostTable, statement, start, variables)
+    result = getList(env, statement, start, variables)
   else:
     env.warnStatement(statement, wInvalidRightHandSide, start)
 
@@ -420,7 +414,7 @@ proc getValue(env: var Env, prepostTable: PrepostTable,
 # Each function matches the trailing whitespace.
 
 proc runStatement*(env: var Env, statement: Statement,
-    prepostTable: PrepostTable, variables: var Variables): Option[VariableData] =
+    variables: var Variables): Option[VariableData] =
   ## Run one statement and assign a variable. Return the variable dot
   ## name string and value.
 
@@ -440,7 +434,7 @@ proc runStatement*(env: var Env, statement: Statement,
   let equalSign = equalSignO.get()
 
   # Get the right hand side value and match the following whitespace.
-  let valueAndLengthO = getValue(env, prepostTable, statement,
+  let valueAndLengthO = getValue(env, statement,
                                  dotNameMatches.length + equalSign.length,
                                  variables)
   if not valueAndLengthO.isSome:
@@ -465,8 +459,7 @@ proc runStatement*(env: var Env, statement: Statement,
   # Return the variable and value for testing.
   result = some(newVariableData(dotNameStr, value))
 
-proc runCommand*(env: var Env, cmdLines: CmdLines, prepostTable: PrepostTable,
-    variables: var Variables) =
+proc runCommand*(env: var Env, cmdLines: CmdLines, variables: var Variables) =
   ## Run a command and fill in the variables dictionaries.
 
   # Clear the local variables and set the tea vars to their initial
@@ -477,7 +470,7 @@ proc runCommand*(env: var Env, cmdLines: CmdLines, prepostTable: PrepostTable,
   for statement in yieldStatements(cmdLines):
     # Run the statement and assign a variable.  When there is a
     # statement error, the statement is skipped.
-    discard runStatement(env, statement, prepostTable, variables)
+    discard runStatement(env, statement, variables)
 
 when defined(test):
   proc newIntValueAndLengthO*(number: int | int64,

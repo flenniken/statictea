@@ -71,7 +71,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     # Run the command the first time.
     var row = 0
     tea["row"] = newValue(row)
-    runCommand(env, cmdLines, prepostTable, variables)
+    runCommand(env, cmdLines, variables)
 
     # Show a warning when the replace command does not have t.content
     # set.
@@ -134,7 +134,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       tea["row"] = newValue(row)
 
       # Run the command and fill in the variables.
-      runCommand(env, cmdLines, prepostTable, variables)
+      runCommand(env, cmdLines, variables)
 
     closeDelete(tempSegments)
 
@@ -180,7 +180,7 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
       # Run the command and fill in the variables.
       var row = 0
       tea["row"] = newValue(row)
-      runCommand(env, cmdLines, prepostTable, variables)
+      runCommand(env, cmdLines, variables)
 
     # Write out the command lines.
     for dumpLine in cmdLines.lines:

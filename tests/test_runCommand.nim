@@ -56,10 +56,11 @@ proc newStrFromBuffer(buffer: seq[uint8]): string =
   for ix in 0 ..< buffer.len:
     result.add((char)buffer[ix])
 
-proc getCmdLineParts(env: var Env, commandLines: seq[string]): seq[LineParts] =
-  ## Return the line parts from the given lines.
+proc getCmdLinePartsTest(env: var Env, commandLines: seq[string]): seq[LineParts] =
+  ## Return the line parts from the given lines. Only used for
+  ## testing. It doesn't work for custom prefixes.
+  let prepostTable = makeDefaultPrepostTable()
   for ix, line in commandLines:
-    let prepostTable = makeDefaultPrepostTable()
     let partsO = parseCmdLine(env, prepostTable, line, lineNum = ix + 1)
     if not partsO.isSome():
       echo "cannot get command line parts for:"
@@ -95,7 +96,7 @@ proc testGetStatements(content: string, expected: string): bool =
   var env = openEnvTest("_getStatements.txt")
   var cmdLines: CmdLines
   cmdLines.lines = splitNewLines(content)
-  cmdLines.lineParts = getCmdLineParts(env, cmdLines.lines)
+  cmdLines.lineParts = getCmdLinePartsTest(env, cmdLines.lines)
 
   var statements = getStatements(cmdLines)
 
@@ -169,11 +170,7 @@ proc testGetVarOrFunctionValue(variables: Variables, statement: Statement, start
 
   var env = openEnvTest("_getVariable.log")
 
-  let prepostTable = makeDefaultPrepostTable()
-
-  let valueAndLengthO = getVarOrFunctionValue(env, prepostTable,
-                                              statement, start,
-                                              variables)
+  let valueAndLengthO = getVarOrFunctionValue(env, statement, start, variables)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
@@ -203,9 +200,7 @@ proc testGetFunctionValue(functionName: string, statement: Statement, start: Nat
   var env = openEnvTest("_testGetFunctionValue.log")
 
   var variables = emptyVariables()
-  let prepostTable = makeDefaultPrepostTable()
-  let valueAndLengthO = getFunctionValue(env, prepostTable,
-                          functionName, statement, start, variables)
+  let valueAndLengthO = getFunctionValue(env, functionName, statement, start, variables)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
@@ -220,8 +215,7 @@ proc testRunStatement(statement: Statement, variables: var Variables,
   ): bool =
   var env = openEnvTest("_runStatement.log")
 
-  let prepostTable = makeDefaultPrepostTable()
-  let variableDataO = runStatement(env, statement, prepostTable, variables)
+  let variableDataO = runStatement(env, statement, variables)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
