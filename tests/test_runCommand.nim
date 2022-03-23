@@ -17,6 +17,18 @@ import tostring
 import readlines
 import collectCommand
 
+proc newIntValueAndLengthO*(number: int | int64, length: Natural):
+    Option[ValueAndLength] =
+  result = some(ValueAndLength(value: newValue(number), length: length))
+
+proc newFloatValueAndLengthO*(number: float64, length: Natural):
+    Option[ValueAndLength] =
+  result = some(ValueAndLength(value: newValue(number), length: length))
+
+proc newStringValueAndLengthO*(str: string, length: Natural):
+    Option[ValueAndLength] =
+  result = some(ValueAndLength(value: newValue(str), length: length))
+
 proc startPointer*(start: Natural): string =
   ## Return a string containing the number of spaces and symbols to
   ## point at the line start value. Display it under the line.

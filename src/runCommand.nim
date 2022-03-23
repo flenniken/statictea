@@ -450,10 +450,12 @@ proc runStatement*(env: var Env, statement: Statement,
     return
 
   # Assign the variable if possible.
-  let warningDataO = assignVariable(variables, dotNameStr, value, equalSign.getGroup())
+  let warningDataO = assignVariable(variables, dotNameStr, value,
+    equalSign.getGroup())
   if isSome(warningDataO):
     let warningData = warningDataO.get()
-    env.warnStatement(statement, warningData.warning, 0, warningData.p1, warningData.p2)
+    env.warnStatement(statement, warningData.warning, 0, warningData.p1,
+      warningData.p2)
     return
 
   # Return the variable and value for testing.
@@ -472,15 +474,3 @@ proc runCommand*(env: var Env, cmdLines: CmdLines, variables: var Variables) =
     # statement error, the statement is skipped.
     discard runStatement(env, statement, variables)
 
-when defined(test):
-  proc newIntValueAndLengthO*(number: int | int64,
-                              length: Natural): Option[ValueAndLength] =
-    result = some(ValueAndLength(value: newValue(number), length: length))
-
-  proc newFloatValueAndLengthO*(number: float64,
-                                length: Natural): Option[ValueAndLength] =
-    result = some(ValueAndLength(value: newValue(number), length: length))
-
-  proc newStringValueAndLengthO*(str: string,
-                                 length: Natural): Option[ValueAndLength] =
-    result = some(ValueAndLength(value: newValue(str), length: length))
