@@ -97,7 +97,7 @@ func `==`(s1: ParentDict; s2: ParentDict): bool
 Return a new ParentDict object of the warning kind. It contains a warning and the two optional strings that go with the warning.
 
 ```nim
-func newParentDictWarn(warning: Warning; p1: string = ""; p2: string = ""): ParentDict
+func newParentDictWarn(warning: Warning; p1: string = ""): ParentDict
 ```
 
 # newParentDict

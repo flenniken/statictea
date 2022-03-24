@@ -208,7 +208,7 @@ func newValueOrWarning(value: Value): ValueOrWarning
 Return a new ValueOrWarning object containing a warning.
 
 ```nim
-func newValueOrWarning(warning: Warning; p1: string = ""; p2: string = ""): ValueOrWarning
+func newValueOrWarning(warning: Warning; p1: string = ""): ValueOrWarning
 ```
 
 # newValueOrWarning

@@ -66,8 +66,7 @@ FunResult = object
 Return a new FunResult object containing a warning. It takes a warning, the index of the problem parameter, and the two optional strings that go with the warning.
 
 ```nim
-func newFunResultWarn(warning: Warning; parameter: Natural = 0; p1: string = "";
-                      p2: string = ""): FunResult
+func newFunResultWarn(warning: Warning; parameter: Natural = 0; p1: string = ""): FunResult
 ```
 
 # newFunResultWarn

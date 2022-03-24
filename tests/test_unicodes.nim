@@ -84,8 +84,8 @@ proc testStringToCodePoints(str: string, eCodePoints: seq[uint32]): bool =
 proc testStringToCodePointsWarn(
     str: string,
     messageId: MessageId = wInvalidUtf8ByteSeq,
-    p1: string = "",
-    p2: string = ""): bool =
+    p1: string = ""
+  ): bool =
   let opResultWarn = stringToCodePoints(str)
   if opResultWarn.isValue:
     echo "expected warning got value: " & $opResultWarn
@@ -98,10 +98,6 @@ proc testStringToCodePointsWarn(
   if opResultWarn.message.p1 != p1:
     echo "expected: " & $opResultWarn.message.p1
     echo "     got: " & $p1
-    result = false
-  if opResultWarn.message.p2 != p2:
-    echo "expected: " & $opResultWarn.message.p2
-    echo "     got: " & $p2
     result = false
 
 proc testParseHexUnicodeError(text: string, pos: Natural,

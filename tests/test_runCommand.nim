@@ -190,7 +190,7 @@ proc testGetVarOrFunctionValue(variables: Variables, statement: Statement, start
     result = false
 
 proc testWarnStatement(statement: Statement,
-    warning: Warning, start: Natural, p1: string="", p2: string="",
+    warning: Warning, start: Natural, p1: string="",
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]
@@ -198,7 +198,7 @@ proc testWarnStatement(statement: Statement,
 
   var env = openEnvTest("_getVariable.log")
 
-  env.warnStatement(statement, warning, start, p1, p2)
+  env.warnStatement(statement, warning, start, p1)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
@@ -702,7 +702,7 @@ statement: result = dict(list("1", "else", "2", "two", "3"))
     let text = """result = case(33, 2, 22, "abc", 11, len(concat()))"""
     let statement = newStatement(text, lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w119: Not enough parameters, expected 2 got 0.
+template.html(1): w119: Not enough parameters, expected 2.
 statement: result = case(33, 2, 22, "abc", 11, len(concat()))
                                                           ^
 """
@@ -775,7 +775,7 @@ statement: t.missing = "1.2.3"
   test "cmpVersion two parameters":
     let statement = newStatement(text="""cmp = cmpVersion("1.2.3")""", lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w119: Not enough parameters, expected 2 got 1.
+template.html(1): w119: Not enough parameters, expected 2.
 statement: cmp = cmpVersion("1.2.3")
                             ^
 """
@@ -786,7 +786,7 @@ statement: cmp = cmpVersion("1.2.3")
     let statement = newStatement(text="""cmp = cmpVersion("1.2.3", 3.5)""",
       lineNum=1, 0)
     let eErrLines = splitNewLines """
-template.html(1): w120: Wrong parameter type, expected string got float.
+template.html(1): w120: Wrong parameter type, expected string.
 statement: cmp = cmpVersion("1.2.3", 3.5)
                                      ^
 """

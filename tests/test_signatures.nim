@@ -33,7 +33,7 @@ proc testMapParametersOk(signatureCode: string, args: seq[Value],
   result = true
 
 proc testMapParametersW(signatureCode: string, args: seq[Value],
-    eParameter: int, warning: Warning, p1: string = "", p2: string = ""): bool =
+    eParameter: int, warning: Warning, p1: string = ""): bool =
 
   var paramsO = signatureCodeToParams(signatureCode)
   if not paramsO.isSome:
@@ -43,7 +43,7 @@ proc testMapParametersW(signatureCode: string, args: seq[Value],
   if not expectedItem("mapParameters", funResult.kind, frWarning):
     echo "no warning: " & $funResult
     return false
-  let eFunResultWarn = newFunResultWarn(warning, eParameter, p1, p2)
+  let eFunResultWarn = newFunResultWarn(warning, eParameter, p1)
   if not expectedItem("mapParameters", funResult, eFunResultWarn):
     echo "signatureCode: " & signatureCode
     return false
@@ -150,30 +150,30 @@ suite "signatures.nim":
 
   test "mapParameters not enough args":
     var parameters: seq[Value] = @[]
-    check testMapParametersW("ii", parameters, 0, kNotEnoughArgs, "1", "0")
+    check testMapParametersW("ii", parameters, 0, kNotEnoughArgs, "1")
 
     parameters = @[newValue(1)]
-    check testMapParametersW("iii", parameters, 0, kNotEnoughArgs, "2", "1")
+    check testMapParametersW("iii", parameters, 0, kNotEnoughArgs, "2")
 
   test "mapParameters too many args":
     var parameters = @[newValue(1), newValue(2)]
-    check testMapParametersW("ii", parameters, 0, kTooManyArgs, "1", "2")
+    check testMapParametersW("ii", parameters, 0, kTooManyArgs, "1")
 
     parameters = @[newValue(1), newValue(2), newValue(3)]
-    check testMapParametersW("iii", parameters, 0, kTooManyArgs, "2", "3")
+    check testMapParametersW("iii", parameters, 0, kTooManyArgs, "2")
 
   test "mapParameters wrong kind":
     var parameters = @[newValue(1)]
-    check testMapParametersW("fi", parameters, 0, kWrongType, "float", "int")
+    check testMapParametersW("fi", parameters, 0, kWrongType, "float")
 
     parameters = @[newValue(1), newValue(2)]
-    check testMapParametersW("ifi", parameters, 1, kWrongType, "float", "int")
+    check testMapParametersW("ifi", parameters, 1, kWrongType, "float")
 
     parameters = @[newValue(1)]
-    check testMapParametersW("ofi", parameters, 0, kWrongType, "float", "int")
+    check testMapParametersW("ofi", parameters, 0, kWrongType, "float")
 
     parameters = @[newValue(1), newValue(2)]
-    check testMapParametersW("oifi", parameters, 1, kWrongType, "float", "int")
+    check testMapParametersW("oifi", parameters, 1, kWrongType, "float")
 
   test "mapParameters sort int, float, string":
     var parameters = @[newEmptyListValue(), newValue("ascending")]

@@ -31,11 +31,11 @@ suite "warnings.nim":
     check warning == "starting(0): w0: Success."
 
   test "getWarning":
-    let warning = getWarning("starting", 5, wNoFilename, p1="server", p2="s")
+    let warning = getWarning("starting", 5, wNoFilename, p1="server")
     check warning == "starting(5): w133: No server filename."
 
   test "getWarning-file-line":
-    let warning = getWarning("tea.html", 23, wNoFilename, p1="server", p2="s")
+    let warning = getWarning("tea.html", 23, wNoFilename, p1="server")
     check warning == "tea.html(23): w133: No server filename."
 
   test "getWarning-one-p":

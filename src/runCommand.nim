@@ -81,8 +81,7 @@ proc startColumn*(start: Natural): string =
   result.add("^")
 
 proc warnStatement*(env: var Env, statement: Statement, warning:
-                    Warning, start: Natural, p1: string = "", p2:
-                                         string = "") =
+    Warning, start: Natural, p1: string = "") =
   ## Show an invalid statement with a pointer pointing at the start of
   ## the problem. Long statements are trimmed around the problem area.
 
@@ -117,7 +116,7 @@ proc warnStatement*(env: var Env, statement: Statement, warning:
 $1
 statement: $2
            $3""" % [
-    getWarning(env.templateFilename, statement.lineNum, warning, p1, p2),
+    getWarning(env.templateFilename, statement.lineNum, warning, p1),
     fragment,
     startColumn(pointerPos)
   ]
@@ -308,7 +307,7 @@ proc getFunctionValue*(env: var Env,
     else:
       warningPos = start
     env.warnStatement(statement, funResult.warningData.warning,
-      warningPos, funResult.warningData.p1, funResult.warningData.p2)
+      warningPos, funResult.warningData.p1)
     return
 
   result = some(ValueAndLength(value: funResult.value, length: pos-start))
@@ -454,8 +453,7 @@ proc runStatement*(env: var Env, statement: Statement,
     equalSign.getGroup())
   if isSome(warningDataO):
     let warningData = warningDataO.get()
-    env.warnStatement(statement, warningData.warning, 0, warningData.p1,
-      warningData.p2)
+    env.warnStatement(statement, warningData.warning, 0, warningData.p1)
     return
 
   # Return the variable and value for testing.

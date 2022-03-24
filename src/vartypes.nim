@@ -139,10 +139,9 @@ func newValueOrWarning*(value: Value): ValueOrWarning =
   ## Return a new ValueOrWarning object containing a value.
   result = ValueOrWarning(kind: vwValue, value: value)
 
-func newValueOrWarning*(warning: Warning, p1: string = "",
-    p2: string = ""): ValueOrWarning =
+func newValueOrWarning*(warning: Warning, p1: string = ""): ValueOrWarning =
   ## Return a new ValueOrWarning object containing a warning.
-  let warningData = newWarningData(warning, p1, p2)
+  let warningData = newWarningData(warning, p1)
   result = ValueOrWarning(kind: vwWarning, warningData: warningData)
 
 func newValueOrWarning*(warningData: WarningData): ValueOrWarning =

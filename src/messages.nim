@@ -202,7 +202,7 @@ const
     "Unable to parse the json file. Skipping file: $1.", ## wJsonParseError
     "File not found: $1.", ## wFileNotFound
     "Unable to open file: $1.", ## wUnableToOpenFile
-    "Setup log rotation for $1 which has $2 bytes.", ## wBigLogFile
+    "The log file is over 1 GB.", ## wBigLogFile
     "Unable to open standard device: $1.", ## wCannotOpenStd
     "No command specified on the line, treating it as a comment.", ## wNotACommand
     "Command line too long.", ## wCmdLineTooLong
@@ -242,7 +242,7 @@ const
     "Expected a string for the second parameter, got $1.", ## wExpectedStringFor2
     "The dictionary does not have an item with key $1.", ## wMissingDictItem
     "Expected a list or dictionary as the first parameter.", ## wExpectedListOrDict
-    "The replacement variable doesn't exist: $1$2.", ## wMissingReplacementVar
+    "The replacement variable doesn't exist: $1.", ## wMissingReplacementVar
     "Unable to create a temporary file.", ## wNoTempFile
     "Read t.maxLines replacement block lines without finding the endblock.", ## wExceededMaxLine
     "No space after the command.", ## wSpaceAfterCommand
@@ -303,11 +303,11 @@ const
     "You reached the maximum number of warnings, suppressing the rest.", ## kMaxWarnings
     "Invalid signature string.", ## kInvalidSignature
     "Invalid parameter type.", ## kInvalidParamType
-    "Not enough parameters, expected $1 got $2.", ## kNotEnoughArgs
-    "Wrong parameter type, expected $1 got $2.", ## kWrongType
+    "Not enough parameters, expected $1.", ## kNotEnoughArgs
+    "Wrong parameter type, expected $1.", ## kWrongType
     "The required vararg parameter has no arguments.", ## kNoVarargArgs
     "Missing vararg parameter, expected groups of 2 got 1.", ## kNotEnoughVarargs
-    "Too many arguments, expected at most $1 got $2.", ## kTooManyArgs
+    "Too many arguments, expected at most $1.", ## kTooManyArgs
     "Expected at least four parameters.", ## wAtLeast4Parameters
     "Expected number string.", ## wExpectedNumberString
     "A case condition is not the same type as the main condition.", ## wCaseTypeMismatch

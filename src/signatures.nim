@@ -221,8 +221,8 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
 
   # Check there are enough parameters.
   if args.len < requiredParams:
-    # Not enough parameters, expected {requiredParams} got {args.len}."
-    return newFunResultWarn(kNotEnoughArgs, 0, $requiredParams, $args.len)
+    # Not enough parameters, $1 required.
+    return newFunResultWarn(kNotEnoughArgs, 0, $requiredParams)
 
   # Check there are not too many parameters.
   var limit: int
@@ -231,8 +231,8 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
   else:
     limit = requiredParams
   if args.len > limit:
-    # Too many parameters, expected {requiredParams} got {args.len}."
-    return newFunResultWarn(kTooManyArgs, 0, $requiredParams, $args.len)
+    # Too many arguments, expected at most $1."
+    return newFunResultWarn(kTooManyArgs, 0, $requiredParams)
 
   # Loop through the parameters.
   for ix in countUp(0, loopParams - 1):
@@ -242,9 +242,8 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
     # Check the parameter is the correct type.
     if not sameType(param.paramTypes[0], arg.kind):
       let expected = paramTypeString(param.paramTypes[0])
-      let got = $arg.kind
-      # Wrong parameter type, expected {expected} got {got}.
-      return newFunResultWarn(kWrongType, ix, $expected, $got)
+      # Wrong parameter type, expected $1.
+      return newFunResultWarn(kWrongType, ix, $expected)
 
     map[param.name] = arg
 

@@ -147,7 +147,7 @@ suite "runFunction.nim":
 
   test "concat nothing":
     var parameters: seq[Value]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "0")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2")
     check testFunction("concat", parameters, eFunResult)
 
   test "len string":
@@ -183,22 +183,22 @@ suite "runFunction.nim":
 
   test "len float":
     var parameters = @[newValue(3.4)]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "float")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string")
     check testFunction("len", parameters, eFunResult)
 
   test "len int":
     var parameters = @[newValue(3)]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string")
     check testFunction("len", parameters, eFunResult)
 
   test "len nothing":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1", "0")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1")
     check testFunction("len", parameters, eFunResult)
 
   test "len 2":
     var parameters = newValue([3, 2]).listv
-    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1", "2")
+    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1")
     check testFunction("len", parameters, eFunResult)
 
   test "get list item":
@@ -240,20 +240,20 @@ suite "runFunction.nim":
   test "get one parameter":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "1")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2")
     check testFunction("get", parameters, eFunResult)
 
   test "get 4 parameters":
     var list = newValue([1, 2, 3, 4, 5])
     let p = newValue(1)
     var parameters = @[list, p, p, p]
-    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "2", "4")
+    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "2")
     check testFunction("get", parameters, eFunResult)
 
   test "get parameter 2 wrong type":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list, newValue("a")]
-    let eFunResult = newFunResultWarn(kWrongType, 1, "int", "string")
+    let eFunResult = newFunResultWarn(kWrongType, 1, "int")
     check testFunction("get", parameters, eFunResult)
 
   test "get warning about best matching get":
@@ -263,18 +263,18 @@ suite "runFunction.nim":
     # second parameter.
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
     var parameters = @[dict, newValue(3.5)]
-    let eFunResult = newFunResultWarn(kWrongType, 1, "string", "float")
+    let eFunResult = newFunResultWarn(kWrongType, 1, "string")
     check testFunction("get", parameters, eFunResult)
 
   test "get wrong first parameter":
     var parameters = @[newValue(2), newValue(2)]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "list", "int")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "list")
     check testFunction("get", parameters, eFunResult)
 
   test "get wrong second parameter":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list, newValue("a")]
-    let eFunResult = newFunResultWarn(kWrongType, 1, "int", "string")
+    let eFunResult = newFunResultWarn(kWrongType, 1, "int")
     check testFunction("get", parameters, eFunResult)
 
   test "get invalid index":
@@ -317,22 +317,22 @@ suite "runFunction.nim":
 
   test "cmp wrong number parameters":
     var parameters = @[newValue(4)]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "1")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2")
     check testFunction("cmp", parameters, eFunResult)
 
   test "cmp not same kind":
     var parameters = @[newValue(4), newValue(4.2)]
-    let eFunResult = newFunResultWarn(kWrongType, 1, "int", "float")
+    let eFunResult = newFunResultWarn(kWrongType, 1, "int")
     check testFunction("cmp", parameters, eFunResult)
 
   test "cmp not int, float or string":
     var parameters = @[newEmptyDictValue(), newEmptyDictValue()]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "int", "dict")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "int")
     check testFunction("cmp", parameters, eFunResult)
 
   test "cmp case insensitive wrong type":
     var parameters = @[newValue(2), newValue(22), newValue("a")]
-    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "2", "3")
+    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "2")
     check testFunction("cmp", parameters, eFunResult)
 
   test "cmp case insensitive not 0 or 1":
@@ -382,22 +382,22 @@ suite "runFunction.nim":
 
   test "add no parameters":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "0")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2")
     check testFunction("add", parameters, eFunResult)
 
   test "add string and int":
     var parameters = @[newValue("hi"), newValue(4)]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "int", "string")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "int")
     check testFunction("add", parameters, eFunResult)
 
   test "add int and string":
     var parameters = @[newValue(4), newValue("hi")]
-    let eFunResult = newFunResultWarn(kWrongType, 1, "int", "string")
+    let eFunResult = newFunResultWarn(kWrongType, 1, "int")
     check testFunction("add", parameters, eFunResult)
 
   test "add int and float":
     var parameters = @[newValue(4), newValue(1.3)]
-    let eFunResult = newFunResultWarn(kWrongType, 1, "int", "float")
+    let eFunResult = newFunResultWarn(kWrongType, 1, "int")
     check testFunction("add", parameters, eFunResult)
 
   test "add int64 overflow":
@@ -488,7 +488,7 @@ suite "runFunction.nim":
       newValue(7), newValue("v7"),
     ])
     var parameters = @[newValue(1.2), cases]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "int", "float")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "int")
     check testFunction("case", parameters, eFunResult)
 
   test "case invalid condition":
@@ -549,7 +549,7 @@ suite "runFunction.nim":
 
   test "int(): wrong number of parameters":
     var parameters = @[newValue(4.57), newValue(1), newValue(2)]
-    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1", "3")
+    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1")
     check testFunction("int", parameters, eFunResult)
 
   test "int(): not a number string":
@@ -559,12 +559,12 @@ suite "runFunction.nim":
 
   test "int(): not a float":
     var parameters = @[newValue(3), newValue("round")]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "float", "int")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "float")
     check testFunction("int", parameters, eFunResult)
 
   test "int(): not round option":
     var parameters = @[newValue(3.4), newValue(5)]
-    let eFunResult = newFunResultWarn(kWrongType, 1, "string", "int")
+    let eFunResult = newFunResultWarn(kWrongType, 1, "string")
     check testFunction("int", parameters, eFunResult)
 
   test "int(): not a float":
@@ -605,7 +605,7 @@ suite "runFunction.nim":
 
   test "to float wrong number parameters":
     var parameters = @[newValue(4), newValue(3)]
-    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1", "2")
+    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1")
     check testFunction("float", parameters, eFunResult)
 
   test "to float warning":
@@ -660,17 +660,17 @@ suite "runFunction.nim":
 
   test "find 1 parameter":
     var parameters = @[newValue("big")]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "1")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2")
     check testFunction("find", parameters, eFunResult)
 
   test "find 1 not string":
     var parameters = @[newValue(1), newValue("bigger")]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string")
     check testFunction("find", parameters, eFunResult)
 
   test "find 2 not string":
     var parameters = @[newValue("at"), newValue(4.5)]
-    let eFunResult = newFunResultWarn(kWrongType, 1, "string", "float")
+    let eFunResult = newFunResultWarn(kWrongType, 1, "string")
     check testFunction("find", parameters, eFunResult)
 
   test "slice Grey":
@@ -690,22 +690,22 @@ suite "runFunction.nim":
 
   test "slice 1 parameter":
     var parameters = @[newValue("big")]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "1")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2")
     check testFunction("slice", parameters, eFunResult)
 
   test "slice 1 not string":
     var parameters = @[newValue(4), newValue(4)]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string")
     check testFunction("slice", parameters, eFunResult)
 
   test "slice 2 not int":
     var parameters = @[newValue("tasdf"), newValue("dsa")]
-    let eFunResult = newFunResultWarn(kWrongType, 1, "int", "string")
+    let eFunResult = newFunResultWarn(kWrongType, 1, "int")
     check testFunction("slice", parameters, eFunResult)
 
   test "slice 3 not int":
     var parameters = @[newValue("tasdf"), newValue(0), newValue("tasdf")]
-    let eFunResult = newFunResultWarn(kWrongType, 2, "int", "string")
+    let eFunResult = newFunResultWarn(kWrongType, 2, "int")
     check testFunction("slice", parameters, eFunResult)
 
   test "slice start < 0":
@@ -751,17 +751,17 @@ suite "runFunction.nim":
 
   test "dup 1 parameter":
     var parameters = @[newValue("abc")]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "1")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2")
     check testFunction("dup", parameters, eFunResult)
 
   test "dup not valid string":
     var parameters = @[newValue(4.3), newValue(2)]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "float")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string")
     check testFunction("dup", parameters, eFunResult)
 
   test "dup not valid count":
     var parameters = @[newValue("="), newValue("=")]
-    let eFunResult = newFunResultWarn(kWrongType, 1, "int", "string")
+    let eFunResult = newFunResultWarn(kWrongType, 1, "int")
     check testFunction("dup", parameters, eFunResult)
 
   test "dup negative count":
@@ -895,25 +895,25 @@ suite "runFunction.nim":
   test "replace invalid p1":
     var parameters: seq[Value] = @[newValue(4),
       newValue(0), newValue(9), newValue("Eat the Sandwich")]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string")
     check testFunction("replace", parameters, eFunResult)
 
-  test "replace invalid p2":
+  test "replace invalid param 2":
     var parameters: seq[Value] = @[newValue("Earl Grey"),
       newValue("a"), newValue(9), newValue("Eat the Sandwich")]
-    let eFunResult = newFunResultWarn(kWrongType, 1, "int", "string")
+    let eFunResult = newFunResultWarn(kWrongType, 1, "int")
     check testFunction("replace", parameters, eFunResult)
 
   test "replace invalid p3":
     var parameters: seq[Value] = @[newValue("Earl Grey"),
       newValue(5), newValue("d"), newValue("Eat the Sandwich")]
-    let eFunResult = newFunResultWarn(kWrongType, 2, "int", "string")
+    let eFunResult = newFunResultWarn(kWrongType, 2, "int")
     check testFunction("replace", parameters, eFunResult)
 
   test "replace invalid p4":
     var parameters: seq[Value] = @[newValue("Earl Grey"),
       newValue(5), newValue(4), newValue(4.3)]
-    let eFunResult = newFunResultWarn(kWrongType, 3, "string", "float")
+    let eFunResult = newFunResultWarn(kWrongType, 3, "string")
     check testFunction("replace", parameters, eFunResult)
 
   test "replace start to small":
@@ -1022,17 +1022,17 @@ suite "runFunction.nim":
 
   test "path: wrong number of parameters":
     var parameters: seq[Value] = @[newValue("Earl Grey"), newValue("a"), newValue("a")]
-    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1", "3")
+    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1")
     check testFunction("path", parameters, eFunResult)
 
   test "path: wrong kind p1":
     var parameters: seq[Value] = @[newValue(12)]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string")
     check testFunction("path", parameters, eFunResult)
 
-  test "path: wrong kind p2":
+  test "path: wrong kind param 2":
     var parameters: seq[Value] = @[newValue("filename"), newValue(12)]
-    let eFunResult = newFunResultWarn(kWrongType, 1, "string", "int")
+    let eFunResult = newFunResultWarn(kWrongType, 1, "string")
     check testFunction("path", parameters, eFunResult)
 
   test "path: wrong kind separator":
@@ -1053,12 +1053,12 @@ suite "runFunction.nim":
 
   test "lower: wrong number of parameters":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1", "0")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1")
     check testFunction("lower", parameters, eFunResult)
 
   test "lower: wrong kind of parameter":
     var parameters: seq[Value] = @[newValue(2)]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string")
     check testFunction("lower", parameters, eFunResult)
 
   test "keys empty":
@@ -1078,12 +1078,12 @@ suite "runFunction.nim":
 
   test "keys: wrong number of parameters":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1", "0")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1")
     check testFunction("keys", parameters, eFunResult)
 
   test "keys: wrong kind of parameter":
     var parameters: seq[Value] = @[newValue(2)]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "dict", "int")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "dict")
     check testFunction("keys", parameters, eFunResult)
 
   test "values empty":
@@ -1103,12 +1103,12 @@ suite "runFunction.nim":
 
   test "values: wrong number of parameters":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1", "0")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1")
     check testFunction("values", parameters, eFunResult)
 
   test "values: wrong kind of parameter":
     var parameters: seq[Value] = @[newValue(2)]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "dict", "int")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "dict")
     check testFunction("values", parameters, eFunResult)
 
   test "sort empty":
@@ -1234,18 +1234,18 @@ suite "runFunction.nim":
 
   test "sort: wrong number of parameters":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "0")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2")
     check testFunction("sort", parameters, eFunResult)
 
   test "sort: not list":
     var parameters: seq[Value] = @[newValue(0), newValue("ascending")]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "list", "int")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "list")
     check testFunction("sort", parameters, eFunResult)
 
   test "sort: invalid order":
     let list = newValue([1])
     var parameters: seq[Value] = @[list, newValue(22)]
-    let eFunResult = newFunResultWarn(kWrongType, 1, "string", "int")
+    let eFunResult = newFunResultWarn(kWrongType, 1, "string")
     check testFunction("sort", parameters, eFunResult)
 
   test "sort: invalid order spelling":
@@ -1268,7 +1268,7 @@ suite "runFunction.nim":
       newValue("ascending"),
       newValue(2.2),
     ]
-    var eFunResult = newFunResultWarn(kWrongType, 2, "string", "float")
+    var eFunResult = newFunResultWarn(kWrongType, 2, "string")
     check testFunction("sort", parameters, eFunResult)
 
     parameters = @[
@@ -1329,12 +1329,12 @@ suite "runFunction.nim":
 
   test "githubAnchor: wrong number of parameters":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1", "0")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "1")
     check testFunction("githubAnchor", parameters, eFunResult)
 
   test "githubAnchor: wrong kind of parameter":
     var parameters: seq[Value] = @[newValue(2)]
-    let eFunResult = newFunResultWarn(kWrongType, 0, "string", "int")
+    let eFunResult = newFunResultWarn(kWrongType, 0, "string")
     check testFunction("githubAnchor", parameters, eFunResult)
 
   test "githubAnchor list":
@@ -1383,12 +1383,12 @@ suite "runFunction.nim":
 
   test "cmdVersion: two few parameters":
     let parameters = @[newValue("1.2.3")]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2", "1")
+    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2")
     check testFunction("cmpVersion", parameters, eFunResult)
 
   test "cmdVersion: two many parameters":
     let parameters = @[newValue("1.2.3"), newValue("1.2.3"), newValue("1.2.3")]
-    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "2", "3")
+    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "2")
     check testFunction("cmpVersion", parameters, eFunResult)
 
   test "cmdVersion: invalid version a":

@@ -315,8 +315,7 @@ proc substituteSegment(env: var Env, lineNum: Natural, variables: Variables,
       let valueStr = valueToStringRB(valueOrWarning.value)
       result = (segmentType, valueStr)
     else:
-      # The variable is missing. Write the original variable name
-      # text with spacing and brackets.
+      # The replacement variable doesn't exist: $1.
       env.warn(lineNum, wMissingReplacementVar, dotNameStr)
       result = (segmentType, segment[12 .. ^2])
   of endline:

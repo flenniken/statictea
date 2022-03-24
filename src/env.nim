@@ -97,7 +97,7 @@ proc outputWarning*(env: var Env, lineNum: Natural, message: string) =
     inc(env.warningWritten)
 
 proc warn*(env: var Env, lineNum: Natural, warning: Warning, p1:
-           string = "", p2: string = "") =
+           string = "") =
   ## Write a formatted warning message to the error stream.
 
   var filename = env.templateFilename
@@ -105,12 +105,12 @@ proc warn*(env: var Env, lineNum: Natural, warning: Warning, p1:
     filename = "unnamed"
     assert lineNum == 0
 
-  let message = getWarning(filename, lineNum, warning, p1, p2)
+  let message = getWarning(filename, lineNum, warning, p1)
   outputWarning(env, lineNum, message)
 
 proc warn*(env: var Env, lineNum: Natural, warningData: WarningData) =
   ## Write a formatted warning message to the error stream.
-  warn(env, lineNum, warningData.warning, warningData.p1, warningData.p2)
+  warn(env, lineNum, warningData.warning, warningData.p1)
 
 func formatDateTime*(dt: DateTime): string =
   ## Return a formatted time stamp for the log.
@@ -158,8 +158,8 @@ proc checkLogSize(env: var Env) =
   if env.logFile != nil:
     let logSize = env.logFile.getFileSize()
     if logSize > logWarnSize:
-      let numStr = insertSep($logSize, ',')
-      env.warn(0, wBigLogFile, env.logFilename, numStr)
+      # The log file is over 1 GB.
+      env.warn(0, wBigLogFile)
 
 proc openLogFile(env: var Env, logFilename: string) =
   ## Open the log file and update the environment. If the log file

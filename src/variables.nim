@@ -70,10 +70,10 @@ func `==`*(s1: ParentDict, s2: ParentDict): bool =
       if s1.warningData == s2.warningData:
         result = true
 
-func newParentDictWarn*(warning: Warning, p1: string = "", p2: string = ""): ParentDict =
+func newParentDictWarn*(warning: Warning, p1: string = ""): ParentDict =
   ## Return a new ParentDict object of the warning kind. It contains a
   ## warning and the two optional strings that go with the warning.
-  let warningData = newWarningData(warning, p1, p2)
+  let warningData = newWarningData(warning, p1)
   result = ParentDict(kind: fdWarning, warningData: warningData)
 
 func newParentDict*(dict: VarsDict): ParentDict =

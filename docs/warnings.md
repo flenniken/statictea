@@ -28,7 +28,6 @@ Warning number and optional extra strings.
 WarningData = object
   warning*: Warning          ## Message id.
   p1*: string                ## Optional warning info.
-  p2*: string                ## Optional warning info.
 
 ```
 
@@ -38,7 +37,7 @@ Return a formatted warning line.
 
 ```nim
 func getWarning(filename: string; lineNum: int; warning: Warning;
-                p1: string = ""; p2: string = ""): string
+                p1: string = ""): string
 ```
 
 # newWarningData
@@ -46,7 +45,7 @@ func getWarning(filename: string; lineNum: int; warning: Warning;
 Create a WarningData object containing the warning information.
 
 ```nim
-proc newWarningData(warning: Warning; p1: string = ""; p2: string = ""): WarningData
+proc newWarningData(warning: Warning; p1: string = ""): WarningData
 ```
 
 # `$`

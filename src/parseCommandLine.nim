@@ -77,7 +77,7 @@ proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
 
   if ArgsOrMessage.kind == cmlMessageKind:
     let messageId = mapCmlMessages(ArgsOrMessage.messageId)
-    let warningData = newWarningData(messageId, ArgsOrMessage.problemParam, "")
+    let warningData = newWarningData(messageId, ArgsOrMessage.problemParam)
     return newArgsOrWarning(warningData)
 
   # Convert the cmlArgs to Args

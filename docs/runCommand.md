@@ -74,7 +74,7 @@ Show an invalid statement with a pointer pointing at the start of the problem. L
 
 ```nim
 proc warnStatement(env: var Env; statement: Statement; warning: Warning;
-                   start: Natural; p1: string = ""; p2: string = "")
+                   start: Natural; p1: string = "")
 ```
 
 # `==`
@@ -132,8 +132,7 @@ proc getNumber(env: var Env; statement: Statement; start: Natural): Option[
 Collect the function parameters then call it and return the function's value and the position after trailing whitespace. Start points at the first parameter.
 
 ```nim
-proc getFunctionValue(env: var Env; prepostTable: PrepostTable;
-                      functionName: string; statement: Statement;
+proc getFunctionValue(env: var Env; functionName: string; statement: Statement;
                       start: Natural; variables: Variables; list = false): Option[
     ValueAndLength]
 ```
@@ -143,8 +142,7 @@ proc getFunctionValue(env: var Env; prepostTable: PrepostTable;
 Return the statement's right hand side value and the length matched. The right hand side must be a variable a function or a list. The right hand side starts at the index specified by start.
 
 ```nim
-proc getVarOrFunctionValue(env: var Env; prepostTable: PrepostTable;
-                           statement: Statement; start: Natural;
+proc getVarOrFunctionValue(env: var Env; statement: Statement; start: Natural;
                            variables: Variables): Option[ValueAndLength]
 ```
 
@@ -153,8 +151,7 @@ proc getVarOrFunctionValue(env: var Env; prepostTable: PrepostTable;
 Run one statement and assign a variable. Return the variable dot name string and value.
 
 ```nim
-proc runStatement(env: var Env; statement: Statement;
-                  prepostTable: PrepostTable; variables: var Variables): Option[
+proc runStatement(env: var Env; statement: Statement; variables: var Variables): Option[
     VariableData]
 ```
 
@@ -163,8 +160,7 @@ proc runStatement(env: var Env; statement: Statement;
 Run a command and fill in the variables dictionaries.
 
 ```nim
-proc runCommand(env: var Env; cmdLines: CmdLines; prepostTable: PrepostTable;
-                variables: var Variables)
+proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables)
 ```
 
 

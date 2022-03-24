@@ -15,7 +15,7 @@ suite "opresultwarn.nim":
     check opResultWarn.isValue == false
     check opResultWarn.isMessage == true
     check opResultWarn.message == newWarningData(wSuccess)
-    check $opResultWarn == "Message: wSuccess(-, -)"
+    check $opResultWarn == "Message: wSuccess(-)"
 
   test "OpResultWarn new value":
     var opResultWarn = opValueW[string]("hello")
@@ -26,7 +26,7 @@ suite "opresultwarn.nim":
   test "OpResultWarn new message id":
     var opResultWarn = opMessageW[string](newWarningData(wSuccess))
     check opResultWarn.isMessage == true
-    check $opResultWarn == "Message: wSuccess(-, -)"
+    check $opResultWarn == "Message: wSuccess(-)"
 
   test "OpResultWarn new value int":
     var opResultWarn = opValueW[int](3)
@@ -37,7 +37,7 @@ suite "opresultwarn.nim":
   test "OpResultWarn new message":
     var opResultWarn = opMessageW[int](newWarningData(wUnknownArg))
     check opResultWarn.isMessage == true
-    check $opResultWarn == "Message: wUnknownArg(-, -)"
+    check $opResultWarn == "Message: wUnknownArg(-)"
 
   test "opValueW my obj":
     let myObj = MyObjTest3(name: "test", size: 12)
