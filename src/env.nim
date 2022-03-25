@@ -92,7 +92,7 @@ proc outputWarning*(env: var Env, lineNum: Natural, message: string) =
     if filename == "":
       filename = "unnamed"
 
-    let message = getWarning(filename, lineNum, kMaxWarnings)
+    let message = getWarningLine(filename, lineNum, kMaxWarnings)
     env.errStream.writeLine(message)
     inc(env.warningWritten)
 
@@ -105,7 +105,7 @@ proc warn*(env: var Env, lineNum: Natural, warning: Warning, p1:
     filename = "unnamed"
     assert lineNum == 0
 
-  let message = getWarning(filename, lineNum, warning, p1)
+  let message = getWarningLine(filename, lineNum, warning, p1)
   outputWarning(env, lineNum, message)
 
 proc warn*(env: var Env, lineNum: Natural, warningData: WarningData) =

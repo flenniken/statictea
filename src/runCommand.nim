@@ -116,7 +116,7 @@ proc warnStatement*(env: var Env, statement: Statement, warning:
 $1
 statement: $2
            $3""" % [
-    getWarning(env.templateFilename, statement.lineNum, warning, p1),
+    getWarningLine(env.templateFilename, statement.lineNum, warning, p1),
     fragment,
     startColumn(pointerPos)
   ]

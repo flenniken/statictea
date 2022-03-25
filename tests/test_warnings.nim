@@ -4,7 +4,7 @@ import std/strformat
 import messages
 import warnings
 
-{. hint: & "hello" .}
+{. hint: & "my special hint" .}
 
 func countLetter(message: string, letter: char): int =
   ## Count the number of times letter is used in the given string.
@@ -26,21 +26,25 @@ suite "warnings.nim":
     check countLetter("22342", '2') == 3
     check countLetter("222", '2') == 3
 
-  test "getWarning 0":
-    let warning = getWarning("starting", 0, wSuccess)
+  test "getWarningLine 0":
+    let warning = getWarningLine("starting", 0, wSuccess)
     check warning == "starting(0): w0: Success."
 
-  test "getWarning":
-    let warning = getWarning("starting", 5, wNoFilename, p1="server")
+  test "getWarningLine":
+    let warning = getWarningLine("starting", 5, wNoFilename, p1="server")
     check warning == "starting(5): w133: No server filename."
 
-  test "getWarning-file-line":
-    let warning = getWarning("tea.html", 23, wNoFilename, p1="server")
+  test "getWarningLine-file-line":
+    let warning = getWarningLine("tea.html", 23, wNoFilename, p1="server")
     check warning == "tea.html(23): w133: No server filename."
 
-  test "getWarning-one-p":
-    let warning = getWarning("tea.html", 23, wUnknownArg, "missing")
+  test "getWarningLine-one-p":
+    let warning = getWarningLine("tea.html", 23, wUnknownArg, "missing")
     check warning == "tea.html(23): w2: Unknown argument: missing."
+
+  test "string rep":
+    let warning = newWarningData(wUnknownArg, "p1", 5)
+    check $warning == "wUnknownArg(p1):5"
 
   test "warningsList":
     for message in Messages:

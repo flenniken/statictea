@@ -22,4 +22,4 @@ suite "tostring.nim":
 
   test "ValueOrWarning string":
     check $newValueOrWarning(newValue(2)) == "2"
-    check $newValueOrWarning(wInvalidJsonRoot) == "wInvalidJsonRoot(-)"
+    check $newValueOrWarning(wInvalidJsonRoot) == "wInvalidJsonRoot(-):0"
