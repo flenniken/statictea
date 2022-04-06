@@ -291,7 +291,7 @@ ending code marker go in the file, even lines that look like commands.
 
 The expected line compares files. You specify two files that should be
 equal.  The compares are run after running the commands. You can use
-the work "empty" for in place of a filename when you expect the file
+the word "empty" for in place of a filename when you expect the file
 to be empty. A line that starts with "### Expected " must be an
 expected line.
 

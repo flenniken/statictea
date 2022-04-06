@@ -87,7 +87,7 @@ func bytesToString*(buffer: openArray[uint8|char]): string =
     result.add((char)buffer[ix])
 
 func parseHexUnicode16*(text: string, start: Natural): OpResultId[uint32] =
-  ## Return the unicode number given a 4 character unicode escape
+  ## Return the unicode code point given a 4 character unicode escape
   ## string like u1234. Start is pointing at the u. On error, return a
   ## message id telling what went wrong.
 
@@ -117,7 +117,7 @@ func parseHexUnicode16*(text: string, start: Natural): OpResultId[uint32] =
   result = opValue[uint32](uint32(num))
 
 func parseHexUnicode*(text: string, pos: var Natural): OpResultId[uint32] =
-  ## Return the unicode number given a 4 or 8 character unicode escape
+  ## Return the unicode code point given a 4 or 8 character unicode escape
   ## string. For example like u1234 or u1234\u1234. Advance the pos
   ## past the end of the escape string. Pos is initially pointing at
   ## the u. On error, return the message id telling what went wrong

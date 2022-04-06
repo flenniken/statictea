@@ -16,7 +16,6 @@ type
     log*: bool
     serverList*: seq[string]
     sharedList*: seq[string]
-    # todo: we only support one template, should be a string not a list.
     templateFilename*: string
     prepostList*: seq[Prepost]
     resultFilename*: string

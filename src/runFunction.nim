@@ -723,7 +723,7 @@ func funInt_sosi*(parameters: seq[Value]): FunResult =
 
 func funFind*(parameters: seq[Value]): FunResult =
   ## Find the position of a substring in a string.  When the substring
-  ## @:is not found you can return a default value.  A warning is
+  ## @:is not found, return an optional default value.  A warning is
   ## @:generated when the substring is missing and you don't specify a
   ## @:default value.
   ## @:
@@ -1613,7 +1613,7 @@ proc getFunction*(functionName: string, parameters: seq[Value]): Option[Function
         maxDistance = funResult.parameter
         maxFunctionSpec = functionSpec
     # Return the function that made if farthest through its
-    # mapParameters.
+    # parameters.
     result = some(maxFunctionSpec)
 
 proc isFunctionName*(functionName: string): bool =

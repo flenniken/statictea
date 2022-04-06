@@ -11,7 +11,7 @@ type
     ## Warning data.
     warning*: Warning ## Message id.
     p1*: string ## Optional extra warning string.
-    pos*: Natural ## Position in the statement.
+    pos*: Natural ## Position in the statement where the problem was detected.
 
 func getWarningLine*(filename: string, lineNum: int,
     warning: Warning, p1 = ""): string =

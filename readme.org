@@ -468,7 +468,7 @@ From left to right a command line consists of:
 - an optional postfix
 - the end of line, either \r\n or \n.
 
-Here is another chart showing line components and where spaces
+Here is a chart showing line components and where spaces
 are allowed:
 
 #+BEGIN_SRC
