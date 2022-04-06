@@ -103,7 +103,7 @@ suite "variables.nim":
     check testGetVariableOk(variables, "l.a", """{"b":{"c":{}}}""")
     check testGetVariableOk(variables, "l", """{"a":{"b":{"c":{}}}}""")
 
-    let wO = newWarningData(wMissingVarName, "hello")
+    let wO = newWarningData(wVariableMissing, "hello")
     check testGetVariableWarning(variables, "hello", wO)
 
 
@@ -127,14 +127,14 @@ suite "variables.nim":
     let eWarningData = newWarningData(wReservedNameSpaces)
     check testGetVariableWarning(variables, "p", eWarningData)
 
-  test "testGetVariableWarning wMissingVarName":
+  test "testGetVariableWarning wVariableMissing":
     var variables = emptyVariables()
-    let eWarningData = newWarningData(wMissingVarName, "hello")
+    let eWarningData = newWarningData(wVariableMissing, "hello")
     check testGetVariableWarning(variables, "s.hello", eWarningData)
 
-  test "testGetVariableWarning wMissingVarName 2":
+  test "testGetVariableWarning wVariableMissing 2":
     var variables = emptyVariables()
-    let eWarningData = newWarningData(wMissingVarName, "d")
+    let eWarningData = newWarningData(wVariableMissing, "d")
     check testGetVariableWarning(variables, "s.d.hello", eWarningData)
 
   test "testGetVariableWarning not dict":
@@ -272,8 +272,8 @@ suite "variables.nim":
     for letterVar in ["a", "b", "c", "d", "e", "v", "w", "x", "y", "z"]:
       check testAssignVariable(letterVar, newValue(1))
 
-  test "assignVariable wMissingVarName":
-    let eWarningDataO = some(newWarningData(wMissingVarName, "w"))
+  test "assignVariable wVariableMissing":
+    let eWarningDataO = some(newWarningData(wVariableMissing, "w"))
     check testAssignVariable("w.hello", newValue(1), eWarningDataO)
 
   test "assignVariable wImmutableVars":
@@ -387,7 +387,7 @@ suite "variables.nim":
     check testAssignVariable(variables, "l.a.b", newValue(1),
       warning1, "&=")
 
-    let eWarningDataO = some(newWarningData(wMissingVarName, "missing"))
+    let eWarningDataO = some(newWarningData(wVariableMissing, "missing"))
     check testAssignVariable(variables, "l.a.b.missing.tea",
                              newValue(1), eWarningDataO)
 

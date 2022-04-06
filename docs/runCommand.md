@@ -1,6 +1,6 @@
 # runCommand.nim
 
-Run a command.
+Run a command and fill in the variables dictionaries.
 
 * [runCommand.nim](../src/runCommand.nim) &mdash; Nim source code.
 # Index
@@ -26,7 +26,7 @@ starts in the template file.
 * [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
 * [getFunctionValue](#getfunctionvalue) &mdash; Collect the function parameters then call it and return the function's value and the position after trailing whitespace.
 * [getVarOrFunctionValue](#getvarorfunctionvalue) &mdash; Return the statement's right hand side value and the length matched.
-* [runStatement](#runstatement) &mdash; Run one statement and assign a variable.
+* [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 
 # Statement
@@ -170,7 +170,7 @@ proc newValueAndLength(value: Value; length: Natural): ValueAndLength
 
 # yieldStatements
 
-Iterate through the command's statements.  Statements are separated by newlines and are not empty or all spaces.
+Iterate through the command's statements. Skip blank statements.
 
 ```nim
 iterator yieldStatements(cmdLines: CmdLines): Statement
@@ -206,7 +206,7 @@ proc getFunctionValue(functionName: string; statement: Statement;
 
 # getVarOrFunctionValue
 
-Return the statement's right hand side value and the length matched. The right hand side must be a variable a function or a list. The right hand side starts at the index specified by start.
+Return the statement's right hand side value and the length matched. The right hand side must be a variable, a function or a list. The right hand side starts in the statement at start.
 
 ```nim
 proc getVarOrFunctionValue(statement: Statement; start: Natural;
@@ -215,7 +215,7 @@ proc getVarOrFunctionValue(statement: Statement; start: Natural;
 
 # runStatement
 
-Run one statement and assign a variable. Return the variable dot name string and value.
+Run one statement and return the variable dot name string, operator and value.
 
 ```nim
 proc runStatement(statement: Statement; variables: var Variables): OpResultWarn[

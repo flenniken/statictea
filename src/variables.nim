@@ -184,8 +184,8 @@ proc getParentDictToAddTo(variables: Variables, dotNameStr: string): ParentDict 
   # Loop through the dictionaries looking up each sub dict.
   for name in dictNames:
     if not (name in parentDict):
-      # Name doesn't exist in the parent dictionary. # wMissingVarName
-      return newParentDictWarn(wMissingVarName, name)
+      # Name doesn't exist in the parent dictionary. # wVariableMissing
+      return newParentDictWarn(wVariableMissing, name)
     if parentDict[name].kind != vkDict:
       # "Name, $1, is not a dictionary.", # wNotDict
       return newParentDictWarn(wNotDict, name)
@@ -315,7 +315,7 @@ func lookUpVar(variables: Variables, names: seq[string]): ValueOrWarning =
   while true:
     let name = names[ix]
     if not (name in next):
-      return newValueOrWarning(wMissingVarName, name)
+      return newValueOrWarning(wVariableMissing, name)
     let value = next[name]
     inc(ix)
     if ix >= names.len:

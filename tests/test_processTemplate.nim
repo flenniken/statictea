@@ -628,7 +628,7 @@ Hello {s.name}!
 Hello World!
 """
     let eErrLines = splitNewLines """
-template.html(1): w102: Name, y, doesn't exist in the parent dictionary.
+template.html(1): w36: The variable 'y' does not exist.
 statement: y.var = "something"
            ^
 """

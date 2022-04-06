@@ -1,4 +1,4 @@
-## Run a command.
+## Run a command and fill in the variables dictionaries.
 
 import std/options
 import std/strUtils
@@ -18,10 +18,6 @@ import collectCommand
 import opresultwarn
 
 type
-  State = enum
-    ## Finite state machine states for finding statements.
-    start, double, single, slashdouble, slashsingle
-
   # todo: what is the maximum statement length?
   Statement* = object
     ## A Statement object stores the statement text and where it
@@ -160,8 +156,12 @@ proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
   result = ValueAndLength(value: value, length: length)
 
 iterator yieldStatements*(cmdLines: CmdLines): Statement =
-  ## Iterate through the command's statements.  Statements are
-  ## separated by newlines and are not empty or all spaces.
+  ## Iterate through the command's statements. Skip blank statements.
+
+  type
+    State {.pure.} = enum
+      ## Finite state machine states for finding statements.
+      start, double
 
   # Find the statements in the list of command lines.  Statements may
   # continue between them. A statement continues when there is a plus
@@ -255,7 +255,13 @@ proc getNumber*(statement: Statement, start: Natural):
 proc getValue(statement: Statement, start: Natural, variables:
     Variables): OpResultWarn[ValueAndLength]
 
-# todo: why is "variables" passed in?
+# Call chain:
+# - runStatement
+# - getValue
+# - getVarOrFunctionValue
+# - getFunctionValue
+# - getValue
+
 proc getFunctionValue*(
     functionName: string,
     statement: Statement,
@@ -328,64 +334,69 @@ proc getFunctionValue*(
 proc getVarOrFunctionValue*(statement: Statement, start: Natural,
     variables: Variables): OpResultWarn[ValueAndLength] =
   ## Return the statement's right hand side value and the length
-  ## matched. The right hand side must be a variable a function or a
-  ## list. The right hand side starts at the index specified by start.
+  ## matched. The right hand side must be a variable, a function or a
+  ## list. The right hand side starts in the statement at start.
 
-  # Get the variable or function name. Match the surrounding white space.
-  let matches0 = matchDotNames(statement.text, start)
-  assert matches0.isSome
-  let matches = matches0.get()
+  # Get the variable or function name. Match the surrounding white
+  # space.
+  let dotNameStrO = matchDotNames(statement.text, start)
+  assert dotNameStrO.isSome
+  let matches = dotNameStrO.get()
   let (_, dotNameStr) = matches.get2Groups()
+  let nameLength = matches.length
 
   # Look for a function. A function name looks like a variable
   # followed by a left parentheses. No space is allowed between the
   # function name and the left parentheses.
-  let parenthesesO = matchLeftParentheses(statement.text, start+matches.length)
+  let parenthesesO = matchLeftParentheses(statement.text, start+nameLength)
   if parenthesesO.isSome:
     # We have a function, run it and return its value.
 
+    # Make sure the function exists.
     var functionName = dotNameStr
-
     if not isFunctionName(functionName):
       # The function does not exist: $1.
       return newValueAndLengthOr(wInvalidFunction, functionName, start)
 
+    # Get the function's value and length.
     let parentheses = parenthesesO.get()
     let funValueLengthOr = getFunctionValue(functionName, statement,
-      start+matches.length+parentheses.length, variables)
+      start+nameLength+parentheses.length, variables)
     if funValueLengthOr.isMessage:
       return funValueLengthOr
     let funValueLength = funValueLengthOr.value
 
+    # Return the value and length.
     let valueAndLength = newValueAndLength(funValueLength.value,
-      matches.length+parentheses.length+funValueLength.length)
+      nameLength+parentheses.length+funValueLength.length)
     result = newValueAndLengthOr(valueAndLength.value, valueAndLength.length)
   else:
-    # We have a variable, look it up and return its value.  Show a
-    # warning when the variable doesn't exist.
+    # We have a variable, look it up and return its value.
     let valueOrWarning = getVariable(variables, dotNameStr)
     if valueOrWarning.kind == vwWarning:
-      # todo: show the message returned by getVariable instead?
-      # The variable '$1' does not exist.
-      return newValueAndLengthOr(wVariableMissing, dotNameStr, start)
+      return newValueAndLengthOr(valueOrWarning.warningData.warning,
+        valueOrWarning.warningData.p1, start)
 
-    result = newValueAndLengthOr(valueOrWarning.value, matches.length)
+    result = newValueAndLengthOr(valueOrWarning.value, nameLength)
 
 proc getList(statement: Statement, start: Natural,
     variables: Variables): OpResultWarn[ValueAndLength] =
   ## Return the literal list value and match length from the
   ## statement. The start index points at [.
 
+  # Match the left bracket and whitespace.
   let startSymbolO = matchSymbol(statement.text, gLeftBracket, start)
   assert startSymbolO.isSome
   let startSymbol = startSymbolO.get()
 
+  # Get the list.
   let funValueLengthOr = getFunctionValue("list", statement,
     start+startSymbol.length, variables, true)
   if funValueLengthOr.isMessage:
     return funValueLengthOr
   let funValueLength = funValueLengthOr.value
 
+  # Return the value and length.
   let valueAndLength = newValueAndLength(funValueLength.value,
     funValueLength.length+startSymbol.length)
   result = newValueAndLengthOr(valueAndLength)
@@ -409,7 +420,6 @@ proc getValue(statement: Statement, start: Natural, variables:
     return newValueAndLengthOr(wInvalidRightHandSide, "", start)
 
   let char = statement.text[start]
-
   if char == '"':
     result = getString(statement, start)
   elif char in {'0' .. '9', '-'}:
@@ -422,26 +432,17 @@ proc getValue(statement: Statement, start: Natural, variables:
     # Expected a string, number, variable, list or function.
     return newValueAndLengthOr(wInvalidRightHandSide, "", start)
 
-# Call chain:
-# - runStatement
-# - getValue
-# - getVarOrFunctionValue
-# - getFunctionValue
-# - getValue
-# example: a = list(1, "2", len(b), d.a, cmp(5, len("abc")))
-# Each function matches the trailing whitespace.
+proc runStatement*(statement: Statement, variables: var Variables):
+    OpResultWarn[VariableData] =
+  ## Run one statement and return the variable dot name string,
+  ## operator and value.
 
-proc runStatement*(statement: Statement,
-    variables: var Variables): OpResultWarn[VariableData] =
-  ## Run one statement and assign a variable. Return the variable dot
-  ## name string and value.
-
-  # Get the variable dot name string and match the surrounding white space.
+  # Get the variable dot name string and match the surrounding white
+  # space.
   let dotNameMatchesO = matchDotNames(statement.text, 0)
   if not isSome(dotNameMatchesO):
     # Statement does not start with a variable name.
     return newVariableDataOr(wMissingStatementVar)
-
   let dotNameMatches = dotNameMatchesO.get()
   let (_, dotNameStr) = dotNameMatches.get2Groups()
 
