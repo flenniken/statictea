@@ -572,7 +572,7 @@ func funInt_sosi(parameters: seq[Value]): FunResult
 # funFind
 
 Find the position of a substring in a string.  When the substring
-is not found you can return a default value.  A warning is
+is not found, return an optional default value.  A warning is
 generated when the substring is missing and you don't specify a
 default value.
 

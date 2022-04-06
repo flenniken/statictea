@@ -19,7 +19,8 @@ StaticTea variable types.
 * [newValue](#newvalue-5) &mdash; Create a dictionary value from a VarsDict.
 * [newValue](#newvalue-6) &mdash; New value from an existing value.
 * [newValue](#newvalue-7) &mdash; New list value from an array of items of the same kind.
-* [newValue](#newvalue-8) &mdash; New dict value from an array of pairs where the pairs are the same type (may be Value type).
+* [newValue](#newvalue-8) &mdash; New dict value from an array of pairs where the pairs are the
+same type (may be Value type).
 * [newEmptyListValue](#newemptylistvalue) &mdash; Return an empty list value.
 * [newEmptyDictValue](#newemptydictvalue) &mdash; Create a dictionary value from a VarsDict.
 * [`==`](#) &mdash; Return true when two values are equal.
@@ -161,7 +162,8 @@ proc newValue[T](list: openArray[T]): Value
 
 # newValue
 
-New dict value from an array of pairs where the pairs are the same type (may be Value type).
+New dict value from an array of pairs where the pairs are the
+same type (may be Value type).
 
  let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
  let dictValue = newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)])

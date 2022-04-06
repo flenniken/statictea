@@ -107,7 +107,7 @@ func signatureCodeToParams(signatureCode: string): Option[seq[Param]]
 
 # mapParameters
 
-Create a dictionary of the parameters. The parameter names are the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the parameters to not match the signature.  The last signature param is for the return type.
+Create a dictionary of the parameters. The parameter names are the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the parameters do not match the signature.  The last signature param is for the return type.
 
 ```nim
 func mapParameters(params: seq[Param]; args: seq[Value]): FunResult
