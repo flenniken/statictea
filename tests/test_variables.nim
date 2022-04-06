@@ -314,6 +314,10 @@ suite "variables.nim":
     let eWarningDataO = some(newWarningData(wReadOnlyTeaVar, "version"))
     check testAssignVariable("t.version", newValue(1), eWarningDataO)
 
+  test "assignVariable missing tea var":
+    let eWarningDataO = some(newWarningData(wInvalidTeaVar, "missing"))
+    check testAssignVariable("t.missing", newValue(1), eWarningDataO)
+
   test "assignVariable args help":
     let eWarningDataO = some(newWarningData(wReadOnlyTeaVar, "args"))
     check testAssignVariable("t.args.help", newValue(1), eWarningDataO)

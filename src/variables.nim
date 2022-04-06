@@ -34,6 +34,7 @@ type
     ## variable is stored, i.e.: l.d.a
     dotNameStr*: string
     value*: Value
+    operator*: string # = or &=
 
   ParentDictKind* = enum
     ## The kind of a ParentDict object, either a dict or warning.
@@ -104,9 +105,10 @@ func emptyVariables*(server: VarsDict = nil, shared: VarsDict = nil,
     tea["args"] = newValue(args)
   result["t"] = newValue(tea)
 
-func newVariableData*(dotNameStr: string, value: Value): VariableData =
+func newVariableData*(dotNameStr: string, operator: string, value: Value):
+     VariableData =
   ## Create a new VariableData object.
-  result = VariableData(dotNameStr: dotNameStr, value: value)
+  result = VariableData(dotNameStr: dotNameStr, operator: operator, value: value)
 
 func getTeaVarIntDefault*(variables: Variables, varName: string): int64 =
   ## Return the int value of one of the tea dictionary integer

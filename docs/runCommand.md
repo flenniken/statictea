@@ -8,8 +8,15 @@ Run a command.
 * type: [Statement](#statement) &mdash; A Statement object stores the statement text and where it
 starts in the template file.
 * type: [ValueAndLength](#valueandlength) &mdash; A value and the length of the matching text in the statement.
+* [newValueAndLengthOr](#newvalueandlengthor) &mdash; Create a OpResultWarn[ValueAndLength] warning.
+* [newValueAndLengthOr](#newvalueandlengthor-1) &mdash; Create a OpResultWarn[ValueAndLength] value.
+* [newValueAndLengthOr](#newvalueandlengthor-2) &mdash; Create a OpResultWarn[ValueAndLength].
+* [newVariableDataOr](#newvariabledataor) &mdash; Create a OpResultWarn[VariableData] warning.
+* [newVariableDataOr](#newvariabledataor-1) &mdash; Create a OpResultWarn[VariableData] warning.
+* [newVariableDataOr](#newvariabledataor-2) &mdash; Create a OpResultWarn[VariableData] value.
 * [newStatement](#newstatement) &mdash; Create a new statement.
 * [startColumn](#startcolumn) &mdash; Return enough spaces to point at the warning column.
+* [getWarnStatement](#getwarnstatement) &mdash; Return a multiline error message.
 * [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
 * [`==`](#) &mdash; Return true when the two statements are equal.
 * [`$`](#-1) &mdash; Return a string representation of a Statement.
@@ -52,6 +59,58 @@ ValueAndLength = object
 
 ```
 
+# newValueAndLengthOr
+
+Create a OpResultWarn[ValueAndLength] warning.
+
+```nim
+func newValueAndLengthOr(warning: Warning; p1 = ""; pos = 0): OpResultWarn[
+    ValueAndLength]
+```
+
+# newValueAndLengthOr
+
+Create a OpResultWarn[ValueAndLength] value.
+
+```nim
+func newValueAndLengthOr(value: Value; length: Natural): OpResultWarn[
+    ValueAndLength]
+```
+
+# newValueAndLengthOr
+
+Create a OpResultWarn[ValueAndLength].
+
+```nim
+func newValueAndLengthOr(val: ValueAndLength): OpResultWarn[ValueAndLength]
+```
+
+# newVariableDataOr
+
+Create a OpResultWarn[VariableData] warning.
+
+```nim
+func newVariableDataOr(warning: Warning; p1 = ""; pos = 0): OpResultWarn[
+    VariableData]
+```
+
+# newVariableDataOr
+
+Create a OpResultWarn[VariableData] warning.
+
+```nim
+func newVariableDataOr(warningData: WarningData): OpResultWarn[VariableData]
+```
+
+# newVariableDataOr
+
+Create a OpResultWarn[VariableData] value.
+
+```nim
+func newVariableDataOr(dotNameStr: string; operator = "="; value: Value): OpResultWarn[
+    VariableData]
+```
+
 # newStatement
 
 Create a new statement.
@@ -68,13 +127,21 @@ Return enough spaces to point at the warning column.  Used under the statement l
 proc startColumn(start: Natural): string
 ```
 
+# getWarnStatement
+
+Return a multiline error message.
+
+```nim
+proc getWarnStatement(statement: Statement; warningData: WarningData;
+                      templateFilename: string): string
+```
+
 # warnStatement
 
 Show an invalid statement with a pointer pointing at the start of the problem. Long statements are trimmed around the problem area.
 
 ```nim
-proc warnStatement(env: var Env; statement: Statement; warning: Warning;
-                   start: Natural; p1: string = "")
+proc warnStatement(env: var Env; statement: Statement; warningData: WarningData)
 ```
 
 # `==`
@@ -114,7 +181,7 @@ iterator yieldStatements(cmdLines: CmdLines): Statement
 Return a literal string value and match length from a statement. The start parameter is the index of the first quote in the statement and the return length includes optional trailing white space after the last quote.
 
 ```nim
-proc getString(env: var Env; statement: Statement; start: Natural): Option[
+func getString(statement: Statement; start: Natural): OpResultWarn[
     ValueAndLength]
 ```
 
@@ -123,7 +190,7 @@ proc getString(env: var Env; statement: Statement; start: Natural): Option[
 Return the literal number value and match length from the statement. The start index points at a digit or minus sign.
 
 ```nim
-proc getNumber(env: var Env; statement: Statement; start: Natural): Option[
+proc getNumber(statement: Statement; start: Natural): OpResultWarn[
     ValueAndLength]
 ```
 
@@ -132,8 +199,8 @@ proc getNumber(env: var Env; statement: Statement; start: Natural): Option[
 Collect the function parameters then call it and return the function's value and the position after trailing whitespace. Start points at the first parameter.
 
 ```nim
-proc getFunctionValue(env: var Env; functionName: string; statement: Statement;
-                      start: Natural; variables: Variables; list = false): Option[
+proc getFunctionValue(functionName: string; statement: Statement;
+                      start: Natural; variables: Variables; list = false): OpResultWarn[
     ValueAndLength]
 ```
 
@@ -142,8 +209,8 @@ proc getFunctionValue(env: var Env; functionName: string; statement: Statement;
 Return the statement's right hand side value and the length matched. The right hand side must be a variable a function or a list. The right hand side starts at the index specified by start.
 
 ```nim
-proc getVarOrFunctionValue(env: var Env; statement: Statement; start: Natural;
-                           variables: Variables): Option[ValueAndLength]
+proc getVarOrFunctionValue(statement: Statement; start: Natural;
+                           variables: Variables): OpResultWarn[ValueAndLength]
 ```
 
 # runStatement
@@ -151,7 +218,7 @@ proc getVarOrFunctionValue(env: var Env; statement: Statement; start: Natural;
 Run one statement and assign a variable. Return the variable dot name string and value.
 
 ```nim
-proc runStatement(env: var Env; statement: Statement; variables: var Variables): Option[
+proc runStatement(statement: Statement; variables: var Variables): OpResultWarn[
     VariableData]
 ```
 

@@ -48,6 +48,7 @@ A variable name and value. The dotNameStr tells where the variable is stored, i.
 VariableData = object
   dotNameStr*: string
   value*: Value
+  operator*: string
 
 ```
 
@@ -122,7 +123,7 @@ func emptyVariables(server: VarsDict = nil; shared: VarsDict = nil;
 Create a new VariableData object.
 
 ```nim
-func newVariableData(dotNameStr: string; value: Value): VariableData
+func newVariableData(dotNameStr: string; operator: string; value: Value): VariableData
 ```
 
 # getTeaVarIntDefault

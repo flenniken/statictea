@@ -1,13 +1,14 @@
 # warnings.nim
 
-The warning messages.
+Module for handling warnings.
 
 * [warnings.nim](../src/warnings.nim) &mdash; Nim source code.
 # Index
 
 * type: [Warning](#warning) &mdash; Warning message id.
-* type: [WarningData](#warningdata) &mdash; Warning number and optional extra strings.
-* [getWarning](#getwarning) &mdash; Return a formatted warning line.
+* type: [WarningData](#warningdata) &mdash; Warning data.
+* [getWarningLine](#getwarningline) &mdash; Return a formatted warning line.
+* [getWarningLine](#getwarningline-1) &mdash; Return a formatted warning line.
 * [newWarningData](#newwarningdata) &mdash; Create a WarningData object containing the warning information.
 * [`$`](#) &mdash; Return a string representation of WarningData.
 * [`==`](#-1) &mdash; Return true when the two WarningData are equal.
@@ -22,22 +23,30 @@ Warning = MessageId
 
 # WarningData
 
-Warning number and optional extra strings.
+Warning data.
 
 ```nim
 WarningData = object
   warning*: Warning          ## Message id.
-  p1*: string                ## Optional warning info.
+  p1*: string                ## Optional extra warning string.
+  pos*: Natural              ## Position in the statement.
 
 ```
 
-# getWarning
+# getWarningLine
 
 Return a formatted warning line.
 
 ```nim
-func getWarning(filename: string; lineNum: int; warning: Warning;
-                p1: string = ""): string
+func getWarningLine(filename: string; lineNum: int; warning: Warning; p1 = ""): string
+```
+
+# getWarningLine
+
+Return a formatted warning line.
+
+```nim
+func getWarningLine(filename: string; lineNum: int; warningData: WarningData): string
 ```
 
 # newWarningData
@@ -45,7 +54,7 @@ func getWarning(filename: string; lineNum: int; warning: Warning;
 Create a WarningData object containing the warning information.
 
 ```nim
-proc newWarningData(warning: Warning; p1: string = ""): WarningData
+proc newWarningData(warning: Warning; p1 = ""; pos = 0): WarningData
 ```
 
 # `$`

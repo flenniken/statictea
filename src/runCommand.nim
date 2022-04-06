@@ -15,6 +15,7 @@ import funtypes
 import runFunction
 import readjson
 import collectCommand
+import opresultwarn
 
 type
   State = enum
@@ -44,29 +45,39 @@ type
     value*: Value
     length*: Natural
 
-#[
+func newValueAndLengthOr*(warning: Warning, p1 = "", pos = 0):
+    OpResultWarn[ValueAndLength] =
+  ## Create a OpResultWarn[ValueAndLength] warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[ValueAndLength](warningData)
 
-When an error is detected on a statement, the error message tells the
-line and column position where the statement starts.  To do this we
-store the line and start position with each statement.
+func newValueAndLengthOr*(value: Value, length: Natural):
+    OpResultWarn[ValueAndLength] =
+  ## Create a OpResultWarn[ValueAndLength] value.
+  let val = ValueAndLength(value: value, length: length)
+  result = opValueW[ValueAndLength](val)
 
-# lines:
-    0123456789 123456789 123456789 123456789
-1:  <--$ block a = 5; b = \-->
-2:  <--$ : "hello"; \-->
-3:  <--$ : c = t.len(s.header) -->
+func newValueAndLengthOr*(val: ValueAndLength):
+    OpResultWarn[ValueAndLength] =
+  ## Create a OpResultWarn[ValueAndLength].
+  result = opValueW[ValueAndLength](val)
 
-statements:
-1:  a = 5
-2:  _b = "hello"
-3:  _c = t.len(s.header)_
+func newVariableDataOr*(warning: Warning, p1 = "", pos = 0):
+    OpResultWarn[VariableData] =
+  ## Create a OpResultWarn[VariableData] warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[VariableData](warningData)
 
-statement 1 starts at line 1, position 11.
-statement 2 starts at line 1, position 18.
-statement 3 starts at line 3, position 7.
+func newVariableDataOr*(warningData: WarningData):
+    OpResultWarn[VariableData] =
+  ## Create a OpResultWarn[VariableData] warning.
+  result = opMessageW[VariableData](warningData)
 
-]#
-
+func newVariableDataOr*(dotNameStr: string, operator = "=", value: Value):
+    OpResultWarn[VariableData] =
+  ## Create a OpResultWarn[VariableData] value.
+  let val = newVariableData(dotNameStr, operator, value)
+  result = opValueW[VariableData](val)
 
 func newStatement*(text: string, lineNum: Natural = 1,
     start: Natural = 1): Statement =
@@ -80,10 +91,10 @@ proc startColumn*(start: Natural): string =
     result.add(' ')
   result.add("^")
 
-proc warnStatement*(env: var Env, statement: Statement, warning:
-    Warning, start: Natural, p1: string = "") =
-  ## Show an invalid statement with a pointer pointing at the start of
-  ## the problem. Long statements are trimmed around the problem area.
+proc getWarnStatement*(statement: Statement,
+    warningData: WarningData,
+    templateFilename: string): string =
+  ## Return a multiline error message.
 
   var fragment: string
   var extraStart = ""
@@ -93,6 +104,11 @@ proc warnStatement*(env: var Env, statement: Statement, warning:
   var startPos: int
   var endPos: int
   var pointerPos: int
+
+  let warning = warningData.warning
+  let p1 = warningData.p1
+  let start = warningData.pos
+
   if statement.text.len <= fragmentMax:
     fragment = statement.text
     startPos = start
@@ -116,10 +132,17 @@ proc warnStatement*(env: var Env, statement: Statement, warning:
 $1
 statement: $2
            $3""" % [
-    getWarningLine(env.templateFilename, statement.lineNum, warning, p1),
+    getWarningLine(templateFilename, statement.lineNum, warning, p1),
     fragment,
     startColumn(pointerPos)
   ]
+  result = message
+
+proc warnStatement*(env: var Env, statement: Statement,
+    warningData: WarningData) =
+  ## Show an invalid statement with a pointer pointing at the start of
+  ## the problem. Long statements are trimmed around the problem area.
+  let message = getWarnStatement(statement, warningData, env.templateFilename)
   env.outputWarning(statement.lineNum, message)
 
 func `==`*(s1: Statement, s2: Statement): bool =
@@ -135,8 +158,6 @@ func `$`*(s: Statement): string =
 proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
   ## Create a newValueAndLength object.
   result = ValueAndLength(value: value, length: length)
-
-
 
 iterator yieldStatements*(cmdLines: CmdLines): Statement =
   ## Iterate through the command's statements.  Statements are
@@ -180,8 +201,8 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
   if notEmptyOrSpaces(text):
     yield newStatement(strip(text), lineNum, start)
 
-proc getString*(env: var Env, statement: Statement, start: Natural):
-    Option[ValueAndLength] =
+func getString*(statement: Statement, start: Natural):
+    OpResultWarn[ValueAndLength] =
   ## Return a literal string value and match length from a statement. The
   ## start parameter is the index of the first quote in the statement
   ## and the return length includes optional trailing white space
@@ -192,63 +213,55 @@ proc getString*(env: var Env, statement: Statement, start: Natural):
   # Parse the json string and remove escaping.
   let parsedString = parseJsonStr(str, start+1)
   if parsedString.messageId != MessageId(0):
-    env.warnStatement(statement, parsedString.messageId, parsedString.pos)
-    return
-  let valueAndLength = newValueAndLength(newValue(parsedString.str),
-    parsedString.pos - start)
-  let literal = parsedString.str
+    return newValueAndLengthOr(parsedString.messageId, "", parsedString.pos)
 
-  let value = Value(kind: vkString, stringv: literal)
-  result = some(ValueAndLength(value: value, length: valueAndLength.length))
+  let value = Value(kind: vkString, stringv: parsedString.str)
+  result = newValueAndLengthOr(value, parsedString.pos - start)
 
-proc getNumber*(env: var Env, statement: Statement, start: Natural):
-    Option[ValueAndLength] =
+proc getNumber*(statement: Statement, start: Natural):
+    OpResultWarn[ValueAndLength] =
   ## Return the literal number value and match length from the
   ## statement. The start index points at a digit or minus sign.
 
   # Check that we have a statictea number.
   var matchesO = matchNumber(statement.text, start)
   if not matchesO.isSome:
-    env.warnStatement(statement, wNotNumber, start)
-    return
+    return newValueAndLengthOr(wNotNumber, "", start)
 
   # The decimal point determines whether the number is an integer or
   # float.
   let matches = matchesO.get()
   let decimalPoint = matches.getGroup()
+  var value: Value
   if decimalPoint == ".":
     # Parse the float.
     let floatPosO = parseFloat64(statement.text, start)
     if not floatPosO.isSome:
-      env.warnStatement(statement, wNumberOverFlow, start)
-      return
+      return newValueAndLengthOr(wNumberOverFlow, "", start)
     let floatPos = floatPosO.get()
-    let value = Value(kind: vkFloat, floatv: floatPos.number)
+    value = Value(kind: vkFloat, floatv: floatPos.number)
     assert floatPos.length <= matches.length
-    result = some(ValueAndLength(value: value, length: matches.length))
   else:
     # Parse the int.
     let intPosO = parseInteger(statement.text, start)
     if not intPosO.isSome:
-      env.warnStatement(statement, wNumberOverFlow, start)
-      return
+      return newValueAndLengthOr(wNumberOverFlow, "", start)
     let intPos = intPosO.get()
-    let value = Value(kind: vkInt, intv: intPos.integer)
+    value = Value(kind: vkInt, intv: intPos.integer)
     assert intPos.length <= matches.length
-    result = some(ValueAndLength(value: value, length: matches.length))
+  result = newValueAndLengthOr(value, matches.length)
 
 # Forward reference since we call getValue recursively.
-proc getValue(env: var Env,
-              statement: Statement, start: Natural, variables:
-                Variables): Option[ValueAndLength]
+proc getValue(statement: Statement, start: Natural, variables:
+    Variables): OpResultWarn[ValueAndLength]
 
 # todo: why is "variables" passed in?
-proc getFunctionValue*(env: var Env,
+proc getFunctionValue*(
     functionName: string,
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list=false): Option[ValueAndLength] =
+    list=false): OpResultWarn[ValueAndLength] =
   ## Collect the function parameters then call it and return the
   ## function's value and the position after trailing whitespace.
   ## Start points at the first parameter.
@@ -265,24 +278,25 @@ proc getFunctionValue*(env: var Env,
   else:
     while true:
       # Get the parameter's value.
-      let valueAndLengthO = getValue(env, statement, pos, variables)
-      if not valueAndLengthO.isSome:
-        # Already have shown an error message.
-        return
+      let valueAndLengthOr = getValue(statement, pos, variables)
+      if valueAndLengthOr.isMessage:
+        return valueAndLengthOr
+      let valueAndLength = valueAndLengthOr.value
 
-      parameters.add(valueAndLengthO.get().value)
+      parameters.add(valueAndLength.value)
       parameterStarts.add(pos)
 
-      pos = pos + valueAndLengthO.get().length
+      pos = pos + valueAndLength.length
 
       # Get the comma or ) or ] and white space following the value.
       let commaSymbolO = matchCommaOrSymbol(statement.text, symbol, pos)
       if not commaSymbolO.isSome:
         if symbol == gRightParentheses:
-          env.warnStatement(statement, wMissingCommaParen, pos)
+          # Expected comma or right parentheses.
+          return newValueAndLengthOr(wMissingCommaParen, "", pos)
         else:
-          env.warnStatement(statement, wMissingCommaBracket, pos)
-        return
+          # Missing comma or right bracket.
+          return newValueAndLengthOr(wMissingCommaBracket, "", pos)
       let commaSymbol = commaSymbolO.get()
       pos = pos + commaSymbol.length
       let foundSymbol = commaSymbol.getGroup()
@@ -293,9 +307,9 @@ proc getFunctionValue*(env: var Env,
   # Lookup the function.
   let functionSpecO = getFunction(functionName, parameters)
   if not isSome(functionSpecO):
-    # The function doesn't exist: name
-    env.warnStatement(statement, wInvalidFunction, start, functionName)
-    return
+    # The function does not exist: $1.
+    return newValueAndLengthOr(wInvalidFunction, functionName, start)
+
   let functionSpec = functionSpecO.get()
 
   # Call the function.
@@ -306,14 +320,13 @@ proc getFunctionValue*(env: var Env,
       warningPos = parameterStarts[funResult.parameter]
     else:
       warningPos = start
-    env.warnStatement(statement, funResult.warningData.warning,
-      warningPos, funResult.warningData.p1)
-    return
+    return newValueAndLengthOr(funResult.warningData.warning,
+      funResult.warningData.p1, warningPos)
 
-  result = some(ValueAndLength(value: funResult.value, length: pos-start))
+  result = newValueAndLengthOr(funResult.value, pos-start)
 
-proc getVarOrFunctionValue*(env: var Env, statement: Statement, start: Natural,
-    variables: Variables): Option[ValueAndLength] =
+proc getVarOrFunctionValue*(statement: Statement, start: Natural,
+    variables: Variables): OpResultWarn[ValueAndLength] =
   ## Return the statement's right hand side value and the length
   ## matched. The right hand side must be a variable a function or a
   ## list. The right hand side starts at the index specified by start.
@@ -334,28 +347,32 @@ proc getVarOrFunctionValue*(env: var Env, statement: Statement, start: Natural,
     var functionName = dotNameStr
 
     if not isFunctionName(functionName):
-      env.warnStatement(statement, wInvalidFunction, start, functionName)
-      return
+      # The function does not exist: $1.
+      return newValueAndLengthOr(wInvalidFunction, functionName, start)
+
     let parentheses = parenthesesO.get()
-    let funValueLengthO = getFunctionValue(env, functionName, statement,
-                            start+matches.length+parentheses.length, variables)
-    if not isSome(funValueLengthO):
-      return
-    let funValueLength = funValueLengthO.get()
-    result = some(ValueAndLength(value: funValueLength.value,
-      length: matches.length+parentheses.length+funValueLength.length))
+    let funValueLengthOr = getFunctionValue(functionName, statement,
+      start+matches.length+parentheses.length, variables)
+    if funValueLengthOr.isMessage:
+      return funValueLengthOr
+    let funValueLength = funValueLengthOr.value
+
+    let valueAndLength = newValueAndLength(funValueLength.value,
+      matches.length+parentheses.length+funValueLength.length)
+    result = newValueAndLengthOr(valueAndLength.value, valueAndLength.length)
   else:
     # We have a variable, look it up and return its value.  Show a
     # warning when the variable doesn't exist.
     let valueOrWarning = getVariable(variables, dotNameStr)
     if valueOrWarning.kind == vwWarning:
-      # todo: show the correct error message.
-      env.warnStatement(statement, wVariableMissing, start, dotNameStr)
-      return
-    result = some(newValueAndLength(valueOrWarning.value, matches.length))
+      # todo: show the message returned by getVariable instead?
+      # The variable '$1' does not exist.
+      return newValueAndLengthOr(wVariableMissing, dotNameStr, start)
 
-proc getList(env: var Env, statement: Statement, start: Natural,
-    variables: Variables): Option[ValueAndLength] =
+    result = newValueAndLengthOr(valueOrWarning.value, matches.length)
+
+proc getList(statement: Statement, start: Natural,
+    variables: Variables): OpResultWarn[ValueAndLength] =
   ## Return the literal list value and match length from the
   ## statement. The start index points at [.
 
@@ -363,17 +380,18 @@ proc getList(env: var Env, statement: Statement, start: Natural,
   assert startSymbolO.isSome
   let startSymbol = startSymbolO.get()
 
-  let funValueLengthO = getFunctionValue(env, "list", statement,
+  let funValueLengthOr = getFunctionValue("list", statement,
     start+startSymbol.length, variables, true)
-  if not isSome(funValueLengthO):
-    return
+  if funValueLengthOr.isMessage:
+    return funValueLengthOr
+  let funValueLength = funValueLengthOr.value
 
-  let funValueLength = funValueLengthO.get()
-  result = some(ValueAndLength(value: funValueLength.value,
-    length: funValueLength.length+startSymbol.length))
+  let valueAndLength = newValueAndLength(funValueLength.value,
+    funValueLength.length+startSymbol.length)
+  result = newValueAndLengthOr(valueAndLength)
 
-proc getValue(env: var Env, statement: Statement, start: Natural, variables:
-    Variables): Option[ValueAndLength] =
+proc getValue(statement: Statement, start: Natural, variables:
+    Variables): OpResultWarn[ValueAndLength] =
   ## Return the statements right hand side value and the match length.
   ## The start parameter points at the first non-whitespace character
   ## of the right hand side. The length includes the trailing
@@ -387,21 +405,22 @@ proc getValue(env: var Env, statement: Statement, start: Natural, variables:
   # * [ -- a list
 
   if start >= statement.text.len:
-    env.warnStatement(statement, wInvalidRightHandSide, start)
-    return
+    # Expected a string, number, variable, list or function.
+    return newValueAndLengthOr(wInvalidRightHandSide, "", start)
 
   let char = statement.text[start]
 
   if char == '"':
-    result = getString(env, statement, start)
+    result = getString(statement, start)
   elif char in {'0' .. '9', '-'}:
-    result = getNumber(env, statement, start)
+    result = getNumber(statement, start)
   elif isLowerAscii(char) or isUpperAscii(char):
-    result = getVarOrFunctionValue(env, statement, start, variables)
+    result = getVarOrFunctionValue(statement, start, variables)
   elif char == '[':
-    result = getList(env, statement, start, variables)
+    result = getList(statement, start, variables)
   else:
-    env.warnStatement(statement, wInvalidRightHandSide, start)
+    # Expected a string, number, variable, list or function.
+    return newValueAndLengthOr(wInvalidRightHandSide, "", start)
 
 # Call chain:
 # - runStatement
@@ -412,52 +431,44 @@ proc getValue(env: var Env, statement: Statement, start: Natural, variables:
 # example: a = list(1, "2", len(b), d.a, cmp(5, len("abc")))
 # Each function matches the trailing whitespace.
 
-proc runStatement*(env: var Env, statement: Statement,
-    variables: var Variables): Option[VariableData] =
+proc runStatement*(statement: Statement,
+    variables: var Variables): OpResultWarn[VariableData] =
   ## Run one statement and assign a variable. Return the variable dot
   ## name string and value.
 
   # Get the variable dot name string and match the surrounding white space.
   let dotNameMatchesO = matchDotNames(statement.text, 0)
   if not isSome(dotNameMatchesO):
-    env.warnStatement(statement, wMissingStatementVar, 0)
-    return
+    # Statement does not start with a variable name.
+    return newVariableDataOr(wMissingStatementVar)
+
   let dotNameMatches = dotNameMatchesO.get()
   let (_, dotNameStr) = dotNameMatches.get2Groups()
 
-  # Get the equal sign and following whitespace.
-  let equalSignO = matchEqualSign(statement.text, dotNameMatches.length)
-  if not equalSignO.isSome:
-    env.warnStatement(statement, wInvalidVariable, 0)
-    return
-  let equalSign = equalSignO.get()
+  # Get the equal sign or &= and following whitespace.
+  let operatorO = matchEqualSign(statement.text, dotNameMatches.length)
+  if not operatorO.isSome:
+    # Invalid variable or missing equal operator.
+    return newVariableDataOr(wInvalidVariable)
+  let operator = operatorO.get()
 
   # Get the right hand side value and match the following whitespace.
-  let valueAndLengthO = getValue(env, statement,
-                                 dotNameMatches.length + equalSign.length,
-                                 variables)
-  if not valueAndLengthO.isSome:
-    # Warning already shown.
-    return
+  let valueAndLengthOr = getValue(statement,
+    dotNameMatches.length + operator.length, variables)
+  if valueAndLengthOr.isMessage:
+    return newVariableDataOr(valueAndLengthOr.message)
+  let value = valueAndLengthOr.value.value
+  let length = valueAndLengthOr.value.length
 
   # Check that there is not any unprocessed text following the value.
-  let value = valueAndLengthO.get().value
-  let length = valueAndLengthO.get().length
-  var pos = dotNameMatches.length + equalSign.length + length
+  var pos = dotNameMatches.length + operator.length + length
   if pos != statement.text.len:
-    env.warnStatement(statement, wTextAfterValue, pos)
-    return
+    # Unused text at the end of the statement.
+    return newVariableDataOr(wTextAfterValue, "", pos)
 
-  # Assign the variable if possible.
-  let warningDataO = assignVariable(variables, dotNameStr, value,
-    equalSign.getGroup())
-  if isSome(warningDataO):
-    let warningData = warningDataO.get()
-    env.warnStatement(statement, warningData.warning, 0, warningData.p1)
-    return
-
-  # Return the variable and value for testing.
-  result = some(newVariableData(dotNameStr, value))
+  # Return the variable dot name and value.
+  let groups = operator.getGroups(1)
+  result = newVariableDataOr(dotNameStr, groups[0], value)
 
 proc runCommand*(env: var Env, cmdLines: CmdLines, variables: var Variables) =
   ## Run a command and fill in the variables dictionaries.
@@ -470,5 +481,15 @@ proc runCommand*(env: var Env, cmdLines: CmdLines, variables: var Variables) =
   for statement in yieldStatements(cmdLines):
     # Run the statement and assign a variable.  When there is a
     # statement error, the statement is skipped.
-    discard runStatement(env, statement, variables)
-
+    let variableDataOr = runStatement(statement, variables)
+    if variableDataOr.isMessage:
+      env.warnStatement(statement, variableDataOr.message)
+      continue
+    let variableData = variableDataOr.value
+    
+    # Assign the variable if possible.
+    let operator = variableData.operator
+    let warningDataO = assignVariable(variables,
+      variableData.dotNameStr, variableData.value, operator)
+    if isSome(warningDataO):
+      env.warnStatement(statement, warningDataO.get())

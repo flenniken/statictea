@@ -16,18 +16,19 @@ import version
 import tostring
 import readlines
 import collectCommand
+import opresultwarn
 
-proc newIntValueAndLengthO*(number: int | int64, length: Natural):
-    Option[ValueAndLength] =
-  result = some(ValueAndLength(value: newValue(number), length: length))
+proc newIntValueAndLengthOr*(number: int | int64, length: Natural):
+    OpResultWarn[ValueAndLength] =
+  result = newValueAndLengthOr(newValue(number), length)
 
-proc newFloatValueAndLengthO*(number: float64, length: Natural):
-    Option[ValueAndLength] =
-  result = some(ValueAndLength(value: newValue(number), length: length))
+proc newFloatValueAndLengthOr*(number: float64, length: Natural):
+    OpResultWarn[ValueAndLength] =
+  result = newValueAndLengthOr(newValue(number), length)
 
-proc newStringValueAndLengthO*(str: string, length: Natural):
-    Option[ValueAndLength] =
-  result = some(ValueAndLength(value: newValue(str), length: length))
+proc newStringValueAndLengthOr*(str: string, length: Natural):
+    OpResultWarn[ValueAndLength] =
+  result = newValueAndLengthOr(newValue(str), length)
 
 proc startPointer*(start: Natural): string =
   ## Return a string containing the number of spaces and symbols to
@@ -39,29 +40,18 @@ proc startPointer*(start: Natural): string =
       result.add(' ')
     result.add("^$1" % $start)
 
-proc testSome*[T](valueAndLengthO: Option[T], eValueAndLengthO: Option[T],
-    text: string, start: Natural): bool =
+proc testSome*[T](valueAndLengthOr: OpResultWarn[T],
+    eValueAndLengthOr: OpResultWarn[T], text: string,
+    start: Natural): bool =
 
-  if valueAndLengthO == eValueAndLengthO:
+  if $valueAndLengthOr == $eValueAndLengthOr:
     return true
-
-  if not isSome(eValueAndLengthO):
-    echo "Expected nothing but got something."
-    echo $valueAndLengthO
-    return false
-
-  let value = valueAndLengthO.get().value
-  let length = valueAndLengthO.get().length
-  let eValue = eValueAndLengthO.get().value
-  let eLength = eValueAndLengthO.get().length
-
-  echo "Did not get the expected value."
-  echo " text: $1" % text
-  echo "start: $1" % startPointer(start)
-  echo "got value: $1" % $value
-  echo " expected: $1" % $evalue
-  echo "got length: $1" % $length
-  echo "  expected: $1" % $eLength
+  echo "text: $1" % text
+  echo "start: $1" % $start
+  echo "      got: $1" % $valueAndLengthOr
+  echo "      got: $1" % $valueAndLengthOr
+  echo " expected: $1" % $eValueAndLengthOr
+  result = false
 
 proc newStrFromBuffer(buffer: seq[uint8]): string =
   result = newStringOfCap(buffer.len)
@@ -94,11 +84,11 @@ proc compareStatements(statements: seq[Statement], eContent: string): bool =
   ## Return true when the statements match the expected statements.
   let lines = splitNewLines(eContent)
   for ix, statement in statements:
-    let got = $statement
     let expected = stripNewline(lines[ix])
+    let got = $statement
     if got != expected:
-      echo "     got: $1" % got
       echo "expected: $1" % expected
+      echo "     got: $1" % got
       return false
   return true
 
@@ -118,75 +108,65 @@ proc testGetStatements(content: string, expected: string): bool =
   if not compareStatements(statements, expected):
     result = false
 
-proc testGetNumber(
-    statement: Statement,
-    start: Natural,
-    eValueAndLengthO: Option[ValueAndLength],
-    eLogLines: seq[string] = @[],
-    eErrLines: seq[string] = @[],
-    eOutLines: seq[string] = @[]): bool =
+proc testGetNumber(statement: Statement, start: Natural,
+    eValueAndLengthOr: OpResultWarn[ValueAndLength]): bool =
   ## Return true when the statement contains the expected number. When
   ## it doesn't, show the values and expected values and return false.
 
-  var env = openEnvTest("_testGetNumber.log")
+  let valueAndLengthOr = getNumber(statement, start)
 
-  let valueAndLengthO = getNumber(env, statement, start)
-
-  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
-
-  if not testSome(valueAndLengthO, eValueAndLengthO, statement.text, start):
+  result = true
+  if $valueAndLengthOr != $eValueAndLengthOr:
+    echo "expected: $1" % $eValueAndLengthOr
+    echo "     got: $1" % $valueAndLengthOr
     result = false
 
-proc testGetString(
-    statement: Statement,
-    start: Natural,
-    eValueAndlengthO: Option[ValueAndLength],
-    eLogLines: seq[string] = @[],
-    eErrLines: seq[string] = @[],
-    eOutLines: seq[string] = @[]): bool =
-  ## Return true when the statement contains the expected string. When
-  ## it doesn't, show the values and expected values and return false.
+proc testGetString(statement: Statement, start: Natural,
+    eValueAndLengthOr: OpResultWarn[ValueAndLength]): bool =
 
-  var env = openEnvTest("_testGetString.log")
+  let valueAndLengthOr = getString(statement, start)
 
-  let valueAndLengthO = getString(env, statement, start)
+  result = true
+  if $valueAndLengthOr != $eValueAndLengthOr:
+    echo "expected: $1" % $eValueAndLengthOr
+    if eValueAndLengthOr.isMessage:
+      echo getWarnStatement(statement, eValueAndLengthOr.message, "template.html")
 
-  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
-
-  if not testSome(valueAndLengthO, eValueAndlengthO, statement.text, start):
+    echo "     got: $1" % $valueAndLengthOr
+    if valueAndLengthOr.isMessage:
+      echo getWarnStatement(statement, valueAndLengthOr.message, "template.html")
     result = false
 
 proc testGetStringInvalid(buffer: seq[uint8]): bool =
   let str = newStrFromBuffer(buffer)
-  let statement = """a = "stringwithbadutf8:$1:end"""" % str
-  let expectedLine = """statement: a = "stringwithbadutf8:$1:end"""" % str
-  let eErrLines = @[
-    "template.html(1): w32: Invalid UTF-8 byte in the string.\n",
-    expectedLine & "\n",
-    "                                  ^\n",
-  ]
-  #  statement: a = "stringwithbadutf8:$1:end
-  result = testGetString(newStatement(statement), 4, none(ValueAndLength), eErrLines = eErrLines)
+  let statement = newStatement("""a = "stringwithbadutf8:$1:end"""" % str)
+  let start = 4
+  let valueAndLengthOr = getString(statement, start)
+  let eValueAndLengthOr = newValueAndLengthOr(wInvalidUtf8, "", 23)
+  result = true
 
-proc testGetVarOrFunctionValue(variables: Variables, statement: Statement, start: Natural,
-    eValueAndLengthO: Option[ValueAndLength] = none(ValueAndLength),
-                     eLogLines: seq[string] = @[],
-                     eErrLines: seq[string] = @[],
-                     eOutLines: seq[string] = @[],
-                              ): bool =
-  ## Get the variable or function value of the rhs for the given
-  ## statement. The rhs starts at the given start index. Compare the
-  ## value and number of characters processed with the given expected
-  ## values and compare the with the given error lines. Return true
-  ## when they match.
+  if $valueAndLengthOr != $eValueAndLengthOr:
+    echo "expected: $1" % $eValueAndLengthOr
+    if eValueAndLengthOr.isMessage:
+      echo getWarnStatement(statement, eValueAndLengthOr.message, "template.html")
 
-  var env = openEnvTest("_getVariable.log")
+    echo "     got: $1" % $valueAndLengthOr
+    if valueAndLengthOr.isMessage:
+      echo getWarnStatement(statement, valueAndLengthOr.message, "template.html")
+    result = false
 
-  let valueAndLengthO = getVarOrFunctionValue(env, statement, start, variables)
 
-  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
-
-  if not expectedItem("valueAndLength", valueAndLengthO, eValueAndLengthO):
+proc testGetVarOrFunctionValue(
+  variables: Variables,
+  statement: Statement,
+  start: Natural,
+  eValueAndLengthOr: OpResultWarn[ValueAndLength]
+     ): bool =
+  let valueAndLengthOr = getVarOrFunctionValue(statement, start, variables)
+  result = true
+  if $valueAndLengthOr != $eValueAndLengthOr:
+    echo "expected: $1" % $eValueAndLengthOr
+    echo "     got: $1" % $valueAndLengthOr
     result = false
 
 proc testWarnStatement(statement: Statement,
@@ -198,41 +178,53 @@ proc testWarnStatement(statement: Statement,
 
   var env = openEnvTest("_getVariable.log")
 
-  env.warnStatement(statement, warning, start, p1)
+  let warningData = newWarningData(warning, p1, start)
+  env.warnStatement(statement, warningData)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-proc testGetFunctionValue(functionName: string, statement: Statement, start: Natural,
-    eValueAndLengthO: Option[ValueAndLength] = none(ValueAndLength),
-    eLogLines: seq[string] = @[],
-    eErrLines: seq[string] = @[],
-    eOutLines: seq[string] = @[]
-  ): bool =
-
-  var env = openEnvTest("_testGetFunctionValue.log")
+proc testGetFunctionValue(
+  functionName: string,
+  statement: Statement,
+  start: Natural,
+  eValueAndLengthOr: OpResultWarn[ValueAndLength]
+    ): bool =
 
   var variables = emptyVariables()
-  let valueAndLengthO = getFunctionValue(env, functionName, statement, start, variables)
+  let valueAndLengthOr = getFunctionValue(functionName,
+    statement, start, variables)
 
-  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+  result = true
+  if $valueAndLengthOr != $eValueAndLengthOr:
+    echo "expected: $1" % $eValueAndLengthOr
+    if eValueAndLengthOr.isMessage:
+      echo getWarnStatement(statement, eValueAndLengthOr.message, "template.html")
 
-  if not expectedItem("valueAndLength", valueAndLengthO, eValueAndLengthO):
+    echo "     got: $1" % $valueAndLengthOr
+    if valueAndLengthOr.isMessage:
+      echo getWarnStatement(statement, valueAndLengthOr.message, "template.html")
+
     result = false
 
-proc testRunStatement(statement: Statement, variables: var Variables,
-    eVariableDataO: Option[VariableData] = none(VariableData),
-    eLogLines: seq[string] = @[],
-    eErrLines: seq[string] = @[],
-    eOutLines: seq[string] = @[]
-  ): bool =
-  var env = openEnvTest("_runStatement.log")
+proc testRunStatement(
+  statement: Statement,
+  variables: var Variables,
+  eVariableDataOr: OpResultWarn[VariableData]
+     ): bool =
 
-  let variableDataO = runStatement(env, statement, variables)
+  let variableDataOr = runStatement(statement, variables)
 
-  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+  result = true
+  if $variableDataOr != $eVariableDataOr:
+    echo "expected: $1" % $eVariableDataOr
+    if eVariableDataOr.isMessage:
+      echo getWarnStatement(statement, eVariableDataOr.message, "template.html")
 
-  if not expectedItem("variableDataO", variableDataO, eVariableDataO):
+    echo "     got: $1" % $variableDataOr
+    if variableDataOr.isMessage:
+      echo getWarnStatement(statement, variableDataOr.message, "template.html")
     result = false
+
 
 suite "runCommand.nim":
 
@@ -352,55 +344,54 @@ $$ : c = len("hello")
     check testGetStatements(content, expected)
 
   test "getNumber":
-    check testGetNumber(newStatement("a = 5"), 4, newIntValueAndLengthO(5, 1))
-    check testGetNumber(newStatement("a = 5.0"), 4, newFloatValueAndLengthO(5.0, 3))
-    check testGetNumber(newStatement("a = -2"), 4, newIntValueAndLengthO(-2, 2))
-    check testGetNumber(newStatement("a = -3.4"), 4, newFloatValueAndLengthO(-3.4, 4))
-    check testGetNumber(newStatement("a = 88 "), 4, newIntValueAndLengthO(88, 3))
+    check testGetNumber(newStatement("a = 5"), 4, newIntValueAndLengthOr(5, 1))
+
+  test "getNumber more":
+    check testGetNumber(newStatement("a = 5.0"), 4, newFloatValueAndLengthOr(5.0, 3))
+    check testGetNumber(newStatement("a = -2"), 4, newIntValueAndLengthOr(-2, 2))
+    check testGetNumber(newStatement("a = -3.4"), 4, newFloatValueAndLengthOr(-3.4, 4))
+    check testGetNumber(newStatement("a = 88 "), 4, newIntValueAndLengthOr(88, 3))
 
     # Starts with Valid number but invalid statement.
     check testGetNumber(newStatement("a = 88 abc "), 4,
-                        newIntValueAndLengthO(88, 3))
+                        newIntValueAndLengthOr(88, 3))
 
   test "getNumber not a number":
-    let eErrLines = splitNewLines """
-template.html(1): w26: Invalid number.
-statement: a = -abc
-               ^
-"""
     check testGetNumber(newStatement("a = -abc"), 4,
-                        none(ValueAndLength), eErrLines = eErrLines)
+      newValueAndLengthOr(wNotNumber, "", 4))
 
   test "getNumberIntTooBig":
-    let eErrLines = splitNewLines """
-template.html(1): w27: The number is too big or too small.
-statement: a = 9_223_372_036_854_775_808
-               ^
-"""
-    check testGetNumber(newStatement("a = 9_223_372_036_854_775_808"),
-                        4, none(ValueAndLength), eErrLines = eErrLines)
+    let statement = newStatement("a = 9_223_372_036_854_775_808")
+    check testGetNumber(statement, 4, newValueAndLengthOr(wNumberOverFlow, "", 4))
 
   test "getString":
     check testGetString(newStatement("""a = "hello""""), 4,
-      newStringValueAndLengthO("hello", 7))
+      newStringValueAndLengthOr("hello", 7))
 
     check testGetString(newStatement("a = \"hello\""), 4,
-      newStringValueAndLengthO("hello", 7))
+      newStringValueAndLengthOr("hello", 7))
 
     check testGetString(newStatement("""a = "hello"  """), 4,
-      newStringValueAndLengthO("hello", 9))
+      newStringValueAndLengthOr("hello", 9))
 
-  test "getString valid UTF-8":
-    var byteBuffers: seq[seq[uint8]] = @[
-      @[0xc3u8, 0xb1],
-      @[0xe2u8, 0x82, 0xa1],
-      @[0xf0u8, 0x90, 0x8c, 0xbc],
-    ]
-    for buffer in byteBuffers:
-      let str = newStrFromBuffer(buffer)
-      let eLength = buffer.len + 2
-      let statement = """a = "$1"""" % str
-      check testGetString(newStatement(statement), 4, newStringValueAndLengthO(str, eLength))
+  test "getString two bytes":
+    let str = newStrFromBuffer(@[0xc3u8, 0xb1])
+    let statement = newStatement("""a = "$1"""" % str)
+    check testGetString(statement, 4, newStringValueAndLengthOr(str, 4))
+
+  test "getString three bytes":
+
+    let str = newStrFromBuffer(@[0xe2u8, 0x82, 0xa1])
+    let statement = newStatement("""a = "$1"""" % str)
+    check testGetString(statement, 4, newStringValueAndLengthOr(str, 5))
+
+  test "getString four bytes":
+
+    let str = newStrFromBuffer(@[0xf0u8, 0x90, 0x8c, 0xbc])
+    let statement = newStatement("""a = "$1"""" % str)
+    check testGetString(statement, 4, newStringValueAndLengthOr(str, 6))
+
+
 
   test "getString invalid ff":
     check testGetStringInvalid(@[0xffu8])
@@ -424,13 +415,8 @@ statement: a = 9_223_372_036_854_775_808
     check testGetStringInvalid(@[0xf0u8, 0x90, 0x28, 0xbc])
 
   test "getString not string":
-    let eErrLines = splitNewLines """
-template.html(1): w139: No ending double quote.
-statement: a = "abc
-                   ^
-"""
     check testGetString(newStatement("""a = "abc"""), 4,
-      none(ValueAndLength), eErrLines = eErrLines)
+      newValueAndLengthOr(wNoEndingQuote, "", 8))
 
   test "getVarOrFunctionValue var1":
     # Test processing the right hand side when it is a variable.
@@ -438,35 +424,27 @@ statement: a = "abc
     var variables = emptyVariables()
     discard assignVariable(variables, "five", newValue(5))
     let statement = newStatement(text="tea = five", lineNum=12, 0)
-    let eValueAndLengthO = some(newValueAndLength(newValue(5), 4))
-    check testGetVarOrFunctionValue(variables, statement, 6, eValueAndLengthO)
+    let eValueAndLengthOr = newValueAndLengthOr(newValue(5), 4)
+    check testGetVarOrFunctionValue(variables, statement, 6, eValueAndLengthOr)
 
   test "getVarOrFunctionValue var2":
     var variables = emptyVariables()
     discard assignVariable(variables, "g.aboutfive", newValue(5.11))
     let statement = newStatement(text="""tea = g.aboutfive """, lineNum=12, 0)
-    let eValueAndLengthO = some(newValueAndLength(newValue(5.11), 12))
-    check testGetVarOrFunctionValue(variables, statement, 6, eValueAndLengthO)
+    let eValueAndLengthOr = newValueAndLengthOr(newValue(5.11), 12)
+    check testGetVarOrFunctionValue(variables, statement, 6, eValueAndLengthOr)
 
   test "getVarOrFunctionValue not defined":
+    var variables = emptyVariables()
     let statement = newStatement(text="tea = a+123", lineNum=12, 0)
-    let eErrLines = splitNewLines """
-template.html(12): w36: The variable 'a' does not exist.
-statement: tea = a+123
-                 ^
-"""
-    var variables = emptyVariables()
-    check testGetVarOrFunctionValue(variables, statement, 6, none(ValueAndLength), eErrLines = eErrLines)
+    let eValueAndLengthOr = newValueAndLengthOr(wVariableMissing, "a", 6)
+    check testGetVarOrFunctionValue(variables, statement, 6, eValueAndLengthOr)
 
   test "getVarOrFunctionValue not defined":
-    let statement = newStatement(text="tea = a123", lineNum=12, 0)
-    let eErrLines = splitNewLines """
-template.html(12): w36: The variable 'a123' does not exist.
-statement: tea = a123
-                 ^
-"""
     var variables = emptyVariables()
-    check testGetVarOrFunctionValue(variables, statement, 6, none(ValueAndLength), eErrLines = eErrLines)
+    let statement = newStatement("tea = a123")
+    let eValueAndLengthOr = newValueAndLengthOr(wVariableMissing, "a123", 6)
+    check testGetVarOrFunctionValue(variables, statement, 6, eValueAndLengthOr)
 
   test "getNewVariables":
     var variables = emptyVariables()
@@ -517,311 +495,181 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     check testWarnStatement(statement, wVariableMissing, 94, p1="num", eErrLines = eErrLines)
 
   test "getFunctionValue":
-    let functionName = "len"
     let statement = newStatement(text="""tea = len("abc") """, lineNum=16, 0)
-    let start = 10
-    let value = Value(kind: vkInt, intv: 3)
-    let eValueAndLengthO = some(ValueAndLength(value: value, length: 7))
-    check testGetFunctionValue(functionName, statement, start, eValueAndLengthO = eValueAndLengthO)
+    let valueAndLength = newValueAndLength(newValue(3), 7)
+    let eValueAndLengthOr = newValueAndLengthOr(valueAndLength)
+    check testGetFunctionValue("len", statement, 10, eValueAndLengthOr)
 
   test "getFunctionValue 2 parameters":
-    let functionName = "concat"
-    let statement = newStatement(text="""tea = concat("abc", "def") """, lineNum=16, 0)
-    let start = 13
-    let value = Value(kind: vkString, stringv: "abcdef")
-    let eValueAndLengthO = some(ValueAndLength(value: value, length: 14))
-    check testGetFunctionValue(functionName, statement, start, eValueAndLengthO = eValueAndLengthO)
+    let statement = newStatement(text="""tea = concat("abc", "def") """,
+      lineNum=16, 0)
+    let valueAndLength = newValueAndLength(newValue("abcdef"), 14)
+    let eValueAndLengthOr = newValueAndLengthOr(valueAndLength)
+    check testGetFunctionValue("concat", statement, 13, eValueAndLengthOr)
 
   test "getFunctionValue nested":
-    let functionName = "concat"
-    let statement = newStatement(text="""tea = concat("abc", concat("xyz", "123")) """, lineNum=16, 0)
-    let start = 13
-    let value = Value(kind: vkString, stringv: "abcxyz123")
-    let eValueAndLengthO = some(ValueAndLength(value: value, length: 29))
-    check testGetFunctionValue(functionName, statement, start, eValueAndLengthO = eValueAndLengthO)
+    let text = """tea = concat("abc", concat("xyz", "123")) """
+                 #0123456789 123456789 123456789 123456789 12345
+    let statement = newStatement(text)
+    let valueAndLength = newValueAndLength(newValue("abcxyz123"), 29)
+    let eValueAndLengthOr = newValueAndLengthOr(valueAndLength)
+    check testGetFunctionValue("concat", statement, 13, eValueAndLengthOr)
 
   test "getFunctionValue missing )":
-    let statement = newStatement(text="""tea = len("abc" """, lineNum=16, 0)
-    let eErrLines = @[
-      "template.html(16): w46: Expected comma or right parentheses.\n",
-      """statement: tea = len("abc" """ & "\n",
-        "                           ^\n",
-    ]
-    check testGetFunctionValue("len", statement, 10, eErrLines = eErrLines)
+    let statement = newStatement(text="""tea = len("abc"""", lineNum=16, 0)
+    let eValueAndLengthOr = newValueAndLengthOr(wMissingCommaParen, "", 15)
+    check testGetFunctionValue("len", statement, 10, eValueAndLengthOr)
 
   test "getFunctionValue missing quote":
-    let statement = newStatement(text="""tea = len("abc) """, lineNum=16, 0)
-    let eErrLines = @[
-      "template.html(16): w139: No ending double quote.\n",
-      """statement: tea = len("abc) """ & "\n",
-        "                           ^\n",
-    ]
-    check testGetFunctionValue("len", statement, 10, eErrLines = eErrLines)
+    let statement = newStatement(text="""tea = len("abc)""", lineNum=16, 0)
+    let eValueAndLengthOr = newValueAndLengthOr(wNoEndingQuote, "", 15)
+    check testGetFunctionValue("len", statement, 10, eValueAndLengthOr)
 
   test "getFunctionValue extra comma":
     let statement = newStatement(text="""tea = len("abc",) """, lineNum=16, 0)
-    let eErrLines = @[
-      "template.html(16): w33: Expected a string, number, variable, list or function.\n",
-      """statement: tea = len("abc",) """ & "\n",
-        "                           ^\n",
-    ]
-    check testGetFunctionValue("len", statement, 10, eErrLines = eErrLines)
+    let eValueAndLengthOr = newValueAndLengthOr(wInvalidRightHandSide, "", 16)
+    check testGetFunctionValue("len", statement, 10, eValueAndLengthOr)
 
   test "runStatement":
-    let statement = newStatement(text="""t.repeat = 4 """, lineNum=1, 0)
     var variables = emptyVariables()
-    check testRunStatement(statement, variables,
-                           some(newVariableData("t.repeat", newValue(4))))
+    let statement = newStatement(text="""t.repeat = 4 """, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("t.repeat", "=", newValue(4))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "runStatement string":
-    let statement = newStatement(text="""str = "testing" """, lineNum=1, 0)
     var variables = emptyVariables()
-    check testRunStatement(statement, variables,
-      eVariableDataO = some(newVariableData("str", newValue("testing"))))
+    let statement = newStatement(text="""str = "testing" """, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("str", "=", newValue("testing"))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "runStatement set log":
     let statement = newStatement(text="""t.output = "log" """, lineNum=1, 0)
     var variables = emptyVariables()
-    check testRunStatement(statement, variables,
-                           some(newVariableData("t.output", newValue("log"))))
-
-  test "set invalid output":
-    let statement = newStatement(text="""t.output = "notvalidv"""", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w41: Invalid t.output value, use: "result", "stdout", "stderr", "log", or "skip".
-statement: t.output = "notvalidv"
-           ^
-"""
-    # The expected value is none, because it doesn't exist yet.
-    var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
+    let eVariableDataOr = newVariableDataOr("t.output", "=", newValue("log"))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "runStatement junk at end":
-    let statement = newStatement(text="""str = "testing" junk at end""", lineNum=1, 0)
-    let eErrLines = @[
-      "template.html(1): w31: Unused text at the end of the statement.\n",
-      """statement: str = "testing" junk at end""" & "\n",
-        "                           ^\n",
-    ]
     var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
+    let statement = newStatement(text="""str = "testing" junk at end""",
+      lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wTextAfterValue, "", 16)
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "does not start with var":
-    let statement = newStatement(text="123 = 343", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w29: Statement does not start with a variable name.
-statement: 123 = 343
-           ^
-"""
     var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
+    let statement = newStatement(text="123 = 343", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wMissingStatementVar)
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "no equal sign":
+    var variables = emptyVariables()
     let statement = newStatement(text="var 343", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w34: Invalid variable or missing equal sign.
-statement: var 343
-           ^
-"""
-    var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
-
-  test "read only var":
-    let statement = newStatement(text="t.server = 343", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w40: Invalid tea variable: server.
-statement: t.server = 343
-           ^
-"""
-    var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
-
-  test "invalid namespace":
-    let statement = newStatement(text="e.server = 343", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w102: Name, e, doesn't exist in the parent dictionary.
-statement: e.server = 343
-           ^
-"""
-    var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
-
-  test "invalid maxLines":
-    let statement = newStatement(text="""t.maxLines = "hello"""", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w42: MaxLines must be an integer greater than 1.
-statement: t.maxLines = "hello"
-           ^
-"""
-    var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
-
-  test "content must be a string":
-    let statement = newStatement(text="t.content = 3.45", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w43: You must assign t.content a string.
-statement: t.content = 3.45
-           ^
-"""
-    var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
-
-  test "invalid repeat":
-    let statement = newStatement(text="t.repeat = 3.45", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w44: The variable t.repeat must be an integer between 0 and t.maxRepeat.
-statement: t.repeat = 3.45
-           ^
-"""
-    var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
-
-  test "invalid tea var":
-    let statement = newStatement(text="t.asdf = 3.45", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w40: Invalid tea variable: asdf.
-statement: t.asdf = 3.45
-           ^
-"""
-    var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
-
+    let eVariableDataOr = newVariableDataOr(wInvalidVariable)
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "invalid missing needed vararg parameter":
-    let statement = newStatement(
-      text="""result = dict(list("1", "else", "2", "two", "3"))""", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w155: Dictionaries require an even number of list items.
-statement: result = dict(list("1", "else", "2", "two", "3"))
-                         ^
-"""
     var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
+    let statement = newStatement(
+      text="""result = dict(list("1", "else", "2", "two", "3"))""",
+      lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wDictRequiresEven, "", 14)
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "parameter error position":
+    var variables = emptyVariables()
     let text = """result = case(33, 2, 22, "abc", 11, len(concat()))"""
     let statement = newStatement(text, lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w119: Not enough parameters, expected 2.
-statement: result = case(33, 2, 22, "abc", 11, len(concat()))
-                                                          ^
-"""
-    var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
-
-
-  test "assignTeaVariable version":
-    let statement = newStatement(text="""t.version = "1.2.3"""", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w39: You cannot change the t.version tea variable.
-statement: t.version = "1.2.3"
-           ^
-"""
-    var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
+    let eVariableDataOr = newVariableDataOr(kNotEnoughArgs, "2", 47)
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "assignTeaVariable missing":
-    let statement = newStatement(text="""t.missing = "1.2.3"""", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w40: Invalid tea variable: missing.
-statement: t.missing = "1.2.3"
-           ^
-"""
+    # The runStatement returns a dot name string and a value.  The
+    # assignment doesn't happen until later. So t.missing, "1.2.3" is
+    # a value return.
     var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
+    let statement = newStatement(text="""t.missing = "1.2.3"""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("t.missing", "=", newValue("1.2.3"))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "assignTeaVariable content":
-    let statement = newStatement(text="""t.content = "1.2.3"""", lineNum=1, 0)
     var variables = emptyVariables()
-    check testRunStatement(statement, variables,
-      some(newVariableData("t.content", newValue("1.2.3"))))
+    let statement = newStatement(text="""t.content = "1.2.3"""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("t.content", "=", newValue("1.2.3"))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "parseVersion":
     check parseVersion("1.2.3") == some((1, 2, 3))
     check parseVersion("111.222.333") == some((111, 222, 333))
 
   test "cmpVersion equal":
+    var variables = emptyVariables()
     let statement = newStatement(text="""cmp = cmpVersion("1.2.3", "1.2.3")""",
       lineNum=1, 0)
-    var variables = emptyVariables()
-    check testRunStatement(statement, variables, some(newVariableData("cmp", newValue(0))))
+    let eVariableDataOr = newVariableDataOr("cmp", "=", newValue(0))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "cmpVersion less":
+    var variables = emptyVariables()
     let statement = newStatement(text="""cmp = cmpVersion("1.2.2", "1.2.3")""",
       lineNum=1, 0)
-    var variables = emptyVariables()
-    check testRunStatement(statement, variables, some(newVariableData("cmp", newValue(-1))))
+    let eVariableDataOr = newVariableDataOr("cmp", "=", newValue(-1))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "cmpVersion greater":
-    let statement = newStatement(text="""cmp = cmpVersion("1.2.4", "1.2.3")""",
-      lineNum=1, 0)
     var variables = emptyVariables()
-    check testRunStatement(statement, variables,
-      some(newVariableData("cmp", newValue(1))))
+    let statement = newStatement(
+      text="""cmp = cmpVersion("1.2.4", "1.2.3")""",
+      lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("cmp", "=", newValue(1))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "cmpVersion less 2":
+    var variables = emptyVariables()
     let statement = newStatement(text="""cmp = cmpVersion("1.22.3", "2.1.0")""",
       lineNum=1, 0)
-    var variables = emptyVariables()
-    check testRunStatement(statement, variables,
-      some(newVariableData("cmp", newValue(-1))))
+    let eVariableDataOr = newVariableDataOr("cmp", "=", newValue(-1))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "cmpVersion less 3":
+    var variables = emptyVariables()
     let statement = newStatement(text="""cmp = cmpVersion("2.22.3", "2.44.0")""",
       lineNum=1, 0)
-    var variables = emptyVariables()
-    check testRunStatement(statement, variables, some(newVariableData("cmp", newValue(-1))))
+    let eVariableDataOr = newVariableDataOr("cmp", "=", newValue(-1))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "cmpVersion two parameters":
-    let statement = newStatement(text="""cmp = cmpVersion("1.2.3")""", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w119: Not enough parameters, expected 2.
-statement: cmp = cmpVersion("1.2.3")
-                            ^
-"""
     var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
+    let statement = newStatement(
+      text="""cmp = cmpVersion("1.2.3")""", lineNum=1, 0)
+    # todo: better at 24?
+    # let eVariableDataOr = newVariableDataOr(kNotEnoughArgs, "2", 24)
+    let eVariableDataOr = newVariableDataOr(kNotEnoughArgs, "2", 17)
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "cmpVersion strings":
+    var variables = emptyVariables()
     let statement = newStatement(text="""cmp = cmpVersion("1.2.3", 3.5)""",
       lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w120: Wrong parameter type, expected string.
-statement: cmp = cmpVersion("1.2.3", 3.5)
-                                     ^
-"""
-    var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
+    let eVariableDataOr = newVariableDataOr(kWrongType, "string", 26)
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "incomplete function":
-    let statement = newStatement(text="""a = len("asdf"""", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w46: Expected comma or right parentheses.
-statement: a = len("asdf"
-                         ^
-"""
     var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
+    let statement = newStatement(text="""a = len("asdf"""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wMissingCommaParen, "", 14)
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "incomplete function 2":
-    let statement = newStatement(text="a = len(case(5,", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w33: Expected a string, number, variable, list or function.
-statement: a = len(case(5,
-                          ^
-"""
     var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
+    let statement = newStatement(text="a = len(case(5,", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wInvalidRightHandSide, "", 15)
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "dot name":
-    let statement = newStatement(text="a# = 5", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w34: Invalid variable or missing equal sign.
-statement: a# = 5
-           ^
-"""
     var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
+    let statement = newStatement(text="a# = 5", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wInvalidVariable)
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "startPointer":
     check startPointer(0) == "^0"
@@ -836,91 +684,84 @@ statement: a# = 5
     check startColumn(3) == "   ^"
 
   test "one quote":
-    let statement = newStatement(text="""  quote = "\""   """, lineNum=1, 0)
     var variables = emptyVariables()
-    check testRunStatement(statement, variables,
-                           some(newVariableData("quote", newValue("""""""))))
+    let statement = newStatement(text="""  quote = "\""   """, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("quote", "=", newValue("""""""))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "literal list emtpy":
-    let statement = newStatement(text="""a = [] """, lineNum=1, 0)
     var variables = emptyVariables()
-    check testRunStatement(statement, variables,
-      some(newVariableData("a", newEmptyListValue())))
+    let statement = newStatement(text="""a = [] """, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newEmptyListValue())
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "literal list 1":
-    let statement = newStatement(text="""a = [1] """, lineNum=1, 0)
     var variables = emptyVariables()
-    check testRunStatement(statement, variables,
-      some(newVariableData("a", newValue(@[1]))))
+    let statement = newStatement(text="""a = [1] """, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(@[1]))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "list space before":
     let statement = newStatement(text="""a = [ 1]""", lineNum=1, 0)
     var variables = emptyVariables()
-    check testRunStatement(statement, variables,
-      some(newVariableData("a", newValue(@[1]))))
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(@[1]))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "list space after":
-    let statement = newStatement(text="""a = [1    ]""", lineNum=1, 0)
     var variables = emptyVariables()
-    check testRunStatement(statement, variables,
-      some(newVariableData("a", newValue(@[1]))))
+    let statement = newStatement(text="""a = [1    ]""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(@[1]))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "list space before and after":
-    let statement = newStatement(text="""a = [   1    ]""", lineNum=1, 0)
     var variables = emptyVariables()
-    check testRunStatement(statement, variables,
-      some(newVariableData("a", newValue(@[1]))))
+    let statement = newStatement(text="""a = [   1    ]""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(@[1]))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "literal list 2":
-    let statement = newStatement(text="""a = [1,2]""", lineNum=1, 0)
     var variables = emptyVariables()
-    check testRunStatement(statement, variables,
-      some(newVariableData("a", newValue(@[1,2]))))
+    let statement = newStatement(text="""a = [1,2]""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(@[1,2]))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "literal list 3":
-    let statement = newStatement(text="""a = [1,2,"3"]""", lineNum=1, 0)
     var variables = emptyVariables()
+    let statement = newStatement(text="""a = [1,2,"3"]""", lineNum=1, 0)
     var eValue = newValue(@[newValue(1), newValue(2), newValue("3")])
-    check testRunStatement(statement, variables,
-      some(newVariableData("a", eValue)))
+    let eVariableDataOr = newVariableDataOr("a", "=", eValue)
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "literal list nested":
-    let statement = newStatement(text="""a = [1,len("3")]""", lineNum=1, 0)
     var variables = emptyVariables()
+    let statement = newStatement(text="""a = [1,len("3")]""", lineNum=1, 0)
     var eValue = newValue(@[newValue(1), newValue(1)])
-    check testRunStatement(statement, variables,
-      some(newVariableData("a", eValue)))
+    let eVariableDataOr = newVariableDataOr("a", "=", eValue)
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "literal list err":
-    let statement = newStatement(text="a = [)", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w33: Expected a string, number, variable, list or function.
-statement: a = [)
-                ^
-"""
     var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
+    let statement = newStatement(text="a = [)", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wInvalidRightHandSide, "", 5)
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "literal list no ]":
-    let statement = newStatement(text="a = [1,2", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w170: Missing comma or right bracket.
-statement: a = [1,2
-                   ^
-"""
     var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
+    let statement = newStatement(text="a = [1,2", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wMissingCommaBracket, "", 8)
+    check testRunStatement(statement, variables, eVariableDataOr)
 
   test "literal list junk after":
-    let statement = newStatement(text="a = [ 1 ] xyz", lineNum=1, 0)
-    let eErrLines = splitNewLines """
-template.html(1): w31: Unused text at the end of the statement.
-statement: a = [ 1 ] xyz
-                     ^
-"""
     var variables = emptyVariables()
-    check testRunStatement(statement, variables, eErrLines = eErrLines)
+    let statement = newStatement(text="a = [ 1 ] xyz", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wTextAfterValue, "", 10)
+    check testRunStatement(statement, variables, eVariableDataOr)
 
+  test "operator":
+    var variables = emptyVariables()
+    let statement = newStatement(text="a &= 5", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "&=", newValue(5))
+    check testRunStatement(statement, variables, eVariableDataOr)
 
 # todo: test that a warning is generated when the item doesn't exist.
 # todo: test prepost when user specified.
