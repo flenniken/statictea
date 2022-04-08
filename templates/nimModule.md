@@ -62,7 +62,7 @@ $$ #
 $$ # Show the index label when there are entries.
 $$ #
 $$ nextline
-$$ : t.repeat = case(len(g.entries), list(0, 0), 1)
+$$ : t.repeat = if0(len(g.entries), 0, 1)
 # Index
 
 $$ #

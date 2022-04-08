@@ -10,8 +10,8 @@ import vartypes
 import readjson
 import messages
 import tostring
-import unicodes
 import utf8decoder
+import sharedtestcode
 
 proc testParseJsonStr(text: string, start: Natural,
     eStr: string, eLength: Natural): bool =

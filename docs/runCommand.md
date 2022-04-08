@@ -218,7 +218,7 @@ proc getVarOrFunctionValue(statement: Statement; start: Natural;
 Run one statement and return the variable dot name string, operator and value.
 
 ```nim
-proc runStatement(statement: Statement; variables: var Variables): OpResultWarn[
+proc runStatement(statement: Statement; variables: Variables): OpResultWarn[
     VariableData]
 ```
 

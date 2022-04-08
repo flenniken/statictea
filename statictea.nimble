@@ -52,7 +52,7 @@ proc get_dir_filenames(folder: string, extension: string, path: bool = false,
 proc get_source_filenames(path: bool = false, noExt: bool = false): seq[string] =
   ## Return the basename of the nim source files in the src
   ## folder excluding a few.
-  let excludeFilenames = @["t.nim", "dot.nim", "runner.nim"]
+  let excludeFilenames = @["t.nim", "dot.nim", "runner.nim", "sharedtestcode.nim"]
   result = get_dir_filenames("src", ".nim", path = path, noExt = noExt,
     excludeFilenames = excludeFilenames)
 
@@ -561,7 +561,12 @@ proc taskDocs(namePart: string) =
       echo "Generate $1" % [mdName]
       let part1 = "bin/statictea -t templates/nimModule.md "
       let part2 = "-s $1 -r $2" % [jsonName, mdName]
-      exec part1 & part2
+      cmd = part1 & part2
+      echo cmd
+      let output = staticExec(cmd)
+      if len(output) > 0:
+        echo output
+        exec fmt"rm {mdName}"
 
       # Remove the temporary files.
       rmFile(jsonName)
@@ -778,9 +783,9 @@ task json, "\tDisplay one or more source file's json doc comments; specify part 
       for line in text.splitLines():
         echo line
       break
-  echo ""
-  echo "The jq command is good for viewing the output."
-  echo "n json name | jq | less"
+  # echo ""
+  # echo "The jq command is good for viewing the output."
+  # echo "n json name | jq | less"
 
 task jsonix, "\tDisplay markdown docs index json.":
   var json = sourceIndexJson()

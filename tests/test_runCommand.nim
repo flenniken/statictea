@@ -17,6 +17,7 @@ import tostring
 import readlines
 import collectCommand
 import opresultwarn
+import sharedtestcode
 
 proc newIntValueAndLengthOr*(number: int | int64, length: Natural):
     OpResultWarn[ValueAndLength] =
@@ -39,24 +40,6 @@ proc startPointer*(start: Natural): string =
     for ix in 0..<start:
       result.add(' ')
     result.add("^$1" % $start)
-
-proc testSome*[T](valueAndLengthOr: OpResultWarn[T],
-    eValueAndLengthOr: OpResultWarn[T], text: string,
-    start: Natural): bool =
-
-  if $valueAndLengthOr == $eValueAndLengthOr:
-    return true
-  echo "text: $1" % text
-  echo "start: $1" % $start
-  echo "      got: $1" % $valueAndLengthOr
-  echo "      got: $1" % $valueAndLengthOr
-  echo " expected: $1" % $eValueAndLengthOr
-  result = false
-
-proc newStrFromBuffer(buffer: seq[uint8]): string =
-  result = newStringOfCap(buffer.len)
-  for ix in 0 ..< buffer.len:
-    result.add((char)buffer[ix])
 
 proc getCmdLinePartsTest(env: var Env, commandLines: seq[string]): seq[LineParts] =
   ## Return the line parts from the given lines. Only used for
@@ -92,6 +75,30 @@ proc compareStatements(statements: seq[Statement], eContent: string): bool =
       return false
   return true
 
+proc cmpOpResultWarn[T](statement: Statement,
+    g, e: OpResultWarn[T]): bool =
+  ## Compare the two values and show the differences when
+  ## different. Return true when they are the same.
+
+  result = true
+  if $g != $e:
+    echo "expected: $1" % $e
+    if e.isMessage:
+      echo getWarnStatement(statement, e.message, "template.html")
+
+    echo "     got: $1" % $g
+    if g.isMessage:
+      echo getWarnStatement(statement, g.message, "template.html")
+    result = false
+
+proc cmpValueAndLengthOr(statement: Statement,
+    g, e: OpResultWarn[ValueAndLength]): bool =
+    result = cmpOpResultWarn[ValueAndLength](statement, g, e)
+
+proc cmpVariableDataOr(statement: Statement,
+    g, e: OpResultWarn[VariableData]): bool =
+    result = cmpOpResultWarn[VariableData](statement, g, e)
+
 proc testGetStatements(content: string, expected: string): bool =
   ## Return true when the template content generates the expected statements.
 
@@ -125,36 +132,15 @@ proc testGetString(statement: Statement, start: Natural,
     eValueAndLengthOr: OpResultWarn[ValueAndLength]): bool =
 
   let valueAndLengthOr = getString(statement, start)
-
-  result = true
-  if $valueAndLengthOr != $eValueAndLengthOr:
-    echo "expected: $1" % $eValueAndLengthOr
-    if eValueAndLengthOr.isMessage:
-      echo getWarnStatement(statement, eValueAndLengthOr.message, "template.html")
-
-    echo "     got: $1" % $valueAndLengthOr
-    if valueAndLengthOr.isMessage:
-      echo getWarnStatement(statement, valueAndLengthOr.message, "template.html")
-    result = false
+  result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr)
 
 proc testGetStringInvalid(buffer: seq[uint8]): bool =
-  let str = newStrFromBuffer(buffer)
+  let str = bytesToString(buffer)
   let statement = newStatement("""a = "stringwithbadutf8:$1:end"""" % str)
   let start = 4
   let valueAndLengthOr = getString(statement, start)
   let eValueAndLengthOr = newValueAndLengthOr(wInvalidUtf8, "", 23)
-  result = true
-
-  if $valueAndLengthOr != $eValueAndLengthOr:
-    echo "expected: $1" % $eValueAndLengthOr
-    if eValueAndLengthOr.isMessage:
-      echo getWarnStatement(statement, eValueAndLengthOr.message, "template.html")
-
-    echo "     got: $1" % $valueAndLengthOr
-    if valueAndLengthOr.isMessage:
-      echo getWarnStatement(statement, valueAndLengthOr.message, "template.html")
-    result = false
-
+  result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr)
 
 proc testGetVarOrFunctionValue(
   variables: Variables,
@@ -163,11 +149,7 @@ proc testGetVarOrFunctionValue(
   eValueAndLengthOr: OpResultWarn[ValueAndLength]
      ): bool =
   let valueAndLengthOr = getVarOrFunctionValue(statement, start, variables)
-  result = true
-  if $valueAndLengthOr != $eValueAndLengthOr:
-    echo "expected: $1" % $eValueAndLengthOr
-    echo "     got: $1" % $valueAndLengthOr
-    result = false
+  result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr)
 
 proc testWarnStatement(statement: Statement,
     warning: Warning, start: Natural, p1: string="",
@@ -193,18 +175,7 @@ proc testGetFunctionValue(
   var variables = emptyVariables()
   let valueAndLengthOr = getFunctionValue(functionName,
     statement, start, variables)
-
-  result = true
-  if $valueAndLengthOr != $eValueAndLengthOr:
-    echo "expected: $1" % $eValueAndLengthOr
-    if eValueAndLengthOr.isMessage:
-      echo getWarnStatement(statement, eValueAndLengthOr.message, "template.html")
-
-    echo "     got: $1" % $valueAndLengthOr
-    if valueAndLengthOr.isMessage:
-      echo getWarnStatement(statement, valueAndLengthOr.message, "template.html")
-
-    result = false
+  result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr)
 
 proc testRunStatement(
   statement: Statement,
@@ -213,18 +184,7 @@ proc testRunStatement(
      ): bool =
 
   let variableDataOr = runStatement(statement, variables)
-
-  result = true
-  if $variableDataOr != $eVariableDataOr:
-    echo "expected: $1" % $eVariableDataOr
-    if eVariableDataOr.isMessage:
-      echo getWarnStatement(statement, eVariableDataOr.message, "template.html")
-
-    echo "     got: $1" % $variableDataOr
-    if variableDataOr.isMessage:
-      echo getWarnStatement(statement, variableDataOr.message, "template.html")
-    result = false
-
+  result = cmpVariableDataOr(statement, variableDataOr, eVariableDataOr)
 
 suite "runCommand.nim":
 
@@ -375,19 +335,19 @@ $$ : c = len("hello")
       newStringValueAndLengthOr("hello", 9))
 
   test "getString two bytes":
-    let str = newStrFromBuffer(@[0xc3u8, 0xb1])
+    let str = bytesToString(@[0xc3u8, 0xb1])
     let statement = newStatement("""a = "$1"""" % str)
     check testGetString(statement, 4, newStringValueAndLengthOr(str, 4))
 
   test "getString three bytes":
 
-    let str = newStrFromBuffer(@[0xe2u8, 0x82, 0xa1])
+    let str = bytesToString(@[0xe2u8, 0x82, 0xa1])
     let statement = newStatement("""a = "$1"""" % str)
     check testGetString(statement, 4, newStringValueAndLengthOr(str, 5))
 
   test "getString four bytes":
 
-    let str = newStrFromBuffer(@[0xf0u8, 0x90, 0x8c, 0xbc])
+    let str = bytesToString(@[0xf0u8, 0x90, 0x8c, 0xbc])
     let statement = newStatement("""a = "$1"""" % str)
     check testGetString(statement, 4, newStringValueAndLengthOr(str, 6))
 

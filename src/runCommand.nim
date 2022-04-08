@@ -224,7 +224,7 @@ proc getNumber*(statement: Statement, start: Natural):
   ## statement. The start index points at a digit or minus sign.
 
   # Check that we have a statictea number.
-  var matchesO = matchNumber(statement.text, start)
+  let matchesO = matchNumber(statement.text, start)
   if not matchesO.isSome:
     return newValueAndLengthOr(wNotNumber, "", start)
 
@@ -342,18 +342,19 @@ proc getVarOrFunctionValue*(statement: Statement, start: Natural,
   let dotNameStrO = matchDotNames(statement.text, start)
   assert dotNameStrO.isSome
   let matches = dotNameStrO.get()
-  let (_, dotNameStr) = matches.get2Groups()
-  let nameLength = matches.length
+  let dotNameStr = matches.getGroups(2)[1]
+  let dotNameLen = matches.length
 
   # Look for a function. A function name looks like a variable
   # followed by a left parentheses. No space is allowed between the
   # function name and the left parentheses.
-  let parenthesesO = matchLeftParentheses(statement.text, start+nameLength)
+  let parenthesesO = matchSymbol(statement.text, gLeftParentheses,
+    start+dotNameLen)
   if parenthesesO.isSome:
     # We have a function, run it and return its value.
 
     # Make sure the function exists.
-    var functionName = dotNameStr
+    let functionName = dotNameStr
     if not isFunctionName(functionName):
       # The function does not exist: $1.
       return newValueAndLengthOr(wInvalidFunction, functionName, start)
@@ -361,14 +362,14 @@ proc getVarOrFunctionValue*(statement: Statement, start: Natural,
     # Get the function's value and length.
     let parentheses = parenthesesO.get()
     let funValueLengthOr = getFunctionValue(functionName, statement,
-      start+nameLength+parentheses.length, variables)
+      start+dotNameLen+parentheses.length, variables)
     if funValueLengthOr.isMessage:
       return funValueLengthOr
     let funValueLength = funValueLengthOr.value
 
     # Return the value and length.
     let valueAndLength = newValueAndLength(funValueLength.value,
-      nameLength+parentheses.length+funValueLength.length)
+      dotNameLen+parentheses.length+funValueLength.length)
     result = newValueAndLengthOr(valueAndLength.value, valueAndLength.length)
   else:
     # We have a variable, look it up and return its value.
@@ -377,7 +378,7 @@ proc getVarOrFunctionValue*(statement: Statement, start: Natural,
       return newValueAndLengthOr(valueOrWarning.warningData.warning,
         valueOrWarning.warningData.p1, start)
 
-    result = newValueAndLengthOr(valueOrWarning.value, nameLength)
+    result = newValueAndLengthOr(valueOrWarning.value, dotNameLen)
 
 proc getList(statement: Statement, start: Natural,
     variables: Variables): OpResultWarn[ValueAndLength] =
@@ -432,7 +433,7 @@ proc getValue(statement: Statement, start: Natural, variables:
     # Expected a string, number, variable, list or function.
     return newValueAndLengthOr(wInvalidRightHandSide, "", start)
 
-proc runStatement*(statement: Statement, variables: var Variables):
+proc runStatement*(statement: Statement, variables: Variables):
     OpResultWarn[VariableData] =
   ## Run one statement and return the variable dot name string,
   ## operator and value.
@@ -443,33 +444,34 @@ proc runStatement*(statement: Statement, variables: var Variables):
   if not isSome(dotNameMatchesO):
     # Statement does not start with a variable name.
     return newVariableDataOr(wMissingStatementVar)
-  let dotNameMatches = dotNameMatchesO.get()
-  let (_, dotNameStr) = dotNameMatches.get2Groups()
+  let matches = dotNameMatchesO.get()
+  let dotNameStr = matches.getGroups(2)[1]
+  let dotNameLen = matches.length
 
   # Get the equal sign or &= and following whitespace.
-  let operatorO = matchEqualSign(statement.text, dotNameMatches.length)
+  let operatorO = matchEqualSign(statement.text, dotNameLen)
   if not operatorO.isSome:
     # Invalid variable or missing equal operator.
     return newVariableDataOr(wInvalidVariable)
-  let operator = operatorO.get()
+  let operatorMatch = operatorO.get()
 
   # Get the right hand side value and match the following whitespace.
   let valueAndLengthOr = getValue(statement,
-    dotNameMatches.length + operator.length, variables)
+    dotNameLen + operatorMatch.length, variables)
   if valueAndLengthOr.isMessage:
     return newVariableDataOr(valueAndLengthOr.message)
   let value = valueAndLengthOr.value.value
   let length = valueAndLengthOr.value.length
 
   # Check that there is not any unprocessed text following the value.
-  var pos = dotNameMatches.length + operator.length + length
+  let pos = dotNameLen + operatorMatch.length + length
   if pos != statement.text.len:
     # Unused text at the end of the statement.
     return newVariableDataOr(wTextAfterValue, "", pos)
 
   # Return the variable dot name and value.
-  let groups = operator.getGroups(1)
-  result = newVariableDataOr(dotNameStr, groups[0], value)
+  let operator = operatorMatch.getGroups(1)[0]
+  result = newVariableDataOr(dotNameStr, operator, value)
 
 proc runCommand*(env: var Env, cmdLines: CmdLines, variables: var Variables) =
   ## Run a command and fill in the variables dictionaries.
@@ -480,8 +482,7 @@ proc runCommand*(env: var Env, cmdLines: CmdLines, variables: var Variables) =
 
   # Loop over the statements and run each one.
   for statement in yieldStatements(cmdLines):
-    # Run the statement and assign a variable.  When there is a
-    # statement error, the statement is skipped.
+    # Run the statement and get the variable, operator and value.
     let variableDataOr = runStatement(statement, variables)
     if variableDataOr.isMessage:
       env.warnStatement(statement, variableDataOr.message)
@@ -489,8 +490,7 @@ proc runCommand*(env: var Env, cmdLines: CmdLines, variables: var Variables) =
     let variableData = variableDataOr.value
     
     # Assign the variable if possible.
-    let operator = variableData.operator
     let warningDataO = assignVariable(variables,
-      variableData.dotNameStr, variableData.value, operator)
+      variableData.dotNameStr, variableData.value, variableData.operator)
     if isSome(warningDataO):
       env.warnStatement(statement, warningDataO.get())

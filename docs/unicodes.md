@@ -8,7 +8,6 @@ Functions that deal with Unicode.
 * [cmpString](#cmpstring) &mdash; Compares two UTF-8 strings a and b.
 * [stringLen](#stringlen) &mdash; Return the number of unicode characters in the string (not bytes).
 * [githubAnchor](#githubanchor) &mdash; Convert the name to a github anchor name.
-* [bytesToString](#bytestostring) &mdash; Create a string from bytes in a buffer.
 * [parseHexUnicode16](#parsehexunicode16) &mdash; Return the unicode code point given a 4 character unicode escape string like u1234.
 * [parseHexUnicode](#parsehexunicode) &mdash; Return the unicode code point given a 4 or 8 character unicode escape string.
 * [codePointToString](#codepointtostring) &mdash; Convert a code point to a one character UTF-8 string.
@@ -39,14 +38,6 @@ Convert the name to a github anchor name.
 
 ```nim
 func githubAnchor(name: string): string
-```
-
-# bytesToString
-
-Create a string from bytes in a buffer. A nim string is UTF-8 incoded but it isn't validated so it is just a string of bytes.
-
-```nim
-func bytesToString(buffer: openArray[uint8 | char]): string
 ```
 
 # parseHexUnicode16
