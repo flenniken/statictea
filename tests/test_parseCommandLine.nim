@@ -76,6 +76,7 @@ proc tpcl(
     result = false
   if not expectedItem("logFilename", args.logFilename, logFilename):
     result = false
+
   if not expectedItems("prepostList", args.prepostList, prepostList):
     result = false
 
@@ -218,8 +219,9 @@ suite "parseCommandLine":
   #   check tpcl("-r=\"name with spaces result.html\"", resultFilename = "name with spaces result.html")
 
   test "parseCommandLine-prepost":
+    let prepostList = @[newPrepost(r"<--$", "")]
     check tpcl("--prepost <--$ -t template", templateFilename = "template",
-               prepostList = @[newPrepost("<--$", "")])
+               prepostList = prepostList)
 
   # The test code splits args by spaces. The following "# $" becomes
   # two args "#" and "$".

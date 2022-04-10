@@ -35,7 +35,7 @@ proc parsePrepost*(str: string): Option[Prepost] =
   ## Each part contains 1 to 20 ascii characters including spaces but
   ## without control characters or commas.
   let pattern = "([\x20-\x2b\x2d-\x7F]{1,20})(?:,([\x20-\x2b\x2d-\x7F]{1,20})){0,1}$"
-  let matchesO = matchPattern(str, pattern)
+  let matchesO = matchPattern(str, pattern, 0, 2)
   if matchesO.isSome:
     let matches = matchesO.get()
     let (prefix, postfix) = matches.get2Groups()

@@ -247,10 +247,7 @@ proc lineToSegments*(line: string): seq[string] =
       pos = nextPos
       continue
     let matches = matches0.get()
-    let groups = matches.getGroups(3)
-    let whitespace = groups[0]
-    let dotNameStr = groups[1]
-    let leftParen = groups[2]
+    let (whitespace, dotNameStr, leftParen) = matches.get3Groups()
     var length = matches.length
 
     # Check that the variable ends with a right bracket.

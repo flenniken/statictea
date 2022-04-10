@@ -197,30 +197,52 @@ suite "matches.nim":
     check testMatchCommand(" coment ", 2)
 
   test "matchLastPart":
-    check testMatchLastPart("<!--$ nextline -->", 15, "-->", some(newMatches(3, 15)))
-    check testMatchLastPart("<!--$ nextline -->\n", 15, "-->", some(newMatches(4, 15, "", "\n")))
-    check testMatchLastPart("<!--$ nextline -->\r\n", 15, "-->", some(newMatches(5, 15, "", "\r\n")))
-    check testMatchLastPart(r"<!--$ nextline +-->", 15, "-->", some(newMatches(4, 15, r"+")))
-    check testMatchLastPart("<!--$ nextline +-->", 15, "-->", some(newMatches(4, 15, r"+")))
-    check testMatchLastPart("<!--$ nextline +-->\n", 15, "-->", some(newMatches(5, 15, r"+", "\n")))
-    check testMatchLastPart("<!--$ nextline +-->\r\n", 15, "-->", some(newMatches(6, 15, r"+", "\r\n")))
+    check testMatchLastPart("<!--$ nextline -->", 15, "-->",
+      some(newMatches(3, 15, "", "")))
+    check testMatchLastPart("<!--$ nextline -->\n", 15, "-->",
+      some(newMatches(4, 15, "", "\n")))
+    check testMatchLastPart("<!--$ nextline -->\r\n", 15, "-->",
+      some(newMatches(5, 15, "", "\r\n")))
+    check testMatchLastPart(r"<!--$ nextline +-->", 15, "-->",
+      some(newMatches(4, 15, r"+", "")))
+    check testMatchLastPart("<!--$ nextline +-->", 15, "-->",
+      some(newMatches(4, 15, r"+", "")))
+    check testMatchLastPart("<!--$ nextline +-->\n", 15, "-->",
+      some(newMatches(5, 15, r"+", "\n")))
+    check testMatchLastPart("<!--$ nextline +-->\r\n", 15, "-->",
+      some(newMatches(6, 15, r"+", "\r\n")))
 
-    check testMatchLastPart("<!--$ nextline -->", 15, "-->", some(newMatches(3, 15)))
-    check testMatchLastPart("<!--$ nextline -->\n", 15, "-->", some(newMatches(4, 15, "", "\n")))
-    check testMatchLastPart("<!--$ nextline -->\r\n", 15, "-->", some(newMatches(5, 15, "", "\r\n")))
-    check testMatchLastPart(r"<!--$ nextline +-->", 15, "-->", some(newMatches(4, 15, r"+")))
-    check testMatchLastPart("<!--$ nextline +-->", 15, "-->", some(newMatches(4, 15, r"+")))
-    check testMatchLastPart("<!--$ nextline +-->\n", 15, "-->", some(newMatches(5, 15, r"+", "\n")))
-    check testMatchLastPart("<!--$ nextline +-->\r\n", 15, "-->", some(newMatches(6, 15, r"+", "\r\n")))
+    check testMatchLastPart("<!--$ nextline -->", 15, "-->",
+      some(newMatches(3, 15, "", "")))
+    check testMatchLastPart("<!--$ nextline -->\n", 15, "-->",
+      some(newMatches(4, 15, "", "\n")))
+    check testMatchLastPart("<!--$ nextline -->\r\n", 15, "-->",
+      some(newMatches(5, 15, "", "\r\n")))
+    check testMatchLastPart(r"<!--$ nextline +-->", 15, "-->",
+      some(newMatches(4, 15, r"+", "")))
+    check testMatchLastPart("<!--$ nextline +-->", 15, "-->",
+      some(newMatches(4, 15, r"+", "")))
+    check testMatchLastPart("<!--$ nextline +-->\n", 15, "-->",
+      some(newMatches(5, 15, r"+", "\n")))
+    check testMatchLastPart("<!--$ nextline +-->\r\n", 15, "-->",
+      some(newMatches(6, 15, r"+", "\r\n")))
 
-    check testMatchLastPart("<!--$ nextline a", 16, "", some(newMatches(0, 16)))
-    check testMatchLastPart("<!--$ nextline a\n", 16, "", some(newMatches(1, 16, "", "\n")))
-    check testMatchLastPart("<!--$ nextline a\r\n", 16, "", some(newMatches(2, 16, "", "\r\n")))
-    check testMatchLastPart(r"<!--$ nextline a+", 16, "", some(newMatches(1, 16, r"+")))
-    check testMatchLastPart("<!--$ nextline a+", 16, "", some(newMatches(1, 16, r"+")))
-    check testMatchLastPart("<!--$ nextline a+\n", 16, "", some(newMatches(2, 16, r"+", "\n")))
-    check testMatchLastPart("<!--$ nextline a+\r\n", 16, "", some(newMatches(3, 16, r"+", "\r\n")))
-    check testMatchLastPart(r"#$ nextline +", 12, "", some(newMatches(1, 12, r"+")))
+    check testMatchLastPart("<!--$ nextline a", 16, "",
+      some(newMatches(0, 16, "", "")))
+    check testMatchLastPart("<!--$ nextline a\n", 16, "",
+      some(newMatches(1, 16, "", "\n")))
+    check testMatchLastPart("<!--$ nextline a\r\n", 16, "",
+      some(newMatches(2, 16, "", "\r\n")))
+    check testMatchLastPart(r"<!--$ nextline a+", 16, "",
+      some(newMatches(1, 16, r"+", "")))
+    check testMatchLastPart("<!--$ nextline a+", 16, "",
+      some(newMatches(1, 16, r"+", "")))
+    check testMatchLastPart("<!--$ nextline a+\n", 16, "",
+      some(newMatches(2, 16, r"+", "\n")))
+    check testMatchLastPart("<!--$ nextline a+\r\n", 16, "",
+      some(newMatches(3, 16, r"+", "\r\n")))
+    check testMatchLastPart(r"#$ nextline +", 12, "",
+      some(newMatches(1, 12, r"+", "")))
 
   test "matchAllSpaceTab":
     check testMatchAllSpaceTab("    ", 0, some(newMatches(4, 0)))
@@ -245,32 +267,32 @@ suite "matches.nim":
     check testMatchTabSpace(" a ", 1)
 
   test "matchVariable":
-    check testMatchDotNames("a = 5", 0, some(newMatches(2, 0, "", "a")))
+    check testMatchDotNames("a = 5", 0, some(newMatches(2, 0, "", "a", "")))
     check testMatchDotNames("a(4)", 0, some(newMatches(2, 0, "", "a", "(")))
-    check testMatchDotNames("a (4)", 0, some(newMatches(2, 0, "", "a")))
+    check testMatchDotNames("a (4)", 0, some(newMatches(2, 0, "", "a", "")))
     check testMatchDotNames("a(  4)", 0, some(newMatches(4, 0, "", "a", "(")))
-    check testMatchDotNames(" a = 5 ", 0, some(newMatches(3, 0, " ", "a")))
-    check testMatchDotNames("t.a = 5", 0, some(newMatches(4, 0, "", "t.a")))
-    check testMatchDotNames("abc = 5", 0, some(newMatches(4, 0, "", "abc")))
-    check testMatchDotNames("   a = 5", 0, some(newMatches(5, 0, "   ", "a")))
-    check testMatchDotNames("aBcD_t = 5", 0, some(newMatches(7, 0, "", "aBcD_t")))
-    check testMatchDotNames("t.server = 5", 0, some(newMatches(9, 0, "", "t.server")))
-    check testMatchDotNames("t.server =", 0, some(newMatches(9, 0, "", "t.server")))
-    check testMatchDotNames("   a =    5", 0, some(newMatches(5, 0, "   ", "a")))
+    check testMatchDotNames(" a = 5 ", 0, some(newMatches(3, 0, " ", "a", "")))
+    check testMatchDotNames("t.a = 5", 0, some(newMatches(4, 0, "", "t.a", "")))
+    check testMatchDotNames("abc = 5", 0, some(newMatches(4, 0, "", "abc", "")))
+    check testMatchDotNames("   a = 5", 0, some(newMatches(5, 0, "   ", "a", "")))
+    check testMatchDotNames("aBcD_t = 5", 0, some(newMatches(7, 0, "", "aBcD_t", "")))
+    check testMatchDotNames("t.server = 5", 0, some(newMatches(9, 0, "", "t.server", "")))
+    check testMatchDotNames("t.server =", 0, some(newMatches(9, 0, "", "t.server", "")))
+    check testMatchDotNames("   a =    5", 0, some(newMatches(5, 0, "   ", "a", "")))
     let longVar = "a23456789_123456789_123456789_123456789_123456789_123456789_1234"
-    check testMatchDotNames(longVar, 0, some(newMatches(64, 0, "", longVar)))
-    check testMatchDotNames(longVar & " = 5", 0, some(newMatches(65, 0, "", longVar)))
-    check testMatchDotNames(" t." & longVar & " = 5", 0, some(newMatches(68, 0, " ", "t." & longVar)))
+    check testMatchDotNames(longVar, 0, some(newMatches(64, 0, "", longVar, "")))
+    check testMatchDotNames(longVar & " = 5", 0, some(newMatches(65, 0, "", longVar, "")))
+    check testMatchDotNames(" t." & longVar & " = 5", 0, some(newMatches(68, 0, " ", "t." & longVar, "")))
 
     # These start with a variable but are not valid statements.
-    check testMatchDotNames("t. =", 0, some(newMatches(1, 0, "", "t")))
-    check testMatchDotNames("tt.a =", 0, some(newMatches(5, 0, "", "tt.a")))
+    check testMatchDotNames("t. =", 0, some(newMatches(1, 0, "", "t", "")))
+    check testMatchDotNames("tt.a =", 0, some(newMatches(5, 0, "", "tt.a", "")))
     check testMatchDotNames("abc() =", 0, some(newMatches(4, 0, "", "abc", "(")))
-    check testMatchDotNames("abc", 0, some(newMatches(3, 0, "", "abc")))
-    check testMatchDotNames("t.1a", 0, some(newMatches(1, 0, "", "t")))
+    check testMatchDotNames("abc", 0, some(newMatches(3, 0, "", "abc", "")))
+    check testMatchDotNames("t.1a", 0, some(newMatches(1, 0, "", "t", "")))
     # It matches up to 64 characters.
     let tooLong = "a23456789_123456789_123456789_123456789_123456789_123456789_12345"
-    check testMatchDotNames(tooLong, 0, some(newMatches(64, 0, "", longVar)))
+    check testMatchDotNames(tooLong, 0, some(newMatches(64, 0, "", longVar, "")))
 
     check testMatchDotNames(".a =", 0)
     check testMatchDotNames("_a =", 0)
@@ -294,24 +316,24 @@ suite "matches.nim":
     check testMatchEqualSign("&", 0)
 
   test "matchNumber":
-    check testMatchNumber("5", 0, some(newMatches(1, 0)))
-    check testMatchNumber("-5", 0, some(newMatches(2, 0)))
+    check testMatchNumber("5", 0, some(newMatches(1, 0, "")))
+    check testMatchNumber("-5", 0, some(newMatches(2, 0, "")))
     check testMatchNumber("-5.", 0, some(newMatches(3, 0, ".")))
     check testMatchNumber("-5.6", 0, some(newMatches(4, 0, ".")))
     check testMatchNumber("56789.654321", 0, some(newMatches(12, 0, ".")))
-    check testMatchNumber("4 ", 0, some(newMatches(2, 0)))
+    check testMatchNumber("4 ", 0, some(newMatches(2, 0, "")))
     check testMatchNumber("4_123_456.0 ", 0, some(newMatches(12, 0, ".")))
-    check testMatchNumber("4_123_456 ", 0, some(newMatches(10, 0)))
+    check testMatchNumber("4_123_456 ", 0, some(newMatches(10, 0, "")))
 
   test "matchNumber with start":
-    check testMatchNumber("a = 5", 4, some(newMatches(1, 4)))
-    check testMatchNumber("a = 5 ", 4, some(newMatches(2, 4)))
+    check testMatchNumber("a = 5", 4, some(newMatches(1, 4, "")))
+    check testMatchNumber("a = 5 ", 4, some(newMatches(2, 4, "")))
     check testMatchNumber("a = -5.2", 4, some(newMatches(4, 4, ".")))
     check testMatchNumber("a = 0.2", 4, some(newMatches(3, 4, ".")))
     check testMatchNumber("a = 0.2   ", 4, some(newMatches(6, 4, ".")))
 
     # Starts with a number but not a valid statement.
-    check testMatchNumber("5a", 0, some(newMatches(1, 0)))
+    check testMatchNumber("5a", 0, some(newMatches(1, 0, "")))
     check testMatchNumber("5.5.", 0, some(newMatches(3, 0, ".")))
     check testMatchNumber("5.5.6", 0, some(newMatches(3, 0, ".")))
 
@@ -331,7 +353,7 @@ suite "matches.nim":
     check testMatchNumber(" 4")
 
   test "matchNumber":
-    check matchNumber("a = 5", 4) == some(newMatches(1, 4))
+    check matchNumber("a = 5", 4) == some(newMatches(1, 4, ""))
     check matchNumber("a = 5.3", 4) == some(newMatches(3, 4, "."))
 
   test "matchLeftParentheses":
@@ -389,43 +411,43 @@ suite "matches.nim":
     check not matchO.isSome
 
   test "matchDotNames":
-    check testMatchDotNames("t.maxLines = 5", 0, some(newMatches(11, 0, "", "t.maxLines")))
+    check testMatchDotNames("t.maxLines = 5", 0, some(newMatches(11, 0, "", "t.maxLines", "")))
 
-    check testMatchDotNames("a", 0, some(newMatches(1, 0, "", "a")))
-    check testMatchDotNames("a.b", 0, some(newMatches(3, 0, "", "a.b")))
-    check testMatchDotNames("a.b.c", 0, some(newMatches(5, 0, "", "a.b.c")))
-    check testMatchDotNames("a.b.c.d", 0, some(newMatches(7, 0, "", "a.b.c.d")))
-    check testMatchDotNames("a.b.c.d.e", 0, some(newMatches(9, 0, "", "a.b.c.d.e")))
-    check testMatchDotNames("a.b.c.d.e.f", 0, some(newMatches(9, 0, "", "a.b.c.d.e")))
+    check testMatchDotNames("a", 0, some(newMatches(1, 0, "", "a", "")))
+    check testMatchDotNames("a.b", 0, some(newMatches(3, 0, "", "a.b", "")))
+    check testMatchDotNames("a.b.c", 0, some(newMatches(5, 0, "", "a.b.c", "")))
+    check testMatchDotNames("a.b.c.d", 0, some(newMatches(7, 0, "", "a.b.c.d", "")))
+    check testMatchDotNames("a.b.c.d.e", 0, some(newMatches(9, 0, "", "a.b.c.d.e", "")))
+    check testMatchDotNames("a.b.c.d.e.f", 0, some(newMatches(9, 0, "", "a.b.c.d.e", "")))
 
-    check testMatchDotNames("a.b.", 0, some(newMatches(3, 0, "", "a.b")))
-    check testMatchDotNames("a..b", 0, some(newMatches(1, 0, "", "a")))
-    check testMatchDotNames("a#", 0, some(newMatches(1, 0, "", "a")))
-    check testMatchDotNames("a#  ", 0, some(newMatches(1, 0, "", "a")))
-    check testMatchDotNames("a$", 0, some(newMatches(1, 0, "", "a")))
+    check testMatchDotNames("a.b.", 0, some(newMatches(3, 0, "", "a.b", "")))
+    check testMatchDotNames("a..b", 0, some(newMatches(1, 0, "", "a", "")))
+    check testMatchDotNames("a#", 0, some(newMatches(1, 0, "", "a", "")))
+    check testMatchDotNames("a#  ", 0, some(newMatches(1, 0, "", "a", "")))
+    check testMatchDotNames("a$", 0, some(newMatches(1, 0, "", "a", "")))
 
-    check testMatchDotNames("  a", 0, some(newMatches(3, 0, "  ", "a")))
-    check testMatchDotNames("  a.bb", 0, some(newMatches(6, 0, "  ", "a.bb")))
+    check testMatchDotNames("  a", 0, some(newMatches(3, 0, "  ", "a", "")))
+    check testMatchDotNames("  a.bb", 0, some(newMatches(6, 0, "  ", "a.bb", "")))
 
-    check testMatchDotNames("  a ", 0, some(newMatches(4, 0, "  ", "a")))
-    check testMatchDotNames("  a  ", 0, some(newMatches(5, 0, "  ", "a")))
-    check testMatchDotNames("  a.", 0, some(newMatches(3, 0, "  ", "a")))
-    check testMatchDotNames("  a=", 0, some(newMatches(3, 0, "  ", "a")))
-    check testMatchDotNames(" var = 5", 0, some(newMatches(5, 0, " ", "var")))
+    check testMatchDotNames("  a ", 0, some(newMatches(4, 0, "  ", "a", "")))
+    check testMatchDotNames("  a  ", 0, some(newMatches(5, 0, "  ", "a", "")))
+    check testMatchDotNames("  a.", 0, some(newMatches(3, 0, "  ", "a", "")))
+    check testMatchDotNames("  a=", 0, some(newMatches(3, 0, "  ", "a", "")))
+    check testMatchDotNames(" var = 5", 0, some(newMatches(5, 0, " ", "var", "")))
 
-    check testMatchDotNames(" s.aZ_4 = b", 0, some(newMatches(8, 0, " ", "s.aZ_4")))
-    check testMatchDotNames(" s.Ab_4 = b", 0, some(newMatches(8, 0, " ", "s.Ab_4")))
-    check testMatchDotNames("a0123456789 = b", 0, some(newMatches(12, 0, "", "a0123456789")))
+    check testMatchDotNames(" s.aZ_4 = b", 0, some(newMatches(8, 0, " ", "s.aZ_4", "")))
+    check testMatchDotNames(" s.Ab_4 = b", 0, some(newMatches(8, 0, " ", "s.Ab_4", "")))
+    check testMatchDotNames("a0123456789 = b", 0, some(newMatches(12, 0, "", "a0123456789", "")))
 
     let longName = "a23456789_123456789_123456789_123456789_123456789_123456789_1234"
     let statement = "$1= 333" % [longName]
-    check testMatchDotNames(statement, 0, some(newMatches(64, 0, "", longName)))
+    check testMatchDotNames(statement, 0, some(newMatches(64, 0, "", longName, "")))
 
     let statement2 = "$1e = 333" % [longName]
-    check testMatchDotNames(statement2, 0, some(newMatches(64, 0, "", longName)))
+    check testMatchDotNames(statement2, 0, some(newMatches(64, 0, "", longName, "")))
 
     let twoVars = "$1.$1" % [longName]
-    check testMatchDotNames(twoVars, 0, some(newMatches(129, 0, "", twoVars)))
+    check testMatchDotNames(twoVars, 0, some(newMatches(129, 0, "", twoVars, "")))
 
   test "matchDotNames no match":
     check testMatchDotNames("", 0)

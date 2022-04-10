@@ -230,8 +230,8 @@ func getString*(statement: Statement, start: Natural):
   if parsedString.messageId != MessageId(0):
     return newValueAndLengthOr(parsedString.messageId, "", parsedString.pos)
 
-  let value = Value(kind: vkString, stringv: parsedString.str)
-  result = newValueAndLengthOr(value, parsedString.pos - start)
+  result = newValueAndLengthOr(newValue(parsedString.str),
+    parsedString.pos - start)
 
 proc getNumber*(statement: Statement, start: Natural):
     OpResultWarn[ValueAndLength] =
@@ -254,7 +254,7 @@ proc getNumber*(statement: Statement, start: Natural):
     if not floatPosO.isSome:
       return newValueAndLengthOr(wNumberOverFlow, "", start)
     let floatPos = floatPosO.get()
-    value = Value(kind: vkFloat, floatv: floatPos.number)
+    value = newValue(floatPos.number)
     assert floatPos.length <= matches.length
   else:
     # Parse the int.
@@ -262,7 +262,7 @@ proc getNumber*(statement: Statement, start: Natural):
     if not intPosO.isSome:
       return newValueAndLengthOr(wNumberOverFlow, "", start)
     let intPos = intPosO.get()
-    value = Value(kind: vkInt, intv: intPos.integer)
+    value = newValue(intPos.integer)
     assert intPos.length <= matches.length
   result = newValueAndLengthOr(value, matches.length)
 
@@ -425,10 +425,7 @@ proc getVarOrFunctionValue*(statement: Statement, start: Natural,
   let dotNameStrO = matchDotNames(statement.text, start)
   assert dotNameStrO.isSome
   let matches = dotNameStrO.get()
-  let groups = matches.getGroups(3)
-  # let whitespace = groups[0]
-  let dotNameStr = groups[1]
-  let leftParen = groups[2]
+  let (_, dotNameStr, leftParen) = matches.get3Groups()
   let dotNameLen = matches.length
 
   if leftParen == "(":
@@ -526,15 +523,12 @@ proc runStatement*(statement: Statement, variables: Variables):
 
   # Get the variable dot name string and match the surrounding white
   # space.
-  let dotNameMatchesO = matchDotNames(statement.text, 0)
-  if not isSome(dotNameMatchesO):
+  let matchesO = matchDotNames(statement.text, 0)
+  if not isSome(matchesO):
     # Statement does not start with a variable name.
     return newVariableDataOr(wMissingStatementVar)
-  let matches = dotNameMatchesO.get()
-  let groups = matches.getGroups(3)
-  # let whitespace = groups[0]
-  let dotNameStr = groups[1]
-  let leftParen = groups[2]
+  let matches = matchesO.get()
+  let (_, dotNameStr, leftParen) = matches.get3Groups()
 
   if leftParen != "":
     # Statement does not start with a variable name.
@@ -563,7 +557,8 @@ proc runStatement*(statement: Statement, variables: Variables):
     return newVariableDataOr(wTextAfterValue, "", pos)
 
   # Return the variable dot name and value.
-  let operator = operatorMatch.getGroups(1)[0]
+  let operator = operatorMatch.getGroup()
+
   result = newVariableDataOr(dotNameStr, operator, value)
 
 proc runCommand*(env: var Env, cmdLines: CmdLines, variables: var Variables) =

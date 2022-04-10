@@ -70,14 +70,15 @@ proc matchPrefix*(line: string, prepostTable: PrepostTable, start: Natural = 0):
   for prefix, _ in prepostTable:
     terms.add(r"\Q$1\E" % prefix)
   let pattern = r"^($1)\s*" % terms.join("|")
-  result = matchPatternCached(line, pattern, start)
+  result = matchPatternCached(line, pattern, start, 1)
 
 proc matchCommand*(line: string, start: Natural = 0): Option[Matches] =
   ## Match statictea commands.
   let pattern = r"($1)" % commands.join("|")
-  result = matchPatternCached(line, pattern, start)
+  result = matchPatternCached(line, pattern, start, 1)
 
-proc matchLastPart*(line: string, postfix: string, start: Natural = 0): Option[Matches] =
+proc matchLastPart*(line: string, postfix: string,
+    start: Natural = 0): Option[Matches] =
   ## Match the last part of a command line.  It matches the optional
   ## continuation plus character, the optional postfix and the
   ## optional line endings.
@@ -86,7 +87,7 @@ proc matchLastPart*(line: string, postfix: string, start: Natural = 0): Option[M
     pattern = r"([+]{0,1})([\r]{0,1}\n){0,1}$"
   else:
     pattern = r"([+]{0,1})\Q$1\E([\r]{0,1}\n){0,1}$" % postfix
-  result = matchPatternCached(line, pattern, start)
+  result = matchPatternCached(line, pattern, start, 2)
 
 proc getLastPart*(line: string, postfix: string): Option[Matches] =
   ## Return the optional plus and line endings from the line.
@@ -116,12 +117,12 @@ proc getLastPart*(line: string, postfix: string): Option[Matches] =
 proc matchAllSpaceTab*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a line of all spaces or tabs.
   let pattern = r"^[ \t]*$"
-  result = matchPatternCached(line, pattern, start)
+  result = matchPatternCached(line, pattern, start, 0)
 
 proc matchTabSpace*(line: string, start: Natural = 0): Option[Matches] =
   ## Match one or more spaces or tabs.
   let pattern = r"[ \t]+"
-  result = matchPatternCached(line, pattern, start)
+  result = matchPatternCached(line, pattern, start, 0)
 
 proc notEmptyOrSpaces*(text: string): bool =
   ## Return true when a statement is not empty or not all whitespace.
@@ -134,34 +135,34 @@ proc matchEqualSign*(line: string, start: Natural = 0): Option[Matches] =
   ## Match an equal sign or "&=" and the optional trailing
   ## whitespace. Return the operator in the group, "=" or "&=".
   let pattern = r"(&{0,1}=)\s*"
-  result = matchPatternCached(line, pattern, start)
+  result = matchPatternCached(line, pattern, start, 1)
 
 proc matchLeftParentheses*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a left parenthese and the optional trailing whitespace.
   let pattern = r"\(\s*"
-  result = matchPatternCached(line, pattern, start)
+  result = matchPatternCached(line, pattern, start, 0)
 
 proc matchCommaParentheses*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a comma or right parentheses and the optional trailing whitespace.
   let pattern = r"([,)])\s*"
-  result = matchPatternCached(line, pattern, start)
+  result = matchPatternCached(line, pattern, start, 1)
 
 proc matchRightParentheses*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a right parentheses and the optional trailing whitespace.
   let pattern = r"\)\s*"
-  result = matchPatternCached(line, pattern, start)
+  result = matchPatternCached(line, pattern, start, 0)
 
 proc matchNumber*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a number and the optional trailing whitespace. Return the
   ## optional decimal point that tells whether the number is a float
   ## or integer.
-  result = matchPatternCached(line, numberPattern, start)
+  result = matchPatternCached(line, numberPattern, start, 1)
 
 func matchNumberNotCached*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a number and the optional trailing whitespace. Return the
   ## optional decimal point that tells whether the number is a float
   ## or integer.
-  result = matchPattern(line, numberPattern, start)
+  result = matchPattern(line, numberPattern, start, 1)
 
 proc matchLeftBracket*(line: string, start: Natural = 0): Option[Matches] =
   ## Match everything up to a left backet. The match length includes
@@ -175,20 +176,21 @@ proc matchLeftBracket*(line: string, start: Natural = 0): Option[Matches] =
   ## @:~~~~
 
   let pattern = "[^{]*{"
-  result = matchPatternCached(line, pattern, start)
+  result = matchPatternCached(line, pattern, start, 0)
 
 proc matchFileLine*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a file and line number like: filename(234).
   let pattern = r"^(.*)\(([0-9]+)\)$"
-  result = matchPatternCached(line, pattern, start)
+  result = matchPatternCached(line, pattern, start, 2)
 
 proc matchVersion*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a StaticTea version number.
-  result = matchPatternCached(line, versionPattern, start)
+  result = matchPatternCached(line, versionPattern, start, 3)
 
-func matchVersionNotCached*(line: string, start: Natural = 0): Option[Matches] =
+func matchVersionNotCached*(line: string, start: Natural = 0,
+    numGroups: Natural = 0): Option[Matches] =
   ## Match a StaticTea version number.
-  result = matchPattern(line, versionPattern, start)
+  result = matchPattern(line, versionPattern, start, 3)
 
 proc matchDotNames*(line: string, start: Natural = 0): Option[Matches] =
   ## Matches variable dot names and surrounding whitespace. Return the
@@ -211,7 +213,7 @@ proc matchDotNames*(line: string, start: Natural = 0): Option[Matches] =
 
   let name = r"[a-zA-Z][a-zA-Z0-9_]{0,63}"
   let pattern = r"(\s*)((?:$1)(?:\.$1){0,4})(\(){0,1}\s*" % [name]
-  result = matchPatternCached(line, pattern, start)
+  result = matchPatternCached(line, pattern, start, 3)
 
 type
   GroupSymbol* = enum
@@ -233,7 +235,7 @@ proc matchCommaOrSymbol*(line: string, symbol: GroupSymbol,
     pattern = r"([,[])\s*"
   of gRightBracket:
     pattern = r"([,\]])\s*"
-  result = matchPatternCached(line, pattern, start)
+  result = matchPatternCached(line, pattern, start, 1)
 
 proc matchSymbol*(line: string, symbol: GroupSymbol, start: Natural = 0): Option[Matches] =
   ## Match the symbol and the optional trailing whitespace.
@@ -247,4 +249,4 @@ proc matchSymbol*(line: string, symbol: GroupSymbol, start: Natural = 0): Option
     pattern = r"\[\s*"
   of gRightBracket:
     pattern = r"\]\s*"
-  result = matchPatternCached(line, pattern, start)
+  result = matchPatternCached(line, pattern, start, 0)

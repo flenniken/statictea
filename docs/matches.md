@@ -196,7 +196,8 @@ proc matchVersion(line: string; start: Natural = 0): Option[Matches]
 Match a StaticTea version number.
 
 ```nim
-func matchVersionNotCached(line: string; start: Natural = 0): Option[Matches]
+func matchVersionNotCached(line: string; start: Natural = 0;
+                           numGroups: Natural = 0): Option[Matches]
 ```
 
 # matchDotNames

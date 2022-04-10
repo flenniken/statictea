@@ -384,13 +384,13 @@ proc parseRunCommandLine*(argv: seq[string]): OpResultStr[RunArgs] =
 proc isRunFileLine*(line: string): bool =
   ## Return true when the line is a file line.
   let pattern = r"^### File "
-  let matchesO = matchPatternCached(line, pattern, 0)
+  let matchesO = matchPatternCached(line, pattern, 0, 0)
   result = matchesO.isSome
 
 proc isExpectedLine*(line: string): bool =
   ## Return true when the line is an expected line.
   let pattern = r"^### Expected "
-  let matchesO = matchPatternCached(line, pattern, 0)
+  let matchesO = matchPatternCached(line, pattern, 0, 0)
   result = matchesO.isSome
 
 proc parseRunFileLine*(line: string): OpResultStr[RunFileLine] =
@@ -398,14 +398,13 @@ proc parseRunFileLine*(line: string): OpResultStr[RunFileLine] =
 
   let pattern = r"^### File ([^\s]+)(.*)$"
 
-  let matchesO = matchPatternCached(line, pattern, 0)
+  let matchesO = matchPatternCached(line, pattern, 0, 2)
   if not matchesO.isSome:
     return opMessageStr[RunFileLine]("Invalid file line: $1" % [line])
 
   let matches = matchesO.get()
-  let groups = matches.getGroups(2)
-  let filename = groups[0]
-  let attributes = groups[1].split(" ")
+  let (filename, attrs) = matches.get2Groups()
+  let attributes = attrs.split(" ")
 
   var noLastEnding, command, nonZeroReturn: bool
   for attr in attributes:
@@ -428,7 +427,7 @@ proc parseExpectedLine*(line: string): OpResultStr[ExpectedLine] =
   # # Expected stdout.expected == stdout
   let pattern = r"^### Expected ([^\s]+) == ([^\s]+)[\s]*$"
 
-  let matchesO = matchPatternCached(line, pattern, 0)
+  let matchesO = matchPatternCached(line, pattern, 0, 2)
   if not matchesO.isSome:
     return opMessageStr[ExpectedLine]("Invalid expected line: $1" % [line])
 
