@@ -246,6 +246,9 @@ suite "matches.nim":
 
   test "matchVariable":
     check testMatchDotNames("a = 5", 0, some(newMatches(2, 0, "", "a")))
+    check testMatchDotNames("a(4)", 0, some(newMatches(2, 0, "", "a", "(")))
+    check testMatchDotNames("a (4)", 0, some(newMatches(2, 0, "", "a")))
+    check testMatchDotNames("a(  4)", 0, some(newMatches(4, 0, "", "a", "(")))
     check testMatchDotNames(" a = 5 ", 0, some(newMatches(3, 0, " ", "a")))
     check testMatchDotNames("t.a = 5", 0, some(newMatches(4, 0, "", "t.a")))
     check testMatchDotNames("abc = 5", 0, some(newMatches(4, 0, "", "abc")))
@@ -262,7 +265,7 @@ suite "matches.nim":
     # These start with a variable but are not valid statements.
     check testMatchDotNames("t. =", 0, some(newMatches(1, 0, "", "t")))
     check testMatchDotNames("tt.a =", 0, some(newMatches(5, 0, "", "tt.a")))
-    check testMatchDotNames("abc() =", 0, some(newMatches(3, 0, "", "abc")))
+    check testMatchDotNames("abc() =", 0, some(newMatches(4, 0, "", "abc", "(")))
     check testMatchDotNames("abc", 0, some(newMatches(3, 0, "", "abc")))
     check testMatchDotNames("t.1a", 0, some(newMatches(1, 0, "", "t")))
     # It matches up to 64 characters.

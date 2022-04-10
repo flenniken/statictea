@@ -215,6 +215,7 @@ proc varSegment*(bracketedVar: string, dotNameStrPos: Natural,
     segmentValue = $ord(variable)
   result.add("{segmentValue},{dotNameStrPos:<4},{dotNameStrLen:<4},{bracketedVar}\n".fmt)
 
+# todo: require no space around the variable. {var} not {  var  }.
 proc lineToSegments*(line: string): seq[string] =
   ## Convert a line to a list of segments.
 
@@ -246,11 +247,15 @@ proc lineToSegments*(line: string): seq[string] =
       pos = nextPos
       continue
     let matches = matches0.get()
-    let (whitespace, dotNameStr) = matches.get2Groups()
+    let groups = matches.getGroups(3)
+    let whitespace = groups[0]
+    let dotNameStr = groups[1]
+    let leftParen = groups[2]
+    var length = matches.length
 
     # Check that the variable ends with a right bracket.
-    nextPos = pos + beforeVar.length + matches.length
-    if nextPos >= line.len or line[nextPos] != '}':
+    nextPos = pos + beforeVar.length + length
+    if leftParen == "(" or (nextPos >= line.len or line[nextPos] != '}'):
       # No closing bracket, so not it's not a variable, output what we
       # have.
       result.add(stringSegment(line, pos, nextPos))
@@ -265,7 +270,7 @@ proc lineToSegments*(line: string): seq[string] =
       result.add(stringSegment(line, pos, start))
 
     # Write out the variable including the left and right brackets.
-    nextPos = start + matches.length + 2
+    nextPos = start + length + 2
     let bracketedVar = line[start ..< nextPos]
     let dotNameStrPos = whitespace.len + 1
     let atEnd = (nextPos >= line.len)

@@ -173,7 +173,7 @@ proc testGetFunctionValue(
     ): bool =
 
   var variables = emptyVariables()
-  let valueAndLengthOr = getFunctionValue(functionName,
+  let valueAndLengthOr = getFunctionValueAndLength(functionName,
     statement, start, variables)
   result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr)
 

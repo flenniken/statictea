@@ -82,12 +82,19 @@ suite "replacement":
 
   test "lineToSegments":
     check expectedItems("segments", lineToSegments("test\n"), @["1,test\n"])
+
     check expectedItems("segments", lineToSegments("test"), @["3,test\n"])
     check expectedItems("segments", lineToSegments("te{1st"), @[
       "0,te{\n",
       "3,1st\n",
     ])
     check expectedItems("segments", lineToSegments("te{st "), @["3,te{st \n"])
+
+  test "lineToSegments2":
+    check expectedItems("segments", lineToSegments("te{st( "), @["3,te{st( \n"])
+    check expectedItems("segments", lineToSegments("te{st("), @["3,te{st(\n"])
+
+  test "lineToSegments3":
     check expectedItems("segments", lineToSegments("{var}"), @["4,1   ,3   ,{var}\n"])
     check expectedItems("segments", lineToSegments("test\n"), @["1,test\n"])
     check expectedItems("segments", lineToSegments("{var}\n"), @["2,1   ,3   ,{var}\n", "1,\n"])

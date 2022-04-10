@@ -202,22 +202,15 @@ proc matchDotNames*(line: string, start: Natural = 0): Option[Matches] =
   ## @:A variable name starts with a letter followed by letters, digits
   ## @:and underscores limited to a total of 64 characters.
   ## @:
-  ## @:The match stops on the first non matching character. You need to
-  ## @:check the next character to see whether it makes sense in the
-  ## @:statement, for example, "t." matches and returns "t" but it is a
-  ## @:syntax error.
+  ## @:No space is allowed between the function name and the left
+  ## @:parentheses.
   ## @:
-  ## @:Return two groups, the leading whitespace and the dotNames. The
-  ## @:length returned includes the optional trailing whitespace.
-  ## @:
-  ## @:~~~
-  ## @:let dotNamesO = matchDotNames(line, start)
-  ## @:if dotNamesO.isSome:
-  ## @:  let (leadingSpaces, dotNameStr) = dotNamesO.get()
-  ## @:~~~~
+  ## @:Return three groups, the leading whitespace and the dotNames
+  ## @:and the optional left parentheses. The length returned includes
+  ## @:the optional trailing whitespace.
 
   let name = r"[a-zA-Z][a-zA-Z0-9_]{0,63}"
-  let pattern = r"(\s*)((?:$1)(?:\.$1){0,4})\s*" % [name]
+  let pattern = r"(\s*)((?:$1)(?:\.$1){0,4})(\(){0,1}\s*" % [name]
   result = matchPatternCached(line, pattern, start)
 
 type

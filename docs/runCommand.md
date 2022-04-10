@@ -9,11 +9,14 @@ Run a command and fill in the variables dictionaries.
 starts in the template file.
 * type: [ValueAndLength](#valueandlength) &mdash; A value and the length of the matching text in the statement.
 * [newValueAndLengthOr](#newvalueandlengthor) &mdash; Create a OpResultWarn[ValueAndLength] warning.
-* [newValueAndLengthOr](#newvalueandlengthor-1) &mdash; Create a OpResultWarn[ValueAndLength] value.
-* [newValueAndLengthOr](#newvalueandlengthor-2) &mdash; Create a OpResultWarn[ValueAndLength].
+* [newValueAndLengthOr](#newvalueandlengthor-1) &mdash; Create a OpResultWarn[ValueAndLength] warning.
+* [newValueAndLengthOr](#newvalueandlengthor-2) &mdash; Create a OpResultWarn[ValueAndLength] value.
+* [newValueAndLengthOr](#newvalueandlengthor-3) &mdash; Create a OpResultWarn[ValueAndLength].
 * [newVariableDataOr](#newvariabledataor) &mdash; Create a OpResultWarn[VariableData] warning.
 * [newVariableDataOr](#newvariabledataor-1) &mdash; Create a OpResultWarn[VariableData] warning.
 * [newVariableDataOr](#newvariabledataor-2) &mdash; Create a OpResultWarn[VariableData] value.
+* [newLengthOr](#newlengthor) &mdash; Create a OpResultWarn[Natural] warning.
+* [newLengthOr](#newlengthor-1) &mdash; Create a OpResultWarn[Natural] value.
 * [newStatement](#newstatement) &mdash; Create a new statement.
 * [startColumn](#startcolumn) &mdash; Return enough spaces to point at the warning column.
 * [getWarnStatement](#getwarnstatement) &mdash; Return a multiline error message.
@@ -24,8 +27,9 @@ starts in the template file.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
 * [getString](#getstring) &mdash; Return a literal string value and match length from a statement.
 * [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
-* [getFunctionValue](#getfunctionvalue) &mdash; Collect the function parameters then call it and return the function's value and the position after trailing whitespace.
-* [getVarOrFunctionValue](#getvarorfunctionvalue) &mdash; Return the statement's right hand side value and the length matched.
+* [ifFunction](#iffunction) &mdash; Handle the if0 and if1 functions which conditionally run one of their parameters.
+* [getFunctionValueAndLength](#getfunctionvalueandlength) &mdash; Collect the function parameters then call it and return the function's value and the position after trailing whitespace.
+* [getVarOrFunctionValue](#getvarorfunctionvalue) &mdash; Return the value and length that "start" points at.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 
@@ -70,6 +74,14 @@ func newValueAndLengthOr(warning: Warning; p1 = ""; pos = 0): OpResultWarn[
 
 # newValueAndLengthOr
 
+Create a OpResultWarn[ValueAndLength] warning.
+
+```nim
+func newValueAndLengthOr(warningData: WarningData): OpResultWarn[ValueAndLength]
+```
+
+# newValueAndLengthOr
+
 Create a OpResultWarn[ValueAndLength] value.
 
 ```nim
@@ -109,6 +121,22 @@ Create a OpResultWarn[VariableData] value.
 ```nim
 func newVariableDataOr(dotNameStr: string; operator = "="; value: Value): OpResultWarn[
     VariableData]
+```
+
+# newLengthOr
+
+Create a OpResultWarn[Natural] warning.
+
+```nim
+func newLengthOr(warning: Warning; p1 = ""; pos = 0): OpResultWarn[Natural]
+```
+
+# newLengthOr
+
+Create a OpResultWarn[Natural] value.
+
+```nim
+func newLengthOr(pos: Natural): OpResultWarn[Natural]
 ```
 
 # newStatement
@@ -194,19 +222,28 @@ proc getNumber(statement: Statement; start: Natural): OpResultWarn[
     ValueAndLength]
 ```
 
-# getFunctionValue
+# ifFunction
+
+Handle the if0 and if1 functions which conditionally run one of their parameters.  Return the function's value and the position after trailing whitespace.  Start points at the first parameter.
+
+```nim
+proc ifFunction(functionName: string; statement: Statement; start: Natural;
+                variables: Variables; list = false): OpResultWarn[ValueAndLength]
+```
+
+# getFunctionValueAndLength
 
 Collect the function parameters then call it and return the function's value and the position after trailing whitespace. Start points at the first parameter.
 
 ```nim
-proc getFunctionValue(functionName: string; statement: Statement;
-                      start: Natural; variables: Variables; list = false): OpResultWarn[
-    ValueAndLength]
+proc getFunctionValueAndLength(functionName: string; statement: Statement;
+                               start: Natural; variables: Variables;
+                               list = false): OpResultWarn[ValueAndLength]
 ```
 
 # getVarOrFunctionValue
 
-Return the statement's right hand side value and the length matched. The right hand side must be a variable, a function or a list. The right hand side starts in the statement at start.
+Return the value and length that "start" points at. Start points at the name of a variable or name of a function or a list.  The length returned includes the trailing whitespace. Start points at the first non-whitespace character of the right hand side or at the start of a function parameter.
 
 ```nim
 proc getVarOrFunctionValue(statement: Statement; start: Natural;

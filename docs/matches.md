@@ -212,19 +212,12 @@ You can have 1 to 5 variable names in a dot name.
 A variable name starts with a letter followed by letters, digits
 and underscores limited to a total of 64 characters.
 
-The match stops on the first non matching character. You need to
-check the next character to see whether it makes sense in the
-statement, for example, "t." matches and returns "t" but it is a
-syntax error.
+No space is allowed between the function name and the left
+parentheses.
 
-Return two groups, the leading whitespace and the dotNames. The
-length returned includes the optional trailing whitespace.
-
-~~~
-let dotNamesO = matchDotNames(line, start)
-if dotNamesO.isSome:
-  let (leadingSpaces, dotNameStr) = dotNamesO.get()
-~~~~
+Return three groups, the leading whitespace and the dotNames
+and the optional left parentheses. The length returned includes
+the optional trailing whitespace.
 
 ```nim
 proc matchDotNames(line: string; start: Natural = 0): Option[Matches]
