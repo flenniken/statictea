@@ -170,6 +170,11 @@ proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
   ## Create a newValueAndLength object.
   result = ValueAndLength(value: value, length: length)
 
+func get3GroupsLen(matchesO: Option[Matches]): (string, string, string, Natural) =
+  let matches = matchesO.get()
+  let (one, two, three) = matches.get3Groups()
+  result = (one, two, three, matches.length)
+
 iterator yieldStatements*(cmdLines: CmdLines): Statement =
   ## Iterate through the command's statements. Skip blank statements.
 
@@ -247,6 +252,7 @@ proc getNumber*(statement: Statement, start: Natural):
   # float.
   let matches = matchesO.get()
   let decimalPoint = matches.getGroup()
+  let length = matches.length
   var value: Value
   if decimalPoint == ".":
     # Parse the float.
@@ -255,7 +261,7 @@ proc getNumber*(statement: Statement, start: Natural):
       return newValueAndLengthOr(wNumberOverFlow, "", start)
     let floatPos = floatPosO.get()
     value = newValue(floatPos.number)
-    assert floatPos.length <= matches.length
+    assert floatPos.length <= length
   else:
     # Parse the int.
     let intPosO = parseInteger(statement.text, start)
@@ -263,8 +269,8 @@ proc getNumber*(statement: Statement, start: Natural):
       return newValueAndLengthOr(wNumberOverFlow, "", start)
     let intPos = intPosO.get()
     value = newValue(intPos.integer)
-    assert intPos.length <= matches.length
-  result = newValueAndLengthOr(value, matches.length)
+    assert intPos.length <= length
+  result = newValueAndLengthOr(value, length)
 
 func skipParameter(statement: Statement, start: Natural):
      OpResultWarn[Natural] =
@@ -424,9 +430,7 @@ proc getVarOrFunctionValue*(statement: Statement, start: Natural,
   # space.
   let dotNameStrO = matchDotNames(statement.text, start)
   assert dotNameStrO.isSome
-  let matches = dotNameStrO.get()
-  let (_, dotNameStr, leftParen) = matches.get3Groups()
-  let dotNameLen = matches.length
+  let (_, dotNameStr, leftParen, dotNameLen) = dotNameStrO.get3GroupsLen()
 
   if leftParen == "(":
     # We have a function, run it and return its value.
@@ -527,13 +531,11 @@ proc runStatement*(statement: Statement, variables: Variables):
   if not isSome(matchesO):
     # Statement does not start with a variable name.
     return newVariableDataOr(wMissingStatementVar)
-  let matches = matchesO.get()
-  let (_, dotNameStr, leftParen) = matches.get3Groups()
+  let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
 
   if leftParen != "":
     # Statement does not start with a variable name.
     return newVariableDataOr(wMissingStatementVar)
-  let dotNameLen = matches.length
 
   # Get the equal sign or &= and following whitespace.
   let operatorO = matchEqualSign(statement.text, dotNameLen)

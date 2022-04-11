@@ -402,8 +402,7 @@ proc parseRunFileLine*(line: string): OpResultStr[RunFileLine] =
   if not matchesO.isSome:
     return opMessageStr[RunFileLine]("Invalid file line: $1" % [line])
 
-  let matches = matchesO.get()
-  let (filename, attrs) = matches.get2Groups()
+  let (filename, attrs) = matchesO.get2Groups()
   let attributes = attrs.split(" ")
 
   var noLastEnding, command, nonZeroReturn: bool
@@ -431,8 +430,7 @@ proc parseExpectedLine*(line: string): OpResultStr[ExpectedLine] =
   if not matchesO.isSome:
     return opMessageStr[ExpectedLine]("Invalid expected line: $1" % [line])
 
-  let matches = matchesO.get()
-  let (gotFilename, expectedFilename) = matches.get2Groups()
+  let (gotFilename, expectedFilename) = matchesO.get2Groups()
   let expectedEqual = newExpectedLine(gotFilename, expectedFilename)
   result = opValueStr[ExpectedLine](expectedEqual)
 

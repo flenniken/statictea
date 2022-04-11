@@ -59,8 +59,7 @@ func numberStringToNum(numString: string): FunResult =
   var matchesO = matchNumberNotCached(numString, 0)
   if not matchesO.isSome:
     return newFunResultWarn(wExpectedNumberString)
-  let matches = matchesO.get()
-  let decimalPoint = matches.getGroup()
+  let decimalPoint = matchesO.getGroup()
 
   if decimalPoint == ".":
     # Float number string to float.
@@ -523,7 +522,7 @@ func parseVersion*(version: string): Option[(int, int, int)] =
   let matchesO = matchVersionNotCached(version, 0)
   if not matchesO.isSome:
     return
-  let (g1, g2, g3) = matchesO.get().get3Groups()
+  let (g1, g2, g3) = matchesO.get3Groups()
   var g1IntPosO = parseInteger(g1)
   var g2IntPosO = parseInteger(g2)
   var g3IntPosO = parseInteger(g3)

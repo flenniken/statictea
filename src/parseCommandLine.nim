@@ -37,8 +37,7 @@ proc parsePrepost*(str: string): Option[Prepost] =
   let pattern = "([\x20-\x2b\x2d-\x7F]{1,20})(?:,([\x20-\x2b\x2d-\x7F]{1,20})){0,1}$"
   let matchesO = matchPattern(str, pattern, 0, 2)
   if matchesO.isSome:
-    let matches = matchesO.get()
-    let (prefix, postfix) = matches.get2Groups()
+    let (prefix, postfix) = matchesO.get2Groups()
     result = some(newPrepost(prefix, postfix))
 
 func `$`*(aw: ArgsOrWarning): string =

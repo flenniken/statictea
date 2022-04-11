@@ -131,24 +131,6 @@ func parmsToSignature*(params: seq[Param]): string =
   # result = fmt"({inside}) {returnType}"
   result = "($1) $2" % [inside, returnType]
 
-# These are for working with signature strings.
-# proc matchInsideAndReturn*(line: string): Option[Matches] =
-#   ## Match a signature like: (a: int, b: int) int.  Return two groups:
-#   ## "a: int, b: int" and "int"
-#   let pattern = r"^\(([^\)]*)\)\s(.*)"
-#   result = matchPatternCached(line, pattern)
-
-# proc matchParamName*(line: string): Option[Matches] =
-#   let pattern = r"^[a-zA-Z][a-zA-Z0-9_]{0,63}$"
-#   result = matchPatternCached(line, pattern)
-
-# func getParameters*(parameters: seq[Value], start: int, count: int): Option[seq[Value]] =
-#   ## Return the number of parameters specified by count starting at
-#   ## start index, if there are enough left.
-#   if start < 0 or count <= 0 or start + count > parameters.len:
-#     return
-#   result = some(parameters[start .. start + count - 1])
-
 proc next*(letterName: var ShortName): string =
   ## Get the next unique single letter name. It returns names a, b, c,
   ## ..., z then repeats a0, b0, c0,....
