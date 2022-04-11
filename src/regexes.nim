@@ -1,4 +1,43 @@
 ## Perl regular expression matching.
+## @:
+## @:Examples:
+## @:
+## @:Match a string with "abc" in it:
+## @:
+## @:~~~
+## @:let line = "123abc456"
+## @:let pattern = ".@.abc"
+## @:let matchesO = matchPattern(line, pattern, start=0, numGroups=0)
+## @:
+## @:check matchesO.isSome == true
+## @:check matchesO.get().length == 6
+## @:~~~~
+## @:
+## @:Match a file and line number like: filename(234):
+## @:
+## @:~~~
+## @:let line = "template.html(87)"
+## @:let pattern = r"^(.@.)\(([0-9]+)\)$"
+## @:let matchesO = matchPatternCached(line, pattern, 0, 2)
+## @:
+## @:check matchesO.isSome == true
+## @:let (filename, lineNum) = matchesO.get2Groups()
+## @:check filename == "template.html"
+## @:check lineNum == "87"
+## @:~~~~
+## @:
+## @:Replace the patterns in the string with their replacements:
+## @:
+## @:~~~
+## @:var replacements: seq[Replacement]
+## @:replacements.add(newReplacement("abc", "456"))
+## @:replacements.add(newReplacement("def", ""))
+## @:
+## @:let resultStringO = replaceMany("abcdefabc", replacements)
+## @:
+## @:check resultStringO.isSome
+## @:check resultStringO.get() == "456456"
+## @:~~~~
 
 # The notice below is there because this module includes the re module.
 #[
@@ -39,7 +78,7 @@ import std/tables
 
 const
   ## The maximum number of groups supported in the matchPattern procedure.
-  maxGroups = 3
+  maxGroups = 10
 
 var compliledPatterns = initTable[string, Regex]()
   ## A cache of compiled regex patterns, mapping a pattern to Regex.
@@ -53,22 +92,60 @@ type
     numGroups*: Natural
 
   Replacement* = object
-    ## Holds the regular expression and replacement for the replaceMany
-    ## function.
+    ## Holds the regular expression pattern and its replacement for
+    ## the replaceMany function.
     pattern*: string
     sub*: string
 
+func newMatches*(length: Natural, start: Natural): Matches =
+  ## Create a new Matches object with no groups.
+  result = Matches(length: length, start: start)
+
+func newMatches*(length: Natural, start: Natural, group: string): Matches =
+  var groups = @[group]
+  ## Create a new Matches object with one group.
+  result = Matches(groups: groups, length: length, start: start, numGroups: 1)
+
+func newMatches*(length: Natural, start: Natural, group1: string,
+    group2: string): Matches =
+  ## Create a new Matches object with two groups.
+  var groups = @[group1, group2]
+  result = Matches(groups: groups, length: length, start: start, numGroups: 2)
+
+func newMatches*(length: Natural, start: Natural, group1: string,
+    group2: string, group3: string): Matches =
+  ## Create a new Matches object with three groups.
+  var groups = @[group1, group2, group3]
+  result = Matches(groups: groups, length: length, start: start, numGroups: 3)
+
 proc newMatches*(length: Natural, start: Natural, numGroups: Natural): Matches =
+  ## Create a Matches object with the given number of groups.
   result = Matches(length: length, start: start, numGroups: numGroups)
 
+func newReplacement*(pattern: string, sub: string): Replacement =
+  ## Create a new Replacement object.
+  result = Replacement(pattern: pattern, sub: sub)
+
 func getGroup*(matches: Matches): string =
-  ## Get the first group in matches if it exists, else return "".
+  ## Get the group in matches.
   if matches.groups.len > 0:
     result = matches.groups[0]
 
+func getGroup*(matchesO: Option[Matches]): string =
+  ## Get the group in matches.
+  assert(matchesO.isSome, "Not a match")
+  result = matchesO.get().getGroup()
+
+func get1Group*(matches: Matches): string =
+  ## Alias for getGroup.
+  result = getGroup(matches)
+
+func get1Group*(matchesO: Option[Matches]): string =
+  ## Alias for getGroup.
+  result = getGroup(matchesO)
+
 func get2Groups*(matches: Matches): (string, string) =
-  ## Get the first two groups in matches. If one of the groups doesn't
-  ## exist, "" is returned for it.
+  ## Get two groups in matches.
   var one: string
   var two: string
   if matches.groups.len > 0:
@@ -77,9 +154,13 @@ func get2Groups*(matches: Matches): (string, string) =
     two = matches.groups[1]
   result = (one, two)
 
+func get2Groups*(matchesO: Option[Matches]): (string, string) =
+  ## Get two groups in matches.
+  assert(matchesO.isSome, "Not a match")
+  result = matchesO.get().get2Groups()
+
 func get3Groups*(matches: Matches): (string, string, string) =
-  ## Get the first three groups in matches. If one of the groups doesn't
-  ## exist, "" is returned for it.
+  ## Get three groups in matches.
   var one: string
   var two: string
   var three: string
@@ -91,41 +172,42 @@ func get3Groups*(matches: Matches): (string, string, string) =
     three = matches.groups[2]
   result = (one, two, three)
 
-# template unpack*(matchesO: Option[Matches]): untyped =
-#   ## Return the length of the match and its associated groups as a
-#   ## tuple.
-#   ## @:
-#   ## @:Example:
-#   ## @:~~~
-#   ## @:let pattern = r"(abc).*(def)$"
-#   ## @:let matchesO = matchPattern("  abc asdfasdfdef def", pattern, 2)
-#   ## @:assert(matchesO.isSome)
-#   ## @:let (length, one, two) = matchesO.unpack()
-#   ## @:
-#   ## @:echo "length = " & $length
-#   ## @:echo "one = " & one
-#   ## @:echo "two = " & two
-#   ## @:~~~~
+func get3Groups*(matchesO: Option[Matches]): (string, string, string) =
+  ## Get three groups in matches.
+  assert(matchesO.isSome, "Not a match")
+  result = matchesO.get().get3Groups()
 
-#   assert(matchesO.isSome, "Not a match.")
+func getGroups*(matches: Matches, numGroups: Natural): seq[string] =
+  ## Return the number of groups specified. If one of the groups doesn't
+  ## exist, "" is returned for it.
 
-#   var tup: untyped
-#   case matches.numGroups
-#   of 1:
-#     tup = matches.getGroup()
-#   of 2:
-#     tup = matches.get2Groups()
-#   of 3:
-#     tup = matches.get3Groups()
-#   else:
-#     assert(false == true, "wrong number of groups")
-#   tup
+  assert(numGroups <= maxGroups, "Too many groups")
+  if numGroups > maxGroups:
+    return
 
-func matchRegex*(str: string, regex: Regex, start: Natural = 0,
-    numGroups: Natural = 0): Option[Matches] =
-  ## Match a regular expression pattern in a string.
+  var groups = newSeqOfCap[string](numGroups)
+  for ix in countUp(0, numGroups-1):
+    if ix < matches.groups.len:
+      groups.add(matches.groups[ix])
+    else:
+      groups.add("")
+  result = groups
+
+func getGroups*(matchesO: Option[Matches], numGroups: Natural): seq[string] =
+  ## Return the number of groups specified. If one of the groups doesn't
+  ## exist, "" is returned for it.
+  assert(matchesO.isSome, "Not a match")
+  result = matchesO.get().getGroups(numGroups)
+  
+func matchRegex(str: string, regex: Regex, start: Natural,
+    numGroups: Natural): Option[Matches] =
+  ## Match a regular expression pattern in a string. Start is the
+  ## index in the string to start the search. NumGroups is the number
+  ## of groups in the pattern.
 
   assert(numGroups <= maxGroups, "Too many groups.")
+  if numGroups > maxGroups:
+    return
 
   var groups = newSeq[string](maxGroups)
   let length = matchLen(str, regex, groups, start)
@@ -144,10 +226,22 @@ func compilePattern(pattern: string): Option[Regex] =
   except:
     result = none(Regex)
 
+func matchPattern*(str: string, pattern: string,
+    start: Natural, numGroups: Natural): Option[Matches] =
+  ## Match a regular expression pattern in a string. Start is the
+  ## index in the string to start the search. NumGroups is the number
+  ## of groups in the pattern.
+  let regexO = compilePattern(pattern)
+  if not regexO.isSome:
+    return
+  result = matchRegex(str, regexO.get(), start, numGroups)
+
 proc matchPatternCached*(str: string, pattern: string,
     start: Natural, numGroups: Natural): Option[Matches] =
   ## Match a pattern in a string and cache the compiled regular
-  ## expression pattern.
+  ## expression pattern for next time. Start is the index in the
+  ## string to start the search. NumGroups is the number of groups in
+  ## the pattern.
 
   # Get the cached regex for the pattern or compile it and add it to
   # the cache.
@@ -162,18 +256,6 @@ proc matchPatternCached*(str: string, pattern: string,
     compliledPatterns[pattern] = regex
   result = matchRegex(str, regex, start, numGroups)
 
-func matchPattern*(str: string, pattern: string,
-    start: Natural, numGroups: Natural): Option[Matches] =
-  ## Match a regular expression pattern in a string.
-  let regexO = compilePattern(pattern)
-  if not regexO.isSome:
-    return
-  result = matchRegex(str, regexO.get(), start, numGroups)
-
-func newReplacement*(pattern: string, sub: string): Replacement =
-  ## Create a new Replacement object.
-  result = Replacement(pattern: pattern, sub: sub)
-
 proc replaceMany*(str: string, replacements: seq[Replacement]): Option[string] =
   ## Replace the patterns in the string with their replacements.
 
@@ -185,20 +267,3 @@ proc replaceMany*(str: string, replacements: seq[Replacement]): Option[string] =
     let regex = regexO.get()
     subs.add((regex, r.sub))
   result = some(multiReplace(str, subs))
-
-proc newMatches*(length: Natural, start: Natural): Matches =
-  result = Matches(length: length, start: start)
-
-proc newMatches*(length: Natural, start: Natural, group: string): Matches =
-  var groups = @[group]
-  result = Matches(groups: groups, length: length, start: start, numGroups: 1)
-
-proc newMatches*(length: Natural, start: Natural, group1: string,
-    group2: string): Matches =
-  var groups = @[group1, group2]
-  result = Matches(groups: groups, length: length, start: start, numGroups: 2)
-
-proc newMatches*(length: Natural, start: Natural, group1: string,
-    group2: string, group3: string): Matches =
-  var groups = @[group1, group2, group3]
-  result = Matches(groups: groups, length: length, start: start, numGroups: 3)

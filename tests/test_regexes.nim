@@ -47,6 +47,16 @@ suite "regexes.nim":
     let one = matchesO.get().getGroup()
     check one == "def"
 
+    let groups0 = getGroups(matchesO, 0)
+    check groups0.len == 0
+    let groups1 = getGroups(matchesO, 1)
+    check groups1.len == 1
+    check groups1[0] == "def"
+    let groups2 = getGroups(matchesO, 2)
+    check groups2.len == 2
+    check groups2[0] == "def"
+    check groups2[1] == ""
+
   test "two groups":
     let pattern = r"(abc).*(def)$"
     check testMatchPattern("  abc asdfasdfdef def", pattern, 2, some(newMatches(19, 2, "abc", "def")), 2)
@@ -56,6 +66,21 @@ suite "regexes.nim":
     let (one, two) = matchesO.get().get2Groups()
     check one == "abc"
     check two == "def"
+
+    let groups0 = getGroups(matchesO, 0)
+    check groups0.len == 0
+    let groups1 = getGroups(matchesO, 1)
+    check groups1.len == 1
+    check groups1[0] == "abc"
+    let groups2 = getGroups(matchesO, 2)
+    check groups2.len == 2
+    check groups2[0] == "abc"
+    check groups2[1] == "def"
+    let groups3 = getGroups(matchesO, 3)
+    check groups3.len == 3
+    check groups3[0] == "abc"
+    check groups3[1] == "def"
+    check groups3[2] == ""
 
   test "unpack two groups":
     let pattern = r"(abc).*(def)$"
@@ -132,3 +157,36 @@ suite "regexes.nim":
     let pattern = r"^----------file: ([^\s]*)\s(\([^)]\)\s*$"
     let matchesO = matchPattern("line", pattern, 0, 0)
     check matchesO.isSome == false
+
+  test "doc comment example":
+    ## Match a string with "abc" in it.
+    let line = "123abc456"
+    let pattern = ".*abc"
+    let matchesO = matchPattern(line, pattern, start=0, numGroups=0)
+    check matchesO.isSome == true
+    check matchesO.get().length == 6
+
+  test "doc comment example 2":
+
+    ## Match a file and line number like: filename(234).
+    let line = "template.html(87)"
+    let pattern = r"^(.*)\(([0-9]+)\)$"
+    let matchesO = matchPatternCached(line, pattern, 0, 2)
+    check matchesO.isSome == true
+    let (filename, lineNum) = matchesO.get2Groups()
+    # let (length, filename, lineNum) = match0.get2Groups()
+    # check length == line.len
+    check filename == "template.html"
+    check lineNum == "87"
+
+  test "doc comment example 3":
+
+    ## Replace the patterns in the string with their replacements.
+
+    var replacements: seq[Replacement]
+    replacements.add(newReplacement("abc", "456"))
+    replacements.add(newReplacement("def", ""))
+
+    let resultStringO = replaceMany("abcdefabc", replacements)
+    check resultStringO.isSome
+    check resultStringO.get() == "456456"

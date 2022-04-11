@@ -2,18 +2,70 @@
 
 Perl regular expression matching.
 
+Examples:
+
+Match a string with "abc" in it:
+
+~~~
+let line = "123abc456"
+let pattern = ".*abc"
+let matchesO = matchPattern(line, pattern, start=0, numGroups=0)
+
+check matchesO.isSome == true
+check matchesO.get().length == 6
+~~~~
+
+Match a file and line number like: filename(234):
+
+~~~
+let line = "template.html(87)"
+let pattern = r"^(.*)(([0-9]+))$"
+let matchesO = matchPatternCached(line, pattern, 0, 2)
+
+check matchesO.isSome == true
+let (filename, lineNum) = matchesO.get2Groups()
+check filename == "template.html"
+check lineNum == "87"
+~~~~
+
+Replace the patterns in the string with their replacements:
+
+~~~
+let str = "abcdefabc"
+
+var replacements: seq[Replacement]
+replacements.add(newReplacement("abc", "456"))
+replacements.add(newReplacement("def", ""))
+
+let resultStringO = replaceMany(str, replacements)
+
+check resultStringO.isSome
+check resultStringO.get() == "456456"
+~~~~
+
 * [regexes.nim](../src/regexes.nim) &mdash; Nim source code.
 # Index
 
 * type: [Matches](#matches) &mdash; Holds the result of a match.
-* type: [Replacement](#replacement) &mdash; Holds the regular expression and replacement for the replaceMany function.
-* [getGroup](#getgroup) &mdash; Get the first group in matches if it exists, else return "".
-* [get2Groups](#get2groups) &mdash; Get the first two groups in matches.
-* [get3Groups](#get3groups) &mdash; Get the first three groups in matches.
-* [matchRegex](#matchregex) &mdash; Match a regular expression pattern in a string.
-* [matchPatternCached](#matchpatterncached) &mdash; Match a pattern in a string and cache the compiled regular expression pattern.
-* [matchPattern](#matchpattern) &mdash; Match a regular expression pattern in a string.
+* type: [Replacement](#replacement) &mdash; Holds the regular expression pattern and its replacement for the replaceMany function.
+* [newMatches](#newmatches) &mdash; Create a new Matches object with no groups.
+* [newMatches](#newmatches-1) &mdash; Create a new Matches object with one group.
+* [newMatches](#newmatches-2) &mdash; Create a new Matches object with two groups.
+* [newMatches](#newmatches-3) &mdash; Create a new Matches object with three groups.
+* [newMatches](#newmatches-4) &mdash; Create a Matches object with the given number of groups.
 * [newReplacement](#newreplacement) &mdash; Create a new Replacement object.
+* [getGroup](#getgroup) &mdash; Get the group in matches.
+* [getGroup](#getgroup-1) &mdash; Get the group in matches.
+* [get1Group](#get1group) &mdash; Alias for getGroup.
+* [get1Group](#get1group-1) &mdash; Alias for getGroup.
+* [get2Groups](#get2groups) &mdash; Get two groups in matches.
+* [get2Groups](#get2groups-1) &mdash; Get two groups in matches.
+* [get3Groups](#get3groups) &mdash; Get three groups in matches.
+* [get3Groups](#get3groups-1) &mdash; Get three groups in matches.
+* [getGroups](#getgroups) &mdash; Return the number of groups specified.
+* [getGroups](#getgroups-1) &mdash; Return the number of groups specified.
+* [matchPattern](#matchpattern) &mdash; Match a regular expression pattern in a string.
+* [matchPatternCached](#matchpatterncached) &mdash; Match a pattern in a string and cache the compiled regular expression pattern for next time.
 * [replaceMany](#replacemany) &mdash; Replace the patterns in the string with their replacements.
 
 # Matches
@@ -31,7 +83,7 @@ Matches = object
 
 # Replacement
 
-Holds the regular expression and replacement for the replaceMany function.
+Holds the regular expression pattern and its replacement for the replaceMany function.
 
 ```nim
 Replacement = object
@@ -40,55 +92,45 @@ Replacement = object
 
 ```
 
-# getGroup
+# newMatches
 
-Get the first group in matches if it exists, else return "".
+Create a new Matches object with no groups.
 
 ```nim
-func getGroup(matches: Matches): string
+func newMatches(length: Natural; start: Natural): Matches
 ```
 
-# get2Groups
+# newMatches
 
-Get the first two groups in matches. If one of the groups doesn't exist, "" is returned for it.
+Create a new Matches object with one group.
 
 ```nim
-func get2Groups(matches: Matches): (string, string)
+func newMatches(length: Natural; start: Natural; group: string): Matches
 ```
 
-# get3Groups
+# newMatches
 
-Get the first three groups in matches. If one of the groups doesn't exist, "" is returned for it.
+Create a new Matches object with two groups.
 
 ```nim
-func get3Groups(matches: Matches): (string, string, string)
+func newMatches(length: Natural; start: Natural; group1: string; group2: string): Matches
 ```
 
-# matchRegex
+# newMatches
 
-Match a regular expression pattern in a string.
+Create a new Matches object with three groups.
 
 ```nim
-func matchRegex(str: string; regex: Regex; start: Natural = 0;
-                numGroups: Natural = 0): Option[Matches]
+func newMatches(length: Natural; start: Natural; group1: string; group2: string;
+                group3: string): Matches
 ```
 
-# matchPatternCached
+# newMatches
 
-Match a pattern in a string and cache the compiled regular expression pattern.
-
-```nim
-proc matchPatternCached(str: string; pattern: string; start: Natural;
-                        numGroups: Natural): Option[Matches]
-```
-
-# matchPattern
-
-Match a regular expression pattern in a string.
+Create a Matches object with the given number of groups.
 
 ```nim
-func matchPattern(str: string; pattern: string; start: Natural;
-                  numGroups: Natural): Option[Matches]
+proc newMatches(length: Natural; start: Natural; numGroups: Natural): Matches
 ```
 
 # newReplacement
@@ -97,6 +139,104 @@ Create a new Replacement object.
 
 ```nim
 func newReplacement(pattern: string; sub: string): Replacement
+```
+
+# getGroup
+
+Get the group in matches.
+
+```nim
+func getGroup(matches: Matches): string
+```
+
+# getGroup
+
+Get the group in matches.
+
+```nim
+func getGroup(matchesO: Option[Matches]): string
+```
+
+# get1Group
+
+Alias for getGroup.
+
+```nim
+func get1Group(matches: Matches): string
+```
+
+# get1Group
+
+Alias for getGroup.
+
+```nim
+func get1Group(matchesO: Option[Matches]): string
+```
+
+# get2Groups
+
+Get two groups in matches.
+
+```nim
+func get2Groups(matches: Matches): (string, string)
+```
+
+# get2Groups
+
+Get two groups in matches.
+
+```nim
+func get2Groups(matchesO: Option[Matches]): (string, string)
+```
+
+# get3Groups
+
+Get three groups in matches.
+
+```nim
+func get3Groups(matches: Matches): (string, string, string)
+```
+
+# get3Groups
+
+Get three groups in matches.
+
+```nim
+func get3Groups(matchesO: Option[Matches]): (string, string, string)
+```
+
+# getGroups
+
+Return the number of groups specified. If one of the groups doesn't exist, "" is returned for it.
+
+```nim
+func getGroups(matches: Matches; numGroups: Natural): seq[string]
+```
+
+# getGroups
+
+Return the number of groups specified. If one of the groups doesn't exist, "" is returned for it.
+
+```nim
+func getGroups(matchesO: Option[Matches]; numGroups: Natural): seq[string]
+```
+
+# matchPattern
+
+Match a regular expression pattern in a string. Start is the index in the string to start the search. NumGroups is the number of groups in the pattern.
+
+```nim
+func matchPattern(str: string; pattern: string; start: Natural;
+                  numGroups: Natural): Option[Matches]
+```
+
+# matchPatternCached
+
+Match a pattern in a string and cache the compiled regular expression pattern for next time. Start is the index in the string to start the search. NumGroups is the number of groups in the pattern.
+
+```nim
+proc matchPatternCached(str: string; pattern: string; start: Natural;
+                        numGroups: Natural): Option[Matches]
 ```
 
 # replaceMany
