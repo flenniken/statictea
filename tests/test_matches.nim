@@ -108,6 +108,14 @@ proc testMatchSymbol(line: string, symbol: GroupSymbol, start: Natural = 0,
   else:
     result = true
 
+proc testGetLastPart(line: string, postfix: string,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = getLastPart(line, postfix)
+  if not expectedItem("matchesO", matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
+
 proc testMatchLeftBracket(line: string, start: Natural = 0,
     eMatchesO: Option[Matches] = none(Matches)): bool =
   let matchesO = matchLeftBracket(line, start)
@@ -476,3 +484,35 @@ suite "matches.nim":
     check testMatchSymbol("  [   ", gLeftBracket, 2, some(newMatches(4, 2)))
     check testMatchSymbol("  ]   ", gRightBracket, 2, some(newMatches(4, 2)))
 
+  test "matchLastPart2":
+    check testMatchLastPart("+", 0, "", some(newMatches(1, 0, "+", "")))
+    check testMatchLastPart("+\n", 0, "", some(newMatches(2, 0, "+", "\n")))
+    check testMatchLastPart("+\r\n", 0, "", some(newMatches(3, 0, "+", "\r\n")))
+
+    check testMatchLastPart("+-->", 0, "-->", some(newMatches(4, 0, "+", "")))
+    check testMatchLastPart("+-->\n", 0, "-->", some(newMatches(5, 0, "+", "\n")))
+    check testMatchLastPart("+-->\r\n", 0, "-->", some(newMatches(6, 0, "+", "\r\n")))
+
+  test "getLastPart":
+    check testGetLastPart("0123 -->", "-->", some(newMatches(3, 5, "", "")))
+    check testGetLastPart("0123 +-->", "-->", some(newMatches(4, 5, "+", "")))
+    check testGetLastPart("0123 +-->\n", "-->", some(newMatches(5, 5, "+", "\n")))
+    check testGetLastPart("0123 +-->\r\n", "-->", some(newMatches(6, 5, "+", "\r\n")))
+    check testGetLastPart("0123 -->\n", "-->", some(newMatches(4, 5, "", "\n")))
+    check testGetLastPart("0123 -->\r\n", "-->", some(newMatches(5, 5, "", "\r\n")))
+    check testGetLastPart(" -->", "-->", some(newMatches(3, 1, "", "")))
+
+    check testGetLastPart("-->", "-->", some(newMatches(3, 0, "", "")))
+    check testGetLastPart("+-->", "-->", some(newMatches(4, 0, "+", "")))
+    check testGetLastPart("+-->\n", "-->", some(newMatches(5, 0, "+", "\n")))
+    check testGetLastPart("+-->\r\n", "-->", some(newMatches(6, 0, "+", "\r\n")))
+
+    check testGetLastPart("", "", some(newMatches(0, 0, "", "")))
+    check testGetLastPart("+", "", some(newMatches(1, 0, "+", "")))
+    check testGetLastPart("+\n", "", some(newMatches(2, 0, "+", "\n")))
+    check testGetLastPart("+\r\n", "", some(newMatches(3, 0, "+", "\r\n")))
+
+  test "getLastPart 2":
+    check testGetLastPart("", "-->")
+    check testGetLastPart("-", "-->")
+    check testGetLastPart("->", "-->")

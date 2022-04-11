@@ -63,7 +63,8 @@ proc makeUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
     assert prepost.prefix != ""
     result[prepost.prefix] = prepost.postfix
 
-proc matchPrefix*(line: string, prepostTable: PrepostTable, start: Natural = 0): Option[Matches] =
+proc matchPrefix*(line: string, prepostTable: PrepostTable,
+    start: Natural = 0): Option[Matches] =
   ## Match lines that start with one of the prefixes in the given
   ## table plus optional following whitespace.
   var terms = newSeq[string]()
@@ -81,7 +82,8 @@ proc matchLastPart*(line: string, postfix: string,
     start: Natural = 0): Option[Matches] =
   ## Match the last part of a command line.  It matches the optional
   ## continuation plus character, the optional postfix and the
-  ## optional line endings.
+  ## optional line endings. A match has two groups, the plus sign and
+  ## the line ending.
   var pattern: string
   if postfix == "":
     pattern = r"([+]{0,1})([\r]{0,1}\n){0,1}$"
@@ -90,13 +92,12 @@ proc matchLastPart*(line: string, postfix: string,
   result = matchPatternCached(line, pattern, start, 2)
 
 proc getLastPart*(line: string, postfix: string): Option[Matches] =
-  ## Return the optional plus and line endings from the line.
+  ## Return the optional plus sign and line endings from the line.
 
   # Start checking 3 characters before the end to account for the
-  # optional slash, cr and linefeed. If the line is too short, return
-  # no match.  Note the nim regex uses the anchored option. Using ^ to
-  # anchor in the pattern does not do what I expect when the start
-  # position is not 1.
+  # optional plus sign, cr and linefeed. If the line is too short,
+  # return no match.  Note that a nim regex uses the anchored
+  # option.
   #
   # 123456
   # 0123456
@@ -105,11 +106,10 @@ proc getLastPart*(line: string, postfix: string): Option[Matches] =
   #   -->n
   #    -->
 
-  var startPos = line.len - postfix.len - 3
-  if startPos < 0:
-    return
-
-  for start in startPos..startPos+3:
+  let startPos = line.len - postfix.len - 3
+  for start in countUp(startPos, startPos+3):
+    if start < 0:
+      continue
     let matchesO = matchLastPart(line, postfix, start)
     if matchesO.isSome:
       return matchesO

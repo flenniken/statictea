@@ -229,8 +229,10 @@ func compilePattern(pattern: string): Option[Regex] =
 func matchPattern*(str: string, pattern: string,
     start: Natural, numGroups: Natural): Option[Matches] =
   ## Match a regular expression pattern in a string. Start is the
-  ## index in the string to start the search. NumGroups is the number
-  ## of groups in the pattern.
+  ## @:index in the string to start the search. NumGroups is the number
+  ## @:of groups in the pattern.
+  ## @:
+  ## @:Note: the pattern uses the anchored option.
   let regexO = compilePattern(pattern)
   if not regexO.isSome:
     return

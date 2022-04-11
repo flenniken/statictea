@@ -31,13 +31,11 @@ check lineNum == "87"
 Replace the patterns in the string with their replacements:
 
 ~~~
-let str = "abcdefabc"
-
 var replacements: seq[Replacement]
 replacements.add(newReplacement("abc", "456"))
 replacements.add(newReplacement("def", ""))
 
-let resultStringO = replaceMany(str, replacements)
+let resultStringO = replaceMany("abcdefabc", replacements)
 
 check resultStringO.isSome
 check resultStringO.get() == "456456"
@@ -223,7 +221,11 @@ func getGroups(matchesO: Option[Matches]; numGroups: Natural): seq[string]
 
 # matchPattern
 
-Match a regular expression pattern in a string. Start is the index in the string to start the search. NumGroups is the number of groups in the pattern.
+Match a regular expression pattern in a string. Start is the
+index in the string to start the search. NumGroups is the number
+of groups in the pattern.
+
+Note: the pattern uses the anchored option.
 
 ```nim
 func matchPattern(str: string; pattern: string; start: Natural;
