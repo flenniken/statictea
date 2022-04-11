@@ -538,7 +538,7 @@ proc myFileNewer(a: string, b: string): bool =
   else:
     result = false
 
-proc taskDocs(namePart: string) =
+proc taskDocs(namePart: string, forceRebuild = false) =
   ## Create one or more markdown docs; specify part of source filename.":
   let filenames = get_source_filenames()
   for filename in filenames:
@@ -546,7 +546,7 @@ proc taskDocs(namePart: string) =
     if namePart in filename or namePart == "docs":
       var mdName = "docs/$1" % [changeFileExt(filename, "md")]
 
-      if myFileNewer("src/" & filename, mdName):
+      if not forceRebuild and myFileNewer("src/" & filename, mdName):
         echo "Skipping unchanged $1." % filename
         continue
 
@@ -774,7 +774,7 @@ task json, "\tDisplay one or more source file's json doc comments; specify part 
   let name = system.paramStr(count-1)
   let filenames = get_source_filenames()
   for filename in filenames:
-    if name in filename:
+    if name.toLower in filename.toLower:
       var jsonName = joinPath("docs", changeFileExt(filename, "json"))
       var cmd = "nim --hints:off jsondoc --out:$1 src/$2" % [jsonName, filename]
       # echo cmd

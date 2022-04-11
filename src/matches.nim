@@ -114,7 +114,7 @@ proc getLastPart*(line: string, postfix: string): Option[Matches] =
     if matchesO.isSome:
       return matchesO
 
-proc matchAllSpaceTab*(line: string, start: Natural = 0): Option[Matches] =
+proc matchAllSpaceTab(line: string, start: Natural = 0): Option[Matches] =
   ## Match a line of all spaces or tabs.
   let pattern = r"^[ \t]*$"
   result = matchPatternCached(line, pattern, start, 0)
@@ -137,20 +137,10 @@ proc matchEqualSign*(line: string, start: Natural = 0): Option[Matches] =
   let pattern = r"(&{0,1}=)\s*"
   result = matchPatternCached(line, pattern, start, 1)
 
-proc matchLeftParentheses*(line: string, start: Natural = 0): Option[Matches] =
-  ## Match a left parenthese and the optional trailing whitespace.
-  let pattern = r"\(\s*"
-  result = matchPatternCached(line, pattern, start, 0)
-
 proc matchCommaParentheses*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a comma or right parentheses and the optional trailing whitespace.
   let pattern = r"([,)])\s*"
   result = matchPatternCached(line, pattern, start, 1)
-
-proc matchRightParentheses*(line: string, start: Natural = 0): Option[Matches] =
-  ## Match a right parentheses and the optional trailing whitespace.
-  let pattern = r"\)\s*"
-  result = matchPatternCached(line, pattern, start, 0)
 
 proc matchNumber*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a number and the optional trailing whitespace. Return the
@@ -164,7 +154,7 @@ func matchNumberNotCached*(line: string, start: Natural = 0): Option[Matches] =
   ## or integer.
   result = matchPattern(line, numberPattern, start, 1)
 
-proc matchLeftBracket*(line: string, start: Natural = 0): Option[Matches] =
+proc matchUpToLeftBracket*(line: string, start: Natural = 0): Option[Matches] =
   ## Match everything up to a left backet. The match length includes
   ## @:the bracket.
   ## @:

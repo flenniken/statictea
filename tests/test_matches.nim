@@ -26,14 +26,6 @@ proc testMatchLastPart(line: string, start: Natural, postfix: string,
   else:
     result = true
 
-proc testMatchAllSpaceTab(line: string, start: Natural,
-    eMatchesO: Option[Matches] = none(Matches)): bool =
-  let matchesO = matchAllSpaceTab(line, start)
-  if not expectedItem("matchesO", matchesO, eMatchesO):
-    result = false
-  else:
-    result = true
-
 proc testMatchTabSpace(line: string, start: Natural,
     eMatchesO: Option[Matches] = none(Matches)): bool =
   let matchesO = matchTabSpace(line, start)
@@ -47,14 +39,6 @@ proc testMatchPrefix(line: string, start: Natural,
 
   let prepostTable = makeDefaultPrepostTable()
   let matchesO = matchPrefix(line, prepostTable, start)
-  if not expectedItem("matchesO", matchesO, eMatchesO):
-    result = false
-  else:
-    result = true
-
-proc testLeftParentheses(line: string, start: Natural,
-    eMatchesO: Option[Matches] = none(Matches)): bool =
-  let matchesO = matchLeftParentheses(line, start)
   if not expectedItem("matchesO", matchesO, eMatchesO):
     result = false
   else:
@@ -116,9 +100,9 @@ proc testGetLastPart(line: string, postfix: string,
   else:
     result = true
 
-proc testMatchLeftBracket(line: string, start: Natural = 0,
+proc testMatchUpToLeftBracket(line: string, start: Natural = 0,
     eMatchesO: Option[Matches] = none(Matches)): bool =
-  let matchesO = matchLeftBracket(line, start)
+  let matchesO = matchUpToLeftBracket(line, start)
   if not expectedItem("matchesO", matchesO, eMatchesO):
     result = false
   else:
@@ -252,11 +236,6 @@ suite "matches.nim":
     check testMatchLastPart(r"#$ nextline +", 12, "",
       some(newMatches(1, 12, r"+", "")))
 
-  test "matchAllSpaceTab":
-    check testMatchAllSpaceTab("    ", 0, some(newMatches(4, 0)))
-    check testMatchAllSpaceTab(" \t \t   ", 0, some(newMatches(7, 0)))
-    check testMatchAllSpaceTab("    s   ", 0)
-
   test "matchTabSpace":
     check testMatchTabSpace(" ", 0, some(newMatches(1, 0)))
     check testMatchTabSpace("\t", 0, some(newMatches(1, 0)))
@@ -364,16 +343,6 @@ suite "matches.nim":
     check matchNumber("a = 5", 4) == some(newMatches(1, 4, ""))
     check matchNumber("a = 5.3", 4) == some(newMatches(3, 4, "."))
 
-  test "matchLeftParentheses":
-    check testLeftParentheses("(", 0, some(newMatches(1, 0)))
-    check testLeftParentheses("( ", 0, some(newMatches(2, 0)))
-    check testLeftParentheses("( 5", 0, some(newMatches(2, 0)))
-    check testLeftParentheses("( 'abc'", 0, some(newMatches(2, 0)))
-
-    check testLeftParentheses(", (", 0)
-    check testLeftParentheses("2(", 0)
-    check testLeftParentheses("abc(", 0)
-    check testLeftParentheses(" (", 0)
 
   test "matchCommaParentheses":
     check testMatchCommaParentheses(",", 0, some(newMatches(1, 0, ",")))
@@ -403,14 +372,14 @@ suite "matches.nim":
     check testMatchCommaOrSymbol("abc)", gRightParentheses, 0)
     check testMatchCommaOrSymbol(" ,", gRightParentheses, 0)
 
-  test "matchLeftBracket":
-    check testMatchLeftBracket("{", 0, some(newMatches(1, 0)))
-    check testMatchLeftBracket("{t}", 0, some(newMatches(1, 0)))
-    check testMatchLeftBracket("asdf{tea}fdsa\r\n", 0, some(newMatches(5, 0)))
+  test "matchUpToLeftBracket":
+    check testMatchUpToLeftBracket("{", 0, some(newMatches(1, 0)))
+    check testMatchUpToLeftBracket("{t}", 0, some(newMatches(1, 0)))
+    check testMatchUpToLeftBracket("asdf{tea}fdsa\r\n", 0, some(newMatches(5, 0)))
 
-    check testMatchLeftBracket("", 0)
-    check testMatchLeftBracket("a", 0)
-    check testMatchLeftBracket("asdf", 0)
+    check testMatchUpToLeftBracket("", 0)
+    check testMatchUpToLeftBracket("a", 0)
+    check testMatchUpToLeftBracket("asdf", 0)
 
   test "matchNumberNotCached":
     var matchO = matchNumberNotCached("123", 0)

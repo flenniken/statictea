@@ -231,7 +231,7 @@ proc lineToSegments*(line: string): seq[string] =
     if pos >= line.len:
       break
     # Get the text before the variable including the left bracket.
-    let beforeVarO = matchLeftBracket(line, pos)
+    let beforeVarO = matchUpToLeftBracket(line, pos)
     if not beforeVarO.isSome:
       # No variable, output the rest of the line as is.
       result.add(stringSegment(line, pos, line.len))
