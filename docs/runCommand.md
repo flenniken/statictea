@@ -29,7 +29,6 @@ starts in the template file.
 * [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
 * [ifFunction](#iffunction) &mdash; Handle the if0 and if1 functions which conditionally run one of their parameters.
 * [getFunctionValueAndLength](#getfunctionvalueandlength) &mdash; Collect the function parameters then call it and return the function's value and the position after trailing whitespace.
-* [getVarOrFunctionValue](#getvarorfunctionvalue) &mdash; Return the value and length that "start" points at.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 
@@ -239,15 +238,6 @@ Collect the function parameters then call it and return the function's value and
 proc getFunctionValueAndLength(functionName: string; statement: Statement;
                                start: Natural; variables: Variables;
                                list = false): OpResultWarn[ValueAndLength]
-```
-
-# getVarOrFunctionValue
-
-Return the value and length that "start" points at. Start points at the name of a variable or name of a function or a list.  The length returned includes the trailing whitespace. Start points at the first non-whitespace character of the right hand side or at the start of a function parameter.
-
-```nim
-proc getVarOrFunctionValue(statement: Statement; start: Natural;
-                           variables: Variables): OpResultWarn[ValueAndLength]
 ```
 
 # runStatement

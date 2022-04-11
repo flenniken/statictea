@@ -285,10 +285,9 @@ func skipParameter(statement: Statement, start: Natural):
 proc getValueAndLength(statement: Statement, start: Natural, variables:
     Variables): OpResultWarn[ValueAndLength]
 
-# Call chain:
+# Call stack:
 # - runStatement
 # - getValueAndLength
-# - getVarOrFunctionValue
 # - getFunctionValueAndLength
 # - getValueAndLength
 
@@ -418,54 +417,6 @@ proc getFunctionValueAndLength*(
 
   result = newValueAndLengthOr(funResult.value, pos-start)
 
-proc getVarOrFunctionValue*(statement: Statement, start: Natural,
-    variables: Variables): OpResultWarn[ValueAndLength] =
-  ## Return the value and length that "start" points at. Start points
-  ## at the name of a variable or name of a function or a list.  The
-  ## length returned includes the trailing whitespace. Start points at
-  ## the first non-whitespace character of the right hand side or at
-  ## the start of a function parameter.
-
-  # Get the variable or function name. Match the surrounding white
-  # space.
-  let dotNameStrO = matchDotNames(statement.text, start)
-  assert dotNameStrO.isSome
-  let (_, dotNameStr, leftParen, dotNameLen) = dotNameStrO.get3GroupsLen()
-
-  if leftParen == "(":
-    # We have a function, run it and return its value.
-
-    # Make sure the function exists.
-    let functionName = dotNameStr
-    if not isFunctionName(functionName):
-      # The function does not exist: $1.
-      return newValueAndLengthOr(wInvalidFunction, functionName, start)
-
-    # Handle the special conditional excecution functions.
-    # if functionName in ["if0", "if1"]:
-    #   return ifFunction(functionName, statement,
-    #     start+dotNameLen, variables)
-
-    # Get the function's value and length.
-    let funValueLengthOr = getFunctionValueAndLength(functionName, statement,
-      start+dotNameLen, variables)
-    if funValueLengthOr.isMessage:
-      return funValueLengthOr
-    let funValueLength = funValueLengthOr.value
-
-    # Return the value and length.
-    let valueAndLength = newValueAndLength(funValueLength.value,
-      dotNameLen+funValueLength.length)
-    result = newValueAndLengthOr(valueAndLength.value, valueAndLength.length)
-  else:
-    # We have a variable, look it up and return its value.
-    let valueOrWarning = getVariable(variables, dotNameStr)
-    if valueOrWarning.kind == vwWarning:
-      return newValueAndLengthOr(valueOrWarning.warningData.warning,
-        valueOrWarning.warningData.p1, start)
-
-    result = newValueAndLengthOr(valueOrWarning.value, dotNameLen)
-
 proc getList(statement: Statement, start: Natural,
     variables: Variables): OpResultWarn[ValueAndLength] =
   ## Return the literal list value and match length from the
@@ -513,7 +464,39 @@ proc getValueAndLength(statement: Statement, start: Natural, variables:
   elif char in {'0' .. '9', '-'}:
     result = getNumber(statement, start)
   elif isLowerAscii(char) or isUpperAscii(char):
-    result = getVarOrFunctionValue(statement, start, variables)
+    # Get the name.
+    let matchesO = matchDotNames(statement.text, start)
+    if not matchesO.isSome:
+      # Expected a string, number, variable, list or function.
+      return newValueAndLengthOr(wInvalidRightHandSide, "", start)
+    let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
+
+    if leftParen == "(":
+      if not isFunctionName(dotNameStr):
+        # The function does not exist: $1.
+        return newValueAndLengthOr(wInvalidFunction, dotNameStr, start)
+
+      # Handle the special conditional excecution functions.
+      # if dotNameStr in ["if0", "if1"]:
+      #   return ifFunction(dotNameStr, statement,
+      #     start+dotNameLen, variables)
+
+      # We have a function, run it and return its value.
+      let fvl = getFunctionValueAndLength(dotNameStr, statement,
+        start+dotNameLen, variables)
+      if fvl.isMessage:
+        return fvl
+      # todo: why add dotNameLen to the length? Can the call above return it added in?
+      let valueAndLength = newValueAndLength(fvl.value.value,
+        dotNameLen+fvl.value.length)
+      result = newValueAndLengthOr(valueAndLength)
+
+    else:
+      # We have a variable, return its value.
+      let valueOrWarning = getVariable(variables, dotNameStr)
+      if valueOrWarning.kind == vwWarning:
+        return newValueAndLengthOr(valueOrWarning.warningData)
+      result = newValueAndLengthOr(valueOrWarning.value, dotNameLen)
   elif char == '[':
     result = getList(statement, start, variables)
   else:

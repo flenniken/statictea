@@ -92,8 +92,24 @@ proc cmpOpResultWarn[T](statement: Statement,
     result = false
 
 proc cmpValueAndLengthOr(statement: Statement,
-    g, e: OpResultWarn[ValueAndLength]): bool =
-    result = cmpOpResultWarn[ValueAndLength](statement, g, e)
+    g, e: OpResultWarn[ValueAndLength], start = 0): bool =
+  ## Compare the two values and show the differences when
+  ## different. Return true when they are the same.
+
+  result = true
+  if $g != $e:
+    if e.isValue:
+      echo "$1|" % statement.text
+      echo startColumn(start + e.value.length)
+    if g.isValue:
+      echo startColumn(start + g.value.length)
+    echo "expected: $1" % $e
+    echo "     got: $1" % $g
+    if e.isMessage:
+      echo getWarnStatement(statement, e.message, "template.html")
+    if g.isMessage:
+      echo getWarnStatement(statement, g.message, "template.html")
+    result = false
 
 proc cmpVariableDataOr(statement: Statement,
     g, e: OpResultWarn[VariableData]): bool =
@@ -142,15 +158,6 @@ proc testGetStringInvalid(buffer: seq[uint8]): bool =
   let eValueAndLengthOr = newValueAndLengthOr(wInvalidUtf8, "", 23)
   result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr)
 
-proc testGetVarOrFunctionValue(
-  variables: Variables,
-  statement: Statement,
-  start: Natural,
-  eValueAndLengthOr: OpResultWarn[ValueAndLength]
-     ): bool =
-  let valueAndLengthOr = getVarOrFunctionValue(statement, start, variables)
-  result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr)
-
 proc testWarnStatement(statement: Statement,
     warning: Warning, start: Natural, p1: string="",
     eLogLines: seq[string] = @[],
@@ -165,7 +172,7 @@ proc testWarnStatement(statement: Statement,
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-proc testGetFunctionValue(
+proc testGetFunctionValueAndLength(
   functionName: string,
   statement: Statement,
   start: Natural,
@@ -175,7 +182,7 @@ proc testGetFunctionValue(
   var variables = emptyVariables()
   let valueAndLengthOr = getFunctionValueAndLength(functionName,
     statement, start, variables)
-  result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr)
+  result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr, start)
 
 proc testRunStatement(
   statement: Statement,
@@ -378,34 +385,6 @@ $$ : c = len("hello")
     check testGetString(newStatement("""a = "abc"""), 4,
       newValueAndLengthOr(wNoEndingQuote, "", 8))
 
-  test "getVarOrFunctionValue var1":
-    # Test processing the right hand side when it is a variable.
-    # The rhs should return 5 and it should process 4 characters.
-    var variables = emptyVariables()
-    discard assignVariable(variables, "five", newValue(5))
-    let statement = newStatement(text="tea = five", lineNum=12, 0)
-    let eValueAndLengthOr = newValueAndLengthOr(newValue(5), 4)
-    check testGetVarOrFunctionValue(variables, statement, 6, eValueAndLengthOr)
-
-  test "getVarOrFunctionValue var2":
-    var variables = emptyVariables()
-    discard assignVariable(variables, "g.aboutfive", newValue(5.11))
-    let statement = newStatement(text="""tea = g.aboutfive """, lineNum=12, 0)
-    let eValueAndLengthOr = newValueAndLengthOr(newValue(5.11), 12)
-    check testGetVarOrFunctionValue(variables, statement, 6, eValueAndLengthOr)
-
-  test "getVarOrFunctionValue not defined":
-    var variables = emptyVariables()
-    let statement = newStatement(text="tea = a+123", lineNum=12, 0)
-    let eValueAndLengthOr = newValueAndLengthOr(wVariableMissing, "a", 6)
-    check testGetVarOrFunctionValue(variables, statement, 6, eValueAndLengthOr)
-
-  test "getVarOrFunctionValue not defined":
-    var variables = emptyVariables()
-    let statement = newStatement("tea = a123")
-    let eValueAndLengthOr = newValueAndLengthOr(wVariableMissing, "a123", 6)
-    check testGetVarOrFunctionValue(variables, statement, 6, eValueAndLengthOr)
-
   test "getNewVariables":
     var variables = emptyVariables()
     check variables["l"].dictv.len == 0
@@ -458,14 +437,14 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let statement = newStatement(text="""tea = len("abc") """, lineNum=16, 0)
     let valueAndLength = newValueAndLength(newValue(3), 7)
     let eValueAndLengthOr = newValueAndLengthOr(valueAndLength)
-    check testGetFunctionValue("len", statement, 10, eValueAndLengthOr)
+    check testGetFunctionValueAndLength("len", statement, 10, eValueAndLengthOr)
 
   test "getFunctionValue 2 parameters":
     let statement = newStatement(text="""tea = concat("abc", "def") """,
       lineNum=16, 0)
     let valueAndLength = newValueAndLength(newValue("abcdef"), 14)
     let eValueAndLengthOr = newValueAndLengthOr(valueAndLength)
-    check testGetFunctionValue("concat", statement, 13, eValueAndLengthOr)
+    check testGetFunctionValueAndLength("concat", statement, 13, eValueAndLengthOr)
 
   test "getFunctionValue nested":
     let text = """tea = concat("abc", concat("xyz", "123")) """
@@ -473,22 +452,22 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let statement = newStatement(text)
     let valueAndLength = newValueAndLength(newValue("abcxyz123"), 29)
     let eValueAndLengthOr = newValueAndLengthOr(valueAndLength)
-    check testGetFunctionValue("concat", statement, 13, eValueAndLengthOr)
+    check testGetFunctionValueAndLength("concat", statement, 13, eValueAndLengthOr)
 
   test "getFunctionValue missing )":
     let statement = newStatement(text="""tea = len("abc"""", lineNum=16, 0)
     let eValueAndLengthOr = newValueAndLengthOr(wMissingCommaParen, "", 15)
-    check testGetFunctionValue("len", statement, 10, eValueAndLengthOr)
+    check testGetFunctionValueAndLength("len", statement, 10, eValueAndLengthOr)
 
   test "getFunctionValue missing quote":
     let statement = newStatement(text="""tea = len("abc)""", lineNum=16, 0)
     let eValueAndLengthOr = newValueAndLengthOr(wNoEndingQuote, "", 15)
-    check testGetFunctionValue("len", statement, 10, eValueAndLengthOr)
+    check testGetFunctionValueAndLength("len", statement, 10, eValueAndLengthOr)
 
   test "getFunctionValue extra comma":
     let statement = newStatement(text="""tea = len("abc",) """, lineNum=16, 0)
     let eValueAndLengthOr = newValueAndLengthOr(wInvalidRightHandSide, "", 16)
-    check testGetFunctionValue("len", statement, 10, eValueAndLengthOr)
+    check testGetFunctionValueAndLength("len", statement, 10, eValueAndLengthOr)
 
   test "runStatement":
     var variables = emptyVariables()
