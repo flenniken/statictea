@@ -220,6 +220,7 @@ func matchRegex(str: string, regex: Regex, start: Natural,
     result = some(matches)
 
 func compilePattern(pattern: string): Option[Regex] =
+  ## Compile the pattern and return a regex object.
   try:
     let regex = re(pattern)
     result = some(regex)

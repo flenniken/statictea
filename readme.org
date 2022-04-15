@@ -383,17 +383,23 @@ repeated block.
 :CUSTOM_ID: statements
 :END:
 
-You create a new variable with a statement.
+You create a new variable with a statement. A statement is an
+expression consisting of a variable, an operator and a right hand
+side.
 
-A statement is an expression consisting of a variable, an equal
-sign, and a right hand side. The right hand side is either
-another variable, a string, a number or a function. Here are a
-few example statements:
+The operator is an equal sign or an "&=". The equal sign appends
+to a dictionary and the &= appends to a list.
+
+The right hand side is either a variable, a string, a
+number or a function.
+
+Here are a few example statements:
 
 #+BEGIN_SRC
 tea = "Earl Grey"
 num = 5
 t.repeat = 2
+b &= 3
 nameLen = len(s.name)
 name = concat(substr(s.name, 0, 7), "...")
 #+END_SRC
@@ -1046,14 +1052,14 @@ Strings follow the same escaping rules as json strings.  You can
 escape 8 special control characters using a slash followed by a
 letter. Special escape letters:
 
-- " -> quotation mark (U+0022)
-- \ -> reverse solidus (U+005C)
-- / -> solidus (U+002F)
-- b -> backspace (U+0008)
-- f -> form feed (U+000C)
-- n -> line feed (U+000A)
-- r -> carriage return (U+000D)
-- t -> tab (U+0009)
+- " -- quotation mark (U+0022)
+- \ -- reverse solidus (U+005C)
+- / -- solidus (U+002F)
+- b -- backspace (U+0008)
+- f -- form feed (U+000C)
+- n -- line feed (U+000A)
+- r -- carriage return (U+000D)
+- t -- tab (U+0009)
 
 Examples with escaping:
 
@@ -1085,7 +1091,8 @@ Surrogate Pair Calculator]].
 :END:
 
 An int is a 64 bit signed integer.  Plus signs are not used
-with numbers.
+with numbers. You can use underscores in long number literals to
+make them more readable.
 
 Example numbers:
 
@@ -1094,6 +1101,7 @@ Example numbers:
 0
 -8823
 42
+1_234_567
 #+END_SRC
 
 [[#contents][茶]]
@@ -1104,7 +1112,8 @@ Example numbers:
 :END:
 
 A float is a 64 bit real number, it has a decimal point and
-starts with a digit or minus sign.
+starts with a digit or minus sign. You can use underscores in
+long number literals to make them more readable.
 
 Example floats:
 
@@ -1113,6 +1122,7 @@ Example floats:
 24.95
 0.123
 -34.0
+1_234.56
 #+END_SRC
 
 [[#contents][茶]]
@@ -1582,11 +1592,10 @@ The nim jsondoc command produces html formatted json data.  Our
 desired final format is Github markdown so having html
 presentation data in the json is a problem.
 
-It was discovered that single paragraph comments are unformatted.
-This is the basis for a workaround. You make all the
-documentation look like one paragraph by inserting some symbols
-in strategic places, then the json data does not contain html
-formatting.
+It was discovered that single paragraph comments are mostly
+unformatted.  This is the basis for a workaround. You avoid the
+formatting by making all the documentation look like one
+paragraph by inserting some symbols in strategic places.
 
 Workaround Rules:
 
@@ -1596,6 +1605,7 @@ Workaround Rules:
 - use @{ for [ in an http link
 - use }@ for ] in an http link
 - use @@: for a : in an http link
+- use @. for *
 
 Change:
 

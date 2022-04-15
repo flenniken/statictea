@@ -346,7 +346,7 @@ func argsPrepostList*(prepostList: seq[Prepost]): seq[seq[string]] =
     result.add(@[prepost.prefix, prepost.postfix])
 
 func getTeaArgs*(args: Args): Value =
-  ## Create the t.args dictionary from the statictea arguments.
+  ## Create the t args dictionary from the statictea arguments.
   var varsDict = newVarsDict()
   varsDict["help"] = newValue(args.help)
   varsDict["version"] = newValue(args.version)

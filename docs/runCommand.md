@@ -28,7 +28,7 @@ starts in the template file.
 * [getString](#getstring) &mdash; Return a literal string value and match length from a statement.
 * [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
 * [ifFunction](#iffunction) &mdash; Handle the if0 and if1 functions which conditionally run one of their parameters.
-* [getFunctionValueAndLength](#getfunctionvalueandlength) &mdash; Collect the function parameters then call it and return the function's value and the position after trailing whitespace.
+* [getFunctionValueAndLength](#getfunctionvalueandlength) &mdash; Return the function's value and the position after trailing whitespace.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 
@@ -232,7 +232,7 @@ proc ifFunction(functionName: string; statement: Statement; start: Natural;
 
 # getFunctionValueAndLength
 
-Collect the function parameters then call it and return the function's value and the position after trailing whitespace. Start points at the first parameter.
+Return the function's value and the position after trailing whitespace.  Start points at the first parameter.
 
 ```nim
 proc getFunctionValueAndLength(functionName: string; statement: Statement;

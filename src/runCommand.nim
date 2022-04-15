@@ -354,9 +354,8 @@ proc getFunctionValueAndLength*(
     start: Natural,
     variables: Variables,
     list=false): OpResultWarn[ValueAndLength] =
-  ## Collect the function parameters then call it and return the
-  ## function's value and the position after trailing whitespace.
-  ## Start points at the first parameter.
+  ## Return the function's value and the position after trailing
+  ## whitespace.  Start points at the first parameter.
 
   var parameters: seq[Value] = @[]
   var parameterStarts: seq[Natural] = @[]

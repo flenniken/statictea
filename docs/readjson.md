@@ -48,16 +48,20 @@ proc readJsonFile(filename: string): ValueOrWarning
 
 # ParsedString
 
-ParsedString holds the result of parsing a string literal. The resulting parsed string and the ending string position.
+ParsedString holds the result of parsing a string literal. The
+resulting parsed string and the ending string position.
+
+* str -- Resulting parsed string.
+* pos -- The position after the last trailing whitespace or the
+position at the first invalid character.
+* messageId -- Message id is 0 when the string was successfully
+parsed, else it is the message id telling what went wrong.
 
 ```nim
 ParsedString = object
-  str*: string               ## Resulting parsed string.
-  pos*: Natural              ## The position after the last trailing whitespace
-                             ## or the position at the first invalid character.
-  messageId*: MessageId      ## Message id is 0 when the string was
-                             ## successfully parsed, else it is the
-                             ## message id telling what went wrong.
+  str*: string
+  pos*: Natural
+  messageId*: MessageId
 
 ```
 
@@ -82,7 +86,7 @@ proc unescapePopularChar(popular: char): char
 Parse the quoted json string literal. The startPos points one past the leading double quote.  Return the parsed string value and the ending position one past the trailing whitespace. On failure, the ending position points at the invalid character and the message id tells what went wrong.
 
 ```nim
-proc parseJsonStr(text: string; startPos: Natural): ParsedString
+func parseJsonStr(text: string; startPos: Natural): ParsedString
 ```
 
 

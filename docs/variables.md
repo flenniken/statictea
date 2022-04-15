@@ -22,7 +22,7 @@ Language variable methods.
 * [assignVariable](#assignvariable) &mdash; Assign the variable the given value if possible, else return a warning.
 * [getVariable](#getvariable) &mdash; Look up the variable and return its value when found, else return a warning.
 * [argsPrepostList](#argsprepostlist) &mdash; Create a prepost list of lists for t.
-* [getTeaArgs](#getteaargs) &mdash; Create the t.
+* [getTeaArgs](#getteaargs) &mdash; Create the t args dictionary from the statictea arguments.
 
 # outputValues
 
@@ -177,7 +177,7 @@ func argsPrepostList(prepostList: seq[Prepost]): seq[seq[string]]
 
 # getTeaArgs
 
-Create the t.args dictionary from the statictea arguments.
+Create the t args dictionary from the statictea arguments.
 
 ```nim
 func getTeaArgs(args: Args): Value

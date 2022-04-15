@@ -105,13 +105,16 @@ proc readJsonFile*(filename: string): ValueOrWarning =
 type
   ParsedString* = object
     ## ParsedString holds the result of parsing a string literal. The
-    ## resulting parsed string and the ending string position.
-    str*: string  ## Resulting parsed string.
-    pos*: Natural ## The position after the last trailing whitespace
-                  ## or the position at the first invalid character.
-    messageId*: MessageId ## Message id is 0 when the string was
-                          ## successfully parsed, else it is the
-                          ## message id telling what went wrong.
+    ## @:resulting parsed string and the ending string position.
+    ## @:
+    ## @:* str -- Resulting parsed string.
+    ## @:* pos -- The position after the last trailing whitespace or the
+    ## @:position at the first invalid character.
+    ## @:* messageId -- Message id is 0 when the string was successfully
+    ## @:parsed, else it is the message id telling what went wrong.
+    str*: string
+    pos*: Natural
+    messageId*: MessageId
 
 func newParsedString*(str: string, pos: Natural, messageId: MessageId): ParsedString =
   ## Create a new ParsedString object.
@@ -156,7 +159,7 @@ proc unescapePopularChar*(popular: char): char =
     # Invalid popular character, return 0.
     result = char(0)
 
-proc parseJsonStr*(text: string, startPos: Natural): ParsedString =
+func parseJsonStr*(text: string, startPos: Natural): ParsedString =
   ## Parse the quoted json string literal. The startPos points one
   ## past the leading double quote.  Return the parsed string value
   ## and the ending position one past the trailing whitespace. On
