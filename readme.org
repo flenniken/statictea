@@ -1421,6 +1421,38 @@ You're a html wizard,
 I'm a {s.teaMaster}!
 #+END_SRC
 
+[[茶]]
+
+** Conditional Evaluation
+
+:PROPERTIES:
+   :CUSTOM_ID: conditional-evaluation
+   :END:
+
+The if0 and if1 funtions evaluate the matching parameter and the
+other parameter is skipped.  This is important when you use the
+warn or return functions to control the statement flow.
+
+The other functions evaluate all their parameters before passing
+them to the function.
+
+In the following example do1 is executed and doOther is skipped.
+
+#+BEGIN_SRC
+a = if1(1, do1(), doOther())
+#+END_SRC
+
+The next example has a warn call in it.  If all the parameters
+were evaluated, the warn would run everytime.
+
+#+BEGIN_SRC
+a = if1(1, do1(), warn("not one"))
+#+END_SRC
+
+The warn and return functions modify the statement flow.  The
+warn function ends the current statement and the return function
+ends the current block.
+
 [[#contents][茶]]
 
 ** Prefix Postfix
