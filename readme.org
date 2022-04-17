@@ -556,7 +556,7 @@ $$ : # comment
 :END:
 
 You use variables to add variable content to your template in its
-replacement blocks. Each string variable gets replaced with it
+replacement blocks. A string variable gets replaced with its
 value, the other variable types get replaced with their json
 equivalent.
 
@@ -565,7 +565,8 @@ times it repeats and other aspects controlling a command.
 
 A variable name starts with a letter followed by letters, digits
 and underscores limited to a total of 64 ASCII characters. Some
-single letters are reserved, see the next section.
+single letters are reserved for important dictionaries, see the
+next section.
 
 Local variables and tea variables, except row, args and version,
 are cleared after processing each replacement block.
@@ -575,15 +576,35 @@ cannot change an existing variable.
 
 [[#contents][茶]]
 
-* Single Letter Variables
+* Dot Names
 :PROPERTIES:
-:CUSTOM_ID: single-letter-variables
+:CUSTOM_ID: dot-names
 :END:
+
+A dot name is a fully qualified variable name.  You can string up
+to five variable names together to make a dot name. For example:
+
+#+BEGIN_SRC
+s.tea.black.earlgrey.vanilla
+#+END_SRC
+
+A dot name refers to a nested variable. For example, you
+reference the server json variables with the letter s,
+i.e. s.name, s.address, etc.
+
+All variables are stored in one of the reserved one letter top
+level dictionaries.
+
+A local variable is stored in the l (local) dictionary. L is
+implied for an unqualified name.
 
 Statictea reserves single letters variable names f - u to refer
 to important dictionaries. Five are currently used: g, h, l, s,
-t.  You can use single letters a, b, c, d, e and v, w, x, y, z
+
+You can use the unreserved letters a, b, c, d, e and v, w, x, y, z
 for your variable names.
+
+Reserved single letter variables:
 
 - f -- Reserved
 - g -- [[#global-variables][Global Variables]]
@@ -1137,7 +1158,7 @@ maps a string key to a value which can be any type. The dict is
 ordered by insertion order.
 
 - You create a dict in a json file or with the dict function.
-- You append to a dict when you create new variables.
+- You append to a dict when you create new variables with a statement.
 - You access dict items with variable names or with the get
   function.
 
@@ -2845,13 +2866,15 @@ values(d) => ["apple", 2, 3]
 - [[#statements][Statements]]
 - [[#syntax][Syntax]]
 - [[#variables][Variables]]
-- [[#single-letter-variables][Single Letter Variables]]
+- [[#dot-names][Dot Names]]
 - [[#types][Types]]
 - [[#run-statictea][Run StaticTea]]
 - [[#miscellaneous][Miscellaneous]]
 - [[#functions][Functions]]
 
 * Tea Info                                                            :notoc:
+
+Tea plant: Camellia sinensis
 
 Tea is the most popular manufactured drink consumed in the world,
 equaling all others – including coffee, soft drinks, and alcohol
