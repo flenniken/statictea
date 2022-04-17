@@ -19,6 +19,7 @@ starts in the template file.
 * [newLengthOr](#newlengthor-1) &mdash; Create a OpResultWarn[Natural] value.
 * [newStatement](#newstatement) &mdash; Create a new statement.
 * [startColumn](#startcolumn) &mdash; Return enough spaces to point at the warning column.
+* [getFragmentAndPos](#getfragmentandpos) &mdash; Return a statement fragment, and new position to show the given position.
 * [getWarnStatement](#getwarnstatement) &mdash; Return a multiline error message.
 * [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
 * [`==`](#) &mdash; Return true when the two statements are equal.
@@ -27,8 +28,8 @@ starts in the template file.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
 * [getString](#getstring) &mdash; Return a literal string value and match length from a statement.
 * [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
-* [ifFunction](#iffunction) &mdash; Handle the if0 and if1 functions which conditionally run one of their parameters.
-* [getFunctionValueAndLength](#getfunctionvalueandlength) &mdash; Return the function's value and the position after trailing whitespace.
+* [ifFunction](#iffunction) &mdash; Return the if0 and if1 function's value and the length.
+* [getFunctionValueAndLength](#getfunctionvalueandlength) &mdash; Return the function's value and the length.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 
@@ -151,7 +152,15 @@ func newStatement(text: string; lineNum: Natural = 1; start: Natural = 1): State
 Return enough spaces to point at the warning column.  Used under the statement line.
 
 ```nim
-proc startColumn(start: Natural): string
+proc startColumn(start: Natural; symbol: string = "^"): string
+```
+
+# getFragmentAndPos
+
+Return a statement fragment, and new position to show the given position.
+
+```nim
+func getFragmentAndPos(statement: Statement; start: Natural): (string, Natural)
 ```
 
 # getWarnStatement
@@ -223,7 +232,7 @@ proc getNumber(statement: Statement; start: Natural): OpResultWarn[
 
 # ifFunction
 
-Handle the if0 and if1 functions which conditionally run one of their parameters.  Return the function's value and the position after trailing whitespace.  Start points at the first parameter.
+Return the if0 and if1 function's value and the length. These functions conditionally run one of their parameters. Start points at the first parameter of the function. The length includes the ending ) and trailing whitespace.
 
 ```nim
 proc ifFunction(functionName: string; statement: Statement; start: Natural;
@@ -232,12 +241,13 @@ proc ifFunction(functionName: string; statement: Statement; start: Natural;
 
 # getFunctionValueAndLength
 
-Return the function's value and the position after trailing whitespace.  Start points at the first parameter.
+Return the function's value and the length. Start points at the first parameter of the function. The length includes the ending ) and trailing whitespace.
 
 ```nim
 proc getFunctionValueAndLength(functionName: string; statement: Statement;
                                start: Natural; variables: Variables;
-                               list = false): OpResultWarn[ValueAndLength]
+                               list = false; skip = false): OpResultWarn[
+    ValueAndLength]
 ```
 
 # runStatement

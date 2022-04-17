@@ -879,6 +879,7 @@ when not defined(test):
       let message = "The dir does not exist: " & dir
       return opMessageStr[Rc](message)
 
+    var failedTests: seq[string]
     var count = 0
     var passedCount = 0
     var rc = 0
@@ -891,17 +892,22 @@ when not defined(test):
         if rcOp.isMessage:
           echo rcOp.message
           rc = 1
+          failedTests.add(path)
         elif rcOp.value == 0:
           inc(passedCount)
         else:
           rc = 1
+          failedTests.add(path)
         inc(count)
+
 
     if count == passedCount:
       echo "All $1 tests passed!" % $passedCount
     else:
       echo "$1 Passed, $2 Failed\n" % [
         $passedCount, $(count - passedCount)]
+      for failedTest in failedTests:
+        echo failedTest
     result = opValueStr[Rc](rc)
 
   proc runDirectoryMain(args: RunArgs): OpResultStr[Rc] =

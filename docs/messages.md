@@ -227,7 +227,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Unused text at the end of the statement.", ## wTextAfterValue
     "Invalid UTF-8 byte in the string.", ## wInvalidUtf8
     "Expected a string, number, variable, list or function.", ## wInvalidRightHandSide
-    "Invalid variable or missing equal operator.", ## wInvalidVariable
+    "Missing operator, = or &=.", ## wInvalidVariable
     "The variable namespace \'$1\' does not exist.", ## wInvalidNameSpace
     "The variable \'$1\' does not exist.", ## wVariableMissing
     "The statement starting at column $1 has an error.", ## wStatementError

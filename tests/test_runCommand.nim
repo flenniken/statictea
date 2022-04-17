@@ -33,7 +33,7 @@ proc newStringValueAndLengthOr*(str: string, length: Natural):
 
 proc startPointer*(start: Natural): string =
   ## Return a string containing the number of spaces and symbols to
-  ## point at the line start value. Display it under the line.
+  ## point at the line start value. Used to display it under the line.
   if start > 100:
     result.add("$1" % $start)
   else:
@@ -701,6 +701,78 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let statement = newStatement(text="a &= 5", lineNum=1, 0)
     let eVariableDataOr = newVariableDataOr("a", "&=", newValue(5))
     check testRunStatement(statement, variables, eVariableDataOr)
+
+  test "extra after":
+    var variables = emptyVariables()
+    let statement = newStatement(text="""a = len("abc")  z""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wTextAfterValue, "", 16)
+    check testRunStatement(statement, variables, eVariableDataOr)
+
+  test "if0 when 0":
+    var variables = emptyVariables()
+    let statement = newStatement(text="""a = if0(0, 1, 2)""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(1))
+    check testRunStatement(statement, variables, eVariableDataOr)
+
+  test "if0 when not 0":
+    var variables = emptyVariables()
+    let statement = newStatement(text="""a = if0(99, 1, 2)""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(2))
+    check testRunStatement(statement, variables, eVariableDataOr)
+
+  test "if0 skipping":
+    var variables = emptyVariables()
+    let text = """a = if0(0, len("123"), len("ab") )"""
+    let statement = newStatement(text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(3))
+    check testRunStatement(statement, variables, eVariableDataOr)
+
+  test "if1 skipping":
+    var variables = emptyVariables()
+    let text = """a = if1(0, len("123"), len("ab") )"""
+    let statement = newStatement(text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(2))
+    check testRunStatement(statement, variables, eVariableDataOr)
+
+  test "if0 missing":
+    var variables = emptyVariables()
+    let text = """a = if0(0, len("123"), missing("ab") )"""
+    let statement = newStatement(text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(3))
+    check testRunStatement(statement, variables, eVariableDataOr)
+
+  test "if1 missing":
+    var variables = emptyVariables()
+    let text = """a = if1(0, missing("123"), len("ab") )"""
+    let statement = newStatement(text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(2))
+    check testRunStatement(statement, variables, eVariableDataOr)
+
+  test "if1 missing 2":
+    var variables = emptyVariables()
+    let text = """a = if1(0, missing(["123", cat(4, 5)], cat()), len("ab") )"""
+    let statement = newStatement(text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(2))
+    check testRunStatement(statement, variables, eVariableDataOr)
+
+  test "if1 exists":
+    var variables = emptyVariables()
+    let text = """exists = if1(exists(t, "repeat"), "exists", "does not")"""
+    # let text = """exists = if1(exists(t, dup("b", 3)), 1, 2)"""
+    let statement = newStatement(text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("exists", "=", newValue("does not"))
+    check testRunStatement(statement, variables, eVariableDataOr)
+
+
+  test "getFragmentAndPos":
+    let text = """a = if1(0, missing(["123", cat(4, 5)], cat()), len("ab") )"""
+    let statement = newStatement(text, lineNum=1, 0)
+    var (fragment, pointerPos) = getFragmentAndPos(statement, 4)
+    check fragment == text
+    check pointerPos == 4
+    (fragment, pointerPos) = getFragmentAndPos(statement, 20)
+    check fragment == text
+    check pointerPos == 20
 
 # todo: test that a warning is generated when the item doesn't exist.
 # todo: test prepost when user specified.

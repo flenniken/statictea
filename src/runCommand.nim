@@ -95,17 +95,17 @@ func newStatement*(text: string, lineNum: Natural = 1,
   ## Create a new statement.
   result = Statement(lineNum: lineNum, start: start, text: text)
 
-proc startColumn*(start: Natural): string =
+proc startColumn*(start: Natural, symbol: string = "^"): string =
   ## Return enough spaces to point at the warning column.  Used under
   ## the statement line.
   for ix in 0..<start:
     result.add(' ')
-  result.add("^")
+  result.add(symbol)
 
-proc getWarnStatement*(statement: Statement,
-    warningData: WarningData,
-    templateFilename: string): string =
-  ## Return a multiline error message.
+func getFragmentAndPos*(statement: Statement, start: Natural):
+     (string, Natural) =
+  ## Return a statement fragment, and new position to show the given
+  ## position.
 
   var fragment: string
   var extraStart = ""
@@ -115,10 +115,6 @@ proc getWarnStatement*(statement: Statement,
   var startPos: int
   var endPos: int
   var pointerPos: int
-
-  let warning = warningData.warning
-  let p1 = warningData.p1
-  let start = warningData.pos
 
   if statement.text.len <= fragmentMax:
     fragment = statement.text
@@ -138,6 +134,28 @@ proc getWarnStatement*(statement: Statement,
       extraEnd = "..."
     fragment = extraStart & statement.text[startPos ..< endPos] & extraEnd
     pointerPos = start.int - startPos + extraStart.len
+
+  assert pointerPos >= 0
+  result = (fragment, Natural(pointerPos))
+
+{.hint[XDeclaredButNotUsed]:off.}
+
+proc showDebugPos(statement: Statement, start: Natural, symbol: string) =
+  let (fragment, pointerPos) = getFragmentAndPos(statement, start)
+  echo fragment
+  echo startColumn(pointerPos, symbol)
+
+proc getWarnStatement*(statement: Statement,
+    warningData: WarningData,
+    templateFilename: string): string =
+  ## Return a multiline error message.
+
+  let start = warningData.pos
+  assert start >= 0
+  let (fragment, pointerPos) = getFragmentAndPos(statement, start)
+
+  let warning = warningData.warning
+  let p1 = warningData.p1
 
   var message = """
 $1
@@ -272,18 +290,9 @@ proc getNumber*(statement: Statement, start: Natural):
     assert intPos.length <= length
   result = newValueAndLengthOr(value, length)
 
-func skipParameter(statement: Statement, start: Natural):
-     OpResultWarn[Natural] =
-  ## Skip the next parameter.  Start is pointing at the parameter to
-  ## skip.  Return the position of the next parameter or the right
-  ## parentheses.  If there is a problem, return an warning message
-  ## which points at the problem position.
-
-  discard
-
 # Forward reference to getValueAndLength since we call it recursively.
 proc getValueAndLength(statement: Statement, start: Natural, variables:
-    Variables): OpResultWarn[ValueAndLength]
+  Variables, skip: bool): OpResultWarn[ValueAndLength]
 
 # Call stack:
 # - runStatement
@@ -297,25 +306,34 @@ proc ifFunction*(
     start: Natural,
     variables: Variables,
     list=false): OpResultWarn[ValueAndLength] =
-  ## Handle the if0 and if1 functions which conditionally run one of
-  ## their parameters.  Return the function's value and the position
-  ## after trailing whitespace.  Start points at the first parameter.
+  ## Return the if0 and if1 function's value and the length. These
+  ## functions conditionally run one of their parameters. Start points
+  ## at the first parameter of the function. The length includes the
+  ## ending ) and trailing whitespace.
+
+  # showDebugPos(statement, start, "s if")
 
   # if0(cond, then, else)
   # if1(cond, then, else)
 
   # Get the condition's integer value.
-  let valueAndLengthOr = getValueAndLength(statement, start, variables)
-  if valueAndLengthOr.isMessage:
-    return valueAndLengthOr
-  let valueAndLength = valueAndLengthOr.value
-  let condition = valueAndLength.value
-  var pos = start + valueAndLength.length
+  let vlcOr = getValueAndLength(statement, start, variables, false)
+  if vlcOr.isMessage:
+    return vlcOr
+  let condition = vlcOr.value.value
+  var runningLen = vlcOr.value.length
 
   # Make sure the condition is an integer.
   if condition.kind != vkInt:
     # The parameter must be an integer.
-    return newValueAndLengthOr(wExpectedInteger)
+    return newValueAndLengthOr(wExpectedInteger, "", start)
+
+  # Match the comma and whitespace.
+  let commaO = matchSymbol(statement.text, gComma, start + runningLen)
+  if not commaO.isSome:
+    # Expected three parameters.
+    return newValueAndLengthOr(wThreeParameters, "", start)
+  runningLen += commaO.get().length
 
   # Determine whether we execute the second or third parameter.
   var getSecond: bool
@@ -327,59 +345,78 @@ proc ifFunction*(
     # Return the third parameter.
     getSecond = false
 
-    # Skip the second parameter.
-    let skipLenOr = skipParameter(statement, pos)
-    if skipLenOr.isMessage:
-      return newValueAndLengthOr(skipLenOr.message)
-    pos = pos + skipLenOr.value
+  # Handle the second parameter.
+  var skip = (getSecond == false)
+  let vl2Or = getValueAndLength(statement, start + runningLen, variables, skip)
+  if vl2Or.isMessage:
+    return vl2Or
+  runningLen += vl2Or.value.length
 
-  # Get the "then" or "else" value pointed at by pos.
-  let valOr = getValueAndLength(statement, pos, variables)
-  if valOr.isMessage:
-    return valOr
-  pos = pos + valOr.value.length
+  # Match the comma and whitespace.
+  let cO = matchSymbol(statement.text, gComma, start + runningLen)
+  if not cO.isSome:
+    # Expected three parameters.
+    return newValueAndLengthOr(wThreeParameters, "", start + runningLen)
+  runningLen += cO.get().length
 
+  # Handle the third parameter.
+  skip = (getSecond == true)
+  let vl3Or = getValueAndLength(statement, start + runningLen, variables, skip)
+  if vl3Or.isMessage:
+    return vl3Or
+  runningLen += vl3Or.value.length
+
+  # Match ) and trailing whitespace.
+  let parenO = matchSymbol(statement.text, gRightParentheses,
+    start + runningLen)
+  if not parenO.isSome:
+    # Expected three parameters.
+    return newValueAndLengthOr(wThreeParameters, "", start + runningLen)
+  runningLen += parenO.get().length
+
+  var value: Value
   if getSecond:
-    # Skip the third parameter.
-    let skipLenOr = skipParameter(statement, pos)
-    if skipLenOr.isMessage:
-      return newValueAndLengthOr(skipLenOr.message)
-    pos = pos + skipLenOr.value
-
-  result = newValueAndLengthOr(valueAndLength.value, pos)
+    value = vl2Or.value.value
+  else:
+    value = vl3Or.value.value
+  # showDebugPos(statement, start+runningLen, "f if")
+  result = newValueAndLengthOr(value, runningLen)
 
 proc getFunctionValueAndLength*(
     functionName: string,
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list=false): OpResultWarn[ValueAndLength] =
-  ## Return the function's value and the position after trailing
-  ## whitespace.  Start points at the first parameter.
+    list = false, skip = false): OpResultWarn[ValueAndLength] =
+  ## Return the function's value and the length. Start points at the
+  ## first parameter of the function. The length includes the ending )
+  ## and trailing whitespace.
+
+  # showDebugPos(statement, start, "^ start function")
 
   var parameters: seq[Value] = @[]
   var parameterStarts: seq[Natural] = @[]
-  var pos = start
+  var pos: Natural
 
-  # If we get a right parentheses or right bracket, there are no parameters.
+  # If we get a right parentheses or right bracket, there are no
+  # parameters.
   let symbol = if list: gRightBracket else: gRightParentheses
-  let startSymbolO = matchSymbol(statement.text, symbol, pos)
+  let startSymbolO = matchSymbol(statement.text, symbol, start)
   if startSymbolO.isSome:
-    pos = pos + startSymbolO.get().length
+    pos = start + startSymbolO.get().length
   else:
+    pos = start
     while true:
       # Get the parameter's value.
-      let valueAndLengthOr = getValueAndLength(statement, pos, variables)
-      if valueAndLengthOr.isMessage:
-        return valueAndLengthOr
-      let valueAndLength = valueAndLengthOr.value
-
-      parameters.add(valueAndLength.value)
+      let vlOr = getValueAndLength(statement, pos, variables, skip)
+      if vlOr.isMessage:
+        return vlOr
+      parameters.add(vlOr.value.value)
       parameterStarts.add(pos)
 
-      pos = pos + valueAndLength.length
+      pos = pos + vlOr.value.length
 
-      # Get the comma or ) or ] and white space following the value.
+      # Get the , or ) or ] and white space following the value.
       let commaSymbolO = matchCommaOrSymbol(statement.text, symbol, pos)
       if not commaSymbolO.isSome:
         if symbol == gRightParentheses:
@@ -395,12 +432,15 @@ proc getFunctionValueAndLength*(
          (foundSymbol == "]" and symbol == gRightBracket):
         break
 
+  if skip:
+    # pos-start is the length including trailing whitespace.
+    return newValueAndLengthOr(newValue(0), pos-start)
+
   # Lookup the function.
   let functionSpecO = getFunction(functionName, parameters)
   if not isSome(functionSpecO):
     # The function does not exist: $1.
     return newValueAndLengthOr(wInvalidFunction, functionName, start)
-
   let functionSpec = functionSpecO.get()
 
   # Call the function.
@@ -414,10 +454,11 @@ proc getFunctionValueAndLength*(
     return newValueAndLengthOr(funResult.warningData.warning,
       funResult.warningData.p1, warningPos)
 
+  # pos-start is the length including trailing whitespace.
   result = newValueAndLengthOr(funResult.value, pos-start)
 
 proc getList(statement: Statement, start: Natural,
-    variables: Variables): OpResultWarn[ValueAndLength] =
+    variables: Variables, skip = false): OpResultWarn[ValueAndLength] =
   ## Return the literal list value and match length from the
   ## statement. The start index points at [.
 
@@ -428,7 +469,7 @@ proc getList(statement: Statement, start: Natural,
 
   # Get the list.
   let funValueLengthOr = getFunctionValueAndLength("list", statement,
-    start+startSymbol.length, variables, true)
+    start+startSymbol.length, variables, true, skip)
   if funValueLengthOr.isMessage:
     return funValueLengthOr
   let funValueLength = funValueLengthOr.value
@@ -439,11 +480,16 @@ proc getList(statement: Statement, start: Natural,
   result = newValueAndLengthOr(valueAndLength)
 
 proc getValueAndLength(statement: Statement, start: Natural, variables:
-    Variables): OpResultWarn[ValueAndLength] =
-  ## Return the value and length of the item that "start" points at.
-  ## The length returned includes the trailing whitespace. Start
-  ## points at the first non-whitespace character of the right hand
-  ## side or at the start of a function parameter.
+    Variables, skip: bool): OpResultWarn[ValueAndLength] =
+  ## Return the value and length of the item that the start parameter
+  ## points at.  Start points at a simple item, either a string,
+  ## number, variable, function or list.  The length returned includes
+  ## the trailing whitespace after the item. So the ending position is
+  ## pointing at the end of the statement, or at the first whitspace
+  ## character after the item.  When skip is true, the return value is
+  ## 0 and functions are not executed.
+
+  # showDebugPos(statement, start, "^")
 
   # The first character determines its type.
   # * quote -- string
@@ -456,12 +502,14 @@ proc getValueAndLength(statement: Statement, start: Natural, variables:
     # Expected a string, number, variable, list or function.
     return newValueAndLengthOr(wInvalidRightHandSide, "", start)
 
-  ## Call the correct get function based on the first character.
+  ## Branch based on the first character.
   let char = statement.text[start]
   if char == '"':
     result = getString(statement, start)
   elif char in {'0' .. '9', '-'}:
     result = getNumber(statement, start)
+  elif char == '[':
+    result = getList(statement, start, variables, skip)
   elif isLowerAscii(char) or isUpperAscii(char):
     # Get the name.
     let matchesO = matchDotNames(statement.text, start)
@@ -471,33 +519,39 @@ proc getValueAndLength(statement: Statement, start: Natural, variables:
     let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
 
     if leftParen == "(":
-      if not isFunctionName(dotNameStr):
-        # The function does not exist: $1.
-        return newValueAndLengthOr(wInvalidFunction, dotNameStr, start)
-
-      # Handle the special conditional excecution functions.
-      # if dotNameStr in ["if0", "if1"]:
-      #   return ifFunction(dotNameStr, statement,
-      #     start+dotNameLen, variables)
-
       # We have a function, run it and return its value.
+
+      # Handle the special if functions.
+      if dotNameStr in ["if0", "if1"]:
+        let ifOr = ifFunction(dotNameStr, statement,
+          start+dotNameLen, variables, skip)
+        if ifOr.isMessage:
+          return ifOr
+        return newValueAndLengthOr(ifOr.value.value,
+          dotNameLen + ifOr.value.length)
+
+      if not skip:
+        if not isFunctionName(dotNameStr):
+          # The function does not exist: $1.
+          return newValueAndLengthOr(wInvalidFunction, dotNameStr, start)
+
       let fvl = getFunctionValueAndLength(dotNameStr, statement,
-        start+dotNameLen, variables)
+        start+dotNameLen, variables, false, skip)
       if fvl.isMessage:
         return fvl
-      # todo: why add dotNameLen to the length? Can the call above return it added in?
       let valueAndLength = newValueAndLength(fvl.value.value,
         dotNameLen+fvl.value.length)
-      result = newValueAndLengthOr(valueAndLength)
+      # showDebugPos(statement, start+valueAndLength.length, "^ finish function")
+      return newValueAndLengthOr(valueAndLength)
 
-    else:
-      # We have a variable, return its value.
-      let valueOrWarning = getVariable(variables, dotNameStr)
-      if valueOrWarning.kind == vwWarning:
-        return newValueAndLengthOr(valueOrWarning.warningData)
-      result = newValueAndLengthOr(valueOrWarning.value, dotNameLen)
-  elif char == '[':
-    result = getList(statement, start, variables)
+    if skip:
+      return newValueAndLengthOr(newValue(0), dotNameLen)
+
+    # We have a variable.
+    let valueOrWarning = getVariable(variables, dotNameStr)
+    if valueOrWarning.kind == vwWarning:
+      return newValueAndLengthOr(valueOrWarning.warningData)
+    return newValueAndLengthOr(valueOrWarning.value, dotNameLen)
   else:
     # Expected a string, number, variable, list or function.
     return newValueAndLengthOr(wInvalidRightHandSide, "", start)
@@ -516,23 +570,25 @@ proc runStatement*(statement: Statement, variables: Variables):
   let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
 
   if leftParen != "":
+    # No functions allow on the left hand side.
     # Statement does not start with a variable name.
     return newVariableDataOr(wMissingStatementVar)
 
   # Get the equal sign or &= and following whitespace.
   let operatorO = matchEqualSign(statement.text, dotNameLen)
   if not operatorO.isSome:
-    # Invalid variable or missing equal operator.
+    # Missing operator, = or &=.
     return newVariableDataOr(wInvalidVariable)
   let operatorMatch = operatorO.get()
 
   # Get the right hand side value and match the following whitespace.
-  let valueAndLengthOr = getValueAndLength(statement,
-    dotNameLen + operatorMatch.length, variables)
-  if valueAndLengthOr.isMessage:
-    return newVariableDataOr(valueAndLengthOr.message)
-  let value = valueAndLengthOr.value.value
-  let length = valueAndLengthOr.value.length
+  let vlOr = getValueAndLength(statement,
+    dotNameLen + operatorMatch.length, variables, false)
+  if vlOr.isMessage:
+    return newVariableDataOr(vlOr.message)
+  let value = vlOr.value.value
+  let length = vlOr.value.length
+  # showDebugPos(statement, dotNameLen+operatorMatch.length+length, "^ f gVAL")
 
   # Check that there is not any unprocessed text following the value.
   let pos = dotNameLen + operatorMatch.length + length
@@ -542,7 +598,6 @@ proc runStatement*(statement: Statement, variables: Variables):
 
   # Return the variable dot name and value.
   let operator = operatorMatch.getGroup()
-
   result = newVariableDataOr(dotNameStr, operator, value)
 
 proc runCommand*(env: var Env, cmdLines: CmdLines, variables: var Variables) =

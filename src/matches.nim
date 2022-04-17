@@ -211,6 +211,7 @@ type
     gRightParentheses # )
     gLeftBracket # [
     gRightBracket # ]
+    gComma # ,
 
 proc matchCommaOrSymbol*(line: string, symbol: GroupSymbol,
     start: Natural = 0): Option[Matches] =
@@ -225,6 +226,9 @@ proc matchCommaOrSymbol*(line: string, symbol: GroupSymbol,
     pattern = r"([,[])\s*"
   of gRightBracket:
     pattern = r"([,\]])\s*"
+  of gComma:
+    # No match.
+    return
   result = matchPatternCached(line, pattern, start, 1)
 
 proc matchSymbol*(line: string, symbol: GroupSymbol, start: Natural = 0): Option[Matches] =
@@ -239,4 +243,6 @@ proc matchSymbol*(line: string, symbol: GroupSymbol, start: Natural = 0): Option
     pattern = r"\[\s*"
   of gRightBracket:
     pattern = r"\]\s*"
+  of gComma:
+    pattern = r",\s*"
   result = matchPatternCached(line, pattern, start, 0)
