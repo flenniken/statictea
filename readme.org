@@ -47,7 +47,7 @@ formatting json.
 :CUSTOM_ID: how-it-works
 :END:
 
-You create a template and add commands around your variable
+You create a template and add command lines around your variable
 content. This defines the replacement blocks.
 
 In the replacement blocks you add variables in brackets for
@@ -560,13 +560,42 @@ replacement blocks. A string variable gets replaced with its
 value, the other variable types get replaced with their json
 equivalent.
 
-You use tea variables to control where the output goes, how many
-times it repeats and other aspects controlling a command.
+In the example below, "name" and "teas" are variables that are
+defined in the command. Both variables are used in the
+replacement block.
+
+Template:
+
+#+BEGIN_SRC
+$$ block
+$$ : name = "Eary Grey"
+$$ : teas = list("Black", "Green", "Oolong")
+Popular tea: {name}
+Available kinds: {teas}
+$$ endblock
+#+END_SRC
+
+Result:
+
+#+BEGIN_SRC
+Popular tea: Earl Grey
+Available kinds: ["Black","Green","Oolong"]
+#+END_SRC
+
+You use variables in the t dictionary ("tea" variables), to
+control where the output goes, how many times it repeats and
+other aspects controlling a command.
 
 A variable name starts with a letter followed by letters, digits
 and underscores limited to a total of 64 ASCII characters. Some
 single letters are reserved for important dictionaries, see the
 next section.
+
+#+BEGIN_SRC
+a = 5
+next_letter = "z"
+firstName = len(s.name)
+#+END_SRC
 
 Local variables and tea variables, except row, args and version,
 are cleared after processing each replacement block.
@@ -581,25 +610,29 @@ cannot change an existing variable.
 :CUSTOM_ID: dot-names
 :END:
 
-A dot name is a fully qualified variable name.  You can string up
-to five variable names together to make a dot name. For example:
+A dot name is a fully qualified variable name where variables are
+connected with dots.
+
+The server json variables are stored in the s dictionary. You
+reference them with "s.", for example:
+
+#+BEGIN_SRC
+s.name
+s.address
+#+END_SRC
+
+You can string up to five variable names together to make a dot
+name. For example:
 
 #+BEGIN_SRC
 s.tea.black.earlgrey.vanilla
 #+END_SRC
 
-A dot name refers to a nested variable. For example, you
-reference the server json variables with the letter s,
-i.e. s.name, s.address, etc.
-
-All variables are stored in one of the reserved one letter top
-level dictionaries.
-
 A local variable is stored in the l (local) dictionary. L is
 implied for an unqualified name.
 
-Statictea reserves single letters variable names f - u to refer
-to important dictionaries. Five are currently used: g, h, l, s,
+All variables are stored in one of the reserved one letter top
+level dictionaries f - u. Five are currently used: g, h, l, s, t.
 
 You can use the unreserved letters a, b, c, d, e and v, w, x, y, z
 for your variable names.
@@ -1334,6 +1367,7 @@ The StaticTea command line options:
 Miscellaneous topics:
 
 - [[#warning-messages][Warning Messages]]
+- [[#conditional-evaluation][Conditional Evaluation]]
 - [[#prefix-postfix][Prefix Postfix]]
 - [[#encoding-and-line-endings][Encoding and Line Endings]]
 - [[#update-option][Update Option]]
@@ -1790,8 +1824,10 @@ List of functions:
 - [[#get][get()]] -- Get a list value by its index.
 - [[#githubAnchor][githubAnchor()]] -- Create Github anchor names from heading names.
 - [[#githubAnchor][githubAnchor()]] -- Create a Github anchor name from a heading name.
-- [[#if0][if0()]] -- If the condition is 0, return the second parameter, else return the third.
-- [[#if1][if1()]] -- If the condition is 1, return the second parameter, else return the third.
+- [[#if0][if0()]] -- If the condition is 0, return the second parameter, else return
+the third.
+- [[#if1][if1()]] -- If the condition is 1, return the second parameter, else return
+the third.
 - [[#int][int()]] -- Create an int from a float.
 - [[#int][int()]] -- Create an int from a number string.
 - [[#joinPath][joinPath()]] -- Join the path components with a path separator.
@@ -1799,7 +1835,7 @@ List of functions:
 - [[#keys][keys()]] -- Create a list from the keys in a dictionary.
 - [[#len][len()]] -- Number of elements in a dictionary.
 - [[#len][len()]] -- Number of elements in a list.
-- [[#len][len()]] -- Number of characters in a string.
+- [[#len][len()]] -- Number of unicode characters in a string.
 - [[#list][list()]] -- Create a list of values.
 - [[#lower][lower()]] -- Lowercase a string.
 - [[#path][path()]] -- Split a file path into its component pieces.
@@ -2277,8 +2313,8 @@ Examples:
 
 #+BEGIN_SRC
 githubAnchor("MyHeading") => "myheading"
-githubAnchor("Eary Gray") => "eary-gray"
-githubAnchor("$Eary-Gray#") => "eary-gray"
+githubAnchor("Eary Grey") => "eary-grey"
+githubAnchor("$Eary-Grey#") => "eary-grey"
 #+END_SRC
 
 Example in a markdown template:
@@ -2297,19 +2333,10 @@ $$ : anchor = githubAnchor(entry.name)
 :CUSTOM_ID: if0
 :END:
 
-If the condition is 0, return the second parameter, else return the third.
-
-#+BEGIN_SRC
-if0(condition: int, then: any, else: any) any
-#+END_SRC
-
-Examples:
-
-#+BEGIN_SRC
-if0(0, "tea", "beer") => "tea"
-if0(1, "tea", "beer") => "beer"
-if0(4, "tea", "beer") => "beer"
-#+END_SRC
+If the condition is 0, return the second parameter, else return
+the third. This function is special because it conditionally
+evaluates the matching parameter and skips the other one.  See
+[[#conditional-evaluation][Conditional Evaluation]].
 
 [[#contents][茶]]
 
@@ -2318,7 +2345,10 @@ if0(4, "tea", "beer") => "beer"
 :CUSTOM_ID: if1
 :END:
 
-If the condition is 1, return the second parameter, else return the third.
+If the condition is 1, return the second parameter, else return
+the third. This function is special because it conditionally
+evaluates the matching parameter and skips the other one.  See
+[[#conditional-evaluation][Conditional Evaluation]].
 
 #+BEGIN_SRC
 if1(condition: int, then: any, else: any) any
@@ -2544,7 +2574,7 @@ len(list(4, 5)) => 2
 :CUSTOM_ID: len
 :END:
 
-Number of characters in a string.
+Number of unicode characters in a string.
 
 #+BEGIN_SRC
 len(str: string) int
@@ -2564,7 +2594,8 @@ len("añyóng") => 6
 :CUSTOM_ID: list
 :END:
 
-Create a list of values.
+Create a list of values. You can also use [ ... ] to create a
+list.
 
 #+BEGIN_SRC
 list(...) list
@@ -2657,29 +2688,47 @@ replace(str: string, start: int, length: int, replacement: string) string
 
 Examples:
 
+Replace:
 #+BEGIN_SRC
 replace("Earl Grey", 5, 4, "of Sandwich")
   => "Earl of Sandwich"
-replace("123", 0, 0, "abcd") => abcd123
 replace("123", 0, 1, "abcd") => abcd23
 replace("123", 0, 2, "abcd") => abcd3
-replace("123", 0, 3, "abcd") => abcd
-replace("123", 3, 0, "abcd") => 123abcd
-replace("123", 2, 1, "abcd") => 12abcd
-replace("123", 1, 2, "abcd") => 1abcd
-replace("123", 0, 3, "abcd") => abcd
-replace("123", 1, 0, "abcd") => 1abcd23
+
 replace("123", 1, 1, "abcd") => 1abcd3
 replace("123", 1, 2, "abcd") => 1abcd
-replace("", 0, 0, "abcd") => abcd
-replace("", 0, 0, "abc") => abc
-replace("", 0, 0, "ab") => ab
-replace("", 0, 0, "a") => a
-replace("", 0, 0, "") =>
-replace("123", 0, 0, "") => 123
+
+replace("123", 2, 1, "abcd") => 12abcd
+#+END_SRC
+Insert:
+#+BEGIN_SRC
+replace("123", 0, 0, "abcd") => abcd123
+replace("123", 1, 0, "abcd") => 1abcd23
+replace("123", 2, 0, "abcd") => 12abcd3
+replace("123", 3, 0, "abcd") => 123abcd
+#+END_SRC
+Append:
+#+BEGIN_SRC
+replace("123", 3, 0, "abcd") => 123abcd
+#+END_SRC
+Delete:
+#+BEGIN_SRC
 replace("123", 0, 1, "") => 23
 replace("123", 0, 2, "") => 3
-replace("123", 0, 3, "") =>
+replace("123", 0, 3, "") => ""
+
+replace("123", 1, 1, "") => 13
+replace("123", 1, 2, "") => 1
+
+replace("123", 2, 1, "") => 12
+#+END_SRC
+Edge Cases:
+#+BEGIN_SRC
+replace("", 0, 0, "") =>
+replace("", 0, 0, "a") => a
+replace("", 0, 0, "ab") => ab
+replace("", 0, 0, "abc") => abc
+replace("", 0, 0, "abcd") => abcd
 #+END_SRC
 
 [[#contents][茶]]
@@ -2828,7 +2877,7 @@ sort(dicts: list, order: string, case: string, key: string) list
 Examples:
 
 #+BEGIN_SRC
-d1 = dict("name", "Earl Gray", "weight", 1.2)
+d1 = dict("name", "Earl Grey", "weight", 1.2)
 d2 = dict("name", "Tea Pot", "weight", 3.5)
 dicts = list(d1, d2)
 sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]

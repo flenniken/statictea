@@ -774,6 +774,10 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     check fragment == text
     check pointerPos == 20
 
+  # test "showDebugPos":
+  #   let statement = newStatement("text", lineNum=1, 0)
+  #   showDebugPos(statement, 0, "^")
+
 # todo: test that a warning is generated when the item doesn't exist.
 # todo: test prepost when user specified.
 # todo: test the maximum variable length of 64, 66 including the optional prefix.

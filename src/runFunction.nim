@@ -177,7 +177,7 @@ func funConcat*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(a & b))
 
 func funLen_si*(parameters: seq[Value]): FunResult =
-  ## Number of characters in a string.
+  ## Number of unicode characters in a string.
   ## @:
   ## @:~~~
   ## @:len(str: string) int
@@ -299,7 +299,10 @@ func funGet_dsoaa*(parameters: seq[Value]): FunResult =
 
 func funIf0*(parameters: seq[Value]): FunResult =
   ## If the condition is 0, return the second parameter, else return
-  ## the third.
+  ## @:the third. This function is special because it conditionally
+  ## @:evaluates the matching parameter and skips the other one.  See
+  ## @:[[#conditional-evaluation][Conditional Evaluation]].
+
   ## @:
   ## @:~~~
   ## @:if0(condition: int, then: any, else: any) any
@@ -325,7 +328,9 @@ func funIf0*(parameters: seq[Value]): FunResult =
 
 func funIf1*(parameters: seq[Value]): FunResult =
   ## If the condition is 1, return the second parameter, else return
-  ## the third.
+  ## @:the third. This function is special because it conditionally
+  ## @:evaluates the matching parameter and skips the other one.  See
+  ## @:[[#conditional-evaluation][Conditional Evaluation]].
   ## @:
   ## @:~~~
   ## @:if1(condition: int, then: any, else: any) any
@@ -869,7 +874,8 @@ func funDict_old*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(dict))
 
 func funList*(parameters: seq[Value]): FunResult =
-  ## Create a list of values.
+  ## Create a list of values. You can also use [ ... ] to create a
+  ## @:list.
   ## @:
   ## @:~~~
   ## @:list(...) list
@@ -902,30 +908,49 @@ func funReplace*(parameters: seq[Value]): FunResult =
   ## @:
   ## @:Examples:
   ## @:
+  ## @:Replace:
   ## @:~~~
   ## @:replace("Earl Grey", 5, 4, "of Sandwich")
   ## @:  => "Earl of Sandwich"
-  ## @:replace("123", 0, 0, "abcd") => abcd123
   ## @:replace("123", 0, 1, "abcd") => abcd23
   ## @:replace("123", 0, 2, "abcd") => abcd3
-  ## @:replace("123", 0, 3, "abcd") => abcd
-  ## @:replace("123", 3, 0, "abcd") => 123abcd
-  ## @:replace("123", 2, 1, "abcd") => 12abcd
-  ## @:replace("123", 1, 2, "abcd") => 1abcd
-  ## @:replace("123", 0, 3, "abcd") => abcd
-  ## @:replace("123", 1, 0, "abcd") => 1abcd23
+  ## @:
   ## @:replace("123", 1, 1, "abcd") => 1abcd3
   ## @:replace("123", 1, 2, "abcd") => 1abcd
-  ## @:replace("", 0, 0, "abcd") => abcd
-  ## @:replace("", 0, 0, "abc") => abc
-  ## @:replace("", 0, 0, "ab") => ab
-  ## @:replace("", 0, 0, "a") => a
-  ## @:replace("", 0, 0, "") =>
-  ## @:replace("123", 0, 0, "") => 123
+  ## @:
+  ## @:replace("123", 2, 1, "abcd") => 12abcd
+  ## @:~~~~
+  ## @:Insert:
+  ## @:~~~
+  ## @:replace("123", 0, 0, "abcd") => abcd123
+  ## @:replace("123", 1, 0, "abcd") => 1abcd23
+  ## @:replace("123", 2, 0, "abcd") => 12abcd3
+  ## @:replace("123", 3, 0, "abcd") => 123abcd
+  ## @:~~~~
+  ## @:Append:
+  ## @:~~~
+  ## @:replace("123", 3, 0, "abcd") => 123abcd
+  ## @:~~~~
+  ## @:Delete:
+  ## @:~~~
   ## @:replace("123", 0, 1, "") => 23
   ## @:replace("123", 0, 2, "") => 3
-  ## @:replace("123", 0, 3, "") =>
+  ## @:replace("123", 0, 3, "") => ""
+  ## @:
+  ## @:replace("123", 1, 1, "") => 13
+  ## @:replace("123", 1, 2, "") => 1
+  ## @:
+  ## @:replace("123", 2, 1, "") => 12
   ## @:~~~~
+  ## @:Edge Cases:
+  ## @:~~~
+  ## @:replace("", 0, 0, "") =>
+  ## @:replace("", 0, 0, "a") => a
+  ## @:replace("", 0, 0, "ab") => ab
+  ## @:replace("", 0, 0, "abc") => abc
+  ## @:replace("", 0, 0, "abcd") => abcd
+  ## @:~~~~
+
 
   tMapParameters("siiss")
 
@@ -1412,7 +1437,7 @@ func funType_as*(parameters: seq[Value]): FunResult =
   ## @:type(3.14159) => "float"
   ## @:type("Tea") => "string"
   ## @:type(list(1,2)) => "list"
-  ## @:type(dict("a", 1, "b", 2)) => "dict"
+  ## @:type(dict("a", 1)) => "dict"
   ## @:~~~~
 
   tMapParameters("as")

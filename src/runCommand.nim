@@ -138,12 +138,11 @@ func getFragmentAndPos*(statement: Statement, start: Natural):
   assert pointerPos >= 0
   result = (fragment, Natural(pointerPos))
 
-{.hint[XDeclaredButNotUsed]:off.}
-
-proc showDebugPos(statement: Statement, start: Natural, symbol: string) =
-  let (fragment, pointerPos) = getFragmentAndPos(statement, start)
-  echo fragment
-  echo startColumn(pointerPos, symbol)
+when defined(test):
+  proc showDebugPos*(statement: Statement, start: Natural, symbol: string) =
+    let (fragment, pointerPos) = getFragmentAndPos(statement, start)
+    echo fragment
+    echo startColumn(pointerPos, symbol)
 
 proc getWarnStatement*(statement: Statement,
     warningData: WarningData,
@@ -460,7 +459,8 @@ proc getFunctionValueAndLength*(
 proc getList(statement: Statement, start: Natural,
     variables: Variables, skip = false): OpResultWarn[ValueAndLength] =
   ## Return the literal list value and match length from the
-  ## statement. The start index points at [.
+  ## statement. The start index points at [. The length includes the
+  ## trailing whitespace after the ending ].
 
   # Match the left bracket and whitespace.
   let startSymbolO = matchSymbol(statement.text, gLeftBracket, start)
@@ -482,12 +482,12 @@ proc getList(statement: Statement, start: Natural,
 proc getValueAndLength(statement: Statement, start: Natural, variables:
     Variables, skip: bool): OpResultWarn[ValueAndLength] =
   ## Return the value and length of the item that the start parameter
-  ## points at.  Start points at a simple item, either a string,
-  ## number, variable, function or list.  The length returned includes
-  ## the trailing whitespace after the item. So the ending position is
-  ## pointing at the end of the statement, or at the first whitspace
-  ## character after the item.  When skip is true, the return value is
-  ## 0 and functions are not executed.
+  ## points at which is a string, number, variable, function or list.
+  ## The length returned includes the trailing whitespace after the
+  ## item. So the ending position is pointing at the end of the
+  ## statement, or at the first whitspace character after the item.
+  ## When skip is true, the return value is 0 and functions are not
+  ## executed.
 
   # showDebugPos(statement, start, "^")
 

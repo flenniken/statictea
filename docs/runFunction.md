@@ -10,13 +10,15 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funCmp_ffi](#funcmp_ffi) &mdash; Compare two floats.
 * [funCmp_ssoii](#funcmp_ssoii) &mdash; Compare two strings.
 * [funConcat](#funconcat) &mdash; Concatentate two strings.
-* [funLen_si](#funlen_si) &mdash; Number of characters in a string.
+* [funLen_si](#funlen_si) &mdash; Number of unicode characters in a string.
 * [funLen_li](#funlen_li) &mdash; Number of elements in a list.
 * [funLen_di](#funlen_di) &mdash; Number of elements in a dictionary.
 * [funGet_lioaa](#funget_lioaa) &mdash; Get a list value by its index.
 * [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
-* [funIf0](#funif0) &mdash; If the condition is 0, return the second parameter, else return the third.
-* [funIf1](#funif1) &mdash; If the condition is 1, return the second parameter, else return the third.
+* [funIf0](#funif0) &mdash; If the condition is 0, return the second parameter, else return
+the third.
+* [funIf1](#funif1) &mdash; If the condition is 1, return the second parameter, else return
+the third.
 * [funAdd_iii](#funadd_iii) &mdash; Add two integers.
 * [funAdd_fff](#funadd_fff) &mdash; Add two floats.
 * [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
@@ -149,7 +151,7 @@ func funConcat(parameters: seq[Value]): FunResult
 
 # funLen_si
 
-Number of characters in a string.
+Number of unicode characters in a string.
 
 ~~~
 len(str: string) int
@@ -261,19 +263,10 @@ func funGet_dsoaa(parameters: seq[Value]): FunResult
 
 # funIf0
 
-If the condition is 0, return the second parameter, else return the third.
-
-~~~
-if0(condition: int, then: any, else: any) any
-~~~~
-
-Examples:
-
-~~~
-if0(0, "tea", "beer") => "tea"
-if0(1, "tea", "beer") => "beer"
-if0(4, "tea", "beer") => "beer"
-~~~~
+If the condition is 0, return the second parameter, else return
+the third. This function is special because it conditionally
+evaluates the matching parameter and skips the other one.  See
+[[#conditional-evaluation][Conditional Evaluation]].
 
 ```nim
 func funIf0(parameters: seq[Value]): FunResult
@@ -281,7 +274,10 @@ func funIf0(parameters: seq[Value]): FunResult
 
 # funIf1
 
-If the condition is 1, return the second parameter, else return the third.
+If the condition is 1, return the second parameter, else return
+the third. This function is special because it conditionally
+evaluates the matching parameter and skips the other one.  See
+[[#conditional-evaluation][Conditional Evaluation]].
 
 ~~~
 if1(condition: int, then: any, else: any) any
@@ -669,7 +665,8 @@ func funDict_old(parameters: seq[Value]): FunResult
 
 # funList
 
-Create a list of values.
+Create a list of values. You can also use [ ... ] to create a
+list.
 
 ~~~
 list(...) list
@@ -704,29 +701,47 @@ replace(str: string, start: int, length: int, replacement: string) string
 
 Examples:
 
+Replace:
 ~~~
 replace("Earl Grey", 5, 4, "of Sandwich")
   => "Earl of Sandwich"
-replace("123", 0, 0, "abcd") => abcd123
 replace("123", 0, 1, "abcd") => abcd23
 replace("123", 0, 2, "abcd") => abcd3
-replace("123", 0, 3, "abcd") => abcd
-replace("123", 3, 0, "abcd") => 123abcd
-replace("123", 2, 1, "abcd") => 12abcd
-replace("123", 1, 2, "abcd") => 1abcd
-replace("123", 0, 3, "abcd") => abcd
-replace("123", 1, 0, "abcd") => 1abcd23
+
 replace("123", 1, 1, "abcd") => 1abcd3
 replace("123", 1, 2, "abcd") => 1abcd
-replace("", 0, 0, "abcd") => abcd
-replace("", 0, 0, "abc") => abc
-replace("", 0, 0, "ab") => ab
-replace("", 0, 0, "a") => a
-replace("", 0, 0, "") =>
-replace("123", 0, 0, "") => 123
+
+replace("123", 2, 1, "abcd") => 12abcd
+~~~~
+Insert:
+~~~
+replace("123", 0, 0, "abcd") => abcd123
+replace("123", 1, 0, "abcd") => 1abcd23
+replace("123", 2, 0, "abcd") => 12abcd3
+replace("123", 3, 0, "abcd") => 123abcd
+~~~~
+Append:
+~~~
+replace("123", 3, 0, "abcd") => 123abcd
+~~~~
+Delete:
+~~~
 replace("123", 0, 1, "") => 23
 replace("123", 0, 2, "") => 3
-replace("123", 0, 3, "") =>
+replace("123", 0, 3, "") => ""
+
+replace("123", 1, 1, "") => 13
+replace("123", 1, 2, "") => 1
+
+replace("123", 2, 1, "") => 12
+~~~~
+Edge Cases:
+~~~
+replace("", 0, 0, "") =>
+replace("", 0, 0, "a") => a
+replace("", 0, 0, "ab") => ab
+replace("", 0, 0, "abc") => abc
+replace("", 0, 0, "abcd") => abcd
 ~~~~
 
 ```nim
