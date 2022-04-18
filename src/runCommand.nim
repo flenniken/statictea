@@ -17,17 +17,21 @@ import readjson
 import collectCommand
 import opresultwarn
 
+const
+  # Turn on showPos for testing to graphically show the start and end
+  # positions when running a statement.
+  showPos = false
+
 type
-  # todo: what is the maximum statement length?
+  # todo: Inforce a maximum statement length?
   Statement* = object
     ## A Statement object stores the statement text and where it
     ## @:starts in the template file.
     ## @:
-    ## @:* lineNum -- Line number starting at 1 where the statement
+    ## @:* lineNum -- line number, starting at 1, where the statement
     ## @:             starts.
-    ## @:* start -- Column position starting at 1 where the statement
-    ## @:           starts on the line.
-    ## @:* text -- The statement text.
+    ## @:* start -- index where the statement starts
+    ## @:* text -- the statement text.
     lineNum*: Natural
     start*: Natural
     text*: string
@@ -40,6 +44,10 @@ type
     ## the length is 2.
     value*: Value
     length*: Natural
+
+proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
+  ## Create a newValueAndLength object.
+  result = ValueAndLength(value: value, length: length)
 
 func newValueAndLengthOr*(warning: Warning, p1 = "", pos = 0):
     OpResultWarn[ValueAndLength] =
@@ -57,6 +65,10 @@ func newValueAndLengthOr*(value: Value, length: Natural):
   ## Create a OpResultWarn[ValueAndLength] value.
   let val = ValueAndLength(value: value, length: length)
   result = opValueW[ValueAndLength](val)
+
+proc newValueAndLengthOr*(number: int | int64 | float64 | string,
+    length: Natural): OpResultWarn[ValueAndLength] =
+  result = newValueAndLengthOr(newValue(number), length)
 
 func newValueAndLengthOr*(val: ValueAndLength):
     OpResultWarn[ValueAndLength] =
@@ -91,7 +103,7 @@ func newLengthOr*(pos: Natural): OpResultWarn[Natural] =
   result = opValueW[Natural](pos)
 
 func newStatement*(text: string, lineNum: Natural = 1,
-    start: Natural = 1): Statement =
+    start: Natural = 0): Statement =
   ## Create a new statement.
   result = Statement(lineNum: lineNum, start: start, text: text)
 
@@ -138,7 +150,7 @@ func getFragmentAndPos*(statement: Statement, start: Natural):
   assert pointerPos >= 0
   result = (fragment, Natural(pointerPos))
 
-when defined(test):
+when showPos:
   proc showDebugPos*(statement: Statement, start: Natural, symbol: string) =
     let (fragment, pointerPos) = getFragmentAndPos(statement, start)
     echo fragment
@@ -183,11 +195,8 @@ func `$`*(s: Statement): string =
   ## Return a string representation of a Statement.
   result = """$1, $2: "$3"""" % [$s.lineNum, $s.start, s.text]
 
-proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
-  ## Create a newValueAndLength object.
-  result = ValueAndLength(value: value, length: length)
-
-func get3GroupsLen(matchesO: Option[Matches]): (string, string, string, Natural) =
+func get3GroupsLen(matchesO: Option[Matches]): (string,
+    string, string, Natural) =
   let matches = matchesO.get()
   let (one, two, three) = matches.get3Groups()
   result = (one, two, three, matches.length)
@@ -258,7 +267,8 @@ func getString*(statement: Statement, start: Natural):
 proc getNumber*(statement: Statement, start: Natural):
     OpResultWarn[ValueAndLength] =
   ## Return the literal number value and match length from the
-  ## statement. The start index points at a digit or minus sign.
+  ## statement. The start index points at a digit or minus sign. The
+  ## length includes the trailing whitespace.
 
   # Check that we have a statictea number.
   let matchesO = matchNumber(statement.text, start)
@@ -290,7 +300,7 @@ proc getNumber*(statement: Statement, start: Natural):
   result = newValueAndLengthOr(value, length)
 
 # Forward reference to getValueAndLength since we call it recursively.
-proc getValueAndLength(statement: Statement, start: Natural, variables:
+proc getValueAndLength*(statement: Statement, start: Natural, variables:
   Variables, skip: bool): OpResultWarn[ValueAndLength]
 
 # Call stack:
@@ -308,15 +318,13 @@ proc ifFunction*(
   ## Return the if0 and if1 function's value and the length. These
   ## functions conditionally run one of their parameters. Start points
   ## at the first parameter of the function. The length includes the
-  ## ending ) and trailing whitespace.
-
-  # showDebugPos(statement, start, "s if")
+  ## trailing whitespace after the ending ).
 
   # if0(cond, then, else)
   # if1(cond, then, else)
 
   # Get the condition's integer value.
-  let vlcOr = getValueAndLength(statement, start, variables, false)
+  let vlcOr = getValueAndLength(statement, start, variables, skip=false)
   if vlcOr.isMessage:
     return vlcOr
   let condition = vlcOr.value.value
@@ -378,7 +386,6 @@ proc ifFunction*(
     value = vl2Or.value.value
   else:
     value = vl3Or.value.value
-  # showDebugPos(statement, start+runningLen, "f if")
   result = newValueAndLengthOr(value, runningLen)
 
 proc getFunctionValueAndLength*(
@@ -386,12 +393,10 @@ proc getFunctionValueAndLength*(
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list = false, skip = false): OpResultWarn[ValueAndLength] =
+    list = false, skip: bool): OpResultWarn[ValueAndLength] =
   ## Return the function's value and the length. Start points at the
-  ## first parameter of the function. The length includes the ending )
-  ## and trailing whitespace.
-
-  # showDebugPos(statement, start, "^ start function")
+  ## first parameter of the function. The length includes the trailing
+  ## whitespace after the ending ).
 
   var parameters: seq[Value] = @[]
   var parameterStarts: seq[Natural] = @[]
@@ -457,7 +462,7 @@ proc getFunctionValueAndLength*(
   result = newValueAndLengthOr(funResult.value, pos-start)
 
 proc getList(statement: Statement, start: Natural,
-    variables: Variables, skip = false): OpResultWarn[ValueAndLength] =
+    variables: Variables, skip: bool): OpResultWarn[ValueAndLength] =
   ## Return the literal list value and match length from the
   ## statement. The start index points at [. The length includes the
   ## trailing whitespace after the ending ].
@@ -479,17 +484,9 @@ proc getList(statement: Statement, start: Natural,
     funValueLength.length+startSymbol.length)
   result = newValueAndLengthOr(valueAndLength)
 
-proc getValueAndLength(statement: Statement, start: Natural, variables:
+proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
     Variables, skip: bool): OpResultWarn[ValueAndLength] =
-  ## Return the value and length of the item that the start parameter
-  ## points at which is a string, number, variable, function or list.
-  ## The length returned includes the trailing whitespace after the
-  ## item. So the ending position is pointing at the end of the
-  ## statement, or at the first whitspace character after the item.
-  ## When skip is true, the return value is 0 and functions are not
-  ## executed.
-
-  # showDebugPos(statement, start, "^")
+  ## Get the value and length from the statement.
 
   # The first character determines its type.
   # * quote -- string
@@ -527,8 +524,8 @@ proc getValueAndLength(statement: Statement, start: Natural, variables:
           start+dotNameLen, variables, skip)
         if ifOr.isMessage:
           return ifOr
-        return newValueAndLengthOr(ifOr.value.value,
-          dotNameLen + ifOr.value.length)
+        let length = dotNameLen + ifOr.value.length
+        return newValueAndLengthOr(ifOr.value.value, length)
 
       if not skip:
         if not isFunctionName(dotNameStr):
@@ -539,9 +536,9 @@ proc getValueAndLength(statement: Statement, start: Natural, variables:
         start+dotNameLen, variables, false, skip)
       if fvl.isMessage:
         return fvl
+      let length = dotNameLen+fvl.value.length
       let valueAndLength = newValueAndLength(fvl.value.value,
-        dotNameLen+fvl.value.length)
-      # showDebugPos(statement, start+valueAndLength.length, "^ finish function")
+        length)
       return newValueAndLengthOr(valueAndLength)
 
     if skip:
@@ -555,6 +552,29 @@ proc getValueAndLength(statement: Statement, start: Natural, variables:
   else:
     # Expected a string, number, variable, list or function.
     return newValueAndLengthOr(wInvalidRightHandSide, "", start)
+
+proc getValueAndLength*(statement: Statement, start: Natural, variables:
+    Variables, skip: bool): OpResultWarn[ValueAndLength] =
+  ## Return the value and length of the item that the start parameter
+  ## points at which is a string, number, variable, function or list.
+  ## The length returned includes the trailing whitespace after the
+  ## item. So the ending position is pointing at the end of the
+  ## statement, or at the first whitspace character after the item.
+  ## When skip is true, the return value is 0 and functions are not
+  ## executed.
+
+  when showPos:
+    showDebugPos(statement, start, "s")
+
+  result = getValueAndLengthWorker(statement, start, variables, skip)
+
+  when showPos:
+    var pos: Natural
+    if result.isMessage:
+      pos = result.message.pos
+    else:
+      pos = start + result.value.length
+    showDebugPos(statement, pos, "f")
 
 proc runStatement*(statement: Statement, variables: Variables):
     OpResultWarn[VariableData] =
@@ -588,7 +608,6 @@ proc runStatement*(statement: Statement, variables: Variables):
     return newVariableDataOr(vlOr.message)
   let value = vlOr.value.value
   let length = vlOr.value.length
-  # showDebugPos(statement, dotNameLen+operatorMatch.length+length, "^ f gVAL")
 
   # Check that there is not any unprocessed text following the value.
   let pos = dotNameLen + operatorMatch.length + length

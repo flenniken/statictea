@@ -50,6 +50,27 @@ type
       of fdWarning:
         warningData*: WarningData
 
+func newVariableData*(dotNameStr: string, operator: string, value: Value):
+     VariableData =
+  ## Create a new VariableData object.
+  result = VariableData(dotNameStr: dotNameStr,
+    operator: operator, value: value)
+
+# func newVariableDataOr*(warning: Warning, p1 = "", pos = 0):
+#     OpResultWarn[VariableData] =
+#   ## Create a OpResultWarn[VariableData] warning.
+#   let warningData = newWarningData(warning, p1, pos)
+#   result = opMessageW[VariableData](warningData)
+
+# func newVariableDataOr*(warningData: WarningData):
+#     OpResultWarn[VariableData] =
+#   ## Create a OpResultWarn[VariableData] warning.
+#   result = opMessageW[VariableData](warningData)
+
+func `$`*(v: VariableData): string =
+  ## Return a string representation of VariableData.
+  result = "$1 $2 $3" % [v.dotNameStr, v.operator, $v.value]
+
 func `$`*(parentDict: ParentDict): string =
   ## Return a string representation of ParentDict.
   var msg: string
@@ -104,11 +125,6 @@ func emptyVariables*(server: VarsDict = nil, shared: VarsDict = nil,
   else:
     tea["args"] = newValue(args)
   result["t"] = newValue(tea)
-
-func newVariableData*(dotNameStr: string, operator: string, value: Value):
-     VariableData =
-  ## Create a new VariableData object.
-  result = VariableData(dotNameStr: dotNameStr, operator: operator, value: value)
 
 func getTeaVarIntDefault*(variables: Variables, varName: string): int64 =
   ## Return the int value of one of the tea dictionary integer
