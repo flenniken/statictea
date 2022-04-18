@@ -75,23 +75,6 @@ func newValueAndLengthOr*(val: ValueAndLength):
   ## Create a OpResultWarn[ValueAndLength].
   result = opValueW[ValueAndLength](val)
 
-func newVariableDataOr*(warning: Warning, p1 = "", pos = 0):
-    OpResultWarn[VariableData] =
-  ## Create a OpResultWarn[VariableData] warning.
-  let warningData = newWarningData(warning, p1, pos)
-  result = opMessageW[VariableData](warningData)
-
-func newVariableDataOr*(warningData: WarningData):
-    OpResultWarn[VariableData] =
-  ## Create a OpResultWarn[VariableData] warning.
-  result = opMessageW[VariableData](warningData)
-
-func newVariableDataOr*(dotNameStr: string, operator = "=", value: Value):
-    OpResultWarn[VariableData] =
-  ## Create a OpResultWarn[VariableData] value.
-  let val = newVariableData(dotNameStr, operator, value)
-  result = opValueW[VariableData](val)
-
 func newLengthOr*(warning: Warning, p1 = "", pos = 0):
     OpResultWarn[Natural] =
   ## Create a OpResultWarn[Natural] warning.
@@ -474,7 +457,7 @@ proc getList(statement: Statement, start: Natural,
 
   # Get the list.
   let funValueLengthOr = getFunctionValueAndLength("list", statement,
-    start+startSymbol.length, variables, true, skip)
+    start+startSymbol.length, variables, list=true, skip)
   if funValueLengthOr.isMessage:
     return funValueLengthOr
   let funValueLength = funValueLengthOr.value
@@ -547,7 +530,9 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
     # We have a variable.
     let valueOrWarning = getVariable(variables, dotNameStr)
     if valueOrWarning.kind == vwWarning:
-      return newValueAndLengthOr(valueOrWarning.warningData)
+      let warningData = newWarningData(valueOrWarning.warningData.warning,
+        valueOrWarning.warningData.p1, start)
+      return newValueAndLengthOr(warningData)
     return newValueAndLengthOr(valueOrWarning.value, dotNameLen)
   else:
     # Expected a string, number, variable, list or function.
@@ -598,7 +583,7 @@ proc runStatement*(statement: Statement, variables: Variables):
   let operatorO = matchEqualSign(statement.text, dotNameLen)
   if not operatorO.isSome:
     # Missing operator, = or &=.
-    return newVariableDataOr(wInvalidVariable)
+    return newVariableDataOr(wInvalidVariable, "", dotNameLen)
   let operatorMatch = operatorO.get()
 
   # Get the right hand side value and match the following whitespace.

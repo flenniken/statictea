@@ -8,13 +8,11 @@ Run a command and fill in the variables dictionaries.
 * type: [Statement](#statement) &mdash; A Statement object stores the statement text and where it
 starts in the template file.
 * type: [ValueAndLength](#valueandlength) &mdash; A value and the length of the matching text in the statement.
+* [newValueAndLength](#newvalueandlength) &mdash; Create a newValueAndLength object.
 * [newValueAndLengthOr](#newvalueandlengthor) &mdash; Create a OpResultWarn[ValueAndLength] warning.
 * [newValueAndLengthOr](#newvalueandlengthor-1) &mdash; Create a OpResultWarn[ValueAndLength] warning.
 * [newValueAndLengthOr](#newvalueandlengthor-2) &mdash; Create a OpResultWarn[ValueAndLength] value.
 * [newValueAndLengthOr](#newvalueandlengthor-3) &mdash; Create a OpResultWarn[ValueAndLength].
-* [newVariableDataOr](#newvariabledataor) &mdash; Create a OpResultWarn[VariableData] warning.
-* [newVariableDataOr](#newvariabledataor-1) &mdash; Create a OpResultWarn[VariableData] warning.
-* [newVariableDataOr](#newvariabledataor-2) &mdash; Create a OpResultWarn[VariableData] value.
 * [newLengthOr](#newlengthor) &mdash; Create a OpResultWarn[Natural] warning.
 * [newLengthOr](#newlengthor-1) &mdash; Create a OpResultWarn[Natural] value.
 * [newStatement](#newstatement) &mdash; Create a new statement.
@@ -24,12 +22,12 @@ starts in the template file.
 * [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
 * [`==`](#) &mdash; Return true when the two statements are equal.
 * [`$`](#-1) &mdash; Return a string representation of a Statement.
-* [newValueAndLength](#newvalueandlength) &mdash; Create a newValueAndLength object.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
 * [getString](#getstring) &mdash; Return a literal string value and match length from a statement.
 * [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
 * [ifFunction](#iffunction) &mdash; Return the if0 and if1 function's value and the length.
 * [getFunctionValueAndLength](#getfunctionvalueandlength) &mdash; Return the function's value and the length.
+* [getValueAndLength](#getvalueandlength) &mdash; Return the value and length of the item that the start parameter points at which is a string, number, variable, function or list.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 
@@ -38,11 +36,10 @@ starts in the template file.
 A Statement object stores the statement text and where it
 starts in the template file.
 
-* lineNum -- Line number starting at 1 where the statement
+* lineNum -- line number, starting at 1, where the statement
              starts.
-* start -- Column position starting at 1 where the statement
-           starts on the line.
-* text -- The statement text.
+* start -- index where the statement starts
+* text -- the statement text.
 
 ```nim
 Statement = object
@@ -61,6 +58,14 @@ ValueAndLength = object
   value*: Value
   length*: Natural
 
+```
+
+# newValueAndLength
+
+Create a newValueAndLength object.
+
+```nim
+proc newValueAndLength(value: Value; length: Natural): ValueAndLength
 ```
 
 # newValueAndLengthOr
@@ -97,32 +102,6 @@ Create a OpResultWarn[ValueAndLength].
 func newValueAndLengthOr(val: ValueAndLength): OpResultWarn[ValueAndLength]
 ```
 
-# newVariableDataOr
-
-Create a OpResultWarn[VariableData] warning.
-
-```nim
-func newVariableDataOr(warning: Warning; p1 = ""; pos = 0): OpResultWarn[
-    VariableData]
-```
-
-# newVariableDataOr
-
-Create a OpResultWarn[VariableData] warning.
-
-```nim
-func newVariableDataOr(warningData: WarningData): OpResultWarn[VariableData]
-```
-
-# newVariableDataOr
-
-Create a OpResultWarn[VariableData] value.
-
-```nim
-func newVariableDataOr(dotNameStr: string; operator = "="; value: Value): OpResultWarn[
-    VariableData]
-```
-
 # newLengthOr
 
 Create a OpResultWarn[Natural] warning.
@@ -144,7 +123,7 @@ func newLengthOr(pos: Natural): OpResultWarn[Natural]
 Create a new statement.
 
 ```nim
-func newStatement(text: string; lineNum: Natural = 1; start: Natural = 1): Statement
+func newStatement(text: string; lineNum: Natural = 1; start: Natural = 0): Statement
 ```
 
 # startColumn
@@ -196,14 +175,6 @@ Return a string representation of a Statement.
 func `$`(s: Statement): string
 ```
 
-# newValueAndLength
-
-Create a newValueAndLength object.
-
-```nim
-proc newValueAndLength(value: Value; length: Natural): ValueAndLength
-```
-
 # yieldStatements
 
 Iterate through the command's statements. Skip blank statements.
@@ -223,7 +194,7 @@ func getString(statement: Statement; start: Natural): OpResultWarn[
 
 # getNumber
 
-Return the literal number value and match length from the statement. The start index points at a digit or minus sign.
+Return the literal number value and match length from the statement. The start index points at a digit or minus sign. The length includes the trailing whitespace.
 
 ```nim
 proc getNumber(statement: Statement; start: Natural): OpResultWarn[
@@ -232,7 +203,7 @@ proc getNumber(statement: Statement; start: Natural): OpResultWarn[
 
 # ifFunction
 
-Return the if0 and if1 function's value and the length. These functions conditionally run one of their parameters. Start points at the first parameter of the function. The length includes the ending ) and trailing whitespace.
+Return the if0 and if1 function's value and the length. These functions conditionally run one of their parameters. Start points at the first parameter of the function. The length includes the trailing whitespace after the ending ).
 
 ```nim
 proc ifFunction(functionName: string; statement: Statement; start: Natural;
@@ -241,12 +212,22 @@ proc ifFunction(functionName: string; statement: Statement; start: Natural;
 
 # getFunctionValueAndLength
 
-Return the function's value and the length. Start points at the first parameter of the function. The length includes the ending ) and trailing whitespace.
+Return the function's value and the length. Start points at the first parameter of the function. The length includes the trailing whitespace after the ending ).
 
 ```nim
 proc getFunctionValueAndLength(functionName: string; statement: Statement;
                                start: Natural; variables: Variables;
-                               list = false; skip = false): OpResultWarn[
+                               list = false; skip: bool): OpResultWarn[
+    ValueAndLength]
+```
+
+# getValueAndLength
+
+Return the value and length of the item that the start parameter points at which is a string, number, variable, function or list. The length returned includes the trailing whitespace after the item. So the ending position is pointing at the end of the statement, or at the first whitspace character after the item. When skip is true, the return value is 0 and functions are not executed.
+
+```nim
+proc getValueAndLength(statement: Statement; start: Natural;
+                       variables: Variables; skip: bool): OpResultWarn[
     ValueAndLength]
 ```
 

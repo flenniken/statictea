@@ -19,6 +19,7 @@ import messages
 import warnings
 import tostring
 import args
+import opresultwarn
 
 const
   outputValues* = ["result", "stdout", "stderr", "log", "skip"]
@@ -56,16 +57,22 @@ func newVariableData*(dotNameStr: string, operator: string, value: Value):
   result = VariableData(dotNameStr: dotNameStr,
     operator: operator, value: value)
 
-# func newVariableDataOr*(warning: Warning, p1 = "", pos = 0):
-#     OpResultWarn[VariableData] =
-#   ## Create a OpResultWarn[VariableData] warning.
-#   let warningData = newWarningData(warning, p1, pos)
-#   result = opMessageW[VariableData](warningData)
+func newVariableDataOr*(warning: Warning, p1 = "", pos = 0):
+    OpResultWarn[VariableData] =
+  ## Create a OpResultWarn[VariableData] warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[VariableData](warningData)
 
-# func newVariableDataOr*(warningData: WarningData):
-#     OpResultWarn[VariableData] =
-#   ## Create a OpResultWarn[VariableData] warning.
-#   result = opMessageW[VariableData](warningData)
+func newVariableDataOr*(warningData: WarningData):
+    OpResultWarn[VariableData] =
+  ## Create a OpResultWarn[VariableData] warning.
+  result = opMessageW[VariableData](warningData)
+
+func newVariableDataOr*(dotNameStr: string, operator = "=", value: Value):
+    OpResultWarn[VariableData] =
+  ## Create a OpResultWarn[VariableData] value.
+  let val = newVariableData(dotNameStr, operator, value)
+  result = opValueW[VariableData](val)
 
 func `$`*(v: VariableData): string =
   ## Return a string representation of VariableData.

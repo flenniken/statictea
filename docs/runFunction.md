@@ -1035,7 +1035,7 @@ type(2) => "int"
 type(3.14159) => "float"
 type("Tea") => "string"
 type(list(1,2)) => "list"
-type(dict("a", 1, "b", 2)) => "dict"
+type(dict("a", 1)) => "dict"
 ~~~~
 
 ```nim

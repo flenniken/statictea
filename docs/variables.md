@@ -10,12 +10,16 @@ Language variable methods.
 * type: [VariableData](#variabledata) &mdash; A variable name and value.
 * type: [ParentDictKind](#parentdictkind) &mdash; The kind of a ParentDict object, either a dict or warning.
 * type: [ParentDict](#parentdict) &mdash; Contains the result of calling getParentDictToAddTo, either a dictionary or a warning.
-* [`$`](#) &mdash; Return a string representation of ParentDict.
-* [`==`](#-1) &mdash; Return true when the two ParentDict are equal.
+* [newVariableData](#newvariabledata) &mdash; Create a new VariableData object.
+* [newVariableDataOr](#newvariabledataor) &mdash; Create a OpResultWarn[VariableData] warning.
+* [newVariableDataOr](#newvariabledataor-1) &mdash; Create a OpResultWarn[VariableData] warning.
+* [newVariableDataOr](#newvariabledataor-2) &mdash; Create a OpResultWarn[VariableData] value.
+* [`$`](#) &mdash; Return a string representation of VariableData.
+* [`$`](#-1) &mdash; Return a string representation of ParentDict.
+* [`==`](#-2) &mdash; Return true when the two ParentDict are equal.
 * [newParentDictWarn](#newparentdictwarn) &mdash; Return a new ParentDict object of the warning kind.
 * [newParentDict](#newparentdict) &mdash; Return a new ParentDict object containing a dict.
 * [emptyVariables](#emptyvariables) &mdash; Create an empty variables object in its initial state.
-* [newVariableData](#newvariabledata) &mdash; Create a new VariableData object.
 * [getTeaVarIntDefault](#getteavarintdefault) &mdash; Return the int value of one of the tea dictionary integer items.
 * [getTeaVarStringDefault](#getteavarstringdefault) &mdash; Return the string value of one of the tea dictionary string items.
 * [resetVariables](#resetvariables) &mdash; Clear the local variables and reset the tea variables for running a command.
@@ -77,6 +81,48 @@ ParentDict = object
 
 ```
 
+# newVariableData
+
+Create a new VariableData object.
+
+```nim
+func newVariableData(dotNameStr: string; operator: string; value: Value): VariableData
+```
+
+# newVariableDataOr
+
+Create a OpResultWarn[VariableData] warning.
+
+```nim
+func newVariableDataOr(warning: Warning; p1 = ""; pos = 0): OpResultWarn[
+    VariableData]
+```
+
+# newVariableDataOr
+
+Create a OpResultWarn[VariableData] warning.
+
+```nim
+func newVariableDataOr(warningData: WarningData): OpResultWarn[VariableData]
+```
+
+# newVariableDataOr
+
+Create a OpResultWarn[VariableData] value.
+
+```nim
+func newVariableDataOr(dotNameStr: string; operator = "="; value: Value): OpResultWarn[
+    VariableData]
+```
+
+# `$`
+
+Return a string representation of VariableData.
+
+```nim
+func `$`(v: VariableData): string
+```
+
 # `$`
 
 Return a string representation of ParentDict.
@@ -116,14 +162,6 @@ Create an empty variables object in its initial state.
 ```nim
 func emptyVariables(server: VarsDict = nil; shared: VarsDict = nil;
                     args: VarsDict = nil): Variables
-```
-
-# newVariableData
-
-Create a new VariableData object.
-
-```nim
-func newVariableData(dotNameStr: string; operator: string; value: Value): VariableData
 ```
 
 # getTeaVarIntDefault

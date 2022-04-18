@@ -2313,8 +2313,8 @@ Examples:
 
 #+BEGIN_SRC
 githubAnchor("MyHeading") => "myheading"
-githubAnchor("Eary Grey") => "eary-grey"
-githubAnchor("$Eary-Grey#") => "eary-grey"
+githubAnchor("Eary Gray") => "eary-gray"
+githubAnchor("$Eary-Gray#") => "eary-gray"
 #+END_SRC
 
 Example in a markdown template:
@@ -2877,7 +2877,7 @@ sort(dicts: list, order: string, case: string, key: string) list
 Examples:
 
 #+BEGIN_SRC
-d1 = dict("name", "Earl Grey", "weight", 1.2)
+d1 = dict("name", "Earl Gray", "weight", 1.2)
 d2 = dict("name", "Tea Pot", "weight", 3.5)
 dicts = list(d1, d2)
 sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
@@ -2904,7 +2904,7 @@ type(2) => "int"
 type(3.14159) => "float"
 type("Tea") => "string"
 type(list(1,2)) => "list"
-type(dict("a", 1, "b", 2)) => "dict"
+type(dict("a", 1)) => "dict"
 #+END_SRC
 
 [[#contents][茶]]

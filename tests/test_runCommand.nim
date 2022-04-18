@@ -508,7 +508,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "no equal sign":
     let statement = newStatement(text="var 343", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr(wInvalidVariable)
+    let eVariableDataOr = newVariableDataOr(wInvalidVariable, "", 4)
     check testRunStatement(statement, eVariableDataOr)
 
   test "invalid missing needed vararg parameter":
@@ -608,7 +608,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "dot name":
     let statement = newStatement(text="a# = 5", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr(wInvalidVariable)
+    let eVariableDataOr = newVariableDataOr(wInvalidVariable, "", 1)
     check testRunStatement(statement, eVariableDataOr)
 
   test "startColumn":
@@ -689,6 +689,12 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr(wTextAfterValue, "", 16)
     check testRunStatement(statement, eVariableDataOr)
 
+  test "undefined function":
+    let text = """a = missing(2.3, "second", "third")"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr(wInvalidFunction, "missing", 4)
+    check testRunStatement(statement, eVariableDataOr)
+
   test "if0 when 0":
     let statement = newStatement(text="""a = if0(0, 1, 2)""", lineNum=1, 0)
     let eVariableDataOr = newVariableDataOr("a", "=", newValue(1))
@@ -735,18 +741,93 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr("exists", "=", newValue("does not"))
     check testRunStatement(statement, eVariableDataOr)
 
-  test "if1 warning":
+  test "if1 not int cond":
     let text = """a = if1(2.3, "second", "third")"""
     let statement = newStatement(text)
     let eVariableDataOr = newVariableDataOr(wExpectedInteger, "", 8)
     check testRunStatement(statement, eVariableDataOr)
 
+  test "if1 one parameter":
+    let text = """a = if1(2)"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr(wThreeParameters, "", 8)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "if1 no second":
+    let text = """a = if1(2,)"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr(wInvalidRightHandSide, "", 10)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "if1 invalid second":
+    let text = """a = if1(2, _abc)"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr(wInvalidRightHandSide, "", 11)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "if1 no third":
+    let text = """a = if1(2, "abc",  )"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr(wInvalidRightHandSide, "", 19)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "if1 no closing paren":
+    let text = """a = if1(2, "abc", 456 """
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr(wThreeParameters, "", 22)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "if1 extra text":
+    let text = """a = if1(2, "abc", 456) * 2"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr(wTextAfterValue, "", 23)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "if0 missing required":
+    let text = """a = if0(3, len("123"), missing("ab") )"""
+    let statement = newStatement(text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wInvalidFunction, "missing", 23)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "if0 missing required":
+    let text = """a = b"""
+    let statement = newStatement(text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wVariableMissing, "b", 4)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "slice":
+    let text = """a = slice("abc", 0, 2)"""
+    let statement = newStatement(text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue("ab"))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "slice wrong type":
+    let text = """a = slice("abc", 2, "b")"""
+    let statement = newStatement(text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(kWrongType, "int", 20)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "slice missing comma":
+    let text = """a = slice("abc", 2 100)"""
+    let statement = newStatement(text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wMissingCommaParen, "", 19)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "max var length":
+    let text = """a23456789_123456789_123456789_123456789_123456789_123456789_1234 = slice("abc", 2 100)"""
+    let statement = newStatement(text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wMissingCommaParen, "", 82)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "max var length + 1":
+    let text = """a23456789_123456789_123456789_123456789_123456789_123456789_12345 = slice("abc", 2 100)"""
+    let statement = newStatement(text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wInvalidVariable, "", 64)
+    check testRunStatement(statement, eVariableDataOr)
 
 
-# todo: test that a warning is generated when the item doesn't exist.
+
+
 # todo: test prepost when user specified.
-# todo: test the maximum variable length of 64, 66 including the optional prefix.
+# todo: test the maximum variable length.
 # todo: test endblock by itself.
-# todo: use "import std/strutils to include system modules
-# todo: update to the latest nim version
-#
