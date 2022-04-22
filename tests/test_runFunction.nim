@@ -198,7 +198,7 @@ suite "runFunction.nim":
 
   test "len 2":
     var parameters = newValue([3, 2]).listv
-    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1")
+    let eFunResult = newFunResultWarn(kTooManyArgs, 1, "1")
     check testFunction("len", parameters, eFunResult)
 
   test "get list item":
@@ -247,7 +247,7 @@ suite "runFunction.nim":
     var list = newValue([1, 2, 3, 4, 5])
     let p = newValue(1)
     var parameters = @[list, p, p, p]
-    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "2")
+    let eFunResult = newFunResultWarn(kTooManyArgs, 2, "2")
     check testFunction("get", parameters, eFunResult)
 
   test "get parameter 2 wrong type":
@@ -332,7 +332,7 @@ suite "runFunction.nim":
 
   test "cmp case insensitive wrong type":
     var parameters = @[newValue(2), newValue(22), newValue("a")]
-    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "2")
+    let eFunResult = newFunResultWarn(kTooManyArgs, 2, "2")
     check testFunction("cmp", parameters, eFunResult)
 
   test "cmp case insensitive not 0 or 1":
@@ -549,7 +549,7 @@ suite "runFunction.nim":
 
   test "int(): wrong number of parameters":
     var parameters = @[newValue(4.57), newValue(1), newValue(2)]
-    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1")
+    let eFunResult = newFunResultWarn(kTooManyArgs, 1, "1")
     check testFunction("int", parameters, eFunResult)
 
   test "int(): not a number string":
@@ -605,7 +605,7 @@ suite "runFunction.nim":
 
   test "to float wrong number parameters":
     var parameters = @[newValue(4), newValue(3)]
-    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1")
+    let eFunResult = newFunResultWarn(kTooManyArgs, 1, "1")
     check testFunction("float", parameters, eFunResult)
 
   test "to float warning":
@@ -1022,7 +1022,7 @@ suite "runFunction.nim":
 
   test "path: wrong number of parameters":
     var parameters: seq[Value] = @[newValue("Earl Grey"), newValue("a"), newValue("a")]
-    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "1")
+    let eFunResult = newFunResultWarn(kTooManyArgs, 1, "1")
     check testFunction("path", parameters, eFunResult)
 
   test "path: wrong kind p1":
@@ -1388,7 +1388,7 @@ suite "runFunction.nim":
 
   test "cmdVersion: two many parameters":
     let parameters = @[newValue("1.2.3"), newValue("1.2.3"), newValue("1.2.3")]
-    let eFunResult = newFunResultWarn(kTooManyArgs, 0, "2")
+    let eFunResult = newFunResultWarn(kTooManyArgs, 2, "2")
     check testFunction("cmpVersion", parameters, eFunResult)
 
   test "cmdVersion: invalid version a":
@@ -1528,3 +1528,9 @@ suite "runFunction.nim":
         newValue("|"),
         newValue(1),
       ], newFunResult(newValue("a|b")))
+
+  test "warn":
+    let message = "my warning"
+    let parameters = @[newValue(message)]
+    let eFunResult = newFunResultWarn(wUserMessage, 0, message)
+    check testFunction("warn", parameters, eFunResult)

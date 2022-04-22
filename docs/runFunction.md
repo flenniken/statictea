@@ -49,6 +49,7 @@ the third.
 * [funType_as](#funtype_as) &mdash; Return the parameter type, one of: int, float, string, list, dict.
 * [funJoinPath_loss](#funjoinpath_loss) &mdash; Join the path components with a path separator.
 * [funJoin_lsois](#funjoin_lsois) &mdash; Join a list of strings with a separator.
+* [funWarn](#funwarn) &mdash; Return a warning message and skip the current statement.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -1108,6 +1109,25 @@ join(list("a", "", "c"), "|", 1) => "a|c"
 
 ```nim
 func funJoin_lsois(parameters: seq[Value]): FunResult
+```
+
+# funWarn
+
+Return a warning message and skip the current statement.
+
+~~~
+warn(message: string) string
+~~~~
+
+Examples:
+
+~~~
+b = warn("message")
+b = if1(a, warn("a is one"), "")
+~~~~
+
+```nim
+func funWarn(parameters: seq[Value]): FunResult
 ```
 
 # createFunctionTable

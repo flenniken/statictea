@@ -214,7 +214,7 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
     limit = requiredParams
   if args.len > limit:
     # Too many arguments, expected at most $1."
-    return newFunResultWarn(kTooManyArgs, 0, $requiredParams)
+    return newFunResultWarn(kTooManyArgs, requiredParams, $requiredParams)
 
   # Loop through the parameters.
   for ix in countUp(0, loopParams - 1):

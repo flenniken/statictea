@@ -14,6 +14,10 @@ func countLetter(message: string, letter: char): int =
 
 suite "warnings.nim":
 
+  test "starts at 0":
+    check low(MessageId) == wSuccess
+    check ord(low(MessageId)) == 0
+
   test "countLetter":
     check countLetter("", '1') == 0
     check countLetter("2", '1') == 0
@@ -47,7 +51,10 @@ suite "warnings.nim":
     check $warning == "wUnknownArg(p1):5"
 
   test "warningsList":
+    check Messages.len > 0
     for message in Messages:
+      if message == "$1":
+        continue
       if not isUpperAscii(message[0]):
         echo "The following message does not start with a capital letter."
         echo message

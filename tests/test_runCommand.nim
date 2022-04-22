@@ -700,9 +700,9 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr("a", "=", newValue(1))
     check testRunStatement(statement, eVariableDataOr)
 
-  test "if0 when not 0":
-    let statement = newStatement(text="""a = if0(99, 1, 2)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(2))
+  test "if0 when 0":
+    let statement = newStatement(text="""a = if0(0, 1, 2)""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(1))
     check testRunStatement(statement, eVariableDataOr)
 
   test "if0 skipping":
@@ -753,6 +753,18 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr(wThreeParameters, "", 8)
     check testRunStatement(statement, eVariableDataOr)
 
+  test "warn syntax error":
+    let text = """a = warn("hello""""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr(wMissingCommaParen, "", 16)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "warn extra parameter":
+    let text = """a = warn("hello", 4)"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr(kTooManyArgs, "1", 18)
+    check testRunStatement(statement, eVariableDataOr)
+
   test "if1 no second":
     let text = """a = if1(2,)"""
     let statement = newStatement(text)
@@ -769,6 +781,12 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let text = """a = if1(2, "abc",  )"""
     let statement = newStatement(text)
     let eVariableDataOr = newVariableDataOr(wInvalidRightHandSide, "", 19)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "if1 no third again":
+    let text = """a = if1(2, "abc"  )"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr(wThreeParameters, "", 18)
     check testRunStatement(statement, eVariableDataOr)
 
   test "if1 no closing paren":
@@ -825,6 +843,17 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr(wInvalidVariable, "", 64)
     check testRunStatement(statement, eVariableDataOr)
 
+  test "warn plus stuff":
+    let text = """a = [1, 2, 3, warn("hello"), 4] junk"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr(wUserMessage, "hello", 19)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "warn plus stuff":
+    let text = """a = len(warn("hello"), 4) junk"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr(wUserMessage, "hello", 13)
+    check testRunStatement(statement, eVariableDataOr)
 
 
 

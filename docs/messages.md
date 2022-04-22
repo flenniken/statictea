@@ -184,7 +184,8 @@ MessageId = enum
   wCmlMissingParameter,     ## w167
   wCmlTooManyBareParameters, ## w168
   wCmlAlreadyHaveOneParameter, ## w169
-  wMissingCommaBracket       ## w170
+  wMissingCommaBracket,     ## w170
+  wUserMessage               ## w171
 ```
 
 # Messages
@@ -359,7 +360,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Duplicate short option: \'-$1\'.", "Duplicate long option: \'--$1\'.",
     "Use the short name \'_\' instead of \'$1\' with a bare parameter.", "Use an alphanumeric ascii character for a short option name instead of \'$1\'.",
     "Missing \'$1\' parameter.", "Extra bare parameter.",
-    "Already have one \'$1\' parameter.", "Missing comma or right bracket."]
+    "Already have one \'$1\' parameter.", "Missing comma or right bracket.", ## wMissingCommaBracket
+    "$1"]
 ```
 
 

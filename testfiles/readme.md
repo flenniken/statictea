@@ -48,5 +48,9 @@ This folder contains stf test files for statictea.
 * [truefalsenull](../testfiles/truefalsenull.stf.md) &mdash; Test json true, false and null.
 * [update-template](../testfiles/update-template.stf.md) &mdash; Test updating a template with the update option.
 * [update1](../testfiles/update1.stf.md) &mdash; Update the replace block in a template.
+* [warn-basics](../testfiles/warn-basics.stf.md) &mdash; Test the warn function.
+* [warn-log](../testfiles/warn-log.stf.md) &mdash; Test that the warn command increments the warning count and returns a
+non-zero return code.
+* [warn-no-warn](../testfiles/warn-no-warn.stf.md) &mdash; Test there is no warning when the warn is not run.
 * [warninglimit](../testfiles/warninglimit.stf.md) &mdash; Test that warnings stop after 11.
 

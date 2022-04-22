@@ -1848,6 +1848,7 @@ the third.
 - [[#sort][sort()]] -- Sort a list of dictionaries.
 - [[#type][type()]] -- Return the parameter type, one of: int, float, string, list, dict.
 - [[#values][values()]] -- Create a list out of the values in the specified dictionary.
+- [[#warn][warn()]] -- Return a warning message and skip the current statement.
 
 [[#contents][茶]]
 
@@ -2927,6 +2928,26 @@ Examples:
 d = dict("a", "apple", "b", 2, "c", 3)
 keys(d) => ["a", "b", "c"]
 values(d) => ["apple", 2, 3]
+#+END_SRC
+
+[[#contents][茶]]
+
+** warn()
+:PROPERTIES:
+:CUSTOM_ID: warn
+:END:
+
+Return a warning message and skip the current statement.
+
+#+BEGIN_SRC
+warn(message: string) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+b = warn("message")
+b = if1(a, warn("a is one"), "")
 #+END_SRC
 
 

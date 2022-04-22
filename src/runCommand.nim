@@ -165,7 +165,12 @@ proc warnStatement*(env: var Env, statement: Statement,
     warningData: WarningData) =
   ## Show an invalid statement with a pointer pointing at the start of
   ## the problem. Long statements are trimmed around the problem area.
-  let message = getWarnStatement(statement, warningData, env.templateFilename)
+  var message: string
+  if warningData.warning == wUserMessage:
+    message = "$1($2): $3" % [env.templateFilename,
+      $statement.lineNum, warningData.p1]
+  else:
+    message = getWarnStatement(statement, warningData, env.templateFilename)
   env.outputWarning(statement.lineNum, message)
 
 func `==`*(s1: Statement, s2: Statement): bool =

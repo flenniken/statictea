@@ -1557,6 +1557,25 @@ func funJoin_lsois*(parameters: seq[Value]): FunResult =
     ret.add(str)
   result = newFunResult(newValue(ret))
 
+func funWarn*(parameters: seq[Value]): FunResult =
+  ## Return a warning message and skip the current statement.
+  ## @:
+  ## @:~~~
+  ## @:warn(message: string) string
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:b = warn("message")
+  ## @:b = if1(a, warn("a is one"), "")
+  ## @:~~~~
+
+  tMapParameters("ss")
+
+  let message = map["a"].stringv
+  result = newFunResultWarn(wUserMessage, 0, message)
+
 const
   functionsList = [
     ("len", funLen_si, "si"),
@@ -1599,6 +1618,7 @@ const
     ("joinPath", funJoinPath_loss, "loss"),
     ("join", funJoin_lsois, "lsois"),
     ("if1", funIf1, "iaaa"),
+    ("warn", funWarn, "ss"),
   ]
 
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =

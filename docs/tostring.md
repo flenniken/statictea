@@ -8,7 +8,7 @@ Value types to string methods.
 * [dictToString](#dicttostring) &mdash; Return a string representation of a dict Value in JSON format.
 * [listToString](#listtostring) &mdash; Return a string representation of a list Value in JSON format.
 * [valueToString](#valuetostring) &mdash; Return a string representation of a Value in JSON format.
-* [valueToStringRB](#valuetostringrb) &mdash; Return th string representation of the Value for use in the replacement blocks.
+* [valueToStringRB](#valuetostringrb) &mdash; Return the string representation of the Value for use in the replacement blocks.
 * [`$`](#) &mdash; Return a string representation of a Value.
 * [`$`](#-1) &mdash; Return a string representation of a VarsDict.
 * [`$`](#-2) &mdash; Return a string representation of a ValueOrWarning object.
@@ -39,7 +39,7 @@ func valueToString(value: Value): string
 
 # valueToStringRB
 
-Return th string representation of the Value for use in the replacement blocks.
+Return the string representation of the Value for use in the replacement blocks.
 
 ```nim
 func valueToStringRB(value: Value): string

@@ -157,10 +157,10 @@ suite "signatures.nim":
 
   test "mapParameters too many args":
     var parameters = @[newValue(1), newValue(2)]
-    check testMapParametersW("ii", parameters, 0, kTooManyArgs, "1")
+    check testMapParametersW("ii", parameters, 1, kTooManyArgs, "1")
 
     parameters = @[newValue(1), newValue(2), newValue(3)]
-    check testMapParametersW("iii", parameters, 0, kTooManyArgs, "2")
+    check testMapParametersW("iii", parameters, 2, kTooManyArgs, "2")
 
   test "mapParameters wrong kind":
     var parameters = @[newValue(1)]

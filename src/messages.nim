@@ -181,6 +181,7 @@ type
     wCmlAlreadyHaveOneParameter,## w169
 
     wMissingCommaBracket,  ## w170
+    wUserMessage,          ## w171
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -355,6 +356,7 @@ const
     "Missing '$1' parameter.",
     "Extra bare parameter.",
     "Already have one '$1' parameter.",
-    "Missing comma or right bracket.", # wMissingCommaBracket
+    "Missing comma or right bracket.", ## wMissingCommaBracket
+    "$1", ## wUserMessage
     ]
     ## The message text.
