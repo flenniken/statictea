@@ -1,6 +1,5 @@
 ## Value types to string methods.
 
-import std/strutils
 import std/tables
 import std/json
 import warnings
@@ -12,19 +11,23 @@ func valueToString*(value: Value): string
 func dictToString*(value: Value): string =
   ## Return a string representation of a dict Value in JSON format.
   result.add("{")
-  var insideLines: seq[string]
+  var ix = 0
   for k, v in value.dictv.pairs:
-    insideLines.add("$1:$2" % [escapeJson(k), valueToString(v)])
-  result.add(insideLines.join(","))
+    if ix > 0:
+      result.add(",")
+    result.add(escapeJson(k))
+    result.add(":")
+    result.add(valueToString(v))
+    inc(ix)
   result.add("}")
 
 func listToString*(value: Value): string =
   ## Return a string representation of a list Value in JSON format.
   result.add("[")
-  var insideLines: seq[string]
-  for item in value.listv:
-    insideLines.add(valueToString(item))
-  result.add(insideLines.join(","))
+  for ix, item in value.listv:
+    if ix > 0:
+      result.add(",")
+    result.add(valueToString(item))
   result.add("]")
 
 func valueToString*(value: Value): string =
@@ -42,7 +45,7 @@ func valueToString*(value: Value): string =
       result.add($value.floatv)
 
 func valueToStringRB*(value: Value): string =
-  ## Return th string representation of the Value for use in the
+  ## Return the string representation of the Value for use in the
   ## replacement blocks.
   case value.kind
   of vkString:

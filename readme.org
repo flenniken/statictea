@@ -391,7 +391,7 @@ The operator is an equal sign or an "&=". The equal sign appends
 to a dictionary and the &= appends to a list.
 
 The right hand side is either a variable, a string, a
-number or a function.
+number, list or a function.
 
 Here are a few example statements:
 
@@ -414,8 +414,9 @@ t.row you use the add function.
 num = add(t.row, 1)
 #+END_SRC
 
-Statements are executed from top to bottom. There is no
-traditional "if" statement to control statement flow.
+Statements are executed from top to bottom. You can use the warn
+function to exit a statement early and use the return function to
+exit a command early.
 
 You can loop at the replacement block level and run the command's
 statements multiple times using t.repeat, and vary the output using
