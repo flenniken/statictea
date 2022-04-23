@@ -22,7 +22,7 @@ type
     ## Variable value reference.
 
   ValueObj {.acyclic.} = object
-    ## Variable object.
+    ## Variable value object.
     case kind*: ValueKind
     of vkString:
       stringv*: string

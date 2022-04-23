@@ -9,9 +9,9 @@ Module for handling warnings.
 * type: [WarningData](#warningdata) &mdash; Warning data.
 * [getWarningLine](#getwarningline) &mdash; Return a formatted warning line.
 * [getWarningLine](#getwarningline-1) &mdash; Return a formatted warning line.
-* [newWarningData](#newwarningdata) &mdash; Create a WarningData object containing the warning information.
+* [newWarningData](#newwarningdata) &mdash; Create a WarningData object containing all the warning information.
 * [`$`](#) &mdash; Return a string representation of WarningData.
-* [`==`](#-1) &mdash; Return true when the two WarningData are equal.
+* [`==`](#-1) &mdash; Return true when the two WarningData objects are equal.
 
 # Warning
 
@@ -23,19 +23,27 @@ Warning = MessageId
 
 # WarningData
 
-Warning data.
+Warning data.<ul class="simple"><li>warning -- the message id</li>
+<li>p1 -- the optional string substituted for the message's $1.</li>
+<li>pos -- the index in the statement where the warning was detected.</li>
+</ul>
+
 
 ```nim
 WarningData = object
-  warning*: Warning          ## Message id.
-  p1*: string                ## Optional extra warning string.
-  pos*: Natural              ## Position in the statement where the problem was detected.
+  warning*: Warning
+  p1*: string
+  pos*: Natural
 
 ```
 
 # getWarningLine
 
-Return a formatted warning line.
+Return a formatted warning line. For example:
+
+~~~
+filename(line): wId: message.
+~~~~
 
 ```nim
 func getWarningLine(filename: string; lineNum: int; warning: Warning; p1 = ""): string
@@ -43,7 +51,11 @@ func getWarningLine(filename: string; lineNum: int; warning: Warning; p1 = ""): 
 
 # getWarningLine
 
-Return a formatted warning line.
+Return a formatted warning line. For example:
+
+~~~
+filename(line): wId: message.
+~~~~
 
 ```nim
 func getWarningLine(filename: string; lineNum: int; warningData: WarningData): string
@@ -51,7 +63,7 @@ func getWarningLine(filename: string; lineNum: int; warningData: WarningData): s
 
 # newWarningData
 
-Create a WarningData object containing the warning information.
+Create a WarningData object containing all the warning information.
 
 ```nim
 proc newWarningData(warning: Warning; p1 = ""; pos = 0): WarningData
@@ -67,7 +79,7 @@ func `$`(warningData: WarningData): string
 
 # `==`
 
-Return true when the two WarningData are equal.
+Return true when the two WarningData objects are equal.
 
 ```nim
 func `==`(w1: WarningData; w2: WarningData): bool
