@@ -10,25 +10,26 @@ import messages
 import warnings
 import readjson
 import args
+import opresultwarn
 
 proc testGetVariableOk(variables: Variables, dotNameStr: string, eJson:
     string): bool =
-  let valueOrWarning = getVariable(variables, dotNameStr)
+  let valueOr = getVariable(variables, dotNameStr)
   result = true
-  if valueOrWarning.kind == vwWarning:
-    echo "Unable to get the variable: " & $valueOrWarning
+  if valueOr.isMessage:
+    echo "Unable to get the variable: " & $valueOr
     return false
-  if not expectedItem("value", $valueOrWarning.value, eJson):
+  if not expectedItem("value", $valueOr.value, eJson):
     return false
 
 proc testGetVariableWarning(variables: Variables, dotNameStr: string,
     eWarningData: WarningData): bool =
-  let valueOrWarning = getVariable(variables, dotNameStr)
+  let valueOr = getVariable(variables, dotNameStr)
   result = true
-  if valueOrWarning.kind != vwWarning:
-    echo "Did not get a warning: " & $valueOrWarning
+  if valueOr.isValue:
+    echo "Did not get a warning: " & $valueOr
     return false
-  if not expectedItem("warning", $valueOrWarning.warningData, $eWarningData):
+  if not expectedItem("warning", $valueOr.message, $eWarningData):
     return false
 
 proc testAssignVariable(variables: var Variables, dotNameStr: string, value: Value,
@@ -40,11 +41,11 @@ proc testAssignVariable(variables: var Variables, dotNameStr: string, value: Val
     return false
   if warningDataO.isSome:
     return true
-  let valueOrWarning = getVariable(variables, dotNameStr)
-  if valueOrWarning.kind == vwWarning:
-    echo "Unable to fetch the variable: " & $valueOrWarning
+  let valueOr = getVariable(variables, dotNameStr)
+  if valueOr.isMessage:
+    echo "Unable to fetch the variable: " & $valueOr
     return false
-  if not expectedItem("fetched value", valueOrWarning.value, value):
+  if not expectedItem("fetched value", valueOr.value, value):
     return false
 
 proc testAssignVariable(dotNameStr: string, value: Value,
@@ -93,9 +94,9 @@ suite "variables.nim":
     }
   }
 }"""
-    var valueOrWarning = readJsonString(variablesJson)
-    check valueOrWarning.kind == vwValue
-    variables["l"] = valueOrWarning.value
+    var valueOr = readJsonString(variablesJson)
+    check valueOr.isValue
+    variables["l"] = valueOr.value
 
     check testGetVariableOk(variables, "l.a.b.c", "{}")
     check testGetVariableOk(variables, "l.a.b", """{"c":{}}""")
@@ -114,9 +115,9 @@ suite "variables.nim":
     "b":5
   }
 }"""
-    var valueOrWarning = readJsonString(variablesJson)
-    check valueOrWarning.kind == vwValue
-    variables["l"] = valueOrWarning.value
+    var valueOr = readJsonString(variablesJson)
+    check valueOr.isValue
+    variables["l"] = valueOr.value
 
     let wO = newWarningData(wNotDict, "b")
     check testGetVariableWarning(variables, "a.b.tea", wO)
@@ -139,9 +140,9 @@ suite "variables.nim":
   test "testGetVariableWarning not dict":
     var variables = emptyVariables()
     let variablesJson = """{"d":"hello"}"""
-    var valueOrWarning = readJsonString(variablesJson)
-    check valueOrWarning.kind == vwValue
-    variables["s"] = valueOrWarning.value
+    var valueOr = readJsonString(variablesJson)
+    check valueOr.isValue
+    variables["s"] = valueOr.value
 
     let eWarningData = newWarningData(wNotDict, "d")
     check testGetVariableWarning(variables, "s.d.hello", eWarningData)
@@ -196,10 +197,10 @@ suite "variables.nim":
  }
 }
 """
-    var valueOrWarning = readJsonString(variablesJson)
-    check valueOrWarning.kind == vwValue
-    var variables = valueOrWarning.value.dictv
-    let beforeJson = valueToString(valueOrWarning.value)
+    var valueOr = readJsonString(variablesJson)
+    check valueOr.isValue
+    var variables = valueOr.value.dictv
+    let beforeJson = valueToString(valueOr.value)
 
     resetVariables(variables)
     let afterJson = valueToString(newValue(variables))
@@ -208,32 +209,32 @@ suite "variables.nim":
   test "resetVariables with server":
     # Make sure the server variables are untouched after reset.
     let server = """{"a": 2}"""
-    var valueOrWarning = readJsonString(server)
-    check valueOrWarning.kind == vwValue
+    var valueOr = readJsonString(server)
+    check valueOr.isValue
     var variables = emptyVariables()
-    variables["s"] = valueOrWarning.value
+    variables["s"] = valueOr.value
     resetVariables(variables)
-    check getVariable(variables, "s.a") == newValueOrWarning(newValue(2))
+    check $getVariable(variables, "s.a") == $newValueOr(newValue(2))
 
   test "resetVariables with shared":
     # Make sure the shared variables are untouched after reset.
     let shared = """{"a": 2}"""
-    var valueOrWarning = readJsonString(shared)
-    check valueOrWarning.kind == vwValue
+    var valueOr = readJsonString(shared)
+    check valueOr.isValue
     var variables = emptyVariables()
-    variables["h"] = valueOrWarning.value
+    variables["h"] = valueOr.value
     resetVariables(variables)
-    check getVariable(variables, "h.a") == newValueOrWarning(newValue(2))
+    check $getVariable(variables, "h.a") == $newValueOr(newValue(2))
 
   test "resetVariables with global":
     # Make sure the global variables are untouched after reset.
     let global = """{"a": 2}"""
-    var valueOrWarning = readJsonString(global)
-    check valueOrWarning.kind == vwValue
+    var valueOr = readJsonString(global)
+    check valueOr.isValue
     var variables = emptyVariables()
-    variables["g"] = valueOrWarning.value
+    variables["g"] = valueOr.value
     resetVariables(variables)
-    check getVariable(variables, "g.a") == newValueOrWarning(newValue(2))
+    check $getVariable(variables, "g.a") == $newValueOr(newValue(2))
 
   test "assignVariable good":
     check testAssignVariable("five", newValue(5))
@@ -377,9 +378,9 @@ suite "variables.nim":
   test "assignVariable nested dict":
     var variables = emptyVariables()
     let variablesJson = """{"a":{"b2":"tea","b":{"c2":[],"c":{"d":"hello"}}}}"""
-    var valueOrWarning = readJsonString(variablesJson)
-    check valueOrWarning.kind == vwValue
-    variables["l"] = valueOrWarning.value
+    var valueOr = readJsonString(variablesJson)
+    check valueOr.isValue
+    variables["l"] = valueOr.value
     check testAssignVariable(variables, "l.a.b.c.tea", newValue(1))
 
     let warning1 = some(newWarningData(wAppendToList, "dict"))
@@ -415,9 +416,9 @@ suite "variables.nim":
  },
  "a3":[]
 }"""
-    var valueOrWarning = readJsonString(variablesJson)
-    check valueOrWarning.kind == vwValue
-    variables["l"] = valueOrWarning.value
+    var valueOr = readJsonString(variablesJson)
+    check valueOr.isValue
+    variables["l"] = valueOr.value
 
     var aO = assignVariable(variables, "l.teas", newValue(5), "&=")
     check not aO.isSome
@@ -435,9 +436,9 @@ suite "variables.nim":
   test "append nested dictionary":
     var variables = emptyVariables()
     let variablesJson = """{"a":{}}"""
-    var valueOrWarning = readJsonString(variablesJson)
-    check valueOrWarning.kind == vwValue
-    variables["l"] = valueOrWarning.value
+    var valueOr = readJsonString(variablesJson)
+    check valueOr.isValue
+    variables["l"] = valueOr.value
 
     var aO = assignVariable(variables, "l.a.tea", newValue(5), "&=")
     check not aO.isSome
@@ -446,9 +447,9 @@ suite "variables.nim":
   test "append nested dictionary2":
     var variables = emptyVariables()
     let variablesJson = """{"a":{"tea":2}}"""
-    var valueOrWarning = readJsonString(variablesJson)
-    check valueOrWarning.kind == vwValue
-    variables["l"] = valueOrWarning.value
+    var valueOr = readJsonString(variablesJson)
+    check valueOr.isValue
+    variables["l"] = valueOr.value
 
     var aO = assignVariable(variables, "l.a.sea", newValue(5), "&=")
     check not aO.isSome
@@ -475,6 +476,6 @@ suite "variables.nim":
     let prepostList = @[newPrepost("abc", "def")]
     check argsPrepostList(prepostList) == @[@["abc", "def"]]
 
-  test "ValueOrWarning string":
-    check $newValueOrWarning(newValue(2)) == "2"
-    check $newValueOrWarning(wInvalidJsonRoot) == "wInvalidJsonRoot(-):0"
+  test "ValueOr string":
+    check $newValueOr(newValue(2)) == $newValueOr(newValue(2))
+    check $newValueOr(wInvalidJsonRoot) == $newValueOr(wInvalidJsonRoot)

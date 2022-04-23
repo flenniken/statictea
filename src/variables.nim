@@ -330,23 +330,25 @@ proc assignVariable*(
     # Append the value to the list.
     lastItem.listv.add(value)
 
-func lookUpVar(variables: Variables, names: seq[string]): ValueOrWarning =
+func lookUpVar(variables: Variables, names: seq[string]):
+     OpResultWarn[Value] =
   ## Return the variable when it exists.
   var next = variables
   var ix = 0
   while true:
     let name = names[ix]
     if not (name in next):
-      return newValueOrWarning(wVariableMissing, name)
+      return newValueOr(wVariableMissing, name)
     let value = next[name]
     inc(ix)
     if ix >= names.len:
-      return newValueOrWarning(value)
+      return newValueOr(value)
     if value.kind != vkDict:
-      return newValueOrWarning(wNotDict, name)
+      return newValueOr(wNotDict, name)
     next = value.dictv
 
-proc getVariable*(variables: Variables, dotNameStr: string): ValueOrWarning =
+proc getVariable*(variables: Variables, dotNameStr: string):
+    OpResultWarn[Value] =
   ## Look up the variable and return its value when found, else return
   ## a warning.
   var names = split(dotNameStr, '.')
@@ -355,7 +357,7 @@ proc getVariable*(variables: Variables, dotNameStr: string): ValueOrWarning =
   of "g", "h", "l", "s", "t":
     discard
   of "f", "i", "j", "k", "m", "n", "o", "p", "q", "r", "u":
-    return newValueOrWarning(wReservedNameSpaces)
+    return newValueOr(wReservedNameSpaces)
   else:
     # It must be a local variable, add the missing l.
     names.insert("l", 0)

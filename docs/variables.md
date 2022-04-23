@@ -202,7 +202,7 @@ proc assignVariable(variables: var Variables; dotNameStr: string; value: Value;
 Look up the variable and return its value when found, else return a warning.
 
 ```nim
-proc getVariable(variables: Variables; dotNameStr: string): ValueOrWarning
+proc getVariable(variables: Variables; dotNameStr: string): OpResultWarn[Value]
 ```
 
 # argsPrepostList

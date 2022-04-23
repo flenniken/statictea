@@ -16,6 +16,7 @@ import variables
 import vartypes
 import readjson
 import replacement
+import opresultwarn
 
 template getNewLineBuffer(env: Env): untyped =
   ## Get a new line buffer for the environment's template.
@@ -199,8 +200,8 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
         lastLine = replaceLine
 
       # Write the content as the replacement lines.
-      var valueOrWarning = getVariable(variables, "t.content")
-      var content = valueOrWarning.value.stringv
+      var valueOr = getVariable(variables, "t.content")
+      var content = valueOr.value.stringv
       for line in yieldContentLine(content):
         env.resultStream.write(line)
 
@@ -224,12 +225,12 @@ proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
 
   var varsDict = newVarsDict()
   for filename in filenames:
-    let valueOrWarning = readJsonFile(filename)
-    if valueOrWarning.kind == vwWarning:
-      env.warn(0, valueOrWarning.warningData)
+    let valueOr = readJsonFile(filename)
+    if valueOr.isMessage:
+      env.warn(0, valueOr.message)
     else:
       # Merge in the variables.
-      for k, v in valueOrWarning.value.dictv.pairs:
+      for k, v in valueOr.value.dictv.pairs:
         if k in varsDict:
           # Skip the duplicates
           env.warn(0, wDuplicateVar, k)

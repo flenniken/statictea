@@ -3,6 +3,7 @@
 import std/tables
 import std/json
 import warnings
+import opresultwarn
 
 type
   VarsDict* = OrderedTableRef[string, Value]
@@ -33,19 +34,6 @@ type
       dictv*: VarsDict
     of vkList:
       listv*: seq[Value]
-
-  ValueOrWarningKind* = enum
-    ## The kind of a ValueOrWarning object, either a value or warning.
-    vwValue,
-    vwWarning
-
-  ValueOrWarning* = object
-    ## Holds a value or a warning.
-    case kind*: ValueOrWarningKind
-      of vwValue:
-        value*: Value
-      of vwWarning:
-        warningData*: WarningData
 
 proc newVarsDict*(): VarsDict =
   ## Create a new empty variables dictionary. VarsDict is a ref type.
@@ -136,27 +124,6 @@ proc `==`*(value1: Value, value2: Value): bool =
       of vkList:
         result = value1.listv == value2.listv
 
-func newValueOrWarning*(value: Value): ValueOrWarning =
-  ## Return a new ValueOrWarning object containing a value.
-  result = ValueOrWarning(kind: vwValue, value: value)
-
-func newValueOrWarning*(warning: Warning, p1: string = ""): ValueOrWarning =
-  ## Return a new ValueOrWarning object containing a warning.
-  let warningData = newWarningData(warning, p1)
-  result = ValueOrWarning(kind: vwWarning, warningData: warningData)
-
-func newValueOrWarning*(warningData: WarningData): ValueOrWarning =
-  ## Return a new ValueOrWarning object containing a warning.
-  result = ValueOrWarning(kind: vwWarning, warningData: warningData)
-
-func `==`*(vw1: ValueOrWarning, vw2: ValueOrWarning): bool =
-  ## Compare two ValueOrWarning objects and return true when equal.
-  if vw1.kind == vw2.kind:
-    if vw1.kind == vwValue:
-      result = vw1.value == vw2.value
-    else:
-      result = vw1.warningData == vw2.warningData
-
 func `$`*(kind: ValueKind): string =
   ## Return a string representation of a value's type.
   case kind
@@ -233,9 +200,17 @@ proc `$`*(varsDict: VarsDict): string =
   ## Return a string representation of a VarsDict.
   result = valueToString(newValue(varsDict))
 
-func `$`*(vw: ValueOrWarning): string =
-  ## Return a string representation of a ValueOrWarning object.
-  if vw.kind == vwValue:
-    result = $vw.value
-  else:
-    result = $vw.warningData
+func newValueOr*(warning: Warning, p1 = "", pos = 0):
+    OpResultWarn[Value] =
+  ## Create a OpResultWarn[Value] warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[Value](warningData)
+
+func newValueOr*(warningData: WarningData): OpResultWarn[Value] =
+  ## Create a OpResultWarn[Value] warning.
+  result = opMessageW[Value](warningData)
+
+func newValueOr*(value: Value): OpResultWarn[Value] =
+  ## Create a OpResultWarn[Value] value.
+  result = opValueW[Value](value)
+

@@ -7,9 +7,9 @@ import std/json
 import std/tables
 import vartypes
 import messages
-import opresultid
 import unicodes
 import utf8decoder
+import OpResultWarn
 
 # Json spec:
 # https://datatracker.ietf.org/doc/html/rfc8259
@@ -55,23 +55,24 @@ proc jsonToValue*(jsonNode: JsonNode, depth: int = 0): Option[Value] =
     value = Value(kind: vkList, listv: listVars)
   result = some(value)
 
-proc readJsonStream*(stream: Stream, filename: string = ""): ValueOrWarning =
+proc readJsonStream*(stream: Stream, filename: string = ""):
+    OpResultWarn[Value] =
   ## Read a json stream and return the variables.  If there is an
   ## error, return a warning. The filename is used in warning
   ## messages.
 
   if stream == nil:
-    return newValueOrWarning(wUnableToOpenFile, filename)
+    return newValueOr(wUnableToOpenFile, filename)
 
   var rootNode: JsonNode
   try:
     rootNode = parseJson(stream, filename)
   except:
-    return newValueOrWarning(wJsonParseError, filename)
+    return newValueOr(wJsonParseError, filename)
 
   # todo: allow any kind of object.
   if rootNode.kind != JObject:
-    return newValueOrWarning(wInvalidJsonRoot, filename)
+    return newValueOr(wInvalidJsonRoot, filename)
 
   var dict = newVarsDict()
   for key, jnode in rootNode:
@@ -79,26 +80,27 @@ proc readJsonStream*(stream: Stream, filename: string = ""): ValueOrWarning =
     assert valueO.isSome
     dict[key] = valueO.get()
 
-  result = newValueOrWarning(newValue(dict))
+  result = newValueOr(newValue(dict))
 
-proc readJsonString*(content: string, filename: string = ""): ValueOrWarning =
+proc readJsonString*(content: string, filename: string = ""):
+    OpResultWarn[Value] =
   ## Read a json string and return the variables.  If there is an
   ## error, return a warning. The filename is used in warning
   ## messages.
   var stream = newStringStream(content)
   result = readJsonStream(stream, filename)
 
-proc readJsonFile*(filename: string): ValueOrWarning =
+proc readJsonFile*(filename: string): OpResultWarn[Value] =
   ## Read a json file and return the variables.  If there is an
   ## error, return a warning.
 
   if not fileExists(filename):
-    return newValueOrWarning(wFileNotFound, filename)
+    return newValueOr(wFileNotFound, filename)
 
   var stream: Stream
   stream = newFileStream(filename)
   if stream == nil:
-    return newValueOrWarning(wUnableToOpenFile, filename)
+    return newValueOr(wUnableToOpenFile, filename)
 
   result = readJsonStream(stream, filename)
 

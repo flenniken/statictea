@@ -8,8 +8,6 @@ StaticTea variable types.
 * type: [VarsDict](#varsdict) &mdash; Variables dictionary type.
 * type: [ValueKind](#valuekind) &mdash; The type of Variables.
 * type: [Value](#value) &mdash; Variable value reference.
-* type: [ValueOrWarningKind](#valueorwarningkind) &mdash; The kind of a ValueOrWarning object, either a value or warning.
-* type: [ValueOrWarning](#valueorwarning) &mdash; Holds a value or a warning.
 * [newVarsDict](#newvarsdict) &mdash; Create a new empty variables dictionary.
 * [newValue](#newvalue) &mdash; Create a string value.
 * [newValue](#newvalue-1) &mdash; Create an integer value.
@@ -24,18 +22,16 @@ same type (may be Value type).
 * [newEmptyListValue](#newemptylistvalue) &mdash; Return an empty list value.
 * [newEmptyDictValue](#newemptydictvalue) &mdash; Create a dictionary value from a VarsDict.
 * [`==`](#) &mdash; Return true when two values are equal.
-* [newValueOrWarning](#newvalueorwarning) &mdash; Return a new ValueOrWarning object containing a value.
-* [newValueOrWarning](#newvalueorwarning-1) &mdash; Return a new ValueOrWarning object containing a warning.
-* [newValueOrWarning](#newvalueorwarning-2) &mdash; Return a new ValueOrWarning object containing a warning.
-* [`==`](#-1) &mdash; Compare two ValueOrWarning objects and return true when equal.
-* [`$`](#-2) &mdash; Return a string representation of a value's type.
+* [`$`](#-1) &mdash; Return a string representation of a value's type.
 * [dictToString](#dicttostring) &mdash; Return a string representation of a dict Value in JSON format.
 * [listToString](#listtostring) &mdash; Return a string representation of a list Value in JSON format.
 * [valueToString](#valuetostring) &mdash; Return a string representation of a Value in JSON format.
 * [valueToStringRB](#valuetostringrb) &mdash; Return the string representation of the Value for use in the replacement blocks.
-* [`$`](#-3) &mdash; Return a string representation of a Value.
-* [`$`](#-4) &mdash; Return a string representation of a VarsDict.
-* [`$`](#-5) &mdash; Return a string representation of a ValueOrWarning object.
+* [`$`](#-2) &mdash; Return a string representation of a Value.
+* [`$`](#-3) &mdash; Return a string representation of a VarsDict.
+* [newValueOr](#newvalueor) &mdash; Create a OpResultWarn[Value] warning.
+* [newValueOr](#newvalueor-1) &mdash; Create a OpResultWarn[Value] warning.
+* [newValueOr](#newvalueor-2) &mdash; Create a OpResultWarn[Value] value.
 
 # VarsDict
 
@@ -61,31 +57,6 @@ Variable value reference.
 
 ```nim
 Value = ref ValueObj
-```
-
-# ValueOrWarningKind
-
-The kind of a ValueOrWarning object, either a value or warning.
-
-```nim
-ValueOrWarningKind = enum
-  vwValue, vwWarning
-```
-
-# ValueOrWarning
-
-Holds a value or a warning.
-
-```nim
-ValueOrWarning = object
-  case kind*: ValueOrWarningKind
-  of vwValue:
-      value*: Value
-
-  of vwWarning:
-      warningData*: WarningData
-
-
 ```
 
 # newVarsDict
@@ -204,38 +175,6 @@ Return true when two values are equal.
 proc `==`(value1: Value; value2: Value): bool
 ```
 
-# newValueOrWarning
-
-Return a new ValueOrWarning object containing a value.
-
-```nim
-func newValueOrWarning(value: Value): ValueOrWarning
-```
-
-# newValueOrWarning
-
-Return a new ValueOrWarning object containing a warning.
-
-```nim
-func newValueOrWarning(warning: Warning; p1: string = ""): ValueOrWarning
-```
-
-# newValueOrWarning
-
-Return a new ValueOrWarning object containing a warning.
-
-```nim
-func newValueOrWarning(warningData: WarningData): ValueOrWarning
-```
-
-# `==`
-
-Compare two ValueOrWarning objects and return true when equal.
-
-```nim
-func `==`(vw1: ValueOrWarning; vw2: ValueOrWarning): bool
-```
-
 # `$`
 
 Return a string representation of a value's type.
@@ -292,12 +231,28 @@ Return a string representation of a VarsDict.
 proc `$`(varsDict: VarsDict): string
 ```
 
-# `$`
+# newValueOr
 
-Return a string representation of a ValueOrWarning object.
+Create a OpResultWarn[Value] warning.
 
 ```nim
-func `$`(vw: ValueOrWarning): string
+func newValueOr(warning: Warning; p1 = ""; pos = 0): OpResultWarn[Value]
+```
+
+# newValueOr
+
+Create a OpResultWarn[Value] warning.
+
+```nim
+func newValueOr(warningData: WarningData): OpResultWarn[Value]
+```
+
+# newValueOr
+
+Create a OpResultWarn[Value] value.
+
+```nim
+func newValueOr(value: Value): OpResultWarn[Value]
 ```
 
 

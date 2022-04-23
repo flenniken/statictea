@@ -27,7 +27,7 @@ proc jsonToValue(jsonNode: JsonNode; depth: int = 0): Option[Value]
 Read a json stream and return the variables.  If there is an error, return a warning. The filename is used in warning messages.
 
 ```nim
-proc readJsonStream(stream: Stream; filename: string = ""): ValueOrWarning
+proc readJsonStream(stream: Stream; filename: string = ""): OpResultWarn[Value]
 ```
 
 # readJsonString
@@ -35,7 +35,7 @@ proc readJsonStream(stream: Stream; filename: string = ""): ValueOrWarning
 Read a json string and return the variables.  If there is an error, return a warning. The filename is used in warning messages.
 
 ```nim
-proc readJsonString(content: string; filename: string = ""): ValueOrWarning
+proc readJsonString(content: string; filename: string = ""): OpResultWarn[Value]
 ```
 
 # readJsonFile
@@ -43,7 +43,7 @@ proc readJsonString(content: string; filename: string = ""): ValueOrWarning
 Read a json file and return the variables.  If there is an error, return a warning.
 
 ```nim
-proc readJsonFile(filename: string): ValueOrWarning
+proc readJsonFile(filename: string): OpResultWarn[Value]
 ```
 
 # ParsedString

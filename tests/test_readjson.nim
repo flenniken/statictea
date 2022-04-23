@@ -11,6 +11,7 @@ import readjson
 import messages
 import utf8decoder
 import sharedtestcode
+import opresultwarn
 
 proc testParseJsonStr(text: string, start: Natural,
     eStr: string, eLength: Natural): bool =
@@ -107,32 +108,32 @@ suite "readjson.nim":
 
   test "readJsonFile file not found":
     let filename = "missing"
-    var valueOrWarning = readJsonFile(filename)
-    check valueOrWarning == newValueOrWarning(wFileNotFound, filename)
+    var valueOr = readJsonFile(filename)
+    check $valueOr == $newValueOr(wFileNotFound, filename)
 
   test "readJsonFile cannot open file":
     let filename = "_cannotopen.tmp"
     createFile(filename, "temp")
     defer: discard tryRemoveFile(filename)
     setFilePermissions(filename, {fpUserWrite, fpGroupWrite})
-    var valueOrWarning = readJsonFile(filename)
-    check valueOrWarning == newValueOrWarning(wUnableToOpenFile, filename)
+    var valueOr = readJsonFile(filename)
+    check $valueOr == $newValueOr(wUnableToOpenFile, filename)
 
   test "readJsonFile parse error":
     let content = "{"
-    var valueOrWarning = readJsonString(content)
-    check valueOrWarning == newValueOrWarning(wJsonParseError)
+    var valueOr = readJsonString(content)
+    check $valueOr == $newValueOr(wJsonParseError)
 
   test "readJsonFile no root object":
     let content = "[5]"
-    var valueOrWarning = readJsonString(content)
-    check valueOrWarning == newValueOrWarning(wInvalidJsonRoot)
+    var valueOr = readJsonString(content)
+    check $valueOr == $newValueOr(wInvalidJsonRoot)
 
   test "readJsonFile a=5":
     let content = """{"a":5}"""
-    let valueOrWarning = readJsonString(content)
-    check valueOrWarning.kind == vwValue
-    let str = dictToString(valueOrWarning.value)
+    let valueOr = readJsonString(content)
+    check valueOr.isValue
+    let str = dictToString(valueOr.value)
     check expectedItem("json", str, content)
 
   test "jsonToValue int":
@@ -244,9 +245,9 @@ suite "readjson.nim":
   ]
 }"""
     let eStr = """{"teaList":[{"tea":"Chamomile"},{"tea":"Chrysanthemum"},{"tea":"White"},{"tea":"Puer"}]}"""
-    let valueOrWarning = readJsonString(content)
-    check valueOrWarning.kind == vwValue
-    let str = dictToString(valueOrWarning.value)
+    let valueOr = readJsonString(content)
+    check valueOr.isValue
+    let str = dictToString(valueOr.value)
     check expectedItem("read json", str, eStr)
 
   test "long string":
@@ -261,9 +262,9 @@ suite "readjson.nim":
 }
 """ % [string256]
     let eStr = """{"longString":"123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456"}"""
-    let valueOrWarning = readJsonString(content)
-    check valueOrWarning.kind == vwValue
-    let str = dictToString(valueOrWarning.value)
+    let valueOr = readJsonString(content)
+    check valueOr.isValue
+    let str = dictToString(valueOr.value)
     check expectedItem("read json", str, eStr)
 
   test "longer string":
@@ -290,9 +291,9 @@ she sat down in a large arm-chair at one end of the table.
 }
 """ % [teaParty]
     let eStr = """{"longString":"CHAPTER VII.\nA Mad Tea-Party\n\nThere was a table set out under a tree in front of the house, and the\nMarch Hare and the Hatter were having tea at it: a Dormouse was\nsitting between them, fast asleep, and the other two were using it as\na cushion, resting their elbows on it, and talking over its\nhead. “Very uncomfortable for the Dormouse,” thought Alice; “only, as\nit’s asleep, I suppose it doesn’t mind.”\n\nThe table was a large one, but the three were all crowded together at\none corner of it: “No room! No room!” they cried out when they saw\nAlice coming. “There’s plenty of room!” said Alice indignantly, and\nshe sat down in a large arm-chair at one end of the table.\n"}"""
-    let valueOrWarning = readJsonString(content)
-    check valueOrWarning.kind == vwValue
-    let str = dictToString(valueOrWarning.value)
+    let valueOr = readJsonString(content)
+    check valueOr.isValue
+    let str = dictToString(valueOr.value)
     check expectedItem("read json", str, eStr)
 
   test "quoted strings":
@@ -302,9 +303,9 @@ she sat down in a large arm-chair at one end of the table.
 }
 """
     let eStr = """{"str":"this is \"quoted\""}"""
-    let valueOrWarning = readJsonString(content)
-    check valueOrWarning.kind == vwValue
-    let str = dictToString(valueOrWarning.value)
+    let valueOr = readJsonString(content)
+    check valueOr.isValue
+    let str = dictToString(valueOr.value)
     check expectedItem("read json", str, eStr)
 
   test "read json mix":
@@ -318,9 +319,9 @@ she sat down in a large arm-chair at one end of the table.
   "list": [1, 2, 3]
 }"""
     let eStr = """{"d":{"a":45,"b":"banana","f":2.5},"list":[1,2,3]}"""
-    var valueOrWarning = readJsonString(content)
-    check valueOrWarning.kind == vwValue
-    var str = dictToString(valueOrWarning.value)
+    var valueOr = readJsonString(content)
+    check valueOr.isValue
+    var str = dictToString(valueOr.value)
     check expectedItem("read json mix", str, eStr)
 
   test "unescapePopularChar":

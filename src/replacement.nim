@@ -14,6 +14,7 @@ import messages
 import variables
 import tempFile
 import parseNumber
+import opresultwarn
 
 
 # To support replacement blocks that consists of many lines and blocks
@@ -310,10 +311,10 @@ proc substituteSegment(env: var Env, lineNum: Natural, variables: Variables,
     let dotNameStr = parseVarSegment(segment)
 
     # Look up the variable's value.
-    let valueOrWarning = getVariable(variables, dotNameStr)
-    if valueOrWarning.kind == vwValue:
+    let valueOr = getVariable(variables, dotNameStr)
+    if valueOr.isValue:
       # Convert the variable to a string.
-      let valueStr = valueToStringRB(valueOrWarning.value)
+      let valueStr = valueToStringRB(valueOr.value)
       result = (segmentType, valueStr)
     else:
       # The replacement variable doesn't exist: $1.

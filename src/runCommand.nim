@@ -533,12 +533,12 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
       return newValueAndLengthOr(newValue(0), dotNameLen)
 
     # We have a variable.
-    let valueOrWarning = getVariable(variables, dotNameStr)
-    if valueOrWarning.kind == vwWarning:
-      let warningData = newWarningData(valueOrWarning.warningData.warning,
-        valueOrWarning.warningData.p1, start)
+    let valueOr = getVariable(variables, dotNameStr)
+    if valueOr.isMessage:
+      let warningData = newWarningData(valueOr.message.warning,
+        valueOr.message.p1, start)
       return newValueAndLengthOr(warningData)
-    return newValueAndLengthOr(valueOrWarning.value, dotNameLen)
+    return newValueAndLengthOr(valueOr.value, dotNameLen)
   else:
     # Expected a string, number, variable, list or function.
     return newValueAndLengthOr(wInvalidRightHandSide, "", start)
