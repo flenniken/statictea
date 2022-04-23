@@ -14,7 +14,6 @@ import messages
 import variables
 import tempFile
 import parseNumber
-import tostring
 
 
 # To support replacement blocks that consists of many lines and blocks

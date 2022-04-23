@@ -16,7 +16,6 @@ import variables
 import vartypes
 import readjson
 import replacement
-# import tostring
 
 template getNewLineBuffer(env: Env): untyped =
   ## Get a new line buffer for the environment's template.

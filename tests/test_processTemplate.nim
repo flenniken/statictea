@@ -7,7 +7,6 @@ import env
 import args
 import readlines
 import version
-import tostring
 import variables
 import vartypes
 import tables

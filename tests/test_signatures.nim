@@ -4,7 +4,6 @@ import env
 import vartypes
 import funtypes
 import options
-import tostring
 import messages
 import warnings
 

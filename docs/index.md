@@ -29,7 +29,6 @@ length.
 * [signatures.nim](signatures.md) &mdash; Statictea function signatures and parameter checking.
 * [statictea.nim](statictea.md) &mdash; StaticTea; A template processor and language.
 * [tempFile.nim](tempFile.md) &mdash; Temporary file methods.
-* [tostring.nim](tostring.md) &mdash; Value types to string methods.
 * [unicodes.nim](unicodes.md) &mdash; Functions that deal with Unicode.
 * [utf8decoder.nim](utf8decoder.md) &mdash; Functions for decoding and validating UTF-8.
 * [variables.nim](variables.md) &mdash; Language variable methods.

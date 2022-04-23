@@ -760,7 +760,6 @@ task docsall, "\tCreate all the docs, docsix, docs, readmefun, dot.":
   createDependencyGraph()
   createDependencyGraph2()
 
-
 task docs, "\tCreate one or more markdown docs; specify part of source filename.":
   let count = system.paramCount()+1
   let namePart = system.paramStr(count-1)

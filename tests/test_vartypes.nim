@@ -1,7 +1,6 @@
 import std/unittest
 import std/tables
 import vartypes
-import tostring
 
 suite "vartypes":
 
@@ -126,3 +125,27 @@ suite "vartypes":
     check $newValue([("a", 1), ("b", 2), ("c", 3)]) == """{"a":1,"b":2,"c":3}"""
     check $newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)]) == """{"a":1.1,"b":2.2,"c":3.3}"""
     check $newValue([("a", newValue(1)), ("b", newValue("c"))]) == """{"a":1,"b":"c"}"""
+
+  test "dictToString":
+    var varsDict = newVarsDict()
+    var dictValue = newValue(varsDict)
+    check $dictValue == "{}"
+    varsDict["k"] = newValue("v")
+    check $dictValue == """{"k":"v"}"""
+    varsDict["a"] = newValue(2)
+    check $dictValue == """{"k":"v","a":2}"""
+
+  test "listToString":
+    var listValue = newEmptyListValue()
+    check listToString(listValue) == """[]"""
+    listValue.listv.add(newValue("a"))
+    check listToString(listValue) == """["a"]"""
+    listValue.listv.add(newValue("b"))
+    check listToString(listValue) == """["a","b"]"""
+    listValue.listv.add(newValue(2))
+    check listToString(listValue) == """["a","b",2]"""
+
+  test "valueToString":
+    let value = newValue(1)
+    check valueToString(value) == "1"
+

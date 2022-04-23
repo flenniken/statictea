@@ -6,7 +6,6 @@ import env
 import vartypes
 import runFunction
 import messages
-import tostring
 import funtypes
 
 # Unicode strings in multiple languages good for test cases.

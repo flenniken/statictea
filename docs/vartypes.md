@@ -29,6 +29,13 @@ same type (may be Value type).
 * [newValueOrWarning](#newvalueorwarning-2) &mdash; Return a new ValueOrWarning object containing a warning.
 * [`==`](#-1) &mdash; Compare two ValueOrWarning objects and return true when equal.
 * [`$`](#-2) &mdash; Return a string representation of a value's type.
+* [dictToString](#dicttostring) &mdash; Return a string representation of a dict Value in JSON format.
+* [listToString](#listtostring) &mdash; Return a string representation of a list Value in JSON format.
+* [valueToString](#valuetostring) &mdash; Return a string representation of a Value in JSON format.
+* [valueToStringRB](#valuetostringrb) &mdash; Return the string representation of the Value for use in the replacement blocks.
+* [`$`](#-3) &mdash; Return a string representation of a Value.
+* [`$`](#-4) &mdash; Return a string representation of a VarsDict.
+* [`$`](#-5) &mdash; Return a string representation of a ValueOrWarning object.
 
 # VarsDict
 
@@ -235,6 +242,62 @@ Return a string representation of a value's type.
 
 ```nim
 func `$`(kind: ValueKind): string
+```
+
+# dictToString
+
+Return a string representation of a dict Value in JSON format.
+
+```nim
+func dictToString(value: Value): string
+```
+
+# listToString
+
+Return a string representation of a list Value in JSON format.
+
+```nim
+func listToString(value: Value): string
+```
+
+# valueToString
+
+Return a string representation of a Value in JSON format.
+
+```nim
+func valueToString(value: Value): string
+```
+
+# valueToStringRB
+
+Return the string representation of the Value for use in the replacement blocks.
+
+```nim
+func valueToStringRB(value: Value): string
+```
+
+# `$`
+
+Return a string representation of a Value.
+
+```nim
+func `$`(value: Value): string
+```
+
+# `$`
+
+Return a string representation of a VarsDict.
+
+```nim
+proc `$`(varsDict: VarsDict): string
+```
+
+# `$`
+
+Return a string representation of a ValueOrWarning object.
+
+```nim
+func `$`(vw: ValueOrWarning): string
 ```
 
 

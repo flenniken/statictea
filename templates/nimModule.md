@@ -5,6 +5,7 @@ $$ # Create a list of all the heading names.
 $$ #
 $$ block
 $$ : t.repeat = len(s.entries)
+$$ : a = if0(t.repeat, warn("Nothing to document in this module."), 0)
 $$ : entry = get(s.entries, t.row)
 $$ : g.names &= entry.name
 $$ endblock

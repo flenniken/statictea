@@ -2,10 +2,7 @@
 
 import vartypes
 import warnings
-import tostring
 import strutils
-
-# todo: rename "parameters" to "arguments"?
 
 type
   FunctionPtr* = proc (parameters: seq[Value]): FunResult {.noSideEffect.}

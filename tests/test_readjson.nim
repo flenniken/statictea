@@ -9,7 +9,6 @@ import env
 import vartypes
 import readjson
 import messages
-import tostring
 import utf8decoder
 import sharedtestcode
 

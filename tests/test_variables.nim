@@ -9,7 +9,6 @@ import env
 import messages
 import warnings
 import readjson
-import tostring
 import args
 
 proc testGetVariableOk(variables: Variables, dotNameStr: string, eJson:
@@ -475,3 +474,7 @@ suite "variables.nim":
     # let prepostList = @[newPrepost("#$", "")]
     let prepostList = @[newPrepost("abc", "def")]
     check argsPrepostList(prepostList) == @[@["abc", "def"]]
+
+  test "ValueOrWarning string":
+    check $newValueOrWarning(newValue(2)) == "2"
+    check $newValueOrWarning(wInvalidJsonRoot) == "wInvalidJsonRoot(-):0"

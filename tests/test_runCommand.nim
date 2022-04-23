@@ -13,7 +13,6 @@ import variables
 import messages
 import warnings
 import version
-import tostring
 import readlines
 import collectCommand
 import opresultwarn

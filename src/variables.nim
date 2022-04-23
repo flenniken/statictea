@@ -17,7 +17,6 @@ import vartypes
 import version
 import messages
 import warnings
-import tostring
 import args
 import opresultwarn
 
