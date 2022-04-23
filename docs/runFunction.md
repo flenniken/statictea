@@ -15,6 +15,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funLen_di](#funlen_di) &mdash; Number of elements in a dictionary.
 * [funGet_lioaa](#funget_lioaa) &mdash; Get a list value by its index.
 * [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
+* [funGet_dioaa](#funget_dioaa) &mdash; Get a dictionary value by its index.
 * [funIf0](#funif0) &mdash; If the condition is 0, return the second parameter, else return
 the third.
 * [funIf1](#funif1) &mdash; If the condition is 1, return the second parameter, else return
@@ -260,6 +261,27 @@ d.tea => "Earl Grey"
 
 ```nim
 func funGet_dsoaa(parameters: seq[Value]): FunResult
+```
+
+# funGet_dioaa
+
+Get a dictionary value by its index.  If the index doesn't exist, the default value is returned if specified, else a warning is generated. The insertion order defines the order.
+
+~~~
+get(dictionary: dict, index: int, optional default: any) any
+~~~~
+
+Examples:
+
+~~~
+d = dict("x", 1, "y", 8, "z": 6)
+get(d, 0) => 1
+get(d, 1) => 8
+get(d, 2) => 6
+~~~~
+
+```nim
+func funGet_dioaa(parameters: seq[Value]): FunResult
 ```
 
 # funIf0

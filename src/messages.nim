@@ -182,6 +182,7 @@ type
 
     wMissingCommaBracket,  ## w170
     wUserMessage,          ## w171
+    wMissingDictIndex,     ## w172
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -358,5 +359,6 @@ const
     "Already have one '$1' parameter.",
     "Missing comma or right bracket.", ## wMissingCommaBracket
     "$1", ## wUserMessage
+    "The dictionary does not have an item with index $1.", ## wMissingDictIndex
     ]
     ## The message text.

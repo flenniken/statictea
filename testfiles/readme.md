@@ -6,6 +6,7 @@ This folder contains stf test files for statictea.
 * [comment](../testfiles/comment.stf.md) &mdash; The readme comment example.
 * [comments-inline](../testfiles/comments-inline.stf.md) &mdash; Test inline comments.
 * [continue-basics](../testfiles/continue-basics.stf.md) &mdash; The continue readme example.
+* [dict-basics](../testfiles/dict-basics.stf.md) &mdash; Test the dictionary type.
 * [dup-json](../testfiles/dup-json.stf.md) &mdash; Test duplicate json variables.
 * [endblock-readme](../testfiles/endblock-readme.stf.md) &mdash; The endblock readme example.
 * [endline](../testfiles/endline.stf.md) &mdash; Test there are no extra lines for the readmefun case.

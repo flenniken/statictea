@@ -82,22 +82,6 @@ proc compareStatements(statements: seq[Statement], eContent: string): bool =
       return false
   return true
 
-proc cmpOpResultWarn[T](statement: Statement,
-    g, e: OpResultWarn[T]): bool =
-  ## Compare the two values and show the differences when
-  ## different. Return true when they are the same.
-
-  result = true
-  if $g != $e:
-    echo "expected: $1" % $e
-    if e.isMessage:
-      echo getWarnStatement(statement, e.message, "template.html")
-
-    echo "     got: $1" % $g
-    if g.isMessage:
-      echo getWarnStatement(statement, g.message, "template.html")
-    result = false
-
 proc cmpValueAndLengthOr(statement: Statement,
     g, e: OpResultWarn[ValueAndLength], start = 0): bool =
   ## Compare the two values and show the differences when
@@ -854,6 +838,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let statement = newStatement(text)
     let eVariableDataOr = newVariableDataOr(wUserMessage, "hello", 13)
     check testRunStatement(statement, eVariableDataOr)
+
 
 
 

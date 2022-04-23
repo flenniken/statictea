@@ -297,6 +297,45 @@ func funGet_dsoaa*(parameters: seq[Value]): FunResult =
   else:
     result = newFunResultWarn(wMissingDictItem, 1, key)
 
+func funGet_dioaa*(parameters: seq[Value]): FunResult =
+  ## Get a dictionary value by its index.  If the index doesn't exist,
+  ## the default value is returned if specified, else a warning is
+  ## generated. The insertion order defines the order.
+  ## @:
+  ## @:~~~
+  ## @:get(dictionary: dict, index: int, optional default: any) any
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:d = dict("x", 1, "y", 8, "z": 6)
+  ## @:get(d, 0) => 1
+  ## @:get(d, 1) => 8
+  ## @:get(d, 2) => 6
+  ## @:~~~~
+
+  tMapParameters("dioaa")
+  let dict = map["a"].dictv
+  let index = map["b"].intv
+
+  if index < 0:
+    # Index values must greater than or equal to 0, got: $1.
+    return newFunResultWarn(wInvalidIndex, 1, $index)
+
+  if index < dict.len:
+    var ix = 0
+    for value in dict.values():
+      if ix == index:
+        return newFunResult(value)
+      inc(ix)
+
+  if "c" in map:
+    result = newFunResult(map["c"])
+  else:
+    # The dictionary does not have an item with index $1.
+    result = newFunResultWarn(wMissingDictIndex, 1, $index)
+
 func funIf0*(parameters: seq[Value]): FunResult =
   ## If the condition is 0, return the second parameter, else return
   ## @:the third. This function is special because it conditionally
@@ -1584,6 +1623,7 @@ const
     ("concat", funConcat, "sss"),
     ("get", funGet_lioaa, "lioaa"),
     ("get", funGet_dsoaa, "dsoaa"),
+    ("get", funGet_dioaa, "dioaa"),
     ("cmp", funCmp_iii, "iii"),
     ("cmp", funCmp_ffi, "ffi"),
     ("cmp", funCmp_ssoii, "ssoii"),

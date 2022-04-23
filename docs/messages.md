@@ -185,7 +185,8 @@ MessageId = enum
   wCmlTooManyBareParameters, ## w168
   wCmlAlreadyHaveOneParameter, ## w169
   wMissingCommaBracket,     ## w170
-  wUserMessage               ## w171
+  wUserMessage,             ## w171
+  wMissingDictIndex          ## w172
 ```
 
 # Messages
@@ -361,7 +362,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Use the short name \'_\' instead of \'$1\' with a bare parameter.", "Use an alphanumeric ascii character for a short option name instead of \'$1\'.",
     "Missing \'$1\' parameter.", "Extra bare parameter.",
     "Already have one \'$1\' parameter.", "Missing comma or right bracket.", ## wMissingCommaBracket
-    "$1"]
+    "$1",                   ## wUserMessage
+    "The dictionary does not have an item with index $1."]
 ```
 
 
