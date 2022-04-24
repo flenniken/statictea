@@ -2,7 +2,6 @@
 
 import std/streams
 import std/os
-import std/options
 import std/json
 import std/tables
 import vartypes
@@ -14,93 +13,86 @@ import OpResultWarn
 # Json spec:
 # https://datatracker.ietf.org/doc/html/rfc8259
 
-# todo: test the the order is preserved.
+var maxDepth* = 10
+   ## The maximum depth you can nest items.
 
-var depth_limit = 3
-
-proc jsonToValue*(jsonNode: JsonNode, depth: int = 0): Option[Value] =
-  ## Convert a json value to a statictea value.
-  if depth > depth_limit:
-    # todo: test the depth limit.
-    # todo: display warning when limit exceeded.
-    # todo: document the depth limit.
-    return none(Value)
+proc jsonToValue*(jsonNode: JsonNode, depth: int = 0): ValueOr =
+  ## Convert a json node to a statictea value.
+  if depth > maxDepth:
+    # The maximum JSON depth of $1 was exceeded.
+    return newValueOr(wMaxDepthExceeded, $maxDepth)
   var value: Value
   case jsonNode.kind
   of JNull:
-    value = Value(kind: vkInt, intv: 0)
+    # JSON nulls become 0.
+    value = newValue(0)
   of JBool:
-    value = Value(kind: vkInt, intv: if jsonNode.getBool(): 1 else: 0)
+    # JSON true becomes 1 and false becomes 0.
+    value = newValue(jsonNode.getBool())
   of JInt:
-    # todo: range check int to 64 bit.
-    value = Value(kind: vkInt, intv: jsonNode.getInt())
+    value = newValue(jsonNode.getInt())
   of JFloat:
-    # todo: range check float to 64 bit.
-    value = Value(kind: vkFloat, floatv: jsonNode.getFloat())
+    value = newValue(jsonNode.getFloat())
   of JString:
-    value = Value(kind: vkString, stringv: jsonNode.getStr())
+    value = newValue(jsonNode.getStr())
   of JObject:
+    var newDepth = depth + 1
     var dict = newVarsDict()
     for key, jnode in jsonNode:
-      let option = jsonToValue(jnode, depth + 1)
-      if option.isSome():
-        dict[key] = option.get()
-    value = Value(kind: vkDict, dictv: dict)
+      let valueOr = jsonToValue(jnode, newDepth)
+      if valueOr.isMessage:
+        return valueOr
+      dict[key] = valueOr.value
+    value = newValue(dict)
   of JArray:
-    var listVars: seq[Value]
+    var newDepth = depth + 1
+    var list: seq[Value]
     for jnode in jsonNode:
-      let option = jsonToValue(jnode, depth)
-      assert option.isSome
-      listVars.add(option.get())
-    value = Value(kind: vkList, listv: listVars)
-  result = some(value)
+      let valueOr = jsonToValue(jnode, newDepth)
+      if valueOr.isMessage:
+        return valueOr
+      list.add(valueOr.value)
+    value = newValue(list)
+  result = newValueOr(value)
 
-proc readJsonStream*(stream: Stream, filename: string = ""): ValueOr =
+proc readJsonStream*(stream: Stream): ValueOr =
   ## Read a json stream and return the variables.  If there is an
-  ## error, return a warning. The filename is used in warning
-  ## messages.
+  ## error, return a warning.
 
-  if stream == nil:
-    return newValueOr(wUnableToOpenFile, filename)
+  assert stream != nil
 
   var rootNode: JsonNode
   try:
-    rootNode = parseJson(stream, filename)
+    rootNode = parseJson(stream, "")
   except:
-    return newValueOr(wJsonParseError, filename)
+    return newValueOr(wJsonParseError)
+  result = jsonToValue(rootNode)
 
-  # todo: allow any kind of object.
-  if rootNode.kind != JObject:
-    return newValueOr(wInvalidJsonRoot, filename)
-
-  var dict = newVarsDict()
-  for key, jnode in rootNode:
-    let valueO = jsonToValue(jnode)
-    assert valueO.isSome
-    dict[key] = valueO.get()
-
-  result = newValueOr(newValue(dict))
-
-proc readJsonString*(content: string, filename: string = ""): ValueOr =
+proc readJsonString*(content: string): ValueOr =
   ## Read a json string and return the variables.  If there is an
-  ## error, return a warning. The filename is used in warning
-  ## messages.
+  ## error, return a warning.
   var stream = newStringStream(content)
-  result = readJsonStream(stream, filename)
+  assert stream != nil
+  result = readJsonStream(stream)
 
 proc readJsonFile*(filename: string): ValueOr =
-  ## Read a json file and return the variables.  If there is an
-  ## error, return a warning.
+  ## Read a json file and return the variables in a dictionary value
+  ## object.  If there is an error, return a warning.
 
   if not fileExists(filename):
     return newValueOr(wFileNotFound, filename)
 
+  # Create a stream out of the file.
   var stream: Stream
   stream = newFileStream(filename)
   if stream == nil:
     return newValueOr(wUnableToOpenFile, filename)
 
-  result = readJsonStream(stream, filename)
+  result = readJsonStream(stream)
+  if result.isValue:
+    if result.value.kind != vkDict:
+      # The root json element must be an object (dictionary).
+      result = newValueOr(wInvalidJsonRoot)
 
 type
   ParsedString* = object

@@ -119,84 +119,160 @@ suite "readjson.nim":
     var valueOr = readJsonFile(filename)
     check $valueOr == $newValueOr(wUnableToOpenFile, filename)
 
-  test "readJsonFile parse error":
+  test "readJsonFile good":
+    let filename = "readJsonFile.tmp"
+    let json = """{"a":1}"""
+    createFile(filename, json)
+    defer: discard tryRemoveFile(filename)
+    var valueOr = readJsonFile(filename)
+    check valueOr.isValue
+    check $valueOr.value == json
+
+  test "readJsonFile must be dict":
+    let filename = "mustbedict.tmp"
+    let json = """[1,2,3]"""
+    createFile(filename, json)
+    defer: discard tryRemoveFile(filename)
+    var valueOr = readJsonFile(filename)
+    check $valueOr == $newValueOr(wInvalidJsonRoot)
+
+  test "readJsonString parse error":
     let content = "{"
     var valueOr = readJsonString(content)
     check $valueOr == $newValueOr(wJsonParseError)
 
-  test "readJsonFile no root object":
+  test "readJsonString [5]":
     let content = "[5]"
     var valueOr = readJsonString(content)
-    check $valueOr == $newValueOr(wInvalidJsonRoot)
+    let value = valueOr.value
+    check $value == content
 
-  test "readJsonFile a=5":
+  test "readJsonString max depth":
+    readjson.maxDepth = 4
+    let content = """{"a":{"b":{"c":{"d":1,"d2":2}}}}"""
+    var valueOr = readJsonString(content)
+    let value = valueOr.value
+    check $value == content
+
+  test "readJsonString max depth + 1":
+    readjson.maxDepth = 3
+    let content = """{"a":{"b":{"c":{"d":1,"d2":2}}}}"""
+    var valueOr = readJsonString(content)
+    check $valueOr == $newValueOr(wMaxDepthExceeded, "3")
+
+  test "readJsonString max depth list":
+    readjson.maxDepth = 3
+    let content = """[[[1,2,3]]]"""
+    var valueOr = readJsonString(content)
+    let value = valueOr.value
+    check $value == content
+
+  test "readJsonString max depth list + 1":
+    readjson.maxDepth = 3
+    let content = """[[[[1]]]]"""
+    var valueOr = readJsonString(content)
+    check $valueOr == $newValueOr(wMaxDepthExceeded, "3")
+
+  test "readJsonString a=5":
     let content = """{"a":5}"""
     let valueOr = readJsonString(content)
     check valueOr.isValue
     let str = dictToString(valueOr.value)
     check expectedItem("json", str, content)
 
+  test "readJsonString syntax error":
+    let content = """{"a":}"""
+    let valueOr = readJsonString(content)
+    check $valueOr == $newValueOr(wJsonParseError)
+
+  test "readJsonString dict order":
+    # Test that the order of dictionary items are preserved.
+    let content = """{"b":1,"a":7,"c":1,"ABC":2}"""
+    let valueOr = readJsonString(content)
+    check valueOr.isValue
+    check $valueOr.value == content
+
+
+  test "readJsonString smallest number":
+    let content = """{"n":-9223372036854775808}"""
+    let valueOr = readJsonString(content)
+    check valueOr.isValue
+    check $valueOr.value == content
+
+  test "readJsonString smallest number - 1":
+    # A too small number turns into a string.
+    let  content = """{"n":-9223372036854775809}"""
+    let eContent = """{"n":"-9223372036854775809"}"""
+    let valueOr = readJsonString(content)
+    check valueOr.isValue
+    check $valueOr.value == eContent
+
+  test "readJsonString biggest number":
+    let content = """{"n":9223372036854775807}"""
+    let valueOr = readJsonString(content)
+    check valueOr.isValue
+    check $valueOr.value == content
+
+  test "readJsonString biggest number + 1":
+    # A too big number turns into a string.
+    let  content = """{"n":9223372036854775808}"""
+    let eContent = """{"n":"9223372036854775808"}"""
+    let valueOr = readJsonString(content)
+    check valueOr.isValue
+    check $valueOr.value == eContent
+
+  test "readJsonString invalid unicode":
+    # Test invalid unicode string.
+    let  content = """{"n":"\uD834"}"""
+    let valueOr = readJsonString(content)
+    check $valueOr == $newValueOr(wJsonParseError)
+
   test "jsonToValue int":
     let jsonNode = newJInt(5)
-    let option = jsonToValue(jsonNode)
-    let value = option.get()
-    check value.intv == 5
-    check $value == "5"
+    let valueOr = jsonToValue(jsonNode)
+    check $valueOr == $newValueOr(newValue(5))
 
   test "jsonToValue string":
     let jsonNode = newJString("string")
-    let option = jsonToValue(jsonNode)
-    let value = option.get()
-    check value.stringv == "string"
-    check $value == """"string""""
+    let valueOr = jsonToValue(jsonNode)
+    check $valueOr == $newValueOr(newValue("string"))
 
   test "jsonToValue quote":
     let str = "this has \"quotes\" in it"
     let jsonNode = newJString(str)
-    let option = jsonToValue(jsonNode)
-    let value = option.get()
-    check value.stringv == str
-    check $value == """"this has \"quotes\" in it""""
+    let valueOr = jsonToValue(jsonNode)
+    check $valueOr == $newValueOr(newValue(str))
 
   test "jsonToValue float":
     let jsonNode = newJFloat(1.5)
-    let option = jsonToValue(jsonNode)
-    let value = option.get()
-    check value.floatv == 1.5
+    let valueOr = jsonToValue(jsonNode)
+    check $valueOr == $newValueOr(newValue(1.5))
 
   test "jsonToValue bool true":
     let jsonNode = newJBool(true)
-    let option = jsonToValue(jsonNode)
-    let value = option.get()
-    check value.intv == 1
-    check $value == "1"
+    let valueOr = jsonToValue(jsonNode)
+    check $valueOr == $newValueOr(newValue(true))
 
   test "jsonToValue bool false":
     let jsonNode = newJBool(false)
-    let option = jsonToValue(jsonNode)
-    let value = option.get()
-    check value.intv == 0
-    check $value == "0"
+    let valueOr = jsonToValue(jsonNode)
+    check $valueOr == $newValueOr(newValue(false))
 
   test "jsonToValue null":
     let jsonNode = newJNull()
-    let option = jsonToValue(jsonNode)
-    let value = option.get()
-    check value.intv == 0
-    check $value == "0"
+    let valueOr = jsonToValue(jsonNode)
+    check $valueOr == $newValueOr(newValue(0))
 
   test "jsonToValue list":
     let jsonNode = newJArray()
-    let option = jsonToValue(jsonNode)
-    let value = option.get()
-    check value.listv.len == 0
-    check $value == "[]"
+    let valueOr = jsonToValue(jsonNode)
+    check $valueOr == $newValueOr(newEmptyListValue())
 
   test "jsonToValue list null":
     var jsonNode = newJArray()
     jsonNode.add(newJNull())
-    let option = jsonToValue(jsonNode)
-    let value = option.get()
+    let valueOr = jsonToValue(jsonNode)
+    let value = valueOr.value
     check value.listv.len == 1
     check $value == "[0]"
 
@@ -208,8 +284,8 @@ suite "readjson.nim":
     jsonNode.add(newJFloat(1.5))
     jsonNode.add(newJBool(true))
     jsonNode.add(newJBool(false))
-    let option = jsonToValue(jsonNode)
-    let value = option.get()
+    let valueOr = jsonToValue(jsonNode)
+    let value = valueOr.value
     check value.listv.len == 6
     # check $value == """[0, 5, "string", 1.5, 1, 0]"""
     # check $value == """[...]"""
@@ -222,15 +298,15 @@ suite "readjson.nim":
     nested.add(newJInt(8))
     jsonNode.add(nested)
     jsonNode.add(newJInt(7))
-    let option = jsonToValue(jsonNode)
-    let value = option.get()
+    let valueOr = jsonToValue(jsonNode)
+    let value = valueOr.value
     check value.listv.len == 4
     check $value == "[5,6,[8],7]"
 
   test "empty dict":
     var jsonNode = newJObject()
-    let option = jsonToValue(jsonNode)
-    let value = option.get()
+    let valueOr = jsonToValue(jsonNode)
+    let value = valueOr.value
     check value.dictv.len == 0
     check $value == "{}"
 
