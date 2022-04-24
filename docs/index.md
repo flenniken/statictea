@@ -31,7 +31,7 @@ length.
 * [tempFile.nim](tempFile.md) &mdash; Temporary file methods.
 * [unicodes.nim](unicodes.md) &mdash; Functions that deal with Unicode.
 * [utf8decoder.nim](utf8decoder.md) &mdash; Functions for decoding and validating UTF-8.
-* [variables.nim](variables.md) &mdash; Language variable methods.
+* [variables.nim](variables.md) &mdash; Procedures for working with statictea variables.
 * [vartypes.nim](vartypes.md) &mdash; StaticTea variable types.
 * [version.nim](version.md) &mdash; The current StaticTea version number.
 * [warnings.nim](warnings.md) &mdash; Module for handling warnings.
