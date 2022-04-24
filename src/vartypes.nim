@@ -213,4 +213,3 @@ func newValueOr*(warningData: WarningData): OpResultWarn[Value] =
 func newValueOr*(value: Value): OpResultWarn[Value] =
   ## Create a OpResultWarn[Value] value.
   result = opValueW[Value](value)
-

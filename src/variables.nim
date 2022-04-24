@@ -1,14 +1,10 @@
-## Language variable methods.
-
-#[
-There is one dictionary to hold the logically separate dictionaries,
-g, h, s, t etc which makes passing them around easier.
-
-The language allows local variables to be specified without the l
-prefix and it allows functions to be specified without the f prefix.
-
-Dot names ie: l.d.a can be used on the left hand side of the equal sign.
-]#
+## Procedures for working with statictea variables.
+## @:
+## @:There is one dictionary to hold the logically separate dictionaries,
+## @:g, h, s, t etc which makes passing them around easier.
+## @:The language allows local variables to be specified without the l
+## @:prefix and it allows functions to be specified without the f prefix.
+## @:Dot names ie: l.d.a can be used on the left hand side of the equal sign.
 
 import std/strutils
 import std/options
@@ -22,7 +18,12 @@ import opresultwarn
 
 const
   outputValues* = ["result", "stdout", "stderr", "log", "skip"]
-    ## Tea output variable values.
+    ## Where the replacement block's output goes.
+    ## @:* result -- output goes to the result file
+    ## @:* stdout -- output goes to the standard output stream
+    ## @:* stdout -- output goes to the standard error stream
+    ## @:* log -- output goes to the log file
+    ## @:* skip -- output goes to the bit bucket
 
 type
   Variables* = VarsDict
@@ -30,25 +31,16 @@ type
     ## logical dictionaries.
 
   VariableData* = object
-    ## A variable name and value. The dotNameStr tells where the
-    ## variable is stored, i.e.: l.d.a
+    ## A variable name, operator and value which is the result of
+    ## @:running a statement.
+    ## @:
+    ## @:* dotNameStr -- the dot name tells which dictionary contains
+    ## @:the variable, i.e.: l.d.a
+    ## @:* operator -- the statement's operator, either = or &=
+    ## @:* value -- the variable's value
     dotNameStr*: string
+    operator*: string
     value*: Value
-    operator*: string # = or &=
-
-  ParentDictKind* = enum
-    ## The kind of a ParentDict object, either a dict or warning.
-    fdDict,
-    fdWarning
-
-  ParentDict* = object
-    ## Contains the result of calling getParentDictToAddTo, either a dictionary
-    ## or a warning.
-    case kind*: ParentDictKind
-      of fdDict:
-        dict*: VarsDict
-      of fdWarning:
-        warningData*: WarningData
 
 func newVariableData*(dotNameStr: string, operator: string, value: Value):
      VariableData =
@@ -58,18 +50,18 @@ func newVariableData*(dotNameStr: string, operator: string, value: Value):
 
 func newVariableDataOr*(warning: Warning, p1 = "", pos = 0):
     OpResultWarn[VariableData] =
-  ## Create a OpResultWarn[VariableData] warning.
+  ## Create a VariableData object containing a warning.
   let warningData = newWarningData(warning, p1, pos)
   result = opMessageW[VariableData](warningData)
 
 func newVariableDataOr*(warningData: WarningData):
     OpResultWarn[VariableData] =
-  ## Create a OpResultWarn[VariableData] warning.
+  ## Create a VariableData object containing a warning.
   result = opMessageW[VariableData](warningData)
 
 func newVariableDataOr*(dotNameStr: string, operator = "=", value: Value):
     OpResultWarn[VariableData] =
-  ## Create a OpResultWarn[VariableData] value.
+  ## Create a VariableData object containing a value.
   let val = newVariableData(dotNameStr, operator, value)
   result = opValueW[VariableData](val)
 
@@ -77,36 +69,15 @@ func `$`*(v: VariableData): string =
   ## Return a string representation of VariableData.
   result = "$1 $2 $3" % [v.dotNameStr, v.operator, $v.value]
 
-func `$`*(parentDict: ParentDict): string =
-  ## Return a string representation of ParentDict.
-  var msg: string
-  case parentDict.kind
-  of fdDict:
-    msg = $parentDict.dict
-  of fdWarning:
-    msg = $parentDict.warningData
-  result = "ParentDict: $1, $2" % [$parentDict.kind, msg]
+func newVarsDictOr*(warning: Warning, p1: string = "", pos = 0):
+     OpResultWarn[VarsDict] =
+  ## Return a new varsDictOr object containing a warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[VarsDict](warningData)
 
-func `==`*(s1: ParentDict, s2: ParentDict): bool =
-  ## Return true when the two ParentDict are equal.
-  if s1.kind == s2.kind:
-    case s1.kind
-    of fdDict:
-      if s1.dict == s2.dict:
-        result = true
-    of fdWarning:
-      if s1.warningData == s2.warningData:
-        result = true
-
-func newParentDictWarn*(warning: Warning, p1: string = ""): ParentDict =
-  ## Return a new ParentDict object of the warning kind. It contains a
-  ## warning and the two optional strings that go with the warning.
-  let warningData = newWarningData(warning, p1)
-  result = ParentDict(kind: fdWarning, warningData: warningData)
-
-func newParentDict*(dict: VarsDict): ParentDict =
-  ## Return a new ParentDict object containing a dict.
-  result = ParentDict(kind: fdDict, dict: dict)
+func newVarsDictOr*(varsDict: VarsDict): OpResultWarn[VarsDict] =
+  ## Return a new VarsDict object containing a dictionary.
+  result = opValueW[VarsDict](varsDict)
 
 func emptyVariables*(server: VarsDict = nil, shared: VarsDict = nil,
     args: VarsDict = nil): Variables =
@@ -185,7 +156,8 @@ proc resetVariables*(variables: var Variables) =
 
   variables["l"] = newValue(newVarsDict())
 
-proc getParentDictToAddTo(variables: Variables, dotNameStr: string): ParentDict =
+proc getParentDictToAddTo(variables: Variables, dotNameStr: string):
+    OpResultWarn[VarsDict] =
   ## Return the last component dictionary specified by the given names
   ## or, on error, return a warning.  For the dot name string
   ## "a.b.c.d" and the c dictionary is the result.
@@ -200,20 +172,20 @@ proc getParentDictToAddTo(variables: Variables, dotNameStr: string): ParentDict 
 
   parentDict = variables[nameSpace].dictv
   if names.len == 2:
-    return newParentDict(parentDict)
+    return newVarsDictOr(parentDict)
   dictNames = names[1 .. ^2]
 
   # Loop through the dictionaries looking up each sub dict.
   for name in dictNames:
     if not (name in parentDict):
       # Name doesn't exist in the parent dictionary. # wVariableMissing
-      return newParentDictWarn(wVariableMissing, name)
+      return newVarsDictOr(wVariableMissing, name)
     if parentDict[name].kind != vkDict:
       # "Name, $1, is not a dictionary.", # wNotDict
-      return newParentDictWarn(wNotDict, name)
+      return newVarsDictOr(wNotDict, name)
     parentDict = parentDict[name].dictv
 
-  result = newParentDict(parentDict)
+  result = newVarsDictOr(parentDict)
 
 func assignTeaVariable(variables: var Variables, dotNameStr: string,
     value: Value, operator: string = "="): Option[WarningData] =
@@ -283,7 +255,7 @@ proc assignVariable*(
   # -- You can specify local variables without the l prefix.
 
   assert dotNameStr.len > 0
-  var parentDict: ParentDict
+  var varDictOr: OpResultWarn[VarsDict]
   let names = split(dotNameStr, '.')
 
   let nameSpace = names[0]
@@ -297,32 +269,32 @@ proc assignVariable*(
   of "g", "l":
     if names.len == 1:
       return some(newWarningData(wImmutableVars))
-    parentDict = getParentDictToAddTo(variables, dotNameStr)
+    varDictOr = getParentDictToAddTo(variables, dotNameStr)
   of "f", "i", "j", "k", "m", "n", "o", "p", "q", "r", "u":
     return some(newWarningData(wReservedNameSpaces))
   else:
     # It must be a local variable, add the missing l.
-    parentDict = getParentDictToAddTo(variables, "l." & dotNameStr)
+    varDictOr = getParentDictToAddTo(variables, "l." & dotNameStr)
 
-  if parentDict.kind == fdWarning:
-    return some(parentDict.warningData)
+  if varDictOr.isMessage:
+    return some(varDictOr.message)
 
   let lastName = names[^1]
   if operator == "=":
     # Assign the value to the dictionary.
-    if lastName in parentDict.dict:
+    if lastName in varDictOr.value:
       return some(newWarningData(wImmutableVars))
-    parentDict.dict[lastName] = value
+    varDictOr.value[lastName] = value
   else:
     assert operator == "&="
 
     # Append to a list, or create then append.
 
     # If the variable doesn't exists, create an empty list.
-    if not (lastName in parentDict.dict):
-      parentDict.dict[lastName] = newEmptyListValue()
+    if not (lastName in varDictOr.value):
+      varDictOr.value[lastName] = newEmptyListValue()
 
-    let lastItem = parentDict.dict[lastName]
+    let lastItem = varDictOr.value[lastName]
     if lastItem.kind != vkList:
       # You can only append to a list, got $1.
       return some(newWarningData(wAppendToList, $lastItem.kind))
@@ -365,7 +337,7 @@ proc getVariable*(variables: Variables, dotNameStr: string):
   result = lookUpVar(variables, names)
 
 func argsPrepostList*(prepostList: seq[Prepost]): seq[seq[string]] =
-  ## Create a prepost list of lists for t.args.
+  ## Create a prepost list of lists for t args.
   for prepost in prepostList:
     result.add(@[prepost.prefix, prepost.postfix])
 

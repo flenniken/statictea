@@ -1,36 +1,44 @@
 # variables.nim
 
-Language variable methods.
+Procedures for working with statictea variables.
+
+There is one dictionary to hold the logically separate dictionaries,
+g, h, s, t etc which makes passing them around easier.
+The language allows local variables to be specified without the l
+prefix and it allows functions to be specified without the f prefix.
+Dot names ie: l.d.a can be used on the left hand side of the equal sign.
 
 * [variables.nim](../src/variables.nim) &mdash; Nim source code.
 # Index
 
-* const: [outputValues](#outputvalues) &mdash; Tea output variable values.
+* const: [outputValues](#outputvalues) &mdash; Where the replacement block's output goes.
 * type: [Variables](#variables) &mdash; Dictionary holding all statictea variables in multiple distinct logical dictionaries.
-* type: [VariableData](#variabledata) &mdash; A variable name and value.
-* type: [ParentDictKind](#parentdictkind) &mdash; The kind of a ParentDict object, either a dict or warning.
-* type: [ParentDict](#parentdict) &mdash; Contains the result of calling getParentDictToAddTo, either a dictionary or a warning.
+* type: [VariableData](#variabledata) &mdash; A variable name, operator and value which is the result of
+running a statement.
 * [newVariableData](#newvariabledata) &mdash; Create a new VariableData object.
-* [newVariableDataOr](#newvariabledataor) &mdash; Create a OpResultWarn[VariableData] warning.
-* [newVariableDataOr](#newvariabledataor-1) &mdash; Create a OpResultWarn[VariableData] warning.
-* [newVariableDataOr](#newvariabledataor-2) &mdash; Create a OpResultWarn[VariableData] value.
+* [newVariableDataOr](#newvariabledataor) &mdash; Create a VariableData object containing a warning.
+* [newVariableDataOr](#newvariabledataor-1) &mdash; Create a VariableData object containing a warning.
+* [newVariableDataOr](#newvariabledataor-2) &mdash; Create a VariableData object containing a value.
 * [`$`](#) &mdash; Return a string representation of VariableData.
-* [`$`](#-1) &mdash; Return a string representation of ParentDict.
-* [`==`](#-2) &mdash; Return true when the two ParentDict are equal.
-* [newParentDictWarn](#newparentdictwarn) &mdash; Return a new ParentDict object of the warning kind.
-* [newParentDict](#newparentdict) &mdash; Return a new ParentDict object containing a dict.
+* [newVarsDictOr](#newvarsdictor) &mdash; Return a new varsDictOr object containing a warning.
+* [newVarsDictOr](#newvarsdictor-1) &mdash; Return a new VarsDict object containing a dictionary.
 * [emptyVariables](#emptyvariables) &mdash; Create an empty variables object in its initial state.
 * [getTeaVarIntDefault](#getteavarintdefault) &mdash; Return the int value of one of the tea dictionary integer items.
 * [getTeaVarStringDefault](#getteavarstringdefault) &mdash; Return the string value of one of the tea dictionary string items.
 * [resetVariables](#resetvariables) &mdash; Clear the local variables and reset the tea variables for running a command.
 * [assignVariable](#assignvariable) &mdash; Assign the variable the given value if possible, else return a warning.
 * [getVariable](#getvariable) &mdash; Look up the variable and return its value when found, else return a warning.
-* [argsPrepostList](#argsprepostlist) &mdash; Create a prepost list of lists for t.
+* [argsPrepostList](#argsprepostlist) &mdash; Create a prepost list of lists for t args.
 * [getTeaArgs](#getteaargs) &mdash; Create the t args dictionary from the statictea arguments.
 
 # outputValues
 
-Tea output variable values.
+Where the replacement block's output goes.
+* result -- output goes to the result file
+* stdout -- output goes to the standard output stream
+* stdout -- output goes to the standard error stream
+* log -- output goes to the log file
+* skip -- output goes to the bit bucket
 
 ```nim
 outputValues = ["result", "stdout", "stderr", "log", "skip"]
@@ -46,38 +54,19 @@ Variables = VarsDict
 
 # VariableData
 
-A variable name and value. The dotNameStr tells where the variable is stored, i.e.: l.d.a
+A variable name, operator and value which is the result of
+running a statement.
+
+* dotNameStr -- the dot name tells which dictionary contains
+the variable, i.e.: l.d.a
+* operator -- the statement's operator, either = or &=
+* value -- the variable's value
 
 ```nim
 VariableData = object
   dotNameStr*: string
-  value*: Value
   operator*: string
-
-```
-
-# ParentDictKind
-
-The kind of a ParentDict object, either a dict or warning.
-
-```nim
-ParentDictKind = enum
-  fdDict, fdWarning
-```
-
-# ParentDict
-
-Contains the result of calling getParentDictToAddTo, either a dictionary or a warning.
-
-```nim
-ParentDict = object
-  case kind*: ParentDictKind
-  of fdDict:
-      dict*: VarsDict
-
-  of fdWarning:
-      warningData*: WarningData
-
+  value*: Value
 
 ```
 
@@ -91,7 +80,7 @@ func newVariableData(dotNameStr: string; operator: string; value: Value): Variab
 
 # newVariableDataOr
 
-Create a OpResultWarn[VariableData] warning.
+Create a VariableData object containing a warning.
 
 ```nim
 func newVariableDataOr(warning: Warning; p1 = ""; pos = 0): OpResultWarn[
@@ -100,7 +89,7 @@ func newVariableDataOr(warning: Warning; p1 = ""; pos = 0): OpResultWarn[
 
 # newVariableDataOr
 
-Create a OpResultWarn[VariableData] warning.
+Create a VariableData object containing a warning.
 
 ```nim
 func newVariableDataOr(warningData: WarningData): OpResultWarn[VariableData]
@@ -108,7 +97,7 @@ func newVariableDataOr(warningData: WarningData): OpResultWarn[VariableData]
 
 # newVariableDataOr
 
-Create a OpResultWarn[VariableData] value.
+Create a VariableData object containing a value.
 
 ```nim
 func newVariableDataOr(dotNameStr: string; operator = "="; value: Value): OpResultWarn[
@@ -123,36 +112,21 @@ Return a string representation of VariableData.
 func `$`(v: VariableData): string
 ```
 
-# `$`
+# newVarsDictOr
 
-Return a string representation of ParentDict.
+Return a new varsDictOr object containing a warning.
 
 ```nim
-func `$`(parentDict: ParentDict): string
+func newVarsDictOr(warning: Warning; p1: string = ""; pos = 0): OpResultWarn[
+    VarsDict]
 ```
 
-# `==`
+# newVarsDictOr
 
-Return true when the two ParentDict are equal.
-
-```nim
-func `==`(s1: ParentDict; s2: ParentDict): bool
-```
-
-# newParentDictWarn
-
-Return a new ParentDict object of the warning kind. It contains a warning and the two optional strings that go with the warning.
+Return a new VarsDict object containing a dictionary.
 
 ```nim
-func newParentDictWarn(warning: Warning; p1: string = ""): ParentDict
-```
-
-# newParentDict
-
-Return a new ParentDict object containing a dict.
-
-```nim
-func newParentDict(dict: VarsDict): ParentDict
+func newVarsDictOr(varsDict: VarsDict): OpResultWarn[VarsDict]
 ```
 
 # emptyVariables
@@ -207,7 +181,7 @@ proc getVariable(variables: Variables; dotNameStr: string): OpResultWarn[Value]
 
 # argsPrepostList
 
-Create a prepost list of lists for t.args.
+Create a prepost list of lists for t args.
 
 ```nim
 func argsPrepostList(prepostList: seq[Prepost]): seq[seq[string]]
