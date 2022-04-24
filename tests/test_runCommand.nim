@@ -19,7 +19,7 @@ import opresultwarn
 import sharedtestcode
 
 proc cmpVariableDataOr(statement: Statement,
-     g: OpResultWarn[VariableData], e: OpResultWarn[VariableData],
+     g: VariableDataOr, e: VariableDataOr,
      templateName = "tmpl"): bool =
   ## Compare two VariableDataOr. When not equal show the differences.
   if $g == $e:
@@ -172,7 +172,7 @@ proc testGetFunctionValueAndLength(
 
 proc testRunStatement(
   statement: Statement,
-  eVariableDataOr: OpResultWarn[VariableData],
+  eVariableDataOr: VariableDataOr,
   variables: Variables = emptyVariables()
      ): bool =
 

@@ -2,10 +2,10 @@
 ## @:
 ## @:There is one dictionary to hold the logically separate dictionaries,
 ## @:g, h, s, t etc which makes passing them around easier.
+## @:
 ## @:The language allows local variables to be specified without the l
 ## @:prefix and it allows functions to be specified without the f prefix.
-## @:Dot names ie: l.d.a can be used on the left hand side of the equal sign.
-
+## @:
 import std/strutils
 import std/options
 import std/tables
@@ -42,42 +42,29 @@ type
     operator*: string
     value*: Value
 
-func newVariableData*(dotNameStr: string, operator: string, value: Value):
-     VariableData =
-  ## Create a new VariableData object.
-  result = VariableData(dotNameStr: dotNameStr,
-    operator: operator, value: value)
+  VariableDataOr* = OpResultWarn[VariableData]
 
 func newVariableDataOr*(warning: Warning, p1 = "", pos = 0):
-    OpResultWarn[VariableData] =
+    VariableDataOr =
   ## Create a VariableData object containing a warning.
   let warningData = newWarningData(warning, p1, pos)
   result = opMessageW[VariableData](warningData)
 
 func newVariableDataOr*(warningData: WarningData):
-    OpResultWarn[VariableData] =
+    VariableDataOr =
   ## Create a VariableData object containing a warning.
   result = opMessageW[VariableData](warningData)
 
 func newVariableDataOr*(dotNameStr: string, operator = "=", value: Value):
-    OpResultWarn[VariableData] =
+    VariableDataOr =
   ## Create a VariableData object containing a value.
-  let val = newVariableData(dotNameStr, operator, value)
-  result = opValueW[VariableData](val)
+  let variableData = VariableData(dotNameStr: dotNameStr,
+    operator: operator, value: value)
+  result = opValueW[VariableData](variableData)
 
 func `$`*(v: VariableData): string =
   ## Return a string representation of VariableData.
   result = "$1 $2 $3" % [v.dotNameStr, v.operator, $v.value]
-
-func newVarsDictOr*(warning: Warning, p1: string = "", pos = 0):
-     OpResultWarn[VarsDict] =
-  ## Return a new varsDictOr object containing a warning.
-  let warningData = newWarningData(warning, p1, pos)
-  result = opMessageW[VarsDict](warningData)
-
-func newVarsDictOr*(varsDict: VarsDict): OpResultWarn[VarsDict] =
-  ## Return a new VarsDict object containing a dictionary.
-  result = opValueW[VarsDict](varsDict)
 
 func emptyVariables*(server: VarsDict = nil, shared: VarsDict = nil,
     args: VarsDict = nil): Variables =
@@ -302,8 +289,7 @@ proc assignVariable*(
     # Append the value to the list.
     lastItem.listv.add(value)
 
-func lookUpVar(variables: Variables, names: seq[string]):
-     OpResultWarn[Value] =
+func lookUpVar(variables: Variables, names: seq[string]): ValueOr =
   ## Return the variable when it exists.
   var next = variables
   var ix = 0
@@ -319,8 +305,7 @@ func lookUpVar(variables: Variables, names: seq[string]):
       return newValueOr(wNotDict, name)
     next = value.dictv
 
-proc getVariable*(variables: Variables, dotNameStr: string):
-    OpResultWarn[Value] =
+proc getVariable*(variables: Variables, dotNameStr: string): ValueOr =
   ## Look up the variable and return its value when found, else return
   ## a warning.
   var names = split(dotNameStr, '.')

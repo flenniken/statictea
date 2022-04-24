@@ -4,9 +4,10 @@ Procedures for working with statictea variables.
 
 There is one dictionary to hold the logically separate dictionaries,
 g, h, s, t etc which makes passing them around easier.
+
 The language allows local variables to be specified without the l
 prefix and it allows functions to be specified without the f prefix.
-Dot names ie: l.d.a can be used on the left hand side of the equal sign.
+
 
 * [variables.nim](../src/variables.nim) &mdash; Nim source code.
 # Index
@@ -15,13 +16,10 @@ Dot names ie: l.d.a can be used on the left hand side of the equal sign.
 * type: [Variables](#variables) &mdash; Dictionary holding all statictea variables in multiple distinct logical dictionaries.
 * type: [VariableData](#variabledata) &mdash; A variable name, operator and value which is the result of
 running a statement.
-* [newVariableData](#newvariabledata) &mdash; Create a new VariableData object.
 * [newVariableDataOr](#newvariabledataor) &mdash; Create a VariableData object containing a warning.
 * [newVariableDataOr](#newvariabledataor-1) &mdash; Create a VariableData object containing a warning.
 * [newVariableDataOr](#newvariabledataor-2) &mdash; Create a VariableData object containing a value.
 * [`$`](#) &mdash; Return a string representation of VariableData.
-* [newVarsDictOr](#newvarsdictor) &mdash; Return a new varsDictOr object containing a warning.
-* [newVarsDictOr](#newvarsdictor-1) &mdash; Return a new VarsDict object containing a dictionary.
 * [emptyVariables](#emptyvariables) &mdash; Create an empty variables object in its initial state.
 * [getTeaVarIntDefault](#getteavarintdefault) &mdash; Return the int value of one of the tea dictionary integer items.
 * [getTeaVarStringDefault](#getteavarstringdefault) &mdash; Return the string value of one of the tea dictionary string items.
@@ -70,12 +68,12 @@ VariableData = object
 
 ```
 
-# newVariableData
+# newVariableDataOr
 
-Create a new VariableData object.
+Create a VariableData object containing a warning.
 
 ```nim
-func newVariableData(dotNameStr: string; operator: string; value: Value): VariableData
+func newVariableDataOr(warning: Warning; p1 = ""; pos = 0): VariableDataOr
 ```
 
 # newVariableDataOr
@@ -83,16 +81,7 @@ func newVariableData(dotNameStr: string; operator: string; value: Value): Variab
 Create a VariableData object containing a warning.
 
 ```nim
-func newVariableDataOr(warning: Warning; p1 = ""; pos = 0): OpResultWarn[
-    VariableData]
-```
-
-# newVariableDataOr
-
-Create a VariableData object containing a warning.
-
-```nim
-func newVariableDataOr(warningData: WarningData): OpResultWarn[VariableData]
+func newVariableDataOr(warningData: WarningData): VariableDataOr
 ```
 
 # newVariableDataOr
@@ -100,8 +89,7 @@ func newVariableDataOr(warningData: WarningData): OpResultWarn[VariableData]
 Create a VariableData object containing a value.
 
 ```nim
-func newVariableDataOr(dotNameStr: string; operator = "="; value: Value): OpResultWarn[
-    VariableData]
+func newVariableDataOr(dotNameStr: string; operator = "="; value: Value): VariableDataOr
 ```
 
 # `$`
@@ -110,23 +98,6 @@ Return a string representation of VariableData.
 
 ```nim
 func `$`(v: VariableData): string
-```
-
-# newVarsDictOr
-
-Return a new varsDictOr object containing a warning.
-
-```nim
-func newVarsDictOr(warning: Warning; p1: string = ""; pos = 0): OpResultWarn[
-    VarsDict]
-```
-
-# newVarsDictOr
-
-Return a new VarsDict object containing a dictionary.
-
-```nim
-func newVarsDictOr(varsDict: VarsDict): OpResultWarn[VarsDict]
 ```
 
 # emptyVariables
@@ -176,7 +147,7 @@ proc assignVariable(variables: var Variables; dotNameStr: string; value: Value;
 Look up the variable and return its value when found, else return a warning.
 
 ```nim
-proc getVariable(variables: Variables; dotNameStr: string): OpResultWarn[Value]
+proc getVariable(variables: Variables; dotNameStr: string): ValueOr
 ```
 
 # argsPrepostList

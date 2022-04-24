@@ -5,10 +5,12 @@ StaticTea variable types.
 * [vartypes.nim](../src/vartypes.nim) &mdash; Nim source code.
 # Index
 
-* type: [VarsDict](#varsdict) &mdash; Variables dictionary type.
-* type: [ValueKind](#valuekind) &mdash; The type of Variables.
-* type: [Value](#value) &mdash; Variable value reference.
+* type: [VarsDict](#varsdict) &mdash; The statictea dictionary type.
+* type: [ValueKind](#valuekind) &mdash; The statictea variable types.
+* type: [Value](#value) &mdash; A variable's value reference.
 * [newVarsDict](#newvarsdict) &mdash; Create a new empty variables dictionary.
+* [newVarsDictOr](#newvarsdictor) &mdash; Return a new varsDictOr object containing a warning.
+* [newVarsDictOr](#newvarsdictor-1) &mdash; Return a new VarsDict object containing a dictionary.
 * [newValue](#newvalue) &mdash; Create a string value.
 * [newValue](#newvalue-1) &mdash; Create an integer value.
 * [newValue](#newvalue-2) &mdash; Create an integer value from a bool.
@@ -21,21 +23,21 @@ StaticTea variable types.
 same type (may be Value type).
 * [newEmptyListValue](#newemptylistvalue) &mdash; Return an empty list value.
 * [newEmptyDictValue](#newemptydictvalue) &mdash; Create a dictionary value from a VarsDict.
-* [`==`](#) &mdash; Return true when two values are equal.
-* [`$`](#-1) &mdash; Return a string representation of a value's type.
+* [`==`](#) &mdash; Return true when two variables are equal.
+* [`$`](#-1) &mdash; Return a string representation of the variable's type.
 * [dictToString](#dicttostring) &mdash; Return a string representation of a dict Value in JSON format.
-* [listToString](#listtostring) &mdash; Return a string representation of a list Value in JSON format.
-* [valueToString](#valuetostring) &mdash; Return a string representation of a Value in JSON format.
-* [valueToStringRB](#valuetostringrb) &mdash; Return the string representation of the Value for use in the replacement blocks.
+* [listToString](#listtostring) &mdash; Return a string representation of a list variable in JSON format.
+* [valueToString](#valuetostring) &mdash; Return a string representation of a variable in JSON format.
+* [valueToStringRB](#valuetostringrb) &mdash; Return the string representation of the variable for use in the replacement blocks.
 * [`$`](#-2) &mdash; Return a string representation of a Value.
 * [`$`](#-3) &mdash; Return a string representation of a VarsDict.
-* [newValueOr](#newvalueor) &mdash; Create a OpResultWarn[Value] warning.
-* [newValueOr](#newvalueor-1) &mdash; Create a OpResultWarn[Value] warning.
-* [newValueOr](#newvalueor-2) &mdash; Create a OpResultWarn[Value] value.
+* [newValueOr](#newvalueor) &mdash; Create a new ValueOr containing a warning.
+* [newValueOr](#newvalueor-1) &mdash; Create a new ValueOr containing a warning.
+* [newValueOr](#newvalueor-2) &mdash; Create a new ValueOr containing a value.
 
 # VarsDict
 
-Variables dictionary type. This is a ref type. Create a new
+The statictea dictionary type. This is a ref type. Create a new
 VarsDict with newVarsDict procedure.
 
 ```nim
@@ -44,7 +46,7 @@ VarsDict = OrderedTableRef[string, Value]
 
 # ValueKind
 
-The type of Variables.
+The statictea variable types.
 
 ```nim
 ValueKind = enum
@@ -53,7 +55,7 @@ ValueKind = enum
 
 # Value
 
-Variable value reference.
+A variable's value reference.
 
 ```nim
 Value = ref ValueObj
@@ -65,6 +67,22 @@ Create a new empty variables dictionary. VarsDict is a ref type.
 
 ```nim
 proc newVarsDict(): VarsDict
+```
+
+# newVarsDictOr
+
+Return a new varsDictOr object containing a warning.
+
+```nim
+func newVarsDictOr(warning: Warning; p1: string = ""; pos = 0): VarsDictOr
+```
+
+# newVarsDictOr
+
+Return a new VarsDict object containing a dictionary.
+
+```nim
+func newVarsDictOr(varsDict: VarsDict): VarsDictOr
 ```
 
 # newValue
@@ -169,7 +187,7 @@ proc newEmptyDictValue(): Value
 
 # `==`
 
-Return true when two values are equal.
+Return true when two variables are equal.
 
 ```nim
 proc `==`(value1: Value; value2: Value): bool
@@ -177,7 +195,7 @@ proc `==`(value1: Value; value2: Value): bool
 
 # `$`
 
-Return a string representation of a value's type.
+Return a string representation of the variable's type.
 
 ```nim
 func `$`(kind: ValueKind): string
@@ -193,7 +211,7 @@ func dictToString(value: Value): string
 
 # listToString
 
-Return a string representation of a list Value in JSON format.
+Return a string representation of a list variable in JSON format.
 
 ```nim
 func listToString(value: Value): string
@@ -201,7 +219,7 @@ func listToString(value: Value): string
 
 # valueToString
 
-Return a string representation of a Value in JSON format.
+Return a string representation of a variable in JSON format.
 
 ```nim
 func valueToString(value: Value): string
@@ -209,7 +227,7 @@ func valueToString(value: Value): string
 
 # valueToStringRB
 
-Return the string representation of the Value for use in the replacement blocks.
+Return the string representation of the variable for use in the replacement blocks.
 
 ```nim
 func valueToStringRB(value: Value): string
@@ -233,26 +251,26 @@ proc `$`(varsDict: VarsDict): string
 
 # newValueOr
 
-Create a OpResultWarn[Value] warning.
+Create a new ValueOr containing a warning.
 
 ```nim
-func newValueOr(warning: Warning; p1 = ""; pos = 0): OpResultWarn[Value]
+func newValueOr(warning: Warning; p1 = ""; pos = 0): ValueOr
 ```
 
 # newValueOr
 
-Create a OpResultWarn[Value] warning.
+Create a new ValueOr containing a warning.
 
 ```nim
-func newValueOr(warningData: WarningData): OpResultWarn[Value]
+func newValueOr(warningData: WarningData): ValueOr
 ```
 
 # newValueOr
 
-Create a OpResultWarn[Value] value.
+Create a new ValueOr containing a value.
 
 ```nim
-func newValueOr(value: Value): OpResultWarn[Value]
+func newValueOr(value: Value): ValueOr
 ```
 
 

@@ -7,11 +7,13 @@ import opresultwarn
 
 type
   VarsDict* = OrderedTableRef[string, Value]
-    ## Variables dictionary type. This is a ref type. Create a new
+    ## The statictea dictionary type. This is a ref type. Create a new
     ## @:VarsDict with newVarsDict procedure.
 
+  VarsDictOr* = OpResultWarn[VarsDict]
+
   ValueKind* = enum
-    ## The type of Variables.
+    ## The statictea variable types.
     vkString,
     vkInt,
     vkFloat,
@@ -19,10 +21,12 @@ type
     vkList
 
   Value* = ref ValueObj
-    ## Variable value reference.
+    ## A variable's value reference.
+
+  ValueOr* = OpResultWarn[Value]
 
   ValueObj {.acyclic.} = object
-    ## Variable value object.
+    ## A variable's value object.
     case kind*: ValueKind
     of vkString:
       stringv*: string
@@ -38,6 +42,16 @@ type
 proc newVarsDict*(): VarsDict =
   ## Create a new empty variables dictionary. VarsDict is a ref type.
   result = newOrderedTable[string, Value]()
+
+func newVarsDictOr*(warning: Warning, p1: string = "", pos = 0):
+     VarsDictOr =
+  ## Return a new varsDictOr object containing a warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[VarsDict](warningData)
+
+func newVarsDictOr*(varsDict: VarsDict): VarsDictOr =
+  ## Return a new VarsDict object containing a dictionary.
+  result = opValueW[VarsDict](varsDict)
 
 proc newValue*(str: string): Value =
   ## Create a string value.
@@ -110,7 +124,7 @@ proc newEmptyDictValue*(): Value =
   result = newValue(newVarsDict())
 
 proc `==`*(value1: Value, value2: Value): bool =
-  ## Return true when two values are equal.
+  ## Return true when two variables are equal.
   if value1.kind == value2.kind:
     case value1.kind:
       of vkString:
@@ -125,7 +139,7 @@ proc `==`*(value1: Value, value2: Value): bool =
         result = value1.listv == value2.listv
 
 func `$`*(kind: ValueKind): string =
-  ## Return a string representation of a value's type.
+  ## Return a string representation of the variable's type.
   case kind
   of vkString:
     result = "string"
@@ -155,7 +169,7 @@ func dictToString*(value: Value): string =
   result.add("}")
 
 func listToString*(value: Value): string =
-  ## Return a string representation of a list Value in JSON format.
+  ## Return a string representation of a list variable in JSON format.
   result.add("[")
   for ix, item in value.listv:
     if ix > 0:
@@ -164,7 +178,7 @@ func listToString*(value: Value): string =
   result.add("]")
 
 func valueToString*(value: Value): string =
-  ## Return a string representation of a Value in JSON format.
+  ## Return a string representation of a variable in JSON format.
   case value.kind:
     of vkDict:
       result.add(dictToString(value))
@@ -178,7 +192,7 @@ func valueToString*(value: Value): string =
       result.add($value.floatv)
 
 func valueToStringRB*(value: Value): string =
-  ## Return the string representation of the Value for use in the
+  ## Return the string representation of the variable for use in the
   ## replacement blocks.
   case value.kind
   of vkString:
@@ -200,16 +214,15 @@ proc `$`*(varsDict: VarsDict): string =
   ## Return a string representation of a VarsDict.
   result = valueToString(newValue(varsDict))
 
-func newValueOr*(warning: Warning, p1 = "", pos = 0):
-    OpResultWarn[Value] =
-  ## Create a OpResultWarn[Value] warning.
+func newValueOr*(warning: Warning, p1 = "", pos = 0): ValueOr =
+  ## Create a new ValueOr containing a warning.
   let warningData = newWarningData(warning, p1, pos)
   result = opMessageW[Value](warningData)
 
-func newValueOr*(warningData: WarningData): OpResultWarn[Value] =
-  ## Create a OpResultWarn[Value] warning.
+func newValueOr*(warningData: WarningData): ValueOr =
+  ## Create a new ValueOr containing a warning.
   result = opMessageW[Value](warningData)
 
-func newValueOr*(value: Value): OpResultWarn[Value] =
-  ## Create a OpResultWarn[Value] value.
+func newValueOr*(value: Value): ValueOr =
+  ## Create a new ValueOr containing a value.
   result = opValueW[Value](value)

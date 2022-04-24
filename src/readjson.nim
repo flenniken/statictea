@@ -55,8 +55,7 @@ proc jsonToValue*(jsonNode: JsonNode, depth: int = 0): Option[Value] =
     value = Value(kind: vkList, listv: listVars)
   result = some(value)
 
-proc readJsonStream*(stream: Stream, filename: string = ""):
-    OpResultWarn[Value] =
+proc readJsonStream*(stream: Stream, filename: string = ""): ValueOr =
   ## Read a json stream and return the variables.  If there is an
   ## error, return a warning. The filename is used in warning
   ## messages.
@@ -82,15 +81,14 @@ proc readJsonStream*(stream: Stream, filename: string = ""):
 
   result = newValueOr(newValue(dict))
 
-proc readJsonString*(content: string, filename: string = ""):
-    OpResultWarn[Value] =
+proc readJsonString*(content: string, filename: string = ""): ValueOr =
   ## Read a json string and return the variables.  If there is an
   ## error, return a warning. The filename is used in warning
   ## messages.
   var stream = newStringStream(content)
   result = readJsonStream(stream, filename)
 
-proc readJsonFile*(filename: string): OpResultWarn[Value] =
+proc readJsonFile*(filename: string): ValueOr =
   ## Read a json file and return the variables.  If there is an
   ## error, return a warning.
 
