@@ -255,42 +255,6 @@ suite "runFunction.nim":
     let eFunResult = newFunResultWarn(kWrongType, 1, "int")
     check testFunction("get", parameters, eFunResult)
 
-  test "get dict by index":
-    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
-    var parameters = @[dict, newValue(0)]
-    let eFunResult = newFunResult(newValue(1))
-    check testFunction("get", parameters, eFunResult)
-
-  test "get dict by index b":
-    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
-    var parameters = @[dict, newValue(1)]
-    let eFunResult = newFunResult(newValue(2))
-    check testFunction("get", parameters, eFunResult)
-
-  test "get dict by index c":
-    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
-    var parameters = @[dict, newValue(4)]
-    let eFunResult = newFunResult(newValue(5))
-    check testFunction("get", parameters, eFunResult)
-
-  test "get dict negative index":
-    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
-    var parameters = @[dict, newValue(-1)]
-    let eFunResult = newFunResultWarn(wInvalidIndex, 1, "-1")
-    check testFunction("get", parameters, eFunResult)
-
-  test "get dict index too big":
-    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
-    var parameters = @[dict, newValue(5)]
-    let eFunResult = newFunResultWarn(wMissingDictIndex, 1, "5")
-    check testFunction("get", parameters, eFunResult)
-
-  test "get dict use default":
-    var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
-    var parameters = @[dict, newValue(5), newValue("def")]
-    let eFunResult = newFunResult(newValue("def"))
-    check testFunction("get", parameters, eFunResult)
-
   test "get warning about best matching get":
     # Test the warning is about the function that makes it through the
     # most number of parameters. The second get function has a dict as

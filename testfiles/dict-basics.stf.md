@@ -46,15 +46,6 @@ y = {y}
 $$ endblock
 
 $$ block
-$$ : name = get(s, 0)
-$$ : d = get(s, 1)
-Get the dictionary values by index.
-name = {name}
-x = {d.x}
-y = {d.y}
-$$ endblock
-
-$$ block
 $$ : d = dict(["a", 9, "b", 8, "c", 7])
 Create a new dictionary.
 d = {d}
@@ -95,11 +86,6 @@ name = server
 x = 100
 y = 200
 
-Get the dictionary values by index.
-name = server
-x = 100
-y = 200
-
 Create a new dictionary.
 d = {"a":9,"b":8,"c":7}
 d.a = 9
@@ -119,10 +105,10 @@ d.c = 7
 tmpl.txt(3): w56: The dictionary does not have an item with key d.
 statement: a = get(d, "d")
                       ^
-tmpl.txt(4): w74: Index values must greater than or equal to 0, got: -1.
+tmpl.txt(4): w120: Wrong parameter type, expected string.
 statement: b = get(d, -1)
                       ^
-tmpl.txt(5): w172: The dictionary does not have an item with index 3.
+tmpl.txt(5): w120: Wrong parameter type, expected string.
 statement: c = get(d, 3)
                       ^
 tmpl.txt(6): w120: Wrong parameter type, expected string.

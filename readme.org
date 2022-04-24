@@ -1239,17 +1239,6 @@ get(d, "y") => 200
 get(d, "missing", 99) => 99
 #+END_SRC
 
-You can also access the elements by index:
-
-#+BEGIN_SRC
-d = dict("a", 4, "b", 2, "c", 5)
-
-get(d, 0) => 4
-get(d, 1) => 2
-get(d, 2) => 5
-get(d, 3, 9) => 9
-#+END_SRC
-
 You append to a dictionary when you create a new variable. In the
 following example the "a" and "str" elements are appended to the
 d dictionary.
