@@ -45,34 +45,36 @@ type
     value*: Value
     length*: Natural
 
+  ValueAndLengthOr* = OpResultWarn[ValueAndLength]
+
 proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
   ## Create a newValueAndLength object.
   result = ValueAndLength(value: value, length: length)
 
 func newValueAndLengthOr*(warning: Warning, p1 = "", pos = 0):
-    OpResultWarn[ValueAndLength] =
-  ## Create a OpResultWarn[ValueAndLength] warning.
+    ValueAndLengthOr =
+  ## Create a ValueAndLengthOr warning.
   let warningData = newWarningData(warning, p1, pos)
   result = opMessageW[ValueAndLength](warningData)
 
 func newValueAndLengthOr*(warningData: WarningData):
-    OpResultWarn[ValueAndLength] =
-  ## Create a OpResultWarn[ValueAndLength] warning.
+    ValueAndLengthOr =
+  ## Create a ValueAndLengthOr warning.
   result = opMessageW[ValueAndLength](warningData)
 
 func newValueAndLengthOr*(value: Value, length: Natural):
-    OpResultWarn[ValueAndLength] =
-  ## Create a OpResultWarn[ValueAndLength] value.
+    ValueAndLengthOr =
+  ## Create a ValueAndLengthOr value.
   let val = ValueAndLength(value: value, length: length)
   result = opValueW[ValueAndLength](val)
 
 proc newValueAndLengthOr*(number: int | int64 | float64 | string,
-    length: Natural): OpResultWarn[ValueAndLength] =
+    length: Natural): ValueAndLengthOr =
   result = newValueAndLengthOr(newValue(number), length)
 
 func newValueAndLengthOr*(val: ValueAndLength):
-    OpResultWarn[ValueAndLength] =
-  ## Create a OpResultWarn[ValueAndLength].
+    ValueAndLengthOr =
+  ## Create a ValueAndLengthOr.
   result = opValueW[ValueAndLength](val)
 
 func newLengthOr*(warning: Warning, p1 = "", pos = 0):
@@ -236,7 +238,7 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
     yield newStatement(strip(text), lineNum, start)
 
 func getString*(statement: Statement, start: Natural):
-    OpResultWarn[ValueAndLength] =
+    ValueAndLengthOr =
   ## Return a literal string value and match length from a statement. The
   ## start parameter is the index of the first quote in the statement
   ## and the return length includes optional trailing white space
@@ -253,7 +255,7 @@ func getString*(statement: Statement, start: Natural):
     parsedString.pos - start)
 
 proc getNumber*(statement: Statement, start: Natural):
-    OpResultWarn[ValueAndLength] =
+    ValueAndLengthOr =
   ## Return the literal number value and match length from the
   ## statement. The start index points at a digit or minus sign. The
   ## length includes the trailing whitespace.
@@ -289,7 +291,7 @@ proc getNumber*(statement: Statement, start: Natural):
 
 # Forward reference to getValueAndLength since we call it recursively.
 proc getValueAndLength*(statement: Statement, start: Natural, variables:
-  Variables, skip: bool): OpResultWarn[ValueAndLength]
+  Variables, skip: bool): ValueAndLengthOr
 
 # Call stack:
 # - runStatement
@@ -302,7 +304,7 @@ proc ifFunction*(
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list=false): OpResultWarn[ValueAndLength] =
+    list=false): ValueAndLengthOr =
   ## Return the if0 and if1 function's value and the length. These
   ## functions conditionally run one of their parameters. Start points
   ## at the first parameter of the function. The length includes the
@@ -381,7 +383,7 @@ proc getFunctionValueAndLength*(
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list = false, skip: bool): OpResultWarn[ValueAndLength] =
+    list = false, skip: bool): ValueAndLengthOr =
   ## Return the function's value and the length. Start points at the
   ## first parameter of the function. The length includes the trailing
   ## whitespace after the ending ).
@@ -450,7 +452,7 @@ proc getFunctionValueAndLength*(
   result = newValueAndLengthOr(funResult.value, pos-start)
 
 proc getList(statement: Statement, start: Natural,
-    variables: Variables, skip: bool): OpResultWarn[ValueAndLength] =
+    variables: Variables, skip: bool): ValueAndLengthOr =
   ## Return the literal list value and match length from the
   ## statement. The start index points at [. The length includes the
   ## trailing whitespace after the ending ].
@@ -473,7 +475,7 @@ proc getList(statement: Statement, start: Natural,
   result = newValueAndLengthOr(valueAndLength)
 
 proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
-    Variables, skip: bool): OpResultWarn[ValueAndLength] =
+    Variables, skip: bool): ValueAndLengthOr =
   ## Get the value and length from the statement.
 
   # The first character determines its type.
@@ -544,7 +546,7 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
     return newValueAndLengthOr(wInvalidRightHandSide, "", start)
 
 proc getValueAndLength*(statement: Statement, start: Natural, variables:
-    Variables, skip: bool): OpResultWarn[ValueAndLength] =
+    Variables, skip: bool): ValueAndLengthOr =
   ## Return the value and length of the item that the start parameter
   ## points at which is a string, number, variable, function or list.
   ## The length returned includes the trailing whitespace after the
@@ -567,7 +569,7 @@ proc getValueAndLength*(statement: Statement, start: Natural, variables:
     showDebugPos(statement, pos, "f")
 
 proc runStatement*(statement: Statement, variables: Variables):
-    OpResultWarn[VariableData] =
+    VariableDataOr =
   ## Run one statement and return the variable dot name string,
   ## operator and value.
 

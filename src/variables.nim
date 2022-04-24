@@ -31,8 +31,8 @@ type
     ## logical dictionaries.
 
   VariableData* = object
-    ## A variable name, operator and value which is the result of
-    ## @:running a statement.
+    ## The VariableData object holds the variable name, operator and
+    ## @:value which is the result of running a statement.
     ## @:
     ## @:* dotNameStr -- the dot name tells which dictionary contains
     ## @:the variable, i.e.: l.d.a
@@ -144,7 +144,7 @@ proc resetVariables*(variables: var Variables) =
   variables["l"] = newValue(newVarsDict())
 
 proc getParentDictToAddTo(variables: Variables, dotNameStr: string):
-    OpResultWarn[VarsDict] =
+    VarsDictOr =
   ## Return the last component dictionary specified by the given names
   ## or, on error, return a warning.  For the dot name string
   ## "a.b.c.d" and the c dictionary is the result.
@@ -242,7 +242,7 @@ proc assignVariable*(
   # -- You can specify local variables without the l prefix.
 
   assert dotNameStr.len > 0
-  var varDictOr: OpResultWarn[VarsDict]
+  var varsDictOr: VarsDictOr
   let names = split(dotNameStr, '.')
 
   let nameSpace = names[0]
@@ -256,32 +256,32 @@ proc assignVariable*(
   of "g", "l":
     if names.len == 1:
       return some(newWarningData(wImmutableVars))
-    varDictOr = getParentDictToAddTo(variables, dotNameStr)
+    varsDictOr = getParentDictToAddTo(variables, dotNameStr)
   of "f", "i", "j", "k", "m", "n", "o", "p", "q", "r", "u":
     return some(newWarningData(wReservedNameSpaces))
   else:
     # It must be a local variable, add the missing l.
-    varDictOr = getParentDictToAddTo(variables, "l." & dotNameStr)
+    varsDictOr = getParentDictToAddTo(variables, "l." & dotNameStr)
 
-  if varDictOr.isMessage:
-    return some(varDictOr.message)
+  if varsDictOr.isMessage:
+    return some(varsDictOr.message)
 
   let lastName = names[^1]
   if operator == "=":
     # Assign the value to the dictionary.
-    if lastName in varDictOr.value:
+    if lastName in varsDictOr.value:
       return some(newWarningData(wImmutableVars))
-    varDictOr.value[lastName] = value
+    varsDictOr.value[lastName] = value
   else:
     assert operator == "&="
 
     # Append to a list, or create then append.
 
     # If the variable doesn't exists, create an empty list.
-    if not (lastName in varDictOr.value):
-      varDictOr.value[lastName] = newEmptyListValue()
+    if not (lastName in varsDictOr.value):
+      varsDictOr.value[lastName] = newEmptyListValue()
 
-    let lastItem = varDictOr.value[lastName]
+    let lastItem = varsDictOr.value[lastName]
     if lastItem.kind != vkList:
       # You can only append to a list, got $1.
       return some(newWarningData(wAppendToList, $lastItem.kind))

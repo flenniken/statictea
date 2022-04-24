@@ -82,7 +82,7 @@ proc compareStatements(statements: seq[Statement], eContent: string): bool =
   return true
 
 proc cmpValueAndLengthOr(statement: Statement,
-    g, e: OpResultWarn[ValueAndLength], start = 0): bool =
+    g, e: ValueAndLengthOr, start = 0): bool =
   ## Compare the two values and show the differences when
   ## different. Return true when they are the same.
 
@@ -118,7 +118,7 @@ proc testGetStatements(content: string, expected: string): bool =
     result = false
 
 proc testGetNumber(statement: Statement, start: Natural,
-    eValueAndLengthOr: OpResultWarn[ValueAndLength]): bool =
+    eValueAndLengthOr: ValueAndLengthOr): bool =
   ## Return true when the statement contains the expected number. When
   ## it doesn't, show the values and expected values and return false.
 
@@ -131,7 +131,7 @@ proc testGetNumber(statement: Statement, start: Natural,
     result = false
 
 proc testGetString(statement: Statement, start: Natural,
-    eValueAndLengthOr: OpResultWarn[ValueAndLength]): bool =
+    eValueAndLengthOr: ValueAndLengthOr): bool =
 
   let valueAndLengthOr = getString(statement, start)
   result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr)
@@ -162,7 +162,7 @@ proc testGetFunctionValueAndLength(
   functionName: string,
   statement: Statement,
   start: Natural,
-  eValueAndLengthOr: OpResultWarn[ValueAndLength]
+  eValueAndLengthOr: ValueAndLengthOr
     ): bool =
 
   var variables = emptyVariables()

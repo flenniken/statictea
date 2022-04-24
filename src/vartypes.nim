@@ -102,11 +102,13 @@ proc newValue*[T](list: openArray[T]): Value =
 
 proc newValue*[T](dictPairs: openArray[(string, T)]): Value =
   ## New dict value from an array of pairs where the pairs are the
-  ## @:same type (may be Value type).
+  ## @:same type which may be Value type.
   ## @:
+  ## @:~~~
   ## @: let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
   ## @: let dictValue = newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)])
   ## @: let dictValue = newValue([("a", newValue(1.1)), ("b", newValue("a"))])
+  ## @:~~~~
   var varsTable = newVarsDict()
   for tup in dictPairs:
     let (a, b) = tup
