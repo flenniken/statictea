@@ -9,10 +9,10 @@ Run a command and fill in the variables dictionaries.
 starts in the template file.
 * type: [ValueAndLength](#valueandlength) &mdash; A value and the length of the matching text in the statement.
 * [newValueAndLength](#newvalueandlength) &mdash; Create a newValueAndLength object.
-* [newValueAndLengthOr](#newvalueandlengthor) &mdash; Create a OpResultWarn[ValueAndLength] warning.
-* [newValueAndLengthOr](#newvalueandlengthor-1) &mdash; Create a OpResultWarn[ValueAndLength] warning.
-* [newValueAndLengthOr](#newvalueandlengthor-2) &mdash; Create a OpResultWarn[ValueAndLength] value.
-* [newValueAndLengthOr](#newvalueandlengthor-3) &mdash; Create a OpResultWarn[ValueAndLength].
+* [newValueAndLengthOr](#newvalueandlengthor) &mdash; Create a ValueAndLengthOr warning.
+* [newValueAndLengthOr](#newvalueandlengthor-1) &mdash; Create a ValueAndLengthOr warning.
+* [newValueAndLengthOr](#newvalueandlengthor-2) &mdash; Create a ValueAndLengthOr value.
+* [newValueAndLengthOr](#newvalueandlengthor-3) &mdash; Create a ValueAndLengthOr.
 * [newLengthOr](#newlengthor) &mdash; Create a OpResultWarn[Natural] warning.
 * [newLengthOr](#newlengthor-1) &mdash; Create a OpResultWarn[Natural] value.
 * [newStatement](#newstatement) &mdash; Create a new statement.
@@ -70,36 +70,34 @@ proc newValueAndLength(value: Value; length: Natural): ValueAndLength
 
 # newValueAndLengthOr
 
-Create a OpResultWarn[ValueAndLength] warning.
+Create a ValueAndLengthOr warning.
 
 ```nim
-func newValueAndLengthOr(warning: Warning; p1 = ""; pos = 0): OpResultWarn[
-    ValueAndLength]
+func newValueAndLengthOr(warning: Warning; p1 = ""; pos = 0): ValueAndLengthOr
 ```
 
 # newValueAndLengthOr
 
-Create a OpResultWarn[ValueAndLength] warning.
+Create a ValueAndLengthOr warning.
 
 ```nim
-func newValueAndLengthOr(warningData: WarningData): OpResultWarn[ValueAndLength]
+func newValueAndLengthOr(warningData: WarningData): ValueAndLengthOr
 ```
 
 # newValueAndLengthOr
 
-Create a OpResultWarn[ValueAndLength] value.
+Create a ValueAndLengthOr value.
 
 ```nim
-func newValueAndLengthOr(value: Value; length: Natural): OpResultWarn[
-    ValueAndLength]
+func newValueAndLengthOr(value: Value; length: Natural): ValueAndLengthOr
 ```
 
 # newValueAndLengthOr
 
-Create a OpResultWarn[ValueAndLength].
+Create a ValueAndLengthOr.
 
 ```nim
-func newValueAndLengthOr(val: ValueAndLength): OpResultWarn[ValueAndLength]
+func newValueAndLengthOr(val: ValueAndLength): ValueAndLengthOr
 ```
 
 # newLengthOr
@@ -188,8 +186,7 @@ iterator yieldStatements(cmdLines: CmdLines): Statement
 Return a literal string value and match length from a statement. The start parameter is the index of the first quote in the statement and the return length includes optional trailing white space after the last quote.
 
 ```nim
-func getString(statement: Statement; start: Natural): OpResultWarn[
-    ValueAndLength]
+func getString(statement: Statement; start: Natural): ValueAndLengthOr
 ```
 
 # getNumber
@@ -197,8 +194,7 @@ func getString(statement: Statement; start: Natural): OpResultWarn[
 Return the literal number value and match length from the statement. The start index points at a digit or minus sign. The length includes the trailing whitespace.
 
 ```nim
-proc getNumber(statement: Statement; start: Natural): OpResultWarn[
-    ValueAndLength]
+proc getNumber(statement: Statement; start: Natural): ValueAndLengthOr
 ```
 
 # ifFunction
@@ -207,7 +203,7 @@ Return the if0 and if1 function's value and the length. These functions conditio
 
 ```nim
 proc ifFunction(functionName: string; statement: Statement; start: Natural;
-                variables: Variables; list = false): OpResultWarn[ValueAndLength]
+                variables: Variables; list = false): ValueAndLengthOr
 ```
 
 # getFunctionValueAndLength
@@ -217,8 +213,7 @@ Return the function's value and the length. Start points at the first parameter 
 ```nim
 proc getFunctionValueAndLength(functionName: string; statement: Statement;
                                start: Natural; variables: Variables;
-                               list = false; skip: bool): OpResultWarn[
-    ValueAndLength]
+                               list = false; skip: bool): ValueAndLengthOr
 ```
 
 # getValueAndLength
@@ -227,8 +222,7 @@ Return the value and length of the item that the start parameter points at which
 
 ```nim
 proc getValueAndLength(statement: Statement; start: Natural;
-                       variables: Variables; skip: bool): OpResultWarn[
-    ValueAndLength]
+                       variables: Variables; skip: bool): ValueAndLengthOr
 ```
 
 # runStatement
@@ -236,8 +230,7 @@ proc getValueAndLength(statement: Statement; start: Natural;
 Run one statement and return the variable dot name string, operator and value.
 
 ```nim
-proc runStatement(statement: Statement; variables: Variables): OpResultWarn[
-    VariableData]
+proc runStatement(statement: Statement; variables: Variables): VariableDataOr
 ```
 
 # runCommand

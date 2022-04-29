@@ -247,12 +247,12 @@ func getString*(statement: Statement, start: Natural):
   let str = statement.text
 
   # Parse the json string and remove escaping.
-  let parsedString = parseJsonStr(str, start+1)
-  if parsedString.messageId != MessageId(0):
-    return newValueAndLengthOr(parsedString.messageId, "", parsedString.pos)
+  let strAndPosOr = parseJsonStr(str, start+1)
+  if strAndPosOr.isMessage:
+    return newValueAndLengthOr(strAndPosOr.message)
 
-  result = newValueAndLengthOr(newValue(parsedString.str),
-    parsedString.pos - start)
+  result = newValueAndLengthOr(newValue(strAndPosOr.value.str),
+    strAndPosOr.value.pos - start)
 
 proc getNumber*(statement: Statement, start: Natural):
     ValueAndLengthOr =

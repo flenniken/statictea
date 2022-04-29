@@ -1827,7 +1827,6 @@ List of functions:
 - [[#find][find()]] -- Find the position of a substring in a string.
 - [[#float][float()]] -- Create a float from an int.
 - [[#float][float()]] -- Create a float from a number string.
-- [[#get][get()]] -- Get a dictionary value by its index.
 - [[#get][get()]] -- Get a dictionary value by its key.
 - [[#get][get()]] -- Get a list value by its index.
 - [[#githubAnchor][githubAnchor()]] -- Create Github anchor names from heading names.
@@ -2222,28 +2221,6 @@ Examples:
 float("2") => 2.0
 float("2.4") => 2.4
 float("33") => 33.0
-#+END_SRC
-
-[[#contents][茶]]
-
-** get()
-:PROPERTIES:
-:CUSTOM_ID: get
-:END:
-
-Get a dictionary value by its index.  If the index doesn't exist, the default value is returned if specified, else a warning is generated. The insertion order defines the order.
-
-#+BEGIN_SRC
-get(dictionary: dict, index: int, optional default: any) any
-#+END_SRC
-
-Examples:
-
-#+BEGIN_SRC
-d = dict("x", 1, "y", 8, "z": 6)
-get(d, 0) => 1
-get(d, 1) => 8
-get(d, 2) => 6
 #+END_SRC
 
 [[#contents][茶]]

@@ -6,15 +6,43 @@ import std/json
 import std/tables
 import vartypes
 import messages
+import warnings
 import unicodes
 import utf8decoder
-import OpResultWarn
+import opresultwarn
 
 # Json spec:
 # https://datatracker.ietf.org/doc/html/rfc8259
 
-var maxDepth* = 10
+# maxDepth is public for testing.
+var maxDepth* = 16
    ## The maximum depth you can nest items.
+
+type
+  StrAndPos* = object
+    ## StrAndPos holds the result of parsing a string literal. The
+    ## @:resulting parsed string and the ending string position.
+    ## @:
+    ## @:* str -- Resulting parsed string.
+    ## @:* pos -- The position after the last trailing whitespace.
+    str*: string
+    pos*: Natural
+
+  StrAndPosOr* = OpResultWarn[StrAndPos]
+
+func newStrAndPosOr*(warning: Warning, p1: string = "", pos = 0):
+     StrAndPosOr =
+  ## Return a new StrAndPos object containing a warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[StrAndPos](warningData)
+
+func newStrAndPosOr*(warningData: WarningData): StrAndPosOr =
+  ## Return a new StrAndPos object containing a warning.
+  result = opMessageW[StrAndPos](warningData)
+
+func newStrAndPosOr*(str: string, pos: Natural): StrAndPosOr =
+  ## Create a new StrAndPosOr object containing a value.
+  result = opValueW[StrAndPos](StrAndPos(str: str, pos: pos))
 
 proc jsonToValue*(jsonNode: JsonNode, depth: int = 0): ValueOr =
   ## Convert a json node to a statictea value.
@@ -94,24 +122,6 @@ proc readJsonFile*(filename: string): ValueOr =
       # The root json element must be an object (dictionary).
       result = newValueOr(wInvalidJsonRoot)
 
-type
-  ParsedString* = object
-    ## ParsedString holds the result of parsing a string literal. The
-    ## @:resulting parsed string and the ending string position.
-    ## @:
-    ## @:* str -- Resulting parsed string.
-    ## @:* pos -- The position after the last trailing whitespace or the
-    ## @:position at the first invalid character.
-    ## @:* messageId -- Message id is 0 when the string was successfully
-    ## @:parsed, else it is the message id telling what went wrong.
-    str*: string
-    pos*: Natural
-    messageId*: MessageId
-
-func newParsedString*(str: string, pos: Natural, messageId: MessageId): ParsedString =
-  ## Create a new ParsedString object.
-  result = ParsedString(str: str, pos: pos, messageId: messageId)
-
 proc unescapePopularChar*(popular: char): char =
   ## Unescape the popular char and return its value. If the char is
   ## not a popular char, return 0.
@@ -151,7 +161,7 @@ proc unescapePopularChar*(popular: char): char =
     # Invalid popular character, return 0.
     result = char(0)
 
-func parseJsonStr*(text: string, startPos: Natural): ParsedString =
+func parseJsonStr*(text: string, startPos: Natural): StrAndPosOr =
   ## Parse the quoted json string literal. The startPos points one
   ## past the leading double quote.  Return the parsed string value
   ## and the ending position one past the trailing whitespace. On
@@ -189,7 +199,7 @@ func parseJsonStr*(text: string, startPos: Natural): ParsedString =
       case getChar(text, pos):
       of '\0':
         # No ending double quote.
-        return newParsedString("", pos, wNoEndingQuote)
+        return newStrAndPosOr(wNoEndingQuote, "", pos)
       of '\\':
         state = slash
         inc(pos)
@@ -198,13 +208,13 @@ func parseJsonStr*(text: string, startPos: Natural): ParsedString =
         inc(pos)
       of char(1)..char(0x1f):
         # Controls characters must be escaped.
-        return newParsedString("", pos, wControlNotEscaped)
+        return newStrAndPosOr(wControlNotEscaped, "", pos)
       else:
         # Get the unicode character at pos.
         let str = utf8CharString(text, pos)
         if str.len == 0:
           # Invalid UTF-8 unicode character.
-          return newParsedString("", pos, wInvalidUtf8)
+          return newStrAndPosOr(wInvalidUtf8, "", pos)
 
         # Add the unicode character to the result string.
         newStr.add(str)
@@ -214,13 +224,13 @@ func parseJsonStr*(text: string, startPos: Natural): ParsedString =
       of 'u':
         let strOrc = parseHexUnicodeToString(text, pos)
         if strOrc.isMessage:
-          return newParsedString("", pos, strOrc.message)
+          return newStrAndPosOr(strOrc.message, "", pos)
         newStr.add(strOrc.value)
       else:
         let ch = unescapePopularChar(getChar(text, pos))
         if ch == '\0':
           # A slash must be followed by one letter from: nr"t\bf/.
-          return newParsedString("", pos, wNotPopular)
+          return newStrAndPosOr(wNotPopular, "", pos)
         newStr.add(ch)
         inc(pos)
       state = middle
@@ -231,4 +241,4 @@ func parseJsonStr*(text: string, startPos: Natural): ParsedString =
       else:
         break
 
-  result = newParsedString(newStr, pos, wSuccess)
+  result = newStrAndPosOr(newStr, pos)

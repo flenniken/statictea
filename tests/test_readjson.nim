@@ -12,17 +12,18 @@ import messages
 import utf8decoder
 import sharedtestcode
 import opresultwarn
+import warnings
 
 proc testParseJsonStr(text: string, start: Natural,
     eStr: string, eLength: Natural): bool =
   # Test parseJsonStr.
 
-  let parsedString = parseJsonStr(text, start)
-  if parsedString.messageId != MessageId(0):
-    echo "Unexpected error: " & $parsedString.messageId
+  let strAndPosOr = parseJsonStr(text, start)
+  if strAndPosOr.isMessage:
+    echo "Unexpected error: " & $strAndPosOr
     return false
-  let literal = parsedString.str
-  let length = parsedString.pos - start
+  let literal = strAndPosOr.value.str
+  let length = strAndPosOr.value.pos - start
 
   result = true
 
@@ -42,26 +43,16 @@ proc testParseJsonStr(text: string, start: Natural,
     result = false
 
 proc testParseJsonStrE(text: string, start: Natural,
-    eMessageId: Messageid, ePos: Natural): bool =
+    eWarningData: WarningData): bool =
   ## Test parseJsonStr for expected errors.
 
+  let strAndPosOr = parseJsonStr(text, start)
+
   result = true
-
-  let parsedString = parseJsonStr(text, start)
-  if parsedString.messageId == MessageId(0):
-    echo "Unexpected value: " & $parsedString
-    return false
-
-  let messageId = parsedString.messageId
-  if messageId != eMessageId:
-    echo "expected message: $1" % [$eMessageId]
-    echo "     got message: $1" % [$messageId]
-    result = false
-
-  let pos = parsedString.pos
-  if pos != ePos:
-    echo "expected pos: $1" % [$ePos]
-    echo "     got pos: $1" % [$pos]
+  let eStrAndPosOr = newStrAndPosOr(eWarningData)
+  if $strAndPosOr != $eStrAndPosOr:
+    echo "expected: $1" % $strAndPosOr
+    echo "     got: $1" % $eStrAndPosOr
     result = false
 
 proc testUnescapePopularChar(popular: char, eChar: char): bool =
@@ -462,32 +453,39 @@ she sat down in a large arm-chair at one end of the table.
     str = bytesToString([0xE2u8, 0x80, 0x90, 0x34, uint8('"')])
     check testParseJsonStr(str, 0, "\xe2\x80\x904", 5)
 
-  test "parseJsonStr error":
-    check testParseJsonStrE(""" "no ending quote """, 2, wNoEndingQuote, 18)
-    check testParseJsonStrE(" \"\n newline not escaped \" ", 2, wControlNotEscaped, 2)
+  test "parseJsonStr no ending quote":
+    check testParseJsonStrE(""" "no ending quote """, 2,
+      newWarningData(wNoEndingQuote, "", 18))
 
-    check testParseJsonStrE(""" "\uDC00x""", 2, wLowSurrogateFirst, 3)
-    check testParseJsonStrE(""" "\a" """, 2, wNotPopular, 3)
+  test "parseJsonStr newline not escaped":
+    check testParseJsonStrE(" \"\n newline not escaped \" ", 2,
+      newWarningData(wControlNotEscaped, "", 2))
 
+  test "parseJsonStr single surrogate":
+    check testParseJsonStrE(""" "\uDC00x""", 2,
+      newWarningData(wLowSurrogateFirst, "", 3))
+    check testParseJsonStrE(""" "\a" """, 2, newWarningData(wNotPopular, "", 3))
+
+  test "parseJsonStr control not escaped":
     let str = bytesToString([0x1u8, 0x02, 0x03, 0x04])
-    check testParseJsonStrE(str, 0, wControlNotEscaped, 0)
+    check testParseJsonStrE(str, 0, newWarningData(wControlNotEscaped, "", 0))
 
   test "parseJsonStr invalid UTF-8":
     var str = bytesToString([0x22u8, 0x2f, 0x22])
     check testParseJsonStr(str, 1, "/", 2)
 
     str = bytesToString([0x31u8, 0x32, 0x33, 0xff, uint8('"')])
-    check testParseJsonStrE(str, 0, wInvalidUtf8, 3)
+    check testParseJsonStrE(str, 0, newWarningData(wInvalidUtf8, "", 3))
 
     # overlong ASCII solidus /.
     str = "overlong solidus: \xe0\x80\xaf."
-    check testParseJsonStrE(str, 0, wInvalidUtf8, 18)
+    check testParseJsonStrE(str, 0, newWarningData(wInvalidUtf8, "", 18))
 
     str = """a = "no ending quote. asdf"""
-    check testParseJsonStrE(str, 5, wNoEndingQuote, 26)
+    check testParseJsonStrE(str, 5, newWarningData(wNoEndingQuote, "", 26))
 
     str = "control not escaped\x0a<-\""
-    check testParseJsonStrE(str, 0, wControlNotEscaped, 19)
+    check testParseJsonStrE(str, 0, newWarningData(wControlNotEscaped, "", 19))
 
     str = r"no popular escaped\a abc"
-    check testParseJsonStrE(str, 0, wNotPopular, 19)
+    check testParseJsonStrE(str, 0, newWarningData(wNotPopular, "", 19))

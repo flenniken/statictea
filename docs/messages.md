@@ -186,7 +186,8 @@ MessageId = enum
   wCmlAlreadyHaveOneParameter, ## w169
   wMissingCommaBracket,     ## w170
   wUserMessage,             ## w171
-  wMissingDictIndex          ## w172
+  wMissingDictIndex,        ## w172
+  wMaxDepthExceeded          ## w173
 ```
 
 # Messages
@@ -209,8 +210,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Exception: \'$1\'.",   ## wExceptionMsg
     "Stack trace: \'$1\'.", ## wStackTrace
     "Unexpected exception: \'$1\'.", ## wUnexpectedException
-    "The root json element must be an object. Skipping file: $1.", ## wInvalidJsonRoot
-    "Unable to parse the json file. Skipping file: $1.", ## wJsonParseError
+    "The root json element must be an object (dictionary).", ## wInvalidJsonRoot
+    "Unable to parse the JSON.", ## wJsonParseError
     "File not found: $1.",  ## wFileNotFound
     "Unable to open file: $1.", ## wUnableToOpenFile
     "The log file is over 1 GB.", ## wBigLogFile
@@ -363,7 +364,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Missing \'$1\' parameter.", "Extra bare parameter.",
     "Already have one \'$1\' parameter.", "Missing comma or right bracket.", ## wMissingCommaBracket
     "$1",                   ## wUserMessage
-    "The dictionary does not have an item with index $1."]
+    "The dictionary does not have an item with index $1.", ## wMissingDictIndex
+    "The maximum JSON depth of $1 was exceeded."]
 ```
 
 
