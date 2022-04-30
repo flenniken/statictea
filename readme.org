@@ -1700,6 +1700,7 @@ Workaround Rules:
 - use }@ for ] in an http link
 - use @@: for a : in an http link
 - use @. for *
+- use @! for |
 
 Change:
 

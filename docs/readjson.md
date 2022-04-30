@@ -5,33 +5,25 @@ Read json content.
 * [readjson.nim](../src/readjson.nim) &mdash; Nim source code.
 # Index
 
-* [maxDepth](#maxdepth) &mdash; The maximum depth you can nest items.
-* type: [StrAndPos](#strandpos) &mdash; StrAndPos holds the result of parsing a string literal.
-* [newStrAndPosOr](#newstrandposor) &mdash; Return a new StrAndPos object containing a warning.
-* [newStrAndPosOr](#newstrandposor-1) &mdash; Return a new StrAndPos object containing a warning.
-* [newStrAndPosOr](#newstrandposor-2) &mdash; Create a new StrAndPosOr object containing a value.
-* [jsonToValue](#jsontovalue) &mdash; Convert a json node to a statictea value.
-* [readJsonStream](#readjsonstream) &mdash; Read a json stream and return the variables.
-* [readJsonString](#readjsonstring) &mdash; Read a json string and return the variables.
-* [readJsonFile](#readjsonfile) &mdash; Read a json file and return the variables in a dictionary value object.
+* type: [StrAndPos](#strandpos) &mdash; StrAndPos holds the result of parsing a string literal, the
+string and the ending position.
+* [newStrAndPosOr](#newstrandposor) &mdash; Return a new StrAndPosOr object containing a warning.
+* [newStrAndPosOr](#newstrandposor-1) &mdash; Return a new StrAndPosOr object containing a warning.
+* [newStrAndPosOr](#newstrandposor-2) &mdash; Return a new StrAndPosOr object containing a StrAndPos object.
+* [jsonToValue](#jsontovalue) &mdash; Convert a Nim json node to a statictea value.
+* [readJsonStream](#readjsonstream) &mdash; Read a json stream and return the variables in a dictionary value.
+* [readJsonString](#readjsonstring) &mdash; Read a json string and return the variables in a dictionary value.
+* [readJsonFile](#readjsonfile) &mdash; Read a json file and return the variables in a dictionary value.
 * [unescapePopularChar](#unescapepopularchar) &mdash; Unescape the popular char and return its value.
 * [parseJsonStr](#parsejsonstr) &mdash; Parse the quoted json string literal.
 
-# maxDepth
-
-The maximum depth you can nest items.
-
-```nim
-maxDepth = 16
-```
-
 # StrAndPos
 
-StrAndPos holds the result of parsing a string literal. The
-resulting parsed string and the ending string position.
+StrAndPos holds the result of parsing a string literal, the
+string and the ending position.
 
-* str -- Resulting parsed string.
-* pos -- The position after the last trailing whitespace.
+* str -- resulting parsed string
+* pos -- the position after the last trailing whitespace
 
 ```nim
 StrAndPos = object
@@ -42,7 +34,7 @@ StrAndPos = object
 
 # newStrAndPosOr
 
-Return a new StrAndPos object containing a warning.
+Return a new StrAndPosOr object containing a warning.
 
 ```nim
 func newStrAndPosOr(warning: Warning; p1: string = ""; pos = 0): StrAndPosOr
@@ -50,7 +42,7 @@ func newStrAndPosOr(warning: Warning; p1: string = ""; pos = 0): StrAndPosOr
 
 # newStrAndPosOr
 
-Return a new StrAndPos object containing a warning.
+Return a new StrAndPosOr object containing a warning.
 
 ```nim
 func newStrAndPosOr(warningData: WarningData): StrAndPosOr
@@ -58,7 +50,7 @@ func newStrAndPosOr(warningData: WarningData): StrAndPosOr
 
 # newStrAndPosOr
 
-Create a new StrAndPosOr object containing a value.
+Return a new StrAndPosOr object containing a StrAndPos object.
 
 ```nim
 func newStrAndPosOr(str: string; pos: Natural): StrAndPosOr
@@ -66,7 +58,7 @@ func newStrAndPosOr(str: string; pos: Natural): StrAndPosOr
 
 # jsonToValue
 
-Convert a json node to a statictea value.
+Convert a Nim json node to a statictea value.
 
 ```nim
 proc jsonToValue(jsonNode: JsonNode; depth: int = 0): ValueOr
@@ -74,7 +66,7 @@ proc jsonToValue(jsonNode: JsonNode; depth: int = 0): ValueOr
 
 # readJsonStream
 
-Read a json stream and return the variables.  If there is an error, return a warning.
+Read a json stream and return the variables in a dictionary value.
 
 ```nim
 proc readJsonStream(stream: Stream): ValueOr
@@ -82,7 +74,7 @@ proc readJsonStream(stream: Stream): ValueOr
 
 # readJsonString
 
-Read a json string and return the variables.  If there is an error, return a warning.
+Read a json string and return the variables in a dictionary value.
 
 ```nim
 proc readJsonString(content: string): ValueOr
@@ -90,7 +82,7 @@ proc readJsonString(content: string): ValueOr
 
 # readJsonFile
 
-Read a json file and return the variables in a dictionary value object.  If there is an error, return a warning.
+Read a json file and return the variables in a dictionary value.
 
 ```nim
 proc readJsonFile(filename: string): ValueOr
@@ -98,7 +90,21 @@ proc readJsonFile(filename: string): ValueOr
 
 # unescapePopularChar
 
-Unescape the popular char and return its value. If the char is not a popular char, return 0.
+Unescape the popular char and return its value. If the char is
+not a popular char, return 0.
+
+ Popular characters and their escape values:
+
+|char      | name           | unicode|
+|----------|----------------|--------|
+|"         | quotation mark | U+0022 |
+|\        | reverse solidus| U+005C |
+|/         | solidus        | U+002F |
+|b         | backspace      | U+0008 |
+|f         | form feed      | U+000C |
+|n         | line feed      | U+000A |
+|r         | carriage return| U+000D |
+|t         | tab            | U+0009 |
 
 ```nim
 proc unescapePopularChar(popular: char): char
@@ -106,7 +112,16 @@ proc unescapePopularChar(popular: char): char
 
 # parseJsonStr
 
-Parse the quoted json string literal. The startPos points one past the leading double quote.  Return the parsed string value and the ending position one past the trailing whitespace. On failure, the ending position points at the invalid character and the message id tells what went wrong.
+Parse the quoted json string literal. The startPos points one
+past the leading double quote.  Return the parsed string value
+and the ending position one past the trailing whitespace. On
+failure, the ending position points at the invalid character and
+the message id tells what went wrong.
+
+~~~
+a = "test string"  \n
+     ^             ^
+~~~~
 
 ```nim
 func parseJsonStr(text: string; startPos: Natural): StrAndPosOr

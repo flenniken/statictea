@@ -14,17 +14,20 @@ import opresultwarn
 # Json spec:
 # https://datatracker.ietf.org/doc/html/rfc8259
 
-# maxDepth is public for testing.
-var maxDepth* = 16
-   ## The maximum depth you can nest items.
+when defined(test):
+  var maxDepth* = 16
+else:
+  const 
+    maxDepth = 16
+      ## The maximum depth you can nest items.
 
 type
   StrAndPos* = object
-    ## StrAndPos holds the result of parsing a string literal. The
-    ## @:resulting parsed string and the ending string position.
+    ## StrAndPos holds the result of parsing a string literal, the
+    ## @:string and the ending position.
     ## @:
-    ## @:* str -- Resulting parsed string.
-    ## @:* pos -- The position after the last trailing whitespace.
+    ## @:* str -- resulting parsed string
+    ## @:* pos -- the position after the last trailing whitespace
     str*: string
     pos*: Natural
 
@@ -32,20 +35,20 @@ type
 
 func newStrAndPosOr*(warning: Warning, p1: string = "", pos = 0):
      StrAndPosOr =
-  ## Return a new StrAndPos object containing a warning.
+  ## Return a new StrAndPosOr object containing a warning.
   let warningData = newWarningData(warning, p1, pos)
   result = opMessageW[StrAndPos](warningData)
 
 func newStrAndPosOr*(warningData: WarningData): StrAndPosOr =
-  ## Return a new StrAndPos object containing a warning.
+  ## Return a new StrAndPosOr object containing a warning.
   result = opMessageW[StrAndPos](warningData)
 
 func newStrAndPosOr*(str: string, pos: Natural): StrAndPosOr =
-  ## Create a new StrAndPosOr object containing a value.
+  ## Return a new StrAndPosOr object containing a StrAndPos object.
   result = opValueW[StrAndPos](StrAndPos(str: str, pos: pos))
 
 proc jsonToValue*(jsonNode: JsonNode, depth: int = 0): ValueOr =
-  ## Convert a json node to a statictea value.
+  ## Convert a Nim json node to a statictea value.
   if depth > maxDepth:
     # The maximum JSON depth of $1 was exceeded.
     return newValueOr(wMaxDepthExceeded, $maxDepth)
@@ -84,36 +87,37 @@ proc jsonToValue*(jsonNode: JsonNode, depth: int = 0): ValueOr =
   result = newValueOr(value)
 
 proc readJsonStream*(stream: Stream): ValueOr =
-  ## Read a json stream and return the variables.  If there is an
-  ## error, return a warning.
-
+  ## Read a json stream and return the variables in a dictionary
+  ## value.
   assert stream != nil
 
   var rootNode: JsonNode
   try:
     rootNode = parseJson(stream, "")
   except:
+    # Unable to parse the JSON.
     return newValueOr(wJsonParseError)
   result = jsonToValue(rootNode)
 
 proc readJsonString*(content: string): ValueOr =
-  ## Read a json string and return the variables.  If there is an
-  ## error, return a warning.
+  ## Read a json string and return the variables in a dictionary
+  ## value.
   var stream = newStringStream(content)
   assert stream != nil
   result = readJsonStream(stream)
 
 proc readJsonFile*(filename: string): ValueOr =
-  ## Read a json file and return the variables in a dictionary value
-  ## object.  If there is an error, return a warning.
+  ## Read a json file and return the variables in a dictionary value.
 
   if not fileExists(filename):
+    # File not found: $1.
     return newValueOr(wFileNotFound, filename)
 
   # Create a stream out of the file.
   var stream: Stream
   stream = newFileStream(filename)
   if stream == nil:
+    # Unable to open file: $1.
     return newValueOr(wUnableToOpenFile, filename)
 
   result = readJsonStream(stream)
@@ -124,20 +128,21 @@ proc readJsonFile*(filename: string): ValueOr =
 
 proc unescapePopularChar*(popular: char): char =
   ## Unescape the popular char and return its value. If the char is
-  ## not a popular char, return 0.
+  ## @:not a popular char, return 0.
+  ## @:
+  ## @: Popular characters and their escape values:
+  ## @:
+  ## @:@!char      @! name           @! unicode@!
+  ## @:@!----------@!----------------@!--------@!
+  ## @:@!"         @! quotation mark @! U+0022 @!
+  ## @:@!\\        @! reverse solidus@! U+005C @!
+  ## @:@!/         @! solidus        @! U+002F @!
+  ## @:@!b         @! backspace      @! U+0008 @!
+  ## @:@!f         @! form feed      @! U+000C @!
+  ## @:@!n         @! line feed      @! U+000A @!
+  ## @:@!r         @! carriage return@! U+000D @!
+  ## @:@!t         @! tab            @! U+0009 @!
 
-  # Popular characters and their escape values:
-  #
-  # character  name    uncode
-  # --+---------------+------
-  # "  quotation mark  U+0022
-  # \  reverse solidus U+005C
-  # /  solidus         U+002F
-  # b  backspace       U+0008
-  # f  form feed       U+000C
-  # n  line feed       U+000A
-  # r  carriage return U+000D
-  # t  tab             U+0009
 
   # Order by popularity.
   case popular
@@ -163,10 +168,15 @@ proc unescapePopularChar*(popular: char): char =
 
 func parseJsonStr*(text: string, startPos: Natural): StrAndPosOr =
   ## Parse the quoted json string literal. The startPos points one
-  ## past the leading double quote.  Return the parsed string value
-  ## and the ending position one past the trailing whitespace. On
-  ## failure, the ending position points at the invalid character and
-  ## the message id tells what went wrong.
+  ## @:past the leading double quote.  Return the parsed string value
+  ## @:and the ending position one past the trailing whitespace. On
+  ## @:failure, the ending position points at the invalid character and
+  ## @:the message id tells what went wrong.
+  ## @:
+  ## @:~~~
+  ## @:a = "test string"  \\n
+  ## @:     ^             ^
+  ## @:~~~~
 
   assert(startPos < text.len, "startPos is greater than the text len")
   assert(startPos >= 0, "startPos is less than 0")

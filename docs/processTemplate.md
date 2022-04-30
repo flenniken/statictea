@@ -6,6 +6,7 @@ Process the template.
 # Index
 
 * [yieldContentLine](#yieldcontentline) &mdash; Yield one content line at a time and keep the line endings.
+* [readJsonFileLog](#readjsonfilelog) &mdash; Read a json file and log.
 * [readJsonFiles](#readjsonfiles) &mdash; Read json files and return a variable dictionary.
 * [processTemplate](#processtemplate) &mdash; Process the template and return 0 on success.
 * [updateTemplate](#updatetemplate) &mdash; Update the template and return 0 on success.
@@ -18,6 +19,14 @@ Yield one content line at a time and keep the line endings.
 
 ```nim
 iterator yieldContentLine(content: string): string
+```
+
+# readJsonFileLog
+
+Read a json file and log.
+
+```nim
+proc readJsonFileLog(env: var Env; filename: string): ValueOr
 ```
 
 # readJsonFiles

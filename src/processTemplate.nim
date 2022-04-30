@@ -4,6 +4,7 @@ import std/streams
 import std/os
 import std/options
 import std/tables
+import std/strutils
 import args
 import messages
 import env
@@ -219,13 +220,42 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
           firstReplaceLine, lb, prepostTable, command, maxLines):
         env.resultStream.write(replaceLine.line)
 
+proc readJsonFileLog*(env: var Env, filename: string): ValueOr =
+  ## Read a json file and log.
+
+  if not fileExists(filename):
+    env.warn(0, wFileNotFound, filename)
+    return
+
+  var file: File
+  try:
+    file = open(filename, fmRead)
+  except:
+    # Unable to open file: $1.
+    env.warn(0, wUnableToOpenFile, filename)
+    return
+
+  # Create a stream out of the file.
+  var stream: Stream
+  stream = newFileStream(file)
+  if stream == nil:
+    # Unable to open file: $1.
+    return newValueOr(wUnableToOpenFile, filename)
+
+  # Log the filename and size.
+  let fileSize = file.getFileSize()
+  env.log("filename: $1\n" % filename)
+  env.log("fileSize: $1\n" % $fileSize)
+
+  result = readJsonStream(stream)
+
 proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
   ## Read json files and return a variable dictionary.  Skip a
   ## duplicate variable and generate a warning.
 
   var varsDict = newVarsDict()
   for filename in filenames:
-    let valueOr = readJsonFile(filename)
+    let valueOr = readJsonFileLog(env, filename)
     if valueOr.isMessage:
       env.warn(0, valueOr.message)
     else:

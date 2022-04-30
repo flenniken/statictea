@@ -40,6 +40,8 @@ hello world
 ~~~
 Starting: argv: @["-l", "log.txt", "-s", "hello.json", "-t", "hello.html"]
 Version: 0.1.0
+filename: hello.json
+fileSize: 18
 Warnings: 0
 Return code: 0
 Done
