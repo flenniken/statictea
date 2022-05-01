@@ -5,50 +5,23 @@ Parse the StaticTea terminal command line and return the arguments.
 * [parseCommandLine.nim](../src/parseCommandLine.nim) &mdash; Nim source code.
 # Index
 
-* type: [ArgsOrWarningKind](#argsorwarningkind) &mdash; The kind of a ArgsOrWarning object, either args or warning.
-* type: [ArgsOrWarning](#argsorwarning) &mdash; Holds args or a warning.
-* [parsePrepost](#parseprepost) &mdash; Match a prefix followed by an optional postfix, prefix[,postfix].
-* [`$`](#) &mdash; Return a string representation of a ArgsOrWarning object.
-
-# ArgsOrWarningKind
-
-The kind of a ArgsOrWarning object, either args or warning.
-
-```nim
-ArgsOrWarningKind = enum
-  awArgs, awWarning
-```
-
-# ArgsOrWarning
-
-Holds args or a warning.
-
-```nim
-ArgsOrWarning = object
-  case kind*: ArgsOrWarningKind
-  of awArgs:
-      args*: Args
-
-  of awWarning:
-      warningData*: WarningData
-
-
-```
+* [parsePrepost](#parseprepost) &mdash; Parse the prepost item on the terminal command line.
+* [parseCommandLine](#parsecommandline) &mdash; Parse the terminal command line.
 
 # parsePrepost
 
-Match a prefix followed by an optional postfix, prefix[,postfix]. Each part contains 1 to 20 ascii characters including spaces but without control characters or commas.
+Parse the prepost item on the terminal command line.  A prefix is followed by an optional postfix, prefix[,postfix].  Each part contains 1 to 20 ascii characters including spaces but without control characters or commas.
 
 ```nim
 proc parsePrepost(str: string): Option[Prepost]
 ```
 
-# `$`
+# parseCommandLine
 
-Return a string representation of a ArgsOrWarning object.
+Parse the terminal command line.
 
 ```nim
-func `$`(aw: ArgsOrWarning): string
+func parseCommandLine(argv: seq[string]): ArgsOr
 ```
 
 

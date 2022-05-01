@@ -543,7 +543,7 @@ proc taskDocs(namePart: string, forceRebuild = false) =
   let filenames = get_source_filenames()
   for filename in filenames:
     # Name is part of a source file name, or "docs" when not specified.
-    if namePart in filename or namePart == "docs":
+    if namePart.toLower in filename.toLower or namePart == "docs":
       var mdName = "docs/$1" % [changeFileExt(filename, "md")]
 
       if not forceRebuild and myFileNewer("src/" & filename, mdName):

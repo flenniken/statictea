@@ -1,15 +1,18 @@
 # args.nim
 
-Command line arguments.
+Types for handling command line arguments.
 
 * [args.nim](../src/args.nim) &mdash; Nim source code.
 # Index
 
 * type: [Prepost](#prepost) &mdash; Prepost holds one prefix and its associated postfix.
 * type: [Args](#args) &mdash; Args holds all the command line arguments.
+* [newArgsOr](#newargsor) &mdash; Return a new Args object containing a warning.
+* [newArgsOr](#newargsor-1) &mdash; Return a new Args object containing a warning.
+* [newArgsOr](#newargsor-2) &mdash; Return a new Args object containing a value.
 * [newPrepost](#newprepost) &mdash; Create a new prepost object from the prefix and postfix.
-* [`$`](#) &mdash; Return a string representation of the Prepost object.
-* [`$`](#-1) &mdash; Return a string representation of the Args object.
+* [`$`](#) &mdash; Return the Prepost string representation.
+* [`$`](#-1) &mdash; Return the Args string representation.
 
 # Prepost
 
@@ -41,6 +44,30 @@ Args = object
 
 ```
 
+# newArgsOr
+
+Return a new Args object containing a warning.
+
+```nim
+func newArgsOr(warningData: WarningData): ArgsOr
+```
+
+# newArgsOr
+
+Return a new Args object containing a warning.
+
+```nim
+func newArgsOr(warning: Warning; p1: string = ""; pos = 0): ArgsOr
+```
+
+# newArgsOr
+
+Return a new Args object containing a value.
+
+```nim
+func newArgsOr(args: Args): ArgsOr
+```
+
 # newPrepost
 
 Create a new prepost object from the prefix and postfix.
@@ -51,7 +78,7 @@ func newPrepost(prefix: string; postfix: string): Prepost
 
 # `$`
 
-Return a string representation of the Prepost object.
+Return the Prepost string representation.
 
 ```nim
 func `$`(p: Prepost): string
@@ -59,7 +86,7 @@ func `$`(p: Prepost): string
 
 # `$`
 
-Return a string representation of the Args object.
+Return the Args string representation.
 
 ```nim
 func `$`(args: Args): string

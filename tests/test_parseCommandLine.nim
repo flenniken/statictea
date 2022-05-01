@@ -8,8 +8,9 @@ import parseCommandLine
 import env
 import messages
 import warnings
+import opresultwarn
 
-proc parseCommandLine*(cmdLine: string = ""): ArgsOrWarning =
+proc parseCommandLine*(cmdLine: string = ""): ArgsOr =
   let argv = cmdLine.splitWhitespace()
   result = parseCommandLine(argv)
 
@@ -26,11 +27,11 @@ proc newStrFromBuffer(buffer: openArray[uint8]): string =
 
 proc parseWarning(cmdline: string, eWarningData: WarningData): bool =
   result = true
-  let argsOrWarning = parseCommandLine(cmdLine)
-  if argsOrWarning.kind != awWarning:
+  let argsOr = parseCommandLine(cmdLine)
+  if argsOr.isValue:
     echo "Did not get a warning."
     result = false
-  elif not expectedItem("warningData", argsOrWarning.warningData, eWarningData):
+  elif not expectedItem("warningData", argsOr.message, eWarningData):
     result = false
 
 proc tpcl(
@@ -50,12 +51,12 @@ proc tpcl(
     eOutLines: seq[string] = @[],
       ): bool =
 
-  let argsOrWarning = parseCommandLine(cmdLine)
-  if argsOrWarning.kind != awArgs:
+  let argsOr = parseCommandLine(cmdLine)
+  if argsOr.isMessage:
     echo "Unexpected warning:"
-    echo $argsOrWarning
+    echo $argsOr
     return false
-  let args = argsOrWarning.args
+  let args = argsOr.value
 
   result = true
   if not expectedItem("help", args.help, help):

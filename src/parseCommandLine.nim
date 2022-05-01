@@ -8,44 +8,16 @@ import warnings
 import regexes
 import cmdline
 
-type
-  ArgsOrWarningKind* = enum
-    ## The kind of a ArgsOrWarning object, either args or warning.
-    awArgs,
-    awWarning
-
-  ArgsOrWarning* = object
-    ## Holds args or a warning.
-    case kind*: ArgsOrWarningKind
-      of awArgs:
-        args*: Args
-      of awWarning:
-        warningData*: WarningData
-
-func newArgsOrWarning(args: Args): ArgsOrWarning =
-  ## Return a new ArgsOrWarning object containing args.
-  result = ArgsOrWarning(kind: awArgs, args: args)
-
-func newArgsOrWarning(warningData: WarningData): ArgsOrWarning =
-  ## Return a new ArgsOrWarning object containing a warning.
-  result = ArgsOrWarning(kind: awWarning, warningData: warningData)
-
 proc parsePrepost*(str: string): Option[Prepost] =
-  ## Match a prefix followed by an optional postfix, prefix[,postfix].
-  ## Each part contains 1 to 20 ascii characters including spaces but
-  ## without control characters or commas.
+  ## Parse the prepost item on the terminal command line.  A prefix is
+  ## followed by an optional postfix, prefix[,postfix].  Each part
+  ## contains 1 to 20 ascii characters including spaces but without
+  ## control characters or commas.
   let pattern = "([\x20-\x2b\x2d-\x7F]{1,20})(?:,([\x20-\x2b\x2d-\x7F]{1,20})){0,1}$"
   let matchesO = matchPattern(str, pattern, 0, 2)
   if matchesO.isSome:
     let (prefix, postfix) = matchesO.get2Groups()
     result = some(newPrepost(prefix, postfix))
-
-func `$`*(aw: ArgsOrWarning): string =
-  ## Return a string representation of a ArgsOrWarning object.
-  if aw.kind == awArgs:
-    result = $aw.args
-  else:
-    result = $aw.warningData
 
 func mapCmlMessages(messageId: CmlMessageId): MessageId =
   when high(CmlMessageId) != cml_12_AlreadyHaveOneParameter:
@@ -53,10 +25,8 @@ func mapCmlMessages(messageId: CmlMessageId): MessageId =
     fail
   result = MessageId(ord(messageId) + 157)
 
-
-
-
-proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
+func parseCommandLine*(argv: seq[string]): ArgsOr =
+  ## Parse the terminal command line.
 
   var options = newSeq[CmlOption]()
   options.add(newCmlOption("help", 'h', cmlStopParameter))
@@ -77,7 +47,7 @@ proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
   if ArgsOrMessage.kind == cmlMessageKind:
     let messageId = mapCmlMessages(ArgsOrMessage.messageId)
     let warningData = newWarningData(messageId, ArgsOrMessage.problemParam)
-    return newArgsOrWarning(warningData)
+    return newArgsOr(warningData)
 
   # Convert the cmlArgs to Args
   let cmlArgs = ArgsOrMessage.args
@@ -95,7 +65,7 @@ proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
     for str in cmlArgs["prepost"]:
       let prepostO = parsePrepost(str)
       if not prepostO.isSome:
-        return newArgsOrWarning(newWarningData(wInvalidPrepost, str))
+        return newArgsOr(newWarningData(wInvalidPrepost, str))
       else:
         prepostList.add(prepostO.get())
     args.prepostList = prepostList
@@ -119,4 +89,4 @@ proc parseCommandLine*(argv: seq[string]): ArgsOrWarning =
 
   # todo: what to do about filenames in multiple places?  result = template = log, etc?
 
-  result = newArgsOrWarning(args)
+  result = newArgsOr(args)

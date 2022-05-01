@@ -8,6 +8,7 @@ import messages
 import gethelp
 import version
 import env
+import opresultwarn
 when isMainModule:
   import std/os
 
@@ -30,11 +31,11 @@ proc main*(env: var Env, argv: seq[string]): int =
   ## Run statictea. Return 0 when no warning messages were written.
 
   # Parse the command line options.
-  let argsOrWarning = parseCommandLine(argv)
-  if argsOrWarning.kind == awWarning:
-    env.warn(0, argsOrWarning.warningData)
+  let argsOr = parseCommandLine(argv)
+  if argsOr.isMessage:
+    env.warn(0, argsOr.message)
     return 1
-  let args = argsOrWarning.args
+  let args = argsOr.value
 
   # Add the log file to the environment when it is turned on.
   if args.log:
