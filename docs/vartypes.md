@@ -25,6 +25,7 @@ same type which may be Value type.
 * [newEmptyDictValue](#newemptydictvalue) &mdash; Create a dictionary value from a VarsDict.
 * [`==`](#) &mdash; Return true when two variables are equal.
 * [`$`](#-1) &mdash; Return a string representation of the variable's type.
+* [jsonStringRepr](#jsonstringrepr) &mdash; Return the JSON string representation.
 * [dictToString](#dicttostring) &mdash; Return a string representation of a dict Value in JSON format.
 * [listToString](#listtostring) &mdash; Return a string representation of a list variable in JSON format.
 * [valueToString](#valuetostring) &mdash; Return a string representation of a variable in JSON format.
@@ -201,6 +202,14 @@ Return a string representation of the variable's type.
 
 ```nim
 func `$`(kind: ValueKind): string
+```
+
+# jsonStringRepr
+
+Return the JSON string representation. It is assumed the string is a valid UTF-8 encoded string.
+
+```nim
+proc jsonStringRepr(str: string): string
 ```
 
 # dictToString

@@ -17,7 +17,7 @@ import opresultwarn
 when defined(test):
   var maxDepth* = 16
 else:
-  const 
+  const
     maxDepth = 16
       ## The maximum depth you can nest items.
 
@@ -143,8 +143,7 @@ proc unescapePopularChar*(popular: char): char =
   ## @:@!r         @! carriage return@! U+000D @!
   ## @:@!t         @! tab            @! U+0009 @!
 
-
-  # Order by popularity.
+  # Order by popularity: nr"t\bf/
   case popular
   of 'n':
     result = char(0x0a)

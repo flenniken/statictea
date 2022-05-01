@@ -20,7 +20,7 @@ suite "vartypes":
     let str = "añyóng"
     check str.len == 8
     check newValue(str).stringv == str
-    
+
   test "newValue int":
     let testInt = 5
     let jsonString = "5"
@@ -36,7 +36,7 @@ suite "vartypes":
     check newValue(2).intv == 2
     check newValue(0).intv == 0
     check newValue(-1).intv == -1
-    
+
   test "newValue float":
     let testFloat = 0.123
     let jsonString = "0.123"
@@ -50,7 +50,7 @@ suite "vartypes":
     check newValue(1.2).floatv == 1.2
     check newValue(0.0).floatv == 0.0
     check newValue(-1.6).floatv == -1.6
-    
+
   test "newValue dict":
     var varsDict = newVarsDict()
     varsDict["string"] = newValue("a")
@@ -149,3 +149,22 @@ suite "vartypes":
     let value = newValue(1)
     check valueToString(value) == "1"
 
+  test "jsonStringRepr":
+    check jsonStringRepr("") == """"""""
+    check jsonStringRepr("a") == """"a""""
+    check jsonStringRepr("abc") == """"abc""""
+    check jsonStringRepr("\n") == """"\n""""
+    check jsonStringRepr("\t") == """"\t""""
+    check jsonStringRepr("\"") == """"\"""""
+    check jsonStringRepr("\r") == """"\r""""
+    check jsonStringRepr("\\") == """"\\""""
+    check jsonStringRepr("\b") == """"\b""""
+    check jsonStringRepr("\f") == """"\f""""
+    check jsonStringRepr("/") == """"\/""""
+    let str =     "\t\n\r\"\\ \b\f/ 9 😃"
+    let eStr = """"\t\n\r\"\\ \b\f\/ 9 😃""""
+    let got = jsonStringRepr(str)
+    if got != eStr:
+      echo "expected: " & eStr
+      echo "     got: " & got
+    check got == eStr

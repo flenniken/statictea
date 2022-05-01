@@ -1,7 +1,7 @@
 ## StaticTea variable types.
 
 import std/tables
-import std/json
+import std/strutils
 import warnings
 import opresultwarn
 
@@ -154,6 +154,55 @@ func `$`*(kind: ValueKind): string =
   of vkList:
     result = "list"
 
+proc jsonStringRepr*(str: string): string =
+  ## Return the JSON string representation. It is assumed the string
+  ## is a valid UTF-8 encoded string.
+
+  # n   U+000A   line feed
+  # r   U+000D   carriage return
+  # "   U+0022   quotation mark
+  # t   U+0009   tab
+  # \   U+005C   reverse solidus
+  # b   U+0008   backspace
+  # f   U+000C   form feed
+  # /   U+002F   solidus
+
+  # * Popular characters ordered by ascii value: 8, 9, a, c, d, 22, 2f, 5c.
+  # * Escaped characters by ascii value: 0 - 1f, 22, 5c.
+  # * Escaped characters, except popular, by ascii ranges:
+  #     0 - 7, b, e - 1f.
+  # * The unescaped characters are 20 - 21,  23 - 5B and 5D - 10FFFF.
+
+  # You must escape quote, reverse solidus and all 0 - 1f.  In the
+  # control character range 0 - 1f use the compact popular escaping
+  # for: \n, \r, \t, \b, \f. The solidus character is outside the
+  # range but you escape it too \/.
+
+  # Order by popularity: nr"t\bf/
+
+  result.add("\"")
+  for byteChar in str:
+    case byteChar
+    of '\n': result.add("\\n")
+    of '\r': result.add("\\r")
+    of '"': result.add("\\\"")
+    of '\t': result.add("\\t")
+    of '\\': result.add("\\\\")
+    of '\b': result.add("\\b")
+    of '\f': result.add("\\f")
+    of '/': result.add("\\/")
+
+    # Escaped characters, except popular, by ascii ranges:
+    # 0 - 7, b, e - 1f.
+
+    of '\0'..'\7', '\x0b':
+      result.add("\\u000" & $ord(byteChar))
+    of '\x0e'..'\x1f':
+      result.add("\\u00" & toHex(ord(byteChar), 2))
+    else:
+      result.add(byteChar)
+  result.add("\"")
+
 # Recursive prototype.
 func valueToString*(value: Value): string
 
@@ -164,7 +213,7 @@ func dictToString*(value: Value): string =
   for k, v in value.dictv.pairs:
     if ix > 0:
       result.add(",")
-    result.add(escapeJson(k))
+    result.add(jsonStringRepr(k))
     result.add(":")
     result.add(valueToString(v))
     inc(ix)
@@ -187,7 +236,7 @@ func valueToString*(value: Value): string =
     of vkList:
       result.add(listToString(value))
     of vkString:
-      result.add(escapeJson(value.stringv))
+      result.add(jsonStringRepr(value.stringv))
     of vkInt:
       result.add($value.intv)
     of vkFloat:
