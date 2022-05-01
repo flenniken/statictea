@@ -22,10 +22,10 @@ type
     ## @:~~~~
     ## @:
     ## @:Whitespace must follow a command except on the last line of the file.
+    ## @:codeStart is 0 when codeLen is 0.
     prefix*: string
     command*: string
     codeStart*: Natural
-      ## where the code starts or 0 when codeLen is 0.
     codeLen*: Natural
     commentLen*: Natural
     continuation*: bool

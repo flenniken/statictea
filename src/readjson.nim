@@ -18,7 +18,7 @@ when defined(test):
   var maxDepth* = 16
 else:
   const
-    maxDepth = 16
+    maxDepth* = 16
       ## The maximum depth you can nest items.
 
 type

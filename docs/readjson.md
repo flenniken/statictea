@@ -5,6 +5,7 @@ Read json content.
 * [readjson.nim](../src/readjson.nim) &mdash; Nim source code.
 # Index
 
+* const: [maxDepth](#maxdepth) &mdash; The maximum depth you can nest items.
 * type: [StrAndPos](#strandpos) &mdash; StrAndPos holds the result of parsing a string literal, the
 string and the ending position.
 * [newStrAndPosOr](#newstrandposor) &mdash; Return a new StrAndPosOr object containing a warning.
@@ -16,6 +17,14 @@ string and the ending position.
 * [readJsonFile](#readjsonfile) &mdash; Read a json file and return the variables in a dictionary value.
 * [unescapePopularChar](#unescapepopularchar) &mdash; Unescape the popular char and return its value.
 * [parseJsonStr](#parsejsonstr) &mdash; Parse the quoted json string literal.
+
+# maxDepth
+
+The maximum depth you can nest items.
+
+```nim
+maxDepth = 16
+```
 
 # StrAndPos
 

@@ -24,12 +24,13 @@ prefix command  [code]   [comment] [continuation]
 ~~~~
 
 Whitespace must follow a command except on the last line of the file.
+codeStart is 0 when codeLen is 0.
 
 ```nim
 LineParts = object
   prefix*: string
   command*: string
-  codeStart*: Natural        ## where the code starts or 0 when codeLen is 0.
+  codeStart*: Natural
   codeLen*: Natural
   commentLen*: Natural
   continuation*: bool
