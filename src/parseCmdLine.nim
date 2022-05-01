@@ -2,10 +2,11 @@
 
 import std/options
 import std/tables
-import env
 import regexes
 import messages
 import matches
+import warnings
+import opresultwarn
 
 type
   LineParts* = object
@@ -33,7 +34,20 @@ type
     ending*: string
     lineNum*: Natural
 
-func getCodeLength*(line: string, codeStart: Natural, length: Natural): Natural =
+  LinePartsOr* = OpResultWarn[LineParts]
+
+func newLinePartsOr*(warning: Warning, p1: string = "", pos = 0):
+     LinePartsOr =
+  ## Return a new LinePartsOr object containing a warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[LineParts](warningData)
+
+func newLinePartsOr*(varsDict: LineParts): LinePartsOr =
+  ## Return a new LineParts object containing a dictionary.
+  result = opValueW[LineParts](varsDict)
+
+func getCodeLength*(line: string, codeStart: Natural,
+    length: Natural): Natural =
   ## Return the length of the code in the line.  The code starts at
   ## codeStart and cannot exceed the given length. The code ends when
   ## there is a comment (a pound sign), or the end is reached.
@@ -73,8 +87,8 @@ func getCodeLength*(line: string, codeStart: Natural, length: Natural): Natural 
       state = quote
   return length
 
-proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
-    line: string, lineNum: Natural): Option[LineParts] =
+proc parseCmdLine*(prepostTable: PrepostTable,
+    line: string, lineNum: Natural): LinePartsOr =
   ## Parse the line and return its parts. Return quickly when not a
   ## command line.
 
@@ -91,8 +105,8 @@ proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
   # Get the command.
   let commandMatchO = matchCommand(line, prefixMatch.length)
   if not isSome(commandMatchO):
-    env.warn(lineNum, wNoCommand, $(prefixMatch.length+1))
-    return
+    return newLinePartsOr(wNoCommand, "", prefixMatch.length+1)
+
   var commandMatch = commandMatchO.get()
   lineParts.command = commandMatch.getGroup()
 
@@ -104,8 +118,7 @@ proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
   # continuation and its position when it matches.
   let lastPartO = getLastPart(line, lineParts.postfix)
   if not isSome(lastPartO):
-    env.warn(lineNum, wNoPostfix, lineParts.postfix)
-    return
+    return newLinePartsOr(wNoPostfix, lineParts.postfix, 0)
   var lastPart = lastPartO.get()
   let (continuation, ending) = lastPart.get2Groups()
   lineParts.continuation = if continuation == "": false else: true
@@ -122,8 +135,7 @@ proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
     let spaceMatchO = matchTabSpace(line, middleStart)
     if not isSome(spaceMatchO):
       # No space after the command.
-      env.warn(lineNum, wSpaceAfterCommand)
-      return
+      return newLinePartsOr(wSpaceAfterCommand, "", 0)
 
     let midStart = middleStart + 1
     let midLen = middleLength - 1
@@ -136,7 +148,7 @@ proc parseCmdLine*(env: var Env, prepostTable: PrepostTable,
   # Line ending is required except for the last line of the file.
   lineParts.ending = ending
   lineParts.lineNum = lineNum
-  result = some(lineParts)
+  result = newLinePartsOr(lineParts)
 
 when defined(Test):
   # Used in multiple test files.

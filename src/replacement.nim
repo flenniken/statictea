@@ -433,9 +433,9 @@ iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
 
       while true:
         # Look for an endblock command and stop when found.
-        var linePartsO = parseCmdLine(env, prepostTable, line, lb.getLineNum())
-        if linePartsO.isSome:
-          if linePartsO.get().command == "endblock":
+        var linePartsOr = parseCmdLine(prepostTable, line, lb.getLineNum())
+        if linePartsOr.isValue:
+          if linePartsOr.value.command == "endblock":
             yield(newReplaceLine(rlEndblockLine, line))
             break # done, found endblock
 

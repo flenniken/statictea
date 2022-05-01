@@ -52,11 +52,12 @@ proc getCmdLinePartsTest(env: var Env,
   ## testing. It doesn't work for custom prefixes.
   let prepostTable = makeDefaultPrepostTable()
   for ix, line in commandLines:
-    let partsO = parseCmdLine(env, prepostTable, line, lineNum = ix + 1)
-    if not partsO.isSome():
+    let linePartsOr = parseCmdLine(prepostTable, line, lineNum = ix + 1)
+    if linePartsOr.isMessage:
       echo "cannot get command line parts for:"
       echo """line: "$1"""" % line
-    result.add(partsO.get())
+      echo $linePartsOr
+    result.add(linePartsOr.value)
 
 proc getStatements(cmdLines: CmdLines): seq[Statement] =
   ## Return a list of statements for the given lines.

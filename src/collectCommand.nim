@@ -1,12 +1,12 @@
 ## Collect template command lines.
 
 import std/streams
-import std/options
 import env
 import matches
 import readlines
 import parseCmdLine
 import messages
+import opresultwarn
 
 type
   ExtraLineKind* = enum
@@ -66,16 +66,16 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
         break
 
     # Parse the line.
-    let linePartsO = parseCmdLine(env, prepostTable, line, lb.getLineNum())
+    let linePartsOr = parseCmdLine(prepostTable, line, lb.getLineNum())
 
     if not collecting:
       # If not a command, write it out and continue.
-      if not linePartsO.isSome:
+      if linePartsOr.isMessage:
         env.resultStream.write(line)
         continue
 
       # Skip comment lines.
-      let lineParts = linePartsO.get()
+      let lineParts = linePartsOr.value
       if lineParts.command == "#":
         continue
 
@@ -98,8 +98,8 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
       # We're in collecting mode.
 
       # Collect continue commands.
-      if linePartsO.isSome:
-        let lineParts = linePartsO.get()
+      if linePartsOr.isValue():
+        let lineParts = linePartsOr.value
         if lineParts.command == ":":
           result.lineParts.add(lineParts)
           result.lines.add(line)
@@ -142,10 +142,10 @@ proc collectReplaceCommand*(env: var Env, lb: var LineBuffer,
 
     # Get the line command if any.
     var command: string
-    let linePartsO = parseCmdLine(env, prepostTable, line, lb.getLineNum())
+    let linePartsOr = parseCmdLine(prepostTable, line, lb.getLineNum())
     var lineParts: LineParts
-    if linePartsO.isSome:
-      lineParts = linePartsO.get()
+    if linePartsOr.isValue:
+      lineParts = linePartsOr.value
       command = lineParts.command
     else:
       command = "other"

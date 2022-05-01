@@ -6,6 +6,8 @@ Parse a StaticTea language command line.
 # Index
 
 * type: [LineParts](#lineparts) &mdash; LineParts holds parsed components of a line.
+* [newLinePartsOr](#newlinepartsor) &mdash; Return a new LinePartsOr object containing a warning.
+* [newLinePartsOr](#newlinepartsor-1) &mdash; Return a new LineParts object containing a dictionary.
 * [getCodeLength](#getcodelength) &mdash; Return the length of the code in the line.
 * [parseCmdLine](#parsecmdline) &mdash; Parse the line and return its parts.
 
@@ -40,6 +42,22 @@ LineParts = object
 
 ```
 
+# newLinePartsOr
+
+Return a new LinePartsOr object containing a warning.
+
+```nim
+func newLinePartsOr(warning: Warning; p1: string = ""; pos = 0): LinePartsOr
+```
+
+# newLinePartsOr
+
+Return a new LineParts object containing a dictionary.
+
+```nim
+func newLinePartsOr(varsDict: LineParts): LinePartsOr
+```
+
 # getCodeLength
 
 Return the length of the code in the line.  The code starts at codeStart and cannot exceed the given length. The code ends when there is a comment (a pound sign), or the end is reached. The input length is returned on errors.
@@ -53,8 +71,7 @@ func getCodeLength(line: string; codeStart: Natural; length: Natural): Natural
 Parse the line and return its parts. Return quickly when not a command line.
 
 ```nim
-proc parseCmdLine(env: var Env; prepostTable: PrepostTable; line: string;
-                  lineNum: Natural): Option[LineParts]
+proc parseCmdLine(prepostTable: PrepostTable; line: string; lineNum: Natural): LinePartsOr
 ```
 
 

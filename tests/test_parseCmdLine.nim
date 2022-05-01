@@ -5,7 +5,8 @@ import std/strutils
 import parseCmdLine
 import env
 import matches
-
+import messages
+import opresultwarn
 
 proc test_getCodeLength(line: string, codeStart: Natural, eCodeLen: Natural): bool =
   if codeStart >= line.len:
@@ -31,30 +32,24 @@ func getEndingString(ending: string): string =
   else:
     result = ending
 
-
 proc testParseCmdLine(
     line: string,
     lineNum: Natural = 1,
     expectedLineParts: LineParts,
-    eLogLines: seq[string] = @[],
-    eErrLines: seq[string] = @[],
-    eOutLines: seq[string] = @[]
   ): bool =
   ## Return true on success.
 
-  var env = openEnvTest("_parseCmdLine.log")
+  result = true
 
   let prepostTable = makeDefaultPrepostTable()
-  let linePartsO = parseCmdLine(env, prepostTable, line, lineNum)
-
-  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
-
-  if not linePartsO.isSome:
+  let linePartsOr = parseCmdLine(prepostTable, line, lineNum)
+  if linePartsOr.isMessage:
     echo line
     echo "parseCmdLine didn't find a line"
+    echo $linePartsOr
     return false
 
-  let lps = linePartsO.get()
+  let lps = linePartsOr.value
   let elps = expectedLineParts
   if lps != elps:
     echo line
@@ -81,23 +76,24 @@ proc testParseCmdLine(
 proc parseCmdLineError(
     line: string,
     lineNum: Natural = 12,
-    eLogLines: seq[string] = @[],
-    eErrLines: seq[string] = @[],
-    eOutLines: seq[string] = @[] ): bool =
+    eLinePartsOr: LinePartsOr): bool =
   ## Test that we get an error parsing the command line. Return true
   ## when we get the expected errors.
 
-  var env = openEnvTest("_parseCmdLine.log")
-
   let prepostTable = makeDefaultPrepostTable()
-  let linePartsO = parseCmdLine(env, prepostTable, line, lineNum)
+  let linePartsOr = parseCmdLine(prepostTable, line, lineNum)
 
-  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
-
-  if linePartsO.isSome:
+  if linePartsOr.isValue:
     echo line
     echo "We parsed the line when we shouldn't have."
-    result = false
+    return false
+
+  if $linePartsOr != $eLinePartsOr:
+    echo "expected: " & $eLinePartsOr
+    echo "     got: " & $linePartsOr
+    return false
+
+  result = true
 
 suite "parseCmdLine.nim":
 
@@ -264,15 +260,14 @@ suite "parseCmdLine.nim":
 
   test "no prefix":
     let line = " nextline -->\n"
-    check parseCmdLineError(line)
+    check parseCmdLineError(line, 0, newLinePartsOr(wSuccess))
 
   test "no command error":
     let line = "<!--$ -->\n"
-    let expectedWarn = "template.html(12): w22: No command found at column 7, treating it as a non-command line.\n"
-
-    check parseCmdLineError(line, eErrLines = @[expectedWarn])
+    # template.html(12): w22: No command found at column 7, treating it as a non-command line.\n"
+    check parseCmdLineError(line, 0, newLinePartsOr(wNoCommand, "", 7))
 
   test "no postfix error":
     let line = "<!--$ nextline \n"
-    let expectedWarn = """template.html(16): w23: The matching closing comment postfix was not found, expected: "-->".""" & "\n"
-    check parseCmdLineError(line, lineNum = 16, eErrLines = @[expectedWarn])
+    # template.html(16): w23: The matching closing comment postfix was not found, expected: "-->".
+    check parseCmdLineError(line, 0, newLinePartsOr(wNoPostfix, "-->", 0))
