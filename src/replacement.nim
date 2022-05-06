@@ -283,8 +283,8 @@ func parseVarSegment*(segment: string): string =
   # 2,2   ,6   ,{ s.name }
   # 0123456789 123456789 0123456789
 
-  let dotNameStrPos = parseInteger(segment, 2).get().integer + 12
-  let dotNameStrLen = parseInteger(segment, 7).get().integer
+  let dotNameStrPos = parseInteger(segment, 2).get().number + 12
+  let dotNameStrLen = parseInteger(segment, 7).get().number
   result = segment[dotNameStrPos ..< dotNameStrPos + dotNameStrLen]
 
 proc substituteSegment(env: var Env, lineNum: Natural, variables: Variables,

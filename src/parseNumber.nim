@@ -8,21 +8,32 @@ import std/parseUtils
 assert sizeof[BiggestInt] == sizeof[int64]
 
 type
-  IntPos* = object
-    ## Integer and characters processed.
-    integer*: BiggestInt
-    length*: int
+  IntAndLength* = object
+    ## IntAndLength holds a 64 bit signed integer and the number of
+    ## characters processed.
+    number*: int64
+    length*: Natural
 
-  FloatPos* = object
-    ## Float and characters processed.
+  FloatAndLength* = object
+    ## FloatAndLength holds a 64 float and the number of characters
+    ## processed.
     number*: float64
-    length*: int
+    length*: Natural
 
-proc parseFloat64*(str: string, start: Natural = 0): Option[FloatPos] =
+func newIntAndLength*(number: int64, length: Natural): IntAndLength =
+  ## Create a new IntAndLength object.
+  result = IntAndLength(number: number, length: length)
+
+func newFloatAndLength*(number: float64, length: Natural): FloatAndLength =
+  ## Create a new FloatAndLength object.
+  result = FloatAndLength(number: number, length: length)
+
+proc parseFloat*(str: string, start: Natural = 0): Option[FloatAndLength] =
   ## Parse the string and return the 64 bit float number and the
-  ## @:number of characters processed. Nothing is returned when the
-  ## @:float is out of range or the str is not a float number.
-  ## @:Processing stops at the first non-number character.
+  ## @:number of characters processed. The number starts at the start
+  ## @:parameter index. Nothing is returned when the float is out of
+  ## @:range or the str is not a float number.  Processing stops at the
+  ## @:first non-number character.
   ## @:
   ## @:A float number starts with an optional minus sign, followed by a
   ## @:digit, followed by digits, underscores or a decimal point. Only
@@ -32,16 +43,18 @@ proc parseFloat64*(str: string, start: Natural = 0): Option[FloatPos] =
   var number: BiggestFloat
   let length = parseBiggestFloat(str, number, start)
   if length > 0:
-    result = some(FloatPos(number: number, length: length))
+    result = some(newFloatAndLength(number, length))
 
-proc parseInteger*(s: string, start: Natural = 0): Option[IntPos] =
-  ## Parse the string and return the integer and number of characters
-  ## @:processed. Nothing is returned when the integer is out of range
-  ## @:or the str is not a number.
+proc parseInteger*(s: string, start: Natural = 0): Option[IntAndLength] =
+  ## Parse the string and return the 64 bit signed integer and number
+  ## @:of characters processed. The number starts at the start parameter
+  ## @:index. Parsing stops at the first non-number character.  Nothing
+  ## @:is returned when the integer is out of range or the str is not a
+  ## @:number.
   ## @:
   ## @:An integer starts with an optional minus sign, followed by a
   ## @:digit, followed by digits or underscores. The underscores are
-  ## @:skipped. Processing stops at the first non-number character.
+  ## @:skipped.
 
   var
     sign: BiggestInt = -1
@@ -68,5 +81,4 @@ proc parseInteger*(s: string, start: Natural = 0): Option[IntPos] =
       return
 
     b = b * sign
-    let value = IntPos(integer: b, length: i - start)
-    result = some(value)
+    result = some(newIntAndLength(b, i - start))

@@ -273,20 +273,20 @@ proc getNumber*(statement: Statement, start: Natural):
   var value: Value
   if decimalPoint == ".":
     # Parse the float.
-    let floatPosO = parseFloat64(statement.text, start)
-    if not floatPosO.isSome:
+    let floatAndLengthO = parseFloat(statement.text, start)
+    if not floatAndLengthO.isSome:
       return newValueAndLengthOr(wNumberOverFlow, "", start)
-    let floatPos = floatPosO.get()
-    value = newValue(floatPos.number)
-    assert floatPos.length <= length
+    let floatAndLength = floatAndLengthO.get()
+    value = newValue(floatAndLength.number)
+    assert floatAndLength.length <= length
   else:
     # Parse the int.
-    let intPosO = parseInteger(statement.text, start)
-    if not intPosO.isSome:
+    let intAndLengthO = parseInteger(statement.text, start)
+    if not intAndLengthO.isSome:
       return newValueAndLengthOr(wNumberOverFlow, "", start)
-    let intPos = intPosO.get()
-    value = newValue(intPos.integer)
-    assert intPos.length <= length
+    let intAndLength = intAndLengthO.get()
+    value = newValue(intAndLength.number)
+    assert intAndLength.length <= length
   result = newValueAndLengthOr(value, length)
 
 # Forward reference to getValueAndLength since we call it recursively.

@@ -5,62 +5,83 @@ Parse an int or float number string.  Return the number and number of characters
 * [parseNumber.nim](../src/parseNumber.nim) &mdash; Nim source code.
 # Index
 
-* type: [IntPos](#intpos) &mdash; Integer and characters processed.
-* type: [FloatPos](#floatpos) &mdash; Float and characters processed.
-* [parseFloat64](#parsefloat64) &mdash; Parse the string and return the 64 bit float number and the
+* type: [IntAndLength](#intandlength) &mdash; IntAndLength holds a 64 bit signed integer and the number of characters processed.
+* type: [FloatAndLength](#floatandlength) &mdash; FloatAndLength holds a 64 float and the number of characters processed.
+* [newIntAndLength](#newintandlength) &mdash; Create a new IntAndLength object.
+* [newFloatAndLength](#newfloatandlength) &mdash; Create a new FloatAndLength object.
+* [parseFloat](#parsefloat) &mdash; Parse the string and return the 64 bit float number and the
 number of characters processed.
-* [parseInteger](#parseinteger) &mdash; Parse the string and return the integer and number of characters
-processed.
+* [parseInteger](#parseinteger) &mdash; Parse the string and return the 64 bit signed integer and number
+of characters processed.
 
-# IntPos
+# IntAndLength
 
-Integer and characters processed.
+IntAndLength holds a 64 bit signed integer and the number of characters processed.
 
 ```nim
-IntPos = object
-  integer*: BiggestInt
-  length*: int
+IntAndLength = object
+  number*: int64
+  length*: Natural
 
 ```
 
-# FloatPos
+# FloatAndLength
 
-Float and characters processed.
+FloatAndLength holds a 64 float and the number of characters processed.
 
 ```nim
-FloatPos = object
+FloatAndLength = object
   number*: float64
-  length*: int
+  length*: Natural
 
 ```
 
-# parseFloat64
+# newIntAndLength
+
+Create a new IntAndLength object.
+
+```nim
+func newIntAndLength(number: int64; length: Natural): IntAndLength
+```
+
+# newFloatAndLength
+
+Create a new FloatAndLength object.
+
+```nim
+func newFloatAndLength(number: float64; length: Natural): FloatAndLength
+```
+
+# parseFloat
 
 Parse the string and return the 64 bit float number and the
-number of characters processed. Nothing is returned when the
-float is out of range or the str is not a float number.
-Processing stops at the first non-number character.
+number of characters processed. The number starts at the start
+parameter index. Nothing is returned when the float is out of
+range or the str is not a float number.  Processing stops at the
+first non-number character.
 
 A float number starts with an optional minus sign, followed by a
 digit, followed by digits, underscores or a decimal point. Only
 one decimal point is allowed and underscores are skipped.
 
 ```nim
-proc parseFloat64(str: string; start: Natural = 0): Option[FloatPos]
+proc parseFloat(str: string; start: Natural = 0): Option[FloatAndLength]
 ```
 
 # parseInteger
 
-Parse the string and return the integer and number of characters
-processed. Nothing is returned when the integer is out of range
-or the str is not a number.
+Parse the string and return the 64 bit signed integer and number
+of characters processed. The number starts at the start parameter
+index. Parsing stops at the first non-number character.  Nothing
+is returned when the integer is out of range or the str is not a
+number.
 
 An integer starts with an optional minus sign, followed by a
 digit, followed by digits or underscores. The underscores are
-skipped. Processing stops at the first non-number character.
+skipped.
 
 ```nim
-proc parseInteger(s: string; start: Natural = 0): Option[IntPos]
+proc parseInteger(s: string; start: Natural = 0): Option[IntAndLength]
 ```
 
 

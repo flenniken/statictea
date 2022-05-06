@@ -4,47 +4,47 @@ import std/options
 import std/strutils
 import parseNumber
 
-proc testParseInteger(str: string, expectedInteger: BiggestInt, expectedLength: int,
-                      start: Natural = 0): bool =
+proc testParseInteger(str: string, expectedNumber: BiggestInt,
+    expectedLength: int, start: Natural = 0): bool =
   # Return true when the string parses as expected.
-  var intPosO = parseInteger(str, start)
-  if not isSome(intPosO):
+  var intAndLengthO = parseInteger(str, start)
+  if not isSome(intAndLengthO):
     echo "Did not find an integer for:"
     echo string
     return false
-  let intPos = intPosO.get()
-  if intPos.length != expectedLength:
-    echo "         length: $1" % $intPos.length
+  let intAndLength = intAndLengthO.get()
+  if intAndLength.length != expectedLength:
+    echo "         length: $1" % $intAndLength.length
     echo "expected length: $1" % $expectedLength
     return false
-  if intPos.integer != expectedInteger:
-    echo "         integer: $1" % $intPos.integer
-    echo "expected integer: $1" % $expectedInteger
+  if intAndLength.number != expectedNumber:
+    echo "         number: $1" % $intAndLength.number
+    echo "expected number: $1" % $expectedNumber
     return false
   return true
 
 proc testParseIntegerError(str: string, start: Natural = 0): bool =
   # Return true when the given string does not parse as an integer,
   # else return false.
-  var intPosO = parseInteger(str, start)
-  if not intPosO.isSome:
+  var intAndLengthO = parseInteger(str, start)
+  if not intAndLengthO.isSome:
     result = true
 
 proc testParseFloat(str: string, expectedFloat: BiggestFloat, expectedLength: int,
                       start: Natural = 0): bool =
   # Return true when the string parses as expected.
-  var floatPosO = parseFloat64(str, start)
-  if not isSome(floatPosO):
+  var floatAndLengthO = parseFloat(str, start)
+  if not isSome(floatAndLengthO):
     echo "Did not find a float for:"
     echo string
     return false
-  let floatPos = floatPosO.get()
-  if floatPos.length != expectedLength:
-    echo "         length: $1" % $floatPos.length
+  let floatAndLength = floatAndLengthO.get()
+  if floatAndLength.length != expectedLength:
+    echo "         length: $1" % $floatAndLength.length
     echo "expected length: $1" % $expectedLength
     return false
-  if floatPos.number != expectedFloat:
-    echo "         number: $1" % $floatPos.number
+  if floatAndLength.number != expectedFloat:
+    echo "         number: $1" % $floatAndLength.number
     echo "expected number: $1" % $expectedFloat
     return false
   return true

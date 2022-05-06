@@ -63,16 +63,16 @@ func numberStringToNum(numString: string): FunResult =
 
   if decimalPoint == ".":
     # Float number string to float.
-    let floatPosO = parseFloat64(numString)
-    if floatPosO.isSome:
-      result = newFunResult(newValue(floatPosO.get().number))
+    let floatAndLengthO = parseNumber.parseFloat(numString)
+    if floatAndLengthO.isSome:
+      result = newFunResult(newValue(floatAndLengthO.get().number))
     else:
       result = newFunResultWarn(wExpectedNumberString)
   else:
     # Int number string to int.
-    let intPosO = parseInteger(numString)
-    if intPosO.isSome:
-      result = newFunResult(newValue(intPosO.get().integer))
+    let intAndLengthO = parseInteger(numString)
+    if intAndLengthO.isSome:
+      result = newFunResult(newValue(intAndLengthO.get().number))
     else:
       result = newFunResultWarn(wExpectedNumberString)
 
@@ -528,10 +528,10 @@ func parseVersion*(version: string): Option[(int, int, int)] =
   if not matchesO.isSome:
     return
   let (g1, g2, g3) = matchesO.get3Groups()
-  var g1IntPosO = parseInteger(g1)
-  var g2IntPosO = parseInteger(g2)
-  var g3IntPosO = parseInteger(g3)
-  result = some((int(g1IntPosO.get().integer), int(g2IntPosO.get().integer), int(g3IntPosO.get().integer)))
+  var g1IntAndLengthO = parseInteger(g1)
+  var g2IntAndLengthO = parseInteger(g2)
+  var g3IntAndLengthO = parseInteger(g3)
+  result = some((int(g1IntAndLengthO.get().number), int(g2IntAndLengthO.get().number), int(g3IntAndLengthO.get().number)))
 
 func funCmpVersion*(parameters: seq[Value]): FunResult =
   ## Compare two StaticTea version numbers. Returns -1 for less, 0 for
