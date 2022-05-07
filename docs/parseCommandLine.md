@@ -1,3 +1,4 @@
+</style>
 # parseCommandLine.nim
 
 Parse the StaticTea terminal command line and return the arguments.

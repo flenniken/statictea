@@ -16,7 +16,8 @@ Parse the command line.
  let argsOrMessage = cmdline(options, collectParams())
  if argsOrMessage.kind == cmlMessageKind:
    # Display the message.
-   echo getMessage(argsOrMessage.messageId, argsOrMessage.problemParam)
+   echo getMessage(argsOrMessage.messageId,
+     argsOrMessage.problemParam)
  else:
    # Optionally post process the resulting arguments.
    let args = newArgs(argsOrMessage.args)
@@ -28,7 +29,8 @@ Parse the command line.
 * [cmdline.nim](../src/cmdline.nim) &mdash; Nim source code.
 # Index
 
-* type: [CmlArgs](#cmlargs) &mdash; CmlArgs holds the parsed command line arguments in an ordered dictionary.
+* type: [CmlArgs](#cmlargs) &mdash; CmlArgs holds the parsed command line arguments in an ordered
+dictionary.
 * type: [CmlMessageId](#cmlmessageid) &mdash; Possible message IDs returned by cmdline.
 * type: [ArgsOrMessageKind](#argsormessagekind) &mdash; The kind of an ArgsOrMessage object, either args or a message.
 * type: [ArgsOrMessage](#argsormessage) &mdash; Contains the command line args or a message.
@@ -44,7 +46,10 @@ Parse the command line.
 
 # CmlArgs
 
-CmlArgs holds the parsed command line arguments in an ordered dictionary. The keys are the supported options found on the command line and each value is a list of associated parameters. An option without parameters will have an empty list.
+CmlArgs holds the parsed command line arguments in an ordered
+dictionary. The keys are the supported options found on the
+command line and each value is a list of associated parameters.
+An option without parameters will have an empty list.
 
 ```nim
 CmlArgs = OrderedTable[string, seq[string]]
@@ -52,7 +57,13 @@ CmlArgs = OrderedTable[string, seq[string]]
 
 # CmlMessageId
 
-Possible message IDs returned by cmdline. The number in the name is the same as its ord value.  Since the message handling is left to the caller, it is important for these values to be stable. New values are added to the end and this is a minor version change. It is ok to leave unused values in the list and this is backward compatible. If items are removed or reordered, that is a major version change.
+Possible message IDs returned by cmdline. The number in the
+name is the same as its ord value.  Since the message handling
+is left to the caller, it is important for these values to be
+stable. New values are added to the end and this is a minor
+version change. It is ok to leave unused values in the list and
+this is backward compatible. If items are removed or reordered,
+that is a major version change.
 
 ```nim
 CmlMessageId = enum
@@ -92,17 +103,21 @@ ArgsOrMessage = object
 # CmlOptionType
 
 The option type.
+* cmlParameter0or1 -- option with a parameter, 0 or 1 times.
+* cmlNoParameter -- option without a parameter, 0 or 1 times.
+* cmlOptionalParameter -- option with an optional parameter, 0
+    or 1 times.
+* cmlBareParameter -- a parameter without an option, 1 time.
+* cmlParameterOnce -- option with a parameter, 1 time.
+* cmlParameterMany -- option with a parameter, unlimited
+    number of times.
+* cmlStopParameter -- option without a parameter, 0 or 1
+    times. Stop and return this option by itself.
 
 ```nim
 CmlOptionType = enum
-  cmlParameter0or1,         ## option with a parameter, 0 or 1 times.
-  cmlNoParameter,           ## option without a parameter, 0 or 1 times.
-  cmlOptionalParameter,     ## option with an optional parameter, 0 or 1 times.
-  cmlBareParameter,         ## a parameter without an option, 1 time
-  cmlParameterOnce,         ## option with a parameter, 1 time.
-  cmlParameterMany,         ## option with a parameter, unlimited number of times.
-  cmlStopParameter ## option without a parameter, 0 or 1 times. Stop and return
-                   ## this option by itself.
+  cmlParameter0or1, cmlNoParameter, cmlOptionalParameter, cmlBareParameter,
+  cmlParameterOnce, cmlParameterMany, cmlStopParameter
 ```
 
 # newCmlOption

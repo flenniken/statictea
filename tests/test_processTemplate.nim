@@ -682,8 +682,6 @@ template.html(2): w67: The maxRepeat value must be greater than or equal to t.re
 statement: t.maxRepeat=3
            ^
 """
-    # todo: it might be better if the arrow pointed at the first non-whitespace character.
-    # todo: or strip leading and trailing whitespace from statements?
     check testProcessTemplate(templateContent = templateContent,
         eErrLines = eErrLines, eResultLines = eResultLines, eRc = 1)
 

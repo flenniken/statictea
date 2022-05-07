@@ -806,7 +806,6 @@ Compare these files.
 ### Expected stdout.expected == stdout
 ### Expected stderr.expected == stderr
 """
-    # todo: rename ExpectedLine ExpectedLine
     let a = newExpectedLine("stdout.expected", "stdout")
     let b = newExpectedLine("stderr.expected", "stderr")
     let f1 = newRunFileLine("cmd.sh", command = true, noLastEnding = true)

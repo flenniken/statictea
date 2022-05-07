@@ -39,7 +39,6 @@ func parseCommandLine*(argv: seq[string]): ArgsOr =
   options.add(newCmlOption("shared", 'j', cmlParameterMany))
   options.add(newCmlOption("prepost", 'p', cmlParameterMany))
 
-  # todo: template is a required parameter.
   options.add(newCmlOption("template", 't', cmlParameter0or1))
   options.add(newCmlOption("result", 'r', cmlParameter0or1))
   let ArgsOrMessage = cmdLine(options, argv)

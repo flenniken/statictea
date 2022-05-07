@@ -14,7 +14,8 @@
 ## @: let argsOrMessage = cmdline(options, collectParams())
 ## @: if argsOrMessage.kind == cmlMessageKind:
 ## @:   # Display the message.
-## @:   echo getMessage(argsOrMessage.messageId, argsOrMessage.problemParam)
+## @:   echo getMessage(argsOrMessage.messageId,
+## @:     argsOrMessage.problemParam)
 ## @: else:
 ## @:   # Optionally post process the resulting arguments.
 ## @:   let args = newArgs(argsOrMessage.args)
@@ -30,18 +31,18 @@ import std/strutils
 type
   CmlArgs* = OrderedTable[string, seq[string]]
     ## CmlArgs holds the parsed command line arguments in an ordered
-    ## dictionary. The keys are the supported options found on the
-    ## command line and each value is a list of associated parameters.
-    ## An option without parameters will have an empty list.
+    ## @:dictionary. The keys are the supported options found on the
+    ## @:command line and each value is a list of associated parameters.
+    ## @:An option without parameters will have an empty list.
 
   CmlMessageId* = enum
     ## Possible message IDs returned by cmdline. The number in the
-    ## name is the same as its ord value.  Since the message handling
-    ## is left to the caller, it is important for these values to be
-    ## stable. New values are added to the end and this is a minor
-    ## version change. It is ok to leave unused values in the list and
-    ## this is backward compatible. If items are removed or reordered,
-    ## that is a major version change.
+    ## @:name is the same as its ord value.  Since the message handling
+    ## @:is left to the caller, it is important for these values to be
+    ## @:stable. New values are added to the end and this is a minor
+    ## @:version change. It is ok to leave unused values in the list and
+    ## @:this is backward compatible. If items are removed or reordered,
+    ## @:that is a major version change.
     cml_00_BareTwoDashes,
     cml_01_InvalidOption,
     cml_02_OptionRequiresParam,
@@ -72,21 +73,23 @@ type
 
   CmlOptionType* = enum
     ## The option type.
+    ## @:* cmlParameter0or1 -- option with a parameter, 0 or 1 times.
+    ## @:* cmlNoParameter -- option without a parameter, 0 or 1 times.
+    ## @:* cmlOptionalParameter -- option with an optional parameter, 0
+    ## @:    or 1 times.
+    ## @:* cmlBareParameter -- a parameter without an option, 1 time.
+    ## @:* cmlParameterOnce -- option with a parameter, 1 time.
+    ## @:* cmlParameterMany -- option with a parameter, unlimited
+    ## @:    number of times.
+    ## @:* cmlStopParameter -- option without a parameter, 0 or 1
+    ## @:    times. Stop and return this option by itself.
     cmlParameter0or1
-      ## option with a parameter, 0 or 1 times.
     cmlNoParameter
-      ## option without a parameter, 0 or 1 times.
     cmlOptionalParameter
-      ## option with an optional parameter, 0 or 1 times.
     cmlBareParameter
-      ## a parameter without an option, 1 time
     cmlParameterOnce
-      ## option with a parameter, 1 time.
     cmlParameterMany
-      ## option with a parameter, unlimited number of times.
     cmlStopParameter
-      ## option without a parameter, 0 or 1 times. Stop and return
-      ## this option by itself.
 
   CmlOption* = object
     # An option holds its type, long name and short name.
@@ -94,7 +97,8 @@ type
     long: string
     short: char
 
-func newCmlOption*(long: string, short: char, optionType: CmlOptionType): CmlOption =
+func newCmlOption*(long: string, short: char,
+    optionType: CmlOptionType): CmlOption =
   ## Create a new CmlOption object. For no short option use a dash.
   result = CmlOption(long: long, short: short, optionType: optionType)
 
@@ -102,7 +106,8 @@ func newArgsOrMessage(args: CmlArgs): ArgsOrMessage =
   ## Create a new ArgsOrMessage object containing arguments.
   result = ArgsOrMessage(kind: cmlArgsKind, args: args)
 
-func newArgsOrMessage(messageId: CmlMessageId, problemParam = ""): ArgsOrMessage =
+func newArgsOrMessage(messageId: CmlMessageId,
+    problemParam = ""): ArgsOrMessage =
   ## Create a new ArgsOrMessage object containing a message id and
   ## optionally the problem parameter.
   result = ArgsOrMessage(kind: cmlMessageKind, messageId: messageId,
@@ -110,7 +115,8 @@ func newArgsOrMessage(messageId: CmlMessageId, problemParam = ""): ArgsOrMessage
 
 func `$`*(a: CmlOption): string =
   ## Return a string representation of an CmlOption object.
-  return "option: long=$1, short=$2, optionType=$3" % [a.long, $a.short, $a.optionType]
+  return "option: long=$1, short=$2, optionType=$3" % [
+    a.long, $a.short, $a.optionType]
 
 func `$`*(a: ArgsOrMessage): string =
   ## Return a string representation of a ArgsOrMessage object.
@@ -172,7 +178,8 @@ proc optionCount(args: var CmlArgs, optionName: string): Natural =
   else:
     result = args[optionName].len
 
-func cmdLine*(options: openArray[CmlOption], parameters: openArray[string]): ArgsOrMessage =
+func cmdLine*(options: openArray[CmlOption],
+    parameters: openArray[string]): ArgsOrMessage =
   ## Parse the command line parameters.  You pass in the list of
   ## supported options and the parameters to parse. The arguments
   ## found are returned. If there is a problem with the parameters,
@@ -337,7 +344,8 @@ func cmdLine*(options: openArray[CmlOption], parameters: openArray[string]): Arg
 
         let option = shortOptions[shortOptionName]
         optionName = option.long
-        if option.optionType in [cmlParameter0or1, cmlParameterOnce, cmlParameterMany]:
+        if option.optionType in [cmlParameter0or1,
+            cmlParameterOnce, cmlParameterMany]:
           # _05_, The option '-$1' needs a parameter; use it by itself.
           return newArgsOrMessage(cml_05_ShortParamInList, $shortOptionName)
         addArg(args, optionName)
@@ -351,7 +359,8 @@ func cmdLine*(options: openArray[CmlOption], parameters: openArray[string]): Arg
 
   if bareIx < bareParameterNames.len:
     # _10_, Missing bare parameter: '$1'.
-    return newArgsOrMessage(cml_10_MissingParameter, bareParameterNames[bareIx])
+    return newArgsOrMessage(cml_10_MissingParameter,
+      bareParameterNames[bareIx])
 
   if state == optionalParameter:
     addArg(args, optionName)

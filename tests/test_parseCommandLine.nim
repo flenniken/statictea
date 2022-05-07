@@ -212,6 +212,11 @@ suite "parseCommandLine":
          resultFilename = "result.html",
     )
 
+  test "parseCommandLine-two-templates":
+    let cmd = "-t tea.html -t tea2.html -r result"
+    check parseWarning(cmd, newWarningData(
+      wCmlAlreadyHaveOneParameter, "template"))
+
   # You cannot test quotes here. The quote processing happens before sending to the parser.
   # test "parseCommandLine-quotes1":
   #   check tpcl("-r='result.html'", resultFilename = "result.html")
