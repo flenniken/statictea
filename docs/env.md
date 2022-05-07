@@ -138,7 +138,7 @@ proc writeOut(env: var Env; message: string)
 Open and return the environment containing standard error and standard out as streams.
 
 ```nim
-proc openEnv(logFilename: string = ""; warnSize: BiggestInt = logWarnSize): Env
+proc openEnv(logFilename: string = ""; warnSize: int64 = logWarnSize): Env
 ```
 
 # setupLogging
@@ -147,7 +147,7 @@ Turn on logging for the environment using the specified log file.
 
 ```nim
 proc setupLogging(env: var Env; logFilename: string = "";
-                  warnSize: BiggestInt = logWarnSize)
+                  warnSize: int64 = logWarnSize)
 ```
 
 # addExtraStreams

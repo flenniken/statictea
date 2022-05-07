@@ -619,9 +619,6 @@ func funFloat_sf*(parameters: seq[Value]): FunResult =
   else:
     result = newFunResult(newValue(float(funResult.value.intv)))
 
-
-# todo: use int64 instead of BiggestInt everywhere.
-
 func convertFloatToInt(num: float, map: VarsDict): FunResult =
   ## Convert float to an integer. The map contains the optional round
   ## options as "b".

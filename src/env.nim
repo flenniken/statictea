@@ -15,7 +15,7 @@ when defined(test):
 # todo: os.sameFile(path1, path2: string) returns whether the to paths refer to the same file.
 
 const
-  logWarnSize: BiggestInt = 1024 * 1024 * 1024
+  logWarnSize: int64 = 1024 * 1024 * 1024
     ## Warn the user when the log file gets over 1 GB.
 
   dtFormat* = "yyyy-MM-dd HH:mm:ss'.'fff"
@@ -173,7 +173,7 @@ proc openLogFile(env: var Env, logFilename: string) =
     env.warn(0, wUnableToOpenLogFile, logFilename)
 
 proc openEnv*(logFilename: string = "",
-                  warnSize: BiggestInt = logWarnSize): Env =
+                  warnSize: int64 = logWarnSize): Env =
   ## Open and return the environment containing standard error and
   ## standard out as streams.
 
@@ -185,7 +185,7 @@ proc openEnv*(logFilename: string = "",
 # todo: test specifying the log filename.
 
 proc setupLogging*(env: var Env, logFilename: string = "",
-                  warnSize: BiggestInt = logWarnSize) =
+                  warnSize: int64 = logWarnSize) =
   ## Turn on logging for the environment using the specified log file.
 
   # When no log filename, use the default.

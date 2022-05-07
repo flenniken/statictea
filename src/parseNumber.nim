@@ -4,9 +4,6 @@
 import std/options
 import std/parseUtils
 
-# todo: use int64 instead of BiggestInt everywhere.
-assert sizeof[BiggestInt] == sizeof[int64]
-
 type
   IntAndLength* = object
     ## IntAndLength holds a 64 bit signed integer and the number of
@@ -57,8 +54,8 @@ proc parseInteger*(s: string, start: Natural = 0): Option[IntAndLength] =
   ## @:skipped.
 
   var
-    sign: BiggestInt = -1
-    b: BiggestInt = 0
+    sign: int64 = -1
+    b: int64 = 0
     i = start
 
   if i < s.len:
@@ -72,12 +69,12 @@ proc parseInteger*(s: string, start: Natural = 0): Option[IntAndLength] =
     while i < s.len and s[i] in {'0'..'9', '_'}:
       if s[i] != '_':
         let c = ord(s[i]) - ord('0')
-        if b >= (low(BiggestInt) + c) div 10:
+        if b >= (low(int64) + c) div 10:
           b = b * 10 - c
         else:
           return
       inc(i)
-    if sign == -1 and b == low(BiggestInt):
+    if sign == -1 and b == low(int64):
       return
 
     b = b * sign

@@ -4,7 +4,7 @@ import std/options
 import std/strutils
 import parseNumber
 
-proc testParseInteger(str: string, expectedNumber: BiggestInt,
+proc testParseInteger(str: string, expectedNumber: int64,
     expectedLength: int, start: Natural = 0): bool =
   # Return true when the string parses as expected.
   var intAndLengthO = parseInteger(str, start)
@@ -80,11 +80,11 @@ suite "parseNumber.nim":
     check testParseInteger("+123_456_789", 123456789, 12)
 
   test "parseIntegerMax":
-    check testParseInteger("-9_223_372_036_854_775_808", low(BiggestInt), 26)
-    check testParseInteger("+9_223_372_036_854_775_807", high(BiggestInt), 26)
-    check testParseInteger("-9223372036854775808", low(BiggestInt), 20)
-    check testParseInteger("+9223372036854775807", high(BiggestInt), 20)
-    check testParseInteger("9223372036854775807", high(BiggestInt), 19)
+    check testParseInteger("-9_223_372_036_854_775_808", low(int64), 26)
+    check testParseInteger("+9_223_372_036_854_775_807", high(int64), 26)
+    check testParseInteger("-9223372036854775808", low(int64), 20)
+    check testParseInteger("+9223372036854775807", high(int64), 20)
+    check testParseInteger("9223372036854775807", high(int64), 19)
 
   test "parseIntegerStopEarly":
     check testParseInteger("1a", 1, 1)
