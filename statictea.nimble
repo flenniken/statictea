@@ -381,12 +381,16 @@ proc createDependencyGraph() =
     let tooltip = fmt"""tooltip="{name}.md""""
     var extra: string
     var allNodes = "fontsize=24;"
-    if sourceNamesDict[name] > 0:
-      # tree trunk
-      extra = "fillcolor=palegoldenrod, style=filled"
-    else:
+    let count = sourceNamesDict[name]
+    if count == 0:
       # tree leaves
       extra = "shape=doubleoctagon, fillcolor=palegreen, style=filled"
+    elif count == 1:
+      extra = "fillcolor=palegoldenrod, style=filled"
+      # extra = "color=red"
+    else:
+      # tree trunk
+      extra = "fillcolor=palegoldenrod, style=filled"
     var attrs: string
     if name == "statictea":
       attrs = fmt"{name} [{allNodes} shape=invhouse, {extra}, {url}, {tooltip}];" & "\n"
@@ -397,7 +401,11 @@ proc createDependencyGraph() =
   # Generate the connections between the nodes.
   for dependency in dependencies:
     if dependency.left in sourceNamesDict and dependency.right in sourceNamesDict:
-      dotText.add(fmt"""{dependency.left} -> "{dependency.right}";""" & "\n")
+      if sourceNamesDict[dependency.left] == 1:
+        dotText.add(
+          fmt"""{dependency.left} -> "{dependency.right}"[color=red];""" & "\n")
+      else:
+        dotText.add(fmt"""{dependency.left} -> "{dependency.right}";""" & "\n")
   dotText.add("}\n")
 
   # Create an svg file from the new dot file.
