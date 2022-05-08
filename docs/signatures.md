@@ -5,38 +5,52 @@ Statictea function signatures and parameter checking.
 * [signatures.nim](../src/signatures.nim) &mdash; Nim source code.
 # Index
 
+* type: [ParamCode](#paramcode) &mdash; Parameter type, one character of "ifslda" corresponding to int, float, string, list, dict, any.
+* type: [ParamKind](#paramkind) &mdash; The kind of parameter.
 * type: [Param](#param) &mdash; Holds attributes for one parameter.
-* type: [ShortName](#shortname) &mdash; Object to hold the state for the "next" function.
 * [newParam](#newparam) &mdash; Create a new Param object.
-* [kindToParamType](#kindtoparamtype) &mdash; Convert a value type to a parameter type.
-* [paramTypeString](#paramtypestring) &mdash; Return a string representation of a ParamType object.
+* [paramCodeString](#paramcodestring) &mdash; Return a string representation of a ParamCode object.
 * [`$`](#) &mdash; Return a string representation of a Param object.
+* [kindToParamCode](#kindtoparamcode) &mdash; Convert a value type to a parameter type.
 * [sameType](#sametype) &mdash; Check whether the param type is the same type or compatible with the value.
 * [parmsToSignature](#parmstosignature) &mdash; Create a signature from a list of Params.
-* [next](#next) &mdash; Get the next unique single letter name.
+* [shortName](#shortname) &mdash; Return a short name based on the given index value.
 * [signatureCodeToParams](#signaturecodetoparams) &mdash; Convert the signature code to a list of Param objects.
 * [mapParameters](#mapparameters) &mdash; Create a dictionary of the parameters.
+
+# ParamCode
+
+Parameter type, one character of "ifslda" corresponding to int, float, string, list, dict, any.
+
+```nim
+ParamCode = char
+```
+
+# ParamKind
+
+The kind of parameter.<ul class="simple"><li>pkNormal -- a normal parameter</li>
+<li>pkOptional -- an optional parameter. It must be last.</li>
+<li>pkReturn -- a return parameter.</li>
+</ul>
+
+
+```nim
+ParamKind = enum
+  pkNormal, pkOptional, pkReturn
+```
 
 # Param
 
 Holds attributes for one parameter.
+* name -- the parameter name
+* paramCode -- the parameter code, one of: ifslda
+* paramKind -- whether it is normal, optional or a return
 
 ```nim
 Param = object
-  name*: string              ## The name of the parameter.
-  paramTypes*: seq[ParamType] ## The type of the parameter.
-  optional*: bool            ## This is an optional parameter.
-  returnType*: bool          ## This is a return parameter.
-
-```
-
-# ShortName
-
-Object to hold the state for the "next" function.
-
-```nim
-ShortName = object
-  ix: int
+  name*: string
+  paramCode*: ParamCode
+  paramKind*: ParamKind
 
 ```
 
@@ -45,24 +59,15 @@ ShortName = object
 Create a new Param object.
 
 ```nim
-func newParam(name: string; optional: bool; returnType: bool;
-              paramTypes: seq[ParamType]): Param
+func newParam(name: string; paramKind: ParamKind; paramCode: ParamCode): Param
 ```
 
-# kindToParamType
+# paramCodeString
 
-Convert a value type to a parameter type.
-
-```nim
-func kindToParamType(kind: ValueKind): ParamType
-```
-
-# paramTypeString
-
-Return a string representation of a ParamType object.
+Return a string representation of a ParamCode object.
 
 ```nim
-func paramTypeString(paramType: ParamType): string
+func paramCodeString(paramCode: ParamCode): string
 ```
 
 # `$`
@@ -73,12 +78,20 @@ Return a string representation of a Param object.
 func `$`(param: Param): string
 ```
 
+# kindToParamCode
+
+Convert a value type to a parameter type.
+
+```nim
+func kindToParamCode(kind: ValueKind): ParamCode
+```
+
 # sameType
 
 Check whether the param type is the same type or compatible with the value.
 
 ```nim
-func sameType(paramType: ParamType; valueKind: ValueKind): bool
+func sameType(paramCode: ParamCode; valueKind: ValueKind): bool
 ```
 
 # parmsToSignature
@@ -89,12 +102,12 @@ Create a signature from a list of Params.
 func parmsToSignature(params: seq[Param]): string
 ```
 
-# next
+# shortName
 
-Get the next unique single letter name. It returns names a, b, c, ..., z then repeats a0, b0, c0,....
+Return a short name based on the given index value. Return a for 0, b for 1, etc.  It returns names a, b, c, ..., z then repeats a0, b0, c0,....
 
 ```nim
-proc next(letterName: var ShortName): string
+proc shortName(index: Natural): string
 ```
 
 # signatureCodeToParams
@@ -107,7 +120,7 @@ func signatureCodeToParams(signatureCode: string): Option[seq[Param]]
 
 # mapParameters
 
-Create a dictionary of the parameters. The parameter names are the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the parameters do not match the signature.  The last signature param is for the return type.
+Create a dictionary of the parameters. The parameter names are the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the parameters do not match the signature.  The last signature parameter is for the return type.
 
 ```nim
 func mapParameters(params: seq[Param]; args: seq[Value]): FunResult

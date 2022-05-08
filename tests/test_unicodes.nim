@@ -185,10 +185,7 @@ suite "unicodes.nim":
     check cmpString("ABC", "abc", true) == 0
     check cmpString("aBc", "Abd", true) == -1
     check cmpString("Abd", "aBc", true) == 1
-
-  test "cmpString unicode":
     # todo: test unicode
-    check cmpString("Abd", "aBc", true) == 1
 
   test "codePointToString":
     check codePointToString(0x00).value == "\x00"

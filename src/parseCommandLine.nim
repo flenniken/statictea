@@ -86,6 +86,9 @@ func parseCommandLine*(argv: seq[string]): ArgsOr =
       args.logFilename = filenames[0]
     args.log = true
 
-  # todo: what to do about filenames in multiple places?  result = template = log, etc?
+  # We don't need to check whether the command line files are
+  # unique. We read the json files first and the code handles
+  # duplicates. There is only one result file that we write to and it
+  # is written after reading the others.
 
   result = newArgsOr(args)

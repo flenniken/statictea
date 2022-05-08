@@ -1,70 +1,46 @@
 ## Statictea function signatures and parameter checking.
 
 import std/tables
+import std/strutils
 import vartypes
 import funtypes
 import options
 import messages
-# import strformat
-import strutils
-
-#[
-
-We prefer the term parameter to mean information that is passed to a
-function. However, inside a function we use parameter for the
-variables in the function signature and argument as the values sent to
-the function when called.
-
-]#
 
 const
   singleCodes = {'i', 'f', 's', 'l', 'd', 'a'}
 
-# todo: support list types, li, lf, ls, ll, ld, la.
+# todo: support list types, li, lf, ls, ll, ld, la or IFSLDA
 
 type
-  ParamType* = char
-    # Parameter type, one character of ifsldaIFSLDA.
+  ParamCode* = char
+    ## Parameter type, one character of "ifslda" corresponding to int,
+    ## float, string, list, dict, any.
+
+  ParamKind* = enum
+    ## The kind of parameter.
+    ## * pkNormal -- a normal parameter
+    ## * pkOptional -- an optional parameter. It must be last.
+    ## * pkReturn -- a return parameter.
+    pkNormal, pkOptional, pkReturn
 
   Param* = object
     ## Holds attributes for one parameter.
+    ## @:* name -- the parameter name
+    ## @:* paramCode -- the parameter code, one of: ifslda
+    ## @:* paramKind -- whether it is normal, optional or a return
     name*: string
-      ## The name of the parameter.
-    paramTypes*: seq[ParamType]
-      ## The type of the parameter.
-    optional*: bool
-      ## This is an optional parameter.
-    returnType*: bool
-      ## This is a return parameter.
+    paramCode*: ParamCode
+    paramKind*: ParamKind
 
-type
-  ShortName* = object
-    ## Object to hold the state for the "next" function.
-    ix: int
-
-func newParam*(name: string, optional: bool, returnType: bool,
-    paramTypes: seq[Paramtype]): Param =
+func newParam*(name: string, paramKind: ParamKind,
+    paramCode: ParamCode): Param =
   ## Create a new Param object.
-  result = Param(name: name, optional: optional,
-                 returnType: returnType, paramTypes: paramTypes)
+  result = Param(name: name, paramKind: paramKind, paramCode: paramCode)
 
-func kindToParamType*(kind: ValueKind): ParamType =
-  ## Convert a value type to a parameter type.
-  case kind:
-    of vkInt:
-      result = 'i'
-    of vkFloat:
-      result = 'f'
-    of vkString:
-      result = 's'
-    of vkList:
-      result = 'l'
-    of vkDict:
-      result = 'd'
-
-func paramTypeString*(paramType: ParamType): string =
-  ## Return a string representation of a ParamType object.
-  case toLowerAscii(paramType):
+func paramCodeString*(paramCode: ParamCode): string =
+  ## Return a string representation of a ParamCode object.
+  case paramCode:
   of 'i':
     result = "int"
   of 'f':
@@ -78,29 +54,42 @@ func paramTypeString*(paramType: ParamType): string =
   of 'a':
     result = "any"
   else:
-    assert false, "Invalid paramType."
+    assert false, "Invalid paramCode."
     discard
 
 func `$`*(param: Param): string =
   ## Return a string representation of a Param object.
   var optional: string
-  if param.optional:
+  if param.paramKind == pkOptional:
     optional = "optional "
   else:
     optional = ""
-  if param.returnType:
-    result = paramTypeString(param.paramTypes[0])
+  if param.paramKind == pkReturn:
+    result = paramCodeString(param.paramCode)
   else:
     # name: int
-    let typeString = paramTypeString(param.paramTypes[0])
-    # result = fmt"{param.name}: {optional}{typeString}"
+    let typeString = paramCodeString(param.paramCode)
     result = "$1: $2$3" % [param.name, optional, typeString]
 
-func sameType*(paramType: ParamType, valueKind: ValueKind): bool =
+func kindToParamCode*(kind: ValueKind): ParamCode =
+  ## Convert a value type to a parameter type.
+  case kind:
+    of vkInt:
+      result = 'i'
+    of vkFloat:
+      result = 'f'
+    of vkString:
+      result = 's'
+    of vkList:
+      result = 'l'
+    of vkDict:
+      result = 'd'
+
+func sameType*(paramCode: ParamCode, valueKind: ValueKind): bool =
   ## Check whether the param type is the same type or compatible with
   ## the value.
 
-  case toLowerAscii(paramType):
+  case paramCode:
     of 'a':
       return true
     of 'i':
@@ -119,62 +108,60 @@ func sameType*(paramType: ParamType, valueKind: ValueKind): bool =
       if valueKind == vkDict:
         return true
     else:
-      assert false, "Invalid paramType"
+      assert false, "Invalid paramCode"
       discard
 
 func parmsToSignature*(params: seq[Param]): string =
   ## Create a signature from a list of Params.
+  assert len(params) > 0
   var inside: string
   if params.len > 1:
     inside = join(params[0 .. params.len-2], ", ")
   let returnType = $params[params.len-1]
-  # result = fmt"({inside}) {returnType}"
   result = "($1) $2" % [inside, returnType]
 
-proc next*(letterName: var ShortName): string =
-  ## Get the next unique single letter name. It returns names a, b, c,
-  ## ..., z then repeats a0, b0, c0,....
+proc shortName*(index: Natural): string =
+  ## Return a short name based on the given index value. Return a for
+  ## 0, b for 1, etc.  It returns names a, b, c, ..., z then repeats
+  ## a0, b0, c0,....
 
-  let letters = "abcdefghijklmnopqurstuvwxyz"
-  var num = 0
-  var numString: string
-  if letterName.ix > letters.len - 1:
-    letterName.ix = 0
-  if num > 0:
-    numString = $num
-  result = $letters[letterName.ix] & numString
-  inc(letterName.ix)
+  let letters = "abcdefghijklmnopqrstuvwxyz"
+  assert len(letters) == 26
+  let remainder = index mod len(letters)
+  let num = index div len(letters)
+  let numString = if num == 0: "" else: $num
+  result = $letters[remainder] & numString
+  # debugEcho("index $1, num $2, remainder $3, result $4" % [
+  #   $index, $num, $remainder, result])
 
 func signatureCodeToParams*(signatureCode: string): Option[seq[Param]] =
   ## Convert the signature code to a list of Param objects.
   var params: seq[Param]
-
-  let returnCode = signatureCode[signatureCode.len-1]
-  var letterName = ShortName()
-  var optional: bool
-  var ix = 0
-
-  while ix < signatureCode.len - 1:
+  var paramKind: ParamKind
+  var nameIx = 0
+  if len(signatureCode) < 1:
+    return
+  for ix in countUp(0, signatureCode.len - 2):
     var code = signatureCode[ix]
     if code in singleCodes:
-      params.add(newParam(letterName.next(), optional, false, @[code]))
-      inc(ix)
+      params.add(newParam(shortName(nameIx), paramKind, code))
+      paramKind = pkNormal
+      inc(nameIx)
     elif code == 'o':
-      optional = true
-      inc(ix)
+      paramKind = pkOptional
     else:
       # Invalid signature code.
       return
 
-  # Return the return parameter.
-  params.add(newParam("result", false, true, @[returnCode]))
+  let returnCode = signatureCode[signatureCode.len-1]
+  params.add(newParam("result", pkReturn, returnCode))
   result = some(params)
 
 func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
   ## Create a dictionary of the parameters. The parameter names are
   ## the dictionary keys.  Return a FunResult object containing the
   ## dictionary or a warning when the parameters do not match the
-  ## signature.  The last signature param is for the return type.
+  ## signature.  The last signature parameter is for the return type.
 
   var map = newVarsDict()
 
@@ -185,7 +172,7 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
   var loopParams: int
   if params.len >= 2:
     let lastParamIx = params.len - 2
-    gotOptional = params[lastParamIx].optional
+    gotOptional = (params[lastParamIx].paramKind == pkOptional)
     if gotOptional:
       requiredParams = lastParamIx
       if args.len > lastParamIx:
@@ -222,8 +209,8 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
     var arg = args[ix]
 
     # Check the parameter is the correct type.
-    if not sameType(param.paramTypes[0], arg.kind):
-      let expected = paramTypeString(param.paramTypes[0])
+    if not sameType(param.paramCode, arg.kind):
+      let expected = paramCodeString(param.paramCode)
       # Wrong parameter type, expected $1.
       return newFunResultWarn(kWrongType, ix, $expected)
 

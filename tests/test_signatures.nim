@@ -26,7 +26,8 @@ proc testMapParametersOk(signatureCode: string, args: seq[Value],
   if not expectedItem("mapParameters", funResult.kind, frValue):
     echo "warning: " & $funResult
     return false
-  if not expectedItem("mapParameters", valueToString(funResult.value), eMapJson):
+  if not expectedItem("mapParameters",
+      valueToString(funResult.value), eMapJson):
     echo "signatureCode: " & signatureCode
     return false
   result = true
@@ -48,15 +49,20 @@ proc testMapParametersW(signatureCode: string, args: seq[Value],
     return false
   result = true
 
-proc testParamStringSingle(name: string, paramType: ParamType, optional: bool,
+proc testParamStringSingle(name: string, paramCode: ParamCode, optional: bool,
                      eString: string): bool =
   ## Test single arg cases.
-  let param = newParam("hello", optional, false, @[paramType])
+  var paramKind: ParamKind
+  if optional:
+    paramKind = pkOptional
+  else:
+    paramKind = pkNormal
+  let param = newParam("hello", paramKind, paramCode)
   result = expectedItem("param", $param, eString)
 
-proc testParamStringReturn(paramType: ParamType, eString: string): bool =
+proc testParamStringReturn(paramCode: ParamCode, eString: string): bool =
   ## Test return parameter case.
-  let param = newParam("result", false, true, @[paramType])
+  let param = newParam("result", pkReturn, paramCode)
   result = expectedItem("param", $param, eString)
 
 
@@ -65,13 +71,13 @@ suite "signatures.nim":
   test "test me":
     check 1 == 1
 
-  test "paramType string":
-    check paramTypeString('i') == "int"
-    check paramTypeString('f') == "float"
-    check paramTypeString('s') == "string"
-    check paramTypeString('l') == "list"
-    check paramTypeString('d') == "dict"
-    check paramTypeString('a') == "any"
+  test "paramCode string":
+    check paramCodeString('i') == "int"
+    check paramCodeString('f') == "float"
+    check paramCodeString('s') == "string"
+    check paramCodeString('l') == "list"
+    check paramCodeString('d') == "dict"
+    check paramCodeString('a') == "any"
 
   test "sameType":
     check sameType('i', vkInt)
@@ -92,6 +98,8 @@ suite "signatures.nim":
     check testSignatureCodeToParams("ss", "(a: string) string")
     check testSignatureCodeToParams("sss", "(a: string, b: string) string")
     check testSignatureCodeToParams("soss", "(a: string, b: optional string) string")
+    check testSignatureCodeToParams("lsosl",
+      "(a: list, b: string, c: optional string) list")
 
   test "signatureCodeToParams all":
     let e = "(a: int, b: string, c: float, d: optional list) int"
@@ -104,12 +112,17 @@ suite "signatures.nim":
   test "Return Param representation":
     check testParamStringReturn('i', "int")
 
-  test "getNextName":
-    var shortName = ShortName()
-    check shortName.next() == "a"
-    check shortName.next() == "b"
-    check shortName.next() == "c"
-    check shortName.next() == "d"
+  test "shortName":
+    check shortName(0) == "a"
+    check shortName(1) == "b"
+    check shortName(2) == "c"
+    check shortName(25) == "z"
+    check shortName(0+26) == "a1"
+    check shortName(1+26) == "b1"
+    check shortName(25+26) == "z1"
+    check shortName(0+26+26) == "a2"
+    check shortName(1+26+26) == "b2"
+    check shortName(25+26+26) == "z2"
 
   test "mapParameters i":
     var parameters: seq[Value] = @[]
@@ -178,7 +191,8 @@ suite "signatures.nim":
     var parameters = @[newEmptyListValue(), newValue("ascending")]
     check testMapParametersOk("lsosl", parameters, """{"a":[],"b":"ascending"}""")
 
-    parameters = @[newEmptyListValue(), newValue("ascending"), newValue("insensitive")]
+    parameters = @[
+      newEmptyListValue(), newValue("ascending"), newValue("insensitive")]
     check testMapParametersOk("lsosl", parameters,
       """{"a":[],"b":"ascending","c":"insensitive"}""")
 

@@ -12,8 +12,6 @@ import args
 when defined(test):
   import readlines
 
-# todo: os.sameFile(path1, path2: string) returns whether the to paths refer to the same file.
-
 const
   logWarnSize: int64 = 1024 * 1024 * 1024
     ## Warn the user when the log file gets over 1 GB.

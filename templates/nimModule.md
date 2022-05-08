@@ -3,7 +3,6 @@ $$ # modules with doc comments.
 $$ #
 $$ # Create a list of all the heading names.
 $$ #
-</style>
 $$ block
 $$ : t.repeat = len(s.entries)
 $$ : a = if0(t.repeat, warn("Nothing to document in this module."), 0)
