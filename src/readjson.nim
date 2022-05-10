@@ -24,7 +24,7 @@ else:
 type
   StrAndPos* = object
     ## StrAndPos holds the result of parsing a string literal, the
-    ## @:string and the ending position.
+    ## @:string and its ending position.
     ## @:
     ## @:* str -- resulting parsed string
     ## @:* pos -- the position after the last trailing whitespace
@@ -32,6 +32,7 @@ type
     pos*: Natural
 
   StrAndPosOr* = OpResultWarn[StrAndPos]
+    ## The string and position or a warning.
 
 func newStrAndPosOr*(warning: MessageId, p1: string = "", pos = 0):
      StrAndPosOr =
@@ -44,7 +45,7 @@ func newStrAndPosOr*(warningData: WarningData): StrAndPosOr =
   result = opMessageW[StrAndPos](warningData)
 
 func newStrAndPosOr*(str: string, pos: Natural): StrAndPosOr =
-  ## Return a new StrAndPosOr object containing a StrAndPos object.
+  ## Return a new StrAndPosOr object containing a string and position.
   result = opValueW[StrAndPos](StrAndPos(str: str, pos: pos))
 
 proc jsonToValue*(jsonNode: JsonNode, depth: int = 0): ValueOr =
@@ -87,8 +88,8 @@ proc jsonToValue*(jsonNode: JsonNode, depth: int = 0): ValueOr =
   result = newValueOr(value)
 
 proc readJsonStream*(stream: Stream): ValueOr =
-  ## Read a json stream and return the variables in a dictionary
-  ## value.
+  ## Read a json stream and return the parsed data in a value object
+  ## or return a warning.
   assert stream != nil
 
   var rootNode: JsonNode
@@ -100,14 +101,16 @@ proc readJsonStream*(stream: Stream): ValueOr =
   result = jsonToValue(rootNode)
 
 proc readJsonString*(content: string): ValueOr =
-  ## Read a json string and return the variables in a dictionary
-  ## value.
+  ## Read a json string and return the parsed data in a value object
+  ## or return a warning.
   var stream = newStringStream(content)
   assert stream != nil
   result = readJsonStream(stream)
 
 proc readJsonFile*(filename: string): ValueOr =
-  ## Read a json file and return the variables in a dictionary value.
+  ## Read a json file and return the parsed data in a value object or
+  ## return a warning. A warning is returned when the root object is
+  ## not a dictionary.
 
   if not fileExists(filename):
     # File not found: $1.

@@ -13,15 +13,23 @@ const
 
 type
   LineBuffer* = object
-    ## Object to hold information about the state of the line buffer.
-    stream: Stream   ## Stream containing lines to read processed sequentially.
-    maxLineLen: int  ## The maximum line length.
-    bufferSize: int  ## The buffer size for reading lines.
-    lineNum: int     ## The current line number in the file starting at 1.
-    pos: int         ## Current byte position in the buffer.
-    charsRead: int   ## Number of bytes of chars in the buffer.
-    buffer: string   ## Memory allocated for the buffer.
-    filename: string ## The optional stream's filename.
+    ## The LineBuffer holds information about reading lines from a buffer.
+    ## @:* stream -- a stream containing lines to read processed sequentially
+    ## @:* maxLineLen -- the maximum line length
+    ## @:* bufferSize -- the buffer size for reading lines
+    ## @:* lineNum -- he current line number in the file starting at 1
+    ## @:* pos -- current byte position in the buffer
+    ## @:* charsRead -- number of bytes in the buffer
+    ## @:* buffer -- memory allocated for the buffer
+    ## @:* filename -- the optional stream's filename
+    stream: Stream
+    maxLineLen: int
+    bufferSize: int
+    lineNum: int
+    pos: int
+    charsRead: int
+    buffer: string
+    filename: string
 
 proc getLineNum*(lineBuffer: LineBuffer): int =
   ## Return the current line number.
@@ -39,8 +47,10 @@ proc getStream*(lineBuffer: LineBuffer): Stream =
   ## Return the associated stream.
   result = lineBuffer.stream
 
-proc newLineBuffer*(stream: Stream, maxLineLen: int = defaultMaxLineLen,
-    bufferSize: int = defaultBufferSize, filename: string = ""): Option[LineBuffer] =
+proc newLineBuffer*(stream: Stream,
+    maxLineLen: int = defaultMaxLineLen,
+    bufferSize: int = defaultBufferSize,
+    filename: string = ""): Option[LineBuffer] =
   ## Return a new LineBuffer for the given stream.
 
   if stream == nil:
@@ -65,23 +75,24 @@ proc newLineBuffer*(stream: Stream, maxLineLen: int = defaultMaxLineLen,
   result = some(lb)
 
 proc reset*(lb: var LineBuffer) =
-  ## Clear the buffer.
+  ## Clear the buffer and set the read position at the start of the
+  ## stream.
   lb.stream.setPosition(0)
   lb.charsRead = 0
   lb.pos = 0
 
 proc readline*(lb: var LineBuffer): string =
-  ## Return a line from the LineBuffer. Reading starts from
-  ## the current position in the stream and advances the amount read.
+  ## Return the next line from the LineBuffer. Reading starts from the
+  ## @:current position in the stream and advances the amount read.
   ## @:
   ## @:A line end is defined by either a crlf or lf and they get
-  ## returned with the line bytes. A line is returned when the line
-  ## ending is found, when the stream runs out of bytes or when the
-  ## maximum line length is reached.
+  ## @:returned with the line bytes. A line is returned when the line
+  ## @:ending is found, when the stream runs out of bytes or when the
+  ## @:maximum line length is reached.
   ## @:
   ## @:You cannot tell whether the line was truncated or not without
-  ## reading the next line. When no more data exists in the stream, an
-  ## empty string is returned.
+  ## @:reading the next line. When no more data exists in the stream, an
+  ## @:empty string is returned.
 
   if lb.stream == nil:
     return
@@ -124,9 +135,9 @@ func splitNewLines*(content: string): seq[string] =
 when defined(test):
   proc readXLines*(lb: var LineBuffer, maxLines: Natural = high(Natural)): seq[string] =
     ## Read lines from a LineBuffer returning line endings but don't
-    ## read more than the maximum number of lines. Reading starts at
-    ## the current lb's current position and the position at the end
-    ## is ready for reading the next line.
+    ## @:read more than the maximum number of lines. Reading starts at
+    ## @:the current lb's current position and the position at the end
+    ## @:is ready for reading the next line.
     var count = 0
     while true:
       if count >= maxLines:

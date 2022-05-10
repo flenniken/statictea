@@ -25,6 +25,7 @@ type
     logFilename*: string
 
   ArgsOr* = OpResultWarn[Args]
+    ## The args or a warning.
 
 func newArgsOr*(warningData: WarningData):
      ArgsOr =

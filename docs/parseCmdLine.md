@@ -6,8 +6,9 @@ Parse a StaticTea language command line.
 # Index
 
 * type: [LineParts](#lineparts) &mdash; LineParts holds parsed components of a line.
+* type: [LinePartsOr](#linepartsor) &mdash; The line parts or a warning.
 * [newLinePartsOr](#newlinepartsor) &mdash; Return a new LinePartsOr object containing a warning.
-* [newLinePartsOr](#newlinepartsor-1) &mdash; Return a new LineParts object containing a dictionary.
+* [newLinePartsOr](#newlinepartsor-1) &mdash; Return a new LinePartsOr object containing a LineParts object.
 * [getCodeLength](#getcodelength) &mdash; Return the length of the code in the line.
 * [parseCmdLine](#parsecmdline) &mdash; Parse the line and return its parts.
 
@@ -42,6 +43,14 @@ LineParts = object
 
 ```
 
+# LinePartsOr
+
+The line parts or a warning.
+
+```nim
+LinePartsOr = OpResultWarn[LineParts]
+```
+
 # newLinePartsOr
 
 Return a new LinePartsOr object containing a warning.
@@ -52,10 +61,10 @@ func newLinePartsOr(warning: MessageId; p1: string = ""; pos = 0): LinePartsOr
 
 # newLinePartsOr
 
-Return a new LineParts object containing a dictionary.
+Return a new LinePartsOr object containing a LineParts object.
 
 ```nim
-func newLinePartsOr(varsDict: LineParts): LinePartsOr
+func newLinePartsOr(lineParts: LineParts): LinePartsOr
 ```
 
 # getCodeLength

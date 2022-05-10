@@ -35,6 +35,7 @@ type
     lineNum*: Natural
 
   LinePartsOr* = OpResultWarn[LineParts]
+    ## The line parts or a warning.
 
 func newLinePartsOr*(warning: MessageId, p1: string = "", pos = 0):
      LinePartsOr =
@@ -42,9 +43,9 @@ func newLinePartsOr*(warning: MessageId, p1: string = "", pos = 0):
   let warningData = newWarningData(warning, p1, pos)
   result = opMessageW[LineParts](warningData)
 
-func newLinePartsOr*(varsDict: LineParts): LinePartsOr =
-  ## Return a new LineParts object containing a dictionary.
-  result = opValueW[LineParts](varsDict)
+func newLinePartsOr*(lineParts: LineParts): LinePartsOr =
+  ## Return a new LinePartsOr object containing a LineParts object.
+  result = opValueW[LineParts](lineParts)
 
 func getCodeLength*(line: string, codeStart: Natural,
     length: Natural): Natural =

@@ -77,8 +77,9 @@ import std/tables
 # todo: add optional parameter to specify regex flags.
 
 const
-  ## The maximum number of groups supported in the matchPattern procedure.
   maxGroups = 10
+    ## The maximum number of groups supported in the matchPattern
+    ## procedure.
 
 var compliledPatterns = initTable[string, Regex]()
   ## A cache of compiled regex patterns, mapping a pattern to Regex.
@@ -86,6 +87,10 @@ var compliledPatterns = initTable[string, Regex]()
 type
   Matches* = object
     ## Holds the result of a match.
+    ## @:* groups -- list of matching groups
+    ## @:* length -- length of the match
+    ## @:* start -- where the match started
+    ## @:* numGroups -- number of groups
     groups*: seq[string]
     length*: Natural
     start*: Natural
@@ -135,14 +140,6 @@ func getGroup*(matchesO: Option[Matches]): string =
   ## Get the group in matches.
   assert(matchesO.isSome, "Not a match")
   result = matchesO.get().getGroup()
-
-func get1Group*(matches: Matches): string =
-  ## Alias for getGroup.
-  result = getGroup(matches)
-
-func get1Group*(matchesO: Option[Matches]): string =
-  ## Alias for getGroup.
-  result = getGroup(matchesO)
 
 func get2Groups*(matches: Matches): (string, string) =
   ## Get two groups in matches.
@@ -242,9 +239,9 @@ func matchPattern*(str: string, pattern: string,
 proc matchPatternCached*(str: string, pattern: string,
     start: Natural, numGroups: Natural): Option[Matches] =
   ## Match a pattern in a string and cache the compiled regular
-  ## expression pattern for next time. Start is the index in the
-  ## string to start the search. NumGroups is the number of groups in
-  ## the pattern.
+  ## @:expression pattern for next time. Start is the index in the
+  ## @:string to start the search. NumGroups is the number of groups in
+  ## @:the pattern.
 
   # Get the cached regex for the pattern or compile it and add it to
   # the cache.

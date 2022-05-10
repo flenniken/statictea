@@ -43,21 +43,22 @@ type
     value*: Value
 
   VariableDataOr* = OpResultWarn[VariableData]
+    ## A VariableData object or a warning.
 
 func newVariableDataOr*(warning: MessageId, p1 = "", pos = 0):
     VariableDataOr =
-  ## Create a VariableData object containing a warning.
+  ## Create an object containing a warning.
   let warningData = newWarningData(warning, p1, pos)
   result = opMessageW[VariableData](warningData)
 
 func newVariableDataOr*(warningData: WarningData):
     VariableDataOr =
-  ## Create a VariableData object containing a warning.
+  ## Create an object containing a warning.
   result = opMessageW[VariableData](warningData)
 
 func newVariableDataOr*(dotNameStr: string, operator = "=", value: Value):
     VariableDataOr =
-  ## Create a VariableData object containing a value.
+  ## Create an object containing a VariableData object.
   let variableData = VariableData(dotNameStr: dotNameStr,
     operator: operator, value: value)
   result = opValueW[VariableData](variableData)
@@ -145,8 +146,8 @@ proc resetVariables*(variables: var Variables) =
 
 proc getParentDictToAddTo(variables: Variables, dotNameStr: string):
     VarsDictOr =
-  ## Return the last component dictionary specified by the given names
-  ## or, on error, return a warning.  For the dot name string
+  ## Return the last component dictionary specified by the given dot
+  ## name or, on error, return a warning.  For the dot name string
   ## "a.b.c.d" and the c dictionary is the result.
 
   let names = split(dotNameStr, '.')
@@ -176,7 +177,8 @@ proc getParentDictToAddTo(variables: Variables, dotNameStr: string):
 
 func assignTeaVariable(variables: var Variables, dotNameStr: string,
     value: Value, operator: string = "="): Option[WarningData] =
-  ## Assign a tea variable if possible, else return a warning.
+  ## Assign a tea variable a value if possible, else return a
+  ## warning. The operator parameter is either "=" or "&=".
 
   assert dotNameStr.len > 0
 
@@ -232,7 +234,7 @@ proc assignVariable*(
     operator: string = "="
   ): Option[WarningData] =
   ## Assign the variable the given value if possible, else return a
-  ## warning.
+  ## warning. The operator parameter is either "=" or "&=".
 
   # -- You cannot overwrite an existing variable.
   # -- You can only assign to known tea variables.

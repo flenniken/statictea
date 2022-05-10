@@ -7,14 +7,15 @@ Read json content.
 
 * const: [maxDepth](#maxdepth) &mdash; The maximum depth you can nest items.
 * type: [StrAndPos](#strandpos) &mdash; StrAndPos holds the result of parsing a string literal, the
-string and the ending position.
+string and its ending position.
+* type: [StrAndPosOr](#strandposor) &mdash; The string and position or a warning.
 * [newStrAndPosOr](#newstrandposor) &mdash; Return a new StrAndPosOr object containing a warning.
 * [newStrAndPosOr](#newstrandposor-1) &mdash; Return a new StrAndPosOr object containing a warning.
-* [newStrAndPosOr](#newstrandposor-2) &mdash; Return a new StrAndPosOr object containing a StrAndPos object.
+* [newStrAndPosOr](#newstrandposor-2) &mdash; Return a new StrAndPosOr object containing a string and position.
 * [jsonToValue](#jsontovalue) &mdash; Convert a Nim json node to a statictea value.
-* [readJsonStream](#readjsonstream) &mdash; Read a json stream and return the variables in a dictionary value.
-* [readJsonString](#readjsonstring) &mdash; Read a json string and return the variables in a dictionary value.
-* [readJsonFile](#readjsonfile) &mdash; Read a json file and return the variables in a dictionary value.
+* [readJsonStream](#readjsonstream) &mdash; Read a json stream and return the parsed data in a value object or return a warning.
+* [readJsonString](#readjsonstring) &mdash; Read a json string and return the parsed data in a value object or return a warning.
+* [readJsonFile](#readjsonfile) &mdash; Read a json file and return the parsed data in a value object or return a warning.
 * [unescapePopularChar](#unescapepopularchar) &mdash; Unescape the popular char and return its value.
 * [parseJsonStr](#parsejsonstr) &mdash; Parse the quoted json string literal.
 
@@ -29,7 +30,7 @@ maxDepth = 16
 # StrAndPos
 
 StrAndPos holds the result of parsing a string literal, the
-string and the ending position.
+string and its ending position.
 
 * str -- resulting parsed string
 * pos -- the position after the last trailing whitespace
@@ -39,6 +40,14 @@ StrAndPos = object
   str*: string
   pos*: Natural
 
+```
+
+# StrAndPosOr
+
+The string and position or a warning.
+
+```nim
+StrAndPosOr = OpResultWarn[StrAndPos]
 ```
 
 # newStrAndPosOr
@@ -59,7 +68,7 @@ func newStrAndPosOr(warningData: WarningData): StrAndPosOr
 
 # newStrAndPosOr
 
-Return a new StrAndPosOr object containing a StrAndPos object.
+Return a new StrAndPosOr object containing a string and position.
 
 ```nim
 func newStrAndPosOr(str: string; pos: Natural): StrAndPosOr
@@ -75,7 +84,7 @@ proc jsonToValue(jsonNode: JsonNode; depth: int = 0): ValueOr
 
 # readJsonStream
 
-Read a json stream and return the variables in a dictionary value.
+Read a json stream and return the parsed data in a value object or return a warning.
 
 ```nim
 proc readJsonStream(stream: Stream): ValueOr
@@ -83,7 +92,7 @@ proc readJsonStream(stream: Stream): ValueOr
 
 # readJsonString
 
-Read a json string and return the variables in a dictionary value.
+Read a json string and return the parsed data in a value object or return a warning.
 
 ```nim
 proc readJsonString(content: string): ValueOr
@@ -91,7 +100,7 @@ proc readJsonString(content: string): ValueOr
 
 # readJsonFile
 
-Read a json file and return the variables in a dictionary value.
+Read a json file and return the parsed data in a value object or return a warning. A warning is returned when the root object is not a dictionary.
 
 ```nim
 proc readJsonFile(filename: string): ValueOr

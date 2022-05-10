@@ -7,6 +7,7 @@ Types for handling command line arguments.
 
 * type: [Prepost](#prepost) &mdash; Prepost holds one prefix and its associated postfix.
 * type: [Args](#args) &mdash; Args holds all the command line arguments.
+* type: [ArgsOr](#argsor) &mdash; The args or a warning.
 * [newArgsOr](#newargsor) &mdash; Return a new Args object containing a warning.
 * [newArgsOr](#newargsor-1) &mdash; Return a new Args object containing a warning.
 * [newArgsOr](#newargsor-2) &mdash; Return a new Args object containing a value.
@@ -42,6 +43,14 @@ Args = object
   resultFilename*: string
   logFilename*: string
 
+```
+
+# ArgsOr
+
+The args or a warning.
+
+```nim
+ArgsOr = OpResultWarn[Args]
 ```
 
 # newArgsOr

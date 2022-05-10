@@ -54,8 +54,6 @@ check resultStringO.get() == "456456"
 * [newReplacement](#newreplacement) &mdash; Create a new Replacement object.
 * [getGroup](#getgroup) &mdash; Get the group in matches.
 * [getGroup](#getgroup-1) &mdash; Get the group in matches.
-* [get1Group](#get1group) &mdash; Alias for getGroup.
-* [get1Group](#get1group-1) &mdash; Alias for getGroup.
 * [get2Groups](#get2groups) &mdash; Get two groups in matches.
 * [get2Groups](#get2groups-1) &mdash; Get two groups in matches.
 * [get3Groups](#get3groups) &mdash; Get three groups in matches.
@@ -63,12 +61,17 @@ check resultStringO.get() == "456456"
 * [getGroups](#getgroups) &mdash; Return the number of groups specified.
 * [getGroups](#getgroups-1) &mdash; Return the number of groups specified.
 * [matchPattern](#matchpattern) &mdash; Match a regular expression pattern in a string.
-* [matchPatternCached](#matchpatterncached) &mdash; Match a pattern in a string and cache the compiled regular expression pattern for next time.
+* [matchPatternCached](#matchpatterncached) &mdash; Match a pattern in a string and cache the compiled regular
+expression pattern for next time.
 * [replaceMany](#replacemany) &mdash; Replace the patterns in the string with their replacements.
 
 # Matches
 
 Holds the result of a match.
+* groups -- list of matching groups
+* length -- length of the match
+* start -- where the match started
+* numGroups -- number of groups
 
 ```nim
 Matches = object
@@ -155,22 +158,6 @@ Get the group in matches.
 func getGroup(matchesO: Option[Matches]): string
 ```
 
-# get1Group
-
-Alias for getGroup.
-
-```nim
-func get1Group(matches: Matches): string
-```
-
-# get1Group
-
-Alias for getGroup.
-
-```nim
-func get1Group(matchesO: Option[Matches]): string
-```
-
 # get2Groups
 
 Get two groups in matches.
@@ -234,7 +221,10 @@ func matchPattern(str: string; pattern: string; start: Natural;
 
 # matchPatternCached
 
-Match a pattern in a string and cache the compiled regular expression pattern for next time. Start is the index in the string to start the search. NumGroups is the number of groups in the pattern.
+Match a pattern in a string and cache the compiled regular
+expression pattern for next time. Start is the index in the
+string to start the search. NumGroups is the number of groups in
+the pattern.
 
 ```nim
 proc matchPatternCached(str: string; pattern: string; start: Natural;

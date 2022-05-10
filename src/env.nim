@@ -13,13 +13,13 @@ when defined(test):
   import readlines
 
 const
-  logWarnSize: int64 = 1024 * 1024 * 1024
+  logWarnSize*: int64 = 1024 * 1024 * 1024
     ## Warn the user when the log file gets over 1 GB.
 
   dtFormat* = "yyyy-MM-dd HH:mm:ss'.'fff"
     ## The date time format in local time written to the log.
 
-  maxWarningsWritten = 10
+  maxWarningsWritten* = 10
     ## The maximum of warning messages to show.
 
 when hostOS == "macosx":
@@ -33,9 +33,28 @@ else:
 type
   Env* = object
     ## Env holds the input and output streams.
+    ## @:
+    ## @:* errStream -- standard error stream; normally stderr but
+    ## @:might be a normal file for testing.
+    ## @:* outStream -- standard output stream; normally stdout but
+    ## @:might be a normal file for testing.
+    ## @:* logFile -- the open log file
+    ## @:* logFilename -- the log filename
+    ## @:* closeErrStream -- whether to close err stream. You don't
+    ## @:close stderr.
+    ## @:* closeOutStream -- whether to close out stream. You don't
+    ## @:close stdout.
+    ## @:* closeTemplateStream -- whether to close the template stream
+    ## @:* closeResultStream -- whether to close the result stream
+    ## @:* templateFilename -- name of the template file
+    ## @:* templateStream -- template stream, may be stdin
+    ## @:* resultFilename -- name of the result file
+    ## @:* resultStream -- result stream, may be stdout
+    ## @:* warningWritten -- the total number of warnings
+
     # These get set at the start.
-    errStream*: Stream ## stderr
-    outStream*: Stream ## stdout
+    errStream*: Stream
+    outStream*: Stream
     logFile*: File
     logFilename*: string
 
@@ -53,7 +72,6 @@ type
     resultStream*: Stream
 
     warningWritten*: Natural
-      ## Count of warnings written.
 
 proc close*(env: var Env) =
   ## Close the environment streams.
@@ -262,7 +280,6 @@ proc addExtraStreams*(env: var Env, args: Args): bool =
 
 # todo: test the case where the template file is the same as the result file.
 # todo: test where a resultFilename is specified with update.
-# todo: test update with two template filenames.
 # todo: test with template of "stdin" when update is specified.
 # todo: test update when the template is readonly.
 

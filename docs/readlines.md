@@ -9,14 +9,14 @@ Read lines from a stream without exceeding the maximum line length. The returned
 * const: [maxMaxLineLen](#maxmaxlinelen) &mdash; The maximum line length supported.
 * const: [defaultMaxLineLen](#defaultmaxlinelen) &mdash; The maximum line length.
 * const: [defaultBufferSize](#defaultbuffersize) &mdash; The buffer size for reading lines.
-* type: [LineBuffer](#linebuffer) &mdash; Object to hold information about the state of the line buffer.
+* type: [LineBuffer](#linebuffer) &mdash; The LineBuffer holds information about reading lines from a buffer.
 * [getLineNum](#getlinenum) &mdash; Return the current line number.
 * [getMaxLineLen](#getmaxlinelen) &mdash; Return the maximum line length.
 * [getFilename](#getfilename) &mdash; Return the filename of the stream, if there is one.
 * [getStream](#getstream) &mdash; Return the associated stream.
 * [newLineBuffer](#newlinebuffer) &mdash; Return a new LineBuffer for the given stream.
-* [reset](#reset) &mdash; Clear the buffer.
-* [readline](#readline) &mdash; Return a line from the LineBuffer.
+* [reset](#reset) &mdash; Clear the buffer and set the read position at the start of the stream.
+* [readline](#readline) &mdash; Return the next line from the LineBuffer.
 * [splitNewLines](#splitnewlines) &mdash; Split lines and keep the line endings.
 
 # minMaxLineLen
@@ -53,18 +53,26 @@ defaultBufferSize = 16384
 
 # LineBuffer
 
-Object to hold information about the state of the line buffer.
+The LineBuffer holds information about reading lines from a buffer.
+* stream -- a stream containing lines to read processed sequentially
+* maxLineLen -- the maximum line length
+* bufferSize -- the buffer size for reading lines
+* lineNum -- he current line number in the file starting at 1
+* pos -- current byte position in the buffer
+* charsRead -- number of bytes in the buffer
+* buffer -- memory allocated for the buffer
+* filename -- the optional stream's filename
 
 ```nim
 LineBuffer = object
-  stream: Stream             ## Stream containing lines to read processed sequentially.
-  maxLineLen: int            ## The maximum line length.
-  bufferSize: int            ## The buffer size for reading lines.
-  lineNum: int               ## The current line number in the file starting at 1.
-  pos: int                   ## Current byte position in the buffer.
-  charsRead: int             ## Number of bytes of chars in the buffer.
-  buffer: string             ## Memory allocated for the buffer.
-  filename: string           ## The optional stream's filename.
+  stream: Stream
+  maxLineLen: int
+  bufferSize: int
+  lineNum: int
+  pos: int
+  charsRead: int
+  buffer: string
+  filename: string
 
 ```
 
@@ -112,7 +120,7 @@ proc newLineBuffer(stream: Stream; maxLineLen: int = defaultMaxLineLen;
 
 # reset
 
-Clear the buffer.
+Clear the buffer and set the read position at the start of the stream.
 
 ```nim
 proc reset(lb: var LineBuffer)
@@ -120,11 +128,17 @@ proc reset(lb: var LineBuffer)
 
 # readline
 
-Return a line from the LineBuffer. Reading starts from the current position in the stream and advances the amount read.
+Return the next line from the LineBuffer. Reading starts from the
+current position in the stream and advances the amount read.
 
-A line end is defined by either a crlf or lf and they get returned with the line bytes. A line is returned when the line ending is found, when the stream runs out of bytes or when the maximum line length is reached.
+A line end is defined by either a crlf or lf and they get
+returned with the line bytes. A line is returned when the line
+ending is found, when the stream runs out of bytes or when the
+maximum line length is reached.
 
-You cannot tell whether the line was truncated or not without reading the next line. When no more data exists in the stream, an empty string is returned.
+You cannot tell whether the line was truncated or not without
+reading the next line. When no more data exists in the stream, an
+empty string is returned.
 
 ```nim
 proc readline(lb: var LineBuffer): string

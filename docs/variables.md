@@ -16,9 +16,10 @@ prefix and it allows functions to be specified without the f prefix.
 * type: [Variables](#variables) &mdash; Dictionary holding all statictea variables in multiple distinct logical dictionaries.
 * type: [VariableData](#variabledata) &mdash; The VariableData object holds the variable name, operator and
 value which is the result of running a statement.
-* [newVariableDataOr](#newvariabledataor) &mdash; Create a VariableData object containing a warning.
-* [newVariableDataOr](#newvariabledataor-1) &mdash; Create a VariableData object containing a warning.
-* [newVariableDataOr](#newvariabledataor-2) &mdash; Create a VariableData object containing a value.
+* type: [VariableDataOr](#variabledataor) &mdash; A VariableData object or a warning.
+* [newVariableDataOr](#newvariabledataor) &mdash; Create an object containing a warning.
+* [newVariableDataOr](#newvariabledataor-1) &mdash; Create an object containing a warning.
+* [newVariableDataOr](#newvariabledataor-2) &mdash; Create an object containing a VariableData object.
 * [`$`](#) &mdash; Return a string representation of VariableData.
 * [emptyVariables](#emptyvariables) &mdash; Create an empty variables object in its initial state.
 * [getTeaVarIntDefault](#getteavarintdefault) &mdash; Return the int value of one of the tea dictionary integer items.
@@ -68,9 +69,17 @@ VariableData = object
 
 ```
 
+# VariableDataOr
+
+A VariableData object or a warning.
+
+```nim
+VariableDataOr = OpResultWarn[VariableData]
+```
+
 # newVariableDataOr
 
-Create a VariableData object containing a warning.
+Create an object containing a warning.
 
 ```nim
 func newVariableDataOr(warning: MessageId; p1 = ""; pos = 0): VariableDataOr
@@ -78,7 +87,7 @@ func newVariableDataOr(warning: MessageId; p1 = ""; pos = 0): VariableDataOr
 
 # newVariableDataOr
 
-Create a VariableData object containing a warning.
+Create an object containing a warning.
 
 ```nim
 func newVariableDataOr(warningData: WarningData): VariableDataOr
@@ -86,7 +95,7 @@ func newVariableDataOr(warningData: WarningData): VariableDataOr
 
 # newVariableDataOr
 
-Create a VariableData object containing a value.
+Create an object containing a VariableData object.
 
 ```nim
 func newVariableDataOr(dotNameStr: string; operator = "="; value: Value): VariableDataOr
@@ -135,7 +144,7 @@ proc resetVariables(variables: var Variables)
 
 # assignVariable
 
-Assign the variable the given value if possible, else return a warning.
+Assign the variable the given value if possible, else return a warning. The operator parameter is either "=" or "&=".
 
 ```nim
 proc assignVariable(variables: var Variables; dotNameStr: string; value: Value;

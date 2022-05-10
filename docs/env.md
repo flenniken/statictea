@@ -5,7 +5,9 @@ Environment holding the input and output streams.
 * [env.nim](../src/env.nim) &mdash; Nim source code.
 # Index
 
+* const: [logWarnSize](#logwarnsize) &mdash; Warn the user when the log file gets over 1 GB.
 * const: [dtFormat](#dtformat) &mdash; The date time format in local time written to the log.
+* const: [maxWarningsWritten](#maxwarningswritten) &mdash; The maximum of warning messages to show.
 * [staticteaLog](#statictealog) &mdash; Name of the default statictea log file when logging on the Mac.
 * type: [Env](#env) &mdash; Env holds the input and output streams.
 * [close](#close) &mdash; Close the environment streams.
@@ -23,12 +25,28 @@ Environment holding the input and output streams.
 * [addExtraStreams](#addextrastreams-1) &mdash; Add the template and result streams to the environment.
 * [addExtraStreamsForUpdate](#addextrastreamsforupdate) &mdash; For the update case, add the template and result streams to the environment.
 
+# logWarnSize
+
+Warn the user when the log file gets over 1 GB.
+
+```nim
+logWarnSize: int64 = 1073741824
+```
+
 # dtFormat
 
 The date time format in local time written to the log.
 
 ```nim
 dtFormat = "yyyy-MM-dd HH:mm:ss\'.\'fff"
+```
+
+# maxWarningsWritten
+
+The maximum of warning messages to show.
+
+```nim
+maxWarningsWritten = 10
 ```
 
 # staticteaLog
@@ -43,10 +61,28 @@ staticteaLog = expandTilde("~/Library/Logs/statictea.log")
 
 Env holds the input and output streams.
 
+* errStream -- standard error stream; normally stderr but
+might be a normal file for testing.
+* outStream -- standard output stream; normally stdout but
+might be a normal file for testing.
+* logFile -- the open log file
+* logFilename -- the log filename
+* closeErrStream -- whether to close err stream. You don't
+close stderr.
+* closeOutStream -- whether to close out stream. You don't
+close stdout.
+* closeTemplateStream -- whether to close the template stream
+* closeResultStream -- whether to close the result stream
+* templateFilename -- name of the template file
+* templateStream -- template stream, may be stdin
+* resultFilename -- name of the result file
+* resultStream -- result stream, may be stdout
+* warningWritten -- the total number of warnings
+
 ```nim
 Env = object
-  errStream*: Stream         ## stderr
-  outStream*: Stream         ## stdout
+  errStream*: Stream
+  outStream*: Stream
   logFile*: File
   logFilename*: string
   closeErrStream*: bool
@@ -57,7 +93,7 @@ Env = object
   templateStream*: Stream
   resultFilename*: string
   resultStream*: Stream
-  warningWritten*: Natural   ## Count of warnings written.
+  warningWritten*: Natural
 
 ```
 
