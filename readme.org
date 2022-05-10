@@ -598,8 +598,8 @@ last_letter = "z"
 nameLen = len(s.name)
 #+END_SRC
 
-Local variables and tea variables, except row, args and version,
-are cleared after processing each replacement block.
+Local variables and writable tea variables cleared after
+processing each replacement block.
 
 You can append a new variable to a list or dictionary but you
 cannot change an existing variable.
@@ -746,7 +746,7 @@ Tea variables:
 :CUSTOM_ID: targs
 :END:
 
-The t.args variable contains the arguments passed to
+The read only t.args variable contains the arguments passed to
 statictea on the command line.
 
 For example using the command line below results in a t.args
@@ -1076,8 +1076,9 @@ result:
 :CUSTOM_ID: tversion
 :END:
 
-The t.version variable contains the current version number of
-StaticTea. See the [[#cmpversion][cmpVersion]] function for more information.
+The readonly t.version variable contains the current version
+number of StaticTea. See the [[#cmpversion][cmpVersion]] function for more
+information.
 
 [[#contents][茶]]
 
