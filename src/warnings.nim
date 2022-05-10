@@ -4,20 +4,17 @@ import std/strutils
 import messages
 
 type
-  Warning* = MessageId
-    ## Warning message id.
-
   WarningData* = object
     ## Warning data.
     ## * warning -- the message id
     ## * p1 -- the optional string substituted for the message's $1.
     ## * pos -- the index in the statement where the warning was detected.
-    warning*: Warning
+    warning*: MessageId
     p1*: string
     pos*: Natural
 
 func getWarningLine*(filename: string, lineNum: int,
-    warning: Warning, p1 = ""): string =
+    warning: MessageId, p1 = ""): string =
   ## Return a formatted warning line. For example:
   ## @:
   ## @:~~~
@@ -37,7 +34,7 @@ func getWarningLine*(filename: string, lineNum: int,
   ## @:~~~~
   return getWarningLine(filename, lineNum, warningData)
 
-proc newWarningData*(warning: Warning, p1 = "", pos = 0): WarningData =
+proc newWarningData*(warning: MessageId, p1 = "", pos = 0): WarningData =
   ## Create a WarningData object containing all the warning
   ## information.
   result = WarningData(warning: warning, p1: p1, pos: pos)

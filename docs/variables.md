@@ -73,7 +73,7 @@ VariableData = object
 Create a VariableData object containing a warning.
 
 ```nim
-func newVariableDataOr(warning: Warning; p1 = ""; pos = 0): VariableDataOr
+func newVariableDataOr(warning: MessageId; p1 = ""; pos = 0): VariableDataOr
 ```
 
 # newVariableDataOr

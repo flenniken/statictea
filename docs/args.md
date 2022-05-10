@@ -57,7 +57,7 @@ func newArgsOr(warningData: WarningData): ArgsOr
 Return a new Args object containing a warning.
 
 ```nim
-func newArgsOr(warning: Warning; p1: string = ""; pos = 0): ArgsOr
+func newArgsOr(warning: MessageId; p1: string = ""; pos = 0): ArgsOr
 ```
 
 # newArgsOr

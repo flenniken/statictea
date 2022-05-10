@@ -2,6 +2,7 @@
 
 import std/tables
 import std/strutils
+import messages
 import warnings
 import opresultwarn
 
@@ -43,7 +44,7 @@ proc newVarsDict*(): VarsDict =
   ## Create a new empty variables dictionary. VarsDict is a ref type.
   result = newOrderedTable[string, Value]()
 
-func newVarsDictOr*(warning: Warning, p1: string = "", pos = 0):
+func newVarsDictOr*(warning: MessageId, p1: string = "", pos = 0):
      VarsDictOr =
   ## Return a new varsDictOr object containing a warning.
   let warningData = newWarningData(warning, p1, pos)
@@ -265,7 +266,7 @@ proc `$`*(varsDict: VarsDict): string =
   ## Return a string representation of a VarsDict.
   result = valueToString(newValue(varsDict))
 
-func newValueOr*(warning: Warning, p1 = "", pos = 0): ValueOr =
+func newValueOr*(warning: MessageId, p1 = "", pos = 0): ValueOr =
   ## Create a new ValueOr containing a warning.
   let warningData = newWarningData(warning, p1, pos)
   result = opMessageW[Value](warningData)

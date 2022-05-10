@@ -51,7 +51,7 @@ proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
   ## Create a newValueAndLength object.
   result = ValueAndLength(value: value, length: length)
 
-func newValueAndLengthOr*(warning: Warning, p1 = "", pos = 0):
+func newValueAndLengthOr*(warning: MessageId, p1 = "", pos = 0):
     ValueAndLengthOr =
   ## Create a ValueAndLengthOr warning.
   let warningData = newWarningData(warning, p1, pos)
@@ -77,7 +77,7 @@ func newValueAndLengthOr*(val: ValueAndLength):
   ## Create a ValueAndLengthOr.
   result = opValueW[ValueAndLength](val)
 
-func newLengthOr*(warning: Warning, p1 = "", pos = 0):
+func newLengthOr*(warning: MessageId, p1 = "", pos = 0):
     OpResultWarn[Natural] =
   ## Create a OpResultWarn[Natural] warning.
   let warningData = newWarningData(warning, p1, pos)

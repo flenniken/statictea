@@ -47,7 +47,7 @@ LineParts = object
 Return a new LinePartsOr object containing a warning.
 
 ```nim
-func newLinePartsOr(warning: Warning; p1: string = ""; pos = 0): LinePartsOr
+func newLinePartsOr(warning: MessageId; p1: string = ""; pos = 0): LinePartsOr
 ```
 
 # newLinePartsOr

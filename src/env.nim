@@ -94,7 +94,7 @@ proc outputWarning*(env: var Env, lineNum: Natural, message: string) =
     env.errStream.writeLine(message)
     inc(env.warningWritten)
 
-proc warn*(env: var Env, lineNum: Natural, warning: Warning, p1:
+proc warn*(env: var Env, lineNum: Natural, warning: MessageId, p1:
            string = "") =
   ## Write a formatted warning message to the error stream.
 

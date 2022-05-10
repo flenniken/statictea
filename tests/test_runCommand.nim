@@ -146,7 +146,7 @@ proc testGetStringInvalid(buffer: seq[uint8]): bool =
   result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr)
 
 proc testWarnStatement(statement: Statement,
-    warning: Warning, start: Natural, p1: string="",
+    warning: MessageId, start: Natural, p1: string="",
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]

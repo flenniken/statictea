@@ -44,7 +44,7 @@ type
 
   VariableDataOr* = OpResultWarn[VariableData]
 
-func newVariableDataOr*(warning: Warning, p1 = "", pos = 0):
+func newVariableDataOr*(warning: MessageId, p1 = "", pos = 0):
     VariableDataOr =
   ## Create a VariableData object containing a warning.
   let warningData = newWarningData(warning, p1, pos)

@@ -52,7 +52,8 @@ proc parseInteger*(s: string, start: Natural = 0): Option[IntAndLength] =
   ## @:An integer starts with an optional minus sign, followed by a
   ## @:digit, followed by digits or underscores. The underscores are
   ## @:skipped.
-
+  # This version is used instead of the nim version because of leading
+  # underscores, plus signs and start position.
   var
     sign: int64 = -1
     b: int64 = 0

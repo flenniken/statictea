@@ -46,7 +46,7 @@ StrAndPos = object
 Return a new StrAndPosOr object containing a warning.
 
 ```nim
-func newStrAndPosOr(warning: Warning; p1: string = ""; pos = 0): StrAndPosOr
+func newStrAndPosOr(warning: MessageId; p1: string = ""; pos = 0): StrAndPosOr
 ```
 
 # newStrAndPosOr

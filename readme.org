@@ -407,7 +407,7 @@ name = concat(substr(s.name, 0, 7), "...")
 Statements are allowed on the nextline, block, continue and
 replace commands.
 
-All operations are done with functions. For example to add 1 to
+All operations are done with functions. For example, to add 1 to
 t.row you use the add function.
 
 #+BEGIN_SRC
@@ -594,8 +594,8 @@ next section.
 
 #+BEGIN_SRC
 a = 5
-next_letter = "z"
-firstName = len(s.name)
+last_letter = "z"
+nameLen = len(s.name)
 #+END_SRC
 
 Local variables and tea variables, except row, args and version,
@@ -622,7 +622,7 @@ s.name
 s.address
 #+END_SRC
 
-You can string up to five variable names together to make a dot
+You can combine up to five variable names together to make a dot
 name. For example:
 
 #+BEGIN_SRC
@@ -695,6 +695,12 @@ specify a prefix for local variables but you can use l. They are
 stored in the l dictionary. The local variables are cleared and
 recalculated for each repeated block.
 
+#+BEGIN_SRC
+a = 5
+pot = "black"
+l.tea = "earl grey"
+#+END_SRC
+
 [[#contents][茶]]
 
 ** Global Variables
@@ -705,6 +711,10 @@ recalculated for each repeated block.
 Like local variables, you create global variables with template
 statements.  All commands have access to them and they are stored
 in the g dictionary.
+
+#+BEGIN_SRC
+g.names &= entry.name
+#+END_SRC
 
 [[#contents][茶]]
 
@@ -1015,9 +1025,11 @@ result:
     :CUSTOM_ID: trow
     :END:
 
-The t.row variable contains the current row number for blocks
-that repeat. The row numbers start at 0 and increase.  You use it
-to format lists and other repeating content in the template.
+The t.row read only variable counts the number of times the
+replacement block repeats.
+
+You use it to format lists and other repeating content in the
+template.
 
 Here is an example using the row variable.  In the example, row
 is used in three places.
@@ -1193,7 +1205,7 @@ ordered by insertion order.
 
 - You create a dict in a json file or with the dict function.
 - You append to a dict when you create new variables with a statement.
-- You access dict items with variable names or with the get
+- You access dict items with dot names or with the get
   function.
 
 In the following json data, the container element is a dictionary and
@@ -1813,53 +1825,53 @@ readmefun nimble task which uses the StaticTea template
 List of functions:
 
 # Dynamic Content Begins
-- [[#add][add()]] -- Add two floats.
-- [[#add][add()]] -- Add two integers.
-- [[#case][case()]] -- Compare integer cases and return the matching value.
-- [[#case][case()]] -- Compare string cases and return the matching value.
-- [[#cmpVersion][cmpVersion()]] -- Compare two StaticTea version numbers.
-- [[#cmp][cmp()]] -- Compare two floats.
-- [[#cmp][cmp()]] -- Compare two ints.
-- [[#cmp][cmp()]] -- Compare two strings.
-- [[#concat][concat()]] -- Concatentate two strings.
-- [[#dict][dict()]] -- Create a dictionary from a list of key, value pairs.
-- [[#dup][dup()]] -- Duplicate a string x times.
-- [[#exists][exists()]] -- Determine whether a key exists in a dictionary.
-- [[#find][find()]] -- Find the position of a substring in a string.
-- [[#float][float()]] -- Create a float from an int.
-- [[#float][float()]] -- Create a float from a number string.
-- [[#get][get()]] -- Get a dictionary value by its key.
-- [[#get][get()]] -- Get a list value by its index.
-- [[#githubAnchor][githubAnchor()]] -- Create Github anchor names from heading names.
-- [[#githubAnchor][githubAnchor()]] -- Create a Github anchor name from a heading name.
-- [[#if0][if0()]] -- If the condition is 0, return the second parameter, else return
+- [[#add][add]] -- Add two floats.
+- [[#add][add]] -- Add two integers.
+- [[#case][case]] -- Compare integer cases and return the matching value.
+- [[#case][case]] -- Compare string cases and return the matching value.
+- [[#cmpVersion][cmpVersion]] -- Compare two StaticTea version numbers.
+- [[#cmp][cmp]] -- Compare two floats.
+- [[#cmp][cmp]] -- Compare two ints.
+- [[#cmp][cmp]] -- Compare two strings.
+- [[#concat][concat]] -- Concatentate two strings.
+- [[#dict][dict]] -- Create a dictionary from a list of key, value pairs.
+- [[#dup][dup]] -- Duplicate a string x times.
+- [[#exists][exists]] -- Determine whether a key exists in a dictionary.
+- [[#find][find]] -- Find the position of a substring in a string.
+- [[#float][float]] -- Create a float from an int.
+- [[#float][float]] -- Create a float from a number string.
+- [[#get][get]] -- Get a dictionary value by its key.
+- [[#get][get]] -- Get a list value by its index.
+- [[#githubAnchor][githubAnchor]] -- Create Github anchor names from heading names.
+- [[#githubAnchor][githubAnchor]] -- Create a Github anchor name from a heading name.
+- [[#if0][if0]] -- If the condition is 0, return the second parameter, else return
 the third.
-- [[#if1][if1()]] -- If the condition is 1, return the second parameter, else return
+- [[#if1][if1]] -- If the condition is 1, return the second parameter, else return
 the third.
-- [[#int][int()]] -- Create an int from a float.
-- [[#int][int()]] -- Create an int from a number string.
-- [[#joinPath][joinPath()]] -- Join the path components with a path separator.
-- [[#join][join()]] -- Join a list of strings with a separator.
-- [[#keys][keys()]] -- Create a list from the keys in a dictionary.
-- [[#len][len()]] -- Number of elements in a dictionary.
-- [[#len][len()]] -- Number of elements in a list.
-- [[#len][len()]] -- Number of unicode characters in a string.
-- [[#list][list()]] -- Create a list of values.
-- [[#lower][lower()]] -- Lowercase a string.
-- [[#path][path()]] -- Split a file path into its component pieces.
-- [[#replace][replace()]] -- Replace a substring specified by its position and length with another string.
-- [[#replaceRe][replaceRe()]] -- Replace multiple parts of a string using regular expressions.
-- [[#slice][slice()]] -- Extract a substring from a string by its position and length.
-- [[#sort][sort()]] -- Sort a list of values of the same type.
-- [[#sort][sort()]] -- Sort a list of lists.
-- [[#sort][sort()]] -- Sort a list of dictionaries.
-- [[#type][type()]] -- Return the parameter type, one of: int, float, string, list, dict.
-- [[#values][values()]] -- Create a list out of the values in the specified dictionary.
-- [[#warn][warn()]] -- Return a warning message and skip the current statement.
+- [[#int][int]] -- Create an int from a float.
+- [[#int][int]] -- Create an int from a number string.
+- [[#joinPath][joinPath]] -- Join the path components with a path separator.
+- [[#join][join]] -- Join a list of strings with a separator.
+- [[#keys][keys]] -- Create a list from the keys in a dictionary.
+- [[#len][len]] -- Number of elements in a dictionary.
+- [[#len][len]] -- Number of elements in a list.
+- [[#len][len]] -- Number of unicode characters in a string.
+- [[#list][list]] -- Create a list of values.
+- [[#lower][lower]] -- Lowercase a string.
+- [[#path][path]] -- Split a file path into its component pieces.
+- [[#replace][replace]] -- Replace a substring specified by its position and length with another string.
+- [[#replaceRe][replaceRe]] -- Replace multiple parts of a string using regular expressions.
+- [[#slice][slice]] -- Extract a substring from a string by its position and length.
+- [[#sort][sort]] -- Sort a list of values of the same type.
+- [[#sort][sort]] -- Sort a list of lists.
+- [[#sort][sort]] -- Sort a list of dictionaries.
+- [[#type][type]] -- Return the parameter type, one of: int, float, string, list, dict.
+- [[#values][values]] -- Create a list out of the values in the specified dictionary.
+- [[#warn][warn]] -- Return a warning message and skip the current statement.
 
 [[#contents][茶]]
 
-** add()
+** add
 :PROPERTIES:
 :CUSTOM_ID: add
 :END:
@@ -1879,7 +1891,7 @@ add(3.2, -2.2) => 1.0
 
 [[#contents][茶]]
 
-** add()
+** add
 :PROPERTIES:
 :CUSTOM_ID: add
 :END:
@@ -1900,7 +1912,7 @@ add(-2, -5) => -7
 
 [[#contents][茶]]
 
-** case()
+** case
 :PROPERTIES:
 :CUSTOM_ID: case
 :END:
@@ -1936,7 +1948,7 @@ case(3, cases, "wine") => "wine"
 
 [[#contents][茶]]
 
-** case()
+** case
 :PROPERTIES:
 :CUSTOM_ID: case
 :END:
@@ -1971,7 +1983,7 @@ case("bunch", cases, "other") => "other"
 
 [[#contents][茶]]
 
-** cmpVersion()
+** cmpVersion
 :PROPERTIES:
 :CUSTOM_ID: cmpVersion
 :END:
@@ -1997,7 +2009,7 @@ cmpVersion("1.2.5", "1.2.5") => 0
 
 [[#contents][茶]]
 
-** cmp()
+** cmp
 :PROPERTIES:
 :CUSTOM_ID: cmp
 :END:
@@ -2019,7 +2031,7 @@ cmp(9.3, 2.2) => 1
 
 [[#contents][茶]]
 
-** cmp()
+** cmp
 :PROPERTIES:
 :CUSTOM_ID: cmp
 :END:
@@ -2041,7 +2053,7 @@ cmp(9, 2) => 1
 
 [[#contents][茶]]
 
-** cmp()
+** cmp
 :PROPERTIES:
 :CUSTOM_ID: cmp
 :END:
@@ -2068,7 +2080,7 @@ cmp("Tea", "tea", 1) => 0
 
 [[#contents][茶]]
 
-** concat()
+** concat
 :PROPERTIES:
 :CUSTOM_ID: concat
 :END:
@@ -2088,7 +2100,7 @@ concat("a", "b") => "ab"
 
 [[#contents][茶]]
 
-** dict()
+** dict
 :PROPERTIES:
 :CUSTOM_ID: dict
 :END:
@@ -2111,7 +2123,7 @@ dict(list("a", 5, "b", 33, "c", 0)) =>
 
 [[#contents][茶]]
 
-** dup()
+** dup
 :PROPERTIES:
 :CUSTOM_ID: dup
 :END:
@@ -2135,7 +2147,7 @@ dup("", 3) => ""
 
 [[#contents][茶]]
 
-** exists()
+** exists
 :PROPERTIES:
 :CUSTOM_ID: exists
 :END:
@@ -2156,7 +2168,7 @@ exists(d, "coffee") => 0
 
 [[#contents][茶]]
 
-** find()
+** find
 :PROPERTIES:
 :CUSTOM_ID: find
 :END:
@@ -2185,7 +2197,7 @@ find(msg, "party", 0) = 0
 
 [[#contents][茶]]
 
-** float()
+** float
 :PROPERTIES:
 :CUSTOM_ID: float
 :END:
@@ -2205,7 +2217,7 @@ float(-33) => -33.0
 
 [[#contents][茶]]
 
-** float()
+** float
 :PROPERTIES:
 :CUSTOM_ID: float
 :END:
@@ -2226,7 +2238,7 @@ float("33") => 33.0
 
 [[#contents][茶]]
 
-** get()
+** get
 :PROPERTIES:
 :CUSTOM_ID: get
 :END:
@@ -2258,7 +2270,7 @@ d.tea => "Earl Grey"
 
 [[#contents][茶]]
 
-** get()
+** get
 :PROPERTIES:
 :CUSTOM_ID: get
 :END:
@@ -2281,7 +2293,7 @@ get(list, 3, 99) => 99
 
 [[#contents][茶]]
 
-** githubAnchor()
+** githubAnchor
 :PROPERTIES:
 :CUSTOM_ID: githubAnchor
 :END:
@@ -2303,7 +2315,7 @@ githubAnchor(list) =>
 
 [[#contents][茶]]
 
-** githubAnchor()
+** githubAnchor
 :PROPERTIES:
 :CUSTOM_ID: githubAnchor
 :END:
@@ -2337,7 +2349,7 @@ $$ : anchor = githubAnchor(entry.name)
 
 [[#contents][茶]]
 
-** if0()
+** if0
 :PROPERTIES:
 :CUSTOM_ID: if0
 :END:
@@ -2347,9 +2359,21 @@ the third. This function is special because it conditionally
 evaluates the matching parameter and skips the other one.  See
 [[#conditional-evaluation][Conditional Evaluation]].
 
+#+BEGIN_SRC
+if0(condition: int, then: any, else: any) any
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+if0(0, "tea", "beer") => "tea"
+if0(1, "tea", "beer") => "beer"
+if0(4, "tea", "beer") => "beer"
+#+END_SRC
+
 [[#contents][茶]]
 
-** if1()
+** if1
 :PROPERTIES:
 :CUSTOM_ID: if1
 :END:
@@ -2373,7 +2397,7 @@ if1(4, "tea", "beer") => "beer"
 
 [[#contents][茶]]
 
-** int()
+** int
 :PROPERTIES:
 :CUSTOM_ID: int
 :END:
@@ -2409,7 +2433,7 @@ int(-6.3456, "truncate") => -6
 
 [[#contents][茶]]
 
-** int()
+** int
 :PROPERTIES:
 :CUSTOM_ID: int
 :END:
@@ -2445,7 +2469,7 @@ int("-6.3456", "truncate") => -6
 
 [[#contents][茶]]
 
-** joinPath()
+** joinPath
 :PROPERTIES:
 :CUSTOM_ID: joinPath
 :END:
@@ -2489,7 +2513,7 @@ joinPath(list("/", "tea")) =>
 
 [[#contents][茶]]
 
-** join()
+** join
 :PROPERTIES:
 :CUSTOM_ID: join
 :END:
@@ -2515,7 +2539,7 @@ join(list("a", "", "c"), "|", 1) => "a|c"
 
 [[#contents][茶]]
 
-** keys()
+** keys
 :PROPERTIES:
 :CUSTOM_ID: keys
 :END:
@@ -2536,7 +2560,7 @@ values(d) => ["apple", 2, 3]
 
 [[#contents][茶]]
 
-** len()
+** len
 :PROPERTIES:
 :CUSTOM_ID: len
 :END:
@@ -2557,7 +2581,7 @@ len(dict("a", 4, "b", 3)) => 2
 
 [[#contents][茶]]
 
-** len()
+** len
 :PROPERTIES:
 :CUSTOM_ID: len
 :END:
@@ -2578,7 +2602,7 @@ len(list(4, 5)) => 2
 
 [[#contents][茶]]
 
-** len()
+** len
 :PROPERTIES:
 :CUSTOM_ID: len
 :END:
@@ -2598,7 +2622,7 @@ len("añyóng") => 6
 
 [[#contents][茶]]
 
-** list()
+** list
 :PROPERTIES:
 :CUSTOM_ID: list
 :END:
@@ -2621,7 +2645,7 @@ list("a", 5, "b") => ["a", 5, "b"]
 
 [[#contents][茶]]
 
-** lower()
+** lower
 :PROPERTIES:
 :CUSTOM_ID: lower
 :END:
@@ -2642,7 +2666,7 @@ lower("TEĀ") => "teā"
 
 [[#contents][茶]]
 
-** path()
+** path
 :PROPERTIES:
 :CUSTOM_ID: path
 :END:
@@ -2678,7 +2702,7 @@ path("src\runFunction.nim", "\") => {
 
 [[#contents][茶]]
 
-** replace()
+** replace
 :PROPERTIES:
 :CUSTOM_ID: replace
 :END:
@@ -2742,7 +2766,7 @@ replace("", 0, 0, "abcd") => abcd
 
 [[#contents][茶]]
 
-** replaceRe()
+** replaceRe
 :PROPERTIES:
 :CUSTOM_ID: replaceRe
 :END:
@@ -2769,7 +2793,7 @@ website: https://regex101.com/
 
 [[#contents][茶]]
 
-** slice()
+** slice
 :PROPERTIES:
 :CUSTOM_ID: slice
 :END:
@@ -2795,7 +2819,7 @@ slice("añyóng", 0, 3) => "añy"
 
 [[#contents][茶]]
 
-** sort()
+** sort
 :PROPERTIES:
 :CUSTOM_ID: sort
 :END:
@@ -2831,7 +2855,7 @@ sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
 
 [[#contents][茶]]
 
-** sort()
+** sort
 :PROPERTIES:
 :CUSTOM_ID: sort
 :END:
@@ -2863,7 +2887,7 @@ sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
 
 [[#contents][茶]]
 
-** sort()
+** sort
 :PROPERTIES:
 :CUSTOM_ID: sort
 :END:
@@ -2895,7 +2919,7 @@ sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 
 [[#contents][茶]]
 
-** type()
+** type
 :PROPERTIES:
 :CUSTOM_ID: type
 :END:
@@ -2918,7 +2942,7 @@ type(dict("a", 1)) => "dict"
 
 [[#contents][茶]]
 
-** values()
+** values
 :PROPERTIES:
 :CUSTOM_ID: values
 :END:
@@ -2939,7 +2963,7 @@ values(d) => ["apple", 2, 3]
 
 [[#contents][茶]]
 
-** warn()
+** warn
 :PROPERTIES:
 :CUSTOM_ID: warn
 :END:
@@ -2991,3 +3015,4 @@ equaling all others – including coffee, soft drinks, and alcohol
 – combined. -- Wikipedia -- Macfarlane, Alan; Macfarlane, Iris
 (2004). The Empire of Tea. The Overlook Press. p. 32. ISBN
 978-1-58567-493-0.
+* templates/readmeFuncSection.org

@@ -61,7 +61,7 @@
 # $ : t.repeat = len(g.entries)
 # $ : entry = get(g.entries, t.row)
 # $ : t.output = entry.output
-- [[#{entry.name}][{entry.name}()]] -- {entry.shortFuncDesc}
+- [[#{entry.name}][{entry.name}]] -- {entry.shortFuncDesc}
 
 # $ #
 # $ # Generate the function sections.
@@ -72,7 +72,7 @@
 # $ : t.output = entry.output
 [[#contents][茶]]
 
-** {entry.name}()
+** {entry.name}
 :PROPERTIES:
 :CUSTOM_ID: {entry.name}
 :END:

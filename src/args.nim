@@ -1,6 +1,7 @@
 ## Types for handling command line arguments.
 
 import std/strutils
+import messages
 import warnings
 import opresultwarn
 
@@ -30,7 +31,7 @@ func newArgsOr*(warningData: WarningData):
   ## Return a new Args object containing a warning.
   result = opMessageW[Args](warningData)
 
-func newArgsOr*(warning: Warning, p1: string = "", pos = 0):
+func newArgsOr*(warning: MessageId, p1: string = "", pos = 0):
      ArgsOr =
   ## Return a new Args object containing a warning.
   let warningData = newWarningData(warning, p1, pos)

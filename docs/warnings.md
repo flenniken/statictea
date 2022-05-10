@@ -5,21 +5,12 @@ Module for handling warnings.
 * [warnings.nim](../src/warnings.nim) &mdash; Nim source code.
 # Index
 
-* type: [Warning](#warning) &mdash; Warning message id.
 * type: [WarningData](#warningdata) &mdash; Warning data.
 * [getWarningLine](#getwarningline) &mdash; Return a formatted warning line.
 * [getWarningLine](#getwarningline-1) &mdash; Return a formatted warning line.
 * [newWarningData](#newwarningdata) &mdash; Create a WarningData object containing all the warning information.
 * [`$`](#) &mdash; Return a string representation of WarningData.
 * [`==`](#-1) &mdash; Return true when the two WarningData objects are equal.
-
-# Warning
-
-Warning message id.
-
-```nim
-Warning = MessageId
-```
 
 # WarningData
 
@@ -31,7 +22,7 @@ Warning data.<ul class="simple"><li>warning -- the message id</li>
 
 ```nim
 WarningData = object
-  warning*: Warning
+  warning*: MessageId
   p1*: string
   pos*: Natural
 
@@ -46,7 +37,7 @@ filename(line): wId: message.
 ~~~~
 
 ```nim
-func getWarningLine(filename: string; lineNum: int; warning: Warning; p1 = ""): string
+func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = ""): string
 ```
 
 # getWarningLine
@@ -66,7 +57,7 @@ func getWarningLine(filename: string; lineNum: int; warningData: WarningData): s
 Create a WarningData object containing all the warning information.
 
 ```nim
-proc newWarningData(warning: Warning; p1 = ""; pos = 0): WarningData
+proc newWarningData(warning: MessageId; p1 = ""; pos = 0): WarningData
 ```
 
 # `$`

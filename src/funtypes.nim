@@ -1,6 +1,7 @@
 ## Statictea function types and supporting routines.
 
 import vartypes
+import messages
 import warnings
 import strutils
 
@@ -31,7 +32,7 @@ type
         parameter*: Natural ## Index of problem parameter.
         warningData*: WarningData
 
-func newFunResultWarn*(warning: Warning, parameter: Natural = 0,
+func newFunResultWarn*(warning: MessageId, parameter: Natural = 0,
       p1: string = ""): FunResult =
   ## Return a new FunResult object containing a warning. It takes a
   ## warning, the index of the problem parameter, and the optional

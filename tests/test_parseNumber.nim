@@ -113,6 +113,8 @@ suite "parseNumber.nim":
   test "parseFloat":
     check testParseFloat("0", 0.0, 1)
     check testParseFloat("9", 9.0, 1)
+    check testParseFloat("9e2", 900.0, 3)
+    check testParseFloat("9E2", 900.0, 3)
 
     check testParseFloat("-9", -9.0, 2)
     check testParseFloat("+9", 9.0, 2)

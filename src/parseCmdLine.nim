@@ -36,7 +36,7 @@ type
 
   LinePartsOr* = OpResultWarn[LineParts]
 
-func newLinePartsOr*(warning: Warning, p1: string = "", pos = 0):
+func newLinePartsOr*(warning: MessageId, p1: string = "", pos = 0):
      LinePartsOr =
   ## Return a new LinePartsOr object containing a warning.
   let warningData = newWarningData(warning, p1, pos)

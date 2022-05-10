@@ -33,7 +33,7 @@ proc testMapParametersOk(signatureCode: string, args: seq[Value],
   result = true
 
 proc testMapParametersW(signatureCode: string, args: seq[Value],
-    eParameter: int, warning: Warning, p1: string = ""): bool =
+    eParameter: int, warning: MessageId, p1: string = ""): bool =
 
   var paramsO = signatureCodeToParams(signatureCode)
   if not paramsO.isSome:

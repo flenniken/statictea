@@ -33,7 +33,7 @@ type
 
   StrAndPosOr* = OpResultWarn[StrAndPos]
 
-func newStrAndPosOr*(warning: Warning, p1: string = "", pos = 0):
+func newStrAndPosOr*(warning: MessageId, p1: string = "", pos = 0):
      StrAndPosOr =
   ## Return a new StrAndPosOr object containing a warning.
   let warningData = newWarningData(warning, p1, pos)

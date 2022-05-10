@@ -73,7 +73,7 @@ proc newValueAndLength(value: Value; length: Natural): ValueAndLength
 Create a ValueAndLengthOr warning.
 
 ```nim
-func newValueAndLengthOr(warning: Warning; p1 = ""; pos = 0): ValueAndLengthOr
+func newValueAndLengthOr(warning: MessageId; p1 = ""; pos = 0): ValueAndLengthOr
 ```
 
 # newValueAndLengthOr
@@ -105,7 +105,7 @@ func newValueAndLengthOr(val: ValueAndLength): ValueAndLengthOr
 Create a OpResultWarn[Natural] warning.
 
 ```nim
-func newLengthOr(warning: Warning; p1 = ""; pos = 0): OpResultWarn[Natural]
+func newLengthOr(warning: MessageId; p1 = ""; pos = 0): OpResultWarn[Natural]
 ```
 
 # newLengthOr

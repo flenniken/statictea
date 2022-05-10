@@ -82,7 +82,7 @@ proc outputWarning(env: var Env; lineNum: Natural; message: string)
 Write a formatted warning message to the error stream.
 
 ```nim
-proc warn(env: var Env; lineNum: Natural; warning: Warning; p1: string = "")
+proc warn(env: var Env; lineNum: Natural; warning: MessageId; p1: string = "")
 ```
 
 # warn

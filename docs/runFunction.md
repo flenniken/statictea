@@ -269,6 +269,18 @@ the third. This function is special because it conditionally
 evaluates the matching parameter and skips the other one.  See
 [[#conditional-evaluation][Conditional Evaluation]].
 
+~~~
+if0(condition: int, then: any, else: any) any
+~~~~
+
+Examples:
+
+~~~
+if0(0, "tea", "beer") => "tea"
+if0(1, "tea", "beer") => "beer"
+if0(4, "tea", "beer") => "beer"
+~~~~
+
 ```nim
 func funIf0(parameters: seq[Value]): FunResult
 ```

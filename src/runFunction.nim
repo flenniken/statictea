@@ -302,7 +302,6 @@ func funIf0*(parameters: seq[Value]): FunResult =
   ## @:the third. This function is special because it conditionally
   ## @:evaluates the matching parameter and skips the other one.  See
   ## @:[[#conditional-evaluation][Conditional Evaluation]].
-
   ## @:
   ## @:~~~
   ## @:if0(condition: int, then: any, else: any) any
