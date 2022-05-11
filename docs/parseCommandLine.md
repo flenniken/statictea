@@ -21,7 +21,7 @@ proc parsePrepost(str: string): Option[Prepost]
 Parse the terminal command line.
 
 ```nim
-func parseCommandLine(argv: seq[string]): ArgsOr
+proc parseCommandLine(argv: seq[string]): ArgsOr
 ```
 
 

@@ -279,7 +279,6 @@ proc addExtraStreams*(env: var Env, args: Args): bool =
 
   result = addExtraStreams(env, templateFilename, resultFilename)
 
-# todo: test the case where the template file is the same as the result file.
 # todo: test where a resultFilename is specified with update.
 # todo: test with template of "stdin" when update is specified.
 # todo: test update when the template is readonly.

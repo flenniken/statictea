@@ -2,6 +2,7 @@
 
 import std/options
 import std/tables
+import std/os
 import args
 import messages
 import warnings
@@ -25,7 +26,15 @@ func mapCmlMessages(messageId: CmlMessageId): MessageId =
     fail
   result = MessageId(ord(messageId) + 157)
 
-func parseCommandLine*(argv: seq[string]): ArgsOr =
+proc mySameFile(filename1: string, filename2: string): bool =
+  ## Return true when the two files are the same file.
+  if not fileExists(filename1):
+    return false
+  if not fileExists(filename2):
+    return false
+  result = sameFile(filename1, filename2)
+
+proc parseCommandLine*(argv: seq[string]): ArgsOr =
   ## Parse the terminal command line.
 
   var options = newSeq[CmlOption]()
@@ -86,9 +95,18 @@ func parseCommandLine*(argv: seq[string]): ArgsOr =
       args.logFilename = filenames[0]
     args.log = true
 
-  # We don't need to check whether the command line files are
+  # We don't need to check whether some of the command line files are
   # unique. We read the json files first and the code handles
-  # duplicates. There is only one result file that we write to and it
-  # is written after reading the others.
+  # duplicates.
 
+  # Check that the template, result and log files are different.
+  if mySameFile(args.templateFilename, args.resultFilename):
+    # The template and result files are the same.
+    return newArgsOr(newWarningData(wSameAsTemplate, "result"))
+  elif mySameFile(args.templateFilename, args.logFilename):
+    # The template and log files are the same.
+    return newArgsOr(newWarningData(wSameAsTemplate, "log"))
+  elif mySameFile(args.resultFilename, args.logFilename):
+    # The result and log files are the same.
+    return newArgsOr(newWarningData(wSameAsResult, "log"))
   result = newArgsOr(args)

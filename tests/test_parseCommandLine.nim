@@ -3,6 +3,7 @@
 import std/unittest
 import std/options
 import std/strutils
+import std/os
 import args
 import parseCommandLine
 import env
@@ -255,3 +256,24 @@ suite "parseCommandLine":
   test "parseCommandLine-two-results":
     check parseWarning("-r result.html -r asdf.html",
       newWarningData(wCmlAlreadyHaveOneParameter, "result"))
+
+  test "template same as result":
+    let filename = "tea.html"
+    createFile(filename, "test file")
+    let cmd = "-t tea.html -r tea.html"
+    check parseWarning(cmd, newWarningData(wSameAsTemplate, "result"))
+    discard tryRemoveFile(filename)
+
+  test "template same as log":
+    let filename = "tea.html"
+    createFile(filename, "test file")
+    let cmd = "-t tea.html -l tea.html"
+    check parseWarning(cmd, newWarningData(wSameAsTemplate, "log"))
+    discard tryRemoveFile(filename)
+
+  test "result same as log":
+    let filename = "tea.html"
+    createFile(filename, "test file")
+    let cmd = "-t template -r tea.html -l tea.html"
+    check parseWarning(cmd, newWarningData(wSameAsResult, "log"))
+    discard tryRemoveFile(filename)

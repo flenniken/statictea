@@ -187,7 +187,9 @@ MessageId = enum
   wMissingCommaBracket,     ## w170
   wUserMessage,             ## w171
   wMissingDictIndex,        ## w172
-  wMaxDepthExceeded          ## w173
+  wMaxDepthExceeded,        ## w173
+  wSameAsTemplate,          ## w174
+  wSameAsResult              ## w175
 ```
 
 # Messages
@@ -365,7 +367,9 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Already have one \'$1\' parameter.", "Missing comma or right bracket.", ## wMissingCommaBracket
     "$1",                   ## wUserMessage
     "The dictionary does not have an item with index $1.", ## wMissingDictIndex
-    "The maximum JSON depth of $1 was exceeded."]
+    "The maximum JSON depth of $1 was exceeded.", ## wMaxDepthExceeded
+    "The template and $1 files are the same.", ## wSameAsTemplate
+    "The result and $1 files are the same."]
 ```
 
 
