@@ -20,15 +20,16 @@ const
     ## The date time format in local time written to the log.
 
   maxWarningsWritten* = 10
-    ## The maximum of warning messages to show.
+    ## The maximum number of warning messages to show.
 
 when hostOS == "macosx":
   let staticteaLog* = expandTilde("~/Library/Logs/statictea.log")
-    ## Name of the default statictea log file when logging on the Mac.
+    ## Name of the default statictea log file.  The path on the Mac is
+    ## different than the other platforms.
 else:
   let staticteaLog* = expandTilde("~/statictea.log")
-    ## Name of the default statictea log file when not logging on the
-    ## Mac.
+    ## Name of the default statictea log file.  The path on the Mac is
+    ## different than the other platforms.
 
 type
   Env* = object
@@ -50,7 +51,7 @@ type
     ## @:* templateStream -- template stream, may be stdin
     ## @:* resultFilename -- name of the result file
     ## @:* resultStream -- result stream, may be stdout
-    ## @:* warningWritten -- the total number of warnings
+    ## @:* warningsWritten -- the total number of warnings
 
     # These get set at the start.
     errStream*: Stream
@@ -71,7 +72,7 @@ type
     resultFilename*: string
     resultStream*: Stream
 
-    warningWritten*: Natural
+    warningsWritten*: Natural
 
 proc close*(env: var Env) =
   ## Close the environment streams.
@@ -96,13 +97,13 @@ proc close*(env: var Env) =
 proc outputWarning*(env: var Env, lineNum: Natural, message: string) =
   ## Write a message to the error stream and increment the warning
   ## count.
-  if env.warningWritten >= maxWarningsWritten:
+  if env.warningsWritten >= maxWarningsWritten:
     return
 
   env.errStream.writeLine(message)
-  inc(env.warningWritten)
+  inc(env.warningsWritten)
 
-  if env.warningWritten == maxWarningsWritten:
+  if env.warningsWritten == maxWarningsWritten:
     # Reached the maximum number of warnings, suppressing the rest.
     var filename = env.templateFilename
     if filename == "":
@@ -110,7 +111,7 @@ proc outputWarning*(env: var Env, lineNum: Natural, message: string) =
 
     let message = getWarningLine(filename, lineNum, kMaxWarnings)
     env.errStream.writeLine(message)
-    inc(env.warningWritten)
+    inc(env.warningsWritten)
 
 proc warn*(env: var Env, lineNum: Natural, warning: MessageId, p1:
            string = "") =

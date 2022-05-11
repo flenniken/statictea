@@ -305,7 +305,7 @@ proc processTemplate*(env: var Env, args: Args): int =
   # Process the template.
   processTemplateLines(env, variables, prepostTable)
 
-  if env.warningWritten > 0:
+  if env.warningsWritten > 0:
     result = 1
 
 proc updateTemplate*(env: var Env, args: Args): int =
@@ -318,7 +318,7 @@ proc updateTemplate*(env: var Env, args: Args): int =
   # Process the template.
   updateTemplateLines(env, variables, prepostTable)
 
-  if env.warningWritten > 0:
+  if env.warningsWritten > 0:
     result = 1
 
 proc processTemplateTop*(env: var Env, args: Args): int =

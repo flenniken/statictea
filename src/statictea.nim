@@ -65,8 +65,8 @@ when isMainModule:
   proc run(): int =
     var env = openEnv()
     result = main(env, commandLineParams())
-    env.log("Warnings: $1\n" % [$env.warningWritten])
-    if result == 0 and env.warningWritten > 0:
+    env.log("Warnings: $1\n" % [$env.warningsWritten])
+    if result == 0 and env.warningsWritten > 0:
       result = 1
     env.log("Return code: $1\n" % [$result])
     env.log("Done\n")

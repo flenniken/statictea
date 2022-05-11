@@ -29,17 +29,17 @@ type
 
 func newArgsOr*(warningData: WarningData):
      ArgsOr =
-  ## Return a new Args object containing a warning.
+  ## Return a new ArgsOr object containing a warning.
   result = opMessageW[Args](warningData)
 
 func newArgsOr*(warning: MessageId, p1: string = "", pos = 0):
      ArgsOr =
-  ## Return a new Args object containing a warning.
+  ## Return a new ArgsOr object containing a warning.
   let warningData = newWarningData(warning, p1, pos)
   result = opMessageW[Args](warningData)
 
 func newArgsOr*(args: Args): ArgsOr =
-  ## Return a new Args object containing a value.
+  ## Return a new ArgsOr object containing args.
   result = opValueW[Args](args)
 
 func newPrepost*(prefix: string, postfix: string): Prepost =

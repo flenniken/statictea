@@ -7,8 +7,8 @@ Environment holding the input and output streams.
 
 * const: [logWarnSize](#logwarnsize) &mdash; Warn the user when the log file gets over 1 GB.
 * const: [dtFormat](#dtformat) &mdash; The date time format in local time written to the log.
-* const: [maxWarningsWritten](#maxwarningswritten) &mdash; The maximum of warning messages to show.
-* [staticteaLog](#statictealog) &mdash; Name of the default statictea log file when logging on the Mac.
+* const: [maxWarningsWritten](#maxwarningswritten) &mdash; The maximum number of warning messages to show.
+* [staticteaLog](#statictealog) &mdash; Name of the default statictea log file.
 * type: [Env](#env) &mdash; Env holds the input and output streams.
 * [close](#close) &mdash; Close the environment streams.
 * [outputWarning](#outputwarning) &mdash; Write a message to the error stream and increment the warning count.
@@ -43,7 +43,7 @@ dtFormat = "yyyy-MM-dd HH:mm:ss\'.\'fff"
 
 # maxWarningsWritten
 
-The maximum of warning messages to show.
+The maximum number of warning messages to show.
 
 ```nim
 maxWarningsWritten = 10
@@ -51,7 +51,7 @@ maxWarningsWritten = 10
 
 # staticteaLog
 
-Name of the default statictea log file when logging on the Mac.
+Name of the default statictea log file.  The path on the Mac is different than the other platforms.
 
 ```nim
 staticteaLog = expandTilde("~/Library/Logs/statictea.log")
@@ -77,7 +77,7 @@ close stdout.
 * templateStream -- template stream, may be stdin
 * resultFilename -- name of the result file
 * resultStream -- result stream, may be stdout
-* warningWritten -- the total number of warnings
+* warningsWritten -- the total number of warnings
 
 ```nim
 Env = object
@@ -93,7 +93,7 @@ Env = object
   templateStream*: Stream
   resultFilename*: string
   resultStream*: Stream
-  warningWritten*: Natural
+  warningsWritten*: Natural
 
 ```
 

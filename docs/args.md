@@ -8,9 +8,9 @@ Types for handling command line arguments.
 * type: [Prepost](#prepost) &mdash; Prepost holds one prefix and its associated postfix.
 * type: [Args](#args) &mdash; Args holds all the command line arguments.
 * type: [ArgsOr](#argsor) &mdash; The args or a warning.
-* [newArgsOr](#newargsor) &mdash; Return a new Args object containing a warning.
-* [newArgsOr](#newargsor-1) &mdash; Return a new Args object containing a warning.
-* [newArgsOr](#newargsor-2) &mdash; Return a new Args object containing a value.
+* [newArgsOr](#newargsor) &mdash; Return a new ArgsOr object containing a warning.
+* [newArgsOr](#newargsor-1) &mdash; Return a new ArgsOr object containing a warning.
+* [newArgsOr](#newargsor-2) &mdash; Return a new ArgsOr object containing args.
 * [newPrepost](#newprepost) &mdash; Create a new prepost object from the prefix and postfix.
 * [`$`](#) &mdash; Return the Prepost string representation.
 * [`$`](#-1) &mdash; Return the Args string representation.
@@ -55,7 +55,7 @@ ArgsOr = OpResultWarn[Args]
 
 # newArgsOr
 
-Return a new Args object containing a warning.
+Return a new ArgsOr object containing a warning.
 
 ```nim
 func newArgsOr(warningData: WarningData): ArgsOr
@@ -63,7 +63,7 @@ func newArgsOr(warningData: WarningData): ArgsOr
 
 # newArgsOr
 
-Return a new Args object containing a warning.
+Return a new ArgsOr object containing a warning.
 
 ```nim
 func newArgsOr(warning: MessageId; p1: string = ""; pos = 0): ArgsOr
@@ -71,7 +71,7 @@ func newArgsOr(warning: MessageId; p1: string = ""; pos = 0): ArgsOr
 
 # newArgsOr
 
-Return a new Args object containing a value.
+Return a new ArgsOr object containing args.
 
 ```nim
 func newArgsOr(args: Args): ArgsOr
