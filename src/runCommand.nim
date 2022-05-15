@@ -2,6 +2,7 @@
 
 import std/options
 import std/strUtils
+import std/tables
 import readLines
 import matches
 import regexes
@@ -632,3 +633,8 @@ proc runCommand*(env: var Env, cmdLines: CmdLines, variables: var Variables) =
       variableData.dotNameStr, variableData.value, variableData.operator)
     if isSome(warningDataO):
       env.warnStatement(statement, warningDataO.get())
+
+    # If t.repeat was set to 0, we're done.
+    let tea = variables["t"].dictv
+    if "repeat" in tea and tea["repeat"].intv == 0:
+      break

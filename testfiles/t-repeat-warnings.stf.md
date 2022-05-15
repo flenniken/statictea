@@ -1,6 +1,6 @@
 stf file, version 0.1.0
 
-# t.repeat Warnings
+# Tea Repeat Warnings
 
 Test t.repeat warnings.
 
@@ -39,6 +39,13 @@ $$ : t.repeat = list
 
 Set t.repeat to maxRepeat.
 $$ block t.repeat = 100
+$$ endblock
+
+Setting t.repeat to 0, short curcuits the command.
+$$ block a = warn("hit")
+$$ : t.repeat = 0
+$$ : b = warn("not hit")
+short curcuit example
 $$ endblock
 
 Increase maxRepeat then set t.repeat to it.
@@ -99,6 +106,8 @@ Set t.repeat to [2].
 
 Set t.repeat to maxRepeat.
 
+Setting t.repeat to 0, short curcuits the command.
+
 Increase maxRepeat then set t.repeat to it.
 
 Increase maxRepeat then set t.repeat one past it.
@@ -137,23 +146,21 @@ statement: t.repeat = "five"
 tmpl.txt(12): w44: The variable t.repeat must be an integer between 0 and t.maxRepeat.
 statement: t.repeat = list
            ^
-tmpl.txt(25): w44: The variable t.repeat must be an integer between 0 and t.maxRepeat.
+tmpl.txt(19): hit
+tmpl.txt(32): w44: The variable t.repeat must be an integer between 0 and t.maxRepeat.
 statement: t.repeat = 201
            ^
-tmpl.txt(32): w44: The variable t.repeat must be an integer between 0 and t.maxRepeat.
+tmpl.txt(39): w44: The variable t.repeat must be an integer between 0 and t.maxRepeat.
 statement: t.repeat = 3
            ^
-tmpl.txt(33): w58: The replacement variable doesn't exist: t.repeat.
-tmpl.txt(39): w129: You cannot reassign a variable.
+tmpl.txt(40): w58: The replacement variable doesn't exist: t.repeat.
+tmpl.txt(46): w129: You cannot reassign a variable.
 statement: t.repeat = 3
            ^
-tmpl.txt(39): w129: You cannot reassign a variable.
+tmpl.txt(46): w129: You cannot reassign a variable.
 statement: t.repeat = 3
            ^
-tmpl.txt(39): w129: You cannot reassign a variable.
-statement: t.repeat = 3
-           ^
-tmpl.txt(39): w116: You reached the maximum number of warnings, suppressing the rest.
+tmpl.txt(46): w116: You reached the maximum number of warnings, suppressing the rest.
 ~~~
 
 ### Expected stdout == stdout.expected

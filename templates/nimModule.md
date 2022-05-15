@@ -5,7 +5,6 @@ $$ # Create a list of all the heading names.
 $$ #
 $$ block
 $$ : t.repeat = len(s.entries)
-$$ : a = if0(t.repeat, warn("Nothing to document in this module."), 0)
 $$ : entry = get(s.entries, t.row)
 $$ : g.names &= entry.name
 $$ endblock
@@ -26,6 +25,7 @@ $$ :   "&lt;", "<", +
 $$ :   "&amp;", "&")
 $$ : path = path(s.orig)
 $$ : g.moduleName = path.filename
+$$ : t.repeat = if0(len(s.entries), 0, 1)
 $$ : g.anchors = githubAnchor(g.names)
 $$ endblock
 $$ #
@@ -65,14 +65,14 @@ $$ #
 $$ # Show the index label when there are entries.
 $$ #
 $$ nextline
-$$ : t.repeat = if0(len(g.entries), 0, 1)
+$$ : t.repeat = if0(len(s.entries), 0, 1)
 # Index
 
 $$ #
 $$ # Create the index.
 $$ #
 $$ nextline
-$$ : t.repeat = len(g.entries)
+$$ : t.repeat = if0(len(s.entries), 0, len(g.entries))
 $$ : entry = get(g.entries, t.row)
 * {entry.type}[{entry.name}](#{entry.anchor}) &mdash; {entry.short}
 
@@ -80,7 +80,7 @@ $$ #
 $$ # Create the function sections.
 $$ #
 $$ block
-$$ : t.repeat = len(g.entries)
+$$ : t.repeat = if0(len(s.entries), 0, len(g.entries))
 $$ : entry = get(g.entries, t.row)
 # {entry.name}
 

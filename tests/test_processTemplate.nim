@@ -1403,6 +1403,16 @@ $$ endblock
         eResultLines = eResultLines)
 
 
+  test "repeat 0 short circuit":
+    let templateContent = """
+$$ block t.repeat = 0
+$$ : a = warn("not hit")
+repeat short circuit
+$$ endblock
+"""
+    check testProcessTemplate(templateContent = templateContent)
+
+
 # todo: test with no result file.
 # todo: test that the template file gets updated
 # todo: test that there is an error when the user specifies a result file.

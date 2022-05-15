@@ -869,6 +869,9 @@ You cannot assign a number bigger than t.maxRepeat to
 t.repeat. You can set t.maxRepeat to anything you want, the
 default is 100.
 
+When you set t.repeat to 0, it short circuits the command and
+exits.  The commands' statements following are not run.
+
 For the following example, the number of items in teaList is
 assigned to the t.repeat variable which outputs the block five
 times.

@@ -38,7 +38,7 @@ Result file with the update option.
 ### File stderr.expected
 
 ~~~
-unnamed(0): w176: The result file is not used with the update option.
+unnamed(0): w176: The result file is used with the update option.
 ~~~
 
 ### Expected result == result.expected

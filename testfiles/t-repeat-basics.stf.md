@@ -115,6 +115,12 @@ The readme forth repeat example:
   <li>Puer</li>
 <!--$ endblock -->
 </ul>
+
+Setting t.repeat to 0, short curcuits the command.
+$$ block t.repeat = 0
+$$ a = warn("not hit")
+short curcuit example
+$$ endblock
 ~~~
 
 
@@ -228,6 +234,8 @@ The readme forth repeat example:
   <li>Sencha</li>
   <li>Herbal</li>
 </ul>
+
+Setting t.repeat to 0, short curcuits the command.
 ~~~
 
 ### Expected stdout == empty
