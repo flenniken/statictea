@@ -7,20 +7,29 @@ import args
 import regexes
 
 const
-  predefinedPrepost: array[8, Prepost] = [
-    ## The predefined prefixes and postfixes.
+  predefinedPrepost*: array[8, Prepost] = [
+    newPrepost("$$", ""),
     newPrepost("<!--$", "-->"),
     newPrepost("#$", ""),
     newPrepost(";$", ""),
     newPrepost("//$", ""),
     newPrepost("/*$", "*/"),
     newPrepost("&lt;!--$", "--&gt;"),
-    newPrepost("$$", ""),
-    newPrepost("# $", ""),
+    newPrepost("# $", "")
   ]
+    ## The predefined prefixes and postfixes.
+    ## @:~~~
+    ## @:* Default when no comment like Markdown: $$
+    ## @:* HTML: <!--$ and -->
+    ## @:* Bash, python, etc: #$
+    ## @:* Config files, Lisp: ;$
+    ## @:* C++: //$
+    ## @:* C, C++: /@.$ and @./
+    ## @:* HTML inside a textarea element: &lt;!--$ and --&gt;
+    ## @:* Org Mode: # $
+    ## @:~~~~
 
-  ## The StaticTea commands.
-  commands: array[6, string] = [
+  commands*: array[6, string] = [
     "nextline",
     "block",
     "replace",
@@ -28,6 +37,13 @@ const
     ":",
     "endblock",
   ]
+    ## The StaticTea commands.
+    ## @:* nextline -- make substitutions in the next line
+    ## @:* block —- make substitutions in the next block of lines
+    ## @:* replace -— replace the block with a variable
+    ## @:* "#" -- code comment
+    ## @:* ":" -- continue a command
+    ## @:* endblock -- end the block and replace commands
 
   numberPattern = r"-{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*\s*"
     ## A number regular expression pattern. A number starts with an
@@ -151,7 +167,8 @@ proc matchNumber*(line: string, start: Natural = 0): Option[Matches] =
 func matchNumberNotCached*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a number and the optional trailing whitespace. Return the
   ## optional decimal point that tells whether the number is a float
-  ## or integer.
+  ## or integer. "Not cached" allows it to be called by a function
+  ## because it has no side effects.  effects.
   result = matchPattern(line, numberPattern, start, 1)
 
 proc matchUpToLeftBracket*(line: string, start: Natural = 0): Option[Matches] =
@@ -179,7 +196,8 @@ proc matchVersion*(line: string, start: Natural = 0): Option[Matches] =
 
 func matchVersionNotCached*(line: string, start: Natural = 0,
     numGroups: Natural = 0): Option[Matches] =
-  ## Match a StaticTea version number.
+  ## Match a StaticTea version number. "Not cached" allows it to be
+  ## called by a function because it has no side effects.
   result = matchPattern(line, versionPattern, start, 3)
 
 proc matchDotNames*(line: string, start: Natural = 0): Option[Matches] =

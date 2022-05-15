@@ -1534,14 +1534,14 @@ them use $$.
 
 Built in Prefixes:
 
+- markdown: $$
 - html: <!--$ and -->
-- html: &lt;!--$ and --&gt; for textarea elements
+- html inside a textarea: &lt;!--$ and --&gt;
 - bash: #$
-- org mode: # $
 - config files: ;$
 - C++: //$
+- org mode: # $
 - C language: ​/\star$ and \star​/
-- markdown: $$
 
 You can define other comment types on the command line using the
 prepost option one or more times. When you specify your own

@@ -5,6 +5,8 @@ Regular expression matching methods.
 * [matches.nim](../src/matches.nim) &mdash; Nim source code.
 # Index
 
+* const: [predefinedPrepost](#predefinedprepost) &mdash; The predefined prefixes and postfixes.
+* const: [commands](#commands) &mdash; The StaticTea commands.
 * type: [PrepostTable](#preposttable) &mdash; The prefix postfix pairs stored in an ordered dictionary.
 * [makeDefaultPrepostTable](#makedefaultpreposttable) &mdash; Return the default ordered table that maps prefixes to postfixes.
 * [makeUserPrepostTable](#makeuserpreposttable) &mdash; Return the user's ordered table that maps prefixes to postfixes.
@@ -25,6 +27,45 @@ Regular expression matching methods.
 * [matchDotNames](#matchdotnames) &mdash; Matches variable dot names and surrounding whitespace.
 * [matchCommaOrSymbol](#matchcommaorsymbol) &mdash; Match a comma or the symbol and the optional trailing whitespace.
 * [matchSymbol](#matchsymbol) &mdash; Match the symbol and the optional trailing whitespace.
+
+# predefinedPrepost
+
+The predefined prefixes and postfixes.
+~~~
+* Default when no comment like Markdown: $$
+* HTML: <!--$ and -->
+* Bash, python, etc: #$
+* Config files, Lisp: ;$
+* C++: //$
+* C, C++: /*$ and */
+* HTML inside a textarea element: &lt;!--$ and --&gt;
+* Org Mode: # $
+~~~~
+
+```nim
+predefinedPrepost: array[8, Prepost] = [(prefix: "$$", postfix: ""),
+                                        (prefix: "<!--$", postfix: "-->"),
+                                        (prefix: "#$", postfix: ""),
+                                        (prefix: ";$", postfix: ""),
+                                        (prefix: "//$", postfix: ""),
+                                        (prefix: "/*$", postfix: "*/"), (
+    prefix: "&lt;!--$", postfix: "--&gt;"), (prefix: "# $", postfix: "")]
+```
+
+# commands
+
+The StaticTea commands.
+* nextline -- make substitutions in the next line
+* block —- make substitutions in the next block of lines
+* replace -— replace the block with a variable
+* "#" -- code comment
+* ":" -- continue a command
+* endblock -- end the block and replace commands
+
+```nim
+commands: array[6, string] = ["nextline", "block", "replace", "#", ":",
+                              "endblock"]
+```
 
 # PrepostTable
 
@@ -126,7 +167,7 @@ proc matchNumber(line: string; start: Natural = 0): Option[Matches]
 
 # matchNumberNotCached
 
-Match a number and the optional trailing whitespace. Return the optional decimal point that tells whether the number is a float or integer.
+Match a number and the optional trailing whitespace. Return the optional decimal point that tells whether the number is a float or integer. "Not cached" allows it to be called by a function because it has no side effects.  effects.
 
 ```nim
 func matchNumberNotCached(line: string; start: Natural = 0): Option[Matches]
@@ -166,7 +207,7 @@ proc matchVersion(line: string; start: Natural = 0): Option[Matches]
 
 # matchVersionNotCached
 
-Match a StaticTea version number.
+Match a StaticTea version number. "Not cached" allows it to be called by a function because it has no side effects.
 
 ```nim
 func matchVersionNotCached(line: string; start: Natural = 0;
