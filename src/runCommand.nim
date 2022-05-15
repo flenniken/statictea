@@ -583,37 +583,50 @@ proc runStatement*(statement: Statement, variables: Variables):
   let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
 
   if leftParen != "":
-    # No functions allow on the left hand side.
-    # Statement does not start with a variable name.
-    return newVariableDataOr(wMissingStatementVar)
+    if dotNameStr != "return":
+      # The return function is the only function allowed on the left
+      # hand side.
+      # Statement does not start with a variable name.
+      return newVariableDataOr(wMissingStatementVar)
 
-  # Get the equal sign or &= and following whitespace.
-  let operatorO = matchEqualSign(statement.text, dotNameLen)
-  if not operatorO.isSome:
-    # Missing operator, = or &=.
-    return newVariableDataOr(wInvalidVariable, "", dotNameLen)
-  let operatorMatch = operatorO.get()
+  var operator = ""
+  var operatorLength = 0
+  if dotNameStr != "return":
+    # Get the equal sign or &= and following whitespace.
+    let operatorO = matchEqualSign(statement.text, dotNameLen)
+    if not operatorO.isSome:
+      # Missing operator, = or &=.
+      return newVariableDataOr(wInvalidVariable, "", dotNameLen)
+    let match = operatorO.get()
+    operator = match.getGroup()
+    operatorLength = match.length
 
   # Get the right hand side value and match the following whitespace.
   let vlOr = getValueAndLength(statement,
-    dotNameLen + operatorMatch.length, variables, false)
+    dotNameLen + operatorLength, variables, false)
   if vlOr.isMessage:
     return newVariableDataOr(vlOr.message)
   let value = vlOr.value.value
   let length = vlOr.value.length
 
   # Check that there is not any unprocessed text following the value.
-  let pos = dotNameLen + operatorMatch.length + length
+  let pos = dotNameLen + operatorLength + length
   if pos != statement.text.len:
     # Unused text at the end of the statement.
     return newVariableDataOr(wTextAfterValue, "", pos)
 
   # Return the variable dot name and value.
-  let operator = operatorMatch.getGroup()
   result = newVariableDataOr(dotNameStr, operator, value)
 
-proc runCommand*(env: var Env, cmdLines: CmdLines, variables: var Variables) =
-  ## Run a command and fill in the variables dictionaries.
+proc runCommand*(env: var Env, cmdLines: CmdLines,
+    variables: var Variables): string =
+  ## Run a command and fill in the variables dictionaries. Return "",
+  ## @:"skip" or "stop".
+  ## @:
+  ## @:* "" -- output the replacement block. This is the default.
+  ## @:* "skip" -- skip this replacement block but continue with the
+  ## @:next.
+  ## @:* "stop" -- stop processing the block.
 
   # Clear the local variables and set the tea vars to their initial
   # state.
@@ -621,6 +634,7 @@ proc runCommand*(env: var Env, cmdLines: CmdLines, variables: var Variables) =
 
   # Loop over the statements and run each one.
   for statement in yieldStatements(cmdLines):
+
     # Run the statement and get the variable, operator and value.
     let variableDataOr = runStatement(statement, variables)
     if variableDataOr.isMessage:
@@ -638,3 +652,5 @@ proc runCommand*(env: var Env, cmdLines: CmdLines, variables: var Variables) =
     let tea = variables["t"].dictv
     if "repeat" in tea and tea["repeat"].intv == 0:
       break
+
+  result = ""
