@@ -23,13 +23,15 @@ const
     ## The maximum number of warning messages to show.
 
 when hostOS == "macosx":
-  let staticteaLog* = expandTilde("~/Library/Logs/statictea.log")
-    ## Name of the default statictea log file.  The path on the Mac is
-    ## different than the other platforms.
+  const
+    staticteaLog* = expandTilde("~/Library/Logs/statictea.log")
+      ## Name of the default statictea log file.  The path on the Mac is
+      ## different than the other platforms.
 else:
-  let staticteaLog* = expandTilde("~/statictea.log")
-    ## Name of the default statictea log file.  The path on the Mac is
-    ## different than the other platforms.
+  const
+    staticteaLog* = expandTilde("~/statictea.log")
+      ## Name of the default statictea log file.  The path on the Mac is
+      ## different than the other platforms.
 
 type
   Env* = object
@@ -198,8 +200,6 @@ proc openEnv*(logFilename: string = "",
     errStream: newFileStream(stderr),
     outStream: newFileStream(stdout),
   )
-
-# todo: test specifying the log filename.
 
 proc setupLogging*(env: var Env, logFilename: string = "",
                   warnSize: int64 = logWarnSize) =

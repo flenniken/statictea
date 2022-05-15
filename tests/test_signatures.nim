@@ -5,7 +5,6 @@ import vartypes
 import funtypes
 import options
 import messages
-import warnings
 
 proc testSignatureCodeToParams(signatureCode: string, expected: string): bool =
   var params0 = signatureCodeToParams(signatureCode)

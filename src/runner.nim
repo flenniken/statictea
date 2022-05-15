@@ -966,3 +966,5 @@ when isMainModule:
   else:
     # Return the return code.
     quit(rcOp.value)
+
+# todo: use "Expected gotFile == expectedFile" everywhere.

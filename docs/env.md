@@ -8,7 +8,7 @@ Environment holding the input and output streams.
 * const: [logWarnSize](#logwarnsize) &mdash; Warn the user when the log file gets over 1 GB.
 * const: [dtFormat](#dtformat) &mdash; The date time format in local time written to the log.
 * const: [maxWarningsWritten](#maxwarningswritten) &mdash; The maximum number of warning messages to show.
-* [staticteaLog](#statictealog) &mdash; Name of the default statictea log file.
+* const: [staticteaLog](#statictealog) &mdash; Name of the default statictea log file.
 * type: [Env](#env) &mdash; Env holds the input and output streams.
 * [close](#close) &mdash; Close the environment streams.
 * [outputWarning](#outputwarning) &mdash; Write a message to the error stream and increment the warning count.
@@ -54,7 +54,7 @@ maxWarningsWritten = 10
 Name of the default statictea log file.  The path on the Mac is different than the other platforms.
 
 ```nim
-staticteaLog = expandTilde("~/Library/Logs/statictea.log")
+staticteaLog = "/Users/steve/Library/Logs/statictea.log"
 ```
 
 # Env
