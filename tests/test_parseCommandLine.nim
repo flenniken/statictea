@@ -277,3 +277,7 @@ suite "parseCommandLine":
     let cmd = "-t template -r tea.html -l tea.html"
     check parseWarning(cmd, newWarningData(wSameAsResult, "log"))
     discard tryRemoveFile(filename)
+
+  test "result with update":
+    let cmd = "-u -t template.html -r tea.html"
+    check parseWarning(cmd, newWarningData(wResultWithUpdate))

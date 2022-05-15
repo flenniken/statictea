@@ -50,6 +50,9 @@ This folder contains stf test files for statictea.
 * [t-version-basics](../testfiles/t-version-basics.stf.md) &mdash; Test the t.version number.
 * [template](../testfiles/template.stf.md) &mdash; This stf file is used as a template by the newstf nimble task.
 * [truefalsenull](../testfiles/truefalsenull.stf.md) &mdash; Test json true, false and null.
+* [update-and-result](../testfiles/update-and-result.stf.md) &mdash; Test the update option and specify a result file. The update option
+changes the template file. It's an error to specify a result file
+because it's easy to think update applies to the result file.
 * [update-template](../testfiles/update-template.stf.md) &mdash; Test updating a template with the update option.
 * [update1](../testfiles/update1.stf.md) &mdash; Update the replace block in a template.
 * [warn-basics](../testfiles/warn-basics.stf.md) &mdash; Test the warn function.

@@ -189,7 +189,8 @@ MessageId = enum
   wMissingDictIndex,        ## w172
   wMaxDepthExceeded,        ## w173
   wSameAsTemplate,          ## w174
-  wSameAsResult              ## w175
+  wSameAsResult,            ## w175
+  wResultWithUpdate          ## w176
 ```
 
 # Messages
@@ -369,7 +370,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The dictionary does not have an item with index $1.", ## wMissingDictIndex
     "The maximum JSON depth of $1 was exceeded.", ## wMaxDepthExceeded
     "The template and $1 files are the same.", ## wSameAsTemplate
-    "The result and $1 files are the same."]
+    "The result and $1 files are the same.", ## wSameAsResult
+    "The result file is used with the update option."]
 ```
 
 

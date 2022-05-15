@@ -87,6 +87,9 @@ proc parseCommandLine*(argv: seq[string]): ArgsOr =
     let filenames = cmlArgs["result"]
     assert len(filenames) == 1
     args.resultFilename = filenames[0]
+    if "update" in cmlArgs:
+      ## The result file is used with the update option.
+      return newArgsOr(newWarningData(wResultWithUpdate))
 
   if "log" in cmlArgs:
     let filenames = cmlArgs["log"]
