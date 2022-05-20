@@ -14,8 +14,8 @@ prefix and it allows functions to be specified without the f prefix.
 
 * const: [outputValues](#outputvalues) &mdash; Where the replacement block's output goes.
 * type: [Variables](#variables) &mdash; Dictionary holding all statictea variables in multiple distinct logical dictionaries.
-* type: [VariableData](#variabledata) &mdash; The VariableData object holds the variable name, operator and
-value which is the result of running a statement.
+* type: [VariableData](#variabledata) &mdash; The VariableData object holds the variable name, operator,
+and value which is the result of running a statement.
 * type: [VariableDataOr](#variabledataor) &mdash; A VariableData object or a warning.
 * [newVariableDataOr](#newvariabledataor) &mdash; Create an object containing a warning.
 * [newVariableDataOr](#newvariabledataor-1) &mdash; Create an object containing a warning.
@@ -53,12 +53,14 @@ Variables = VarsDict
 
 # VariableData
 
-The VariableData object holds the variable name, operator and
-value which is the result of running a statement.
+The VariableData object holds the variable name, operator,
+and value which is the result of running a statement. A
+"" dotNameStr and operator means there is no assignment,
+e.g. a bare if statement with a return function.
 
 * dotNameStr -- the dot name tells which dictionary contains
 the variable, i.e.: l.d.a
-* operator -- the statement's operator, either = or &=
+* operator -- the statement's operator, either =, &=, or ""
 * value -- the variable's value
 
 ```nim

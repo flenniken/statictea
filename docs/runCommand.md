@@ -235,10 +235,16 @@ proc runStatement(statement: Statement; variables: Variables): VariableDataOr
 
 # runCommand
 
-Run a command and fill in the variables dictionaries.
+Run a command and fill in the variables dictionaries. Return "",
+"skip" or "stop".
+
+* "" -- output the replacement block. This is the default.
+* "skip" -- skip this replacement block but continue with the
+next.
+* "stop" -- stop processing the block.
 
 ```nim
-proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables)
+proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables): string
 ```
 
 

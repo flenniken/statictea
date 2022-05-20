@@ -1867,6 +1867,7 @@ the third.
 - [[#path][path]] -- Split a file path into its component pieces.
 - [[#replace][replace]] -- Replace a substring specified by its position and length with another string.
 - [[#replaceRe][replaceRe]] -- Replace multiple parts of a string using regular expressions.
+- [[#return][return]] -- Return the given value and stop processing the command.
 - [[#slice][slice]] -- Extract a substring from a string by its position and length.
 - [[#sort][sort]] -- Sort a list of values of the same type.
 - [[#sort][sort]] -- Sort a list of lists.
@@ -2796,6 +2797,26 @@ replaceRe("abcdefabc", list))
 
 For developing and debugging regular expressions see the
 website: https://regex101.com/
+
+[[#contents][茶]]
+
+** return
+:PROPERTIES:
+:CUSTOM_ID: return
+:END:
+
+Return the given value and stop processing the command.
+
+#+BEGIN_SRC
+return(value: any) any
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+if0(c, return("stop"))
+if1(c, return("skip"))
+#+END_SRC
 
 [[#contents][茶]]
 

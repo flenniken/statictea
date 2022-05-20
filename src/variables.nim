@@ -31,9 +31,10 @@ type
     ## logical dictionaries.
 
   VariableData* = object
-    ## The VariableData object holds the variable name, operator and
-    ## @:value which is the result of running a statement. A ""
-    ## operator means there is none, e.g. a return statement.
+    ## The VariableData object holds the variable name, operator,
+    ## @:and value which is the result of running a statement. A
+    ## @:"" dotNameStr and operator means there is no assignment,
+    ## @:e.g. a bare if statement with a return function.
     ## @:
     ## @:* dotNameStr -- the dot name tells which dictionary contains
     ## @:the variable, i.e.: l.d.a
@@ -57,8 +58,8 @@ func newVariableDataOr*(warningData: WarningData):
   ## Create an object containing a warning.
   result = opMessageW[VariableData](warningData)
 
-func newVariableDataOr*(dotNameStr: string, operator = "=", value: Value):
-    VariableDataOr =
+func newVariableDataOr*(dotNameStr: string, operator = "=",
+    value: Value): VariableDataOr =
   ## Create an object containing a VariableData object.
   let variableData = VariableData(dotNameStr: dotNameStr,
     operator: operator, value: value)
@@ -66,7 +67,8 @@ func newVariableDataOr*(dotNameStr: string, operator = "=", value: Value):
 
 func `$`*(v: VariableData): string =
   ## Return a string representation of VariableData.
-  result = "$1 $2 $3" % [v.dotNameStr, v.operator, $v.value]
+  result = "dotName='$1', operator='$2', value=$3" % [
+    v.dotNameStr, v.operator, $v.value]
 
 func emptyVariables*(server: VarsDict = nil, shared: VarsDict = nil,
     args: VarsDict = nil): Variables =

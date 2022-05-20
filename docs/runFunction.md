@@ -50,6 +50,7 @@ the third.
 * [funJoinPath_loss](#funjoinpath_loss) &mdash; Join the path components with a path separator.
 * [funJoin_lsois](#funjoin_lsois) &mdash; Join a list of strings with a separator.
 * [funWarn](#funwarn) &mdash; Return a warning message and skip the current statement.
+* [funReturn](#funreturn) &mdash; Return the given value and stop processing the command.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -1140,6 +1141,25 @@ b = if1(a, warn("a is one"), "")
 
 ```nim
 func funWarn(parameters: seq[Value]): FunResult
+```
+
+# funReturn
+
+Return the given value and stop processing the command.
+
+~~~
+return(value: any) any
+~~~~
+
+Examples:
+
+~~~
+if0(c, return("stop"))
+if1(c, return("skip"))
+~~~~
+
+```nim
+func funReturn(parameters: seq[Value]): FunResult
 ```
 
 # createFunctionTable

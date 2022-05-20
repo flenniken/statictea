@@ -1533,3 +1533,10 @@ suite "runFunction.nim":
     let parameters = @[newValue(message)]
     let eFunResult = newFunResultWarn(wUserMessage, 0, message)
     check testFunction("warn", parameters, eFunResult)
+
+  test "return":
+    check testFunction("return", @[newValue(1)], newFunResult(newValue(1)))
+    check testFunction("return", @[newValue("skip")],
+      newFunResult(newValue("skip")))
+    check testFunction("return", @[newValue(3.4)],
+      newFunResult(newValue(3.4)))

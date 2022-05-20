@@ -27,14 +27,14 @@ proc cmpVariableDataOr(statement: Statement,
 
   echo statement.text
   echo ""
-  if e.isMessage and e.isMessage == g.isMessage:
+  if e.isMessage and g.isMessage:
     echo "expected message:"
     echo getWarnStatement(statement, e.message, templateName)
     echo "got message:"
     echo getWarnStatement(statement, g.message, templateName)
-  elif e.isValue and e.isValue == g.isValue:
-    echo "expected value: " & $e.value
-    echo "     got value: " & $g.value
+  elif e.isValue and g.isValue:
+    echo "expected value: " & $e & ", type=" & $e.value.value.kind
+    echo "     got value: " & $g & ", type=" & $g.value.value.kind
   elif e.isMessage:
     echo "expected message:"
     echo getWarnStatement(statement, e.message, templateName)
@@ -173,12 +173,12 @@ proc testGetFunctionValueAndLength(
 
 proc testRunStatement(
   statement: Statement,
-  eVariableDataOr: VariableDataOr,
+  eVDataOr: VariableDataOr,
   variables: Variables = emptyVariables()
      ): bool =
 
   let variableDataOr = runStatement(statement, variables)
-  result = cmpVariableDataOr(statement, variableDataOr, eVariableDataOr)
+  result = cmpVariableDataOr(statement, variableDataOr, eVDataOr)
 
 suite "runCommand.nim":
 

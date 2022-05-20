@@ -1572,6 +1572,23 @@ func funWarn*(parameters: seq[Value]): FunResult =
   let message = map["a"].stringv
   result = newFunResultWarn(wUserMessage, 0, message)
 
+func funReturn*(parameters: seq[Value]): FunResult =
+  ## Return the given value and stop processing the command.
+  ## @:
+  ## @:~~~
+  ## @:return(value: any) any
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:if0(c, return("stop"))
+  ## @:if1(c, return("skip"))
+  ## @:~~~~
+
+  tMapParameters("aa")
+  result = newFunResult(map["a"])
+
 const
   functionsList = [
     ("len", funLen_si, "si"),
@@ -1615,6 +1632,7 @@ const
     ("join", funJoin_lsois, "lsois"),
     ("if1", funIf1, "iaaa"),
     ("warn", funWarn, "ss"),
+    ("return", funReturn, "aa"),
   ]
 
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =
