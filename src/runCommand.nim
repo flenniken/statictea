@@ -311,8 +311,12 @@ proc ifFunction*(
   ## at the first parameter of the function. The length includes the
   ## trailing whitespace after the ending ).
 
-  # if0(cond, then, else)
-  # if1(cond, then, else)
+  # a = if0(cond, then, else)
+  # a = if1(cond, then, else)
+  # a = if0(cond, then)
+  # a = if1(cond, then)
+  # if0(cond, then)
+  # if1(cond, then)
 
   # Get the condition's integer value.
   let vlcOr = getValueAndLength(statement, start, variables, skip=false)
@@ -329,8 +333,8 @@ proc ifFunction*(
   # Match the comma and whitespace.
   let commaO = matchSymbol(statement.text, gComma, start + runningLen)
   if not commaO.isSome:
-    # Expected three parameters.
-    return newValueAndLengthOr(wThreeParameters, "", start)
+    # Expected two or three parameters.
+    return newValueAndLengthOr(wTwoOrThreeParams, "", start)
   runningLen += commaO.get().length
 
   # Determine whether we execute the second or third parameter.
@@ -350,26 +354,30 @@ proc ifFunction*(
     return vl2Or
   runningLen += vl2Or.value.length
 
+  var vl3Or: ValueAndLengthOr
   # Match the comma and whitespace.
   let cO = matchSymbol(statement.text, gComma, start + runningLen)
-  if not cO.isSome:
-    # Expected three parameters.
-    return newValueAndLengthOr(wThreeParameters, "", start + runningLen)
-  runningLen += cO.get().length
+  if cO.isSome:
+    # We got a comma so we expect a third parameter.
+    runningLen += cO.get().length
 
-  # Handle the third parameter.
-  skip = (getSecond == true)
-  let vl3Or = getValueAndLength(statement, start + runningLen, variables, skip)
-  if vl3Or.isMessage:
-    return vl3Or
-  runningLen += vl3Or.value.length
+    # Handle the third parameter.
+    skip = (getSecond == true)
+    vl3Or = getValueAndLength(statement, start + runningLen, variables, skip)
+    if vl3Or.isMessage:
+      return vl3Or
+    runningLen += vl3Or.value.length
+  else:
+    # The third parameter is optional. When it dosn't exist use 0 for
+    # it.
+    vl3Or = newValueAndLengthOr(newValue(0), 0)
 
   # Match ) and trailing whitespace.
   let parenO = matchSymbol(statement.text, gRightParentheses,
     start + runningLen)
   if not parenO.isSome:
-    # Expected three parameters.
-    return newValueAndLengthOr(wThreeParameters, "", start + runningLen)
+    # Expected two or three parameters.
+    return newValueAndLengthOr(wTwoOrThreeParams, "", start + runningLen)
   runningLen += parenO.get().length
 
   var value: Value

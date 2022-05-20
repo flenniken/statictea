@@ -83,7 +83,7 @@ MessageId = enum
   wTwoOrMoreParameters,     ## w66
   wInvalidMaxRepeat,        ## w67
   wContentNotSet,           ## w68
-  wThreeParameters,         ## w69
+  wTwoOrThreeParams,        ## w69
   wExpectedInteger,         ## w70
   wAllIntOrFloat,           ## w71
   wOverflow,                ## w72
@@ -268,7 +268,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The function takes two or more parameters.", ## wTwoOrMoreParameters
     "The maxRepeat value must be greater than or equal to t.repeat.", ## wInvalidMaxRepeat
     "The t.content variable is not set for the replace command, treating it like the block command.", ## wContentNotSet
-    "Expected three parameters.", ## wThreeParameters
+    "Expected two or three parameters.", ## wTwoOrThreeParams
     "The parameter must be an integer.", ## wExpectedInteger
     "The parameters must be all integers or all floats.", ## wAllIntOrFloat
     "Overflow or underflow.", ## wOverflow

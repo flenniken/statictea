@@ -16,9 +16,9 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funGet_lioaa](#funget_lioaa) &mdash; Get a list value by its index.
 * [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
 * [funIf0](#funif0) &mdash; If the condition is 0, return the second parameter, else return
-the third.
+the third parameter.
 * [funIf1](#funif1) &mdash; If the condition is 1, return the second parameter, else return
-the third.
+the third parameter.
 * [funAdd_iii](#funadd_iii) &mdash; Add two integers.
 * [funAdd_fff](#funadd_fff) &mdash; Add two floats.
 * [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
@@ -266,20 +266,39 @@ func funGet_dsoaa(parameters: seq[Value]): FunResult
 # funIf0
 
 If the condition is 0, return the second parameter, else return
-the third. This function is special because it conditionally
-evaluates the matching parameter and skips the other one.  See
-[[#conditional-evaluation][Conditional Evaluation]].
+the third parameter.
+
+This function is special in a couple of ways. It conditionally
+evaluates it parameters, see
+[[#conditional-evaluation][Conditional Evaluation]] and when you
+don't specify an else parameter you use the function without a
+left hand side or operator. This second form is used with a
+return or warn function because they do not assign a variable.
 
 ~~~
-if0(condition: int, then: any, else: any) any
+if0(condition: int, then: any, optional else: any) any
 ~~~~
 
 Examples:
 
 ~~~
-if0(0, "tea", "beer") => "tea"
-if0(1, "tea", "beer") => "beer"
-if0(4, "tea", "beer") => "beer"
+drink0 = if0(0, "tea", "beer")
+drink1 = if0(1, "tea", "beer")
+drink4 = if0(4, "tea", "beer")
+drink5 = if0(0, "tea")
+drink6 = if0(8, "tea")
+if0(c, return("skip"))
+if0(c, warn("c is 0"))
+~~~~
+
+result:
+
+~~~
+drink0 => tea
+drink1 => beer
+drink4 => beer
+drink5 => tea
+drink6 => 0
 ~~~~
 
 ```nim
@@ -289,20 +308,39 @@ func funIf0(parameters: seq[Value]): FunResult
 # funIf1
 
 If the condition is 1, return the second parameter, else return
-the third. This function is special because it conditionally
-evaluates the matching parameter and skips the other one.  See
-[[#conditional-evaluation][Conditional Evaluation]].
+the third parameter.
+
+This function is special in a couple of ways. It conditionally
+evaluates it parameters, see
+[[#conditional-evaluation][Conditional Evaluation]] and when you
+don't specify an else parameter you use the function without a
+left hand side or operator. This second form is used with a
+return or warn function because they do not assign a variable.
 
 ~~~
-if1(condition: int, then: any, else: any) any
+if1(condition: int, then: any, optional else: any) any
 ~~~~
 
 Examples:
 
 ~~~
-if1(0, "tea", "beer") => "beer"
-if1(1, "tea", "beer") => "tea"
-if1(4, "tea", "beer") => "beer"
+drink0 = if1(0, "tea", "beer")
+drink1 = if1(1, "tea", "beer")
+drink4 = if1(4, "tea", "beer")
+drink5 = if1(1, "tea")
+drink6 = if1(8, "tea")
+if1(c, return("skip"))
+if1(c, warn("c is 1"))
+~~~~
+
+result:
+
+~~~
+drink0 => beer
+drink1 => tea
+drink4 => beer
+drink5 => tea
+drink6 => 0
 ~~~~
 
 ```nim

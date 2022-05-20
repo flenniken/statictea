@@ -719,6 +719,18 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr("a", "=", newValue(2))
     check testRunStatement(statement, eVariableDataOr)
 
+  test "if0 two parameters no match":
+    let text = """a = if0(2, "abc")"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(0))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "if0 two parameters match":
+    let text = """a = if0(0, "abc")"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue("abc"))
+    check testRunStatement(statement, eVariableDataOr)
+
   test "if1 exists":
     let text = """exists = if1(exists(t, "repeat"), "exists", "does not")"""
     let statement = newStatement(text, lineNum=1, 0)
@@ -734,7 +746,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "if1 one parameter":
     let text = """a = if1(2)"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wThreeParameters, "", 8)
+    let eVariableDataOr = newVariableDataOr(wTwoOrThreeParams, "", 8)
     check testRunStatement(statement, eVariableDataOr)
 
   test "warn syntax error":
@@ -767,16 +779,22 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr(wInvalidRightHandSide, "", 19)
     check testRunStatement(statement, eVariableDataOr)
 
-  test "if1 no third again":
-    let text = """a = if1(2, "abc"  )"""
+  test "if1 two parameters no match":
+    let text = """a = if1(2, "abc")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wThreeParameters, "", 18)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(0))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "if1 two parameters match":
+    let text = """a = if1(1, "abc")"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue("abc"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "if1 no closing paren":
     let text = """a = if1(2, "abc", 456 """
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wThreeParameters, "", 22)
+    let eVariableDataOr = newVariableDataOr(wTwoOrThreeParams, "", 22)
     check testRunStatement(statement, eVariableDataOr)
 
   test "if1 extra text":

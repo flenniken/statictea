@@ -344,6 +344,16 @@ suite "runFunction.nim":
     let eFunResult = newFunResult(newValue("then"))
     check testFunction("if0", parameters, eFunResult)
 
+  test "if function no else":
+    var parameters = @[newValue(0), newValue("then")]
+    let eFunResult = newFunResult(newValue("then"))
+    check testFunction("if0", parameters, eFunResult)
+
+  test "if function no else taken":
+    var parameters = @[newValue(1), newValue("then")]
+    let eFunResult = newFunResult(newValue(0))
+    check testFunction("if0", parameters, eFunResult)
+
   test "if function not 0":
     var parameters = @[newValue(33), newValue("then"), newValue("else")]
     let eFunResult = newFunResult(newValue("else"))

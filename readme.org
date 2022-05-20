@@ -1851,9 +1851,9 @@ List of functions:
 - [[#githubAnchor][githubAnchor]] -- Create Github anchor names from heading names.
 - [[#githubAnchor][githubAnchor]] -- Create a Github anchor name from a heading name.
 - [[#if0][if0]] -- If the condition is 0, return the second parameter, else return
-the third.
+the third parameter.
 - [[#if1][if1]] -- If the condition is 1, return the second parameter, else return
-the third.
+the third parameter.
 - [[#int][int]] -- Create an int from a float.
 - [[#int][int]] -- Create an int from a number string.
 - [[#joinPath][joinPath]] -- Join the path components with a path separator.
@@ -2362,20 +2362,39 @@ $$ : anchor = githubAnchor(entry.name)
 :END:
 
 If the condition is 0, return the second parameter, else return
-the third. This function is special because it conditionally
-evaluates the matching parameter and skips the other one.  See
-[[#conditional-evaluation][Conditional Evaluation]].
+the third parameter.
+
+This function is special in a couple of ways. It conditionally
+evaluates it parameters, see
+[[#conditional-evaluation][Conditional Evaluation]] and when you
+don't specify an else parameter you use the function without a
+left hand side or operator. This second form is used with a
+return or warn function because they do not assign a variable.
 
 #+BEGIN_SRC
-if0(condition: int, then: any, else: any) any
+if0(condition: int, then: any, optional else: any) any
 #+END_SRC
 
 Examples:
 
 #+BEGIN_SRC
-if0(0, "tea", "beer") => "tea"
-if0(1, "tea", "beer") => "beer"
-if0(4, "tea", "beer") => "beer"
+drink0 = if0(0, "tea", "beer")
+drink1 = if0(1, "tea", "beer")
+drink4 = if0(4, "tea", "beer")
+drink5 = if0(0, "tea")
+drink6 = if0(8, "tea")
+if0(c, return("skip"))
+if0(c, warn("c is 0"))
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+drink0 => tea
+drink1 => beer
+drink4 => beer
+drink5 => tea
+drink6 => 0
 #+END_SRC
 
 [[#contents][茶]]
@@ -2386,20 +2405,39 @@ if0(4, "tea", "beer") => "beer"
 :END:
 
 If the condition is 1, return the second parameter, else return
-the third. This function is special because it conditionally
-evaluates the matching parameter and skips the other one.  See
-[[#conditional-evaluation][Conditional Evaluation]].
+the third parameter.
+
+This function is special in a couple of ways. It conditionally
+evaluates it parameters, see
+[[#conditional-evaluation][Conditional Evaluation]] and when you
+don't specify an else parameter you use the function without a
+left hand side or operator. This second form is used with a
+return or warn function because they do not assign a variable.
 
 #+BEGIN_SRC
-if1(condition: int, then: any, else: any) any
+if1(condition: int, then: any, optional else: any) any
 #+END_SRC
 
 Examples:
 
 #+BEGIN_SRC
-if1(0, "tea", "beer") => "beer"
-if1(1, "tea", "beer") => "tea"
-if1(4, "tea", "beer") => "beer"
+drink0 = if1(0, "tea", "beer")
+drink1 = if1(1, "tea", "beer")
+drink4 = if1(4, "tea", "beer")
+drink5 = if1(1, "tea")
+drink6 = if1(8, "tea")
+if1(c, return("skip"))
+if1(c, warn("c is 1"))
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+drink0 => beer
+drink1 => tea
+drink4 => beer
+drink5 => tea
+drink6 => 0
 #+END_SRC
 
 [[#contents][茶]]

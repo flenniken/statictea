@@ -299,59 +299,106 @@ func funGet_dsoaa*(parameters: seq[Value]): FunResult =
 
 func funIf0*(parameters: seq[Value]): FunResult =
   ## If the condition is 0, return the second parameter, else return
-  ## @:the third. This function is special because it conditionally
-  ## @:evaluates the matching parameter and skips the other one.  See
-  ## @:[[#conditional-evaluation][Conditional Evaluation]].
+  ## @:the third parameter.
+  ## @:
+  ## @:This function is special in a couple of ways. It conditionally
+  ## @:evaluates it parameters, see
+  ## @:[[#conditional-evaluation][Conditional Evaluation]] and when you
+  ## @:don't specify an else parameter you use the function without a
+  ## @:left hand side or operator. This second form is used with a
+  ## @:return or warn function because they do not assign a variable.
   ## @:
   ## @:~~~
-  ## @:if0(condition: int, then: any, else: any) any
+  ## @:if0(condition: int, then: any, optional else: any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:if0(0, "tea", "beer") => "tea"
-  ## @:if0(1, "tea", "beer") => "beer"
-  ## @:if0(4, "tea", "beer") => "beer"
+  ## @:drink0 = if0(0, "tea", "beer")
+  ## @:drink1 = if0(1, "tea", "beer")
+  ## @:drink4 = if0(4, "tea", "beer")
+  ## @:drink5 = if0(0, "tea")
+  ## @:drink6 = if0(8, "tea")
+  ## @:if0(c, return("skip"))
+  ## @:if0(c, warn("c is 0"))
+  ## @:~~~~
+  ## @:
+  ## @:result:
+  ## @:
+  ## @:~~~
+  ## @:drink0 => tea
+  ## @:drink1 => beer
+  ## @:drink4 => beer
+  ## @:drink5 => tea
+  ## @:drink6 => 0
   ## @:~~~~
 
-  tMapParameters("iaaa")
+  # Note: the if functions are handled in runCommand as a special
+  # case. This code is not run. It is here for the function list and
+  # documentation.
+  tMapParameters("iaoaa")
   let condition = map["a"].intv
   let thenCase = map["b"]
-  let elseCase = map["c"]
 
   if condition == 0:
     result = newFunResult(thenCase)
+  elif "c" in map:
+    result = newFunResult(map["c"])
   else:
-    result = newFunResult(elseCase)
+    result = newFunResult(newValue(0))
 
 func funIf1*(parameters: seq[Value]): FunResult =
   ## If the condition is 1, return the second parameter, else return
-  ## @:the third. This function is special because it conditionally
-  ## @:evaluates the matching parameter and skips the other one.  See
-  ## @:[[#conditional-evaluation][Conditional Evaluation]].
+  ## @:the third parameter.
+  ## @:
+  ## @:This function is special in a couple of ways. It conditionally
+  ## @:evaluates it parameters, see
+  ## @:[[#conditional-evaluation][Conditional Evaluation]] and when you
+  ## @:don't specify an else parameter you use the function without a
+  ## @:left hand side or operator. This second form is used with a
+  ## @:return or warn function because they do not assign a variable.
   ## @:
   ## @:~~~
-  ## @:if1(condition: int, then: any, else: any) any
+  ## @:if1(condition: int, then: any, optional else: any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:if1(0, "tea", "beer") => "beer"
-  ## @:if1(1, "tea", "beer") => "tea"
-  ## @:if1(4, "tea", "beer") => "beer"
+  ## @:drink0 = if1(0, "tea", "beer")
+  ## @:drink1 = if1(1, "tea", "beer")
+  ## @:drink4 = if1(4, "tea", "beer")
+  ## @:drink5 = if1(1, "tea")
+  ## @:drink6 = if1(8, "tea")
+  ## @:if1(c, return("skip"))
+  ## @:if1(c, warn("c is 1"))
+  ## @:~~~~
+  ## @:
+  ## @:result:
+  ## @:
+  ## @:~~~
+  ## @:drink0 => beer
+  ## @:drink1 => tea
+  ## @:drink4 => beer
+  ## @:drink5 => tea
+  ## @:drink6 => 0
   ## @:~~~~
 
-  tMapParameters("iaaa")
+  # Note: the if functions are handled in runCommand as a special
+  # case. This code is not run. It is here for the function list and
+  # documentation.
+
+  tMapParameters("iaoaa")
   let condition = map["a"].intv
   let thenCase = map["b"]
-  let elseCase = map["c"]
 
   if condition == 1:
     result = newFunResult(thenCase)
+  elif "c" in map:
+    result = newFunResult(map["c"])
   else:
-    result = newFunResult(elseCase)
+    result = newFunResult(newValue(0))
 
 {.push overflowChecks: on, floatChecks: on.}
 
