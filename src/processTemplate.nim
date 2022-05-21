@@ -87,7 +87,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
     # If repeat is 0, read the replacement lines and the endblock and
     # discard them.
-    if repeat == 0 or loopControl == "skip":
+    if repeat == 0 or loopControl == "stop":
       for replaceLine in yieldReplacementLine(env,
         firstReplaceLine, lb, prepostTable, command, maxLines):
         discard

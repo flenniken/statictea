@@ -1620,20 +1620,28 @@ func funWarn*(parameters: seq[Value]): FunResult =
   result = newFunResultWarn(wUserMessage, 0, message)
 
 func funReturn*(parameters: seq[Value]): FunResult =
-  ## Return the given value and stop processing the command.
+  ## Return the given value and control command looping. A return in a
+  ## @:statement causes the command to stop processing the current
+  ## @:statement and following statements in the command. You can
+  ## @:control whether the replacement block is output or not.
+  ## @:
+  ## @:* "stop" -- stop processing the command
+  ## @:* "skip" -- skip this replacement block and continue with the next
+  ## @:* "" -- output the replacement block and continue
   ## @:
   ## @:~~~
-  ## @:return(value: any) any
+  ## @:return(value: string) string
   ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:if0(c, return("stop"))
+  ## @:if1(c, return("stop"))
   ## @:if1(c, return("skip"))
+  ## @:if1(c, return(""))
   ## @:~~~~
 
-  tMapParameters("aa")
+  tMapParameters("ss")
   result = newFunResult(map["a"])
 
 const
@@ -1679,7 +1687,7 @@ const
     ("join", funJoin_lsois, "lsois"),
     ("if1", funIf1, "iaaa"),
     ("warn", funWarn, "ss"),
-    ("return", funReturn, "aa"),
+    ("return", funReturn, "ss"),
   ]
 
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =

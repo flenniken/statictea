@@ -42,13 +42,16 @@ type
     ## For the example statement: "var = 567 ". The value 567 starts
     ## at index 6 and the matching length is 4 because it includes the
     ## trailing space. For example "id = row(3 )" the value is 3 and
-    ## the length is 2.
+    ## the length is 2. Exit is set true by the return function to
+    ## exit a command.
     value*: Value
     length*: Natural
+    exit*: bool
 
   ValueAndLengthOr* = OpResultWarn[ValueAndLength]
 
-proc newValueAndLength*(value: Value, length: Natural): ValueAndLength =
+proc newValueAndLength*(value: Value, length: Natural,
+    exit = false): ValueAndLength =
   ## Create a newValueAndLength object.
   result = ValueAndLength(value: value, length: length)
 
@@ -63,10 +66,10 @@ func newValueAndLengthOr*(warningData: WarningData):
   ## Create a ValueAndLengthOr warning.
   result = opMessageW[ValueAndLength](warningData)
 
-func newValueAndLengthOr*(value: Value, length: Natural):
+func newValueAndLengthOr*(value: Value, length: Natural, exit=false):
     ValueAndLengthOr =
   ## Create a ValueAndLengthOr value.
-  let val = ValueAndLength(value: value, length: length)
+  let val = ValueAndLength(value: value, length: length, exit: exit)
   result = opValueW[ValueAndLength](val)
 
 proc newValueAndLengthOr*(number: int | int64 | float64 | string,
@@ -298,6 +301,8 @@ proc getValueAndLength*(statement: Statement, start: Natural, variables:
 # - runStatement
 # - getValueAndLength
 # - getFunctionValueAndLength
+# - ifFunction
+# - getList
 # - getValueAndLength
 
 proc ifFunction*(
@@ -311,6 +316,7 @@ proc ifFunction*(
   ## at the first parameter of the function. The length includes the
   ## trailing whitespace after the ending ).
 
+  # cases:
   # a = if0(cond, then, else)
   # a = if1(cond, then, else)
   # a = if0(cond, then)
@@ -320,7 +326,7 @@ proc ifFunction*(
 
   # Get the condition's integer value.
   let vlcOr = getValueAndLength(statement, start, variables, skip=false)
-  if vlcOr.isMessage:
+  if vlcOr.isMessage or vlcOr.value.exit:
     return vlcOr
   let condition = vlcOr.value.value
   var runningLen = vlcOr.value.length
@@ -350,7 +356,7 @@ proc ifFunction*(
   # Handle the second parameter.
   var skip = (getSecond == false)
   let vl2Or = getValueAndLength(statement, start + runningLen, variables, skip)
-  if vl2Or.isMessage:
+  if vl2Or.isMessage or vl2Or.value.exit:
     return vl2Or
   runningLen += vl2Or.value.length
 
@@ -364,7 +370,7 @@ proc ifFunction*(
     # Handle the third parameter.
     skip = (getSecond == true)
     vl3Or = getValueAndLength(statement, start + runningLen, variables, skip)
-    if vl3Or.isMessage:
+    if vl3Or.isMessage or vl3Or.value.exit:
       return vl3Or
     runningLen += vl3Or.value.length
   else:
@@ -412,7 +418,7 @@ proc getFunctionValueAndLength*(
     while true:
       # Get the parameter's value.
       let vlOr = getValueAndLength(statement, pos, variables, skip)
-      if vlOr.isMessage:
+      if vlOr.isMessage or vlOr.value.exit:
         return vlOr
       parameters.add(vlOr.value.value)
       parameterStarts.add(pos)
@@ -457,8 +463,9 @@ proc getFunctionValueAndLength*(
     return newValueAndLengthOr(funResult.warningData.warning,
       funResult.warningData.p1, warningPos)
 
+  var exit = if functionName == "return": true else: false
   # pos-start is the length including trailing whitespace.
-  result = newValueAndLengthOr(funResult.value, pos-start)
+  result = newValueAndLengthOr(funResult.value, pos-start, exit)
 
 proc getList(statement: Statement, start: Natural,
     variables: Variables, skip: bool): ValueAndLengthOr =
@@ -474,8 +481,9 @@ proc getList(statement: Statement, start: Natural,
   # Get the list.
   let funValueLengthOr = getFunctionValueAndLength("list", statement,
     start+startSymbol.length, variables, list=true, skip)
-  if funValueLengthOr.isMessage:
+  if funValueLengthOr.isMessage or funValueLengthOr.value.exit:
     return funValueLengthOr
+
   let funValueLength = funValueLengthOr.value
 
   # Return the value and length.
@@ -521,7 +529,7 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
       if dotNameStr in ["if0", "if1"]:
         let ifOr = ifFunction(dotNameStr, statement,
           start+dotNameLen, variables, skip)
-        if ifOr.isMessage:
+        if ifOr.isMessage or ifOr.value.exit:
           return ifOr
         let length = dotNameLen + ifOr.value.length
         return newValueAndLengthOr(ifOr.value.value, length)
@@ -533,7 +541,7 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
 
       let fvl = getFunctionValueAndLength(dotNameStr, statement,
         start+dotNameLen, variables, false, skip)
-      if fvl.isMessage:
+      if fvl.isMessage or fvl.value.exit:
         return fvl
       let length = dotNameLen+fvl.value.length
       let valueAndLength = newValueAndLength(fvl.value.value,
@@ -591,40 +599,38 @@ proc runStatement*(statement: Statement, variables: Variables):
   let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
 
   if leftParen != "":
-    if dotNameStr != "return":
-      # The return function is the only function allowed on the left
-      # hand side.
-      # Statement does not start with a variable name.
-      return newVariableDataOr(wMissingStatementVar)
+    # Statement does not start with a variable name.
+    return newVariableDataOr(wMissingStatementVar)
 
   var operator = ""
   var operatorLength = 0
-  if dotNameStr != "return":
-    # Get the equal sign or &= and following whitespace.
-    let operatorO = matchEqualSign(statement.text, dotNameLen)
-    if not operatorO.isSome:
-      # Missing operator, = or &=.
-      return newVariableDataOr(wInvalidVariable, "", dotNameLen)
-    let match = operatorO.get()
-    operator = match.getGroup()
-    operatorLength = match.length
+  # Get the equal sign or &= and following whitespace.
+  let operatorO = matchEqualSign(statement.text, dotNameLen)
+  if not operatorO.isSome:
+    # Missing operator, = or &=.
+    return newVariableDataOr(wInvalidVariable, "", dotNameLen)
+  let match = operatorO.get()
+  operator = match.getGroup()
+  operatorLength = match.length
 
   # Get the right hand side value and match the following whitespace.
   let vlOr = getValueAndLength(statement,
     dotNameLen + operatorLength, variables, false)
   if vlOr.isMessage:
     return newVariableDataOr(vlOr.message)
-  let value = vlOr.value.value
-  let length = vlOr.value.length
+
+  # Return function exit.
+  if vlOr.value.exit:
+    return newVariableDataOr("", "", vlOr.value.value)
 
   # Check that there is not any unprocessed text following the value.
-  let pos = dotNameLen + operatorLength + length
+  let pos = dotNameLen + operatorLength + vlOr.value.length
   if pos != statement.text.len:
     # Unused text at the end of the statement.
     return newVariableDataOr(wTextAfterValue, "", pos)
 
   # Return the variable dot name and value.
-  result = newVariableDataOr(dotNameStr, operator, value)
+  result = newVariableDataOr(dotNameStr, operator, vlOr.value.value)
 
 proc runCommand*(env: var Env, cmdLines: CmdLines,
     variables: var Variables): string =
@@ -649,6 +655,14 @@ proc runCommand*(env: var Env, cmdLines: CmdLines,
       env.warnStatement(statement, variableDataOr.message)
       continue
     let variableData = variableDataOr.value
+
+    # Return function exit.
+    if variableData.operator == "":
+      if variableData.value.kind != vkString:
+        # Expected 'skip', 'stop' or '' for the block command return value.
+        env.warnStatement(statement, newWarningData(wSkipStopOrEmpty))
+        continue
+      return variableData.value.stringv
 
     # Assign the variable if possible.
     let warningDataO = assignVariable(variables,

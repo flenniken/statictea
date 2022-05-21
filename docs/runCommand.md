@@ -51,12 +51,13 @@ Statement = object
 
 # ValueAndLength
 
-A value and the length of the matching text in the statement. For the example statement: "var = 567 ". The value 567 starts at index 6 and the matching length is 4 because it includes the trailing space. For example "id = row(3 )" the value is 3 and the length is 2.
+A value and the length of the matching text in the statement. For the example statement: "var = 567 ". The value 567 starts at index 6 and the matching length is 4 because it includes the trailing space. For example "id = row(3 )" the value is 3 and the length is 2. Exit is set true by the return function to exit a command.
 
 ```nim
 ValueAndLength = object
   value*: Value
   length*: Natural
+  exit*: bool
 
 ```
 
@@ -65,7 +66,7 @@ ValueAndLength = object
 Create a newValueAndLength object.
 
 ```nim
-proc newValueAndLength(value: Value; length: Natural): ValueAndLength
+proc newValueAndLength(value: Value; length: Natural; exit = false): ValueAndLength
 ```
 
 # newValueAndLengthOr
@@ -89,7 +90,7 @@ func newValueAndLengthOr(warningData: WarningData): ValueAndLengthOr
 Create a ValueAndLengthOr value.
 
 ```nim
-func newValueAndLengthOr(value: Value; length: Natural): ValueAndLengthOr
+func newValueAndLengthOr(value: Value; length: Natural; exit = false): ValueAndLengthOr
 ```
 
 # newValueAndLengthOr

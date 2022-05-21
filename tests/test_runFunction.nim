@@ -1545,8 +1545,8 @@ suite "runFunction.nim":
     check testFunction("warn", parameters, eFunResult)
 
   test "return":
-    check testFunction("return", @[newValue(1)], newFunResult(newValue(1)))
+    check testFunction("return", @[newValue("")], newFunResult(newValue("")))
     check testFunction("return", @[newValue("skip")],
       newFunResult(newValue("skip")))
-    check testFunction("return", @[newValue(3.4)],
-      newFunResult(newValue(3.4)))
+    check testFunction("return", @[newValue("stop")],
+      newFunResult(newValue("stop")))

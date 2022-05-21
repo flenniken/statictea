@@ -490,6 +490,11 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr(wMissingStatementVar)
     check testRunStatement(statement, eVariableDataOr)
 
+  test "missing statement left hand":
+    let statement = newStatement(text="return(5)", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wMissingStatementVar)
+    check testRunStatement(statement, eVariableDataOr)
+
   test "no equal sign":
     let statement = newStatement(text="var 343", lineNum=1, 0)
     let eVariableDataOr = newVariableDataOr(wInvalidVariable, "", 4)
@@ -855,6 +860,54 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let text = """a = len(warn("hello"), 4) junk"""
     let statement = newStatement(text)
     let eVariableDataOr = newVariableDataOr(wUserMessage, "hello", 13)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "return empty":
+    let text = """a = return("")"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("", "", newValue(""))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "return skip":
+    let text = """a = return("skip")"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("", "", newValue("skip"))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "return stop nested":
+    let text = """a = if1(1, return("stop"))"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("", "", newValue("stop"))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "return no stop":
+    let text = """a = if1(0, return("stop"))"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(0))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "return no stop":
+    let text = """a = if1(1, [1,2,return("stop")])"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("", "", newValue("stop"))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "return cond stop":
+    let text = """a = if1(return("stop"),5)"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("", "", newValue("stop"))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "return third stop":
+    let text = """a = if1(0, 5, return("stop"))"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("", "", newValue("stop"))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "return third stop":
+    let text = """a = len(return("stop"))"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("", "", newValue("stop"))
     check testRunStatement(statement, eVariableDataOr)
 
 

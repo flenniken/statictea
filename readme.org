@@ -1867,7 +1867,7 @@ the third parameter.
 - [[#path][path]] -- Split a file path into its component pieces.
 - [[#replace][replace]] -- Replace a substring specified by its position and length with another string.
 - [[#replaceRe][replaceRe]] -- Replace multiple parts of a string using regular expressions.
-- [[#return][return]] -- Return the given value and stop processing the command.
+- [[#return][return]] -- Return the given value and control command looping.
 - [[#slice][slice]] -- Extract a substring from a string by its position and length.
 - [[#sort][sort]] -- Sort a list of values of the same type.
 - [[#sort][sort]] -- Sort a list of lists.
@@ -2843,17 +2843,25 @@ website: https://regex101.com/
 :CUSTOM_ID: return
 :END:
 
-Return the given value and stop processing the command.
+Return the given value and control command looping. A return in a
+statement causes the command to stop processing the current
+statement and following statements in the command. You can
+control whether the replacement block is output or not.
+
+- "stop" -- stop processing the command
+- "skip" -- skip this replacement block and continue with the next
+- "" -- output the replacement block and continue
 
 #+BEGIN_SRC
-return(value: any) any
+return(value: string) string
 #+END_SRC
 
 Examples:
 
 #+BEGIN_SRC
-if0(c, return("stop"))
+if1(c, return("stop"))
 if1(c, return("skip"))
+if1(c, return(""))
 #+END_SRC
 
 [[#contents][茶]]

@@ -50,7 +50,7 @@ the third parameter.
 * [funJoinPath_loss](#funjoinpath_loss) &mdash; Join the path components with a path separator.
 * [funJoin_lsois](#funjoin_lsois) &mdash; Join a list of strings with a separator.
 * [funWarn](#funwarn) &mdash; Return a warning message and skip the current statement.
-* [funReturn](#funreturn) &mdash; Return the given value and stop processing the command.
+* [funReturn](#funreturn) &mdash; Return the given value and control command looping.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -1183,17 +1183,25 @@ func funWarn(parameters: seq[Value]): FunResult
 
 # funReturn
 
-Return the given value and stop processing the command.
+Return the given value and control command looping. A return in a
+statement causes the command to stop processing the current
+statement and following statements in the command. You can
+control whether the replacement block is output or not.
+
+* "stop" -- stop processing the command
+* "skip" -- skip this replacement block and continue with the next
+* "" -- output the replacement block and continue
 
 ~~~
-return(value: any) any
+return(value: string) string
 ~~~~
 
 Examples:
 
 ~~~
-if0(c, return("stop"))
+if1(c, return("stop"))
 if1(c, return("skip"))
+if1(c, return(""))
 ~~~~
 
 ```nim

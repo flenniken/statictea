@@ -14,7 +14,7 @@ type
     ## @:
     ## @:~~~
     ## @:prefix command  [code]   [comment] [continuation]
-    ## @:|      |        |        |         |[postfix]
+    ## @:|      |        |        |         @![postfix]
     ## @:|      |        |        |         ||  [ending]
     ## @:|      |        |        |         ||  |
     ## @:<!--$  nextline var = 5  # comment +-->\n

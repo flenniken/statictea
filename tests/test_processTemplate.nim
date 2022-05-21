@@ -1412,6 +1412,105 @@ $$ endblock
 """
     check testProcessTemplate(templateContent = templateContent)
 
+  test "return short circuit":
+    let templateContent = """
+$$ block a = return("stop")
+$$ : a = warn("not hit")
+repeat short circuit
+$$ endblock
+"""
+    check testProcessTemplate(templateContent = templateContent)
+
+  test "return short circuit 2":
+    let templateContent = """
+$$ block a = return("")
+$$ : a = warn("not hit")
+return short circuit 2
+$$ endblock
+"""
+    let eResultLines = @[
+      "return short circuit 2\n",
+    ]
+    check testProcessTemplate(templateContent = templateContent,
+      eResultLines = eResultLines)
+
+  test "return short circuit 3":
+    let templateContent = """
+$$ block t.repeat = 2
+$$ : a = if0(t.row, return("skip"))
+return short circuit
+$$ endblock
+"""
+    let eResultLines = @[
+      "return short circuit\n",
+    ]
+    check testProcessTemplate(templateContent = templateContent,
+      eResultLines = eResultLines)
+
+  test "return short circuit 4":
+    let templateContent = """
+$$ block t.repeat = 3
+$$ : a = if1(t.row, return("stop"))
+{t.row}) return short circuit
+$$ endblock
+"""
+    let eResultLines = @[
+      "0) return short circuit\n",
+    ]
+    check testProcessTemplate(templateContent = templateContent,
+      eResultLines = eResultLines)
+
+  test "return short circuit 5":
+    let templateContent = """
+$$ block t.repeat = 3
+$$ : a = if1(t.row, return("skip"))
+{t.row}) return short circuit
+$$ endblock
+"""
+    let eResultLines = @[
+      "0) return short circuit\n",
+      "2) return short circuit\n",
+    ]
+    check testProcessTemplate(templateContent = templateContent,
+      eResultLines = eResultLines)
+
+  test "return short circuit 6":
+    let templateContent = """
+$$ block t.repeat = 3
+$$ : a = if1(t.row, return(""))
+$$ : b = if1(t.row, warn("not hit"))
+{t.row}) return short circuit
+$$ endblock
+"""
+    let eResultLines = @[
+      "0) return short circuit\n",
+      "1) return short circuit\n",
+      "2) return short circuit\n",
+    ]
+    check testProcessTemplate(templateContent = templateContent,
+      eResultLines = eResultLines)
+
+  test "return short circuit 7":
+    let templateContent = """
+$$ block t.repeat = 3
+$$ : a = if1(t.row, return(""))
+$$ : b = if1(t.row, warn("not hit"))
+{t.row}) a={a} b={b}
+$$ endblock
+"""
+    let eResultLines = @[
+      "0) a=0 b=0\n",
+      "1) a={a} b={b}\n",
+      "2) a=0 b=0\n",
+    ]
+    let eErrLines = @[
+      "template.html(4): w58: The replacement variable doesn't exist: a.\n",
+      "template.html(4): w58: The replacement variable doesn't exist: b.\n"
+    ]
+    check testProcessTemplate(templateContent = templateContent,
+      eResultLines = eResultLines, eErrLines = eErrLines, eRc = 1)
+
+
 
 # todo: test with no result file.
 # todo: test that the template file gets updated

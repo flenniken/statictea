@@ -190,7 +190,8 @@ MessageId = enum
   wMaxDepthExceeded,        ## w173
   wSameAsTemplate,          ## w174
   wSameAsResult,            ## w175
-  wResultWithUpdate          ## w176
+  wResultWithUpdate,        ## w176
+  wSkipStopOrEmpty           ## w177
 ```
 
 # Messages
@@ -371,7 +372,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The maximum JSON depth of $1 was exceeded.", ## wMaxDepthExceeded
     "The template and $1 files are the same.", ## wSameAsTemplate
     "The result and $1 files are the same.", ## wSameAsResult
-    "The result file is used with the update option."]
+    "The result file is used with the update option.", ## wResultWithUpdate
+    "Expected \'skip\', \'stop\' or \'\' for the block command return value."]
 ```
 
 
