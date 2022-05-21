@@ -374,7 +374,7 @@ You can repeat the block to make lists and other repeating
 content. You control how many times the block repeats with the
 t.repeat variable.  The t.row counts the number of times the
 block has repeated and you use its value to customize each
-repeated block.
+repeated block.  See [[#trow][t.row]] for an example.
 
 [[#contents][茶]]
 
@@ -1026,7 +1026,7 @@ result:
 [[#contents][茶]]
 
 *** t.row
-    :PROPERTIES:
+:PROPERTIES:
     :CUSTOM_ID: trow
     :END:
 
@@ -1480,20 +1480,34 @@ function. Like the system warning messages it skips the current
 statement, increments the warning count and produces a non-zero
 return code.
 
-[[茶]]
+For example if the server item list should contain one or more
+items, you could output a warning when it's zero:
 
-** Conditional Evaluation
+#+BEGIN_SRC
+if0(len(s.items), warn("no items"))
+#+END_SRC
+
+[[#contents][茶]]
+
+** If Functions
 
 :PROPERTIES:
-   :CUSTOM_ID: conditional-evaluation
+   :CUSTOM_ID: if-functions
    :END:
 
-The if0 and if1 funtions evaluate the matching parameter and the
-other parameter is skipped.  This is important when you use the
-warn or return functions to control the statement flow.
+The if0 and if1 functions are special in a couple of ways. They
+conditionally evaluate their parameters and they can be used in a
+statement bare without an assignment.
 
-The other functions evaluate all their parameters before passing
-them to the function.
+You use the bare form with the warn and return functions for
+their side effects.
+
+The if functions evaluate the condition parameter first to
+determine which parameter to evaluate next and the non-matching
+parameter is skipped.  This is important when you use the warn or
+return functions to control the statement flow.  The other
+functions evaluate all their parameters before passing them to the
+function.
 
 In the following example do1 is executed and doOther is skipped.
 
@@ -1511,6 +1525,13 @@ a = if1(1, do1(), warn("not one"))
 The warn and return functions modify the statement flow.  The
 warn function skips the current statement and the return function
 ends the current block.
+
+The next example is a bare if.  It generates a warning when cond
+is 1.
+
+#+BEGIN_SRC
+if1(s.cond, warn("s.cond is 1"))
+#+END_SRC
 
 [[#contents][茶]]
 
@@ -2359,14 +2380,10 @@ $$ : anchor = githubAnchor(entry.name)
 :CUSTOM_ID: if0
 :END:
 
-If the condition is 0, return the second parameter, else return the third parameter.
+If the condition is 0, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter.
 
-This function is special in a couple of ways. It conditionally
-evaluates it parameters, see
-[[#conditional-evaluation][Conditional Evaluation]] and when you
-don't specify an else parameter you use the function without a
-left hand side or operator. This second form is used with a
-return or warn function because they do not assign a variable.
+The if functions, if0 and if1 are special in a couple of ways, see
+[[#if-functions][If Functions]]
 
 #+BEGIN_SRC
 if0(condition: int, then: any, optional else: any) any
@@ -2401,14 +2418,10 @@ drink6 => 0
 :CUSTOM_ID: if1
 :END:
 
-If the condition is 1, return the second parameter, else return the third parameter.
+If the condition is 1, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter.
 
-This function is special in a couple of ways. It conditionally
-evaluates it parameters, see
-[[#conditional-evaluation][Conditional Evaluation]] and when you
-don't specify an else parameter you use the function without a
-left hand side or operator. This second form is used with a
-return or warn function because they do not assign a variable.
+The if functions, if0 and if1 are special in a couple of ways, see
+[[#if-functions][If Functions]]
 
 #+BEGIN_SRC
 if1(condition: int, then: any, optional else: any) any

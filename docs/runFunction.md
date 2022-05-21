@@ -263,14 +263,10 @@ func funGet_dsoaa(parameters: seq[Value]): FunResult
 
 # funIf0
 
-If the condition is 0, return the second parameter, else return the third parameter.
+If the condition is 0, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter.
 
-This function is special in a couple of ways. It conditionally
-evaluates it parameters, see
-[[#conditional-evaluation][Conditional Evaluation]] and when you
-don't specify an else parameter you use the function without a
-left hand side or operator. This second form is used with a
-return or warn function because they do not assign a variable.
+The if functions, if0 and if1 are special in a couple of ways, see
+[[#if-functions][If Functions]]
 
 ~~~
 if0(condition: int, then: any, optional else: any) any
@@ -304,14 +300,10 @@ func funIf0(parameters: seq[Value]): FunResult
 
 # funIf1
 
-If the condition is 1, return the second parameter, else return the third parameter.
+If the condition is 1, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter.
 
-This function is special in a couple of ways. It conditionally
-evaluates it parameters, see
-[[#conditional-evaluation][Conditional Evaluation]] and when you
-don't specify an else parameter you use the function without a
-left hand side or operator. This second form is used with a
-return or warn function because they do not assign a variable.
+The if functions, if0 and if1 are special in a couple of ways, see
+[[#if-functions][If Functions]]
 
 ~~~
 if1(condition: int, then: any, optional else: any) any
