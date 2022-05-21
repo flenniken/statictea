@@ -1850,10 +1850,8 @@ List of functions:
 - [[#get][get]] -- Get a list value by its index.
 - [[#githubAnchor][githubAnchor]] -- Create Github anchor names from heading names.
 - [[#githubAnchor][githubAnchor]] -- Create a Github anchor name from a heading name.
-- [[#if0][if0]] -- If the condition is 0, return the second parameter, else return
-the third parameter.
-- [[#if1][if1]] -- If the condition is 1, return the second parameter, else return
-the third parameter.
+- [[#if0][if0]] -- If the condition is 0, return the second parameter, else return the third parameter.
+- [[#if1][if1]] -- If the condition is 1, return the second parameter, else return the third parameter.
 - [[#int][int]] -- Create an int from a float.
 - [[#int][int]] -- Create an int from a number string.
 - [[#joinPath][joinPath]] -- Join the path components with a path separator.
@@ -2361,8 +2359,7 @@ $$ : anchor = githubAnchor(entry.name)
 :CUSTOM_ID: if0
 :END:
 
-If the condition is 0, return the second parameter, else return
-the third parameter.
+If the condition is 0, return the second parameter, else return the third parameter.
 
 This function is special in a couple of ways. It conditionally
 evaluates it parameters, see
@@ -2404,8 +2401,7 @@ drink6 => 0
 :CUSTOM_ID: if1
 :END:
 
-If the condition is 1, return the second parameter, else return
-the third parameter.
+If the condition is 1, return the second parameter, else return the third parameter.
 
 This function is special in a couple of ways. It conditionally
 evaluates it parameters, see

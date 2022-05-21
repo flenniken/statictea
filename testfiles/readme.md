@@ -1,4 +1,4 @@
-# Test Files
+# Stf Test Files
 
 This folder contains stf test files for statictea.
 

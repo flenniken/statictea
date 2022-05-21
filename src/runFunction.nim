@@ -299,7 +299,7 @@ func funGet_dsoaa*(parameters: seq[Value]): FunResult =
 
 func funIf0*(parameters: seq[Value]): FunResult =
   ## If the condition is 0, return the second parameter, else return
-  ## @:the third parameter.
+  ## the third parameter.
   ## @:
   ## @:This function is special in a couple of ways. It conditionally
   ## @:evaluates it parameters, see
@@ -350,7 +350,7 @@ func funIf0*(parameters: seq[Value]): FunResult =
 
 func funIf1*(parameters: seq[Value]): FunResult =
   ## If the condition is 1, return the second parameter, else return
-  ## @:the third parameter.
+  ## the third parameter.
   ## @:
   ## @:This function is special in a couple of ways. It conditionally
   ## @:evaluates it parameters, see

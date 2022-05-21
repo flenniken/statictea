@@ -64,6 +64,11 @@ proc newWarningData(warning: MessageId; p1 = ""; pos = 0): WarningData
 
 Return a string representation of WarningData.
 
+~~~
+let warning = newWarningData(wUnknownArg, "p1", 5)
+check $warning == "wUnknownArg(p1):5"
+~~~~
+
 ```nim
 func `$`(warningData: WarningData): string
 ```

@@ -56,7 +56,9 @@ DESCRIPTION
      -l[=filename], --log[=filename]
 
              Turn on logging and optionally specify the filename. When
-             no filename is specified, use "/var/log/statictea.log".
+             no filename is specified this file is used:
+             * Mac: ~/Library/log/statictea.log
+             * Other: ~/statictea.log
 
      -v, --version
 

@@ -15,10 +15,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funLen_di](#funlen_di) &mdash; Number of elements in a dictionary.
 * [funGet_lioaa](#funget_lioaa) &mdash; Get a list value by its index.
 * [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
-* [funIf0](#funif0) &mdash; If the condition is 0, return the second parameter, else return
-the third parameter.
-* [funIf1](#funif1) &mdash; If the condition is 1, return the second parameter, else return
-the third parameter.
+* [funIf0](#funif0) &mdash; If the condition is 0, return the second parameter, else return the third parameter.
+* [funIf1](#funif1) &mdash; If the condition is 1, return the second parameter, else return the third parameter.
 * [funAdd_iii](#funadd_iii) &mdash; Add two integers.
 * [funAdd_fff](#funadd_fff) &mdash; Add two floats.
 * [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
@@ -265,8 +263,7 @@ func funGet_dsoaa(parameters: seq[Value]): FunResult
 
 # funIf0
 
-If the condition is 0, return the second parameter, else return
-the third parameter.
+If the condition is 0, return the second parameter, else return the third parameter.
 
 This function is special in a couple of ways. It conditionally
 evaluates it parameters, see
@@ -307,8 +304,7 @@ func funIf0(parameters: seq[Value]): FunResult
 
 # funIf1
 
-If the condition is 1, return the second parameter, else return
-the third parameter.
+If the condition is 1, return the second parameter, else return the third parameter.
 
 This function is special in a couple of ways. It conditionally
 evaluates it parameters, see

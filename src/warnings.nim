@@ -47,6 +47,11 @@ func dashIfEmpty(a: string): string =
 
 func `$`*(warningData: WarningData): string =
   ## Return a string representation of WarningData.
+  ## @:
+  ## @:~~~
+  ## @:let warning = newWarningData(wUnknownArg, "p1", 5)
+  ## @:check $warning == "wUnknownArg(p1):5"
+  ## @:~~~~
   result = "$1($2):$3" % [$warningData.warning,
     dashIfEmpty(warningData.p1), $warningData.pos]
 

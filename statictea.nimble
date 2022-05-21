@@ -740,7 +740,7 @@ task n, "\tShow available tasks.":
 task test, "\tRun one or more tests; specify part of test filename.":
   ## Run one or more tests.  You specify part of the test filename and
   ## all files that match case insensitive are run. If you don't
-  ## specify a name, all are run. Task "t" is faster to run them all.
+  ## specify a name, all are run.
   let count = system.paramCount()+1
   # The name is either part of a name or "test" when not
   # specified. Test happens to match all test files.
