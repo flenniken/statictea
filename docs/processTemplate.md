@@ -8,10 +8,10 @@ Process the template.
 * [yieldContentLine](#yieldcontentline) &mdash; Yield one content line at a time and keep the line endings.
 * [readJsonFileLog](#readjsonfilelog) &mdash; Read a json file and log.
 * [readJsonFiles](#readjsonfiles) &mdash; Read json files and return a variable dictionary.
-* [processTemplate](#processtemplate) &mdash; Process the template and return 0 on success.
+* [processTemplate](#processtemplate) &mdash; Process the template.
 * [updateTemplate](#updatetemplate) &mdash; Update the template and return 0 on success.
-* [processTemplateTop](#processtemplatetop) &mdash; Setup the environment streams then process the template and return 0 on success.
-* [updateTemplateTop](#updatetemplatetop) &mdash; Update the template and return 0 on success.
+* [processTemplateTop](#processtemplatetop) &mdash; Setup the environment streams then process the template.
+* [updateTemplateTop](#updatetemplatetop) &mdash; Update the template.
 
 # yieldContentLine
 
@@ -39,10 +39,10 @@ proc readJsonFiles(env: var Env; filenames: seq[string]): VarsDict
 
 # processTemplate
 
-Process the template and return 0 on success. Return 1 if a warning messages was written while processing the template.
+Process the template.
 
 ```nim
-proc processTemplate(env: var Env; args: Args): int
+proc processTemplate(env: var Env; args: Args)
 ```
 
 # updateTemplate
@@ -50,23 +50,23 @@ proc processTemplate(env: var Env; args: Args): int
 Update the template and return 0 on success. Return 1 if a warning messages was written while processing the template.
 
 ```nim
-proc updateTemplate(env: var Env; args: Args): int
+proc updateTemplate(env: var Env; args: Args)
 ```
 
 # processTemplateTop
 
-Setup the environment streams then process the template and return 0 on success.
+Setup the environment streams then process the template.
 
 ```nim
-proc processTemplateTop(env: var Env; args: Args): int
+proc processTemplateTop(env: var Env; args: Args)
 ```
 
 # updateTemplateTop
 
-Update the template and return 0 on success. This calls updateTemplate.
+Update the template.
 
 ```nim
-proc updateTemplateTop(env: var Env; args: Args): int
+proc updateTemplateTop(env: var Env; args: Args)
 ```
 
 

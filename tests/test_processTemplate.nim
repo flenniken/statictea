@@ -57,7 +57,9 @@ proc testProcessTemplate(templateContent: string = "",
     args.sharedList = @[sharedFilename]
 
   # Process the template and write out the result.
-  let rc = processTemplate(env, args)
+  processTemplate(env, args)
+
+  let rc = if env.warningsWritten > 0: 1 else: 0
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines,
     eResultLines = eResultLines, showLog = showLog)
@@ -99,7 +101,9 @@ proc testUpdateTemplate(templateContent: string = "",
     args.sharedList = @[sharedFilename]
 
   # Update the template and write out the result.
-  let rc = updateTemplate(env, args)
+  updateTemplate(env, args)
+
+  let rc = if env.warningsWritten > 0: 1 else: 0
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines,
     eResultLines = eResultLines, eTemplateLines = eTemplateLines, showLog = showLog)

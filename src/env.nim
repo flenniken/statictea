@@ -131,6 +131,14 @@ proc warn*(env: var Env, lineNum: Natural, warningData: WarningData) =
   ## Write a formatted warning message to the error stream.
   warn(env, lineNum, warningData.warning, warningData.p1)
 
+proc warn*(env: var Env, warningData: WarningData) =
+  ## Write a formatted warning message to the error stream.
+  warn(env, 0, warningData.warning, warningData.p1)
+
+proc warn*(env: var Env, messageId: MessageId, p1 = "") =
+  ## Write a formatted warning message to the error stream.
+  warn(env, 0, messageId, p1)
+
 func formatDateTime*(dt: DateTime): string =
   ## Return a formatted time stamp for the log.
   result = dt.format(dtFormat)
@@ -152,11 +160,11 @@ proc logLine*(env: var Env, filename: string, lineNum: int, message: string) =
     # raise newException(IOError, "test io error")
     env.logFile.write(line)
   except:
-    env.warn(0, wUnableToWriteLogFile, filename)
-    env.warn(0, wExceptionMsg, getCurrentExceptionMsg())
+    env.warn(wUnableToWriteLogFile, filename)
+    env.warn(wExceptionMsg, getCurrentExceptionMsg())
     # The stack trace is only available in the debug builds.
     when not defined(release):
-      env.warn(0, wStackTrace, getCurrentException().getStackTrace())
+      env.warn(wStackTrace, getCurrentException().getStackTrace())
     # Close the log file.  Only one warning goes out about it not working.
     env.logFile.close()
     env.logFile = nil
@@ -178,7 +186,7 @@ proc checkLogSize(env: var Env) =
     let logSize = env.logFile.getFileSize()
     if logSize > logWarnSize:
       # The log file is over 1 GB.
-      env.warn(0, wBigLogFile)
+      env.warn(wBigLogFile)
 
 proc openLogFile(env: var Env, logFilename: string) =
   ## Open the log file and update the environment. If the log file
@@ -189,7 +197,7 @@ proc openLogFile(env: var Env, logFilename: string) =
     env.logFile = file
     env.logFilename = logFilename
   else:
-    env.warn(0, wUnableToOpenLogFile, logFilename)
+    env.warn(wUnableToOpenLogFile, logFilename)
 
 proc openEnv*(logFilename: string = "",
                   warnSize: int64 = logWarnSize): Env =
@@ -216,9 +224,8 @@ proc setupLogging*(env: var Env, logFilename: string = "",
   checkLogSize(env)
 
 proc addExtraStreams*(env: var Env, templateFilename: string,
-                      resultFilename: string): bool =
-  ## Add the template and result streams to the environment. Return
-  ## true on success.
+    resultFilename: string): Option[WarningData] =
+  ## Add the template and result streams to the environment.
 
   # You can only add them once.
   assert env.templateStream == nil
@@ -230,16 +237,13 @@ proc addExtraStreams*(env: var Env, templateFilename: string,
   if templateFilename == "stdin":
     tStream = newFileStream(stdin)
     if tStream == nil:
-      env.warn(0, wCannotOpenStd, "stdin")
-      return
+      return some(newWarningData(wCannotOpenStd, "stdin"))
   else:
     if not fileExists(templateFilename):
-      env.warn(0, wFileNotFound, templateFilename)
-      return
+      return some(newWarningData(wFileNotFound, templateFilename))
     tStream = newFileStream(templateFilename, fmRead)
     if tStream == nil:
-      env.warn(0, wUnableToOpenFile, templateFilename)
-      return
+      return some(newWarningData(wUnableToOpenFile, templateFilename))
     closeTStream = true
 
   env.templateFilename = templateFilename
@@ -256,17 +260,14 @@ proc addExtraStreams*(env: var Env, templateFilename: string,
   else:
     rStream = newFileStream(resultFilename, fmReadWrite)
     if rStream == nil:
-      env.warn(0, wUnableToOpenFile, resultFilename)
-      return
+      return some(newWarningData(wUnableToOpenFile, resultFilename))
     closeRStream = true
 
   env.resultFilename = resultFilename
   env.resultStream = rStream
   env.closeResultStream = closeRStream
 
-  result = true
-
-proc addExtraStreams*(env: var Env, args: Args): bool =
+proc addExtraStreams*(env: var Env, args: Args): Option[WarningData] =
   ## Add the template and result streams to the environment. Return
   ## true on success.
 
@@ -283,14 +284,14 @@ proc addExtraStreams*(env: var Env, args: Args): bool =
 # todo: test with template of "stdin" when update is specified.
 # todo: test update when the template is readonly.
 
-proc addExtraStreamsForUpdate*(env: var Env, args: Args): bool =
+proc addExtraStreamsForUpdate*(env: var Env, args: Args):
+    Option[WarningData] =
   ## For the update case, add the template and result streams to the
   ## environment. Return true on success.
 
   # Warn and exit when a resultFilename is specified.
   if args.resultFilename != "":
-    env.warn(0, wResultFileNotAllowed)
-    return false
+    return some(newWarningData(wResultFileNotAllowed))
 
   # Get the template filename.
   assert args.templateFilename != ""
@@ -304,8 +305,7 @@ proc addExtraStreamsForUpdate*(env: var Env, args: Args): bool =
     # filename at the end.
     var tempFileO = openTempFile()
     if not tempFileO.isSome():
-      env.warn(0, wUnableToOpenTempFile)
-      return false
+      return some(newWarningData(wUnableToOpenTempFile))
     var tempFile = tempFileO.get()
     tempFile.file.close()
     resultFilename = tempFile.filename

@@ -14,6 +14,8 @@ Environment holding the input and output streams.
 * [outputWarning](#outputwarning) &mdash; Write a message to the error stream and increment the warning count.
 * [warn](#warn) &mdash; Write a formatted warning message to the error stream.
 * [warn](#warn-1) &mdash; Write a formatted warning message to the error stream.
+* [warn](#warn-2) &mdash; Write a formatted warning message to the error stream.
+* [warn](#warn-3) &mdash; Write a formatted warning message to the error stream.
 * [formatDateTime](#formatdatetime) &mdash; Return a formatted time stamp for the log.
 * [formatLine](#formatline) &mdash; Return a formatted log line.
 * [logLine](#logline) &mdash; Append a message to the log file.
@@ -129,6 +131,22 @@ Write a formatted warning message to the error stream.
 proc warn(env: var Env; lineNum: Natural; warningData: WarningData)
 ```
 
+# warn
+
+Write a formatted warning message to the error stream.
+
+```nim
+proc warn(env: var Env; warningData: WarningData)
+```
+
+# warn
+
+Write a formatted warning message to the error stream.
+
+```nim
+proc warn(env: var Env; messageId: MessageId; p1 = "")
+```
+
 # formatDateTime
 
 Return a formatted time stamp for the log.
@@ -188,11 +206,11 @@ proc setupLogging(env: var Env; logFilename: string = "";
 
 # addExtraStreams
 
-Add the template and result streams to the environment. Return true on success.
+Add the template and result streams to the environment.
 
 ```nim
 proc addExtraStreams(env: var Env; templateFilename: string;
-                     resultFilename: string): bool
+                     resultFilename: string): Option[WarningData]
 ```
 
 # addExtraStreams
@@ -200,7 +218,7 @@ proc addExtraStreams(env: var Env; templateFilename: string;
 Add the template and result streams to the environment. Return true on success.
 
 ```nim
-proc addExtraStreams(env: var Env; args: Args): bool
+proc addExtraStreams(env: var Env; args: Args): Option[WarningData]
 ```
 
 # addExtraStreamsForUpdate
@@ -208,7 +226,7 @@ proc addExtraStreams(env: var Env; args: Args): bool
 For the update case, add the template and result streams to the environment. Return true on success.
 
 ```nim
-proc addExtraStreamsForUpdate(env: var Env; args: Args): bool
+proc addExtraStreamsForUpdate(env: var Env; args: Args): Option[WarningData]
 ```
 
 

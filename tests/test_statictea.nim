@@ -15,7 +15,9 @@ proc testMain(argv: seq[string],
   ): bool =
   var env = openEnvTest("_testMain")
 
-  let rc = main(env, argv)
+  main(env, argv)
+
+  let rc = if env.warningsWritten > 0: 1 else: 0
 
   let (logLines, errLines, outLines, resultLines, _) = env.readCloseDeleteEnv()
 

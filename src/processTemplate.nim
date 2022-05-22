@@ -26,7 +26,7 @@ template getNewLineBuffer(env: Env): untyped =
   let lineBufferO = newLineBuffer(env.templateStream,
       filename = env.templateFilename)
   if not lineBufferO.isSome():
-    env.warn(0, wNotEnoughMemoryForLB)
+    env.warn(wNotEnoughMemoryForLB)
     return
   lineBufferO.get()
   # var lb {.inject.} = lineBufferO.get()
@@ -228,7 +228,7 @@ proc readJsonFileLog*(env: var Env, filename: string): ValueOr =
   ## Read a json file and log.
 
   if not fileExists(filename):
-    env.warn(0, wFileNotFound, filename)
+    env.warn(wFileNotFound, filename)
     return
 
   var file: File
@@ -236,7 +236,7 @@ proc readJsonFileLog*(env: var Env, filename: string): ValueOr =
     file = open(filename, fmRead)
   except:
     # Unable to open file: $1.
-    env.warn(0, wUnableToOpenFile, filename)
+    env.warn(wUnableToOpenFile, filename)
     return
 
   # Create a stream out of the file.
@@ -261,13 +261,13 @@ proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
   for filename in filenames:
     let valueOr = readJsonFileLog(env, filename)
     if valueOr.isMessage:
-      env.warn(0, valueOr.message)
+      env.warn(valueOr.message)
     else:
       # Merge in the variables.
       for k, v in valueOr.value.dictv.pairs:
         if k in varsDict:
           # Skip the duplicates
-          env.warn(0, wDuplicateVar, k)
+          env.warn(wDuplicateVar, k)
         else:
           varsDict[k] = v
   result = varsDict
@@ -299,9 +299,8 @@ proc getPrepostTable(args: Args): PrepostTable =
   else:
     result = makeDefaultPrepostTable()
 
-proc processTemplate*(env: var Env, args: Args): int =
-  ## Process the template and return 0 on success. Return 1 if a
-  ## warning messages was written while processing the template.
+proc processTemplate*(env: var Env, args: Args) =
+  ## Process the template.
 
   var variables = getStartingVariables(env, args)
   var prepostTable = getPrepostTable(args)
@@ -309,44 +308,38 @@ proc processTemplate*(env: var Env, args: Args): int =
   # Process the template.
   processTemplateLines(env, variables, prepostTable)
 
-  if env.warningsWritten > 0:
-    result = 1
-
-proc updateTemplate*(env: var Env, args: Args): int =
+proc updateTemplate*(env: var Env, args: Args) =
   ## Update the template and return 0 on success. Return 1 if a
   ## warning messages was written while processing the template.
 
   var variables = getStartingVariables(env, args)
   var prepostTable = getPrepostTable(args)
-
-  # Process the template.
   updateTemplateLines(env, variables, prepostTable)
 
-  if env.warningsWritten > 0:
-    result = 1
-
-proc processTemplateTop*(env: var Env, args: Args): int =
-  ## Setup the environment streams then process the template and
-  ## return 0 on success.
+proc processTemplateTop*(env: var Env, args: Args) =
+  ## Setup the environment streams then process the template.
 
   # Add the template and result streams to the environment.
-  if not env.addExtraStreams(args):
-    return 1
+  let warningDataO = env.addExtraStreams(args)
+  if warningDataO.isSome:
+    env.warn(warningDataO.get())
+    return
 
   # Process the template.
-  result = processTemplate(env, args)
+  processTemplate(env, args)
 
-proc updateTemplateTop*(env: var Env, args: Args): int =
-  ## Update the template and return 0 on success. This calls
-  ## updateTemplate.
+proc updateTemplateTop*(env: var Env, args: Args) =
+  ## Update the template.
 
   # Add the template and result streams to the environment. Result
   # file is either a temp file or standard out.
-  if not env.addExtraStreamsForUpdate(args):
-    return 1
+  let warningDataO = env.addExtraStreamsForUpdate(args)
+  if warningDataO.isSome:
+    env.warn(warningDataO.get())
+    return
 
   # Update the template.
-  result = updateTemplate(env, args)
+  updateTemplate(env, args)
 
   # When the template is coming from a file, update it from the temp
   # file.
@@ -362,7 +355,6 @@ proc updateTemplateTop*(env: var Env, args: Args): int =
     try:
       moveFile(env.resultFilename, env.templateFilename)
     except OSError:
-      env.warn(0, wUnableToRenameTemp)
+      env.warn(wUnableToRenameTemp)
       # Delete the temp file.
       discard tryRemoveFile(env.resultFilename)
-      result = 1

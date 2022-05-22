@@ -9,10 +9,10 @@ StaticTea; A template processor and language.
 
 # main
 
-Run statictea. Return 0 when no warning messages were written.
+Run statictea.
 
 ```nim
-proc main(env: var Env; argv: seq[string]): int
+proc main(env: var Env; argv: seq[string])
 ```
 
 
