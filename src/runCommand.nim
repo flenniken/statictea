@@ -598,39 +598,50 @@ proc runStatement*(statement: Statement, variables: Variables):
     return newVariableDataOr(wMissingStatementVar)
   let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
 
-  if leftParen != "":
-    # Statement does not start with a variable name.
-    return newVariableDataOr(wMissingStatementVar)
-
+  var vlOr: ValueAndLengthOr
   var operator = ""
   var operatorLength = 0
-  # Get the equal sign or &= and following whitespace.
-  let operatorO = matchEqualSign(statement.text, dotNameLen)
-  if not operatorO.isSome:
-    # Missing operator, = or &=.
-    return newVariableDataOr(wInvalidVariable, "", dotNameLen)
-  let match = operatorO.get()
-  operator = match.getGroup()
-  operatorLength = match.length
+  var varName = ""
 
-  # Get the right hand side value and match the following whitespace.
-  let vlOr = getValueAndLength(statement,
-    dotNameLen + operatorLength, variables, false)
+  if leftParen == "(" and dotNameStr in ["if0", "if1"]:
+    # Handle the special bare if functions.
+    vlOr = ifFunction(dotNameStr, statement, dotNameLen, variables)
+  else:
+    # Handle normal "varName operator right" statements.
+    varName = dotNameStr
+
+    if leftParen != "":
+      # Statement does not start with a variable name.
+      return newVariableDataOr(wMissingStatementVar)
+
+    # Get the equal sign or &= and the following whitespace.
+    let operatorO = matchEqualSign(statement.text, dotNameLen)
+    if not operatorO.isSome:
+      # Missing operator, = or &=.
+      return newVariableDataOr(wInvalidVariable, "", dotNameLen)
+    let match = operatorO.get()
+    operator = match.getGroup()
+    operatorLength = match.length
+
+    # Get the right hand side value and match the following whitespace.
+    vlOr = getValueAndLength(statement,
+      dotNameLen + operatorLength, variables, false)
+
   if vlOr.isMessage:
     return newVariableDataOr(vlOr.message)
 
   # Return function exit.
   if vlOr.value.exit:
-    return newVariableDataOr("", "", vlOr.value.value)
+    return newVariableDataOr("", "exit", vlOr.value.value)
 
   # Check that there is not any unprocessed text following the value.
-  let pos = dotNameLen + operatorLength + vlOr.value.length
-  if pos != statement.text.len:
+  let length = dotNameLen + operatorLength + vlOr.value.length
+  if length != statement.text.len:
     # Unused text at the end of the statement.
-    return newVariableDataOr(wTextAfterValue, "", pos)
+    return newVariableDataOr(wTextAfterValue, "", length)
 
   # Return the variable dot name and value.
-  result = newVariableDataOr(dotNameStr, operator, vlOr.value.value)
+  result = newVariableDataOr(varName, operator, vlOr.value.value)
 
 proc runCommand*(env: var Env, cmdLines: CmdLines,
     variables: var Variables): string =
@@ -657,12 +668,16 @@ proc runCommand*(env: var Env, cmdLines: CmdLines,
     let variableData = variableDataOr.value
 
     # Return function exit.
-    if variableData.operator == "":
+    if variableData.operator == "exit":
       if variableData.value.kind != vkString:
         # Expected 'skip', 'stop' or '' for the block command return value.
         env.warnStatement(statement, newWarningData(wSkipStopOrEmpty))
         continue
       return variableData.value.stringv
+
+    # A bare if without taking a return.
+    if variableData.operator == "":
+      continue
 
     # Assign the variable if possible.
     let warningDataO = assignVariable(variables,

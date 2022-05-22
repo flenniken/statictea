@@ -32,13 +32,14 @@ type
 
   VariableData* = object
     ## The VariableData object holds the variable name, operator,
-    ## @:and value which is the result of running a statement. A
-    ## @:"" dotNameStr and operator means there is no assignment,
-    ## @:e.g. a bare if statement with a return function.
+    ## @:and value which is the result of running a statement.
+    ## @:
+    ## @:For a bare if statement, the operator is "exit" when a return
+    ## @:function ran, otherwise the operator is an empty string.
     ## @:
     ## @:* dotNameStr -- the dot name tells which dictionary contains
     ## @:the variable, i.e.: l.d.a
-    ## @:* operator -- the statement's operator, either =, &=, or ""
+    ## @:* operator -- the statement's operator, either =, &=, "" or "exit".
     ## @:* value -- the variable's value
     dotNameStr*: string
     operator*: string
