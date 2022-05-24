@@ -63,7 +63,7 @@ func githubAnchor*(name: string): string =
   var codePoint: uint32
   for valid in yieldUtf8Chars(name, ixStartSeq, ixEndSeq, codePoint):
     if not valid:
-      # todo: return warning
+      # Invalid UTF-8 name.
       break
     let rune = Rune(codePoint)
     if isAlpha(rune): # letters

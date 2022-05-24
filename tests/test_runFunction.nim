@@ -719,7 +719,6 @@ suite "runFunction.nim":
 
   test "slice start < 0":
     var parameters = @[newValue("tasdf"), newValue(-2), newValue(1)]
-    # todo: bubble the error parameter up?
     let eFunResult = newFunResultWarn(wStartPosTooSmall, 0)
     check testFunction("slice", parameters, eFunResult)
 

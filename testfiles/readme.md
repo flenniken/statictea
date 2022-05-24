@@ -11,6 +11,7 @@ This folder contains stf test files for statictea.
 * [dict-basics](../testfiles/dict-basics.stf.md) &mdash; Test the dictionary type.
 * [dup-json](../testfiles/dup-json.stf.md) &mdash; Test duplicate json variables.
 * [endblock-readme](../testfiles/endblock-readme.stf.md) &mdash; The endblock readme example.
+* [endcommand-alone](../testfiles/endcommand-alone.stf.md) &mdash; Test endcommand without a block command.
 * [endline](../testfiles/endline.stf.md) &mdash; Test there are no extra lines for the readmefun case.
 * [globalvars](../testfiles/globalvars.stf.md) &mdash; Test global variables.
 * [hello](../testfiles/hello.stf.md) &mdash; Readme Hello World example.
@@ -38,6 +39,7 @@ This folder contains stf test files for statictea.
 * [slice](../testfiles/slice.stf.md) &mdash; Test the slice function.
 * [statements](../testfiles/statements.stf.md) &mdash; Test readme statements section.
 * [stdin](../testfiles/stdin.stf.md) &mdash; Test a template coming from stdin.
+* [stdout-result](../testfiles/stdout-result.stf.md) &mdash; Test when no result file is specified. Result goes to stdout.
 * [string-basics](../testfiles/string-basics.stf.md) &mdash; Test the string type.
 * [string-unicode](../testfiles/string-unicode.stf.md) &mdash; Test unicode in strings.
 * [syntax-basics](../testfiles/syntax-basics.stf.md) &mdash; Test the readme syntax section.

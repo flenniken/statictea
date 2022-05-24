@@ -734,26 +734,6 @@ house at 5:00 pm.
     check testProcessTemplate(templateContent = templateContent,
         serverJson = serverJson, eResultLines = eResultLines, eRc = 0)
 
-# todo: need some functions defined before this works.
-#   test "readme do your own warnings":
-#     let templateContent = """
-# <!--$ nextline +-->
-# <!--$ : t.output = if( +-->
-# <!--$ :   exists("s.admin"), "skip", +-->
-# <!--$ :   "stderr"); +-->
-# <!--$ : msg = concat( +-->
-# <!--$ :   template(), "(", +-->
-# <!--$ :   getLineNumber(), ")", +-->
-# <!--$ :   "missing admin var") -->
-# {msg}
-# """
-
-#     let eResultLines = splitNewLines """
-# template.html(45): missing admin var
-# """
-#     check testProcessTemplate(templateContent = templateContent,
-#         eResultLines = eResultLines, eRc = 0)
-
   test "readme repeat example":
     let templateContent = """
 <!--$ nextline t.repeat = len(s.tea_list) -->
@@ -782,50 +762,6 @@ house at 5:00 pm.
 """
     check testProcessTemplate(templateContent = templateContent,
         serverJson = serverJson, eResultLines = eResultLines, eRc = 0)
-
-# todo: need if statement
-#   test "readme repeat example 2":
-#     let templateContent = """
-# <h3>Tea Companies</h3>
-# <select>
-# <!--$ nextline t.repeat=len(s.companyList); +-->
-# <!--$ : d = get(s.companyList, t.row); +-->
-# <!--$ : company = get(d, "company"); +-->
-# <!--$ : selected = get(d, "selected", 0); +-->
-# <!--$ : current=if(selected, ' selected="selected"', "") -->
-# <option{current}>{company}</option>
-# </select>
-# """
-
-#     let serverJson = """
-# {
-# "companyList": [
-#   {"company": "Lipton"},
-#   {"company": "Tetley"},
-#   {"company": "Twinings", "selected": 1},
-#   {"company": "American Tea Room"},
-#   {"company": "Argo Tea"},
-#   {"company": "Bigelow Tea Company"}
-# ]
-# }
-# """
-
-#     let eResultLines = splitNewLines """
-# <h3>Tea Companies</h3>
-# <select>
-# <option>Lipton</option>
-# <option>Tetley</option>
-# <option>selected="selected">Twinings</option>
-# <option>Argo Tea</option>
-# <option>American Tea Room</option>
-# <option>Bigelow Tea Company</option>
-# </select>
-# """
-#     check testProcessTemplate(templateContent = templateContent,
-#       serverJson = serverJson, eResultLines = eResultLines, eRc = 0, showLog = true)
-
-
-# todo: test json parsing errors. Tell to look in the log file?
 
   test "readme repeat = 0":
     let templateContent = """
@@ -866,36 +802,6 @@ house at 5:00 pm.
 """
     check testProcessTemplate(templateContent = templateContent,
         serverJson = serverJson, eResultLines = eResultLines, eRc = 0)
-
-
-# todo: need add function
-#   test "readme row example":
-#     let templateContent = """
-# <!--$ nextline t.repeat=len(s.companies); +-->
-# <!--$ : company = get(s.companies, t.row); +-->
-# <!--$ : num = add(t.row, 1) -->
-# <li id="r{t.row}>{num}. {company}</li>
-# """
-
-#     let serverJson = """
-# {
-#   "companies": [
-#     "Mighty Leaf Tea",
-#     "Numi Organic Tea",
-#     "Peet's Coffee & Tea",
-#     "Red Diamond"
-#   ]
-# }
-# """
-
-#     let eResultLines = splitNewLines """
-# <li id="r0">1. Mighty Leaf Tea</li>
-# <li id="r1">2. Numi Organic Tea</li>
-# <li id="r2">3. Peet's Coffee & Tea</li>
-# <li id="r3">4. Red Diamond</li>
-# """
-#     check testProcessTemplate(templateContent = templateContent,
-#         serverJson = serverJson, eResultLines = eResultLines, eRc = 0)
 
   test "readme undefined variable":
     let templateContent = """
@@ -1513,10 +1419,3 @@ $$ endblock
     ]
     check testProcessTemplate(templateContent = templateContent,
       eResultLines = eResultLines, eErrLines = eErrLines, eRc = 1)
-
-
-
-# todo: test with no result file.
-# todo: test that the template file gets updated
-# todo: test that there is an error when the user specifies a result file.
-# todo: support result file equal the template file?

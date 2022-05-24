@@ -564,8 +564,6 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "cmpVersion two parameters":
     let statement = newStatement(
       text="""cmp = cmpVersion("1.2.3")""", lineNum=1, 0)
-    # todo: better at 24?
-    # let eVariableDataOr = newVariableDataOr(kNotEnoughArgs, "2", 24)
     let eVariableDataOr = newVariableDataOr(kNotEnoughArgs, "2", 17)
     check testRunStatement(statement, eVariableDataOr)
 
@@ -939,12 +937,3 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let statement = newStatement(text)
     let eVariableDataOr = newVariableDataOr(wTextAfterValue, "", 24)
     check testRunStatement(statement, eVariableDataOr)
-
-
-
-
-
-
-# todo: test prepost when user specified.
-# todo: test the maximum variable length.
-# todo: test endblock by itself.

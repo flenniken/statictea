@@ -185,7 +185,14 @@ suite "unicodes.nim":
     check cmpString("ABC", "abc", true) == 0
     check cmpString("aBc", "Abd", true) == -1
     check cmpString("Abd", "aBc", true) == 1
-    # todo: test unicode
+
+  test "cmpString unicode":
+    check cmpString("Heizölrückstoßabdämpgunf",
+       "Heizölrückstoßabdämpfung", true) == 1
+    check cmpString("HeizölrückstoßabdämpFunG",
+      "Heizölrückstoßabdämpfung", true) == 0
+    check cmpString("HeizölrückstoßabdämpFunG",
+      "Heizölrückstoßabdämpfung", false) == -1
 
   test "codePointToString":
     check codePointToString(0x00).value == "\x00"
@@ -415,4 +422,3 @@ suite "unicodes.nim":
     let str = "\xc2\xa9\xe2\x80\x90\xF0\x9D\x92\x9C" # 3 unicode characters
     check stringLen(str) == 3
     check stringLen("ab\xffc") == 4 # with one invalid
-

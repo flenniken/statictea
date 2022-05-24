@@ -3,7 +3,6 @@
 import vartypes
 import messages
 import warnings
-import strutils
 
 type
   FunctionPtr* = proc (parameters: seq[Value]): FunResult {.noSideEffect.}
@@ -68,6 +67,4 @@ func `$`*(funResult: FunResult): string =
   of frValue:
     result = $funResult.value
   else:
-    result = "warning: $1: $2" % [
-      $funResult.warningData, $funResult.parameter
-    ]
+    result = "warning: " & $funResult.warningData & ": " & $funResult.parameter
