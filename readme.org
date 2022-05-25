@@ -657,7 +657,8 @@ Reserved single letter variables:
 :CUSTOM_ID: json-variables
 :END:
 
-You pass variables to the template in json files.
+You pass variables to the template in json files where the top
+level item is a dictionary.
 
 The variables are defined by the top level dictionary items. Each
 item's key is the name of a variable and the item's value is

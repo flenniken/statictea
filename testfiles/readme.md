@@ -16,6 +16,7 @@ This folder contains stf test files for statictea.
 * [globalvars](../testfiles/globalvars.stf.md) &mdash; Test global variables.
 * [hello](../testfiles/hello.stf.md) &mdash; Readme Hello World example.
 * [int-section](../testfiles/int-section.stf.md) &mdash; Test the int type.
+* [json-get](../testfiles/json-get.stf.md) &mdash; Test that you can access non-variable name keys with get.
 * [len](../testfiles/len.stf.md) &mdash; Test the len function.
 * [list-literal](../testfiles/list-literal.stf.md) &mdash; Test literal lists.
 * [localvars-basics](../testfiles/localvars-basics.stf.md) &mdash; Test the readme local variables section.
