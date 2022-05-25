@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # Test t.args
 
-Test the t.args variable.
+Test the t args variable.
 
 ### File cmd.sh command
 

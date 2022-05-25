@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # Tea Repeat Warnings
 
-Test t.repeat warnings.
+Test t repeat warnings.
 
 ### File cmd.sh command nonZeroReturn
 

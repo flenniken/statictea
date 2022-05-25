@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # t.content
 
-Test the t.content variable.
+Test the t content variable.
 
 ### File cmd.sh command
 

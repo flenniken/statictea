@@ -25,37 +25,35 @@ This folder contains stf test files for statictea.
 * [logging-replacement-block](../testfiles/logging-replacement-block.stf.md) &mdash; Test logging the replacement block.
 * [logging](../testfiles/logging.stf.md) &mdash; Logging with Hello World.
 * [lreturncode](../testfiles/lreturncode.stf.md) &mdash; Test the return code for -l -h is 0.
-* [maxlines](../testfiles/maxlines.stf.md) &mdash; Test t.maxLines tea variable.
-* [maxrepeat](../testfiles/maxrepeat.stf.md) &mdash; Test the t.maxRepeat tea variable.
+* [maxlines](../testfiles/maxlines.stf.md) &mdash; Test t maxLines tea variable.
+* [maxrepeat](../testfiles/maxrepeat.stf.md) &mdash; Test the t maxRepeat tea variable.
 * [missingvar](../testfiles/missingvar.stf.md) &mdash; Test with a missing replacement variable.
 * [multiple-json](../testfiles/multiple-json.stf.md) &mdash; Test with multiple json files.
 * [nextline-readme](../testfiles/nextline-readme.stf.md) &mdash; The nextline readme example.
 * [noendingline](../testfiles/noendingline.stf.md) &mdash; Test with no ending newline at the bottom of the file.
 * [nothing](../testfiles/nothing.stf.md) &mdash; Test that the return code for no arguments is not 0.
 * [orgmode](../testfiles/orgmode.stf.md) &mdash; Test the org mode prefix (# $).
-* [output](../testfiles/output.stf.md) &mdash; Test the t.output variable
+* [output](../testfiles/output.stf.md) &mdash; Test the t output variable.
 * [replace-readme1](../testfiles/replace-readme1.stf.md) &mdash; The first replace readme example.
 * [replace-readme2](../testfiles/replace-readme2.stf.md) &mdash; The second replace readme example.
 * [replace-readme3](../testfiles/replace-readme3.stf.md) &mdash; Test standard readme replace example 3.
 * [slice](../testfiles/slice.stf.md) &mdash; Test the slice function.
 * [statements](../testfiles/statements.stf.md) &mdash; Test readme statements section.
 * [stdin](../testfiles/stdin.stf.md) &mdash; Test a template coming from stdin.
-* [stdout-result](../testfiles/stdout-result.stf.md) &mdash; Test when no result file is specified. Result goes to stdout.
+* [stdout-result](../testfiles/stdout-result.stf.md) &mdash; Test when no result file is specified.
 * [string-basics](../testfiles/string-basics.stf.md) &mdash; Test the string type.
 * [string-unicode](../testfiles/string-unicode.stf.md) &mdash; Test unicode in strings.
 * [syntax-basics](../testfiles/syntax-basics.stf.md) &mdash; Test the readme syntax section.
-* [t-args](../testfiles/t-args.stf.md) &mdash; Test the t.args variable.
-* [t-content](../testfiles/t-content.stf.md) &mdash; Test the t.content variable.
-* [t-repeat-basics](../testfiles/t-repeat-basics.stf.md) &mdash; Test the t.repeat variable.
-* [t-repeat-warnings](../testfiles/t-repeat-warnings.stf.md) &mdash; Test t.repeat warnings.
-* [t-row-basics](../testfiles/t-row-basics.stf.md) &mdash; Test the t.row variable.
-* [t-row-warnings](../testfiles/t-row-warnings.stf.md) &mdash; Test t.row warnings.
-* [t-version-basics](../testfiles/t-version-basics.stf.md) &mdash; Test the t.version number.
+* [t-args](../testfiles/t-args.stf.md) &mdash; Test the t args variable.
+* [t-content](../testfiles/t-content.stf.md) &mdash; Test the t content variable.
+* [t-repeat-basics](../testfiles/t-repeat-basics.stf.md) &mdash; Test the t repeat variable.
+* [t-repeat-warnings](../testfiles/t-repeat-warnings.stf.md) &mdash; Test t repeat warnings.
+* [t-row-basics](../testfiles/t-row-basics.stf.md) &mdash; Test the t row variable.
+* [t-row-warnings](../testfiles/t-row-warnings.stf.md) &mdash; Test t row warnings.
+* [t-version-basics](../testfiles/t-version-basics.stf.md) &mdash; Test the t version number.
 * [template](../testfiles/template.stf.md) &mdash; This stf file is used as a template by the newstf nimble task.
 * [truefalsenull](../testfiles/truefalsenull.stf.md) &mdash; Test json true, false and null.
-* [update-and-result](../testfiles/update-and-result.stf.md) &mdash; Test the update option and specify a result file. The update option
-changes the template file. It's an error to specify a result file
-because it's easy to think update applies to the result file.
+* [update-and-result](../testfiles/update-and-result.stf.md) &mdash; Test the update option and specify a result file.
 * [update-template](../testfiles/update-template.stf.md) &mdash; Test updating a template with the update option.
 * [update1](../testfiles/update1.stf.md) &mdash; Update the replace block in a template.
 * [warn-basics](../testfiles/warn-basics.stf.md) &mdash; Test the warn function.

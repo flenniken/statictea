@@ -11,6 +11,10 @@ $$ : d = get(g.modules, t.row)
 $$ : path = path(d.filename)
 $$ : # Use the filename without the ending ".stf.md".
 $$ : name = slice(path.filename, 0, add(len(path.filename), -7))
-* [{name}](../testfiles/{path.filename}) &mdash; {d.description}
+$$ : # Use the first sentence for the short description.
+$$ : a = d.description
+$$ : shortLen = add(find(a, ".", add(len(a), -1)), 1)
+$$ : short = slice(a, 0, shortLen)
+* [{name}](../testfiles/{path.filename}) &mdash; {short}
 $$ endblock
 

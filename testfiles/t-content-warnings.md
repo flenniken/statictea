@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # t.content Warnings
 
-Test t.content warnings.
+Test t content warnings.
 
 ### File cmd.sh command nonZeroReturn
 

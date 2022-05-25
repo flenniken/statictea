@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # t.row
 
-Test the t.row variable.
+Test the t row variable.
 
 ### File cmd.sh command
 

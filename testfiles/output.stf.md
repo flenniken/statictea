@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # t.output
 
-Test the t.output variable
+Test the t output variable.
 
 The t.output variable determines where the block output goes.  By
 default it goes to the result file.

@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # t.row Warnings
 
-Test t.row warnings.
+Test t row warnings.
 
 ### File cmd.sh command nonZeroReturn
 

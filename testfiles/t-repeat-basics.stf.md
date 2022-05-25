@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # t.repeat
 
-Test the t.repeat variable.
+Test the t repeat variable.
 
 ### File cmd.sh command
 

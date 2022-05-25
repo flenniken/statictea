@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # t.maxLines
 
-Test t.maxLines tea variable.
+Test t maxLines tea variable.
 
 ### File cmd.sh command nonZeroReturn
 

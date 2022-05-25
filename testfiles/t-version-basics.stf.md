@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # t.version
 
-Test the t.version number.
+Test the t version number.
 
 ### File cmd.sh command nonZeroReturn
 

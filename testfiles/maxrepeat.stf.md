@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # maxRepeat
 
-Test the t.maxRepeat tea variable.
+Test the t maxRepeat tea variable.
 
 ### File cmd.sh command nonZeroReturn
 
