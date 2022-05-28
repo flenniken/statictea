@@ -30,15 +30,12 @@ hello world
 :END:
 
 You can view, edit and validate your templates with its normal
-tools as if they were static pages.
+tools as if they were static pages and at the same time share
+common template fragments between templates.
 
-The template designer has full control over the presentation.
-You can change the look without changing the server.
-
-You can share common template fragments between templates.
-
-In a general sense StaticTea is a program and language for
-formatting json.
+The template designer has full control over the presentation
+providing a clear separation of concerns. They can change the
+look without changing the server.
 
 [[#contents][茶]]
 
@@ -400,6 +397,7 @@ tea = "Earl Grey"
 num = 5
 t.repeat = 2
 b &= 3
+nums = [1, 2, 3]
 nameLen = len(s.name)
 name = concat(substr(s.name, 0, 7), "...")
 #+END_SRC
@@ -437,9 +435,9 @@ result:
 2
 #+END_SRC
 
-There is no traditional "print" function. You print the
-replacement block, either to the template or to other places by
-setting the t.output variable.
+You have control over where the replacement block goes, either
+the result file, standard out, standard error, or the log file
+using the t.output variable.
 
 If there is a syntax error or a function generates a warning, the
 statement is skipped.
@@ -598,7 +596,7 @@ last_letter = "z"
 nameLen = len(s.name)
 #+END_SRC
 
-Local variables and writable tea variables cleared after
+Local variables and writable tea variables are cleared after
 processing each replacement block.
 
 You can append a new variable to a list or dictionary but you

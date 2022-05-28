@@ -150,14 +150,14 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
                           prepostTable: PrepostTable) =
   ## Update the given template file.
 
-  #[ Read template lines and write them out. Read command lines and
-  write them out. Run the command to determine the t.content, then
-  write out the t.content. Repeat.
+  # Read template lines and write them out. Read command lines and
+  # write them out. Run the command to determine the t.content, then
+  # write out the t.content. Repeat.
 
-  If the template is coming from a file, write the content to a temp
-  file then rename it at the end overwriting the original template
-  file.  If the template comes from standard in, write the new
-  template to standard out. ]#
+  # If the template is coming from a file, write the content to a temp
+  # file then rename it at the end overwriting the original template
+  # file.  If the template comes from standard in, write the new
+  # template to standard out.
 
   # Allocate a buffer for reading lines. Return when no enough memory.
   var lb = getNewLineBuffer(env)
@@ -341,9 +341,14 @@ proc updateTemplateTop*(env: var Env, args: Args) =
   # Update the template.
   updateTemplate(env, args)
 
-  # When the template is coming from a file, update it from the temp
-  # file.
-  if env.templateFilename != "":
+  # When the template is coming from a file, the result file is a temp
+  # file. You can tell this case because templateFilename is not
+  # "stdin".  Rename the temp file to be the new template.
+
+  # When the template is coming from stdin, the result file is
+  # stdout. No renaming needs to be done for this case.
+
+  if env.templateFilename != "stdin":
 
     # Close the template and result files.
     env.templateStream.close()
@@ -351,7 +356,7 @@ proc updateTemplateTop*(env: var Env, args: Args) =
     env.resultStream.close()
     env.resultStream = nil
 
-    # Rename the temp file overwriting the template file.
+    # Rename the temp result file overwriting the template file.
     try:
       moveFile(env.resultFilename, env.templateFilename)
     except OSError:
