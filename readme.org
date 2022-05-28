@@ -445,6 +445,9 @@ statement is skipped.
 You can continue a long statement on the next line by using a "+"
 character at the end.
 
+You can have a bare if function on a statement which is an
+exception to the rule, see [[#if-functions][If Functions]].
+
 [[#contents][茶]]
 
 * Syntax
@@ -1386,7 +1389,7 @@ The StaticTea command line options:
 Miscellaneous topics:
 
 - [[#warning-messages][Warning Messages]]
-- [[#conditional-evaluation][Conditional Evaluation]]
+- [[#if-functions][If Functions]]
 - [[#prefix-postfix][Prefix Postfix]]
 - [[#encoding-and-line-endings][Encoding and Line Endings]]
 - [[#update-option][Update Option]]
@@ -1489,7 +1492,6 @@ if0(len(s.items), warn("no items"))
 [[#contents][茶]]
 
 ** If Functions
-
 :PROPERTIES:
    :CUSTOM_ID: if-functions
    :END:
@@ -1640,6 +1642,9 @@ statictea \
   --template template.html \
   --update
 #+END_SRC
+
+If the template content comes from the standard input stream the
+result goes to the standard output stream.
 
 See the [[#replace-command][replace command]] for update examples.
 
