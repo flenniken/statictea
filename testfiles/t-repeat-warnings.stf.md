@@ -126,11 +126,6 @@ repeat this 4 times
 after
 ~~~
 
-### File stdout.expected
-
-~~~
-~~~
-
 ### File stderr.expected
 
 ~~~
@@ -160,10 +155,15 @@ statement: t.repeat = 3
 tmpl.txt(46): w129: You cannot reassign a variable.
 statement: t.repeat = 3
            ^
-tmpl.txt(46): w116: You reached the maximum number of warnings, suppressing the rest.
+tmpl.txt(46): w129: You cannot reassign a variable.
+statement: t.repeat = 3
+           ^
+tmpl.txt(46): w129: You cannot reassign a variable.
+statement: t.repeat = 3
+           ^
 ~~~
 
-### Expected stdout == stdout.expected
+### Expected stdout == empty
 ### Expected stderr == stderr.expected
 ### Expected log.filtered == empty
 ### Expected result.html == result.expected

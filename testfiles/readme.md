@@ -37,6 +37,7 @@ This folder contains stf test files for statictea.
 * [replace-readme1](../testfiles/replace-readme1.stf.md) &mdash; The first replace readme example.
 * [replace-readme2](../testfiles/replace-readme2.stf.md) &mdash; The second replace readme example.
 * [replace-readme3](../testfiles/replace-readme3.stf.md) &mdash; Test standard readme replace example 3.
+* [slice-warnings](../testfiles/slice-warnings.stf.md) &mdash; Test the slice functions warning cases.
 * [slice](../testfiles/slice.stf.md) &mdash; Test the slice function.
 * [statements](../testfiles/statements.stf.md) &mdash; Test readme statements section.
 * [stdin](../testfiles/stdin.stf.md) &mdash; Test a template coming from stdin.
@@ -62,5 +63,5 @@ This folder contains stf test files for statictea.
 * [warn-log](../testfiles/warn-log.stf.md) &mdash; Test that the warn command increments the warning count and returns a
 non-zero return code.
 * [warn-no-warn](../testfiles/warn-no-warn.stf.md) &mdash; Test there is no warning when the warn is not run.
-* [warninglimit](../testfiles/warninglimit.stf.md) &mdash; Test that warnings stop after 11.
+* [warninglimit](../testfiles/warninglimit.stf.md) &mdash; Test that warnings stop after 32 + 1.
 

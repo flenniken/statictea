@@ -93,7 +93,7 @@ func stringToCodePoints(str: string): OpResultWarn[seq[uint32]]
 Extract a substring from a string by its Unicode character position (not byte index). You pass the string, the substring's start index, and its length. If the length is negative, return all the characters from start to the end of the string. If the str is "" or the length is 0, return "".
 
 ```nim
-func slice(str: string; start: int; length: int): OpResultWarn[string]
+func slice(str: string; start: int; length: int): FunResult
 ```
 
 

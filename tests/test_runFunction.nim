@@ -239,14 +239,14 @@ suite "runFunction.nim":
   test "get one parameter":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2")
+    let eFunResult = newFunResultWarn(kNotEnoughArgsOpt, 0, "2")
     check testFunction("get", parameters, eFunResult)
 
   test "get 4 parameters":
     var list = newValue([1, 2, 3, 4, 5])
     let p = newValue(1)
     var parameters = @[list, p, p, p]
-    let eFunResult = newFunResultWarn(kTooManyArgs, 2, "2")
+    let eFunResult = newFunResultWarn(kTooManyArgsOpt, 3, "3")
     check testFunction("get", parameters, eFunResult)
 
   test "get parameter 2 wrong type":
@@ -558,7 +558,7 @@ suite "runFunction.nim":
 
   test "int(): wrong number of parameters":
     var parameters = @[newValue(4.57), newValue(1), newValue(2)]
-    let eFunResult = newFunResultWarn(kTooManyArgs, 1, "1")
+    let eFunResult = newFunResultWarn(kTooManyArgsOpt, 2, "2")
     check testFunction("int", parameters, eFunResult)
 
   test "int(): not a number string":
@@ -669,7 +669,7 @@ suite "runFunction.nim":
 
   test "find 1 parameter":
     var parameters = @[newValue("big")]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2")
+    let eFunResult = newFunResultWarn(kNotEnoughArgsOpt, 0, "2")
     check testFunction("find", parameters, eFunResult)
 
   test "find 1 not string":
@@ -699,7 +699,7 @@ suite "runFunction.nim":
 
   test "slice 1 parameter":
     var parameters = @[newValue("big")]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2")
+    let eFunResult = newFunResultWarn(kNotEnoughArgsOpt, 0, "2")
     check testFunction("slice", parameters, eFunResult)
 
   test "slice 1 not string":
@@ -719,12 +719,12 @@ suite "runFunction.nim":
 
   test "slice start < 0":
     var parameters = @[newValue("tasdf"), newValue(-2), newValue(1)]
-    let eFunResult = newFunResultWarn(wStartPosTooSmall, 0)
+    let eFunResult = newFunResultWarn(wStartPosTooSmall, 1)
     check testFunction("slice", parameters, eFunResult)
 
   test "slice length too big":
     var parameters = @[newValue("tasdf"), newValue(0), newValue(10)]
-    let eFunResult = newFunResultWarn(wLengthTooBig, 0)
+    let eFunResult = newFunResultWarn(wLengthTooBig, 2)
     check testFunction("slice", parameters, eFunResult)
 
   test "slice nothing":
@@ -1030,7 +1030,13 @@ suite "runFunction.nim":
 
   test "path: wrong number of parameters":
     var parameters: seq[Value] = @[newValue("Earl Grey"), newValue("a"), newValue("a")]
-    let eFunResult = newFunResultWarn(kTooManyArgs, 1, "1")
+    let eFunResult = newFunResultWarn(kTooManyArgsOpt, 2, "2")
+    check testFunction("path", parameters, eFunResult)
+
+  test "path: wrong number of parameters 2":
+    var parameters: seq[Value] = @[newValue("Earl Grey"),
+                                   newValue("a"), newValue("a"), newValue(2)]
+    let eFunResult = newFunResultWarn(kTooManyArgsOpt, 2, "2")
     check testFunction("path", parameters, eFunResult)
 
   test "path: wrong kind p1":
@@ -1242,7 +1248,7 @@ suite "runFunction.nim":
 
   test "sort: wrong number of parameters":
     var parameters: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(kNotEnoughArgs, 0, "2")
+    let eFunResult = newFunResultWarn(kNotEnoughArgsOpt, 0, "2")
     check testFunction("sort", parameters, eFunResult)
 
   test "sort: not list":

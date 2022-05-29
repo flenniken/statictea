@@ -48,7 +48,7 @@ dtFormat = "yyyy-MM-dd HH:mm:ss\'.\'fff"
 The maximum number of warning messages to show.
 
 ```nim
-maxWarningsWritten = 10
+maxWarningsWritten = 32
 ```
 
 # staticteaLog

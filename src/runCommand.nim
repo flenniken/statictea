@@ -24,7 +24,6 @@ const
   showPos = false
 
 type
-  # todo: Inforce a maximum statement length?
   Statement* = object
     ## A Statement object stores the statement text and where it
     ## @:starts in the template file.

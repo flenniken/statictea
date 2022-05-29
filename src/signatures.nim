@@ -7,6 +7,18 @@ import funtypes
 import options
 import messages
 
+# * Function parameters are the names listed in the function's definition.
+# * Function arguments are the real values passed to the function.
+#
+# proc myFunction(parameter: string):
+#   echo parameter
+#
+# const argument = 'foo';
+# myFunction(argument);
+
+
+# todo: use the correct term, parameter or argument in the messages.
+
 const
   singleCodes = {'i', 'f', 's', 'l', 'd', 'a'}
 
@@ -190,8 +202,12 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
 
   # Check there are enough parameters.
   if args.len < requiredParams:
-    # Not enough parameters, $1 required.
-    return newFunResultWarn(kNotEnoughArgs, 0, $requiredParams)
+    if gotOptional:
+      # The function requires at least $1 arguments.
+      return newFunResultWarn(kNotEnoughArgsOpt, 0, $requiredParams)
+    else:
+      # Not enough parameters, $1 required.
+      return newFunResultWarn(kNotEnoughArgs, 0, $requiredParams)
 
   # Check there are not too many parameters.
   var limit: int
@@ -200,8 +216,13 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
   else:
     limit = requiredParams
   if args.len > limit:
-    # Too many arguments, expected at most $1."
-    return newFunResultWarn(kTooManyArgs, requiredParams, $requiredParams)
+    if gotOptional:
+      # The function requires at most $1 arguments.
+      return newFunResultWarn(kTooManyArgsOpt, limit, $limit)
+    else:
+      # The function requires $1 arguments.
+      # Too many arguments, expected at most $1."
+      return newFunResultWarn(kTooManyArgs, limit, $limit)
 
   # Loop through the parameters.
   for ix in countUp(0, loopParams - 1):

@@ -17,7 +17,6 @@ import matches
 import unicodes
 import signatures
 import funtypes
-import opresultwarn
 
 # Table of the built in functions. Each function name can have
 # multiple versions with different signatures.
@@ -828,13 +827,13 @@ func funSlice*(parameters: seq[Value]): FunResult =
   var length: int
   if "c" in map:
     length = int(map["c"].intv)
+    if length < 0:
+      # The length must be a positive number.
+      return newFunResultWarn(wNegativeLength, 2)
   else:
     length = -1
 
-  let stringOr = slice(str, start, length)
-  if stringOr.isMessage:
-    return newFunResultWarn(stringOr.message)
-  result = newFunResult(newValue(stringOr.value))
+  result = slice(str, start, length)
 
 func funDup*(parameters: seq[Value]): FunResult =
   ## Duplicate a string x times.  The result is a new string built by

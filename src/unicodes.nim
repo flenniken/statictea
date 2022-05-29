@@ -7,6 +7,8 @@ import opresultwarn
 import messages
 import warnings
 import utf8decoder
+import funtypes
+import vartypes
 
 func cmpString*(a, b: string, insensitive: bool = false): int =
   ## Compares two UTF-8 strings a and b.  When a equals b return 0,
@@ -224,13 +226,12 @@ func stringToCodePoints*(str: string): OpResultWarn[seq[uint32]] =
   for valid in yieldUtf8Chars(str, ixStartSeq, ixEndSeq, codePoint):
     if not valid:
       # Invalid UTF-8 byte sequence at position {ixStartSeq}.
-      # todo use character position instead of byte positions here?
       return opMessageW[seq[uint32]](newWarningData(wInvalidUtf8ByteSeq,
         $(ixStartSeq)))
     codePoints.add(codePoint)
   result = opValueW[seq[uint32]](codePoints)
 
-func slice*(str: string, start: int, length: int): OpResultWarn[string] =
+func slice*(str: string, start: int, length: int): FunResult =
   ## Extract a substring from a string by its Unicode character
   ## position (not byte index). You pass the string, the substring's
   ## start index, and its length. If the length is negative, return
@@ -238,11 +239,14 @@ func slice*(str: string, start: int, length: int): OpResultWarn[string] =
   ## str is "" or the length is 0, return "".
 
   if str.len == 0 or length == 0:
-    return opValueW[string]("")
+    return newFunResult(newValue(""))
+
+  # note: We are using the warning pos field to be the position of the
+  # parameter with the problem.
 
   if start < 0:
     # The start position is less than 0.
-    return opMessageW[string](newWarningData(wStartPosTooSmall))
+    return newFunResultWarn(wStartPosTooSmall, 1)
 
   var charCount = 0 # Current number of Unicode characters.
   var ixStartSlice = 0 # Index to the start of the slice.
@@ -253,22 +257,25 @@ func slice*(str: string, start: int, length: int): OpResultWarn[string] =
   for valid in yieldUtf8Chars(str, ixStartSeq, ixEndSeq, codePoint):
     if not valid:
       # Invalid UTF-8 byte sequence at position $1.
-      return opMessageW[string](newWarningData(wInvalidUtf8ByteSeq, $(charCount)))
+      return newFunResultWarn(wInvalidUtf8ByteSeq, 0, $(charCount))
     else:
       if charCount == start:
         ixStartSlice = ixStartSeq
       inc(charCount)
       if length > 0 and charCount == start + length:
-        return opValueW[string](str[ixStartSlice .. ixEndSeq])
+        return newFunResult(newValue(str[ixStartSlice .. ixEndSeq]))
 
   var messageId: MessageId
+  var parameter: Natural
   if charCount <= start:
     # The start position is greater then the number of characters in the string.
     messageId = wStartPosTooBig
+    parameter = 1
   elif length < 0:
     # Return from start to the end of the string.
-    return opValueW[string](str[ixStartSlice .. str.len - 1])
+    return newFunResult(newValue(str[ixStartSlice .. str.len - 1]))
   else:
     # The length is greater then the possible number of characters in the slice.
     messageId = wLengthTooBig
-  result = opMessageW[string](newWarningData(messageId))
+    parameter = 2
+  return newFunResultWarn(messageId, parameter)

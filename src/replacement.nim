@@ -377,7 +377,6 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
     # Write out completed lines.
     if kind == newline or kind == endline or kind == endVariable:
       if log:
-        # todo: why is it rLineNum-1 and not rLineNum?
         env.logLine(env.templateFilename, rLineNum-1, line)
       else:
         stream.write(line)

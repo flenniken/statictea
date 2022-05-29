@@ -1434,7 +1434,7 @@ statement: tea = len("abc",)
                            ^
 #+END_SRC
 
-Warnings are suppressed after the first 10. When you reach the
+Warnings are suppressed after the first 32. When you reach the
 limit you will see the message:
 
 #+BEGIN_SRC

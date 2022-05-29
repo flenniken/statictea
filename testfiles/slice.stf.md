@@ -15,8 +15,6 @@ The start index is by unicode characters not bytes.
 slice(str: string, start: int, optional length: int) string
 ~~~
 
-todo: test error cases. nonZeroReturn
-
 ### File cmd.sh command 
 
 ~~~

@@ -13,63 +13,63 @@ $statictea -t template.html -r result.html >stdout 2>stderr
 ### File template.html
 
 ~~~
-Set max repeat to 3 then repeat to 4.
+Set max repeat to 3 then repeat to 4. Expect one line.
 $$ nextline
 $$ : t.maxRepeat = 3
 $$ : t.repeat = 4
 hello
 
-Set max repeat to 3 then repeat to 3.
+Set max repeat to 3 then repeat to 3. Expect 3 lines.
 $$ nextline
 $$ : t.maxRepeat = 3
 $$ : t.repeat = 3
 hello
 
-Set max repeat to 3 then repeat to -1.
+Set max repeat to 3 then repeat to -1. Expect 1 line.
 $$ nextline
 $$ : t.maxRepeat = 3
 $$ : t.repeat = -1
 hello
 
-Set max repeat to 3 then repeat to 0.
+Set max repeat to 3 then repeat to 0. Expect no lines.
 $$ nextline
 $$ : t.maxRepeat = 3
 $$ : t.repeat = 0
 hidden
 
-Set max repeat to 3 then repeat to 2.
+Set max repeat to 3 then repeat to 2. Expect 2 lines.
 $$ nextline
 $$ : t.maxRepeat = 3
 $$ : t.repeat = 2
 t.maxRepeat = {t.maxRepeat}, t.repeat = {t.repeat}
 
-Repeat and max repeat are not set by default.
+Repeat and max repeat are not set by default. Expect 1 line and warnings.
 $$ nextline
 t.maxRepeat = {t.maxRepeat}, t.repeat = {t.repeat}
 
-Set max repeat to 0.
+Set max repeat to 0. Expect 1 line and a warning.
 $$ nextline
 $$ : t.maxRepeat = 0
 hello
 
-Set max repeat to -1.
+Set max repeat to -1. Expect 1 line and a warning.
 $$ nextline
 $$ : t.maxRepeat = -1
 hello
 
-Set repeat to 2 and max repeat to 1.
+Set repeat to 2 and max repeat to 1. Expect 2 lines and a warning.
 $$ nextline
 $$ : t.repeat = 2
 $$ : t.maxRepeat = 1
 hello
 
-Set max repeat to 1 then repeat to 2.
+Set max repeat to 1 then repeat to 2. Expect 1 line and a warning.
 $$ nextline
 $$ : t.maxRepeat = 1
 $$ : t.repeat = 2
 hello
 
-Set max repeat to 2 then set it to 1.
+Set max repeat to 2 then set it to 1. Expect 1 line and a warning.
 $$ nextline
 $$ : t.maxRepeat = 2
 $$ : t.maxRepeat = 1
@@ -79,46 +79,41 @@ hello
 ### File result.expected
 
 ~~~
-Set max repeat to 3 then repeat to 4.
+Set max repeat to 3 then repeat to 4. Expect one line.
 hello
 
-Set max repeat to 3 then repeat to 3.
+Set max repeat to 3 then repeat to 3. Expect 3 lines.
 hello
 hello
 hello
 
-Set max repeat to 3 then repeat to -1.
+Set max repeat to 3 then repeat to -1. Expect 1 line.
 hello
 
-Set max repeat to 3 then repeat to 0.
+Set max repeat to 3 then repeat to 0. Expect no lines.
 
-Set max repeat to 3 then repeat to 2.
+Set max repeat to 3 then repeat to 2. Expect 2 lines.
 t.maxRepeat = 3, t.repeat = 2
 t.maxRepeat = 3, t.repeat = 2
 
-Repeat and max repeat are not set by default.
+Repeat and max repeat are not set by default. Expect 1 line and warnings.
 t.maxRepeat = {t.maxRepeat}, t.repeat = {t.repeat}
 
-Set max repeat to 0.
+Set max repeat to 0. Expect 1 line and a warning.
 hello
 
-Set max repeat to -1.
+Set max repeat to -1. Expect 1 line and a warning.
 hello
 
-Set repeat to 2 and max repeat to 1.
+Set repeat to 2 and max repeat to 1. Expect 2 lines and a warning.
 hello
 hello
 
-Set max repeat to 1 then repeat to 2.
+Set max repeat to 1 then repeat to 2. Expect 1 line and a warning.
 hello
 
-Set max repeat to 2 then set it to 1.
+Set max repeat to 2 then set it to 1. Expect 1 line and a warning.
 hello
-~~~
-
-### File stdout.expected
-
-~~~
 ~~~
 
 ### File stderr.expected
@@ -150,10 +145,9 @@ statement: t.repeat = 2
 template.html(60): w129: You cannot reassign a variable.
 statement: t.maxRepeat = 1
            ^
-template.html(60): w116: You reached the maximum number of warnings, suppressing the rest.
 ~~~
 
 ### Expected result.expected == result.html
-### Expected stdout.expected == stdout
+### Expected stdout == empty
 ### Expected stderr.expected == stderr
 

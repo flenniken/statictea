@@ -192,7 +192,10 @@ MessageId = enum
   wSameAsResult,            ## w175
   wResultWithUpdate,        ## w176
   wSkipStopOrEmpty,         ## w177
-  wUpdateReadonly            ## w178
+  wUpdateReadonly,          ## w178
+  kNotEnoughArgsOpt,        ## w179
+  kTooManyArgsOpt,          ## w180
+  wNegativeLength            ## w181
 ```
 
 # Messages
@@ -324,7 +327,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Wrong parameter type, expected $1.", ## kWrongType
     "The required vararg parameter has no arguments.", ## kNoVarargArgs
     "Missing vararg parameter, expected groups of 2 got 1.", ## kNotEnoughVarargs
-    "Too many arguments, expected at most $1.", ## kTooManyArgs
+    "The function requires $1 arguments.", ## kTooManyArgs
     "Expected at least four parameters.", ## wAtLeast4Parameters
     "Expected number string.", ## wExpectedNumberString
     "A case condition is not the same type as the main condition.", ## wCaseTypeMismatch
@@ -375,7 +378,10 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The result and $1 files are the same.", ## wSameAsResult
     "The result file is used with the update option.", ## wResultWithUpdate
     "Expected \'skip\', \'stop\' or \'\' for the block command return value.", ## wSkipStopOrEmpty
-    "Cannot update the readonly template."]
+    "Cannot update the readonly template.", ## wUpdateReadonly
+    "The function requires at least $1 arguments.", ## kNotEnoughArgsOpt
+    "The function requires at most $1 arguments.", ## kTooManyArgsOpt
+    "The length must be a positive number."]
 ```
 
 
