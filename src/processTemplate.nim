@@ -356,6 +356,16 @@ proc updateTemplateTop*(env: var Env, args: Args) =
     env.resultStream.close()
     env.resultStream = nil
 
+    # Don't overwrite a read only template.
+    # If no write permissions, assume it is readonly.
+    let permissions = getFilePermissions(env.templateFilename)
+    let writeSet = {fpUserWrite, fpGroupWrite, fpOthersWrite}
+    let writeable = writeSet * permissions
+    if writeable.len == 0:
+      # Cannot update the readonly template.
+      env.warn(wUpdateReadonly)
+      return
+
     # Rename the temp result file overwriting the template file.
     try:
       moveFile(env.resultFilename, env.templateFilename)

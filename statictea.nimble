@@ -652,6 +652,8 @@ proc runRunStf() =
 
   let stf_filenames = get_stf_filenames()
   var failed = false
+  var numberRan = 0
+  var lastCmd: string
   for filename in stf_filenames:
     if name == "rt" or name.toLower in filename.toLower:
       # Run a stf file.
@@ -659,11 +661,18 @@ proc runRunStf() =
 export statictea='../../bin/statictea'; bin/runner -f=testfiles/$1""" % filename
       echo "Running: " & filename
       let result = staticExec cmd
+      lastCmd = cmd
+      inc(numberRan)
       if result != "":
         failed = true
         echo result
   if not failed:
     echo "Success"
+  # Show the command when running just one test that fails.
+  if numberRan == 1 and failed:
+    echo ""
+    echo "command line used:"
+    echo lastCmd
 
 proc runRunStfMain() =
   try:

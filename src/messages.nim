@@ -188,6 +188,7 @@ type
     wSameAsResult,         ## w175
     wResultWithUpdate,     ## w176
     wSkipStopOrEmpty,      ## w177
+    wUpdateReadonly,       ## w178
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -370,6 +371,6 @@ const
     "The result and $1 files are the same.", ## wSameAsResult
     "The result file is used with the update option.", ## wResultWithUpdate
     "Expected 'skip', 'stop' or '' for the block command return value.", ## wSkipStopOrEmpty
-
+    "Cannot update the readonly template.", ## wUpdateReadonly
     ]
     ## The message text.

@@ -55,6 +55,7 @@ This folder contains stf test files for statictea.
 * [truefalsenull](../testfiles/truefalsenull.stf.md) &mdash; Test json true, false and null.
 * [update-and-result](../testfiles/update-and-result.stf.md) &mdash; Test the update option and specify a result file.
 * [update-and-stdin](../testfiles/update-and-stdin.stf.md) &mdash; Test update when stdin is used for the template.
+* [update-readonly](../testfiles/update-readonly.stf.md) &mdash; Test update with a read only template.
 * [update-template](../testfiles/update-template.stf.md) &mdash; Test updating a template with the update option.
 * [update1](../testfiles/update1.stf.md) &mdash; Update the replace block in a template.
 * [warn-basics](../testfiles/warn-basics.stf.md) &mdash; Test the warn function.

@@ -1083,7 +1083,7 @@ result:
 :CUSTOM_ID: tversion
 :END:
 
-The readonly t.version variable contains the current version
+The read only t.version variable contains the current version
 number of StaticTea. See the [[#cmpversion][cmpVersion]] function for more
 information.
 

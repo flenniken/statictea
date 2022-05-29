@@ -280,9 +280,6 @@ proc addExtraStreams*(env: var Env, args: Args): Option[WarningData] =
 
   result = addExtraStreams(env, templateFilename, resultFilename)
 
-# todo: test with template of "stdin" when update is specified.
-# todo: test update when the template is readonly.
-
 proc addExtraStreamsForUpdate*(env: var Env, args: Args):
     Option[WarningData] =
   ## For the update case, add the template and result streams to the
