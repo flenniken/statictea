@@ -74,8 +74,6 @@ import std/re
 import std/options
 import std/tables
 
-# todo: add optional parameter to specify regex flags.
-
 const
   maxGroups = 10
     ## The maximum number of groups supported in the matchPattern

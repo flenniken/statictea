@@ -19,8 +19,6 @@ import messages
 const
   singleCodes = {'i', 'f', 's', 'l', 'd', 'a'}
 
-# todo: support list types, li, lf, ls, ll, ld, la or IFSLDA
-
 type
   ParamCode* = char
     ## Parameter type, one character of "ifslda" corresponding to int,

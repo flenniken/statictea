@@ -800,8 +800,6 @@ func funFind*(parameters: seq[Value]): FunResult =
   else:
     result = newFunResult(newValue(pos))
 
-# todo: support slice with lists and dictionaries.
-
 func funSlice*(parameters: seq[Value]): FunResult =
   ## Extract a substring from a string by its position and length. You
   ## @:pass the string, the substring's start index and its length.  The

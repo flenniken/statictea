@@ -189,8 +189,6 @@ proc stringSegment*(line: string, start: Natural, finish: Natural): string =
 
   result = "$1,$2$3" % [$ord(segmentType), line[start ..< finish], ending]
 
-# todo: don't allow spaces around the dotNameStr inside the brackets?
-
 proc varSegment*(bracketedVar: string, dotNameStrPos: Natural,
                  dotNameStrLen: Natural, atEnd: bool): string =
   ## Return a variable segment. The bracketedVar is a string starting
@@ -215,7 +213,6 @@ proc varSegment*(bracketedVar: string, dotNameStrPos: Natural,
     segmentValue = $ord(variable)
   result.add("{segmentValue},{dotNameStrPos:<4},{dotNameStrLen:<4},{bracketedVar}\n".fmt)
 
-# todo: require no space around the variable. {var} not {  var  }.
 proc lineToSegments*(line: string): seq[string] =
   ## Convert a line to a list of segments.
 
