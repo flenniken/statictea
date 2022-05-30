@@ -21,10 +21,31 @@ proc parsePrepost*(str: string): Option[Prepost] =
     result = some(newPrepost(prefix, postfix))
 
 func mapCmlMessages(messageId: CmlMessageId): MessageId =
-  when high(CmlMessageId) != cml_12_AlreadyHaveOneParameter:
+  ## Map a cml message to a MessageId.
+  # The cml messages were added to the message list in order. This
+  # makes it easy to map one message number to the other.  If new
+  # cml messages are added, you need to change this code.
+  when high(CmlMessageId) != cml_12_AlreadyHaveOneArg:
     debugEcho "Update mapCmlMessages"
     fail
-  result = MessageId(ord(messageId) + 157)
+  result = MessageId(ord(messageId) + ord(wCmlBareTwoDashes))
+
+  # Here are the matching messages.  They are here so when you grep
+  # for one of them you end up here.
+
+  # [cml_00_BareTwoDashes, wCmlBareTwoDashes],
+  # [cml_01_InvalidOption, wCmlInvalidOption],
+  # [cml_02_OptionRequiresArg, wCmlOptionRequiresArg],
+  # [cml_03_BareOneDash, wCmlBareOneDash],
+  # [cml_04_InvalidShortOption, wCmlInvalidShortOption],
+  # [cml_05_ShortParamInList, wCmlShortParamInList],
+  # [cml_06_DupShortOption, wCmlDupShortOption],
+  # [cml_07_DupLongOption, wCmlDupLongOption],
+  # [cml_08_BareShortName, wCmlBareShortName],
+  # [cml_09_AlphaNumericShort, wCmlAlphaNumericShort],
+  # [cml_10_MissingArgument, wCmlMissingArgument],
+  # [cml_11_TooManyBareArgs, wCmdTooManyBareArgs],
+  # [cml_12_AlreadyHaveOneArg, wCmlAlreadyHaveOneArg],
 
 proc mySameFile(filename1: string, filename2: string): bool =
   ## Return true when the two files are the same file.

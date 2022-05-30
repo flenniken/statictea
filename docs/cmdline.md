@@ -48,7 +48,7 @@ dictionary.
 
 CmlArgs holds the parsed command line arguments in an ordered
 dictionary. The keys are the supported options found on the
-command line and each value is a list of associated parameters.
+command line and each value is a list of associated arguments.
 An option without parameters will have an empty list.
 
 ```nim
@@ -67,11 +67,11 @@ that is a major version change.
 
 ```nim
 CmlMessageId = enum
-  cml_00_BareTwoDashes, cml_01_InvalidOption, cml_02_OptionRequiresParam,
+  cml_00_BareTwoDashes, cml_01_InvalidOption, cml_02_OptionRequiresArg,
   cml_03_BareOneDash, cml_04_InvalidShortOption, cml_05_ShortParamInList,
   cml_06_DupShortOption, cml_07_DupLongOption, cml_08_BareShortName,
-  cml_09_AlphaNumericShort, cml_10_MissingParameter,
-  cml_11_TooManyBareParameters, cml_12_AlreadyHaveOneParameter
+  cml_09_AlphaNumericShort, cml_10_MissingArgument, cml_11_TooManyBareArgs,
+  cml_12_AlreadyHaveOneArg
 ```
 
 # ArgsOrMessageKind

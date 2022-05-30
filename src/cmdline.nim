@@ -32,7 +32,7 @@ type
   CmlArgs* = OrderedTable[string, seq[string]]
     ## CmlArgs holds the parsed command line arguments in an ordered
     ## @:dictionary. The keys are the supported options found on the
-    ## @:command line and each value is a list of associated parameters.
+    ## @:command line and each value is a list of associated arguments.
     ## @:An option without parameters will have an empty list.
 
   CmlMessageId* = enum
@@ -45,7 +45,7 @@ type
     ## @:that is a major version change.
     cml_00_BareTwoDashes,
     cml_01_InvalidOption,
-    cml_02_OptionRequiresParam,
+    cml_02_OptionRequiresArg,
     cml_03_BareOneDash,
     cml_04_InvalidShortOption,
     cml_05_ShortParamInList,
@@ -53,9 +53,9 @@ type
     cml_07_DupLongOption,
     cml_08_BareShortName,
     cml_09_AlphaNumericShort,
-    cml_10_MissingParameter,
-    cml_11_TooManyBareParameters,
-    cml_12_AlreadyHaveOneParameter,
+    cml_10_MissingArgument,
+    cml_11_TooManyBareArgs,
+    cml_12_AlreadyHaveOneArg,
 
   ArgsOrMessageKind* = enum
     ## The kind of an ArgsOrMessage object, either args or a message.
@@ -257,7 +257,7 @@ func cmdLine*(options: openArray[CmlOption],
       else:
         # _11_, Extra bare parameter.
         if bareIx >= bareParameterNames.len:
-          return newArgsOrMessage(cml_11_TooManyBareParameters)
+          return newArgsOrMessage(cml_11_TooManyBareArgs)
 
         let name = bareParameterNames[bareIx]
         addArg(args, name, parameter)
@@ -302,7 +302,7 @@ func cmdLine*(options: openArray[CmlOption],
       of cmlOptionalParameter, cmlParameter0or1, cmlParameterOnce:
         if args.optionCount(option.long) > 0:
           # _12_, Already have one '$1' parameter.
-          return newArgsOrMessage(cml_12_AlreadyHaveOneParameter, $option.long)
+          return newArgsOrMessage(cml_12_AlreadyHaveOneArg, $option.long)
         if option.optionType == cmlOptionalParameter:
           state = optionalParameter
         else:
@@ -322,7 +322,7 @@ func cmdLine*(options: openArray[CmlOption],
     of needParameter:
       if parameter.startsWith("-"):
         # _02_, The option '$1' needs a parameter.
-        return newArgsOrMessage(cml_02_OptionRequiresParam, optionName)
+        return newArgsOrMessage(cml_02_OptionRequiresArg, optionName)
       addArg(args, optionName, parameter)
       state = start
       inc(ix)
@@ -355,11 +355,11 @@ func cmdLine*(options: openArray[CmlOption],
 
   if state == needParameter:
     # _02_, The option '$1' needs a parameter.
-    return newArgsOrMessage(cml_02_OptionRequiresParam, optionName)
+    return newArgsOrMessage(cml_02_OptionRequiresArg, optionName)
 
   if bareIx < bareParameterNames.len:
     # _10_, Missing bare parameter: '$1'.
-    return newArgsOrMessage(cml_10_MissingParameter,
+    return newArgsOrMessage(cml_10_MissingArgument,
       bareParameterNames[bareIx])
 
   if state == optionalParameter:
@@ -370,7 +370,7 @@ func cmdLine*(options: openArray[CmlOption],
     if option.optionType == cmlParameterOnce:
       if not (option.long in args):
         # _02_, The option '$1' needs a parameter.
-        return newArgsOrMessage(cml_02_OptionRequiresParam, option.long)
+        return newArgsOrMessage(cml_02_OptionRequiresArg, option.long)
 
   result = newArgsOrMessage(args)
 

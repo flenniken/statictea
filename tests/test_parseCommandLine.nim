@@ -216,7 +216,7 @@ suite "parseCommandLine":
   test "parseCommandLine-two-templates":
     let cmd = "-t tea.html -t tea2.html -r result"
     check parseWarning(cmd, newWarningData(
-      wCmlAlreadyHaveOneParameter, "template"))
+      wCmlAlreadyHaveOneArg, "template"))
 
   # You cannot test quotes here. The quote processing happens before sending to the parser.
   # test "parseCommandLine-quotes1":
@@ -239,7 +239,7 @@ suite "parseCommandLine":
   # Test some error cases.
 
   test "parseCommandLine-no-filename":
-    check parseWarning("-s", newWarningData(wCmlOptionRequiresParam, "server"))
+    check parseWarning("-s", newWarningData(wCmlOptionRequiresArg, "server"))
 
   test "parseCommandLine-no-switch":
     check parseWarning("-w", newWarningData(wCmlInvalidShortOption, "w"))
@@ -248,14 +248,14 @@ suite "parseCommandLine":
     check parseWarning("--hello", newWarningData(wCmlInvalidOption, "hello"))
 
   test "parseCommandLine-no-arg":
-    check parseWarning("bare", newWarningData(wCmlTooManyBareParameters))
+    check parseWarning("bare", newWarningData(wCmdTooManyBareArgs))
 
   test "parseCommandLine-missing-result":
-    check parseWarning("-r", newWarningData(wCmlOptionRequiresParam, "result"))
+    check parseWarning("-r", newWarningData(wCmlOptionRequiresArg, "result"))
 
   test "parseCommandLine-two-results":
     check parseWarning("-r result.html -r asdf.html",
-      newWarningData(wCmlAlreadyHaveOneParameter, "result"))
+      newWarningData(wCmlAlreadyHaveOneArg, "result"))
 
   test "template same as result":
     let filename = "tea.html"

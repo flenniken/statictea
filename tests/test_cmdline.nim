@@ -314,7 +314,7 @@ suite "cmdline.nim":
     # check testCmdlineMessage(options, "-l -l",
     # check testCmdlineMessage(options, "-l --log",
     check testCmdlineMessage(options, "-l abc --log def",
-      cml_12_AlreadyHaveOneParameter, "log")
+      cml_12_AlreadyHaveOneArg, "log")
 
   test "cml_00_BareTwoDashes":
     var options = newSeq[CmlOption]()
@@ -337,18 +337,18 @@ suite "cmdline.nim":
     check testCmdlineMessage(options, "-t --tea -l", cml_01_InvalidOption, "tea")
     check testCmdlineMessage(options, "-t -l --tea", cml_01_InvalidOption, "tea")
 
-  test "cml_02_OptionRequiresParam":
+  test "cml_02_OptionRequiresArg":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("many", 'm', cmlParameterMany))
     options.add(newCmlOption("log", 'l', cmlNoParameter))
     options.add(newCmlOption("once", 'o', cmlParameterOnce))
 
-    check testCmdlineMessage(options, "--many -l", cml_02_OptionRequiresParam, "many")
-    check testCmdlineMessage(options, "--many --log", cml_02_OptionRequiresParam,
+    check testCmdlineMessage(options, "--many -l", cml_02_OptionRequiresArg, "many")
+    check testCmdlineMessage(options, "--many --log", cml_02_OptionRequiresArg,
       "many")
-    check testCmdlineMessage(options, "--log --many", cml_02_OptionRequiresParam,
+    check testCmdlineMessage(options, "--log --many", cml_02_OptionRequiresArg,
       "many")
-    check testCmdlineMessage(options, "--many a", cml_02_OptionRequiresParam,
+    check testCmdlineMessage(options, "--many a", cml_02_OptionRequiresArg,
       "once")
 
   test "cml_03_BareOneDash":
@@ -393,53 +393,53 @@ suite "cmdline.nim":
     options.add(newCmlOption("tea", '*', cmlParameterMany))
     check testCmdlineMessage(options, "-l", cml_09_AlphaNumericShort, "*")
 
-  test "cml_10_MissingParameter":
+  test "cml_10_MissingArgument":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("tea", '_', cmlBareParameter))
     options.add(newCmlOption("log", 'l', cmlNoParameter))
-    check testCmdlineMessage(options, "-l", cml_10_MissingParameter, "tea")
+    check testCmdlineMessage(options, "-l", cml_10_MissingArgument, "tea")
 
-  test "cml_10_MissingParameters":
+  test "cml_10_MissingArguments":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("tea", '_', cmlBareParameter))
     options.add(newCmlOption("tea2", '_', cmlBareParameter))
     options.add(newCmlOption("log", 'l', cmlNoParameter))
     options.add(newCmlOption("help", 'h', cmlNoParameter))
 
-    check testCmdlineMessage(options, "-l -h", cml_10_MissingParameter, "tea")
-    check testCmdlineMessage(options, "-lh -l", cml_10_MissingParameter, "tea")
-    check testCmdlineMessage(options, "--log --help", cml_10_MissingParameter, "tea")
+    check testCmdlineMessage(options, "-l -h", cml_10_MissingArgument, "tea")
+    check testCmdlineMessage(options, "-lh -l", cml_10_MissingArgument, "tea")
+    check testCmdlineMessage(options, "--log --help", cml_10_MissingArgument, "tea")
 
-    check testCmdlineMessage(options, "-l bare", cml_10_MissingParameter, "tea2")
-    check testCmdlineMessage(options, "-lh bare", cml_10_MissingParameter, "tea2")
-    check testCmdlineMessage(options, "bare --help", cml_10_MissingParameter, "tea2")
+    check testCmdlineMessage(options, "-l bare", cml_10_MissingArgument, "tea2")
+    check testCmdlineMessage(options, "-lh bare", cml_10_MissingArgument, "tea2")
+    check testCmdlineMessage(options, "bare --help", cml_10_MissingArgument, "tea2")
 
-  test "cml_11_TooManyBareParameters":
+  test "cml_11_TooManyBareArgs":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("log", 'l', cmlNoParameter))
-    check testCmdlineMessage(options, "--log statictea.log", cml_11_TooManyBareParameters)
+    check testCmdlineMessage(options, "--log statictea.log", cml_11_TooManyBareArgs)
 
-  test "cml_12_AlreadyHaveOneParameter":
+  test "cml_12_AlreadyHaveOneArg":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("log", 'l', cmlParameterOnce))
 
     check testCmdlineMessage(options, "--log statictea.log --log hello",
-      cml_12_AlreadyHaveOneParameter, "log")
+      cml_12_AlreadyHaveOneArg, "log")
     check testCmdlineMessage(options, "-l statictea.log -l hello",
-      cml_12_AlreadyHaveOneParameter, "log")
+      cml_12_AlreadyHaveOneArg, "log")
     check testCmdlineMessage(options, "-l statictea.log --log hello",
-      cml_12_AlreadyHaveOneParameter, "log")
+      cml_12_AlreadyHaveOneArg, "log")
     check testCmdlineMessage(options, "--log statictea.log -l hello",
-      cml_12_AlreadyHaveOneParameter, "log")
+      cml_12_AlreadyHaveOneArg, "log")
 
-  test "cml_12_AlreadyHaveOneParameter 0 or 1":
+  test "cml_12_AlreadyHaveOneArg 0 or 1":
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("log", 'l', cmlParameter0or1))
 
     check testCmdlineMessage(options, "--log statictea.log --log hello",
-      cml_12_AlreadyHaveOneParameter, "log")
+      cml_12_AlreadyHaveOneArg, "log")
     check testCmdlineMessage(options, "-l statictea.log -l hello",
-      cml_12_AlreadyHaveOneParameter, "log")
+      cml_12_AlreadyHaveOneArg, "log")
 
   test "CmlMessageId":
     check ord(low(CmlMessageId)) == 0
@@ -450,7 +450,7 @@ suite "cmdline.nim":
     let expected = @ [
       cml_00_BareTwoDashes,
       cml_01_InvalidOption,
-      cml_02_OptionRequiresParam,
+      cml_02_OptionRequiresArg,
       cml_03_BareOneDash,
       cml_04_InvalidShortOption,
       cml_05_ShortParamInList,
@@ -458,9 +458,9 @@ suite "cmdline.nim":
       cml_07_DupLongOption,
       cml_08_BareShortName,
       cml_09_AlphaNumericShort,
-      cml_10_MissingParameter,
-      cml_11_TooManyBareParameters,
-      cml_12_AlreadyHaveOneParameter,
+      cml_10_MissingArgument,
+      cml_11_TooManyBareArgs,
+      cml_12_AlreadyHaveOneArg,
     ]
 
     var ix = 0

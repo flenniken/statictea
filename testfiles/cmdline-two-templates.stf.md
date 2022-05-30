@@ -14,7 +14,7 @@ $statictea -t tmpl.txt -t tmpl2.txt \
 ### File stderr.expected
 
 ~~~
-unnamed(0): w169: Already have one 'template' parameter.
+unnamed(0): w169: Already have one 'template' argument.
 ~~~
 
 ### Expected stdout == empty

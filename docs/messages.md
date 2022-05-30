@@ -173,7 +173,7 @@ MessageId = enum
   wDictStringKey,           ## w156
   wCmlBareTwoDashes,        ## w157
   wCmlInvalidOption,        ## w158
-  wCmlOptionRequiresParam,  ## w159
+  wCmlOptionRequiresArg,    ## w159
   wCmlBareOneDash,          ## w160
   wCmlInvalidShortOption,   ## w161
   wCmlShortParamInList,     ## w162
@@ -182,8 +182,8 @@ MessageId = enum
   wCmlBareShortName,        ## w165
   wCmlAlphaNumericShort,    ## w166
   wCmlMissingParameter,     ## w167
-  wCmlTooManyBareParameters, ## w168
-  wCmlAlreadyHaveOneParameter, ## w169
+  wCmdTooManyBareArgs,      ## w168
+  wCmlAlreadyHaveOneArg,    ## w169
   wMissingCommaBracket,     ## w170
   wUserMessage,             ## w171
   wMissingDictIndex,        ## w172
@@ -361,16 +361,20 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The start position is less than 0.", ## wStartPosTooSmall
     "Dictionaries require an even number of list items.", ## wDictRequiresEven
     "The dictionary keys must be strings.", ## wDictStringKey
-    "Two dashes must be followed by an option name.",
-    "The option \'--$1\' is not supported.",
-    "The option \'$1\' requires a parameter.",
-    "One dash must be followed by a short option name.",
-    "The short option \'-$1\' is not supported.",
-    "The option \'-$1\' needs a parameter; use it by itself.",
-    "Duplicate short option: \'-$1\'.", "Duplicate long option: \'--$1\'.",
-    "Use the short name \'_\' instead of \'$1\' with a bare parameter.", "Use an alphanumeric ascii character for a short option name instead of \'$1\'.",
-    "Missing \'$1\' parameter.", "Extra bare parameter.",
-    "Already have one \'$1\' parameter.", "Missing comma or right bracket.", ## wMissingCommaBracket
+    "Two dashes must be followed by an option name.", ## wCmlBareTwoDashes
+    "The option \'--$1\' is not supported.", ## wCmlInvalidOption
+    "The option \'$1\' requires an argument.", ## wCmlOptionRequiresArg
+    "One dash must be followed by a short option name.", ## wCmlBareOneDash
+    "The short option \'-$1\' is not supported.", ## wCmlInvalidShortOption
+    "The option \'-$1\' needs an argument; use it by itself.", ## wCmlShortParamInList
+    "Duplicate short option: \'-$1\'.", ## wCmlDupShortOption
+    "Duplicate long option: \'--$1\'.", ## wCmlDupLongOption
+    "Use the short name \'_\' instead of \'$1\' with a bare argument.", ## wCmlBareShortName
+    "Use an alphanumeric ascii character for a short option name instead of \'$1\'.", ## wCmlAlphaNumericShort
+    "Missing \'$1\' argument.", ## wCmlMissingArgument
+    "Extra bare argument.", ## wCmdTooManyBareArgs
+    "Already have one \'$1\' argument.", ## wCmlAlreadyHaveOneArg
+    "Missing comma or right bracket.", ## wMissingCommaBracket
     "$1",                   ## wUserMessage
     "The dictionary does not have an item with index $1.", ## wMissingDictIndex
     "The maximum JSON depth of $1 was exceeded.", ## wMaxDepthExceeded
