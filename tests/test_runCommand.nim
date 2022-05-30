@@ -510,7 +510,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "parameter error position":
     let text = """result = case(33, 2, 22, "abc", 11, len(concat()))"""
     let statement = newStatement(text, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr(kNotEnoughArgs, "2", 47)
+    let eVariableDataOr = newVariableDataOr(wNotEnoughArgs, "2", 47)
     check testRunStatement(statement, eVariableDataOr)
 
   test "assignTeaVariable missing":
@@ -564,13 +564,13 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "cmpVersion two parameters":
     let statement = newStatement(
       text="""cmp = cmpVersion("1.2.3")""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr(kNotEnoughArgs, "2", 17)
+    let eVariableDataOr = newVariableDataOr(wNotEnoughArgs, "2", 17)
     check testRunStatement(statement, eVariableDataOr)
 
   test "cmpVersion strings":
     let statement = newStatement(text="""cmp = cmpVersion("1.2.3", 3.5)""",
       lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr(kWrongType, "string", 26)
+    let eVariableDataOr = newVariableDataOr(wWrongType, "string", 26)
     check testRunStatement(statement, eVariableDataOr)
 
   test "getFragmentAndPos":
@@ -761,7 +761,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "warn extra parameter":
     let text = """a = warn("hello", 4)"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(kTooManyArgs, "1", 18)
+    let eVariableDataOr = newVariableDataOr(wTooManyArgs, "1", 18)
     check testRunStatement(statement, eVariableDataOr)
 
   test "if1 no second":
@@ -827,7 +827,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "slice wrong type":
     let text = """a = slice("abc", 2, "b")"""
     let statement = newStatement(text, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr(kWrongType, "int", 20)
+    let eVariableDataOr = newVariableDataOr(wWrongType, "int", 20)
     check testRunStatement(statement, eVariableDataOr)
 
   test "slice missing comma":

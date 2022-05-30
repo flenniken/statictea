@@ -1423,7 +1423,6 @@ example messages:
 
 - tea.html(0): w15: "Unable to parse the json file. Skipping file: test.json.
 - tea.html(45): w61: No space after the command.
-- tea.html(121): w52: The get function takes 2 or 3 parameters.
 
 Statement errors generate multi-line messages showing the
 statement and problem location, for example:
@@ -1497,7 +1496,7 @@ if0(len(s.items), warn("no items"))
    :END:
 
 The if0 and if1 functions are special in a couple of ways. They
-conditionally evaluate their parameters and they can be used in a
+conditionally evaluate their arguments and they can be used in a
 statement bare without an assignment.
 
 You use the bare form with the warn and return functions for
@@ -1507,7 +1506,7 @@ The if functions evaluate the condition parameter first to
 determine which parameter to evaluate next and the non-matching
 parameter is skipped.  This is important when you use the warn or
 return functions to control the statement flow.  The other
-functions evaluate all their parameters before passing them to the
+functions evaluate all their arguments before passing them to the
 function.
 
 In the following example do1 is executed and doOther is skipped.
@@ -1516,7 +1515,7 @@ In the following example do1 is executed and doOther is skipped.
 a = if1(1, do1(), doOther())
 #+END_SRC
 
-The next example has a warn call in it.  If all the parameters
+The next example has a warn call in it.  If all the arguments
 were evaluated, the warn would run everytime.
 
 #+BEGIN_SRC

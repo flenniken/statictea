@@ -106,12 +106,12 @@ proc outputWarning*(env: var Env, lineNum: Natural, message: string) =
   inc(env.warningsWritten)
 
   if env.warningsWritten == maxWarningsWritten:
-    # Reached the maximum number of warnings, suppressing the rest.
     var filename = env.templateFilename
     if filename == "":
       filename = "unnamed"
 
-    let message = getWarningLine(filename, lineNum, kMaxWarnings)
+    # You reached the maximum number of warnings, suppressing the rest.
+    let message = getWarningLine(filename, lineNum, wMaxWarnings)
     env.errStream.writeLine(message)
     inc(env.warningsWritten)
 

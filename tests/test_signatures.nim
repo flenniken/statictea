@@ -161,30 +161,30 @@ suite "signatures.nim":
 
   test "mapParameters not enough args":
     var parameters: seq[Value] = @[]
-    check testMapParametersW("ii", parameters, 0, kNotEnoughArgs, "1")
+    check testMapParametersW("ii", parameters, 0, wNotEnoughArgs, "1")
 
     parameters = @[newValue(1)]
-    check testMapParametersW("iii", parameters, 0, kNotEnoughArgs, "2")
+    check testMapParametersW("iii", parameters, 0, wNotEnoughArgs, "2")
 
   test "mapParameters too many args":
     var parameters = @[newValue(1), newValue(2)]
-    check testMapParametersW("ii", parameters, 1, kTooManyArgs, "1")
+    check testMapParametersW("ii", parameters, 1, wTooManyArgs, "1")
 
     parameters = @[newValue(1), newValue(2), newValue(3)]
-    check testMapParametersW("iii", parameters, 2, kTooManyArgs, "2")
+    check testMapParametersW("iii", parameters, 2, wTooManyArgs, "2")
 
   test "mapParameters wrong kind":
     var parameters = @[newValue(1)]
-    check testMapParametersW("fi", parameters, 0, kWrongType, "float")
+    check testMapParametersW("fi", parameters, 0, wWrongType, "float")
 
     parameters = @[newValue(1), newValue(2)]
-    check testMapParametersW("ifi", parameters, 1, kWrongType, "float")
+    check testMapParametersW("ifi", parameters, 1, wWrongType, "float")
 
     parameters = @[newValue(1)]
-    check testMapParametersW("ofi", parameters, 0, kWrongType, "float")
+    check testMapParametersW("ofi", parameters, 0, wWrongType, "float")
 
     parameters = @[newValue(1), newValue(2)]
-    check testMapParametersW("oifi", parameters, 1, kWrongType, "float")
+    check testMapParametersW("oifi", parameters, 1, wWrongType, "float")
 
   test "mapParameters sort int, float, string":
     var parameters = @[newEmptyListValue(), newValue("ascending")]

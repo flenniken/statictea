@@ -124,14 +124,14 @@ type
     wKeyValueKindDiff,     ## w113
     wSubListsEmpty,        ## w114
     wSubListsDiffTypes,    ## w115
-    kMaxWarnings,          ## w116
-    kInvalidSignature,     ## w117
-    kInvalidParamType,     ## w118
-    kNotEnoughArgs,        ## w119
-    kWrongType,            ## w120
-    kNoVarargArgs,         ## w121
-    kNotEnoughVarargs,     ## w122
-    kTooManyArgs,          ## w123
+    wMaxWarnings,          ## w116
+    wInvalidSignature,     ## w117
+    wInvalidParmType,     ## w118
+    wNotEnoughArgs,        ## w119
+    wWrongType,            ## w120
+    wNoVarargArgs,         ## w121
+    wNotEnoughVarargs,     ## w122
+    wTooManyArgs,          ## w123
     wAtLeast4Parameters,   ## w124
     wExpectedNumberString, ## w125
     wCaseTypeMismatch,     ## w126
@@ -189,8 +189,8 @@ type
     wResultWithUpdate,     ## w176
     wSkipStopOrEmpty,      ## w177
     wUpdateReadonly,       ## w178
-    kNotEnoughArgsOpt,     ## w179
-    kTooManyArgsOpt,       ## w180
+    wNotEnoughArgsOpt,     ## w179
+    wTooManyArgsOpt,       ## w180
     wNegativeLength,       ## w181
 
 const
@@ -311,14 +311,14 @@ const
     "The sort key values are different types.", ## wKeyValueKindDiff
     "A sublist is empty.", ## wSubListsEmpty
     "The first item in the sublists are different types.", ## wSubListsDiffTypes
-    "You reached the maximum number of warnings, suppressing the rest.", ## kMaxWarnings
-    "Invalid signature string.", ## kInvalidSignature
-    "", ## kInvalidParamType
-    "Not enough arguments, expected $1.", ## kNotEnoughArgs
-    "Wrong argument type, expected $1.", ## kWrongType
-    "", ## kNoVarargArgs
-    "", ## kNotEnoughVarargs
-    "The function requires $1 arguments.", ## kTooManyArgs
+    "You reached the maximum number of warnings, suppressing the rest.", ## wMaxWarnings
+    "", ## wInvalidSignature
+    "", ## wInvalidParmType
+    "Not enough arguments, expected $1.", ## wNotEnoughArgs
+    "Wrong argument type, expected $1.", ## wWrongType
+    "", ## wNoVarargArgs
+    "", ## wNotEnoughVarargs
+    "The function requires $1 arguments.", ## wTooManyArgs
     "", ## wAtLeast4Parameters
     "Expected number string.", ## wExpectedNumberString
     "A case condition is not the same type as the main condition.", ## wCaseTypeMismatch
@@ -375,8 +375,8 @@ const
     "The result file is used with the update option.", ## wResultWithUpdate
     "Expected 'skip', 'stop' or '' for the block command return value.", ## wSkipStopOrEmpty
     "Cannot update the readonly template.", ## wUpdateReadonly
-    "The function requires at least $1 arguments.", ## kNotEnoughArgsOpt
-    "The function requires at most $1 arguments.", ## kTooManyArgsOpt
+    "The function requires at least $1 arguments.", ## wNotEnoughArgsOpt
+    "The function requires at most $1 arguments.", ## wTooManyArgsOpt
     "The length must be a positive number.", ## wNegativeLength
     ]
     ## The message text.
