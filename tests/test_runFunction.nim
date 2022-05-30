@@ -993,9 +993,11 @@ suite "runFunction.nim":
     check testReplaceReGoodList("@:* test", newValue(["@:\\*", "-"]), "- test")
     check testReplaceReGoodList("""* "round""", newValue(["\\* \"", "- \""]), "- \"round")
 
-  # todo: runtime error. catch all these type of runtime errors in replace.
-  # test "replaceRe error":
-  #   check testReplaceReGood("* test", r"^*", "-", "- test")
+  test "replaceRe runtime error":
+    # check testReplaceReGoodList("* test", newValue([r"^*", "-"]), "- test")
+    let eFunResult = newFunResultWarn(wReplaceMany, 1)
+    var parameters = @[newValue("* test"), newValue([r"^*", "-"])]
+    check testFunction("replaceRe", parameters, eFunResult)
 
   test "replaceRe good list":
     check testReplaceReGoodList("abc123abc", newValue(["abc", "456"]), "456123456")

@@ -1026,8 +1026,15 @@ func replaceReMap(map: VarsDict): FunResult =
   for ix in countUp(0, list.len-1, 2):
     replacements.add(newReplacement(list[ix].stringv, list[ix+1].stringv))
 
-  let resultStringO = replaceMany(str, replacements)
+  var resultStringO: Option[string]
+  try:
+    resultStringO = replaceMany(str, replacements)
+  except:
+    # You cannot get the msg because it has side effects.
+    # debugEcho getCurrentExceptionMsg()
+    discard
   if not resultStringO.isSome:
+    # The replaceMany function failed.
     return newFunResultWarn(wReplaceMany, 1)
 
   result = newFunResult(newValue(resultStringO.get()))

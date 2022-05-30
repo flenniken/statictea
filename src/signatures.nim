@@ -16,9 +16,6 @@ import messages
 # const argument = 'foo';
 # myFunction(argument);
 
-
-# todo: use the correct term, parameter or argument in the messages.
-
 const
   singleCodes = {'i', 'f', 's', 'l', 'd', 'a'}
 
