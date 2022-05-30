@@ -11,7 +11,8 @@ proc testMain(argv: seq[string],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[],
     eResultLines: seq[string] = @[],
-    eHelpLineCount: int = -1
+    eHelpLineCount: int = -1,
+    echoLogLines = false
   ): bool =
   var env = openEnvTest("_testMain")
 
@@ -20,6 +21,10 @@ proc testMain(argv: seq[string],
   let rc = if env.warningsWritten > 0: 1 else: 0
 
   let (logLines, errLines, outLines, resultLines, _) = env.readCloseDeleteEnv()
+
+  if echoLogLines:
+    for line in logLines:
+      stdout.write(line)
 
   result = true
   if not compareLogLines(logLines, eLogLines):
@@ -54,7 +59,8 @@ XXXX-XX-XX XX:XX:XX.XXX; statictea.nim(XX); Version: X.X.X
     var eLogLines = splitNewLines(logLines)
     let eOutLines = @[staticteaVersion & "\n"]
     let argv = @["-v"]
-    check testMain(argv, 0, eOutLines = eOutLines, eLogLines = eLogLines)
+    check testMain(argv, 0, eOutLines = eOutLines, eLogLines =
+        eLogLines, echoLogLines = false)
 
   test "main help":
     let argv = @["-h"]

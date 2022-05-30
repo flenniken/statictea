@@ -248,8 +248,8 @@ proc readJsonFileLog*(env: var Env, filename: string): ValueOr =
 
   # Log the filename and size.
   let fileSize = file.getFileSize()
-  env.log("filename: $1\n" % filename)
-  env.log("fileSize: $1\n" % $fileSize)
+  env.log("Json filename: $1\n" % filename)
+  env.log("Json file size: $1\n" % $fileSize)
 
   result = readJsonStream(stream)
 

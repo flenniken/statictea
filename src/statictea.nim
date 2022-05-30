@@ -11,6 +11,7 @@ import env
 import opresultwarn
 when isMainModule:
   import std/os
+  import timer
 
 proc processArgs(env: var Env, args: Args) =
   if args.help:
@@ -63,11 +64,13 @@ proc main*(env: var Env, argv: seq[string]) =
 
 when isMainModule:
   proc run(): int =
+    var timer = newTimer()
     var env = openEnv()
     main(env, commandLineParams())
     env.log("Warnings: $1\n" % [$env.warningsWritten])
     if env.warningsWritten > 0:
       result = 1
+    env.log("Duration: $1\n" % $timer.seconds())
     env.close()
 
   quit(if run() == 0: QuitSuccess else: QuitFailure)

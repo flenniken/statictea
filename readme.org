@@ -1377,7 +1377,7 @@ The StaticTea command line options:
   multiple prepost options. When you specify a value, the
   defaults are no longer used. See the [[#prefix-postfix][Prefix
   Postfix]] section.
-- log - log to a file, see [[#log-file][Log File]] section.
+- log - log to a file, see [[#logging][Logging]] section.
 
 [[#contents][茶]]
 
@@ -1665,7 +1665,7 @@ Logging is off by default. You turn it on with the log option.
 If you don't specify a filename, the log lines are written to the
 platform default location:
 
-- Mac: ~/Library/log/statictea.log
+- Mac: ~/Library/Logs/statictea.log
 - Other: ~/statictea.log
 
 You can specify a full path. If you don't include path

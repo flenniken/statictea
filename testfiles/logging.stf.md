@@ -12,8 +12,11 @@ $statictea -l log.txt -s hello.json -t hello.html >stdout 2>stderr
 
 ### File log.sh command
 
+Remove the time and filename from the start of the log lines.
+Ignore the duration line.
+
 ~~~
-cat log.txt | sed 's/^.*); //' >log.filtered
+cat log.txt | sed 's/^.*); //' | grep -v "Duration: " >log.filtered
 ~~~
 
 ### File hello.html
@@ -40,11 +43,12 @@ hello world
 ~~~
 Starting: argv: @["-l", "log.txt", "-s", "hello.json", "-t", "hello.html"]
 Version: 0.1.0
-filename: hello.json
-fileSize: 18
+Json filename: hello.json
+Json file size: 18
 Warnings: 0
 ~~~
 
 ### Expected stdout == stdout.expected
 ### Expected stderr == empty
 ### Expected log.filtered == log.filtered.expected
+Expected log.txt == empty
