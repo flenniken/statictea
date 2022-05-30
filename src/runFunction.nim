@@ -151,6 +151,7 @@ func funCmp_ssoii*(parameters: seq[Value]): FunResult =
     of 1:
       insensitive = true
     else:
+      # The argument must be 0 or 1.
       return newFunResultWarn(wNotZeroOne, 2)
 
   let ret = cmpString(a, b, insensitive)
@@ -794,6 +795,7 @@ func funFind*(parameters: seq[Value]): FunResult =
     if "c" in map:
       result = newFunResult(map["c"])
     else:
+      # The substring was not found and no default argument.
       result = newFunResultWarn(wSubstringNotFound, 1)
   else:
     result = newFunResult(newValue(pos))
@@ -1054,9 +1056,11 @@ func funReplaceRe_sls*(parameters: seq[Value]): FunResult =
   tMapParameters("sls")
   let list = map["b"].listv
   if list.len mod 2 != 0:
+    # Specify arguments in pairs.
     return newFunResultWarn(wPairParameters, 1)
   for ix, value in list:
     if value.kind != vkString:
+      # The argument must be a string.
       return newFunResultWarn(wExpectedString, ix)
 
   replaceReMap(map)
@@ -1261,6 +1265,7 @@ func generalSort(map: VarsDict): FunResult =
   # Verify the all the values are the same type.
   for value in list:
     if value.kind != listKind:
+      # The two arguments are not the same type.
       return newFunResultWarn(wNotSameKind, 0)
     case listKind:
       of vkList:

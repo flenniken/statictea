@@ -16,7 +16,7 @@ $statictea -t tmpl.txt \
 slice(str: string, start: int, optional length: int) string
 
 ~~~
-Wrong number of parameters.
+Wrong number of arguments.
 $$ block
 $$ : s = slice()
 $$ : s = slice("string")
@@ -24,7 +24,7 @@ $$ : s = slice("string", 0, 4, 3)
 $$ : s = slice("string", 0, 4, 3, 7)
 $$ endblock
 
-Wrong kind of parameters.
+Wrong kind of arguments.
 $$ block
 $$ : s = slice(5, 0)
 $$ : s = slice("string", 2.2)
@@ -49,9 +49,9 @@ $$ endblock
 ### File result.expected
 
 ~~~
-Wrong number of parameters.
+Wrong number of arguments.
 
-Wrong kind of parameters.
+Wrong kind of arguments.
 
 Invalid start index.
 
@@ -79,13 +79,13 @@ statement: s = slice("string", 0, 4, 3)
 tmpl.txt(6): w180: The function requires at most 3 arguments.
 statement: s = slice("string", 0, 4, 3, 7)
                                      ^
-tmpl.txt(11): w120: Wrong parameter type, expected string.
+tmpl.txt(11): w120: Wrong argument type, expected string.
 statement: s = slice(5, 0)
                      ^
-tmpl.txt(12): w120: Wrong parameter type, expected int.
+tmpl.txt(12): w120: Wrong argument type, expected int.
 statement: s = slice("string", 2.2)
                                ^
-tmpl.txt(13): w120: Wrong parameter type, expected int.
+tmpl.txt(13): w120: Wrong argument type, expected int.
 statement: s = slice("string", 0, "a")
                                   ^
 tmpl.txt(18): w154: The start position is less than 0.

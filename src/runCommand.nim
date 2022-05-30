@@ -332,13 +332,13 @@ proc ifFunction*(
 
   # Make sure the condition is an integer.
   if condition.kind != vkInt:
-    # The parameter must be an integer.
+    # The argument must be an integer.
     return newValueAndLengthOr(wExpectedInteger, "", start)
 
   # Match the comma and whitespace.
   let commaO = matchSymbol(statement.text, gComma, start + runningLen)
   if not commaO.isSome:
-    # Expected two or three parameters.
+    # Expected two or three arguments.
     return newValueAndLengthOr(wTwoOrThreeParams, "", start)
   runningLen += commaO.get().length
 

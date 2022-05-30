@@ -72,10 +72,10 @@ len("añyóng") => 6
 ### File stderr.expected
 
 ~~~
-tmpl.txt(26): w120: Wrong parameter type, expected string.
+tmpl.txt(26): w120: Wrong argument type, expected string.
 statement: a = len(0)
                    ^
-tmpl.txt(27): w120: Wrong parameter type, expected string.
+tmpl.txt(27): w120: Wrong argument type, expected string.
 statement: b = len(1.0)
                    ^
 ~~~

@@ -232,7 +232,7 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
     # Check the parameter is the correct type.
     if not sameType(param.paramCode, arg.kind):
       let expected = paramCodeString(param.paramCode)
-      # Wrong parameter type, expected $1.
+      # Wrong argument type, expected $1.
       return newFunResultWarn(kWrongType, ix, $expected)
 
     map[param.name] = arg

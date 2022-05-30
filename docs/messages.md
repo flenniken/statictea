@@ -253,41 +253,41 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Expected comma or right parentheses.", ## wMissingCommaParen
     "Expected a string.",   ## wExpectedString
     "Invalid statement, skipping it.", ## wInvalidStatement
-    "Expected one parameter.", ## wOneParameter
-    "Len takes a string, list or dict parameter.", ## wStringListDict
+    "",                     ## wOneParameter
+    "",                     ## wStringListDict
     "The function does not exist: $1.", ## wInvalidFunction
-    "The get function takes 2 or 3 parameters.", ## wGetTakes2or3Params
-    "Expected an int for the second parameter, got $1.", ## wExpectedIntFor2
+    "",                     ## wGetTakes2or3Params
+    "",                     ## wExpectedIntFor2
     "The list index $1 out of range.", ## wMissingListItem
-    "Expected a string for the second parameter, got $1.", ## wExpectedStringFor2
+    "",                     ## wExpectedStringFor2
     "The dictionary does not have an item with key $1.", ## wMissingDictItem
-    "Expected a list or dictionary as the first parameter.", ## wExpectedListOrDict
+    "",                     ## wExpectedListOrDict
     "The replacement variable doesn\'t exist: $1.", ## wMissingReplacementVar
     "Unable to create a temporary file.", ## wNoTempFile
     "Read t.maxLines replacement block lines without finding the endblock.", ## wExceededMaxLine
     "No space after the command.", ## wSpaceAfterCommand
-    "The function takes two parameters.", ## wTwoParameters
-    "The two parameters are not the same type.", ## wNotSameKind
-    "The parameters must be numbers or strings.", ## wNotNumberOrString
-    "The function takes two or three parameters.", ## wTwoOrThreeParameters
-    "The function takes two or more parameters.", ## wTwoOrMoreParameters
+    "",                     ## wTwoParameters
+    "The two arguments are not the same type.", ## wNotSameKind
+    "",                     ## wNotNumberOrString
+    "",                     ## wTwoOrThreeParameters
+    "",                     ## wTwoOrMoreParameters
     "The maxRepeat value must be greater than or equal to t.repeat.", ## wInvalidMaxRepeat
     "The t.content variable is not set for the replace command, treating it like the block command.", ## wContentNotSet
-    "Expected two or three parameters.", ## wTwoOrThreeParams
-    "The parameter must be an integer.", ## wExpectedInteger
-    "The parameters must be all integers or all floats.", ## wAllIntOrFloat
+    "Expected two or three arguments.", ## wTwoOrThreeParams
+    "The argument must be an integer.", ## wExpectedInteger
+    "",                     ## wAllIntOrFloat
     "Overflow or underflow.", ## wOverflow
-    "The parameter must be a string.", ## wExpectedString
+    "The argument must be a string.", ## wExpectedString
     "Index values must greater than or equal to 0, got: $1.", ## wInvalidIndex
-    "The parameter must be a dictionary.", ## wExpectedDictionary
-    "The function takes at least 3 parameters.", ## wThreeOrMoreParameters
+    "",                     ## wExpectedDictionary
+    "",                     ## wThreeOrMoreParameters
     "The main condition type must an int or string.", ## wInvalidMainType
     "The case condition must be an int or string.", ## wInvalidCondition
     "Invalid StaticTea version string.", ## wInvalidVersion
     "Expected int or int number string.", ## wIntOrStringNumber
     "Expected a float or float number string.", ## wFloatOrStringNumber
     "Expected round, floor, ceiling or truncate.", ## wExpectedRoundOption
-    "The function takes one or two parameters.", ## wOneOrTwoParameters
+    "",                     ## wOneOrTwoParameters
     "The t.content does not end with a newline, adding one.", ## wMissingNewLineContent
     "The update option overwrites the template, no result file allowed.", ## wResultFileNotAllowed
     "Unable to open temporary file.", ## wUnableToOpenTempFile
@@ -295,14 +295,14 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "No template name. Use -h for help.", ## wNoTemplateName
     "Invalid position: got $1.", ## wInvalidPosition
     "The end position is less that the start position.", ## wEndLessThenStart
-    "The substring was not found and no default parameter.", ## wSubstringNotFound
+    "The substring was not found and no default argument.", ## wSubstringNotFound
     "The resulting duplicated string must be under 1024 characters, got: $1.", ## wDupStringTooLong
-    "Specify parameters in pairs.", ## wPairParameters
+    "Specify arguments in pairs.", ## wPairParameters
     "None of the case conditions match and no else case.", ## wMissingElse
     "You cannot assign to an existing variable.", ## wImmutableVars
-    "Expected four parameters.", ## wExpected4Parameters
+    "",                     ## wExpected4Parameters
     "Invalid length: $1.",  ## wInvalidLength
-    "Invalid number of parameters, the pattern and replacement come in pairs.", ## wMissingReplacement
+    "",                     ## wMissingReplacement
     "Expected a list.",     ## wExpectedList
     "Expected / or \\.",    ## wExpectedSeparator
     "The variables f, g, h, l, s and t are reserved variable names.", ## wReservedNameSpaces
@@ -312,8 +312,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Expected the sort order, \'ascending\' or \'descending\'.", ## wExpectedSortOrder
     "The list values must be all ints, all floats or all strings.", ## wAllNotIntFloatString
     "The values must be integers, floats or strings.", ## wIntFloatString
-    "The parameter must be 0 or 1.", ## wNotZeroOne
-    "The function takes one to four parameters.", ## wOneToFourParameters
+    "The argument must be 0 or 1.", ## wNotZeroOne
+    "",                     ## wOneToFourParameters
     "Expected the sensitive or unsensitive.", ## wExpectedSensitivity
     "Expected the dictionary sort key.", ## wExpectedKey
     "A dictionary is missing the sort key.", ## wDictKeyMissing
@@ -322,13 +322,13 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The first item in the sublists are different types.", ## wSubListsDiffTypes
     "You reached the maximum number of warnings, suppressing the rest.", ## kMaxWarnings
     "Invalid signature string.", ## kInvalidSignature
-    "Invalid parameter type.", ## kInvalidParamType
-    "Not enough parameters, expected $1.", ## kNotEnoughArgs
-    "Wrong parameter type, expected $1.", ## kWrongType
-    "The required vararg parameter has no arguments.", ## kNoVarargArgs
-    "Missing vararg parameter, expected groups of 2 got 1.", ## kNotEnoughVarargs
+    "",                     ## kInvalidParamType
+    "Not enough arguments, expected $1.", ## kNotEnoughArgs
+    "Wrong argument type, expected $1.", ## kWrongType
+    "",                     ## kNoVarargArgs
+    "",                     ## kNotEnoughVarargs
     "The function requires $1 arguments.", ## kTooManyArgs
-    "Expected at least four parameters.", ## wAtLeast4Parameters
+    "",                     ## wAtLeast4Parameters
     "Expected number string.", ## wExpectedNumberString
     "A case condition is not the same type as the main condition.", ## wCaseTypeMismatch
     "Expected an even number of cases, got $1 list items.", ## wNotEvenCases

@@ -105,13 +105,13 @@ d.c = 7
 tmpl.txt(3): w56: The dictionary does not have an item with key d.
 statement: a = get(d, "d")
                       ^
-tmpl.txt(4): w120: Wrong parameter type, expected string.
+tmpl.txt(4): w120: Wrong argument type, expected string.
 statement: b = get(d, -1)
                       ^
-tmpl.txt(5): w120: Wrong parameter type, expected string.
+tmpl.txt(5): w120: Wrong argument type, expected string.
 statement: c = get(d, 3)
                       ^
-tmpl.txt(6): w120: Wrong parameter type, expected string.
+tmpl.txt(6): w120: Wrong argument type, expected string.
 statement: e = get(d, 2.2)
                       ^
 tmpl.txt(10): w58: The replacement variable doesn't exist: d.missing.
