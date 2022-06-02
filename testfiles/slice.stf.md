@@ -9,7 +9,7 @@ string, the substring's start index and its length.  The length
 is optional. When not specified, the slice returns the characters
 from the start to the end of the string.
 
-The start index is by unicode characters not bytes.
+The start index and length are by unicode characters not bytes.
 
 ~~~
 slice(str: string, start: int, optional length: int) string

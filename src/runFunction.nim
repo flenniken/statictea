@@ -806,7 +806,7 @@ func funSlice*(parameters: seq[Value]): FunResult =
   ## @:length is optional. When not specified, the slice returns the
   ## @:characters from the start to the end of the string.
   ## @:
-  ## @:The start index is by unicode characters not bytes.
+  ## @:The start index and length are by unicode characters not bytes.
   ## @:
   ## @:~~~
   ## @:slice(str: string, start: int, optional length: int) string
@@ -1613,8 +1613,8 @@ func funWarn*(parameters: seq[Value]): FunResult =
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:b = warn("message")
-  ## @:b = if1(a, warn("a is one"), "")
+  ## @:if1(c, warn("message"))
+  ## @:b = if1(c, warn("c is one"), "")
   ## @:~~~~
 
   tMapParameters("ss")
