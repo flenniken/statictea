@@ -843,10 +843,8 @@ $$ hello {name}"""
 
     let r = newRunFileLine(cmdFilename, command = true, nonZeroReturn = false)
     let runFileLines = @[r]
-    let rcOp = runCommands(folder, runFileLines)
-
-    check rcOp.isValue
-    check rcOp.value == 0
+    let rc = runCommands(folder, runFileLines)
+    check rc == 0
 
     # The current working directory is set to the testfiles folder.
     # t.txt file should appear in the folder.

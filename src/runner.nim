@@ -262,23 +262,23 @@ Example file lines:
 
 File Attributes:
 
-* *filename* - the name of the file to create.
+* **filename** - the name of the file to create.
 
 The name is required and cannot contain spaces. The file is created in
 the temp folder.
 
-* *command* — marks this file to be run.
+* **command** — marks this file to be run.
 
 All files are created before any command runs. The file is run in the
 temp folder as the working directory. The commands are run in the
 order specified in the file.
 
-* *nonZeroReturn* — the command returns non-zero on success
+* **nonZeroReturn** — the command returns non-zero on success
 
 Normally the runner fails when a command returns a non-zero return
 code.  With nonZeroReturn set, it fails when it returns zero.
 
-* *noLineEnding* — create the file without an ending newline.
+* **noLineEnding** — create the file without an ending newline.
 
 ### File Block Lines
 
@@ -619,7 +619,7 @@ expected: $1
   result = opValueStr[DirAndFiles](dirAndFiles)
 
 proc runCommands*(folder: string, runFileLines: seq[RunFileLine]):
-    OpResultStr[Rc] =
+    int =
   ## Run the command files and return 0 when they all returned their
   ## expected return code.
 
@@ -627,8 +627,6 @@ proc runCommands*(folder: string, runFileLines: seq[RunFileLine]):
   assert(dirExists(folder))
   let oldDir = getCurrentDir()
   setCurrentDir(folder)
-
-  var rc = 0
 
   # Run each command file.
   for runFileLine in runFileLines:
@@ -645,18 +643,13 @@ proc runCommands*(folder: string, runFileLines: seq[RunFileLine]):
         if cmdRc == 0:
           echo "$1 generated an unexpected return code of 0." %
             runFileLine.filename
-          rc = 1
+          result = 1
       elif cmdRc != 0:
         echo "$1 generated a non-zero return code." %
           runFileLine.filename
-        rc = 1
+        result = 1
 
   setCurrentDir(oldDir)
-
-  if rc != 0:
-    return opMessageStr[Rc]("Failed")
-
-  result = opValueStr[Rc](rc)
 
 func showTabsAndLineEndings*(str: string): string =
   ## Return a new string with the tab and line endings visible.
@@ -800,11 +793,10 @@ $3
   return opValueStr[string](message)
 
 proc compareFileSets(folder: string, expectedLines: seq[ExpectedLine]):
-    OpResultStr[Rc] =
+    int =
   ## Compare multiple pairs of files and show the differences. When
   ## they are all the same return 0.
 
-  var rc = 0
   for expectedLine in expectedLines:
     var gotPath = joinPath(folder, expectedLine.gotFilename)
     var expectedPath = joinPath(folder, expectedLine.expectedFilename)
@@ -815,44 +807,38 @@ proc compareFileSets(folder: string, expectedLines: seq[ExpectedLine]):
     if stringOp.isMessage:
       # Show the error.
       echo stringOp.message
-      rc = 1
+      result = 1
     else:
       # Show the differences, if any.
       let differences = stringOp.value
       if differences != "":
         echo differences
-        rc = 1
+        result = 1
 
-  result = opValueStr[Rc](rc)
-
-proc runStfFilename*(filename: string): OpResultStr[Rc] =
+proc runStfFilename*(filename: string): int =
   ## Run the stf file and leave the temp dir. Return 0 when all the
   ## tests passed.
 
   # Create the temp folder and files inside it.
   let dirAndFilesOp = makeDirAndFiles(filename)
   if dirAndFilesOp.isMessage:
-    return opMessageStr[Rc](dirAndFilesOp.message)
+    echo dirAndFilesOp.message
+    return 1
   let dirAndFiles = dirAndFilesOp.value
 
   let folder = filename & ".tempdir"
 
   # Run the command files.
   result = runCommands(folder, dirAndFiles.runFileLines)
+  if result != 0:
+    return result
 
   # Compare the files.
-  var rcOp = compareFileSets(folder, dirAndFiles.expectedLines)
-  if rcOp.isMessage:
-    return rcOp
-  if rcOp.value != 0:
-    result = opMessageStr[Rc]("Failed")
-
-# todo: fix up the error handling. Echo error messages as you go and
-# keep track of success or failure.
+  result = compareFileSets(folder, dirAndFiles.expectedLines)
 
 when not defined(test):
 
-  proc runFilename(filename: string, leaveTempDir: bool): OpResultStr[Rc] =
+  proc runFilename(filename: string, leaveTempDir: bool): int =
     ## Run the stf file and optionally leave the temp dir. Return 0 when
     ## all the tests pass.
 
@@ -866,40 +852,34 @@ when not defined(test):
       if fileExists(filename):
         discard deleteFolder(tempDir)
 
-  proc runFilenameMain(args: RunArgs): OpResultStr[Rc] =
+  proc runFilenameMain(args: RunArgs): int =
     ## Run a stf file specified by a RunArgs object. Return 0 when it
     ## passes.
     result = runFilename(args.filename, args.leaveTempDir)
 
-  proc runDirectory(dir: string, leaveTempDir: bool): OpResultStr[Rc] =
+  proc runDirectory(dir: string, leaveTempDir: bool): int =
     ## Run all the stf files in the specified directory. Return 0 when
     ## they all pass. Show progess and count of passed and failed.
 
     if not dirExists(dir):
-      let message = "The dir does not exist: " & dir
-      return opMessageStr[Rc](message)
+      echo "The dir does not exist: " & dir
+      return 1
 
     var failedTests: seq[string]
     var count = 0
     var passedCount = 0
-    var rc = 0
     for kind, path in walkDir(dir):
       if path.endsWith(".stf") or ".stf." in path:
         let (_, basename) = splitPath(path)
         echo "Running: " & basename
 
-        let rcOp = runFilename(path, leaveTempDir)
-        if rcOp.isMessage:
-          echo rcOp.message
-          rc = 1
-          failedTests.add(path)
-        elif rcOp.value == 0:
+        let runRc = runFilename(path, leaveTempDir)
+        if runRc == 0:
           inc(passedCount)
         else:
-          rc = 1
           failedTests.add(path)
+          result = 1
         inc(count)
-
 
     if count == passedCount:
       echo "All $1 tests passed!" % $passedCount
@@ -908,31 +888,28 @@ when not defined(test):
         $passedCount, $(count - passedCount)]
       for failedTest in failedTests:
         echo failedTest
-    result = opValueStr[Rc](rc)
 
-  proc runDirectoryMain(args: RunArgs): OpResultStr[Rc] =
+  proc runDirectoryMain(args: RunArgs): int =
     ## Run all stf files in a directory. Return 0 when all pass.
     result = runDirectory(args.directory, args.leaveTempDir)
 
-  proc processRunArgs(args: RunArgs): OpResultStr[Rc] =
+  proc processRunArgs(args: RunArgs): int =
     ## Run what was specified on the command line. Return 0 when
     ## successful.
 
     if args.help:
       echo getHelp()
-      result = opValueStr[Rc](0)
     elif args.version:
       echo runnerId
-      result = opValueStr[Rc](0)
     elif args.filename != "":
       result = runFilenameMain(args)
     elif args.directory != "":
       result = runDirectoryMain(args)
     else:
       echo "Missing argments, use -h for help."
-      result = opValueStr[Rc](1)
+      result = 1
 
-  proc main(argv: seq[string]): OpResultStr[Rc] =
+  proc main(argv: seq[string]): int =
     ## Run stf test files. Return 0 when all the tests pass and 1 when
     ## one or more fail.
 
@@ -945,26 +922,19 @@ when not defined(test):
       # Parse the command line options.
       let argsOp = parseRunCommandLine(argv)
       if argsOp.isMessage:
-        return opMessageStr[Rc](argsOp.message)
+        return 1
       let args = argsOp.value
-
-      # Run.
       result = processRunArgs(args)
     except:
-      var message = "Unexpected exception: $1" % [getCurrentExceptionMsg()]
+      echo "Unexpected exception: $1" % [getCurrentExceptionMsg()]
       # The stack trace is only available in the debug builds.
       when not defined(release):
-        message = message & "\n" & getCurrentException().getStackTrace()
-      result = opMessageStr[Rc](message)
+        echo message & "\n" & getCurrentException().getStackTrace()
+      result = 1
 
 when isMainModule:
-  let rcOp = main(commandLineParams())
-  if rcOp.isMessage:
-    # Error path. Write the message to stderr.
-    writeErr(rcOp.message)
-    quit(QuitFailure)
+  let rc = main(commandLineParams())
+  if rc == 0:
+    quit(QuitSuccess)
   else:
-    # Return the return code.
-    quit(rcOp.value)
-
-# todo: use "Expected gotFile == expectedFile" everywhere.
+    quit(QuitFailure)
