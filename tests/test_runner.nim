@@ -18,14 +18,14 @@ proc testGetAnyLine(line: string, eAnyLine: AnyLine): bool =
   result = true
   if anyLine.kind != eAnyLine.kind:
     echo "Did not get the expected line type:"
-    echo    "expected: {eAnyLine.kind}"
     echo fmt"     got: {anyLine.kind}"
+    echo    "expected: {eAnyLine.kind}"
     result = false
 
   if $anyLine != $eAnyLine:
     echo "Did not get the expected line:"
-    echo fmt"expected: {eAnyLine}"
     echo fmt"     got: {anyLine}"
+    echo fmt"expected: {eAnyLine}"
     result = false
 
 proc createFile*(filename: string, content: string) =
@@ -38,27 +38,28 @@ proc parseRunCommandLine*(cmdLine: string = ""): runner.OpResultStr[RunArgs] =
   let argv = strutils.splitWhitespace(cmdLine)
   result = parseRunCommandLine(argv)
 
-proc showExpectedLines*[T](expectedLines: seq[T], gotLines: seq[T],
+proc showExpectedLines*[T](gotLines: seq[T], expectedLines: seq[T], 
     showSame = false, stopOnFirstDiff = false): bool =
   ## Compare two sets of lines and show the differences.  If no
   ## differences, return true.
 
   result = true
-  for ix in countUp(0, max(expectedLines.len, gotLines.len)-1):
-    var eLine = ""
-    if ix < expectedLines.len:
-      eLine = $expectedLines[ix]
+  for ix in countUp(0, max(gotLines.len, expectedLines.len)-1):
     var gLine = ""
     if ix < gotLines.len:
       gLine = $gotLines[ix]
+
+    var eLine = ""
+    if ix < expectedLines.len:
+      eLine = $expectedLines[ix]
 
     var lineNum = $(ix+1)
     if eLine == gLine:
       if showSame:
         echo "$1     same: '$2'" % [lineNum, eLine]
     else:
-      echo "$1 expected: '$2'" % [lineNum, eLine]
       echo "$1      got: '$2'" % [lineNum, gLine]
+      echo "$1 expected: '$2'" % [lineNum, eLine]
       result = false
       if stopOnFirstDiff:
         break
@@ -83,41 +84,41 @@ proc testMakeDirAndFiles(filename: string, content: string,
   result = true
   let dirAndFilesOp = makeDirAndFiles(filename)
   if expectedDirAndFilesOp.isMessage and dirAndFilesOp.isValue:
-    echo "Expected message but got value."
-    echo "expected message: " & expectedDirAndFilesOp.message
+    echo "Got value but expected message."
     echo "       got value: " & $dirAndFilesOp.value
+    echo "expected message: " & expectedDirAndFilesOp.message
     result = false
   elif expectedDirAndFilesOp.isValue and dirAndFilesOp.isMessage:
-    echo "Expected value but got message."
-    echo "expected value: " & $expectedDirAndFilesOp.value
+    echo "Got message bu expected value."
     echo "   got message: " & dirAndFilesOp.message
+    echo "expected value: " & $expectedDirAndFilesOp.value
     result = false
   elif expectedDirAndFilesOp.isValue and dirAndFilesOp.isValue:
 
-    let expected = expectedDirAndFilesOp.value
     let got = dirAndFilesOp.value
-    if expected != got:
+    let expected = expectedDirAndFilesOp.value
+    if got != expected:
 
       # expectedLines: seq[ExpectedLine]
       # runFileLines: seq[RunFileLine]
 
-      if expected.expectedLines == got.expectedLines:
+      if got.expectedLines == expected.expectedLines:
         echo "same expectedLines"
       else:
         echo "expectedLines:"
-        discard showExpectedLines(expected.expectedLines, got.expectedLines)
+        discard showExpectedLines(got.expectedLines, expected.expectedLines)
 
-      if expected.runFileLines == got.runFileLines:
+      if got.runFileLines == expected.runFileLines:
         echo "same runFileLines"
       else:
         echo "runFileLines:"
-        discard showExpectedLines(expected.runFileLines, got.runFileLines)
+        discard showExpectedLines(got.runFileLines, expected.runFileLines)
 
       result = false
   else:
     if expectedDirAndFilesOp.message != dirAndFilesOp.message:
-      echo "expected message: '$1'" % expectedDirAndFilesOp.message
       echo "     got message: '$1'" % dirAndFilesOp.message
+      echo "expected message: '$1'" % expectedDirAndFilesOp.message
       result = false
 
 proc removeFileAndTempdir(filename: string) =
@@ -158,10 +159,10 @@ proc testDir(filename: string, nameAndContentList: seq[NameAndContent]): bool =
       let gotContent = readFile(path)
       if gotContent != content:
         let (_, basename) = splitPath(path)
-        echo "expected $1:" % basename
-        echo content
         echo "     got $1:" % basename
         echo gotContent
+        echo "expected $1:" % basename
+        echo content
         result = false
 
   for kind, path in walkDir(tempdir):
@@ -188,8 +189,9 @@ proc testCompareFilesEqual(content1: string, content2: string): bool =
   let stringOp = compareFiles(f1, f2)
   if stringOp.isValue:
     if stringOp.value != "":
-      echo "expected message: '', got:"
+      echo "got:"
       echo stringOp.value
+      echo "expected message: ''"
       echo "---"
       result = false
   else:
@@ -213,16 +215,16 @@ proc testCompareFilesDifferent(content1: string, content2: string, expected: str
     # Unable to compare the files.
     if expected != stringOp.message:
       echo "Unable to compare the files."
-      echo "expected: " & expected
       echo "     got: " & stringOp.message
+      echo "expected: " & expected
       result = false
   else:
     # Able to compare and differences in the value.
     if expected != stringOp.value:
-      echo "expected-----------"
-      echo expected
       echo "     got-----------"
       echo stringOp.value
+      echo "expected-----------"
+      echo expected
       result = false
 
   discard tryRemoveFile(f1)
@@ -249,8 +251,8 @@ proc testParseRunFileLine(line: string, eRunFileLine: RunFileLine): bool =
     echo runFileLineOp.message
     return false
   if runFileLineOp.value != eRunFileLine:
-    echo "expected: " & $eRunFileLine
     echo "     got: " & $runFileLineOp.value
+    echo "expected: " & $eRunFileLine
     return false
   result = true
 
@@ -261,8 +263,8 @@ proc testParseExpectedLine(line: string, eExpectedLine: ExpectedLine): bool =
     echo compareLineOp.message
     return false
   if compareLineOp.value != eExpectedLine:
-    echo "expected: " & $eExpectedLine
     echo "     got: " & $compareLineOp.value
+    echo "expected: " & $eExpectedLine
     return false
   result = true
 
@@ -564,8 +566,8 @@ suite "runner.nim":
     let content = "not a stf file"
     let message = """
 Invalid stf file first line:
-expected: stf file, version 0.1.0
-     got: not a stf file"""
+     got: not a stf file
+expected: stf file, version 0.1.0"""
     let expected = opMessageStr[DirAndFiles](message)
     # let a = newExpectedLine("filea", "emptyfile.txt")
     # let b = newRunFileLine("afile.txt", false, false, false)
@@ -885,8 +887,8 @@ my expected line
 what I got
 """
     let expected = """
-1 expected: my expected line␊
-1      got: what I got␊"""
+1      got: what I got␊
+1 expected: my expected line␊"""
     check testLinesSideBySide(content1, content2, expected)
 
   test "linesSideBySide2":
@@ -900,8 +902,8 @@ what I got
 """
     let expected = """
 1     same: my expected line␊
-2 expected: my second line␊
-2      got: what I got␊"""
+2      got: what I got␊
+2 expected: my second line␊"""
     check testLinesSideBySide(content1, content2, expected)
 
   test "linesSideBySide3":
@@ -917,8 +919,8 @@ my last line
 """
     let expected = """
 1     same: my expected line␊
-2 expected: middle␊
 2      got:   the center␊
+2 expected: middle␊
 3     same: my last line␊"""
     check testLinesSideBySide(content1, content2, expected)
 
@@ -948,9 +950,9 @@ hello there
 """
     let expected = """
 
-Difference: f1.txt (expected) != f2.txt (got)
-1 expected: test file␊
+Difference: f1.txt (got) != f2.txt (expected)
 1      got: hello there␊
+1 expected: test file␊
 """
     check testCompareFilesDifferent(f1, f2, expected)
 
@@ -965,10 +967,10 @@ wow we
 """
     let expected = """
 
-Difference: f1.txt (expected) != f2.txt (got)
+Difference: f1.txt (got) != f2.txt (expected)
 1     same: test line␊
-2 expected: different line␊
 2      got: wow we␊
+2 expected: different line␊
 """
     check testCompareFilesDifferent(f1, f2, expected)
 
@@ -985,10 +987,10 @@ more
 """
     let expected = """
 
-Difference: f1.txt (expected) != f2.txt (got)
+Difference: f1.txt (got) != f2.txt (expected)
 1     same: test line␊
-2 expected: third line␊
 2      got: something else␊
+2 expected: third line␊
 3     same: more␊
 """
     check testCompareFilesDifferent(f1, f2, expected)
@@ -1019,6 +1021,7 @@ something else
 more
 """
     let f2 = ""
+
     let expected = """
 
 Difference: f1.txt != f2.txt

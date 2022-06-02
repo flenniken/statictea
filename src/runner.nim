@@ -582,8 +582,8 @@ proc makeDirAndFiles*(filename: string): OpResultStr[DirAndFiles] =
     return opMessageStr[DirAndFiles]("Empty file: '$1'." % filename)
   if not line.startsWith(runnerId):
     let message = """Invalid stf file first line:
-expected: $1
-     got: $2""" % [runnerId, line]
+     got: $1
+expected: $2""" % [line, runnerId]
     return opMessageStr[DirAndFiles](message)
 
   while true:
@@ -679,31 +679,31 @@ when false:
 proc linesSideBySide*(expectedContent: string, gotContent: string): string =
   ## Show the two sets of lines side by side.
 
-  if expectedContent == "" and gotContent == "":
+  if gotContent == "" and expectedContent == "":
      return "both empty"
 
-  let expected = splitNewLines(expectedContent)
   let got = splitNewLines(gotContent)
+  let expected = splitNewLines(expectedContent)
 
   var show = showTabsAndLineEndings
 
   var lines: seq[string]
-  for ix in countUp(0, max(expected.len, got.len)-1):
-    var eLine = ""
-    if ix < expected.len:
-      eLine = $expected[ix]
-
+  for ix in countUp(0, max(got.len, expected.len)-1):
     var gLine = ""
     if ix < got.len:
       gLine = $got[ix]
+
+    var eLine = ""
+    if ix < expected.len:
+      eLine = $expected[ix]
 
     var lineNum = $(ix+1)
     if eLine == gLine:
       # lines.add("$1     same: $2" % [dup(" ", lineNum.len), show(eLine)])
       lines.add("$1     same: $2" % [$lineNum, show(eLine)])
     else:
-      lines.add("$1 expected: $2" % [lineNum, show(eLine)])
       lines.add("$1      got: $2" % [lineNum, show(gLine)])
+      lines.add("$1 expected: $2" % [lineNum, show(eLine)])
 
   result = lines.join("\n")
 
@@ -715,22 +715,12 @@ proc readFileContent(filename: string): OpResultStr[string] =
   except:
     result = opMessageStr[string](getCurrentExceptionMsg())
 
-proc compareFiles*(expectedFilename: string, gotFilename: string): OpResultStr[string] =
+proc compareFiles*(gotFilename: string, expectedFilename: string): OpResultStr[string] =
   ## Compare two files and return the differences. When they are equal
   ## return "".
 
-  let (_, expBasename) = splitPath(expectedFilename)
   let (_, gotBasename) = splitPath(gotFilename)
-
-  # Read the "expected" file.
-  var expectedContent: string
-  if expBasename == "empty":
-    expectedContent = ""
-  else:
-    let expectedContentOp = readFileContent(expectedFilename)
-    if expectedContentOp.isMessage:
-      return opMessageStr[string]("Error: " & expectedContentOp.message)
-    expectedContent = expectedContentOp.value
+  let (_, expBasename) = splitPath(expectedFilename)
 
   # Read the "got" file.
   var gotContent: string
@@ -741,6 +731,16 @@ proc compareFiles*(expectedFilename: string, gotFilename: string): OpResultStr[s
     if gotContentOp.isMessage:
       return opMessageStr[string]("Error: " & gotContentOp.message)
     gotContent = gotContentOp.value
+
+  # Read the "expected" file.
+  var expectedContent: string
+  if expBasename == "empty":
+    expectedContent = ""
+  else:
+    let expectedContentOp = readFileContent(expectedFilename)
+    if expectedContentOp.isMessage:
+      return opMessageStr[string]("Error: " & expectedContentOp.message)
+    expectedContent = expectedContentOp.value
 
   #  ⤶ ⤷ ⤴ ⤵
   # ⬉ ⬈ ⬊ ⬋
@@ -761,18 +761,18 @@ proc compareFiles*(expectedFilename: string, gotFilename: string): OpResultStr[s
 
   # If the files are different, show the differences.
   var message: string
-  if expectedContent != gotContent:
-    let (_, expBasename) = splitPath(expectedFilename)
+  if gotContent != expectedContent:
     let (_, gotBasename) = splitPath(gotFilename)
+    let (_, expBasename) = splitPath(expectedFilename)
 
-    if expectedContent == "" or gotContent == "":
-      if expectedContent == "":
+    if gotContent == "" or expectedContent == "":
+      if gotContent == "":
         message = """
 
 Difference: $1 != $2
             $1 is empty
 $2$3$4$5
-""" % [expBasename, gotBasename, topBorder, gotContent, bottomBorder]
+""" % [gotBasename, expBasename, topBorder, expectedContent, bottomBorder]
 
       else:
 
@@ -781,14 +781,14 @@ $2$3$4$5
 Difference: $1 != $2
             $2 is empty
 $1$3$4$5
-""" % [expBasename, gotBasename, topBorder, expectedContent, bottomBorder]
+""" % [gotBasename, expBasename, topBorder, gotContent, bottomBorder]
 
     else:
       message = """
 
-Difference: $1 (expected) != $2 (got)
+Difference: $1 (got) != $2 (expected)
 $3
-""" % [expBasename, gotBasename, linesSideBySide(expectedContent, gotContent)]
+""" % [gotBasename, expBasename, linesSideBySide(gotContent, expectedContent)]
 
   return opValueStr[string](message)
 
@@ -802,7 +802,7 @@ proc compareFileSets(folder: string, expectedLines: seq[ExpectedLine]):
     var expectedPath = joinPath(folder, expectedLine.expectedFilename)
 
     # Compare the two files.
-    let stringOp = compareFiles(expectedPath, gotPath)
+    let stringOp = compareFiles(gotPath, expectedPath)
 
     if stringOp.isMessage:
       # Show the error.
