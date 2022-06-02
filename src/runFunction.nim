@@ -910,8 +910,7 @@ func funDict_old*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(dict))
 
 func funList*(parameters: seq[Value]): FunResult =
-  ## Create a list of values. You can also use [ ... ] to create a
-  ## @:list.
+  ## You create a list with the list function or with brackets.
   ## @:
   ## @:~~~
   ## @:list(...) list
@@ -920,10 +919,14 @@ func funList*(parameters: seq[Value]): FunResult =
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:list() => []
-  ## @:list(1) => [1]
-  ## @:list(1, 2, 3) => [1, 2, 3]
-  ## @:list("a", 5, "b") => ["a", 5, "b"]
+  ## @:a = list()
+  ## @:a = list(1)
+  ## @:a = list(1, 2, 3)
+  ## @:a = list("a", 5, "b")
+  ## @:a = []
+  ## @:a = [1]
+  ## @:a = [1, 2, 3]
+  ## @:a = ["a", 5, "b"]
   ## @:~~~~
 
   result = newFunResult(newValue(parameters))
@@ -1538,22 +1541,22 @@ func funJoinPath_loss*(parameters: seq[Value]): FunResult =
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:joinPath(list("images", "tea")) =>
+  ## @:joinPath(["images", "tea"]) =>
   ## @:  "images/tea"
   ## @:
-  ## @:joinPath(list("images", "tea"), "/") =>
+  ## @:joinPath(["images", "tea"], "/") =>
   ## @:  "images/tea"
   ## @:
-  ## @:joinPath(list("images", "tea"), "\\") =>
+  ## @:joinPath(["images", "tea"], "\\") =>
   ## @:  "images\\tea"
   ## @:
-  ## @:joinPath(list("images/", "tea") =>
+  ## @:joinPath(["images/", "tea"]) =>
   ## @:  "images/tea"
   ## @:
-  ## @:joinPath(list("", "tea")) =>
+  ## @:joinPath(["", "tea"]) =>
   ## @:  "/tea"
   ## @:
-  ## @:joinPath(list("/", "tea")) =>
+  ## @:joinPath(["/", "tea"]) =>
   ## @:  "/tea"
   ## @:~~~~
 

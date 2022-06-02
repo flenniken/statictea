@@ -32,7 +32,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funSlice](#funslice) &mdash; Extract a substring from a string by its position and length.
 * [funDup](#fundup) &mdash; Duplicate a string x times.
 * [funDict_old](#fundict_old) &mdash; Create a dictionary from a list of key, value pairs.
-* [funList](#funlist) &mdash; Create a list of values.
+* [funList](#funlist) &mdash; You create a list with the list function or with brackets.
 * [funReplace](#funreplace) &mdash; Replace a substring specified by its position and length with another string.
 * [funReplaceRe_sls](#funreplacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
 * [funPath](#funpath) &mdash; Split a file path into its component pieces.
@@ -705,8 +705,7 @@ func funDict_old(parameters: seq[Value]): FunResult
 
 # funList
 
-Create a list of values. You can also use [ ... ] to create a
-list.
+You create a list with the list function or with brackets.
 
 ~~~
 list(...) list
@@ -715,10 +714,14 @@ list(...) list
 Examples:
 
 ~~~
-list() => []
-list(1) => [1]
-list(1, 2, 3) => [1, 2, 3]
-list("a", 5, "b") => ["a", 5, "b"]
+a = list()
+a = list(1)
+a = list(1, 2, 3)
+a = list("a", 5, "b")
+a = []
+a = [1]
+a = [1, 2, 3]
+a = ["a", 5, "b"]
 ~~~~
 
 ```nim
@@ -1102,22 +1105,22 @@ joinPath(components: list, optional separator: string) string
 Examples:
 
 ~~~
-joinPath(list("images", "tea")) =>
+joinPath(["images", "tea"]) =>
   "images/tea"
 
-joinPath(list("images", "tea"), "/") =>
+joinPath(["images", "tea"], "/") =>
   "images/tea"
 
-joinPath(list("images", "tea"), "\") =>
+joinPath(["images", "tea"], "\") =>
   "images\tea"
 
-joinPath(list("images/", "tea") =>
+joinPath(["images/", "tea"]) =>
   "images/tea"
 
-joinPath(list("", "tea")) =>
+joinPath(["", "tea"]) =>
   "/tea"
 
-joinPath(list("/", "tea")) =>
+joinPath(["/", "tea"]) =>
   "/tea"
 ~~~~
 
