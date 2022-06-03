@@ -829,12 +829,15 @@ proc runStfFilename*(filename: string): int =
   let folder = filename & ".tempdir"
 
   # Run the command files.
-  result = runCommands(folder, dirAndFiles.runFileLines)
-  if result != 0:
-    return result
+  var rc = runCommands(folder, dirAndFiles.runFileLines)
+  if rc != 0:
+    result = rc
 
   # Compare the files.
-  result = compareFileSets(folder, dirAndFiles.expectedLines)
+  rc = compareFileSets(folder, dirAndFiles.expectedLines)
+  if rc != 0:
+    result = rc
+
 
 when not defined(test):
 
