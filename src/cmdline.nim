@@ -102,11 +102,11 @@ func newCmlOption*(long: string, short: char,
   ## Create a new CmlOption object. For no short option use a dash.
   result = CmlOption(long: long, short: short, optionType: optionType)
 
-func newArgsOrMessage(args: CmlArgs): ArgsOrMessage =
+func newArgsOrMessage*(args: CmlArgs): ArgsOrMessage =
   ## Create a new ArgsOrMessage object containing arguments.
   result = ArgsOrMessage(kind: cmlArgsKind, args: args)
 
-func newArgsOrMessage(messageId: CmlMessageId,
+func newArgsOrMessage*(messageId: CmlMessageId,
     problemParam = ""): ArgsOrMessage =
   ## Create a new ArgsOrMessage object containing a message id and
   ## optionally the problem parameter.
@@ -125,15 +125,16 @@ func `$`*(a: ArgsOrMessage): string =
     if a.args.len == 0:
       result = "no arguments"
     else:
-      var lines = newSeq[string]()
+      var first = true
       for k, v in pairs(a.args):
-       lines.add("argsOrMessage.args[$1] = $2" % [k, $v])
-      result = lines.join("\n")
+        if first:
+          first = false
+        else:
+          result.add("\n")
+        result.add("argsOrMessage.args[$1] = $2" % [k, ($v)[1..^1]])
   else:
-    var lines = newSeq[string]()
-    lines.add("argsOrMessage.messageId = $1" % $a.messageId)
-    lines.add("argsOrMessage.problemParam = '$1'" % $a.problemParam)
-    result = lines.join("\n")
+    result.add("argsOrMessage.messageId = $1\n" % $a.messageId)
+    result.add("argsOrMessage.problemParam = '$1'" % $a.problemParam)
 
 proc commandLineEcho*() =
   ## Show the command line arguments.
@@ -429,15 +430,13 @@ cmdline [-h] [-u name] [-l [filename]] -r leader [-s state] source destination
 
   func `$`*(a: Args): string =
     ## Return a string representation of an Args object.
-    var lines = newSeq[string]()
-    lines.add("arg.help = $1" % $a.help)
-    lines.add("arg.log = $1" % $a.log)
-    lines.add("arg.logFilename = '$1'" % a.logFilename)
-    lines.add("arg.user = '$1'" % $a.user)
-    lines.add("arg.leader = '$1'" % $a.leader)
-    lines.add("arg.source = '$1'" % a.source)
-    lines.add("arg.destination = '$1'" % a.destination)
-    result = lines.join("\n")
+    result.add("arg.help = $1\n" % $a.help)
+    result.add("arg.log = $1\n" % $a.log)
+    result.add("arg.logFilename = '$1'\n" % a.logFilename)
+    result.add("arg.user = '$1'\n" % $a.user)
+    result.add("arg.leader = '$1'\n" % $a.leader)
+    result.add("arg.source = '$1'\n" % a.source)
+    result.add("arg.destination = '$1'" % a.destination)
 
   func newArgs(cmlArgs: CmlArgs): Args =
     ## Create an Args object from a CmlArgs.

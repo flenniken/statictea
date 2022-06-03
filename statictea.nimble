@@ -233,21 +233,26 @@ proc fileIndexJson(filenames: seq[string], descriptions: seq[string]): string =
     return
 
   # Generate the index json with a filename and description.
-  var modules = newSeq[string]()
+  result = """
+{
+  "modules": ["""
+
   for ix, filename in filenames:
-    modules.add("""
+    if ix == 0:
+      result.add("\n")
+    else:
+      result.add(",\n")
+    result.add("""
   {
     "filename": "$1",
     "description": "$2"
   }""" % [filename, jsonQuote(descriptions[ix])])
 
-  result = """
-{
-  "modules": [
-$1
+  result.add("""
+
   ]
 }
-""" % [join(modules, ",\n")]
+""")
 
 proc sourceIndexJson(): string =
   ## Generate json for the doc comment index of all the source files.

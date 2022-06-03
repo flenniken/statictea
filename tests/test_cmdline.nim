@@ -470,3 +470,33 @@ suite "cmdline.nim":
       inc(ix)
       if messageId == expected[expected.len - 1]:
         break
+
+  test "ArgsOrMessage string repr warning":
+    let expected = """
+argsOrMessage.messageId = cml_07_DupLongOption
+argsOrMessage.problemParam = 'test'"""
+    let argsOrMessage = newArgsOrMessage(cml_07_DupLongOption, "test")
+    check $argsOrMessage == expected
+
+  test "ArgsOrMessage no args":
+    let expected = "no arguments"
+    var args: CmlArgs
+    let argsOrMessage = newArgsOrMessage(args)
+    check $argsOrMessage == expected
+
+  test "ArgsOrMessage args":
+    let expected = """argsOrMessage.args[test] = ["me"]"""
+    var args: CmlArgs
+    args["test"] = @["me"]
+    let argsOrMessage = newArgsOrMessage(args)
+    check $argsOrMessage == expected
+
+  test "ArgsOrMessage multiple args":
+    let expected = """
+argsOrMessage.args[test] = ["me"]
+argsOrMessage.args[save] = ["flower.jpg", "tea.png"]"""
+    var args: CmlArgs
+    args["test"] = @["me"]
+    args["save"] = @["flower.jpg", "tea.png"]
+    let argsOrMessage = newArgsOrMessage(args)
+    check $argsOrMessage == expected

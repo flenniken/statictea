@@ -36,6 +36,8 @@ dictionary.
 * type: [ArgsOrMessage](#argsormessage) &mdash; Contains the command line args or a message.
 * type: [CmlOptionType](#cmloptiontype) &mdash; The option type.
 * [newCmlOption](#newcmloption) &mdash; Create a new CmlOption object.
+* [newArgsOrMessage](#newargsormessage) &mdash; Create a new ArgsOrMessage object containing arguments.
+* [newArgsOrMessage](#newargsormessage-1) &mdash; Create a new ArgsOrMessage object containing a message id and optionally the problem parameter.
 * [`$`](#) &mdash; Return a string representation of an CmlOption object.
 * [`$`](#-1) &mdash; Return a string representation of a ArgsOrMessage object.
 * [commandLineEcho](#commandlineecho) &mdash; Show the command line arguments.
@@ -126,6 +128,22 @@ Create a new CmlOption object. For no short option use a dash.
 
 ```nim
 func newCmlOption(long: string; short: char; optionType: CmlOptionType): CmlOption
+```
+
+# newArgsOrMessage
+
+Create a new ArgsOrMessage object containing arguments.
+
+```nim
+func newArgsOrMessage(args: CmlArgs): ArgsOrMessage
+```
+
+# newArgsOrMessage
+
+Create a new ArgsOrMessage object containing a message id and optionally the problem parameter.
+
+```nim
+func newArgsOrMessage(messageId: CmlMessageId; problemParam = ""): ArgsOrMessage
 ```
 
 # `$`
