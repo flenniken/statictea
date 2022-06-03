@@ -146,6 +146,8 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     if lastLine.kind == rlNormalLine:
       inOutExtraLine = newNormalLine(lastLine.line)
 
+  env.log("Template lines: $1\n" % $(lb.getLineNum()-1))
+
 proc updateTemplateLines(env: var Env, variables: var Variables,
                           prepostTable: PrepostTable) =
   ## Update the given template file.

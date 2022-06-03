@@ -46,6 +46,7 @@ Starting: argv: @["-l", "log.txt", "-s", "hello.json", "-t", "hello.html"]
 Version: 0.1.0
 Json filename: hello.json
 Json file size: 18
+Template lines: 2
 Warnings: 0
 ~~~
 

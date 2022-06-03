@@ -676,7 +676,7 @@ when false:
     for ix in countUp(1, int(count)):
       result.add(pattern)
 
-proc linesSideBySide*(expectedContent: string, gotContent: string): string =
+proc linesSideBySide*(gotContent: string, expectedContent: string): string =
   ## Show the two sets of lines side by side.
 
   if gotContent == "" and expectedContent == "":

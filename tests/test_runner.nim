@@ -887,8 +887,8 @@ my expected line
 what I got
 """
     let expected = """
-1      got: what I got␊
-1 expected: my expected line␊"""
+1      got: my expected line␊
+1 expected: what I got␊"""
     check testLinesSideBySide(content1, content2, expected)
 
   test "linesSideBySide2":
@@ -902,8 +902,8 @@ what I got
 """
     let expected = """
 1     same: my expected line␊
-2      got: what I got␊
-2 expected: my second line␊"""
+2      got: my second line␊
+2 expected: what I got␊"""
     check testLinesSideBySide(content1, content2, expected)
 
   test "linesSideBySide3":
@@ -919,8 +919,8 @@ my last line
 """
     let expected = """
 1     same: my expected line␊
-2      got:   the center␊
-2 expected: middle␊
+2      got: middle␊
+2 expected:   the center␊
 3     same: my last line␊"""
     check testLinesSideBySide(content1, content2, expected)
 
@@ -951,8 +951,8 @@ hello there
     let expected = """
 
 Difference: f1.txt (got) != f2.txt (expected)
-1      got: hello there␊
-1 expected: test file␊
+1      got: test file␊
+1 expected: hello there␊
 """
     check testCompareFilesDifferent(f1, f2, expected)
 
@@ -969,8 +969,8 @@ wow we
 
 Difference: f1.txt (got) != f2.txt (expected)
 1     same: test line␊
-2      got: wow we␊
-2 expected: different line␊
+2      got: different line␊
+2 expected: wow we␊
 """
     check testCompareFilesDifferent(f1, f2, expected)
 
@@ -989,8 +989,8 @@ more
 
 Difference: f1.txt (got) != f2.txt (expected)
 1     same: test line␊
-2      got: something else␊
-2 expected: third line␊
+2      got: third line␊
+2 expected: something else␊
 3     same: more␊
 """
     check testCompareFilesDifferent(f1, f2, expected)
