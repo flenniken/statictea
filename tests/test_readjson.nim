@@ -475,11 +475,11 @@ she sat down in a large arm-chair at one end of the table.
     check testParseJsonStr(str, 1, "/", 2)
 
     str = bytesToString([0x31u8, 0x32, 0x33, 0xff, uint8('"')])
-    check testParseJsonStrE(str, 0, newWarningData(wInvalidUtf8, "", 3))
+    check testParseJsonStrE(str, 0, newWarningData(wInvalidUtf8ByteSeq, "", 3))
 
     # overlong ASCII solidus /.
     str = "overlong solidus: \xe0\x80\xaf."
-    check testParseJsonStrE(str, 0, newWarningData(wInvalidUtf8, "", 18))
+    check testParseJsonStrE(str, 0, newWarningData(wInvalidUtf8ByteSeq, "", 18))
 
     str = """a = "no ending quote. asdf"""
     check testParseJsonStrE(str, 5, newWarningData(wNoEndingQuote, "", 26))

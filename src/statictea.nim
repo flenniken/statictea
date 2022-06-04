@@ -14,6 +14,7 @@ when isMainModule:
   import timer
 
 proc processArgs(env: var Env, args: Args) =
+  ## Run the option specified.
   if args.help:
     env.writeOut(getHelp())
   elif args.version:
@@ -54,23 +55,19 @@ proc main*(env: var Env, argv: seq[string]) =
     let msg = getCurrentExceptionMsg()
     env.log(msg & "\n")
     # Unexpected exception: '$1'.
-    env.warn(wUnexpectedException)
-    # Exception: '$1'.
-    env.warn(wExceptionMsg, msg)
-    # The stack trace is only available in the debug builds.
+    env.warn(wUnexpectedException, msg)
     when not defined(release):
+      # The stack trace is only available in the debug builds.
       # Stack trace: '$1'.
       env.warn(wStackTrace, getCurrentException().getStackTrace())
 
 when isMainModule:
-  proc run(): int =
+  block:
     var timer = newTimer()
     var env = openEnv()
     main(env, commandLineParams())
+    let rc = if env.warningsWritten > 0: QuitFailure else: QuitSuccess
     env.log("Warnings: $1\n" % [$env.warningsWritten])
-    if env.warningsWritten > 0:
-      result = 1
     env.log("Duration: $1\n" % $timer.seconds())
     env.close()
-
-  quit(if run() == 0: QuitSuccess else: QuitFailure)
+    quit(rc)

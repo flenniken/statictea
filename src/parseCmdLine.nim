@@ -106,6 +106,7 @@ proc parseCmdLine*(prepostTable: PrepostTable,
   # Get the command.
   let commandMatchO = matchCommand(line, prefixMatch.length)
   if not isSome(commandMatchO):
+    # No command found at column $1, treating it as a non-command line.
     return newLinePartsOr(wNoCommand, "", prefixMatch.length+1)
 
   var commandMatch = commandMatchO.get()
@@ -119,6 +120,7 @@ proc parseCmdLine*(prepostTable: PrepostTable,
   # continuation and its position when it matches.
   let lastPartO = getLastPart(line, lineParts.postfix)
   if not isSome(lastPartO):
+    # The matching closing comment postfix was not found, expected: "$1".
     return newLinePartsOr(wNoPostfix, lineParts.postfix, 0)
   var lastPart = lastPartO.get()
   let (continuation, ending) = lastPart.get2Groups()

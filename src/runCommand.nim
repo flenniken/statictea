@@ -266,6 +266,7 @@ proc getNumber*(statement: Statement, start: Natural):
   # Check that we have a statictea number.
   let matchesO = matchNumber(statement.text, start)
   if not matchesO.isSome:
+    # Invalid number.
     return newValueAndLengthOr(wNotNumber, "", start)
 
   # The decimal point determines whether the number is an integer or
@@ -278,6 +279,7 @@ proc getNumber*(statement: Statement, start: Natural):
     # Parse the float.
     let floatAndLengthO = parseFloat(statement.text, start)
     if not floatAndLengthO.isSome:
+      # The number is too big or too small.
       return newValueAndLengthOr(wNumberOverFlow, "", start)
     let floatAndLength = floatAndLengthO.get()
     value = newValue(floatAndLength.number)
@@ -286,6 +288,7 @@ proc getNumber*(statement: Statement, start: Natural):
     # Parse the int.
     let intAndLengthO = parseInteger(statement.text, start)
     if not intAndLengthO.isSome:
+      # The number is too big or too small.
       return newValueAndLengthOr(wNumberOverFlow, "", start)
     let intAndLength = intAndLengthO.get()
     value = newValue(intAndLength.number)

@@ -510,15 +510,15 @@ after
 """
 
     let eErrLines = splitNewLines """
-template.html(4): w54: The list index 2 out of range.
+template.html(4): w54: The list index 2 is out of range.
 statement: var = get(s.nums, t.row)
                              ^
 template.html(6): w58: The replacement variable doesn't exist: var.
-template.html(4): w54: The list index 3 out of range.
+template.html(4): w54: The list index 3 is out of range.
 statement: var = get(s.nums, t.row)
                              ^
 template.html(6): w58: The replacement variable doesn't exist: var.
-template.html(4): w54: The list index 4 out of range.
+template.html(4): w54: The list index 4 is out of range.
 statement: var = get(s.nums, t.row)
                              ^
 template.html(6): w58: The replacement variable doesn't exist: var.

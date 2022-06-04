@@ -388,6 +388,7 @@ proc allocTempSegments*(env: var Env, lineNum: Natural): Option[TempSegments] =
   # Create a temporary file for the replacement block segments.
   let tempFileStreamO = getTempFileStream()
   if not isSome(tempFileStreamO):
+    # Unable to create a temporary file.
     env.warn(lineNum, wNoTempFile)
     return
   let tempFileStream = tempFileStreamO.get()
@@ -400,6 +401,7 @@ proc allocTempSegments*(env: var Env, lineNum: Natural): Option[TempSegments] =
                                   maxLineLen = maxLineLen)
   if not lineBufferO.isSome():
     tempFile.closeDelete()
+    # Not enough memory for the line buffer.
     env.warn(lineNum, wNotEnoughMemoryForLB)
     return
 
@@ -437,6 +439,7 @@ iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
 
         # Stop when we reach the maximum line count for a replacement block.
         if count >= maxLines:
+          # Read t.maxLines replacement block lines without finding the endblock.
           env.warn(lb.getLineNum(), wExceededMaxLine)
           yield(newReplaceLine(rlNormalLine, line))
           break

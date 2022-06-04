@@ -26,6 +26,7 @@ template getNewLineBuffer(env: Env): untyped =
   let lineBufferO = newLineBuffer(env.templateStream,
       filename = env.templateFilename)
   if not lineBufferO.isSome():
+    # Not enough memory for the line buffer.
     env.warn(wNotEnoughMemoryForLB)
     return
   lineBufferO.get()
@@ -230,6 +231,7 @@ proc readJsonFileLog*(env: var Env, filename: string): ValueOr =
   ## Read a json file and log.
 
   if not fileExists(filename):
+    # File not found: $1.
     env.warn(wFileNotFound, filename)
     return
 
@@ -268,7 +270,7 @@ proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
       # Merge in the variables.
       for k, v in valueOr.value.dictv.pairs:
         if k in varsDict:
-          # Skip the duplicates
+          # Duplicate json variable '$1' skipped.
           env.warn(wDuplicateVar, k)
         else:
           varsDict[k] = v
@@ -372,6 +374,7 @@ proc updateTemplateTop*(env: var Env, args: Args) =
     try:
       moveFile(env.resultFilename, env.templateFilename)
     except OSError:
+      # Unable to rename temporary file over template file.
       env.warn(wUnableToRenameTemp)
       # Delete the temp file.
       discard tryRemoveFile(env.resultFilename)

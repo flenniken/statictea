@@ -160,10 +160,13 @@ proc logLine*(env: var Env, filename: string, lineNum: int, message: string) =
     # raise newException(IOError, "test io error")
     env.logFile.write(line)
   except:
+    # Unable to write to the log file: '$1'.
     env.warn(wUnableToWriteLogFile, filename)
+    # Exception: '$1'.
     env.warn(wExceptionMsg, getCurrentExceptionMsg())
     # The stack trace is only available in the debug builds.
     when not defined(release):
+      # Stack trace: '$1'.
       env.warn(wStackTrace, getCurrentException().getStackTrace())
     # Close the log file.  Only one warning goes out about it not working.
     env.logFile.close()
@@ -197,6 +200,7 @@ proc openLogFile(env: var Env, logFilename: string) =
     env.logFile = file
     env.logFilename = logFilename
   else:
+    # Unable to open log file: '$1'.
     env.warn(wUnableToOpenLogFile, logFilename)
 
 proc openEnv*(logFilename: string = "",
@@ -237,6 +241,7 @@ proc addExtraStreams*(env: var Env, templateFilename: string,
   if templateFilename == "stdin":
     tStream = newFileStream(stdin)
     if tStream == nil:
+      # Unable to open standard input: $1.
       return some(newWarningData(wCannotOpenStd, "stdin"))
   else:
     if not fileExists(templateFilename):
@@ -287,6 +292,7 @@ proc addExtraStreamsForUpdate*(env: var Env, args: Args):
 
   # Warn and exit when a resultFilename is specified.
   if args.resultFilename != "":
+    # The update option overwrites the template, no result file allowed.
     return some(newWarningData(wResultFileNotAllowed))
 
   # Get the template filename.
@@ -301,6 +307,7 @@ proc addExtraStreamsForUpdate*(env: var Env, args: Args):
     # filename at the end.
     var tempFileO = openTempFile()
     if not tempFileO.isSome():
+      # Unable to open temporary file.
       return some(newWarningData(wUnableToOpenTempFile))
     var tempFile = tempFileO.get()
     tempFile.file.close()

@@ -170,10 +170,10 @@ proc getParentDictToAddTo(variables: Variables, dotNameStr: string):
   # Loop through the dictionaries looking up each sub dict.
   for name in dictNames:
     if not (name in parentDict):
-      # Name doesn't exist in the parent dictionary. # wVariableMissing
+      # The variable '$1' does not exist.
       return newVarsDictOr(wVariableMissing, name)
     if parentDict[name].kind != vkDict:
-      # "Name, $1, is not a dictionary.", # wNotDict
+      # Name, $1, is not a dictionary.
       return newVarsDictOr(wNotDict, name)
     parentDict = parentDict[name].dictv
 
@@ -190,13 +190,15 @@ func assignTeaVariable(variables: var Variables, dotNameStr: string,
   assert names[0] == "t"
 
   if names.len == 1:
+    # You cannot assign to an existing variable.
     return some(newWarningData(wImmutableVars))
 
   let varName = names[1]
   var tea = variables["t"].dictv
   if varName in tea:
     if varName in ["row", "version", "args"]:
-        return some(newWarningData(wReadOnlyTeaVar, varName))
+      # You cannot change the t.$1 tea variable.
+      return some(newWarningData(wReadOnlyTeaVar, varName))
     # You cannot reassign a tea variable.
     return some(newWarningData(wTeaVariableExists))
 
@@ -204,29 +206,36 @@ func assignTeaVariable(variables: var Variables, dotNameStr: string,
     of "maxLines":
       # MaxLines must be an integer greater than 1.
       if value.kind != vkInt or value.intv < 2:
+        # MaxLines must be an integer greater than 1.
         return some(newWarningData(wInvalidMaxCount))
     of "maxRepeat":
       # The maxRepeat variable must be a positive integer >= t.repeat.
       if value.kind != vkInt or value.intv < getTeaVarIntDefault(variables, "repeat"):
+        # The maxRepeat value must be greater than or equal to t.repeat.
         return some(newWarningData(wInvalidMaxRepeat))
     of "content":
       # Content must be a string.
       if value.kind != vkString:
+        # You must assign t.content a string.
         return some(newWarningData(wInvalidTeaContent))
     of "output":
       # Output must be a string of "result", etc.
       if value.kind != vkString or not outputValues.contains(value.stringv):
+        # Invalid t.output value, use: "result", "stdout", "stderr", "log", or "skip".
         return some(newWarningData(wInvalidOutputValue))
     of "repeat":
       # Repeat is an integer >= 0 and <= t.maxRepeat.
       if value.kind != vkInt or value.intv < 0 or
           value.intv > getTeaVarIntDefault(variables, "maxRepeat"):
+        # The variable t.repeat must be an integer between 0 and t.maxRepeat.
         return some(newWarningData(wInvalidRepeat))
     else:
+      # Invalid tea variable: $1.
       return some(newWarningData(wInvalidTeaVar, varName))
 
   # You cannot append to a tea variable.
   if operator == "&=":
+    # You cannot append to a tea variable.
     return some(newWarningData(wAppendToTeaVar))
 
   tea[varName] = value
@@ -257,10 +266,13 @@ proc assignVariable*(
     return assignTeaVariable(variables, dotNameStr, value, operator)
   of "s", "h":
     if names.len == 1:
+      # You cannot assign to an existing variable.
       return some(newWarningData(wImmutableVars))
+    # You cannot overwrite the server or shared variables.
     return some(newWarningData(wReadOnlyDictionary))
   of "g", "l":
     if names.len == 1:
+      # You cannot assign to an existing variable.
       return some(newWarningData(wImmutableVars))
     varsDictOr = getParentDictToAddTo(variables, dotNameStr)
   of "f", "i", "j", "k", "m", "n", "o", "p", "q", "r", "u":
@@ -276,6 +288,7 @@ proc assignVariable*(
   if operator == "=":
     # Assign the value to the dictionary.
     if lastName in varsDictOr.value:
+      # You cannot assign to an existing variable.
       return some(newWarningData(wImmutableVars))
     varsDictOr.value[lastName] = value
   else:
@@ -302,12 +315,14 @@ func lookUpVar(variables: Variables, names: seq[string]): ValueOr =
   while true:
     let name = names[ix]
     if not (name in next):
+      # The variable '$1' does not exist.
       return newValueOr(wVariableMissing, name)
     let value = next[name]
     inc(ix)
     if ix >= names.len:
       return newValueOr(value)
     if value.kind != vkDict:
+      # Name, $1, is not a dictionary.
       return newValueOr(wNotDict, name)
     next = value.dictv
 
@@ -320,6 +335,7 @@ proc getVariable*(variables: Variables, dotNameStr: string): ValueOr =
   of "g", "h", "l", "s", "t":
     discard
   of "f", "i", "j", "k", "m", "n", "o", "p", "q", "r", "u":
+    # The variables f, i - k, m - r, u are reserved variable names.
     return newValueOr(wReservedNameSpaces)
   else:
     # It must be a local variable, add the missing l.

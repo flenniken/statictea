@@ -57,6 +57,7 @@ func numberStringToNum(numString: string): FunResult =
 
   var matchesO = matchNumberNotCached(numString, 0)
   if not matchesO.isSome:
+    # Expected number string.
     return newFunResultWarn(wExpectedNumberString)
   let decimalPoint = matchesO.getGroup()
 
@@ -66,6 +67,7 @@ func numberStringToNum(numString: string): FunResult =
     if floatAndLengthO.isSome:
       result = newFunResult(newValue(floatAndLengthO.get().number))
     else:
+      # Expected number string.
       result = newFunResultWarn(wExpectedNumberString)
   else:
     # Int number string to int.
@@ -73,6 +75,7 @@ func numberStringToNum(numString: string): FunResult =
     if intAndLengthO.isSome:
       result = newFunResult(newValue(intAndLengthO.get().number))
     else:
+      # Expected number string.
       result = newFunResultWarn(wExpectedNumberString)
 
 func funCmp_iii*(parameters: seq[Value]): FunResult =
@@ -258,6 +261,7 @@ func funGet_lioaa*(parameters: seq[Value]): FunResult =
   elif "c" in map:
     result = newFunResult(map["c"])
   else:
+    # The list index $1 is out of range.
     result = newFunResultWarn(wMissingListItem, 1, $index)
 
 func funGet_dsoaa*(parameters: seq[Value]): FunResult =
@@ -295,6 +299,7 @@ func funGet_dsoaa*(parameters: seq[Value]): FunResult =
   elif "c" in map:
     result = newFunResult(map["c"])
   else:
+    # The dictionary does not have an item with key $1.
     result = newFunResultWarn(wMissingDictItem, 1, key)
 
 func funIf0*(parameters: seq[Value]): FunResult =
@@ -439,6 +444,7 @@ func funAdd_fff*(parameters: seq[Value]): FunResult =
   try:
     result = newFunResult(newValue(a + b))
   except:
+    # Overflow or underflow.
     result = newFunResultWarn(wOverflow)
 
 {.pop.}
@@ -495,7 +501,8 @@ func getCase(map: VarsDict): FunResult =
   if "c" in map:
     result = newFunResult(map["c"])
   else:
-     result = newFunResultWarn(wMissingElse, 2)
+    # None of the case conditions match and no else case.
+    result = newFunResultWarn(wMissingElse, 2)
 
 func funCase_iloaa*(parameters: seq[Value]): FunResult =
   ## Compare integer cases and return the matching value.  It takes a
@@ -605,6 +612,7 @@ func funCmpVersion*(parameters: seq[Value]): FunResult =
 
   let bTupleO = parseVersion(versionB)
   if not bTupleO.isSome:
+    # Invalid StaticTea version string.
     return newFunResultWarn(wInvalidVersion, 1)
   let (oneV2, twoV2, threeV2) = bTupleO.get()
 
@@ -663,6 +671,7 @@ func convertFloatToInt(num: float, map: VarsDict): FunResult =
   ## Convert float to an integer. The map contains the optional round
   ## options as "b".
   if num > float(high(int64)) or num < float(low(int64)):
+    # The number is too big or too small.
     return newFunResultWarn(wNumberOverFlow)
 
   var option: string
@@ -682,6 +691,7 @@ func convertFloatToInt(num: float, map: VarsDict): FunResult =
     of "truncate":
       ret = int(trunc(num))
     else:
+      # Expected round, floor, ceiling or truncate.
       return newFunResultWarn(wExpectedRoundOption, 1)
   result = newFunResult(newValue(ret))
 
@@ -865,6 +875,7 @@ func funDup*(parameters: seq[Value]): FunResult =
   # Result must be less than 1024 characters.
   let length = count * pattern.len
   if length > 1024:
+    # The resulting duplicated string must be under 1024 characters, got: $1.
     result = newFunResultWarn(wDupStringTooLong, 1, $length)
     return
 
@@ -999,10 +1010,12 @@ func funReplace*(parameters: seq[Value]): FunResult =
   let replacement = map["d"].stringv
 
   if start < 0 or start > str.len:
+    # Invalid position: got $1.
     result = newFunResultWarn(wInvalidPosition, 1, $start)
     return
 
   if length < 0 or start + length > str.len:
+    # Invalid length: $1.
     result = newFunResultWarn(wInvalidLength, 2, $length)
     return
 
@@ -1113,6 +1126,7 @@ func funPath*(parameters: seq[Value]): FunResult =
     of "\\":
       separator = '\\'
     else:
+      # Expected / or \\.
       return newFunResultWarn(wExpectedSeparator, 1)
   else:
     separator = os.DirSep
@@ -1231,6 +1245,7 @@ func generalSort(map: VarsDict): FunResult =
       of "descending":
         sortOrder = Descending
       else:
+        # Expected the sort order, 'ascending' or 'descending'.
         return newFunResultWarn(wExpectedSortOrder, 1)
   else:
     sortOrder = Ascending
@@ -1243,6 +1258,7 @@ func generalSort(map: VarsDict): FunResult =
       of "insensitive":
         insensitive = true
       else:
+        # Expected sensitive or unsensitive.
         return newFunResultWarn(wExpectedSensitivity, 2)
 
   var index = 0i64
@@ -1263,10 +1279,12 @@ func generalSort(map: VarsDict): FunResult =
   var firstKeyValueKind = vkString
   if listKind == vkDict:
     if not (key in firstItem.dictv):
+      # A dictionary is missing the sort key.
       return newFunResultWarn(wDictKeyMissing, 0)
     firstKeyValueKind = firstItem.dictv[key].kind
   elif listKind == vkList:
     if firstItem.listv.len == 0:
+      # A sublist is empty.
       return newFunResultWarn(wSubListsEmpty, 0)
     firstListValueKind = firstItem.listv[0].kind
 
@@ -1457,6 +1475,7 @@ func funGithubAnchor_ll*(parameters: seq[Value]): FunResult =
   var anchorNames: seq[string]
   for name in list:
     if name.kind != vkString:
+      # The list values must be all strings.
       return newFunResultWarn(wNotAllStrings, 0)
 
     let anchorName = githubAnchor(name.stringv)
@@ -1506,7 +1525,7 @@ func joinPathList(map: VarsDict): FunResult =
       of "":
         discard
       else:
-        # Invalid separator
+        # Expected / or \\.
         return newFunResultWarn(wExpectedSeparator, 0)
 
   var ret: string

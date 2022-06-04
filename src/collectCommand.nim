@@ -84,8 +84,10 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
       if lineParts.command == ":" or lineParts.command == "endblock":
         var warn: MessageId
         if lineParts.command == ":":
+          # The continue command is not part of a command.
           warn = wBareContinue
         else:
+          # The endblock command does not have a matching block command.
           warn = wBareEndblock
         env.warn(lb.getLineNum(), warn)
         env.resultStream.write(line)

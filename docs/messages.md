@@ -205,15 +205,15 @@ The message text.
 ```nim
 Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The message text.
 ## wSuccess
-    "Unknown switch: $1.",  ## wUnknownSwitch
+    "",                     ## wUnknownSwitch
     "Unknown argument: $1.", ## wUnknownArg
-    "One result file allowed, skipping: \'$1\'.", ## wOneResultAllowed
-    "Skipping extra prepost text: $1.", ## wExtraPrepostText
-    "One template file allowed on the command line, skipping: $1.", ## wOneTemplateAllowed
-    "No prepost value.",    ## wNoPrepostValue
+    "",                     ## wOneResultAllowed
+    "",                     ## wExtraPrepostText
+    "",                     ## wOneTemplateAllowed
+    "",                     ## wNoPrepostValue
     "Skipping extra prepost text: $1.", ## wSkippingExtraPrepost
     "Unable to open log file: \'$1\'.", ## wUnableToOpenLogFile
-    "One log file allowed, skipping: \'$1\'.", ## wOneLogAllowed
+    "",                     ## wOneLogAllowed
     "Unable to write to the log file: \'$1\'.", ## wUnableToWriteLogFile
     "Exception: \'$1\'.",   ## wExceptionMsg
     "Stack trace: \'$1\'.", ## wStackTrace
@@ -223,25 +223,25 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "File not found: $1.",  ## wFileNotFound
     "Unable to open file: $1.", ## wUnableToOpenFile
     "The log file is over 1 GB.", ## wBigLogFile
-    "Unable to open standard device: $1.", ## wCannotOpenStd
-    "No command specified on the line, treating it as a comment.", ## wNotACommand
-    "Command line too long.", ## wCmdLineTooLong
+    "Unable to open standard input: $1.", ## wCannotOpenStd
+    "",                     ## wNotACommand
+    "",                     ## wCmdLineTooLong
     "No command found at column $1, treating it as a non-command line.", ## wNoCommand
     """The matching closing comment postfix was not found, expected: "$1".""", ## wNoPostfix
-    "Missing the continuation command, abandoning the previous command.", ## wNoContinuationLine
-    "Ignoring extra text after the number.", ## wSkippingTextAfterNum
+    "",                     ## wNoContinuationLine
+    "",                     ## wSkippingTextAfterNum
     "Invalid number.",      ## wNotNumber
     "The number is too big or too small.", ## wNumberOverFlow
     "Not enough memory for the line buffer.", ## wNotEnoughMemoryForLB
     "Statement does not start with a variable name.", ## wMissingStatementVar
-    "Invalid string.",      ## wNotString
+    "",                     ## wNotString
     "Unused text at the end of the statement.", ## wTextAfterValue
-    "Invalid UTF-8 byte in the string.", ## wInvalidUtf8
+    "",                     ## wInvalidUtf8
     "Expected a string, number, variable, list or function.", ## wInvalidRightHandSide
     "Missing operator, = or &=.", ## wInvalidVariable
-    "The variable namespace \'$1\' does not exist.", ## wInvalidNameSpace
+    "",                     ## wInvalidNameSpace
     "The variable \'$1\' does not exist.", ## wVariableMissing
-    "The statement starting at column $1 has an error.", ## wStatementError
+    "",                     ## wStatementError
     "You cannot overwrite the server or shared variables.", ## wReadOnlyDictionary
     "You cannot change the t.$1 tea variable.", ## wReadOnlyTeaVar
     "Invalid tea variable: $1.", ## wInvalidTeaVar
@@ -252,13 +252,13 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Invalid prepost: $1.", ## wInvalidPrepost
     "Expected comma or right parentheses.", ## wMissingCommaParen
     "Expected a string.",   ## wExpectedString
-    "Invalid statement, skipping it.", ## wInvalidStatement
+    "",                     ## wInvalidStatement
     "",                     ## wOneParameter
     "",                     ## wStringListDict
     "The function does not exist: $1.", ## wInvalidFunction
     "",                     ## wGetTakes2or3Params
     "",                     ## wExpectedIntFor2
-    "The list index $1 out of range.", ## wMissingListItem
+    "The list index $1 is out of range.", ## wMissingListItem
     "",                     ## wExpectedStringFor2
     "The dictionary does not have an item with key $1.", ## wMissingDictItem
     "",                     ## wExpectedListOrDict
@@ -278,23 +278,23 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "",                     ## wAllIntOrFloat
     "Overflow or underflow.", ## wOverflow
     "The argument must be a string.", ## wExpectedString
-    "Index values must greater than or equal to 0, got: $1.", ## wInvalidIndex
+    "",                     ## wInvalidIndex
     "",                     ## wExpectedDictionary
     "",                     ## wThreeOrMoreParameters
-    "The main condition type must an int or string.", ## wInvalidMainType
-    "The case condition must be an int or string.", ## wInvalidCondition
+    "",                     ## wInvalidMainType
+    "",                     ## wInvalidCondition
     "Invalid StaticTea version string.", ## wInvalidVersion
-    "Expected int or int number string.", ## wIntOrStringNumber
-    "Expected a float or float number string.", ## wFloatOrStringNumber
+    "",                     ## wIntOrStringNumber
+    "",                     ## wFloatOrStringNumber
     "Expected round, floor, ceiling or truncate.", ## wExpectedRoundOption
     "",                     ## wOneOrTwoParameters
-    "The t.content does not end with a newline, adding one.", ## wMissingNewLineContent
+    "",                     ## wMissingNewLineContent
     "The update option overwrites the template, no result file allowed.", ## wResultFileNotAllowed
     "Unable to open temporary file.", ## wUnableToOpenTempFile
     "Unable to rename temporary file over template file.", ## wUnableToRenameTemp
     "No template name. Use -h for help.", ## wNoTemplateName
     "Invalid position: got $1.", ## wInvalidPosition
-    "The end position is less that the start position.", ## wEndLessThenStart
+    "",                     ## wEndLessThenStart
     "The substring was not found and no default argument.", ## wSubstringNotFound
     "The resulting duplicated string must be under 1024 characters, got: $1.", ## wDupStringTooLong
     "Specify arguments in pairs.", ## wPairParameters
@@ -303,19 +303,19 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "",                     ## wExpected4Parameters
     "Invalid length: $1.",  ## wInvalidLength
     "",                     ## wMissingReplacement
-    "Expected a list.",     ## wExpectedList
+    "",                     ## wExpectedList
     "Expected / or \\.",    ## wExpectedSeparator
-    "The variables f, g, h, l, s and t are reserved variable names.", ## wReservedNameSpaces
-    "Name, $1, doesn\'t exist in the parent dictionary.", ## wMissingVarName
+    "The variables f, i - k, m - r, u are reserved variable names.", ## wReservedNameSpaces
+    "",                     ## wMissingVarName
     "Name, $1, is not a dictionary.", ## wNotDict
-    "The dictionary $1 doesn\'t exist.", ## wMissingDict
+    "",                     ## wMissingDict
     "Expected the sort order, \'ascending\' or \'descending\'.", ## wExpectedSortOrder
-    "The list values must be all ints, all floats or all strings.", ## wAllNotIntFloatString
-    "The values must be integers, floats or strings.", ## wIntFloatString
+    "",                     ## wAllNotIntFloatString
+    "",                     ## wIntFloatString
     "The argument must be 0 or 1.", ## wNotZeroOne
     "",                     ## wOneToFourParameters
-    "Expected the sensitive or unsensitive.", ## wExpectedSensitivity
-    "Expected the dictionary sort key.", ## wExpectedKey
+    "Expected sensitive or unsensitive.", ## wExpectedSensitivity
+    "",                     ## wExpectedKey
     "A dictionary is missing the sort key.", ## wDictKeyMissing
     "The sort key values are different types.", ## wKeyValueKindDiff
     "A sublist is empty.",  ## wSubListsEmpty
@@ -339,13 +339,13 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Duplicate json variable \'$1\' skipped.", ## wDuplicateVar
     "No $1 filename.",      ## wNoFilename
     "A \\u must be followed by 4 hex digits.", ## wFourHexDigits
-    "The second value is not a matching surrogate pair.", ## wNotMatchingSurrogate
+    "",                     ## wNotMatchingSurrogate
     "Missing the low surrogate.", ## wMissingSurrogatePair
     """A slash must be followed by one letter from: nr"t\bf/.""", ## wNotPopular
     "Controls characters must be escaped.", ## wControlNotEscaped
     "No ending double quote.", ## wNoEndingQuote
     "You cannot use a low surrogate by itself or first in a pair.", ## wLowSurrogateFirst
-    "Invalid paired surrogate.", ## wPairedSurrogate
+    "",                     ## wPairedSurrogate
     "The replaceMany function failed.", ## wReplaceMany
     "The join list items must be strings.", ## wJoinListString
     "The endblock command does not have a matching block command.", ## wBareEndblock
@@ -354,8 +354,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Unicode code point over the limit of 10FFFF.", ## wCodePointTooBig
     "Invalid UTF-8 byte sequence at position $1.", ## wInvalidUtf8ByteSeq
     "Unicode surrogate code points are invalid in UTF-8 strings.", ## wUtf8Surrogate
-    "The end position is less than start position.", ## wEndPosTooSmall
-    "The end position is greater then the number of characters in the string.", ## wEndPosTooBig
+    "",                     ## wEndPosTooSmall
+    "",                     ## wEndPosTooBig
     "The start position is greater then the number of characters in the string.", ## wStartPosTooBig
     "The length is greater then the possible number of characters in the slice.", ## wLengthTooBig
     "The start position is less than 0.", ## wStartPosTooSmall
@@ -376,7 +376,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Already have one \'$1\' argument.", ## wCmlAlreadyHaveOneArg
     "Missing comma or right bracket.", ## wMissingCommaBracket
     "$1",                   ## wUserMessage
-    "The dictionary does not have an item with index $1.", ## wMissingDictIndex
+    "",                     ## wMissingDictIndex
     "The maximum JSON depth of $1 was exceeded.", ## wMaxDepthExceeded
     "The template and $1 files are the same.", ## wSameAsTemplate
     "The result and $1 files are the same.", ## wSameAsResult

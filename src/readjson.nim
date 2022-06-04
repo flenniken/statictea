@@ -225,8 +225,8 @@ func parseJsonStr*(text: string, startPos: Natural): StrAndPosOr =
         # Get the unicode character at pos.
         let str = utf8CharString(text, pos)
         if str.len == 0:
-          # Invalid UTF-8 unicode character.
-          return newStrAndPosOr(wInvalidUtf8, "", pos)
+          # Invalid UTF-8 byte sequence at position $1.
+          return newStrAndPosOr(wInvalidUtf8ByteSeq, "", pos)
 
         # Add the unicode character to the result string.
         newStr.add(str)

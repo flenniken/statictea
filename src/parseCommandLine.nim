@@ -28,6 +28,7 @@ func mapCmlMessages(messageId: CmlMessageId): MessageId =
   when high(CmlMessageId) != cml_12_AlreadyHaveOneArg:
     debugEcho "Update mapCmlMessages"
     fail
+  # Two dashes must be followed by an option name.
   result = MessageId(ord(messageId) + ord(wCmlBareTwoDashes))
 
   # Here are the matching messages.  They are here so when you grep
@@ -94,6 +95,7 @@ proc parseCommandLine*(argv: seq[string]): ArgsOr =
     for str in cmlArgs["prepost"]:
       let prepostO = parsePrepost(str)
       if not prepostO.isSome:
+        # Invalid prepost: $1.
         return newArgsOr(newWarningData(wInvalidPrepost, str))
       else:
         prepostList.add(prepostO.get())

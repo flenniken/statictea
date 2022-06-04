@@ -142,7 +142,7 @@ proc testGetStringInvalid(buffer: seq[uint8]): bool =
   let statement = newStatement("""a = "stringwithbadutf8:$1:end"""" % str)
   let start = 4
   let valueAndLengthOr = getString(statement, start)
-  let eValueAndLengthOr = newValueAndLengthOr(wInvalidUtf8, "", 23)
+  let eValueAndLengthOr = newValueAndLengthOr(wInvalidUtf8ByteSeq, "", 23)
   result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr)
 
 proc testWarnStatement(statement: Statement,

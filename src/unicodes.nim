@@ -173,6 +173,7 @@ func codePointToString*(codePoint: uint32): OpResultId[string] =
     # High surrogate is from D800 to DBFF
     # Low surrogate is from DC00 to DFFF.
     if (i >= 0xD800 and i <= 0xDBFF) or (i >= 0xDC00 and i <= 0xDFFF):
+      # Unicode surrogate code points are invalid in UTF-8 strings.
       return opMessage[string](wUtf8Surrogate)
     # 1110_xxxx
     str.add(chr(i shr 12 or 0b1110_0000))

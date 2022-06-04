@@ -19,8 +19,8 @@ type
     log*: bool
     serverList*: seq[string]
     sharedList*: seq[string]
-    templateFilename*: string
     prepostList*: seq[Prepost]
+    templateFilename*: string
     resultFilename*: string
     logFilename*: string
 
