@@ -1096,15 +1096,15 @@ information.
 
 StaticTea variable types:
 
-- [[#string-type][string]]
-- [[#int-type][int]]
-- [[#float-type][float]]
-- [[#dict-type][dict]]
-- [[#list-type][list]]
+- [[#string-type][String Type]]
+- [[#int-type][Int Type]]
+- [[#float-type][Float Type]]
+- [[#dict-type][Dict Type]]
+- [[#list-type][List Type]]
 
 [[#contents][茶]]
 
-** String
+** String Type
 :PROPERTIES:
 :CUSTOM_ID: string-type
 :END:
@@ -1158,7 +1158,7 @@ Surrogate Pair Calculator]].
 
 [[#contents][茶]]
 
-** Int
+** Int Type
 :PROPERTIES:
 :CUSTOM_ID: int-type
 :END:
@@ -1179,7 +1179,7 @@ Example numbers:
 
 [[#contents][茶]]
 
-** Float
+** Float Type
 :PROPERTIES:
 :CUSTOM_ID: float-type
 :END:
@@ -1200,7 +1200,7 @@ Example floats:
 
 [[#contents][茶]]
 
-** Dict
+** Dict Type
 :PROPERTIES:
 :CUSTOM_ID: dict-type
 :END:
@@ -1274,7 +1274,7 @@ d => {
 
 [[#contents][茶]]
 
-** List
+** List Type
 :PROPERTIES:
 :CUSTOM_ID: list-type
 :END:
