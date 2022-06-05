@@ -1,7 +1,7 @@
 ## Run a command and fill in the variables dictionaries.
 
 import std/options
-import std/strUtils
+import std/strutils
 import std/tables
 import readLines
 import matches

@@ -1,6 +1,22 @@
-import std/unittest
+import std/strutils
 import std/tables
+import std/unittest
+import opresultwarn
+import readjson
 import vartypes
+
+proc testDotNameRep(json: string, eDotNameRep: string): bool =
+  var valueOr = readJsonString(json)
+  if valueOr.isMessage:
+    echo valueOr.message
+    return false
+  let dotNameRep = dotNameRep(valueOr.value.dictv)
+  if dotNameRep != eDotNameRep:
+    echo "     got: '$1'" % dotNameRep
+    echo "expected: '$1'" % eDotNameRep
+    echo "     for: '$1'" % json
+    return false
+  return true
 
 suite "vartypes":
 
@@ -168,3 +184,62 @@ suite "vartypes":
       echo "expected: " & eStr
       echo "     got: " & got
     check got == eStr
+
+  test "dotNameRep empty":
+    check testDotNameRep("{}", "")
+    check testDotNameRep("""{"a":5}""", "a = 5")
+
+  test "dotNameRep one var empty":
+    check testDotNameRep("""{"a":{}}""", "a = {}")
+
+  test "dotNameRep":
+    let json = """
+{
+  "a":{
+    "b":{
+      "c":{
+      }
+    }
+  }
+}"""
+    check testDotNameRep(json, """a.b.c = {}""")
+
+  test "dotNameRep string":
+    check testDotNameRep("""{"a":"string"}""", """a = "string"""")
+
+  test "dotNameRep list":
+    check testDotNameRep("""{"a":[]}""", "a = []")
+    check testDotNameRep("""{"a":[1]}""", "a = [1]")
+    check testDotNameRep("""{"a":[1,2]}""", "a = [1,2]")
+    check testDotNameRep("""{"a":[1,2,"str"]}""", """a = [1,2,"str"]""")
+    check testDotNameRep("""{"a":[1,{"b":5}]}""", """a = [1,{"b":5}]""")
+    check testDotNameRep("""{"a":[1,{"b":5},{}]}""", """a = [1,{"b":5},{}]""")
+
+  test "dotNameRep multiple 2":
+    let json = """
+{
+  "a": 5,
+  "b": 6,
+}
+"""
+    let expected = """
+a = 5
+b = 6"""
+    check testDotNameRep(json, expected)
+
+  test "dotNameRep nested":
+    let json = """{ "a": {"b": 5} }"""
+    let expected = """a.b = 5"""
+    check testDotNameRep(json, expected)
+
+  test "dotNameRep nested 2":
+    let json = """{ "a": {"b": 5}, "c": {"d": 7} }"""
+    let expected = """a.b = 5
+c.d = 7"""
+    check testDotNameRep(json, expected)
+
+  test "dotNameRep nested list":
+    let json = """{ "a": {"b": []}, "c": {"d": [7]} }"""
+    let expected = """a.b = []
+c.d = [7]"""
+    check testDotNameRep(json, expected)

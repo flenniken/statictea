@@ -129,6 +129,10 @@ proc readJsonFile*(filename: string): ValueOr =
       # The root json element must be an object (dictionary).
       result = newValueOr(wInvalidJsonRoot)
 
+  # Close the stream and file.
+  stream.close()
+
+
 proc unescapePopularChar*(popular: char): char =
   ## Unescape the popular char and return its value. If the char is
   ## @:not a popular char, return 0.

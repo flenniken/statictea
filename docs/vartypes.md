@@ -32,6 +32,7 @@ same type which may be Value type.
 * [valueToStringRB](#valuetostringrb) &mdash; Return the string representation of the variable for use in the replacement blocks.
 * [`$`](#-2) &mdash; Return a string representation of a Value.
 * [`$`](#-3) &mdash; Return a string representation of a VarsDict.
+* [dotNameRep](#dotnamerep) &mdash; Return a dot name string representation of a dictionary.
 * [newValueOr](#newvalueor) &mdash; Create a new ValueOr containing a warning.
 * [newValueOr](#newvalueor-1) &mdash; Create a new ValueOr containing a warning.
 * [newValueOr](#newvalueor-2) &mdash; Create a new ValueOr containing a value.
@@ -258,6 +259,14 @@ Return a string representation of a VarsDict.
 
 ```nim
 proc `$`(varsDict: VarsDict): string
+```
+
+# dotNameRep
+
+Return a dot name string representation of a dictionary.
+
+```nim
+func dotNameRep(dict: VarsDict; left: string = ""): string
 ```
 
 # newValueOr

@@ -1,5 +1,5 @@
 import std/unittest
-import std/strUtils
+import std/strutils
 import std/strformat
 import messages
 import warnings

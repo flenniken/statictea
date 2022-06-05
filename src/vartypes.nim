@@ -207,6 +207,8 @@ proc jsonStringRepr*(str: string): string =
 # Recursive prototype.
 func valueToString*(value: Value): string
 
+# todo: string representation of a dict value as dot names.
+
 func dictToString*(value: Value): string =
   ## Return a string representation of a dict Value in JSON format.
   result.add("{")
@@ -265,6 +267,26 @@ func `$`*(value: Value): string =
 proc `$`*(varsDict: VarsDict): string =
   ## Return a string representation of a VarsDict.
   result = valueToString(newValue(varsDict))
+
+func dotNameRep*(dict: VarsDict, left: string = ""): string =
+  ## Return a dot name string representation of a dictionary.
+  # Loop through the dictionary and flatten it to dot names.  Stop at
+  # a leaf. A list is a leaf.  Use json for the leaf.
+  if dict.len == 0:
+    if left == "":
+      return ""
+    return "$1 = {}" % left
+  var first = true
+  for k, v in pairs(dict):
+    if first:
+      first = false
+    else:
+      result.add("\n")
+    let left = if left == "": k else: "$1.$2" % [left, k]
+    if v.kind == vkDict:
+      result.add(dotNameRep(v.dictv, left))
+    else:
+      result.add("$1 = $2" % [left, $v])
 
 func newValueOr*(warning: MessageId, p1 = "", pos = 0): ValueOr =
   ## Create a new ValueOr containing a warning.
