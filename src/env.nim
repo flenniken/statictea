@@ -11,6 +11,7 @@ import warnings
 import args
 when defined(test):
   import readlines
+  import sharedtestcode
 
 const
   logWarnSize*: int64 = 1024 * 1024 * 1024
@@ -316,12 +317,6 @@ proc addExtraStreamsForUpdate*(env: var Env, args: Args):
   result = addExtraStreams(env, templateFilename, resultFilename)
 
 when defined(test):
-  proc createFile*(filename: string, content: string) =
-    ## Create a file with the given content.
-    var file = open(filename, fmWrite)
-    file.write(content)
-    file.close()
-
   proc echoNewline*(str: string) =
     ## Print a line to the screen and display the line endings as \n
     ## or \r\n.

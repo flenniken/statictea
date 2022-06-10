@@ -52,7 +52,7 @@ proc get_dir_filenames(folder: string, extension: string, path: bool = false,
 proc get_source_filenames(path: bool = false, noExt: bool = false): seq[string] =
   ## Return the basename of the nim source files in the src
   ## folder excluding a few.
-  let excludeFilenames = @["t.nim", "dot.nim", "runner.nim", "sharedtestcode.nim"]
+  let excludeFilenames = @["t.nim", "dot.nim", "sharedtestcode.nim"]
   result = get_dir_filenames("src", ".nim", path = path, noExt = noExt,
     excludeFilenames = excludeFilenames)
 

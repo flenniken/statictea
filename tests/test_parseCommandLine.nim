@@ -10,6 +10,7 @@ import env
 import messages
 import warnings
 import opresultwarn
+import sharedtestcode
 
 proc parseCommandLine*(cmdLine: string = ""): ArgsOr =
   let argv = cmdLine.splitWhitespace()

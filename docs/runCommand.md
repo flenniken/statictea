@@ -155,7 +155,8 @@ proc getWarnStatement(statement: Statement; warningData: WarningData;
 Show an invalid statement with a pointer pointing at the start of the problem. Long statements are trimmed around the problem area.
 
 ```nim
-proc warnStatement(env: var Env; statement: Statement; warningData: WarningData)
+proc warnStatement(env: var Env; statement: Statement; warningData: WarningData;
+                   sourceFilename = "")
 ```
 
 # `==`

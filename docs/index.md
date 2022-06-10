@@ -6,8 +6,9 @@ StaticTea nim source code documentation.
 
 * [args.nim](args.md) &mdash; Types for handling command line arguments.
 * [cmdline.nim](cmdline.md) &mdash; Parse the command line.
-* [codefile.nim](codefile.md) &mdash; 
+* [codefile.nim](codefile.md) &mdash; Run code files.
 * [collectCommand.nim](collectCommand.md) &mdash; Collect template command lines.
+* [comparelines.nim](comparelines.md) &mdash; Compare lines of text.
 * [env.nim](env.md) &mdash; Environment holding the input and output streams.
 * [funtypes.nim](funtypes.md) &mdash; Statictea function types and supporting routines.
 * [gethelp.nim](gethelp.md) &mdash; Get the command line help message.
@@ -27,6 +28,7 @@ length.
 * [replacement.nim](replacement.md) &mdash; Handle the replacement block lines.
 * [runCommand.nim](runCommand.md) &mdash; Run a command and fill in the variables dictionaries.
 * [runFunction.nim](runFunction.md) &mdash; This module contains the StaticTea functions and supporting types.
+* [runner.nim](runner.md) &mdash; Standalone command to run Single Test File (stf) files.
 * [signatures.nim](signatures.md) &mdash; Statictea function signatures and parameter checking.
 * [statictea.nim](statictea.md) &mdash; StaticTea; A template processor and language.
 * [tempFile.nim](tempFile.md) &mdash; Temporary file methods.

@@ -180,8 +180,8 @@ func parseJsonStr*(text: string, startPos: Natural): StrAndPosOr =
   ## @:the message id tells what went wrong.
   ## @:
   ## @:~~~
-  ## @:a = "test string"  \\n
-  ## @:     ^             ^
+  ## @:a = "test string"  \n
+  ## @:     ^               ^
   ## @:~~~~
 
   assert(startPos < text.len, "startPos is greater than the text len")
@@ -252,7 +252,7 @@ func parseJsonStr*(text: string, startPos: Natural): StrAndPosOr =
       state = middle
     of whitespace:
       case getChar(text, pos):
-      of ' ', '\t':
+      of ' ', '\t', '\n', '\r':
         inc(pos)
       else:
         break

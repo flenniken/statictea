@@ -339,6 +339,12 @@ $$ : c = len("hello")
     check testGetString(newStatement("""a = "hello"  """), 4,
       newValueAndLengthOr("hello", 9))
 
+    check testGetString(newStatement("a = \"hello\"\n"), 4,
+      newValueAndLengthOr("hello", 8))
+
+    check testGetString(newStatement("a = \"hello\"   \n"), 4,
+      newValueAndLengthOr("hello", 11))
+
   test "getString two bytes":
     let str = bytesToString(@[0xc3u8, 0xb1])
     let statement = newStatement("""a = "$1"""" % str)
@@ -471,6 +477,11 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "runStatement string":
     let statement = newStatement(text="""str = "testing" """, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("str", "=", newValue("testing"))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "runStatement string newline":
+    let statement = newStatement(text="str = \"testing\"\n", lineNum=1, 0)
     let eVariableDataOr = newVariableDataOr("str", "=", newValue("testing"))
     check testRunStatement(statement, eVariableDataOr)
 

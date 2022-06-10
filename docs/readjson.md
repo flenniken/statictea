@@ -137,8 +137,8 @@ failure, the ending position points at the invalid character and
 the message id tells what went wrong.
 
 ~~~
-a = "test string"  \n
-     ^             ^
+a = "test string"  n
+     ^               ^
 ~~~~
 
 ```nim

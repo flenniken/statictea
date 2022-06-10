@@ -10,6 +10,7 @@ import version
 import variables
 import vartypes
 import tables
+import sharedtestcode
 
 iterator yieldContentLine*(content: string): string =
   ## Yield one content line at a time and keep the line endings.

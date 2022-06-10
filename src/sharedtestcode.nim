@@ -10,3 +10,8 @@ when defined(test):
     for ix in 0 .. buffer.len-1:
       result.add((char)buffer[ix])
 
+  proc createFile*(filename: string, content: string) =
+    ## Create a file with the given content.
+    var file = open(filename, fmWrite)
+    file.write(content)
+    file.close()

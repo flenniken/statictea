@@ -1,6 +1,9 @@
+## Run code file.
+
 import std/options
 import std/os
 import std/streams
+import std/strutils
 import env
 import messages
 import opresultwarn
@@ -12,7 +15,6 @@ import warnings
 
 # process the file line by line
 # + newline and """ \w newline continue the statement
-
 
 proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
   ## Run the code file and fill in the variables.
@@ -41,10 +43,11 @@ proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
   # Read and process code lines.
   while true:
     # Read a line.
-    let line = lb.readline()
+    var line = lb.readline()
     if line == "":
       break
 
+    line.removeSuffix()
     let statement = newStatement(line)
 
     # Run the statement and get the variable, operator and value.
@@ -70,9 +73,7 @@ proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
     let warningDataO = assignVariable(variables,
       variableData.dotNameStr, variableData.value, variableData.operator)
     if isSome(warningDataO):
-      env.warnStatement(statement, warningDataO.get())
-
-
+      env.warnStatement(statement, warningDataO.get(), filename)
 
   # Close the stream and file.
   stream.close()
