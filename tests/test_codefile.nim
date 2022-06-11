@@ -63,10 +63,8 @@ suite "codefile.nim":
 
   test "runCodeFile a = 5":
     let content = "a = 5"
-    let eVarRep = """
-l.a = 5"""
     var variables = emptyVariables()
-    check testRunCodeFile(content, variables, eVarRep)
+    check testRunCodeFile(content, variables, content)
 
   test "runCodeFile dup":
     let content = """
@@ -75,7 +73,7 @@ a = 6
 """
     var variables = emptyVariables()
     let eVarRep = """
-l.a = 5"""
+a = 5"""
     let eErrLines: seq[string] = splitNewLines """
 testcode.txt(1): w95: You cannot assign to an existing variable.
 statement: a = 6
@@ -94,12 +92,12 @@ ls = [1, 2, 3]
 """
 
     let eVarRep = """
-l.a = 5
-l.b = 3
-l.c = "string"
-l.d.x = 1
-l.d.y = 2
-l.e = 3.14159
-l.ls = [1,2,3]"""
+a = 5
+b = 3
+c = "string"
+d.x = 1
+d.y = 2
+e = 3.14159
+ls = [1,2,3]"""
     var variables = emptyVariables()
     check testRunCodeFile(content, variables, eVarRep)

@@ -268,22 +268,36 @@ proc `$`*(varsDict: VarsDict): string =
   ## Return a string representation of a VarsDict.
   result = valueToString(newValue(varsDict))
 
-func dotNameRep*(dict: VarsDict, left: string = ""): string =
+func dotNameRep*(dict: VarsDict, leftSide: string = ""): string =
   ## Return a dot name string representation of a dictionary.
   # Loop through the dictionary and flatten it to dot names.  Stop at
   # a leaf. A list is a leaf.  Use json for the leaf.
+
   if dict.len == 0:
-    if left == "":
+    if leftSide == "":
       return ""
-    return "$1 = {}" % left
+    return "$1 = {}" % leftSide
+
+  ## Loop through the dictionary items.
   var first = true
   for k, v in pairs(dict):
     if first:
       first = false
     else:
       result.add("\n")
-    let left = if left == "": k else: "$1.$2" % [left, k]
+
+    ## Determine the left side. Do not show the l dictionary prefix.
+    var left: string
+    if leftSide == "":
+      if k == "l":
+        left = ""
+      else:
+        left = k
+    else:
+      left = "$1.$2" % [leftSide, k]
+
     if v.kind == vkDict:
+      # Recursively call dotNameRep.
       result.add(dotNameRep(v.dictv, left))
     else:
       result.add("$1 = $2" % [left, $v])

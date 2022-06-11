@@ -12,9 +12,11 @@ proc testDotNameRep(json: string, eDotNameRep: string): bool =
     return false
   let dotNameRep = dotNameRep(valueOr.value.dictv)
   if dotNameRep != eDotNameRep:
-    echo "     got: '$1'" % dotNameRep
-    echo "expected: '$1'" % eDotNameRep
-    echo "     for: '$1'" % json
+    echo "     got:\n$1" % dotNameRep
+    echo ""
+    echo "expected:\n$1" % eDotNameRep
+    echo ""
+    echo "     for:\n$1" % json
     return false
   return true
 
@@ -203,6 +205,23 @@ suite "vartypes":
   }
 }"""
     check testDotNameRep(json, """a.b.c = {}""")
+
+  test "dotNameRep hide l":
+    let json = """
+{
+  "l":{
+    "b":{
+      "c":{
+      }
+    }
+  },
+  "a": 5
+}"""
+
+    let expected = """
+b.c = {}
+a = 5"""
+    check testDotNameRep(json, expected)
 
   test "dotNameRep string":
     check testDotNameRep("""{"a":"string"}""", """a = "string"""")
