@@ -71,9 +71,14 @@ proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
 
     # Assign the variable if possible.
     let warningDataO = assignVariable(variables,
-      variableData.dotNameStr, variableData.value, variableData.operator)
+      variableData.dotNameStr, variableData.value,
+      variableData.operator, inCodeFile = true)
     if isSome(warningDataO):
       env.warnStatement(statement, warningDataO.get(), filename)
 
   # Close the stream and file.
   stream.close()
+
+proc runCodeFiles*(env: var Env, variables: var Variables, codeList: seq[string]) =
+  ## Run each code file and populate the variables.
+  discard

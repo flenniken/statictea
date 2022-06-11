@@ -85,6 +85,7 @@ func emptyVariables*(server: VarsDict = nil, shared: VarsDict = nil,
     result["h"] = newValue(shared)
   result["l"] = newValue(newVarsDict())
   result["g"] = newValue(newVarsDict())
+  result["o"] = newValue(newVarsDict())
 
   var tea = newVarsDict()
   tea["row"] = newValue(0)
@@ -156,7 +157,7 @@ proc getParentDictToAddTo(variables: Variables, dotNameStr: string):
 
   let names = split(dotNameStr, '.')
   assert names.len > 1
-  assert names[0] in ["g", "h", "l", "s"]
+  assert names[0] in ["g", "h", "l", "s", "o"]
 
   var parentDict: VarsDict
   var dictNames: seq[string]
@@ -244,7 +245,8 @@ proc assignVariable*(
     variables: var Variables,
     dotNameStr: string,
     value: Value,
-    operator: string = "="
+    operator: string = "=",
+    inCodeFile = false
   ): Option[WarningData] =
   ## Assign the variable the given value if possible, else return a
   ## warning. The operator parameter is either "=" or "&=".
@@ -256,30 +258,40 @@ proc assignVariable*(
   # -- You can append to local and global lists but not others.
   # -- You can specify local variables without the l prefix.
 
+  # -- You can assign new values to the code dictonary when in code files.
+
   assert dotNameStr.len > 0
   var varsDictOr: VarsDictOr
   let names = split(dotNameStr, '.')
 
   let nameSpace = names[0]
-  case nameSpace
-  of "t":
-    return assignTeaVariable(variables, dotNameStr, value, operator)
-  of "s", "h":
-    if names.len == 1:
-      # You cannot assign to an existing variable.
-      return some(newWarningData(wImmutableVars))
-    # You cannot overwrite the server or shared variables.
-    return some(newWarningData(wReadOnlyDictionary))
-  of "g", "l":
-    if names.len == 1:
-      # You cannot assign to an existing variable.
-      return some(newWarningData(wImmutableVars))
+
+  if inCodeFile and nameSpace == "o":
     varsDictOr = getParentDictToAddTo(variables, dotNameStr)
-  of "f", "i", "j", "k", "m", "n", "o", "p", "q", "r", "u":
-    return some(newWarningData(wReservedNameSpaces))
   else:
-    # It must be a local variable, add the missing l.
-    varsDictOr = getParentDictToAddTo(variables, "l." & dotNameStr)
+    case nameSpace
+    of "t":
+      return assignTeaVariable(variables, dotNameStr, value, operator)
+    of "s", "h", "o":
+      if names.len == 1:
+        # You cannot assign to an existing variable.
+        return some(newWarningData(wImmutableVars))
+      if nameSpace == "o":
+        # You can only change code variables in code files.
+        return some(newWarningData(wReadOnlyCodeVars))
+      else:
+        # You cannot overwrite the server or shared variables.
+        return some(newWarningData(wReadOnlyDictionary))
+    of "g", "l":
+      if names.len == 1:
+        # You cannot assign to an existing variable.
+        return some(newWarningData(wImmutableVars))
+      varsDictOr = getParentDictToAddTo(variables, dotNameStr)
+    of "f", "i", "j", "k", "m", "n", "p", "q", "r", "u":
+      return some(newWarningData(wReservedNameSpaces))
+    else:
+      # It must be a local variable, add the missing l.
+      varsDictOr = getParentDictToAddTo(variables, "l." & dotNameStr)
 
   if varsDictOr.isMessage:
     return some(varsDictOr.message)
@@ -332,10 +344,10 @@ proc getVariable*(variables: Variables, dotNameStr: string): ValueOr =
   var names = split(dotNameStr, '.')
   let nameSpace = names[0]
   case nameSpace
-  of "g", "h", "l", "s", "t":
+  of "g", "h", "l", "s", "t", "o":
     discard
-  of "f", "i", "j", "k", "m", "n", "o", "p", "q", "r", "u":
-    # The variables f, i - k, m - r, u are reserved variable names.
+  of "f", "i", "j", "k", "m", "n", "p", "q", "r", "u":
+    # The variables f, i, j, k, m, n, p, q, r, u are reserved variable names.
     return newValueOr(wReservedNameSpaces)
   else:
     # It must be a local variable, add the missing l.

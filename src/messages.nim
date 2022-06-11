@@ -192,6 +192,7 @@ type
     wNotEnoughArgsOpt,     ## w179
     wTooManyArgsOpt,       ## w180
     wNegativeLength,       ## w181
+    wReadOnlyCodeVars,     ## w182
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -377,5 +378,6 @@ const
     "The function requires at least $1 arguments.", ## wNotEnoughArgsOpt
     "The function requires at most $1 arguments.", ## wTooManyArgsOpt
     "The length must be a positive number.", ## wNegativeLength
+    "You can only change code variables in code files.", ## wReadOnlyCodeVars
     ]
     ## The message text.

@@ -286,10 +286,11 @@ func dotNameRep*(dict: VarsDict, leftSide: string = ""): string =
     else:
       result.add("\n")
 
-    ## Determine the left side. Do not show the l dictionary prefix.
+    ## Determine the left side. Do not show the l dictionary prefix
+    ## except when it is empty.
     var left: string
     if leftSide == "":
-      if k == "l":
+      if k == "l" and v.dictv.len != 0:
         left = ""
       else:
         left = k

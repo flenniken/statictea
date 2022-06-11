@@ -18,6 +18,7 @@ import vartypes
 import readjson
 import replacement
 import opresultwarn
+import codefile
 
 template getNewLineBuffer(env: Env): untyped =
   ## Get a new line buffer for the environment's template.
@@ -287,7 +288,6 @@ proc getStartingVariables(env: var Env, args: Args): Variables =
   var serverVarDict = readJsonFiles(env, args.serverList)
   var sharedVarDict = readJsonFiles(env, args.sharedList)
   var argsVarDict = getTeaArgs(args).dictv
-
   result = emptyVariables(serverVarDict, sharedVarDict, argsVarDict)
 
 proc getPrepostTable(args: Args): PrepostTable =
@@ -307,6 +307,11 @@ proc processTemplate*(env: var Env, args: Args) =
   ## Process the template.
 
   var variables = getStartingVariables(env, args)
+
+  let codeFilenames = newSeq[string]()
+  # let codeFilenames = args.codeFilenames
+  runCodeFiles(env, variables, codeFilenames)
+
   var prepostTable = getPrepostTable(args)
 
   # Process the template.

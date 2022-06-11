@@ -223,6 +223,18 @@ b.c = {}
 a = 5"""
     check testDotNameRep(json, expected)
 
+  test "dotNameRep empty l":
+    let json = """
+{
+  "l":{},
+  "a": 5
+}"""
+
+    let expected = """
+l = {}
+a = 5"""
+    check testDotNameRep(json, expected)
+
   test "dotNameRep string":
     check testDotNameRep("""{"a":"string"}""", """a = "string"""")
 

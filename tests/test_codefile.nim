@@ -66,6 +66,13 @@ suite "codefile.nim":
     var variables = emptyVariables()
     check testRunCodeFile(content, variables, content)
 
+  test "runCodeFile l.a = 5":
+    let content = "l.a = 5"
+    let eVarRep = """
+a = 5"""
+    var variables = emptyVariables()
+    check testRunCodeFile(content, variables, eVarRep)
+
   test "runCodeFile dup":
     let content = """
 a = 5
@@ -99,5 +106,25 @@ d.x = 1
 d.y = 2
 e = 3.14159
 ls = [1,2,3]"""
+    var variables = emptyVariables()
+    check testRunCodeFile(content, variables, eVarRep)
+
+  test "runCodeFile o.a = 5":
+    let content = "o.a = 5"
+    let eVarRep = """
+o.a = 5"""
+    var variables = emptyVariables()
+    check testRunCodeFile(content, variables, eVarRep)
+
+  test "runCodeFile append to list":
+    let content = """
+o.a = 5
+o.l &= 1
+o.l &= 2
+o.l &= 3"""
+
+    let eVarRep = """
+o.a = 5
+o.l = [1,2,3]"""
     var variables = emptyVariables()
     check testRunCodeFile(content, variables, eVarRep)

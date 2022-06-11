@@ -266,7 +266,7 @@ proc `$`(varsDict: VarsDict): string
 Return a dot name string representation of a dictionary.
 
 ```nim
-func dotNameRep(dict: VarsDict; left: string = ""): string
+func dotNameRep(dict: VarsDict; leftSide: string = ""): string
 ```
 
 # newValueOr

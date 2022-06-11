@@ -151,7 +151,8 @@ Assign the variable the given value if possible, else return a warning. The oper
 
 ```nim
 proc assignVariable(variables: var Variables; dotNameStr: string; value: Value;
-                    operator: string = "="): Option[WarningData]
+                    operator: string = "="; inCodeFile = false): Option[
+    WarningData]
 ```
 
 # getVariable

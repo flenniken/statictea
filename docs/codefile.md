@@ -1,11 +1,12 @@
 # codefile.nim
 
-Run code files.
+Run code file.
 
 * [codefile.nim](../src/codefile.nim) &mdash; Nim source code.
 # Index
 
 * [runCodeFile](#runcodefile) &mdash; Run the code file and fill in the variables.
+* [runCodeFiles](#runcodefiles) &mdash; Run each code file and populate the variables.
 
 # runCodeFile
 
@@ -13,6 +14,14 @@ Run the code file and fill in the variables.
 
 ```nim
 proc runCodeFile(env: var Env; filename: string; variables: var Variables)
+```
+
+# runCodeFiles
+
+Run each code file and populate the variables.
+
+```nim
+proc runCodeFiles(env: var Env; variables: var Variables; codeList: seq[string])
 ```
 
 

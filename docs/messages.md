@@ -195,7 +195,8 @@ MessageId = enum
   wUpdateReadonly,          ## w178
   wNotEnoughArgsOpt,        ## w179
   wTooManyArgsOpt,          ## w180
-  wNegativeLength            ## w181
+  wNegativeLength,          ## w181
+  wReadOnlyCodeVars          ## w182
 ```
 
 # Messages
@@ -385,7 +386,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Cannot update the readonly template.", ## wUpdateReadonly
     "The function requires at least $1 arguments.", ## wNotEnoughArgsOpt
     "The function requires at most $1 arguments.", ## wTooManyArgsOpt
-    "The length must be a positive number."]
+    "The length must be a positive number.", ## wNegativeLength
+    "You can only change code variables in code files."]
 ```
 
 

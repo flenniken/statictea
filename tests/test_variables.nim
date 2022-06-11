@@ -14,6 +14,7 @@ import opresultwarn
 
 proc testGetVariableOk(variables: Variables, dotNameStr: string, eJson:
     string): bool =
+  ## Get a variable and verify its value matches the expected value.
   let valueOr = getVariable(variables, dotNameStr)
   result = true
   if valueOr.isMessage:
@@ -33,9 +34,11 @@ proc testGetVariableWarning(variables: Variables, dotNameStr: string,
     return false
 
 proc testAssignVariable(variables: var Variables, dotNameStr: string, value: Value,
-    eWarningDataO: Option[WarningData] = none(WarningData), operator = "="): bool =
+    eWarningDataO: Option[WarningData] = none(WarningData),
+    operator = "=", inCodeFile = false): bool =
   ## Assign a variable then fetch and verify it was set.
-  let warningDataO = assignVariable(variables, dotNameStr, value, operator)
+  let warningDataO = assignVariable(variables, dotNameStr, value,
+    operator, inCodeFile)
   result = true
   if not expectedItem("warningDataO", warningDataO, eWarningDataO):
     return false
@@ -50,20 +53,27 @@ proc testAssignVariable(variables: var Variables, dotNameStr: string, value: Val
 
 proc testAssignVariable(dotNameStr: string, value: Value,
     eWarningDataO: Option[WarningData] = none(WarningData),
-    operator: string = "="): bool =
+    operator: string = "=", inCodeFile = false): bool =
   ## Assign a variable then fetch and verify it was set. Start with an
   ## empty dictionary.
   var variables = emptyVariables()
   result = testAssignVariable(variables, dotNameStr,
-    value, eWarningDataO, operator)
+    value, eWarningDataO, operator, inCodeFile)
 
 suite "variables.nim":
 
   test "emptyVariables":
     var variables = emptyVariables()
-    # echo $variables
-    let e = """{"s":{},"h":{},"l":{},"g":{},"t":{"row":0,"version":"0.1.0","args":{}}}"""
-    check $variables == e
+    let expected = """
+s = {}
+h = {}
+l = {}
+g = {}
+o = {}
+t.row = 0
+t.version = "0.1.0"
+t.args = {}"""
+    check dotNameRep(variables) == expected
 
   test "getVariable":
     var variables = emptyVariables()
@@ -72,6 +82,7 @@ suite "variables.nim":
     check testGetVariableOk(variables, "t.version", "\"0.1.0\"")
     check testGetVariableOk(variables, "s", "{}")
     check testGetVariableOk(variables, "h", "{}")
+    check testGetVariableOk(variables, "o", "{}")
     check testGetVariableOk(variables, "l", "{}")
     check testGetVariableOk(variables, "g", "{}")
     let eTea = """{"row":0,"version":"0.1.0","args":{}}"""
@@ -190,6 +201,9 @@ suite "variables.nim":
  "h": {
     "b": 3
  },
+ "o": {
+    "bb": 3.5
+ },
  "g": {
     "c": 4
  },
@@ -226,6 +240,16 @@ suite "variables.nim":
     resetVariables(variables)
     check $getVariable(variables, "h.a") == $newValueOr(newValue(2))
 
+  test "resetVariables with shared":
+    # Make sure the code variables are untouched after reset.
+    let codeVars = """{"a": 2}"""
+    var valueOr = readJsonString(codeVars)
+    check valueOr.isValue
+    var variables = emptyVariables()
+    variables["o"] = valueOr.value
+    resetVariables(variables)
+    check $getVariable(variables, "o.a") == $newValueOr(newValue(2))
+
   test "resetVariables with global":
     # Make sure the global variables are untouched after reset.
     let global = """{"a": 2}"""
@@ -247,8 +271,14 @@ suite "variables.nim":
     check testAssignVariable("t.output", newValue("stdout"))
     check testAssignVariable("t.repeat", newValue(20))
 
+  test "assign code variable":
+    check testAssignVariable("o.tea", newValue(20), inCodeFile = true)
+    check testAssignVariable("o.tea", newValue(20),
+      some(newWarningData(wReadOnlyCodeVars)))
+
   test "assignVariable warning":
-    check testAssignVariable("t.repeat", newValue("hello"), some(newWarningData(wInvalidRepeat)))
+    check testAssignVariable("t.repeat", newValue("hello"),
+      some(newWarningData(wInvalidRepeat)))
 
   test "assignVariable wReadOnlyDictionary":
     let eWarningDataO = some(newWarningData(wReadOnlyDictionary))
@@ -259,13 +289,14 @@ suite "variables.nim":
     let eWarningDataO = some(newWarningData(wImmutableVars))
     check testAssignVariable("s", newValue(1), eWarningDataO)
     check testAssignVariable("h", newValue(1), eWarningDataO)
+    check testAssignVariable("o", newValue(1), eWarningDataO)
     check testAssignVariable("g", newValue(1), eWarningDataO)
     check testAssignVariable("l", newValue(1), eWarningDataO)
     check testAssignVariable("t", newValue(1), eWarningDataO)
 
   test "assignVariable wReservedNameSpaces":
     let eWarningDataO = some(newWarningData(wReservedNameSpaces))
-    for letterVar in ["f", "i", "j", "k", "m", "n", "o", "p", "q", "r", "u"]:
+    for letterVar in ["f", "i", "j", "k", "m", "n", "p", "q", "r", "u"]:
       check testAssignVariable(letterVar, newValue(1), eWarningDataO)
 
   test "assignVariable not wReservedNameSpaces":
@@ -286,6 +317,10 @@ suite "variables.nim":
 
     check testAssignVariable(variables, "g.five", newValue(1))
     check testAssignVariable(variables, "g.five", newValue(2), eWarningDataO)
+
+    check testAssignVariable(variables, "o.five", newValue(1), inCodeFile = true)
+    check testAssignVariable(variables, "o.five", newValue(2),
+      eWarningDataO, inCodeFile = true)
 
   test "assignVariable tea vars":
     ## Set tea variables then try to change them.
