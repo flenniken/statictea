@@ -1,12 +1,59 @@
 import std/unittest
 import std/os
 import std/strutils
+import std/options
+import std/streams
 import codefile
 import variables
 import env
 import vartypes
 import readlines
 import sharedtestcode
+import runCommand
+
+let tripleQuotes = "\"\"\""
+
+proc testMatchTripleOrPlusSign(line: string,
+    eOne: string = "", eTwo: string = ""): bool =
+  let (one, two) = matchTripleOrPlusSign(line)
+  result = true
+  if not expectedItem("'$1'" % line, one, eOne):
+    result = false
+  if not expectedItem("'$1'" % line, two, eTwo):
+    result = false
+
+proc testReadStatement(
+    content: string = "",
+    eText: string = "",
+    eLineNum: Natural = 1,
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[],
+    showLog: bool = false
+  ): bool =
+
+  # Open err and log streams.
+  var env = openEnvTest("_testReadStatement.log")
+
+  # Create a LineBuffer for reading the file content.
+  var inStream = newStringStream(content)
+  var lineBufferO = newLineBuffer(inStream)
+  check lineBufferO.isSome
+  var lb = lineBufferO.get()
+
+  # Read the statement.
+  let statementO = readStatement(env, lb)
+
+  result = true
+  if not env.readCloseDeleteCompare(eLogLines, eErrLines, showLog = showLog):
+    result = false
+
+  var eStatementO: Option[Statement]
+  if eText != "":
+    eStatementO = some(newStatement(eText, eLineNum))
+
+  if not expectedItem("readStatement", statementO, eStatementO):
+    return false
 
 proc testRunCodeFile(
     content: string = "",
@@ -17,7 +64,6 @@ proc testRunCodeFile(
     eOutLines: seq[string] = @[],
     showLog: bool = false
   ): bool =
-  ## Test the runCodeFile procedure.
 
   # Open err and log streams.
   var env = openEnvTest("_testRunCodeFile.log")
@@ -55,6 +101,147 @@ proc testRunCodeFile(
 
 suite "codefile.nim":
 
+  test "matchTripleOrPlusSign":
+    let testTp = testMatchTripleOrPlusSign
+    check testTp("")
+    check testTp("\n", "", "\n")
+    check testTp("\r\n", "", "\r\n")
+
+    check testTp("a = 5")
+    check testTp("a = 5\n", "", "\n")
+    check testTp("a = 5\r\n", "", "\r\n")
+
+    let triple = "\"\"\""
+    check testTp("a = $1" % triple, triple, "")
+    check testTp("a = $1\n" % triple, triple, "\n")
+    check testTp("a = $1\r\n" % triple, triple, "\r\n")
+
+    check testTp("a = +", "+", "")
+    check testTp("a = +\n", "+", "\n")
+    check testTp("a = +\r\n", "+", "\r\n")
+
+    check testTp("+", "+", "")
+    check testTp("+\n", "+", "\n")
+    check testTp("+\r\n", "+", "\r\n")
+
+    check testTp("""b = len("abc")""")
+    check testTp("b = len(\"abc\")\"")
+    check testTp("b = len(\"abc\")\"\"")
+
+    check testTp("+ ")
+    check testTp(" + ")
+    check testTp(" $1 " % triple)
+    check testTp("$1 " % triple)
+
+  test "readStatement empty":
+    check testReadStatement("", "")
+
+  test "readStatement multiline":
+    let content = """
+a = $1
+multiline
+string
+$1
+""" % tripleQuotes
+
+    let eText = "a = \"\"\"multiline\nstring\n\"\"\""
+    check testReadStatement(content, eText, 4)
+
+  test "readStatement no continue":
+    check testReadStatement("one", "one")
+    check testReadStatement("one\n", "one")
+    check testReadStatement("one\r\n", "one")
+
+  test "readStatement +":
+    let content = """
+a = +
+5
+"""
+    check testReadStatement(content, "a = 5", 2)
+
+  test "readStatement ++":
+    let content = """
+a = +
++
+5
+"""
+    check testReadStatement(content, "a = 5", 3)
+
+  test "readStatement multiline empty":
+    let content = """
+$1
+$1
+""" % tripleQuotes
+    let eText = "$1$1" % tripleQuotes
+    check testReadStatement(content, eText, 2)
+
+  test "readStatement multiline a":
+    let content = """
+$1
+a$1
+""" % tripleQuotes
+    let eText = "$1a$1" % tripleQuotes
+    check testReadStatement(content, eText, 2)
+
+  test "readStatement multiline a\\n":
+    let content = """
+$1
+a
+$1
+""" % tripleQuotes
+    let eText = "$1a\n$1" % tripleQuotes
+    check testReadStatement(content, eText, 3)
+
+  test "readStatement multiline 1":
+    let content = """
+a = $1
+this is
+a multiline+
+string
+$1""" % tripleQuotes
+    let eText = "a = $1this is\na multiline+\nstring\n$1" % tripleQuotes
+    check testReadStatement(content, eText, 5)
+
+  test "readStatement multiline 2":
+    let content = """
+a = $1
+this is
+a multiline
+string$1
+""" % tripleQuotes
+    let eText = "a = $1this is\na multiline\nstring$1" % tripleQuotes
+    check testReadStatement(content, eText, 4)
+
+  test "readStatement multiline extra after":
+    let content = """
+a = $1 multiline $1
+""" % tripleQuotes
+
+    let eErrLines: seq[string] = splitNewLines """
+template.html(2): w184: Out of lines looking for the multiline string.
+"""
+    check testReadStatement(content, eErrLines = eErrLines)
+
+  test "readStatement multiline extra after 2":
+    let content = """
+a = $1 multiline
+$1
+""" % tripleQuotes
+
+    let eText = "a = \"\"\" multiline"
+    check testReadStatement(content, eText)
+
+  test "readStatement multiline extra after 3":
+    let content = """
+a = $1
+multiline
+$1 extra
+""" % tripleQuotes
+    let eErrLines: seq[string] = splitNewLines """
+template.html(4): w184: Out of lines looking for the multiline string.
+"""
+    check testReadStatement(content, eErrLines = eErrLines)
+
   test "runCodeFile empty":
     let content = ""
     let eVarRep = ""
@@ -82,7 +269,7 @@ a = 6
     let eVarRep = """
 a = 5"""
     let eErrLines: seq[string] = splitNewLines """
-testcode.txt(1): w95: You cannot assign to an existing variable.
+testcode.txt(2): w95: You cannot assign to an existing variable.
 statement: a = 6
            ^
 """
@@ -97,7 +284,6 @@ d = dict(["x", 1, "y", 2])
 e = 3.14159
 ls = [1, 2, 3]
 """
-
     let eVarRep = """
 a = 5
 b = 3
@@ -128,3 +314,73 @@ o.a = 5
 o.l = [1,2,3]"""
     var variables = emptyVariables()
     check testRunCodeFile(content, variables, eVarRep)
+
+  test "runCodeFile +":
+    let content = """
+a = +
+5
+b = 1
+"""
+    let eVarRep = """
+a = 5
+b = 1"""
+    var variables = emptyVariables()
+    check testRunCodeFile(content, variables, eVarRep)
+
+  test "runCodeFile +++":
+    let content = """
+a = +
+5+
+5+
+5
+b = 1
+"""
+    let eVarRep = """
+a = 555
+b = 1"""
+    var variables = emptyVariables()
+    check testRunCodeFile(content, variables, eVarRep)
+
+  test "runCodeFile + at end":
+    let content = """
+a = +
+"""
+    var variables = emptyVariables()
+    let eErrLines: seq[string] = splitNewLines """
+template.html(2): w183: Out of lines looking for the plus sign line.
+"""
+    check testRunCodeFile(content, variables, eErrLines = eErrLines)
+
+# a =     +
+#      """
+# this is a multiline
+# string
+#   """
+
+
+  test "runCodeFile line number":
+    let content = """
+a = 5
+b = 1
+c = 3
+d ~ 2
+"""
+    let eVarRep = """
+a = 5
+b = 1
+c = 3"""
+    var variables = emptyVariables()
+    let eErrLines: seq[string] = splitNewLines """
+template.html(4): w34: Missing operator, = or &=.
+statement: d ~ 2
+             ^
+"""
+    check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+
+# todo: test filename in warning messages.
+# todo: test "skip":
+# todo: test "stop":
+# todo: test """ continue":
+# todo: test "if":
+# todo: test "multiline with ending quotes on same line":
+# todo: test "no g access":

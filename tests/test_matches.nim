@@ -442,7 +442,7 @@ suite "matches.nim":
     check testMatchSymbol("(", gLeftParentheses, 0, some(newMatches(1, 0)))
     check testMatchSymbol("[", gLeftBracket, 0, some(newMatches(1, 0)))
     check testMatchSymbol("]", gRightBracket, 0, some(newMatches(1, 0)))
-    
+
     check testMatchSymbol("  )", gRightParentheses, 2, some(newMatches(1, 2)))
     check testMatchSymbol("  (", gLeftParentheses, 2, some(newMatches(1, 2)))
     check testMatchSymbol("  [", gLeftBracket, 2, some(newMatches(1, 2)))
@@ -485,3 +485,4 @@ suite "matches.nim":
     check testGetLastPart("", "-->")
     check testGetLastPart("-", "-->")
     check testGetLastPart("->", "-->")
+

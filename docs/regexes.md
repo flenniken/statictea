@@ -51,6 +51,7 @@ check resultStringO.get() == "456456"
 * [newMatches](#newmatches-2) &mdash; Create a new Matches object with two groups.
 * [newMatches](#newmatches-3) &mdash; Create a new Matches object with three groups.
 * [newMatches](#newmatches-4) &mdash; Create a Matches object with the given number of groups.
+* [newMatches](#newmatches-5) &mdash; Create a Matches object with the given number of groups.
 * [newReplacement](#newreplacement) &mdash; Create a new Replacement object.
 * [getGroup](#getgroup) &mdash; Get the group in matches.
 * [getGroup](#getgroup-1) &mdash; Get the group in matches.
@@ -124,6 +125,14 @@ Create a new Matches object with three groups.
 ```nim
 func newMatches(length: Natural; start: Natural; group1: string; group2: string;
                 group3: string): Matches
+```
+
+# newMatches
+
+Create a Matches object with the given number of groups.
+
+```nim
+proc newMatches(length: Natural; start: Natural; groups: seq[string]): Matches
 ```
 
 # newMatches

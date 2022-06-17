@@ -121,6 +121,11 @@ func newMatches*(length: Natural, start: Natural, group1: string,
   var groups = @[group1, group2, group3]
   result = Matches(groups: groups, length: length, start: start, numGroups: 3)
 
+proc newMatches*(length: Natural, start: Natural, groups: seq[string]): Matches =
+  ## Create a Matches object with the given number of groups.
+  result = Matches(length: length, start: start, groups: groups,
+                   numGroups: groups.len)
+
 proc newMatches*(length: Natural, start: Natural, numGroups: Natural): Matches =
   ## Create a Matches object with the given number of groups.
   result = Matches(length: length, start: start, numGroups: numGroups)

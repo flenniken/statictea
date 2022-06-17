@@ -5,8 +5,26 @@ Run code file.
 * [codefile.nim](../src/codefile.nim) &mdash; Nim source code.
 # Index
 
+* [matchTripleOrPlusSign](#matchtripleorplussign) &mdash; Match the optional """ or + at the end of the line.
+* [readStatement](#readstatement) &mdash; Read the next statement from the file.
 * [runCodeFile](#runcodefile) &mdash; Run the code file and fill in the variables.
 * [runCodeFiles](#runcodefiles) &mdash; Run each code file and populate the variables.
+
+# matchTripleOrPlusSign
+
+Match the optional """ or + at the end of the line. This tells whether the statement continues on the next line for code files. A match has two groups. The first group contains triple quotes, plus sign or nothing.  The second group contains cr, crlf or nothing.
+
+```nim
+proc matchTripleOrPlusSign(line: string): (string, string)
+```
+
+# readStatement
+
+Read the next statement from the file.
+
+```nim
+proc readStatement(env: var Env; lb: var LineBuffer): Option[Statement]
+```
 
 # runCodeFile
 

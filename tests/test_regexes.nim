@@ -20,6 +20,51 @@ pattern: $3""" % [str, $start, pattern]
     result = true
 
 suite "regexes.nim":
+  test "newMatches 0":
+    let m = newMatches(6, 3)
+    check m.length == 6
+    check m.start == 3
+    check m.numGroups == 0
+    check m.groups.len == 0
+
+  test "newMatches 1":
+    let m = newMatches(6, 3, "abc")
+    check m.length == 6
+    check m.start == 3
+    check m.numGroups == 1
+    check m.groups.len == 1
+    check m.groups[0] == "abc"
+
+  test "newMatches 2":
+    let m = newMatches(6, 3, "abc", "def")
+    check m.length == 6
+    check m.start == 3
+    check m.numGroups == 2
+    check m.groups.len == 2
+    check m.groups[0] == "abc"
+    check m.groups[1] == "def"
+
+  test "newMatches 3":
+    let m = newMatches(6, 3, "abc", "def", "ghi")
+    check m.length == 6
+    check m.start == 3
+    check m.numGroups == 3
+    check m.groups.len == 3
+    check m.groups[0] == "abc"
+    check m.groups[1] == "def"
+    check m.groups[2] == "ghi"
+
+  test "newMatches 4":
+    let m = newMatches(6, 3, @["abc", "def", "ghi", "jkl"])
+    check m.length == 6
+    check m.start == 3
+    check m.numGroups == 4
+    check m.groups.len == 4
+    check m.groups[0] == "abc"
+    check m.groups[1] == "def"
+    check m.groups[2] == "ghi"
+    check m.groups[3] == "jkl"
+
   test "no groups":
     let pattern = r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"
     check testMatchPattern("0.1.0", pattern, 0, some(newMatches(5, 0)))

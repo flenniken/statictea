@@ -196,7 +196,9 @@ MessageId = enum
   wNotEnoughArgsOpt,        ## w179
   wTooManyArgsOpt,          ## w180
   wNegativeLength,          ## w181
-  wReadOnlyCodeVars          ## w182
+  wReadOnlyCodeVars,        ## w182
+  wNoPlusSignLine,          ## w183
+  wIncompleteMultiline       ## w184
 ```
 
 # Messages
@@ -387,7 +389,9 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The function requires at least $1 arguments.", ## wNotEnoughArgsOpt
     "The function requires at most $1 arguments.", ## wTooManyArgsOpt
     "The length must be a positive number.", ## wNegativeLength
-    "You can only change code variables in code files."]
+    "You can only change code variables in code files.", ## wReadOnlyCodeVars
+    "Out of lines looking for the plus sign line.", ## wNoPlusSignLine
+    "Out of lines looking for the multiline string."]
 ```
 
 
