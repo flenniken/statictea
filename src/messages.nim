@@ -195,6 +195,7 @@ type
     wReadOnlyCodeVars,     ## w182
     wNoPlusSignLine,       ## w183
     wIncompleteMultiline,  ## w184
+    wTripleAtEnd,          ## w185
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -383,5 +384,6 @@ const
     "You can only change code variables in code files.", ## wReadOnlyCodeVars
     "Out of lines looking for the plus sign line.", ## wNoPlusSignLine
     "Out of lines looking for the multiline string.", ## wIncompleteMultiline
+    "Triple quotes must always end the line.", ## wTripleAtEnd
     ]
     ## The message text.

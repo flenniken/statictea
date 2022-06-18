@@ -198,7 +198,8 @@ MessageId = enum
   wNegativeLength,          ## w181
   wReadOnlyCodeVars,        ## w182
   wNoPlusSignLine,          ## w183
-  wIncompleteMultiline       ## w184
+  wIncompleteMultiline,     ## w184
+  wTripleAtEnd               ## w185
 ```
 
 # Messages
@@ -391,7 +392,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The length must be a positive number.", ## wNegativeLength
     "You can only change code variables in code files.", ## wReadOnlyCodeVars
     "Out of lines looking for the plus sign line.", ## wNoPlusSignLine
-    "Out of lines looking for the multiline string."]
+    "Out of lines looking for the multiline string.", ## wIncompleteMultiline
+    "Triple quotes must always end the line."]
 ```
 
 

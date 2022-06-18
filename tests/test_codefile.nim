@@ -11,15 +11,24 @@ import readlines
 import sharedtestcode
 import runCommand
 
-let tripleQuotes = "\"\"\""
+proc testAddText*(beginning: string, ending: string, found: Found): bool =
+  var text: string
 
-proc testMatchTripleOrPlusSign(line: string,
-    eOne: string = "", eTwo: string = ""): bool =
-  let (one, two) = matchTripleOrPlusSign(line)
+  let line = beginning & ending
+  addText(line, found, text)
   result = true
-  if not expectedItem("'$1'" % line, one, eOne):
+  var expected: string
+  if found in [triple, triple_n, triple_crlf]:
+    expected = beginning & tripleQuotes
+  else:
+    expected = beginning
+  if not expectedItem("'$1, '" % [line, $found], text, expected):
     result = false
-  if not expectedItem("'$1'" % line, two, eTwo):
+
+proc testMatchTripleOrPlusSign(line: string, eFound: Found = nothing): bool =
+  let found = matchTripleOrPlusSign(line)
+  result = true
+  if not expectedItem("'$1'" % line, found, eFound):
     result = false
 
 proc testReadStatement(
@@ -52,7 +61,7 @@ proc testReadStatement(
   if eText != "":
     eStatementO = some(newStatement(eText, eLineNum))
 
-  if not expectedItem("readStatement", statementO, eStatementO):
+  if not expectedItem("content:\n" & content, statementO, eStatementO):
     return false
 
 proc testRunCodeFile(
@@ -101,28 +110,41 @@ proc testRunCodeFile(
 
 suite "codefile.nim":
 
+  test "addText":
+    for beginning in ["", "a", "ab", "abc", "abcd", "abcde", "abcdef"]:
+      check testAddText(beginning, "", nothing)
+      check testAddText(beginning, "\n", newline)
+      check testAddText(beginning, "\r\n", crlf)
+
+      check testAddText(beginning, "+", plus)
+      check testAddText(beginning, "+\n", plus_n)
+      check testAddText(beginning, "+\r\n", plus_crlf)
+
+      check testAddText(beginning, "$1" % tripleQuotes, triple)
+      check testAddText(beginning, "$1\n" % tripleQuotes, triple_n)
+      check testAddText(beginning, "$1\r\n" % tripleQuotes, triple_crlf)
+
   test "matchTripleOrPlusSign":
     let testTp = testMatchTripleOrPlusSign
     check testTp("")
-    check testTp("\n", "", "\n")
-    check testTp("\r\n", "", "\r\n")
+    check testTp("\n", newline)
+    check testTp("\r\n", crlf)
 
     check testTp("a = 5")
-    check testTp("a = 5\n", "", "\n")
-    check testTp("a = 5\r\n", "", "\r\n")
+    check testTp("a = 5\n", newline)
+    check testTp("a = 5\r\n", crlf)
 
-    let triple = "\"\"\""
-    check testTp("a = $1" % triple, triple, "")
-    check testTp("a = $1\n" % triple, triple, "\n")
-    check testTp("a = $1\r\n" % triple, triple, "\r\n")
+    check testTp("a = $1" % tripleQuotes, triple)
+    check testTp("a = $1\n" % tripleQuotes, triple_n)
+    check testTp("a = $1\r\n" % tripleQuotes, triple_crlf)
 
-    check testTp("a = +", "+", "")
-    check testTp("a = +\n", "+", "\n")
-    check testTp("a = +\r\n", "+", "\r\n")
+    check testTp("a = +", plus)
+    check testTp("a = +\n", plus_n)
+    check testTp("a = +\r\n", plus_crlf)
 
-    check testTp("+", "+", "")
-    check testTp("+\n", "+", "\n")
-    check testTp("+\r\n", "+", "\r\n")
+    check testTp("+", plus)
+    check testTp("+\n", plus_n)
+    check testTp("+\r\n", plus_crlf)
 
     check testTp("""b = len("abc")""")
     check testTp("b = len(\"abc\")\"")
@@ -130,8 +152,10 @@ suite "codefile.nim":
 
     check testTp("+ ")
     check testTp(" + ")
-    check testTp(" $1 " % triple)
-    check testTp("$1 " % triple)
+    check testTp(" $1 " % tripleQuotes)
+    check testTp("$1 " % tripleQuotes)
+    check testTp("abc\"")
+    check testTp("abc\"\"")
 
   test "readStatement empty":
     check testReadStatement("", "")
@@ -142,9 +166,10 @@ a = $1
 multiline
 string
 $1
+b = 2
 """ % tripleQuotes
 
-    let eText = "a = \"\"\"multiline\nstring\n\"\"\""
+    let eText = "a = $1multiline\nstring\n$1" % tripleQuotes
     check testReadStatement(content, eText, 4)
 
   test "readStatement no continue":
@@ -212,13 +237,16 @@ string$1
     let eText = "a = $1this is\na multiline\nstring$1" % tripleQuotes
     check testReadStatement(content, eText, 4)
 
-  test "readStatement multiline extra after":
+  test "readStatement not multiline":
     let content = """
 a = $1 multiline $1
+b = 3
+c = 4
+d = 5
 """ % tripleQuotes
 
     let eErrLines: seq[string] = splitNewLines """
-template.html(2): w184: Out of lines looking for the multiline string.
+template.html(1): w185: Triple quotes must always end the line.
 """
     check testReadStatement(content, eErrLines = eErrLines)
 
@@ -230,17 +258,6 @@ $1
 
     let eText = "a = \"\"\" multiline"
     check testReadStatement(content, eText)
-
-  test "readStatement multiline extra after 3":
-    let content = """
-a = $1
-multiline
-$1 extra
-""" % tripleQuotes
-    let eErrLines: seq[string] = splitNewLines """
-template.html(4): w184: Out of lines looking for the multiline string.
-"""
-    check testReadStatement(content, eErrLines = eErrLines)
 
   test "runCodeFile empty":
     let content = ""
@@ -375,6 +392,31 @@ template.html(4): w34: Missing operator, = or &=.
 statement: d ~ 2
              ^
 """
+    check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+
+  test "runCodeFile bad triple":
+    let content = """
+len = 10
+a = $1
+ 123
+abc$1 q
+c = 3
+""" % tripleQuotes
+    let eVarRep = """
+len = 10
+c = 3"""
+    var variables = emptyVariables()
+
+    # todo: handle multiline string error messages better. I expect ^
+    # under " q".
+    let eErrLines: seq[string] = splitNewLines """
+template.html(4): w185: Triple quotes must always end the line.
+template.html(4): w31: Unused text at the end of the statement.
+statement: a = $1 123
+abc$1 q
+
+                 ^
+""" % tripleQuotes
     check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
 
 # todo: test filename in warning messages.

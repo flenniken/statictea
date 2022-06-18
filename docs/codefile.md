@@ -5,22 +5,47 @@ Run code file.
 * [codefile.nim](../src/codefile.nim) &mdash; Nim source code.
 # Index
 
+* type: [Found](#found) &mdash; The line endings found.
 * [matchTripleOrPlusSign](#matchtripleorplussign) &mdash; Match the optional """ or + at the end of the line.
-* [readStatement](#readstatement) &mdash; Read the next statement from the file.
+* [addText](#addtext) &mdash; Add the line up to the line ending to the text string.
+* [readStatement](#readstatement) &mdash; Read the next statement from the file reading multiple lines if needed.
 * [runCodeFile](#runcodefile) &mdash; Run the code file and fill in the variables.
 * [runCodeFiles](#runcodefiles) &mdash; Run each code file and populate the variables.
 
-# matchTripleOrPlusSign
+# Found
 
-Match the optional """ or + at the end of the line. This tells whether the statement continues on the next line for code files. A match has two groups. The first group contains triple quotes, plus sign or nothing.  The second group contains cr, crlf or nothing.
+The line endings found.<ul class="simple"><li>plus = +</li>
+<li>triple = """</li>
+<li>n = newline / line feed</li>
+<li>r = carriage return</li>
+<li>crlf = carriage return, line feed</li>
+</ul>
+
 
 ```nim
-proc matchTripleOrPlusSign(line: string): (string, string)
+Found = enum
+  nothing, plus, triple, newline, plus_n, triple_n, crlf, plus_crlf, triple_crlf
+```
+
+# matchTripleOrPlusSign
+
+Match the optional """ or + at the end of the line. This tells whether the statement continues on the next line for code files.
+
+```nim
+proc matchTripleOrPlusSign(line: string): Found
+```
+
+# addText
+
+Add the line up to the line ending to the text string.
+
+```nim
+proc addText(line: string; found: Found; text: var string)
 ```
 
 # readStatement
 
-Read the next statement from the file.
+Read the next statement from the file reading multiple lines if needed.
 
 ```nim
 proc readStatement(env: var Env; lb: var LineBuffer): Option[Statement]

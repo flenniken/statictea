@@ -1,25 +1,13 @@
 ## Private module for experimenting.
 
-import std/os
-import std/strutils
+let line = ""
+echo line
 
-let filename = "abc.txt"
+# abc
+# 012
 
-if not fileExists(filename):
-  var file = open(filename, fmWrite)
-  file.write("test file")
-  file.close()
+echo "line[0 ..-1] = " & line[0 .. -1]
+# echo "line[0 .. 0] = " & line[0 .. 0]
+# echo "line[0 .. 1] = " & line[0 .. 1]
+# echo "line[0 .. 2] = " & line[0 .. 2]
 
-let permissions = getFilePermissions(filename)
-echo $permissions
-
-let writeSet = {fpUserWrite, fpGroupWrite, fpOthersWrite}
-echo $writeSet
-
-let writeable = writeSet * permissions
-echo $writeable
-
-if writeable.len == 0:
-  echo "readonly"
-else:
-  echo "writeable"
