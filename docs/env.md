@@ -120,7 +120,8 @@ proc outputWarning(env: var Env; lineNum: Natural; message: string)
 Write a formatted warning message to the error stream.
 
 ```nim
-proc warn(env: var Env; lineNum: Natural; warning: MessageId; p1: string = "")
+proc warn(env: var Env; lineNum: Natural; warning: MessageId; p1: string = "";
+          filename: string = "")
 ```
 
 # warn
@@ -128,7 +129,8 @@ proc warn(env: var Env; lineNum: Natural; warning: MessageId; p1: string = "")
 Write a formatted warning message to the error stream.
 
 ```nim
-proc warn(env: var Env; lineNum: Natural; warningData: WarningData)
+proc warn(env: var Env; lineNum: Natural; warningData: WarningData;
+          filename: string = "")
 ```
 
 # warn
@@ -136,7 +138,7 @@ proc warn(env: var Env; lineNum: Natural; warningData: WarningData)
 Write a formatted warning message to the error stream.
 
 ```nim
-proc warn(env: var Env; warningData: WarningData)
+proc warn(env: var Env; warningData: WarningData; filename: string = "")
 ```
 
 # warn
@@ -144,7 +146,7 @@ proc warn(env: var Env; warningData: WarningData)
 Write a formatted warning message to the error stream.
 
 ```nim
-proc warn(env: var Env; messageId: MessageId; p1 = "")
+proc warn(env: var Env; messageId: MessageId; p1 = ""; filename: string = "")
 ```
 
 # formatDateTime

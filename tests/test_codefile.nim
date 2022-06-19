@@ -46,7 +46,7 @@ proc testReadStatement(
 
   # Create a LineBuffer for reading the file content.
   var inStream = newStringStream(content)
-  var lineBufferO = newLineBuffer(inStream)
+  var lineBufferO = newLineBuffer(inStream, filename = "testlb.txt")
   check lineBufferO.isSome
   var lb = lineBufferO.get()
 
@@ -246,7 +246,7 @@ d = 5
 """ % tripleQuotes
 
     let eErrLines: seq[string] = splitNewLines """
-template.html(1): w185: Triple quotes must always end the line.
+testlb.txt(1): w185: Triple quotes must always end the line.
 """
     check testReadStatement(content, eErrLines = eErrLines)
 
@@ -364,7 +364,7 @@ a = +
 """
     var variables = emptyVariables()
     let eErrLines: seq[string] = splitNewLines """
-template.html(2): w183: Out of lines looking for the plus sign line.
+testcode.txt(2): w183: Out of lines looking for the plus sign line.
 """
     check testRunCodeFile(content, variables, eErrLines = eErrLines)
 
@@ -388,7 +388,7 @@ b = 1
 c = 3"""
     var variables = emptyVariables()
     let eErrLines: seq[string] = splitNewLines """
-template.html(4): w34: Missing operator, = or &=.
+testcode.txt(4): w34: Missing operator, = or &=.
 statement: d ~ 2
              ^
 """
@@ -403,21 +403,25 @@ abc$1 q
 c = 3
 """ % tripleQuotes
     let eVarRep = """
-len = 10
-c = 3"""
+len = 10"""
     var variables = emptyVariables()
 
-    # todo: handle multiline string error messages better. I expect ^
-    # under " q".
     let eErrLines: seq[string] = splitNewLines """
-template.html(4): w185: Triple quotes must always end the line.
-template.html(4): w31: Unused text at the end of the statement.
-statement: a = $1 123
-abc$1 q
-
-                 ^
+testcode.txt(6): w184: Out of lines looking for the multiline string.
 """ % tripleQuotes
     check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+
+
+  test "runCodeFile missing file":
+    let eErrLines: seq[string] = splitNewLines """
+missing(0): w16: File not found: missing.
+""" % tripleQuotes
+
+    var env = openEnvTest("_missingfile.log")
+    var variables = emptyVariables()
+    runCodeFile(env, "missing", variables)
+    check env.readCloseDeleteCompare(eErrLines = eErrLines)
+
 
 # todo: test filename in warning messages.
 # todo: test "skip":

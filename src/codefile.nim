@@ -147,7 +147,7 @@ proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
         of multiline:
           # Out of lines looking for the multiline string.
           messageId = wIncompleteMultiline
-      env.warn(lb.getLineNum(), newWarningData(messageId))
+      env.warn(lb.getLineNum(), newWarningData(messageId), lb.getFilename)
       return
 
     # Match the optional """ or + at the end of the line. This tells
@@ -165,7 +165,8 @@ proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
           # line.  This catches the mistake of a = """xyx""".
           if line[0 .. line.len - 4].contains(tripleQuotes):
             # Triple quotes must always end the line.
-            env.warn(lb.getLineNum(), newWarningData(wTripleAtEnd))
+            env.warn(lb.getLineNum(), newWarningData(wTripleAtEnd),
+                     filename = lb.getfilename)
             return
 
         addText(line, found, text)
@@ -186,11 +187,6 @@ proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
         else:
           # Add the whole line.
           addText(line, nothing, text)
-
-          if line.contains(tripleQuotes):
-            # Triple quotes must always end the line.
-            env.warn(lb.getLineNum(), newWarningData(wTripleAtEnd))
-            break
         if state == start:
           break # done
 
@@ -203,7 +199,7 @@ proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
 
   if not fileExists(filename):
     # File not found: $1.
-    env.warn(wFileNotFound, filename)
+    env.warn(wFileNotFound, filename, filename = filename)
     return
 
   # Create a stream out of the file.
@@ -211,14 +207,14 @@ proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
   stream = newFileStream(filename)
   if stream == nil:
     # Unable to open file: $1.
-    env.warn(wUnableToOpenFile, filename)
+    env.warn(wUnableToOpenFile, filename, filename = filename)
     return
 
   # Allocate a buffer for reading lines. Return when not enough memory.
   let lineBufferO = newLineBuffer(stream, filename = filename)
   if not lineBufferO.isSome():
     # Not enough memory for the line buffer.
-    env.warn(wNotEnoughMemoryForLB)
+    env.warn(wNotEnoughMemoryForLB, filename = filename)
     return
   var lb = lineBufferO.get()
 
@@ -232,7 +228,7 @@ proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
     # Run the statement and get the variable, operator and value.
     let variableDataOr = runStatement(statement, variables)
     if variableDataOr.isMessage:
-      env.warnStatement(statement, variableDataOr.message)
+      env.warnStatement(statement, variableDataOr.message, sourceFilename = filename)
       continue
     let variableData = variableDataOr.value
 
@@ -240,7 +236,8 @@ proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
     if variableData.operator == "exit":
       if variableData.value.kind != vkString:
         # Expected 'skip', 'stop' or '' for the block command return value.
-        env.warnStatement(statement, newWarningData(wSkipStopOrEmpty))
+        env.warnStatement(statement, newWarningData(wSkipStopOrEmpty),
+          sourceFilename = filename)
         continue
       break # done
 

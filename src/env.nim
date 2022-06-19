@@ -116,29 +116,37 @@ proc outputWarning*(env: var Env, lineNum: Natural, message: string) =
     env.errStream.writeLine(message)
     inc(env.warningsWritten)
 
+# todo: change the order. env, filename, lineNum, messageId, p1
+# todo: require filename and lineNum
+
 proc warn*(env: var Env, lineNum: Natural, warning: MessageId, p1:
-           string = "") =
+           string = "", filename: string = "") =
   ## Write a formatted warning message to the error stream.
-
-  var filename = env.templateFilename
+  var fn: string
   if filename == "":
-    filename = "unnamed"
-    assert lineNum == 0
+    fn = env.templateFilename
+    if fn == "":
+      fn = "unnamed"
+      assert lineNum == 0
+  else:
+    fn = filename
 
-  let message = getWarningLine(filename, lineNum, warning, p1)
+  let message = getWarningLine(fn, lineNum, warning, p1)
   outputWarning(env, lineNum, message)
 
-proc warn*(env: var Env, lineNum: Natural, warningData: WarningData) =
+proc warn*(env: var Env, lineNum: Natural, warningData: WarningData,
+    filename: string = "") =
   ## Write a formatted warning message to the error stream.
-  warn(env, lineNum, warningData.warning, warningData.p1)
+  warn(env, lineNum, warningData.warning, warningData.p1, filename)
 
-proc warn*(env: var Env, warningData: WarningData) =
+proc warn*(env: var Env, warningData: WarningData, filename: string = "") =
   ## Write a formatted warning message to the error stream.
-  warn(env, 0, warningData.warning, warningData.p1)
+  echo "this warn x"
+  warn(env, 0, warningData.warning, warningData.p1, filename)
 
-proc warn*(env: var Env, messageId: MessageId, p1 = "") =
+proc warn*(env: var Env, messageId: MessageId, p1 = "", filename: string = "") =
   ## Write a formatted warning message to the error stream.
-  warn(env, 0, messageId, p1)
+  warn(env, 0, messageId, p1, filename)
 
 func formatDateTime*(dt: DateTime): string =
   ## Return a formatted time stamp for the log.
