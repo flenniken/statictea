@@ -66,8 +66,10 @@ proc parseCommandLine*(argv: seq[string]): ArgsOr =
 
   options.add(newCmlOption("log", 'l', cmlOptionalParameter))
 
+  # todo: use j for server?
   options.add(newCmlOption("server", 's', cmlParameterMany))
   options.add(newCmlOption("shared", 'j', cmlParameterMany))
+  options.add(newCmlOption("code", 'o', cmlParameterMany))
   options.add(newCmlOption("prepost", 'p', cmlParameterMany))
 
   options.add(newCmlOption("template", 't', cmlParameter0or1))
@@ -90,6 +92,8 @@ proc parseCommandLine*(argv: seq[string]): ArgsOr =
     args.serverList = cmlArgs["server"]
   if "shared" in cmlArgs:
     args.sharedList = cmlArgs["shared"]
+  if "code" in cmlArgs:
+    args.codeFileList = cmlArgs["code"]
   if "prepost" in cmlArgs:
     var prepostList: seq[Prepost]
     for str in cmlArgs["prepost"]:

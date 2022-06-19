@@ -639,7 +639,7 @@ proc get_stf_filenames(): seq[string] =
   result = @[]
   var list = listFiles("testfiles")
   for filename in list:
-    if ".stf." in filename and not filename.startsWith(".#"):
+    if ".stf" in filename and not filename.startsWith(".#"):
       result.add(lastPathPart(filename))
 
 proc runRunStf() =
@@ -657,11 +657,13 @@ proc runRunStf() =
 
   let stf_filenames = get_stf_filenames()
   var failed = false
+  var foundTest = false
   var numberRan = 0
   var lastCmd: string
   for filename in stf_filenames:
     if name == "rt" or name.toLower in filename.toLower:
       # Run a stf file.
+      foundTest = true
       let cmd = """
 export statictea='../../bin/statictea'; bin/runner -f=testfiles/$1""" % filename
       echo "Running: " & filename
@@ -671,7 +673,9 @@ export statictea='../../bin/statictea'; bin/runner -f=testfiles/$1""" % filename
       if result != "":
         failed = true
         echo result
-  if not failed:
+  if not foundTest:
+    echo "test not found: " & name
+  elif not failed:
     echo "Success"
   # Show the command when running just one test that fails.
   if numberRan == 1 and failed:

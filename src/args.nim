@@ -19,6 +19,7 @@ type
     log*: bool
     serverList*: seq[string]
     sharedList*: seq[string]
+    codeFileList*: seq[string]
     prepostList*: seq[Prepost]
     templateFilename*: string
     resultFilename*: string
@@ -87,5 +88,6 @@ func `$`*(args: Args): string =
   result.add("args.resultFilename = \"$1\"\n" % args.resultFilename)
   result.add("args.serverList = $1\n" % toString(args.serverList))
   result.add("args.sharedList = $1\n" % toString(args.sharedList))
+  result.add("args.codeFileList = $1\n" % toString(args.codeFileList))
   result.add("args.templateFilename = \"$1\"\n" % args.templateFilename)
   result.add("args.prepostList = $1" % toString(args.prepostList))

@@ -7,8 +7,8 @@ Test t.args with normal arguments.
 ### File cmd.sh command
 
 ~~~
-$statictea -l -s server.json -j shared.json \
-  -s server2.json -j shared2.json \
+$statictea -l -s server.json -o codefile.tea \
+  -s server2.json -o codefile2.tea \
   -p 'abc$,def' -p '$$' \
   -t template.html -r result.html >stdout 2>stderr
 ~~~
@@ -16,28 +16,16 @@ $statictea -l -s server.json -j shared.json \
 ### File template.html
 
 ~~~
-t.args keys:
+$statictea -l -s server.json -o codefile.tea \
+  -s server2.json -o codefile2.tea \
+  -p 'abc$,def' -p '$$' \
+  -t template.html -r result.html >stdout 2>stderr
 
-$$ nextline g.keys = keys(t.args)
-  {g.keys}
-
-t.args keys:
-
+t.args keys and values:
 $$ nextline
-$$ : t.repeat = len(g.keys)
-$$ : num = add(t.row, 1)
-$$ : key = get(g.keys, t.row)
-  {num}: {key}
-
-t.args:
-
-$$ nextline
-  {t.args}
-
-t.args:
-
-$$ nextline t.repeat = len(g.keys)
-$$ : key = get(g.keys, t.row)
+$$ : keys = keys(t.args)
+$$ : t.repeat = len(keys)
+$$ : key = get(keys, t.row)
 $$ : value = get(t.args, key)
   {key}: {value}
 
@@ -46,11 +34,11 @@ Command line from t.args:
 $$ block t.repeat = len(t.args.serverList)
 $$ : g.serverParts &= concat("--server ", get(t.args.serverList, t.row))
 $$ endblock
-$$ block t.repeat = len(t.args.serverList)
-$$ : g.sharedParts &= concat("--server ", get(t.args.sharedList, t.row))
+$$ block t.repeat = len(t.args.codeFileList)
+$$ : g.codeFileParts &= concat("--code ", get(t.args.codeFileList, t.row))
 $$ endblock
 $$ block
-$$ : g.templateParts &= concat("--server ", t.args.templateFilename)
+$$ : g.templateParts &= concat("--template ", t.args.templateFilename)
 $$ endblock
 $$ block t.repeat = len(t.args.prepostList)
 $$ : prepost = get(t.args.prepostList, t.row)
@@ -73,7 +61,7 @@ $$ : parts &= if0(len(t.args.logFilename), "", +
 $$ :   concat("--log ", t.args.logFilename))
 $$ :
 $$ : parts &= join(g.serverParts, " ")
-$$ : parts &= join(g.sharedParts, " ")
+$$ : parts &= join(g.codeFileParts, " ")
 $$ : parts &= join(g.templateParts, " ")
 $$ : parts &= join(g.prepostParts, " ")
 $$ : cmd = join(parts, " ", 1)
@@ -87,19 +75,19 @@ $$ : cmd = join(parts, " ", 1)
 {}
 ~~~
 
-### File shared.json
-
-~~~
-{}
-~~~
-
 ### File server2.json
 
 ~~~
 {}
 ~~~
 
-### File shared2.json
+### File codefile.tea
+
+~~~
+{}
+~~~
+
+### File codefile2.tea
 
 ~~~
 {}
@@ -108,43 +96,27 @@ $$ : cmd = join(parts, " ", 1)
 ### File result.expected
 
 ~~~
-t.args keys:
+$statictea -l -s server.json -o codefile.tea \
+  -s server2.json -o codefile2.tea \
+  -p 'abc$,def' -p '$$' \
+  -t template.html -r result.html >stdout 2>stderr
 
-  ["help","version","update","log","serverList","sharedList","resultFilename","templateFilename","logFilename","prepostList"]
-
-t.args keys:
-
-  1: help
-  2: version
-  3: update
-  4: log
-  5: serverList
-  6: sharedList
-  7: resultFilename
-  8: templateFilename
-  9: logFilename
-  10: prepostList
-
-t.args:
-
-  {"help":0,"version":0,"update":0,"log":1,"serverList":["server.json","server2.json"],"sharedList":["shared.json","shared2.json"],"resultFilename":"result.html","templateFilename":"template.html","logFilename":"","prepostList":[["abc$","def"],["$$",""]]}
-
-t.args:
-
+t.args keys and values:
   help: 0
   version: 0
   update: 0
   log: 1
   serverList: ["server.json","server2.json"]
-  sharedList: ["shared.json","shared2.json"]
+  sharedList: []
+  codeFileList: ["codefile.tea","codefile2.tea"]
   resultFilename: result.html
   templateFilename: template.html
-  logFilename: 
+  logFilename:
   prepostList: [["abc$","def"],["$$",""]]
 
 Command line from t.args:
 
-  statictea --log --result result.html --server server.json --server server2.json --server shared.json --server shared2.json --server template.html --prepost 'abc$,def' --prepost '$$'
+  statictea --log --result result.html --server server.json --server server2.json --code codefile.tea --code codefile2.tea --template template.html --prepost 'abc$,def' --prepost '$$'
 ~~~
 
 ### Expected result.html == result.expected

@@ -18,6 +18,7 @@ args.logFilename = ""
 args.resultFilename = ""
 args.serverList = []
 args.sharedList = []
+args.codeFileList = []
 args.templateFilename = ""
 args.prepostList = []"""
     check $args == expected
@@ -37,6 +38,7 @@ args.logFilename = ""
 args.resultFilename = "result.html"
 args.serverList = ["one.json", "two.json"]
 args.sharedList = []
+args.codeFileList = []
 args.templateFilename = ""
 args.prepostList = ["#,@", "begin,end"]"""
     check $args == expected
@@ -56,6 +58,7 @@ args.logFilename = ""
 args.resultFilename = "result.html"
 args.serverList = ["server.json", "more.json"]
 args.sharedList = ["shared.json"]
+args.codeFileList = []
 args.templateFilename = ""
 args.prepostList = []"""
     check($args == expected)
@@ -76,6 +79,7 @@ args.logFilename = ""
 args.resultFilename = "result.html"
 args.serverList = ["server.json", "more.json"]
 args.sharedList = ["shared.json"]
+args.codeFileList = []
 args.templateFilename = ""
 args.prepostList = []"""
     check($args == expected)
@@ -97,6 +101,7 @@ args.logFilename = "statictea.log"
 args.resultFilename = "result.html"
 args.serverList = ["server.json", "more.json"]
 args.sharedList = ["shared.json"]
+args.codeFileList = []
 args.templateFilename = ""
 args.prepostList = []"""
     check($args == expected)

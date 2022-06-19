@@ -11,6 +11,7 @@ import variables
 import vartypes
 import tables
 import sharedtestcode
+import comparelines
 
 iterator yieldContentLine*(content: string): string =
   ## Yield one content line at a time and keep the line endings.
@@ -23,10 +24,13 @@ iterator yieldContentLine*(content: string): string =
   if start < content.len:
     yield(content[start ..< content.len])
 
-proc testGetTeaArgs(args: Args, eJson: string): bool =
+proc testGetTeaArgs(args: Args, eVarRep: string): bool =
   let value = getTeaArgs(args)
-  let valueStr = $value
-  result = expectedItem("getTeaArgs", valueStr, eJson)
+  let varRep = dotNameRep(value.dictv)
+  result = true
+  if varRep != eVarRep:
+    echo linesSideBySide(varRep, eVarRep)
+    result = false
 
 proc testProcessTemplate(templateContent: string = "",
     serverJson: string = "",
@@ -1111,7 +1115,19 @@ teas => ["black","green"]
 
   test "getTeaArgs empty":
     var args: Args
-    check testGetTeaArgs(args, """{"help":0,"version":0,"update":0,"log":0,"serverList":[],"sharedList":[],"resultFilename":"","templateFilename":"","logFilename":"","prepostList":[]}""")
+    let eVarRep = """
+help = 0
+version = 0
+update = 0
+log = 0
+serverList = []
+sharedList = []
+codeFileList = []
+resultFilename = ""
+templateFilename = ""
+logFilename = ""
+prepostList = []"""
+    check testGetTeaArgs(args, eVarRep)
 
   test "getTeaArgs multiple":
     var args: Args

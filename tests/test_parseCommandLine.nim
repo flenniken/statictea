@@ -46,6 +46,7 @@ proc tpcl(
     logFilename: string = "",
     serverList: seq[string] = @[],
     sharedList: seq[string] = @[],
+    codeFileList: seq[string] = @[],
     templateFilename: string = "",
     prepostList: seq[Prepost]= @[],
     eLogLines: seq[string] = @[],
@@ -72,6 +73,8 @@ proc tpcl(
   if not expectedItem("serverList", args.serverList, serverList):
     result = false
   if not expectedItem("sharedList", args.sharedList, sharedList):
+    result = false
+  if not expectedItem("codeFileList", args.codeFileList, codeFileList):
     result = false
   if not expectedItem("templateFilename", args.templateFilename, templateFilename):
     result = false
@@ -174,10 +177,20 @@ suite "parseCommandLine":
       templateFilename = "tea.html",
       sharedList = @["shared.json"])
 
+  test "parseCommandLine-0":
+    check tpcl("-o codefile.tea -t tea.html",
+      templateFilename = "tea.html",
+      codeFileList = @["codefile.tea"])
+
   test "parseCommandLine-shared":
     check tpcl("--shared shared.json -t tea.html",
       templateFilename = "tea.html",
       sharedList = @["shared.json"])
+
+  test "parseCommandLine-code":
+    check tpcl("--code codefile.tea -t tea.html",
+      templateFilename = "tea.html",
+      codeFileList = @["codefile.tea"])
 
   test "parseCommandLine-r":
     check tpcl("-r result.html -t tea.html",
@@ -199,17 +212,17 @@ suite "parseCommandLine":
       logFilename = "statictea.log")
 
   test "parseCommandLine-happy-path":
-    check tpcl("-s server.json -j shared.json -t tea.html -r result.html",
+    check tpcl("-s server.json -o codefile.tea -t tea.html -r result.html",
          serverList = @["server.json"],
-         sharedList = @["shared.json"],
+         codeFileList = @["codefile.tea"],
          templateFilename = "tea.html",
          resultFilename = "result.html",
     )
 
   test "parseCommandLine-multiple":
-    check tpcl("-s server.json -s server2.json -j shared.json -j shared2.json -t tea.html -r result.html",
+    check tpcl("-s server.json -s server2.json -o codefile.tea -o codefile2.tea -t tea.html -r result.html",
          serverList = @["server.json", "server2.json"],
-         sharedList = @["shared.json", "shared2.json"],
+         codeFileList = @["codefile.tea", "codefile2.tea"],
          templateFilename = "tea.html",
          resultFilename = "result.html",
     )
