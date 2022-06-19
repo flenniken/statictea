@@ -13,7 +13,7 @@ $statictea >stdout 2>stderr
 ### File stderr.expected
 
 ~~~
-unnamed(0): w88: No template name. Use -h for help.
+nofile(0): w88: No template name. Use -h for help.
 ~~~
 
 ### Expected stdout == empty

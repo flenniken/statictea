@@ -144,6 +144,7 @@ when showPos:
     echo fragment
     echo startColumn(pointerPos, symbol)
 
+# todo: filename, statement, warningData
 proc getWarnStatement*(statement: Statement,
     warningData: WarningData,
     templateFilename: string): string =

@@ -28,7 +28,7 @@ template getNewLineBuffer(env: Env): untyped =
       filename = env.templateFilename)
   if not lineBufferO.isSome():
     # Not enough memory for the line buffer.
-    env.warn(wNotEnoughMemoryForLB)
+    env.warnNoFile(wNotEnoughMemoryForLB)
     return
   lineBufferO.get()
   # var lb {.inject.} = lineBufferO.get()
@@ -82,7 +82,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     if command == "replace" and not tea.contains("content"):
       # lineNum-1 because the current line number is at the first
       # replacement line.
-      env.warn(lb.getLineNum()-1, wContentNotSet)
+      env.warn(lb.getFilename(), lb.getLineNum()-1, wContentNotSet)
 
     let repeat = getTeaVarIntDefault(variables, "repeat")
     var maxLines = getTeaVarIntDefault(variables, "maxLines")
@@ -199,7 +199,7 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
     if command == "replace" and not tea.contains("content"):
       # lineNum-1 because the current line number is at the first
       # replacement line.
-      env.warn(lb.getLineNum()-1, wContentNotSet)
+      env.warn(lb.getFilename(), lb.getLineNum()-1, wContentNotSet)
 
     if command == "replace" and tea.contains("content"):
       # Discard the replacement block lines and save the endblock if it exists.
@@ -233,7 +233,7 @@ proc readJsonFileLog*(env: var Env, filename: string): ValueOr =
 
   if not fileExists(filename):
     # File not found: $1.
-    env.warn(wFileNotFound, filename)
+    env.warnNoFile(wFileNotFound, filename)
     return
 
   var file: File
@@ -241,7 +241,7 @@ proc readJsonFileLog*(env: var Env, filename: string): ValueOr =
     file = open(filename, fmRead)
   except:
     # Unable to open file: $1.
-    env.warn(wUnableToOpenFile, filename)
+    env.warnNoFile(wUnableToOpenFile, filename)
     return
 
   # Create a stream out of the file.
@@ -266,13 +266,13 @@ proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
   for filename in filenames:
     let valueOr = readJsonFileLog(env, filename)
     if valueOr.isMessage:
-      env.warn(valueOr.message)
+      env.warn(filename, 0, valueOr.message)
     else:
       # Merge in the variables.
       for k, v in valueOr.value.dictv.pairs:
         if k in varsDict:
           # Duplicate json variable '$1' skipped.
-          env.warn(wDuplicateVar, k)
+          env.warn(filename, 0, wDuplicateVar, k)
         else:
           varsDict[k] = v
   result = varsDict
@@ -331,7 +331,7 @@ proc processTemplateTop*(env: var Env, args: Args) =
   # Add the template and result streams to the environment.
   let warningDataO = env.addExtraStreams(args)
   if warningDataO.isSome:
-    env.warn(warningDataO.get())
+    env.warnNoFile(warningDataO.get())
     return
 
   # Process the template.
@@ -344,7 +344,7 @@ proc updateTemplateTop*(env: var Env, args: Args) =
   # file is either a temp file or standard out.
   let warningDataO = env.addExtraStreamsForUpdate(args)
   if warningDataO.isSome:
-    env.warn(warningDataO.get())
+    env.warnNoFile(warningDataO.get())
     return
 
   # Update the template.
@@ -372,7 +372,7 @@ proc updateTemplateTop*(env: var Env, args: Args) =
     let writeable = writeSet * permissions
     if writeable.len == 0:
       # Cannot update the readonly template.
-      env.warn(wUpdateReadonly)
+      env.warnNoFile(wUpdateReadonly)
       return
 
     # Rename the temp result file overwriting the template file.
@@ -380,6 +380,6 @@ proc updateTemplateTop*(env: var Env, args: Args) =
       moveFile(env.resultFilename, env.templateFilename)
     except OSError:
       # Unable to rename temporary file over template file.
-      env.warn(wUnableToRenameTemp)
+      env.warnNoFile(wUnableToRenameTemp)
       # Delete the temp file.
       discard tryRemoveFile(env.resultFilename)

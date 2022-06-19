@@ -9,8 +9,8 @@ import tempFile
 import messages
 import warnings
 import args
+import readlines
 when defined(test):
-  import readlines
   import sharedtestcode
 
 const
@@ -119,34 +119,32 @@ proc outputWarning*(env: var Env, lineNum: Natural, message: string) =
 # todo: change the order. env, filename, lineNum, messageId, p1
 # todo: require filename and lineNum
 
-proc warn*(env: var Env, lineNum: Natural, warning: MessageId, p1:
-           string = "", filename: string = "") =
+proc warn*(env: var Env, filename: string, lineNum: Natural,
+    warning: MessageId, p1: string = "") =
   ## Write a formatted warning message to the error stream.
-  var fn: string
-  if filename == "":
-    fn = env.templateFilename
-    if fn == "":
-      fn = "unnamed"
-      assert lineNum == 0
-  else:
-    fn = filename
 
-  let message = getWarningLine(fn, lineNum, warning, p1)
+  # Use warnNoFile
+  assert filename != ""
+
+  let message = getWarningLine(filename, lineNum, warning, p1)
   outputWarning(env, lineNum, message)
 
-proc warn*(env: var Env, lineNum: Natural, warningData: WarningData,
-    filename: string = "") =
+proc warn*(env: var Env, filename: string, lineNum: Natural,
+    warningData: WarningData) =
   ## Write a formatted warning message to the error stream.
-  warn(env, lineNum, warningData.warning, warningData.p1, filename)
+  warn(env, filename, lineNum, warningData.warning, warningData.p1)
 
-proc warn*(env: var Env, warningData: WarningData, filename: string = "") =
+proc warnNoFile*(env: var Env, messageId: MessageId, p1: string = "") =
   ## Write a formatted warning message to the error stream.
-  echo "this warn x"
-  warn(env, 0, warningData.warning, warningData.p1, filename)
+  warn(env, "nofile", 0, messageId, p1)
 
-proc warn*(env: var Env, messageId: MessageId, p1 = "", filename: string = "") =
+proc warnNoFile*(env: var Env, warningData: WarningData) =
   ## Write a formatted warning message to the error stream.
-  warn(env, 0, messageId, p1, filename)
+  warn(env, "nofile", 0, warningData.warning, warningData.p1)
+
+proc warnLb*(env: var Env, lb: LineBuffer, messageId: MessageId, p1: string = "") =
+  ## Write a formatted warning message to the error stream.
+  warn(env, lb.getFilename(), lb.getLineNum(), messageId, p1)
 
 func formatDateTime*(dt: DateTime): string =
   ## Return a formatted time stamp for the log.
@@ -170,13 +168,13 @@ proc logLine*(env: var Env, filename: string, lineNum: int, message: string) =
     env.logFile.write(line)
   except:
     # Unable to write to the log file: '$1'.
-    env.warn(wUnableToWriteLogFile, filename)
+    env.warnNoFile(wUnableToWriteLogFile, filename)
     # Exception: '$1'.
-    env.warn(wExceptionMsg, getCurrentExceptionMsg())
+    env.warnNoFile(wExceptionMsg, getCurrentExceptionMsg())
     # The stack trace is only available in the debug builds.
     when not defined(release):
       # Stack trace: '$1'.
-      env.warn(wStackTrace, getCurrentException().getStackTrace())
+      env.warnNoFile(wStackTrace, getCurrentException().getStackTrace())
     # Close the log file.  Only one warning goes out about it not working.
     env.logFile.close()
     env.logFile = nil
@@ -198,7 +196,7 @@ proc checkLogSize(env: var Env) =
     let logSize = env.logFile.getFileSize()
     if logSize > logWarnSize:
       # The log file is over 1 GB.
-      env.warn(wBigLogFile)
+      env.warnNoFile(wBigLogFile)
 
 proc openLogFile(env: var Env, logFilename: string) =
   ## Open the log file and update the environment. If the log file
@@ -210,7 +208,7 @@ proc openLogFile(env: var Env, logFilename: string) =
     env.logFilename = logFilename
   else:
     # Unable to open log file: '$1'.
-    env.warn(wUnableToOpenLogFile, logFilename)
+    env.warnNoFile(wUnableToOpenLogFile, logFilename)
 
 proc openEnv*(logFilename: string = "",
                   warnSize: int64 = logWarnSize): Env =

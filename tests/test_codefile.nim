@@ -414,7 +414,7 @@ testcode.txt(6): w184: Out of lines looking for the multiline string.
 
   test "runCodeFile missing file":
     let eErrLines: seq[string] = splitNewLines """
-missing(0): w16: File not found: missing.
+nofile(0): w16: File not found: missing.
 """ % tripleQuotes
 
     var env = openEnvTest("_missingfile.log")

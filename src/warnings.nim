@@ -3,6 +3,8 @@
 import std/strutils
 import messages
 
+# todo: rename "warning" to "messageId".
+
 type
   WarningData* = object
     ## Warning data.

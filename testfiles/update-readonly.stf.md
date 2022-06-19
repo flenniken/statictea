@@ -48,7 +48,7 @@ $$ endblock
 ### File stderr.expected
 
 ~~~
-tmpl.txt(0): w178: Cannot update the readonly template.
+nofile(0): w178: Cannot update the readonly template.
 ~~~
 
 ### Expected tmpl.txt == tmpl.expected

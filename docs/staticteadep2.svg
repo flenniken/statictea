@@ -100,13 +100,13 @@
 <polygon fill="#000000" stroke="#000000" points="496.8862,-1169.8428 507.4746,-1169.4727 498.9665,-1163.159 496.8862,-1169.8428"/>
 </g>
 <!-- matches -->
-<g id="node18" class="node">
+<g id="node19" class="node">
 <title>matches</title>
 <ellipse fill="none" stroke="#000000" cx="545.1518" cy="-367.4917" rx="39.1627" ry="18"/>
 <text text-anchor="middle" x="545.1518" y="-363.2917" font-family="Times,serif" font-size="14.00" fill="#000000">matches</text>
 </g>
 <!-- strutils&#45;&gt;matches -->
-<g id="edge27" class="edge">
+<g id="edge29" class="edge">
 <title>strutils&#45;&gt;matches</title>
 <path fill="none" stroke="#000000" d="M119.1912,-780.4752C136.5883,-769.2831 158.0949,-754.2595 175.3343,-738.4917 322.4691,-603.9169 298.3455,-506.4637 463.3343,-394.4917 474.0769,-387.2011 486.9403,-381.7505 499.2515,-377.7302"/>
 <polygon fill="#000000" stroke="#000000" points="500.3911,-381.0423 508.9553,-374.8049 498.3706,-374.3402 500.3911,-381.0423"/>
@@ -255,23 +255,23 @@
 <path fill="none" stroke="#000000" d="M128.8668,-492.3191C144.9436,-500.4668 162.5449,-511.5449 175.3343,-525.4917 382.0474,-750.9118 235.1928,-946.7862 463.3343,-1150.4917 472.5741,-1158.7419 484.3976,-1164.4797 496.1665,-1168.4674"/>
 <polygon fill="#000000" stroke="#000000" points="495.397,-1171.8909 505.9815,-1171.4222 497.4149,-1165.188 495.397,-1171.8909"/>
 </g>
-<!-- options&#45;&gt;matches -->
-<g id="edge29" class="edge">
-<title>options&#45;&gt;matches</title>
-<path fill="none" stroke="#000000" d="M139.7011,-463.2079C230.1687,-441.8509 414.9257,-398.2347 500.1934,-378.1052"/>
-<polygon fill="#000000" stroke="#000000" points="501.1574,-381.4739 510.0857,-375.7699 499.5491,-374.6612 501.1574,-381.4739"/>
-</g>
 <!-- readlines -->
-<g id="node19" class="node">
+<g id="node18" class="node">
 <title>readlines</title>
 <ellipse fill="none" stroke="#000000" cx="545.1518" cy="-529.4917" rx="42.0524" ry="18"/>
 <text text-anchor="middle" x="545.1518" y="-525.2917" font-family="Times,serif" font-size="14.00" fill="#000000">readlines</text>
 </g>
 <!-- options&#45;&gt;readlines -->
-<g id="edge31" class="edge">
+<g id="edge28" class="edge">
 <title>options&#45;&gt;readlines</title>
 <path fill="none" stroke="#000000" d="M146.0726,-482.3857C236.5788,-493.0688 409.1638,-513.4402 494.6224,-523.5274"/>
 <polygon fill="#000000" stroke="#000000" points="494.2596,-527.0088 504.6009,-524.7052 495.0802,-520.0571 494.2596,-527.0088"/>
+</g>
+<!-- options&#45;&gt;matches -->
+<g id="edge31" class="edge">
+<title>options&#45;&gt;matches</title>
+<path fill="none" stroke="#000000" d="M139.7011,-463.2079C230.1687,-441.8509 414.9257,-398.2347 500.1934,-378.1052"/>
+<polygon fill="#000000" stroke="#000000" points="501.1574,-381.4739 510.0857,-375.7699 499.5491,-374.6612 501.1574,-381.4739"/>
 </g>
 <!-- parseCmdLine -->
 <g id="node20" class="node">
@@ -364,7 +364,7 @@
 <polygon fill="#000000" stroke="#000000" points="486.2848,-678.4706 496.8793,-678.5437 488.6427,-671.8797 486.2848,-678.4706"/>
 </g>
 <!-- tables&#45;&gt;matches -->
-<g id="edge28" class="edge">
+<g id="edge30" class="edge">
 <title>tables&#45;&gt;matches</title>
 <path fill="none" stroke="#000000" d="M138.374,-387.0533C226.9008,-382.7961 408.5343,-374.0615 495.9753,-369.8566"/>
 <polygon fill="#000000" stroke="#000000" points="496.339,-373.3432 506.1593,-369.3669 496.0027,-366.3513 496.339,-373.3432"/>
@@ -509,7 +509,7 @@
 <polygon fill="#000000" stroke="#000000" points="509.3016,-955.255 519.8852,-954.7659 511.3066,-948.5482 509.3016,-955.255"/>
 </g>
 <!-- streams&#45;&gt;readlines -->
-<g id="edge30" class="edge">
+<g id="edge27" class="edge">
 <title>streams&#45;&gt;readlines</title>
 <path fill="none" stroke="#000000" d="M132.8421,-690.3823C146.5331,-685.3979 161.585,-679.8155 175.3343,-674.4917 304.3293,-624.5447 333.5749,-604.4179 463.3343,-556.4917 475.6239,-551.9526 489.0812,-547.359 501.4687,-543.2795"/>
 <polygon fill="#000000" stroke="#000000" points="502.7089,-546.5566 511.1312,-540.1289 500.5388,-539.9014 502.7089,-546.5566"/>

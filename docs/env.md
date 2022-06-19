@@ -14,8 +14,9 @@ Environment holding the input and output streams.
 * [outputWarning](#outputwarning) &mdash; Write a message to the error stream and increment the warning count.
 * [warn](#warn) &mdash; Write a formatted warning message to the error stream.
 * [warn](#warn-1) &mdash; Write a formatted warning message to the error stream.
-* [warn](#warn-2) &mdash; Write a formatted warning message to the error stream.
-* [warn](#warn-3) &mdash; Write a formatted warning message to the error stream.
+* [warnNoFile](#warnnofile) &mdash; Write a formatted warning message to the error stream.
+* [warnNoFile](#warnnofile-1) &mdash; Write a formatted warning message to the error stream.
+* [warnLb](#warnlb) &mdash; Write a formatted warning message to the error stream.
 * [formatDateTime](#formatdatetime) &mdash; Return a formatted time stamp for the log.
 * [formatLine](#formatline) &mdash; Return a formatted log line.
 * [logLine](#logline) &mdash; Append a message to the log file.
@@ -120,8 +121,8 @@ proc outputWarning(env: var Env; lineNum: Natural; message: string)
 Write a formatted warning message to the error stream.
 
 ```nim
-proc warn(env: var Env; lineNum: Natural; warning: MessageId; p1: string = "";
-          filename: string = "")
+proc warn(env: var Env; filename: string; lineNum: Natural; warning: MessageId;
+          p1: string = "")
 ```
 
 # warn
@@ -129,24 +130,32 @@ proc warn(env: var Env; lineNum: Natural; warning: MessageId; p1: string = "";
 Write a formatted warning message to the error stream.
 
 ```nim
-proc warn(env: var Env; lineNum: Natural; warningData: WarningData;
-          filename: string = "")
+proc warn(env: var Env; filename: string; lineNum: Natural;
+          warningData: WarningData)
 ```
 
-# warn
+# warnNoFile
 
 Write a formatted warning message to the error stream.
 
 ```nim
-proc warn(env: var Env; warningData: WarningData; filename: string = "")
+proc warnNoFile(env: var Env; messageId: MessageId; p1: string = "")
 ```
 
-# warn
+# warnNoFile
 
 Write a formatted warning message to the error stream.
 
 ```nim
-proc warn(env: var Env; messageId: MessageId; p1 = ""; filename: string = "")
+proc warnNoFile(env: var Env; warningData: WarningData)
+```
+
+# warnLb
+
+Write a formatted warning message to the error stream.
+
+```nim
+proc warnLb(env: var Env; lb: LineBuffer; messageId: MessageId; p1: string = "")
 ```
 
 # formatDateTime

@@ -147,7 +147,7 @@ proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
         of multiline:
           # Out of lines looking for the multiline string.
           messageId = wIncompleteMultiline
-      env.warn(lb.getLineNum(), newWarningData(messageId), lb.getFilename)
+      env.warn(lb.getFilename, lb.getLineNum(), newWarningData(messageId))
       return
 
     # Match the optional """ or + at the end of the line. This tells
@@ -165,8 +165,7 @@ proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
           # line.  This catches the mistake of a = """xyx""".
           if line[0 .. line.len - 4].contains(tripleQuotes):
             # Triple quotes must always end the line.
-            env.warn(lb.getLineNum(), newWarningData(wTripleAtEnd),
-                     filename = lb.getfilename)
+            env.warn(lb.getfilename, lb.getLineNum(), newWarningData(wTripleAtEnd))
             return
 
         addText(line, found, text)
@@ -199,7 +198,7 @@ proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
 
   if not fileExists(filename):
     # File not found: $1.
-    env.warn(wFileNotFound, filename, filename = filename)
+    env.warnNoFile(wFileNotFound, filename)
     return
 
   # Create a stream out of the file.
@@ -207,14 +206,14 @@ proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
   stream = newFileStream(filename)
   if stream == nil:
     # Unable to open file: $1.
-    env.warn(wUnableToOpenFile, filename, filename = filename)
+    env.warnNoFile(wUnableToOpenFile, filename)
     return
 
   # Allocate a buffer for reading lines. Return when not enough memory.
   let lineBufferO = newLineBuffer(stream, filename = filename)
   if not lineBufferO.isSome():
     # Not enough memory for the line buffer.
-    env.warn(wNotEnoughMemoryForLB, filename = filename)
+    env.warnNoFile(wNotEnoughMemoryForLB)
     return
   var lb = lineBufferO.get()
 

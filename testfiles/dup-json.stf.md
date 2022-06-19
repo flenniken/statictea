@@ -43,7 +43,7 @@ Earl
 ### File stderr.expected
 
 ~~~
-template.html(0): w132: Duplicate json variable 'name' skipped.
+server2.json(0): w132: Duplicate json variable 'name' skipped.
 ~~~
 
 ### Expected result.html == result.expected

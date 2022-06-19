@@ -95,7 +95,7 @@ XXXX-XX-XX XX:XX:XX.XXX; test_env.nim(X*); testProc done
     check env.logFile == nil
 
     let eErrLines = @[
-      "template.html(0): w8: Unable to open log file: ''.\n"
+      "nofile(0): w8: Unable to open log file: ''.\n"
     ]
     check env.readCloseDeleteCompare(eErrLines = eErrLines)
 
@@ -108,7 +108,7 @@ XXXX-XX-XX XX:XX:XX.XXX; test_env.nim(X*); testProc done
     env.log("test line no log2\n")
 
     let eErrLines = @[
-      "template.html(0): w8: Unable to open log file: ''.\n"
+      "nofile(0): w8: Unable to open log file: ''.\n"
     ]
     check env.readCloseDeleteCompare(eErrLines = eErrLines)
 

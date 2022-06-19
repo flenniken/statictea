@@ -89,7 +89,7 @@ proc collectCommand*(env: var Env, lb: var LineBuffer,
         else:
           # The endblock command does not have a matching block command.
           warn = wBareEndblock
-        env.warn(lb.getLineNum(), warn)
+        env.warn(lb.getFilename, lb.getLineNum(), warn)
         env.resultStream.write(line)
         continue
 

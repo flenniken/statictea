@@ -19,7 +19,7 @@ proc testYieldReplacementLine(
 
   var env = openEnvTest("_testTempSegments.log", replaceContent)
 
-  var lineBufferO = newLineBuffer(env.templateStream)
+  var lineBufferO = newLineBuffer(env.templateStream, filename = "testStream")
   if not lineBufferO.isSome:
     return false
   var lb = lineBufferO.get()
@@ -206,7 +206,7 @@ line 3
       newReplaceLine(rlNormalLine, "line 3\n"),
     ]
     var eErrLines = @[
-      "template.html(2): w60: Read t.maxLines replacement block lines without finding the endblock.\n"
+      "testStream(2): w60: Read t.maxLines replacement block lines without finding the endblock.\n"
     ]
 
     check testYieldReplacementLine(firstReplaceLine, replaceContent,
@@ -232,7 +232,7 @@ six
       newReplaceLine(rlNormalLine, "five\n"),
     ]
     var eErrLines = @[
-      "template.html(4): w60: Read t.maxLines replacement block lines without finding the endblock.\n"
+      "testStream(4): w60: Read t.maxLines replacement block lines without finding the endblock.\n"
     ]
     check testYieldReplacementLine(firstReplaceLine, replaceContent, maxLines = 4,
       eYieldLines = eYieldLines, eErrLines = eErrLines)

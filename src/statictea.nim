@@ -25,7 +25,7 @@ proc processArgs(env: var Env, args: Args) =
     processTemplateTop(env, args)
   else:
     # No template name. Use -h for help.
-    env.warn(wNoTemplateName)
+    env.warnNoFile(wNoTemplateName)
 
 proc main*(env: var Env, argv: seq[string]) =
   ## Run statictea.
@@ -33,7 +33,7 @@ proc main*(env: var Env, argv: seq[string]) =
   # Parse the command line options.
   let argsOr = parseCommandLine(argv)
   if argsOr.isMessage:
-    env.warn(argsOr.message)
+    env.warnNoFile(argsOr.message)
     return
   let args = argsOr.value
 
@@ -55,11 +55,11 @@ proc main*(env: var Env, argv: seq[string]) =
     let msg = getCurrentExceptionMsg()
     env.log(msg & "\n")
     # Unexpected exception: '$1'.
-    env.warn(wUnexpectedException, msg)
+    env.warnNoFile(wUnexpectedException, msg)
     when not defined(release):
       # The stack trace is only available in the debug builds.
       # Stack trace: '$1'.
-      env.warn(wStackTrace, getCurrentException().getStackTrace())
+      env.warnNoFile(wStackTrace, getCurrentException().getStackTrace())
 
 when isMainModule:
   block:
