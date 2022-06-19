@@ -229,11 +229,14 @@ proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
       continue
     let variableData = variableDataOr.value
 
+    # echo "variableData = $1" % $variableData
+
     # Return function exit.
     if variableData.operator == "exit":
-      if variableData.value.kind != vkString:
-        # Expected 'skip', 'stop' or '' for the block command return value.
-        env.warnStatement(statement, newWarningData(wSkipStopOrEmpty),
+      if not (variableData.value.kind == vkString and
+              variableData.value.stringv == "stop"):
+        # Use '...return(\"stop\")...' in a code file.
+        env.warnStatement(statement, newWarningData(wUseStop),
           sourceFilename = filename)
         continue
       break # done

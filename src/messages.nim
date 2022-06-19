@@ -197,6 +197,7 @@ type
     wIncompleteMultiline,  ## w184
     wTripleAtEnd,          ## w185
     wNoGlobalInCodeFile,   ## w186
+    wUseStop,              ## w187
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -387,5 +388,6 @@ const
     "Out of lines looking for the multiline string.", ## wIncompleteMultiline
     "Triple quotes must always end the line.", ## wTripleAtEnd
     "You cannot assign to the g namespace in a code file.", ## wNoGlobalInCodeFile
+    "Use '...return(\"stop\")...' in a code file.", ## wUseStop
     ]
     ## The message text.

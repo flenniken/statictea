@@ -427,6 +427,53 @@ statement: g.a = 5
 """
     check testRunCodeFile(content, variables, eErrLines = eErrLines)
 
-# todo: test "skip":
-# todo: test "stop":
-# todo: test "if":
+  test "runCodeFile warn":
+    let content = """
+if1(1, warn("hello"))
+v = if0(1, warn("not this"), 5)
+a = warn("there")
+"""
+    var variables = emptyVariables()
+    let eVarRep = """
+v = 5"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.txt(1): hello
+testcode.txt(3): there
+"""
+    check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+
+  test "runCodeFile return":
+    let content = """
+a = 1
+b = 2
+c = if0(a, return("stop"), 3)
+d = 4
+e = if1(a, return("stop"))
+end = 5
+"""
+    var variables = emptyVariables()
+    let eVarRep = """
+a = 1
+b = 2
+c = 3
+d = 4"""
+    let eErrLines: seq[string] = splitNewLines """
+"""
+    check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+
+  test "runCodeFile return warning":
+    let content = """
+a = 1
+c = if1(1, return("skip"))
+b = 2
+"""
+    var variables = emptyVariables()
+    let eVarRep = """
+a = 1
+b = 2"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.txt(2): w187: Use '...return("stop")...' in a code file.
+statement: c = if1(1, return("skip"))
+           ^
+"""
+    check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
