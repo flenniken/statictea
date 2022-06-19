@@ -116,9 +116,6 @@ proc outputWarning*(env: var Env, lineNum: Natural, message: string) =
     env.errStream.writeLine(message)
     inc(env.warningsWritten)
 
-# todo: change the order. env, filename, lineNum, messageId, p1
-# todo: require filename and lineNum
-
 proc warn*(env: var Env, filename: string, lineNum: Natural,
     warning: MessageId, p1: string = "") =
   ## Write a formatted warning message to the error stream.

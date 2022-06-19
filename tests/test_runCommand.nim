@@ -29,21 +29,21 @@ proc cmpVariableDataOr(statement: Statement,
   echo ""
   if e.isMessage and g.isMessage:
     echo "expected message:"
-    echo getWarnStatement(statement, e.message, templateName)
+    echo getWarnStatement(templateName, statement, e.message)
     echo "got message:"
-    echo getWarnStatement(statement, g.message, templateName)
+    echo getWarnStatement(templateName, statement, g.message)
   elif e.isValue and g.isValue:
     echo "expected value: " & $e & ", type=" & $e.value.value.kind
     echo "     got value: " & $g & ", type=" & $g.value.value.kind
   elif e.isMessage:
     echo "expected message:"
-    echo getWarnStatement(statement, e.message, templateName)
+    echo getWarnStatement(templateName, statement, e.message)
     echo "got value:"
     echo $g.value
   else:
     echo "expected value: " & $e.value
     echo "got message:"
-    echo getWarnStatement(statement, g.message, templateName)
+    echo getWarnStatement(templateName, statement, g.message)
   echo ""
 
 proc getCmdLinePartsTest(env: var Env,
@@ -97,9 +97,9 @@ proc cmpValueAndLengthOr(statement: Statement,
     echo "expected: $1" % $e
     echo "     got: $1" % $g
     if e.isMessage:
-      echo getWarnStatement(statement, e.message, "template.html")
+      echo getWarnStatement("template.html", statement, e.message)
     if g.isMessage:
-      echo getWarnStatement(statement, g.message, "template.html")
+      echo getWarnStatement("template.html", statement, g.message)
     result = false
 
 proc testGetStatements(content: string, expected: string): bool =

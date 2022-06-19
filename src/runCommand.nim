@@ -144,10 +144,8 @@ when showPos:
     echo fragment
     echo startColumn(pointerPos, symbol)
 
-# todo: filename, statement, warningData
-proc getWarnStatement*(statement: Statement,
-    warningData: WarningData,
-    templateFilename: string): string =
+proc getWarnStatement*(filename: string, statement: Statement,
+    warningData: WarningData): string =
   ## Return a multiline error message.
 
   let start = warningData.pos
@@ -161,7 +159,7 @@ proc getWarnStatement*(statement: Statement,
 $1
 statement: $2
            $3""" % [
-    getWarningLine(templateFilename, statement.lineNum, warning, p1),
+    getWarningLine(filename, statement.lineNum, warning, p1),
     fragment,
     startColumn(pointerPos)
   ]
@@ -182,7 +180,7 @@ proc warnStatement*(env: var Env, statement: Statement,
     message = "$1($2): $3" % [filename,
       $statement.lineNum, warningData.p1]
   else:
-    message = getWarnStatement(statement, warningData, filename)
+    message = getWarnStatement(filename, statement, warningData)
   env.outputWarning(statement.lineNum, message)
 
 func `==`*(s1: Statement, s2: Statement): bool =

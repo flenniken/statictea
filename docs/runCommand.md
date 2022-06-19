@@ -146,8 +146,8 @@ func getFragmentAndPos(statement: Statement; start: Natural): (string, Natural)
 Return a multiline error message.
 
 ```nim
-proc getWarnStatement(statement: Statement; warningData: WarningData;
-                      templateFilename: string): string
+proc getWarnStatement(filename: string; statement: Statement;
+                      warningData: WarningData): string
 ```
 
 # warnStatement
