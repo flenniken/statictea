@@ -368,13 +368,6 @@ testcode.txt(2): w183: Out of lines looking for the plus sign line.
 """
     check testRunCodeFile(content, variables, eErrLines = eErrLines)
 
-# a =     +
-#      """
-# this is a multiline
-# string
-#   """
-
-
   test "runCodeFile line number":
     let content = """
 a = 5
@@ -422,11 +415,18 @@ nofile(0): w16: File not found: missing.
     runCodeFile(env, "missing", variables)
     check env.readCloseDeleteCompare(eErrLines = eErrLines)
 
+  test "runCodeFile no g access":
+    let content = """
+g.a = 5
+"""
+    var variables = emptyVariables()
+    let eErrLines: seq[string] = splitNewLines """
+testcode.txt(1): w186: You cannot assign to the g namespace in a code file.
+statement: g.a = 5
+           ^
+"""
+    check testRunCodeFile(content, variables, eErrLines = eErrLines)
 
-# todo: test filename in warning messages.
 # todo: test "skip":
 # todo: test "stop":
-# todo: test """ continue":
 # todo: test "if":
-# todo: test "multiline with ending quotes on same line":
-# todo: test "no g access":

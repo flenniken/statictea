@@ -199,7 +199,8 @@ MessageId = enum
   wReadOnlyCodeVars,        ## w182
   wNoPlusSignLine,          ## w183
   wIncompleteMultiline,     ## w184
-  wTripleAtEnd               ## w185
+  wTripleAtEnd,             ## w185
+  wNoGlobalInCodeFile        ## w186
 ```
 
 # Messages
@@ -393,7 +394,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "You can only change code variables in code files.", ## wReadOnlyCodeVars
     "Out of lines looking for the plus sign line.", ## wNoPlusSignLine
     "Out of lines looking for the multiline string.", ## wIncompleteMultiline
-    "Triple quotes must always end the line."]
+    "Triple quotes must always end the line.", ## wTripleAtEnd
+    "You cannot assign to the g namespace in a code file."]
 ```
 
 

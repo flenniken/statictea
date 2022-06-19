@@ -191,8 +191,6 @@ proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
 
   result = some(newStatement(text, lb.getLineNum()))
 
-# todo: add a stream version of runCodeFile.
-
 proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
   ## Run the code file and fill in the variables.
 

@@ -196,6 +196,7 @@ type
     wNoPlusSignLine,       ## w183
     wIncompleteMultiline,  ## w184
     wTripleAtEnd,          ## w185
+    wNoGlobalInCodeFile,   ## w186
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -385,5 +386,6 @@ const
     "Out of lines looking for the plus sign line.", ## wNoPlusSignLine
     "Out of lines looking for the multiline string.", ## wIncompleteMultiline
     "Triple quotes must always end the line.", ## wTripleAtEnd
+    "You cannot assign to the g namespace in a code file.", ## wNoGlobalInCodeFile
     ]
     ## The message text.

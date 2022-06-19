@@ -283,6 +283,9 @@ proc assignVariable*(
         # You cannot overwrite the server or shared variables.
         return some(newWarningData(wReadOnlyDictionary))
     of "g", "l":
+      if inCodeFile and nameSpace == "g":
+        # You cannot assign to the g namespace in a code file.
+        return some(newWarningData(wNoGlobalInCodeFile))
       if names.len == 1:
         # You cannot assign to an existing variable.
         return some(newWarningData(wImmutableVars))
