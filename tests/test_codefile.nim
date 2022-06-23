@@ -477,3 +477,15 @@ statement: c = if1(1, return("skip"))
            ^
 """
     check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+
+  test "runCodeFile comment":
+    let content = """
+# this is a comment
+a = 5
+"""
+    var variables = emptyVariables()
+    let eVarRep = """
+a = 5"""
+    let eErrLines: seq[string] = splitNewLines """
+"""
+    check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)

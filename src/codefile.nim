@@ -222,6 +222,9 @@ proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
       break # done
     let statement = statementO.get()
 
+    # todo: update runStatement to handle comments and blank lines.
+    # A comment can start before you get the left hand side or at the end.
+
     # Run the statement and get the variable, operator and value.
     let variableDataOr = runStatement(statement, variables)
     if variableDataOr.isMessage:
@@ -257,4 +260,6 @@ proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
 
 proc runCodeFiles*(env: var Env, variables: var Variables, codeList: seq[string]) =
   ## Run each code file and populate the variables.
-  discard
+  for filename in codeList:
+    runCodeFile(env, filename, variables)
+    resetVariables(variables)

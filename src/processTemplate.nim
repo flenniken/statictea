@@ -307,10 +307,7 @@ proc processTemplate*(env: var Env, args: Args) =
   ## Process the template.
 
   var variables = getStartingVariables(env, args)
-
-  let codeFilenames = newSeq[string]()
-  # let codeFilenames = args.codeFilenames
-  runCodeFiles(env, variables, codeFilenames)
+  runCodeFiles(env, variables, args.codeFileList)
 
   var prepostTable = getPrepostTable(args)
 
