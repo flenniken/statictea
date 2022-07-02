@@ -84,13 +84,11 @@ $$ : cmd = join(parts, " ", 1)
 ### File codefile.tea
 
 ~~~
-{}
 ~~~
 
 ### File codefile2.tea
 
 ~~~
-{}
 ~~~
 
 ### File result.expected
@@ -111,7 +109,7 @@ t.args keys and values:
   codeFileList: ["codefile.tea","codefile2.tea"]
   resultFilename: result.html
   templateFilename: template.html
-  logFilename:
+  logFilename: 
   prepostList: [["abc$","def"],["$$",""]]
 
 Command line from t.args:

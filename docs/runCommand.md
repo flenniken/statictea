@@ -23,6 +23,7 @@ starts in the template file.
 * [`==`](#) &mdash; Return true when the two statements are equal.
 * [`$`](#-1) &mdash; Return a string representation of a Statement.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
+* [getMultilineStr](#getmultilinestr) &mdash; Return the triple quoted string literal.
 * [getString](#getstring) &mdash; Return a literal string value and match length from a statement.
 * [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
 * [ifFunction](#iffunction) &mdash; Return the if0 and if1 function's value and the length.
@@ -181,6 +182,23 @@ Iterate through the command's statements. Skip blank statements.
 
 ```nim
 iterator yieldStatements(cmdLines: CmdLines): Statement
+```
+
+# getMultilineStr
+
+Return the triple quoted string literal. The startPos points one
+past the leading triple quote.  Return the parsed
+string value and the ending position one past the trailing
+whitespace.
+
+~~~
+a = """ntest string"""n
+        ^                ^
+a = """n"""n
+~~~~
+
+```nim
+func getMultilineStr(text: string; start: Natural): StrAndPosOr
 ```
 
 # getString

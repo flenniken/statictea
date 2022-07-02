@@ -1,5 +1,6 @@
 import std/unittest
 import std/os
+import std/unicode
 import opresult
 import sharedtestcode
 import comparelines
@@ -71,25 +72,32 @@ proc testLinesSideBySide(content1: string, content2: string,
   else:
     result = true
 
+proc got_expected*(got: string, expected: string): bool =
+  if got != expected:
+    echo "     got: " & got
+    echo "expected: " & expected
+    return false
+  return true
+
+proc testVisibleControl(text: string, eText: string): bool =
+  let got = visibleControl(text)
+  result = got_expected(got, eText)
 
 suite "comparelines.nim":
 
-  test "showTabsAndLineEndings":
-    check showTabsAndLineEndings("asdf") == "asdf"
-    check showTabsAndLineEndings("asdf\n") == "asdf␊"
-    check showTabsAndLineEndings("asdf\r\n") == "asdf␍␊"
-    check showTabsAndLineEndings("	asdf") == "␉asdf"
-    check showTabsAndLineEndings(" 	 asdf") == " ␉ asdf"
+  test "visibleControl":
+    check testVisibleControl("asdf", "asdf")
+    check testVisibleControl("asdf\n",  "asdf␊")
+    check testVisibleControl("asdf\r\n", "asdf␍␊")
+    check testVisibleControl("	asdf", "␉asdf")
+    check testVisibleControl(" 	 asdf", " ␉ asdf")
 
-  test "showTabsAndLineEndings others":
-    check showTabsAndLineEndings("abc\0def") == "abc\x00def"
-    check showTabsAndLineEndings("abc\1def") == "abc\x01def"
-    check showTabsAndLineEndings("abc\2def") == "abc\x02def"
-    check showTabsAndLineEndings("abc\3def") == "abc\x03def"
-    check showTabsAndLineEndings("abc\4def") == "abc\x04def"
-    check showTabsAndLineEndings("abc\5def") == "abc\x05def"
-    check showTabsAndLineEndings("abc\6def") == "abc\x06def"
-    check showTabsAndLineEndings("abc\7def") == "abc\x07def"
+  test "visibleControl others":
+    for num in countUp(0, 31):
+      let rune = Rune(num)
+      var str = "abc"
+      str.add(rune)
+      # echo visibleControl(str)
 
   test "linesSideBySide empty":
     let content1 = ""

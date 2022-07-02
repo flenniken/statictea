@@ -5,6 +5,7 @@ This folder contains stf test files for statictea.
 * [block-readme](../testfiles/block-readme.stf.md) &mdash; The readme block example.
 * [cmdline-no-templates](../testfiles/cmdline-no-templates.stf.md) &mdash; Test with no templates on the command line.
 * [cmdline-two-templates](../testfiles/cmdline-two-templates.stf.md) &mdash; Test with two templates on the command line.
+* [codefile-basics](../testfiles/codefile-basics.stf.md) &mdash; Test using a code file.
 * [comment](../testfiles/comment.stf.md) &mdash; The readme comment example.
 * [comments-inline](../testfiles/comments-inline.stf.md) &mdash; Test inline comments.
 * [continue-basics](../testfiles/continue-basics.stf.md) &mdash; The continue readme example.

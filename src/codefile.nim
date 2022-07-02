@@ -88,38 +88,40 @@ proc matchTripleOrPlusSign*(line: string): Found =
       return crlf
 
 proc addText*(line: string, found: Found, text: var string) =
-  ## Add the line up to the line ending to the text string.
-  var offset: Natural
+  ## Add the line up to the line-ending to the text string.
+  var skipNum: Natural
+  var addNewline = false
   case found:
   of nothing:
-    offset = 1
-
+    skipNum = 0
   of plus:
-    offset = 2
+    skipNum = 1
   of triple:
     # Include the quotes.
-    offset = 1
-
+    skipNum = 0
+    addNewline = true
   of newline:
-    offset = 2
+    skipNum = 1
   of plus_n:
-    offset = 3
+    skipNum = 2
   of triple_n:
-    # Include the quotes.
-    offset = 2
-
+    # Include the quotes and newline
+    skipNum = 0
   of crlf:
-    offset = 3
+    skipNum = 2
   of plus_crlf:
-    offset = 4
+    skipNum = 3
   of triple_crlf:
     # Include the quotes.
-    offset = 3
+    skipNum = 2
+    addNewline = true
 
-  var endPos = line.len - offset
+  var endPos = line.len - 1 - skipNum
   if endPos < -1:
     endPos = -1
   text.add(line[0 .. endPos])
+  if addNewline:
+    text.add('\n')
 
 proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
   ## Read the next statement from the file reading multiple lines if
@@ -221,9 +223,6 @@ proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
     if not statementO.isSome:
       break # done
     let statement = statementO.get()
-
-    # todo: update runStatement to handle comments and blank lines.
-    # A comment can start before you get the left hand side or at the end.
 
     # Run the statement and get the variable, operator and value.
     let variableDataOr = runStatement(statement, variables)

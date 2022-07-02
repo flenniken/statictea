@@ -19,7 +19,7 @@ proc testAddText*(beginning: string, ending: string, found: Found): bool =
   result = true
   var expected: string
   if found in [triple, triple_n, triple_crlf]:
-    expected = beginning & tripleQuotes
+    expected = beginning & tripleQuotes & "\n"
   else:
     expected = beginning
   if not expectedItem("'$1, '" % [line, $found], text, expected):
@@ -169,8 +169,17 @@ $1
 b = 2
 """ % tripleQuotes
 
-    let eText = "a = $1multiline\nstring\n$1" % tripleQuotes
+    let eText = "a = $1\nmultiline\nstring\n$1\n" % tripleQuotes
     check testReadStatement(content, eText, 4)
+
+  test "readStatement multiline at end":
+    let content = """
+a = $1
+multiline
+string$1""" % tripleQuotes
+
+    let eText = "a = $1\nmultiline\nstring$1\n" % tripleQuotes
+    check testReadStatement(content, eText, 3)
 
   test "readStatement no continue":
     check testReadStatement("one", "one")
@@ -197,7 +206,7 @@ a = +
 $1
 $1
 """ % tripleQuotes
-    let eText = "$1$1" % tripleQuotes
+    let eText = "$1\n$1\n" % tripleQuotes
     check testReadStatement(content, eText, 2)
 
   test "readStatement multiline a":
@@ -205,7 +214,7 @@ $1
 $1
 a$1
 """ % tripleQuotes
-    let eText = "$1a$1" % tripleQuotes
+    let eText = "$1\na$1\n" % tripleQuotes
     check testReadStatement(content, eText, 2)
 
   test "readStatement multiline a\\n":
@@ -214,7 +223,7 @@ $1
 a
 $1
 """ % tripleQuotes
-    let eText = "$1a\n$1" % tripleQuotes
+    let eText = "$1\na\n$1\n" % tripleQuotes
     check testReadStatement(content, eText, 3)
 
   test "readStatement multiline 1":
@@ -224,7 +233,7 @@ this is
 a multiline+
 string
 $1""" % tripleQuotes
-    let eText = "a = $1this is\na multiline+\nstring\n$1" % tripleQuotes
+    let eText = "a = $1\nthis is\na multiline+\nstring\n$1\n" % tripleQuotes
     check testReadStatement(content, eText, 5)
 
   test "readStatement multiline 2":
@@ -234,7 +243,7 @@ this is
 a multiline
 string$1
 """ % tripleQuotes
-    let eText = "a = $1this is\na multiline\nstring$1" % tripleQuotes
+    let eText = "a = $1\nthis is\na multiline\nstring$1\n" % tripleQuotes
     check testReadStatement(content, eText, 4)
 
   test "readStatement not multiline":

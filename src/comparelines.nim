@@ -26,14 +26,16 @@ proc readFileContent(filename: string): OpResultStr[string] =
   except:
     result = opMessageStr[string](getCurrentExceptionMsg())
 
-func showTabsAndLineEndings*(str: string): string =
-  ## Return a new string with the tab and line endings visible.
+func visibleControl*(str: string): string =
+  ## Return a new string with the tab and line endings and other
+  ## control characters visible.
 
   var visibleRunes = newSeq[Rune]()
   for rune in runes(str):
     var num = uint(rune)
-    # Show a special glyph for tab, carrage return and line feed.
-    if num == 9 or num == 10 or num == 13:
+    # Show a special glyph for tab, carrage return and line feed and
+    # other control characters.
+    if num <= 0x1f:
       num = 0x00002400 + num
     visibleRunes.add(Rune(num))
   result = $visibleRunes
@@ -47,7 +49,7 @@ proc linesSideBySide*(gotContent: string, expectedContent: string): string =
   let got = splitNewLines(gotContent)
   let expected = splitNewLines(expectedContent)
 
-  var show = showTabsAndLineEndings
+  var show = visibleControl
 
   var lines: seq[string]
   for ix in countUp(0, max(got.len, expected.len)-1):

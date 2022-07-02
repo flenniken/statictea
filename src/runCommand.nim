@@ -17,6 +17,7 @@ import runFunction
 import readjson
 import collectCommand
 import opresultwarn
+import comparelines
 
 const
   # Turn on showPos for testing to graphically show the start and end
@@ -107,6 +108,10 @@ func getFragmentAndPos*(statement: Statement, start: Natural):
   ## Return a statement fragment, and new position to show the given
   ## position.
 
+  # Change the newlines and control characters to something readable
+  # and so the fragment fixs on one line.
+  let text = visibleControl(statement.text)
+
   var fragment: string
   var extraStart = ""
   var extraEnd = ""
@@ -116,8 +121,8 @@ func getFragmentAndPos*(statement: Statement, start: Natural):
   var endPos: int
   var pointerPos: int
 
-  if statement.text.len <= fragmentMax:
-    fragment = statement.text
+  if text.len <= fragmentMax:
+    fragment = text
     startPos = start
     pointerPos = start
   else:
@@ -128,11 +133,11 @@ func getFragmentAndPos*(statement: Statement, start: Natural):
       extraStart = "..."
 
     endPos = startPos + fragmentMax
-    if endPos > statement.text.len:
-      endPos = statement.text.len
+    if endPos > text.len:
+      endPos = text.len
     else:
       extraEnd = "..."
-    fragment = extraStart & statement.text[startPos ..< endPos] & extraEnd
+    fragment = extraStart & text[startPos ..< endPos] & extraEnd
     pointerPos = start.int - startPos + extraStart.len
 
   assert pointerPos >= 0
@@ -245,6 +250,30 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
   if notEmptyOrSpaces(text):
     yield newStatement(strip(text), lineNum, start)
 
+func getMultilineStr*(text: string, start: Natural): StrAndPosOr =
+  ## Return the triple quoted string literal. The startPos points one
+  ## @:past the leading triple quote.  Return the parsed
+  ## @:string value and the ending position one past the trailing
+  ## @:whitespace.
+  ## @:
+  ## @:~~~
+  ## @:a = """\ntest string"""\n
+  ## @:        ^                ^
+  ## @:a = """\n"""\n
+  ## @:~~~~
+
+  # todo: handle or document whether the string has to be UTF-8.
+
+  if start >= text.len or text[start] != '\n':
+    # Triple quotes must always end the line.
+    return newStrAndPosOr(wTripleAtEnd, "", start)
+  if start + 5 > text.len or text[text.len - 4 .. text.len - 1] != "\"\"\"\n":
+    # Missing the ending triple quotes.
+    return newStrAndPosOr(wMissingEndingTriple, "", text.len)
+
+  let newStr = text[start + 1 .. text.len - 5]
+  result = newStrAndPosOr(newStr, text.len)
+
 func getString*(statement: Statement, start: Natural):
     ValueAndLengthOr =
   ## Return a literal string value and match length from a statement. The
@@ -255,9 +284,17 @@ func getString*(statement: Statement, start: Natural):
   let str = statement.text
 
   # Parse the json string and remove escaping.
-  let strAndPosOr = parseJsonStr(str, start+1)
+  var strAndPosOr = parseJsonStr(str, start+1)
   if strAndPosOr.isMessage:
     return newValueAndLengthOr(strAndPosOr.message)
+  let strAndPos = strAndPosOr.value
+
+  # A triple quoted string looks like an empty string with a quote
+  # following it to the parseJsonStr function.
+  if strAndPos.pos < str.len and strAndPos.pos == start+2 and str[start+2] == '"':
+    strAndPosOr = getMultilineStr(str, start+3)
+    if strAndPosOr.isMessage:
+      return newValueAndLengthOr(strAndPosOr.message)
 
   result = newValueAndLengthOr(newValue(strAndPosOr.value.str),
     strAndPosOr.value.pos - start)
@@ -597,13 +634,24 @@ proc runStatement*(statement: Statement, variables: Variables):
   ## Run one statement and return the variable dot name string,
   ## operator and value.
 
+  # Skip blank lines and comments.
+  var pos: Natural
+  let spacesO = matchTabSpace(statement.text, 0)
+  if not isSome(spacesO):
+    pos = 0
+  else:
+    pos = spacesO.get().length
+  if pos >= statement.text.len or statement.text[pos] == '#':
+    return newVariableDataOr("", "", newValue(0))
+
   # Get the variable dot name string and match the surrounding white
   # space.
-  let matchesO = matchDotNames(statement.text, 0)
+  let matchesO = matchDotNames(statement.text, pos)
   if not isSome(matchesO):
     # Statement does not start with a variable name.
     return newVariableDataOr(wMissingStatementVar)
   let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
+  let leadingLen = dotNameLen + pos
 
   var vlOr: ValueAndLengthOr
   var operator = ""
@@ -612,7 +660,7 @@ proc runStatement*(statement: Statement, variables: Variables):
 
   if leftParen == "(" and dotNameStr in ["if0", "if1"]:
     # Handle the special bare if functions.
-    vlOr = ifFunction(dotNameStr, statement, dotNameLen, variables)
+    vlOr = ifFunction(dotNameStr, statement, leadingLen, variables)
   else:
     # Handle normal "varName operator right" statements.
     varName = dotNameStr
@@ -622,17 +670,17 @@ proc runStatement*(statement: Statement, variables: Variables):
       return newVariableDataOr(wMissingStatementVar)
 
     # Get the equal sign or &= and the following whitespace.
-    let operatorO = matchEqualSign(statement.text, dotNameLen)
+    let operatorO = matchEqualSign(statement.text, leadingLen)
     if not operatorO.isSome:
       # Missing operator, = or &=.
-      return newVariableDataOr(wInvalidVariable, "", dotNameLen)
+      return newVariableDataOr(wInvalidVariable, "", leadingLen)
     let match = operatorO.get()
     operator = match.getGroup()
     operatorLength = match.length
 
     # Get the right hand side value and match the following whitespace.
     vlOr = getValueAndLength(statement,
-      dotNameLen + operatorLength, variables, false)
+      leadingLen + operatorLength, variables, false)
 
   if vlOr.isMessage:
     return newVariableDataOr(vlOr.message)
@@ -642,10 +690,12 @@ proc runStatement*(statement: Statement, variables: Variables):
     return newVariableDataOr("", "exit", vlOr.value.value)
 
   # Check that there is not any unprocessed text following the value.
-  let length = dotNameLen + operatorLength + vlOr.value.length
+  let length = leadingLen + operatorLength + vlOr.value.length
   if length != statement.text.len:
-    # Unused text at the end of the statement.
-    return newVariableDataOr(wTextAfterValue, "", length)
+    # Check for a trailing comment.
+    if statement.text[length] != '#':
+      # Unused text at the end of the statement.
+      return newVariableDataOr(wTextAfterValue, "", length)
 
   # Return the variable dot name and value.
   result = newVariableDataOr(varName, operator, vlOr.value.value)

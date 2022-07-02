@@ -7,7 +7,7 @@ Run code file.
 
 * type: [Found](#found) &mdash; The line endings found.
 * [matchTripleOrPlusSign](#matchtripleorplussign) &mdash; Match the optional """ or + at the end of the line.
-* [addText](#addtext) &mdash; Add the line up to the line ending to the text string.
+* [addText](#addtext) &mdash; Add the line up to the line-ending to the text string.
 * [readStatement](#readstatement) &mdash; Read the next statement from the file reading multiple lines if needed.
 * [runCodeFile](#runcodefile) &mdash; Run the code file and fill in the variables.
 * [runCodeFiles](#runcodefiles) &mdash; Run each code file and populate the variables.
@@ -37,7 +37,7 @@ proc matchTripleOrPlusSign(line: string): Found
 
 # addText
 
-Add the line up to the line ending to the text string.
+Add the line up to the line-ending to the text string.
 
 ```nim
 proc addText(line: string; found: Found; text: var string)

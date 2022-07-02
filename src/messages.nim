@@ -198,6 +198,7 @@ type
     wTripleAtEnd,          ## w185
     wNoGlobalInCodeFile,   ## w186
     wUseStop,              ## w187
+    wMissingEndingTriple,  ## w188
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -389,5 +390,6 @@ const
     "Triple quotes must always end the line.", ## wTripleAtEnd
     "You cannot assign to the g namespace in a code file.", ## wNoGlobalInCodeFile
     "Use '...return(\"stop\")...' in a code file.", ## wUseStop
+    "Missing the ending triple quotes.", ## wMissingEndingTriple
     ]
     ## The message text.

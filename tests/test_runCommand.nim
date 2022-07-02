@@ -17,6 +17,65 @@ import readlines
 import collectCommand
 import opresultwarn
 import sharedtestcode
+import codefile
+import readjson
+import comparelines
+
+proc testGetMultilineStr(pattern: string, start: Natural,
+    eStr: string, eLength: Natural): bool =
+  # Test getMultilineStr.
+
+  let text = pattern % tripleQuotes
+  let strAndPosOr = getMultilineStr(text, start)
+  if strAndPosOr.isMessage:
+    echo "Unexpected error: " & $strAndPosOr
+    return false
+  let literal = strAndPosOr.value.str
+  let length = strAndPosOr.value.pos - start
+
+  result = true
+
+  if literal != eStr:
+    echo "line: $1" % visibleControl(text)
+    echo "      " & startColumn(start)
+    echo "     got str: $1" % visibleControl(literal)
+    echo "expected str: $1" % visibleControl(eStr)
+    result = false
+
+  if length != eLength:
+    echo "     got length: $1" % $length
+    echo "expected length: $1" % $eLength
+    echo "    line: $1" % visibleControl(text)
+    echo "     got: " & startColumn(start+length)
+    echo "expected: " & startColumn(start+eLength)
+    result = false
+
+  # var pos = validateUtf8String(literal)
+  # if pos != -1:
+  #   echo "Invalid UTF-8 bytes starting at $1." % $pos
+  #   result = false
+
+proc testGetMultilineStrE(pattern: string, start: Natural,
+    eWarningData: WarningData): bool =
+  ## Test parseJsonStr for expected errors.
+
+  let text = pattern % tripleQuotes
+  let strAndPosOr = getMultilineStr(text, start)
+
+  result = true
+  let eStrAndPosOr = newStrAndPosOr(eWarningData)
+  if $strAndPosOr != $eStrAndPosOr:
+    echo "     got: $1" % $strAndPosOr
+    echo "expected: $1" % $eStrAndPosOr
+
+    let pos = strAndPosOr.message.pos
+    let ePos = eWarningData.pos
+    if pos != ePos:
+      echo "    line: $1" % visibleControl(text)
+      echo "     got: " & startColumn(pos)
+      echo "expected: " & startColumn(ePos)
+
+    result = false
 
 proc cmpVariableDataOr(statement: Statement,
      g: VariableDataOr, e: VariableDataOr,
@@ -28,22 +87,22 @@ proc cmpVariableDataOr(statement: Statement,
   echo statement.text
   echo ""
   if e.isMessage and g.isMessage:
-    echo "expected message:"
-    echo getWarnStatement(templateName, statement, e.message)
     echo "got message:"
     echo getWarnStatement(templateName, statement, g.message)
-  elif e.isValue and g.isValue:
-    echo "expected value: " & $e & ", type=" & $e.value.value.kind
-    echo "     got value: " & $g & ", type=" & $g.value.value.kind
-  elif e.isMessage:
     echo "expected message:"
     echo getWarnStatement(templateName, statement, e.message)
+  elif e.isValue and g.isValue:
+    echo "     got value: " & $g & ", type=" & $g.value.value.kind
+    echo "expected value: " & $e & ", type=" & $e.value.value.kind
+  elif e.isMessage:
     echo "got value:"
     echo $g.value
+    echo "expected message:"
+    echo getWarnStatement(templateName, statement, e.message)
   else:
-    echo "expected value: " & $e.value
     echo "got message:"
     echo getWarnStatement(templateName, statement, g.message)
+    echo "expected value: " & $e.value
   echo ""
 
 proc getCmdLinePartsTest(env: var Env,
@@ -948,3 +1007,108 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let statement = newStatement(text)
     let eVariableDataOr = newVariableDataOr(wTextAfterValue, "", 24)
     check testRunStatement(statement, eVariableDataOr)
+
+  test "empty line":
+    let text = ""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("", "", newValue(0))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "blank line":
+    let text = "     \t  "
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("", "", newValue(0))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "comment":
+    let text = "# this is a comment"
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("", "", newValue(0))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "comment leading spaces":
+    let text = "    # this is a comment"
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("", "", newValue(0))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "trailing comment":
+    let statement = newStatement(text="""a = 5# comment """, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(5))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "trailing comment leading sp":
+    let statement = newStatement(text="""a = 5  # comment """, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(5))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "multiline":
+    let text = """
+o.x = $1
+Black
+Green
+White
+$1
+""" % tripleQuotes
+    let multiline = """
+Black
+Green
+White
+"""
+    let statement = newStatement(text=text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("o.x", "=", newValue(multiline))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "multiline 2":
+    let text = """
+o.x = $1
+Black
+Green
+White$1
+""" % tripleQuotes
+    let multiline = """
+Black
+Green
+White"""
+    let statement = newStatement(text=text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("o.x", "=", newValue(multiline))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "multiline 3":
+    let text = """
+o.x = ""t
+Black
+Green
+White$1
+""" % tripleQuotes
+    let statement = newStatement(text=text, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wTextAfterValue, "", 8)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "getMultilineStr":
+    check testGetMultilineStr("$1\n$1\n", 3, "", 5)
+    check testGetMultilineStr("$1\na$1\n", 3, "a", 6)
+    check testGetMultilineStr("$1\n\n$1\n", 3, "\n", 6)
+    check testGetMultilineStr("$1\nabc$1\n", 3, "abc", 8)
+    check testGetMultilineStr("  $1\n$1\n", 5, "", 5)
+    check testGetMultilineStr("  $1\nabc\ndef\n$1\n", 5, "abc\ndef\n", 13)
+
+  test "getMultilineStr error":
+    check testGetMultilineStrE("$1", 3,
+      newWarningData(wTripleAtEnd, "", 3))
+
+    check testGetMultilineStrE("a = $1", 6,
+      newWarningData(wTripleAtEnd, "", 6))
+
+    check testGetMultilineStrE("$1abc$1\n", 3,
+      newWarningData(wTripleAtEnd, "", 3))
+
+    check testGetMultilineStrE("$1\n\"\"\n", 3,
+      newWarningData(wMissingEndingTriple, "", 7))
+
+    check testGetMultilineStrE("$1\n   \"\"\n", 3,
+      newWarningData(wMissingEndingTriple, "", 10))
+
+    check testGetMultilineStrE("$1\n", 3,
+      newWarningData(wMissingEndingTriple, "", 4))
+

@@ -1436,3 +1436,16 @@ $$ endblock
     ]
     check testProcessTemplate(templateContent = templateContent,
       eResultLines = eResultLines, eErrLines = eErrLines, eRc = 1)
+
+  test "replace with empty string":
+    let templateContent = """
+<!--$ replace t.content="" -->
+abc
+<!--$ endblock -->
+after
+"""
+    let eResultLines = splitNewLines """
+after
+"""
+    check testProcessTemplate(templateContent = templateContent, 
+        eResultLines = eResultLines)
