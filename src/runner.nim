@@ -1,4 +1,15 @@
-## Standalone command to run Single Test File (stf) files.
+## A standalone command to run Single Test File (stf) files.
+## @:
+## @:You use runner for testing command line applications. A stf file
+## @:contains the test which the runner executes to determine whether the
+## @:test passed.
+## @:
+## @:A stf file contains instructions for creating files, running files and
+## @:comparing files and it is designed to look good in a markdown reader.
+## @:
+## @:See the runner help message (get_help) for more information about stf
+## @:files, or run the nimble task "runhelp" to show the help text with
+## @:glow.
 
 import std/strutils
 import std/os
