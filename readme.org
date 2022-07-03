@@ -164,16 +164,17 @@ t.content variable. Here is a simple example:
 template:
 
 #+BEGIN_SRC
-<!--$ replace t.content=h.header -->
+<!--$ replace t.content = o.header -->
 <!--$ endblock -->
 #+END_SRC
 
-shared json:
+shared code file:
 
 #+BEGIN_SRC
-{
-  "header": "<!doctype html>\n<html lang=\"en\">\n"
-}
+o.header = """
+<!doctype html>
+<html lang="en">
+"""
 #+END_SRC
 
 result:
@@ -202,13 +203,13 @@ If you don't assign the t.content variable, a warning is
 generated, and the command behaves like a block command.  This is
 good for testing changes you want to make to the shared value.
 
-The following example uses a common header from the shared json data
-and it mirrors it in the replacement block.
+The following example uses a common header from the shared code
+file and it mirrors it in the replacement block.
 
 template:
 
 #+BEGIN_SRC
-<!--$ replace t.content=h.header -->
+<!--$ replace t.content = o.header -->
 <!doctype html>
 <html lang="en">
 <!--$ endblock -—>
@@ -220,7 +221,7 @@ an example of that:
 template:
 
 #+BEGIN_SRC
-<!--$ replace t.content=h.header -->
+<!--$ replace t.content = o.header -->
 <!DOCTYPE html>
 <html lang="{s.languageCode}" dir="{s.languageDirection}">
 <head>
@@ -239,16 +240,16 @@ server json:
 }
 #+END_SRC
 
-shared json:
+shared code file:
 
 #+BEGIN_SRC
-{
-  "header": "<!DOCTYPE html>
-<html lang=\"{s.languageCode}\" dir=\"{s.languageDirection}\">
+o.header = """
+<!DOCTYPE html>
+<html lang="{s.languageCode}" dir="{s.languageDirection}">
 <head>
-<meta charset=\"UTF-8\"/>
-<title>{s.title}</title>\n"
-}
+<meta charset="UTF-8"/>
+<title>{s.title}</title>
+"""
 #+END_SRC
 
 result:
@@ -643,10 +644,11 @@ Reserved single letter variables:
 
 - f -- Reserved
 - g -- [[#global-variables][Global Variables]]
-- h -- [[#json-variables][Shared Json Variables]]
-- i, j, k -- Reserved
+- h, i, j, k -- Reserved
 - l -- [[#local-variables][Local Variables]]
-- m, n, o, p, q, r -- Reserved
+- m, n -- Reserved
+- o -- [[#code-variables][Shared Code Variables]]
+- p, q, r -- Reserved
 - s -- [[#json-variables][Server Json Variables]]
 - t -- [[#tea-variables][Tea Variables]]
 - u -- Reserved
@@ -665,13 +667,11 @@ The variables are defined by the top level dictionary items. Each
 item's key is the name of a variable and the item's value is
 the variables' value.
 
-There are two types of json files, the server json and the shared
-json. The server file populates the s dictionary and the
-shared file populates the h dictionary.
-
 You can use multiple server and shared json files by specifying
 multiple files on the command line. The files are processed
 left to right.
+
+The server json files populate the s dictionary.
 
 The json null values get converted to the 0. Json True and False
 get converted to 1 and 0.
@@ -680,9 +680,16 @@ To give full control of the presentation to the template
 designers, the server json shouldn't contain any presentation
 data.
 
-The shared json is created and maintained by the template
+** Code Variables
+:PROPERTIES:
+:CUSTOM_ID: code-variables
+:END:
+
+The shared code files are created and maintained by the template
 designer for sharing common template fragments and other
 presentation needs.
+
+The shared code files populate the o dictionary.
 
 [[#contents][茶]]
 
@@ -755,8 +762,8 @@ For example using the command line below results in a t.args
 value shown:
 
 #+BEGIN_SRC
-statictea -l -s server.json -j shared.json \
-  -s server2.json -j shared2.json \
+statictea -l -s server.json -o codefile.tea \
+  -s server2.json -o codefile2.tea \
   -p 'abc$,def' -p '$$' \
   -t template.html -r result.html
 
@@ -766,7 +773,7 @@ t.args => {
   "update":0,
   "log":1,
   "serverList":["server.json","server2.json"],
-  "sharedList":["shared.json","shared2.json"],
+  "codeList":["codefile.tea","codefile2.tea"],
   "resultFilename":"result.html",
   "templateFilename":"template.html",
   "logFilename":"",
@@ -1329,6 +1336,132 @@ get(list, 3, 99) => 99
 
 [[#contents][茶]]
 
+* Code Files
+:PROPERTIES:
+:CUSTOM_ID: code-files
+:END:
+
+You share common template fragments with code files. The template
+designer controls the code files to factor templates and for
+other presentation needs.
+
+You import them from the command line with the -o or --code
+option. You can import multiple code files and they run in the
+order specified.
+
+The code populates the o dictionary that is available to the
+template commands.
+
+A code file is a list of statements.  There are no prefix,
+postfix and other line decorations that you use in templates so
+the code is easier to read and write.
+
+The maximum line length is 1024 bytes.  An ending plus sign
+continues a long statement on the next line.
+
+Here is an example of a code file that defines two variables, pi
+and footer.
+
+#+BEGIN_SRC
+o.pi = 3.14159
+o.footer = "</html>"
+#+END_SRC
+
+You primarily use a code file for sharing template fragments
+using multiline strings.  See the [[#multiline-strings][Multiline Strings]] section.
+
+The code files run after importing the JSON files so they have
+access to the server variables.
+
+You can use the local variables for intermediate values but the
+disappear when the code file finishes running.  For example the
+"a" variable is local:
+
+#+BEGIN_SRC
+a = 5
+o.x = a + 6
+#+END_SRC
+
+[[#contents][茶]]
+
+* Multiline Strings
+:PROPERTIES:
+:CUSTOM_ID: multiline-strings
+:END:
+
+Code files support multiline strings. They are useful for
+sharing template fragments without escaping characters.
+
+Multiline strings are triple quoted UTF-8 encode strings. In the
+following example the header variable is assigned a two line
+string containing quotes and newlines.
+
+#+BEGIN_SRC
+o.header = """
+<!doctype html>
+<html lang="en">
+"""
+#+END_SRC
+
+Both the leading and ending triple quotes end the line. Nothing
+follows the quotes except the lf or crlf.
+
+The next couple of examples compare multiline strings with normal
+strings.
+
+#+BEGIN_SRC
+str = """
+All the tea in China.
+"""
+#+END_SRC
+
+is equivalent to:
+
+#+BEGIN_SRC
+str = "All the tea in China.\n"
+#+END_SRC
+
+The multiline string:
+
+#+BEGIN_SRC
+str = """
+All the tea in China."""
+#+END_SRC
+
+is equivalent to:
+
+#+BEGIN_SRC
+str = "All the tea in China."
+#+END_SRC
+
+The advantage of a multiline string over a regular string is no
+quoting of the newline and other special characters.  For example
+you can copy and past HTML directly into the code file then mark
+variables in it:
+
+#+BEGIN_SRC
+o.header = """
+<!DOCTYPE html>
+<html lang="{s.languageCode}"
+dir="{s.languageDirection}">
+<head>
+<meta charset="UTF-8"/>
+<title>{s.title}</title>
+"""
+#+END_SRC
+
+A multiline string literal cannot be a argument to a
+function. The workaround is to assign it to a local variable and
+pass that to the function.
+
+#+BEGIN_SRC
+str = """
+Teas of China"""
+count = len(str)
+#+END_SRC
+
+[[#contents][茶]]
+
 * Run StaticTea
 :PROPERTIES:
 :CUSTOM_ID: run-statictea
@@ -1346,13 +1479,13 @@ is generated.
   warning messages, else it returns 1.
 
 The example below shows a typical invocation which specifies four
-file arguments, the server json, the shared json, the template
+file arguments, the server json, the shared code file, the template
 and the result.
 
 #+BEGIN_SRC
 statictea \
   --server server.json \
-  --shared shared.json \
+  --code shared.tea \
   --template template.html \
   --result result.html
 #+END_SRC
@@ -1363,7 +1496,7 @@ The StaticTea command line options:
 - version -- outputs the version number.
 - server -- a server json file. You can specify multiple server
   options.
-- shared -- a shared json file. You can specify multiple shared
+- code -- a shared code file. You can specify multiple shared
   options.
 - template -- the template file, or "stdin" for input from
   standard input.
@@ -1622,7 +1755,7 @@ or PDF files.
 
 The update option updates the template's replace blocks to
 match their t.content text.  The text normally comes from the
-shared template files but it doesn't have to.
+shared code files but it doesn't have to.
 
 You use this to keep the template blocks in sync with the shared
 content so you can work with them as static pages.
@@ -1635,7 +1768,7 @@ The following example shows a typical invocation:
 #+BEGIN_SRC
 statictea \
   --server server.json \
-  --shared shared.json \
+  --code shared.tea \
   --template template.html \
   --update
 #+END_SRC
@@ -3088,6 +3221,8 @@ b = if1(c, warn("c is one"), "")
 - [[#variables][Variables]]
 - [[#dot-names][Dot Names]]
 - [[#types][Types]]
+- [[#code-files][Code Files]]
+- [[#multiline-strings][Multiline Strings]]
 - [[#run-statictea][Run StaticTea]]
 - [[#miscellaneous][Miscellaneous]]
 - [[#functions][Functions]]
