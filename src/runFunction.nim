@@ -161,7 +161,7 @@ func funCmp_ssoii*(parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(ret))
 
 func funConcat*(parameters: seq[Value]): FunResult =
-  ## Concatentate two strings.
+  ## Concatentate two strings. See join for more that two arguments.
   ## @:
   ## @:~~~
   ## @:concat(a: string, b: string) string
@@ -1583,9 +1583,9 @@ func funJoinPath_loss*(parameters: seq[Value]): FunResult =
   result = joinPathList(map)
 
 func funJoin_lsois*(parameters: seq[Value]): FunResult =
-  ## Join a list of strings with a separator.
-  ## @:An optional parameter determines whether you skip empty
-  ## @:strings or not.
+  ## Join a list of strings with a separator.  An optional parameter
+  ## determines whether you skip empty strings or not. You can use an
+  ## empty separator to concatenate the arguments.
   ## @:
   ## @:~~~
   ## @:join(strs: list, sep: string, optional skipEmpty: int) string
@@ -1594,12 +1594,14 @@ func funJoin_lsois*(parameters: seq[Value]): FunResult =
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:join(list("a", "b"), ", ") => "a, b"
-  ## @:join(list("a"), ", ") => "a"
-  ## @:join(list(""), ", ") => ""
-  ## @:join(list("a", "b"), "") => "ab"
-  ## @:join(list("a", "", "c"), "|") => "a||c"
-  ## @:join(list("a", "", "c"), "|", 1) => "a|c"
+  ## @:join(["a", "b"], ", ") => "a, b"
+  ## @:join(["a", "b"], "") => "ab"
+  ## @:join(["a", "b", "c"], "") => "abc"
+  ## @:join(["a"], ", ") => "a"
+  ## @:join([""], ", ") => ""
+  ## @:join(["a", "b"], "") => "ab"
+  ## @:join(["a", "", "c"], "|") => "a||c"
+  ## @:join(["a", "", "c"], "|", 1) => "a|c"
   ## @:~~~~
 
   tMapParameters("lsois")

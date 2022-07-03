@@ -57,7 +57,7 @@ func getWarningLine(filename: string; lineNum: int; warningData: WarningData): s
 Create a WarningData object containing all the warning information.
 
 ```nim
-proc newWarningData(warning: MessageId; p1 = ""; pos = 0): WarningData
+func newWarningData(warning: MessageId; p1 = ""; pos = 0): WarningData
 ```
 
 # `$`

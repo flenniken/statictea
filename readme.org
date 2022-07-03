@@ -388,7 +388,7 @@ The operator is an equal sign or an "&=". The equal sign appends
 to a dictionary and the &= appends to a list.
 
 The right hand side is either a variable, a string, a
-number, list or a function.
+number, a list or a function.
 
 Here are a few example statements:
 
@@ -2112,7 +2112,7 @@ cmp("Tea", "tea", 1) => 0
 :CUSTOM_ID: concat
 :END:
 
-Concatentate two strings.
+Concatentate two strings. See join for more that two arguments.
 
 #+BEGIN_SRC
 concat(a: string, b: string) string
@@ -2573,9 +2573,7 @@ joinPath(["/", "tea"]) =>
 :CUSTOM_ID: join
 :END:
 
-Join a list of strings with a separator.
-An optional parameter determines whether you skip empty
-strings or not.
+Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
 
 #+BEGIN_SRC
 join(strs: list, sep: string, optional skipEmpty: int) string
@@ -2584,12 +2582,14 @@ join(strs: list, sep: string, optional skipEmpty: int) string
 Examples:
 
 #+BEGIN_SRC
-join(list("a", "b"), ", ") => "a, b"
-join(list("a"), ", ") => "a"
-join(list(""), ", ") => ""
-join(list("a", "b"), "") => "ab"
-join(list("a", "", "c"), "|") => "a||c"
-join(list("a", "", "c"), "|", 1) => "a|c"
+join(["a", "b"], ", ") => "a, b"
+join(["a", "b"], "") => "ab"
+join(["a", "b", "c"], "") => "abc"
+join(["a"], ", ") => "a"
+join([""], ", ") => ""
+join(["a", "b"], "") => "ab"
+join(["a", "", "c"], "|") => "a||c"
+join(["a", "", "c"], "|", 1) => "a|c"
 #+END_SRC
 
 [[#contents][茶]]

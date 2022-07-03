@@ -191,12 +191,6 @@ past the leading triple quote.  Return the parsed
 string value and the ending position one past the trailing
 whitespace.
 
-~~~
-a = """ntest string"""n
-        ^                ^
-a = """n"""n
-~~~~
-
 ```nim
 func getMultilineStr(text: string; start: Natural): StrAndPosOr
 ```

@@ -1516,6 +1516,20 @@ suite "runFunction.nim":
         newValue(", "),
       ], newFunResult(newValue("a, b")))
 
+  test "join a, b empty separator":
+    let list = newValue(["a", "b"])
+    check testFunction("join", @[
+        newValue(list),
+        newValue(""),
+      ], newFunResult(newValue("ab")))
+
+  test "join a, b, c empty separator":
+    let list = newValue(["apple", "banana", "cherry"])
+    check testFunction("join", @[
+        newValue(list),
+        newValue(""),
+      ], newFunResult(newValue("applebananacherry")))
+
   test "join a":
     let list = newValue(["a"])
     check testFunction("join", @[

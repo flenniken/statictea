@@ -28,7 +28,7 @@ length.
 * [replacement.nim](replacement.md) &mdash; Handle the replacement block lines.
 * [runCommand.nim](runCommand.md) &mdash; Run a command and fill in the variables dictionaries.
 * [runFunction.nim](runFunction.md) &mdash; This module contains the StaticTea functions and supporting types.
-* [runner.nim](runner.md) &mdash; Standalone command to run Single Test File (stf) files.
+* [runner.nim](runner.md) &mdash; A standalone command to run Single Test File (stf) files.
 * [signatures.nim](signatures.md) &mdash; Statictea function signatures and parameter checking.
 * [statictea.nim](statictea.md) &mdash; StaticTea; A template processor and language.
 * [tempFile.nim](tempFile.md) &mdash; Temporary file methods.
