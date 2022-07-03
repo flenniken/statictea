@@ -8,16 +8,16 @@ Parse the command line.
 
  # Define the supported options.
  var options = newSeq[CmlOption]()
- options.add(newCmlOption("help", 'h', cmlStopParameter))
- options.add(newCmlOption("log", 'l', cmlOptionalParameter))
+ options.add(newCmlOption("help", 'h', cmlStopArgument))
+ options.add(newCmlOption("log", 'l', cmlOptionalArgument))
  ...
 
  # Parse the command line.
- let argsOrMessage = cmdline(options, collectParams())
+ let argsOrMessage = cmdline(options, collectArgs())
  if argsOrMessage.kind == cmlMessageKind:
    # Display the message.
    echo getMessage(argsOrMessage.messageId,
-     argsOrMessage.problemParam)
+     argsOrMessage.problemArg)
  else:
    # Optionally post process the resulting arguments.
    let args = newArgs(argsOrMessage.args)
@@ -37,13 +37,13 @@ dictionary.
 * type: [CmlOptionType](#cmloptiontype) &mdash; The option type.
 * [newCmlOption](#newcmloption) &mdash; Create a new CmlOption object.
 * [newArgsOrMessage](#newargsormessage) &mdash; Create a new ArgsOrMessage object containing arguments.
-* [newArgsOrMessage](#newargsormessage-1) &mdash; Create a new ArgsOrMessage object containing a message id and optionally the problem parameter.
+* [newArgsOrMessage](#newargsormessage-1) &mdash; Create a new ArgsOrMessage object containing a message id and optionally the problem augument.
 * [`$`](#) &mdash; Return a string representation of an CmlOption object.
 * [`$`](#-1) &mdash; Return a string representation of a ArgsOrMessage object.
 * [commandLineEcho](#commandlineecho) &mdash; Show the command line arguments.
-* [collectParams](#collectparams) &mdash; Get the command line parameters from the system and return a list.
-* [cmdLine](#cmdline) &mdash; Parse the command line parameters.
-* [getMessage](#getmessage) &mdash; Return a message from a message id and problem parameter.
+* [collectArgs](#collectargs) &mdash; Get the command line arguments from the system and return a list.
+* [cmdLine](#cmdline) &mdash; Parse the command line arguments.
+* [getMessage](#getmessage) &mdash; Return a message from a message id and problem augument.
 * [`$`](#-2) &mdash; Return a string representation of an Args object.
 
 # CmlArgs
@@ -51,7 +51,7 @@ dictionary.
 CmlArgs holds the parsed command line arguments in an ordered
 dictionary. The keys are the supported options found on the
 command line and each value is a list of associated arguments.
-An option without parameters will have an empty list.
+An option without arguments will have an empty list.
 
 ```nim
 CmlArgs = OrderedTable[string, seq[string]]
@@ -59,18 +59,12 @@ CmlArgs = OrderedTable[string, seq[string]]
 
 # CmlMessageId
 
-Possible message IDs returned by cmdline. The number in the
-name is the same as its ord value.  Since the message handling
-is left to the caller, it is important for these values to be
-stable. New values are added to the end and this is a minor
-version change. It is ok to leave unused values in the list and
-this is backward compatible. If items are removed or reordered,
-that is a major version change.
+Possible message IDs returned by cmdline. The number in the name is the same as its ord value.  Since the message handling is left to the caller, it is important for these values to be stable. New values are added to the end and this is a minor version change. It is ok to leave unused values in the list and this is backward compatible. If items are removed or reordered, that is a major version change.
 
 ```nim
 CmlMessageId = enum
   cml_00_BareTwoDashes, cml_01_InvalidOption, cml_02_OptionRequiresArg,
-  cml_03_BareOneDash, cml_04_InvalidShortOption, cml_05_ShortParamInList,
+  cml_03_BareOneDash, cml_04_InvalidShortOption, cml_05_ShortArgInList,
   cml_06_DupShortOption, cml_07_DupLongOption, cml_08_BareShortName,
   cml_09_AlphaNumericShort, cml_10_MissingArgument, cml_11_TooManyBareArgs,
   cml_12_AlreadyHaveOneArg
@@ -97,7 +91,7 @@ ArgsOrMessage = object
 
   of cmlMessageKind:
       messageId*: CmlMessageId
-      problemParam*: string
+      problemArg*: string
 
 
 ```
@@ -105,21 +99,21 @@ ArgsOrMessage = object
 # CmlOptionType
 
 The option type.
-* cmlParameter0or1 -- option with a parameter, 0 or 1 times.
-* cmlNoParameter -- option without a parameter, 0 or 1 times.
-* cmlOptionalParameter -- option with an optional parameter, 0
+* cmlArgument0or1 -- option with a augument, 0 or 1 times.
+* cmlNoArgument -- option without a augument, 0 or 1 times.
+* cmlOptionalArgument -- option with an optional augument, 0
     or 1 times.
-* cmlBareParameter -- a parameter without an option, 1 time.
-* cmlParameterOnce -- option with a parameter, 1 time.
-* cmlParameterMany -- option with a parameter, unlimited
+* cmlBareArgument -- a augument without an option, 1 time.
+* cmlArgumentOnce -- option with a augument, 1 time.
+* cmlArgumentMany -- option with a augument, unlimited
     number of times.
-* cmlStopParameter -- option without a parameter, 0 or 1
+* cmlStopArgument -- option without a augument, 0 or 1
     times. Stop and return this option by itself.
 
 ```nim
 CmlOptionType = enum
-  cmlParameter0or1, cmlNoParameter, cmlOptionalParameter, cmlBareParameter,
-  cmlParameterOnce, cmlParameterMany, cmlStopParameter
+  cmlArgument0or1, cmlNoArgument, cmlOptionalArgument, cmlBareArgument,
+  cmlArgumentOnce, cmlArgumentMany, cmlStopArgument
 ```
 
 # newCmlOption
@@ -140,10 +134,10 @@ func newArgsOrMessage(args: CmlArgs): ArgsOrMessage
 
 # newArgsOrMessage
 
-Create a new ArgsOrMessage object containing a message id and optionally the problem parameter.
+Create a new ArgsOrMessage object containing a message id and optionally the problem augument.
 
 ```nim
-func newArgsOrMessage(messageId: CmlMessageId; problemParam = ""): ArgsOrMessage
+func newArgsOrMessage(messageId: CmlMessageId; problemArg = ""): ArgsOrMessage
 ```
 
 # `$`
@@ -170,28 +164,28 @@ Show the command line arguments.
 proc commandLineEcho()
 ```
 
-# collectParams
+# collectArgs
 
-Get the command line parameters from the system and return a list. Don't return the first one which is the app name. This is the list that cmdLine expects.
+Get the command line arguments from the system and return a list. Don't return the first one which is the app name. This is the list that cmdLine expects.
 
 ```nim
-proc collectParams(): seq[string]
+proc collectArgs(): seq[string]
 ```
 
 # cmdLine
 
-Parse the command line parameters.  You pass in the list of supported options and the parameters to parse. The arguments found are returned. If there is a problem with the parameters, args contains a message telling the problem. Use collectParams() to generate the parameters.
+Parse the command line arguments.  You pass in the list of supported options and the arguments to parse. The arguments found are returned. If there is a problem with the arguments, args contains a message telling the problem. Use collectArgs() to generate the arguments.
 
 ```nim
-func cmdLine(options: openArray[CmlOption]; parameters: openArray[string]): ArgsOrMessage
+func cmdLine(options: openArray[CmlOption]; arguments: openArray[string]): ArgsOrMessage
 ```
 
 # getMessage
 
-Return a message from a message id and problem parameter.
+Return a message from a message id and problem augument.
 
 ```nim
-func getMessage(message: CmlMessageId; problemParam: string = ""): string
+func getMessage(message: CmlMessageId; problemArg: string = ""): string
 ```
 
 # `$`

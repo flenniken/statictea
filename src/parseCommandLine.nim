@@ -60,25 +60,25 @@ proc parseCommandLine*(argv: seq[string]): ArgsOr =
   ## Parse the terminal command line.
 
   var options = newSeq[CmlOption]()
-  options.add(newCmlOption("help", 'h', cmlStopParameter))
-  options.add(newCmlOption("version", 'v', cmlStopParameter))
-  options.add(newCmlOption("update", 'u', cmlNoParameter))
+  options.add(newCmlOption("help", 'h', cmlStopArgument))
+  options.add(newCmlOption("version", 'v', cmlStopArgument))
+  options.add(newCmlOption("update", 'u', cmlNoArgument))
 
-  options.add(newCmlOption("log", 'l', cmlOptionalParameter))
+  options.add(newCmlOption("log", 'l', cmlOptionalArgument))
 
   # todo: use j for server?
-  options.add(newCmlOption("server", 's', cmlParameterMany))
-  options.add(newCmlOption("shared", 'j', cmlParameterMany))
-  options.add(newCmlOption("code", 'o', cmlParameterMany))
-  options.add(newCmlOption("prepost", 'p', cmlParameterMany))
+  options.add(newCmlOption("server", 's', cmlArgumentMany))
+  options.add(newCmlOption("shared", 'j', cmlArgumentMany))
+  options.add(newCmlOption("code", 'o', cmlArgumentMany))
+  options.add(newCmlOption("prepost", 'p', cmlArgumentMany))
 
-  options.add(newCmlOption("template", 't', cmlParameter0or1))
-  options.add(newCmlOption("result", 'r', cmlParameter0or1))
+  options.add(newCmlOption("template", 't', cmlArgument0or1))
+  options.add(newCmlOption("result", 'r', cmlArgument0or1))
   let ArgsOrMessage = cmdLine(options, argv)
 
   if ArgsOrMessage.kind == cmlMessageKind:
     let messageId = mapCmlMessages(ArgsOrMessage.messageId)
-    let warningData = newWarningData(messageId, ArgsOrMessage.problemParam)
+    let warningData = newWarningData(messageId, ArgsOrMessage.problemArg)
     return newArgsOr(warningData)
 
   # Convert the cmlArgs to Args

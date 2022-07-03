@@ -6,16 +6,16 @@
 ## @:
 ## @: # Define the supported options.
 ## @: var options = newSeq@{CmlOption]()
-## @: options.add(newCmlOption("help", 'h', cmlStopParameter))
-## @: options.add(newCmlOption("log", 'l', cmlOptionalParameter))
+## @: options.add(newCmlOption("help", 'h', cmlStopArgument))
+## @: options.add(newCmlOption("log", 'l', cmlOptionalArgument))
 ## @: ...
 ## @:
 ## @: # Parse the command line.
-## @: let argsOrMessage = cmdline(options, collectParams())
+## @: let argsOrMessage = cmdline(options, collectArgs())
 ## @: if argsOrMessage.kind == cmlMessageKind:
 ## @:   # Display the message.
 ## @:   echo getMessage(argsOrMessage.messageId,
-## @:     argsOrMessage.problemParam)
+## @:     argsOrMessage.problemArg)
 ## @: else:
 ## @:   # Optionally post process the resulting arguments.
 ## @:   let args = newArgs(argsOrMessage.args)
@@ -33,22 +33,22 @@ type
     ## CmlArgs holds the parsed command line arguments in an ordered
     ## @:dictionary. The keys are the supported options found on the
     ## @:command line and each value is a list of associated arguments.
-    ## @:An option without parameters will have an empty list.
+    ## @:An option without arguments will have an empty list.
 
   CmlMessageId* = enum
     ## Possible message IDs returned by cmdline. The number in the
-    ## @:name is the same as its ord value.  Since the message handling
-    ## @:is left to the caller, it is important for these values to be
-    ## @:stable. New values are added to the end and this is a minor
-    ## @:version change. It is ok to leave unused values in the list and
-    ## @:this is backward compatible. If items are removed or reordered,
-    ## @:that is a major version change.
+    ## name is the same as its ord value.  Since the message handling
+    ## is left to the caller, it is important for these values to be
+    ## stable. New values are added to the end and this is a minor
+    ## version change. It is ok to leave unused values in the list and
+    ## this is backward compatible. If items are removed or reordered,
+    ## that is a major version change.
     cml_00_BareTwoDashes,
     cml_01_InvalidOption,
     cml_02_OptionRequiresArg,
     cml_03_BareOneDash,
     cml_04_InvalidShortOption,
-    cml_05_ShortParamInList,
+    cml_05_ShortArgInList,
     cml_06_DupShortOption,
     cml_07_DupLongOption,
     cml_08_BareShortName,
@@ -69,27 +69,27 @@ type
       args*: CmlArgs
     of cmlMessageKind:
       messageId*: CmlMessageId
-      problemParam*: string
+      problemArg*: string
 
   CmlOptionType* = enum
     ## The option type.
-    ## @:* cmlParameter0or1 -- option with a parameter, 0 or 1 times.
-    ## @:* cmlNoParameter -- option without a parameter, 0 or 1 times.
-    ## @:* cmlOptionalParameter -- option with an optional parameter, 0
+    ## @:* cmlArgument0or1 -- option with a augument, 0 or 1 times.
+    ## @:* cmlNoArgument -- option without a augument, 0 or 1 times.
+    ## @:* cmlOptionalArgument -- option with an optional augument, 0
     ## @:    or 1 times.
-    ## @:* cmlBareParameter -- a parameter without an option, 1 time.
-    ## @:* cmlParameterOnce -- option with a parameter, 1 time.
-    ## @:* cmlParameterMany -- option with a parameter, unlimited
+    ## @:* cmlBareArgument -- a augument without an option, 1 time.
+    ## @:* cmlArgumentOnce -- option with a augument, 1 time.
+    ## @:* cmlArgumentMany -- option with a augument, unlimited
     ## @:    number of times.
-    ## @:* cmlStopParameter -- option without a parameter, 0 or 1
+    ## @:* cmlStopArgument -- option without a augument, 0 or 1
     ## @:    times. Stop and return this option by itself.
-    cmlParameter0or1
-    cmlNoParameter
-    cmlOptionalParameter
-    cmlBareParameter
-    cmlParameterOnce
-    cmlParameterMany
-    cmlStopParameter
+    cmlArgument0or1
+    cmlNoArgument
+    cmlOptionalArgument
+    cmlBareArgument
+    cmlArgumentOnce
+    cmlArgumentMany
+    cmlStopArgument
 
   CmlOption* = object
     # An option holds its type, long name and short name.
@@ -107,11 +107,11 @@ func newArgsOrMessage*(args: CmlArgs): ArgsOrMessage =
   result = ArgsOrMessage(kind: cmlArgsKind, args: args)
 
 func newArgsOrMessage*(messageId: CmlMessageId,
-    problemParam = ""): ArgsOrMessage =
+    problemArg = ""): ArgsOrMessage =
   ## Create a new ArgsOrMessage object containing a message id and
-  ## optionally the problem parameter.
+  ## optionally the problem augument.
   result = ArgsOrMessage(kind: cmlMessageKind, messageId: messageId,
-    problemParam: problemParam)
+    problemArg: problemArg)
 
 func `$`*(a: CmlOption): string =
   ## Return a string representation of an CmlOption object.
@@ -134,7 +134,7 @@ func `$`*(a: ArgsOrMessage): string =
         result.add("argsOrMessage.args[$1] = $2" % [k, ($v)[1..^1]])
   else:
     result.add("argsOrMessage.messageId = $1\n" % $a.messageId)
-    result.add("argsOrMessage.problemParam = '$1'" % $a.problemParam)
+    result.add("argsOrMessage.problemArg = '$1'" % $a.problemArg)
 
 proc commandLineEcho*() =
   ## Show the command line arguments.
@@ -149,8 +149,8 @@ proc commandLineEcho*() =
     echo "$1: $2" % [$ix, paramStr(ix)]
   echo ""
 
-proc collectParams*(): seq[string] =
-  ## Get the command line parameters from the system and return a
+proc collectArgs*(): seq[string] =
+  ## Get the command line arguments from the system and return a
   ## list. Don't return the first one which is the app name. This is
   ## the list that cmdLine expects.
   let count = paramCount() + 1
@@ -159,18 +159,18 @@ proc collectParams*(): seq[string] =
 
 proc addArg(args: var CmlArgs, optionName: string) =
   ## Add the given option name that doesn't have an associated
-  ## parameter to args.
+  ## augument to args.
   if not (optionName in args):
     args[optionName] = newSeq[string]()
 
-proc addArg(args: var CmlArgs, optionName: string, parameter: string) =
-  ## Add the given option name and its parameter value to the args.
+proc addArg(args: var CmlArgs, optionName: string, augument: string) =
+  ## Add the given option name and its augument value to the args.
   if optionName in args:
-    var parameters = args[optionName]
-    parameters.add(parameter)
-    args[optionName] = parameters
+    var arguments = args[optionName]
+    arguments.add(augument)
+    args[optionName] = arguments
   else:
-    args[optionName] = @[parameter]
+    args[optionName] = @[augument]
 
 proc optionCount(args: var CmlArgs, optionName: string): Natural =
   ## Return the number of values the given option name has.
@@ -180,12 +180,12 @@ proc optionCount(args: var CmlArgs, optionName: string): Natural =
     result = args[optionName].len
 
 func cmdLine*(options: openArray[CmlOption],
-    parameters: openArray[string]): ArgsOrMessage =
-  ## Parse the command line parameters.  You pass in the list of
-  ## supported options and the parameters to parse. The arguments
-  ## found are returned. If there is a problem with the parameters,
-  ## args contains a message telling the problem. Use collectParams()
-  ## to generate the parameters.
+    arguments: openArray[string]): ArgsOrMessage =
+  ## Parse the command line arguments.  You pass in the list of
+  ## supported options and the arguments to parse. The arguments
+  ## found are returned. If there is a problem with the arguments,
+  ## args contains a message telling the problem. Use collectArgs()
+  ## to generate the arguments.
 
   # shortOptions maps a short option letter to its option.
   var shortOptions: OrderedTable[char, CmlOption]
@@ -193,25 +193,25 @@ func cmdLine*(options: openArray[CmlOption],
   # longOptions maps a long name to its option.
   var longOptions: OrderedTable[string, CmlOption]
 
-  # bareParameterNames is a list of each bare name in the order specified.
-  var bareParameterNames = newSeq[string]()
+  # bareArgumentNames is a list of each bare name in the order specified.
+  var bareArgumentNames = newSeq[string]()
 
-  # onceNames is a list of each cmlParameterOnce type option.
+  # onceNames is a list of each cmlArgumentOnce type option.
   var onceNames = newSeq[string]()
 
-  # Populate shortOptions, longOptions, bareParameterNames and onceNames.
+  # Populate shortOptions, longOptions, bareArgumentNames and onceNames.
   var bareIx = 0
   for option in options:
     if option.long in longOptions:
       # _07_, Duplicate long option: '--$1'.
       return newArgsOrMessage(cml_07_DupLongOption, $option.long)
     longOptions[option.long] = option
-    if option.optionType == cmlParameterOnce:
+    if option.optionType == cmlArgumentOnce:
       onceNames.add(option.long)
-    if option.optionType == cmlBareParameter:
-      bareParameterNames.add(option.long)
+    if option.optionType == cmlBareArgument:
+      bareArgumentNames.add(option.long)
       if option.short != '_':
-        # _08_, Use the short name '_' instead of '$1' with a bare parameter.
+        # _08_, Use the short name '_' instead of '$1' with a bare augument.
         return newArgsOrMessage(cml_08_BareShortName, $option.short)
     else:
       if option.short != '_' and not isAlphaNumeric(option.short):
@@ -228,48 +228,48 @@ func cmdLine*(options: openArray[CmlOption],
       start,
       longOption,
       shortOption,
-      needParameter,
+      needArgument,
       processOption,
-      optionalParameter,
+      optionalArgument,
       multipleShortOptions,
 
-  # Loop over the parameters and populate args.
+  # Loop over the arguments and populate args.
   var args: CmlArgs
   var ix = 0
   var state: State
-  var parameter: string
+  var augument: string
   var optionName: string
   while true:
-    if ix >= parameters.len:
+    if ix >= arguments.len:
       break
-    parameter = parameters[ix]
+    augument = arguments[ix]
 
-    # Skip empty parameters.
-    if parameter == "":
+    # Skip empty arguments.
+    if augument == "":
       inc(ix)
       continue
 
     case state:
     of start:
-      if parameter.startsWith("--"):
+      if augument.startsWith("--"):
         state = longOption
-      elif parameter.startsWith("-"):
+      elif augument.startsWith("-"):
         state = shortOption
       else:
-        # _11_, Extra bare parameter.
-        if bareIx >= bareParameterNames.len:
+        # _11_, Extra bare augument.
+        if bareIx >= bareArgumentNames.len:
           return newArgsOrMessage(cml_11_TooManyBareArgs)
 
-        let name = bareParameterNames[bareIx]
-        addArg(args, name, parameter)
+        let name = bareArgumentNames[bareIx]
+        addArg(args, name, augument)
         inc(ix)
         inc(bareIx)
 
     of longOption:
-      if parameter.len < 3:
+      if augument.len < 3:
         # _00_, Two dashes must be followed by an option name.
         return newArgsOrMessage(cml_00_BareTwoDashes)
-      optionName = parameter[2 .. parameter.len - 1]
+      optionName = augument[2 .. augument.len - 1]
       if not (optionName in longOptions):
         # _01_, The option '--$1' is not supported.
         return newArgsOrMessage(cml_01_InvalidOption, optionName)
@@ -277,14 +277,14 @@ func cmdLine*(options: openArray[CmlOption],
       state = processOption
 
     of shortOption:
-      if parameter.len < 2:
+      if augument.len < 2:
         # _03_, One dash must be followed by a short option name.
         return newArgsOrMessage(cml_03_BareOneDash)
-      if parameter.len > 2:
+      if augument.len > 2:
         state = multipleShortOptions
         continue
 
-      let shortOptionName = parameter[1]
+      let shortOptionName = augument[1]
       if not (shortOptionName in shortOptions):
         # _04_, The short option '-$1' is not supported.
         return newArgsOrMessage(cml_04_InvalidShortOption, $shortOptionName)
@@ -296,81 +296,81 @@ func cmdLine*(options: openArray[CmlOption],
     of processOption:
       let option = longOptions[optionName]
       case option.optionType:
-      of cmlNoParameter:
+      of cmlNoArgument:
         state = start
         addArg(args, optionName)
         inc(ix)
-      of cmlOptionalParameter, cmlParameter0or1, cmlParameterOnce:
+      of cmlOptionalArgument, cmlArgument0or1, cmlArgumentOnce:
         if args.optionCount(option.long) > 0:
-          # _12_, Already have one '$1' parameter.
+          # _12_, Already have one '$1' augument.
           return newArgsOrMessage(cml_12_AlreadyHaveOneArg, $option.long)
-        if option.optionType == cmlOptionalParameter:
-          state = optionalParameter
+        if option.optionType == cmlOptionalArgument:
+          state = optionalArgument
         else:
-          state = needParameter
+          state = needArgument
         inc(ix)
-      of cmlParameterMany:
-        state = needParameter
+      of cmlArgumentMany:
+        state = needArgument
         inc(ix)
-      of cmlBareParameter:
-        assert(false, "got a bare parameter and option combination somehow")
+      of cmlBareArgument:
+        assert(false, "got a bare augument and option combination somehow")
         inc(ix)
-      of cmlStopParameter:
+      of cmlStopArgument:
         var stopArgs: CmlArgs
         addArg(stopArgs, optionName)
         return newArgsOrMessage(stopArgs)
 
-    of needParameter:
-      if parameter.startsWith("-"):
-        # _02_, The option '$1' needs a parameter.
+    of needArgument:
+      if augument.startsWith("-"):
+        # _02_, The option '$1' needs a augument.
         return newArgsOrMessage(cml_02_OptionRequiresArg, optionName)
-      addArg(args, optionName, parameter)
+      addArg(args, optionName, augument)
       state = start
       inc(ix)
 
-    of optionalParameter:
-      if parameter.startsWith("-"):
+    of optionalArgument:
+      if augument.startsWith("-"):
         addArg(args, optionName)
       else:
-        addArg(args, optionName, parameter)
+        addArg(args, optionName, augument)
         inc(ix)
       state = start
 
     of multipleShortOptions:
 
-      for shortOptionName in parameter[1 .. parameter.len - 1]:
+      for shortOptionName in augument[1 .. augument.len - 1]:
         if not (shortOptionName in shortOptions):
           # _04_, The short option '-$1' is not supported.
           return newArgsOrMessage(cml_04_InvalidShortOption, $shortOptionName)
 
         let option = shortOptions[shortOptionName]
         optionName = option.long
-        if option.optionType in [cmlParameter0or1,
-            cmlParameterOnce, cmlParameterMany]:
-          # _05_, The option '-$1' needs a parameter; use it by itself.
-          return newArgsOrMessage(cml_05_ShortParamInList, $shortOptionName)
+        if option.optionType in [cmlArgument0or1,
+            cmlArgumentOnce, cmlArgumentMany]:
+          # _05_, The option '-$1' needs a augument; use it by itself.
+          return newArgsOrMessage(cml_05_ShortArgInList, $shortOptionName)
         addArg(args, optionName)
 
       state = start
       inc(ix)
 
-  if state == needParameter:
-    # _02_, The option '$1' needs a parameter.
+  if state == needArgument:
+    # _02_, The option '$1' needs a augument.
     return newArgsOrMessage(cml_02_OptionRequiresArg, optionName)
 
-  if bareIx < bareParameterNames.len:
-    # _10_, Missing bare parameter: '$1'.
+  if bareIx < bareArgumentNames.len:
+    # _10_, Missing bare augument: '$1'.
     return newArgsOrMessage(cml_10_MissingArgument,
-      bareParameterNames[bareIx])
+      bareArgumentNames[bareIx])
 
-  if state == optionalParameter:
+  if state == optionalArgument:
     addArg(args, optionName)
 
-  # Make sure all the once parameters have one.
+  # Make sure all the once arguments have one.
   for option in options:
-    if option.optionType == cmlParameterOnce:
+    if option.optionType == cmlArgumentOnce:
       if not (option.long in args):
-        # _02_, The option '$1' needs a parameter.
+        # _02_, The option '$1' needs a augument.
         return newArgsOrMessage(cml_02_OptionRequiresArg, option.long)
 
   result = newArgsOrMessage(args)
@@ -381,28 +381,28 @@ when defined(Test) or isMainModule:
     cmlMessages*: array[low(CmlMessageId)..high(CmlMessageId), string] = [
       #[_00_]# "Two dashes must be followed by an option name.",
       #[_01_]# "The option '--$1' is not supported.",
-      #[_02_]# "The option '$1' requires a parameter.",
+      #[_02_]# "The option '$1' requires a augument.",
       #[_03_]# "One dash must be followed by a short option name.",
       #[_04_]# "The short option '-$1' is not supported.",
-      #[_05_]# "The option '-$1' needs a parameter; use it by itself.",
+      #[_05_]# "The option '-$1' needs a augument; use it by itself.",
       #[_06_]# "Duplicate short option: '-$1'.",
       #[_07_]# "Duplicate long option: '--$1'.",
-      #[_08_]# "Use the short name '_' instead of '$1' with a bare parameter.",
+      #[_08_]# "Use the short name '_' instead of '$1' with a bare augument.",
       #[_09_]# "Use an alphanumeric ascii character for a short option name instead of '$1'.",
-      #[_10_]# "Missing '$1' parameter.",
-      #[_11_]# "Extra bare parameter.",
-      #[_12_]# "Already have one '$1' parameter.",
+      #[_10_]# "Missing '$1' augument.",
+      #[_11_]# "Extra bare augument.",
+      #[_12_]# "Already have one '$1' augument.",
     ]
 
-  func getMessage*(message: CmlMessageId, problemParam: string = ""): string =
-    ## Return a message from a message id and problem parameter.
-    result = cmlMessages[message] % [problemParam]
+  func getMessage*(message: CmlMessageId, problemArg: string = ""): string =
+    ## Return a message from a message id and problem augument.
+    result = cmlMessages[message] % [problemArg]
 
 when isMainModule:
 
   echo """
 This is a parsing example for a fictional command that takes several
-types of parameters.
+types of arguments.
 
 cmdline [-h] [-u name] [-l [filename]] -r leader [-s state] source destination
 * -h, --help
@@ -457,14 +457,14 @@ cmdline [-h] [-u name] [-l [filename]] -r leader [-s state] source destination
 
   # Parse the command line.
   var options = newSeq[CmlOption]()
-  options.add(newCmlOption("help", 'h', cmlStopParameter))
-  options.add(newCmlOption("log", 'l', cmlOptionalParameter))
-  options.add(newCmlOption("user", 'u', cmlParameterMany))
-  options.add(newCmlOption("leader", 'r', cmlParameterOnce))
-  options.add(newCmlOption("state", 's', cmlParameter0or1))
-  options.add(newCmlOption("source", '_', cmlBareParameter))
-  options.add(newCmlOption("destination", '_', cmlBareParameter))
-  let argsOrMessage = cmdline(options, collectParams())
+  options.add(newCmlOption("help", 'h', cmlStopArgument))
+  options.add(newCmlOption("log", 'l', cmlOptionalArgument))
+  options.add(newCmlOption("user", 'u', cmlArgumentMany))
+  options.add(newCmlOption("leader", 'r', cmlArgumentOnce))
+  options.add(newCmlOption("state", 's', cmlArgument0or1))
+  options.add(newCmlOption("source", '_', cmlBareArgument))
+  options.add(newCmlOption("destination", '_', cmlBareArgument))
+  let argsOrMessage = cmdline(options, collectArgs())
   echo "Resulting argsOrMessage object:"
   echo ""
   echo $argsOrMessage
@@ -472,7 +472,7 @@ cmdline [-h] [-u name] [-l [filename]] -r leader [-s state] source destination
 
   if argsOrMessage.kind == cmlMessageKind:
     # Display the message.
-    echo getMessage(argsOrMessage.messageId, argsOrMessage.problemParam)
+    echo getMessage(argsOrMessage.messageId, argsOrMessage.problemArg)
   else:
     # Post process the resulting arguments.
     let args = newArgs(argsOrMessage.args)
