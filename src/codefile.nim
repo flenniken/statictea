@@ -163,11 +163,15 @@ proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
         elif found == triple or found == triple_n or found == triple_crlf:
           state = multiline
 
-          # Check whether there is another set of triple quotes in the
-          # line.  This catches the mistake of a = """xyx""".
-          if line[0 .. line.len - 4].contains(tripleQuotes):
+          # Check for the case where there are starting and ending
+          # triple quotes on the same line. This catches the mistake
+          # like: a = """xyx""".
+          let triplePos = line.find(tripleQuotes)
+          if triplePos != -1 and triplePos+4 != line.len:
             # Triple quotes must always end the line.
-            env.warn(lb.getfilename, lb.getLineNum(), newWarningData(wTripleAtEnd))
+            let statement = newStatement(line, lb.getLineNum())
+            env.warnStatement(statement,
+              newWarningData(wTripleAtEnd, "", triplePos+3), lb.getfilename)
             return
 
         addText(line, found, text)

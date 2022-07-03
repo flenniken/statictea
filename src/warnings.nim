@@ -36,7 +36,7 @@ func getWarningLine*(filename: string, lineNum: int,
   ## @:~~~~
   return getWarningLine(filename, lineNum, warningData)
 
-proc newWarningData*(warning: MessageId, p1 = "", pos = 0): WarningData =
+func newWarningData*(warning: MessageId, p1 = "", pos = 0): WarningData =
   ## Create a WarningData object containing all the warning
   ## information.
   result = WarningData(warning: warning, p1: p1, pos: pos)

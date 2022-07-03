@@ -255,12 +255,10 @@ func getMultilineStr*(text: string, start: Natural): StrAndPosOr =
   ## @:past the leading triple quote.  Return the parsed
   ## @:string value and the ending position one past the trailing
   ## @:whitespace.
-  ## @:
-  ## @:~~~
-  ## @:a = """\ntest string"""\n
-  ## @:        ^                ^
-  ## @:a = """\n"""\n
-  ## @:~~~~
+
+  # a = """\ntest string"""\n
+  #         ^                ^
+  # a = """\n"""\n
 
   # todo: handle or document whether the string has to be UTF-8.
 

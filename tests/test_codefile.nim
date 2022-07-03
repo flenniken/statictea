@@ -256,7 +256,22 @@ d = 5
 
     let eErrLines: seq[string] = splitNewLines """
 testlb.txt(1): w185: Triple quotes must always end the line.
-"""
+statement: a = $1 multiline $1␊
+                  ^
+""" % tripleQuotes
+    check testReadStatement(content, eErrLines = eErrLines)
+
+  test "readStatement not multiline 2":
+    let content = """
+a = $1$1
+b = 3
+""" % tripleQuotes
+
+    let eErrLines: seq[string] = splitNewLines """
+testlb.txt(1): w185: Triple quotes must always end the line.
+statement: a = $1$1␊
+                  ^
+""" % tripleQuotes
     check testReadStatement(content, eErrLines = eErrLines)
 
   test "readStatement multiline extra after 2":
