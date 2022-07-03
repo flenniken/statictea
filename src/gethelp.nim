@@ -9,7 +9,7 @@ NAME
 
 SYNOPSIS
 
-     statictea [-h] [-n] [-v] [-u] [-s=server.json] [-j=shared.json] 
+     statictea [-h] [-n] [-v] [-u] [-s=server.json] [-o=codefile.tea] 
          [-t=template.html] [-p="prefix[,postfix]"] [-r=result.html]
 
 DESCRIPTION
@@ -37,10 +37,10 @@ DESCRIPTION
              Read a json file and store it in the server
              dictionary. You can specify zero or more server options.
 
-     -j=filename, --shared=filename
+     -o=filename, --code=filename
 
-             Read a json file and store it in the shared
-             dictionary. You can specify zero or more shared options.
+             Run a code file to populate the o shared dictionary. You
+             can specify zero or more code options.
 
      -p="prefix,postfix", --prepost="prefix,postfix"
 
@@ -67,12 +67,12 @@ DESCRIPTION
 EXAMPES
      Typical usage:
 
-             statictea -s=server.json -j=shared.json \
+             statictea -s=server.json -o=codefile.tea \
                  -t:template.html -r=home.html
 
-     You can specify multiple shared or server json files.
+     You can specify multiple server or code files.
 
-             statictea -s=server.json -j=s1.json -j=s2.json \
+             statictea -s=server.json -o=shared.tea -o=shared2.tea \
                  -t=template.html -r=h.html
 
      You can specify comment styles to use in your templates with the
@@ -82,9 +82,9 @@ EXAMPES
              statictea -p='/*$,*/' ...
 
      You can specify update to syncronize your template's replace
-     blocks with the json data.
+     blocks with the shared data.
 
-             statictea -u -j=shared.json -t=template.html
+             statictea -u -o=shared.tea -t=template.html
 
 SEE ALSO
      For more information see https://github.com/flenniken/statictea
