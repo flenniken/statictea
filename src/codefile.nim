@@ -1,4 +1,4 @@
-## Run code file.
+## Run code files.
 
 import std/options
 import std/os
@@ -12,6 +12,7 @@ import runCommand
 import variables
 import vartypes
 import warnings
+import utf8decoder
 
 const
   tripleQuotes* = "\"\"\""
@@ -138,6 +139,14 @@ proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
     # Read a line.
     var line = lb.readline()
 
+    # Validate the line is UTF-8.
+    let invalidPos = validateUtf8String(line)
+    if invalidPos != -1:
+      let statement = newStatement(line, lb.getLineNum())
+      env.warnStatement(statement,
+        newWarningData(wInvalidUtf8ByteSeq, $invalidPos, invalidPos), lb.getfilename)
+      return
+
     if line == "":
       var messageId: MessageId
       case state
@@ -197,7 +206,7 @@ proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
 
   result = some(newStatement(text, lb.getLineNum()))
 
-proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
+proc runCodeFile*(env: var Env, variables: var Variables, filename: string) =
   ## Run the code file and fill in the variables.
 
   if not fileExists(filename):
@@ -264,5 +273,5 @@ proc runCodeFile*(env: var Env, filename: string, variables: var Variables) =
 proc runCodeFiles*(env: var Env, variables: var Variables, codeList: seq[string]) =
   ## Run each code file and populate the variables.
   for filename in codeList:
-    runCodeFile(env, filename, variables)
+    runCodeFile(env, variables, filename)
     resetVariables(variables)

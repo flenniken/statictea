@@ -1,6 +1,6 @@
 # codefile.nim
 
-Run code file.
+Run code files.
 
 * [codefile.nim](../src/codefile.nim) &mdash; Nim source code.
 # Index
@@ -56,7 +56,7 @@ proc readStatement(env: var Env; lb: var LineBuffer): Option[Statement]
 Run the code file and fill in the variables.
 
 ```nim
-proc runCodeFile(env: var Env; filename: string; variables: var Variables)
+proc runCodeFile(env: var Env; variables: var Variables; filename: string)
 ```
 
 # runCodeFiles

@@ -81,7 +81,7 @@ proc testRunCodeFile(
   createFile(filename, content)
   defer: discard tryRemoveFile(filename)
 
-  runCodeFile(env, filename, variables)
+  runCodeFile(env, variables, filename)
 
   result = true
   if not env.readCloseDeleteCompare(eLogLines, eErrLines, showLog = showLog):
@@ -200,6 +200,14 @@ a = +
 5
 """
     check testReadStatement(content, "a = 5", 3)
+
+  test "readStatement triple +":
+    let content = """
+a = $1+
+multiline+
+string$1""" % tripleQuotes
+    let eText = "a = $1multilinestring$1\n" % tripleQuotes
+    check testReadStatement(content, eText, 3)
 
   test "readStatement multiline empty":
     let content = """
@@ -436,7 +444,7 @@ nofile(0): w16: File not found: missing.
 
     var env = openEnvTest("_missingfile.log")
     var variables = emptyVariables()
-    runCodeFile(env, "missing", variables)
+    runCodeFile(env, variables, "missing")
     check env.readCloseDeleteCompare(eErrLines = eErrLines)
 
   test "runCodeFile no g access":
@@ -513,3 +521,38 @@ a = 5"""
     let eErrLines: seq[string] = splitNewLines """
 """
     check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+
+  test "readStatement invalid UTF-8":
+    let content = """
+a = 5
+b = $1
+ab$2cd
+$1
+c = 3
+""" % [tripleQuotes, "\xff"]
+
+    let eVarRep = """
+a = 5"""
+
+    let eErrLines: seq[string] = splitNewLines """
+testcode.txt(3): w148: Invalid UTF-8 byte sequence at position 2.
+statement: abÿcd␊
+             ^
+"""
+    var variables = emptyVariables()
+    check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+
+
+  test "runCodeFile triple +":
+    let content = """
+a = $1+
+multiline+
+string$1""" % tripleQuotes
+    let eErrLines: seq[string] = splitNewLines """
+testcode.txt(3): w185: Triple quotes must always end the line.
+statement: a = $1multilinestring$1␊
+                  ^
+""" % tripleQuotes
+    var variables = emptyVariables()
+    check testRunCodeFile(content, variables, eErrLines = eErrLines)
+
