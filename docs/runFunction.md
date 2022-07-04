@@ -49,6 +49,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funJoin_lsois](#funjoin_lsois) &mdash; Join a list of strings with a separator.
 * [funWarn](#funwarn) &mdash; Return a warning message and skip the current statement.
 * [funReturn](#funreturn) &mdash; Return the given value and control command looping.
+* [funString_aoss](#funstring_aoss) &mdash; Convert the variable to a string.
+* [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -1197,6 +1199,75 @@ if1(c, return(""))
 
 ```nim
 func funReturn(parameters: seq[Value]): FunResult
+```
+
+# funString_aoss
+
+Convert the variable to a string.
+
+~~~
+string(var: any, optional stype: string) string
+~~~~
+
+The default stype is "rb".
+
+stypes:
+* json -- returns JSON
+* rb -- returns JSON except strings are not quoted (replacement block)
+* dn -- Dot name format where leaf elements are JSON (dot names)
+
+Examples:
+
+json type:
+~~~
+string(5, "json") => "5"
+string("str", "json") => "str"
+
+a = [1, 2, 3]
+d = ["a", 1, "b", 2, "c", 3]
+string(a, "json") => [1,2,3]
+string(d, "json") => {"a":1,"b":2,"c":3}
+~~~~
+
+rb:
+~~~
+string("str", "rb") => str
+string("str") => str
+~~~~
+
+dot-names:
+~~~
+string(d, "dn") =>
+a = 1
+b = 2
+c = 3
+~~~~
+
+```nim
+func funString_aoss(parameters: seq[Value]): FunResult
+```
+
+# funString_sds
+
+Convert the dictionary variable to dot names.
+
+~~~
+string(dictName: string: d: dict) string
+~~~~
+
+Example:
+
+~~~
+d = {"x",1,"y":"tea","z":{"a":8}}
+string("d", d) =>
+
+d.x = 1
+d.y = "tea"
+d.z.a = 8
+~~~~
+
+```nim
+func funString_sds(parameters: seq[Value]): FunResult
 ```
 
 # createFunctionTable

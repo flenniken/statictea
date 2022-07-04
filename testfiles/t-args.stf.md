@@ -20,18 +20,8 @@ $statictea \
 ### File tmpl.txt
 
 ~~~
-$$ block a = t.args.help
-t.args.help = {t.args.help}
-t.args.version = {t.args.version}
-t.args.update = {t.args.update}
-t.args.log = {t.args.log}
-t.args.serverList = {t.args.serverList}
-t.args.codeList = {t.args.codeList}
-t.args.resultFilename = {t.args.resultFilename}
-t.args.templateFilename = {t.args.templateFilename}
-t.args.logFilename = {t.args.logFilename}
-t.args.prepostList = {t.args.prepostList}
-$$ endblock
+$$ nextline args = string("t.args", t.args)
+{args}
 ~~~
 
 ### File server.json
@@ -54,9 +44,9 @@ t.args.update = 0
 t.args.log = 1
 t.args.serverList = ["server.json"]
 t.args.codeList = ["shared.tea"]
-t.args.resultFilename = result
-t.args.templateFilename = tmpl.txt
-t.args.logFilename = log.txt
+t.args.resultFilename = "result"
+t.args.templateFilename = "tmpl.txt"
+t.args.logFilename = "log.txt"
 t.args.prepostList = [["$$",""],["pre$","post"]]
 ~~~
 

@@ -2025,6 +2025,8 @@ List of functions:
 - [[#sort][sort]] -- Sort a list of values of the same type.
 - [[#sort][sort]] -- Sort a list of lists.
 - [[#sort][sort]] -- Sort a list of dictionaries.
+- [[#string][string]] -- Convert the variable to a string.
+- [[#string][string]] -- Convert the dictionary variable to dot names.
 - [[#type][type]] -- Return the parameter type, one of: int, float, string, list, dict.
 - [[#values][values]] -- Create a list out of the values in the specified dictionary.
 - [[#warn][warn]] -- Return a warning message and skip the current statement.
@@ -3134,6 +3136,77 @@ d2 = dict("name", "Tea Pot", "weight", 3.5)
 dicts = list(d1, d2)
 sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
 sort(dicts, "descending", "sensitive", "name") => [d2, d1]
+#+END_SRC
+
+[[#contents][茶]]
+
+** string
+:PROPERTIES:
+:CUSTOM_ID: string
+:END:
+
+Convert the variable to a string.
+
+#+BEGIN_SRC
+string(var: any, optional stype: string) string
+#+END_SRC
+
+The default stype is "rb".
+
+stypes:
+- json -- returns JSON
+- rb -- returns JSON except strings are not quoted (replacement block)
+- dn -- Dot name format where leaf elements are JSON (dot names)
+
+Examples:
+
+json type:
+#+BEGIN_SRC
+string(5, "json") => "5"
+string("str", "json") => "str"
+
+a = [1, 2, 3]
+d = ["a", 1, "b", 2, "c", 3]
+string(a, "json") => [1,2,3]
+string(d, "json") => {"a":1,"b":2,"c":3}
+#+END_SRC
+
+rb:
+#+BEGIN_SRC
+string("str", "rb") => str
+string("str") => str
+#+END_SRC
+
+dot-names:
+#+BEGIN_SRC
+string(d, "dn") =>
+a = 1
+b = 2
+c = 3
+#+END_SRC
+
+[[#contents][茶]]
+
+** string
+:PROPERTIES:
+:CUSTOM_ID: string
+:END:
+
+Convert the dictionary variable to dot names.
+
+#+BEGIN_SRC
+string(dictName: string: d: dict) string
+#+END_SRC
+
+Example:
+
+#+BEGIN_SRC
+d = {"x",1,"y":"tea","z":{"a":8}}
+string("d", d) =>
+
+d.x = 1
+d.y = "tea"
+d.z.a = 8
 #+END_SRC
 
 [[#contents][茶]]

@@ -1671,6 +1671,96 @@ func funReturn*(parameters: seq[Value]): FunResult =
   tMapParameters("ss")
   result = newFunResult(map["a"])
 
+func funString_aoss*(parameters: seq[Value]): FunResult =
+  ## Convert the variable to a string.
+  ## @:
+  ## @:~~~
+  ## @:string(var: any, optional stype: string) string
+  ## @:~~~~
+  ## @:
+  ## @:The default stype is "rb".
+  ## @:
+  ## @:stypes:
+  ## @:* json -- returns JSON 
+  ## @:* rb -- returns JSON except strings are not quoted (replacement block)
+  ## @:* dn -- Dot name format where leaf elements are JSON (dot names)
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:json type:
+  ## @:~~~
+  ## @:string(5, "json") => "5"
+  ## @:string("str", "json") => "str"
+  ## @:
+  ## @:a = [1, 2, 3]
+  ## @:d = ["a", 1, "b", 2, "c", 3]
+  ## @:string(a, "json") => [1,2,3]
+  ## @:string(d, "json") => {"a":1,"b":2,"c":3}
+  ## @:~~~~
+  ## @:
+  ## @:rb:
+  ## @:~~~
+  ## @:string("str", "rb") => str
+  ## @:string("str") => str
+  ## @:~~~~
+  ## @:
+  ## @:dot-names:
+  ## @:~~~
+  ## @:string(d, "dn") => 
+  ## @:a = 1
+  ## @:b = 2
+  ## @:c = 3
+  ## @:~~~~
+
+  tMapParameters("aoss")
+  let value = map["a"]
+  var ctype: string
+  if "b" in map:
+    ctype = map["b"].stringv
+  else:
+    ctype = "rb"
+
+  var str: string
+  case ctype:
+  of "json":
+    str = valueToString(value)
+  of "rb":
+    str = valueToStringRB(value)
+  of "dot-names":
+    if value.kind == vkDict:
+      str = dotNameRep(value.dictv)
+    else:
+      str = valueToString(value)
+  else:
+    # Invalid string type, expected rb, json or dot-names.
+    return newFunResultWarn(wInvalidStringType, 1)
+
+  result = newFunResult(newValue(str))
+
+func funString_sds*(parameters: seq[Value]): FunResult =
+  ## Convert the dictionary variable to dot names.
+  ## @:
+  ## @:~~~
+  ## @:string(dictName: string: d: dict) string
+  ## @:~~~~
+  ## @:
+  ## @:Example:
+  ## @:
+  ## @:~~~
+  ## @:d = {"x",1,"y":"tea","z":{"a":8}}
+  ## @:string("d", d) =>
+  ## @:
+  ## @:d.x = 1
+  ## @:d.y = "tea"
+  ## @:d.z.a = 8
+  ## @:~~~~
+
+  tMapParameters("sds")
+  let name = map["a"].stringv
+  let dict = map["b"].dictv
+  let str = dotNameRep(dict, name)
+  result = newFunResult(newValue(str))
+
 const
   functionsList = [
     ("len", funLen_si, "si"),
@@ -1715,6 +1805,8 @@ const
     ("if1", funIf1, "iaaa"),
     ("warn", funWarn, "ss"),
     ("return", funReturn, "ss"),
+    ("string", funString_aoss, "aoss"),
+    ("string", funString_sds, "sds"),
   ]
 
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =

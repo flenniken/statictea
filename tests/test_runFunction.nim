@@ -1571,3 +1571,64 @@ suite "runFunction.nim":
       newFunResult(newValue("skip")))
     check testFunction("return", @[newValue("stop")],
       newFunResult(newValue("stop")))
+
+  test "string default":
+    check testFunction("string", @[newValue(1)], newFunResult(newValue("1")))
+    check testFunction("string", @[newValue(1.5)], newFunResult(newValue("1.5")))
+    check testFunction("string", @[newValue("str")], newFunResult(newValue("str")))
+    let list = newValue([newValue("a"), newValue(2), newValue(3.4)])
+    check testFunction("string", @[list], newFunResult(newValue("""["a",2,3.4]""")))
+    var dict = newVarsDict()
+    dict["abc"] = newValue("str")
+    dict["xyz"] = newValue(8)
+    check testFunction("string", @[newValue(dict)],
+      newFunResult(newValue("""{"abc":"str","xyz":8}""")))
+
+  test "string rb":
+    let stype = newValue("rb")
+    check testFunction("string", @[newValue(1), stype],
+      newFunResult(newValue("1")))
+    check testFunction("string", @[newValue(1.5), stype],
+      newFunResult(newValue("1.5")))
+    check testFunction("string", @[newValue("str"), stype],
+      newFunResult(newValue("str")))
+    let list = newValue([newValue("a"), newValue(2), newValue(3.4)])
+    check testFunction("string", @[list, stype],
+      newFunResult(newValue("""["a",2,3.4]""")))
+    var dict = newVarsDict()
+    dict["abc"] = newValue("str")
+    dict["xyz"] = newValue(8)
+    check testFunction("string", @[newValue(dict), stype],
+      newFunResult(newValue("""{"abc":"str","xyz":8}""")))
+
+  test "string json":
+    let stype = newValue("json")
+    check testFunction("string", @[newValue("str"), stype],
+      newFunResult(newValue("\"str\"")))
+
+  test "string dot-names":
+    let stype = newValue("dot-names")
+    check testFunction("string", @[newValue("str"), stype],
+      newFunResult(newValue("\"str\"")))
+
+  test "string other":
+    let stype = newValue("other")
+    let eFunResult = newFunResultWarn(wInvalidStringType, 1)
+    check testFunction("string", @[newValue("str"), stype],
+      eFunResult)
+
+  test "string dictionary":
+    var dict = newVarsDict()
+    dict["abc"] = newValue("str")
+    dict["eight"] = newValue(8)
+    var sub = newVarsDict()
+    sub["x"] = newValue("tea")
+    sub["y"] = newValue(4)
+    dict["sub"] = newValue(sub)
+    let expected = """
+d.abc = "str"
+d.eight = 8
+d.sub.x = "tea"
+d.sub.y = 4"""
+    check testFunction("string", @[newValue("d"), newValue(dict)],
+      newFunResult(newValue(expected)))
