@@ -1607,7 +1607,7 @@ suite "runFunction.nim":
       newFunResult(newValue("\"str\"")))
 
   test "string dot-names":
-    let stype = newValue("dot-names")
+    let stype = newValue("dn")
     check testFunction("string", @[newValue("str"), stype],
       newFunResult(newValue("\"str\"")))
 

@@ -1726,7 +1726,7 @@ func funString_aoss*(parameters: seq[Value]): FunResult =
     str = valueToString(value)
   of "rb":
     str = valueToStringRB(value)
-  of "dot-names":
+  of "dn":
     if value.kind == vkDict:
       str = dotNameRep(value.dictv)
     else:

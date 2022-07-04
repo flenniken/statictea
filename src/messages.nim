@@ -392,6 +392,6 @@ const
     "You cannot assign to the g namespace in a code file.", ## wNoGlobalInCodeFile
     "Use '...return(\"stop\")...' in a code file.", ## wUseStop
     "Missing the ending triple quotes.", ## wMissingEndingTriple
-    "Invalid string type, expected rb, json or dot-names.", ## wInvalidStringType
+    "Invalid string type, expected rb, json or dn.", ## wInvalidStringType
     ]
     ## The message text.
