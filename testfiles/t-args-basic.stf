@@ -34,8 +34,8 @@ Command line from t.args:
 $$ block t.repeat = len(t.args.serverList)
 $$ : g.serverParts &= concat("--server ", get(t.args.serverList, t.row))
 $$ endblock
-$$ block t.repeat = len(t.args.codeFileList)
-$$ : g.codeFileParts &= concat("--code ", get(t.args.codeFileList, t.row))
+$$ block t.repeat = len(t.args.codeList)
+$$ : g.codeFileParts &= concat("--code ", get(t.args.codeList, t.row))
 $$ endblock
 $$ block
 $$ : g.templateParts &= concat("--template ", t.args.templateFilename)
@@ -105,8 +105,7 @@ t.args keys and values:
   update: 0
   log: 1
   serverList: ["server.json","server2.json"]
-  sharedList: []
-  codeFileList: ["codefile.tea","codefile2.tea"]
+  codeList: ["codefile.tea","codefile2.tea"]
   resultFilename: result.html
   templateFilename: template.html
   logFilename: 

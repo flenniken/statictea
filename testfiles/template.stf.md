@@ -16,7 +16,7 @@ noLastEnding command nonZeroReturn
 $statictea \
   -l log.txt \
   -s server.json \
-  -j shared.json \
+  -o shared.tea \
   -t tmpl.txt \
   -r result >stdout 2>stderr
 ~~~
@@ -43,7 +43,7 @@ cat log.txt | sed 's/^.*); //' >log.filtered
 
 ~~~
 $$ block
-hello {s.name}, hello {h.name}
+hello {s.name}, hello {o.name}
 $$ endblock
 ~~~
 
@@ -56,13 +56,11 @@ $$ endblock
 }
 ~~~
 
-### File shared.json
+### File shared.tea
 
 ~~~
-{
-  "name": "shared",
-  "type": "json"
-}
+o.name = "shared"
+o.type = "json"
 ~~~
 
 ### File result.expected

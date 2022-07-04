@@ -117,8 +117,7 @@ func `$`(v: VariableData): string
 Create an empty variables object in its initial state.
 
 ```nim
-func emptyVariables(server: VarsDict = nil; shared: VarsDict = nil;
-                    args: VarsDict = nil): Variables
+func emptyVariables(server: VarsDict = nil; args: VarsDict = nil): Variables
 ```
 
 # getTeaVarIntDefault

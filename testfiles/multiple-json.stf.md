@@ -7,7 +7,7 @@ Test with multiple json files.
 ### File cmd.sh command
 
 ~~~
-$statictea -s server.json -j j1.json -j j2.json \
+$statictea -s server.json -o c1.tea -o c2.tea \
   -t template.html -r result.html >stdout 2>stderr
 ~~~
 
@@ -15,7 +15,7 @@ $statictea -s server.json -j j1.json -j j2.json \
 
 ~~~
 <!--$ block -->
-hello {s.data}, hello {h.data1}, hello {h.data2}
+hello {s.data}, hello {o.data1}, hello {o.data2}
 <!--$ endblock -->
 ~~~
 
@@ -27,26 +27,22 @@ hello {s.data}, hello {h.data1}, hello {h.data2}
 }
 ~~~
 
-### File j1.json
+### File c1.tea
 
 ~~~
-{
-  "data1": "j1.json"
-}
+o.data1 = "c1.tea"
 ~~~
 
-### File j2.json
+### File c2.tea
 
 ~~~
-{
-  "data2": "j2.json"
-}
+o.data2 = "c2.tea"
 ~~~
 
 ### File result.expected
 
 ~~~
-hello server.json, hello j1.json, hello j2.json
+hello server.json, hello c1.tea, hello c2.tea
 ~~~
 
 ### Expected result.html == result.expected

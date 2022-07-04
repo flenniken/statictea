@@ -7,13 +7,13 @@ The second replace readme example.
 ### File cmd.sh command
 
 ~~~
-$statictea -j shared.json -s server.json -t replace.html >stdout 2>stderr
+$statictea -o shared.tea -s server.json -t replace.html >stdout 2>stderr
 ~~~
 
 ### File replace.html
 
 ~~~
-<!--$ replace t.content=h.header -->
+<!--$ replace t.content=o.header -->
 <!DOCTYPE html>
 <html lang="{s.languageCode}" dir="{s.languageDirection}">
 <head>
@@ -32,16 +32,16 @@ $statictea -j shared.json -s server.json -t replace.html >stdout 2>stderr
 }
 ~~~
 
-### File shared.json
+### File shared.tea
 
 ~~~
-{
-  "header": "<!DOCTYPE html>
-<html lang=\"{s.languageCode}\" dir=\"{s.languageDirection}\">
+o.header = """
+<!DOCTYPE html>
+<html lang="{s.languageCode}" dir="{s.languageDirection}">
 <head>
-<meta charset=\"UTF-8\"/>
-<title>{s.title}</title>\n"
-}
+<meta charset="UTF-8"/>
+<title>{s.title}</title>
+"""
 ~~~
 
 ### File stdout.expected

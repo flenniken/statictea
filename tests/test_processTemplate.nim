@@ -12,6 +12,7 @@ import vartypes
 import tables
 import sharedtestcode
 import comparelines
+import codefile
 
 iterator yieldContentLine*(content: string): string =
   ## Yield one content line at a time and keep the line endings.
@@ -34,7 +35,7 @@ proc testGetTeaArgs(args: Args, eVarRep: string): bool =
 
 proc testProcessTemplate(templateContent: string = "",
     serverJson: string = "",
-    sharedJson: string = "",
+    sharedCode: string = "",
     eRc = 0,
     eResultLines: seq[string] = @[],
     eLogLines: seq[string] = @[],
@@ -55,11 +56,11 @@ proc testProcessTemplate(templateContent: string = "",
     createFile(serverFilename, serverJson)
     args.serverList = @[serverFilename]
 
-  # Create the shared json file.
-  if sharedJson != "":
-    let sharedFilename = "shared.json"
-    createFile(sharedFilename, sharedJson)
-    args.sharedList = @[sharedFilename]
+  # Create the shared code file.
+  if sharedCode != "":
+    let sharedFilename = "shared.tea"
+    createFile(sharedFilename, sharedCode)
+    args.codeList = @[sharedFilename]
 
   # Process the template and write out the result.
   processTemplate(env, args)
@@ -73,11 +74,11 @@ proc testProcessTemplate(templateContent: string = "",
     result = false
 
   discard tryRemoveFile("server.json")
-  discard tryRemoveFile("shared.json")
+  discard tryRemoveFile("shared.tea")
 
 proc testUpdateTemplate(templateContent: string = "",
     serverJson: string = "",
-    sharedJson: string = "",
+    sharedCode: string = "",
     eRc = 0,
     eResultLines: seq[string] = @[],
     eLogLines: seq[string] = @[],
@@ -99,11 +100,11 @@ proc testUpdateTemplate(templateContent: string = "",
     createFile(serverFilename, serverJson)
     args.serverList = @[serverFilename]
 
-  # Create the shared json file.
-  if sharedJson != "":
-    let sharedFilename = "shared.json"
-    createFile(sharedFilename, sharedJson)
-    args.sharedList = @[sharedFilename]
+  # Create the shared code file.
+  if sharedCode != "":
+    let sharedFilename = "shared.tea"
+    createFile(sharedFilename, sharedCode)
+    args.codeList = @[sharedFilename]
 
   # Update the template and write out the result.
   updateTemplate(env, args)
@@ -117,7 +118,7 @@ proc testUpdateTemplate(templateContent: string = "",
     result = false
 
   discard tryRemoveFile("server.json")
-  discard tryRemoveFile("shared.json")
+  discard tryRemoveFile("shared.tea")
 
 proc testYieldcontentline(content: string, eLines: seq[string] = @[]): bool =
   var lines = newSeq[string]()
@@ -188,27 +189,28 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
 
   test "readme shared header":
     let templateContent = """
-<!--$ replace t.content=h.header -->
+<!--$ replace t.content=o.header -->
 <!--$ endblock -->
 """
 
-    let sharedJson = """
-{
-  "header": "<!doctype html>\n<html lang=\"en\">\n"
-}
-"""
+    let sharedCode = """
+o.header = $1
+<!doctype html>
+<html lang="en">
+$1
+""" % tripleQuotes
 
     let eResultLines = splitNewLines """
 <!doctype html>
 <html lang="en">
 """
 
-    check testProcessTemplate(templateContent = templateContent, sharedJson =
-        sharedJson, eResultLines = eResultLines)
+    check testProcessTemplate(templateContent = templateContent, sharedCode =
+        sharedCode, eResultLines = eResultLines)
 
   test "readme shared header 2":
     let templateContent = """
-<!--$ replace t.content=h.header -->
+<!--$ replace t.content=o.header -->
 <!DOCTYPE html>
 <html lang="{s.languageCode}" dir="{s.languageDirection}">
 <head>
@@ -224,16 +226,15 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
 "title": "Teas in England"
 }
 """
-
-    let sharedJson = """
-{
-  "header": "<!DOCTYPE html>
-<html lang=\"{s.languageCode}\" dir=\"{s.languageDirection}\">
+    let sharedCode = """
+o.header = $1
+<!DOCTYPE html>
+<html lang="{s.languageCode}" dir="{s.languageDirection}">
 <head>
-<meta charset=\"UTF-8\"/>
-<title>{s.title}</title>\n"
-}
-"""
+<meta charset="UTF-8"/>
+<title>{s.title}</title>
+$1
+""" % tripleQuotes
 
     let eResultLines = splitNewLines """
 <!DOCTYPE html>
@@ -242,15 +243,15 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
 <meta charset="UTF-8"/>
 <title>Teas in England</title>
 """
-    check testProcessTemplate(templateContent = templateContent, serverJson = serverJson, sharedJson =
-        sharedJson, eResultLines = eResultLines)
-
+    check testProcessTemplate(templateContent = templateContent,
+      serverJson = serverJson, sharedCode = sharedCode,
+      eResultLines = eResultLines)
 
   test "readme shared header 3":
 
 
     let templateContent = """
-<!--$ replace t.content=h.header -->
+<!--$ replace t.content=o.header -->
 <!DOCTYPE html>
 <html lang="{s.languageCode}" dir="{s.languageDirection}">
 <head>
@@ -267,15 +268,15 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
 }
 """
 
-    let sharedJson = """
-{
-  "header": "<!DOCTYPE html>
-<html lang=\"{s.languageCode}\" dir=\"{s.languageDirection}\">
+    let sharedCode = """
+o.header = $1
+<!DOCTYPE html>
+<html lang="{s.languageCode}" dir="{s.languageDirection}">
 <head>
-<meta charset=\"UTF-8\"/>
-<title>{s.title}</title>\n"
-}
-"""
+<meta charset="UTF-8"/>
+<title>{s.title}</title>
+$1
+""" % tripleQuotes
 
     let eResultLines = splitNewLines """
 <!DOCTYPE html>
@@ -284,8 +285,9 @@ Drink {s.drink} -- {s.drinkType} is my favorite.
 <meta charset="UTF-8"/>
 <title>Teas in England</title>
 """
-    check testProcessTemplate(templateContent = templateContent, serverJson = serverJson, sharedJson =
-        sharedJson, eResultLines = eResultLines)
+    check testProcessTemplate(templateContent = templateContent,
+      serverJson = serverJson, sharedCode = sharedCode,
+      eResultLines = eResultLines)
 
   test "readme comment":
 
@@ -360,9 +362,9 @@ fake nextline
     let templateContent = """
 <!--$ block -->
 <!--$ : serverElements = len(s) -->
-<!--$ : jsonElements = len(h) -->
+<!--$ : codeElements = len(o) -->
 The server has {serverElements} elements
-and the shared json has {jsonElements}.
+and the shared code has {codeElements}.
 <!--$ endblock -->
 """
     let serverJson = """
@@ -376,9 +378,10 @@ and the shared json has {jsonElements}.
 """
     let eResultLines = splitNewLines """
 The server has 5 elements
-and the shared json has 0.
+and the shared code has 0.
 """
-    check testProcessTemplate(templateContent = templateContent, serverJson = serverJson, eResultLines = eResultLines)
+    check testProcessTemplate(templateContent = templateContent,
+      serverJson = serverJson, eResultLines = eResultLines)
 
 #   test "output admin var missing":
 
@@ -893,61 +896,58 @@ ending line
     check testUpdateTemplate(templateContent = templateContent, eResultLines = eResultLines)
 
   test "update replace":
-    let sharedJson = """
-{
- "header": "<html>\n"
-}
+    let sharedCode = """
+o.header = "<html>\n"
 """
     let templateContent = """
 line
-<!--$ replace t.content = h.header -->
+<!--$ replace t.content = o.header -->
 replacement block
 <!--$ endblock -->
 ending line
 """
     let eResultLines = splitNewLines """
 line
-<!--$ replace t.content = h.header -->
+<!--$ replace t.content = o.header -->
 <html>
 <!--$ endblock -->
 ending line
 """
-    check testUpdateTemplate(templateContent = templateContent, sharedJson = sharedJson,
-                                               eResultLines = eResultLines)
+    check testUpdateTemplate(templateContent = templateContent,
+      sharedCode = sharedCode, eResultLines = eResultLines)
 
   test "update replace 2":
-    let sharedJson = """
-{
- "header": "<html>\n"
-}
+    let sharedCode = """
+o.header = "<html>\n"
 """
     let templateContent = """
 line
-<!--$ replace t.content = h.header -->
+<!--$ replace t.content = o.header -->
 replacement block
 <!--$ endblock -->
 ending line
 """
     let eResultLines = splitNewLines """
 line
-<!--$ replace t.content = h.header -->
+<!--$ replace t.content = o.header -->
 <html>
 <!--$ endblock -->
 ending line
 """
-    check testUpdateTemplate(templateContent = templateContent, sharedJson = sharedJson,
-                                               eResultLines = eResultLines)
+    check testUpdateTemplate(templateContent = templateContent,
+      sharedCode = sharedCode, eResultLines = eResultLines)
 
   test "update replace two lines":
 
-    let sharedJson = """
-{
-  "header": "<!doctype html>\n<html lang=\"en\">\n"
-}
-"""
+    let sharedCode = """
+o.header = $1
+<!doctype html>
+<html lang="en">
+$1
+""" % tripleQuotes
     let templateContent = """
 line
-<!--$ replace t.content = h.header -->
+<!--$ replace t.content = o.header -->
 replacement block
 asdf
 asdfasdf
@@ -956,28 +956,29 @@ ending line
 """
     let eResultLines = splitNewLines """
 line
-<!--$ replace t.content = h.header -->
+<!--$ replace t.content = o.header -->
 <!doctype html>
 <html lang="en">
 <!--$ endblock -->
 ending line
 """
-    check testUpdateTemplate(templateContent = templateContent, sharedJson = sharedJson,
-                                               eResultLines = eResultLines)
+    check testUpdateTemplate(templateContent = templateContent,
+      sharedCode = sharedCode, eResultLines = eResultLines)
 
   test "update replace multiple commands":
 
-    let sharedJson = """
-{
-  "header": "<!doctype html>\n<html lang=\"en\">\n"
-}
-"""
+    let sharedCode = """
+o.header = $1
+<!doctype html>
+<html lang="en">
+$1
+""" % tripleQuotes
     let templateContent = """
 <!--$ nextline +-->
 <!--$ : a = "b" +-->
 <!--$ : b = "c" -->
 {a}, {b}
-<!--$ replace t.content = h.header -->
+<!--$ replace t.content = o.header -->
 replacement block
 asdf
 asdfasdf
@@ -991,7 +992,7 @@ asdfasdfsdff
 <!--$ : a = "b" +-->
 <!--$ : b = "c" -->
 {a}, {b}
-<!--$ replace t.content = h.header -->
+<!--$ replace t.content = o.header -->
 <!doctype html>
 <html lang="en">
 <!--$ endblock -->
@@ -999,8 +1000,8 @@ asdfasdfsdff
 asdfasdfsdff
 <!-- # last line -->
 """
-    check testUpdateTemplate(templateContent = templateContent, sharedJson = sharedJson,
-                                               eResultLines = eResultLines)
+    check testUpdateTemplate(templateContent = templateContent,
+      sharedCode = sharedCode, eResultLines = eResultLines)
 
   test "update no content":
     let templateContent = """
@@ -1121,8 +1122,7 @@ version = 0
 update = 0
 log = 0
 serverList = []
-sharedList = []
-codeFileList = []
+codeList = []
 resultFilename = ""
 templateFilename = ""
 logFilename = ""
@@ -1132,7 +1132,7 @@ prepostList = []"""
   test "getTeaArgs multiple":
     var args: Args
     args.serverList = @["server.json"]
-    args.sharedList = @["shared.json"]
+    args.codeList = @["shared.tea"]
     args.templateFilename = "template.html"
     args.resultFilename = "result.html"
     let value = getTeaArgs(args)

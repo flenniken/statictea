@@ -12,29 +12,27 @@ noLastEnding command nonZeroReturn
 ### File cmd.sh command
 
 ~~~
-$statictea -u --shared shared.json -t stdin <tmpl.txt >stdout 2>stderr
+$statictea -u --code shared.tea -t stdin <tmpl.txt >stdout 2>stderr
 ~~~
 
 ### File tmpl.txt
 
 ~~~
-$$ replace t.content = h.content
+$$ replace t.content = o.content
 replace me
 $$ endblock
 ~~~
 
-### File shared.json
+### File shared.tea
 
 ~~~
-{
-  "content": "shared content",
-}
+o.content = "shared content"
 ~~~
 
 ### File stdout.expected
 
 ~~~
-$$ replace t.content = h.content
+$$ replace t.content = o.content
 shared content
 $$ endblock
 ~~~

@@ -7,22 +7,20 @@ Update the replace block in a template.
 ### File cmd.sh command
 
 ~~~
-$statictea -u -j shared.json -t template.html >stdout 2>stderr
+$statictea -u -o shared.tea -t template.html >stdout 2>stderr
 ~~~
 
-### File shared.json
+### File shared.tea
 
 ~~~
-{
- "header": "<html>\n"
-}
+o.header = "<html>\n"
 ~~~
 
 ### File template.html
 
 ~~~
 line
-<!--$ replace t.content = h.header -->
+<!--$ replace t.content = o.header -->
 replacement block
 <!--$ endblock -->
 ending line
@@ -32,7 +30,7 @@ ending line
 
 ~~~
 line
-<!--$ replace t.content = h.header -->
+<!--$ replace t.content = o.header -->
 <html>
 <!--$ endblock -->
 ending line

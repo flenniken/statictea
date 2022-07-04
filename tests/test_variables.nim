@@ -67,7 +67,6 @@ suite "variables.nim":
     var variables = emptyVariables()
     let expected = """
 s = {}
-h = {}
 l = {}
 g = {}
 o = {}
@@ -82,7 +81,6 @@ t.args = {}"""
     check testGetVariableOk(variables, "t.args", "{}")
     check testGetVariableOk(variables, "t.version", "\"0.1.0\"")
     check testGetVariableOk(variables, "s", "{}")
-    check testGetVariableOk(variables, "h", "{}")
     check testGetVariableOk(variables, "o", "{}")
     check testGetVariableOk(variables, "l", "{}")
     check testGetVariableOk(variables, "g", "{}")
@@ -192,8 +190,7 @@ version = 0
 update = 0
 log = 0
 serverList = []
-sharedList = []
-codeFileList = []
+codeList = []
 resultFilename = ""
 templateFilename = ""
 logFilename = ""

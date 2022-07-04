@@ -71,18 +71,13 @@ func `$`*(v: VariableData): string =
   result = "dotName='$1', operator='$2', value=$3" % [
     v.dotNameStr, v.operator, $v.value]
 
-func emptyVariables*(server: VarsDict = nil, shared: VarsDict = nil,
-    args: VarsDict = nil): Variables =
+func emptyVariables*(server: VarsDict = nil, args: VarsDict = nil): Variables =
   ## Create an empty variables object in its initial state.
   result = newVarsDict()
   if server == nil:
     result["s"] = newValue(newVarsDict())
   else:
     result["s"] = newValue(server)
-  if shared == nil:
-    result["h"] = newValue(newVarsDict())
-  else:
-    result["h"] = newValue(shared)
   result["l"] = newValue(newVarsDict())
   result["g"] = newValue(newVarsDict())
   result["o"] = newValue(newVarsDict())
@@ -371,8 +366,7 @@ func getTeaArgs*(args: Args): Value =
   varsDict["update"] = newValue(args.update)
   varsDict["log"] = newValue(args.log)
   varsDict["serverList"] = newValue(args.serverList)
-  varsDict["sharedList"] = newValue(args.sharedList)
-  varsDict["codeFileList"] = newValue(args.codeFileList)
+  varsDict["codeList"] = newValue(args.codeList)
   varsDict["resultFilename"] = newValue(args.resultFilename)
   varsDict["templateFilename"] = newValue(args.templateFilename)
   varsDict["logFilename"] = newValue(args.logFilename)

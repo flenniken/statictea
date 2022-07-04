@@ -12,7 +12,7 @@ $statictea \
   -p '$$' \
   -p "pre$,post" \
   -s server.json \
-  -j shared.json \
+  -o shared.tea \
   -t tmpl.txt \
   -r result >stdout 2>stderr
 ~~~
@@ -26,7 +26,7 @@ t.args.version = {t.args.version}
 t.args.update = {t.args.update}
 t.args.log = {t.args.log}
 t.args.serverList = {t.args.serverList}
-t.args.sharedList = {t.args.sharedList}
+t.args.codeList = {t.args.codeList}
 t.args.resultFilename = {t.args.resultFilename}
 t.args.templateFilename = {t.args.templateFilename}
 t.args.logFilename = {t.args.logFilename}
@@ -40,10 +40,9 @@ $$ endblock
 {}
 ~~~
 
-### File shared.json
+### File shared.tea
 
 ~~~
-{}
 ~~~
 
 ### File result.expected
@@ -54,7 +53,7 @@ t.args.version = 0
 t.args.update = 0
 t.args.log = 1
 t.args.serverList = ["server.json"]
-t.args.sharedList = ["shared.json"]
+t.args.codeList = ["shared.tea"]
 t.args.resultFilename = result
 t.args.templateFilename = tmpl.txt
 t.args.logFilename = log.txt

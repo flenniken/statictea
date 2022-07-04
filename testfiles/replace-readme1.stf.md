@@ -7,22 +7,23 @@ The first replace readme example.
 ### File cmd.sh command
 
 ~~~
-$statictea -j replace.json -t replace.html >stdout 2>stderr
+$statictea -o replace.tea -t replace.html >stdout 2>stderr
 ~~~
 
 ### File replace.html
 
 ~~~
-<!--$ replace t.content=h.header -->
+<!--$ replace t.content=o.header -->
 <!--$ endblock -->
 ~~~
 
-### File replace.json
+### File replace.tea
 
 ~~~
-{
-  "header": "<!doctype html>\n<html lang=\"en\">\n"
-}
+o.header = """
+<!doctype html>
+<html lang="en">
+"""
 ~~~
 
 ### File stdout.expected

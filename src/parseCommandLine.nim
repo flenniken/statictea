@@ -90,10 +90,8 @@ proc parseCommandLine*(argv: seq[string]): ArgsOr =
 
   if "server" in cmlArgs:
     args.serverList = cmlArgs["server"]
-  if "shared" in cmlArgs:
-    args.sharedList = cmlArgs["shared"]
   if "code" in cmlArgs:
-    args.codeFileList = cmlArgs["code"]
+    args.codeList = cmlArgs["code"]
   if "prepost" in cmlArgs:
     var prepostList: seq[Prepost]
     for str in cmlArgs["prepost"]:

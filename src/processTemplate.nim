@@ -286,9 +286,9 @@ proc getStartingVariables(env: var Env, args: Args): Variables =
   # dictionary.
 
   var serverVarDict = readJsonFiles(env, args.serverList)
-  var sharedVarDict = readJsonFiles(env, args.sharedList)
   var argsVarDict = getTeaArgs(args).dictv
-  result = emptyVariables(serverVarDict, sharedVarDict, argsVarDict)
+  result = emptyVariables(serverVarDict, argsVarDict)
+  runCodeFiles(env, result, args.codeList)
 
 proc getPrepostTable(args: Args): PrepostTable =
   ## Get the the prepost settings from the user or use the default
@@ -307,7 +307,6 @@ proc processTemplate*(env: var Env, args: Args) =
   ## Process the template.
 
   var variables = getStartingVariables(env, args)
-  runCodeFiles(env, variables, args.codeFileList)
 
   var prepostTable = getPrepostTable(args)
 

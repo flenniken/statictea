@@ -450,7 +450,7 @@ $$ : c = len("hello")
     check variables["l"].dictv.len == 0
     check variables["g"].dictv.len == 0
     check variables["s"].dictv.len == 0
-    check variables["h"].dictv.len == 0
+    check variables["o"].dictv.len == 0
     check variables["t"].dictv.len != 0
     let tea = variables["t"].dictv
     check tea["row"] == Value(kind: vkInt, intv: 0)

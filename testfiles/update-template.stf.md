@@ -7,47 +7,45 @@ Test updating a template with the update option.
 ### File cmd.sh command
 
 ~~~
-$statictea -u -j shared.json -t template.html >stdout 2>stderr
+$statictea -u -o shared.tea -t template.html >stdout 2>stderr
 ~~~
 
 ### File template.html
 
 ~~~
-<!--$ replace t.content = h.header -->
+<!--$ replace t.content = o.header -->
 this is where the header goes
 <!--$ endblock -->
 
-<!--$ replace t.content = h.menu -->
+<!--$ replace t.content = o.menu -->
 the menu goes here
 <!--$ endblock -->
 
-<!--$ replace t.content = h.footer -->
+<!--$ replace t.content = o.footer -->
 footer location
 <!--$ endblock -->
 ~~~
 
-### File shared.json
+### File shared.tea
 
 ~~~
-{
-  "header": "=== header ===\n",
-  "menu": "pick an option\n",
-  "footer": "=== footer ===\n"
-}
+o.header = "=== header ==="
+o.menu = "pick an option"
+o.footer = "=== footer ==="
 ~~~
 
 ### File template.expected
 
 ~~~
-<!--$ replace t.content = h.header -->
+<!--$ replace t.content = o.header -->
 === header ===
 <!--$ endblock -->
 
-<!--$ replace t.content = h.menu -->
+<!--$ replace t.content = o.menu -->
 pick an option
 <!--$ endblock -->
 
-<!--$ replace t.content = h.footer -->
+<!--$ replace t.content = o.footer -->
 === footer ===
 <!--$ endblock -->
 ~~~
