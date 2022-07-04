@@ -1,6 +1,5 @@
 import std/unittest
 import std/os
-import std/unicode
 import opresult
 import sharedtestcode
 import comparelines
@@ -72,32 +71,7 @@ proc testLinesSideBySide(content1: string, content2: string,
   else:
     result = true
 
-proc got_expected*(got: string, expected: string): bool =
-  if got != expected:
-    echo "     got: " & got
-    echo "expected: " & expected
-    return false
-  return true
-
-proc testVisibleControl(text: string, eText: string): bool =
-  let got = visibleControl(text)
-  result = got_expected(got, eText)
-
 suite "comparelines.nim":
-
-  test "visibleControl":
-    check testVisibleControl("asdf", "asdf")
-    check testVisibleControl("asdf\n",  "asdf␊")
-    check testVisibleControl("asdf\r\n", "asdf␍␊")
-    check testVisibleControl("	asdf", "␉asdf")
-    check testVisibleControl(" 	 asdf", " ␉ asdf")
-
-  test "visibleControl others":
-    for num in countUp(0, 31):
-      let rune = Rune(num)
-      var str = "abc"
-      str.add(rune)
-      # echo visibleControl(str)
 
   test "linesSideBySide empty":
     let content1 = ""
@@ -264,3 +238,21 @@ more
     let rcOp = compareFiles("f1", "f2")
     check rcOp.isMessage
     check rcOp.message == "Error: cannot open: f1"
+
+  test "splitNewLines":
+    check splitNewLines("").len == 0
+    check splitNewLines("a") == @["a"]
+    check splitNewLines("abc") == @["abc"]
+    check splitNewLines("\n") == @["\n"]
+    check splitNewLines("b\n") == @["b\n"]
+    check splitNewLines("b\nc") == @["b\n", "c"]
+    check splitNewLines("b\nlast") == @["b\n", "last"]
+    check splitNewLines("b\nc\n") == @["b\n", "c\n"]
+    check splitNewLines("b\nc\nd") == @["b\n", "c\n", "d"]
+    let content = """
+line one
+two
+three
+"""
+    check splitNewLines(content) == @["line one\n", "two\n", "three\n"]
+

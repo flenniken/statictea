@@ -45,23 +45,6 @@ proc readContentTest(content: string, expected: seq[string],
 
 suite "readlines.nim":
 
-  test "splitNewLines":
-    check splitNewLines("").len == 0
-    check splitNewLines("a") == @["a"]
-    check splitNewLines("abc") == @["abc"]
-    check splitNewLines("\n") == @["\n"]
-    check splitNewLines("b\n") == @["b\n"]
-    check splitNewLines("b\nc") == @["b\n", "c"]
-    check splitNewLines("b\nlast") == @["b\n", "last"]
-    check splitNewLines("b\nc\n") == @["b\n", "c\n"]
-    check splitNewLines("b\nc\nd") == @["b\n", "c\n", "d"]
-    let content = """
-line one
-two
-three
-"""
-    check splitNewLines(content) == @["line one\n", "two\n", "three\n"]
-
   test "setLen":
     var buffer: string
     buffer.setLen(24)

@@ -3,7 +3,7 @@ import std/strutils
 import statictea
 import env
 import version
-import readlines
+import comparelines
 
 proc testMain(argv: seq[string],
     eRc: int,

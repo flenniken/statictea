@@ -15,3 +15,12 @@ when defined(test):
     var file = open(filename, fmWrite)
     file.write(content)
     file.close()
+
+  proc got_expected*(got: string, expected: string): bool =
+    ## Return true when the got string matches the expected string,
+    ## otherwise return false and show the differences.
+    if got != expected:
+      echo "     got: " & got
+      echo "expected: " & expected
+      return false
+    return true

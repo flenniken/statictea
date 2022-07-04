@@ -46,6 +46,9 @@ filename.
 * [stdin](../testfiles/stdin.stf.md) &mdash; Test a template coming from stdin.
 * [stdout-result](../testfiles/stdout-result.stf.md) &mdash; Test when no result file is specified.
 * [string-basics](../testfiles/string-basics.stf.md) &mdash; Test the string type.
+* [string-fun-basics](../testfiles/string-fun-basics.stf.md) &mdash; Test the string function.
+* [string-fun-more](../testfiles/string-fun-more.stf.md) &mdash; Test the first string function.
+* [string-fun-warn](../testfiles/string-fun-warn.stf.md) &mdash; Test the string function warnings.
 * [string-unicode](../testfiles/string-unicode.stf.md) &mdash; Test unicode in strings.
 * [syntax-basics](../testfiles/syntax-basics.stf.md) &mdash; Test the readme syntax section.
 * [t-args](../testfiles/t-args.stf.md) &mdash; Test the t args variable.

@@ -2,9 +2,8 @@
 
 import std/strutils
 import std/os
-import std/unicode
-import readlines
 import opresult
+import unicodes
 
 type
   OpResultStr*[T] = OpResult[T, string]
@@ -18,6 +17,20 @@ func opMessageStr*[T](message: string): OpResultStr[T] =
   ## Return an OpResultStr with a message why the value cannot be returned.
   result = OpResult[T, string](kind: orMessage, message: message)
 
+func splitNewLines*(content: string): seq[string] =
+  ## Split lines and keep the line endings. Works with \n and \r\n
+  ## type endings.
+  if content.len == 0:
+    return
+  var start = 0
+  for pos in 0 ..< content.len:
+    let ch = content[pos]
+    if ch == '\n':
+      result.add(content[start .. pos])
+      start = pos+1
+  if start < content.len:
+    result.add(content[start ..< content.len])
+
 proc readFileContent(filename: string): OpResultStr[string] =
   ## Read the file and return the content as a string.
   try:
@@ -25,20 +38,6 @@ proc readFileContent(filename: string): OpResultStr[string] =
     result = opValueStr[string](content)
   except:
     result = opMessageStr[string](getCurrentExceptionMsg())
-
-func visibleControl*(str: string): string =
-  ## Return a new string with the tab and line endings and other
-  ## control characters visible.
-
-  var visibleRunes = newSeq[Rune]()
-  for rune in runes(str):
-    var num = uint(rune)
-    # Show a special glyph for tab, carrage return and line feed and
-    # other control characters.
-    if num <= 0x1f:
-      num = 0x00002400 + num
-    visibleRunes.add(Rune(num))
-  result = $visibleRunes
 
 proc linesSideBySide*(gotContent: string, expectedContent: string): string =
   ## Show the two sets of lines side by side.
@@ -147,4 +146,3 @@ $3
 """ % [gotBasename, expBasename, linesSideBySide(gotContent, expectedContent)]
 
   return opValueStr[string](message)
-

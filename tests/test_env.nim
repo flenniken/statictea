@@ -6,7 +6,7 @@ import std/times
 import env
 import regexes
 import matches
-import readlines
+import comparelines
 
 type
   FileLine* = object

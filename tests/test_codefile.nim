@@ -10,6 +10,7 @@ import vartypes
 import readlines
 import sharedtestcode
 import runCommand
+import comparelines
 
 proc testAddText*(beginning: string, ending: string, found: Found): bool =
   var text: string

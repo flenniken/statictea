@@ -13,13 +13,13 @@ import variables
 import messages
 import warnings
 import version
-import readlines
 import collectCommand
 import opresultwarn
 import sharedtestcode
 import codefile
 import readjson
 import comparelines
+import unicodes
 
 proc testGetMultilineStr(pattern: string, start: Natural,
     eStr: string, eLength: Natural): bool =

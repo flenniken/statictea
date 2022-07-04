@@ -1,6 +1,7 @@
 import std/unittest
 import std/strformat
 import std/strutils
+import std/unicode
 import unicodes
 import opresultid
 import opresultwarn
@@ -8,6 +9,11 @@ import messages
 import warnings
 import funtypes
 import vartypes
+import sharedtestcode
+
+proc testVisibleControl(text: string, eText: string): bool =
+  let got = visibleControl(text)
+  result = got_expected(got, eText)
 
 func stringToHex(str: string): string =
   ## Convert the string bytes to hex bytes like 34 a9 ff e2.
@@ -441,3 +447,18 @@ suite "unicodes.nim":
     let str = "\xc2\xa9\xe2\x80\x90\xF0\x9D\x92\x9C" # 3 unicode characters
     check stringLen(str) == 3
     check stringLen("ab\xffc") == 4 # with one invalid
+
+  test "visibleControl":
+    check testVisibleControl("asdf", "asdf")
+    check testVisibleControl("asdf\n",  "asdf␊")
+    check testVisibleControl("asdf\r\n", "asdf␍␊")
+    check testVisibleControl("	asdf", "␉asdf")
+    check testVisibleControl(" 	 asdf", " ␉ asdf")
+
+  test "visibleControl others":
+    for num in countUp(0, 31):
+      let rune = Rune(num)
+      var str = "abc"
+      str.add(rune)
+      # echo visibleControl(str)
+

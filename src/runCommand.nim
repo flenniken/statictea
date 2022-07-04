@@ -17,7 +17,7 @@ import runFunction
 import readjson
 import collectCommand
 import opresultwarn
-import comparelines
+import unicodes
 
 const
   # Turn on showPos for testing to graphically show the start and end

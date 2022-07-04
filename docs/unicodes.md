@@ -15,6 +15,7 @@ Functions that deal with Unicode.
 * [parseHexUnicodeToString](#parsehexunicodetostring) &mdash; Return a one character string given a 4 or 8 character unicode escape string.
 * [stringToCodePoints](#stringtocodepoints) &mdash; Return the string as a list of code points.
 * [slice](#slice) &mdash; Extract a substring from a string by its Unicode character position (not byte index).
+* [visibleControl](#visiblecontrol) &mdash; Return a new string with the tab and line endings and other control characters visible.
 
 # cmpString
 
@@ -94,6 +95,14 @@ Extract a substring from a string by its Unicode character position (not byte in
 
 ```nim
 func slice(str: string; start: int; length: int): FunResult
+```
+
+# visibleControl
+
+Return a new string with the tab and line endings and other control characters visible.
+
+```nim
+func visibleControl(str: string): string
 ```
 
 

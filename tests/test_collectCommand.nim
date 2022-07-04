@@ -6,6 +6,7 @@ import env
 import matches
 import readlines
 import collectCommand
+import comparelines
 
 func splitContent(content: string, startLine: Natural, numLines: Natural): seq[string] =
   ## Split the content string at newlines and return a range of the

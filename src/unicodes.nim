@@ -280,3 +280,17 @@ func slice*(str: string, start: int, length: int): FunResult =
     messageId = wLengthTooBig
     parameter = 2
   return newFunResultWarn(messageId, parameter)
+
+func visibleControl*(str: string): string =
+  ## Return a new string with the tab and line endings and other
+  ## control characters visible.
+
+  var visibleRunes = newSeq[Rune]()
+  for rune in runes(str):
+    var num = uint(rune)
+    # Show a special glyph for tab, carrage return and line feed and
+    # other control characters.
+    if num <= 0x1f:
+      num = 0x00002400 + num
+    visibleRunes.add(Rune(num))
+  result = $visibleRunes

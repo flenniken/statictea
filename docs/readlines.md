@@ -17,7 +17,6 @@ Read lines from a stream without exceeding the maximum line length. The returned
 * [newLineBuffer](#newlinebuffer) &mdash; Return a new LineBuffer for the given stream.
 * [reset](#reset) &mdash; Clear the buffer and set the read position at the start of the stream.
 * [readline](#readline) &mdash; Return the next line from the LineBuffer.
-* [splitNewLines](#splitnewlines) &mdash; Split lines and keep the line endings.
 
 # minMaxLineLen
 
@@ -142,14 +141,6 @@ empty string is returned.
 
 ```nim
 proc readline(lb: var LineBuffer): string
-```
-
-# splitNewLines
-
-Split lines and keep the line endings. Works with n and rn type endings.
-
-```nim
-func splitNewLines(content: string): seq[string]
 ```
 
 

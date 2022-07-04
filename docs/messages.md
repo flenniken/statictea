@@ -401,7 +401,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "You cannot assign to the g namespace in a code file.", ## wNoGlobalInCodeFile
     "Use \'...return(\"stop\")...\' in a code file.", ## wUseStop
     "Missing the ending triple quotes.", ## wMissingEndingTriple
-    "Invalid string type, expected rb, json or dot-names."]
+    "Invalid string type, expected rb, json or dn."]
 ```
 
 

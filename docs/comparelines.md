@@ -8,7 +8,7 @@ Compare lines of text.
 * type: [OpResultStr](#opresultstr) &mdash; On success return T, otherwise return a message telling what went wrong.
 * [opValueStr](#opvaluestr) &mdash; Return an OpResultStr with a value.
 * [opMessageStr](#opmessagestr) &mdash; Return an OpResultStr with a message why the value cannot be returned.
-* [visibleControl](#visiblecontrol) &mdash; Return a new string with the tab and line endings and other control characters visible.
+* [splitNewLines](#splitnewlines) &mdash; Split lines and keep the line endings.
 * [linesSideBySide](#linessidebyside) &mdash; Show the two sets of lines side by side.
 * [compareFiles](#comparefiles) &mdash; Compare two files and return the differences.
 
@@ -36,12 +36,12 @@ Return an OpResultStr with a message why the value cannot be returned.
 func opMessageStr[T](message: string): OpResultStr[T]
 ```
 
-# visibleControl
+# splitNewLines
 
-Return a new string with the tab and line endings and other control characters visible.
+Split lines and keep the line endings. Works with n and rn type endings.
 
 ```nim
-func visibleControl(str: string): string
+func splitNewLines(content: string): seq[string]
 ```
 
 # linesSideBySide

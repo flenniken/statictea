@@ -89,7 +89,7 @@ o.type = "json"
 Show the s dictionary which is empty.
 default: {}
      rb: {}
-     dn:
+     dn: 
    json: {}
 
 Strings are not quoted with rb but they are for the others.
