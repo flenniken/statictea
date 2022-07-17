@@ -1,11 +1,38 @@
 import std/os
 import std/unittest
 import std/options
+import std/tables
 import env
 import replacement
 import matches
 import tempFile
 import readlines
+import variables
+import sharedtestcode
+import opresultwarn
+import vartypes
+import warnings
+import messages
+
+proc testFormatString(str: string, eStr: string,
+    variables = emptyVariables()): bool =
+  let stringOr = formatString(variables, str)
+  if stringOr.isMessage:
+    echo stringOr
+    return false
+  result = gotExpected(stringOr.value, eStr)
+
+proc testFormatStringWarn(str: string, eWarningData: WarningData,
+    variables = emptyVariables()): bool =
+  let stringOr = formatString(variables, str)
+  if stringOr.isValue:
+    echo stringOr
+    return false
+  let warningData = stringOr.message
+  result = gotExpected($warningData, $eWarningData)
+  if not result:
+    echo str
+    echo getWarningLine("", 0, warningData.warning, warningData.p1)
 
 proc testYieldReplacementLine(
     firstReplaceLine: string,
@@ -295,3 +322,50 @@ three
   test "replace line":
     var replaceLine: ReplaceLine
     check replaceLine.kind == rlNoLine
+
+  test "formatString":
+    check testFormatString("", "")
+    check testFormatString("a", "a")
+    check testFormatString("ab", "ab")
+    check testFormatString("}", "}")
+
+    var variables = emptyVariables()
+    variables["l"].dictv["v"] = newValue("a")
+    variables["l"].dictv["v2"] = newValue("ab")
+    variables["l"].dictv["v3"] = newValue("xyz")
+
+    check testFormatString("{v}", "a", variables)
+    check testFormatString("{v2}", "ab", variables)
+    check testFormatString("{v3}", "xyz", variables)
+
+    check testFormatString("1{v}2", "1a2", variables)
+    check testFormatString("1{v3}2", "1xyz2", variables)
+
+    check testFormatString("{v}{v}", "aa", variables)
+    check testFormatString("{v}{v2}", "aab", variables)
+    check testFormatString("{v}{v2}{v3}", "aabxyz", variables)
+
+    check testFormatString("{{{v} {{ } {v2}{v3}", "{a { } abxyz", variables)
+
+    check testFormatString(" {v} {v} ", " a a ", variables)
+
+    check testFormatString("{{", "{", variables)
+    check testFormatString(" {{ ", " { ", variables)
+
+  test "formatString warnings":
+    check testFormatStringWarn("{", newWarningData(wNoEndingBracket, "", 1))
+    check testFormatStringWarn("{a", newWarningData(wNoEndingBracket, "", 2))
+    check testFormatStringWarn("  {a", newWarningData(wNoEndingBracket, "", 4))
+    check testFormatStringWarn("  {abcd", newWarningData(wNoEndingBracket, "", 7))
+
+    check testFormatStringWarn("{a", newWarningData(wNoEndingBracket, "", 2))
+    check testFormatStringWarn("{abc", newWarningData(wNoEndingBracket, "", 4))
+
+    check testFormatStringWarn("{3", newWarningData(wInvalidVarNameStart, "", 1))
+    check testFormatStringWarn("{3}", newWarningData(wInvalidVarNameStart, "", 1))
+    check testFormatStringWarn(" {3}", newWarningData(wInvalidVarNameStart, "", 2))
+
+    check testFormatStringWarn("{a}", newWarningData(wVariableMissing, "a", 1))
+    check testFormatStringWarn("{a!}", newWarningData(wInvalidVarName, "", 2))
+
+    check testFormatStringWarn("{{{a!}", newWarningData(wInvalidVarName, "", 4))

@@ -585,7 +585,7 @@ Popular tea: Earl Grey
 Available kinds: ["Black","Green","Oolong"]
 #+END_SRC
 
-You use variables in the t dictionary ("tea" variables), to
+You use variables in the t dictionary (tea variables), to
 control where the output goes, how many times it repeats and
 other aspects controlling a command.
 
@@ -2001,6 +2001,7 @@ List of functions:
 - [[#find][find]] -- Find the position of a substring in a string.
 - [[#float][float]] -- Create a float from an int.
 - [[#float][float]] -- Create a float from a number string.
+- [[#format][format]] -- Format a string using replacement variables similar to a replacement block.
 - [[#get][get]] -- Get a dictionary value by its key.
 - [[#get][get]] -- Get a list value by its index.
 - [[#githubAnchor][githubAnchor]] -- Create Github anchor names from heading names.
@@ -2396,6 +2397,32 @@ Examples:
 float("2") => 2.0
 float("2.4") => 2.4
 float("33") => 33.0
+#+END_SRC
+
+[[#contents][茶]]
+
+** format
+:PROPERTIES:
+:CUSTOM_ID: format
+:END:
+
+Format a string using replacement variables similar to a replacement block. To enter a left bracket use two in a row.
+
+#+BEGIN_SRC
+format(str: string) string
+#+END_SRC
+
+Example:
+
+#+BEGIN_SRC
+myVar = "variable"
+str = format("this is a {myVar}")
+
+this is a variable
+
+str = format("use two {{ to get one")
+
+use two { to get one
 #+END_SRC
 
 [[#contents][茶]]

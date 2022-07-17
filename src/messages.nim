@@ -200,6 +200,9 @@ type
     wUseStop,              ## w187
     wMissingEndingTriple,  ## w188
     wInvalidStringType,    ## w189
+    wInvalidVarNameStart,  ## w190
+    wInvalidVarName,       ## w191
+    wNoEndingBracket,      ## w192
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -393,5 +396,8 @@ const
     "Use '...return(\"stop\")...' in a code file.", ## wUseStop
     "Missing the ending triple quotes.", ## wMissingEndingTriple
     "Invalid string type, expected rb, json or dn.", ## wInvalidStringType
+    "Invalid variable name; names start with an ascii letter.", ## wInvalidVarNameStart
+    "Invalid variable name; names contain letters, digits or underscores.", ## wInvalidVarName
+    "No ending bracket.", ## wNoEndingBracket
     ]
     ## The message text.

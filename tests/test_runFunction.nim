@@ -7,12 +7,14 @@ import vartypes
 import runFunction
 import messages
 import funtypes
+import variables
 
 # Unicode strings in multiple languages good for test cases.
 # https://www.cl.cam.ac.uk/~mgk25/ucs/examples/quickbrown.txt
 
 proc testFunction(functionName: string, parameters: seq[Value],
     eFunResult: FunResult,
+    variables: Variables = emptyVariables(),
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]
@@ -23,7 +25,7 @@ proc testFunction(functionName: string, parameters: seq[Value],
     echo "The function doesn't exist: " & functionName
     return false
   let functionSpec = functionSpecO.get()
-  let funResult = functionSpec.functionPtr(parameters)
+  let funResult = functionSpec.functionPtr(variables, parameters)
 
   result = true
   if not expectedItem("funResult", funResult, eFunResult):
@@ -1632,3 +1634,20 @@ d.sub.x = "tea"
 d.sub.y = 4"""
     check testFunction("string", @[newValue("d"), newValue(dict)],
       newFunResult(newValue(expected)))
+
+  test "format":
+    let str = newValue("hello")
+    check testFunction("format", @[str],
+      newFunResult(newValue("hello")))
+
+  test "format one":
+    var variables = emptyVariables()
+    variables["l"].dictv["name"] = newValue("world")
+    let str = newValue("hello {name}")
+    check testFunction("format", @[str],
+      newFunResult(newValue("hello world")), variables)
+
+  test "format warning":
+    let str = newValue("hello {name}")
+    let eFunResult = newFunResultWarn(wVariableMissing, 1)
+    check testFunction("format", @[str], eFunResult)

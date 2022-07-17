@@ -172,6 +172,7 @@ proc unescapePopularChar*(popular: char): char =
     # Invalid popular character, return 0.
     result = char(0)
 
+# todo: replace StrAndPosOr with StringOr
 func parseJsonStr*(text: string, startPos: Natural): StrAndPosOr =
   ## Parse the quoted json string literal. The startPos points one
   ## @:past the leading double quote.  Return the parsed string value

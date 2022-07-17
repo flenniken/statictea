@@ -3,9 +3,11 @@
 import vartypes
 import messages
 import warnings
+import variables
 
 type
-  FunctionPtr* = proc (parameters: seq[Value]): FunResult {.noSideEffect.}
+  FunctionPtr* = proc (variables: Variables, parameters: seq[Value]):
+      FunResult {.noSideEffect.}
     ## Signature of a statictea function. It takes any number of values
     ## and returns a value or a warning message.
 

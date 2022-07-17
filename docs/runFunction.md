@@ -51,6 +51,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funReturn](#funreturn) &mdash; Return the given value and control command looping.
 * [funString_aoss](#funstring_aoss) &mdash; Convert the variable to a string.
 * [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names.
+* [funFormat](#funformat) &mdash; Format a string using replacement variables similar to a replacement block.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -82,7 +83,7 @@ cmp(9, 2) => 1
 ~~~~
 
 ```nim
-func funCmp_iii(parameters: seq[Value]): FunResult
+func funCmp_iii(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funCmp_ffi
@@ -103,7 +104,7 @@ cmp(9.3, 2.2) => 1
 ~~~~
 
 ```nim
-func funCmp_ffi(parameters: seq[Value]): FunResult
+func funCmp_ffi(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funCmp_ssoii
@@ -129,7 +130,7 @@ cmp("Tea", "tea", 1) => 0
 ~~~~
 
 ```nim
-func funCmp_ssoii(parameters: seq[Value]): FunResult
+func funCmp_ssoii(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funConcat
@@ -148,7 +149,7 @@ concat("a", "b") => "ab"
 ~~~~
 
 ```nim
-func funConcat(parameters: seq[Value]): FunResult
+func funConcat(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funLen_si
@@ -167,7 +168,7 @@ len("añyóng") => 6
 ~~~~
 
 ```nim
-func funLen_si(parameters: seq[Value]): FunResult
+func funLen_si(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funLen_li
@@ -187,7 +188,7 @@ len(list(4, 5)) => 2
 ~~~~
 
 ```nim
-func funLen_li(parameters: seq[Value]): FunResult
+func funLen_li(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funLen_di
@@ -207,7 +208,7 @@ len(dict("a", 4, "b", 3)) => 2
 ~~~~
 
 ```nim
-func funLen_di(parameters: seq[Value]): FunResult
+func funLen_di(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funGet_lioaa
@@ -229,7 +230,7 @@ get(list, 3, 99) => 99
 ~~~~
 
 ```nim
-func funGet_lioaa(parameters: seq[Value]): FunResult
+func funGet_lioaa(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funGet_dsoaa
@@ -260,7 +261,7 @@ d.tea => "Earl Grey"
 ~~~~
 
 ```nim
-func funGet_dsoaa(parameters: seq[Value]): FunResult
+func funGet_dsoaa(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funIf0
@@ -297,7 +298,7 @@ drink6 => 0
 ~~~~
 
 ```nim
-func funIf0(parameters: seq[Value]): FunResult
+func funIf0(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funIf1
@@ -334,7 +335,7 @@ drink6 => 0
 ~~~~
 
 ```nim
-func funIf1(parameters: seq[Value]): FunResult
+func funIf1(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funAdd_iii
@@ -354,7 +355,7 @@ add(-2, -5) => -7
 ~~~~
 
 ```nim
-func funAdd_iii(parameters: seq[Value]): FunResult
+func funAdd_iii(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funAdd_fff
@@ -373,7 +374,7 @@ add(3.2, -2.2) => 1.0
 ~~~~
 
 ```nim
-func funAdd_fff(parameters: seq[Value]): FunResult
+func funAdd_fff(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funExists
@@ -393,7 +394,7 @@ exists(d, "coffee") => 0
 ~~~~
 
 ```nim
-func funExists(parameters: seq[Value]): FunResult
+func funExists(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funCase_iloaa
@@ -428,7 +429,7 @@ case(3, cases, "wine") => "wine"
 ~~~~
 
 ```nim
-func funCase_iloaa(parameters: seq[Value]): FunResult
+func funCase_iloaa(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funCase_sloaa
@@ -462,7 +463,7 @@ case("bunch", cases, "other") => "other"
 ~~~~
 
 ```nim
-func funCase_sloaa(parameters: seq[Value]): FunResult
+func funCase_sloaa(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # parseVersion
@@ -495,7 +496,7 @@ cmpVersion("1.2.5", "1.2.5") => 0
 ~~~~
 
 ```nim
-func funCmpVersion(parameters: seq[Value]): FunResult
+func funCmpVersion(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funFloat_if
@@ -514,7 +515,7 @@ float(-33) => -33.0
 ~~~~
 
 ```nim
-func funFloat_if(parameters: seq[Value]): FunResult
+func funFloat_if(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funFloat_sf
@@ -534,7 +535,7 @@ float("33") => 33.0
 ~~~~
 
 ```nim
-func funFloat_sf(parameters: seq[Value]): FunResult
+func funFloat_sf(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funInt_fosi
@@ -569,7 +570,7 @@ int(-6.3456, "truncate") => -6
 ~~~~
 
 ```nim
-func funInt_fosi(parameters: seq[Value]): FunResult
+func funInt_fosi(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funInt_sosi
@@ -604,7 +605,7 @@ int("-6.3456", "truncate") => -6
 ~~~~
 
 ```nim
-func funInt_sosi(parameters: seq[Value]): FunResult
+func funInt_sosi(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funFind
@@ -632,7 +633,7 @@ find(msg, "party", 0) = 0
 ~~~~
 
 ```nim
-func funFind(parameters: seq[Value]): FunResult
+func funFind(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funSlice
@@ -657,7 +658,7 @@ slice("añyóng", 0, 3) => "añy"
 ~~~~
 
 ```nim
-func funSlice(parameters: seq[Value]): FunResult
+func funSlice(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funDup
@@ -680,7 +681,7 @@ dup("", 3) => ""
 ~~~~
 
 ```nim
-func funDup(parameters: seq[Value]): FunResult
+func funDup(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funDict_old
@@ -702,7 +703,7 @@ dict(list("a", 5, "b", 33, "c", 0)) =>
 ~~~~
 
 ```nim
-func funDict_old(parameters: seq[Value]): FunResult
+func funDict_old(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funList
@@ -727,7 +728,7 @@ a = ["a", 5, "b"]
 ~~~~
 
 ```nim
-func funList(parameters: seq[Value]): FunResult
+func funList(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funReplace
@@ -790,7 +791,7 @@ replace("", 0, 0, "abcd") => abcd
 ~~~~
 
 ```nim
-func funReplace(parameters: seq[Value]): FunResult
+func funReplace(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funReplaceRe_sls
@@ -816,7 +817,7 @@ For developing and debugging regular expressions see the
 website: https://regex101.com/
 
 ```nim
-func funReplaceRe_sls(parameters: seq[Value]): FunResult
+func funReplaceRe_sls(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funPath
@@ -851,7 +852,7 @@ path("src\runFunction.nim", "\") => {
 ~~~~
 
 ```nim
-func funPath(parameters: seq[Value]): FunResult
+func funPath(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funLower
@@ -871,7 +872,7 @@ lower("TEĀ") => "teā"
 ~~~~
 
 ```nim
-func funLower(parameters: seq[Value]): FunResult
+func funLower(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funKeys
@@ -891,7 +892,7 @@ values(d) => ["apple", 2, 3]
 ~~~~
 
 ```nim
-func funKeys(parameters: seq[Value]): FunResult
+func funKeys(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funValues
@@ -911,7 +912,7 @@ values(d) => ["apple", 2, 3]
 ~~~~
 
 ```nim
-func funValues(parameters: seq[Value]): FunResult
+func funValues(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funSort_lsosl
@@ -946,7 +947,7 @@ sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
 ~~~~
 
 ```nim
-func funSort_lsosl(parameters: seq[Value]): FunResult
+func funSort_lsosl(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funSort_lssil
@@ -977,7 +978,7 @@ sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
 ~~~~
 
 ```nim
-func funSort_lssil(parameters: seq[Value]): FunResult
+func funSort_lssil(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funSort_lsssl
@@ -1008,7 +1009,7 @@ sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 ~~~~
 
 ```nim
-func funSort_lsssl(parameters: seq[Value]): FunResult
+func funSort_lsssl(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funGithubAnchor_ss
@@ -1041,7 +1042,7 @@ $$ : anchor = githubAnchor(entry.name)
 ~~~~
 
 ```nim
-func funGithubAnchor_ss(parameters: seq[Value]): FunResult
+func funGithubAnchor_ss(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funGithubAnchor_ll
@@ -1062,7 +1063,7 @@ githubAnchor(list) =>
 ~~~~
 
 ```nim
-func funGithubAnchor_ll(parameters: seq[Value]): FunResult
+func funGithubAnchor_ll(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funType_as
@@ -1084,7 +1085,7 @@ type(dict("a", 1)) => "dict"
 ~~~~
 
 ```nim
-func funType_as(parameters: seq[Value]): FunResult
+func funType_as(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funJoinPath_loss
@@ -1127,7 +1128,7 @@ joinPath(["/", "tea"]) =>
 ~~~~
 
 ```nim
-func funJoinPath_loss(parameters: seq[Value]): FunResult
+func funJoinPath_loss(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funJoin_lsois
@@ -1152,7 +1153,7 @@ join(["a", "", "c"], "|", 1) => "a|c"
 ~~~~
 
 ```nim
-func funJoin_lsois(parameters: seq[Value]): FunResult
+func funJoin_lsois(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funWarn
@@ -1171,7 +1172,7 @@ b = if1(c, warn("c is one"), "")
 ~~~~
 
 ```nim
-func funWarn(parameters: seq[Value]): FunResult
+func funWarn(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funReturn
@@ -1198,7 +1199,7 @@ if1(c, return(""))
 ~~~~
 
 ```nim
-func funReturn(parameters: seq[Value]): FunResult
+func funReturn(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funString_aoss
@@ -1244,7 +1245,7 @@ c = 3
 ~~~~
 
 ```nim
-func funString_aoss(parameters: seq[Value]): FunResult
+func funString_aoss(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funString_sds
@@ -1267,7 +1268,32 @@ d.z.a = 8
 ~~~~
 
 ```nim
-func funString_sds(parameters: seq[Value]): FunResult
+func funString_sds(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funFormat
+
+Format a string using replacement variables similar to a replacement block. To enter a left bracket use two in a row.
+
+~~~
+format(str: string) string
+~~~~
+
+Example:
+
+~~~
+myVar = "variable"
+str = format("this is a {myVar}")
+
+this is a variable
+
+str = format("use two {{ to get one")
+
+use two { to get one
+~~~~
+
+```nim
+func funFormat(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # createFunctionTable
@@ -1288,7 +1314,7 @@ proc getFunctionList(name: string): seq[FunctionSpec]
 
 # getFunction
 
-Find the function with the given name and return a pointer to it. If there are multiple functions with the name, return the one that matches the parameters, if none match, return the first one.
+Find the function with the given name and return a pointer to it. If there are multiple functions with the name, return the one that matches the arguments, if none match, return the first one.
 
 ```nim
 proc getFunction(functionName: string; parameters: seq[Value]): Option[

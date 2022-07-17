@@ -203,7 +203,10 @@ MessageId = enum
   wNoGlobalInCodeFile,      ## w186
   wUseStop,                 ## w187
   wMissingEndingTriple,     ## w188
-  wInvalidStringType         ## w189
+  wInvalidStringType,       ## w189
+  wInvalidVarNameStart,     ## w190
+  wInvalidVarName,          ## w191
+  wNoEndingBracket           ## w192
 ```
 
 # Messages
@@ -401,7 +404,10 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "You cannot assign to the g namespace in a code file.", ## wNoGlobalInCodeFile
     "Use \'...return(\"stop\")...\' in a code file.", ## wUseStop
     "Missing the ending triple quotes.", ## wMissingEndingTriple
-    "Invalid string type, expected rb, json or dn."]
+    "Invalid string type, expected rb, json or dn.", ## wInvalidStringType
+    "Invalid variable name; names start with an ascii letter.", ## wInvalidVarNameStart
+    "Invalid variable name; names contain letters, digits or underscores.", ## wInvalidVarName
+    "No ending bracket."]
 ```
 
 

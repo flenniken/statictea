@@ -20,6 +20,11 @@ Handle the replacement block lines.
 * [storeLineSegments](#storelinesegments) &mdash; Divide the line into segments and write them to the TempSegments' temp file.
 * [yieldReplacementLine](#yieldreplacementline) &mdash; Yield all the replacement block lines and one after.
 * [newTempSegments](#newtempsegments) &mdash; Read replacement block lines and return a TempSegments object containing the compiled block.
+* type: [StringOr](#stringor) &mdash; A string or a warning.
+* [newStringOr](#newstringor) &mdash; Return a new StringOr object containing a warning.
+* [newStringOr](#newstringor-1) &mdash; Return a new StringOr object containing a warning.
+* [newStringOr](#newstringor-2) &mdash; Return a new StringOr object containing a string.
+* [formatString](#formatstring) &mdash; <p>Format the string by filling in the variable placeholders with their values.
 
 # ReplaceLineKind
 
@@ -152,6 +157,49 @@ Read replacement block lines and return a TempSegments object containing the com
 proc newTempSegments(env: var Env; lb: var LineBuffer;
                      prepostTable: PrepostTable; command: string;
                      repeat: Natural; variables: Variables): Option[TempSegments]
+```
+
+# StringOr
+
+A string or a warning.
+
+```nim
+StringOr = OpResultWarn[string]
+```
+
+# newStringOr
+
+Return a new StringOr object containing a warning.
+
+```nim
+func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
+```
+
+# newStringOr
+
+Return a new StringOr object containing a warning.
+
+```nim
+func newStringOr(warningData: WarningData): StringOr
+```
+
+# newStringOr
+
+Return a new StringOr object containing a string.
+
+```nim
+func newStringOr(str: string): StringOr
+```
+
+# formatString
+
+<p>Format the string by filling in the variable placeholders with their values. Generate a warning when the variable doesn't exist. No space around the bracketed variables.</p>
+<p>let var = "variable" "string {var}" => "string variable"</p>
+<p>To enter a left bracket use two in a row. "single bracket {{" => "single bracket {" </p>
+
+
+```nim
+proc formatString(variables: Variables; text: string): StringOr
 ```
 
 

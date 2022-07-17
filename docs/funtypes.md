@@ -20,7 +20,7 @@ Statictea function types and supporting routines.
 Signature of a statictea function. It takes any number of values and returns a value or a warning message.
 
 ```nim
-FunctionPtr = proc (parameters: seq[Value]): FunResult
+FunctionPtr = proc (variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # FunResultKind

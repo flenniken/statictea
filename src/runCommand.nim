@@ -495,7 +495,7 @@ proc getFunctionValueAndLength*(
   let functionSpec = functionSpecO.get()
 
   # Call the function.
-  let funResult = functionSpec.functionPtr(parameters)
+  let funResult = functionSpec.functionPtr(variables, parameters)
   if funResult.kind == frWarning:
     var warningPos: int
     if funResult.parameter < parameterStarts.len:

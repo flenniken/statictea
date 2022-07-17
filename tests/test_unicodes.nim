@@ -13,7 +13,7 @@ import sharedtestcode
 
 proc testVisibleControl(text: string, eText: string): bool =
   let got = visibleControl(text)
-  result = got_expected(got, eText)
+  result = gotExpected(got, eText)
 
 func stringToHex(str: string): string =
   ## Convert the string bytes to hex bytes like 34 a9 ff e2.
