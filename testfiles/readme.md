@@ -14,6 +14,8 @@ This folder contains stf test files for statictea.
 * [endblock-readme](../testfiles/endblock-readme.stf.md) &mdash; The endblock readme example.
 * [endcommand-alone](../testfiles/endcommand-alone.stf.md) &mdash; Test endcommand without a block command.
 * [endline](../testfiles/endline.stf.md) &mdash; Test there are no extra lines for the readmefun case.
+* [format-basic](../testfiles/format-basic.stf.md) &mdash; Test the format function.
+* [format-warnings](../testfiles/format-warnings.stf.md) &mdash; Test the format function's warning messages.
 * [globalvars](../testfiles/globalvars.stf.md) &mdash; Test global variables.
 * [hello](../testfiles/hello.stf.md) &mdash; Readme Hello World example.
 * [if-fun](../testfiles/if-fun.stf.md) &mdash; Test the if0 and if1 functions.

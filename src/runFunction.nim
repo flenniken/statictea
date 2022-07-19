@@ -1789,7 +1789,7 @@ func funFormat*(variables: Variables, parameters: seq[Value]): FunResult =
   let str = map["a"].stringv
   let stringOr = formatString(variables, str)
   if stringOr.isMessage:
-    return newFunResultWarn(stringOr.message.warning, 1)
+    return newFunResultWarn(stringOr.message)
 
   result = newFunResult(newValue(stringOr.value))
 

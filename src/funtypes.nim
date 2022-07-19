@@ -34,11 +34,11 @@ type
         warningData*: WarningData
 
 func newFunResultWarn*(warning: MessageId, parameter: Natural = 0,
-      p1: string = ""): FunResult =
+    p1: string = "", pos = 0): FunResult =
   ## Return a new FunResult object containing a warning. It takes a
   ## message id, the index of the problem parameter, and the optional
   ## string that goes with the warning.
-  let warningData = newWarningData(warning, p1)
+  let warningData = newWarningData(warning, p1, pos)
   result = FunResult(kind: frWarning, parameter: parameter,
                      warningData: warningData)
 

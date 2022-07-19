@@ -1649,5 +1649,5 @@ d.sub.y = 4"""
 
   test "format warning":
     let str = newValue("hello {name}")
-    let eFunResult = newFunResultWarn(wVariableMissing, 1)
+    let eFunResult = newFunResultWarn(wVariableMissing, 0, "name", 7)
     check testFunction("format", @[str], eFunResult)

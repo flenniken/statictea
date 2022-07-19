@@ -67,7 +67,7 @@ Return a new FunResult object containing a warning. It takes a message id, the i
 
 ```nim
 func newFunResultWarn(warning: MessageId; parameter: Natural = 0;
-                      p1: string = ""): FunResult
+                      p1: string = ""; pos = 0): FunResult
 ```
 
 # newFunResultWarn
