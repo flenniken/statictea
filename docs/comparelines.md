@@ -38,7 +38,7 @@ func opMessageStr[T](message: string): OpResultStr[T]
 
 # splitNewLines
 
-Split lines and keep the line endings. Works with n and rn type endings.
+Split lines and keep the line endings. Works with n and rn type endings. keyword: splitLines
 
 ```nim
 func splitNewLines(content: string): seq[string]

@@ -5,13 +5,16 @@ Temporary file methods.
 * [tempFile.nim](../src/tempFile.nim) &mdash; Nim source code.
 # Index
 
-* type: [TempFile](#tempfile) &mdash; Temporary filename and file object.
-* [openTempFile](#opentempfile) &mdash; Create and open an empty file in the temp directory open for read write.
-* [closeDelete](#closedelete) &mdash; Close and delete the temp file.
+* type: [TempFile](#tempfile) &mdash; Temporary filename and associated file object.
+* type: [TempFileStream](#tempfilestream) &mdash; Temporary filename and associated stream object.
+* [openTempFile](#opentempfile) &mdash; Create an empty file in the temp directory open for read write.
+* [closeDeleteFile](#closedeletefile) &mdash; Close and delete the temp file.
+* [openTempFileStream](#opentempfilestream) &mdash; Create an empty file stream in the temp directory open for read write.
+* [closeDeleteStream](#closedeletestream) &mdash; Close the stream and delete the associated temp file.
 
 # TempFile
 
-Temporary filename and file object.
+Temporary filename and associated file object.
 
 ```nim
 TempFile = object
@@ -20,20 +23,47 @@ TempFile = object
 
 ```
 
+# TempFileStream
+
+Temporary filename and associated stream object.
+
+```nim
+TempFileStream = object
+  filename*: string
+  stream*: Stream
+
+```
+
 # openTempFile
 
-Create and open an empty file in the temp directory open for read write. When no error, return TempFile containing the file and filename.
+Create an empty file in the temp directory open for read write. Return a TempFile object containing the filename and file object.  Call closeDeleteFile when you are done with the file.
 
 ```nim
 proc openTempFile(): Option[TempFile]
 ```
 
-# closeDelete
+# closeDeleteFile
 
 Close and delete the temp file.
 
 ```nim
-proc closeDelete(tempFile: TempFile)
+proc closeDeleteFile(tempFile: TempFile)
+```
+
+# openTempFileStream
+
+Create an empty file stream in the temp directory open for read write. Return a TempFileStream object containing the filename and stream object.  Call closeDeleteStream when you are done with the stream.
+
+```nim
+proc openTempFileStream(): Option[TempFileStream]
+```
+
+# closeDeleteStream
+
+Close the stream and delete the associated temp file.
+
+```nim
+proc closeDeleteStream(tempFileStream: TempFileStream)
 ```
 
 

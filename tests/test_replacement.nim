@@ -1,11 +1,9 @@
-import std/os
 import std/unittest
 import std/options
 import std/tables
 import env
 import replacement
 import matches
-import tempFile
 import readlines
 import variables
 import sharedtestcode
@@ -36,7 +34,7 @@ proc testTempSegments(replacmentBlock: string,
     storeLineSegments(env, tempSegments, line)
 
   writeTempSegments(env, tempSegments, startLineNum, variables)
-  tempSegments.closeDelete()
+  tempSegments.closeDeleteTempSegments()
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines, eResultLines)
 
@@ -98,43 +96,30 @@ suite "replacement":
   # t.five = 5
   # g.aboutfive = 5.11
 
-  test "getTempFileStream":
-    let tempFileStreamO = getTempFileStream()
-    check isSome(tempFileStreamO)
-    let tempFileStream = tempFileStreamO.get()
-    let tempFile = tempFileStream.tempFile
-    tempFile.closeDelete()
-    check not fileExists(tempFile.filename)
-
   test "stringSegment":
-    check stringSegment("a", 0, 1) == "3,a\n"
-    check stringSegment("\n", 0, 1) == "1,\n"
-    check stringSegment("ab", 0, 2) == "3,ab\n"
-    check stringSegment("a\n", 0, 2) == "1,a\n"
+    check stringSegment("", false) == "0,\n"
+    check stringSegment("", true) == "3,\n"
 
-    check stringSegment("ab", 0, 1) == "0,a\n"
-    check stringSegment("a\n", 0, 1) == "0,a\n"
+    check stringSegment("a", false) == "0,a\n"
+    check stringSegment("a", true) == "3,a\n"
+    check stringSegment("\n", true) == "1,\n"
 
-    check stringSegment("ab", 1, 2) == "3,b\n"
-    check stringSegment("a\n", 1, 2) == "1,\n"
-
-    check stringSegment("test\n", 0, 2) == "0,te\n"
-    check stringSegment("test\n", 1, 3) == "0,es\n"
-    check stringSegment("test\n", 2, 4) == "0,st\n"
-    check stringSegment("test\n", 3, 5) == "1,t\n"
+    check stringSegment("abc", false) == "0,abc\n"
+    check stringSegment("abc", true) == "3,abc\n"
+    check stringSegment("abc\n", true) == "1,abc\n"
 
   test "varSegment":
-    check varSegment("{a}", 1, 1, false)     == "2,{a}\n"
-    # check varSegment("{ a }", 2, 1, false)   == "2,{ a }\n"
-    # check varSegment("{ abc }", 2, 3, false) == "2,2   ,3   ,{ abc }\n"
-    check varSegment("{t.a}", 1, 3, false)   == "2,{t.a}\n"
-    check varSegment("{t.ab}", 1, 4, false)  == "2,{t.ab}\n"
+    check varSegment("", false) == "2,{}\n"
+    check varSegment("", true) == "4,{}\n"
 
-    check varSegment("{a}", 1, 1, true)     == "4,{a}\n"
-    # check varSegment("{ a }", 2, 1, true)   == "4,2   ,1   ,{ a }\n"
-    # check varSegment("{ abc }", 2, 3, true) == "4,2   ,3   ,{ abc }\n"
-    check varSegment("{t.a}", 1, 3, true)   == "4,{t.a}\n"
-    check varSegment("{t.ab}", 1, 4, true)  == "4,{t.ab}\n"
+    check varSegment("a", false) == "2,{a}\n"
+    check varSegment("a", true) == "4,{a}\n"
+
+    check varSegment("abc", false) == "2,{abc}\n"
+    check varSegment("abc", true) == "4,{abc}\n"
+
+    check varSegment("s.abc", false) == "2,{s.abc}\n"
+    check varSegment("s.abc", true) == "4,{s.abc}\n"
 
   test "lineToSegments":
     check testLineToSegments("test\n", @["1,test\n"])

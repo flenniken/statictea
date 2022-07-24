@@ -1282,14 +1282,19 @@ format(str: string) string
 Example:
 
 ~~~
-myVar = "variable"
-str = format("this is a {myVar}")
+let first = "Earl"
+let last = "Grey"
+str = format("name: {first} {last}")
 
-this is a variable
+str => "name: Earl Grey"
+~~~~
 
+To enter a left bracket use two in a row.
+
+~~~
 str = format("use two {{ to get one")
 
-use two { to get one
+str => "use two { to get one"
 ~~~~
 
 ```nim

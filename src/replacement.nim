@@ -17,13 +17,15 @@ import warnings
 
 # To support replacement blocks that consists of many lines and blocks
 # that repeat many times, we read the replacement block and compile
-# and store it in a temp file to a format that is easy to write out
+# and store it in a temp file in a format that is easy to write out
 # multiple times.
 
 # The temporary file consists of parts of lines called segments. There
-# are segments for strings and segments for variables.
+# are segments for the variables in the line and segments for the rest
+# of the text.
 
-# Segments are a text format containing a number, a comma and a string.
+# Segments are a text format containing a number (type), a comma and a
+# string.
 
 # All segments end with a newline. If a template line uses cr/lf, the
 # segment will end with cr/lf.  The segment type tells you whether to
@@ -96,7 +98,7 @@ type
 
   TempSegments = object
     ## A temporary file to store the parsed replacement block.
-    tempFile: TempFile
+    tempStream: TempFileStream
     lb: LineBuffer
 
 func newStringOr*(warning: MessageId, p1: string = "", pos = 0):
@@ -127,30 +129,6 @@ const
   maxLineLen = defaultMaxLineLen + 20
     ## The max segment line length. Add 20 for the segment prefix.
 
-type
-  # todo: move this and support procedures into tempfile.nim. Handle
-  # closing correctly.
-  TempFileStream = object
-    ## Temporary file and associated stream.
-    tempFile*: TempFile
-    stream*: Stream
-
-proc getTempFileStream*(): Option[TempFileStream] =
-  ## Create a stream from a temporary file and return both.
-
-  # Get a temp file.
-  let tempFileO = openTempFile()
-  if not isSome(tempFileO):
-    return
-  let tempFile = tempFileO.get()
-
-  # Create a stream from the temp file.
-  var stream = newFileStream(tempFile.file)
-  if stream == nil:
-    tempFile.closeDelete()
-    return
-  result = some(TempFileStream(tempFile: tempFile, stream: stream))
-
 proc seekToStart(tempSegments: var TempSegments) =
   ## Seek to the start of the TempSegments file so you can read the
   ## same segments again with readNextSegment.
@@ -161,64 +139,35 @@ proc readNextSegment(env: var Env, tempSegments: var TempSegments): string =
   ## no more segments.
   result = tempSegments.lb.readline()
 
-proc stringSegment*(line: string, start: Natural, finish: Natural): string =
-  ## Return the string segment. The line contains the segment starting at
-  ## the given position and ending at finish position in the line (1
-  ## after).
-
-  let length = finish - start
-  assert length > 0
-  assert start + length <= line.len
-
-  var ending = "\n"
-  var segmentType: SegmentType
-
-  if finish == line.len:
-    # The segment ends the line.
-    if line[finish-1] == '\n':
-      segmentType = newline
-      ending = ""
+proc stringSegment*(fragment: string, atEnd: bool): string =
+  ## Return a string segment made from the fragment. AtEnd is true
+  ## when the fragment ends the line.
+  let length = fragment.len
+  if length == 0:
+    if atEnd:
+      return "3,\n"
     else:
-      segmentType = endline
-  else:
-    segmentType = middle
+      return "0,\n"
 
-  result = "$1,$2$3" % [$ord(segmentType), line[start ..< finish], ending]
-
-proc stringSegment*(line: string, atEnd: bool): string =
-  ## Return a string segment.
-  let length = line.len
-  var ending = "\n"
+  var ending: string
   var segmentType: SegmentType
   if atEnd:
     # The segment ends the line.
-    if line[length-1] == '\n':
-      segmentType = newline
+    if fragment[length-1] == '\n':
+      segmentType = newline # 1
       ending = ""
     else:
-      segmentType = endline
+      segmentType = endline # 3
+      ending = "\n"
   else:
-    segmentType = middle
+    segmentType = middle # 0
+    ending = "\n"
 
-  result = "$1,$2$3" % [$ord(segmentType), line, ending]
-
-proc varSegment*(bracketedVar: string, dotNameStrPos: Natural,
-                 dotNameStrLen: Natural, atEnd: bool): string =
-  ## Return a variable segment. The bracketedVar is a string starting
-  ## with { and ending with } that has a variable inside.
-  ## i.e. "{s.name}". The atEnd parameter is true when the
-  ## bracketedVar ends the line without an ending newline.
-  assert dotNameStrPos <= 9999
-  assert dotNameStrLen <= 9999
-  assert bracketedVar.len > 2
-  assert bracketedVar[0] == '{'
-  assert bracketedVar[^1] == '}'
-
-  let segmentValue = $ord(if atEnd: endVariable else: variable)
-  result.add("{segmentValue},{bracketedVar}\n".fmt)
+  result = "$1,$2$3" % [$ord(segmentType), fragment, ending]
 
 proc varSegment*(dotName: string, atEnd: bool): string =
-  ## Return a variable segment.
+  ## Return a variable segment made from the dot name. AtEnd is true
+  ## when the bracketed variable ends the line.
   let segmentValue = $ord(if atEnd: endVariable else: variable)
   result.add("{segmentValue},{{{dotName}}}\n".fmt)
 
@@ -301,12 +250,14 @@ proc lineToSegments*(line: string): seq[string] =
         state = text
 
 func varSegmentDotName*(segment: string): string =
-  ## Parse a variable type segment and return the dotNameStr.
+  ## Given a variable segment, return its dot name.
   # 2,{s.name}\n
   result = segment[3 ..< (segment.len - 2)]
 
 func getOutputStream(env: Env, output: string): Stream =
-  ## Return the output stream.
+  ## Return the environment's stream specified by the output
+  ## parameter. Output is "result", "stderr" or "stdout". Nil is
+  ## returned for other output values.
   case output
   of "result":
     # The block output goes to the result file (default).
@@ -323,8 +274,9 @@ func getOutputStream(env: Env, output: string): Stream =
 
 proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
                         lineNum: Natural, variables: Variables) =
-  ## Write the replacement block stored segments to the result stream.
-  ## The lineNum is the beginning line of the replacement block.
+  ## Write the replacement block's stored segments to the result
+  ## stream with the variables filled in.  The lineNum is the
+  ## beginning line of the replacement block.
 
   # Seek to the beginning of the temp file.
   tempSegments.seekToStart()
@@ -390,46 +342,45 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
 
 proc allocTempSegments*(env: var Env, lineNum: Natural): Option[TempSegments] =
   ## Create a TempSegments object. This reserves memory for a line
-  ## buffer and creates a backing temp file. Call the closeDelete
+  ## buffer and creates a backing temp file. Call the closeDeleteTempSegments
   ## procedure when done to free the memory and to close and delete
   ## the file.
 
   # Create a temporary file for the replacement block segments.
-  let tempFileStreamO = getTempFileStream()
-  if not isSome(tempFileStreamO):
+  let tempStreamO = openTempFileStream()
+  if not isSome(tempStreamO):
     # Unable to create a temporary file.
     env.warn(env.templateFilename, lineNum, wNoTempFile)
     return
-  let tempFileStream = tempFileStreamO.get()
-  let tempFile = tempFileStream.tempFile
-  let stream = tempFileStream.stream
+  let tempStream = tempStreamO.get()
+  let stream = tempStream.stream
 
   # Allocate a line buffer for reading lines.
-  var lineBufferO = newLineBuffer(stream, filename = tempFile.filename,
+  var lineBufferO = newLineBuffer(stream, filename = tempStream.filename,
                                   bufferSize = replacementBufferSize,
                                   maxLineLen = maxLineLen)
   if not lineBufferO.isSome():
-    tempFile.closeDelete()
+    tempStream.closeDeleteStream()
     # Not enough memory for the line buffer.
     env.warn(env.templateFilename, lineNum, wNotEnoughMemoryForLB)
     return
 
-  result = some(TempSegments(tempFile: tempFile, lb: lineBufferO.get()))
+  result = some(TempSegments(tempStream: tempStream, lb: lineBufferO.get()))
 
-proc closeDelete*(tempSegments: TempSegments) =
+proc closeDeleteTempSegments*(tempSegments: TempSegments) =
   ## Close the TempSegments and delete its backing temporary file.
-  tempSegments.tempFile.closeDelete()
+  tempSegments.tempStream.closeDeleteStream()
 
 proc storeLineSegments*(env: var Env, tempSegments: TempSegments, line: string) =
   ## Divide the line into segments and write them to the TempSegments' temp file.
   let segments = lineToSegments(line)
   for segment in segments:
-    tempSegments.tempFile.file.write(segment)
+    tempSegments.tempStream.stream.write(segment)
 
 iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
     LineBuffer, prepostTable: PrepostTable, command: string,
     maxLines: Natural): ReplaceLine =
-  ## Yield all the replacement block lines and one after.
+  ## Yield all the replacement block lines and one line after.
 
   if firstReplaceLine != "":
     if command == "nextline":
@@ -463,16 +414,21 @@ iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
         count.inc
 
 proc formatString*(variables: Variables, text: string): StringOr =
-  ## Format the string by filling in the variable placeholders with
-  ## their values. Generate a warning when the variable doesn't
-  ## exist. No space around the bracketed variables.
-  ##
-  ## let var = "variable"
-  ## "string {var}" => "string variable"
-  ##
-  ## To enter a left bracket use two in a row.
-  ## "single bracket {{" => "single bracket {"
-  ##
+  ## Format a string by filling in the variable placeholders with
+  ## @:their values. Generate a warning when the variable doesn't
+  ## @:exist. No space around the bracketed variables.
+  ## @:
+  ## @:~~~
+  ## @:let first = "Earl"
+  ## @:let last = "Grey"
+  ## @:"name: {first} {last}" => "name: Earl Grey"
+  ## @:~~~~
+  ## @:
+  ## @:To enter a left bracket use two in a row.
+  ## @:
+  ## @:~~~
+  ## @:"{{" => "{"
+  ## @:~~~~
   type
     State = enum
       ## Parsing states.

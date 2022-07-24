@@ -142,7 +142,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       if loopControl == "stop":
         break
 
-    closeDelete(tempSegments)
+    closeDeleteTempSegments(tempSegments)
 
     if lastLine.kind == rlNormalLine:
       inOutExtraLine = newNormalLine(lastLine.line)

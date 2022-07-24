@@ -267,7 +267,7 @@ and three
     var tempFile = tempFileO.get()
     tempFile.file.write(content)
     tempFile.file.close()
-    defer: tempFile.closeDelete()
+    defer: tempFile.closeDeleteFile()
 
     var stream = newFileStream(tempFile.filename, fmRead)
     var lineBufferO = newLineBuffer(stream)

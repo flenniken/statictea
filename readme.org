@@ -2415,14 +2415,19 @@ format(str: string) string
 Example:
 
 #+BEGIN_SRC
-myVar = "variable"
-str = format("this is a {myVar}")
+let first = "Earl"
+let last = "Grey"
+str = format("name: {first} {last}")
 
-this is a variable
+str => "name: Earl Grey"
+#+END_SRC
 
+To enter a left bracket use two in a row.
+
+#+BEGIN_SRC
 str = format("use two {{ to get one")
 
-use two { to get one
+str => "use two { to get one"
 #+END_SRC
 
 [[#contents][茶]]
