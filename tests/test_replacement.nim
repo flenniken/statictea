@@ -13,6 +13,35 @@ import opresultwarn
 import vartypes
 import warnings
 import messages
+import unicodes
+import compareLines
+
+proc testTempSegments(replacmentBlock: string,
+    variables: Variables = emptyVariables(),
+    eResultLines: seq[string] = @[],
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[],
+  ): bool =
+  ## Test the TempSegments procedures.
+
+  var env = openEnvTest("_testTempSegments.log")
+
+  let startLineNum = 1
+  var tempSegmentsO = allocTempSegments(env, startLineNum)
+  var tempSegments = tempSegmentsO.get()
+
+  let lines = splitNewLines(replacmentBlock)
+  for line in lines:
+    storeLineSegments(env, tempSegments, line)
+
+  writeTempSegments(env, tempSegments, startLineNum, variables)
+  tempSegments.closeDelete()
+
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines, eResultLines)
+
+proc testLineToSegments(line: string, eSegments: seq[string]): bool =
+  return expectedItems(visibleControl(line), lineToSegments(line), eSegments)
 
 proc testFormatString(str: string, eStr: string,
     variables = emptyVariables()): bool =
@@ -44,7 +73,7 @@ proc testYieldReplacementLine(
   ): bool =
   ## Test the yieldReplacementLine.
 
-  var env = openEnvTest("_testTempSegments.log", replaceContent)
+  var env = openEnvTest("_yieldReplacementLine.log", replaceContent)
 
   var lineBufferO = newLineBuffer(env.templateStream, filename = "testStream")
   if not lineBufferO.isSome:
@@ -95,77 +124,89 @@ suite "replacement":
     check stringSegment("test\n", 3, 5) == "1,t\n"
 
   test "varSegment":
-    check varSegment("{a}", 1, 1, false)     == "2,1   ,1   ,{a}\n"
-    check varSegment("{ a }", 2, 1, false)   == "2,2   ,1   ,{ a }\n"
-    check varSegment("{ abc }", 2, 3, false) == "2,2   ,3   ,{ abc }\n"
-    check varSegment("{t.a}", 1, 3, false)   == "2,1   ,3   ,{t.a}\n"
-    check varSegment("{t.ab}", 1, 4, false)  == "2,1   ,4   ,{t.ab}\n"
+    check varSegment("{a}", 1, 1, false)     == "2,{a}\n"
+    # check varSegment("{ a }", 2, 1, false)   == "2,{ a }\n"
+    # check varSegment("{ abc }", 2, 3, false) == "2,2   ,3   ,{ abc }\n"
+    check varSegment("{t.a}", 1, 3, false)   == "2,{t.a}\n"
+    check varSegment("{t.ab}", 1, 4, false)  == "2,{t.ab}\n"
 
-    check varSegment("{a}", 1, 1, true)     == "4,1   ,1   ,{a}\n"
-    check varSegment("{ a }", 2, 1, true)   == "4,2   ,1   ,{ a }\n"
-    check varSegment("{ abc }", 2, 3, true) == "4,2   ,3   ,{ abc }\n"
-    check varSegment("{t.a}", 1, 3, true)   == "4,1   ,3   ,{t.a}\n"
-    check varSegment("{t.ab}", 1, 4, true)  == "4,1   ,4   ,{t.ab}\n"
+    check varSegment("{a}", 1, 1, true)     == "4,{a}\n"
+    # check varSegment("{ a }", 2, 1, true)   == "4,2   ,1   ,{ a }\n"
+    # check varSegment("{ abc }", 2, 3, true) == "4,2   ,3   ,{ abc }\n"
+    check varSegment("{t.a}", 1, 3, true)   == "4,{t.a}\n"
+    check varSegment("{t.ab}", 1, 4, true)  == "4,{t.ab}\n"
 
   test "lineToSegments":
-    check expectedItems("segments", lineToSegments("test\n"), @["1,test\n"])
+    check testLineToSegments("test\n", @["1,test\n"])
+    check testLineToSegments("test", @["3,test\n"])
+    check testLineToSegments("{name}\n", @["2,{name}\n", "1,\n"])
+    check testLineToSegments("{name}", @["4,{name}\n"])
+    check testLineToSegments("test}", @["3,test}\n"])
 
-    check expectedItems("segments", lineToSegments("test"), @["3,test\n"])
-    check expectedItems("segments", lineToSegments("te{1st"), @[
-      "0,te{\n",
-      "3,1st\n",
+    check testLineToSegments("te{1st", @["3,te{1st\n"])
+    check testLineToSegments("abc {{ test {s.name} line\n", @["0,abc { test \n",
+      "2,{s.name}\n", "1, line\n"])
+    check testLineToSegments("abc {test {s.name} line\n", @[
+      "0,abc {test \n",
+      "2,{s.name}\n",
+      "1, line\n",
     ])
-    check expectedItems("segments", lineToSegments("te{st "), @["3,te{st \n"])
+    check testLineToSegments("abc { s.name } line\n", @[
+      "1,abc { s.name } line\n",
+    ])
+    check testLineToSegments("abc { {s.name} line\n", @[
+      "0,abc { \n",
+      "2,{s.name}\n",
+      "1, line\n",
+    ])
 
   test "lineToSegments2":
-    check expectedItems("segments", lineToSegments("te{st( "), @["3,te{st( \n"])
-    check expectedItems("segments", lineToSegments("te{st("), @["3,te{st(\n"])
+    check testLineToSegments("te{st( ", @["3,te{st( \n"])
+    check testLineToSegments("te{st(", @["3,te{st(\n"])
 
   test "lineToSegments3":
-    check expectedItems("segments", lineToSegments("{var}"), @["4,1   ,3   ,{var}\n"])
-    check expectedItems("segments", lineToSegments("test\n"), @["1,test\n"])
-    check expectedItems("segments", lineToSegments("{var}\n"), @["2,1   ,3   ,{var}\n", "1,\n"])
+    check testLineToSegments("{var}", @["4,{var}\n"])
+    check testLineToSegments("test\n", @["1,test\n"])
+    check testLineToSegments("{var}\n", @["2,{var}\n", "1,\n"])
 
-    check expectedItems("segments", lineToSegments("before{var}after\n"), @[
+    check testLineToSegments("before{var}after\n", @[
       "0,before\n",
-      "2,1   ,3   ,{var}\n",
+      "2,{var}\n",
       "1,after\n",
     ])
 
-    check expectedItems("segments", lineToSegments("before{var}after{endingvar}"), @[
+    check testLineToSegments("before{var}after{endingvar}", @[
       "0,before\n",
-      "2,1   ,3   ,{var}\n",
+      "2,{var}\n",
       "0,after\n",
-      "4,1   ,9   ,{endingvar}\n",
+      "4,{endingvar}\n",
     ])
 
-    check expectedItems("segments", lineToSegments("before {s.name} after {h.header}{ a }end\n"), @[
+    check testLineToSegments("before {s.name} after {h.header}{a}end\n", @[
       "0,before \n",
-      "2,1   ,6   ,{s.name}\n",
+      "2,{s.name}\n",
       "0, after \n",
-      "2,1   ,8   ,{h.header}\n",
-      "2,2   ,1   ,{ a }\n",
+      "2,{h.header}\n",
+      "2,{a}\n",
       "1,end\n",
     ])
 
-    check expectedItems("segments", lineToSegments(
-      "{  t.row}before {s.name} after {h.header}{ a }end\n"), @[
-        "2,3   ,5   ,{  t.row}\n",
-        "0,before \n",
-        "2,1   ,6   ,{s.name}\n",
-        "0, after \n",
-        "2,1   ,8   ,{h.header}\n",
-        "2,2   ,1   ,{ a }\n",
-        "1,end\n",
-      ])
+    check testLineToSegments(
+      "{t.row}before {s.name} {{}after {h.header}{a}end\n", @[
+      "2,{t.row}\n",
+      "0,before \n",
+      "2,{s.name}\n",
+      "0, {}after \n",
+      "2,{h.header}\n",
+      "2,{a}\n",
+      "1,end\n",
+    ])
 
-  test "parseVarSegment":
-    check parseVarSegment("2,1   ,1   ,{n}") == "n"
-    check parseVarSegment("2,1   ,3   ,{t.n}") == "t.n"
-    check parseVarSegment("2,2   ,6   ,{ s.name }") == "s.name"
-    check parseVarSegment("2,2   ,6   ,{ s.name    }") == "s.name"
-    check parseVarSegment("2,7   ,6   ,{      s.name }") == "s.name"
-    check parseVarSegment("2,4   ,4   ,{   name }") == "name"
+  test "varSegmentDotName":
+    check varSegmentDotName("2,{n}\n") == "n"
+    check varSegmentDotName("2,{t.n}\n") == "t.n"
+    check varSegmentDotName("2,{s.name}\n") == "s.name"
+    check varSegmentDotName("2,{a.b.c.d.e}\n") == "a.b.c.d.e"
 
   test "yieldReplacementLine nextline":
     let firstReplaceLine = "replacement block\n"
@@ -338,6 +379,8 @@ three
     check testFormatString("{v2}", "ab", variables)
     check testFormatString("{v3}", "xyz", variables)
 
+    check testFormatString("{l.v}", "a", variables)
+
     check testFormatString("1{v}2", "1a2", variables)
     check testFormatString("1{v3}2", "1xyz2", variables)
 
@@ -369,3 +412,64 @@ three
     check testFormatStringWarn("{a!}", newWarningData(wInvalidVarName, "", 2))
 
     check testFormatStringWarn("{{{a!}", newWarningData(wInvalidVarName, "", 4))
+
+  test "testTempSegments empty block":
+    check testTempSegments("")
+
+  test "testTempSegments one line":
+    let eResultLines = @["one line"]
+    check testTempSegments("one line", eResultLines=eResultLines)
+
+  test "testTempSegments two lines":
+    let lines = """
+one line
+two lines
+"""
+    let eResultLines = splitNewlines(lines)
+    check testTempSegments(lines, eResultLines=eResultLines)
+
+  test "testTempSegments missing var":
+    let lines = """
+{var}
+"""
+    let eResultLines = splitNewlines(lines)
+    let eErrLines = @["template.html(1): w58: The replacement variable doesn't exist: var.\n"]
+    check testTempSegments(lines, eErrLines=eErrLines, eResultLines=eResultLines)
+
+  test "testTempSegments var":
+    var variables = emptyVariables()
+    discard assignVariable(variables, "var", newValue(5))
+    let lines = """
+{var}
+"""
+    let eLines = """
+5
+"""
+    let eResultLines = splitNewlines(eLines)
+    check testTempSegments(lines, variables=variables, eResultLines=eResultLines)
+
+  test "testTempSegments multiple vars":
+    var variables = emptyVariables()
+    discard assignVariable(variables, "var", newValue(5))
+    let lines = """
+{var}
+line
+line {var}
+{var} line
+asdf {var} line
+{var}{var} line
+{{
+}}}
+"""
+    let eLines = """
+5
+line
+line 5
+5 line
+asdf 5 line
+55 line
+{
+}}}
+"""
+    let eResultLines = splitNewlines(eLines)
+    check testTempSegments(lines, variables=variables, eResultLines=eResultLines)

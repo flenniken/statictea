@@ -97,8 +97,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
     # Create a new TempSegments object for storing segments.
     var startLineNum = lb.getLineNum()
-    var tempSegmentsO = newTempSegments(env, lb, prepostTable,
-      command, repeat, variables)
+    var tempSegmentsO = allocTempSegments(env, startLineNum)
     if not isSome(tempSegmentsO):
       break # Cannot create temp file or allocate memory, quit.
     var tempSegments = tempSegmentsO.get()

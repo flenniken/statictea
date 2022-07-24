@@ -4,7 +4,6 @@ import std/options
 import std/streams
 import std/strformat
 import std/strutils
-import regexes
 import env
 import vartypes
 import parseCmdLine
@@ -13,127 +12,124 @@ import matches
 import messages
 import variables
 import tempFile
-import parseNumber
 import opresultwarn
 import warnings
 
-
 # To support replacement blocks that consists of many lines and blocks
-# that repeat many times, we read the replacement block and compile it
-# to a format that is easy to write out and store it in a temp file.
+# that repeat many times, we read the replacement block and compile
+# and store it in a temp file to a format that is easy to write out
+# multiple times.
 
 # The temporary file consists of parts of lines called segments. There
 # are segments for strings and segments for variables.
 
-# Segment types:
+# Segments are a text format containing a number, a comma and a string.
 
-# * 0 string segment without ending newline
-# * 1 string segment with ending newline
-# * 2 variable segment
-# * 3 string segment that ends a line without a newline
-# * 4 variable segment that ends a line without a newline
-
-# For the example replacement block:
-
-# Test segments
-# {s.tea}
-# This is a test { s.name } line\n
-# Second line {h.tea}  \r\n
-# third {variable} test\n
-
-# It gets saved to the temp file as shown below. The underscores show
-# ending spaces. Each line ends with a newline that's not shown.
-
-# 1,Test segments
-# 3,1   ,5   ,{s.tea}
-# 0,This is a test_
-# 2,2   ,6   ,{ s.name }
-# 1, line
-# 0,Second line_
-# 2,1   ,5   ,{h.tea}
-# 1,  \r
-# 0,third_
-# 2,1   ,8   ,{variable}
-# 1, test
-
-# A string segment starts with the segment type number 0 or 1. A type
-# 1 segment means the template text ends with a new line and a type 0
-# segment means the template text does not end with a new line.  After
-# the type digit is a comma followed the string from the line followed
-# by a newline.
-
-# All segments end with a newline, whether it exists in the template
-# or not. If a template line uses cr/lf, the segment will end with
-# cr/lf. The segment number tells you whether to write out the ending
-# newline or not to the result file. The template line endings are
-# preserved in the result.
+# All segments end with a newline. If a template line uses cr/lf, the
+# segment will end with cr/lf.  The segment type tells you whether to
+# write out the ending newline or not to the result file.
 
 # Segment text are bytes. The bracketed variables are ascii.
 
-# A variable segment, type 2 and 3 are similar to the string segments
-# that type 2 does not end with a new line and 3 does.  The variable
-# segment contains the bracketed variable as it exists in the
-# replacement block with the brackets and leading and trailing white if
-# any, i.e., "{ t.row }".  The segment starts with two numbers telling
-# where the variable dotNameStr starts and its length. The variable
-# segment numbers are left aligned and padded with spaces so the
-# bracketed text part always starts at the same index.
+# A bracketed variable does not contain space around the variable.
+# {var} not { var }.
 
-# Variable Segments:
-
-# * first number is 2 or 3.
-
-# * second number is the index where the variable starts. There are four
-#  digits reserved for it to account for the maximum line length of
-#  about 1k. A variable can have a lot of padding. { var }.
-
-# * The third number is the length of the variable dotNameStr. There are
-#  4 digits reserved for it since a variable's maximum length is about
-#  1k.
-
-
+# To use a left bracket in a replacement block you use two left brackets, {{,
+# {{ results in {.
 
 type
   SegmentType = enum
-    ## A replacement block line is divided into segments of these types.
-    middle,   ## String segment in the middle of the line.
-    newline,  ## String segment with ending newline that ends a line.
-    variable, ## Variable segment in the middle.
-    endline,  ## String segment that ends a line without a newline.
-    endVariable ## Variable segment that ends a line without a newline.
+    ## A replacement block line is divided into segments of different
+    ## types.
+    ##
+    ## * middle -- String segment in the middle of the line.
+    ##
+    ## ~~~
+    ## ... segment{var} ... => 0,segment\n
+    ## ~~~~
+    ##
+    ## * newline -- String segment with ending newline that ends a line.
+    ##
+    ## ~~~
+    ## ... segment\n => 1,segment\n
+    ## ... segment\r\n => 1,segment\r\n
+    ## ~~~~
+    ##
+    ## * variable -- Variable segment in the middle.
+    ##
+    ## ~~~
+    ## ... {var} ... => 2,{var}\n
+    ## ~~~~
+    ##
+    ## * endline --  String segment that ends a line without a newline.
+    ##
+    ## ~~~
+    ## ... segment => 3,segment\n
+    ## ~~~~
+    ##
+    ## * endVariable -- Variable segment that ends a line without a newline.
+    ## ~~~
+    ## ... {var} => 4,{var}\n
+    ## ~~~~
+    middle,     # 0
+    newline,    # 1
+    variable,   # 2
+    endline,    # 3
+    endVariable # 4
 
   ReplaceLineKind* = enum
     ## Line type returned by yieldReplacementLine.
-    rlNoLine,      ## Value when not initialized.
-    rlReplaceLine, ## A replacement block line.
-    rlEndblockLine ## The endblock line.
-    rlNormalLine ## The last line when maxLines was exceeded.
+    ##
+    ## * rlNoLine -- Value when not initialized.
+    ## * rlReplaceLine -- A replacement block line.
+    ## * rlEndblockLine -- The endblock command line.
+    ## * rlNormalLine -- The last line when maxLines was exceeded.
+    rlNoLine, rlReplaceLine, rlEndblockLine, rlNormalLine
 
   ReplaceLine* = object
     ## Line information returned by yieldReplacementLine.
     kind*: ReplaceLineKind
     line*: string
 
+  StringOr* = OpResultWarn[string]
+    ## A string or a warning.
+
+  TempSegments = object
+    ## A temporary file to store the parsed replacement block.
+    tempFile: TempFile
+    lb: LineBuffer
+
+func newStringOr*(warning: MessageId, p1: string = "", pos = 0):
+     StringOr =
+  ## Return a new StringOr object containing a warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[string](warningData)
+
+func newStringOr*(warningData: WarningData): StringOr =
+  ## Return a new StringOr object containing a warning.
+  result = opMessageW[string](warningData)
+
+func newStringOr*(str: string): StringOr =
+  ## Return a new StringOr object containing a string.
+  result = opValueW[string](str)
+
 func newReplaceLine*(kind: ReplaceLineKind, line: string): ReplaceLine =
-  ## Return a ReplaceLine object.
+  ## Return a new ReplaceLine object.
   return ReplaceLine(kind: kind, line: line)
 
 func `$`*(replaceLine: ReplaceLine): string =
-  ## Return a string representation of a ReplaceLine.
+  ## Return a string representation of a ReplaceLine object.
   result = $replaceLine.kind & ": \"" & replaceLine.line & "\""
 
 const
   replacementBufferSize = 2*1024
     ## Space reserved for the replacement block line buffer.
   maxLineLen = defaultMaxLineLen + 20
-    ## 20 more than a template line for the segment prefix info.
+    ## The max segment line length. Add 20 for the segment prefix.
 
 type
-  TempSegments = object
-    ## A temporary file to store the parsed replacement block.
-    tempFile: TempFile
-    lb: LineBuffer
-
+  # todo: move this and support procedures into tempfile.nim. Handle
+  # closing correctly.
   TempFileStream = object
     ## Temporary file and associated stream.
     tempFile*: TempFile
@@ -168,10 +164,9 @@ proc readNextSegment(env: var Env, tempSegments: var TempSegments): string =
 proc stringSegment*(line: string, start: Natural, finish: Natural): string =
   ## Return the string segment. The line contains the segment starting at
   ## the given position and ending at finish position in the line (1
-  ## after). If the start and finish are at the end, output a endline segment.
+  ## after).
 
   let length = finish - start
-
   assert length > 0
   assert start + length <= line.len
 
@@ -179,7 +174,7 @@ proc stringSegment*(line: string, start: Natural, finish: Natural): string =
   var segmentType: SegmentType
 
   if finish == line.len:
-    # At end of line.
+    # The segment ends the line.
     if line[finish-1] == '\n':
       segmentType = newline
       ending = ""
@@ -190,193 +185,206 @@ proc stringSegment*(line: string, start: Natural, finish: Natural): string =
 
   result = "$1,$2$3" % [$ord(segmentType), line[start ..< finish], ending]
 
+proc stringSegment*(line: string, atEnd: bool): string =
+  ## Return a string segment.
+  let length = line.len
+  var ending = "\n"
+  var segmentType: SegmentType
+  if atEnd:
+    # The segment ends the line.
+    if line[length-1] == '\n':
+      segmentType = newline
+      ending = ""
+    else:
+      segmentType = endline
+  else:
+    segmentType = middle
+
+  result = "$1,$2$3" % [$ord(segmentType), line, ending]
+
 proc varSegment*(bracketedVar: string, dotNameStrPos: Natural,
                  dotNameStrLen: Natural, atEnd: bool): string =
   ## Return a variable segment. The bracketedVar is a string starting
-  ## with { and ending with } that has a variable inside with optional
-  ## whitespace around the variable, i.e. "{ s.name }". The atEnd
-  ## parameter is true when the bracketedVar ends the line without an
-  ## ending newline.
+  ## with { and ending with } that has a variable inside.
+  ## i.e. "{s.name}". The atEnd parameter is true when the
+  ## bracketedVar ends the line without an ending newline.
   assert dotNameStrPos <= 9999
   assert dotNameStrLen <= 9999
   assert bracketedVar.len > 2
   assert bracketedVar[0] == '{'
   assert bracketedVar[^1] == '}'
-  # 2,dotNameStrPos
-  # | |    dotNameStrLen
-  # | |    |    bracketedVar
-  # | |    |    |
-  # 2,2   ,6   ,{ s.name }
-  var segmentValue: string
-  if atEnd:
-    segmentValue = $ord(endVariable)
-  else:
-    segmentValue = $ord(variable)
-  result.add("{segmentValue},{dotNameStrPos:<4},{dotNameStrLen:<4},{bracketedVar}\n".fmt)
+
+  let segmentValue = $ord(if atEnd: endVariable else: variable)
+  result.add("{segmentValue},{bracketedVar}\n".fmt)
+
+proc varSegment*(dotName: string, atEnd: bool): string =
+  ## Return a variable segment.
+  let segmentValue = $ord(if atEnd: endVariable else: variable)
+  result.add("{segmentValue},{{{dotName}}}\n".fmt)
 
 proc lineToSegments*(line: string): seq[string] =
-  ## Convert a line to a list of segments.
+  ## Convert a line to a list of segments. No warnings.
+
+  type
+    State = enum
+      ## Parsing states.
+      text, bracket, variable
 
   var pos = 0
-  var nextPos: int
+  var state = text
+  var fragment = newStringOfCap(line.len)
+  var dotName = newStringOfCap(line.len)
 
-  # This is a test { s.name } line\n
-  # 0,This is a test_
-  # 2,2   ,2,4  ,{ s.name }
-  # 1, line
-
+  # Loop through the text one byte at a time and build segments.
   while true:
-    if pos >= line.len:
-      break
-    # Get the text before the variable including the left bracket.
-    let beforeVarO = matchUpToLeftBracket(line, pos)
-    if not beforeVarO.isSome:
-      # No variable, output the rest of the line as is.
-      result.add(stringSegment(line, pos, line.len))
-      break
-    let beforeVar = beforeVarO.get()
+    case state
+    of text:
+      if pos >= line.len:
+        if fragment.len > 0:
+          result.add(stringSegment(fragment, true))
+        break # done
+      let ch = line[pos]
+      if ch == '{':
+        state = bracket
+      else:
+        fragment.add(ch)
+      inc(pos)
+    of bracket:
+      if pos >= line.len:
+        # No ending bracket.
+        fragment.add('{')
+        result.add(stringSegment(fragment, true))
+        break # done
+      let ch = line[pos]
+      case ch
+      of '{':
+        # Two left brackets in a row equal one bracket.
+        fragment.add('{')
+        state = text
+      of 'a' .. 'z', 'A' .. 'Z':
+        dotName.add(ch)
+        state = variable
+      else:
+        # Invalid variable name; names start with an ascii letter.
+        fragment.add('{')
+        fragment.add(ch)
+        state = text
+      inc(pos)
+    of variable:
+      if pos >= line.len:
+        # No ending bracket.
+        if fragment.len > 0:
+          result.add(stringSegment(fragment, true))
+        if dotName.len > 0:
+          result.add(varSegment(dotName, true))
+        break # done
+      let ch = line[pos]
+      case ch
+      of '}':
+        # We got a variable.
+        if fragment.len > 0:
+          result.add(stringSegment(fragment, false))
+          fragment = ""
+        if dotName.len > 0:
+          result.add(varSegment(dotName, (pos+1 == line.len)))
+          dotName = ""
+        state = text
+        inc(pos)
+      of 'a' .. 'z', '.', 'A' .. 'Z', '0' .. '9', '_':
+        dotName.add(ch)
+        inc(pos)
+      else:
+        # Invalid variable name; names contain letters, digits or underscores.
+        fragment.add('{')
+        fragment.add(dotName)
+        dotName = ""
+        state = text
 
-    # Match the variable. It matches leading and trailing whitespace.
-    let matches0 = matchDotNames(line, pos + beforeVar.length)
-    if not matches0.isSome:
-      # Found left bracket but no variable, output what we have.
-      nextPos = pos + beforeVar.length
-      result.add(stringSegment(line, pos, nextPos))
-      pos = nextPos
-      continue
-    let matches = matches0.get()
-    let (whitespace, dotNameStr, leftParen) = matches.get3Groups()
-    var length = matches.length
-
-    # Check that the variable ends with a right bracket.
-    nextPos = pos + beforeVar.length + length
-    if leftParen == "(" or (nextPos >= line.len or line[nextPos] != '}'):
-      # No closing bracket, so not it's not a variable, output what we
-      # have.
-      result.add(stringSegment(line, pos, nextPos))
-      pos = nextPos
-      continue
-
-    # We have a variable.
-
-    # Output the text before the variable not including the left bracket.
-    let start = pos + beforeVar.length - 1
-    if beforeVar.length > 1:
-      result.add(stringSegment(line, pos, start))
-
-    # Write out the variable including the left and right brackets.
-    nextPos = start + length + 2
-    let bracketedVar = line[start ..< nextPos]
-    let dotNameStrPos = whitespace.len + 1
-    let atEnd = (nextPos >= line.len)
-    let varSeg = varSegment(bracketedVar, dotNameStrPos, dotNameStr.len, atEnd)
-    result.add(varSeg)
-    pos = nextPos
-
-func parseVarSegment*(segment: string): string =
+func varSegmentDotName*(segment: string): string =
   ## Parse a variable type segment and return the dotNameStr.
+  # 2,{s.name}\n
+  result = segment[3 ..< (segment.len - 2)]
 
-  # Example variable segments showing limits:
-  # 2,1024,1024,{ s.name }
-  # 2,2   ,6   ,{ s.name }
-  # 0123456789 123456789 0123456789
-
-  let dotNameStrPos = parseInteger(segment, 2).get().number + 12
-  let dotNameStrLen = parseInteger(segment, 7).get().number
-  result = segment[dotNameStrPos ..< dotNameStrPos + dotNameStrLen]
-
-proc substituteSegment(env: var Env, lineNum: Natural, variables: Variables,
-    segment: string): tuple[kind: SegmentType, str: string] =
-  ## Substitute variables in a segment and return the filled in
-  ## segment and its type.  If a variable is missing, write a warning
-  ## message and return the string as is.
-
-  # Get the segment type from the first character of the segment.
-  let segmentType = SegmentType(ord(segment[0]) - 0x30)
-
-  # Handle each type of segment.
-  case segmentType:
-  of middle:
-    # String segment without ending newline.
-    result = (middle, segment[2 .. ^2])
-  of newline:
-    # String segment with ending newline.
-    result = (newline, segment[2 .. ^1])
-  of variable, endVariable:
-    # Variable segment. Subsitute the variable content, if possible.
-
-    # Get the variable name.
-    let dotNameStr = parseVarSegment(segment)
-
-    # Look up the variable's value.
-    let valueOr = getVariable(variables, dotNameStr)
-    if valueOr.isValue:
-      # Convert the variable to a string.
-      let valueStr = valueToStringRB(valueOr.value)
-      result = (segmentType, valueStr)
-    else:
-      # The replacement variable doesn't exist: $1.
-      env.warn(env.templateFilename, lineNum, wMissingReplacementVar, dotNameStr)
-      result = (segmentType, segment[12 .. ^2])
-  of endline:
-    # String segment ending the line without ending newline.
-    result = (endline, segment[2 .. ^2])
+func getOutputStream(env: Env, output: string): Stream =
+  ## Return the output stream.
+  case output
+  of "result":
+    # The block output goes to the result file (default).
+    result = env.resultStream
+  of "stderr":
+    # The block output goes to standard error.
+    result = env.errStream
+  of "stdout":
+    # The block output goes to standard out.
+    result = env.outStream
+  else:
+    # of "log", "skip":
+    result = nil
 
 proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
                         lineNum: Natural, variables: Variables) =
-  ## Write the updated replacement block to the result stream.  It
-  ## does it by writing all the stored segments and updating variable
-  ## segments as it goes. The lineNum is the beginning line of the
-  ## replacement block.
+  ## Write the replacement block stored segments to the result stream.
+  ## The lineNum is the beginning line of the replacement block.
 
   # Seek to the beginning of the temp file.
   tempSegments.seekToStart()
 
   # Determine where to write the result.
-  var log: bool
-  var output = getTeaVarStringDefault(variables, "output")
-  var stream: Stream
-  case output
-  of "result":
-    # The block output goes to the result file (default).
-    stream = env.resultStream
-  of "stderr":
-    # The block output goes to standard error.
-    stream = env.errStream
-  of "stdout":
-    # The block output goes to standard out.
-    stream = env.outStream
-  of "log":
-    # The block output goes to the log file.
-    log = true
-  # of "skip":
-  #   # The block is skipped.
-  #   return
-  else:
+  let output = getTeaVarStringDefault(variables, "output")
+  if output == "skip":
     return
+  let stream = getOutputStream(env, output)
 
-  # Write the segments.
-  var rLineNum = lineNum
+  # Read the store segments and write them out.
   var line: string
+  var rLineNum = lineNum
   while true:
     let segment = readNextSegment(env, tempSegments)
     if segment == "":
-       break # No more segments.
+      assert line == ""
+      break # No more segments.
+
+    let segmentType = SegmentType(ord(segment[0]) - 0x30)
 
     # Increment the line number when the segment ends with a newline.
-    assert ord(newline) == 1
-    if segment[0] == '1':
+    if segmentType == newline:
       inc(rLineNum)
 
-    let (kind, segString) = substituteSegment(env, rLineNum, variables, segment)
+    # Get the segment string.
+    var segString: string
+    case segmentType
+    of variable, endVariable:
+      # Use the variable's value for the segment string.
 
+      # Get the variable name.
+      let dotNameStr = varSegmentDotName(segment)
+
+      # Look up the variable's value.
+      let valueOr = getVariable(variables, dotNameStr)
+      if valueOr.isValue:
+        # Convert the variable to a string.
+        let valueStr = valueToStringRB(valueOr.value)
+        segString = valueStr
+      else:
+        # The replacement variable doesn't exist: $1.
+        env.warn(env.templateFilename, rLineNum, wMissingReplacementVar, dotNameStr)
+        segString = segment[2 .. ^2]
+    of newline:
+      # The segment ends with a newline.
+      segString = segment[2 .. ^1]
+    of middle, endline:
+      # The segment does not end with a newline.
+      segString = segment[2 .. ^2]
+
+    # Append the segment string to the current line.
     line.add(segString)
 
     # Write out completed lines.
-    if kind == newline or kind == endline or kind == endVariable:
-      if log:
+    if segmentType == newline or segmentType == endline or segmentType == endVariable:
+      if output == "log":
         env.logLine(env.templateFilename, rLineNum-1, line)
       else:
+        assert(stream != nil)
         stream.write(line)
       line = ""
 
@@ -454,35 +462,6 @@ iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
 
         count.inc
 
-proc newTempSegments*(env: var Env, lb: var LineBuffer, prepostTable: PrepostTable,
-    command: string, repeat: Natural, variables: Variables): Option[TempSegments] =
-  ## Read replacement block lines and return a TempSegments object
-  ## containing the compiled block. Call writeTempSegments to write
-  ## out the segments. Call closeDelete to close and delete the
-  ## associated temp file.
-
-  result = allocTempSegments(env, lb.getLineNum())
-  if not isSome(result):
-    return
-
-type
-  StringOr* = OpResultWarn[string]
-    ## A string or a warning.
-
-func newStringOr*(warning: MessageId, p1: string = "", pos = 0):
-     StringOr =
-  ## Return a new StringOr object containing a warning.
-  let warningData = newWarningData(warning, p1, pos)
-  result = opMessageW[string](warningData)
-
-func newStringOr*(warningData: WarningData): StringOr =
-  ## Return a new StringOr object containing a warning.
-  result = opMessageW[string](warningData)
-
-func newStringOr*(str: string): StringOr =
-  ## Return a new StringOr object containing a string.
-  result = opValueW[string](str)
-
 proc formatString*(variables: Variables, text: string): StringOr =
   ## Format the string by filling in the variable placeholders with
   ## their values. Generate a warning when the variable doesn't
@@ -493,7 +472,7 @@ proc formatString*(variables: Variables, text: string): StringOr =
   ##
   ## To enter a left bracket use two in a row.
   ## "single bracket {{" => "single bracket {"
-  ## 
+  ##
   type
     State = enum
       ## Parsing states.
@@ -552,7 +531,7 @@ proc formatString*(variables: Variables, text: string): StringOr =
         let str = valueToStringRB(valueOr.value)
         newStr.add(str)
         state = start
-      of 'a' .. 'z', 'A' .. 'Z', '0' .. '9', '_':
+      of 'a' .. 'z', '.', 'A' .. 'Z', '0' .. '9', '_':
         discard
       else:
         # Invalid variable name; names contain letters, digits or underscores.

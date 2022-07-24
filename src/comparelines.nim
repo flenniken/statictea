@@ -19,7 +19,7 @@ func opMessageStr*[T](message: string): OpResultStr[T] =
 
 func splitNewLines*(content: string): seq[string] =
   ## Split lines and keep the line endings. Works with \n and \r\n
-  ## type endings.
+  ## type endings. keyword: splitLines
   if content.len == 0:
     return
   var start = 0
