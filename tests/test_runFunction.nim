@@ -208,6 +208,18 @@ suite "runFunction.nim":
     let eFunResult = newFunResult(newValue(1))
     check testFunction("get", parameters, eFunResult)
 
+  test "get list item -1":
+    var list = newValue([1, 2, 3, 4, 5])
+    var parameters = @[list, newValue(-1)]
+    let eFunResult = newFunResult(newValue(5))
+    check testFunction("get", parameters, eFunResult)
+
+  test "get list item -2":
+    var list = newValue([1, 2, 3, 4, 5])
+    var parameters = @[list, newValue(-2)]
+    let eFunResult = newFunResult(newValue(4))
+    check testFunction("get", parameters, eFunResult)
+
   test "get list default":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list, newValue(5), newValue(100)]
@@ -218,6 +230,12 @@ suite "runFunction.nim":
     var list = newValue([1, 2, 3, 4, 5])
     var parameters = @[list, newValue(12)]
     let eFunResult = newFunResultWarn(wMissingListItem, 1, "12")
+    check testFunction("get", parameters, eFunResult)
+
+  test "get list invalid -6":
+    var list = newValue([1, 2, 3, 4, 5])
+    var parameters = @[list, newValue(-6)]
+    let eFunResult = newFunResultWarn(wMissingListItem, 1, "-6")
     check testFunction("get", parameters, eFunResult)
 
   test "get dict item":
@@ -280,13 +298,19 @@ suite "runFunction.nim":
 
   test "get invalid index":
     var list = newValue([1, 2, 3, 4, 5])
-    var parameters = @[list, newValue(-1)]
-    let eFunResult = newFunResultWarn(wMissingListItem, 1, "-1")
+    var parameters = @[list, newValue(5)]
+    let eFunResult = newFunResultWarn(wMissingListItem, 1, "5")
+    check testFunction("get", parameters, eFunResult)
+
+  test "get invalid index 2":
+    var list = newValue([1, 2, 3, 4, 5])
+    var parameters = @[list, newValue(-6)]
+    let eFunResult = newFunResultWarn(wMissingListItem, 1, "-6")
     check testFunction("get", parameters, eFunResult)
 
   test "get invalid index with default":
     var list = newValue([1, 2, 3, 4, 5])
-    var parameters = @[list, newValue(-1), newValue("hi")]
+    var parameters = @[list, newValue(5), newValue("hi")]
     let eFunResult = newFunResult(newValue("hi"))
     check testFunction("get", parameters, eFunResult)
 

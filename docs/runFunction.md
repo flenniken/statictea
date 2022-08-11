@@ -215,7 +215,9 @@ func funLen_di(variables: Variables; parameters: seq[Value]): FunResult
 
 Get a list value by its index.  If the index is invalid, the
 default value is returned when specified, else a warning is
-generated.
+generated. You can use negative index values. Index -1 gets the
+last element. It is short hand for len - 1. Index -2 is len - 2,
+etc.
 
 ~~~
 get(list: list, index: int, optional default: any) any
@@ -225,8 +227,14 @@ Examples:
 
 ~~~
 list = list(4, "a", 10)
+get(list, 0) => 4
+get(list, 1) => "a"
 get(list, 2) => 10
 get(list, 3, 99) => 99
+get(list, -1) => 10
+get(list, -2) => "a"
+get(list, -3) => 4
+get(list, -4, 11) => 11
 ~~~~
 
 ```nim

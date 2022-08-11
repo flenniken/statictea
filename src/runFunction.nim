@@ -241,7 +241,9 @@ func funLen_di*(variables: Variables, parameters: seq[Value]): FunResult =
 func funGet_lioaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Get a list value by its index.  If the index is invalid, the
   ## @:default value is returned when specified, else a warning is
-  ## @:generated.
+  ## @:generated. You can use negative index values. Index -1 gets the
+  ## @:last element. It is short hand for len - 1. Index -2 is len - 2,
+  ## @:etc.
   ## @:
   ## @:~~~
   ## @:get(list: list, index: int, optional default: any) any
@@ -251,16 +253,27 @@ func funGet_lioaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:
   ## @:~~~
   ## @:list = list(4, "a", 10)
+  ## @:get(list, 0) => 4
+  ## @:get(list, 1) => "a"
   ## @:get(list, 2) => 10
   ## @:get(list, 3, 99) => 99
+  ## @:get(list, -1) => 10
+  ## @:get(list, -2) => "a"
+  ## @:get(list, -3) => 4
+  ## @:get(list, -4, 11) => 11
   ## @:~~~~
 
   tMapParameters("lioaa")
   let list = map["a"].listv
   let index = map["b"].intv
 
-  if index >= 0 and index < list.len:
-    result = newFunResult(newValue(list[index]))
+  var ix: int64
+  if index < 0:
+    ix = list.len + index
+  else:
+    ix = index
+  if ix >= 0 and ix < list.len:
+    result = newFunResult(newValue(list[ix]))
   elif "c" in map:
     result = newFunResult(map["c"])
   else:
