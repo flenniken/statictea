@@ -18,18 +18,18 @@ $statictea \
 $$ nextline a = warn("My message that's always output.")
 next line case
 
-$$ block a = if1(1, warn("warning 1 is 1"), 2)
+$$ block a = if0(0, warn("warning 1 is 1"), 2)
 a = {a}
 $$ endblock
 
-$$ block a = if1(0, warn("warning 1 is 1"), 2)
+$$ block a = if0(1, warn("warning 1 is 1"), 2)
 a = {a}
 $$ endblock
 
 $$ block
-$$ : a = if1(1, warn("warning a"), "a")
-$$ : b = if1(0, warn("warning b"), "b")
-$$ : c = if1(1, warn("warning c"), "c")
+$$ : a = if0(0, warn("warning a"), "a")
+$$ : b = if0(1, warn("warning b"), "b")
+$$ : c = if0(0, warn("warning c"), "c")
 a = {a}
 b = {b}
 c = {c}

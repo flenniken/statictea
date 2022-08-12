@@ -38,7 +38,7 @@ $$ nextline t.repeat = 0
 Block that is skipped since repeat is 0.
 
 Repeat is not set by default.
-$$ nextline exists = if1(exists(t, "repeat"), "exists", "does not exist")
+$$ nextline exists = if0(cmp(1, exists(t, "repeat")), "exists", "does not exist")
 t.repeat = {exists}
 
 Blocks repeat one time by default.
@@ -78,7 +78,7 @@ The readme second repeat example:
 <!--$ block t.repeat=len(s.companyList) -->
 <!--$ : d = get(s.companyList, t.row) -->
 <!--$ : selected = get(d, "selected", 0) -->
-<!--$ : current = if1(selected, " selected=\"selected\"", "") -->
+<!--$ : current = if0(cmp(selected,1), " selected=\"selected\"", "") -->
   <option{current}>{d.company}</option>
 $$ endblock
 </select>

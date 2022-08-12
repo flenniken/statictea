@@ -39,9 +39,9 @@ $$ endblock
 # The local variables are cleared and recalculated for each repeated
 # block.
 $$ block t.repeat = 2
-$$ : before = if1(exists(l, "x"), "exists", "doesn't exist")
+$$ : before = if0(cmp(1,exists(l, "x")), "exists", "doesn't exist")
 $$ : x = add(t.row, 1)
-$$ : after = if1(exists(l, "x"), "exists", "doesn't exist")
+$$ : after = if0(cmp(1,exists(l, "x")), "exists", "doesn't exist")
 
 {x}. Before defining x it {before}.
 {x}. After defining x it {after}.

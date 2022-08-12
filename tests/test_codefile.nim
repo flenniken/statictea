@@ -462,7 +462,7 @@ statement: g.a = 5
 
   test "runCodeFile warn":
     let content = """
-if1(1, warn("hello"))
+if0(0, warn("hello"))
 v = if0(1, warn("not this"), 5)
 a = warn("there")
 """
@@ -481,7 +481,7 @@ a = 1
 b = 2
 c = if0(a, return("stop"), 3)
 d = 4
-e = if1(a, return("stop"))
+e = if0(cmp(1,a), return("stop"))
 end = 5
 """
     var variables = emptyVariables()
@@ -497,7 +497,7 @@ d = 4"""
   test "runCodeFile return warning":
     let content = """
 a = 1
-c = if1(1, return("skip"))
+c = if0(0, return("skip"))
 b = 2
 """
     var variables = emptyVariables()
@@ -506,7 +506,7 @@ a = 1
 b = 2"""
     let eErrLines: seq[string] = splitNewLines """
 testcode.txt(2): w187: Use '...return("stop")...' in a code file.
-statement: c = if1(1, return("skip"))
+statement: c = if0(0, return("skip"))
            ^
 """
     check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)

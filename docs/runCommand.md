@@ -26,7 +26,7 @@ starts in the template file.
 * [getMultilineStr](#getmultilinestr) &mdash; Return the triple quoted string literal.
 * [getString](#getstring) &mdash; Return a literal string value and match length from a statement.
 * [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
-* [ifFunction](#iffunction) &mdash; Return the if0 and if1 function's value and the length.
+* [ifFunction](#iffunction) &mdash; Return the if0 function's value and the length.
 * [getFunctionValueAndLength](#getfunctionvalueandlength) &mdash; Return the function's value and the length.
 * [getValueAndLength](#getvalueandlength) &mdash; Return the value and length of the item that the start parameter points at which is a string, number, variable, function or list.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
@@ -213,7 +213,7 @@ proc getNumber(statement: Statement; start: Natural): ValueAndLengthOr
 
 # ifFunction
 
-Return the if0 and if1 function's value and the length. These functions conditionally run one of their parameters. Start points at the first parameter of the function. The length includes the trailing whitespace after the ending ).
+Return the if0 function's value and the length. It conditionally runs one of its parameters. Start points at the first parameter of the function. The length includes the trailing whitespace after the ending ).
 
 ```nim
 proc ifFunction(functionName: string; statement: Statement; start: Natural;

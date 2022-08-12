@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # If Function
 
-Test the if0 and if1 functions.
+Test the if0 function.
 
 If the condition is 0, return the second parameter, else return
 the third parameter. Return 0 for the else case when there is no
@@ -35,11 +35,11 @@ drink5: {drink5} = 0
 $$ endblock
 
 $$ block
-$$ : drink1 = if1(0, "tea", "beer")
-$$ : drink2 = if1(1, "tea", "beer")
-$$ : drink3 = if1(4, "tea", "beer")
-$$ : drink4 = if1(0, "tea")
-$$ : drink5 = if1(1, "tea")
+$$ : drink1 = if0(1, "tea", "beer")
+$$ : drink2 = if0(0, "tea", "beer")
+$$ : drink3 = if0(4, "tea", "beer")
+$$ : drink4 = if0(1, "tea")
+$$ : drink5 = if0(0, "tea")
 drink1: {drink1} = beer
 drink2: {drink2} = tea
 drink3: {drink3} = beer
@@ -50,12 +50,12 @@ $$ endblock
 Warn that c is 0.
 $$ block c = 0
 $$ : if0(c, warn("c is 0"))
-$$ : if1(c, warn("not hit"))
+$$ : if0(cmp(1,c), warn("not hit"))
 $$ endblock
 
 Warn that c is 1.
 $$ block c = 1
-$$ : if1(c, warn("c is 1"))
+$$ : if0(cmp(1,c), warn("c is 1"))
 $$ : if0(c, warn("not hit"))
 $$ endblock
 ~~~

@@ -16,7 +16,6 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funGet_lioaa](#funget_lioaa) &mdash; Get a list value by its index.
 * [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
 * [funIf0](#funif0) &mdash; If the condition is 0, return the second parameter, else return the third parameter.
-* [funIf1](#funif1) &mdash; If the condition is 1, return the second parameter, else return the third parameter.
 * [funAdd_iii](#funadd_iii) &mdash; Add two integers.
 * [funAdd_fff](#funadd_fff) &mdash; Add two floats.
 * [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
@@ -274,13 +273,19 @@ func funGet_dsoaa(variables: Variables; parameters: seq[Value]): FunResult
 
 # funIf0
 
-If the condition is 0, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter.
+If the condition is 0, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter. You can use any type for the condition, strings, lists and dictionaries use their length.
 
-The if functions, if0 and if1 are special in a couple of ways, see
+* int -- 0
+* float -- 0.0
+* string -- when the length of the string is 0
+* list -- when the length of the list is 0
+* dict -- when the length of the dictionary is 0
+
+The if functions are special in a couple of ways, see
 [[#if-functions][If Functions]]
 
 ~~~
-if0(condition: int, then: any, optional else: any) any
+if0(condition: any, then: any, optional else: any) any
 ~~~~
 
 Examples:
@@ -291,6 +296,9 @@ drink1 = if0(1, "tea", "beer")
 drink4 = if0(4, "tea", "beer")
 drink5 = if0(0, "tea")
 drink6 = if0(8, "tea")
+drink7 = if0("", "tea")
+drink8 = if0([], "tea")
+drink9 = if0(dict(), "tea")
 if0(c, return("skip"))
 if0(c, warn("c is 0"))
 ~~~~
@@ -303,47 +311,13 @@ drink1 => beer
 drink4 => beer
 drink5 => tea
 drink6 => 0
+drink7 => tea
+drink8 => tea
+drink9 => tea
 ~~~~
 
 ```nim
 func funIf0(variables: Variables; parameters: seq[Value]): FunResult
-```
-
-# funIf1
-
-If the condition is 1, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter.
-
-The if functions, if0 and if1 are special in a couple of ways, see
-[[#if-functions][If Functions]]
-
-~~~
-if1(condition: int, then: any, optional else: any) any
-~~~~
-
-Examples:
-
-~~~
-drink0 = if1(0, "tea", "beer")
-drink1 = if1(1, "tea", "beer")
-drink4 = if1(4, "tea", "beer")
-drink5 = if1(1, "tea")
-drink6 = if1(8, "tea")
-if1(c, return("skip"))
-if1(c, warn("c is 1"))
-~~~~
-
-result:
-
-~~~
-drink0 => beer
-drink1 => tea
-drink4 => beer
-drink5 => tea
-drink6 => 0
-~~~~
-
-```nim
-func funIf1(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funAdd_iii
@@ -1175,8 +1149,8 @@ warn(message: string) string
 Examples:
 
 ~~~
-if1(c, warn("message"))
-b = if1(c, warn("c is one"), "")
+if0(c, warn("message is 0"))
+b = if0(c, warn("c is not 0"), "")
 ~~~~
 
 ```nim
@@ -1201,9 +1175,9 @@ return(value: string) string
 Examples:
 
 ~~~
-if1(c, return("stop"))
-if1(c, return("skip"))
-if1(c, return(""))
+if0(c, return("stop"))
+if0(c, return("skip"))
+if0(c, return(""))
 ~~~~
 
 ```nim

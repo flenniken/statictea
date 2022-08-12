@@ -1377,7 +1377,7 @@ $$ endblock
   test "return short circuit 4":
     let templateContent = """
 $$ block t.repeat = 3
-$$ : a = if1(t.row, return("stop"))
+$$ : a = if0(cmp(1,t.row), return("stop"))
 {t.row}) return short circuit
 $$ endblock
 """
@@ -1390,7 +1390,7 @@ $$ endblock
   test "return short circuit 5":
     let templateContent = """
 $$ block t.repeat = 3
-$$ : a = if1(t.row, return("skip"))
+$$ : a = if0(cmp(1,t.row), return("skip"))
 {t.row}) return short circuit
 $$ endblock
 """
@@ -1404,8 +1404,8 @@ $$ endblock
   test "return short circuit 6":
     let templateContent = """
 $$ block t.repeat = 3
-$$ : a = if1(t.row, return(""))
-$$ : b = if1(t.row, warn("not hit"))
+$$ : a = if0(t.row, return(""))
+$$ : b = if0(t.row, warn("not hit"))
 {t.row}) return short circuit
 $$ endblock
 """
@@ -1420,8 +1420,8 @@ $$ endblock
   test "return short circuit 7":
     let templateContent = """
 $$ block t.repeat = 3
-$$ : a = if1(t.row, return(""))
-$$ : b = if1(t.row, warn("not hit"))
+$$ : a = if0(cmp(1, t.row), return(""))
+$$ : b = if0(cmp(1,t.row), warn("not hit"))
 {t.row}) a={a} b={b}
 $$ endblock
 """

@@ -353,30 +353,40 @@ proc ifFunction*(
     start: Natural,
     variables: Variables,
     list=false): ValueAndLengthOr =
-  ## Return the if0 and if1 function's value and the length. These
-  ## functions conditionally run one of their parameters. Start points
-  ## at the first parameter of the function. The length includes the
-  ## trailing whitespace after the ending ).
+  ## Return the if0 function's value and the length. It conditionally
+  ## runs one of its parameters. Start points at the first parameter
+  ## of the function. The length includes the trailing whitespace
+  ## after the ending ).
 
   # cases:
   # a = if0(cond, then, else)
-  # a = if1(cond, then, else)
   # a = if0(cond, then)
-  # a = if1(cond, then)
   # if0(cond, then)
-  # if1(cond, then)
 
-  # Get the condition's integer value.
+  # Get the condition's value.
   let vlcOr = getValueAndLength(statement, start, variables, skip=false)
   if vlcOr.isMessage or vlcOr.value.exit:
     return vlcOr
-  let condition = vlcOr.value.value
+  let cond = vlcOr.value.value
   var runningLen = vlcOr.value.length
 
-  # Make sure the condition is an integer.
-  if condition.kind != vkInt:
-    # The argument must be an integer.
-    return newValueAndLengthOr(wExpectedInteger, "", start)
+  var condition = false
+  case cond.kind:
+   of vkInt:
+     if cond.intv == 0:
+       condition = true
+   of vkFloat:
+     if cond.floatv == 0.0:
+       condition = true
+   of vkString:
+     if cond.stringv.len == 0:
+       condition = true
+   of vkList:
+     if cond.listv.len == 0:
+       condition = true
+   of vkDict:
+     if cond.dictv.len == 0:
+       condition = true
 
   # Match the comma and whitespace.
   let commaO = matchSymbol(statement.text, gComma, start + runningLen)
@@ -387,8 +397,7 @@ proc ifFunction*(
 
   # Determine whether we execute the second or third parameter.
   var getSecond: bool
-  if (condition.intv == 0 and functionName == "if0") or
-     (condition.intv == 1 and functionName == "if1"):
+  if (condition and functionName == "if0"):
     # Return the second parameter.
     getSecond = true
   else:
@@ -568,7 +577,7 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
       # We have a function, run it and return its value.
 
       # Handle the special if functions.
-      if dotNameStr in ["if0", "if1"]:
+      if dotNameStr in ["if0"]:
         let ifOr = ifFunction(dotNameStr, statement,
           start+dotNameLen, variables, skip)
         if ifOr.isMessage or ifOr.value.exit:
@@ -656,7 +665,7 @@ proc runStatement*(statement: Statement, variables: Variables):
   var operatorLength = 0
   var varName = ""
 
-  if leftParen == "(" and dotNameStr in ["if0", "if1"]:
+  if leftParen == "(" and dotNameStr in ["if0"]:
     # Handle the special bare if functions.
     vlOr = ifFunction(dotNameStr, statement, leadingLen, variables)
   else:

@@ -931,7 +931,7 @@ template:
 <!--$ block t.repeat=len(s.companyList) -->
 <!--$ : d = get(s.companyList, t.row) -->
 <!--$ : selected = get(d, "selected", 0) -->
-<!--$ : current = if1(selected, " selected=\"selected\"", "") -->
+<!--$ : current = if0(cmp(1,selected), " selected=\"selected\"", "") -->
   <option{current}>{d.company}</option>
 $$ endblock
 </select>
@@ -1626,14 +1626,14 @@ if0(len(s.items), warn("no items"))
    :CUSTOM_ID: if-functions
    :END:
 
-The if0 and if1 functions are special in a couple of ways. They
-conditionally evaluate their arguments and they can be used in a
-statement bare without an assignment.
+The if0 function is special in a couple of ways. It conditionally
+evaluate its arguments and it can be used in a statement bare
+without an assignment.
 
 You use the bare form with the warn and return functions for
 their side effects.
 
-The if functions evaluate the condition parameter first to
+The if0 function evaluates the condition parameter first to
 determine which parameter to evaluate next and the non-matching
 parameter is skipped.  This is important when you use the warn or
 return functions to control the statement flow.  The other
@@ -1643,14 +1643,14 @@ function.
 In the following example do1 is executed and doOther is skipped.
 
 #+BEGIN_SRC
-a = if1(1, do1(), doOther())
+a = if0(0, do1(), doOther())
 #+END_SRC
 
 The next example has a warn call in it.  If all the arguments
 were evaluated, the warn would run everytime.
 
 #+BEGIN_SRC
-a = if1(1, do1(), warn("not one"))
+a = if0(0, do1(), warn("not one"))
 #+END_SRC
 
 The warn and return functions modify the statement flow.  The
@@ -1658,10 +1658,10 @@ warn function skips the current statement and the return function
 ends the current block.
 
 The next example is a bare if.  It generates a warning when cond
-is 1.
+is 0.
 
 #+BEGIN_SRC
-if1(s.cond, warn("s.cond is 1"))
+if0(s.cond, warn("s.cond is 0"))
 #+END_SRC
 
 [[#contents][茶]]
@@ -2007,7 +2007,6 @@ List of functions:
 - [[#githubAnchor][githubAnchor]] -- Create Github anchor names from heading names.
 - [[#githubAnchor][githubAnchor]] -- Create a Github anchor name from a heading name.
 - [[#if0][if0]] -- If the condition is 0, return the second parameter, else return the third parameter.
-- [[#if1][if1]] -- If the condition is 1, return the second parameter, else return the third parameter.
 - [[#int][int]] -- Create an int from a float.
 - [[#int][int]] -- Create an int from a number string.
 - [[#joinPath][joinPath]] -- Join the path components with a path separator.
@@ -2556,13 +2555,19 @@ $$ : anchor = githubAnchor(entry.name)
 :CUSTOM_ID: if0
 :END:
 
-If the condition is 0, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter.
+If the condition is 0, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter. You can use any type for the condition, strings, lists and dictionaries use their length.
 
-The if functions, if0 and if1 are special in a couple of ways, see
+- int -- 0
+- float -- 0.0
+- string -- when the length of the string is 0
+- list -- when the length of the list is 0
+- dict -- when the length of the dictionary is 0
+
+The if functions are special in a couple of ways, see
 [[#if-functions][If Functions]]
 
 #+BEGIN_SRC
-if0(condition: int, then: any, optional else: any) any
+if0(condition: any, then: any, optional else: any) any
 #+END_SRC
 
 Examples:
@@ -2573,6 +2578,9 @@ drink1 = if0(1, "tea", "beer")
 drink4 = if0(4, "tea", "beer")
 drink5 = if0(0, "tea")
 drink6 = if0(8, "tea")
+drink7 = if0("", "tea")
+drink8 = if0([], "tea")
+drink9 = if0(dict(), "tea")
 if0(c, return("skip"))
 if0(c, warn("c is 0"))
 #+END_SRC
@@ -2585,44 +2593,9 @@ drink1 => beer
 drink4 => beer
 drink5 => tea
 drink6 => 0
-#+END_SRC
-
-[[#contents][茶]]
-
-** if1
-:PROPERTIES:
-:CUSTOM_ID: if1
-:END:
-
-If the condition is 1, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter.
-
-The if functions, if0 and if1 are special in a couple of ways, see
-[[#if-functions][If Functions]]
-
-#+BEGIN_SRC
-if1(condition: int, then: any, optional else: any) any
-#+END_SRC
-
-Examples:
-
-#+BEGIN_SRC
-drink0 = if1(0, "tea", "beer")
-drink1 = if1(1, "tea", "beer")
-drink4 = if1(4, "tea", "beer")
-drink5 = if1(1, "tea")
-drink6 = if1(8, "tea")
-if1(c, return("skip"))
-if1(c, warn("c is 1"))
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-drink0 => beer
-drink1 => tea
-drink4 => beer
-drink5 => tea
-drink6 => 0
+drink7 => tea
+drink8 => tea
+drink9 => tea
 #+END_SRC
 
 [[#contents][茶]]
@@ -3047,9 +3020,9 @@ return(value: string) string
 Examples:
 
 #+BEGIN_SRC
-if1(c, return("stop"))
-if1(c, return("skip"))
-if1(c, return(""))
+if0(c, return("stop"))
+if0(c, return("skip"))
+if0(c, return(""))
 #+END_SRC
 
 [[#contents][茶]]
@@ -3309,8 +3282,8 @@ warn(message: string) string
 Examples:
 
 #+BEGIN_SRC
-if1(c, warn("message"))
-b = if1(c, warn("c is one"), "")
+if0(c, warn("message is 0"))
+b = if0(c, warn("c is not 0"), "")
 #+END_SRC
 
 

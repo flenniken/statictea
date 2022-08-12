@@ -18,7 +18,7 @@ This folder contains stf test files for statictea.
 * [format-warnings](../testfiles/format-warnings.stf.md) &mdash; Test the format function's warning messages.
 * [globalvars](../testfiles/globalvars.stf.md) &mdash; Test global variables.
 * [hello](../testfiles/hello.stf.md) &mdash; Readme Hello World example.
-* [if-fun](../testfiles/if-fun.stf.md) &mdash; Test the if0 and if1 functions.
+* [if-fun](../testfiles/if-fun.stf.md) &mdash; Test the if0 function.
 * [int-section](../testfiles/int-section.stf.md) &mdash; Test the int type.
 * [json-get](../testfiles/json-get.stf.md) &mdash; Test that you can access non-variable name keys with get.
 * [len](../testfiles/len.stf.md) &mdash; Test the len function.

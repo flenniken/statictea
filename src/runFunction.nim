@@ -321,13 +321,20 @@ func funGet_dsoaa*(variables: Variables, parameters: seq[Value]): FunResult =
 func funIf0*(variables: Variables, parameters: seq[Value]): FunResult =
   ## If the condition is 0, return the second parameter, else return
   ## the third parameter. Return 0 for the else case when there is no
-  ## third parameter.
+  ## third parameter. You can use any type for the condition, strings,
+  ## lists and dictionaries use their length.
   ## @:
-  ## @:The if functions, if0 and if1 are special in a couple of ways, see
+  ## @:* int -- 0
+  ## @:* float -- 0.0
+  ## @:* string -- when the length of the string is 0
+  ## @:* list -- when the length of the list is 0
+  ## @:* dict -- when the length of the dictionary is 0
+  ## @:
+  ## @:The if functions are special in a couple of ways, see
   ## @:[[#if-functions][If Functions]]
   ## @:
   ## @:~~~
-  ## @:if0(condition: int, then: any, optional else: any) any
+  ## @:if0(condition: any, then: any, optional else: any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -338,6 +345,9 @@ func funIf0*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:drink4 = if0(4, "tea", "beer")
   ## @:drink5 = if0(0, "tea")
   ## @:drink6 = if0(8, "tea")
+  ## @:drink7 = if0("", "tea")
+  ## @:drink8 = if0([], "tea")
+  ## @:drink9 = if0(dict(), "tea")
   ## @:if0(c, return("skip"))
   ## @:if0(c, warn("c is 0"))
   ## @:~~~~
@@ -350,65 +360,20 @@ func funIf0*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:drink4 => beer
   ## @:drink5 => tea
   ## @:drink6 => 0
+  ## @:drink7 => tea
+  ## @:drink8 => tea
+  ## @:drink9 => tea
   ## @:~~~~
 
   # Note: the if functions are handled in runCommand as a special
   # case. This code is not run. It is here for the function list and
   # documentation.
+
   tMapParameters("iaoaa")
   let condition = map["a"].intv
   let thenCase = map["b"]
 
   if condition == 0:
-    result = newFunResult(thenCase)
-  elif "c" in map:
-    result = newFunResult(map["c"])
-  else:
-    result = newFunResult(newValue(0))
-
-func funIf1*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## If the condition is 1, return the second parameter, else return
-  ## the third parameter. Return 0 for the else case when there is no
-  ## third parameter.
-  ## @:
-  ## @:The if functions, if0 and if1 are special in a couple of ways, see
-  ## @:[[#if-functions][If Functions]]
-  ## @:
-  ## @:~~~
-  ## @:if1(condition: int, then: any, optional else: any) any
-  ## @:~~~~
-  ## @:
-  ## @:Examples:
-  ## @:
-  ## @:~~~
-  ## @:drink0 = if1(0, "tea", "beer")
-  ## @:drink1 = if1(1, "tea", "beer")
-  ## @:drink4 = if1(4, "tea", "beer")
-  ## @:drink5 = if1(1, "tea")
-  ## @:drink6 = if1(8, "tea")
-  ## @:if1(c, return("skip"))
-  ## @:if1(c, warn("c is 1"))
-  ## @:~~~~
-  ## @:
-  ## @:result:
-  ## @:
-  ## @:~~~
-  ## @:drink0 => beer
-  ## @:drink1 => tea
-  ## @:drink4 => beer
-  ## @:drink5 => tea
-  ## @:drink6 => 0
-  ## @:~~~~
-
-  # Note: the if functions are handled in runCommand as a special
-  # case. This code is not run. It is here for the function list and
-  # documentation.
-
-  tMapParameters("iaoaa")
-  let condition = map["a"].intv
-  let thenCase = map["b"]
-
-  if condition == 1:
     result = newFunResult(thenCase)
   elif "c" in map:
     result = newFunResult(map["c"])
@@ -1653,8 +1618,8 @@ func funWarn*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:if1(c, warn("message"))
-  ## @:b = if1(c, warn("c is one"), "")
+  ## @:if0(c, warn("message is 0"))
+  ## @:b = if0(c, warn("c is not 0"), "")
   ## @:~~~~
 
   tMapParameters("ss")
@@ -1679,9 +1644,9 @@ func funReturn*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:if1(c, return("stop"))
-  ## @:if1(c, return("skip"))
-  ## @:if1(c, return(""))
+  ## @:if0(c, return("stop"))
+  ## @:if0(c, return("skip"))
+  ## @:if0(c, return(""))
   ## @:~~~~
 
   tMapParameters("ss")
@@ -1852,7 +1817,6 @@ const
     ("type", funType_as, "as"),
     ("joinPath", funJoinPath_loss, "loss"),
     ("join", funJoin_lsois, "lsois"),
-    ("if1", funIf1, "iaaa"),
     ("warn", funWarn, "ss"),
     ("return", funReturn, "ss"),
     ("string", funString_aoss, "aoss"),
