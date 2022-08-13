@@ -1,4 +1,26 @@
-## Temporary file methods.
+## Create a temporary file.
+## @:
+## @:Example:
+## @:~~~
+## @:var tempFileO = openTempFile()
+## @:require tempFileO.isSome
+## @:var tempFile = tempFileO.get()
+## @:
+## @:tempFile.file.write("this is a test\\n")
+## @:tempFile.file.write("line 2\\n")
+## @:tempFile.file.close()
+## @:
+## @:var fh = open(tempFile.filename, fmRead)
+## @:let line1 = readline(fh)
+## @:let line2 = readline(fh)
+## @:fh.close()
+## @:
+## @:discard tryRemoveFile(tempFile.filename)
+## @:
+## @:check line1 == "this is a test"
+## @:check line2 == "line 2"
+## @:~~~
+
 
 import std/os
 import std/random

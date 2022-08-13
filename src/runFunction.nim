@@ -1659,7 +1659,7 @@ func funString_aoss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:string(var: any, optional stype: string) string
   ## @:~~~~
   ## @:
-  ## @:The default stype is "rb".
+  ## @:The default stype is "rb". This type is used in replacement blocks.
   ## @:
   ## @:stypes:
   ## @:* json -- returns JSON 
@@ -1729,11 +1729,11 @@ func funString_sds*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:
   ## @:~~~
   ## @:d = {"x",1,"y":"tea","z":{"a":8}}
-  ## @:string("d", d) =>
+  ## @:string("teas", d) =>
   ## @:
-  ## @:d.x = 1
-  ## @:d.y = "tea"
-  ## @:d.z.a = 8
+  ## @:teas.x = 1
+  ## @:teas.y = "tea"
+  ## @:teas.z.a = 8
   ## @:~~~~
 
   tMapParameters("sds")

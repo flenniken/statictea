@@ -73,15 +73,15 @@ type
 
   CmlOptionType* = enum
     ## The option type.
-    ## @:* cmlArgument0or1 -- option with a augument, 0 or 1 times.
-    ## @:* cmlNoArgument -- option without a augument, 0 or 1 times.
-    ## @:* cmlOptionalArgument -- option with an optional augument, 0
+    ## @:* cmlArgument0or1 -- option with a argument, 0 or 1 times.
+    ## @:* cmlNoArgument -- option without a argument, 0 or 1 times.
+    ## @:* cmlOptionalArgument -- option with an optional argument, 0
     ## @:    or 1 times.
-    ## @:* cmlBareArgument -- a augument without an option, 1 time.
-    ## @:* cmlArgumentOnce -- option with a augument, 1 time.
-    ## @:* cmlArgumentMany -- option with a augument, unlimited
+    ## @:* cmlBareArgument -- a argument without an option, 1 time.
+    ## @:* cmlArgumentOnce -- option with a argument, 1 time.
+    ## @:* cmlArgumentMany -- option with a argument, unlimited
     ## @:    number of times.
-    ## @:* cmlStopArgument -- option without a augument, 0 or 1
+    ## @:* cmlStopArgument -- option without a argument, 0 or 1
     ## @:    times. Stop and return this option by itself.
     cmlArgument0or1
     cmlNoArgument
@@ -109,7 +109,7 @@ func newArgsOrMessage*(args: CmlArgs): ArgsOrMessage =
 func newArgsOrMessage*(messageId: CmlMessageId,
     problemArg = ""): ArgsOrMessage =
   ## Create a new ArgsOrMessage object containing a message id and
-  ## optionally the problem augument.
+  ## optionally the problem argument.
   result = ArgsOrMessage(kind: cmlMessageKind, messageId: messageId,
     problemArg: problemArg)
 
@@ -159,18 +159,18 @@ proc collectArgs*(): seq[string] =
 
 proc addArg(args: var CmlArgs, optionName: string) =
   ## Add the given option name that doesn't have an associated
-  ## augument to args.
+  ## argument to args.
   if not (optionName in args):
     args[optionName] = newSeq[string]()
 
-proc addArg(args: var CmlArgs, optionName: string, augument: string) =
-  ## Add the given option name and its augument value to the args.
+proc addArg(args: var CmlArgs, optionName: string, argument: string) =
+  ## Add the given option name and its argument value to the args.
   if optionName in args:
     var arguments = args[optionName]
-    arguments.add(augument)
+    arguments.add(argument)
     args[optionName] = arguments
   else:
-    args[optionName] = @[augument]
+    args[optionName] = @[argument]
 
 proc optionCount(args: var CmlArgs, optionName: string): Natural =
   ## Return the number of values the given option name has.
@@ -182,10 +182,12 @@ proc optionCount(args: var CmlArgs, optionName: string): Natural =
 func cmdLine*(options: openArray[CmlOption],
     arguments: openArray[string]): ArgsOrMessage =
   ## Parse the command line arguments.  You pass in the list of
-  ## supported options and the arguments to parse. The arguments
-  ## found are returned. If there is a problem with the arguments,
-  ## args contains a message telling the problem. Use collectArgs()
-  ## to generate the arguments.
+  ## supported options and the arguments to parse. The arguments found
+  ## are returned. If there is a problem with the arguments, args
+  ## contains a message telling the problem. Use collectArgs() to
+  ## generate the arguments. Parse uses "arg value" not "arg=value".
+
+  # todo: is it easy to post process to support arg=value on an option?
 
   # shortOptions maps a short option letter to its option.
   var shortOptions: OrderedTable[char, CmlOption]
@@ -211,7 +213,7 @@ func cmdLine*(options: openArray[CmlOption],
     if option.optionType == cmlBareArgument:
       bareArgumentNames.add(option.long)
       if option.short != '_':
-        # _08_, Use the short name '_' instead of '$1' with a bare augument.
+        # _08_, Use the short name '_' instead of '$1' with a bare argument.
         return newArgsOrMessage(cml_08_BareShortName, $option.short)
     else:
       if option.short != '_' and not isAlphaNumeric(option.short):
@@ -237,39 +239,39 @@ func cmdLine*(options: openArray[CmlOption],
   var args: CmlArgs
   var ix = 0
   var state: State
-  var augument: string
+  var argument: string
   var optionName: string
   while true:
     if ix >= arguments.len:
       break
-    augument = arguments[ix]
+    argument = arguments[ix]
 
     # Skip empty arguments.
-    if augument == "":
+    if argument == "":
       inc(ix)
       continue
 
     case state:
     of start:
-      if augument.startsWith("--"):
+      if argument.startsWith("--"):
         state = longOption
-      elif augument.startsWith("-"):
+      elif argument.startsWith("-"):
         state = shortOption
       else:
-        # _11_, Extra bare augument.
+        # _11_, Extra bare argument.
         if bareIx >= bareArgumentNames.len:
           return newArgsOrMessage(cml_11_TooManyBareArgs)
 
         let name = bareArgumentNames[bareIx]
-        addArg(args, name, augument)
+        addArg(args, name, argument)
         inc(ix)
         inc(bareIx)
 
     of longOption:
-      if augument.len < 3:
+      if argument.len < 3:
         # _00_, Two dashes must be followed by an option name.
         return newArgsOrMessage(cml_00_BareTwoDashes)
-      optionName = augument[2 .. augument.len - 1]
+      optionName = argument[2 .. argument.len - 1]
       if not (optionName in longOptions):
         # _01_, The option '--$1' is not supported.
         return newArgsOrMessage(cml_01_InvalidOption, optionName)
@@ -277,14 +279,14 @@ func cmdLine*(options: openArray[CmlOption],
       state = processOption
 
     of shortOption:
-      if augument.len < 2:
+      if argument.len < 2:
         # _03_, One dash must be followed by a short option name.
         return newArgsOrMessage(cml_03_BareOneDash)
-      if augument.len > 2:
+      if argument.len > 2:
         state = multipleShortOptions
         continue
 
-      let shortOptionName = augument[1]
+      let shortOptionName = argument[1]
       if not (shortOptionName in shortOptions):
         # _04_, The short option '-$1' is not supported.
         return newArgsOrMessage(cml_04_InvalidShortOption, $shortOptionName)
@@ -302,7 +304,7 @@ func cmdLine*(options: openArray[CmlOption],
         inc(ix)
       of cmlOptionalArgument, cmlArgument0or1, cmlArgumentOnce:
         if args.optionCount(option.long) > 0:
-          # _12_, Already have one '$1' augument.
+          # _12_, Already have one '$1' argument.
           return newArgsOrMessage(cml_12_AlreadyHaveOneArg, $option.long)
         if option.optionType == cmlOptionalArgument:
           state = optionalArgument
@@ -313,7 +315,7 @@ func cmdLine*(options: openArray[CmlOption],
         state = needArgument
         inc(ix)
       of cmlBareArgument:
-        assert(false, "got a bare augument and option combination somehow")
+        assert(false, "got a bare argument and option combination somehow")
         inc(ix)
       of cmlStopArgument:
         var stopArgs: CmlArgs
@@ -321,24 +323,24 @@ func cmdLine*(options: openArray[CmlOption],
         return newArgsOrMessage(stopArgs)
 
     of needArgument:
-      if augument.startsWith("-"):
-        # _02_, The option '$1' needs a augument.
+      if argument.startsWith("-"):
+        # _02_, The option '$1' needs a argument.
         return newArgsOrMessage(cml_02_OptionRequiresArg, optionName)
-      addArg(args, optionName, augument)
+      addArg(args, optionName, argument)
       state = start
       inc(ix)
 
     of optionalArgument:
-      if augument.startsWith("-"):
+      if argument.startsWith("-"):
         addArg(args, optionName)
       else:
-        addArg(args, optionName, augument)
+        addArg(args, optionName, argument)
         inc(ix)
       state = start
 
     of multipleShortOptions:
 
-      for shortOptionName in augument[1 .. augument.len - 1]:
+      for shortOptionName in argument[1 .. argument.len - 1]:
         if not (shortOptionName in shortOptions):
           # _04_, The short option '-$1' is not supported.
           return newArgsOrMessage(cml_04_InvalidShortOption, $shortOptionName)
@@ -347,7 +349,7 @@ func cmdLine*(options: openArray[CmlOption],
         optionName = option.long
         if option.optionType in [cmlArgument0or1,
             cmlArgumentOnce, cmlArgumentMany]:
-          # _05_, The option '-$1' needs a augument; use it by itself.
+          # _05_, The option '-$1' needs an argument; use it by itself.
           return newArgsOrMessage(cml_05_ShortArgInList, $shortOptionName)
         addArg(args, optionName)
 
@@ -355,11 +357,11 @@ func cmdLine*(options: openArray[CmlOption],
       inc(ix)
 
   if state == needArgument:
-    # _02_, The option '$1' needs a augument.
+    # _02_, The option '$1' needs an argument.
     return newArgsOrMessage(cml_02_OptionRequiresArg, optionName)
 
   if bareIx < bareArgumentNames.len:
-    # _10_, Missing bare augument: '$1'.
+    # _10_, Missing bare argument: '$1'.
     return newArgsOrMessage(cml_10_MissingArgument,
       bareArgumentNames[bareIx])
 
@@ -370,7 +372,7 @@ func cmdLine*(options: openArray[CmlOption],
   for option in options:
     if option.optionType == cmlArgumentOnce:
       if not (option.long in args):
-        # _02_, The option '$1' needs a augument.
+        # _02_, The option '$1' needs an argument.
         return newArgsOrMessage(cml_02_OptionRequiresArg, option.long)
 
   result = newArgsOrMessage(args)
@@ -381,21 +383,21 @@ when defined(Test) or isMainModule:
     cmlMessages*: array[low(CmlMessageId)..high(CmlMessageId), string] = [
       #[_00_]# "Two dashes must be followed by an option name.",
       #[_01_]# "The option '--$1' is not supported.",
-      #[_02_]# "The option '$1' requires a augument.",
+      #[_02_]# "The option '$1' requires an argument.",
       #[_03_]# "One dash must be followed by a short option name.",
       #[_04_]# "The short option '-$1' is not supported.",
-      #[_05_]# "The option '-$1' needs a augument; use it by itself.",
+      #[_05_]# "The option '-$1' needs an argument; use it by itself.",
       #[_06_]# "Duplicate short option: '-$1'.",
       #[_07_]# "Duplicate long option: '--$1'.",
-      #[_08_]# "Use the short name '_' instead of '$1' with a bare augument.",
+      #[_08_]# "Use the short name '_' instead of '$1' with a bare argument.",
       #[_09_]# "Use an alphanumeric ascii character for a short option name instead of '$1'.",
-      #[_10_]# "Missing '$1' augument.",
-      #[_11_]# "Extra bare augument.",
-      #[_12_]# "Already have one '$1' augument.",
+      #[_10_]# "Missing '$1' argument.",
+      #[_11_]# "Extra bare argument.",
+      #[_12_]# "Already have one '$1' argumen.",
     ]
 
   func getMessage*(message: CmlMessageId, problemArg: string = ""): string =
-    ## Return a message from a message id and problem augument.
+    ## Return a message from a message id and problem argument.
     result = cmlMessages[message] % [problemArg]
 
 when isMainModule:

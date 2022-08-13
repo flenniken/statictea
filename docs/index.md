@@ -31,7 +31,7 @@ length.
 * [runner.nim](runner.md) &mdash; A standalone command to run Single Test File (stf) files.
 * [signatures.nim](signatures.md) &mdash; Statictea function signatures and parameter checking.
 * [statictea.nim](statictea.md) &mdash; StaticTea; A template processor and language.
-* [tempFile.nim](tempFile.md) &mdash; Temporary file methods.
+* [tempFile.nim](tempFile.md) &mdash; Create a temporary file.
 * [timer.nim](timer.md) &mdash; Time how long it takes something to run.
 * [unicodes.nim](unicodes.md) &mdash; Functions that deal with Unicode.
 * [utf8decoder.nim](utf8decoder.md) &mdash; Functions for decoding and validating UTF-8.

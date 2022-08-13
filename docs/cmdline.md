@@ -37,13 +37,13 @@ dictionary.
 * type: [CmlOptionType](#cmloptiontype) &mdash; The option type.
 * [newCmlOption](#newcmloption) &mdash; Create a new CmlOption object.
 * [newArgsOrMessage](#newargsormessage) &mdash; Create a new ArgsOrMessage object containing arguments.
-* [newArgsOrMessage](#newargsormessage-1) &mdash; Create a new ArgsOrMessage object containing a message id and optionally the problem augument.
+* [newArgsOrMessage](#newargsormessage-1) &mdash; Create a new ArgsOrMessage object containing a message id and optionally the problem argument.
 * [`$`](#) &mdash; Return a string representation of an CmlOption object.
 * [`$`](#-1) &mdash; Return a string representation of a ArgsOrMessage object.
 * [commandLineEcho](#commandlineecho) &mdash; Show the command line arguments.
 * [collectArgs](#collectargs) &mdash; Get the command line arguments from the system and return a list.
 * [cmdLine](#cmdline) &mdash; Parse the command line arguments.
-* [getMessage](#getmessage) &mdash; Return a message from a message id and problem augument.
+* [getMessage](#getmessage) &mdash; Return a message from a message id and problem argument.
 * [`$`](#-2) &mdash; Return a string representation of an Args object.
 
 # CmlArgs
@@ -99,15 +99,15 @@ ArgsOrMessage = object
 # CmlOptionType
 
 The option type.
-* cmlArgument0or1 -- option with a augument, 0 or 1 times.
-* cmlNoArgument -- option without a augument, 0 or 1 times.
-* cmlOptionalArgument -- option with an optional augument, 0
+* cmlArgument0or1 -- option with a argument, 0 or 1 times.
+* cmlNoArgument -- option without a argument, 0 or 1 times.
+* cmlOptionalArgument -- option with an optional argument, 0
     or 1 times.
-* cmlBareArgument -- a augument without an option, 1 time.
-* cmlArgumentOnce -- option with a augument, 1 time.
-* cmlArgumentMany -- option with a augument, unlimited
+* cmlBareArgument -- a argument without an option, 1 time.
+* cmlArgumentOnce -- option with a argument, 1 time.
+* cmlArgumentMany -- option with a argument, unlimited
     number of times.
-* cmlStopArgument -- option without a augument, 0 or 1
+* cmlStopArgument -- option without a argument, 0 or 1
     times. Stop and return this option by itself.
 
 ```nim
@@ -134,7 +134,7 @@ func newArgsOrMessage(args: CmlArgs): ArgsOrMessage
 
 # newArgsOrMessage
 
-Create a new ArgsOrMessage object containing a message id and optionally the problem augument.
+Create a new ArgsOrMessage object containing a message id and optionally the problem argument.
 
 ```nim
 func newArgsOrMessage(messageId: CmlMessageId; problemArg = ""): ArgsOrMessage
@@ -174,7 +174,7 @@ proc collectArgs(): seq[string]
 
 # cmdLine
 
-Parse the command line arguments.  You pass in the list of supported options and the arguments to parse. The arguments found are returned. If there is a problem with the arguments, args contains a message telling the problem. Use collectArgs() to generate the arguments.
+Parse the command line arguments.  You pass in the list of supported options and the arguments to parse. The arguments found are returned. If there is a problem with the arguments, args contains a message telling the problem. Use collectArgs() to generate the arguments. Parse uses "arg value" not "arg=value".
 
 ```nim
 func cmdLine(options: openArray[CmlOption]; arguments: openArray[string]): ArgsOrMessage
@@ -182,7 +182,7 @@ func cmdLine(options: openArray[CmlOption]; arguments: openArray[string]): ArgsO
 
 # getMessage
 
-Return a message from a message id and problem augument.
+Return a message from a message id and problem argument.
 
 ```nim
 func getMessage(message: CmlMessageId; problemArg: string = ""): string
