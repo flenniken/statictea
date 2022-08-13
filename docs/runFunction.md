@@ -51,6 +51,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funString_aoss](#funstring_aoss) &mdash; Convert the variable to a string.
 * [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names.
 * [funFormat](#funformat) &mdash; Format a string using replacement variables similar to a replacement block.
+* [funStartsWith](#funstartswith) &mdash; Check whether a strings starts with the given prefix.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -1281,6 +1282,28 @@ str => "use two { to get one"
 
 ```nim
 func funFormat(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funStartsWith
+
+Check whether a strings starts with the given prefix. Return 1 when it does.
+
+~~~
+startsWith(str: string, str: prefix) int
+~~~~
+
+Examples:
+
+~~~
+a = startsWith("abcdef", "abc")
+b = startsWith("abcdef", "abf")
+
+a => 1
+b => 0
+~~~~
+
+```nim
+func funStartsWith(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # createFunctionTable

@@ -2025,6 +2025,7 @@ List of functions:
 - [[#sort][sort]] -- Sort a list of values of the same type.
 - [[#sort][sort]] -- Sort a list of lists.
 - [[#sort][sort]] -- Sort a list of dictionaries.
+- [[#startsWith][startsWith]] -- Check whether a strings starts with the given prefix.
 - [[#string][string]] -- Convert the variable to a string.
 - [[#string][string]] -- Convert the dictionary variable to dot names.
 - [[#type][type]] -- Return the parameter type, one of: int, float, string, list, dict.
@@ -3149,6 +3150,29 @@ d2 = dict("name", "Tea Pot", "weight", 3.5)
 dicts = list(d1, d2)
 sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
 sort(dicts, "descending", "sensitive", "name") => [d2, d1]
+#+END_SRC
+
+[[#contents][茶]]
+
+** startsWith
+:PROPERTIES:
+:CUSTOM_ID: startsWith
+:END:
+
+Check whether a strings starts with the given prefix. Return 1 when it does.
+
+#+BEGIN_SRC
+startsWith(str: string, str: prefix) int
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+a = startsWith("abcdef", "abc")
+b = startsWith("abcdef", "abf")
+
+a => 1
+b => 0
 #+END_SRC
 
 [[#contents][茶]]

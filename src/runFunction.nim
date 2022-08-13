@@ -1776,6 +1776,34 @@ func funFormat*(variables: Variables, parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(stringOr.value))
 
+func funStartsWith*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Check whether a strings starts with the given prefix. Return 1
+  ## when it does.
+  ## @:
+  ## @:~~~
+  ## @:startsWith(str: string, str: prefix) int
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:a = startsWith("abcdef", "abc")
+  ## @:b = startsWith("abcdef", "abf")
+  ## @:
+  ## @:a => 1
+  ## @:b => 0
+  ## @:~~~~
+
+  tMapParameters("sss")
+  let str = map["a"].stringv
+  let prefix = map["b"].stringv
+  var starts: int
+  if startsWith(str, prefix):
+    starts = 1
+  else:
+    starts = 0
+  result = newFunResult(newValue(starts))
+
 const
   functionsList = [
     ("len", funLen_si, "si"),
@@ -1822,6 +1850,7 @@ const
     ("string", funString_aoss, "aoss"),
     ("string", funString_sds, "sds"),
     ("format", funFormat, "ss"),
+    ("startsWith", funStartsWith, "sss"),
   ]
 
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =

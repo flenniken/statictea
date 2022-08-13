@@ -107,6 +107,13 @@ proc testIntOk(num: Value, option: string, eIntNum: int): bool =
   if testFunction("int", parameters, eFunResult):
     result = true
 
+proc testStartsWith(str: string, prefix: string, eIntNum: int): bool =
+  var parameters = @[newValue(str), newValue(prefix)]
+  let eFunResult = newFunResult(newValue(eIntNum))
+  if testFunction("startsWith", parameters, eFunResult):
+    result = true
+
+
 suite "runFunction.nim":
 
   test "getFunction missing":
@@ -1666,3 +1673,16 @@ d.sub.y = 4"""
     let str = newValue("hello {name}")
     let eFunResult = newFunResultWarn(wVariableMissing, 0, "name", 7)
     check testFunction("format", @[str], eFunResult)
+
+  test "startsWith":
+    check testStartsWith("hello", "he", 1)
+    check testStartsWith("hello", "ll", 0)
+    check testStartsWith("a", "a", 1)
+    check testStartsWith("a", "ab", 0)
+    check testStartsWith("ab", "a", 1)
+    check testStartsWith("ab", "ab", 1)
+
+    check testStartsWith("", "", 1)
+    check testStartsWith("abc", "", 1)
+    check testStartsWith("", "l", 0)
+
