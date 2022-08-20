@@ -55,6 +55,20 @@ suite "vartypes":
     check newValue(0).intv == 0
     check newValue(-1).intv == -1
 
+  test "newValue bool":
+    let testBool = true
+    let jsonString = "true"
+    let value = newValue(testBool)
+    let sameValue = newValue(testBool)
+    check $value == jsonString
+    check value == sameValue
+    check value != newValue(false)
+    check value != newValue(1)
+    check value.kind == vkBool
+    check $value.kind == "bool"
+    check newValue(true).boolv == true
+    check newValue(false).boolv == false
+
   test "newValue float":
     let testFloat = 0.123
     let jsonString = "0.123"
@@ -77,6 +91,7 @@ suite "vartypes":
 
     var varsDict2 = newVarsDict()
     varsDict2["string"] = newValue("a")
+
 
   test "newEmptyListValue":
     var listValue = newEmptyListValue()

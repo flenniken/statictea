@@ -335,6 +335,12 @@ suite "runFunction.nim":
     # check testCmpFun(1.2, 2.0, expected = -1)
     # check testCmpFun(2.1, 1.3, expected = 1)
 
+  test "cmp bools":
+    check testCmpFun(true, true, expected = 0)
+    check testCmpFun(false, false, expected = 0)
+    check testCmpFun(true, false, expected = 1)
+    check testCmpFun(false, true, expected = -1)
+
   test "cmp strings":
     check testCmpFun("abc", "abc", expected = 0)
     check testCmpFun("abc", "abd", expected = -1)
@@ -1713,4 +1719,14 @@ d.sub.y = 4"""
     check testStartsWith("", "", 1)
     check testStartsWith("abc", "", 1)
     check testStartsWith("", "l", 0)
+
+  test "bool false":
+    var parameters = @[newValue(0)]
+    let eFunResult = newFunResult(newValue(false))
+    check testFunction("bool", parameters, eFunResult)
+
+  test "bool true":
+    var parameters = @[newValue(3)]
+    let eFunResult = newFunResult(newValue(true))
+    check testFunction("bool", parameters, eFunResult)
 

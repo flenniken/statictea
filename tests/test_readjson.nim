@@ -218,6 +218,14 @@ suite "readjson.nim":
     let valueOr = readJsonString(content)
     check $valueOr == $newValueOr(wJsonParseError)
 
+  test "readJsonString true=5":
+    # It's ok to have a variable named true or false (but confusing).
+    let content = """{"true":5}"""
+    let valueOr = readJsonString(content)
+    check valueOr.isValue
+    let str = dictToString(valueOr.value)
+    check expectedItem("json", str, content)
+
   test "jsonToValue int":
     let jsonNode = newJInt(5)
     let valueOr = jsonToValue(jsonNode)

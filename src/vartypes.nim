@@ -19,7 +19,8 @@ type
     vkInt,
     vkFloat,
     vkDict,
-    vkList
+    vkList,
+    vkBool
 
   Value* = ref ValueObj
     ## A variable's value reference.
@@ -39,6 +40,8 @@ type
       dictv*: VarsDict
     of vkList:
       listv*: seq[Value]
+    of vkBool:
+      boolv*: bool
 
 proc newVarsDict*(): VarsDict =
   ## Create a new empty variables dictionary. VarsDict is a ref type.
@@ -63,13 +66,8 @@ proc newValue*(num: int | int64): Value =
   result = Value(kind: vkInt, intv: num)
 
 proc newValue*(a: bool): Value =
-  ## Create an integer value from a bool.
-  var num: int64
-  if a:
-    num = 1
-  else:
-    num = 0
-  result = Value(kind: vkInt, intv: num)
+  ## Create a bool value.
+  result = Value(kind: vkBool, boolv: a)
 
 proc newValue*(num: float): Value =
   ## Create a float value.
@@ -140,6 +138,8 @@ proc `==`*(value1: Value, value2: Value): bool =
         result = value1.dictv == value2.dictv
       of vkList:
         result = value1.listv == value2.listv
+      of vkBool:
+        result = value1.boolv == value2.boolv
 
 func `$`*(kind: ValueKind): string =
   ## Return a string representation of the variable's type.
@@ -154,6 +154,8 @@ func `$`*(kind: ValueKind): string =
     result = "dict"
   of vkList:
     result = "list"
+  of vkBool:
+    result = "bool"
 
 proc jsonStringRepr*(str: string): string =
   ## Return the JSON string representation. It is assumed the string
@@ -244,6 +246,8 @@ func valueToString*(value: Value): string =
       result.add($value.intv)
     of vkFloat:
       result.add($value.floatv)
+    of vkBool:
+      result.add($value.boolv)
 
 func valueToStringRB*(value: Value): string =
   ## Return the string representation of the variable for use in the
@@ -259,6 +263,8 @@ func valueToStringRB*(value: Value): string =
     result.add(dictToString(value))
   of vkList:
     result.add(listToString(value))
+  of vkBool:
+    result = $value.boolv
 
 func `$`*(value: Value): string =
   ## Return a string representation of a Value.

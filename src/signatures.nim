@@ -17,7 +17,7 @@ import messages
 # myFunction(argument);
 
 const
-  singleCodes = {'i', 'f', 's', 'l', 'd', 'a'}
+  singleCodes = {'i', 'f', 's', 'l', 'd', 'a', 'b'}
 
 type
   ParamCode* = char
@@ -60,6 +60,8 @@ func paramCodeString*(paramCode: ParamCode): string =
     result = "dict"
   of 'a':
     result = "any"
+  of 'b':
+    result = "bool"
   else:
     assert false, "Invalid paramCode."
     discard
@@ -91,6 +93,8 @@ func kindToParamCode*(kind: ValueKind): ParamCode =
       result = 'l'
     of vkDict:
       result = 'd'
+    of vkBool:
+      result = 'b'
 
 func sameType*(paramCode: ParamCode, valueKind: ValueKind): bool =
   ## Check whether the param type is the same type or compatible with
@@ -113,6 +117,9 @@ func sameType*(paramCode: ParamCode, valueKind: ValueKind): bool =
         return true
     of 'd':
       if valueKind == vkDict:
+        return true
+    of 'b':
+      if valueKind == vkBool:
         return true
     else:
       assert false, "Invalid paramCode"

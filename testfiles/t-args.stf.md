@@ -38,10 +38,10 @@ $$ nextline args = string("t.args", t.args)
 ### File result.expected
 
 ~~~
-t.args.help = 0
-t.args.version = 0
-t.args.update = 0
-t.args.log = 1
+t.args.help = false
+t.args.version = false
+t.args.update = false
+t.args.log = true
 t.args.serverList = ["server.json"]
 t.args.codeList = ["shared.tea"]
 t.args.resultFilename = "result"

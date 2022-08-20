@@ -33,8 +33,8 @@ $$ endblock
 ### File stdout.expected
 
 ~~~
-true => 1
-false => 0
+true => true
+false => false
 null => 0
 ~~~
 

@@ -49,10 +49,10 @@ $$ : g.prepostParts &= part
 $$ endblock
 $$ nextline
 $$ : parts &= "statictea"
-$$ : parts &= if0(t.args.help, "", "--help")
-$$ : parts &= if0(t.args.version, "", "--version")
-$$ : parts &= if0(t.args.update, "", "--update")
-$$ : parts &= if0(t.args.log, "", "--log")
+$$ : parts &= if0(cmp(t.args.help, bool(1)), "--help", "")
+$$ : parts &= if0(cmp(t.args.version, bool(1)), "--version", "")
+$$ : parts &= if0(cmp(t.args.update, bool(1)), "--update", "")
+$$ : parts &= if0(cmp(t.args.log, bool(1)), "--log", "")
 $$ :
 $$ : parts &= if0(len(t.args.resultFilename), "", +
 $$ :   concat("--result ", t.args.resultFilename))
@@ -100,10 +100,10 @@ $statictea -l -s server.json -o codefile.tea \
   -t template.html -r result.html >stdout 2>stderr
 
 t.args keys and values:
-  help: 0
-  version: 0
-  update: 0
-  log: 1
+  help: false
+  version: false
+  update: false
+  log: true
   serverList: ["server.json","server2.json"]
   codeList: ["codefile.tea","codefile2.tea"]
   resultFilename: result.html

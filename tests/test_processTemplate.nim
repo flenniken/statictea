@@ -1117,10 +1117,10 @@ teas => ["black","green"]
   test "getTeaArgs empty":
     var args: Args
     let eVarRep = """
-help = 0
-version = 0
-update = 0
-log = 0
+help = false
+version = false
+update = false
+log = false
 serverList = []
 codeList = []
 resultFilename = ""
@@ -1163,9 +1163,9 @@ $$ endblock
 """
 
     let eResultLines = splitNewLines """
-help => 0
-help2 => 0
-help3 => 0
+help => false
+help2 => false
+help3 => false
 """
     check testProcessTemplate(templateContent = templateContent,
         serverJson = serverJson, eResultLines = eResultLines, eRc = 0)

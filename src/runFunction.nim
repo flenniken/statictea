@@ -123,6 +123,28 @@ func funCmp_ffi*(variables: Variables, parameters: seq[Value]): FunResult =
   let b = map["b"].floatv
   result = newFunResult(newValue(cmp(a, b)))
 
+func funCmp_bbi*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Compare two bools. Returns -1 for less, 0 for equal and 1 for
+  ## @: greater than with true > false.
+  ## @:
+  ## @:~~~
+  ## @:cmp(a: bool, b: bool) int
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:cmp(true, true) => 0
+  ## @:cmp(false, false) => 0
+  ## @:cmp(true, false) => 1
+  ## @:cmp(false, true) => -1
+  ## @:~~~~
+
+  tMapParameters("bbi")
+  let a = map["a"].boolv
+  let b = map["b"].boolv
+  result = newFunResult(newValue(cmp(a, b)))
+
 func funCmp_ssoii*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Compare two strings. Returns -1 for less, 0 for equal and 1 for
   ## @:greater than.
@@ -324,6 +346,7 @@ func funIf0*(variables: Variables, parameters: seq[Value]): FunResult =
   ## third parameter. You can use any type for the condition, strings,
   ## lists and dictionaries use their length.
   ## @:
+  ## @:* bool -- false
   ## @:* int -- 0
   ## @:* float -- 0.0
   ## @:* string -- when the length of the string is 0
@@ -340,29 +363,32 @@ func funIf0*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:drink0 = if0(0, "tea", "beer")
-  ## @:drink1 = if0(1, "tea", "beer")
-  ## @:drink4 = if0(4, "tea", "beer")
-  ## @:drink5 = if0(0, "tea")
-  ## @:drink6 = if0(8, "tea")
-  ## @:drink7 = if0("", "tea")
-  ## @:drink8 = if0([], "tea")
-  ## @:drink9 = if0(dict(), "tea")
-  ## @:if0(c, return("skip"))
-  ## @:if0(c, warn("c is 0"))
+  ## @:if0(0, "tea", "beer") => tea
+  ## @:if0(1, "tea", "beer") => beer
+  ## @:if0(4, "tea", "beer") => beer
+  ## @:if0("", "tea", "beer") => tea
+  ## @:if0("abc", "tea", "beer") => beer
+  ## @:if0([], "tea", "beer") => tea
+  ## @:if0([1,2], "tea", "beer") => beer
+  ## @:if0(dict(), "tea", "beer") => tea
+  ## @:if0(dict("a",1), "tea", "beer") => beer
+  ## @:if0(false, "tea", "beer") => tea
+  ## @:if0(true, "tea", "beer") => beer
   ## @:~~~~
   ## @:
-  ## @:result:
+  ## @:No third parameter examples:
   ## @:
   ## @:~~~
-  ## @:drink0 => tea
-  ## @:drink1 => beer
-  ## @:drink4 => beer
-  ## @:drink5 => tea
-  ## @:drink6 => 0
-  ## @:drink7 => tea
-  ## @:drink8 => tea
-  ## @:drink9 => tea
+  ## @:if0(0, "tea") => tea
+  ## @:if0(4, "tea") => 0
+  ## @:~~~~
+  ## @:
+  ## @:You don't have to assign the result of an if0 function which is
+  ## @:useful when use a warn or return function for its side effects.
+  ## @:
+  ## @:~~~
+  ## @:c = 0
+  ## @:if0(c, warn("got zero value"))
   ## @:~~~~
 
   # Note: the if functions are handled in runCommand as a special
@@ -810,6 +836,28 @@ func funInt_ssaa*(variables: Variables, parameters: seq[Value]): FunResult =
 
   if result.value.kind == vkFloat:
     result = convertFloatToInt(result.value.floatv, map)
+
+func funBool_ib*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Create an bool from an int. A 0 is false and all other values are true.
+  ## @:
+  ## @:~~~
+  ## @:bool(num: int) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:bool(0) => false
+  ## @:bool(1) => true
+  ## @:bool(2) => true
+  ## @:bool(3) => true
+  ## @:bool(-1) => true
+  ## @:~~~~
+
+  tMapParameters("ib")
+  let num = map["a"].intv
+  let b = if num == 0: false else: true
+  result = newFunResult(newValue(b))
 
 func funFind*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Find the position of a substring in a string.  When the substring
@@ -1359,13 +1407,21 @@ func generalSort(map: VarsDict): FunResult =
       result = cmpBaseValues(a.listv[0], b.listv[0], insensitive)
     of vkDict:
       result = cmpBaseValues(a.dictv[key], b.dictv[key], insensitive)
+    of vkBool:
+      # Sort as if true is 1 and false is 0.
+      if a == b:
+        result = 0
+      elif a.boolv == true:
+        result = 1
+      else:
+        result = -1
 
   let newList = sorted(list, sortCmpValues, sortOrder)
   result = newFunResult(newValue(newList))
 
 func funSort_lsosl*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Sort a list of values of the same type.  The values are ints,
-  ## @:floats or strings.
+  ## @:floats, strings or bools. Bools are sorts as if true is 1 and false is 0.
   ## @:
   ## @:You specify the sort order, "ascending" or "descending".
   ## @:
@@ -1405,8 +1461,8 @@ func funSort_lssil*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:"insensitive".
   ## @:
   ## @:You specify which index to compare by.  The compare index value
-  ## @:must exist in each list, be the same type and be an int, float or
-  ## @:string.
+  ## @:must exist in each list, be the same type and be an int, float,
+  ## @:string or bool. Bools are sorts as if true is 1 and false is 0.
   ## @:
   ## @:~~~
   ## @:sort(lists: list, order: string, case: string, index: int) list
@@ -1433,9 +1489,9 @@ func funSort_lsssl*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:You specify how to sort strings either case "sensitive" or
   ## @:"insensitive".
   ## @:
-  ## @:You specify the compare key.  The key value must exist
-  ## @:in each dictionary, be the same type and be an int, float or
-  ## @:string.
+  ## @:You specify the compare key.  The key value must exist in
+  ## @:each dictionary, be the same type and be an int, float, bool or
+  ## @:string. Bools are sorts as if true is 1 and false is 0.
   ## @:
   ## @:~~~
   ## @:sort(dicts: list, order: string, case: string, key: string) list
@@ -1873,6 +1929,7 @@ const
     ("cmp", funCmp_iii, "iii"),
     ("cmp", funCmp_ffi, "ffi"),
     ("cmp", funCmp_ssoii, "ssoii"),
+    ("cmp", funCmp_bbi, "bbi"),
     ("if0", funIf0, "iaaa"),
     ("add", funAdd_iii, "iii"),
     ("add", funAdd_fff, "fff"),
@@ -1911,6 +1968,7 @@ const
     ("string", funString_sds, "sds"),
     ("format", funFormat, "ss"),
     ("startsWith", funStartsWith, "sss"),
+    ("bool", funBool_ib, "ib"),
   ]
 
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =

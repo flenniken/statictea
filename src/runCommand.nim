@@ -343,11 +343,11 @@ proc getValueAndLength*(statement: Statement, start: Natural, variables:
 # - runStatement
 # - getValueAndLength
 # - getFunctionValueAndLength
-# - ifFunction
+# - if0Function
 # - getList
 # - getValueAndLength
 
-proc ifFunction*(
+proc if0Function*(
     functionName: string,
     statement: Statement,
     start: Natural,
@@ -387,6 +387,8 @@ proc ifFunction*(
    of vkDict:
      if cond.dictv.len == 0:
        condition = true
+   of vkBool:
+     condition = cond.boolv
 
   # Match the comma and whitespace.
   let commaO = matchSymbol(statement.text, gComma, start + runningLen)
@@ -578,7 +580,7 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
 
       # Handle the special if functions.
       if dotNameStr in ["if0"]:
-        let ifOr = ifFunction(dotNameStr, statement,
+        let ifOr = if0Function(dotNameStr, statement,
           start+dotNameLen, variables, skip)
         if ifOr.isMessage or ifOr.value.exit:
           return ifOr
@@ -667,7 +669,7 @@ proc runStatement*(statement: Statement, variables: Variables):
 
   if leftParen == "(" and dotNameStr in ["if0"]:
     # Handle the special bare if functions.
-    vlOr = ifFunction(dotNameStr, statement, leadingLen, variables)
+    vlOr = if0Function(dotNameStr, statement, leadingLen, variables)
   else:
     # Handle normal "varName operator right" statements.
     varName = dotNameStr
