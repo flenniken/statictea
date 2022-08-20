@@ -216,3 +216,7 @@ suite "signatures.nim":
   test "mapParameters loss":
     var parameters: seq[Value] = @[newEmptyListValue()]
     check testMapParametersOk("loss", parameters, """{"a":[]}""")
+
+  test "mapParameters saa":
+    var parameters = @[newValue("3"), newValue("nan")]
+    check testMapParametersOk("saa", parameters, """{"a":"3","b":"nan"}""")

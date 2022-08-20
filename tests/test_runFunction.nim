@@ -143,6 +143,10 @@ suite "runFunction.nim":
     var parameters = @[newValue(1), newValue(1.0)]
     check testGetFunctionExists("cmp", parameters, "iii")
 
+  test "getFunction float":
+    var parameters = @[newValue("1.0"), newValue("default")]
+    check testGetFunctionExists("float", parameters, "saa")
+
   test "concat hello world":
     var parameters = newValue(["Hello", " World"]).listv
     let eFunResult = newFunResult(newValue("Hello World"))
@@ -630,10 +634,19 @@ suite "runFunction.nim":
     let eFunResult = newFunResultWarn(wNumberOverFlow)
     check testFunction("int", parameters, eFunResult)
 
-
   test "to float":
     var parameters = @[newValue(3)]
     let eFunResult = newFunResult(newValue(3.0))
+    check testFunction("float", parameters, eFunResult)
+
+  test "to float with default":
+    var parameters = @[newValue("3"), newValue("nan")]
+    let eFunResult = newFunResult(newValue(3.0))
+    check testFunction("float", parameters, eFunResult)
+
+  test "to float not a number":
+    var parameters = @[newValue("notnum"), newValue("nan")]
+    let eFunResult = newFunResult(newValue("nan"))
     check testFunction("float", parameters, eFunResult)
 
   test "to float minus":

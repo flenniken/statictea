@@ -25,6 +25,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funCmpVersion](#funcmpversion) &mdash; Compare two StaticTea version numbers.
 * [funFloat_if](#funfloat_if) &mdash; Create a float from an int.
 * [funFloat_sf](#funfloat_sf) &mdash; Create a float from a number string.
+* [funFloat_saa](#funfloat_saa) &mdash; Create a float from a number string.
 * [funInt_fosi](#funint_fosi) &mdash; Create an int from a float.
 * [funInt_sosi](#funint_sosi) &mdash; Create an int from a number string.
 * [funInt_ssaa](#funint_ssaa) &mdash; Create an int from a number string.
@@ -520,6 +521,25 @@ float("33") => 33.0
 
 ```nim
 func funFloat_sf(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funFloat_saa
+
+Create a float from a number string. If the string is not a number, return the default.
+
+~~~
+float(numString: string, default: any) any
+~~~~
+
+Examples:
+
+~~~
+float("2") => 2.0
+float("notnum", "nan") => nan
+~~~~
+
+```nim
+func funFloat_saa(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funInt_fosi

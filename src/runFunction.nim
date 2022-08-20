@@ -648,6 +648,31 @@ func funFloat_sf*(variables: Variables, parameters: seq[Value]): FunResult =
   else:
     result = newFunResult(newValue(float(funResult.value.intv)))
 
+func funFloat_saa*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Create a float from a number string. If the string is not a
+  ## number, return the default.
+  ## @:
+  ## @:~~~
+  ## @:float(numString: string, default: any) any
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:float("2") => 2.0
+  ## @:float("notnum", "nan") => nan
+  ## @:~~~~
+  tMapParameters("saa")
+  let numString = map["a"].stringv
+
+  result = numberStringToNum(numString)
+  if result.kind == frWarning and result.warningData.warning == wExpectedNumberString:
+    # Return the default.
+    return newFunResult(map["b"])
+
+  if result.value.kind == vkInt:
+    result = newFunResult(newValue(float(result.value.intv)))
+
 func convertFloatToInt(num: float, map: VarsDict): FunResult =
   ## Convert float to an integer. The map contains the optional round
   ## options as "b".
@@ -1860,6 +1885,7 @@ const
     ("int", funInt_ssaa, "ssaa"),
     ("float", funFloat_if, "if"),
     ("float", funFloat_sf, "sf"),
+    ("float", funFloat_saa, "saa"),
     ("find", funFind, "ssoaa"),
     ("slice", funSlice, "siois"),
     ("dup", funDup, "sis"),

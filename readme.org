@@ -2000,6 +2000,7 @@ List of functions:
 - [[#find][find]] -- Find the position of a substring in a string.
 - [[#float][float]] -- Create a float from an int.
 - [[#float][float]] -- Create a float from a number string.
+- [[#float][float]] -- Create a float from a number string.
 - [[#format][format]] -- Format a string using replacement variables similar to a replacement block.
 - [[#get][get]] -- Get a dictionary value by its key.
 - [[#get][get]] -- Get a list value by its index.
@@ -2376,6 +2377,26 @@ Examples:
 #+BEGIN_SRC
 float(2) => 2.0
 float(-33) => -33.0
+#+END_SRC
+
+[[#contents][茶]]
+
+** float
+:PROPERTIES:
+:CUSTOM_ID: float
+:END:
+
+Create a float from a number string. If the string is not a number, return the default.
+
+#+BEGIN_SRC
+float(numString: string, default: any) any
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+float("2") => 2.0
+float("notnum", "nan") => nan
 #+END_SRC
 
 [[#contents][茶]]

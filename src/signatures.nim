@@ -216,7 +216,6 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
       return newFunResultWarn(wTooManyArgsOpt, limit, $limit)
     else:
       # The function requires $1 arguments.
-      # Too many arguments, expected at most $1."
       return newFunResultWarn(wTooManyArgs, limit, $limit)
 
   # Loop through the parameters.
