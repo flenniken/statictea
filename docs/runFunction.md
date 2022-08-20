@@ -27,6 +27,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funFloat_sf](#funfloat_sf) &mdash; Create a float from a number string.
 * [funInt_fosi](#funint_fosi) &mdash; Create an int from a float.
 * [funInt_sosi](#funint_sosi) &mdash; Create an int from a number string.
+* [funInt_ssaa](#funint_ssaa) &mdash; Create an int from a number string.
 * [funFind](#funfind) &mdash; Find the position of a substring in a string.
 * [funSlice](#funslice) &mdash; Extract a substring from a string by its position and length.
 * [funDup](#fundup) &mdash; Duplicate a string x times.
@@ -589,6 +590,32 @@ int("-6.3456", "truncate") => -6
 
 ```nim
 func funInt_sosi(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funInt_ssaa
+
+Create an int from a number string. If the string is not a number, return the default value.
+
+~~~
+int(numString: string, roundOption: string, default: any) any
+~~~~
+
+Round options:
+
+* "round" - nearest integer, the default
+* "floor" - integer below (to the left on number line)
+* "ceiling" - integer above (to the right on number line)
+* "truncate" - remove decimals
+
+Examples:
+
+~~~
+int("2", "round", "nan") => 2
+int("notnum", "round", "nan") => nan
+~~~~
+
+```nim
+func funInt_ssaa(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funFind

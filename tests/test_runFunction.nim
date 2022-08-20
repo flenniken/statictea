@@ -561,6 +561,21 @@ suite "runFunction.nim":
     check testIntOk(newValue(6.3456), "truncate", 6)
     check testIntOk(newValue(-6.3456), "truncate", -6)
 
+  test "int() with default":
+    var parameters = @[newValue("5"), newValue("round"), newValue("nan")]
+    let eFunResult = newFunResult(newValue(5))
+    check testFunction("int", parameters, eFunResult)
+
+  test "int() with default 2":
+    var parameters = @[newValue("5.4"), newValue("round"), newValue("nan")]
+    let eFunResult = newFunResult(newValue(5))
+    check testFunction("int", parameters, eFunResult)
+
+  test "int() not a number":
+    var parameters = @[newValue("notnum"), newValue("round"), newValue("nan")]
+    let eFunResult = newFunResult(newValue("nan"))
+    check testFunction("int", parameters, eFunResult)
+
   test "int() float number string to int":
     check testIntOk(newValue("2.34"), "round", 2)
     check testIntOk(newValue("-2.34"), "round", -2)

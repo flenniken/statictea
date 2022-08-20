@@ -753,6 +753,39 @@ func funInt_sosi*(variables: Variables, parameters: seq[Value]): FunResult =
   else:
     result = funResult
 
+func funInt_ssaa*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Create an int from a number string. If the string is not a number,
+  ## return the default value.
+  ## @:
+  ## @:~~~
+  ## @:int(numString: string, roundOption: string, default: any) any
+  ## @:~~~~
+  ## @:
+  ## @:Round options:
+  ## @:
+  ## @:* "round" - nearest integer, the default
+  ## @:* "floor" - integer below (to the left on number line)
+  ## @:* "ceiling" - integer above (to the right on number line)
+  ## @:* "truncate" - remove decimals
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:int("2", "round", "nan") => 2
+  ## @:int("notnum", "round", "nan") => nan
+  ## @:~~~~
+
+  tMapParameters("ssaa")
+  let numString = map["a"].stringv
+
+  result = numberStringToNum(numString)
+  if result.kind == frWarning and result.warningData.warning == wExpectedNumberString:
+    # Return the default.
+    return newFunResult(map["c"])
+
+  if result.value.kind == vkFloat:
+    result = convertFloatToInt(result.value.floatv, map)
+
 func funFind*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Find the position of a substring in a string.  When the substring
   ## @:is not found, return an optional default value.  A warning is
@@ -1824,6 +1857,7 @@ const
     ("cmpVersion", funCmpVersion, "ssi"),
     ("int", funInt_fosi, "fosi"),
     ("int", funInt_sosi, "sosi"),
+    ("int", funInt_ssaa, "ssaa"),
     ("float", funFloat_if, "if"),
     ("float", funFloat_sf, "sf"),
     ("find", funFind, "ssoaa"),

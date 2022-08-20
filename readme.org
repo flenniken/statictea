@@ -2008,6 +2008,7 @@ List of functions:
 - [[#if0][if0]] -- If the condition is 0, return the second parameter, else return the third parameter.
 - [[#int][int]] -- Create an int from a float.
 - [[#int][int]] -- Create an int from a number string.
+- [[#int][int]] -- Create an int from a number string.
 - [[#joinPath][joinPath]] -- Join the path components with a path separator.
 - [[#join][join]] -- Join a list of strings with a separator.
 - [[#keys][keys]] -- Create a list from the keys in a dictionary.
@@ -2668,6 +2669,33 @@ int("6.3", "ceiling") => 7
 int("-6.3", "ceiling") => -6
 int("6.3456", "truncate") => 6
 int("-6.3456", "truncate") => -6
+#+END_SRC
+
+[[#contents][茶]]
+
+** int
+:PROPERTIES:
+:CUSTOM_ID: int
+:END:
+
+Create an int from a number string. If the string is not a number, return the default value.
+
+#+BEGIN_SRC
+int(numString: string, roundOption: string, default: any) any
+#+END_SRC
+
+Round options:
+
+- "round" - nearest integer, the default
+- "floor" - integer below (to the left on number line)
+- "ceiling" - integer above (to the right on number line)
+- "truncate" - remove decimals
+
+Examples:
+
+#+BEGIN_SRC
+int("2", "round", "nan") => 2
+int("notnum", "round", "nan") => nan
 #+END_SRC
 
 [[#contents][茶]]
