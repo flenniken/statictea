@@ -1058,3 +1058,43 @@ White$1
     check testGetMultilineStrE("$1\n", 3,
       newWarningData(wMissingEndingTriple, "", 4))
 
+  test "true and true":
+    let statement = newStatement(text="""a = and(true, true)""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(true))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "true and false":
+    let statement = newStatement(text="""a = and(true, false)""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(false))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "false and true":
+    let statement = newStatement(text="""a = and(false, true)""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(false))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "false and false":
+    let statement = newStatement(text="""a = and(false, false)""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(false))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "true or true":
+    let statement = newStatement(text="""a = or(true, true)""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(true))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "true or false":
+    let statement = newStatement(text="""a = or(true, false)""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(true))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "false or true":
+    let statement = newStatement(text="""a = or(false, true)""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(true))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "false or false":
+    let statement = newStatement(text="""a = or(false, false)""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(false))
+    check testRunStatement(statement, eVariableDataOr)
+

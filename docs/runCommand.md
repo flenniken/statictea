@@ -27,6 +27,7 @@ starts in the template file.
 * [getString](#getstring) &mdash; Return a literal string value and match length from a statement.
 * [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
 * [ifFunctions](#iffunctions) &mdash; Return the if/if0 function's value and the length.
+* [andOrFunctions](#andorfunctions) &mdash; Return the and/or function's value and the length.
 * [getFunctionValueAndLength](#getfunctionvalueandlength) &mdash; Return the function's value and the length.
 * [getValueAndLength](#getvalueandlength) &mdash; Return the value and length of the item that the start parameter points at which is a string, number, variable, function or list.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
@@ -218,6 +219,15 @@ Return the if/if0 function's value and the length. It conditionally runs one of 
 ```nim
 proc ifFunctions(functionName: string; statement: Statement; start: Natural;
                  variables: Variables; list = false): ValueAndLengthOr
+```
+
+# andOrFunctions
+
+Return the and/or function's value and the length. The and function stops on the first false. The or function stops on the first true. The rest of the arguments are skipped. Start points at the first parameter of the function. The length includes the trailing whitespace after the ending ).
+
+```nim
+proc andOrFunctions(functionName: string; statement: Statement; start: Natural;
+                    variables: Variables; list = false): ValueAndLengthOr
 ```
 
 # getFunctionValueAndLength

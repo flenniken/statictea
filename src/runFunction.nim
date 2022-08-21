@@ -1982,6 +1982,58 @@ func funNot_bb*(variables: Variables, parameters: seq[Value]): FunResult =
   let cond = map["a"].boolv
   result = newFunResult(newValue(not(cond)))
 
+func funAnd_bbb*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Boolean and with short circuit. If the first argument is false,
+  ## the second argument is not evaluated.
+  ## @:
+  ## @:~~~
+  ## @:and(a: bool, b: bool) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:and(true, true) => true
+  ## @:and(false, true) => false
+  ## @:and(true, false) => false
+  ## @:and(false, false) => false
+  ## @:and(false, warn("not hit")) => false
+  ## @:~~~~
+
+  # Note: this code isn't run, it hear for the docs and the function
+  # list.  The the code in runCommand.nim.
+  tMapParameters("bbb")
+  let a = map["a"].boolv
+  let b = map["b"].boolv
+  let cond = a and b
+  result = newFunResult(newValue(cond))
+
+func funOr_bbb*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Boolean or with short circuit. If the first argument is true,
+  ## the second argument is not evaluated.
+  ## @:
+  ## @:~~~
+  ## @:or(a: bool, b: bool) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:or(true, true) => true
+  ## @:or(false, true) => true
+  ## @:or(true, false) => true
+  ## @:or(false, false) => false
+  ## @:or(true, warn("not hit")) => true
+  ## @:~~~~
+
+  # Note: this code isn't run, it hear for the docs and the function
+  # list.  The the code in runCommand.nim.
+  tMapParameters("bbb")
+  let a = map["a"].boolv
+  let b = map["b"].boolv
+  let cond = a or b
+  result = newFunResult(newValue(cond))
+
 const
   functionsList = [
     ("len", funLen_si, "si"),
@@ -2035,6 +2087,8 @@ const
     ("startsWith", funStartsWith, "ssb"),
     ("bool", funBool_ib, "ib"),
     ("not", funNot_bb, "bb"),
+    ("and", funAnd_bbb, "bbb"),
+    ("or", funOr_bbb, "bbb"),
   ]
 
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =

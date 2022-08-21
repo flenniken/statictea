@@ -444,6 +444,74 @@ proc ifFunctions*(
     value = vl3Or.value.value
   result = newValueAndLengthOr(value, runningLen)
 
+proc andOrFunctions*(
+    functionName: string,
+    statement: Statement,
+    start: Natural,
+    variables: Variables,
+    list=false): ValueAndLengthOr =
+  ## Return the and/or function's value and the length. The and
+  ## function stops on the first false. The or function stops on the
+  ## first true. The rest of the arguments are skipped.
+  ## Start points at the first parameter of the function. The length
+  ## includes the trailing whitespace after the ending ).
+
+  # cases:
+  #   c1 = and(a, b)
+  #   c2 = or(a, b)
+
+  # Get the first argument value.
+  let vlcOr = getValueAndLength(statement, start, variables, skip=false)
+  if vlcOr.isMessage or vlcOr.value.exit:
+    return vlcOr
+  let firstValue = vlcOr.value.value
+  var runningLen = vlcOr.value.length
+
+  if firstValue.kind != vkBool:
+    # Expected bool argument got $1.
+    return newValueAndLengthOr(wExpectedBool, $firstValue.kind, start)
+
+  let a = firstValue.boolv
+  var skip = if functionName == "and": a == false else: a == true
+
+  # Match the comma and whitespace.
+  let commaO = matchSymbol(statement.text, gComma, start + runningLen)
+  if not commaO.isSome:
+    # Expected two arguments.
+    return newValueAndLengthOr(wTwoArguments, "", start + runningLen)
+  runningLen += commaO.get().length
+
+  # Handle the second parameter.
+  let vl2Or = getValueAndLength(statement, start + runningLen, variables, skip)
+  if vl2Or.isMessage or vl2Or.value.exit:
+    return vl2Or
+  let secondValue = vl2Or.value.value
+
+  var b: bool
+  if skip:
+    b = true
+  else:
+    if secondValue.kind != vkBool:
+      # Expected bool argument got $1.
+      return newValueAndLengthOr(wExpectedBool, $secondValue.kind, start + runningLen)
+    b = secondValue.boolv
+  runningLen += vl2Or.value.length
+
+  # Match ) and trailing whitespace.
+  let parenO = matchSymbol(statement.text, gRightParentheses,
+    start + runningLen)
+  if not parenO.isSome:
+    # Expected two arguments.
+    return newValueAndLengthOr(wTwoArguments, "", start + runningLen)
+  runningLen += parenO.get().length
+
+  var value: bool
+  if functionName == "and":
+    value = a and b
+  else:
+    value = a or b
+  result = newValueAndLengthOr(newValue(value), runningLen)
+
 proc getFunctionValueAndLength*(
     functionName: string,
     statement: Statement,
@@ -584,6 +652,15 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
           return ifOr
         let length = dotNameLen + ifOr.value.length
         return newValueAndLengthOr(ifOr.value.value, length)
+
+      # Handle the special and/or functions.
+      if dotNameStr in ["and", "or"]:
+        let andOrOr = andOrFunctions(dotNameStr, statement,
+          start+dotNameLen, variables, skip)
+        if andOrOr.isMessage or andOrOr.value.exit:
+          return andOrOr
+        let length = dotNameLen + andOrOr.value.length
+        return newValueAndLengthOr(andOrOr.value.value, length)
 
       if not skip:
         if not isFunctionName(dotNameStr):

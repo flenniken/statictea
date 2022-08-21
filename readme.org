@@ -2013,6 +2013,7 @@ List of functions:
 # Dynamic Content Begins
 - [[#add][add]] -- Add two floats.
 - [[#add][add]] -- Add two integers.
+- [[#and][and]] -- Boolean and with short circuit.
 - [[#bool][bool]] -- Create an bool from an int.
 - [[#case][case]] -- Compare integer cases and return the matching value.
 - [[#case][case]] -- Compare string cases and return the matching value.
@@ -2048,6 +2049,7 @@ List of functions:
 - [[#list][list]] -- You create a list with the list function or with brackets.
 - [[#lower][lower]] -- Lowercase a string.
 - [[#not][not]] -- Boolean not.
+- [[#or][or]] -- Boolean or with short circuit.
 - [[#path][path]] -- Split a file path into its component pieces.
 - [[#replace][replace]] -- Replace a substring specified by its position and length with another string.
 - [[#replaceRe][replaceRe]] -- Replace multiple parts of a string using regular expressions.
@@ -2102,6 +2104,29 @@ Examples:
 add(1, 2) => 3
 add(3, -2) => 1
 add(-2, -5) => -7
+#+END_SRC
+
+[[#contents][茶]]
+
+** and
+:PROPERTIES:
+:CUSTOM_ID: and
+:END:
+
+Boolean and with short circuit. If the first argument is false, the second argument is not evaluated.
+
+#+BEGIN_SRC
+and(a: bool, b: bool) bool
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+and(true, true) => true
+and(false, true) => false
+and(true, false) => false
+and(false, false) => false
+and(false, warn("not hit")) => false
 #+END_SRC
 
 [[#contents][茶]]
@@ -3055,6 +3080,29 @@ Examples:
 #+BEGIN_SRC
 not(true) => false
 not(false) => true
+#+END_SRC
+
+[[#contents][茶]]
+
+** or
+:PROPERTIES:
+:CUSTOM_ID: or
+:END:
+
+Boolean or with short circuit. If the first argument is true, the second argument is not evaluated.
+
+#+BEGIN_SRC
+or(a: bool, b: bool) bool
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+or(true, true) => true
+or(false, true) => true
+or(true, false) => true
+or(false, false) => false
+or(true, warn("not hit")) => true
 #+END_SRC
 
 [[#contents][茶]]

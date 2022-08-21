@@ -2,6 +2,7 @@
 
 This folder contains stf test files for statictea.
 
+* [and-or](../testfiles/and-or.stf.md) &mdash; Test the and and or functions.
 * [block-readme](../testfiles/block-readme.stf.md) &mdash; The readme block example.
 * [cmdline-no-templates](../testfiles/cmdline-no-templates.stf.md) &mdash; Test with no templates on the command line.
 * [cmdline-two-templates](../testfiles/cmdline-two-templates.stf.md) &mdash; Test with two templates on the command line.

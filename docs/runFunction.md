@@ -58,6 +58,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funFormat](#funformat) &mdash; Format a string using replacement variables similar to a replacement block.
 * [funStartsWith](#funstartswith) &mdash; Check whether a strings starts with the given prefix.
 * [funNot_bb](#funnot_bb) &mdash; Boolean not.
+* [funAnd_bbb](#funand_bbb) &mdash; Boolean and with short circuit.
+* [funOr_bbb](#funor_bbb) &mdash; Boolean or with short circuit.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -1459,6 +1461,50 @@ not(false) => true
 
 ```nim
 func funNot_bb(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funAnd_bbb
+
+Boolean and with short circuit. If the first argument is false, the second argument is not evaluated.
+
+~~~
+and(a: bool, b: bool) bool
+~~~~
+
+Examples:
+
+~~~
+and(true, true) => true
+and(false, true) => false
+and(true, false) => false
+and(false, false) => false
+and(false, warn("not hit")) => false
+~~~~
+
+```nim
+func funAnd_bbb(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funOr_bbb
+
+Boolean or with short circuit. If the first argument is true, the second argument is not evaluated.
+
+~~~
+or(a: bool, b: bool) bool
+~~~~
+
+Examples:
+
+~~~
+or(true, true) => true
+or(false, true) => true
+or(true, false) => true
+or(false, false) => false
+or(true, warn("not hit")) => true
+~~~~
+
+```nim
+func funOr_bbb(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # createFunctionTable

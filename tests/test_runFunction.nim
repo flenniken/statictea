@@ -1758,3 +1758,43 @@ d.sub.y = 4"""
     let eFunResult = newFunResult(newValue(false))
     check testFunction("not", parameters, eFunResult)
 
+  test "true and true":
+    var parameters = @[newValue(true), newValue(true)]
+    let eFunResult = newFunResult(newValue(true))
+    check testFunction("and", parameters, eFunResult)
+
+  test "false and true":
+    var parameters = @[newValue(false), newValue(true)]
+    let eFunResult = newFunResult(newValue(false))
+    check testFunction("and", parameters, eFunResult)
+
+  test "true and false":
+    var parameters = @[newValue(true), newValue(false)]
+    let eFunResult = newFunResult(newValue(false))
+    check testFunction("and", parameters, eFunResult)
+
+  test "false and false":
+    var parameters = @[newValue(false), newValue(false)]
+    let eFunResult = newFunResult(newValue(false))
+    check testFunction("and", parameters, eFunResult)
+
+  test "true or true":
+    var parameters = @[newValue(true), newValue(true)]
+    let eFunResult = newFunResult(newValue(true))
+    check testFunction("or", parameters, eFunResult)
+
+  test "false or true":
+    var parameters = @[newValue(false), newValue(true)]
+    let eFunResult = newFunResult(newValue(true))
+    check testFunction("or", parameters, eFunResult)
+
+  test "true or false":
+    var parameters = @[newValue(true), newValue(false)]
+    let eFunResult = newFunResult(newValue(true))
+    check testFunction("or", parameters, eFunResult)
+
+  test "false or false":
+    var parameters = @[newValue(false), newValue(false)]
+    let eFunResult = newFunResult(newValue(false))
+    check testFunction("or", parameters, eFunResult)
+
