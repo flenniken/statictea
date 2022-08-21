@@ -1176,7 +1176,7 @@ $$ nextline e = exists(l, "x")
 e => {e}
 """
     let eResultLines = @[
-      "e => 0\n"
+      "e => false\n"
     ]
     check testProcessTemplate(templateContent = templateContent,
         eResultLines = eResultLines)
@@ -1189,7 +1189,7 @@ $$ : e = exists(l, "x")
 e => {e}
 """
     let eResultLines = @[
-      "e => 1\n"
+      "e => true\n"
     ]
     check testProcessTemplate(templateContent = templateContent,
         eResultLines = eResultLines)

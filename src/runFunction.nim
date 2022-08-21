@@ -457,28 +457,28 @@ func funAdd_fff*(variables: Variables, parameters: seq[Value]): FunResult =
 {.pop.}
 
 func funExists*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Determine whether a key exists in a dictionary. Return 1 when it
-  ## exists, else 0.
+  ## Determine whether a key exists in a dictionary. Return true when it
+  ## exists, else false.
   ## @:
   ## @:~~~
-  ## @:exists(dictionary: dict, key: string) int
+  ## @:exists(dictionary: dict, key: string) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
   ## @:d = dict("tea", "Earl")
-  ## @:exists(d, "tea") => 1
-  ## @:exists(d, "coffee") => 0
+  ## @:exists(d, "tea") => true
+  ## @:exists(d, "coffee") => false
   ## @:~~~~
 
-  tMapParameters("dsi")
+  tMapParameters("dsb")
   let dictionary = map["a"].dictv
   let key = map["b"].stringv
 
-  var ret: int
+  var ret: bool
   if key in dictionary:
-    ret = 1
+    ret = true
   result = newFunResult(newValue(ret))
 
 func getCase(map: VarsDict): FunResult =
@@ -1891,11 +1891,11 @@ func funFormat*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(stringOr.value))
 
 func funStartsWith*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Check whether a strings starts with the given prefix. Return 1
-  ## when it does.
+  ## Check whether a strings starts with the given prefix. Return true
+  ## when it does, else false.
   ## @:
   ## @:~~~
-  ## @:startsWith(str: string, str: prefix) int
+  ## @:startsWith(str: string, str: prefix) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1904,19 +1904,14 @@ func funStartsWith*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:a = startsWith("abcdef", "abc")
   ## @:b = startsWith("abcdef", "abf")
   ## @:
-  ## @:a => 1
-  ## @:b => 0
+  ## @:a => true
+  ## @:b => false
   ## @:~~~~
 
-  tMapParameters("sss")
+  tMapParameters("ssb")
   let str = map["a"].stringv
   let prefix = map["b"].stringv
-  var starts: int
-  if startsWith(str, prefix):
-    starts = 1
-  else:
-    starts = 0
-  result = newFunResult(newValue(starts))
+  result = newFunResult(newValue(startsWith(str, prefix)))
 
 const
   functionsList = [
@@ -1933,7 +1928,7 @@ const
     ("if0", funIf0, "iaaa"),
     ("add", funAdd_iii, "iii"),
     ("add", funAdd_fff, "fff"),
-    ("exists", funExists, "dsi"),
+    ("exists", funExists, "dsb"),
     ("case", funCase_iloaa, "iloaa"),
     ("case", funCase_sloaa, "sloaa"),
     ("cmpVersion", funCmpVersion, "ssi"),
@@ -1967,7 +1962,7 @@ const
     ("string", funString_aoss, "aoss"),
     ("string", funString_sds, "sds"),
     ("format", funFormat, "ss"),
-    ("startsWith", funStartsWith, "sss"),
+    ("startsWith", funStartsWith, "ssb"),
     ("bool", funBool_ib, "ib"),
   ]
 

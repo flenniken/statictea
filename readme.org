@@ -672,8 +672,7 @@ files on the command line. The files are processed left to right.
 
 The server json files populate the s dictionary.
 
-The json null values get converted to the 0. Json True and False
-get converted to 1 and 0.
+The json null values get converted to the 0.
 
 To give full control of the presentation to the template
 designers, the server json shouldn't contain any presentation
@@ -1107,6 +1106,7 @@ StaticTea variable types:
 - [[#float-type][Float Type]]
 - [[#dict-type][Dict Type]]
 - [[#list-type][List Type]]
+- [[#bool-type][Bool Type]]
 
 [[#contents][茶]]
 
@@ -1331,6 +1331,25 @@ get(list, 0) => 1
 get(list, 1) => 3.3
 get(list, 2) => "a"
 get(list, 3, 99) => 99
+#+END_SRC
+
+[[#contents][茶]]
+
+** Bool Type
+:PROPERTIES:
+:CUSTOM_ID: bool-type
+:END:
+
+A bool is a true or false value.
+
+You can create a bool value using true or false or with the bool
+function.
+
+#+BEGIN_SRC
+a = true
+b = false
+c = bool(0) # false
+d = bool(1) # true (not 0)
 #+END_SRC
 
 [[#contents][茶]]
@@ -1987,9 +2006,11 @@ List of functions:
 # Dynamic Content Begins
 - [[#add][add]] -- Add two floats.
 - [[#add][add]] -- Add two integers.
+- [[#bool][bool]] -- Create an bool from an int.
 - [[#case][case]] -- Compare integer cases and return the matching value.
 - [[#case][case]] -- Compare string cases and return the matching value.
 - [[#cmpVersion][cmpVersion]] -- Compare two StaticTea version numbers.
+- [[#cmp][cmp]] -- Compare two bools.
 - [[#cmp][cmp]] -- Compare two floats.
 - [[#cmp][cmp]] -- Compare two ints.
 - [[#cmp][cmp]] -- Compare two strings.
@@ -2072,6 +2093,29 @@ Examples:
 add(1, 2) => 3
 add(3, -2) => 1
 add(-2, -5) => -7
+#+END_SRC
+
+[[#contents][茶]]
+
+** bool
+:PROPERTIES:
+:CUSTOM_ID: bool
+:END:
+
+Create an bool from an int. A 0 is false and all other values are true.
+
+#+BEGIN_SRC
+bool(num: int) bool
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+bool(0) => false
+bool(1) => true
+bool(2) => true
+bool(3) => true
+bool(-1) => true
 #+END_SRC
 
 [[#contents][茶]]
@@ -2169,6 +2213,29 @@ Examples:
 cmpVersion("1.2.5", "1.1.8") => 1
 cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
+#+END_SRC
+
+[[#contents][茶]]
+
+** cmp
+:PROPERTIES:
+:CUSTOM_ID: cmp
+:END:
+
+Compare two bools. Returns -1 for less, 0 for equal and 1 for
+ greater than with true > false.
+
+#+BEGIN_SRC
+cmp(a: bool, b: bool) int
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+cmp(true, true) => 0
+cmp(false, false) => 0
+cmp(true, false) => 1
+cmp(false, true) => -1
 #+END_SRC
 
 [[#contents][茶]]
@@ -2316,18 +2383,18 @@ dup("", 3) => ""
 :CUSTOM_ID: exists
 :END:
 
-Determine whether a key exists in a dictionary. Return 1 when it exists, else 0.
+Determine whether a key exists in a dictionary. Return true when it exists, else false.
 
 #+BEGIN_SRC
-exists(dictionary: dict, key: string) int
+exists(dictionary: dict, key: string) bool
 #+END_SRC
 
 Examples:
 
 #+BEGIN_SRC
 d = dict("tea", "Earl")
-exists(d, "tea") => 1
-exists(d, "coffee") => 0
+exists(d, "tea") => true
+exists(d, "coffee") => false
 #+END_SRC
 
 [[#contents][茶]]
@@ -2579,6 +2646,7 @@ $$ : anchor = githubAnchor(entry.name)
 
 If the condition is 0, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter. You can use any type for the condition, strings, lists and dictionaries use their length.
 
+- bool -- false
 - int -- 0
 - float -- 0.0
 - string -- when the length of the string is 0
@@ -2595,29 +2663,32 @@ if0(condition: any, then: any, optional else: any) any
 Examples:
 
 #+BEGIN_SRC
-drink0 = if0(0, "tea", "beer")
-drink1 = if0(1, "tea", "beer")
-drink4 = if0(4, "tea", "beer")
-drink5 = if0(0, "tea")
-drink6 = if0(8, "tea")
-drink7 = if0("", "tea")
-drink8 = if0([], "tea")
-drink9 = if0(dict(), "tea")
-if0(c, return("skip"))
-if0(c, warn("c is 0"))
+if0(0, "tea", "beer") => tea
+if0(1, "tea", "beer") => beer
+if0(4, "tea", "beer") => beer
+if0("", "tea", "beer") => tea
+if0("abc", "tea", "beer") => beer
+if0([], "tea", "beer") => tea
+if0([1,2], "tea", "beer") => beer
+if0(dict(), "tea", "beer") => tea
+if0(dict("a",1), "tea", "beer") => beer
+if0(false, "tea", "beer") => tea
+if0(true, "tea", "beer") => beer
 #+END_SRC
 
-result:
+No third parameter examples:
 
 #+BEGIN_SRC
-drink0 => tea
-drink1 => beer
-drink4 => beer
-drink5 => tea
-drink6 => 0
-drink7 => tea
-drink8 => tea
-drink9 => tea
+if0(0, "tea") => tea
+if0(4, "tea") => 0
+#+END_SRC
+
+You don't have to assign the result of an if0 function which is
+useful when use a warn or return function for its side effects.
+
+#+BEGIN_SRC
+c = 0
+if0(c, warn("got zero value"))
 #+END_SRC
 
 [[#contents][茶]]
@@ -3108,7 +3179,7 @@ slice("añyóng", 0, 3) => "añy"
 :END:
 
 Sort a list of values of the same type.  The values are ints,
-floats or strings.
+floats, strings or bools. Bools are sorts as if true is 1 and false is 0.
 
 You specify the sort order, "ascending" or "descending".
 
@@ -3151,8 +3222,8 @@ You specify how to sort strings either case "sensitive" or
 "insensitive".
 
 You specify which index to compare by.  The compare index value
-must exist in each list, be the same type and be an int, float or
-string.
+must exist in each list, be the same type and be an int, float,
+string or bool. Bools are sorts as if true is 1 and false is 0.
 
 #+BEGIN_SRC
 sort(lists: list, order: string, case: string, index: int) list
@@ -3182,9 +3253,9 @@ You specify the sort order, "ascending" or "descending".
 You specify how to sort strings either case "sensitive" or
 "insensitive".
 
-You specify the compare key.  The key value must exist
-in each dictionary, be the same type and be an int, float or
-string.
+You specify the compare key.  The key value must exist in
+each dictionary, be the same type and be an int, float, bool or
+string. Bools are sorts as if true is 1 and false is 0.
 
 #+BEGIN_SRC
 sort(dicts: list, order: string, case: string, key: string) list
@@ -3207,10 +3278,10 @@ sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 :CUSTOM_ID: startsWith
 :END:
 
-Check whether a strings starts with the given prefix. Return 1 when it does.
+Check whether a strings starts with the given prefix. Return true when it does, else false.
 
 #+BEGIN_SRC
-startsWith(str: string, str: prefix) int
+startsWith(str: string, str: prefix) bool
 #+END_SRC
 
 Examples:
@@ -3219,8 +3290,8 @@ Examples:
 a = startsWith("abcdef", "abc")
 b = startsWith("abcdef", "abf")
 
-a => 1
-b => 0
+a => true
+b => false
 #+END_SRC
 
 [[#contents][茶]]

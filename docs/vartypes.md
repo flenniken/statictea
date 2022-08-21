@@ -13,7 +13,7 @@ StaticTea variable types.
 * [newVarsDictOr](#newvarsdictor-1) &mdash; Return a new VarsDict object containing a dictionary.
 * [newValue](#newvalue) &mdash; Create a string value.
 * [newValue](#newvalue-1) &mdash; Create an integer value.
-* [newValue](#newvalue-2) &mdash; Create an integer value from a bool.
+* [newValue](#newvalue-2) &mdash; Create a bool value.
 * [newValue](#newvalue-3) &mdash; Create a float value.
 * [newValue](#newvalue-4) &mdash; Create a list value.
 * [newValue](#newvalue-5) &mdash; Create a dictionary value from a VarsDict.
@@ -52,7 +52,7 @@ The statictea variable types.
 
 ```nim
 ValueKind = enum
-  vkString, vkInt, vkFloat, vkDict, vkList
+  vkString, vkInt, vkFloat, vkDict, vkList, vkBool
 ```
 
 # Value
@@ -105,7 +105,7 @@ proc newValue(num: int | int64): Value
 
 # newValue
 
-Create an integer value from a bool.
+Create a bool value.
 
 ```nim
 proc newValue(a: bool): Value

@@ -107,12 +107,11 @@ proc testIntOk(num: Value, option: string, eIntNum: int): bool =
   if testFunction("int", parameters, eFunResult):
     result = true
 
-proc testStartsWith(str: string, prefix: string, eIntNum: int): bool =
+proc testStartsWith(str: string, prefix: string, eBool: bool): bool =
   var parameters = @[newValue(str), newValue(prefix)]
-  let eFunResult = newFunResult(newValue(eIntNum))
+  let eFunResult = newFunResult(newValue(eBool))
   if testFunction("startsWith", parameters, eFunResult):
     result = true
-
 
 suite "runFunction.nim":
 
@@ -459,16 +458,16 @@ suite "runFunction.nim":
     let eFunResult = newFunResultWarn(wOverflow)
     check testFunction("add", parameters, eFunResult)
 
-  test "exists 1":
+  test "exists true":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
     var parameters = @[dict, newValue("b")]
-    let eFunResult = newFunResult(newValue(1))
+    let eFunResult = newFunResult(newValue(true))
     check testFunction("exists", parameters, eFunResult)
 
-  test "exists 0":
+  test "exists false":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
     var parameters = @[dict, newValue("z")]
-    let eFunResult = newFunResult(newValue(0))
+    let eFunResult = newFunResult(newValue(false))
     check testFunction("exists", parameters, eFunResult)
 
   test "case int":
@@ -1709,16 +1708,16 @@ d.sub.y = 4"""
     check testFunction("format", @[str], eFunResult)
 
   test "startsWith":
-    check testStartsWith("hello", "he", 1)
-    check testStartsWith("hello", "ll", 0)
-    check testStartsWith("a", "a", 1)
-    check testStartsWith("a", "ab", 0)
-    check testStartsWith("ab", "a", 1)
-    check testStartsWith("ab", "ab", 1)
+    check testStartsWith("hello", "he", true)
+    check testStartsWith("hello", "ll", false)
+    check testStartsWith("a", "a", true)
+    check testStartsWith("a", "ab", false)
+    check testStartsWith("ab", "a", true)
+    check testStartsWith("ab", "ab", true)
 
-    check testStartsWith("", "", 1)
-    check testStartsWith("abc", "", 1)
-    check testStartsWith("", "l", 0)
+    check testStartsWith("", "", true)
+    check testStartsWith("abc", "", true)
+    check testStartsWith("", "l", false)
 
   test "bool false":
     var parameters = @[newValue(0)]

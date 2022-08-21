@@ -8,6 +8,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
 * [funCmp_iii](#funcmp_iii) &mdash; Compare two ints.
 * [funCmp_ffi](#funcmp_ffi) &mdash; Compare two floats.
+* [funCmp_bbi](#funcmp_bbi) &mdash; Compare two bools.
 * [funCmp_ssoii](#funcmp_ssoii) &mdash; Compare two strings.
 * [funConcat](#funconcat) &mdash; Concatentate two strings.
 * [funLen_si](#funlen_si) &mdash; Number of unicode characters in a string.
@@ -29,6 +30,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funInt_fosi](#funint_fosi) &mdash; Create an int from a float.
 * [funInt_sosi](#funint_sosi) &mdash; Create an int from a number string.
 * [funInt_ssaa](#funint_ssaa) &mdash; Create an int from a number string.
+* [funBool_ib](#funbool_ib) &mdash; Create an bool from an int.
 * [funFind](#funfind) &mdash; Find the position of a substring in a string.
 * [funSlice](#funslice) &mdash; Extract a substring from a string by its position and length.
 * [funDup](#fundup) &mdash; Duplicate a string x times.
@@ -107,6 +109,28 @@ cmp(9.3, 2.2) => 1
 
 ```nim
 func funCmp_ffi(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funCmp_bbi
+
+Compare two bools. Returns -1 for less, 0 for equal and 1 for
+ greater than with true > false.
+
+~~~
+cmp(a: bool, b: bool) int
+~~~~
+
+Examples:
+
+~~~
+cmp(true, true) => 0
+cmp(false, false) => 0
+cmp(true, false) => 1
+cmp(false, true) => -1
+~~~~
+
+```nim
+func funCmp_bbi(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funCmp_ssoii
@@ -278,6 +302,7 @@ func funGet_dsoaa(variables: Variables; parameters: seq[Value]): FunResult
 
 If the condition is 0, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter. You can use any type for the condition, strings, lists and dictionaries use their length.
 
+* bool -- false
 * int -- 0
 * float -- 0.0
 * string -- when the length of the string is 0
@@ -294,29 +319,32 @@ if0(condition: any, then: any, optional else: any) any
 Examples:
 
 ~~~
-drink0 = if0(0, "tea", "beer")
-drink1 = if0(1, "tea", "beer")
-drink4 = if0(4, "tea", "beer")
-drink5 = if0(0, "tea")
-drink6 = if0(8, "tea")
-drink7 = if0("", "tea")
-drink8 = if0([], "tea")
-drink9 = if0(dict(), "tea")
-if0(c, return("skip"))
-if0(c, warn("c is 0"))
+if0(0, "tea", "beer") => tea
+if0(1, "tea", "beer") => beer
+if0(4, "tea", "beer") => beer
+if0("", "tea", "beer") => tea
+if0("abc", "tea", "beer") => beer
+if0([], "tea", "beer") => tea
+if0([1,2], "tea", "beer") => beer
+if0(dict(), "tea", "beer") => tea
+if0(dict("a",1), "tea", "beer") => beer
+if0(false, "tea", "beer") => tea
+if0(true, "tea", "beer") => beer
 ~~~~
 
-result:
+No third parameter examples:
 
 ~~~
-drink0 => tea
-drink1 => beer
-drink4 => beer
-drink5 => tea
-drink6 => 0
-drink7 => tea
-drink8 => tea
-drink9 => tea
+if0(0, "tea") => tea
+if0(4, "tea") => 0
+~~~~
+
+You don't have to assign the result of an if0 function which is
+useful when use a warn or return function for its side effects.
+
+~~~
+c = 0
+if0(c, warn("got zero value"))
 ~~~~
 
 ```nim
@@ -364,18 +392,18 @@ func funAdd_fff(variables: Variables; parameters: seq[Value]): FunResult
 
 # funExists
 
-Determine whether a key exists in a dictionary. Return 1 when it exists, else 0.
+Determine whether a key exists in a dictionary. Return true when it exists, else false.
 
 ~~~
-exists(dictionary: dict, key: string) int
+exists(dictionary: dict, key: string) bool
 ~~~~
 
 Examples:
 
 ~~~
 d = dict("tea", "Earl")
-exists(d, "tea") => 1
-exists(d, "coffee") => 0
+exists(d, "tea") => true
+exists(d, "coffee") => false
 ~~~~
 
 ```nim
@@ -636,6 +664,28 @@ int("notnum", "round", "nan") => nan
 
 ```nim
 func funInt_ssaa(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funBool_ib
+
+Create an bool from an int. A 0 is false and all other values are true.
+
+~~~
+bool(num: int) bool
+~~~~
+
+Examples:
+
+~~~
+bool(0) => false
+bool(1) => true
+bool(2) => true
+bool(3) => true
+bool(-1) => true
+~~~~
+
+```nim
+func funBool_ib(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funFind
@@ -948,7 +998,7 @@ func funValues(variables: Variables; parameters: seq[Value]): FunResult
 # funSort_lsosl
 
 Sort a list of values of the same type.  The values are ints,
-floats or strings.
+floats, strings or bools. Bools are sorts as if true is 1 and false is 0.
 
 You specify the sort order, "ascending" or "descending".
 
@@ -990,8 +1040,8 @@ You specify how to sort strings either case "sensitive" or
 "insensitive".
 
 You specify which index to compare by.  The compare index value
-must exist in each list, be the same type and be an int, float or
-string.
+must exist in each list, be the same type and be an int, float,
+string or bool. Bools are sorts as if true is 1 and false is 0.
 
 ~~~
 sort(lists: list, order: string, case: string, index: int) list
@@ -1020,9 +1070,9 @@ You specify the sort order, "ascending" or "descending".
 You specify how to sort strings either case "sensitive" or
 "insensitive".
 
-You specify the compare key.  The key value must exist
-in each dictionary, be the same type and be an int, float or
-string.
+You specify the compare key.  The key value must exist in
+each dictionary, be the same type and be an int, float, bool or
+string. Bools are sorts as if true is 1 and false is 0.
 
 ~~~
 sort(dicts: list, order: string, case: string, key: string) list
@@ -1333,10 +1383,10 @@ func funFormat(variables: Variables; parameters: seq[Value]): FunResult
 
 # funStartsWith
 
-Check whether a strings starts with the given prefix. Return 1 when it does.
+Check whether a strings starts with the given prefix. Return true when it does, else false.
 
 ~~~
-startsWith(str: string, str: prefix) int
+startsWith(str: string, str: prefix) bool
 ~~~~
 
 Examples:
@@ -1345,8 +1395,8 @@ Examples:
 a = startsWith("abcdef", "abc")
 b = startsWith("abcdef", "abf")
 
-a => 1
-b => 0
+a => true
+b => false
 ~~~~
 
 ```nim

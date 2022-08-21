@@ -72,7 +72,7 @@ $$ #
 $$ # Create the index.
 $$ #
 $$ nextline
-$$ : if0(exists(g, "entries"), return("stop"))
+$$ : if0(cmp(bool(0), exists(g, "entries")), return("stop"))
 $$ : t.repeat = len(g.entries)
 $$ : entry = get(g.entries, t.row)
 * {entry.type}[{entry.name}](#{entry.anchor}) &mdash; {entry.short}
@@ -81,7 +81,7 @@ $$ #
 $$ # Create the function sections.
 $$ #
 $$ block
-$$ : if0(exists(g, "entries"), return("stop"))
+$$ : if0(cmp(bool(0), exists(g, "entries")), return("stop"))
 $$ : t.repeat = len(g.entries)
 $$ : entry = get(g.entries, t.row)
 # {entry.name}
