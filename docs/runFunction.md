@@ -60,6 +60,20 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funNot_bb](#funnot_bb) &mdash; Boolean not.
 * [funAnd_bbb](#funand_bbb) &mdash; Boolean and with short circuit.
 * [funOr_bbb](#funor_bbb) &mdash; Boolean or with short circuit.
+* [funEq_iib](#funeq_iib) &mdash; Return true when the two arguments are equal.
+* [funEq_ffb](#funeq_ffb) &mdash; Return true when the two arguments are equal.
+* [funEq_ssb](#funeq_ssb) &mdash; Return true when the two arguments are equal.
+* [funNe_iib](#funne_iib) &mdash; Return true when the two arguments are not equal.
+* [funNe_ffb](#funne_ffb) &mdash; Return true when the two arguments are not equal.
+* [funNe_ssb](#funne_ssb) &mdash; Return true when the two arguments are not equal.
+* [funGt_iib](#fungt_iib) &mdash; Return true when the a is greater than b.
+* [funGt_ffb](#fungt_ffb) &mdash; Return true when the a is greater than b.
+* [funGte_iib](#fungte_iib) &mdash; Return true when the a is greater than to equal to b.
+* [funGte_ffb](#fungte_ffb) &mdash; Return true when the a is greater than to equal to b.
+* [funLt_iib](#funlt_iib) &mdash; Return true when the a is less than b.
+* [funLt_ffb](#funlt_ffb) &mdash; Return true when the a is less than b.
+* [funLte_iib](#funlte_iib) &mdash; Return true when the a is less than or equal to b.
+* [funLte_ffb](#funlte_ffb) &mdash; Return true when the a is less than or equal to b.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -1505,6 +1519,274 @@ or(true, warn("not hit")) => true
 
 ```nim
 func funOr_bbb(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funEq_iib
+
+Return true when the two arguments are equal.
+
+~~~
+eq(a: int, b: int) bool
+~~~~
+
+Examples:
+
+~~~
+eq(1, 1) => true
+eq(2, 3) => false
+~~~~
+
+```nim
+func funEq_iib(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funEq_ffb
+
+Return true when the two arguments are equal.
+
+~~~
+eq(a: float, b: float) bool
+~~~~
+
+Examples:
+
+~~~
+eq(1.2, 1.2) => true
+eq(1.2, 3.2) => false
+~~~~
+
+```nim
+func funEq_ffb(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funEq_ssb
+
+Return true when the two arguments are equal.
+
+~~~
+eq(a: string, b: string) bool
+~~~~
+
+Examples:
+
+~~~
+eq("tea", "tea") => true
+eq("1.2", "3.2") => false
+~~~~
+
+```nim
+func funEq_ssb(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funNe_iib
+
+Return true when the two arguments are not equal.
+
+~~~
+ne(a: int, b: int) bool
+~~~~
+
+Examples:
+
+~~~
+ne(1, 1) => false
+ne(2, 3) => true
+~~~~
+
+```nim
+func funNe_iib(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funNe_ffb
+
+Return true when the two arguments are not equal.
+
+~~~
+ne(a: float, b: float) bool
+~~~~
+
+Examples:
+
+~~~
+ne(1.2, 1.2) => false
+ne(1.2, 3.2) => true
+~~~~
+
+```nim
+func funNe_ffb(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funNe_ssb
+
+Return true when the two arguments are not equal.
+
+~~~
+ne(a: string, b: string) bool
+~~~~
+
+Examples:
+
+~~~
+ne("tea", "tea") => false
+ne("earl", "grey") => true
+~~~~
+
+```nim
+func funNe_ssb(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funGt_iib
+
+Return true when the a is greater than b.
+
+~~~
+gt(a: int, b: int) bool
+~~~~
+
+Examples:
+
+~~~
+gt(2, 4) => false
+gt(3, 2) => true
+~~~~
+
+```nim
+func funGt_iib(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funGt_ffb
+
+Return true when the a is greater than b.
+
+~~~
+gt(a: float, b: float) bool
+~~~~
+
+Examples:
+
+~~~
+gt(2.8, 4.3) => false
+gt(3.1, 2.5) => true
+~~~~
+
+```nim
+func funGt_ffb(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funGte_iib
+
+Return true when the a is greater than to equal to b.
+
+~~~
+gte(a: int, b: int) bool
+~~~~
+
+Examples:
+
+~~~
+gte(2, 4) => false
+gte(3, 3) => true
+~~~~
+
+```nim
+func funGte_iib(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funGte_ffb
+
+Return true when the a is greater than to equal to b.
+
+~~~
+gte(a: float, b: float) bool
+~~~~
+
+Examples:
+
+~~~
+gte(2.8, 4.3) => false
+gte(3.1, 3.1) => true
+~~~~
+
+```nim
+func funGte_ffb(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funLt_iib
+
+Return true when the a is less than b.
+
+~~~
+lt(a: int, b: int) bool
+~~~~
+
+Examples:
+
+~~~
+gt(2, 4) => true
+gt(3, 2) => false
+~~~~
+
+```nim
+func funLt_iib(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funLt_ffb
+
+Return true when the a is less than b.
+
+~~~
+lt(a: float, b: float) bool
+~~~~
+
+Examples:
+
+~~~
+lt(2.8, 4.3) => true
+lt(3.1, 2.5) => false
+~~~~
+
+```nim
+func funLt_ffb(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funLte_iib
+
+Return true when the a is less than or equal to b.
+
+~~~
+lte(a: int, b: int) bool
+~~~~
+
+Examples:
+
+~~~
+lte(2, 4) => true
+lte(3, 3) => true
+lte(4, 3) => false
+~~~~
+
+```nim
+func funLte_iib(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funLte_ffb
+
+Return true when the a is less than or equal to b.
+
+~~~
+lte(a: float, b: float) bool
+~~~~
+
+Examples:
+
+~~~
+lte(2.3, 4.4) => true
+lte(3.0, 3.0) => true
+lte(4.0, 3.0) => false
+~~~~
+
+```nim
+func funLte_ffb(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # createFunctionTable

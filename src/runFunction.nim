@@ -2034,6 +2034,274 @@ func funOr_bbb*(variables: Variables, parameters: seq[Value]): FunResult =
   let cond = a or b
   result = newFunResult(newValue(cond))
 
+func funEq_iib*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Return true when the two arguments are equal.
+  ## @:
+  ## @:~~~
+  ## @:eq(a: int, b: int) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:eq(1, 1) => true
+  ## @:eq(2, 3) => false
+  ## @:~~~~
+  tMapParameters("iib")
+  let a = map["a"].intv
+  let b = map["b"].intv
+  let cond = a == b
+  result = newFunResult(newValue(cond))
+
+func funEq_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Return true when the two arguments are equal.
+  ## @:
+  ## @:~~~
+  ## @:eq(a: float, b: float) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:eq(1.2, 1.2) => true
+  ## @:eq(1.2, 3.2) => false
+  ## @:~~~~
+  tMapParameters("ffb")
+  let a = map["a"].floatv
+  let b = map["b"].floatv
+  let cond = a == b
+  result = newFunResult(newValue(cond))
+
+func funEq_ssb*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Return true when the two arguments are equal.
+  ## @:
+  ## @:~~~
+  ## @:eq(a: string, b: string) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:eq("tea", "tea") => true
+  ## @:eq("1.2", "3.2") => false
+  ## @:~~~~
+  tMapParameters("ssb")
+  let a = map["a"].stringv
+  let b = map["b"].stringv
+  let cond = a == b
+  result = newFunResult(newValue(cond))
+
+func funNe_iib*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Return true when the two arguments are not equal.
+  ## @:
+  ## @:~~~
+  ## @:ne(a: int, b: int) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:ne(1, 1) => false
+  ## @:ne(2, 3) => true
+  ## @:~~~~
+  tMapParameters("iib")
+  let a = map["a"].intv
+  let b = map["b"].intv
+  let cond = a != b
+  result = newFunResult(newValue(cond))
+
+func funNe_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Return true when the two arguments are not equal.
+  ## @:
+  ## @:~~~
+  ## @:ne(a: float, b: float) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:ne(1.2, 1.2) => false
+  ## @:ne(1.2, 3.2) => true
+  ## @:~~~~
+  tMapParameters("ffb")
+  let a = map["a"].floatv
+  let b = map["b"].floatv
+  let cond = a != b
+  result = newFunResult(newValue(cond))
+
+func funNe_ssb*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Return true when the two arguments are not equal.
+  ## @:
+  ## @:~~~
+  ## @:ne(a: string, b: string) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:ne("tea", "tea") => false
+  ## @:ne("earl", "grey") => true
+  ## @:~~~~
+  tMapParameters("ssb")
+  let a = map["a"].stringv
+  let b = map["b"].stringv
+  let cond = a != b
+  result = newFunResult(newValue(cond))
+
+func funGt_iib*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Return true when the a is greater than b.
+  ## @:
+  ## @:~~~
+  ## @:gt(a: int, b: int) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:gt(2, 4) => false
+  ## @:gt(3, 2) => true
+  ## @:~~~~
+  tMapParameters("iib")
+  let a = map["a"].intv
+  let b = map["b"].intv
+  let cond = a > b
+  result = newFunResult(newValue(cond))
+
+func funGt_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Return true when the a is greater than b.
+  ## @:
+  ## @:~~~
+  ## @:gt(a: float, b: float) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:gt(2.8, 4.3) => false
+  ## @:gt(3.1, 2.5) => true
+  ## @:~~~~
+  tMapParameters("ffb")
+  let a = map["a"].floatv
+  let b = map["b"].floatv
+  let cond = a > b
+  result = newFunResult(newValue(cond))
+
+func funGte_iib*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Return true when the a is greater than to equal to b.
+  ## @:
+  ## @:~~~
+  ## @:gte(a: int, b: int) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:gte(2, 4) => false
+  ## @:gte(3, 3) => true
+  ## @:~~~~
+  tMapParameters("iib")
+  let a = map["a"].intv
+  let b = map["b"].intv
+  let cond = a >= b
+  result = newFunResult(newValue(cond))
+
+func funGte_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Return true when the a is greater than to equal to b.
+  ## @:
+  ## @:~~~
+  ## @:gte(a: float, b: float) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:gte(2.8, 4.3) => false
+  ## @:gte(3.1, 3.1) => true
+  ## @:~~~~
+  tMapParameters("ffb")
+  let a = map["a"].stringv
+  let b = map["b"].stringv
+  let cond = a >= b
+  result = newFunResult(newValue(cond))
+
+func funLt_iib*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Return true when the a is less than b.
+  ## @:
+  ## @:~~~
+  ## @:lt(a: int, b: int) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:gt(2, 4) => true
+  ## @:gt(3, 2) => false
+  ## @:~~~~
+  tMapParameters("iib")
+  let a = map["a"].intv
+  let b = map["b"].intv
+  let cond = a < b
+  result = newFunResult(newValue(cond))
+
+func funLt_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Return true when the a is less than b.
+  ## @:
+  ## @:~~~
+  ## @:lt(a: float, b: float) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:lt(2.8, 4.3) => true
+  ## @:lt(3.1, 2.5) => false
+  ## @:~~~~
+  tMapParameters("ffb")
+  let a = map["a"].floatv
+  let b = map["b"].floatv
+  let cond = a > b
+  result = newFunResult(newValue(cond))
+
+func funLte_iib*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Return true when the a is less than or equal to b.
+  ## @:
+  ## @:~~~
+  ## @:lte(a: int, b: int) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:lte(2, 4) => true
+  ## @:lte(3, 3) => true
+  ## @:lte(4, 3) => false
+  ## @:~~~~
+  tMapParameters("iib")
+  let a = map["a"].intv
+  let b = map["b"].intv
+  let cond = a <= b
+  result = newFunResult(newValue(cond))
+
+func funLte_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Return true when the a is less than or equal to b.
+  ## @:
+  ## @:~~~
+  ## @:lte(a: float, b: float) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:lte(2.3, 4.4) => true
+  ## @:lte(3.0, 3.0) => true
+  ## @:lte(4.0, 3.0) => false
+  ## @:~~~~
+  tMapParameters("ffb")
+  let a = map["a"].floatv
+  let b = map["b"].floatv
+  let cond = a <= b
+  result = newFunResult(newValue(cond))
+
 const
   functionsList = [
     ("len", funLen_si, "si"),
@@ -2089,6 +2357,20 @@ const
     ("not", funNot_bb, "bb"),
     ("and", funAnd_bbb, "bbb"),
     ("or", funOr_bbb, "bbb"),
+    ("eq", funEq_ffb, "ffb"),
+    ("eq", funEq_iib, "iib"),
+    ("eq", funEq_ssb, "ssb"),
+    ("gt", funGt_ffb, "ffb"),
+    ("gt", funGt_iib, "iib"),
+    ("gte", funGte_ffb, "ffb"),
+    ("gte", funGte_iib, "iib"),
+    ("lt", funLt_ffb, "ffb"),
+    ("lt", funLt_iib, "iib"),
+    ("lte", funLte_ffb, "ffb"),
+    ("lte", funLte_iib, "iib"),
+    ("ne", funNe_ffb, "ffb"),
+    ("ne", funNe_iib, "iib"),
+    ("ne", funNe_ssb, "ssb"),
   ]
 
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =
