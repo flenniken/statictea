@@ -2027,6 +2027,7 @@ List of functions:
 - [[#get][get]] -- Get a list value by its index.
 - [[#githubAnchor][githubAnchor]] -- Create Github anchor names from heading names.
 - [[#githubAnchor][githubAnchor]] -- Create a Github anchor name from a heading name.
+- [[#if][if]] -- If the condition is true, return the second parameter, else return the third parameter.
 - [[#if0][if0]] -- If the condition is 0, return the second parameter, else return the third parameter.
 - [[#int][int]] -- Create an int from a float.
 - [[#int][int]] -- Create an int from a number string.
@@ -2639,6 +2640,44 @@ $$ : anchor = githubAnchor(entry.name)
 
 [[#contents][茶]]
 
+** if
+:PROPERTIES:
+:CUSTOM_ID: if
+:END:
+
+If the condition is true, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter.
+
+The if functions are special in a couple of ways, see
+[[#if-functions][If Functions]]
+
+#+BEGIN_SRC
+if(condition: bool, then: any, optional else: any) any
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+if(true, "tea", "beer") => tea
+if(false, "tea", "beer") => beer
+#+END_SRC
+
+No third parameter examples:
+
+#+BEGIN_SRC
+if(true, "tea") => tea
+if(false, "tea") => 0
+#+END_SRC
+
+You don't have to assign the result of an if function which is
+useful when using a warn or return function for its side effects.
+
+#+BEGIN_SRC
+c = true
+if(c, warn("c is true"))
+#+END_SRC
+
+[[#contents][茶]]
+
 ** if0
 :PROPERTIES:
 :CUSTOM_ID: if0
@@ -2684,7 +2723,7 @@ if0(4, "tea") => 0
 #+END_SRC
 
 You don't have to assign the result of an if0 function which is
-useful when use a warn or return function for its side effects.
+useful when using a warn or return function for its side effects.
 
 #+BEGIN_SRC
 c = 0

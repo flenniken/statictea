@@ -384,7 +384,7 @@ func funIf0*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:~~~~
   ## @:
   ## @:You don't have to assign the result of an if0 function which is
-  ## @:useful when use a warn or return function for its side effects.
+  ## @:useful when using a warn or return function for its side effects.
   ## @:
   ## @:~~~
   ## @:c = 0
@@ -400,6 +400,57 @@ func funIf0*(variables: Variables, parameters: seq[Value]): FunResult =
   let thenCase = map["b"]
 
   if condition == 0:
+    result = newFunResult(thenCase)
+  elif "c" in map:
+    result = newFunResult(map["c"])
+  else:
+    result = newFunResult(newValue(0))
+
+{.push overflowChecks: on, floatChecks: on.}
+
+func funIf*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## If the condition is true, return the second parameter, else return
+  ## the third parameter. Return 0 for the else case when there is no
+  ## third parameter.
+  ## @:
+  ## @:The if functions are special in a couple of ways, see
+  ## @:[[#if-functions][If Functions]]
+  ## @:
+  ## @:~~~
+  ## @:if(condition: bool, then: any, optional else: any) any
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:if(true, "tea", "beer") => tea
+  ## @:if(false, "tea", "beer") => beer
+  ## @:~~~~
+  ## @:
+  ## @:No third parameter examples:
+  ## @:
+  ## @:~~~
+  ## @:if(true, "tea") => tea
+  ## @:if(false, "tea") => 0
+  ## @:~~~~
+  ## @:
+  ## @:You don't have to assign the result of an if function which is
+  ## @:useful when using a warn or return function for its side effects.
+  ## @:
+  ## @:~~~
+  ## @:c = true
+  ## @:if(c, warn("c is true"))
+  ## @:~~~~
+
+  # Note: the if functions are handled in runCommand as a special
+  # case. This code is not run. It is here for the function list and
+  # documentation.
+
+  tMapParameters("baoaa")
+  let condition = map["a"].boolv
+  let thenCase = map["b"]
+
+  if condition:
     result = newFunResult(thenCase)
   elif "c" in map:
     result = newFunResult(map["c"])
@@ -1925,7 +1976,8 @@ const
     ("cmp", funCmp_ffi, "ffi"),
     ("cmp", funCmp_ssoii, "ssoii"),
     ("cmp", funCmp_bbi, "bbi"),
-    ("if0", funIf0, "iaaa"),
+    ("if0", funIf0, "iaoaa"),
+    ("if", funIf, "baoaa"),
     ("add", funAdd_iii, "iii"),
     ("add", funAdd_fff, "fff"),
     ("exists", funExists, "dsb"),

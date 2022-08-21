@@ -17,6 +17,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funGet_lioaa](#funget_lioaa) &mdash; Get a list value by its index.
 * [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
 * [funIf0](#funif0) &mdash; If the condition is 0, return the second parameter, else return the third parameter.
+* [funIf](#funif) &mdash; If the condition is true, return the second parameter, else return the third parameter.
 * [funAdd_iii](#funadd_iii) &mdash; Add two integers.
 * [funAdd_fff](#funadd_fff) &mdash; Add two floats.
 * [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
@@ -340,7 +341,7 @@ if0(4, "tea") => 0
 ~~~~
 
 You don't have to assign the result of an if0 function which is
-useful when use a warn or return function for its side effects.
+useful when using a warn or return function for its side effects.
 
 ~~~
 c = 0
@@ -349,6 +350,43 @@ if0(c, warn("got zero value"))
 
 ```nim
 func funIf0(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funIf
+
+If the condition is true, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter.
+
+The if functions are special in a couple of ways, see
+[[#if-functions][If Functions]]
+
+~~~
+if(condition: bool, then: any, optional else: any) any
+~~~~
+
+Examples:
+
+~~~
+if(true, "tea", "beer") => tea
+if(false, "tea", "beer") => beer
+~~~~
+
+No third parameter examples:
+
+~~~
+if(true, "tea") => tea
+if(false, "tea") => 0
+~~~~
+
+You don't have to assign the result of an if function which is
+useful when using a warn or return function for its side effects.
+
+~~~
+c = true
+if(c, warn("c is true"))
+~~~~
+
+```nim
+func funIf(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funAdd_iii

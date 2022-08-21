@@ -752,6 +752,16 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr(wInvalidFunction, "missing", 4)
     check testRunStatement(statement, eVariableDataOr)
 
+  test "if when true":
+    let statement = newStatement(text="""a = if(bool(1), 1, 2)""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(1))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "if when false":
+    let statement = newStatement(text="""a = if(bool(0), 1, 2)""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(2))
+    check testRunStatement(statement, eVariableDataOr)
+
   test "if0 when 0":
     let statement = newStatement(text="""a = if0(0, 1, 2)""", lineNum=1, 0)
     let eVariableDataOr = newVariableDataOr("a", "=", newValue(1))

@@ -38,7 +38,7 @@ $$ nextline t.repeat = 0
 Block that is skipped since repeat is 0.
 
 Repeat is not set by default.
-$$ nextline exists = if0(cmp(bool(1), exists(t, "repeat")), "exists", "does not exist")
+$$ nextline exists = if(exists(t, "repeat"), "exists", "does not exist")
 t.repeat = {exists}
 
 Blocks repeat one time by default.

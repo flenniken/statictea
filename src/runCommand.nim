@@ -343,25 +343,26 @@ proc getValueAndLength*(statement: Statement, start: Natural, variables:
 # - runStatement
 # - getValueAndLength
 # - getFunctionValueAndLength
-# - if0Function
+# - ifFunctions
 # - getList
 # - getValueAndLength
 
-proc if0Function*(
+proc ifFunctions*(
     functionName: string,
     statement: Statement,
     start: Natural,
     variables: Variables,
     list=false): ValueAndLengthOr =
-  ## Return the if0 function's value and the length. It conditionally
+  ## Return the if/if0 function's value and the length. It conditionally
   ## runs one of its parameters. Start points at the first parameter
   ## of the function. The length includes the trailing whitespace
   ## after the ending ).
 
   # cases:
-  # a = if0(cond, then, else)
-  # a = if0(cond, then)
-  # if0(cond, then)
+  #   a = if(cond, then, else)
+  #   a = if(cond, then)
+  #   if(cond, then)
+  # The if function cond is a boolean, for if0 it is anything.
 
   # Get the condition's value.
   let vlcOr = getValueAndLength(statement, start, variables, skip=false)
@@ -371,24 +372,30 @@ proc if0Function*(
   var runningLen = vlcOr.value.length
 
   var condition = false
-  case cond.kind:
-   of vkInt:
-     if cond.intv == 0:
-       condition = true
-   of vkFloat:
-     if cond.floatv == 0.0:
-       condition = true
-   of vkString:
-     if cond.stringv.len == 0:
-       condition = true
-   of vkList:
-     if cond.listv.len == 0:
-       condition = true
-   of vkDict:
-     if cond.dictv.len == 0:
-       condition = true
-   of vkBool:
-     condition = cond.boolv
+  if functionName == "if":
+    if cond.kind != vkBool:
+      # The if condition must be a bool value, got a $1.
+      return newValueAndLengthOr(wExpectedBool, $cond.kind, start)
+    condition = cond.boolv
+  else: # functionName == "if0"
+    case cond.kind:
+     of vkInt:
+       if cond.intv == 0:
+         condition = true
+     of vkFloat:
+       if cond.floatv == 0.0:
+         condition = true
+     of vkString:
+       if cond.stringv.len == 0:
+         condition = true
+     of vkList:
+       if cond.listv.len == 0:
+         condition = true
+     of vkDict:
+       if cond.dictv.len == 0:
+         condition = true
+     of vkBool:
+       condition = cond.boolv
 
   # Match the comma and whitespace.
   let commaO = matchSymbol(statement.text, gComma, start + runningLen)
@@ -397,17 +404,8 @@ proc if0Function*(
     return newValueAndLengthOr(wTwoOrThreeParams, "", start)
   runningLen += commaO.get().length
 
-  # Determine whether we execute the second or third parameter.
-  var getSecond: bool
-  if (condition and functionName == "if0"):
-    # Return the second parameter.
-    getSecond = true
-  else:
-    # Return the third parameter.
-    getSecond = false
-
   # Handle the second parameter.
-  var skip = (getSecond == false)
+  var skip = (condition == false)
   let vl2Or = getValueAndLength(statement, start + runningLen, variables, skip)
   if vl2Or.isMessage or vl2Or.value.exit:
     return vl2Or
@@ -421,7 +419,7 @@ proc if0Function*(
     runningLen += cO.get().length
 
     # Handle the third parameter.
-    skip = (getSecond == true)
+    skip = (condition == true)
     vl3Or = getValueAndLength(statement, start + runningLen, variables, skip)
     if vl3Or.isMessage or vl3Or.value.exit:
       return vl3Or
@@ -440,7 +438,7 @@ proc if0Function*(
   runningLen += parenO.get().length
 
   var value: Value
-  if getSecond:
+  if condition:
     value = vl2Or.value.value
   else:
     value = vl3Or.value.value
@@ -579,8 +577,8 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
       # We have a function, run it and return its value.
 
       # Handle the special if functions.
-      if dotNameStr in ["if0"]:
-        let ifOr = if0Function(dotNameStr, statement,
+      if dotNameStr in ["if", "if0"]:
+        let ifOr = ifFunctions(dotNameStr, statement,
           start+dotNameLen, variables, skip)
         if ifOr.isMessage or ifOr.value.exit:
           return ifOr
@@ -667,9 +665,9 @@ proc runStatement*(statement: Statement, variables: Variables):
   var operatorLength = 0
   var varName = ""
 
-  if leftParen == "(" and dotNameStr in ["if0"]:
+  if leftParen == "(" and dotNameStr in ["if0", "if"]:
     # Handle the special bare if functions.
-    vlOr = if0Function(dotNameStr, statement, leadingLen, variables)
+    vlOr = ifFunctions(dotNameStr, statement, leadingLen, variables)
   else:
     # Handle normal "varName operator right" statements.
     varName = dotNameStr

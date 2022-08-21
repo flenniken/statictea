@@ -381,26 +381,45 @@ suite "runFunction.nim":
     let eFunResult = newFunResultWarn(wNotZeroOne, 2)
     check testFunction("cmp", parameters, eFunResult)
 
-  test "if function 0":
+  test "if0 function 0":
     var parameters = @[newValue(0), newValue("then"), newValue("else")]
     let eFunResult = newFunResult(newValue("then"))
     check testFunction("if0", parameters, eFunResult)
 
-  test "if function no else":
+  test "if0 function no else":
     var parameters = @[newValue(0), newValue("then")]
     let eFunResult = newFunResult(newValue("then"))
     check testFunction("if0", parameters, eFunResult)
 
-  test "if function no else taken":
+  test "if0 function no else taken":
     var parameters = @[newValue(1), newValue("then")]
     let eFunResult = newFunResult(newValue(0))
     check testFunction("if0", parameters, eFunResult)
 
-  test "if function not 0":
+  test "if0 function not 0":
     var parameters = @[newValue(33), newValue("then"), newValue("else")]
     let eFunResult = newFunResult(newValue("else"))
     check testFunction("if0", parameters, eFunResult)
 
+  test "if function true":
+    var parameters = @[newValue(true), newValue("then"), newValue("else")]
+    let eFunResult = newFunResult(newValue("then"))
+    check testFunction("if", parameters, eFunResult)
+
+  test "if function no else":
+    var parameters = @[newValue(true), newValue("then")]
+    let eFunResult = newFunResult(newValue("then"))
+    check testFunction("if", parameters, eFunResult)
+
+  test "if function no else taken":
+    var parameters = @[newValue(false), newValue("then")]
+    let eFunResult = newFunResult(newValue(0))
+    check testFunction("if", parameters, eFunResult)
+
+  test "if function not false":
+    var parameters = @[newValue(false), newValue("then"), newValue("else")]
+    let eFunResult = newFunResult(newValue("else"))
+    check testFunction("if", parameters, eFunResult)
 
   test "add 1 + 2":
     var parameters = @[newValue(1), newValue(2)]

@@ -30,12 +30,12 @@ $$ nextline t.content = t.args
 
 The t.content doesn't exist by default.
 $$ nextline
-$$ : e = if0(cmp(1, exists(t, "content")), "exists", "does not exist")
+$$ : e = if(exists(t, "content"), "exists", "does not exist")
 t.content {e}
 
 The t.content doesn't exist by default for the replace command.
 $$ replace
-$$ : e = if0(cmp(1,exists(t, "content")), "exists", "does not exist")
+$$ : e = if(exists(t, "content"), "exists", "does not exist")
 t.content {e}
 $$ endblock
 ~~~

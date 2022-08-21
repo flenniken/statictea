@@ -206,7 +206,8 @@ MessageId = enum
   wInvalidStringType,       ## w189
   wInvalidVarNameStart,     ## w190
   wInvalidVarName,          ## w191
-  wNoEndingBracket           ## w192
+  wNoEndingBracket,         ## w192
+  wExpectedBool              ## w193
 ```
 
 # Messages
@@ -407,7 +408,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Invalid string type, expected rb, json or dn.", ## wInvalidStringType
     "Invalid variable name; names start with an ascii letter.", ## wInvalidVarNameStart
     "Invalid variable name; names contain letters, digits or underscores.", ## wInvalidVarName
-    "No ending bracket."]
+    "No ending bracket.",   ## wNoEndingBracket
+    "The if condition must be a bool value, got a $1."]
 ```
 
 

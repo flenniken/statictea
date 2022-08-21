@@ -203,6 +203,7 @@ type
     wInvalidVarNameStart,  ## w190
     wInvalidVarName,       ## w191
     wNoEndingBracket,      ## w192
+    wExpectedBool,         ## w193
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -399,5 +400,6 @@ const
     "Invalid variable name; names start with an ascii letter.", ## wInvalidVarNameStart
     "Invalid variable name; names contain letters, digits or underscores.", ## wInvalidVarName
     "No ending bracket.", ## wNoEndingBracket
+    "The if condition must be a bool value, got a $1.", ## wExpectedBool
     ]
     ## The message text.
