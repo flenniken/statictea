@@ -1352,6 +1352,13 @@ c = bool(0) # false
 d = bool(1) # true (not 0)
 #+END_SRC
 
+You can define variables called true and false except in the
+local dictionary.
+
+#+BEGIN_SRC
+s.true = "server true"
+#+END_SRC
+
 [[#contents][茶]]
 
 * Code Files

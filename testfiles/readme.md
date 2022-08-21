@@ -61,6 +61,7 @@ filename.
 * [t-row-warnings](../testfiles/t-row-warnings.stf.md) &mdash; Test t row warnings.
 * [t-version-basics](../testfiles/t-version-basics.stf.md) &mdash; Test the t version number.
 * [template](../testfiles/template.stf.md) &mdash; This stf file is used as a template by the newstf nimble task.
+* [true-false](../testfiles/true-false.stf.md) &mdash; Test true and false.
 * [truefalsenull](../testfiles/truefalsenull.stf.md) &mdash; Test json true, false and null.
 * [update-and-result](../testfiles/update-and-result.stf.md) &mdash; Test the update option and specify a result file.
 * [update-and-stdin](../testfiles/update-and-stdin.stf.md) &mdash; Test update when stdin is used for the template.

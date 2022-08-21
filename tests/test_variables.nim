@@ -77,6 +77,8 @@ t.args = {}"""
 
   test "getVariable":
     var variables = emptyVariables()
+    check testGetVariableOk(variables, "true", "true")
+    check testGetVariableOk(variables, "false", "false")
     check testGetVariableOk(variables, "t.row", "0")
     check testGetVariableOk(variables, "t.args", "{}")
     check testGetVariableOk(variables, "t.version", "\"0.1.0\"")
@@ -156,7 +158,6 @@ t.args = {}"""
 
     let eWarningData = newWarningData(wNotDict, "d")
     check testGetVariableWarning(variables, "s.d.hello", eWarningData)
-
 
   test "getTeaVarStringDefault":
     var variables = emptyVariables()
@@ -244,9 +245,9 @@ prepostList = []"""
     var valueOr = readJsonString(shared)
     check valueOr.isValue
     var variables = emptyVariables()
-    variables["h"] = valueOr.value
+    variables["o"] = valueOr.value
     resetVariables(variables)
-    check $getVariable(variables, "h.a") == $newValueOr(newValue(2))
+    check $getVariable(variables, "o.a") == $newValueOr(newValue(2))
 
   test "resetVariables with shared":
     # Make sure the code variables are untouched after reset.
@@ -288,15 +289,24 @@ prepostList = []"""
     check testAssignVariable("t.repeat", newValue("hello"),
       some(newWarningData(wInvalidRepeat)))
 
+  test "assignVariable true false":
+    check testAssignVariable("true", newValue("hello"),
+      some(newWarningData(wAssignTrueFalse)))
+    check testAssignVariable("l.true", newValue("hello"),
+      some(newWarningData(wAssignTrueFalse)))
+
+    check testAssignVariable("false", newValue("hello"),
+      some(newWarningData(wAssignTrueFalse)))
+    check testAssignVariable("l.false", newValue("hello"),
+      some(newWarningData(wAssignTrueFalse)))
+
   test "assignVariable wReadOnlyDictionary":
     let eWarningDataO = some(newWarningData(wReadOnlyDictionary))
     check testAssignVariable("s.hello", newValue(1), eWarningDataO)
-    check testAssignVariable("h.hello", newValue(1), eWarningDataO)
 
   test "assignVariable wImmutableVars":
     let eWarningDataO = some(newWarningData(wImmutableVars))
     check testAssignVariable("s", newValue(1), eWarningDataO)
-    check testAssignVariable("h", newValue(1), eWarningDataO)
     check testAssignVariable("o", newValue(1), eWarningDataO)
     check testAssignVariable("g", newValue(1), eWarningDataO)
     check testAssignVariable("l", newValue(1), eWarningDataO)

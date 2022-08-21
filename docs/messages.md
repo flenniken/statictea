@@ -207,7 +207,8 @@ MessageId = enum
   wInvalidVarNameStart,     ## w190
   wInvalidVarName,          ## w191
   wNoEndingBracket,         ## w192
-  wExpectedBool              ## w193
+  wExpectedBool,            ## w193
+  wAssignTrueFalse           ## w194
 ```
 
 # Messages
@@ -254,7 +255,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "",                     ## wInvalidNameSpace
     "The variable \'$1\' does not exist.", ## wVariableMissing
     "",                     ## wStatementError
-    "You cannot overwrite the server or shared variables.", ## wReadOnlyDictionary
+    "You cannot overwrite the server variables.", ## wReadOnlyDictionary
     "You cannot change the t.$1 tea variable.", ## wReadOnlyTeaVar
     "Invalid tea variable: $1.", ## wInvalidTeaVar
     """Invalid t.output value, use: "result", "stdout", "stderr", "log", or "skip".""", ## wInvalidOutputValue
@@ -317,7 +318,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "",                     ## wMissingReplacement
     "",                     ## wExpectedList
     "Expected / or \\.",    ## wExpectedSeparator
-    "The variables f, i - k, m - r, u are reserved variable names.", ## wReservedNameSpaces
+    "The variables f, h - k, m - r, u are reserved variable names.", ## wReservedNameSpaces
     "",                     ## wMissingVarName
     "Name, $1, is not a dictionary.", ## wNotDict
     "",                     ## wMissingDict
@@ -409,7 +410,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Invalid variable name; names start with an ascii letter.", ## wInvalidVarNameStart
     "Invalid variable name; names contain letters, digits or underscores.", ## wInvalidVarName
     "No ending bracket.",   ## wNoEndingBracket
-    "The if condition must be a bool value, got a $1."]
+    "The if condition must be a bool value, got a $1.", ## wExpectedBool
+    "You cannot assign true or false."]
 ```
 
 

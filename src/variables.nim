@@ -252,6 +252,7 @@ proc assignVariable*(
   #    but not the others (except for the previous rule).
   # -- You can append to local and global lists but not others.
   # -- You can specify local variables without the l prefix.
+  # -- You cannot assign true and false.
 
   # -- You can assign new values to the code dictonary when in code files.
 
@@ -267,7 +268,7 @@ proc assignVariable*(
     case nameSpace
     of "t":
       return assignTeaVariable(variables, dotNameStr, value, operator)
-    of "s", "h", "o":
+    of "s", "o":
       if names.len == 1:
         # You cannot assign to an existing variable.
         return some(newWarningData(wImmutableVars))
@@ -275,19 +276,26 @@ proc assignVariable*(
         # You can only change code variables in code files.
         return some(newWarningData(wReadOnlyCodeVars))
       else:
-        # You cannot overwrite the server or shared variables.
+        # You cannot overwrite the server variables.
         return some(newWarningData(wReadOnlyDictionary))
     of "g", "l":
       if inCodeFile and nameSpace == "g":
         # You cannot assign to the g namespace in a code file.
         return some(newWarningData(wNoGlobalInCodeFile))
+      if nameSpace == "l" and (dotNameStr == "l.true" or dotNameStr == "l.false"):
+        # You cannot assign true or false.
+        return some(newWarningData(wAssignTrueFalse))
       if names.len == 1:
         # You cannot assign to an existing variable.
         return some(newWarningData(wImmutableVars))
       varsDictOr = getParentDictToAddTo(variables, dotNameStr)
-    of "f", "i", "j", "k", "m", "n", "p", "q", "r", "u":
+    of "f", "h", "i", "j", "k", "m", "n", "p", "q", "r", "u":
+      # The variables f, h - k, m - r, u are reserved variable names.
       return some(newWarningData(wReservedNameSpaces))
     else:
+      if dotNameStr == "true" or dotNameStr == "false":
+        # You cannot assign true or false.
+        return some(newWarningData(wAssignTrueFalse))
       # It must be a local variable, add the missing l.
       varsDictOr = getParentDictToAddTo(variables, "l." & dotNameStr)
 
@@ -339,12 +347,17 @@ func lookUpVar(variables: Variables, names: seq[string]): ValueOr =
 proc getVariable*(variables: Variables, dotNameStr: string): ValueOr =
   ## Look up the variable and return its value when found, else return
   ## a warning.
+  if dotNameStr == "true":
+    return newValueOr(newValue(true))
+  elif dotNameStr == "false":
+    return newValueOr(newValue(false))
+
   var names = split(dotNameStr, '.')
   let nameSpace = names[0]
   case nameSpace
-  of "g", "h", "l", "s", "t", "o":
+  of "g", "l", "s", "t", "o":
     discard
-  of "f", "i", "j", "k", "m", "n", "p", "q", "r", "u":
+  of "f", "h", "i", "j", "k", "m", "n", "p", "q", "r", "u":
     # The variables f, i, j, k, m, n, p, q, r, u are reserved variable names.
     return newValueOr(wReservedNameSpaces)
   else:
