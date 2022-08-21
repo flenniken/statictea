@@ -1748,3 +1748,13 @@ d.sub.y = 4"""
     let eFunResult = newFunResult(newValue(true))
     check testFunction("bool", parameters, eFunResult)
 
+  test "not false":
+    var parameters = @[newValue(false)]
+    let eFunResult = newFunResult(newValue(true))
+    check testFunction("not", parameters, eFunResult)
+
+  test "not true":
+    var parameters = @[newValue(true)]
+    let eFunResult = newFunResult(newValue(false))
+    check testFunction("not", parameters, eFunResult)
+

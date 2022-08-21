@@ -57,6 +57,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names.
 * [funFormat](#funformat) &mdash; Format a string using replacement variables similar to a replacement block.
 * [funStartsWith](#funstartswith) &mdash; Check whether a strings starts with the given prefix.
+* [funNot_bb](#funnot_bb) &mdash; Boolean not.
 * [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
 * [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
 * [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
@@ -1439,6 +1440,25 @@ b => false
 
 ```nim
 func funStartsWith(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funNot_bb
+
+Boolean not.
+
+~~~
+not(value: bool) bool
+~~~~
+
+Examples:
+
+~~~
+not(true) => false
+not(false) => true
+~~~~
+
+```nim
+func funNot_bb(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # createFunctionTable

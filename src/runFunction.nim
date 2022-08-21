@@ -1964,6 +1964,24 @@ func funStartsWith*(variables: Variables, parameters: seq[Value]): FunResult =
   let prefix = map["b"].stringv
   result = newFunResult(newValue(startsWith(str, prefix)))
 
+func funNot_bb*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Boolean not.
+  ## @:
+  ## @:~~~
+  ## @:not(value: bool) bool
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:not(true) => false
+  ## @:not(false) => true
+  ## @:~~~~
+
+  tMapParameters("bb")
+  let cond = map["a"].boolv
+  result = newFunResult(newValue(not(cond)))
+
 const
   functionsList = [
     ("len", funLen_si, "si"),
@@ -2016,6 +2034,7 @@ const
     ("format", funFormat, "ss"),
     ("startsWith", funStartsWith, "ssb"),
     ("bool", funBool_ib, "ib"),
+    ("not", funNot_bb, "bb"),
   ]
 
 func createFunctionTable*(): Table[string, seq[FunctionSpec]] =

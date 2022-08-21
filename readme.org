@@ -2040,6 +2040,7 @@ List of functions:
 - [[#len][len]] -- Number of unicode characters in a string.
 - [[#list][list]] -- You create a list with the list function or with brackets.
 - [[#lower][lower]] -- Lowercase a string.
+- [[#not][not]] -- Boolean not.
 - [[#path][path]] -- Split a file path into its component pieces.
 - [[#replace][replace]] -- Replace a substring specified by its position and length with another string.
 - [[#replaceRe][replaceRe]] -- Replace multiple parts of a string using regular expressions.
@@ -3027,6 +3028,26 @@ Examples:
 lower("Tea") => "tea"
 lower("TEA") => "tea"
 lower("TEĀ") => "teā"
+#+END_SRC
+
+[[#contents][茶]]
+
+** not
+:PROPERTIES:
+:CUSTOM_ID: not
+:END:
+
+Boolean not.
+
+#+BEGIN_SRC
+not(value: bool) bool
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+not(true) => false
+not(false) => true
 #+END_SRC
 
 [[#contents][茶]]
