@@ -304,7 +304,7 @@ func cmdLine*(options: openArray[CmlOption],
         inc(ix)
       of cmlOptionalArgument, cmlArgument0or1, cmlArgumentOnce:
         if args.optionCount(option.long) > 0:
-          # _12_, Already have one '$1' argument.
+          # _12_, One '$1' argument is allowed.
           return newArgsOrMessage(cml_12_AlreadyHaveOneArg, $option.long)
         if option.optionType == cmlOptionalArgument:
           state = optionalArgument
@@ -393,7 +393,7 @@ when defined(Test) or isMainModule:
       #[_09_]# "Use an alphanumeric ascii character for a short option name instead of '$1'.",
       #[_10_]# "Missing '$1' argument.",
       #[_11_]# "Extra bare argument.",
-      #[_12_]# "Already have one '$1' argumen.",
+      #[_12_]# "One '$1' argument is allowed.",
     ]
 
   func getMessage*(message: CmlMessageId, problemArg: string = ""): string =

@@ -1651,14 +1651,14 @@ if0(len(s.items), warn("no items"))
    :CUSTOM_ID: if-functions
    :END:
 
-The if0 function is special in a couple of ways. It conditionally
-evaluate its arguments and it can be used in a statement bare
-without an assignment.
+The if and if0 functions are special in a couple of ways. They
+conditionally evaluate there arguments and they can be used in a
+statement bare without an assignment.
 
 You use the bare form with the warn and return functions for
 their side effects.
 
-The if0 function evaluates the condition parameter first to
+The functions evaluates the condition parameter first to
 determine which parameter to evaluate next and the non-matching
 parameter is skipped.  This is important when you use the warn or
 return functions to control the statement flow.  The other
@@ -1668,14 +1668,14 @@ function.
 In the following example do1 is executed and doOther is skipped.
 
 #+BEGIN_SRC
-a = if0(0, do1(), doOther())
+a = if(true, do1(), doOther())
 #+END_SRC
 
 The next example has a warn call in it.  If all the arguments
 were evaluated, the warn would run everytime.
 
 #+BEGIN_SRC
-a = if0(0, do1(), warn("not one"))
+a = if0(0, do0(), warn("not zero"))
 #+END_SRC
 
 The warn and return functions modify the statement flow.  The
@@ -1683,10 +1683,10 @@ warn function skips the current statement and the return function
 ends the current block.
 
 The next example is a bare if.  It generates a warning when cond
-is 0.
+is true.
 
 #+BEGIN_SRC
-if0(s.cond, warn("s.cond is 0"))
+if(s.cond, warn("s.cond is true"))
 #+END_SRC
 
 [[#contents][茶]]
@@ -2025,9 +2025,9 @@ List of functions:
 - [[#concat][concat]] -- Concatentate two strings.
 - [[#dict][dict]] -- Create a dictionary from a list of key, value pairs.
 - [[#dup][dup]] -- Duplicate a string x times.
-- [[#eq][eq]] -- Return true when the two arguments are equal.
-- [[#eq][eq]] -- Return true when the two arguments are equal.
-- [[#eq][eq]] -- Return true when the two arguments are equal.
+- [[#eq][eq]] -- Return true when the a equals b.
+- [[#eq][eq]] -- Return true when the a equals b.
+- [[#eq][eq]] -- Return true when the a equals b.
 - [[#exists][exists]] -- Determine whether a key exists in a dictionary.
 - [[#find][find]] -- Find the position of a substring in a string.
 - [[#float][float]] -- Create a float from an int.
@@ -2041,7 +2041,7 @@ List of functions:
 - [[#gt][gt]] -- Return true when the a is greater than b.
 - [[#gt][gt]] -- Return true when the a is greater than b.
 - [[#gte][gte]] -- Return true when the a is greater than to equal to b.
-- [[#gte][gte]] -- Return true when the a is greater than to equal to b.
+- [[#gte][gte]] -- Return true when the a is greater than or equal to b.
 - [[#if][if]] -- If the condition is true, return the second parameter, else return the third parameter.
 - [[#if0][if0]] -- If the condition is 0, return the second parameter, else return the third parameter.
 - [[#int][int]] -- Create an int from a float.
@@ -2059,9 +2059,9 @@ List of functions:
 - [[#lt][lt]] -- Return true when the a is less than b.
 - [[#lte][lte]] -- Return true when the a is less than or equal to b.
 - [[#lte][lte]] -- Return true when the a is less than or equal to b.
-- [[#ne][ne]] -- Return true when the two arguments are not equal.
-- [[#ne][ne]] -- Return true when the two arguments are not equal.
-- [[#ne][ne]] -- Return true when the two arguments are not equal.
+- [[#ne][ne]] -- Return true when the a does not equal b.
+- [[#ne][ne]] -- Return true when the a does not equal b.
+- [[#ne][ne]] -- Return true when the a does not equal b.
 - [[#not][not]] -- Boolean not.
 - [[#or][or]] -- Boolean or with short circuit.
 - [[#path][path]] -- Split a file path into its component pieces.
@@ -2075,7 +2075,7 @@ List of functions:
 - [[#startsWith][startsWith]] -- Check whether a strings starts with the given prefix.
 - [[#string][string]] -- Convert the variable to a string.
 - [[#string][string]] -- Convert the dictionary variable to dot names.
-- [[#type][type]] -- Return the parameter type, one of: int, float, string, list, dict.
+- [[#type][type]] -- Return the parameter type, one of: int, float, string, list, dict or bool.
 - [[#values][values]] -- Create a list out of the values in the specified dictionary.
 - [[#warn][warn]] -- Return a warning message and skip the current statement.
 
@@ -2431,7 +2431,7 @@ dup("", 3) => ""
 :CUSTOM_ID: eq
 :END:
 
-Return true when the two arguments are equal.
+Return true when the a equals b.
 
 #+BEGIN_SRC
 eq(a: float, b: float) bool
@@ -2451,7 +2451,7 @@ eq(1.2, 3.2) => false
 :CUSTOM_ID: eq
 :END:
 
-Return true when the two arguments are equal.
+Return true when the a equals b.
 
 #+BEGIN_SRC
 eq(a: int, b: int) bool
@@ -2471,7 +2471,7 @@ eq(2, 3) => false
 :CUSTOM_ID: eq
 :END:
 
-Return true when the two arguments are equal.
+Return true when the a equals b.
 
 #+BEGIN_SRC
 eq(a: string, b: string) bool
@@ -2812,7 +2812,7 @@ gte(3.1, 3.1) => true
 :CUSTOM_ID: gte
 :END:
 
-Return true when the a is greater than to equal to b.
+Return true when the a is greater than or equal to b.
 
 #+BEGIN_SRC
 gte(a: int, b: int) bool
@@ -3305,7 +3305,7 @@ lte(4, 3) => false
 :CUSTOM_ID: ne
 :END:
 
-Return true when the two arguments are not equal.
+Return true when the a does not equal b.
 
 #+BEGIN_SRC
 ne(a: float, b: float) bool
@@ -3325,7 +3325,7 @@ ne(1.2, 3.2) => true
 :CUSTOM_ID: ne
 :END:
 
-Return true when the two arguments are not equal.
+Return true when the a does not equal b.
 
 #+BEGIN_SRC
 ne(a: int, b: int) bool
@@ -3345,7 +3345,7 @@ ne(2, 3) => true
 :CUSTOM_ID: ne
 :END:
 
-Return true when the two arguments are not equal.
+Return true when the a does not equal b.
 
 #+BEGIN_SRC
 ne(a: string, b: string) bool
@@ -3783,7 +3783,7 @@ teas.z.a = 8
 :CUSTOM_ID: type
 :END:
 
-Return the parameter type, one of: int, float, string, list, dict.
+Return the parameter type, one of: int, float, string, list, dict or bool.
 
 #+BEGIN_SRC
 type(variable: any) string
@@ -3797,6 +3797,7 @@ type(3.14159) => "float"
 type("Tea") => "string"
 type(list(1,2)) => "list"
 type(dict("a", 1)) => "dict"
+type(true) => "bool"
 #+END_SRC
 
 [[#contents][茶]]

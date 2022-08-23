@@ -387,7 +387,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Use an alphanumeric ascii character for a short option name instead of \'$1\'.", ## wCmlAlphaNumericShort
     "Missing \'$1\' argument.", ## wCmlMissingArgument
     "Extra bare argument.", ## wCmdTooManyBareArgs
-    "Already have one \'$1\' argument.", ## wCmlAlreadyHaveOneArg
+    "One \'$1\' argument is allowed.", ## wCmlAlreadyHaveOneArg
     "Missing comma or right bracket.", ## wMissingCommaBracket
     "$1",                   ## wUserMessage
     "",                     ## wMissingDictIndex

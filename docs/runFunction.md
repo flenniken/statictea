@@ -48,7 +48,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funSort_lsssl](#funsort_lsssl) &mdash; Sort a list of dictionaries.
 * [funGithubAnchor_ss](#fungithubanchor_ss) &mdash; Create a Github anchor name from a heading name.
 * [funGithubAnchor_ll](#fungithubanchor_ll) &mdash; Create Github anchor names from heading names.
-* [funType_as](#funtype_as) &mdash; Return the parameter type, one of: int, float, string, list, dict.
+* [funType_as](#funtype_as) &mdash; Return the parameter type, one of: int, float, string, list, dict or bool.
 * [funJoinPath_loss](#funjoinpath_loss) &mdash; Join the path components with a path separator.
 * [funJoin_lsois](#funjoin_lsois) &mdash; Join a list of strings with a separator.
 * [funWarn](#funwarn) &mdash; Return a warning message and skip the current statement.
@@ -60,15 +60,15 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funNot_bb](#funnot_bb) &mdash; Boolean not.
 * [funAnd_bbb](#funand_bbb) &mdash; Boolean and with short circuit.
 * [funOr_bbb](#funor_bbb) &mdash; Boolean or with short circuit.
-* [funEq_iib](#funeq_iib) &mdash; Return true when the two arguments are equal.
-* [funEq_ffb](#funeq_ffb) &mdash; Return true when the two arguments are equal.
-* [funEq_ssb](#funeq_ssb) &mdash; Return true when the two arguments are equal.
-* [funNe_iib](#funne_iib) &mdash; Return true when the two arguments are not equal.
-* [funNe_ffb](#funne_ffb) &mdash; Return true when the two arguments are not equal.
-* [funNe_ssb](#funne_ssb) &mdash; Return true when the two arguments are not equal.
+* [funEq_iib](#funeq_iib) &mdash; Return true when the a equals b.
+* [funEq_ffb](#funeq_ffb) &mdash; Return true when the a equals b.
+* [funEq_ssb](#funeq_ssb) &mdash; Return true when the a equals b.
+* [funNe_iib](#funne_iib) &mdash; Return true when the a does not equal b.
+* [funNe_ffb](#funne_ffb) &mdash; Return true when the a does not equal b.
+* [funNe_ssb](#funne_ssb) &mdash; Return true when the a does not equal b.
 * [funGt_iib](#fungt_iib) &mdash; Return true when the a is greater than b.
 * [funGt_ffb](#fungt_ffb) &mdash; Return true when the a is greater than b.
-* [funGte_iib](#fungte_iib) &mdash; Return true when the a is greater than to equal to b.
+* [funGte_iib](#fungte_iib) &mdash; Return true when the a is greater than or equal to b.
 * [funGte_ffb](#fungte_ffb) &mdash; Return true when the a is greater than to equal to b.
 * [funLt_iib](#funlt_iib) &mdash; Return true when the a is less than b.
 * [funLt_ffb](#funlt_ffb) &mdash; Return true when the a is less than b.
@@ -1203,7 +1203,7 @@ func funGithubAnchor_ll(variables: Variables; parameters: seq[Value]): FunResult
 
 # funType_as
 
-Return the parameter type, one of: int, float, string, list, dict.
+Return the parameter type, one of: int, float, string, list, dict or bool.
 
 ~~~
 type(variable: any) string
@@ -1217,6 +1217,7 @@ type(3.14159) => "float"
 type("Tea") => "string"
 type(list(1,2)) => "list"
 type(dict("a", 1)) => "dict"
+type(true) => "bool"
 ~~~~
 
 ```nim
@@ -1523,7 +1524,7 @@ func funOr_bbb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funEq_iib
 
-Return true when the two arguments are equal.
+Return true when the a equals b.
 
 ~~~
 eq(a: int, b: int) bool
@@ -1542,7 +1543,7 @@ func funEq_iib(variables: Variables; parameters: seq[Value]): FunResult
 
 # funEq_ffb
 
-Return true when the two arguments are equal.
+Return true when the a equals b.
 
 ~~~
 eq(a: float, b: float) bool
@@ -1561,7 +1562,7 @@ func funEq_ffb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funEq_ssb
 
-Return true when the two arguments are equal.
+Return true when the a equals b.
 
 ~~~
 eq(a: string, b: string) bool
@@ -1580,7 +1581,7 @@ func funEq_ssb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funNe_iib
 
-Return true when the two arguments are not equal.
+Return true when the a does not equal b.
 
 ~~~
 ne(a: int, b: int) bool
@@ -1599,7 +1600,7 @@ func funNe_iib(variables: Variables; parameters: seq[Value]): FunResult
 
 # funNe_ffb
 
-Return true when the two arguments are not equal.
+Return true when the a does not equal b.
 
 ~~~
 ne(a: float, b: float) bool
@@ -1618,7 +1619,7 @@ func funNe_ffb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funNe_ssb
 
-Return true when the two arguments are not equal.
+Return true when the a does not equal b.
 
 ~~~
 ne(a: string, b: string) bool
@@ -1675,7 +1676,7 @@ func funGt_ffb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funGte_iib
 
-Return true when the a is greater than to equal to b.
+Return true when the a is greater than or equal to b.
 
 ~~~
 gte(a: int, b: int) bool

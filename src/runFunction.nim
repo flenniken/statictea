@@ -1638,7 +1638,7 @@ func funGithubAnchor_ll*(variables: Variables, parameters: seq[Value]): FunResul
 
 func funType_as*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Return the parameter type, one of: int, float, string, list,
-  ## dict.
+  ## dict or bool.
   ## @:
   ## @:~~~
   ## @:type(variable: any) string
@@ -1652,6 +1652,7 @@ func funType_as*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:type("Tea") => "string"
   ## @:type(list(1,2)) => "list"
   ## @:type(dict("a", 1)) => "dict"
+  ## @:type(true) => "bool"
   ## @:~~~~
 
   tMapParameters("as")
@@ -2035,7 +2036,7 @@ func funOr_bbb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funEq_iib*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the two arguments are equal.
+  ## Return true when the a equals b.
   ## @:
   ## @:~~~
   ## @:eq(a: int, b: int) bool
@@ -2054,7 +2055,7 @@ func funEq_iib*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funEq_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the two arguments are equal.
+  ## Return true when the a equals b.
   ## @:
   ## @:~~~
   ## @:eq(a: float, b: float) bool
@@ -2073,7 +2074,7 @@ func funEq_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funEq_ssb*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the two arguments are equal.
+  ## Return true when the a equals b.
   ## @:
   ## @:~~~
   ## @:eq(a: string, b: string) bool
@@ -2092,7 +2093,7 @@ func funEq_ssb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funNe_iib*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the two arguments are not equal.
+  ## Return true when the a does not equal b.
   ## @:
   ## @:~~~
   ## @:ne(a: int, b: int) bool
@@ -2111,7 +2112,7 @@ func funNe_iib*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funNe_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the two arguments are not equal.
+  ## Return true when the a does not equal b.
   ## @:
   ## @:~~~
   ## @:ne(a: float, b: float) bool
@@ -2130,7 +2131,7 @@ func funNe_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funNe_ssb*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the two arguments are not equal.
+  ## Return true when the a does not equal b.
   ## @:
   ## @:~~~
   ## @:ne(a: string, b: string) bool
@@ -2187,7 +2188,7 @@ func funGt_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funGte_iib*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the a is greater than to equal to b.
+  ## Return true when the a is greater than or equal to b.
   ## @:
   ## @:~~~
   ## @:gte(a: int, b: int) bool

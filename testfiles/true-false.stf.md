@@ -49,6 +49,10 @@ True = {True} = true
 False = {False} = false
 bool(0) = {b0} = false
 bool(1) = {b1} = true
+o.true_type = {o.true_type} = bool
+o.false_type = {o.false_type} = bool
+o.t = {o.t} = bool
+o.f = {o.f} = bool
 $$ endblock
 ~~~
 
@@ -66,6 +70,10 @@ $$ endblock
 ~~~
 o.true = "my true"
 o.false = "my false"
+o.true_type = type(true)
+o.false_type = type(false)
+o.t = type(bool(1))
+o.f = type(bool(0))
 ~~~
 
 ### File result.expected
@@ -84,6 +92,10 @@ True = true = true
 False = false = false
 bool(0) = false = false
 bool(1) = true = true
+o.true_type = bool = bool
+o.false_type = bool = bool
+o.t = bool = bool
+o.f = bool = bool
 ~~~
 
 ### File stdout.expected
