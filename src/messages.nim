@@ -206,6 +206,14 @@ type
     wExpectedBool,         ## w193
     wAssignTrueFalse,      ## w194
     wTwoArguments,         ## w195
+    wNotTakesBool,         ## w196
+    wNotBoolOperator,      ## w197
+    wAndOrNotBoolArgs,     ## w198
+    wLeftAndRightNotBools, ## w199
+    wMissingBoolAndOr,     ## w200
+    wNotSameType,          ## w201
+    wCompareNotBaseType,   ## w202
+    wMissingCondRightParen,## w203
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -405,5 +413,14 @@ const
     "The argument must be a bool value, got a $1.", ## wExpectedBool
     "You cannot assign true or false.", ## wAssignTrueFalse
     "Expected two arguments.", ## wTwoArguments
+    "The not operator takes a bool argument, got $1.", ## wNotTakesBool
+    "Expected a boolean operator, and, or, ==, !=, <, >, <=, >=.", ## wNotBoolOperator
+    "Bool arguments require boolean operators.", ## wAndOrNotBoolArgs
+    "The left and right arguments must both be bool values.", ## wLeftAndRightNotBools
+    "Expected the boolean operator 'and' or 'or'.", ## wMissingBoolAndOr
+    "You can only compare values of the same type.", ## wNotSameType
+    "You can compare int, float or string types.", ## wCompareNotBaseType
+    "The condition expression's closing right parentheses was not found.", ## wMissingCondRightParen
     ]
+
     ## The message text.

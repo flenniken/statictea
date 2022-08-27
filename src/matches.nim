@@ -264,3 +264,14 @@ proc matchSymbol*(line: string, symbol: GroupSymbol, start: Natural = 0): Option
   of gComma:
     pattern = r",\s*"
   result = matchPatternCached(line, pattern, start, 0)
+
+proc matchNotOrParen*(line: string, start: Natural = 0): Option[Matches] =
+  ## Match "not " or "(" and the trailing whitespace.
+  let pattern = r"(not |\()\s*"
+  result = matchPatternCached(line, pattern, start, 1)
+
+proc matchBoolOperator*(line: string, start: Natural): Option[Matches] =
+  ## Match "and ", "or ", "=="... and the trailing whitespace. And and
+  ## or require at least one trailing space.
+  let pattern = r"(and |or |==|!=|<=|>=|<|>)\s*"
+  result = matchPatternCached(line, pattern, start, 1)

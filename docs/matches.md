@@ -27,6 +27,8 @@ Regular expression matching methods.
 * [matchDotNames](#matchdotnames) &mdash; Matches variable dot names and surrounding whitespace.
 * [matchCommaOrSymbol](#matchcommaorsymbol) &mdash; Match a comma or the symbol and the optional trailing whitespace.
 * [matchSymbol](#matchsymbol) &mdash; Match the symbol and the optional trailing whitespace.
+* [matchNotOrParen](#matchnotorparen) &mdash; Match "not " or "(" and the trailing whitespace.
+* [matchBoolOperator](#matchbooloperator) &mdash; Match "and ", "or ", "==".
 
 # predefinedPrepost
 
@@ -254,6 +256,22 @@ Match the symbol and the optional trailing whitespace.
 ```nim
 proc matchSymbol(line: string; symbol: GroupSymbol; start: Natural = 0): Option[
     Matches]
+```
+
+# matchNotOrParen
+
+Match "not " or "(" and the trailing whitespace.
+
+```nim
+proc matchNotOrParen(line: string; start: Natural = 0): Option[Matches]
+```
+
+# matchBoolOperator
+
+Match "and ", "or ", "=="... and the trailing whitespace. And and or require at least one trailing space.
+
+```nim
+proc matchBoolOperator(line: string; start: Natural): Option[Matches]
 ```
 
 

@@ -2001,7 +2001,7 @@ func funAnd_bbb*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:and(false, warn("not hit")) => false
   ## @:~~~~
 
-  # Note: this code isn't run, it hear for the docs and the function
+  # Note: this code isn't run, it's here for the docs and the function
   # list.  The the code in runCommand.nim.
   tMapParameters("bbb")
   let a = map["a"].boolv
@@ -2027,7 +2027,7 @@ func funOr_bbb*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:or(true, warn("not hit")) => true
   ## @:~~~~
 
-  # Note: this code isn't run, it hear for the docs and the function
+  # Note: this code isn't run, it's here for the docs and the function
   # list.  The the code in runCommand.nim.
   tMapParameters("bbb")
   let a = map["a"].boolv

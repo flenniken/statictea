@@ -13,8 +13,8 @@ starts in the template file.
 * [newValueAndLengthOr](#newvalueandlengthor-1) &mdash; Create a ValueAndLengthOr warning.
 * [newValueAndLengthOr](#newvalueandlengthor-2) &mdash; Create a ValueAndLengthOr value.
 * [newValueAndLengthOr](#newvalueandlengthor-3) &mdash; Create a ValueAndLengthOr.
-* [newLengthOr](#newlengthor) &mdash; Create a OpResultWarn[Natural] warning.
-* [newLengthOr](#newlengthor-1) &mdash; Create a OpResultWarn[Natural] value.
+* [newLengthOr](#newlengthor) &mdash; Create a LengthOr warning.
+* [newLengthOr](#newlengthor-1) &mdash; Create a LengthOr value.
 * [newStatement](#newstatement) &mdash; Create a new statement.
 * [startColumn](#startcolumn) &mdash; Return enough spaces to point at the warning column.
 * [getFragmentAndPos](#getfragmentandpos) &mdash; Return a statement fragment, and new position to show the given position.
@@ -105,18 +105,18 @@ func newValueAndLengthOr(val: ValueAndLength): ValueAndLengthOr
 
 # newLengthOr
 
-Create a OpResultWarn[Natural] warning.
+Create a LengthOr warning.
 
 ```nim
-func newLengthOr(warning: MessageId; p1 = ""; pos = 0): OpResultWarn[Natural]
+func newLengthOr(warning: MessageId; p1 = ""; pos = 0): LengthOr
 ```
 
 # newLengthOr
 
-Create a OpResultWarn[Natural] value.
+Create a LengthOr value.
 
 ```nim
-func newLengthOr(pos: Natural): OpResultWarn[Natural]
+func newLengthOr(length: Natural): LengthOr
 ```
 
 # newStatement
