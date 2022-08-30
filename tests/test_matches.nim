@@ -116,9 +116,9 @@ proc testMatchNotOrParen(line: string, start: Natural = 0,
   else:
     result = true
 
-proc testmatchBoolOperator(line: string, start: Natural = 0,
+proc testMatchBoolExprOperator(line: string, start: Natural = 0,
     eMatchesO: Option[Matches] = none(Matches)): bool =
-  let matchesO = matchBoolOperator(line, start)
+  let matchesO = matchBoolExprOperator(line, start)
   if not expectedItem("matchesO", matchesO, eMatchesO):
     result = false
   else:
@@ -511,29 +511,30 @@ suite "matches.nim":
     check testMatchNotOrParen("(a < b) ", 0, some(newMatches(1, 0, "(")))
     check testMatchNotOrParen("(  a < b  ) ", 0, some(newMatches(3, 0, "(")))
 
-  test "testmatchBoolOperator":
-    check testmatchBoolOperator("")
-    check testmatchBoolOperator("no match")
-    check testmatchBoolOperator("and")
-    check testmatchBoolOperator(" and")
-    check testmatchBoolOperator(" and ")
+  test "testMatchCondOperator":
+    check testMatchBoolExprOperator("")
+    check testMatchBoolExprOperator("no match")
+    check testMatchBoolExprOperator("and")
+    check testMatchBoolExprOperator("or")
+    check testMatchBoolExprOperator(" and")
+    check testMatchBoolExprOperator(" and ")
 
-    check testmatchBoolOperator("and ", 0, some(newMatches(4, 0, "and ")))
-    check testmatchBoolOperator("or ", 0, some(newMatches(3, 0, "or ")))
-    check testmatchBoolOperator("==", 0, some(newMatches(2, 0, "==")))
-    check testmatchBoolOperator("!=", 0, some(newMatches(2, 0, "!=")))
-    check testmatchBoolOperator("<", 0, some(newMatches(1, 0, "<")))
-    check testmatchBoolOperator(">", 0, some(newMatches(1, 0, ">")))
-    check testmatchBoolOperator("<=", 0, some(newMatches(2, 0, "<=")))
-    check testmatchBoolOperator(">=", 0, some(newMatches(2, 0, ">=")))
+    check testMatchBoolExprOperator("and ", 0, some(newMatches(4, 0, "and")))
+    check testMatchBoolExprOperator("or ", 0, some(newMatches(3, 0, "or")))
+    check testMatchBoolExprOperator("==", 0, some(newMatches(2, 0, "==")))
+    check testMatchBoolExprOperator("!=", 0, some(newMatches(2, 0, "!=")))
+    check testMatchBoolExprOperator("<", 0, some(newMatches(1, 0, "<")))
+    check testMatchBoolExprOperator(">", 0, some(newMatches(1, 0, ">")))
+    check testMatchBoolExprOperator("<=", 0, some(newMatches(2, 0, "<=")))
+    check testMatchBoolExprOperator(">=", 0, some(newMatches(2, 0, ">=")))
 
-    check testmatchBoolOperator(" and ", 1, some(newMatches(4, 1, "and ")))
-    check testmatchBoolOperator(" or ", 1, some(newMatches(3, 1, "or ")))
-    check testmatchBoolOperator(" ==", 1, some(newMatches(2, 1, "==")))
-    check testmatchBoolOperator(" !=", 1, some(newMatches(2, 1, "!=")))
-    check testmatchBoolOperator(" <", 1, some(newMatches(1, 1, "<")))
-    check testmatchBoolOperator(" >", 1, some(newMatches(1, 1, ">")))
-    check testmatchBoolOperator(" <=", 1, some(newMatches(2, 1, "<=")))
-    check testmatchBoolOperator(" >=", 1, some(newMatches(2, 1, ">=")))
+    check testMatchBoolExprOperator(" and ", 1, some(newMatches(4, 1, "and")))
+    check testMatchBoolExprOperator(" or ", 1, some(newMatches(3, 1, "or")))
+    check testMatchBoolExprOperator(" ==", 1, some(newMatches(2, 1, "==")))
+    check testMatchBoolExprOperator(" !=", 1, some(newMatches(2, 1, "!=")))
+    check testMatchBoolExprOperator(" <", 1, some(newMatches(1, 1, "<")))
+    check testMatchBoolExprOperator(" >", 1, some(newMatches(1, 1, ">")))
+    check testMatchBoolExprOperator(" <=", 1, some(newMatches(2, 1, "<=")))
+    check testMatchBoolExprOperator(" >=", 1, some(newMatches(2, 1, ">=")))
 
-    check testmatchBoolOperator("a == b", 2, some(newMatches(3, 2, "==")))
+    check testMatchBoolExprOperator("a == b", 2, some(newMatches(3, 2, "==")))

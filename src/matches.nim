@@ -270,8 +270,19 @@ proc matchNotOrParen*(line: string, start: Natural = 0): Option[Matches] =
   let pattern = r"(not |\()\s*"
   result = matchPatternCached(line, pattern, start, 1)
 
-proc matchBoolOperator*(line: string, start: Natural): Option[Matches] =
-  ## Match "and ", "or ", "=="... and the trailing whitespace. And and
-  ## or require at least one trailing space.
-  let pattern = r"(and |or |==|!=|<=|>=|<|>)\s*"
-  result = matchPatternCached(line, pattern, start, 1)
+proc matchBoolExprOperator*(line: string, start: Natural): Option[Matches] =
+  ## Match boolean expression operators (bool operators plus compareh
+  ## operators) and the trailing whitespace.  The bool operators
+  ## require a trailing space but it isn't part of the operator name
+  ## returned but still in the length.
+  let pattern = r"(==|!=|<=|>=|<|>)\s*|(and|or)\s+"
+  result = matchPatternCached(line, pattern, start, 2)
+  if result.isSome:
+    # Return one group.
+    var (a, b) = result.get2Groups()
+    var operator: string
+    if a != "":
+      operator = a
+    else:
+      operator = b
+    result = some(newMatches(result.get().length, start, operator))

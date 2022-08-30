@@ -669,101 +669,132 @@ func skipCondition(statement: string, start: Natural): LengthOr =
 proc getCondition(statement: Statement, start: Natural,
     variables: Variables, skip: bool = false): ValueAndLengthOr
 
-proc getNotOrNestedCondition(statement: Statement, start: Natural,
+proc getValueOrNestedCond(statement: Statement, start: Natural,
     variables: Variables, skip: bool = false): ValueAndLengthOr =
-  ## Return a value and length. If start points at a not or nested
-  ## condition, handle it, else return the start value and length.
+  ## Return a value and length. If start points at a nested
+  ## condition, handle it. Return the start value and length.
 
   var runningLen = start
-  let notOrParenO = matchNotOrParen(statement.text, runningLen)
-  if not notOrParenO.isSome:
-    result = getValueAndLength(statement, start, variables, skip)
+  let parenO = matchSymbol(statement.text, gLeftParentheses, runningLen)
+  if parenO.isSome:
+    # Found a left parenetheses, get the nested condition.
+    result = getCondition(statement, start, variables, skip)
   else:
-    # Found a not or a paren.
-    let notOrParen = notOrParenO.getGroup()
-    runningLen += notOrParenO.get().length
-    if notOrParen == "(":
-      result = getCondition(statement, start, variables, skip)
-    else:
-      # Handle not.
-      let vlOr = getValueAndLength(statement, runningLen, variables, skip)
-      if skip or vlOr.isMessage or vlOr.value.exit:
-        return vlOr
-      let value = vlOr.value.value
-      runningLen += vlOr.value.length
-      if value.kind != vkBool:
-        # The not operator takes a bool argument, got $1.
-        return newValueAndLengthOr(wNotTakesBool, $value.kind, runningLen)
-      let vAndL = newValueAndLength(newValue(not value.boolv), runningLen)
-      result = newValueAndLengthOr(vAndL)
+    result = getValueAndLength(statement, start, variables, skip)
+
+proc runOperator(statement: Statement, start: Natural, variables: Variables,
+    left: Value, op: string, right: Value): ValueAndLengthOr =
+  ## Run the operator or get the next set and run both.
+  var runningLen = start
+  var bValue: Value
+  if right.kind == vkBool:
+    let bValueOr = runBoolOp(left, op, right)
+    if bValueOr.isMessage:
+      let messageData = newWarningData(bValueOr.message.warning, bValueOr.message.p1, runningLen)
+      return newValueAndLengthOr(messageData)
+    bValue = bValueOr.value
+  elif left.kind != vkBool:
+    # Run the comparison.
+    let bValueOr = runCompareOp(left, op, right)
+    if bValueOr.isMessage:
+      let messageData = newWarningData(bValueOr.message.warning, bValueOr.message.p1, runningLen)
+      return newValueAndLengthOr(messageData)
+    bValue = bValueOr.value
+  else:
+    # Continue to get the next operator and value for a comparison.
+    let op2O = matchBoolExprOperator(statement.text, runningLen)
+    if not op2O.isSome:
+      # Expected a boolean operator, and, or, ==, !=, <, >, <=, >=.
+      return newValueAndLengthOr(wNotBoolOperator, "", runningLen)
+    let op2 = op2O.getGroup()
+    runningLen += op2O.get().length
+
+    # Return a value and length after handling any nested condition.
+    let vlRight2Or = getValueOrNestedCond(statement, runningLen, variables)
+    if vlRight2Or.isMessage or vlRight2Or.value.exit:
+      return vlRight2Or
+    runningLen += vlRight2Or.value.length
+
+    let bValue2Or = runCompareOp(right, op2, vlRight2Or.value.value)
+    if bValue2Or.isMessage:
+      # Compare arg miss-match.
+      let messageData = newWarningData(bValue2Or.message.warning, bValue2Or.message.p1, runningLen)
+      return newValueAndLengthOr(messageData)
+    let bValueOr = runBoolOp(left, op, bValue2Or.value)
+    if bValueOr.isMessage:
+      # Compare arg miss-match.
+      let messageData = newWarningData(bValueOr.message.warning, bValueOr.message.p1, runningLen)
+      return newValueAndLengthOr(messageData)
+    bValue = bValueOr.value
 
 proc getCondition(statement: Statement, start: Natural,
     variables: Variables, skip: bool = false): ValueAndLengthOr =
   ## Return the bool value of the condition expression and its
   ## length. The start index points at the ( left parentheses. The
   ## length includes the trailing whitespace after the ending ).
+  var runningLen = start
 
   # Match the left parentheses and following whitespace.
-  let startSymbolO = matchSymbol(statement.text, gLeftParentheses, start)
-  assert startSymbolO.isSome
-  let startSymbol = startSymbolO.get()
+  let parenO = matchSymbol(statement.text, gLeftParentheses, runningLen)
+  assert parenO.isSome
+  runningLen += parenO.get().length
 
-  var runningLen = start + startSymbol.length
-
-  # Return a value and length after handling any not or nested condition.
-  var accumOr = getNotOrNestedCondition(statement, runningLen, variables, skip)
+  # Return a value and length after handling any nested condition.
+  var accumOr = getValueOrNestedCond(statement, runningLen, variables)
   if accumOr.isMessage or accumOr.value.exit:
     return accumOr
-  runningLen = start + accumOr.value.length
+  var accum = accumOr.value.value
+  runningLen += accumOr.value.length
 
   while true:
     # Check for ending right parentheses and trailing whitespace.
-    let endSymbolO = matchSymbol(statement.text, gRightParentheses, runningLen)
-    if endSymbolO.isSome:
-      # Done
-      let vAndL = newValueAndLength(accumOr.value.value, runningLen + endSymbolO.get().length)
+    let rightParenO = matchSymbol(statement.text, gRightParentheses, runningLen)
+    if rightParenO.isSome:
+      let vAndL = newValueAndLength(accum, runningLen + rightParenO.get().length)
       return newValueAndLengthOr(vAndL)
 
-    # Get the boolean operator.
-    let opO = matchBoolOperator(statement.text, runningLen)
+    # Get the operator.
+    let opO = matchBoolExprOperator(statement.text, runningLen)
     if not opO.isSome:
-      # Expected a boolean operator, and, or, ==, !=, <, >, <=, >=.
+      # Expected a boolean expression operator, and, or, ==, !=, <, >, <=, >=.
       return newValueAndLengthOr(wNotBoolOperator, "", runningLen)
     let op = opO.getGroup()
     runningLen += opO.get().length
 
     # Handle short ciruit conditions.
-    if accumOr.value.value.kind == vkBool:
-      var shortCiruit: bool
-      var shortCiruitValue: bool
+    if accum.kind == vkBool:
+      var sortCiruitTaken: bool
+      var shortCiruitResult: bool
       if op == "or":
-        if accumOr.value.value.boolv == true:
-          shortCiruit = true
-          shortCiruitValue = true
+        if accum.boolv == true:
+          sortCiruitTaken = true
+          shortCiruitResult = true
       elif op == "and":
-        if accumOr.value.value.boolv == false:
-          shortCiruit = true
-          shortCiruitValue = false
+        if accum.boolv == false:
+          sortCiruitTaken = true
+          shortCiruitResult = false
       else:
-        # Bool arguments require boolean operators.
-        return newValueAndLengthOr(wAndOrNotBoolArgs, "", runningLen)
-      if shortCiruit:
-        # Done
-        # Sort ciruit the condition and skip to the closing right parentheses.
+        # A compare operator requires numbers or string arguments.
+        return newValueAndLengthOr(wCompareBaseType, "", runningLen)
+      if sortCiruitTaken:
+        # Sort ciruit the condition and skip past the closing right parentheses.
         let lengthOr = skipCondition(statement.text, start)
         if lengthOr.isMessage:
           # Problem skipping.
           return newValueAndLengthOr(lengthOr.message)
-        let vAndL = newValueAndLength(newValue(shortCiruitValue), lengthOr.value)
+        runningLen += lengthOr.value
+        let vAndL = newValueAndLength(newValue(shortCiruitResult), runningLen)
         return newValueAndLengthOr(vAndL)
     else:
-      # We expect condition operators for non-bool values.
+      # Non-bool argument.
       if op == "or" or op == "and":
-        # Non boolean arguments require condition operators.
+        # The boolean operators 'and' and 'or' require bool arguments.
         return newValueAndLengthOr(wAndOrNotBoolArgs, "", runningLen)
 
-    # Return a value and length after handling any not or nested condition.
-    let vlRightOr = getNotOrNestedCondition(statement, runningLen, variables, skip)
+    # todo: check that all bool operators are the same.
+
+    # Return a value and length after handling any nested condition.
+    let vlRightOr = getValueOrNestedCond(statement, runningLen, variables)
     if vlRightOr.isMessage or vlRightOr.value.exit:
       return vlRightOr
     runningLen += vlRightOr.value.length
@@ -771,52 +802,14 @@ proc getCondition(statement: Statement, start: Natural,
     # We have a left and right value with an operator but the right value
     # might be part of a following comparision.
 
-    # Run the operator or get the next set and run both.
-    var bValue: Value
-    if vlRightOr.value.value.kind == vkBool:
-      let bValueOr = runBoolOp(accumOr.value.value, op, vlRightOr.value.value)
-      if bValueOr.isMessage:
-        # Bool arg miss-match.
-        let messageData = newWarningData(bValueOr.message.warning, bValueOr.message.p1, start+runningLen)
-        return newValueAndLengthOr(messageData)
-      bValue = bValueOr.value
-    elif accumOr.value.value.kind != vkBool:
-      # Run the comparison or bool operator.
-      let bValueOr = runCompareOp(accumOr.value.value, op, vlRightOr.value.value)
-      if bValueOr.isMessage:
-        # Compare arg miss-match.
-        let messageData = newWarningData(bValueOr.message.warning, bValueOr.message.p1, start+runningLen)
-        return newValueAndLengthOr(messageData)
-      bValue = bValueOr.value
-    else:
-      # Continue to get the next operator and value for a comparison.
-      let op2O = matchBoolOperator(statement.text, runningLen)
-      if not op2O.isSome:
-        # Expected a boolean operator, and, or, ==, !=, <, >, <=, >=.
-        return newValueAndLengthOr(wNotBoolOperator, "", runningLen)
-      let op2 = op2O.getGroup()
-      runningLen += op2O.get().length
+    let vlNextOr = runOperator(statement, runningLen, variables,
+      accum, op, vlRightOr.value.value)
+    if vlNextOr.isMessage:
+      return vlNextOr
+    runningLen += vlNextOr.value.length
 
-      # Return a value and length after handling any not or nested condition.
-      let vlRight2Or = getNotOrNestedCondition(statement, runningLen, variables, skip)
-      if vlRight2Or.isMessage or vlRight2Or.value.exit:
-        return vlRight2Or
-      runningLen += vlRight2Or.value.length
-
-      let bValue2Or = runCompareOp(vlRightOr.value.value, op2, vlRight2Or.value.value)
-      if bValue2Or.isMessage:
-        # Compare arg miss-match.
-        let messageData = newWarningData(bValue2Or.message.warning, bValue2Or.message.p1, start+runningLen)
-        return newValueAndLengthOr(messageData)
-      let bValueOr = runBoolOp(accumOr.value.value, op, bValue2Or.value)
-      if bValueOr.isMessage:
-        # Compare arg miss-match.
-        let messageData = newWarningData(bValueOr.message.warning, bValueOr.message.p1, start+runningLen)
-        return newValueAndLengthOr(messageData)
-      bValue = bValueOr.value
-
-    accumOr = newValueAndLengthOr(bValue, runningLen)
-
+    accum = vlNextOr.value.value
+    accumOr = newValueAndLengthOr(accum, runningLen)
 
 
 proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
