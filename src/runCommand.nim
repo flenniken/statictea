@@ -611,7 +611,7 @@ proc getList(statement: Statement, start: Natural,
     funValueLength.length+startSymbol.length)
   result = newValueAndLengthOr(valueAndLength)
 
-proc runBoolOp(left: Value, op: string, right: Value): ValueOr =
+proc runBoolOp*(left: Value, op: string, right: Value): ValueOr =
   ## Evaluate the bool expression and return a bool value or a warning
   ## message.
   var b: bool
@@ -627,7 +627,7 @@ proc runBoolOp(left: Value, op: string, right: Value): ValueOr =
     return newValueOr(wMissingBoolAndOr)
   result = newValueOr(newValue(b))
 
-proc runCompareOp(left: Value, op: string, right: Value): ValueOr =
+proc runCompareOp*(left: Value, op: string, right: Value): ValueOr =
   ## Evaluate the comparison and return a bool value or a warning
   ## message.
   if left.kind != right.kind:
@@ -653,9 +653,13 @@ proc runCompareOp(left: Value, op: string, right: Value): ValueOr =
     b = cmpValue <= 0
   of ">=":
     b = cmpValue >= 0
+  else:
+    # Expected a boolean expression operator, ==, !=, <, >, <=, >=.
+    return newValueOr(wNotCompareOperator)
+
   result = newValueOr(newValue(b))
 
-func skipCondition(statement: string, start: Natural): LengthOr =
+func skipCondition*(statement: string, start: Natural): LengthOr =
   ## Skip the condition expression. Start points at the ( and the
   ## function finds the matching ) and trailing whitespace and returns
   ## the length. When not found return a message.
@@ -666,7 +670,7 @@ func skipCondition(statement: string, start: Natural): LengthOr =
   # result = newLengthOr(0)
 
 # Forward reference since we call getCondition recursively.
-proc getCondition(statement: Statement, start: Natural,
+proc getCondition*(statement: Statement, start: Natural,
     variables: Variables, skip: bool = false): ValueAndLengthOr
 
 proc getValueOrNestedCond(statement: Statement, start: Natural,
@@ -727,7 +731,7 @@ proc runOperator(statement: Statement, start: Natural, variables: Variables,
       return newValueAndLengthOr(messageData)
     bValue = bValueOr.value
 
-proc getCondition(statement: Statement, start: Natural,
+proc getCondition*(statement: Statement, start: Natural,
     variables: Variables, skip: bool = false): ValueAndLengthOr =
   ## Return the bool value of the condition expression and its
   ## length. The start index points at the ( left parentheses. The
@@ -810,7 +814,6 @@ proc getCondition(statement: Statement, start: Natural,
 
     accum = vlNextOr.value.value
     accumOr = newValueAndLengthOr(accum, runningLen)
-
 
 proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
     Variables, skip: bool): ValueAndLengthOr =

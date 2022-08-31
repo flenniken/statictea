@@ -29,6 +29,10 @@ starts in the template file.
 * [ifFunctions](#iffunctions) &mdash; Return the if/if0 function's value and the length.
 * [andOrFunctions](#andorfunctions) &mdash; Return the and/or function's value and the length.
 * [getFunctionValueAndLength](#getfunctionvalueandlength) &mdash; Return the function's value and the length.
+* [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value or a warning message.
+* [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value or a warning message.
+* [skipCondition](#skipcondition) &mdash; Skip the condition expression.
+* [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and its length.
 * [getValueAndLength](#getvalueandlength) &mdash; Return the value and length of the item that the start parameter points at which is a string, number, variable, function or list.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
@@ -238,6 +242,39 @@ Return the function's value and the length. Start points at the first parameter 
 proc getFunctionValueAndLength(functionName: string; statement: Statement;
                                start: Natural; variables: Variables;
                                list = false; skip: bool): ValueAndLengthOr
+```
+
+# runBoolOp
+
+Evaluate the bool expression and return a bool value or a warning message.
+
+```nim
+proc runBoolOp(left: Value; op: string; right: Value): ValueOr
+```
+
+# runCompareOp
+
+Evaluate the comparison and return a bool value or a warning message.
+
+```nim
+proc runCompareOp(left: Value; op: string; right: Value): ValueOr
+```
+
+# skipCondition
+
+Skip the condition expression. Start points at the ( and the function finds the matching ) and trailing whitespace and returns the length. When not found return a message.
+
+```nim
+func skipCondition(statement: string; start: Natural): LengthOr
+```
+
+# getCondition
+
+Return the bool value of the condition expression and its length. The start index points at the ( left parentheses. The length includes the trailing whitespace after the ending ).
+
+```nim
+proc getCondition(statement: Statement; start: Natural; variables: Variables;
+                  skip: bool = false): ValueAndLengthOr
 ```
 
 # getValueAndLength

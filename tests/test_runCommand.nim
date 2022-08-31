@@ -239,6 +239,18 @@ proc testRunStatement(
   let variableDataOr = runStatement(statement, variables)
   result = cmpVariableDataOr(statement, variableDataOr, eVDataOr)
 
+proc testRunBoolOp(left: bool | Value, op: string, right: bool | Value, eValueOr: ValueOr): bool =
+  let valueOr = runBoolOp(newValue(left), op, newValue(right))
+  result = true
+  if $valueOr != $eValueOr:
+    result = gotExpected($valueOr, $eValueOr)
+
+proc testRunCompareOp(left: bool | Value, op: string, right: bool | Value, eValueOr: ValueOr): bool =
+  let valueOr = runCompareOp(newValue(left), op, newValue(right))
+  result = true
+  if $valueOr != $eValueOr:
+    result = gotExpected($valueOr, $eValueOr)
+
 suite "runCommand.nim":
 
   test "stripNewline":
@@ -1098,3 +1110,60 @@ White$1
     let eVariableDataOr = newVariableDataOr("a", "=", newValue(false))
     check testRunStatement(statement, eVariableDataOr)
 
+  test "runBoolOp":
+    check testRunBoolOp(true, "or", true, newValueOr(newValue(true)))
+    check testRunBoolOp(true, "or", false, newValueOr(newValue(true)))
+    check testRunBoolOp(false, "or", true, newValueOr(newValue(true)))
+    check testRunBoolOp(false, "or", false, newValueOr(newValue(false)))
+
+    check testRunBoolOp(true, "and", true, newValueOr(newValue(true)))
+    check testRunBoolOp(true, "and", false, newValueOr(newValue(false)))
+    check testRunBoolOp(false, "and", true, newValueOr(newValue(false)))
+    check testRunBoolOp(false, "and", false, newValueOr(newValue(false)))
+
+  test "runBoolOp warnings":
+    check testRunBoolOp(newValue(5), "and", false, newValueOr(wLeftAndRightNotBools))
+    check testRunBoolOp(newValue(false), "and", newValue(5), newValueOr(wLeftAndRightNotBools))
+    check testRunBoolOp(newValue(true), "or", newValue(5), newValueOr(wLeftAndRightNotBools))
+    check testRunBoolOp(false, "xor", false, newValueOr(wMissingBoolAndOr))
+
+  test "runCompareOp":
+    check testRunCompareOp(newValue(5), "==", newValue(5), newValueOr(newValue(true)))
+    check testRunCompareOp(newValue(2), "==", newValue(5), newValueOr(newValue(false)))
+
+    check testRunCompareOp(newValue(5), "!=", newValue(5), newValueOr(newValue(false)))
+    check testRunCompareOp(newValue(2), "!=", newValue(5), newValueOr(newValue(true)))
+
+    check testRunCompareOp(newValue(5), "<", newValue(5), newValueOr(newValue(false)))
+    check testRunCompareOp(newValue(2), "<", newValue(5), newValueOr(newValue(true)))
+    check testRunCompareOp(newValue(7), "<", newValue(5), newValueOr(newValue(false)))
+
+    check testRunCompareOp(newValue(5), ">", newValue(5), newValueOr(newValue(false)))
+    check testRunCompareOp(newValue(2), ">", newValue(5), newValueOr(newValue(false)))
+    check testRunCompareOp(newValue(7), ">", newValue(5), newValueOr(newValue(true)))
+
+    check testRunCompareOp(newValue(5), ">=", newValue(5), newValueOr(newValue(true)))
+    check testRunCompareOp(newValue(2), ">=", newValue(5), newValueOr(newValue(false)))
+    check testRunCompareOp(newValue(7), ">=", newValue(5), newValueOr(newValue(true)))
+
+    check testRunCompareOp(newValue(5), "<=", newValue(5), newValueOr(newValue(true)))
+    check testRunCompareOp(newValue(2), "<=", newValue(5), newValueOr(newValue(true)))
+    check testRunCompareOp(newValue(7), "<=", newValue(5), newValueOr(newValue(false)))
+
+    check testRunCompareOp(newValue(5.3), ">", newValue(5.3), newValueOr(newValue(false)))
+    check testRunCompareOp(newValue(2.4), ">", newValue(5.8), newValueOr(newValue(false)))
+    check testRunCompareOp(newValue(7.2), ">", newValue(5.2), newValueOr(newValue(true)))
+
+    check testRunCompareOp(newValue("abc"), "==", newValue("abc"), newValueOr(newValue(true)))
+    check testRunCompareOp(newValue("abc"), "==", newValue("abcd"), newValueOr(newValue(false)))
+
+  test "runCompareOp warnings":
+    check testRunCompareOp(newValue(true), "==", newValue(5), newValueOr(wNotSameType))
+    check testRunCompareOp(newValue(5), "==", newValue([5]), newValueOr(wNotSameType))
+    check testRunCompareOp(newValue(3), "==", newValue(3.5), newValueOr(wNotSameType))
+
+    check testRunCompareOp(newValue([5]), "==", newValue([5]), newValueOr(wCompareNotBaseType))
+    check testRunCompareOp(newValue(true), "==", newValue(false), newValueOr(wCompareNotBaseType))
+
+    check testRunCompareOp(newValue(5), "and", newValue(5), newValueOr(wNotCompareOperator))
+    check testRunCompareOp(newValue(5), "xor", newValue(5), newValueOr(wNotCompareOperator))

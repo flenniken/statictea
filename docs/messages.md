@@ -217,7 +217,9 @@ MessageId = enum
   wMissingBoolAndOr,        ## w200
   wNotSameType,             ## w201
   wCompareNotBaseType,      ## w202
-  wMissingCondRightParen     ## w203
+  wMissingCondRightParen,   ## w203
+  wCompareBaseType,         ## w204
+  wNotCompareOperator        ## w205
 ```
 
 # Messages
@@ -424,12 +426,14 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Expected two arguments.", ## wTwoArguments
     "The not operator takes a bool argument, got $1.", ## wNotTakesBool
     "Expected a boolean operator, and, or, ==, !=, <, >, <=, >=.", ## wNotBoolOperator
-    "Bool arguments require boolean operators.", ## wAndOrNotBoolArgs
+    "The boolean operators \'and\' and \'or\' require bool arguments.", ## wAndOrNotBoolArgs
     "The left and right arguments must both be bool values.", ## wLeftAndRightNotBools
-    "Expected the boolean operator \'and\' or \'or\'.", ## wMissingBoolAndOr
+    "Expected a boolean expression operator \'and\' or \'or\'.", ## wMissingBoolAndOr
     "You can only compare values of the same type.", ## wNotSameType
     "You can compare int, float or string types.", ## wCompareNotBaseType
-    "The condition expression\'s closing right parentheses was not found."]
+    "The condition expression\'s closing right parentheses was not found.", ## wMissingCondRightParen
+    "A compare operator requires numbers or string arguments.", ## wCompareBaseType
+    "Expected a compare operator, ==, !=, <, >, <=, >=."]
 ```
 
 

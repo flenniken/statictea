@@ -28,7 +28,7 @@ Regular expression matching methods.
 * [matchCommaOrSymbol](#matchcommaorsymbol) &mdash; Match a comma or the symbol and the optional trailing whitespace.
 * [matchSymbol](#matchsymbol) &mdash; Match the symbol and the optional trailing whitespace.
 * [matchNotOrParen](#matchnotorparen) &mdash; Match "not " or "(" and the trailing whitespace.
-* [matchBoolOperator](#matchbooloperator) &mdash; Match "and ", "or ", "==".
+* [matchBoolExprOperator](#matchboolexproperator) &mdash; Match boolean expression operators (bool operators plus compareh operators) and the trailing whitespace.
 
 # predefinedPrepost
 
@@ -266,12 +266,12 @@ Match "not " or "(" and the trailing whitespace.
 proc matchNotOrParen(line: string; start: Natural = 0): Option[Matches]
 ```
 
-# matchBoolOperator
+# matchBoolExprOperator
 
-Match "and ", "or ", "=="... and the trailing whitespace. And and or require at least one trailing space.
+Match boolean expression operators (bool operators plus compareh operators) and the trailing whitespace.  The bool operators require a trailing space but it isn't part of the operator name returned but still in the length.
 
 ```nim
-proc matchBoolOperator(line: string; start: Natural): Option[Matches]
+proc matchBoolExprOperator(line: string; start: Natural): Option[Matches]
 ```
 
 

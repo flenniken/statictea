@@ -215,6 +215,7 @@ type
     wCompareNotBaseType,   ## w202
     wMissingCondRightParen,## w203
     wCompareBaseType,      ## w204
+    wNotCompareOperator,   ## w205
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -423,6 +424,7 @@ const
     "You can compare int, float or string types.", ## wCompareNotBaseType
     "The condition expression's closing right parentheses was not found.", ## wMissingCondRightParen
     "A compare operator requires numbers or string arguments.", ## wCompareBaseType
+    "Expected a compare operator, ==, !=, <, >, <=, >=.", ## wNotCompareOperator
     ]
 
     ## The message text.
