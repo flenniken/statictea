@@ -286,3 +286,8 @@ proc matchBoolExprOperator*(line: string, start: Natural): Option[Matches] =
     else:
       operator = b
     result = some(newMatches(result.get().length, start, operator))
+
+proc matchCompareOperator*(line: string, start: Natural): Option[Matches] =
+  ## Match the compare operators and the trailing whitespace.
+  let pattern = r"(==|!=|<=|>=|<|>)\s*"
+  result = matchPatternCached(line, pattern, start, 1)

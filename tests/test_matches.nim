@@ -124,6 +124,14 @@ proc testMatchBoolExprOperator(line: string, start: Natural = 0,
   else:
     result = true
 
+proc testMatchCompareOperator(line: string, start: Natural = 0,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = matchCompareOperator(line, start)
+  if not expectedItem("matchesO", matchesO, eMatchesO):
+    result = false
+  else:
+    result = true
+
 suite "matches.nim":
 
   test "prepost table":
@@ -538,3 +546,11 @@ suite "matches.nim":
     check testMatchBoolExprOperator(" >=", 1, some(newMatches(2, 1, ">=")))
 
     check testMatchBoolExprOperator("a == b", 2, some(newMatches(3, 2, "==")))
+
+  test "testMatchCompareOperator":
+    check testMatchCompareOperator("==", 0, some(newMatches(2, 0, "==")))
+    check testMatchCompareOperator("!=", 0, some(newMatches(2, 0, "!=")))
+    check testMatchCompareOperator("<", 0, some(newMatches(1, 0, "<")))
+    check testMatchCompareOperator(">", 0, some(newMatches(1, 0, ">")))
+    check testMatchCompareOperator("<=", 0, some(newMatches(2, 0, "<=")))
+    check testMatchCompareOperator(">=", 0, some(newMatches(2, 0, ">=")))

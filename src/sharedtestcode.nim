@@ -16,10 +16,12 @@ when defined(test):
     file.write(content)
     file.close()
 
-  proc gotExpected*(got: string, expected: string): bool =
+  proc gotExpected*(got: string, expected: string, message = ""): bool =
     ## Return true when the got string matches the expected string,
     ## otherwise return false and show the differences.
     if got != expected:
+      if message != "":
+        echo message
       echo "     got: " & got
       echo "expected: " & expected
       return false

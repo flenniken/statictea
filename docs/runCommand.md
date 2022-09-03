@@ -11,6 +11,8 @@ starts in the template file.
 * [newValueAndLength](#newvalueandlength) &mdash; Create a newValueAndLength object.
 * [newValueAndLengthOr](#newvalueandlengthor) &mdash; Create a ValueAndLengthOr warning.
 * [newValueAndLengthOr](#newvalueandlengthor-1) &mdash; Create a ValueAndLengthOr warning.
+* [`==`](#) &mdash; Return true when a equals b.
+* [`==`](#-1) &mdash; Return true when a equals b.
 * [newValueAndLengthOr](#newvalueandlengthor-2) &mdash; Create a ValueAndLengthOr value.
 * [newValueAndLengthOr](#newvalueandlengthor-3) &mdash; Create a ValueAndLengthOr.
 * [newLengthOr](#newlengthor) &mdash; Create a LengthOr warning.
@@ -20,8 +22,8 @@ starts in the template file.
 * [getFragmentAndPos](#getfragmentandpos) &mdash; Return a statement fragment, and new position to show the given position.
 * [getWarnStatement](#getwarnstatement) &mdash; Return a multiline error message.
 * [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
-* [`==`](#) &mdash; Return true when the two statements are equal.
-* [`$`](#-1) &mdash; Return a string representation of a Statement.
+* [`==`](#-2) &mdash; Return true when the two statements are equal.
+* [`$`](#-3) &mdash; Return a string representation of a Statement.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
 * [getMultilineStr](#getmultilinestr) &mdash; Return the triple quoted string literal.
 * [getString](#getstring) &mdash; Return a literal string value and match length from a statement.
@@ -89,6 +91,22 @@ Create a ValueAndLengthOr warning.
 
 ```nim
 func newValueAndLengthOr(warningData: WarningData): ValueAndLengthOr
+```
+
+# `==`
+
+Return true when a equals b.
+
+```nim
+proc `==`(a: ValueAndLengthOr; b: ValueAndLengthOr): bool
+```
+
+# `==`
+
+Return true when a equals b.
+
+```nim
+proc `==`(a: LengthOr; b: LengthOr): bool
 ```
 
 # newValueAndLengthOr
@@ -249,7 +267,7 @@ proc getFunctionValueAndLength(functionName: string; statement: Statement;
 Evaluate the bool expression and return a bool value or a warning message.
 
 ```nim
-proc runBoolOp(left: Value; op: string; right: Value): ValueOr
+proc runBoolOp(left: Value; op: string; right: Value): Value
 ```
 
 # runCompareOp
@@ -257,15 +275,15 @@ proc runBoolOp(left: Value; op: string; right: Value): ValueOr
 Evaluate the comparison and return a bool value or a warning message.
 
 ```nim
-proc runCompareOp(left: Value; op: string; right: Value): ValueOr
+proc runCompareOp(left: Value; op: string; right: Value): Value
 ```
 
 # skipCondition
 
-Skip the condition expression. Start points at the ( and the function finds the matching ) and trailing whitespace and returns the length. When not found return a message.
+Skip the condition expression. startPos points at the starting ( and the function finds the matching end ) and trailing whitespace. Returns the length or a message when not found.
 
 ```nim
-func skipCondition(statement: string; start: Natural): LengthOr
+func skipCondition(text: string; startPos: Natural): LengthOr
 ```
 
 # getCondition

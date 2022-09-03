@@ -29,6 +29,7 @@ Regular expression matching methods.
 * [matchSymbol](#matchsymbol) &mdash; Match the symbol and the optional trailing whitespace.
 * [matchNotOrParen](#matchnotorparen) &mdash; Match "not " or "(" and the trailing whitespace.
 * [matchBoolExprOperator](#matchboolexproperator) &mdash; Match boolean expression operators (bool operators plus compareh operators) and the trailing whitespace.
+* [matchCompareOperator](#matchcompareoperator) &mdash; Match the compare operators and the trailing whitespace.
 
 # predefinedPrepost
 
@@ -272,6 +273,14 @@ Match boolean expression operators (bool operators plus compareh operators) and 
 
 ```nim
 proc matchBoolExprOperator(line: string; start: Natural): Option[Matches]
+```
+
+# matchCompareOperator
+
+Match the compare operators and the trailing whitespace.
+
+```nim
+proc matchCompareOperator(line: string; start: Natural): Option[Matches]
 ```
 
 

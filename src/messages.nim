@@ -206,16 +206,14 @@ type
     wExpectedBool,         ## w193
     wAssignTrueFalse,      ## w194
     wTwoArguments,         ## w195
-    wNotTakesBool,         ## w196
-    wNotBoolOperator,      ## w197
-    wAndOrNotBoolArgs,     ## w198
-    wLeftAndRightNotBools, ## w199
-    wMissingBoolAndOr,     ## w200
-    wNotSameType,          ## w201
-    wCompareNotBaseType,   ## w202
-    wMissingCondRightParen,## w203
-    wCompareBaseType,      ## w204
-    wNotCompareOperator,   ## w205
+    wNotBoolOperator,      ## w196
+    wMissingCondRightParen,## w197
+    wNotCompareOperator,   ## w198
+    wBoolOperatorLeft,     ## w199
+    wCompareOperator,      ## w200
+    wCompareOperatorSame,  ## w201
+    wNeedPrecedence,       ## w202
+    wNoMatchingParen,      ## w203
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -415,16 +413,14 @@ const
     "The argument must be a bool value, got a $1.", ## wExpectedBool
     "You cannot assign true or false.", ## wAssignTrueFalse
     "Expected two arguments.", ## wTwoArguments
-    "The not operator takes a bool argument, got $1.", ## wNotTakesBool
     "Expected a boolean operator, and, or, ==, !=, <, >, <=, >=.", ## wNotBoolOperator
-    "The boolean operators 'and' and 'or' require bool arguments.", ## wAndOrNotBoolArgs
-    "The left and right arguments must both be bool values.", ## wLeftAndRightNotBools
-    "Expected a boolean expression operator 'and' or 'or'.", ## wMissingBoolAndOr
-    "You can only compare values of the same type.", ## wNotSameType
-    "You can compare int, float or string types.", ## wCompareNotBaseType
     "The condition expression's closing right parentheses was not found.", ## wMissingCondRightParen
-    "A compare operator requires numbers or string arguments.", ## wCompareBaseType
     "Expected a compare operator, ==, !=, <, >, <=, >=.", ## wNotCompareOperator
+    "A boolean operator’s left value must be a bool.", ## wBoolOperatorLeft
+    "A comparison operator’s values must be numbers or strings of the same type.", ## wCompareOperator
+    "The comparison operator’s right value must be the same type as the left value.", ## wCompareOperatorSame
+    "When mixing 'and's and 'or's you need to specify the precedence with parentheses.", ## wNeedPrecedence
+    "No matching end right parentheses.", ## wNoMatchingParen
     ]
 
     ## The message text.

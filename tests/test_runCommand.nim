@@ -239,17 +239,23 @@ proc testRunStatement(
   let variableDataOr = runStatement(statement, variables)
   result = cmpVariableDataOr(statement, variableDataOr, eVDataOr)
 
-proc testRunBoolOp(left: bool | Value, op: string, right: bool | Value, eValueOr: ValueOr): bool =
-  let valueOr = runBoolOp(newValue(left), op, newValue(right))
+proc testRunBoolOp(left: bool | Value, op: string, right: bool | Value, eValue: Value): bool =
+  let value = runBoolOp(newValue(left), op, newValue(right))
   result = true
-  if $valueOr != $eValueOr:
-    result = gotExpected($valueOr, $eValueOr)
+  if value != eValue:
+    result = gotExpected($value, $eValue)
 
-proc testRunCompareOp(left: bool | Value, op: string, right: bool | Value, eValueOr: ValueOr): bool =
-  let valueOr = runCompareOp(newValue(left), op, newValue(right))
+proc testRunCompareOp(left: bool | Value, op: string, right: bool | Value, eValue: Value): bool =
+  let value = runCompareOp(newValue(left), op, newValue(right))
   result = true
-  if $valueOr != $eValueOr:
-    result = gotExpected($valueOr, $eValueOr)
+  if value != eValue:
+    result = gotExpected($value, $eValue)
+
+proc testSkipCondition(text: string, startPos: Natural, eLengthOr: LengthOr): bool =
+  let lengthOr = skipCondition(text, startPos)
+  result = true
+  if lengthOr != eLengthOr:
+    result = gotExpected($lengthOr, $eLengthOr)
 
 suite "runCommand.nim":
 
@@ -1111,59 +1117,61 @@ White$1
     check testRunStatement(statement, eVariableDataOr)
 
   test "runBoolOp":
-    check testRunBoolOp(true, "or", true, newValueOr(newValue(true)))
-    check testRunBoolOp(true, "or", false, newValueOr(newValue(true)))
-    check testRunBoolOp(false, "or", true, newValueOr(newValue(true)))
-    check testRunBoolOp(false, "or", false, newValueOr(newValue(false)))
+    check testRunBoolOp(true, "or", true, newValue(true))
+    check testRunBoolOp(true, "or", false, newValue(true))
+    check testRunBoolOp(false, "or", true, newValue(true))
+    check testRunBoolOp(false, "or", false, newValue(false))
 
-    check testRunBoolOp(true, "and", true, newValueOr(newValue(true)))
-    check testRunBoolOp(true, "and", false, newValueOr(newValue(false)))
-    check testRunBoolOp(false, "and", true, newValueOr(newValue(false)))
-    check testRunBoolOp(false, "and", false, newValueOr(newValue(false)))
-
-  test "runBoolOp warnings":
-    check testRunBoolOp(newValue(5), "and", false, newValueOr(wLeftAndRightNotBools))
-    check testRunBoolOp(newValue(false), "and", newValue(5), newValueOr(wLeftAndRightNotBools))
-    check testRunBoolOp(newValue(true), "or", newValue(5), newValueOr(wLeftAndRightNotBools))
-    check testRunBoolOp(false, "xor", false, newValueOr(wMissingBoolAndOr))
+    check testRunBoolOp(true, "and", true, newValue(true))
+    check testRunBoolOp(true, "and", false, newValue(false))
+    check testRunBoolOp(false, "and", true, newValue(false))
+    check testRunBoolOp(false, "and", false, newValue(false))
 
   test "runCompareOp":
-    check testRunCompareOp(newValue(5), "==", newValue(5), newValueOr(newValue(true)))
-    check testRunCompareOp(newValue(2), "==", newValue(5), newValueOr(newValue(false)))
+    check testRunCompareOp(newValue(5), "==", newValue(5), newValue(true))
+    check testRunCompareOp(newValue(2), "==", newValue(5), newValue(false))
 
-    check testRunCompareOp(newValue(5), "!=", newValue(5), newValueOr(newValue(false)))
-    check testRunCompareOp(newValue(2), "!=", newValue(5), newValueOr(newValue(true)))
+    check testRunCompareOp(newValue(5), "!=", newValue(5), newValue(false))
+    check testRunCompareOp(newValue(2), "!=", newValue(5), newValue(true))
 
-    check testRunCompareOp(newValue(5), "<", newValue(5), newValueOr(newValue(false)))
-    check testRunCompareOp(newValue(2), "<", newValue(5), newValueOr(newValue(true)))
-    check testRunCompareOp(newValue(7), "<", newValue(5), newValueOr(newValue(false)))
+    check testRunCompareOp(newValue(5), "<", newValue(5), newValue(false))
+    check testRunCompareOp(newValue(2), "<", newValue(5), newValue(true))
+    check testRunCompareOp(newValue(7), "<", newValue(5), newValue(false))
 
-    check testRunCompareOp(newValue(5), ">", newValue(5), newValueOr(newValue(false)))
-    check testRunCompareOp(newValue(2), ">", newValue(5), newValueOr(newValue(false)))
-    check testRunCompareOp(newValue(7), ">", newValue(5), newValueOr(newValue(true)))
+    check testRunCompareOp(newValue(5), ">", newValue(5), newValue(false))
+    check testRunCompareOp(newValue(2), ">", newValue(5), newValue(false))
+    check testRunCompareOp(newValue(7), ">", newValue(5), newValue(true))
 
-    check testRunCompareOp(newValue(5), ">=", newValue(5), newValueOr(newValue(true)))
-    check testRunCompareOp(newValue(2), ">=", newValue(5), newValueOr(newValue(false)))
-    check testRunCompareOp(newValue(7), ">=", newValue(5), newValueOr(newValue(true)))
+    check testRunCompareOp(newValue(5), ">=", newValue(5), newValue(true))
+    check testRunCompareOp(newValue(2), ">=", newValue(5), newValue(false))
+    check testRunCompareOp(newValue(7), ">=", newValue(5), newValue(true))
 
-    check testRunCompareOp(newValue(5), "<=", newValue(5), newValueOr(newValue(true)))
-    check testRunCompareOp(newValue(2), "<=", newValue(5), newValueOr(newValue(true)))
-    check testRunCompareOp(newValue(7), "<=", newValue(5), newValueOr(newValue(false)))
+    check testRunCompareOp(newValue(5), "<=", newValue(5), newValue(true))
+    check testRunCompareOp(newValue(2), "<=", newValue(5), newValue(true))
+    check testRunCompareOp(newValue(7), "<=", newValue(5), newValue(false))
 
-    check testRunCompareOp(newValue(5.3), ">", newValue(5.3), newValueOr(newValue(false)))
-    check testRunCompareOp(newValue(2.4), ">", newValue(5.8), newValueOr(newValue(false)))
-    check testRunCompareOp(newValue(7.2), ">", newValue(5.2), newValueOr(newValue(true)))
+    check testRunCompareOp(newValue(5.3), ">", newValue(5.3), newValue(false))
+    check testRunCompareOp(newValue(2.4), ">", newValue(5.8), newValue(false))
+    check testRunCompareOp(newValue(7.2), ">", newValue(5.2), newValue(true))
 
-    check testRunCompareOp(newValue("abc"), "==", newValue("abc"), newValueOr(newValue(true)))
-    check testRunCompareOp(newValue("abc"), "==", newValue("abcd"), newValueOr(newValue(false)))
+    check testRunCompareOp(newValue("abc"), "==", newValue("abc"), newValue(true))
+    check testRunCompareOp(newValue("abc"), "==", newValue("abcd"), newValue(false))
 
-  test "runCompareOp warnings":
-    check testRunCompareOp(newValue(true), "==", newValue(5), newValueOr(wNotSameType))
-    check testRunCompareOp(newValue(5), "==", newValue([5]), newValueOr(wNotSameType))
-    check testRunCompareOp(newValue(3), "==", newValue(3.5), newValueOr(wNotSameType))
+  test "testSkipCondition":
+    #                        0123456789 123456789
+    #                         123456789 123456789 123
+    check testSkipCondition("a = ( b < c ) # test", 4, newLengthOr(11))
+    check testSkipCondition("()", 0, newLengthOr(2))
+    check testSkipCondition("(())", 0, newLengthOr(4))
+    check testSkipCondition("((()))", 0, newLengthOr(6))
+    check testSkipCondition("(a < b)", 0, newLengthOr(7))
+    check testSkipCondition("((a and b) or c)", 0, newLengthOr(16))
+    check testSkipCondition("((a and b) or c)", 1, newLengthOr(11))
+    check testSkipCondition("(len(b) < 5) ,", 0, newLengthOr(14))
+    check testSkipCondition("""(len("abc") < 5) ,""", 0, newLengthOr(18))
+    check testSkipCondition("""(len("a\"bc") < 5) ,""", 0, newLengthOr(20))
+    check testSkipCondition("""(len("(((bc") < 5) ,""", 0, newLengthOr(20))
 
-    check testRunCompareOp(newValue([5]), "==", newValue([5]), newValueOr(wCompareNotBaseType))
-    check testRunCompareOp(newValue(true), "==", newValue(false), newValueOr(wCompareNotBaseType))
-
-    check testRunCompareOp(newValue(5), "and", newValue(5), newValueOr(wNotCompareOperator))
-    check testRunCompareOp(newValue(5), "xor", newValue(5), newValueOr(wNotCompareOperator))
+  test "testSkipCondition warning":
+    check testSkipCondition("(", 0, newLengthOr(wNoMatchingParen, "", 1))
+    check testSkipCondition("((())", 0, newLengthOr(wNoMatchingParen, "", 5))
