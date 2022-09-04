@@ -1393,7 +1393,7 @@ You can write boolean expressions with the following operators:
 - >=
 
 You typically use a boolean expression with an if statement. In
-the next example v is set to “small” because 3 is less than 5.
+the next example v is set to “s” because 3 is less than 5.
 
 #+BEGIN_SRC
 v = if((3 < 5), “s”, “l”)
@@ -1404,7 +1404,7 @@ Note: a conditional is wrapped in parentheses and there is no
 name on the left, so the following statement is invalid:
 
 #+BEGIN_SRC
-v = if(a < 5, “small”, “large”)
+v = if(3 < 5, “s”, “l”)
        ^ invalid syntax
 #+END_SRC
 
