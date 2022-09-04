@@ -49,7 +49,7 @@ type
     exit*: bool
 
   ValueAndLengthOr* = OpResultWarn[ValueAndLength]
-  LengthOr* = OpResultWarn[Natural]
+  PosOr* = OpResultWarn[Natural]
 
 
 proc newValueAndLength*(value: Value, length: Natural,
@@ -79,17 +79,6 @@ proc `==`*(a: ValueAndLengthOr, b: ValueAndLengthOr): bool =
 proc `!=`*(a: ValueAndLengthOr, b: ValueAndLengthOr): bool =
   result = not (a == b)
 
-proc `==`*(a: LengthOr, b: LengthOr): bool =
-  ## Return true when a equals b.
-  if a.kind == b.kind:
-    if a.isMessage:
-      result = a.message == b.message
-    else:
-      result = a.value == b.value
-
-proc `!=`*(a: LengthOr, b: LengthOr): bool =
-  result = not (a == b)
-
 func newValueAndLengthOr*(value: Value, length: Natural, exit=false):
     ValueAndLengthOr =
   ## Create a ValueAndLengthOr value.
@@ -105,14 +94,25 @@ func newValueAndLengthOr*(val: ValueAndLength):
   ## Create a ValueAndLengthOr.
   result = opValueW[ValueAndLength](val)
 
-func newLengthOr*(warning: MessageId, p1 = "", pos = 0): LengthOr =
-  ## Create a LengthOr warning.
+func newPosOr*(warning: MessageId, p1 = "", pos = 0): PosOr =
+  ## Create a PosOr warning.
   let warningData = newWarningData(warning, p1, pos)
   result = opMessageW[Natural](warningData)
 
-func newLengthOr*(length: Natural): LengthOr =
-  ## Create a LengthOr value.
-  result = opValueW[Natural](length)
+func newPosOr*(pos: Natural): PosOr =
+  ## Create a PosOr value.
+  result = opValueW[Natural](pos)
+
+proc `==`*(a: PosOr, b: PosOr): bool =
+  ## Return true when a equals b.
+  if a.kind == b.kind:
+    if a.isMessage:
+      result = a.message == b.message
+    else:
+      result = a.value == b.value
+
+proc `!=`*(a: PosOr, b: PosOr): bool =
+  result = not (a == b)
 
 func newStatement*(text: string, lineNum: Natural = 1,
     start: Natural = 0): Statement =
@@ -672,11 +672,10 @@ proc runCompareOp*(left: Value, op: string, right: Value): Value =
     assert(false, "Expected a boolean expression operator.")
   result = newValue(b)
 
-func skipCondition*(text: string, startPos: Natural): LengthOr =
-  ## Skip the condition expression. startPos points at the starting (
-  ## and the function finds the matching end ) and trailing whitespace.
-  ## Returns the length or a message when not found.
-
+func skipCondition*(text: string, startPos: Natural): PosOr =
+  ## Skip the condition expression and optional trailing
+  ## whitespace. startPos points at the starting (.  Return the
+  ## position or a message when not found.
   ## @:~~~
   ## @:a = if( (b < c)  , d, e)
   ## @:        ^        ^
@@ -692,15 +691,14 @@ func skipCondition*(text: string, startPos: Natural): LengthOr =
       start, middle, inString, slash, whitespace
 
   var state = start
+  var pos = text.len
 
   # The difference between the number of left and right parentheses.
   var count = 0
-  var length = 0
 
   # Loop through the text one byte at a time.
   for ix in countUp(startPos, text.len-1):
     let ch = text[ix]
-    inc(length)
 
     case state
     of start:
@@ -738,18 +736,18 @@ func skipCondition*(text: string, startPos: Natural): LengthOr =
       of ' ', '\t', '\n', '\r':
         discard
       else:
+        pos = ix
         break
 
-  if state == whitespace:
-    result = newLengthOr(length)
-  else:
+  if state != whitespace:
     # No matching end right parentheses.
-    result = newLengthOr(wNoMatchingParen, "", length)
-
+    result = newPosOr(wNoMatchingParen, "", startPos)
+  else:
+    result = newPosOr(pos)
 
 # Forward reference since we call getCondition recursively.
 proc getCondition*(statement: Statement, start: Natural,
-    variables: Variables, skip: bool = false): ValueAndLengthOr
+    variables: Variables): ValueAndLengthOr
 
 proc getValueOrNestedCond(statement: Statement, start: Natural,
     variables: Variables, skip: bool = false): ValueAndLengthOr =
@@ -760,15 +758,18 @@ proc getValueOrNestedCond(statement: Statement, start: Natural,
   let parenO = matchSymbol(statement.text, gLeftParentheses, runningLen)
   if parenO.isSome:
     # Found a left parenetheses, get the nested condition.
-    result = getCondition(statement, start, variables, skip)
+    result = getCondition(statement, start, variables)
   else:
     result = getValueAndLength(statement, start, variables, skip)
 
 proc getCondition*(statement: Statement, start: Natural,
-    variables: Variables, skip: bool = false): ValueAndLengthOr =
+    variables: Variables): ValueAndLengthOr =
   ## Return the bool value of the condition expression and its
   ## length. The start index points at the ( left parentheses. The
   ## length includes the trailing whitespace after the ending ).
+  when showPos:
+    showDebugPos(statement, start, "^sc")
+
   var runningPos = start
   var lastBoolOp: string
 
@@ -788,7 +789,10 @@ proc getCondition*(statement: Statement, start: Natural,
     # Check for ending right parentheses and trailing whitespace.
     let rightParenO = matchSymbol(statement.text, gRightParentheses, runningPos)
     if rightParenO.isSome:
-      let vAndL = newValueAndLength(accum, runningPos + rightParenO.get().length)
+      let finish = runningPos + rightParenO.get().length
+      let vAndL = newValueAndLength(accum, finish - start)
+      when showPos:
+        showDebugPos(statement, finish, "^fc")
       return newValueAndLengthOr(vAndL)
 
     # Get the operator.
@@ -800,9 +804,8 @@ proc getCondition*(statement: Statement, start: Natural,
     if (op == "and" or op == "or") and accum.kind != vkBool:
       # A boolean operator’s left value must be a bool.
       return newValueAndLengthOr(wBoolOperatorLeft, "", runningPos)
-    runningPos += opO.get().length
 
-    # Handle short ciruit conditions.
+    # Look for short ciruit conditions.
     var sortCiruitTaken: bool
     var shortCiruitResult: bool
     if op == "or":
@@ -825,21 +828,25 @@ proc getCondition*(statement: Statement, start: Natural,
         shortCiruitResult = false
     else:
       # We have a compare operator.
-      if accum.kind != vkInt or accum.kind != vkFloat or accum.kind != vkString:
+      if accum.kind != vkInt and accum.kind != vkFloat and accum.kind != vkString:
         # The comparison operator’s left value must be a number or string.
         return newValueAndLengthOr(wCompareOperator, "", runningPos)
 
+    runningPos += opO.get().length
+
     if sortCiruitTaken:
       # Sort ciruit the condition and skip past the closing right parentheses.
-      let lengthOr = skipCondition(statement.text, start)
-      if lengthOr.isMessage:
-        # Problem skipping.
-        return newValueAndLengthOr(lengthOr.message)
-      runningPos += lengthOr.value
-      let vAndL = newValueAndLength(newValue(shortCiruitResult), runningPos)
+      let posOr = skipCondition(statement.text, start)
+      if posOr.isMessage:
+        # No matching end right parentheses.
+        return newValueAndLengthOr(posOr.message)
+      runningPos = posOr.value
+      when showPos:
+        showDebugPos(statement, runningPos, "^fc")
+      let vAndL = newValueAndLength(newValue(shortCiruitResult), runningPos-start)
       return newValueAndLengthOr(vAndL)
 
-    # Return a value and length after handling any nested condition.
+    # Return a value and length after handling any nestedcondition.
     let vlRightOr = getValueOrNestedCond(statement, runningPos, variables)
     if vlRightOr.isMessage or vlRightOr.value.exit:
       return vlRightOr
@@ -851,9 +858,10 @@ proc getCondition*(statement: Statement, start: Natural,
 
     var bValue: Value
     if op != "and" and op != "or":
+      # Compare two values.
       if right.kind != accum.kind:
         # The comparison operator’s right value must be the same type as the left value.
-        let messageData = newWarningData(wCompareOperatorSame, "", runningPos)
+        let messageData = newWarningData(wCompareOperatorSame, "", runningPos - vlRightOr.value.length)
         return newValueAndLengthOr(messageData)
       bValue = runCompareOp(accum, op, right)
     elif right.kind == vkBool:
@@ -881,7 +889,6 @@ proc getCondition*(statement: Statement, start: Natural,
       runningPos += vlThirdOr.value.length
 
     accum = newValue(bValue)
-    accumOr = newValueAndLengthOr(accum, runningPos-start)
 
 proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
     Variables, skip: bool): ValueAndLengthOr =
@@ -908,7 +915,7 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
   elif char == '[':
     result = getList(statement, start, variables, skip)
   elif char == '(':
-    result = getCondition(statement, start, variables, skip)
+    result = getCondition(statement, start, variables)
   elif isLowerAscii(char) or isUpperAscii(char):
     # Get the name.
     let matchesO = matchDotNames(statement.text, start)

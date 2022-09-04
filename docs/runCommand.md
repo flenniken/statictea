@@ -12,11 +12,11 @@ starts in the template file.
 * [newValueAndLengthOr](#newvalueandlengthor) &mdash; Create a ValueAndLengthOr warning.
 * [newValueAndLengthOr](#newvalueandlengthor-1) &mdash; Create a ValueAndLengthOr warning.
 * [`==`](#) &mdash; Return true when a equals b.
-* [`==`](#-1) &mdash; Return true when a equals b.
 * [newValueAndLengthOr](#newvalueandlengthor-2) &mdash; Create a ValueAndLengthOr value.
 * [newValueAndLengthOr](#newvalueandlengthor-3) &mdash; Create a ValueAndLengthOr.
-* [newLengthOr](#newlengthor) &mdash; Create a LengthOr warning.
-* [newLengthOr](#newlengthor-1) &mdash; Create a LengthOr value.
+* [newPosOr](#newposor) &mdash; Create a PosOr warning.
+* [newPosOr](#newposor-1) &mdash; Create a PosOr value.
+* [`==`](#-1) &mdash; Return true when a equals b.
 * [newStatement](#newstatement) &mdash; Create a new statement.
 * [startColumn](#startcolumn) &mdash; Return enough spaces to point at the warning column.
 * [getFragmentAndPos](#getfragmentandpos) &mdash; Return a statement fragment, and new position to show the given position.
@@ -33,7 +33,7 @@ starts in the template file.
 * [getFunctionValueAndLength](#getfunctionvalueandlength) &mdash; Return the function's value and the length.
 * [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value or a warning message.
 * [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value or a warning message.
-* [skipCondition](#skipcondition) &mdash; Skip the condition expression.
+* [skipCondition](#skipcondition) &mdash; Skip the condition expression and optional trailing whitespace.
 * [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and its length.
 * [getValueAndLength](#getvalueandlength) &mdash; Return the value and length of the item that the start parameter points at which is a string, number, variable, function or list.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
@@ -101,14 +101,6 @@ Return true when a equals b.
 proc `==`(a: ValueAndLengthOr; b: ValueAndLengthOr): bool
 ```
 
-# `==`
-
-Return true when a equals b.
-
-```nim
-proc `==`(a: LengthOr; b: LengthOr): bool
-```
-
 # newValueAndLengthOr
 
 Create a ValueAndLengthOr value.
@@ -125,20 +117,28 @@ Create a ValueAndLengthOr.
 func newValueAndLengthOr(val: ValueAndLength): ValueAndLengthOr
 ```
 
-# newLengthOr
+# newPosOr
 
-Create a LengthOr warning.
+Create a PosOr warning.
 
 ```nim
-func newLengthOr(warning: MessageId; p1 = ""; pos = 0): LengthOr
+func newPosOr(warning: MessageId; p1 = ""; pos = 0): PosOr
 ```
 
-# newLengthOr
+# newPosOr
 
-Create a LengthOr value.
+Create a PosOr value.
 
 ```nim
-func newLengthOr(length: Natural): LengthOr
+func newPosOr(pos: Natural): PosOr
+```
+
+# `==`
+
+Return true when a equals b.
+
+```nim
+proc `==`(a: PosOr; b: PosOr): bool
 ```
 
 # newStatement
@@ -280,10 +280,14 @@ proc runCompareOp(left: Value; op: string; right: Value): Value
 
 # skipCondition
 
-Skip the condition expression. startPos points at the starting ( and the function finds the matching end ) and trailing whitespace. Returns the length or a message when not found.
+Skip the condition expression and optional trailing whitespace. startPos points at the starting (.  Return the position or a message when not found.
+~~~
+a = if( (b < c)  , d, e)
+        ^        ^
+~~~~
 
 ```nim
-func skipCondition(text: string; startPos: Natural): LengthOr
+func skipCondition(text: string; startPos: Natural): PosOr
 ```
 
 # getCondition
@@ -291,8 +295,7 @@ func skipCondition(text: string; startPos: Natural): LengthOr
 Return the bool value of the condition expression and its length. The start index points at the ( left parentheses. The length includes the trailing whitespace after the ending ).
 
 ```nim
-proc getCondition(statement: Statement; start: Natural; variables: Variables;
-                  skip: bool = false): ValueAndLengthOr
+proc getCondition(statement: Statement; start: Natural; variables: Variables): ValueAndLengthOr
 ```
 
 # getValueAndLength

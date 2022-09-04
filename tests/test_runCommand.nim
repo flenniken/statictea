@@ -251,11 +251,39 @@ proc testRunCompareOp(left: bool | Value, op: string, right: bool | Value, eValu
   if value != eValue:
     result = gotExpected($value, $eValue)
 
-proc testSkipCondition(text: string, startPos: Natural, eLengthOr: LengthOr): bool =
-  let lengthOr = skipCondition(text, startPos)
+proc testSkipCondition(text: string, startPos: Natural, ePosOr: PosOr): bool =
+  let posOr = skipCondition(text, startPos)
   result = true
-  if lengthOr != eLengthOr:
-    result = gotExpected($lengthOr, $eLengthOr)
+  if posOr != ePosOr:
+    result = gotExpected($posOr, $ePosOr)
+
+proc testGetCondition(text: string, start: Natural, eBool: bool, ePos: Natural,
+    variables = emptyVariables()): bool =
+  let statement = newStatement(text)
+  let valueAndLengthOr = getCondition(statement, start, variables)
+  result = true
+  let eLength = ePos - start
+  let eValueAndLengthOr = newValueAndLengthOr(newValue(eBool), eLength)
+  if valueAndLengthOr != eValueAndLengthOr:
+    result = gotExpected($valueAndLengthOr, $eValueAndLengthOr, text)
+
+proc testGetConditionWarn(text: string, start: Natural, eWarning: MessageId, ePos = 0, eP1 = "",
+    variables = emptyVariables()): bool =
+  let statement = newStatement(text)
+  let valueAndLengthOr = getCondition(statement, start, variables)
+  result = true
+  let eValueAndLengthOr = newValueAndLengthOr(eWarning, eP1, ePos)
+  if valueAndLengthOr != eValueAndLengthOr:
+    if valueAndLengthOr.isValue:
+      result = gotExpected($valueAndLengthOr, $eValueAndLengthOr)
+    else:
+      let pointerPos = valueAndLengthOr.message.pos
+      let message = "$1\n$2\n$3" % [
+        text,
+        startColumn(pointerPos, "^ got"),
+        startColumn(ePos, "^ expected")
+      ]
+      result = gotExpected($valueAndLengthOr, $eValueAndLengthOr, message)
 
 suite "runCommand.nim":
 
@@ -1158,20 +1186,78 @@ White$1
     check testRunCompareOp(newValue("abc"), "==", newValue("abcd"), newValue(false))
 
   test "testSkipCondition":
+    check testSkipCondition("a = ( b < c ) # test", 4, newPosOr(14))
     #                        0123456789 123456789
-    #                         123456789 123456789 123
-    check testSkipCondition("a = ( b < c ) # test", 4, newLengthOr(11))
-    check testSkipCondition("()", 0, newLengthOr(2))
-    check testSkipCondition("(())", 0, newLengthOr(4))
-    check testSkipCondition("((()))", 0, newLengthOr(6))
-    check testSkipCondition("(a < b)", 0, newLengthOr(7))
-    check testSkipCondition("((a and b) or c)", 0, newLengthOr(16))
-    check testSkipCondition("((a and b) or c)", 1, newLengthOr(11))
-    check testSkipCondition("(len(b) < 5) ,", 0, newLengthOr(14))
-    check testSkipCondition("""(len("abc") < 5) ,""", 0, newLengthOr(18))
-    check testSkipCondition("""(len("a\"bc") < 5) ,""", 0, newLengthOr(20))
-    check testSkipCondition("""(len("(((bc") < 5) ,""", 0, newLengthOr(20))
+    check testSkipCondition("()", 0, newPosOr(2))
+    check testSkipCondition("(())", 0, newPosOr(4))
+    check testSkipCondition("((()))", 0, newPosOr(6))
+    check testSkipCondition("(a < b)", 0, newPosOr(7))
+    check testSkipCondition("((a and b) or c)", 0, newPosOr(16))
+    check testSkipCondition("((a and b) or c)", 1, newPosOr(11))
+    check testSkipCondition("(len(b) < 5) ,", 0, newPosOr(13))
+    check testSkipCondition("""(len("abc") < 5) ,""", 0, newPosOr(17))
+    check testSkipCondition("""(len("a\"bc") < 5) ,""", 0, newPosOr(19))
+    check testSkipCondition("""(len("(((bc") < 5) ,""", 0, newPosOr(19))
+    check testSkipCondition("""a = ( true or true and false )""", 4, newPosOr(30))
+    #                          0123456789 123456789 123456789
 
   test "testSkipCondition warning":
-    check testSkipCondition("(", 0, newLengthOr(wNoMatchingParen, "", 1))
-    check testSkipCondition("((())", 0, newLengthOr(wNoMatchingParen, "", 5))
+    check testSkipCondition("(", 0, newPosOr(wNoMatchingParen, "", 0))
+    check testSkipCondition("( abc", 0, newPosOr(wNoMatchingParen, "", 0))
+    check testSkipCondition("((())", 0, newPosOr(wNoMatchingParen, "", 0))
+    check testSkipCondition("  (", 2, newPosOr(wNoMatchingParen, "", 2))
+
+  test "getCondition":
+    #                         0123456789 123456789 123456789 12345
+    check testGetCondition("""a = (3 < 5)""", 4, true, 11)
+    check testGetCondition("""a = (true)""", 4, true, 10)
+    check testGetCondition("""a = (false)""", 4, false, 11)
+    check testGetCondition("""a = (false or false)""", 4, false, 20)
+    check testGetCondition("""a = (false or true)""", 4, true, 19)
+    check testGetCondition("""a = (true or false)""", 4, true, 19)
+    check testGetCondition("""a = (true or true)""", 4, true, 18)
+    check testGetCondition("""a = (true or true)  # test""", 4, true, 20)
+    check testGetCondition("""a = (3 < 5)  # abc""", 4, true, 13)
+    check testGetCondition("""a = (false and false)""", 4, false, 21)
+    check testGetCondition("""a = (false and true)""", 4, false, 20)
+    check testGetCondition("""a = (true and false)""", 4, false, 20)
+    check testGetCondition("""a = (true and true)""", 4, true, 19)
+    check testGetCondition("""a = (false or false or false)""", 4, false, 29)
+    check testGetCondition("""a = (false or false or true)""", 4, true, 28)
+    check testGetCondition("""a = (false or true or true)""", 4, true, 27)
+    check testGetCondition("""a = (true or true or true)""", 4, true, 26)
+    check testGetCondition("""a = (true and true and true)""", 4, true, 28)
+    check testGetCondition("""a = (exists(l, "abc"))""", 4, false, 22)
+    check testGetCondition("""a = ( (true) )""", 4, true, 14)
+    check testGetCondition("""a = ( true and (true) )""", 4, true, 23)
+    check testGetCondition("""a = ( 3 < 5 and (4 < 6) )""", 4, true, 25)
+    check testGetCondition("""a = ( 3 < 5 or (4 < 6) )""", 4, true, 24)
+    check testGetCondition("""a = ( 4 < 6 or 5 < 2 )""", 4, true, 22)
+    check testGetCondition("""a = ( (4 < 6) )""", 4, true, 15)
+    check testGetCondition("""a = ( (false or false) ) """, 4, false, 25)
+    check testGetCondition("""a = ( (true or false) )  # test""", 4, true, 25)
+    check testGetCondition("""a = ( (4 < 6 or 5 < 2) )""", 4, true, 24)
+    check testGetCondition("""a = ( 3 < 5 and (4 < 6 or 5 < 2) )""", 4, true, 34)
+    #                         0123456789 123456789 123456789 12345
+
+  test "getCondition warning":
+    #                             0123456789 123456789 123456789 12345
+    check testGetConditionWarn("""a = ( 3 xor 5 )""", 4, wNotBoolOperator, 8)
+    check testGetConditionWarn("""a = ( 3 and 5 )""", 4, wBoolOperatorLeft, 8)
+    check testGetConditionWarn("""a = ( true and true or false )""", 4, wNeedPrecedence, 20)
+    check testGetConditionWarn("""a = ( false or false and false )""", 4, wNeedPrecedence, 21)
+    check testGetConditionWarn("""a = ( true < 5 )""", 4, wCompareOperator, 11)
+    check testGetConditionWarn("""a = ( false and true # no right paren""", 4, wNoMatchingParen, 4)
+    check testGetConditionWarn("""a = ( 3 < 5.5 )""", 4, wCompareOperatorSame, 10)
+    check testGetConditionWarn("""a = ( 3.2 < 5 )""", 4, wCompareOperatorSame, 12)
+    check testGetConditionWarn("""a = ( "a" < 5 )""", 4, wCompareOperatorSame, 12)
+    check testGetConditionWarn("""a = ( 3 < 5 and 3 xor 8)""", 4, wNotCompareOperator, 18)
+    check testGetConditionWarn("""a = ( 3 < 5 and 3 == 8.8)""", 4, wCompareOperatorSame, 21)
+    #                             0123456789 123456789 123456789 12345
+
+    # When a condition is short ciruited, the rest of the condition is skipped. This means
+    # the rest might not be well formed.
+    check testGetCondition("""a = ( false and true or false )""", 4, false, 31)
+    check testGetCondition("""a = ( false and true and 3 xor 5 )""", 4, false, 34)
+    check testGetCondition("""a = ( true or true and false )""", 4, true, 30)
+    #                         0123456789 123456789 123456789 12345
