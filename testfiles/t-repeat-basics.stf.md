@@ -78,7 +78,7 @@ The readme second repeat example:
 <!--$ block t.repeat=len(s.companyList) -->
 <!--$ : d = get(s.companyList, t.row) -->
 <!--$ : selected = get(d, "selected", 0) -->
-<!--$ : current = if0(cmp(selected,1), " selected=\"selected\"", "") -->
+<!--$ : current = if((selected == 1), " selected=\"selected\"", "") -->
   <option{current}>{d.company}</option>
 $$ endblock
 </select>
