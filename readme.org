@@ -1377,7 +1377,8 @@ In the following example the (3 == 4) is an expression and the e
 variable is assigned false because 3 does not equal 4.
 
 #+BEGIN_SRC
-e = (3 == 4) => false
+e = (3 == 4)
+  => false
 #+END_SRC
 
 You can write boolean expressions with the following operators:
@@ -1395,9 +1396,8 @@ You typically use a boolean expression with an if statement. In
 the next example v is set to “small” because 3 is less than 5.
 
 #+BEGIN_SRC
-a = 3
-v = if( (a < 5), “small”, “large”)
-  => “small”
+v = if((3 < 5), “s”, “l”)
+  => “s”
 #+END_SRC
 
 Note: a conditional is wrapped in parentheses and there is no
@@ -1414,18 +1414,19 @@ The comparisons have the highest precedence, then the logical
 - <, >, ==, !=, <=, >=
 - and, or
 
-You can control precedence with parentheses. The following two expressions are equivalent:
+You can control precedence with parentheses. The following two
+expressions are equivalent:
 
 #+BEGIN_SRC
-( a < b and c > d) =>
+(a < b and c > d) =>
 ( (a < b) and ( c > d) )
 #+END_SRC
 
 You can use multiple and’s or or’s in an expression.  For example:
 
 #+BEGIN_SRC
-( a < b and c > d and e == f)
-( a < b or c > d or e == f)
+(a < b and c > d and e == f)
+(a < b or c > d or e == f)
 #+END_SRC
 
 If you mix and’s and or’s, you need to specify the precedence
@@ -1448,9 +1449,8 @@ pass a logical expression to it to invert it.  Here are a couple
 of examples:
 
 #+BEGIN_SRC
-not( (a < b and c > d) )
-
-(a < b and not((c > d)))
+x = not( (a < b and c > d) )
+y = (a < b and not((c > d)))
 #+END_SRC
 
 There is an equivalent function for each boolean operator:
@@ -1470,12 +1470,14 @@ The following  code fragments are equivalent:
 #+BEGIN_SRC
 (a < b) => lt(a, b)
 
-( a < b and c > d) =>
-    and(lt(a, b), gt(c,d))
+(a < b and c > d) =>
+  and(lt(a, b), gt(c,d))
 
-(a or b or c) => or(or(a, b), c)
+(a or b or c) =>
+  or(or(a, b), c)
 
-(a and (b or c)) => and(a, or(b, c))
+(a and (b or c)) =>
+  and(a, or(b, c))
 #+END_SRC
 
 Note: If you need case insensitive string compare, use the cmp
