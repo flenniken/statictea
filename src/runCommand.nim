@@ -12,7 +12,6 @@ import messages
 import warnings
 import parseNumber
 import variables
-import funtypes
 import runFunction
 import readjson
 import collectCommand

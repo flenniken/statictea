@@ -2,7 +2,6 @@ import std/unittest
 import signatures
 import env
 import vartypes
-import funtypes
 import options
 import messages
 

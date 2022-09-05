@@ -26,10 +26,6 @@ const
     ## @:* skip -- output goes to the bit bucket
 
 type
-  Variables* = VarsDict
-    ## Dictionary holding all statictea variables in multiple distinct
-    ## logical dictionaries.
-
   VariableData* = object
     ## The VariableData object holds the variable name, operator,
     ## @:and value which is the result of running a statement.

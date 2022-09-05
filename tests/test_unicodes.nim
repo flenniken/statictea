@@ -7,7 +7,6 @@ import opresultid
 import opresultwarn
 import messages
 import warnings
-import funtypes
 import vartypes
 import sharedtestcode
 

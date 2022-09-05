@@ -7,7 +7,6 @@ import opresultwarn
 import messages
 import warnings
 import utf8decoder
-import funtypes
 import vartypes
 
 func cmpString*(a, b: string, insensitive: bool = false): int =

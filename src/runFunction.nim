@@ -16,8 +16,6 @@ import parseNumber
 import matches
 import unicodes
 import signatures
-import funtypes
-import variables
 import replacement
 import opresultwarn
 

@@ -3,7 +3,6 @@
 import std/tables
 import std/strutils
 import vartypes
-import funtypes
 import options
 import messages
 

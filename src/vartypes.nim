@@ -11,6 +11,10 @@ type
     ## The statictea dictionary type. This is a ref type. Create a new
     ## @:VarsDict with newVarsDict procedure.
 
+  Variables* = VarsDict
+    ## Dictionary holding all statictea variables in multiple distinct
+    ## logical dictionaries.
+
   VarsDictOr* = OpResultWarn[VarsDict]
 
   ValueKind* = enum
@@ -21,6 +25,7 @@ type
     vkDict,
     vkList,
     vkBool
+    # vkFunc
 
   Value* = ref ValueObj
     ## A variable's value reference.
@@ -42,6 +47,38 @@ type
       listv*: seq[Value]
     of vkBool:
       boolv*: bool
+    # of vkFunc:
+    #   funcv*: Func
+
+  FunctionPtr* = proc (variables: Variables, parameters: seq[Value]):
+      FunResult {.noSideEffect.}
+    ## Signature of a statictea function. It takes any number of values
+    ## and returns a value or a warning message.
+
+  FunctionSpec* = object
+    ## The name of a function, a pointer to the code, and its signature
+    ## code.
+    name*: string
+    functionPtr*: FunctionPtr
+    signatureCode*: string
+
+  Func* = ref FunctionSpec
+    ## A func value is a reference to a FunctionSpec.
+
+  FunResultKind* = enum
+    ## The kind of a FunResult object, either a value or warning.
+    frValue,
+    frWarning
+
+  FunResult* = object
+    ## Contains the result of calling a function, either a value or a
+    ## warning.
+    case kind*: FunResultKind
+      of frValue:
+        value*: Value       ## Return value of the function.
+      of frWarning:
+        parameter*: Natural ## Index of problem parameter.
+        warningData*: WarningData
 
 proc newVarsDict*(): VarsDict =
   ## Create a new empty variables dictionary. VarsDict is a ref type.
@@ -321,3 +358,46 @@ func newValueOr*(warningData: WarningData): ValueOr =
 func newValueOr*(value: Value): ValueOr =
   ## Create a new ValueOr containing a value.
   result = opValueW[Value](value)
+
+
+func newFunResultWarn*(warning: MessageId, parameter: Natural = 0,
+    p1: string = "", pos = 0): FunResult =
+  ## Return a new FunResult object containing a warning. It takes a
+  ## message id, the index of the problem parameter, and the optional
+  ## string that goes with the warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = FunResult(kind: frWarning, parameter: parameter,
+                     warningData: warningData)
+
+func newFunResultWarn*(warningData: Warningdata, parameter: Natural = 0): FunResult =
+  ## Return a new FunResult object containing a warning created from a
+  ## WarningData object.
+  result = FunResult(kind: frWarning, parameter: parameter,
+                     warningData: warningData)
+
+func newFunResult*(value: Value): FunResult =
+  ## Return a new FunResult object containing a value.
+  result = FunResult(kind: frValue, value: value)
+
+func `==`*(r1: FunResult, r2: FunResult): bool =
+  ## Compare two FunResult objects and return true when equal.
+  if r1.kind == r2.kind:
+    case r1.kind:
+      of frValue:
+        result = r1.value == r2.value
+      else:
+        if r1.warningData == r2.warningData and
+           r1.parameter == r2.parameter:
+          result = true
+
+proc `!=`*(a: FunResult, b: FunResult): bool =
+  ## Compare two FunResult objects and return false when equal.
+  result = not (a == b)
+
+func `$`*(funResult: FunResult): string =
+  ## Return a string representation of a FunResult object.
+  case funResult.kind
+  of frValue:
+    result = $funResult.value
+  else:
+    result = "warning: " & $funResult.warningData & ": " & $funResult.parameter
