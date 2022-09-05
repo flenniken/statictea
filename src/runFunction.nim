@@ -1464,6 +1464,8 @@ func generalSort(map: VarsDict): FunResult =
         result = 1
       else:
         result = -1
+    of vkFunc:
+      result = 0
 
   let newList = sorted(list, sortCmpValues, sortOrder)
   result = newFunResult(newValue(newList))

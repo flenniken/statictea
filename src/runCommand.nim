@@ -418,6 +418,8 @@ proc ifFunctions*(
          condition = true
      of vkBool:
        condition = cond.boolv
+     of vkFunc:
+       condition = false
 
   # Match the comma and whitespace.
   let commaO = matchSymbol(statement.text, gComma, start + runningLen)

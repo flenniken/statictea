@@ -16,12 +16,21 @@ import messages
 # myFunction(argument);
 
 const
-  singleCodes = {'i', 'f', 's', 'l', 'd', 'a', 'b'}
+  singleCodes = {'a', 'i', 'f', 's', 'l', 'd', 'b', 'p'}
+
+static:
+  # Generate a compile error when the single code list doesn't have a
+  # letter for each type of value excluding "a".
+  const numCodes = len(singleCodes)-1
+  const numKinds = ord(high(ValueKind))+1
+  when numCodes != numKinds:
+    const message = "Update singleCodes:\nnumCode = $1, numKinds = $2\n" % [$numCodes, $numKinds]
+    {.error: message .}
 
 type
   ParamCode* = char
-    ## Parameter type, one character of "ifslda" corresponding to int,
-    ## float, string, list, dict, any.
+    ## Parameter type, one character of "ifsldpa" corresponding to int,
+    ## float, string, list, dict, func, any.
 
   ParamKind* = enum
     ## The kind of parameter.
@@ -33,7 +42,7 @@ type
   Param* = object
     ## Holds attributes for one parameter.
     ## @:* name -- the parameter name
-    ## @:* paramCode -- the parameter code, one of: ifslda
+    ## @:* paramCode -- the parameter code, one of: ifsldpa
     ## @:* paramKind -- whether it is normal, optional or a return
     name*: string
     paramCode*: ParamCode
@@ -46,24 +55,27 @@ func newParam*(name: string, paramKind: ParamKind,
 
 func paramCodeString*(paramCode: ParamCode): string =
   ## Return a string representation of a ParamCode object.
+
   case paramCode:
   of 'i':
-    result = "int"
+    result = $vkInt
   of 'f':
-    result = "float"
+    result = $vkFloat
   of 's':
-    result = "string"
+    result = $vkString
   of 'l':
-    result = "list"
+    result = $vkList
   of 'd':
-    result = "dict"
+    result = $vkDict
+  of 'b':
+    result = $vkBool
+  of 'p':
+    result = $vkFunc
   of 'a':
     result = "any"
-  of 'b':
-    result = "bool"
   else:
-    assert false, "Invalid paramCode."
-    discard
+    assert(false, "invalid ParamCode")
+    result = $vkInt
 
 func `$`*(param: Param): string =
   ## Return a string representation of a Param object.
@@ -94,6 +106,9 @@ func kindToParamCode*(kind: ValueKind): ParamCode =
       result = 'd'
     of vkBool:
       result = 'b'
+    of vkFunc:
+      # p for procedure
+      result = 'p'
 
 func sameType*(paramCode: ParamCode, valueKind: ValueKind): bool =
   ## Check whether the param type is the same type or compatible with
@@ -119,6 +134,9 @@ func sameType*(paramCode: ParamCode, valueKind: ValueKind): bool =
         return true
     of 'b':
       if valueKind == vkBool:
+        return true
+    of 'p':
+      if valueKind == vkFunc:
         return true
     else:
       assert false, "Invalid paramCode"

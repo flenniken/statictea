@@ -25,7 +25,7 @@ type
     vkDict,
     vkList,
     vkBool
-    # vkFunc
+    vkFunc
 
   Value* = ref ValueObj
     ## A variable's value reference.
@@ -47,8 +47,8 @@ type
       listv*: seq[Value]
     of vkBool:
       boolv*: bool
-    # of vkFunc:
-    #   funcv*: Func
+    of vkFunc:
+      funcv*: Func
 
   FunctionPtr* = proc (variables: Variables, parameters: seq[Value]):
       FunResult {.noSideEffect.}
@@ -161,22 +161,28 @@ proc newEmptyDictValue*(): Value =
   ## Create a dictionary value from a VarsDict.
   result = newValue(newVarsDict())
 
-proc `==`*(value1: Value, value2: Value): bool =
+proc `==`*(a: Func, b: Func): bool =
+  ## Return true when two functions are equal.
+  result = a == b
+
+proc `==`*(a: Value, b: Value): bool =
   ## Return true when two variables are equal.
-  if value1.kind == value2.kind:
-    case value1.kind:
+  if a.kind == b.kind:
+    case a.kind:
       of vkString:
-        result = value1.stringv == value2.stringv
+        result = a.stringv == b.stringv
       of vkInt:
-        result = value1.intv == value2.intv
+        result = a.intv == b.intv
       of vkFloat:
-        result = value1.floatv == value2.floatv
+        result = a.floatv == b.floatv
       of vkDict:
-        result = value1.dictv == value2.dictv
+        result = a.dictv == b.dictv
       of vkList:
-        result = value1.listv == value2.listv
+        result = a.listv == b.listv
       of vkBool:
-        result = value1.boolv == value2.boolv
+        result = a.boolv == b.boolv
+      of vkFunc:
+        result = a.funcv == b.funcv
 
 func `$`*(kind: ValueKind): string =
   ## Return a string representation of the variable's type.
@@ -193,6 +199,8 @@ func `$`*(kind: ValueKind): string =
     result = "list"
   of vkBool:
     result = "bool"
+  of vkFunc:
+    result = "func"
 
 proc jsonStringRepr*(str: string): string =
   ## Return the JSON string representation. It is assumed the string
@@ -270,6 +278,11 @@ func listToString*(value: Value): string =
     result.add(valueToString(item))
   result.add("]")
 
+func `$`*(fun: Func): string =
+  ## Return a string representation of a function.
+  # todo: update function string rep.
+  result = "\"function\""
+
 func valueToString*(value: Value): string =
   ## Return a string representation of a variable in JSON format.
   case value.kind:
@@ -285,6 +298,8 @@ func valueToString*(value: Value): string =
       result.add($value.floatv)
     of vkBool:
       result.add($value.boolv)
+    of vkFunc:
+      result.add($value.funcv)
 
 func valueToStringRB*(value: Value): string =
   ## Return the string representation of the variable for use in the
@@ -302,6 +317,8 @@ func valueToStringRB*(value: Value): string =
     result.add(listToString(value))
   of vkBool:
     result = $value.boolv
+  of vkFunc:
+    result = $value.funcv
 
 func `$`*(value: Value): string =
   ## Return a string representation of a Value.
