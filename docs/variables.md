@@ -13,7 +13,6 @@ prefix and it allows functions to be specified without the f prefix.
 # Index
 
 * const: [outputValues](#outputvalues) &mdash; Where the replacement block's output goes.
-* type: [Variables](#variables) &mdash; Dictionary holding all statictea variables in multiple distinct logical dictionaries.
 * type: [VariableData](#variabledata) &mdash; The VariableData object holds the variable name, operator,
 and value which is the result of running a statement.
 * type: [VariableDataOr](#variabledataor) &mdash; A VariableData object or a warning.
@@ -41,14 +40,6 @@ Where the replacement block's output goes.
 
 ```nim
 outputValues = ["result", "stdout", "stderr", "log", "skip"]
-```
-
-# Variables
-
-Dictionary holding all statictea variables in multiple distinct logical dictionaries.
-
-```nim
-Variables = VarsDict
 ```
 
 # VariableData
@@ -117,7 +108,8 @@ func `$`(v: VariableData): string
 Create an empty variables object in its initial state.
 
 ```nim
-func emptyVariables(server: VarsDict = nil; args: VarsDict = nil): Variables
+func emptyVariables(server: VarsDict = nil; args: VarsDict = nil;
+                    funcs: VarsDict = nil): Variables
 ```
 
 # getTeaVarIntDefault

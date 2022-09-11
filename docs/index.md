@@ -10,7 +10,6 @@ StaticTea nim source code documentation.
 * [collectCommand.nim](collectCommand.md) &mdash; Collect template command lines.
 * [comparelines.nim](comparelines.md) &mdash; Compare lines of text.
 * [env.nim](env.md) &mdash; Environment holding the input and output streams.
-* [funtypes.nim](funtypes.md) &mdash; Statictea function types and supporting routines.
 * [gethelp.nim](gethelp.md) &mdash; Get the command line help message.
 * [matches.nim](matches.md) &mdash; Regular expression matching methods.
 * [messages.nim](messages.md) &mdash; Messages IDs and associated strings.

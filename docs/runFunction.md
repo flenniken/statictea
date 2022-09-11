@@ -10,21 +10,21 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funCmp_ffi](#funcmp_ffi) &mdash; Compare two floats.
 * [funCmp_bbi](#funcmp_bbi) &mdash; Compare two bools.
 * [funCmp_ssoii](#funcmp_ssoii) &mdash; Compare two strings.
-* [funConcat](#funconcat) &mdash; Concatentate two strings.
+* [funcConcat_sss](#funcconcat_sss) &mdash; Concatentate two strings.
 * [funLen_si](#funlen_si) &mdash; Number of unicode characters in a string.
 * [funLen_li](#funlen_li) &mdash; Number of elements in a list.
 * [funLen_di](#funlen_di) &mdash; Number of elements in a dictionary.
 * [funGet_lioaa](#funget_lioaa) &mdash; Get a list value by its index.
 * [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
-* [funIf0](#funif0) &mdash; If the condition is 0, return the second parameter, else return the third parameter.
-* [funIf](#funif) &mdash; If the condition is true, return the second parameter, else return the third parameter.
+* [funIf0_iaoaa](#funif0_iaoaa) &mdash; If the condition is 0, return the second parameter, else return the third parameter.
+* [funIf_baoaa](#funif_baoaa) &mdash; If the condition is true, return the second parameter, else return the third parameter.
 * [funAdd_iii](#funadd_iii) &mdash; Add two integers.
 * [funAdd_fff](#funadd_fff) &mdash; Add two floats.
-* [funExists](#funexists) &mdash; Determine whether a key exists in a dictionary.
+* [funExists_dsb](#funexists_dsb) &mdash; Determine whether a key exists in a dictionary.
 * [funCase_iloaa](#funcase_iloaa) &mdash; Compare integer cases and return the matching value.
 * [funCase_sloaa](#funcase_sloaa) &mdash; Compare string cases and return the matching value.
 * [parseVersion](#parseversion) &mdash; Parse a StaticTea version number and return its three components.
-* [funCmpVersion](#funcmpversion) &mdash; Compare two StaticTea version numbers.
+* [funCmpVersion_ssi](#funcmpversion_ssi) &mdash; Compare two StaticTea version numbers.
 * [funFloat_if](#funfloat_if) &mdash; Create a float from an int.
 * [funFloat_sf](#funfloat_sf) &mdash; Create a float from a number string.
 * [funFloat_saa](#funfloat_saa) &mdash; Create a float from a number string.
@@ -32,17 +32,17 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funInt_sosi](#funint_sosi) &mdash; Create an int from a number string.
 * [funInt_ssaa](#funint_ssaa) &mdash; Create an int from a number string.
 * [funBool_ib](#funbool_ib) &mdash; Create an bool from an int.
-* [funFind](#funfind) &mdash; Find the position of a substring in a string.
-* [funSlice](#funslice) &mdash; Extract a substring from a string by its position and length.
-* [funDup](#fundup) &mdash; Duplicate a string x times.
+* [funFind_ssoaa](#funfind_ssoaa) &mdash; Find the position of a substring in a string.
+* [funSlice_siois](#funslice_siois) &mdash; Extract a substring from a string by its position and length.
+* [funDup_sis](#fundup_sis) &mdash; Duplicate a string x times.
 * [funDict_old](#fundict_old) &mdash; Create a dictionary from a list of key, value pairs.
 * [funList](#funlist) &mdash; You create a list with the list function or with brackets.
-* [funReplace](#funreplace) &mdash; Replace a substring specified by its position and length with another string.
+* [funReplace_siiss](#funreplace_siiss) &mdash; Replace a substring specified by its position and length with another string.
 * [funReplaceRe_sls](#funreplacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
-* [funPath](#funpath) &mdash; Split a file path into its component pieces.
-* [funLower](#funlower) &mdash; Lowercase a string.
-* [funKeys](#funkeys) &mdash; Create a list from the keys in a dictionary.
-* [funValues](#funvalues) &mdash; Create a list out of the values in the specified dictionary.
+* [funPath_sosd](#funpath_sosd) &mdash; Split a file path into its component pieces.
+* [funLower_ss](#funlower_ss) &mdash; Lowercase a string.
+* [funKeys_dl](#funkeys_dl) &mdash; Create a list from the keys in a dictionary.
+* [funValues_dl](#funvalues_dl) &mdash; Create a list out of the values in the specified dictionary.
 * [funSort_lsosl](#funsort_lsosl) &mdash; Sort a list of values of the same type.
 * [funSort_lssil](#funsort_lssil) &mdash; Sort a list of lists.
 * [funSort_lsssl](#funsort_lsssl) &mdash; Sort a list of dictionaries.
@@ -51,12 +51,12 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funType_as](#funtype_as) &mdash; Return the parameter type, one of: int, float, string, list, dict or bool.
 * [funJoinPath_loss](#funjoinpath_loss) &mdash; Join the path components with a path separator.
 * [funJoin_lsois](#funjoin_lsois) &mdash; Join a list of strings with a separator.
-* [funWarn](#funwarn) &mdash; Return a warning message and skip the current statement.
-* [funReturn](#funreturn) &mdash; Return the given value and control command looping.
+* [funWarn_ss](#funwarn_ss) &mdash; Return a warning message and skip the current statement.
+* [funReturn_ss](#funreturn_ss) &mdash; Return the given value and control command looping.
 * [funString_aoss](#funstring_aoss) &mdash; Convert the variable to a string.
 * [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names.
-* [funFormat](#funformat) &mdash; Format a string using replacement variables similar to a replacement block.
-* [funStartsWith](#funstartswith) &mdash; Check whether a strings starts with the given prefix.
+* [funFormat_ss](#funformat_ss) &mdash; Format a string using replacement variables similar to a replacement block.
+* [funStartsWith_ssb](#funstartswith_ssb) &mdash; Check whether a strings starts with the given prefix.
 * [funNot_bb](#funnot_bb) &mdash; Boolean not.
 * [funAnd_bbb](#funand_bbb) &mdash; Boolean and with short circuit.
 * [funOr_bbb](#funor_bbb) &mdash; Boolean or with short circuit.
@@ -74,10 +74,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funLt_ffb](#funlt_ffb) &mdash; Return true when the a is less than b.
 * [funLte_iib](#funlte_iib) &mdash; Return true when the a is less than or equal to b.
 * [funLte_ffb](#funlte_ffb) &mdash; Return true when the a is less than or equal to b.
-* [createFunctionTable](#createfunctiontable) &mdash; Create a table of all the built in functions.
-* [getFunctionList](#getfunctionlist) &mdash; Return the functions with the given name.
-* [getFunction](#getfunction) &mdash; Find the function with the given name and return a pointer to it.
-* [isFunctionName](#isfunctionname) &mdash; Return true when the function exists.
+* [getFunction](#getfunction) &mdash; Return the func variable with the given name, if it exists.
+* [createFuncDictionary](#createfuncdictionary) &mdash; Create the f dictionary from the built in functions.
 
 # cmpBaseValues
 
@@ -177,7 +175,7 @@ cmp("Tea", "tea", 1) => 0
 func funCmp_ssoii(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funConcat
+# funcConcat_sss
 
 Concatentate two strings. See join for more that two arguments.
 
@@ -193,7 +191,7 @@ concat("a", "b") => "ab"
 ~~~~
 
 ```nim
-func funConcat(variables: Variables; parameters: seq[Value]): FunResult
+func funcConcat_sss(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funLen_si
@@ -316,7 +314,7 @@ d.tea => "Earl Grey"
 func funGet_dsoaa(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funIf0
+# funIf0_iaoaa
 
 If the condition is 0, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter. You can use any type for the condition, strings, lists and dictionaries use their length.
 
@@ -366,10 +364,10 @@ if0(c, warn("got zero value"))
 ~~~~
 
 ```nim
-func funIf0(variables: Variables; parameters: seq[Value]): FunResult
+func funIf0_iaoaa(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funIf
+# funIf_baoaa
 
 If the condition is true, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter.
 
@@ -403,7 +401,7 @@ if(c, warn("c is true"))
 ~~~~
 
 ```nim
-func funIf(variables: Variables; parameters: seq[Value]): FunResult
+func funIf_baoaa(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funAdd_iii
@@ -445,7 +443,7 @@ add(3.2, -2.2) => 1.0
 func funAdd_fff(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funExists
+# funExists_dsb
 
 Determine whether a key exists in a dictionary. Return true when it exists, else false.
 
@@ -462,7 +460,7 @@ exists(d, "coffee") => false
 ~~~~
 
 ```nim
-func funExists(variables: Variables; parameters: seq[Value]): FunResult
+func funExists_dsb(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funCase_iloaa
@@ -542,7 +540,7 @@ Parse a StaticTea version number and return its three components.
 func parseVersion(version: string): Option[(int, int, int)]
 ```
 
-# funCmpVersion
+# funCmpVersion_ssi
 
 Compare two StaticTea version numbers. Returns -1 for less, 0 for
 equal and 1 for greater than.
@@ -564,7 +562,7 @@ cmpVersion("1.2.5", "1.2.5") => 0
 ~~~~
 
 ```nim
-func funCmpVersion(variables: Variables; parameters: seq[Value]): FunResult
+func funCmpVersion_ssi(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funFloat_if
@@ -743,7 +741,7 @@ bool(-1) => true
 func funBool_ib(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funFind
+# funFind_ssoaa
 
 Find the position of a substring in a string.  When the substring
 is not found, return an optional default value.  A warning is
@@ -768,10 +766,10 @@ find(msg, "party", 0) = 0
 ~~~~
 
 ```nim
-func funFind(variables: Variables; parameters: seq[Value]): FunResult
+func funFind_ssoaa(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funSlice
+# funSlice_siois
 
 Extract a substring from a string by its position and length. You
 pass the string, the substring's start index and its length.  The
@@ -793,10 +791,10 @@ slice("añyóng", 0, 3) => "añy"
 ~~~~
 
 ```nim
-func funSlice(variables: Variables; parameters: seq[Value]): FunResult
+func funSlice_siois(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funDup
+# funDup_sis
 
 Duplicate a string x times.  The result is a new string built by
 concatenating the string to itself the specified number of times.
@@ -816,7 +814,7 @@ dup("", 3) => ""
 ~~~~
 
 ```nim
-func funDup(variables: Variables; parameters: seq[Value]): FunResult
+func funDup_sis(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funDict_old
@@ -866,7 +864,7 @@ a = ["a", 5, "b"]
 func funList(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funReplace
+# funReplace_siiss
 
 Replace a substring specified by its position and length with another string.  You can use the function to insert and append to
 a string as well.
@@ -926,7 +924,7 @@ replace("", 0, 0, "abcd") => abcd
 ~~~~
 
 ```nim
-func funReplace(variables: Variables; parameters: seq[Value]): FunResult
+func funReplace_siiss(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funReplaceRe_sls
@@ -955,7 +953,7 @@ website: https://regex101.com/
 func funReplaceRe_sls(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funPath
+# funPath_sosd
 
 Split a file path into its component pieces. Return a dictionary
 with the filename, basename, extension and directory.
@@ -987,10 +985,10 @@ path("src\runFunction.nim", "\") => {
 ~~~~
 
 ```nim
-func funPath(variables: Variables; parameters: seq[Value]): FunResult
+func funPath_sosd(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funLower
+# funLower_ss
 
 Lowercase a string.
 
@@ -1007,10 +1005,10 @@ lower("TEĀ") => "teā"
 ~~~~
 
 ```nim
-func funLower(variables: Variables; parameters: seq[Value]): FunResult
+func funLower_ss(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funKeys
+# funKeys_dl
 
 Create a list from the keys in a dictionary.
 
@@ -1027,10 +1025,10 @@ values(d) => ["apple", 2, 3]
 ~~~~
 
 ```nim
-func funKeys(variables: Variables; parameters: seq[Value]): FunResult
+func funKeys_dl(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funValues
+# funValues_dl
 
 Create a list out of the values in the specified dictionary.
 
@@ -1047,7 +1045,7 @@ values(d) => ["apple", 2, 3]
 ~~~~
 
 ```nim
-func funValues(variables: Variables; parameters: seq[Value]): FunResult
+func funValues_dl(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funSort_lsosl
@@ -1292,7 +1290,7 @@ join(["a", "", "c"], "|", 1) => "a|c"
 func funJoin_lsois(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funWarn
+# funWarn_ss
 
 Return a warning message and skip the current statement.
 
@@ -1308,10 +1306,10 @@ b = if0(c, warn("c is not 0"), "")
 ~~~~
 
 ```nim
-func funWarn(variables: Variables; parameters: seq[Value]): FunResult
+func funWarn_ss(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funReturn
+# funReturn_ss
 
 Return the given value and control command looping. A return in a
 statement causes the command to stop processing the current
@@ -1335,7 +1333,7 @@ if0(c, return(""))
 ~~~~
 
 ```nim
-func funReturn(variables: Variables; parameters: seq[Value]): FunResult
+func funReturn_ss(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funString_aoss
@@ -1407,7 +1405,7 @@ teas.z.a = 8
 func funString_sds(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funFormat
+# funFormat_ss
 
 Format a string using replacement variables similar to a replacement block. To enter a left bracket use two in a row.
 
@@ -1434,10 +1432,10 @@ str => "use two { to get one"
 ~~~~
 
 ```nim
-func funFormat(variables: Variables; parameters: seq[Value]): FunResult
+func funFormat_ss(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funStartsWith
+# funStartsWith_ssb
 
 Check whether a strings starts with the given prefix. Return true when it does, else false.
 
@@ -1456,7 +1454,7 @@ b => false
 ~~~~
 
 ```nim
-func funStartsWith(variables: Variables; parameters: seq[Value]): FunResult
+func funStartsWith_ssb(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funNot_bb
@@ -1790,37 +1788,21 @@ lte(4.0, 3.0) => false
 func funLte_ffb(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# createFunctionTable
-
-Create a table of all the built in functions.
-
-```nim
-func createFunctionTable(): Table[string, seq[FunctionSpec]]
-```
-
-# getFunctionList
-
-Return the functions with the given name.
-
-```nim
-proc getFunctionList(name: string): seq[FunctionSpec]
-```
-
 # getFunction
 
-Find the function with the given name and return a pointer to it. If there are multiple functions with the name, return the one that matches the arguments, if none match, return the first one.
+Return the func variable with the given name, if it exists. If there are multiple functions with the name, return the one that matches the arguments or return the first one.
 
 ```nim
-proc getFunction(functionName: string; parameters: seq[Value]): Option[
-    FunctionSpec]
+proc getFunction(variables: Variables; functionName: string;
+                 parameters: seq[Value]): Option[Value]
 ```
 
-# isFunctionName
+# createFuncDictionary
 
-Return true when the function exists.
+Create the f dictionary from the built in functions.
 
 ```nim
-proc isFunctionName(functionName: string): bool
+proc createFuncDictionary(): Value
 ```
 
 

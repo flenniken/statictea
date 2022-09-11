@@ -1107,6 +1107,7 @@ StaticTea variable types:
 - [[#dict-type][Dict Type]]
 - [[#list-type][List Type]]
 - [[#bool-type][Bool Type]]
+- [[#func-type][Func Type]]
 
 [[#contents][茶]]
 
@@ -1357,6 +1358,62 @@ local dictionary.
 
 #+BEGIN_SRC
 s.true = "server true"
+#+END_SRC
+
+[[茶]]
+
+** Func Type
+:PROPERTIES:
+:CUSTOM_ID: func-type
+:END:
+
+A func variable refers to a function. You use it to call the
+function, to get information about it, and to pass it around.
+
+You create a func variable from an existing func variable.
+
+All the functions exist in the f dictionary by name. Their value
+is a list of func values with the same name.
+
+In the following example the “a” func variable is defined to be
+equal to the second built in cmp function.
+
+#+BEGIN_SRC
+a = get(f.cmp, 1)
+#+END_SRC
+
+You call it with parentheses:
+
+#+BEGIN_SRC
+b = a(4, 7) => -1
+#+END_SRC
+
+You can have multiple functions with the same name as long as
+their signatures differ.
+
+There are three cmp functions so the f dictionary value for it is
+a list of three function variables:
+
+#+BEGIN_SRC
+cmp => [func, func, func]
+#+END_SRC
+
+You can call a list of func variables. The function called is
+determined by the parameters passed, the one with the matching
+signature is called. All the built in functions are lists
+containing one or more items.
+
+Example calling a function given a list:
+
+#+BEGIN_SRC
+value = f.cmp(1,2)
+#+END_SRC
+
+When you use a variable without a prefix, Statictea searches for
+it first in the l dictionary then the f dictionary.
+
+#+BEGIN_SRC
+a = cmp
 #+END_SRC
 
 [[#contents][茶]]
@@ -2146,7 +2203,6 @@ List of functions:
 - [[#cmp][cmp]] -- Compare two floats.
 - [[#cmp][cmp]] -- Compare two ints.
 - [[#cmp][cmp]] -- Compare two strings.
-- [[#concat][concat]] -- Concatentate two strings.
 - [[#dict][dict]] -- Create a dictionary from a list of key, value pairs.
 - [[#dup][dup]] -- Duplicate a string x times.
 - [[#eq][eq]] -- Return true when the a equals b.
@@ -2166,8 +2222,8 @@ List of functions:
 - [[#gt][gt]] -- Return true when the a is greater than b.
 - [[#gte][gte]] -- Return true when the a is greater than to equal to b.
 - [[#gte][gte]] -- Return true when the a is greater than or equal to b.
-- [[#if][if]] -- If the condition is true, return the second parameter, else return the third parameter.
 - [[#if0][if0]] -- If the condition is 0, return the second parameter, else return the third parameter.
+- [[#if][if]] -- If the condition is true, return the second parameter, else return the third parameter.
 - [[#int][int]] -- Create an int from a float.
 - [[#int][int]] -- Create an int from a number string.
 - [[#int][int]] -- Create an int from a number string.
@@ -2189,8 +2245,8 @@ List of functions:
 - [[#not][not]] -- Boolean not.
 - [[#or][or]] -- Boolean or with short circuit.
 - [[#path][path]] -- Split a file path into its component pieces.
-- [[#replace][replace]] -- Replace a substring specified by its position and length with another string.
 - [[#replaceRe][replaceRe]] -- Replace multiple parts of a string using regular expressions.
+- [[#replace][replace]] -- Replace a substring specified by its position and length with another string.
 - [[#return][return]] -- Return the given value and control command looping.
 - [[#slice][slice]] -- Extract a substring from a string by its position and length.
 - [[#sort][sort]] -- Sort a list of values of the same type.
@@ -2202,6 +2258,7 @@ List of functions:
 - [[#type][type]] -- Return the parameter type, one of: int, float, string, list, dict or bool.
 - [[#values][values]] -- Create a list out of the values in the specified dictionary.
 - [[#warn][warn]] -- Return a warning message and skip the current statement.
+- [[#cConcat][cConcat]] -- Concatentate two strings.
 
 [[#contents][茶]]
 
@@ -2479,26 +2536,6 @@ cmp("tea", "tea") => 0
 cmp("Tea", "tea") => 1
 cmp("Tea", "tea", 0) => 1
 cmp("Tea", "tea", 1) => 0
-#+END_SRC
-
-[[#contents][茶]]
-
-** concat
-:PROPERTIES:
-:CUSTOM_ID: concat
-:END:
-
-Concatentate two strings. See join for more that two arguments.
-
-#+BEGIN_SRC
-concat(a: string, b: string) string
-#+END_SRC
-
-Examples:
-
-#+BEGIN_SRC
-concat("tea", " time") => "tea time"
-concat("a", "b") => "ab"
 #+END_SRC
 
 [[#contents][茶]]
@@ -2951,44 +2988,6 @@ gte(3, 3) => true
 
 [[#contents][茶]]
 
-** if
-:PROPERTIES:
-:CUSTOM_ID: if
-:END:
-
-If the condition is true, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter.
-
-The if functions are special in a couple of ways, see
-[[#if-functions][If Functions]]
-
-#+BEGIN_SRC
-if(condition: bool, then: any, optional else: any) any
-#+END_SRC
-
-Examples:
-
-#+BEGIN_SRC
-if(true, "tea", "beer") => tea
-if(false, "tea", "beer") => beer
-#+END_SRC
-
-No third parameter examples:
-
-#+BEGIN_SRC
-if(true, "tea") => tea
-if(false, "tea") => 0
-#+END_SRC
-
-You don't have to assign the result of an if function which is
-useful when using a warn or return function for its side effects.
-
-#+BEGIN_SRC
-c = true
-if(c, warn("c is true"))
-#+END_SRC
-
-[[#contents][茶]]
-
 ** if0
 :PROPERTIES:
 :CUSTOM_ID: if0
@@ -3039,6 +3038,44 @@ useful when using a warn or return function for its side effects.
 #+BEGIN_SRC
 c = 0
 if0(c, warn("got zero value"))
+#+END_SRC
+
+[[#contents][茶]]
+
+** if
+:PROPERTIES:
+:CUSTOM_ID: if
+:END:
+
+If the condition is true, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter.
+
+The if functions are special in a couple of ways, see
+[[#if-functions][If Functions]]
+
+#+BEGIN_SRC
+if(condition: bool, then: any, optional else: any) any
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+if(true, "tea", "beer") => tea
+if(false, "tea", "beer") => beer
+#+END_SRC
+
+No third parameter examples:
+
+#+BEGIN_SRC
+if(true, "tea") => tea
+if(false, "tea") => 0
+#+END_SRC
+
+You don't have to assign the result of an if function which is
+useful when using a warn or return function for its side effects.
+
+#+BEGIN_SRC
+c = true
+if(c, warn("c is true"))
 #+END_SRC
 
 [[#contents][茶]]
@@ -3563,6 +3600,33 @@ path("src\runFunction.nim", "\") => {
 
 [[#contents][茶]]
 
+** replaceRe
+:PROPERTIES:
+:CUSTOM_ID: replaceRe
+:END:
+
+Replace multiple parts of a string using regular expressions.
+
+You specify one or more pairs of regex patterns and their string
+replacements.
+
+#+BEGIN_SRC
+replaceRe(str: string, pairs: list) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+list = list("abc", "456", "def", "")
+replaceRe("abcdefabc", list))
+  => "456456"
+#+END_SRC
+
+For developing and debugging regular expressions see the
+website: https://regex101.com/
+
+[[#contents][茶]]
+
 ** replace
 :PROPERTIES:
 :CUSTOM_ID: replace
@@ -3624,33 +3688,6 @@ replace("", 0, 0, "ab") => ab
 replace("", 0, 0, "abc") => abc
 replace("", 0, 0, "abcd") => abcd
 #+END_SRC
-
-[[#contents][茶]]
-
-** replaceRe
-:PROPERTIES:
-:CUSTOM_ID: replaceRe
-:END:
-
-Replace multiple parts of a string using regular expressions.
-
-You specify one or more pairs of regex patterns and their string
-replacements.
-
-#+BEGIN_SRC
-replaceRe(str: string, pairs: list) string
-#+END_SRC
-
-Examples:
-
-#+BEGIN_SRC
-list = list("abc", "456", "def", "")
-replaceRe("abcdefabc", list))
-  => "456456"
-#+END_SRC
-
-For developing and debugging regular expressions see the
-website: https://regex101.com/
 
 [[#contents][茶]]
 
@@ -3963,6 +4000,26 @@ Examples:
 #+BEGIN_SRC
 if0(c, warn("message is 0"))
 b = if0(c, warn("c is not 0"), "")
+#+END_SRC
+
+[[#contents][茶]]
+
+** cConcat
+:PROPERTIES:
+:CUSTOM_ID: cConcat
+:END:
+
+Concatentate two strings. See join for more that two arguments.
+
+#+BEGIN_SRC
+concat(a: string, b: string) string
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+concat("tea", " time") => "tea time"
+concat("a", "b") => "ab"
 #+END_SRC
 
 

@@ -6,8 +6,14 @@ StaticTea variable types.
 # Index
 
 * type: [VarsDict](#varsdict) &mdash; The statictea dictionary type.
+* type: [Variables](#variables) &mdash; Dictionary holding all statictea variables in multiple distinct logical dictionaries.
 * type: [ValueKind](#valuekind) &mdash; The statictea variable types.
 * type: [Value](#value) &mdash; A variable's value reference.
+* type: [FunctionPtr](#functionptr) &mdash; Signature of a statictea function.
+* type: [Func](#func) &mdash; A func value is a reference to a FunctionSpec.
+* type: [FunctionSpec](#functionspec) &mdash; The name of a function, a pointer to the code, and its signature code.
+* type: [FunResultKind](#funresultkind) &mdash; The kind of a FunResult object, either a value or warning.
+* type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a warning.
 * [newVarsDict](#newvarsdict) &mdash; Create a new empty variables dictionary.
 * [newVarsDictOr](#newvarsdictor) &mdash; Return a new varsDictOr object containing a warning.
 * [newVarsDictOr](#newvarsdictor-1) &mdash; Return a new VarsDict object containing a dictionary.
@@ -21,21 +27,32 @@ StaticTea variable types.
 * [newValue](#newvalue-7) &mdash; New list value from an array of items of the same kind.
 * [newValue](#newvalue-8) &mdash; New dict value from an array of pairs where the pairs are the
 same type which may be Value type.
+* [newFunc](#newfunc) &mdash; Create a new func which is a reference to a FunctionSpec.
+* [newFunc](#newfunc-1) &mdash; Create a new func which is a reference to a FunctionSpec.
+* [newValue](#newvalue-9) &mdash; Create a new func value.
 * [newEmptyListValue](#newemptylistvalue) &mdash; Return an empty list value.
 * [newEmptyDictValue](#newemptydictvalue) &mdash; Create a dictionary value from a VarsDict.
-* [`==`](#) &mdash; Return true when two variables are equal.
-* [`$`](#-1) &mdash; Return a string representation of the variable's type.
+* [`==`](#) &mdash; Return true when two functions are equal.
+* [`==`](#-1) &mdash; Return true when two variables are equal.
+* [`$`](#-2) &mdash; Return a string representation of a function.
+* [`$`](#-3) &mdash; Return a string representation of the variable's type.
 * [jsonStringRepr](#jsonstringrepr) &mdash; Return the JSON string representation.
 * [dictToString](#dicttostring) &mdash; Return a string representation of a dict Value in JSON format.
 * [listToString](#listtostring) &mdash; Return a string representation of a list variable in JSON format.
 * [valueToString](#valuetostring) &mdash; Return a string representation of a variable in JSON format.
 * [valueToStringRB](#valuetostringrb) &mdash; Return the string representation of the variable for use in the replacement blocks.
-* [`$`](#-2) &mdash; Return a string representation of a Value.
-* [`$`](#-3) &mdash; Return a string representation of a VarsDict.
+* [`$`](#-4) &mdash; Return a string representation of a Value.
+* [`$`](#-5) &mdash; Return a string representation of a VarsDict.
 * [dotNameRep](#dotnamerep) &mdash; Return a dot name string representation of a dictionary.
 * [newValueOr](#newvalueor) &mdash; Create a new ValueOr containing a warning.
 * [newValueOr](#newvalueor-1) &mdash; Create a new ValueOr containing a warning.
 * [newValueOr](#newvalueor-2) &mdash; Create a new ValueOr containing a value.
+* [newFunResultWarn](#newfunresultwarn) &mdash; Return a new FunResult object containing a warning.
+* [newFunResultWarn](#newfunresultwarn-1) &mdash; Return a new FunResult object containing a warning created from a WarningData object.
+* [newFunResult](#newfunresult) &mdash; Return a new FunResult object containing a value.
+* [`==`](#-6) &mdash; Compare two FunResult objects and return true when equal.
+* [`!=`](#-7) &mdash; Compare two FunResult objects and return false when equal.
+* [`$`](#-8) &mdash; Return a string representation of a FunResult object.
 
 # VarsDict
 
@@ -46,13 +63,21 @@ VarsDict with newVarsDict procedure.
 VarsDict = OrderedTableRef[string, Value]
 ```
 
+# Variables
+
+Dictionary holding all statictea variables in multiple distinct logical dictionaries.
+
+```nim
+Variables = VarsDict
+```
+
 # ValueKind
 
 The statictea variable types.
 
 ```nim
 ValueKind = enum
-  vkString, vkInt, vkFloat, vkDict, vkList, vkBool
+  vkString, vkInt, vkFloat, vkDict, vkList, vkBool, vkFunc
 ```
 
 # Value
@@ -61,6 +86,60 @@ A variable's value reference.
 
 ```nim
 Value = ref ValueObj
+```
+
+# FunctionPtr
+
+Signature of a statictea function. It takes any number of values and returns a value or a warning message.
+
+```nim
+FunctionPtr = proc (variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# Func
+
+A func value is a reference to a FunctionSpec.
+
+```nim
+Func = ref FunctionSpec
+```
+
+# FunctionSpec
+
+The name of a function, a pointer to the code, and its signature code.
+
+```nim
+FunctionSpec = object
+  name*: string
+  functionPtr*: FunctionPtr
+  signatureCode*: string
+
+```
+
+# FunResultKind
+
+The kind of a FunResult object, either a value or warning.
+
+```nim
+FunResultKind = enum
+  frValue, frWarning
+```
+
+# FunResult
+
+Contains the result of calling a function, either a value or a warning.
+
+```nim
+FunResult = object
+  case kind*: FunResultKind
+  of frValue:
+      value*: Value          ## Return value of the function.
+    
+  of frWarning:
+      parameter*: Natural    ## Index of problem parameter.
+      warningData*: WarningData
+
+
 ```
 
 # newVarsDict
@@ -173,6 +252,30 @@ same type which may be Value type.
 proc newValue[T](dictPairs: openArray[(string, T)]): Value
 ```
 
+# newFunc
+
+Create a new func which is a reference to a FunctionSpec.
+
+```nim
+func newFunc(name: string; functionPtr: FunctionPtr; signatureCode: string): Func
+```
+
+# newFunc
+
+Create a new func which is a reference to a FunctionSpec.
+
+```nim
+func newFunc(functionSpec: FunctionSpec): Func
+```
+
+# newValue
+
+Create a new func value.
+
+```nim
+func newValue(function: Func): Value
+```
+
 # newEmptyListValue
 
 Return an empty list value.
@@ -191,10 +294,26 @@ proc newEmptyDictValue(): Value
 
 # `==`
 
+Return true when two functions are equal.
+
+```nim
+proc `==`(a: Func; b: Func): bool
+```
+
+# `==`
+
 Return true when two variables are equal.
 
 ```nim
-proc `==`(value1: Value; value2: Value): bool
+proc `==`(a: Value; b: Value): bool
+```
+
+# `$`
+
+Return a string representation of a function.
+
+```nim
+func `$`(function: Func): string
 ```
 
 # `$`
@@ -263,10 +382,10 @@ proc `$`(varsDict: VarsDict): string
 
 # dotNameRep
 
-Return a dot name string representation of a dictionary.
+Return a dot name string representation of a dictionary. The top variables tells whether the dict is the variables dictionary.
 
 ```nim
-func dotNameRep(dict: VarsDict; leftSide: string = ""): string
+func dotNameRep(dict: VarsDict; leftSide: string = ""; top = false): string
 ```
 
 # newValueOr
@@ -291,6 +410,55 @@ Create a new ValueOr containing a value.
 
 ```nim
 func newValueOr(value: Value): ValueOr
+```
+
+# newFunResultWarn
+
+Return a new FunResult object containing a warning. It takes a message id, the index of the problem parameter, and the optional string that goes with the warning.
+
+```nim
+func newFunResultWarn(warning: MessageId; parameter: Natural = 0;
+                      p1: string = ""; pos = 0): FunResult
+```
+
+# newFunResultWarn
+
+Return a new FunResult object containing a warning created from a WarningData object.
+
+```nim
+func newFunResultWarn(warningData: WarningData; parameter: Natural = 0): FunResult
+```
+
+# newFunResult
+
+Return a new FunResult object containing a value.
+
+```nim
+func newFunResult(value: Value): FunResult
+```
+
+# `==`
+
+Compare two FunResult objects and return true when equal.
+
+```nim
+func `==`(r1: FunResult; r2: FunResult): bool
+```
+
+# `!=`
+
+Compare two FunResult objects and return false when equal.
+
+```nim
+proc `!=`(a: FunResult; b: FunResult): bool
+```
+
+# `$`
+
+Return a string representation of a FunResult object.
+
+```nim
+func `$`(funResult: FunResult): string
 ```
 
 

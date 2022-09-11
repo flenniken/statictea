@@ -5,7 +5,7 @@ Statictea function signatures and parameter checking.
 * [signatures.nim](../src/signatures.nim) &mdash; Nim source code.
 # Index
 
-* type: [ParamCode](#paramcode) &mdash; Parameter type, one character of "ifslda" corresponding to int, float, string, list, dict, any.
+* type: [ParamCode](#paramcode) &mdash; Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.
 * type: [ParamKind](#paramkind) &mdash; The kind of parameter.
 * type: [Param](#param) &mdash; Holds attributes for one parameter.
 * [newParam](#newparam) &mdash; Create a new Param object.
@@ -20,7 +20,7 @@ Statictea function signatures and parameter checking.
 
 # ParamCode
 
-Parameter type, one character of "ifslda" corresponding to int, float, string, list, dict, any.
+Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.
 
 ```nim
 ParamCode = char
@@ -43,7 +43,7 @@ ParamKind = enum
 
 Holds attributes for one parameter.
 * name -- the parameter name
-* paramCode -- the parameter code, one of: ifslda
+* paramCode -- the parameter code, one of: ifsldpa
 * paramKind -- whether it is normal, optional or a return
 
 ```nim
