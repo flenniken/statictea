@@ -189,10 +189,12 @@ func signatureCodeToParams*(signatureCode: string): Option[seq[Param]] =
   result = some(params)
 
 func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
-  ## Create a dictionary of the parameters. The parameter names are
-  ## the dictionary keys.  Return a FunResult object containing the
+  ## Create a dictionary of the arguments. The parameter names are the
+  ## dictionary keys.  Return a FunResult object containing the
   ## dictionary or a warning when the parameters do not match the
   ## signature.  The last signature parameter is for the return type.
+  ## The warning parameter value tells how many arguments matched the
+  ## parameters.
 
   var map = newVarsDict()
 
@@ -223,10 +225,10 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
   if args.len < requiredParams:
     if gotOptional:
       # The function requires at least $1 arguments.
-      return newFunResultWarn(wNotEnoughArgsOpt, 0, $requiredParams)
+      return newFunResultWarn(wNotEnoughArgsOpt, parameter=0, p1 = $requiredParams)
     else:
       # Not enough parameters, $1 required.
-      return newFunResultWarn(wNotEnoughArgs, 0, $requiredParams)
+      return newFunResultWarn(wNotEnoughArgs, parameter=0, p1 = $requiredParams)
 
   # Check there are not too many parameters.
   var limit: int
@@ -237,10 +239,10 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
   if args.len > limit:
     if gotOptional:
       # The function requires at most $1 arguments.
-      return newFunResultWarn(wTooManyArgsOpt, limit, $limit)
+      return newFunResultWarn(wTooManyArgsOpt, parameter=0, p1 = $limit)
     else:
       # The function requires $1 arguments.
-      return newFunResultWarn(wTooManyArgs, limit, $limit)
+      return newFunResultWarn(wTooManyArgs, parameter=0, p1 = $limit)
 
   # Loop through the parameters.
   for ix in countUp(0, loopParams - 1):
@@ -251,7 +253,7 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
     if not sameType(param.paramCode, arg.kind):
       let expected = paramCodeString(param.paramCode)
       # Wrong argument type, expected $1.
-      return newFunResultWarn(wWrongType, ix, $expected)
+      return newFunResultWarn(wWrongType, parameter=ix, p1 = $expected)
 
     map[param.name] = arg
 

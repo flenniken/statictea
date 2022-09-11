@@ -176,10 +176,6 @@ proc newEmptyDictValue*(): Value =
   ## Create a dictionary value from a VarsDict.
   result = newValue(newVarsDict())
 
-proc `==`*(a: Func, b: Func): bool =
-  ## Return true when two functions are equal.
-  result = a == b
-
 proc `==`*(a: Value, b: Value): bool =
   ## Return true when two variables are equal.
   if a.kind == b.kind:
@@ -204,7 +200,7 @@ func `$`*(function: Func): string =
   let length = function.signatureCode.len
   let parmCodes = function.signatureCode[0..length-2]
   let returnCode = function.signatureCode[length-1..length-1]
-  result = "$1($2)$3" % [function.name, parmCodes, returnCode]
+  result = "\"$1($2)$3\"" % [function.name, parmCodes, returnCode]
 
 func `$`*(kind: ValueKind): string =
   ## Return a string representation of the variable's type.
@@ -435,4 +431,4 @@ func `$`*(funResult: FunResult): string =
   of frValue:
     result = $funResult.value
   else:
-    result = "warning: " & $funResult.warningData & ": " & $funResult.parameter
+    result = "warning: " & $funResult.warningData & ": parameter " & $funResult.parameter

@@ -167,10 +167,10 @@ suite "signatures.nim":
 
   test "mapParameters too many args":
     var parameters = @[newValue(1), newValue(2)]
-    check testMapParametersW("ii", parameters, 1, wTooManyArgs, "1")
+    check testMapParametersW("ii", parameters, 0, wTooManyArgs, "1")
 
     parameters = @[newValue(1), newValue(2), newValue(3)]
-    check testMapParametersW("iii", parameters, 2, wTooManyArgs, "2")
+    check testMapParametersW("iii", parameters, 0, wTooManyArgs, "2")
 
   test "mapParameters wrong kind":
     var parameters = @[newValue(1)]
@@ -184,6 +184,12 @@ suite "signatures.nim":
 
     parameters = @[newValue(1), newValue(2)]
     check testMapParametersW("oifi", parameters, 1, wWrongType, "float")
+
+  test "mapParameters string compare senitive":
+    var parameters = @[newValue("tea"), newValue("Tea"), newValue(true)]
+    check testMapParametersOk("ssobi", parameters, """{"a":"tea","b":"Tea","c":true}""")
+    parameters = @[newValue("tea"), newValue("Tea"), newValue(1)]
+    check testMapParametersW("ssobi", parameters, 2, wWrongType, "bool")
 
   test "mapParameters sort int, float, string":
     var parameters = @[newEmptyListValue(), newValue("ascending")]

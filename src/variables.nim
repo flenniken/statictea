@@ -366,15 +366,20 @@ proc getVariable*(variables: Variables, dotNameStr: string): ValueOr =
   let nameSpace = names[0]
   case nameSpace
   of "g", "l", "s", "t", "o", "f":
-    discard
+    result = lookUpVar(variables, names)
   of "h", "i", "j", "k", "m", "n", "p", "q", "r", "u":
     # The variables f, i, j, k, m, n, p, q, r, u are reserved variable names.
-    return newValueOr(wReservedNameSpaces)
+    result = newValueOr(wReservedNameSpaces)
   else:
-    # It must be a local variable, add the missing l.
-    names.insert("l", 0)
-
-  result = lookUpVar(variables, names)
+    # No prefix, look in l then f.
+    var varNames = @["l"] & names
+    result = lookUpVar(variables, varNames)
+    if result.isMessage:
+      varNames = @["f"] & names
+      result = lookUpVar(variables, varNames)
+      if result.isMessage:
+        # The variable wasn't found in the l or f dictionaries.
+        result = newValueOr(wNotInLorF, dotNameStr)
 
 func argsPrepostList*(prepostList: seq[Prepost]): seq[seq[string]] =
   ## Create a prepost list of lists for t args.

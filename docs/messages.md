@@ -218,7 +218,8 @@ MessageId = enum
   wCompareOperatorSame,     ## w201
   wNeedPrecedence,          ## w202
   wNoMatchingParen,         ## w203
-  wReadOnlyFunctions         ## w204
+  wReadOnlyFunctions,       ## w204
+  wNotInLorF                 ## w205
 ```
 
 # Messages
@@ -431,7 +432,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The comparison operator’s right value must be the same type as the left value.", ## wCompareOperatorSame
     "When mixing \'and\'s and \'or\'s you need to specify the precedence with parentheses.", ## wNeedPrecedence
     "No matching end right parentheses.", ## wNoMatchingParen
-    "You cannot assign to the functions dictionary."]
+    "You cannot assign to the functions dictionary.", ## wReadOnlyFunctions
+    "The variable wasn\'t found in the l or f dictionaries."]
 ```
 
 

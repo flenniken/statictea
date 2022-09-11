@@ -2525,7 +2525,7 @@ You have the option to compare case insensitive. Case sensitive
 is the default.
 
 #+BEGIN_SRC
-cmp(a: string, b: string, optional insensitive: int) int
+cmp(a: string, b: string, optional insensitive: bool) int
 #+END_SRC
 
 Examples:
@@ -2534,8 +2534,8 @@ Examples:
 cmp("coffee", "tea") => -1
 cmp("tea", "tea") => 0
 cmp("Tea", "tea") => 1
-cmp("Tea", "tea", 0) => 1
-cmp("Tea", "tea", 1) => 0
+cmp("Tea", "tea", true) => 1
+cmp("Tea", "tea", false) => 0
 #+END_SRC
 
 [[#contents][茶]]

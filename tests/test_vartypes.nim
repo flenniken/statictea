@@ -5,6 +5,7 @@ import opresultwarn
 import readjson
 import vartypes
 import messages
+import sharedtestcode
 
 proc testDotNameRep(json: string, eDotNameRep: string, top=false): bool =
   var valueOr = readJsonString(json)
@@ -297,7 +298,7 @@ c.d = [7]"""
 
   test "newFunResultWarn":
     let funResultWarn = newFunResultWarn(wSkippingExtraPrepost, 5, "p1")
-    check $funResultWarn == "warning: wSkippingExtraPrepost(p1):0: 5"
+    check $funResultWarn == """warning: wSkippingExtraPrepost p1="p1" pos=0: parameter 5"""
 
   test "newFunResult tea":
     let funResult = newFunResult(newValue("tea"))
@@ -317,6 +318,7 @@ c.d = [7]"""
     func abc(variables: Variables, parameters: seq[Value]): FunResult =
       result = newFunResult(newValue("hi"))
     let function = newFunc("abc", abc, "iis")
-    check $function == "abc(ii)s"
+    check gotExpected($function, "\"abc(ii)s\"")
+
     let value = newValue(function)
-    check $value == "abc(ii)s"
+    check function == value.funcv

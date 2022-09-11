@@ -591,7 +591,6 @@ proc getFunctionValueAndLength*(
   # Lookup the function.
   let funcO = getFunction(variables, functionName, parameters)
   if not isSome(funcO):
-    debugEcho("variables['f'].dictv.len = " & $variables["f"].dictv.len)
     # The function does not exist: $1.
     return newValueAndLengthOr(wInvalidFunction, functionName, start)
   let function = funcO.get()

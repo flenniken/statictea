@@ -32,17 +32,16 @@ same type which may be Value type.
 * [newValue](#newvalue-9) &mdash; Create a new func value.
 * [newEmptyListValue](#newemptylistvalue) &mdash; Return an empty list value.
 * [newEmptyDictValue](#newemptydictvalue) &mdash; Create a dictionary value from a VarsDict.
-* [`==`](#) &mdash; Return true when two functions are equal.
-* [`==`](#-1) &mdash; Return true when two variables are equal.
-* [`$`](#-2) &mdash; Return a string representation of a function.
-* [`$`](#-3) &mdash; Return a string representation of the variable's type.
+* [`==`](#) &mdash; Return true when two variables are equal.
+* [`$`](#-1) &mdash; Return a string representation of a function.
+* [`$`](#-2) &mdash; Return a string representation of the variable's type.
 * [jsonStringRepr](#jsonstringrepr) &mdash; Return the JSON string representation.
 * [dictToString](#dicttostring) &mdash; Return a string representation of a dict Value in JSON format.
 * [listToString](#listtostring) &mdash; Return a string representation of a list variable in JSON format.
 * [valueToString](#valuetostring) &mdash; Return a string representation of a variable in JSON format.
 * [valueToStringRB](#valuetostringrb) &mdash; Return the string representation of the variable for use in the replacement blocks.
-* [`$`](#-4) &mdash; Return a string representation of a Value.
-* [`$`](#-5) &mdash; Return a string representation of a VarsDict.
+* [`$`](#-3) &mdash; Return a string representation of a Value.
+* [`$`](#-4) &mdash; Return a string representation of a VarsDict.
 * [dotNameRep](#dotnamerep) &mdash; Return a dot name string representation of a dictionary.
 * [newValueOr](#newvalueor) &mdash; Create a new ValueOr containing a warning.
 * [newValueOr](#newvalueor-1) &mdash; Create a new ValueOr containing a warning.
@@ -50,9 +49,9 @@ same type which may be Value type.
 * [newFunResultWarn](#newfunresultwarn) &mdash; Return a new FunResult object containing a warning.
 * [newFunResultWarn](#newfunresultwarn-1) &mdash; Return a new FunResult object containing a warning created from a WarningData object.
 * [newFunResult](#newfunresult) &mdash; Return a new FunResult object containing a value.
-* [`==`](#-6) &mdash; Compare two FunResult objects and return true when equal.
-* [`!=`](#-7) &mdash; Compare two FunResult objects and return false when equal.
-* [`$`](#-8) &mdash; Return a string representation of a FunResult object.
+* [`==`](#-5) &mdash; Compare two FunResult objects and return true when equal.
+* [`!=`](#-6) &mdash; Compare two FunResult objects and return false when equal.
+* [`$`](#-7) &mdash; Return a string representation of a FunResult object.
 
 # VarsDict
 
@@ -290,14 +289,6 @@ Create a dictionary value from a VarsDict.
 
 ```nim
 proc newEmptyDictValue(): Value
-```
-
-# `==`
-
-Return true when two functions are equal.
-
-```nim
-proc `==`(a: Func; b: Func): bool
 ```
 
 # `==`

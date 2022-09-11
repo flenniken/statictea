@@ -10,6 +10,9 @@ import warnings
 import vartypes
 import sharedtestcode
 
+# Unicode strings in multiple languages good for test cases.
+# https://www.cl.cam.ac.uk/~mgk25/ucs/examples/quickbrown.txt
+
 proc testVisibleControl(text: string, eText: string): bool =
   let got = visibleControl(text)
   result = gotExpected(got, eText)

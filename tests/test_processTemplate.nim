@@ -1039,21 +1039,21 @@ no newline
   test "missing slash":
     let templateContent = """
 $$ nextline
-$$ : len = len(case(5,
+$$ : num = len(case(5,
 $$ :  5, "five", "one"))
-{len}
+{num}
 """
     let eResultLines = splitNewLines """
-{len}
+{num}
 """
     let eErrLines = splitNewLines """
 template.html(2): w33: Expected a string, number, variable, list or function.
-statement: len = len(case(5,
+statement: num = len(case(5,
                             ^
 template.html(3): w29: Statement does not start with a variable name.
 statement: 5, "five", "one"))
            ^
-template.html(4): w58: The replacement variable doesn't exist: len.
+template.html(4): w58: The replacement variable doesn't exist: num.
 """
     check testProcessTemplate(templateContent = templateContent, eErrLines = eErrLines,
       eResultLines = eResultLines, eRc = 1)

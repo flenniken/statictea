@@ -9,7 +9,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funCmp_iii](#funcmp_iii) &mdash; Compare two ints.
 * [funCmp_ffi](#funcmp_ffi) &mdash; Compare two floats.
 * [funCmp_bbi](#funcmp_bbi) &mdash; Compare two bools.
-* [funCmp_ssoii](#funcmp_ssoii) &mdash; Compare two strings.
+* [funCmp_ssobi](#funcmp_ssobi) &mdash; Compare two strings.
 * [funcConcat_sss](#funcconcat_sss) &mdash; Concatentate two strings.
 * [funLen_si](#funlen_si) &mdash; Number of unicode characters in a string.
 * [funLen_li](#funlen_li) &mdash; Number of elements in a list.
@@ -149,7 +149,7 @@ cmp(false, true) => -1
 func funCmp_bbi(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funCmp_ssoii
+# funCmp_ssobi
 
 Compare two strings. Returns -1 for less, 0 for equal and 1 for
 greater than.
@@ -158,7 +158,7 @@ You have the option to compare case insensitive. Case sensitive
 is the default.
 
 ~~~
-cmp(a: string, b: string, optional insensitive: int) int
+cmp(a: string, b: string, optional insensitive: bool) int
 ~~~~
 
 Examples:
@@ -167,12 +167,12 @@ Examples:
 cmp("coffee", "tea") => -1
 cmp("tea", "tea") => 0
 cmp("Tea", "tea") => 1
-cmp("Tea", "tea", 0) => 1
-cmp("Tea", "tea", 1) => 0
+cmp("Tea", "tea", true) => 1
+cmp("Tea", "tea", false) => 0
 ~~~~
 
 ```nim
-func funCmp_ssoii(variables: Variables; parameters: seq[Value]): FunResult
+func funCmp_ssobi(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funcConcat_sss
@@ -1790,7 +1790,7 @@ func funLte_ffb(variables: Variables; parameters: seq[Value]): FunResult
 
 # getFunction
 
-Return the func variable with the given name, if it exists. If there are multiple functions with the name, return the one that matches the arguments or return the first one.
+Return the func variable with the given name, if it exists.  If the name is found but none of the signatures match, return the one that matched the farthest going left to right.
 
 ```nim
 proc getFunction(variables: Variables; functionName: string;

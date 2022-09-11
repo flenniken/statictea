@@ -215,6 +215,7 @@ type
     wNeedPrecedence,       ## w202
     wNoMatchingParen,      ## w203
     wReadOnlyFunctions,    ## w204
+    wNotInLorF,            ## w205
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -423,6 +424,7 @@ const
     "When mixing 'and's and 'or's you need to specify the precedence with parentheses.", ## wNeedPrecedence
     "No matching end right parentheses.", ## wNoMatchingParen
     "You cannot assign to the functions dictionary.", ## wReadOnlyFunctions
+    "The variable wasn't found in the l or f dictionaries.", ## wNotInLorF
     ]
 
     ## The message text.

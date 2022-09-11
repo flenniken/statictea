@@ -48,7 +48,7 @@ suite "warnings.nim":
 
   test "string rep":
     let warning = newWarningData(wUnknownArg, "p1", 5)
-    check $warning == "wUnknownArg(p1):5"
+    check $warning == """wUnknownArg p1="p1" pos=5"""
 
   test "warningsList":
     check Messages.len > 0

@@ -16,7 +16,7 @@ Statictea function signatures and parameter checking.
 * [parmsToSignature](#parmstosignature) &mdash; Create a signature from a list of Params.
 * [shortName](#shortname) &mdash; Return a short name based on the given index value.
 * [signatureCodeToParams](#signaturecodetoparams) &mdash; Convert the signature code to a list of Param objects.
-* [mapParameters](#mapparameters) &mdash; Create a dictionary of the parameters.
+* [mapParameters](#mapparameters) &mdash; Create a dictionary of the arguments.
 
 # ParamCode
 
@@ -120,7 +120,7 @@ func signatureCodeToParams(signatureCode: string): Option[seq[Param]]
 
 # mapParameters
 
-Create a dictionary of the parameters. The parameter names are the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the parameters do not match the signature.  The last signature parameter is for the return type.
+Create a dictionary of the arguments. The parameter names are the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the parameters do not match the signature.  The last signature parameter is for the return type. The warning parameter value tells how many arguments matched the parameters.
 
 ```nim
 func mapParameters(params: seq[Param]; args: seq[Value]): FunResult

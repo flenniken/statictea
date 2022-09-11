@@ -393,7 +393,8 @@ three
     check testFormatStringWarn("{3}", newWarningData(wInvalidVarNameStart, "", 1))
     check testFormatStringWarn(" {3}", newWarningData(wInvalidVarNameStart, "", 2))
 
-    check testFormatStringWarn("{a}", newWarningData(wVariableMissing, "a", 1))
+    check testFormatStringWarn("{a}", newWarningData(wNotInLorF, "a", 1))
+    check testFormatStringWarn("{l.a}", newWarningData(wVariableMissing, "a", 1))
     check testFormatStringWarn("{a!}", newWarningData(wInvalidVarName, "", 2))
 
     check testFormatStringWarn("{{{a!}", newWarningData(wInvalidVarName, "", 4))

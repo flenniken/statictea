@@ -12,6 +12,7 @@ import readjson
 import args
 import opresultwarn
 import comparelines
+import runFunction
 
 proc testGetVariableOk(variables: Variables, dotNameStr: string, eJson:
     string): bool =
@@ -77,7 +78,8 @@ t.version = "0.1.0""""
     check dotNameRep(variables, top=true) == expected
 
   test "getVariable":
-    var variables = emptyVariables()
+    let funcsVarDict = createFuncDictionary().dictv
+    var variables = emptyVariables(funcs = funcsVarDict)
     check testGetVariableOk(variables, "true", "true")
     check testGetVariableOk(variables, "false", "false")
     check testGetVariableOk(variables, "t.row", "0")
@@ -89,6 +91,8 @@ t.version = "0.1.0""""
     check testGetVariableOk(variables, "g", "{}")
     let eTea = """{"args":{},"row":0,"version":"0.1.0"}"""
     check testGetVariableOk(variables, "t", eTea)
+    let expected = """["cmp(bb)i","cmp(ff)i","cmp(ii)i","cmp(ssob)i"]"""
+    check testGetVariableOk(variables, "f.cmp", expected)
 
   test "getVariable five":
     var variables = emptyVariables()
@@ -117,7 +121,7 @@ t.version = "0.1.0""""
     check testGetVariableOk(variables, "l", """{"a":{"b":{"c":{}}}}""")
 
     let wO = newWarningData(wVariableMissing, "hello")
-    check testGetVariableWarning(variables, "hello", wO)
+    check testGetVariableWarning(variables, "l.hello", wO)
 
 
   test "getVariable not dict":
@@ -131,9 +135,10 @@ t.version = "0.1.0""""
     var valueOr = readJsonString(variablesJson)
     check valueOr.isValue
     variables["l"] = valueOr.value
-
     let wO = newWarningData(wNotDict, "b")
-    check testGetVariableWarning(variables, "a.b.tea", wO)
+    check testGetVariableWarning(variables, "l.a.b.tea", wO)
+    let w2 = newWarningData(wNotInLorF, "a.b.tea")
+    check testGetVariableWarning(variables, "a.b.tea", w2)
 
   test "testGetVariableWarning wReservedNameSpaces":
     var variables = emptyVariables()

@@ -133,7 +133,7 @@ func funCmp_bbi*(variables: Variables, parameters: seq[Value]): FunResult =
   let b = map["b"].boolv
   result = newFunResult(newValue(cmp(a, b)))
 
-func funCmp_ssoii*(variables: Variables, parameters: seq[Value]): FunResult =
+func funCmp_ssobi*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Compare two strings. Returns -1 for less, 0 for equal and 1 for
   ## @:greater than.
   ## @:
@@ -141,7 +141,7 @@ func funCmp_ssoii*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:is the default.
   ## @:
   ## @:~~~
-  ## @:cmp(a: string, b: string, optional insensitive: int) int
+  ## @:cmp(a: string, b: string, optional insensitive: bool) int
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -150,25 +150,18 @@ func funCmp_ssoii*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:cmp("coffee", "tea") => -1
   ## @:cmp("tea", "tea") => 0
   ## @:cmp("Tea", "tea") => 1
-  ## @:cmp("Tea", "tea", 0) => 1
-  ## @:cmp("Tea", "tea", 1) => 0
+  ## @:cmp("Tea", "tea", true) => 1
+  ## @:cmp("Tea", "tea", false) => 0
   ## @:~~~~
 
-  tMapParameters("ssoii")
+  tMapParameters("ssobi")
   let a = map["a"].stringv
   let b = map["b"].stringv
 
-  # Get the optional case insensitive and check it is 0 or 1.
+  # Get the optional case insensitive.
   var insensitive = false
   if "c" in map:
-    case map["c"].intv:
-    of 0:
-      insensitive = false
-    of 1:
-      insensitive = true
-    else:
-      # The argument must be 0 or 1.
-      return newFunResultWarn(wNotZeroOne, 2)
+    insensitive = map["c"].boolv
 
   let ret = cmpString(a, b, insensitive)
   result = newFunResult(newValue(ret))
@@ -2305,7 +2298,7 @@ const
     ("cmp", funCmp_bbi, "bbi"),
     ("cmp", funCmp_ffi, "ffi"),
     ("cmp", funCmp_iii, "iii"),
-    ("cmp", funCmp_ssoii, "ssoii"),
+    ("cmp", funCmp_ssobi, "ssobi"),
     ("cmpVersion", funCmpVersion_ssi, "ssi"),
     ("concat", funcConcat_sss, "sss"),
     ("dict", funDict_old, "old"),
@@ -2367,31 +2360,33 @@ const
 
 proc getFunction*(variables: Variables, functionName: string,
     parameters: seq[Value]): Option[Value] =
-  ## Return the func variable with the given name, if it exists.
-  ## If there are multiple functions with the name, return the one
-  ## that matches the arguments or return the first one.
+  ## Return the func variable with the given name, if it exists.  If
+  ## the name is found but none of the signatures match, return the
+  ## one that matched the farthest going left to right.
 
   assert "f" in variables
   assert variables["f"].kind == vkDict
 
   let funcDict = variables["f"].dictv
   if not (functionName in funcDict):
+    # No function with with the specified name.
     return
 
   assert funcDict[functionName].kind == vkList
 
   let funcList = funcDict[functionName].listv
   if funcList.len == 1:
+    # There is only one function with the specified name, return it.
     result = some(funcList[0])
   elif funcList.len > 1:
-    # Find the function that matches the parameters.
+    # Find the function that matches the most arguments.
     var maxDistance = 0
     var maxFuncValue = funcList[0]
     for funcValue in funcList:
       let paramsO = signatureCodeToParams(funcValue.funcv.signatureCode)
       let funResult = mapParameters(paramsO.get(), parameters)
       if funResult.kind != frWarning:
-        # Parameters good, return the function.
+        # All arguments match the parameters, return the function.
         return some(funcValue)
       if funResult.parameter > maxDistance:
         maxDistance = funResult.parameter

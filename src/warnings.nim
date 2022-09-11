@@ -41,12 +41,6 @@ func newWarningData*(warning: MessageId, p1 = "", pos = 0): WarningData =
   ## information.
   result = WarningData(warning: warning, p1: p1, pos: pos)
 
-func dashIfEmpty(a: string): string =
-  if a.len == 0:
-    result = "-"
-  else:
-    result = a
-
 func `$`*(warningData: WarningData): string =
   ## Return a string representation of WarningData.
   ## @:
@@ -54,8 +48,8 @@ func `$`*(warningData: WarningData): string =
   ## @:let warning = newWarningData(wUnknownArg, "p1", 5)
   ## @:check $warning == "wUnknownArg(p1):5"
   ## @:~~~~
-  result = "$1($2):$3" % [$warningData.warning,
-    dashIfEmpty(warningData.p1), $warningData.pos]
+  result = """$1 p1="$2" pos=$3""" % [$warningData.warning,
+    warningData.p1, $warningData.pos]
 
 func `==`*(w1: WarningData, w2: WarningData): bool =
   ## Return true when the two WarningData objects are equal.

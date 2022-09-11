@@ -8,29 +8,25 @@ import runFunction
 import messages
 import variables
 
-# Unicode strings in multiple languages good for test cases.
-# https://www.cl.cam.ac.uk/~mgk25/ucs/examples/quickbrown.txt
-
-proc getFunc(functionName: string, parameters: seq[Value]): Option[Value] =
-  ## Get the func variable given its name and parameters.
-  let funcsVarDict = createFuncDictionary().dictv
-  let variables = emptyVariables(funcs = funcsVarDict)
-  result = getFunction(variables, functionName, parameters)
+let funcsVarDict = createFuncDictionary().dictv
 
 proc testFunction(functionName: string, parameters: seq[Value],
     eFunResult: FunResult,
-    variables: Variables = emptyVariables(),
+    variables: Variables = nil,
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]
   ): bool =
 
-  let funcO = getFunc(functionName, parameters)
+  var vars = variables
+  if vars == nil:
+    vars = emptyVariables(funcs = funcsVarDict)
+  let funcO = getFunction(vars, functionName, parameters)
   if not funcO.isSome:
     echo "The function doesn't exist: " & functionName
     return false
   let function = funcO.get()
-  let funResult = function.funcv.functionPtr(variables, parameters)
+  let funResult = function.funcv.functionPtr(vars, parameters)
 
   result = true
   if not expectedItem("funResult", funResult, eFunResult):
@@ -62,7 +58,7 @@ proc testCmpFun[T](a: T, b: T, caseInsensitive: bool = false, expected: int = 0)
   ## Test the cmpFun
   var parameters: seq[Value]
   if caseInsensitive:
-    parameters = @[newValue(a), newValue(b), newValue(1)]
+    parameters = @[newValue(a), newValue(b), newValue(caseInsensitive)]
   else:
     parameters = @[newValue(a), newValue(b)]
   let eFunResult = newFunResult(newValue(expected))
@@ -97,7 +93,8 @@ proc testAnchor(str: string, eStr: string): bool =
 proc testGetFunctionExists(functionName: string, parameters: seq[Value],
     eSignatureCode: string): bool =
 
-  let funcO = getFunc(functionName, parameters)
+  let variables = emptyVariables(funcs = funcsVarDict)
+  let funcO = getFunction(variables, functionName, parameters)
   result = true
   if not isSome(funcO):
     echo "No function with this name."
@@ -127,7 +124,8 @@ suite "runFunction.nim":
 
   test "getFunction missing":
     var parameters = @[newValue(1)]
-    let funcO = getFunc("notfunction", parameters)
+    let variables = emptyVariables(funcs = funcsVarDict)
+    let funcO = getFunction(variables, "missing", parameters)
     check not isSome(funcO)
 
   test "getFunction concat":
@@ -144,9 +142,9 @@ suite "runFunction.nim":
 
   test "getFunction cmp strings":
     var parameters = @[newValue("a"), newValue("b")]
-    check testGetFunctionExists("cmp", parameters, "ssoii")
-    parameters = @[newValue("a"), newValue("b"), newValue(1)]
-    check testGetFunctionExists("cmp", parameters, "ssoii")
+    check testGetFunctionExists("cmp", parameters, "ssobi")
+    parameters = @[newValue("a"), newValue("b"), newValue(true)]
+    check testGetFunctionExists("cmp", parameters, "ssobi")
 
   test "getFunction cmp miss match":
     var parameters = @[newValue(1), newValue(1.0)]
@@ -219,7 +217,7 @@ suite "runFunction.nim":
 
   test "len 2":
     var parameters = newValue([3, 2]).listv
-    let eFunResult = newFunResultWarn(wTooManyArgs, 1, "1")
+    let eFunResult = newFunResultWarn(wTooManyArgs, 0, "1")
     check testFunction("len", parameters, eFunResult)
 
   test "get list item":
@@ -286,7 +284,7 @@ suite "runFunction.nim":
     var list = newValue([1, 2, 3, 4, 5])
     let p = newValue(1)
     var parameters = @[list, p, p, p]
-    let eFunResult = newFunResultWarn(wTooManyArgsOpt, 3, "3")
+    let eFunResult = newFunResultWarn(wTooManyArgsOpt, 0, "3")
     check testFunction("get", parameters, eFunResult)
 
   test "get parameter 2 wrong type":
@@ -381,14 +379,14 @@ suite "runFunction.nim":
     let eFunResult = newFunResultWarn(wWrongType, 0, "bool")
     check testFunction("cmp", parameters, eFunResult)
 
-  test "cmp case insensitive wrong type":
-    var parameters = @[newValue(2), newValue(22), newValue("a")]
-    let eFunResult = newFunResultWarn(wTooManyArgs, 2, "2")
+  test "cmp case insensitive not bool":
+    var parameters = @[newValue("tea"), newValue("Tea"), newValue(2)]
+    let eFunResult = newFunResultWarn(wWrongType, 2, "bool")
     check testFunction("cmp", parameters, eFunResult)
 
-  test "cmp case insensitive not 0 or 1":
-    var parameters = @[newValue("tea"), newValue("Tea"), newValue(2)]
-    let eFunResult = newFunResultWarn(wNotZeroOne, 2)
+  test "cmp case insensitive default":
+    var parameters = @[newValue("tea"), newValue("Tea")]
+    let eFunResult = newFunResult(newValue(1))
     check testFunction("cmp", parameters, eFunResult)
 
   test "if0 function 0":
@@ -635,7 +633,7 @@ suite "runFunction.nim":
 
   test "int(): wrong number of parameters":
     var parameters = @[newValue(4.57), newValue(1), newValue(2)]
-    let eFunResult = newFunResultWarn(wTooManyArgsOpt, 2, "2")
+    let eFunResult = newFunResultWarn(wTooManyArgsOpt, 0, "2")
     check testFunction("int", parameters, eFunResult)
 
   test "int(): not a number string":
@@ -700,7 +698,7 @@ suite "runFunction.nim":
 
   test "to float wrong number parameters":
     var parameters = @[newValue(4), newValue(3)]
-    let eFunResult = newFunResultWarn(wTooManyArgs, 1, "1")
+    let eFunResult = newFunResultWarn(wTooManyArgs, 0, "1")
     check testFunction("float", parameters, eFunResult)
 
   test "to float warning":
@@ -1118,13 +1116,13 @@ suite "runFunction.nim":
 
   test "path: wrong number of parameters":
     var parameters: seq[Value] = @[newValue("Earl Grey"), newValue("a"), newValue("a")]
-    let eFunResult = newFunResultWarn(wTooManyArgsOpt, 2, "2")
+    let eFunResult = newFunResultWarn(wTooManyArgsOpt, 0, "2")
     check testFunction("path", parameters, eFunResult)
 
   test "path: wrong number of parameters 2":
     var parameters: seq[Value] = @[newValue("Earl Grey"),
                                    newValue("a"), newValue("a"), newValue(2)]
-    let eFunResult = newFunResultWarn(wTooManyArgsOpt, 2, "2")
+    let eFunResult = newFunResultWarn(wTooManyArgsOpt, 0, "2")
     check testFunction("path", parameters, eFunResult)
 
   test "path: wrong kind p1":
@@ -1490,7 +1488,7 @@ suite "runFunction.nim":
 
   test "cmdVersion: two many parameters":
     let parameters = @[newValue("1.2.3"), newValue("1.2.3"), newValue("1.2.3")]
-    let eFunResult = newFunResultWarn(wTooManyArgs, 2, "2")
+    let eFunResult = newFunResultWarn(wTooManyArgs, parameter=0, "2")
     check testFunction("cmpVersion", parameters, eFunResult)
 
   test "cmdVersion: invalid version a":
@@ -1725,7 +1723,7 @@ d.sub.y = 4"""
       newFunResult(newValue("hello")))
 
   test "format one":
-    var variables = emptyVariables()
+    var variables = emptyVariables(funcs = funcsVarDict)
     variables["l"].dictv["name"] = newValue("world")
     let str = newValue("hello {name}")
     check testFunction("format", @[str],
@@ -1733,7 +1731,7 @@ d.sub.y = 4"""
 
   test "format warning":
     let str = newValue("hello {name}")
-    let eFunResult = newFunResultWarn(wVariableMissing, 0, "name", 7)
+    let eFunResult = newFunResultWarn(wNotInLorF, 0, "name", 7)
     check testFunction("format", @[str], eFunResult)
 
   test "startsWith":

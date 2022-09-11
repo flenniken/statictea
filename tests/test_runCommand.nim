@@ -882,13 +882,13 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "warn extra parameter":
     let text = """a = warn("hello", 4)"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wTooManyArgs, "1", 18)
+    let eVariableDataOr = newVariableDataOr(wTooManyArgs, "1", 9)
     check testRunStatement(statement, eVariableDataOr)
 
   test "if0 missing required":
     let text = """a = b"""
     let statement = newStatement(text, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr(wVariableMissing, "b", 4)
+    let eVariableDataOr = newVariableDataOr(wNotInLorF, "b", 4)
     check testRunStatement(statement, eVariableDataOr)
 
   test "slice":
