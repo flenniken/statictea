@@ -225,17 +225,16 @@ proc testGetFunctionValueAndLength(
   eValueAndLengthOr: ValueAndLengthOr
     ): bool =
 
-  var variables = emptyVariables()
+  let funcsVarDict = createFuncDictionary().dictv
+  let variables = emptyVariables(funcs = funcsVarDict)
   let valueAndLengthOr = getFunctionValueAndLength(functionName,
     statement, start, variables, list=false, skip=false)
   result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr, start)
 
-proc testRunStatement(
-  statement: Statement,
-  eVDataOr: VariableDataOr,
-  variables: Variables = emptyVariables()
-     ): bool =
+proc testRunStatement(statement: Statement, eVDataOr: VariableDataOr): bool =
 
+  let funcsVarDict = createFuncDictionary().dictv
+  let variables = emptyVariables(funcs = funcsVarDict)
   let variableDataOr = runStatement(statement, variables)
   result = cmpVariableDataOr(statement, variableDataOr, eVDataOr)
 
@@ -257,8 +256,10 @@ proc testSkipCondition(text: string, startPos: Natural, ePosOr: PosOr): bool =
   if posOr != ePosOr:
     result = gotExpected($posOr, $ePosOr)
 
-proc testGetCondition(text: string, start: Natural, eBool: bool, ePos: Natural,
-    variables = emptyVariables()): bool =
+proc testGetCondition(text: string, start: Natural, eBool: bool, ePos: Natural): bool =
+  let funcsVarDict = createFuncDictionary().dictv
+  let variables = emptyVariables(funcs = funcsVarDict)
+
   let statement = newStatement(text)
   let valueAndLengthOr = getCondition(statement, start, variables)
   result = true
@@ -267,8 +268,10 @@ proc testGetCondition(text: string, start: Natural, eBool: bool, ePos: Natural,
   if valueAndLengthOr != eValueAndLengthOr:
     result = gotExpected($valueAndLengthOr, $eValueAndLengthOr, text)
 
-proc testGetConditionWarn(text: string, start: Natural, eWarning: MessageId, ePos = 0, eP1 = "",
-    variables = emptyVariables()): bool =
+proc testGetConditionWarn(text: string, start: Natural, eWarning: MessageId,
+    ePos = 0, eP1 = ""): bool =
+  let funcsVarDict = createFuncDictionary().dictv
+  let variables = emptyVariables(funcs = funcsVarDict)
   let statement = newStatement(text)
   let valueAndLengthOr = getCondition(statement, start, variables)
   result = true
@@ -492,9 +495,11 @@ $$ : c = len("hello")
       newValueAndLengthOr(wNoEndingQuote, "", 8))
 
   test "getNewVariables":
-    var variables = emptyVariables()
-    check variables["l"].dictv.len == 0
+    let funcsVarDict = createFuncDictionary().dictv
+    let variables = emptyVariables(funcs = funcsVarDict)
+    check variables["f"].dictv.len != 0
     check variables["g"].dictv.len == 0
+    check variables["l"].dictv.len == 0
     check variables["s"].dictv.len == 0
     check variables["o"].dictv.len == 0
     check variables["t"].dictv.len != 0
@@ -502,6 +507,12 @@ $$ : c = len("hello")
     check tea["row"] == Value(kind: vkInt, intv: 0)
     check tea["version"] == Value(kind: vkString, stringv: staticteaVersion)
     check tea.contains("content") == false
+
+    let fDict = variables["f"].dictv
+    let existsList = fDict["exists"].listv
+    check existsList.len == 1
+    let function = existsList[0]
+    check function.funcv.name == "exists"
 
   test "warnStatement":
     let statement = newStatement(text="tea = a123", lineNum=12, 0)
@@ -795,7 +806,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "undefined function":
     let text = """a = missing(2.3, "second", "third")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wInvalidFunction, "missing", 4)
+    let eVariableDataOr = newVariableDataOr(wInvalidFunction, "missing", 12)
     check testRunStatement(statement, eVariableDataOr)
 
   test "if when true":

@@ -27,6 +27,7 @@ type
     vkBool
     vkFunc
 
+
   Value* = ref ValueObj
     ## A variable's value reference.
 
@@ -55,15 +56,15 @@ type
     ## Signature of a statictea function. It takes any number of values
     ## and returns a value or a warning message.
 
+  Func* = ref FunctionSpec
+    ## A func value is a reference to a FunctionSpec.
+
   FunctionSpec* = object
     ## The name of a function, a pointer to the code, and its signature
     ## code.
     name*: string
     functionPtr*: FunctionPtr
     signatureCode*: string
-
-  Func* = ref FunctionSpec
-    ## A func value is a reference to a FunctionSpec.
 
   FunResultKind* = enum
     ## The kind of a FunResult object, either a value or warning.
@@ -152,6 +153,20 @@ proc newValue*[T](dictPairs: openArray[(string, T)]): Value =
     varsTable[a] = value
   result = Value(kind: vkDict, dictv: varsTable)
 
+func newFunc*(name: string, functionPtr: FunctionPtr, signatureCode: string): Func =
+  ## Create a new func which is a reference to a FunctionSpec.
+  new(result)
+  result[] = FunctionSpec(name: name, functionPtr: functionPtr, signatureCode: signatureCode)
+
+func newFunc*(functionSpec: FunctionSpec): Func =
+  ## Create a new func which is a reference to a FunctionSpec.
+  new(result)
+  result[] = functionSpec
+
+func newValue*(function: Func): Value =
+  ## Create a new func value.
+  result = Value(kind: vkFunc, funcv: function)
+
 proc newEmptyListValue*(): Value =
   ## Return an empty list value.
   var valueList: seq[Value]
@@ -183,6 +198,13 @@ proc `==`*(a: Value, b: Value): bool =
         result = a.boolv == b.boolv
       of vkFunc:
         result = a.funcv == b.funcv
+
+func `$`*(function: Func): string =
+  ## Return a string representation of a function.
+  let length = function.signatureCode.len
+  let parmCodes = function.signatureCode[0..length-2]
+  let returnCode = function.signatureCode[length-1..length-1]
+  result = "$1($2)$3" % [function.name, parmCodes, returnCode]
 
 func `$`*(kind: ValueKind): string =
   ## Return a string representation of the variable's type.
@@ -278,11 +300,6 @@ func listToString*(value: Value): string =
     result.add(valueToString(item))
   result.add("]")
 
-func `$`*(fun: Func): string =
-  ## Return a string representation of a function.
-  # todo: update function string rep.
-  result = "\"function\""
-
 func valueToString*(value: Value): string =
   ## Return a string representation of a variable in JSON format.
   case value.kind:
@@ -328,8 +345,9 @@ proc `$`*(varsDict: VarsDict): string =
   ## Return a string representation of a VarsDict.
   result = valueToString(newValue(varsDict))
 
-func dotNameRep*(dict: VarsDict, leftSide: string = ""): string =
-  ## Return a dot name string representation of a dictionary.
+func dotNameRep*(dict: VarsDict, leftSide: string = "", top = false): string =
+  ## Return a dot name string representation of a dictionary. The top
+  ## variables tells whether the dict is the variables dictionary.
   # Loop through the dictionary and flatten it to dot names.  Stop at
   # a leaf. A list is a leaf.  Use json for the leaf.
 
@@ -350,7 +368,7 @@ func dotNameRep*(dict: VarsDict, leftSide: string = ""): string =
     ## except when it is empty.
     var left: string
     if leftSide == "":
-      if k == "l" and v.dictv.len != 0:
+      if top and k == "l" and v.dictv.len != 0:
         left = ""
       else:
         left = k

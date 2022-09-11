@@ -2,6 +2,7 @@ import std/unittest
 import std/os
 import std/strutils
 import std/options
+import std/tables
 import std/streams
 import codefile
 import variables
@@ -11,6 +12,7 @@ import readlines
 import sharedtestcode
 import runCommand
 import comparelines
+import runFunction
 
 proc testAddText*(beginning: string, ending: string, found: Found): bool =
   var text: string
@@ -67,7 +69,6 @@ proc testReadStatement(
 
 proc testRunCodeFile(
     content: string = "",
-    variables: var Variables,
     eVarRep: string = "",
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
@@ -82,29 +83,22 @@ proc testRunCodeFile(
   createFile(filename, content)
   defer: discard tryRemoveFile(filename)
 
+  let funcsVarDict = createFuncDictionary().dictv
+  var variables = emptyVariables(funcs = funcsVarDict)
   runCodeFile(env, variables, filename)
 
   result = true
   if not env.readCloseDeleteCompare(eLogLines, eErrLines, showLog = showLog):
     result = false
 
-  let varRep = dotNameRep(variables)
+  let lRep = dotNameRep(variables["l"].dictv)
+  let varsDict = variables["o"].dictv
+  let oRep = dotNameRep(varsDict)
+  let varRep = $lRep & $oRep
 
-  # Remove the starting variables from the result.
-  let startingVars = emptyVariables()
-  let startingVarsRep = dotNameRep(startingVars)
-  let startingLines = splitLines(startingVarsRep)
-  let gotLines = splitLines(varRep)
-
-  var newLines: seq[string]
-  for line in gotLines:
-    if not (line in startingLines):
-      newLines.add(line)
-  let newVarRep = newLines.join("\n")
-
-  if newVarRep != eVarRep:
+  if varRep != eVarRep:
     echo "got:"
-    echo newVarRep
+    echo varRep
     echo "expected:"
     echo eVarRep
     result = false
@@ -295,27 +289,23 @@ $1
   test "runCodeFile empty":
     let content = ""
     let eVarRep = ""
-    var variables = emptyVariables()
-    check testRunCodeFile(content, variables, eVarRep)
+    check testRunCodeFile(content, eVarRep)
 
   test "runCodeFile a = 5":
     let content = "a = 5"
-    var variables = emptyVariables()
-    check testRunCodeFile(content, variables, content)
+    check testRunCodeFile(content, content)
 
   test "runCodeFile l.a = 5":
     let content = "l.a = 5"
     let eVarRep = """
 a = 5"""
-    var variables = emptyVariables()
-    check testRunCodeFile(content, variables, eVarRep)
+    check testRunCodeFile(content, eVarRep)
 
   test "runCodeFile dup":
     let content = """
 a = 5
 a = 6
 """
-    var variables = emptyVariables()
     let eVarRep = """
 a = 5"""
     let eErrLines: seq[string] = splitNewLines """
@@ -323,7 +313,7 @@ testcode.txt(2): w95: You cannot assign to an existing variable.
 statement: a = 6
            ^
 """
-    check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+    check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 
   test "runCodeFile variety":
     let content = """
@@ -342,15 +332,13 @@ d.x = 1
 d.y = 2
 e = 3.14159
 ls = [1,2,3]"""
-    var variables = emptyVariables()
-    check testRunCodeFile(content, variables, eVarRep)
+    check testRunCodeFile(content, eVarRep)
 
   test "runCodeFile o.a = 5":
     let content = "o.a = 5"
     let eVarRep = """
-o.a = 5"""
-    var variables = emptyVariables()
-    check testRunCodeFile(content, variables, eVarRep)
+a = 5"""
+    check testRunCodeFile(content, eVarRep)
 
   test "runCodeFile append to list":
     let content = """
@@ -360,10 +348,9 @@ o.l &= 2
 o.l &= 3"""
 
     let eVarRep = """
-o.a = 5
-o.l = [1,2,3]"""
-    var variables = emptyVariables()
-    check testRunCodeFile(content, variables, eVarRep)
+a = 5
+l = [1,2,3]"""
+    check testRunCodeFile(content, eVarRep)
 
   test "runCodeFile +":
     let content = """
@@ -374,8 +361,7 @@ b = 1
     let eVarRep = """
 a = 5
 b = 1"""
-    var variables = emptyVariables()
-    check testRunCodeFile(content, variables, eVarRep)
+    check testRunCodeFile(content, eVarRep)
 
   test "runCodeFile +++":
     let content = """
@@ -388,18 +374,16 @@ b = 1
     let eVarRep = """
 a = 555
 b = 1"""
-    var variables = emptyVariables()
-    check testRunCodeFile(content, variables, eVarRep)
+    check testRunCodeFile(content, eVarRep)
 
   test "runCodeFile + at end":
     let content = """
 a = +
 """
-    var variables = emptyVariables()
     let eErrLines: seq[string] = splitNewLines """
 testcode.txt(2): w183: Out of lines looking for the plus sign line.
 """
-    check testRunCodeFile(content, variables, eErrLines = eErrLines)
+    check testRunCodeFile(content, eErrLines = eErrLines)
 
   test "runCodeFile line number":
     let content = """
@@ -412,13 +396,12 @@ d ~ 2
 a = 5
 b = 1
 c = 3"""
-    var variables = emptyVariables()
     let eErrLines: seq[string] = splitNewLines """
 testcode.txt(4): w34: Missing operator, = or &=.
 statement: d ~ 2
              ^
 """
-    check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+    check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 
   test "runCodeFile bad triple":
     let content = """
@@ -430,12 +413,11 @@ c = 3
 """ % tripleQuotes
     let eVarRep = """
 len = 10"""
-    var variables = emptyVariables()
 
     let eErrLines: seq[string] = splitNewLines """
 testcode.txt(6): w184: Out of lines looking for the multiline string.
 """ % tripleQuotes
-    check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+    check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 
 
   test "runCodeFile missing file":
@@ -452,13 +434,12 @@ nofile(0): w16: File not found: missing.
     let content = """
 g.a = 5
 """
-    var variables = emptyVariables()
     let eErrLines: seq[string] = splitNewLines """
 testcode.txt(1): w186: You cannot assign to the g namespace in a code file.
 statement: g.a = 5
            ^
 """
-    check testRunCodeFile(content, variables, eErrLines = eErrLines)
+    check testRunCodeFile(content, eErrLines = eErrLines)
 
   test "runCodeFile warn":
     let content = """
@@ -466,14 +447,13 @@ if0(0, warn("hello"))
 v = if0(1, warn("not this"), 5)
 a = warn("there")
 """
-    var variables = emptyVariables()
     let eVarRep = """
 v = 5"""
     let eErrLines: seq[string] = splitNewLines """
 testcode.txt(1): hello
 testcode.txt(3): there
 """
-    check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+    check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 
   test "runCodeFile return":
     let content = """
@@ -484,7 +464,6 @@ d = 4
 e = if0(cmp(1,a), return("stop"))
 end = 5
 """
-    var variables = emptyVariables()
     let eVarRep = """
 a = 1
 b = 2
@@ -492,7 +471,7 @@ c = 3
 d = 4"""
     let eErrLines: seq[string] = splitNewLines """
 """
-    check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+    check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 
   test "runCodeFile return warning":
     let content = """
@@ -500,7 +479,6 @@ a = 1
 c = if0(0, return("skip"))
 b = 2
 """
-    var variables = emptyVariables()
     let eVarRep = """
 a = 1
 b = 2"""
@@ -509,19 +487,18 @@ testcode.txt(2): w187: Use '...return("stop")...' in a code file.
 statement: c = if0(0, return("skip"))
            ^
 """
-    check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+    check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 
   test "runCodeFile comment":
     let content = """
 # this is a comment
 a = 5
 """
-    var variables = emptyVariables()
     let eVarRep = """
 a = 5"""
     let eErrLines: seq[string] = splitNewLines """
 """
-    check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+    check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 
   test "readStatement invalid UTF-8":
     let content = """
@@ -540,8 +517,7 @@ testcode.txt(3): w148: Invalid UTF-8 byte sequence at position 2.
 statement: abÿcd␊
              ^
 """
-    var variables = emptyVariables()
-    check testRunCodeFile(content, variables, eVarRep, eErrLines = eErrLines)
+    check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 
 
   test "runCodeFile triple +":
@@ -554,6 +530,5 @@ testcode.txt(3): w185: Triple quotes must always end the line.
 statement: a = $1multilinestring$1␊
                   ^
 """ % tripleQuotes
-    var variables = emptyVariables()
-    check testRunCodeFile(content, variables, eErrLines = eErrLines)
+    check testRunCodeFile(content, eErrLines = eErrLines)
 

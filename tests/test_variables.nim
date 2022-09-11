@@ -66,14 +66,15 @@ suite "variables.nim":
   test "emptyVariables":
     var variables = emptyVariables()
     let expected = """
-s = {}
-l = {}
+f = {}
 g = {}
+l = {}
 o = {}
+s = {}
+t.args = {}
 t.row = 0
-t.version = "0.1.0"
-t.args = {}"""
-    check dotNameRep(variables) == expected
+t.version = "0.1.0""""
+    check dotNameRep(variables, top=true) == expected
 
   test "getVariable":
     var variables = emptyVariables()
@@ -86,7 +87,7 @@ t.args = {}"""
     check testGetVariableOk(variables, "o", "{}")
     check testGetVariableOk(variables, "l", "{}")
     check testGetVariableOk(variables, "g", "{}")
-    let eTea = """{"row":0,"version":"0.1.0","args":{}}"""
+    let eTea = """{"args":{},"row":0,"version":"0.1.0"}"""
     check testGetVariableOk(variables, "t", eTea)
 
   test "getVariable five":
@@ -312,9 +313,14 @@ prepostList = []"""
     check testAssignVariable("l", newValue(1), eWarningDataO)
     check testAssignVariable("t", newValue(1), eWarningDataO)
 
+  test "assignVariable wReadOnlyFunctions":
+    let eWarningDataO = some(newWarningData(wReadOnlyFunctions))
+    check testAssignVariable("f", newValue(1), eWarningDataO)
+    check testAssignVariable("f.a", newValue(1), eWarningDataO)
+
   test "assignVariable wReservedNameSpaces":
     let eWarningDataO = some(newWarningData(wReservedNameSpaces))
-    for letterVar in ["f", "i", "j", "k", "m", "n", "p", "q", "r", "u"]:
+    for letterVar in ["i", "j", "k", "m", "n", "p", "q", "r", "u"]:
       check testAssignVariable(letterVar, newValue(1), eWarningDataO)
 
   test "assignVariable not wReservedNameSpaces":

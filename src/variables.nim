@@ -67,24 +67,35 @@ func `$`*(v: VariableData): string =
   result = "dotName='$1', operator='$2', value=$3" % [
     v.dotNameStr, v.operator, $v.value]
 
-func emptyVariables*(server: VarsDict = nil, args: VarsDict = nil): Variables =
+func emptyVariables*(server: VarsDict = nil, args: VarsDict = nil,
+    funcs: VarsDict = nil): Variables =
   ## Create an empty variables object in its initial state.
+
+  # Add the standard dictionaries in alphabetical order.
   result = newVarsDict()
+
+  if funcs == nil:
+    result["f"] = newValue(newVarsDict())
+  else:
+    result["f"] = newValue(funcs)
+
+  result["g"] = newValue(newVarsDict())
+  result["l"] = newValue(newVarsDict())
+  result["o"] = newValue(newVarsDict())
+
   if server == nil:
     result["s"] = newValue(newVarsDict())
   else:
     result["s"] = newValue(server)
-  result["l"] = newValue(newVarsDict())
-  result["g"] = newValue(newVarsDict())
-  result["o"] = newValue(newVarsDict())
 
+  # Tea variables.
   var tea = newVarsDict()
-  tea["row"] = newValue(0)
-  tea["version"] = newValue(staticteaVersion)
   if args == nil:
     tea["args"] = newValue(newVarsDict())
   else:
     tea["args"] = newValue(args)
+  tea["row"] = newValue(0)
+  tea["version"] = newValue(staticteaVersion)
   result["t"] = newValue(tea)
 
 func getTeaVarIntDefault*(variables: Variables, varName: string): int64 =
@@ -148,7 +159,7 @@ proc getParentDictToAddTo(variables: Variables, dotNameStr: string):
 
   let names = split(dotNameStr, '.')
   assert names.len > 1
-  assert names[0] in ["g", "h", "l", "s", "o"]
+  assert names[0] in ["f", "g", "h", "l", "s", "o"]
 
   var parentDict: VarsDict
   var dictNames: seq[string]
@@ -285,7 +296,10 @@ proc assignVariable*(
         # You cannot assign to an existing variable.
         return some(newWarningData(wImmutableVars))
       varsDictOr = getParentDictToAddTo(variables, dotNameStr)
-    of "f", "h", "i", "j", "k", "m", "n", "p", "q", "r", "u":
+    of "f":
+        # You cannot assign to the functions dictionary.
+        return some(newWarningData(wReadOnlyFunctions))
+    of "h", "i", "j", "k", "m", "n", "p", "q", "r", "u":
       # The variables f, h - k, m - r, u are reserved variable names.
       return some(newWarningData(wReservedNameSpaces))
     else:
@@ -351,9 +365,9 @@ proc getVariable*(variables: Variables, dotNameStr: string): ValueOr =
   var names = split(dotNameStr, '.')
   let nameSpace = names[0]
   case nameSpace
-  of "g", "l", "s", "t", "o":
+  of "g", "l", "s", "t", "o", "f":
     discard
-  of "f", "h", "i", "j", "k", "m", "n", "p", "q", "r", "u":
+  of "h", "i", "j", "k", "m", "n", "p", "q", "r", "u":
     # The variables f, i, j, k, m, n, p, q, r, u are reserved variable names.
     return newValueOr(wReservedNameSpaces)
   else:

@@ -427,10 +427,10 @@ and the shared code has 0.
     let eErrLines = splitNewLines """
 template.html(1): w51: The function does not exist: notfunction.
 statement: cond1 = notfunction(4, 5)
-                   ^
+                               ^
 template.html(3): w51: The function does not exist: hello.
 statement: cond3 = hello(5, 4)
-                   ^
+                         ^
 """
     check testProcessTemplate(templateContent = templateContent, eRc = 1, eErrLines = eErrLines)
 

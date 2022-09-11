@@ -11,6 +11,12 @@ import variables
 # Unicode strings in multiple languages good for test cases.
 # https://www.cl.cam.ac.uk/~mgk25/ucs/examples/quickbrown.txt
 
+proc getFunc(functionName: string, parameters: seq[Value]): Option[Value] =
+  ## Get the func variable given its name and parameters.
+  let funcsVarDict = createFuncDictionary().dictv
+  let variables = emptyVariables(funcs = funcsVarDict)
+  result = getFunction(variables, functionName, parameters)
+
 proc testFunction(functionName: string, parameters: seq[Value],
     eFunResult: FunResult,
     variables: Variables = emptyVariables(),
@@ -19,12 +25,12 @@ proc testFunction(functionName: string, parameters: seq[Value],
     eOutLines: seq[string] = @[]
   ): bool =
 
-  let functionSpecO = getFunction(functionName, parameters)
-  if not functionSpecO.isSome:
+  let funcO = getFunc(functionName, parameters)
+  if not funcO.isSome:
     echo "The function doesn't exist: " & functionName
     return false
-  let functionSpec = functionSpecO.get()
-  let funResult = functionSpec.functionPtr(variables, parameters)
+  let function = funcO.get()
+  let funResult = function.funcv.functionPtr(variables, parameters)
 
   result = true
   if not expectedItem("funResult", funResult, eFunResult):
@@ -88,16 +94,16 @@ proc testAnchor(str: string, eStr: string): bool =
     let eFunResult = newFunResult(newValue(eStr))
     result = testFunction("githubAnchor", parameters, eFunResult)
 
-proc testGetFunctionExists(name: string, parameters: seq[Value],
+proc testGetFunctionExists(functionName: string, parameters: seq[Value],
     eSignatureCode: string): bool =
 
-  let functionSpecO = getFunction(name, parameters)
+  let funcO = getFunc(functionName, parameters)
   result = true
-  if not isSome(functionSpecO):
+  if not isSome(funcO):
     echo "No function with this name."
     return false
-  let functionSpec = functionSpecO.get()
-  if not expectedItem("eSignatureCode", functionSpec.signatureCode, eSignatureCode):
+  let function = funcO.get()
+  if not expectedItem("eSignatureCode", function.funcv.signatureCode, eSignatureCode):
     result = false
 
 proc testIntOk(num: Value, option: string, eIntNum: int): bool =
@@ -121,8 +127,8 @@ suite "runFunction.nim":
 
   test "getFunction missing":
     var parameters = @[newValue(1)]
-    let functionSpec = getFunction("notfunction", parameters)
-    check not isSome(functionSpec)
+    let funcO = getFunc("notfunction", parameters)
+    check not isSome(funcO)
 
   test "getFunction concat":
     var parameters = @[newValue(1), newValue(1)]
@@ -198,12 +204,12 @@ suite "runFunction.nim":
 
   test "len float":
     var parameters = @[newValue(3.4)]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "string")
+    let eFunResult = newFunResultWarn(wWrongType, 0, "dict")
     check testFunction("len", parameters, eFunResult)
 
   test "len int":
     var parameters = @[newValue(3)]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "string")
+    let eFunResult = newFunResultWarn(wWrongType, 0, "dict")
     check testFunction("len", parameters, eFunResult)
 
   test "len nothing":
@@ -301,7 +307,7 @@ suite "runFunction.nim":
 
   test "get wrong first parameter":
     var parameters = @[newValue(2), newValue(2)]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "list")
+    let eFunResult = newFunResultWarn(wWrongType, 0, "dict")
     check testFunction("get", parameters, eFunResult)
 
   test "get wrong second parameter":
@@ -372,7 +378,7 @@ suite "runFunction.nim":
 
   test "cmp not int, float or string":
     var parameters = @[newEmptyDictValue(), newEmptyDictValue()]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "int")
+    let eFunResult = newFunResultWarn(wWrongType, 0, "bool")
     check testFunction("cmp", parameters, eFunResult)
 
   test "cmp case insensitive wrong type":
@@ -452,7 +458,7 @@ suite "runFunction.nim":
 
   test "add string and int":
     var parameters = @[newValue("hi"), newValue(4)]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "int")
+    let eFunResult = newFunResultWarn(wWrongType, 0, "float")
     check testFunction("add", parameters, eFunResult)
 
   test "add int and string":
@@ -1430,7 +1436,7 @@ suite "runFunction.nim":
 
   test "githubAnchor: wrong kind of parameter":
     var parameters: seq[Value] = @[newValue(2)]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "string")
+    let eFunResult = newFunResultWarn(wWrongType, 0, "list")
     check testFunction("githubAnchor", parameters, eFunResult)
 
   test "githubAnchor list":

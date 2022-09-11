@@ -6,12 +6,12 @@ import readjson
 import vartypes
 import messages
 
-proc testDotNameRep(json: string, eDotNameRep: string): bool =
+proc testDotNameRep(json: string, eDotNameRep: string, top=false): bool =
   var valueOr = readJsonString(json)
   if valueOr.isMessage:
     echo valueOr.message
     return false
-  let dotNameRep = dotNameRep(valueOr.value.dictv)
+  let dotNameRep = dotNameRep(valueOr.value.dictv, top=top)
   if dotNameRep != eDotNameRep:
     echo "     got:\n$1" % dotNameRep
     echo ""
@@ -237,7 +237,7 @@ suite "vartypes":
     let expected = """
 b.c = {}
 a = 5"""
-    check testDotNameRep(json, expected)
+    check testDotNameRep(json, expected, top=true)
 
   test "dotNameRep empty l":
     let json = """
@@ -312,3 +312,11 @@ c.d = [7]"""
     let funResult = newFunResult(newValue("tea"))
     let funResult2 = newFunResult(newValue("tea"))
     check funResult == funResult2
+
+  test "new function":
+    func abc(variables: Variables, parameters: seq[Value]): FunResult =
+      result = newFunResult(newValue("hi"))
+    let function = newFunc("abc", abc, "iis")
+    check $function == "abc(ii)s"
+    let value = newValue(function)
+    check $value == "abc(ii)s"

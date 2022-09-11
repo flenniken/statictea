@@ -589,14 +589,15 @@ proc getFunctionValueAndLength*(
     return newValueAndLengthOr(newValue(0), pos-start)
 
   # Lookup the function.
-  let functionSpecO = getFunction(functionName, parameters)
-  if not isSome(functionSpecO):
+  let funcO = getFunction(variables, functionName, parameters)
+  if not isSome(funcO):
+    debugEcho("variables['f'].dictv.len = " & $variables["f"].dictv.len)
     # The function does not exist: $1.
     return newValueAndLengthOr(wInvalidFunction, functionName, start)
-  let functionSpec = functionSpecO.get()
+  let function = funcO.get()
 
   # Call the function.
-  let funResult = functionSpec.functionPtr(variables, parameters)
+  let funResult = function.funcv.functionPtr(variables, parameters)
   if funResult.kind == frWarning:
     var warningPos: int
     if funResult.parameter < parameterStarts.len:
@@ -946,10 +947,10 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
         let length = dotNameLen + andOrOr.value.length
         return newValueAndLengthOr(andOrOr.value.value, length)
 
-      if not skip:
-        if not isFunctionName(dotNameStr):
-          # The function does not exist: $1.
-          return newValueAndLengthOr(wInvalidFunction, dotNameStr, start)
+      # if not skip:
+      #   if not isFunctionName(dotNameStr):
+      #     # The function does not exist: $1.
+      #     return newValueAndLengthOr(wInvalidFunction, dotNameStr, start)
 
       let fvl = getFunctionValueAndLength(dotNameStr, statement,
         start+dotNameLen, variables, false, skip)

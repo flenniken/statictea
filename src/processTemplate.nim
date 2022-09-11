@@ -19,6 +19,7 @@ import readjson
 import replacement
 import opresultwarn
 import codefile
+import runFunction
 
 template getNewLineBuffer(env: Env): untyped =
   ## Get a new line buffer for the environment's template.
@@ -284,9 +285,10 @@ proc getStartingVariables(env: var Env, args: Args): Variables =
   # variables in the sense that they all exists somewhere in this
   # dictionary.
 
-  var serverVarDict = readJsonFiles(env, args.serverList)
-  var argsVarDict = getTeaArgs(args).dictv
-  result = emptyVariables(serverVarDict, argsVarDict)
+  let serverVarDict = readJsonFiles(env, args.serverList)
+  let argsVarDict = getTeaArgs(args).dictv
+  let funcsVarDict = createFuncDictionary().dictv
+  result = emptyVariables(serverVarDict, argsVarDict, funcsVarDict)
   runCodeFiles(env, result, args.codeList)
 
 proc getPrepostTable(args: Args): PrepostTable =
