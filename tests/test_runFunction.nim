@@ -2,7 +2,6 @@ import std/unittest
 import std/options
 import std/strutils
 import std/tables
-import env
 import vartypes
 import runFunction
 import messages
@@ -13,13 +12,12 @@ import sharedtestcode
 let funcsVarDict = createFuncDictionary().dictv
 
 proc testFunction(functionName: string, arguments: seq[Value],
-    eFunResult: FunResult,
-    variables: Variables = nil,
-    eLogLines: seq[string] = @[],
-    eErrLines: seq[string] = @[],
-    eOutLines: seq[string] = @[]
-  ): bool =
+    eFunResult: FunResult, variables: Variables = nil): bool =
+  ## Call the function with the given arguments and verify it returns
+  ## the expected results. If you don't pass in variables, variables
+  ## in the initial state are used.
 
+  # Set up variables when not passed in.
   var vars = variables
   if vars == nil:
     vars = emptyVariables(funcs = funcsVarDict)
@@ -30,6 +28,7 @@ proc testFunction(functionName: string, arguments: seq[Value],
     echo funcValueOr.message
     return false
 
+  # Get the function to match the arguments.
   funcValueOr = getBestFunction(funcValueOr.value, arguments)
   if funcValueOr.isMessage:
     echo funcValueOr.message
@@ -38,20 +37,12 @@ proc testFunction(functionName: string, arguments: seq[Value],
   # Call the function.
   let funResult = funcValueOr.value.funcv.functionPtr(vars, arguments)
 
-  result = true
-  if not expectedItem("funResult", funResult, eFunResult):
-    result = false
-    if funResult.kind == frValue and funResult.value.kind == vkDict:
-      echo "got:"
-      for k, v in funResult.value.dictv.pairs:
-        echo "  $1: '$2'" % [k, $v]
-    if eFunResult.kind == frValue and eFunResult.value.kind == vkDict:
-      echo "expected:"
-      for k, v in eFunResult.value.dictv.pairs:
-        echo "  $1: '$2'" % [k, $v]
+  # Verify it returned the expected results.
+  let test = "$1(args=$2)" % [functionName, $arguments]
+  result = gotExpected($funResult, $eFunResult, test)
 
 proc testPathGood(path, filename, basename, ext, dir: string, separator = ""): bool =
-    var parameters = @[newValue(path)]
+    var arguments = @[newValue(path)]
     var dict = newVarsDict()
     dict["filename"] = newValue(filename)
     dict["basename"] = newValue(basename)
@@ -59,88 +50,92 @@ proc testPathGood(path, filename, basename, ext, dir: string, separator = ""): b
     dict["dir"] = newValue(dir)
     let eFunResult = newFunResult(newValue(dict))
     if separator.len > 0:
-      parameters.add(newValue(separator))
-      result = testFunction("path", parameters, eFunResult)
+      arguments.add(newValue(separator))
+      result = testFunction("path", arguments, eFunResult)
     else:
-      result = testFunction("path", parameters, eFunResult)
+      result = testFunction("path", arguments, eFunResult)
 
 proc testCmpFun[T](a: T, b: T, caseInsensitive: bool = false, expected: int = 0): bool =
   ## Test the cmpFun
-  var parameters: seq[Value]
+  var arguments: seq[Value]
   if caseInsensitive:
-    parameters = @[newValue(a), newValue(b), newValue(caseInsensitive)]
+    arguments = @[newValue(a), newValue(b), newValue(caseInsensitive)]
   else:
-    parameters = @[newValue(a), newValue(b)]
+    arguments = @[newValue(a), newValue(b)]
   let eFunResult = newFunResult(newValue(expected))
-  result = testFunction("cmp", parameters, eFunResult)
+  result = testFunction("cmp", arguments, eFunResult)
 
 proc testCmpVersionGood(versionA: string, versionB: string, eResult: int): bool =
-  var parameters = @[newValue(versionA), newValue(versionB)]
+  var arguments = @[newValue(versionA), newValue(versionB)]
   let eFunResult = newFunResult(newValue(eResult))
-  result = testFunction("cmpVersion", parameters, eFunResult)
+  result = testFunction("cmpVersion", arguments, eFunResult)
 
 proc testReplaceGood(str: string, start: int, length: int, replace: string, eResult: string): bool =
-  var parameters: seq[Value] = @[newValue(str),
+  var arguments: seq[Value] = @[newValue(str),
     newValue(start), newValue(length), newValue(replace)]
   let eFunResult = newFunResult(newValue(eResult))
-  result = testFunction("replace", parameters, eFunResult)
+  result = testFunction("replace", arguments, eFunResult)
 
 proc testReplaceReGoodList(str: string, list: Value, eString: string): bool =
   let eFunResult = newFunResult(newValue(eString))
-  var parameters = @[newValue(str), list]
-  result = testFunction("replaceRe", parameters, eFunResult)
+  var arguments = @[newValue(str), list]
+  result = testFunction("replaceRe", arguments, eFunResult)
 
 proc testLower(str: string, eStr: string): bool =
-    var parameters = @[newValue(str)]
+    var arguments = @[newValue(str)]
     let eFunResult = newFunResult(newValue(eStr))
-    result = testFunction("lower", parameters, eFunResult)
+    result = testFunction("lower", arguments, eFunResult)
 
 proc testAnchor(str: string, eStr: string): bool =
-    var parameters = @[newValue(str)]
+    var arguments = @[newValue(str)]
     let eFunResult = newFunResult(newValue(eStr))
-    result = testFunction("githubAnchor", parameters, eFunResult)
+    result = testFunction("githubAnchor", arguments, eFunResult)
 
-proc testGetBestFunctionExists(functionName: string, parameters: seq[Value],
+proc testGetBestFunctionExists(functionName: string, arguments: seq[Value],
     eSignatureCode: string): bool =
-
+  ## Call getBestFunction with an existing function name with the
+  ## given arguments. Verify it returns a function with the expected
+  ## signature code.
   let variables = emptyVariables(funcs = funcsVarDict)
   var funcValueOr = getVariable(variables, functionName)
   if funcValueOr.isMessage:
     echo funcValueOr.message
     return false
 
-  funcValueOr = getBestFunction(funcValueOr.value, parameters)
+  funcValueOr = getBestFunction(funcValueOr.value, arguments)
   result = true
   if funcValueOr.isMessage:
     echo funcValueOr.message
     return false
   let signatureCode = funcValueOr.value.funcv.signatureCode
-  if not expectedItem("eSignatureCode", signatureCode, eSignatureCode):
-    result = false
 
-proc testGetBestFunction(value: Value, parameters: seq[Value],
+  let test = "$1(args=$2)" % [functionName, $arguments]
+  result = gotExpected(signatureCode, eSignatureCode, test)
+
+proc testGetBestFunction(value: Value, arguments: seq[Value],
     eFuncValueOr: ValueOr): bool =
-  let funcValueOr = getBestFunction(value, parameters)
+  let funcValueOr = getBestFunction(value, arguments)
   result = gotExpected($funcValueOr, $eFuncValueOr)
 
 proc testIntOk(num: Value, option: string, eIntNum: int): bool =
-  var parameters = @[newValue(num), newValue(option)]
+  var arguments = @[newValue(num), newValue(option)]
   let eFunResult = newFunResult(newValue(eIntNum))
-  if testFunction("int", parameters, eFunResult):
+  if testFunction("int", arguments, eFunResult):
     result = true
 
 proc testStartsWith(str: string, prefix: string, eBool: bool): bool =
-  var parameters = @[newValue(str), newValue(prefix)]
+  var arguments = @[newValue(str), newValue(prefix)]
   let eFunResult = newFunResult(newValue(eBool))
-  if testFunction("startsWith", parameters, eFunResult):
+  if testFunction("startsWith", arguments, eFunResult):
     result = true
 
 proc testComp(a: int|float|string, op: string, b: int|float|string, eResult: bool): bool =
-  var parameters = @[newValue(a), newValue(b)]
+  var arguments = @[newValue(a), newValue(b)]
   let eFunResult = newFunResult(newValue(eResult))
-  result = testFunction(op, parameters, eFunResult)
+  result = testFunction(op, arguments, eFunResult)
 
-func abc(variables: Variables, parameters: seq[Value]): FunResult =
+func abc(variables: Variables, arguments: seq[Value]): FunResult =
+  ## Do nothing test function.
   result = newFunResult(newValue("hi"))
 
 suite "runFunction.nim":
@@ -188,208 +183,208 @@ suite "runFunction.nim":
     check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(wNotFunction))
 
   test "getFunction concat":
-    var parameters = @[newValue(1), newValue(1)]
-    check testGetBestFunctionExists("concat", parameters, "sss")
+    var arguments = @[newValue(1), newValue(1)]
+    check testGetBestFunctionExists("concat", arguments, "sss")
 
   test "getFunction cmp ints":
-    var parameters = @[newValue(1), newValue(1)]
-    check testGetBestFunctionExists("cmp", parameters, "iii")
+    var arguments = @[newValue(1), newValue(1)]
+    check testGetBestFunctionExists("cmp", arguments, "iii")
 
   test "getFunction cmp floats":
-    var parameters = @[newValue(1.0), newValue(1.0)]
-    check testGetBestFunctionExists("cmp", parameters, "ffi")
+    var arguments = @[newValue(1.0), newValue(1.0)]
+    check testGetBestFunctionExists("cmp", arguments, "ffi")
 
   test "getFunction cmp strings":
-    var parameters = @[newValue("a"), newValue("b")]
-    check testGetBestFunctionExists("cmp", parameters, "ssobi")
-    parameters = @[newValue("a"), newValue("b"), newValue(true)]
-    check testGetBestFunctionExists("cmp", parameters, "ssobi")
+    var arguments = @[newValue("a"), newValue("b")]
+    check testGetBestFunctionExists("cmp", arguments, "ssobi")
+    arguments = @[newValue("a"), newValue("b"), newValue(true)]
+    check testGetBestFunctionExists("cmp", arguments, "ssobi")
 
   test "getFunction cmp miss match":
-    var parameters = @[newValue(1), newValue(1.0)]
-    check testGetBestFunctionExists("cmp", parameters, "iii")
+    var arguments = @[newValue(1), newValue(1.0)]
+    check testGetBestFunctionExists("cmp", arguments, "iii")
 
   test "getFunction float":
-    var parameters = @[newValue("1.0"), newValue("default")]
-    check testGetBestFunctionExists("float", parameters, "saa")
+    var arguments = @[newValue("1.0"), newValue("default")]
+    check testGetBestFunctionExists("float", arguments, "saa")
 
   test "concat hello world":
-    var parameters = newValue(["Hello", " World"]).listv
+    var arguments = newValue(["Hello", " World"]).listv
     let eFunResult = newFunResult(newValue("Hello World"))
-    check testFunction("concat", parameters, eFunResult)
+    check testFunction("concat", arguments, eFunResult)
 
   test "concat empty string":
-    var parameters = newValue(["abc", ""]).listv
+    var arguments = newValue(["abc", ""]).listv
     let eFunResult = newFunResult(newValue("abc"))
-    check testFunction("concat", parameters, eFunResult)
+    check testFunction("concat", arguments, eFunResult)
 
   test "concat nothing":
-    var parameters: seq[Value]
+    var arguments: seq[Value]
     let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "2")
-    check testFunction("concat", parameters, eFunResult)
+    check testFunction("concat", arguments, eFunResult)
 
   test "len string":
-    var parameters = newValue(["abc"]).listv
+    var arguments = newValue(["abc"]).listv
     let eFunResult = newFunResult(newValue(3))
-    check testFunction("len", parameters, eFunResult)
+    check testFunction("len", arguments, eFunResult)
 
   test "len unicode string":
     # The byte length is different than the number of unicode characters.
     let str = "añyóng"
     check str.len == 8
-    var parameters = newValue([str]).listv
+    var arguments = newValue([str]).listv
     let eFunResult = newFunResult(newValue(6))
-    check testFunction("len", parameters, eFunResult)
+    check testFunction("len", arguments, eFunResult)
 
   test "len list":
     var list = newValue([5, 3]).listv
-    var parameters = @[newValue(list)]
+    var arguments = @[newValue(list)]
     let eFunResult = newFunResult(newValue(2))
-    check testFunction("len", parameters, eFunResult)
+    check testFunction("len", arguments, eFunResult)
 
   test "len dict":
     var dict = newValue([("a", 5), ("b", 5)]).dictv
-    var parameters = @[newValue(dict)]
+    var arguments = @[newValue(dict)]
     let eFunResult = newFunResult(newValue(2))
-    check testFunction("len", parameters, eFunResult)
+    check testFunction("len", arguments, eFunResult)
 
   test "len strings":
     var list = newValue(["5", "3", "hi"])
-    var parameters = @[newValue(list)]
+    var arguments = @[newValue(list)]
     let eFunResult = newFunResult(newValue(3))
-    check testFunction("len", parameters, eFunResult)
+    check testFunction("len", arguments, eFunResult)
 
   test "len float":
-    var parameters = @[newValue(3.4)]
+    var arguments = @[newValue(3.4)]
     let eFunResult = newFunResultWarn(wWrongType, 0, "dict")
-    check testFunction("len", parameters, eFunResult)
+    check testFunction("len", arguments, eFunResult)
 
   test "len int":
-    var parameters = @[newValue(3)]
+    var arguments = @[newValue(3)]
     let eFunResult = newFunResultWarn(wWrongType, 0, "dict")
-    check testFunction("len", parameters, eFunResult)
+    check testFunction("len", arguments, eFunResult)
 
   test "len nothing":
-    var parameters: seq[Value] = @[]
+    var arguments: seq[Value] = @[]
     let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "1")
-    check testFunction("len", parameters, eFunResult)
+    check testFunction("len", arguments, eFunResult)
 
   test "len 2":
-    var parameters = newValue([3, 2]).listv
+    var arguments = newValue([3, 2]).listv
     let eFunResult = newFunResultWarn(wTooManyArgs, 0, "1")
-    check testFunction("len", parameters, eFunResult)
+    check testFunction("len", arguments, eFunResult)
 
   test "get list item":
     var list = newValue([1, 2, 3, 4, 5])
-    var parameters = @[list, newValue(0)]
+    var arguments = @[list, newValue(0)]
     let eFunResult = newFunResult(newValue(1))
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get list item -1":
     var list = newValue([1, 2, 3, 4, 5])
-    var parameters = @[list, newValue(-1)]
+    var arguments = @[list, newValue(-1)]
     let eFunResult = newFunResult(newValue(5))
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get list item -2":
     var list = newValue([1, 2, 3, 4, 5])
-    var parameters = @[list, newValue(-2)]
+    var arguments = @[list, newValue(-2)]
     let eFunResult = newFunResult(newValue(4))
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get list default":
     var list = newValue([1, 2, 3, 4, 5])
-    var parameters = @[list, newValue(5), newValue(100)]
+    var arguments = @[list, newValue(5), newValue(100)]
     let eFunResult = newFunResult(newValue(100))
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get list invalid index":
     var list = newValue([1, 2, 3, 4, 5])
-    var parameters = @[list, newValue(12)]
+    var arguments = @[list, newValue(12)]
     let eFunResult = newFunResultWarn(wMissingListItem, 1, "12")
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get list invalid -6":
     var list = newValue([1, 2, 3, 4, 5])
-    var parameters = @[list, newValue(-6)]
+    var arguments = @[list, newValue(-6)]
     let eFunResult = newFunResultWarn(wMissingListItem, 1, "-6")
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get dict item":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
-    var parameters = @[dict, newValue("b")]
+    var arguments = @[dict, newValue("b")]
     let eFunResult = newFunResult(newValue(2))
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get dict default":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
-    var parameters = @[dict, newValue("t"), newValue("hi")]
+    var arguments = @[dict, newValue("t"), newValue("hi")]
     let eFunResult = newFunResult(newValue("hi"))
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get dict item missing":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
-    var parameters = @[dict, newValue("p")]
+    var arguments = @[dict, newValue("p")]
     let eFunResult = newFunResultWarn(wMissingDictItem, 1, "p")
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get one parameter":
     var list = newValue([1, 2, 3, 4, 5])
-    var parameters = @[list]
+    var arguments = @[list]
     let eFunResult = newFunResultWarn(wNotEnoughArgsOpt, 0, "2")
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
-  test "get 4 parameters":
+  test "get 4 arguments":
     var list = newValue([1, 2, 3, 4, 5])
     let p = newValue(1)
-    var parameters = @[list, p, p, p]
+    var arguments = @[list, p, p, p]
     let eFunResult = newFunResultWarn(wTooManyArgsOpt, 0, "3")
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get parameter 2 wrong type":
     var list = newValue([1, 2, 3, 4, 5])
-    var parameters = @[list, newValue("a")]
+    var arguments = @[list, newValue("a")]
     let eFunResult = newFunResultWarn(wWrongType, 1, "int")
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get warning about best matching get":
     # Test the warning is about the function that makes it through the
-    # most number of parameters. The second get function has a dict as
+    # most number of arguments. The second get function has a dict as
     # the first parameter so the warning should be about the wrong
     # second parameter.
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
-    var parameters = @[dict, newValue(3.5)]
+    var arguments = @[dict, newValue(3.5)]
     let eFunResult = newFunResultWarn(wWrongType, 1, "string")
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get wrong first parameter":
-    var parameters = @[newValue(2), newValue(2)]
+    var arguments = @[newValue(2), newValue(2)]
     let eFunResult = newFunResultWarn(wWrongType, 0, "dict")
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get wrong second parameter":
     var list = newValue([1, 2, 3, 4, 5])
-    var parameters = @[list, newValue("a")]
+    var arguments = @[list, newValue("a")]
     let eFunResult = newFunResultWarn(wWrongType, 1, "int")
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get invalid index":
     var list = newValue([1, 2, 3, 4, 5])
-    var parameters = @[list, newValue(5)]
+    var arguments = @[list, newValue(5)]
     let eFunResult = newFunResultWarn(wMissingListItem, 1, "5")
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get invalid index 2":
     var list = newValue([1, 2, 3, 4, 5])
-    var parameters = @[list, newValue(-6)]
+    var arguments = @[list, newValue(-6)]
     let eFunResult = newFunResultWarn(wMissingListItem, 1, "-6")
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "get invalid index with default":
     var list = newValue([1, 2, 3, 4, 5])
-    var parameters = @[list, newValue(5), newValue("hi")]
+    var arguments = @[list, newValue(5), newValue("hi")]
     let eFunResult = newFunResult(newValue("hi"))
-    check testFunction("get", parameters, eFunResult)
+    check testFunction("get", arguments, eFunResult)
 
   test "cmp ints":
     check testCmpFun(1, 1, expected = 0)
@@ -423,138 +418,138 @@ suite "runFunction.nim":
     check testCmpFun("abc", "ABD", true, expected = -1)
     check testCmpFun("ABD", "abc", true, expected = 1)
 
-  test "cmp wrong number parameters":
-    var parameters = @[newValue(4)]
+  test "cmp wrong number arguments":
+    var arguments = @[newValue(4)]
     let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "2")
-    check testFunction("cmp", parameters, eFunResult)
+    check testFunction("cmp", arguments, eFunResult)
 
   test "cmp not same kind":
-    var parameters = @[newValue(4), newValue(4.2)]
+    var arguments = @[newValue(4), newValue(4.2)]
     let eFunResult = newFunResultWarn(wWrongType, 1, "int")
-    check testFunction("cmp", parameters, eFunResult)
+    check testFunction("cmp", arguments, eFunResult)
 
   test "cmp not int, float or string":
-    var parameters = @[newEmptyDictValue(), newEmptyDictValue()]
+    var arguments = @[newEmptyDictValue(), newEmptyDictValue()]
     let eFunResult = newFunResultWarn(wWrongType, 0, "bool")
-    check testFunction("cmp", parameters, eFunResult)
+    check testFunction("cmp", arguments, eFunResult)
 
   test "cmp case insensitive not bool":
-    var parameters = @[newValue("tea"), newValue("Tea"), newValue(2)]
+    var arguments = @[newValue("tea"), newValue("Tea"), newValue(2)]
     let eFunResult = newFunResultWarn(wWrongType, 2, "bool")
-    check testFunction("cmp", parameters, eFunResult)
+    check testFunction("cmp", arguments, eFunResult)
 
   test "cmp case insensitive default":
-    var parameters = @[newValue("tea"), newValue("Tea")]
+    var arguments = @[newValue("tea"), newValue("Tea")]
     let eFunResult = newFunResult(newValue(1))
-    check testFunction("cmp", parameters, eFunResult)
+    check testFunction("cmp", arguments, eFunResult)
 
   test "if0 function 0":
-    var parameters = @[newValue(0), newValue("then"), newValue("else")]
+    var arguments = @[newValue(0), newValue("then"), newValue("else")]
     let eFunResult = newFunResult(newValue("then"))
-    check testFunction("if0", parameters, eFunResult)
+    check testFunction("if0", arguments, eFunResult)
 
   test "if0 function no else":
-    var parameters = @[newValue(0), newValue("then")]
+    var arguments = @[newValue(0), newValue("then")]
     let eFunResult = newFunResult(newValue("then"))
-    check testFunction("if0", parameters, eFunResult)
+    check testFunction("if0", arguments, eFunResult)
 
   test "if0 function no else taken":
-    var parameters = @[newValue(1), newValue("then")]
+    var arguments = @[newValue(1), newValue("then")]
     let eFunResult = newFunResult(newValue(0))
-    check testFunction("if0", parameters, eFunResult)
+    check testFunction("if0", arguments, eFunResult)
 
   test "if0 function not 0":
-    var parameters = @[newValue(33), newValue("then"), newValue("else")]
+    var arguments = @[newValue(33), newValue("then"), newValue("else")]
     let eFunResult = newFunResult(newValue("else"))
-    check testFunction("if0", parameters, eFunResult)
+    check testFunction("if0", arguments, eFunResult)
 
   test "if function true":
-    var parameters = @[newValue(true), newValue("then"), newValue("else")]
+    var arguments = @[newValue(true), newValue("then"), newValue("else")]
     let eFunResult = newFunResult(newValue("then"))
-    check testFunction("if", parameters, eFunResult)
+    check testFunction("if", arguments, eFunResult)
 
   test "if function no else":
-    var parameters = @[newValue(true), newValue("then")]
+    var arguments = @[newValue(true), newValue("then")]
     let eFunResult = newFunResult(newValue("then"))
-    check testFunction("if", parameters, eFunResult)
+    check testFunction("if", arguments, eFunResult)
 
   test "if function no else taken":
-    var parameters = @[newValue(false), newValue("then")]
+    var arguments = @[newValue(false), newValue("then")]
     let eFunResult = newFunResult(newValue(0))
-    check testFunction("if", parameters, eFunResult)
+    check testFunction("if", arguments, eFunResult)
 
   test "if function not false":
-    var parameters = @[newValue(false), newValue("then"), newValue("else")]
+    var arguments = @[newValue(false), newValue("then"), newValue("else")]
     let eFunResult = newFunResult(newValue("else"))
-    check testFunction("if", parameters, eFunResult)
+    check testFunction("if", arguments, eFunResult)
 
   test "add 1 + 2":
-    var parameters = @[newValue(1), newValue(2)]
+    var arguments = @[newValue(1), newValue(2)]
     let eFunResult = newFunResult(newValue(3))
-    check testFunction("add", parameters, eFunResult)
+    check testFunction("add", arguments, eFunResult)
 
   test "add 1 - 4":
-    var parameters = @[newValue(1), newValue(-4)]
+    var arguments = @[newValue(1), newValue(-4)]
     let eFunResult = newFunResult(newValue(-3))
-    check testFunction("add", parameters, eFunResult)
+    check testFunction("add", arguments, eFunResult)
 
   test "add 1.5 + 2.3":
-    var parameters = @[newValue(1.5), newValue(2.3)]
+    var arguments = @[newValue(1.5), newValue(2.3)]
     let eFunResult = newFunResult(newValue(3.8))
-    check testFunction("add", parameters, eFunResult)
+    check testFunction("add", arguments, eFunResult)
 
   test "add 3.3 - 2.2 = 1.1":
-    var parameters = @[newValue(3.5), newValue(-2.5)]
+    var arguments = @[newValue(3.5), newValue(-2.5)]
     let eFunResult = newFunResult(newValue(1.0))
-    check testFunction("add", parameters, eFunResult)
+    check testFunction("add", arguments, eFunResult)
 
-  test "add no parameters":
-    var parameters: seq[Value] = @[]
+  test "add no arguments":
+    var arguments: seq[Value] = @[]
     let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "2")
-    check testFunction("add", parameters, eFunResult)
+    check testFunction("add", arguments, eFunResult)
 
   test "add string and int":
-    var parameters = @[newValue("hi"), newValue(4)]
+    var arguments = @[newValue("hi"), newValue(4)]
     let eFunResult = newFunResultWarn(wWrongType, 0, "float")
-    check testFunction("add", parameters, eFunResult)
+    check testFunction("add", arguments, eFunResult)
 
   test "add int and string":
-    var parameters = @[newValue(4), newValue("hi")]
+    var arguments = @[newValue(4), newValue("hi")]
     let eFunResult = newFunResultWarn(wWrongType, 1, "int")
-    check testFunction("add", parameters, eFunResult)
+    check testFunction("add", arguments, eFunResult)
 
   test "add int and float":
-    var parameters = @[newValue(4), newValue(1.3)]
+    var arguments = @[newValue(4), newValue(1.3)]
     let eFunResult = newFunResultWarn(wWrongType, 1, "int")
-    check testFunction("add", parameters, eFunResult)
+    check testFunction("add", arguments, eFunResult)
 
   test "add int64 overflow":
-    var parameters = @[newValue(high(int64)), newValue(1)]
+    var arguments = @[newValue(high(int64)), newValue(1)]
     let eFunResult = newFunResultWarn(wOverflow)
-    check testFunction("add", parameters, eFunResult)
+    check testFunction("add", arguments, eFunResult)
 
   test "add int64 underflow":
-    var parameters = @[newValue(low(int64)), newValue(-1)]
+    var arguments = @[newValue(low(int64)), newValue(-1)]
     let eFunResult = newFunResultWarn(wOverflow)
-    check testFunction("add", parameters, eFunResult)
+    check testFunction("add", arguments, eFunResult)
 
   test "add float64 overflow":
     var big = 1.7976931348623158e+308
-    var parameters = @[newValue(big), newValue(big)]
+    var arguments = @[newValue(big), newValue(big)]
     let eFunResult = newFunResultWarn(wOverflow)
-    check testFunction("add", parameters, eFunResult)
+    check testFunction("add", arguments, eFunResult)
 
   test "exists true":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
-    var parameters = @[dict, newValue("b")]
+    var arguments = @[dict, newValue("b")]
     let eFunResult = newFunResult(newValue(true))
-    check testFunction("exists", parameters, eFunResult)
+    check testFunction("exists", arguments, eFunResult)
 
   test "exists false":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
-    var parameters = @[dict, newValue("z")]
+    var arguments = @[dict, newValue("z")]
     let eFunResult = newFunResult(newValue(false))
-    check testFunction("exists", parameters, eFunResult)
+    check testFunction("exists", arguments, eFunResult)
 
   test "case int":
     var cases = newValue([
@@ -564,40 +559,40 @@ suite "runFunction.nim":
       newValue(8), newValue("v8"),
       newValue(9), newValue("v9"),
     ])
-    var parameters = @[newValue(5), cases]
+    var arguments = @[newValue(5), cases]
     var eFunResult = newFunResult(newValue("v5"))
-    check testFunction("case", parameters, eFunResult)
+    check testFunction("case", arguments, eFunResult)
 
   test "case int using else":
     var cases = newValue([
       newValue(5), newValue("v5"),
     ])
-    var parameters = @[newValue(11), cases, newValue("else")]
+    var arguments = @[newValue(11), cases, newValue("else")]
     let eFunResult = newFunResult(newValue("else"))
-    check testFunction("case", parameters, eFunResult)
+    check testFunction("case", arguments, eFunResult)
 
   test "case empty list":
     let cases = newEmptyListValue()
-    var parameters = @[newValue(11), cases, newValue("else")]
+    var arguments = @[newValue(11), cases, newValue("else")]
     let eFunResult = newFunResult(newValue("else"))
-    check testFunction("case", parameters, eFunResult)
+    check testFunction("case", arguments, eFunResult)
 
   test "case int else needed":
     var cases = newValue([
       newValue(5), newValue("v5"),
     ])
-    var parameters = @[newValue(11), cases]
+    var arguments = @[newValue(11), cases]
     let eFunResult = newFunResultWarn(wMissingElse, 2)
-    check testFunction("case", parameters, eFunResult)
+    check testFunction("case", arguments, eFunResult)
 
   test "case string":
     var cases = newValue([
       newValue("5"), newValue("v5"),
       newValue("9"), newValue("v9"),
     ])
-    var parameters = @[newValue("5"), cases]
+    var arguments = @[newValue("5"), cases]
     var eFunResult = newFunResult(newValue("v5"))
-    check testFunction("case", parameters, eFunResult)
+    check testFunction("case", arguments, eFunResult)
 
   test "case multiple matches":
     var cases = newValue([
@@ -607,44 +602,44 @@ suite "runFunction.nim":
       newValue("5"), newValue("second5"),
       newValue("9"), newValue("v9"),
     ])
-    var parameters = @[newValue("5"), cases]
+    var arguments = @[newValue("5"), cases]
     let eFunResult = newFunResult(newValue("first5"))
-    check testFunction("case", parameters, eFunResult)
+    check testFunction("case", arguments, eFunResult)
 
   test "case invalid main condition":
     var cases = newValue([
       newValue(7), newValue("v7"),
     ])
-    var parameters = @[newValue(1.2), cases]
+    var arguments = @[newValue(1.2), cases]
     let eFunResult = newFunResultWarn(wWrongType, 0, "int")
-    check testFunction("case", parameters, eFunResult)
+    check testFunction("case", arguments, eFunResult)
 
   test "case invalid condition":
     var cases = newValue([
       newValue(3.5), newValue(9),
       newValue(5), newValue(8),
     ])
-    var parameters = @[newValue(5), cases]
+    var arguments = @[newValue(5), cases]
     let eFunResult = newFunResultWarn(wCaseTypeMismatch)
-    check testFunction("case", parameters, eFunResult)
+    check testFunction("case", arguments, eFunResult)
 
   test "case main case different type":
     var cases = newValue([
       newValue(5), newValue(5),
       newValue(9), newValue(9),
     ])
-    var parameters = @[newValue("a"), cases]
+    var arguments = @[newValue("a"), cases]
     let eFunResult = newFunResultWarn(wCaseTypeMismatch)
-    check testFunction("case", parameters, eFunResult)
+    check testFunction("case", arguments, eFunResult)
 
   test "case odd number of case items":
     var cases = newValue([
       newValue(5), newValue(5),
       newValue(9),
     ])
-    var parameters = @[newValue(5), cases]
+    var arguments = @[newValue(5), cases]
     let eFunResult = newFunResultWarn(wNotEvenCases, 1, "3")
-    check testFunction("case", parameters, eFunResult)
+    check testFunction("case", arguments, eFunResult)
 
   test "int() float to int":
     check testIntOk(newValue(2.34), "round", 2)
@@ -657,19 +652,19 @@ suite "runFunction.nim":
     check testIntOk(newValue(-6.3456), "truncate", -6)
 
   test "int() with default":
-    var parameters = @[newValue("5"), newValue("round"), newValue("nan")]
+    var arguments = @[newValue("5"), newValue("round"), newValue("nan")]
     let eFunResult = newFunResult(newValue(5))
-    check testFunction("int", parameters, eFunResult)
+    check testFunction("int", arguments, eFunResult)
 
   test "int() with default 2":
-    var parameters = @[newValue("5.4"), newValue("round"), newValue("nan")]
+    var arguments = @[newValue("5.4"), newValue("round"), newValue("nan")]
     let eFunResult = newFunResult(newValue(5))
-    check testFunction("int", parameters, eFunResult)
+    check testFunction("int", arguments, eFunResult)
 
   test "int() not a number":
-    var parameters = @[newValue("notnum"), newValue("round"), newValue("nan")]
+    var arguments = @[newValue("notnum"), newValue("round"), newValue("nan")]
     let eFunResult = newFunResult(newValue("nan"))
-    check testFunction("int", parameters, eFunResult)
+    check testFunction("int", arguments, eFunResult)
 
   test "int() float number string to int":
     check testIntOk(newValue("2.34"), "round", 2)
@@ -686,304 +681,304 @@ suite "runFunction.nim":
     check testIntOk(newValue("-2"), "round", -2)
 
   test "int(): default":
-    var parameters = @[newValue(4.57)]
+    var arguments = @[newValue(4.57)]
     let eFunResult = newFunResult(newValue(5))
-    check testFunction("int", parameters, eFunResult)
+    check testFunction("int", arguments, eFunResult)
 
-  test "int(): wrong number of parameters":
-    var parameters = @[newValue(4.57), newValue(1), newValue(2)]
+  test "int(): wrong number of arguments":
+    var arguments = @[newValue(4.57), newValue(1), newValue(2)]
     let eFunResult = newFunResultWarn(wTooManyArgsOpt, 0, "2")
-    check testFunction("int", parameters, eFunResult)
+    check testFunction("int", arguments, eFunResult)
 
   test "int(): not a number string":
-    var parameters = @[newValue("hello"), newValue("round")]
+    var arguments = @[newValue("hello"), newValue("round")]
     let eFunResult = newFunResultWarn(wExpectedNumberString)
-    check testFunction("int", parameters, eFunResult)
+    check testFunction("int", arguments, eFunResult)
 
   test "int(): not a float":
-    var parameters = @[newValue(3), newValue("round")]
+    var arguments = @[newValue(3), newValue("round")]
     let eFunResult = newFunResultWarn(wWrongType, 0, "float")
-    check testFunction("int", parameters, eFunResult)
+    check testFunction("int", arguments, eFunResult)
 
   test "int(): not round option":
-    var parameters = @[newValue(3.4), newValue(5)]
+    var arguments = @[newValue(3.4), newValue(5)]
     let eFunResult = newFunResultWarn(wWrongType, 1, "string")
-    check testFunction("int", parameters, eFunResult)
+    check testFunction("int", arguments, eFunResult)
 
   test "int(): not a float":
-    var parameters = @[newValue(3.5), newValue("rounder")]
+    var arguments = @[newValue(3.5), newValue("rounder")]
     let eFunResult = newFunResultWarn(wExpectedRoundOption, 1)
-    check testFunction("int", parameters, eFunResult)
+    check testFunction("int", arguments, eFunResult)
 
   test "int(): to big":
-    var parameters = @[newValue(3.5e300), newValue("round")]
+    var arguments = @[newValue(3.5e300), newValue("round")]
     let eFunResult = newFunResultWarn(wNumberOverFlow)
-    check testFunction("int", parameters, eFunResult)
+    check testFunction("int", arguments, eFunResult)
 
   test "int(): to small":
-    var parameters = @[newValue(-3.5e300), newValue("round")]
+    var arguments = @[newValue(-3.5e300), newValue("round")]
     let eFunResult = newFunResultWarn(wNumberOverFlow)
-    check testFunction("int", parameters, eFunResult)
+    check testFunction("int", arguments, eFunResult)
 
   test "to float":
-    var parameters = @[newValue(3)]
+    var arguments = @[newValue(3)]
     let eFunResult = newFunResult(newValue(3.0))
-    check testFunction("float", parameters, eFunResult)
+    check testFunction("float", arguments, eFunResult)
 
   test "to float with default":
-    var parameters = @[newValue("3"), newValue("nan")]
+    var arguments = @[newValue("3"), newValue("nan")]
     let eFunResult = newFunResult(newValue(3.0))
-    check testFunction("float", parameters, eFunResult)
+    check testFunction("float", arguments, eFunResult)
 
   test "to float not a number":
-    var parameters = @[newValue("notnum"), newValue("nan")]
+    var arguments = @[newValue("notnum"), newValue("nan")]
     let eFunResult = newFunResult(newValue("nan"))
-    check testFunction("float", parameters, eFunResult)
+    check testFunction("float", arguments, eFunResult)
 
   test "to float minus":
-    var parameters = @[newValue(-3)]
+    var arguments = @[newValue(-3)]
     let eFunResult = newFunResult(newValue(-3.0))
-    check testFunction("float", parameters, eFunResult)
+    check testFunction("float", arguments, eFunResult)
 
   test "to float from string":
-    var parameters = @[newValue("-3")]
+    var arguments = @[newValue("-3")]
     let eFunResult = newFunResult(newValue(-3.0))
-    check testFunction("float", parameters, eFunResult)
+    check testFunction("float", arguments, eFunResult)
 
   test "to float from string 2":
-    var parameters = @[newValue("-3.5")]
+    var arguments = @[newValue("-3.5")]
     let eFunResult = newFunResult(newValue(-3.5))
-    check testFunction("float", parameters, eFunResult)
+    check testFunction("float", arguments, eFunResult)
 
-  test "to float wrong number parameters":
-    var parameters = @[newValue(4), newValue(3)]
+  test "to float wrong number arguments":
+    var arguments = @[newValue(4), newValue(3)]
     let eFunResult = newFunResultWarn(wTooManyArgs, 0, "1")
-    check testFunction("float", parameters, eFunResult)
+    check testFunction("float", arguments, eFunResult)
 
   test "to float warning":
-    var parameters = @[newValue("abc")]
+    var arguments = @[newValue("abc")]
     let eFunResult = newFunResultWarn(wExpectedNumberString)
-    check testFunction("float", parameters, eFunResult)
+    check testFunction("float", arguments, eFunResult)
 
   test "find":
-    var parameters = @[newValue("Tea time at 4:00."), newValue("time")]
+    var arguments = @[newValue("Tea time at 4:00."), newValue("time")]
     let eFunResult = newFunResult(newValue(4))
-    check testFunction("find", parameters, eFunResult)
+    check testFunction("find", arguments, eFunResult)
 
   test "find start":
-    var parameters = @[newValue("Tea time at 4:00."), newValue("Tea")]
+    var arguments = @[newValue("Tea time at 4:00."), newValue("Tea")]
     let eFunResult = newFunResult(newValue(0))
-    check testFunction("find", parameters, eFunResult)
+    check testFunction("find", arguments, eFunResult)
 
   test "find end":
-    var parameters = @[newValue("Tea time at 4:00."), newValue("00.")]
+    var arguments = @[newValue("Tea time at 4:00."), newValue("00.")]
     let eFunResult = newFunResult(newValue(14))
-    check testFunction("find", parameters, eFunResult)
+    check testFunction("find", arguments, eFunResult)
 
   test "find missing":
-    var parameters = newValue(["Tea time at 4:00.", "party", "3:00"]).listv
+    var arguments = newValue(["Tea time at 4:00.", "party", "3:00"]).listv
     let eFunResult = newFunResult(newValue("3:00"))
-    check testFunction("find", parameters, eFunResult)
+    check testFunction("find", arguments, eFunResult)
 
   test "find bigger":
-    var parameters = newValue(["big", "bigger", "smaller"]).listv
+    var arguments = newValue(["big", "bigger", "smaller"]).listv
     let eFunResult = newFunResult(newValue("smaller"))
-    check testFunction("find", parameters, eFunResult)
+    check testFunction("find", arguments, eFunResult)
 
   test "find nothing":
-    var parameters = @[newValue("big"), newValue("")]
+    var arguments = @[newValue("big"), newValue("")]
     let eFunResult = newFunResult(newValue(0))
-    check testFunction("find", parameters, eFunResult)
+    check testFunction("find", arguments, eFunResult)
 
   test "find from nothing":
-    var parameters = @[newValue(""), newValue("")]
+    var arguments = @[newValue(""), newValue("")]
     let eFunResult = newFunResult(newValue(0))
-    check testFunction("find", parameters, eFunResult)
+    check testFunction("find", arguments, eFunResult)
 
   test "find from nothing 2":
-    var parameters = @[newValue(""), newValue("2"), newValue(0)]
+    var arguments = @[newValue(""), newValue("2"), newValue(0)]
     let eFunResult = newFunResult(newValue(0))
-    check testFunction("find", parameters, eFunResult)
+    check testFunction("find", arguments, eFunResult)
 
   test "find missing no default":
-    var parameters = @[newValue("Tea time at 4:00."), newValue("aTea")]
+    var arguments = @[newValue("Tea time at 4:00."), newValue("aTea")]
     let eFunResult = newFunResultWarn(wSubstringNotFound, 1)
-    check testFunction("find", parameters, eFunResult)
+    check testFunction("find", arguments, eFunResult)
 
   test "find 1 parameter":
-    var parameters = @[newValue("big")]
+    var arguments = @[newValue("big")]
     let eFunResult = newFunResultWarn(wNotEnoughArgsOpt, 0, "2")
-    check testFunction("find", parameters, eFunResult)
+    check testFunction("find", arguments, eFunResult)
 
   test "find 1 not string":
-    var parameters = @[newValue(1), newValue("bigger")]
+    var arguments = @[newValue(1), newValue("bigger")]
     let eFunResult = newFunResultWarn(wWrongType, 0, "string")
-    check testFunction("find", parameters, eFunResult)
+    check testFunction("find", arguments, eFunResult)
 
   test "find 2 not string":
-    var parameters = @[newValue("at"), newValue(4.5)]
+    var arguments = @[newValue("at"), newValue(4.5)]
     let eFunResult = newFunResultWarn(wWrongType, 1, "string")
-    check testFunction("find", parameters, eFunResult)
+    check testFunction("find", arguments, eFunResult)
 
   test "slice Grey":
-    var parameters = @[newValue("Earl Grey"), newValue(5)]
+    var arguments = @[newValue("Earl Grey"), newValue(5)]
     let eFunResult = newFunResult(newValue("Grey"))
-    check testFunction("slice", parameters, eFunResult)
+    check testFunction("slice", arguments, eFunResult)
 
   test "slice Earl":
-    var parameters = @[newValue("Earl Grey"), newValue(0), newValue(4)]
+    var arguments = @[newValue("Earl Grey"), newValue(0), newValue(4)]
     let eFunResult = newFunResult(newValue("Earl"))
-    check testFunction("slice", parameters, eFunResult)
+    check testFunction("slice", arguments, eFunResult)
 
   test "slice unicode":
-    var parameters = @[newValue("añyóng"), newValue(1), newValue(1)]
+    var arguments = @[newValue("añyóng"), newValue(1), newValue(1)]
     let eFunResult = newFunResult(newValue("ñ"))
-    check testFunction("slice", parameters, eFunResult)
+    check testFunction("slice", arguments, eFunResult)
 
   test "slice 1 parameter":
-    var parameters = @[newValue("big")]
+    var arguments = @[newValue("big")]
     let eFunResult = newFunResultWarn(wNotEnoughArgsOpt, 0, "2")
-    check testFunction("slice", parameters, eFunResult)
+    check testFunction("slice", arguments, eFunResult)
 
   test "slice 1 not string":
-    var parameters = @[newValue(4), newValue(4)]
+    var arguments = @[newValue(4), newValue(4)]
     let eFunResult = newFunResultWarn(wWrongType, 0, "string")
-    check testFunction("slice", parameters, eFunResult)
+    check testFunction("slice", arguments, eFunResult)
 
   test "slice 2 not int":
-    var parameters = @[newValue("tasdf"), newValue("dsa")]
+    var arguments = @[newValue("tasdf"), newValue("dsa")]
     let eFunResult = newFunResultWarn(wWrongType, 1, "int")
-    check testFunction("slice", parameters, eFunResult)
+    check testFunction("slice", arguments, eFunResult)
 
   test "slice 3 not int":
-    var parameters = @[newValue("tasdf"), newValue(0), newValue("tasdf")]
+    var arguments = @[newValue("tasdf"), newValue(0), newValue("tasdf")]
     let eFunResult = newFunResultWarn(wWrongType, 2, "int")
-    check testFunction("slice", parameters, eFunResult)
+    check testFunction("slice", arguments, eFunResult)
 
   test "slice start < 0":
-    var parameters = @[newValue("tasdf"), newValue(-2), newValue(1)]
+    var arguments = @[newValue("tasdf"), newValue(-2), newValue(1)]
     let eFunResult = newFunResultWarn(wStartPosTooSmall, 1)
-    check testFunction("slice", parameters, eFunResult)
+    check testFunction("slice", arguments, eFunResult)
 
   test "slice length too big":
-    var parameters = @[newValue("tasdf"), newValue(0), newValue(10)]
+    var arguments = @[newValue("tasdf"), newValue(0), newValue(10)]
     let eFunResult = newFunResultWarn(wLengthTooBig, 2)
-    check testFunction("slice", parameters, eFunResult)
+    check testFunction("slice", arguments, eFunResult)
 
   test "slice nothing":
-    var parameters = @[newValue("tasdf"), newValue(3), newValue(0)]
+    var arguments = @[newValue("tasdf"), newValue(3), newValue(0)]
     let eFunResult = newFunResult(newValue(""))
-    check testFunction("slice", parameters, eFunResult)
+    check testFunction("slice", arguments, eFunResult)
 
   test "dup":
-    var parameters = @[newValue("-"), newValue(5)]
+    var arguments = @[newValue("-"), newValue(5)]
     let eFunResult = newFunResult(newValue("-----"))
-    check testFunction("dup", parameters, eFunResult)
+    check testFunction("dup", arguments, eFunResult)
 
   test "dup 0":
-    var parameters = @[newValue("-"), newValue(0)]
+    var arguments = @[newValue("-"), newValue(0)]
     let eFunResult = newFunResult(newValue(""))
-    check testFunction("dup", parameters, eFunResult)
+    check testFunction("dup", arguments, eFunResult)
 
   test "dup 1":
-    var parameters = @[newValue("abc"), newValue(1)]
+    var arguments = @[newValue("abc"), newValue(1)]
     let eFunResult = newFunResult(newValue("abc"))
-    check testFunction("dup", parameters, eFunResult)
+    check testFunction("dup", arguments, eFunResult)
 
   test "dup multiple":
-    var parameters = @[newValue("123456789 "), newValue(2)]
+    var arguments = @[newValue("123456789 "), newValue(2)]
     let eFunResult = newFunResult(newValue("123456789 123456789 "))
-    check testFunction("dup", parameters, eFunResult)
+    check testFunction("dup", arguments, eFunResult)
 
   test "dup nothing":
-    var parameters = @[newValue(""), newValue(1)]
+    var arguments = @[newValue(""), newValue(1)]
     let eFunResult = newFunResult(newValue(""))
-    check testFunction("dup", parameters, eFunResult)
+    check testFunction("dup", arguments, eFunResult)
 
   test "dup 1 parameter":
-    var parameters = @[newValue("abc")]
+    var arguments = @[newValue("abc")]
     let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "2")
-    check testFunction("dup", parameters, eFunResult)
+    check testFunction("dup", arguments, eFunResult)
 
   test "dup not valid string":
-    var parameters = @[newValue(4.3), newValue(2)]
+    var arguments = @[newValue(4.3), newValue(2)]
     let eFunResult = newFunResultWarn(wWrongType, 0, "string")
-    check testFunction("dup", parameters, eFunResult)
+    check testFunction("dup", arguments, eFunResult)
 
   test "dup not valid count":
-    var parameters = @[newValue("="), newValue("=")]
+    var arguments = @[newValue("="), newValue("=")]
     let eFunResult = newFunResultWarn(wWrongType, 1, "int")
-    check testFunction("dup", parameters, eFunResult)
+    check testFunction("dup", arguments, eFunResult)
 
   test "dup negative count":
-    var parameters = @[newValue("="), newValue(-9)]
+    var arguments = @[newValue("="), newValue(-9)]
     let eFunResult = newFunResultWarn(wInvalidMaxCount, 1)
-    check testFunction("dup", parameters, eFunResult)
+    check testFunction("dup", arguments, eFunResult)
 
   test "dup too long":
-    var parameters = @[newValue("="), newValue(123_333)]
+    var arguments = @[newValue("="), newValue(123_333)]
     let eFunResult = newFunResultWarn(wDupStringTooLong, 1, "123333")
-    check testFunction("dup", parameters, eFunResult)
+    check testFunction("dup", arguments, eFunResult)
 
   test "dict()":
-    var parameters: seq[Value] = @[]
+    var arguments: seq[Value] = @[]
     let eFunResult = newFunResult(newEmptyDictValue())
-    check testFunction("dict", parameters, eFunResult)
+    check testFunction("dict", arguments, eFunResult)
 
   test "dict(['a', 5])":
     let listValue = newValue([newValue("a"), newValue(5)])
-    var parameters = @[listValue]
+    var arguments = @[listValue]
     var dict = newValue([("a", 5)])
     let eFunResult = newFunResult(dict)
-    check testFunction("dict", parameters, eFunResult)
+    check testFunction("dict", arguments, eFunResult)
 
   test "dict(['a', 5, 'b', 3])":
     let listValue = newValue([newValue("a"), newValue(5), newValue("b"), newValue(3)])
-    var parameters = @[listValue]
+    var arguments = @[listValue]
     let dict = newValue([("a", 5), ("b", 3)])
     let eFunResult = newFunResult(dict)
-    check testFunction("dict", parameters, eFunResult)
+    check testFunction("dict", arguments, eFunResult)
 
   test "dict(['a'])":
-    var parameters = @[newValue([newValue("a")])]
+    var arguments = @[newValue([newValue("a")])]
     let eFunResult = newFunResultWarn(wDictRequiresEven, 0)
-    check testFunction("dict", parameters, eFunResult)
+    check testFunction("dict", arguments, eFunResult)
 
   test "dict(['a', 'b', 'c'])":
     let listValue = newValue([newValue("a"), newValue("b"), newValue("c")])
-    var parameters = @[listValue]
+    var arguments = @[listValue]
     let eFunResult = newFunResultWarn(wDictRequiresEven, 0)
-    check testFunction("dict", parameters, eFunResult)
+    check testFunction("dict", arguments, eFunResult)
 
   test "dict(['key', 1, 2, 1])":
     let listValue = newValue([newValue("key"), newValue(1), newValue(2), newValue(1)])
-    var parameters = @[listValue]
+    var arguments = @[listValue]
     let eFunResult = newFunResultWarn(wDictStringKey, 0)
-    check testFunction("dict", parameters, eFunResult)
+    check testFunction("dict", arguments, eFunResult)
 
   test "list empty":
-    var parameters: seq[Value] = @[]
+    var arguments: seq[Value] = @[]
     var list: seq[Value]
     let eFunResult = newFunResult(newValue(list))
-    check testFunction("list", parameters, eFunResult)
+    check testFunction("list", arguments, eFunResult)
 
   test "list one item":
-    var parameters: seq[Value] = @[newValue(1)]
-    var list = parameters
+    var arguments: seq[Value] = @[newValue(1)]
+    var list = arguments
     let eFunResult = newFunResult(newValue(list))
-    check testFunction("list", parameters, eFunResult)
+    check testFunction("list", arguments, eFunResult)
 
   test "list two kinds of items":
-    var parameters: seq[Value] = @[newValue(1), newValue("a")]
-    var list = parameters
+    var arguments: seq[Value] = @[newValue(1), newValue("a")]
+    var list = arguments
     let eFunResult = newFunResult(newValue(list))
-    check testFunction("list", parameters, eFunResult)
+    check testFunction("list", arguments, eFunResult)
 
   test "replace":
-    var parameters: seq[Value] = @[newValue("Earl Grey"),
+    var arguments: seq[Value] = @[newValue("Earl Grey"),
       newValue(5), newValue(4), newValue("of Sandwich")]
     let eFunResult = newFunResult(newValue("Earl of Sandwich"))
-    check testFunction("replace", parameters, eFunResult)
+    check testFunction("replace", arguments, eFunResult)
 
   test "replace good":
     check testReplaceGood("123", 0, 0, "abcd", "abcd123")
@@ -1008,88 +1003,88 @@ suite "runFunction.nim":
     check testReplaceGood("123", 0, 3, "", "")
 
   test "replace empty str":
-    var parameters: seq[Value] = @[newValue(""),
+    var arguments: seq[Value] = @[newValue(""),
       newValue(0), newValue(0), newValue("of Sandwich")]
     let eFunResult = newFunResult(newValue("of Sandwich"))
-    check testFunction("replace", parameters, eFunResult)
+    check testFunction("replace", arguments, eFunResult)
 
   test "replace empty empty":
-    var parameters: seq[Value] = @[newValue(""),
+    var arguments: seq[Value] = @[newValue(""),
       newValue(0), newValue(0), newValue("")]
     let eFunResult = newFunResult(newValue(""))
-    check testFunction("replace", parameters, eFunResult)
+    check testFunction("replace", arguments, eFunResult)
 
   test "replace whole thing":
-    var parameters: seq[Value] = @[newValue("Earl Grey"),
+    var arguments: seq[Value] = @[newValue("Earl Grey"),
       newValue(0), newValue(9), newValue("Eat the Sandwich")]
     let eFunResult = newFunResult(newValue("Eat the Sandwich"))
-    check testFunction("replace", parameters, eFunResult)
+    check testFunction("replace", arguments, eFunResult)
 
   test "replace last char":
-    var parameters: seq[Value] = @[newValue("Earl Grey"),
+    var arguments: seq[Value] = @[newValue("Earl Grey"),
       newValue(8), newValue(1), newValue("of Sandwich")]
     let eFunResult = newFunResult(newValue("Earl Greof Sandwich"))
-    check testFunction("replace", parameters, eFunResult)
+    check testFunction("replace", arguments, eFunResult)
 
   test "replace with nothing":
-    var parameters: seq[Value] = @[newValue("Earl Grey"),
+    var arguments: seq[Value] = @[newValue("Earl Grey"),
       newValue(8), newValue(1), newValue("")]
     let eFunResult = newFunResult(newValue("Earl Gre"))
-    check testFunction("replace", parameters, eFunResult)
+    check testFunction("replace", arguments, eFunResult)
 
   test "replace with nothing 2":
-    var parameters: seq[Value] = @[newValue("Earl Grey"),
+    var arguments: seq[Value] = @[newValue("Earl Grey"),
       newValue(8), newValue(0), newValue("123")]
     let eFunResult = newFunResult(newValue("Earl Gre123y"))
-    check testFunction("replace", parameters, eFunResult)
+    check testFunction("replace", arguments, eFunResult)
 
   test "replace invalid p1":
-    var parameters: seq[Value] = @[newValue(4),
+    var arguments: seq[Value] = @[newValue(4),
       newValue(0), newValue(9), newValue("Eat the Sandwich")]
     let eFunResult = newFunResultWarn(wWrongType, 0, "string")
-    check testFunction("replace", parameters, eFunResult)
+    check testFunction("replace", arguments, eFunResult)
 
   test "replace invalid param 2":
-    var parameters: seq[Value] = @[newValue("Earl Grey"),
+    var arguments: seq[Value] = @[newValue("Earl Grey"),
       newValue("a"), newValue(9), newValue("Eat the Sandwich")]
     let eFunResult = newFunResultWarn(wWrongType, 1, "int")
-    check testFunction("replace", parameters, eFunResult)
+    check testFunction("replace", arguments, eFunResult)
 
   test "replace invalid p3":
-    var parameters: seq[Value] = @[newValue("Earl Grey"),
+    var arguments: seq[Value] = @[newValue("Earl Grey"),
       newValue(5), newValue("d"), newValue("Eat the Sandwich")]
     let eFunResult = newFunResultWarn(wWrongType, 2, "int")
-    check testFunction("replace", parameters, eFunResult)
+    check testFunction("replace", arguments, eFunResult)
 
   test "replace invalid p4":
-    var parameters: seq[Value] = @[newValue("Earl Grey"),
+    var arguments: seq[Value] = @[newValue("Earl Grey"),
       newValue(5), newValue(4), newValue(4.3)]
     let eFunResult = newFunResultWarn(wWrongType, 3, "string")
-    check testFunction("replace", parameters, eFunResult)
+    check testFunction("replace", arguments, eFunResult)
 
   test "replace start to small":
-    var parameters: seq[Value] = @[newValue("Earl Grey"),
+    var arguments: seq[Value] = @[newValue("Earl Grey"),
       newValue(-1), newValue(4), newValue("of Sandwich")]
     let eFunResult = newFunResultWarn(wInvalidPosition, 1, "-1")
-    check testFunction("replace", parameters, eFunResult)
+    check testFunction("replace", arguments, eFunResult)
 
   test "replace start too big":
-    var parameters: seq[Value] = @[newValue("Earl Grey"),
+    var arguments: seq[Value] = @[newValue("Earl Grey"),
       newValue(10), newValue(0), newValue("of Sandwich")]
     let eFunResult = newFunResultWarn(wInvalidPosition, 1, "10")
-    check testFunction("replace", parameters, eFunResult)
+    check testFunction("replace", arguments, eFunResult)
 
   test "replace length too small":
-    var parameters: seq[Value] = @[newValue("Earl Grey"),
+    var arguments: seq[Value] = @[newValue("Earl Grey"),
       newValue(0), newValue(-4), newValue("of Sandwich")]
     let eFunResult = newFunResultWarn(wInvalidLength, 2, "-4")
-    check testFunction("replace", parameters, eFunResult)
+    check testFunction("replace", arguments, eFunResult)
 
   test "replace length too big":
-    var parameters: seq[Value] = @[newValue("Earl Grey"),
+    var arguments: seq[Value] = @[newValue("Earl Grey"),
       newValue(0), newValue(10), newValue("of Sandwich")]
     let eFunResult = newFunResultWarn(wInvalidLength, 2, "10")
-    check testFunction("replace", parameters, eFunResult)
+    check testFunction("replace", arguments, eFunResult)
 
   test "replaceRe good":
     check testReplaceReGoodList("abc123abc", newValue(["abc", "456"]), "456123456")
@@ -1139,8 +1134,8 @@ suite "runFunction.nim":
   test "replaceRe runtime error":
     # check testReplaceReGoodList("* test", newValue([r"^*", "-"]), "- test")
     let eFunResult = newFunResultWarn(wReplaceMany, 1)
-    var parameters = @[newValue("* test"), newValue([r"^*", "-"])]
-    check testFunction("replaceRe", parameters, eFunResult)
+    var arguments = @[newValue("* test"), newValue([r"^*", "-"])]
+    check testFunction("replaceRe", arguments, eFunResult)
 
   test "replaceRe good list":
     check testReplaceReGoodList("abc123abc", newValue(["abc", "456"]), "456123456")
@@ -1173,31 +1168,31 @@ suite "runFunction.nim":
     check testPathGood("dir/basename.ext", "basename.ext", "basename", ".ext", "dir/", "/")
     check testPathGood(r"dir\basename.ext", "basename.ext", "basename", ".ext", r"dir\", r"\")
 
-  test "path: wrong number of parameters":
-    var parameters: seq[Value] = @[newValue("Earl Grey"), newValue("a"), newValue("a")]
+  test "path: wrong number of arguments":
+    var arguments: seq[Value] = @[newValue("Earl Grey"), newValue("a"), newValue("a")]
     let eFunResult = newFunResultWarn(wTooManyArgsOpt, 0, "2")
-    check testFunction("path", parameters, eFunResult)
+    check testFunction("path", arguments, eFunResult)
 
-  test "path: wrong number of parameters 2":
-    var parameters: seq[Value] = @[newValue("Earl Grey"),
+  test "path: wrong number of arguments 2":
+    var arguments: seq[Value] = @[newValue("Earl Grey"),
                                    newValue("a"), newValue("a"), newValue(2)]
     let eFunResult = newFunResultWarn(wTooManyArgsOpt, 0, "2")
-    check testFunction("path", parameters, eFunResult)
+    check testFunction("path", arguments, eFunResult)
 
   test "path: wrong kind p1":
-    var parameters: seq[Value] = @[newValue(12)]
+    var arguments: seq[Value] = @[newValue(12)]
     let eFunResult = newFunResultWarn(wWrongType, 0, "string")
-    check testFunction("path", parameters, eFunResult)
+    check testFunction("path", arguments, eFunResult)
 
   test "path: wrong kind param 2":
-    var parameters: seq[Value] = @[newValue("filename"), newValue(12)]
+    var arguments: seq[Value] = @[newValue("filename"), newValue(12)]
     let eFunResult = newFunResultWarn(wWrongType, 1, "string")
-    check testFunction("path", parameters, eFunResult)
+    check testFunction("path", arguments, eFunResult)
 
   test "path: wrong kind separator":
-    var parameters: seq[Value] = @[newValue("filename"), newValue("a")]
+    var arguments: seq[Value] = @[newValue("filename"), newValue("a")]
     let eFunResult = newFunResultWarn(wExpectedSeparator, 1)
-    check testFunction("path", parameters, eFunResult)
+    check testFunction("path", arguments, eFunResult)
 
   test "lower":
     check testLower("", "")
@@ -1210,15 +1205,15 @@ suite "runFunction.nim":
     # ā is the same, lower-case, 0101
     check testLower("TEĀ", "teā")
 
-  test "lower: wrong number of parameters":
-    var parameters: seq[Value] = @[]
+  test "lower: wrong number of arguments":
+    var arguments: seq[Value] = @[]
     let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "1")
-    check testFunction("lower", parameters, eFunResult)
+    check testFunction("lower", arguments, eFunResult)
 
   test "lower: wrong kind of parameter":
-    var parameters: seq[Value] = @[newValue(2)]
+    var arguments: seq[Value] = @[newValue(2)]
     let eFunResult = newFunResultWarn(wWrongType, 0, "string")
-    check testFunction("lower", parameters, eFunResult)
+    check testFunction("lower", arguments, eFunResult)
 
   test "keys empty":
     let dictValue = newEmptyDictValue()
@@ -1235,15 +1230,15 @@ suite "runFunction.nim":
     let listValue = newValue(["a", "b", "c"])
     check testFunction("keys", @[dictValue], newFunResult(listValue))
 
-  test "keys: wrong number of parameters":
-    var parameters: seq[Value] = @[]
+  test "keys: wrong number of arguments":
+    var arguments: seq[Value] = @[]
     let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "1")
-    check testFunction("keys", parameters, eFunResult)
+    check testFunction("keys", arguments, eFunResult)
 
   test "keys: wrong kind of parameter":
-    var parameters: seq[Value] = @[newValue(2)]
+    var arguments: seq[Value] = @[newValue(2)]
     let eFunResult = newFunResultWarn(wWrongType, 0, "dict")
-    check testFunction("keys", parameters, eFunResult)
+    check testFunction("keys", arguments, eFunResult)
 
   test "values empty":
     let dictValue = newEmptyDictValue()
@@ -1260,15 +1255,15 @@ suite "runFunction.nim":
     let listValue = newValue([1, 2, 3])
     check testFunction("values", @[dictValue], newFunResult(listValue))
 
-  test "values: wrong number of parameters":
-    var parameters: seq[Value] = @[]
+  test "values: wrong number of arguments":
+    var arguments: seq[Value] = @[]
     let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "1")
-    check testFunction("values", parameters, eFunResult)
+    check testFunction("values", arguments, eFunResult)
 
   test "values: wrong kind of parameter":
-    var parameters: seq[Value] = @[newValue(2)]
+    var arguments: seq[Value] = @[newValue(2)]
     let eFunResult = newFunResultWarn(wWrongType, 0, "dict")
-    check testFunction("values", parameters, eFunResult)
+    check testFunction("values", arguments, eFunResult)
 
   test "sort empty":
     let emptyList = newEmptyListValue()
@@ -1391,78 +1386,78 @@ suite "runFunction.nim":
       list, newValue("descending"), newValue("insensitive"), newValue("name")
     ], newFunResult(eList2))
 
-  test "sort: wrong number of parameters":
-    var parameters: seq[Value] = @[]
+  test "sort: wrong number of arguments":
+    var arguments: seq[Value] = @[]
     let eFunResult = newFunResultWarn(wNotEnoughArgsOpt, 0, "2")
-    check testFunction("sort", parameters, eFunResult)
+    check testFunction("sort", arguments, eFunResult)
 
   test "sort: not list":
-    var parameters: seq[Value] = @[newValue(0), newValue("ascending")]
+    var arguments: seq[Value] = @[newValue(0), newValue("ascending")]
     let eFunResult = newFunResultWarn(wWrongType, 0, "list")
-    check testFunction("sort", parameters, eFunResult)
+    check testFunction("sort", arguments, eFunResult)
 
   test "sort: invalid order":
     let list = newValue([1])
-    var parameters: seq[Value] = @[list, newValue(22)]
+    var arguments: seq[Value] = @[list, newValue(22)]
     let eFunResult = newFunResultWarn(wWrongType, 1, "string")
-    check testFunction("sort", parameters, eFunResult)
+    check testFunction("sort", arguments, eFunResult)
 
   test "sort: invalid order spelling":
     let list = newValue([1])
-    var parameters: seq[Value] = @[list, newValue("asc")]
+    var arguments: seq[Value] = @[list, newValue("asc")]
     let eFunResult = newFunResultWarn(wExpectedSortOrder, 1)
-    check testFunction("sort", parameters, eFunResult)
+    check testFunction("sort", arguments, eFunResult)
 
   test "sort: values not same kind":
-    var parameters: seq[Value] = @[
+    var arguments: seq[Value] = @[
       newValue([newValue(1), newValue(2.2)]),
       newValue("ascending"),
     ]
     let eFunResult = newFunResultWarn(wNotSameKind, 0)
-    check testFunction("sort", parameters, eFunResult)
+    check testFunction("sort", arguments, eFunResult)
 
   test "sort: invalid sensitive option":
     let list = newValue(["abc", "b", "aaa"])
-    var parameters: seq[Value] = @[list,
+    var arguments: seq[Value] = @[list,
       newValue("ascending"),
       newValue(2.2),
     ]
     var eFunResult = newFunResultWarn(wWrongType, 2, "string")
-    check testFunction("sort", parameters, eFunResult)
+    check testFunction("sort", arguments, eFunResult)
 
-    parameters = @[
+    arguments = @[
       list,
       newValue("ascending"),
       newValue("t")
     ]
     eFunResult = newFunResultWarn(wExpectedSensitivity, 2)
-    check testFunction("sort", parameters, eFunResult)
+    check testFunction("sort", arguments, eFunResult)
 
   test "sort: none first dict key missing":
     let d1 = newValue([("a", 2), ("b", 3)])
     let d2 = newValue([("a3", 2), ("b3", 3)])
     let list = newValue([d1, d2])
-    var parameters = @[
+    var arguments = @[
       list,
       newValue("ascending"),
       newValue("sensitive"),
       newValue("a")
     ]
     let eFunResult = newFunResultWarn(wDictKeyMissing, 0)
-    check testFunction("sort", parameters, eFunResult)
+    check testFunction("sort", arguments, eFunResult)
 
   test "sort: dict key values different":
     let d1 = newValue([("a", 2), ("b", 3)])
     let d2 = newValue([("a", 2.2), ("b", 3.3)])
     let list = newValue([d1, d2])
-    var parameters = @[
+    var arguments = @[
       list,
       newValue("ascending"),
       newValue("sensitive"),
       newValue("a")
     ]
     let eFunResult = newFunResultWarn(wKeyValueKindDiff, 0)
-    check testFunction("sort", parameters, eFunResult)
+    check testFunction("sort", arguments, eFunResult)
 
   test "githubAnchor":
     check testAnchor("", "")
@@ -1486,34 +1481,34 @@ suite "runFunction.nim":
     check testAnchor("funSort_lsssl", "funsort_lsssl")
     check testAnchor("sort_lsssl", "sort_lsssl")
 
-  test "githubAnchor: wrong number of parameters":
-    var parameters: seq[Value] = @[]
+  test "githubAnchor: wrong number of arguments":
+    var arguments: seq[Value] = @[]
     let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "1")
-    check testFunction("githubAnchor", parameters, eFunResult)
+    check testFunction("githubAnchor", arguments, eFunResult)
 
   test "githubAnchor: wrong kind of parameter":
-    var parameters: seq[Value] = @[newValue(2)]
+    var arguments: seq[Value] = @[newValue(2)]
     let eFunResult = newFunResultWarn(wWrongType, 0, "list")
-    check testFunction("githubAnchor", parameters, eFunResult)
+    check testFunction("githubAnchor", arguments, eFunResult)
 
   test "githubAnchor list":
     let list = newValue(["Tea", "Water", "tea"])
     let expected = newValue(["tea", "water", "tea-1"])
-    let parameters = @[list]
+    let arguments = @[list]
     let eFunResult = newFunResult(expected)
-    check testFunction("githubAnchor", parameters, eFunResult)
+    check testFunction("githubAnchor", arguments, eFunResult)
 
   test "githubAnchor wrong list item":
     let list = newValue([newValue("Tea"), newValue(5)])
-    let parameters = @[list]
+    let arguments = @[list]
     let eFunResult = newFunResultWarn(wNotAllStrings, 0)
-    check testFunction("githubAnchor", parameters, eFunResult)
+    check testFunction("githubAnchor", arguments, eFunResult)
 
   test "githubAnchor empty list":
     let emptyList = newEmptyListValue()
-    let parameters = @[emptyList]
+    let arguments = @[emptyList]
     let eFunResult = newFunResult(emptyList)
-    check testFunction("githubAnchor", parameters, eFunResult)
+    check testFunction("githubAnchor", arguments, eFunResult)
 
   test "cmdVersion":
     check testCmpVersionGood("0.0.0", "0.0.0", 0)
@@ -1540,25 +1535,25 @@ suite "runFunction.nim":
     check testCmpVersionGood("00.00.00", "0.0.0", 0)
     check testCmpVersionGood("0.00.000", "0.0.0", 0)
 
-  test "cmdVersion: two few parameters":
-    let parameters = @[newValue("1.2.3")]
+  test "cmdVersion: two few arguments":
+    let arguments = @[newValue("1.2.3")]
     let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "2")
-    check testFunction("cmpVersion", parameters, eFunResult)
+    check testFunction("cmpVersion", arguments, eFunResult)
 
-  test "cmdVersion: two many parameters":
-    let parameters = @[newValue("1.2.3"), newValue("1.2.3"), newValue("1.2.3")]
+  test "cmdVersion: two many arguments":
+    let arguments = @[newValue("1.2.3"), newValue("1.2.3"), newValue("1.2.3")]
     let eFunResult = newFunResultWarn(wTooManyArgs, parameter=0, "2")
-    check testFunction("cmpVersion", parameters, eFunResult)
+    check testFunction("cmpVersion", arguments, eFunResult)
 
   test "cmdVersion: invalid version a":
-    let parameters = @[newValue("1.2.3a"), newValue("1.2.3")]
+    let arguments = @[newValue("1.2.3a"), newValue("1.2.3")]
     let eFunResult = newFunResultWarn(wInvalidVersion, 0)
-    check testFunction("cmpVersion", parameters, eFunResult)
+    check testFunction("cmpVersion", arguments, eFunResult)
 
   test "cmdVersion: invalid version b":
-    let parameters = @[newValue("1.2.3"), newValue("1.2.3b")]
+    let arguments = @[newValue("1.2.3"), newValue("1.2.3b")]
     let eFunResult = newFunResultWarn(wInvalidVersion, 1)
-    check testFunction("cmpVersion", parameters, eFunResult)
+    check testFunction("cmpVersion", arguments, eFunResult)
 
   test "type":
     check testFunction("type", @[newValue(1)], newFunResult(newValue("int")))
@@ -1641,9 +1636,9 @@ suite "runFunction.nim":
       ], newFunResult(newValue("/var//log/tea/")))
 
   test "joinPath invalid separator":
-    let parameters = @[newEmptyListValue(), newValue("h")]
+    let arguments = @[newEmptyListValue(), newValue("h")]
     let eFunResult = newFunResultWarn(wExpectedSeparator, 0)
-    check testFunction("joinPath", parameters, eFunResult)
+    check testFunction("joinPath", arguments, eFunResult)
 
   test "join nothing":
     let list = newEmptyListValue()
@@ -1704,9 +1699,9 @@ suite "runFunction.nim":
 
   test "warn":
     let message = "my warning"
-    let parameters = @[newValue(message)]
+    let arguments = @[newValue(message)]
     let eFunResult = newFunResultWarn(wUserMessage, 0, message)
-    check testFunction("warn", parameters, eFunResult)
+    check testFunction("warn", arguments, eFunResult)
 
   test "return":
     check testFunction("return", @[newValue("")], newFunResult(newValue("")))
@@ -1806,64 +1801,64 @@ d.sub.y = 4"""
     check testStartsWith("", "l", false)
 
   test "bool false":
-    var parameters = @[newValue(0)]
+    var arguments = @[newValue(0)]
     let eFunResult = newFunResult(newValue(false))
-    check testFunction("bool", parameters, eFunResult)
+    check testFunction("bool", arguments, eFunResult)
 
   test "bool true":
-    var parameters = @[newValue(3)]
+    var arguments = @[newValue(3)]
     let eFunResult = newFunResult(newValue(true))
-    check testFunction("bool", parameters, eFunResult)
+    check testFunction("bool", arguments, eFunResult)
 
   test "not false":
-    var parameters = @[newValue(false)]
+    var arguments = @[newValue(false)]
     let eFunResult = newFunResult(newValue(true))
-    check testFunction("not", parameters, eFunResult)
+    check testFunction("not", arguments, eFunResult)
 
   test "not true":
-    var parameters = @[newValue(true)]
+    var arguments = @[newValue(true)]
     let eFunResult = newFunResult(newValue(false))
-    check testFunction("not", parameters, eFunResult)
+    check testFunction("not", arguments, eFunResult)
 
   test "true and true":
-    var parameters = @[newValue(true), newValue(true)]
+    var arguments = @[newValue(true), newValue(true)]
     let eFunResult = newFunResult(newValue(true))
-    check testFunction("and", parameters, eFunResult)
+    check testFunction("and", arguments, eFunResult)
 
   test "false and true":
-    var parameters = @[newValue(false), newValue(true)]
+    var arguments = @[newValue(false), newValue(true)]
     let eFunResult = newFunResult(newValue(false))
-    check testFunction("and", parameters, eFunResult)
+    check testFunction("and", arguments, eFunResult)
 
   test "true and false":
-    var parameters = @[newValue(true), newValue(false)]
+    var arguments = @[newValue(true), newValue(false)]
     let eFunResult = newFunResult(newValue(false))
-    check testFunction("and", parameters, eFunResult)
+    check testFunction("and", arguments, eFunResult)
 
   test "false and false":
-    var parameters = @[newValue(false), newValue(false)]
+    var arguments = @[newValue(false), newValue(false)]
     let eFunResult = newFunResult(newValue(false))
-    check testFunction("and", parameters, eFunResult)
+    check testFunction("and", arguments, eFunResult)
 
   test "true or true":
-    var parameters = @[newValue(true), newValue(true)]
+    var arguments = @[newValue(true), newValue(true)]
     let eFunResult = newFunResult(newValue(true))
-    check testFunction("or", parameters, eFunResult)
+    check testFunction("or", arguments, eFunResult)
 
   test "false or true":
-    var parameters = @[newValue(false), newValue(true)]
+    var arguments = @[newValue(false), newValue(true)]
     let eFunResult = newFunResult(newValue(true))
-    check testFunction("or", parameters, eFunResult)
+    check testFunction("or", arguments, eFunResult)
 
   test "true or false":
-    var parameters = @[newValue(true), newValue(false)]
+    var arguments = @[newValue(true), newValue(false)]
     let eFunResult = newFunResult(newValue(true))
-    check testFunction("or", parameters, eFunResult)
+    check testFunction("or", arguments, eFunResult)
 
   test "false or false":
-    var parameters = @[newValue(false), newValue(false)]
+    var arguments = @[newValue(false), newValue(false)]
     let eFunResult = newFunResult(newValue(false))
-    check testFunction("or", parameters, eFunResult)
+    check testFunction("or", arguments, eFunResult)
 
   test "eq int":
     check testComp(1, "eq", 1, true)
@@ -1918,6 +1913,8 @@ d.sub.y = 4"""
     check testComp(2.2, "lte", 2.2, true)
 
   test "function list is sorted":
+    # Test that the built in function list is sorted by name then by
+    # signature code.
     var lastName = ""
     var lastSignatureCode = ""
     for (name, functionPtr, signatureCode) in functionsList:
