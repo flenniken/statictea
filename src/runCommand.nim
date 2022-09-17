@@ -594,10 +594,6 @@ proc getFunctionValueAndLength*(
       valueOr.message.p1, start)
     return newValueAndLengthOr(warningData)
   let value = valueOr.value
-  if value.kind != vkFunc and value.kind != vkList:
-    # You cannot call the variable because it's not a function or a list of functions.
-    let warningData = newWarningData(wNotFunction, pos=start)
-    return newValueAndLengthOr(warningData)
 
   # Find the best matching function by looking at the arguments.
   let funcValueOr = getBestFunction(value, arguments)
