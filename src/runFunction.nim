@@ -2358,42 +2358,50 @@ const
     ("warn", funWarn_ss, "ss"),
   ]
 
-proc getFunction*(variables: Variables, functionName: string,
-    parameters: seq[Value]): Option[Value] =
-  ## Return the func variable with the given name, if it exists.  If
-  ## the name is found but none of the signatures match, return the
-  ## one that matched the farthest going left to right.
+proc getBestFunction*(funcValue: Value, arguments: seq[Value]): ValueOr =
+  ## Given a function variable or a list of function variables and a
+  ## list of arguments, return the one that best matches the
+  ## arguments.  If none of the signatures match, return the one that
+  ## matched the farthest going left to right.
 
-  assert "f" in variables
-  assert variables["f"].kind == vkDict
+  if funcValue.kind == vkFunc:
+    return newValueOr(funcValue)
 
-  let funcDict = variables["f"].dictv
-  if not (functionName in funcDict):
-    # No function with with the specified name.
-    return
+  if funcValue.kind != vkList:
+    # You cannot call the variable because it's not a function or a list of functions.
+    let warningData = newWarningData(wNotFunction)
+    return newValueOr(warningData)
+  let funcList = funcValue.listv
 
-  assert funcDict[functionName].kind == vkList
-
-  let funcList = funcDict[functionName].listv
   if funcList.len == 1:
-    # There is only one function with the specified name, return it.
-    result = some(funcList[0])
+    # There is only one function, return it.
+    let funcValue = funcList[0]
+    if funcValue.kind != vkFunc:
+      # You cannot call the variable because it's not a function or a list of functions.
+      let warningData = newWarningData(wNotFunction)
+      return newValueOr(warningData)
+    result = newValueOr(funcValue)
   elif funcList.len > 1:
     # Find the function that matches the most arguments.
     var maxDistance = 0
     var maxFuncValue = funcList[0]
     for funcValue in funcList:
+      if funcValue.kind != vkFunc:
+        # You cannot call the variable because it's not a function or a list of functions.
+        let warningData = newWarningData(wNotFunction)
+        return newValueOr(warningData)
+
       let paramsO = signatureCodeToParams(funcValue.funcv.signatureCode)
-      let funResult = mapParameters(paramsO.get(), parameters)
+      let funResult = mapParameters(paramsO.get(), arguments)
       if funResult.kind != frWarning:
         # All arguments match the parameters, return the function.
-        return some(funcValue)
+        return newValueOr(funcValue)
       if funResult.parameter > maxDistance:
         maxDistance = funResult.parameter
         maxFuncValue = funcValue
     # Return the function that made if farthest through its
     # parameters.
-    result = some(maxFuncValue)
+    result = newValueOr(maxFuncValue)
 
 proc createFuncDictionary*(): Value =
   ## Create the f dictionary from the built in functions.

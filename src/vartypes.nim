@@ -331,7 +331,7 @@ func valueToStringRB*(value: Value): string =
   of vkBool:
     result = $value.boolv
   of vkFunc:
-    result = $value.funcv
+    result = value.funcv.name
 
 func `$`*(value: Value): string =
   ## Return a string representation of a Value.

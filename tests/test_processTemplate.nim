@@ -425,10 +425,10 @@ and the shared code has 0.
 #$ endblock
 """
     let eErrLines = splitNewLines """
-template.html(1): w51: The function does not exist: notfunction.
+template.html(1): w205: The variable 'notfunction' wasn't found in the l or f dictionaries.
 statement: cond1 = notfunction(4, 5)
                                ^
-template.html(3): w51: The function does not exist: hello.
+template.html(3): w205: The variable 'hello' wasn't found in the l or f dictionaries.
 statement: cond3 = hello(5, 4)
                          ^
 """
@@ -1447,5 +1447,22 @@ after
     let eResultLines = splitNewLines """
 after
 """
-    check testProcessTemplate(templateContent = templateContent, 
+    check testProcessTemplate(templateContent = templateContent,
+        eResultLines = eResultLines)
+
+  test "run function variable":
+    let templateContent = """
+$$ block myCmp = cmp
+$$ : b = myCmp(3, 2)
+$$ : fCmp = get(cmp, 1)
+$$ : d = fCmp(1.1, 2.2)
+{b}
+{d}
+<!--$ endblock -->
+"""
+    let eResultLines = splitNewLines """
+1
+-1
+"""
+    check testProcessTemplate(templateContent = templateContent,
         eResultLines = eResultLines)

@@ -77,34 +77,6 @@ proc testGetMultilineStrE(pattern: string, start: Natural,
 
     result = false
 
-proc cmpVariableDataOr(statement: Statement,
-     g: VariableDataOr, e: VariableDataOr,
-     templateName = "tmpl"): bool =
-  ## Compare two VariableDataOr. When not equal show the differences.
-  if $g == $e:
-    return true
-
-  echo statement.text
-  echo ""
-  if e.isMessage and g.isMessage:
-    echo "got message:"
-    echo getWarnStatement(templateName, statement, g.message)
-    echo "expected message:"
-    echo getWarnStatement(templateName, statement, e.message)
-  elif e.isValue and g.isValue:
-    echo "     got value: " & $g & ", type=" & $g.value.value.kind
-    echo "expected value: " & $e & ", type=" & $e.value.value.kind
-  elif e.isMessage:
-    echo "got value:"
-    echo $g.value
-    echo "expected message:"
-    echo getWarnStatement(templateName, statement, e.message)
-  else:
-    echo "got message:"
-    echo getWarnStatement(templateName, statement, g.message)
-    echo "expected value: " & $e.value
-  echo ""
-
 proc getCmdLinePartsTest(env: var Env,
     commandLines: seq[string]): seq[LineParts] =
   ## Return the line parts from the given lines. Only used for
@@ -231,12 +203,15 @@ proc testGetFunctionValueAndLength(
     statement, start, variables, list=false, skip=false)
   result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr, start)
 
-proc testRunStatement(statement: Statement, eVDataOr: VariableDataOr): bool =
-
-  let funcsVarDict = createFuncDictionary().dictv
-  let variables = emptyVariables(funcs = funcsVarDict)
-  let variableDataOr = runStatement(statement, variables)
-  result = cmpVariableDataOr(statement, variableDataOr, eVDataOr)
+proc testRunStatement(statement: Statement, eVDataOr: VariableDataOr, variables: Variables = nil): bool =
+  var vars: Variables
+  if variables == nil:
+    let funcsVarDict = createFuncDictionary().dictv
+    vars = emptyVariables(funcs = funcsVarDict)
+  else:
+    vars = variables
+  let variableDataOr = runStatement(statement, vars)
+  result = gotExpected($variableDataOr, $eVDataOr, statement.text)
 
 proc testRunBoolOp(left: bool | Value, op: string, right: bool | Value, eValue: Value): bool =
   let value = runBoolOp(newValue(left), op, newValue(right))
@@ -806,7 +781,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "undefined function":
     let text = """a = missing(2.3, "second", "third")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wInvalidFunction, "missing", 12)
+    let eVariableDataOr = newVariableDataOr(wNotInLorF, "missing", 12)
     check testRunStatement(statement, eVariableDataOr)
 
   test "if when true":
@@ -1272,3 +1247,26 @@ White$1
     check testGetCondition("""a = ( false and true and 3 xor 5 )""", 4, false, 34)
     check testGetCondition("""a = ( true or true and false )""", 4, true, 30)
     #                         0123456789 123456789 123456789 12345
+
+  test "a = cmp":
+    let statement = newStatement(text="""a = cmp""", lineNum=1, 0)
+    let funcsVarDict = createFuncDictionary().dictv
+    let variables = emptyVariables(funcs = funcsVarDict)
+    let cmpValueOr = getVariable(variables, "cmp")
+    if cmpValueOr.isMessage:
+      echo cmpValueOr.message
+      fail
+    let eVariableDataOr = newVariableDataOr("a", "=", cmpValueOr.value)
+    check testRunStatement(statement, eVariableDataOr, variables)
+
+  test "a = get(cmp, 0)":
+    let statement = newStatement(text="""a = get(cmp, 0)""", lineNum=1, 0)
+    let funcsVarDict = createFuncDictionary().dictv
+    let variables = emptyVariables(funcs = funcsVarDict)
+    let cmpValueOr = getVariable(variables, "cmp")
+    if cmpValueOr.isMessage:
+      echo cmpValueOr.message
+      fail
+    let eVariableDataOr = newVariableDataOr("a", "=", cmpValueOr.value.listv[0])
+    check testRunStatement(statement, eVariableDataOr, variables)
+

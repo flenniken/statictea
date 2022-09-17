@@ -537,34 +537,33 @@ proc andOrFunctions*(
   result = newValueAndLengthOr(newValue(value), runningLen)
 
 proc getFunctionValueAndLength*(
-    functionName: string,
+    dotNameStr: string,
     statement: Statement,
     start: Natural,
     variables: Variables,
     list = false, skip: bool): ValueAndLengthOr =
   ## Return the function's value and the length. Start points at the
-  ## first parameter of the function. The length includes the trailing
+  ## first argument of the function. The length includes the trailing
   ## whitespace after the ending ).
 
-  var parameters: seq[Value] = @[]
-  var parameterStarts: seq[Natural] = @[]
+  var arguments: seq[Value] = @[]
+  var argumentStarts: seq[Natural] = @[]
   var pos: Natural
 
-  # If we get a right parentheses or right bracket, there are no
-  # parameters.
   let symbol = if list: gRightBracket else: gRightParentheses
   let startSymbolO = matchSymbol(statement.text, symbol, start)
   if startSymbolO.isSome:
+    # There are no arguments.
     pos = start + startSymbolO.get().length
   else:
+    # Get the arguments to the function.
     pos = start
     while true:
-      # Get the parameter's value.
       let vlOr = getValueAndLength(statement, pos, variables, skip)
       if vlOr.isMessage or vlOr.value.exit:
         return vlOr
-      parameters.add(vlOr.value.value)
-      parameterStarts.add(pos)
+      arguments.add(vlOr.value.value)
+      argumentStarts.add(pos)
 
       pos = pos + vlOr.value.length
 
@@ -588,25 +587,37 @@ proc getFunctionValueAndLength*(
     # pos-start is the length including trailing whitespace.
     return newValueAndLengthOr(newValue(0), pos-start)
 
-  # Lookup the function.
-  let funcO = getFunction(variables, functionName, parameters)
-  if not isSome(funcO):
-    # The function does not exist: $1.
-    return newValueAndLengthOr(wInvalidFunction, functionName, start)
-  let function = funcO.get()
+  # Lookup the variable's value.
+  let valueOr = getVariable(variables, dotNameStr)
+  if valueOr.isMessage:
+    let warningData = newWarningData(valueOr.message.warning,
+      valueOr.message.p1, start)
+    return newValueAndLengthOr(warningData)
+  let value = valueOr.value
+  if value.kind != vkFunc and value.kind != vkList:
+    # You cannot call the variable because it's not a function or a list of functions.
+    let warningData = newWarningData(wNotFunction, pos=start)
+    return newValueAndLengthOr(warningData)
+
+  # Find the best matching function by looking at the arguments.
+  let funcValueOr = getBestFunction(value, arguments)
+  if funcValueOr.isMessage:
+    let warningData = newWarningData(funcValueOr.message.warning,
+      funcValueOr.message.p1, start)
+    return newValueAndLengthOr(warningData)
 
   # Call the function.
-  let funResult = function.funcv.functionPtr(variables, parameters)
+  let funResult = funcValueOr.value.funcv.functionPtr(variables, arguments)
   if funResult.kind == frWarning:
     var warningPos: int
-    if funResult.parameter < parameterStarts.len:
-      warningPos = parameterStarts[funResult.parameter]
+    if funResult.parameter < argumentStarts.len:
+      warningPos = argumentStarts[funResult.parameter]
     else:
       warningPos = start
     return newValueAndLengthOr(funResult.warningData.warning,
       funResult.warningData.p1, warningPos)
 
-  var exit = if functionName == "return": true else: false
+  var exit = if dotNameStr == "return": true else: false
   # pos-start is the length including trailing whitespace.
   result = newValueAndLengthOr(funResult.value, pos-start, exit)
 

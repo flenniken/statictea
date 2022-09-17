@@ -254,10 +254,10 @@ proc andOrFunctions(functionName: string; statement: Statement; start: Natural;
 
 # getFunctionValueAndLength
 
-Return the function's value and the length. Start points at the first parameter of the function. The length includes the trailing whitespace after the ending ).
+Return the function's value and the length. Start points at the first argument of the function. The length includes the trailing whitespace after the ending ).
 
 ```nim
-proc getFunctionValueAndLength(functionName: string; statement: Statement;
+proc getFunctionValueAndLength(dotNameStr: string; statement: Statement;
                                start: Natural; variables: Variables;
                                list = false; skip: bool): ValueAndLengthOr
 ```

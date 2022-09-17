@@ -74,7 +74,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funLt_ffb](#funlt_ffb) &mdash; Return true when the a is less than b.
 * [funLte_iib](#funlte_iib) &mdash; Return true when the a is less than or equal to b.
 * [funLte_ffb](#funlte_ffb) &mdash; Return true when the a is less than or equal to b.
-* [getFunction](#getfunction) &mdash; Return the func variable with the given name, if it exists.
+* [getBestFunction](#getbestfunction) &mdash; Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
 * [createFuncDictionary](#createfuncdictionary) &mdash; Create the f dictionary from the built in functions.
 
 # cmpBaseValues
@@ -1788,13 +1788,12 @@ lte(4.0, 3.0) => false
 func funLte_ffb(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# getFunction
+# getBestFunction
 
-Return the func variable with the given name, if it exists.  If the name is found but none of the signatures match, return the one that matched the farthest going left to right.
+Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.  If none of the signatures match, return the one that matched the farthest going left to right.
 
 ```nim
-proc getFunction(variables: Variables; functionName: string;
-                 parameters: seq[Value]): Option[Value]
+proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr
 ```
 
 # createFuncDictionary

@@ -4,7 +4,7 @@ stf file, version 0.1.0
 
 Test the func type.
 
-### File cmd.sh command nonZeroReturn
+### File cmd.sh command
 
 ~~~
 $statictea \
@@ -17,9 +17,18 @@ $statictea \
 
 ~~~
 $$ block
-cmp (o.a) = {o.a}
-cmp[0] (o.b) = {o.b}
-cmp[1] (o.c) = {o.c}
+$$ : a = cmp
+$$ : fa = a("tea", "tea2")
+$$ : foa = o.a(3, 4)
+$$ : fob = o.b(true, true)
+$$ : foc = o.c(5.5, 5.1)
+o.a = {o.a} = array of signatures
+o.b = {o.b} = cmp
+o.c = {o.c} = cmp
+{fa} = -1
+{foa} = -1
+{fob} = 0
+{foc} = 1
 $$ endblock
 ~~~
 
@@ -34,6 +43,13 @@ o.c = get(cmp, 1)
 ### File result.expected
 
 ~~~
+o.a = ["cmp(bb)i","cmp(ff)i","cmp(ii)i","cmp(ssob)i"] = array of signatures
+o.b = cmp = cmp
+o.c = cmp = cmp
+-1 = -1
+-1 = -1
+0 = 0
+1 = 1
 ~~~
 
 ### File stdout.expected

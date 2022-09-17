@@ -357,6 +357,8 @@ func lookUpVar(variables: Variables, names: seq[string]): ValueOr =
 proc getVariable*(variables: Variables, dotNameStr: string): ValueOr =
   ## Look up the variable and return its value when found, else return
   ## a warning.
+  assert variables != nil
+
   if dotNameStr == "true":
     return newValueOr(newValue(true))
   elif dotNameStr == "false":

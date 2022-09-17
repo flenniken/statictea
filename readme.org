@@ -560,8 +560,8 @@ $$ : # comment
 
 You use variables to add variable content to your template in its
 replacement blocks. A string variable gets replaced with its
-value, the other variable types get replaced with their json
-equivalent.
+value, a function with its name and the other variable types get
+replaced with their json equivalent.
 
 In the example below, "name" and "teas" are variables that are
 defined in the command. Both variables are used in the
@@ -606,15 +606,25 @@ processing each replacement block.
 You can append a new variable to a list or dictionary but you
 cannot change an existing variable.
 
-[[#contents][茶]]
-
-* Dot Names
-:PROPERTIES:
-:CUSTOM_ID: dot-names
-:END:
-
 A dot name is a fully qualified variable name where variables are
 connected with dots.
+
+You can combine up to five variable names together to make a dot
+name. For example:
+
+#+BEGIN_SRC
+s.tea.black.earlgrey.vanilla
+#+END_SRC
+
+[[#contents][茶]]
+
+* Single Letter Dictionaries
+:PROPERTIES:
+:CUSTOM_ID: single-letter-dictionaries
+:END:
+
+All variables are stored in one of the reserved one letter top
+level dictionaries f - u. Six are currently used: f, g, l, o, s, t.
 
 The server json variables are stored in the s dictionary. You
 reference them with "s.", for example:
@@ -624,25 +634,15 @@ s.name
 s.address
 #+END_SRC
 
-You can combine up to five variable names together to make a dot
-name. For example:
-
-#+BEGIN_SRC
-s.tea.black.earlgrey.vanilla
-#+END_SRC
-
 A local variable is stored in the l (local) dictionary. L is
 implied for an unqualified name.
-
-All variables are stored in one of the reserved one letter top
-level dictionaries f - u. Five are currently used: g, h, l, s, t.
 
 You can use the unreserved letters a, b, c, d, e and v, w, x, y, z
 for your variable names.
 
 Reserved single letter variables:
 
-- f -- Reserved
+- f -- [[#function-variables][Function Variables]]
 - g -- [[#global-variables][Global Variables]]
 - h, i, j, k -- Reserved
 - l -- [[#local-variables][Local Variables]]
@@ -660,8 +660,7 @@ Reserved single letter variables:
 :CUSTOM_ID: json-variables
 :END:
 
-You pass variables to the template in json files where the top
-level item is a dictionary.
+You pass variables from the server to the template in json files.
 
 The variables are defined by the top level dictionary items. Each
 item's key is the name of a variable and the item's value is
@@ -683,11 +682,9 @@ data.
 :CUSTOM_ID: code-variables
 :END:
 
-The shared code files are created and maintained by the template
-designer for sharing common template fragments and other
-presentation needs.
-
-The shared code files populate the o dictionary.
+You create code variables with statements in code files. Code
+files are good for sharing common template variables between
+templates. The variables go in the o dictionary.
 
 [[#contents][茶]]
 
@@ -706,6 +703,20 @@ recalculated for each repeated block.
 a = 5
 pot = "black"
 l.tea = "earl grey"
+#+END_SRC
+
+[[#contents][茶]]
+
+** Function Variables
+:PROPERTIES:
+:CUSTOM_ID: function-variables
+:END:
+
+All the built in functions exist in the f dictionary.  See [[#func-type][Func Type]]
+for more information.
+
+#+BEGIN_SRC
+g.names &= entry.name
 #+END_SRC
 
 [[#contents][茶]]
@@ -928,8 +939,8 @@ template:
 <select>
 <!--$ block t.repeat=len(s.companyList) -->
 <!--$ : d = get(s.companyList, t.row) -->
-<!--$ : selected = get(d, "selected", 0) -->
-<!--$ : current = if0(cmp(1,selected), " selected=\"selected\"", "") -->
+<!--$ : selected = get(d, "selected", false) -->
+<!--$ : current = if(selected, " selected=\"selected\"", "") -->
   <option{current}>{d.company}</option>
 $$ endblock
 </select>
@@ -942,7 +953,7 @@ server json:
 "companyList": [
   {"company": "Lipton"},
   {"company": "Tetley"},
-  {"company": "Twinings", "selected": 1},
+  {"company": "Twinings", "selected": true},
   {"company": "American Tea Room"},
   {"company": "Argo Tea"},
   {"company": "Bigelow Tea Company"}
@@ -1360,7 +1371,7 @@ local dictionary.
 s.true = "server true"
 #+END_SRC
 
-[[茶]]
+[[#contents][茶]]
 
 ** Func Type
 :PROPERTIES:
@@ -2158,9 +2169,6 @@ information about stf files.
 
 The testfiles folder contains statictea stf files.
 
-- [[testfiles/readme.md][StaticTea Stf Files]] --- Index to the
-  stf files.
-
 [[#contents][茶]]
 
 ** Example Templates
@@ -2171,7 +2179,9 @@ The testfiles folder contains statictea stf files.
 You can examine simple self contained statictea templates
 in the testfiles folder.
 
-The [[#module-docs][Module Docs]] section has more complex examples.
+- [[testfiles/readme.md][StaticTea Stf Files]] --- Index to the stf files.
+
+The [[#module-docs][Module Docs]] section has more real world examples.
 
 [[#contents][茶]]
 
@@ -4041,7 +4051,7 @@ concat("a", "b") => "ab"
 - [[#statements][Statements]]
 - [[#syntax][Syntax]]
 - [[#variables][Variables]]
-- [[#dot-names][Dot Names]]
+- [[#single-letter-dictionaries][Single Letter Dictionaries]]
 - [[#types][Types]]
 - [[#boolean-expression][Boolean Expression]]
 - [[#code-files][Code Files]]

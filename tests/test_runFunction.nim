@@ -7,10 +7,12 @@ import vartypes
 import runFunction
 import messages
 import variables
+import opresultwarn
+import sharedtestcode
 
 let funcsVarDict = createFuncDictionary().dictv
 
-proc testFunction(functionName: string, parameters: seq[Value],
+proc testFunction(functionName: string, arguments: seq[Value],
     eFunResult: FunResult,
     variables: Variables = nil,
     eLogLines: seq[string] = @[],
@@ -21,12 +23,20 @@ proc testFunction(functionName: string, parameters: seq[Value],
   var vars = variables
   if vars == nil:
     vars = emptyVariables(funcs = funcsVarDict)
-  let funcO = getFunction(vars, functionName, parameters)
-  if not funcO.isSome:
-    echo "The function doesn't exist: " & functionName
+
+  # Lookup the variable's value.
+  var funcValueOr = getVariable(vars, functionName)
+  if funcValueOr.isMessage:
+    echo funcValueOr.message
     return false
-  let function = funcO.get()
-  let funResult = function.funcv.functionPtr(vars, parameters)
+
+  funcValueOr = getBestFunction(funcValueOr.value, arguments)
+  if funcValueOr.isMessage:
+    echo funcValueOr.message
+    return false
+
+  # Call the function.
+  let funResult = funcValueOr.value.funcv.functionPtr(vars, arguments)
 
   result = true
   if not expectedItem("funResult", funResult, eFunResult):
@@ -90,18 +100,28 @@ proc testAnchor(str: string, eStr: string): bool =
     let eFunResult = newFunResult(newValue(eStr))
     result = testFunction("githubAnchor", parameters, eFunResult)
 
-proc testGetFunctionExists(functionName: string, parameters: seq[Value],
+proc testGetBestFunctionExists(functionName: string, parameters: seq[Value],
     eSignatureCode: string): bool =
 
   let variables = emptyVariables(funcs = funcsVarDict)
-  let funcO = getFunction(variables, functionName, parameters)
-  result = true
-  if not isSome(funcO):
-    echo "No function with this name."
+  var funcValueOr = getVariable(variables, functionName)
+  if funcValueOr.isMessage:
+    echo funcValueOr.message
     return false
-  let function = funcO.get()
-  if not expectedItem("eSignatureCode", function.funcv.signatureCode, eSignatureCode):
+
+  funcValueOr = getBestFunction(funcValueOr.value, parameters)
+  result = true
+  if funcValueOr.isMessage:
+    echo funcValueOr.message
+    return false
+  let signatureCode = funcValueOr.value.funcv.signatureCode
+  if not expectedItem("eSignatureCode", signatureCode, eSignatureCode):
     result = false
+
+proc testGetBestFunction(value: Value, parameters: seq[Value],
+    eFuncValueOr: ValueOr): bool =
+  let funcValueOr = getBestFunction(value, parameters)
+  result = gotExpected($funcValueOr, $eFuncValueOr)
 
 proc testIntOk(num: Value, option: string, eIntNum: int): bool =
   var parameters = @[newValue(num), newValue(option)]
@@ -120,39 +140,78 @@ proc testComp(a: int|float|string, op: string, b: int|float|string, eResult: boo
   let eFunResult = newFunResult(newValue(eResult))
   result = testFunction(op, parameters, eFunResult)
 
+func abc(variables: Variables, parameters: seq[Value]): FunResult =
+  result = newFunResult(newValue("hi"))
+
 suite "runFunction.nim":
 
-  test "getFunction missing":
-    var parameters = @[newValue(1)]
-    let variables = emptyVariables(funcs = funcsVarDict)
-    let funcO = getFunction(variables, "missing", parameters)
-    check not isSome(funcO)
+  test "getBestFunction function value":
+    let function = newFunc("abc", abc, "iis")
+    let value = newValue(function)
+    check testGetBestFunction(value, @[newValue(1), newValue(1)], newValueOr(value))
+
+  test "getBestFunction function list of one":
+    let function = newFunc("abc", abc, "iis")
+    let value = newValue(function)
+    let listValue = newValue(@[value])
+    check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(value))
+
+  test "getBestFunction function list of two":
+    let function1 = newFunc("abc", abc, "iis")
+    let function2 = newFunc("abc", abc, "ffs")
+    let value1 = newValue(function1)
+    let value2 = newValue(function2)
+    let listValue = newValue(@[value1, value2])
+    check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(value1))
+    check testGetBestFunction(listValue, @[newValue(1.2), newValue(1.1)], newValueOr(value2))
+    check testGetBestFunction(listValue, @[newValue(1), newValue("tea")], newValueOr(value1))
+    check testGetBestFunction(listValue, @[newValue(1.1), newValue("tea")], newValueOr(value2))
+    check testGetBestFunction(listValue, @[newValue("tea"), newValue("tea")], newValueOr(value1))
+
+  test "getBestFunction not function":
+    let value = newValue(2)
+    check testGetBestFunction(value, @[newValue(1), newValue(1)], newValueOr(wNotFunction))
+    var listValue = newValue(@[value])
+    check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(wNotFunction))
+
+    let function2 = newFunc("abc", abc, "iis")
+    let value2 = newValue(function2)
+    listValue = newValue(@[value2, value])
+    check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(value2))
+
+    listValue = newValue(@[value, value2])
+    check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(wNotFunction))
+
+    let function3 = newFunc("abc", abc, "fss")
+    let value3 = newValue(function3)
+    listValue = newValue(@[value3, value])
+    check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(wNotFunction))
 
   test "getFunction concat":
     var parameters = @[newValue(1), newValue(1)]
-    check testGetFunctionExists("concat", parameters, "sss")
+    check testGetBestFunctionExists("concat", parameters, "sss")
 
   test "getFunction cmp ints":
     var parameters = @[newValue(1), newValue(1)]
-    check testGetFunctionExists("cmp", parameters, "iii")
+    check testGetBestFunctionExists("cmp", parameters, "iii")
 
   test "getFunction cmp floats":
     var parameters = @[newValue(1.0), newValue(1.0)]
-    check testGetFunctionExists("cmp", parameters, "ffi")
+    check testGetBestFunctionExists("cmp", parameters, "ffi")
 
   test "getFunction cmp strings":
     var parameters = @[newValue("a"), newValue("b")]
-    check testGetFunctionExists("cmp", parameters, "ssobi")
+    check testGetBestFunctionExists("cmp", parameters, "ssobi")
     parameters = @[newValue("a"), newValue("b"), newValue(true)]
-    check testGetFunctionExists("cmp", parameters, "ssobi")
+    check testGetBestFunctionExists("cmp", parameters, "ssobi")
 
   test "getFunction cmp miss match":
     var parameters = @[newValue(1), newValue(1.0)]
-    check testGetFunctionExists("cmp", parameters, "iii")
+    check testGetBestFunctionExists("cmp", parameters, "iii")
 
   test "getFunction float":
     var parameters = @[newValue("1.0"), newValue("default")]
-    check testGetFunctionExists("float", parameters, "saa")
+    check testGetBestFunctionExists("float", parameters, "saa")
 
   test "concat hello world":
     var parameters = newValue(["Hello", " World"]).listv
