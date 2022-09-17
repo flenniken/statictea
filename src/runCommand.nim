@@ -282,8 +282,6 @@ func getMultilineStr*(text: string, start: Natural): StrAndPosOr =
   #         ^                ^
   # a = """\n"""\n
 
-  # todo: handle or document whether the string has to be UTF-8.
-
   if start >= text.len or text[start] != '\n':
     # Triple quotes must always end the line.
     return newStrAndPosOr(wTripleAtEnd, "", start)

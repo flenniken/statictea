@@ -2288,7 +2288,7 @@ func funLte_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
 
 const
   # Sorted list of built in functions.
-  functionsList = [
+  functionsList* = [
     ("add", funAdd_fff, "fff"),
     ("add", funAdd_iii, "iii"),
     ("and", funAnd_bbb, "bbb"),
@@ -2362,7 +2362,7 @@ proc getBestFunction*(funcValue: Value, arguments: seq[Value]): ValueOr =
   ## Given a function variable or a list of function variables and a
   ## list of arguments, return the one that best matches the
   ## arguments.  If none of the signatures match, return the one that
-  ## matched the farthest going left to right.
+  ## matched the most parameters going left to right.
 
   if funcValue.kind == vkFunc:
     return newValueOr(funcValue)
@@ -2411,6 +2411,8 @@ proc createFuncDictionary*(): Value =
 
   assert(functionsList.len > 0)
   var varsDict = newVarsDict()
+
+  # functionsList is sorted by name then signature code.
 
   var funcList = newEmptyListValue()
   var lastName = ""

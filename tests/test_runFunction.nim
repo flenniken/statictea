@@ -1917,5 +1917,25 @@ d.sub.y = 4"""
     check testComp(2.2, "lte", 33.3, true)
     check testComp(2.2, "lte", 2.2, true)
 
+  test "function list is sorted":
+    var lastName = ""
+    var lastSignatureCode = ""
+    for (name, functionPtr, signatureCode) in functionsList:
+      if name < lastName:
+        echo "'$1' < '$2'" % [name, lastName]
+        fail
+      if name == lastName and signatureCode < lastSignatureCode:
+        echo "'$1' == '$2'" % [name, lastName]
+        echo "'$1' < '$2'" % [signatureCode, lastSignatureCode]
+        fail
+      lastName = name
+      lastSignatureCode = signatureCode
 
+    var count = 0
+    for key, value in funcsVarDict:
+      check value.kind == vkList
+      count += value.listv.len
+      for val in value.listv:
+        check val.kind == vkFunc
 
+    check functionsList.len == count
