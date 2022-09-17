@@ -6,7 +6,6 @@ import unicodes
 import opresultid
 import opresultwarn
 import messages
-import warnings
 import vartypes
 import sharedtestcode
 
@@ -27,26 +26,25 @@ func stringToHex(str: string): string =
 
 proc testSlice(str: string, start: int, length: int, eString: string): bool =
   let funResult = slice(str, start, length)
-  if funResult.kind == frWarning:
-    echo "Expected value got warning: " & $funResult
-    return false
-  if funResult.value.stringv != eString:
-    echo "expected: " & eString
-    echo "     got: " & funResult.value.stringv
-    return false
-  return true
+
+  let test = """slice("$1", $2, $3)""" % [str, $start, $length]
+  let eFunResult = newFunResult(newValue(eString))
+  result = gotExpected($funResult, $eFunResult, test)
+  
+  # if funResult.kind == frWarning:
+  #   echo "Expected value got warning: " & $funResult
+  #   return false
+  # if funResult.value.stringv != eString:
+  #   echo "     got: " & funResult.value.stringv
+  #   echo "expected: " & eString
+  #   return false
+  # return true
 
 proc testSliceWarn(str: string, start: int, length: int,
     eFunResult: FunResult): bool =
   let funResult = slice(str, start, length)
-  if funResult.kind == frValue:
-    echo "Expected message got value: " & $funResult.value
-    return false
-  if funResult != eFunResult:
-    echo "expected: " & $funResult
-    echo "     got: " & $eFunResult
-    return false
-  return true
+  let test = """slice("$1", $2, $3)""" % [str, $start, $length]
+  result = gotExpected($funResult, $eFunResult, test)
 
 proc testCodePointToStringWarn(codePoint: uint32, eMessageId: MessageId): bool =
   let opResultId = codePointToString(codePoint)
@@ -54,8 +52,8 @@ proc testCodePointToStringWarn(codePoint: uint32, eMessageId: MessageId): bool =
     echo "expected message, got value: " & $opResultId
     return false
   if opResultId.message != eMessageId:
-    echo "expected: " & $eMessageId
     echo "     got: " & $opResultId.message
+    echo "expected: " & $eMessageId
     return false
   result = true
 
@@ -65,8 +63,8 @@ proc testCodePointsToString(codePoints: seq[uint32], eString: string): bool =
     echo "expected value, got message: " & $opResultId
     return false
   if opResultId.value != eString:
-    echo "expected: " & $eString
     echo "     got: " & $opResultId.value
+    echo "expected: " & $eString
     return false
   result = true
 
@@ -76,40 +74,40 @@ proc testCodePointsToStringWarn(codePoints: seq[uint32], eMessageId: MessageId):
     echo "expected message, got value: " & $opResultId
     return false
   if opResultId.message != eMessageId:
-    echo "expected: " & $eMessageId
     echo "     got: " & $opResultId.message
+    echo "expected: " & $eMessageId
     return false
   result = true
 
-proc testStringToCodePoints(str: string, eCodePoints: seq[uint32]): bool =
-  let opResultWarn = stringToCodePoints(str)
-  if opResultWarn.isMessage:
-    echo "expected value, got message: " & $opResultWarn
-    return false
-  if opResultWarn.value != eCodePoints:
-    echo "expected: " & $eCodePoints
-    echo "     got: " & $opResultWarn.value
-    return false
-  result = true
+# proc testStringToCodePoints(str: string, eCodePoints: seq[uint32]): bool =
+#   let opResultWarn = stringToCodePoints(str)
+#   if opResultWarn.isMessage:
+#     echo "expected value, got message: " & $opResultWarn
+#     return false
+#   if opResultWarn.value != eCodePoints:
+#     echo "expected: " & $eCodePoints
+#     echo "     got: " & $opResultWarn.value
+#     return false
+#   result = true
 
-proc testStringToCodePointsWarn(
-    str: string,
-    messageId: MessageId = wInvalidUtf8ByteSeq,
-    p1: string = ""
-  ): bool =
-  let opResultWarn = stringToCodePoints(str)
-  if opResultWarn.isValue:
-    echo "expected warning got value: " & $opResultWarn
-    return false
-  result = true
-  if opResultWarn.message.warning != messageId:
-    echo "expected: " & $opResultWarn.message.warning
-    echo "     got: " & $messageId
-    result = false
-  if opResultWarn.message.p1 != p1:
-    echo "expected: " & $opResultWarn.message.p1
-    echo "     got: " & $p1
-    result = false
+# proc testStringToCodePointsWarn(
+#     str: string,
+#     messageId: MessageId = wInvalidUtf8ByteSeq,
+#     p1: string = ""
+#   ): bool =
+#   let opResultWarn = stringToCodePoints(str)
+#   if opResultWarn.isValue:
+#     echo "expected warning got value: " & $opResultWarn
+#     return false
+#   result = true
+#   if opResultWarn.message.warning != messageId:
+#     echo "expected: " & $opResultWarn.message.warning
+#     echo "     got: " & $messageId
+#     result = false
+#   if opResultWarn.message.p1 != p1:
+#     echo "expected: " & $opResultWarn.message.p1
+#     echo "     got: " & $p1
+#     result = false
 
 proc testParseHexUnicodeError(text: string, pos: Natural,
     ePos: Natural, eMessageId: MessageId): bool =
@@ -121,13 +119,13 @@ proc testParseHexUnicodeError(text: string, pos: Natural,
   result = true
   if numOrId.message != eMessageId:
     echo "got unexpected message id:"
-    echo "expected: " & $eMessageId
     echo "     got: " & $numOrId.message
+    echo "expected: " & $eMessageId
     result = false
   if inOutPos != ePos:
     echo "got unexpected pos:"
-    echo "expected: " & $ePos
     echo "     got: " & $inOutPos
+    echo "expected: " & $ePos
     result = false
 
 
@@ -143,13 +141,13 @@ proc testParseHexUnicode(text: string, pos: Natural,
   result = true
   if numOrId.value != eCodePoint:
     echo "got unexpected string:"
-    echo "expected: " & toHex(eCodePoint)
     echo "     got: " & toHex(numOrId.value)
+    echo "expected: " & toHex(eCodePoint)
     result = false
   if inOutPos != ePos:
     echo "got unexpected pos:"
-    echo "expected: " & $ePos
     echo "     got: " & $inOutPos
+    echo "expected: " & $ePos
     result = false
 
 proc testParseHexUnicodeToString(text: string, pos: Natural,
@@ -164,13 +162,13 @@ proc testParseHexUnicodeToString(text: string, pos: Natural,
   result = true
   if stringOrId.value != eString:
     echo "got unexpected string:"
-    echo "expected: $1, $2" % [stringToHex(eString), eString]
     echo "     got: $1, $2" % [stringToHex(stringOrId.value), stringOrId.value]
+    echo "expected: $1, $2" % [stringToHex(eString), eString]
     result = false
   if inOutPos != ePos:
     echo "got unexpected pos:"
-    echo "expected: " & $ePos
     echo "     got: " & $inOutPos
+    echo "expected: " & $ePos
     result = false
 
 suite "unicodes.nim":
@@ -310,26 +308,26 @@ suite "unicodes.nim":
     check parseHexUnicodeToString(r"tea \uD800", pos).message == wMissingSurrogatePair
     check pos == 10
 
-  test "stringToCodePoints":
-    check testStringToCodePoints("", newSeq[uint32]())
-    check testStringToCodePoints("x", @[uint32(ord('x'))])
-    check testStringToCodePoints("ab", @[uint32(ord('a')), ord('b')])
-    check testStringToCodePoints("ab\u0080", @[uint32(ord('a')), ord('b'), 0x80])
-    check testStringToCodePoints("ab\u2010", @[uint32(ord('a')), ord('b'), 0x2010])
-    check testStringToCodePoints("\u{1D49C}", @[uint32(0x1D49C)])
-    check testStringToCodePoints("\u{10ffff}", @[uint32(0x10ffff)])
-    check testStringToCodePoints("añyóng", @[uint32(97), 241, 121, 243, 110, 103])
+  # test "stringToCodePoints":
+  #   check testStringToCodePoints("", newSeq[uint32]())
+  #   check testStringToCodePoints("x", @[uint32(ord('x'))])
+  #   check testStringToCodePoints("ab", @[uint32(ord('a')), ord('b')])
+  #   check testStringToCodePoints("ab\u0080", @[uint32(ord('a')), ord('b'), 0x80])
+  #   check testStringToCodePoints("ab\u2010", @[uint32(ord('a')), ord('b'), 0x2010])
+  #   check testStringToCodePoints("\u{1D49C}", @[uint32(0x1D49C)])
+  #   check testStringToCodePoints("\u{10ffff}", @[uint32(0x10ffff)])
+  #   check testStringToCodePoints("añyóng", @[uint32(97), 241, 121, 243, 110, 103])
 
-  test "stringToCodePoints warnings":
-    check testStringToCodePointsWarn("\xff", p1 = "0")
-    check testStringToCodePointsWarn("a\xffb", p1 = "1")
-    check testStringToCodePointsWarn("01\xff", p1 = "2")
-    # Invalid two byte sequence <e0 80>.
-    check testStringToCodePointsWarn("01\xe0\x80", p1 = "2")
-    # Invalid three byte sequence <f0 80 80>.
-    check testStringToCodePointsWarn("01\xf0\x80\x80", p1 = "2")
-    # Invalid four byte sequence <f1 80 bf 77>
-    check testStringToCodePointsWarn("01\xf1\x80\xbf\x77", p1 = "2")
+  # test "stringToCodePoints warnings":
+  #   check testStringToCodePointsWarn("\xff", p1 = "0")
+  #   check testStringToCodePointsWarn("a\xffb", p1 = "1")
+  #   check testStringToCodePointsWarn("01\xff", p1 = "2")
+  #   # Invalid two byte sequence <e0 80>.
+  #   check testStringToCodePointsWarn("01\xe0\x80", p1 = "2")
+  #   # Invalid three byte sequence <f0 80 80>.
+  #   check testStringToCodePointsWarn("01\xf0\x80\x80", p1 = "2")
+  #   # Invalid four byte sequence <f1 80 bf 77>
+  #   check testStringToCodePointsWarn("01\xf1\x80\xbf\x77", p1 = "2")
 
   test "codePointsToString":
     check testCodePointsToString(newSeq[uint32](), "")
@@ -344,7 +342,7 @@ suite "unicodes.nim":
   test "slice":
     check testSlice("abc", 0, 0, "")
     check testSlice("abc", 0, 1, "a")
-    check testSlice("abc", 0, 2, "ab")
+    check testSlice("abc", 0, 3, "abc")
     check testSlice("abc", 0, 3, "abc")
     check testSlice("abc", 0, -1, "abc")
 
@@ -418,21 +416,21 @@ suite "unicodes.nim":
     check testSliceWarn("\xff", 0, 1,
       newFunResultWarn(wInvalidUtf8ByteSeq, 0, "0"))
     check testSliceWarn("a\xff", 0, 2,
-      newFunResultWarn(wInvalidUtf8ByteSeq, 0, "1"))
+      newFunResultWarn(wInvalidUtf8ByteSeq, 0, "1", 1))
     check testSliceWarn("a\xff", 1, 1,
-      newFunResultWarn(wInvalidUtf8ByteSeq, 0, "1"))
+      newFunResultWarn(wInvalidUtf8ByteSeq, 0, "1", 1))
 
     var str = "\xc2\xa9\xe2\x80\x90\xF0\x9D\x92\x9C\xff"
     check testSliceWarn(str, 3, 1,
-      newFunResultWarn(wInvalidUtf8ByteSeq, 0, "3"))
+      newFunResultWarn(wInvalidUtf8ByteSeq, 0, "3", 3))
 
     str = "\xc2\xa9\xe2\x80\x90\xF0\x9D\x92\xc0a"
     check testSliceWarn(str, 0, 4,
-      newFunResultWarn(wInvalidUtf8ByteSeq, 0, "2"))
+      newFunResultWarn(wInvalidUtf8ByteSeq, 0, "2", 2))
 
     str = "\xc2\xa9\xe2\x80\x90\xF0\x9D\x92\xc0"
     check testSliceWarn(str, 0, 4,
-      newFunResultWarn(wInvalidUtf8ByteSeq, 0, "2"))
+      newFunResultWarn(wInvalidUtf8ByteSeq, 0, "2", 2))
 
   test "slice mult-byte warn pos":
     let str = "\xc2\xa9\xe2\x80\x90\xF0\x9D\x92\x9C" # 3 unicode characters

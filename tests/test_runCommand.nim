@@ -96,6 +96,7 @@ proc getStatements(cmdLines: CmdLines): seq[Statement] =
     result.add(statement)
 
 proc stripNewline(line: string): string =
+  ## Remove an ending newline if it exists.
   if line.len > 0 and line[^1] == '\n':
     result = line[0 .. ^2]
   else:
@@ -108,30 +109,27 @@ proc compareStatements(statements: seq[Statement], eContent: string): bool =
     let expected = stripNewline(lines[ix])
     let got = $statement
     if got != expected:
-      echo "expected: $1" % expected
       echo "     got: $1" % got
+      echo "expected: $1" % expected
       return false
   return true
 
-proc cmpValueAndLengthOr(statement: Statement,
-    g, e: ValueAndLengthOr, start = 0): bool =
-  ## Compare the two values and show the differences when
-  ## different. Return true when they are the same.
+proc cmpValueAndLengthOr(functionName: string, statement: Statement, start: Natural,
+    g, e: ValueAndLengthOr): bool =
+  ## Compare the two ValueAndLengthOr objects. When different show
+  ## helpful messages.
 
-  result = true
-  if $g != $e:
-    if e.isValue:
-      echo "$1|" % statement.text
-      echo startColumn(start + e.value.length)
-    if g.isValue:
-      echo startColumn(start + g.value.length)
-    echo "expected: $1" % $e
-    echo "     got: $1" % $g
-    if e.isMessage:
-      echo getWarnStatement("template.html", statement, e.message)
+  let digits = startColumn(start, "123456789 123456789 123456789")
+  let begin = startColumn(start, "^ start")
+  let test = "$1\n$2\n$3\n$4" % [functionName, digits, statement.text, begin]
+  result = gotExpected($g, $e, test)
+  if not result and (e.isMessage or g.isMessage):
     if g.isMessage:
+      echo "\nGot full warning:"
       echo getWarnStatement("template.html", statement, g.message)
-    result = false
+    if e.isMessage:
+      echo "\nExpected full warning:"
+      echo getWarnStatement("template.html", statement, e.message)
 
 proc testGetStatements(content: string, expected: string): bool =
   ## Return true when the template content generates the expected statements.
@@ -155,26 +153,21 @@ proc testGetNumber(statement: Statement, start: Natural,
   ## it doesn't, show the values and expected values and return false.
 
   let valueAndLengthOr = getNumber(statement, start)
-
-  result = true
-  if $valueAndLengthOr != $eValueAndLengthOr:
-    echo "expected: $1" % $eValueAndLengthOr
-    echo "     got: $1" % $valueAndLengthOr
-    result = false
+  result = gotExpected($valueAndLengthOr, $eValueAndLengthOr, statement.text)
 
 proc testGetString(statement: Statement, start: Natural,
     eValueAndLengthOr: ValueAndLengthOr): bool =
 
   let valueAndLengthOr = getString(statement, start)
-  result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr)
+  result = cmpValueAndLengthOr("getString", statement, start, valueAndLengthOr, eValueAndLengthOr)
 
 proc testGetStringInvalid(buffer: seq[uint8]): bool =
   let str = bytesToString(buffer)
   let statement = newStatement("""a = "stringwithbadutf8:$1:end"""" % str)
   let start = 4
   let valueAndLengthOr = getString(statement, start)
-  let eValueAndLengthOr = newValueAndLengthOr(wInvalidUtf8ByteSeq, "", 23)
-  result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr)
+  let eValueAndLengthOr = newValueAndLengthOr(wInvalidUtf8ByteSeq, "23", 23)
+  result = cmpValueAndLengthOr("getString", statement, start, valueAndLengthOr, eValueAndLengthOr)
 
 proc testWarnStatement(statement: Statement,
     warning: MessageId, start: Natural, p1: string="",
@@ -201,7 +194,7 @@ proc testGetFunctionValueAndLength(
   let variables = emptyVariables(funcs = funcsVarDict)
   let valueAndLengthOr = getFunctionValueAndLength(functionName,
     statement, start, variables, list=false, skip=false)
-  result = cmpValueAndLengthOr(statement, valueAndLengthOr, eValueAndLengthOr, start)
+  result = cmpValueAndLengthOr(functionName, statement, start, valueAndLengthOr, eValueAndLengthOr)
 
 proc testRunStatement(statement: Statement, eVDataOr: VariableDataOr, variables: Variables = nil): bool =
   var vars: Variables

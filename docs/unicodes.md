@@ -13,7 +13,6 @@ Functions that deal with Unicode.
 * [codePointToString](#codepointtostring) &mdash; Convert a code point to a one character UTF-8 string.
 * [codePointsToString](#codepointstostring) &mdash; Convert a list of code points to a string.
 * [parseHexUnicodeToString](#parsehexunicodetostring) &mdash; Return a one character string given a 4 or 8 character unicode escape string.
-* [stringToCodePoints](#stringtocodepoints) &mdash; Return the string as a list of code points.
 * [slice](#slice) &mdash; Extract a substring from a string by its Unicode character position (not byte index).
 * [visibleControl](#visiblecontrol) &mdash; Return a new string with the tab and line endings and other control characters visible.
 
@@ -79,14 +78,6 @@ Return a one character string given a 4 or 8 character unicode escape string. Fo
 
 ```nim
 func parseHexUnicodeToString(text: string; pos: var Natural): OpResultId[string]
-```
-
-# stringToCodePoints
-
-Return the string as a list of code points.
-
-```nim
-func stringToCodePoints(str: string): OpResultWarn[seq[uint32]]
 ```
 
 # slice

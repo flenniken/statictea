@@ -5,7 +5,6 @@ import std/strutils
 import opresultid
 import opresultwarn
 import messages
-import warnings
 import utf8decoder
 import vartypes
 
@@ -217,19 +216,19 @@ func parseHexUnicodeToString*(text: string, pos: var Natural): OpResultId[string
     return opMessage[string](numOrc.message)
   result = codePointToString(numOrc.value)
 
-func stringToCodePoints*(str: string): OpResultWarn[seq[uint32]] =
-  ## Return the string as a list of code points.
-  var codePoints = newSeq[uint32]()
-  var ixStartSeq: int
-  var ixEndSeq: int
-  var codePoint: uint32
-  for valid in yieldUtf8Chars(str, ixStartSeq, ixEndSeq, codePoint):
-    if not valid:
-      # Invalid UTF-8 byte sequence at position {ixStartSeq}.
-      return opMessageW[seq[uint32]](newWarningData(wInvalidUtf8ByteSeq,
-        $(ixStartSeq)))
-    codePoints.add(codePoint)
-  result = opValueW[seq[uint32]](codePoints)
+# func stringToCodePoints*(str: string): OpResultWarn[seq[uint32]] =
+#   ## Return the string as a list of code points.
+#   var codePoints = newSeq[uint32]()
+#   var ixStartSeq: int
+#   var ixEndSeq: int
+#   var codePoint: uint32
+#   for valid in yieldUtf8Chars(str, ixStartSeq, ixEndSeq, codePoint):
+#     if not valid:
+#       # Invalid UTF-8 byte sequence at position $1.
+#       return opMessageW[seq[uint32]](newWarningData(wInvalidUtf8ByteSeq,
+#         $ixStartSeq, ixStartSeq))
+#     codePoints.add(codePoint)
+#   result = opValueW[seq[uint32]](codePoints)
 
 func slice*(str: string, start: int, length: int): FunResult =
   ## Extract a substring from a string by its Unicode character
@@ -257,7 +256,7 @@ func slice*(str: string, start: int, length: int): FunResult =
   for valid in yieldUtf8Chars(str, ixStartSeq, ixEndSeq, codePoint):
     if not valid:
       # Invalid UTF-8 byte sequence at position $1.
-      return newFunResultWarn(wInvalidUtf8ByteSeq, 0, $(charCount))
+      return newFunResultWarn(wInvalidUtf8ByteSeq, 0, $(charCount), charCount)
     else:
       if charCount == start:
         ixStartSlice = ixStartSeq
