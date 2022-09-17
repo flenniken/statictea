@@ -324,6 +324,7 @@ If the condition is 0, return the second parameter, else return the third parame
 * string -- when the length of the string is 0
 * list -- when the length of the list is 0
 * dict -- when the length of the dictionary is 0
+* func -- always 0
 
 The if functions are special in a couple of ways, see
 [[#if-functions][If Functions]]
@@ -1051,7 +1052,8 @@ func funValues_dl(variables: Variables; parameters: seq[Value]): FunResult
 # funSort_lsosl
 
 Sort a list of values of the same type.  The values are ints,
-floats, strings or bools. Bools are sorts as if true is 1 and false is 0.
+floats, strings or bools. Bools are sorted as if true is 1 and
+false is 0.
 
 You specify the sort order, "ascending" or "descending".
 
@@ -1790,7 +1792,7 @@ func funLte_ffb(variables: Variables; parameters: seq[Value]): FunResult
 
 # getBestFunction
 
-Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.  If none of the signatures match, return the one that matched the farthest going left to right.
+Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.  If none of the signatures match, return the one that matched the most parameters going left to right.
 
 ```nim
 proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr

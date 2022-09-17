@@ -246,7 +246,7 @@ proc runCodeFile*(env: var Env, variables: var Variables, filename: string) =
 
     # echo "variableData = $1" % $variableData
 
-    # Return function exit.
+    # Handle a return function exit.
     if variableData.operator == "exit":
       if not (variableData.value.kind == vkString and
               variableData.value.stringv == "stop"):

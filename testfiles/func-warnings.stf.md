@@ -63,7 +63,7 @@ statement: b2 = ccc()
 shared.tea(8): w46: Expected comma or right parentheses.
 statement: b3 = cmp(1 2)
                       ^
-shared.tea(9): w33: Expected a string, number, variable, list or function.
+shared.tea(9): w33: Expected a string, number, variable, list or condition.
 statement: b4 = cmp(1,)
                       ^
 shared.tea(10): w170: Missing comma or right bracket.

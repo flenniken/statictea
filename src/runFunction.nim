@@ -333,6 +333,7 @@ func funIf0_iaoaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:* string -- when the length of the string is 0
   ## @:* list -- when the length of the list is 0
   ## @:* dict -- when the length of the dictionary is 0
+  ## @:* func -- always 0
   ## @:
   ## @:The if functions are special in a couple of ways, see
   ## @:[[#if-functions][If Functions]]
@@ -1455,7 +1456,8 @@ func generalSort(map: VarsDict): FunResult =
 
 func funSort_lsosl*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Sort a list of values of the same type.  The values are ints,
-  ## @:floats, strings or bools. Bools are sorts as if true is 1 and false is 0.
+  ## @:floats, strings or bools. Bools are sorted as if true is 1 and
+  ## @:false is 0.
   ## @:
   ## @:You specify the sort order, "ascending" or "descending".
   ## @:
@@ -2412,7 +2414,7 @@ proc createFuncDictionary*(): Value =
   assert(functionsList.len > 0)
   var varsDict = newVarsDict()
 
-  # functionsList is sorted by name then signature code.
+  # The functionsList is sorted by name then signature code.
 
   var funcList = newEmptyListValue()
   var lastName = ""

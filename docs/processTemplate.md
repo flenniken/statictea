@@ -5,7 +5,7 @@ Process the template.
 * [processTemplate.nim](../src/processTemplate.nim) &mdash; Nim source code.
 # Index
 
-* [yieldContentLine](#yieldcontentline) &mdash; Yield one content line at a time and keep the line endings.
+* [yieldContentLine](#yieldcontentline) &mdash; Yield one line at a time and keep the line endings.
 * [readJsonFileLog](#readjsonfilelog) &mdash; Read a json file and log.
 * [readJsonFiles](#readjsonfiles) &mdash; Read json files and return a variable dictionary.
 * [processTemplate](#processtemplate) &mdash; Process the template.
@@ -15,7 +15,7 @@ Process the template.
 
 # yieldContentLine
 
-Yield one content line at a time and keep the line endings.
+Yield one line at a time and keep the line endings.
 
 ```nim
 iterator yieldContentLine(content: string): string

@@ -1402,11 +1402,11 @@ b = a(4, 7) => -1
 You can have multiple functions with the same name as long as
 their signatures differ.
 
-There are three cmp functions so the f dictionary value for it is
-a list of three function variables:
+There are four cmp functions so the f dictionary value for it is
+a list of four function variables:
 
 #+BEGIN_SRC
-cmp => [func, func, func]
+cmp => [func, func, func, func]
 #+END_SRC
 
 You can call a list of func variables. The function called is
@@ -1776,7 +1776,7 @@ Statement errors generate multi-line messages showing the
 statement and problem location, for example:
 
 #+BEGIN_SRC
-template.html(16): w33: Expected a string, number, variable, list or function.
+template.html(16): w33: Expected a string, number, variable, list or condition.
 statement: tea = len("abc",)
                            ^
 #+END_SRC
@@ -3011,6 +3011,7 @@ If the condition is 0, return the second parameter, else return the third parame
 - string -- when the length of the string is 0
 - list -- when the length of the list is 0
 - dict -- when the length of the dictionary is 0
+- func -- always 0
 
 The if functions are special in a couple of ways, see
 [[#if-functions][If Functions]]
@@ -3761,7 +3762,8 @@ slice("añyóng", 0, 3) => "añy"
 :END:
 
 Sort a list of values of the same type.  The values are ints,
-floats, strings or bools. Bools are sorts as if true is 1 and false is 0.
+floats, strings or bools. Bools are sorted as if true is 1 and
+false is 0.
 
 You specify the sort order, "ascending" or "descending".
 

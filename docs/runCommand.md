@@ -31,8 +31,8 @@ starts in the template file.
 * [ifFunctions](#iffunctions) &mdash; Return the if/if0 function's value and the length.
 * [andOrFunctions](#andorfunctions) &mdash; Return the and/or function's value and the length.
 * [getFunctionValueAndLength](#getfunctionvalueandlength) &mdash; Return the function's value and the length.
-* [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value or a warning message.
-* [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value or a warning message.
+* [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value.
+* [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value.
 * [skipCondition](#skipcondition) &mdash; Skip the condition expression and optional trailing whitespace.
 * [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and its length.
 * [getValueAndLength](#getvalueandlength) &mdash; Return the value and length of the item that the start parameter points at which is a string, number, variable, function or list.
@@ -264,7 +264,7 @@ proc getFunctionValueAndLength(dotNameStr: string; statement: Statement;
 
 # runBoolOp
 
-Evaluate the bool expression and return a bool value or a warning message.
+Evaluate the bool expression and return a bool value.
 
 ```nim
 proc runBoolOp(left: Value; op: string; right: Value): Value
@@ -272,7 +272,7 @@ proc runBoolOp(left: Value; op: string; right: Value): Value
 
 # runCompareOp
 
-Evaluate the comparison and return a bool value or a warning message.
+Evaluate the comparison and return a bool value.
 
 ```nim
 proc runCompareOp(left: Value; op: string; right: Value): Value
@@ -300,7 +300,7 @@ proc getCondition(statement: Statement; start: Natural; variables: Variables): V
 
 # getValueAndLength
 
-Return the value and length of the item that the start parameter points at which is a string, number, variable, function or list. The length returned includes the trailing whitespace after the item. So the ending position is pointing at the end of the statement, or at the first whitspace character after the item. When skip is true, the return value is 0 and functions are not executed.
+Return the value and length of the item that the start parameter points at which is a string, number, variable, function or list. The length returned includes the trailing whitespace after the item. So the ending position is pointing at the end of the statement, or at the first whitespace character after the item. When skip is true, the return value is 0 and functions are not executed.
 
 ```nim
 proc getValueAndLength(statement: Statement; start: Natural;

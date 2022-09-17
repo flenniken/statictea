@@ -26,16 +26,15 @@ template getNewLineBuffer(env: Env): untyped =
   ## When there is not enough memory for the line buffer, generate a
   ## warning and return.
   let lineBufferO = newLineBuffer(env.templateStream,
-      filename = env.templateFilename)
+      filename=env.templateFilename)
   if not lineBufferO.isSome():
     # Not enough memory for the line buffer.
     env.warnNoFile(wNotEnoughMemoryForLB)
     return
   lineBufferO.get()
-  # var lb {.inject.} = lineBufferO.get()
 
 iterator yieldContentLine*(content: string): string =
-  ## Yield one content line at a time and keep the line endings.
+  ## Yield one line at a time and keep the line endings.
   var start = 0
   for pos in 0 ..< content.len:
     let ch = content[pos]
@@ -278,12 +277,8 @@ proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
   result = varsDict
 
 proc getStartingVariables(env: var Env, args: Args): Variables =
-  ## Read and return the server and shared variables and setup the
-  ## initial tea variables.
-
-  # The tea variables are the top level items.  All variables are tea
-  # variables in the sense that they all exists somewhere in this
-  # dictionary.
+  ## Return the starting variables.  Read the server json files, run
+  ## the code files and setup the initial tea variables.
 
   let serverVarDict = readJsonFiles(env, args.serverList)
   let argsVarDict = getTeaArgs(args).dictv

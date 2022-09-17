@@ -640,8 +640,7 @@ proc getList(statement: Statement, start: Natural,
   result = newValueAndLengthOr(valueAndLength)
 
 proc runBoolOp*(left: Value, op: string, right: Value): Value =
-  ## Evaluate the bool expression and return a bool value or a warning
-  ## message.
+  ## Evaluate the bool expression and return a bool value.
   assert left.kind == vkBool and right.kind == vkBool
 
   var b: bool
@@ -654,8 +653,7 @@ proc runBoolOp*(left: Value, op: string, right: Value): Value =
   result = newValue(b)
 
 proc runCompareOp*(left: Value, op: string, right: Value): Value =
-  ## Evaluate the comparison and return a bool value or a warning
-  ## message.
+  ## Evaluate the comparison and return a bool value.
   assert left.kind == right.kind
   assert left.kind == vkInt or left.kind == vkFloat or left.kind == vkString
 
@@ -909,7 +907,7 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
 
   # Make sure start is pointing to something.
   if start >= statement.text.len:
-    # Expected a string, number, variable, list or function.
+    # Expected a string, number, variable, list or condition.
     return newValueAndLengthOr(wInvalidRightHandSide, "", start)
 
   ## Branch based on the first character.
@@ -926,7 +924,7 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
     # Get the name.
     let matchesO = matchDotNames(statement.text, start)
     if not matchesO.isSome:
-      # Expected a string, number, variable, list or function.
+      # Expected a string, number, variable, list or condition.
       return newValueAndLengthOr(wInvalidRightHandSide, "", start)
     let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
 
@@ -976,7 +974,7 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
       return newValueAndLengthOr(warningData)
     return newValueAndLengthOr(valueOr.value, dotNameLen)
   else:
-    # Expected a string, number, variable, list or function.
+    # Expected a string, number, variable, list or condition.
     return newValueAndLengthOr(wInvalidRightHandSide, "", start)
 
 proc getValueAndLength*(statement: Statement, start: Natural, variables:
@@ -985,7 +983,7 @@ proc getValueAndLength*(statement: Statement, start: Natural, variables:
   ## points at which is a string, number, variable, function or list.
   ## The length returned includes the trailing whitespace after the
   ## item. So the ending position is pointing at the end of the
-  ## statement, or at the first whitspace character after the item.
+  ## statement, or at the first whitespace character after the item.
   ## When skip is true, the return value is 0 and functions are not
   ## executed.
 

@@ -253,7 +253,7 @@ const
     "", ## wNotString
     "Unused text at the end of the statement.", ## wTextAfterValue
     "", ## wInvalidUtf8
-    "Expected a string, number, variable, list or function.", ## wInvalidRightHandSide
+    "Expected a string, number, variable, list or condition.", ## wInvalidRightHandSide
     "Missing operator, = or &=.", ## wInvalidVariable
     "", ## wInvalidNameSpace
     "The variable '$1' does not exist.", ## wVariableMissing
