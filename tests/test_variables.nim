@@ -91,7 +91,7 @@ t.version = "0.1.0""""
     check testGetVariableOk(variables, "g", "{}")
     let eTea = """{"args":{},"row":0,"version":"0.1.0"}"""
     check testGetVariableOk(variables, "t", eTea)
-    let expected = """["cmp(bb)i","cmp(ff)i","cmp(ii)i","cmp(ssob)i"]"""
+    let expected = """["cmp(ff)i","cmp(ii)i","cmp(ssob)i"]"""
     check testGetVariableOk(variables, "f.cmp", expected)
 
   test "getVariable five":

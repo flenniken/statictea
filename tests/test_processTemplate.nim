@@ -1452,10 +1452,11 @@ after
 
   test "run function variable":
     let templateContent = """
-$$ block myCmp = cmp
+$$ block
+$$ : myCmp = cmp
 $$ : b = myCmp(3, 2)
-$$ : fCmp = get(cmp, 1)
-$$ : d = fCmp(1.1, 2.2)
+$$ : myCmp2 = get(cmp, 0)
+$$ : d = myCmp2(1.1, 2.2)
 {b}
 {d}
 <!--$ endblock -->

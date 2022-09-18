@@ -397,10 +397,16 @@ suite "runFunction.nim":
     # check testCmpFun(2.1, 1.3, expected = 1)
 
   test "cmp bools":
-    check testCmpFun(true, true, expected = 0)
-    check testCmpFun(false, false, expected = 0)
-    check testCmpFun(true, false, expected = 1)
-    check testCmpFun(false, true, expected = -1)
+    var arguments = @[newValue(true), newValue(false)]
+    let eFunResult = newFunResultWarn(wWrongType, 0, "float")
+    check testFunction("cmp", arguments, eFunResult)
+
+  test "cmp functions":
+    let function = newFunc("abc", abc, "iis")
+    let value = newValue(function)
+    var arguments = @[newValue(value), newValue(value)]
+    let eFunResult = newFunResultWarn(wWrongType, 0, "float")
+    check testFunction("cmp", arguments, eFunResult)
 
   test "cmp strings":
     check testCmpFun("abc", "abc", expected = 0)
@@ -428,9 +434,9 @@ suite "runFunction.nim":
     let eFunResult = newFunResultWarn(wWrongType, 1, "int")
     check testFunction("cmp", arguments, eFunResult)
 
-  test "cmp not int, float or string":
+  test "cmp dictionaries":
     var arguments = @[newEmptyDictValue(), newEmptyDictValue()]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "bool")
+    let eFunResult = newFunResultWarn(wWrongType, 0, "float")
     check testFunction("cmp", arguments, eFunResult)
 
   test "cmp case insensitive not bool":

@@ -111,28 +111,6 @@ func funCmp_ffi*(variables: Variables, parameters: seq[Value]): FunResult =
   let b = map["b"].floatv
   result = newFunResult(newValue(cmp(a, b)))
 
-func funCmp_bbi*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Compare two bools. Returns -1 for less, 0 for equal and 1 for
-  ## @: greater than with true > false.
-  ## @:
-  ## @:~~~
-  ## @:cmp(a: bool, b: bool) int
-  ## @:~~~~
-  ## @:
-  ## @:Examples:
-  ## @:
-  ## @:~~~
-  ## @:cmp(true, true) => 0
-  ## @:cmp(false, false) => 0
-  ## @:cmp(true, false) => 1
-  ## @:cmp(false, true) => -1
-  ## @:~~~~
-
-  tMapParameters("bbi")
-  let a = map["a"].boolv
-  let b = map["b"].boolv
-  result = newFunResult(newValue(cmp(a, b)))
-
 func funCmp_ssobi*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Compare two strings. Returns -1 for less, 0 for equal and 1 for
   ## @:greater than.
@@ -1440,15 +1418,7 @@ func generalSort(map: VarsDict): FunResult =
       result = cmpBaseValues(a.listv[0], b.listv[0], insensitive)
     of vkDict:
       result = cmpBaseValues(a.dictv[key], b.dictv[key], insensitive)
-    of vkBool:
-      # Sort as if true is 1 and false is 0.
-      if a == b:
-        result = 0
-      elif a.boolv == true:
-        result = 1
-      else:
-        result = -1
-    of vkFunc:
+    of vkBool, vkFunc:
       result = 0
 
   let newList = sorted(list, sortCmpValues, sortOrder)
@@ -1456,8 +1426,7 @@ func generalSort(map: VarsDict): FunResult =
 
 func funSort_lsosl*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Sort a list of values of the same type.  The values are ints,
-  ## @:floats, strings or bools. Bools are sorted as if true is 1 and
-  ## @:false is 0.
+  ## @:floats, or strings.
   ## @:
   ## @:You specify the sort order, "ascending" or "descending".
   ## @:
@@ -1498,7 +1467,7 @@ func funSort_lssil*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:
   ## @:You specify which index to compare by.  The compare index value
   ## @:must exist in each list, be the same type and be an int, float,
-  ## @:string or bool. Bools are sorts as if true is 1 and false is 0.
+  ## @:or string.
   ## @:
   ## @:~~~
   ## @:sort(lists: list, order: string, case: string, index: int) list
@@ -1526,8 +1495,8 @@ func funSort_lsssl*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:"insensitive".
   ## @:
   ## @:You specify the compare key.  The key value must exist in
-  ## @:each dictionary, be the same type and be an int, float, bool or
-  ## @:string. Bools are sorts as if true is 1 and false is 0.
+  ## @:each dictionary, be the same type and be an int, float or
+  ## @:string.
   ## @:
   ## @:~~~
   ## @:sort(dicts: list, order: string, case: string, key: string) list
@@ -1623,7 +1592,7 @@ func funGithubAnchor_ll*(variables: Variables, parameters: seq[Value]): FunResul
 
 func funType_as*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Return the parameter type, one of: int, float, string, list,
-  ## dict or bool.
+  ## dict, bool or func.
   ## @:
   ## @:~~~
   ## @:type(variable: any) string
@@ -1638,6 +1607,7 @@ func funType_as*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:type(list(1,2)) => "list"
   ## @:type(dict("a", 1)) => "dict"
   ## @:type(true) => "bool"
+  ## @:type(f.cmp) => "func"
   ## @:~~~~
 
   tMapParameters("as")
@@ -2297,7 +2267,6 @@ const
     ("bool", funBool_ib, "ib"),
     ("case", funCase_iloaa, "iloaa"),
     ("case", funCase_sloaa, "sloaa"),
-    ("cmp", funCmp_bbi, "bbi"),
     ("cmp", funCmp_ffi, "ffi"),
     ("cmp", funCmp_iii, "iii"),
     ("cmp", funCmp_ssobi, "ssobi"),
