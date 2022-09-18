@@ -166,7 +166,7 @@ func funCmp_ssobi*(variables: Variables, parameters: seq[Value]): FunResult =
   let ret = cmpString(a, b, insensitive)
   result = newFunResult(newValue(ret))
 
-func funcConcat_sss*(variables: Variables, parameters: seq[Value]): FunResult =
+func funConcat_sss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Concatentate two strings. See join for more that two arguments.
   ## @:
   ## @:~~~
@@ -1795,9 +1795,9 @@ func funReturn_ss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:if0(c, return("stop"))
-  ## @:if0(c, return("skip"))
-  ## @:if0(c, return(""))
+  ## @:if(c, return("stop"))
+  ## @:if(c, return("skip"))
+  ## @:if(c, return(""))
   ## @:~~~~
 
   tMapParameters("ss")
@@ -2302,7 +2302,7 @@ const
     ("cmp", funCmp_iii, "iii"),
     ("cmp", funCmp_ssobi, "ssobi"),
     ("cmpVersion", funCmpVersion_ssi, "ssi"),
-    ("concat", funcConcat_sss, "sss"),
+    ("concat", funConcat_sss, "sss"),
     ("dict", funDict_old, "old"),
     ("dup", funDup_sis, "sis"),
     ("eq", funEq_ffb, "ffb"),

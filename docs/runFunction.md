@@ -10,7 +10,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funCmp_ffi](#funcmp_ffi) &mdash; Compare two floats.
 * [funCmp_bbi](#funcmp_bbi) &mdash; Compare two bools.
 * [funCmp_ssobi](#funcmp_ssobi) &mdash; Compare two strings.
-* [funcConcat_sss](#funcconcat_sss) &mdash; Concatentate two strings.
+* [funConcat_sss](#funconcat_sss) &mdash; Concatentate two strings.
 * [funLen_si](#funlen_si) &mdash; Number of unicode characters in a string.
 * [funLen_li](#funlen_li) &mdash; Number of elements in a list.
 * [funLen_di](#funlen_di) &mdash; Number of elements in a dictionary.
@@ -175,7 +175,7 @@ cmp("Tea", "tea", false) => 0
 func funCmp_ssobi(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funcConcat_sss
+# funConcat_sss
 
 Concatentate two strings. See join for more that two arguments.
 
@@ -191,7 +191,7 @@ concat("a", "b") => "ab"
 ~~~~
 
 ```nim
-func funcConcat_sss(variables: Variables; parameters: seq[Value]): FunResult
+func funConcat_sss(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funLen_si
@@ -1329,9 +1329,9 @@ return(value: string) string
 Examples:
 
 ~~~
-if0(c, return("stop"))
-if0(c, return("skip"))
-if0(c, return(""))
+if(c, return("stop"))
+if(c, return("skip"))
+if(c, return(""))
 ~~~~
 
 ```nim
