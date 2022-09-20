@@ -189,72 +189,54 @@ func signatureCodeToParams*(signatureCode: string): Option[seq[Param]] =
   result = some(params)
 
 func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
-  ## Create a dictionary of the arguments. The parameter names are the
-  ## dictionary keys.  Return a FunResult object containing the
-  ## dictionary or a warning when the parameters do not match the
-  ## signature.  The last signature parameter is for the return type.
-  ## The warning parameter value tells how many arguments matched the
-  ## parameters.
+  ## Create a dictionary of the arguments. The parameter names become
+  ## the dictionary keys.  Return a FunResult object containing the
+  ## dictionary or a warning when the arguments do not match the
+  ## signature.  When they do not match, the warning parameter tells
+  ## the first non-matching argument.
 
   var map = newVarsDict()
 
-  # Determine the number of required parameters and whether the
-  # signature contains an optional last element.
+  # Determine whether the signature contains an optional last element.
+  # The last signature parameter is for the return type.
   var gotOptional: bool
-  var requiredParams: int
-  var loopParams: int
   if params.len >= 2:
     let lastParamIx = params.len - 2
     gotOptional = (params[lastParamIx].paramKind == pkOptional)
-    if gotOptional:
-      requiredParams = lastParamIx
-      if args.len > lastParamIx:
-        loopParams = lastParamIx + 1
-      else:
-        loopParams = lastParamIx
-    else:
-      requiredParams = params.len - 1
-      loopParams = params.len - 1
   else:
     # No parameters case.
     gotOptional = false
-    requiredParams = 0
-    loopParams = 0
 
-  # Check there are enough parameters.
-  if args.len < requiredParams:
-    if gotOptional:
+  # Loop through the parameters and compare to the arguments.
+  var lastIx: int
+  for ix in countUp(0, params.len - 2):
+    lastIx = ix
+    let param = params[ix]
+
+    if ix == args.len and gotOptional and param.paramKind == pkOptional:
+      break
+
+    if ix >= args.len:
+      let warning = if gotOptional: wNotEnoughArgsOpt else: wNotEnoughArgs
+      let requiredArgs = if gotOptional: params.len - 2 else: params.len - 1
       # The function requires at least $1 arguments.
-      return newFunResultWarn(wNotEnoughArgsOpt, parameter=0, p1 = $requiredParams)
-    else:
-      # Not enough parameters, $1 required.
-      return newFunResultWarn(wNotEnoughArgs, parameter=0, p1 = $requiredParams)
+      # Not enough arguments, $1 required.
+      return newFunResultWarn(warning, parameter=ix, p1 = $requiredArgs)
 
-  # Check there are not too many parameters.
-  var limit: int
-  if gotOptional:
-    limit = requiredParams + 1
-  else:
-    limit = requiredParams
-  if args.len > limit:
-    if gotOptional:
-      # The function requires at most $1 arguments.
-      return newFunResultWarn(wTooManyArgsOpt, parameter=0, p1 = $limit)
-    else:
-      # The function requires $1 arguments.
-      return newFunResultWarn(wTooManyArgs, parameter=0, p1 = $limit)
+    let arg = args[ix]
 
-  # Loop through the parameters.
-  for ix in countUp(0, loopParams - 1):
-    var param = params[ix]
-    var arg = args[ix]
-
-    # Check the parameter is the correct type.
+    # Check the parameter and argument match.
     if not sameType(param.paramCode, arg.kind):
       let expected = paramCodeString(param.paramCode)
       # Wrong argument type, expected $1.
       return newFunResultWarn(wWrongType, parameter=ix, p1 = $expected)
 
     map[param.name] = arg
+
+  if args.len > params.len - 1:
+    let warning = if gotOptional: wTooManyArgsOpt else: wTooManyArgs
+      # The function requires at most $1 arguments.
+      # The function requires $1 arguments.
+    return newFunResultWarn(warning, parameter=lastIx+1, p1 = $(params.len - 1))
 
   result = newFunResult(newValue(map))

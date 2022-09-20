@@ -2211,7 +2211,6 @@ List of functions:
 - [[#case][case]] -- Compare integer cases and return the matching value.
 - [[#case][case]] -- Compare string cases and return the matching value.
 - [[#cmpVersion][cmpVersion]] -- Compare two StaticTea version numbers.
-- [[#cmp][cmp]] -- Compare two bools.
 - [[#cmp][cmp]] -- Compare two floats.
 - [[#cmp][cmp]] -- Compare two ints.
 - [[#cmp][cmp]] -- Compare two strings.
@@ -2268,7 +2267,7 @@ List of functions:
 - [[#startsWith][startsWith]] -- Check whether a strings starts with the given prefix.
 - [[#string][string]] -- Convert the variable to a string.
 - [[#string][string]] -- Convert the dictionary variable to dot names.
-- [[#type][type]] -- Return the parameter type, one of: int, float, string, list, dict or bool.
+- [[#type][type]] -- Return the parameter type, one of: int, float, string, list, dict, bool or func.
 - [[#values][values]] -- Create a list out of the values in the specified dictionary.
 - [[#warn][warn]] -- Return a warning message and skip the current statement.
 
@@ -2454,29 +2453,6 @@ Examples:
 cmpVersion("1.2.5", "1.1.8") => 1
 cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
-#+END_SRC
-
-[[#contents][茶]]
-
-** cmp
-:PROPERTIES:
-:CUSTOM_ID: cmp
-:END:
-
-Compare two bools. Returns -1 for less, 0 for equal and 1 for
- greater than with true > false.
-
-#+BEGIN_SRC
-cmp(a: bool, b: bool) int
-#+END_SRC
-
-Examples:
-
-#+BEGIN_SRC
-cmp(true, true) => 0
-cmp(false, false) => 0
-cmp(true, false) => 1
-cmp(false, true) => -1
 #+END_SRC
 
 [[#contents][茶]]
@@ -3784,8 +3760,7 @@ slice("añyóng", 0, 3) => "añy"
 :END:
 
 Sort a list of values of the same type.  The values are ints,
-floats, strings or bools. Bools are sorted as if true is 1 and
-false is 0.
+floats, or strings.
 
 You specify the sort order, "ascending" or "descending".
 
@@ -3829,7 +3804,7 @@ You specify how to sort strings either case "sensitive" or
 
 You specify which index to compare by.  The compare index value
 must exist in each list, be the same type and be an int, float,
-string or bool. Bools are sorts as if true is 1 and false is 0.
+or string.
 
 #+BEGIN_SRC
 sort(lists: list, order: string, case: string, index: int) list
@@ -3860,8 +3835,8 @@ You specify how to sort strings either case "sensitive" or
 "insensitive".
 
 You specify the compare key.  The key value must exist in
-each dictionary, be the same type and be an int, float, bool or
-string. Bools are sorts as if true is 1 and false is 0.
+each dictionary, be the same type and be an int, float or
+string.
 
 #+BEGIN_SRC
 sort(dicts: list, order: string, case: string, key: string) list
@@ -3978,7 +3953,7 @@ teas.z.a = 8
 :CUSTOM_ID: type
 :END:
 
-Return the parameter type, one of: int, float, string, list, dict or bool.
+Return the parameter type, one of: int, float, string, list, dict, bool or func.
 
 #+BEGIN_SRC
 type(variable: any) string
@@ -3993,6 +3968,7 @@ type("Tea") => "string"
 type(list(1,2)) => "list"
 type(dict("a", 1)) => "dict"
 type(true) => "bool"
+type(f.cmp) => "func"
 #+END_SRC
 
 [[#contents][茶]]

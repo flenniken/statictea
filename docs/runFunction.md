@@ -8,7 +8,6 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
 * [funCmp_iii](#funcmp_iii) &mdash; Compare two ints.
 * [funCmp_ffi](#funcmp_ffi) &mdash; Compare two floats.
-* [funCmp_bbi](#funcmp_bbi) &mdash; Compare two bools.
 * [funCmp_ssobi](#funcmp_ssobi) &mdash; Compare two strings.
 * [funConcat_sss](#funconcat_sss) &mdash; Concatentate two strings.
 * [funLen_si](#funlen_si) &mdash; Number of unicode characters in a string.
@@ -48,7 +47,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funSort_lsssl](#funsort_lsssl) &mdash; Sort a list of dictionaries.
 * [funGithubAnchor_ss](#fungithubanchor_ss) &mdash; Create a Github anchor name from a heading name.
 * [funGithubAnchor_ll](#fungithubanchor_ll) &mdash; Create Github anchor names from heading names.
-* [funType_as](#funtype_as) &mdash; Return the parameter type, one of: int, float, string, list, dict or bool.
+* [funType_as](#funtype_as) &mdash; Return the parameter type, one of: int, float, string, list, dict, bool or func.
 * [funJoinPath_loss](#funjoinpath_loss) &mdash; Join the path components with a path separator.
 * [funJoin_lsois](#funjoin_lsois) &mdash; Join a list of strings with a separator.
 * [funWarn_ss](#funwarn_ss) &mdash; Return a warning message and skip the current statement.
@@ -125,28 +124,6 @@ cmp(9.3, 2.2) => 1
 
 ```nim
 func funCmp_ffi(variables: Variables; parameters: seq[Value]): FunResult
-```
-
-# funCmp_bbi
-
-Compare two bools. Returns -1 for less, 0 for equal and 1 for
- greater than with true > false.
-
-~~~
-cmp(a: bool, b: bool) int
-~~~~
-
-Examples:
-
-~~~
-cmp(true, true) => 0
-cmp(false, false) => 0
-cmp(true, false) => 1
-cmp(false, true) => -1
-~~~~
-
-```nim
-func funCmp_bbi(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funCmp_ssobi
@@ -1052,8 +1029,7 @@ func funValues_dl(variables: Variables; parameters: seq[Value]): FunResult
 # funSort_lsosl
 
 Sort a list of values of the same type.  The values are ints,
-floats, strings or bools. Bools are sorted as if true is 1 and
-false is 0.
+floats, or strings.
 
 You specify the sort order, "ascending" or "descending".
 
@@ -1096,7 +1072,7 @@ You specify how to sort strings either case "sensitive" or
 
 You specify which index to compare by.  The compare index value
 must exist in each list, be the same type and be an int, float,
-string or bool. Bools are sorts as if true is 1 and false is 0.
+or string.
 
 ~~~
 sort(lists: list, order: string, case: string, index: int) list
@@ -1126,8 +1102,8 @@ You specify how to sort strings either case "sensitive" or
 "insensitive".
 
 You specify the compare key.  The key value must exist in
-each dictionary, be the same type and be an int, float, bool or
-string. Bools are sorts as if true is 1 and false is 0.
+each dictionary, be the same type and be an int, float or
+string.
 
 ~~~
 sort(dicts: list, order: string, case: string, key: string) list
@@ -1203,7 +1179,7 @@ func funGithubAnchor_ll(variables: Variables; parameters: seq[Value]): FunResult
 
 # funType_as
 
-Return the parameter type, one of: int, float, string, list, dict or bool.
+Return the parameter type, one of: int, float, string, list, dict, bool or func.
 
 ~~~
 type(variable: any) string
@@ -1218,6 +1194,7 @@ type("Tea") => "string"
 type(list(1,2)) => "list"
 type(dict("a", 1)) => "dict"
 type(true) => "bool"
+type(f.cmp) => "func"
 ~~~~
 
 ```nim
@@ -1792,7 +1769,7 @@ func funLte_ffb(variables: Variables; parameters: seq[Value]): FunResult
 
 # getBestFunction
 
-Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.  If none of the signatures match, return the one that matched the most parameters going left to right.
+Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
 
 ```nim
 proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr

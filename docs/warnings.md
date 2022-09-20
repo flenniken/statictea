@@ -6,6 +6,7 @@ Module for handling warnings.
 # Index
 
 * type: [WarningData](#warningdata) &mdash; Warning data.
+* [getWarning](#getwarning) &mdash; Return the warning string.
 * [getWarningLine](#getwarningline) &mdash; Return a formatted warning line.
 * [getWarningLine](#getwarningline-1) &mdash; Return a formatted warning line.
 * [newWarningData](#newwarningdata) &mdash; Create a WarningData object containing all the warning information.
@@ -26,6 +27,14 @@ WarningData = object
   p1*: string
   pos*: Natural
 
+```
+
+# getWarning
+
+Return the warning string.
+
+```nim
+func getWarning(warning: MessageId; p1 = ""): string
 ```
 
 # getWarningLine

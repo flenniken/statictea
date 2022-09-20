@@ -220,7 +220,8 @@ MessageId = enum
   wNoMatchingParen,         ## w203
   wReadOnlyFunctions,       ## w204
   wNotInLorF,               ## w205
-  wNotFunction               ## w206
+  wNotFunction,             ## w206
+  wNoneMatchedFirst          ## w207
 ```
 
 # Messages
@@ -435,7 +436,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "No matching end right parentheses.", ## wNoMatchingParen
     "You cannot assign to the functions dictionary.", ## wReadOnlyFunctions
     "The variable \'$1\' wasn\'t found in the l or f dictionaries.", ## wNotInLorF
-    "You cannot call the variable because it\'s not a function or a list of functions."]
+    "You cannot call the variable because it\'s not a function or a list of functions.", ## wNotFunction
+    "None of the $1 functions matched the first argument."]
 ```
 
 

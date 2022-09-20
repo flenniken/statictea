@@ -2332,8 +2332,7 @@ const
 proc getBestFunction*(funcValue: Value, arguments: seq[Value]): ValueOr =
   ## Given a function variable or a list of function variables and a
   ## list of arguments, return the one that best matches the
-  ## arguments.  If none of the signatures match, return the one that
-  ## matched the most parameters going left to right.
+  ## arguments.
 
   if funcValue.kind == vkFunc:
     return newValueOr(funcValue)
@@ -2367,10 +2366,20 @@ proc getBestFunction*(funcValue: Value, arguments: seq[Value]): ValueOr =
       if funResult.kind != frWarning:
         # All arguments match the parameters, return the function.
         return newValueOr(funcValue)
+
+      # The mapParameters function returns the first parameter that
+      # doesn't match. Use that to determine the best function to
+      # return.
       if funResult.parameter > maxDistance:
         maxDistance = funResult.parameter
         maxFuncValue = funcValue
-    # Return the function that made if farthest through its
+
+    if maxDistance == 0:
+      # None of the $1 function signatures matched the first argument.
+      let warningData = newWarningData(wNoneMatchedFirst, $funcList.len)
+      return newValueOr(warningData)
+
+    # Return the function that made it farthest through its
     # parameters.
     result = newValueOr(maxFuncValue)
 

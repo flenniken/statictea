@@ -75,10 +75,10 @@ statement: s = slice("string")
                      ^
 tmpl.txt(5): w180: The function requires at most 3 arguments.
 statement: s = slice("string", 0, 4, 3)
-                     ^
+                                     ^
 tmpl.txt(6): w180: The function requires at most 3 arguments.
 statement: s = slice("string", 0, 4, 3, 7)
-                     ^
+                                     ^
 tmpl.txt(11): w120: Wrong argument type, expected string.
 statement: s = slice(5, 0)
                      ^

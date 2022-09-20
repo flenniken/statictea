@@ -217,6 +217,7 @@ type
     wReadOnlyFunctions,    ## w204
     wNotInLorF,            ## w205
     wNotFunction,          ## w206
+    wNoneMatchedFirst,     ## w207
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -427,6 +428,8 @@ const
     "You cannot assign to the functions dictionary.", ## wReadOnlyFunctions
     "The variable '$1' wasn't found in the l or f dictionaries.", ## wNotInLorF
     "You cannot call the variable because it's not a function or a list of functions.", ## wNotFunction
+    "None of the $1 functions matched the first argument.", ## wNoneMatchedFirst
+
     ]
 
     ## The message text.

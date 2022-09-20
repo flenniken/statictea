@@ -205,6 +205,9 @@ proc testRunStatement(statement: Statement, eVDataOr: VariableDataOr, variables:
     vars = variables
   let variableDataOr = runStatement(statement, vars)
   result = gotExpected($variableDataOr, $eVDataOr, statement.text)
+  if not result and variableDataOr.isMessage:
+    echo ""
+    echo getWarnStatement("filename", statement, variableDataOr.message)
 
 proc testRunBoolOp(left: bool | Value, op: string, right: bool | Value, eValue: Value): bool =
   let value = runBoolOp(newValue(left), op, newValue(right))
@@ -850,7 +853,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "warn extra parameter":
     let text = """a = warn("hello", 4)"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wTooManyArgs, "1", 9)
+    let eVariableDataOr = newVariableDataOr(wTooManyArgs, "1", 18)
     check testRunStatement(statement, eVariableDataOr)
 
   test "if0 missing required":

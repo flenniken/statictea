@@ -72,10 +72,10 @@ len("añyóng") => 6
 ### File stderr.expected
 
 ~~~
-tmpl.txt(26): w120: Wrong argument type, expected dict.
+tmpl.txt(26): w207: None of the 3 functions matched the first argument.
 statement: a = len(0)
                    ^
-tmpl.txt(27): w120: Wrong argument type, expected dict.
+tmpl.txt(27): w207: None of the 3 functions matched the first argument.
 statement: b = len(1.0)
                    ^
 ~~~

@@ -5,11 +5,20 @@ import std/tables
 import vartypes
 import runFunction
 import messages
+import warnings
 import variables
 import opresultwarn
 import sharedtestcode
 
 let funcsVarDict = createFuncDictionary().dictv
+
+func newFunResult(valueOr: ValueOr, parameter=0): FunResult =
+  ## Return a new FunResult object based on the ValueOr and the parameter index.
+  if valueOr.isValue:
+    result = FunResult(kind: frValue, value: valueOr.value)
+  else:
+    result = FunResult(kind: frWarning, parameter: parameter,
+      warningData: valueOr.message)
 
 proc testFunction(functionName: string, arguments: seq[Value],
     eFunResult: FunResult, variables: Variables = nil): bool =
@@ -22,24 +31,27 @@ proc testFunction(functionName: string, arguments: seq[Value],
   if vars == nil:
     vars = emptyVariables(funcs = funcsVarDict)
 
+  var funResult: FunResult
   # Lookup the variable's value.
-  var funcValueOr = getVariable(vars, functionName)
-  if funcValueOr.isMessage:
-    echo funcValueOr.message
-    return false
+  let funcValueOr = getVariable(vars, functionName)
+  funResult = newFunResult(funcValueOr, parameter=0)
+  if funResult.kind == frValue:
+    # Get the function to match the arguments.
+    let bestValueOr = getBestFunction(funcValueOr.value, arguments)
+    funResult = newFunResult(bestValueOr, parameter=0)
+    if funResult.kind == frValue:
+      # Call the function.
+      funResult = bestValueOr.value.funcv.functionPtr(vars, arguments)
 
-  # Get the function to match the arguments.
-  funcValueOr = getBestFunction(funcValueOr.value, arguments)
-  if funcValueOr.isMessage:
-    echo funcValueOr.message
-    return false
-
-  # Call the function.
-  let funResult = funcValueOr.value.funcv.functionPtr(vars, arguments)
-
-  # Verify it returned the expected results.
-  let test = "$1(args=$2)" % [functionName, $arguments]
+  # Verify we got the expected results.
+  let test = "$1(args=$2)  $3\n" % [functionName, $arguments, $funcValueOr]
   result = gotExpected($funResult, $eFunResult, test)
+  if not result and eFunResult.kind == frWarning and funResult.kind == frWarning:
+    echo ""
+    echo "    got  message: $1" % getWarning(
+      funResult.warningData.warning, funResult.warningData.p1)
+    echo "expected message: $1" % getWarning(
+      eFunResult.warningData.warning, eFunResult.warningData.p1)
 
 proc testPathGood(path, filename, basename, ext, dir: string, separator = ""): bool =
     var arguments = @[newValue(path)]
@@ -161,7 +173,8 @@ suite "runFunction.nim":
     check testGetBestFunction(listValue, @[newValue(1.2), newValue(1.1)], newValueOr(value2))
     check testGetBestFunction(listValue, @[newValue(1), newValue("tea")], newValueOr(value1))
     check testGetBestFunction(listValue, @[newValue(1.1), newValue("tea")], newValueOr(value2))
-    check testGetBestFunction(listValue, @[newValue("tea"), newValue("tea")], newValueOr(value1))
+    check testGetBestFunction(listValue, @[newValue("tea"), newValue("tea")],
+      newValueOr(wNoneMatchedFirst, "2"))
 
   test "getBestFunction not function":
     let value = newValue(2)
@@ -218,11 +231,6 @@ suite "runFunction.nim":
     let eFunResult = newFunResult(newValue("abc"))
     check testFunction("concat", arguments, eFunResult)
 
-  test "concat nothing":
-    var arguments: seq[Value]
-    let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "2")
-    check testFunction("concat", arguments, eFunResult)
-
   test "len string":
     var arguments = newValue(["abc"]).listv
     let eFunResult = newFunResult(newValue(3))
@@ -252,26 +260,6 @@ suite "runFunction.nim":
     var list = newValue(["5", "3", "hi"])
     var arguments = @[newValue(list)]
     let eFunResult = newFunResult(newValue(3))
-    check testFunction("len", arguments, eFunResult)
-
-  test "len float":
-    var arguments = @[newValue(3.4)]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "dict")
-    check testFunction("len", arguments, eFunResult)
-
-  test "len int":
-    var arguments = @[newValue(3)]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "dict")
-    check testFunction("len", arguments, eFunResult)
-
-  test "len nothing":
-    var arguments: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "1")
-    check testFunction("len", arguments, eFunResult)
-
-  test "len 2":
-    var arguments = newValue([3, 2]).listv
-    let eFunResult = newFunResultWarn(wTooManyArgs, 0, "1")
     check testFunction("len", arguments, eFunResult)
 
   test "get list item":
@@ -331,14 +319,14 @@ suite "runFunction.nim":
   test "get one parameter":
     var list = newValue([1, 2, 3, 4, 5])
     var arguments = @[list]
-    let eFunResult = newFunResultWarn(wNotEnoughArgsOpt, 0, "2")
+    let eFunResult = newFunResultWarn(wNotEnoughArgsOpt, 1, "2")
     check testFunction("get", arguments, eFunResult)
 
   test "get 4 arguments":
     var list = newValue([1, 2, 3, 4, 5])
     let p = newValue(1)
     var arguments = @[list, p, p, p]
-    let eFunResult = newFunResultWarn(wTooManyArgsOpt, 0, "3")
+    let eFunResult = newFunResultWarn(wTooManyArgsOpt, 3, "3")
     check testFunction("get", arguments, eFunResult)
 
   test "get parameter 2 wrong type":
@@ -355,17 +343,6 @@ suite "runFunction.nim":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
     var arguments = @[dict, newValue(3.5)]
     let eFunResult = newFunResultWarn(wWrongType, 1, "string")
-    check testFunction("get", arguments, eFunResult)
-
-  test "get wrong first parameter":
-    var arguments = @[newValue(2), newValue(2)]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "dict")
-    check testFunction("get", arguments, eFunResult)
-
-  test "get wrong second parameter":
-    var list = newValue([1, 2, 3, 4, 5])
-    var arguments = @[list, newValue("a")]
-    let eFunResult = newFunResultWarn(wWrongType, 1, "int")
     check testFunction("get", arguments, eFunResult)
 
   test "get invalid index":
@@ -396,18 +373,6 @@ suite "runFunction.nim":
     # check testCmpFun(1.2, 2.0, expected = -1)
     # check testCmpFun(2.1, 1.3, expected = 1)
 
-  test "cmp bools":
-    var arguments = @[newValue(true), newValue(false)]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "float")
-    check testFunction("cmp", arguments, eFunResult)
-
-  test "cmp functions":
-    let function = newFunc("abc", abc, "iis")
-    let value = newValue(function)
-    var arguments = @[newValue(value), newValue(value)]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "float")
-    check testFunction("cmp", arguments, eFunResult)
-
   test "cmp strings":
     check testCmpFun("abc", "abc", expected = 0)
     check testCmpFun("abc", "abd", expected = -1)
@@ -426,7 +391,7 @@ suite "runFunction.nim":
 
   test "cmp wrong number arguments":
     var arguments = @[newValue(4)]
-    let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "2")
+    let eFunResult = newFunResultWarn(wNotEnoughArgs, 1, "2")
     check testFunction("cmp", arguments, eFunResult)
 
   test "cmp not same kind":
@@ -436,7 +401,7 @@ suite "runFunction.nim":
 
   test "cmp dictionaries":
     var arguments = @[newEmptyDictValue(), newEmptyDictValue()]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "float")
+    let eFunResult = newFunResultWarn(wNoneMatchedFirst, 0, "3")
     check testFunction("cmp", arguments, eFunResult)
 
   test "cmp case insensitive not bool":
@@ -511,12 +476,12 @@ suite "runFunction.nim":
 
   test "add no arguments":
     var arguments: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "2")
+    let eFunResult = newFunResultWarn(wNoneMatchedFirst, 0, "2")
     check testFunction("add", arguments, eFunResult)
 
   test "add string and int":
     var arguments = @[newValue("hi"), newValue(4)]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "float")
+    let eFunResult = newFunResultWarn(wNoneMatchedFirst, 0, "2")
     check testFunction("add", arguments, eFunResult)
 
   test "add int and string":
@@ -617,7 +582,7 @@ suite "runFunction.nim":
       newValue(7), newValue("v7"),
     ])
     var arguments = @[newValue(1.2), cases]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "int")
+    let eFunResult = newFunResultWarn(wNoneMatchedFirst, 0, "2")
     check testFunction("case", arguments, eFunResult)
 
   test "case invalid condition":
@@ -691,19 +656,9 @@ suite "runFunction.nim":
     let eFunResult = newFunResult(newValue(5))
     check testFunction("int", arguments, eFunResult)
 
-  test "int(): wrong number of arguments":
-    var arguments = @[newValue(4.57), newValue(1), newValue(2)]
-    let eFunResult = newFunResultWarn(wTooManyArgsOpt, 0, "2")
-    check testFunction("int", arguments, eFunResult)
-
   test "int(): not a number string":
     var arguments = @[newValue("hello"), newValue("round")]
     let eFunResult = newFunResultWarn(wExpectedNumberString)
-    check testFunction("int", arguments, eFunResult)
-
-  test "int(): not a float":
-    var arguments = @[newValue(3), newValue("round")]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "float")
     check testFunction("int", arguments, eFunResult)
 
   test "int(): not round option":
@@ -758,7 +713,7 @@ suite "runFunction.nim":
 
   test "to float wrong number arguments":
     var arguments = @[newValue(4), newValue(3)]
-    let eFunResult = newFunResultWarn(wTooManyArgs, 0, "1")
+    let eFunResult = newFunResultWarn(wTooManyArgs, 1, "1")
     check testFunction("float", arguments, eFunResult)
 
   test "to float warning":
@@ -813,7 +768,7 @@ suite "runFunction.nim":
 
   test "find 1 parameter":
     var arguments = @[newValue("big")]
-    let eFunResult = newFunResultWarn(wNotEnoughArgsOpt, 0, "2")
+    let eFunResult = newFunResultWarn(wNotEnoughArgsOpt, 1, "2")
     check testFunction("find", arguments, eFunResult)
 
   test "find 1 not string":
@@ -843,7 +798,7 @@ suite "runFunction.nim":
 
   test "slice 1 parameter":
     var arguments = @[newValue("big")]
-    let eFunResult = newFunResultWarn(wNotEnoughArgsOpt, 0, "2")
+    let eFunResult = newFunResultWarn(wNotEnoughArgsOpt, 1, "2")
     check testFunction("slice", arguments, eFunResult)
 
   test "slice 1 not string":
@@ -903,7 +858,7 @@ suite "runFunction.nim":
 
   test "dup 1 parameter":
     var arguments = @[newValue("abc")]
-    let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "2")
+    let eFunResult = newFunResultWarn(wNotEnoughArgs, 1, "2")
     check testFunction("dup", arguments, eFunResult)
 
   test "dup not valid string":
@@ -1176,13 +1131,13 @@ suite "runFunction.nim":
 
   test "path: wrong number of arguments":
     var arguments: seq[Value] = @[newValue("Earl Grey"), newValue("a"), newValue("a")]
-    let eFunResult = newFunResultWarn(wTooManyArgsOpt, 0, "2")
+    let eFunResult = newFunResultWarn(wTooManyArgsOpt, 2, "2")
     check testFunction("path", arguments, eFunResult)
 
   test "path: wrong number of arguments 2":
     var arguments: seq[Value] = @[newValue("Earl Grey"),
                                    newValue("a"), newValue("a"), newValue(2)]
-    let eFunResult = newFunResultWarn(wTooManyArgsOpt, 0, "2")
+    let eFunResult = newFunResultWarn(wTooManyArgsOpt, 2, "2")
     check testFunction("path", arguments, eFunResult)
 
   test "path: wrong kind p1":
@@ -1394,12 +1349,12 @@ suite "runFunction.nim":
 
   test "sort: wrong number of arguments":
     var arguments: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(wNotEnoughArgsOpt, 0, "2")
+    let eFunResult = newFunResultWarn(wNoneMatchedFirst, 0, "3")
     check testFunction("sort", arguments, eFunResult)
 
   test "sort: not list":
     var arguments: seq[Value] = @[newValue(0), newValue("ascending")]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "list")
+    let eFunResult = newFunResultWarn(wNoneMatchedFirst, 0, "3")
     check testFunction("sort", arguments, eFunResult)
 
   test "sort: invalid order":
@@ -1489,12 +1444,12 @@ suite "runFunction.nim":
 
   test "githubAnchor: wrong number of arguments":
     var arguments: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "1")
+    let eFunResult = newFunResultWarn(wNoneMatchedFirst, 0, "2")
     check testFunction("githubAnchor", arguments, eFunResult)
 
   test "githubAnchor: wrong kind of parameter":
     var arguments: seq[Value] = @[newValue(2)]
-    let eFunResult = newFunResultWarn(wWrongType, 0, "list")
+    let eFunResult = newFunResultWarn(wNoneMatchedFirst, 0, "2")
     check testFunction("githubAnchor", arguments, eFunResult)
 
   test "githubAnchor list":
@@ -1543,12 +1498,12 @@ suite "runFunction.nim":
 
   test "cmdVersion: two few arguments":
     let arguments = @[newValue("1.2.3")]
-    let eFunResult = newFunResultWarn(wNotEnoughArgs, 0, "2")
+    let eFunResult = newFunResultWarn(wNotEnoughArgs, 1, "2")
     check testFunction("cmpVersion", arguments, eFunResult)
 
   test "cmdVersion: two many arguments":
     let arguments = @[newValue("1.2.3"), newValue("1.2.3"), newValue("1.2.3")]
-    let eFunResult = newFunResultWarn(wTooManyArgs, parameter=0, "2")
+    let eFunResult = newFunResultWarn(wTooManyArgs, parameter=2, "2")
     check testFunction("cmpVersion", arguments, eFunResult)
 
   test "cmdVersion: invalid version a":

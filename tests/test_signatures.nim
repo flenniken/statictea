@@ -1,9 +1,12 @@
 import std/unittest
+import std/strutils
 import signatures
 import env
 import vartypes
 import options
 import messages
+import sharedtestcode
+import warnings
 
 proc testSignatureCodeToParams(signatureCode: string, expected: string): bool =
   var params0 = signatureCodeToParams(signatureCode)
@@ -41,11 +44,17 @@ proc testMapParametersW(signatureCode: string, args: seq[Value],
   if not expectedItem("mapParameters", funResult.kind, frWarning):
     echo "no warning: " & $funResult
     return false
-  let eFunResultWarn = newFunResultWarn(warning, eParameter, p1)
-  if not expectedItem("mapParameters", funResult, eFunResultWarn):
-    echo "signatureCode: " & signatureCode
-    return false
-  result = true
+  let eFunResult = newFunResultWarn(warning, eParameter, p1)
+  let test = "$1 $2" % [signatureCode, $args]
+  result = gotExpected($funResult, $eFunResult, test)
+
+  if not result and eFunResult.kind == frWarning and funResult.kind == frWarning:
+    echo ""
+    echo "    got  message: $1" % getWarning(
+      funResult.warningData.warning, funResult.warningData.p1)
+    echo "expected message: $1" % getWarning(
+      eFunResult.warningData.warning, eFunResult.warningData.p1)
+
 
 proc testParamStringSingle(name: string, paramCode: ParamCode, optional: bool,
                      eString: string): bool =
@@ -158,19 +167,32 @@ suite "signatures.nim":
     var parameters: seq[Value] = @[newValue(1)]
     check testMapParametersOk("ioii", parameters, """{"a":1}""")
 
+  test "mapParameters ll":
+    var list = newValue([1, 2, 3, 4, 5])
+    var parameters = @[list]
+    check testMapParametersOk("ll", parameters, """{"a":[1,2,3,4,5]}""")
+
+  test "ssoaa":
+    var parameters: seq[Value] = @[newValue("tea"), newValue("beer")]
+    check testMapParametersOk("ssoaa", parameters, """{"a":"tea","b":"beer"}""")
+
+  test "ssoaa not enough":
+    var parameters: seq[Value] = @[newValue("tea")]
+    check testMapParametersW("ssoaa", parameters, 1, wNotEnoughArgsOpt, "2")
+
   test "mapParameters not enough args":
     var parameters: seq[Value] = @[]
     check testMapParametersW("ii", parameters, 0, wNotEnoughArgs, "1")
 
     parameters = @[newValue(1)]
-    check testMapParametersW("iii", parameters, 0, wNotEnoughArgs, "2")
+    check testMapParametersW("iii", parameters, 1, wNotEnoughArgs, "2")
 
   test "mapParameters too many args":
     var parameters = @[newValue(1), newValue(2)]
-    check testMapParametersW("ii", parameters, 0, wTooManyArgs, "1")
+    check testMapParametersW("ii", parameters, 1, wTooManyArgs, "1")
 
     parameters = @[newValue(1), newValue(2), newValue(3)]
-    check testMapParametersW("iii", parameters, 0, wTooManyArgs, "2")
+    check testMapParametersW("iii", parameters, 2, wTooManyArgs, "2")
 
   test "mapParameters wrong kind":
     var parameters = @[newValue(1)]
@@ -225,3 +247,9 @@ suite "signatures.nim":
   test "mapParameters saa":
     var parameters = @[newValue("3"), newValue("nan")]
     check testMapParametersOk("saa", parameters, """{"a":"3","b":"nan"}""")
+
+  test "mapParameters lioaa":
+    var list = newValue([1, 2, 3, 4, 5])
+    let p = newValue(1)
+    var parameters = @[list, p, p, p]
+    check testMapParametersW("lioaa", parameters, 3, wTooManyArgsOpt, "3")

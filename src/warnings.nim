@@ -15,6 +15,11 @@ type
     p1*: string
     pos*: Natural
 
+func getWarning*(warning: MessageId, p1 = ""): string =
+  ## Return the warning string.
+  let pattern = Messages[warning]
+  result = pattern % [p1]
+
 func getWarningLine*(filename: string, lineNum: int,
     warning: MessageId, p1 = ""): string =
   ## Return a formatted warning line. For example:
@@ -22,10 +27,8 @@ func getWarningLine*(filename: string, lineNum: int,
   ## @:~~~
   ## @:filename(line): wId: message.
   ## @:~~~~
-  let pattern = Messages[warning]
   let warningCode = $ord(warning)
-  let message = pattern % [p1]
-  result = "$1($2): w$3: $4" % [filename, $lineNum, warningCode, message]
+  result = "$1($2): w$3: $4" % [filename, $lineNum, warningCode, getWarning(warning, p1)]
 
 func getWarningLine*(filename: string, lineNum: int,
     warningData: WarningData): string =
