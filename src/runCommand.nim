@@ -373,15 +373,18 @@ proc ifFunctions*(
     start: Natural,
     variables: Variables,
     list=false): ValueAndLengthOr =
-  ## Return the if/if0 function's value and the length. It conditionally
-  ## runs one of its parameters. Start points at the first parameter
-  ## of the function. The length includes the trailing whitespace
- ## after the ending ).
+  ## Return the if/if0 function's value and the length. It
+  ## conditionally runs one of its arguments and skips the
+  ## other. Start points at the first argument of the function. The
+  ## length includes the trailing whitespace after the ending ).
 
   # cases:
   #   a = if(cond, then, else)
-  #   a = if(cond, then)
+  #          ^                ^
+  #   a = if(cond, then) #
+  #          ^           ^
   #   if(cond, then)
+  #      ^          ^
   # The if function cond is a boolean, for if0 it is anything.
 
   # Get the condition's value.
@@ -428,6 +431,7 @@ proc ifFunctions*(
 
   # Handle the second parameter.
   var skip = (condition == false)
+
   let vl2Or = getValueAndLength(statement, start + runningLen, variables, skip)
   if vl2Or.isMessage or vl2Or.value.exit:
     return vl2Or
@@ -676,13 +680,24 @@ proc runCompareOp*(left: Value, op: string, right: Value): Value =
     assert(false, "Expected a boolean expression operator.")
   result = newValue(b)
 
-func skipCondition*(text: string, startPos: Natural): PosOr =
-  ## Skip the condition expression and optional trailing
-  ## whitespace. startPos points at the starting (.  Return the
-  ## position or a message when not found.
+func skipArgument*(text: string, startPos: Natural): PosOr =
+  ## Skip past the argument.  startPos points at the first character
+  ## of a function argument.  Return the first non-whitespace
+  ## character after the argument or a message when there is a
+  ## problem.
   ## @:~~~
   ## @:a = if( (b < c)  , d, e)
+  ## @:    ^                   ^
+  ## @:a = if( (b < c)  , d, e)
   ## @:        ^        ^
+  ## @:a = if( (b < c)  , d, e)
+  ## @:                   ^^
+  ## @:a = if( (b < c)  , d, e)
+  ## @:                      ^^
+  ## @:a = if( (b < c)  , d  , e)
+  ## @:                   ^    ^
+  ## @:a = if( len(b)  , len(d)  , len(e))
+  ## @:        ^         ^
   ## @:~~~~
   # Count matching parens skipping parens in quoted strings.
 
@@ -706,7 +721,7 @@ func skipCondition*(text: string, startPos: Natural): PosOr =
 
     case state
     of start:
-      assert(ch == '(', "The start isn't pointing at the left parentheses.")
+      # assert(ch == '(', "The start isn't pointing at the left parentheses.")
       state = middle
       inc(count)
 
@@ -840,7 +855,7 @@ proc getCondition*(statement: Statement, start: Natural,
 
     if sortCiruitTaken:
       # Sort ciruit the condition and skip past the closing right parentheses.
-      let posOr = skipCondition(statement.text, start)
+      let posOr = skipArgument(statement.text, start)
       if posOr.isMessage:
         # No matching end right parentheses.
         return newValueAndLengthOr(posOr.message)
@@ -980,12 +995,35 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
 proc getValueAndLength*(statement: Statement, start: Natural, variables:
     Variables, skip: bool): ValueAndLengthOr =
   ## Return the value and length of the item that the start parameter
-  ## points at which is a string, number, variable, function or list.
+  ## points at which is a string, number, variable, list, or condition.
   ## The length returned includes the trailing whitespace after the
   ## item. So the ending position is pointing at the end of the
-  ## statement, or at the first whitespace character after the item.
-  ## When skip is true, the return value is 0 and functions are not
-  ## executed.
+  ## statement, or at the first non-whitespace character after the
+  ## item.
+  ## @:
+  ## @:~~~
+  ## @:a = "tea" # string
+  ## @:    ^     ^
+  ## @:a = 123.5 # number
+  ## @:    ^     ^
+  ## @:a = t.row # variable
+  ## @:    ^     ^
+  ## @:a = [1, 2, 3] # list
+  ## @:    ^         ^
+  ## @:a = (c < 10) # condition
+  ## @:    ^        ^
+  ## @:a = cmp(b, c) # calling variable
+  ## @:    ^         ^
+  ## @:a = if( (b < c), d, e) # if
+  ## @:    ^                  ^
+  ## @:a = if( bool(len(b)), d, e) # if
+  ## @:    ^                       ^
+  ## @:        ^             ^
+  ## @:             ^     ^
+  ## @:                 ^ ^
+  ## @:                      ^  ^
+  ## @:                         ^ ^
+  ## @:~~~~
 
   when showPos:
     showDebugPos(statement, start, "s")

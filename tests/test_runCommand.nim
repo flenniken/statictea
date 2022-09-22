@@ -1,4 +1,3 @@
-
 import std/unittest
 import std/options
 import std/strutils
@@ -20,6 +19,53 @@ import codefile
 import readjson
 import comparelines
 import unicodes
+
+proc testGetValueAndLength(statement: Statement, start: Natural,
+    eValueAndLengthOr: ValueAndLengthOr, variables: Variables = nil): bool =
+
+  # Set up variables when not passed in.
+  var vars = variables
+  if vars == nil:
+    let funcsVarDict = createFuncDictionary().dictv
+    vars = emptyVariables(funcs = funcsVarDict)
+
+  let valueAndLengthOr = getValueAndLength(statement, start, vars, false)
+  result = gotExpected($valueAndLengthOr, $eValueAndLengthOr)
+
+  if not result:
+    echo ""
+    echo statement.text
+    echo startColumn(start, "^")
+    if valueAndLengthOr.isValue:
+      let length = valueAndLengthOr.value.length
+      echo startColumn(start+length, "^ got")
+    else:
+      echo getWarnStatement("filename", statement, valueAndLengthOr.message)
+
+    echo statement.text
+    echo startColumn(start, "^")
+    if eValueAndLengthOr.isValue:
+      let length = eValueAndLengthOr.value.length
+      echo startColumn(start+length, "^ expected")
+    else:
+      echo getWarnStatement("filename", statement, eValueAndLengthOr.message)
+
+proc testGetValueAndLength(text: string, start: Natural,
+    eWarning: MessageId, pos = 0, p1 = "", variables: Variables = nil): bool =
+  let statement = newStatement(text)
+  let eValueAndLengthOr = newValueAndLengthOr(eWarning, p1, pos)
+  result = testGetValueAndLength(statement, start, eValueAndLengthOr, variables)
+
+proc testGetValueAndLength(text: string, start: Natural,
+    ePos: Natural, eJson: string, variables: Variables = nil): bool =
+  let statement = newStatement(text)
+  let eValue = readJsonString(eJson)
+  if eValue.isMessage:
+    echo "eJson = " & eJson
+    echo $eValue
+    return false
+  let eValueAndLengthOr = newValueAndLengthOr(eValue.value, ePos - start)
+  result = testGetValueAndLength(statement, start, eValueAndLengthOr, variables)
 
 proc testGetMultilineStr(pattern: string, start: Natural,
     eStr: string, eLength: Natural): bool =
@@ -221,8 +267,8 @@ proc testRunCompareOp(left: bool | Value, op: string, right: bool | Value, eValu
   if value != eValue:
     result = gotExpected($value, $eValue)
 
-proc testSkipCondition(text: string, startPos: Natural, ePosOr: PosOr): bool =
-  let posOr = skipCondition(text, startPos)
+proc testSkipArgument(text: string, startPos: Natural, ePosOr: PosOr): bool =
+  let posOr = skipArgument(text, startPos)
   result = true
   if posOr != ePosOr:
     result = gotExpected($posOr, $ePosOr)
@@ -1167,27 +1213,28 @@ White$1
     check testRunCompareOp(newValue("abc"), "==", newValue("abc"), newValue(true))
     check testRunCompareOp(newValue("abc"), "==", newValue("abcd"), newValue(false))
 
-  test "testSkipCondition":
-    check testSkipCondition("a = ( b < c ) # test", 4, newPosOr(14))
+  test "testSkipArgument":
+    check testSkipArgument("a = ( b < c ) # test", 4, newPosOr(14))
     #                        0123456789 123456789
-    check testSkipCondition("()", 0, newPosOr(2))
-    check testSkipCondition("(())", 0, newPosOr(4))
-    check testSkipCondition("((()))", 0, newPosOr(6))
-    check testSkipCondition("(a < b)", 0, newPosOr(7))
-    check testSkipCondition("((a and b) or c)", 0, newPosOr(16))
-    check testSkipCondition("((a and b) or c)", 1, newPosOr(11))
-    check testSkipCondition("(len(b) < 5) ,", 0, newPosOr(13))
-    check testSkipCondition("""(len("abc") < 5) ,""", 0, newPosOr(17))
-    check testSkipCondition("""(len("a\"bc") < 5) ,""", 0, newPosOr(19))
-    check testSkipCondition("""(len("(((bc") < 5) ,""", 0, newPosOr(19))
-    check testSkipCondition("""a = ( true or true and false )""", 4, newPosOr(30))
-    #                          0123456789 123456789 123456789
+    check testSkipArgument("()", 0, newPosOr(2))
+    check testSkipArgument("(())", 0, newPosOr(4))
+    check testSkipArgument("((()))", 0, newPosOr(6))
+    check testSkipArgument("(a < b)", 0, newPosOr(7))
+    check testSkipArgument("((a and b) or c)", 0, newPosOr(16))
+    check testSkipArgument("((a and b) or c)", 1, newPosOr(11))
+    check testSkipArgument("(len(b) < 5) ,", 0, newPosOr(13))
+    check testSkipArgument("""(len("abc") < 5) ,""", 0, newPosOr(17))
+    check testSkipArgument("""(len("a\"bc") < 5) ,""", 0, newPosOr(19))
+    check testSkipArgument("""(len("(((bc") < 5) ,""", 0, newPosOr(19))
+    check testSkipArgument("""a = ( true or true and false )""", 4, newPosOr(30))
+    # check testSkipArgument("if(a,b,c)", 3, newPosOr(4))
+    #                       0123456789 123456789 123456789
 
-  test "testSkipCondition warning":
-    check testSkipCondition("(", 0, newPosOr(wNoMatchingParen, "", 0))
-    check testSkipCondition("( abc", 0, newPosOr(wNoMatchingParen, "", 0))
-    check testSkipCondition("((())", 0, newPosOr(wNoMatchingParen, "", 0))
-    check testSkipCondition("  (", 2, newPosOr(wNoMatchingParen, "", 2))
+  test "testSkipArgument warning":
+    check testSkipArgument("(", 0, newPosOr(wNoMatchingParen, "", 0))
+    check testSkipArgument("( abc", 0, newPosOr(wNoMatchingParen, "", 0))
+    check testSkipArgument("((())", 0, newPosOr(wNoMatchingParen, "", 0))
+    check testSkipArgument("  (", 2, newPosOr(wNoMatchingParen, "", 2))
 
   test "getCondition":
     #                         0123456789 123456789 123456789 12345
@@ -1266,3 +1313,28 @@ White$1
     let eVariableDataOr = newVariableDataOr("a", "=", cmpValueOr.value.listv[0])
     check testRunStatement(statement, eVariableDataOr, variables)
 
+  test "getValueAndLength":
+    # var valueOr = readJsonString("{b:1,c:2}")
+    let statements = [
+      ("""a = 5 # number""", 4, 6, "5"),
+      ("""a = "abc" # string""", 4, 10, """"abc""""),
+      ("""a = [1,2,3] # list""", 4, 12, "[1,2,3]"),
+      ("""a = dict(["b", 1,"c", 2]) # dict""", 4, 26, """{"b":1,"c":2}"""),
+      ("""a = len("3") # var""", 4, 13, "1"),
+      ("""a = (3 < 5) # var""", 4, 12, "true"),
+      ("""a = t.row # variable""", 4, 10, "0"),
+      ("""a = if( (1 < 2), 3, 4) # if""", 4, 23, "3"),
+      ("""a = if( bool(len("tea")), 22, 33) # if""", 4, 34, "22"),
+      ("""a = if( bool(len("tea")), 22, 33) # if""", 8, 24, "true"),
+      ("""a = if( bool(len("tea")), 22, 33) # if""", 13, 23, "3"),
+      ("""a = if( bool(len("tea")), 22, 33) # if""", 26, 28, "22"),
+      ("""a = if( bool(len("tea")), 22, 33) # if""", 30, 32, "33"),
+    #     0123456789 123456789 123456789 123456789
+    ]
+    for (text, start, ePos, eJson) in statements:
+      check testGetValueAndLength(text, start, ePos, eJson)
+
+  test "getValueAndLength warnings":
+    check testGetValueAndLength("""a = 5""", 1, wInvalidRightHandSide, 1)
+    check testGetValueAndLength("""a = b""", 4, wNotInLorF, 4, "b")
+    check testGetValueAndLength("""a = _""", 4, wInvalidRightHandSide, 4)

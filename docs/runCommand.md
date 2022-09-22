@@ -33,9 +33,9 @@ starts in the template file.
 * [getFunctionValueAndLength](#getfunctionvalueandlength) &mdash; Return the function's value and the length.
 * [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value.
 * [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value.
-* [skipCondition](#skipcondition) &mdash; Skip the condition expression and optional trailing whitespace.
+* [skipArgument](#skipargument) &mdash; Skip past the argument.
 * [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and its length.
-* [getValueAndLength](#getvalueandlength) &mdash; Return the value and length of the item that the start parameter points at which is a string, number, variable, function or list.
+* [getValueAndLength](#getvalueandlength) &mdash; Return the value and length of the item that the start parameter points at which is a string, number, variable, list, or condition.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 
@@ -236,7 +236,7 @@ proc getNumber(statement: Statement; start: Natural): ValueAndLengthOr
 
 # ifFunctions
 
-Return the if/if0 function's value and the length. It conditionally runs one of its parameters. Start points at the first parameter of the function. The length includes the trailing whitespace after the ending ).
+Return the if/if0 function's value and the length. It conditionally runs one of its arguments and skips the other. Start points at the first argument of the function. The length includes the trailing whitespace after the ending ).
 
 ```nim
 proc ifFunctions(functionName: string; statement: Statement; start: Natural;
@@ -278,16 +278,26 @@ Evaluate the comparison and return a bool value.
 proc runCompareOp(left: Value; op: string; right: Value): Value
 ```
 
-# skipCondition
+# skipArgument
 
-Skip the condition expression and optional trailing whitespace. startPos points at the starting (.  Return the position or a message when not found.
+Skip past the argument.  startPos points at the first character of a function argument.  Return the first non-whitespace character after the argument or a message when there is a problem.
 ~~~
 a = if( (b < c)  , d, e)
+    ^                   ^
+a = if( (b < c)  , d, e)
         ^        ^
+a = if( (b < c)  , d, e)
+                   ^^
+a = if( (b < c)  , d, e)
+                      ^^
+a = if( (b < c)  , d  , e)
+                   ^    ^
+a = if( len(b)  , len(d)  , len(e))
+        ^         ^
 ~~~~
 
 ```nim
-func skipCondition(text: string; startPos: Natural): PosOr
+func skipArgument(text: string; startPos: Natural): PosOr
 ```
 
 # getCondition
@@ -300,7 +310,31 @@ proc getCondition(statement: Statement; start: Natural; variables: Variables): V
 
 # getValueAndLength
 
-Return the value and length of the item that the start parameter points at which is a string, number, variable, function or list. The length returned includes the trailing whitespace after the item. So the ending position is pointing at the end of the statement, or at the first whitespace character after the item. When skip is true, the return value is 0 and functions are not executed.
+Return the value and length of the item that the start parameter points at which is a string, number, variable, list, or condition. The length returned includes the trailing whitespace after the item. So the ending position is pointing at the end of the statement, or at the first non-whitespace character after the item.
+
+~~~
+a = "tea" # string
+    ^     ^
+a = 123.5 # number
+    ^     ^
+a = t.row # variable
+    ^     ^
+a = [1, 2, 3] # list
+    ^         ^
+a = (c < 10) # condition
+    ^        ^
+a = cmp(b, c) # calling variable
+    ^         ^
+a = if( (b < c), d, e) # if
+    ^                  ^
+a = if( bool(len(b)), d, e) # if
+    ^                       ^
+        ^             ^
+             ^     ^
+                 ^ ^
+                      ^  ^
+                         ^ ^
+~~~~
 
 ```nim
 proc getValueAndLength(statement: Statement; start: Natural;
