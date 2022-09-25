@@ -354,331 +354,6 @@ proc getNumber*(statement: Statement, start: Natural):
     assert intAndLength.length <= length
   result = newValueAndLengthOr(value, length)
 
-# Forward reference to getValueAndLength since we call it recursively.
-proc getValueAndLength*(statement: Statement, start: Natural, variables:
-  Variables, skip: bool): ValueAndLengthOr
-
-# Call stack:
-# - runStatement
-# - getValueAndLength
-# - getFunctionValueAndLength
-# - ifFunctions
-# - getList
-# - getValueAndLength
-
-proc ifFunctions*(
-    functionName: string,
-    statement: Statement,
-    start: Natural,
-    variables: Variables,
-    list=false): ValueAndLengthOr =
-  ## Return the if/if0 function's value and the length. It
-  ## conditionally runs one of its arguments and skips the
-  ## other. Start points at the first argument of the function. The
-  ## length includes the trailing whitespace after the ending ).
-
-  # cases:
-  #   a = if(cond, then, else)
-  #          ^                ^
-  #   a = if(cond, then) #
-  #          ^           ^
-  #   if(cond, then)
-  #      ^          ^
-  # The if function cond is a boolean, for if0 it is anything.
-
-  # Get the condition's value.
-  let vlcOr = getValueAndLength(statement, start, variables, skip=false)
-  if vlcOr.isMessage or vlcOr.value.exit:
-    return vlcOr
-  let cond = vlcOr.value.value
-  var runningLen = vlcOr.value.length
-
-  var condition = false
-  if functionName == "if":
-    if cond.kind != vkBool:
-      # The if condition must be a bool value, got a $1.
-      return newValueAndLengthOr(wExpectedBool, $cond.kind, start)
-    condition = cond.boolv
-  else: # functionName == "if0"
-    case cond.kind:
-     of vkInt:
-       if cond.intv == 0:
-         condition = true
-     of vkFloat:
-       if cond.floatv == 0.0:
-         condition = true
-     of vkString:
-       if cond.stringv.len == 0:
-         condition = true
-     of vkList:
-       if cond.listv.len == 0:
-         condition = true
-     of vkDict:
-       if cond.dictv.len == 0:
-         condition = true
-     of vkBool:
-       condition = cond.boolv
-     of vkFunc:
-       condition = false
-
-  # Match the comma and whitespace.
-  let commaO = matchSymbol(statement.text, gComma, start + runningLen)
-  if not commaO.isSome:
-    # Expected two or three arguments.
-    return newValueAndLengthOr(wTwoOrThreeParams, "", start)
-  runningLen += commaO.get().length
-
-  # Handle the second parameter.
-  var skip = (condition == false)
-
-  let vl2Or = getValueAndLength(statement, start + runningLen, variables, skip)
-  if vl2Or.isMessage or vl2Or.value.exit:
-    return vl2Or
-  runningLen += vl2Or.value.length
-
-  var vl3Or: ValueAndLengthOr
-  # Match the comma and whitespace.
-  let cO = matchSymbol(statement.text, gComma, start + runningLen)
-  if cO.isSome:
-    # We got a comma so we expect a third parameter.
-    runningLen += cO.get().length
-
-    # Handle the third parameter.
-    skip = (condition == true)
-    vl3Or = getValueAndLength(statement, start + runningLen, variables, skip)
-    if vl3Or.isMessage or vl3Or.value.exit:
-      return vl3Or
-    runningLen += vl3Or.value.length
-  else:
-    # The third parameter is optional. When it dosn't exist use 0 for
-    # it.
-    vl3Or = newValueAndLengthOr(newValue(0), 0)
-
-  # Match ) and trailing whitespace.
-  let parenO = matchSymbol(statement.text, gRightParentheses,
-    start + runningLen)
-  if not parenO.isSome:
-    # Expected two or three parameters.
-    return newValueAndLengthOr(wTwoOrThreeParams, "", start + runningLen)
-  runningLen += parenO.get().length
-
-  var value: Value
-  if condition:
-    value = vl2Or.value.value
-  else:
-    value = vl3Or.value.value
-  result = newValueAndLengthOr(value, runningLen)
-
-proc andOrFunctions*(
-    functionName: string,
-    statement: Statement,
-    start: Natural,
-    variables: Variables,
-    list=false): ValueAndLengthOr =
-  ## Return the and/or function's value and the length. The and
-  ## function stops on the first false. The or function stops on the
-  ## first true. The rest of the arguments are skipped.
-  ## Start points at the first parameter of the function. The length
-  ## includes the trailing whitespace after the ending ).
-
-  # cases:
-  #   c1 = and(a, b)
-  #   c2 = or(a, b)
-
-  # Get the first argument value.
-  let vlcOr = getValueAndLength(statement, start, variables, skip=false)
-  if vlcOr.isMessage or vlcOr.value.exit:
-    return vlcOr
-  let firstValue = vlcOr.value.value
-  var runningLen = vlcOr.value.length
-
-  if firstValue.kind != vkBool:
-    # Expected bool argument got $1.
-    return newValueAndLengthOr(wExpectedBool, $firstValue.kind, start)
-
-  let a = firstValue.boolv
-  var skip = if functionName == "and": a == false else: a == true
-
-  # Match the comma and whitespace.
-  let commaO = matchSymbol(statement.text, gComma, start + runningLen)
-  if not commaO.isSome:
-    # Expected two arguments.
-    return newValueAndLengthOr(wTwoArguments, "", start + runningLen)
-  runningLen += commaO.get().length
-
-  # Handle the second parameter.
-  let vl2Or = getValueAndLength(statement, start + runningLen, variables, skip)
-  if vl2Or.isMessage or vl2Or.value.exit:
-    return vl2Or
-  let secondValue = vl2Or.value.value
-
-  var b: bool
-  if skip:
-    b = true
-  else:
-    if secondValue.kind != vkBool:
-      # Expected bool argument got $1.
-      return newValueAndLengthOr(wExpectedBool, $secondValue.kind, start + runningLen)
-    b = secondValue.boolv
-  runningLen += vl2Or.value.length
-
-  # Match ) and trailing whitespace.
-  let parenO = matchSymbol(statement.text, gRightParentheses,
-    start + runningLen)
-  if not parenO.isSome:
-    # Expected two arguments.
-    return newValueAndLengthOr(wTwoArguments, "", start + runningLen)
-  runningLen += parenO.get().length
-
-  var value: bool
-  if functionName == "and":
-    value = a and b
-  else:
-    value = a or b
-  result = newValueAndLengthOr(newValue(value), runningLen)
-
-proc getFunctionValueAndLength*(
-    dotNameStr: string,
-    statement: Statement,
-    start: Natural,
-    variables: Variables,
-    list = false, skip: bool): ValueAndLengthOr =
-  ## Return the function's value and the length. Start points at the
-  ## first argument of the function. The length includes the trailing
-  ## whitespace after the ending ).
-
-  var arguments: seq[Value] = @[]
-  var argumentStarts: seq[Natural] = @[]
-  var pos: Natural
-
-  let symbol = if list: gRightBracket else: gRightParentheses
-  let startSymbolO = matchSymbol(statement.text, symbol, start)
-  if startSymbolO.isSome:
-    # There are no arguments.
-    pos = start + startSymbolO.get().length
-  else:
-    # Get the arguments to the function.
-    pos = start
-    while true:
-      let vlOr = getValueAndLength(statement, pos, variables, skip)
-      if vlOr.isMessage or vlOr.value.exit:
-        return vlOr
-      arguments.add(vlOr.value.value)
-      argumentStarts.add(pos)
-
-      pos = pos + vlOr.value.length
-
-      # Get the , or ) or ] and white space following the value.
-      let commaSymbolO = matchCommaOrSymbol(statement.text, symbol, pos)
-      if not commaSymbolO.isSome:
-        if symbol == gRightParentheses:
-          # Expected comma or right parentheses.
-          return newValueAndLengthOr(wMissingCommaParen, "", pos)
-        else:
-          # Missing comma or right bracket.
-          return newValueAndLengthOr(wMissingCommaBracket, "", pos)
-      let commaSymbol = commaSymbolO.get()
-      pos = pos + commaSymbol.length
-      let foundSymbol = commaSymbol.getGroup()
-      if (foundSymbol == ")" and symbol == gRightParentheses) or
-         (foundSymbol == "]" and symbol == gRightBracket):
-        break
-
-  if skip:
-    # pos-start is the length including trailing whitespace.
-    return newValueAndLengthOr(newValue(0), pos-start)
-
-  # Lookup the variable's value.
-  let valueOr = getVariable(variables, dotNameStr)
-  if valueOr.isMessage:
-    let warningData = newWarningData(valueOr.message.warning,
-      valueOr.message.p1, start)
-    return newValueAndLengthOr(warningData)
-  let value = valueOr.value
-
-  # Find the best matching function by looking at the arguments.
-  let funcValueOr = getBestFunction(value, arguments)
-  if funcValueOr.isMessage:
-    let warningData = newWarningData(funcValueOr.message.warning,
-      funcValueOr.message.p1, start)
-    return newValueAndLengthOr(warningData)
-
-  # Call the function.
-  let funResult = funcValueOr.value.funcv.functionPtr(variables, arguments)
-  if funResult.kind == frWarning:
-    var warningPos: int
-    if funResult.parameter < argumentStarts.len:
-      warningPos = argumentStarts[funResult.parameter]
-    else:
-      warningPos = start
-    return newValueAndLengthOr(funResult.warningData.warning,
-      funResult.warningData.p1, warningPos)
-
-  var exit = if dotNameStr == "return": true else: false
-  # pos-start is the length including trailing whitespace.
-  result = newValueAndLengthOr(funResult.value, pos-start, exit)
-
-proc getList(statement: Statement, start: Natural,
-    variables: Variables, skip: bool): ValueAndLengthOr =
-  ## Return the literal list value and match length from the
-  ## statement. The start index points at [. The length includes the
-  ## trailing whitespace after the ending ].
-
-  # Match the left bracket and whitespace.
-  let startSymbolO = matchSymbol(statement.text, gLeftBracket, start)
-  assert startSymbolO.isSome
-  let startSymbol = startSymbolO.get()
-
-  # Get the list. The literal list [...] and list(...) are similar.
-  let funValueLengthOr = getFunctionValueAndLength("list", statement,
-    start+startSymbol.length, variables, list=true, skip)
-  if funValueLengthOr.isMessage or funValueLengthOr.value.exit:
-    return funValueLengthOr
-
-  let funValueLength = funValueLengthOr.value
-
-  # Return the value and length.
-  let valueAndLength = newValueAndLength(funValueLength.value,
-    funValueLength.length+startSymbol.length)
-  result = newValueAndLengthOr(valueAndLength)
-
-proc runBoolOp*(left: Value, op: string, right: Value): Value =
-  ## Evaluate the bool expression and return a bool value.
-  assert left.kind == vkBool and right.kind == vkBool
-
-  var b: bool
-  if op == "and":
-    b = left.boolv and right.boolv
-  elif op == "or":
-    b = left.boolv or right.boolv
-  else:
-    assert(false, "Expected the boolean operator 'and' or 'or'.")
-  result = newValue(b)
-
-proc runCompareOp*(left: Value, op: string, right: Value): Value =
-  ## Evaluate the comparison and return a bool value.
-  assert left.kind == right.kind
-  assert left.kind == vkInt or left.kind == vkFloat or left.kind == vkString
-
-  let cmpValue = cmpBaseValues(left, right)
-  var b: bool
-  case op
-  of "==":
-    b = cmpValue == 0
-  of "!=":
-    b = cmpValue != 0
-  of "<":
-    b = cmpValue < 0
-  of ">":
-    b = cmpValue > 0
-  of "<=":
-    b = cmpValue <= 0
-  of ">=":
-    b = cmpValue >= 0
-  else:
-    assert(false, "Expected a boolean expression operator.")
-  result = newValue(b)
-
 func skipArgument*(text: string, startPos: Natural): PosOr =
   ## Skip past the argument.  startPos points at the first character
   ## of a function argument.  Return the first non-whitespace
@@ -815,6 +490,352 @@ func skipArgument*(text: string, startPos: Natural): PosOr =
   else:
     result = newPosOr(pos)
 
+# Forward reference to getValueAndLength since we call it recursively.
+proc getValueAndLength*(statement: Statement, start: Natural, variables:
+  Variables, skip: bool): ValueAndLengthOr
+
+# Call stack:
+# - runStatement
+# - getValueAndLength
+# - getFunctionValueAndLength
+# - ifFunctions
+# - getList
+# - getValueAndLength
+
+proc ifFunctions*(
+    functionName: string,
+    statement: Statement,
+    start: Natural,
+    variables: Variables,
+    list=false): ValueAndLengthOr =
+  ## Return the if/if0 function's value and the length. It
+  ## conditionally runs one of its arguments and skips the
+  ## other. Start points at the first argument of the function. The
+  ## length includes the trailing whitespace after the ending ).
+
+  # cases:
+  #   a = if(cond, then, else)
+  #          ^                ^
+  #   a = if(cond, then) #
+  #          ^           ^
+  #   if(cond, then)
+  #      ^          ^
+  # The if function cond is a boolean, for if0 it is anything.
+
+  # Get the condition's value.
+  let vlcOr = getValueAndLength(statement, start, variables, skip=false)
+  if vlcOr.isMessage or vlcOr.value.exit:
+    return vlcOr
+  let cond = vlcOr.value.value
+  var runningLen = vlcOr.value.length
+
+  var condition = false
+  if functionName == "if":
+    if cond.kind != vkBool:
+      # The if condition must be a bool value, got a $1.
+      return newValueAndLengthOr(wExpectedBool, $cond.kind, start)
+    condition = cond.boolv
+  else: # functionName == "if0"
+    case cond.kind:
+     of vkInt:
+       if cond.intv == 0:
+         condition = true
+     of vkFloat:
+       if cond.floatv == 0.0:
+         condition = true
+     of vkString:
+       if cond.stringv.len == 0:
+         condition = true
+     of vkList:
+       if cond.listv.len == 0:
+         condition = true
+     of vkDict:
+       if cond.dictv.len == 0:
+         condition = true
+     of vkBool:
+       condition = cond.boolv
+     of vkFunc:
+       condition = false
+
+  # Match the comma and whitespace.
+  let commaO = matchSymbol(statement.text, gComma, start + runningLen)
+  if not commaO.isSome:
+    # Expected two or three arguments.
+    return newValueAndLengthOr(wTwoOrThreeParams, "", start)
+  runningLen += commaO.get().length
+
+  # Handle the second parameter.
+  var vl2Or: ValueAndLengthOr
+  var skip = (condition == false)
+  
+  if skip:
+    let posOr = skipArgument(statement.text, start + runningLen)
+    if posOr.isMessage:
+      return newValueAndLengthOr(posOr.message)
+    runningLen = (posOr.value - start)
+  else:
+    vl2Or = getValueAndLength(statement, start + runningLen, variables, skip)
+    if vl2Or.isMessage or vl2Or.value.exit:
+      return vl2Or
+    runningLen += vl2Or.value.length
+
+  var vl3Or: ValueAndLengthOr
+  # Match the comma and whitespace.
+  let cO = matchSymbol(statement.text, gComma, start + runningLen)
+  if cO.isSome:
+    # We got a comma so we expect a third parameter.
+    runningLen += cO.get().length
+
+    # Handle the third parameter.
+    skip = (condition == true)
+    if skip:
+      let posOr = skipArgument(statement.text, start + runningLen)
+      if posOr.isMessage:
+        return newValueAndLengthOr(posOr.message)
+      runningLen = (posOr.value - start)
+    else:
+      vl3Or = getValueAndLength(statement, start + runningLen, variables, skip)
+      if vl3Or.isMessage or vl3Or.value.exit:
+        return vl3Or
+      runningLen += vl3Or.value.length
+  else:
+    # The third parameter is optional. When it dosn't exist use 0 for
+    # it.
+    vl3Or = newValueAndLengthOr(newValue(0), 0)
+
+  # Match ) and trailing whitespace.
+  let parenO = matchSymbol(statement.text, gRightParentheses,
+    start + runningLen)
+  if not parenO.isSome:
+    # Expected two or three parameters.
+    return newValueAndLengthOr(wTwoOrThreeParams, "", start + runningLen)
+  runningLen += parenO.get().length
+
+  var value: Value
+  if condition:
+    value = vl2Or.value.value
+  else:
+    value = vl3Or.value.value
+  result = newValueAndLengthOr(value, runningLen)
+
+proc andOrFunctions*(
+    functionName: string,
+    statement: Statement,
+    start: Natural,
+    variables: Variables,
+    list=false): ValueAndLengthOr =
+  ## Return the and/or function's value and the length. The and
+  ## function stops on the first false. The or function stops on the
+  ## first true. The rest of the arguments are skipped.
+  ## Start points at the first parameter of the function. The length
+  ## includes the trailing whitespace after the ending ).
+
+  # cases:
+  #   c1 = and(a, b)
+  #   c2 = or(a, b)
+
+  # Get the first argument value.
+  let vlcOr = getValueAndLength(statement, start, variables, skip=false)
+  if vlcOr.isMessage or vlcOr.value.exit:
+    return vlcOr
+  let firstValue = vlcOr.value.value
+  var runningLen = vlcOr.value.length
+
+  if firstValue.kind != vkBool:
+    # Expected bool argument got $1.
+    return newValueAndLengthOr(wExpectedBool, $firstValue.kind, start)
+
+  let a = firstValue.boolv
+  var skip = if functionName == "and": a == false else: a == true
+
+  # Match the comma and whitespace.
+  let commaO = matchSymbol(statement.text, gComma, start + runningLen)
+  if not commaO.isSome:
+    # Expected two arguments.
+    return newValueAndLengthOr(wTwoArguments, "", start + runningLen)
+  runningLen += commaO.get().length
+
+  # todo: use pos instead of length everywhere.
+
+  # Handle the second parameter.
+  var secondValue: Value
+  var secondLength: Natural
+  if skip:
+    let posOr = skipArgument(statement.text, start + runningLen)
+    if posOr.isMessage:
+      return newValueAndLengthOr(posOr.message)
+    secondLength = (posOr.value - (start + runningLen))
+    secondValue = newValue(0)
+  else:    
+    let vl2Or = getValueAndLength(statement, start + runningLen, variables, skip)
+    if vl2Or.isMessage or vl2Or.value.exit:
+      return vl2Or
+    secondLength = vl2Or.value.length
+    secondValue = vl2Or.value.value
+
+  var b: bool
+  if skip:
+    b = true
+  else:
+    if secondValue.kind != vkBool:
+      # Expected bool argument got $1.
+      return newValueAndLengthOr(wExpectedBool, $secondValue.kind, start + runningLen)
+    b = secondValue.boolv
+  runningLen += secondLength
+
+  # Match ) and trailing whitespace.
+  let parenO = matchSymbol(statement.text, gRightParentheses,
+    start + runningLen)
+  if not parenO.isSome:
+    # Expected two arguments.
+    return newValueAndLengthOr(wTwoArguments, "", start + runningLen)
+  runningLen += parenO.get().length
+
+  var value: bool
+  if functionName == "and":
+    value = a and b
+  else:
+    value = a or b
+  result = newValueAndLengthOr(newValue(value), runningLen)
+
+proc getFunctionValueAndLength*(
+    dotNameStr: string,
+    statement: Statement,
+    start: Natural,
+    variables: Variables,
+    list = false, skip: bool): ValueAndLengthOr =
+  ## Return the function's value and the length. Start points at the
+  ## first argument of the function. The length includes the trailing
+  ## whitespace after the ending ).
+
+  var arguments: seq[Value] = @[]
+  var argumentStarts: seq[Natural] = @[]
+  var pos: Natural
+
+  let symbol = if list: gRightBracket else: gRightParentheses
+  let startSymbolO = matchSymbol(statement.text, symbol, start)
+  if startSymbolO.isSome:
+    # There are no arguments.
+    pos = start + startSymbolO.get().length
+  else:
+    # Get the arguments to the function.
+    pos = start
+    while true:
+      let vlOr = getValueAndLength(statement, pos, variables, skip)
+      if vlOr.isMessage or vlOr.value.exit:
+        return vlOr
+      arguments.add(vlOr.value.value)
+      argumentStarts.add(pos)
+
+      pos = pos + vlOr.value.length
+
+      # Get the , or ) or ] and white space following the value.
+      let commaSymbolO = matchCommaOrSymbol(statement.text, symbol, pos)
+      if not commaSymbolO.isSome:
+        if symbol == gRightParentheses:
+          # Expected comma or right parentheses.
+          return newValueAndLengthOr(wMissingCommaParen, "", pos)
+        else:
+          # Missing comma or right bracket.
+          return newValueAndLengthOr(wMissingCommaBracket, "", pos)
+      let commaSymbol = commaSymbolO.get()
+      pos = pos + commaSymbol.length
+      let foundSymbol = commaSymbol.getGroup()
+      if (foundSymbol == ")" and symbol == gRightParentheses) or
+         (foundSymbol == "]" and symbol == gRightBracket):
+        break
+
+  # Lookup the variable's value.
+  let valueOr = getVariable(variables, dotNameStr)
+  if valueOr.isMessage:
+    let warningData = newWarningData(valueOr.message.warning,
+      valueOr.message.p1, start)
+    return newValueAndLengthOr(warningData)
+  let value = valueOr.value
+
+  # Find the best matching function by looking at the arguments.
+  let funcValueOr = getBestFunction(value, arguments)
+  if funcValueOr.isMessage:
+    let warningData = newWarningData(funcValueOr.message.warning,
+      funcValueOr.message.p1, start)
+    return newValueAndLengthOr(warningData)
+
+  # Call the function.
+  let funResult = funcValueOr.value.funcv.functionPtr(variables, arguments)
+  if funResult.kind == frWarning:
+    var warningPos: int
+    if funResult.parameter < argumentStarts.len:
+      warningPos = argumentStarts[funResult.parameter]
+    else:
+      warningPos = start
+    return newValueAndLengthOr(funResult.warningData.warning,
+      funResult.warningData.p1, warningPos)
+
+  var exit = if dotNameStr == "return": true else: false
+  # pos-start is the length including trailing whitespace.
+  result = newValueAndLengthOr(funResult.value, pos-start, exit)
+
+proc getList(statement: Statement, start: Natural,
+    variables: Variables, skip: bool): ValueAndLengthOr =
+  ## Return the literal list value and match length from the
+  ## statement. The start index points at [. The length includes the
+  ## trailing whitespace after the ending ].
+
+  # Match the left bracket and whitespace.
+  let startSymbolO = matchSymbol(statement.text, gLeftBracket, start)
+  assert startSymbolO.isSome
+  let startSymbol = startSymbolO.get()
+
+  # Get the list. The literal list [...] and list(...) are similar.
+  let funValueLengthOr = getFunctionValueAndLength("list", statement,
+    start+startSymbol.length, variables, list=true, skip)
+  if funValueLengthOr.isMessage or funValueLengthOr.value.exit:
+    return funValueLengthOr
+
+  let funValueLength = funValueLengthOr.value
+
+  # Return the value and length.
+  let valueAndLength = newValueAndLength(funValueLength.value,
+    funValueLength.length+startSymbol.length)
+  result = newValueAndLengthOr(valueAndLength)
+
+proc runBoolOp*(left: Value, op: string, right: Value): Value =
+  ## Evaluate the bool expression and return a bool value.
+  assert left.kind == vkBool and right.kind == vkBool
+
+  var b: bool
+  if op == "and":
+    b = left.boolv and right.boolv
+  elif op == "or":
+    b = left.boolv or right.boolv
+  else:
+    assert(false, "Expected the boolean operator 'and' or 'or'.")
+  result = newValue(b)
+
+proc runCompareOp*(left: Value, op: string, right: Value): Value =
+  ## Evaluate the comparison and return a bool value.
+  assert left.kind == right.kind
+  assert left.kind == vkInt or left.kind == vkFloat or left.kind == vkString
+
+  let cmpValue = cmpBaseValues(left, right)
+  var b: bool
+  case op
+  of "==":
+    b = cmpValue == 0
+  of "!=":
+    b = cmpValue != 0
+  of "<":
+    b = cmpValue < 0
+  of ">":
+    b = cmpValue > 0
+  of "<=":
+    b = cmpValue <= 0
+  of ">=":
+    b = cmpValue >= 0
+  else:
+    assert(false, "Expected a boolean expression operator.")
+  result = newValue(b)
+
 # Forward reference since we call getCondition recursively.
 proc getCondition*(statement: Statement, start: Natural,
     variables: Variables): ValueAndLengthOr
@@ -908,7 +929,6 @@ proc getCondition*(statement: Statement, start: Natural,
       # Sort ciruit the condition and skip past the closing right parentheses.
       let posOr = skipArgument(statement.text, start)
       if posOr.isMessage:
-        # No matching end right parentheses.
         return newValueAndLengthOr(posOr.message)
       runningPos = posOr.value
       when showPos:
@@ -1015,11 +1035,6 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
         let length = dotNameLen + andOrOr.value.length
         return newValueAndLengthOr(andOrOr.value.value, length)
 
-      # if not skip:
-      #   if not isFunctionName(dotNameStr):
-      #     # The function does not exist: $1.
-      #     return newValueAndLengthOr(wInvalidFunction, dotNameStr, start)
-
       let fvl = getFunctionValueAndLength(dotNameStr, statement,
         start+dotNameLen, variables, false, skip)
       if fvl.isMessage or fvl.value.exit:
@@ -1028,9 +1043,6 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
       let valueAndLength = newValueAndLength(fvl.value.value,
         length)
       return newValueAndLengthOr(valueAndLength)
-
-    if skip:
-      return newValueAndLengthOr(newValue(0), dotNameLen)
 
     # We have a variable.
     let valueOr = getVariable(variables, dotNameStr)
