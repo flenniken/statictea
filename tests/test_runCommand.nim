@@ -1366,7 +1366,7 @@ White$1
     check testGetValueAndLength("""a = b""", 4, wNotInLorF, 4, "b")
     check testGetValueAndLength("""a = _""", 4, wInvalidRightHandSide, 4)
 
-  test "testSkipArgument start":
+  test "skipArgument":
     check testSkipArgument("""a = fn(1)""", 7, newPosOr(8))
     check testSkipArgument("""a = Fn(1)""", 7, newPosOr(8))
     check testSkipArgument("""a = fn(1 )""", 7, newPosOr(9))

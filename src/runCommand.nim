@@ -685,12 +685,11 @@ func skipArgument*(text: string, startPos: Natural): PosOr =
   ## character after the argument or a message when there is a
   ## problem.
   ## @:~~~
-  ## @:a = add(1,2)
-  ## @:        ^^
+  ## @:a = fn( 1 )
+  ## @:        ^ ^
   ## @:          ^^
-  ## @:a = add( 1 , 2 )
-  ## @:         ^ ^
-  ## @:           ^   ^
+  ## @:a = fn( 1 , 2 )
+  ## @:        ^ ^
   ## @:~~~~
 
   assert(startPos < text.len, "startPos is greater than the text len")
@@ -699,17 +698,16 @@ func skipArgument*(text: string, startPos: Natural): PosOr =
   type
     State = enum
       ## Parsing states.
-      start, middle, inParen, inBracket, inString, slash,
-      inParenString inParenSlash, inBracketString, inBracketSlash,
-      endWhitespace
+      start, middle, inString, slash, inGroup,
+      inGroupString, inGroupSlash, endWhitespace
 
   var state = start
   var pos = text.len
 
   # The difference between the number of left and right parentheses or
   # left and right brackets.
-  var parenCount = 0
-  var bracketCount = 0
+  var groupCount = 0
+  var groupSymbol: char # ( or [
 
   # Loop through the text one byte at a time.
   for ix in countUp(startPos, text.len-1):
@@ -724,14 +722,11 @@ func skipArgument*(text: string, startPos: Natural): PosOr =
       # string
       of '"':
         state = inString
-      # boolean expression
-      of '(':
-        state = inParen
-        inc(parenCount)
-      # list
-      of '[':
-        state = inBracket
-        inc(bracketCount)
+      # boolean expression or list
+      of '(', '[':
+        state = inGroup
+        groupSymbol = ch
+        inc(groupCount)
       else:
         # Invalid argument.
         return newPosOr(wInvalidFirstArgChar, "", startPos)
@@ -750,12 +745,10 @@ func skipArgument*(text: string, startPos: Natural): PosOr =
 
     of middle:
       case ch
-      of '(':
-        state = inParen
-        inc(parenCount)
-      of '[':
-        state = inBracket
-        inc(bracketCount)
+      of '(', '[':
+        state = inGroup
+        groupSymbol = ch
+        inc(groupCount)
       of ',', ')', ']':
         return newPosOr(ix)
       of ' ', '\t':
@@ -767,55 +760,37 @@ func skipArgument*(text: string, startPos: Natural): PosOr =
         # Invalid character.
         return newPosOr(wInvalidCharacter, "", ix)
 
-    of inParen:
+    of inGroup:
       case ch
       of '"':
-        state = inParenString
-      of '(':
-        inc(parenCount)
+        state = inGroupString
+      of '(', '[':
+        if groupSymbol == ch:
+          inc(groupCount)
       of ')':
-        dec(parenCount)
-        if parenCount == 0:
-          state = endWhiteSpace
-      else:
-        discard
-
-    of inParenString:
-      case ch
-      of '\\':
-        state = inParenSlash
-      of '"':
-        state = inParen
-      else:
-        discard
-
-    of inParenSlash:
-      state = inParenString
-
-    of inBracketString :
-      case ch
-      of '\\':
-        state = inBracketSlash
-      of '"':
-        state = inBracket
-      else:
-        discard
-
-    of inBracketSlash:
-      state = inBracketString
-
-    of inBracket:
-      case ch
-      of '"':
-        state = inBracketString
-      of '[':
-        inc(bracketCount)
+        if groupSymbol == '(':
+          dec(groupCount)
+          if groupCount == 0:
+            state = endWhiteSpace
       of ']':
-        dec(bracketCount)
-        if bracketCount == 0:
-          state = endWhiteSpace
+        if groupSymbol == '[':
+          dec(groupCount)
+          if groupCount == 0:
+            state = endWhiteSpace
       else:
         discard
+
+    of inGroupString:
+      case ch
+      of '\\':
+        state = inGroupSlash
+      of '"':
+        state = inGroup
+      else:
+        discard
+
+    of inGroupSlash:
+      state = inGroupString
 
     of endWhitespace:
       case ch
@@ -827,12 +802,13 @@ func skipArgument*(text: string, startPos: Natural): PosOr =
 
   if state != endWhitespace:
     case state:
-    of inParen:
-      # No matching end right parentheses.
-      result = newPosOr(wNoMatchingParen, "", text.len)
-    of inBracket:
-      # No matching end right bracket.
-      result = newPosOr(wNoMatchingBracket, "", text.len)
+    of inGroup:
+      if groupSymbol == '(':
+        # No matching end right parentheses.
+        result = newPosOr(wNoMatchingParen, "", text.len)
+      else:
+        # No matching end right bracket.
+        result = newPosOr(wNoMatchingBracket, "", text.len)
     else:
       # Ran out of characters before finishing the statement.
       result = newPosOr(wNotEnoughCharacters, "", text.len)
