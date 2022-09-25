@@ -492,7 +492,7 @@ func skipArgument*(text: string, startPos: Natural): PosOr =
 
 # Forward reference to getValueAndLength since we call it recursively.
 proc getValueAndLength*(statement: Statement, start: Natural, variables:
-  Variables, skip: bool): ValueAndLengthOr
+  Variables): ValueAndLengthOr
 
 # Call stack:
 # - runStatement
@@ -523,7 +523,7 @@ proc ifFunctions*(
   # The if function cond is a boolean, for if0 it is anything.
 
   # Get the condition's value.
-  let vlcOr = getValueAndLength(statement, start, variables, skip=false)
+  let vlcOr = getValueAndLength(statement, start, variables)
   if vlcOr.isMessage or vlcOr.value.exit:
     return vlcOr
   let cond = vlcOr.value.value
@@ -574,7 +574,7 @@ proc ifFunctions*(
       return newValueAndLengthOr(posOr.message)
     runningLen = (posOr.value - start)
   else:
-    vl2Or = getValueAndLength(statement, start + runningLen, variables, skip)
+    vl2Or = getValueAndLength(statement, start + runningLen, variables)
     if vl2Or.isMessage or vl2Or.value.exit:
       return vl2Or
     runningLen += vl2Or.value.length
@@ -594,7 +594,7 @@ proc ifFunctions*(
         return newValueAndLengthOr(posOr.message)
       runningLen = (posOr.value - start)
     else:
-      vl3Or = getValueAndLength(statement, start + runningLen, variables, skip)
+      vl3Or = getValueAndLength(statement, start + runningLen, variables)
       if vl3Or.isMessage or vl3Or.value.exit:
         return vl3Or
       runningLen += vl3Or.value.length
@@ -635,7 +635,7 @@ proc andOrFunctions*(
   #   c2 = or(a, b)
 
   # Get the first argument value.
-  let vlcOr = getValueAndLength(statement, start, variables, skip=false)
+  let vlcOr = getValueAndLength(statement, start, variables)
   if vlcOr.isMessage or vlcOr.value.exit:
     return vlcOr
   let firstValue = vlcOr.value.value
@@ -667,7 +667,7 @@ proc andOrFunctions*(
     secondLength = (posOr.value - (start + runningLen))
     secondValue = newValue(0)
   else:    
-    let vl2Or = getValueAndLength(statement, start + runningLen, variables, skip)
+    let vl2Or = getValueAndLength(statement, start + runningLen, variables)
     if vl2Or.isMessage or vl2Or.value.exit:
       return vl2Or
     secondLength = vl2Or.value.length
@@ -703,7 +703,7 @@ proc getFunctionValueAndLength*(
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list = false, skip: bool): ValueAndLengthOr =
+    list = false): ValueAndLengthOr =
   ## Return the function's value and the length. Start points at the
   ## first argument of the function. The length includes the trailing
   ## whitespace after the ending ).
@@ -721,7 +721,7 @@ proc getFunctionValueAndLength*(
     # Get the arguments to the function.
     pos = start
     while true:
-      let vlOr = getValueAndLength(statement, pos, variables, skip)
+      let vlOr = getValueAndLength(statement, pos, variables)
       if vlOr.isMessage or vlOr.value.exit:
         return vlOr
       arguments.add(vlOr.value.value)
@@ -776,7 +776,7 @@ proc getFunctionValueAndLength*(
   result = newValueAndLengthOr(funResult.value, pos-start, exit)
 
 proc getList(statement: Statement, start: Natural,
-    variables: Variables, skip: bool): ValueAndLengthOr =
+    variables: Variables): ValueAndLengthOr =
   ## Return the literal list value and match length from the
   ## statement. The start index points at [. The length includes the
   ## trailing whitespace after the ending ].
@@ -788,7 +788,7 @@ proc getList(statement: Statement, start: Natural,
 
   # Get the list. The literal list [...] and list(...) are similar.
   let funValueLengthOr = getFunctionValueAndLength("list", statement,
-    start+startSymbol.length, variables, list=true, skip)
+    start+startSymbol.length, variables, list=true)
   if funValueLengthOr.isMessage or funValueLengthOr.value.exit:
     return funValueLengthOr
 
@@ -841,7 +841,7 @@ proc getCondition*(statement: Statement, start: Natural,
     variables: Variables): ValueAndLengthOr
 
 proc getValueOrNestedCond(statement: Statement, start: Natural,
-    variables: Variables, skip: bool = false): ValueAndLengthOr =
+    variables: Variables): ValueAndLengthOr =
   ## Return a value and length. If start points at a nested
   ## condition, handle it. Return the start value and length.
 
@@ -851,7 +851,7 @@ proc getValueOrNestedCond(statement: Statement, start: Natural,
     # Found a left parenetheses, get the nested condition.
     result = getCondition(statement, start, variables)
   else:
-    result = getValueAndLength(statement, start, variables, skip)
+    result = getValueAndLength(statement, start, variables)
 
 proc getCondition*(statement: Statement, start: Natural,
     variables: Variables): ValueAndLengthOr =
@@ -981,7 +981,7 @@ proc getCondition*(statement: Statement, start: Natural,
     accum = newValue(bValue)
 
 proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
-    Variables, skip: bool): ValueAndLengthOr =
+    Variables): ValueAndLengthOr =
   ## Get the value and length from the statement.
 
   # The first character determines its type.
@@ -1003,7 +1003,7 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
   elif char in {'0' .. '9', '-'}:
     result = getNumber(statement, start)
   elif char == '[':
-    result = getList(statement, start, variables, skip)
+    result = getList(statement, start, variables)
   elif char == '(':
     result = getCondition(statement, start, variables)
   elif isLowerAscii(char) or isUpperAscii(char):
@@ -1020,7 +1020,7 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
       # Handle the special if functions.
       if dotNameStr in ["if", "if0"]:
         let ifOr = ifFunctions(dotNameStr, statement,
-          start+dotNameLen, variables, skip)
+          start+dotNameLen, variables)
         if ifOr.isMessage or ifOr.value.exit:
           return ifOr
         let length = dotNameLen + ifOr.value.length
@@ -1029,14 +1029,14 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
       # Handle the special and/or functions.
       if dotNameStr in ["and", "or"]:
         let andOrOr = andOrFunctions(dotNameStr, statement,
-          start+dotNameLen, variables, skip)
+          start+dotNameLen, variables)
         if andOrOr.isMessage or andOrOr.value.exit:
           return andOrOr
         let length = dotNameLen + andOrOr.value.length
         return newValueAndLengthOr(andOrOr.value.value, length)
 
       let fvl = getFunctionValueAndLength(dotNameStr, statement,
-        start+dotNameLen, variables, false, skip)
+        start+dotNameLen, variables, false)
       if fvl.isMessage or fvl.value.exit:
         return fvl
       let length = dotNameLen+fvl.value.length
@@ -1056,7 +1056,7 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
     return newValueAndLengthOr(wInvalidRightHandSide, "", start)
 
 proc getValueAndLength*(statement: Statement, start: Natural, variables:
-    Variables, skip: bool): ValueAndLengthOr =
+    Variables): ValueAndLengthOr =
   ## Return the value and length of the item that the start parameter
   ## points at which is a string, number, variable, list, or condition.
   ## The length returned includes the trailing whitespace after the
@@ -1091,7 +1091,7 @@ proc getValueAndLength*(statement: Statement, start: Natural, variables:
   when showPos:
     showDebugPos(statement, start, "s")
 
-  result = getValueAndLengthWorker(statement, start, variables, skip)
+  result = getValueAndLengthWorker(statement, start, variables)
 
   when showPos:
     var pos: Natural
@@ -1152,7 +1152,7 @@ proc runStatement*(statement: Statement, variables: Variables):
 
     # Get the right hand side value and match the following whitespace.
     vlOr = getValueAndLength(statement,
-      leadingLen + operatorLength, variables, false)
+      leadingLen + operatorLength, variables)
 
   if vlOr.isMessage:
     return newVariableDataOr(vlOr.message)

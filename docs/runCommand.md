@@ -28,12 +28,12 @@ starts in the template file.
 * [getMultilineStr](#getmultilinestr) &mdash; Return the triple quoted string literal.
 * [getString](#getstring) &mdash; Return a literal string value and match length from a statement.
 * [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
+* [skipArgument](#skipargument) &mdash; Skip past the argument.
 * [ifFunctions](#iffunctions) &mdash; Return the if/if0 function's value and the length.
 * [andOrFunctions](#andorfunctions) &mdash; Return the and/or function's value and the length.
 * [getFunctionValueAndLength](#getfunctionvalueandlength) &mdash; Return the function's value and the length.
 * [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value.
 * [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value.
-* [skipArgument](#skipargument) &mdash; Skip past the argument.
 * [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and its length.
 * [getValueAndLength](#getvalueandlength) &mdash; Return the value and length of the item that the start parameter points at which is a string, number, variable, list, or condition.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
@@ -234,6 +234,21 @@ Return the literal number value and match length from the statement. The start i
 proc getNumber(statement: Statement; start: Natural): ValueAndLengthOr
 ```
 
+# skipArgument
+
+Skip past the argument.  startPos points at the first character of a function argument.  Return the first non-whitespace character after the argument or a message when there is a problem.
+~~~
+a = fn( 1 )
+        ^ ^
+          ^^
+a = fn( 1 , 2 )
+        ^ ^
+~~~~
+
+```nim
+func skipArgument(text: string; startPos: Natural): PosOr
+```
+
 # ifFunctions
 
 Return the if/if0 function's value and the length. It conditionally runs one of its arguments and skips the other. Start points at the first argument of the function. The length includes the trailing whitespace after the ending ).
@@ -259,7 +274,7 @@ Return the function's value and the length. Start points at the first argument o
 ```nim
 proc getFunctionValueAndLength(dotNameStr: string; statement: Statement;
                                start: Natural; variables: Variables;
-                               list = false; skip: bool): ValueAndLengthOr
+                               list = false): ValueAndLengthOr
 ```
 
 # runBoolOp
@@ -276,22 +291,6 @@ Evaluate the comparison and return a bool value.
 
 ```nim
 proc runCompareOp(left: Value; op: string; right: Value): Value
-```
-
-# skipArgument
-
-Skip past the argument.  startPos points at the first character of a function argument.  Return the first non-whitespace character after the argument or a message when there is a problem.
-~~~
-a = add(1,2)
-        ^^
-          ^^
-a = add( 1 , 2 )
-         ^ ^
-           ^   ^
-~~~~
-
-```nim
-func skipArgument(text: string; startPos: Natural): PosOr
 ```
 
 # getCondition
@@ -332,7 +331,7 @@ a = if( bool(len(b)), d, e) # if
 
 ```nim
 proc getValueAndLength(statement: Statement; start: Natural;
-                       variables: Variables; skip: bool): ValueAndLengthOr
+                       variables: Variables): ValueAndLengthOr
 ```
 
 # runStatement

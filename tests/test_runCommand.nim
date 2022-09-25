@@ -29,7 +29,7 @@ proc testGetValueAndLength(statement: Statement, start: Natural,
     let funcsVarDict = createFuncDictionary().dictv
     vars = emptyVariables(funcs = funcsVarDict)
 
-  let valueAndLengthOr = getValueAndLength(statement, start, vars, false)
+  let valueAndLengthOr = getValueAndLength(statement, start, vars)
   result = gotExpected($valueAndLengthOr, $eValueAndLengthOr)
 
   if not result:
@@ -239,7 +239,7 @@ proc testGetFunctionValueAndLength(
   let funcsVarDict = createFuncDictionary().dictv
   let variables = emptyVariables(funcs = funcsVarDict)
   let valueAndLengthOr = getFunctionValueAndLength(functionName,
-    statement, start, variables, list=false, skip=false)
+    statement, start, variables, list=false)
   result = cmpValueAndLengthOr(functionName, statement, start, valueAndLengthOr, eValueAndLengthOr)
 
 proc testRunStatement(statement: Statement, eVDataOr: VariableDataOr, variables: Variables = nil): bool =

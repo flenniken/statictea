@@ -225,7 +225,7 @@ MessageId = enum
   wNotEnoughCharacters,     ## w208
   wNoMatchingBracket,       ## w209
   wInvalidCharacter,        ## w210
-  wInvalidArgument           ## w211
+  wInvalidFirstArgChar       ## w211
 ```
 
 # Messages
@@ -445,7 +445,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Ran out of characters before finishing the statement.", ## wNotEnoughCharacters
     "No matching end right bracket.", ## wNoMatchingBracket
     "Invalid character.",   ## wInvalidCharacter
-    "Invalid argument."]
+    "Invalid first character of the argument."]
 ```
 
 
