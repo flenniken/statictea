@@ -221,7 +221,11 @@ MessageId = enum
   wReadOnlyFunctions,       ## w204
   wNotInLorF,               ## w205
   wNotFunction,             ## w206
-  wNoneMatchedFirst          ## w207
+  wNoneMatchedFirst,        ## w207
+  wNotEnoughCharacters,     ## w208
+  wNoMatchingBracket,       ## w209
+  wInvalidCharacter,        ## w210
+  wInvalidArgument           ## w211
 ```
 
 # Messages
@@ -437,7 +441,11 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "You cannot assign to the functions dictionary.", ## wReadOnlyFunctions
     "The variable \'$1\' wasn\'t found in the l or f dictionaries.", ## wNotInLorF
     "You cannot call the variable because it\'s not a function or a list of functions.", ## wNotFunction
-    "None of the $1 functions matched the first argument."]
+    "None of the $1 functions matched the first argument.", ## wNoneMatchedFirst
+    "Ran out of characters before finishing the statement.", ## wNotEnoughCharacters
+    "No matching end right bracket.", ## wNoMatchingBracket
+    "Invalid character.",   ## wInvalidCharacter
+    "Invalid argument."]
 ```
 
 

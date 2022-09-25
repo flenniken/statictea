@@ -50,7 +50,6 @@ type
   ValueAndLengthOr* = OpResultWarn[ValueAndLength]
   PosOr* = OpResultWarn[Natural]
 
-
 proc newValueAndLength*(value: Value, length: Natural,
     exit = false): ValueAndLength =
   ## Create a newValueAndLength object.
@@ -686,20 +685,13 @@ func skipArgument*(text: string, startPos: Natural): PosOr =
   ## character after the argument or a message when there is a
   ## problem.
   ## @:~~~
-  ## @:a = if( (b < c)  , d, e)
-  ## @:    ^                   ^
-  ## @:a = if( (b < c)  , d, e)
-  ## @:        ^        ^
-  ## @:a = if( (b < c)  , d, e)
-  ## @:                   ^^
-  ## @:a = if( (b < c)  , d, e)
-  ## @:                      ^^
-  ## @:a = if( (b < c)  , d  , e)
-  ## @:                   ^    ^
-  ## @:a = if( len(b)  , len(d)  , len(e))
-  ## @:        ^         ^
+  ## @:a = add(1,2)
+  ## @:        ^^
+  ## @:          ^^
+  ## @:a = add( 1 , 2 )
+  ## @:         ^ ^
+  ## @:           ^   ^
   ## @:~~~~
-  # Count matching parens skipping parens in quoted strings.
 
   assert(startPos < text.len, "startPos is greater than the text len")
   assert(startPos >= 0, "startPos is less than 0")
@@ -707,13 +699,17 @@ func skipArgument*(text: string, startPos: Natural): PosOr =
   type
     State = enum
       ## Parsing states.
-      start, middle, inString, slash, whitespace
+      start, middle, inParen, inBracket, inString, slash,
+      inParenString inParenSlash, inBracketString, inBracketSlash,
+      endWhitespace
 
   var state = start
   var pos = text.len
 
-  # The difference between the number of left and right parentheses.
-  var count = 0
+  # The difference between the number of left and right parentheses or
+  # left and right brackets.
+  var parenCount = 0
+  var bracketCount = 0
 
   # Loop through the text one byte at a time.
   for ix in countUp(startPos, text.len-1):
@@ -721,36 +717,107 @@ func skipArgument*(text: string, startPos: Natural): PosOr =
 
     case state
     of start:
-      # assert(ch == '(', "The start isn't pointing at the left parentheses.")
-      state = middle
-      inc(count)
-
-    of middle:
       case ch
+      # true, false, variable, number
+      of 'a' .. 'z', 'A' .. 'Z', '0' .. '9', '-':
+        state = middle
+      # string
       of '"':
         state = inString
-      of ')':
-        dec(count)
-        if count == 0:
-          state = whitespace
+      # boolean expression
       of '(':
-        inc(count)
+        state = inParen
+        inc(parenCount)
+      # list
+      of '[':
+        state = inBracket
+        inc(bracketCount)
       else:
-        discard
+        # Invalid argument.
+        return newPosOr(wInvalidFirstArgChar, "", startPos)
 
     of inString:
       case ch
       of '\\':
         state = slash
       of '"':
-        state = middle
+        state = endWhitespace
       else:
         discard
 
     of slash:
       state = inString
 
-    of whitespace:
+    of middle:
+      case ch
+      of '(':
+        state = inParen
+        inc(parenCount)
+      of '[':
+        state = inBracket
+        inc(bracketCount)
+      of ',', ')', ']':
+        return newPosOr(ix)
+      of ' ', '\t':
+        state = endWhitespace
+      # true, false, variable, number
+      of 'a' .. 'z', 'A' .. 'Z', '0' .. '9', '_', '.':
+        discard
+      else:
+        # Invalid character.
+        return newPosOr(wInvalidCharacter, "", ix)
+
+    of inParen:
+      case ch
+      of '"':
+        state = inParenString
+      of '(':
+        inc(parenCount)
+      of ')':
+        dec(parenCount)
+        if parenCount == 0:
+          state = endWhiteSpace
+      else:
+        discard
+
+    of inParenString:
+      case ch
+      of '\\':
+        state = inParenSlash
+      of '"':
+        state = inParen
+      else:
+        discard
+
+    of inParenSlash:
+      state = inParenString
+
+    of inBracketString :
+      case ch
+      of '\\':
+        state = inBracketSlash
+      of '"':
+        state = inBracket
+      else:
+        discard
+
+    of inBracketSlash:
+      state = inBracketString
+
+    of inBracket:
+      case ch
+      of '"':
+        state = inBracketString
+      of '[':
+        inc(bracketCount)
+      of ']':
+        dec(bracketCount)
+        if bracketCount == 0:
+          state = endWhiteSpace
+      else:
+        discard
+
+    of endWhitespace:
       case ch
       of ' ', '\t', '\n', '\r':
         discard
@@ -758,9 +825,17 @@ func skipArgument*(text: string, startPos: Natural): PosOr =
         pos = ix
         break
 
-  if state != whitespace:
-    # No matching end right parentheses.
-    result = newPosOr(wNoMatchingParen, "", startPos)
+  if state != endWhitespace:
+    case state:
+    of inParen:
+      # No matching end right parentheses.
+      result = newPosOr(wNoMatchingParen, "", text.len)
+    of inBracket:
+      # No matching end right bracket.
+      result = newPosOr(wNoMatchingBracket, "", text.len)
+    else:
+      # Ran out of characters before finishing the statement.
+      result = newPosOr(wNotEnoughCharacters, "", text.len)
   else:
     result = newPosOr(pos)
 
@@ -1020,9 +1095,9 @@ proc getValueAndLength*(statement: Statement, start: Natural, variables:
   ## @:    ^                       ^
   ## @:        ^             ^
   ## @:             ^     ^
-  ## @:                 ^ ^
+  ## @:                 ^^
   ## @:                      ^  ^
-  ## @:                         ^ ^
+  ## @:                         ^  ^
   ## @:~~~~
 
   when showPos:

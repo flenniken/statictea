@@ -273,6 +273,20 @@ proc testSkipArgument(text: string, startPos: Natural, ePosOr: PosOr): bool =
   if posOr != ePosOr:
     result = gotExpected($posOr, $ePosOr)
 
+    echo "          10        20        30        40"
+    echo "0123456789 123456789 123456789 123456789 123456789"
+    echo text
+    echo startColumn(startPos, "^ start")
+    if posOr.isValue:
+      echo startColumn(posOr.value, "^ got")
+    else:
+      echo startColumn(posOr.message.pos, "^ got")
+    if ePosOr.isValue:
+      echo startColumn(ePosOr.value, "^ expected")
+    else:
+      echo startColumn(ePosOr.message.pos, "^ expected")
+
+
 proc testGetCondition(text: string, start: Natural, eBool: bool, ePos: Natural): bool =
   let funcsVarDict = createFuncDictionary().dictv
   let variables = emptyVariables(funcs = funcsVarDict)
@@ -283,7 +297,8 @@ proc testGetCondition(text: string, start: Natural, eBool: bool, ePos: Natural):
   let eLength = ePos - start
   let eValueAndLengthOr = newValueAndLengthOr(newValue(eBool), eLength)
   if valueAndLengthOr != eValueAndLengthOr:
-    result = gotExpected($valueAndLengthOr, $eValueAndLengthOr, text)
+    let message = "\n$1\n0123456789 123456789 123456789" % text
+    result = gotExpected($valueAndLengthOr, $eValueAndLengthOr, message)
 
 proc testGetConditionWarn(text: string, start: Natural, eWarning: MessageId,
     ePos = 0, eP1 = ""): bool =
@@ -425,6 +440,8 @@ $$ : c = len("hello")
   test "getNumber":
     check testGetNumber(newStatement("a = 5"), 4,
       newValueAndLengthOr(5, 1))
+    check testGetNumber(newStatement("a = 22  ,  # test"), 4,
+      newValueAndLengthOr(22, 4))
     check testGetNumber(newStatement("a = 123456"), 4,
       newValueAndLengthOr(123456, 6))
     check testGetNumber(newStatement("a = 1_23_456"), 4,
@@ -1215,7 +1232,7 @@ White$1
 
   test "testSkipArgument":
     check testSkipArgument("a = ( b < c ) # test", 4, newPosOr(14))
-    #                        0123456789 123456789
+    #                       0123456789 123456789
     check testSkipArgument("()", 0, newPosOr(2))
     check testSkipArgument("(())", 0, newPosOr(4))
     check testSkipArgument("((()))", 0, newPosOr(6))
@@ -1231,10 +1248,10 @@ White$1
     #                       0123456789 123456789 123456789
 
   test "testSkipArgument warning":
-    check testSkipArgument("(", 0, newPosOr(wNoMatchingParen, "", 0))
-    check testSkipArgument("( abc", 0, newPosOr(wNoMatchingParen, "", 0))
-    check testSkipArgument("((())", 0, newPosOr(wNoMatchingParen, "", 0))
-    check testSkipArgument("  (", 2, newPosOr(wNoMatchingParen, "", 2))
+    check testSkipArgument("(", 0, newPosOr(wNoMatchingParen, "", 1))
+    check testSkipArgument("( abc", 0, newPosOr(wNoMatchingParen, "", 5))
+    check testSkipArgument("((())", 0, newPosOr(wNoMatchingParen, "", 5))
+    check testSkipArgument("  (", 2, newPosOr(wNoMatchingParen, "", 3))
 
   test "getCondition":
     #                         0123456789 123456789 123456789 12345
@@ -1276,7 +1293,7 @@ White$1
     check testGetConditionWarn("""a = ( true and true or false )""", 4, wNeedPrecedence, 20)
     check testGetConditionWarn("""a = ( false or false and false )""", 4, wNeedPrecedence, 21)
     check testGetConditionWarn("""a = ( true < 5 )""", 4, wCompareOperator, 11)
-    check testGetConditionWarn("""a = ( false and true # no right paren""", 4, wNoMatchingParen, 4)
+    check testGetConditionWarn("""a = ( false and true # no right paren""", 4, wNoMatchingParen, 37)
     check testGetConditionWarn("""a = ( 3 < 5.5 )""", 4, wCompareOperatorSame, 10)
     check testGetConditionWarn("""a = ( 3.2 < 5 )""", 4, wCompareOperatorSame, 12)
     check testGetConditionWarn("""a = ( "a" < 5 )""", 4, wCompareOperatorSame, 12)
@@ -1313,7 +1330,7 @@ White$1
     let eVariableDataOr = newVariableDataOr("a", "=", cmpValueOr.value.listv[0])
     check testRunStatement(statement, eVariableDataOr, variables)
 
-  test "getValueAndLength":
+  test "getValueAndLength and skip":
     # var valueOr = readJsonString("{b:1,c:2}")
     let statements = [
       ("""a = 5 # number""", 4, 6, "5"),
@@ -1323,18 +1340,80 @@ White$1
       ("""a = len("3") # var""", 4, 13, "1"),
       ("""a = (3 < 5) # var""", 4, 12, "true"),
       ("""a = t.row # variable""", 4, 10, "0"),
-      ("""a = if( (1 < 2), 3, 4) # if""", 4, 23, "3"),
-      ("""a = if( bool(len("tea")), 22, 33) # if""", 4, 34, "22"),
-      ("""a = if( bool(len("tea")), 22, 33) # if""", 8, 24, "true"),
-      ("""a = if( bool(len("tea")), 22, 33) # if""", 13, 23, "3"),
-      ("""a = if( bool(len("tea")), 22, 33) # if""", 26, 28, "22"),
-      ("""a = if( bool(len("tea")), 22, 33) # if""", 30, 32, "33"),
-    #     0123456789 123456789 123456789 123456789
+      ("""a = if( (1 < 2), 3, 4) # if a""", 4, 23, "3"),
+      ("""a = if( bool(len("tea")), 22, 33) # if b""", 4, 34, "22"),
+      ("""a = if( bool(len("tea")), 22, 33) # if c""", 8, 24, "true"),
+      ("""a = if( bool(len("tea")), 22, 33) # if d""", 13, 23, "3"),
+      ("""a = if( bool(len("tea")), 22, 33) # if e""", 17, 22, """"tea""""),
+      ("""a = if( bool(len("tea")), 22, 33) # if f""", 26, 28, "22"),
+      ("""a = if( bool(len("tea")), 22, 33) # if g""", 30, 32, "33"),
+      #   0123456789 123456789 123456789 123456789 1234
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if h""", 4, 41, "22"),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if i""", 8, 29, "true"),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if j""", 14, 27, "3"),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if k""", 19, 25, """"tea""""),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if l""", 31, 34, "22"),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if m""", 36, 39, "33"),
+      #   0123456789 123456789 123456789 123456789 1234
+      #             10        20        30        40
     ]
     for (text, start, ePos, eJson) in statements:
       check testGetValueAndLength(text, start, ePos, eJson)
+      check testSkipArgument(text, start, newPosOr(ePos))
 
   test "getValueAndLength warnings":
     check testGetValueAndLength("""a = 5""", 1, wInvalidRightHandSide, 1)
     check testGetValueAndLength("""a = b""", 4, wNotInLorF, 4, "b")
     check testGetValueAndLength("""a = _""", 4, wInvalidRightHandSide, 4)
+
+  test "testSkipArgument start":
+    check testSkipArgument("""a = fn(1)""", 7, newPosOr(8))
+    check testSkipArgument("""a = Fn(1)""", 7, newPosOr(8))
+    check testSkipArgument("""a = fn(1 )""", 7, newPosOr(9))
+    check testSkipArgument("""a = fn(123)""", 7, newPosOr(10))
+    check testSkipArgument("""a = fn(1,2)""", 7, newPosOr(8))
+    check testSkipArgument("""a = fn(1 ,2)""", 7, newPosOr(9))
+    check testSkipArgument("""a = fn(-1)""", 7, newPosOr(9))
+    check testSkipArgument("""a = fn(b)""", 7, newPosOr(8))
+    check testSkipArgument("""a = fn(b )""", 7, newPosOr(9))
+    check testSkipArgument("""a = fn("t")""", 7, newPosOr(10))
+    check testSkipArgument("""a = fn("t" )""", 7, newPosOr(11))
+    check testSkipArgument("""a = fn("t",b)""", 7, newPosOr(10))
+    check testSkipArgument("""a = fn("t" ,b)""", 7, newPosOr(11))
+    check testSkipArgument("""a = fn("\"")""", 7, newPosOr(11))
+    check testSkipArgument("""a = fn((1<2))""", 7, newPosOr(12))
+    check testSkipArgument("""a = fn((1<2) )""", 7, newPosOr(13))
+    check testSkipArgument("""a = fn((1<2),a)""", 7, newPosOr(12))
+    check testSkipArgument("""a = fn((1<2)  ,a)""", 7, newPosOr(14))
+    check testSkipArgument("""a = fn([1])""", 7, newPosOr(10))
+    check testSkipArgument("""a = fn([1] )""", 7, newPosOr(11))
+    check testSkipArgument("""a = fn([1],b)""", 7, newPosOr(10))
+    check testSkipArgument("""a = fn([1] ,b)""", 7, newPosOr(11))
+    check testSkipArgument("""a = fn(f2(1))""", 7, newPosOr(12))
+    check testSkipArgument("""a = fn(f2(1)  )""", 7, newPosOr(14))
+    check testSkipArgument("""a = fn(f2(1,2))""", 7, newPosOr(14))
+    check testSkipArgument("""a = fn(f2(1),b)""", 7, newPosOr(12))
+    check testSkipArgument("""a = fn(f2(1) ,b)""", 7, newPosOr(13))
+    check testSkipArgument("""a = fn([[1]])""", 7, newPosOr(12))
+    check testSkipArgument("""a = fn([[1],2])""", 7, newPosOr(14))
+    check testSkipArgument("""a = fn([[1],[2]])""", 7, newPosOr(16))
+    check testSkipArgument("""a = fn(l.b)""", 7, newPosOr(10))
+    check testSkipArgument("""a = fn(l_)""", 7, newPosOr(9))
+    check testSkipArgument("""a = fn(lA)""", 7, newPosOr(9))
+    check testSkipArgument("""a = fn(f2(f3(1)))""", 7, newPosOr(16))
+    check testSkipArgument("""a = fn(f2(1,f4(1)))""", 7, newPosOr(18))
+    check testSkipArgument("""a = fn(f2(1,f4(1)),3)""", 7, newPosOr(18))
+    check testSkipArgument("""a = fn(f2(1,f4(1)) ,3)""", 7, newPosOr(19))
+    check testSkipArgument("""a = fn(f2("abc"))""", 7, newPosOr(16))
+    check testSkipArgument("""a = fn(f2("))"))""", 7, newPosOr(15))
+    check testSkipArgument("""a = fn(f2("(("))""", 7, newPosOr(15))
+
+  test "skipArgument warnings":
+    check testSkipArgument("""a = fn(_b)""", 7, newPosOr(wInvalidFirstArgChar, "", 7))
+    check testSkipArgument("""a = fn(b$)""", 7, newPosOr(wInvalidCharacter, "", 8))
+    check testSkipArgument("""a = fn(fn2(b""", 7, newPosOr(wNoMatchingParen, "", 12))
+    check testSkipArgument("""a = fn([1,2)""", 7, newPosOr(wNoMatchingBracket, "", 12))
+    #                         0123456789 123456789
+    check testSkipArgument("""a = fn(fn2(b,fn3()""", 7, newPosOr(wNoMatchingParen, "", 18))
+    check testSkipArgument("""a = fn("tea""", 7, newPosOr(wNotEnoughCharacters, "", 11))
+

@@ -282,18 +282,12 @@ proc runCompareOp(left: Value; op: string; right: Value): Value
 
 Skip past the argument.  startPos points at the first character of a function argument.  Return the first non-whitespace character after the argument or a message when there is a problem.
 ~~~
-a = if( (b < c)  , d, e)
-    ^                   ^
-a = if( (b < c)  , d, e)
-        ^        ^
-a = if( (b < c)  , d, e)
-                   ^^
-a = if( (b < c)  , d, e)
-                      ^^
-a = if( (b < c)  , d  , e)
-                   ^    ^
-a = if( len(b)  , len(d)  , len(e))
-        ^         ^
+a = add(1,2)
+        ^^
+          ^^
+a = add( 1 , 2 )
+         ^ ^
+           ^   ^
 ~~~~
 
 ```nim
@@ -331,9 +325,9 @@ a = if( bool(len(b)), d, e) # if
     ^                       ^
         ^             ^
              ^     ^
-                 ^ ^
+                 ^^
                       ^  ^
-                         ^ ^
+                         ^  ^
 ~~~~
 
 ```nim
