@@ -14,6 +14,7 @@ StaticTea variable types.
 * type: [FunctionSpec](#functionspec) &mdash; The name of a function, a pointer to the code, and its signature code.
 * type: [FunResultKind](#funresultkind) &mdash; The kind of a FunResult object, either a value or warning.
 * type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a warning.
+* type: [ValueAndPos](#valueandpos) &mdash; A value and the position after the value in the statement.
 * [newVarsDict](#newvarsdict) &mdash; Create a new empty variables dictionary.
 * [newVarsDictOr](#newvarsdictor) &mdash; Return a new varsDictOr object containing a warning.
 * [newVarsDictOr](#newvarsdictor-1) &mdash; Return a new VarsDict object containing a dictionary.
@@ -52,6 +53,13 @@ same type which may be Value type.
 * [`==`](#-5) &mdash; Compare two FunResult objects and return true when equal.
 * [`!=`](#-6) &mdash; Compare two FunResult objects and return false when equal.
 * [`$`](#-7) &mdash; Return a string representation of a FunResult object.
+* [newValueAndPos](#newvalueandpos) &mdash; Create a newValueAndPos object.
+* [newValueAndPosOr](#newvalueandposor) &mdash; Create a ValueAndPosOr warning.
+* [newValueAndPosOr](#newvalueandposor-1) &mdash; Create a ValueAndPosOr warning.
+* [`==`](#-8) &mdash; Return true when a equals b.
+* [newValueAndPosOr](#newvalueandposor-2) &mdash; Create a ValueAndPosOr value.
+* [newValueAndPosOr](#newvalueandposor-3) &mdash; Create a ValueAndPosOr.
+* [startColumn](#startcolumn) &mdash; Return enough spaces to point at the warning column.
 
 # VarsDict
 
@@ -138,6 +146,18 @@ FunResult = object
       parameter*: Natural    ## Index of problem parameter.
       warningData*: WarningData
 
+
+```
+
+# ValueAndPos
+
+A value and the position after the value in the statement.  For the example statement: "var = 567 # test"". The value 567 starts at index 6 and the position 10 because it includes the trailing space. For example "id = row(3 )" the value is 3 and the position is 5. Exit is set true by the return function to exit a command.
+
+```nim
+ValueAndPos = object
+  value*: Value
+  pos*: Natural
+  exit*: bool
 
 ```
 
@@ -450,6 +470,62 @@ Return a string representation of a FunResult object.
 
 ```nim
 func `$`(funResult: FunResult): string
+```
+
+# newValueAndPos
+
+Create a newValueAndPos object.
+
+```nim
+proc newValueAndPos(value: Value; pos: Natural; exit = false): ValueAndPos
+```
+
+# newValueAndPosOr
+
+Create a ValueAndPosOr warning.
+
+```nim
+func newValueAndPosOr(warning: MessageId; p1 = ""; pos = 0): ValueAndPosOr
+```
+
+# newValueAndPosOr
+
+Create a ValueAndPosOr warning.
+
+```nim
+func newValueAndPosOr(warningData: WarningData): ValueAndPosOr
+```
+
+# `==`
+
+Return true when a equals b.
+
+```nim
+proc `==`(a: ValueAndPosOr; b: ValueAndPosOr): bool
+```
+
+# newValueAndPosOr
+
+Create a ValueAndPosOr value.
+
+```nim
+func newValueAndPosOr(value: Value; pos: Natural; exit = false): ValueAndPosOr
+```
+
+# newValueAndPosOr
+
+Create a ValueAndPosOr.
+
+```nim
+func newValueAndPosOr(val: ValueAndPos): ValueAndPosOr
+```
+
+# startColumn
+
+Return enough spaces to point at the warning column.  Used under the statement line.
+
+```nim
+proc startColumn(start: Natural; message: string = "^"): string
 ```
 
 

@@ -5,57 +5,15 @@ Parse an int or float number string.  Return the number and number of characters
 * [parseNumber.nim](../src/parseNumber.nim) &mdash; Nim source code.
 # Index
 
-* type: [IntAndLength](#intandlength) &mdash; IntAndLength holds a 64 bit signed integer and the number of characters processed.
-* type: [FloatAndLength](#floatandlength) &mdash; FloatAndLength holds a 64 float and the number of characters processed.
-* [newIntAndLength](#newintandlength) &mdash; Create a new IntAndLength object.
-* [newFloatAndLength](#newfloatandlength) &mdash; Create a new FloatAndLength object.
 * [parseFloat](#parsefloat) &mdash; Parse the string and return the 64 bit float number and the
-number of characters processed.
-* [parseInteger](#parseinteger) &mdash; Parse the string and return the 64 bit signed integer and number
-of characters processed.
-
-# IntAndLength
-
-IntAndLength holds a 64 bit signed integer and the number of characters processed.
-
-```nim
-IntAndLength = object
-  number*: int64
-  length*: Natural
-
-```
-
-# FloatAndLength
-
-FloatAndLength holds a 64 float and the number of characters processed.
-
-```nim
-FloatAndLength = object
-  number*: float64
-  length*: Natural
-
-```
-
-# newIntAndLength
-
-Create a new IntAndLength object.
-
-```nim
-func newIntAndLength(number: int64; length: Natural): IntAndLength
-```
-
-# newFloatAndLength
-
-Create a new FloatAndLength object.
-
-```nim
-func newFloatAndLength(number: float64; length: Natural): FloatAndLength
-```
+number position after the number.
+* [parseInteger](#parseinteger) &mdash; Parse the string and return the 64 bit signed integer and the
+position after the number.
 
 # parseFloat
 
 Parse the string and return the 64 bit float number and the
-number of characters processed. The number starts at the start
+number position after the number. The number starts at the start
 parameter index. Nothing is returned when the float is out of
 range or the str is not a float number.  Processing stops at the
 first non-number character.
@@ -65,13 +23,13 @@ digit, followed by digits, underscores or a decimal point. Only
 one decimal point is allowed and underscores are skipped.
 
 ```nim
-proc parseFloat(str: string; start: Natural = 0): Option[FloatAndLength]
+proc parseFloat(str: string; start: Natural = 0): Option[ValueAndPos]
 ```
 
 # parseInteger
 
-Parse the string and return the 64 bit signed integer and number
-of characters processed. The number starts at the start parameter
+Parse the string and return the 64 bit signed integer and the
+position after the number. The number starts at the start parameter
 index. Parsing stops at the first non-number character.  Nothing
 is returned when the integer is out of range or the str is not a
 number.
@@ -81,7 +39,7 @@ digit, followed by digits or underscores. The underscores are
 skipped.
 
 ```nim
-proc parseInteger(s: string; start: Natural = 0): Option[IntAndLength]
+proc parseInteger(s: string; start: Natural = 0): Option[ValueAndPos]
 ```
 
 

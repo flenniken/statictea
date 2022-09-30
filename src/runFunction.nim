@@ -56,15 +56,15 @@ func numberStringToNum(numString: string): FunResult =
     # Float number string to float.
     let floatAndLengthO = parseNumber.parseFloat(numString)
     if floatAndLengthO.isSome:
-      result = newFunResult(newValue(floatAndLengthO.get().number))
+      result = newFunResult(floatAndLengthO.get().value)
     else:
       # Expected number string.
       result = newFunResultWarn(wExpectedNumberString)
   else:
     # Int number string to int.
-    let intAndLengthO = parseInteger(numString)
-    if intAndLengthO.isSome:
-      result = newFunResult(newValue(intAndLengthO.get().number))
+    let valueAndPosO = parseInteger(numString)
+    if valueAndPosO.isSome:
+      result = newFunResult(valueAndPosO.get().value)
     else:
       # Expected number string.
       result = newFunResultWarn(wExpectedNumberString)
@@ -593,10 +593,11 @@ func parseVersion*(version: string): Option[(int, int, int)] =
   if not matchesO.isSome:
     return
   let (g1, g2, g3) = matchesO.get3Groups()
-  var g1IntAndLengthO = parseInteger(g1)
-  var g2IntAndLengthO = parseInteger(g2)
-  var g3IntAndLengthO = parseInteger(g3)
-  result = some((int(g1IntAndLengthO.get().number), int(g2IntAndLengthO.get().number), int(g3IntAndLengthO.get().number)))
+  var g1ValueAndPos = parseInteger(g1)
+  var g2ValueAndPos = parseInteger(g2)
+  var g3ValueAndPos = parseInteger(g3)
+  result = some((int(g1ValueAndPos.get().value.intv),
+    int(g2ValueAndPos.get().value.intv), int(g3ValueAndPos.get().value.intv)))
 
 func funCmpVersion_ssi*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Compare two StaticTea version numbers. Returns -1 for less, 0 for

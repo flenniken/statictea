@@ -6,12 +6,6 @@ Read json content.
 # Index
 
 * const: [maxDepth](#maxdepth) &mdash; The maximum depth you can nest items.
-* type: [StrAndPos](#strandpos) &mdash; StrAndPos holds the result of parsing a string literal, the
-string and its ending position.
-* type: [StrAndPosOr](#strandposor) &mdash; The string and position or a warning.
-* [newStrAndPosOr](#newstrandposor) &mdash; Return a new StrAndPosOr object containing a warning.
-* [newStrAndPosOr](#newstrandposor-1) &mdash; Return a new StrAndPosOr object containing a warning.
-* [newStrAndPosOr](#newstrandposor-2) &mdash; Return a new StrAndPosOr object containing a string and position.
 * [jsonToValue](#jsontovalue) &mdash; Convert a Nim json node to a statictea value.
 * [readJsonStream](#readjsonstream) &mdash; Read a json stream and return the parsed data in a value object or return a warning.
 * [readJsonString](#readjsonstring) &mdash; Read a json string and return the parsed data in a value object or return a warning.
@@ -25,53 +19,6 @@ The maximum depth you can nest items.
 
 ```nim
 maxDepth = 16
-```
-
-# StrAndPos
-
-StrAndPos holds the result of parsing a string literal, the
-string and its ending position.
-
-* str -- resulting parsed string
-* pos -- the position after the last trailing whitespace
-
-```nim
-StrAndPos = object
-  str*: string
-  pos*: Natural
-
-```
-
-# StrAndPosOr
-
-The string and position or a warning.
-
-```nim
-StrAndPosOr = OpResultWarn[StrAndPos]
-```
-
-# newStrAndPosOr
-
-Return a new StrAndPosOr object containing a warning.
-
-```nim
-func newStrAndPosOr(warning: MessageId; p1: string = ""; pos = 0): StrAndPosOr
-```
-
-# newStrAndPosOr
-
-Return a new StrAndPosOr object containing a warning.
-
-```nim
-func newStrAndPosOr(warningData: WarningData): StrAndPosOr
-```
-
-# newStrAndPosOr
-
-Return a new StrAndPosOr object containing a string and position.
-
-```nim
-func newStrAndPosOr(str: string; pos: Natural): StrAndPosOr
 ```
 
 # jsonToValue
@@ -132,17 +79,17 @@ proc unescapePopularChar(popular: char): char
 
 Parse the quoted json string literal. The startPos points one
 past the leading double quote.  Return the parsed string value
-and the ending position one past the trailing whitespace. On
+and the ending position after the trailing whitespace. On
 failure, the ending position points at the invalid character and
 the message id tells what went wrong.
 
 ~~~
-a = "test string"  n
-     ^               ^
+a = "test string"  # test
+     ^             ^
 ~~~~
 
 ```nim
-func parseJsonStr(text: string; startPos: Natural): StrAndPosOr
+func parseJsonStr(text: string; startPos: Natural): ValueAndPosOr
 ```
 
 

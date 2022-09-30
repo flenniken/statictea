@@ -20,8 +20,27 @@ import readjson
 import comparelines
 import unicodes
 
-proc testGetValueAndLength(statement: Statement, start: Natural,
-    eValueAndLengthOr: ValueAndLengthOr, variables: Variables = nil): bool =
+proc echoValueAndPosOr(statement: Statement, start: Natural,
+    valueAndPosOr: ValueAndPosOr, eValueAndPosOr: ValueAndPosOr) =
+  echo ""
+  echo "0123456789 123456789 123456789"
+  echo statement.text
+  echo startColumn(start, "^")
+  if valueAndPosOr.isValue:
+    echo startColumn(valueAndPosOr.value.pos, "^ got")
+  else:
+    echo "got:"
+    echo getWarnStatement("filename", statement, valueAndPosOr.message)
+
+  if eValueAndPosOr.isValue:
+    echo startColumn(eValueAndPosOr.value.pos, "^ expected")
+  else:
+    echo "expected:"
+    echo getWarnStatement("filename", statement, eValueAndPosOr.message)
+
+
+proc testGetValueAndPos(statement: Statement, start: Natural,
+    eValueAndPosOr: ValueAndPosOr, variables: Variables = nil): bool =
 
   # Set up variables when not passed in.
   var vars = variables
@@ -29,34 +48,19 @@ proc testGetValueAndLength(statement: Statement, start: Natural,
     let funcsVarDict = createFuncDictionary().dictv
     vars = emptyVariables(funcs = funcsVarDict)
 
-  let valueAndLengthOr = getValueAndLength(statement, start, vars)
-  result = gotExpected($valueAndLengthOr, $eValueAndLengthOr)
+  let valueAndPosOr = getValueAndPos(statement, start, vars)
+  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
 
   if not result:
-    echo ""
-    echo statement.text
-    echo startColumn(start, "^")
-    if valueAndLengthOr.isValue:
-      let length = valueAndLengthOr.value.length
-      echo startColumn(start+length, "^ got")
-    else:
-      echo getWarnStatement("filename", statement, valueAndLengthOr.message)
+    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
-    echo statement.text
-    echo startColumn(start, "^")
-    if eValueAndLengthOr.isValue:
-      let length = eValueAndLengthOr.value.length
-      echo startColumn(start+length, "^ expected")
-    else:
-      echo getWarnStatement("filename", statement, eValueAndLengthOr.message)
-
-proc testGetValueAndLength(text: string, start: Natural,
+proc testGetValueAndPos(text: string, start: Natural,
     eWarning: MessageId, pos = 0, p1 = "", variables: Variables = nil): bool =
   let statement = newStatement(text)
-  let eValueAndLengthOr = newValueAndLengthOr(eWarning, p1, pos)
-  result = testGetValueAndLength(statement, start, eValueAndLengthOr, variables)
+  let eValueAndPosOr = newValueAndPosOr(eWarning, p1, pos)
+  result = testGetValueAndPos(statement, start, eValueAndPosOr, variables)
 
-proc testGetValueAndLength(text: string, start: Natural,
+proc testGetValueAndPos(text: string, start: Natural,
     ePos: Natural, eJson: string, variables: Variables = nil): bool =
   let statement = newStatement(text)
   let eValue = readJsonString(eJson)
@@ -64,37 +68,27 @@ proc testGetValueAndLength(text: string, start: Natural,
     echo "eJson = " & eJson
     echo $eValue
     return false
-  let eValueAndLengthOr = newValueAndLengthOr(eValue.value, ePos - start)
-  result = testGetValueAndLength(statement, start, eValueAndLengthOr, variables)
+  let eValueAndPosOr = newValueAndPosOr(eValue.value, ePos)
+  result = testGetValueAndPos(statement, start, eValueAndPosOr, variables)
 
 proc testGetMultilineStr(pattern: string, start: Natural,
-    eStr: string, eLength: Natural): bool =
+    eStr: string, ePos: Natural): bool =
   # Test getMultilineStr.
 
   let text = pattern % tripleQuotes
-  let strAndPosOr = getMultilineStr(text, start)
-  if strAndPosOr.isMessage:
-    echo "Unexpected error: " & $strAndPosOr
+  let valueAndPosOr = getMultilineStr(text, start)
+  if valueAndPosOr.isMessage:
+    echo "Unexpected error: " & $valueAndPosOr
     return false
-  let literal = strAndPosOr.value.str
-  let length = strAndPosOr.value.pos - start
+  let eValueAndPosOr = newValueAndPosOr(eStr, ePos)
+  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
 
-  result = true
-
-  if literal != eStr:
-    echo "line: $1" % visibleControl(text)
-    echo "      " & startColumn(start)
-    echo "     got str: $1" % visibleControl(literal)
-    echo "expected str: $1" % visibleControl(eStr)
-    result = false
-
-  if length != eLength:
-    echo "     got length: $1" % $length
-    echo "expected length: $1" % $eLength
-    echo "    line: $1" % visibleControl(text)
-    echo "     got: " & startColumn(start+length)
-    echo "expected: " & startColumn(start+eLength)
-    result = false
+  if not result:
+    echo "0123456789 123456789"
+    echo visibleControl(text)
+    echo startColumn(start)
+    echo startColumn(valueAndPosOr.value.pos, "^ got")
+    echo startColumn(eValueAndPosOr.value.pos, "^ expected")
 
   # var pos = validateUtf8String(literal)
   # if pos != -1:
@@ -103,25 +97,12 @@ proc testGetMultilineStr(pattern: string, start: Natural,
 
 proc testGetMultilineStrE(pattern: string, start: Natural,
     eWarningData: WarningData): bool =
-  ## Test parseJsonStr for expected errors.
+  ## Test getMultilineStr for expected errors.
 
   let text = pattern % tripleQuotes
-  let strAndPosOr = getMultilineStr(text, start)
-
-  result = true
-  let eStrAndPosOr = newStrAndPosOr(eWarningData)
-  if $strAndPosOr != $eStrAndPosOr:
-    echo "     got: $1" % $strAndPosOr
-    echo "expected: $1" % $eStrAndPosOr
-
-    let pos = strAndPosOr.message.pos
-    let ePos = eWarningData.pos
-    if pos != ePos:
-      echo "    line: $1" % visibleControl(text)
-      echo "     got: " & startColumn(pos)
-      echo "expected: " & startColumn(ePos)
-
-    result = false
+  let valueAndPosOr = getMultilineStr(text, start)
+  let eValueAndPosOr = newValueAndPosOr(eWarningData)
+  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
 
 proc getCmdLinePartsTest(env: var Env,
     commandLines: seq[string]): seq[LineParts] =
@@ -160,9 +141,9 @@ proc compareStatements(statements: seq[Statement], eContent: string): bool =
       return false
   return true
 
-proc cmpValueAndLengthOr(functionName: string, statement: Statement, start: Natural,
-    g, e: ValueAndLengthOr): bool =
-  ## Compare the two ValueAndLengthOr objects. When different show
+proc cmpValueAndPosOr(functionName: string, statement: Statement, start: Natural,
+    g, e: ValueAndPosOr): bool =
+  ## Compare the two ValueAndPosOr objects. When different show
   ## helpful messages.
 
   let digits = startColumn(start, "123456789 123456789 123456789")
@@ -194,26 +175,64 @@ proc testGetStatements(content: string, expected: string): bool =
     result = false
 
 proc testGetNumber(statement: Statement, start: Natural,
-    eValueAndLengthOr: ValueAndLengthOr): bool =
+    eValueAndPosOr: ValueAndPosOr): bool =
   ## Return true when the statement contains the expected number. When
   ## it doesn't, show the values and expected values and return false.
 
-  let valueAndLengthOr = getNumber(statement, start)
-  result = gotExpected($valueAndLengthOr, $eValueAndLengthOr, statement.text)
+  let valueAndPosOr = getNumber(statement, start)
+  result = gotExpected($valueAndPosOr, $eValueAndPosOr, statement.text)
+
+  if not result:
+    echo ""
+    echo "0123456789 123456789"
+    echo statement.text
+    echo startColumn(start, "^")
+    if valueAndPosOr.isValue:
+      echo startColumn(valueAndPosOr.value.pos, "^ got")
+    else:
+      echo getWarnStatement("filename", statement, valueAndPosOr.message)
+    if eValueAndPosOr.isValue:
+      echo startColumn(eValueAndPosOr.value.pos, "^ expected")
+    else:
+      echo getWarnStatement("filename", statement, eValueAndPosOr.message)
 
 proc testGetString(statement: Statement, start: Natural,
-    eValueAndLengthOr: ValueAndLengthOr): bool =
+    eValueAndPosOr: ValueAndPosOr): bool =
 
-  let valueAndLengthOr = getString(statement, start)
-  result = cmpValueAndLengthOr("getString", statement, start, valueAndLengthOr, eValueAndLengthOr)
+  let valueAndPosOr = getString(statement, start)
+  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
+
+  if not result:
+    echo ""
+    echo "0123456789 123456789"
+    echo statement.text
+    if valueAndPosOr.isValue:
+      # Show a string with the same number of bytes as the UTF-8 string.
+      let length = valueAndPosOr.value.value.stringv.len
+      var str = newStringOfCap(length)
+      str.add("\"")
+      for ix in countUp(1, int(length)):
+        str.add("_")
+      str.add("\"")
+      echo startColumn(start, str)
+    echo startColumn(start, "^")
+    if valueAndPosOr.isValue:
+      echo startColumn(valueAndPosOr.value.pos, "^ got")
+    else:
+      echo getWarnStatement("filename", statement, valueAndPosOr.message)
+    if eValueAndPosOr.isValue:
+      echo startColumn(eValueAndPosOr.value.pos, "^ expected")
+    else:
+      echo getWarnStatement("filename", statement, eValueAndPosOr.message)
+
 
 proc testGetStringInvalid(buffer: seq[uint8]): bool =
   let str = bytesToString(buffer)
   let statement = newStatement("""a = "stringwithbadutf8:$1:end"""" % str)
   let start = 4
-  let valueAndLengthOr = getString(statement, start)
-  let eValueAndLengthOr = newValueAndLengthOr(wInvalidUtf8ByteSeq, "23", 23)
-  result = cmpValueAndLengthOr("getString", statement, start, valueAndLengthOr, eValueAndLengthOr)
+  let valueAndPosOr = getString(statement, start)
+  let eValueAndPosOr = newValueAndPosOr(wInvalidUtf8ByteSeq, "23", 23)
+  result = cmpValueAndPosOr("getString", statement, start, valueAndPosOr, eValueAndPosOr)
 
 proc testWarnStatement(statement: Statement,
     warning: MessageId, start: Natural, p1: string="",
@@ -229,20 +248,22 @@ proc testWarnStatement(statement: Statement,
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-proc testGetFunctionValueAndLength(
+proc testGetFunctionValueAndPos(
   functionName: string,
   statement: Statement,
   start: Natural,
-  eValueAndLengthOr: ValueAndLengthOr
+  eValueAndPosOr: ValueAndPosOr
     ): bool =
 
   let funcsVarDict = createFuncDictionary().dictv
   let variables = emptyVariables(funcs = funcsVarDict)
-  let valueAndLengthOr = getFunctionValueAndLength(functionName,
+  let valueAndPosOr = getFunctionValueAndPos(functionName,
     statement, start, variables, list=false)
-  result = cmpValueAndLengthOr(functionName, statement, start, valueAndLengthOr, eValueAndLengthOr)
+  result = gotExpected($valueAndPosOr, $eValueAndPosOr, statement.text)
+  if not result:
+    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
-proc testRunStatement(statement: Statement, eVDataOr: VariableDataOr, variables: Variables = nil): bool =
+proc testRunStatement(statement: Statement, eVariableDataOr: VariableDataOr, variables: Variables = nil): bool =
   var vars: Variables
   if variables == nil:
     let funcsVarDict = createFuncDictionary().dictv
@@ -250,10 +271,7 @@ proc testRunStatement(statement: Statement, eVDataOr: VariableDataOr, variables:
   else:
     vars = variables
   let variableDataOr = runStatement(statement, vars)
-  result = gotExpected($variableDataOr, $eVDataOr, statement.text)
-  if not result and variableDataOr.isMessage:
-    echo ""
-    echo getWarnStatement("filename", statement, variableDataOr.message)
+  result = gotExpected($variableDataOr, $eVariableDataOr, statement.text)
 
 proc testRunBoolOp(left: bool | Value, op: string, right: bool | Value, eValue: Value): bool =
   let value = runBoolOp(newValue(left), op, newValue(right))
@@ -268,7 +286,8 @@ proc testRunCompareOp(left: bool | Value, op: string, right: bool | Value, eValu
     result = gotExpected($value, $eValue)
 
 proc testSkipArgument(text: string, startPos: Natural, ePosOr: PosOr): bool =
-  let posOr = skipArgument(text, startPos)
+  let statement = newStatement(text)
+  let posOr = skipArgument(statement, startPos)
   result = true
   if posOr != ePosOr:
     result = gotExpected($posOr, $ePosOr)
@@ -286,39 +305,27 @@ proc testSkipArgument(text: string, startPos: Natural, ePosOr: PosOr): bool =
     else:
       echo startColumn(ePosOr.message.pos, "^ expected")
 
-
 proc testGetCondition(text: string, start: Natural, eBool: bool, ePos: Natural): bool =
   let funcsVarDict = createFuncDictionary().dictv
   let variables = emptyVariables(funcs = funcsVarDict)
 
   let statement = newStatement(text)
-  let valueAndLengthOr = getCondition(statement, start, variables)
-  result = true
-  let eLength = ePos - start
-  let eValueAndLengthOr = newValueAndLengthOr(newValue(eBool), eLength)
-  if valueAndLengthOr != eValueAndLengthOr:
-    let message = "\n$1\n0123456789 123456789 123456789" % text
-    result = gotExpected($valueAndLengthOr, $eValueAndLengthOr, message)
+  let valueAndPosOr = getCondition(statement, start, variables)
+  let eValueAndPosOr = newValueAndPosOr(newValue(eBool), ePos)
+  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
+  if not result:
+    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
 proc testGetConditionWarn(text: string, start: Natural, eWarning: MessageId,
     ePos = 0, eP1 = ""): bool =
   let funcsVarDict = createFuncDictionary().dictv
   let variables = emptyVariables(funcs = funcsVarDict)
   let statement = newStatement(text)
-  let valueAndLengthOr = getCondition(statement, start, variables)
-  result = true
-  let eValueAndLengthOr = newValueAndLengthOr(eWarning, eP1, ePos)
-  if valueAndLengthOr != eValueAndLengthOr:
-    if valueAndLengthOr.isValue:
-      result = gotExpected($valueAndLengthOr, $eValueAndLengthOr)
-    else:
-      let pointerPos = valueAndLengthOr.message.pos
-      let message = "$1\n$2\n$3" % [
-        text,
-        startColumn(pointerPos, "^ got"),
-        startColumn(ePos, "^ expected")
-      ]
-      result = gotExpected($valueAndLengthOr, $eValueAndLengthOr, message)
+  let valueAndPosOr = getCondition(statement, start, variables)
+  let eValueAndPosOr = newValueAndPosOr(eWarning, eP1, ePos)
+  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
+  if not result:
+    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
 suite "runCommand.nim":
 
@@ -439,69 +446,69 @@ $$ : c = len("hello")
 
   test "getNumber":
     check testGetNumber(newStatement("a = 5"), 4,
-      newValueAndLengthOr(5, 1))
+      newValueAndPosOr(5, 5))
     check testGetNumber(newStatement("a = 22  ,  # test"), 4,
-      newValueAndLengthOr(22, 4))
+      newValueAndPosOr(22, 8))
     check testGetNumber(newStatement("a = 123456"), 4,
-      newValueAndLengthOr(123456, 6))
+      newValueAndPosOr(123456, 10))
     check testGetNumber(newStatement("a = 1_23_456"), 4,
-      newValueAndLengthOr(123456, 8))
+      newValueAndPosOr(123456, 12))
     check testGetNumber(newStatement("a = 1_23_456.78"), 4,
-      newValueAndLengthOr(123456.78, 11))
+      newValueAndPosOr(123456.78, 15))
 
   test "getNumber more":
     check testGetNumber(newStatement("a = 5.0"), 4,
-      newValueAndLengthOr(5.0, 3))
+      newValueAndPosOr(5.0, 7))
     check testGetNumber(newStatement("a = -2"), 4,
-      newValueAndLengthOr(-2, 2))
+      newValueAndPosOr(-2, 6))
     check testGetNumber(newStatement("a = -3.4"), 4,
-      newValueAndLengthOr(-3.4, 4))
+      newValueAndPosOr(-3.4, 8))
     check testGetNumber(newStatement("a = 88 "), 4,
-      newValueAndLengthOr(88, 3))
+      newValueAndPosOr(88, 7))
 
     # Starts with Valid number but invalid statement.
     check testGetNumber(newStatement("a = 88 abc "), 4,
-      newValueAndLengthOr(88, 3))
+      newValueAndPosOr(88, 7))
 
   test "getNumber not a number":
     check testGetNumber(newStatement("a = -abc"), 4,
-      newValueAndLengthOr(wNotNumber, "", 4))
+      newValueAndPosOr(wNotNumber, "", 4))
 
   test "getNumberIntTooBig":
     let statement = newStatement("a = 9_223_372_036_854_775_808")
-    check testGetNumber(statement, 4, newValueAndLengthOr(wNumberOverFlow, "", 4))
+    check testGetNumber(statement, 4, newValueAndPosOr(wNumberOverFlow, "", 4))
 
   test "getString":
     check testGetString(newStatement("""a = "hello""""), 4,
-      newValueAndLengthOr("hello", 7))
+      newValueAndPosOr("hello", 11))
 
     check testGetString(newStatement("a = \"hello\""), 4,
-      newValueAndLengthOr("hello", 7))
+      newValueAndPosOr("hello", 11))
 
     check testGetString(newStatement("""a = "hello"  """), 4,
-      newValueAndLengthOr("hello", 9))
+      newValueAndPosOr("hello", 13))
 
     check testGetString(newStatement("a = \"hello\"\n"), 4,
-      newValueAndLengthOr("hello", 8))
+      newValueAndPosOr("hello", 12))
 
-    check testGetString(newStatement("a = \"hello\"   \n"), 4,
-      newValueAndLengthOr("hello", 11))
+    check testGetString(newStatement("a = \"hello\"   #\n"), 4,
+      newValueAndPosOr("hello", 14))
 
   test "getString two bytes":
     let str = bytesToString(@[0xc3u8, 0xb1])
     let statement = newStatement("""a = "$1"""" % str)
-    check testGetString(statement, 4, newValueAndLengthOr(str, 4))
+    check testGetString(statement, 4, newValueAndPosOr(str, 8))
 
   test "getString three bytes":
 
     let str = bytesToString(@[0xe2u8, 0x82, 0xa1])
     let statement = newStatement("""a = "$1"""" % str)
-    check testGetString(statement, 4, newValueAndLengthOr(str, 5))
+    check testGetString(statement, 4, newValueAndPosOr(str, 9))
 
   test "getString four bytes":
     let str = bytesToString(@[0xf0u8, 0x90, 0x8c, 0xbc])
     let statement = newStatement("""a = "$1"""" % str)
-    check testGetString(statement, 4, newValueAndLengthOr(str, 6))
+    check testGetString(statement, 4, newValueAndPosOr(str, 10))
 
   test "getString invalid ff":
     check testGetStringInvalid(@[0xffu8])
@@ -526,7 +533,7 @@ $$ : c = len("hello")
 
   test "getString not string":
     check testGetString(newStatement("""a = "abc"""), 4,
-      newValueAndLengthOr(wNoEndingQuote, "", 8))
+      newValueAndPosOr(wNoEndingQuote, "", 8))
 
   test "getNewVariables":
     let funcsVarDict = createFuncDictionary().dictv
@@ -586,39 +593,39 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "getFunctionValue":
     let statement = newStatement(text="""tea = len("abc") """, lineNum=16, 0)
-    let valueAndLength = newValueAndLength(newValue(3), 7)
-    let eValueAndLengthOr = newValueAndLengthOr(valueAndLength)
-    check testGetFunctionValueAndLength("len", statement, 10, eValueAndLengthOr)
+    let valueAndPos = newValueAndPos(newValue(3), 17)
+    let eValueAndPosOr = newValueAndPosOr(valueAndPos)
+    check testGetFunctionValueAndPos("len", statement, 10, eValueAndPosOr)
 
   test "getFunctionValue 2 parameters":
     let statement = newStatement(text="""tea = concat("abc", "def") """,
       lineNum=16, 0)
-    let valueAndLength = newValueAndLength(newValue("abcdef"), 14)
-    let eValueAndLengthOr = newValueAndLengthOr(valueAndLength)
-    check testGetFunctionValueAndLength("concat", statement, 13, eValueAndLengthOr)
+    let valueAndPos = newValueAndPos(newValue("abcdef"), 27)
+    let eValueAndPosOr = newValueAndPosOr(valueAndPos)
+    check testGetFunctionValueAndPos("concat", statement, 13, eValueAndPosOr)
 
   test "getFunctionValue nested":
     let text = """tea = concat("abc", concat("xyz", "123")) """
                  #0123456789 123456789 123456789 123456789 12345
     let statement = newStatement(text)
-    let valueAndLength = newValueAndLength(newValue("abcxyz123"), 29)
-    let eValueAndLengthOr = newValueAndLengthOr(valueAndLength)
-    check testGetFunctionValueAndLength("concat", statement, 13, eValueAndLengthOr)
+    let valueAndPos = newValueAndPos(newValue("abcxyz123"), 42)
+    let eValueAndPosOr = newValueAndPosOr(valueAndPos)
+    check testGetFunctionValueAndPos("concat", statement, 13, eValueAndPosOr)
 
   test "getFunctionValue missing )":
     let statement = newStatement(text="""tea = len("abc"""", lineNum=16, 0)
-    let eValueAndLengthOr = newValueAndLengthOr(wMissingCommaParen, "", 15)
-    check testGetFunctionValueAndLength("len", statement, 10, eValueAndLengthOr)
+    let eValueAndPosOr = newValueAndPosOr(wMissingCommaParen, "", 15)
+    check testGetFunctionValueAndPos("len", statement, 10, eValueAndPosOr)
 
   test "getFunctionValue missing quote":
     let statement = newStatement(text="""tea = len("abc)""", lineNum=16, 0)
-    let eValueAndLengthOr = newValueAndLengthOr(wNoEndingQuote, "", 15)
-    check testGetFunctionValueAndLength("len", statement, 10, eValueAndLengthOr)
+    let eValueAndPosOr = newValueAndPosOr(wNoEndingQuote, "", 15)
+    check testGetFunctionValueAndPos("len", statement, 10, eValueAndPosOr)
 
   test "getFunctionValue extra comma":
     let statement = newStatement(text="""tea = len("abc",) """, lineNum=16, 0)
-    let eValueAndLengthOr = newValueAndLengthOr(wInvalidRightHandSide, "", 16)
-    check testGetFunctionValueAndLength("len", statement, 10, eValueAndLengthOr)
+    let eValueAndPosOr = newValueAndPosOr(wInvalidRightHandSide, "", 16)
+    check testGetFunctionValueAndPos("len", statement, 10, eValueAndPosOr)
 
   test "runStatement":
     let statement = newStatement(text="""t.repeat = 4 """, lineNum=1, 0)
@@ -638,6 +645,11 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "runStatement set log":
     let statement = newStatement(text="""t.output = "log" """, lineNum=1, 0)
     let eVariableDataOr = newVariableDataOr("t.output", "=", newValue("log"))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "runStatement a5":
+    let statement = newStatement(text="""a = 5   """, lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("a", "=", newValue(5))
     check testRunStatement(statement, eVariableDataOr)
 
   test "runStatement junk at end":
@@ -1123,12 +1135,12 @@ White$1
     check testRunStatement(statement, eVariableDataOr)
 
   test "getMultilineStr":
-    check testGetMultilineStr("$1\n$1\n", 3, "", 5)
-    check testGetMultilineStr("$1\na$1\n", 3, "a", 6)
-    check testGetMultilineStr("$1\n\n$1\n", 3, "\n", 6)
-    check testGetMultilineStr("$1\nabc$1\n", 3, "abc", 8)
-    check testGetMultilineStr("  $1\n$1\n", 5, "", 5)
-    check testGetMultilineStr("  $1\nabc\ndef\n$1\n", 5, "abc\ndef\n", 13)
+    check testGetMultilineStr("$1\n$1\n", 3, "", 8)
+    check testGetMultilineStr("$1\na$1\n", 3, "a", 9)
+    check testGetMultilineStr("$1\n\n$1\n", 3, "\n", 9)
+    check testGetMultilineStr("$1\nabc$1\n", 3, "abc", 11)
+    check testGetMultilineStr("  $1\n$1\n", 5, "", 10)
+    check testGetMultilineStr("  $1\nabc\ndef\n$1\n", 5, "abc\ndef\n", 18)
 
   test "getMultilineStr error":
     check testGetMultilineStrE("$1", 3,
@@ -1330,7 +1342,10 @@ White$1
     let eVariableDataOr = newVariableDataOr("a", "=", cmpValueOr.value.listv[0])
     check testRunStatement(statement, eVariableDataOr, variables)
 
-  test "getValueAndLength and skip":
+  test "a5#":
+    check testGetValueAndPos("""a = 5 #""", 4, 6, "5")
+
+  test "getValueAndPos and skip":
     # var valueOr = readJsonString("{b:1,c:2}")
     let statements = [
       ("""a = 5 # number""", 4, 6, "5"),
@@ -1358,13 +1373,13 @@ White$1
       #             10        20        30        40
     ]
     for (text, start, ePos, eJson) in statements:
-      check testGetValueAndLength(text, start, ePos, eJson)
+      check testGetValueAndPos(text, start, ePos, eJson)
       check testSkipArgument(text, start, newPosOr(ePos))
 
-  test "getValueAndLength warnings":
-    check testGetValueAndLength("""a = 5""", 1, wInvalidRightHandSide, 1)
-    check testGetValueAndLength("""a = b""", 4, wNotInLorF, 4, "b")
-    check testGetValueAndLength("""a = _""", 4, wInvalidRightHandSide, 4)
+  test "getValueAndPos warnings":
+    check testGetValueAndPos("""a = 5""", 1, wInvalidRightHandSide, 1)
+    check testGetValueAndPos("""a = b""", 4, wNotInLorF, 4, "b")
+    check testGetValueAndPos("""a = _""", 4, wInvalidRightHandSide, 4)
 
   test "skipArgument":
     check testSkipArgument("""a = fn(1)""", 7, newPosOr(8))

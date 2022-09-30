@@ -15,29 +15,22 @@ import opresultwarn
 import warnings
 
 proc testParseJsonStr(text: string, start: Natural,
-    eStr: string, eLength: Natural): bool =
+    eStr: string, ePos: Natural): bool =
   # Test parseJsonStr.
 
-  let strAndPosOr = parseJsonStr(text, start)
-  if strAndPosOr.isMessage:
-    echo "Unexpected error: " & $strAndPosOr
+  let valueAndPosOr = parseJsonStr(text, start)
+  if valueAndPosOr.isMessage:
+    echo "Unexpected error: " & $valueAndPosOr
     return false
-  let literal = strAndPosOr.value.str
-  let length = strAndPosOr.value.pos - start
+  let eValueAndPosOr = newValueAndPosOr(newValue(eStr), ePos)
+  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
+  if not result:
+    echo text
+    echo startColumn(start)
+    echo startColumn(valueAndPosOr.value.pos, "^ got")
+    echo startColumn(ePos, "^ expected")
 
-  result = true
-
-  if literal != eStr:
-    echo "expected str: $1" % [eStr]
-    echo "     got str: $1" % [literal]
-    result = false
-
-  if length != eLength:
-    echo "expected length: $1" % [$eLength]
-    echo "     got length: $1" % [$length]
-    result = false
-
-  var pos = validateUtf8String(literal)
+  var pos = validateUtf8String(valueAndPosOr.value.value.stringv)
   if pos != -1:
     echo "Invalid UTF-8 bytes starting at $1." % $pos
     result = false
@@ -46,14 +39,12 @@ proc testParseJsonStrE(text: string, start: Natural,
     eWarningData: WarningData): bool =
   ## Test parseJsonStr for expected errors.
 
-  let strAndPosOr = parseJsonStr(text, start)
-
-  result = true
-  let eStrAndPosOr = newStrAndPosOr(eWarningData)
-  if $strAndPosOr != $eStrAndPosOr:
-    echo "expected: $1" % $strAndPosOr
-    echo "     got: $1" % $eStrAndPosOr
-    result = false
+  let valueAndPosOr = parseJsonStr(text, start)
+  if valueAndPosOr.isValue:
+    echo "Unexpected value: " & $valueAndPosOr
+    return false
+  let eValueAndPosOr = newValueAndPosOr(eWarningData)
+  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
 
 proc testUnescapePopularChar(popular: char, eChar: char): bool =
   let ch = unescapePopularChar(popular)
@@ -418,36 +409,36 @@ she sat down in a large arm-chair at one end of the table.
     # Parsing starts after the start quote and ends after the
     # whitespace after the end quote.
     check testParseJsonStr(""""""", 0, "", 1)
-    check testParseJsonStr(""" """", 1, "", 1)
-    check testParseJsonStr(""" """"", 2, "", 1)
-    check testParseJsonStr(""" "" """, 2, "", 2)
-    check testParseJsonStr(""" ""  """, 2, "", 3)
+    check testParseJsonStr(""" """", 1, "", 2)
+    check testParseJsonStr(""" """"", 2, "", 3)
+    check testParseJsonStr(""" "" """, 2, "", 4)
+    check testParseJsonStr(""" ""  """, 2, "", 5)
 
-    check testParseJsonStr(""" "t" """, 2, "t", 3)
-    check testParseJsonStr(""" "tea" """, 2, "tea", 5)
-    check testParseJsonStr(""" "tea" other""", 2, "tea", 5)
+    check testParseJsonStr(""" "t" """, 2, "t", 5)
+    check testParseJsonStr(""" "tea" """, 2, "tea", 7)
+    check testParseJsonStr(""" "tea" other""", 2, "tea", 7)
 
   test "parseJsonStr popular escape":
-    check testParseJsonStr(""" "\b" """, 2, "\b", 4)
-    check testParseJsonStr(""" "\f" """, 2, "\f", 4)
-    check testParseJsonStr(""" "\n" """, 2, "\n", 4)
-    check testParseJsonStr(""" "\r" """, 2, "\r", 4)
-    check testParseJsonStr(""" "\t" """, 2, "\t", 4)
+    check testParseJsonStr(""" "\b" """, 2, "\b", 6)
+    check testParseJsonStr(""" "\f" """, 2, "\f", 6)
+    check testParseJsonStr(""" "\n" """, 2, "\n", 6)
+    check testParseJsonStr(""" "\r" """, 2, "\r", 6)
+    check testParseJsonStr(""" "\t" """, 2, "\t", 6)
 
   test "parseJsonStr unicode escape":
-    check testParseJsonStr(""" "\u0038" """, 2, "8", 8)
-    check testParseJsonStr(""" "\u03A6" """, 2, "Φ", 8)
-    check testParseJsonStr(""" "\u1E00" """, 2, "Ḁ", 8)
-    check testParseJsonStr(""" "\u8336" """, 2, "茶", 8)
-    check testParseJsonStr(""" "\uD834\uDD1E" """, 2, "\u{1D11E}", 14)
+    check testParseJsonStr(""" "\u0038" """, 2, "8", 10)
+    check testParseJsonStr(""" "\u03A6" """, 2, "Φ", 10)
+    check testParseJsonStr(""" "\u1E00" """, 2, "Ḁ", 10)
+    check testParseJsonStr(""" "\u8336" """, 2, "茶", 10)
+    check testParseJsonStr(""" "\uD834\uDD1E" """, 2, "\u{1D11E}", 16)
 
   test "parseJsonStr varying":
-    check testParseJsonStr(""" "\u0038 39 40 \t 50" """, 2, "8 39 40 \t 50", 20)
+    check testParseJsonStr(""" "\u0038 39 40 \t 50" """, 2, "8 39 40 \t 50", 22)
     check testParseJsonStr(""" "\t\n\r\"\\ \b\f\/ \u0039 \uD83D\uDE03" """, 2,
-      "\t\n\r\"\\ \b\f/ 9 😃", 39)
+                           "\t\n\r\"\\ \b\f/ 9 😃", 41)
 
-    check testParseJsonStr(""" "a"	""", 2, "a", 3)
-    check testParseJsonStr(""" "a"	 """, 2, "a", 4)
+    check testParseJsonStr(""" "a"	""", 2, "a", 5)
+    check testParseJsonStr(""" "a"	 """, 2, "a", 6)
 
   test "parseJsonStr utf8":
     var str = bytesToString([0x31u8, 0x32, 0x33, 0x34, uint8('"')])
@@ -480,7 +471,7 @@ she sat down in a large arm-chair at one end of the table.
 
   test "parseJsonStr invalid UTF-8":
     var str = bytesToString([0x22u8, 0x2f, 0x22])
-    check testParseJsonStr(str, 1, "/", 2)
+    check testParseJsonStr(str, 1, "/", 3)
 
     str = bytesToString([0x31u8, 0x32, 0x33, 0xff, uint8('"')])
     check testParseJsonStrE(str, 0, newWarningData(wInvalidUtf8ByteSeq, "3", 3))

@@ -7,35 +7,27 @@ Run a command and fill in the variables dictionaries.
 
 * type: [Statement](#statement) &mdash; A Statement object stores the statement text and where it
 starts in the template file.
-* type: [ValueAndLength](#valueandlength) &mdash; A value and the length of the matching text in the statement.
-* [newValueAndLength](#newvalueandlength) &mdash; Create a newValueAndLength object.
-* [newValueAndLengthOr](#newvalueandlengthor) &mdash; Create a ValueAndLengthOr warning.
-* [newValueAndLengthOr](#newvalueandlengthor-1) &mdash; Create a ValueAndLengthOr warning.
-* [`==`](#) &mdash; Return true when a equals b.
-* [newValueAndLengthOr](#newvalueandlengthor-2) &mdash; Create a ValueAndLengthOr value.
-* [newValueAndLengthOr](#newvalueandlengthor-3) &mdash; Create a ValueAndLengthOr.
 * [newPosOr](#newposor) &mdash; Create a PosOr warning.
 * [newPosOr](#newposor-1) &mdash; Create a PosOr value.
-* [`==`](#-1) &mdash; Return true when a equals b.
+* [`==`](#) &mdash; Return true when a equals b.
 * [newStatement](#newstatement) &mdash; Create a new statement.
-* [startColumn](#startcolumn) &mdash; Return enough spaces to point at the warning column.
-* [getFragmentAndPos](#getfragmentandpos) &mdash; Return a statement fragment, and new position to show the given position.
+* [getFragmentAndPos](#getfragmentandpos) &mdash; Split up a long statement around the given position.
 * [getWarnStatement](#getwarnstatement) &mdash; Return a multiline error message.
 * [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
-* [`==`](#-2) &mdash; Return true when the two statements are equal.
-* [`$`](#-3) &mdash; Return a string representation of a Statement.
+* [`==`](#-1) &mdash; Return true when the two statements are equal.
+* [`$`](#-2) &mdash; Return a string representation of a Statement.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
 * [getMultilineStr](#getmultilinestr) &mdash; Return the triple quoted string literal.
-* [getString](#getstring) &mdash; Return a literal string value and match length from a statement.
-* [getNumber](#getnumber) &mdash; Return the literal number value and match length from the statement.
+* [getString](#getstring) &mdash; Return a literal string value and position after it.
+* [getNumber](#getnumber) &mdash; Return the literal number value and position after it.
 * [skipArgument](#skipargument) &mdash; Skip past the argument.
-* [ifFunctions](#iffunctions) &mdash; Return the if/if0 function's value and the length.
-* [andOrFunctions](#andorfunctions) &mdash; Return the and/or function's value and the length.
-* [getFunctionValueAndLength](#getfunctionvalueandlength) &mdash; Return the function's value and the length.
+* [ifFunctions](#iffunctions) &mdash; Return the if/if0 function's value and position after.
+* [andOrFunctions](#andorfunctions) &mdash; Return the and/or function's value and the position after.
+* [getFunctionValueAndPos](#getfunctionvalueandpos) &mdash; Return the function's value and the position after it.
 * [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value.
 * [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value.
-* [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and its length.
-* [getValueAndLength](#getvalueandlength) &mdash; Return the value and length of the item that the start parameter points at which is a string, number, variable, list, or condition.
+* [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and the position after it.
+* [getValueAndPos](#getvalueandpos) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 
@@ -55,66 +47,6 @@ Statement = object
   start*: Natural
   text*: string
 
-```
-
-# ValueAndLength
-
-A value and the length of the matching text in the statement. For the example statement: "var = 567 ". The value 567 starts at index 6 and the matching length is 4 because it includes the trailing space. For example "id = row(3 )" the value is 3 and the length is 2. Exit is set true by the return function to exit a command.
-
-```nim
-ValueAndLength = object
-  value*: Value
-  length*: Natural
-  exit*: bool
-
-```
-
-# newValueAndLength
-
-Create a newValueAndLength object.
-
-```nim
-proc newValueAndLength(value: Value; length: Natural; exit = false): ValueAndLength
-```
-
-# newValueAndLengthOr
-
-Create a ValueAndLengthOr warning.
-
-```nim
-func newValueAndLengthOr(warning: MessageId; p1 = ""; pos = 0): ValueAndLengthOr
-```
-
-# newValueAndLengthOr
-
-Create a ValueAndLengthOr warning.
-
-```nim
-func newValueAndLengthOr(warningData: WarningData): ValueAndLengthOr
-```
-
-# `==`
-
-Return true when a equals b.
-
-```nim
-proc `==`(a: ValueAndLengthOr; b: ValueAndLengthOr): bool
-```
-
-# newValueAndLengthOr
-
-Create a ValueAndLengthOr value.
-
-```nim
-func newValueAndLengthOr(value: Value; length: Natural; exit = false): ValueAndLengthOr
-```
-
-# newValueAndLengthOr
-
-Create a ValueAndLengthOr.
-
-```nim
-func newValueAndLengthOr(val: ValueAndLength): ValueAndLengthOr
 ```
 
 # newPosOr
@@ -149,17 +81,9 @@ Create a new statement.
 func newStatement(text: string; lineNum: Natural = 1; start: Natural = 0): Statement
 ```
 
-# startColumn
-
-Return enough spaces to point at the warning column.  Used under the statement line.
-
-```nim
-proc startColumn(start: Natural; symbol: string = "^"): string
-```
-
 # getFragmentAndPos
 
-Return a statement fragment, and new position to show the given position.
+Split up a long statement around the given position.  Return the statement fragment, and the position where the fragment starts in the statement.
 
 ```nim
 func getFragmentAndPos(statement: Statement; start: Natural): (string, Natural)
@@ -215,23 +139,23 @@ string value and the ending position one past the trailing
 whitespace.
 
 ```nim
-func getMultilineStr(text: string; start: Natural): StrAndPosOr
+func getMultilineStr(text: string; start: Natural): ValueAndPosOr
 ```
 
 # getString
 
-Return a literal string value and match length from a statement. The start parameter is the index of the first quote in the statement and the return length includes optional trailing white space after the last quote.
+Return a literal string value and position after it. The start parameter is the index of the first quote in the statement and the return position is after the optional trailing white space following the last quote.
 
 ```nim
-func getString(statement: Statement; start: Natural): ValueAndLengthOr
+func getString(statement: Statement; start: Natural): ValueAndPosOr
 ```
 
 # getNumber
 
-Return the literal number value and match length from the statement. The start index points at a digit or minus sign. The length includes the trailing whitespace.
+Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.
 
 ```nim
-proc getNumber(statement: Statement; start: Natural): ValueAndLengthOr
+proc getNumber(statement: Statement; start: Natural): ValueAndPosOr
 ```
 
 # skipArgument
@@ -246,35 +170,34 @@ a = fn( 1 , 2 )
 ~~~~
 
 ```nim
-func skipArgument(text: string; startPos: Natural): PosOr
+func skipArgument(statement: Statement; startPos: Natural): PosOr
 ```
 
 # ifFunctions
 
-Return the if/if0 function's value and the length. It conditionally runs one of its arguments and skips the other. Start points at the first argument of the function. The length includes the trailing whitespace after the ending ).
+Return the if/if0 function's value and position after. It conditionally runs one of its arguments and skips the other. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
 
 ```nim
 proc ifFunctions(functionName: string; statement: Statement; start: Natural;
-                 variables: Variables; list = false): ValueAndLengthOr
+                 variables: Variables; list = false): ValueAndPosOr
 ```
 
 # andOrFunctions
 
-Return the and/or function's value and the length. The and function stops on the first false. The or function stops on the first true. The rest of the arguments are skipped. Start points at the first parameter of the function. The length includes the trailing whitespace after the ending ).
+Return the and/or function's value and the position after. The and function stops on the first false. The or function stops on the first true. The rest of the arguments are skipped. Start points at the first parameter of the function. The position includes the trailing whitespace after the ending ).
 
 ```nim
 proc andOrFunctions(functionName: string; statement: Statement; start: Natural;
-                    variables: Variables; list = false): ValueAndLengthOr
+                    variables: Variables; list = false): ValueAndPosOr
 ```
 
-# getFunctionValueAndLength
+# getFunctionValueAndPos
 
-Return the function's value and the length. Start points at the first argument of the function. The length includes the trailing whitespace after the ending ).
+Return the function's value and the position after it. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
 
 ```nim
-proc getFunctionValueAndLength(dotNameStr: string; statement: Statement;
-                               start: Natural; variables: Variables;
-                               list = false): ValueAndLengthOr
+proc getFunctionValueAndPos(dotNameStr: string; statement: Statement;
+                            start: Natural; variables: Variables; list = false): ValueAndPosOr
 ```
 
 # runBoolOp
@@ -295,15 +218,15 @@ proc runCompareOp(left: Value; op: string; right: Value): Value
 
 # getCondition
 
-Return the bool value of the condition expression and its length. The start index points at the ( left parentheses. The length includes the trailing whitespace after the ending ).
+Return the bool value of the condition expression and the position after it.  The start index points at the ( left parentheses. The position includes the trailing whitespace after the ending ).
 
 ```nim
-proc getCondition(statement: Statement; start: Natural; variables: Variables): ValueAndLengthOr
+proc getCondition(statement: Statement; start: Natural; variables: Variables): ValueAndPosOr
 ```
 
-# getValueAndLength
+# getValueAndPos
 
-Return the value and length of the item that the start parameter points at which is a string, number, variable, list, or condition. The length returned includes the trailing whitespace after the item. So the ending position is pointing at the end of the statement, or at the first non-whitespace character after the item.
+Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition. The position returned includes the trailing whitespace after the item. So the ending position is pointing at the end of the statement, or at the first non-whitespace character after the item.
 
 ~~~
 a = "tea" # string
@@ -330,8 +253,7 @@ a = if( bool(len(b)), d, e) # if
 ~~~~
 
 ```nim
-proc getValueAndLength(statement: Statement; start: Natural;
-                       variables: Variables): ValueAndLengthOr
+proc getValueAndPos(statement: Statement; start: Natural; variables: Variables): ValueAndPosOr
 ```
 
 # runStatement

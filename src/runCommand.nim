@@ -36,61 +36,8 @@ type
     start*: Natural
     text*: string
 
-  ValueAndLength* = object
-    ## A value and the length of the matching text in the statement.
-    ## For the example statement: "var = 567 ". The value 567 starts
-    ## at index 6 and the matching length is 4 because it includes the
-    ## trailing space. For example "id = row(3 )" the value is 3 and
-    ## the length is 2. Exit is set true by the return function to
-    ## exit a command.
-    value*: Value
-    length*: Natural
-    exit*: bool
-
-  ValueAndLengthOr* = OpResultWarn[ValueAndLength]
   PosOr* = OpResultWarn[Natural]
 
-proc newValueAndLength*(value: Value, length: Natural,
-    exit = false): ValueAndLength =
-  ## Create a newValueAndLength object.
-  result = ValueAndLength(value: value, length: length)
-
-func newValueAndLengthOr*(warning: MessageId, p1 = "", pos = 0):
-    ValueAndLengthOr =
-  ## Create a ValueAndLengthOr warning.
-  let warningData = newWarningData(warning, p1, pos)
-  result = opMessageW[ValueAndLength](warningData)
-
-func newValueAndLengthOr*(warningData: WarningData):
-    ValueAndLengthOr =
-  ## Create a ValueAndLengthOr warning.
-  result = opMessageW[ValueAndLength](warningData)
-
-proc `==`*(a: ValueAndLengthOr, b: ValueAndLengthOr): bool =
-  ## Return true when a equals b.
-  if a.kind == b.kind:
-    if a.isMessage:
-      result = a.message == b.message
-    else:
-      result = a.value == b.value
-
-proc `!=`*(a: ValueAndLengthOr, b: ValueAndLengthOr): bool =
-  result = not (a == b)
-
-func newValueAndLengthOr*(value: Value, length: Natural, exit=false):
-    ValueAndLengthOr =
-  ## Create a ValueAndLengthOr value.
-  let val = ValueAndLength(value: value, length: length, exit: exit)
-  result = opValueW[ValueAndLength](val)
-
-proc newValueAndLengthOr*(number: int | int64 | float64 | string,
-    length: Natural): ValueAndLengthOr =
-  result = newValueAndLengthOr(newValue(number), length)
-
-func newValueAndLengthOr*(val: ValueAndLength):
-    ValueAndLengthOr =
-  ## Create a ValueAndLengthOr.
-  result = opValueW[ValueAndLength](val)
 
 func newPosOr*(warning: MessageId, p1 = "", pos = 0): PosOr =
   ## Create a PosOr warning.
@@ -117,17 +64,11 @@ func newStatement*(text: string, lineNum: Natural = 1,
   ## Create a new statement.
   result = Statement(lineNum: lineNum, start: start, text: text)
 
-proc startColumn*(start: Natural, symbol: string = "^"): string =
-  ## Return enough spaces to point at the warning column.  Used under
-  ## the statement line.
-  for ix in 0..<start:
-    result.add(' ')
-  result.add(symbol)
-
 func getFragmentAndPos*(statement: Statement, start: Natural):
      (string, Natural) =
-  ## Return a statement fragment, and new position to show the given
-  ## position.
+  ## Split up a long statement around the given position.  Return the
+  ## statement fragment, and the position where the fragment starts in
+  ## the statement.
 
   # Change the newlines and control characters to something readable
   # and so the fragment fixs on one line.
@@ -219,8 +160,8 @@ func `$`*(s: Statement): string =
   ## Return a string representation of a Statement.
   result = """$1, $2: "$3"""" % [$s.lineNum, $s.start, s.text]
 
-func get3GroupsLen(matchesO: Option[Matches]): (string,
-    string, string, Natural) =
+func get3GroupsLen(matchesO: Option[Matches]):
+    (string, string, string, Natural) =
   let matches = matchesO.get()
   let (one, two, three) = matches.get3Groups()
   result = (one, two, three, matches.length)
@@ -271,7 +212,7 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
   if notEmptyOrSpaces(text):
     yield newStatement(strip(text), lineNum, start)
 
-func getMultilineStr*(text: string, start: Natural): StrAndPosOr =
+func getMultilineStr*(text: string, start: Natural): ValueAndPosOr =
   ## Return the triple quoted string literal. The startPos points one
   ## @:past the leading triple quote.  Return the parsed
   ## @:string value and the ending position one past the trailing
@@ -279,82 +220,71 @@ func getMultilineStr*(text: string, start: Natural): StrAndPosOr =
 
   # a = """\ntest string"""\n
   #         ^                ^
-  # a = """\n"""\n
 
   if start >= text.len or text[start] != '\n':
     # Triple quotes must always end the line.
-    return newStrAndPosOr(wTripleAtEnd, "", start)
+    return newValueAndPosOr(wTripleAtEnd, "", start)
   if start + 5 > text.len or text[text.len - 4 .. text.len - 1] != "\"\"\"\n":
     # Missing the ending triple quotes.
-    return newStrAndPosOr(wMissingEndingTriple, "", text.len)
+    return newValueAndPosOr(wMissingEndingTriple, "", text.len)
 
   let newStr = text[start + 1 .. text.len - 5]
-  result = newStrAndPosOr(newStr, text.len)
+  result = newValueAndPosOr(newStr, text.len)
 
-func getString*(statement: Statement, start: Natural):
-    ValueAndLengthOr =
-  ## Return a literal string value and match length from a statement. The
-  ## start parameter is the index of the first quote in the statement
-  ## and the return length includes optional trailing white space
-  ## after the last quote.
+func getString*(statement: Statement, start: Natural): ValueAndPosOr =
+  ## Return a literal string value and position after it. The start
+  ## parameter is the index of the first quote in the statement and
+  ## the return position is after the optional trailing white space
+  ## following the last quote.
 
   let str = statement.text
 
   # Parse the json string and remove escaping.
-  var strAndPosOr = parseJsonStr(str, start+1)
-  if strAndPosOr.isMessage:
-    return newValueAndLengthOr(strAndPosOr.message)
-  let strAndPos = strAndPosOr.value
+  result = parseJsonStr(str, start+1)
+  if result.isMessage:
+    return result
 
   # A triple quoted string looks like an empty string with a quote
   # following it to the parseJsonStr function.
-  if strAndPos.pos < str.len and strAndPos.pos == start+2 and str[start+2] == '"':
-    strAndPosOr = getMultilineStr(str, start+3)
-    if strAndPosOr.isMessage:
-      return newValueAndLengthOr(strAndPosOr.message)
+  let pos = result.value.pos
+  if pos < str.len and pos == start+2 and str[start+2] == '"':
+    result = getMultilineStr(str, start+3)
 
-  result = newValueAndLengthOr(newValue(strAndPosOr.value.str),
-    strAndPosOr.value.pos - start)
+proc getNumber*(statement: Statement, start: Natural): ValueAndPosOr =
+  ## Return the literal number value and position after it.  The start
+  ## index points at a digit or minus sign. The position includes the
+  ## trailing whitespace.
 
-proc getNumber*(statement: Statement, start: Natural):
-    ValueAndLengthOr =
-  ## Return the literal number value and match length from the
-  ## statement. The start index points at a digit or minus sign. The
-  ## length includes the trailing whitespace.
-
-  # Check that we have a statictea number.
+  # Check that we have a statictea number and get the length including
+  # trailing whitespace.
   let matchesO = matchNumber(statement.text, start)
   if not matchesO.isSome:
     # Invalid number.
-    return newValueAndLengthOr(wNotNumber, "", start)
+    return newValueAndPosOr(wNotNumber, "", start)
 
   # The decimal point determines whether the number is an integer or
   # float.
   let matches = matchesO.get()
   let decimalPoint = matches.getGroup()
-  let length = matches.length
-  var value: Value
+  var valueAndPos: ValueAndPos
   if decimalPoint == ".":
     # Parse the float.
-    let floatAndLengthO = parseFloat(statement.text, start)
-    if not floatAndLengthO.isSome:
+    let valueAndPosO = parseFloat(statement.text, start)
+    if not valueAndPosO.isSome:
       # The number is too big or too small.
-      return newValueAndLengthOr(wNumberOverFlow, "", start)
-    let floatAndLength = floatAndLengthO.get()
-    value = newValue(floatAndLength.number)
-    assert floatAndLength.length <= length
+      return newValueAndPosOr(wNumberOverFlow, "", start)
+    valueAndPos = valueAndPosO.get()
   else:
     # Parse the int.
-    let intAndLengthO = parseInteger(statement.text, start)
-    if not intAndLengthO.isSome:
+    let valueAndPosO = parseInteger(statement.text, start)
+    if not valueAndPosO.isSome:
       # The number is too big or too small.
-      return newValueAndLengthOr(wNumberOverFlow, "", start)
-    let intAndLength = intAndLengthO.get()
-    value = newValue(intAndLength.number)
-    assert intAndLength.length <= length
-  result = newValueAndLengthOr(value, length)
+      return newValueAndPosOr(wNumberOverFlow, "", start)
+    valueAndPos = valueAndPosO.get()
+  # Note that we use the matches length so it includes the trailing whitespace.
+  result = newValueAndPosOr(newValueAndPos(valueAndPos.value, start + matches.length))
 
-func skipArgument*(text: string, startPos: Natural): PosOr =
+func skipArgument*(statement: Statement, startPos: Natural): PosOr =
   ## Skip past the argument.  startPos points at the first character
   ## of a function argument.  Return the first non-whitespace
   ## character after the argument or a message when there is a
@@ -367,6 +297,7 @@ func skipArgument*(text: string, startPos: Natural): PosOr =
   ## @:        ^ ^
   ## @:~~~~
 
+  let text = statement.text
   assert(startPos < text.len, "startPos is greater than the text len")
   assert(startPos >= 0, "startPos is less than 0")
 
@@ -490,28 +421,40 @@ func skipArgument*(text: string, startPos: Natural): PosOr =
   else:
     result = newPosOr(pos)
 
-# Forward reference to getValueAndLength since we call it recursively.
-proc getValueAndLength*(statement: Statement, start: Natural, variables:
-  Variables): ValueAndLengthOr
+proc skipArg(statement: Statement, start: Natural): PosOr =
+  when showPos:
+    showDebugPos(statement, start, "^sa")
+  result = skipArgument(statement, start)
+  when showPos:
+    var pos: Natural
+    if result.isMessage:
+      pos = result.message.pos
+    else:
+      pos = result.value
+    showDebugPos(statement, pos, "^fa")
+
+# Forward reference to getValueAndPos since we call it recursively.
+proc getValueAndPos*(statement: Statement, start: Natural, variables:
+  Variables): ValueAndPosOr
 
 # Call stack:
 # - runStatement
-# - getValueAndLength
-# - getFunctionValueAndLength
+# - getValueAndPos
+# - getFunctionValueAndPos
 # - ifFunctions
 # - getList
-# - getValueAndLength
+# - getValueAndPos
 
 proc ifFunctions*(
     functionName: string,
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list=false): ValueAndLengthOr =
-  ## Return the if/if0 function's value and the length. It
+    list=false): ValueAndPosOr =
+  ## Return the if/if0 function's value and position after. It
   ## conditionally runs one of its arguments and skips the
   ## other. Start points at the first argument of the function. The
-  ## length includes the trailing whitespace after the ending ).
+  ## position includes the trailing whitespace after the ending ).
 
   # cases:
   #   a = if(cond, then, else)
@@ -523,17 +466,17 @@ proc ifFunctions*(
   # The if function cond is a boolean, for if0 it is anything.
 
   # Get the condition's value.
-  let vlcOr = getValueAndLength(statement, start, variables)
+  let vlcOr = getValueAndPos(statement, start, variables)
   if vlcOr.isMessage or vlcOr.value.exit:
     return vlcOr
   let cond = vlcOr.value.value
-  var runningLen = vlcOr.value.length
+  var runningPos = vlcOr.value.pos
 
   var condition = false
   if functionName == "if":
     if cond.kind != vkBool:
       # The if condition must be a bool value, got a $1.
-      return newValueAndLengthOr(wExpectedBool, $cond.kind, start)
+      return newValueAndPosOr(wExpectedBool, $cond.kind, start)
     condition = cond.boolv
   else: # functionName == "if0"
     case cond.kind:
@@ -558,119 +501,117 @@ proc ifFunctions*(
        condition = false
 
   # Match the comma and whitespace.
-  let commaO = matchSymbol(statement.text, gComma, start + runningLen)
+  let commaO = matchSymbol(statement.text, gComma, runningPos)
   if not commaO.isSome:
     # Expected two or three arguments.
-    return newValueAndLengthOr(wTwoOrThreeParams, "", start)
-  runningLen += commaO.get().length
+    return newValueAndPosOr(wTwoOrThreeParams, "", start)
+  runningPos += commaO.get().length
 
   # Handle the second parameter.
-  var vl2Or: ValueAndLengthOr
+  var vl2Or: ValueAndPosOr
   var skip = (condition == false)
   
   if skip:
-    let posOr = skipArgument(statement.text, start + runningLen)
+    let posOr = skipArg(statement, runningPos)
     if posOr.isMessage:
-      return newValueAndLengthOr(posOr.message)
-    runningLen = (posOr.value - start)
+      return newValueAndPosOr(posOr.message)
+    runningPos = posOr.value
   else:
-    vl2Or = getValueAndLength(statement, start + runningLen, variables)
+    vl2Or = getValueAndPos(statement, runningPos, variables)
     if vl2Or.isMessage or vl2Or.value.exit:
       return vl2Or
-    runningLen += vl2Or.value.length
+    runningPos = vl2Or.value.pos
 
-  var vl3Or: ValueAndLengthOr
+  var vl3Or: ValueAndPosOr
   # Match the comma and whitespace.
-  let cO = matchSymbol(statement.text, gComma, start + runningLen)
+  let cO = matchSymbol(statement.text, gComma, runningPos)
   if cO.isSome:
     # We got a comma so we expect a third parameter.
-    runningLen += cO.get().length
+    runningPos += cO.get().length
 
     # Handle the third parameter.
     skip = (condition == true)
     if skip:
-      let posOr = skipArgument(statement.text, start + runningLen)
+      let posOr = skipArg(statement, runningPos)
       if posOr.isMessage:
-        return newValueAndLengthOr(posOr.message)
-      runningLen = (posOr.value - start)
+        return newValueAndPosOr(posOr.message)
+      runningPos = posOr.value
     else:
-      vl3Or = getValueAndLength(statement, start + runningLen, variables)
+      vl3Or = getValueAndPos(statement, runningPos, variables)
       if vl3Or.isMessage or vl3Or.value.exit:
         return vl3Or
-      runningLen += vl3Or.value.length
+      runningPos = vl3Or.value.pos
   else:
     # The third parameter is optional. When it dosn't exist use 0 for
     # it.
-    vl3Or = newValueAndLengthOr(newValue(0), 0)
+    vl3Or = newValueAndPosOr(newValue(0), 0)
 
   # Match ) and trailing whitespace.
-  let parenO = matchSymbol(statement.text, gRightParentheses,
-    start + runningLen)
+  let parenO = matchSymbol(statement.text, gRightParentheses, runningPos)
   if not parenO.isSome:
     # Expected two or three parameters.
-    return newValueAndLengthOr(wTwoOrThreeParams, "", start + runningLen)
-  runningLen += parenO.get().length
+    return newValueAndPosOr(wTwoOrThreeParams, "", runningPos)
+  runningPos += parenO.get().length
 
   var value: Value
   if condition:
     value = vl2Or.value.value
   else:
     value = vl3Or.value.value
-  result = newValueAndLengthOr(value, runningLen)
+  result = newValueAndPosOr(value, runningPos)
 
 proc andOrFunctions*(
     functionName: string,
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list=false): ValueAndLengthOr =
-  ## Return the and/or function's value and the length. The and
+    list=false): ValueAndPosOr =
+  ## Return the and/or function's value and the position after. The and
   ## function stops on the first false. The or function stops on the
   ## first true. The rest of the arguments are skipped.
-  ## Start points at the first parameter of the function. The length
+  ## Start points at the first parameter of the function. The position
   ## includes the trailing whitespace after the ending ).
-
   # cases:
-  #   c1 = and(a, b)
-  #   c2 = or(a, b)
+  #   c1 = and(a, b)  # test
+  #            ^      ^
+  #   c2 = or(a, b)  # test
+  #           ^      ^
 
   # Get the first argument value.
-  let vlcOr = getValueAndLength(statement, start, variables)
+  let vlcOr = getValueAndPos(statement, start, variables)
   if vlcOr.isMessage or vlcOr.value.exit:
     return vlcOr
   let firstValue = vlcOr.value.value
-  var runningLen = vlcOr.value.length
+  var runningPos = vlcOr.value.pos
 
   if firstValue.kind != vkBool:
     # Expected bool argument got $1.
-    return newValueAndLengthOr(wExpectedBool, $firstValue.kind, start)
+    return newValueAndPosOr(wExpectedBool, $firstValue.kind, start)
 
   let a = firstValue.boolv
   var skip = if functionName == "and": a == false else: a == true
 
   # Match the comma and whitespace.
-  let commaO = matchSymbol(statement.text, gComma, start + runningLen)
+  let commaO = matchSymbol(statement.text, gComma, runningPos)
   if not commaO.isSome:
     # Expected two arguments.
-    return newValueAndLengthOr(wTwoArguments, "", start + runningLen)
-  runningLen += commaO.get().length
-
-  # todo: use pos instead of length everywhere.
+    return newValueAndPosOr(wTwoArguments, "", runningPos)
+  runningPos += commaO.get().length
 
   # Handle the second parameter.
   var secondValue: Value
-  var secondLength: Natural
+  var afterSecond: Natural
   if skip:
-    let posOr = skipArgument(statement.text, start + runningLen)
+    let posOr = skipArg(statement, runningPos)
     if posOr.isMessage:
-      return newValueAndLengthOr(posOr.message)
-    secondLength = (posOr.value - (start + runningLen))
+      return newValueAndPosOr(posOr.message)
+    afterSecond = posOr.value
     secondValue = newValue(0)
   else:    
-    let vl2Or = getValueAndLength(statement, start + runningLen, variables)
+    let vl2Or = getValueAndPos(statement, runningPos, variables)
     if vl2Or.isMessage or vl2Or.value.exit:
       return vl2Or
-    secondLength = vl2Or.value.length
+    afterSecond = vl2Or.value.pos
     secondValue = vl2Or.value.value
 
   var b: bool
@@ -679,33 +620,32 @@ proc andOrFunctions*(
   else:
     if secondValue.kind != vkBool:
       # Expected bool argument got $1.
-      return newValueAndLengthOr(wExpectedBool, $secondValue.kind, start + runningLen)
+      return newValueAndPosOr(wExpectedBool, $secondValue.kind, runningPos)
     b = secondValue.boolv
-  runningLen += secondLength
+  runningPos = afterSecond
 
   # Match ) and trailing whitespace.
-  let parenO = matchSymbol(statement.text, gRightParentheses,
-    start + runningLen)
+  let parenO = matchSymbol(statement.text, gRightParentheses, runningPos)
   if not parenO.isSome:
     # Expected two arguments.
-    return newValueAndLengthOr(wTwoArguments, "", start + runningLen)
-  runningLen += parenO.get().length
+    return newValueAndPosOr(wTwoArguments, "", runningPos)
+  runningPos += parenO.get().length
 
   var value: bool
   if functionName == "and":
     value = a and b
   else:
     value = a or b
-  result = newValueAndLengthOr(newValue(value), runningLen)
+  result = newValueAndPosOr(newValue(value), runningPos)
 
-proc getFunctionValueAndLength*(
+proc getFunctionValueAndPos*(
     dotNameStr: string,
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list = false): ValueAndLengthOr =
-  ## Return the function's value and the length. Start points at the
-  ## first argument of the function. The length includes the trailing
+    list = false): ValueAndPosOr =
+  ## Return the function's value and the position after it. Start points at the
+  ## first argument of the function. The position includes the trailing
   ## whitespace after the ending ).
 
   var arguments: seq[Value] = @[]
@@ -721,23 +661,23 @@ proc getFunctionValueAndLength*(
     # Get the arguments to the function.
     pos = start
     while true:
-      let vlOr = getValueAndLength(statement, pos, variables)
+      let vlOr = getValueAndPos(statement, pos, variables)
       if vlOr.isMessage or vlOr.value.exit:
         return vlOr
       arguments.add(vlOr.value.value)
       argumentStarts.add(pos)
 
-      pos = pos + vlOr.value.length
+      pos = vlOr.value.pos
 
       # Get the , or ) or ] and white space following the value.
       let commaSymbolO = matchCommaOrSymbol(statement.text, symbol, pos)
       if not commaSymbolO.isSome:
         if symbol == gRightParentheses:
           # Expected comma or right parentheses.
-          return newValueAndLengthOr(wMissingCommaParen, "", pos)
+          return newValueAndPosOr(wMissingCommaParen, "", pos)
         else:
           # Missing comma or right bracket.
-          return newValueAndLengthOr(wMissingCommaBracket, "", pos)
+          return newValueAndPosOr(wMissingCommaBracket, "", pos)
       let commaSymbol = commaSymbolO.get()
       pos = pos + commaSymbol.length
       let foundSymbol = commaSymbol.getGroup()
@@ -750,7 +690,7 @@ proc getFunctionValueAndLength*(
   if valueOr.isMessage:
     let warningData = newWarningData(valueOr.message.warning,
       valueOr.message.p1, start)
-    return newValueAndLengthOr(warningData)
+    return newValueAndPosOr(warningData)
   let value = valueOr.value
 
   # Find the best matching function by looking at the arguments.
@@ -758,7 +698,7 @@ proc getFunctionValueAndLength*(
   if funcValueOr.isMessage:
     let warningData = newWarningData(funcValueOr.message.warning,
       funcValueOr.message.p1, start)
-    return newValueAndLengthOr(warningData)
+    return newValueAndPosOr(warningData)
 
   # Call the function.
   let funResult = funcValueOr.value.funcv.functionPtr(variables, arguments)
@@ -768,17 +708,16 @@ proc getFunctionValueAndLength*(
       warningPos = argumentStarts[funResult.parameter]
     else:
       warningPos = start
-    return newValueAndLengthOr(funResult.warningData.warning,
+    return newValueAndPosOr(funResult.warningData.warning,
       funResult.warningData.p1, warningPos)
 
   var exit = if dotNameStr == "return": true else: false
-  # pos-start is the length including trailing whitespace.
-  result = newValueAndLengthOr(funResult.value, pos-start, exit)
+  result = newValueAndPosOr(funResult.value, pos, exit)
 
 proc getList(statement: Statement, start: Natural,
-    variables: Variables): ValueAndLengthOr =
-  ## Return the literal list value and match length from the
-  ## statement. The start index points at [. The length includes the
+    variables: Variables): ValueAndPosOr =
+  ## Return the literal list value and position afte it.
+  ## The start index points at [. The position includes the
   ## trailing whitespace after the ending ].
 
   # Match the left bracket and whitespace.
@@ -787,17 +726,8 @@ proc getList(statement: Statement, start: Natural,
   let startSymbol = startSymbolO.get()
 
   # Get the list. The literal list [...] and list(...) are similar.
-  let funValueLengthOr = getFunctionValueAndLength("list", statement,
+  return getFunctionValueAndPos("list", statement,
     start+startSymbol.length, variables, list=true)
-  if funValueLengthOr.isMessage or funValueLengthOr.value.exit:
-    return funValueLengthOr
-
-  let funValueLength = funValueLengthOr.value
-
-  # Return the value and length.
-  let valueAndLength = newValueAndLength(funValueLength.value,
-    funValueLength.length+startSymbol.length)
-  result = newValueAndLengthOr(valueAndLength)
 
 proc runBoolOp*(left: Value, op: string, right: Value): Value =
   ## Evaluate the bool expression and return a bool value.
@@ -838,26 +768,27 @@ proc runCompareOp*(left: Value, op: string, right: Value): Value =
 
 # Forward reference since we call getCondition recursively.
 proc getCondition*(statement: Statement, start: Natural,
-    variables: Variables): ValueAndLengthOr
+    variables: Variables): ValueAndPosOr
 
 proc getValueOrNestedCond(statement: Statement, start: Natural,
-    variables: Variables): ValueAndLengthOr =
-  ## Return a value and length. If start points at a nested
-  ## condition, handle it. Return the start value and length.
+    variables: Variables): ValueAndPosOr =
+  ## Return a value and position after it. If start points at a nested
+  ## condition, handle it.
 
-  var runningLen = start
-  let parenO = matchSymbol(statement.text, gLeftParentheses, runningLen)
+  var runningPos = start
+  let parenO = matchSymbol(statement.text, gLeftParentheses, runningPos)
   if parenO.isSome:
     # Found a left parenetheses, get the nested condition.
     result = getCondition(statement, start, variables)
   else:
-    result = getValueAndLength(statement, start, variables)
+    result = getValueAndPos(statement, start, variables)
 
 proc getCondition*(statement: Statement, start: Natural,
-    variables: Variables): ValueAndLengthOr =
-  ## Return the bool value of the condition expression and its
-  ## length. The start index points at the ( left parentheses. The
-  ## length includes the trailing whitespace after the ending ).
+    variables: Variables): ValueAndPosOr =
+  ## Return the bool value of the condition expression and the
+  ## position after it.  The start index points at the ( left
+  ## parentheses. The position includes the trailing whitespace after
+  ## the ending ).
   when showPos:
     showDebugPos(statement, start, "^sc")
 
@@ -869,32 +800,32 @@ proc getCondition*(statement: Statement, start: Natural,
   assert parenO.isSome
   runningPos += parenO.get().length
 
-  # Return a value and length after handling any nested condition.
+  # Return a value and position after handling any nested condition.
   var accumOr = getValueOrNestedCond(statement, runningPos, variables)
   if accumOr.isMessage or accumOr.value.exit:
     return accumOr
   var accum = accumOr.value.value
-  runningPos += accumOr.value.length
+  runningPos = accumOr.value.pos
 
   while true:
     # Check for ending right parentheses and trailing whitespace.
     let rightParenO = matchSymbol(statement.text, gRightParentheses, runningPos)
     if rightParenO.isSome:
       let finish = runningPos + rightParenO.get().length
-      let vAndL = newValueAndLength(accum, finish - start)
+      let vAndL = newValueAndPos(accum, finish)
       when showPos:
         showDebugPos(statement, finish, "^fc")
-      return newValueAndLengthOr(vAndL)
+      return newValueAndPosOr(vAndL)
 
     # Get the operator.
     let opO = matchBoolExprOperator(statement.text, runningPos)
     if not opO.isSome:
       # Expected a boolean expression operator, and, or, ==, !=, <, >, <=, >=.
-      return newValueAndLengthOr(wNotBoolOperator, "", runningPos)
+      return newValueAndPosOr(wNotBoolOperator, "", runningPos)
     let op = opO.getGroup()
     if (op == "and" or op == "or") and accum.kind != vkBool:
       # A boolean operator’s left value must be a bool.
-      return newValueAndLengthOr(wBoolOperatorLeft, "", runningPos)
+      return newValueAndPosOr(wBoolOperatorLeft, "", runningPos)
 
     # Look for short ciruit conditions.
     var sortCiruitTaken: bool
@@ -904,7 +835,7 @@ proc getCondition*(statement: Statement, start: Natural,
         lastBoolOp = "or"
       elif lastBoolOp != "or":
         # When mixing 'and's and 'or's you need to specify the precedence with parentheses.
-        return newValueAndLengthOr(wNeedPrecedence, "", runningPos)
+        return newValueAndPosOr(wNeedPrecedence, "", runningPos)
       if accum.boolv == true:
         sortCiruitTaken = true
         shortCiruitResult = true
@@ -913,7 +844,7 @@ proc getCondition*(statement: Statement, start: Natural,
         lastBoolOp = "and"
       elif lastBoolOp != "and":
         # When mixing 'and's and 'or's you need to specify the precedence with parentheses.
-        return newValueAndLengthOr(wNeedPrecedence, "", runningPos)
+        return newValueAndPosOr(wNeedPrecedence, "", runningPos)
       if accum.boolv == false:
         sortCiruitTaken = true
         shortCiruitResult = false
@@ -921,27 +852,27 @@ proc getCondition*(statement: Statement, start: Natural,
       # We have a compare operator.
       if accum.kind != vkInt and accum.kind != vkFloat and accum.kind != vkString:
         # The comparison operator’s left value must be a number or string.
-        return newValueAndLengthOr(wCompareOperator, "", runningPos)
+        return newValueAndPosOr(wCompareOperator, "", runningPos)
 
     runningPos += opO.get().length
 
     if sortCiruitTaken:
       # Sort ciruit the condition and skip past the closing right parentheses.
-      let posOr = skipArgument(statement.text, start)
+      let posOr = skipArg(statement, start)
       if posOr.isMessage:
-        return newValueAndLengthOr(posOr.message)
+        return newValueAndPosOr(posOr.message)
       runningPos = posOr.value
       when showPos:
         showDebugPos(statement, runningPos, "^fc")
-      let vAndL = newValueAndLength(newValue(shortCiruitResult), runningPos-start)
-      return newValueAndLengthOr(vAndL)
+      return newValueAndPosOr(newValue(shortCiruitResult), runningPos)
 
-    # Return a value and length after handling any nestedcondition.
+    # Return a value and position after handling any nestedcondition.
     let vlRightOr = getValueOrNestedCond(statement, runningPos, variables)
+    let xyz = runningPos
     if vlRightOr.isMessage or vlRightOr.value.exit:
       return vlRightOr
     let right = vlRightOr.value.value
-    runningPos += vlRightOr.value.length
+    runningPos = vlRightOr.value.pos
 
     # We have a left and right value with an operator but the right value
     # might be part of a following comparision.
@@ -951,8 +882,8 @@ proc getCondition*(statement: Statement, start: Natural,
       # Compare two values.
       if right.kind != accum.kind:
         # The comparison operator’s right value must be the same type as the left value.
-        let messageData = newWarningData(wCompareOperatorSame, "", runningPos - vlRightOr.value.length)
-        return newValueAndLengthOr(messageData)
+        let messageData = newWarningData(wCompareOperatorSame, "", xyz)
+        return newValueAndPosOr(messageData)
       bValue = runCompareOp(accum, op, right)
     elif right.kind == vkBool:
       bValue = runBoolOp(accum, op, right)
@@ -961,28 +892,28 @@ proc getCondition*(statement: Statement, start: Natural,
       let op2O = matchCompareOperator(statement.text, runningPos)
       if not op2O.isSome:
         # Expected a compare operator, ==, !=, <, >, <=, >=.
-        return newValueAndLengthOr(wNotCompareOperator, "", runningPos)
+        return newValueAndPosOr(wNotCompareOperator, "", runningPos)
       let op2 = op2O.getGroup()
       runningPos += op2O.get().length
 
-      # Return a value and length after handling any nested condition.
+      # Return a value and position after handling any nested condition.
       let vlThirdOr = getValueOrNestedCond(statement, runningPos, variables)
       if vlThirdOr.isMessage or vlThirdOr.value.exit:
         return vlThirdOr
 
       if vlThirdOr.value.value.kind != right.kind:
         # The comparison operator’s right value must be the same type as the left value.
-        return newValueAndLengthOr(wCompareOperatorSame, "", runningPos)
+        return newValueAndPosOr(wCompareOperatorSame, "", runningPos)
 
       let bValue2 = runCompareOp(right, op2, vlThirdOr.value.value)
       bValue = runBoolOp(accum, op, bValue2)
-      runningPos += vlThirdOr.value.length
+      runningPos = vlThirdOr.value.pos
 
     accum = newValue(bValue)
 
-proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
-    Variables): ValueAndLengthOr =
-  ## Get the value and length from the statement.
+proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
+    Variables): ValueAndPosOr =
+  ## Get the value and position from the statement.
 
   # The first character determines its type.
   # * quote -- string
@@ -994,7 +925,7 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
   # Make sure start is pointing to something.
   if start >= statement.text.len:
     # Expected a string, number, variable, list or condition.
-    return newValueAndLengthOr(wInvalidRightHandSide, "", start)
+    return newValueAndPosOr(wInvalidRightHandSide, "", start)
 
   ## Branch based on the first character.
   let char = statement.text[start]
@@ -1011,7 +942,7 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
     let matchesO = matchDotNames(statement.text, start)
     if not matchesO.isSome:
       # Expected a string, number, variable, list or condition.
-      return newValueAndLengthOr(wInvalidRightHandSide, "", start)
+      return newValueAndPosOr(wInvalidRightHandSide, "", start)
     let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
 
     if leftParen == "(":
@@ -1019,47 +950,31 @@ proc getValueAndLengthWorker(statement: Statement, start: Natural, variables:
 
       # Handle the special if functions.
       if dotNameStr in ["if", "if0"]:
-        let ifOr = ifFunctions(dotNameStr, statement,
-          start+dotNameLen, variables)
-        if ifOr.isMessage or ifOr.value.exit:
-          return ifOr
-        let length = dotNameLen + ifOr.value.length
-        return newValueAndLengthOr(ifOr.value.value, length)
+        return ifFunctions(dotNameStr, statement, start+dotNameLen, variables)
 
       # Handle the special and/or functions.
       if dotNameStr in ["and", "or"]:
-        let andOrOr = andOrFunctions(dotNameStr, statement,
-          start+dotNameLen, variables)
-        if andOrOr.isMessage or andOrOr.value.exit:
-          return andOrOr
-        let length = dotNameLen + andOrOr.value.length
-        return newValueAndLengthOr(andOrOr.value.value, length)
+        return andOrFunctions(dotNameStr, statement, start+dotNameLen, variables)
 
-      let fvl = getFunctionValueAndLength(dotNameStr, statement,
+      return getFunctionValueAndPos(dotNameStr, statement,
         start+dotNameLen, variables, false)
-      if fvl.isMessage or fvl.value.exit:
-        return fvl
-      let length = dotNameLen+fvl.value.length
-      let valueAndLength = newValueAndLength(fvl.value.value,
-        length)
-      return newValueAndLengthOr(valueAndLength)
 
     # We have a variable.
     let valueOr = getVariable(variables, dotNameStr)
     if valueOr.isMessage:
       let warningData = newWarningData(valueOr.message.warning,
         valueOr.message.p1, start)
-      return newValueAndLengthOr(warningData)
-    return newValueAndLengthOr(valueOr.value, dotNameLen)
+      return newValueAndPosOr(warningData)
+    return newValueAndPosOr(valueOr.value, start+dotNameLen)
   else:
     # Expected a string, number, variable, list or condition.
-    return newValueAndLengthOr(wInvalidRightHandSide, "", start)
+    return newValueAndPosOr(wInvalidRightHandSide, "", start)
 
-proc getValueAndLength*(statement: Statement, start: Natural, variables:
-    Variables): ValueAndLengthOr =
-  ## Return the value and length of the item that the start parameter
+proc getValueAndPos*(statement: Statement, start: Natural, variables:
+    Variables): ValueAndPosOr =
+  ## Return the value and position of the item that the start parameter
   ## points at which is a string, number, variable, list, or condition.
-  ## The length returned includes the trailing whitespace after the
+  ## The position returned includes the trailing whitespace after the
   ## item. So the ending position is pointing at the end of the
   ## statement, or at the first non-whitespace character after the
   ## item.
@@ -1091,14 +1006,14 @@ proc getValueAndLength*(statement: Statement, start: Natural, variables:
   when showPos:
     showDebugPos(statement, start, "s")
 
-  result = getValueAndLengthWorker(statement, start, variables)
+  result = getValueAndPosWorker(statement, start, variables)
 
   when showPos:
     var pos: Natural
     if result.isMessage:
       pos = result.message.pos
     else:
-      pos = start + result.value.length
+      pos = result.value.pos
     showDebugPos(statement, pos, "f")
 
 proc runStatement*(statement: Statement, variables: Variables):
@@ -1125,7 +1040,7 @@ proc runStatement*(statement: Statement, variables: Variables):
   let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
   let leadingLen = dotNameLen + pos
 
-  var vlOr: ValueAndLengthOr
+  var vlOr: ValueAndPosOr
   var operator = ""
   var operatorLength = 0
   var varName = ""
@@ -1151,7 +1066,7 @@ proc runStatement*(statement: Statement, variables: Variables):
     operatorLength = match.length
 
     # Get the right hand side value and match the following whitespace.
-    vlOr = getValueAndLength(statement,
+    vlOr = getValueAndPos(statement,
       leadingLen + operatorLength, variables)
 
   if vlOr.isMessage:
@@ -1162,12 +1077,11 @@ proc runStatement*(statement: Statement, variables: Variables):
     return newVariableDataOr("", "exit", vlOr.value.value)
 
   # Check that there is not any unprocessed text following the value.
-  let length = leadingLen + operatorLength + vlOr.value.length
-  if length != statement.text.len:
+  if vlOr.value.pos != statement.text.len:
     # Check for a trailing comment.
-    if statement.text[length] != '#':
+    if statement.text[vlOr.value.pos] != '#':
       # Unused text at the end of the statement.
-      return newVariableDataOr(wTextAfterValue, "", length)
+      return newVariableDataOr(wTextAfterValue, "", vlOr.value.pos)
 
   # Return the variable dot name and value.
   result = newVariableDataOr(varName, operator, vlOr.value.value)

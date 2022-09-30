@@ -81,6 +81,20 @@ type
         parameter*: Natural ## Index of problem parameter.
         warningData*: WarningData
 
+  ValueAndPos* = object
+    ## A value and the position after the value in the statement.  For
+    ## the example statement: "var = 567 # test"". The value 567
+    ## starts at index 6 and the position 10 because it includes the
+    ## trailing space. For example "id = row(3 )" the value is 3 and
+    ## the position is 5. Exit is set true by the return function to
+    ## exit a command.
+    value*: Value
+    pos*: Natural
+    exit*: bool
+# todo: remove exit from ValueAndPos
+
+  ValueAndPosOr* = OpResultWarn[ValueAndPos]
+
 proc newVarsDict*(): VarsDict =
   ## Create a new empty variables dictionary. VarsDict is a ref type.
   result = newOrderedTable[string, Value]()
@@ -432,3 +446,52 @@ func `$`*(funResult: FunResult): string =
     result = $funResult.value
   else:
     result = "warning: " & $funResult.warningData & ": parameter " & $funResult.parameter
+
+proc newValueAndPos*(value: Value, pos: Natural,
+    exit = false): ValueAndPos =
+  ## Create a newValueAndPos object.
+  result = ValueAndPos(value: value, pos: pos)
+
+func newValueAndPosOr*(warning: MessageId, p1 = "", pos = 0):
+    ValueAndPosOr =
+  ## Create a ValueAndPosOr warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[ValueAndPos](warningData)
+
+func newValueAndPosOr*(warningData: WarningData):
+    ValueAndPosOr =
+  ## Create a ValueAndPosOr warning.
+  result = opMessageW[ValueAndPos](warningData)
+
+proc `==`*(a: ValueAndPosOr, b: ValueAndPosOr): bool =
+  ## Return true when a equals b.
+  if a.kind == b.kind:
+    if a.isMessage:
+      result = a.message == b.message
+    else:
+      result = a.value == b.value
+
+proc `!=`*(a: ValueAndPosOr, b: ValueAndPosOr): bool =
+  result = not (a == b)
+
+func newValueAndPosOr*(value: Value, pos: Natural, exit=false):
+    ValueAndPosOr =
+  ## Create a ValueAndPosOr value.
+  let val = ValueAndPos(value: value, pos: pos, exit: exit)
+  result = opValueW[ValueAndPos](val)
+
+proc newValueAndPosOr*(number: int | int64 | float64 | string,
+    pos: Natural): ValueAndPosOr =
+  result = newValueAndPosOr(newValue(number), pos)
+
+func newValueAndPosOr*(val: ValueAndPos):
+    ValueAndPosOr =
+  ## Create a ValueAndPosOr.
+  result = opValueW[ValueAndPos](val)
+
+proc startColumn*(start: Natural, message: string = "^"): string =
+  ## Return enough spaces to point at the warning column.  Used under
+  ## the statement line.
+  for ix in 0 ..< start:
+    result.add(' ')
+  result.add(message)
