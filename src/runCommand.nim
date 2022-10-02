@@ -39,7 +39,6 @@ type
 
   PosOr* = OpResultWarn[Natural]
 
-
 func newPosOr*(warning: MessageId, p1 = "", pos = 0): PosOr =
   ## Create a PosOr warning.
   let warningData = newWarningData(warning, p1, pos)
@@ -71,14 +70,12 @@ proc startColumn*(text: string, start: Natural, message: string = "^"): string =
   var byteCount = 0
   var charCount = 0
   for valid in yieldUtf8Chars(text, ixFirst, ixLast, codePoint):
+    # Byte positions inside multibyte sequences except the first point
+    # to the next start.
     if byteCount >= start:
       break
     byteCount += (ixLast - ixFirst + 1)
     inc(charCount)
-
-  # debugEcho "charCount = " & $charCount
-  # debugEcho "byteCount = " & $byteCount
-  for ix in countUp(0, charCount-1):
     result.add(' ')
   result.add(message)
 
