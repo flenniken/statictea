@@ -59,7 +59,6 @@ same type which may be Value type.
 * [`==`](#-8) &mdash; Return true when a equals b.
 * [newValueAndPosOr](#newvalueandposor-2) &mdash; Create a ValueAndPosOr value.
 * [newValueAndPosOr](#newvalueandposor-3) &mdash; Create a ValueAndPosOr.
-* [startColumn](#startcolumn) &mdash; Return enough spaces to point at the warning column.
 
 # VarsDict
 
@@ -518,14 +517,6 @@ Create a ValueAndPosOr.
 
 ```nim
 func newValueAndPosOr(val: ValueAndPos): ValueAndPosOr
-```
-
-# startColumn
-
-Return enough spaces to point at the warning column.  Used under the statement line.
-
-```nim
-proc startColumn(start: Natural; message: string = "^"): string
 ```
 
 

@@ -488,10 +488,3 @@ func newValueAndPosOr*(val: ValueAndPos):
     ValueAndPosOr =
   ## Create a ValueAndPosOr.
   result = opValueW[ValueAndPos](val)
-
-proc startColumn*(start: Natural, message: string = "^"): string =
-  ## Return enough spaces to point at the warning column.  Used under
-  ## the statement line.
-  for ix in 0 ..< start:
-    result.add(' ')
-  result.add(message)

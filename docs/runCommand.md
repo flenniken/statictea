@@ -10,6 +10,7 @@ starts in the template file.
 * [newPosOr](#newposor) &mdash; Create a PosOr warning.
 * [newPosOr](#newposor-1) &mdash; Create a PosOr value.
 * [`==`](#) &mdash; Return true when a equals b.
+* [startColumn](#startcolumn) &mdash; Return enough spaces to point at the start byte position of the given text.
 * [newStatement](#newstatement) &mdash; Create a new statement.
 * [getFragmentAndPos](#getfragmentandpos) &mdash; Split up a long statement around the given position.
 * [getWarnStatement](#getwarnstatement) &mdash; Return a multiline error message.
@@ -71,6 +72,14 @@ Return true when a equals b.
 
 ```nim
 proc `==`(a: PosOr; b: PosOr): bool
+```
+
+# startColumn
+
+Return enough spaces to point at the start byte position of the given text.  This accounts for multibyte UTF-8 sequences that might be in the text.
+
+```nim
+proc startColumn(text: string; start: Natural; message: string = "^"): string
 ```
 
 # newStatement

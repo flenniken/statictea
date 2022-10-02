@@ -17,6 +17,7 @@ import readjson
 import collectCommand
 import opresultwarn
 import unicodes
+import utf8decoder
 
 const
   # Turn on showPos for testing to graphically show the start and end
@@ -59,6 +60,28 @@ proc `==`*(a: PosOr, b: PosOr): bool =
 proc `!=`*(a: PosOr, b: PosOr): bool =
   result = not (a == b)
 
+proc startColumn*(text: string, start: Natural, message: string = "^"): string =
+  ## Return enough spaces to point at the start byte position of the
+  ## given text.  This accounts for multibyte UTF-8 sequences that
+  ## might be in the text.
+  result = newStringOfCap(start + message.len)
+  var ixFirst: int
+  var ixLast: int
+  var codePoint: uint32
+  var byteCount = 0
+  var charCount = 0
+  for valid in yieldUtf8Chars(text, ixFirst, ixLast, codePoint):
+    if byteCount >= start:
+      break
+    byteCount += (ixLast - ixFirst + 1)
+    inc(charCount)
+
+  # debugEcho "charCount = " & $charCount
+  # debugEcho "byteCount = " & $byteCount
+  for ix in countUp(0, charCount-1):
+    result.add(' ')
+  result.add(message)
+
 func newStatement*(text: string, lineNum: Natural = 1,
     start: Natural = 0): Statement =
   ## Create a new statement.
@@ -71,7 +94,7 @@ func getFragmentAndPos*(statement: Statement, start: Natural):
   ## the statement.
 
   # Change the newlines and control characters to something readable
-  # and so the fragment fixs on one line.
+  # and so the fragment fits on one line.
   let text = visibleControl(statement.text)
 
   var fragment: string
@@ -109,7 +132,7 @@ when showPos:
   proc showDebugPos*(statement: Statement, start: Natural, symbol: string) =
     let (fragment, pointerPos) = getFragmentAndPos(statement, start)
     echo fragment
-    echo startColumn(pointerPos, symbol)
+    echo startColumn(fragment, pointerPos, symbol)
 
 proc getWarnStatement*(filename: string, statement: Statement,
     warningData: WarningData): string =
@@ -128,7 +151,7 @@ statement: $2
            $3""" % [
     getWarningLine(filename, statement.lineNum, warning, p1),
     fragment,
-    startColumn(pointerPos)
+    startColumn(fragment, pointerPos)
   ]
   result = message
 

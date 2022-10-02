@@ -13,6 +13,7 @@ import utf8decoder
 import sharedtestcode
 import opresultwarn
 import warnings
+import runCommand
 
 proc testParseJsonStr(text: string, start: Natural,
     eStr: string, ePos: Natural): bool =
@@ -26,9 +27,9 @@ proc testParseJsonStr(text: string, start: Natural,
   result = gotExpected($valueAndPosOr, $eValueAndPosOr)
   if not result:
     echo text
-    echo startColumn(start)
-    echo startColumn(valueAndPosOr.value.pos, "^ got")
-    echo startColumn(ePos, "^ expected")
+    echo startColumn(text, start)
+    echo startColumn(text, valueAndPosOr.value.pos, "^ got")
+    echo startColumn(text, ePos, "^ expected")
 
   var pos = validateUtf8String(valueAndPosOr.value.value.stringv)
   if pos != -1:

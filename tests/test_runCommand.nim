@@ -19,25 +19,26 @@ import codefile
 import readjson
 import comparelines
 import unicodes
+import utf8decoder
 
 proc echoValueAndPosOr(statement: Statement, start: Natural,
     valueAndPosOr: ValueAndPosOr, eValueAndPosOr: ValueAndPosOr) =
-  echo ""
+  ## Show the statement and the two values and positions so you can
+  ## visually compare them.
   echo "0123456789 123456789 123456789"
   echo statement.text
-  echo startColumn(start, "^")
+  echo startColumn(statement.text, start, "^")
   if valueAndPosOr.isValue:
-    echo startColumn(valueAndPosOr.value.pos, "^ got")
+    echo startColumn(statement.text, valueAndPosOr.value.pos, "^ got")
   else:
     echo "got:"
     echo getWarnStatement("filename", statement, valueAndPosOr.message)
 
   if eValueAndPosOr.isValue:
-    echo startColumn(eValueAndPosOr.value.pos, "^ expected")
+    echo startColumn(statement.text, eValueAndPosOr.value.pos, "^ expected")
   else:
     echo "expected:"
     echo getWarnStatement("filename", statement, eValueAndPosOr.message)
-
 
 proc testGetValueAndPos(statement: Statement, start: Natural,
     eValueAndPosOr: ValueAndPosOr, variables: Variables = nil): bool =
@@ -84,16 +85,15 @@ proc testGetMultilineStr(pattern: string, start: Natural,
   result = gotExpected($valueAndPosOr, $eValueAndPosOr)
 
   if not result:
-    echo "0123456789 123456789"
+    let statement = newStatement(text)
     echo visibleControl(text)
-    echo startColumn(start)
-    echo startColumn(valueAndPosOr.value.pos, "^ got")
-    echo startColumn(eValueAndPosOr.value.pos, "^ expected")
-
-  # var pos = validateUtf8String(literal)
-  # if pos != -1:
-  #   echo "Invalid UTF-8 bytes starting at $1." % $pos
-  #   result = false
+    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
+  else:
+    let literal = valueAndPosOr.value.value.stringv
+    var pos = validateUtf8String(literal)
+    if pos != -1:
+      echo "Invalid UTF-8 bytes starting at $1." % $pos
+      result = false
 
 proc testGetMultilineStrE(pattern: string, start: Natural,
     eWarningData: WarningData): bool =
@@ -103,6 +103,10 @@ proc testGetMultilineStrE(pattern: string, start: Natural,
   let valueAndPosOr = getMultilineStr(text, start)
   let eValueAndPosOr = newValueAndPosOr(eWarningData)
   result = gotExpected($valueAndPosOr, $eValueAndPosOr)
+  if not result:
+    let statement = newStatement(text)
+    echo visibleControl(text)
+    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
 proc getCmdLinePartsTest(env: var Env,
     commandLines: seq[string]): seq[LineParts] =
@@ -141,23 +145,6 @@ proc compareStatements(statements: seq[Statement], eContent: string): bool =
       return false
   return true
 
-proc cmpValueAndPosOr(functionName: string, statement: Statement, start: Natural,
-    g, e: ValueAndPosOr): bool =
-  ## Compare the two ValueAndPosOr objects. When different show
-  ## helpful messages.
-
-  let digits = startColumn(start, "123456789 123456789 123456789")
-  let begin = startColumn(start, "^ start")
-  let test = "$1\n$2\n$3\n$4" % [functionName, digits, statement.text, begin]
-  result = gotExpected($g, $e, test)
-  if not result and (e.isMessage or g.isMessage):
-    if g.isMessage:
-      echo "\nGot full warning:"
-      echo getWarnStatement("template.html", statement, g.message)
-    if e.isMessage:
-      echo "\nExpected full warning:"
-      echo getWarnStatement("template.html", statement, e.message)
-
 proc testGetStatements(content: string, expected: string): bool =
   ## Return true when the template content generates the expected statements.
 
@@ -181,50 +168,68 @@ proc testGetNumber(statement: Statement, start: Natural,
 
   let valueAndPosOr = getNumber(statement, start)
   result = gotExpected($valueAndPosOr, $eValueAndPosOr, statement.text)
-
   if not result:
-    echo ""
-    echo "0123456789 123456789"
-    echo statement.text
-    echo startColumn(start, "^")
-    if valueAndPosOr.isValue:
-      echo startColumn(valueAndPosOr.value.pos, "^ got")
+    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
+
+func sameNumBytesStr(text: string): Option[string] =
+  ## Create an ascii string with the same number of bytes as the given
+  ## UTF-8 string.
+  var newStr = newStringOfCap(text.len+10)
+  var ixFirst: int
+  var ixLast: int
+  var codePoint: uint32
+  var pattern = "U234"
+  for valid in yieldUtf8Chars(text, ixFirst, ixLast, codePoint):
+    if not valid:
+      # invalid UTF-8 byte sequence
+      return
+    let length = ixLast - ixFirst + 1
+    if length == 1:
+      newStr.add(text[ixFirst])
+    elif length < 1 or length > 4:
+      # A UTF-8 byte sequence is 1 to 4 bytes.
+      return
     else:
-      echo getWarnStatement("filename", statement, valueAndPosOr.message)
-    if eValueAndPosOr.isValue:
-      echo startColumn(eValueAndPosOr.value.pos, "^ expected")
-    else:
-      echo getWarnStatement("filename", statement, eValueAndPosOr.message)
+      newStr.add(pattern[0 ..< length])
+  result = some(newStr)
+
+proc testSameNumBytesStr(str: string, eStr: string): bool =
+  let stringO = sameNumBytesStr(str)
+  if not stringO.isSome:
+    echo "Invalid string"
+    return false
+  result = gotExpected(stringO.get(), eStr)
+
+proc testStartColumn(text: string, start: Natural, eStr = "", message = "^"): bool =
+  let str = startColumn(text, start, message)
+  result = gotExpected(str, eStr)
+  if not result:
+    let stringO = sameNumBytesStr(text)
+    if not stringO.isSome:
+      echo "Invalid string"
+      return false
+    echo "start = " & $start
+    echo stringO.get() & " - expanded bytes"
+    echo "0123456789 123456789 123456789"
+    echo text & " - text"
+    echo str & " - got"
+    echo eStr & " - expected"
 
 proc testGetString(statement: Statement, start: Natural,
     eValueAndPosOr: ValueAndPosOr): bool =
 
   let valueAndPosOr = getString(statement, start)
   result = gotExpected($valueAndPosOr, $eValueAndPosOr)
-
   if not result:
-    echo ""
-    echo "0123456789 123456789"
-    echo statement.text
-    if valueAndPosOr.isValue:
-      # Show a string with the same number of bytes as the UTF-8 string.
-      let length = valueAndPosOr.value.value.stringv.len
-      var str = newStringOfCap(length)
-      str.add("\"")
-      for ix in countUp(1, int(length)):
-        str.add("_")
-      str.add("\"")
-      echo startColumn(start, str)
-    echo startColumn(start, "^")
-    if valueAndPosOr.isValue:
-      echo startColumn(valueAndPosOr.value.pos, "^ got")
-    else:
-      echo getWarnStatement("filename", statement, valueAndPosOr.message)
-    if eValueAndPosOr.isValue:
-      echo startColumn(eValueAndPosOr.value.pos, "^ expected")
-    else:
-      echo getWarnStatement("filename", statement, eValueAndPosOr.message)
+    let numBytesStrO = sameNumBytesStr(statement.text)
+    if not numBytesStrO.isSome:
+      echo "invalid string"
+      return false
+    let numBytesStr = numBytesStrO.get()
+    if numBytesStr != statement.text:
+      echo numBytesStr
 
+    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
 proc testGetStringInvalid(buffer: seq[uint8]): bool =
   let str = bytesToString(buffer)
@@ -232,7 +237,9 @@ proc testGetStringInvalid(buffer: seq[uint8]): bool =
   let start = 4
   let valueAndPosOr = getString(statement, start)
   let eValueAndPosOr = newValueAndPosOr(wInvalidUtf8ByteSeq, "23", 23)
-  result = cmpValueAndPosOr("getString", statement, start, valueAndPosOr, eValueAndPosOr)
+  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
+  if not result:
+    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
 proc testWarnStatement(statement: Statement,
     warning: MessageId, start: Natural, p1: string="",
@@ -295,15 +302,15 @@ proc testSkipArgument(text: string, startPos: Natural, ePosOr: PosOr): bool =
     echo "          10        20        30        40"
     echo "0123456789 123456789 123456789 123456789 123456789"
     echo text
-    echo startColumn(startPos, "^ start")
+    echo startColumn(text, startPos, "^ start")
     if posOr.isValue:
-      echo startColumn(posOr.value, "^ got")
+      echo startColumn(text, posOr.value, "^ got")
     else:
-      echo startColumn(posOr.message.pos, "^ got")
+      echo startColumn(text, posOr.message.pos, "^ got")
     if ePosOr.isValue:
-      echo startColumn(ePosOr.value, "^ expected")
+      echo startColumn(text, ePosOr.value, "^ expected")
     else:
-      echo startColumn(ePosOr.message.pos, "^ expected")
+      echo startColumn(text, ePosOr.message.pos, "^ expected")
 
 proc testGetCondition(text: string, start: Natural, eBool: bool, ePos: Natural): bool =
   let funcsVarDict = createFuncDictionary().dictv
@@ -328,6 +335,51 @@ proc testGetConditionWarn(text: string, start: Natural, eWarning: MessageId,
     echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
 suite "runCommand.nim":
+  test "startColumn":
+    check testStartColumn("abcdefghij", 0, "^")
+    check testStartColumn("abcdefghij", 1, " ^")
+    check testStartColumn("abcdefghij", 2, "  ^")
+    check testStartColumn("abcdefghij", 2, "  ", "")
+    check testStartColumn("abcdefghij", 2, "  ^ start", "^ start")
+    let twoBytes = bytesToString(@[0xc3u8, 0xb1])
+    let threeBytes = bytesToString(@[0xe2u8, 0x82, 0xa1])
+    let fourBytes = bytesToString(@[0xf0u8, 0x90, 0x8c, 0xbc])
+    check testStartColumn(twoBytes & "abcdefghij", 0, "^")
+    check testStartColumn(twoBytes & "abcdefghij", 1, " ^")
+    check testStartColumn(twoBytes & "abcdefghij", 2, " ^")
+    check testStartColumn(twoBytes & "abcdefghij", 3, "  ^")
+    check testStartColumn(twoBytes & "abcdefghij", 4, "   ^")
+    let text = "abc" & twoBytes & "de" & threeBytes & "fg" & fourBytes & "h"
+    check testStartColumn(text, 0, "^")
+    check testStartColumn(text, 2, "  ^")
+    check testStartColumn(text, 3, "   ^")
+    check testStartColumn(text, 4, "    ^")
+    check testStartColumn(text, 5, "    ^")
+    check testStartColumn(text, 6, "     ^")
+    check testStartColumn(text, 7, "      ^")
+    check testStartColumn(text, 8, "       ^")
+    check testStartColumn(text, 9, "       ^")
+    check testStartColumn(text, 10, "       ^")
+    check testStartColumn(text, 11, "        ^")
+    check testStartColumn(text, 12, "         ^")
+    check testStartColumn(text, 13, "          ^")
+    check testStartColumn(text, 14, "          ^")
+    check testStartColumn(text, 15, "          ^")
+    check testStartColumn(text, 16, "          ^")
+    let fragment = """a = "₡ invalid \4 slashed " # test"""
+    check testStartColumn(fragment, 18, "                ^")
+
+  test "sameNumBytesStr":
+    check testSameNumBytesStr("", "")
+    check testSameNumBytesStr("a", "a")
+    check testSameNumBytesStr("abc", "abc")
+    let twoBytes = bytesToString(@[0xc3u8, 0xb1])
+    let threeBytes = bytesToString(@[0xe2u8, 0x82, 0xa1])
+    let fourBytes = bytesToString(@[0xf0u8, 0x90, 0x8c, 0xbc])
+    check testSameNumBytesStr(twoBytes, "U2")
+    check testSameNumBytesStr(threeBytes, "U23")
+    check testSameNumBytesStr(fourBytes, "U234")
+    check testSameNumBytesStr("abc" & twoBytes & "def", "abcU2def")
 
   test "stripNewline":
     check stripNewline("") == ""
@@ -500,7 +552,6 @@ $$ : c = len("hello")
     check testGetString(statement, 4, newValueAndPosOr(str, 8))
 
   test "getString three bytes":
-
     let str = bytesToString(@[0xe2u8, 0x82, 0xa1])
     let statement = newStatement("""a = "$1"""" % str)
     check testGetString(statement, 4, newValueAndPosOr(str, 9))
@@ -509,6 +560,11 @@ $$ : c = len("hello")
     let str = bytesToString(@[0xf0u8, 0x90, 0x8c, 0xbc])
     let statement = newStatement("""a = "$1"""" % str)
     check testGetString(statement, 4, newValueAndPosOr(str, 10))
+
+  test "getString invalid after multibytes":
+    let threeBytes = bytesToString(@[0xe2u8, 0x82, 0xa1])
+    let statement = newStatement("""a = "$1 invalid \4 slashed " # test""" % threeBytes)
+    check testGetString(statement, 4, newValueAndPosOr(wNotPopular, "", 18))
 
   test "getString invalid ff":
     check testGetStringInvalid(@[0xffu8])
@@ -770,12 +826,6 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let statement = newStatement(text="a# = 5", lineNum=1, 0)
     let eVariableDataOr = newVariableDataOr(wInvalidVariable, "", 1)
     check testRunStatement(statement, eVariableDataOr)
-
-  test "startColumn":
-    check startColumn(0) == "^"
-    check startColumn(1) == " ^"
-    check startColumn(2) == "  ^"
-    check startColumn(3) == "   ^"
 
   test "one quote":
     let statement = newStatement(text="""  quote = "\""   """, lineNum=1, 0)
@@ -1431,4 +1481,3 @@ White$1
     #                         0123456789 123456789
     check testSkipArgument("""a = fn(fn2(b,fn3()""", 7, newPosOr(wNoMatchingParen, "", 18))
     check testSkipArgument("""a = fn("tea""", 7, newPosOr(wNotEnoughCharacters, "", 11))
-
