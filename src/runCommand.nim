@@ -470,17 +470,18 @@ proc ifFunctions*(
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list=false): ValueAndPosOr =
+    list=false, bare=false): ValueAndPosOr =
   ## Return the if/if0 function's value and position after. It
   ## conditionally runs one of its arguments and skips the
   ## other. Start points at the first argument of the function. The
   ## position includes the trailing whitespace after the ending ).
 
+  # The three parameter if requires an assignment.  The two parameter
+  # version cannot have an assignment.
+
   # cases:
   #   a = if(cond, then, else)
   #          ^                ^
-  #   a = if(cond, then) #
-  #          ^           ^
   #   if(cond, then)
   #      ^          ^
   # The if function cond is a boolean, for if0 it is anything.
@@ -523,14 +524,18 @@ proc ifFunctions*(
   # Match the comma and whitespace.
   let commaO = matchSymbol(statement.text, gComma, runningPos)
   if not commaO.isSome:
-    # Expected two or three arguments.
-    return newValueAndPosOr(wTwoOrThreeParams, "", start)
+    if bare:
+      # "An if without an assignment takes two arguments.
+      return newValueAndPosOr(wBareIfTwoArguments, "", start)
+    else:
+      # An if with an assignment takes three arguments.
+      return newValueAndPosOr(wAssignmentIf, "", start)
   runningPos += commaO.get().length
 
   # Handle the second parameter.
   var vl2Or: ValueAndPosOr
   var skip = (condition == false)
-  
+
   if skip:
     let posOr = skipArg(statement, runningPos)
     if posOr.isMessage:
@@ -546,6 +551,10 @@ proc ifFunctions*(
   # Match the comma and whitespace.
   let cO = matchSymbol(statement.text, gComma, runningPos)
   if cO.isSome:
+    if bare:
+      # A bare if statement takes to arguments.
+      return newValueAndPosOr(wBareIfTwoArguments, "", runningPos)
+
     # We got a comma so we expect a third parameter.
     runningPos += cO.get().length
 
@@ -562,9 +571,9 @@ proc ifFunctions*(
         return vl3Or
       runningPos = vl3Or.value.pos
   else:
-    # The third parameter is optional. When it dosn't exist use 0 for
-    # it.
-    vl3Or = newValueAndPosOr(newValue(0), 0)
+    if not bare:
+      # An if with an assignment takes three arguments.
+      return newValueAndPosOr(wAssignmentIf, "", runningPos)
 
   # Match ) and trailing whitespace.
   let parenO = matchSymbol(statement.text, gRightParentheses, runningPos)
@@ -573,12 +582,15 @@ proc ifFunctions*(
     return newValueAndPosOr(wTwoOrThreeParams, "", runningPos)
   runningPos += parenO.get().length
 
-  var value: Value
-  if condition:
-    value = vl2Or.value.value
+  if bare:
+    result = newValueAndPosOr(newValue(0), runningPos)
   else:
-    value = vl3Or.value.value
-  result = newValueAndPosOr(value, runningPos)
+    var value: Value
+    if condition:
+      value = vl2Or.value.value
+    else:
+      value = vl3Or.value.value
+    result = newValueAndPosOr(value, runningPos)
 
 proc andOrFunctions*(
     functionName: string,
@@ -627,7 +639,7 @@ proc andOrFunctions*(
       return newValueAndPosOr(posOr.message)
     afterSecond = posOr.value
     secondValue = newValue(0)
-  else:    
+  else:
     let vl2Or = getValueAndPos(statement, runningPos, variables)
     if vl2Or.isMessage or vl2Or.value.exit:
       return vl2Or
@@ -1067,7 +1079,7 @@ proc runStatement*(statement: Statement, variables: Variables):
 
   if leftParen == "(" and dotNameStr in ["if0", "if"]:
     # Handle the special bare if functions.
-    vlOr = ifFunctions(dotNameStr, statement, leadingLen, variables)
+    vlOr = ifFunctions(dotNameStr, statement, leadingLen, variables, bare=true)
   else:
     # Handle normal "varName operator right" statements.
     varName = dotNameStr

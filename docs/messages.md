@@ -225,7 +225,9 @@ MessageId = enum
   wNotEnoughCharacters,     ## w208
   wNoMatchingBracket,       ## w209
   wInvalidCharacter,        ## w210
-  wInvalidFirstArgChar       ## w211
+  wInvalidFirstArgChar,     ## w211
+  wAssignmentIf,            ## w212
+  wBareIfTwoArguments        ## w213
 ```
 
 # Messages
@@ -445,7 +447,9 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Ran out of characters before finishing the statement.", ## wNotEnoughCharacters
     "No matching end right bracket.", ## wNoMatchingBracket
     "Invalid character.",   ## wInvalidCharacter
-    "Invalid first character of the argument."]
+    "Invalid first character of the argument.", ## wInvalidFirstArgChar
+    "An if with an assignment takes three arguments.", ## wAssignmentIf
+    "An if without an assignment takes two arguments."]
 ```
 
 

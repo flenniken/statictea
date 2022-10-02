@@ -1364,7 +1364,7 @@ $$ endblock
   test "return short circuit 3":
     let templateContent = """
 $$ block t.repeat = 2
-$$ : a = if0(t.row, return("skip"))
+$$ : if0(t.row, return("skip"))
 return short circuit
 $$ endblock
 """
@@ -1377,7 +1377,7 @@ $$ endblock
   test "return short circuit 4":
     let templateContent = """
 $$ block t.repeat = 3
-$$ : a = if0(cmp(1,t.row), return("stop"))
+$$ : if0(cmp(1,t.row), return("stop"))
 {t.row}) return short circuit
 $$ endblock
 """
@@ -1390,7 +1390,7 @@ $$ endblock
   test "return short circuit 5":
     let templateContent = """
 $$ block t.repeat = 3
-$$ : a = if0(cmp(1,t.row), return("skip"))
+$$ : if0(cmp(1,t.row), return("skip"))
 {t.row}) return short circuit
 $$ endblock
 """
@@ -1404,8 +1404,8 @@ $$ endblock
   test "return short circuit 6":
     let templateContent = """
 $$ block t.repeat = 3
-$$ : a = if0(t.row, return(""))
-$$ : b = if0(t.row, warn("not hit"))
+$$ : if0(t.row, return(""))
+$$ : if0(t.row, warn("not hit"))
 {t.row}) return short circuit
 $$ endblock
 """
@@ -1420,19 +1420,17 @@ $$ endblock
   test "return short circuit 7":
     let templateContent = """
 $$ block t.repeat = 3
-$$ : a = if0(cmp(1, t.row), return(""))
-$$ : b = if0(cmp(1,t.row), warn("not hit"))
-{t.row}) a={a} b={b}
+$$ : if((t.row == 1), return("skip"))
+$$ : if((t.row == 2), warn("row 2 warning"))
+{t.row}
 $$ endblock
 """
     let eResultLines = @[
-      "0) a=0 b=0\n",
-      "1) a={a} b={b}\n",
-      "2) a=0 b=0\n",
+      "0\n",
+      "2\n"
     ]
     let eErrLines = @[
-      "template.html(4): w58: The replacement variable doesn't exist: a.\n",
-      "template.html(4): w58: The replacement variable doesn't exist: b.\n"
+      "template.html(3): row 2 warning\n"
     ]
     check testProcessTemplate(templateContent = templateContent,
       eResultLines = eResultLines, eErrLines = eErrLines, eRc = 1)

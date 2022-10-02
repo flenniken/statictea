@@ -25,26 +25,22 @@ $$ block
 $$ : drink1 = if0(0, "tea", "beer")
 $$ : drink2 = if0(1, "tea", "beer")
 $$ : drink3 = if0(4, "tea", "beer")
-$$ : drink4 = if0(0, "tea")
-$$ : drink5 = if0(8, "tea")
+$$ : if0(0, "tea")
+$$ : if0(8, "tea")
 drink1: {drink1} = tea
 drink2: {drink2} = beer
 drink3: {drink3} = beer
-drink4: {drink4} = tea
-drink5: {drink5} = 0
 $$ endblock
 
 $$ block
 $$ : drink1 = if0(1, "tea", "beer")
 $$ : drink2 = if0(0, "tea", "beer")
 $$ : drink3 = if0(4, "tea", "beer")
-$$ : drink4 = if0(1, "tea")
-$$ : drink5 = if0(0, "tea")
+$$ : if0(1, "tea")
+$$ : if0(0, "tea")
 drink1: {drink1} = beer
 drink2: {drink2} = tea
 drink3: {drink3} = beer
-drink4: {drink4} = 0
-drink5: {drink5} = tea
 $$ endblock
 
 Warn that c is 0.
@@ -58,6 +54,10 @@ $$ block c = 1
 $$ : if0(cmp(1,c), warn("c is 1"))
 $$ : if0(c, warn("not hit"))
 $$ endblock
+
+$$ nextline a = if(true, 1)
+$$ : if(true, 1, 2)
+assignment or not
 ~~~
 
 ### File result.expected
@@ -66,18 +66,16 @@ $$ endblock
 drink1: tea = tea
 drink2: beer = beer
 drink3: beer = beer
-drink4: tea = tea
-drink5: 0 = 0
 
 drink1: beer = beer
 drink2: tea = tea
 drink3: beer = beer
-drink4: 0 = 0
-drink5: tea = tea
 
 Warn that c is 0.
 
 Warn that c is 1.
+
+assignment or not
 ~~~
 
 ### File stdout.expected
@@ -88,8 +86,14 @@ Warn that c is 1.
 ### File stderr.expected
 
 ~~~
-tmpl.txt(29): c is 0
-tmpl.txt(35): c is 1
+tmpl.txt(25): c is 0
+tmpl.txt(31): c is 1
+tmpl.txt(35): w212: An if with an assignment takes three arguments.
+statement: a = if(true, 1)
+                         ^
+tmpl.txt(36): w213: An if without an assignment takes two arguments.
+statement: if(true, 1, 2)
+                     ^
 ~~~
 
 ### Expected result == result.expected

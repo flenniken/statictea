@@ -188,7 +188,7 @@ Return the if/if0 function's value and position after. It conditionally runs one
 
 ```nim
 proc ifFunctions(functionName: string; statement: Statement; start: Natural;
-                 variables: Variables; list = false): ValueAndPosOr
+                 variables: Variables; list = false; bare = false): ValueAndPosOr
 ```
 
 # andOrFunctions

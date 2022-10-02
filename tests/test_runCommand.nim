@@ -278,7 +278,16 @@ proc testRunStatement(statement: Statement, eVariableDataOr: VariableDataOr, var
   else:
     vars = variables
   let variableDataOr = runStatement(statement, vars)
-  result = gotExpected($variableDataOr, $eVariableDataOr, statement.text)
+  result = gotExpected($variableDataOr, $eVariableDataOr)
+  if not result:
+    echo statement.text
+    if variableDataOr.isMessage:
+      echo "got:"
+      echo getWarnStatement("filename", statement, variableDataOr.message)
+    if eVariableDataOr.isMessage:
+      echo "expected:"
+      echo getWarnStatement("filename", statement, eVariableDataOr.message)
+
 
 proc testRunBoolOp(left: bool | Value, op: string, right: bool | Value, eValue: Value): bool =
   let value = runBoolOp(newValue(left), op, newValue(right))
@@ -957,16 +966,16 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr("a", "=", newValue(3))
     check testRunStatement(statement, eVariableDataOr)
 
-  test "if0 two parameters no match":
+  test "if0 two arguments":
     let text = """a = if0(2, "abc")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(0))
+    let eVariableDataOr = newVariableDataOr(wAssignmentIf, "", 16)
     check testRunStatement(statement, eVariableDataOr)
 
-  test "if0 two parameters match":
+  test "if assignment takes 3 args":
     let text = """a = if0(0, "abc")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue("abc"))
+    let eVariableDataOr = newVariableDataOr(wAssignmentIf, "", 16)
     check testRunStatement(statement, eVariableDataOr)
 
   test "warn syntax error":
@@ -1047,10 +1056,10 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr("", "exit", newValue("stop"))
     check testRunStatement(statement, eVariableDataOr)
 
-  test "return no stop":
+  test "if assignment takes three args":
     let text = """a = if0(1, return("stop"))"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(0))
+    let eVariableDataOr = newVariableDataOr(wAssignmentIf, "", 25)
     check testRunStatement(statement, eVariableDataOr)
 
   test "return no stop":
@@ -1089,16 +1098,16 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr("", "", newValue(0))
     check testRunStatement(statement, eVariableDataOr)
 
-  test "bare if":
+  test "bare if takes two args":
     let text = """if0(0, "second", "third")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", "", newValue("second"))
+    let eVariableDataOr = newVariableDataOr(wBareIfTwoArguments, "", 15)
     check testRunStatement(statement, eVariableDataOr)
 
   test "bare if third":
     let text = """if0(1, "second", "third")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", "", newValue("third"))
+    let eVariableDataOr = newVariableDataOr(wBareIfTwoArguments, "", 15)
     check testRunStatement(statement, eVariableDataOr)
 
   test "bare extra":
