@@ -1386,8 +1386,8 @@ function, to get information about it, and to pass it around.
 
 You create a func variable from an existing func variable.
 
-All the functions exist in the f dictionary by name. Their value
-is a list of func values with the same name.
+All the functions exist in the f dictionary by name. The
+dictionary value is a list of func values with the same name.
 
 In the following example the “a” func variable is defined to be
 equal to the second built in cmp function.
@@ -1428,6 +1428,34 @@ it first in the l dictionary then the f dictionary.
 
 #+BEGIN_SRC
 a = cmp
+#+END_SRC
+
+When a name has more than one function assigned to it is called
+overloaded.  When none of the overloaded functions match the
+passed arguments, statictea shows a different message depending
+on whether any of the signatures matched the first argument or
+not.
+
+When the first argument doesn't match any signatures, you get a
+message saying that. Otherwise, the function that matches the
+most arguments is returned and the error message applies to
+it. The next examples show both cases. Notice for the cmp(1, 4.5)
+case the 1 matches the first parameter of "cmp(int, int) int" so
+the error message expects an int for the second parameter too.
+
+#+BEGIN_SRC
+shared.tea(1): w207: None of the 3 functions matched the first argument.
+statement: o.a = cmp(l, f)
+                     ^
+o.b = cmp(1, 4.5)
+shared.tea(2): w120: Wrong argument type, expected int.
+statement: o.b = cmp(1, 4.5)
+                        ^
+o.c = cmp(1.9, 5)
+shared.tea(2): w120: Wrong argument type, expected float.
+statement: o.b = cmp(1.9, 5)
+                          ^
+
 #+END_SRC
 
 [[#contents][茶]]
