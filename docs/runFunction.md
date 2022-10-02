@@ -15,8 +15,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funLen_di](#funlen_di) &mdash; Number of elements in a dictionary.
 * [funGet_lioaa](#funget_lioaa) &mdash; Get a list value by its index.
 * [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
-* [funIf0_iaoaa](#funif0_iaoaa) &mdash; If the condition is 0, return the second parameter, else return the third parameter.
-* [funIf_baoaa](#funif_baoaa) &mdash; If the condition is true, return the second parameter, else return the third parameter.
+* [funIf0_iaoaa](#funif0_iaoaa) &mdash; If the condition is 0, return the second argument, else return the third argument.
+* [funIf_baoaa](#funif_baoaa) &mdash; If the condition is true, return the second argument, else return the third argument.
 * [funAdd_iii](#funadd_iii) &mdash; Add two integers.
 * [funAdd_fff](#funadd_fff) &mdash; Add two floats.
 * [funExists_dsb](#funexists_dsb) &mdash; Determine whether a key exists in a dictionary.
@@ -293,7 +293,9 @@ func funGet_dsoaa(variables: Variables; parameters: seq[Value]): FunResult
 
 # funIf0_iaoaa
 
-If the condition is 0, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter. You can use any type for the condition, strings, lists and dictionaries use their length.
+If the condition is 0, return the second argument, else return the third argument.  You can use any type for the condition.  The condition is 0 for strings, lists and dictionaries when their length is 0.
+
+The condition types and what is considered 0:
 
 * bool -- false
 * int -- 0
@@ -307,34 +309,29 @@ The if functions are special in a couple of ways, see
 [[#if-functions][If Functions]]
 
 ~~~
-if0(condition: any, then: any, optional else: any) any
+if0(condition: any, then: any, else: any) any
+if0(condition: any, then: any)
 ~~~~
 
 Examples:
 
 ~~~
-if0(0, "tea", "beer") => tea
-if0(1, "tea", "beer") => beer
-if0(4, "tea", "beer") => beer
-if0("", "tea", "beer") => tea
-if0("abc", "tea", "beer") => beer
-if0([], "tea", "beer") => tea
-if0([1,2], "tea", "beer") => beer
-if0(dict(), "tea", "beer") => tea
-if0(dict("a",1), "tea", "beer") => beer
-if0(false, "tea", "beer") => tea
-if0(true, "tea", "beer") => beer
-~~~~
-
-No third parameter examples:
-
-~~~
-if0(0, "tea") => tea
-if0(4, "tea") => 0
+a = if0(0, "tea", "beer") => tea
+a = if0(1, "tea", "beer") => beer
+a = if0(4, "tea", "beer") => beer
+a = if0("", "tea", "beer") => tea
+a = if0("abc", "tea", "beer") => beer
+a = if0([], "tea", "beer") => tea
+a = if0([1,2], "tea", "beer") => beer
+a = if0(dict(), "tea", "beer") => tea
+a = if0(dict("a",1), "tea", "beer") => beer
+a = if0(false, "tea", "beer") => tea
+a = if0(true, "tea", "beer") => beer
 ~~~~
 
 You don't have to assign the result of an if0 function which is
 useful when using a warn or return function for its side effects.
+The if takes two arguments when there is no assignment.
 
 ~~~
 c = 0
@@ -347,10 +344,12 @@ func funIf0_iaoaa(variables: Variables; parameters: seq[Value]): FunResult
 
 # funIf_baoaa
 
-If the condition is true, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter.
+If the condition is true, return the second argument, else return the third argument.
 
-The if functions are special in a couple of ways, see
+- The if functions are special in a couple of ways, see
 [[#if-functions][If Functions]]
+- You usually use boolean expressions for the condition, see:
+[[#boolean-expressions][Boolean Expressions]]
 
 ~~~
 if(condition: bool, then: any, optional else: any) any
@@ -359,23 +358,18 @@ if(condition: bool, then: any, optional else: any) any
 Examples:
 
 ~~~
-if(true, "tea", "beer") => tea
-if(false, "tea", "beer") => beer
-~~~~
-
-No third parameter examples:
-
-~~~
-if(true, "tea") => tea
-if(false, "tea") => 0
+a = if(true, "tea", "beer") => tea
+b = if(false, "tea", "beer") => beer
+c = if((d < 5), "tea", "beer") => beer
 ~~~~
 
 You don't have to assign the result of an if function which is
 useful when using a warn or return function for its side effects.
+The if takes two arguments when there is no assignment.
 
 ~~~
-c = true
 if(c, warn("c is true"))
+if(c, return("skip"))
 ~~~~
 
 ```nim

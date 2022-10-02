@@ -1,7 +1,8 @@
 #+TITLE: StaticTea
 A template processor and language.
 
-StaticTea produces a file from a template and json data.
+StaticTea produces a file from a template and optional json and
+code files.
 
 Example hello world html template:
 
@@ -561,8 +562,8 @@ $$ : # comment
 
 You use variables to add variable content to your template in its
 replacement blocks. A string variable gets replaced with its
-value, a function with its name and the other variable types get
-replaced with their json equivalent.
+value, a function variable with its name, and the other variable
+types get replaced with their json equivalent.
 
 In the example below, "name" and "teas" are variables that are
 defined in the command. Both variables are used in the
@@ -1404,11 +1405,11 @@ b = a(4, 7) => -1
 You can have multiple functions with the same name as long as
 their signatures differ.
 
-There are four cmp functions so the f dictionary value for it is
-a list of four function variables:
+There are three cmp functions so the f dictionary value for it is
+a list of three function variables:
 
 #+BEGIN_SRC
-cmp => [func, func, func, func]
+cmp => [func, func, func]
 #+END_SRC
 
 You can call a list of func variables. The function called is
@@ -1846,18 +1847,27 @@ if0(len(s.items), warn("no items"))
    :END:
 
 The if and if0 functions are special in a couple of ways. They
-conditionally evaluate there arguments and they can be used in a
-statement bare without an assignment.
+conditionally evaluate their arguments and they can be used in a
+statement without an assignment.
 
-You use the bare form with the warn and return functions for
-their side effects.
+There are two forms, one with assignment and one without. The
+assignment form has three parameters and the other one has two.
+Here is an example of each:
 
-The functions evaluates the condition parameter first to
-determine which parameter to evaluate next and the non-matching
-parameter is skipped.  This is important when you use the warn or
-return functions to control the statement flow.  The other
-functions evaluate all their arguments before passing them to the
-function.
+#+BEGIN_SRC
+a = if(true, 1, 2)
+if(c, warn("c is true")
+#+END_SRC
+
+The no assignment form is uses with the warn and return functions
+for their side effects.
+
+The if functions evaluates their condition argument first to
+determine which argument to evaluate next and the non-matching
+argument is skipped. This is important when you use the warn or
+return functions to control the statement flow and it is
+different from the other functions which evaluate all their
+arguments before passing them to the function.
 
 In the following example do1 is executed and doOther is skipped.
 
@@ -1876,8 +1886,8 @@ The warn and return functions modify the statement flow.  The
 warn function skips the current statement and the return function
 ends the current block.
 
-The next example is a bare if.  It generates a warning when cond
-is true.
+The next example is an if without an assignment.  It generates a
+warning when cond is true.
 
 #+BEGIN_SRC
 if(s.cond, warn("s.cond is true"))
@@ -2234,8 +2244,8 @@ List of functions:
 - [[#gt][gt]] -- Return true when the a is greater than b.
 - [[#gte][gte]] -- Return true when the a is greater than to equal to b.
 - [[#gte][gte]] -- Return true when the a is greater than or equal to b.
-- [[#if0][if0]] -- If the condition is 0, return the second parameter, else return the third parameter.
-- [[#if][if]] -- If the condition is true, return the second parameter, else return the third parameter.
+- [[#if0][if0]] -- If the condition is 0, return the second argument, else return the third argument.
+- [[#if][if]] -- If the condition is true, return the second argument, else return the third argument.
 - [[#int][int]] -- Create an int from a float.
 - [[#int][int]] -- Create an int from a number string.
 - [[#int][int]] -- Create an int from a number string.
@@ -3001,7 +3011,9 @@ gte(3, 3) => true
 :CUSTOM_ID: if0
 :END:
 
-If the condition is 0, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter. You can use any type for the condition, strings, lists and dictionaries use their length.
+If the condition is 0, return the second argument, else return the third argument.  You can use any type for the condition.  The condition is 0 for strings, lists and dictionaries when their length is 0.
+
+The condition types and what is considered 0:
 
 - bool -- false
 - int -- 0
@@ -3015,34 +3027,29 @@ The if functions are special in a couple of ways, see
 [[#if-functions][If Functions]]
 
 #+BEGIN_SRC
-if0(condition: any, then: any, optional else: any) any
+if0(condition: any, then: any, else: any) any
+if0(condition: any, then: any)
 #+END_SRC
 
 Examples:
 
 #+BEGIN_SRC
-if0(0, "tea", "beer") => tea
-if0(1, "tea", "beer") => beer
-if0(4, "tea", "beer") => beer
-if0("", "tea", "beer") => tea
-if0("abc", "tea", "beer") => beer
-if0([], "tea", "beer") => tea
-if0([1,2], "tea", "beer") => beer
-if0(dict(), "tea", "beer") => tea
-if0(dict("a",1), "tea", "beer") => beer
-if0(false, "tea", "beer") => tea
-if0(true, "tea", "beer") => beer
-#+END_SRC
-
-No third parameter examples:
-
-#+BEGIN_SRC
-if0(0, "tea") => tea
-if0(4, "tea") => 0
+a = if0(0, "tea", "beer") => tea
+a = if0(1, "tea", "beer") => beer
+a = if0(4, "tea", "beer") => beer
+a = if0("", "tea", "beer") => tea
+a = if0("abc", "tea", "beer") => beer
+a = if0([], "tea", "beer") => tea
+a = if0([1,2], "tea", "beer") => beer
+a = if0(dict(), "tea", "beer") => tea
+a = if0(dict("a",1), "tea", "beer") => beer
+a = if0(false, "tea", "beer") => tea
+a = if0(true, "tea", "beer") => beer
 #+END_SRC
 
 You don't have to assign the result of an if0 function which is
 useful when using a warn or return function for its side effects.
+The if takes two arguments when there is no assignment.
 
 #+BEGIN_SRC
 c = 0
@@ -3056,10 +3063,12 @@ if0(c, warn("got zero value"))
 :CUSTOM_ID: if
 :END:
 
-If the condition is true, return the second parameter, else return the third parameter. Return 0 for the else case when there is no third parameter.
+If the condition is true, return the second argument, else return the third argument.
 
-The if functions are special in a couple of ways, see
+- The if functions are special in a couple of ways, see
 [[#if-functions][If Functions]]
+- You usually use boolean expressions for the condition, see:
+[[#boolean-expressions][Boolean Expressions]]
 
 #+BEGIN_SRC
 if(condition: bool, then: any, optional else: any) any
@@ -3068,23 +3077,18 @@ if(condition: bool, then: any, optional else: any) any
 Examples:
 
 #+BEGIN_SRC
-if(true, "tea", "beer") => tea
-if(false, "tea", "beer") => beer
-#+END_SRC
-
-No third parameter examples:
-
-#+BEGIN_SRC
-if(true, "tea") => tea
-if(false, "tea") => 0
+a = if(true, "tea", "beer") => tea
+b = if(false, "tea", "beer") => beer
+c = if((d < 5), "tea", "beer") => beer
 #+END_SRC
 
 You don't have to assign the result of an if function which is
 useful when using a warn or return function for its side effects.
+The if takes two arguments when there is no assignment.
 
 #+BEGIN_SRC
-c = true
 if(c, warn("c is true"))
+if(c, return("skip"))
 #+END_SRC
 
 [[#contents][茶]]
