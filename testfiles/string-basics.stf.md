@@ -12,7 +12,7 @@ Run statictea template tmpl.txt:
 $statictea \
   -l log.txt \
   -s server.json \
-  -j shared.json \
+  -s shared.json \
   -t tmpl.txt \
   -r result.html >stdout 2>stderr
 ~~~
@@ -94,8 +94,8 @@ $$ : - \t -> tab (U+0009)\n"
 
 ~~~
 {
-  "name": "shared",
-  "type": "json"
+  "name2": "shared",
+  "type2": "json"
 }
 ~~~
 

@@ -13,20 +13,20 @@ proc compareArgs(argsOrMessage: ArgsOrMessage, eCmlArgs: CmlArgs): bool =
   let cmlArgs = argsOrMessage.args
   if cmlArgs.len != eCmlArgs.len:
     echo "The two CmlArgs have a different number of items:"
-    echo "expected: $1" % $eCmlArgs.len
     echo "     got: $1" % $cmlArgs.len
+    echo "expected: $1" % $eCmlArgs.len
     result = false
 
   for eKey, eValue in pairs(eCmlArgs):
     if not (eKey in cmlArgs):
-      echo "expected: $1" % eKey
       echo "     got: nothing"
+      echo "expected: $1" % eKey
       result = false
       continue
     let value = cmlArgs[eKey]
     if value != eValue:
-      echo "expected: $1 = $2" % [eKey, $eValue]
       echo "     got: $1 = $2" % [eKey, $value]
+      echo "expected: $1 = $2" % [eKey, $eValue]
       result = false
 
 proc testCmdlineMessage(options: seq[CmlOption], line: string,
@@ -108,6 +108,29 @@ suite "cmdline.nim":
     eCmlArgs["help"] = newSeq[string]()
     check compareArgs(argsOrMessage, eCmlArgs)
 
+  test "-l":
+    let parameters = @["-l", "-t", "template.html"]
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("help", 'h', cmlStopArgument))
+    options.add(newCmlOption("version", 'v', cmlStopArgument))
+    options.add(newCmlOption("update", 'u', cmlNoArgument))
+
+    options.add(newCmlOption("log", 'l', cmlOptionalArgument))
+    options.add(newCmlOption("repl", 'x', cmlOptionalArgument))
+
+    options.add(newCmlOption("server", 's', cmlArgumentMany))
+    options.add(newCmlOption("code", 'o', cmlArgumentMany))
+    options.add(newCmlOption("prepost", 'p', cmlArgumentMany))
+
+    options.add(newCmlOption("template", 't', cmlArgument0or1))
+    options.add(newCmlOption("result", 'r', cmlArgument0or1))
+    let argsOrMessage = cmdLine(options, parameters)
+
+    var eCmlArgs: CmlArgs
+    eCmlArgs["log"] = newSeq[string]()
+    eCmlArgs["template"] = @["template.html"]
+    check compareArgs(argsOrMessage, eCmlArgs)
+
   test "--help --log":
     let parameterSets = [
       ["--help", "--log"],
@@ -143,12 +166,12 @@ suite "cmdline.nim":
   test "--server server.json --shared shared.json":
     let parameterSets = [
       ["--server", "server.json", "--shared", "shared.json"],
-      ["-s", "server.json", "-j", "shared.json"],
+      ["-s", "server.json", "-o", "shared.json"],
     ]
     for parameters in parameterSets:
       var options = newSeq[CmlOption]()
       options.add(newCmlOption("server", 's', cmlArgumentMany))
-      options.add(newCmlOption("shared", 'j', cmlArgumentMany))
+      options.add(newCmlOption("shared", 'o', cmlArgumentMany))
       let argsOrMessage = cmdLine(options, parameters)
 
       var eCmlArgs: CmlArgs

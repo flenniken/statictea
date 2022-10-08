@@ -67,9 +67,7 @@ proc parseCommandLine*(argv: seq[string]): ArgsOr =
   options.add(newCmlOption("log", 'l', cmlOptionalArgument))
   options.add(newCmlOption("repl", 'x', cmlOptionalArgument))
 
-  # todo: use j for server?
   options.add(newCmlOption("server", 's', cmlArgumentMany))
-  options.add(newCmlOption("shared", 'j', cmlArgumentMany))
   options.add(newCmlOption("code", 'o', cmlArgumentMany))
   options.add(newCmlOption("prepost", 'p', cmlArgumentMany))
 

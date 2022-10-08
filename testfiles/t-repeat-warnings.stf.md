@@ -10,7 +10,7 @@ Test t repeat warnings.
 $statictea \
   -l log.txt \
   -s server.json \
-  -j shared.json \
+  -s shared.json \
   -t tmpl.txt \
   -r result.html >stdout 2>stderr
 ~~~
@@ -88,8 +88,8 @@ after
 
 ~~~
 {
-  "name": "shared",
-  "type": "json"
+  "name2": "shared",
+  "type2": "json"
 }
 ~~~
 

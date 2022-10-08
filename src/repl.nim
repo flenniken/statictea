@@ -2,83 +2,92 @@
 ## Run evaluate print loop (REPL).
 
 import std/rdstdin
+import std/options
 import warnings
 import env
 import vartypes
 import args
 import opresultwarn
-
-type
-  ReplLineKind = enum
-    rlHelp,
-    rlQuit,
-    rlPrintRbVar,
-    rlPrintDotnames,
-    rlPrintJson,
-    rlPringVariables,
-    rlRunStatement
-
-  ReplLine = object
-    line: string
-    kind: ReplLineKind
-    value: Value
-  
-  ReplLineOr = OpResultWarn[ReplLine]
-
-func newReplLine(line: string): ReplLine =
-  result = ReplLine(line: line, kind: rlHelp, value: newValue(5))
-
-func newReplLineOr(warningData: WarningData): ReplLineOr =
-  result = opMessageW[ReplLine](warningData)
-
-func newReplLineOr(replLine: ReplLine): ReplLineOr =
-  result = opValueW[ReplLine](replLine)
+import startingvars
+import matches
+import regexes
+import messages
+import runcommand
+import variables
 
 proc echoReplHelp() =
   echo """
+You enter statements or commands at the prompt.
+
 Available commands:
-* h — this help
-* p <var> — print the value of a variable
-* pd <var> — print a dictionary as dot names
-* pj <var> — print a variable as json 
+* h — this help text
+* p dotname — print the value of a variable
+* pd dotname — print a dictionary as dot names
+* pj dotname — print a variable as json 
 * v — show the number of variables in the top level dictionaries
 * q — quit"""
 
-func parseReplLine(line: string): ReplLineOr =
-  let replLine = newReplLine(line)
-  result = newReplLineOr(replLine)
-
 proc runEvaluatePrintLoop*(env: var Env, args: Args) =
   ## Run commands at a prompt.
-  # var variables = getStartingVariables(env, args)
+  var variables = getStartingVariables(env, args)
 
+  var runningPos: Natural = 0
   var line: string
-  let value = newValue(5)
   while true:
     try:
       line = readLineFromStdin("tea> ")
     except IOError:
       break
-    let replLineOr = parseReplLine(line)
-    if replLineOr.isMessage:
-      echo replLineOr.message
+    let replCmdO = matchReplCmd(line, runningPos)
+    if not replCmdO.isSome:
+      echo "not repl command"
       continue
-    let replLine = replLineOr.value
-    case replLine.kind:
-    of rlHelp:
-      echoReplHelp()
-    of rlQuit:
+    let replCmd = replCmdO.getGroup()
+    runningPos += replCmdO.get().length
+
+    if replCmd == "q":
       break
-    of rlPrintRbVar:
-      echo valueToStringRB(replLine.value)
-    of rlPrintDotnames:
-      if replLine.value.kind == vkDict:
-        echo dotNameRep(replLine.value.dictv)
-      else:
-        echo valueToString(replLine.value)
-    of rlPrintJson:
-      echo valueToString(replLine.value)
-    of rlPringVariables:
+    if replCmd == "h":
+      echoReplHelp()
+      continue
+    if replCmd == "v":
       echo "show variables"
-    of rlRunStatement:
-      echo "run statement"
+      continue
+
+    let matchesO = matchDotNames(line, runningPos)
+    if not matchesO.isSome:
+      # Expected a variable or a dot name.
+      echo getWarning(wExpectedDotname)
+      echo startColumn(line, runningPos)
+      continue
+    let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
+    if leftParen == "(":
+      # Invalid variable or dot name.
+      echo getWarning(wInvalidDotname)
+      echo startColumn(line, runningPos + dotNameStr.len)
+      continue
+    runningPos += dotNameLen
+    if runningPos != line.len:
+      echo "extra junk at the end"
+      echo startColumn(line, runningPos)
+      continue
+
+    # Read the dotname's value.
+    let valueOr = getVariable(variables, dotNameStr)
+    if valueOr.isMessage:
+      echo "The variable doesn't exist: " & dotNameStr
+      continue
+    let value = valueOr.value    
+
+    case replCmd:
+    of "p ":
+      echo valueToStringRB(value)
+    of "pd ":
+      if value.kind == vkDict:
+        echo dotNameRep(value.dictv)
+      else:
+        echo valueToString(value)
+    of "pj ":
+      echo valueToString(value)
+    else:
+      echo "unknown command"

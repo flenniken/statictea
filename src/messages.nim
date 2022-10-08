@@ -222,8 +222,10 @@ type
     wNoMatchingBracket,    ## w209
     wInvalidCharacter,     ## w210
     wInvalidFirstArgChar,  ## w211
-    wAssignmentIf,       ## w212
+    wAssignmentIf,         ## w212
     wBareIfTwoArguments,   ## w213
+    wExpectedDotname,      ## w214
+    wInvalidDotname,       ## w215
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -441,6 +443,8 @@ const
     "Invalid first character of the argument.", ## wInvalidFirstArgChar
     "An if with an assignment takes three arguments.", ## wAssignmentIf
     "An if without an assignment takes two arguments.", ## wBareIfTwoArguments
+    "Expected a variable or a dot name.", ##  wExpectedDotname
+    "Invalid variable or dot name.", ## wInvalidDotname
     ]
 
     ## The message text.

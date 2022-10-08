@@ -180,7 +180,8 @@ func `$`*(s: Statement): string =
   ## Return a string representation of a Statement.
   result = """$1, $2: "$3"""" % [$s.lineNum, $s.start, s.text]
 
-func get3GroupsLen(matchesO: Option[Matches]):
+# todo: move this
+func get3GroupsLen*(matchesO: Option[Matches]):
     (string, string, string, Natural) =
   let matches = matchesO.get()
   let (one, two, three) = matches.get3Groups()

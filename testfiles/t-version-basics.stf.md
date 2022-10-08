@@ -10,7 +10,7 @@ Test the t version number.
 $statictea \
   -l log.txt \
   -s server.json \
-  -j shared.json \
+  -s shared.json \
   -t tmpl.txt \
   -r result.html >stdout 2>stderr
 ~~~
@@ -51,8 +51,8 @@ t.version => {t.version}
 
 ~~~
 {
-  "name": "shared",
-  "type": "json"
+  "name2": "shared",
+  "type2": "json"
 }
 ~~~
 

@@ -291,3 +291,8 @@ proc matchCompareOperator*(line: string, start: Natural): Option[Matches] =
   ## Match the compare operators and the trailing whitespace.
   let pattern = r"(==|!=|<=|>=|<|>)\s*"
   result = matchPatternCached(line, pattern, start, 1)
+
+proc matchReplCmd*(line: string, start: Natural): Option[Matches] =
+  ## Match the REPL commands and the trailing optional whitespace.
+  let pattern = r"(p |pd |pj |h|v|q)\s*"
+  result = matchPatternCached(line, pattern, start, 1)

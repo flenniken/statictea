@@ -7,6 +7,7 @@ import matches
 import regexes
 import env
 import args
+import sharedtestcode
 
 proc testMatchCommand(line: string, start: Natural = 0,
     eMatchesO: Option[Matches] = none(Matches)): bool =
@@ -131,6 +132,11 @@ proc testMatchCompareOperator(line: string, start: Natural = 0,
     result = false
   else:
     result = true
+
+proc testMatchReplCmd(line: string, start: Natural = 0,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = matchReplCmd(line, start)
+  result = gotExpected($matchesO, $eMatchesO, line & ".")
 
 suite "matches.nim":
 
@@ -554,3 +560,14 @@ suite "matches.nim":
     check testMatchCompareOperator(">", 0, some(newMatches(1, 0, ">")))
     check testMatchCompareOperator("<=", 0, some(newMatches(2, 0, "<=")))
     check testMatchCompareOperator(">=", 0, some(newMatches(2, 0, ">=")))
+
+  test "matchReplCmd":
+    check testMatchReplCmd("v", 0, some(newMatches(1, 0, "v")))
+    check testMatchReplCmd("q", 0, some(newMatches(1, 0, "q")))
+    check testMatchReplCmd("h", 0, some(newMatches(1, 0, "h")))
+    check testMatchReplCmd("v ", 0, some(newMatches(2, 0, "v")))
+    check testMatchReplCmd("p ", 0, some(newMatches(2, 0, "p ")))
+    check testMatchReplCmd("p  ", 0, some(newMatches(3, 0, "p ")))
+    check testMatchReplCmd("pd ", 0, some(newMatches(3, 0, "pd ")))
+    check testMatchReplCmd("pj ", 0, some(newMatches(3, 0, "pj ")))
+

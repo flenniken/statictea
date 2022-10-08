@@ -65,13 +65,6 @@ func toString(list: openArray[string]): string =
     result.add("\"")
   result.add("]")
 
-func toString(b: bool): string =
-  ## Return the bool string representation, 0 or 1.
-  if b:
-    result = "true"
-  else:
-    result = "false"
-
 func `$`*(p: Prepost): string =
   ## Return the Prepost string representation.
   result = "\"" & p.prefix &  "," & p.postfix & "\""
@@ -87,11 +80,11 @@ func toString(list: openArray[Prepost]): string =
 
 func `$`*(args: Args): string =
   ## Return the Args string representation.
-  result.add("args.help = $1\n" % toString(args.help))
-  result.add("args.version = $1\n" % toString(args.version))
-  result.add("args.update = $1\n" % toString(args.update))
-  result.add("args.log = $1\n" % toString(args.log))
-  result.add("args.repl = $1\n" % toString(args.repl))
+  result.add("args.help = $1\n" % $args.help)
+  result.add("args.version = $1\n" % $args.version)
+  result.add("args.update = $1\n" % $args.update)
+  result.add("args.log = $1\n" % $args.log)
+  result.add("args.repl = $1\n" % $args.repl)
   result.add("args.logFilename = \"$1\"\n" % args.logFilename)
   result.add("args.resultFilename = \"$1\"\n" % args.resultFilename)
   result.add("args.serverList = $1\n" % toString(args.serverList))

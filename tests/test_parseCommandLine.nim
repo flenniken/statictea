@@ -285,3 +285,44 @@ suite "parseCommandLine":
   test "result with update":
     let cmd = "-u -t template.html -r tea.html"
     check parseWarning(cmd, newWarningData(wResultWithUpdate))
+
+  test "-x":
+    check tpcl("-x", repl = true)
+
+  test "-x -s":
+    check tpcl("-x -s server.json",
+      repl = true,
+      serverList = @["server.json"]
+    )
+
+  test "-x -s -o":
+    check tpcl("-x -s server.json -o shared.tea",
+      repl = true,
+      serverList = @["server.json"],
+      codeList = @["shared.tea"],
+    )
+
+  test "-x -s -o -t":
+    check tpcl("-x -s server.json -o shared.tea -t tmpl.html",
+      repl = true,
+      serverList = @["server.json"],
+      codeList = @["shared.tea"],
+      templateFilename = "tmpl.html",
+    )
+
+  test "-l -t":
+    check tpcl("-l -t tmpl.html",
+      log = true,
+      templateFilename = "tmpl.html",
+    )
+
+  test "-l -s -o -t -r -p":
+    check tpcl(
+      "-l -s server.json -o codefile.tea -s server2.json -p abc$,def -p $$ -r result.html -t tmpl.html",
+      log = true,
+      serverList = @["server.json", "server2.json"],
+      codeList = @["codefile.tea"],
+      templateFilename = "tmpl.html",
+      resultFilename = "result.html",
+      prepostList = @[newPrepost("abc$", "def"), newPrepost("$$", "")]
+    )

@@ -544,8 +544,8 @@ hello {s.name}
 """
 
     let eLogLines = splitNewLines """
-XXXX-XX-XX XX:XX:XX.XXX; processTemplate.nim(X*); Json filename: server.json
-XXXX-XX-XX XX:XX:XX.XXX; processTemplate.nim(X*); Json file size: 18
+XXXX-XX-XX XX:XX:XX.XXX; startingvars.nim(X*); Json filename: server.json
+XXXX-XX-XX XX:XX:XX.XXX; startingvars.nim(X*); Json file size: 18
 XXXX-XX-XX XX:XX:XX.XXX; template.html(X*); hello world
 """
     check testProcessTemplate(templateContent = templateContent, serverJson =
