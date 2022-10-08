@@ -65,6 +65,7 @@ proc parseCommandLine*(argv: seq[string]): ArgsOr =
   options.add(newCmlOption("update", 'u', cmlNoArgument))
 
   options.add(newCmlOption("log", 'l', cmlOptionalArgument))
+  options.add(newCmlOption("repl", 'x', cmlOptionalArgument))
 
   # todo: use j for server?
   options.add(newCmlOption("server", 's', cmlArgumentMany))
@@ -122,6 +123,9 @@ proc parseCommandLine*(argv: seq[string]): ArgsOr =
     if len(filenames) == 1:
       args.logFilename = filenames[0]
     args.log = true
+
+  if "repl" in cmlArgs:
+    args.repl = true
 
   # We don't need to check whether some of the command line files are
   # unique. We read the json files first and the code handles

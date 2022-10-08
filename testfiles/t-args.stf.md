@@ -42,6 +42,7 @@ t.args.help = false
 t.args.version = false
 t.args.update = false
 t.args.log = true
+t.args.repl = false
 t.args.serverList = ["server.json"]
 t.args.codeList = ["shared.tea"]
 t.args.resultFilename = "result"

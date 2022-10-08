@@ -196,6 +196,7 @@ help = false
 version = false
 update = false
 log = false
+repl = false
 serverList = []
 codeList = []
 resultFilename = ""

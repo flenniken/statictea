@@ -42,6 +42,7 @@ proc tpcl(
     help: bool=false,
     update: bool=false,
     log: bool=false,
+    repl: bool=false,
     resultFilename: string = "",
     logFilename: string = "",
     serverList: seq[string] = @[],
@@ -68,6 +69,8 @@ proc tpcl(
   if not expectedItem("update", args.update, update):
     result = false
   if not expectedItem("log", args.log, log):
+    result = false
+  if not expectedItem("repl", args.repl, repl):
     result = false
   if not expectedItem("serverList", args.serverList, serverList):
     result = false

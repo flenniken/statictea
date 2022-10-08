@@ -17,6 +17,7 @@ type
     version*: bool
     update*: bool
     log*: bool
+    repl*: bool
     serverList*: seq[string]
     codeList*: seq[string]
     prepostList*: seq[Prepost]
@@ -26,6 +27,13 @@ type
 
   ArgsOr* = OpResultWarn[Args]
     ## The args or a warning.
+
+# func newArgs*(help=false, version=false, update=false, log=false, repl=false,
+#     logFilename="", serverList = newSeq[string](), codeList = newSeq[string](),
+#     templateFilename="", prepostList = newSeq[Prepost]()): Args =
+#   result = Args(help: help, version: version, update: update, log: log, repl: repl,
+#              logFilename: logFilename, serverList: serverList, codeList: codeList,
+#              templateFilename: templateFilename, prepostList: prepostList)
 
 func newArgsOr*(warningData: WarningData):
      ArgsOr =
@@ -60,9 +68,9 @@ func toString(list: openArray[string]): string =
 func toString(b: bool): string =
   ## Return the bool string representation, 0 or 1.
   if b:
-    result = "1"
+    result = "true"
   else:
-    result = "0"
+    result = "false"
 
 func `$`*(p: Prepost): string =
   ## Return the Prepost string representation.
@@ -83,6 +91,7 @@ func `$`*(args: Args): string =
   result.add("args.version = $1\n" % toString(args.version))
   result.add("args.update = $1\n" % toString(args.update))
   result.add("args.log = $1\n" % toString(args.log))
+  result.add("args.repl = $1\n" % toString(args.repl))
   result.add("args.logFilename = \"$1\"\n" % args.logFilename)
   result.add("args.resultFilename = \"$1\"\n" % args.resultFilename)
   result.add("args.serverList = $1\n" % toString(args.serverList))

@@ -395,6 +395,7 @@ func getTeaArgs*(args: Args): Value =
   varsDict["version"] = newValue(args.version)
   varsDict["update"] = newValue(args.update)
   varsDict["log"] = newValue(args.log)
+  varsDict["repl"] = newValue(args.log)
   varsDict["serverList"] = newValue(args.serverList)
   varsDict["codeList"] = newValue(args.codeList)
   varsDict["resultFilename"] = newValue(args.resultFilename)

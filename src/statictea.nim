@@ -9,6 +9,7 @@ import gethelp
 import version
 import env
 import opresultwarn
+import repl
 when isMainModule:
   import std/os
   import timer
@@ -19,6 +20,8 @@ proc processArgs(env: var Env, args: Args) =
     env.writeOut(getHelp())
   elif args.version:
     env.writeOut(staticteaVersion)
+  elif args.repl:
+    runEvaluatePrintLoop(env, args)
   elif args.update:
     updateTemplateTop(env, args)
   elif args.templateFilename != "":

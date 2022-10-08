@@ -53,6 +53,7 @@ $$ : parts &= if(t.args.help, "--help", "")
 $$ : parts &= if(t.args.version, "--version", "")
 $$ : parts &= if(t.args.update, "--update", "")
 $$ : parts &= if(t.args.log, "--log", "")
+$$ : parts &= if(t.args.repl, "--repl", "")
 $$ :
 $$ : parts &= if0(len(t.args.resultFilename), "", +
 $$ :   concat("--result ", t.args.resultFilename))
@@ -104,6 +105,7 @@ t.args keys and values:
   version: false
   update: false
   log: true
+  repl: false
   serverList: ["server.json","server2.json"]
   codeList: ["codefile.tea","codefile2.tea"]
   resultFilename: result.html
