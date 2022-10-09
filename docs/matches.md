@@ -16,6 +16,7 @@ Regular expression matching methods.
 * [getLastPart](#getlastpart) &mdash; Return the optional plus sign and line endings from the line.
 * [matchTabSpace](#matchtabspace) &mdash; Match one or more spaces or tabs.
 * [notEmptyOrSpaces](#notemptyorspaces) &mdash; Return true when a statement is not empty or not all whitespace.
+* [emptyOrSpaces](#emptyorspaces) &mdash; Return true when the text is empty or all whitespace from start to the end.
 * [matchEqualSign](#matchequalsign) &mdash; Match an equal sign or "&=" and the optional trailing whitespace.
 * [matchCommaParentheses](#matchcommaparentheses) &mdash; Match a comma or right parentheses and the optional trailing whitespace.
 * [matchNumber](#matchnumber) &mdash; Match a number and the optional trailing whitespace.
@@ -30,6 +31,7 @@ Regular expression matching methods.
 * [matchNotOrParen](#matchnotorparen) &mdash; Match "not " or "(" and the trailing whitespace.
 * [matchBoolExprOperator](#matchboolexproperator) &mdash; Match boolean expression operators (bool operators plus compareh operators) and the trailing whitespace.
 * [matchCompareOperator](#matchcompareoperator) &mdash; Match the compare operators and the trailing whitespace.
+* [matchReplCmd](#matchreplcmd) &mdash; Match the REPL commands and the trailing optional whitespace.
 
 # predefinedPrepost
 
@@ -142,6 +144,14 @@ Return true when a statement is not empty or not all whitespace.
 
 ```nim
 proc notEmptyOrSpaces(text: string): bool
+```
+
+# emptyOrSpaces
+
+Return true when the text is empty or all whitespace from start to the end.
+
+```nim
+proc emptyOrSpaces(text: string; start: Natural): bool
 ```
 
 # matchEqualSign
@@ -281,6 +291,14 @@ Match the compare operators and the trailing whitespace.
 
 ```nim
 proc matchCompareOperator(line: string; start: Natural): Option[Matches]
+```
+
+# matchReplCmd
+
+Match the REPL commands and the trailing optional whitespace.
+
+```nim
+proc matchReplCmd(line: string; start: Natural): Option[Matches]
 ```
 
 

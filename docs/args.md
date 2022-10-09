@@ -36,6 +36,7 @@ Args = object
   version*: bool
   update*: bool
   log*: bool
+  repl*: bool
   serverList*: seq[string]
   codeList*: seq[string]
   prepostList*: seq[Prepost]

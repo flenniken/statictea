@@ -6,8 +6,6 @@ Process the template.
 # Index
 
 * [yieldContentLine](#yieldcontentline) &mdash; Yield one line at a time and keep the line endings.
-* [readJsonFileLog](#readjsonfilelog) &mdash; Read a json file and log.
-* [readJsonFiles](#readjsonfiles) &mdash; Read json files and return a variable dictionary.
 * [processTemplate](#processtemplate) &mdash; Process the template.
 * [updateTemplate](#updatetemplate) &mdash; Update the template and return 0 on success.
 * [processTemplateTop](#processtemplatetop) &mdash; Setup the environment streams then process the template.
@@ -19,22 +17,6 @@ Yield one line at a time and keep the line endings.
 
 ```nim
 iterator yieldContentLine(content: string): string
-```
-
-# readJsonFileLog
-
-Read a json file and log.
-
-```nim
-proc readJsonFileLog(env: var Env; filename: string): ValueOr
-```
-
-# readJsonFiles
-
-Read json files and return a variable dictionary.  Skip a duplicate variable and generate a warning.
-
-```nim
-proc readJsonFiles(env: var Env; filenames: seq[string]): VarsDict
 ```
 
 # processTemplate

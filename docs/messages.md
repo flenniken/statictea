@@ -227,7 +227,10 @@ MessageId = enum
   wInvalidCharacter,        ## w210
   wInvalidFirstArgChar,     ## w211
   wAssignmentIf,            ## w212
-  wBareIfTwoArguments        ## w213
+  wBareIfTwoArguments,      ## w213
+  wExpectedDotname,         ## w214
+  wInvalidDotname,          ## w215
+  wInvalidReplSyntax         ## w216
 ```
 
 # Messages
@@ -449,7 +452,10 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Invalid character.",   ## wInvalidCharacter
     "Invalid first character of the argument.", ## wInvalidFirstArgChar
     "An if with an assignment takes three arguments.", ## wAssignmentIf
-    "An if without an assignment takes two arguments."]
+    "An if without an assignment takes two arguments.", ## wBareIfTwoArguments
+    "Expected a variable or a dot name.", ## wExpectedDotname
+    "Invalid variable or dot name.", ## wInvalidDotname
+    "Invalid REPL command syntax."]
 ```
 
 

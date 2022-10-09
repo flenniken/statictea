@@ -1778,6 +1778,7 @@ Miscellaneous topics:
 - [[#nimble-tasks][Nimble Tasks]]
 - [[#stf-runner][Stf Runner]]
 - [[#example-templates][Example Templates]]
+- [[#repl-environment][REPL Environment]]
 
 ** Warning Messages
 :PROPERTIES:
@@ -1864,7 +1865,7 @@ For example if the server item list should contain one or more
 items, you could output a warning when it's zero:
 
 #+BEGIN_SRC
-if0(len(s.items), warn("no items"))
+if0(s.items, warn("no items"))
 #+END_SRC
 
 [[#contents][茶]]
@@ -1884,7 +1885,7 @@ Here is an example of each:
 
 #+BEGIN_SRC
 a = if(true, 1, 2)
-if(c, warn("c is true")
+if(c, warn("c is true"))
 #+END_SRC
 
 The no assignment form is uses with the warn and return functions
@@ -1913,13 +1914,6 @@ a = if0(0, do0(), warn("not zero"))
 The warn and return functions modify the statement flow.  The
 warn function skips the current statement and the return function
 ends the current block.
-
-The next example is an if without an assignment.  It generates a
-warning when cond is true.
-
-#+BEGIN_SRC
-if(s.cond, warn("s.cond is true"))
-#+END_SRC
 
 [[#contents][茶]]
 
@@ -2222,6 +2216,55 @@ in the testfiles folder.
 - [[testfiles/readme.md][StaticTea Stf Files]] --- Index to the stf files.
 
 The [[#module-docs][Module Docs]] section has more real world examples.
+
+[[#contents][茶]]
+
+** REPL Environment
+:PROPERTIES:
+   :CUSTOM_ID: repl-environment
+   :END:
+
+You can run static tea interactively with a prompt. You run
+statements at the prompt and print variables with commands.
+
+The -x option starts the Read Eval Print Loop (REPL).
+
+#+BEGIN_SRC
+statictea -x
+tea>
+#+END_SRC
+
+The prompt appears after processing code files and importing json
+files, so you can inspect values they create.
+
+#+BEGIN_SRC
+stawtictea -x -o codefile.tea -s in.json
+tea>
+#+END_SRC
+
+In the following example the statement is “z = 5” is entered then
+the value of z is printed. P is short for print.
+
+#+BEGIN_SRC
+statictea -x
+tea> z = 5
+tea> p z
+5
+#+END_SRC
+
+You can use several commands for printing out values. The help
+command (h) shows them.
+
+#+BEGIN_SRC
+tea> h
+Available commands:
+* h — this help
+* p — print the value of a variable
+* pd — print a dictionary as dot names
+* pj — print a variable as json 
+* v — show number of variables in the top level dictionaries
+* q — quit
+#+END_SRC
 
 [[#contents][茶]]
 
