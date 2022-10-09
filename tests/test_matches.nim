@@ -138,6 +138,10 @@ proc testMatchReplCmd(line: string, start: Natural = 0,
   let matchesO = matchReplCmd(line, start)
   result = gotExpected($matchesO, $eMatchesO, line & ".")
 
+proc testEmptyOrSpaces(line: string, start: Natural = 0, expected: bool): bool =
+  let got = emptyOrSpaces(line, start)
+  result = gotExpected($got, $expected, line & ".")
+
 suite "matches.nim":
 
   test "prepost table":
@@ -566,8 +570,17 @@ suite "matches.nim":
     check testMatchReplCmd("q", 0, some(newMatches(1, 0, "q")))
     check testMatchReplCmd("h", 0, some(newMatches(1, 0, "h")))
     check testMatchReplCmd("v ", 0, some(newMatches(2, 0, "v")))
-    check testMatchReplCmd("p ", 0, some(newMatches(2, 0, "p ")))
-    check testMatchReplCmd("p  ", 0, some(newMatches(3, 0, "p ")))
-    check testMatchReplCmd("pd ", 0, some(newMatches(3, 0, "pd ")))
-    check testMatchReplCmd("pj ", 0, some(newMatches(3, 0, "pj ")))
+    check testMatchReplCmd("p", 0, some(newMatches(1, 0, "p")))
+    check testMatchReplCmd("p ", 0, some(newMatches(2, 0, "p")))
+    check testMatchReplCmd("pd ", 0, some(newMatches(3, 0, "pd")))
+    check testMatchReplCmd("pj ", 0, some(newMatches(3, 0, "pj")))
 
+  test "matchReplCmd":
+    check testEmptyOrSpaces("", 0, true)
+    check testEmptyOrSpaces(" ", 0, true)
+    check testEmptyOrSpaces("  ", 0, true)
+    check testEmptyOrSpaces("tea> ", 5, true)
+    check testEmptyOrSpaces("tea> ", 6, true)
+    check testEmptyOrSpaces("tea>  ", 5, true)
+    check testEmptyOrSpaces("tea> ", 0, false)
+    check testEmptyOrSpaces("a  ", 0, false)

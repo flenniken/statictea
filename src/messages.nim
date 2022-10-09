@@ -226,6 +226,7 @@ type
     wBareIfTwoArguments,   ## w213
     wExpectedDotname,      ## w214
     wInvalidDotname,       ## w215
+    wInvalidReplSyntax,    ## w216
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -445,6 +446,7 @@ const
     "An if without an assignment takes two arguments.", ## wBareIfTwoArguments
     "Expected a variable or a dot name.", ##  wExpectedDotname
     "Invalid variable or dot name.", ## wInvalidDotname
+    "Invalid REPL command syntax.", ## wInvalidReplSyntax
     ]
 
     ## The message text.

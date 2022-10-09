@@ -21,8 +21,7 @@ proc processArgs(env: var Env, args: Args) =
   elif args.version:
     env.writeOut(staticteaVersion)
   elif args.repl:
-    # runEvaluatePrintLoop(env, args)
-    discard
+    runEvaluatePrintLoop(env, args)
   elif args.update:
     updateTemplateTop(env, args)
   elif args.templateFilename != "":

@@ -1049,6 +1049,7 @@ proc getValueAndPos*(statement: Statement, start: Natural, variables:
       pos = result.value.pos
     showDebugPos(statement, pos, "f")
 
+# todo: add a start
 proc runStatement*(statement: Statement, variables: Variables):
     VariableDataOr =
   ## Run one statement and return the variable dot name string,

@@ -147,6 +147,15 @@ proc notEmptyOrSpaces*(text: string): bool =
     if not matchesO.isSome:
       result = true
 
+proc emptyOrSpaces*(text: string, start: Natural): bool =
+  ## Return true when the text is empty or all whitespace from start to the end.
+  if start >= text.len:
+    return true
+  let pattern = r"[ \t]*$"
+  let matchesO = matchPatternCached(text, pattern, start, 0)
+  if matchesO.isSome:
+    result = true
+
 proc matchEqualSign*(line: string, start: Natural = 0): Option[Matches] =
   ## Match an equal sign or "&=" and the optional trailing
   ## whitespace. Return the operator in the group, "=" or "&=".
@@ -294,5 +303,5 @@ proc matchCompareOperator*(line: string, start: Natural): Option[Matches] =
 
 proc matchReplCmd*(line: string, start: Natural): Option[Matches] =
   ## Match the REPL commands and the trailing optional whitespace.
-  let pattern = r"(p |pd |pj |h|v|q)\s*"
+  let pattern = r"(pd|pj|h|v|q|p)\s*"
   result = matchPatternCached(line, pattern, start, 1)
