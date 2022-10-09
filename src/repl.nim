@@ -99,10 +99,10 @@ proc handleReplLine*(line: string, start: Natural, variables: var Variables, sto
     # Expected a variable or a dot name.
     return errorAndColumn(wExpectedDotname, line, runningPos)
   let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
+  runningPos += dotNameLen
   if leftParen == "(":
     # Invalid variable or dot name.
-    return errorAndColumn(wInvalidDotname, line, runningPos)
-  runningPos += dotNameLen
+    return errorAndColumn(wInvalidDotname, line, runningPos-1)
   if runningPos != line.len:
     # Invalid REPL command syntax.
     return errorAndColumn(wInvalidReplSyntax, line, runningPos)

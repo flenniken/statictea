@@ -77,3 +77,23 @@ Invalid REPL command syntax."""
            ^
 Unused text at the end of the statement."""
     check testHandleReplLine("tea> a = 5 asdf", eStr)
+
+  test "p len(a)":
+    let eStr = """
+          ^
+Invalid variable or dot name."""
+    check testHandleReplLine("tea> p len(a)", eStr)
+  
+  test "p len  abc":
+    let eStr = """
+            ^
+Invalid REPL command syntax."""
+    check testHandleReplLine("tea> p len  abc", eStr)
+
+  test "p missing":
+    let eStr = """
+              ^
+The variable 'missing' does not exist."""
+    check testHandleReplLine("tea> p missing", eStr)
+
+
