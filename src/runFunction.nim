@@ -1774,38 +1774,57 @@ func funString_aoss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:string(var: any, optional stype: string) string
   ## @:~~~~
   ## @:
-  ## @:The default stype is "rb". This type is used in replacement blocks.
+  ## @:The default stype is "rb" which is used for replacement blocks.
   ## @:
-  ## @:stypes:
+  ## @:stype:
+  ## @:
   ## @:* json -- returns JSON
-  ## @:* rb -- returns JSON except strings are not quoted (replacement block)
-  ## @:* dn -- Dot name format where leaf elements are JSON (dot names)
+  ## @:* rb -- returns JSON except strings are not quoted and
+  ## @ characters are not excaped. Rb stands for replacement block.
+  ## @:* dn -- returns JSON except dictionary elements are
+  ## @ printed one per line as "key = value". Dn stands for dot name.
   ## @:
-  ## @:Examples:
+  ## @:Examples variables:
   ## @:
-  ## @:json type:
   ## @:~~~
-  ## @:string(5, "json") => "5"
-  ## @:string("str", "json") => "str"
-  ## @:
+  ## @:str = "Earl Grey"
+  ## @:pi = 3.14159
+  ## @:one = 1
   ## @:a = [1, 2, 3]
-  ## @:d = ["a", 1, "b", 2, "c", 3]
-  ## @:string(a, "json") => [1,2,3]
-  ## @:string(d, "json") => {"a":1,"b":2,"c":3}
+  ## @:d = dict(["x", 1, "y", 2])
+  ## @:fn = cmp[[0]
+  ## @:found = true
+  ## @:~~~~
+  ## @:
+  ## @:json:
+  ## @:
+  ## @:~~~
+  ## @:str => "Earl Grey"
+  ## @:pi => 3.14159
+  ## @:one => 1
+  ## @:a => [1,2,3]
+  ## @:d => {"x":1,"y":2}
+  ## @:fn => "cmp"
+  ## @:found => true
   ## @:~~~~
   ## @:
   ## @:rb:
+  ## @:
+  ## @:Same as JSON except the following.
+  ## @:
   ## @:~~~
-  ## @:string("str", "rb") => str
-  ## @:string("str") => str
+  ## @:str => Earl Grey
+  ## @:fn => "cmp"
   ## @:~~~~
   ## @:
-  ## @:dot-names:
+  ## @:dn:
+  ## @:
+  ## @:Same as JSON except the following.
+  ## @:
   ## @:~~~
-  ## @:string(d, "dn") =>
-  ## @:a = 1
-  ## @:b = 2
-  ## @:c = 3
+  ## @:d =>
+  ## @:x = 1
+  ## @:y = 2
   ## @:~~~~
 
   tMapParameters("aoss")
@@ -1828,13 +1847,13 @@ func funString_aoss*(variables: Variables, parameters: seq[Value]): FunResult =
     else:
       str = valueToString(value)
   else:
-    # Invalid string type, expected rb, json or dot-names.
+    # Invalid string type, expected rb, json or dot names.
     return newFunResultWarn(wInvalidStringType, 1)
 
   result = newFunResult(newValue(str))
 
 func funString_sds*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Convert the dictionary variable to dot names.
+  ## Convert the dictionary variable to dot names were you specify the name of the dictionary.
   ## @:
   ## @:~~~
   ## @:string(dictName: string: d: dict) string
@@ -1843,14 +1862,13 @@ func funString_sds*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:Example:
   ## @:
   ## @:~~~
-  ## @:d = {"x",1,"y":"tea","z":{"a":8}}
+  ## @:d = {"x",1, "y":"tea", "z":{"a":8}}
   ## @:string("teas", d) =>
   ## @:
   ## @:teas.x = 1
   ## @:teas.y = "tea"
   ## @:teas.z.a = 8
   ## @:~~~~
-
   tMapParameters("sds")
   let name = map["a"].stringv
   let dict = map["b"].dictv

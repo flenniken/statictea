@@ -26,6 +26,7 @@ d.b = "banana"
 d.c = dict()
 d.d = []
 o.table = d
+o.cmp = get(f, "cmp", 0)
 ~~~
 
 ### File tmpl.txt
@@ -83,6 +84,7 @@ o.table.a = "apple"
 o.table.b = "banana"
 o.table.c = {}
 o.table.d = []
+o.cmp = ["cmp","cmp","cmp"]
 
 The local variables as rb:
 

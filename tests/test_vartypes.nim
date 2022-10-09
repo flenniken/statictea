@@ -318,7 +318,51 @@ c.d = [7]"""
     func abc(variables: Variables, parameters: seq[Value]): FunResult =
       result = newFunResult(newValue("hi"))
     let function = newFunc("abc", abc, "iis")
-    check gotExpected($function, "\"abc(ii)s\"")
+    check gotExpected($function, "\"abc\"")
 
     let value = newValue(function)
     check function == value.funcv
+
+  test "string representations":
+    let str = newValue("Eary Grey")
+    let one = newValue(1)
+    let pi = newValue(3.14159)
+    let a = newValue([1, 2, 3])
+    let d = newValue({"x":1, "y":2})
+    func abc(variables: Variables, parameters: seq[Value]): FunResult =
+      result = newFunResult(newValue("hi"))
+    let fn = newValue(newFunc("abc", abc, "iis"))
+    let found = newValue(true)
+
+    check $str == """"Eary Grey""""
+    check valueToString(str) == """"Eary Grey""""
+    check valueToStringRB(str) == "Eary Grey"
+
+    check $one == "1"
+    check valueToString(one) == "1"
+    check valueToStringRB(one) == "1"
+
+    check $pi == "3.14159"
+    check valueToString(pi) == "3.14159"
+    check valueToStringRB(pi) == "3.14159"
+
+    check $a == "[1,2,3]"
+    check valueToString(a) == "[1,2,3]"
+    check valueToStringRB(a) == "[1,2,3]"
+
+    check $d == """{"x":1,"y":2}"""
+    check valueToString(d) == """{"x":1,"y":2}"""
+    check valueToStringRB(d) == """{"x":1,"y":2}"""
+
+    let expected = """
+x = 1
+y = 2"""
+    check dotNameRep(d.dictv) == expected
+
+    check $fn == """"abc""""
+    check valueToString(fn) == """"abc""""
+    check valueToStringRB(fn) == "abc"
+
+    check $found == "true"
+    check valueToString(found) == "true"
+    check valueToStringRB(found) == "true"

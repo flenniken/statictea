@@ -53,7 +53,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funWarn_ss](#funwarn_ss) &mdash; Return a warning message and skip the current statement.
 * [funReturn_ss](#funreturn_ss) &mdash; Return the given value and control command looping.
 * [funString_aoss](#funstring_aoss) &mdash; Convert the variable to a string.
-* [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names.
+* [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names were you specify the name of the dictionary.
 * [funFormat_ss](#funformat_ss) &mdash; Format a string using replacement variables similar to a replacement block.
 * [funStartsWith_ssb](#funstartswith_ssb) &mdash; Check whether a strings starts with the given prefix.
 * [funNot_bb](#funnot_bb) &mdash; Boolean not.
@@ -1317,38 +1317,55 @@ Convert the variable to a string.
 string(var: any, optional stype: string) string
 ~~~~
 
-The default stype is "rb". This type is used in replacement blocks.
+The default stype is "rb" which is used for replacement blocks.
 
-stypes:
+stype:
+
 * json -- returns JSON
-* rb -- returns JSON except strings are not quoted (replacement block)
-* dn -- Dot name format where leaf elements are JSON (dot names)
+* rb -- returns JSON except strings are not quoted and @ characters are not excaped. Rb stands for replacement block.
+* dn -- returns JSON except dictionary elements are @ printed one per line as "key = value". Dn stands for dot name.
 
-Examples:
+Examples variables:
 
-json type:
 ~~~
-string(5, "json") => "5"
-string("str", "json") => "str"
-
+str = "Earl Grey"
+pi = 3.14159
+one = 1
 a = [1, 2, 3]
-d = ["a", 1, "b", 2, "c", 3]
-string(a, "json") => [1,2,3]
-string(d, "json") => {"a":1,"b":2,"c":3}
+d = dict(["x", 1, "y", 2])
+fn = cmp[[0]
+found = true
+~~~~
+
+json:
+
+~~~
+str => "Earl Grey"
+pi => 3.14159
+one => 1
+a => [1,2,3]
+d => {"x":1,"y":2}
+fn => "cmp"
+found => true
 ~~~~
 
 rb:
+
+Same as JSON except the following.
+
 ~~~
-string("str", "rb") => str
-string("str") => str
+str => Earl Grey
+fn => "cmp"
 ~~~~
 
-dot-names:
+dn:
+
+Same as JSON except the following.
+
 ~~~
-string(d, "dn") =>
-a = 1
-b = 2
-c = 3
+d =>
+x = 1
+y = 2
 ~~~~
 
 ```nim
@@ -1357,7 +1374,7 @@ func funString_aoss(variables: Variables; parameters: seq[Value]): FunResult
 
 # funString_sds
 
-Convert the dictionary variable to dot names.
+Convert the dictionary variable to dot names were you specify the name of the dictionary.
 
 ~~~
 string(dictName: string: d: dict) string
@@ -1366,7 +1383,7 @@ string(dictName: string: d: dict) string
 Example:
 
 ~~~
-d = {"x",1,"y":"tea","z":{"a":8}}
+d = {"x",1, "y":"tea", "z":{"a":8}}
 string("teas", d) =>
 
 teas.x = 1

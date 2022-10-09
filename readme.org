@@ -2242,8 +2242,8 @@ stawtictea -x -o codefile.tea -s in.json
 tea>
 #+END_SRC
 
-In the following example the statement is “z = 5” is entered then
-the value of z is printed. P is short for print.
+In the following example the statement “z = 5” is entered then
+z is printed. P is short for print.
 
 #+BEGIN_SRC
 statictea -x
@@ -2347,7 +2347,7 @@ List of functions:
 - [[#sort][sort]] -- Sort a list of dictionaries.
 - [[#startsWith][startsWith]] -- Check whether a strings starts with the given prefix.
 - [[#string][string]] -- Convert the variable to a string.
-- [[#string][string]] -- Convert the dictionary variable to dot names.
+- [[#string][string]] -- Convert the dictionary variable to dot names were you specify the name of the dictionary.
 - [[#type][type]] -- Return the parameter type, one of: int, float, string, list, dict, bool or func.
 - [[#values][values]] -- Create a list out of the values in the specified dictionary.
 - [[#warn][warn]] -- Return a warning message and skip the current statement.
@@ -3963,38 +3963,55 @@ Convert the variable to a string.
 string(var: any, optional stype: string) string
 #+END_SRC
 
-The default stype is "rb". This type is used in replacement blocks.
+The default stype is "rb" which is used for replacement blocks.
 
-stypes:
+stype:
+
 - json -- returns JSON
-- rb -- returns JSON except strings are not quoted (replacement block)
-- dn -- Dot name format where leaf elements are JSON (dot names)
+- rb -- returns JSON except strings are not quoted and @ characters are not excaped. Rb stands for replacement block.
+- dn -- returns JSON except dictionary elements are @ printed one per line as "key = value". Dn stands for dot name.
 
-Examples:
+Examples variables:
 
-json type:
 #+BEGIN_SRC
-string(5, "json") => "5"
-string("str", "json") => "str"
-
+str = "Earl Grey"
+pi = 3.14159
+one = 1
 a = [1, 2, 3]
-d = ["a", 1, "b", 2, "c", 3]
-string(a, "json") => [1,2,3]
-string(d, "json") => {"a":1,"b":2,"c":3}
+d = dict(["x", 1, "y", 2])
+fn = cmp[[0]
+found = true
+#+END_SRC
+
+json:
+
+#+BEGIN_SRC
+str => "Earl Grey"
+pi => 3.14159
+one => 1
+a => [1,2,3]
+d => {"x":1,"y":2}
+fn => "cmp"
+found => true
 #+END_SRC
 
 rb:
+
+Same as JSON except the following.
+
 #+BEGIN_SRC
-string("str", "rb") => str
-string("str") => str
+str => Earl Grey
+fn => "cmp"
 #+END_SRC
 
-dot-names:
+dn:
+
+Same as JSON except the following.
+
 #+BEGIN_SRC
-string(d, "dn") =>
-a = 1
-b = 2
-c = 3
+d =>
+x = 1
+y = 2
 #+END_SRC
 
 [[#contents][茶]]
@@ -4004,7 +4021,7 @@ c = 3
 :CUSTOM_ID: string
 :END:
 
-Convert the dictionary variable to dot names.
+Convert the dictionary variable to dot names were you specify the name of the dictionary.
 
 #+BEGIN_SRC
 string(dictName: string: d: dict) string
@@ -4013,7 +4030,7 @@ string(dictName: string: d: dict) string
 Example:
 
 #+BEGIN_SRC
-d = {"x",1,"y":"tea","z":{"a":8}}
+d = {"x",1, "y":"tea", "z":{"a":8}}
 string("teas", d) =>
 
 teas.x = 1

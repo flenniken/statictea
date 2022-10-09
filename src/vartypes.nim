@@ -211,10 +211,14 @@ proc `==`*(a: Value, b: Value): bool =
 
 func `$`*(function: Func): string =
   ## Return a string representation of a function.
-  let length = function.signatureCode.len
-  let parmCodes = function.signatureCode[0..length-2]
-  let returnCode = function.signatureCode[length-1..length-1]
-  result = "\"$1($2)$3\"" % [function.name, parmCodes, returnCode]
+  result.add("\"")
+  result.add(function.name)
+  result.add("\"")
+
+  # let length = function.signatureCode.len
+  # let parmCodes = function.signatureCode[0..length-2]
+  # let returnCode = function.signatureCode[length-1..length-1]
+  # result = "\"$1($2)$3\"" % [function.name, parmCodes, returnCode]
 
 func `$`*(kind: ValueKind): string =
   ## Return a string representation of the variable's type.
@@ -285,8 +289,6 @@ proc jsonStringRepr*(str: string): string =
 
 # Recursive prototype.
 func valueToString*(value: Value): string
-
-# todo: string representation of a dict value as dot names.
 
 func dictToString*(value: Value): string =
   ## Return a string representation of a dict Value in JSON format.

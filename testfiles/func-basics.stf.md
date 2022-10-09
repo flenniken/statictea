@@ -21,7 +21,7 @@ $$ : a = cmp
 $$ : sc = a("tea", "tea2")
 $$ : fc = o.floatCmp(5.5, 5.1)
 $$ : ic = o.intCmp(3, 3)
-{a} = array of cmp signatures
+{a} = array of cmp functions
 string compare = {sc} = -1
 int compare = {ic} = 0
 float compare = {fc} = 1
@@ -38,7 +38,7 @@ o.intCmp = get(cmp, 1)
 ### File result.expected
 
 ~~~
-["cmp(ff)i","cmp(ii)i","cmp(ssob)i"] = array of cmp signatures
+["cmp","cmp","cmp"] = array of cmp functions
 string compare = -1 = -1
 int compare = 0 = 0
 float compare = 1 = 1
