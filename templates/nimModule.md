@@ -5,7 +5,7 @@ $$ # Create a list of all the heading names.
 $$ #
 $$ block
 $$ : t.repeat = len(s.entries)
-$$ : entry = get(s.entries, t.row)
+$$ : entry = s.entries[t.row]
 $$ : g.names &= entry.name
 $$ endblock
 $$ #
@@ -47,7 +47,7 @@ $$ : newEntry.description = replaceRe(desc, g.patterns)
 $$ : code = replaceRe(entry.code, list("[ ]*$", ""))
 $$ : pos = find(code, " {", len(code))
 $$ : newEntry.signature = slice(code, 0, pos)
-$$ : newEntry.anchor = get(g.anchors, t.row)
+$$ : newEntry.anchor = g.anchors[t.row]
 $$ : g.entries &= newEntry
 $$ endblock
 $$ #
@@ -74,7 +74,7 @@ $$ #
 $$ nextline
 $$ : if(not(exists(g, "entries")), return("stop"))
 $$ : t.repeat = len(g.entries)
-$$ : entry = get(g.entries, t.row)
+$$ : entry = g.entries[t.row]
 * {entry.type}[{entry.name}](#{entry.anchor}) &mdash; {entry.short}
 
 $$ #
@@ -83,7 +83,7 @@ $$ #
 $$ block
 $$ : if(not(exists(g, "entries")), return("stop"))
 $$ : t.repeat = len(g.entries)
-$$ : entry = get(g.entries, t.row)
+$$ : entry = g.entries[t.row]
 # {entry.name}
 
 {entry.description}
