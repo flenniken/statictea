@@ -1814,7 +1814,7 @@ func funString_aoss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:
   ## @:~~~
   ## @:str => Earl Grey
-  ## @:fn => "cmp"
+  ## @:fn => cmp
   ## @:~~~~
   ## @:
   ## @:dn:

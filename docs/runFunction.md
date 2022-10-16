@@ -1355,7 +1355,7 @@ Same as JSON except the following.
 
 ~~~
 str => Earl Grey
-fn => "cmp"
+fn => cmp
 ~~~~
 
 dn:

@@ -651,15 +651,15 @@ Reserved single letter variables:
 - m, n -- Reserved
 - o -- [[#code-variables][Shared Code Variables]]
 - p, q, r -- Reserved
-- s -- [[#json-variables][Server Json Variables]]
+- s -- [[#server-json-variables][Server Json Variables]]
 - t -- [[#tea-variables][Tea Variables]]
 - u -- Reserved
 
 [[#contents][茶]]
 
-** Json Variables
+** Server Json Variables
 :PROPERTIES:
-:CUSTOM_ID: json-variables
+:CUSTOM_ID: server-json-variables
 :END:
 
 You pass variables from the server to the template in json files.
@@ -719,7 +719,8 @@ for more information.
 
 #+BEGIN_SRC
 myCmp = cmp
-a = myCmp(7,2) => 1
+a = myCmp(7,2)
+a => 1
 #+END_SRC
 
 [[#contents][茶]]
@@ -1262,14 +1263,17 @@ s.d.x => 100
 s.d.y => 200
 #+END_SRC
 
-Or you access the elements with the get function. The get
-function has an optional default parameter and it works with keys
-that don't look like variables.  Examples:
+You can also access the elements with the get function or bracket
+notation. The get function has an optional default parameter and
+it works with keys that don't look like variables.  Examples:
 
 #+BEGIN_SRC
 get(s, "a") => 1
 get(s, "b") => 2
 get(s, "d") => dict("x", 100, "y", 200)
+
+s["a"] => 1
+s["b"] => 2
 
 d = get(s, "d")
 
@@ -1338,7 +1342,7 @@ $$ : g.names &= entry.name
 $$ endblock
 #+END_SRC
 
-You can access list elements with the get function:
+You can access list elements with the get function or bracket notation:
 
 #+BEGIN_SRC
 list = list(1, 3.3, "a")
@@ -1346,6 +1350,10 @@ get(list, 0) => 1
 get(list, 1) => 3.3
 get(list, 2) => "a"
 get(list, 3, 99) => 99
+
+list[0] => 1
+list[1] => 3.3
+list[2] => "a"
 #+END_SRC
 
 [[#contents][茶]]
@@ -1386,7 +1394,7 @@ function, to get information about it, and to pass it around.
 
 You create a func variable from an existing func variable.
 
-All the functions exist in the f dictionary by name. The
+All the functions exist in the f dictionary by name. Each
 dictionary value is a list of func values with the same name.
 
 In the following example the “a” func variable is defined to be
@@ -1466,7 +1474,7 @@ statement: o.b = cmp(1.9, 5)
 :END:
 
 You use a boolean expression with an if statement to make a
-decision.
+decision that controls code flow.
 
 A boolean expression is an infix expression wrapped with
 parentheses containing logical and compare operators that returns
@@ -1704,7 +1712,8 @@ pass that to the function.
 
 #+BEGIN_SRC
 str = """
-Teas of China"""
+Teas of China
+"""
 count = len(str)
 #+END_SRC
 
@@ -1788,6 +1797,9 @@ Miscellaneous topics:
 When StaticTea detects a problem, a warning message is written to
 standard error, the problem is skipped, and processing
 continues.
+
+StaticTea returns success, return code 0, when there are no
+warning messages, else it returns 1.
 
 For example, if a variable in a replacement block is used but it
 doesn't exist, the bracketed variable remains as is in the
@@ -2238,7 +2250,7 @@ The prompt appears after processing code files and importing json
 files, so you can inspect values they create.
 
 #+BEGIN_SRC
-stawtictea -x -o codefile.tea -s in.json
+statictea -x -o codefile.tea -s in.json
 tea>
 #+END_SRC
 
@@ -4001,7 +4013,7 @@ Same as JSON except the following.
 
 #+BEGIN_SRC
 str => Earl Grey
-fn => "cmp"
+fn => cmp
 #+END_SRC
 
 dn:
