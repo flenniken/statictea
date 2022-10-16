@@ -211,9 +211,8 @@ func matchVersionNotCached*(line: string, start: Natural = 0,
 
 proc matchDotNames*(line: string, start: Natural = 0): Option[Matches] =
   ## Matches variable dot names and surrounding whitespace. Return the
-  ## @:leading whitespace and dot names as one string like "a.b.c.d".
-  ## @:This is used to match functions too. They look like a variable
-  ## @:followed by an open parentheses.
+  ## @:dot names as one string like "a.b.c.d".  A function call is a
+  ## @:variable followed by a left parentheses or a left bracket.
   ## @:
   ## @:A dot name is a list of variable names separated by dots.
   ## @:You can have 1 to 5 variable names in a dot name.
@@ -222,14 +221,14 @@ proc matchDotNames*(line: string, start: Natural = 0): Option[Matches] =
   ## @:and underscores limited to a total of 64 characters.
   ## @:
   ## @:No space is allowed between the function name and the left
-  ## @:parentheses.
+  ## @:parentheses or bracket.
   ## @:
-  ## @:Return three groups, the leading whitespace and the dotNames
-  ## @:and the optional left parentheses. The length returned includes
-  ## @:the optional trailing whitespace.
+  ## @:Return three groups, the leading whitespace, the dotNames and the
+  ## @:optional left parentheses or bracket. The length returned
+  ## @:includes the optional trailing whitespace.
 
   let name = r"[a-zA-Z][a-zA-Z0-9_]{0,63}"
-  let pattern = r"(\s*)((?:$1)(?:\.$1){0,4})(\(){0,1}\s*" % [name]
+  let pattern = r"(\s*)((?:$1)(?:\.$1){0,4})([\(\[]){0,1}\s*" % [name]
   result = matchPatternCached(line, pattern, start, 3)
 
 type

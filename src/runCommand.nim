@@ -444,7 +444,7 @@ func skipArgument*(statement: Statement, startPos: Natural): PosOr =
 
 proc skipArg(statement: Statement, start: Natural): PosOr =
   when showPos:
-    showDebugPos(statement, start, "^sa")
+    showDebugPos(statement, start, "^ s arg")
   result = skipArgument(statement, start)
   when showPos:
     var pos: Natural
@@ -452,7 +452,7 @@ proc skipArg(statement: Statement, start: Natural): PosOr =
       pos = result.message.pos
     else:
       pos = result.value
-    showDebugPos(statement, pos, "^fa")
+    showDebugPos(statement, pos, "^ f arg")
 
 # Forward reference to getValueAndPos since we call it recursively.
 proc getValueAndPos*(statement: Statement, start: Natural, variables:
@@ -823,7 +823,7 @@ proc getCondition*(statement: Statement, start: Natural,
   ## parentheses. The position includes the trailing whitespace after
   ## the ending ).
   when showPos:
-    showDebugPos(statement, start, "^sc")
+    showDebugPos(statement, start, "^ s condition")
 
   var runningPos = start
   var lastBoolOp: string
@@ -847,7 +847,7 @@ proc getCondition*(statement: Statement, start: Natural,
       let finish = runningPos + rightParenO.get().length
       let vAndL = newValueAndPos(accum, finish)
       when showPos:
-        showDebugPos(statement, finish, "^fc")
+        showDebugPos(statement, finish, "^ f condition")
       return newValueAndPosOr(vAndL)
 
     # Get the operator.
@@ -896,7 +896,7 @@ proc getCondition*(statement: Statement, start: Natural,
         return newValueAndPosOr(posOr.message)
       runningPos = posOr.value
       when showPos:
-        showDebugPos(statement, runningPos, "^fc")
+        showDebugPos(statement, runningPos, "^ f condition")
       return newValueAndPosOr(newValue(shortCiruitResult), runningPos)
 
     # Return a value and position after handling any nestedcondition.
@@ -944,6 +944,75 @@ proc getCondition*(statement: Statement, start: Natural,
 
     accum = newValue(bValue)
 
+proc getBracketedVarValue*(statement: Statement, dotName: string, dotNameLen: Natural, start: Natural,
+    variables: Variables): ValueAndPosOr =
+  ## Return the value of the bracketed variable. Start points a the
+  ## container variable name.
+  ## a = list[ 4 ]
+  ##     ^ sbv    ^ fbv
+  ## a = dict[ "abc" ]
+  ##     ^ sbv        ^ fbv
+  when showPos:
+    showDebugPos(statement, start, "^ s bracketed")
+  var runningPos = start
+
+  # Get the container variable.
+  let containerOr = getVariable(variables, dotName)
+  if containerOr.isMessage:
+    # The variable doesn't exist, etc.
+    let warningData = newWarningData(containerOr.message.warning,
+      containerOr.message.p1, runningPos)
+    return newValueAndPosOr(warningData)
+  let containerValue = containerOr.value
+  if containerValue.kind != vkList and containerValue.kind != vkDict:
+    # The container variable must be a list or dictionary got $1.
+    return newValueAndPosOr(wIndexNotListOrDict, $containerValue.kind, runningPos)
+  runningPos += dotNameLen
+
+  # Get the index/key value.
+  let vAndPosOr = getValueAndPos(statement, runningPos, variables)
+  if vAndPosOr.isMessage:
+    return vAndPosOr
+  let indexValue = vAndPosOr.value.value
+
+  # Get the value from the container using the index/key.
+  var value: Value
+  if containerValue.kind == vkList:
+    # list container
+    if indexValue.kind != vkInt:
+      # The index variable must be an integer.
+      return newValueAndPosOr(wIndexNotInt, "", runningPos)
+    let index = indexValue.intv
+    let list = containerValue.listv
+    if index < 0 or index >= list.len:
+      # The index value $1 is out of range.
+      return newValueAndPosOr(wInvalidIndexRange, $index, runningPos)
+    value = containerValue.listv[index]
+  else:
+    # dictionary container
+    if indexValue.kind != vkString:
+      # The key variable must be an string.
+      return newValueAndPosOr(wKeyNotString, "", runningPos)
+    let key = indexValue.stringv
+    let dict = containerValue.dictv
+    if not (key in dict):
+      # The key doesn't exist in the dictionary.
+      return newValueAndPosOr(wMissingKey, "", runningPos)
+    value = dict[key]
+
+  # Get the ending right bracket.
+  runningPos = vAndPosOr.value.pos
+  let rightBracketO = matchSymbol(statement.text, gRightBracket, runningPos)
+  if not rightBracketO.isSome:
+    # Missing right bracket.
+    return newValueAndPosOr(wMissingRightBracket, "", runningPos)
+  runningPos += rightBracketO.get().length
+
+  when showPos:
+    showDebugPos(statement, runningPos, "^ f bracketed")
+
+  return newValueAndPosOr(value, runningPos)
+
 proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
     Variables): ValueAndPosOr =
   ## Get the value and position from the statement.
@@ -976,9 +1045,9 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
     if not matchesO.isSome:
       # Expected a string, number, variable, list or condition.
       return newValueAndPosOr(wInvalidRightHandSide, "", start)
-    let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
+    let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
 
-    if leftParen == "(":
+    if leftParenBrack == "(":
       # We have a function, run it and return its value.
 
       # Handle the special if functions.
@@ -991,6 +1060,9 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
 
       return getFunctionValueAndPos(dotNameStr, statement,
         start+dotNameLen, variables, false)
+    elif leftParenBrack == "[":
+      # a = list[2] or a = dict["key"]
+      return getBracketedVarValue(statement, dotNameStr, dotNameLen, start, variables)
 
     # We have a variable.
     let valueOr = getVariable(variables, dotNameStr)
@@ -1037,7 +1109,7 @@ proc getValueAndPos*(statement: Statement, start: Natural, variables:
   ## @:~~~~
 
   when showPos:
-    showDebugPos(statement, start, "s")
+    showDebugPos(statement, start, "^ s")
 
   result = getValueAndPosWorker(statement, start, variables)
 
@@ -1047,7 +1119,7 @@ proc getValueAndPos*(statement: Statement, start: Natural, variables:
       pos = result.message.pos
     else:
       pos = result.value.pos
-    showDebugPos(statement, pos, "f")
+    showDebugPos(statement, pos, "^ f")
 
 # todo: add a start
 proc runStatement*(statement: Statement, variables: Variables):
@@ -1071,7 +1143,7 @@ proc runStatement*(statement: Statement, variables: Variables):
   if not isSome(matchesO):
     # Statement does not start with a variable name.
     return newVariableDataOr(wMissingStatementVar)
-  let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
+  let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
   let leadingLen = dotNameLen + pos
 
   var vlOr: ValueAndPosOr
@@ -1079,14 +1151,17 @@ proc runStatement*(statement: Statement, variables: Variables):
   var operatorLength = 0
   var varName = ""
 
-  if leftParen == "(" and dotNameStr in ["if0", "if"]:
+  if leftParenBrack == "(" and dotNameStr in ["if0", "if"]:
     # Handle the special bare if functions.
     vlOr = ifFunctions(dotNameStr, statement, leadingLen, variables, bare=true)
+  # elif leftParenBrack == "[":
+  #   # a[2] = 4
+  #   # not implemented
   else:
     # Handle normal "varName operator right" statements.
     varName = dotNameStr
 
-    if leftParen != "":
+    if leftParenBrack != "":
       # Statement does not start with a variable name.
       return newVariableDataOr(wMissingStatementVar)
 

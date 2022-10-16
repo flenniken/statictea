@@ -227,6 +227,13 @@ type
     wExpectedDotname,      ## w214
     wInvalidDotname,       ## w215
     wInvalidReplSyntax,    ## w216
+    wIndexNotListOrDict,   ## w217
+    wIndexNotInt,          ## w218
+    wInvalidIndexRange,    ## w219
+    wKeyNotString,         ## w220
+    wMissingKey,           ## w221
+    wMissingRightBracket,  ## w222
+
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -447,6 +454,14 @@ const
     "Expected a variable or a dot name.", ##  wExpectedDotname
     "Invalid variable or dot name.", ## wInvalidDotname
     "Invalid REPL command syntax.", ## wInvalidReplSyntax
+    "The container variable must be a list or dictionary got $1.", ## wIndexNotListOrDict
+    "The index variable must be an integer.", ## wIndexNotInt
+    "The index value $1 is out of range.", ## wInvalidIndexRange
+    "The key variable must be an string.", ## wKeyNotString
+    "The key doesn't exist in the dictionary.", ## wMissingKey
+    "Missing right bracket.", ## wMissingRightBracket
+
+
     ]
 
     ## The message text.

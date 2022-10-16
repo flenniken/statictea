@@ -290,6 +290,7 @@ suite "matches.nim":
   test "matchVariable":
     check testMatchDotNames("a = 5", 0, some(newMatches(2, 0, "", "a", "")))
     check testMatchDotNames("a(4)", 0, some(newMatches(2, 0, "", "a", "(")))
+    check testMatchDotNames("a[4]", 0, some(newMatches(2, 0, "", "a", "[")))
     check testMatchDotNames("a (4)", 0, some(newMatches(2, 0, "", "a", "")))
     check testMatchDotNames("a(  4)", 0, some(newMatches(4, 0, "", "a", "(")))
     check testMatchDotNames(" a = 5 ", 0, some(newMatches(3, 0, " ", "a", "")))

@@ -27,7 +27,7 @@ proc echoValueAndPosOr(statement: Statement, start: Natural,
   ## visually compare them.
   echo "0123456789 123456789 123456789"
   echo statement.text
-  echo startColumn(statement.text, start, "^")
+  echo startColumn(statement.text, start, "^ s")
   if valueAndPosOr.isValue:
     echo startColumn(statement.text, valueAndPosOr.value.pos, "^ got")
   else:
@@ -1490,3 +1490,77 @@ White$1
     #                         0123456789 123456789
     check testSkipArgument("""a = fn(fn2(b,fn3()""", 7, newPosOr(wNoMatchingParen, "", 18))
     check testSkipArgument("""a = fn("tea""", 7, newPosOr(wNotEnoughCharacters, "", 11))
+
+  test "a = b[0]":
+    let funcsVarDict = createFuncDictionary().dictv
+    var variables = emptyVariables(funcs = funcsVarDict)
+    discard assignVariable(variables, "l.b", newValue(2), "&=")
+    check $variables["l"] == """{"b":[2]}"""
+    check testGetValueAndPos("""a = b[0]""", 4, 8, "2", variables)
+
+  test "index 1":
+    let funcsVarDict = createFuncDictionary().dictv
+    var variables = emptyVariables(funcs = funcsVarDict)
+    discard assignVariable(variables, "l.b", newValue(2), "&=")
+    discard assignVariable(variables, "l.b", newValue(3), "&=")
+    check $variables["l"] == """{"b":[2,3]}"""
+    check testGetValueAndPos("""a = b[1]""", 4, 8, "3", variables)
+
+  test "backets with spaces":
+    let funcsVarDict = createFuncDictionary().dictv
+    var variables = emptyVariables(funcs = funcsVarDict)
+    discard assignVariable(variables, "l.b", newValue(2), "&=")
+    check testGetValueAndPos("""a = b[ 0 ]""", 4, 10, "2", variables)
+
+  test "backets with function":
+    let funcsVarDict = createFuncDictionary().dictv
+    var variables = emptyVariables(funcs = funcsVarDict)
+    discard assignVariable(variables, "l.b", newValue(2), "&=")
+    check testGetValueAndPos("""a = b[ len("") ]""", 4, 16, "2", variables)
+
+  test "a = d['abc']":
+    let funcsVarDict = createFuncDictionary().dictv
+    var variables = emptyVariables(funcs = funcsVarDict)
+    let content = """{"abc": 5}"""
+    var valueOr = readJsonString(content)
+    let value = valueOr.value
+    discard assignVariable(variables, "l.d", value, "=")
+    check $variables["l"] == """{"d":{"abc":5}}"""
+    check testGetValueAndPos("""a = d["abc"]""", 4, 12, "5", variables)
+
+  test "bracketed variable missing":
+    check testGetValueAndPos("""a = b[0]""", 4, wNotInLorF, 4, "b")
+
+  test "bracketed list or dict":
+    let funcsVarDict = createFuncDictionary().dictv
+    var variables = emptyVariables(funcs = funcsVarDict)
+    discard assignVariable(variables, "l.b", newValue(2), "=")
+    check testGetValueAndPos("""a = b[0]""", 4, wIndexNotListOrDict, 4, "int", variables)
+
+  test "bracketed list warnings":
+    let funcsVarDict = createFuncDictionary().dictv
+    var variables = emptyVariables(funcs = funcsVarDict)
+    discard assignVariable(variables, "l.ix", newValue(22), "=")
+    discard assignVariable(variables, "l.b", newValue(2), "&=")
+    check testGetValueAndPos("""a = b[abc]""", 4, wNotInLorF, 6, "abc", variables)
+    check testGetValueAndPos("""a = b[%abc]""", 4, wInvalidRightHandSide, 6, "", variables)
+    check testGetValueAndPos("""a = b[2.3]""", 4, wIndexNotInt, 6, "", variables)
+    check testGetValueAndPos("""a = b[-1]""", 4, wInvalidIndexRange, 6, "-1", variables)
+    check testGetValueAndPos("""a = b[ix]""", 4, wInvalidIndexRange, 6, "22", variables)
+
+  test "bracketed dict warnings":
+    let funcsVarDict = createFuncDictionary().dictv
+    var variables = emptyVariables(funcs = funcsVarDict)
+    let content = """{"abc": 5}"""
+    var valueOr = readJsonString(content)
+    let value = valueOr.value
+    discard assignVariable(variables, "l.d", value, "=")
+
+    check testGetValueAndPos("""a = d[5]""", 4, wKeyNotString, 6, "", variables)
+    check testGetValueAndPos("""a = d["missing"]""", 4, wMissingKey, 6, "", variables)
+
+  test "missing ending bracket":
+    let funcsVarDict = createFuncDictionary().dictv
+    var variables = emptyVariables(funcs = funcsVarDict)
+    discard assignVariable(variables, "l.b", newValue(2), "&=")
+    check testGetValueAndPos("""a = b[0""", 4, wMissingRightBracket, 7, "", variables)

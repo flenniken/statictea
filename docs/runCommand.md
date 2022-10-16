@@ -28,6 +28,7 @@ starts in the template file.
 * [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value.
 * [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value.
 * [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and the position after it.
+* [getBracketedVarValue](#getbracketedvarvalue) &mdash; Return the value of the bracketed variable.
 * [getValueAndPos](#getvalueandpos) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
@@ -231,6 +232,21 @@ Return the bool value of the condition expression and the position after it.  Th
 
 ```nim
 proc getCondition(statement: Statement; start: Natural; variables: Variables): ValueAndPosOr
+```
+
+# getBracketedVarValue
+
+Return the value of the bracketed variable. Start points a the container variable name.<dl class="docutils"><dt>a = list[ 4 ]</dt>
+<dd>^ sbv    ^ fbv</dd>
+<dt>a = dict[ "abc" ]</dt>
+<dd>^ sbv        ^ fbv</dd>
+</dl>
+
+
+```nim
+proc getBracketedVarValue(statement: Statement; dotName: string;
+                          dotNameLen: Natural; start: Natural;
+                          variables: Variables): ValueAndPosOr
 ```
 
 # getValueAndPos
