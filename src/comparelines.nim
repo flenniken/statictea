@@ -70,6 +70,14 @@ proc linesSideBySide*(gotContent: string, expectedContent: string): string =
 
   result = lines.join("\n")
 
+proc testLinesSideBySide*(got: string, expected: string): bool =
+  ## If the two strings are equal, return true, else show the
+  ## differences and return false.
+  if got == expected:
+    result = true
+  else:
+    echo linesSideBySide(got, expected)
+
 proc compareFiles*(gotFilename: string, expectedFilename: string): OpResultStr[string] =
   ## Compare two files and return the differences. When they are equal
   ## return "".

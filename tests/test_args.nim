@@ -1,5 +1,6 @@
 import std/unittest
 import args
+import compareLines
 
 suite "args.nim":
 
@@ -21,7 +22,7 @@ args.serverList = []
 args.codeList = []
 args.templateFilename = ""
 args.prepostList = []"""
-    check $args == expected
+    check testLinesSideBySide($args, expected)
 
   test "args string":
     var args: Args
@@ -41,7 +42,7 @@ args.serverList = ["one.json", "two.json"]
 args.codeList = []
 args.templateFilename = ""
 args.prepostList = ["#,@", "begin,end"]"""
-    check $args == expected
+    check testLinesSideBySide($args, expected)
 
   test "args string2":
     var args: Args
@@ -61,7 +62,7 @@ args.serverList = ["server.json", "more.json"]
 args.codeList = ["shared.tea"]
 args.templateFilename = ""
 args.prepostList = []"""
-    check($args == expected)
+    check testLinesSideBySide($args, expected)
 
   test "args logging no name":
     var args: Args
@@ -82,7 +83,7 @@ args.serverList = ["server.json", "more.json"]
 args.codeList = ["shared.tea"]
 args.templateFilename = ""
 args.prepostList = []"""
-    check($args == expected)
+    check testLinesSideBySide($args, expected)
 
   test "args logging with name":
     var args: Args
@@ -104,7 +105,7 @@ args.serverList = ["server.json", "more.json"]
 args.codeList = ["shared.tea"]
 args.templateFilename = ""
 args.prepostList = []"""
-    check($args == expected)
+    check testLinesSideBySide($args, expected)
 
   test "args repl":
     var args: Args
@@ -121,5 +122,6 @@ args.serverList = []
 args.codeList = []
 args.templateFilename = ""
 args.prepostList = []"""
-    check($args == expected)
+    check testLinesSideBySide($args, expected)
+
 

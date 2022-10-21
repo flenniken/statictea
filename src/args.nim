@@ -1,6 +1,6 @@
 ## Types for handling command line arguments.
 
-import std/strutils
+import std/strformat
 import messages
 import warnings
 import opresultwarn
@@ -28,13 +28,6 @@ type
   ArgsOr* = OpResultWarn[Args]
     ## The args or a warning.
 
-# func newArgs*(help=false, version=false, update=false, log=false, repl=false,
-#     logFilename="", serverList = newSeq[string](), codeList = newSeq[string](),
-#     templateFilename="", prepostList = newSeq[Prepost]()): Args =
-#   result = Args(help: help, version: version, update: update, log: log, repl: repl,
-#              logFilename: logFilename, serverList: serverList, codeList: codeList,
-#              templateFilename: templateFilename, prepostList: prepostList)
-
 func newArgsOr*(warningData: WarningData):
      ArgsOr =
   ## Return a new ArgsOr object containing a warning.
@@ -60,14 +53,12 @@ func toString(list: openArray[string]): string =
   for i, item in list:
     if i > 0:
       result.add(", ")
-    result.add("\"")
-    result.add(item)
-    result.add("\"")
+    result.add(fmt""""{item}"""")
   result.add("]")
 
 func `$`*(p: Prepost): string =
   ## Return the Prepost string representation.
-  result = "\"" & p.prefix &  "," & p.postfix & "\""
+  result = fmt""""{p.prefix},{p.postfix}""""
 
 func toString(list: openArray[Prepost]): string =
   ## Return the Prepost list string representation.
@@ -80,14 +71,15 @@ func toString(list: openArray[Prepost]): string =
 
 func `$`*(args: Args): string =
   ## Return the Args string representation.
-  result.add("args.help = $1\n" % $args.help)
-  result.add("args.version = $1\n" % $args.version)
-  result.add("args.update = $1\n" % $args.update)
-  result.add("args.log = $1\n" % $args.log)
-  result.add("args.repl = $1\n" % $args.repl)
-  result.add("args.logFilename = \"$1\"\n" % args.logFilename)
-  result.add("args.resultFilename = \"$1\"\n" % args.resultFilename)
-  result.add("args.serverList = $1\n" % toString(args.serverList))
-  result.add("args.codeList = $1\n" % toString(args.codeList))
-  result.add("args.templateFilename = \"$1\"\n" % args.templateFilename)
-  result.add("args.prepostList = $1" % toString(args.prepostList))
+  result.add(fmt"""
+args.help = {args.help}
+args.version = {args.version}
+args.update = {args.update}
+args.log = {args.log}
+args.repl = {args.repl}
+args.logFilename = "{args.logFilename}"
+args.resultFilename = "{args.resultFilename}"
+args.serverList = {toString(args.serverList)}
+args.codeList = {toString(args.codeList)}
+args.templateFilename = "{args.templateFilename}"
+args.prepostList = {toString(args.prepostList)}""")
