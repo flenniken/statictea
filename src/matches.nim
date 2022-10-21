@@ -177,7 +177,7 @@ func matchNumberNotCached*(line: string, start: Natural = 0): Option[Matches] =
   ## Match a number and the optional trailing whitespace. Return the
   ## optional decimal point that tells whether the number is a float
   ## or integer. "Not cached" allows it to be called by a function
-  ## because it has no side effects.  effects.
+  ## because it has no side effects.
   result = matchPattern(line, numberPattern, start, 1)
 
 proc matchUpToLeftBracket*(line: string, start: Natural = 0): Option[Matches] =

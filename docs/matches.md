@@ -180,7 +180,7 @@ proc matchNumber(line: string; start: Natural = 0): Option[Matches]
 
 # matchNumberNotCached
 
-Match a number and the optional trailing whitespace. Return the optional decimal point that tells whether the number is a float or integer. "Not cached" allows it to be called by a function because it has no side effects.  effects.
+Match a number and the optional trailing whitespace. Return the optional decimal point that tells whether the number is a float or integer. "Not cached" allows it to be called by a function because it has no side effects.
 
 ```nim
 func matchNumberNotCached(line: string; start: Natural = 0): Option[Matches]

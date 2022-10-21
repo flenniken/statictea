@@ -408,7 +408,7 @@ name = concat(substr(s.name, 0, 7), "...")
 Statements are allowed on the nextline, block, continue and
 replace commands.
 
-All operations are done with functions. For example, to add 1 to
+Most operations are done with functions. For example, to add 1 to
 t.row you use the add function.
 
 #+BEGIN_SRC
@@ -1066,7 +1066,7 @@ template:
 #+BEGIN_SRC
 <ul>
 <!--$ nextline t.repeat=len(s.companies)-->
-<!--$ : company = get(s.companies, t.row) -->
+<!--$ : company = s.companies[t.row] -->
 <!--$ : num = add(t.row, 1) -->
   <li id="r{t.row}">{num}. {company}</li>
 </ul>
@@ -1468,9 +1468,9 @@ statement: o.b = cmp(1.9, 5)
 
 [[#contents][茶]]
 
-* Boolean Expression
+* Boolean Expressions
 :PROPERTIES:
-:CUSTOM_ID: boolean-expression
+:CUSTOM_ID: boolean-expressions
 :END:
 
 You use a boolean expression with an if statement to make a
@@ -1706,7 +1706,7 @@ dir="{s.languageDirection}">
 """
 #+END_SRC
 
-A multiline string literal cannot be a argument to a
+A multiline string literal cannot be an argument to a
 function. The workaround is to assign it to a local variable and
 pass that to the function.
 
@@ -1900,7 +1900,7 @@ a = if(true, 1, 2)
 if(c, warn("c is true"))
 #+END_SRC
 
-The no assignment form is uses with the warn and return functions
+The no assignment form is used with the warn and return functions
 for their side effects.
 
 The if functions evaluates their condition argument first to
@@ -1925,7 +1925,7 @@ a = if0(0, do0(), warn("not zero"))
 
 The warn and return functions modify the statement flow.  The
 warn function skips the current statement and the return function
-ends the current block.
+ends the current command.
 
 [[#contents][茶]]
 
