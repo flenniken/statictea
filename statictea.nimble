@@ -631,8 +631,11 @@ proc runRunnerFolder() =
 
   let cmd = "export statictea='../../bin/statictea'; bin/runner -d=testfiles"
   # echo cmd
-  let result = staticExec cmd
+  let (result, rc) = gorgeEx(cmd)
   echo result
+  if rc != 0:
+    echo "stf test failure"
+    raise newException(IOError, "stf failure")
 
 proc get_stf_filenames(): seq[string] =
   ## Return the basename of the stf files in the testfiles folder.
@@ -750,19 +753,10 @@ proc otherTests() =
   # Make sure utf8decoder is up-to-date.
   checkUtf8DecoderEcho()
 
-# Tasks below
-
-task n, "\tShow available tasks.":
-  exec "nimble tasks"
-
-task test, "\tRun one or more tests; specify part of test filename.":
+proc runUnitTests(name = "") =
   ## Run one or more tests.  You specify part of the test filename and
   ## all files that match case insensitive are run. If you don't
   ## specify a name, all are run.
-  let count = system.paramCount()+1
-  # The name is either part of a name or "test" when not
-  # specified. Test happens to match all test files.
-  let name = system.paramStr(count-1)
   let test_filenames = get_test_filenames()
   for filename in test_filenames:
     if name.toLower in filename.toLower:
@@ -771,6 +765,16 @@ task test, "\tRun one or more tests; specify part of test filename.":
       let cmd = get_test_module_cmd(filename)
       echo cmd
       exec cmd
+
+# Tasks below
+
+task n, "\tShow available tasks.":
+  exec "nimble tasks"
+
+task test, "\tRun one or more tests; specify part of test filename.":
+  let count = system.paramCount()+1
+  let name = system.paramStr(count-1)
+  runUnitTests(name)
 
 task other, "\tRun other tests and build tests.":
   otherTests()
@@ -909,3 +913,13 @@ task cmdline, "\tBuild cmdline.":
   echo cmd
   exec cmd
   echo "Run bin/cmdline"
+
+task release, "\tRun tests and update docs.":
+  runUnitTests()
+  otherTests()
+  taskDocsIx()
+  taskDocs("")
+  taskReadMeFun()
+  taskTestfilesReadme()
+  createDependencyGraph()
+  createDependencyGraph2()
