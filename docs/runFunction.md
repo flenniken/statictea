@@ -1243,7 +1243,7 @@ func funJoinPath_loss(variables: Variables; parameters: seq[Value]): FunResult
 Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
 
 ~~~
-join(strs: list, sep: string, optional skipEmpty: int) string
+join(strs: list, sep: string, optional skipEmpty: bool) string
 ~~~~
 
 Examples:
@@ -1256,7 +1256,7 @@ join(["a"], ", ") => "a"
 join([""], ", ") => ""
 join(["a", "b"], "") => "ab"
 join(["a", "", "c"], "|") => "a||c"
-join(["a", "", "c"], "|", 1) => "a|c"
+join(["a", "", "c"], "|", true) => "a|c"
 ~~~~
 
 ```nim

@@ -15,7 +15,7 @@ Time how long it takes something to run.
 
 * type: [Timer](#timer) &mdash; Holds the start time in seconds.
 * [newTimer](#newtimer) &mdash; Create a new timer and set the start time.
-* [seconds](#seconds) &mdash; Return the elapsed seconds rounded to thousandths.
+* [seconds](#seconds) &mdash; Return the elapsed seconds rounded to the specified number of digits.
 
 # Timer
 
@@ -37,7 +37,7 @@ proc newTimer(): Timer
 
 # seconds
 
-Return the elapsed seconds rounded to thousandths.
+Return the elapsed seconds rounded to the specified number of digits.
 
 ```nim
 proc seconds(timer: Timer; digits: Natural = 3): float

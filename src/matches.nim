@@ -1,4 +1,4 @@
-## Regular expression matching methods.
+## Methods for matching sub-strings.
 
 import std/strutils
 import std/tables
@@ -136,7 +136,7 @@ proc matchAllSpaceTab(line: string, start: Natural = 0): Option[Matches] =
   result = matchPatternCached(line, pattern, start, 0)
 
 proc matchTabSpace*(line: string, start: Natural = 0): Option[Matches] =
-  ## Match one or more spaces or tabs.
+  ## Match one or more spaces or tabs starting at the given position.
   let pattern = r"[ \t]+"
   result = matchPatternCached(line, pattern, start, 0)
 

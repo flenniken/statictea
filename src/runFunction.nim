@@ -1684,7 +1684,7 @@ func funJoin_lsois*(variables: Variables, parameters: seq[Value]): FunResult =
   ## empty separator to concatenate the arguments.
   ## @:
   ## @:~~~
-  ## @:join(strs: list, sep: string, optional skipEmpty: int) string
+  ## @:join(strs: list, sep: string, optional skipEmpty: bool) string
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1697,7 +1697,7 @@ func funJoin_lsois*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:join([""], ", ") => ""
   ## @:join(["a", "b"], "") => "ab"
   ## @:join(["a", "", "c"], "|") => "a||c"
-  ## @:join(["a", "", "c"], "|", 1) => "a|c"
+  ## @:join(["a", "", "c"], "|", true) => "a|c"
   ## @:~~~~
 
   tMapParameters("lsois")

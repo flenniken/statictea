@@ -1,6 +1,6 @@
 # matches.nim
 
-Regular expression matching methods.
+Methods for matching sub-strings.
 
 * [matches.nim](../src/matches.nim) &mdash; Nim source code.
 # Index
@@ -14,7 +14,7 @@ Regular expression matching methods.
 * [matchCommand](#matchcommand) &mdash; Match statictea commands.
 * [matchLastPart](#matchlastpart) &mdash; Match the last part of a command line.
 * [getLastPart](#getlastpart) &mdash; Return the optional plus sign and line endings from the line.
-* [matchTabSpace](#matchtabspace) &mdash; Match one or more spaces or tabs.
+* [matchTabSpace](#matchtabspace) &mdash; Match one or more spaces or tabs starting at the given position.
 * [notEmptyOrSpaces](#notemptyorspaces) &mdash; Return true when a statement is not empty or not all whitespace.
 * [emptyOrSpaces](#emptyorspaces) &mdash; Return true when the text is empty or all whitespace from start to the end.
 * [matchEqualSign](#matchequalsign) &mdash; Match an equal sign or "&=" and the optional trailing whitespace.
@@ -132,7 +132,7 @@ proc getLastPart(line: string; postfix: string): Option[Matches]
 
 # matchTabSpace
 
-Match one or more spaces or tabs.
+Match one or more spaces or tabs starting at the given position.
 
 ```nim
 proc matchTabSpace(line: string; start: Natural = 0): Option[Matches]

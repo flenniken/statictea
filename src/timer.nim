@@ -21,5 +21,6 @@ proc newTimer*(): Timer =
   result = Timer(start: cpuTime())
 
 proc seconds*(timer: Timer, digits: Natural = 3): float =
-  ## Return the elapsed seconds rounded to thousandths.
+  ## Return the elapsed seconds rounded to the specified number of
+  ## digits.
   result = round(cpuTime() - timer.start, digits)

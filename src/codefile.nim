@@ -20,11 +20,15 @@ const
 type
   Found* = enum
     ## The line endings found.
+    ## * nothing = no special ending
     ## * plus = +
     ## * triple = """
-    ## * n = newline / line feed
-    ## * r = carriage return
-    ## * crlf = carriage return, line feed
+    ## * newline = \\n
+    ## * plus_n = +\\n
+    ## * triple_n = """\\n
+    ## * crlf = \\r\\n
+    ## * plus_crlf = +\\r\\n
+    ## * triple_crlf = """\\r\\n
     nothing,
     plus,       # +
     triple,     # """

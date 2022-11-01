@@ -14,11 +14,15 @@ Run code files.
 
 # Found
 
-The line endings found.<ul class="simple"><li>plus = +</li>
+The line endings found.<ul class="simple"><li>nothing = no special ending</li>
+<li>plus = +</li>
 <li>triple = """</li>
-<li>n = newline / line feed</li>
-<li>r = carriage return</li>
-<li>crlf = carriage return, line feed</li>
+<li>newline = \n</li>
+<li>plus_n = +\n</li>
+<li>triple_n = """\n</li>
+<li>crlf = \r\n</li>
+<li>plus_crlf = +\r\n</li>
+<li>triple_crlf = """\r\n</li>
 </ul>
 
 

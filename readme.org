@@ -3327,7 +3327,7 @@ joinPath(["/", "tea"]) =>
 Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
 
 #+BEGIN_SRC
-join(strs: list, sep: string, optional skipEmpty: int) string
+join(strs: list, sep: string, optional skipEmpty: bool) string
 #+END_SRC
 
 Examples:
@@ -3340,7 +3340,7 @@ join(["a"], ", ") => "a"
 join([""], ", ") => ""
 join(["a", "b"], "") => "ab"
 join(["a", "", "c"], "|") => "a||c"
-join(["a", "", "c"], "|", 1) => "a|c"
+join(["a", "", "c"], "|", true) => "a|c"
 #+END_SRC
 
 [[#contents][茶]]

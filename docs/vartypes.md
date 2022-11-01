@@ -150,7 +150,17 @@ FunResult = object
 
 # ValueAndPos
 
-A value and the position after the value in the statement.  For the example statement: "var = 567 # test"". The value 567 starts at index 6 and the position 10 because it includes the trailing space. For example "id = row(3 )" the value is 3 and the position is 5. Exit is set true by the return function to exit a command.
+A value and the position after the value in the statement. The position includes the trailing whitespace.  For the example statement below, the value 567 starts at index 6 and ends at
+position 10.
+
+~~~
+0123456789
+var = 567 # test
+      ^ start
+          ^ end position
+~~~~
+
+Exit is set true by the return function to exit a command.
 
 ```nim
 ValueAndPos = object

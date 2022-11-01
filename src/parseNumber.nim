@@ -7,7 +7,7 @@ import vartypes
 
 proc parseFloat*(str: string, start: Natural = 0): Option[ValueAndPos] =
   ## Parse the string and return the 64 bit float number and the
-  ## @:number position after the number. The number starts at the start
+  ## @:position after the number. The number starts at the start
   ## @:parameter index. Nothing is returned when the float is out of
   ## @:range or the str is not a float number.  Processing stops at the
   ## @:first non-number character.

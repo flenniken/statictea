@@ -6,14 +6,14 @@ Parse an int or float number string.  Return the number and number of characters
 # Index
 
 * [parseFloat](#parsefloat) &mdash; Parse the string and return the 64 bit float number and the
-number position after the number.
+position after the number.
 * [parseInteger](#parseinteger) &mdash; Parse the string and return the 64 bit signed integer and the
 position after the number.
 
 # parseFloat
 
 Parse the string and return the 64 bit float number and the
-number position after the number. The number starts at the start
+position after the number. The number starts at the start
 parameter index. Nothing is returned when the float is out of
 range or the str is not a float number.  Processing stops at the
 first non-number character.
