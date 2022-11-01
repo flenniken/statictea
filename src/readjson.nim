@@ -31,7 +31,6 @@ proc jsonToValue*(jsonNode: JsonNode, depth: int = 0): ValueOr =
     # JSON nulls become 0.
     value = newValue(0)
   of JBool:
-    # JSON true becomes 1 and false becomes 0.
     value = newValue(jsonNode.getBool())
   of JInt:
     value = newValue(jsonNode.getInt())

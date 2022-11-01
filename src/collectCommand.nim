@@ -11,9 +11,12 @@ import opresultwarn
 type
   ExtraLineKind* = enum
     ## The ExtraLine type.
-    elkNoLine,     ## there is no line here
-    elkOutOfLines, ## no more lines in the template
-    elkNormalLine  ## we have a line of some type.
+    ## @:* elkNoLine -- there is no line here
+    ## @:* elkOutOfLines -- no more lines in the template
+    ## @:* elkNormalLine -- we have a line of some type
+    elkNoLine,
+    elkOutOfLines,
+    elkNormalLine
 
   ExtraLine* = object
     ## The extra line and its type. The line is empty except for the

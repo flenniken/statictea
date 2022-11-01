@@ -17,12 +17,13 @@ Collect template command lines.
 # ExtraLineKind
 
 The ExtraLine type.
+* elkNoLine -- there is no line here
+* elkOutOfLines -- no more lines in the template
+* elkNormalLine -- we have a line of some type
 
 ```nim
 ExtraLineKind = enum
-  elkNoLine,                ## there is no line here
-  elkOutOfLines,            ## no more lines in the template
-  elkNormalLine              ## we have a line of some type.
+  elkNoLine, elkOutOfLines, elkNormalLine
 ```
 
 # ExtraLine

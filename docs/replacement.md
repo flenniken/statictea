@@ -2,6 +2,30 @@
 
 Handle the replacement block lines.
 
+To support replacement blocks that consists of many lines and blocks
+that repeat many times, we read the replacement block and compile
+and store it in a temp file in a format that is easy to write out
+multiple times.
+
+The temporary file consists of parts of lines called segments. There
+are segments for the variables in the line and segments for the rest
+of the text.
+
+Segments are a text format containing a number (type), a comma and a
+string.
+
+All segments end with a newline. If a template line uses cr/lf, the
+segment will end with cr/lf.  The segment type tells you whether to
+write out the ending newline or not to the result file.
+
+Segment text are bytes. The bracketed variables are ascii.
+
+A bracketed variable does not contain space around the variable.
+{var} not { var }.
+
+To use a left bracket in a replacement block you use two left brackets, {{,
+{{ results in {.
+
 * [replacement.nim](../src/replacement.nim) &mdash; Nim source code.
 # Index
 
