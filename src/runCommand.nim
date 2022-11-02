@@ -14,10 +14,10 @@ import parseNumber
 import variables
 import runFunction
 import readjson
-import collectCommand
 import opresultwarn
 import unicodes
 import utf8decoder
+import parseCmdLine
 
 const
   # Turn on showPos for testing to graphically show the start and end

@@ -271,3 +271,22 @@ suite "parseCmdLine.nim":
     let line = "<!--$ nextline \n"
     # template.html(16): w23: The matching closing comment postfix was not found, expected: "-->".
     check parseCmdLineError(line, 0, newLinePartsOr(wNoPostfix, "-->", 0))
+
+  test "ExtraLine default":
+    var extraLine: ExtraLine
+    check extraLine.kind == elkNoLine
+    check extraLine.line == ""
+
+  test "newNormalLine":
+    let extraLine = newNormalLine("hello")
+    check extraLine.kind == elkNormalLine
+    check extraLine.line == "hello"
+
+  test "newExtraLineSpecial":
+    var extraLine = newNoLine()
+    check extraLine.kind == elkNoLine
+    check extraLine.line == ""
+
+    extraLine = newOutOfLines()
+    check extraLine.kind == elkOutOfLines
+    check extraLine.line == ""

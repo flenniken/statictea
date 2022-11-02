@@ -12,7 +12,6 @@ import variables
 import messages
 import warnings
 import version
-import collectCommand
 import opresultwarn
 import sharedtestcode
 import codefile

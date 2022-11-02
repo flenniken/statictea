@@ -7,6 +7,12 @@ Parse a StaticTea language command line.
 
 * type: [LineParts](#lineparts) &mdash; LineParts holds parsed components of a line.
 * type: [LinePartsOr](#linepartsor) &mdash; The line parts or a warning.
+* type: [CmdLines](#cmdlines) &mdash; The collected command lines and their parts.
+* type: [ExtraLineKind](#extralinekind) &mdash; The ExtraLine type.
+* type: [ExtraLine](#extraline) &mdash; The extra line and its type.
+* [newNormalLine](#newnormalline) &mdash; Create a normal ExtraLine.
+* [newNoLine](#newnoline) &mdash; Create a no line ExtraLine.
+* [newOutOfLines](#newoutoflines) &mdash; Create an out of lines ExtraLine.
 * [newLinePartsOr](#newlinepartsor) &mdash; Return a new LinePartsOr object containing a warning.
 * [newLinePartsOr](#newlinepartsor-1) &mdash; Return a new LinePartsOr object containing a LineParts object.
 * [getCodeLength](#getcodelength) &mdash; Return the length of the code in the line.
@@ -49,6 +55,64 @@ The line parts or a warning.
 
 ```nim
 LinePartsOr = OpResultWarn[LineParts]
+```
+
+# CmdLines
+
+The collected command lines and their parts.
+
+```nim
+CmdLines = object
+  lines*: seq[string]
+  lineParts*: seq[LineParts]
+
+```
+
+# ExtraLineKind
+
+The ExtraLine type.
+* elkNoLine -- there is no line here
+* elkOutOfLines -- no more lines in the template
+* elkNormalLine -- we have a line of some type
+
+```nim
+ExtraLineKind = enum
+  elkNoLine, elkOutOfLines, elkNormalLine
+```
+
+# ExtraLine
+
+The extra line and its type. The line is empty except for the elkNormalLine type.
+
+```nim
+ExtraLine = object
+  kind*: ExtraLineKind
+  line*: string
+
+```
+
+# newNormalLine
+
+Create a normal ExtraLine.
+
+```nim
+func newNormalLine(line: string): ExtraLine
+```
+
+# newNoLine
+
+Create a no line ExtraLine.
+
+```nim
+func newNoLine(): ExtraLine
+```
+
+# newOutOfLines
+
+Create an out of lines ExtraLine.
+
+```nim
+func newOutOfLines(): ExtraLine
 ```
 
 # newLinePartsOr

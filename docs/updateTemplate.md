@@ -5,8 +5,18 @@ Update a template.
 * [updateTemplate.nim](../src/updateTemplate.nim) &mdash; Nim source code.
 # Index
 
+* [collectReplaceCommand](#collectreplacecommand) &mdash; Collect the replace commands.
 * [updateTemplate](#updatetemplate) &mdash; Update the template and return 0 on success.
 * [updateTemplateTop](#updatetemplatetop) &mdash; Update the template.
+
+# collectReplaceCommand
+
+Collect the replace commands.  Read template lines and write out non-command lines. When a replace command is found, return its lines.  This includes the command line and its continue lines. On input extraLine is the first line to use.  On exit extraLine is the line that caused the collection to stop which is commonly the first replacement block line.
+
+```nim
+proc collectReplaceCommand(env: var Env; lb: var LineBuffer;
+                           prepostTable: PrepostTable; extraLine: var ExtraLine): CmdLines
+```
 
 # updateTemplate
 

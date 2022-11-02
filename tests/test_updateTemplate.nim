@@ -2,12 +2,53 @@
 import std/unittest
 import std/os
 import std/strutils
+import std/streams
+import std/options
 import env
 import args
 import sharedtestcode
 import comparelines
 import codefile
 import updateTemplate
+import matches
+import readlines
+import parseCmdLine
+
+proc testCollectReplaceCommand(
+    inExtraLine: ExtraLine,
+    content: string,
+    eCmdStartLine: Natural,
+    eCmdNumLines: Natural,
+    eOutExtraLine: ExtraLine,
+    eResultPickedLines: openarray[int] = [],
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[],
+  ): bool =
+
+  var inStream = newStringStream(content)
+  var lineBufferO = newLineBuffer(inStream, filename="template.html")
+  var lb = lineBufferO.get()
+  var env = openEnvTest("_collectReplaceCommand.log")
+  let prepostTable = makeDefaultPrepostTable()
+
+  let totalContent = inExtraLine.line & content
+  let eCmdLines = splitContent(totalContent, eCmdStartLine, eCmdNumLines)
+  let eResultLines = splitContentPick(totalContent, eResultPickedLines)
+  var inOutExtraLine = inExtraLine
+
+  var cmdLines = collectReplaceCommand(env, lb, prepostTable, inOutExtraLine)
+
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines,
+    eResultLines)
+
+  if not expectedItems("cmdLines.lines", cmdLines.lines, eCmdLines):
+    echo ""
+    result = false
+
+  if not expectedItem("eOutExtraLine", inOutExtraLine, eOutExtraLine):
+    echo ""
+    result = false
 
 proc testUpdateTemplate(templateContent: string = "",
     serverJson: string = "",
@@ -53,7 +94,7 @@ proc testUpdateTemplate(templateContent: string = "",
   discard tryRemoveFile("server.json")
   discard tryRemoveFile("shared.tea")
 
-suite "processTemplate":
+suite "updateTemplate.nim":
 
   test "update empty template":
     let templateContent = ""
@@ -243,4 +284,52 @@ no newline
 """
     check testUpdateTemplate(templateContent = templateContent,
       eResultLines = eResultLines)
+
+  test "collect replace":
+    let inLine = newNoLine()
+    let content = """
+$$ replace
+replacement block
+$$ endblock
+"""
+    let eOutLine = newNormalLine("replacement block\n")
+    check testCollectReplaceCommand(inLine, content, 0, 1, eOutLine)
+
+  test "collect replace but not others":
+    let inLine = newNoLine()
+    let content = """
+others
+$$ nextline
+replacement block
+$$ block
+$$ endblock
+$$ replace
+replacement block
+$$ endblock
+end
+"""
+    let eOutLine = newNormalLine("replacement block\n")
+    check testCollectReplaceCommand(inLine, content, 5, 1, eOutLine, [0,1,2,3,4])
+
+  test "collect replace out of lines":
+    let inLine = newNoLine()
+    let content = """
+$$ block
+replacement block
+$$ endblock
+"""
+    let eOutLine = newOutOfLines()
+    check testCollectReplaceCommand(inLine, content, 0, 0, eOutLine, [0,1,2])
+
+  test "collect replace again":
+    let inLine = newNoLine()
+    let content = """
+$$ block
+replacement block
+$$ replace
+$$ replace
+$$ endblock
+"""
+    let eOutLine = newOutOfLines()
+    check testCollectReplaceCommand(inLine, content, 0, 0, eOutLine, [0,1,2,3,4])
 

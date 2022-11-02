@@ -37,6 +37,38 @@ type
   LinePartsOr* = OpResultWarn[LineParts]
     ## The line parts or a warning.
 
+  CmdLines* = object
+    ## The collected command lines and their parts.
+    lines*: seq[string]
+    lineParts*: seq[LineParts]
+
+  ExtraLineKind* = enum
+    ## The ExtraLine type.
+    ## @:* elkNoLine -- there is no line here
+    ## @:* elkOutOfLines -- no more lines in the template
+    ## @:* elkNormalLine -- we have a line of some type
+    elkNoLine,
+    elkOutOfLines,
+    elkNormalLine
+
+  ExtraLine* = object
+    ## The extra line and its type. The line is empty except for the
+    ## elkNormalLine type.
+    kind*: ExtraLineKind
+    line*: string
+
+func newNormalLine*(line: string): ExtraLine =
+  ## Create a normal ExtraLine.
+  result = ExtraLine(kind: elkNormalLine, line: line)
+
+func newNoLine*(): ExtraLine =
+  ## Create a no line ExtraLine.
+  result = ExtraLine(kind: elkNoLine, line: "")
+
+func newOutOfLines*(): ExtraLine =
+  ## Create an out of lines ExtraLine.
+  result = ExtraLine(kind: elkOutOfLines, line: "")
+
 func newLinePartsOr*(warning: MessageId, p1: string = "", pos = 0):
      LinePartsOr =
   ## Return a new LinePartsOr object containing a warning.
