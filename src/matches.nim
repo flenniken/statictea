@@ -79,6 +79,19 @@ proc makeUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
     assert prepost.prefix != ""
     result[prepost.prefix] = prepost.postfix
 
+proc getPrepostTable*(args: Args): PrepostTable =
+  ## Get the the prepost settings from the user or use the default
+  ## ones.
+
+  # Get the prepost table, either the user specified one or the
+  # default one. The defaults are not used when the user specifies
+  # them, so that they have complete control over the preposts used.
+  if args.prepostList.len > 0:
+    # The prepostList has been validated already.
+    result = makeUserPrepostTable(args.prepostList)
+  else:
+    result = makeDefaultPrepostTable()
+
 proc matchPrefix*(line: string, prepostTable: PrepostTable,
     start: Natural = 0): Option[Matches] =
   ## Match lines that start with one of the prefixes in the given

@@ -5,19 +5,8 @@ Process the template.
 * [processTemplate.nim](../src/processTemplate.nim) &mdash; Nim source code.
 # Index
 
-* [yieldContentLine](#yieldcontentline) &mdash; Yield one line at a time and keep the line endings.
 * [processTemplate](#processtemplate) &mdash; Process the template.
-* [updateTemplate](#updatetemplate) &mdash; Update the template and return 0 on success.
 * [processTemplateTop](#processtemplatetop) &mdash; Setup the environment streams then process the template.
-* [updateTemplateTop](#updatetemplatetop) &mdash; Update the template.
-
-# yieldContentLine
-
-Yield one line at a time and keep the line endings.
-
-```nim
-iterator yieldContentLine(content: string): string
-```
 
 # processTemplate
 
@@ -27,28 +16,12 @@ Process the template.
 proc processTemplate(env: var Env; args: Args)
 ```
 
-# updateTemplate
-
-Update the template and return 0 on success. Return 1 if a warning messages was written while processing the template.
-
-```nim
-proc updateTemplate(env: var Env; args: Args)
-```
-
 # processTemplateTop
 
 Setup the environment streams then process the template.
 
 ```nim
 proc processTemplateTop(env: var Env; args: Args)
-```
-
-# updateTemplateTop
-
-Update the template.
-
-```nim
-proc updateTemplateTop(env: var Env; args: Args)
 ```
 
 

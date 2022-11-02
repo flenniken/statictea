@@ -35,6 +35,7 @@ StaticTea nim source code documentation.
 * [tempFile.nim](tempFile.md) &mdash; Create a temporary file.
 * [timer.nim](timer.md) &mdash; Time how long it takes something to run.
 * [unicodes.nim](unicodes.md) &mdash; Functions that deal with Unicode.
+* [updateTemplate.nim](updateTemplate.md) &mdash; Update a template.
 * [utf8decoder.nim](utf8decoder.md) &mdash; Functions for decoding and validating UTF-8.
 * [variables.nim](variables.md) &mdash; Procedures for working with statictea variables.
 * [vartypes.nim](vartypes.md) &mdash; StaticTea variable types.

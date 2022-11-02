@@ -10,6 +10,7 @@ Methods for matching sub-strings.
 * type: [PrepostTable](#preposttable) &mdash; The prefix postfix pairs stored in an ordered dictionary.
 * [makeDefaultPrepostTable](#makedefaultpreposttable) &mdash; Return the default ordered table that maps prefixes to postfixes.
 * [makeUserPrepostTable](#makeuserpreposttable) &mdash; Return the user's ordered table that maps prefixes to postfixes.
+* [getPrepostTable](#getpreposttable) &mdash; Get the the prepost settings from the user or use the default ones.
 * [matchPrefix](#matchprefix) &mdash; Match lines that start with one of the prefixes in the given table plus optional following whitespace.
 * [matchCommand](#matchcommand) &mdash; Match statictea commands.
 * [matchLastPart](#matchlastpart) &mdash; Match the last part of a command line.
@@ -94,6 +95,14 @@ Return the user's ordered table that maps prefixes to postfixes. This is used wh
 
 ```nim
 proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable
+```
+
+# getPrepostTable
+
+Get the the prepost settings from the user or use the default ones.
+
+```nim
+proc getPrepostTable(args: Args): PrepostTable
 ```
 
 # matchPrefix

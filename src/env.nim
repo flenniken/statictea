@@ -554,3 +554,15 @@ when defined(test):
     if eTemplateLines.len > 0:
       if not expectedItems("templateLines", templateLines, eTemplateLines):
         result = false
+
+iterator yieldContentLine*(content: string): string =
+  ## Yield one line at a time and keep the line endings.
+  var start = 0
+  for pos in 0 ..< content.len:
+    let ch = content[pos]
+    if ch == '\n':
+      yield(content[start .. pos])
+      start = pos+1
+  if start < content.len:
+    yield(content[start ..< content.len])
+

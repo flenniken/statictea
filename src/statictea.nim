@@ -3,6 +3,7 @@
 import std/strutils
 import parseCommandLine
 import processTemplate
+import updateTemplate
 import args
 import messages
 import gethelp
