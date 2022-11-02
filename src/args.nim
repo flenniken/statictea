@@ -83,3 +83,13 @@ args.serverList = {toString(args.serverList)}
 args.codeList = {toString(args.codeList)}
 args.templateFilename = "{args.templateFilename}"
 args.prepostList = {toString(args.prepostList)}""")
+
+func `$`*(prepostList: seq[Prepost]): string =
+  var first = true
+  for pp in prepostList:
+    if not first:
+      result.add(", ")
+    first = false
+    result.add(fmt"({pp.prefix}, {pp.postfix})")
+
+

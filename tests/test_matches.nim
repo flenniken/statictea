@@ -9,6 +9,30 @@ import env
 import args
 import sharedtestcode
 
+proc newStrFromBuffer(buffer: openArray[uint8]): string =
+  result = newStringOfCap(buffer.len)
+  for ix in 0 ..< buffer.len:
+    result.add((char)buffer[ix])
+
+proc testParsePrepostGood(str: string, ePrefix: string, ePostfix: string = ""): bool =
+  let prepostO = parsePrepost(str)
+  if not isSome(prepostO):
+    echo "'$1' is not a valid prepost." % str
+    return false
+  result = true
+  let prepost = prepostO.get()
+  if not expectedItem("prefix", prepost.prefix, ePrefix):
+    result = false
+  if not expectedItem("postfix", prepost.postfix, ePostfix):
+    result = false
+
+proc testParsePrepostBad(str: string): bool =
+  let prepostO = parsePrepost(str)
+  if isSome(prepostO):
+    echo "'$1' is a valid prepost." % str
+    return false
+  result = true
+
 proc testMatchCommand(line: string, start: Natural = 0,
     eMatchesO: Option[Matches] = none(Matches)): bool =
   ## Test MatchCommand.
@@ -585,3 +609,46 @@ suite "matches.nim":
     check testEmptyOrSpaces("tea>  ", 5, true)
     check testEmptyOrSpaces("tea> ", 0, false)
     check testEmptyOrSpaces("a  ", 0, false)
+
+  test "prepost string representation":
+    var prepostList: seq[Prepost]
+
+    prepostList = @[newPrepost("#$", "")]
+    check($prepostList == "(#$, )")
+
+    prepostList = @[newPrepost("<--$", "-->")]
+    check($prepostList == "(<--$, -->)")
+
+    prepostList = @[newPrepost("<--$", "-->"), newPrepost("#$", "")]
+    check($prepostList == "(<--$, -->), (#$, )")
+
+  test "parsePrepost":
+    check testParsePrepostGood("a,b", "a", ePostfix = "b")
+    check testParsePrepostGood("a,b", "a", "b")
+    check testParsePrepostGood("a", "a", "")
+    check testParsePrepostGood("<--$,-->", "<--$", "-->")
+    check testParsePrepostGood("$$", "$$", "")
+    check testParsePrepostGood("1234567890123456789$,2234567890123456789$",
+                               "1234567890123456789$", "2234567890123456789$")
+    check testParsePrepostGood("# ", "# ", "")
+    check testParsePrepostGood(" ", " ", "")
+    check testParsePrepostGood("  ", "  ", "")
+    check testParsePrepostGood("   ", "   ", "")
+    check testParsePrepostGood("   ,   ", "   ", "   ")
+    check testParsePrepostGood("[[$,]]", "[[$", "]]")
+    check testParsePrepostGood("$$", "$$")
+
+  test "testOrgModePrefix":
+    check testParsePrepostGood("# $", "# $", "")
+
+  test "testParsePrepostBad":
+    check testParsePrepostBad("")
+    check testParsePrepostBad(",")
+    check testParsePrepostBad("a,")
+    check testParsePrepostBad(",asdf")
+    check testParsePrepostBad("a,b,")
+    check testParsePrepostBad("123456789 123456789 1,b")
+    check testParsePrepostBad("b,123456789 123456789 1")
+    check testParsePrepostBad("añyóng")
+    check testParsePrepostBad(newStrFromBuffer([0x08u8, 0x12]))
+    check testParsePrepostBad(newStrFromBuffer([0x31u8, 0x2c, 0x12]))

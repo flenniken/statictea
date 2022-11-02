@@ -6,19 +6,8 @@ import std/os
 import args
 import messages
 import warnings
-import regexes
 import cmdline
-
-proc parsePrepost*(str: string): Option[Prepost] =
-  ## Parse the prepost item on the terminal command line.  A prefix is
-  ## followed by an optional postfix, prefix[,postfix].  Each part
-  ## contains 1 to 20 ascii characters including spaces but without
-  ## control characters or commas.
-  let pattern = "([\x20-\x2b\x2d-\x7F]{1,20})(?:,([\x20-\x2b\x2d-\x7F]{1,20})){0,1}$"
-  let matchesO = matchPattern(str, pattern, 0, 2)
-  if matchesO.isSome:
-    let (prefix, postfix) = matchesO.get2Groups()
-    result = some(newPrepost(prefix, postfix))
+import matches
 
 func mapCmlMessages(messageId: CmlMessageId): MessageId =
   ## Map a cml message to a MessageId.

@@ -5,16 +5,7 @@ Parse the StaticTea terminal command line and return the arguments.
 * [parseCommandLine.nim](../src/parseCommandLine.nim) &mdash; Nim source code.
 # Index
 
-* [parsePrepost](#parseprepost) &mdash; Parse the prepost item on the terminal command line.
 * [parseCommandLine](#parsecommandline) &mdash; Parse the terminal command line.
-
-# parsePrepost
-
-Parse the prepost item on the terminal command line.  A prefix is followed by an optional postfix, prefix[,postfix].  Each part contains 1 to 20 ascii characters including spaces but without control characters or commas.
-
-```nim
-proc parsePrepost(str: string): Option[Prepost]
-```
 
 # parseCommandLine
 

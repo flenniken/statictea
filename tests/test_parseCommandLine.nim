@@ -16,17 +16,6 @@ proc parseCommandLine*(cmdLine: string = ""): ArgsOr =
   let argv = cmdLine.splitWhitespace()
   result = parseCommandLine(argv)
 
-func `$`(prepostList: seq[Prepost]): string =
-  var parts: seq[string]
-  for pp in prepostList:
-    parts.add("($1, $2)" % [pp.prefix, pp.postfix])
-  result = parts.join(", ")
-
-proc newStrFromBuffer(buffer: openArray[uint8]): string =
-  result = newStringOfCap(buffer.len)
-  for ix in 0 ..< buffer.len:
-    result.add((char)buffer[ix])
-
 proc parseWarning(cmdline: string, eWarningData: WarningData): bool =
   result = true
   let argsOr = parseCommandLine(cmdLine)
@@ -86,69 +75,7 @@ proc tpcl(
   if not expectedItems("prepostList", args.prepostList, prepostList):
     result = false
 
-proc testParsePrepostGood(str: string, ePrefix: string, ePostfix: string = ""): bool =
-  let prepostO = parsePrepost(str)
-  if not isSome(prepostO):
-    echo "'$1' is not a valid prepost." % str
-    return false
-  result = true
-  let prepost = prepostO.get()
-  if not expectedItem("prefix", prepost.prefix, ePrefix):
-    result = false
-  if not expectedItem("postfix", prepost.postfix, ePostfix):
-    result = false
-
-proc testParsePrepostBad(str: string): bool =
-  let prepostO = parsePrepost(str)
-  if isSome(prepostO):
-    echo "'$1' is a valid prepost." % str
-    return false
-  result = true
-
 suite "parseCommandLine":
-
-  test "prepost string representation":
-    var prepostList: seq[Prepost]
-
-    prepostList = @[newPrepost("#$", "")]
-    check($prepostList == "(#$, )")
-
-    prepostList = @[newPrepost("<--$", "-->")]
-    check($prepostList == "(<--$, -->)")
-
-    prepostList = @[newPrepost("<--$", "-->"), newPrepost("#$", "")]
-    check($prepostList == "(<--$, -->), (#$, )")
-
-  test "parsePrepost":
-    check testParsePrepostGood("a,b", "a", ePostfix = "b")
-    check testParsePrepostGood("a,b", "a", "b")
-    check testParsePrepostGood("a", "a", "")
-    check testParsePrepostGood("<--$,-->", "<--$", "-->")
-    check testParsePrepostGood("$$", "$$", "")
-    check testParsePrepostGood("1234567890123456789$,2234567890123456789$",
-                               "1234567890123456789$", "2234567890123456789$")
-    check testParsePrepostGood("# ", "# ", "")
-    check testParsePrepostGood(" ", " ", "")
-    check testParsePrepostGood("  ", "  ", "")
-    check testParsePrepostGood("   ", "   ", "")
-    check testParsePrepostGood("   ,   ", "   ", "   ")
-    check testParsePrepostGood("[[$,]]", "[[$", "]]")
-    check testParsePrepostGood("$$", "$$")
-
-  test "testOrgModePrefix":
-    check testParsePrepostGood("# $", "# $", "")
-
-  test "testParsePrepostBad":
-    check testParsePrepostBad("")
-    check testParsePrepostBad(",")
-    check testParsePrepostBad("a,")
-    check testParsePrepostBad(",asdf")
-    check testParsePrepostBad("a,b,")
-    check testParsePrepostBad("123456789 123456789 1,b")
-    check testParsePrepostBad("b,123456789 123456789 1")
-    check testParsePrepostBad("añyóng")
-    check testParsePrepostBad(newStrFromBuffer([0x08u8, 0x12]))
-    check testParsePrepostBad(newStrFromBuffer([0x31u8, 0x2c, 0x12]))
 
   test "parseCommandLine-v":
     check tpcl("-v", version=true)
