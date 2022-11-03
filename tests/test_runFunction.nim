@@ -150,6 +150,11 @@ func abc(variables: Variables, arguments: seq[Value]): FunResult =
   ## Do nothing test function.
   result = newFunResult(newValue("hi"))
 
+proc testBool(value: Value, eResult: bool): bool =
+  var arguments = @[value]
+  let eFunResult = newFunResult(newValue(eResult))
+  result = testFunction("bool", arguments, eFunResult)
+
 suite "runFunction.nim":
 
   test "getBestFunction function value":
@@ -1762,9 +1767,23 @@ d.sub.y = 4"""
     check testStartsWith("", "l", false)
 
   test "bool false":
-    var arguments = @[newValue(0)]
-    let eFunResult = newFunResult(newValue(false))
-    check testFunction("bool", arguments, eFunResult)
+    check testBool(newValue(0), false)
+    check testBool(newValue(0.0), false)
+    check testBool(newValue(""), false)
+    check testBool(newEmptyListValue(), false)
+    check testBool(newEmptyDictValue(), false)
+    let function = newFunc("abc", abc, "iis")
+    check testBool(newValue(function), false)
+
+  test "bool true":
+    check testBool(newValue(2), true)
+    check testBool(newValue(3.0), true)
+    check testBool(newValue("t"), true)
+    check testBool(newValue([1,2]), true)
+    var varsDict = newVarsDict()
+    var dictValue = newValue(varsDict)
+    varsDict["k"] = newValue("v")
+    check testBool(dictValue, true)
 
   test "bool true":
     var arguments = @[newValue(3)]

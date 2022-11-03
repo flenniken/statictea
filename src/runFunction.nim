@@ -842,27 +842,66 @@ func funInt_ssaa*(variables: Variables, parameters: seq[Value]): FunResult =
   if result.value.kind == vkFloat:
     result = convertFloatToInt(result.value.floatv, map)
 
-func funBool_ib*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Create an bool from an int. A 0 is false and all other values are true.
+func if0Condition*(cond: Value): bool =
+  ## Convert the value to a boolean.
+  result = true
+  case cond.kind:
+   of vkInt:
+     if cond.intv == 0:
+       result = false
+   of vkFloat:
+     if cond.floatv == 0.0:
+       result = false
+   of vkString:
+     if cond.stringv.len == 0:
+       result = false
+   of vkList:
+     if cond.listv.len == 0:
+       result = false
+   of vkDict:
+     if cond.dictv.len == 0:
+       result = false
+   of vkBool:
+     result = cond.boolv
+   of vkFunc:
+     result = false
+
+func funBool_ab*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Create an bool from a value.
   ## @:
   ## @:~~~
-  ## @:bool(num: int) bool
+  ## @:bool(value: Value) bool
   ## @:~~~~
+  ## @:
+  ## @:False values by variable types:
+  ## @:
+  ## @:* bool -- false
+  ## @:* int -- 0
+  ## @:* float -- 0.0
+  ## @:* string -- when the length of the string is 0
+  ## @:* list -- when the length of the list is 0
+  ## @:* dict -- when the length of the dictionary is 0
+  ## @:* func -- always false
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
   ## @:bool(0) => false
-  ## @:bool(1) => true
-  ## @:bool(2) => true
-  ## @:bool(3) => true
-  ## @:bool(-1) => true
+  ## @:bool(0.0) => false
+  ## @:bool([]) => false
+  ## @:bool("") => false
+  ## @:bool(dict()) => false
+  ## @:
+  ## @:bool(5) => true
+  ## @:bool(3.3) => true
+  ## @:bool([8]) => true
+  ## @:bool("tea") => true
+  ## @:bool(dict("tea", 2)) => true
   ## @:~~~~
 
-  tMapParameters("ib")
-  let num = map["a"].intv
-  let b = if num == 0: false else: true
-  result = newFunResult(newValue(b))
+  tMapParameters("ab")
+  let value = map["a"]
+  result = newFunResult(newValue(if0Condition(value)))
 
 func funFind_ssoaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Find the position of a substring in a string.  When the substring
@@ -2276,7 +2315,7 @@ const
     ("add", funAdd_fff, "fff"),
     ("add", funAdd_iii, "iii"),
     ("and", funAnd_bbb, "bbb"),
-    ("bool", funBool_ib, "ib"),
+    ("bool", funBool_ab, "ab"),
     ("case", funCase_iloaa, "iloaa"),
     ("case", funCase_sloaa, "sloaa"),
     ("cmp", funCmp_ffi, "ffi"),

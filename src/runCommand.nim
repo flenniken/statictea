@@ -501,26 +501,7 @@ proc ifFunctions*(
       return newValueAndPosOr(wExpectedBool, $cond.kind, start)
     condition = cond.boolv
   else: # functionName == "if0"
-    case cond.kind:
-     of vkInt:
-       if cond.intv == 0:
-         condition = true
-     of vkFloat:
-       if cond.floatv == 0.0:
-         condition = true
-     of vkString:
-       if cond.stringv.len == 0:
-         condition = true
-     of vkList:
-       if cond.listv.len == 0:
-         condition = true
-     of vkDict:
-       if cond.dictv.len == 0:
-         condition = true
-     of vkBool:
-       condition = cond.boolv
-     of vkFunc:
-       condition = false
+    condition = if0Condition(cond) == false
 
   # Match the comma and whitespace.
   let commaO = matchSymbol(statement.text, gComma, runningPos)

@@ -30,7 +30,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funInt_fosi](#funint_fosi) &mdash; Create an int from a float.
 * [funInt_sosi](#funint_sosi) &mdash; Create an int from a number string.
 * [funInt_ssaa](#funint_ssaa) &mdash; Create an int from a number string.
-* [funBool_ib](#funbool_ib) &mdash; Create an bool from an int.
+* [if0Condition](#if0condition) &mdash; Convert the value to a boolean.
+* [funBool_ab](#funbool_ab) &mdash; Create an bool from a value.
 * [funFind_ssoaa](#funfind_ssoaa) &mdash; Find the position of a substring in a string.
 * [funSlice_siois](#funslice_siois) &mdash; Extract a substring from a string by its position and length.
 * [funDup_sis](#fundup_sis) &mdash; Duplicate a string x times.
@@ -691,26 +692,50 @@ int("notnum", "round", "nan") => nan
 func funInt_ssaa(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funBool_ib
+# if0Condition
 
-Create an bool from an int. A 0 is false and all other values are true.
+Convert the value to a boolean.
+
+```nim
+func if0Condition(cond: Value): bool
+```
+
+# funBool_ab
+
+Create an bool from a value.
 
 ~~~
-bool(num: int) bool
+bool(value: Value) bool
 ~~~~
+
+False values by variable types:
+
+* bool -- false
+* int -- 0
+* float -- 0.0
+* string -- when the length of the string is 0
+* list -- when the length of the list is 0
+* dict -- when the length of the dictionary is 0
+* func -- always false
 
 Examples:
 
 ~~~
 bool(0) => false
-bool(1) => true
-bool(2) => true
-bool(3) => true
-bool(-1) => true
+bool(0.0) => false
+bool([]) => false
+bool("") => false
+bool(dict()) => false
+
+bool(5) => true
+bool(3.3) => true
+bool([8]) => true
+bool("tea") => true
+bool(dict("tea", 2)) => true
 ~~~~
 
 ```nim
-func funBool_ib(variables: Variables; parameters: seq[Value]): FunResult
+func funBool_ab(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funFind_ssoaa

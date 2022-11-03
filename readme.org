@@ -2300,7 +2300,7 @@ List of functions:
 - [[#add][add]] -- Add two floats.
 - [[#add][add]] -- Add two integers.
 - [[#and][and]] -- Boolean and with short circuit.
-- [[#bool][bool]] -- Create an bool from an int.
+- [[#bool][bool]] -- Create an bool from a value.
 - [[#case][case]] -- Compare integer cases and return the matching value.
 - [[#case][case]] -- Compare string cases and return the matching value.
 - [[#cmpVersion][cmpVersion]] -- Compare two StaticTea version numbers.
@@ -2435,20 +2435,36 @@ and(false, warn("not hit")) => false
 :CUSTOM_ID: bool
 :END:
 
-Create an bool from an int. A 0 is false and all other values are true.
+Create an bool from a value.
 
 #+BEGIN_SRC
-bool(num: int) bool
+bool(value: Value) bool
 #+END_SRC
+
+False values by variable types:
+
+- bool -- false
+- int -- 0
+- float -- 0.0
+- string -- when the length of the string is 0
+- list -- when the length of the list is 0
+- dict -- when the length of the dictionary is 0
+- func -- always false
 
 Examples:
 
 #+BEGIN_SRC
 bool(0) => false
-bool(1) => true
-bool(2) => true
-bool(3) => true
-bool(-1) => true
+bool(0.0) => false
+bool([]) => false
+bool("") => false
+bool(dict()) => false
+
+bool(5) => true
+bool(3.3) => true
+bool([8]) => true
+bool("tea") => true
+bool(dict("tea", 2)) => true
 #+END_SRC
 
 [[#contents][茶]]
