@@ -2350,6 +2350,7 @@ List of functions:
 - [[#not][not]] -- Boolean not.
 - [[#or][or]] -- Boolean or with short circuit.
 - [[#path][path]] -- Split a file path into its component pieces.
+- [[#readJson][readJson]] -- Read the JSON string and return it as a variable.
 - [[#replaceRe][replaceRe]] -- Replace multiple parts of a string using regular expressions.
 - [[#replace][replace]] -- Replace a substring specified by its position and length with another string.
 - [[#return][return]] -- Return the given value and control command looping.
@@ -3708,6 +3709,29 @@ path("src\runFunction.nim", "\") => {
   "ext": ".nim",
   "dir": "src\",
 }
+#+END_SRC
+
+[[#contents][茶]]
+
+** readJson
+:PROPERTIES:
+:CUSTOM_ID: readJson
+:END:
+
+Read the JSON string and return it as a variable.
+
+#+BEGIN_SRC
+readJson(json: string) any
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+a = readJson(""tea"") => "tea"
+b = readJson("4.5") => 4.5
+c = readJson("[1,2,3]") => [1, 2, 3]
+d = readJson("{"a":1, "b": 2}")
+  => {"a": 1, "b", 2}
 #+END_SRC
 
 [[#contents][茶]]

@@ -233,7 +233,7 @@ type
     wKeyNotString,         ## w220
     wMissingKey,           ## w221
     wMissingRightBracket,  ## w222
-
+    wUnableCreateStream,   ## w223
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -460,8 +460,7 @@ const
     "The key variable must be an string.", ## wKeyNotString
     "The key doesn't exist in the dictionary.", ## wMissingKey
     "Missing right bracket.", ## wMissingRightBracket
-
-
+    "Unable to create a stream object.", ## wUnableCreateStream
     ]
 
     ## The message text.

@@ -26,7 +26,7 @@ maxDepth = 16
 Convert a Nim json node to a statictea value.
 
 ```nim
-proc jsonToValue(jsonNode: JsonNode; depth: int = 0): ValueOr
+func jsonToValue(jsonNode: JsonNode; depth: int = 0): ValueOr
 ```
 
 # readJsonStream
@@ -34,7 +34,7 @@ proc jsonToValue(jsonNode: JsonNode; depth: int = 0): ValueOr
 Read a json stream and return the parsed data in a value object or return a warning.
 
 ```nim
-proc readJsonStream(stream: Stream): ValueOr
+func readJsonStream(stream: Stream): ValueOr
 ```
 
 # readJsonString
@@ -42,7 +42,7 @@ proc readJsonStream(stream: Stream): ValueOr
 Read a json string and return the parsed data in a value object or return a warning.
 
 ```nim
-proc readJsonString(content: string): ValueOr
+func readJsonString(content: string): ValueOr
 ```
 
 # readJsonFile
@@ -72,7 +72,7 @@ not a popular char, return 0.
 |t         | tab            | U+0009 |
 
 ```nim
-proc unescapePopularChar(popular: char): char
+func unescapePopularChar(popular: char): char
 ```
 
 # parseJsonStr

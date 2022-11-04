@@ -38,7 +38,7 @@ filename.
 * [maxlines](../testfiles/maxlines.stf.md) &mdash; Test t maxLines tea variable.
 * [maxrepeat](../testfiles/maxrepeat.stf.md) &mdash; Test the t maxRepeat tea variable.
 * [missingvar](../testfiles/missingvar.stf.md) &mdash; Test with a missing replacement variable.
-* [multiple-json](../testfiles/multiple-json.stf.md) &mdash; Test with multiple json files.
+* [multiple-json](../testfiles/multiple-json.stf.md) &mdash; Test with multiple json and code files.
 * [nextline-readme](../testfiles/nextline-readme.stf.md) &mdash; The nextline readme example.
 * [noendingline](../testfiles/noendingline.stf.md) &mdash; Test with no ending newline at the bottom of the file.
 * [nothing](../testfiles/nothing.stf.md) &mdash; Test that the return code for no arguments is not 0.

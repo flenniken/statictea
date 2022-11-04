@@ -236,7 +236,8 @@ MessageId = enum
   wInvalidIndexRange,       ## w219
   wKeyNotString,            ## w220
   wMissingKey,              ## w221
-  wMissingRightBracket       ## w222
+  wMissingRightBracket,     ## w222
+  wUnableCreateStream        ## w223
 ```
 
 # Messages
@@ -467,7 +468,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The index value $1 is out of range.", ## wInvalidIndexRange
     "The key variable must be an string.", ## wKeyNotString
     "The key doesn\'t exist in the dictionary.", ## wMissingKey
-    "Missing right bracket."]
+    "Missing right bracket.", ## wMissingRightBracket
+    "Unable to create a stream object."]
 ```
 
 

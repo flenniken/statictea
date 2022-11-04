@@ -74,6 +74,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funLt_ffb](#funlt_ffb) &mdash; Return true when the a is less than b.
 * [funLte_iib](#funlte_iib) &mdash; Return true when the a is less than or equal to b.
 * [funLte_ffb](#funlte_ffb) &mdash; Return true when the a is less than or equal to b.
+* [funReadJson_sa](#funreadjson_sa) &mdash; Read the JSON string and return it as a variable.
 * [getBestFunction](#getbestfunction) &mdash; Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
 * [createFuncDictionary](#createfuncdictionary) &mdash; Create the f dictionary from the built in functions.
 
@@ -1801,6 +1802,28 @@ lte(4.0, 3.0) => false
 
 ```nim
 func funLte_ffb(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# funReadJson_sa
+
+Read the JSON string and return it as a variable.
+
+~~~
+readJson(json: string) any
+~~~~
+
+Examples:
+
+~~~
+a = readJson(""tea"") => "tea"
+b = readJson("4.5") => 4.5
+c = readJson("[1,2,3]") => [1, 2, 3]
+d = readJson("{"a":1, "b": 2}")
+  => {"a": 1, "b", 2}
+~~~~
+
+```nim
+func funReadJson_sa(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # getBestFunction

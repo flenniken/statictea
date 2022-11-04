@@ -13,6 +13,7 @@ import opresultwarn
 # Json spec:
 # https://datatracker.ietf.org/doc/html/rfc8259
 
+# Test code can set the max depth.
 when defined(test):
   var maxDepth* = 16
 else:
@@ -20,11 +21,21 @@ else:
     maxDepth* = 16
       ## The maximum depth you can nest items.
 
-proc jsonToValue*(jsonNode: JsonNode, depth: int = 0): ValueOr =
+func jsonToValue*(jsonNode: JsonNode, depth: int = 0): ValueOr =
   ## Convert a Nim json node to a statictea value.
-  if depth > maxDepth:
-    # The maximum JSON depth of $1 was exceeded.
-    return newValueOr(wMaxDepthExceeded, $maxDepth)
+
+  # When testing remove the side effect so the function can be defined
+  # as func.
+  when defined(test):
+    {.cast(noSideEffect).}:
+      if depth > maxDepth:
+        # The maximum JSON depth of $1 was exceeded.
+        return newValueOr(wMaxDepthExceeded, $maxDepth)
+  else:
+    if depth > maxDepth:
+      # The maximum JSON depth of $1 was exceeded.
+      return newValueOr(wMaxDepthExceeded, $maxDepth)
+
   var value: Value
   case jsonNode.kind
   of JNull:
@@ -58,24 +69,27 @@ proc jsonToValue*(jsonNode: JsonNode, depth: int = 0): ValueOr =
     value = newValue(list)
   result = newValueOr(value)
 
-proc readJsonStream*(stream: Stream): ValueOr =
+func readJsonStream*(stream: Stream): ValueOr =
   ## Read a json stream and return the parsed data in a value object
   ## or return a warning.
   assert stream != nil
 
   var rootNode: JsonNode
   try:
-    rootNode = parseJson(stream, "")
+    {.cast(noSideEffect).}:
+      rootNode = parseJson(stream, "")
   except:
     # Unable to parse the JSON.
     return newValueOr(wJsonParseError)
   result = jsonToValue(rootNode)
 
-proc readJsonString*(content: string): ValueOr =
+func readJsonString*(content: string): ValueOr =
   ## Read a json string and return the parsed data in a value object
   ## or return a warning.
   var stream = newStringStream(content)
-  assert stream != nil
+  if stream == nil:
+    # Unable to create a stream object.
+    return newValueOr(wUnableCreateStream)
   result = readJsonStream(stream)
 
 proc readJsonFile*(filename: string): ValueOr =
@@ -103,7 +117,7 @@ proc readJsonFile*(filename: string): ValueOr =
   # Close the stream and file.
   stream.close()
 
-proc unescapePopularChar*(popular: char): char =
+func unescapePopularChar*(popular: char): char =
   ## Unescape the popular char and return its value. If the char is
   ## @:not a popular char, return 0.
   ## @:

@@ -18,6 +18,7 @@ import unicodes
 import signatures
 import replacement
 import opresultwarn
+import readJson
 
 template tMapParameters(signatureCode: string) =
   ## Template that checks the signatureCode against the parameters and
@@ -2309,6 +2310,29 @@ func funLte_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   let cond = a <= b
   result = newFunResult(newValue(cond))
 
+func funReadJson_sa*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Read the JSON string and return it as a variable.
+  ## @:
+  ## @:~~~
+  ## @:readJson(json: string) any
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:a = readJson("\"tea\"") => "tea"
+  ## @:b = readJson("4.5") => 4.5
+  ## @:c = readJson("[1,2,3]") => [1, 2, 3]
+  ## @:d = readJson("{\"a\":1, \"b\": 2}")
+  ## @:  => {"a": 1, "b", 2}
+  ## @:~~~~
+  tMapParameters("sa")
+  let json = map["a"].stringv
+  var valueOr = readJsonString(json)
+  if valueOr.isMessage:
+    return newFunResultWarn(valueOr.message)
+  result = newFunResult(valueOr.value)
+
 const
   # Sorted list of built in functions.
   functionsList* = [
@@ -2365,6 +2389,7 @@ const
     ("not", funNot_bb, "bb"),
     ("or", funOr_bbb, "bbb"),
     ("path", funPath_sosd, "sosd"),
+    ("readJson", funReadJson_sa, "sa"),
     ("replace", funReplace_siiss, "siiss"),
     ("replaceRe", funReplaceRe_sls, "sls"),
     ("return", funReturn_ss, "ss"),

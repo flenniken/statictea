@@ -155,6 +155,11 @@ proc testBool(value: Value, eResult: bool): bool =
   let eFunResult = newFunResult(newValue(eResult))
   result = testFunction("bool", arguments, eFunResult)
 
+proc testReadJson(json: string, eResult: Value): bool =
+  var arguments = @[newValue(json)]
+  let eFunResult = newFunResult(eResult)
+  result = testFunction("readJson", arguments, eFunResult)
+
 suite "runFunction.nim":
 
   test "getBestFunction function value":
@@ -1916,3 +1921,14 @@ d.sub.y = 4"""
         check val.kind == vkFunc
 
     check functionsList.len == count
+
+  test "readJson":
+    check testReadJson(""""tea"""", newValue("tea"))
+    check testReadJson("""3""", newValue(3))
+    check testReadJson("""2.3""", newValue(2.3))
+    check testReadJson("""[1,2,3]""", newValue([1,2,3]))
+
+    var varsDict = newVarsDict()
+    varsDict["a"] = newValue(1)
+    varsDict["b"] = newValue(2)
+    check testReadJson("{\"a\":1, \"b\": 2}", newValue(varsDict))

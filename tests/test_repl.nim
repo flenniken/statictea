@@ -1,4 +1,6 @@
 import std/unittest
+import std/tables
+import std/strutils
 import repl
 import variables
 import sharedtestcode
@@ -67,7 +69,10 @@ Invalid REPL command syntax."""
     check testHandleReplLine("tea> pj t.args", "{}")
 
   test "show variables":
-    check testHandleReplLine("tea> v", "f={43} g={} l={} o={} s={} t={3}")
+    let funcsVarDict = createFuncDictionary().dictv
+    let numFunctionKeys = funcsVarDict.len
+    let str = "f={$1} g={} l={} o={} s={} t={3}" % $numFunctionKeys
+    check testHandleReplLine("tea> v", str)
 
   test "run statement":
     check testHandleReplLine("tea> a = 5", "")
