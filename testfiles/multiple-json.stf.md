@@ -2,28 +2,45 @@ stf file, version 0.1.0
 
 # Multiple Json Files
 
-Test with multiple json files.
+Test with multiple json and code files.
 
 ### File cmd.sh command
 
 ~~~
-$statictea -s server.json -o c1.tea -o c2.tea \
-  -t template.html -r result.html >stdout 2>stderr
+$statictea \
+  -s server1.json \
+  -s server2.json \
+  -o c1.tea \
+  -o c2.tea \
+  -t template.html \
+  -r result.html \
+  >stdout 2>stderr
 ~~~
 
 ### File template.html
 
 ~~~
 <!--$ block -->
-hello {s.data}, hello {o.data1}, hello {o.data2}
+hello {s.data1}
+hello {s.data2}
+hello {o.data1}
+hello {o.data2}
 <!--$ endblock -->
 ~~~
 
-### File server.json
+### File server1.json
 
 ~~~
 {
-  "data": "server.json"
+  "data1": "server1.json"
+}
+~~~
+
+### File server2.json
+
+~~~
+{
+  "data2": "server2.json"
 }
 ~~~
 
@@ -42,7 +59,10 @@ o.data2 = "c2.tea"
 ### File result.expected
 
 ~~~
-hello server.json, hello c1.tea, hello c2.tea
+hello server1.json
+hello server2.json
+hello c1.tea
+hello c2.tea
 ~~~
 
 ### Expected result.html == result.expected
