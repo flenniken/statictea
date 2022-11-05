@@ -931,3 +931,68 @@ task release, "\tRun tests and update docs.":
   taskTestfilesReadme()
   createDependencyGraph()
   createDependencyGraph2()
+
+const
+  image = "statictea-image"
+  container = "statictea-container"
+
+task drun, "\tRun a statictea debian docker build env.":
+  let statusCmd = fmt"docker inspect {image} 2>/dev/null | grep 'Id'"
+  # echo statusCmd
+  let (status, statusRc) = gorgeEx(statusCmd)
+  # echo status
+  if "sha256" in status:
+    echo fmt"The {image} exists."
+  else:
+    echo fmt"The {image} does not exist, creating it..."
+    let buildCmd = fmt"docker build --tag={image} env/debian/."
+    # echo buildCmd
+    let (buildStatus, buildRc) = gorgeEx(buildCmd)
+    echo buildStatus
+    echo fmt"rc = {buildRc}"
+    echo "If no errors, run again to run the container."
+    echo ""
+    exit()
+
+  let containerCmd = fmt"docker inspect {container} 2>/dev/null | grep Status"
+  let (containerStatus, rc2) = gorgeEx(containerCmd)
+  # echo containerStatus
+  if "running" in containerStatus:
+    echo fmt"The {container} is running, attaching to it..."
+    let attachCmd = fmt"docker attach {container}"
+    exec attachCmd
+  elif "exited" in containerStatus:
+    echo fmt"The {container} exists but its not running, starting it..."
+    let runCmd = fmt"docker start -ai {container}"
+    exec runCmd
+  else:
+    echo fmt"The {container} does not exist, creating it..."
+    let shared_option = ""
+    let createCmd = fmt"docker run --name={container} -it {shared_option} {image}"
+    exec createCmd
+
+task ddelete, "\tDelete the statictea docker image and container.":
+  let cmd = fmt"docker rm {container}; docker image rm {image}"
+  # echo cmd
+  let (output, rc) = gorgeEx(cmd)
+  echo output
+
+task dlist, "\tList the docker image and container.":
+  let cmd = fmt"docker inspect {image} 2>/dev/null | grep 'Id'"
+  # echo cmd
+  let (imageStatus, rc) = gorgeEx(cmd)
+  # echo imageStatus
+  if "sha256" in imageStatus:
+    echo fmt"The {image} exists."
+  else:
+    echo fmt"No {image}."
+
+  let cmd2=fmt"docker inspect {container} 2>/dev/null | grep Status"
+  let (containerStatus, rc2) = gorgeEx(cmd2)
+  # echo containerStatus
+  if "running" in containerStatus:
+    echo fmt"The {container} is running."
+  elif "exited" in containerStatus:
+    echo fmt"The {container} is stopped."
+  else:
+    echo fmt"No {container}."
