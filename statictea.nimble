@@ -14,7 +14,7 @@ license       = "MIT"
 srcDir        = "src"
 bin           = @["bin/statictea"]
 
-requires "nim >= 1.6.8"
+requires "nim >= 1.4.2"
 
 # The nimscript module is imported by default. It contains functions
 # you can call in your nimble file.

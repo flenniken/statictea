@@ -10,3 +10,4 @@ alias l='ls -ltr | tail -10'
 
 alias ls='ls --color=auto'
 alias ll='ls -l'
+alias n='nimble --silent'
