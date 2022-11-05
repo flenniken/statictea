@@ -85,6 +85,7 @@ args.templateFilename = "{args.templateFilename}"
 args.prepostList = {toString(args.prepostList)}""")
 
 func `$`*(prepostList: seq[Prepost]): string =
+  ## Return the seq[Prepost] string representation.
   var first = true
   for pp in prepostList:
     if not first:

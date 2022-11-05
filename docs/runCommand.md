@@ -7,16 +7,19 @@ Run a command and fill in the variables dictionaries.
 
 * type: [Statement](#statement) &mdash; A Statement object stores the statement text and where it
 starts in the template file.
+* type: [PosOr](#posor) &mdash; A position in a string or a message.
 * [newPosOr](#newposor) &mdash; Create a PosOr warning.
 * [newPosOr](#newposor-1) &mdash; Create a PosOr value.
 * [`==`](#) &mdash; Return true when a equals b.
+* [`!=`](#-1) &mdash; Compare whether two PosOr are not equal.
 * [startColumn](#startcolumn) &mdash; Return enough spaces to point at the start byte position of the given text.
 * [newStatement](#newstatement) &mdash; Create a new statement.
 * [getFragmentAndPos](#getfragmentandpos) &mdash; Split up a long statement around the given position.
 * [getWarnStatement](#getwarnstatement) &mdash; Return a multiline error message.
 * [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
-* [`==`](#-1) &mdash; Return true when the two statements are equal.
-* [`$`](#-2) &mdash; Return a string representation of a Statement.
+* [`==`](#-2) &mdash; Return true when the two statements are equal.
+* [`$`](#-3) &mdash; Return a string representation of a Statement.
+* [get3GroupsLen](#get3groupslen) &mdash; Return the three groups and the length of the match.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
 * [getMultilineStr](#getmultilinestr) &mdash; Return the triple quoted string literal.
 * [getString](#getstring) &mdash; Return a literal string value and position after it.
@@ -51,6 +54,14 @@ Statement = object
 
 ```
 
+# PosOr
+
+A position in a string or a message.
+
+```nim
+PosOr = OpResultWarn[Natural]
+```
+
 # newPosOr
 
 Create a PosOr warning.
@@ -73,6 +84,14 @@ Return true when a equals b.
 
 ```nim
 proc `==`(a: PosOr; b: PosOr): bool
+```
+
+# `!=`
+
+Compare whether two PosOr are not equal.
+
+```nim
+proc `!=`(a: PosOr; b: PosOr): bool
 ```
 
 # startColumn
@@ -131,6 +150,14 @@ Return a string representation of a Statement.
 
 ```nim
 func `$`(s: Statement): string
+```
+
+# get3GroupsLen
+
+Return the three groups and the length of the match.
+
+```nim
+func get3GroupsLen(matchesO: Option[Matches]): (string, string, string, Natural)
 ```
 
 # yieldStatements

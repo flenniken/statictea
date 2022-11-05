@@ -2334,7 +2334,6 @@ func funReadJson_sa*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(valueOr.value)
 
 const
-  # Sorted list of built in functions.
   functionsList* = [
     ("add", funAdd_fff, "fff"),
     ("add", funAdd_iii, "iii"),
@@ -2404,6 +2403,8 @@ const
     ("values", funValues_dl, "dl"),
     ("warn", funWarn_ss, "ss"),
   ]
+    ## Sorted list of built in functions, their function name, nim
+    ## name and their signature.
 
 proc getBestFunction*(funcValue: Value, arguments: seq[Value]): ValueOr =
   ## Given a function variable or a list of function variables and a

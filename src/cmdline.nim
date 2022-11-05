@@ -92,7 +92,7 @@ type
     cmlStopArgument
 
   CmlOption* = object
-    # An option holds its type, long name and short name.
+    ## An CmlOption holds its type, long name and short name.
     optionType: CmlOptionType
     long: string
     short: char
@@ -395,6 +395,7 @@ when defined(Test) or isMainModule:
       #[_11_]# "Extra bare argument.",
       #[_12_]# "One '$1' argument is allowed.",
     ]
+      ## Messages used by this module.
 
   func getMessage*(message: CmlMessageId, problemArg: string = ""): string =
     ## Return a message from a message id and problem argument.

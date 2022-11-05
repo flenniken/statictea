@@ -16,6 +16,7 @@ import utf8decoder
 
 const
   tripleQuotes* = "\"\"\""
+    ## Triple quotes for building strings.
 
 type
   Found* = enum

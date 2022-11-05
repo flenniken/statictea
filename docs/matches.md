@@ -28,6 +28,7 @@ Methods for matching sub-strings.
 * [matchVersion](#matchversion) &mdash; Match a StaticTea version number.
 * [matchVersionNotCached](#matchversionnotcached) &mdash; Match a StaticTea version number.
 * [matchDotNames](#matchdotnames) &mdash; Matches variable dot names and surrounding whitespace.
+* type: [GroupSymbol](#groupsymbol) &mdash; Grouping symbols we search for in the statements.
 * [matchCommaOrSymbol](#matchcommaorsymbol) &mdash; Match a comma or the symbol and the optional trailing whitespace.
 * [matchSymbol](#matchsymbol) &mdash; Match the symbol and the optional trailing whitespace.
 * [matchNotOrParen](#matchnotorparen) &mdash; Match "not " or "(" and the trailing whitespace.
@@ -266,6 +267,15 @@ includes the optional trailing whitespace.
 
 ```nim
 proc matchDotNames(line: string; start: Natural = 0): Option[Matches]
+```
+
+# GroupSymbol
+
+Grouping symbols we search for in the statements.
+
+```nim
+GroupSymbol = enum
+  gLeftParentheses, gRightParentheses, gLeftBracket, gRightBracket, gComma
 ```
 
 # matchCommaOrSymbol

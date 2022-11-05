@@ -5,12 +5,21 @@ Run code files.
 * [codefile.nim](../src/codefile.nim) &mdash; Nim source code.
 # Index
 
+* const: [tripleQuotes](#triplequotes) &mdash; Triple quotes for building strings.
 * type: [Found](#found) &mdash; The line endings found.
 * [matchTripleOrPlusSign](#matchtripleorplussign) &mdash; Match the optional """ or + at the end of the line.
 * [addText](#addtext) &mdash; Add the line up to the line-ending to the text string.
 * [readStatement](#readstatement) &mdash; Read the next statement from the file reading multiple lines if needed.
 * [runCodeFile](#runcodefile) &mdash; Run the code file and fill in the variables.
 * [runCodeFiles](#runcodefiles) &mdash; Run each code file and populate the variables.
+
+# tripleQuotes
+
+Triple quotes for building strings.
+
+```nim
+tripleQuotes = "\"\"\""
+```
 
 # Found
 

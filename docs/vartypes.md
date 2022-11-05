@@ -7,14 +7,17 @@ StaticTea variable types.
 
 * type: [VarsDict](#varsdict) &mdash; The statictea dictionary type.
 * type: [Variables](#variables) &mdash; Dictionary holding all statictea variables in multiple distinct logical dictionaries.
+* type: [VarsDictOr](#varsdictor) &mdash; A VarsDict object or a warning.
 * type: [ValueKind](#valuekind) &mdash; The statictea variable types.
 * type: [Value](#value) &mdash; A variable's value reference.
+* type: [ValueOr](#valueor) &mdash; A Value object or a warning.
 * type: [FunctionPtr](#functionptr) &mdash; Signature of a statictea function.
 * type: [Func](#func) &mdash; A func value is a reference to a FunctionSpec.
 * type: [FunctionSpec](#functionspec) &mdash; The name of a function, a pointer to the code, and its signature code.
 * type: [FunResultKind](#funresultkind) &mdash; The kind of a FunResult object, either a value or warning.
 * type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a warning.
 * type: [ValueAndPos](#valueandpos) &mdash; A value and the position after the value in the statement.
+* type: [ValueAndPosOr](#valueandposor) &mdash; A ValueAndPos object or a warning.
 * [newVarsDict](#newvarsdict) &mdash; Create a new empty variables dictionary.
 * [newVarsDictOr](#newvarsdictor) &mdash; Return a new varsDictOr object containing a warning.
 * [newVarsDictOr](#newvarsdictor-1) &mdash; Return a new VarsDict object containing a dictionary.
@@ -57,8 +60,10 @@ same type which may be Value type.
 * [newValueAndPosOr](#newvalueandposor) &mdash; Create a ValueAndPosOr warning.
 * [newValueAndPosOr](#newvalueandposor-1) &mdash; Create a ValueAndPosOr warning.
 * [`==`](#-8) &mdash; Return true when a equals b.
-* [newValueAndPosOr](#newvalueandposor-2) &mdash; Create a ValueAndPosOr value.
-* [newValueAndPosOr](#newvalueandposor-3) &mdash; Create a ValueAndPosOr.
+* [`!=`](#-9) &mdash; Compare two ValueAndPosOr objects and return false when equal.
+* [newValueAndPosOr](#newvalueandposor-2) &mdash; Create a ValueAndPosOr from a value, pos and exit.
+* [newValueAndPosOr](#newvalueandposor-3) &mdash; Create a ValueAndPosOr value from a number or string.
+* [newValueAndPosOr](#newvalueandposor-4) &mdash; Create a ValueAndPosOr from a ValueAndPos.
 
 # VarsDict
 
@@ -77,6 +82,14 @@ Dictionary holding all statictea variables in multiple distinct logical dictiona
 Variables = VarsDict
 ```
 
+# VarsDictOr
+
+A VarsDict object or a warning.
+
+```nim
+VarsDictOr = OpResultWarn[VarsDict]
+```
+
 # ValueKind
 
 The statictea variable types.
@@ -92,6 +105,14 @@ A variable's value reference.
 
 ```nim
 Value = ref ValueObj
+```
+
+# ValueOr
+
+A Value object or a warning.
+
+```nim
+ValueOr = OpResultWarn[Value]
 ```
 
 # FunctionPtr
@@ -168,6 +189,14 @@ ValueAndPos = object
   pos*: Natural
   exit*: bool
 
+```
+
+# ValueAndPosOr
+
+A ValueAndPos object or a warning.
+
+```nim
+ValueAndPosOr = OpResultWarn[ValueAndPos]
 ```
 
 # newVarsDict
@@ -513,9 +542,17 @@ Return true when a equals b.
 proc `==`(a: ValueAndPosOr; b: ValueAndPosOr): bool
 ```
 
+# `!=`
+
+Compare two ValueAndPosOr objects and return false when equal.
+
+```nim
+proc `!=`(a: ValueAndPosOr; b: ValueAndPosOr): bool
+```
+
 # newValueAndPosOr
 
-Create a ValueAndPosOr value.
+Create a ValueAndPosOr from a value, pos and exit.
 
 ```nim
 func newValueAndPosOr(value: Value; pos: Natural; exit = false): ValueAndPosOr
@@ -523,7 +560,15 @@ func newValueAndPosOr(value: Value; pos: Natural; exit = false): ValueAndPosOr
 
 # newValueAndPosOr
 
-Create a ValueAndPosOr.
+Create a ValueAndPosOr value from a number or string.
+
+```nim
+proc newValueAndPosOr(number: int | int64 | float64 | string; pos: Natural): ValueAndPosOr
+```
+
+# newValueAndPosOr
+
+Create a ValueAndPosOr from a ValueAndPos.
 
 ```nim
 func newValueAndPosOr(val: ValueAndPos): ValueAndPosOr

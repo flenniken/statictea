@@ -257,6 +257,7 @@ proc matchDotNames*(line: string, start: Natural = 0): Option[Matches] =
 
 type
   GroupSymbol* = enum
+    ## Grouping symbols we search for in the statements.
     gLeftParentheses # (
     gRightParentheses # )
     gLeftBracket # [

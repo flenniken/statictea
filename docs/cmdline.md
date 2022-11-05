@@ -35,6 +35,7 @@ dictionary.
 * type: [ArgsOrMessageKind](#argsormessagekind) &mdash; The kind of an ArgsOrMessage object, either args or a message.
 * type: [ArgsOrMessage](#argsormessage) &mdash; Contains the command line args or a message.
 * type: [CmlOptionType](#cmloptiontype) &mdash; The option type.
+* type: [CmlOption](#cmloption) &mdash; An CmlOption holds its type, long name and short name.
 * [newCmlOption](#newcmloption) &mdash; Create a new CmlOption object.
 * [newArgsOrMessage](#newargsormessage) &mdash; Create a new ArgsOrMessage object containing arguments.
 * [newArgsOrMessage](#newargsormessage-1) &mdash; Create a new ArgsOrMessage object containing a message id and optionally the problem argument.
@@ -43,6 +44,7 @@ dictionary.
 * [commandLineEcho](#commandlineecho) &mdash; Show the command line arguments.
 * [collectArgs](#collectargs) &mdash; Get the command line arguments from the system and return a list.
 * [cmdLine](#cmdline) &mdash; Parse the command line arguments.
+* const: [cmlMessages](#cmlmessages) &mdash; Messages used by this module.
 * [getMessage](#getmessage) &mdash; Return a message from a message id and problem argument.
 * [`$`](#-2) &mdash; Return a string representation of an Args object.
 
@@ -116,6 +118,18 @@ CmlOptionType = enum
   cmlArgumentOnce, cmlArgumentMany, cmlStopArgument
 ```
 
+# CmlOption
+
+An CmlOption holds its type, long name and short name.
+
+```nim
+CmlOption = object
+  optionType: CmlOptionType
+  long: string
+  short: char
+
+```
+
 # newCmlOption
 
 Create a new CmlOption object. For no short option use a dash.
@@ -178,6 +192,24 @@ Parse the command line arguments.  You pass in the list of supported options and
 
 ```nim
 func cmdLine(options: openArray[CmlOption]; arguments: openArray[string]): ArgsOrMessage
+```
+
+# cmlMessages
+
+Messages used by this module.
+
+```nim
+cmlMessages: array[low(CmlMessageId) .. high(CmlMessageId), string] = [
+    "Two dashes must be followed by an option name.",
+    "The option \'--$1\' is not supported.",
+    "The option \'$1\' requires an argument.",
+    "One dash must be followed by a short option name.",
+    "The short option \'-$1\' is not supported.",
+    "The option \'-$1\' needs an argument; use it by itself.",
+    "Duplicate short option: \'-$1\'.", "Duplicate long option: \'--$1\'.",
+    "Use the short name \'_\' instead of \'$1\' with a bare argument.", "Use an alphanumeric ascii character for a short option name instead of \'$1\'.",
+    "Missing \'$1\' argument.", "Extra bare argument.",
+    "One \'$1\' argument is allowed."]
 ```
 
 # getMessage

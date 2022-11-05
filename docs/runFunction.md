@@ -75,6 +75,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funLte_iib](#funlte_iib) &mdash; Return true when the a is less than or equal to b.
 * [funLte_ffb](#funlte_ffb) &mdash; Return true when the a is less than or equal to b.
 * [funReadJson_sa](#funreadjson_sa) &mdash; Read the JSON string and return it as a variable.
+* const: [functionsList](#functionslist) &mdash; Sorted list of built in functions, their function name, nim name and their signature.
 * [getBestFunction](#getbestfunction) &mdash; Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
 * [createFuncDictionary](#createfuncdictionary) &mdash; Create the f dictionary from the built in functions.
 
@@ -1824,6 +1825,57 @@ d = readJson("{"a":1, "b": 2}")
 
 ```nim
 func funReadJson_sa(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# functionsList
+
+Sorted list of built in functions, their function name, nim name and their signature.
+
+```nim
+functionsList = [("add", funAdd_fff, "fff"), ("add", funAdd_iii, "iii"),
+                 ("and", funAnd_bbb, "bbb"), ("bool", funBool_ab, "ab"),
+                 ("case", funCase_iloaa, "iloaa"),
+                 ("case", funCase_sloaa, "sloaa"), ("cmp", funCmp_ffi, "ffi"),
+                 ("cmp", funCmp_iii, "iii"), ("cmp", funCmp_ssobi, "ssobi"),
+                 ("cmpVersion", funCmpVersion_ssi, "ssi"),
+                 ("concat", funConcat_sss, "sss"),
+                 ("dict", funDict_old, "old"), ("dup", funDup_sis, "sis"),
+                 ("eq", funEq_ffb, "ffb"), ("eq", funEq_iib, "iib"),
+                 ("eq", funEq_ssb, "ssb"), ("exists", funExists_dsb, "dsb"),
+                 ("find", funFind_ssoaa, "ssoaa"),
+                 ("float", funFloat_if, "if"), ("float", funFloat_saa, "saa"),
+                 ("float", funFloat_sf, "sf"), ("format", funFormat_ss, "ss"),
+                 ("get", funGet_dsoaa, "dsoaa"),
+                 ("get", funGet_lioaa, "lioaa"),
+                 ("githubAnchor", funGithubAnchor_ll, "ll"),
+                 ("githubAnchor", funGithubAnchor_ss, "ss"),
+                 ("gt", funGt_ffb, "ffb"), ("gt", funGt_iib, "iib"),
+                 ("gte", funGte_ffb, "ffb"), ("gte", funGte_iib, "iib"),
+                 ("if", funIf_baoaa, "baoaa"), ("if0", funIf0_iaoaa, "iaoaa"),
+                 ("int", funInt_fosi, "fosi"), ("int", funInt_sosi, "sosi"),
+                 ("int", funInt_ssaa, "ssaa"),
+                 ("join", funJoin_lsois, "lsois"),
+                 ("joinPath", funJoinPath_loss, "loss"),
+                 ("keys", funKeys_dl, "dl"), ("len", funLen_di, "di"),
+                 ("len", funLen_li, "li"), ("len", funLen_si, "si"),
+                 ("list", funList, "..."), ("lower", funLower_ss, "ss"),
+                 ("lt", funLt_ffb, "ffb"), ("lt", funLt_iib, "iib"),
+                 ("lte", funLte_ffb, "ffb"), ("lte", funLte_iib, "iib"),
+                 ("ne", funNe_ffb, "ffb"), ("ne", funNe_iib, "iib"),
+                 ("ne", funNe_ssb, "ssb"), ("not", funNot_bb, "bb"),
+                 ("or", funOr_bbb, "bbb"), ("path", funPath_sosd, "sosd"),
+                 ("readJson", funReadJson_sa, "sa"),
+                 ("replace", funReplace_siiss, "siiss"),
+                 ("replaceRe", funReplaceRe_sls, "sls"),
+                 ("return", funReturn_ss, "ss"),
+                 ("slice", funSlice_siois, "siois"),
+                 ("sort", funSort_lsosl, "lsosl"),
+                 ("sort", funSort_lssil, "lssil"),
+                 ("sort", funSort_lsssl, "lsssl"),
+                 ("startsWith", funStartsWith_ssb, "ssb"),
+                 ("string", funString_aoss, "aoss"),
+                 ("string", funString_sds, "sds"), ("type", funType_as, "as"),
+                 ("values", funValues_dl, "dl"), ("warn", funWarn_ss, "ss")]
 ```
 
 # getBestFunction

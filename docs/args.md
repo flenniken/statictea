@@ -14,6 +14,7 @@ Types for handling command line arguments.
 * [newPrepost](#newprepost) &mdash; Create a new prepost object from the prefix and postfix.
 * [`$`](#) &mdash; Return the Prepost string representation.
 * [`$`](#-1) &mdash; Return the Args string representation.
+* [`$`](#-2) &mdash; Return the seq[Prepost] string representation.
 
 # Prepost
 
@@ -100,6 +101,14 @@ Return the Args string representation.
 
 ```nim
 func `$`(args: Args): string
+```
+
+# `$`
+
+Return the seq[Prepost] string representation.
+
+```nim
+func `$`(prepostList: seq[Prepost]): string
 ```
 
 

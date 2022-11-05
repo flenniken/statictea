@@ -16,6 +16,7 @@ type
     ## logical dictionaries.
 
   VarsDictOr* = OpResultWarn[VarsDict]
+    ## A VarsDict object or a warning.
 
   ValueKind* = enum
     ## The statictea variable types.
@@ -27,11 +28,11 @@ type
     vkBool
     vkFunc
 
-
   Value* = ref ValueObj
     ## A variable's value reference.
 
   ValueOr* = OpResultWarn[Value]
+    ## A Value object or a warning.
 
   ValueObj {.acyclic.} = object
     ## A variable's value object.
@@ -100,6 +101,7 @@ type
     exit*: bool
 
   ValueAndPosOr* = OpResultWarn[ValueAndPos]
+    ## A ValueAndPos object or a warning.
 
 proc newVarsDict*(): VarsDict =
   ## Create a new empty variables dictionary. VarsDict is a ref type.
@@ -480,19 +482,21 @@ proc `==`*(a: ValueAndPosOr, b: ValueAndPosOr): bool =
       result = a.value == b.value
 
 proc `!=`*(a: ValueAndPosOr, b: ValueAndPosOr): bool =
+  ## Compare two ValueAndPosOr objects and return false when equal.
   result = not (a == b)
 
 func newValueAndPosOr*(value: Value, pos: Natural, exit=false):
     ValueAndPosOr =
-  ## Create a ValueAndPosOr value.
+  ## Create a ValueAndPosOr from a value, pos and exit.
   let val = ValueAndPos(value: value, pos: pos, exit: exit)
   result = opValueW[ValueAndPos](val)
 
 proc newValueAndPosOr*(number: int | int64 | float64 | string,
     pos: Natural): ValueAndPosOr =
+  ## Create a ValueAndPosOr value from a number or string.
   result = newValueAndPosOr(newValue(number), pos)
 
 func newValueAndPosOr*(val: ValueAndPos):
     ValueAndPosOr =
-  ## Create a ValueAndPosOr.
+  ## Create a ValueAndPosOr from a ValueAndPos.
   result = opValueW[ValueAndPos](val)

@@ -14,7 +14,7 @@ license       = "MIT"
 srcDir        = "src"
 bin           = @["bin/statictea"]
 
-requires "nim >= 1.4.8"
+requires "nim >= 1.6.8"
 
 # The nimscript module is imported by default. It contains functions
 # you can call in your nimble file.
@@ -96,6 +96,11 @@ proc get_test_module_cmd(filename: string, release = false): string =
 
     Turn off XCannotRaiseY hint messages.
 
+  --hint[Name]:off
+
+    Turn off hints like:
+      Hint: 'funReadJson_sa' should be: 'funReadJsonSa'
+
   -d:release
 
     Compile for release.  It is off when running tests.
@@ -133,7 +138,7 @@ proc get_test_module_cmd(filename: string, release = false): string =
     rel = ""
 
   let part1 = "nim c --verbosity:0 --hint[Performance]:off "
-  let part2 = "--hint[XCannotRaiseY]:off -d:test "
+  let part2 = "--hint[XCannotRaiseY]:off --hint[Name]:off -d:test "
   let part3 = "$1 -r -p:src --out:bin/$2 tests/$3" % [rel, binName, filename]
 
   result = part1 & part2 & part3
@@ -141,7 +146,7 @@ proc get_test_module_cmd(filename: string, release = false): string =
 proc buildRelease() =
   ## Build the release version of statictea.
   let part1 = "nim c --hint[Performance]:off "
-  let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
+  let part2 = "--hint[Conf]:off --hint[Name]:off --hint[Link]:off -d:release "
   let part3 = "--out:bin/ src/statictea"
   var cmd = part1 & part2 & part3
   echo cmd
@@ -445,7 +450,8 @@ proc createDependencyGraph2() =
     let left = dependency.right
     let right = dependency.left
     if not (left in sourceNamesSet) and (right in sourceNamesSet):
-      dependencies.add(newDependency(left, right))
+      # Remove "std/" from the nim module names.
+      dependencies.add(newDependency(left[4 .. ^1], right))
 
   # Count the number of modules the left module references.
   var nameCount = initTable[string, int]()
@@ -475,7 +481,7 @@ proc createDependencyGraph2() =
       lineAttrs = "color=red;"
     let attrs = fmt"{left} [fontsize=24; {nodetAttrs}];" & "\n"
     dotText.add(attrs)
-    dotText.add("$1 -> \"$2\" [$3];\n" % [dependency.left, dependency.right, lineAttrs])
+    dotText.add("$1 -> \"$2\" [$3];\n" % [left, dependency.right, lineAttrs])
     # dotText.add(fmt"""{dependency.left} -> "{dependency.right}" [{lineAttrs}];""" & "\n")
   dotText.add("}\n")
 
@@ -565,7 +571,8 @@ proc taskDocs(namePart: string, forceRebuild = false) =
 
       # Create json doc comments from the source file.
       var jsonName = "docs/$1" % [changeFileExt(filename, "json")]
-      var cmd = "nim --hint[Conf]:off --hint[SuccessX]:off jsondoc --out:$1 src/$2" % [jsonName, filename]
+      let hintsOff = "--hint[Conf]:off --hint[SuccessX]:off --hint[Name]:off"
+      var cmd = "nim $1 jsondoc --out:$2 src/$3" % [hintsOff, jsonName, filename]
       echo "Create $1 from nim json doc comments." % [jsonName]
       exec cmd
       echo ""
@@ -592,8 +599,9 @@ proc taskReadMeFun() =
 
   let filename = "runFunction.nim"
   var jsonName = joinPath("docs", changeFileExt(filename, "json"))
-  var cmd = "nim --hint[Conf]:off --hint[SuccessX]:off jsondoc --out:$1 src/$2" %
-    [jsonName, filename]
+  let hintsOff = "--hint[Conf]:off --hint[SuccessX]:off --hint[Name]:off"
+  var cmd = "nim $1 jsondoc --out:$2 src/$3" %
+    [hintsOff, jsonName, filename]
   exec cmd
   echo ""
   echo "Exported runFunctions.nim json doc comments to $1" % [jsonName]
@@ -850,7 +858,7 @@ task dot2, "\tCreate a dependency graph of the system modules used by StaticTea.
   echoGrip()
   echo """
 View the svg file in your browser:
-  http://localhost:6419/staticteadep2.svg
+  http://localhost:6419/docs/staticteadep2.svg
 """
 
 task tt, "\tCompile and run t.nim.":

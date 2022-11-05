@@ -38,6 +38,7 @@ type
     text*: string
 
   PosOr* = OpResultWarn[Natural]
+    ## A position in a string or a message.
 
 func newPosOr*(warning: MessageId, p1 = "", pos = 0): PosOr =
   ## Create a PosOr warning.
@@ -57,6 +58,7 @@ proc `==`*(a: PosOr, b: PosOr): bool =
       result = a.value == b.value
 
 proc `!=`*(a: PosOr, b: PosOr): bool =
+  ## Compare whether two PosOr are not equal.
   result = not (a == b)
 
 proc startColumn*(text: string, start: Natural, message: string = "^"): string =
@@ -183,6 +185,7 @@ func `$`*(s: Statement): string =
 # todo: move this
 func get3GroupsLen*(matchesO: Option[Matches]):
     (string, string, string, Natural) =
+  ## Return the three groups and the length of the match.
   let matches = matchesO.get()
   let (one, two, three) = matches.get3Groups()
   result = (one, two, three, matches.length)
