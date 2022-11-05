@@ -967,7 +967,8 @@ task drun, "\tRun a statictea debian docker build env.":
     exec runCmd
   else:
     echo fmt"The {container} does not exist, creating it..."
-    let shared_option = ""
+    let staticteaFolder = "/Users/steve/code/statictea"
+    let shared_option = fmt"-v {staticteaFolder}:/home/steve/statictea"
     let createCmd = fmt"docker run --name={container} -it {shared_option} {image}"
     exec createCmd
 
