@@ -24,11 +24,13 @@
 # $ #
 # $ block
 # $ : # Create a list of functions to show.
+# $ :
 # $ : t.repeat = len(g.sortedEntries)
 # $ : entry = get(g.sortedEntries, t.row, dict())
 # $ :
 # $ : # Use the skProc entries, skip the rest.
-# $ : if((entry.type != "skProc"), return("skip"))
+# $ : # if((entry.type != "skProc"), warn(format("skip {entry.name} of type {entry.type}")))
+# $ : if((entry.type != "skProc" and entry.type != "skFunc"), return("skip"))
 # $ :
 # $ : # Use the procs that start with "fun" and skip the others.
 # $ : pos = find(entry.name, "fun", -1)
@@ -62,7 +64,7 @@
 # $ #
 # $ #
 # $ nextline
-# $ : t.repeat = len(g.entries)
+# $ : t.repeat = if(exists(g, "entries"), len(g.entries), 0)
 # $ : entry = g.entries[t.row]
 - [[#{entry.name}][{entry.name}]] -- {entry.shortFuncDesc}
 
@@ -70,7 +72,7 @@
 # $ # Generate the function sections.
 # $ #
 # $ block
-# $ : t.repeat = len(g.entries)
+# $ : t.repeat = if(exists(g, "entries"), len(g.entries), 0)
 # $ : entry = g.entries[t.row]
 [[#contents][茶]]
 

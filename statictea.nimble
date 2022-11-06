@@ -525,7 +525,7 @@ proc taskTestfilesReadme() =
   ## Create a testfiles folder readme containing an index to the stf
   ## test files.
 
-  echo "Create a json file with the name of all the stf tests an their description."
+  echo "Create a json file with the name of all the stf tests and their descriptions."
   var jsonFilename = "testfiles.index.json"
   var json = testfilesIndexJson()
   writeFile(jsonFilename, json)
