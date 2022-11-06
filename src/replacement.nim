@@ -377,8 +377,8 @@ proc storeLineSegments*(env: var Env, tempSegments: TempSegments, line: string) 
   for segment in segments:
     tempSegments.tempStream.stream.write(segment)
 
-iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
-    LineBuffer, prepostTable: PrepostTable, command: string,
+iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string,
+    lb: var LineBuffer, prepostTable: PrepostTable, command: string,
     maxLines: Natural): ReplaceLine =
   ## Yield all the replacement block lines and one line after.
 
@@ -400,7 +400,7 @@ iterator yieldReplacementLine*(env: var Env, firstReplaceLine: string, lb: var
         # Stop when we reach the maximum line count for a replacement block.
         if count >= maxLines:
           # Read t.maxLines replacement block lines without finding the endblock.
-          env.warnLb(lb, wExceededMaxLine)
+          warn(env, lb.getFilename(), lb.getLineNum(), wExceededMaxLine, "")
           yield(newReplaceLine(rlNormalLine, line))
           break
 

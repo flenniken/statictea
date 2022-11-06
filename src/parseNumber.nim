@@ -2,7 +2,7 @@
 ## of characters processed.
 
 import std/options
-import std/parseUtils
+import std/parseutils
 import vartypes
 
 proc parseFloat*(str: string, start: Natural = 0): Option[ValueAndPos] =

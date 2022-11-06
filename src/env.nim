@@ -320,6 +320,8 @@ proc addExtraStreamsForUpdate*(env: var Env, args: Args):
   result = addExtraStreams(env, templateFilename, resultFilename)
 
 when defined(test):
+  # todo: move to test code
+
   proc echoNewline*(str: string) =
     ## Print a line to the screen and display the line endings as \n
     ## or \r\n.

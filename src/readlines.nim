@@ -129,6 +129,8 @@ proc readline*(lb: var LineBuffer): string =
   result = line
 
 when defined(test):
+  # todo: move to test code.
+
   proc readXLines*(lb: var LineBuffer, maxLines: Natural = high(Natural)): seq[string] =
     ## Read lines from a LineBuffer returning line endings but don't
     ## @:read more than the maximum number of lines. Reading starts at

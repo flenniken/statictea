@@ -945,13 +945,18 @@ task drun, "\tRun a statictea debian docker build env.":
     echo fmt"The {image} exists."
   else:
     echo fmt"The {image} does not exist, creating it..."
+
+    # It would be nice if the output went to the screen without
+    # buffering to give better feedback.
+
     let buildCmd = fmt"docker build --tag={image} env/debian/."
     # echo buildCmd
-    let (buildStatus, buildRc) = gorgeEx(buildCmd)
-    echo buildStatus
-    echo fmt"rc = {buildRc}"
-    echo "If no errors, run again to run the container."
+
+    exec buildCmd
+
     echo ""
+    echo "If no errors, run drun again to run the container."
+    quit(1)
     exit()
 
   let containerCmd = fmt"docker inspect {container} 2>/dev/null | grep Status"
@@ -967,8 +972,9 @@ task drun, "\tRun a statictea debian docker build env.":
     exec runCmd
   else:
     echo fmt"The {container} does not exist, creating it..."
+    # todo: get statictea the folder dynamically.
     let staticteaFolder = "/Users/steve/code/statictea"
-    let shared_option = fmt"-v {staticteaFolder}:/home/steve/statictea"
+    let shared_option = fmt"-v {staticteaFolder}:/home/teamaster/statictea"
     let createCmd = fmt"docker run --name={container} -it {shared_option} {image}"
     exec createCmd
 
