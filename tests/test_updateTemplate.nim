@@ -11,7 +11,7 @@ import comparelines
 import codefile
 import updateTemplate
 import matches
-import readlines
+import linebuffer
 import parseCmdLine
 
 proc testCollectReplaceCommand(

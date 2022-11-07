@@ -2,11 +2,14 @@
 
 FROM debian:latest
 MAINTAINER Steve Flenniken
+ENV statictea_env=debian
 
-# Install apps and the nim language.
+# Install base apps.
+RUN apt update && apt -qy install less man sudo tree curl wget
+
+# Install the c language and the nim language.
 # https://nim-lang.org/
-RUN apt update && apt -qy install less man sudo tree \
-  libssl-dev build-essential gcc curl nim
+RUN apt -qy install libssl-dev build-essential clang nim
 
 # Install glow for viewing markdown at the command line.
 # https://github.com/charmbracelet/glow
@@ -18,14 +21,9 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] \
   | tee /etc/apt/sources.list.d/charm.list
 RUN apt update && apt install glow
 
-# Install graphviz for creating svg dependency charts.
-# https://graphviz.org/
-RUN apt install -qy graphviz
-
 # Install jq for viewing JSON at the command line.
 # https://github.com/stedolan/jq
 ENV JQ_VERSION='1.5'
-RUN apt install wget
 RUN \
   wget --no-check-certificate \
     https://raw.githubusercontent.com/stedolan/jq/master/sig/jq-release.key \
@@ -44,6 +42,10 @@ RUN \
   rm -f /tmp/jq-linux64.asc && \
   rm -f /tmp/jq-linux64
 
+# Install graphviz for creating svg dependency charts.
+# https://graphviz.org/
+RUN apt install -qy graphviz
+
 # Create user teamaster with sudo permissions and no password.
 RUN mkdir -p /etc/sudoers.d \
   && echo "teamaster ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/teamaster \
@@ -57,6 +59,7 @@ USER teamaster
 WORKDIR /home/teamaster
 
 # Choosenim install isn't supported for linux_arm64 yet.
+# You could probably get the latest nim version as a tar file and build it.
 # # Install choosenim and the latest version of nim.
 # RUN curl -sSfLo init.sh https://nim-lang.org/choosenim/init.sh \
 #   && sed -i 's/need_tty=yes/need_tty=no/' init.sh \

@@ -18,7 +18,7 @@ import std/options
 import std/parseopt
 import std/streams
 import std/strformat
-import readlines
+import linebuffer
 import regexes
 import opresult
 import comparelines
@@ -494,7 +494,7 @@ proc createSectionFile(lb: var LineBuffer, folder: string,
   var blockLine: string
   var lineNum = 0
   while true:
-    line = readlines.readline(lb)
+    line = linebuffer.readline(lb)
     if line == "":
       # The start block was missing. Close and delete the new file.
       file.close()
@@ -514,7 +514,7 @@ proc createSectionFile(lb: var LineBuffer, folder: string,
   var previousLine: string
   var firstLine = true
   while true:
-    line = readlines.readline(lb)
+    line = linebuffer.readline(lb)
     if line == "":
       # The end block was missing. Close and delete the new file.
       file.close()
@@ -577,7 +577,7 @@ proc makeDirAndFiles*(filename: string): OpResultStr[DirAndFiles] =
 
   # Check the file type is supported. The first line contains the type
   # and version number.
-  var line = readlines.readline(lb)
+  var line = linebuffer.readline(lb)
   if line == "":
     return opMessageStr[DirAndFiles]("Empty file: '$1'." % filename)
   if not line.startsWith(runnerId):
@@ -588,7 +588,7 @@ expected: $2""" % [line, runnerId]
 
   while true:
     # Read a line from the stf file.
-    line = readlines.readline(lb)
+    line = linebuffer.readline(lb)
     if line == "":
       break # No more lines.
     let anyLineOr = getAnyLine(line)

@@ -3,7 +3,7 @@
 import std/options
 import std/strutils
 import std/tables
-import readLines
+import linebuffer
 import matches
 import regexes
 import env

@@ -9,7 +9,7 @@ import tempFile
 import messages
 import warnings
 import args
-import readlines
+import linebuffer
 when defined(test):
   import sharedtestcode
 

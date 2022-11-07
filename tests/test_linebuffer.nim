@@ -2,7 +2,7 @@ import std/streams
 import std/options
 import std/unittest
 import std/strutils
-import readlines
+import linebuffer
 import tempFile
 
 proc readContentTest(content: string, expected: seq[string],
@@ -43,7 +43,7 @@ proc readContentTest(content: string, expected: seq[string],
     check lines[ix] == expected[ix]
 
 
-suite "readlines.nim":
+suite "linebuffer.nim":
 
   test "setLen":
     var buffer: string

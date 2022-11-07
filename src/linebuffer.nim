@@ -1,9 +1,9 @@
 ## Read lines from a stream without exceeding the maximum line
 ## @:length. The returned lines contain the line ending, either crlf or
 ## @:lf.
-## @: 
+## @:
 ## @:Example:
-## @: 
+## @:
 ## @:~~~
 ## @:let lbO = newLineBuffer(stream)
 ## @:check lbO.isSome == true
@@ -70,17 +70,12 @@ proc newLineBuffer*(stream: Stream,
   if bufferSize < maxLineLen:
     return
 
-  var lb: LineBuffer
-  lb.stream = stream
-  lb.maxLineLen = maxLineLen
-  lb.bufferSize = bufferSize
-  lb.charsRead = 0
-  lb.pos = 0
-
   # Allocate the buffer.
-  lb.buffer.setLen(bufferSize)
+  var buffer: string
+  buffer.setLen(bufferSize)
 
-  lb.filename = filename
+  var lb = LineBuffer(stream: stream, maxLineLen: maxLineLen,
+    bufferSize:bufferSize, buffer:buffer, filename:filename)
 
   result = some(lb)
 

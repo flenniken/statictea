@@ -8,7 +8,7 @@ import codefile
 import variables
 import env
 import vartypes
-import readlines
+import linebuffer
 import sharedtestcode
 import runCommand
 import comparelines

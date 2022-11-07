@@ -729,7 +729,7 @@ proc checkUtf8DecoderEcho() =
 
   if not dirExists(utf8testsFolder):
     # Ignore when the repo is missing.
-    echo fmt"missing: {utf8testsFolder}"
+    # echo fmt"missing: {utf8testsFolder}"
     return
   var different = false
   for ix, remoteRelative in remoteRelativeFiles:
@@ -849,7 +849,7 @@ task dot, "\tCreate a dependency graph of the StaticTea source.":
   echo """
 
 View the svg file in your browser:
-  http://localhost:6419/staticteadep.svg
+  http://localhost:6419/docs/staticteadep.svg
 """
 
 task dot2, "\tCreate a dependency graph of the system modules used by StaticTea.":
@@ -945,9 +945,6 @@ task drun, "\tRun a statictea debian docker build env.":
     echo fmt"The {image} exists."
   else:
     echo fmt"The {image} does not exist, creating it..."
-
-    # It would be nice if the output went to the screen without
-    # buffering to give better feedback.
 
     let buildCmd = fmt"docker build --tag={image} env/debian/."
     # echo buildCmd

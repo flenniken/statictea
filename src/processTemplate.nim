@@ -8,7 +8,7 @@ import args
 import messages
 import env
 import matches
-import readlines
+import linebuffer
 import parseCmdLine
 import runCommand
 import variables

@@ -7,7 +7,7 @@ import std/options
 import processTemplate
 import env
 import args
-import readlines
+import linebuffer
 import version
 import variables
 import vartypes

@@ -4,7 +4,7 @@ import std/tables
 import env
 import replacement
 import matches
-import readlines
+import linebuffer
 import variables
 import sharedtestcode
 import opresultwarn

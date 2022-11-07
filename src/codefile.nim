@@ -7,7 +7,7 @@ import std/strutils
 import env
 import messages
 import opresultwarn
-import readLines
+import linebuffer
 import runCommand
 import variables
 import vartypes

@@ -31,7 +31,7 @@ import std/strutils
 import env
 import vartypes
 import parseCmdLine
-import readLines
+import linebuffer
 import matches
 import messages
 import variables

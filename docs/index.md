@@ -10,6 +10,8 @@ StaticTea nim source code documentation.
 * [comparelines.nim](comparelines.md) &mdash; Compare lines of text.
 * [env.nim](env.md) &mdash; Environment holding the input and output streams.
 * [gethelp.nim](gethelp.md) &mdash; Get the command line help message.
+* [linebuffer.nim](linebuffer.md) &mdash; Read lines from a stream without exceeding the maximum line
+@:length.
 * [matches.nim](matches.md) &mdash; Methods for matching sub-strings.
 * [messages.nim](messages.md) &mdash; Messages IDs and associated strings.
 * [opresult.nim](opresult.md) &mdash; OpResult holds either a value or a message.
@@ -20,8 +22,6 @@ StaticTea nim source code documentation.
 * [parseNumber.nim](parseNumber.md) &mdash; Parse an int or float number string.
 * [processTemplate.nim](processTemplate.md) &mdash; Process the template.
 * [readjson.nim](readjson.md) &mdash; Read json content.
-* [readlines.nim](readlines.md) &mdash; Read lines from a stream without exceeding the maximum line
-@:length.
 * [regexes.nim](regexes.md) &mdash; Perl regular expression matching.
 * [repl.nim](repl.md) &mdash; Run commands at a prompt.
 * [replacement.nim](replacement.md) &mdash; Handle the replacement block lines.
