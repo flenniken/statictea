@@ -28,20 +28,28 @@ proc parseDotLine*(line: string): Option[Dependency] =
 
   # You cannot import re in nimble.
 
-  # Example line:
-  # tempFile -> "random";
-  # or in 1.6.2
-  # "tempFile" -> "random";
-
+  var pos2 = 0
+  var left: string
   if line.len == 0 or line[0] != '"':
-    return
-  let pos = find(line, "\"", 1)
-  if pos == -1:
-    return
-  if pos <= 0:
-    return
-  let left = line[1 .. pos - 1]
-  let pos2 = find(line, "-> \"", pos)
+    # in 1.4.2
+    # tempFile -> "random";
+    let pos = find(line, " ")
+    if pos == -1:
+     return
+    if pos <= 0:
+     return
+    left = line[0 .. pos - 1]
+    pos2 = find(line, "-> \"", pos)
+  else:
+    # in 1.6.2
+    # "tempFile" -> "random";
+    let pos = find(line, "\"", 1)
+    if pos == -1:
+      return
+    if pos <= 0:
+      return
+    left = line[1 .. pos - 1]
+    pos2 = find(line, "-> \"", pos)
   if pos2 == -1:
     return
   let startPos = pos2 + 4

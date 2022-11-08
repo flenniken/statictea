@@ -450,8 +450,13 @@ proc createDependencyGraph2() =
     let left = dependency.right
     let right = dependency.left
     if not (left in sourceNamesSet) and (right in sourceNamesSet):
-      # Remove "std/" from the nim module names.
-      dependencies.add(newDependency(left[4 .. ^1], right))
+      if left.startsWith("std/"):
+        # Remove "std/" from the nim module names.
+        # 1.6.2
+        dependencies.add(newDependency(left[4 .. ^1], right))
+      else:
+        # 1.4.2
+        dependencies.add(newDependency(left, right))
 
   # Count the number of modules the left module references.
   var nameCount = initTable[string, int]()
