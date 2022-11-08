@@ -1,4 +1,4 @@
-# readl.nim
+# linebuffer.nim
 
 Read lines from a stream without exceeding the maximum line
 length. The returned lines contain the line ending, either crlf or
@@ -14,7 +14,7 @@ while line = lb.readLine():
   processLine(line)
 ~~~~
 
-* [readl.nim](../src/readl.nim) &mdash; Nim source code.
+* [linebuffer.nim](../src/linebuffer.nim) &mdash; Nim source code.
 # Index
 
 * const: [minMaxLineLen](#minmaxlinelen) &mdash; The minimum line length supported.

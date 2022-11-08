@@ -1005,3 +1005,12 @@ task dlist, "\tList the docker image and container.":
     echo fmt"The {container} is stopped."
   else:
     echo fmt"No {container}."
+
+task clean, "\tRemove all the binaries so everything gets built next time.":
+  # Remove all the bin and doc files.
+  let dirs = @["bin", "docs"]
+  for dir in dirs:
+    let list = listFiles(dir)
+    for filename in list:
+      rmFile(filename)
+  
