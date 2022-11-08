@@ -30,7 +30,9 @@ proc parseDotLine*(line: string): Option[Dependency] =
 
   var pos2 = 0
   var left: string
-  if line.len == 0 or line[0] != '"':
+  if line.len == 0:
+    return
+  if line[0] != '"':
     # in 1.4.2
     # tempFile -> "random";
     let pos = find(line, " ")
@@ -61,4 +63,7 @@ proc parseDotLine*(line: string): Option[Dependency] =
   if endPos - 1 < startPos:
     return
   let right = line[startPos .. endPos - 1]
+
+  # ("tempFile", "random")
+
   result = some(newDependency(left, right))
