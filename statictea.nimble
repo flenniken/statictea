@@ -7,12 +7,31 @@ import std/sets
 include src/version
 include src/dot
 
+proc getDirName(): string =
+  ## Return a directory name corresponding to the given nim hostOS
+  ## name.  The name is good for storing host specific files, for
+  ## example in the bin and env folders.  Current possible host
+  ## values: "windows", "macosx", "linux", "netbsd", "freebsd",
+  ## "openbsd", "solaris", "aix", "haiku", "standalone".
+
+  let host = hostOS
+  if host == "macosx":
+    result = "mac"
+  elif host == "linux":
+    result = "linux"
+  # elif host == "windows":
+  #   result = "win"
+  else:
+    assert false, "add a new platform"
+
+let dirName = getDirName()
+
 version       = staticteaVersion
 author        = "Steve Flenniken"
 description   = "A template processor and language."
 license       = "MIT"
 srcDir        = "src"
-bin           = @["bin/statictea"]
+bin           = @[fmt"bin/{dirName}/statictea"]
 
 requires "nim >= 1.4.2"
 
@@ -120,7 +139,7 @@ proc get_test_module_cmd(filename: string, release = false): string =
     The commands are run from the statictea folder.  The nim non-test source code
     is in the src folder which is specified by -p:src so the imports can be found.
 
-  --out:bin/test_testfile.bin
+  --out:bin/{dirName}/test_testfile.bin
 
     The compiled test files go in the bin folder and their extension there is "bin".
 
@@ -139,7 +158,7 @@ proc get_test_module_cmd(filename: string, release = false): string =
 
   let part1 = "nim c --verbosity:0 --hint[Performance]:off "
   let part2 = "--hint[XCannotRaiseY]:off --hint[Name]:off -d:test "
-  let part3 = "$1 -r -p:src --out:bin/$2 tests/$3" % [rel, binName, filename]
+  let part3 = fmt"{rel} -r -p:src --out:bin/{dirName}/{binName} tests/{filename}"
 
   result = part1 & part2 & part3
 
@@ -147,28 +166,12 @@ proc buildRelease() =
   ## Build the release version of statictea.
   let part1 = "nim c --hint[Performance]:off "
   let part2 = "--hint[Conf]:off --hint[Name]:off --hint[Link]:off -d:release "
-  let part3 = "--out:bin/ src/statictea"
+  let part3 = fmt"--out:bin/{dirName}/ src/statictea"
   var cmd = part1 & part2 & part3
   echo cmd
   exec cmd
-  cmd = "strip bin/statictea"
+  cmd = fmt"strip bin/{dirName}/statictea"
   exec cmd
-
-proc getDirName(host: string): string =
-  ## Return a directory name corresponding to the given nim hostOS
-  ## name.  The name is good for storing host specific files, for
-  ## example in the bin and env folders.  Current possible host
-  ## values: "windows", "macosx", "linux", "netbsd", "freebsd",
-  ## "openbsd", "solaris", "aix", "haiku", "standalone".
-
-  if host == "macosx":
-    result = "mac"
-  elif host == "linux":
-    result = "linux"
-  elif host == "windows":
-    result = "win"
-  else:
-    assert false, "add a new platform"
 
 proc readModuleDescription(filename: string): string =
   ## Return the module doc comment at the top of the file.
@@ -518,8 +521,7 @@ proc taskDocsIx() =
 
   # Process the index template and create the index.md file.
   echo "Create the index.md file"
-  var cmd = "bin/statictea -s $1 -t templates/nimModuleIndex.md -r docs/index.md" %
-    [jsonFilename]
+  var cmd = fmt"bin/{dirName}/statictea -s {jsonFilename} -t templates/nimModuleIndex.md -r docs/index.md"
   exec cmd
 
   rmFile(jsonFilename)
@@ -537,8 +539,7 @@ proc taskTestfilesReadme() =
 
   # Process the index template and create the index.md file.
   echo "Create the testfiles/readme.md file"
-  var cmd = "bin/statictea -s $1 -t templates/testfiles.md -r testfiles/readme.md" %
-    [jsonFilename]
+  var cmd = fmt"bin/{dirName}/statictea -s {jsonFilename} -t templates/testfiles.md -r testfiles/readme.md"
   exec cmd
 
   rmFile(jsonFilename)
@@ -584,8 +585,8 @@ proc taskDocs(namePart: string, forceRebuild = false) =
 
       # Create markdown from the json comments using a statictea template.
       echo "Generate $1" % [mdName]
-      let part1 = "bin/statictea -t templates/nimModule.md "
-      let part2 = "-s $1 -r $2" % [jsonName, mdName]
+      let part1 = fmt"bin/{dirName}/statictea -t templates/nimModule.md "
+      let part2 = fmt"-s {jsonName} -r {mdName}"
       cmd = part1 & part2
       echo cmd
       let output = staticExec(cmd)
@@ -614,8 +615,7 @@ proc taskReadMeFun() =
   # Create the readme function section org file.
   let templateName = joinPath("templates", "readmeFuncSection.org")
   let sectionFile = joinPath("docs", "readmeFuncs.org")
-  cmd = "bin/statictea -l -s $1 -t $2 -r $3" %
-     [jsonName, templateName, sectionFile]
+  cmd = fmt"bin/{dirName}/statictea -l -s {jsonName} -t {templateName} -r {sectionFile}"
   echo cmd
   exec cmd
   echo "Generated readme function section file " & sectionFile
@@ -632,17 +632,17 @@ proc taskReadMeFun() =
 proc buildRunner() =
   let part1 = "nim c --hint[Performance]:off "
   let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
-  let part3 = "--out:bin/ src/runner"
+  let part3 = fmt"--out:bin/{dirName}/ src/runner"
   var cmd = part1 & part2 & part3
   echo cmd
   exec cmd
-  cmd = "strip bin/runner"
+  cmd = fmt"strip bin/{dirName}/runner"
   exec cmd
 
 proc runRunnerFolder() =
   ## Run the stf files in the testfiles folder.
 
-  let cmd = "export statictea='../../bin/statictea'; bin/runner -d=testfiles"
+  let cmd = fmt"export statictea='../../bin/{dirName}/statictea'; bin/{dirName}/runner -d=testfiles"
   # echo cmd
   let (result, rc) = gorgeEx(cmd)
   echo result
@@ -666,7 +666,7 @@ proc runRunStf() =
   # When the name is "rt" that means no name was specified.  Run the
   # whole directory using the -d option.
   if name == "rt":
-    let cmd = "export statictea='../../bin/statictea'; bin/runner -d=testfiles"
+    let cmd = fmt"export statictea='../../bin/{dirName}/statictea'; bin/{dirName}/runner -d=testfiles"
     let result = staticExec cmd
     echo result
     return
@@ -680,8 +680,8 @@ proc runRunStf() =
     if name == "rt" or name.toLower in filename.toLower:
       # Run a stf file.
       foundTest = true
-      let cmd = """
-export statictea='../../bin/statictea'; bin/runner -f=testfiles/$1""" % filename
+      let cmd = fmt"""
+export statictea='../../bin/{dirName}/statictea'; bin/{dirName}/runner -f=testfiles/{filename}"""
       echo "Running: " & filename
       let result = staticExec cmd
       lastCmd = cmd
@@ -867,7 +867,7 @@ View the svg file in your browser:
 """
 
 task tt, "\tCompile and run t.nim.":
-  let cmd = "nim c -r --hints:off --outdir:bin/tests/ src/t.nim"
+  let cmd = fmt"nim c -r --hints:off --outdir:bin/{dirName}/tests/ src/t.nim"
   echo cmd
   exec cmd
 
@@ -910,10 +910,10 @@ task newstf, "\tCreate new stf as a starting point for a new test.":
         exec cmd
 
 task runhelp, "\tShow the runner help text with glow.":
-  exec "bin/runner -h | glow -"
+  exec fmt"bin/{dirName}/runner -h | glow -"
 
 task helpme, "\tShow the statictea help text.":
-  exec "bin/statictea -h | less"
+  exec fmt"bin/{dirName}/statictea -h | less"
 
 task remote, "\tCheck whether the remote code needs updating.":
   checkUtf8DecoderEcho()
@@ -921,11 +921,11 @@ task remote, "\tCheck whether the remote code needs updating.":
 task cmdline, "\tBuild cmdline.":
   let part1 = "nim c --hint[Performance]:off "
   let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
-  let part3 = "--out:bin/ src/cmdline"
+  let part3 = fmt"--out:bin/{dirName}/ src/cmdline"
   var cmd = part1 & part2 & part3
   echo cmd
   exec cmd
-  echo "Run bin/cmdline"
+  echo fmt"Run bin/{dirName}/cmdline"
 
 task release, "\tRun tests and update docs.":
   runUnitTests()
@@ -1008,7 +1008,7 @@ task dlist, "\tList the docker image and container.":
 
 task clean, "\tRemove all the binaries so everything gets built next time.":
   # Remove all the bin and doc files.
-  let dirs = @["bin", "docs"]
+  let dirs = @[fmt"bin/{dirName}", "docs"]
   for dir in dirs:
     let list = listFiles(dir)
     for filename in list:
