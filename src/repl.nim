@@ -14,7 +14,7 @@ import startingvars
 import matches
 import regexes
 import messages
-import runcommand
+import runCommand
 import variables
 
 func showVariables(variables: Variables): string =

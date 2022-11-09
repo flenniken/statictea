@@ -4,6 +4,7 @@ import std/json
 import std/nre
 import std/strformat
 import std/sets
+import std/algorithm
 include src/version
 include src/dot
 
@@ -389,7 +390,7 @@ proc createDependencyGraph() =
 """
   # size="14,8";
 
-  for name in sourceNames:
+  for name in sorted(sourceNames):
     let url = fmt"""URL="{name}.md""""
     let tooltip = fmt"""tooltip="{name}.md""""
     var extra: string
@@ -434,7 +435,7 @@ proc createDependencyGraph2() =
   ## the right.
 
   # Create a dot file of all the import dependencies.
-  let dotFilename = "src/statictea.dot"
+  let dotFilename = "src/statictea2.dot"
   exec "nim --hints:off genDepend src/statictea.nim"
   echo fmt"Generated {dotFilename}"
   rmFile("src/statictea.png")

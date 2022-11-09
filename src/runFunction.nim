@@ -18,7 +18,7 @@ import unicodes
 import signatures
 import replacement
 import opresultwarn
-import readJson
+import readjson
 
 template tMapParameters(signatureCode: string) =
   ## Template that checks the signatureCode against the parameters and
