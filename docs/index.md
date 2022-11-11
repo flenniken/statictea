@@ -11,7 +11,7 @@ StaticTea nim source code documentation.
 * [env.nim](env.md) &mdash; Environment holding the input and output streams.
 * [gethelp.nim](gethelp.md) &mdash; Get the command line help message.
 * [linebuffer.nim](linebuffer.md) &mdash; Read lines from a stream without exceeding the maximum line
-@:length.
+length.
 * [matches.nim](matches.md) &mdash; Methods for matching sub-strings.
 * [messages.nim](messages.md) &mdash; Messages IDs and associated strings.
 * [opresult.nim](opresult.md) &mdash; OpResult holds either a value or a message.

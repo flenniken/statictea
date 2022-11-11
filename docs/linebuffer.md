@@ -1,8 +1,6 @@
 # linebuffer.nim
 
-Read lines from a stream without exceeding the maximum line
-length. The returned lines contain the line ending, either crlf or
-lf.
+Read lines from a stream without exceeding the maximum line length. The returned lines contain the line ending, either crlf or lf.
 
 Example:
 
