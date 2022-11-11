@@ -384,7 +384,8 @@ proc createDependencyGraph() =
 
   # Create a new dot file without the nim runtime modules. Format the
   # nodes and edges.
-  var dotText = """digraph statictea {
+  var dotText = """
+digraph statictea {
 ratio=.5;
 """
 
@@ -433,8 +434,9 @@ proc createDependencyGraph2() =
   ## the right.
 
   # Create a dot file of all the import dependencies.
-  let dotFilename = "src/statictea2.dot"
+  let dotFilename = "src/statictea.dot"
   exec "nim --hints:off genDepend src/statictea.nim"
+
   echo fmt"Generated {dotFilename}"
   rmFile("src/statictea.png")
   rmFile("statictea.deps")
@@ -1012,4 +1014,3 @@ task clean, "\tRemove all the binaries so everything gets built next time.":
     let list = listFiles(dir)
     for filename in list:
       rmFile(filename)
-  
