@@ -385,10 +385,8 @@ proc createDependencyGraph() =
   # Create a new dot file without the nim runtime modules. Format the
   # nodes and edges.
   var dotText = """digraph statictea {
-  ratio=.5;
-  size="10";
+ratio=.5;
 """
-  # size="14,8";
 
   for name in sorted(sourceNames):
     let url = fmt"""URL="{name}.md""""
