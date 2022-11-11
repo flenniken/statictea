@@ -1,0 +1,60 @@
+# Nim module code file.
+
+# Define replacement patterns to remove formatting from the descriptions.
+o.patterns = list( +
+  "@@", "", +
+  "@{", "[", +
+  "}@", "]", +
+  "@!", "|", +
+  "[ ]*@:", "\n", +
+  "@\\.", "*", +
+  "&quot;", "\"", +
+  "&gt;", ">", +
+  "&lt;", "<", +
+  "&amp;", "&")
+
+# func getNameCallback(entry: dict) list
+#   ## Return the entry name.
+#   result &= "add"
+#   result &= entry.name
+#   return(result)
+
+# # Create a list of all the heading names.
+# names = list(s, getNameCallback)
+# anchors = githubAnchor(names)
+
+# path = path(s.orig)
+# o.moduleName = path.filename
+
+# func getEntryCallback(entry: dict, state: dict) list
+#   ## Return the entry name.
+#   newEntry = dict()
+#   newEntry.name = entry.name
+#   cases = list("skType", "type: ", +
+#     "skConst", "const: ", +
+#     "skMacro", "macro: ")
+#   newEntry.type = case(entry.type, cases, "")
+
+#   desc = get(entry, "description", "")
+#   sentence = slice(desc, 0, add(find(desc, ".", -1), 1))
+#   newEntry.short = replaceRe(sentence, state.patterns)
+#   newEntry.description = replaceRe(desc, state.patterns)
+
+#   code = replaceRe(entry.code, list("[ ]*$", ""))
+#   pos = find(code, " {", len(code))
+#   newEntry.signature = slice(code, 0, pos)
+
+#   newEntry.anchor = state.anchors[t.row]
+
+#   result &= "add"
+#   result &= newEntry
+#   return(result)
+
+# # Reformat the entries list and store it in o.entries.
+# state = dict()
+# state.patterns = o.patterns
+# state.anchors = anchors
+# o.entries = list(s, getEntryCallback, state)
+
+
+

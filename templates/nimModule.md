@@ -2,35 +2,21 @@ $$ # StaticTea template for generating markdown documents from nim
 $$ # modules with doc comments.
 $$ #
 $$ # Create a list of all the heading names.
-$$ #
 $$ block
 $$ : t.repeat = len(s.entries)
 $$ : entry = s.entries[t.row]
 $$ : g.names &= entry.name
 $$ endblock
 $$ #
-$$ # Define replacement patterns to remove formatting from the descriptions.
-$$ #
+$$ # Get the module name from the full path.
 $$ block
-$$ : g.patterns = list( +
-$$ :   "@@", "", +
-$$ :   "@{", "[", +
-$$ :   "}@", "]", +
-$$ :   "@!", "|", +
-$$ :   "[ ]*@:", "\n", +
-$$ :   "@\\.", "*", +
-$$ :   "&quot;", "\"", +
-$$ :   "&gt;", ">", +
-$$ :   "&lt;", "<", +
-$$ :   "&amp;", "&")
 $$ : path = path(s.orig)
 $$ : g.moduleName = path.filename
-$$ : t.repeat = if0(len(s.entries), 0, 1)
+$$ : t.repeat = if0(s.entries, 0, 1)
 $$ : g.anchors = githubAnchor(g.names)
 $$ endblock
 $$ #
 $$ # Reformat the entries list and store it in g.entries.
-$$ #
 $$ block
 $$ : t.repeat = len(s.entries)
 $$ : entry = get(s.entries, t.row, dict())
@@ -42,8 +28,8 @@ $$ :   "skMacro", "macro: ")
 $$ : newEntry.type = case(entry.type, cases, "")
 $$ : desc = get(entry, "description", "")
 $$ : sentence = slice(desc, 0, add(find(desc, ".", -1), 1))
-$$ : newEntry.short = replaceRe(sentence, g.patterns)
-$$ : newEntry.description = replaceRe(desc, g.patterns)
+$$ : newEntry.short = replaceRe(sentence, o.patterns)
+$$ : newEntry.description = replaceRe(desc, o.patterns)
 $$ : code = replaceRe(entry.code, list("[ ]*$", ""))
 $$ : pos = find(code, " {", len(code))
 $$ : newEntry.signature = slice(code, 0, pos)
@@ -54,7 +40,7 @@ $$ #
 $$ # Module section.
 $$ #
 $$ block
-$$ : modDescription = replaceRe(s.moduleDescription, g.patterns)
+$$ : modDescription = replaceRe(s.moduleDescription, o.patterns)
 # {g.moduleName}
 
 {modDescription}
@@ -65,7 +51,7 @@ $$ #
 $$ # Show the index label when there are entries.
 $$ #
 $$ nextline
-$$ : t.repeat = if0(len(s.entries), 0, 1)
+$$ : t.repeat = if0(s.entries, 0, 1)
 # Index
 
 $$ #

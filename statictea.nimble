@@ -587,7 +587,7 @@ proc taskDocs(namePart: string, forceRebuild = false) =
       # Create markdown from the json comments using a statictea template.
       echo "Generate $1" % [mdName]
       let part1 = fmt"bin/{dirName}/statictea -t templates/nimModule.md "
-      let part2 = fmt"-s {jsonName} -r {mdName}"
+      let part2 = fmt"-o templates/nimModule.tea -s {jsonName} -r {mdName}"
       cmd = part1 & part2
       echo cmd
       let output = staticExec(cmd)
