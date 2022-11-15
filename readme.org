@@ -1788,6 +1788,8 @@ Miscellaneous topics:
 - [[#stf-runner][Stf Runner]]
 - [[#example-templates][Example Templates]]
 - [[#repl-environment][REPL Environment]]
+- [[#docker-development][Docker Development]]
+- [[#mac-development][Mac Development]]
 
 ** Warning Messages
 :PROPERTIES:
@@ -2270,12 +2272,118 @@ command (h) shows them.
 #+BEGIN_SRC
 tea> h
 Available commands:
-* h — this help
-* p — print the value of a variable
-* pd — print a dictionary as dot names
-* pj — print a variable as json 
-* v — show number of variables in the top level dictionaries
-* q — quit
+  * h — this help text
+  * p dotname — print the value of a variable
+  * pd dotname — print a dictionary as dot names
+  * pj dotname — print a variable as json
+  * v — show the number of variables in the top level dictionaries
+  * q — quit
+tea>
+#+END_SRC
+
+[[#contents][茶]]
+
+** Docker Development
+:PROPERTIES:
+:CUSTOM_ID: docker-development
+:ORDERED:  t
+:END:
+
+You can use the statictea docker image as a development
+environment.  It is a Debian system with the nim compiler and
+optional applications used to build and test.
+
+The statictea source folder is shared with the docker container,
+so you can use your own editor and applications on the host as
+well.
+
+Steps:
+
+- download code
+- start docker environment
+- build the exe, test and docs
+
+1. Download Code
+
+Download the statictea source code to a folder on your system in a terminal window:
+
+#+BEGIN_SRC
+mkdir ~/code/statictea
+cd ~/code/statictea
+git clone git@github.com:flenniken/statictea.git .
+#+END_SRC
+
+2. Start Docker Environment
+
+You start the docker statictea environment with the nimble drun
+command. The first time you run it, it builds the docker image
+and stops so you can check for errors. You run it again to start
+the env.
+
+#+BEGIN_SRC
+nimble drun
+#+END_SRC
+
+3. Build
+
+You build the statictea executable in the environment using the
+nimble release command.  It runs all the tests and builds the exe
+and docs.
+
+#+BEGIN_SRC
+nimble release
+#+END_SRC
+
+** Mac Development
+:PROPERTIES:
+:CUSTOM_ID: mac-development
+:ORDERED:  t
+:END:
+
+Besides the docker environment, you can development on a mac.
+
+You setup for it is similar to the docker environment except you
+need to install the needed apps to your mac manually. Once you’re
+setup, you run the release command.
+
+1. Download Code
+
+Download the statictea source code to a folder on your system:
+
+#+BEGIN_SRC
+mkdir ~/code/statictea
+cd ~/code/statictea
+git clone git@github.com:flenniken/statictea.git .
+#+END_SRC
+
+2. Download Nim
+
+- https://nim-lang.org/install.html -- install Nim
+
+3. Download Helper Apps (optional)
+
+- glow —- for viewing markdown in your terminal
+- jq -— for viewing JSON
+- grip -— for viewing markdown in your browser
+- tree —- for viewing the statictea directory structure
+- graphviz dot -— for creating dependency charts
+
+#+BEGIN_SRC
+brew install glow
+brew install jq
+brew install grip
+brew install tree
+brew install graphviz
+#+END_SRC
+
+4. Build
+
+Then you build the statictea executable using the nimble release
+command.  It runs all the tests and builds the exe and docs.
+
+#+BEGIN_SRC
+cd -/code/statictea
+nimble release
 #+END_SRC
 
 [[#contents][茶]]
