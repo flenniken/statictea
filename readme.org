@@ -2169,7 +2169,6 @@ nimble n
 
 Nimble Tasks:
 
-#+BEGIN_SRC
 - n          Show available tasks.
 - test       Run one or more tests; specify part of test filename.
 - other      Run other tests and build tests.
@@ -2194,7 +2193,6 @@ Nimble Tasks:
 - helpme     Show the statictea help text.
 - remote     Check whether the remote code needs updating.
 - cmdline    Build cmdline.
-#+END_SRC
 
 [[#contents][茶]]
 
@@ -2346,7 +2344,7 @@ You setup for it is similar to the docker environment except you
 need to install the needed apps to your mac manually. Once you’re
 setup, you run the release command.
 
-1. Download Code
+- Download Code
 
 Download the statictea source code to a folder on your system:
 
@@ -2356,11 +2354,11 @@ cd ~/code/statictea
 git clone git@github.com:flenniken/statictea.git .
 #+END_SRC
 
-2. Download Nim
+- Download Nim
 
 - https://nim-lang.org/install.html -- install Nim
 
-3. Download Helper Apps (optional)
+- Download Helper Apps (optional)
 
 - [[https://github.com/charmbracelet/glow/][glow]] —- for viewing markdown in your terminal
 - [[https://github.com/stedolan/jq/][jq]] -— for viewing JSON
@@ -2376,7 +2374,7 @@ brew install tree
 brew install graphviz
 #+END_SRC
 
-4. Build
+- Build
 
 Then you build the statictea executable using the nimble release
 command.  It runs all the tests and builds the exe and docs.
