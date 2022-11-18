@@ -2356,15 +2356,21 @@ git clone git@github.com:flenniken/statictea.git .
 
 - Download Nim
 
-- https://nim-lang.org/install.html -- install Nim
+Download nim following instructions on their website:
+https://nim-lang.org/install.html.
 
-- Download Helper Apps (optional)
+- Install Helper Apps (optional)
+
+On the mac you install the helper applications using brew. They
+help debugging issues.
 
 - [[https://github.com/charmbracelet/glow/][glow]] —- for viewing markdown in your terminal
 - [[https://github.com/stedolan/jq/][jq]] -— for viewing JSON
 - [[https://github.com/joeyespo/grip][grip]] -— for viewing markdown in your browser
 - [[https://formulae.brew.sh][tree]] —- for viewing the statictea directory structure
 - [[https://graphviz.org][graphviz dot]] -— for creating dependency charts
+
+Install using brew at the command line:
 
 #+BEGIN_SRC
 brew install glow
