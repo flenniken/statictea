@@ -1,6 +1,6 @@
 # This builds a development environment for the statictea project.
 
-FROM debian:latest
+FROM debian:11
 MAINTAINER Steve Flenniken
 ENV statictea_env=debian
 
