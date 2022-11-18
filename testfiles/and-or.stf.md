@@ -79,16 +79,16 @@ c5 = true = true
 ### File stderr.expected
 
 ~~~
-tmpl.txt(2): w193: The argument must be a bool value, got a int.
+tmpl.txt(2): w193: The argument must be a bool value, got int.
 statement: c1 = and(1, 2)
                     ^
-tmpl.txt(3): w193: The argument must be a bool value, got a int.
+tmpl.txt(3): w193: The argument must be a bool value, got int.
 statement: c2 = and(true, 2)
                           ^
-tmpl.txt(4): w193: The argument must be a bool value, got a int.
+tmpl.txt(4): w193: The argument must be a bool value, got int.
 statement: c3 = or(1, 2)
                    ^
-tmpl.txt(5): w193: The argument must be a bool value, got a int.
+tmpl.txt(5): w193: The argument must be a bool value, got int.
 statement: c4 = or(false, 2)
                           ^
 tmpl.txt(6): w195: Expected two arguments.

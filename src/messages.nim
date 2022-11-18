@@ -430,7 +430,7 @@ const
     "Invalid variable name; names start with an ascii letter.", ## wInvalidVarNameStart
     "Invalid variable name; names contain letters, digits or underscores.", ## wInvalidVarName
     "No ending bracket.", ## wNoEndingBracket
-    "The argument must be a bool value, got a $1.", ## wExpectedBool
+    "The argument must be a bool value, got $1.", ## wExpectedBool
     "You cannot assign true or false.", ## wAssignTrueFalse
     "Expected two arguments.", ## wTwoArguments
     "Expected a boolean operator, and, or, ==, !=, <, >, <=, >=.", ## wNotBoolOperator

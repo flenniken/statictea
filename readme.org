@@ -1774,8 +1774,6 @@ The StaticTea command line options:
 :CUSTOM_ID: miscellaneous
 :END:
 
-Miscellaneous topics:
-
 - [[#warning-messages][Warning Messages]]
 - [[#if-functions][If Functions]]
 - [[#prefix-postfix][Prefix Postfix]]
@@ -2172,30 +2170,30 @@ nimble n
 Nimble Tasks:
 
 #+BEGIN_SRC
-n          Show available tasks.
-test       Run one or more tests; specify part of test filename.
-other      Run other tests and build tests.
-b          Build the statictea exe.
-docsall    Create all the docs, docsix, docs, readmefun, dot.
-docs       Create one or more markdown docs; specify part of source filename.
-docsix     Create markdown docs index.
-json       Display one or more source file's json doc comments; specify part of name.
-jsonix     Display markdown docs index json.
-stfix      Display markdown testfiles index json.
-readmefun  Create the readme function section.
-dot        Create a dependency graph of the StaticTea source.
-dot2       Create a dependency graph of the system modules used by StaticTea.
-tt         Compile and run t.nim.
-tree       Show the project directory tree.
-args       Show command line arguments.
-br         Build the stf test runner.
-rt         Run one or more stf tests in testfiles; specify part of the name.
-stfrm      Create testfiles readme.md.
-newstf     Create new stf as a starting point for a new test.
-runhelp    Show the runner help text with glow.
-helpme     Show the statictea help text.
-remote     Check whether the remote code needs updating.
-cmdline    Build cmdline.
+- n          Show available tasks.
+- test       Run one or more tests; specify part of test filename.
+- other      Run other tests and build tests.
+- b          Build the statictea exe.
+- docsall    Create all the docs, docsix, docs, readmefun, dot.
+- docs       Create one or more markdown docs; specify part of source filename.
+- docsix     Create markdown docs index.
+- json       Display one or more source file's json doc comments; specify part of name.
+- jsonix     Display markdown docs index json.
+- stfix      Display markdown testfiles index json.
+- readmefun  Create the readme function section.
+- dot        Create a dependency graph of the StaticTea source.
+- dot2       Create a dependency graph of the system modules used by StaticTea.
+- tt         Compile and run t.nim.
+- tree       Show the project directory tree.
+- args       Show command line arguments.
+- br         Build the stf test runner.
+- rt         Run one or more stf tests in testfiles; specify part of the name.
+- stfrm      Create testfiles readme.md.
+- newstf     Create new stf as a starting point for a new test.
+- runhelp    Show the runner help text with glow.
+- helpme     Show the statictea help text.
+- remote     Check whether the remote code needs updating.
+- cmdline    Build cmdline.
 #+END_SRC
 
 [[#contents][茶]]
@@ -2299,11 +2297,11 @@ well.
 
 Steps:
 
-- download code
-- start docker environment
-- build the exe, test and docs
+1. download code
+2. start docker environment
+3. build
 
-1. Download Code
+- Download Code
 
 Download the statictea source code to a folder on your system in a terminal window:
 
@@ -2313,7 +2311,7 @@ cd ~/code/statictea
 git clone git@github.com:flenniken/statictea.git .
 #+END_SRC
 
-2. Start Docker Environment
+- Start Docker Environment
 
 You start the docker statictea environment with the nimble drun
 command. The first time you run it, it builds the docker image
@@ -2324,7 +2322,7 @@ the env.
 nimble drun
 #+END_SRC
 
-3. Build
+- Build
 
 You build the statictea executable in the environment using the
 nimble release command.  It runs all the tests and builds the exe
@@ -2333,6 +2331,8 @@ and docs.
 #+BEGIN_SRC
 nimble release
 #+END_SRC
+
+[[#contents][茶]]
 
 ** Mac Development
 :PROPERTIES:
@@ -2362,11 +2362,11 @@ git clone git@github.com:flenniken/statictea.git .
 
 3. Download Helper Apps (optional)
 
-- glow —- for viewing markdown in your terminal
-- jq -— for viewing JSON
-- grip -— for viewing markdown in your browser
-- tree —- for viewing the statictea directory structure
-- graphviz dot -— for creating dependency charts
+- [[https://github.com/charmbracelet/glow/][glow]] —- for viewing markdown in your terminal
+- [[https://github.com/stedolan/jq/][jq]] -— for viewing JSON
+- [[https://github.com/joeyespo/grip][grip]] -— for viewing markdown in your browser
+- [[https://formulae.brew.sh][tree]] —- for viewing the statictea directory structure
+- [[https://graphviz.org][graphviz dot]] -— for creating dependency charts
 
 #+BEGIN_SRC
 brew install glow

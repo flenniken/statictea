@@ -81,7 +81,7 @@ shortCiruit = expected
 ### File stderr.expected
 
 ~~~
-shared.tea(4): w193: The argument must be a bool value, got a int.
+shared.tea(4): w193: The argument must be a bool value, got int.
 statement: a0 = if(3 < 5, 1, 2)
                    ^
 shared.tea(7): w201: The comparison operator’s right value must be the same type as the left value.
