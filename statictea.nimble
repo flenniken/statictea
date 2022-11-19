@@ -391,7 +391,7 @@ proc createDependencyGraph() =
     let bin = int(bytes / maxBytes * 5)
     let fontSize = bins[bin]
     sourceSizes[name] = fontSize
-    echo fmt"{bin} {name} {fontSize}"
+    # echo fmt"{bin} {name} {fontSize}"
 
   # Read the dot file into a sequence of left and right values.
   let dependencies = readDotFile(dotFilename)

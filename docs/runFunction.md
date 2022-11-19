@@ -39,6 +39,9 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funList](#funlist) &mdash; You create a list with the list function or with brackets.
 * [funReplace_siiss](#funreplace_siiss) &mdash; Replace a substring specified by its position and length with another string.
 * [funReplaceRe_sls](#funreplacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
+* type: [PathComponents](#pathcomponents) &mdash; PathComponents holds the components of the file path components.
+* [newPathComponents](#newpathcomponents) &mdash; 
+* [parsePath](#parsepath) &mdash; Parse the given file path into its component pieces.
 * [funPath_sosd](#funpath_sosd) &mdash; Split a file path into its component pieces.
 * [funLower_ss](#funlower_ss) &mdash; Lowercase a string.
 * [funKeys_dl](#funkeys_dl) &mdash; Create a list from the keys in a dictionary.
@@ -950,6 +953,35 @@ website: https://regex101.com/
 
 ```nim
 func funReplaceRe_sls(variables: Variables; parameters: seq[Value]): FunResult
+```
+
+# PathComponents
+
+PathComponents holds the components of the file path components.
+
+```nim
+PathComponents = object
+  dir: string
+  filename: string
+  basename: string
+  ext: string
+
+```
+
+# newPathComponents
+
+
+
+```nim
+func newPathComponents(dir, filename, basename, ext: string): PathComponents
+```
+
+# parsePath
+
+Parse the given file path into its component pieces.
+
+```nim
+func parsePath(path: string; separator = '/'): PathComponents
 ```
 
 # funPath_sosd
