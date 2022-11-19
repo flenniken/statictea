@@ -13,6 +13,7 @@ import args
 import opresultwarn
 import comparelines
 import runFunction
+import version
 
 proc testGetVariableOk(variables: Variables, dotNameStr: string, eJson:
     string): bool =
@@ -74,7 +75,7 @@ o = {}
 s = {}
 t.args = {}
 t.row = 0
-t.version = "0.1.0""""
+t.version = "$1"""" % staticteaVersion
     check dotNameRep(variables, top=true) == expected
 
   test "getVariable":
@@ -84,12 +85,12 @@ t.version = "0.1.0""""
     check testGetVariableOk(variables, "false", "false")
     check testGetVariableOk(variables, "t.row", "0")
     check testGetVariableOk(variables, "t.args", "{}")
-    check testGetVariableOk(variables, "t.version", "\"0.1.0\"")
+    check testGetVariableOk(variables, "t.version", "\"$1\"" % staticteaVersion)
     check testGetVariableOk(variables, "s", "{}")
     check testGetVariableOk(variables, "o", "{}")
     check testGetVariableOk(variables, "l", "{}")
     check testGetVariableOk(variables, "g", "{}")
-    let eTea = """{"args":{},"row":0,"version":"0.1.0"}"""
+    let eTea = """{"args":{},"row":0,"version":"$1"}""" % staticteaVersion
     check testGetVariableOk(variables, "t", eTea)
     let expected = """["cmp","cmp","cmp"]"""
     check testGetVariableOk(variables, "f.cmp", expected)

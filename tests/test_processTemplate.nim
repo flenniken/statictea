@@ -841,7 +841,7 @@ I'm a {s.teaMaster}!
 statictea version number: {t.version}
 """
     let eResultLines = @[
-      "statictea version number: 0.1.0\n" % staticteaVersion
+      "statictea version number: $1\n" % staticteaVersion
     ]
     check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
 

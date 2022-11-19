@@ -6,6 +6,7 @@ import variables
 import sharedtestcode
 import vartypes
 import runfunction
+import version
 
 proc testHandleReplLine(line: string, eStr = "", eStop = false, start: Natural = 5): bool =
   # Set up variables when not passed in.
@@ -57,11 +58,11 @@ Invalid REPL command syntax."""
     check testHandleReplLine("tea> pj t.row", "0")
 
   test "show t.version":
-    let version = "0.1.0"
-    let qversion = """"0.1.0""""
+    let version = staticteaVersion
+    let quotedVersion = """"$1"""" % version
     check testHandleReplLine("tea> p t.version", version)
-    check testHandleReplLine("tea> pd t.version", qversion)
-    check testHandleReplLine("tea> pj t.version", qversion)
+    check testHandleReplLine("tea> pd t.version", quotedVersion)
+    check testHandleReplLine("tea> pj t.version", quotedVersion)
 
   test "show t.args":
     check testHandleReplLine("tea> p t.args", "{}")
