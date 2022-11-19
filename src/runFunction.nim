@@ -1218,6 +1218,43 @@ func funReplaceRe_sls*(variables: Variables, parameters: seq[Value]): FunResult 
 
   replaceReMap(map)
 
+type
+  PathComponents* = object
+    ## PathComponents holds the components of the file path components.
+    dir: string
+    filename: string
+    basename: string
+    ext: string
+
+func newPathComponents*(dir, filename, basename, ext: string): PathComponents =
+  result = PathComponents(dir: dir, filename: filename, basename: basename, ext: ext)
+
+func parsePath*(path: string, separator='/'): PathComponents =
+  ## Parse the given file path into its component pieces.
+
+  var dir: string
+  var filename: string
+  var basename: string
+  var ext: string
+  let pos = rfind(path, separator)
+  if pos == -1:
+    filename = path
+  else:
+    dir = path[0 .. pos]
+    if pos+1 < path.len:
+      filename = path[pos+1 .. ^1]
+
+  if filename.len > 0:
+    let dotPos = rfind(filename, '.')
+    if dotPos != -1:
+      ext = filename[dotPos .. ^1]
+      if dotPos > 0:
+        basename = filename[0 .. dotPos - 1]
+    else:
+      basename = filename
+
+  result = newPathComponents(dir, filename, basename, ext)
+
 func funPath_sosd*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Split a file path into its component pieces. Return a dictionary
   ## @:with the filename, basename, extension and directory.
@@ -1263,32 +1300,13 @@ func funPath_sosd*(variables: Variables, parameters: seq[Value]): FunResult =
   else:
     separator = os.DirSep
 
-  var dir: string
-  var filename: string
-  var basename: string
-  var ext: string
-  let pos = rfind(path, separator)
-  if pos == -1:
-    filename = path
-  else:
-    dir = path[0 .. pos]
-    if pos+1 < path.len:
-      filename = path[pos+1 .. ^1]
-
-  if filename.len > 0:
-    let dotPos = rfind(filename, '.')
-    if dotPos != -1:
-      ext = filename[dotPos .. ^1]
-      if dotPos > 0:
-        basename = filename[0 .. dotPos - 1]
-    else:
-      basename = filename
+  let components = parsePath(path, separator)
 
   var dict = newVarsDict()
-  dict["filename"] = newValue(filename)
-  dict["basename"] = newValue(basename)
-  dict["ext"] = newValue(ext)
-  dict["dir"] = newValue(dir)
+  dict["filename"] = newValue(components.filename)
+  dict["basename"] = newValue(components.basename)
+  dict["ext"] = newValue(components.ext)
+  dict["dir"] = newValue(components.dir)
 
   result = newFunResult(newValue(dict))
 

@@ -64,6 +64,7 @@ proc get_dir_filenames(folder: string, extension: string, path: bool = false,
     if filename.endsWith(extension) and not (lastPathPart(filename) in excludeFilenames):
       var name = filename
       if noExt:
+        # Remove ".nim"
         name = name[0 .. ^5]
       if not path:
         name = lastPathPart(name)
@@ -334,6 +335,12 @@ proc readDotFile*(dotFilename: string): seq[Dependency] =
     if dependencyO.isSome():
       result.add(dependencyO.get())
 
+proc getFileSizeNimble(filename: string): int =
+  let cmd = fmt"ls -l {filename} | awk '{{print $5}}'"
+  let (str, rc) = gorgeEx(cmd)
+  # echo fmt"------{filename} {str} {rc}"
+  result = parseInt(str)
+
 proc createDependencyGraph() =
   ## Create a dependency dot file from statictea.nim modules showing
   ## the module import dependencies.
@@ -350,22 +357,41 @@ proc createDependencyGraph() =
   # Add color the node's background and link them to their docs.
   # https://www.graphviz.org/doc/info/colors.html
 
+  # Online viewer: http://magjac.com/graphviz-visual-editor/
+
+  # Create dot file of the dependencies between nim modules.
   let dotFilename = "src/statictea.dot"
   exec "nim --hints:off genDepend src/statictea.nim"
   echo fmt"Generated {dotFilename}"
   rmFile("src/statictea.png")
   rmFile("statictea.deps")
 
-  # Create a dictionary of all the source filenames and how many
+  # Create a dictionary of all the source filenames to store how many
   # imports each has.
   let sourceNames = get_source_filenames(noExt = true)
   var sourceNamesDict = initTable[string, int]()
   for name in sourceNames:
     sourceNamesDict[name] = 0
 
-  # echo "sourceNamesDict keys:"
-  # for name, _ in pairs(sourceNamesDict):
-  #   echo fmt"name: {name}"
+  # Create a dictionary mapping filename to it font size.
+  let sourcePaths = get_source_filenames(path = true)
+  var sourceSizes = initTable[string, int]()
+  var maxBytes = 0
+  for path in sourcePaths:
+    let bytes = getFileSizeNimble(path)
+    if bytes > maxBytes:
+      maxBytes = bytes
+    # Get the name without the extension.
+    let name = lastPathPart(path)[0 .. ^5]
+
+    sourceSizes[name] = bytes
+    # echo fmt"{path} {name} {bytes}"
+  let bins = [24, 36, 48, 60, 72, 84]
+  for name, bytes in pairs(sourceSizes):
+    let bin = int(bytes / maxBytes * 5)
+    let fontSize = bins[bin]
+    sourceSizes[name] = fontSize
+    echo fmt"{bin} {name} {fontSize}"
 
   # Read the dot file into a sequence of left and right values.
   let dependencies = readDotFile(dotFilename)
@@ -393,7 +419,7 @@ ratio=.5;
     let url = fmt"""URL="{name}.md""""
     let tooltip = fmt"""tooltip="{name}.md""""
     var extra: string
-    var allNodes = "fontsize=24;"
+    var fontSize = sourceSizes[name]
     let count = sourceNamesDict[name]
     if count == 0:
       # tree leaves
@@ -406,9 +432,9 @@ ratio=.5;
       extra = "fillcolor=palegoldenrod, style=filled"
     var attrs: string
     if name == "statictea":
-      attrs = fmt"{name} [{allNodes} shape=invhouse, {extra}, {url}, {tooltip}];" & "\n"
+      attrs = fmt"{name} [fontsize=48, shape=diamond, {extra}, {url}, {tooltip}];" & "\n"
     else:
-      attrs = fmt"{name} [{allNodes} {extra}, {url}, {tooltip}];" & "\n"
+      attrs = fmt"{name} [fontsize={fontSize}, {extra}, {url}, {tooltip}];" & "\n"
     dotText.add(attrs)
 
   # Generate the connections between the nodes.
