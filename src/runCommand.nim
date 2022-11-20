@@ -1138,9 +1138,9 @@ proc runStatement*(statement: Statement, variables: Variables):
   if leftParenBrack == "(" and dotNameStr in ["if0", "if"]:
     # Handle the special bare if functions.
     vlOr = ifFunctions(dotNameStr, statement, leadingLen, variables, bare=true)
-  # elif leftParenBrack == "[":
-  #   # a[2] = 4
-  #   # not implemented
+  elif leftParenBrack == "(" and dotNameStr == "warn":
+    # Handle a bare warn function.
+    vlOr = getFunctionValueAndPos(dotNameStr, statement, leadingLen, variables)
   else:
     # Handle normal "varName operator right" statements.
     varName = dotNameStr

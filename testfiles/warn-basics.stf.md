@@ -14,25 +14,37 @@ $statictea \
 
 ### File tmpl.txt
 
+When the warn function is run, it exits the statement and no
+assignment happens. It similar to what happens when a function
+generates a normal warning.
+
 ~~~
-$$ nextline a = warn("My message that's always output.")
+$$ nextline a = warn("warn1: My message that's always output.")
 next line case
 
-$$ block a = if0(0, warn("warning 1 is 1"), 2)
-a = {a}
-$$ endblock
-
-$$ block a = if0(1, warn("warning 1 is 1"), 2)
-a = {a}
+$$ block
+$$ : a = if0(0, warn("warn2: conditional warning"), 2)
+a = {a} -- missing
 $$ endblock
 
 $$ block
-$$ : a = if0(0, warn("warning a"), "a")
-$$ : b = if0(1, warn("warning b"), "b")
-$$ : c = if0(0, warn("warning c"), "c")
-a = {a}
-b = {b}
-c = {c}
+$$ : a = if0(1, warn("warning not hit"), 2)
+a = {a} = 2
+$$ endblock
+
+$$ block
+$$ : a = if0(0, warn("warn3: conditional warning"), "a")
+$$ : b = if0(1, warn("b warning not hit"), "b")
+$$ : c = if0(0, warn("warn4: conditional warning"), "c")
+a = {a} = missing
+b = {b} = b
+c = {c} = missing
+$$ endblock
+
+$$ block
+$$ : warn("warn5: bare warning")
+$$ : if0(0, warn("warn6: warning in bare if")
+$$ : if0(2, warn("not hit"))
 $$ endblock
 ~~~
 
@@ -42,13 +54,14 @@ $$ endblock
 ~~~
 next line case
 
-a = {a}
+a = {a} -- missing
 
-a = 2
+a = 2 = 2
 
-a = {a}
-b = b
-c = {c}
+a = {a} = missing
+b = b = b
+c = {c} = missing
+
 ~~~
 
 ### File stdout.expected
@@ -59,13 +72,15 @@ c = {c}
 ### File stderr.expected
 
 ~~~
-tmpl.txt(1): My message that's always output.
-tmpl.txt(4): warning 1 is 1
-tmpl.txt(5): w58: The replacement variable doesn't exist: a.
-tmpl.txt(13): warning a
-tmpl.txt(15): warning c
-tmpl.txt(16): w58: The replacement variable doesn't exist: a.
-tmpl.txt(18): w58: The replacement variable doesn't exist: c.
+tmpl.txt(1): warn1: My message that's always output.
+tmpl.txt(5): warn2: conditional warning
+tmpl.txt(6): w58: The replacement variable doesn't exist: a.
+tmpl.txt(15): warn3: conditional warning
+tmpl.txt(17): warn4: conditional warning
+tmpl.txt(18): w58: The replacement variable doesn't exist: a.
+tmpl.txt(20): w58: The replacement variable doesn't exist: c.
+tmpl.txt(24): warn5: bare warning
+tmpl.txt(25): warn6: warning in bare if
 ~~~
 
 ### Expected result == result.expected
