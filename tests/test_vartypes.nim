@@ -1,7 +1,7 @@
 import std/strutils
 import std/tables
 import std/unittest
-import opresultwarn
+import opresult
 import readjson
 import vartypes
 import messages

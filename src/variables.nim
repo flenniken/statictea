@@ -14,7 +14,7 @@ import version
 import messages
 import warnings
 import args
-import opresultwarn
+import opresult
 
 const
   outputValues* = ["result", "stdout", "stderr", "log", "skip"]

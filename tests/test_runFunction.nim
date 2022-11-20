@@ -7,7 +7,7 @@ import runFunction
 import messages
 import warnings
 import variables
-import opresultwarn
+import opresult
 import sharedtestcode
 
 let funcsVarDict = createFuncDictionary().dictv

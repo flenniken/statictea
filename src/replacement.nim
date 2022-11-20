@@ -36,7 +36,7 @@ import matches
 import messages
 import variables
 import tempFile
-import opresultwarn
+import opresult
 import warnings
 
 type

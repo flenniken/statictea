@@ -2,8 +2,7 @@
 
 import std/unicode
 import std/strutils
-import opresultid
-import opresultwarn
+import opresult
 import messages
 import utf8decoder
 import vartypes

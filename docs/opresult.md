@@ -14,6 +14,12 @@ You use this to make particular OpResult objects. See [OpResultId](opresultid.md
 * [isMessage](#ismessage) &mdash; Return true when the OpResult object contains a message.
 * [isValue](#isvalue) &mdash; Return true when the OpResult object contains a value.
 * [`$`](#) &mdash; Return a string representation of an OpResult object.
+* type: [OpResultWarn](#opresultwarn) &mdash; OpResultWarn holds either a value or warning data.
+* [opValueW](#opvaluew) &mdash; Create a new OpResultWarn object containing a value T.
+* [opMessageW](#opmessagew) &mdash; Create a new OpResultWarn object containing a warning.
+* type: [OpResultId](#opresultid) &mdash; OpResultId holds either a value or a message id.
+* [opValue](#opvalue) &mdash; Create a new OpResultId object containing a value T.
+* [opMessage](#opmessage) &mdash; Create a new OpResultId object containing a message id.
 
 # OpResultKind
 
@@ -62,6 +68,92 @@ Return a string representation of an OpResult object.
 
 ```nim
 func `$`(opResult: OpResult): string
+```
+
+# OpResultWarn
+
+OpResultWarn holds either a value or warning data.  It's similar to the Option type but instead of returning nothing, you return a warning that tells why you cannot return the value.
+
+Example Usage:
+
+~~~
+import opresult
+
+proc get_string(): OpResultWarn[string] =
+  if problem:
+    result = opMessage[string](newWarningData(wUnknownArg))
+  else:
+    result = opValue[string]("string of char")
+
+let strOr = get_string()
+if strOr.isMessage:
+  echo show_message(strOr.message)
+else:
+  echo "value = " & $strOr.value
+~~~~
+
+```nim
+OpResultWarn[T] = OpResult[T, WarningData]
+```
+
+# opValueW
+
+Create a new OpResultWarn object containing a value T.
+
+```nim
+func opValueW[T](value: T): OpResultWarn[T]
+```
+
+# opMessageW
+
+Create a new OpResultWarn object containing a warning.
+
+```nim
+func opMessageW[T](message: WarningData): OpResultWarn[T]
+```
+
+# OpResultId
+
+OpResultId holds either a value or a message id.  It's similar to
+the Option type but instead of returning nothing, you return a
+message id that tells why you cannot return the value.
+
+Example Usage:
+
+~~~
+import opresult
+
+proc get_string(): OpResultId[string] =
+  if problem:
+    result = opMessage[string](wUnknownArg)
+  else:
+    result = opValue[string]("string of char")
+
+let strOr = get_string()
+if strOr.isMessage:
+  echo show_message(strOr.message)
+else:
+  echo "value = " & $strOr.value
+~~~~
+
+```nim
+OpResultId[T] = OpResult[T, MessageId]
+```
+
+# opValue
+
+Create a new OpResultId object containing a value T.
+
+```nim
+func opValue[T](value: T): OpResultId[T]
+```
+
+# opMessage
+
+Create a new OpResultId object containing a message id.
+
+```nim
+func opMessage[T](message: MessageId): OpResultId[T]
 ```
 
 

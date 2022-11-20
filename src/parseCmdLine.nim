@@ -6,7 +6,7 @@ import regexes
 import messages
 import matches
 import warnings
-import opresultwarn
+import opresult
 
 type
   LineParts* = object

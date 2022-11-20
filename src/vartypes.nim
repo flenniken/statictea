@@ -4,7 +4,7 @@ import std/tables
 import std/strutils
 import messages
 import warnings
-import opresultwarn
+import opresult
 
 type
   VarsDict* = OrderedTableRef[string, Value]

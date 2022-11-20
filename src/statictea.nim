@@ -9,7 +9,7 @@ import messages
 import gethelp
 import version
 import env
-import opresultwarn
+import opresult
 import repl
 when isMainModule:
   import std/os

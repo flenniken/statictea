@@ -6,7 +6,7 @@ import std/streams
 import std/strutils
 import env
 import messages
-import opresultwarn
+import opresult
 import linebuffer
 import runCommand
 import variables

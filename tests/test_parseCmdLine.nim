@@ -6,7 +6,7 @@ import parseCmdLine
 import env
 import matches
 import messages
-import opresultwarn
+import opresult
 
 proc test_getCodeLength(line: string, codeStart: Natural, eCodeLen: Natural): bool =
   if codeStart >= line.len:

@@ -11,7 +11,7 @@ import readjson
 import messages
 import utf8decoder
 import sharedtestcode
-import opresultwarn
+import opresult
 import warnings
 import runCommand
 

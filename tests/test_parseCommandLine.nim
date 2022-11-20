@@ -9,7 +9,7 @@ import parseCommandLine
 import env
 import messages
 import warnings
-import opresultwarn
+import opresult
 import sharedtestcode
 
 proc parseCommandLine*(cmdLine: string = ""): ArgsOr =

@@ -3,8 +3,8 @@ import std/strformat
 import std/strutils
 import std/unicode
 import unicodes
-import opresultid
-import opresultwarn
+import opresult
+import opresult
 import messages
 import vartypes
 import sharedtestcode

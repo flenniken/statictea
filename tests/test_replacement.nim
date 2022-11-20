@@ -7,7 +7,7 @@ import matches
 import linebuffer
 import variables
 import sharedtestcode
-import opresultwarn
+import opresult
 import vartypes
 import warnings
 import messages

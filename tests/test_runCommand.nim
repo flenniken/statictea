@@ -12,7 +12,7 @@ import variables
 import messages
 import warnings
 import version
-import opresultwarn
+import opresult
 import sharedtestcode
 import codefile
 import readjson

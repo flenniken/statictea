@@ -9,7 +9,7 @@ import warnings
 import env
 import vartypes
 import args
-import opresultwarn
+import opresult
 import startingvars
 import matches
 import regexes

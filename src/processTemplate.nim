@@ -15,7 +15,7 @@ import variables
 import vartypes
 import replacement
 import startingvars
-import opresultwarn
+import opresult
 
 proc collectCommand*(env: var Env, lb: var LineBuffer,
       prepostTable: PrepostTable, extraLine: var ExtraLine): CmdLines =

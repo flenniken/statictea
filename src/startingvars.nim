@@ -9,7 +9,7 @@ import env
 import variables
 import vartypes
 import readjson
-import opresultwarn
+import opresult
 import codefile
 import runFunction
 

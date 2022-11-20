@@ -14,7 +14,7 @@ import parseNumber
 import variables
 import runFunction
 import readjson
-import opresultwarn
+import opresult
 import unicodes
 import utf8decoder
 import parseCmdLine

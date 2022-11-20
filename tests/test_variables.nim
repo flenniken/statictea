@@ -10,7 +10,7 @@ import messages
 import warnings
 import readjson
 import args
-import opresultwarn
+import opresult
 import comparelines
 import runFunction
 import version

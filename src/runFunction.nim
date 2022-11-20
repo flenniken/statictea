@@ -17,7 +17,7 @@ import matches
 import unicodes
 import signatures
 import replacement
-import opresultwarn
+import opresult
 import readjson
 
 template tMapParameters(signatureCode: string) =
