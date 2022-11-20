@@ -143,14 +143,14 @@ proc warnLb*(env: var Env, lb: LineBuffer, messageId: MessageId, p1: string = ""
   ## Write a formatted warning message to the error stream.
   warn(env, lb.getFilename(), lb.getLineNum(), messageId, p1)
 
-func formatDateTime*(dt: DateTime): string =
+func formatLogDateTime*(dt: DateTime): string =
   ## Return a formatted time stamp for the log.
   result = dt.format(dtFormat)
 
-func formatLine*(filename: string, lineNum: int, message: string, dt = now()):
+func formatLogLine*(filename: string, lineNum: int, message: string, dt = now()):
      string =
   ## Return a formatted log line.
-  let dtString = formatDateTime(dt)
+  let dtString = formatLogDateTime(dt)
   result = "$1; $2($3); $4" % [dtString, filename, $lineNum, message]
 
 proc logLine*(env: var Env, filename: string, lineNum: int, message: string) =
@@ -159,7 +159,7 @@ proc logLine*(env: var Env, filename: string, lineNum: int, message: string) =
   ## not added to the line.
   if env.logFile == nil:
     return
-  let line = formatLine(filename, lineNum, message)
+  let line = formatLogLine(filename, lineNum, message)
   try:
     # raise newException(IOError, "test io error")
     env.logFile.write(line)

@@ -115,7 +115,7 @@ XXXX-XX-XX XX:XX:XX.XXX; test_env.nim(X*); testProc done
   test "parseTimeStamp":
     let dtOption = parseTimeStamp("2020-10-01 08:21:28.618")
     check dtOption.isSome
-    let line = formatLine("filename", 44, "message", dtOption.get())
+    let line = formatLogLine("filename", 44, "message", dtOption.get())
     let expected = "2020-10-01 08:21:28.618; filename(44); message"
     check line == expected
 
@@ -135,7 +135,7 @@ XXXX-XX-XX XX:XX:XX.XXX; test_env.nim(X*); testProc done
       "2020-10-01 08:21:28.618; statictea.nim(65); version: 0.1.0")
     check logLineO.isSome
     let logLine = logLineO.get()
-    let dtString = formatDateTime(logLine.dt)
+    let dtString = formatLogDateTime(logLine.dt)
     check dtString == "2020-10-01 08:21:28.618"
     check logLine.filename == "statictea.nim"
     check logLine.lineNum == 65

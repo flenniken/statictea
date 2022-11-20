@@ -17,8 +17,8 @@ Environment holding the input and output streams.
 * [warnNoFile](#warnnofile) &mdash; Write a formatted warning message to the error stream.
 * [warnNoFile](#warnnofile-1) &mdash; Write a formatted warning message to the error stream.
 * [warnLb](#warnlb) &mdash; Write a formatted warning message to the error stream.
-* [formatDateTime](#formatdatetime) &mdash; Return a formatted time stamp for the log.
-* [formatLine](#formatline) &mdash; Return a formatted log line.
+* [formatLogDateTime](#formatlogdatetime) &mdash; Return a formatted time stamp for the log.
+* [formatLogLine](#formatlogline) &mdash; Return a formatted log line.
 * [logLine](#logline) &mdash; Append a message to the log file.
 * [log](#log) &mdash; Append the message to the log file.
 * [writeOut](#writeout) &mdash; Write a message to the output stream.
@@ -159,20 +159,20 @@ Write a formatted warning message to the error stream.
 proc warnLb(env: var Env; lb: LineBuffer; messageId: MessageId; p1: string = "")
 ```
 
-# formatDateTime
+# formatLogDateTime
 
 Return a formatted time stamp for the log.
 
 ```nim
-func formatDateTime(dt: DateTime): string
+func formatLogDateTime(dt: DateTime): string
 ```
 
-# formatLine
+# formatLogLine
 
 Return a formatted log line.
 
 ```nim
-func formatLine(filename: string; lineNum: int; message: string; dt = now()): string
+func formatLogLine(filename: string; lineNum: int; message: string; dt = now()): string
 ```
 
 # logLine
