@@ -5,7 +5,7 @@ import std/rdstdin
 import std/tables
 import std/options
 import std/strutils
-import warnings
+import messages
 import env
 import vartypes
 import args
@@ -13,7 +13,6 @@ import opresult
 import startingvars
 import matches
 import regexes
-import messages
 import runCommand
 import variables
 

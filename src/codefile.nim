@@ -11,7 +11,6 @@ import linebuffer
 import runCommand
 import variables
 import vartypes
-import warnings
 import utf8decoder
 
 const

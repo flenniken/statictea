@@ -12,7 +12,6 @@ import std/tables
 import vartypes
 import version
 import messages
-import warnings
 import args
 import opresult
 

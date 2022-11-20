@@ -10,7 +10,6 @@ import matches
 import vartypes
 import variables
 import messages
-import warnings
 import version
 import opresult
 import sharedtestcode

@@ -2,7 +2,6 @@
 
 import std/strformat
 import messages
-import warnings
 import opresult
 
 type

@@ -5,7 +5,6 @@ import std/tables
 import regexes
 import messages
 import matches
-import warnings
 import opresult
 
 type

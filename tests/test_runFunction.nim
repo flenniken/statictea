@@ -5,7 +5,6 @@ import std/tables
 import vartypes
 import runFunction
 import messages
-import warnings
 import variables
 import opresult
 import sharedtestcode

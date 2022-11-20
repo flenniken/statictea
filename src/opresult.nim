@@ -4,7 +4,6 @@
 ## @:
 ## @:You use this to make particular OpResult objects. See @{OpResultId}@(opresultid.md).
 
-import warnings
 import messages
 
 type

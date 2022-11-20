@@ -12,7 +12,6 @@ import messages
 import utf8decoder
 import sharedtestcode
 import opresult
-import warnings
 import runCommand
 
 proc testParseJsonStr(text: string, start: Natural,

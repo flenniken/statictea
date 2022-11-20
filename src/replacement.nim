@@ -37,7 +37,6 @@ import messages
 import variables
 import tempFile
 import opresult
-import warnings
 
 type
   SegmentType = enum

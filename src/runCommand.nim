@@ -9,7 +9,6 @@ import regexes
 import env
 import vartypes
 import messages
-import warnings
 import parseNumber
 import variables
 import runFunction

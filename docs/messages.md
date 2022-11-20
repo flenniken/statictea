@@ -1,12 +1,19 @@
 # messages.nim
 
-Messages IDs and associated strings.
+Messages IDs and associated strings and routines to get them
 
 * [messages.nim](../src/messages.nim) &mdash; Nim source code.
 # Index
 
 * type: [MessageId](#messageid) &mdash; Message numbers.
 * const: [Messages](#messages) &mdash; The message text.
+* type: [WarningData](#warningdata) &mdash; Warning data.
+* [getWarning](#getwarning) &mdash; Return the warning string.
+* [getWarningLine](#getwarningline) &mdash; Return a formatted warning line.
+* [getWarningLine](#getwarningline-1) &mdash; Return a formatted warning line.
+* [newWarningData](#newwarningdata) &mdash; Create a WarningData object containing all the warning information.
+* [`$`](#) &mdash; Return a string representation of WarningData.
+* [`==`](#-1) &mdash; Return true when the two WarningData objects are equal.
 
 # MessageId
 
@@ -470,6 +477,83 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The key doesn\'t exist in the dictionary.", ## wMissingKey
     "Missing right bracket.", ## wMissingRightBracket
     "Unable to create a stream object."]
+```
+
+# WarningData
+
+Warning data.<ul class="simple"><li>warning -- the message id</li>
+<li>p1 -- the optional string substituted for the message's $1.</li>
+<li>pos -- the index in the statement where the warning was detected.</li>
+</ul>
+
+
+```nim
+WarningData = object
+  warning*: MessageId
+  p1*: string
+  pos*: Natural
+
+```
+
+# getWarning
+
+Return the warning string.
+
+```nim
+func getWarning(warning: MessageId; p1 = ""): string
+```
+
+# getWarningLine
+
+Return a formatted warning line. For example:
+
+~~~
+filename(line): wId: message.
+~~~~
+
+```nim
+func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = ""): string
+```
+
+# getWarningLine
+
+Return a formatted warning line. For example:
+
+~~~
+filename(line): wId: message.
+~~~~
+
+```nim
+func getWarningLine(filename: string; lineNum: int; warningData: WarningData): string
+```
+
+# newWarningData
+
+Create a WarningData object containing all the warning information.
+
+```nim
+func newWarningData(warning: MessageId; p1 = ""; pos = 0): WarningData
+```
+
+# `$`
+
+Return a string representation of WarningData.
+
+~~~
+let warning = newWarningData(wUnknownArg, "p1", 5)
+check $warning == "wUnknownArg(p1):5"
+~~~~
+
+```nim
+func `$`(warningData: WarningData): string
+```
+
+# `==`
+
+Return true when the two WarningData objects are equal.
+
+```nim
+func `==`(w1: WarningData; w2: WarningData): bool
 ```
 
 

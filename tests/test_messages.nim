@@ -1,10 +1,8 @@
 import std/unittest
 import std/strutils
-import std/strformat
 import messages
-import warnings
 
-{. hint: & "my special hint" .}
+# {. hint: & "my special hint" .}
 
 func countLetter(message: string, letter: char): int =
   ## Count the number of times letter is used in the given string.
@@ -12,7 +10,7 @@ func countLetter(message: string, letter: char): int =
     if ch == letter:
       inc(result)
 
-suite "warnings.nim":
+suite "messages.nim":
 
   test "starts at 0":
     check low(MessageId) == wSuccess

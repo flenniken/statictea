@@ -7,7 +7,6 @@ import variables
 import vartypes
 import env
 import messages
-import warnings
 import readjson
 import args
 import opresult

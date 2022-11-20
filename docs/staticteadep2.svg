@@ -27,17 +27,17 @@
 <path fill="none" stroke="black" d="M135.11,-822.44C148.76,-817.37 163.5,-811.14 176.38,-804 317.04,-726.06 322.03,-659.79 464.38,-585 475.78,-579.01 488.77,-574 501,-569.99"/>
 <polygon fill="black" stroke="black" points="501.99,-573.35 510.5,-567.04 499.91,-566.66 501.99,-573.35"/>
 </g>
-<!-- warnings -->
+<!-- messages -->
 <g id="node9" class="node">
-<title>warnings</title>
-<ellipse fill="none" stroke="black" cx="547.57" cy="-1152" rx="42.79" ry="18"/>
-<text text-anchor="middle" x="547.57" y="-1148.3" font-family="Times,serif" font-size="14.00">warnings</text>
+<title>messages</title>
+<ellipse fill="none" stroke="black" cx="547.57" cy="-1152" rx="44.39" ry="18"/>
+<text text-anchor="middle" x="547.57" y="-1148.3" font-family="Times,serif" font-size="14.00">messages</text>
 </g>
-<!-- strutils&#45;&gt;warnings -->
+<!-- strutils&#45;&gt;messages -->
 <g id="edge6" class="edge">
-<title>strutils&#45;&gt;warnings</title>
-<path fill="none" stroke="black" d="M117.12,-858.04C134.25,-870.97 156.62,-887.9 176.38,-903 304.81,-1001.11 321.56,-1049.36 464.38,-1125 475.36,-1130.81 487.82,-1135.69 499.66,-1139.62"/>
-<polygon fill="black" stroke="black" points="498.26,-1142.85 508.85,-1142.52 500.37,-1136.18 498.26,-1142.85"/>
+<title>strutils&#45;&gt;messages</title>
+<path fill="none" stroke="black" d="M117.12,-858.04C134.25,-870.97 156.62,-887.9 176.38,-903 304.81,-1001.11 321.56,-1049.36 464.38,-1125 474.94,-1130.59 486.88,-1135.32 498.32,-1139.17"/>
+<polygon fill="black" stroke="black" points="497.03,-1142.44 507.62,-1142.14 499.16,-1135.77 497.03,-1142.44"/>
 </g>
 <!-- cmdline -->
 <g id="node10" class="node">

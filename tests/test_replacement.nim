@@ -9,7 +9,6 @@ import variables
 import sharedtestcode
 import opresult
 import vartypes
-import warnings
 import messages
 import unicodes
 import compareLines

@@ -7,7 +7,6 @@ import std/options
 import std/strutils
 import tempFile
 import messages
-import warnings
 import args
 import linebuffer
 when defined(test):

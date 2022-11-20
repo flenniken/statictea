@@ -3,7 +3,6 @@
 import std/tables
 import std/strutils
 import messages
-import warnings
 import opresult
 
 type

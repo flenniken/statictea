@@ -8,7 +8,6 @@ import args
 import parseCommandLine
 import env
 import messages
-import warnings
 import opresult
 import sharedtestcode
 

@@ -1,6 +1,5 @@
 import std/unittest
 import messages
-import warnings
 import opresult
 
 type

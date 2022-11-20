@@ -5,7 +5,6 @@ import std/tables
 import std/os
 import args
 import messages
-import warnings
 import cmdline
 import matches
 
