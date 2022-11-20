@@ -124,25 +124,25 @@
 <polygon fill="black" stroke="black" points="497.93,-1307.11 508.51,-1306.63 499.94,-1300.4 497.93,-1307.11"/>
 </g>
 <!-- variables -->
-<g id="node26" class="node">
+<g id="node24" class="node">
 <title>variables</title>
 <ellipse fill="none" stroke="black" cx="547.57" cy="-1044" rx="42.49" ry="18"/>
 <text text-anchor="middle" x="547.57" y="-1040.3" font-family="Times,serif" font-size="14.00">variables</text>
 </g>
 <!-- strutils&#45;&gt;variables -->
-<g id="edge41" class="edge">
+<g id="edge39" class="edge">
 <title>strutils&#45;&gt;variables</title>
 <path fill="none" stroke="black" d="M124.97,-856.1C190.9,-890.85 336.52,-965.58 464.38,-1017 476.22,-1021.76 489.26,-1026.34 501.4,-1030.33"/>
 <polygon fill="black" stroke="black" points="500.19,-1033.62 510.78,-1033.35 502.34,-1026.95 500.19,-1033.62"/>
 </g>
 <!-- runFunction -->
-<g id="node27" class="node">
+<g id="node25" class="node">
 <title>runFunction</title>
 <ellipse fill="none" stroke="black" cx="547.57" cy="-612" rx="53.89" ry="18"/>
 <text text-anchor="middle" x="547.57" y="-608.3" font-family="Times,serif" font-size="14.00">runFunction</text>
 </g>
 <!-- strutils&#45;&gt;runFunction -->
-<g id="edge46" class="edge">
+<g id="edge44" class="edge">
 <title>strutils&#45;&gt;runFunction</title>
 <path fill="none" stroke="black" d="M133.67,-821.72C147.54,-816.54 162.77,-810.43 176.38,-804 309.78,-741.03 329.61,-698.99 464.38,-639 474.16,-634.65 484.86,-630.63 495.21,-627.09"/>
 <polygon fill="black" stroke="black" points="495.99,-630.52 504.39,-624.06 493.79,-623.87 495.99,-630.52"/>
@@ -303,29 +303,29 @@
 <path fill="none" stroke="black" d="M132.99,-700.68C147.57,-707.35 163.39,-715.88 176.38,-726 333.92,-848.79 299.11,-958.83 464.38,-1071 471.63,-1075.92 479.85,-1080 488.22,-1083.37"/>
 <polygon fill="black" stroke="black" points="486.82,-1086.59 497.41,-1086.74 489.23,-1080.01 486.82,-1086.59"/>
 </g>
-<!-- parseNumber -->
-<g id="node24" class="node">
-<title>parseNumber</title>
-<ellipse fill="none" stroke="black" cx="547.57" cy="-72" rx="58.49" ry="18"/>
-<text text-anchor="middle" x="547.57" y="-68.3" font-family="Times,serif" font-size="14.00">parseNumber</text>
-</g>
-<!-- options&#45;&gt;parseNumber -->
-<g id="edge39" class="edge">
-<title>options&#45;&gt;parseNumber</title>
-<path fill="none" stroke="black" d="M141.06,-671.37C153.64,-666.52 166.33,-659.92 176.38,-651 383.34,-467.32 253.39,-278.04 464.38,-99 470.91,-93.46 478.61,-89.05 486.63,-85.54"/>
-<polygon fill="black" stroke="black" points="487.81,-88.83 495.88,-81.97 485.29,-82.3 487.81,-88.83"/>
-</g>
 <!-- options&#45;&gt;variables -->
-<g id="edge42" class="edge">
+<g id="edge40" class="edge">
 <title>options&#45;&gt;variables</title>
 <path fill="none" stroke="black" d="M132.07,-701.11C146.73,-707.87 162.84,-716.34 176.38,-726 324.51,-831.69 309.63,-921.27 464.38,-1017 474.74,-1023.41 486.78,-1028.46 498.4,-1032.38"/>
 <polygon fill="black" stroke="black" points="497.31,-1035.71 507.9,-1035.35 499.4,-1029.03 497.31,-1035.71"/>
 </g>
 <!-- options&#45;&gt;runFunction -->
-<g id="edge44" class="edge">
+<g id="edge42" class="edge">
 <title>options&#45;&gt;runFunction</title>
 <path fill="none" stroke="black" d="M145.73,-675.1C232.63,-661.42 398.23,-635.35 486.95,-621.39"/>
 <polygon fill="black" stroke="black" points="487.33,-624.87 496.66,-619.86 486.24,-617.95 487.33,-624.87"/>
+</g>
+<!-- parseNumber -->
+<g id="node28" class="node">
+<title>parseNumber</title>
+<ellipse fill="none" stroke="black" cx="547.57" cy="-72" rx="58.49" ry="18"/>
+<text text-anchor="middle" x="547.57" y="-68.3" font-family="Times,serif" font-size="14.00">parseNumber</text>
+</g>
+<!-- options&#45;&gt;parseNumber -->
+<g id="edge48" class="edge">
+<title>options&#45;&gt;parseNumber</title>
+<path fill="none" stroke="black" d="M141.06,-671.37C153.64,-666.52 166.33,-659.92 176.38,-651 383.34,-467.32 253.39,-278.04 464.38,-99 470.91,-93.46 478.61,-89.05 486.63,-85.54"/>
+<polygon fill="black" stroke="black" points="487.81,-88.83 495.88,-81.97 485.29,-82.3 487.81,-88.83"/>
 </g>
 <!-- options&#45;&gt;signatures -->
 <g id="edge54" class="edge">
@@ -418,13 +418,13 @@
 <polygon fill="black" stroke="black" points="499.11,-1305.97 509.7,-1305.56 501.16,-1299.28 499.11,-1305.97"/>
 </g>
 <!-- tables&#45;&gt;variables -->
-<g id="edge43" class="edge">
+<g id="edge41" class="edge">
 <title>tables&#45;&gt;variables</title>
 <path fill="none" stroke="black" d="M134.3,-946.65C220.99,-967.12 410.1,-1011.78 498.83,-1032.73"/>
 <polygon fill="black" stroke="black" points="497.89,-1036.1 508.42,-1034.99 499.5,-1029.29 497.89,-1036.1"/>
 </g>
 <!-- tables&#45;&gt;runFunction -->
-<g id="edge45" class="edge">
+<g id="edge43" class="edge">
 <title>tables&#45;&gt;runFunction</title>
 <path fill="none" stroke="black" d="M116.44,-915.68C133.71,-902.73 156.46,-885.52 176.38,-870 305.81,-769.14 320.12,-717.19 464.38,-639 473.4,-634.11 483.46,-629.91 493.35,-626.38"/>
 <polygon fill="black" stroke="black" points="494.18,-629.79 502.54,-623.29 491.95,-623.16 494.18,-629.79"/>
@@ -502,7 +502,7 @@
 <polygon fill="black" stroke="black" points="502.7,-413.48 511.19,-407.14 500.6,-406.8 502.7,-413.48"/>
 </g>
 <!-- os&#45;&gt;runFunction -->
-<g id="edge48" class="edge">
+<g id="edge46" class="edge">
 <title>os&#45;&gt;runFunction</title>
 <path fill="none" stroke="black" d="M115.09,-544.08C186.24,-555.28 386.06,-586.73 486.85,-602.6"/>
 <polygon fill="black" stroke="black" points="486.13,-606.03 496.55,-604.13 487.22,-599.11 486.13,-606.03"/>
@@ -659,27 +659,14 @@
 <path fill="none" stroke="black" d="M161.41,-456.63C254.82,-441.93 415.12,-416.69 496.31,-403.91"/>
 <polygon fill="black" stroke="black" points="496.4,-407.44 505.73,-402.43 495.31,-400.53 496.4,-407.44"/>
 </g>
-<!-- parseutils -->
-<g id="node25" class="node">
-<title>parseutils</title>
-<polygon fill="palegreen" stroke="black" points="171,-37.21 171,-58.79 122.49,-74.04 53.89,-74.04 5.38,-58.79 5.38,-37.21 53.89,-21.96 122.49,-21.96 171,-37.21"/>
-<polygon fill="none" stroke="black" points="175.01,-34.28 175.01,-61.72 123.11,-78.04 53.27,-78.04 1.37,-61.72 1.37,-34.28 53.27,-17.96 123.11,-17.96 175.01,-34.28"/>
-<text text-anchor="middle" x="88.19" y="-41.8" font-family="Times,serif" font-size="24.00">parseutils</text>
-</g>
-<!-- parseutils&#45;&gt;parseNumber -->
-<g id="edge40" class="edge">
-<title>parseutils&#45;&gt;parseNumber</title>
-<path fill="none" stroke="black" d="M175.49,-52.53C263.39,-57.14 397.9,-64.2 478.54,-68.43"/>
-<polygon fill="black" stroke="black" points="477.87,-71.9 488.04,-68.93 478.24,-64.91 477.87,-71.9"/>
-</g>
 <!-- math -->
-<g id="node28" class="node">
+<g id="node26" class="node">
 <title>math</title>
 <ellipse fill="none" stroke="red" cx="88.19" cy="-330" rx="45.92" ry="24.08"/>
 <text text-anchor="middle" x="88.19" y="-323.8" font-family="Times,serif" font-size="24.00">math</text>
 </g>
 <!-- math&#45;&gt;runFunction -->
-<g id="edge47" class="edge">
+<g id="edge45" class="edge">
 <title>math&#45;&gt;runFunction</title>
 <path fill="none" stroke="red" d="M128.49,-342.1C143.88,-347.54 161.4,-354.64 176.38,-363 317.49,-441.79 321.56,-509.36 464.38,-585 473.45,-589.8 483.52,-593.96 493.43,-597.48"/>
 <polygon fill="red" stroke="red" points="492.03,-600.7 502.62,-600.57 494.25,-594.07 492.03,-600.7"/>
@@ -691,17 +678,30 @@
 <polygon fill="red" stroke="red" points="510.35,-140.31 518.86,-134 508.27,-133.63 510.35,-140.31"/>
 </g>
 <!-- algorithm -->
-<g id="node29" class="node">
+<g id="node27" class="node">
 <title>algorithm</title>
 <polygon fill="palegreen" stroke="black" points="172.56,-601.21 172.56,-622.79 123.14,-638.04 53.24,-638.04 3.82,-622.79 3.82,-601.21 53.24,-585.96 123.14,-585.96 172.56,-601.21"/>
 <polygon fill="none" stroke="black" points="176.57,-598.26 176.57,-625.74 123.74,-642.04 52.64,-642.04 -0.19,-625.74 -0.19,-598.26 52.64,-581.96 123.74,-581.96 176.57,-598.26"/>
 <text text-anchor="middle" x="88.19" y="-605.8" font-family="Times,serif" font-size="24.00">algorithm</text>
 </g>
 <!-- algorithm&#45;&gt;runFunction -->
-<g id="edge49" class="edge">
+<g id="edge47" class="edge">
 <title>algorithm&#45;&gt;runFunction</title>
 <path fill="none" stroke="black" d="M176.84,-612C266.09,-612 402.36,-612 482.15,-612"/>
 <polygon fill="black" stroke="black" points="481.99,-615.5 491.99,-612 481.99,-608.5 481.99,-615.5"/>
+</g>
+<!-- parseutils -->
+<g id="node29" class="node">
+<title>parseutils</title>
+<polygon fill="palegreen" stroke="black" points="171,-37.21 171,-58.79 122.49,-74.04 53.89,-74.04 5.38,-58.79 5.38,-37.21 53.89,-21.96 122.49,-21.96 171,-37.21"/>
+<polygon fill="none" stroke="black" points="175.01,-34.28 175.01,-61.72 123.11,-78.04 53.27,-78.04 1.37,-61.72 1.37,-34.28 53.27,-17.96 123.11,-17.96 175.01,-34.28"/>
+<text text-anchor="middle" x="88.19" y="-41.8" font-family="Times,serif" font-size="24.00">parseutils</text>
+</g>
+<!-- parseutils&#45;&gt;parseNumber -->
+<g id="edge49" class="edge">
+<title>parseutils&#45;&gt;parseNumber</title>
+<path fill="none" stroke="black" d="M175.49,-52.53C263.39,-57.14 397.9,-64.2 478.54,-68.43"/>
+<polygon fill="black" stroke="black" points="477.87,-71.9 488.04,-68.93 478.24,-64.91 477.87,-71.9"/>
 </g>
 <!-- unicode -->
 <g id="node30" class="node">

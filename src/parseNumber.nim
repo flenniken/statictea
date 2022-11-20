@@ -3,31 +3,25 @@
 
 import std/options
 import std/parseutils
-import vartypes
 
-proc parseFloat*(str: string, start: Natural = 0): Option[ValueAndPos] =
+proc parseFloat*(str: string, start: Natural = 0): Option[tuple[number: float64, pos: Natural]] =
   ## Parse the string and return the 64 bit float number and the
-  ## @:position after the number. The number starts at the start
-  ## @:parameter index. Nothing is returned when the float is out of
-  ## @:range or the str is not a float number.  Processing stops at the
-  ## @:first non-number character.
-  ## @:
-  ## @:A float number starts with an optional minus sign, followed by a
-  ## @:digit, followed by digits, underscores or a decimal point. Only
-  ## @:one decimal point is allowed and underscores are skipped.
-
+  ## position after the number. The number starts at the start
+  ## index. Nothing is returned when the float is out of range or the
+  ## str is not a float number.  Processing stops at the first
+  ## non-number character.
   assert sizeof[BiggestFloat] == sizeof[float64]
   var number: BiggestFloat
   let length = parseBiggestFloat(str, number, start)
   if length > 0:
-    result = some(newValueAndPos(newValue(number), start+length))
+    result = some((number, Natural(start+length)))
 
-proc parseInteger*(s: string, start: Natural = 0): Option[ValueAndPos] =
+proc parseInteger*(s: string, start: Natural = 0): Option[tuple[number: int64, pos: Natural]] =
   ## Parse the string and return the 64 bit signed integer and the
-  ## @:position after the number. The number starts at the start parameter
-  ## @:index. Parsing stops at the first non-number character.  Nothing
-  ## @:is returned when the integer is out of range or the str is not a
-  ## @:number.
+  ## position after the number. The number starts at the start
+  ## parameter index. Parsing stops at the first non-number character.
+  ## Nothing is returned when the integer is out of range or the str
+  ## is not a number.
   ## @:
   ## @:An integer starts with an optional minus sign, followed by a
   ## @:digit, followed by digits or underscores. The underscores are
@@ -59,4 +53,4 @@ proc parseInteger*(s: string, start: Natural = 0): Option[ValueAndPos] =
       return
 
     b = b * sign
-    result = some(newValueAndPos(newValue(b), i))
+    result = some((b, i))

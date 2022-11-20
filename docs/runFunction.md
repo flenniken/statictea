@@ -6,6 +6,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 # Index
 
 * [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
+* [parseNumber](#parsenumber) &mdash; Return the literal number value and position after it.
 * [funCmp_iii](#funcmp_iii) &mdash; Compare two ints.
 * [funCmp_ffi](#funcmp_ffi) &mdash; Compare two floats.
 * [funCmp_ssobi](#funcmp_ssobi) &mdash; Compare two strings.
@@ -88,6 +89,14 @@ Compares two values a and b.  When a equals b return 0, when a is greater than b
 
 ```nim
 func cmpBaseValues(a, b: Value; insensitive: bool = false): int
+```
+
+# parseNumber
+
+Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.
+
+```nim
+func parseNumber(line: string; start: Natural): ValueAndPosOr
 ```
 
 # funCmp_iii

@@ -1,57 +1,48 @@
 
 import std/unittest
 import std/options
-import vartypes
 import parseNumber
 import sharedtestcode
-import runCommand
 
-proc testParseInteger(text: string, start: Natural, expectedNumber: int64,
+proc testParseInteger(text: string, start: Natural, eNumber: int64,
     ePos: Natural): bool =
   # Return true when the string parses as expected.
-  var valueAndPosO = parseInteger(text, start)
-  if not isSome(valueAndPosO):
+  var intAndPosO = parseInteger(text, start)
+  if not isSome(intAndPosO):
     echo "Did not find an integer for:"
     echo text
     return false
-  let valueAndPos = valueAndPosO.get()
-  let eValueAndPos = newValueAndPos(newValue(expectedNumber), ePos)
-  result = gotExpected($valueAndPos, $eValueAndPos)
-  if not result:
-    echo text
-    echo startColumn(text, start)
-    echo startColumn(text, valueAndPos.pos, "^ got")
-    echo startColumn(text, ePos, "^ expected")
+  let (number, pos) = intAndPosO.get()
+  result = gotExpected($number, $eNumber)
+  if not gotExpected($pos, $ePos):
+    result = false
 
 proc testParseIntegerError(text: string, start: Natural = 0): bool =
   # Return true when the given string does not parse as an integer,
   # else return false.
-  var valueAndPosO = parseInteger(text, start)
-  if not valueAndPosO.isSome:
+  var intAndPosO = parseInteger(text, start)
+  if not intAndPosO.isSome:
     result = true
 
-proc testParseFloat(text: string, start: Natural, expectedNumber: BiggestFloat,
+proc testParseFloat(text: string, start: Natural, eNumber: BiggestFloat,
     ePos: Natural): bool =
   # Return true when the string parses as expected.
-  var valueAndPosO = parseFloat(text, start)
-  if not isSome(valueAndPosO):
+  var floatAndPosO = parseFloat(text, start)
+  if not isSome(floatAndPosO):
     echo "Did not find a float for:"
     echo text
     return false
-  let valueAndPos = valueAndPosO.get()
-  let eValueAndPos = newValueAndPos(newValue(expectedNumber), ePos)
-  result = gotExpected($valueAndPos, $eValueAndPos)
-  if not result:
-    echo text
-    echo startColumn(text, start)
-    echo startColumn(text, valueAndPos.pos, "^ got")
-    echo startColumn(text, ePos, "^ expected")
+  let (number, pos) = floatAndPosO.get()
+  result = gotExpected($number, $eNumber)
+  let samePos = gotExpected($pos, $ePos)
+  if not samePos:
+    result = false
 
 proc testParseFloatError(text: string, start: Natural = 0): bool =
   # Return true when the given string does not parse as an float,
   # else return false.
-  var valueAndPosO = parseFloat(text, start)
-  if not valueAndPosO.isSome:
+  let numberPosO = parseFloat(text, start)
+  if not numberPosO.isSome:
     result = true
 
 

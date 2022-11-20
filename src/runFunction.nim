@@ -43,31 +43,52 @@ func cmpBaseValues*(a, b: Value, insensitive: bool = false): int =
     else:
       result = 0
 
+func parseNumber*(line: string, start: Natural): ValueAndPosOr =
+  ## Return the literal number value and position after it.  The start
+  ## index points at a digit or minus sign. The position includes the
+  ## trailing whitespace.
+
+  # Check that we have a statictea number and get the length including
+  # trailing whitespace.
+  var matchesO = matchNumberNotCached(line, start)
+  if not matchesO.isSome:
+    # Invalid number.
+    return newValueAndPosOr(wNotNumber, "", start)
+
+  # The decimal point determines whether the number is an integer or
+  # float.
+  let matches = matchesO.get()
+  let decimalPoint = matches.getGroup()
+  var valueAndPos: ValueAndPos
+  if decimalPoint == ".":
+    # Parse the float.
+    let floatAndPosO = parseFloat(line, start)
+    if not floatAndPosO.isSome:
+      # The number is too big or too small.
+      return newValueAndPosOr(wNumberOverFlow, "", start)
+    let (number, pos) = floatAndPosO.get()
+    valueAndPos = newValueAndPos(newValue(number), pos)
+  else:
+    # Parse the int.
+    let intAndPosO = parseInteger(line, start)
+    if not intAndPosO.isSome:
+      # The number is too big or too small.
+      return newValueAndPosOr(wNumberOverFlow, "", start)
+    let (number, pos) = intAndPosO.get()
+    valueAndPos = newValueAndPos(newValue(number), pos)
+  # Note that we use the matches length so it includes the trailing whitespace.
+  result = newValueAndPosOr(newValueAndPos(valueAndPos.value, start + matches.length))
+
 func numberStringToNum(numString: string): FunResult =
   ## Convert the number string to a float or int, if possible.
 
-  var matchesO = matchNumberNotCached(numString, 0)
-  if not matchesO.isSome:
+  let valueAndPosOr = parseNumber(numString, 0)
+  if valueAndPosOr.isMessage:
     # Expected number string.
+    # todo: will the message above work instead of changing it here?
     return newFunResultWarn(wExpectedNumberString)
-  let decimalPoint = matchesO.getGroup()
 
-  if decimalPoint == ".":
-    # Float number string to float.
-    let floatAndLengthO = parseNumber.parseFloat(numString)
-    if floatAndLengthO.isSome:
-      result = newFunResult(floatAndLengthO.get().value)
-    else:
-      # Expected number string.
-      result = newFunResultWarn(wExpectedNumberString)
-  else:
-    # Int number string to int.
-    let valueAndPosO = parseInteger(numString)
-    if valueAndPosO.isSome:
-      result = newFunResult(valueAndPosO.get().value)
-    else:
-      # Expected number string.
-      result = newFunResultWarn(wExpectedNumberString)
+  result = newFunResult(valueAndPosOr.value.value)
 
 func funCmp_iii*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Compare two ints. Returns -1 for less, 0 for equal and 1 for
@@ -586,11 +607,11 @@ func parseVersion*(version: string): Option[(int, int, int)] =
   if not matchesO.isSome:
     return
   let (g1, g2, g3) = matchesO.get3Groups()
-  var g1ValueAndPos = parseInteger(g1)
-  var g2ValueAndPos = parseInteger(g2)
-  var g3ValueAndPos = parseInteger(g3)
-  result = some((int(g1ValueAndPos.get().value.intv),
-    int(g2ValueAndPos.get().value.intv), int(g3ValueAndPos.get().value.intv)))
+  let g1IntAndPos = parseInteger(g1)
+  let g2IntAndPos = parseInteger(g2)
+  let g3IntAndPos = parseInteger(g3)
+  result = some((int(g1IntAndPos.get().number),
+    int(g2IntAndPos.get().number), int(g3IntAndPos.get().number)))
 
 func funCmpVersion_ssi*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Compare two StaticTea version numbers. Returns -1 for less, 0 for

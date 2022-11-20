@@ -9,7 +9,6 @@ import regexes
 import env
 import vartypes
 import messages
-import parseNumber
 import variables
 import runFunction
 import readjson
@@ -277,35 +276,7 @@ proc getNumber*(statement: Statement, start: Natural): ValueAndPosOr =
   ## Return the literal number value and position after it.  The start
   ## index points at a digit or minus sign. The position includes the
   ## trailing whitespace.
-
-  # Check that we have a statictea number and get the length including
-  # trailing whitespace.
-  let matchesO = matchNumber(statement.text, start)
-  if not matchesO.isSome:
-    # Invalid number.
-    return newValueAndPosOr(wNotNumber, "", start)
-
-  # The decimal point determines whether the number is an integer or
-  # float.
-  let matches = matchesO.get()
-  let decimalPoint = matches.getGroup()
-  var valueAndPos: ValueAndPos
-  if decimalPoint == ".":
-    # Parse the float.
-    let valueAndPosO = parseFloat(statement.text, start)
-    if not valueAndPosO.isSome:
-      # The number is too big or too small.
-      return newValueAndPosOr(wNumberOverFlow, "", start)
-    valueAndPos = valueAndPosO.get()
-  else:
-    # Parse the int.
-    let valueAndPosO = parseInteger(statement.text, start)
-    if not valueAndPosO.isSome:
-      # The number is too big or too small.
-      return newValueAndPosOr(wNumberOverFlow, "", start)
-    valueAndPos = valueAndPosO.get()
-  # Note that we use the matches length so it includes the trailing whitespace.
-  result = newValueAndPosOr(newValueAndPos(valueAndPos.value, start + matches.length))
+  result = parseNumber(statement.text, start)
 
 func skipArgument*(statement: Statement, startPos: Natural): PosOr =
   ## Skip past the argument.  startPos points at the first character
