@@ -1783,16 +1783,30 @@ func funJoin_lsois*(variables: Variables, parameters: seq[Value]): FunResult =
 
 func funWarn_ss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Return a warning message and skip the current statement.
+  ## You can call the warn function without an assignment.
   ## @:
   ## @:~~~
   ## @:warn(message: string) string
   ## @:~~~~
   ## @:
-  ## @:Examples:
+  ## @:You can warn conditionally in a bare if statement:
   ## @:
   ## @:~~~
   ## @:if0(c, warn("message is 0"))
+  ## @:~~~
+  ## @:
+  ## @:You can warn conditionally in a normal if statement. In the
+  ## @:following example, if warn is called the b variable will not
+  ## @:get created.
+  ## @:
+  ## @:~~~
   ## @:b = if0(c, warn("c is not 0"), "")
+  ## @:~~~
+  ## @:
+  ## @:You can warn unconditionally using a bare warn statement:
+  ## @:
+  ## @:~~~
+  ## @:warn("always warn")
   ## @:~~~~
 
   tMapParameters("ss")

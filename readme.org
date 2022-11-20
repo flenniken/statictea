@@ -4255,17 +4255,30 @@ values(d) => ["apple", 2, 3]
 :CUSTOM_ID: warn
 :END:
 
-Return a warning message and skip the current statement.
+Return a warning message and skip the current statement. You can call the warn function without an assignment.
 
 #+BEGIN_SRC
 warn(message: string) string
 #+END_SRC
 
-Examples:
+You can warn conditionally in a bare if statement:
 
 #+BEGIN_SRC
 if0(c, warn("message is 0"))
+#+BEGIN_SRC
+
+You can warn conditionally in a normal if statement. In the
+following example, if warn is called the b variable will not
+get created.
+
+#+BEGIN_SRC
 b = if0(c, warn("c is not 0"), "")
+#+BEGIN_SRC
+
+You can warn unconditionally using a bare warn statement:
+
+#+BEGIN_SRC
+warn("always warn")
 #+END_SRC
 
 
