@@ -3,7 +3,7 @@ import std/unittest
 import std/options
 import std/strutils
 import parseCmdLine
-import env
+import sharedtestcode
 import matches
 import messages
 import opresult

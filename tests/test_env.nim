@@ -7,6 +7,7 @@ import env
 import regexes
 import matches
 import comparelines
+import sharedtestcode
 
 type
   FileLine* = object

@@ -2,7 +2,7 @@ import std/unittest
 import std/options
 import std/strutils
 import dot
-import env
+import sharedtestcode
 
 proc testParseDotLine(line: string, eDep: Option[Dependency]): bool =
   let depO = parseDotLine(line)

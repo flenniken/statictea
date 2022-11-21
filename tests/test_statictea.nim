@@ -1,7 +1,7 @@
 import std/unittest
 import std/strutils
 import statictea
-import env
+import sharedtestcode
 import version
 import comparelines
 

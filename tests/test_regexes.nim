@@ -2,7 +2,7 @@ import std/unittest
 import std/options
 import std/strutils
 import regexes
-import env
+import sharedtestcode
 
 proc testMatchPattern*(str: string, pattern: string, start: Natural = 0,
     eMatchesO: Option[Matches] = none(Matches),

@@ -5,7 +5,7 @@ import std/strutils
 import std/tables
 import variables
 import vartypes
-import env
+import sharedtestcode
 import messages
 import readjson
 import args
