@@ -219,7 +219,8 @@ proc processTemplateTop*(env: var Env, args: Args) =
   ## Setup the environment streams then process the template.
 
   # Add the template and result streams to the environment.
-  let warningDataO = env.addExtraStreams(args)
+  assert args.templateFilename != ""
+  let warningDataO = addExtraStreams(env, args.templateFilename, args.resultFilename)
   if warningDataO.isSome:
     env.warnNoFile(warningDataO.get())
     return

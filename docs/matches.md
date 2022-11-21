@@ -112,7 +112,7 @@ proc getPrepostTable(args: Args): PrepostTable
 Parse the prepost item on the terminal command line.  A prefix is followed by an optional postfix, prefix[,postfix].  Each part contains 1 to 20 ascii characters including spaces but without control characters or commas.
 
 ```nim
-proc parsePrepost(str: string): Option[Prepost]
+proc parsePrepost(str: string): Option[tuple[prefix: string, postfix: string]]
 ```
 
 # matchPrefix

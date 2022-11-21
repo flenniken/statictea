@@ -7,8 +7,6 @@ import std/options
 import std/strutils
 import tempFile
 import messages
-import args
-import linebuffer
 
 const
   logWarnSize*: int64 = 1024 * 1024 * 1024
@@ -135,10 +133,6 @@ proc warnNoFile*(env: var Env, messageId: MessageId, p1: string = "") =
 proc warnNoFile*(env: var Env, warningData: WarningData) =
   ## Write a formatted warning message to the error stream.
   warn(env, "nofile", 0, warningData.messageId, warningData.p1)
-
-proc warnLb*(env: var Env, lb: LineBuffer, messageId: MessageId, p1: string = "") =
-  ## Write a formatted warning message to the error stream.
-  warn(env, lb.getFilename(), lb.getLineNum(), messageId, p1)
 
 func formatLogDateTime*(dt: DateTime): string =
   ## Return a formatted time stamp for the log.
@@ -273,32 +267,18 @@ proc addExtraStreams*(env: var Env, templateFilename: string,
   env.resultStream = rStream
   env.closeResultStream = closeRStream
 
-proc addExtraStreams*(env: var Env, args: Args): Option[WarningData] =
-  ## Add the template and result streams to the environment. Return
-  ## true on success.
-
-  # Get the template filename.
-  assert args.templateFilename != ""
-  let templateFilename = args.templateFilename
-
-  # Get the result filename.
-  let resultFilename = args.resultFilename
-
-  result = addExtraStreams(env, templateFilename, resultFilename)
-
-proc addExtraStreamsForUpdate*(env: var Env, args: Args):
+proc addExtraStreamsForUpdate*(env: var Env, resultFilename: string, templateFilename: string):
     Option[WarningData] =
   ## For the update case, add the template and result streams to the
   ## environment. Return true on success.
 
   # Warn and exit when a resultFilename is specified.
-  if args.resultFilename != "":
+  if resultFilename != "":
     # The update option overwrites the template, no result file allowed.
     return some(newWarningData(wResultFileNotAllowed))
 
   # Get the template filename.
-  assert args.templateFilename != ""
-  let templateFilename = args.templateFilename
+  assert templateFilename != ""
 
   # If you specify "stdin" for the template, the template comes from
   # stdin and the output goes to standard out.

@@ -177,7 +177,7 @@ proc updateTemplateTop*(env: var Env, args: Args) =
 
   # Add the template and result streams to the environment. Result
   # file is either a temp file or standard out.
-  let warningDataO = env.addExtraStreamsForUpdate(args)
+  let warningDataO = env.addExtraStreamsForUpdate(args.resultFilename, args.templateFilename)
   if warningDataO.isSome:
     env.warnNoFile(warningDataO.get())
     return

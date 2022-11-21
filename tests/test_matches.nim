@@ -19,10 +19,10 @@ proc testParsePrepostGood(str: string, ePrefix: string, ePostfix: string = ""): 
     echo "'$1' is not a valid prepost." % str
     return false
   result = true
-  let prepost = prepostO.get()
-  if not expectedItem("prefix", prepost.prefix, ePrefix):
+  let (prefix, postfix) = prepostO.get()
+  if not expectedItem("prefix", prefix, ePrefix):
     result = false
-  if not expectedItem("postfix", prepost.postfix, ePostfix):
+  if not expectedItem("postfix", postfix, ePostfix):
     result = false
 
 proc testParsePrepostBad(str: string): bool =

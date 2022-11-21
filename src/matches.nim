@@ -92,7 +92,7 @@ proc getPrepostTable*(args: Args): PrepostTable =
   else:
     result = makeDefaultPrepostTable()
 
-proc parsePrepost*(str: string): Option[Prepost] =
+proc parsePrepost*(str: string): Option[tuple[prefix: string, postfix:string]] =
   ## Parse the prepost item on the terminal command line.  A prefix is
   ## followed by an optional postfix, prefix[,postfix].  Each part
   ## contains 1 to 20 ascii characters including spaces but without
@@ -101,7 +101,7 @@ proc parsePrepost*(str: string): Option[Prepost] =
   let matchesO = matchPattern(str, pattern, 0, 2)
   if matchesO.isSome:
     let (prefix, postfix) = matchesO.get2Groups()
-    result = some(newPrepost(prefix, postfix))
+    result = some((prefix, postfix))
 
 proc matchPrefix*(line: string, prepostTable: PrepostTable,
     start: Natural = 0): Option[Matches] =

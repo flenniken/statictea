@@ -87,7 +87,8 @@ proc parseCommandLine*(argv: seq[string]): ArgsOr =
         # Invalid prepost: $1.
         return newArgsOr(newWarningData(wInvalidPrepost, str))
       else:
-        prepostList.add(prepostO.get())
+        let (prefix, postfix) = prepostO.get()
+        prepostList.add(newPrepost(prefix, postfix))
     args.prepostList = prepostList
 
   if "template" in cmlArgs:
