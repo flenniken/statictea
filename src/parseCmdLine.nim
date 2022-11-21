@@ -187,21 +187,3 @@ proc parseCmdLine*(prepostTable: PrepostTable,
   lineParts.ending = ending
   lineParts.lineNum = lineNum
   result = newLinePartsOr(lineParts)
-
-when defined(Test):
-  # Used in multiple test files.
-  proc newLineParts*(
-      prefix: string = "<!--$",
-      command: string = "nextline",
-      codeStart: Natural = 0,
-      codeLen: Natural = 0,
-      commentLen: Natural = 0,
-      continuation: bool = false,
-      postfix: string = "-->",
-      ending: string = "\n",
-      lineNum: Natural = 1): LineParts =
-    ## Return a new LineParts object. The default is: <!--$ nextline -->\n.
-    result = LineParts(prefix: prefix, command: command,
-      codeStart: codeStart, codeLen: codeLen, commentLen: commentLen,
-      continuation: continuation, postfix: postfix,
-      ending: ending, lineNum: lineNum)

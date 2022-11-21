@@ -451,6 +451,12 @@ she sat down in a large arm-chair at one end of the table.
     str = bytesToString([0xE2u8, 0x80, 0x90, 0x34, uint8('"')])
     check testParseJsonStr(str, 0, "\xe2\x80\x904", 5)
 
+  test "parseJsonStr bad start":
+    check testParseJsonStrE("", 2,
+      newWarningData(wStartPosTooBig, "", 2))
+    check testParseJsonStrE("", 0,
+      newWarningData(wStartPosTooBig, "", 0))
+
   test "parseJsonStr no ending quote":
     check testParseJsonStrE(""" "no ending quote """, 2,
       newWarningData(wNoEndingQuote, "", 18))

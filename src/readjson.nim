@@ -72,7 +72,8 @@ func jsonToValue*(jsonNode: JsonNode, depth: int = 0): ValueOr =
 func readJsonStream*(stream: Stream): ValueOr =
   ## Read a json stream and return the parsed data in a value object
   ## or return a warning.
-  assert stream != nil
+  if stream == nil:
+    return newValueOr(wJsonParseError)
 
   var rootNode: JsonNode
   try:
@@ -107,15 +108,15 @@ proc readJsonFile*(filename: string): ValueOr =
   if stream == nil:
     # Unable to open file: $1.
     return newValueOr(wUnableToOpenFile, filename)
+  defer:
+    # Close the stream and file at the end.
+    stream.close()
 
   result = readJsonStream(stream)
   if result.isValue:
     if result.value.kind != vkDict:
       # The root json element must be an object (dictionary).
       result = newValueOr(wInvalidJsonRoot)
-
-  # Close the stream and file.
-  stream.close()
 
 func unescapePopularChar*(popular: char): char =
   ## Unescape the popular char and return its value. If the char is
@@ -168,8 +169,8 @@ func parseJsonStr*(text: string, startPos: Natural): ValueAndPosOr =
   ## @:     ^             ^
   ## @:~~~~
 
-  assert(startPos < text.len, "startPos is greater than the text len")
-  assert(startPos >= 0, "startPos is less than 0")
+  if startPos >= text.len:
+    return newValueAndPosOr(wStartPosTooBig, "", startPos)
 
   type
     State = enum
