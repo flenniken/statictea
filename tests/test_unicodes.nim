@@ -100,8 +100,8 @@ proc testCodePointsToStringWarn(codePoints: seq[uint32], eMessageId: MessageId):
 #     echo "expected warning got value: " & $opResultWarn
 #     return false
 #   result = true
-#   if opResultWarn.message.warning != messageId:
-#     echo "expected: " & $opResultWarn.message.warning
+#   if opResultWarn.message.messageId != messageId:
+#     echo "expected: " & $opResultWarn.message.messageId
 #     echo "     got: " & $messageId
 #     result = false
 #   if opResultWarn.message.p1 != p1:

@@ -74,7 +74,7 @@ proc handleReplLine*(line: string, start: Natural, variables: var Variables, sto
     let warningDataO = runReplStatement(statement, variables)
     if isSome(warningDataO):
       let wd = warningDataO.get()
-      return errorAndColumn(wd.warning, line, wd.pos+runningPos, wd.p1)
+      return errorAndColumn(wd.messageId, line, wd.pos+runningPos, wd.p1)
     return
 
   let replCmd = replCmdO.getGroup()

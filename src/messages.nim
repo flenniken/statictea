@@ -474,7 +474,7 @@ type
     ## * p1 -- the optional string substituted for the message's $1.
     ## * pos -- the index in the statement where the warning was detected.
     # todo: rename "warning" to "messageId".
-    warning*: MessageId
+    messageId*: MessageId
     p1*: string
     pos*: Natural
 
@@ -502,10 +502,10 @@ func getWarningLine*(filename: string, lineNum: int,
   ## @:~~~~
   return getWarningLine(filename, lineNum, warningData)
 
-func newWarningData*(warning: MessageId, p1 = "", pos = 0): WarningData =
+func newWarningData*(messageId: MessageId, p1 = "", pos = 0): WarningData =
   ## Create a WarningData object containing all the warning
   ## information.
-  result = WarningData(warning: warning, p1: p1, pos: pos)
+  result = WarningData(messageId: messageId, p1: p1, pos: pos)
 
 func `$`*(warningData: WarningData): string =
   ## Return a string representation of WarningData.
@@ -514,10 +514,10 @@ func `$`*(warningData: WarningData): string =
   ## @:let warning = newWarningData(wUnknownArg, "p1", 5)
   ## @:check $warning == "wUnknownArg(p1):5"
   ## @:~~~~
-  result = """$1 p1="$2" pos=$3""" % [$warningData.warning,
+  result = """$1 p1="$2" pos=$3""" % [$warningData.messageId,
     warningData.p1, $warningData.pos]
 
 func `==`*(w1: WarningData, w2: WarningData): bool =
   ## Return true when the two WarningData objects are equal.
-  if w1.warning == w2.warning and w1.p1 == w2.p1 and w1.pos == w2.pos:
+  if w1.messageId == w2.messageId and w1.p1 == w2.p1 and w1.pos == w2.pos:
     result = true

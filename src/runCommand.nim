@@ -139,7 +139,7 @@ proc getWarnStatement*(filename: string, statement: Statement,
   assert start >= 0
   let (fragment, pointerPos) = getFragmentAndPos(statement, start)
 
-  let warning = warningData.warning
+  let warning = warningData.messageId
   let p1 = warningData.p1
 
   var message = """
@@ -163,7 +163,7 @@ proc warnStatement*(env: var Env, statement: Statement,
   else:
     filename = sourceFilename
 
-  if warningData.warning == wUserMessage:
+  if warningData.messageId == wUserMessage:
     message = "$1($2): $3" % [filename,
       $statement.lineNum, warningData.p1]
   else:
@@ -675,7 +675,7 @@ proc getFunctionValueAndPos*(
   # Lookup the variable's value.
   let valueOr = getVariable(variables, dotNameStr)
   if valueOr.isMessage:
-    let warningData = newWarningData(valueOr.message.warning,
+    let warningData = newWarningData(valueOr.message.messageId,
       valueOr.message.p1, start)
     return newValueAndPosOr(warningData)
   let value = valueOr.value
@@ -683,7 +683,7 @@ proc getFunctionValueAndPos*(
   # Find the best matching function by looking at the arguments.
   let funcValueOr = getBestFunction(value, arguments)
   if funcValueOr.isMessage:
-    let warningData = newWarningData(funcValueOr.message.warning,
+    let warningData = newWarningData(funcValueOr.message.messageId,
       funcValueOr.message.p1, start)
     return newValueAndPosOr(warningData)
 
@@ -695,7 +695,7 @@ proc getFunctionValueAndPos*(
       warningPos = argumentStarts[funResult.parameter]
     else:
       warningPos = start
-    return newValueAndPosOr(funResult.warningData.warning,
+    return newValueAndPosOr(funResult.warningData.messageId,
       funResult.warningData.p1, warningPos)
 
   var exit = if dotNameStr == "return": true else: false
@@ -914,7 +914,7 @@ proc getBracketedVarValue*(statement: Statement, dotName: string, dotNameLen: Na
   let containerOr = getVariable(variables, dotName)
   if containerOr.isMessage:
     # The variable doesn't exist, etc.
-    let warningData = newWarningData(containerOr.message.warning,
+    let warningData = newWarningData(containerOr.message.messageId,
       containerOr.message.p1, runningPos)
     return newValueAndPosOr(warningData)
   let containerValue = containerOr.value
@@ -1021,7 +1021,7 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
     # We have a variable.
     let valueOr = getVariable(variables, dotNameStr)
     if valueOr.isMessage:
-      let warningData = newWarningData(valueOr.message.warning,
+      let warningData = newWarningData(valueOr.message.messageId,
         valueOr.message.p1, start)
       return newValueAndPosOr(warningData)
     return newValueAndPosOr(valueOr.value, start+dotNameLen)

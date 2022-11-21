@@ -1083,15 +1083,5 @@
 <path fill="none" stroke="black" d="M2583.06,-436.65C2538.81,-414.16 2475.5,-380.79 2422.2,-348.02 2382.49,-323.61 2374.64,-314.35 2336.2,-287.98 2303.49,-265.54 2266.17,-240.42 2238.59,-221.96"/>
 <polygon fill="black" stroke="black" points="2240.78,-219.21 2230.52,-216.56 2236.89,-225.03 2240.78,-219.21"/>
 </g>
-<!-- warnings -->
-<g id="node33" class="node">
-<title>warnings</title>
-<g id="a_node33"><a xlink:href="warnings.md" xlink:title="warnings.md">
-<polygon fill="palegreen" stroke="black" points="2667.89,-1703.21 2667.89,-1724.79 2621.21,-1740.04 2555.19,-1740.04 2508.51,-1724.79 2508.51,-1703.21 2555.19,-1687.96 2621.21,-1687.96 2667.89,-1703.21"/>
-<polygon fill="none" stroke="black" points="2671.9,-1700.31 2671.9,-1727.69 2621.85,-1744.04 2554.55,-1744.04 2504.5,-1727.69 2504.5,-1700.31 2554.55,-1683.96 2621.85,-1683.96 2671.9,-1700.31"/>
-<text text-anchor="middle" x="2588.2" y="-1707.8" font-family="Times,serif" font-size="24.00">warnings</text>
-</a>
-</g>
-</g>
 </g>
 </svg>

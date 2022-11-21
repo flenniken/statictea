@@ -37,7 +37,6 @@ length.
 * [variables.nim](variables.md) &mdash; Procedures for working with statictea variables.
 * [vartypes.nim](vartypes.md) &mdash; StaticTea variable types.
 * [version.nim](version.md) &mdash; The current StaticTea version number.
-* [warnings.nim](warnings.md) &mdash; Module for handling warnings.
 
 # Nim Module Usage
 [<img src="staticteadep2.svg" width="500">](#nim-module-usage)

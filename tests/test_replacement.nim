@@ -58,7 +58,7 @@ proc testFormatStringWarn(str: string, eWarningData: WarningData,
   result = gotExpected($warningData, $eWarningData)
   if not result:
     echo str
-    echo getWarningLine("", 0, warningData.warning, warningData.p1)
+    echo getWarningLine("", 0, warningData.messageId, warningData.p1)
 
 proc testYieldReplacementLine(
     firstReplaceLine: string,

@@ -128,7 +128,7 @@ proc warn*(env: var Env, filename: string, lineNum: Natural,
 proc warn*(env: var Env, filename: string, lineNum: Natural,
     warningData: WarningData) =
   ## Write a formatted warning message to the error stream.
-  warn(env, filename, lineNum, warningData.warning, warningData.p1)
+  warn(env, filename, lineNum, warningData.messageId, warningData.p1)
 
 proc warnNoFile*(env: var Env, messageId: MessageId, p1: string = "") =
   ## Write a formatted warning message to the error stream.
@@ -136,7 +136,7 @@ proc warnNoFile*(env: var Env, messageId: MessageId, p1: string = "") =
 
 proc warnNoFile*(env: var Env, warningData: WarningData) =
   ## Write a formatted warning message to the error stream.
-  warn(env, "nofile", 0, warningData.warning, warningData.p1)
+  warn(env, "nofile", 0, warningData.messageId, warningData.p1)
 
 proc warnLb*(env: var Env, lb: LineBuffer, messageId: MessageId, p1: string = "") =
   ## Write a formatted warning message to the error stream.

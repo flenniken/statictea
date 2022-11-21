@@ -50,9 +50,9 @@ proc testMapParametersW(signatureCode: string, args: seq[Value],
   if not result and eFunResult.kind == frWarning and funResult.kind == frWarning:
     echo ""
     echo "    got  message: $1" % getWarning(
-      funResult.warningData.warning, funResult.warningData.p1)
+      funResult.warningData.messageId, funResult.warningData.p1)
     echo "expected message: $1" % getWarning(
-      eFunResult.warningData.warning, eFunResult.warningData.p1)
+      eFunResult.warningData.messageId, eFunResult.warningData.p1)
 
 
 proc testParamStringSingle(name: string, paramCode: ParamCode, optional: bool,

@@ -480,7 +480,7 @@ proc formatString*(variables: Variables, text: string): StringOr =
         let varName = text[varStart .. pos - 1]
         var valueOr = getVariable(variables, varName)
         if valueOr.isMessage:
-          let wd = newWarningData(valueOr.message.warning,
+          let wd = newWarningData(valueOr.message.messageId,
             valueOr.message.p1, varStart)
           return newStringOr(wd)
         let str = valueToStringRB(valueOr.value)

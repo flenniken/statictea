@@ -489,7 +489,7 @@ Warning data.<ul class="simple"><li>warning -- the message id</li>
 
 ```nim
 WarningData = object
-  warning*: MessageId
+  messageId*: MessageId
   p1*: string
   pos*: Natural
 
@@ -532,7 +532,7 @@ func getWarningLine(filename: string; lineNum: int; warningData: WarningData): s
 Create a WarningData object containing all the warning information.
 
 ```nim
-func newWarningData(warning: MessageId; p1 = ""; pos = 0): WarningData
+func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData
 ```
 
 # `$`
