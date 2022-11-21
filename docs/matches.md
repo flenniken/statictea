@@ -5,12 +5,7 @@ Methods for matching sub-strings.
 * [matches.nim](../src/matches.nim) &mdash; Nim source code.
 # Index
 
-* const: [predefinedPrepost](#predefinedprepost) &mdash; The predefined prefixes and postfixes.
 * const: [commands](#commands) &mdash; The StaticTea commands.
-* type: [PrepostTable](#preposttable) &mdash; The prefix postfix pairs stored in an ordered dictionary.
-* [makeDefaultPrepostTable](#makedefaultpreposttable) &mdash; Return the default ordered table that maps prefixes to postfixes.
-* [makeUserPrepostTable](#makeuserpreposttable) &mdash; Return the user's ordered table that maps prefixes to postfixes.
-* [getPrepostTable](#getpreposttable) &mdash; Get the the prepost settings from the user or use the default ones.
 * [parsePrepost](#parseprepost) &mdash; Parse the prepost item on the terminal command line.
 * [matchPrefix](#matchprefix) &mdash; Match lines that start with one of the prefixes in the given table plus optional following whitespace.
 * [matchCommand](#matchcommand) &mdash; Match statictea commands.
@@ -36,30 +31,6 @@ Methods for matching sub-strings.
 * [matchCompareOperator](#matchcompareoperator) &mdash; Match the compare operators and the trailing whitespace.
 * [matchReplCmd](#matchreplcmd) &mdash; Match the REPL commands and the trailing optional whitespace.
 
-# predefinedPrepost
-
-The predefined prefixes and postfixes.
-~~~
-* Default when no comment like Markdown: $$
-* HTML: <!--$ and -->
-* Bash, python, etc: #$
-* Config files, Lisp: ;$
-* C++: //$
-* C, C++: /*$ and */
-* HTML inside a textarea element: &lt;!--$ and --&gt;
-* Org Mode: # $
-~~~~
-
-```nim
-predefinedPrepost: array[8, Prepost] = [(prefix: "$$", postfix: ""),
-                                        (prefix: "<!--$", postfix: "-->"),
-                                        (prefix: "#$", postfix: ""),
-                                        (prefix: ";$", postfix: ""),
-                                        (prefix: "//$", postfix: ""),
-                                        (prefix: "/*$", postfix: "*/"), (
-    prefix: "&lt;!--$", postfix: "--&gt;"), (prefix: "# $", postfix: "")]
-```
-
 # commands
 
 The StaticTea commands.
@@ -75,38 +46,6 @@ commands: array[6, string] = ["nextline", "block", "replace", "#", ":",
                               "endblock"]
 ```
 
-# PrepostTable
-
-The prefix postfix pairs stored in an ordered dictionary.
-
-```nim
-PrepostTable = OrderedTable[string, string]
-```
-
-# makeDefaultPrepostTable
-
-Return the default ordered table that maps prefixes to postfixes.
-
-```nim
-proc makeDefaultPrepostTable(): PrepostTable
-```
-
-# makeUserPrepostTable
-
-Return the user's ordered table that maps prefixes to postfixes. This is used when the user specifies prefixes on the command line and it does not contain any defaults.
-
-```nim
-proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable
-```
-
-# getPrepostTable
-
-Get the the prepost settings from the user or use the default ones.
-
-```nim
-proc getPrepostTable(args: Args): PrepostTable
-```
-
 # parsePrepost
 
 Parse the prepost item on the terminal command line.  A prefix is followed by an optional postfix, prefix[,postfix].  Each part contains 1 to 20 ascii characters including spaces but without control characters or commas.
@@ -120,7 +59,7 @@ proc parsePrepost(str: string): Option[tuple[prefix: string, postfix: string]]
 Match lines that start with one of the prefixes in the given table plus optional following whitespace.
 
 ```nim
-proc matchPrefix(line: string; prepostTable: PrepostTable; start: Natural = 0): Option[
+proc matchPrefix(line: string; prefixes: seq[string]; start: Natural = 0): Option[
     Matches]
 ```
 

@@ -3,12 +3,16 @@
 import std/strformat
 import messages
 import opresult
+import tables
 
 type
   Prepost* = object
     ## Prepost holds one prefix and its associated postfix.
     prefix*: string
     postfix*: string
+
+  PrepostTable* = OrderedTable[string, string]
+    ## The prefix postfix pairs stored in an ordered dictionary.
 
   Args* = object
     ## Args holds all the command line arguments.
@@ -26,6 +30,20 @@ type
 
   ArgsOr* = OpResultWarn[Args]
     ## The args or a warning.
+
+
+
+proc makeUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
+  ## Return the user's ordered table that maps prefixes to
+  ## postfixes. This is used when the user specifies prefixes on the
+  ## command line and it does not contain any defaults.
+  assert prepostList.len > 0
+  result = initOrderedTable[string, string]()
+  for prepost in prepostList:
+    # The prefix and postfix values have been validated by the command line
+    # processing procedure parsePrepost.
+    assert prepost.prefix != ""
+    result[prepost.prefix] = prepost.postfix
 
 func newArgsOr*(warningData: WarningData):
      ArgsOr =
@@ -92,4 +110,46 @@ func `$`*(prepostList: seq[Prepost]): string =
     first = false
     result.add(fmt"({pp.prefix}, {pp.postfix})")
 
+const
+  predefinedPrepost*: array[8, Prepost] = [
+    newPrepost("$$", ""),
+    newPrepost("<!--$", "-->"),
+    newPrepost("#$", ""),
+    newPrepost(";$", ""),
+    newPrepost("//$", ""),
+    newPrepost("/*$", "*/"),
+    newPrepost("&lt;!--$", "--&gt;"),
+    newPrepost("# $", "")
+  ]
+    ## The predefined prefixes and postfixes.
+    ## @:~~~
+    ## @:* Default when no comment like Markdown: $$
+    ## @:* HTML: <!--$ and -->
+    ## @:* Bash, python, etc: #$
+    ## @:* Config files, Lisp: ;$
+    ## @:* C++: //$
+    ## @:* C, C++: /@.$ and @./
+    ## @:* HTML inside a textarea element: &lt;!--$ and --&gt;
+    ## @:* Org Mode: # $
+    ## @:~~~~
+
+proc makeDefaultPrepostTable*(): PrepostTable =
+  ## Return the default ordered table that maps prefixes to postfixes.
+  result = initOrderedTable[string, string]()
+  for prepost in predefinedPrepost:
+    assert prepost.prefix != ""
+    result[prepost.prefix] = prepost.postfix
+
+proc getPrepostTable*(args: Args): PrepostTable =
+  ## Get the the prepost settings from the user or use the default
+  ## ones.
+
+  # Get the prepost table, either the user specified one or the
+  # default one. The defaults are not used when the user specifies
+  # them, so that they have complete control over the preposts used.
+  if args.prepostList.len > 0:
+    # The prepostList has been validated already.
+    result = makeUserPrepostTable(args.prepostList)
+  else:
+    result = makeDefaultPrepostTable()
 

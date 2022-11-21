@@ -6,6 +6,7 @@ import regexes
 import messages
 import matches
 import opresult
+import args
 
 type
   LineParts* = object
@@ -127,7 +128,10 @@ proc parseCmdLine*(prepostTable: PrepostTable,
   var lineParts: LineParts
 
   # Get the prefix plus the optional following whitespace.
-  let prefixMatchO = matchPrefix(line, prepostTable)
+  var prefixes = newSeq[string]()
+  for key in prepostTable.keys():
+    prefixes.add(key)
+  let prefixMatchO = matchPrefix(line, prefixes)
   if not prefixMatchO.isSome():
     # No prefix so not a command line. No error.
     return

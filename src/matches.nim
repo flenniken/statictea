@@ -1,34 +1,10 @@
 ## Methods for matching sub-strings.
 
 import std/strutils
-import std/tables
 import std/options
-import args
 import regexes
 
 const
-  predefinedPrepost*: array[8, Prepost] = [
-    newPrepost("$$", ""),
-    newPrepost("<!--$", "-->"),
-    newPrepost("#$", ""),
-    newPrepost(";$", ""),
-    newPrepost("//$", ""),
-    newPrepost("/*$", "*/"),
-    newPrepost("&lt;!--$", "--&gt;"),
-    newPrepost("# $", "")
-  ]
-    ## The predefined prefixes and postfixes.
-    ## @:~~~
-    ## @:* Default when no comment like Markdown: $$
-    ## @:* HTML: <!--$ and -->
-    ## @:* Bash, python, etc: #$
-    ## @:* Config files, Lisp: ;$
-    ## @:* C++: //$
-    ## @:* C, C++: /@.$ and @./
-    ## @:* HTML inside a textarea element: &lt;!--$ and --&gt;
-    ## @:* Org Mode: # $
-    ## @:~~~~
-
   commands*: array[6, string] = [
     "nextline",
     "block",
@@ -56,42 +32,6 @@ const
     ## three components each with one to three digits: i.e. 1.2.3,
     ## 123.456.789, 0.1.0,... .
 
-type
-  PrepostTable* = OrderedTable[string, string]
-    ## The prefix postfix pairs stored in an ordered dictionary.
-
-proc makeDefaultPrepostTable*(): PrepostTable =
-  ## Return the default ordered table that maps prefixes to postfixes.
-  result = initOrderedTable[string, string]()
-  for prepost in predefinedPrepost:
-    assert prepost.prefix != ""
-    result[prepost.prefix] = prepost.postfix
-
-proc makeUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
-  ## Return the user's ordered table that maps prefixes to
-  ## postfixes. This is used when the user specifies prefixes on the
-  ## command line and it does not contain any defaults.
-  assert prepostList.len > 0
-  result = initOrderedTable[string, string]()
-  for prepost in prepostList:
-    # The prefix and postfix values have been validated by the command line
-    # processing procedure parsePrepost.
-    assert prepost.prefix != ""
-    result[prepost.prefix] = prepost.postfix
-
-proc getPrepostTable*(args: Args): PrepostTable =
-  ## Get the the prepost settings from the user or use the default
-  ## ones.
-
-  # Get the prepost table, either the user specified one or the
-  # default one. The defaults are not used when the user specifies
-  # them, so that they have complete control over the preposts used.
-  if args.prepostList.len > 0:
-    # The prepostList has been validated already.
-    result = makeUserPrepostTable(args.prepostList)
-  else:
-    result = makeDefaultPrepostTable()
-
 proc parsePrepost*(str: string): Option[tuple[prefix: string, postfix:string]] =
   ## Parse the prepost item on the terminal command line.  A prefix is
   ## followed by an optional postfix, prefix[,postfix].  Each part
@@ -103,12 +43,12 @@ proc parsePrepost*(str: string): Option[tuple[prefix: string, postfix:string]] =
     let (prefix, postfix) = matchesO.get2Groups()
     result = some((prefix, postfix))
 
-proc matchPrefix*(line: string, prepostTable: PrepostTable,
+proc matchPrefix*(line: string, prefixes: seq[string],
     start: Natural = 0): Option[Matches] =
   ## Match lines that start with one of the prefixes in the given
   ## table plus optional following whitespace.
   var terms = newSeq[string]()
-  for prefix, _ in prepostTable:
+  for prefix in prefixes:
     terms.add(r"\Q$1\E" % prefix)
   let pattern = r"^($1)\s*" % terms.join("|")
   result = matchPatternCached(line, pattern, start, 1)

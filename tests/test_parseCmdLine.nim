@@ -4,9 +4,9 @@ import std/options
 import std/strutils
 import parseCmdLine
 import sharedtestcode
-import matches
 import messages
 import opresult
+import args
 
 proc test_getCodeLength(line: string, codeStart: Natural, eCodeLen: Natural): bool =
   if codeStart >= line.len:

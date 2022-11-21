@@ -15,7 +15,6 @@ import tables
 import sharedtestcode
 import comparelines
 import codefile
-import matches
 import parseCmdLine
 
 proc testCollectCommand(

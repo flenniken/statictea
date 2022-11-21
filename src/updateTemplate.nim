@@ -7,7 +7,6 @@ import std/tables
 import args
 import messages
 import env
-import matches
 import linebuffer
 import parseCmdLine
 import runCommand

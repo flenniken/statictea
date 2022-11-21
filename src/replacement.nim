@@ -32,11 +32,11 @@ import env
 import vartypes
 import parseCmdLine
 import linebuffer
-import matches
 import messages
 import variables
 import tempFile
 import opresult
+import args
 
 type
   SegmentType = enum

@@ -6,8 +6,10 @@ Types for handling command line arguments.
 # Index
 
 * type: [Prepost](#prepost) &mdash; Prepost holds one prefix and its associated postfix.
+* type: [PrepostTable](#preposttable) &mdash; The prefix postfix pairs stored in an ordered dictionary.
 * type: [Args](#args) &mdash; Args holds all the command line arguments.
 * type: [ArgsOr](#argsor) &mdash; The args or a warning.
+* [makeUserPrepostTable](#makeuserpreposttable) &mdash; Return the user's ordered table that maps prefixes to postfixes.
 * [newArgsOr](#newargsor) &mdash; Return a new ArgsOr object containing a warning.
 * [newArgsOr](#newargsor-1) &mdash; Return a new ArgsOr object containing a warning.
 * [newArgsOr](#newargsor-2) &mdash; Return a new ArgsOr object containing args.
@@ -15,6 +17,9 @@ Types for handling command line arguments.
 * [`$`](#) &mdash; Return the Prepost string representation.
 * [`$`](#-1) &mdash; Return the Args string representation.
 * [`$`](#-2) &mdash; Return the seq[Prepost] string representation.
+* const: [predefinedPrepost](#predefinedprepost) &mdash; The predefined prefixes and postfixes.
+* [makeDefaultPrepostTable](#makedefaultpreposttable) &mdash; Return the default ordered table that maps prefixes to postfixes.
+* [getPrepostTable](#getpreposttable) &mdash; Get the the prepost settings from the user or use the default ones.
 
 # Prepost
 
@@ -25,6 +30,14 @@ Prepost = object
   prefix*: string
   postfix*: string
 
+```
+
+# PrepostTable
+
+The prefix postfix pairs stored in an ordered dictionary.
+
+```nim
+PrepostTable = OrderedTable[string, string]
 ```
 
 # Args
@@ -53,6 +66,14 @@ The args or a warning.
 
 ```nim
 ArgsOr = OpResultWarn[Args]
+```
+
+# makeUserPrepostTable
+
+Return the user's ordered table that maps prefixes to postfixes. This is used when the user specifies prefixes on the command line and it does not contain any defaults.
+
+```nim
+proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable
 ```
 
 # newArgsOr
@@ -109,6 +130,46 @@ Return the seq[Prepost] string representation.
 
 ```nim
 func `$`(prepostList: seq[Prepost]): string
+```
+
+# predefinedPrepost
+
+The predefined prefixes and postfixes.
+~~~
+* Default when no comment like Markdown: $$
+* HTML: <!--$ and -->
+* Bash, python, etc: #$
+* Config files, Lisp: ;$
+* C++: //$
+* C, C++: /*$ and */
+* HTML inside a textarea element: &lt;!--$ and --&gt;
+* Org Mode: # $
+~~~~
+
+```nim
+predefinedPrepost: array[8, Prepost] = [(prefix: "$$", postfix: ""),
+                                        (prefix: "<!--$", postfix: "-->"),
+                                        (prefix: "#$", postfix: ""),
+                                        (prefix: ";$", postfix: ""),
+                                        (prefix: "//$", postfix: ""),
+                                        (prefix: "/*$", postfix: "*/"), (
+    prefix: "&lt;!--$", postfix: "--&gt;"), (prefix: "# $", postfix: "")]
+```
+
+# makeDefaultPrepostTable
+
+Return the default ordered table that maps prefixes to postfixes.
+
+```nim
+proc makeDefaultPrepostTable(): PrepostTable
+```
+
+# getPrepostTable
+
+Get the the prepost settings from the user or use the default ones.
+
+```nim
+proc getPrepostTable(args: Args): PrepostTable
 ```
 
 

@@ -62,7 +62,10 @@ proc testMatchPrefix(line: string, start: Natural,
     eMatchesO: Option[Matches] = none(Matches)): bool =
 
   let prepostTable = makeDefaultPrepostTable()
-  let matchesO = matchPrefix(line, prepostTable, start)
+  var prefixes = newSeq[string]()
+  for key in prepostTable.keys():
+    prefixes.add(key)
+  let matchesO = matchPrefix(line, prefixes, start)
   if not expectedItem("matchesO", matchesO, eMatchesO):
     result = false
   else:
