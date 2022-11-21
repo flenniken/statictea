@@ -6,7 +6,6 @@ import std/tables
 import std/streams
 import codefile
 import variables
-import env
 import vartypes
 import linebuffer
 import sharedtestcode

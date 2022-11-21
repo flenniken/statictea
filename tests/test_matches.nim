@@ -5,7 +5,6 @@ import std/tables
 import std/options
 import matches
 import regexes
-import env
 import args
 import sharedtestcode
 

@@ -1,7 +1,6 @@
 import std/unittest
 import std/strutils
 import signatures
-import env
 import vartypes
 import options
 import messages

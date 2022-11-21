@@ -123,48 +123,14 @@ proc readline*(lb: var LineBuffer): string =
 
   result = line
 
-when defined(test):
-  # todo: move to test code.
-
-  proc readXLines*(lb: var LineBuffer, maxLines: Natural = high(Natural)): seq[string] =
-    ## Read lines from a LineBuffer returning line endings but don't
-    ## @:read more than the maximum number of lines. Reading starts at
-    ## @:the current lb's current position and the position at the end
-    ## @:is ready for reading the next line.
-    var count = 0
-    while true:
-      if count >= maxLines:
-        break
-      var line = lb.readline()
-      if line == "":
-        break
-      result.add(line)
-      inc(count)
-
-  proc readXLines*(stream: Stream,
-    maxLineLen: int = defaultMaxLineLen,
-    bufferSize: int = defaultBufferSize,
-    filename: string = "",
-    maxLines: Natural = high(Natural)
-  ): seq[string] =
-    ## Read all lines from a stream returning line endings but don't
-    ## read more than the maximum number of lines.
-    stream.setPosition(0)
-    var lineBufferO = newLineBuffer(stream)
-    if not lineBufferO.isSome:
-      return
-    var lb = lineBufferO.get()
-    result = readXLines(lb, maxLines)
-
-  proc readXLines*(filename: string,
-    maxLineLen: int = defaultMaxLineLen,
-    bufferSize: int = defaultBufferSize,
-    maxLines: Natural = high(Natural)
-  ): seq[string] =
-    ## Read all lines from a file returning line endings but don't
-    ## read more than the maximum number of lines.
-    var stream = newFileStream(filename)
-    if stream == nil:
-      return
-    result = readXLines(stream, maxLineLen, bufferSize, filename, maxLines)
-    stream.close
+iterator yieldContentLine*(content: string): string =
+  ## Yield one line at a time from the content string and keep the
+  ## line endings.
+  var start = 0
+  for pos in 0 ..< content.len:
+    let ch = content[pos]
+    if ch == '\n':
+      yield(content[start .. pos])
+      start = pos+1
+  if start < content.len:
+    yield(content[start ..< content.len])

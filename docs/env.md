@@ -29,7 +29,6 @@ Environment holding the input and output streams.
 * [addExtraStreams](#addextrastreams) &mdash; Add the template and result streams to the environment.
 * [addExtraStreams](#addextrastreams-1) &mdash; Add the template and result streams to the environment.
 * [addExtraStreamsForUpdate](#addextrastreamsforupdate) &mdash; For the update case, add the template and result streams to the environment.
-* [yieldContentLine](#yieldcontentline) &mdash; Yield one line at a time and keep the line endings.
 
 # logWarnSize
 
@@ -257,14 +256,6 @@ For the update case, add the template and result streams to the environment. Ret
 
 ```nim
 proc addExtraStreamsForUpdate(env: var Env; args: Args): Option[WarningData]
-```
-
-# yieldContentLine
-
-Yield one line at a time and keep the line endings.
-
-```nim
-iterator yieldContentLine(content: string): string
 ```
 
 

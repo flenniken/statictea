@@ -5,7 +5,6 @@ import std/options
 import std/strutils
 import std/tables
 import std/strformat
-import env
 import vartypes
 import readjson
 import messages

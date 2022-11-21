@@ -6,7 +6,6 @@ import std/strutils
 import std/os
 import args
 import parseCommandLine
-import env
 import messages
 import opresult
 import sharedtestcode

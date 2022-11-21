@@ -4,6 +4,7 @@ import std/unittest
 import std/strutils
 import linebuffer
 import tempFile
+import sharedtestcode
 
 proc readContentTest(content: string, expected: seq[string],
     maxLineLen: int = defaultMaxLineLen,

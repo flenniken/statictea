@@ -27,6 +27,7 @@ while line = lb.readLine():
 * [newLineBuffer](#newlinebuffer) &mdash; Return a new LineBuffer for the given stream.
 * [reset](#reset) &mdash; Clear the buffer and set the read position at the start of the stream.
 * [readline](#readline) &mdash; Return the next line from the LineBuffer.
+* [yieldContentLine](#yieldcontentline) &mdash; Yield one line at a time from the content string and keep the line endings.
 
 # minMaxLineLen
 
@@ -151,6 +152,14 @@ empty string is returned.
 
 ```nim
 proc readline(lb: var LineBuffer): string
+```
+
+# yieldContentLine
+
+Yield one line at a time from the content string and keep the line endings.
+
+```nim
+iterator yieldContentLine(content: string): string
 ```
 
 
