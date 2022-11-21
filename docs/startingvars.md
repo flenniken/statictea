@@ -6,6 +6,8 @@ Get the starting variables.
 # Index
 
 * [readJsonFiles](#readjsonfiles) &mdash; Read json files and return a variable dictionary.
+* [argsPrepostList](#argsprepostlist) &mdash; Create a prepost list of lists for t args.
+* [getTeaArgs](#getteaargs) &mdash; Create the t args dictionary from the statictea arguments.
 * [getStartingVariables](#getstartingvariables) &mdash; Return the starting variables.
 
 # readJsonFiles
@@ -14,6 +16,22 @@ Read json files and return a variable dictionary.  Skip a duplicate variable and
 
 ```nim
 proc readJsonFiles(env: var Env; filenames: seq[string]): VarsDict
+```
+
+# argsPrepostList
+
+Create a prepost list of lists for t args.
+
+```nim
+func argsPrepostList(prepostList: seq[Prepost]): seq[seq[string]]
+```
+
+# getTeaArgs
+
+Create the t args dictionary from the statictea arguments.
+
+```nim
+func getTeaArgs(args: Args): Value
 ```
 
 # getStartingVariables

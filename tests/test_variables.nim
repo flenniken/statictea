@@ -8,9 +8,7 @@ import vartypes
 import sharedtestcode
 import messages
 import readjson
-import args
 import opresult
-import comparelines
 import runFunction
 import version
 
@@ -184,57 +182,6 @@ t.version = "$1"""" % staticteaVersion
       echo "expected: " & emptyVariables
       echo "     got: " & $variables
       fail
-
-  test "check the initial t.args":
-    var args: Args
-    var argsVarDict = getTeaArgs(args).dictv
-    var variables = emptyVariables(args = argsVarDict)
-    let targs = variables["t"].dictv["args"]
-    let varRep = dotNameRep(targs.dictv)
-    let eVarRep = """
-help = false
-version = false
-update = false
-log = false
-repl = false
-serverList = []
-codeList = []
-resultFilename = ""
-templateFilename = ""
-logFilename = ""
-prepostList = []"""
-    if varRep != eVarRep:
-      echo linesSideBySide(varRep, eVarRep)
-      fail
-
-  test "resetVariables untouched":
-    # Make sure the some variables are untouched after reset.
-    let variablesJson = """
-{
- "s": {
-    "a": 2
- },
- "h": {
-    "b": 3
- },
- "o": {
-    "bb": 3.5
- },
- "g": {
-    "c": 4
- },
- "l": {
- }
-}
-"""
-    var valueOr = readJsonString(variablesJson)
-    check valueOr.isValue
-    var variables = valueOr.value.dictv
-    let beforeJson = valueToString(valueOr.value)
-
-    resetVariables(variables)
-    let afterJson = valueToString(newValue(variables))
-    check expectedItem("reset test", beforeJson, afterJson)
 
   test "resetVariables with server":
     # Make sure the server variables are untouched after reset.
@@ -535,11 +482,6 @@ prepostList = []"""
     let eWarningDataO = some(newWarningData(wAppendToList, "int"))
     warningDataO = assignVariable(variables, "a", newValue(6), "&=")
     check warningDataO == eWarningDataO
-
-  test "argsPrepostList":
-    # let prepostList = @[newPrepost("#$", "")]
-    let prepostList = @[newPrepost("abc", "def")]
-    check argsPrepostList(prepostList) == @[@["abc", "def"]]
 
   test "ValueOr string":
     check $newValueOr(newValue(2)) == $newValueOr(newValue(2))

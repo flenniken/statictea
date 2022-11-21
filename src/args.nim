@@ -31,8 +31,6 @@ type
   ArgsOr* = OpResultWarn[Args]
     ## The args or a warning.
 
-
-
 proc makeUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
   ## Return the user's ordered table that maps prefixes to
   ## postfixes. This is used when the user specifies prefixes on the
@@ -152,4 +150,3 @@ proc getPrepostTable*(args: Args): PrepostTable =
     result = makeUserPrepostTable(args.prepostList)
   else:
     result = makeDefaultPrepostTable()
-

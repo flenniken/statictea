@@ -9,13 +9,13 @@ import env
 import args
 import linebuffer
 import version
-import variables
 import vartypes
 import tables
 import sharedtestcode
 import comparelines
 import codefile
 import parseCmdLine
+import startingvars
 
 proc testCollectCommand(
     inExtraLine: ExtraLine,

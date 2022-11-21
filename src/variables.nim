@@ -12,7 +12,6 @@ import std/tables
 import vartypes
 import version
 import messages
-import args
 import opresult
 
 const
@@ -382,23 +381,3 @@ proc getVariable*(variables: Variables, dotNameStr: string): ValueOr =
         # The variable wasn't found in the l or f dictionaries.
         result = newValueOr(wNotInLorF, dotNameStr)
 
-func argsPrepostList*(prepostList: seq[Prepost]): seq[seq[string]] =
-  ## Create a prepost list of lists for t args.
-  for prepost in prepostList:
-    result.add(@[prepost.prefix, prepost.postfix])
-
-func getTeaArgs*(args: Args): Value =
-  ## Create the t args dictionary from the statictea arguments.
-  var varsDict = newVarsDict()
-  varsDict["help"] = newValue(args.help)
-  varsDict["version"] = newValue(args.version)
-  varsDict["update"] = newValue(args.update)
-  varsDict["log"] = newValue(args.log)
-  varsDict["repl"] = newValue(args.repl)
-  varsDict["serverList"] = newValue(args.serverList)
-  varsDict["codeList"] = newValue(args.codeList)
-  varsDict["resultFilename"] = newValue(args.resultFilename)
-  varsDict["templateFilename"] = newValue(args.templateFilename)
-  varsDict["logFilename"] = newValue(args.logFilename)
-  varsDict["prepostList"] = newValue(argsPrepostList(args.prepostList))
-  result = newValue(varsDict)

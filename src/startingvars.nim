@@ -34,6 +34,27 @@ proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
           varsDict[k] = v
   result = varsDict
 
+func argsPrepostList*(prepostList: seq[Prepost]): seq[seq[string]] =
+  ## Create a prepost list of lists for t args.
+  for prepost in prepostList:
+    result.add(@[prepost.prefix, prepost.postfix])
+
+func getTeaArgs*(args: Args): Value =
+  ## Create the t args dictionary from the statictea arguments.
+  var varsDict = newVarsDict()
+  varsDict["help"] = newValue(args.help)
+  varsDict["version"] = newValue(args.version)
+  varsDict["update"] = newValue(args.update)
+  varsDict["log"] = newValue(args.log)
+  varsDict["repl"] = newValue(args.repl)
+  varsDict["serverList"] = newValue(args.serverList)
+  varsDict["codeList"] = newValue(args.codeList)
+  varsDict["resultFilename"] = newValue(args.resultFilename)
+  varsDict["templateFilename"] = newValue(args.templateFilename)
+  varsDict["logFilename"] = newValue(args.logFilename)
+  varsDict["prepostList"] = newValue(argsPrepostList(args.prepostList))
+  result = newValue(varsDict)
+
 proc getStartingVariables*(env: var Env, args: Args): Variables =
   ## Return the starting variables.  Read the server json files, run
   ## the code files and setup the initial tea variables.
@@ -43,4 +64,3 @@ proc getStartingVariables*(env: var Env, args: Args): Variables =
   let funcsVarDict = createFuncDictionary().dictv
   result = emptyVariables(serverVarDict, argsVarDict, funcsVarDict)
   runCodeFiles(env, result, args.codeList)
-

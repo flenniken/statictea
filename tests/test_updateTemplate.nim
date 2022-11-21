@@ -10,7 +10,6 @@ import sharedtestcode
 import comparelines
 import codefile
 import updateTemplate
-import matches
 import linebuffer
 import parseCmdLine
 

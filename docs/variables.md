@@ -26,8 +26,6 @@ and value which is the result of running a statement.
 * [resetVariables](#resetvariables) &mdash; Clear the local variables and reset the tea variables for running a command.
 * [assignVariable](#assignvariable) &mdash; Assign the variable the given value if possible, else return a warning.
 * [getVariable](#getvariable) &mdash; Look up the variable and return its value when found, else return a warning.
-* [argsPrepostList](#argsprepostlist) &mdash; Create a prepost list of lists for t args.
-* [getTeaArgs](#getteaargs) &mdash; Create the t args dictionary from the statictea arguments.
 
 # outputValues
 
@@ -152,22 +150,6 @@ Look up the variable and return its value when found, else return a warning.
 
 ```nim
 proc getVariable(variables: Variables; dotNameStr: string): ValueOr
-```
-
-# argsPrepostList
-
-Create a prepost list of lists for t args.
-
-```nim
-func argsPrepostList(prepostList: seq[Prepost]): seq[seq[string]]
-```
-
-# getTeaArgs
-
-Create the t args dictionary from the statictea arguments.
-
-```nim
-func getTeaArgs(args: Args): Value
 ```
 
 
