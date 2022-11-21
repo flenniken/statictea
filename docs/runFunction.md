@@ -596,7 +596,7 @@ func funFloat_sf(variables: Variables; parameters: seq[Value]): FunResult
 Create a float from a number string. If the string is not a number, return the default.
 
 ~~~
-float(numString: string, default: any) any
+float(numString: string, default: optional any) any
 ~~~~
 
 Examples:
@@ -685,7 +685,7 @@ func funInt_sosi(variables: Variables; parameters: seq[Value]): FunResult
 Create an int from a number string. If the string is not a number, return the default value.
 
 ~~~
-int(numString: string, roundOption: string, default: any) any
+int(numString: string, roundOption: string, default: optional any) any
 ~~~~
 
 Round options:

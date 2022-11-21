@@ -84,9 +84,9 @@ func numberStringToNum(numString: string): FunResult =
 
   let valueAndPosOr = parseNumber(numString, 0)
   if valueAndPosOr.isMessage:
-    # Expected number string.
-    # todo: will the message above work instead of changing it here?
-    return newFunResultWarn(wExpectedNumberString)
+    # return newFunResultWarn(wExpectedNumberString)
+    let messageData = valueAndPosOr.message
+    return newFunResultWarn(messageData)
 
   result = newFunResult(valueAndPosOr.value.value)
 
@@ -607,11 +607,11 @@ func parseVersion*(version: string): Option[(int, int, int)] =
   if not matchesO.isSome:
     return
   let (g1, g2, g3) = matchesO.get3Groups()
-  let g1IntAndPos = parseInteger(g1)
-  let g2IntAndPos = parseInteger(g2)
-  let g3IntAndPos = parseInteger(g3)
-  result = some((int(g1IntAndPos.get().number),
-    int(g2IntAndPos.get().number), int(g3IntAndPos.get().number)))
+  let g1IntAndPosO = parseInteger(g1)
+  let g2IntAndPosO = parseInteger(g2)
+  let g3IntAndPosO = parseInteger(g3)
+  result = some((int(g1IntAndPosO.get().number),
+    int(g2IntAndPosO.get().number), int(g3IntAndPosO.get().number)))
 
 func funCmpVersion_ssi*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Compare two StaticTea version numbers. Returns -1 for less, 0 for
@@ -705,7 +705,7 @@ func funFloat_saa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## number, return the default.
   ## @:
   ## @:~~~
-  ## @:float(numString: string, default: any) any
+  ## @:float(numString: string, default: optional any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -718,9 +718,11 @@ func funFloat_saa*(variables: Variables, parameters: seq[Value]): FunResult =
   let numString = map["a"].stringv
 
   result = numberStringToNum(numString)
-  if result.kind == frWarning and result.warningData.warning == wExpectedNumberString:
-    # Return the default.
-    return newFunResult(map["b"])
+  if result.kind == frWarning:
+    if "b" in map:
+      # Return the default.
+      return newFunResult(map["b"])
+    return result
 
   if result.value.kind == vkInt:
     result = newFunResult(newValue(float(result.value.intv)))
@@ -835,7 +837,7 @@ func funInt_ssaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## return the default value.
   ## @:
   ## @:~~~
-  ## @:int(numString: string, roundOption: string, default: any) any
+  ## @:int(numString: string, roundOption: string, default: optional any) any
   ## @:~~~~
   ## @:
   ## @:Round options:
@@ -856,9 +858,11 @@ func funInt_ssaa*(variables: Variables, parameters: seq[Value]): FunResult =
   let numString = map["a"].stringv
 
   result = numberStringToNum(numString)
-  if result.kind == frWarning and result.warningData.warning == wExpectedNumberString:
-    # Return the default.
-    return newFunResult(map["c"])
+  if result.kind == frWarning:
+    if "c" in map:
+      # Return the default.
+      return newFunResult(map["c"])
+    return result
 
   if result.value.kind == vkFloat:
     result = convertFloatToInt(result.value.floatv, map)

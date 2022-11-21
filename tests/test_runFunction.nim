@@ -667,7 +667,7 @@ suite "runFunction.nim":
 
   test "int(): not a number string":
     var arguments = @[newValue("hello"), newValue("round")]
-    let eFunResult = newFunResultWarn(wExpectedNumberString)
+    let eFunResult = newFunResultWarn(wNotNumber)
     check testFunction("int", arguments, eFunResult)
 
   test "int(): not round option":
@@ -727,7 +727,7 @@ suite "runFunction.nim":
 
   test "to float warning":
     var arguments = @[newValue("abc")]
-    let eFunResult = newFunResultWarn(wExpectedNumberString)
+    let eFunResult = newFunResultWarn(wNotNumber)
     check testFunction("float", arguments, eFunResult)
 
   test "find":

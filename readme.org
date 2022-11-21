@@ -2955,7 +2955,7 @@ float(-33) => -33.0
 Create a float from a number string. If the string is not a number, return the default.
 
 #+BEGIN_SRC
-float(numString: string, default: any) any
+float(numString: string, default: optional any) any
 #+END_SRC
 
 Examples:
@@ -3385,7 +3385,7 @@ int("-6.3456", "truncate") => -6
 Create an int from a number string. If the string is not a number, return the default value.
 
 #+BEGIN_SRC
-int(numString: string, roundOption: string, default: any) any
+int(numString: string, roundOption: string, default: optional any) any
 #+END_SRC
 
 Round options:

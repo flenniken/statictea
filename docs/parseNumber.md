@@ -1,6 +1,6 @@
 # parseNumber.nim
 
-Parse an int or float number string.  Return the number and number of characters processed.
+Parse an int or float number string.  Return the number and position after the number.
 
 * [parseNumber.nim](../src/parseNumber.nim) &mdash; Nim source code.
 # Index
@@ -19,7 +19,7 @@ proc parseFloat(str: string; start: Natural = 0): Option[
 
 # parseInteger
 
-Parse the string and return the 64 bit signed integer and the position after the number. The number starts at the start parameter index. Parsing stops at the first non-number character. Nothing is returned when the integer is out of range or the str is not a number.
+Parse the string and return the 64 bit signed integer and the position after the number. The number starts at the start index. Parsing stops at the first non-number character.  Nothing is returned when the integer is out of range or the str is not a number.
 
 An integer starts with an optional minus sign, followed by a
 digit, followed by digits or underscores. The underscores are

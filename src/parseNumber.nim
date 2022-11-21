@@ -1,5 +1,5 @@
-## Parse an int or float number string.  Return the number and number
-## of characters processed.
+## Parse an int or float number string.  Return the number and
+## position after the number.
 
 import std/options
 import std/parseutils
@@ -19,9 +19,9 @@ proc parseFloat*(str: string, start: Natural = 0): Option[tuple[number: float64,
 proc parseInteger*(s: string, start: Natural = 0): Option[tuple[number: int64, pos: Natural]] =
   ## Parse the string and return the 64 bit signed integer and the
   ## position after the number. The number starts at the start
-  ## parameter index. Parsing stops at the first non-number character.
-  ## Nothing is returned when the integer is out of range or the str
-  ## is not a number.
+  ## index. Parsing stops at the first non-number character.  Nothing
+  ## is returned when the integer is out of range or the str is not a
+  ## number.
   ## @:
   ## @:An integer starts with an optional minus sign, followed by a
   ## @:digit, followed by digits or underscores. The underscores are
