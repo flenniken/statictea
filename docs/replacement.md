@@ -31,10 +31,6 @@ To use a left bracket in a replacement block you use two left brackets, {{,
 
 * type: [ReplaceLineKind](#replacelinekind) &mdash; Line type returned by yieldReplacementLine.
 * type: [ReplaceLine](#replaceline) &mdash; Line information returned by yieldReplacementLine.
-* type: [StringOr](#stringor) &mdash; A string or a warning.
-* [newStringOr](#newstringor) &mdash; Return a new StringOr object containing a warning.
-* [newStringOr](#newstringor-1) &mdash; Return a new StringOr object containing a warning.
-* [newStringOr](#newstringor-2) &mdash; Return a new StringOr object containing a string.
 * [newReplaceLine](#newreplaceline) &mdash; Return a new ReplaceLine object.
 * [`$`](#) &mdash; Return a string representation of a ReplaceLine object.
 * [stringSegment](#stringsegment) &mdash; Return a string segment made from the fragment.
@@ -46,8 +42,6 @@ To use a left bracket in a replacement block you use two left brackets, {{,
 * [closeDeleteTempSegments](#closedeletetempsegments) &mdash; Close the TempSegments and delete its backing temporary file.
 * [storeLineSegments](#storelinesegments) &mdash; Divide the line into segments and write them to the TempSegments' temp file.
 * [yieldReplacementLine](#yieldreplacementline) &mdash; Yield all the replacement block lines and one line after.
-* [formatString](#formatstring) &mdash; Format a string by filling in the variable placeholders with
-their values.
 
 # ReplaceLineKind
 
@@ -72,38 +66,6 @@ ReplaceLine = object
   kind*: ReplaceLineKind
   line*: string
 
-```
-
-# StringOr
-
-A string or a warning.
-
-```nim
-StringOr = OpResultWarn[string]
-```
-
-# newStringOr
-
-Return a new StringOr object containing a warning.
-
-```nim
-func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
-```
-
-# newStringOr
-
-Return a new StringOr object containing a warning.
-
-```nim
-func newStringOr(warningData: WarningData): StringOr
-```
-
-# newStringOr
-
-Return a new StringOr object containing a string.
-
-```nim
-func newStringOr(str: string): StringOr
 ```
 
 # newReplaceLine
@@ -195,28 +157,6 @@ Yield all the replacement block lines and one line after.
 iterator yieldReplacementLine(env: var Env; firstReplaceLine: string;
                               lb: var LineBuffer; prepostTable: PrepostTable;
                               command: string; maxLines: Natural): ReplaceLine
-```
-
-# formatString
-
-Format a string by filling in the variable placeholders with
-their values. Generate a warning when the variable doesn't
-exist. No space around the bracketed variables.
-
-~~~
-let first = "Earl"
-let last = "Grey"
-"name: {first} {last}" => "name: Earl Grey"
-~~~~
-
-To enter a left bracket use two in a row.
-
-~~~
-"{{" => "{"
-~~~~
-
-```nim
-proc formatString(variables: Variables; text: string): StringOr
 ```
 
 

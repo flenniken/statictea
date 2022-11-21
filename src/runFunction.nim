@@ -15,9 +15,9 @@ import parseNumber
 import matches
 import unicodes
 import signatures
-import replacement
 import opresult
 import readjson
+import variables
 
 template tMapParameters(signatureCode: string) =
   ## Template that checks the signatureCode against the parameters and
@@ -89,6 +89,107 @@ func numberStringToNum(numString: string): FunResult =
     return newFunResultWarn(messageData)
 
   result = newFunResult(valueAndPosOr.value.value)
+
+type
+  StringOr* = OpResultWarn[string]
+    ## A string or a warning.
+
+func newStringOr*(warning: MessageId, p1: string = "", pos = 0):
+     StringOr =
+  ## Return a new StringOr object containing a warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[string](warningData)
+
+func newStringOr*(warningData: WarningData): StringOr =
+  ## Return a new StringOr object containing a warning.
+  result = opMessageW[string](warningData)
+
+func newStringOr*(str: string): StringOr =
+  ## Return a new StringOr object containing a string.
+  result = opValueW[string](str)
+
+proc formatString*(variables: Variables, text: string): StringOr =
+  ## Format a string by filling in the variable placeholders with
+  ## @:their values. Generate a warning when the variable doesn't
+  ## @:exist. No space around the bracketed variables.
+  ## @:
+  ## @:~~~
+  ## @:let first = "Earl"
+  ## @:let last = "Grey"
+  ## @:"name: {first} {last}" => "name: Earl Grey"
+  ## @:~~~~
+  ## @:
+  ## @:To enter a left bracket use two in a row.
+  ## @:
+  ## @:~~~
+  ## @:"{{" => "{"
+  ## @:~~~~
+  type
+    State = enum
+      ## Parsing states.
+      start, bracket, variable
+
+  var pos = 0
+  var state = start
+  var newStr = newStringOfCap(text.len)
+  var varStart: int
+
+  # Loop through the text one byte at a time and add to the result
+  # string.
+  while true:
+    case state
+    of start:
+      if pos >= text.len:
+        break # done
+      let ch = text[pos]
+      if ch == '{':
+        state = bracket
+      else:
+        newStr.add(ch)
+      inc(pos)
+    of bracket:
+      if pos >= text.len:
+        # No ending bracket.
+        return newStringOr(wNoEndingBracket, "", pos)
+      let ch = text[pos]
+      case ch
+      of '{':
+        # Two left brackets in a row equal one bracket.
+        state = start
+        newStr.add('{')
+      of 'a' .. 'z', 'A' .. 'Z':
+        state = variable
+        varStart = pos
+      else:
+        # Invalid variable name; names start with an ascii letter.
+        return newStringOr(wInvalidVarNameStart, "", pos)
+      inc(pos)
+    of variable:
+      if pos >= text.len:
+        # No ending bracket.
+        return newStringOr(wNoEndingBracket, "", pos)
+      let ch = text[pos]
+      case ch
+      of '}':
+        # Replace the placeholder with the variable's string
+        # representation.
+        let varName = text[varStart .. pos - 1]
+        var valueOr = getVariable(variables, varName)
+        if valueOr.isMessage:
+          let wd = newWarningData(valueOr.message.messageId,
+            valueOr.message.p1, varStart)
+          return newStringOr(wd)
+        let str = valueToStringRB(valueOr.value)
+        newStr.add(str)
+        state = start
+      of 'a' .. 'z', '.', 'A' .. 'Z', '0' .. '9', '_':
+        discard
+      else:
+        # Invalid variable name; names contain letters, digits or underscores.
+        return newStringOr(wInvalidVarName, "", pos)
+      inc(pos)
+
+  result = newStringOr(newStr)
 
 func funCmp_iii*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Compare two ints. Returns -1 for less, 0 for equal and 1 for

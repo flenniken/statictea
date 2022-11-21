@@ -7,6 +7,12 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 
 * [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
 * [parseNumber](#parsenumber) &mdash; Return the literal number value and position after it.
+* type: [StringOr](#stringor) &mdash; A string or a warning.
+* [newStringOr](#newstringor) &mdash; Return a new StringOr object containing a warning.
+* [newStringOr](#newstringor-1) &mdash; Return a new StringOr object containing a warning.
+* [newStringOr](#newstringor-2) &mdash; Return a new StringOr object containing a string.
+* [formatString](#formatstring) &mdash; Format a string by filling in the variable placeholders with
+their values.
 * [funCmp_iii](#funcmp_iii) &mdash; Compare two ints.
 * [funCmp_ffi](#funcmp_ffi) &mdash; Compare two floats.
 * [funCmp_ssobi](#funcmp_ssobi) &mdash; Compare two strings.
@@ -97,6 +103,60 @@ Return the literal number value and position after it.  The start index points a
 
 ```nim
 func parseNumber(line: string; start: Natural): ValueAndPosOr
+```
+
+# StringOr
+
+A string or a warning.
+
+```nim
+StringOr = OpResultWarn[string]
+```
+
+# newStringOr
+
+Return a new StringOr object containing a warning.
+
+```nim
+func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
+```
+
+# newStringOr
+
+Return a new StringOr object containing a warning.
+
+```nim
+func newStringOr(warningData: WarningData): StringOr
+```
+
+# newStringOr
+
+Return a new StringOr object containing a string.
+
+```nim
+func newStringOr(str: string): StringOr
+```
+
+# formatString
+
+Format a string by filling in the variable placeholders with
+their values. Generate a warning when the variable doesn't
+exist. No space around the bracketed variables.
+
+~~~
+let first = "Earl"
+let last = "Grey"
+"name: {first} {last}" => "name: Earl Grey"
+~~~~
+
+To enter a left bracket use two in a row.
+
+~~~
+"{{" => "{"
+~~~~
+
+```nim
+proc formatString(variables: Variables; text: string): StringOr
 ```
 
 # funCmp_iii

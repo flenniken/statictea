@@ -172,13 +172,13 @@
 <polygon fill="black" stroke="black" points="497.9,-487.59 506.34,-481.19 495.74,-480.93 497.9,-487.59"/>
 </g>
 <!-- replacement -->
-<g id="node33" class="node">
+<g id="node35" class="node">
 <title>replacement</title>
 <ellipse fill="none" stroke="black" cx="547.57" cy="-741.04" rx="53.89" ry="18"/>
 <text text-anchor="middle" x="547.57" y="-737.34" font-family="Times,serif" font-size="14.00">replacement</text>
 </g>
 <!-- strutils&#45;&gt;replacement -->
-<g id="edge58" class="edge">
+<g id="edge62" class="edge">
 <title>strutils&#45;&gt;replacement</title>
 <path fill="none" stroke="black" d="M144.36,-788.53C230.17,-778.4 395.06,-758.93 484.76,-748.34"/>
 <polygon fill="black" stroke="black" points="485.09,-751.83 494.61,-747.18 484.27,-744.87 485.09,-751.83"/>
@@ -334,7 +334,7 @@
 <polygon fill="black" stroke="black" points="499.84,-488.69 508.27,-482.28 497.68,-482.03 499.84,-488.69"/>
 </g>
 <!-- options&#45;&gt;replacement -->
-<g id="edge55" class="edge">
+<g id="edge59" class="edge">
 <title>options&#45;&gt;replacement</title>
 <path fill="none" stroke="black" d="M147.58,-693.94C234.33,-704.18 396.5,-723.32 485.04,-733.78"/>
 <polygon fill="black" stroke="black" points="484.4,-737.23 494.74,-734.92 485.22,-730.27 484.4,-737.23"/>
@@ -442,13 +442,13 @@
 <polygon fill="black" stroke="black" points="500.59,-488.88 509.12,-482.59 498.53,-482.19 500.59,-488.88"/>
 </g>
 <!-- readjson -->
-<g id="node34" class="node">
+<g id="node33" class="node">
 <title>readjson</title>
 <ellipse fill="none" stroke="black" cx="547.57" cy="-1389.04" rx="40.09" ry="18"/>
 <text text-anchor="middle" x="547.57" y="-1385.34" font-family="Times,serif" font-size="14.00">readjson</text>
 </g>
 <!-- tables&#45;&gt;readjson -->
-<g id="edge62" class="edge">
+<g id="edge58" class="edge">
 <title>tables&#45;&gt;readjson</title>
 <path fill="none" stroke="black" d="M131.36,-625.03C147.14,-631.63 164.19,-641.06 176.38,-654.04 408.96,-901.64 216.04,-1130.26 464.38,-1362.04 473.71,-1370.75 485.91,-1376.65 498.03,-1380.65"/>
 <polygon fill="black" stroke="black" points="497.04,-1384.01 507.61,-1383.4 498.97,-1377.28 497.04,-1384.01"/>
@@ -514,7 +514,7 @@
 <polygon fill="black" stroke="black" points="490.17,-324.76 498.37,-318.06 487.78,-318.18 490.17,-324.76"/>
 </g>
 <!-- os&#45;&gt;readjson -->
-<g id="edge60" class="edge">
+<g id="edge56" class="edge">
 <title>os&#45;&gt;readjson</title>
 <path fill="none" stroke="black" d="M112.98,-1085.89C131,-1093.79 156.04,-1105.73 176.38,-1119.04 316.51,-1210.75 318.15,-1280.41 464.38,-1362.04 475.63,-1368.32 488.56,-1373.42 500.79,-1377.43"/>
 <polygon fill="black" stroke="black" points="499.72,-1380.76 510.31,-1380.36 501.78,-1374.07 499.72,-1380.76"/>
@@ -550,7 +550,7 @@
 <polygon fill="red" stroke="red" points="511.7,-159.81 520.32,-153.66 509.75,-153.09 511.7,-159.81"/>
 </g>
 <!-- strformat&#45;&gt;replacement -->
-<g id="edge57" class="edge">
+<g id="edge61" class="edge">
 <title>strformat&#45;&gt;replacement</title>
 <path fill="none" stroke="red" d="M143.4,-418.63C154.72,-423.16 166.27,-428.62 176.38,-435.04 326.83,-530.56 311.84,-621.89 464.38,-714.04 472.88,-719.18 482.47,-723.46 492.03,-726.99"/>
 <polygon fill="red" stroke="red" points="490.71,-730.24 501.3,-730.17 492.98,-723.62 490.71,-730.24"/>
@@ -598,17 +598,17 @@
 <path fill="none" stroke="black" d="M139.45,-1166.22C228.26,-1191.27 411.79,-1243.03 498.8,-1267.57"/>
 <polygon fill="black" stroke="black" points="497.64,-1270.88 508.21,-1270.22 499.54,-1264.14 497.64,-1270.88"/>
 </g>
-<!-- streams&#45;&gt;replacement -->
-<g id="edge56" class="edge">
-<title>streams&#45;&gt;replacement</title>
-<path fill="none" stroke="black" d="M132.94,-1134.77C147.52,-1127.92 163.35,-1119.23 176.38,-1109.04 332.63,-986.82 299.92,-878.97 464.38,-768.04 472.52,-762.55 481.87,-758.1 491.27,-754.52"/>
-<polygon fill="black" stroke="black" points="492.13,-757.93 500.42,-751.34 489.83,-751.32 492.13,-757.93"/>
-</g>
 <!-- streams&#45;&gt;readjson -->
-<g id="edge59" class="edge">
+<g id="edge55" class="edge">
 <title>streams&#45;&gt;readjson</title>
 <path fill="none" stroke="black" d="M121.22,-1172.78C184.69,-1213.24 331.79,-1303.81 464.38,-1362.04 476.4,-1367.32 489.79,-1372.14 502.22,-1376.2"/>
 <polygon fill="black" stroke="black" points="500.8,-1379.42 511.39,-1379.11 502.92,-1372.75 500.8,-1379.42"/>
+</g>
+<!-- streams&#45;&gt;replacement -->
+<g id="edge60" class="edge">
+<title>streams&#45;&gt;replacement</title>
+<path fill="none" stroke="black" d="M132.94,-1134.77C147.52,-1127.92 163.35,-1119.23 176.38,-1109.04 332.63,-986.82 299.92,-878.97 464.38,-768.04 472.52,-762.55 481.87,-758.1 491.27,-754.52"/>
+<polygon fill="black" stroke="black" points="492.13,-757.93 500.42,-751.34 489.83,-751.32 492.13,-757.93"/>
 </g>
 <!-- streams&#45;&gt;codefile -->
 <g id="edge68" class="edge">
@@ -717,14 +717,14 @@
 <polygon fill="black" stroke="black" points="493.29,-258.19 503.31,-254.76 493.33,-251.19 493.29,-258.19"/>
 </g>
 <!-- json -->
-<g id="node35" class="node">
+<g id="node34" class="node">
 <title>json</title>
 <polygon fill="palegreen" stroke="black" points="130.92,-1390.25 130.92,-1411.83 105.89,-1427.08 70.49,-1427.08 45.46,-1411.83 45.46,-1390.25 70.49,-1375 105.89,-1375 130.92,-1390.25"/>
 <polygon fill="none" stroke="black" points="134.91,-1388 134.91,-1414.08 107.01,-1431.09 69.37,-1431.09 41.47,-1414.08 41.47,-1388 69.37,-1371 107.01,-1371 134.91,-1388"/>
 <text text-anchor="middle" x="88.19" y="-1394.84" font-family="Times,serif" font-size="24.00">json</text>
 </g>
 <!-- json&#45;&gt;readjson -->
-<g id="edge61" class="edge">
+<g id="edge57" class="edge">
 <title>json&#45;&gt;readjson</title>
 <path fill="none" stroke="black" d="M135.14,-1399.84C221.21,-1397.58 406.1,-1392.73 495.76,-1390.37"/>
 <polygon fill="black" stroke="black" points="495.82,-1393.87 505.73,-1390.11 495.64,-1386.88 495.82,-1393.87"/>
