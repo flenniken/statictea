@@ -217,7 +217,7 @@ type
     wNeedPrecedence,       ## w202
     wNoMatchingParen,      ## w203
     wReadOnlyFunctions,    ## w204
-    wNotInLorF,            ## w205
+    wNotInL,               ## w205
     wNotFunction,          ## w206
     wNoneMatchedFirst,     ## w207
     wNotEnoughCharacters,  ## w208
@@ -236,6 +236,7 @@ type
     wMissingKey,           ## w221
     wMissingRightBracket,  ## w222
     wUnableCreateStream,   ## w223
+    wNotInF,               ## w224
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -444,7 +445,7 @@ const
     "When mixing 'and's and 'or's you need to specify the precedence with parentheses.", ## wNeedPrecedence
     "No matching end right parentheses.", ## wNoMatchingParen
     "You cannot assign to the functions dictionary.", ## wReadOnlyFunctions
-    "The variable '$1' wasn't found in the l or f dictionaries.", ## wNotInLorF
+    "The variable '$1' isn't in the l dictionary.", ## wNotInL
     "You cannot call the variable because it's not a function or a list of functions.", ## wNotFunction
     "None of the $1 functions matched the first argument.", ## wNoneMatchedFirst
     "Ran out of characters before finishing the statement.", ## wNotEnoughCharacters
@@ -463,6 +464,7 @@ const
     "The key doesn't exist in the dictionary.", ## wMissingKey
     "Missing right bracket.", ## wMissingRightBracket
     "Unable to create a stream object.", ## wUnableCreateStream
+    "The variable '$1' isn't in the f dictionary.", ## wNotInF
     ]
 
     ## The message text.

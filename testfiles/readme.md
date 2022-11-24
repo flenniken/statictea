@@ -20,6 +20,7 @@ This folder contains stf test files for statictea.
 * [format-basic](../testfiles/format-basic.stf.md) &mdash; Test the format function.
 * [format-warnings](../testfiles/format-warnings.stf.md) &mdash; Test the format function's warning messages.
 * [func-basics](../testfiles/func-basics.stf.md) &mdash; Test the func type.
+* [func-special-forms](../testfiles/func-special-forms.stf.md) &mdash; Test the special forms.
 * [func-warnings](../testfiles/func-warnings.stf.md) &mdash; Test the function warnings.
 * [globalvars](../testfiles/globalvars.stf.md) &mdash; Test global variables.
 * [hello](../testfiles/hello.stf.md) &mdash; Readme Hello World example.

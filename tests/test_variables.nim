@@ -15,7 +15,7 @@ import version
 proc testGetVariableOk(variables: Variables, dotNameStr: string, eJson:
     string): bool =
   ## Get a variable and verify its value matches the expected value.
-  let valueOr = getVariable(variables, dotNameStr)
+  let valueOr = getVariable(variables, dotNameStr, "l")
   result = true
   if valueOr.isMessage:
     echo "Unable to get the variable: " & $valueOr
@@ -25,7 +25,7 @@ proc testGetVariableOk(variables: Variables, dotNameStr: string, eJson:
 
 proc testGetVariableWarning(variables: Variables, dotNameStr: string,
     eWarningData: WarningData): bool =
-  let valueOr = getVariable(variables, dotNameStr)
+  let valueOr = getVariable(variables, dotNameStr, "l")
   result = true
   if valueOr.isValue:
     echo "Did not get a warning: " & $valueOr
@@ -44,7 +44,7 @@ proc testAssignVariable(variables: var Variables, dotNameStr: string, value: Val
     return false
   if warningDataO.isSome:
     return true
-  let valueOr = getVariable(variables, dotNameStr)
+  let valueOr = getVariable(variables, dotNameStr, "l")
   if valueOr.isMessage:
     echo "Unable to fetch the variable: " & $valueOr
     return false
@@ -135,7 +135,7 @@ t.version = "$1"""" % staticteaVersion
     variables["l"] = valueOr.value
     let wO = newWarningData(wNotDict, "b")
     check testGetVariableWarning(variables, "l.a.b.tea", wO)
-    let w2 = newWarningData(wNotInLorF, "a.b.tea")
+    let w2 = newWarningData(wNotInL, "a.b.tea")
     check testGetVariableWarning(variables, "a.b.tea", w2)
 
   test "testGetVariableWarning wReservedNameSpaces":

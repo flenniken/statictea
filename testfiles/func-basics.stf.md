@@ -17,8 +17,8 @@ $statictea \
 
 ~~~
 $$ block
-$$ : a = cmp
-$$ : sc = a("tea", "tea2")
+$$ : a = f.cmp
+$$ : sc = l.a("tea", "tea2")
 $$ : fc = o.floatCmp(5.5, 5.1)
 $$ : ic = o.intCmp(3, 3)
 {a} = array of cmp functions
@@ -31,8 +31,8 @@ $$ endblock
 ### File shared.tea
 
 ~~~
-o.floatCmp = get(cmp, 0)
-o.intCmp = get(cmp, 1)
+o.floatCmp = get(f.cmp, 0)
+o.intCmp = get(f.cmp, 1)
 ~~~
 
 ### File result.expected

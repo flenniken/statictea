@@ -32,7 +32,7 @@ proc testFunction(functionName: string, arguments: seq[Value],
 
   var funResult: FunResult
   # Lookup the variable's value.
-  let funcValueOr = getVariable(vars, functionName)
+  let funcValueOr = getVariable(vars, functionName, "f")
   funResult = newFunResult(funcValueOr, parameter=0)
   if funResult.kind == frValue:
     # Get the function to match the arguments.
@@ -108,7 +108,7 @@ proc testGetBestFunctionExists(functionName: string, arguments: seq[Value],
   ## given arguments. Verify it returns a function with the expected
   ## signature code.
   let variables = emptyVariables(funcs = funcsVarDict)
-  var funcValueOr = getVariable(variables, functionName)
+  var funcValueOr = getVariable(variables, functionName, "f")
   if funcValueOr.isMessage:
     echo funcValueOr.message
     return false
@@ -1775,7 +1775,7 @@ d.sub.y = 4"""
 
   test "format warning":
     let str = newValue("hello {name}")
-    let eFunResult = newFunResultWarn(wNotInLorF, 0, "name", 7)
+    let eFunResult = newFunResultWarn(wNotInL, 0, "name", 7)
     check testFunction("format", @[str], eFunResult)
 
   test "startsWith":
@@ -1996,7 +1996,7 @@ d.sub.y = 4"""
     check testFormatStringWarn("{3}", newWarningData(wInvalidVarNameStart, "", 1))
     check testFormatStringWarn(" {3}", newWarningData(wInvalidVarNameStart, "", 2))
 
-    check testFormatStringWarn("{a}", newWarningData(wNotInLorF, "a", 1))
+    check testFormatStringWarn("{a}", newWarningData(wNotInL, "a", 1))
     check testFormatStringWarn("{l.a}", newWarningData(wVariableMissing, "a", 1))
     check testFormatStringWarn("{a!}", newWarningData(wInvalidVarName, "", 2))
 

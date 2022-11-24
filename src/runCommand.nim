@@ -439,6 +439,28 @@ proc getValueAndPos*(statement: Statement, start: Natural, variables:
 # - getList
 # - getValueAndPos
 
+func getSpecialFunc(dotNameValue: Value): Func =
+  ## Return a Func when the given variable is a special function, else
+  ## return nil.
+
+  var value: Value
+  if dotNameValue.kind == vkList:
+    let list = dotNameValue.listv
+    if list.len != 1:
+      # There is only one special function in the list.
+      return nil
+    value = list[0]
+  else:
+    value = dotNameValue
+
+  if value.kind != vkFunc:
+    return nil
+  let funcPtr = value.funcv
+
+  if not (funcPtr.name in ["if", "if0", "and", "or", "warn", "return"]):
+    return nil
+  result = funcPtr
+
 proc ifFunctions*(
     functionName: string,
     statement: Statement,
@@ -673,7 +695,7 @@ proc getFunctionValueAndPos*(
         break
 
   # Lookup the variable's value.
-  let valueOr = getVariable(variables, dotNameStr)
+  let valueOr = getVariable(variables, dotNameStr, "f")
   if valueOr.isMessage:
     let warningData = newWarningData(valueOr.message.messageId,
       valueOr.message.p1, start)
@@ -911,7 +933,7 @@ proc getBracketedVarValue*(statement: Statement, dotName: string, dotNameLen: Na
   var runningPos = start
 
   # Get the container variable.
-  let containerOr = getVariable(variables, dotName)
+  let containerOr = getVariable(variables, dotName, "l")
   if containerOr.isMessage:
     # The variable doesn't exist, etc.
     let warningData = newWarningData(containerOr.message.messageId,
@@ -1004,12 +1026,21 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
     if leftParenBrack == "(":
       # We have a function, run it and return its value.
 
+      # Get the function or list of functions.
+      let dotNameValueOr = getVariable(variables, dotNameStr, "f")
+      if dotNameValueOr.isMessage:
+        let warningData = newWarningData(dotNameValueOr.message.messageId,
+          dotNameValueOr.message.p1, start)
+        return newValueAndPosOr(warningData)
+      # Get the special function or nil.
+      let specialFunc = getSpecialFunc(dotNameValueOr.value)
+
       # Handle the special if functions.
-      if dotNameStr in ["if", "if0"]:
+      if specialFunc != nil and specialFunc.name in ["if", "if0"]:
         return ifFunctions(dotNameStr, statement, start+dotNameLen, variables)
 
       # Handle the special and/or functions.
-      if dotNameStr in ["and", "or"]:
+      if specialFunc != nil and specialFunc.name in ["and", "or"]:
         return andOrFunctions(dotNameStr, statement, start+dotNameLen, variables)
 
       return getFunctionValueAndPos(dotNameStr, statement,
@@ -1019,7 +1050,7 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
       return getBracketedVarValue(statement, dotNameStr, dotNameLen, start, variables)
 
     # We have a variable.
-    let valueOr = getVariable(variables, dotNameStr)
+    let valueOr = getVariable(variables, dotNameStr, "l")
     if valueOr.isMessage:
       let warningData = newWarningData(valueOr.message.messageId,
         valueOr.message.p1, start)
@@ -1105,7 +1136,18 @@ proc runStatement*(statement: Statement, variables: Variables):
   var operatorLength = 0
   var varName = ""
 
-  if leftParenBrack == "(" and dotNameStr in ["if0", "if"]:
+  var specialFunc: Func
+  if leftParenBrack == "(":
+    # Get the function or list of functions.
+    let dotNameValueOr = getVariable(variables, dotNameStr, "f")
+    if dotNameValueOr.isMessage:
+      let warningData = newWarningData(dotNameValueOr.message.messageId,
+        dotNameValueOr.message.p1, pos)
+      return newVariableDataOr(warningData)
+    # Get the special function or nil.
+    specialFunc = getSpecialFunc(dotNameValueOr.value)
+
+  if leftParenBrack == "(" and specialFunc != nil and specialFunc.name in ["if0", "if"]:
     # Handle the special bare if functions.
     vlOr = ifFunctions(dotNameStr, statement, leadingLen, variables, bare=true)
   elif leftParenBrack == "(" and dotNameStr == "warn":

@@ -352,9 +352,10 @@ func lookUpVar(variables: Variables, names: seq[string]): ValueOr =
       return newValueOr(wNotDict, name)
     next = value.dictv
 
-proc getVariable*(variables: Variables, dotNameStr: string): ValueOr =
+proc getVariable*(variables: Variables, dotNameStr: string, noPrefixDict = ""): ValueOr =
   ## Look up the variable and return its value when found, else return
-  ## a warning.
+  ## a warning. When no prefix, look in the noPrefixDict dictionary,
+  ## either l or f or "".
   assert variables != nil
 
   if dotNameStr == "true":
@@ -371,13 +372,21 @@ proc getVariable*(variables: Variables, dotNameStr: string): ValueOr =
     # The variables f, i, j, k, m, n, p, q, r, u are reserved variable names.
     result = newValueOr(wReservedNameSpaces)
   else:
-    # No prefix, look in l then f.
-    var varNames = @["l"] & names
-    result = lookUpVar(variables, varNames)
-    if result.isMessage:
-      varNames = @["f"] & names
+    # No prefix.
+    if noPrefixDict == "":
+      result = newValueOr(wVariableMissing, dotNameStr)
+    else:
+      # Look in the extra dictionary.
+      var varNames = @[noPrefixDict] & names
       result = lookUpVar(variables, varNames)
       if result.isMessage:
-        # The variable wasn't found in the l or f dictionaries.
-        result = newValueOr(wNotInLorF, dotNameStr)
+        # The variable isn't in the x dictionary.
+        var messageId: MessageId
+        if noPrefixDict == "l":
+          messageId = wNotInL
+        elif noPrefixDict == "f":
+          messageId = wNotInF
+        else:
+          return result
+        result = newValueOr(messageId, dotNameStr)
 

@@ -618,6 +618,12 @@ name. For example:
 s.tea.black.earlgrey.vanilla
 #+END_SRC
 
+When you call a function variable without a prefix, statictea for
+it in the function dictionary. 
+
+Otherwise when you use a variable without a prefix, statictea
+looks for it in the local dictionary.
+
 [[#contents][茶]]
 
 * Single Letter Dictionaries
@@ -1407,7 +1413,7 @@ a = get(f.cmp, 1)
 You call it with parentheses:
 
 #+BEGIN_SRC
-b = a(4, 7) => -1
+b = l.a(4, 7) => -1
 #+END_SRC
 
 You can have multiple functions with the same name as long as
@@ -1431,8 +1437,8 @@ Example calling a function given a list:
 value = f.cmp(1,2)
 #+END_SRC
 
-When you use a variable without a prefix, Statictea searches for
-it first in the l dictionary then the f dictionary.
+When you call a function variable without a prefix, statictea for
+it in the function dictionary. 
 
 #+BEGIN_SRC
 a = cmp

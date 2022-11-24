@@ -146,10 +146,10 @@ proc assignVariable(variables: var Variables; dotNameStr: string; value: Value;
 
 # getVariable
 
-Look up the variable and return its value when found, else return a warning.
+Look up the variable and return its value when found, else return a warning. When no prefix, look in the noPrefixDict dictionary, either l or f or "".
 
 ```nim
-proc getVariable(variables: Variables; dotNameStr: string): ValueOr
+proc getVariable(variables: Variables; dotNameStr: string; noPrefixDict = ""): ValueOr
 ```
 
 

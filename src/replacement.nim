@@ -294,7 +294,7 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
       let dotNameStr = varSegmentDotName(segment)
 
       # Look up the variable's value.
-      let valueOr = getVariable(variables, dotNameStr)
+      let valueOr = getVariable(variables, dotNameStr, "l")
       if valueOr.isValue:
         # Convert the variable to a string.
         let valueStr = valueToStringRB(valueOr.value)

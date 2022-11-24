@@ -174,7 +174,7 @@ proc formatString*(variables: Variables, text: string): StringOr =
         # Replace the placeholder with the variable's string
         # representation.
         let varName = text[varStart .. pos - 1]
-        var valueOr = getVariable(variables, varName)
+        var valueOr = getVariable(variables, varName, "l")
         if valueOr.isMessage:
           let wd = newWarningData(valueOr.message.messageId,
             valueOr.message.p1, varStart)

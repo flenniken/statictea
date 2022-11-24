@@ -42,10 +42,10 @@ v5: "5".
 ### File stderr.expected
 
 ~~~
-tmpl.txt(2): w205: The variable 'missing' wasn't found in the l or f dictionaries.
+tmpl.txt(2): w205: The variable 'missing' isn't in the l dictionary.
 statement: v = format("this is {missing}")
                       ^
-tmpl.txt(6): w205: The variable 'missing' wasn't found in the l or f dictionaries.
+tmpl.txt(6): w205: The variable 'missing' isn't in the l dictionary.
 statement: v2 = format("{a} {missing}")
                        ^
 tmpl.txt(7): w192: No ending bracket.

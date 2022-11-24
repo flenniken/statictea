@@ -48,18 +48,18 @@ b5 = cmp([1)
 ### File stderr.expected
 
 ~~~
-shared.tea(2): w206: You cannot call the variable because it's not a function or a list of functions.
+shared.tea(2): w224: The variable 'a' isn't in the f dictionary.
 statement: o.name = a("shared")
-                      ^
-shared.tea(4): w206: You cannot call the variable because it's not a function or a list of functions.
+                    ^
+shared.tea(4): w224: The variable 'b' isn't in the f dictionary.
 statement: o.t = b(1)
-                   ^
-shared.tea(6): w206: You cannot call the variable because it's not a function or a list of functions.
+                 ^
+shared.tea(6): w224: The variable 'b' isn't in the f dictionary.
 statement: o.t2 = b(1)
-                    ^
-shared.tea(7): w205: The variable 'ccc' wasn't found in the l or f dictionaries.
+                  ^
+shared.tea(7): w224: The variable 'ccc' isn't in the f dictionary.
 statement: b2 = ccc()
-                    ^
+                ^
 shared.tea(8): w46: Expected comma or right parentheses.
 statement: b3 = cmp(1 2)
                       ^

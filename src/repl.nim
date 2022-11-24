@@ -107,7 +107,7 @@ proc handleReplLine*(line: string, start: Natural, variables: var Variables, sto
     return errorAndColumn(wInvalidReplSyntax, line, runningPos)
 
   # Read the dotname's value.
-  let valueOr = getVariable(variables, dotNameStr)
+  let valueOr = getVariable(variables, dotNameStr, "l")
   if valueOr.isMessage:
     # The variable '$1' does not exist.", ## wVariableMissing
     return errorAndColumn(wVariableMissing, line, runningPos, dotNameStr)

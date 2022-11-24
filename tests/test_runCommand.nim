@@ -23,20 +23,29 @@ proc echoValueAndPosOr(statement: Statement, start: Natural,
     valueAndPosOr: ValueAndPosOr, eValueAndPosOr: ValueAndPosOr) =
   ## Show the statement and the two values and positions so you can
   ## visually compare them.
+  echo ""
   echo "0123456789 123456789 123456789"
   echo statement.text
   echo startColumn(statement.text, start, "^ s")
+  echo ""
+  echo "got:"
   if valueAndPosOr.isValue:
-    echo startColumn(statement.text, valueAndPosOr.value.pos, "^ got")
+    echo "value: $1" % $valueAndPosOr.value
+    echo "0123456789 123456789 123456789"
+    echo statement.text
+    echo startColumn(statement.text, valueAndPosOr.value.pos, "^ pos")
   else:
-    echo "got:"
     echo getWarnStatement("filename", statement, valueAndPosOr.message)
 
+  echo "expected:"
   if eValueAndPosOr.isValue:
-    echo startColumn(statement.text, eValueAndPosOr.value.pos, "^ expected")
+    echo "value: $1" % $eValueAndPosOr.value
+    echo "0123456789 123456789 123456789"
+    echo statement.text
+    echo startColumn(statement.text, eValueAndPosOr.value.pos, "^ pos")
   else:
-    echo "expected:"
     echo getWarnStatement("filename", statement, eValueAndPosOr.message)
+  echo ""
 
 proc testGetValueAndPos(statement: Statement, start: Natural,
     eValueAndPosOr: ValueAndPosOr, variables: Variables = nil): bool =
@@ -48,9 +57,10 @@ proc testGetValueAndPos(statement: Statement, start: Natural,
     vars = emptyVariables(funcs = funcsVarDict)
 
   let valueAndPosOr = getValueAndPos(statement, start, vars)
-  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
 
-  if not result:
+  result = true
+  if valueAndPosOr != eValueAndPosOr:
+    result = false
     echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
 proc testGetValueAndPos(text: string, start: Natural,
@@ -909,7 +919,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "undefined function":
     let text = """a = missing(2.3, "second", "third")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wNotInLorF, "missing", 12)
+    let eVariableDataOr = newVariableDataOr(wNotInF, "missing", 4)
     check testRunStatement(statement, eVariableDataOr)
 
   test "if when true":
@@ -991,7 +1001,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "if0 missing required":
     let text = """a = b"""
     let statement = newStatement(text, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr(wNotInLorF, "b", 4)
+    let eVariableDataOr = newVariableDataOr(wNotInL, "b", 4)
     check testRunStatement(statement, eVariableDataOr)
 
   test "slice":
@@ -1378,10 +1388,10 @@ White$1
     #                         0123456789 123456789 123456789 12345
 
   test "a = cmp":
-    let statement = newStatement(text="""a = cmp""", lineNum=1, 0)
+    let statement = newStatement(text="""a = f.cmp""", lineNum=1, 0)
     let funcsVarDict = createFuncDictionary().dictv
     let variables = emptyVariables(funcs = funcsVarDict)
-    let cmpValueOr = getVariable(variables, "cmp")
+    let cmpValueOr = getVariable(variables, "f.cmp")
     if cmpValueOr.isMessage:
       echo cmpValueOr.message
       fail
@@ -1389,10 +1399,10 @@ White$1
     check testRunStatement(statement, eVariableDataOr, variables)
 
   test "a = get(cmp, 0)":
-    let statement = newStatement(text="""a = get(cmp, 0)""", lineNum=1, 0)
+    let statement = newStatement(text="""a = get(f.cmp, 0)""", lineNum=1, 0)
     let funcsVarDict = createFuncDictionary().dictv
     let variables = emptyVariables(funcs = funcsVarDict)
-    let cmpValueOr = getVariable(variables, "cmp")
+    let cmpValueOr = getVariable(variables, "f.cmp")
     if cmpValueOr.isMessage:
       echo cmpValueOr.message
       fail
@@ -1435,7 +1445,7 @@ White$1
 
   test "getValueAndPos warnings":
     check testGetValueAndPos("""a = 5""", 1, wInvalidRightHandSide, 1)
-    check testGetValueAndPos("""a = b""", 4, wNotInLorF, 4, "b")
+    check testGetValueAndPos("""a = b""", 4, wNotInL, 4, "b")
     check testGetValueAndPos("""a = _""", 4, wInvalidRightHandSide, 4)
 
   test "skipArgument":
@@ -1504,13 +1514,13 @@ White$1
     check $variables["l"] == """{"b":[2,3]}"""
     check testGetValueAndPos("""a = b[1]""", 4, 8, "3", variables)
 
-  test "backets with spaces":
+  test "brackets with spaces":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = emptyVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), "&=")
     check testGetValueAndPos("""a = b[ 0 ]""", 4, 10, "2", variables)
 
-  test "backets with function":
+  test "brackets with function":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = emptyVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), "&=")
@@ -1527,7 +1537,7 @@ White$1
     check testGetValueAndPos("""a = d["abc"]""", 4, 12, "5", variables)
 
   test "bracketed variable missing":
-    check testGetValueAndPos("""a = b[0]""", 4, wNotInLorF, 4, "b")
+    check testGetValueAndPos("""a = b[0]""", 4, wNotInL, 4, "b")
 
   test "bracketed list or dict":
     let funcsVarDict = createFuncDictionary().dictv
@@ -1540,7 +1550,7 @@ White$1
     var variables = emptyVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.ix", newValue(22), "=")
     discard assignVariable(variables, "l.b", newValue(2), "&=")
-    check testGetValueAndPos("""a = b[abc]""", 4, wNotInLorF, 6, "abc", variables)
+    check testGetValueAndPos("""a = b[abc]""", 4, wNotInL, 6, "abc", variables)
     check testGetValueAndPos("""a = b[%abc]""", 4, wInvalidRightHandSide, 6, "", variables)
     check testGetValueAndPos("""a = b[2.3]""", 4, wIndexNotInt, 6, "", variables)
     check testGetValueAndPos("""a = b[-1]""", 4, wInvalidIndexRange, 6, "-1", variables)

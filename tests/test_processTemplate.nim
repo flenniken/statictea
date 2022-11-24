@@ -422,12 +422,12 @@ and the shared code has 0.
 #$ endblock
 """
     let eErrLines = splitNewLines """
-template.html(1): w205: The variable 'notfunction' wasn't found in the l or f dictionaries.
+template.html(1): w224: The variable 'notfunction' isn't in the f dictionary.
 statement: cond1 = notfunction(4, 5)
-                               ^
-template.html(3): w205: The variable 'hello' wasn't found in the l or f dictionaries.
+                   ^
+template.html(3): w224: The variable 'hello' isn't in the f dictionary.
 statement: cond3 = hello(5, 4)
-                         ^
+                   ^
 """
     check testProcessTemplate(templateContent = templateContent, eRc = 1, eErrLines = eErrLines)
 
@@ -1260,10 +1260,10 @@ after
   test "run function variable":
     let templateContent = """
 $$ block
-$$ : myCmp = cmp
-$$ : b = myCmp(3, 2)
-$$ : myCmp2 = get(cmp, 0)
-$$ : d = myCmp2(1.1, 2.2)
+$$ : myCmp = f.cmp
+$$ : b = l.myCmp(3, 2)
+$$ : myCmp2 = get(f.cmp, 0)
+$$ : d = l.myCmp2(1.1, 2.2)
 {b}
 {d}
 <!--$ endblock -->
