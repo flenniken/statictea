@@ -267,7 +267,7 @@ func funCmp_ssobi*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(ret))
 
 func funConcat_sss*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Concatentate two strings. See join for more that two arguments.
+  ## Concatentate two strings. See [[#join][join]] for more that two arguments.
   ## @:
   ## @:~~~
   ## @:concat(a: string, b: string) string
@@ -1178,7 +1178,7 @@ func funDict_old*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(dict))
 
 func funList*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## You create a list with the list function or with brackets.
+  ## Create a list of variables. You can also create a list with brackets.
   ## @:
   ## @:~~~
   ## @:list(...) list
@@ -1918,7 +1918,7 @@ func funWarn_ss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:
   ## @:~~~
   ## @:if0(c, warn("message is 0"))
-  ## @:~~~
+  ## @:~~~~
   ## @:
   ## @:You can warn conditionally in a normal if statement. In the
   ## @:following example, if warn is called the b variable will not
@@ -1926,7 +1926,7 @@ func funWarn_ss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:
   ## @:~~~
   ## @:b = if0(c, warn("c is not 0"), "")
-  ## @:~~~
+  ## @:~~~~
   ## @:
   ## @:You can warn unconditionally using a bare warn statement:
   ## @:
@@ -1965,7 +1965,8 @@ func funReturn_ss*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(map["a"])
 
 func funString_aoss*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Convert the variable to a string.
+  ## Convert a variable to a string. You specify the variable and
+  ## optionally the type of output you want.
   ## @:
   ## @:~~~
   ## @:string(var: any, optional stype: string) string
@@ -2050,7 +2051,8 @@ func funString_aoss*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(str))
 
 func funString_sds*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Convert the dictionary variable to dot names were you specify the name of the dictionary.
+  ## Convert the dictionary variable to dot names. You specify the
+  ## name of the dictionary and the dict variable.
   ## @:
   ## @:~~~
   ## @:string(dictName: string: d: dict) string
@@ -2148,7 +2150,7 @@ func funNot_bb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(not(cond)))
 
 func funAnd_bbb*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Boolean and with short circuit. If the first argument is false,
+  ## Boolean AND with short circuit. If the first argument is false,
   ## the second argument is not evaluated.
   ## @:
   ## @:~~~
@@ -2174,7 +2176,7 @@ func funAnd_bbb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funOr_bbb*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Boolean or with short circuit. If the first argument is true,
+  ## Boolean OR with short circuit. If the first argument is true,
   ## the second argument is not evaluated.
   ## @:
   ## @:~~~
@@ -2200,7 +2202,7 @@ func funOr_bbb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funEq_iib*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the a equals b.
+  ## Return true when the two ints are equal.
   ## @:
   ## @:~~~
   ## @:eq(a: int, b: int) bool
@@ -2219,7 +2221,7 @@ func funEq_iib*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funEq_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the a equals b.
+  ## Return true when two floats are equal.
   ## @:
   ## @:~~~
   ## @:eq(a: float, b: float) bool
@@ -2238,7 +2240,8 @@ func funEq_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funEq_ssb*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the a equals b.
+  ## Return true when two strings are equal.  See [[#cmd][cmd]] for case
+  ## insensitive compare.
   ## @:
   ## @:~~~
   ## @:eq(a: string, b: string) bool
@@ -2257,7 +2260,7 @@ func funEq_ssb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funNe_iib*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the a does not equal b.
+  ## Return true when two ints are not equal.
   ## @:
   ## @:~~~
   ## @:ne(a: int, b: int) bool
@@ -2276,7 +2279,7 @@ func funNe_iib*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funNe_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the a does not equal b.
+  ## Return true when two floats are not equal.
   ## @:
   ## @:~~~
   ## @:ne(a: float, b: float) bool
@@ -2295,7 +2298,7 @@ func funNe_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funNe_ssb*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the a does not equal b.
+  ## Return true when two strings are not equal.
   ## @:
   ## @:~~~
   ## @:ne(a: string, b: string) bool
@@ -2314,7 +2317,7 @@ func funNe_ssb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funGt_iib*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the a is greater than b.
+  ## Return true when an int is greater then another int.
   ## @:
   ## @:~~~
   ## @:gt(a: int, b: int) bool
@@ -2333,7 +2336,7 @@ func funGt_iib*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funGt_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the a is greater than b.
+  ## Return true when one float is greater than another float.
   ## @:
   ## @:~~~
   ## @:gt(a: float, b: float) bool
@@ -2352,7 +2355,7 @@ func funGt_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funGte_iib*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the a is greater than or equal to b.
+  ## Return true when an int is greater then or equal to another int.
   ## @:
   ## @:~~~
   ## @:gte(a: int, b: int) bool
@@ -2371,7 +2374,7 @@ func funGte_iib*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funGte_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the a is greater than to equal to b.
+  ## Return true when a float is greater than or equal to another float.
   ## @:
   ## @:~~~
   ## @:gte(a: float, b: float) bool
@@ -2390,7 +2393,7 @@ func funGte_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funLt_iib*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the a is less than b.
+  ## Return true when an int is less than another int.
   ## @:
   ## @:~~~
   ## @:lt(a: int, b: int) bool
@@ -2409,7 +2412,7 @@ func funLt_iib*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funLt_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the a is less than b.
+  ## Return true when a float is less then another float.
   ## @:
   ## @:~~~
   ## @:lt(a: float, b: float) bool
@@ -2428,7 +2431,7 @@ func funLt_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funLte_iib*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the a is less than or equal to b.
+  ## Return true when an int is less than or equal to another int.
   ## @:
   ## @:~~~
   ## @:lte(a: int, b: int) bool
@@ -2448,7 +2451,7 @@ func funLte_iib*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funLte_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Return true when the a is less than or equal to b.
+  ## Return true when a float is less than or equal to another float.
   ## @:
   ## @:~~~
   ## @:lte(a: float, b: float) bool
@@ -2468,7 +2471,7 @@ func funLte_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func funReadJson_sa*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## Read the JSON string and return it as a variable.
+  ## Convert a JSON string to a variable.
   ## @:
   ## @:~~~
   ## @:readJson(json: string) any

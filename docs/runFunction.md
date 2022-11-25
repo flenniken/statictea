@@ -43,7 +43,7 @@ their values.
 * [funSlice_siois](#funslice_siois) &mdash; Extract a substring from a string by its position and length.
 * [funDup_sis](#fundup_sis) &mdash; Duplicate a string x times.
 * [funDict_old](#fundict_old) &mdash; Create a dictionary from a list of key, value pairs.
-* [funList](#funlist) &mdash; You create a list with the list function or with brackets.
+* [funList](#funlist) &mdash; Create a list of variables.
 * [funReplace_siiss](#funreplace_siiss) &mdash; Replace a substring specified by its position and length with another string.
 * [funReplaceRe_sls](#funreplacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
 * type: [PathComponents](#pathcomponents) &mdash; PathComponents holds the components of the file path components.
@@ -63,28 +63,28 @@ their values.
 * [funJoin_lsois](#funjoin_lsois) &mdash; Join a list of strings with a separator.
 * [funWarn_ss](#funwarn_ss) &mdash; Return a warning message and skip the current statement.
 * [funReturn_ss](#funreturn_ss) &mdash; Return the given value and control command looping.
-* [funString_aoss](#funstring_aoss) &mdash; Convert the variable to a string.
-* [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names were you specify the name of the dictionary.
+* [funString_aoss](#funstring_aoss) &mdash; Convert a variable to a string.
+* [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names.
 * [funFormat_ss](#funformat_ss) &mdash; Format a string using replacement variables similar to a replacement block.
 * [funStartsWith_ssb](#funstartswith_ssb) &mdash; Check whether a strings starts with the given prefix.
 * [funNot_bb](#funnot_bb) &mdash; Boolean not.
-* [funAnd_bbb](#funand_bbb) &mdash; Boolean and with short circuit.
-* [funOr_bbb](#funor_bbb) &mdash; Boolean or with short circuit.
-* [funEq_iib](#funeq_iib) &mdash; Return true when the a equals b.
-* [funEq_ffb](#funeq_ffb) &mdash; Return true when the a equals b.
-* [funEq_ssb](#funeq_ssb) &mdash; Return true when the a equals b.
-* [funNe_iib](#funne_iib) &mdash; Return true when the a does not equal b.
-* [funNe_ffb](#funne_ffb) &mdash; Return true when the a does not equal b.
-* [funNe_ssb](#funne_ssb) &mdash; Return true when the a does not equal b.
-* [funGt_iib](#fungt_iib) &mdash; Return true when the a is greater than b.
-* [funGt_ffb](#fungt_ffb) &mdash; Return true when the a is greater than b.
-* [funGte_iib](#fungte_iib) &mdash; Return true when the a is greater than or equal to b.
-* [funGte_ffb](#fungte_ffb) &mdash; Return true when the a is greater than to equal to b.
-* [funLt_iib](#funlt_iib) &mdash; Return true when the a is less than b.
-* [funLt_ffb](#funlt_ffb) &mdash; Return true when the a is less than b.
-* [funLte_iib](#funlte_iib) &mdash; Return true when the a is less than or equal to b.
-* [funLte_ffb](#funlte_ffb) &mdash; Return true when the a is less than or equal to b.
-* [funReadJson_sa](#funreadjson_sa) &mdash; Read the JSON string and return it as a variable.
+* [funAnd_bbb](#funand_bbb) &mdash; Boolean AND with short circuit.
+* [funOr_bbb](#funor_bbb) &mdash; Boolean OR with short circuit.
+* [funEq_iib](#funeq_iib) &mdash; Return true when the two ints are equal.
+* [funEq_ffb](#funeq_ffb) &mdash; Return true when two floats are equal.
+* [funEq_ssb](#funeq_ssb) &mdash; Return true when two strings are equal.
+* [funNe_iib](#funne_iib) &mdash; Return true when two ints are not equal.
+* [funNe_ffb](#funne_ffb) &mdash; Return true when two floats are not equal.
+* [funNe_ssb](#funne_ssb) &mdash; Return true when two strings are not equal.
+* [funGt_iib](#fungt_iib) &mdash; Return true when an int is greater then another int.
+* [funGt_ffb](#fungt_ffb) &mdash; Return true when one float is greater than another float.
+* [funGte_iib](#fungte_iib) &mdash; Return true when an int is greater then or equal to another int.
+* [funGte_ffb](#fungte_ffb) &mdash; Return true when a float is greater than or equal to another float.
+* [funLt_iib](#funlt_iib) &mdash; Return true when an int is less than another int.
+* [funLt_ffb](#funlt_ffb) &mdash; Return true when a float is less then another float.
+* [funLte_iib](#funlte_iib) &mdash; Return true when an int is less than or equal to another int.
+* [funLte_ffb](#funlte_ffb) &mdash; Return true when a float is less than or equal to another float.
+* [funReadJson_sa](#funreadjson_sa) &mdash; Convert a JSON string to a variable.
 * const: [functionsList](#functionslist) &mdash; Sorted list of built in functions, their function name, nim name and their signature.
 * [getBestFunction](#getbestfunction) &mdash; Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
 * [createFuncDictionary](#createfuncdictionary) &mdash; Create the f dictionary from the built in functions.
@@ -229,7 +229,7 @@ func funCmp_ssobi(variables: Variables; parameters: seq[Value]): FunResult
 
 # funConcat_sss
 
-Concatentate two strings. See join for more that two arguments.
+Concatentate two strings. See [[#join][join]] for more that two arguments.
 
 ~~~
 concat(a: string, b: string) string
@@ -912,7 +912,7 @@ func funDict_old(variables: Variables; parameters: seq[Value]): FunResult
 
 # funList
 
-You create a list with the list function or with brackets.
+Create a list of variables. You can also create a list with brackets.
 
 ~~~
 list(...) list
@@ -1403,7 +1403,7 @@ You can warn conditionally in a bare if statement:
 
 ~~~
 if0(c, warn("message is 0"))
-~~~
+~~~~
 
 You can warn conditionally in a normal if statement. In the
 following example, if warn is called the b variable will not
@@ -1411,7 +1411,7 @@ get created.
 
 ~~~
 b = if0(c, warn("c is not 0"), "")
-~~~
+~~~~
 
 You can warn unconditionally using a bare warn statement:
 
@@ -1452,7 +1452,7 @@ func funReturn_ss(variables: Variables; parameters: seq[Value]): FunResult
 
 # funString_aoss
 
-Convert the variable to a string.
+Convert a variable to a string. You specify the variable and optionally the type of output you want.
 
 ~~~
 string(var: any, optional stype: string) string
@@ -1515,7 +1515,7 @@ func funString_aoss(variables: Variables; parameters: seq[Value]): FunResult
 
 # funString_sds
 
-Convert the dictionary variable to dot names were you specify the name of the dictionary.
+Convert the dictionary variable to dot names. You specify the name of the dictionary and the dict variable.
 
 ~~~
 string(dictName: string: d: dict) string
@@ -1609,7 +1609,7 @@ func funNot_bb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funAnd_bbb
 
-Boolean and with short circuit. If the first argument is false, the second argument is not evaluated.
+Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
 
 ~~~
 and(a: bool, b: bool) bool
@@ -1631,7 +1631,7 @@ func funAnd_bbb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funOr_bbb
 
-Boolean or with short circuit. If the first argument is true, the second argument is not evaluated.
+Boolean OR with short circuit. If the first argument is true, the second argument is not evaluated.
 
 ~~~
 or(a: bool, b: bool) bool
@@ -1653,7 +1653,7 @@ func funOr_bbb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funEq_iib
 
-Return true when the a equals b.
+Return true when the two ints are equal.
 
 ~~~
 eq(a: int, b: int) bool
@@ -1672,7 +1672,7 @@ func funEq_iib(variables: Variables; parameters: seq[Value]): FunResult
 
 # funEq_ffb
 
-Return true when the a equals b.
+Return true when two floats are equal.
 
 ~~~
 eq(a: float, b: float) bool
@@ -1691,7 +1691,7 @@ func funEq_ffb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funEq_ssb
 
-Return true when the a equals b.
+Return true when two strings are equal.  See [[#cmd][cmd]] for case insensitive compare.
 
 ~~~
 eq(a: string, b: string) bool
@@ -1710,7 +1710,7 @@ func funEq_ssb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funNe_iib
 
-Return true when the a does not equal b.
+Return true when two ints are not equal.
 
 ~~~
 ne(a: int, b: int) bool
@@ -1729,7 +1729,7 @@ func funNe_iib(variables: Variables; parameters: seq[Value]): FunResult
 
 # funNe_ffb
 
-Return true when the a does not equal b.
+Return true when two floats are not equal.
 
 ~~~
 ne(a: float, b: float) bool
@@ -1748,7 +1748,7 @@ func funNe_ffb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funNe_ssb
 
-Return true when the a does not equal b.
+Return true when two strings are not equal.
 
 ~~~
 ne(a: string, b: string) bool
@@ -1767,7 +1767,7 @@ func funNe_ssb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funGt_iib
 
-Return true when the a is greater than b.
+Return true when an int is greater then another int.
 
 ~~~
 gt(a: int, b: int) bool
@@ -1786,7 +1786,7 @@ func funGt_iib(variables: Variables; parameters: seq[Value]): FunResult
 
 # funGt_ffb
 
-Return true when the a is greater than b.
+Return true when one float is greater than another float.
 
 ~~~
 gt(a: float, b: float) bool
@@ -1805,7 +1805,7 @@ func funGt_ffb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funGte_iib
 
-Return true when the a is greater than or equal to b.
+Return true when an int is greater then or equal to another int.
 
 ~~~
 gte(a: int, b: int) bool
@@ -1824,7 +1824,7 @@ func funGte_iib(variables: Variables; parameters: seq[Value]): FunResult
 
 # funGte_ffb
 
-Return true when the a is greater than to equal to b.
+Return true when a float is greater than or equal to another float.
 
 ~~~
 gte(a: float, b: float) bool
@@ -1843,7 +1843,7 @@ func funGte_ffb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funLt_iib
 
-Return true when the a is less than b.
+Return true when an int is less than another int.
 
 ~~~
 lt(a: int, b: int) bool
@@ -1862,7 +1862,7 @@ func funLt_iib(variables: Variables; parameters: seq[Value]): FunResult
 
 # funLt_ffb
 
-Return true when the a is less than b.
+Return true when a float is less then another float.
 
 ~~~
 lt(a: float, b: float) bool
@@ -1881,7 +1881,7 @@ func funLt_ffb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funLte_iib
 
-Return true when the a is less than or equal to b.
+Return true when an int is less than or equal to another int.
 
 ~~~
 lte(a: int, b: int) bool
@@ -1901,7 +1901,7 @@ func funLte_iib(variables: Variables; parameters: seq[Value]): FunResult
 
 # funLte_ffb
 
-Return true when the a is less than or equal to b.
+Return true when a float is less than or equal to another float.
 
 ~~~
 lte(a: float, b: float) bool
@@ -1921,7 +1921,7 @@ func funLte_ffb(variables: Variables; parameters: seq[Value]): FunResult
 
 # funReadJson_sa
 
-Read the JSON string and return it as a variable.
+Convert a JSON string to a variable.
 
 ~~~
 readJson(json: string) any

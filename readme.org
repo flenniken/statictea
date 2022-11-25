@@ -618,11 +618,28 @@ name. For example:
 s.tea.black.earlgrey.vanilla
 #+END_SRC
 
-When you call a function variable without a prefix, statictea for
-it in the function dictionary. 
+You can leave off the “l” prefix from your non-function local
+variables, they are assumed to be in the local dictionary.
 
-Otherwise when you use a variable without a prefix, statictea
-looks for it in the local dictionary.
+#+BEGIN_SRC
+a = 5
+
+same as:
+
+l.a = 5
+#+END_SRC
+
+You can leave off the “f” prefix from functions you call, they
+are assumed to be in the function dictionary.  A function call is
+a variable followed by a left parentheses.
+
+#+BEGIN_SRC
+rt = cmp(a, b)
+
+same as:
+
+rt = f.cmp(a, b)
+#+END_SRC
 
 [[#contents][茶]]
 
@@ -643,7 +660,7 @@ s.address
 #+END_SRC
 
 A local variable is stored in the l (local) dictionary. L is
-implied for an unqualified name.
+implied for an unqualified non-function name.
 
 You can use the unreserved letters a, b, c, d, e and v, w, x, y, z
 for your variable names.
@@ -685,6 +702,8 @@ To give full control of the presentation to the template
 designers, the server json shouldn't contain any presentation
 data.
 
+[[#contents][茶]]
+
 ** Code Variables
 :PROPERTIES:
 :CUSTOM_ID: code-variables
@@ -720,14 +739,9 @@ l.tea = "earl grey"
 :CUSTOM_ID: function-variables
 :END:
 
-All the built in functions exist in the f dictionary.  See [[#func-type][Func Type]]
+All the built in functions exist in the f dictionary. F is
+implied for an unqualified function name you call.  See [[#func-type][Func Type]]
 for more information.
-
-#+BEGIN_SRC
-myCmp = cmp
-a = myCmp(7,2)
-a => 1
-#+END_SRC
 
 [[#contents][茶]]
 
@@ -1423,7 +1437,7 @@ There are three cmp functions so the f dictionary value for it is
 a list of three function variables:
 
 #+BEGIN_SRC
-cmp => [func, func, func]
+cmp => ["cmp","cmp","cmp"]
 #+END_SRC
 
 You can call a list of func variables. The function called is
@@ -1437,12 +1451,8 @@ Example calling a function given a list:
 value = f.cmp(1,2)
 #+END_SRC
 
-When you call a function variable without a prefix, statictea for
-it in the function dictionary. 
-
-#+BEGIN_SRC
-a = cmp
-#+END_SRC
+When you call a function variable without a prefix, statictea
+looks for it in the function dictionary.
 
 When a name has more than one function assigned to it is called
 overloaded.  When none of the overloaded functions match the
@@ -1635,7 +1645,7 @@ using multiline strings.  See the [[#multiline-strings][Multiline Strings]] sect
 The code files run after importing the JSON files so they have
 access to the server variables.
 
-You can use the local variables for intermediate values but the
+You can use the local variables for intermediate values but they
 disappear when the code file finishes running.  For example the
 "a" variable is local:
 
@@ -1731,8 +1741,8 @@ count = len(str)
 :END:
 
 You run StaticTea from the command line. You specify the template
-file to process along with the json data files and a result file
-is generated.
+file to process along with the json data files and code files and
+a result file is generated.
 
 - Warning messages go to standard error.
 - If you don't specify the result file, the result goes to standard out.
@@ -1755,8 +1765,8 @@ statictea \
 
 The StaticTea command line options:
 
-- help -- show options and usage then quit.
-- version -- outputs the version number.
+- help -- show options and usage help then quit
+- version -- show the version number then quit
 - server -- a server json file. You can specify multiple server
   options.
 - code -- a shared code file. You can specify multiple shared
@@ -1771,7 +1781,7 @@ The StaticTea command line options:
   multiple prepost options. When you specify a value, the
   defaults are no longer used. See the [[#prefix-postfix][Prefix
   Postfix]] section.
-- log - log to a file, see [[#logging][Logging]] section.
+- log - log to a file, see [[#logging][Logging]] section
 
 [[#contents][茶]]
 
@@ -1795,6 +1805,8 @@ The StaticTea command line options:
 - [[#docker-development][Docker Development]]
 - [[#mac-development][Mac Development]]
 
+[[#contents][茶]]
+
 ** Warning Messages
 :PROPERTIES:
    :CUSTOM_ID: warning-messages
@@ -1803,9 +1815,6 @@ The StaticTea command line options:
 When StaticTea detects a problem, a warning message is written to
 standard error, the problem is skipped, and processing
 continues.
-
-StaticTea returns success, return code 0, when there are no
-warning messages, else it returns 1.
 
 For example, if a variable in a replacement block is used but it
 doesn't exist, the bracketed variable remains as is in the
@@ -1884,6 +1893,52 @@ items, you could output a warning when it's zero:
 
 #+BEGIN_SRC
 if0(s.items, warn("no items"))
+#+END_SRC
+
+[[#contents][茶]]
+
+** Special Forms
+:PROPERTIES:
+   :CUSTOM_ID: special-forms
+   :END:
+
+The normal way functions behave when you call them is known as
+the normal form. A few functions deviate in one or more ways from
+the normal form and these are known as special forms.
+
+The normal form you call with parentheses and pass a fixed number
+of arguments which get evaluated before hand. The function
+returns a value and there are no side effects.
+
+A normal statement has a left side, an operator, and a right hand
+side, for example:
+
+#+BEGIN_SRC
+a = len(“tea”)
+#+END_SRC
+
+The functions with special forms and how they deviate from the
+normal form:
+
+- list - takes any number of arguments
+- if - conditional evaluates its arguments and it has a bare no
+  return value option, see see [[#if-functions][If Functions]]
+- and — conditional evaluates its arguments
+- or — conditional evaluates its arguments
+- warn — exits the statement like a normal warning
+- return - exits the command block or function
+
+Special Form Examples:
+
+#+BEGIN_SRC
+v = list(1,2,3,4,5,6,7)
+v = if(b, 5, 6)
+if(c, warn(“abc”))
+if(c, return(“abc”))
+v = and(c, d)
+v = or(c, d)
+warn(“the tea is hot”)
+return(1)
 #+END_SRC
 
 [[#contents][茶]]
@@ -2293,11 +2348,11 @@ tea>
 
 You can use the statictea docker image as a development
 environment.  It is a Debian system with the nim compiler and
-optional applications used to build and test.
+applications used to build and test.
 
-The statictea source folder is shared with the docker container,
-so you can use your own editor and applications on the host as
-well.
+The statictea host source folder is shared with the docker
+container, so you can use your own editor and applications on the
+host as well.
 
 Steps:
 
@@ -2404,9 +2459,9 @@ nimble release
 :ORDERED:  t
 :END:
 
-Functions allow you to format variables for presentation.  They
-return a value that you assign to a variable or pass to another
-function.
+Functions allow you to format variables for presentation in a
+replacement block.  They return a value that you assign to a
+variable or pass to another function.
 
 This section was created from the nim source code by running the
 readmefun nimble task which uses the StaticTea template
@@ -2417,7 +2472,7 @@ List of functions:
 # Dynamic Content Begins
 - [[#add][add]] -- Add two floats.
 - [[#add][add]] -- Add two integers.
-- [[#and][and]] -- Boolean and with short circuit.
+- [[#and][and]] -- Boolean AND with short circuit.
 - [[#bool][bool]] -- Create an bool from a value.
 - [[#case][case]] -- Compare integer cases and return the matching value.
 - [[#case][case]] -- Compare string cases and return the matching value.
@@ -2428,9 +2483,9 @@ List of functions:
 - [[#concat][concat]] -- Concatentate two strings.
 - [[#dict][dict]] -- Create a dictionary from a list of key, value pairs.
 - [[#dup][dup]] -- Duplicate a string x times.
-- [[#eq][eq]] -- Return true when the a equals b.
-- [[#eq][eq]] -- Return true when the a equals b.
-- [[#eq][eq]] -- Return true when the a equals b.
+- [[#eq][eq]] -- Return true when two floats are equal.
+- [[#eq][eq]] -- Return true when the two ints are equal.
+- [[#eq][eq]] -- Return true when two strings are equal.
 - [[#exists][exists]] -- Determine whether a key exists in a dictionary.
 - [[#find][find]] -- Find the position of a substring in a string.
 - [[#float][float]] -- Create a float from an int.
@@ -2441,10 +2496,10 @@ List of functions:
 - [[#get][get]] -- Get a list value by its index.
 - [[#githubAnchor][githubAnchor]] -- Create Github anchor names from heading names.
 - [[#githubAnchor][githubAnchor]] -- Create a Github anchor name from a heading name.
-- [[#gt][gt]] -- Return true when the a is greater than b.
-- [[#gt][gt]] -- Return true when the a is greater than b.
-- [[#gte][gte]] -- Return true when the a is greater than to equal to b.
-- [[#gte][gte]] -- Return true when the a is greater than or equal to b.
+- [[#gt][gt]] -- Return true when one float is greater than another float.
+- [[#gt][gt]] -- Return true when an int is greater then another int.
+- [[#gte][gte]] -- Return true when a float is greater than or equal to another float.
+- [[#gte][gte]] -- Return true when an int is greater then or equal to another int.
 - [[#if0][if0]] -- If the condition is 0, return the second argument, else return the third argument.
 - [[#if][if]] -- If the condition is true, return the second argument, else return the third argument.
 - [[#int][int]] -- Create an int from a float.
@@ -2456,19 +2511,19 @@ List of functions:
 - [[#len][len]] -- Number of elements in a dictionary.
 - [[#len][len]] -- Number of elements in a list.
 - [[#len][len]] -- Number of unicode characters in a string.
-- [[#list][list]] -- You create a list with the list function or with brackets.
+- [[#list][list]] -- Create a list of variables.
 - [[#lower][lower]] -- Lowercase a string.
-- [[#lt][lt]] -- Return true when the a is less than b.
-- [[#lt][lt]] -- Return true when the a is less than b.
-- [[#lte][lte]] -- Return true when the a is less than or equal to b.
-- [[#lte][lte]] -- Return true when the a is less than or equal to b.
-- [[#ne][ne]] -- Return true when the a does not equal b.
-- [[#ne][ne]] -- Return true when the a does not equal b.
-- [[#ne][ne]] -- Return true when the a does not equal b.
+- [[#lt][lt]] -- Return true when a float is less then another float.
+- [[#lt][lt]] -- Return true when an int is less than another int.
+- [[#lte][lte]] -- Return true when a float is less than or equal to another float.
+- [[#lte][lte]] -- Return true when an int is less than or equal to another int.
+- [[#ne][ne]] -- Return true when two floats are not equal.
+- [[#ne][ne]] -- Return true when two ints are not equal.
+- [[#ne][ne]] -- Return true when two strings are not equal.
 - [[#not][not]] -- Boolean not.
-- [[#or][or]] -- Boolean or with short circuit.
+- [[#or][or]] -- Boolean OR with short circuit.
 - [[#path][path]] -- Split a file path into its component pieces.
-- [[#readJson][readJson]] -- Read the JSON string and return it as a variable.
+- [[#readJson][readJson]] -- Convert a JSON string to a variable.
 - [[#replaceRe][replaceRe]] -- Replace multiple parts of a string using regular expressions.
 - [[#replace][replace]] -- Replace a substring specified by its position and length with another string.
 - [[#return][return]] -- Return the given value and control command looping.
@@ -2477,8 +2532,8 @@ List of functions:
 - [[#sort][sort]] -- Sort a list of lists.
 - [[#sort][sort]] -- Sort a list of dictionaries.
 - [[#startsWith][startsWith]] -- Check whether a strings starts with the given prefix.
-- [[#string][string]] -- Convert the variable to a string.
-- [[#string][string]] -- Convert the dictionary variable to dot names were you specify the name of the dictionary.
+- [[#string][string]] -- Convert a variable to a string.
+- [[#string][string]] -- Convert the dictionary variable to dot names.
 - [[#type][type]] -- Return the parameter type, one of: int, float, string, list, dict, bool or func.
 - [[#values][values]] -- Create a list out of the values in the specified dictionary.
 - [[#warn][warn]] -- Return a warning message and skip the current statement.
@@ -2531,7 +2586,7 @@ add(-2, -5) => -7
 :CUSTOM_ID: and
 :END:
 
-Boolean and with short circuit. If the first argument is false, the second argument is not evaluated.
+Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
 
 #+BEGIN_SRC
 and(a: bool, b: bool) bool
@@ -2761,7 +2816,7 @@ cmp("Tea", "tea", false) => 0
 :CUSTOM_ID: concat
 :END:
 
-Concatentate two strings. See join for more that two arguments.
+Concatentate two strings. See [[#join][join]] for more that two arguments.
 
 #+BEGIN_SRC
 concat(a: string, b: string) string
@@ -2828,7 +2883,7 @@ dup("", 3) => ""
 :CUSTOM_ID: eq
 :END:
 
-Return true when the a equals b.
+Return true when two floats are equal.
 
 #+BEGIN_SRC
 eq(a: float, b: float) bool
@@ -2848,7 +2903,7 @@ eq(1.2, 3.2) => false
 :CUSTOM_ID: eq
 :END:
 
-Return true when the a equals b.
+Return true when the two ints are equal.
 
 #+BEGIN_SRC
 eq(a: int, b: int) bool
@@ -2868,7 +2923,7 @@ eq(2, 3) => false
 :CUSTOM_ID: eq
 :END:
 
-Return true when the a equals b.
+Return true when two strings are equal.  See [[#cmd][cmd]] for case insensitive compare.
 
 #+BEGIN_SRC
 eq(a: string, b: string) bool
@@ -3149,7 +3204,7 @@ $$ : anchor = githubAnchor(entry.name)
 :CUSTOM_ID: gt
 :END:
 
-Return true when the a is greater than b.
+Return true when one float is greater than another float.
 
 #+BEGIN_SRC
 gt(a: float, b: float) bool
@@ -3169,7 +3224,7 @@ gt(3.1, 2.5) => true
 :CUSTOM_ID: gt
 :END:
 
-Return true when the a is greater than b.
+Return true when an int is greater then another int.
 
 #+BEGIN_SRC
 gt(a: int, b: int) bool
@@ -3189,7 +3244,7 @@ gt(3, 2) => true
 :CUSTOM_ID: gte
 :END:
 
-Return true when the a is greater than to equal to b.
+Return true when a float is greater than or equal to another float.
 
 #+BEGIN_SRC
 gte(a: float, b: float) bool
@@ -3209,7 +3264,7 @@ gte(3.1, 3.1) => true
 :CUSTOM_ID: gte
 :END:
 
-Return true when the a is greater than or equal to b.
+Return true when an int is greater then or equal to another int.
 
 #+BEGIN_SRC
 gte(a: int, b: int) bool
@@ -3568,7 +3623,7 @@ len("añyóng") => 6
 :CUSTOM_ID: list
 :END:
 
-You create a list with the list function or with brackets.
+Create a list of variables. You can also create a list with brackets.
 
 #+BEGIN_SRC
 list(...) list
@@ -3615,7 +3670,7 @@ lower("TEĀ") => "teā"
 :CUSTOM_ID: lt
 :END:
 
-Return true when the a is less than b.
+Return true when a float is less then another float.
 
 #+BEGIN_SRC
 lt(a: float, b: float) bool
@@ -3635,7 +3690,7 @@ lt(3.1, 2.5) => false
 :CUSTOM_ID: lt
 :END:
 
-Return true when the a is less than b.
+Return true when an int is less than another int.
 
 #+BEGIN_SRC
 lt(a: int, b: int) bool
@@ -3655,7 +3710,7 @@ gt(3, 2) => false
 :CUSTOM_ID: lte
 :END:
 
-Return true when the a is less than or equal to b.
+Return true when a float is less than or equal to another float.
 
 #+BEGIN_SRC
 lte(a: float, b: float) bool
@@ -3676,7 +3731,7 @@ lte(4.0, 3.0) => false
 :CUSTOM_ID: lte
 :END:
 
-Return true when the a is less than or equal to b.
+Return true when an int is less than or equal to another int.
 
 #+BEGIN_SRC
 lte(a: int, b: int) bool
@@ -3697,7 +3752,7 @@ lte(4, 3) => false
 :CUSTOM_ID: ne
 :END:
 
-Return true when the a does not equal b.
+Return true when two floats are not equal.
 
 #+BEGIN_SRC
 ne(a: float, b: float) bool
@@ -3717,7 +3772,7 @@ ne(1.2, 3.2) => true
 :CUSTOM_ID: ne
 :END:
 
-Return true when the a does not equal b.
+Return true when two ints are not equal.
 
 #+BEGIN_SRC
 ne(a: int, b: int) bool
@@ -3737,7 +3792,7 @@ ne(2, 3) => true
 :CUSTOM_ID: ne
 :END:
 
-Return true when the a does not equal b.
+Return true when two strings are not equal.
 
 #+BEGIN_SRC
 ne(a: string, b: string) bool
@@ -3777,7 +3832,7 @@ not(false) => true
 :CUSTOM_ID: or
 :END:
 
-Boolean or with short circuit. If the first argument is true, the second argument is not evaluated.
+Boolean OR with short circuit. If the first argument is true, the second argument is not evaluated.
 
 #+BEGIN_SRC
 or(a: bool, b: bool) bool
@@ -3836,7 +3891,7 @@ path("src\runFunction.nim", "\") => {
 :CUSTOM_ID: readJson
 :END:
 
-Read the JSON string and return it as a variable.
+Convert a JSON string to a variable.
 
 #+BEGIN_SRC
 readJson(json: string) any
@@ -4127,7 +4182,7 @@ b => false
 :CUSTOM_ID: string
 :END:
 
-Convert the variable to a string.
+Convert a variable to a string. You specify the variable and optionally the type of output you want.
 
 #+BEGIN_SRC
 string(var: any, optional stype: string) string
@@ -4191,7 +4246,7 @@ y = 2
 :CUSTOM_ID: string
 :END:
 
-Convert the dictionary variable to dot names were you specify the name of the dictionary.
+Convert the dictionary variable to dot names. You specify the name of the dictionary and the dict variable.
 
 #+BEGIN_SRC
 string(dictName: string: d: dict) string
@@ -4271,7 +4326,7 @@ You can warn conditionally in a bare if statement:
 
 #+BEGIN_SRC
 if0(c, warn("message is 0"))
-#+BEGIN_SRC
+#+END_SRC
 
 You can warn conditionally in a normal if statement. In the
 following example, if warn is called the b variable will not
@@ -4279,7 +4334,7 @@ get created.
 
 #+BEGIN_SRC
 b = if0(c, warn("c is not 0"), "")
-#+BEGIN_SRC
+#+END_SRC
 
 You can warn unconditionally using a bare warn statement:
 
