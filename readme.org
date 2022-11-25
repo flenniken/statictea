@@ -1791,11 +1791,12 @@ The StaticTea command line options:
 :END:
 
 - [[#warning-messages][Warning Messages]]
-- [[#if-functions][If Functions]]
 - [[#prefix-postfix][Prefix Postfix]]
 - [[#encoding-and-line-endings][Encoding and Line Endings]]
 - [[#update-option][Update Option]]
 - [[#logging][Logging]]
+- [[#special-forms][Special Forms]]
+- [[#if-functions][If Functions]]
 - [[#module-docs][Module Docs]]
 - [[#html-formatted-json][HTML Formatted Json]]
 - [[#nimble-tasks][Nimble Tasks]]
@@ -1894,99 +1895,6 @@ items, you could output a warning when it's zero:
 #+BEGIN_SRC
 if0(s.items, warn("no items"))
 #+END_SRC
-
-[[#contents][茶]]
-
-** Special Forms
-:PROPERTIES:
-   :CUSTOM_ID: special-forms
-   :END:
-
-The normal way functions behave when you call them is known as
-the normal form. A few functions deviate in one or more ways from
-the normal form and these are known as special forms.
-
-The normal form you call with parentheses and pass a fixed number
-of arguments which get evaluated before hand. The function
-returns a value and there are no side effects.
-
-A normal statement has a left side, an operator, and a right hand
-side, for example:
-
-#+BEGIN_SRC
-a = len(“tea”)
-#+END_SRC
-
-The functions with special forms and how they deviate from the
-normal form:
-
-- list - takes any number of arguments
-- if - conditional evaluates its arguments and it has a bare no
-  return value option, see see [[#if-functions][If Functions]]
-- and — conditional evaluates its arguments
-- or — conditional evaluates its arguments
-- warn — exits the statement like a normal warning
-- return - exits the command block or function
-
-Special Form Examples:
-
-#+BEGIN_SRC
-v = list(1,2,3,4,5,6,7)
-v = if(b, 5, 6)
-if(c, warn(“abc”))
-if(c, return(“abc”))
-v = and(c, d)
-v = or(c, d)
-warn(“the tea is hot”)
-return(1)
-#+END_SRC
-
-[[#contents][茶]]
-
-** If Functions
-:PROPERTIES:
-   :CUSTOM_ID: if-functions
-   :END:
-
-The if and if0 functions are special in a couple of ways. They
-conditionally evaluate their arguments and they can be used in a
-statement without an assignment.
-
-There are two forms, one with assignment and one without. The
-assignment form has three parameters and the other one has two.
-Here is an example of each:
-
-#+BEGIN_SRC
-a = if(true, 1, 2)
-if(c, warn("c is true"))
-#+END_SRC
-
-The no assignment form is used with the warn and return functions
-for their side effects.
-
-The if functions evaluates their condition argument first to
-determine which argument to evaluate next and the non-matching
-argument is skipped. This is important when you use the warn or
-return functions to control the statement flow and it is
-different from the other functions which evaluate all their
-arguments before passing them to the function.
-
-In the following example do1 is executed and doOther is skipped.
-
-#+BEGIN_SRC
-a = if(true, do1(), doOther())
-#+END_SRC
-
-The next example has a warn call in it.  If all the arguments
-were evaluated, the warn would run everytime.
-
-#+BEGIN_SRC
-a = if0(0, do0(), warn("not zero"))
-#+END_SRC
-
-The warn and return functions modify the statement flow.  The
-warn function skips the current statement and the return function
-ends the current command.
 
 [[#contents][茶]]
 
@@ -2143,6 +2051,99 @@ file and line number of the replacement block appear there.
 2021-12-07 22:03:59.910; statictea.nim(69); Return code: 0
 2021-12-07 22:03:59.910; statictea.nim(70); Done
 #+END_SRC
+
+[[#contents][茶]]
+
+** Special Forms
+:PROPERTIES:
+   :CUSTOM_ID: special-forms
+   :END:
+
+The normal way functions behave when you call them is known as
+the normal form. A few functions deviate in one or more ways from
+the normal form and these are known as special forms.
+
+The normal form you call with parentheses and pass a fixed number
+of arguments which get evaluated before hand. The function
+returns a value and there are no side effects.
+
+A normal statement has a left side, an operator, and a right hand
+side, for example:
+
+#+BEGIN_SRC
+a = len(“tea”)
+#+END_SRC
+
+The functions with special forms and how they deviate from the
+normal form:
+
+- list - takes any number of arguments
+- if - conditional evaluates its arguments and it has a bare no
+  return value option, see see [[#if-functions][If Functions]]
+- and — conditional evaluates its arguments
+- or — conditional evaluates its arguments
+- warn — exits the statement like a normal warning
+- return - exits the command block or function
+
+Special Form Examples:
+
+#+BEGIN_SRC
+v = list(1,2,3,4,5,6,7)
+v = if(b, 5, 6)
+if(c, warn(“abc”))
+if(c, return(“abc”))
+v = and(c, d)
+v = or(c, d)
+warn(“the tea is hot”)
+return(1)
+#+END_SRC
+
+[[#contents][茶]]
+
+** If Functions
+:PROPERTIES:
+   :CUSTOM_ID: if-functions
+   :END:
+
+The if and if0 functions are special in a couple of ways. They
+conditionally evaluate their arguments and they can be used in a
+statement without an assignment.
+
+There are two forms, one with assignment and one without. The
+assignment form has three parameters and the other one has two.
+Here is an example of each:
+
+#+BEGIN_SRC
+a = if(true, 1, 2)
+if(c, warn("c is true"))
+#+END_SRC
+
+The no assignment form is used with the warn and return functions
+for their side effects.
+
+The if functions evaluates their condition argument first to
+determine which argument to evaluate next and the non-matching
+argument is skipped. This is important when you use the warn or
+return functions to control the statement flow and it is
+different from the other functions which evaluate all their
+arguments before passing them to the function.
+
+In the following example do1 is executed and doOther is skipped.
+
+#+BEGIN_SRC
+a = if(true, do1(), doOther())
+#+END_SRC
+
+The next example has a warn call in it.  If all the arguments
+were evaluated, the warn would run everytime.
+
+#+BEGIN_SRC
+a = if0(0, do0(), warn("not zero"))
+#+END_SRC
+
+The warn and return functions modify the statement flow.  The
+warn function skips the current statement and the return function
+ends the current command.
 
 [[#contents][茶]]
 
