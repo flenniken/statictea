@@ -26,20 +26,7 @@ The special forms and how they deviate from the normal form:
 * and — conditional evaluation of arguments
 * or — conditional evaluation of arguments
 * warn — no return value, exits the statement like a normal warning
-* return - no return value, exits command block or function
-
-Special Form Examples:
-
-~~~
-v = list(1,2,3,4,5,6,7)
-v = if(b, 5, 6)
-if(c, warn(“abc”))
-if(c, return(“abc”))
-v = and(c, d)
-v = or(c, d)
-warn(“abc”)
-return(1)
-~~~
+* return - exits command block or function
 
 
 ### File cmd.sh command nonZeroReturn
@@ -58,9 +45,17 @@ $statictea \
 ~~~
 $$ block
 $$ :
-o.r1 = {o.r1}
-o.r2 = {o.r2}
-o.r3 = {o.r3}
+o.v = {o.v} = [1,2,3,4,5,6,7]
+o.r1 = {o.r1} = {{o.r1}
+o.r2 = {o.r2} = {{o.r2}
+o.r3 = {o.r3} = 5
+o.v1 = {o.v1} = false
+o.v2 = {o.v2} = false
+o.v3 = {o.v3} = true
+o.v4 = {o.v4} = {{o.v4}
+o.v5 = {o.v5} = return taken
+o.v6 = {o.v6} = 3
+o.v7 = {o.v7} = 1
 $$ endblock
 ~~~
 
@@ -76,6 +71,9 @@ $$ endblock
 ### File shared.tea
 
 ~~~
+# Create a list of 7 ints.
+o.v = list(1,2,3,4,5,6,7)
+
 # Try to call "a" which is not defined.
 o.r1 = a(true, 1, 2)
 
@@ -83,18 +81,43 @@ o.r1 = a(true, 1, 2)
 a = 5
 o.r2 = a(true, 3, 4)
 
+# Call if from a variable.
 o.iffunc = f.if
 o.r3 = o.iffunc(true, 5, 6)
 
+o.v1 = and(false, warn("not expected AND message"))
+addfunc = f.and
+o.v2 = l.addfunc(false, warn("not expected addfunc"))
 
+orfunc = f.or
+o.v3 = l.orfunc(true, warn("not expected orfunc"))
+
+warnfunc = f.warn
+o.v4 = l.warnfunc("calling warn"))
+
+returnfunc = f.return
+o.v5 = l.returnfunc("return taken")
+
+if(false, "not expected IF message")
+if(true, "if true message")
+o.v6 = if(true, 3, "not hit")
+o.v7 = if(false, "not hit", 1)
 ~~~
 
 ### File result.expected
 
 ~~~
-o.r1 = {o.r1}
-o.r2 = {o.r2}
-o.r3 = 6
+o.v = [1,2,3,4,5,6,7] = [1,2,3,4,5,6,7]
+o.r1 = {o.r1} = {o.r1}
+o.r2 = {o.r2} = {o.r2}
+o.r3 = 5 = 5
+o.v1 = false = false
+o.v2 = false = false
+o.v3 = true = true
+o.v4 = {o.v4} = {o.v4}
+o.v5 = return taken = return taken
+o.v6 = 3 = 3
+o.v7 = 1 = 1
 ~~~
 
 ### File stdout.expected
@@ -105,14 +128,16 @@ o.r3 = 6
 ### File stderr.expected
 
 ~~~
-shared.tea(2): w224: The variable 'a' isn't in the f dictionary.
+shared.tea(5): w224: The variable 'a' isn't in the f dictionary.
 statement: o.r1 = a(true, 1, 2)
                   ^
-shared.tea(6): w224: The variable 'a' isn't in the f dictionary.
+shared.tea(9): w224: The variable 'a' isn't in the f dictionary.
 statement: o.r2 = a(true, 3, 4)
                   ^
-tmpl.txt(3): w58: The replacement variable doesn't exist: o.r1.
-tmpl.txt(4): w58: The replacement variable doesn't exist: o.r2.
+shared.tea(23): calling warn
+tmpl.txt(4): w58: The replacement variable doesn't exist: o.r1.
+tmpl.txt(5): w58: The replacement variable doesn't exist: o.r2.
+tmpl.txt(10): w58: The replacement variable doesn't exist: o.v4.
 ~~~
 
 ### Expected result == result.expected

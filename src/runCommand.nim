@@ -1037,11 +1037,11 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
 
       # Handle the special if functions.
       if specialFunc != nil and specialFunc.name in ["if", "if0"]:
-        return ifFunctions(dotNameStr, statement, start+dotNameLen, variables)
+        return ifFunctions(specialFunc.name, statement, start+dotNameLen, variables)
 
       # Handle the special and/or functions.
       if specialFunc != nil and specialFunc.name in ["and", "or"]:
-        return andOrFunctions(dotNameStr, statement, start+dotNameLen, variables)
+        return andOrFunctions(specialFunc.name, statement, start+dotNameLen, variables)
 
       return getFunctionValueAndPos(dotNameStr, statement,
         start+dotNameLen, variables, false)
@@ -1149,10 +1149,10 @@ proc runStatement*(statement: Statement, variables: Variables):
 
   if leftParenBrack == "(" and specialFunc != nil and specialFunc.name in ["if0", "if"]:
     # Handle the special bare if functions.
-    vlOr = ifFunctions(dotNameStr, statement, leadingLen, variables, bare=true)
-  elif leftParenBrack == "(" and dotNameStr == "warn":
+    vlOr = ifFunctions(specialFunc.name, statement, leadingLen, variables, bare=true)
+  elif leftParenBrack == "(" and specialFunc != nil and specialFunc.name == "warn":
     # Handle a bare warn function.
-    vlOr = getFunctionValueAndPos(dotNameStr, statement, leadingLen, variables)
+    vlOr = getFunctionValueAndPos(specialFunc.name, statement, leadingLen, variables)
   else:
     # Handle normal "varName operator right" statements.
     varName = dotNameStr

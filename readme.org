@@ -2082,8 +2082,8 @@ normal form:
   return value option, see see [[#if-functions][If Functions]]
 - and — conditional evaluates its arguments
 - or — conditional evaluates its arguments
-- warn — exits the statement like a normal warning
-- return - exits the command block or function
+- warn — exits the statement like a normal warning with no return value
+- return - exits the command block or function with a return value
 
 Special Form Examples:
 
