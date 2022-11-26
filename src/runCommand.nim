@@ -555,8 +555,9 @@ proc ifFunctions*(
   # Match ) and trailing whitespace.
   let parenO = matchSymbol(statement.text, gRightParentheses, runningPos)
   if not parenO.isSome:
-    # Expected two or three parameters.
-    return newValueAndPosOr(wTwoOrThreeParams, "", runningPos)
+    # No matching end right parentheses.
+    return newValueAndPosOr(wNoMatchingParen, "", runningPos)
+
   runningPos += parenO.get().length
 
   if bare:

@@ -1,0 +1,149 @@
+stf file, version 0.1.0
+
+# Replacment Block
+
+Test the replacement block basics.
+
+### File cmd.sh command
+
+~~~
+$statictea \
+  -s server.json \
+  -o shared.tea \
+  -t tmpl.txt \
+  -r result >stdout 2>stderr
+~~~
+
+
+### File tmpl.txt
+
+~~~
+$$ block variable = "var"
+this is a replacement block
+and here is an ending bracket: }
+Here is a normal {variable}.
+Here is an example of just text {{text} not a variable.
+$$ endblock
+
+Second replacement block:
+----
+$$ block t.repeat = 2
+This block repeats twice.
+Server variable name = {s.name}.
+Server var type = {s.type}
+Tea code file o.name = {o.name}
+Tea code file o.type = {o.type}
+
+$$ endblock
+----
+$$ nextline t.repeat = 3
+$$ : num = add(t.row, 1)
+* {num} -- this nextline replacement block repeats 3 times
+
+Stop on row 2:
+$$ nextline t.repeat = 3
+$$ : num = add(t.row, 1)
+$$ : if((num == 2), return("stop"))
+* {num} -- stop on row 2
+
+Skip row 2:
+$$ nextline t.repeat = 3
+$$ : num = add(t.row, 1)
+$$ : if((num == 2), return("skip"))
+* {num} -- skip row 2
+
+Stop on row 2:
+$$ nextline t.repeat = 3
+$$ : num = add(t.row, 1)
+$$ : a = if((num == 2), return("stop"), 1)
+* {num} -- stop on row 2
+
+Skip row 2:
+$$ nextline t.repeat = 3
+$$ : num = add(t.row, 1)
+$$ : a = if((num == 2), return("skip"), 1)
+* {num} -- skip row 2
+
+Loop 3 times:
+$$ nextline t.repeat = 3
+$$ : num = add(t.row, 1)
+$$ : if((num == 2), return(""))
+* {num} -- using "" to continue
+~~~
+
+### File server.json
+
+~~~
+{
+  "name": "server",
+  "type": "json"
+}
+~~~
+
+### File shared.tea
+
+~~~
+o.name = "shared"
+o.type = "json"
+~~~
+
+### File result.expected
+
+~~~
+this is a replacement block
+and here is an ending bracket: }
+Here is a normal var.
+Here is an example of just text {text} not a variable.
+
+Second replacement block:
+----
+This block repeats twice.
+Server variable name = server.
+Server var type = json
+Tea code file o.name = shared
+Tea code file o.type = json
+
+This block repeats twice.
+Server variable name = server.
+Server var type = json
+Tea code file o.name = shared
+Tea code file o.type = json
+
+----
+* 1 -- this nextline replacement block repeats 3 times
+* 2 -- this nextline replacement block repeats 3 times
+* 3 -- this nextline replacement block repeats 3 times
+
+Stop on row 2:
+* 1 -- stop on row 2
+
+Skip row 2:
+* 1 -- skip row 2
+* 3 -- skip row 2
+
+Stop on row 2:
+* 1 -- stop on row 2
+
+Skip row 2:
+* 1 -- skip row 2
+* 3 -- skip row 2
+
+Loop 3 times:
+* 1 -- using "" to continue
+* 2 -- using "" to continue
+* 3 -- using "" to continue
+~~~
+
+### File stdout.expected
+
+~~~
+~~~
+
+### File stderr.expected
+
+~~~
+~~~
+
+### Expected result == result.expected
+### Expected stdout == stdout.expected
+### Expected stderr == stderr.expected

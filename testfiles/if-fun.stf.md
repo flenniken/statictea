@@ -1,16 +1,10 @@
 stf file, version 0.1.0
 
-# If Function
+# If Functions
 
-Test the if0 function.
+Test the if functions.
 
-If the condition is 0, return the second parameter, else return
-the third parameter. Return 0 for the else case when there is no
-third parameter.
 
-~~~
-if0(condition: int, then: any, optional else: any) any
-~~~
 
 ### File cmd.sh command nonZeroReturn
 
@@ -58,6 +52,14 @@ $$ endblock
 $$ nextline a = if(true, 1)
 $$ : if(true, 1, 2)
 assignment or not
+
+Test number of args.
+$$ block
+$$ : # No return version takes two arguments:
+$$ : if(true, 1, 2)
+$$ : # Return version takes three arguments:
+$$ : a = if(true, 1)
+$$ endblock
 ~~~
 
 ### File result.expected
@@ -76,6 +78,8 @@ Warn that c is 0.
 Warn that c is 1.
 
 assignment or not
+
+Test number of args.
 ~~~
 
 ### File stdout.expected
@@ -94,6 +98,12 @@ statement: a = if(true, 1)
 tmpl.txt(36): w213: An if without an assignment takes two arguments.
 statement: if(true, 1, 2)
                      ^
+tmpl.txt(42): w213: An if without an assignment takes two arguments.
+statement: if(true, 1, 2)
+                     ^
+tmpl.txt(44): w212: An if with an assignment takes three arguments.
+statement: a = if(true, 1)
+                         ^
 ~~~
 
 ### Expected result == result.expected

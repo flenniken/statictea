@@ -371,7 +371,7 @@ substitution. Each variable gets replaced with its value.
 
 You can repeat the block to make lists and other repeating
 content. You control how many times the block repeats with the
-t.repeat variable.  You can skip and exit early with the return
+t.repeat variable.  You can skip and stop early with the return
 function. The t.row counts the number of times the block has
 repeated and you use its value to customize each repeated block.
 See [[#trow][t.row]] for an example.

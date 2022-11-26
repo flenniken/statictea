@@ -1070,6 +1070,18 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr(wAssignmentIf, "", 25)
     check testRunStatement(statement, eVariableDataOr)
 
+  test "if missing right paren":
+    let text = """a = if0(1, return("stop"), 2"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr(wNoMatchingParen, "", 28)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "if missing right paren 2":
+    let text = """if0(1, return("stop")"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr(wNoMatchingParen, "", 21)
+    check testRunStatement(statement, eVariableDataOr)
+
   test "return no stop":
     let text = """a = if0(0, [1,2,return("stop")])"""
     let statement = newStatement(text)
