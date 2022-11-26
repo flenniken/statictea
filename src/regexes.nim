@@ -177,6 +177,13 @@ func get3Groups*(matchesO: Option[Matches]): (string, string, string) =
   assert(matchesO.isSome, "Not a match")
   result = matchesO.get().get3Groups()
 
+func get3GroupsLen*(matchesO: Option[Matches]):
+    (string, string, string, Natural) =
+  ## Return the three groups and the length of the match.
+  let matches = matchesO.get()
+  let (one, two, three) = matches.get3Groups()
+  result = (one, two, three, matches.length)
+
 func getGroups*(matches: Matches, numGroups: Natural): seq[string] =
   ## Return the number of groups specified. If one of the groups doesn't
   ## exist, "" is returned for it.

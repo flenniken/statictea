@@ -19,7 +19,6 @@ starts in the template file.
 * [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
 * [`==`](#-2) &mdash; Return true when the two statements are equal.
 * [`$`](#-3) &mdash; Return a string representation of a Statement.
-* [get3GroupsLen](#get3groupslen) &mdash; Return the three groups and the length of the match.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
 * [getMultilineStr](#getmultilinestr) &mdash; Return the triple quoted string literal.
 * [getString](#getstring) &mdash; Return a literal string value and position after it.
@@ -150,14 +149,6 @@ Return a string representation of a Statement.
 
 ```nim
 func `$`(s: Statement): string
-```
-
-# get3GroupsLen
-
-Return the three groups and the length of the match.
-
-```nim
-func get3GroupsLen(matchesO: Option[Matches]): (string, string, string, Natural)
 ```
 
 # yieldStatements

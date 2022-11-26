@@ -59,6 +59,7 @@ check resultStringO.get() == "456456"
 * [get2Groups](#get2groups-1) &mdash; Get two groups in matches.
 * [get3Groups](#get3groups) &mdash; Get three groups in matches.
 * [get3Groups](#get3groups-1) &mdash; Get three groups in matches.
+* [get3GroupsLen](#get3groupslen) &mdash; Return the three groups and the length of the match.
 * [getGroups](#getgroups) &mdash; Return the number of groups specified.
 * [getGroups](#getgroups-1) &mdash; Return the number of groups specified.
 * [matchPattern](#matchpattern) &mdash; Match a regular expression pattern in a string.
@@ -197,6 +198,14 @@ Get three groups in matches.
 
 ```nim
 func get3Groups(matchesO: Option[Matches]): (string, string, string)
+```
+
+# get3GroupsLen
+
+Return the three groups and the length of the match.
+
+```nim
+func get3GroupsLen(matchesO: Option[Matches]): (string, string, string, Natural)
 ```
 
 # getGroups

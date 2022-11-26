@@ -278,7 +278,8 @@ proc testGetFunctionValueAndPos(
   if not result:
     echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
-proc testRunStatement(statement: Statement, eVariableDataOr: VariableDataOr, variables: Variables = nil): bool =
+proc testRunStatement(statement: Statement, eVariableDataOr: VariableDataOr,
+    variables: Variables = nil): bool =
   var vars: Variables
   if variables == nil:
     let funcsVarDict = createFuncDictionary().dictv

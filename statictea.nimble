@@ -1015,11 +1015,14 @@ task drun, "\tRun a statictea debian docker build env.":
     exec runCmd
   else:
     echo fmt"The {staticteaContainer} does not exist, creating it..."
-    # todo: get statictea the folder dynamically.
-    let staticteaFolder = "/Users/steve/code/statictea"
-    let shared_option = fmt"-v {staticteaFolder}:/home/teamaster/statictea"
-    let createCmd = fmt"docker run --name={staticteaContainer} -it {shared_option} {staticteaImage}"
-    exec createCmd
+    let dir = getCurrentDir()
+    let staticteaFolder = joinPath(dir, "code", "statictea")
+    if not fileExists(staticteaFolder):
+      echo fmt"Missing dir: {staticteaFolder}"
+    else:
+      let shared_option = fmt"-v {staticteaFolder}:/home/teamaster/statictea"
+      let createCmd = fmt"docker run --name={staticteaContainer} -it {shared_option} {staticteaImage}"
+      exec createCmd
 
 task ddelete, "\tDelete the statictea docker image and container.":
   if existsEnv("statictea_env"):

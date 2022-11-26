@@ -187,8 +187,6 @@ func cmdLine*(options: openArray[CmlOption],
   ## contains a message telling the problem. Use collectArgs() to
   ## generate the arguments. Parse uses "arg value" not "arg=value".
 
-  # todo: is it easy to post process to support arg=value on an option?
-
   # shortOptions maps a short option letter to its option.
   var shortOptions: OrderedTable[char, CmlOption]
 

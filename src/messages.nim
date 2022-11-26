@@ -475,7 +475,6 @@ type
     ## * warning -- the message id
     ## * p1 -- the optional string substituted for the message's $1.
     ## * pos -- the index in the statement where the warning was detected.
-    # todo: rename "warning" to "messageId".
     messageId*: MessageId
     p1*: string
     pos*: Natural

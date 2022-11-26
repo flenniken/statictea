@@ -180,14 +180,6 @@ func `$`*(s: Statement): string =
   ## Return a string representation of a Statement.
   result = """$1, $2: "$3"""" % [$s.lineNum, $s.start, s.text]
 
-# todo: move this
-func get3GroupsLen*(matchesO: Option[Matches]):
-    (string, string, string, Natural) =
-  ## Return the three groups and the length of the match.
-  let matches = matchesO.get()
-  let (one, two, three) = matches.get3Groups()
-  result = (one, two, three, matches.length)
-
 iterator yieldStatements*(cmdLines: CmdLines): Statement =
   ## Iterate through the command's statements. Skip blank statements.
 
