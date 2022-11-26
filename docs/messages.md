@@ -323,7 +323,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "",                     ## wTwoOrMoreParameters
     "The maxRepeat value must be greater than or equal to t.repeat.", ## wInvalidMaxRepeat
     "The t.content variable is not set for the replace command, treating it like the block command.", ## wContentNotSet
-    "Expected two or three arguments.", ## wTwoOrThreeParams
+    "",                     ## wTwoOrThreeParams
     "The argument must be an integer.", ## wExpectedInteger
     "",                     ## wAllIntOrFloat
     "Overflow or underflow.", ## wOverflow
