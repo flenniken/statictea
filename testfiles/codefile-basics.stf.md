@@ -4,7 +4,7 @@ stf file, version 0.1.0
 
 Test using a code file.
 
-### File cmd.sh command
+### File cmd.sh command nonZeroReturn
 
 ~~~
 $statictea \
@@ -26,6 +26,9 @@ o.e = {o.e}
 o.x = {o.x}
 o.xLen = {o.xLen}
 o.sum = {o.sum}
+$$ endblock
+
+$$ block o.hello = "not allowed"
 $$ endblock
 ~~~
 
@@ -60,6 +63,7 @@ Green
 White
 o.xLen = 17
 o.sum = 8
+
 ~~~
 
 ### File stdout.expected
@@ -70,6 +74,9 @@ o.sum = 8
 ### File stderr.expected
 
 ~~~
+tmpl.txt(12): w182: You can only change code variables in code files.
+statement: o.hello = "not allowed"
+           ^
 ~~~
 
 ### Expected result == result.expected
