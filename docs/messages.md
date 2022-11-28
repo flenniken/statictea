@@ -198,7 +198,7 @@ MessageId = enum
   wSameAsTemplate,          ## w174
   wSameAsResult,            ## w175
   wResultWithUpdate,        ## w176
-  wSkipStopOrEmpty,         ## w177
+  wSkipOrStop,              ## w177
   wUpdateReadonly,          ## w178
   wNotEnoughArgsOpt,        ## w179
   wTooManyArgsOpt,          ## w180
@@ -431,7 +431,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The template and $1 files are the same.", ## wSameAsTemplate
     "The result and $1 files are the same.", ## wSameAsResult
     "The result file is used with the update option.", ## wResultWithUpdate
-    "Expected \'skip\', \'stop\' or \'\' for the block command return value.", ## wSkipStopOrEmpty
+    "Expected \'skip\' or \'stop\' for the return function value.", ## wSkipOrStop
     "Cannot update the readonly template.", ## wUpdateReadonly
     "The function requires at least $1 arguments.", ## wNotEnoughArgsOpt
     "The function requires at most $1 arguments.", ## wTooManyArgsOpt

@@ -110,7 +110,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
   var firstReplaceLine: string
 
   # Read and process template lines.
-  var loopControl = ""
+  var loopControl = lcContinue
   var tea = variables["t"].dictv
   while true:
     # Read template lines and write out non-commands lines. When a
@@ -144,7 +144,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
     # If repeat is 0, read the replacement lines and the endblock and
     # discard them.
-    if repeat == 0 or loopControl == "stop":
+    if repeat == 0 or loopControl == lcStop:
       for replaceLine in yieldReplacementLine(env,
         firstReplaceLine, lb, prepostTable, command, maxLines):
         discard
@@ -183,7 +183,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     while true:
       # Write out all the stored replacement block lines and make the
       # variable substitutions.
-      if loopControl == "":
+      if loopControl != lcSkip:
         writeTempSegments(env, tempSegments, startLineNum, variables)
 
       # Increment the row variable.
@@ -194,7 +194,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
       # Run the command and fill in the variables.
       loopControl = runCommand(env, cmdLines, variables)
-      if loopControl == "stop":
+      if loopControl == lcStop:
         break
 
     closeDeleteTempSegments(tempSegments)

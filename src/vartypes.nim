@@ -81,6 +81,17 @@ type
         parameter*: Natural ## Index of problem parameter.
         warningData*: WarningData
 
+  SideEffect* = enum
+    ## The kind of side effect for a statement.
+    ## @:
+    ## @:* seNone -- no side effect, the normal case
+    ## @:* seReturn -- a return side effect, either stop or skip. stop
+    ## @:the command or skip the replacement block iteration.
+    ## @:* seLogMessage -- the log function specified to write a message to the log file
+    seNone,
+    seReturn,
+    seLogMessage,
+
   ValueAndPos* = object
     ## A value and the position after the value in the statement. The
     ## position includes the trailing whitespace.  For the example
@@ -97,7 +108,7 @@ type
     ## @:Exit is set true by the return function to exit a command.
     value*: Value
     pos*: Natural
-    exit*: bool
+    sideEffect*: SideEffect
 
   ValueAndPosOr* = OpResultWarn[ValueAndPos]
     ## A ValueAndPos object or a warning.
@@ -457,7 +468,7 @@ func `$`*(funResult: FunResult): string =
     result = "warning: " & $funResult.warningData & ": parameter " & $funResult.parameter
 
 proc newValueAndPos*(value: Value, pos: Natural,
-    exit = false): ValueAndPos =
+    sideEffect: SideEffect = seNone): ValueAndPos =
   ## Create a newValueAndPos object.
   result = ValueAndPos(value: value, pos: pos)
 
@@ -484,10 +495,10 @@ proc `!=`*(a: ValueAndPosOr, b: ValueAndPosOr): bool =
   ## Compare two ValueAndPosOr objects and return false when equal.
   result = not (a == b)
 
-func newValueAndPosOr*(value: Value, pos: Natural, exit=false):
+func newValueAndPosOr*(value: Value, pos: Natural, sideEffect: SideEffect = seNone):
     ValueAndPosOr =
   ## Create a ValueAndPosOr from a value, pos and exit.
-  let val = ValueAndPos(value: value, pos: pos, exit: exit)
+  let val = ValueAndPos(value: value, pos: pos, sideEffect: sideEffect)
   result = opValueW[ValueAndPos](val)
 
 proc newValueAndPosOr*(number: int | int64 | float64 | string,

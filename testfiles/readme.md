@@ -30,11 +30,11 @@ This folder contains stf test files for statictea.
 * [len](../testfiles/len.stf.md) &mdash; Test the len function.
 * [list-literal](../testfiles/list-literal.stf.md) &mdash; Test literal lists.
 * [localvars-basics](../testfiles/localvars-basics.stf.md) &mdash; Test the readme local variables section.
+* [log-function](../testfiles/log-function.stf.md) &mdash; Test the log function.
 * [log-path](../testfiles/log-path.stf.md) &mdash; Test the default log path is written to when you specify -l without a
 filename.
 * [logging-hello-world](../testfiles/logging-hello-world.stf.md) &mdash; Test logging with Hello World.
 * [logging-replacement-block](../testfiles/logging-replacement-block.stf.md) &mdash; Test logging the replacement block.
-* [logging](../testfiles/logging.stf.md) &mdash; Logging with Hello World.
 * [lreturncode](../testfiles/lreturncode.stf.md) &mdash; Test the return code for -l -h is 0.
 * [maxlines](../testfiles/maxlines.stf.md) &mdash; Test t maxLines tea variable.
 * [maxrepeat](../testfiles/maxrepeat.stf.md) &mdash; Test the t maxRepeat tea variable.

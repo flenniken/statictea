@@ -703,27 +703,27 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "runStatement":
     let statement = newStatement(text="""t.repeat = 4 """, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("t.repeat", "=", newValue(4))
+    let eVariableDataOr = newVariableDataOr("t.repeat", opEqual, newValue(4))
     check testRunStatement(statement, eVariableDataOr)
 
   test "runStatement string":
     let statement = newStatement(text="""str = "testing" """, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("str", "=", newValue("testing"))
+    let eVariableDataOr = newVariableDataOr("str", opEqual, newValue("testing"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "runStatement string newline":
     let statement = newStatement(text="str = \"testing\"\n", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("str", "=", newValue("testing"))
+    let eVariableDataOr = newVariableDataOr("str", opEqual, newValue("testing"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "runStatement set log":
     let statement = newStatement(text="""t.output = "log" """, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("t.output", "=", newValue("log"))
+    let eVariableDataOr = newVariableDataOr("t.output", opEqual, newValue("log"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "runStatement a5":
     let statement = newStatement(text="""a = 5   """, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(5))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(5))
     check testRunStatement(statement, eVariableDataOr)
 
   test "runStatement junk at end":
@@ -765,12 +765,12 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     # assignment doesn't happen until later. So t.missing, "1.2.3" is
     # a value return.
     let statement = newStatement(text="""t.missing = "1.2.3"""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("t.missing", "=", newValue("1.2.3"))
+    let eVariableDataOr = newVariableDataOr("t.missing", opEqual, newValue("1.2.3"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "assignTeaVariable content":
     let statement = newStatement(text="""t.content = "1.2.3"""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("t.content", "=", newValue("1.2.3"))
+    let eVariableDataOr = newVariableDataOr("t.content", opEqual, newValue("1.2.3"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "parseVersion":
@@ -780,32 +780,32 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "cmpVersion equal":
     let statement = newStatement(text="""cmp = cmpVersion("1.2.3", "1.2.3")""",
       lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("cmp", "=", newValue(0))
+    let eVariableDataOr = newVariableDataOr("cmp", opEqual, newValue(0))
     check testRunStatement(statement, eVariableDataOr)
 
   test "cmpVersion less":
     let statement = newStatement(text="""cmp = cmpVersion("1.2.2", "1.2.3")""",
       lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("cmp", "=", newValue(-1))
+    let eVariableDataOr = newVariableDataOr("cmp", opEqual, newValue(-1))
     check testRunStatement(statement, eVariableDataOr)
 
   test "cmpVersion greater":
     let statement = newStatement(
       text="""cmp = cmpVersion("1.2.4", "1.2.3")""",
       lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("cmp", "=", newValue(1))
+    let eVariableDataOr = newVariableDataOr("cmp", opEqual, newValue(1))
     check testRunStatement(statement, eVariableDataOr)
 
   test "cmpVersion less 2":
     let statement = newStatement(text="""cmp = cmpVersion("1.22.3", "2.1.0")""",
       lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("cmp", "=", newValue(-1))
+    let eVariableDataOr = newVariableDataOr("cmp", opEqual, newValue(-1))
     check testRunStatement(statement, eVariableDataOr)
 
   test "cmpVersion less 3":
     let statement = newStatement(text="""cmp = cmpVersion("2.22.3", "2.44.0")""",
       lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("cmp", "=", newValue(-1))
+    let eVariableDataOr = newVariableDataOr("cmp", opEqual, newValue(-1))
     check testRunStatement(statement, eVariableDataOr)
 
   test "cmpVersion two parameters":
@@ -847,49 +847,49 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "one quote":
     let statement = newStatement(text="""  quote = "\""   """, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("quote", "=", newValue("""""""))
+    let eVariableDataOr = newVariableDataOr("quote", opEqual, newValue("""""""))
     check testRunStatement(statement, eVariableDataOr)
 
   test "literal list emtpy":
     let statement = newStatement(text="""a = [] """, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newEmptyListValue())
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newEmptyListValue())
     check testRunStatement(statement, eVariableDataOr)
 
   test "literal list 1":
     let statement = newStatement(text="""a = [1] """, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(@[1]))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(@[1]))
     check testRunStatement(statement, eVariableDataOr)
 
   test "list space before":
     let statement = newStatement(text="""a = [ 1]""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(@[1]))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(@[1]))
     check testRunStatement(statement, eVariableDataOr)
 
   test "list space after":
     let statement = newStatement(text="""a = [1    ]""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(@[1]))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(@[1]))
     check testRunStatement(statement, eVariableDataOr)
 
   test "list space before and after":
     let statement = newStatement(text="""a = [   1    ]""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(@[1]))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(@[1]))
     check testRunStatement(statement, eVariableDataOr)
 
   test "literal list 2":
     let statement = newStatement(text="""a = [1,2]""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(@[1,2]))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(@[1,2]))
     check testRunStatement(statement, eVariableDataOr)
 
   test "literal list 3":
     let statement = newStatement(text="""a = [1,2,"3"]""", lineNum=1, 0)
     var eValue = newValue(@[newValue(1), newValue(2), newValue("3")])
-    let eVariableDataOr = newVariableDataOr("a", "=", eValue)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, eValue)
     check testRunStatement(statement, eVariableDataOr)
 
   test "literal list nested":
     let statement = newStatement(text="""a = [1,len("3")]""", lineNum=1, 0)
     var eValue = newValue(@[newValue(1), newValue(1)])
-    let eVariableDataOr = newVariableDataOr("a", "=", eValue)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, eValue)
     check testRunStatement(statement, eVariableDataOr)
 
   test "literal list err":
@@ -909,7 +909,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "operator":
     let statement = newStatement(text="a &= 5", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "&=", newValue(5))
+    let eVariableDataOr = newVariableDataOr("a", opAppendList, newValue(5))
     check testRunStatement(statement, eVariableDataOr)
 
   test "extra after":
@@ -925,54 +925,54 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "if when true":
     let statement = newStatement(text="""a = if(bool(1), 1, 2)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(1))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(1))
     check testRunStatement(statement, eVariableDataOr)
 
   test "if when false":
     let statement = newStatement(text="""a = if(bool(0), 1, 2)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(2))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(2))
     check testRunStatement(statement, eVariableDataOr)
 
   test "if0 when 0":
     let statement = newStatement(text="""a = if0(0, 1, 2)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(1))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(1))
     check testRunStatement(statement, eVariableDataOr)
 
   test "if0 when 0.0":
     let statement = newStatement(text="""a = if0(0.0, 1, 2)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(1))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(1))
     check testRunStatement(statement, eVariableDataOr)
 
   test "if0 when empty string":
     let statement = newStatement(text="""a = if0("", 1, 2)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(1))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(1))
     check testRunStatement(statement, eVariableDataOr)
 
   test "if0 when empty list":
     let statement = newStatement(text="""a = if0([], 1, 2)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(1))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(1))
     check testRunStatement(statement, eVariableDataOr)
 
   test "if0 when empty dict":
     let statement = newStatement(text="""a = if0(dict(), 1, 2)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(1))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(1))
     check testRunStatement(statement, eVariableDataOr)
 
   test "if0 when not empty list":
     let statement = newStatement(text="""a = if0([4], 1, 2)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(2))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(2))
     check testRunStatement(statement, eVariableDataOr)
 
   test "if0 skipping":
     let text = """a = if0(0, len("123"), len("ab") )"""
     let statement = newStatement(text, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(3))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(3))
     check testRunStatement(statement, eVariableDataOr)
 
   test "if0 missing":
     let text = """a = if0(0, len("123"), missing("ab") )"""
     let statement = newStatement(text, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(3))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(3))
     check testRunStatement(statement, eVariableDataOr)
 
   test "if0 two arguments":
@@ -1008,7 +1008,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "slice":
     let text = """a = slice("abc", 0, 2)"""
     let statement = newStatement(text, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue("ab"))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue("ab"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "slice wrong type":
@@ -1048,21 +1048,21 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     check testRunStatement(statement, eVariableDataOr)
 
   test "return empty":
-    let text = """a = return("")"""
+    let text = """a = return("asdf")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", "exit", newValue(""))
+    let eVariableDataOr = newVariableDataOr(wSkipOrStop, "", 11)
     check testRunStatement(statement, eVariableDataOr)
 
   test "return skip":
     let text = """a = return("skip")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", "exit", newValue("skip"))
+    let eVariableDataOr = newVariableDataOr("", opReturn, newValue("skip"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "return stop nested":
     let text = """a = if0(0, return("stop"))"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", "exit", newValue("stop"))
+    let eVariableDataOr = newVariableDataOr("", opReturn, newValue("stop"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "if assignment takes three args":
@@ -1086,37 +1086,37 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "return no stop":
     let text = """a = if0(0, [1,2,return("stop")])"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", "exit", newValue("stop"))
+    let eVariableDataOr = newVariableDataOr("", opReturn, newValue("stop"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "return cond stop":
     let text = """a = if0(return("stop"),5)"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", "exit", newValue("stop"))
+    let eVariableDataOr = newVariableDataOr("", opReturn, newValue("stop"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "return third stop":
     let text = """a = if0(1, 5, return("stop"))"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", "exit", newValue("stop"))
+    let eVariableDataOr = newVariableDataOr("", opReturn, newValue("stop"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "return third stop":
     let text = """a = len(return("stop"))"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", "exit", newValue("stop"))
+    let eVariableDataOr = newVariableDataOr("", opReturn, newValue("stop"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "bare if taken":
     let text = """if0(0, return("stop"))"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", "exit", newValue("stop"))
+    let eVariableDataOr = newVariableDataOr("", opReturn, newValue("stop"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "bare if not taken":
     let text = """if0(1, return("stop"))"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", "", newValue(0))
+    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(0))
     check testRunStatement(statement, eVariableDataOr)
 
   test "bare if takes two args":
@@ -1140,35 +1140,35 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "empty line":
     let text = ""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", "", newValue(0))
+    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(0))
     check testRunStatement(statement, eVariableDataOr)
 
   test "blank line":
     let text = "     \t  "
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", "", newValue(0))
+    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(0))
     check testRunStatement(statement, eVariableDataOr)
 
   test "comment":
     let text = "# this is a comment"
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", "", newValue(0))
+    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(0))
     check testRunStatement(statement, eVariableDataOr)
 
   test "comment leading spaces":
     let text = "    # this is a comment"
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", "", newValue(0))
+    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(0))
     check testRunStatement(statement, eVariableDataOr)
 
   test "trailing comment":
     let statement = newStatement(text="""a = 5# comment """, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(5))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(5))
     check testRunStatement(statement, eVariableDataOr)
 
   test "trailing comment leading sp":
     let statement = newStatement(text="""a = 5  # comment """, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(5))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(5))
     check testRunStatement(statement, eVariableDataOr)
 
   test "multiline":
@@ -1185,7 +1185,7 @@ Green
 White
 """
     let statement = newStatement(text=text, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("o.x", "=", newValue(multiline))
+    let eVariableDataOr = newVariableDataOr("o.x", opEqual, newValue(multiline))
     check testRunStatement(statement, eVariableDataOr)
 
   test "multiline 2":
@@ -1200,7 +1200,7 @@ Black
 Green
 White"""
     let statement = newStatement(text=text, lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("o.x", "=", newValue(multiline))
+    let eVariableDataOr = newVariableDataOr("o.x", opEqual, newValue(multiline))
     check testRunStatement(statement, eVariableDataOr)
 
   test "multiline 3":
@@ -1243,42 +1243,42 @@ White$1
 
   test "true and true":
     let statement = newStatement(text="""a = and(true, true)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(true))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(true))
     check testRunStatement(statement, eVariableDataOr)
 
   test "true and false":
     let statement = newStatement(text="""a = and(true, false)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(false))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(false))
     check testRunStatement(statement, eVariableDataOr)
 
   test "false and true":
     let statement = newStatement(text="""a = and(false, true)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(false))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(false))
     check testRunStatement(statement, eVariableDataOr)
 
   test "false and false":
     let statement = newStatement(text="""a = and(false, false)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(false))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(false))
     check testRunStatement(statement, eVariableDataOr)
 
   test "true or true":
     let statement = newStatement(text="""a = or(true, true)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(true))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(true))
     check testRunStatement(statement, eVariableDataOr)
 
   test "true or false":
     let statement = newStatement(text="""a = or(true, false)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(true))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(true))
     check testRunStatement(statement, eVariableDataOr)
 
   test "false or true":
     let statement = newStatement(text="""a = or(false, true)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(true))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(true))
     check testRunStatement(statement, eVariableDataOr)
 
   test "false or false":
     let statement = newStatement(text="""a = or(false, false)""", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr("a", "=", newValue(false))
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(false))
     check testRunStatement(statement, eVariableDataOr)
 
   test "runBoolOp":
@@ -1408,7 +1408,7 @@ White$1
     if cmpValueOr.isMessage:
       echo cmpValueOr.message
       fail
-    let eVariableDataOr = newVariableDataOr("a", "=", cmpValueOr.value)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, cmpValueOr.value)
     check testRunStatement(statement, eVariableDataOr, variables)
 
   test "a = get(cmp, 0)":
@@ -1419,7 +1419,7 @@ White$1
     if cmpValueOr.isMessage:
       echo cmpValueOr.message
       fail
-    let eVariableDataOr = newVariableDataOr("a", "=", cmpValueOr.value.listv[0])
+    let eVariableDataOr = newVariableDataOr("a", opEqual, cmpValueOr.value.listv[0])
     check testRunStatement(statement, eVariableDataOr, variables)
 
   test "a5#":
@@ -1515,28 +1515,28 @@ White$1
   test "a = b[0]":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = emptyVariables(funcs = funcsVarDict)
-    discard assignVariable(variables, "l.b", newValue(2), "&=")
+    discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check $variables["l"] == """{"b":[2]}"""
     check testGetValueAndPos("""a = b[0]""", 4, 8, "2", variables)
 
   test "index 1":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = emptyVariables(funcs = funcsVarDict)
-    discard assignVariable(variables, "l.b", newValue(2), "&=")
-    discard assignVariable(variables, "l.b", newValue(3), "&=")
+    discard assignVariable(variables, "l.b", newValue(2), opAppendList)
+    discard assignVariable(variables, "l.b", newValue(3), opAppendList)
     check $variables["l"] == """{"b":[2,3]}"""
     check testGetValueAndPos("""a = b[1]""", 4, 8, "3", variables)
 
   test "brackets with spaces":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = emptyVariables(funcs = funcsVarDict)
-    discard assignVariable(variables, "l.b", newValue(2), "&=")
+    discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check testGetValueAndPos("""a = b[ 0 ]""", 4, 10, "2", variables)
 
   test "brackets with function":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = emptyVariables(funcs = funcsVarDict)
-    discard assignVariable(variables, "l.b", newValue(2), "&=")
+    discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check testGetValueAndPos("""a = b[ len("") ]""", 4, 16, "2", variables)
 
   test "a = d['abc']":
@@ -1545,7 +1545,7 @@ White$1
     let content = """{"abc": 5}"""
     var valueOr = readJsonString(content)
     let value = valueOr.value
-    discard assignVariable(variables, "l.d", value, "=")
+    discard assignVariable(variables, "l.d", value, opEqual)
     check $variables["l"] == """{"d":{"abc":5}}"""
     check testGetValueAndPos("""a = d["abc"]""", 4, 12, "5", variables)
 
@@ -1555,14 +1555,14 @@ White$1
   test "bracketed list or dict":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = emptyVariables(funcs = funcsVarDict)
-    discard assignVariable(variables, "l.b", newValue(2), "=")
+    discard assignVariable(variables, "l.b", newValue(2), opEqual)
     check testGetValueAndPos("""a = b[0]""", 4, wIndexNotListOrDict, 4, "int", variables)
 
   test "bracketed list warnings":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = emptyVariables(funcs = funcsVarDict)
-    discard assignVariable(variables, "l.ix", newValue(22), "=")
-    discard assignVariable(variables, "l.b", newValue(2), "&=")
+    discard assignVariable(variables, "l.ix", newValue(22), opEqual)
+    discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check testGetValueAndPos("""a = b[abc]""", 4, wNotInL, 6, "abc", variables)
     check testGetValueAndPos("""a = b[%abc]""", 4, wInvalidRightHandSide, 6, "", variables)
     check testGetValueAndPos("""a = b[2.3]""", 4, wIndexNotInt, 6, "", variables)
@@ -1575,7 +1575,7 @@ White$1
     let content = """{"abc": 5}"""
     var valueOr = readJsonString(content)
     let value = valueOr.value
-    discard assignVariable(variables, "l.d", value, "=")
+    discard assignVariable(variables, "l.d", value, opEqual)
 
     check testGetValueAndPos("""a = d[5]""", 4, wKeyNotString, 6, "", variables)
     check testGetValueAndPos("""a = d["missing"]""", 4, wMissingKey, 6, "", variables)
@@ -1583,5 +1583,5 @@ White$1
   test "missing ending bracket":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = emptyVariables(funcs = funcsVarDict)
-    discard assignVariable(variables, "l.b", newValue(2), "&=")
+    discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check testGetValueAndPos("""a = b[0""", 4, wMissingRightBracket, 7, "", variables)

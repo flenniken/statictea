@@ -47,17 +47,15 @@ func errorAndColumn(messageId: MessageId, line: string, runningPos: Natural, p1 
 
 proc runReplStatement(statement: Statement, variables: var Variables): Option[WarningData] =
   ## Run the statement and add to the variables.
+
   let variableDataOr = runStatement(statement, variables)
   if variableDataOr.isMessage:
     return some(variableDataOr.message)
   let variableData = variableDataOr.value
-  # echo "variableData = $1" % $variableData
-
-  if variableData.operator == "exit" or variableData.operator == "":
-    return
 
   # Assign the variable if possible.
-  result = assignVariable(variables, variableData.dotNameStr, variableData.value)
+  if variableData.operator == opEqual or variableData.operator == opAppendList:
+    result = assignVariable(variables, variableData.dotNameStr, variableData.value)
 
 proc handleReplLine*(line: string, start: Natural, variables: var Variables, stop: var bool): string =
   ## Handle the REPL line. Set the stop variable to end the loop. The

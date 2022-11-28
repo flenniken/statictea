@@ -1,6 +1,6 @@
 stf file, version 0.1.0
 
-# Template warn-basics
+# Warn Function
 
 Test the warn function.
 
@@ -47,7 +47,6 @@ $$ : if0(0, warn("warn6: warning in bare if")
 $$ : if0(2, warn("not hit"))
 $$ endblock
 ~~~
-
 
 ### File result.expected
 

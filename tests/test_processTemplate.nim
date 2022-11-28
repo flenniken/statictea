@@ -1157,19 +1157,6 @@ $$ endblock
 """
     check testProcessTemplate(templateContent = templateContent)
 
-  test "return short circuit 2":
-    let templateContent = """
-$$ block a = return("")
-$$ : a = warn("not hit")
-return short circuit 2
-$$ endblock
-"""
-    let eResultLines = @[
-      "return short circuit 2\n",
-    ]
-    check testProcessTemplate(templateContent = templateContent,
-      eResultLines = eResultLines)
-
   test "return short circuit 3":
     let templateContent = """
 $$ block t.repeat = 2
@@ -1210,27 +1197,11 @@ $$ endblock
     check testProcessTemplate(templateContent = templateContent,
       eResultLines = eResultLines)
 
-  test "return short circuit 6":
-    let templateContent = """
-$$ block t.repeat = 3
-$$ : if0(t.row, return(""))
-$$ : if0(t.row, warn("not hit"))
-{t.row}) return short circuit
-$$ endblock
-"""
-    let eResultLines = @[
-      "0) return short circuit\n",
-      "1) return short circuit\n",
-      "2) return short circuit\n",
-    ]
-    check testProcessTemplate(templateContent = templateContent,
-      eResultLines = eResultLines)
-
   test "return short circuit 7":
     let templateContent = """
 $$ block t.repeat = 3
 $$ : if((t.row == 1), return("skip"))
-$$ : if((t.row == 2), warn("row 2 warning"))
+$$ : warn(format("row {t.row} warning"))
 {t.row}
 $$ endblock
 """
@@ -1239,7 +1210,8 @@ $$ endblock
       "2\n"
     ]
     let eErrLines = @[
-      "template.html(3): row 2 warning\n"
+      "template.html(3): row 0 warning\n",
+      "template.html(3): row 2 warning\n",
     ]
     check testProcessTemplate(templateContent = templateContent,
       eResultLines = eResultLines, eErrLines = eErrLines, eRc = 1)

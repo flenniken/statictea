@@ -1694,11 +1694,14 @@ suite "runFunction.nim":
     check testFunction("warn", arguments, eFunResult)
 
   test "return":
-    check testFunction("return", @[newValue("")], newFunResult(newValue("")))
     check testFunction("return", @[newValue("skip")],
       newFunResult(newValue("skip")))
     check testFunction("return", @[newValue("stop")],
       newFunResult(newValue("stop")))
+    check testFunction("return", @[newValue("other")],
+      newFunResultWarn(wSkipOrStop, 0))
+    check testFunction("return", @[newValue(5)],
+      newFunResultWarn(wWrongType, 0, "string"))
 
   test "string default":
     check testFunction("string", @[newValue(1)], newFunResult(newValue("1")))
@@ -2002,3 +2005,8 @@ d.sub.y = 4"""
 
     check testFormatStringWarn("{{{a!}", newWarningData(wInvalidVarName, "", 4))
 
+  test "log":
+    let message = "log message"
+    var arguments = @[newValue(message)]
+    let eFunResult = newFunResult(newValue(message))
+    check testFunction("log", arguments, eFunResult)

@@ -62,7 +62,8 @@ their values.
 * [funJoinPath_loss](#funjoinpath_loss) &mdash; Join the path components with a path separator.
 * [funJoin_lsois](#funjoin_lsois) &mdash; Join a list of strings with a separator.
 * [funWarn_ss](#funwarn_ss) &mdash; Return a warning message and skip the current statement.
-* [funReturn_ss](#funreturn_ss) &mdash; Return the given value and control command looping.
+* [funLog_ss](#funlog_ss) &mdash; Log a message to the log file.
+* [funReturn_ss](#funreturn_ss) &mdash; A return in a statement causes the command to stop processing the statement and following statements in the command for the current replacement block iteration.
 * [funString_aoss](#funstring_aoss) &mdash; Convert a variable to a string.
 * [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names.
 * [funFormat_ss](#funformat_ss) &mdash; Format a string using replacement variables similar to a replacement block.
@@ -1423,16 +1424,44 @@ warn("always warn")
 func funWarn_ss(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
+# funLog_ss
+
+Log a message to the log file.  You can call the log function without an assignment.
+
+~~~
+log(message: string) string
+~~~~
+
+You can log conditionally in a bare if statement:
+
+~~~
+if0(c, log("log this message when c is 0"))
+~~~
+
+You can log conditionally in a normal if statement. In the
+following example, if log is called the b variable will not
+get created.
+
+~~~
+b = if0(c, log("c is not 0"), "")
+~~~
+
+You can log unconditionally using a bare log statement:
+
+~~~
+log("always log")
+~~~~
+
+```nim
+func funLog_ss(variables: Variables; parameters: seq[Value]): FunResult
+```
+
 # funReturn_ss
 
-Return the given value and control command looping. A return in a
-statement causes the command to stop processing the current
-statement and following statements in the command. You can
-control whether the replacement block is output or not.
+A return in a statement causes the command to stop processing the statement and following statements in the command for the current replacement block iteration. The replacement block is not output for this iteration. There are two variations, "stop" and "skip" which determine whether to continue iterating or not.
 
 * "stop" -- stop processing the command
-* "skip" -- skip this replacement block and continue with the next
-* "" -- output the replacement block and continue
+* "skip" -- skip this replacement block and continue with the next iteration
 
 ~~~
 return(value: string) string
@@ -1443,7 +1472,6 @@ Examples:
 ~~~
 if(c, return("stop"))
 if(c, return("skip"))
-if(c, return(""))
 ~~~~
 
 ```nim
@@ -1972,12 +2000,13 @@ functionsList = [("add", funAdd_fff, "fff"), ("add", funAdd_iii, "iii"),
                  ("joinPath", funJoinPath_loss, "loss"),
                  ("keys", funKeys_dl, "dl"), ("len", funLen_di, "di"),
                  ("len", funLen_li, "li"), ("len", funLen_si, "si"),
-                 ("list", funList, "..."), ("lower", funLower_ss, "ss"),
-                 ("lt", funLt_ffb, "ffb"), ("lt", funLt_iib, "iib"),
-                 ("lte", funLte_ffb, "ffb"), ("lte", funLte_iib, "iib"),
-                 ("ne", funNe_ffb, "ffb"), ("ne", funNe_iib, "iib"),
-                 ("ne", funNe_ssb, "ssb"), ("not", funNot_bb, "bb"),
-                 ("or", funOr_bbb, "bbb"), ("path", funPath_sosd, "sosd"),
+                 ("list", funList, "..."), ("log", funLog_ss, "si"),
+                 ("lower", funLower_ss, "ss"), ("lt", funLt_ffb, "ffb"),
+                 ("lt", funLt_iib, "iib"), ("lte", funLte_ffb, "ffb"),
+                 ("lte", funLte_iib, "iib"), ("ne", funNe_ffb, "ffb"),
+                 ("ne", funNe_iib, "iib"), ("ne", funNe_ssb, "ssb"),
+                 ("not", funNot_bb, "bb"), ("or", funOr_bbb, "bbb"),
+                 ("path", funPath_sosd, "sosd"),
                  ("readJson", funReadJson_sa, "sa"),
                  ("replace", funReplace_siiss, "siiss"),
                  ("replaceRe", funReplaceRe_sls, "sls"),

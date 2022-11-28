@@ -53,7 +53,7 @@ o.v1 = {o.v1} = false
 o.v2 = {o.v2} = false
 o.v3 = {o.v3} = true
 o.v4 = {o.v4} = {{o.v4}
-o.v5 = {o.v5} = return taken
+o.v5 = {o.v5} = skip
 o.v6 = {o.v6} = 3
 o.v7 = {o.v7} = 1
 $$ endblock
@@ -96,7 +96,7 @@ warnfunc = f.warn
 o.v4 = l.warnfunc("calling warn"))
 
 returnfunc = f.return
-o.v5 = l.returnfunc("return taken")
+o.v5 = l.returnfunc("skip")
 
 if(false, "not expected IF message")
 if(true, "if true message")
@@ -115,7 +115,7 @@ o.v1 = false = false
 o.v2 = false = false
 o.v3 = true = true
 o.v4 = {o.v4} = {o.v4}
-o.v5 = return taken = return taken
+o.v5 = skip = skip
 o.v6 = 3 = 3
 o.v7 = 1 = 1
 ~~~

@@ -6,7 +6,6 @@ import std/streams
 import std/strutils
 import env
 import messages
-import opresult
 import linebuffer
 import runCommand
 import variables
@@ -225,6 +224,9 @@ proc runCodeFile*(env: var Env, variables: var Variables, filename: string) =
     # Unable to open file: $1.
     env.warnNoFile(wUnableToOpenFile, filename)
     return
+  defer:
+    # Close the stream and file.
+    stream.close()
 
   # Allocate a buffer for reading lines. Return when not enough memory.
   let lineBufferO = newLineBuffer(stream, filename = filename)
@@ -240,39 +242,13 @@ proc runCodeFile*(env: var Env, variables: var Variables, filename: string) =
     if not statementO.isSome:
       break # done
     let statement = statementO.get()
-
-    # Run the statement and get the variable, operator and value.
-    let variableDataOr = runStatement(statement, variables)
-    if variableDataOr.isMessage:
-      env.warnStatement(statement, variableDataOr.message, sourceFilename = filename)
-      continue
-    let variableData = variableDataOr.value
-
-    # echo "variableData = $1" % $variableData
-
-    # Handle a return function exit.
-    if variableData.operator == "exit":
-      if not (variableData.value.kind == vkString and
-              variableData.value.stringv == "stop"):
-        # Use '...return(\"stop\")...' in a code file.
-        env.warnStatement(statement, newWarningData(wUseStop),
-          sourceFilename = filename)
-        continue
-      break # done
-
-    # A bare if without taking a return.
-    if variableData.operator == "":
-      continue
-
-    # Assign the variable if possible.
-    let warningDataO = assignVariable(variables,
-      variableData.dotNameStr, variableData.value,
-      variableData.operator, inCodeFile = true)
-    if isSome(warningDataO):
-      env.warnStatement(statement, warningDataO.get(), filename)
-
-  # Close the stream and file.
-  stream.close()
+    let loopControl = runStatementAssignVar(env, statement, variables, filename, codeFile=true)
+    if loopControl == lcStop:
+      break
+    elif loopControl == lcSkip:
+      # Use '...return(\"stop\")...' in a code file.
+      let warningData = newWarningData(wUseStop)
+      env.warnStatement(statement, warningData, sourceFilename = filename)
 
 proc runCodeFiles*(env: var Env, variables: var Variables, codeList: seq[string]) =
   ## Run each code file and populate the variables.

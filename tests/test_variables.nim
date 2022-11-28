@@ -35,7 +35,7 @@ proc testGetVariableWarning(variables: Variables, dotNameStr: string,
 
 proc testAssignVariable(variables: var Variables, dotNameStr: string, value: Value,
     eWarningDataO: Option[WarningData] = none(WarningData),
-    operator = "=", inCodeFile = false): bool =
+    operator = opEqual, inCodeFile = false): bool =
   ## Assign a variable then fetch and verify it was set.
   let warningDataO = assignVariable(variables, dotNameStr, value,
     operator, inCodeFile)
@@ -53,7 +53,7 @@ proc testAssignVariable(variables: var Variables, dotNameStr: string, value: Val
 
 proc testAssignVariable(dotNameStr: string, value: Value,
     eWarningDataO: Option[WarningData] = none(WarningData),
-    operator: string = "=", inCodeFile = false): bool =
+    operator = opEqual, inCodeFile = false): bool =
   ## Assign a variable then fetch and verify it was set. Start with an
   ## empty dictionary.
   var variables = emptyVariables()
@@ -380,12 +380,12 @@ t.version = "$1"""" % staticteaVersion
 
   test "assignVariable append to tea":
     let eWarningDataO = some(newWarningData(wImmutableVars))
-    check testAssignVariable("t", newValue("hello"), eWarningDataO, "&=")
+    check testAssignVariable("t", newValue("hello"), eWarningDataO, opAppendList)
 
   test "assignVariable append to tea args":
     let eWarningDataO = some(newWarningData(wReadOnlyTeaVar, "args"))
-    check testAssignVariable("t.args", newValue("hello"), eWarningDataO, "&=")
-    check testAssignVariable("t.args.hello", newValue("hello"), eWarningDataO, "&=")
+    check testAssignVariable("t.args", newValue("hello"), eWarningDataO, opAppendList)
+    check testAssignVariable("t.args.hello", newValue("hello"), eWarningDataO, opAppendList)
 
   test "assignVariable nested dict":
     var variables = emptyVariables()
@@ -397,7 +397,7 @@ t.version = "$1"""" % staticteaVersion
 
     let warning1 = some(newWarningData(wAppendToList, "dict"))
     check testAssignVariable(variables, "l.a.b", newValue(1),
-      warning1, "&=")
+      warning1, opAppendList)
 
     let eWarningDataO = some(newWarningData(wVariableMissing, "missing"))
     check testAssignVariable(variables, "l.a.b.missing.tea",
@@ -410,11 +410,11 @@ t.version = "$1"""" % staticteaVersion
 
   test "append to a list":
     var variables = emptyVariables()
-    var warningDataO = assignVariable(variables, "teas", newValue(5), "&=")
+    var warningDataO = assignVariable(variables, "teas", newValue(5), opAppendList)
     check not warningDataO.isSome
-    warningDataO = assignVariable(variables, "teas", newValue(6), "&=")
+    warningDataO = assignVariable(variables, "teas", newValue(6), opAppendList)
     check not warningDataO.isSome
-    warningDataO = assignVariable(variables, "teas", newValue(7), "&=")
+    warningDataO = assignVariable(variables, "teas", newValue(7), opAppendList)
     check not warningDataO.isSome
     check $variables["l"] == """{"teas":[5,6,7]}"""
 
@@ -432,15 +432,15 @@ t.version = "$1"""" % staticteaVersion
     check valueOr.isValue
     variables["l"] = valueOr.value
 
-    var aO = assignVariable(variables, "l.teas", newValue(5), "&=")
+    var aO = assignVariable(variables, "l.teas", newValue(5), opAppendList)
     check not aO.isSome
     check $variables["l"] == """{"a1":"hello","a2":{"b1":[]},"a3":[],"teas":[5]}"""
 
-    var bO = assignVariable(variables, "teas", newValue(6), "&=")
+    var bO = assignVariable(variables, "teas", newValue(6), opAppendList)
     check not bO.isSome
     check $variables["l"] == """{"a1":"hello","a2":{"b1":[]},"a3":[],"teas":[5,6]}"""
 
-    var cO = assignVariable(variables, "a2.b1", newValue(7), "&=")
+    var cO = assignVariable(variables, "a2.b1", newValue(7), opAppendList)
     check not cO.isSome
     check $variables["l"] == """{"a1":"hello","a2":{"b1":[7]},"a3":[],"teas":[5,6]}"""
 
@@ -452,7 +452,7 @@ t.version = "$1"""" % staticteaVersion
     check valueOr.isValue
     variables["l"] = valueOr.value
 
-    var aO = assignVariable(variables, "l.a.tea", newValue(5), "&=")
+    var aO = assignVariable(variables, "l.a.tea", newValue(5), opAppendList)
     check not aO.isSome
     check $variables["l"] == """{"a":{"tea":[5]}}"""
 
@@ -463,15 +463,15 @@ t.version = "$1"""" % staticteaVersion
     check valueOr.isValue
     variables["l"] = valueOr.value
 
-    var aO = assignVariable(variables, "l.a.sea", newValue(5), "&=")
+    var aO = assignVariable(variables, "l.a.sea", newValue(5), opAppendList)
     check not aO.isSome
     check $variables["l"] == """{"a":{"tea":2,"sea":[5]}}"""
 
   test "append list to a list":
     var variables = emptyVariables()
-    var warningDataO = assignVariable(variables, "teas", newEmptyListValue(), "&=")
+    var warningDataO = assignVariable(variables, "teas", newEmptyListValue(), opAppendList)
     check not warningDataO.isSome
-    warningDataO = assignVariable(variables, "teas", newEmptyListValue(), "&=")
+    warningDataO = assignVariable(variables, "teas", newEmptyListValue(), opAppendList)
     check not warningDataO.isSome
     check $variables["l"] == """{"teas":[[],[]]}"""
 
@@ -480,7 +480,7 @@ t.version = "$1"""" % staticteaVersion
     var warningDataO = assignVariable(variables, "a", newValue(5))
     check not warningDataO.isSome
     let eWarningDataO = some(newWarningData(wAppendToList, "int"))
-    warningDataO = assignVariable(variables, "a", newValue(6), "&=")
+    warningDataO = assignVariable(variables, "a", newValue(6), opAppendList)
     check warningDataO == eWarningDataO
 
   test "ValueOr string":

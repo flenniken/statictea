@@ -24,19 +24,30 @@ const
     ## @:* skip -- output goes to the bit bucket
 
 type
+  Operator* = enum
+    ## The statement operator types.
+    ## @:
+    ## @:* opIgnore -- ignore the statement
+    ## @:* opAppendDict (=) -- append the value to the dictionary
+    ## @:* opAppendList ($=) -- append the value to the list
+    ## @:* opReturn -- stop or skip the current replacement iteration
+    ## @:* opLog -- log a message
+    opIgnore,
+    opEqual,
+    opAppendList,
+    opReturn,
+    opLog,
+
   VariableData* = object
     ## The VariableData object holds the variable name, operator,
     ## @:and value which is the result of running a statement.
     ## @:
-    ## @:For a bare if statement, the operator is "exit" when a return
-    ## @:function ran, otherwise the operator is an empty string.
-    ## @:
-    ## @:* dotNameStr -- the dot name tells which dictionary contains
+    ## @:* dotNameStr -- the variable dot name tells which dictionary contains
     ## @:the variable, i.e.: l.d.a
-    ## @:* operator -- the statement's operator, either =, &=, "" or "exit".
+    ## @:* operator -- the statement's operator; what to do with the variable and value.
     ## @:* value -- the variable's value
     dotNameStr*: string
-    operator*: string
+    operator*: Operator
     value*: Value
 
   VariableDataOr* = OpResultWarn[VariableData]
@@ -53,17 +64,31 @@ func newVariableDataOr*(warningData: WarningData):
   ## Create an object containing a warning.
   result = opMessageW[VariableData](warningData)
 
-func newVariableDataOr*(dotNameStr: string, operator = "=",
+func newVariableDataOr*(dotNameStr: string, operator = opEqual,
     value: Value): VariableDataOr =
   ## Create an object containing a VariableData object.
   let variableData = VariableData(dotNameStr: dotNameStr,
     operator: operator, value: value)
   result = opValueW[VariableData](variableData)
 
+func `$`*(operator: Operator): string =
+  ## Return a string representation of Operator.
+  case operator:
+  of opEqual:
+    result = "="
+  of opAppendList:
+    result = "&="
+  of opIgnore:
+    result = "ignore"
+  of opReturn:
+    result = "return"
+  of opLog:
+    result = "log"
+
 func `$`*(v: VariableData): string =
   ## Return a string representation of VariableData.
   result = "dotName='$1', operator='$2', value=$3" % [
-    v.dotNameStr, v.operator, $v.value]
+  v.dotNameStr, $v.operator, $v.value]
 
 func emptyVariables*(server: VarsDict = nil, args: VarsDict = nil,
     funcs: VarsDict = nil): Variables =
@@ -181,9 +206,9 @@ proc getParentDictToAddTo(variables: Variables, dotNameStr: string):
   result = newVarsDictOr(parentDict)
 
 func assignTeaVariable(variables: var Variables, dotNameStr: string,
-    value: Value, operator: string = "="): Option[WarningData] =
+    value: Value, operator = opEqual): Option[WarningData] =
   ## Assign a tea variable a value if possible, else return a
-  ## warning. The operator parameter is either "=" or "&=".
+  ## warning.
 
   assert dotNameStr.len > 0
 
@@ -235,7 +260,7 @@ func assignTeaVariable(variables: var Variables, dotNameStr: string,
       return some(newWarningData(wInvalidTeaVar, varName))
 
   # You cannot append to a tea variable.
-  if operator == "&=":
+  if operator == opAppendList:
     # You cannot append to a tea variable.
     return some(newWarningData(wAppendToTeaVar))
 
@@ -245,11 +270,11 @@ proc assignVariable*(
     variables: var Variables,
     dotNameStr: string,
     value: Value,
-    operator: string = "=",
+    operator = opEqual,
     inCodeFile = false
   ): Option[WarningData] =
   ## Assign the variable the given value if possible, else return a
-  ## warning. The operator parameter is either "=" or "&=".
+  ## warning.
 
   # -- You cannot overwrite an existing variable.
   # -- You can only assign to known tea variables.
@@ -311,14 +336,14 @@ proc assignVariable*(
     return some(varsDictOr.message)
 
   let lastName = names[^1]
-  if operator == "=":
+  if operator == opEqual:
     # Assign the value to the dictionary.
     if lastName in varsDictOr.value:
       # You cannot assign to an existing variable.
       return some(newWarningData(wImmutableVars))
     varsDictOr.value[lastName] = value
   else:
-    assert operator == "&="
+    assert operator == opAppendList
 
     # Append to a list, or create then append.
 

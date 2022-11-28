@@ -407,6 +407,11 @@ func skipArgument*(statement: Statement, startPos: Natural): PosOr =
   else:
     result = newPosOr(pos)
 
+func quickExit(valueAndPosOr: ValueAndPosOr): bool =
+  ## Return true when the ValueAndPosOr is a messsage or a return or a
+  ## log.
+  result = valueAndPosOr.isMessage or valueAndPosOr.value.sideEffect != seNone
+
 proc skipArg(statement: Statement, start: Natural): PosOr =
   when showPos:
     showDebugPos(statement, start, "^ s arg")
@@ -449,7 +454,7 @@ func getSpecialFunc(dotNameValue: Value): Func =
     return nil
   let funcPtr = value.funcv
 
-  if not (funcPtr.name in ["if", "if0", "and", "or", "warn", "return"]):
+  if not (funcPtr.name in ["if", "if0", "and", "or", "warn", "return", "log"]):
     return nil
   result = funcPtr
 
@@ -476,7 +481,7 @@ proc ifFunctions*(
 
   # Get the condition's value.
   let vlcOr = getValueAndPos(statement, start, variables)
-  if vlcOr.isMessage or vlcOr.value.exit:
+  if quickExit(vlcOr):
     return vlcOr
   let cond = vlcOr.value.value
   var runningPos = vlcOr.value.pos
@@ -512,7 +517,7 @@ proc ifFunctions*(
     runningPos = posOr.value
   else:
     vl2Or = getValueAndPos(statement, runningPos, variables)
-    if vl2Or.isMessage or vl2Or.value.exit:
+    if quickExit(vl2Or):
       return vl2Or
     runningPos = vl2Or.value.pos
 
@@ -536,7 +541,7 @@ proc ifFunctions*(
       runningPos = posOr.value
     else:
       vl3Or = getValueAndPos(statement, runningPos, variables)
-      if vl3Or.isMessage or vl3Or.value.exit:
+      if vl3Or.isMessage or vl3Or.value.sideEffect != seNone:
         return vl3Or
       runningPos = vl3Or.value.pos
   else:
@@ -581,7 +586,7 @@ proc andOrFunctions*(
 
   # Get the first argument value.
   let vlcOr = getValueAndPos(statement, start, variables)
-  if vlcOr.isMessage or vlcOr.value.exit:
+  if quickExit(vlcOr):
     return vlcOr
   let firstValue = vlcOr.value.value
   var runningPos = vlcOr.value.pos
@@ -611,7 +616,7 @@ proc andOrFunctions*(
     secondValue = newValue(0)
   else:
     let vl2Or = getValueAndPos(statement, runningPos, variables)
-    if vl2Or.isMessage or vl2Or.value.exit:
+    if quickExit(vl2Or):
       return vl2Or
     afterSecond = vl2Or.value.pos
     secondValue = vl2Or.value.value
@@ -641,7 +646,7 @@ proc andOrFunctions*(
   result = newValueAndPosOr(newValue(value), runningPos)
 
 proc getFunctionValueAndPos*(
-    dotNameStr: string,
+    functionName: string,
     statement: Statement,
     start: Natural,
     variables: Variables,
@@ -664,7 +669,7 @@ proc getFunctionValueAndPos*(
     pos = start
     while true:
       let vlOr = getValueAndPos(statement, pos, variables)
-      if vlOr.isMessage or vlOr.value.exit:
+      if quickExit(vlOr):
         return vlOr
       arguments.add(vlOr.value.value)
       argumentStarts.add(pos)
@@ -688,7 +693,7 @@ proc getFunctionValueAndPos*(
         break
 
   # Lookup the variable's value.
-  let valueOr = getVariable(variables, dotNameStr, "f")
+  let valueOr = getVariable(variables, functionName, "f")
   if valueOr.isMessage:
     let warningData = newWarningData(valueOr.message.messageId,
       valueOr.message.p1, start)
@@ -713,8 +718,15 @@ proc getFunctionValueAndPos*(
     return newValueAndPosOr(funResult.warningData.messageId,
       funResult.warningData.p1, warningPos)
 
-  var exit = if dotNameStr == "return": true else: false
-  result = newValueAndPosOr(funResult.value, pos, exit)
+  var sideEffect: SideEffect
+  if functionName == "return":
+    sideEffect = seReturn
+  elif functionName == "log":
+    sideEffect = seLogMessage
+  else:
+    sideEffect = seNone
+
+  result = newValueAndPosOr(funResult.value, pos, sideEffect)
 
 proc getList(statement: Statement, start: Natural,
     variables: Variables): ValueAndPosOr =
@@ -804,7 +816,7 @@ proc getCondition*(statement: Statement, start: Natural,
 
   # Return a value and position after handling any nested condition.
   var accumOr = getValueOrNestedCond(statement, runningPos, variables)
-  if accumOr.isMessage or accumOr.value.exit:
+  if quickExit(accumOr):
     return accumOr
   var accum = accumOr.value.value
   runningPos = accumOr.value.pos
@@ -871,7 +883,7 @@ proc getCondition*(statement: Statement, start: Natural,
     # Return a value and position after handling any nestedcondition.
     let vlRightOr = getValueOrNestedCond(statement, runningPos, variables)
     let xyz = runningPos
-    if vlRightOr.isMessage or vlRightOr.value.exit:
+    if quickExit(vlRightOr):
       return vlRightOr
     let right = vlRightOr.value.value
     runningPos = vlRightOr.value.pos
@@ -900,7 +912,7 @@ proc getCondition*(statement: Statement, start: Natural,
 
       # Return a value and position after handling any nested condition.
       let vlThirdOr = getValueOrNestedCond(statement, runningPos, variables)
-      if vlThirdOr.isMessage or vlThirdOr.value.exit:
+      if quickExit(vlThirdOr):
         return vlThirdOr
 
       if vlThirdOr.value.value.kind != right.kind:
@@ -1099,7 +1111,6 @@ proc getValueAndPos*(statement: Statement, start: Natural, variables:
       pos = result.value.pos
     showDebugPos(statement, pos, "^ f")
 
-# todo: add a start
 proc runStatement*(statement: Statement, variables: Variables):
     VariableDataOr =
   ## Run one statement and return the variable dot name string,
@@ -1113,7 +1124,7 @@ proc runStatement*(statement: Statement, variables: Variables):
   else:
     pos = spacesO.get().length
   if pos >= statement.text.len or statement.text[pos] == '#':
-    return newVariableDataOr("", "", newValue(0))
+    return newVariableDataOr("", opIgnore, newValue(0))
 
   # Get the variable dot name string and match the surrounding white
   # space.
@@ -1125,7 +1136,7 @@ proc runStatement*(statement: Statement, variables: Variables):
   let leadingLen = dotNameLen + pos
 
   var vlOr: ValueAndPosOr
-  var operator = ""
+  var operator = opIgnore
   var operatorLength = 0
   var varName = ""
 
@@ -1143,8 +1154,8 @@ proc runStatement*(statement: Statement, variables: Variables):
   if leftParenBrack == "(" and specialFunc != nil and specialFunc.name in ["if0", "if"]:
     # Handle the special bare if functions.
     vlOr = ifFunctions(specialFunc.name, statement, leadingLen, variables, bare=true)
-  elif leftParenBrack == "(" and specialFunc != nil and specialFunc.name == "warn":
-    # Handle a bare warn function.
+  elif leftParenBrack == "(" and specialFunc != nil and specialFunc.name in ["warn", "log"]:
+    # Handle a bare warn or log function.
     vlOr = getFunctionValueAndPos(specialFunc.name, statement, leadingLen, variables)
   else:
     # Handle normal "varName operator right" statements.
@@ -1160,7 +1171,12 @@ proc runStatement*(statement: Statement, variables: Variables):
       # Missing operator, = or &=.
       return newVariableDataOr(wInvalidVariable, "", leadingLen)
     let match = operatorO.get()
-    operator = match.getGroup()
+    let op = match.getGroup()
+    if op == "=":
+      operator = opEqual
+    else:
+      operator = opAppendList
+
     operatorLength = match.length
 
     # Get the right hand side value and match the following whitespace.
@@ -1171,8 +1187,11 @@ proc runStatement*(statement: Statement, variables: Variables):
     return newVariableDataOr(vlOr.message)
 
   # Return function exit.
-  if vlOr.value.exit:
-    return newVariableDataOr("", "exit", vlOr.value.value)
+  if vlOr.value.sideEffect == seReturn:
+    return newVariableDataOr("", opReturn, vlOr.value.value)
+
+  if vlOr.value.sideEffect == seLogMessage:
+    return newVariableDataOr("", opLog, vlOr.value.value)
 
   # Check that there is not any unprocessed text following the value.
   if vlOr.value.pos != statement.text.len:
@@ -1184,15 +1203,55 @@ proc runStatement*(statement: Statement, variables: Variables):
   # Return the variable dot name and value.
   result = newVariableDataOr(varName, operator, vlOr.value.value)
 
+type
+  LoopControl* = enum
+    ## Controls whether to output the current replacement block
+    ## iteration and whether to stop or not.
+    ## @:
+    ## @:* lcStop -- do not output this replacement block and stop iterating
+    ## @:* lcSkip -- do not output this replacement block and continue with the next iteration
+    ## @:* lcContinue -- output the replacment block and continue with the next iteration
+    lcStop,
+    lcSkip,
+    lcContinue,
+
+proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var Variables,
+    sourceFilename: string, codeFile: bool): LoopControl =
+  ## Run a statement and assign the variable. Return skip, stop or
+  ## continue to control the loop.
+
+  # Run the statement and get the variable, operator and value.
+  let variableDataOr = runStatement(statement, variables)
+  if variableDataOr.isMessage:
+    env.warnStatement(statement, variableDataOr.message, sourceFilename = sourceFilename)
+    return lcContinue
+  let variableData = variableDataOr.value
+
+  # Handle a return function exit.
+  if variableData.operator == opReturn:
+    if variableData.value.stringv == "stop":
+      return lcStop
+    # "skip"
+    return lcSkip
+
+  if variableData.operator == opLog:
+    env.logLine(sourceFilename, statement.lineNum, variableData.value.stringv & "\n")
+    return lcContinue
+
+  if variableData.operator == opIgnore:
+    return lcContinue
+
+  # Assign the variable if possible.
+  let warningDataO = assignVariable(variables,
+    variableData.dotNameStr, variableData.value,
+    variableData.operator, inCodeFile = codeFile)
+  if isSome(warningDataO):
+    env.warnStatement(statement, warningDataO.get(), sourceFilename)
+  return lcContinue
+
 proc runCommand*(env: var Env, cmdLines: CmdLines,
-    variables: var Variables): string =
-  ## Run a command and fill in the variables dictionaries. Return "",
-  ## @:"skip" or "stop".
-  ## @:
-  ## @:* "" -- output the replacement block. This is the default.
-  ## @:* "skip" -- skip this replacement block but continue with the
-  ## @:next.
-  ## @:* "stop" -- stop processing the block.
+    variables: var Variables): LoopControl =
+  ## Run a command and fill in the variables dictionaries.
 
   # Clear the local variables and set the tea vars to their initial
   # state.
@@ -1201,34 +1260,17 @@ proc runCommand*(env: var Env, cmdLines: CmdLines,
   # Loop over the statements and run each one.
   for statement in yieldStatements(cmdLines):
 
-    # Run the statement and get the variable, operator and value.
-    let variableDataOr = runStatement(statement, variables)
-    if variableDataOr.isMessage:
-      env.warnStatement(statement, variableDataOr.message)
-      continue
-    let variableData = variableDataOr.value
+    # Run the statement.
+    let loopControl = runStatementAssignVar(env, statement, variables,
+        env.templateFilename, codeFile=false)
 
-    # Return function exit.
-    if variableData.operator == "exit":
-      if variableData.value.kind != vkString:
-        # Expected 'skip', 'stop' or '' for the block command return value.
-        env.warnStatement(statement, newWarningData(wSkipStopOrEmpty))
-        continue
-      return variableData.value.stringv
-
-    # A bare if without taking a return.
-    if variableData.operator == "":
-      continue
-
-    # Assign the variable if possible.
-    let warningDataO = assignVariable(variables,
-      variableData.dotNameStr, variableData.value, variableData.operator)
-    if isSome(warningDataO):
-      env.warnStatement(statement, warningDataO.get())
+    # Stop looping when we get a return.
+    if loopControl == lcStop or loopControl == lcSkip:
+      return loopControl
 
     # If t.repeat was set to 0, we're done.
     let tea = variables["t"].dictv
     if "repeat" in tea and tea["repeat"].intv == 0:
       break
 
-  result = ""
+  result = lcContinue

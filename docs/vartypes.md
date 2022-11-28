@@ -16,6 +16,7 @@ StaticTea variable types.
 * type: [FunctionSpec](#functionspec) &mdash; The name of a function, a pointer to the code, and its signature code.
 * type: [FunResultKind](#funresultkind) &mdash; The kind of a FunResult object, either a value or warning.
 * type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a warning.
+* type: [SideEffect](#sideeffect) &mdash; The kind of side effect for a statement.
 * type: [ValueAndPos](#valueandpos) &mdash; A value and the position after the value in the statement.
 * type: [ValueAndPosOr](#valueandposor) &mdash; A ValueAndPos object or a warning.
 * [newVarsDict](#newvarsdict) &mdash; Create a new empty variables dictionary.
@@ -169,6 +170,20 @@ FunResult = object
 
 ```
 
+# SideEffect
+
+The kind of side effect for a statement.
+
+* seNone -- no side effect, the normal case
+* seReturn -- a return side effect, either stop or skip. stop
+the command or skip the replacement block iteration.
+* seLogMessage -- the log function specified to write a message to the log file
+
+```nim
+SideEffect = enum
+  seNone, seReturn, seLogMessage
+```
+
 # ValueAndPos
 
 A value and the position after the value in the statement. The position includes the trailing whitespace.  For the example statement below, the value 567 starts at index 6 and ends at
@@ -187,7 +202,7 @@ Exit is set true by the return function to exit a command.
 ValueAndPos = object
   value*: Value
   pos*: Natural
-  exit*: bool
+  sideEffect*: SideEffect
 
 ```
 
@@ -515,7 +530,7 @@ func `$`(funResult: FunResult): string
 Create a newValueAndPos object.
 
 ```nim
-proc newValueAndPos(value: Value; pos: Natural; exit = false): ValueAndPos
+proc newValueAndPos(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValueAndPos
 ```
 
 # newValueAndPosOr
@@ -555,7 +570,8 @@ proc `!=`(a: ValueAndPosOr; b: ValueAndPosOr): bool
 Create a ValueAndPosOr from a value, pos and exit.
 
 ```nim
-func newValueAndPosOr(value: Value; pos: Natural; exit = false): ValueAndPosOr
+func newValueAndPosOr(value: Value; pos: Natural;
+                      sideEffect: SideEffect = seNone): ValueAndPosOr
 ```
 
 # newValueAndPosOr

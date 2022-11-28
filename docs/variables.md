@@ -13,13 +13,15 @@ prefix and it allows functions to be specified without the f prefix.
 # Index
 
 * const: [outputValues](#outputvalues) &mdash; Where the replacement block's output goes.
+* type: [Operator](#operator) &mdash; The statement operator types.
 * type: [VariableData](#variabledata) &mdash; The VariableData object holds the variable name, operator,
 and value which is the result of running a statement.
 * type: [VariableDataOr](#variabledataor) &mdash; A VariableData object or a warning.
 * [newVariableDataOr](#newvariabledataor) &mdash; Create an object containing a warning.
 * [newVariableDataOr](#newvariabledataor-1) &mdash; Create an object containing a warning.
 * [newVariableDataOr](#newvariabledataor-2) &mdash; Create an object containing a VariableData object.
-* [`$`](#) &mdash; Return a string representation of VariableData.
+* [`$`](#) &mdash; Return a string representation of Operator.
+* [`$`](#-1) &mdash; Return a string representation of VariableData.
 * [emptyVariables](#emptyvariables) &mdash; Create an empty variables object in its initial state.
 * [getTeaVarIntDefault](#getteavarintdefault) &mdash; Return the int value of one of the tea dictionary integer items.
 * [getTeaVarStringDefault](#getteavarstringdefault) &mdash; Return the string value of one of the tea dictionary string items.
@@ -40,23 +42,35 @@ Where the replacement block's output goes.
 outputValues = ["result", "stdout", "stderr", "log", "skip"]
 ```
 
+# Operator
+
+The statement operator types.
+
+* opIgnore -- ignore the statement
+* opAppendDict (=) -- append the value to the dictionary
+* opAppendList ($=) -- append the value to the list
+* opReturn -- stop or skip the current replacement iteration
+* opLog -- log a message
+
+```nim
+Operator = enum
+  opIgnore, opEqual, opAppendList, opReturn, opLog
+```
+
 # VariableData
 
 The VariableData object holds the variable name, operator,
 and value which is the result of running a statement.
 
-For a bare if statement, the operator is "exit" when a return
-function ran, otherwise the operator is an empty string.
-
-* dotNameStr -- the dot name tells which dictionary contains
+* dotNameStr -- the variable dot name tells which dictionary contains
 the variable, i.e.: l.d.a
-* operator -- the statement's operator, either =, &=, "" or "exit".
+* operator -- the statement's operator; what to do with the variable and value.
 * value -- the variable's value
 
 ```nim
 VariableData = object
   dotNameStr*: string
-  operator*: string
+  operator*: Operator
   value*: Value
 
 ```
@@ -90,7 +104,15 @@ func newVariableDataOr(warningData: WarningData): VariableDataOr
 Create an object containing a VariableData object.
 
 ```nim
-func newVariableDataOr(dotNameStr: string; operator = "="; value: Value): VariableDataOr
+func newVariableDataOr(dotNameStr: string; operator = opEqual; value: Value): VariableDataOr
+```
+
+# `$`
+
+Return a string representation of Operator.
+
+```nim
+func `$`(operator: Operator): string
 ```
 
 # `$`
@@ -136,12 +158,11 @@ proc resetVariables(variables: var Variables)
 
 # assignVariable
 
-Assign the variable the given value if possible, else return a warning. The operator parameter is either "=" or "&=".
+Assign the variable the given value if possible, else return a warning.
 
 ```nim
 proc assignVariable(variables: var Variables; dotNameStr: string; value: Value;
-                    operator: string = "="; inCodeFile = false): Option[
-    WarningData]
+                    operator = opEqual; inCodeFile = false): Option[WarningData]
 ```
 
 # getVariable

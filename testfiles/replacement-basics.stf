@@ -67,8 +67,7 @@ $$ : a = if((num == 2), return("skip"), 1)
 Loop 3 times:
 $$ nextline t.repeat = 3
 $$ : num = add(t.row, 1)
-$$ : if((num == 2), return(""))
-* {num} -- using "" to continue
+* {num}
 ~~~
 
 ### File server.json
@@ -129,9 +128,9 @@ Skip row 2:
 * 3 -- skip row 2
 
 Loop 3 times:
-* 1 -- using "" to continue
-* 2 -- using "" to continue
-* 3 -- using "" to continue
+* 1
+* 2
+* 3
 ~~~
 
 ### File stdout.expected

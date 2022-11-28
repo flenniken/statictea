@@ -33,6 +33,8 @@ starts in the template file.
 * [getBracketedVarValue](#getbracketedvarvalue) &mdash; Return the value of the bracketed variable.
 * [getValueAndPos](#getvalueandpos) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
+* type: [LoopControl](#loopcontrol) &mdash; Controls whether to output the current replacement block iteration and whether to stop or not.
+* [runStatementAssignVar](#runstatementassignvar) &mdash; Run a statement and assign the variable.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 
 # Statement
@@ -224,7 +226,7 @@ proc andOrFunctions(functionName: string; statement: Statement; start: Natural;
 Return the function's value and the position after it. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
 
 ```nim
-proc getFunctionValueAndPos(dotNameStr: string; statement: Statement;
+proc getFunctionValueAndPos(functionName: string; statement: Statement;
                             start: Natural; variables: Variables; list = false): ValueAndPosOr
 ```
 
@@ -307,18 +309,35 @@ Run one statement and return the variable dot name string, operator and value.
 proc runStatement(statement: Statement; variables: Variables): VariableDataOr
 ```
 
-# runCommand
+# LoopControl
 
-Run a command and fill in the variables dictionaries. Return "",
-"skip" or "stop".
+Controls whether to output the current replacement block iteration and whether to stop or not.
 
-* "" -- output the replacement block. This is the default.
-* "skip" -- skip this replacement block but continue with the
-next.
-* "stop" -- stop processing the block.
+* lcStop -- do not output this replacement block and stop iterating
+* lcSkip -- do not output this replacement block and continue with the next iteration
+* lcContinue -- output the replacment block and continue with the next iteration
 
 ```nim
-proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables): string
+LoopControl = enum
+  lcStop, lcSkip, lcContinue
+```
+
+# runStatementAssignVar
+
+Run a statement and assign the variable. Return skip, stop or continue to control the loop.
+
+```nim
+proc runStatementAssignVar(env: var Env; statement: Statement;
+                           variables: var Variables; sourceFilename: string;
+                           codeFile: bool): LoopControl
+```
+
+# runCommand
+
+Run a command and fill in the variables dictionaries.
+
+```nim
+proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables): LoopControl
 ```
 
 
