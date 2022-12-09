@@ -444,7 +444,8 @@ func getSpecialFunc(dotNameValue: Value): Func =
   if dotNameValue.kind == vkList:
     let list = dotNameValue.listv
     if list.len != 1:
-      # There is only one special function in the list.
+      # This is not a special function because there is more than one
+      # item in the list and all special functions are a list of one.
       return nil
     value = list[0]
   else:
@@ -454,7 +455,7 @@ func getSpecialFunc(dotNameValue: Value): Func =
     return nil
   let funcPtr = value.funcv
 
-  if not (funcPtr.name in ["if", "if0", "and", "or", "warn", "return", "log"]):
+  if not (funcPtr.name in ["if", "if0", "and", "or", "warn", "return", "log", "func"]):
     return nil
   result = funcPtr
 
@@ -644,6 +645,16 @@ proc andOrFunctions*(
   else:
     value = a or b
   result = newValueAndPosOr(newValue(value), runningPos)
+
+proc defineFunction*(
+    nameValue: Value,
+    statement: Statement,
+    start: Natural,
+    variables: Variables,
+  ): ValueAndPosOr =
+  ## Define a new function and return the its func variable or a
+  ## message when there is a problem. The start argument points at "func".
+  result = newValueAndPosOr(wMissingKey, "", start)
 
 proc getFunctionValueAndPos*(
     functionName: string,
@@ -996,12 +1007,14 @@ proc getBracketedVarValue*(statement: Statement, dotName: string, dotNameLen: Na
 
 proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
     Variables): ValueAndPosOr =
-  ## Get the value and position from the statement.
+  ## Get the value and position from the statement. Start points at
+  ## the right hand side of the statement. For "a = 5" start points at
+  ## the 5.
 
   # The first character determines its type.
   # * quote -- string
   # * digit or minus sign -- number
-  # * a-zA-Z -- variable or function
+  # * a-zA-Z -- variable
   # * [ -- a list
   # * ( -- a condition expression
 
@@ -1021,13 +1034,14 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
   elif char == '(':
     result = getCondition(statement, start, variables)
   elif isLowerAscii(char) or isUpperAscii(char):
-    # Get the name.
+    # Get the variable name.
     let matchesO = matchDotNames(statement.text, start)
     if not matchesO.isSome:
       # Expected a string, number, variable, list or condition.
       return newValueAndPosOr(wInvalidRightHandSide, "", start)
     let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
 
+    # Handle top level function calls. a = cmp(4, 4)
     if leftParenBrack == "(":
       # We have a function, run it and return its value.
 
@@ -1037,19 +1051,28 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
         let warningData = newWarningData(dotNameValueOr.message.messageId,
           dotNameValueOr.message.p1, start)
         return newValueAndPosOr(warningData)
+
       # Get the special function or nil.
       let specialFunc = getSpecialFunc(dotNameValueOr.value)
 
-      # Handle the special if functions.
-      if specialFunc != nil and specialFunc.name in ["if", "if0"]:
-        return ifFunctions(specialFunc.name, statement, start+dotNameLen, variables)
+      if specialFunc != nil:
+        # Handle the special IF functions.
+        if specialFunc.name in ["if", "if0"]:
+          return ifFunctions(specialFunc.name, statement, start+dotNameLen, variables)
 
-      # Handle the special and/or functions.
-      if specialFunc != nil and specialFunc.name in ["and", "or"]:
-        return andOrFunctions(specialFunc.name, statement, start+dotNameLen, variables)
+        # Handle the special AND/OR functions.
+        if specialFunc.name in ["and", "or"]:
+          return andOrFunctions(specialFunc.name, statement, start+dotNameLen, variables)
 
+        # Handle the special FUNC function.
+        if specialFunc.name == "func":
+          # Define a function in a code file and not nested.
+          return newValueAndPosOr(wDefineFunction)
+
+      # Handle normal functions.
       return getFunctionValueAndPos(dotNameStr, statement,
         start+dotNameLen, variables, false)
+
     elif leftParenBrack == "[":
       # a = list[2] or a = dict["key"]
       return getBracketedVarValue(statement, dotNameStr, dotNameLen, start, variables)
@@ -1140,9 +1163,12 @@ proc runStatement*(statement: Statement, variables: Variables):
   var operatorLength = 0
   var varName = ""
 
-  var specialFunc: Func
+  var specialFunc: Func = nil
   if leftParenBrack == "(":
-    # Get the function or list of functions.
+    # We're calling a special bare function.  "if(...)", "return(5)", etc.
+
+    # Fetch the dot string's value which is a function or the list of
+    # functions.
     let dotNameValueOr = getVariable(variables, dotNameStr, "f")
     if dotNameValueOr.isMessage:
       let warningData = newWarningData(dotNameValueOr.message.messageId,
@@ -1151,12 +1177,24 @@ proc runStatement*(statement: Statement, variables: Variables):
     # Get the special function or nil.
     specialFunc = getSpecialFunc(dotNameValueOr.value)
 
-  if leftParenBrack == "(" and specialFunc != nil and specialFunc.name in ["if0", "if"]:
-    # Handle the special bare if functions.
-    vlOr = ifFunctions(specialFunc.name, statement, leadingLen, variables, bare=true)
-  elif leftParenBrack == "(" and specialFunc != nil and specialFunc.name in ["warn", "log"]:
-    # Handle a bare warn or log function.
-    vlOr = getFunctionValueAndPos(specialFunc.name, statement, leadingLen, variables)
+    # todo: create an enum for these:
+    # ["if", "if0", "and", "or", "warn", "return", "log", "func"]):
+
+    if specialFunc == nil:
+      # Missing left hand side and operator, e.g. a = len(b) not len(b).
+      return newVariableDataOr(wMissingLeftAndOpr)
+
+    if specialFunc.name in ["if0", "if"]:
+      # Handle the special bare if functions.
+      vlOr = ifFunctions(specialFunc.name, statement, leadingLen, variables, bare=true)
+    elif specialFunc.name in ["warn", "log", "return"]:
+      # Handle a bare warn or log function.
+      vlOr = getFunctionValueAndPos(specialFunc.name, statement, leadingLen, variables)
+    else:
+      # We got: and, or or func
+      # Missing left hand side and operator, e.g. a = len(b) not len(b).
+      return newVariableDataOr(wMissingLeftAndOpr)
+
   else:
     # Handle normal "varName operator right" statements.
     varName = dotNameStr

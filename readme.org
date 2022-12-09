@@ -649,7 +649,8 @@ rt = f.cmp(a, b)
 :END:
 
 All variables are stored in one of the reserved one letter top
-level dictionaries f - u. Six are currently used: f, g, l, o, s, t.
+level dictionaries f - u. Seven are currently used: f, g, l, m,
+o, s, t.
 
 The server json variables are stored in the s dictionary. You
 reference them with "s.", for example:
@@ -671,7 +672,8 @@ Reserved single letter variables:
 - g -- [[#global-variables][Global Variables]]
 - h, i, j, k -- Reserved
 - l -- [[#local-variables][Local Variables]]
-- m, n -- Reserved
+- m -- [[#user-functions][User Function Locals]]
+- n -- Reserved
 - o -- [[#code-variables][Shared Code Variables]]
 - p, q, r -- Reserved
 - s -- [[#server-json-variables][Server Json Variables]]
@@ -1412,9 +1414,11 @@ s.true = "server true"
 A func variable refers to a function. You use it to call the
 function, to get information about it, and to pass it around.
 
-You create a func variable from an existing func variable.
+You create a func variable from an existing func variable or by
+defining a new function with the special "func" function, see
+[[#user-functions][User Functions]].
 
-All the functions exist in the f dictionary by name. Each
+All the predefined functions exist in the f dictionary by name. Each
 dictionary value is a list of func values with the same name.
 
 In the following example the “a” func variable is defined to be
@@ -1732,6 +1736,92 @@ Teas of China
 """
 count = len(str)
 #+END_SRC
+
+[[#contents][茶]]
+
+* User Functions
+:PROPERTIES:
+:CUSTOM_ID: user-functions
+:END:
+
+You can define your own functions in code files.
+
+User defined functions are important for sharing common code,
+looping and as callbacks for building lists and dictionaries.
+
+A function definition is several lines. The first line, the func
+line, names the function and defines its signature. The next
+lines are for the doc comments, then the statement lines then a
+return statement ends the function definition.
+
+In the following example we define a function called l.cmp that
+takes two parameters, a string called numStr and an integer
+called num2 and it returns an integer.
+
+#+BEGIN_SRC
+l.cmp = func(numStr: string, num2: int) int
+  ## Compare a number string
+  ## with a number, return 1, 0, -1.
+  num1 = int(numStr)
+  return(cmp(num1, num2))
+#+END_SRC
+
+**Function Definition Lines:**
+
+- function name and signature — a line with the function name and its signature
+- doc comment — one or more lines that tell what the function does.
+- statements — zero or more statements
+- return statement line
+
+The code is line based so the indentation doesn’t matter, there
+aren’t any brackets, and no line terminators.
+
+Here is how you call the example l.cmp function:
+
+#+BEGIN_SRC
+a = l.cmp(“1”, 2)
+#+END_SRC
+
+**Function Name:**
+
+The variable name you assign to the function becomes the
+function name which is stored internally in the func
+variable. You see the name when you get the function details,
+otherwise it's not used.
+
+**Function Signature:**
+
+A function signature tells the parameter names, their types and
+the return type.
+
+Functions can have the same name as long as their signatures are
+different. Signatures are the same when they resolve to the same
+set of parameter types.  A signature using “all” or “optional”
+may resolve to multiple even when it’s not an exact match.
+
+You can specify that the last parameter is optional.  The get
+function is an example of that:
+
+#+BEGIN_SRC
+get(dictionary: dict, key: string, optional default: any) any
+#+END_SRC
+
+**Return Statement:**
+
+You use the return statement to return the function’s value and
+to finish the definition of the function. A bare return ends the
+function; you can use returns in IF statements and they don’t end
+the function.
+
+**Function Local Variables:**
+
+The function‘s local variables and its arguments are stored in
+the m dictionary which exists while the function runs. It
+contains the parameters and their argument values and local
+variables used in the function.
+
+To access variables outside the function, you need to pass them
+to it.
 
 [[#contents][茶]]
 
@@ -4374,7 +4464,6 @@ You can warn unconditionally using a bare warn statement:
 warn("always warn")
 #+END_SRC
 
-
 # Dynamic Content Ends
 * Contents :notoc:
 :PROPERTIES:
@@ -4398,6 +4487,7 @@ warn("always warn")
 - [[#boolean-expression][Boolean Expression]]
 - [[#code-files][Code Files]]
 - [[#multiline-strings][Multiline Strings]]
+- [[#user-functions][User Functions]]
 - [[#run-statictea][Run StaticTea]]
 - [[#miscellaneous][Miscellaneous]]
 - [[#functions][Functions]]

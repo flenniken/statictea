@@ -737,9 +737,24 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr(wMissingStatementVar)
     check testRunStatement(statement, eVariableDataOr)
 
-  test "missing statement left hand":
-    let statement = newStatement(text="return(5)", lineNum=1, 0)
-    let eVariableDataOr = newVariableDataOr(wMissingStatementVar)
+  test "bare regular function":
+    let statement = newStatement(text="cmp(5, 4)", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wMissingLeftAndOpr)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "bare return":
+    let statement = newStatement(text="""return("stop")""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("", opReturn, newValue("stop"))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "bare warn":
+    let statement = newStatement(text="""warn("hello")""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr(wUserMessage, "hello", 5)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "bare log":
+    let statement = newStatement(text="""log("hello")""", lineNum=1, 0)
+    let eVariableDataOr = newVariableDataOr("", opLog, newValue("hello"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "no equal sign":

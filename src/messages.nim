@@ -237,6 +237,8 @@ type
     wMissingRightBracket,  ## w222
     wUnableCreateStream,   ## w223
     wNotInF,               ## w224
+    wDefineFunction,       ## w225
+    wMissingLeftAndOpr,    ## w226
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -465,6 +467,8 @@ const
     "Missing right bracket.", ## wMissingRightBracket
     "Unable to create a stream object.", ## wUnableCreateStream
     "The variable '$1' isn't in the f dictionary.", ## wNotInF
+    "Define a function in a code file and not nested.", ## wDefineFunction
+    "Missing left hand side and operator, e.g. a = len(b) not len(b).", ## wMissingLeftAndOpr
     ]
 
     ## The message text.
