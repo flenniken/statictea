@@ -1122,7 +1122,7 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
         return andOrFunctions(specialFunction, statement, start+dotNameLen, variables)
       of spFunc:
         # Define a function in a code file and not nested.
-        return newValueAndPosOr(wDefineFunction)
+        return newValueAndPosOr(wDefineFunction, "", start)
       of spNotSpecial, spWarn, spReturn, spLog:
         # Handle normal functions and warn, return and log.
         return getFunctionValueAndPos(dotNameStr, statement,
@@ -1232,7 +1232,7 @@ proc runStatement*(statement: Statement, variables: Variables):
     case specialFunction:
     of spNotSpecial, spAnd, spOr, spFunc:
       # Missing left hand side and operator, e.g. a = len(b) not len(b).
-      return newVariableDataOr(wMissingLeftAndOpr)
+      return newVariableDataOr(wMissingLeftAndOpr, "", pos)
     of spIf, spIf0:
       # Handle the special bare if functions.
       vlOr = ifFunctions(specialFunction, statement, leadingLen, variables, bare=true)

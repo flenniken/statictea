@@ -1600,3 +1600,13 @@ White$1
     var variables = emptyVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check testGetValueAndPos("""a = b[0""", 4, wMissingRightBracket, 7, "", variables)
+
+  test "function definition in template":
+    let funcsVarDict = createFuncDictionary().dictv
+    var variables = emptyVariables(funcs = funcsVarDict)
+    check testGetValueAndPos("""a = func("() int")""", 4, wDefineFunction, 4, "", variables)
+
+  test "nested function definition":
+    let funcsVarDict = createFuncDictionary().dictv
+    var variables = emptyVariables(funcs = funcsVarDict)
+    check testGetValueAndPos("""a = len(func("() int"))""", 4, wDefineFunction, 8, "", variables)

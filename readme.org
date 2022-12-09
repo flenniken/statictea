@@ -1759,10 +1759,11 @@ takes two parameters, a string called numStr and an integer
 called num2 and it returns an integer.
 
 #+BEGIN_SRC
-l.cmp = func(numStr: string, num2: int) int
-  ## Compare a number string
-  ## with a number, return 1, 0, -1.
-  num1 = int(numStr)
+l.cmp = func("(numStr1: string, numStr2: string) int")
+  ## Compare two number strings
+  ## and return 1, 0, or -1.
+  num1 = int(numStr1)
+  num2 = int(numStr2)
   return(cmp(num1, num2))
 #+END_SRC
 
@@ -2585,6 +2586,7 @@ List of functions:
 - [[#float][float]] -- Create a float from a number string.
 - [[#float][float]] -- Create a float from a number string.
 - [[#format][format]] -- Format a string using replacement variables similar to a replacement block.
+- [[#func][func]] -- Define a function.
 - [[#get][get]] -- Get a dictionary value by its key.
 - [[#get][get]] -- Get a list value by its index.
 - [[#githubAnchor][githubAnchor]] -- Create Github anchor names from heading names.
@@ -3170,6 +3172,30 @@ To enter a left bracket use two in a row.
 str = format("use two {{ to get one")
 
 str => "use two { to get one"
+#+END_SRC
+
+[[#contents][茶]]
+
+** func
+:PROPERTIES:
+:CUSTOM_ID: func
+:END:
+
+Define a function.
+
+#+BEGIN_SRC
+func(str: string) func
+#+END_SRC
+
+Example:
+
+#+BEGIN_SRC
+l.cmp = func("(numStr1: string, numStr2: string) int")
+  ## Compare two number strings
+  ## and return 1, 0, or -1.
+  num1 = int(numStr1)
+  num2 = int(numStr2)
+  return(cmp(num1, num2))
 #+END_SRC
 
 [[#contents][茶]]
