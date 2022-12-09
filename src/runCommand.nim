@@ -38,6 +38,28 @@ type
   PosOr* = OpResultWarn[Natural]
     ## A position in a string or a message.
 
+  SpecialFunction* {.pure.} = enum
+    ## The special functions.
+    ## @:
+    ## @:* spNotSpecial -- not a special function
+    ## @:* spIf -- if function.
+    ## @:* spIf0 -- if0 function.
+    ## @:* spWarn -- warn function.
+    ## @:* spLog -- log function.
+    ## @:* spReturn -- return function.
+    ## @:* spAnd -- and function.
+    ## @:* spOr -- or function.
+    ## @:* spFunc -- func function.
+    spNotSpecial = "not-special",
+    spIf = "if",
+    spIf0 = "if0",
+    spWarn = "warn",
+    spLog = "log",
+    spReturn = "return",
+    spAnd = "and",
+    spOr = "or",
+    spFunc = "func",
+
 func newPosOr*(warning: MessageId, p1 = "", pos = 0): PosOr =
   ## Create a PosOr warning.
   let warningData = newWarningData(warning, p1, pos)
@@ -436,9 +458,8 @@ proc getValueAndPos*(statement: Statement, start: Natural, variables:
 # - getList
 # - getValueAndPos
 
-func getSpecialFunc(dotNameValue: Value): Func =
-  ## Return a Func when the given variable is a special function, else
-  ## return nil.
+func getSpecialFunction(dotNameValue: Value): SpecialFunction =
+  ## Check whether the variable is a special function.
 
   var value: Value
   if dotNameValue.kind == vkList:
@@ -446,21 +467,36 @@ func getSpecialFunc(dotNameValue: Value): Func =
     if list.len != 1:
       # This is not a special function because there is more than one
       # item in the list and all special functions are a list of one.
-      return nil
+      return spNotSpecial
     value = list[0]
   else:
     value = dotNameValue
 
   if value.kind != vkFunc:
-    return nil
-  let funcPtr = value.funcv
+    return spNotSpecial
 
-  if not (funcPtr.name in ["if", "if0", "and", "or", "warn", "return", "log", "func"]):
-    return nil
-  result = funcPtr
+  case value.funcv.name
+  of "if":
+    result = spIf
+  of "if0":
+    result = spIf0
+  of "and":
+    result = spAnd
+  of "or":
+    result = spOr
+  of "warn":
+    result = spWarn
+  of "return":
+    result = spReturn
+  of "log":
+    result = spLog
+  of "func":
+    result = spFunc
+  else:
+    result = spNotSpecial
 
 proc ifFunctions*(
-    functionName: string,
+    specialFunction: SpecialFunction,
     statement: Statement,
     start: Natural,
     variables: Variables,
@@ -488,12 +524,12 @@ proc ifFunctions*(
   var runningPos = vlcOr.value.pos
 
   var condition = false
-  if functionName == "if":
+  if specialFunction == spIf:
     if cond.kind != vkBool:
       # The if condition must be a bool value, got a $1.
       return newValueAndPosOr(wExpectedBool, $cond.kind, start)
     condition = cond.boolv
-  else: # functionName == "if0"
+  else: # if0
     condition = if0Condition(cond) == false
 
   # Match the comma and whitespace.
@@ -569,7 +605,7 @@ proc ifFunctions*(
     result = newValueAndPosOr(value, runningPos)
 
 proc andOrFunctions*(
-    functionName: string,
+    specialFunction: SpecialFunction,
     statement: Statement,
     start: Natural,
     variables: Variables,
@@ -597,7 +633,7 @@ proc andOrFunctions*(
     return newValueAndPosOr(wExpectedBool, $firstValue.kind, start)
 
   let a = firstValue.boolv
-  var skip = if functionName == "and": a == false else: a == true
+  var skip = if specialFunction == spAnd: a == false else: a == true
 
   # Match the comma and whitespace.
   let commaO = matchSymbol(statement.text, gComma, runningPos)
@@ -640,7 +676,7 @@ proc andOrFunctions*(
   runningPos += parenO.get().length
 
   var value: bool
-  if functionName == "and":
+  if specialFunction == spAnd:
     value = a and b
   else:
     value = a or b
@@ -1053,25 +1089,22 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
         return newValueAndPosOr(warningData)
 
       # Get the special function or nil.
-      let specialFunc = getSpecialFunc(dotNameValueOr.value)
+      let specialFunction = getSpecialFunction(dotNameValueOr.value)
 
-      if specialFunc != nil:
+      case specialFunction:
+      of spIf, spIf0:
         # Handle the special IF functions.
-        if specialFunc.name in ["if", "if0"]:
-          return ifFunctions(specialFunc.name, statement, start+dotNameLen, variables)
-
+        return ifFunctions(specialFunction, statement, start+dotNameLen, variables)
+      of spAnd, spOr:
         # Handle the special AND/OR functions.
-        if specialFunc.name in ["and", "or"]:
-          return andOrFunctions(specialFunc.name, statement, start+dotNameLen, variables)
-
-        # Handle the special FUNC function.
-        if specialFunc.name == "func":
-          # Define a function in a code file and not nested.
-          return newValueAndPosOr(wDefineFunction)
-
-      # Handle normal functions.
-      return getFunctionValueAndPos(dotNameStr, statement,
-        start+dotNameLen, variables, false)
+        return andOrFunctions(specialFunction, statement, start+dotNameLen, variables)
+      of spFunc:
+        # Define a function in a code file and not nested.
+        return newValueAndPosOr(wDefineFunction)
+      of spNotSpecial, spWarn, spReturn, spLog:
+        # Handle normal functions and warn, return and log.
+        return getFunctionValueAndPos(dotNameStr, statement,
+          start+dotNameLen, variables, false)
 
     elif leftParenBrack == "[":
       # a = list[2] or a = dict["key"]
@@ -1163,7 +1196,6 @@ proc runStatement*(statement: Statement, variables: Variables):
   var operatorLength = 0
   var varName = ""
 
-  var specialFunc: Func = nil
   if leftParenBrack == "(":
     # We're calling a special bare function.  "if(...)", "return(5)", etc.
 
@@ -1175,23 +1207,19 @@ proc runStatement*(statement: Statement, variables: Variables):
         dotNameValueOr.message.p1, pos)
       return newVariableDataOr(warningData)
     # Get the special function or nil.
-    specialFunc = getSpecialFunc(dotNameValueOr.value)
+    let specialFunction = getSpecialFunction(dotNameValueOr.value)
 
-    # todo: create an enum for these:
-    # ["if", "if0", "and", "or", "warn", "return", "log", "func"]):
-
-    if specialFunc == nil:
+    case specialFunction
+    of spNotSpecial:
       # Missing left hand side and operator, e.g. a = len(b) not len(b).
       return newVariableDataOr(wMissingLeftAndOpr)
-
-    if specialFunc.name in ["if0", "if"]:
+    of spIf, spIf0:
       # Handle the special bare if functions.
-      vlOr = ifFunctions(specialFunc.name, statement, leadingLen, variables, bare=true)
-    elif specialFunc.name in ["warn", "log", "return"]:
-      # Handle a bare warn or log function.
-      vlOr = getFunctionValueAndPos(specialFunc.name, statement, leadingLen, variables)
-    else:
-      # We got: and, or or func
+      vlOr = ifFunctions(specialFunction, statement, leadingLen, variables, bare=true)
+    of spWarn, spLog, spReturn:
+      # Handle a bare warn, log or return function.
+      vlOr = getFunctionValueAndPos($specialFunction, statement, leadingLen, variables)
+    of spAnd, spOr, spFunc:
       # Missing left hand side and operator, e.g. a = len(b) not len(b).
       return newVariableDataOr(wMissingLeftAndOpr)
 

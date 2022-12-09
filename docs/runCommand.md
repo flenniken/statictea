@@ -8,6 +8,7 @@ Run a command and fill in the variables dictionaries.
 * type: [Statement](#statement) &mdash; A Statement object stores the statement text and where it
 starts in the template file.
 * type: [PosOr](#posor) &mdash; A position in a string or a message.
+* type: [SpecialFunction](#specialfunction) &mdash; The special functions.
 * [newPosOr](#newposor) &mdash; Create a PosOr warning.
 * [newPosOr](#newposor-1) &mdash; Create a PosOr value.
 * [`==`](#) &mdash; Return true when a equals b.
@@ -26,6 +27,7 @@ starts in the template file.
 * [skipArgument](#skipargument) &mdash; Skip past the argument.
 * [ifFunctions](#iffunctions) &mdash; Return the if/if0 function's value and position after.
 * [andOrFunctions](#andorfunctions) &mdash; Return the and/or function's value and the position after.
+* [defineFunction](#definefunction) &mdash; Define a new function and return the its func variable or a message when there is a problem.
 * [getFunctionValueAndPos](#getfunctionvalueandpos) &mdash; Return the function's value and the position after it.
 * [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value.
 * [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value.
@@ -61,6 +63,24 @@ A position in a string or a message.
 
 ```nim
 PosOr = OpResultWarn[Natural]
+```
+
+# SpecialFunction
+
+The special functions.
+
+* spNotSpecial -- not a special function
+* spIf -- if function.
+* spIf0 -- if0 function.
+* spWarn -- warn function.
+* spLog -- log function.
+* spReturn -- return function.
+* spAnd -- and function.
+* spOr -- or function.
+* spFunc -- func function.
+
+```nim
+SpecialFunction
 ```
 
 # newPosOr
@@ -208,8 +228,9 @@ func skipArgument(statement: Statement; startPos: Natural): PosOr
 Return the if/if0 function's value and position after. It conditionally runs one of its arguments and skips the other. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
 
 ```nim
-proc ifFunctions(functionName: string; statement: Statement; start: Natural;
-                 variables: Variables; list = false; bare = false): ValueAndPosOr
+proc ifFunctions(specialFunction: SpecialFunction; statement: Statement;
+                 start: Natural; variables: Variables; list = false;
+                 bare = false): ValueAndPosOr
 ```
 
 # andOrFunctions
@@ -217,8 +238,17 @@ proc ifFunctions(functionName: string; statement: Statement; start: Natural;
 Return the and/or function's value and the position after. The and function stops on the first false. The or function stops on the first true. The rest of the arguments are skipped. Start points at the first parameter of the function. The position includes the trailing whitespace after the ending ).
 
 ```nim
-proc andOrFunctions(functionName: string; statement: Statement; start: Natural;
-                    variables: Variables; list = false): ValueAndPosOr
+proc andOrFunctions(specialFunction: SpecialFunction; statement: Statement;
+                    start: Natural; variables: Variables; list = false): ValueAndPosOr
+```
+
+# defineFunction
+
+Define a new function and return the its func variable or a message when there is a problem. The start argument points at "func".
+
+```nim
+proc defineFunction(nameValue: Value; statement: Statement; start: Natural;
+                    variables: Variables): ValueAndPosOr
 ```
 
 # getFunctionValueAndPos
