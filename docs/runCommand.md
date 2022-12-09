@@ -9,8 +9,11 @@ Run a command and fill in the variables dictionaries.
 starts in the template file.
 * type: [PosOr](#posor) &mdash; A position in a string or a message.
 * type: [SpecialFunction](#specialfunction) &mdash; The special functions.
+* type: [SpecialFunctionOr](#specialfunctionor) &mdash; A SpecialFunction or a warning message.
 * [newPosOr](#newposor) &mdash; Create a PosOr warning.
 * [newPosOr](#newposor-1) &mdash; Create a PosOr value.
+* [newSpecialFunctionOr](#newspecialfunctionor) &mdash; Create a PosOr warning.
+* [newSpecialFunctionOr](#newspecialfunctionor-1) &mdash; Create a SpecialFunctionOr value.
 * [`==`](#) &mdash; Return true when a equals b.
 * [`!=`](#-1) &mdash; Compare whether two PosOr are not equal.
 * [startColumn](#startcolumn) &mdash; Return enough spaces to point at the start byte position of the given text.
@@ -83,6 +86,14 @@ The special functions.
 SpecialFunction
 ```
 
+# SpecialFunctionOr
+
+A SpecialFunction or a warning message.
+
+```nim
+SpecialFunctionOr = OpResultWarn[SpecialFunction]
+```
+
 # newPosOr
 
 Create a PosOr warning.
@@ -97,6 +108,22 @@ Create a PosOr value.
 
 ```nim
 func newPosOr(pos: Natural): PosOr
+```
+
+# newSpecialFunctionOr
+
+Create a PosOr warning.
+
+```nim
+func newSpecialFunctionOr(warning: MessageId; p1 = ""; pos = 0): SpecialFunctionOr
+```
+
+# newSpecialFunctionOr
+
+Create a SpecialFunctionOr value.
+
+```nim
+func newSpecialFunctionOr(specialFunction: SpecialFunction): SpecialFunctionOr
 ```
 
 # `==`

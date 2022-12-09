@@ -60,6 +60,10 @@ type
     spOr = "or",
     spFunc = "func",
 
+  SpecialFunctionOr* = OpResultWarn[SpecialFunction]
+    ## A SpecialFunction or a warning message.
+
+
 func newPosOr*(warning: MessageId, p1 = "", pos = 0): PosOr =
   ## Create a PosOr warning.
   let warningData = newWarningData(warning, p1, pos)
@@ -68,6 +72,15 @@ func newPosOr*(warning: MessageId, p1 = "", pos = 0): PosOr =
 func newPosOr*(pos: Natural): PosOr =
   ## Create a PosOr value.
   result = opValueW[Natural](pos)
+
+func newSpecialFunctionOr*(warning: MessageId, p1 = "", pos = 0): SpecialFunctionOr =
+  ## Create a PosOr warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[SpecialFunction](warningData)
+
+func newSpecialFunctionOr*(specialFunction: SpecialFunction): SpecialFunctionOr =
+  ## Create a SpecialFunctionOr value.
+  result = opValueW[SpecialFunction](specialFunction)
 
 proc `==`*(a: PosOr, b: PosOr): bool =
   ## Return true when a equals b.
@@ -458,8 +471,14 @@ proc getValueAndPos*(statement: Statement, start: Natural, variables:
 # - getList
 # - getValueAndPos
 
-func getSpecialFunction(dotNameValue: Value): SpecialFunction =
-  ## Check whether the variable is a special function.
+func getSpecialFunction(dotNameStr: string, variables: Variables): SpecialFunctionOr =
+  ## Return the function type given a function name.
+
+  # Get the function or list of functions.
+  let dotNameValueOr = getVariable(variables, dotNameStr, "f")
+  if dotNameValueOr.isMessage:
+    return newSpecialFunctionOr(dotNameValueOr.message.messageId, dotNameValueOr.message.p1)
+  let dotNameValue = dotNameValueOr.value
 
   var value: Value
   if dotNameValue.kind == vkList:
@@ -467,33 +486,36 @@ func getSpecialFunction(dotNameValue: Value): SpecialFunction =
     if list.len != 1:
       # This is not a special function because there is more than one
       # item in the list and all special functions are a list of one.
-      return spNotSpecial
+      return newSpecialFunctionOr(spNotSpecial)
     value = list[0]
   else:
     value = dotNameValue
 
   if value.kind != vkFunc:
-    return spNotSpecial
+    return newSpecialFunctionOr(spNotSpecial)
 
+  var spFun: SpecialFunction
   case value.funcv.name
   of "if":
-    result = spIf
+    spFun = spIf
   of "if0":
-    result = spIf0
+    spFun = spIf0
   of "and":
-    result = spAnd
+    spFun = spAnd
   of "or":
-    result = spOr
+    spFun = spOr
   of "warn":
-    result = spWarn
+    spFun = spWarn
   of "return":
-    result = spReturn
+    spFun = spReturn
   of "log":
-    result = spLog
+    spFun = spLog
   of "func":
-    result = spFunc
+    spFun = spFunc
   else:
-    result = spNotSpecial
+    spFun = spNotSpecial
+
+  result = newSpecialFunctionOr(spFun)
 
 proc ifFunctions*(
     specialFunction: SpecialFunction,
@@ -1043,9 +1065,9 @@ proc getBracketedVarValue*(statement: Statement, dotName: string, dotNameLen: Na
 
 proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
     Variables): ValueAndPosOr =
-  ## Get the value and position from the statement. Start points at
-  ## the right hand side of the statement. For "a = 5" start points at
-  ## the 5.
+  ## Get the value, position and side effect from the statement. Start
+  ## points at the right hand side of the statement. For "a = 5" start
+  ## points at the 5.
 
   # The first character determines its type.
   # * quote -- string
@@ -1077,19 +1099,19 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
       return newValueAndPosOr(wInvalidRightHandSide, "", start)
     let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
 
-    # Handle top level function calls. a = cmp(4, 4)
+    # Handle top level function call or nested call.
+    # top level: a = cmp(4, 4)
+    # len nested: a = cmd(len(b), len(c))
+
     if leftParenBrack == "(":
       # We have a function, run it and return its value.
 
-      # Get the function or list of functions.
-      let dotNameValueOr = getVariable(variables, dotNameStr, "f")
-      if dotNameValueOr.isMessage:
-        let warningData = newWarningData(dotNameValueOr.message.messageId,
-          dotNameValueOr.message.p1, start)
+      let specialFunctionOr = getSpecialFunction(dotNameStr, variables)
+      if specialFunctionOr.isMessage:
+        let warningData = newWarningData(specialFunctionOr.message.messageId,
+          specialFunctionOr.message.p1, start)
         return newValueAndPosOr(warningData)
-
-      # Get the special function or nil.
-      let specialFunction = getSpecialFunction(dotNameValueOr.value)
+      let specialFunction = specialFunctionOr.value
 
       case specialFunction:
       of spIf, spIf0:
@@ -1197,20 +1219,18 @@ proc runStatement*(statement: Statement, variables: Variables):
   var varName = ""
 
   if leftParenBrack == "(":
-    # We're calling a special bare function.  "if(...)", "return(5)", etc.
+    # Handle bare function: if, if0, return, warn and log. A bare
+    # function does not assign a variable.
 
-    # Fetch the dot string's value which is a function or the list of
-    # functions.
-    let dotNameValueOr = getVariable(variables, dotNameStr, "f")
-    if dotNameValueOr.isMessage:
-      let warningData = newWarningData(dotNameValueOr.message.messageId,
-        dotNameValueOr.message.p1, pos)
+    let specialFunctionOr = getSpecialFunction(dotNameStr, variables)
+    if specialFunctionOr.isMessage:
+      let warningData = newWarningData(specialFunctionOr.message.messageId,
+        specialFunctionOr.message.p1, pos)
       return newVariableDataOr(warningData)
-    # Get the special function or nil.
-    let specialFunction = getSpecialFunction(dotNameValueOr.value)
+    let specialFunction = specialFunctionOr.value
 
-    case specialFunction
-    of spNotSpecial:
+    case specialFunction:
+    of spNotSpecial, spAnd, spOr, spFunc:
       # Missing left hand side and operator, e.g. a = len(b) not len(b).
       return newVariableDataOr(wMissingLeftAndOpr)
     of spIf, spIf0:
@@ -1219,9 +1239,6 @@ proc runStatement*(statement: Statement, variables: Variables):
     of spWarn, spLog, spReturn:
       # Handle a bare warn, log or return function.
       vlOr = getFunctionValueAndPos($specialFunction, statement, leadingLen, variables)
-    of spAnd, spOr, spFunc:
-      # Missing left hand side and operator, e.g. a = len(b) not len(b).
-      return newVariableDataOr(wMissingLeftAndOpr)
 
   else:
     # Handle normal "varName operator right" statements.
