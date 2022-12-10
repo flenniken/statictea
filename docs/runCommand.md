@@ -30,7 +30,6 @@ starts in the template file.
 * [skipArgument](#skipargument) &mdash; Skip past the argument.
 * [ifFunctions](#iffunctions) &mdash; Return the if/if0 function's value and position after.
 * [andOrFunctions](#andorfunctions) &mdash; Return the and/or function's value and the position after.
-* [defineFunction](#definefunction) &mdash; Define a new function and return the its func variable or a message when there is a problem.
 * [getFunctionValueAndPos](#getfunctionvalueandpos) &mdash; Return the function's value and the position after it.
 * [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value.
 * [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value.
@@ -39,7 +38,9 @@ starts in the template file.
 * [getValueAndPos](#getvalueandpos) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * type: [LoopControl](#loopcontrol) &mdash; Controls whether to output the current replacement block iteration and whether to stop or not.
-* [runStatementAssignVar](#runstatementassignvar) &mdash; Run a statement and assign the variable.
+* [runStatementAssignVar](#runstatementassignvar) &mdash; Run a statement and assign the variable if appropriate.
+* [funcStatement](#funcstatement) &mdash; Return true when the statement starts a function definition.
+* [defineFunction](#definefunction) &mdash; Define a function.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 
 # Statement
@@ -269,15 +270,6 @@ proc andOrFunctions(specialFunction: SpecialFunction; statement: Statement;
                     start: Natural; variables: Variables; list = false): ValueAndPosOr
 ```
 
-# defineFunction
-
-Define a new function and return the its func variable or a message when there is a problem. The start argument points at "func".
-
-```nim
-proc defineFunction(nameValue: Value; statement: Statement; start: Natural;
-                    variables: Variables): ValueAndPosOr
-```
-
 # getFunctionValueAndPos
 
 Return the function's value and the position after it. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
@@ -381,12 +373,30 @@ LoopControl = enum
 
 # runStatementAssignVar
 
-Run a statement and assign the variable. Return skip, stop or continue to control the loop.
+Run a statement and assign the variable if appropriate. Return skip, stop or continue to control the loop.
 
 ```nim
 proc runStatementAssignVar(env: var Env; statement: Statement;
                            variables: var Variables; sourceFilename: string;
                            codeFile: bool): LoopControl
+```
+
+# funcStatement
+
+Return true when the statement starts a function definition.
+
+```nim
+func funcStatement(statement: Statement): bool
+```
+
+# defineFunction
+
+Define a function.
+
+```nim
+proc defineFunction(env: var Env; lb: LineBuffer; statement: Statement;
+                    variables: var Variables; sourceFilename: string;
+                    codeFile: bool)
 ```
 
 # runCommand

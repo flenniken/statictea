@@ -463,14 +463,6 @@ proc skipArg(statement: Statement, start: Natural): PosOr =
 proc getValueAndPos*(statement: Statement, start: Natural, variables:
   Variables): ValueAndPosOr
 
-# Call stack:
-# - runStatement
-# - getValueAndPos
-# - getFunctionValueAndPos
-# - ifFunctions
-# - getList
-# - getValueAndPos
-
 func getSpecialFunction(dotNameStr: string, variables: Variables): SpecialFunctionOr =
   ## Return the function type given a function name.
 
@@ -703,16 +695,6 @@ proc andOrFunctions*(
   else:
     value = a or b
   result = newValueAndPosOr(newValue(value), runningPos)
-
-proc defineFunction*(
-    nameValue: Value,
-    statement: Statement,
-    start: Natural,
-    variables: Variables,
-  ): ValueAndPosOr =
-  ## Define a new function and return the its func variable or a
-  ## message when there is a problem. The start argument points at "func".
-  result = newValueAndPosOr(wMissingKey, "", start)
 
 proc getFunctionValueAndPos*(
     functionName: string,
@@ -1123,10 +1105,10 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
       of spFunc:
         # Define a function in a code file and not nested.
         return newValueAndPosOr(wDefineFunction, "", start)
-      of spNotSpecial, spWarn, spReturn, spLog:
+      of spNotSpecial, spReturn, spWarn, spLog:
         # Handle normal functions and warn, return and log.
         return getFunctionValueAndPos(dotNameStr, statement,
-          start+dotNameLen, variables, false)
+          start+dotNameLen, variables, list=false)
 
     elif leftParenBrack == "[":
       # a = list[2] or a = dict["key"]
@@ -1230,15 +1212,15 @@ proc runStatement*(statement: Statement, variables: Variables):
     let specialFunction = specialFunctionOr.value
 
     case specialFunction:
-    of spNotSpecial, spAnd, spOr, spFunc:
-      # Missing left hand side and operator, e.g. a = len(b) not len(b).
-      return newVariableDataOr(wMissingLeftAndOpr, "", pos)
     of spIf, spIf0:
       # Handle the special bare if functions.
       vlOr = ifFunctions(specialFunction, statement, leadingLen, variables, bare=true)
-    of spWarn, spLog, spReturn:
+    of spNotSpecial, spAnd, spOr, spFunc:
+      # Missing left hand side and operator, e.g. a = len(b) not len(b).
+      return newVariableDataOr(wMissingLeftAndOpr, "", pos)
+    of spReturn, spWarn, spLog:
       # Handle a bare warn, log or return function.
-      vlOr = getFunctionValueAndPos($specialFunction, statement, leadingLen, variables)
+      vlOr = getFunctionValueAndPos($specialFunction, statement, leadingLen, variables, list=false)
 
   else:
     # Handle normal "varName operator right" statements.
@@ -1300,8 +1282,8 @@ type
 
 proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var Variables,
     sourceFilename: string, codeFile: bool): LoopControl =
-  ## Run a statement and assign the variable. Return skip, stop or
-  ## continue to control the loop.
+  ## Run a statement and assign the variable if appropriate. Return
+  ## skip, stop or continue to control the loop.
 
   # Run the statement and get the variable, operator and value.
   let variableDataOr = runStatement(statement, variables)
@@ -1331,6 +1313,16 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
   if isSome(warningDataO):
     env.warnStatement(statement, warningDataO.get(), sourceFilename)
   return lcContinue
+
+func funcStatement*(statement: Statement): bool =
+  ## Return true when the statement starts a function definition.
+  result = false
+
+proc defineFunction*(env: var Env, lb: LineBuffer, statement: Statement,
+    variables: var Variables, sourceFilename: string,
+    codeFile: bool) =
+  ## Define a function.
+  return
 
 proc runCommand*(env: var Env, cmdLines: CmdLines,
     variables: var Variables): LoopControl =

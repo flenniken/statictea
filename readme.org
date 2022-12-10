@@ -964,7 +964,7 @@ template:
 <h3>Tea Companies</h3>
 <select>
 <!--$ block t.repeat=len(s.companyList) -->
-<!--$ : d = get(s.companyList, t.row) -->
+<!--$ : d = s.companyList[t.row] -->
 <!--$ : selected = get(d, "selected", false) -->
 <!--$ : current = if(selected, " selected=\"selected\"", "") -->
   <option{current}>{d.company}</option>
@@ -1425,7 +1425,7 @@ In the following example the “a” func variable is defined to be
 equal to the second built in cmp function.
 
 #+BEGIN_SRC
-a = get(f.cmp, 1)
+l.a = get(f.cmp, 1)
 #+END_SRC
 
 You call it with parentheses:
@@ -1458,23 +1458,20 @@ value = f.cmp(1,2)
 When you call a function variable without a prefix, statictea
 looks for it in the function dictionary.
 
-When a name has more than one function assigned to it is called
-overloaded.  When none of the overloaded functions match the
-passed arguments, statictea shows a different message depending
-on whether any of the signatures matched the first argument or
-not.
-
-When the first argument doesn't match any signatures, you get a
-message saying that. Otherwise, the function that matches the
-most arguments is returned and the error message applies to
-it. The next examples show both cases. Notice for the cmp(1, 4.5)
-case the 1 matches the first parameter of "cmp(int, int) int" so
-the error message expects an int for the second parameter too.
+When none of the signatures match the first argument, you see a
+message as show below because there is no cmp function that
+compares dictionaries.
 
 #+BEGIN_SRC
 shared.tea(1): w207: None of the 3 functions matched the first argument.
 statement: o.a = cmp(l, f)
                      ^
+#+END_SRC
+
+In the next example you see different warning messages depending
+on the first argument.
+
+#+BEGIN_SRC
 o.b = cmp(1, 4.5)
 shared.tea(2): w120: Wrong argument type, expected int.
 statement: o.b = cmp(1, 4.5)
@@ -1483,7 +1480,6 @@ o.c = cmp(1.9, 5)
 shared.tea(2): w120: Wrong argument type, expected float.
 statement: o.b = cmp(1.9, 5)
                           ^
-
 #+END_SRC
 
 [[#contents][茶]]
@@ -1754,12 +1750,12 @@ line, names the function and defines its signature. The next
 lines are for the doc comments, then the statement lines then a
 return statement ends the function definition.
 
-In the following example we define a function called l.cmp that
-takes two parameters, a string called numStr and an integer
-called num2 and it returns an integer.
+In the following example we define a function called mycmp that
+takes two string parameters called numStr1 and numStr2. It
+returns an integer.
 
 #+BEGIN_SRC
-l.cmp = func("(numStr1: string, numStr2: string) int")
+l.cmp = func("mycmp(numStr1: string, numStr2: string) int")
   ## Compare two number strings
   ## and return 1, 0, or -1.
   num1 = int(numStr1)
@@ -1767,7 +1763,7 @@ l.cmp = func("(numStr1: string, numStr2: string) int")
   return(cmp(num1, num2))
 #+END_SRC
 
-**Function Definition Lines:**
+*Function Definition Lines:*
 
 - function name and signature — a line with the function name and its signature
 - doc comment — one or more lines that tell what the function does.
@@ -1777,28 +1773,20 @@ l.cmp = func("(numStr1: string, numStr2: string) int")
 The code is line based so the indentation doesn’t matter, there
 aren’t any brackets, and no line terminators.
 
-Here is how you call the example l.cmp function:
+Here is how you call the example function:
 
 #+BEGIN_SRC
-a = l.cmp(“1”, 2)
+a = l.cmp(“1”, "2")
 #+END_SRC
 
-**Function Name:**
+*Function Signature:*
 
-The variable name you assign to the function becomes the
-function name which is stored internally in the func
-variable. You see the name when you get the function details,
-otherwise it's not used.
+A function signature tells the function name, the parameter names
+and types and the return type.
 
-**Function Signature:**
-
-A function signature tells the parameter names, their types and
-the return type.
-
-Functions can have the same name as long as their signatures are
-different. Signatures are the same when they resolve to the same
-set of parameter types.  A signature using “all” or “optional”
-may resolve to multiple even when it’s not an exact match.
+The function name is stored internally in the func variable. You
+see the name when you get the function details, otherwise it's
+not used.
 
 You can specify that the last parameter is optional.  The get
 function is an example of that:
@@ -1807,14 +1795,14 @@ function is an example of that:
 get(dictionary: dict, key: string, optional default: any) any
 #+END_SRC
 
-**Return Statement:**
+*Return Statement:*
 
 You use the return statement to return the function’s value and
 to finish the definition of the function. A bare return ends the
-function; you can use returns in IF statements and they don’t end
+function; you can use a return in a IF statement and they don’t end
 the function.
 
-**Function Local Variables:**
+*Function Local Variables:*
 
 The function‘s local variables and its arguments are stored in
 the m dictionary which exists while the function runs. It
@@ -2348,6 +2336,11 @@ Nimble Tasks:
 - *helpme*:  Show the statictea help text.
 - *remote*:  Check whether the remote code needs updating.
 - *cmdline*: Build cmdline.
+- *release*: Run tests and update docs.
+- *drun*: Run a statictea debian docker build env.
+- *ddelete*: Delete the statictea docker image and container.
+- *dlist*: List the docker image and container.
+- *clean*: Remove all the binaries so everything gets built next time.
 
 [[#contents][茶]]
 
