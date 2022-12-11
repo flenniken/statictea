@@ -247,7 +247,8 @@ MessageId = enum
   wUnableCreateStream,      ## w223
   wNotInF,                  ## w224
   wDefineFunction,          ## w225
-  wMissingLeftAndOpr         ## w226
+  wMissingLeftAndOpr,       ## w226
+  wExpectedSignature         ## w227
 ```
 
 # Messages
@@ -482,7 +483,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Unable to create a stream object.", ## wUnableCreateStream
     "The variable \'$1\' isn\'t in the f dictionary.", ## wNotInF
     "Define a function in a code file and not nested.", ## wDefineFunction
-    "Missing left hand side and operator, e.g. a = len(b) not len(b)."]
+    "Missing left hand side and operator, e.g. a = len(b) not len(b).", ## wMissingLeftAndOpr
+    "Expected signature string."]
 ```
 
 # WarningData

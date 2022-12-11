@@ -205,6 +205,11 @@ proc warnStatement*(env: var Env, statement: Statement,
     message = getWarnStatement(filename, statement, warningData)
   env.outputWarning(statement.lineNum, message)
 
+proc warnStatement*(env: var Env, statement: Statement,
+    messageId: MessageId, p1: string, pos:Natural, sourceFilename = "") =
+  let warningData = newWarningData(messageId, p1, pos)
+  env.warnStatement(statement, warningData, sourceFilename)
+
 func `==`*(s1: Statement, s2: Statement): bool =
   ## Return true when the two statements are equal.
   if s1.lineNum == s2.lineNum and s1.start == s2.start and
@@ -1314,15 +1319,142 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
     env.warnStatement(statement, warningDataO.get(), sourceFilename)
   return lcContinue
 
-func funcStatement*(statement: Statement): bool =
-  ## Return true when the statement starts a function definition.
-  result = false
+func abc(variables: Variables, arguments: seq[Value]): FunResult =
+  ## Do nothing test function.
+  result = newFunResult(newValue("hi"))
+
+proc processSignature*(signature: string): ValueOr =
+  ## Return a new function variable with the given signature.
+  let function = newFunc("abc", abc, "iis")
+  result = newValueOr(newValue(function))
+
+proc processDocComments*(env: var Env, lb: LineBuffer, statement: Statement,
+    sourceFilename: string, funcVar: var Value, extraStatement: var Statement): bool =
+  ## Add the function definition doc comments to the function
+  ## variable. Return false when there was an error. Fill in the
+  ## extraStatement with the statement after the comments.
+
+  return false
+
+proc processStatements*(env: var Env, lb: LineBuffer, statement: Statement,
+    sourceFilename: string, funcVar: var Value): bool =
+  ## Add the function definition statements to the function
+  ## variable. Return false when there was an error. The passed in
+  ## statement is the first statement after the doc commands.
+  return false
 
 proc defineFunction*(env: var Env, lb: LineBuffer, statement: Statement,
     variables: var Variables, sourceFilename: string,
-    codeFile: bool) =
-  ## Define a function.
-  return
+    codeFile: bool): bool =
+  ## If the statement is a function definition handle it. If the
+  ## statement is not handled, return false.
+
+  # Quick exit when we know its not a function definition.
+  if not ("func(" in statement.text):
+    return false
+
+  # Skip blank lines and comments.
+  var runningPos: Natural
+  let spacesO = matchTabSpace(statement.text, 0)
+  if not isSome(spacesO):
+    runningPos = 0
+  else:
+    runningPos = spacesO.get().length
+  if runningPos >= statement.text.len or statement.text[runningPos] == '#':
+    # We handled it.
+    return true
+
+  # Get the left hand variable dot name string and match the
+  # surrounding white space.
+  let matchesO = matchDotNames(statement.text, runningPos)
+  if not isSome(matchesO):
+    return false
+  let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
+  if leftParenBrack == "(":
+    return false
+  runningPos += dotNameLen
+  let varName = dotNameStr
+
+  # Get the equal sign or &= and the following whitespace.
+  let operatorO = matchEqualSign(statement.text, runningPos)
+  if not operatorO.isSome:
+    return false
+  let match = operatorO.get()
+  let op = match.getGroup()
+  var operator: Operator
+  if op == "=":
+    operator = opEqual
+  else:
+    operator = opAppendList
+  runningPos += match.length
+
+  # Look for "func(".
+  let mO = matchDotNames(statement.text, runningPos)
+  if not isSome(mO):
+    return false
+  let (_, funcStr, leftParen, funcStrLen) = mO.get3GroupsLen()
+  if funcStr != "func":
+    return false
+  if leftParen != "(":
+    return false
+  runningPos += funcStrLen
+
+  # We have a function definition. Now we start showing warning
+  # messages when there are issues.
+
+  # Get the signature string argument.
+  let vlOr = getValueAndPos(statement, runningPos, variables)
+  if vlOr.isMessage:
+    env.warnStatement(statement, vlOr.message, sourceFilename)
+    return false
+  if vlOr.value.value.kind != vkString:
+    # Expected signature string.
+    env.warnStatement(statement, wExpectedSignature, "", runningPos)
+    return false
+  let signature = vlOr.value.value.stringv
+  runningPos += vlOr.value.pos
+
+  # Look for ) and white space following the value.
+  let rightParenO = matchCommaOrSymbol(statement.text, gRightParentheses, runningPos)
+  if not rightParenO.isSome:
+    # No matching end right parentheses.
+    env.warnStatement(statement, wNoMatchingParen, "", runningPos)
+    return false
+  runningPos += rightParenO.get().length
+
+  # Check that there is not any unprocessed text following the function.
+  if runningPos != statement.text.len:
+    # Check for a trailing comment.
+    if statement.text[runningPos] != '#':
+      # Unused text at the end of the statement.
+      env.warnStatement(statement, wTextAfterValue, "", runningPos, sourceFilename)
+      return false
+
+  # Process the signature and return a function variable partially
+  # filled in.
+  let funcVarOr = processSignature(signature)
+  if not funcVarOr.isMessage:
+    let md = funcVarOr.message
+    env.warnStatement(statement, md.messageId, md.p1, runningPos, sourceFilename)
+    return false
+  var funcVar = funcVarOr.value
+
+  # Add the doc comments to the function variable and fill in
+  # extraStatement with the statement after them.
+  var extraStatement: Statement
+  if not processDocComments(env, lb, statement, sourceFilename, funcVar, extraStatement):
+    return false
+
+  # Add the statements to the function variable.
+  if not processStatements(env, lb, extraStatement, sourceFilename, funcVar):
+    return false
+
+  # Assign the variable if possible.
+  let warningDataO = assignVariable(variables, varName, funcVar,
+    operator, inCodeFile = true)
+  if isSome(warningDataO):
+    env.warnStatement(statement, warningDataO.get(), sourceFilename)
+  return true
 
 proc runCommand*(env: var Env, cmdLines: CmdLines,
     variables: var Variables): LoopControl =

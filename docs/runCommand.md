@@ -21,6 +21,7 @@ starts in the template file.
 * [getFragmentAndPos](#getfragmentandpos) &mdash; Split up a long statement around the given position.
 * [getWarnStatement](#getwarnstatement) &mdash; Return a multiline error message.
 * [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
+* [warnStatement](#warnstatement-1) &mdash; 
 * [`==`](#-2) &mdash; Return true when the two statements are equal.
 * [`$`](#-3) &mdash; Return a string representation of a Statement.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
@@ -39,8 +40,10 @@ starts in the template file.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * type: [LoopControl](#loopcontrol) &mdash; Controls whether to output the current replacement block iteration and whether to stop or not.
 * [runStatementAssignVar](#runstatementassignvar) &mdash; Run a statement and assign the variable if appropriate.
-* [funcStatement](#funcstatement) &mdash; Return true when the statement starts a function definition.
-* [defineFunction](#definefunction) &mdash; Define a function.
+* [processSignature](#processsignature) &mdash; Return a new function variable with the given signature.
+* [processDocComments](#processdoccomments) &mdash; Add the function definition doc comments to the function variable.
+* [processStatements](#processstatements) &mdash; Add the function definition statements to the function variable.
+* [defineFunction](#definefunction) &mdash; If the statement is a function definition handle it.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 
 # Statement
@@ -183,6 +186,15 @@ Show an invalid statement with a pointer pointing at the start of the problem. L
 ```nim
 proc warnStatement(env: var Env; statement: Statement; warningData: WarningData;
                    sourceFilename = "")
+```
+
+# warnStatement
+
+
+
+```nim
+proc warnStatement(env: var Env; statement: Statement; messageId: MessageId;
+                   p1: string; pos: Natural; sourceFilename = "")
 ```
 
 # `==`
@@ -381,22 +393,41 @@ proc runStatementAssignVar(env: var Env; statement: Statement;
                            codeFile: bool): LoopControl
 ```
 
-# funcStatement
+# processSignature
 
-Return true when the statement starts a function definition.
+Return a new function variable with the given signature.
 
 ```nim
-func funcStatement(statement: Statement): bool
+proc processSignature(signature: string): ValueOr
+```
+
+# processDocComments
+
+Add the function definition doc comments to the function variable. Return false when there was an error. Fill in the extraStatement with the statement after the comments.
+
+```nim
+proc processDocComments(env: var Env; lb: LineBuffer; statement: Statement;
+                        sourceFilename: string; funcVar: var Value;
+                        extraStatement: var Statement): bool
+```
+
+# processStatements
+
+Add the function definition statements to the function variable. Return false when there was an error. The passed in statement is the first statement after the doc commands.
+
+```nim
+proc processStatements(env: var Env; lb: LineBuffer; statement: Statement;
+                       sourceFilename: string; funcVar: var Value): bool
 ```
 
 # defineFunction
 
-Define a function.
+If the statement is a function definition handle it. If the statement is not handled, return false.
 
 ```nim
 proc defineFunction(env: var Env; lb: LineBuffer; statement: Statement;
                     variables: var Variables; sourceFilename: string;
-                    codeFile: bool)
+                    codeFile: bool): bool
 ```
 
 # runCommand

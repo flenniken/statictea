@@ -243,16 +243,18 @@ proc runCodeFile*(env: var Env, variables: var Variables, filename: string) =
       break # done
     let statement = statementO.get()
 
-    if funcStatement(statement):
-      defineFunction(env, lb, statement, variables, filename, codeFile=true)
-    else:
-      let loopControl = runStatementAssignVar(env, statement, variables, filename, codeFile=true)
-      if loopControl == lcStop:
-        break
-      elif loopControl == lcSkip:
-        # Use '...return(\"stop\")...' in a code file.
-        let warningData = newWarningData(wUseStop)
-        env.warnStatement(statement, warningData, sourceFilename = filename)
+    # If the statement is a function definition, handle it and return
+    # true.
+    if defineFunction(env, lb, statement, variables, filename, codeFile=true):
+      continue
+
+    let loopControl = runStatementAssignVar(env, statement, variables, filename, codeFile=true)
+    if loopControl == lcStop:
+      break
+    elif loopControl == lcSkip:
+      # Use '...return(\"stop\")...' in a code file.
+      let warningData = newWarningData(wUseStop)
+      env.warnStatement(statement, warningData, sourceFilename = filename)
 
 proc runCodeFiles*(env: var Env, variables: var Variables, codeList: seq[string]) =
   ## Run each code file and populate the variables.
