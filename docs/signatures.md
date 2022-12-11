@@ -5,62 +5,15 @@ Statictea function signatures and parameter checking.
 * [signatures.nim](../src/signatures.nim) &mdash; Nim source code.
 # Index
 
-* type: [ParamCode](#paramcode) &mdash; Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.
-* type: [ParamKind](#paramkind) &mdash; The kind of parameter.
-* type: [Param](#param) &mdash; Holds attributes for one parameter.
-* [newParam](#newparam) &mdash; Create a new Param object.
 * [paramCodeString](#paramcodestring) &mdash; Return a string representation of a ParamCode object.
 * [`$`](#) &mdash; Return a string representation of a Param object.
 * [kindToParamCode](#kindtoparamcode) &mdash; Convert a value type to a parameter type.
 * [sameType](#sametype) &mdash; Check whether the param type is the same type or compatible with the value.
+* [sameType](#sametype-1) &mdash; Check whether the param type is the same type or compatible with the value.
 * [parmsToSignature](#parmstosignature) &mdash; Create a signature from a list of Params.
 * [shortName](#shortname) &mdash; Return a short name based on the given index value.
 * [signatureCodeToParams](#signaturecodetoparams) &mdash; Convert the signature code to a list of Param objects.
 * [mapParameters](#mapparameters) &mdash; Create a dictionary of the arguments.
-
-# ParamCode
-
-Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.
-
-```nim
-ParamCode = char
-```
-
-# ParamKind
-
-The kind of parameter.<ul class="simple"><li>pkNormal -- a normal parameter</li>
-<li>pkOptional -- an optional parameter. It must be last.</li>
-<li>pkReturn -- a return parameter.</li>
-</ul>
-
-
-```nim
-ParamKind = enum
-  pkNormal, pkOptional, pkReturn
-```
-
-# Param
-
-Holds attributes for one parameter.
-* name -- the parameter name
-* paramCode -- the parameter code, one of: ifsldpa
-* paramKind -- whether it is normal, optional or a return
-
-```nim
-Param = object
-  name*: string
-  paramCode*: ParamCode
-  paramKind*: ParamKind
-
-```
-
-# newParam
-
-Create a new Param object.
-
-```nim
-func newParam(name: string; paramKind: ParamKind; paramCode: ParamCode): Param
-```
 
 # paramCodeString
 
@@ -92,6 +45,14 @@ Check whether the param type is the same type or compatible with the value.
 
 ```nim
 func sameType(paramCode: ParamCode; valueKind: ValueKind): bool
+```
+
+# sameType
+
+Check whether the param type is the same type or compatible with the value.
+
+```nim
+func sameType(paramType: ParamType; valueKind: ValueKind): bool
 ```
 
 # parmsToSignature

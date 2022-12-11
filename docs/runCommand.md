@@ -395,7 +395,7 @@ proc runStatementAssignVar(env: var Env; statement: Statement;
 
 # processSignature
 
-Return a new function variable with the given signature.
+Return a new function variable with the given signature. cmp(numStr1: string, numStr2: string) int
 
 ```nim
 proc processSignature(signature: string): ValueOr

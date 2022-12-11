@@ -3458,7 +3458,7 @@ If the condition is true, return the second argument, else return the third argu
 - The if functions are special in a couple of ways, see
 [[#if-functions][If Functions]]
 - You usually use boolean expressions for the condition, see:
-[[#boolean-expression][Boolean Expression]]
+[[#boolean-expressions][Boolean Expressions]]
 
 #+BEGIN_SRC
 if(condition: bool, then: any, optional else: any) any

@@ -6,6 +6,8 @@ import readjson
 import vartypes
 import messages
 import sharedtestcode
+import signatures
+import options
 
 proc testDotNameRep(json: string, eDotNameRep: string, top=false): bool =
   var valueOr = readJsonString(json)
@@ -317,7 +319,8 @@ c.d = [7]"""
   test "new function":
     func abc(variables: Variables, parameters: seq[Value]): FunResult =
       result = newFunResult(newValue("hi"))
-    let function = newFunc("abc", abc, "iis")
+    let paramsO = signatureCodeToParams("iis")
+    let function = newFunc("abc", abc, paramsO.get())
     check gotExpected($function, "\"abc\"")
 
     let value = newValue(function)
@@ -331,7 +334,8 @@ c.d = [7]"""
     let d = newValue({"x":1, "y":2})
     func abc(variables: Variables, parameters: seq[Value]): FunResult =
       result = newFunResult(newValue("hi"))
-    let fn = newValue(newFunc("abc", abc, "iis"))
+    let paramsO = signatureCodeToParams("iis")
+    let fn = newValue(newFunc("abc", abc, paramsO.get()))
     let found = newValue(true)
 
     check $str == """"Eary Grey""""
@@ -366,3 +370,9 @@ y = 2"""
     check $found == "true"
     check valueToString(found) == "true"
     check valueToStringRB(found) == "true"
+
+  test "ParamType and ValueKind":
+    # ParamType and ValueKind are the same except the extra any
+    # parameter type.
+    check ord(high(ValueKind)) == 6
+    check ord(high(ParamType)) == 7

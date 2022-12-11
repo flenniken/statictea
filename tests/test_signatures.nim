@@ -53,8 +53,7 @@ proc testMapParametersW(signatureCode: string, args: seq[Value],
     echo "expected message: $1" % getWarning(
       eFunResult.warningData.messageId, eFunResult.warningData.p1)
 
-
-proc testParamStringSingle(name: string, paramCode: ParamCode, optional: bool,
+proc testParamStringSingle(name: string, paramType: ParamType, optional: bool,
                      eString: string): bool =
   ## Test single arg cases.
   var paramKind: ParamKind
@@ -62,12 +61,12 @@ proc testParamStringSingle(name: string, paramCode: ParamCode, optional: bool,
     paramKind = pkOptional
   else:
     paramKind = pkNormal
-  let param = newParam("hello", paramKind, paramCode)
+  let param = newParam("hello", paramKind, paramType)
   result = expectedItem("param", $param, eString)
 
-proc testParamStringReturn(paramCode: ParamCode, eString: string): bool =
+proc testParamStringReturn(paramType: ParamType, eString: string): bool =
   ## Test return parameter case.
-  let param = newParam("result", pkReturn, paramCode)
+  let param = newParam("result", pkReturn, paramType)
   result = expectedItem("param", $param, eString)
 
 
@@ -111,11 +110,11 @@ suite "signatures.nim":
     check testSignatureCodeToParams("isfoli", e)
 
   test "Single Param representation":
-    check testParamStringSingle("hello", 'i', false, "hello: int")
-    check testParamStringSingle("hello", 'i', true, "hello: optional int")
+    check testParamStringSingle("hello", ptInt, false, "hello: int")
+    check testParamStringSingle("hello", ptInt, true, "hello: optional int")
 
   test "Return Param representation":
-    check testParamStringReturn('i', "int")
+    check testParamStringReturn(ptInt, "int")
 
   test "shortName":
     check shortName(0) == "a"

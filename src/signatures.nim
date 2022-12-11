@@ -27,32 +27,6 @@ static:
     const message = "Update singleCodes:\nnumCode = $1, numKinds = $2\n" % [$numCodes, $numKinds]
     {.error: message .}
 
-type
-  ParamCode* = char
-    ## Parameter type, one character of "ifsldpa" corresponding to int,
-    ## float, string, list, dict, func, any.
-
-  ParamKind* = enum
-    ## The kind of parameter.
-    ## * pkNormal -- a normal parameter
-    ## * pkOptional -- an optional parameter. It must be last.
-    ## * pkReturn -- a return parameter.
-    pkNormal, pkOptional, pkReturn
-
-  Param* = object
-    ## Holds attributes for one parameter.
-    ## @:* name -- the parameter name
-    ## @:* paramCode -- the parameter code, one of: ifsldpa
-    ## @:* paramKind -- whether it is normal, optional or a return
-    name*: string
-    paramCode*: ParamCode
-    paramKind*: ParamKind
-
-func newParam*(name: string, paramKind: ParamKind,
-    paramCode: ParamCode): Param =
-  ## Create a new Param object.
-  result = Param(name: name, paramKind: paramKind, paramCode: paramCode)
-
 func paramCodeString*(paramCode: ParamCode): string =
   ## Return a string representation of a ParamCode object.
 
@@ -77,6 +51,28 @@ func paramCodeString*(paramCode: ParamCode): string =
     assert(false, "invalid ParamCode")
     result = $vkInt
 
+func codeToParamType(code: ParamCode): ParamType =
+  case code:
+  of 'i':
+    result = ptInt
+  of 'f':
+    result = ptFloat
+  of 's':
+    result = ptString
+  of 'l':
+    result = ptList
+  of 'd':
+    result = ptDict
+  of 'b':
+    result = ptBool
+  of 'p':
+    result = ptFunc
+  of 'a':
+    result = ptAny
+  else:
+    assert(false, "invalid ParamCode")
+    result = ptInt
+
 func `$`*(param: Param): string =
   ## Return a string representation of a Param object.
   var optional: string
@@ -85,11 +81,10 @@ func `$`*(param: Param): string =
   else:
     optional = ""
   if param.paramKind == pkReturn:
-    result = paramCodeString(param.paramCode)
+    result = $param.paramType
   else:
     # name: int
-    let typeString = paramCodeString(param.paramCode)
-    result = "$1: $2$3" % [param.name, optional, typeString]
+    result = "$1: $2$3" % [param.name, optional, $param.paramType]
 
 func kindToParamCode*(kind: ValueKind): ParamCode =
   ## Convert a value type to a parameter type.
@@ -142,6 +137,35 @@ func sameType*(paramCode: ParamCode, valueKind: ValueKind): bool =
       assert false, "Invalid paramCode"
       discard
 
+func sameType*(paramType: ParamType, valueKind: ValueKind): bool =
+  ## Check whether the param type is the same type or compatible with
+  ## the value.
+
+  case paramType:
+    of ptAny:
+      return true
+    of ptInt:
+      if valueKind == vkInt:
+        return true
+    of ptFloat:
+      if valueKind == vkFloat:
+        return true
+    of ptString:
+      if valueKind == vkString:
+        return true
+    of ptList:
+      if valueKind == vkList:
+        return true
+    of ptDict:
+      if valueKind == vkDict:
+        return true
+    of ptBool:
+      if valueKind == vkBool:
+        return true
+    of ptFunc:
+      if valueKind == vkFunc:
+        return true
+
 func parmsToSignature*(params: seq[Param]): string =
   ## Create a signature from a list of Params.
   assert len(params) > 0
@@ -175,7 +199,8 @@ func signatureCodeToParams*(signatureCode: string): Option[seq[Param]] =
   for ix in countUp(0, signatureCode.len - 2):
     var code = signatureCode[ix]
     if code in singleCodes:
-      params.add(newParam(shortName(nameIx), paramKind, code))
+      let parmType = codeToParamType(code)
+      params.add(newParam(shortName(nameIx), paramKind, parmType))
       paramKind = pkNormal
       inc(nameIx)
     elif code == 'o':
@@ -185,7 +210,8 @@ func signatureCodeToParams*(signatureCode: string): Option[seq[Param]] =
       return
 
   let returnCode = signatureCode[signatureCode.len-1]
-  params.add(newParam("result", pkReturn, returnCode))
+  let parmType = codeToParamType(returnCode)
+  params.add(newParam("result", pkReturn, parmType))
   result = some(params)
 
 func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
@@ -226,10 +252,9 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
     let arg = args[ix]
 
     # Check the parameter and argument match.
-    if not sameType(param.paramCode, arg.kind):
-      let expected = paramCodeString(param.paramCode)
+    if not sameType(param.paramType, arg.kind):
       # Wrong argument type, expected $1.
-      return newFunResultWarn(wWrongType, parameter=ix, p1 = $expected)
+      return newFunResultWarn(wWrongType, parameter=ix, p1 = $param.paramType)
 
     map[param.name] = arg
 
@@ -240,3 +265,4 @@ func mapParameters*(params: seq[Param], args: seq[Value]): FunResult =
     return newFunResultWarn(warning, parameter=lastIx+1, p1 = $(params.len - 1))
 
   result = newFunResult(newValue(map))
+

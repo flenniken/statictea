@@ -2594,7 +2594,7 @@ const
     ("len", funLen_di, "di"),
     ("len", funLen_li, "li"),
     ("len", funLen_si, "si"),
-    ("list", funList, "..."),
+    ("list", funList, "al"),
     ("log", funLog_ss, "si"),
     ("lower", funLower_ss, "ss"),
     ("lt", funLt_ffb, "ffb"),
@@ -2657,8 +2657,7 @@ proc getBestFunction*(funcValue: Value, arguments: seq[Value]): ValueOr =
         let warningData = newWarningData(wNotFunction)
         return newValueOr(warningData)
 
-      let paramsO = signatureCodeToParams(funcValue.funcv.signatureCode)
-      let funResult = mapParameters(paramsO.get(), arguments)
+      let funResult = mapParameters(funcValue.funcv.signature, arguments)
       if funResult.kind != frWarning:
         # All arguments match the parameters, return the function.
         return newValueOr(funcValue)
@@ -2693,7 +2692,8 @@ proc createFuncDictionary*(): Value =
   var funcList = newEmptyListValue()
   var lastName = ""
   for (name, functionPtr, signatureCode) in functionsList:
-    let function = newFunc(name, functionPtr, signatureCode)
+    let signatureO = signatureCodeToParams(signatureCode)
+    let function = newFunc(name, functionPtr, signatureO.get())
     let funcValue = newValue(function)
     if name == lastName:
       funcList.listv.add(funcValue)

@@ -8,6 +8,7 @@ import messages
 import variables
 import opresult
 import sharedtestcode
+import signatures
 
 let funcsVarDict = createFuncDictionary().dictv
 
@@ -118,10 +119,11 @@ proc testGetBestFunctionExists(functionName: string, arguments: seq[Value],
   if funcValueOr.isMessage:
     echo funcValueOr.message
     return false
-  let signatureCode = funcValueOr.value.funcv.signatureCode
+  let signature = funcValueOr.value.funcv.signature
+  let eSignature = signatureCodeToParams(eSignatureCode).get()
 
   let test = "$1(args=$2)" % [functionName, $arguments]
-  result = gotExpected(signatureCode, eSignatureCode, test)
+  result = gotExpected($signature, $eSignature, test)
 
 proc testGetBestFunction(value: Value, arguments: seq[Value],
     eFuncValueOr: ValueOr): bool =
@@ -182,19 +184,20 @@ proc testFormatStringWarn(str: string, eWarningData: WarningData,
 suite "runFunction.nim":
 
   test "getBestFunction function value":
-    let function = newFunc("abc", abc, "iis")
+    let function = newFunc("abc", abc, signatureCodeToParams("iis").get())
     let value = newValue(function)
     check testGetBestFunction(value, @[newValue(1), newValue(1)], newValueOr(value))
 
   test "getBestFunction function list of one":
-    let function = newFunc("abc", abc, "iis")
+    let params = signatureCodeToParams("iis")
+    let function = newFunc("abc", abc, params.get())
     let value = newValue(function)
     let listValue = newValue(@[value])
     check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(value))
 
   test "getBestFunction function list of two":
-    let function1 = newFunc("abc", abc, "iis")
-    let function2 = newFunc("abc", abc, "ffs")
+    let function1 = newFunc("abc", abc, signatureCodeToParams("iis").get())
+    let function2 = newFunc("abc", abc, signatureCodeToParams("ffs").get())
     let value1 = newValue(function1)
     let value2 = newValue(function2)
     let listValue = newValue(@[value1, value2])
@@ -211,7 +214,7 @@ suite "runFunction.nim":
     var listValue = newValue(@[value])
     check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(wNotFunction))
 
-    let function2 = newFunc("abc", abc, "iis")
+    let function2 = newFunc("abc", abc, signatureCodeToParams("iis").get())
     let value2 = newValue(function2)
     listValue = newValue(@[value2, value])
     check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(value2))
@@ -219,7 +222,7 @@ suite "runFunction.nim":
     listValue = newValue(@[value, value2])
     check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(wNotFunction))
 
-    let function3 = newFunc("abc", abc, "fss")
+    let function3 = newFunc("abc", abc, signatureCodeToParams("fss").get())
     let value3 = newValue(function3)
     listValue = newValue(@[value3, value])
     check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(wNotFunction))
@@ -1799,7 +1802,7 @@ d.sub.y = 4"""
     check testBool(newValue(""), false)
     check testBool(newEmptyListValue(), false)
     check testBool(newEmptyDictValue(), false)
-    let function = newFunc("abc", abc, "iis")
+    let function = newFunc("abc", abc, signatureCodeToParams("iis").get())
     check testBool(newValue(function), false)
 
   test "bool true":

@@ -1325,7 +1325,14 @@ func abc(variables: Variables, arguments: seq[Value]): FunResult =
 
 proc processSignature*(signature: string): ValueOr =
   ## Return a new function variable with the given signature.
-  let function = newFunc("abc", abc, "iis")
+  ## cmp(numStr1: string, numStr2: string) int
+
+  var params = newSeq[Param]()
+  params.add(newParam("numStr1", pkNormal, ptString))
+  params.add(newParam("numStr2", pkNormal, ptString))
+  params.add(newParam("", pkReturn, ptInt))
+
+  let function = newFunc("abc", abc, params)
   result = newValueOr(newValue(function))
 
 proc processDocComments*(env: var Env, lb: LineBuffer, statement: Statement,

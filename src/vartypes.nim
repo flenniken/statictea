@@ -19,11 +19,11 @@ type
 
   ValueKind* = enum
     ## The statictea variable types.
-    vkString,
-    vkInt,
-    vkFloat,
-    vkDict,
-    vkList,
+    vkString
+    vkInt
+    vkFloat
+    vkDict
+    vkList
     vkBool
     vkFunc
 
@@ -59,12 +59,45 @@ type
   Func* = ref FunctionSpec
     ## A func value is a reference to a FunctionSpec.
 
+  ParamCode* = char
+    ## Parameter type, one character of "ifsldpa" corresponding to int,
+    ## float, string, list, dict, func, any.
+
+  ParamType* = enum
+    ## The statictea parameter types. The same as the variable types
+    ## ValueKind with an extra for "any".
+    ptString = "string"
+    ptInt = "int"
+    ptFloat = "float"
+    ptDict = "dict"
+    ptList = "list"
+    ptBool = "bool"
+    ptFunc = "func"
+    ptAny = "any"
+
+  ParamKind* = enum
+    ## The kind of parameter.
+    ## * pkNormal -- a normal parameter
+    ## * pkOptional -- an optional parameter. It must be last.
+    ## * pkReturn -- a return parameter.
+    pkNormal, pkOptional, pkReturn
+
+  Param* = object
+    ## Holds attributes for one parameter.
+    ## @:* name -- the parameter name
+    ## @:* paramCode -- the parameter code, one of: ifsldpa
+    ## @:* paramKind -- whether it is normal, optional or a return
+    name*: string
+    paramType*: ParamType
+    paramKind*: ParamKind
+
   FunctionSpec* = object
     ## The name of a function, a pointer to the code, and its signature
     ## code.
     name*: string
     functionPtr*: FunctionPtr
-    signatureCode*: string
+    # todo: rename to parameters or params
+    signature*: seq[Param]
 
   FunResultKind* = enum
     ## The kind of a FunResult object, either a value or warning.
@@ -112,6 +145,10 @@ type
 
   ValueAndPosOr* = OpResultWarn[ValueAndPos]
     ## A ValueAndPos object or a warning.
+
+func newParam*(name: string, paramKind: ParamKind, paramType: ParamType): Param =
+  ## Create a new Param object.
+  result = Param(name: name, paramKind: paramKind, paramType: paramType)
 
 proc newVarsDict*(): VarsDict =
   ## Create a new empty variables dictionary. VarsDict is a ref type.
@@ -185,10 +222,10 @@ proc newValue*[T](dictPairs: openArray[(string, T)]): Value =
     varsTable[a] = value
   result = Value(kind: vkDict, dictv: varsTable)
 
-func newFunc*(name: string, functionPtr: FunctionPtr, signatureCode: string): Func =
+func newFunc*(name: string, functionPtr: FunctionPtr, signature: seq[Param]): Func =
   ## Create a new func which is a reference to a FunctionSpec.
   new(result)
-  result[] = FunctionSpec(name: name, functionPtr: functionPtr, signatureCode: signatureCode)
+  result[] = FunctionSpec(name: name, functionPtr: functionPtr, signature: signature)
 
 func newFunc*(functionSpec: FunctionSpec): Func =
   ## Create a new func which is a reference to a FunctionSpec.

@@ -13,12 +13,17 @@ StaticTea variable types.
 * type: [ValueOr](#valueor) &mdash; A Value object or a warning.
 * type: [FunctionPtr](#functionptr) &mdash; Signature of a statictea function.
 * type: [Func](#func) &mdash; A func value is a reference to a FunctionSpec.
+* type: [ParamCode](#paramcode) &mdash; Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.
+* type: [ParamType](#paramtype) &mdash; The statictea parameter types.
+* type: [ParamKind](#paramkind) &mdash; The kind of parameter.
+* type: [Param](#param) &mdash; Holds attributes for one parameter.
 * type: [FunctionSpec](#functionspec) &mdash; The name of a function, a pointer to the code, and its signature code.
 * type: [FunResultKind](#funresultkind) &mdash; The kind of a FunResult object, either a value or warning.
 * type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a warning.
 * type: [SideEffect](#sideeffect) &mdash; The kind of side effect for a statement.
 * type: [ValueAndPos](#valueandpos) &mdash; A value and the position after the value in the statement along with the side effect, if any.
 * type: [ValueAndPosOr](#valueandposor) &mdash; A ValueAndPos object or a warning.
+* [newParam](#newparam) &mdash; Create a new Param object.
 * [newVarsDict](#newvarsdict) &mdash; Create a new empty variables dictionary.
 * [newVarsDictOr](#newvarsdictor) &mdash; Return a new varsDictOr object containing a warning.
 * [newVarsDictOr](#newvarsdictor-1) &mdash; Return a new VarsDict object containing a dictionary.
@@ -132,6 +137,52 @@ A func value is a reference to a FunctionSpec.
 Func = ref FunctionSpec
 ```
 
+# ParamCode
+
+Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.
+
+```nim
+ParamCode = char
+```
+
+# ParamType
+
+The statictea parameter types. The same as the variable types ValueKind with an extra for "any".
+
+```nim
+ParamType = enum
+  ptString = "string", ptInt = "int", ptFloat = "float", ptDict = "dict",
+  ptList = "list", ptBool = "bool", ptFunc = "func", ptAny = "any"
+```
+
+# ParamKind
+
+The kind of parameter.<ul class="simple"><li>pkNormal -- a normal parameter</li>
+<li>pkOptional -- an optional parameter. It must be last.</li>
+<li>pkReturn -- a return parameter.</li>
+</ul>
+
+
+```nim
+ParamKind = enum
+  pkNormal, pkOptional, pkReturn
+```
+
+# Param
+
+Holds attributes for one parameter.
+* name -- the parameter name
+* paramCode -- the parameter code, one of: ifsldpa
+* paramKind -- whether it is normal, optional or a return
+
+```nim
+Param = object
+  name*: string
+  paramType*: ParamType
+  paramKind*: ParamKind
+
+```
+
 # FunctionSpec
 
 The name of a function, a pointer to the code, and its signature code.
@@ -140,7 +191,7 @@ The name of a function, a pointer to the code, and its signature code.
 FunctionSpec = object
   name*: string
   functionPtr*: FunctionPtr
-  signatureCode*: string
+  signature*: seq[Param]
 
 ```
 
@@ -211,6 +262,14 @@ A ValueAndPos object or a warning.
 
 ```nim
 ValueAndPosOr = OpResultWarn[ValueAndPos]
+```
+
+# newParam
+
+Create a new Param object.
+
+```nim
+func newParam(name: string; paramKind: ParamKind; paramType: ParamType): Param
 ```
 
 # newVarsDict
@@ -328,7 +387,7 @@ proc newValue[T](dictPairs: openArray[(string, T)]): Value
 Create a new func which is a reference to a FunctionSpec.
 
 ```nim
-func newFunc(name: string; functionPtr: FunctionPtr; signatureCode: string): Func
+func newFunc(name: string; functionPtr: FunctionPtr; signature: seq[Param]): Func
 ```
 
 # newFunc
