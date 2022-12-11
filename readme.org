@@ -1484,9 +1484,9 @@ statement: o.b = cmp(1.9, 5)
 
 [[#contents][茶]]
 
-* Boolean Expressions
+* Boolean Expression
 :PROPERTIES:
-:CUSTOM_ID: boolean-expressions
+:CUSTOM_ID: boolean-expression
 :END:
 
 You use a boolean expression with an if statement to make a
@@ -1639,8 +1639,11 @@ o.pi = 3.14159
 o.footer = "</html>"
 #+END_SRC
 
-You primarily use a code file for sharing template fragments
-using multiline strings.  See the [[#multiline-strings][Multiline Strings]] section.
+A code file is good for sharing template fragments and for
+formatting variables to minimize the code needed in a template.
+You can define functions in code files. For sharing template
+fragments see the [[#multiline-strings][Multiline Strings]] section. For defining
+functions see [[#user-functions][User Functions]] section.
 
 The code files run after importing the JSON files so they have
 access to the server variables.
@@ -2157,13 +2160,14 @@ The functions with special forms and how they deviate from the
 normal form:
 
 - list - takes any number of arguments
-- if - conditional evaluates its arguments and it has a bare no
-  return value option, see see [[#if-functions][If Functions]]
-- and — conditional evaluates its arguments
-- or — conditional evaluates its arguments
+- if - conditionally evaluates its arguments and it has a bare no
+  return value option, see [[#if-functions][If Functions]]
+- and — conditionally evaluates its arguments
+- or — conditionally evaluates its arguments
 - warn — exits the statement like a normal warning with no return value
 - return - exits the command block or function with a return value
 - log - writes a message to the log file
+- func - define a function, see [[#user-functions][User Functions]]
 
 Special Form Examples:
 
@@ -3454,7 +3458,7 @@ If the condition is true, return the second argument, else return the third argu
 - The if functions are special in a couple of ways, see
 [[#if-functions][If Functions]]
 - You usually use boolean expressions for the condition, see:
-[[#boolean-expressions][Boolean Expressions]]
+[[#boolean-expression][Boolean Expression]]
 
 #+BEGIN_SRC
 if(condition: bool, then: any, optional else: any) any
