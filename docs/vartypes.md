@@ -17,7 +17,7 @@ StaticTea variable types.
 * type: [ParamType](#paramtype) &mdash; The statictea parameter types.
 * type: [ParamKind](#paramkind) &mdash; The kind of parameter.
 * type: [Param](#param) &mdash; Holds attributes for one parameter.
-* type: [FunctionSpec](#functionspec) &mdash; The name of a function, a pointer to the code, and its signature code.
+* type: [FunctionSpec](#functionspec) &mdash; The name of a function, a pointer to the code, and its parameters.
 * type: [FunResultKind](#funresultkind) &mdash; The kind of a FunResult object, either a value or warning.
 * type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a warning.
 * type: [SideEffect](#sideeffect) &mdash; The kind of side effect for a statement.
@@ -185,13 +185,13 @@ Param = object
 
 # FunctionSpec
 
-The name of a function, a pointer to the code, and its signature code.
+The name of a function, a pointer to the code, and its parameters.
 
 ```nim
 FunctionSpec = object
   name*: string
   functionPtr*: FunctionPtr
-  signature*: seq[Param]
+  params*: seq[Param]
 
 ```
 
@@ -387,7 +387,7 @@ proc newValue[T](dictPairs: openArray[(string, T)]): Value
 Create a new func which is a reference to a FunctionSpec.
 
 ```nim
-func newFunc(name: string; functionPtr: FunctionPtr; signature: seq[Param]): Func
+func newFunc(name: string; functionPtr: FunctionPtr; params: seq[Param]): Func
 ```
 
 # newFunc

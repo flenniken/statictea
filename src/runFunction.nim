@@ -2657,7 +2657,7 @@ proc getBestFunction*(funcValue: Value, arguments: seq[Value]): ValueOr =
         let warningData = newWarningData(wNotFunction)
         return newValueOr(warningData)
 
-      let funResult = mapParameters(funcValue.funcv.signature, arguments)
+      let funResult = mapParameters(funcValue.funcv.params, arguments)
       if funResult.kind != frWarning:
         # All arguments match the parameters, return the function.
         return newValueOr(funcValue)

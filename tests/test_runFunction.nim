@@ -119,11 +119,11 @@ proc testGetBestFunctionExists(functionName: string, arguments: seq[Value],
   if funcValueOr.isMessage:
     echo funcValueOr.message
     return false
-  let signature = funcValueOr.value.funcv.signature
-  let eSignature = signatureCodeToParams(eSignatureCode).get()
+  let params = funcValueOr.value.funcv.params
+  let eParams = signatureCodeToParams(eSignatureCode).get()
 
   let test = "$1(args=$2)" % [functionName, $arguments]
-  result = gotExpected($signature, $eSignature, test)
+  result = gotExpected($params, $eParams, test)
 
 proc testGetBestFunction(value: Value, arguments: seq[Value],
     eFuncValueOr: ValueOr): bool =

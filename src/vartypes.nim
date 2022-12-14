@@ -92,12 +92,11 @@ type
     paramKind*: ParamKind
 
   FunctionSpec* = object
-    ## The name of a function, a pointer to the code, and its signature
-    ## code.
+    ## The name of a function, a pointer to the code, and its
+    ## parameters.
     name*: string
     functionPtr*: FunctionPtr
-    # todo: rename to parameters or params
-    signature*: seq[Param]
+    params*: seq[Param]
 
   FunResultKind* = enum
     ## The kind of a FunResult object, either a value or warning.
@@ -222,10 +221,10 @@ proc newValue*[T](dictPairs: openArray[(string, T)]): Value =
     varsTable[a] = value
   result = Value(kind: vkDict, dictv: varsTable)
 
-func newFunc*(name: string, functionPtr: FunctionPtr, signature: seq[Param]): Func =
+func newFunc*(name: string, functionPtr: FunctionPtr, params: seq[Param]): Func =
   ## Create a new func which is a reference to a FunctionSpec.
   new(result)
-  result[] = FunctionSpec(name: name, functionPtr: functionPtr, signature: signature)
+  result[] = FunctionSpec(name: name, functionPtr: functionPtr, params: params)
 
 func newFunc*(functionSpec: FunctionSpec): Func =
   ## Create a new func which is a reference to a FunctionSpec.
