@@ -6,22 +6,22 @@ import options
 import messages
 import sharedtestcode
 
-proc testSignatureCodeToParams(signatureCode: string, expected: string): bool =
-  var params0 = signatureCodeToParams(signatureCode)
-  if not params0.isSome:
+proc testSignatureCodeToSignature(signatureCode: string, expected: string,
+    functionName = "name"): bool =
+  var signatureO = signatureCodeToSignature(functionName, signatureCode)
+  if not signatureO.isSome:
     echo "Not a valid signature."
     result = false
   else:
-    result = expectedItem("signatureCodeToParams",
-      parmsToSignature(params0.get()), expected)
+    result = gotExpected($signatureO.get(), expected, "signatureCodeToSignature")
 
 proc testMapParametersOk(signatureCode: string, args: seq[Value],
-                       eMapJson: string): bool =
-  var paramsO = signatureCodeToParams(signatureCode)
-  if not paramsO.isSome:
+    eMapJson: string, functionName = "name"): bool =
+  var signatureO = signatureCodeToSignature(functionName, signatureCode)
+  if not signatureO.isSome:
     echo "Invalid signature: " & signatureCode
     return false
-  let funResult = mapParameters(paramsO.get(), args)
+  let funResult = mapParameters(signatureO.get(), args)
   if not expectedItem("mapParameters", funResult.kind, frValue):
     echo "warning: " & $funResult
     return false
@@ -32,13 +32,13 @@ proc testMapParametersOk(signatureCode: string, args: seq[Value],
   result = true
 
 proc testMapParametersW(signatureCode: string, args: seq[Value],
-    eParameter: int, warning: MessageId, p1: string = ""): bool =
-
-  var paramsO = signatureCodeToParams(signatureCode)
-  if not paramsO.isSome:
+    eParameter: int, warning: MessageId, p1: string = "",
+    functionName = "name"): bool =
+  var signatureO = signatureCodeToSignature(functionName, signatureCode)
+  if not signatureO.isSome:
     echo "Invalid signature: " & signatureCode
     return false
-  let funResult = mapParameters(paramsO.get(), args)
+  let funResult = mapParameters(signatureO.get(), args)
   if not expectedItem("mapParameters", funResult.kind, frWarning):
     echo "no warning: " & $funResult
     return false
@@ -52,22 +52,6 @@ proc testMapParametersW(signatureCode: string, args: seq[Value],
       funResult.warningData.messageId, funResult.warningData.p1)
     echo "expected message: $1" % getWarning(
       eFunResult.warningData.messageId, eFunResult.warningData.p1)
-
-proc testParamStringSingle(name: string, paramType: ParamType, optional: bool,
-                     eString: string): bool =
-  ## Test single arg cases.
-  var paramKind: ParamKind
-  if optional:
-    paramKind = pkOptional
-  else:
-    paramKind = pkNormal
-  let param = newParam("hello", paramKind, paramType)
-  result = expectedItem("param", $param, eString)
-
-proc testParamStringReturn(paramType: ParamType, eString: string): bool =
-  ## Test return parameter case.
-  let param = newParam("result", pkReturn, paramType)
-  result = expectedItem("param", $param, eString)
 
 
 suite "signatures.nim":
@@ -97,24 +81,17 @@ suite "signatures.nim":
     check sameType('a', vkList)
     check sameType('a', vkDict)
 
-  test "signatureCodeToParams":
-    check testSignatureCodeToParams("s", "() string")
-    check testSignatureCodeToParams("ss", "(a: string) string")
-    check testSignatureCodeToParams("sss", "(a: string, b: string) string")
-    check testSignatureCodeToParams("soss", "(a: string, b: optional string) string")
-    check testSignatureCodeToParams("lsosl",
-      "(a: list, b: string, c: optional string) list")
+  test "signatureCodeToSignature":
+    check testSignatureCodeToSignature("s", "name() string")
+    check testSignatureCodeToSignature("ss", "name(a: string) string")
+    check testSignatureCodeToSignature("sss", "name(a: string, b: string) string")
+    check testSignatureCodeToSignature("soss", "name(a: string, b: optional string) string")
+    check testSignatureCodeToSignature("lsosl",
+      "name(a: list, b: string, c: optional string) list")
 
-  test "signatureCodeToParams all":
-    let e = "(a: int, b: string, c: float, d: optional list) int"
-    check testSignatureCodeToParams("isfoli", e)
-
-  test "Single Param representation":
-    check testParamStringSingle("hello", ptInt, false, "hello: int")
-    check testParamStringSingle("hello", ptInt, true, "hello: optional int")
-
-  test "Return Param representation":
-    check testParamStringReturn(ptInt, "int")
+  test "signatureCodeToSignature all":
+    let e = "name(a: int, b: string, c: float, d: optional list) int"
+    check testSignatureCodeToSignature("isfoli", e)
 
   test "shortName":
     check shortName(0) == "a"
@@ -176,6 +153,10 @@ suite "signatures.nim":
   test "ssoaa not enough":
     var parameters: seq[Value] = @[newValue("tea")]
     check testMapParametersW("ssoaa", parameters, 1, wNotEnoughArgsOpt, "2")
+
+  test "ssoaa not enough2":
+    var parameters: seq[Value] = @[]
+    check testMapParametersW("ssoaa", parameters, 0, wNotEnoughArgsOpt, "2")
 
   test "mapParameters not enough args":
     var parameters: seq[Value] = @[]

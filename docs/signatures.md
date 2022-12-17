@@ -6,13 +6,9 @@ Statictea function signatures and parameter checking.
 # Index
 
 * [paramCodeString](#paramcodestring) &mdash; Return a string representation of a ParamCode object.
-* [`$`](#) &mdash; Return a string representation of a Param object.
 * [kindToParamCode](#kindtoparamcode) &mdash; Convert a value type to a parameter type.
 * [sameType](#sametype) &mdash; Check whether the param type is the same type or compatible with the value.
 * [sameType](#sametype-1) &mdash; Check whether the param type is the same type or compatible with the value.
-* [parmsToSignature](#parmstosignature) &mdash; Create a signature from a list of Params.
-* [shortName](#shortname) &mdash; Return a short name based on the given index value.
-* [signatureCodeToParams](#signaturecodetoparams) &mdash; Convert the signature code to a list of Param objects.
 * [mapParameters](#mapparameters) &mdash; Create a dictionary of the arguments.
 
 # paramCodeString
@@ -21,14 +17,6 @@ Return a string representation of a ParamCode object.
 
 ```nim
 func paramCodeString(paramCode: ParamCode): string
-```
-
-# `$`
-
-Return a string representation of a Param object.
-
-```nim
-func `$`(param: Param): string
 ```
 
 # kindToParamCode
@@ -55,36 +43,12 @@ Check whether the param type is the same type or compatible with the value.
 func sameType(paramType: ParamType; valueKind: ValueKind): bool
 ```
 
-# parmsToSignature
-
-Create a signature from a list of Params.
-
-```nim
-func parmsToSignature(params: seq[Param]): string
-```
-
-# shortName
-
-Return a short name based on the given index value. Return a for 0, b for 1, etc.  It returns names a, b, c, ..., z then repeats a0, b0, c0,....
-
-```nim
-proc shortName(index: Natural): string
-```
-
-# signatureCodeToParams
-
-Convert the signature code to a list of Param objects.
-
-```nim
-func signatureCodeToParams(signatureCode: string): Option[seq[Param]]
-```
-
 # mapParameters
 
 Create a dictionary of the arguments. The parameter names become the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the arguments do not match the signature.  When they do not match, the warning parameter tells the first non-matching argument.
 
 ```nim
-func mapParameters(params: seq[Param]; args: seq[Value]): FunResult
+func mapParameters(signature: Signature; args: seq[Value]): FunResult
 ```
 
 

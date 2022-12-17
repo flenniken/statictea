@@ -15,14 +15,19 @@ StaticTea variable types.
 * type: [Func](#func) &mdash; A func value is a reference to a FunctionSpec.
 * type: [ParamCode](#paramcode) &mdash; Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.
 * type: [ParamType](#paramtype) &mdash; The statictea parameter types.
-* type: [ParamKind](#paramkind) &mdash; The kind of parameter.
 * type: [Param](#param) &mdash; Holds attributes for one parameter.
-* type: [FunctionSpec](#functionspec) &mdash; The name of a function, a pointer to the code, and its parameters.
+* type: [SignatureKind](#signaturekind) &mdash; The statictea signature types.
+* type: [Signature](#signature) &mdash; Holds the function signature.
+* type: [SignatureOr](#signatureor) &mdash; A signature or message.
+* type: [FunctionSpec](#functionspec) &mdash; Holds the function signature and a pointer to the function.
 * type: [FunResultKind](#funresultkind) &mdash; The kind of a FunResult object, either a value or warning.
 * type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a warning.
 * type: [SideEffect](#sideeffect) &mdash; The kind of side effect for a statement.
 * type: [ValueAndPos](#valueandpos) &mdash; A value and the position after the value in the statement along with the side effect, if any.
 * type: [ValueAndPosOr](#valueandposor) &mdash; A ValueAndPos object or a warning.
+* [newSignature](#newsignature) &mdash; Create a Signature object.
+* [newSignatureOr](#newsignatureor) &mdash; Create a new SignatureOr with a message.
+* [newSignatureOr](#newsignatureor-1) &mdash; Create a new SignatureOr with a value.
 * [newParam](#newparam) &mdash; Create a new Param object.
 * [newVarsDict](#newvarsdict) &mdash; Create a new empty variables dictionary.
 * [newVarsDictOr](#newvarsdictor) &mdash; Return a new varsDictOr object containing a warning.
@@ -43,15 +48,16 @@ same type which may be Value type.
 * [newEmptyListValue](#newemptylistvalue) &mdash; Return an empty list value.
 * [newEmptyDictValue](#newemptydictvalue) &mdash; Create a dictionary value from a VarsDict.
 * [`==`](#) &mdash; Return true when two variables are equal.
-* [`$`](#-1) &mdash; Return a string representation of a function.
-* [`$`](#-2) &mdash; Return a string representation of the variable's type.
+* [`$`](#-1) &mdash; Return a string representation of a signature.
+* [`$`](#-2) &mdash; Return a string representation of a function.
+* [`$`](#-3) &mdash; Return a string representation of the variable's type.
 * [jsonStringRepr](#jsonstringrepr) &mdash; Return the JSON string representation.
 * [dictToString](#dicttostring) &mdash; Return a string representation of a dict Value in JSON format.
 * [listToString](#listtostring) &mdash; Return a string representation of a list variable in JSON format.
 * [valueToString](#valuetostring) &mdash; Return a string representation of a variable in JSON format.
 * [valueToStringRB](#valuetostringrb) &mdash; Return the string representation of the variable for use in the replacement blocks.
-* [`$`](#-3) &mdash; Return a string representation of a Value.
-* [`$`](#-4) &mdash; Return a string representation of a VarsDict.
+* [`$`](#-4) &mdash; Return a string representation of a Value.
+* [`$`](#-5) &mdash; Return a string representation of a VarsDict.
 * [dotNameRep](#dotnamerep) &mdash; Return a dot name string representation of a dictionary.
 * [newValueOr](#newvalueor) &mdash; Create a new ValueOr containing a warning.
 * [newValueOr](#newvalueor-1) &mdash; Create a new ValueOr containing a warning.
@@ -59,17 +65,20 @@ same type which may be Value type.
 * [newFunResultWarn](#newfunresultwarn) &mdash; Return a new FunResult object containing a warning.
 * [newFunResultWarn](#newfunresultwarn-1) &mdash; Return a new FunResult object containing a warning created from a WarningData object.
 * [newFunResult](#newfunresult) &mdash; Return a new FunResult object containing a value.
-* [`==`](#-5) &mdash; Compare two FunResult objects and return true when equal.
-* [`!=`](#-6) &mdash; Compare two FunResult objects and return false when equal.
-* [`$`](#-7) &mdash; Return a string representation of a FunResult object.
+* [`==`](#-6) &mdash; Compare two FunResult objects and return true when equal.
+* [`!=`](#-7) &mdash; Compare two FunResult objects and return false when equal.
+* [`$`](#-8) &mdash; Return a string representation of a FunResult object.
 * [newValueAndPos](#newvalueandpos) &mdash; Create a newValueAndPos object.
 * [newValueAndPosOr](#newvalueandposor) &mdash; Create a ValueAndPosOr warning.
 * [newValueAndPosOr](#newvalueandposor-1) &mdash; Create a ValueAndPosOr warning.
-* [`==`](#-8) &mdash; Return true when a equals b.
-* [`!=`](#-9) &mdash; Compare two ValueAndPosOr objects and return false when equal.
+* [`==`](#-9) &mdash; Return true when a equals b.
+* [`!=`](#-10) &mdash; Compare two ValueAndPosOr objects and return false when equal.
 * [newValueAndPosOr](#newvalueandposor-2) &mdash; Create a ValueAndPosOr from a value, pos and exit.
 * [newValueAndPosOr](#newvalueandposor-3) &mdash; Create a ValueAndPosOr value from a number or string.
 * [newValueAndPosOr](#newvalueandposor-4) &mdash; Create a ValueAndPosOr from a ValueAndPos.
+* [codeToParamType](#codetoparamtype) &mdash; 
+* [shortName](#shortname) &mdash; Return a short name based on the given index value.
+* [signatureCodeToSignature](#signaturecodetosignature) &mdash; Convert the signature code to a signature object.
 
 # VarsDict
 
@@ -155,43 +164,60 @@ ParamType = enum
   ptList = "list", ptBool = "bool", ptFunc = "func", ptAny = "any"
 ```
 
-# ParamKind
-
-The kind of parameter.<ul class="simple"><li>pkNormal -- a normal parameter</li>
-<li>pkOptional -- an optional parameter. It must be last.</li>
-<li>pkReturn -- a return parameter.</li>
-</ul>
-
-
-```nim
-ParamKind = enum
-  pkNormal, pkOptional, pkReturn
-```
-
 # Param
 
 Holds attributes for one parameter.
 * name -- the parameter name
-* paramCode -- the parameter code, one of: ifsldpa
-* paramKind -- whether it is normal, optional or a return
+* paramType -- the parameter type
 
 ```nim
 Param = object
   name*: string
   paramType*: ParamType
-  paramKind*: ParamKind
 
+```
+
+# SignatureKind
+
+The statictea signature types.
+ vkNormal -- normal signature
+ vkOptional -- the signature's last parameter is optional
+
+```nim
+SignatureKind = enum
+  skNormal, skOptional
+```
+
+# Signature
+
+Holds the function signature.
+* name -- the function name
+
+```nim
+Signature = object
+  kind*: SignatureKind
+  name*: string
+  params*: seq[Param]
+  returnType*: ParamType
+
+```
+
+# SignatureOr
+
+A signature or message.
+
+```nim
+SignatureOr = OpResultWarn[Signature]
 ```
 
 # FunctionSpec
 
-The name of a function, a pointer to the code, and its parameters.
+Holds the function signature and a pointer to the function.
 
 ```nim
 FunctionSpec = object
-  name*: string
+  signature*: Signature
   functionPtr*: FunctionPtr
-  params*: seq[Param]
 
 ```
 
@@ -264,12 +290,37 @@ A ValueAndPos object or a warning.
 ValueAndPosOr = OpResultWarn[ValueAndPos]
 ```
 
+# newSignature
+
+Create a Signature object.
+
+```nim
+proc newSignature(kind: SignatureKind; name: string; params: seq[Param];
+                  returnType: ParamType): Signature
+```
+
+# newSignatureOr
+
+Create a new SignatureOr with a message.
+
+```nim
+func newSignatureOr(warning: MessageId; p1 = ""; pos = 0): SignatureOr
+```
+
+# newSignatureOr
+
+Create a new SignatureOr with a value.
+
+```nim
+func newSignatureOr(signature: Signature): SignatureOr
+```
+
 # newParam
 
 Create a new Param object.
 
 ```nim
-func newParam(name: string; paramKind: ParamKind; paramType: ParamType): Param
+func newParam(name: string; paramType: ParamType): Param
 ```
 
 # newVarsDict
@@ -387,7 +438,7 @@ proc newValue[T](dictPairs: openArray[(string, T)]): Value
 Create a new func which is a reference to a FunctionSpec.
 
 ```nim
-func newFunc(name: string; functionPtr: FunctionPtr; params: seq[Param]): Func
+func newFunc(signature: Signature; functionPtr: FunctionPtr): Func
 ```
 
 # newFunc
@@ -428,6 +479,14 @@ Return true when two variables are equal.
 
 ```nim
 proc `==`(a: Value; b: Value): bool
+```
+
+# `$`
+
+Return a string representation of a signature.
+
+```nim
+func `$`(signature: Signature): string
 ```
 
 # `$`
@@ -646,6 +705,31 @@ Create a ValueAndPosOr from a ValueAndPos.
 
 ```nim
 func newValueAndPosOr(val: ValueAndPos): ValueAndPosOr
+```
+
+# codeToParamType
+
+
+
+```nim
+func codeToParamType(code: ParamCode): ParamType
+```
+
+# shortName
+
+Return a short name based on the given index value. Return a for 0, b for 1, etc.  It returns names a, b, c, ..., z then repeats a0, b0, c0,....
+
+```nim
+proc shortName(index: Natural): string
+```
+
+# signatureCodeToSignature
+
+Convert the signature code to a signature object.
+
+```nim
+func signatureCodeToSignature(functionName: string; signatureCode: string): Option[
+    Signature]
 ```
 
 

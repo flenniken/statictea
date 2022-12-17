@@ -40,6 +40,7 @@ starts in the template file.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * type: [LoopControl](#loopcontrol) &mdash; Controls whether to output the current replacement block iteration and whether to stop or not.
 * [runStatementAssignVar](#runstatementassignvar) &mdash; Run a statement and assign the variable if appropriate.
+* [parseSignature](#parsesignature) &mdash; Parse the signature and return the list of parameters or a message.
 * [processSignature](#processsignature) &mdash; Return a new function variable with the given signature.
 * [processDocComments](#processdoccomments) &mdash; Add the function definition doc comments to the function variable.
 * [processStatements](#processstatements) &mdash; Add the function definition statements to the function variable.
@@ -393,9 +394,17 @@ proc runStatementAssignVar(env: var Env; statement: Statement;
                            codeFile: bool): LoopControl
 ```
 
+# parseSignature
+
+Parse the signature and return the list of parameters or a message. Example signature: cmp(numStr1: string, numStr2: string) int
+
+```nim
+func parseSignature(signature: string): SignatureOr
+```
+
 # processSignature
 
-Return a new function variable with the given signature. cmp(numStr1: string, numStr2: string) int
+Return a new function variable with the given signature. Example signature: cmp(numStr1: string, numStr2: string) int
 
 ```nim
 proc processSignature(signature: string): ValueOr

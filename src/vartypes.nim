@@ -4,6 +4,7 @@ import std/tables
 import std/strutils
 import messages
 import opresult
+import options
 
 type
   VarsDict* = OrderedTableRef[string, Value]
@@ -75,28 +76,35 @@ type
     ptFunc = "func"
     ptAny = "any"
 
-  ParamKind* = enum
-    ## The kind of parameter.
-    ## * pkNormal -- a normal parameter
-    ## * pkOptional -- an optional parameter. It must be last.
-    ## * pkReturn -- a return parameter.
-    pkNormal, pkOptional, pkReturn
-
   Param* = object
     ## Holds attributes for one parameter.
     ## @:* name -- the parameter name
-    ## @:* paramCode -- the parameter code, one of: ifsldpa
-    ## @:* paramKind -- whether it is normal, optional or a return
+    ## @:* paramType -- the parameter type
     name*: string
     paramType*: ParamType
-    paramKind*: ParamKind
+
+  SignatureKind* = enum
+    ## The statictea signature types.
+    ## @: vkNormal -- normal signature
+    ## @: vkOptional -- the signature's last parameter is optional
+    skNormal
+    skOptional
+
+  Signature* = object
+    ## Holds the function signature.
+    ## @:* name -- the function name
+    kind*: SignatureKind
+    name*: string
+    params*: seq[Param]
+    returnType*: ParamType
+
+  SignatureOr* = OpResultWarn[Signature]
+    ## A signature or message.
 
   FunctionSpec* = object
-    ## The name of a function, a pointer to the code, and its
-    ## parameters.
-    name*: string
+    ## Holds the function signature and a pointer to the function.
+    signature*: Signature
     functionPtr*: FunctionPtr
-    params*: seq[Param]
 
   FunResultKind* = enum
     ## The kind of a FunResult object, either a value or warning.
@@ -129,14 +137,14 @@ type
     ## with the side effect, if any. The position includes the trailing
     ## whitespace.  For the example statement below, the value 567
     ## starts at index 6 and ends at position 10.
-    ## @:   
+    ## @:
     ## @:~~~
     ## @:0123456789
     ## @:var = 567 # test
     ## @:      ^ start
     ## @:          ^ end position
     ## @:~~~~
-    ## @:   
+    ## @:
     ## @:Exit is set true by the return function to exit a command.
     value*: Value
     pos*: Natural
@@ -145,9 +153,22 @@ type
   ValueAndPosOr* = OpResultWarn[ValueAndPos]
     ## A ValueAndPos object or a warning.
 
-func newParam*(name: string, paramKind: ParamKind, paramType: ParamType): Param =
+proc newSignature*(kind: SignatureKind, name: string, params: seq[Param], returnType: ParamType): Signature =
+  ## Create a Signature object.
+  result = Signature(kind: kind, name: name, params: params, returnType: returnType)
+
+func newSignatureOr*(warning: MessageId, p1 = "", pos = 0): SignatureOr =
+  ## Create a new SignatureOr with a message.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[Signature](warningData)
+
+func newSignatureOr*(signature: Signature): SignatureOr =
+  ## Create a new SignatureOr with a value.
+  result = opValueW[Signature](signature)
+
+func newParam*(name: string, paramType: ParamType): Param =
   ## Create a new Param object.
-  result = Param(name: name, paramKind: paramKind, paramType: paramType)
+  result = Param(name: name, paramType: paramType)
 
 proc newVarsDict*(): VarsDict =
   ## Create a new empty variables dictionary. VarsDict is a ref type.
@@ -221,10 +242,10 @@ proc newValue*[T](dictPairs: openArray[(string, T)]): Value =
     varsTable[a] = value
   result = Value(kind: vkDict, dictv: varsTable)
 
-func newFunc*(name: string, functionPtr: FunctionPtr, params: seq[Param]): Func =
+func newFunc*(signature: Signature, functionPtr: FunctionPtr): Func =
   ## Create a new func which is a reference to a FunctionSpec.
   new(result)
-  result[] = FunctionSpec(name: name, functionPtr: functionPtr, params: params)
+  result[] = FunctionSpec(signature: signature, functionPtr: functionPtr)
 
 func newFunc*(functionSpec: FunctionSpec): Func =
   ## Create a new func which is a reference to a FunctionSpec.
@@ -263,16 +284,26 @@ proc `==`*(a: Value, b: Value): bool =
       of vkFunc:
         result = a.funcv == b.funcv
 
+func `$`*(signature: Signature): string =
+  ## Return a string representation of a signature.
+  result.add(signature.name)
+  result.add("(")
+  for ix, param in signature.params:
+    if ix > 0:
+      result.add(", ")
+    result.add(param.name)
+    result.add(": ")
+    if signature.kind == skOptional and ix == signature.params.len - 1:
+      result.add("optional ")
+    result.add($param.paramType)
+  result.add(") ")
+  result.add($signature.returnType)
+
 func `$`*(function: Func): string =
   ## Return a string representation of a function.
   result.add("\"")
-  result.add(function.name)
+  result.add(function.signature.name)
   result.add("\"")
-
-  # let length = function.signatureCode.len
-  # let parmCodes = function.signatureCode[0..length-2]
-  # let returnCode = function.signatureCode[length-1..length-1]
-  # result = "\"$1($2)$3\"" % [function.name, parmCodes, returnCode]
 
 func `$`*(kind: ValueKind): string =
   ## Return a string representation of the variable's type.
@@ -401,7 +432,7 @@ func valueToStringRB*(value: Value): string =
   of vkBool:
     result = $value.boolv
   of vkFunc:
-    result = value.funcv.name
+    result = value.funcv.signature.name
 
 func `$`*(value: Value): string =
   ## Return a string representation of a Value.
@@ -546,3 +577,78 @@ func newValueAndPosOr*(val: ValueAndPos):
     ValueAndPosOr =
   ## Create a ValueAndPosOr from a ValueAndPos.
   result = opValueW[ValueAndPos](val)
+
+const
+  singleCodes = {'a', 'i', 'f', 's', 'l', 'd', 'b', 'p'}
+
+static:
+  # Generate a compile error when the single code list doesn't have a
+  # letter for each type of value excluding "a".
+  const numCodes = len(singleCodes)-1
+  const numKinds = ord(high(ValueKind))+1
+  when numCodes != numKinds:
+    const message = "Update singleCodes:\nnumCode = $1, numKinds = $2\n" % [$numCodes, $numKinds]
+    {.error: message .}
+
+func codeToParamType*(code: ParamCode): ParamType =
+  case code:
+  of 'i':
+    result = ptInt
+  of 'f':
+    result = ptFloat
+  of 's':
+    result = ptString
+  of 'l':
+    result = ptList
+  of 'd':
+    result = ptDict
+  of 'b':
+    result = ptBool
+  of 'p':
+    result = ptFunc
+  of 'a':
+    result = ptAny
+  else:
+    assert(false, "invalid ParamCode")
+    result = ptInt
+
+proc shortName*(index: Natural): string =
+  ## Return a short name based on the given index value. Return a for
+  ## 0, b for 1, etc.  It returns names a, b, c, ..., z then repeats
+  ## a0, b0, c0,....
+
+  let letters = "abcdefghijklmnopqrstuvwxyz"
+  assert len(letters) == 26
+  let remainder = index mod len(letters)
+  let num = index div len(letters)
+  let numString = if num == 0: "" else: $num
+  result = $letters[remainder] & numString
+  # debugEcho("index $1, num $2, remainder $3, result $4" % [
+  #   $index, $num, $remainder, result])
+
+func signatureCodeToSignature*(functionName: string, signatureCode: string): Option[Signature] =
+  ## Convert the signature code to a signature object.
+  var params: seq[Param]
+  var nameIx = 0
+  var signatureKind = skNormal
+
+  if len(signatureCode) < 1:
+    return
+  for ix in countUp(0, signatureCode.len - 2):
+    var code = signatureCode[ix]
+    if code in singleCodes:
+      let parmType = codeToParamType(code)
+      params.add(newParam(shortName(nameIx), parmType))
+      inc(nameIx)
+    elif code == 'o':
+      if signatureKind == skOptional:
+        # You can only have one optional parameter.
+        return
+      signatureKind = skOptional
+    else:
+      # Invalid signature code.
+      return
+
+  let returnCode = signatureCode[signatureCode.len-1]
+  let returnType = codeToParamType(returnCode)
+  result = some(newSignature(signatureKind, functionName, params, returnType))

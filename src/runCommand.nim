@@ -492,7 +492,7 @@ func getSpecialFunction(dotNameStr: string, variables: Variables): SpecialFuncti
     return newSpecialFunctionOr(spNotSpecial)
 
   var spFun: SpecialFunction
-  case value.funcv.name
+  case value.funcv.signature.name
   of "if":
     spFun = spIf
   of "if0":
@@ -1319,20 +1319,30 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
     env.warnStatement(statement, warningDataO.get(), sourceFilename)
   return lcContinue
 
-func abc(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Do nothing test function.
-  result = newFunResult(newValue("hi"))
+func zero(variables: Variables, arguments: seq[Value]): FunResult =
+  ## Return 0.
+  result = newFunResult(newValue(0))
 
-proc processSignature*(signature: string): ValueOr =
-  ## Return a new function variable with the given signature.
+func parseSignature*(signature: string): SignatureOr =
+  ## Parse the signature and return the list of parameters or a
+  ## message.
+  ## Example signature:
   ## cmp(numStr1: string, numStr2: string) int
 
   var params = newSeq[Param]()
-  params.add(newParam("numStr1", pkNormal, ptString))
-  params.add(newParam("numStr2", pkNormal, ptString))
-  params.add(newParam("", pkReturn, ptInt))
+  let signature = newSignature(skNormal, "zero", params, ptInt)
+  result = newSignatureOr(signature)
 
-  let function = newFunc("abc", abc, params)
+proc processSignature*(signature: string): ValueOr =
+  ## Return a new function variable with the given signature.
+  ## Example signature:
+  ## cmp(numStr1: string, numStr2: string) int
+
+  let signatureOr = parseSignature("zero() int")
+  if signatureOr.isMessage:
+     return newValueOr(signatureOr.message)
+
+  let function = newFunc(signatureOr.value, zero)
   result = newValueOr(newValue(function))
 
 proc processDocComments*(env: var Env, lb: LineBuffer, statement: Statement,
@@ -1356,7 +1366,7 @@ proc defineFunction*(env: var Env, lb: LineBuffer, statement: Statement,
   ## If the statement is a function definition handle it. If the
   ## statement is not handled, return false.
 
-  # Quick exit when we know its not a function definition.
+  # Quick exit when we know it's not a function definition.
   if not ("func(" in statement.text):
     return false
 
@@ -1442,7 +1452,7 @@ proc defineFunction*(env: var Env, lb: LineBuffer, statement: Statement,
   let funcVarOr = processSignature(signature)
   if not funcVarOr.isMessage:
     let md = funcVarOr.message
-    env.warnStatement(statement, md.messageId, md.p1, runningPos, sourceFilename)
+    env.warnStatement(statement, md.messageId, md.p1, runningPos + md.pos, sourceFilename)
     return false
   var funcVar = funcVarOr.value
 

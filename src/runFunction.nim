@@ -19,11 +19,11 @@ import opresult
 import readjson
 import variables
 
-template tMapParameters(signatureCode: string) =
+template tMapParameters(functionName: string, signatureCode: string) =
   ## Template that checks the signatureCode against the parameters and
   ## sets the map dictionary variable.
-  let paramsO = signatureCodeToParams(signatureCode)
-  let funResult = mapParameters(paramsO.get(), parameters)
+  let signatureO = signatureCodeToSignature(functionName, signatureCode)
+  let funResult = mapParameters(signatureO.get(), parameters)
   if funResult.kind == frWarning:
     return funResult
   let map {.inject.} = funResult.value.dictv
@@ -207,7 +207,7 @@ func funCmp_iii*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:cmp(9, 2) => 1
   ## @:~~~~
 
-  tMapParameters("iii")
+  tMapParameters("cmp", "iii")
   let a = map["a"].intv
   let b = map["b"].intv
   result = newFunResult(newValue(cmp(a, b)))
@@ -228,7 +228,7 @@ func funCmp_ffi*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:cmp(9.3, 2.2) => 1
   ## @:~~~~
 
-  tMapParameters("ffi")
+  tMapParameters("cmp", "ffi")
   let a = map["a"].floatv
   let b = map["b"].floatv
   result = newFunResult(newValue(cmp(a, b)))
@@ -254,7 +254,7 @@ func funCmp_ssobi*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:cmp("Tea", "tea", false) => 0
   ## @:~~~~
 
-  tMapParameters("ssobi")
+  tMapParameters("cmp", "ssobi")
   let a = map["a"].stringv
   let b = map["b"].stringv
 
@@ -280,7 +280,7 @@ func funConcat_sss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:concat("a", "b") => "ab"
   ## @:~~~~
 
-  tMapParameters("sss")
+  tMapParameters("concat", "sss")
   var a = map["a"].stringv
   let b = map["b"].stringv
   result = newFunResult(newValue(a & b))
@@ -299,7 +299,7 @@ func funLen_si*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:len("añyóng") => 6
   ## @:~~~~
 
-  tMapParameters("si")
+  tMapParameters("len", "si")
   let str = map["a"].stringv
   result = newFunResult(newValue(stringLen(str)))
 
@@ -318,7 +318,7 @@ func funLen_li*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:len(list(4, 5)) => 2
   ## @:~~~~
 
-  tMapParameters("li")
+  tMapParameters("len", "li")
   let list = map["a"].listv
   result = newFunResult(newValue(list.len))
 
@@ -337,7 +337,7 @@ func funLen_di*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:len(dict("a", 4, "b", 3)) => 2
   ## @:~~~~
 
-  tMapParameters("di")
+  tMapParameters("len", "di")
   let dict = map["a"].dictv
   result = newFunResult(newValue(dict.len))
 
@@ -366,7 +366,7 @@ func funGet_lioaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:get(list, -4, 11) => 11
   ## @:~~~~
 
-  tMapParameters("lioaa")
+  tMapParameters("get", "lioaa")
   let list = map["a"].listv
   let index = map["b"].intv
 
@@ -409,7 +409,7 @@ func funGet_dsoaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:d.tea => "Earl Grey"
   ## @:~~~~
 
-  tMapParameters("dsoaa")
+  tMapParameters("get", "dsoaa")
   let dict = map["a"].dictv
   let key = map["b"].stringv
 
@@ -474,7 +474,7 @@ func funIf0_iaoaa*(variables: Variables, parameters: seq[Value]): FunResult =
   # case. This code is not run. It is here for the function list and
   # documentation.
 
-  tMapParameters("iaoaa")
+  tMapParameters("if0", "iaoaa")
   let condition = map["a"].intv
   let thenCase = map["b"]
 
@@ -521,7 +521,7 @@ func funIf_baoaa*(variables: Variables, parameters: seq[Value]): FunResult =
   # case. This code is not run. It is here for the function list and
   # documentation.
 
-  tMapParameters("baoaa")
+  tMapParameters("if", "baoaa")
   let condition = map["a"].boolv
   let thenCase = map["b"]
 
@@ -549,7 +549,7 @@ func funAdd_iii*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:add(-2, -5) => -7
   ## @:~~~~
 
-  tMapParameters("iii")
+  tMapParameters("add", "iii")
   let a = map["a"].intv
   let b = map["b"].intv
   try:
@@ -571,7 +571,7 @@ func funAdd_fff*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:add(3.2, -2.2) => 1.0
   ## @:~~~~
 
-  tMapParameters("fff")
+  tMapParameters("add", "fff")
   let a = map["a"].floatv
   let b = map["b"].floatv
   try:
@@ -598,7 +598,7 @@ func funExists_dsb*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:exists(d, "coffee") => false
   ## @:~~~~
 
-  tMapParameters("dsb")
+  tMapParameters("exists", "dsb")
   let dictionary = map["a"].dictv
   let key = map["b"].stringv
 
@@ -667,7 +667,7 @@ func funCase_iloaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:case(3, cases, "wine") => "wine"
   ## @:~~~~
 
-  tMapParameters("iloaa")
+  tMapParameters("case", "iloaa")
   result = getCase(map)
 
 func funCase_sloaa*(variables: Variables, parameters: seq[Value]): FunResult =
@@ -699,7 +699,7 @@ func funCase_sloaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:case("bunch", cases, "other") => "other"
   ## @:~~~~
 
-  tMapParameters("sloaa")
+  tMapParameters("case", "sloaa")
   result = getCase(map)
 
 func parseVersion*(version: string): Option[(int, int, int)] =
@@ -734,7 +734,7 @@ func funCmpVersion_ssi*(variables: Variables, parameters: seq[Value]): FunResult
   ## @:cmpVersion("1.2.5", "1.2.5") => 0
   ## @:~~~~
 
-  tMapParameters("ssi")
+  tMapParameters("cmpVersion", "ssi")
 
   let versionA = map["a"].stringv
   let versionB = map["b"].stringv
@@ -771,7 +771,7 @@ func funFloat_if*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:float(2) => 2.0
   ## @:float(-33) => -33.0
   ## @:~~~~
-  tMapParameters("if")
+  tMapParameters("float", "if")
   let num = map["a"].intv
   result = newFunResult(newValue(float(num)))
 
@@ -789,7 +789,7 @@ func funFloat_sf*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:float("2.4") => 2.4
   ## @:float("33") => 33.0
   ## @:~~~~
-  tMapParameters("sf")
+  tMapParameters("float", "sf")
   let numString = map["a"].stringv
 
   let funResult = numberStringToNum(numString)
@@ -815,7 +815,7 @@ func funFloat_saa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:float("2") => 2.0
   ## @:float("notnum", "nan") => nan
   ## @:~~~~
-  tMapParameters("saa")
+  tMapParameters("float", "saa")
   let numString = map["a"].stringv
 
   result = numberStringToNum(numString)
@@ -886,7 +886,7 @@ func funInt_fosi*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:int(-6.3456, "truncate") => -6
   ## @:~~~~
 
-  tMapParameters("fosi")
+  tMapParameters("int", "fosi")
   let num = map["a"].floatv
 
   result = convertFloatToInt(num, map)
@@ -921,7 +921,7 @@ func funInt_sosi*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:int("-6.3456", "truncate") => -6
   ## @:~~~~
 
-  tMapParameters("sosi")
+  tMapParameters("int", "sosi")
   let numString = map["a"].stringv
 
   let funResult = numberStringToNum(numString)
@@ -955,7 +955,7 @@ func funInt_ssaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:int("notnum", "round", "nan") => nan
   ## @:~~~~
 
-  tMapParameters("ssaa")
+  tMapParameters("int", "ssaa")
   let numString = map["a"].stringv
 
   result = numberStringToNum(numString)
@@ -1025,7 +1025,7 @@ func funBool_ab*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:bool(dict("tea", 2)) => true
   ## @:~~~~
 
-  tMapParameters("ab")
+  tMapParameters("bool", "ab")
   let value = map["a"]
   result = newFunResult(newValue(if0Condition(value)))
 
@@ -1052,7 +1052,7 @@ func funFind_ssoaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:find(msg, "party", 0) = 0
   ## @:~~~~
 
-  tMapParameters("ssoaa")
+  tMapParameters("find", "ssoaa")
 
   let str = map["a"].stringv
   let substring = map["b"].stringv
@@ -1087,7 +1087,7 @@ func funSlice_siois*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:slice("añyóng", 0, 3) => "añy"
   ## @:~~~~
 
-  tMapParameters("siois")
+  tMapParameters("slice", "siois")
 
   let str = map["a"].stringv
   let start = int(map["b"].intv)
@@ -1120,7 +1120,7 @@ func funDup_sis*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:dup("", 3) => ""
   ## @:~~~~
 
-  tMapParameters("sis")
+  tMapParameters("dup", "sis")
 
   let pattern = map["a"].stringv
   let count = map["b"].intv
@@ -1158,7 +1158,7 @@ func funDict_old*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:  {"a": 5, "b": 33, "c": 0}
   ## @:~~~~
 
-  tMapParameters("old")
+  tMapParameters("dict", "old")
 
   var dict = newVarsDict()
 
@@ -1259,7 +1259,7 @@ func funReplace_siiss*(variables: Variables, parameters: seq[Value]): FunResult 
   ## @:~~~~
 
 
-  tMapParameters("siiss")
+  tMapParameters("replace", "siiss")
 
   let str = map["a"].stringv
   let start = map["b"].intv
@@ -1331,7 +1331,7 @@ func funReplaceRe_sls*(variables: Variables, parameters: seq[Value]): FunResult 
   ## @:For developing and debugging regular expressions see the
   ## @:website: https@@://regex101.com/
 
-  tMapParameters("sls")
+  tMapParameters("replaceRe", "sls")
   let list = map["b"].listv
   if list.len mod 2 != 0:
     # Specify arguments in pairs.
@@ -1410,7 +1410,7 @@ func funPath_sosd*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:}
   ## @:~~~~
 
-  tMapParameters("sosd")
+  tMapParameters("path", "sosd")
   let path = map["a"].stringv
   var separator: char
   if "b" in map:
@@ -1450,7 +1450,7 @@ func funLower_ss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:lower("TEĀ") => "teā"
   ## @:~~~~
 
-  tMapParameters("ss")
+  tMapParameters("lower", "ss")
   let str = map["a"].stringv
   result = newFunResult(newValue(toLower(str)))
 
@@ -1469,7 +1469,7 @@ func funKeys_dl*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:values(d) => ["apple", 2, 3]
   ## @:~~~~
 
-  tMapParameters("dl")
+  tMapParameters("keys", "dl")
   let dict = map["a"].dictv
 
   var list: seq[string]
@@ -1493,7 +1493,7 @@ func funValues_dl*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:values(d) => ["apple", 2, 3]
   ## @:~~~~
 
-  tMapParameters("dl")
+  tMapParameters("values", "dl")
   let dict = map["a"].dictv
 
   var list: seq[Value]
@@ -1631,7 +1631,7 @@ func funSort_lsosl*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
   ## @:~~~~
 
-  tMapParameters("lsosl")
+  tMapParameters("sort", "lsosl")
   result = generalSort(map)
 
 func funSort_lssil*(variables: Variables, parameters: seq[Value]): FunResult =
@@ -1660,7 +1660,7 @@ func funSort_lssil*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
   ## @:~~~~
 
-  tMapParameters("lssil")
+  tMapParameters("sort", "lssil")
   result = generalSort(map)
 
 func funSort_lsssl*(variables: Variables, parameters: seq[Value]): FunResult =
@@ -1689,7 +1689,7 @@ func funSort_lsssl*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:sort(dicts, "descending", "sensitive", "name") => [d2, d1]
   ## @:~~~~
 
-  tMapParameters("lsssl")
+  tMapParameters("sort", "lsssl")
   result = generalSort(map)
 
 func funGithubAnchor_ss*(variables: Variables, parameters: seq[Value]): FunResult =
@@ -1720,7 +1720,7 @@ func funGithubAnchor_ss*(variables: Variables, parameters: seq[Value]): FunResul
   ## @:# {entry.name}
   ## @:~~~~
 
-  tMapParameters("ss")
+  tMapParameters("gethubAnchor", "ss")
 
   let name = map["a"].stringv
   let anchorName = githubAnchor(name)
@@ -1742,7 +1742,7 @@ func funGithubAnchor_ll*(variables: Variables, parameters: seq[Value]): FunResul
   ## @:  ["tea", "water", "tea-1"]
   ## @:~~~~
 
-  tMapParameters("ll")
+  tMapParameters("githubAnchor", "ll")
 
   let list = map["a"].listv
 
@@ -1787,7 +1787,7 @@ func funType_as*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:type(f.cmp) => "func"
   ## @:~~~~
 
-  tMapParameters("as")
+  tMapParameters("type", "as")
   let kind = map["a"].kind
   result = newFunResult(newValue($kind))
 
@@ -1858,7 +1858,7 @@ func funJoinPath_loss*(variables: Variables, parameters: seq[Value]): FunResult 
   ## @:  "/tea"
   ## @:~~~~
 
-  tMapParameters("loss")
+  tMapParameters("joinPath", "loss")
   result = joinPathList(map)
 
 func funJoin_lsois*(variables: Variables, parameters: seq[Value]): FunResult =
@@ -1883,7 +1883,7 @@ func funJoin_lsois*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:join(["a", "", "c"], "|", true) => "a|c"
   ## @:~~~~
 
-  tMapParameters("lsois")
+  tMapParameters("join", "lsois")
 
   let listv = map["a"].listv
   let sep = map["b"].stringv
@@ -1934,7 +1934,7 @@ func funWarn_ss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:warn("always warn")
   ## @:~~~~
 
-  tMapParameters("ss")
+  tMapParameters("warn", "ss")
 
   let message = map["a"].stringv
   result = newFunResultWarn(wUserMessage, 0, message)
@@ -1967,7 +1967,7 @@ func funLog_ss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:log("always log")
   ## @:~~~~
 
-  tMapParameters("si")
+  tMapParameters("log", "si")
   let message = map["a"].stringv
   result = newFunResult(newValue(message))
 
@@ -1992,7 +1992,7 @@ func funReturn_ss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:if(c, return("skip"))
   ## @:~~~~
 
-  tMapParameters("ss")
+  tMapParameters("return", "ss")
   result = newFunResult(map["a"])
   if result.value.stringv != "stop" and result.value.stringv != "skip":
     # Expected 'skip' or 'stop' for the return function value.
@@ -2059,7 +2059,7 @@ func funString_aoss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:y = 2
   ## @:~~~~
 
-  tMapParameters("aoss")
+  tMapParameters("string", "aoss")
   let value = map["a"]
   var ctype: string
   if "b" in map:
@@ -2102,7 +2102,7 @@ func funString_sds*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:teas.y = "tea"
   ## @:teas.z.a = 8
   ## @:~~~~
-  tMapParameters("sds")
+  tMapParameters("string", "sds")
   let name = map["a"].stringv
   let dict = map["b"].dictv
   let str = dotNameRep(dict, name)
@@ -2134,7 +2134,7 @@ func funFormat_ss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:str => "use two { to get one"
   ## @:~~~~
 
-  tMapParameters("ss")
+  tMapParameters("format", "ss")
   let str = map["a"].stringv
   let stringOr = formatString(variables, str)
   if stringOr.isMessage:
@@ -2183,7 +2183,7 @@ func funStartsWith_ssb*(variables: Variables, parameters: seq[Value]): FunResult
   ## @:b => false
   ## @:~~~~
 
-  tMapParameters("ssb")
+  tMapParameters("startsWith", "ssb")
   let str = map["a"].stringv
   let prefix = map["b"].stringv
   result = newFunResult(newValue(startsWith(str, prefix)))
@@ -2202,7 +2202,7 @@ func funNot_bb*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:not(false) => true
   ## @:~~~~
 
-  tMapParameters("bb")
+  tMapParameters("not", "bb")
   let cond = map["a"].boolv
   result = newFunResult(newValue(not(cond)))
 
@@ -2226,7 +2226,7 @@ func funAnd_bbb*(variables: Variables, parameters: seq[Value]): FunResult =
 
   # Note: this code isn't run, it's here for the docs and the function
   # list.  The the code in runCommand.nim.
-  tMapParameters("bbb")
+  tMapParameters("and", "bbb")
   let a = map["a"].boolv
   let b = map["b"].boolv
   let cond = a and b
@@ -2252,7 +2252,7 @@ func funOr_bbb*(variables: Variables, parameters: seq[Value]): FunResult =
 
   # Note: this code isn't run, it's here for the docs and the function
   # list.  The the code in runCommand.nim.
-  tMapParameters("bbb")
+  tMapParameters("or", "bbb")
   let a = map["a"].boolv
   let b = map["b"].boolv
   let cond = a or b
@@ -2271,7 +2271,7 @@ func funEq_iib*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:eq(1, 1) => true
   ## @:eq(2, 3) => false
   ## @:~~~~
-  tMapParameters("iib")
+  tMapParameters("eq", "iib")
   let a = map["a"].intv
   let b = map["b"].intv
   let cond = a == b
@@ -2290,7 +2290,7 @@ func funEq_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:eq(1.2, 1.2) => true
   ## @:eq(1.2, 3.2) => false
   ## @:~~~~
-  tMapParameters("ffb")
+  tMapParameters("eq", "ffb")
   let a = map["a"].floatv
   let b = map["b"].floatv
   let cond = a == b
@@ -2310,7 +2310,7 @@ func funEq_ssb*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:eq("tea", "tea") => true
   ## @:eq("1.2", "3.2") => false
   ## @:~~~~
-  tMapParameters("ssb")
+  tMapParameters("eq", "ssb")
   let a = map["a"].stringv
   let b = map["b"].stringv
   let cond = a == b
@@ -2329,7 +2329,7 @@ func funNe_iib*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:ne(1, 1) => false
   ## @:ne(2, 3) => true
   ## @:~~~~
-  tMapParameters("iib")
+  tMapParameters("ne", "iib")
   let a = map["a"].intv
   let b = map["b"].intv
   let cond = a != b
@@ -2348,7 +2348,7 @@ func funNe_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:ne(1.2, 1.2) => false
   ## @:ne(1.2, 3.2) => true
   ## @:~~~~
-  tMapParameters("ffb")
+  tMapParameters("ne", "ffb")
   let a = map["a"].floatv
   let b = map["b"].floatv
   let cond = a != b
@@ -2367,7 +2367,7 @@ func funNe_ssb*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:ne("tea", "tea") => false
   ## @:ne("earl", "grey") => true
   ## @:~~~~
-  tMapParameters("ssb")
+  tMapParameters("ne", "ssb")
   let a = map["a"].stringv
   let b = map["b"].stringv
   let cond = a != b
@@ -2386,7 +2386,7 @@ func funGt_iib*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:gt(2, 4) => false
   ## @:gt(3, 2) => true
   ## @:~~~~
-  tMapParameters("iib")
+  tMapParameters("gt", "iib")
   let a = map["a"].intv
   let b = map["b"].intv
   let cond = a > b
@@ -2405,7 +2405,7 @@ func funGt_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:gt(2.8, 4.3) => false
   ## @:gt(3.1, 2.5) => true
   ## @:~~~~
-  tMapParameters("ffb")
+  tMapParameters("gt", "ffb")
   let a = map["a"].floatv
   let b = map["b"].floatv
   let cond = a > b
@@ -2424,7 +2424,7 @@ func funGte_iib*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:gte(2, 4) => false
   ## @:gte(3, 3) => true
   ## @:~~~~
-  tMapParameters("iib")
+  tMapParameters("gte", "iib")
   let a = map["a"].intv
   let b = map["b"].intv
   let cond = a >= b
@@ -2443,7 +2443,7 @@ func funGte_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:gte(2.8, 4.3) => false
   ## @:gte(3.1, 3.1) => true
   ## @:~~~~
-  tMapParameters("ffb")
+  tMapParameters("gte", "ffb")
   let a = map["a"].stringv
   let b = map["b"].stringv
   let cond = a >= b
@@ -2462,7 +2462,7 @@ func funLt_iib*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:gt(2, 4) => true
   ## @:gt(3, 2) => false
   ## @:~~~~
-  tMapParameters("iib")
+  tMapParameters("gt", "iib")
   let a = map["a"].intv
   let b = map["b"].intv
   let cond = a < b
@@ -2481,7 +2481,7 @@ func funLt_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:lt(2.8, 4.3) => true
   ## @:lt(3.1, 2.5) => false
   ## @:~~~~
-  tMapParameters("ffb")
+  tMapParameters("lt", "ffb")
   let a = map["a"].floatv
   let b = map["b"].floatv
   let cond = a > b
@@ -2501,7 +2501,7 @@ func funLte_iib*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:lte(3, 3) => true
   ## @:lte(4, 3) => false
   ## @:~~~~
-  tMapParameters("iib")
+  tMapParameters("lte", "iib")
   let a = map["a"].intv
   let b = map["b"].intv
   let cond = a <= b
@@ -2521,7 +2521,7 @@ func funLte_ffb*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:lte(3.0, 3.0) => true
   ## @:lte(4.0, 3.0) => false
   ## @:~~~~
-  tMapParameters("ffb")
+  tMapParameters("lte", "ffb")
   let a = map["a"].floatv
   let b = map["b"].floatv
   let cond = a <= b
@@ -2543,7 +2543,7 @@ func funReadJson_sa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:d = readJson("{\"a\":1, \"b\": 2}")
   ## @:  => {"a": 1, "b", 2}
   ## @:~~~~
-  tMapParameters("sa")
+  tMapParameters("readJson", "sa")
   let json = map["a"].stringv
   var valueOr = readJsonString(json)
   if valueOr.isMessage:
@@ -2657,7 +2657,7 @@ proc getBestFunction*(funcValue: Value, arguments: seq[Value]): ValueOr =
         let warningData = newWarningData(wNotFunction)
         return newValueOr(warningData)
 
-      let funResult = mapParameters(funcValue.funcv.params, arguments)
+      let funResult = mapParameters(funcValue.funcv.signature, arguments)
       if funResult.kind != frWarning:
         # All arguments match the parameters, return the function.
         return newValueOr(funcValue)
@@ -2691,18 +2691,18 @@ proc createFuncDictionary*(): Value =
 
   var funcList = newEmptyListValue()
   var lastName = ""
-  for (name, functionPtr, signatureCode) in functionsList:
-    let signatureO = signatureCodeToParams(signatureCode)
-    let function = newFunc(name, functionPtr, signatureO.get())
+  for (functionName, functionPtr, signatureCode) in functionsList:
+    let signatureO = signatureCodeToSignature(functionName, signatureCode)
+    let function = newFunc(signatureO.get(), functionPtr)
     let funcValue = newValue(function)
-    if name == lastName:
+    if functionName == lastName:
       funcList.listv.add(funcValue)
     else:
       if lastName != "":
         varsDict[lastName] = funcList
       funcList = newEmptyListValue()
       funcList.listv.add(funcValue)
-      lastName = name
+      lastName = functionName
 
   if funcList.listv.len > 0:
     varsDict[lastName] = funcList

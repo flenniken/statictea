@@ -352,6 +352,18 @@ proc testGetConditionWarn(text: string, start: Natural, eWarning: MessageId,
   if not result:
     echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
+proc testParseSignature(signatureStr: string, eSignatureStr = ""): bool =
+  let signatureOr = parseSignature(signatureStr)
+  if signatureOr.isMessage:
+    return false
+  let gotSignature = signatureOr.value
+  var expected: string
+  if eSignatureStr == "":
+    expected = signatureStr
+  else:
+    expected = eSignatureStr
+  result = gotExpected($gotSignature, expected)
+
 suite "runCommand.nim":
   test "startColumn":
     check testStartColumn("abcdefghij", 0, "^")
@@ -627,7 +639,7 @@ $$ : c = len("hello")
     let existsList = fDict["exists"].listv
     check existsList.len == 1
     let function = existsList[0]
-    check function.funcv.name == "exists"
+    check function.funcv.signature.name == "exists"
 
   test "warnStatement":
     let statement = newStatement(text="tea = a123", lineNum=12, 0)
@@ -1610,3 +1622,6 @@ White$1
     let funcsVarDict = createFuncDictionary().dictv
     var variables = emptyVariables(funcs = funcsVarDict)
     check testGetValueAndPos("""a = len(func("() int"))""", 4, wDefineFunction, 8, "", variables)
+
+  test "parse signature":
+    check testParseSignature("zero()int", "zero() int")

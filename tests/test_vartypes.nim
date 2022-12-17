@@ -6,7 +6,7 @@ import readjson
 import vartypes
 import messages
 import sharedtestcode
-import signatures
+# import signatures
 import options
 
 proc testDotNameRep(json: string, eDotNameRep: string, top=false): bool =
@@ -319,8 +319,8 @@ c.d = [7]"""
   test "new function":
     func abc(variables: Variables, parameters: seq[Value]): FunResult =
       result = newFunResult(newValue("hi"))
-    let paramsO = signatureCodeToParams("iis")
-    let function = newFunc("abc", abc, paramsO.get())
+    let signatureO = signatureCodeToSignature("abc", "iis")
+    let function = newFunc(signatureO.get(), abc)
     check gotExpected($function, "\"abc\"")
 
     let value = newValue(function)
@@ -334,8 +334,8 @@ c.d = [7]"""
     let d = newValue({"x":1, "y":2})
     func abc(variables: Variables, parameters: seq[Value]): FunResult =
       result = newFunResult(newValue("hi"))
-    let paramsO = signatureCodeToParams("iis")
-    let fn = newValue(newFunc("abc", abc, paramsO.get()))
+    let signatureO = signatureCodeToSignature("abc", "iis")
+    let fn = newValue(newFunc(signatureO.get(), abc))
     let found = newValue(true)
 
     check $str == """"Eary Grey""""
@@ -376,3 +376,19 @@ y = 2"""
     # parameter type.
     check ord(high(ValueKind)) == 6
     check ord(high(ParamType)) == 7
+
+  test "signature zero":
+    var params = newSeq[Param]()
+    let signature = newSignature(skNormal, "zero", params, ptInt)
+    check signature.kind == skNormal
+    check signature.name == "zero"
+    check $signature == "zero() int"
+
+  test "signature one":
+    var params = newSeq[Param]()
+    params.add(newParam("p1", ptString))
+    let signature = newSignature(skNormal, "one", params, ptInt)
+    check signature.kind == skNormal
+    check signature.name == "one"
+    check $signature == "one(p1: string) int"
+
