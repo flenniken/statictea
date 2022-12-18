@@ -203,6 +203,7 @@ type
     gLeftBracket # [
     gRightBracket # ]
     gComma # ,
+    gColon # :
 
 proc matchCommaOrSymbol*(line: string, symbol: GroupSymbol,
     start: Natural = 0): Option[Matches] =
@@ -217,6 +218,8 @@ proc matchCommaOrSymbol*(line: string, symbol: GroupSymbol,
     pattern = r"([,[])\s*"
   of gRightBracket:
     pattern = r"([,\]])\s*"
+  of gColon:
+    pattern = r"([,:])\s*"
   of gComma:
     # No match.
     return
@@ -234,6 +237,8 @@ proc matchSymbol*(line: string, symbol: GroupSymbol, start: Natural = 0): Option
     pattern = r"\[\s*"
   of gRightBracket:
     pattern = r"\]\s*"
+  of gColon:
+    pattern = r":\s*"
   of gComma:
     pattern = r",\s*"
   result = matchPatternCached(line, pattern, start, 0)
@@ -268,4 +273,9 @@ proc matchCompareOperator*(line: string, start: Natural): Option[Matches] =
 proc matchReplCmd*(line: string, start: Natural): Option[Matches] =
   ## Match the REPL commands and the trailing optional whitespace.
   let pattern = r"(pd|pj|h|v|q|p)\s*"
+  result = matchPatternCached(line, pattern, start, 1)
+
+proc matchParameterType*(line: string, start: Natural): Option[Matches] =
+  ## Match a parameter type and the trailing whitespace.
+  let pattern = r"(bool|int|float|string|dict|list|func|any)\s*"
   result = matchPatternCached(line, pattern, start, 1)

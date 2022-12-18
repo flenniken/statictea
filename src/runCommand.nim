@@ -1323,14 +1323,96 @@ func zero(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return 0.
   result = newFunResult(newValue(0))
 
-func parseSignature*(signature: string): SignatureOr =
+proc parseSignature*(signature: string): SignatureOr =
   ## Parse the signature and return the list of parameters or a
   ## message.
-  ## Example signature:
-  ## cmp(numStr1: string, numStr2: string) int
+  ## @:
+  ## @:Example signature:
+  ## @:~~~
+  ## @:cmp(numStr1: string, numStr2: string) int
+  ## @:~~~~
+
+  var runningPos = 0
+  let matchesO = matchDotNames(signature, runningPos)
+  if not isSome(matchesO):
+    # Excected a function name.
+    return newSignatureOr(wFunctionName, "", runningPos)
+  let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
+  if leftParenBrack != "(":
+    # Excected a left parentheses for the signature.
+    return newSignatureOr(wMissingLeftParen, "", runningPos)
+  runningPos += dotNameLen
+  let functionName = dotNameStr
 
   var params = newSeq[Param]()
-  let signature = newSignature(skNormal, "zero", params, ptInt)
+
+  # Look for ) and following white space.
+  let rightParen = matchSymbol(signature, gRightParentheses, runningPos)
+  if rightParen.isSome:
+    # No parameters case.
+    runningPos += rightParen.get().length
+  else:
+    # One or more parameters.
+
+    while true:
+      var parameterName: string
+      let parenNameO = matchDotNames(signature, runningPos)
+      if not isSome(parenNameO):
+        # Excected a parameter name.
+        return newSignatureOr(wParameterName, "", runningPos)
+      let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
+      if leftParenBrack == "(":
+        # Excected a parameter name.
+        return newSignatureOr(wParameterName, "", runningPos)
+      runningPos += dotNameLen
+      parameterName = dotNameStr
+
+      # Look for : and following white space.
+      let colonO = matchSymbol(signature, gColon, runningPos)
+      if not colonO.isSome:
+        # Expected a colon.
+        return newSignatureOr(wMissingColon, "", runningPos)
+      runningPos += colonO.get().length
+
+      # Look for the parameter type and following white space.
+      let paramTypeO = matchParameterType(signature, runningPos)
+      if not paramTypeO.isSome:
+        # Expected a parameter type: bool, int, float, string, dict, list, func or any.
+        return newSignatureOr(wExpectedParamType, "", runningPos)
+      let (paramTypeStr, matchLen) = paramTypeO.getGroupLen()
+      runningPos += matchLen
+
+      # todo: support optional
+
+      let paramType = strToParamType(paramTypeStr)
+      params.add(newParam(parameterName, paramType))
+
+      # Look for a comma or right parentheses.
+      let corpO = matchCommaOrSymbol(signature, gRightParentheses, runningPos)
+      if not corpO.isSome:
+        # Expected comma or right parentheses.
+        return newSignatureOr(wMissingCommaParen, "", runningPos)
+      let (corp, corpLen) = corpO.getGroupLen()
+      runningPos += corpLen
+
+      if corp == ")":
+        break
+
+  # Look for the return type and following white space.
+  let returnTypeO = matchParameterType(signature, runningPos)
+  if not returnTypeO.isSome:
+    # Expected the return type.
+    return newSignatureOr(wExpectedReturnType, "", runningPos)
+  let (returnTypeStr, matchLen) = returnTypeO.getGroupLen()
+  runningPos += matchLen
+  let returnType = strToParamType(returnTypeStr)
+
+  # Look for trailing junk.
+  if runningPos < signature.len:
+    # Unused extra text at the end of the signature.
+    return newSignatureOr(wUnusedSignatureText, "", runningPos)
+
+  let signature = newSignature(skNormal, functionName, params, returnType)
   result = newSignatureOr(signature)
 
 proc processSignature*(signature: string): ValueOr =
@@ -1396,14 +1478,13 @@ proc defineFunction*(env: var Env, lb: LineBuffer, statement: Statement,
   let operatorO = matchEqualSign(statement.text, runningPos)
   if not operatorO.isSome:
     return false
-  let match = operatorO.get()
-  let op = match.getGroup()
+  let (op, matchLen) = operatorO.getGroupLen()
   var operator: Operator
   if op == "=":
     operator = opEqual
   else:
     operator = opAppendList
-  runningPos += match.length
+  runningPos += matchLen
 
   # Look for "func(".
   let mO = matchDotNames(statement.text, runningPos)

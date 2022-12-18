@@ -102,6 +102,14 @@ suite "regexes.nim":
     check groups2[0] == "def"
     check groups2[1] == ""
 
+  test "one group and len":
+    let pattern = r"(def)\s*"
+    let matchesO = matchPattern("def  ab", pattern, 0, 1)
+    check matchesO.isSome
+    let (one, length) = matchesO.getGroupLen()
+    check one == "def"
+    check length == 5
+
   test "two groups":
     let pattern = r"(abc).*(def)$"
     check testMatchPattern("  abc asdfasdfdef def", pattern, 2, some(newMatches(19, 2, "abc", "def")), 2)

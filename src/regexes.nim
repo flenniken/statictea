@@ -144,6 +144,13 @@ func getGroup*(matchesO: Option[Matches]): string =
   assert(matchesO.isSome, "Not a match")
   result = matchesO.get().getGroup()
 
+func getGroupLen*(matchesO: Option[Matches]): (string, Natural) =
+  ## Get the group in matches and the match length.
+  assert(matchesO.isSome, "Not a match")
+  let matches = matchesO.get()
+  let one = matches.getGroup()
+  result = (one, matches.length)
+
 func get2Groups*(matches: Matches): (string, string) =
   ## Get two groups in matches.
   var one: string

@@ -594,6 +594,28 @@ func codeToParamType*(code: ParamCode): ParamType =
     assert(false, "invalid ParamCode")
     result = ptInt
 
+func strToParamType*(str: string): ParamType =
+  case str:
+  of "int":
+    result = ptInt
+  of "float":
+    result = ptFloat
+  of "string":
+    result = ptString
+  of "list":
+    result = ptList
+  of "dict":
+    result = ptDict
+  of "bool":
+    result = ptBool
+  of "func":
+    result = ptFunc
+  of "any":
+    result = ptAny
+  else:
+    assert(false, "invalid parameter type string")
+    result = ptInt
+
 proc shortName*(index: Natural): string =
   ## Return a short name based on the given index value. Return a for
   ## 0, b for 1, etc.  It returns names a, b, c, ..., z then repeats

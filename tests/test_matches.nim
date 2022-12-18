@@ -168,6 +168,34 @@ proc testEmptyOrSpaces(line: string, start: Natural = 0, expected: bool): bool =
   let got = emptyOrSpaces(line, start)
   result = gotExpected($got, $expected, line & ".")
 
+proc testMatchParameterType(paramTypeStr: string, eParamTypeStr: string = "",
+    eLength: Natural = 0): bool =
+  let matchO = matchParameterType(paramTypeStr, 0)
+  if not isSome(matchO):
+    echo "'$1' is not a valid parameter type." % paramTypeStr
+    return false
+
+  var expected = eParamTypeStr
+  if eParamTypeStr == "":
+    expected = paramTypeStr
+
+  var expectedLen = eLength
+  if eLength == 0:
+    expectedLen = paramTypeStr.len
+
+  let (gotParamTypeStr, length) = matchO.getGroupLen()
+  result = gotExpected(gotParamTypeStr, expected)
+  let ge = gotExpected($length, $expectedLen)
+  if not ge:
+    result = false
+
+proc testMatchParameterTypeBad(paramTypeStr: string): bool =
+  let matchO = matchParameterType(paramTypeStr, 0)
+  if isSome(matchO):
+    echo "'$1' is a valid parameter type." % paramTypeStr
+    return false
+  result = true
+
 suite "matches.nim":
 
   test "prepost table":
@@ -503,6 +531,7 @@ suite "matches.nim":
     check testMatchSymbol("(", gLeftParentheses, 0, some(newMatches(1, 0)))
     check testMatchSymbol("[", gLeftBracket, 0, some(newMatches(1, 0)))
     check testMatchSymbol("]", gRightBracket, 0, some(newMatches(1, 0)))
+    check testMatchSymbol(":", gColon, 0, some(newMatches(1, 0)))
 
     check testMatchSymbol("  )", gRightParentheses, 2, some(newMatches(1, 2)))
     check testMatchSymbol("  (", gLeftParentheses, 2, some(newMatches(1, 2)))
@@ -513,6 +542,7 @@ suite "matches.nim":
     check testMatchSymbol("  (   ", gLeftParentheses, 2, some(newMatches(4, 2)))
     check testMatchSymbol("  [   ", gLeftBracket, 2, some(newMatches(4, 2)))
     check testMatchSymbol("  ]   ", gRightBracket, 2, some(newMatches(4, 2)))
+    check testMatchSymbol("  :   ", gColon, 2, some(newMatches(4, 2)))
 
   test "matchLastPart2":
     check testMatchLastPart("+", 0, "", some(newMatches(1, 0, "+", "")))
@@ -654,3 +684,23 @@ suite "matches.nim":
     check testParsePrepostBad("añyóng")
     check testParsePrepostBad(newStrFromBuffer([0x08u8, 0x12]))
     check testParsePrepostBad(newStrFromBuffer([0x31u8, 0x2c, 0x12]))
+
+  test "matchParameterType":
+    check testMatchParameterType("bool")
+    check testMatchParameterType("int")
+    check testMatchParameterType("float")
+    check testMatchParameterType("string")
+    check testMatchParameterType("list")
+    check testMatchParameterType("dict")
+    check testMatchParameterType("func")
+    check testMatchParameterType("any")
+
+    check testMatchParameterType("any ", "any", 4)
+    check testMatchParameterType("any  ", "any", 5)
+    check testMatchParameterType("any   ab", "any", 6)
+
+    check testMatchParameterType("boolean", "bool", 4)
+
+  test "matchParameterType  bad":
+    check testMatchParameterTypeBad("dic")
+    check testMatchParameterTypeBad("abc")

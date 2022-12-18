@@ -352,17 +352,10 @@ proc testGetConditionWarn(text: string, start: Natural, eWarning: MessageId,
   if not result:
     echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
-proc testParseSignature(signatureStr: string, eSignatureStr = ""): bool =
+proc testParseSignature(signatureStr: string, eSignature: Signature): bool =
   let signatureOr = parseSignature(signatureStr)
-  if signatureOr.isMessage:
-    return false
-  let gotSignature = signatureOr.value
-  var expected: string
-  if eSignatureStr == "":
-    expected = signatureStr
-  else:
-    expected = eSignatureStr
-  result = gotExpected($gotSignature, expected)
+  let eSignatureOr = newSignatureOr(eSignature)
+  result = gotExpected($signatureOr, $eSignatureOr)
 
 suite "runCommand.nim":
   test "startColumn":
@@ -1624,4 +1617,5 @@ White$1
     check testGetValueAndPos("""a = len(func("() int"))""", 4, wDefineFunction, 8, "", variables)
 
   test "parse signature":
-    check testParseSignature("zero()int", "zero() int")
+    let params = newSeq[Param]()
+    check testParseSignature("zero() int", newSignature(skNormal, "zero", params, ptInt))

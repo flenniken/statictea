@@ -425,3 +425,13 @@ y = 2"""
     check shortName(0+26+26) == "a2"
     check shortName(1+26+26) == "b2"
     check shortName(25+26+26) == "z2"
+
+  test "strToParamType":
+    check strToParamType("bool") == ptBool
+    check strToParamType("int") == ptInt
+    check strToParamType("float") == ptFloat
+    check strToParamType("string") == ptString
+    check strToParamType("dict") == ptDict
+    check strToParamType("list") == ptList
+    check strToParamType("func") == ptFunc
+    check strToParamType("any") == ptAny
