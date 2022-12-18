@@ -1616,6 +1616,11 @@ White$1
     var variables = emptyVariables(funcs = funcsVarDict)
     check testGetValueAndPos("""a = len(func("() int"))""", 4, wDefineFunction, 8, "", variables)
 
-  test "parse signature":
+  test "parse signature no params":
     let params = newSeq[Param]()
     check testParseSignature("zero() int", newSignature(skNormal, "zero", params, ptInt))
+
+  test "parse signature one param":
+    let params = newSeq[Param]()
+    params.add(newParam("one", ptInt)
+    check testParseSignature("one(num: int) int", newSignature(skNormal, "one", params, ptInt))
