@@ -86,30 +86,12 @@ func sameType*(paramType: ParamType, valueKind: ValueKind): bool =
   ## Check whether the param type is the same type or compatible with
   ## the value.
 
-  case paramType:
-    of ptAny:
-      return true
-    of ptInt:
-      if valueKind == vkInt:
-        return true
-    of ptFloat:
-      if valueKind == vkFloat:
-        return true
-    of ptString:
-      if valueKind == vkString:
-        return true
-    of ptList:
-      if valueKind == vkList:
-        return true
-    of ptDict:
-      if valueKind == vkDict:
-        return true
-    of ptBool:
-      if valueKind == vkBool:
-        return true
-    of ptFunc:
-      if valueKind == vkFunc:
-        return true
+  if ord(paramType) == ord(valueKind):
+    result = true
+  elif paramType == ptAny:
+    result = true
+  else:
+    result = false
 
 func mapParameters*(signature: Signature, args: seq[Value]): FunResult =
   ## Create a dictionary of the arguments. The parameter names become

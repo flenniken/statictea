@@ -1397,8 +1397,8 @@ c = bool(0) # false
 d = bool(1) # true (not 0)
 #+END_SRC
 
-You can define variables called true and false except in the
-local dictionary.
+True and false are variables in the local dictionary.  You can
+define variables called true and false in other dictionaries.
 
 #+BEGIN_SRC
 s.true = "server true"
@@ -1613,23 +1613,10 @@ function.
 :CUSTOM_ID: code-files
 :END:
 
-You share common template fragments with code files. The template
-designer controls the code files to factor templates and for
-other presentation needs.
-
-You import them from the command line with the -o or --code
-option. You can import multiple code files and they run in the
-order specified.
-
-The code populates the o dictionary that is available to the
-template commands.
-
-A code file is a list of statements.  There are no prefix,
-postfix and other line decorations that you use in templates so
-the code is easier to read and write.
-
-The maximum line length is 1024 bytes.  An ending plus sign
-continues a long statement on the next line.
+A code file is a list of statements. You use a code file for
+defining variables and templates fragments for use in one or more
+templates and for defining functions. The template designer
+controls the code files.
 
 Here is an example of a code file that defines two variables, pi
 and footer.
@@ -1639,11 +1626,34 @@ o.pi = 3.14159
 o.footer = "</html>"
 #+END_SRC
 
-A code file is good for sharing template fragments and for
-formatting variables to minimize the code needed in a template.
-You can define functions in code files. For sharing template
-fragments see the [[#multiline-strings][Multiline Strings]] section. For defining
-functions see [[#user-functions][User Functions]] section.
+There are no prefix, postfix and other line decorations that you
+use in templates so the code is easier to read and write.  It is
+suggested that you add most of your code in code files to
+minimize the amount in the template.
+
+Below is an example of defining a multiline string header in a
+code file for sharing with templates. The code populates the o
+dictionary that is available to the template commands.
+
+#+BEGIN_SRC
+o. header = “””
+<!doctype html>
+<html lang="en">
+“””
+#+END_SRC
+
+You use the header in a template’s replace command
+
+#+BEGIN_SRC
+$$ replace t.content = o.header
+#+END_SRC
+
+See the [[#multiline-strings][Multiline Strings]], [[#replace-command][Replace Command]] and [[#user-functions][User Functions]]
+sections for more information.
+
+You import a code file from the command line with the -o or –code
+option. You can use multiple -o files and they run in the order
+specified.
 
 The code files run after importing the JSON files so they have
 access to the server variables.
@@ -1656,6 +1666,12 @@ disappear when the code file finishes running.  For example the
 a = 5
 o.x = a + 6
 #+END_SRC
+
+The code files run after importing the JSON files so they have
+access to the server variables.
+
+The maximum line length is 1024 bytes.  An ending plus sign
+continues a long statement on the next line.
 
 [[#contents][茶]]
 
@@ -1748,17 +1764,19 @@ You can define your own functions in code files.
 User defined functions are important for sharing common code,
 looping and as callbacks for building lists and dictionaries.
 
-A function definition is several lines. The first line, the func
-line, names the function and defines its signature. The next
-lines are for the doc comments, then the statement lines then a
-return statement ends the function definition.
+The first line names the function and defines its signature and
+assigns it to a variable.
 
-In the following example we define a function called mycmp that
-takes two string parameters called numStr1 and numStr2. It
-returns an integer.
+The next lines are for the doc comment followed by the statement
+lines.  A return statement ends the function definition.
+
+In the following example we define a function called strNumCmp
+and assigns the result to the mycmp function variable. The
+function takes two string parameters called numStr1 and numStr2
+and it returns an integer.
 
 #+BEGIN_SRC
-l.cmp = func("mycmp(numStr1: string, numStr2: string) int")
+mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
   ## Compare two number strings
   ## and return 1, 0, or -1.
   num1 = int(numStr1)
@@ -1766,20 +1784,13 @@ l.cmp = func("mycmp(numStr1: string, numStr2: string) int")
   return(cmp(num1, num2))
 #+END_SRC
 
-*Function Definition Lines:*
-
-- function name and signature — a line with the function name and its signature
-- doc comment — one or more lines that tell what the function does.
-- statements — zero or more statements
-- return statement line
-
 The code is line based so the indentation doesn’t matter, there
 aren’t any brackets, and no line terminators.
 
 Here is how you call the example function:
 
 #+BEGIN_SRC
-a = l.cmp(“1”, "2")
+a = l.mycmp(“1”, "2")
 #+END_SRC
 
 *Function Signature:*
@@ -1787,11 +1798,11 @@ a = l.cmp(“1”, "2")
 A function signature tells the function name, the parameter names
 and types and the return type.
 
-The function name is stored internally in the func variable. You
-see the name when you get the function details, otherwise it's
-not used.
+You call, query and pass around the the function variable. The
+signature function name is not used except in the function
+details.
 
-You can specify that the last parameter is optional.  The get
+You can specify an optional last parameter.  The built in get
 function is an example of that:
 
 #+BEGIN_SRC
@@ -2490,7 +2501,7 @@ nimble release
 :ORDERED:  t
 :END:
 
-Besides the docker environment, you can development on a mac.
+Besides the docker environment, you can develop on a mac.
 
 You setup for it is similar to the docker environment except you
 need to install the needed apps to your mac manually. Once you’re
@@ -2661,7 +2672,7 @@ add(3.2, -2.2) => 1.0
 Add two integers. A warning is generated on overflow.
 
 #+BEGIN_SRC
-add(a: int, b: int)) int
+add(a: int, b: int) int
 #+END_SRC
 
 Examples:

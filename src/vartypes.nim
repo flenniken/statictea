@@ -20,13 +20,13 @@ type
 
   ValueKind* = enum
     ## The statictea variable types.
-    vkString
-    vkInt
-    vkFloat
-    vkDict
-    vkList
-    vkBool
-    vkFunc
+    vkString = "string"
+    vkInt = "int"
+    vkFloat = "float"
+    vkDict = "dict"
+    vkList = "list"
+    vkBool = "bool"
+    vkFunc = "func"
 
   Value* = ref ValueObj
     ## A variable's value reference.
@@ -304,24 +304,6 @@ func `$`*(function: Func): string =
   result.add("\"")
   result.add(function.signature.name)
   result.add("\"")
-
-func `$`*(kind: ValueKind): string =
-  ## Return a string representation of the variable's type.
-  case kind
-  of vkString:
-    result = "string"
-  of vkInt:
-    result = "int"
-  of vkFloat:
-    result = "float"
-  of vkDict:
-    result = "dict"
-  of vkList:
-    result = "list"
-  of vkBool:
-    result = "bool"
-  of vkFunc:
-    result = "func"
 
 proc jsonStringRepr*(str: string): string =
   ## Return the JSON string representation. It is assumed the string
@@ -617,14 +599,14 @@ proc shortName*(index: Natural): string =
   ## 0, b for 1, etc.  It returns names a, b, c, ..., z then repeats
   ## a0, b0, c0,....
 
-  let letters = "abcdefghijklmnopqrstuvwxyz"
-  assert len(letters) == 26
+  const
+    letters = "abcdefghijklmnopqrstuvwxyz"
   let remainder = index mod len(letters)
   let num = index div len(letters)
-  let numString = if num == 0: "" else: $num
-  result = $letters[remainder] & numString
-  # debugEcho("index $1, num $2, remainder $3, result $4" % [
-  #   $index, $num, $remainder, result])
+
+  result = $letters[remainder]
+  if num != 0:
+    result &= $num
 
 func signatureCodeToSignature*(functionName: string, signatureCode: string): Option[Signature] =
   ## Convert the signature code to a signature object.

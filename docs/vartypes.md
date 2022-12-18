@@ -50,14 +50,13 @@ same type which may be Value type.
 * [`==`](#) &mdash; Return true when two variables are equal.
 * [`$`](#-1) &mdash; Return a string representation of a signature.
 * [`$`](#-2) &mdash; Return a string representation of a function.
-* [`$`](#-3) &mdash; Return a string representation of the variable's type.
 * [jsonStringRepr](#jsonstringrepr) &mdash; Return the JSON string representation.
 * [dictToString](#dicttostring) &mdash; Return a string representation of a dict Value in JSON format.
 * [listToString](#listtostring) &mdash; Return a string representation of a list variable in JSON format.
 * [valueToString](#valuetostring) &mdash; Return a string representation of a variable in JSON format.
 * [valueToStringRB](#valuetostringrb) &mdash; Return the string representation of the variable for use in the replacement blocks.
-* [`$`](#-4) &mdash; Return a string representation of a Value.
-* [`$`](#-5) &mdash; Return a string representation of a VarsDict.
+* [`$`](#-3) &mdash; Return a string representation of a Value.
+* [`$`](#-4) &mdash; Return a string representation of a VarsDict.
 * [dotNameRep](#dotnamerep) &mdash; Return a dot name string representation of a dictionary.
 * [newValueOr](#newvalueor) &mdash; Create a new ValueOr containing a warning.
 * [newValueOr](#newvalueor-1) &mdash; Create a new ValueOr containing a warning.
@@ -65,14 +64,14 @@ same type which may be Value type.
 * [newFunResultWarn](#newfunresultwarn) &mdash; Return a new FunResult object containing a warning.
 * [newFunResultWarn](#newfunresultwarn-1) &mdash; Return a new FunResult object containing a warning created from a WarningData object.
 * [newFunResult](#newfunresult) &mdash; Return a new FunResult object containing a value.
-* [`==`](#-6) &mdash; Compare two FunResult objects and return true when equal.
-* [`!=`](#-7) &mdash; Compare two FunResult objects and return false when equal.
-* [`$`](#-8) &mdash; Return a string representation of a FunResult object.
+* [`==`](#-5) &mdash; Compare two FunResult objects and return true when equal.
+* [`!=`](#-6) &mdash; Compare two FunResult objects and return false when equal.
+* [`$`](#-7) &mdash; Return a string representation of a FunResult object.
 * [newValueAndPos](#newvalueandpos) &mdash; Create a newValueAndPos object.
 * [newValueAndPosOr](#newvalueandposor) &mdash; Create a ValueAndPosOr warning.
 * [newValueAndPosOr](#newvalueandposor-1) &mdash; Create a ValueAndPosOr warning.
-* [`==`](#-9) &mdash; Return true when a equals b.
-* [`!=`](#-10) &mdash; Compare two ValueAndPosOr objects and return false when equal.
+* [`==`](#-8) &mdash; Return true when a equals b.
+* [`!=`](#-9) &mdash; Compare two ValueAndPosOr objects and return false when equal.
 * [newValueAndPosOr](#newvalueandposor-2) &mdash; Create a ValueAndPosOr from a value, pos and exit.
 * [newValueAndPosOr](#newvalueandposor-3) &mdash; Create a ValueAndPosOr value from a number or string.
 * [newValueAndPosOr](#newvalueandposor-4) &mdash; Create a ValueAndPosOr from a ValueAndPos.
@@ -111,7 +110,8 @@ The statictea variable types.
 
 ```nim
 ValueKind = enum
-  vkString, vkInt, vkFloat, vkDict, vkList, vkBool, vkFunc
+  vkString = "string", vkInt = "int", vkFloat = "float", vkDict = "dict",
+  vkList = "list", vkBool = "bool", vkFunc = "func"
 ```
 
 # Value
@@ -495,14 +495,6 @@ Return a string representation of a function.
 
 ```nim
 func `$`(function: Func): string
-```
-
-# `$`
-
-Return a string representation of the variable's type.
-
-```nim
-func `$`(kind: ValueKind): string
 ```
 
 # jsonStringRepr

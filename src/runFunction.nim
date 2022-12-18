@@ -538,7 +538,7 @@ func funAdd_iii*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Add two integers. A warning is generated on overflow.
   ## @:
   ## @:~~~
-  ## @:add(a: int, b: int)) int
+  ## @:add(a: int, b: int) int
   ## @:~~~~
   ## @:
   ## @:Examples:

@@ -24,6 +24,16 @@ proc testDotNameRep(json: string, eDotNameRep: string, top=false): bool =
     return false
   return true
 
+proc testSignatureCodeToSignature(signatureCode: string, expected: string,
+    functionName = "name"): bool =
+  var signatureO = signatureCodeToSignature(functionName, signatureCode)
+  if not signatureO.isSome:
+    echo "Not a valid signature."
+    result = false
+  else:
+    result = gotExpected($signatureO.get(), expected, "signatureCodeToSignature")
+
+
 suite "vartypes":
 
   test "newValue string":
@@ -392,3 +402,26 @@ y = 2"""
     check signature.name == "one"
     check $signature == "one(p1: string) int"
 
+  test "signatureCodeToSignature":
+    check testSignatureCodeToSignature("s", "name() string")
+    check testSignatureCodeToSignature("ss", "name(a: string) string")
+    check testSignatureCodeToSignature("sss", "name(a: string, b: string) string")
+    check testSignatureCodeToSignature("soss", "name(a: string, b: optional string) string")
+    check testSignatureCodeToSignature("lsosl",
+      "name(a: list, b: string, c: optional string) list")
+
+  test "signatureCodeToSignature all":
+    let e = "name(a: int, b: string, c: float, d: optional list) int"
+    check testSignatureCodeToSignature("isfoli", e)
+
+  test "shortName":
+    check shortName(0) == "a"
+    check shortName(1) == "b"
+    check shortName(2) == "c"
+    check shortName(25) == "z"
+    check shortName(0+26) == "a1"
+    check shortName(1+26) == "b1"
+    check shortName(25+26) == "z1"
+    check shortName(0+26+26) == "a2"
+    check shortName(1+26+26) == "b2"
+    check shortName(25+26+26) == "z2"
