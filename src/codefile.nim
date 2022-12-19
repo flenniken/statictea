@@ -243,11 +243,12 @@ proc runCodeFile*(env: var Env, variables: var Variables, filename: string) =
       break # done
     let statement = statementO.get()
 
-    # If the statement is a function definition, handle it and return
-    # true.
-    if defineFunction(env, lb, statement, variables, filename, codeFile=true):
+    # If the statement starts a function definition, define it, assign
+    # the variable and return true.
+    if defineFunctionAssignVar(env, lb, statement, variables, filename, codeFile=true):
       continue
 
+    # Process the statement.
     let loopControl = runStatementAssignVar(env, statement, variables, filename, codeFile=true)
     if loopControl == lcStop:
       break

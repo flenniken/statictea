@@ -1319,7 +1319,7 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
     env.warnStatement(statement, warningDataO.get(), sourceFilename)
   return lcContinue
 
-func zero(variables: Variables, arguments: seq[Value]): FunResult =
+func runUserFunc(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return 0.
   result = newFunResult(newValue(0))
 
@@ -1417,38 +1417,46 @@ proc parseSignature*(signature: string): SignatureOr =
   let signature = newSignature(skNormal, functionName, params, returnType)
   result = newSignatureOr(signature)
 
-proc processSignature*(signature: string): ValueOr =
-  ## Return a new function variable with the given signature.
-  ## Example signature:
-  ## cmp(numStr1: string, numStr2: string) int
+type
+  LinesOr* = OpResultWarn[seq[string]]
+    ## A list of lines or a warning.
 
-  let signatureOr = parseSignature("zero() int")
-  if signatureOr.isMessage:
-     return newValueOr(signatureOr.message)
+func newLinesOr*(warning: MessageId, p1: string = "", pos = 0):
+     LinesOr =
+  ## Return a new LinesOr object containing a warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[seq[string]](warningData)
 
-  let function = newFunc(signatureOr.value, zero)
-  result = newValueOr(newValue(function))
+func newLinesOr*(warningData: WarningData): LinesOr =
+  ## Return a new LinesOr object containing a warning.
+  result = opMessageW[seq[string]](warningData)
 
-proc processDocComments*(env: var Env, lb: LineBuffer, statement: Statement,
-    sourceFilename: string, funcVar: var Value, extraStatement: var Statement): bool =
-  ## Add the function definition doc comments to the function
-  ## variable. Return false when there was an error. Fill in the
-  ## extraStatement with the statement after the comments.
+func newLinesOr*(lines: seq[string]): LinesOr =
+  ## Return a new LinesOr object containing a list of lines.
+  result = opValueW[seq[string]](lines)
 
-  return false
+proc readDocComments*(env: var Env, lb: LineBuffer, statement: Statement,
+    sourceFilename: string, extraStatement: var Statement): LinesOr =
+  ## Read the doc comment lines.  Fill in the extraStatement with the
+  ## line after the comments.
 
-proc processStatements*(env: var Env, lb: LineBuffer, statement: Statement,
-    sourceFilename: string, funcVar: var Value): bool =
-  ## Add the function definition statements to the function
-  ## variable. Return false when there was an error. The passed in
-  ## statement is the first statement after the doc commands.
-  return false
+  return newLinesOr(wDefineFunction, "")
 
-proc defineFunction*(env: var Env, lb: LineBuffer, statement: Statement,
-    variables: var Variables, sourceFilename: string,
-    codeFile: bool): bool =
-  ## If the statement is a function definition handle it. If the
-  ## statement is not handled, return false.
+proc readFunctionStatements*(env: var Env, lb: LineBuffer, statement: Statement,
+    sourceFilename: string): LinesOr =
+  ## Read the function definition statements and return true when
+  ## successful.  The passed in statement is the first statement after
+  ## the doc commands.
+
+  return newLinesOr(wDefineFunction, "")
+
+proc processFunctionStartLine*(env: var Env, lb: LineBuffer, statement: Statement,
+    variables: Variables, sourceFilename: string, codeFile: bool,
+    retLeftName: var string, retOperator: var Operator, retSignature: var Signature): bool =
+  ## If the line is the start of a function definition, return true
+  ## and fill in the function signature.
+  ## Example:
+  ## mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
 
   # Quick exit when we know it's not a function definition.
   if not ("func(" in statement.text):
@@ -1463,18 +1471,17 @@ proc defineFunction*(env: var Env, lb: LineBuffer, statement: Statement,
     runningPos = spacesO.get().length
   if runningPos >= statement.text.len or statement.text[runningPos] == '#':
     # We handled it.
-    return true
+    return false
 
   # Get the left hand variable dot name string and match the
   # surrounding white space.
-  let matchesO = matchDotNames(statement.text, runningPos)
-  if not isSome(matchesO):
+  let leftNameO = matchDotNames(statement.text, runningPos)
+  if not isSome(leftNameO):
     return false
-  let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
+  let (_, leftName, leftParenBrack, leftNameLen) = leftNameO.get3GroupsLen()
   if leftParenBrack == "(":
     return false
-  runningPos += dotNameLen
-  let varName = dotNameStr
+  runningPos += leftNameLen
 
   # Get the equal sign or &= and the following whitespace.
   let operatorO = matchEqualSign(statement.text, runningPos)
@@ -1530,30 +1537,57 @@ proc defineFunction*(env: var Env, lb: LineBuffer, statement: Statement,
       env.warnStatement(statement, wTextAfterValue, "", runningPos, sourceFilename)
       return false
 
-  # Process the signature and return a function variable partially
-  # filled in.
-  let funcVarOr = processSignature(signature)
-  if not funcVarOr.isMessage:
-    let md = funcVarOr.message
+  # Parse the signature and return a signature object.
+  let signatureOr = parseSignature(signature)
+  if signatureOr.isMessage:
+    let md = signatureOr.message
     env.warnStatement(statement, md.messageId, md.p1, runningPos + md.pos, sourceFilename)
     return false
-  var funcVar = funcVarOr.value
 
-  # Add the doc comments to the function variable and fill in
-  # extraStatement with the statement after them.
+  retLeftName = leftName
+  retOperator = operator
+  retSignature = signatureOr.value
+  return true
+
+proc defineFunctionAssignVar*(env: var Env, lb: LineBuffer, statement: Statement,
+    variables: var Variables, sourceFilename: string,
+    codeFile: bool): bool =
+  ## If the statement starts a function definition, define it, assign
+  ## the variable and return true. Return quickly when not a function
+  ## definition statement.
+
+  var leftName: string
+  var operator: Operator
+  var signature: Signature
+  if not processFunctionStartLine(env, lb, statement, variables,
+      sourceFilename, codeFile = true, leftName, operator, signature):
+    return false
+
+  # Read the doc comments. The extraStatement is filled in with the
+  # statement after the doc comments.
   var extraStatement: Statement
-  if not processDocComments(env, lb, statement, sourceFilename, funcVar, extraStatement):
+  let docCommentsOr = readDocComments(env, lb, statement, sourceFilename, extraStatement)
+  if docCommentsOr.isMessage:
+    let md = docCommentsOr.message
+    env.warnStatement(statement, md.messageId, md.p1,  md.pos, sourceFilename)
     return false
 
   # Add the statements to the function variable.
-  if not processStatements(env, lb, extraStatement, sourceFilename, funcVar):
+  let statementsOr = readFunctionStatements(env, lb, extraStatement, sourceFilename)
+  if statementsOr.isMessage:
+    let md = statementsOr.message
+    env.warnStatement(statement, md.messageId, md.p1, md.pos, sourceFilename)
     return false
 
+  let userFunc = newFunc(signature, runUserFunc)
+  let funcVar = newValue(userFunc)
+
   # Assign the variable if possible.
-  let warningDataO = assignVariable(variables, varName, funcVar,
+  let warningDataO = assignVariable(variables, leftName, funcVar,
     operator, inCodeFile = true)
   if isSome(warningDataO):
     env.warnStatement(statement, warningDataO.get(), sourceFilename)
+    return false
   return true
 
 proc runCommand*(env: var Env, cmdLines: CmdLines,

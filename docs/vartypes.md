@@ -28,6 +28,7 @@ StaticTea variable types.
 * [newSignature](#newsignature) &mdash; Create a Signature object.
 * [newSignatureOr](#newsignatureor) &mdash; Create a new SignatureOr with a message.
 * [newSignatureOr](#newsignatureor-1) &mdash; Create a new SignatureOr with a value.
+* [newSignatureOr](#newsignatureor-2) &mdash; Create a SignatureOr object.
 * [newParam](#newparam) &mdash; Create a new Param object.
 * [newVarsDict](#newvarsdict) &mdash; Create a new empty variables dictionary.
 * [newVarsDictOr](#newvarsdictor) &mdash; Return a new varsDictOr object containing a warning.
@@ -76,6 +77,7 @@ same type which may be Value type.
 * [newValueAndPosOr](#newvalueandposor-3) &mdash; Create a ValueAndPosOr value from a number or string.
 * [newValueAndPosOr](#newvalueandposor-4) &mdash; Create a ValueAndPosOr from a ValueAndPos.
 * [codeToParamType](#codetoparamtype) &mdash; 
+* [strToParamType](#strtoparamtype) &mdash; Return the parameter type for the given string.
 * [shortName](#shortname) &mdash; Return a short name based on the given index value.
 * [signatureCodeToSignature](#signaturecodetosignature) &mdash; Convert the signature code to a signature object.
 
@@ -313,6 +315,15 @@ Create a new SignatureOr with a value.
 
 ```nim
 func newSignatureOr(signature: Signature): SignatureOr
+```
+
+# newSignatureOr
+
+Create a SignatureOr object.
+
+```nim
+proc newSignatureOr(kind: SignatureKind; name: string; params: seq[Param];
+                    returnType: ParamType): SignatureOr
 ```
 
 # newParam
@@ -705,6 +716,14 @@ func newValueAndPosOr(val: ValueAndPos): ValueAndPosOr
 
 ```nim
 func codeToParamType(code: ParamCode): ParamType
+```
+
+# strToParamType
+
+Return the parameter type for the given string.
+
+```nim
+func strToParamType(str: string): ParamType
 ```
 
 # shortName

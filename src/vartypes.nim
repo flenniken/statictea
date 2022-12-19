@@ -601,6 +601,7 @@ func codeToParamType*(code: ParamCode): ParamType =
     result = ptInt
 
 func strToParamType*(str: string): ParamType =
+  ## Return the parameter type for the given string.
   case str:
   of "int":
     result = ptInt

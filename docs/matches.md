@@ -30,6 +30,7 @@ Methods for matching sub-strings.
 * [matchBoolExprOperator](#matchboolexproperator) &mdash; Match boolean expression operators (bool operators plus compareh operators) and the trailing whitespace.
 * [matchCompareOperator](#matchcompareoperator) &mdash; Match the compare operators and the trailing whitespace.
 * [matchReplCmd](#matchreplcmd) &mdash; Match the REPL commands and the trailing optional whitespace.
+* [matchParameterType](#matchparametertype) &mdash; Match a parameter type and the trailing whitespace.
 
 # commands
 
@@ -214,7 +215,8 @@ Grouping symbols we search for in the statements.
 
 ```nim
 GroupSymbol = enum
-  gLeftParentheses, gRightParentheses, gLeftBracket, gRightBracket, gComma
+  gLeftParentheses, gRightParentheses, gLeftBracket, gRightBracket, gComma,
+  gColon
 ```
 
 # matchCommaOrSymbol
@@ -265,6 +267,14 @@ Match the REPL commands and the trailing optional whitespace.
 
 ```nim
 proc matchReplCmd(line: string; start: Natural): Option[Matches]
+```
+
+# matchParameterType
+
+Match a parameter type and the trailing whitespace.
+
+```nim
+proc matchParameterType(line: string; start: Natural): Option[Matches]
 ```
 
 

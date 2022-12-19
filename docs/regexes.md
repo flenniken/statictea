@@ -55,6 +55,7 @@ check resultStringO.get() == "456456"
 * [newReplacement](#newreplacement) &mdash; Create a new Replacement object.
 * [getGroup](#getgroup) &mdash; Get the group in matches.
 * [getGroup](#getgroup-1) &mdash; Get the group in matches.
+* [getGroupLen](#getgrouplen) &mdash; Get the group in matches and the match length.
 * [get2Groups](#get2groups) &mdash; Get two groups in matches.
 * [get2Groups](#get2groups-1) &mdash; Get two groups in matches.
 * [get3Groups](#get3groups) &mdash; Get three groups in matches.
@@ -166,6 +167,14 @@ Get the group in matches.
 
 ```nim
 func getGroup(matchesO: Option[Matches]): string
+```
+
+# getGroupLen
+
+Get the group in matches and the match length.
+
+```nim
+func getGroupLen(matchesO: Option[Matches]): (string, Natural)
 ```
 
 # get2Groups

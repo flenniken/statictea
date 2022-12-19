@@ -41,10 +41,14 @@ starts in the template file.
 * type: [LoopControl](#loopcontrol) &mdash; Controls whether to output the current replacement block iteration and whether to stop or not.
 * [runStatementAssignVar](#runstatementassignvar) &mdash; Run a statement and assign the variable if appropriate.
 * [parseSignature](#parsesignature) &mdash; Parse the signature and return the list of parameters or a message.
-* [processSignature](#processsignature) &mdash; Return a new function variable with the given signature.
-* [processDocComments](#processdoccomments) &mdash; Add the function definition doc comments to the function variable.
-* [processStatements](#processstatements) &mdash; Add the function definition statements to the function variable.
-* [defineFunction](#definefunction) &mdash; If the statement is a function definition handle it.
+* type: [LinesOr](#linesor) &mdash; A list of lines or a warning.
+* [newLinesOr](#newlinesor) &mdash; Return a new LinesOr object containing a warning.
+* [newLinesOr](#newlinesor-1) &mdash; Return a new LinesOr object containing a warning.
+* [newLinesOr](#newlinesor-2) &mdash; Return a new LinesOr object containing a list of lines.
+* [readDocComments](#readdoccomments) &mdash; Read the doc comment lines.
+* [readFunctionStatements](#readfunctionstatements) &mdash; Read the function definition statements and return true when successful.
+* [processFunctionStartLine](#processfunctionstartline) &mdash; If the line is the start of a function definition, return true and fill in the function signature.
+* [defineFunctionAssignVar](#definefunctionassignvar) &mdash; If the statement starts a function definition, define it, assign the variable and return true.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 
 # Statement
@@ -396,47 +400,88 @@ proc runStatementAssignVar(env: var Env; statement: Statement;
 
 # parseSignature
 
-Parse the signature and return the list of parameters or a message. Example signature: cmp(numStr1: string, numStr2: string) int
+Parse the signature and return the list of parameters or a message.
+
+Example signature:
+~~~
+cmp(numStr1: string, numStr2: string) int
+~~~~
 
 ```nim
-func parseSignature(signature: string): SignatureOr
+proc parseSignature(signature: string): SignatureOr
 ```
 
-# processSignature
+# LinesOr
 
-Return a new function variable with the given signature. Example signature: cmp(numStr1: string, numStr2: string) int
+A list of lines or a warning.
 
 ```nim
-proc processSignature(signature: string): ValueOr
+LinesOr = OpResultWarn[seq[string]]
 ```
 
-# processDocComments
+# newLinesOr
 
-Add the function definition doc comments to the function variable. Return false when there was an error. Fill in the extraStatement with the statement after the comments.
+Return a new LinesOr object containing a warning.
 
 ```nim
-proc processDocComments(env: var Env; lb: LineBuffer; statement: Statement;
-                        sourceFilename: string; funcVar: var Value;
-                        extraStatement: var Statement): bool
+func newLinesOr(warning: MessageId; p1: string = ""; pos = 0): LinesOr
 ```
 
-# processStatements
+# newLinesOr
 
-Add the function definition statements to the function variable. Return false when there was an error. The passed in statement is the first statement after the doc commands.
+Return a new LinesOr object containing a warning.
 
 ```nim
-proc processStatements(env: var Env; lb: LineBuffer; statement: Statement;
-                       sourceFilename: string; funcVar: var Value): bool
+func newLinesOr(warningData: WarningData): LinesOr
 ```
 
-# defineFunction
+# newLinesOr
 
-If the statement is a function definition handle it. If the statement is not handled, return false.
+Return a new LinesOr object containing a list of lines.
 
 ```nim
-proc defineFunction(env: var Env; lb: LineBuffer; statement: Statement;
-                    variables: var Variables; sourceFilename: string;
-                    codeFile: bool): bool
+func newLinesOr(lines: seq[string]): LinesOr
+```
+
+# readDocComments
+
+Read the doc comment lines.  Fill in the extraStatement with the line after the comments.
+
+```nim
+proc readDocComments(env: var Env; lb: LineBuffer; statement: Statement;
+                     sourceFilename: string; extraStatement: var Statement): LinesOr
+```
+
+# readFunctionStatements
+
+Read the function definition statements and return true when successful.  The passed in statement is the first statement after the doc commands.
+
+```nim
+proc readFunctionStatements(env: var Env; lb: LineBuffer; statement: Statement;
+                            sourceFilename: string): LinesOr
+```
+
+# processFunctionStartLine
+
+If the line is the start of a function definition, return true and fill in the function signature. Example: mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
+
+```nim
+proc processFunctionStartLine(env: var Env; lb: LineBuffer;
+                              statement: Statement; variables: Variables;
+                              sourceFilename: string; codeFile: bool;
+                              retLeftName: var string;
+                              retOperator: var Operator;
+                              retSignature: var Signature): bool
+```
+
+# defineFunctionAssignVar
+
+If the statement starts a function definition, define it, assign the variable and return true. Return quickly when not a function definition statement.
+
+```nim
+proc defineFunctionAssignVar(env: var Env; lb: LineBuffer; statement: Statement;
+                             variables: var Variables; sourceFilename: string;
+                             codeFile: bool): bool
 ```
 
 # runCommand
