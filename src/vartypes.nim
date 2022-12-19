@@ -166,6 +166,12 @@ func newSignatureOr*(signature: Signature): SignatureOr =
   ## Create a new SignatureOr with a value.
   result = opValueW[Signature](signature)
 
+proc newSignatureOr*(kind: SignatureKind, name: string, params: seq[Param],
+    returnType: ParamType): SignatureOr =
+  ## Create a SignatureOr object.
+  let signature = Signature(kind: kind, name: name, params: params, returnType: returnType)
+  result = opValueW[Signature](signature)
+
 func newParam*(name: string, paramType: ParamType): Param =
   ## Create a new Param object.
   result = Param(name: name, paramType: paramType)

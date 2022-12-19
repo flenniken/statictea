@@ -352,10 +352,20 @@ proc testGetConditionWarn(text: string, start: Natural, eWarning: MessageId,
   if not result:
     echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
-proc testParseSignature(signatureStr: string, eSignature: Signature): bool =
+proc testParseSignature(signatureStr: string, eSignatureOr: SignatureOr): bool =
   let signatureOr = parseSignature(signatureStr)
-  let eSignatureOr = newSignatureOr(eSignature)
   result = gotExpected($signatureOr, $eSignatureOr)
+  if not result:
+    if signatureOr.isMessage:
+      echo "0123456789 123456789 123456789"
+    if signatureOr.isMessage:
+      echo "     got: $1" % getWarning(signatureOr.message.messageId, signatureOr.message.p1)
+      echo startColumn(signatureStr, signatureOr.message.pos, "↓ got")
+    echo signatureStr
+    if eSignatureOr.isMessage:
+      echo startColumn(signatureStr, eSignatureOr.message.pos, "↑ expected")
+      echo "expected: $1" % getWarning(eSignatureOr.message.messageId, eSignatureOr.message.p1)
+    echo ""
 
 suite "runCommand.nim":
   test "startColumn":
@@ -1618,9 +1628,93 @@ White$1
 
   test "parse signature no params":
     let params = newSeq[Param]()
-    check testParseSignature("zero() int", newSignature(skNormal, "zero", params, ptInt))
+    check testParseSignature("zero() int", newSignatureOr(skNormal, "zero", params, ptInt))
 
   test "parse signature one param":
-    let params = newSeq[Param]()
-    params.add(newParam("one", ptInt)
-    check testParseSignature("one(num: int) int", newSignature(skNormal, "one", params, ptInt))
+    var params = newSeq[Param]()
+    params.add(newParam("num", ptInt))
+    check testParseSignature("one(num: int) int", newSignatureOr(skNormal, "one", params, ptInt))
+
+  test "parse signature two params":
+    var params = newSeq[Param]()
+    params.add(newParam("num1", ptInt))
+    params.add(newParam("num2", ptInt))
+    check testParseSignature("two(num1: int, num2: int) int", newSignatureOr(skNormal, "two", params, ptInt))
+
+  test "parse signature three params":
+    var params = newSeq[Param]()
+    params.add(newParam("num1", ptInt))
+    params.add(newParam("num2", ptInt))
+    params.add(newParam("num3", ptInt))
+    check testParseSignature("three(num1: int, num2: int, num3: int) int",
+      newSignatureOr(skNormal, "three", params, ptInt))
+
+  test "parse path signature":
+    var params = newSeq[Param]()
+    params.add(newParam("filename", ptString))
+    check testParseSignature("path(filename: string) dict", newSignatureOr(skNormal, "path", params, ptDict))
+
+  test "parse path signature no space":
+    var params = newSeq[Param]()
+    params.add(newParam("filename", ptString))
+    check testParseSignature("path(filename:string)dict", newSignatureOr(skNormal, "path", params, ptDict))
+
+  test "parse path signature space":
+    var params = newSeq[Param]()
+    params.add(newParam("name", ptString))
+    check testParseSignature("  path(  name  : string  )  dict  ",
+      newSignatureOr(skNormal, "path", params, ptDict))
+
+  test "signature missing signature":
+    check testParseSignature("", newSignatureOr(wMissingSignature, "", 0))
+
+  test "signature missing signature2":
+    check testParseSignature("   \t  ", newSignatureOr(wMissingSignature, "", 0))
+
+  test "signature bad function name":
+    check testParseSignature("123(name: string) dict",
+      newSignatureOr(wFunctionName, "", 0))
+
+  test "signature missing (":
+    check testParseSignature("path (name: string) dict",
+      newSignatureOr(wMissingLeftParen, "", 4))
+
+  test "signature bad parameter name":
+    check testParseSignature("path(21name: string) dict",
+      newSignatureOr(wParameterName, "", 5))
+
+  test "signature extra parentheses":
+    check testParseSignature("path(name(): string) dict",
+      newSignatureOr(wMissingColon, "", 9))
+
+  test "signature missing colon":
+    check testParseSignature("path(name , string) dict",
+      newSignatureOr(wMissingColon, "", 10))
+
+  test "signature invalid type":
+    check testParseSignature("path(name: number) dict",
+      newSignatureOr(wExpectedParamType, "", 11))
+
+  test "signature comma or paren":
+    check testParseSignature("path(num: string;) dict",
+      newSignatureOr(wMissingCommaParen, "", 16))
+
+  test "signature comma or paren 2":
+    check testParseSignature("path(num: string, abc: int dict",
+      newSignatureOr(wMissingCommaParen, "", 27))
+
+  test "signature invalid return type":
+    check testParseSignature("path(num: string, abc: int) number",
+      newSignatureOr(wExpectedReturnType, "", 28))
+
+  test "signature trailing junk":
+    check testParseSignature("path(num: string, abc: int) int 333",
+      newSignatureOr(wUnusedSignatureText, "", 32))
+
+  test "signature missing":
+    check testParseSignature("path(", newSignatureOr(wParameterName, "", 5))
+    check testParseSignature("path(name", newSignatureOr(wMissingColon, "", 9))
+    check testParseSignature("path(name:", newSignatureOr(wExpectedParamType, "", 10))
+    check testParseSignature("path(name:int", newSignatureOr(wMissingCommaParen, "", 13))
+    check testParseSignature("path(name:int)", newSignatureOr(wExpectedReturnType, "", 14))
+    check testParseSignature("path(name:int)  ", newSignatureOr(wExpectedReturnType, "", 16))

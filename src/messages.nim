@@ -247,6 +247,7 @@ type
     wExpectedParamType,    ## w232
     wExpectedReturnType,   ## w233
     wUnusedSignatureText,  ## w234
+    wMissingSignature,     ## w235
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -478,13 +479,14 @@ const
     "Define a function in a code file and not nested.", ## wDefineFunction
     "Missing left hand side and operator, e.g. a = len(b) not len(b).", ## wMissingLeftAndOpr
     "Expected signature string.", ## wExpectedSignature
-    "Excected a function name.", ## wFunctionName
+    "Expected a function name.", ## wFunctionName
     "Expected a left parentheses for the signature.", ## wMissingLeftParen
-    "Excected a parameter name.", ## wParameterName
+    "Expected a parameter name.", ## wParameterName
     "Expected a colon.", ## wMissingColon
     "Expected a parameter type: bool, int, float, string, dict, list, func or any.", ## wExpectedParamType
-    "Expected the return type.", ## wExpectedReturnType
+    "Invalid return type.", ## wExpectedReturnType
     "Unused extra text at the end of the signature.", ## wUnusedSignatureText
+    "Missing the function signature string.", ## wMissingSignature
     ]
 
     ## The message text.

@@ -1331,16 +1331,19 @@ proc parseSignature*(signature: string): SignatureOr =
   ## @:~~~
   ## @:cmp(numStr1: string, numStr2: string) int
   ## @:~~~~
-
   var runningPos = 0
   let matchesO = matchDotNames(signature, runningPos)
   if not isSome(matchesO):
-    # Excected a function name.
-    return newSignatureOr(wFunctionName, "", runningPos)
+    if notEmptyOrSpaces(signature):
+      # Excected a function name.
+      return newSignatureOr(wFunctionName, "", runningPos)
+    else:
+      # Missing the function signature string.
+      return newSignatureOr(wMissingSignature, "", runningPos)
   let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
   if leftParenBrack != "(":
     # Excected a left parentheses for the signature.
-    return newSignatureOr(wMissingLeftParen, "", runningPos)
+    return newSignatureOr(wMissingLeftParen, "", runningPos + dotNameStr.len)
   runningPos += dotNameLen
   let functionName = dotNameStr
 
@@ -1355,19 +1358,18 @@ proc parseSignature*(signature: string): SignatureOr =
     # One or more parameters.
 
     while true:
-      var parameterName: string
-      let parenNameO = matchDotNames(signature, runningPos)
-      if not isSome(parenNameO):
+      # Get the parameter name and following white space.
+      let paramNameO = matchDotNames(signature, runningPos)
+      if not isSome(paramNameO):
         # Excected a parameter name.
         return newSignatureOr(wParameterName, "", runningPos)
-      let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
-      if leftParenBrack == "(":
-        # Excected a parameter name.
-        return newSignatureOr(wParameterName, "", runningPos)
-      runningPos += dotNameLen
-      parameterName = dotNameStr
+      let (_, paramName, leftP, paramNameLen) = paramNameO.get3GroupsLen()
+      if leftP == "(":
+        # Expected a colon.
+        return newSignatureOr(wMissingColon, "", runningPos + paramName.len)
+      runningPos += paramNameLen
 
-      # Look for : and following white space.
+      # Look for : and the following white space.
       let colonO = matchSymbol(signature, gColon, runningPos)
       if not colonO.isSome:
         # Expected a colon.
@@ -1379,13 +1381,13 @@ proc parseSignature*(signature: string): SignatureOr =
       if not paramTypeO.isSome:
         # Expected a parameter type: bool, int, float, string, dict, list, func or any.
         return newSignatureOr(wExpectedParamType, "", runningPos)
-      let (paramTypeStr, matchLen) = paramTypeO.getGroupLen()
-      runningPos += matchLen
+      let (paramTypeStr, paramTypeLen) = paramTypeO.getGroupLen()
+      runningPos += paramTypeLen
 
-      # todo: support optional
+      # todo: support optional parameters
 
       let paramType = strToParamType(paramTypeStr)
-      params.add(newParam(parameterName, paramType))
+      params.add(newParam(paramName, paramType))
 
       # Look for a comma or right parentheses.
       let corpO = matchCommaOrSymbol(signature, gRightParentheses, runningPos)
