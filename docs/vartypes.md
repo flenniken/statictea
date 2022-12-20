@@ -11,15 +11,14 @@ StaticTea variable types.
 * type: [ValueKind](#valuekind) &mdash; The statictea variable types.
 * type: [Value](#value) &mdash; A variable's value reference.
 * type: [ValueOr](#valueor) &mdash; A Value object or a warning.
-* type: [FunctionPtr](#functionptr) &mdash; Signature of a statictea function.
-* type: [Func](#func) &mdash; A func value is a reference to a FunctionSpec.
+* type: [FunctionPtr](#functionptr) &mdash; Signature of a statictea built in function.
 * type: [ParamCode](#paramcode) &mdash; Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.
 * type: [ParamType](#paramtype) &mdash; The statictea parameter types.
 * type: [Param](#param) &mdash; Holds attributes for one parameter.
 * type: [SignatureKind](#signaturekind) &mdash; The statictea signature types.
 * type: [Signature](#signature) &mdash; Holds the function signature.
 * type: [SignatureOr](#signatureor) &mdash; A signature or message.
-* type: [FunctionSpec](#functionspec) &mdash; Holds the function signature and a pointer to the function.
+* type: [FunctionSpec](#functionspec) &mdash; Holds the function details.
 * type: [FunResultKind](#funresultkind) &mdash; The kind of a FunResult object, either a value or warning.
 * type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a warning.
 * type: [SideEffect](#sideeffect) &mdash; The kind of side effect for a statement.
@@ -43,8 +42,7 @@ StaticTea variable types.
 * [newValue](#newvalue-7) &mdash; New list value from an array of items of the same kind.
 * [newValue](#newvalue-8) &mdash; New dict value from an array of pairs where the pairs are the
 same type which may be Value type.
-* [newFunc](#newfunc) &mdash; Create a new func which is a reference to a FunctionSpec.
-* [newFunc](#newfunc-1) &mdash; Create a new func which is a reference to a FunctionSpec.
+* [newFunc](#newfunc) &mdash; Create a new func which is a FunctionSpec.
 * [newValue](#newvalue-9) &mdash; Create a new func value.
 * [newEmptyListValue](#newemptylistvalue) &mdash; Return an empty list value.
 * [newEmptyDictValue](#newemptydictvalue) &mdash; Create a dictionary value from a VarsDict.
@@ -134,18 +132,10 @@ ValueOr = OpResultWarn[Value]
 
 # FunctionPtr
 
-Signature of a statictea function. It takes any number of values and returns a value or a warning message.
+Signature of a statictea built in function. It takes any number of values and returns a value or a warning message.
 
 ```nim
 FunctionPtr = proc (variables: Variables; parameters: seq[Value]): FunResult
-```
-
-# Func
-
-A func value is a reference to a FunctionSpec.
-
-```nim
-Func = ref FunctionSpec
 ```
 
 # ParamCode
@@ -214,11 +204,26 @@ SignatureOr = OpResultWarn[Signature]
 
 # FunctionSpec
 
-Holds the function signature and a pointer to the function.
+Holds the function details.
+
+builtIn -- true for the built-in functions, false for user functions
+signature -- the function signature
+docComments -- the function document comments
+filename -- the filename where the function is defined either the code file or runFunctions.nim
+lineNum -- the line number where the function definition starts
+numLines -- the number of lines to define the function
+statementLines -- a list of the function statements for user functions
+functionPtr -- pointer to the function for built-in functions
 
 ```nim
 FunctionSpec = object
+  builtIn*: bool
   signature*: Signature
+  docComments*: seq[string]
+  filename*: string
+  lineNum*: Natural
+  numLines*: Natural
+  statementLines*: seq[string]
   functionPtr*: FunctionPtr
 
 ```
@@ -446,18 +451,12 @@ proc newValue[T](dictPairs: openArray[(string, T)]): Value
 
 # newFunc
 
-Create a new func which is a reference to a FunctionSpec.
+Create a new func which is a FunctionSpec.
 
 ```nim
-func newFunc(signature: Signature; functionPtr: FunctionPtr): Func
-```
-
-# newFunc
-
-Create a new func which is a reference to a FunctionSpec.
-
-```nim
-func newFunc(functionSpec: FunctionSpec): Func
+func newFunc(builtIn: bool; signature: Signature; docComments: seq[string];
+             filename: string; lineNum: Natural; numLines: Natural;
+             statementLines: seq[string]; functionPtr: FunctionPtr): FunctionSpec
 ```
 
 # newValue
@@ -465,7 +464,7 @@ func newFunc(functionSpec: FunctionSpec): Func
 Create a new func value.
 
 ```nim
-func newValue(function: Func): Value
+func newValue(function: FunctionSpec): Value
 ```
 
 # newEmptyListValue
@@ -505,7 +504,7 @@ func `$`(signature: Signature): string
 Return a string representation of a function.
 
 ```nim
-func `$`(function: Func): string
+func `$`(function: FunctionSpec): string
 ```
 
 # jsonStringRepr

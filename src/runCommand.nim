@@ -701,6 +701,20 @@ proc andOrFunctions*(
     value = a or b
   result = newValueAndPosOr(newValue(value), runningPos)
 
+func callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult =
+  ## Run the given user function.
+  assert funcVar.kind == vkFunc
+  assert funcVar.funcv.builtIn == false
+  result = newFunResultWarn(wInvalidVersion, 1)
+
+func callFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult =
+  ## Call the function variable.
+  assert funcVar.kind == vkFunc
+  if funcVar.funcv.builtIn:
+    result = funcVar.funcv.functionPtr(variables, arguments)
+  else:
+    result = callUserFunction(funcVar, variables, arguments)
+
 proc getFunctionValueAndPos*(
     functionName: string,
     statement: Statement,
@@ -762,9 +776,10 @@ proc getFunctionValueAndPos*(
     let warningData = newWarningData(funcValueOr.message.messageId,
       funcValueOr.message.p1, start)
     return newValueAndPosOr(warningData)
+  let funcVar = funcValueOr.value
 
   # Call the function.
-  let funResult = funcValueOr.value.funcv.functionPtr(variables, arguments)
+  let funResult = callFunction(funcVar, variables, arguments)
   if funResult.kind == frWarning:
     var warningPos: int
     if funResult.parameter < argumentStarts.len:
@@ -1319,10 +1334,6 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
     env.warnStatement(statement, warningDataO.get(), sourceFilename)
   return lcContinue
 
-func runUserFunc(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return 0.
-  result = newFunResult(newValue(0))
-
 proc parseSignature*(signature: string): SignatureOr =
   ## Parse the signature and return the list of parameters or a
   ## message.
@@ -1549,7 +1560,7 @@ proc processFunctionStartLine*(env: var Env, lb: LineBuffer, statement: Statemen
   retSignature = signatureOr.value
   return true
 
-proc defineFunctionAssignVar*(env: var Env, lb: LineBuffer, statement: Statement,
+proc defineUserFunctionAssignVar*(env: var Env, lb: LineBuffer, statement: Statement,
     variables: var Variables, sourceFilename: string,
     codeFile: bool): bool =
   ## If the statement starts a function definition, define it, assign
@@ -1571,15 +1582,24 @@ proc defineFunctionAssignVar*(env: var Env, lb: LineBuffer, statement: Statement
     let md = docCommentsOr.message
     env.warnStatement(statement, md.messageId, md.p1,  md.pos, sourceFilename)
     return false
+  let docComments = docCommentsOr.value
 
   # Add the statements to the function variable.
-  let statementsOr = readFunctionStatements(env, lb, extraStatement, sourceFilename)
-  if statementsOr.isMessage:
-    let md = statementsOr.message
+  let statementLinesOr = readFunctionStatements(env, lb, extraStatement, sourceFilename)
+  if statementLinesOr.isMessage:
+    let md = statementLinesOr.message
     env.warnStatement(statement, md.messageId, md.p1, md.pos, sourceFilename)
     return false
+  let statementLines = statementLinesOr.value
 
-  let userFunc = newFunc(signature, runUserFunc)
+  # todo get filename, line number and number of lines.
+  func dummy(variables: Variables, parameters: seq[Value]): FunResult =
+    result = newFunResult(newValue(0))
+  let filename = "filename.tea"
+  let lineNum = 0
+  let numLines = 3
+  let userFunc = newFunc(true, signature, docComments, filename, lineNum,
+    numLines, statementLines, dummy)
   let funcVar = newValue(userFunc)
 
   # Assign the variable if possible.

@@ -12,6 +12,7 @@ when defined(test):
   import env
   import comparelines
   import parseCmdLine
+  import vartypes
 
   proc readXLines*(lb: var LineBuffer, maxLines: Natural = high(Natural)): seq[string] =
     ## Read lines from a LineBuffer returning line endings but don't
@@ -347,3 +348,37 @@ when defined(test):
       codeStart: codeStart, codeLen: codeLen, commentLen: commentLen,
       continuation: continuation, postfix: postfix,
       ending: ending, lineNum: lineNum)
+
+  func newDummyFunctionSpec*(
+      functionName: string = "zero",
+      signatureCode: string = "i",
+      builtIn = false,
+      docComments = newSeq[string](),
+      filename = "test.nim",
+      lineNum = 0,
+      numLines = 3,
+      functionPtr: FunctionPtr = nil,
+      statementLines = newSeq[string]()): FunctionSpec =
+    # Create a function spec for testing.
+
+    func zero(variables: Variables, parameters: seq[Value]): FunResult =
+      result = newFunResult(newValue(0))
+    var functionPtrDefault: FunctionPtr
+    if functionPtr == nil:
+      functionPtrDefault = zero
+    else:
+      functionPtrDefault = functionPtr
+    let signatureO = signatureCodeToSignature(functionName, signatureCode)
+    var docCommentsList: seq[string]
+    if docCommentsList.len == 0:
+      docCommentsList.add("Return the number 0.")
+    else:
+      docCommentsList = docComments
+    var statementLinesList: seq[string]
+    if statementLinesList.len == 0:
+      statementLinesList.add("return 0")
+    else:
+      statementLinesList = statementLines
+    let builtIn = false
+    result = newFunc(builtIn, signatureO.get(), docCommentsList, filename,
+      lineNum, numLines, statementLinesList, functionPtrDefault)

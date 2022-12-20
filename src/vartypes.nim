@@ -50,15 +50,12 @@ type
     of vkBool:
       boolv*: bool
     of vkFunc:
-      funcv*: Func
+      funcv*: FunctionSpec
 
   FunctionPtr* = proc (variables: Variables, parameters: seq[Value]):
       FunResult {.noSideEffect.}
-    ## Signature of a statictea function. It takes any number of values
+    ## Signature of a statictea built in function. It takes any number of values
     ## and returns a value or a warning message.
-
-  Func* = ref FunctionSpec
-    ## A func value is a reference to a FunctionSpec.
 
   ParamCode* = char
     ## Parameter type, one character of "ifsldpa" corresponding to int,
@@ -102,8 +99,23 @@ type
     ## A signature or message.
 
   FunctionSpec* = object
-    ## Holds the function signature and a pointer to the function.
+    ## Holds the function details.
+    ## @:
+    ## @:builtIn -- true for the built-in functions, false for user functions
+    ## @:signature -- the function signature
+    ## @:docComments -- the function document comments
+    ## @:filename -- the filename where the function is defined either the code file or runFunctions.nim
+    ## @:lineNum -- the line number where the function definition starts
+    ## @:numLines -- the number of lines to define the function
+    ## @:statementLines -- a list of the function statements for user functions
+    ## @:functionPtr -- pointer to the function for built-in functions
+    builtIn*: bool
     signature*: Signature
+    docComments*: seq[string]
+    filename*: string
+    lineNum*: Natural
+    numLines*: Natural
+    statementLines*: seq[string]
     functionPtr*: FunctionPtr
 
   FunResultKind* = enum
@@ -248,17 +260,37 @@ proc newValue*[T](dictPairs: openArray[(string, T)]): Value =
     varsTable[a] = value
   result = Value(kind: vkDict, dictv: varsTable)
 
-func newFunc*(signature: Signature, functionPtr: FunctionPtr): Func =
-  ## Create a new func which is a reference to a FunctionSpec.
-  new(result)
-  result[] = FunctionSpec(signature: signature, functionPtr: functionPtr)
+# func newFunc*(signature: Signature, functionPtr: FunctionPtr): FunctionSpec =
+#   ## Create a new built-in func which is a FunctionSpec.
+#   let builtIn = true
+#   let docComments = newSeq[string]()
+#   let statementLines = newSeq[string]()
+#   let filename = "runFunction.nim"
+#   let lineNum = 0
+#   let numLines = 10
+#   assert(functionPtr != nil)
+#   result = FunctionSpec(builtIn: builtIn, signature: signature, docComments: docComments,
+#                           filename: filename, lineNum: lineNum, numLines: numLines,
+#                           statementLines: statementLines, functionPtr: functionPtr)
 
-func newFunc*(functionSpec: FunctionSpec): Func =
-  ## Create a new func which is a reference to a FunctionSpec.
-  new(result)
-  result[] = functionSpec
+func newFunc*(builtIn: bool, signature: Signature, docComments: seq[string],
+    filename: string, lineNum: Natural, numLines: Natural,
+    statementLines: seq[string], functionPtr: FunctionPtr): FunctionSpec =
+  ## Create a new func which is a FunctionSpec.
 
-func newValue*(function: Func): Value =
+  when defined(test):
+    if builtIn:
+      if functionPtr == nil:
+        raiseAssert("a built-in function requires a function pointer")
+    else:
+      if statementLines.len < 1:
+        raiseAssert("a user function requires statement lines")
+
+  result = FunctionSpec(builtIn: builtIn, signature: signature, docComments: docComments,
+                          filename: filename, lineNum: lineNum, numLines: numLines,
+                          statementLines: statementLines, functionPtr: functionPtr)
+
+func newValue*(function: FunctionSpec): Value =
   ## Create a new func value.
   result = Value(kind: vkFunc, funcv: function)
 
@@ -305,7 +337,7 @@ func `$`*(signature: Signature): string =
   result.add(") ")
   result.add($signature.returnType)
 
-func `$`*(function: Func): string =
+func `$`*(function: FunctionSpec): string =
   ## Return a string representation of a function.
   result.add("\"")
   result.add(function.signature.name)

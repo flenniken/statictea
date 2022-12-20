@@ -2693,7 +2693,18 @@ proc createFuncDictionary*(): Value =
   var lastName = ""
   for (functionName, functionPtr, signatureCode) in functionsList:
     let signatureO = signatureCodeToSignature(functionName, signatureCode)
-    let function = newFunc(signatureO.get(), functionPtr)
+
+    # todo: fill in data correctly
+    let builtIn = true
+    var docComments = newSeq[string]()
+    docComments.add(functionName)
+    let filename = "runFunction.nim"
+    let lineNum = 0
+    let numLines = 0
+    var statementLines = newSeq[string]()
+    let function = newFunc(builtIn, signatureO.get(), docComments, filename,
+      lineNum, numLines, statementLines, functionPtr)
+
     let funcValue = newValue(function)
     if functionName == lastName:
       funcList.listv.add(funcValue)

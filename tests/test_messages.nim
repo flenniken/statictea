@@ -67,5 +67,3 @@ suite "messages.nim":
         echo "The message has too many $ characters."
         echo message
         check count <= 1
-      if "parameter" in message:
-        echo "$1: $2" %  [$ix, message]

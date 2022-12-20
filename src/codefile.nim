@@ -245,7 +245,7 @@ proc runCodeFile*(env: var Env, variables: var Variables, filename: string) =
 
     # If the statement starts a function definition, define it, assign
     # the variable and return true.
-    if defineFunctionAssignVar(env, lb, statement, variables, filename, codeFile=true):
+    if defineUserFunctionAssignVar(env, lb, statement, variables, filename, codeFile=true):
       continue
 
     # Process the statement.

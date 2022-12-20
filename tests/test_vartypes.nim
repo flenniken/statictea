@@ -326,13 +326,15 @@ c.d = [7]"""
     let funResult2 = newFunResult(newValue("tea"))
     check funResult == funResult2
 
-  test "new function":
-    func abc(variables: Variables, parameters: seq[Value]): FunResult =
-      result = newFunResult(newValue("hi"))
-    let signatureO = signatureCodeToSignature("abc", "iis")
-    let function = newFunc(signatureO.get(), abc)
+  test "new dummy built-in function":
+    let function = newDummyFunctionSpec(builtIn = true, functionName = "abc", signatureCode = "iis")
     check gotExpected($function, "\"abc\"")
+    let value = newValue(function)
+    check function == value.funcv
 
+  test "new dummy user function":
+    let function = newDummyFunctionSpec(builtIn = false, functionName = "abc", signatureCode = "iis")
+    check gotExpected($function, "\"abc\"")
     let value = newValue(function)
     check function == value.funcv
 
@@ -342,10 +344,13 @@ c.d = [7]"""
     let pi = newValue(3.14159)
     let a = newValue([1, 2, 3])
     let d = newValue({"x":1, "y":2})
+
     func abc(variables: Variables, parameters: seq[Value]): FunResult =
       result = newFunResult(newValue("hi"))
-    let signatureO = signatureCodeToSignature("abc", "iis")
-    let fn = newValue(newFunc(signatureO.get(), abc))
+    let fn = newValue(newDummyFunctionSpec(builtIn = true,
+      functionName = "abc", signatureCode = "iis", functionPtr = abc))
+
+    # let fn = newValue(newFuncDummy())
     let found = newValue(true)
 
     check $str == """"Eary Grey""""
@@ -376,6 +381,10 @@ y = 2"""
     check $fn == """"abc""""
     check valueToString(fn) == """"abc""""
     check valueToStringRB(fn) == "abc"
+
+    # check $fn == """"five""""
+    # check valueToString(fn) == """"five""""
+    # check valueToStringRB(fn) == "five"
 
     check $found == "true"
     check valueToString(found) == "true"

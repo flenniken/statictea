@@ -146,10 +146,6 @@ proc testComp(a: int|float|string, op: string, b: int|float|string, eResult: boo
   let eFunResult = newFunResult(newValue(eResult))
   result = testFunction(op, arguments, eFunResult)
 
-func abc(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Do nothing test function.
-  result = newFunResult(newValue("hi"))
-
 proc testBool(value: Value, eResult: bool): bool =
   var arguments = @[value]
   let eFunResult = newFunResult(newValue(eResult))
@@ -183,22 +179,17 @@ proc testFormatStringWarn(str: string, eWarningData: WarningData,
 suite "runFunction.nim":
 
   test "getBestFunction function value":
-    let function = newFunc(signatureCodeToSignature("abc", "iis").get(), abc)
-    let value = newValue(function)
+    let value = newValue(newDummyFunctionSpec())
     check testGetBestFunction(value, @[newValue(1), newValue(1)], newValueOr(value))
 
   test "getBestFunction function list of one":
-    let signature = signatureCodeToSignature("abc", "iis").get()
-    let function = newFunc(signature, abc)
-    let value = newValue(function)
+    let value = newValue(newDummyFunctionSpec())
     let listValue = newValue(@[value])
     check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(value))
 
   test "getBestFunction function list of two":
-    let function1 = newFunc(signatureCodeToSignature("abc", "iis").get(), abc)
-    let function2 = newFunc(signatureCodeToSignature("abc", "ffs").get(), abc)
-    let value1 = newValue(function1)
-    let value2 = newValue(function2)
+    let value1 = newValue(newDummyFunctionSpec(functionName="abc", signatureCode="iis"))
+    let value2 = newValue(newDummyFunctionSpec(functionName="abc", signatureCode="ffs"))
     let listValue = newValue(@[value1, value2])
     check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(value1))
     check testGetBestFunction(listValue, @[newValue(1.2), newValue(1.1)], newValueOr(value2))
@@ -213,16 +204,14 @@ suite "runFunction.nim":
     var listValue = newValue(@[value])
     check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(wNotFunction))
 
-    let function2 = newFunc(signatureCodeToSignature("abc", "iis").get(), abc)
-    let value2 = newValue(function2)
+    let value2 = newValue(newDummyFunctionSpec(functionName="abc", signatureCode="iis"))
     listValue = newValue(@[value2, value])
     check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(value2))
 
     listValue = newValue(@[value, value2])
     check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(wNotFunction))
 
-    let function3 = newFunc(signatureCodeToSignature("abc", "fss").get(), abc)
-    let value3 = newValue(function3)
+    let value3 = newValue(newDummyFunctionSpec(functionName="abc", signatureCode="fss"))
     listValue = newValue(@[value3, value])
     check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(wNotFunction))
 
@@ -1801,8 +1790,8 @@ d.sub.y = 4"""
     check testBool(newValue(""), false)
     check testBool(newEmptyListValue(), false)
     check testBool(newEmptyDictValue(), false)
-    let function = newFunc(signatureCodeToSignature("abc", "iis").get(), abc)
-    check testBool(newValue(function), false)
+    let value = newValue(newDummyFunctionSpec(functionName="abc", signatureCode="iis"))
+    check testBool(value, false)
 
   test "bool true":
     check testBool(newValue(2), true)

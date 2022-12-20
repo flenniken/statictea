@@ -31,6 +31,8 @@ starts in the template file.
 * [skipArgument](#skipargument) &mdash; Skip past the argument.
 * [ifFunctions](#iffunctions) &mdash; Return the if/if0 function's value and position after.
 * [andOrFunctions](#andorfunctions) &mdash; Return the and/or function's value and the position after.
+* [callUserFunction](#calluserfunction) &mdash; Run the given user function.
+* [callFunction](#callfunction) &mdash; Call the function variable.
 * [getFunctionValueAndPos](#getfunctionvalueandpos) &mdash; Return the function's value and the position after it.
 * [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value.
 * [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value.
@@ -48,7 +50,7 @@ starts in the template file.
 * [readDocComments](#readdoccomments) &mdash; Read the doc comment lines.
 * [readFunctionStatements](#readfunctionstatements) &mdash; Read the function definition statements and return true when successful.
 * [processFunctionStartLine](#processfunctionstartline) &mdash; If the line is the start of a function definition, return true and fill in the function signature.
-* [defineFunctionAssignVar](#definefunctionassignvar) &mdash; If the statement starts a function definition, define it, assign the variable and return true.
+* [defineUserFunctionAssignVar](#defineuserfunctionassignvar) &mdash; If the statement starts a function definition, define it, assign the variable and return true.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 
 # Statement
@@ -287,6 +289,23 @@ proc andOrFunctions(specialFunction: SpecialFunction; statement: Statement;
                     start: Natural; variables: Variables; list = false): ValueAndPosOr
 ```
 
+# callUserFunction
+
+Run the given user function.
+
+```nim
+func callUserFunction(funcVar: Value; variables: Variables;
+                      arguments: seq[Value]): FunResult
+```
+
+# callFunction
+
+Call the function variable.
+
+```nim
+func callFunction(funcVar: Value; variables: Variables; arguments: seq[Value]): FunResult
+```
+
 # getFunctionValueAndPos
 
 Return the function's value and the position after it. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
@@ -474,14 +493,14 @@ proc processFunctionStartLine(env: var Env; lb: LineBuffer;
                               retSignature: var Signature): bool
 ```
 
-# defineFunctionAssignVar
+# defineUserFunctionAssignVar
 
 If the statement starts a function definition, define it, assign the variable and return true. Return quickly when not a function definition statement.
 
 ```nim
-proc defineFunctionAssignVar(env: var Env; lb: LineBuffer; statement: Statement;
-                             variables: var Variables; sourceFilename: string;
-                             codeFile: bool): bool
+proc defineUserFunctionAssignVar(env: var Env; lb: LineBuffer;
+                                 statement: Statement; variables: var Variables;
+                                 sourceFilename: string; codeFile: bool): bool
 ```
 
 # runCommand
