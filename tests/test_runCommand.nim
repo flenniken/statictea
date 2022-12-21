@@ -1705,11 +1705,23 @@ White$1
     params.add(newParam("num", ptInt))
     check testParseSignature("one(num: int) int", newSignatureOr(false, "one", params, ptInt))
 
+  test "parse signature one optional param":
+    var params = newSeq[Param]()
+    params.add(newParam("num", ptInt))
+    check testParseSignature("one(num: optional int) int", newSignatureOr(true, "one", params, ptInt))
+
   test "parse signature two params":
     var params = newSeq[Param]()
     params.add(newParam("num1", ptInt))
     params.add(newParam("num2", ptInt))
     check testParseSignature("two(num1: int, num2: int) int", newSignatureOr(false, "two", params, ptInt))
+
+  test "parse signature two params optional":
+    var params = newSeq[Param]()
+    params.add(newParam("num1", ptInt))
+    params.add(newParam("num2", ptInt))
+    check testParseSignature("two(num1: int, num2: optional int) int",
+      newSignatureOr(true, "two", params, ptInt))
 
   test "parse signature three params":
     var params = newSeq[Param]()
@@ -1780,6 +1792,18 @@ White$1
   test "signature trailing junk":
     check testParseSignature("path(num: string, abc: int) int 333",
       newSignatureOr(wUnusedSignatureText, "", 32))
+
+  test "signature optional not last":
+    check testParseSignature("path(name: optional string, num: int) dict",
+      newSignatureOr(wNotLastOptional, "", 28))
+
+  test "signature two optionals":
+    check testParseSignature("path(name: optional string, num: optional int) dict",
+      newSignatureOr(wNotLastOptional, "", 28))
+
+  test "signature return required":
+    check testParseSignature("path(name: string) optional dict",
+      newSignatureOr(wReturnTypeRequired, "", 19))
 
   test "signature missing":
     check testParseSignature("path(", newSignatureOr(wParameterName, "", 5))

@@ -248,6 +248,8 @@ type
     wExpectedReturnType,   ## w233
     wUnusedSignatureText,  ## w234
     wMissingSignature,     ## w235
+    wNotLastOptional,      ## w236
+    wReturnTypeRequired,   ## w237
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -487,6 +489,8 @@ const
     "Invalid return type.", ## wExpectedReturnType
     "Unused extra text at the end of the signature.", ## wUnusedSignatureText
     "Missing the function signature string.", ## wMissingSignature
+    "Only the last parameter can be optional.", ## wNotLastOptional
+    "The return type is required.", ## wReturnTypeRequired
     ]
 
     ## The message text.

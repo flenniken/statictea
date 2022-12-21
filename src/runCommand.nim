@@ -1338,9 +1338,10 @@ proc parseSignature*(signature: string): SignatureOr =
   ## Parse the signature and return the list of parameters or a
   ## message.
   ## @:
-  ## @:Example signature:
+  ## @:Example signatures:
   ## @:~~~
   ## @:cmp(numStr1: string, numStr2: string) int
+  ## @:get(group: list, ix: int, optional any) any
   ## @:~~~~
   var runningPos = 0
   let matchesO = matchDotNames(signature, runningPos)
@@ -1358,6 +1359,7 @@ proc parseSignature*(signature: string): SignatureOr =
   runningPos += dotNameLen
   let functionName = dotNameStr
 
+  var optional = false
   var params = newSeq[Param]()
 
   # Look for ) and following white space.
@@ -1369,6 +1371,10 @@ proc parseSignature*(signature: string): SignatureOr =
     # One or more parameters.
 
     while true:
+      if optional:
+        # Only the last parameter can be optional.
+        return newSignatureOr(wNotLastOptional, "", runningPos)
+
       # Get the parameter name and following white space.
       let paramNameO = matchDotNames(signature, runningPos)
       if not isSome(paramNameO):
@@ -1392,10 +1398,10 @@ proc parseSignature*(signature: string): SignatureOr =
       if not paramTypeO.isSome:
         # Expected a parameter type: bool, int, float, string, dict, list, func or any.
         return newSignatureOr(wExpectedParamType, "", runningPos)
-      let (paramTypeStr, paramTypeLen) = paramTypeO.getGroupLen()
+      let (optionalText, paramTypeStr, paramTypeLen) = paramTypeO.get2GroupsLen()
+      if optionalText.len > 0:
+        optional = true
       runningPos += paramTypeLen
-
-      # todo: support optional parameters
 
       let paramType = strToParamType(paramTypeStr)
       params.add(newParam(paramName, paramType))
@@ -1416,7 +1422,10 @@ proc parseSignature*(signature: string): SignatureOr =
   if not returnTypeO.isSome:
     # Expected the return type.
     return newSignatureOr(wExpectedReturnType, "", runningPos)
-  let (returnTypeStr, matchLen) = returnTypeO.getGroupLen()
+  let (optionalText, returnTypeStr, matchLen) = returnTypeO.get2GroupsLen()
+  if optionalText.len > 0:
+    # The return type is required.
+    return newSignatureOr(wReturnTypeRequired, "", runningPos)
   runningPos += matchLen
   let returnType = strToParamType(returnTypeStr)
 
@@ -1425,7 +1434,7 @@ proc parseSignature*(signature: string): SignatureOr =
     # Unused extra text at the end of the signature.
     return newSignatureOr(wUnusedSignatureText, "", runningPos)
 
-  let signature = newSignature(false, functionName, params, returnType)
+  let signature = newSignature(optional, functionName, params, returnType)
   result = newSignatureOr(signature)
 
 type

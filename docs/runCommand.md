@@ -422,9 +422,10 @@ proc runStatementAssignVar(env: var Env; statement: Statement;
 
 Parse the signature and return the list of parameters or a message.
 
-Example signature:
+Example signatures:
 ~~~
 cmp(numStr1: string, numStr2: string) int
+get(group: list, ix: int, optional any) any
 ~~~~
 
 ```nim

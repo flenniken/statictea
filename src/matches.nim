@@ -279,5 +279,5 @@ proc matchReplCmd*(line: string, start: Natural): Option[Matches] =
 
 proc matchParameterType*(line: string, start: Natural): Option[Matches] =
   ## Match a parameter type and the trailing whitespace.
-  let pattern = r"(bool|int|float|string|dict|list|func|any)\s*"
-  result = matchPatternCached(line, pattern, start, 1)
+  let pattern = r"(optional\s*){0,1}(bool|int|float|string|dict|list|func|any)\s*"
+  result = matchPatternCached(line, pattern, start, 2)

@@ -139,6 +139,11 @@ func getGroup*(matches: Matches): string =
   if matches.groups.len > 0:
     result = matches.groups[0]
 
+func getGroupLen*(matches: Matches): (string, Natural) =
+  ## Get the group in matches.
+  if matches.groups.len > 0:
+    result = (matches.groups[0], matches.length)
+
 func getGroup*(matchesO: Option[Matches]): string =
   ## Get the group in matches.
   assert(matchesO.isSome, "Not a match")
@@ -147,9 +152,7 @@ func getGroup*(matchesO: Option[Matches]): string =
 func getGroupLen*(matchesO: Option[Matches]): (string, Natural) =
   ## Get the group in matches and the match length.
   assert(matchesO.isSome, "Not a match")
-  let matches = matchesO.get()
-  let one = matches.getGroup()
-  result = (one, matches.length)
+  result = matchesO.get().getGroupLen()
 
 func get2Groups*(matches: Matches): (string, string) =
   ## Get two groups in matches.
@@ -161,10 +164,25 @@ func get2Groups*(matches: Matches): (string, string) =
     two = matches.groups[1]
   result = (one, two)
 
+func get2GroupsLen*(matches: Matches): (string, string, Natural) =
+  ## Get two groups and length in matches.
+  var one: string
+  var two: string
+  if matches.groups.len > 0:
+    one = matches.groups[0]
+  if matches.groups.len > 1:
+    two = matches.groups[1]
+  result = (one, two, matches.length)
+
 func get2Groups*(matchesO: Option[Matches]): (string, string) =
   ## Get two groups in matches.
   assert(matchesO.isSome, "Not a match")
   result = matchesO.get().get2Groups()
+
+func get2GroupsLen*(matchesO: Option[Matches]): (string, string, Natural) =
+  ## Get two groups and length in matchesO.
+  assert(matchesO.isSome, "Not a match")
+  result = matchesO.get().get2GroupsLen()
 
 func get3Groups*(matches: Matches): (string, string, string) =
   ## Get three groups in matches.

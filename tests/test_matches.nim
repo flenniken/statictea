@@ -169,7 +169,7 @@ proc testEmptyOrSpaces(line: string, start: Natural = 0, expected: bool): bool =
   result = gotExpected($got, $expected, line & ".")
 
 proc testMatchParameterType(paramTypeStr: string, eParamTypeStr: string = "",
-    eLength: Natural = 0): bool =
+    eLength: Natural = 0, eOptional: bool = false): bool =
   let matchO = matchParameterType(paramTypeStr, 0)
   if not isSome(matchO):
     echo "'$1' is not a valid parameter type." % paramTypeStr
@@ -183,11 +183,16 @@ proc testMatchParameterType(paramTypeStr: string, eParamTypeStr: string = "",
   if eLength == 0:
     expectedLen = paramTypeStr.len
 
-  let (gotParamTypeStr, length) = matchO.getGroupLen()
-  result = gotExpected(gotParamTypeStr, expected)
-  let ge = gotExpected($length, $expectedLen)
-  if not ge:
-    result = false
+  let (optionalText, gotParamTypeStr, length) = matchO.get2GroupsLen()
+  # debugEcho "optionalText = '$1'" % optionalText
+  result = gotExpected(gotParamTypeStr, expected, "parameter type:")
+
+  var optional: bool
+  if optionalText.len > 0:
+    optional = true
+  gotExpectedResult($optional, $eOptional, "optional:")
+
+  gotExpectedResult($length, $expectedLen, "length:")
 
 proc testMatchParameterTypeBad(paramTypeStr: string): bool =
   let matchO = matchParameterType(paramTypeStr, 0)
@@ -697,12 +702,18 @@ suite "matches.nim":
     check testMatchParameterType("func")
     check testMatchParameterType("any")
 
+    check testMatchParameterType("optional bool", eParamTypeStr="bool", eOptional=true)
+    check testMatchParameterType("optional int", eParamTypeStr="int", eOptional=true)
+    check testMatchParameterType("optional   int  ", eParamTypeStr="int", eOptional=true)
+
     check testMatchParameterType("any ", "any", 4)
     check testMatchParameterType("any  ", "any", 5)
     check testMatchParameterType("any   ab", "any", 6)
 
     check testMatchParameterType("boolean", "bool", 4)
 
-  test "matchParameterType  bad":
+  test "matchParameterType bad":
     check testMatchParameterTypeBad("dic")
     check testMatchParameterTypeBad("abc")
+    check testMatchParameterTypeBad("optional")
+    check testMatchParameterTypeBad("optional num")

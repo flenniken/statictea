@@ -54,10 +54,13 @@ check resultStringO.get() == "456456"
 * [newMatches](#newmatches-5) &mdash; Create a Matches object with the given number of groups.
 * [newReplacement](#newreplacement) &mdash; Create a new Replacement object.
 * [getGroup](#getgroup) &mdash; Get the group in matches.
+* [getGroupLen](#getgrouplen) &mdash; Get the group in matches.
 * [getGroup](#getgroup-1) &mdash; Get the group in matches.
-* [getGroupLen](#getgrouplen) &mdash; Get the group in matches and the match length.
+* [getGroupLen](#getgrouplen-1) &mdash; Get the group in matches and the match length.
 * [get2Groups](#get2groups) &mdash; Get two groups in matches.
+* [get2GroupsLen](#get2groupslen) &mdash; Get two groups and length in matches.
 * [get2Groups](#get2groups-1) &mdash; Get two groups in matches.
+* [get2GroupsLen](#get2groupslen-1) &mdash; Get two groups and length in matchesO.
 * [get3Groups](#get3groups) &mdash; Get three groups in matches.
 * [get3Groups](#get3groups-1) &mdash; Get three groups in matches.
 * [get3GroupsLen](#get3groupslen) &mdash; Return the three groups and the length of the match.
@@ -161,6 +164,14 @@ Get the group in matches.
 func getGroup(matches: Matches): string
 ```
 
+# getGroupLen
+
+Get the group in matches.
+
+```nim
+func getGroupLen(matches: Matches): (string, Natural)
+```
+
 # getGroup
 
 Get the group in matches.
@@ -185,12 +196,28 @@ Get two groups in matches.
 func get2Groups(matches: Matches): (string, string)
 ```
 
+# get2GroupsLen
+
+Get two groups and length in matches.
+
+```nim
+func get2GroupsLen(matches: Matches): (string, string, Natural)
+```
+
 # get2Groups
 
 Get two groups in matches.
 
 ```nim
 func get2Groups(matchesO: Option[Matches]): (string, string)
+```
+
+# get2GroupsLen
+
+Get two groups and length in matchesO.
+
+```nim
+func get2GroupsLen(matchesO: Option[Matches]): (string, string, Natural)
 ```
 
 # get3Groups

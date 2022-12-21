@@ -256,7 +256,9 @@ MessageId = enum
   wExpectedParamType,       ## w232
   wExpectedReturnType,      ## w233
   wUnusedSignatureText,     ## w234
-  wMissingSignature          ## w235
+  wMissingSignature,        ## w235
+  wNotLastOptional,         ## w236
+  wReturnTypeRequired        ## w237
 ```
 
 # Messages
@@ -500,7 +502,9 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Expected a parameter type: bool, int, float, string, dict, list, func or any.", ## wExpectedParamType
     "Invalid return type.", ## wExpectedReturnType
     "Unused extra text at the end of the signature.", ## wUnusedSignatureText
-    "Missing the function signature string."]
+    "Missing the function signature string.", ## wMissingSignature
+    "Only the last parameter can be optional.", ## wNotLastOptional
+    "The return type is required."]
 ```
 
 # WarningData
