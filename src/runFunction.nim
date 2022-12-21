@@ -2142,11 +2142,11 @@ func funFormat_ss*(variables: Variables, parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(stringOr.value))
 
-func funFunc_ss*(variables: Variables, parameters: seq[Value]): FunResult =
+func funFunc_sp*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Define a function.
   ## @:
   ## @:~~~
-  ## @:func(signature: string) string
+  ## @:func(signature: string) func
   ## @:~~~~
   ## @:
   ## @:Example:
@@ -2159,10 +2159,9 @@ func funFunc_ss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:  num2 = int(numStr2)
   ## @:  return(cmp(num1, num2))
   ## @:~~~~
-  # todo: return a signature dictionary instead?
-  tMapParameters("func", "ss")
-  let str = map["a"].stringv
-  result = newFunResult(newValue(str))
+  # The func definition is handled in the runCommand module. This code
+  # is called for nested calls to func and it returns a warning.
+  result = newFunResultWarn(wDefineFunction)
 
 func funStartsWith_ssb*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Check whether a strings starts with the given prefix. Return true
@@ -2573,7 +2572,7 @@ const
     ("float", funFloat_saa, "saa"),
     ("float", funFloat_sf, "sf"),
     ("format", funFormat_ss, "ss"),
-    ("func", funFunc_ss, "ss"),
+    ("func", funFunc_sp, "sp"),
     ("get", funGet_dsoaa, "dsoaa"),
     ("get", funGet_lioaa, "lioaa"),
     ("githubAnchor", funGithubAnchor_ll, "ll"),

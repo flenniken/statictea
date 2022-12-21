@@ -2001,3 +2001,8 @@ d.sub.y = 4"""
     var arguments = @[newValue(message)]
     let eFunResult = newFunResult(newValue(message))
     check testFunction("log", arguments, eFunResult)
+
+  test "func":
+    var arguments = @[newValue("signature")]
+    let eFunResult = newFunResultWarn(wDefineFunction)
+    check testFunction("func", arguments, eFunResult)
