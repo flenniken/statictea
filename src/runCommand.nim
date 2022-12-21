@@ -1461,19 +1461,18 @@ proc readFunctionStatements*(env: var Env, lb: LineBuffer, statement: Statement,
 
   return newLinesOr(wDefineFunction, "")
 
-proc processFunctionStartLine*(env: var Env, lb: LineBuffer, statement: Statement,
-    variables: Variables, sourceFilename: string, codeFile: bool,
-    retLeftName: var string, retOperator: var Operator, retSignature: var Signature): bool =
-  ## If the line is the start of a function definition, return true
-  ## and fill in the function signature.
-  ## Example:
-  ## mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
+proc isFunctionDefinition*(statement: Statement, retLeftName: var string,
+    retOperator: var Operator, retPos: var Natural): bool =
+  ## If the statement is the first line of a function definition,
+  ## return true and fill in the return parameters.  Return quickly
+  ## when not a function definition. The retPos points at the first
+  ## non-whitespace after the "func(".
 
   # Quick exit when we know it's not a function definition.
   if not ("func(" in statement.text):
     return false
 
-  # Skip blank lines and comments.
+  # Skip comment only line with func() in it.
   var runningPos: Natural
   let spacesO = matchTabSpace(statement.text, 0)
   if not isSome(spacesO):
@@ -1517,62 +1516,78 @@ proc processFunctionStartLine*(env: var Env, lb: LineBuffer, statement: Statemen
     return false
   runningPos += funcStrLen
 
-  # We have a function definition. Now we start showing warning
-  # messages when there are issues.
+  retLeftName = leftName
+  retOperator = operator
+  retPos = runningPos
+  return true
 
-  # Get the signature string argument.
-  let vlOr = getValueAndPos(statement, runningPos, variables)
+proc processFunctionSignature*(statement: Statement, start: Natural): SignatureOr =
+  ## Process the function definition line starting at the signature
+  ## string. The start parameter points at the first non-whitespace
+  ## character after "func(".
+  ## @:
+  ## @:Example:
+  ## @:mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
+  ## @:             ^ start
+
+  var runningPos = start
+  if runningPos >= statement.text.len or statement.text[runningPos] != '"':
+    return newSignatureOr(wExpectedSignature, "", runningPos)
+
+  let signatureStrStart = runningPos+1
+  runningPos = signatureStrStart
+
+  # Get the signature string argument and following white space.
+  let vlOr = parseJsonStr(statement.text, runningPos)
   if vlOr.isMessage:
-    env.warnStatement(statement, vlOr.message, sourceFilename)
-    return false
-  if vlOr.value.value.kind != vkString:
-    # Expected signature string.
-    env.warnStatement(statement, wExpectedSignature, "", runningPos)
-    return false
-  let signature = vlOr.value.value.stringv
-  runningPos += vlOr.value.pos
+    return newSignatureOr(vlOr.message)
+  assert vlOr.value.value.kind == vkString
+  let signatureStr = vlOr.value.value.stringv
+  runningPos = vlOr.value.pos
 
-  # Look for ) and white space following the value.
-  let rightParenO = matchCommaOrSymbol(statement.text, gRightParentheses, runningPos)
+  # Check for ending right parentheses and trailing whitespace.
+  let rightParenO = matchSymbol(statement.text, gRightParentheses, runningPos)
   if not rightParenO.isSome:
     # No matching end right parentheses.
-    env.warnStatement(statement, wNoMatchingParen, "", runningPos)
-    return false
+    return newSignatureOr(wNoMatchingParen, "", runningPos)
   runningPos += rightParenO.get().length
 
   # Check that there is not any unprocessed text following the function.
-  if runningPos != statement.text.len:
+  if runningPos < statement.text.len:
     # Check for a trailing comment.
     if statement.text[runningPos] != '#':
       # Unused text at the end of the statement.
-      env.warnStatement(statement, wTextAfterValue, "", runningPos, sourceFilename)
-      return false
+      return newSignatureOr(wTextAfterValue, "", runningPos)
 
-  # Parse the signature and return a signature object.
-  let signatureOr = parseSignature(signature)
+  # Parse the signature string and return a signature object.
+  let signatureOr = parseSignature(signatureStr)
   if signatureOr.isMessage:
     let md = signatureOr.message
-    env.warnStatement(statement, md.messageId, md.p1, runningPos + md.pos, sourceFilename)
-    return false
+    return newSignatureOr(md.messageId, md.p1, signatureStrStart + md.pos)
 
-  retLeftName = leftName
-  retOperator = operator
-  retSignature = signatureOr.value
-  return true
+  result = signatureOr
 
 proc defineUserFunctionAssignVar*(env: var Env, lb: LineBuffer, statement: Statement,
     variables: var Variables, sourceFilename: string,
     codeFile: bool): bool =
   ## If the statement starts a function definition, define it, assign
-  ## the variable and return true. Return quickly when not a function
-  ## definition statement.
+  ## the variable. Return quickly when not a function definition
+  ## statement. Return true when the line(s) were handled, either by
+  ## processing the function definition or by displaying a warning
+  ## message. Return false when the line wasn't handled.
 
   var leftName: string
   var operator: Operator
-  var signature: Signature
-  if not processFunctionStartLine(env, lb, statement, variables,
-      sourceFilename, codeFile = true, leftName, operator, signature):
+  var pos: Natural
+  if not isFunctionDefinition(statement, leftName, operator, pos):
     return false
+
+  let signatureOr = processFunctionSignature(statement, pos)
+  if signatureOr.isMessage:
+    let md = signatureOr.message
+    env.warnStatement(statement, md.messageId, md.p1,  md.pos, sourceFilename)
+    return true
+  let signature = signatureOr.value
 
   # Read the doc comments. The extraStatement is filled in with the
   # statement after the doc comments.
@@ -1581,7 +1596,7 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: LineBuffer, statement: State
   if docCommentsOr.isMessage:
     let md = docCommentsOr.message
     env.warnStatement(statement, md.messageId, md.p1,  md.pos, sourceFilename)
-    return false
+    return true
   let docComments = docCommentsOr.value
 
   # Add the statements to the function variable.
@@ -1589,7 +1604,7 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: LineBuffer, statement: State
   if statementLinesOr.isMessage:
     let md = statementLinesOr.message
     env.warnStatement(statement, md.messageId, md.p1, md.pos, sourceFilename)
-    return false
+    return true
   let statementLines = statementLinesOr.value
 
   # todo get filename, line number and number of lines.
@@ -1607,7 +1622,6 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: LineBuffer, statement: State
     operator, inCodeFile = true)
   if isSome(warningDataO):
     env.warnStatement(statement, warningDataO.get(), sourceFilename)
-    return false
   return true
 
 proc runCommand*(env: var Env, cmdLines: CmdLines,

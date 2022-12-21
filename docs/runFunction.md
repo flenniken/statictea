@@ -67,7 +67,7 @@ their values.
 * [funString_aoss](#funstring_aoss) &mdash; Convert a variable to a string.
 * [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names.
 * [funFormat_ss](#funformat_ss) &mdash; Format a string using replacement variables similar to a replacement block.
-* [funFunc_sp](#funfunc_sp) &mdash; Define a function.
+* [funFunc_ss](#funfunc_ss) &mdash; Define a function.
 * [funStartsWith_ssb](#funstartswith_ssb) &mdash; Check whether a strings starts with the given prefix.
 * [funNot_bb](#funnot_bb) &mdash; Boolean not.
 * [funAnd_bbb](#funand_bbb) &mdash; Boolean AND with short circuit.
@@ -1595,18 +1595,18 @@ str => "use two { to get one"
 func funFormat_ss(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funFunc_sp
+# funFunc_ss
 
 Define a function.
 
 ~~~
-func(str: string) func
+func(signature: string) string
 ~~~~
 
 Example:
 
 ~~~
-l.cmp = func("(numStr1: string, numStr2: string) int")
+mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
   ## Compare two number strings
   ## and return 1, 0, or -1.
   num1 = int(numStr1)
@@ -1615,7 +1615,7 @@ l.cmp = func("(numStr1: string, numStr2: string) int")
 ~~~~
 
 ```nim
-func funFunc_sp(variables: Variables; parameters: seq[Value]): FunResult
+func funFunc_ss(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funStartsWith_ssb
@@ -2011,7 +2011,7 @@ functionsList = [("add", funAdd_fff, "fff"), ("add", funAdd_iii, "iii"),
                  ("find", funFind_ssoaa, "ssoaa"),
                  ("float", funFloat_if, "if"), ("float", funFloat_saa, "saa"),
                  ("float", funFloat_sf, "sf"), ("format", funFormat_ss, "ss"),
-                 ("func", funFunc_sp, "sp"), ("get", funGet_dsoaa, "dsoaa"),
+                 ("func", funFunc_ss, "ss"), ("get", funGet_dsoaa, "dsoaa"),
                  ("get", funGet_lioaa, "lioaa"),
                  ("githubAnchor", funGithubAnchor_ll, "ll"),
                  ("githubAnchor", funGithubAnchor_ss, "ss"),

@@ -26,8 +26,9 @@ StaticTea variable types.
 * type: [ValueAndPosOr](#valueandposor) &mdash; A ValueAndPos object or a warning.
 * [newSignature](#newsignature) &mdash; Create a Signature object.
 * [newSignatureOr](#newsignatureor) &mdash; Create a new SignatureOr with a message.
-* [newSignatureOr](#newsignatureor-1) &mdash; Create a new SignatureOr with a value.
-* [newSignatureOr](#newsignatureor-2) &mdash; Create a SignatureOr object.
+* [newSignatureOr](#newsignatureor-1) &mdash; Create a new SignatureOr with a message.
+* [newSignatureOr](#newsignatureor-2) &mdash; Create a new SignatureOr with a value.
+* [newSignatureOr](#newsignatureor-3) &mdash; Create a SignatureOr object.
 * [newParam](#newparam) &mdash; Create a new Param object.
 * [newVarsDict](#newvarsdict) &mdash; Create a new empty variables dictionary.
 * [newVarsDictOr](#newvarsdictor) &mdash; Return a new varsDictOr object containing a warning.
@@ -77,7 +78,7 @@ same type which may be Value type.
 * [codeToParamType](#codetoparamtype) &mdash; 
 * [strToParamType](#strtoparamtype) &mdash; Return the parameter type for the given string.
 * [shortName](#shortname) &mdash; Return a short name based on the given index value.
-* [signatureCodeToSignature](#signaturecodetosignature) &mdash; Convert the signature code to a signature object.
+* [newSignatureO](#newsignatureo) &mdash; Return a new signature for the function name and signature code.
 
 # VarsDict
 
@@ -312,6 +313,14 @@ Create a new SignatureOr with a message.
 
 ```nim
 func newSignatureOr(warning: MessageId; p1 = ""; pos = 0): SignatureOr
+```
+
+# newSignatureOr
+
+Create a new SignatureOr with a message.
+
+```nim
+func newSignatureOr(warningData: WarningData): SignatureOr
 ```
 
 # newSignatureOr
@@ -733,12 +742,12 @@ Return a short name based on the given index value. Return a for 0, b for 1, etc
 proc shortName(index: Natural): string
 ```
 
-# signatureCodeToSignature
+# newSignatureO
 
-Convert the signature code to a signature object.
+Return a new signature for the function name and signature code.
 
 ```nim
-func signatureCodeToSignature(functionName: string; signatureCode: string): Option[
+func newSignatureO(functionName: string; signatureCode: string): Option[
     Signature]
 ```
 

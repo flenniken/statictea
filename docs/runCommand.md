@@ -49,8 +49,9 @@ starts in the template file.
 * [newLinesOr](#newlinesor-2) &mdash; Return a new LinesOr object containing a list of lines.
 * [readDocComments](#readdoccomments) &mdash; Read the doc comment lines.
 * [readFunctionStatements](#readfunctionstatements) &mdash; Read the function definition statements and return true when successful.
-* [processFunctionStartLine](#processfunctionstartline) &mdash; If the line is the start of a function definition, return true and fill in the function signature.
-* [defineUserFunctionAssignVar](#defineuserfunctionassignvar) &mdash; If the statement starts a function definition, define it, assign the variable and return true.
+* [isFunctionDefinition](#isfunctiondefinition) &mdash; If the statement is the first line of a function definition, return true and fill in the return parameters.
+* [processFunctionSignature](#processfunctionsignature) &mdash; Process the function definition line starting at the signature string.
+* [defineUserFunctionAssignVar](#defineuserfunctionassignvar) &mdash; If the statement starts a function definition, define it, assign the variable.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 
 # Statement
@@ -480,22 +481,30 @@ proc readFunctionStatements(env: var Env; lb: LineBuffer; statement: Statement;
                             sourceFilename: string): LinesOr
 ```
 
-# processFunctionStartLine
+# isFunctionDefinition
 
-If the line is the start of a function definition, return true and fill in the function signature. Example: mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
+If the statement is the first line of a function definition, return true and fill in the return parameters.  Return quickly when not a function definition. The retPos points at the first non-whitespace after the "func(".
 
 ```nim
-proc processFunctionStartLine(env: var Env; lb: LineBuffer;
-                              statement: Statement; variables: Variables;
-                              sourceFilename: string; codeFile: bool;
-                              retLeftName: var string;
-                              retOperator: var Operator;
-                              retSignature: var Signature): bool
+proc isFunctionDefinition(statement: Statement; retLeftName: var string;
+                          retOperator: var Operator; retPos: var Natural): bool
+```
+
+# processFunctionSignature
+
+Process the function definition line starting at the signature string. The start parameter points at the first non-whitespace character after "func(".
+
+Example:
+mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
+             ^ start
+
+```nim
+proc processFunctionSignature(statement: Statement; start: Natural): SignatureOr
 ```
 
 # defineUserFunctionAssignVar
 
-If the statement starts a function definition, define it, assign the variable and return true. Return quickly when not a function definition statement.
+If the statement starts a function definition, define it, assign the variable. Return quickly when not a function definition statement. Return true when the line(s) were handled, either by processing the function definition or by displaying a warning message. Return false when the line wasn't handled.
 
 ```nim
 proc defineUserFunctionAssignVar(env: var Env; lb: LineBuffer;

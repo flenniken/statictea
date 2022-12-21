@@ -352,20 +352,90 @@ proc testGetConditionWarn(text: string, start: Natural, eWarning: MessageId,
   if not result:
     echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
+proc showGotExpectedWarnings(line: string, signatureOr: SignatureOr, eSignatureOr: SignatureOr) =
+  if signatureOr.isMessage or eSignatureOr.isMessage:
+    echo "0123456789 123456789 123456789 123456789"
+  if signatureOr.isMessage:
+    let msg = "↓ got: " & getWarning(signatureOr.message.messageId, signatureOr.message.p1)
+    echo startColumn(line, signatureOr.message.pos, msg)
+  echo line
+  if eSignatureOr.isMessage:
+    let msg = "↑ expected: " & getWarning(eSignatureOr.message.messageId, eSignatureOr.message.p1)
+    echo startColumn(line, eSignatureOr.message.pos, msg)
+  echo ""
+
 proc testParseSignature(signatureStr: string, eSignatureOr: SignatureOr): bool =
   let signatureOr = parseSignature(signatureStr)
   result = gotExpected($signatureOr, $eSignatureOr)
   if not result:
-    if signatureOr.isMessage:
-      echo "0123456789 123456789 123456789"
-    if signatureOr.isMessage:
-      echo "     got: $1" % getWarning(signatureOr.message.messageId, signatureOr.message.p1)
-      echo startColumn(signatureStr, signatureOr.message.pos, "↓ got")
-    echo signatureStr
-    if eSignatureOr.isMessage:
-      echo startColumn(signatureStr, eSignatureOr.message.pos, "↑ expected")
-      echo "expected: $1" % getWarning(eSignatureOr.message.messageId, eSignatureOr.message.p1)
-    echo ""
+    showGotExpectedWarnings(signatureStr, signatureOr, eSignatureOr)
+
+proc testIsFunctionDefinition(content: string, eIsFunction: bool, eLeftName: string = "",
+    eOperator: Operator = opEqual, ePos: Natural = 0): bool =
+
+  let statement = newStatement(content)
+
+  var leftName: string
+  var operator: Operator
+  var pos: Natural
+  let isFunction = isFunctionDefinition(statement, leftName, operator, pos)
+
+  result = gotExpected($isFunction, $eIsFunction, "is function:")
+  if isFunction:
+    gotExpectedResult(leftName, eLeftName, "left name:")
+    gotExpectedResult($operator, $eOperator, "operator:")
+    gotExpectedResult($pos, $ePos, "pos:")
+
+proc testProcessFunctionSignature(content: string, start: Natural,
+    eSignatureOr: SignatureOr): bool =
+  let statement = newStatement(content)
+  let signatureOr = processFunctionSignature(statement, start)
+  result = gotExpected($signatureOr, $eSignatureOr)
+  if not result:
+    showGotExpectedWarnings(content, signatureOr, eSignatureOr)
+
+# proc testProcessFunctionStartLine(content: string, eHandled: bool, eLeftName: string = "",
+#     eOperator: Operator = opEqual, eFunctionName: string = "",
+#     eSignatureCode: string = ""): bool =
+#   ## Test handling the first function definition line.
+
+#   let sourceFilename = "code.tea"
+#   let codeFile = true
+#   let statement = newStatement(content)
+
+#   var env = openEnvTest("_testProcessFunctionStartLine.log")
+#   var inStream = newStringStream(content)
+#   var lineBufferO = newLineBuffer(inStream, filename = sourceFilename)
+#   var lb = lineBufferO.get()
+#   let funcsVarDict = createFuncDictionary().dictv
+#   let variables = emptyVariables(funcs = funcsVarDict)
+
+#   var retLeftName: string
+#   var retOperator: Operator
+#   var retSignature: Signature
+#   let handled = processFunctionStartLine(env, lb, statement,
+#     variables, sourceFilename, codeFile, retLeftName, retOperator, retSignature)
+
+#   let eLogLines: seq[string] = @[]
+#   let eErrLines: seq[string] = @[]
+#   let eOutLines: seq[string] = @[]
+#   let eResultLines: seq[string] = @[]
+#   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines,
+#     eResultLines)
+
+#   gotExpectedResult($handled, $eHandled, "handled:")
+#   if handled:
+#     gotExpectedResult(retLeftName, eLeftName, "left name:")
+#     gotExpectedResult($retOperator, $eOperator, "operator:")
+#     let eSignatureO = newSignatureO(eFunctionName, eSignatureCode)
+#     var eSignatureStr: string
+#     if not eSignatureO.isSome:
+#       eSignatureStr = "no expected signature specified"
+#     else:
+#       eSignatureStr = $eSignatureO.get()
+#     gotExpectedResult($retSignature, eSignatureStr, "signature:")
+#   if not result:
+#     echo ""
 
 suite "runCommand.nim":
   test "startColumn":
@@ -1718,3 +1788,65 @@ White$1
     check testParseSignature("path(name:int", newSignatureOr(wMissingCommaParen, "", 13))
     check testParseSignature("path(name:int)", newSignatureOr(wExpectedReturnType, "", 14))
     check testParseSignature("path(name:int)  ", newSignatureOr(wExpectedReturnType, "", 16))
+
+  test "isFunctionDefinition false":
+    check testIsFunctionDefinition("", false)
+    check testIsFunctionDefinition("    ", false)
+    check testIsFunctionDefinition("  not definition  ", false)
+    check testIsFunctionDefinition(" # comment func()", false)
+    check testIsFunctionDefinition("123 = func()", false)
+    check testIsFunctionDefinition("if() # func()", false)
+    check testIsFunctionDefinition("a @ func()", false)
+    check testIsFunctionDefinition("a = 123func()", false)
+    check testIsFunctionDefinition("a = function() # func()", false)
+    check testIsFunctionDefinition("a = func[] # func()", false)
+
+  test "isFunctionDefinition true":
+    check testIsFunctionDefinition("""a = func("mycmp() int")""", true, "a", opEqual, 9)
+    check testIsFunctionDefinition(""" a = func(  "mycmp() int" )""", true, "a", opEqual, 12)
+    check testIsFunctionDefinition("""a = func(""", true, "a", opEqual, 9)
+
+  test "processFunctionSignature none":
+    var params = newSeq[Param]()
+    check testProcessFunctionSignature("""fn = func("test() int")""", 10,
+      newSignatureOr(skNormal, "test", params, ptInt))
+
+  test "processFunctionSignature one":
+    var params = newSeq[Param]()
+    params.add(newParam("a", ptInt))
+    check testProcessFunctionSignature("""fn = func("test(a: int) int")""", 10,
+      newSignatureOr(skNormal, "test", params, ptInt))
+
+  test "processFunctionSignature two":
+    var params = newSeq[Param]()
+    params.add(newParam("a", ptString))
+    params.add(newParam("b", ptFloat))
+    check testProcessFunctionSignature("""fn = func("test(a: string, b: float) dict")""", 10,
+      newSignatureOr(skNormal, "test", params, ptDict))
+
+  test "processFunctionSignature comment":
+    var params = newSeq[Param]()
+    check testProcessFunctionSignature("""fn = func("test() int")  # comment""", 10,
+      newSignatureOr(skNormal, "test", params, ptInt))
+
+  test "processFunctionSignature spaces":
+    var params = newSeq[Param]()
+    check testProcessFunctionSignature("""  fn  =  func(  "test()  int " )  # comment """, 16,
+      newSignatureOr(skNormal, "test", params, ptInt))
+
+  test "processFunctionSignature bad signature":
+    #                                     0123456789 123456789
+    check testProcessFunctionSignature("""fn = func(""", 10,
+      newSignatureOr(wExpectedSignature, "", 10))
+    check testProcessFunctionSignature("""fn = func()""", 10,
+      newSignatureOr(wExpectedSignature, "", 10))
+    check testProcessFunctionSignature("""fn = func(")""", 10,
+      newSignatureOr(wNoEndingQuote, "", 12))
+    check testProcessFunctionSignature("""fn = func("\uDC00")""", 10,
+      newSignatureOr(wLowSurrogateFirst, "", 12))
+    check testProcessFunctionSignature("""fn = func("abc"""", 10,
+      newSignatureOr(wNoMatchingParen, "", 15))
+    check testProcessFunctionSignature("""fn = func("abc") j """, 10,
+      newSignatureOr(wTextAfterValue, "", 17))
+    check testProcessFunctionSignature("""fn = func("test() num")""", 10,
+      newSignatureOr(wExpectedReturnType, "", 18))

@@ -24,15 +24,14 @@ proc testDotNameRep(json: string, eDotNameRep: string, top=false): bool =
     return false
   return true
 
-proc testSignatureCodeToSignature(signatureCode: string, expected: string,
+proc testNewSignatureO(signatureCode: string, expected: string,
     functionName = "name"): bool =
-  var signatureO = signatureCodeToSignature(functionName, signatureCode)
+  var signatureO = newSignatureO(functionName, signatureCode)
   if not signatureO.isSome:
     echo "Not a valid signature."
     result = false
   else:
-    result = gotExpected($signatureO.get(), expected, "signatureCodeToSignature")
-
+    result = gotExpected($signatureO.get(), expected, "newSignatureO")
 
 suite "vartypes":
 
@@ -411,17 +410,17 @@ y = 2"""
     check signature.name == "one"
     check $signature == "one(p1: string) int"
 
-  test "signatureCodeToSignature":
-    check testSignatureCodeToSignature("s", "name() string")
-    check testSignatureCodeToSignature("ss", "name(a: string) string")
-    check testSignatureCodeToSignature("sss", "name(a: string, b: string) string")
-    check testSignatureCodeToSignature("soss", "name(a: string, b: optional string) string")
-    check testSignatureCodeToSignature("lsosl",
+  test "newSignatureO":
+    check testNewSignatureO("s", "name() string")
+    check testNewSignatureO("ss", "name(a: string) string")
+    check testNewSignatureO("sss", "name(a: string, b: string) string")
+    check testNewSignatureO("soss", "name(a: string, b: optional string) string")
+    check testNewSignatureO("lsosl",
       "name(a: list, b: string, c: optional string) list")
 
-  test "signatureCodeToSignature all":
+  test "newSignatureO all":
     let e = "name(a: int, b: string, c: float, d: optional list) int"
-    check testSignatureCodeToSignature("isfoli", e)
+    check testNewSignatureO("isfoli", e)
 
   test "shortName":
     check shortName(0) == "a"

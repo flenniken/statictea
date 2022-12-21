@@ -174,6 +174,10 @@ func newSignatureOr*(warning: MessageId, p1 = "", pos = 0): SignatureOr =
   let warningData = newWarningData(warning, p1, pos)
   result = opMessageW[Signature](warningData)
 
+func newSignatureOr*(warningData: WarningData): SignatureOr =
+  ## Create a new SignatureOr with a message.
+  result = opMessageW[Signature](warningData)
+
 func newSignatureOr*(signature: Signature): SignatureOr =
   ## Create a new SignatureOr with a value.
   result = opValueW[Signature](signature)
@@ -669,8 +673,8 @@ proc shortName*(index: Natural): string =
   if num != 0:
     result &= $num
 
-func signatureCodeToSignature*(functionName: string, signatureCode: string): Option[Signature] =
-  ## Convert the signature code to a signature object.
+func newSignatureO*(functionName: string, signatureCode: string): Option[Signature] =
+  ## Return a new signature for the function name and signature code.
   var params: seq[Param]
   var nameIx = 0
   var signatureKind = skNormal

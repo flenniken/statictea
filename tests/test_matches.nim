@@ -460,6 +460,7 @@ suite "matches.nim":
     check testMatchCommaOrSymbol("2,", gRightParentheses, 0)
     check testMatchCommaOrSymbol("abc)", gRightParentheses, 0)
     check testMatchCommaOrSymbol(" ,", gRightParentheses, 0)
+    check testMatchCommaOrSymbol("""a = func("test() int"""", gRightParentheses, 30)
 
   test "matchUpToLeftBracket":
     check testMatchUpToLeftBracket("{", 0, some(newMatches(1, 0)))
@@ -567,10 +568,11 @@ suite "matches.nim":
     check testGetLastPart("+-->\n", "-->", some(newMatches(5, 0, "+", "\n")))
     check testGetLastPart("+-->\r\n", "-->", some(newMatches(6, 0, "+", "\r\n")))
 
-    check testGetLastPart("", "", some(newMatches(0, 0, "", "")))
     check testGetLastPart("+", "", some(newMatches(1, 0, "+", "")))
     check testGetLastPart("+\n", "", some(newMatches(2, 0, "+", "\n")))
     check testGetLastPart("+\r\n", "", some(newMatches(3, 0, "+", "\r\n")))
+
+    check testGetLastPart("", "", some(newMatches(0, 0, "", "")))
 
   test "getLastPart 2":
     check testGetLastPart("", "-->")

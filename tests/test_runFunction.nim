@@ -119,7 +119,7 @@ proc testGetBestFunctionExists(functionName: string, arguments: seq[Value],
     echo funcValueOr.message
     return false
   let signature = funcValueOr.value.funcv.signature
-  let eSignature = signatureCodeToSignature(functionName, eSignatureCode).get()
+  let eSignature = newSignatureO(functionName, eSignatureCode).get()
 
   let test = "$1(args=$2)" % [functionName, $arguments]
   result = gotExpected($signature, $eSignature, test)

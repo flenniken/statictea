@@ -219,6 +219,9 @@ func matchRegex(str: string, regex: Regex, start: Natural,
   ## index in the string to start the search. NumGroups is the number
   ## of groups in the pattern.
 
+  if start >= str.len:
+    return
+
   assert(numGroups <= maxGroups, "Too many groups.")
   if numGroups > maxGroups:
     return

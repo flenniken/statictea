@@ -414,6 +414,8 @@ she sat down in a large arm-chair at one end of the table.
     check testParseJsonStr(""" ""  """, 2, "", 5)
 
     check testParseJsonStr(""" "t" """, 2, "t", 5)
+    check testParseJsonStr(""" "t")""", 2, "t", 4)
+    check testParseJsonStr(""" "t",9)""", 2, "t", 4)
     check testParseJsonStr(""" "tea" """, 2, "tea", 7)
     check testParseJsonStr(""" "tea" other""", 2, "tea", 7)
 

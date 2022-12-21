@@ -682,60 +682,6 @@ Reserved single letter variables:
 
 [[#contents][茶]]
 
-** Server Json Variables
-:PROPERTIES:
-:CUSTOM_ID: server-json-variables
-:END:
-
-You pass variables from the server to the template in json files.
-
-The variables are defined by the top level dictionary items. Each
-item's key is the name of a variable and the item's value is
-the variables' value.
-
-You can use multiple server json files by specifying multiple
-files on the command line. The files are processed left to right.
-
-The server json files populate the s dictionary.
-
-The json null values get converted to the 0.
-
-To give full control of the presentation to the template
-designers, the server json shouldn't contain any presentation
-data.
-
-[[#contents][茶]]
-
-** Code Variables
-:PROPERTIES:
-:CUSTOM_ID: code-variables
-:END:
-
-You create code variables with statements in code files. Code
-files are good for sharing common template variables between
-templates. The variables go in the o dictionary.
-
-[[#contents][茶]]
-
-** Local Variables
-:PROPERTIES:
-:CUSTOM_ID: local-variables
-:END:
-
-You create local variables with template statements.  They are
-local to the command where they are defined. You do not have to
-specify a prefix for local variables but you can use l. They are
-stored in the l dictionary. The local variables are cleared and
-recalculated for each repeated block.
-
-#+BEGIN_SRC
-a = 5
-pot = "black"
-l.tea = "earl grey"
-#+END_SRC
-
-[[#contents][茶]]
-
 ** Function Variables
 :PROPERTIES:
 :CUSTOM_ID: function-variables
@@ -759,6 +705,157 @@ in the g dictionary.
 #+BEGIN_SRC
 g.names &= entry.name
 #+END_SRC
+
+[[#contents][茶]]
+
+** Local Variables
+:PROPERTIES:
+:CUSTOM_ID: local-variables
+:END:
+
+You create local variables with template statements.  They are
+local to the command where they are defined. You do not have to
+specify a prefix for local variables but you can use l. They are
+stored in the l dictionary. The local variables are cleared and
+recalculated for each repeated block.
+
+#+BEGIN_SRC
+a = 5
+pot = "black"
+l.tea = "earl grey"
+#+END_SRC
+
+[[#contents][茶]]
+
+* User Functions
+:PROPERTIES:
+:CUSTOM_ID: user-functions
+:END:
+
+You can define your own functions in code files.
+
+User defined functions are important for sharing common code,
+looping and as callbacks for building lists and dictionaries.
+
+In the following example we define a function called strNumCmp
+and assign the result to the mycmp function variable. The
+function takes two string parameters called numStr1 and numStr2
+and it returns an integer.
+
+#+BEGIN_SRC
+mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+  ## Compare two number strings
+  ## and return 1, 0, or -1.
+  num1 = int(numStr1)
+  num2 = int(numStr2)
+  return(cmp(num1, num2))
+#+END_SRC
+
+The first line names the function and defines its signature and
+assigns it to a variable.
+
+#+BEGIN_SRC
+mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+#+END_SRC
+
+The doc comment come next and they tell what the function does:
+
+#+BEGIN_SRC
+  ## Compare two number strings
+  ## and return 1, 0, or -1.
+#+END_SRC
+
+The last lines of the definition are the statement
+lines.  A return statement ends the function definition.
+
+#+BEGIN_SRC
+  num1 = int(numStr1)
+  num2 = int(numStr2)
+  return(cmp(num1, num2))
+#+END_SRC
+
+The code is line based so the indentation doesn’t matter, there
+aren’t any brackets, and no line terminators.
+
+Here is how you call the example function:
+
+#+BEGIN_SRC
+a = l.mycmp(“1”, "2")
+#+END_SRC
+
+*Function Signature:*
+
+A function signature tells the function name, the parameter names
+and types and the return type. For the example above the
+signature string is:
+
+#+BEGIN_SRC
+"strNumCmp(numStr1: string, numStr2: string) int"
+#+END_SRC
+
+You call, query and pass around the the function variable. The
+signature function name (strNumCmp) is not used except in the
+function details.
+
+You can specify an optional last parameter and a parameter can
+use "any" to when it accepts any type. The built-in get function
+is an example of optional and any.
+
+#+BEGIN_SRC
+get(dictionary: dict, key: string, optional default: any) any
+#+END_SRC
+
+*Return Statement:*
+
+You use the return statement to return the function’s value and
+to finish the definition of the function. A bare return ends the
+function; you can use a return in a IF statement and they don’t end
+the function.
+
+*Function Local Variables:*
+
+The function‘s local variables and its arguments are stored in
+the m dictionary which exists while the function runs. It
+contains the parameters and their argument values and local
+variables used in the function.
+
+To access variables outside the function, you need to pass them
+to it.
+
+[[#contents][茶]]
+
+** Code Variables
+:PROPERTIES:
+:CUSTOM_ID: code-variables
+:END:
+
+You create code variables with statements in code files. Code
+files are good for sharing common template variables between
+templates. The variables go in the o dictionary.
+
+[[#contents][茶]]
+
+** Server Json Variables
+:PROPERTIES:
+:CUSTOM_ID: server-json-variables
+:END:
+
+You pass variables from the server to the template in json files.
+
+The variables are defined by the top level dictionary items. Each
+item's key is the name of a variable and the item's value is
+the variables' value.
+
+You can use multiple server json files by specifying multiple
+files on the command line. The files are processed left to right.
+
+The server json files populate the s dictionary.
+
+The json null values get converted to the 0.
+
+To give full control of the presentation to the template
+designers, the server json shouldn't contain any presentation
+data.
 
 [[#contents][茶]]
 
@@ -1751,80 +1848,6 @@ Teas of China
 """
 count = len(str)
 #+END_SRC
-
-[[#contents][茶]]
-
-* User Functions
-:PROPERTIES:
-:CUSTOM_ID: user-functions
-:END:
-
-You can define your own functions in code files.
-
-User defined functions are important for sharing common code,
-looping and as callbacks for building lists and dictionaries.
-
-The first line names the function and defines its signature and
-assigns it to a variable.
-
-The next lines are for the doc comment followed by the statement
-lines.  A return statement ends the function definition.
-
-In the following example we define a function called strNumCmp
-and assigns the result to the mycmp function variable. The
-function takes two string parameters called numStr1 and numStr2
-and it returns an integer.
-
-#+BEGIN_SRC
-mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
-  ## Compare two number strings
-  ## and return 1, 0, or -1.
-  num1 = int(numStr1)
-  num2 = int(numStr2)
-  return(cmp(num1, num2))
-#+END_SRC
-
-The code is line based so the indentation doesn’t matter, there
-aren’t any brackets, and no line terminators.
-
-Here is how you call the example function:
-
-#+BEGIN_SRC
-a = l.mycmp(“1”, "2")
-#+END_SRC
-
-*Function Signature:*
-
-A function signature tells the function name, the parameter names
-and types and the return type.
-
-You call, query and pass around the the function variable. The
-signature function name is not used except in the function
-details.
-
-You can specify an optional last parameter.  The built in get
-function is an example of that:
-
-#+BEGIN_SRC
-get(dictionary: dict, key: string, optional default: any) any
-#+END_SRC
-
-*Return Statement:*
-
-You use the return statement to return the function’s value and
-to finish the definition of the function. A bare return ends the
-function; you can use a return in a IF statement and they don’t end
-the function.
-
-*Function Local Variables:*
-
-The function‘s local variables and its arguments are stored in
-the m dictionary which exists while the function runs. It
-contains the parameters and their argument values and local
-variables used in the function.
-
-To access variables outside the function, you need to pass them
-to it.
 
 [[#contents][茶]]
 
@@ -3192,13 +3215,13 @@ str => "use two { to get one"
 Define a function.
 
 #+BEGIN_SRC
-func(str: string) func
+func(signature: string) string
 #+END_SRC
 
 Example:
 
 #+BEGIN_SRC
-l.cmp = func("(numStr1: string, numStr2: string) int")
+mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
   ## Compare two number strings
   ## and return 1, 0, or -1.
   num1 = int(numStr1)

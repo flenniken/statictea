@@ -8,7 +8,7 @@ import sharedtestcode
 
 proc testMapParametersOk(signatureCode: string, args: seq[Value],
     eMapJson: string, functionName = "name"): bool =
-  var signatureO = signatureCodeToSignature(functionName, signatureCode)
+  var signatureO = newSignatureO(functionName, signatureCode)
   if not signatureO.isSome:
     echo "Invalid signature: " & signatureCode
     return false
@@ -25,7 +25,7 @@ proc testMapParametersOk(signatureCode: string, args: seq[Value],
 proc testMapParametersW(signatureCode: string, args: seq[Value],
     eParameter: int, warning: MessageId, p1: string = "",
     functionName = "name"): bool =
-  var signatureO = signatureCodeToSignature(functionName, signatureCode)
+  var signatureO = newSignatureO(functionName, signatureCode)
   if not signatureO.isSome:
     echo "Invalid signature: " & signatureCode
     return false

@@ -22,7 +22,7 @@ import variables
 template tMapParameters(functionName: string, signatureCode: string) =
   ## Template that checks the signatureCode against the parameters and
   ## sets the map dictionary variable.
-  let signatureO = signatureCodeToSignature(functionName, signatureCode)
+  let signatureO = newSignatureO(functionName, signatureCode)
   let funResult = mapParameters(signatureO.get(), parameters)
   if funResult.kind == frWarning:
     return funResult
@@ -2142,28 +2142,27 @@ func funFormat_ss*(variables: Variables, parameters: seq[Value]): FunResult =
 
   result = newFunResult(newValue(stringOr.value))
 
-func funFunc_sp*(variables: Variables, parameters: seq[Value]): FunResult =
+func funFunc_ss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Define a function.
   ## @:
   ## @:~~~
-  ## @:func(str: string) func
+  ## @:func(signature: string) string
   ## @:~~~~
   ## @:
   ## @:Example:
   ## @:
   ## @:~~~
-  ## @:l.cmp = func("(numStr1: string, numStr2: string) int")
+  ## @:mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
   ## @:  ## Compare two number strings
   ## @:  ## and return 1, 0, or -1.
   ## @:  num1 = int(numStr1)
   ## @:  num2 = int(numStr2)
   ## @:  return(cmp(num1, num2))
   ## @:~~~~
-  # Note: this code is handled as a special case in code files.  It is
-  # here for the function list and documentation.
-
-  # Define a function in a code file and not nested.
-  return newFunResultWarn(wDefineFunction)
+  # todo: return a signature dictionary instead?
+  tMapParameters("func", "ss")
+  let str = map["a"].stringv
+  result = newFunResult(newValue(str))
 
 func funStartsWith_ssb*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Check whether a strings starts with the given prefix. Return true
@@ -2574,7 +2573,7 @@ const
     ("float", funFloat_saa, "saa"),
     ("float", funFloat_sf, "sf"),
     ("format", funFormat_ss, "ss"),
-    ("func", funFunc_sp, "sp"),
+    ("func", funFunc_ss, "ss"),
     ("get", funGet_dsoaa, "dsoaa"),
     ("get", funGet_lioaa, "lioaa"),
     ("githubAnchor", funGithubAnchor_ll, "ll"),
@@ -2692,7 +2691,7 @@ proc createFuncDictionary*(): Value =
   var funcList = newEmptyListValue()
   var lastName = ""
   for (functionName, functionPtr, signatureCode) in functionsList:
-    let signatureO = signatureCodeToSignature(functionName, signatureCode)
+    let signatureO = newSignatureO(functionName, signatureCode)
 
     # todo: fill in data correctly
     let builtIn = true

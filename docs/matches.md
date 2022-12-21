@@ -74,7 +74,7 @@ proc matchCommand(line: string; start: Natural = 0): Option[Matches]
 
 # matchLastPart
 
-Match the last part of a command line.  It matches the optional continuation plus character, the optional postfix and the optional line endings. A match has two groups, the plus sign and the line ending.
+Match the last part of a command line.  It matches the optional continuation plus character, the optional postfix and the optional line endings. A match has two groups, the plus sign and the line ending. When nothing at the end, return groups: "", "".
 
 ```nim
 proc matchLastPart(line: string; postfix: string; start: Natural = 0): Option[

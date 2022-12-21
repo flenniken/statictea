@@ -1,7 +1,22 @@
 import std/unittest
 import sharedtestcode
 
+proc testGotExpectedResult(eStr: string): bool =
+  gotExpectedResult("expected", eStr)
+
+proc testGotExpectedResult2(eStr: string): bool =
+  result = true
+  gotExpectedResult("expected", eStr)
+
 suite "sharedtestcode.nim":
+
+  test "gotExpectedResult":
+    check testGotExpectedResult("expected") == false
+    # check testGotExpectedResult("nasdf") == false
+
+  test "gotExpectedResult2":
+    check testGotExpectedResult2("expected") == true
+    # check testGotExpectedResult2("nasdf") == false
 
   test "append sequences":
     let a = @[1, 2]
@@ -55,4 +70,3 @@ tea
     let eCmdLines = splitContent(content, 1, 1)
     require eCmdLines.len == 1
     check eCmdLines[0] == "there\n"
-

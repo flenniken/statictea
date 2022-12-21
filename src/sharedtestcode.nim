@@ -83,6 +83,26 @@ when defined(test):
       return false
     return true
 
+  template gotExpectedResult*(got: string, expected: string, message = "") =
+    ## Compare got with expected and show the differences if any. Set
+    ## the result variable to false when there are differences, else
+    ## leave result as is.
+    ## @:
+    ## @:Example usage:
+    ## @:
+    ## @:~~~
+    ## @:result = gotExpected($handled, $eHandled, "handled:")
+    ## @:gotExpectedResult(retLeftName, eLeftName, "left name:")
+    ## @:gotExpectedResult($retOperator, $eOperator, "operator:")
+    ## @:~~~~
+
+    if got != expected:
+      if message != "":
+        echo message
+      echo "     got: " & got
+      echo "expected: " & expected
+      result = false
+
   func splitContent*(content: string, startLine: Natural, numLines: Natural): seq[string] =
     ## Split the content string at newlines and return a range of the
     ## lines.  startLine is the index of the first line.
@@ -368,7 +388,7 @@ when defined(test):
       functionPtrDefault = zero
     else:
       functionPtrDefault = functionPtr
-    let signatureO = signatureCodeToSignature(functionName, signatureCode)
+    let signatureO = newSignatureO(functionName, signatureCode)
     var docCommentsList: seq[string]
     if docCommentsList.len == 0:
       docCommentsList.add("Return the number 0.")
