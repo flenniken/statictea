@@ -15,7 +15,6 @@ StaticTea variable types.
 * type: [ParamCode](#paramcode) &mdash; Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.
 * type: [ParamType](#paramtype) &mdash; The statictea parameter types.
 * type: [Param](#param) &mdash; Holds attributes for one parameter.
-* type: [SignatureKind](#signaturekind) &mdash; The statictea signature types.
 * type: [Signature](#signature) &mdash; Holds the function signature.
 * type: [SignatureOr](#signatureor) &mdash; A signature or message.
 * type: [FunctionSpec](#functionspec) &mdash; Holds the function details.
@@ -170,25 +169,17 @@ Param = object
 
 ```
 
-# SignatureKind
-
-The statictea signature types.
- vkNormal -- normal signature
- vkOptional -- the signature's last parameter is optional
-
-```nim
-SignatureKind = enum
-  skNormal, skOptional
-```
-
 # Signature
 
 Holds the function signature.
+* optional -- true when the last parameter is optional
 * name -- the function name
+* params -- the function parameters name and type
+* returnType -- the function return type
 
 ```nim
 Signature = object
-  kind*: SignatureKind
+  optional*: bool
   name*: string
   params*: seq[Param]
   returnType*: ParamType
@@ -303,7 +294,7 @@ ValueAndPosOr = OpResultWarn[ValueAndPos]
 Create a Signature object.
 
 ```nim
-proc newSignature(kind: SignatureKind; name: string; params: seq[Param];
+proc newSignature(optional: bool; name: string; params: seq[Param];
                   returnType: ParamType): Signature
 ```
 
@@ -336,7 +327,7 @@ func newSignatureOr(signature: Signature): SignatureOr
 Create a SignatureOr object.
 
 ```nim
-proc newSignatureOr(kind: SignatureKind; name: string; params: seq[Param];
+proc newSignatureOr(optional: bool; name: string; params: seq[Param];
                     returnType: ParamType): SignatureOr
 ```
 

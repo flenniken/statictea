@@ -67,7 +67,7 @@ their values.
 * [funString_aoss](#funstring_aoss) &mdash; Convert a variable to a string.
 * [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names.
 * [funFormat_ss](#funformat_ss) &mdash; Format a string using replacement variables similar to a replacement block.
-* [funFunc_ss](#funfunc_ss) &mdash; Define a function.
+* [funFunc_sp](#funfunc_sp) &mdash; Define a function.
 * [funStartsWith_ssb](#funstartswith_ssb) &mdash; Check whether a strings starts with the given prefix.
 * [funNot_bb](#funnot_bb) &mdash; Boolean not.
 * [funAnd_bbb](#funand_bbb) &mdash; Boolean AND with short circuit.
@@ -212,7 +212,7 @@ You have the option to compare case insensitive. Case sensitive
 is the default.
 
 ~~~
-cmp(a: string, b: string, optional insensitive: bool) int
+cmp(a: string, b: string, insensitive: optional bool) int
 ~~~~
 
 Examples:
@@ -316,7 +316,7 @@ last element. It is short hand for len - 1. Index -2 is len - 2,
 etc.
 
 ~~~
-get(list: list, index: int, optional default: any) any
+get(list: list, index: int, default: optional any) any
 ~~~~
 
 Examples:
@@ -344,7 +344,7 @@ default value is returned if specified, else a warning is
 generated.
 
 ~~~
-get(dictionary: dict, key: string, optional default: any) any
+get(dictionary: dict, key: string, default: optional any) any
 ~~~~
 
 Note: For dictionary lookup you can use dot notation. It's the
@@ -429,7 +429,7 @@ If the condition is true, return the second argument, else return the third argu
 [[#boolean-expressions][Boolean Expressions]]
 
 ~~~
-if(condition: bool, then: any, optional else: any) any
+if(condition: bool, then: any, else: optional any) any
 ~~~~
 
 Examples:
@@ -529,7 +529,7 @@ generated.  The conditions must be integers. The return values
 can be any type.
 
 ~~~
-case(condition: int, pairs: list, optional default: any) any
+case(condition: int, pairs: list, default: optional any) any
 ~~~~
 
 Examples:
@@ -564,7 +564,7 @@ generated.  The conditions must be strings. The return values
 can be any type.
 
 ~~~
-case(condition: string, pairs: list, optional default: any) any
+case(condition: string, pairs: list, default: optional any) any
 ~~~~
 
 Examples:
@@ -677,7 +677,7 @@ func funFloat_saa(variables: Variables; parameters: seq[Value]): FunResult
 Create an int from a float.
 
 ~~~
-int(num: float, optional roundOption: string) int
+int(num: float, roundOption: optional string) int
 ~~~~
 
 Round options:
@@ -712,7 +712,7 @@ func funInt_fosi(variables: Variables; parameters: seq[Value]): FunResult
 Create an int from a number string.
 
 ~~~
-int(numString: string, optional roundOption: string) int
+int(numString: string, roundOption: optional string) int
 ~~~~
 
 Round options:
@@ -822,7 +822,7 @@ generated when the substring is missing and you don't specify a
 default value.
 
 ~~~
-find(str: string, substring: string, optional default: any) any
+find(str: string, substring: string, default: optional any) any
 ~~~~
 
 Examples:
@@ -852,7 +852,7 @@ characters from the start to the end of the string.
 The start index and length are by unicode characters not bytes.
 
 ~~~
-slice(str: string, start: int, optional length: int) string
+slice(str: string, start: int, length: optional int) string
 ~~~~
 
 Examples:
@@ -1065,7 +1065,7 @@ slash or or backwards slash. When no separator, the current
 system separator is used.
 
 ~~~
-path(filename: string, optional separator: string) dict
+path(filename: string, separator: optional string) dict
 ~~~~
 
 Examples:
@@ -1161,7 +1161,7 @@ You have the option of sorting strings case "insensitive". Case
 "sensitive" is the default.
 
 ~~~
-sort(values: list, order: string, optional insensitive: string) list
+sort(values: list, order: string, insensitive: optional string) list
 ~~~~
 
 Examples:
@@ -1339,7 +1339,7 @@ is not added. If a component is "", the platform separator is
 used for it.
 
 ~~~
-joinPath(components: list, optional separator: string) string
+joinPath(components: list, separator: optional string) string
 ~~~~
 
 Examples:
@@ -1373,7 +1373,7 @@ func funJoinPath_loss(variables: Variables; parameters: seq[Value]): FunResult
 Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
 
 ~~~
-join(strs: list, sep: string, optional skipEmpty: bool) string
+join(strs: list, sep: string, skipEmpty: optional bool) string
 ~~~~
 
 Examples:
@@ -1484,7 +1484,7 @@ func funReturn_ss(variables: Variables; parameters: seq[Value]): FunResult
 Convert a variable to a string. You specify the variable and optionally the type of output you want.
 
 ~~~
-string(var: any, optional stype: string) string
+string(var: any, stype: optional string) string
 ~~~~
 
 The default stype is "rb" which is used for replacement blocks.
@@ -1595,12 +1595,12 @@ str => "use two { to get one"
 func funFormat_ss(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funFunc_ss
+# funFunc_sp
 
 Define a function.
 
 ~~~
-func(signature: string) string
+func(signature: string) func
 ~~~~
 
 Example:
@@ -1615,7 +1615,7 @@ mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
 ~~~~
 
 ```nim
-func funFunc_ss(variables: Variables; parameters: seq[Value]): FunResult
+func funFunc_sp(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funStartsWith_ssb
@@ -2011,7 +2011,7 @@ functionsList = [("add", funAdd_fff, "fff"), ("add", funAdd_iii, "iii"),
                  ("find", funFind_ssoaa, "ssoaa"),
                  ("float", funFloat_if, "if"), ("float", funFloat_saa, "saa"),
                  ("float", funFloat_sf, "sf"), ("format", funFormat_ss, "ss"),
-                 ("func", funFunc_ss, "ss"), ("get", funGet_dsoaa, "dsoaa"),
+                 ("func", funFunc_sp, "sp"), ("get", funGet_dsoaa, "dsoaa"),
                  ("get", funGet_lioaa, "lioaa"),
                  ("githubAnchor", funGithubAnchor_ll, "ll"),
                  ("githubAnchor", funGithubAnchor_ss, "ss"),

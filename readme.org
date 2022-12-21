@@ -2790,7 +2790,7 @@ generated.  The conditions must be integers. The return values
 can be any type.
 
 #+BEGIN_SRC
-case(condition: int, pairs: list, optional default: any) any
+case(condition: int, pairs: list, default: optional any) any
 #+END_SRC
 
 Examples:
@@ -2826,7 +2826,7 @@ generated.  The conditions must be strings. The return values
 can be any type.
 
 #+BEGIN_SRC
-case(condition: string, pairs: list, optional default: any) any
+case(condition: string, pairs: list, default: optional any) any
 #+END_SRC
 
 Examples:
@@ -2923,7 +2923,7 @@ You have the option to compare case insensitive. Case sensitive
 is the default.
 
 #+BEGIN_SRC
-cmp(a: string, b: string, optional insensitive: bool) int
+cmp(a: string, b: string, insensitive: optional bool) int
 #+END_SRC
 
 Examples:
@@ -3097,7 +3097,7 @@ generated when the substring is missing and you don't specify a
 default value.
 
 #+BEGIN_SRC
-find(str: string, substring: string, optional default: any) any
+find(str: string, substring: string, default: optional any) any
 #+END_SRC
 
 Examples:
@@ -3215,7 +3215,7 @@ str => "use two { to get one"
 Define a function.
 
 #+BEGIN_SRC
-func(signature: string) string
+func(signature: string) func
 #+END_SRC
 
 Example:
@@ -3241,7 +3241,7 @@ default value is returned if specified, else a warning is
 generated.
 
 #+BEGIN_SRC
-get(dictionary: dict, key: string, optional default: any) any
+get(dictionary: dict, key: string, default: optional any) any
 #+END_SRC
 
 Note: For dictionary lookup you can use dot notation. It's the
@@ -3275,7 +3275,7 @@ last element. It is short hand for len - 1. Index -2 is len - 2,
 etc.
 
 #+BEGIN_SRC
-get(list: list, index: int, optional default: any) any
+get(list: list, index: int, default: optional any) any
 #+END_SRC
 
 Examples:
@@ -3495,7 +3495,7 @@ If the condition is true, return the second argument, else return the third argu
 [[#boolean-expressions][Boolean Expressions]]
 
 #+BEGIN_SRC
-if(condition: bool, then: any, optional else: any) any
+if(condition: bool, then: any, else: optional any) any
 #+END_SRC
 
 Examples:
@@ -3525,7 +3525,7 @@ if(c, return("skip"))
 Create an int from a float.
 
 #+BEGIN_SRC
-int(num: float, optional roundOption: string) int
+int(num: float, roundOption: optional string) int
 #+END_SRC
 
 Round options:
@@ -3561,7 +3561,7 @@ int(-6.3456, "truncate") => -6
 Create an int from a number string.
 
 #+BEGIN_SRC
-int(numString: string, optional roundOption: string) int
+int(numString: string, roundOption: optional string) int
 #+END_SRC
 
 Round options:
@@ -3633,7 +3633,7 @@ is not added. If a component is "", the platform separator is
 used for it.
 
 #+BEGIN_SRC
-joinPath(components: list, optional separator: string) string
+joinPath(components: list, separator: optional string) string
 #+END_SRC
 
 Examples:
@@ -3668,7 +3668,7 @@ joinPath(["/", "tea"]) =>
 Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
 
 #+BEGIN_SRC
-join(strs: list, sep: string, optional skipEmpty: bool) string
+join(strs: list, sep: string, skipEmpty: optional bool) string
 #+END_SRC
 
 Examples:
@@ -4047,7 +4047,7 @@ slash or or backwards slash. When no separator, the current
 system separator is used.
 
 #+BEGIN_SRC
-path(filename: string, optional separator: string) dict
+path(filename: string, separator: optional string) dict
 #+END_SRC
 
 Examples:
@@ -4220,7 +4220,7 @@ characters from the start to the end of the string.
 The start index and length are by unicode characters not bytes.
 
 #+BEGIN_SRC
-slice(str: string, start: int, optional length: int) string
+slice(str: string, start: int, length: optional int) string
 #+END_SRC
 
 Examples:
@@ -4247,7 +4247,7 @@ You have the option of sorting strings case "insensitive". Case
 "sensitive" is the default.
 
 #+BEGIN_SRC
-sort(values: list, order: string, optional insensitive: string) list
+sort(values: list, order: string, insensitive: optional string) list
 #+END_SRC
 
 Examples:
@@ -4364,7 +4364,7 @@ b => false
 Convert a variable to a string. You specify the variable and optionally the type of output you want.
 
 #+BEGIN_SRC
-string(var: any, optional stype: string) string
+string(var: any, stype: optional string) string
 #+END_SRC
 
 The default stype is "rb" which is used for replacement blocks.

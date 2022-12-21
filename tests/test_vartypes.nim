@@ -397,16 +397,16 @@ y = 2"""
 
   test "signature zero":
     var params = newSeq[Param]()
-    let signature = newSignature(skNormal, "zero", params, ptInt)
-    check signature.kind == skNormal
+    let signature = newSignature(false, "zero", params, ptInt)
+    check not signature.optional
     check signature.name == "zero"
     check $signature == "zero() int"
 
   test "signature one":
     var params = newSeq[Param]()
     params.add(newParam("p1", ptString))
-    let signature = newSignature(skNormal, "one", params, ptInt)
-    check signature.kind == skNormal
+    let signature = newSignature(false, "one", params, ptInt)
+    check not signature.optional
     check signature.name == "one"
     check $signature == "one(p1: string) int"
 

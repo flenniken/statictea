@@ -80,17 +80,13 @@ type
     name*: string
     paramType*: ParamType
 
-  SignatureKind* = enum
-    ## The statictea signature types.
-    ## @: vkNormal -- normal signature
-    ## @: vkOptional -- the signature's last parameter is optional
-    skNormal
-    skOptional
-
   Signature* = object
     ## Holds the function signature.
+    ## @:* optional -- true when the last parameter is optional
     ## @:* name -- the function name
-    kind*: SignatureKind
+    ## @:* params -- the function parameters name and type
+    ## @:* returnType -- the function return type
+    optional*: bool
     name*: string
     params*: seq[Param]
     returnType*: ParamType
@@ -165,9 +161,9 @@ type
   ValueAndPosOr* = OpResultWarn[ValueAndPos]
     ## A ValueAndPos object or a warning.
 
-proc newSignature*(kind: SignatureKind, name: string, params: seq[Param], returnType: ParamType): Signature =
+proc newSignature*(optional: bool, name: string, params: seq[Param], returnType: ParamType): Signature =
   ## Create a Signature object.
-  result = Signature(kind: kind, name: name, params: params, returnType: returnType)
+  result = Signature(optional: optional, name: name, params: params, returnType: returnType)
 
 func newSignatureOr*(warning: MessageId, p1 = "", pos = 0): SignatureOr =
   ## Create a new SignatureOr with a message.
@@ -182,10 +178,10 @@ func newSignatureOr*(signature: Signature): SignatureOr =
   ## Create a new SignatureOr with a value.
   result = opValueW[Signature](signature)
 
-proc newSignatureOr*(kind: SignatureKind, name: string, params: seq[Param],
+proc newSignatureOr*(optional: bool, name: string, params: seq[Param],
     returnType: ParamType): SignatureOr =
   ## Create a SignatureOr object.
-  let signature = Signature(kind: kind, name: name, params: params, returnType: returnType)
+  let signature = Signature(optional: optional, name: name, params: params, returnType: returnType)
   result = opValueW[Signature](signature)
 
 func newParam*(name: string, paramType: ParamType): Param =
@@ -335,7 +331,7 @@ func `$`*(signature: Signature): string =
       result.add(", ")
     result.add(param.name)
     result.add(": ")
-    if signature.kind == skOptional and ix == signature.params.len - 1:
+    if signature.optional and ix == signature.params.len - 1:
       result.add("optional ")
     result.add($param.paramType)
   result.add(") ")
@@ -677,7 +673,7 @@ func newSignatureO*(functionName: string, signatureCode: string): Option[Signatu
   ## Return a new signature for the function name and signature code.
   var params: seq[Param]
   var nameIx = 0
-  var signatureKind = skNormal
+  var optional = false
 
   if len(signatureCode) < 1:
     return
@@ -688,14 +684,14 @@ func newSignatureO*(functionName: string, signatureCode: string): Option[Signatu
       params.add(newParam(shortName(nameIx), parmType))
       inc(nameIx)
     elif code == 'o':
-      if signatureKind == skOptional:
+      if optional:
         # You can only have one optional parameter.
         return
-      signatureKind = skOptional
+      optional = true
     else:
       # Invalid signature code.
       return
 
   let returnCode = signatureCode[signatureCode.len-1]
   let returnType = codeToParamType(returnCode)
-  result = some(newSignature(signatureKind, functionName, params, returnType))
+  result = some(newSignature(optional, functionName, params, returnType))

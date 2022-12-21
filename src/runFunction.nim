@@ -241,7 +241,7 @@ func funCmp_ssobi*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:is the default.
   ## @:
   ## @:~~~
-  ## @:cmp(a: string, b: string, optional insensitive: bool) int
+  ## @:cmp(a: string, b: string, insensitive: optional bool) int
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -349,7 +349,7 @@ func funGet_lioaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:etc.
   ## @:
   ## @:~~~
-  ## @:get(list: list, index: int, optional default: any) any
+  ## @:get(list: list, index: int, default: optional any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -389,7 +389,7 @@ func funGet_dsoaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:generated.
   ## @:
   ## @:~~~
-  ## @:get(dictionary: dict, key: string, optional default: any) any
+  ## @:get(dictionary: dict, key: string, default: optional any) any
   ## @:~~~~
   ## @:
   ## @:Note: For dictionary lookup you can use dot notation. It's the
@@ -497,7 +497,7 @@ func funIf_baoaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:[[#boolean-expressions][Boolean Expressions]]
   ## @:
   ## @:~~~
-  ## @:if(condition: bool, then: any, optional else: any) any
+  ## @:if(condition: bool, then: any, else: optional any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -653,7 +653,7 @@ func funCase_iloaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:can be any type.
   ## @:
   ## @:~~~
-  ## @:case(condition: int, pairs: list, optional default: any) any
+  ## @:case(condition: int, pairs: list, default: optional any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -686,7 +686,7 @@ func funCase_sloaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:can be any type.
   ## @:
   ## @:~~~
-  ## @:case(condition: string, pairs: list, optional default: any) any
+  ## @:case(condition: string, pairs: list, default: optional any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -860,7 +860,7 @@ func funInt_fosi*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Create an int from a float.
   ## @:
   ## @:~~~
-  ## @:int(num: float, optional roundOption: string) int
+  ## @:int(num: float, roundOption: optional string) int
   ## @:~~~~
   ## @:
   ## @:Round options:
@@ -895,7 +895,7 @@ func funInt_sosi*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Create an int from a number string.
   ## @:
   ## @:~~~
-  ## @:int(numString: string, optional roundOption: string) int
+  ## @:int(numString: string, roundOption: optional string) int
   ## @:~~~~
   ## @:
   ## @:Round options:
@@ -1036,7 +1036,7 @@ func funFind_ssoaa*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:default value.
   ## @:
   ## @:~~~
-  ## @:find(str: string, substring: string, optional default: any) any
+  ## @:find(str: string, substring: string, default: optional any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1076,7 +1076,7 @@ func funSlice_siois*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:The start index and length are by unicode characters not bytes.
   ## @:
   ## @:~~~
-  ## @:slice(str: string, start: int, optional length: int) string
+  ## @:slice(str: string, start: int, length: optional int) string
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1389,7 +1389,7 @@ func funPath_sosd*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:system separator is used.
   ## @:
   ## @:~~~
-  ## @:path(filename: string, optional separator: string) dict
+  ## @:path(filename: string, separator: optional string) dict
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1611,7 +1611,7 @@ func funSort_lsosl*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:"sensitive" is the default.
   ## @:
   ## @:~~~
-  ## @:sort(values: list, order: string, optional insensitive: string) list
+  ## @:sort(values: list, order: string, insensitive: optional string) list
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1833,7 +1833,7 @@ func funJoinPath_loss*(variables: Variables, parameters: seq[Value]): FunResult 
   ## @:used for it.
   ## @:
   ## @:~~~
-  ## @:joinPath(components: list, optional separator: string) string
+  ## @:joinPath(components: list, separator: optional string) string
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1867,7 +1867,7 @@ func funJoin_lsois*(variables: Variables, parameters: seq[Value]): FunResult =
   ## empty separator to concatenate the arguments.
   ## @:
   ## @:~~~
-  ## @:join(strs: list, sep: string, optional skipEmpty: bool) string
+  ## @:join(strs: list, sep: string, skipEmpty: optional bool) string
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2003,7 +2003,7 @@ func funString_aoss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## optionally the type of output you want.
   ## @:
   ## @:~~~
-  ## @:string(var: any, optional stype: string) string
+  ## @:string(var: any, stype: optional string) string
   ## @:~~~~
   ## @:
   ## @:The default stype is "rb" which is used for replacement blocks.

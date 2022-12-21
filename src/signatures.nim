@@ -109,16 +109,16 @@ func mapParameters*(signature: Signature, args: seq[Value]): FunResult =
     if ix >= args.len:
       var message: MessageId
       var requiredArgs: Natural
-      if signature.kind == skNormal:
-        requiredArgs = numParams
-        # Not enough arguments, $1 required.
-        message = wNotEnoughArgs
-      else: # optional
+      if signature.optional:
         if ix == args.len and ix == numParams - 1:
           break # matched all required
         # The function requires at least $1 arguments.
         message = wNotEnoughArgsOpt
         requiredArgs = numParams - 1
+      else: # required
+        requiredArgs = numParams
+        # Not enough arguments, $1 required.
+        message = wNotEnoughArgs
       return newFunResultWarn(message, parameter=ix, p1 = $requiredArgs)
 
     let arg = args[ix]
@@ -133,13 +133,13 @@ func mapParameters*(signature: Signature, args: seq[Value]): FunResult =
   if args.len > numParams:
     var message: MessageId
     var requiredArgs: Natural
-    if signature.kind == skNormal:
-      # The function requires $1 arguments.
-      message = wTooManyArgs
-      requiredArgs = numParams
-    else: # optional
+    if signature.optional:
       # The function requires at most $1 arguments.
       message = wTooManyArgsOpt
+      requiredArgs = numParams
+    else: # required
+      # The function requires $1 arguments.
+      message = wTooManyArgs
       requiredArgs = numParams
     return newFunResultWarn(message, parameter=numParams, p1 = $requiredArgs)
 

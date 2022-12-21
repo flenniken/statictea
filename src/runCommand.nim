@@ -1425,7 +1425,7 @@ proc parseSignature*(signature: string): SignatureOr =
     # Unused extra text at the end of the signature.
     return newSignatureOr(wUnusedSignatureText, "", runningPos)
 
-  let signature = newSignature(skNormal, functionName, params, returnType)
+  let signature = newSignature(false, functionName, params, returnType)
   result = newSignatureOr(signature)
 
 type

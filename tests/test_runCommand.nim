@@ -1698,18 +1698,18 @@ White$1
 
   test "parse signature no params":
     let params = newSeq[Param]()
-    check testParseSignature("zero() int", newSignatureOr(skNormal, "zero", params, ptInt))
+    check testParseSignature("zero() int", newSignatureOr(false, "zero", params, ptInt))
 
   test "parse signature one param":
     var params = newSeq[Param]()
     params.add(newParam("num", ptInt))
-    check testParseSignature("one(num: int) int", newSignatureOr(skNormal, "one", params, ptInt))
+    check testParseSignature("one(num: int) int", newSignatureOr(false, "one", params, ptInt))
 
   test "parse signature two params":
     var params = newSeq[Param]()
     params.add(newParam("num1", ptInt))
     params.add(newParam("num2", ptInt))
-    check testParseSignature("two(num1: int, num2: int) int", newSignatureOr(skNormal, "two", params, ptInt))
+    check testParseSignature("two(num1: int, num2: int) int", newSignatureOr(false, "two", params, ptInt))
 
   test "parse signature three params":
     var params = newSeq[Param]()
@@ -1717,23 +1717,23 @@ White$1
     params.add(newParam("num2", ptInt))
     params.add(newParam("num3", ptInt))
     check testParseSignature("three(num1: int, num2: int, num3: int) int",
-      newSignatureOr(skNormal, "three", params, ptInt))
+      newSignatureOr(false, "three", params, ptInt))
 
   test "parse path signature":
     var params = newSeq[Param]()
     params.add(newParam("filename", ptString))
-    check testParseSignature("path(filename: string) dict", newSignatureOr(skNormal, "path", params, ptDict))
+    check testParseSignature("path(filename: string) dict", newSignatureOr(false, "path", params, ptDict))
 
   test "parse path signature no space":
     var params = newSeq[Param]()
     params.add(newParam("filename", ptString))
-    check testParseSignature("path(filename:string)dict", newSignatureOr(skNormal, "path", params, ptDict))
+    check testParseSignature("path(filename:string)dict", newSignatureOr(false, "path", params, ptDict))
 
   test "parse path signature space":
     var params = newSeq[Param]()
     params.add(newParam("name", ptString))
     check testParseSignature("  path(  name  : string  )  dict  ",
-      newSignatureOr(skNormal, "path", params, ptDict))
+      newSignatureOr(false, "path", params, ptDict))
 
   test "signature missing signature":
     check testParseSignature("", newSignatureOr(wMissingSignature, "", 0))
@@ -1809,30 +1809,30 @@ White$1
   test "processFunctionSignature none":
     var params = newSeq[Param]()
     check testProcessFunctionSignature("""fn = func("test() int")""", 10,
-      newSignatureOr(skNormal, "test", params, ptInt))
+      newSignatureOr(false, "test", params, ptInt))
 
   test "processFunctionSignature one":
     var params = newSeq[Param]()
     params.add(newParam("a", ptInt))
     check testProcessFunctionSignature("""fn = func("test(a: int) int")""", 10,
-      newSignatureOr(skNormal, "test", params, ptInt))
+      newSignatureOr(false, "test", params, ptInt))
 
   test "processFunctionSignature two":
     var params = newSeq[Param]()
     params.add(newParam("a", ptString))
     params.add(newParam("b", ptFloat))
     check testProcessFunctionSignature("""fn = func("test(a: string, b: float) dict")""", 10,
-      newSignatureOr(skNormal, "test", params, ptDict))
+      newSignatureOr(false, "test", params, ptDict))
 
   test "processFunctionSignature comment":
     var params = newSeq[Param]()
     check testProcessFunctionSignature("""fn = func("test() int")  # comment""", 10,
-      newSignatureOr(skNormal, "test", params, ptInt))
+      newSignatureOr(false, "test", params, ptInt))
 
   test "processFunctionSignature spaces":
     var params = newSeq[Param]()
     check testProcessFunctionSignature("""  fn  =  func(  "test()  int " )  # comment """, 16,
-      newSignatureOr(skNormal, "test", params, ptInt))
+      newSignatureOr(false, "test", params, ptInt))
 
   test "processFunctionSignature bad signature":
     #                                     0123456789 123456789
