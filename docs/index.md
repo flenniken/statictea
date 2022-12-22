@@ -6,7 +6,6 @@ StaticTea nim source code documentation.
 
 * [args.nim](args.md) &mdash; Types for handling command line arguments.
 * [cmdline.nim](cmdline.md) &mdash; Parse the command line.
-* [codefile.nim](codefile.md) &mdash; Run code files.
 * [comparelines.nim](comparelines.md) &mdash; Compare lines of text.
 * [env.nim](env.md) &mdash; Environment holding the input and output streams.
 * [gethelp.nim](gethelp.md) &mdash; Get the command line help message.

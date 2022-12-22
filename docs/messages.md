@@ -258,7 +258,10 @@ MessageId = enum
   wUnusedSignatureText,     ## w234
   wMissingSignature,        ## w235
   wNotLastOptional,         ## w236
-  wReturnTypeRequired        ## w237
+  wReturnTypeRequired,      ## w237
+  wMissingDocComment,       ## w238
+  wMissingStatements,       ## w239
+  wNoReturnStatement         ## w240
 ```
 
 # Messages
@@ -504,7 +507,10 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Unused extra text at the end of the signature.", ## wUnusedSignatureText
     "Missing the function signature string.", ## wMissingSignature
     "Only the last parameter can be optional.", ## wNotLastOptional
-    "The return type is required."]
+    "The return type is required.", ## wReturnTypeRequired
+    "Out of lines; Missing required doc comment.", ## wMissingDocComment
+    "Out of lines; No statements for the function.", ## wMissingStatements
+    "Out of lines; missing the function\'s return statement."]
 ```
 
 # WarningData

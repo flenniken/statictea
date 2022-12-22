@@ -8,7 +8,7 @@ import env
 import args
 import sharedtestcode
 import comparelines
-import codefile
+import runCommand
 import updateTemplate
 import linebuffer
 import parseCmdLine

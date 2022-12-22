@@ -10,7 +10,7 @@ import variables
 import vartypes
 import readjson
 import opresult
-import codefile
+import runCommand
 import runFunction
 
 proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =

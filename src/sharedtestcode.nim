@@ -378,7 +378,7 @@ when defined(test):
       lineNum = 0,
       numLines = 3,
       functionPtr: FunctionPtr = nil,
-      statementLines = newSeq[string]()): FunctionSpec =
+      statementLines = newSeq[Statement]()): FunctionSpec =
     # Create a function spec for testing.
 
     func zero(variables: Variables, parameters: seq[Value]): FunResult =
@@ -394,9 +394,9 @@ when defined(test):
       docCommentsList.add("Return the number 0.")
     else:
       docCommentsList = docComments
-    var statementLinesList: seq[string]
+    var statementLinesList: seq[Statement]
     if statementLinesList.len == 0:
-      statementLinesList.add("return 0")
+      statementLinesList.add(newStatement("return 0"))
     else:
       statementLinesList = statementLines
     let builtIn = false

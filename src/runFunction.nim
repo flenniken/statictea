@@ -2699,7 +2699,7 @@ proc createFuncDictionary*(): Value =
     let filename = "runFunction.nim"
     let lineNum = 0
     let numLines = 0
-    var statementLines = newSeq[string]()
+    var statementLines = newSeq[Statement]()
     let function = newFunc(builtIn, signatureO.get(), docComments, filename,
       lineNum, numLines, statementLines, functionPtr)
 

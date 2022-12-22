@@ -3,6 +3,8 @@
 import std/options
 import std/strutils
 import std/tables
+import std/os
+import std/streams
 import linebuffer
 import matches
 import regexes
@@ -23,18 +25,6 @@ const
   showPos = false
 
 type
-  Statement* = object
-    ## A Statement object stores the statement text and where it
-    ## @:starts in the template file.
-    ## @:
-    ## @:* lineNum -- line number, starting at 1, where the statement
-    ## @:             starts.
-    ## @:* start -- index where the statement starts
-    ## @:* text -- the statement text.
-    lineNum*: Natural
-    start*: Natural
-    text*: string
-
   PosOr* = OpResultWarn[Natural]
     ## A position in a string or a message.
 
@@ -62,6 +52,122 @@ type
 
   SpecialFunctionOr* = OpResultWarn[SpecialFunction]
     ## A SpecialFunction or a warning message.
+
+
+const
+  tripleQuotes* = "\"\"\""
+    ## Triple quotes for building strings.
+
+type
+  Found* = enum
+    ## The line endings found.
+    ## * nothing = no special ending
+    ## * plus = +
+    ## * triple = """
+    ## * newline = \\n
+    ## * plus_n = +\\n
+    ## * triple_n = """\\n
+    ## * crlf = \\r\\n
+    ## * plus_crlf = +\\r\\n
+    ## * triple_crlf = """\\r\\n
+    nothing,
+    plus,       # +
+    triple,     # """
+    newline,    # n
+    plus_n,     # +n
+    triple_n,   # """n
+    crlf,       # rn
+    plus_crlf,  # +rn
+    triple_crlf # """rn
+
+func isTriple(line: string, ch: char, ix: Natural): bool =
+  if ch == '"' and line.len >= ix-2 and
+      line[ix-1] == '"' and line[ix-2] == '"':
+    result = true
+
+proc matchTripleOrPlusSign*(line: string): Found =
+  ## Match the optional """ or + at the end of the line. This tells
+  ## whether the statement continues on the next line for code files.
+
+  type
+    Have = enum
+      have_nothing, have_lf, have_cr
+
+  var state = have_nothing
+  var ix = line.len - 1
+  while true:
+    if ix < 0 or ix >= line.len:
+      case state:
+      of have_nothing:
+        return nothing
+      of have_lf:
+        return newline
+      of have_cr:
+        return crlf
+    var ch = line[ix]
+    case state:
+    of have_nothing:
+      if ch == '\n':
+        state = have_lf
+        dec(ix)
+        continue
+      if ch == '+':
+        return plus
+      elif isTriple(line, ch, ix):
+        return triple
+      return nothing
+    of have_lf:
+      if ch == '\r':
+        state = have_cr
+        dec(ix)
+        continue
+      if ch == '+':
+        return plus_n
+      elif isTriple(line, ch, ix):
+        return triple_n
+      return newline
+    of have_cr:
+      if ch == '+':
+        return plus_crlf
+      elif isTriple(line, ch, ix):
+        return triple_crlf
+      return crlf
+
+proc addText*(line: string, found: Found, text: var string) =
+  ## Add the line up to the line-ending to the text string.
+  var skipNum: Natural
+  var addNewline = false
+  case found:
+  of nothing:
+    skipNum = 0
+  of plus:
+    skipNum = 1
+  of triple:
+    # Include the quotes.
+    skipNum = 0
+    addNewline = true
+  of newline:
+    skipNum = 1
+  of plus_n:
+    skipNum = 2
+  of triple_n:
+    # Include the quotes and newline
+    skipNum = 0
+  of crlf:
+    skipNum = 2
+  of plus_crlf:
+    skipNum = 3
+  of triple_crlf:
+    # Include the quotes.
+    skipNum = 2
+    addNewline = true
+
+  var endPos = line.len - 1 - skipNum
+  if endPos < -1:
+    endPos = -1
+  text.add(line[0 .. endPos])
+  if addNewline:
+    text.add('\n')
 
 
 func newPosOr*(warning: MessageId, p1 = "", pos = 0): PosOr =
@@ -113,11 +219,6 @@ proc startColumn*(text: string, start: Natural, message: string = "^"): string =
     inc(charCount)
     result.add(' ')
   result.add(message)
-
-func newStatement*(text: string, lineNum: Natural = 1,
-    start: Natural = 0): Statement =
-  ## Create a new statement.
-  result = Statement(lineNum: lineNum, start: start, text: text)
 
 func getFragmentAndPos*(statement: Statement, start: Natural):
      (string, Natural) =
@@ -265,6 +366,88 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
 
   if notEmptyOrSpaces(text):
     yield newStatement(strip(text), lineNum, start)
+
+proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
+  ## Read the next statement from the code file reading multiple lines
+  ## if needed.
+
+  type
+    State = enum
+      ## Parsing states.
+      start, plusSign, multiline
+
+  var text: string
+  var state = start
+  while true:
+    # Read a line.
+    var line = lb.readline()
+
+    # Validate the line is UTF-8.
+    let invalidPos = validateUtf8String(line)
+    if invalidPos != -1:
+      let statement = newStatement(line, lb.getLineNum())
+      env.warnStatement(statement,
+        newWarningData(wInvalidUtf8ByteSeq, $invalidPos, invalidPos), lb.getfilename)
+      return
+
+    if line == "":
+      var messageId: MessageId
+      case state
+        of start:
+          return # done
+        of plusSign:
+          # Out of lines looking for the plus sign line.
+          messageId = wNoPlusSignLine
+        of multiline:
+          # Out of lines looking for the multiline string.
+          messageId = wIncompleteMultiline
+      env.warn(lb.getFilename, lb.getLineNum(), newWarningData(messageId))
+      return
+
+    # Match the optional """ or + at the end of the line. This tells
+    # whether the statement continues on the next line.
+    let found = matchTripleOrPlusSign(line)
+
+    case state:
+      of start:
+        if found == plus or found == plus_n or found == plus_crlf:
+          state = plusSign
+        elif found == triple or found == triple_n or found == triple_crlf:
+          state = multiline
+
+          # Check for the case where there are starting and ending
+          # triple quotes on the same line. This catches the mistake
+          # like: a = """xyx""".
+          let triplePos = line.find(tripleQuotes)
+          if triplePos != -1 and triplePos+4 != line.len:
+            # Triple quotes must always end the line.
+            let statement = newStatement(line, lb.getLineNum())
+            env.warnStatement(statement,
+              newWarningData(wTripleAtEnd, "", triplePos+3), lb.getfilename)
+            return
+
+        addText(line, found, text)
+        if state == start:
+          break # done
+
+      of plusSign:
+        if not (found == plus or found == plus_n or found == plus_crlf):
+          state = start
+        addText(line, found, text)
+        if state == start:
+          break # done
+
+      of multiline:
+        if found == triple or found == triple_n or found == triple_crlf:
+          state = start
+          addText(line, found, text)
+        else:
+          # Add the whole line.
+          addText(line, nothing, text)
+        if state == start:
+          break # done
+
+  result = some(newStatement(text, lb.getLineNum()))
 
 func getMultilineStr*(text: string, start: Natural): ValueAndPosOr =
   ## Return the triple quoted string literal. The startPos points one
@@ -1455,12 +1638,6 @@ func newLinesOr*(lines: seq[string]): LinesOr =
   ## Return a new LinesOr object containing a list of lines.
   result = opValueW[seq[string]](lines)
 
-proc readDocComments*(env: var Env, lb: LineBuffer, statement: Statement,
-    sourceFilename: string, extraStatement: var Statement): LinesOr =
-  ## Read the doc comment lines.  Fill in the extraStatement with the
-  ## line after the comments.
-
-  return newLinesOr(wDefineFunction, "")
 
 proc readFunctionStatements*(env: var Env, lb: LineBuffer, statement: Statement,
     sourceFilename: string): LinesOr =
@@ -1576,54 +1753,87 @@ proc processFunctionSignature*(statement: Statement, start: Natural): SignatureO
 
   result = signatureOr
 
-proc defineUserFunctionAssignVar*(env: var Env, lb: LineBuffer, statement: Statement,
+func getDocComment*(statement: Statement): Option[string] =
+  ## Return the doc comment from the line when found.
+  result = none(string)
+
+func isReturnStatement*(statement: Statement): bool =
+  ## Return true when the statement is a return statement.
+
+proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: Statement,
     variables: var Variables, sourceFilename: string,
     codeFile: bool): bool =
-  ## If the statement starts a function definition, define it, assign
-  ## the variable. Return quickly when not a function definition
-  ## statement. Return true when the line(s) were handled, either by
-  ## processing the function definition or by displaying a warning
-  ## message. Return false when the line wasn't handled.
+  ## If the statement starts a function definition, define it and
+  ## assign the variable. A true return value means the statement(s)
+  ## were processed and maybe errors output. A false means the
+  ## statement should be processed as a regular statement.
 
   var leftName: string
   var operator: Operator
   var pos: Natural
   if not isFunctionDefinition(statement, leftName, operator, pos):
-    return false
+    return false # run as regular statement
+
+  let lineNum = lb.getLineNum()
 
   let signatureOr = processFunctionSignature(statement, pos)
   if signatureOr.isMessage:
     let md = signatureOr.message
     env.warnStatement(statement, md.messageId, md.p1,  md.pos, sourceFilename)
-    return true
+    return true # handled
   let signature = signatureOr.value
 
-  # Read the doc comments. The extraStatement is filled in with the
-  # statement after the doc comments.
-  var extraStatement: Statement
-  let docCommentsOr = readDocComments(env, lb, statement, sourceFilename, extraStatement)
-  if docCommentsOr.isMessage:
-    let md = docCommentsOr.message
-    env.warnStatement(statement, md.messageId, md.p1,  md.pos, sourceFilename)
-    return true
-  let docComments = docCommentsOr.value
+  # Read the doc comments.
+  var docComments = newSeq[string]()
 
-  # Add the statements to the function variable.
-  let statementLinesOr = readFunctionStatements(env, lb, extraStatement, sourceFilename)
-  if statementLinesOr.isMessage:
-    let md = statementLinesOr.message
-    env.warnStatement(statement, md.messageId, md.p1, md.pos, sourceFilename)
-    return true
-  let statementLines = statementLinesOr.value
+  let firstStatementO = readStatement(env, lb)
+  if not firstStatementO.isSome:
+    # Out of lines; Missing required doc comment.
+    env.warn(sourceFilename, lb.getLineNum, wMissingDocComment, "")
+    return true # handled
+  let strO = getDocComment(firstStatementO.get())
+  if not strO.isSome:
+    # Missing required doc comment.
+    env.warnStatement(statement, wMissingDocComment, "",  0, sourceFilename)
+    # Process it as a regular statement.
+    return true # handled
+  let str = strO.get()
+  docComments.add(str)
 
-  # todo get filename, line number and number of lines.
+  var statement: Statement
+  while true:
+    let statementO = readStatement(env, lb)
+    if not statementO.isSome:
+      # Out of lines; No statements for the function.
+      env.warn(sourceFilename, lb.getLineNum, wMissingStatements, "")
+      return true # handled
+    statement = statementO.get()
+
+    let docCommentO = getDocComment(statement)
+    if not docCommentO.isSome:
+      break
+    docComments.add(docCommentO.get())
+
+  var userStatements = newSeq[Statement]()
+  userStatements.add(statement)
+
+  while true:
+    if isReturnStatement(statement):
+      break
+    let statementO = readStatement(env, lb)
+    if not statementO.isSome:
+      # Out of lines; missing the function's return statement.
+      env.warn(sourceFilename, lb.getLineNum, wNoReturnStatement, "")
+      return true # handled
+    userStatements.add(statementO.get())
+
+  let numLines = lb.getLineNum() - lineNum
+
   func dummy(variables: Variables, parameters: seq[Value]): FunResult =
     result = newFunResult(newValue(0))
-  let filename = "filename.tea"
-  let lineNum = 0
-  let numLines = 3
-  let userFunc = newFunc(true, signature, docComments, filename, lineNum,
-    numLines, statementLines, dummy)
+
+  let userFunc = newFunc(true, signature, docComments, sourceFilename, lineNum,
+    numLines, userStatements, dummy)
   let funcVar = newValue(userFunc)
 
   # Assign the variable if possible.
@@ -1658,3 +1868,59 @@ proc runCommand*(env: var Env, cmdLines: CmdLines,
       break
 
   result = lcContinue
+
+proc runCodeFile*(env: var Env, variables: var Variables, filename: string) =
+  ## Run the code file and fill in the variables.
+
+  if not fileExists(filename):
+    # File not found: $1.
+    env.warnNoFile(wFileNotFound, filename)
+    return
+
+  # Create a stream out of the file.
+  var stream: Stream
+  stream = newFileStream(filename)
+  if stream == nil:
+    # Unable to open file: $1.
+    env.warnNoFile(wUnableToOpenFile, filename)
+    return
+  defer:
+    # Close the stream and file.
+    stream.close()
+
+  # Allocate a buffer for reading lines. Return when not enough memory.
+  let lineBufferO = newLineBuffer(stream, filename = filename)
+  if not lineBufferO.isSome():
+    # Not enough memory for the line buffer.
+    env.warnNoFile(wNotEnoughMemoryForLB)
+    return
+  var lb = lineBufferO.get()
+
+  # Read and process code lines.
+  while true:
+    let statementO = readStatement(env, lb)
+    if not statementO.isSome:
+      break # done
+    let statement = statementO.get()
+
+    # If the statement starts a function definition, define it and
+    # assign the variable. A true return value means the statement(s)
+    # were processed and maybe errors output. A false means the
+    # statement should be processed as a regular statement.
+    if defineUserFunctionAssignVar(env, lb, statement, variables, filename, codeFile=true):
+      continue
+
+    # Process a regular statement.
+    let loopControl = runStatementAssignVar(env, statement, variables, filename, codeFile=true)
+    if loopControl == lcStop:
+      break
+    elif loopControl == lcSkip:
+      # Use '...return(\"stop\")...' in a code file.
+      let warningData = newWarningData(wUseStop)
+      env.warnStatement(statement, warningData, sourceFilename = filename)
+
+proc runCodeFiles*(env: var Env, variables: var Variables, codeList: seq[string]) =
+  ## Run each code file and populate the variables.
+  for filename in codeList:
+    runCodeFile(env, variables, filename)
+    resetVariables(variables)

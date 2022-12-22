@@ -5,11 +5,13 @@ Run a command and fill in the variables dictionaries.
 * [runCommand.nim](../src/runCommand.nim) &mdash; Nim source code.
 # Index
 
-* type: [Statement](#statement) &mdash; A Statement object stores the statement text and where it
-starts in the template file.
 * type: [PosOr](#posor) &mdash; A position in a string or a message.
 * type: [SpecialFunction](#specialfunction) &mdash; The special functions.
 * type: [SpecialFunctionOr](#specialfunctionor) &mdash; A SpecialFunction or a warning message.
+* const: [tripleQuotes](#triplequotes) &mdash; Triple quotes for building strings.
+* type: [Found](#found) &mdash; The line endings found.
+* [matchTripleOrPlusSign](#matchtripleorplussign) &mdash; Match the optional """ or + at the end of the line.
+* [addText](#addtext) &mdash; Add the line up to the line-ending to the text string.
 * [newPosOr](#newposor) &mdash; Create a PosOr warning.
 * [newPosOr](#newposor-1) &mdash; Create a PosOr value.
 * [newSpecialFunctionOr](#newspecialfunctionor) &mdash; Create a PosOr warning.
@@ -17,7 +19,6 @@ starts in the template file.
 * [`==`](#) &mdash; Return true when a equals b.
 * [`!=`](#-1) &mdash; Compare whether two PosOr are not equal.
 * [startColumn](#startcolumn) &mdash; Return enough spaces to point at the start byte position of the given text.
-* [newStatement](#newstatement) &mdash; Create a new statement.
 * [getFragmentAndPos](#getfragmentandpos) &mdash; Split up a long statement around the given position.
 * [getWarnStatement](#getwarnstatement) &mdash; Return a multiline error message.
 * [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
@@ -25,6 +26,7 @@ starts in the template file.
 * [`==`](#-2) &mdash; Return true when the two statements are equal.
 * [`$`](#-3) &mdash; Return a string representation of a Statement.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
+* [readStatement](#readstatement) &mdash; Read the next statement from the code file reading multiple lines if needed.
 * [getMultilineStr](#getmultilinestr) &mdash; Return the triple quoted string literal.
 * [getString](#getstring) &mdash; Return a literal string value and position after it.
 * [getNumber](#getnumber) &mdash; Return the literal number value and position after it.
@@ -47,30 +49,15 @@ starts in the template file.
 * [newLinesOr](#newlinesor) &mdash; Return a new LinesOr object containing a warning.
 * [newLinesOr](#newlinesor-1) &mdash; Return a new LinesOr object containing a warning.
 * [newLinesOr](#newlinesor-2) &mdash; Return a new LinesOr object containing a list of lines.
-* [readDocComments](#readdoccomments) &mdash; Read the doc comment lines.
 * [readFunctionStatements](#readfunctionstatements) &mdash; Read the function definition statements and return true when successful.
 * [isFunctionDefinition](#isfunctiondefinition) &mdash; If the statement is the first line of a function definition, return true and fill in the return parameters.
 * [processFunctionSignature](#processfunctionsignature) &mdash; Process the function definition line starting at the signature string.
-* [defineUserFunctionAssignVar](#defineuserfunctionassignvar) &mdash; If the statement starts a function definition, define it, assign the variable.
+* [getDocComment](#getdoccomment) &mdash; Return the doc comment from the line when found.
+* [isReturnStatement](#isreturnstatement) &mdash; Return true when the statement is a return statement.
+* [defineUserFunctionAssignVar](#defineuserfunctionassignvar) &mdash; If the statement starts a function definition, define it and assign the variable.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
-
-# Statement
-
-A Statement object stores the statement text and where it
-starts in the template file.
-
-* lineNum -- line number, starting at 1, where the statement
-             starts.
-* start -- index where the statement starts
-* text -- the statement text.
-
-```nim
-Statement = object
-  lineNum*: Natural
-  start*: Natural
-  text*: string
-
-```
+* [runCodeFile](#runcodefile) &mdash; Run the code file and fill in the variables.
+* [runCodeFiles](#runcodefiles) &mdash; Run each code file and populate the variables.
 
 # PosOr
 
@@ -104,6 +91,49 @@ A SpecialFunction or a warning message.
 
 ```nim
 SpecialFunctionOr = OpResultWarn[SpecialFunction]
+```
+
+# tripleQuotes
+
+Triple quotes for building strings.
+
+```nim
+tripleQuotes = "\"\"\""
+```
+
+# Found
+
+The line endings found.<ul class="simple"><li>nothing = no special ending</li>
+<li>plus = +</li>
+<li>triple = """</li>
+<li>newline = \n</li>
+<li>plus_n = +\n</li>
+<li>triple_n = """\n</li>
+<li>crlf = \r\n</li>
+<li>plus_crlf = +\r\n</li>
+<li>triple_crlf = """\r\n</li>
+</ul>
+
+
+```nim
+Found = enum
+  nothing, plus, triple, newline, plus_n, triple_n, crlf, plus_crlf, triple_crlf
+```
+
+# matchTripleOrPlusSign
+
+Match the optional """ or + at the end of the line. This tells whether the statement continues on the next line for code files.
+
+```nim
+proc matchTripleOrPlusSign(line: string): Found
+```
+
+# addText
+
+Add the line up to the line-ending to the text string.
+
+```nim
+proc addText(line: string; found: Found; text: var string)
 ```
 
 # newPosOr
@@ -160,14 +190,6 @@ Return enough spaces to point at the start byte position of the given text.  Thi
 
 ```nim
 proc startColumn(text: string; start: Natural; message: string = "^"): string
-```
-
-# newStatement
-
-Create a new statement.
-
-```nim
-func newStatement(text: string; lineNum: Natural = 1; start: Natural = 0): Statement
 ```
 
 # getFragmentAndPos
@@ -227,6 +249,14 @@ Iterate through the command's statements. Skip blank statements.
 
 ```nim
 iterator yieldStatements(cmdLines: CmdLines): Statement
+```
+
+# readStatement
+
+Read the next statement from the code file reading multiple lines if needed.
+
+```nim
+proc readStatement(env: var Env; lb: var LineBuffer): Option[Statement]
 ```
 
 # getMultilineStr
@@ -464,15 +494,6 @@ Return a new LinesOr object containing a list of lines.
 func newLinesOr(lines: seq[string]): LinesOr
 ```
 
-# readDocComments
-
-Read the doc comment lines.  Fill in the extraStatement with the line after the comments.
-
-```nim
-proc readDocComments(env: var Env; lb: LineBuffer; statement: Statement;
-                     sourceFilename: string; extraStatement: var Statement): LinesOr
-```
-
 # readFunctionStatements
 
 Read the function definition statements and return true when successful.  The passed in statement is the first statement after the doc commands.
@@ -503,12 +524,28 @@ mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
 proc processFunctionSignature(statement: Statement; start: Natural): SignatureOr
 ```
 
-# defineUserFunctionAssignVar
+# getDocComment
 
-If the statement starts a function definition, define it, assign the variable. Return quickly when not a function definition statement. Return true when the line(s) were handled, either by processing the function definition or by displaying a warning message. Return false when the line wasn't handled.
+Return the doc comment from the line when found.
 
 ```nim
-proc defineUserFunctionAssignVar(env: var Env; lb: LineBuffer;
+func getDocComment(statement: Statement): Option[string]
+```
+
+# isReturnStatement
+
+Return true when the statement is a return statement.
+
+```nim
+func isReturnStatement(statement: Statement): bool
+```
+
+# defineUserFunctionAssignVar
+
+If the statement starts a function definition, define it and assign the variable. A true return value means the statement(s) were processed and maybe errors output. A false means the statement should be processed as a regular statement.
+
+```nim
+proc defineUserFunctionAssignVar(env: var Env; lb: var LineBuffer;
                                  statement: Statement; variables: var Variables;
                                  sourceFilename: string; codeFile: bool): bool
 ```
@@ -519,6 +556,22 @@ Run a command and fill in the variables dictionaries.
 
 ```nim
 proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables): LoopControl
+```
+
+# runCodeFile
+
+Run the code file and fill in the variables.
+
+```nim
+proc runCodeFile(env: var Env; variables: var Variables; filename: string)
+```
+
+# runCodeFiles
+
+Run each code file and populate the variables.
+
+```nim
+proc runCodeFiles(env: var Env; variables: var Variables; codeList: seq[string])
 ```
 
 

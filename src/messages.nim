@@ -250,6 +250,9 @@ type
     wMissingSignature,     ## w235
     wNotLastOptional,      ## w236
     wReturnTypeRequired,   ## w237
+    wMissingDocComment,    ## w238
+    wMissingStatements,    ## w239
+    wNoReturnStatement,    ## w240
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -491,6 +494,9 @@ const
     "Missing the function signature string.", ## wMissingSignature
     "Only the last parameter can be optional.", ## wNotLastOptional
     "The return type is required.", ## wReturnTypeRequired
+    "Out of lines; Missing required doc comment.", ## wMissingDocComment
+    "Out of lines; No statements for the function.", ## wMissingStatements
+    "Out of lines; missing the function's return statement.", ## wNoReturnStatement
     ]
 
     ## The message text.

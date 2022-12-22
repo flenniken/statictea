@@ -11,6 +11,8 @@ StaticTea variable types.
 * type: [ValueKind](#valuekind) &mdash; The statictea variable types.
 * type: [Value](#value) &mdash; A variable's value reference.
 * type: [ValueOr](#valueor) &mdash; A Value object or a warning.
+* type: [Statement](#statement) &mdash; A Statement object stores the statement text and where it
+starts in the template file.
 * type: [FunctionPtr](#functionptr) &mdash; Signature of a statictea built in function.
 * type: [ParamCode](#paramcode) &mdash; Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.
 * type: [ParamType](#paramtype) &mdash; The statictea parameter types.
@@ -47,6 +49,7 @@ same type which may be Value type.
 * [newEmptyListValue](#newemptylistvalue) &mdash; Return an empty list value.
 * [newEmptyDictValue](#newemptydictvalue) &mdash; Create a dictionary value from a VarsDict.
 * [`==`](#) &mdash; Return true when two variables are equal.
+* [newStatement](#newstatement) &mdash; Create a new statement.
 * [`$`](#-1) &mdash; Return a string representation of a signature.
 * [`$`](#-2) &mdash; Return a string representation of a function.
 * [jsonStringRepr](#jsonstringrepr) &mdash; Return the JSON string representation.
@@ -128,6 +131,24 @@ A Value object or a warning.
 
 ```nim
 ValueOr = OpResultWarn[Value]
+```
+
+# Statement
+
+A Statement object stores the statement text and where it
+starts in the template file.
+
+* text -- a line containing a statement
+* start -- index where the statement starts in the text
+* lineNum -- line number in the file starting at 1 where the
+statement starts.
+
+```nim
+Statement = object
+  text*: string
+  start*: Natural
+  lineNum*: Natural
+
 ```
 
 # FunctionPtr
@@ -215,7 +236,7 @@ FunctionSpec = object
   filename*: string
   lineNum*: Natural
   numLines*: Natural
-  statementLines*: seq[string]
+  statementLines*: seq[Statement]
   functionPtr*: FunctionPtr
 
 ```
@@ -456,7 +477,7 @@ Create a new func which is a FunctionSpec.
 ```nim
 func newFunc(builtIn: bool; signature: Signature; docComments: seq[string];
              filename: string; lineNum: Natural; numLines: Natural;
-             statementLines: seq[string]; functionPtr: FunctionPtr): FunctionSpec
+             statementLines: seq[Statement]; functionPtr: FunctionPtr): FunctionSpec
 ```
 
 # newValue
@@ -489,6 +510,14 @@ Return true when two variables are equal.
 
 ```nim
 proc `==`(a: Value; b: Value): bool
+```
+
+# newStatement
+
+Create a new statement.
+
+```nim
+func newStatement(text: string; lineNum: Natural = 1; start: Natural = 0): Statement
 ```
 
 # `$`

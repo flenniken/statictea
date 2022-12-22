@@ -13,7 +13,7 @@ import vartypes
 import tables
 import sharedtestcode
 import comparelines
-import codefile
+import runCommand
 import parseCmdLine
 import startingvars
 

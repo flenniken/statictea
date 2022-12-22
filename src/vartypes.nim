@@ -52,6 +52,18 @@ type
     of vkFunc:
       funcv*: FunctionSpec
 
+  Statement* = object
+    ## A Statement object stores the statement text and where it
+    ## @:starts in the template file.
+    ## @:
+    ## @:* text -- a line containing a statement
+    ## @:* start -- index where the statement starts in the text
+    ## @:* lineNum -- line number in the file starting at 1 where the
+    ## @:statement starts.
+    text*: string
+    start*: Natural
+    lineNum*: Natural
+
   FunctionPtr* = proc (variables: Variables, parameters: seq[Value]):
       FunResult {.noSideEffect.}
     ## Signature of a statictea built in function. It takes any number of values
@@ -111,7 +123,7 @@ type
     filename*: string
     lineNum*: Natural
     numLines*: Natural
-    statementLines*: seq[string]
+    statementLines*: seq[Statement]
     functionPtr*: FunctionPtr
 
   FunResultKind* = enum
@@ -275,7 +287,7 @@ proc newValue*[T](dictPairs: openArray[(string, T)]): Value =
 
 func newFunc*(builtIn: bool, signature: Signature, docComments: seq[string],
     filename: string, lineNum: Natural, numLines: Natural,
-    statementLines: seq[string], functionPtr: FunctionPtr): FunctionSpec =
+    statementLines: seq[Statement], functionPtr: FunctionPtr): FunctionSpec =
   ## Create a new func which is a FunctionSpec.
 
   when defined(test):
@@ -321,6 +333,11 @@ proc `==`*(a: Value, b: Value): bool =
         result = a.boolv == b.boolv
       of vkFunc:
         result = a.funcv == b.funcv
+
+func newStatement*(text: string, lineNum: Natural = 1,
+    start: Natural = 0): Statement =
+  ## Create a new statement.
+  result = Statement(lineNum: lineNum, start: start, text: text)
 
 func `$`*(signature: Signature): string =
   ## Return a string representation of a signature.
