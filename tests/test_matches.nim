@@ -201,6 +201,11 @@ proc testMatchParameterTypeBad(paramTypeStr: string): bool =
     return false
   result = true
 
+proc testMatchDocComment(line: string, start: Natural,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = matchDocComment(line, start)
+  result = gotExpected($matchesO, $eMatchesO, line)
+
 suite "matches.nim":
 
   test "prepost table":
@@ -717,3 +722,11 @@ suite "matches.nim":
     check testMatchParameterTypeBad("abc")
     check testMatchParameterTypeBad("optional")
     check testMatchParameterTypeBad("optional num")
+
+  test "matchDocComment":
+    check testMatchDocComment("", 0)
+    check testMatchDocComment("##", 0, some(newMatches(2, 0)))
+    check testMatchDocComment(" ##", 0, some(newMatches(3, 0)))
+    check testMatchDocComment("  ##", 0, some(newMatches(4, 0)))
+    check testMatchDocComment("## comment", 0, some(newMatches(2, 0)))
+    check testMatchDocComment("  ## comment", 0, some(newMatches(4, 0)))

@@ -281,3 +281,13 @@ proc matchParameterType*(line: string, start: Natural): Option[Matches] =
   ## Match a parameter type and the trailing whitespace.
   let pattern = r"(optional\s*){0,1}(bool|int|float|string|dict|list|func|any)\s*"
   result = matchPatternCached(line, pattern, start, 2)
+
+proc matchDocComment*(line: string, start: Natural): Option[Matches] =
+  ## Match a doc comment.
+  let pattern = r"\s*##"
+  result = matchPatternCached(line, pattern, start, 0)
+
+proc matchReturnStatement*(line: string, start: Natural): Option[Matches] =
+  ## Match a return statement. a = return(...
+  let pattern = r"\s*[a-z-A-Z_]*\s*[=&]\s*return("
+  result = matchPatternCached(line, pattern, start, 0)

@@ -115,7 +115,7 @@ type
     ## @:filename -- the filename where the function is defined either the code file or functions.nim
     ## @:lineNum -- the line number where the function definition starts
     ## @:numLines -- the number of lines to define the function
-    ## @:statementLines -- a list of the function statements for user functions
+    ## @:statements -- a list of the function statements for user functions
     ## @:functionPtr -- pointer to the function for built-in functions
     builtIn*: bool
     signature*: Signature
@@ -123,7 +123,7 @@ type
     filename*: string
     lineNum*: Natural
     numLines*: Natural
-    statementLines*: seq[Statement]
+    statements*: seq[Statement]
     functionPtr*: FunctionPtr
 
   FunResultKind* = enum
@@ -276,18 +276,18 @@ proc newValue*[T](dictPairs: openArray[(string, T)]): Value =
 #   ## Create a new built-in func which is a FunctionSpec.
 #   let builtIn = true
 #   let docComments = newSeq[string]()
-#   let statementLines = newSeq[string]()
+#   let statements = newSeq[string]()
 #   let filename = "functions.nim"
 #   let lineNum = 0
 #   let numLines = 10
 #   assert(functionPtr != nil)
 #   result = FunctionSpec(builtIn: builtIn, signature: signature, docComments: docComments,
 #                           filename: filename, lineNum: lineNum, numLines: numLines,
-#                           statementLines: statementLines, functionPtr: functionPtr)
+#                           statements: statements, functionPtr: functionPtr)
 
 func newFunc*(builtIn: bool, signature: Signature, docComments: seq[string],
     filename: string, lineNum: Natural, numLines: Natural,
-    statementLines: seq[Statement], functionPtr: FunctionPtr): FunctionSpec =
+    statements: seq[Statement], functionPtr: FunctionPtr): FunctionSpec =
   ## Create a new func which is a FunctionSpec.
 
   when defined(test):
@@ -295,12 +295,12 @@ func newFunc*(builtIn: bool, signature: Signature, docComments: seq[string],
       if functionPtr == nil:
         raiseAssert("a built-in function requires a function pointer")
     else:
-      if statementLines.len < 1:
+      if statements.len < 1:
         raiseAssert("a user function requires statement lines")
 
   result = FunctionSpec(builtIn: builtIn, signature: signature, docComments: docComments,
                           filename: filename, lineNum: lineNum, numLines: numLines,
-                          statementLines: statementLines, functionPtr: functionPtr)
+                          statements: statements, functionPtr: functionPtr)
 
 func newValue*(function: FunctionSpec): Value =
   ## Create a new func value.

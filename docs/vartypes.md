@@ -225,7 +225,7 @@ docComments -- the function document comments
 filename -- the filename where the function is defined either the code file or functions.nim
 lineNum -- the line number where the function definition starts
 numLines -- the number of lines to define the function
-statementLines -- a list of the function statements for user functions
+statements -- a list of the function statements for user functions
 functionPtr -- pointer to the function for built-in functions
 
 ```nim
@@ -236,7 +236,7 @@ FunctionSpec = object
   filename*: string
   lineNum*: Natural
   numLines*: Natural
-  statementLines*: seq[Statement]
+  statements*: seq[Statement]
   functionPtr*: FunctionPtr
 
 ```
@@ -477,7 +477,7 @@ Create a new func which is a FunctionSpec.
 ```nim
 func newFunc(builtIn: bool; signature: Signature; docComments: seq[string];
              filename: string; lineNum: Natural; numLines: Natural;
-             statementLines: seq[Statement]; functionPtr: FunctionPtr): FunctionSpec
+             statements: seq[Statement]; functionPtr: FunctionPtr): FunctionSpec
 ```
 
 # newValue

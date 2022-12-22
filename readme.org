@@ -2618,6 +2618,7 @@ List of functions:
 - [[#float][float]] -- Create a float from a number string.
 - [[#format][format]] -- Format a string using replacement variables similar to a replacement block.
 - [[#func][func]] -- Define a function.
+- [[#functionDetails][functionDetails]] -- Return the function details.
 - [[#get][get]] -- Get a dictionary value by its key.
 - [[#get][get]] -- Get a list value by its index.
 - [[#githubAnchor][githubAnchor]] -- Create Github anchor names from heading names.
@@ -2664,6 +2665,7 @@ List of functions:
 - [[#type][type]] -- Return the parameter type, one of: int, float, string, list, dict, bool or func.
 - [[#values][values]] -- Create a list out of the values in the specified dictionary.
 - [[#warn][warn]] -- Return a warning message and skip the current statement.
+- [[#ctionDetails][ctionDetails]] -- Convert the function spec to a dictionary value.
 
 [[#contents][茶]]
 
@@ -3227,6 +3229,30 @@ mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
   num1 = int(numStr1)
   num2 = int(numStr2)
   return(cmp(num1, num2))
+#+END_SRC
+
+[[#contents][茶]]
+
+** functionDetails
+:PROPERTIES:
+:CUSTOM_ID: functionDetails
+:END:
+
+Return the function details.
+
+#+BEGIN_SRC
+functionDetails(funcVar: func) dict
+#+END_SRC
+
+Example:
+
+#+BEGIN_SRC
+details = functionDetails(mycmp)
+=>
+
+
+
+
 #+END_SRC
 
 [[#contents][茶]]
@@ -4520,6 +4546,15 @@ You can warn unconditionally using a bare warn statement:
 #+BEGIN_SRC
 warn("always warn")
 #+END_SRC
+
+[[#contents][茶]]
+
+** ctionDetails
+:PROPERTIES:
+:CUSTOM_ID: ctionDetails
+:END:
+
+Convert the function spec to a dictionary value.
 
 
 # Dynamic Content Ends

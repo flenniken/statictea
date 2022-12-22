@@ -1753,12 +1753,42 @@ proc processFunctionSignature*(statement: Statement, start: Natural): SignatureO
 
   result = signatureOr
 
-func getDocComment*(statement: Statement): Option[string] =
-  ## Return the doc comment from the line when found.
-  result = none(string)
+proc isDocComment(statement: Statement): bool =
+  ## Return true when the statement is a doc comment.
+  let mO = matchDocComment(statement.text, 0)
+  result = mO.isSome
 
-func isReturnStatement*(statement: Statement): bool =
-  ## Return true when the statement is a return statement.
+# func leftOpRightFunc*(statement: Statement,
+#     retLeftName: string,
+#     retOperator: string,
+#     retRightName: string,
+#     retRightNameParen: string,
+#     retPos: Natural
+#   ): bool =
+#   ## Parse the statement and fill in the left name, operator, the
+#   ## right hand side dot name and right hand paren. Return true when
+#   ## it matches.
+#   var runningPos = 0
+
+#   var leftName: string
+#   var operator: Operator
+#   var rightName: string
+#   var pos: Natural
+#   if not leftAndOperator(statement, leftName, operator, runningPos):
+#     return false
+
+#   let mO = matchDotNames(statement.text, runningPos)
+#   if not isSome(mO):
+#     return false
+#   let (_, rightName, rightNameParen, rightLen) = mO.get3GroupsLen()
+#   runningPos += funcStrLen
+
+#   retLeftName = leftName
+#   retOperator = operator
+#   retRightName = rightName
+#   retRightNameParen = rightNameParen
+#   retPos = runningPos
+#   return true
 
 proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: Statement,
     variables: var Variables, sourceFilename: string,
@@ -1785,21 +1815,18 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
 
   # Read the doc comments.
   var docComments = newSeq[string]()
-
   let firstStatementO = readStatement(env, lb)
   if not firstStatementO.isSome:
     # Out of lines; Missing required doc comment.
     env.warn(sourceFilename, lb.getLineNum, wMissingDocComment, "")
     return true # handled
-  let strO = getDocComment(firstStatementO.get())
-  if not strO.isSome:
+  let firstStatement = firstStatementO.get()
+  if not isDocComment(firstStatement):
     # Missing required doc comment.
     env.warnStatement(statement, wMissingDocComment, "",  0, sourceFilename)
     # Process it as a regular statement.
     return true # handled
-  let str = strO.get()
-  docComments.add(str)
-
+  docComments.add(firstStatement.text)
   var statement: Statement
   while true:
     let statementO = readStatement(env, lb)
@@ -1808,24 +1835,28 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
       env.warn(sourceFilename, lb.getLineNum, wMissingStatements, "")
       return true # handled
     statement = statementO.get()
-
-    let docCommentO = getDocComment(statement)
-    if not docCommentO.isSome:
+    if not isDocComment(statement):
       break
-    docComments.add(docCommentO.get())
+    docComments.add(statement.text)
 
+  # Collect the function's statements.
   var userStatements = newSeq[Statement]()
   userStatements.add(statement)
-
   while true:
-    if isReturnStatement(statement):
-      break
+    # Look for a return statement.
+    let mO = matchDotNames(statement.text, 0)
+    if isSome(mO):
+      let (_, leftName, leftNameParen, _) = mO.get3GroupsLen()
+      if leftName == "return" and leftNameParen == "(":
+        break
+
     let statementO = readStatement(env, lb)
     if not statementO.isSome:
       # Out of lines; missing the function's return statement.
       env.warn(sourceFilename, lb.getLineNum, wNoReturnStatement, "")
       return true # handled
-    userStatements.add(statementO.get())
+    statement = statementO.get()
+    userStatements.add(statement)
 
   let numLines = lb.getLineNum() - lineNum
 
@@ -1902,6 +1933,8 @@ proc runCodeFile*(env: var Env, variables: var Variables, filename: string) =
     if not statementO.isSome:
       break # done
     let statement = statementO.get()
+
+    # todo: merge in the code for defining user functions better
 
     # If the statement starts a function definition, define it and
     # assign the variable. A true return value means the statement(s)

@@ -2394,3 +2394,42 @@ statement: a = $1multilinestring$1␊
                   ^
 """ % tripleQuotes
     check testRunCodeFile(content, eErrLines = eErrLines)
+
+  test "user function":
+    let content = """
+mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+  ## Compare two number strings
+  ## and return 1, 0, or -1.
+  num1 = int(numStr1)
+  num2 = int(numStr2)
+  return(cmp(num1, num2))
+"""
+    let eVarRep = """
+mycmp = "strNumCmp""""
+    check testRunCodeFile(content, eVarRep)
+
+  test "user function 2":
+    let content = """
+a = 5
+
+mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+  ## Compare two number strings and return 1, 0, or -1.
+  return(cmp(int(numStr1), int(numStr2)))
+
+details = functionDetails(mycmp)
+"""
+    let eVarRep = """
+a = 5
+mycmp = "strNumCmp"
+details.builtIn = true
+details.signature.optional = false
+details.signature.name = "strNumCmp"
+details.signature.paramNames = ["numStr1","numStr2"]
+details.signature.paramTypes = ["string","string"]
+details.signature.returnType = "int"
+details.docComments = ["  ## Compare two number strings and return 1, 0, or -1."]
+details.filename = "testcode.txt"
+details.lineNum = 3
+details.numLines = 2
+details.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]"""
+    check testRunCodeFile(content, eVarRep)

@@ -378,7 +378,7 @@ when defined(test):
       lineNum = 0,
       numLines = 3,
       functionPtr: FunctionPtr = nil,
-      statementLines = newSeq[Statement]()): FunctionSpec =
+      statements = newSeq[Statement]()): FunctionSpec =
     # Create a function spec for testing.
 
     func zero(variables: Variables, parameters: seq[Value]): FunResult =
@@ -394,11 +394,11 @@ when defined(test):
       docCommentsList.add("Return the number 0.")
     else:
       docCommentsList = docComments
-    var statementLinesList: seq[Statement]
-    if statementLinesList.len == 0:
-      statementLinesList.add(newStatement("return 0"))
+    var statementsList: seq[Statement]
+    if statementsList.len == 0:
+      statementsList.add(newStatement("return 0"))
     else:
-      statementLinesList = statementLines
+      statementsList = statements
     let builtIn = false
     result = newFunc(builtIn, signatureO.get(), docCommentsList, filename,
-      lineNum, numLines, statementLinesList, functionPtrDefault)
+      lineNum, numLines, statementsList, functionPtrDefault)

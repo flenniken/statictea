@@ -2006,3 +2006,57 @@ d.sub.y = 4"""
     var arguments = @[newValue("signature")]
     let eFunResult = newFunResultWarn(wDefineFunction)
     check testFunction("func", arguments, eFunResult)
+
+  test "signatureDetails":
+    var signatureO = newSignatureO("thename", "isp")
+    let details = signatureDetails(signatureO.get())
+    let got = dotNameRep(details.dictv, "signature")
+    let expected = """
+signature.optional = false
+signature.name = "thename"
+signature.paramNames = ["a","b"]
+signature.paramTypes = ["int","string"]
+signature.returnType = "func""""
+    check gotExpected(got, expected)
+
+  test "signatureDetails2":
+    var signatureO = newSignatureO("n", "d")
+    let details = signatureDetails(signatureO.get())
+    let got = dotNameRep(details.dictv, "signature")
+    let expected = """
+signature.optional = false
+signature.name = "n"
+signature.paramNames = []
+signature.paramTypes = []
+signature.returnType = "dict""""
+    check gotExpected(got, expected)
+
+  test "signatureDetails3":
+    var signatureO = newSignatureO("thename", "islosf")
+    let details = signatureDetails(signatureO.get())
+    let got = dotNameRep(details.dictv, "signature")
+    let expected = """
+signature.optional = true
+signature.name = "thename"
+signature.paramNames = ["a","b","c","d"]
+signature.paramTypes = ["int","string","list","string"]
+signature.returnType = "float""""
+    check gotExpected(got, expected)
+
+  test "functionDetails":
+    let functionSpec = newDummyFunctionSpec()
+    let details = functionDetails(functionSpec)
+    let got = dotNameRep(details.dictv, "spec")
+    let expected = """
+spec.builtIn = false
+spec.signature.optional = false
+spec.signature.name = "zero"
+spec.signature.paramNames = []
+spec.signature.paramTypes = []
+spec.signature.returnType = "int"
+spec.docComments = ["Return the number 0."]
+spec.filename = "test.nim"
+spec.lineNum = 0
+spec.numLines = 3
+spec.statements = ["return 0"]"""
+    check gotExpected(got, expected)

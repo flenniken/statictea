@@ -5,6 +5,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [functions.nim](../src/functions.nim) &mdash; Nim source code.
 # Index
 
+* [signatureDetails](#signaturedetails) &mdash; Convert the signature object to a dictionary value.
+* [functionDetails](#functiondetails) &mdash; Convert the function spec to a dictionary value.
 * [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
 * [parseNumber](#parsenumber) &mdash; Return the literal number value and position after it.
 * type: [StringOr](#stringor) &mdash; A string or a warning.
@@ -68,6 +70,7 @@ their values.
 * [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names.
 * [funFormat_ss](#funformat_ss) &mdash; Format a string using replacement variables similar to a replacement block.
 * [funFunc_sp](#funfunc_sp) &mdash; Define a function.
+* [funFunctionDetails_pd](#funfunctiondetails_pd) &mdash; Return the function details.
 * [funStartsWith_ssb](#funstartswith_ssb) &mdash; Check whether a strings starts with the given prefix.
 * [funNot_bb](#funnot_bb) &mdash; Boolean not.
 * [funAnd_bbb](#funand_bbb) &mdash; Boolean AND with short circuit.
@@ -90,6 +93,22 @@ their values.
 * const: [functionsList](#functionslist) &mdash; Sorted list of built in functions, their function name, nim name and their signature.
 * [getBestFunction](#getbestfunction) &mdash; Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
 * [createFuncDictionary](#createfuncdictionary) &mdash; Create the f dictionary from the built in functions.
+
+# signatureDetails
+
+Convert the signature object to a dictionary value.
+
+```nim
+func signatureDetails(signature: Signature): Value
+```
+
+# functionDetails
+
+Convert the function spec to a dictionary value.
+
+```nim
+func functionDetails(fs: FunctionSpec): Value
+```
 
 # cmpBaseValues
 
@@ -1618,6 +1637,29 @@ mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
 func funFunc_sp(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
+# funFunctionDetails_pd
+
+Return the function details.
+
+~~~
+functionDetails(funcVar: func) dict
+~~~~
+
+Example:
+
+~~~
+details = functionDetails(mycmp)
+=>
+
+
+
+
+~~~~
+
+```nim
+func funFunctionDetails_pd(variables: Variables; parameters: seq[Value]): FunResult
+```
+
 # funStartsWith_ssb
 
 Check whether a strings starts with the given prefix. Return true when it does, else false.
@@ -2011,7 +2053,9 @@ functionsList = [("add", funAdd_fff, "fff"), ("add", funAdd_iii, "iii"),
                  ("find", funFind_ssoaa, "ssoaa"),
                  ("float", funFloat_if, "if"), ("float", funFloat_saa, "saa"),
                  ("float", funFloat_sf, "sf"), ("format", funFormat_ss, "ss"),
-                 ("func", funFunc_sp, "sp"), ("get", funGet_dsoaa, "dsoaa"),
+                 ("func", funFunc_sp, "sp"),
+                 ("functionDetails", funFunctionDetails_pd, "pd"),
+                 ("get", funGet_dsoaa, "dsoaa"),
                  ("get", funGet_lioaa, "lioaa"),
                  ("githubAnchor", funGithubAnchor_ll, "ll"),
                  ("githubAnchor", funGithubAnchor_ss, "ss"),

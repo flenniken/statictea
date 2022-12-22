@@ -31,6 +31,8 @@ Methods for matching sub-strings.
 * [matchCompareOperator](#matchcompareoperator) &mdash; Match the compare operators and the trailing whitespace.
 * [matchReplCmd](#matchreplcmd) &mdash; Match the REPL commands and the trailing optional whitespace.
 * [matchParameterType](#matchparametertype) &mdash; Match a parameter type and the trailing whitespace.
+* [matchDocComment](#matchdoccomment) &mdash; Match a doc comment.
+* [matchReturnStatement](#matchreturnstatement) &mdash; Match a return statement.
 
 # commands
 
@@ -275,6 +277,22 @@ Match a parameter type and the trailing whitespace.
 
 ```nim
 proc matchParameterType(line: string; start: Natural): Option[Matches]
+```
+
+# matchDocComment
+
+Match a doc comment.
+
+```nim
+proc matchDocComment(line: string; start: Natural): Option[Matches]
+```
+
+# matchReturnStatement
+
+Match a return statement. a = return(...
+
+```nim
+proc matchReturnStatement(line: string; start: Natural): Option[Matches]
 ```
 
 

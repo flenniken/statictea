@@ -28,6 +28,36 @@ template tMapParameters(functionName: string, signatureCode: string) =
     return funResult
   let map {.inject.} = funResult.value.dictv
 
+func signatureDetails*(signature: Signature): Value =
+  ## Convert the signature object to a dictionary value.
+  var dictv = newVarsDict()
+  dictv["optional"] = newValue(signature.optional)
+  dictv["name"] = newValue(signature.name)
+  var paramNames = newSeq[string]()
+  var paramTypes = newSeq[string]()
+  for param in signature.params:
+    paramNames.add($param.name)
+    paramTypes.add($param.paramType)
+  dictv["paramNames"] = newValue(paramNames)
+  dictv["paramTypes"] = newValue(paramTypes)
+  dictv["returnType"] = newValue($signature.returnType)
+  result = newValue(dictv)
+
+func functionDetails*(fs: FunctionSpec): Value =
+  ## Convert the function spec to a dictionary value.
+  var dictv = newVarsDict()
+  dictv["builtIn"] = newValue(fs.builtIn)
+  dictv["signature"] = signatureDetails(fs.signature)
+  dictv["docComments"] = newValue(fs.docComments)
+  dictv["filename"] = newValue(fs.filename)
+  dictv["lineNum"] = newValue(fs.lineNum)
+  dictv["numLines"] = newValue(fs.numLines)
+  var statementStrings = newSeq[string]()
+  for statement in fs.statements:
+    statementStrings.add(statement.text)
+  dictv["statements"] = newValue(statementStrings)
+  result = newValue(dictv)
+
 func cmpBaseValues*(a, b: Value, insensitive: bool = false): int =
   ## Compares two values a and b.  When a equals b return 0, when a is
   ## greater than b return 1 and when a is less than b return -1.
@@ -2163,6 +2193,28 @@ func funFunc_sp*(variables: Variables, parameters: seq[Value]): FunResult =
   # is called for nested calls to func and it returns a warning.
   result = newFunResultWarn(wDefineFunction)
 
+func funFunctionDetails_pd*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## Return the function details.
+  ## @:
+  ## @:~~~
+  ## @:functionDetails(funcVar: func) dict
+  ## @:~~~~
+  ## @:
+  ## @:Example:
+  ## @:
+  ## @:~~~
+  ## @:details = functionDetails(mycmp)
+  ## @:=>
+  ## @:
+  ## @:
+  ## @:
+  ## @:
+  ## @:~~~~
+  tMapParameters("functionDetails", "pd")
+  let functionSpec = map["a"].funcv
+  let details = functionDetails(functionSpec)
+  result = newFunResult(details)
+
 func funStartsWith_ssb*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Check whether a strings starts with the given prefix. Return true
   ## when it does, else false.
@@ -2573,6 +2625,7 @@ const
     ("float", funFloat_sf, "sf"),
     ("format", funFormat_ss, "ss"),
     ("func", funFunc_sp, "sp"),
+    ("functionDetails", funFunctionDetails_pd, "pd"),
     ("get", funGet_dsoaa, "dsoaa"),
     ("get", funGet_lioaa, "lioaa"),
     ("githubAnchor", funGithubAnchor_ll, "ll"),

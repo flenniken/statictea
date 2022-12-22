@@ -52,8 +52,6 @@ Run a command and fill in the variables dictionaries.
 * [readFunctionStatements](#readfunctionstatements) &mdash; Read the function definition statements and return true when successful.
 * [isFunctionDefinition](#isfunctiondefinition) &mdash; If the statement is the first line of a function definition, return true and fill in the return parameters.
 * [processFunctionSignature](#processfunctionsignature) &mdash; Process the function definition line starting at the signature string.
-* [getDocComment](#getdoccomment) &mdash; Return the doc comment from the line when found.
-* [isReturnStatement](#isreturnstatement) &mdash; Return true when the statement is a return statement.
 * [defineUserFunctionAssignVar](#defineuserfunctionassignvar) &mdash; If the statement starts a function definition, define it and assign the variable.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 * [runCodeFile](#runcodefile) &mdash; Run the code file and fill in the variables.
@@ -522,22 +520,6 @@ mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
 
 ```nim
 proc processFunctionSignature(statement: Statement; start: Natural): SignatureOr
-```
-
-# getDocComment
-
-Return the doc comment from the line when found.
-
-```nim
-func getDocComment(statement: Statement): Option[string]
-```
-
-# isReturnStatement
-
-Return true when the statement is a return statement.
-
-```nim
-func isReturnStatement(statement: Statement): bool
 ```
 
 # defineUserFunctionAssignVar
