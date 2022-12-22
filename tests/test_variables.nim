@@ -9,7 +9,7 @@ import sharedtestcode
 import messages
 import readjson
 import opresult
-import runFunction
+import functions
 import version
 
 proc testGetVariableOk(variables: Variables, dotNameStr: string, eJson:

@@ -1,5 +1,5 @@
 bin/
 testfiles/t.txt
 docs/readmeFuncs.org
-docs/runFunction.json
+docs/functions.json
 *.dot

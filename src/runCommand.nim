@@ -12,7 +12,7 @@ import env
 import vartypes
 import messages
 import variables
-import runFunction
+import functions
 import readjson
 import opresult
 import unicodes

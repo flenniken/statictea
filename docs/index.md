@@ -8,6 +8,7 @@ StaticTea nim source code documentation.
 * [cmdline.nim](cmdline.md) &mdash; Parse the command line.
 * [comparelines.nim](comparelines.md) &mdash; Compare lines of text.
 * [env.nim](env.md) &mdash; Environment holding the input and output streams.
+* [functions.nim](functions.md) &mdash; This module contains the StaticTea functions and supporting types.
 * [gethelp.nim](gethelp.md) &mdash; Get the command line help message.
 * [linebuffer.nim](linebuffer.md) &mdash; Read lines from a stream without exceeding the maximum line
 length.
@@ -23,7 +24,6 @@ length.
 * [repl.nim](repl.md) &mdash; Run commands at a prompt.
 * [replacement.nim](replacement.md) &mdash; Handle the replacement block lines.
 * [runCommand.nim](runCommand.md) &mdash; Run a command and fill in the variables dictionaries.
-* [runFunction.nim](runFunction.md) &mdash; This module contains the StaticTea functions and supporting types.
 * [runner.nim](runner.md) &mdash; A standalone command to run Single Test File (stf) files.
 * [signatures.nim](signatures.md) &mdash; Statictea function signatures and parameter checking.
 * [startingvars.nim](startingvars.md) &mdash; Get the starting variables.

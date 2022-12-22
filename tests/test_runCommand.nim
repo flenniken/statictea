@@ -5,7 +5,7 @@ import std/strutils
 import std/tables
 import std/streams
 import runCommand
-import runFunction
+import functions
 import parseCmdLine
 import env
 import args

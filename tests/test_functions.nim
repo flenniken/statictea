@@ -3,7 +3,7 @@ import std/options
 import std/strutils
 import std/tables
 import vartypes
-import runFunction
+import functions
 import messages
 import variables
 import opresult
@@ -176,7 +176,7 @@ proc testFormatStringWarn(str: string, eWarningData: WarningData,
     echo str
     echo getWarningLine("", 0, warningData.messageId, warningData.p1)
 
-suite "runFunction.nim":
+suite "functions.nim":
 
   test "getBestFunction function value":
     let value = newValue(newDummyFunctionSpec())

@@ -1395,16 +1395,16 @@ func funPath_sosd*(variables: Variables, parameters: seq[Value]): FunResult =
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:path("src/runFunction.nim") => {
-  ## @:  "filename": "runFunction.nim",
-  ## @:  "basename": "runFunction",
+  ## @:path("src/functions.nim") => {
+  ## @:  "filename": "functions.nim",
+  ## @:  "basename": "functions",
   ## @:  "ext": ".nim",
   ## @:  "dir": "src/",
   ## @:}
   ## @:
-  ## @:path("src\\runFunction.nim", "\\") => {
-  ## @:  "filename": "runFunction.nim",
-  ## @:  "basename": "runFunction",
+  ## @:path("src\\functions.nim", "\\") => {
+  ## @:  "filename": "functions.nim",
+  ## @:  "basename": "functions",
   ## @:  "ext": ".nim",
   ## @:  "dir": "src\\",
   ## @:}
@@ -2696,7 +2696,7 @@ proc createFuncDictionary*(): Value =
     let builtIn = true
     var docComments = newSeq[string]()
     docComments.add(functionName)
-    let filename = "runFunction.nim"
+    let filename = "functions.nim"
     let lineNum = 0
     let numLines = 0
     var statementLines = newSeq[Statement]()

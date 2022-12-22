@@ -1,8 +1,8 @@
-# runFunction.nim
+# functions.nim
 
 This module contains the StaticTea functions and supporting types. The StaticTea language functions start with "fun", for example, the "funCmp" function implements the StaticTea "cmp" function.
 
-* [runFunction.nim](../src/runFunction.nim) &mdash; Nim source code.
+* [functions.nim](../src/functions.nim) &mdash; Nim source code.
 # Index
 
 * [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
@@ -1071,16 +1071,16 @@ path(filename: string, separator: optional string) dict
 Examples:
 
 ~~~
-path("src/runFunction.nim") => {
-  "filename": "runFunction.nim",
-  "basename": "runFunction",
+path("src/functions.nim") => {
+  "filename": "functions.nim",
+  "basename": "functions",
   "ext": ".nim",
   "dir": "src/",
 }
 
-path("src\runFunction.nim", "\") => {
-  "filename": "runFunction.nim",
-  "basename": "runFunction",
+path("src\functions.nim", "\") => {
+  "filename": "functions.nim",
+  "basename": "functions",
   "ext": ".nim",
   "dir": "src\",
 }

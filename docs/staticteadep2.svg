@@ -135,17 +135,17 @@
 <path fill="none" stroke="black" d="M116.44,-757.83C176.38,-712 325.41,-602.5 464.38,-536.04 475.69,-530.63 488.36,-525.88 500.3,-521.93"/>
 <polygon fill="black" stroke="black" points="501.09,-525.36 509.56,-519 498.97,-518.68 501.09,-525.36"/>
 </g>
-<!-- runFunction -->
+<!-- functions -->
 <g id="node25" class="node">
-<title>runFunction</title>
-<ellipse fill="none" stroke="black" cx="547.57" cy="-401.04" rx="53.89" ry="18"/>
-<text text-anchor="middle" x="547.57" y="-397.34" font-family="Times,serif" font-size="14.00">runFunction</text>
+<title>functions</title>
+<ellipse fill="none" stroke="black" cx="547.57" cy="-401.04" rx="43.59" ry="18"/>
+<text text-anchor="middle" x="547.57" y="-397.34" font-family="Times,serif" font-size="14.00">functions</text>
 </g>
-<!-- strutils&#45;&gt;runFunction -->
+<!-- strutils&#45;&gt;functions -->
 <g id="edge47" class="edge">
-<title>strutils&#45;&gt;runFunction</title>
-<path fill="none" stroke="black" d="M118.61,-758.27C135.88,-745.71 157.87,-729.08 176.38,-713.04 312.47,-595.11 310.74,-521.98 464.38,-428.04 472.85,-422.86 482.43,-418.56 491.98,-415.02"/>
-<polygon fill="black" stroke="black" points="492.93,-418.39 501.26,-411.84 490.66,-411.77 492.93,-418.39"/>
+<title>strutils&#45;&gt;functions</title>
+<path fill="none" stroke="black" d="M118.61,-758.27C135.88,-745.71 157.87,-729.08 176.38,-713.04 312.47,-595.11 310.74,-521.98 464.38,-428.04 474.58,-421.81 486.38,-416.84 497.8,-412.95"/>
+<polygon fill="black" stroke="black" points="498.64,-416.36 507.12,-410.01 496.53,-409.68 498.64,-416.36"/>
 </g>
 <!-- unicodes -->
 <g id="node31" class="node">
@@ -291,11 +291,11 @@
 <path fill="none" stroke="black" d="M133.57,-663.31C147.3,-658.11 162.47,-652.35 176.38,-647.04 304.53,-598.1 335.18,-582.13 464.38,-536.04 476.51,-531.71 489.74,-527.26 501.96,-523.24"/>
 <polygon fill="black" stroke="black" points="502.99,-526.59 511.41,-520.16 500.82,-519.93 502.99,-526.59"/>
 </g>
-<!-- options&#45;&gt;runFunction -->
+<!-- options&#45;&gt;functions -->
 <g id="edge45" class="edge">
-<title>options&#45;&gt;runFunction</title>
-<path fill="none" stroke="black" d="M136.46,-664.98C149.73,-660 163.92,-653.94 176.38,-647.04 317.04,-569.11 322.03,-502.83 464.38,-428.04 473.46,-423.27 483.55,-419.12 493.46,-415.61"/>
-<polygon fill="black" stroke="black" points="494.28,-419.02 502.65,-412.52 492.05,-412.39 494.28,-419.02"/>
+<title>options&#45;&gt;functions</title>
+<path fill="none" stroke="black" d="M136.46,-664.98C149.73,-660 163.92,-653.94 176.38,-647.04 317.04,-569.11 322.03,-502.83 464.38,-428.04 475.06,-422.43 487.13,-417.68 498.67,-413.81"/>
+<polygon fill="black" stroke="black" points="499.59,-417.19 508.06,-410.82 497.47,-410.52 499.59,-417.19"/>
 </g>
 <!-- parseNumber -->
 <g id="node28" class="node">
@@ -399,11 +399,11 @@
 <path fill="none" stroke="black" d="M134.3,-603.69C220.88,-583.81 409.63,-540.48 498.49,-520.08"/>
 <polygon fill="black" stroke="black" points="499.15,-523.52 508.11,-517.87 497.58,-516.7 499.15,-523.52"/>
 </g>
-<!-- tables&#45;&gt;runFunction -->
+<!-- tables&#45;&gt;functions -->
 <g id="edge46" class="edge">
-<title>tables&#45;&gt;runFunction</title>
-<path fill="none" stroke="black" d="M130,-599.81C144.78,-594.34 161.49,-587.78 176.38,-581.04 308.42,-521.27 331.04,-484.87 464.38,-428.04 474.23,-423.85 484.96,-419.89 495.32,-416.38"/>
-<polygon fill="black" stroke="black" points="496.09,-419.81 504.49,-413.35 493.9,-413.16 496.09,-419.81"/>
+<title>tables&#45;&gt;functions</title>
+<path fill="none" stroke="black" d="M130,-599.81C144.78,-594.34 161.49,-587.78 176.38,-581.04 308.42,-521.27 331.04,-484.87 464.38,-428.04 475.81,-423.17 488.43,-418.63 500.28,-414.72"/>
+<polygon fill="black" stroke="black" points="501,-418.16 509.45,-411.77 498.85,-411.5 501,-418.16"/>
 </g>
 <!-- signatures -->
 <g id="node32" class="node">
@@ -489,11 +489,11 @@
 <path fill="none" stroke="black" d="M114.76,-1011.46C185.59,-1026.49 385.74,-1068.93 486.73,-1090.35"/>
 <polygon fill="black" stroke="black" points="485.96,-1093.76 496.47,-1092.41 487.41,-1086.92 485.96,-1093.76"/>
 </g>
-<!-- os&#45;&gt;runFunction -->
+<!-- os&#45;&gt;functions -->
 <g id="edge49" class="edge">
-<title>os&#45;&gt;runFunction</title>
-<path fill="none" stroke="black" d="M100.67,-984.4C151.51,-889.31 358.46,-509.61 464.38,-428.04 471.99,-422.18 480.93,-417.56 490.06,-413.93"/>
-<polygon fill="black" stroke="black" points="491.13,-417.27 499.37,-410.62 488.78,-410.67 491.13,-417.27"/>
+<title>os&#45;&gt;functions</title>
+<path fill="none" stroke="black" d="M100.67,-984.4C151.51,-889.31 358.46,-509.61 464.38,-428.04 473.76,-420.82 485.15,-415.48 496.43,-411.56"/>
+<polygon fill="black" stroke="black" points="497.2,-414.99 505.7,-408.67 495.11,-408.31 497.2,-414.99"/>
 </g>
 <!-- os&#45;&gt;readjson -->
 <g id="edge57" class="edge">
@@ -641,11 +641,11 @@
 <ellipse fill="none" stroke="red" cx="88.19" cy="-24.04" rx="45.92" ry="24.08"/>
 <text text-anchor="middle" x="88.19" y="-17.84" font-family="Times,serif" font-size="24.00">math</text>
 </g>
-<!-- math&#45;&gt;runFunction -->
+<!-- math&#45;&gt;functions -->
 <g id="edge48" class="edge">
-<title>math&#45;&gt;runFunction</title>
-<path fill="none" stroke="red" d="M128.84,-35.71C144.45,-41.36 162.03,-49.1 176.38,-59.04 332.3,-167.08 305.06,-271.08 464.38,-374.04 472.63,-379.37 482.03,-383.74 491.45,-387.29"/>
-<polygon fill="red" stroke="red" points="490.01,-390.5 500.6,-390.47 492.3,-383.88 490.01,-390.5"/>
+<title>math&#45;&gt;functions</title>
+<path fill="none" stroke="red" d="M128.84,-35.71C144.45,-41.36 162.03,-49.1 176.38,-59.04 332.3,-167.08 305.06,-271.08 464.38,-374.04 474.42,-380.53 486.16,-385.59 497.57,-389.49"/>
+<polygon fill="red" stroke="red" points="496.31,-392.76 506.9,-392.42 498.41,-386.08 496.31,-392.76"/>
 </g>
 <!-- math&#45;&gt;timer -->
 <g id="edge76" class="edge">
@@ -660,11 +660,11 @@
 <polygon fill="none" stroke="black" points="176.57,-384.3 176.57,-411.78 123.74,-428.09 52.64,-428.09 -0.19,-411.78 -0.19,-384.3 52.64,-368 123.74,-368 176.57,-384.3"/>
 <text text-anchor="middle" x="88.19" y="-391.84" font-family="Times,serif" font-size="24.00">algorithm</text>
 </g>
-<!-- algorithm&#45;&gt;runFunction -->
+<!-- algorithm&#45;&gt;functions -->
 <g id="edge50" class="edge">
-<title>algorithm&#45;&gt;runFunction</title>
-<path fill="none" stroke="black" d="M176.84,-398.62C266.09,-399.2 402.36,-400.1 482.15,-400.62"/>
-<polygon fill="black" stroke="black" points="481.96,-404.12 491.99,-400.68 482.01,-397.12 481.96,-404.12"/>
+<title>algorithm&#45;&gt;functions</title>
+<path fill="none" stroke="black" d="M176.84,-398.62C269.98,-399.23 414.32,-400.17 492.25,-400.69"/>
+<polygon fill="black" stroke="black" points="492.17,-404.18 502.19,-400.75 492.22,-397.18 492.17,-404.18"/>
 </g>
 <!-- parseutils -->
 <g id="node29" class="node">

@@ -627,17 +627,17 @@ proc taskDocs(namePart: string, forceRebuild = false) =
   echoGrip()
 
 proc taskReadMeFun() =
-  ## Create the readme function section from the runFunctions.nim
+  ## Create the readme function section from the functions.nim
   ## file.
 
-  let filename = "runFunction.nim"
+  let filename = "functions.nim"
   var jsonName = joinPath("docs", changeFileExt(filename, "json"))
   let hintsOff = "--hint[Conf]:off --hint[SuccessX]:off --hint[Name]:off"
   var cmd = "nim $1 jsondoc --out:$2 src/$3" %
     [hintsOff, jsonName, filename]
   exec cmd
   echo ""
-  echo "Exported runFunctions.nim json doc comments to $1" % [jsonName]
+  echo "Exported functions.nim json doc comments to $1" % [jsonName]
 
   # Create the readme function section org file.
   let templateName = joinPath("templates", "readmeFuncSection.org")

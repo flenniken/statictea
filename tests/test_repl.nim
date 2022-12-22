@@ -5,7 +5,7 @@ import repl
 import variables
 import sharedtestcode
 import vartypes
-import runfunction
+import functions
 import version
 
 proc testHandleReplLine(line: string, eStr = "", eStop = false, start: Natural = 5): bool =

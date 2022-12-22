@@ -222,7 +222,7 @@ Holds the function details.
 builtIn -- true for the built-in functions, false for user functions
 signature -- the function signature
 docComments -- the function document comments
-filename -- the filename where the function is defined either the code file or runFunctions.nim
+filename -- the filename where the function is defined either the code file or functions.nim
 lineNum -- the line number where the function definition starts
 numLines -- the number of lines to define the function
 statementLines -- a list of the function statements for user functions

@@ -11,7 +11,7 @@ import vartypes
 import readjson
 import opresult
 import runCommand
-import runFunction
+import functions
 
 proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
   ## Read json files and return a variable dictionary.  Skip a
