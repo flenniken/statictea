@@ -24,6 +24,9 @@ const
   # positions when running a statement.
   showPos = false
 
+  tripleQuotes* = "\"\"\""
+    ## Triple quotes for building strings.
+
 type
   PosOr* = OpResultWarn[Natural]
     ## A position in a string or a message.
@@ -53,12 +56,6 @@ type
   SpecialFunctionOr* = OpResultWarn[SpecialFunction]
     ## A SpecialFunction or a warning message.
 
-
-const
-  tripleQuotes* = "\"\"\""
-    ## Triple quotes for building strings.
-
-type
   Found* = enum
     ## The line endings found.
     ## * nothing = no special ending
@@ -79,6 +76,74 @@ type
     crlf,       # rn
     plus_crlf,  # +rn
     triple_crlf # """rn
+
+  LinesOr* = OpResultWarn[seq[string]]
+    ## A list of lines or a warning.
+
+  LoopControl* = enum
+    ## Controls whether to output the current replacement block
+    ## iteration and whether to stop or not.
+    ## @:
+    ## @:* lcStop -- do not output this replacement block and stop iterating
+    ## @:* lcSkip -- do not output this replacement block and continue with the next iteration
+    ## @:* lcContinue -- output the replacment block and continue with the next iteration
+    lcStop,
+    lcSkip,
+    lcContinue,
+
+func newLinesOr*(warning: MessageId, p1: string = "", pos = 0):
+     LinesOr =
+  ## Return a new LinesOr object containing a warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[seq[string]](warningData)
+
+func newLinesOr*(warningData: WarningData): LinesOr =
+  ## Return a new LinesOr object containing a warning.
+  result = opMessageW[seq[string]](warningData)
+
+func newLinesOr*(lines: seq[string]): LinesOr =
+  ## Return a new LinesOr object containing a list of lines.
+  result = opValueW[seq[string]](lines)
+
+func newPosOr*(warning: MessageId, p1 = "", pos = 0): PosOr =
+  ## Create a PosOr warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[Natural](warningData)
+
+func newPosOr*(pos: Natural): PosOr =
+  ## Create a PosOr value.
+  result = opValueW[Natural](pos)
+
+func newSpecialFunctionOr*(warning: MessageId, p1 = "", pos = 0): SpecialFunctionOr =
+  ## Create a PosOr warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[SpecialFunction](warningData)
+
+func newSpecialFunctionOr*(specialFunction: SpecialFunction): SpecialFunctionOr =
+  ## Create a SpecialFunctionOr value.
+  result = opValueW[SpecialFunction](specialFunction)
+
+func `$`*(s: Statement): string =
+  ## Return a string representation of a Statement.
+  result = """$1, $2: "$3"""" % [$s.lineNum, $s.start, s.text]
+
+func `==`*(s1: Statement, s2: Statement): bool =
+  ## Return true when the two statements are equal.
+  if s1.lineNum == s2.lineNum and s1.start == s2.start and
+      s1.text == s2.text:
+    result = true
+
+proc `==`*(a: PosOr, b: PosOr): bool =
+  ## Return true when a equals b.
+  if a.kind == b.kind:
+    if a.isMessage:
+      result = a.message == b.message
+    else:
+      result = a.value == b.value
+
+proc `!=`*(a: PosOr, b: PosOr): bool =
+  ## Compare whether two PosOr are not equal.
+  result = not (a == b)
 
 func isTriple(line: string, ch: char, ix: Natural): bool =
   if ch == '"' and line.len >= ix-2 and
@@ -168,37 +233,6 @@ proc addText*(line: string, found: Found, text: var string) =
   text.add(line[0 .. endPos])
   if addNewline:
     text.add('\n')
-
-
-func newPosOr*(warning: MessageId, p1 = "", pos = 0): PosOr =
-  ## Create a PosOr warning.
-  let warningData = newWarningData(warning, p1, pos)
-  result = opMessageW[Natural](warningData)
-
-func newPosOr*(pos: Natural): PosOr =
-  ## Create a PosOr value.
-  result = opValueW[Natural](pos)
-
-func newSpecialFunctionOr*(warning: MessageId, p1 = "", pos = 0): SpecialFunctionOr =
-  ## Create a PosOr warning.
-  let warningData = newWarningData(warning, p1, pos)
-  result = opMessageW[SpecialFunction](warningData)
-
-func newSpecialFunctionOr*(specialFunction: SpecialFunction): SpecialFunctionOr =
-  ## Create a SpecialFunctionOr value.
-  result = opValueW[SpecialFunction](specialFunction)
-
-proc `==`*(a: PosOr, b: PosOr): bool =
-  ## Return true when a equals b.
-  if a.kind == b.kind:
-    if a.isMessage:
-      result = a.message == b.message
-    else:
-      result = a.value == b.value
-
-proc `!=`*(a: PosOr, b: PosOr): bool =
-  ## Compare whether two PosOr are not equal.
-  result = not (a == b)
 
 proc startColumn*(text: string, start: Natural, message: string = "^"): string =
   ## Return enough spaces to point at the start byte position of the
@@ -310,16 +344,6 @@ proc warnStatement*(env: var Env, statement: Statement,
     messageId: MessageId, p1: string, pos:Natural, sourceFilename = "") =
   let warningData = newWarningData(messageId, p1, pos)
   env.warnStatement(statement, warningData, sourceFilename)
-
-func `==`*(s1: Statement, s2: Statement): bool =
-  ## Return true when the two statements are equal.
-  if s1.lineNum == s2.lineNum and s1.start == s2.start and
-      s1.text == s2.text:
-    result = true
-
-func `$`*(s: Statement): string =
-  ## Return a string representation of a Statement.
-  result = """$1, $2: "$3"""" % [$s.lineNum, $s.start, s.text]
 
 iterator yieldStatements*(cmdLines: CmdLines): Statement =
   ## Iterate through the command's statements. Skip blank statements.
@@ -1471,18 +1495,6 @@ proc runStatement*(statement: Statement, variables: Variables):
   # Return the variable dot name and value.
   result = newVariableDataOr(varName, operator, vlOr.value.value)
 
-type
-  LoopControl* = enum
-    ## Controls whether to output the current replacement block
-    ## iteration and whether to stop or not.
-    ## @:
-    ## @:* lcStop -- do not output this replacement block and stop iterating
-    ## @:* lcSkip -- do not output this replacement block and continue with the next iteration
-    ## @:* lcContinue -- output the replacment block and continue with the next iteration
-    lcStop,
-    lcSkip,
-    lcContinue,
-
 proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var Variables,
     sourceFilename: string, codeFile: bool): LoopControl =
   ## Run a statement and assign the variable if appropriate. Return
@@ -1619,33 +1631,6 @@ proc parseSignature*(signature: string): SignatureOr =
 
   let signature = newSignature(optional, functionName, params, returnType)
   result = newSignatureOr(signature)
-
-type
-  LinesOr* = OpResultWarn[seq[string]]
-    ## A list of lines or a warning.
-
-func newLinesOr*(warning: MessageId, p1: string = "", pos = 0):
-     LinesOr =
-  ## Return a new LinesOr object containing a warning.
-  let warningData = newWarningData(warning, p1, pos)
-  result = opMessageW[seq[string]](warningData)
-
-func newLinesOr*(warningData: WarningData): LinesOr =
-  ## Return a new LinesOr object containing a warning.
-  result = opMessageW[seq[string]](warningData)
-
-func newLinesOr*(lines: seq[string]): LinesOr =
-  ## Return a new LinesOr object containing a list of lines.
-  result = opValueW[seq[string]](lines)
-
-
-proc readFunctionStatements*(env: var Env, lb: LineBuffer, statement: Statement,
-    sourceFilename: string): LinesOr =
-  ## Read the function definition statements and return true when
-  ## successful.  The passed in statement is the first statement after
-  ## the doc commands.
-
-  return newLinesOr(wDefineFunction, "")
 
 proc isFunctionDefinition*(statement: Statement, retLeftName: var string,
     retOperator: var Operator, retPos: var Natural): bool =

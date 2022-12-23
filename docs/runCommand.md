@@ -5,26 +5,31 @@ Run a command and fill in the variables dictionaries.
 * [runCommand.nim](../src/runCommand.nim) &mdash; Nim source code.
 # Index
 
+* const: [tripleQuotes](#triplequotes) &mdash; Triple quotes for building strings.
 * type: [PosOr](#posor) &mdash; A position in a string or a message.
 * type: [SpecialFunction](#specialfunction) &mdash; The special functions.
 * type: [SpecialFunctionOr](#specialfunctionor) &mdash; A SpecialFunction or a warning message.
-* const: [tripleQuotes](#triplequotes) &mdash; Triple quotes for building strings.
 * type: [Found](#found) &mdash; The line endings found.
-* [matchTripleOrPlusSign](#matchtripleorplussign) &mdash; Match the optional """ or + at the end of the line.
-* [addText](#addtext) &mdash; Add the line up to the line-ending to the text string.
+* type: [LinesOr](#linesor) &mdash; A list of lines or a warning.
+* type: [LoopControl](#loopcontrol) &mdash; Controls whether to output the current replacement block iteration and whether to stop or not.
+* [newLinesOr](#newlinesor) &mdash; Return a new LinesOr object containing a warning.
+* [newLinesOr](#newlinesor-1) &mdash; Return a new LinesOr object containing a warning.
+* [newLinesOr](#newlinesor-2) &mdash; Return a new LinesOr object containing a list of lines.
 * [newPosOr](#newposor) &mdash; Create a PosOr warning.
 * [newPosOr](#newposor-1) &mdash; Create a PosOr value.
 * [newSpecialFunctionOr](#newspecialfunctionor) &mdash; Create a PosOr warning.
 * [newSpecialFunctionOr](#newspecialfunctionor-1) &mdash; Create a SpecialFunctionOr value.
-* [`==`](#) &mdash; Return true when a equals b.
-* [`!=`](#-1) &mdash; Compare whether two PosOr are not equal.
+* [`$`](#) &mdash; Return a string representation of a Statement.
+* [`==`](#-1) &mdash; Return true when the two statements are equal.
+* [`==`](#-2) &mdash; Return true when a equals b.
+* [`!=`](#-3) &mdash; Compare whether two PosOr are not equal.
+* [matchTripleOrPlusSign](#matchtripleorplussign) &mdash; Match the optional """ or + at the end of the line.
+* [addText](#addtext) &mdash; Add the line up to the line-ending to the text string.
 * [startColumn](#startcolumn) &mdash; Return enough spaces to point at the start byte position of the given text.
 * [getFragmentAndPos](#getfragmentandpos) &mdash; Split up a long statement around the given position.
 * [getWarnStatement](#getwarnstatement) &mdash; Return a multiline error message.
 * [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
 * [warnStatement](#warnstatement-1) &mdash; 
-* [`==`](#-2) &mdash; Return true when the two statements are equal.
-* [`$`](#-3) &mdash; Return a string representation of a Statement.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
 * [readStatement](#readstatement) &mdash; Read the next statement from the code file reading multiple lines if needed.
 * [getMultilineStr](#getmultilinestr) &mdash; Return the triple quoted string literal.
@@ -42,20 +47,22 @@ Run a command and fill in the variables dictionaries.
 * [getBracketedVarValue](#getbracketedvarvalue) &mdash; Return the value of the bracketed variable.
 * [getValueAndPos](#getvalueandpos) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
-* type: [LoopControl](#loopcontrol) &mdash; Controls whether to output the current replacement block iteration and whether to stop or not.
 * [runStatementAssignVar](#runstatementassignvar) &mdash; Run a statement and assign the variable if appropriate.
 * [parseSignature](#parsesignature) &mdash; Parse the signature and return the list of parameters or a message.
-* type: [LinesOr](#linesor) &mdash; A list of lines or a warning.
-* [newLinesOr](#newlinesor) &mdash; Return a new LinesOr object containing a warning.
-* [newLinesOr](#newlinesor-1) &mdash; Return a new LinesOr object containing a warning.
-* [newLinesOr](#newlinesor-2) &mdash; Return a new LinesOr object containing a list of lines.
-* [readFunctionStatements](#readfunctionstatements) &mdash; Read the function definition statements and return true when successful.
 * [isFunctionDefinition](#isfunctiondefinition) &mdash; If the statement is the first line of a function definition, return true and fill in the return parameters.
 * [processFunctionSignature](#processfunctionsignature) &mdash; Process the function definition line starting at the signature string.
 * [defineUserFunctionAssignVar](#defineuserfunctionassignvar) &mdash; If the statement starts a function definition, define it and assign the variable.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 * [runCodeFile](#runcodefile) &mdash; Run the code file and fill in the variables.
 * [runCodeFiles](#runcodefiles) &mdash; Run each code file and populate the variables.
+
+# tripleQuotes
+
+Triple quotes for building strings.
+
+```nim
+tripleQuotes = "\"\"\""
+```
 
 # PosOr
 
@@ -91,14 +98,6 @@ A SpecialFunction or a warning message.
 SpecialFunctionOr = OpResultWarn[SpecialFunction]
 ```
 
-# tripleQuotes
-
-Triple quotes for building strings.
-
-```nim
-tripleQuotes = "\"\"\""
-```
-
 # Found
 
 The line endings found.<ul class="simple"><li>nothing = no special ending</li>
@@ -118,20 +117,49 @@ Found = enum
   nothing, plus, triple, newline, plus_n, triple_n, crlf, plus_crlf, triple_crlf
 ```
 
-# matchTripleOrPlusSign
+# LinesOr
 
-Match the optional """ or + at the end of the line. This tells whether the statement continues on the next line for code files.
+A list of lines or a warning.
 
 ```nim
-proc matchTripleOrPlusSign(line: string): Found
+LinesOr = OpResultWarn[seq[string]]
 ```
 
-# addText
+# LoopControl
 
-Add the line up to the line-ending to the text string.
+Controls whether to output the current replacement block iteration and whether to stop or not.
+
+* lcStop -- do not output this replacement block and stop iterating
+* lcSkip -- do not output this replacement block and continue with the next iteration
+* lcContinue -- output the replacment block and continue with the next iteration
 
 ```nim
-proc addText(line: string; found: Found; text: var string)
+LoopControl = enum
+  lcStop, lcSkip, lcContinue
+```
+
+# newLinesOr
+
+Return a new LinesOr object containing a warning.
+
+```nim
+func newLinesOr(warning: MessageId; p1: string = ""; pos = 0): LinesOr
+```
+
+# newLinesOr
+
+Return a new LinesOr object containing a warning.
+
+```nim
+func newLinesOr(warningData: WarningData): LinesOr
+```
+
+# newLinesOr
+
+Return a new LinesOr object containing a list of lines.
+
+```nim
+func newLinesOr(lines: seq[string]): LinesOr
 ```
 
 # newPosOr
@@ -166,6 +194,22 @@ Create a SpecialFunctionOr value.
 func newSpecialFunctionOr(specialFunction: SpecialFunction): SpecialFunctionOr
 ```
 
+# `$`
+
+Return a string representation of a Statement.
+
+```nim
+func `$`(s: Statement): string
+```
+
+# `==`
+
+Return true when the two statements are equal.
+
+```nim
+func `==`(s1: Statement; s2: Statement): bool
+```
+
 # `==`
 
 Return true when a equals b.
@@ -180,6 +224,22 @@ Compare whether two PosOr are not equal.
 
 ```nim
 proc `!=`(a: PosOr; b: PosOr): bool
+```
+
+# matchTripleOrPlusSign
+
+Match the optional """ or + at the end of the line. This tells whether the statement continues on the next line for code files.
+
+```nim
+proc matchTripleOrPlusSign(line: string): Found
+```
+
+# addText
+
+Add the line up to the line-ending to the text string.
+
+```nim
+proc addText(line: string; found: Found; text: var string)
 ```
 
 # startColumn
@@ -223,22 +283,6 @@ proc warnStatement(env: var Env; statement: Statement; warningData: WarningData;
 ```nim
 proc warnStatement(env: var Env; statement: Statement; messageId: MessageId;
                    p1: string; pos: Natural; sourceFilename = "")
-```
-
-# `==`
-
-Return true when the two statements are equal.
-
-```nim
-func `==`(s1: Statement; s2: Statement): bool
-```
-
-# `$`
-
-Return a string representation of a Statement.
-
-```nim
-func `$`(s: Statement): string
 ```
 
 # yieldStatements
@@ -423,19 +467,6 @@ Run one statement and return the variable dot name string, operator and value.
 proc runStatement(statement: Statement; variables: Variables): VariableDataOr
 ```
 
-# LoopControl
-
-Controls whether to output the current replacement block iteration and whether to stop or not.
-
-* lcStop -- do not output this replacement block and stop iterating
-* lcSkip -- do not output this replacement block and continue with the next iteration
-* lcContinue -- output the replacment block and continue with the next iteration
-
-```nim
-LoopControl = enum
-  lcStop, lcSkip, lcContinue
-```
-
 # runStatementAssignVar
 
 Run a statement and assign the variable if appropriate. Return skip, stop or continue to control the loop.
@@ -458,47 +489,6 @@ get(group: list, ix: int, optional any) any
 
 ```nim
 proc parseSignature(signature: string): SignatureOr
-```
-
-# LinesOr
-
-A list of lines or a warning.
-
-```nim
-LinesOr = OpResultWarn[seq[string]]
-```
-
-# newLinesOr
-
-Return a new LinesOr object containing a warning.
-
-```nim
-func newLinesOr(warning: MessageId; p1: string = ""; pos = 0): LinesOr
-```
-
-# newLinesOr
-
-Return a new LinesOr object containing a warning.
-
-```nim
-func newLinesOr(warningData: WarningData): LinesOr
-```
-
-# newLinesOr
-
-Return a new LinesOr object containing a list of lines.
-
-```nim
-func newLinesOr(lines: seq[string]): LinesOr
-```
-
-# readFunctionStatements
-
-Read the function definition statements and return true when successful.  The passed in statement is the first statement after the doc commands.
-
-```nim
-proc readFunctionStatements(env: var Env; lb: LineBuffer; statement: Statement;
-                            sourceFilename: string): LinesOr
 ```
 
 # isFunctionDefinition
