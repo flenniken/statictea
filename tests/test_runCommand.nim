@@ -2433,3 +2433,62 @@ details.lineNum = 3
 details.numLines = 2
 details.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]"""
     check testRunCodeFile(content, eVarRep)
+
+  test "user function no signature":
+    let content = """
+mycmp = func()
+  ## Compare two number strings and return 1, 0, or -1.
+  return(cmp(int(numStr1), int(numStr2)))
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.txt(1): w227: Expected signature string.
+statement: mycmp = func()
+                        ^
+testcode.txt(3): w205: The variable 'numStr1' isn't in the l dictionary.
+statement:   return(cmp(int(numStr1), int(numStr2)))
+                            ^
+"""
+    check testRunCodeFile(content, eErrLines=eErrLines)
+
+  test "user function no doc comments":
+    let content = """
+mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.txt(2): w238: Out of lines; Missing required doc comment.
+"""
+    check testRunCodeFile(content, eErrLines=eErrLines)
+
+  test "user function no statements":
+    let content = """
+mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+## hello
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.txt(3): w239: Out of lines; No statements for the function.
+"""
+    check testRunCodeFile(content, eErrLines=eErrLines)
+
+  test "user function no return":
+    let content = """
+mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+## hello
+a = 5
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.txt(4): w240: Out of lines; missing the function's return statement.
+"""
+    check testRunCodeFile(content, eErrLines=eErrLines)
+
+  test "user function no return":
+    let content = """
+mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+## hello
+a = 5
+b = if(false, return(a), a)
+if(false, return("abc")
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.txt(6): w240: Out of lines; missing the function's return statement.
+"""
+    check testRunCodeFile(content, eErrLines=eErrLines)
