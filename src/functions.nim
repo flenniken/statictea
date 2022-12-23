@@ -2200,15 +2200,28 @@ func funFunctionDetails_pd*(variables: Variables, parameters: seq[Value]): FunRe
   ## @:functionDetails(funcVar: func) dict
   ## @:~~~~
   ## @:
-  ## @:Example:
+  ## @:The following example defines a simple function then gets its
+  ## @:function details.
   ## @:
   ## @:~~~
-  ## @:details = functionDetails(mycmp)
-  ## @:=>
+  ## @:mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+  ## @:  ## Compare two number strings and return 1, 0, or -1.
+  ## @:  return(cmp(int(numStr1), int(numStr2)))
   ## @:
+  ## @:fd = functionDetails(mycmp)
   ## @:
-  ## @:
-  ## @:
+  ## @:fd =>
+  ## @:fd.builtIn = false
+  ## @:fd.signature.optional = false
+  ## @:fd.signature.name = "strNumCmp"
+  ## @:fd.signature.paramNames = ["numStr1","numStr2"]
+  ## @:fd.signature.paramTypes = ["string","string"]
+  ## @:fd.signature.returnType = "int"
+  ## @:fd.docComments = ["  ## Compare two number strings and return 1, 0, or -1."]
+  ## @:fd.filename = "testcode.txt"
+  ## @:fd.lineNum = 3
+  ## @:fd.numLines = 2
+  ## @:fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]"""
   ## @:~~~~
   tMapParameters("functionDetails", "pd")
   let functionSpec = map["a"].funcv

@@ -727,103 +727,6 @@ l.tea = "earl grey"
 
 [[#contents][茶]]
 
-* User Functions
-:PROPERTIES:
-:CUSTOM_ID: user-functions
-:END:
-
-You can define your own functions in code files.
-
-User defined functions are important for sharing common code,
-looping and as callbacks for building lists and dictionaries.
-
-In the following example we define a function called strNumCmp
-and assign the result to the mycmp function variable. The
-function takes two string parameters called numStr1 and numStr2
-and it returns an integer.
-
-#+BEGIN_SRC
-mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
-  ## Compare two number strings
-  ## and return 1, 0, or -1.
-  num1 = int(numStr1)
-  num2 = int(numStr2)
-  return(cmp(num1, num2))
-#+END_SRC
-
-The first line names the function and defines its signature and
-assigns it to a variable.
-
-#+BEGIN_SRC
-mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
-#+END_SRC
-
-The doc comment come next and they tell what the function does:
-
-#+BEGIN_SRC
-  ## Compare two number strings
-  ## and return 1, 0, or -1.
-#+END_SRC
-
-The last lines of the definition are the statement
-lines.  A return statement ends the function definition.
-
-#+BEGIN_SRC
-  num1 = int(numStr1)
-  num2 = int(numStr2)
-  return(cmp(num1, num2))
-#+END_SRC
-
-The code is line based so the indentation doesn’t matter, there
-aren’t any brackets, and no line terminators.
-
-Here is how you call the example function:
-
-#+BEGIN_SRC
-a = l.mycmp(“1”, "2")
-#+END_SRC
-
-*Function Signature:*
-
-A function signature tells the function name, the parameter names
-and types and the return type. For the example above the
-signature string is:
-
-#+BEGIN_SRC
-"strNumCmp(numStr1: string, numStr2: string) int"
-#+END_SRC
-
-You call, query and pass around the the function variable. The
-signature function name (strNumCmp) is not used except in the
-function details.
-
-You can specify an optional last parameter and a parameter can
-use "any" to when it accepts any type. The built-in get function
-is an example of optional and any.
-
-#+BEGIN_SRC
-get(dictionary: dict, key: string, optional default: any) any
-#+END_SRC
-
-*Return Statement:*
-
-You use the return statement to return the function’s value and
-to finish the definition of the function. A bare return ends the
-function; you can use a return in a IF statement and they don’t end
-the function.
-
-*Function Local Variables:*
-
-The function‘s local variables and its arguments are stored in
-the m dictionary which exists while the function runs. It
-contains the parameters and their argument values and local
-variables used in the function.
-
-To access variables outside the function, you need to pass them
-to it.
-
-[[#contents][茶]]
-
 ** Code Variables
 :PROPERTIES:
 :CUSTOM_ID: code-variables
@@ -1252,8 +1155,11 @@ StaticTea variable types:
 
 A string is an immutable sequence of unicode characters.
 
-You define a literal string with double quotes. The example below
-defines a literal string and assigns it to the variable str:
+You define a single line literal string with double quotes and a
+[[#multiline-strings][multiline string]] in code files with triple quotes.
+
+The example below defines a literal string and assigns it to the
+variable str:
 
 #+BEGIN_SRC
 str = "black teas vs. green teas"
@@ -1355,9 +1261,9 @@ ordered by insertion order.
 - You access dict items with dot names or with the get
   function.
 
-In the following json data, the container element is a dictionary and
-the d element is a dictionary.  The d dictionary has two key/value
-pairs, ("x", 100) and ("y", 200).
+In the following json data, the container element is the s
+dictionary and the d element is a dictionary.  The d dictionary
+has two key/value pairs, ("x", 100) and ("y", 200).
 
 server json:
 
@@ -1494,8 +1400,9 @@ c = bool(0) # false
 d = bool(1) # true (not 0)
 #+END_SRC
 
-True and false are variables in the local dictionary.  You can
-define variables called true and false in other dictionaries.
+True and false are variables in the local dictionary.  It's not
+recommended, but you can define variables called true and false
+in other dictionaries.
 
 #+BEGIN_SRC
 s.true = "server true"
@@ -1522,7 +1429,7 @@ In the following example the “a” func variable is defined to be
 equal to the second built in cmp function.
 
 #+BEGIN_SRC
-l.a = get(f.cmp, 1)
+l.a = f.cmp[1]
 #+END_SRC
 
 You call it with parentheses:
@@ -1578,6 +1485,9 @@ shared.tea(2): w120: Wrong argument type, expected float.
 statement: o.b = cmp(1.9, 5)
                           ^
 #+END_SRC
+
+You can call [[#functionDetails][functionDetails]] to get the signature, doc comment,
+statements etc. of a user or built in function.
 
 [[#contents][茶]]
 
@@ -1848,6 +1758,103 @@ Teas of China
 """
 count = len(str)
 #+END_SRC
+
+[[#contents][茶]]
+
+* User Functions
+:PROPERTIES:
+:CUSTOM_ID: user-functions
+:END:
+
+You can define your own functions in code files.
+
+User defined functions are important for sharing common code,
+looping and as callbacks for building lists and dictionaries.
+
+In the following example we define a function called strNumCmp
+and assign the result to the mycmp function variable. The
+function takes two string parameters called numStr1 and numStr2
+and it returns an integer.
+
+#+BEGIN_SRC
+mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+  ## Compare two number strings
+  ## and return 1, 0, or -1.
+  num1 = int(numStr1)
+  num2 = int(numStr2)
+  return(cmp(num1, num2))
+#+END_SRC
+
+The first line names the function and defines its signature and
+assigns it to a variable.
+
+#+BEGIN_SRC
+mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+#+END_SRC
+
+The doc comment come next and tells what the function does:
+
+#+BEGIN_SRC
+  ## Compare two number strings
+  ## and return 1, 0, or -1.
+#+END_SRC
+
+The last lines of the definition are the statement
+lines.  A return statement ends the function definition.
+
+#+BEGIN_SRC
+  num1 = int(numStr1)
+  num2 = int(numStr2)
+  return(cmp(num1, num2))
+#+END_SRC
+
+The code is line based so the indentation doesn’t matter, there
+aren’t any brackets, and no line terminators.
+
+Here is how you call the example function:
+
+#+BEGIN_SRC
+a = l.mycmp(“1”, "2")
+#+END_SRC
+
+*Function Signature:*
+
+A function signature tells the function name, the parameter names
+and types and the return type. For the example above the
+signature string is:
+
+#+BEGIN_SRC
+"strNumCmp(numStr1: string, numStr2: string) int"
+#+END_SRC
+
+You call, query and pass around the the function variable. The
+signature function name (strNumCmp) is not used except in the
+function details.
+
+You can specify an optional last parameter and a parameter can
+use "any" when it accepts any type. The built-in get function
+is an example of optional and any.
+
+#+BEGIN_SRC
+get(dictionary: dict, key: string, default: optional any) any
+#+END_SRC
+
+*Return Statement:*
+
+You use the return statement to return the function’s value and
+to finish the definition of the function. A bare return ends the
+function; you can use a return in a IF statement and they don’t end
+the function.
+
+*Function Local Variables:*
+
+The function‘s local variables and its arguments are stored in
+the m dictionary which exists while the function runs. It
+contains the parameters and their argument values and local
+variables used in the function.
+
+To access variables outside the function, you need to pass them
+to it.
 
 [[#contents][茶]]
 
@@ -2578,9 +2585,9 @@ nimble release
 
 [[#contents][茶]]
 
-* Functions
+* Builtin Functions
 :PROPERTIES:
-:CUSTOM_ID: functions
+:CUSTOM_ID: builtin-functions
 :ORDERED:  t
 :END:
 
@@ -3244,15 +3251,28 @@ Return the function details.
 functionDetails(funcVar: func) dict
 #+END_SRC
 
-Example:
+The following example defines a simple function then gets its
+function details.
 
 #+BEGIN_SRC
-details = functionDetails(mycmp)
-=>
+mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+  ## Compare two number strings and return 1, 0, or -1.
+  return(cmp(int(numStr1), int(numStr2)))
 
+fd = functionDetails(mycmp)
 
-
-
+fd =>
+fd.builtIn = false
+fd.signature.optional = false
+fd.signature.name = "strNumCmp"
+fd.signature.paramNames = ["numStr1","numStr2"]
+fd.signature.paramTypes = ["string","string"]
+fd.signature.returnType = "int"
+fd.docComments = ["  ## Compare two number strings and return 1, 0, or -1."]
+fd.filename = "testcode.txt"
+fd.lineNum = 3
+fd.numLines = 2
+fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]"""
 #+END_SRC
 
 [[#contents][茶]]
@@ -4583,7 +4603,7 @@ Convert the function spec to a dictionary value.
 - [[#user-functions][User Functions]]
 - [[#run-statictea][Run StaticTea]]
 - [[#miscellaneous][Miscellaneous]]
-- [[#functions][Functions]]
+- [[#builtin-functions][Builtin Functions]]
 
 * Tea Info                                                            :notoc:
 
