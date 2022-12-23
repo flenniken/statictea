@@ -15,6 +15,7 @@ Functions that deal with Unicode.
 * [parseHexUnicodeToString](#parsehexunicodetostring) &mdash; Return a one character string given a 4 or 8 character unicode escape string.
 * [slice](#slice) &mdash; Extract a substring from a string by its Unicode character position (not byte index).
 * [visibleControl](#visiblecontrol) &mdash; Return a new string with the tab and line endings and other control characters visible.
+* [startColumn](#startcolumn) &mdash; Return enough spaces to point at the start byte position of the given text.
 
 # cmpString
 
@@ -94,6 +95,14 @@ Return a new string with the tab and line endings and other control characters v
 
 ```nim
 func visibleControl(str: string): string
+```
+
+# startColumn
+
+Return enough spaces to point at the start byte position of the given text.  This accounts for multibyte UTF-8 sequences that might be in the text.
+
+```nim
+func startColumn(text: string; start: Natural; message: string = "^"): string
 ```
 
 

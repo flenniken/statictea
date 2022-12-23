@@ -25,7 +25,6 @@ Run a command and fill in the variables dictionaries.
 * [`!=`](#-3) &mdash; Compare whether two PosOr are not equal.
 * [matchTripleOrPlusSign](#matchtripleorplussign) &mdash; Match the optional """ or + at the end of the line.
 * [addText](#addtext) &mdash; Add the line up to the line-ending to the text string.
-* [startColumn](#startcolumn) &mdash; Return enough spaces to point at the start byte position of the given text.
 * [getFragmentAndPos](#getfragmentandpos) &mdash; Split up a long statement around the given position.
 * [getWarnStatement](#getwarnstatement) &mdash; Return a multiline error message.
 * [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
@@ -215,7 +214,7 @@ func `==`(s1: Statement; s2: Statement): bool
 Return true when a equals b.
 
 ```nim
-proc `==`(a: PosOr; b: PosOr): bool
+func `==`(a: PosOr; b: PosOr): bool
 ```
 
 # `!=`
@@ -223,7 +222,7 @@ proc `==`(a: PosOr; b: PosOr): bool
 Compare whether two PosOr are not equal.
 
 ```nim
-proc `!=`(a: PosOr; b: PosOr): bool
+func `!=`(a: PosOr; b: PosOr): bool
 ```
 
 # matchTripleOrPlusSign
@@ -231,7 +230,7 @@ proc `!=`(a: PosOr; b: PosOr): bool
 Match the optional """ or + at the end of the line. This tells whether the statement continues on the next line for code files.
 
 ```nim
-proc matchTripleOrPlusSign(line: string): Found
+func matchTripleOrPlusSign(line: string): Found
 ```
 
 # addText
@@ -239,15 +238,7 @@ proc matchTripleOrPlusSign(line: string): Found
 Add the line up to the line-ending to the text string.
 
 ```nim
-proc addText(line: string; found: Found; text: var string)
-```
-
-# startColumn
-
-Return enough spaces to point at the start byte position of the given text.  This accounts for multibyte UTF-8 sequences that might be in the text.
-
-```nim
-proc startColumn(text: string; start: Natural; message: string = "^"): string
+func addText(line: string; found: Found; text: var string)
 ```
 
 # getFragmentAndPos
@@ -263,7 +254,7 @@ func getFragmentAndPos(statement: Statement; start: Natural): (string, Natural)
 Return a multiline error message.
 
 ```nim
-proc getWarnStatement(filename: string; statement: Statement;
+func getWarnStatement(filename: string; statement: Statement;
                       warningData: WarningData): string
 ```
 
@@ -325,7 +316,7 @@ func getString(statement: Statement; start: Natural): ValueAndPosOr
 Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.
 
 ```nim
-proc getNumber(statement: Statement; start: Natural): ValueAndPosOr
+func getNumber(statement: Statement; start: Natural): ValueAndPosOr
 ```
 
 # skipArgument
@@ -393,7 +384,7 @@ proc getFunctionValueAndPos(functionName: string; statement: Statement;
 Evaluate the bool expression and return a bool value.
 
 ```nim
-proc runBoolOp(left: Value; op: string; right: Value): Value
+func runBoolOp(left: Value; op: string; right: Value): Value
 ```
 
 # runCompareOp
@@ -401,7 +392,7 @@ proc runBoolOp(left: Value; op: string; right: Value): Value
 Evaluate the comparison and return a bool value.
 
 ```nim
-proc runCompareOp(left: Value; op: string; right: Value): Value
+func runCompareOp(left: Value; op: string; right: Value): Value
 ```
 
 # getCondition

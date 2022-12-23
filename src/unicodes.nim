@@ -291,3 +291,23 @@ func visibleControl*(str: string): string =
       num = 0x00002400 + num
     visibleRunes.add(Rune(num))
   result = $visibleRunes
+
+func startColumn*(text: string, start: Natural, message: string = "^"): string =
+  ## Return enough spaces to point at the start byte position of the
+  ## given text.  This accounts for multibyte UTF-8 sequences that
+  ## might be in the text.
+  result = newStringOfCap(start + message.len)
+  var ixFirst: int
+  var ixLast: int
+  var codePoint: uint32
+  var byteCount = 0
+  var charCount = 0
+  for valid in yieldUtf8Chars(text, ixFirst, ixLast, codePoint):
+    # Byte positions inside multibyte sequences except the first point
+    # to the next start.
+    if byteCount >= start:
+      break
+    byteCount += (ixLast - ixFirst + 1)
+    inc(charCount)
+    result.add(' ')
+  result.add(message)

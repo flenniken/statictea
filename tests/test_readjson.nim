@@ -11,7 +11,7 @@ import messages
 import utf8decoder
 import sharedtestcode
 import opresult
-import runCommand
+import unicodes
 
 proc testParseJsonStr(text: string, start: Natural,
     eStr: string, ePos: Natural): bool =

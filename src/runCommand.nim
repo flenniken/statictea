@@ -133,7 +133,7 @@ func `==`*(s1: Statement, s2: Statement): bool =
       s1.text == s2.text:
     result = true
 
-proc `==`*(a: PosOr, b: PosOr): bool =
+func `==`*(a: PosOr, b: PosOr): bool =
   ## Return true when a equals b.
   if a.kind == b.kind:
     if a.isMessage:
@@ -141,7 +141,7 @@ proc `==`*(a: PosOr, b: PosOr): bool =
     else:
       result = a.value == b.value
 
-proc `!=`*(a: PosOr, b: PosOr): bool =
+func `!=`*(a: PosOr, b: PosOr): bool =
   ## Compare whether two PosOr are not equal.
   result = not (a == b)
 
@@ -150,7 +150,7 @@ func isTriple(line: string, ch: char, ix: Natural): bool =
       line[ix-1] == '"' and line[ix-2] == '"':
     result = true
 
-proc matchTripleOrPlusSign*(line: string): Found =
+func matchTripleOrPlusSign*(line: string): Found =
   ## Match the optional """ or + at the end of the line. This tells
   ## whether the statement continues on the next line for code files.
 
@@ -198,7 +198,7 @@ proc matchTripleOrPlusSign*(line: string): Found =
         return triple_crlf
       return crlf
 
-proc addText*(line: string, found: Found, text: var string) =
+func addText*(line: string, found: Found, text: var string) =
   ## Add the line up to the line-ending to the text string.
   var skipNum: Natural
   var addNewline = false
@@ -233,26 +233,6 @@ proc addText*(line: string, found: Found, text: var string) =
   text.add(line[0 .. endPos])
   if addNewline:
     text.add('\n')
-
-proc startColumn*(text: string, start: Natural, message: string = "^"): string =
-  ## Return enough spaces to point at the start byte position of the
-  ## given text.  This accounts for multibyte UTF-8 sequences that
-  ## might be in the text.
-  result = newStringOfCap(start + message.len)
-  var ixFirst: int
-  var ixLast: int
-  var codePoint: uint32
-  var byteCount = 0
-  var charCount = 0
-  for valid in yieldUtf8Chars(text, ixFirst, ixLast, codePoint):
-    # Byte positions inside multibyte sequences except the first point
-    # to the next start.
-    if byteCount >= start:
-      break
-    byteCount += (ixLast - ixFirst + 1)
-    inc(charCount)
-    result.add(' ')
-  result.add(message)
 
 func getFragmentAndPos*(statement: Statement, start: Natural):
      (string, Natural) =
@@ -301,7 +281,7 @@ when showPos:
     echo fragment
     echo startColumn(fragment, pointerPos, symbol)
 
-proc getWarnStatement*(filename: string, statement: Statement,
+func getWarnStatement*(filename: string, statement: Statement,
     warningData: WarningData): string =
   ## Return a multiline error message.
 
@@ -511,7 +491,7 @@ func getString*(statement: Statement, start: Natural): ValueAndPosOr =
   if pos < str.len and pos == start+2 and str[start+2] == '"':
     result = getMultilineStr(str, start+3)
 
-proc getNumber*(statement: Statement, start: Natural): ValueAndPosOr =
+func getNumber*(statement: Statement, start: Natural): ValueAndPosOr =
   ## Return the literal number value and position after it.  The start
   ## index points at a digit or minus sign. The position includes the
   ## trailing whitespace.
@@ -659,7 +639,7 @@ func quickExit(valueAndPosOr: ValueAndPosOr): bool =
   ## log.
   result = valueAndPosOr.isMessage or valueAndPosOr.value.sideEffect != seNone
 
-proc skipArg(statement: Statement, start: Natural): PosOr =
+func skipArg(statement: Statement, start: Natural): PosOr =
   when showPos:
     showDebugPos(statement, start, "^ s arg")
   result = skipArgument(statement, start)
@@ -1021,7 +1001,7 @@ proc getList(statement: Statement, start: Natural,
   return getFunctionValueAndPos("list", statement,
     start+startSymbol.length, variables, list=true)
 
-proc runBoolOp*(left: Value, op: string, right: Value): Value =
+func runBoolOp*(left: Value, op: string, right: Value): Value =
   ## Evaluate the bool expression and return a bool value.
   assert left.kind == vkBool and right.kind == vkBool
 
@@ -1034,7 +1014,7 @@ proc runBoolOp*(left: Value, op: string, right: Value): Value =
     assert(false, "Expected the boolean operator 'and' or 'or'.")
   result = newValue(b)
 
-proc runCompareOp*(left: Value, op: string, right: Value): Value =
+func runCompareOp*(left: Value, op: string, right: Value): Value =
   ## Evaluate the comparison and return a bool value.
   assert left.kind == right.kind
   assert left.kind == vkInt or left.kind == vkFloat or left.kind == vkString

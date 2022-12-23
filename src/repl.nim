@@ -15,6 +15,7 @@ import matches
 import regexes
 import runCommand
 import variables
+import unicodes
 
 func showVariables(variables: Variables): string =
   ## Show repl command.
