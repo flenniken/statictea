@@ -698,11 +698,11 @@ for more information.
 :CUSTOM_ID: global-variables
 :END:
 
-Like local variables, you create global variables with template
-statements.  All commands have access to them and they are stored
-in the g dictionary.
+Variables you add to the g dictionary are global. They’re visible
+to all commands.
 
 #+BEGIN_SRC
+g.title = “Teas of the World”
 g.names &= entry.name
 #+END_SRC
 
@@ -713,11 +713,13 @@ g.names &= entry.name
 :CUSTOM_ID: local-variables
 :END:
 
-You create local variables with template statements.  They are
-local to the command where they are defined. You do not have to
-specify a prefix for local variables but you can use l. They are
-stored in the l dictionary. The local variables are cleared and
-recalculated for each repeated block.
+Variables you create without a prefix go in the local (l)
+dictionary.
+
+The local variables are cleared and recalculated for each
+iteration of a repeated block.
+
+Examples:
 
 #+BEGIN_SRC
 a = 5
@@ -900,15 +902,17 @@ default it goes to the result file.
     :END:
 
 The t.repeat variable is an integer that tells how many times to
-repeat the block. A value of 0 means don't show the block at
-all. If you don't set it, the block repeats one time.
+show the command’s replacement block.  A value of 0 means don't
+show the block at all. If you don't set it, the block repeats one
+time.
 
 Each time the block repeats the local variables get cleared then
 recalculated.
 
 The t.row variable counts the number of times the block repeats
-and is used with t.repeat to customize each block.
+and is used to customize each block iteration.
 
+The t.maxRepeat variable limits how many times the block can repeat.
 You cannot assign a number bigger than t.maxRepeat to
 t.repeat. You can set t.maxRepeat to anything you want, the
 default is 100.
@@ -968,7 +972,7 @@ template:
 <!--$ : selected = get(d, "selected", false) -->
 <!--$ : current = if(selected, " selected=\"selected\"", "") -->
   <option{current}>{d.company}</option>
-$$ endblock
+<!--$ endblock -->
 </select>
 #+END_SRC
 
@@ -1004,7 +1008,7 @@ result:
 Setting t.repeat to 0 is good for building test lists.
 
 When you view the following template fragment in a browser it
-shows one item in the list.
+shows one item in the list, “{tea}”.
 
 template:
 
@@ -1257,9 +1261,10 @@ maps a string key to a value which can be any type. The dict is
 ordered by insertion order.
 
 - You create a dict in a json file or with the dict function.
-- You append to a dict when you create new variables with a statement.
-- You access dict items with dot names or with the get
-  function.
+- You append to a dict when you create a new variable with a
+  statement.
+- You access a dict item with a dot name, bracket notation or
+  with the get function.
 
 In the following json data, the container element is the s
 dictionary and the d element is a dictionary.  The d dictionary
@@ -1362,7 +1367,7 @@ list of dictionaries:
 #+BEGIN_SRC
 $$ block
 $$ : t.repeat = len(s.entries)
-$$ : entry = get(s.entries, t.row)
+$$ : entry = s.entries[t.row]
 $$ : g.names &= entry.name
 $$ endblock
 #+END_SRC
@@ -1422,11 +1427,28 @@ You create a func variable from an existing func variable or by
 defining a new function with the special "func" function, see
 [[#user-functions][User Functions]].
 
-All the predefined functions exist in the f dictionary by name. Each
-dictionary value is a list of func values with the same name.
+All the built-in functions exist in the f dictionary by
+name. Each dictionary value is a list of func values with the
+same name. There are three cmp functions so the f dictionary
+value for it is a list of three function variables:
 
-In the following example the “a” func variable is defined to be
-equal to the second built in cmp function.
+#+BEGIN_SRC
+cmp => ["cmp","cmp","cmp"]
+#+END_SRC
+
+You can call a list of func variables. The function called is
+determined by the parameters passed, the one with the matching
+signature is called. All the built in functions are lists
+containing one or more items. Below is an example calling a
+function given a list:
+
+#+BEGIN_SRC
+value = f.cmp(1,2)
+#+END_SRC
+
+You can call a func variable directly. In the following example
+the “a” func variable is defined to be equal to the second built
+in cmp function.
 
 #+BEGIN_SRC
 l.a = f.cmp[1]
@@ -1440,24 +1462,6 @@ b = l.a(4, 7) => -1
 
 You can have multiple functions with the same name as long as
 their signatures differ.
-
-There are three cmp functions so the f dictionary value for it is
-a list of three function variables:
-
-#+BEGIN_SRC
-cmp => ["cmp","cmp","cmp"]
-#+END_SRC
-
-You can call a list of func variables. The function called is
-determined by the parameters passed, the one with the matching
-signature is called. All the built in functions are lists
-containing one or more items.
-
-Example calling a function given a list:
-
-#+BEGIN_SRC
-value = f.cmp(1,2)
-#+END_SRC
 
 When you call a function variable without a prefix, statictea
 looks for it in the function dictionary.
@@ -1643,7 +1647,7 @@ code file for sharing with templates. The code populates the o
 dictionary that is available to the template commands.
 
 #+BEGIN_SRC
-o. header = “””
+o.header = “””
 <!doctype html>
 <html lang="en">
 “””
@@ -2395,16 +2399,17 @@ Nimble Tasks:
    :END:
 
 The Single Test File (stf) runner is a standalone program used
-for testing command line applications. A stf file contains the
-test which the runner executes to determine whether the test
-passed. The stf files are designed to look good in markdown
-readers.
+for testing command line applications.
 
-The stf file contains instructions for creating files, running
-files and comparing files. See the runner help message for more
-information about stf files.
+A stf file contains the test which the runner executes to
+determine whether the test passed. The stf file contains
+instructions for creating files, running files and comparing
+files.
 
-The testfiles folder contains statictea stf files.
+The stf files are designed to look good in markdown readers.  The
+testfiles folder contains [[testfiles/readme.md][StaticTea Stf Files]].
+
+See the runner help message for more information about stf files.
 
 [[#contents][茶]]
 
@@ -2625,7 +2630,7 @@ List of functions:
 - [[#float][float]] -- Create a float from a number string.
 - [[#format][format]] -- Format a string using replacement variables similar to a replacement block.
 - [[#func][func]] -- Define a function.
-- [[#functionDetails][functionDetails]] -- Return the function details.
+- [[#functionDetails][functionDetails]] -- Return the function details as a dictionary.
 - [[#get][get]] -- Get a dictionary value by its key.
 - [[#get][get]] -- Get a list value by its index.
 - [[#githubAnchor][githubAnchor]] -- Create Github anchor names from heading names.
@@ -2672,7 +2677,6 @@ List of functions:
 - [[#type][type]] -- Return the parameter type, one of: int, float, string, list, dict, bool or func.
 - [[#values][values]] -- Create a list out of the values in the specified dictionary.
 - [[#warn][warn]] -- Return a warning message and skip the current statement.
-- [[#ctionDetails][ctionDetails]] -- Convert the function spec to a dictionary value.
 
 [[#contents][茶]]
 
