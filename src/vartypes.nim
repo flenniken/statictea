@@ -543,7 +543,6 @@ func newValueOr*(value: Value): ValueOr =
   ## Create a new ValueOr containing a value.
   result = opValueW[Value](value)
 
-
 func newFunResultWarn*(warning: MessageId, parameter: Natural = 0,
     p1: string = "", pos = 0): FunResult =
   ## Return a new FunResult object containing a warning. It takes a

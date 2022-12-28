@@ -27,14 +27,14 @@ type
   Operator* = enum
     ## The statement operator types.
     ## @:
-    ## @:* opIgnore -- ignore the statement
+    ## @:* opIgnore -- ignore the statement, e.g. comment or blank statement.
     ## @:* opAppendDict (=) -- append the value to the dictionary
     ## @:* opAppendList ($=) -- append the value to the list
     ## @:* opReturn -- stop or skip the current replacement iteration
     ## @:* opLog -- log a message
     opIgnore = "ignore",
-    opEqual = "equal",
-    opAppendList = "appendList",
+    opEqual = "=",
+    opAppendList = "&=",
     opReturn = "return",
     opLog = "log",
 
@@ -74,26 +74,12 @@ func newVariableDataOr*(warningData: WarningData):
   ## Create an object containing a warning.
   result = opMessageW[VariableData](warningData)
 
-func newVariableDataOr*(dotNameStr: string, operator = opEqual,
+func newVariableDataOr*(dotNameStr: string, operator: Operator,
     value: Value): VariableDataOr =
   ## Create an object containing a VariableData object.
   let variableData = VariableData(dotNameStr: dotNameStr,
     operator: operator, value: value)
   result = opValueW[VariableData](variableData)
-
-func `$`*(operator: Operator): string =
-  ## Return a string representation of Operator.
-  case operator:
-  of opEqual:
-    result = "="
-  of opAppendList:
-    result = "&="
-  of opIgnore:
-    result = "ignore"
-  of opReturn:
-    result = "return"
-  of opLog:
-    result = "log"
 
 func `$`*(v: VariableData): string =
   ## Return a string representation of VariableData.
@@ -269,13 +255,14 @@ func assignTeaVariable(variables: var Variables, dotNameStr: string,
       # Invalid tea variable: $1.
       return some(newWarningData(wInvalidTeaVar, varName))
 
-  # You cannot append to a tea variable.
-  if operator == opAppendList:
+  case operator:
+  of opEqual:
+    tea[varName] = value
+  of opAppendList:
     # You cannot append to a tea variable.
     return some(newWarningData(wAppendToTeaVar))
-
-  tea[varName] = value
-
+  of opIgnore, opReturn, opLog:
+    discard
 
 proc assignVariable*(
     variables: var Variables,
@@ -347,15 +334,14 @@ proc assignVariable*(
     return some(varsDictOr.message)
 
   let lastName = names[^1]
-  if operator == opEqual:
+  case operator
+  of opEqual:
     # Assign the value to the dictionary.
     if lastName in varsDictOr.value:
       # You cannot assign to an existing variable.
       return some(newWarningData(wImmutableVars))
     varsDictOr.value[lastName] = value
-  else:
-    assert operator == opAppendList
-
+  of opAppendList:
     # Append to a list, or create then append.
 
     # If the variable doesn't exists, create an empty list.
@@ -369,6 +355,9 @@ proc assignVariable*(
 
     # Append the value to the list.
     lastItem.listv.add(value)
+  of opIgnore, opReturn, opLog:
+    assert(false, "You cannot assign using the $1 operator." % $operator)
+    discard
 
 func lookUpVar(variables: Variables, names: seq[string]): ValueOr =
   ## Return the variable when it exists.

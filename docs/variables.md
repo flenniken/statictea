@@ -21,8 +21,7 @@ and value which is the result of running a statement.
 * [newVariableDataOr](#newvariabledataor) &mdash; Create an object containing a warning.
 * [newVariableDataOr](#newvariabledataor-1) &mdash; Create an object containing a warning.
 * [newVariableDataOr](#newvariabledataor-2) &mdash; Create an object containing a VariableData object.
-* [`$`](#) &mdash; Return a string representation of Operator.
-* [`$`](#-1) &mdash; Return a string representation of VariableData.
+* [`$`](#) &mdash; Return a string representation of VariableData.
 * [emptyVariables](#emptyvariables) &mdash; Create an empty variables object in its initial state.
 * [getTeaVarIntDefault](#getteavarintdefault) &mdash; Return the int value of one of the tea dictionary integer items.
 * [getTeaVarStringDefault](#getteavarstringdefault) &mdash; Return the string value of one of the tea dictionary string items.
@@ -48,7 +47,7 @@ outputValues = ["result", "stdout", "stderr", "log", "skip"]
 
 The statement operator types.
 
-* opIgnore -- ignore the statement
+* opIgnore -- ignore the statement, e.g. comment or blank statement.
 * opAppendDict (=) -- append the value to the dictionary
 * opAppendList ($=) -- append the value to the list
 * opReturn -- stop or skip the current replacement iteration
@@ -56,8 +55,8 @@ The statement operator types.
 
 ```nim
 Operator = enum
-  opIgnore = "ignore", opEqual = "equal", opAppendList = "appendList",
-  opReturn = "return", opLog = "log"
+  opIgnore = "ignore", opEqual = "=", opAppendList = "&=", opReturn = "return",
+  opLog = "log"
 ```
 
 # CodeLocation
@@ -120,15 +119,7 @@ func newVariableDataOr(warningData: WarningData): VariableDataOr
 Create an object containing a VariableData object.
 
 ```nim
-func newVariableDataOr(dotNameStr: string; operator = opEqual; value: Value): VariableDataOr
-```
-
-# `$`
-
-Return a string representation of Operator.
-
-```nim
-func `$`(operator: Operator): string
+func newVariableDataOr(dotNameStr: string; operator: Operator; value: Value): VariableDataOr
 ```
 
 # `$`

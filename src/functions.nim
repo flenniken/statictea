@@ -2010,7 +2010,8 @@ func funReturn_ss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## which determine whether to continue iterating or not.
   ## @:
   ## @:* "stop" -- stop processing the command
-  ## @:* "skip" -- skip this replacement block and continue with the next iteration
+  ## @:* "skip" -- skip this replacement block and continue with the
+  ## next iteration
   ## @:
   ## @:~~~
   ## @:return(value: string) string

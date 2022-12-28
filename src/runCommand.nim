@@ -18,6 +18,7 @@ import opresult
 import unicodes
 import utf8decoder
 import parseCmdLine
+import signatures
 
 const
   # Turn on showPos for testing to graphically show the start and end
@@ -889,53 +890,7 @@ proc andOrFunctions*(
     value = a or b
   result = newValueAndPosOr(newValue(value), runningPos)
 
-proc callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult =
-  ## Run the given user function.
-  assert funcVar.kind == vkFunc
-  assert funcVar.funcv.builtIn == false
-
-  return newFunResultWarn(wInvalidStringType, 1)
-
-  # var userVariables = emptyVariables()
-
-  # # Populate the m dictionary with the parameters and arguments.
-  # let funResult = mapParameters(funcVar.funcv.signature, arguments)
-  # if funResult.kind == frWarning:
-  #   return funResult
-  # userVariables["m"] = funResult.value
-
-  # # Run the function statements.
-  # for statement in funcVar.funcv.statements:
-
-  #   let variableDataOr = runStatement(statement, variables)
-  #   if variableDataOr.isMessage:
-  #     return newFuncResult(variableDataOr.message)
-  #   let variableData = variableDataOr.value
-
-  #   # Handle a return function exit.
-  #   if variableData.operator == opReturn:
-  #       return newFuncResult(variableData.value)
-
-  #   # Write log lines.
-  #   if variableData.operator == opLog:
-  #     env.logLine(sourceFilename, statement.lineNum, variableData.value.stringv & "\n")
-
-  #   # if variableData.operator == opIgnore:
-
-  #   # Assign the variable if possible.
-  #   let warningDataO = assignVariable(userVariables,
-  #     variableData.dotNameStr, variableData.value,
-  #     variableData.operator, location = lcFunction)
-  #   if isSome(warningDataO):
-  #     return newFuncResult(warningDataO.message)
-
-proc callFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult =
-  ## Call the function variable.
-  assert funcVar.kind == vkFunc
-  if funcVar.funcv.builtIn:
-    result = funcVar.funcv.functionPtr(variables, arguments)
-  else:
-    result = callUserFunction(funcVar, variables, arguments)
+proc callFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult
 
 proc getFunctionValueAndPos*(
     functionName: string,
@@ -1494,12 +1449,15 @@ proc runStatement*(statement: Statement, variables: Variables):
   if vlOr.isMessage:
     return newVariableDataOr(vlOr.message)
 
-  # Return function exit.
-  if vlOr.value.sideEffect == seReturn:
+  case vlOr.value.sideEffect
+  of seReturn:
+    # Return function exit.
     return newVariableDataOr("", opReturn, vlOr.value.value)
-
-  if vlOr.value.sideEffect == seLogMessage:
+  of seLogMessage:
+    # Log statement exit.
     return newVariableDataOr("", opLog, vlOr.value.value)
+  of seNone:
+    discard
 
   # Check that there is not any unprocessed text following the value.
   if vlOr.value.pos != statement.text.len:
@@ -1510,6 +1468,56 @@ proc runStatement*(statement: Statement, variables: Variables):
 
   # Return the variable dot name and value.
   result = newVariableDataOr(varName, operator, vlOr.value.value)
+
+proc callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult =
+  ## Run the given user function.
+  assert funcVar.kind == vkFunc
+  assert funcVar.funcv.builtIn == false
+
+  var userVariables = emptyVariables()
+
+  # Populate the m dictionary with the parameters and arguments.
+  let funResult = mapParameters(funcVar.funcv.signature, arguments)
+  if funResult.kind == frWarning:
+    return funResult
+  userVariables["m"] = funResult.value
+
+  # Run the function statements.
+  for statement in funcVar.funcv.statements:
+
+    # Run the statement.
+    let variableDataOr = runStatement(statement, variables)
+    if variableDataOr.isMessage:
+      return newFunResultWarn(variableDataOr.message)
+    let variableData = variableDataOr.value
+
+    # Handle the result of the statement.
+    case variableData.operator
+    of opEqual, opAppendList:
+      # Assign the variable if possible.
+      let wdO = assignVariable(userVariables, variableData, inFunction)
+      if isSome(wdO):
+        return newFunResultWarn(wdO.get())
+    of opIgnore:
+      continue
+    of opReturn:
+      # Return the value of the function.
+      return newFunResult(variableData.value)
+    of opLog:
+      # todo: support logging in user functions.
+      discard
+
+  assert(false, "the function doesn't have a return statement")
+  # Out of lines; missing the function's return statement.
+  result = newFunResultWarn(wNoReturnStatement)
+
+proc callFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult =
+  ## Call the function variable.
+  assert funcVar.kind == vkFunc
+  if funcVar.funcv.builtIn:
+    result = funcVar.funcv.functionPtr(variables, arguments)
+  else:
+    result = callUserFunction(funcVar, variables, arguments)
 
 proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var Variables,
     sourceFilename: string, codeLocation: CodeLocation): LoopControl =
@@ -1523,26 +1531,26 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
     return lcContinue
   let variableData = variableDataOr.value
 
-  # Handle a return function exit.
-  if variableData.operator == opReturn:
+  case variableData.operator
+  of opEqual, opAppendList:
+    # Assign the variable if possible.
+    let warningDataO = assignVariable(variables,
+      variableData.dotNameStr, variableData.value, variableData.operator, codeLocation)
+    if isSome(warningDataO):
+      env.warnStatement(statement, warningDataO.get(), sourceFilename)
+    result = lcContinue
+  of opIgnore:
+    result = lcContinue
+  of opReturn:
+    # Handle a return function exit.
     if variableData.value.stringv == "stop":
-      return lcStop
-    # "skip"
-    return lcSkip
-
-  if variableData.operator == opLog:
+      result = lcStop
+    else:
+      assert(variableData.value.stringv == "skip", "returned something besides stop or skip")
+      result = lcSkip
+  of opLog:
     env.logLine(sourceFilename, statement.lineNum, variableData.value.stringv & "\n")
-    return lcContinue
-
-  if variableData.operator == opIgnore:
-    return lcContinue
-
-  # Assign the variable if possible.
-  let warningDataO = assignVariable(variables,
-    variableData.dotNameStr, variableData.value, variableData.operator, codeLocation)
-  if isSome(warningDataO):
-    env.warnStatement(statement, warningDataO.get(), sourceFilename)
-  return lcContinue
+    result = lcContinue
 
 proc parseSignature*(signature: string): SignatureOr =
   ## Parse the signature and return the list of parameters or a
