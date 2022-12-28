@@ -9,7 +9,7 @@ Statictea function signatures and parameter checking.
 * [kindToParamCode](#kindtoparamcode) &mdash; Convert a value type to a parameter type.
 * [sameType](#sametype) &mdash; Check whether the param type is the same type or compatible with the value.
 * [sameType](#sametype-1) &mdash; Check whether the param type is the same type or compatible with the value.
-* [mapParameters](#mapparameters) &mdash; Create a dictionary of the arguments.
+* [mapParameters](#mapparameters) &mdash; Create a dictionary of the parameters and arguments.
 
 # paramCodeString
 
@@ -45,7 +45,7 @@ func sameType(paramType: ParamType; valueKind: ValueKind): bool
 
 # mapParameters
 
-Create a dictionary of the arguments. The parameter names become the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the arguments do not match the signature.  When they do not match, the warning parameter tells the first non-matching argument.
+Create a dictionary of the parameters and arguments. The parameter names become the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the arguments do not match the signature.  When they do not match, the warning parameter tells the first non-matching argument.
 
 ```nim
 func mapParameters(signature: Signature; args: seq[Value]): FunResult

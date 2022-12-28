@@ -358,7 +358,7 @@ proc andOrFunctions(specialFunction: SpecialFunction; statement: Statement;
 Run the given user function.
 
 ```nim
-func callUserFunction(funcVar: Value; variables: Variables;
+proc callUserFunction(funcVar: Value; variables: Variables;
                       arguments: seq[Value]): FunResult
 ```
 
@@ -367,7 +367,7 @@ func callUserFunction(funcVar: Value; variables: Variables;
 Call the function variable.
 
 ```nim
-func callFunction(funcVar: Value; variables: Variables; arguments: seq[Value]): FunResult
+proc callFunction(funcVar: Value; variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # getFunctionValueAndPos
@@ -465,7 +465,7 @@ Run a statement and assign the variable if appropriate. Return skip, stop or con
 ```nim
 proc runStatementAssignVar(env: var Env; statement: Statement;
                            variables: var Variables; sourceFilename: string;
-                           codeFile: bool): LoopControl
+                           codeLocation: CodeLocation): LoopControl
 ```
 
 # parseSignature
@@ -518,7 +518,8 @@ proc defineUserFunctionAssignVar(env: var Env; lb: var LineBuffer;
 Run a command and fill in the variables dictionaries.
 
 ```nim
-proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables): LoopControl
+proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables;
+                codeLocation: CodeLocation): LoopControl
 ```
 
 # runCodeFile

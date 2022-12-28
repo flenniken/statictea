@@ -14,6 +14,7 @@ prefix and it allows functions to be specified without the f prefix.
 
 * const: [outputValues](#outputvalues) &mdash; Where the replacement block's output goes.
 * type: [Operator](#operator) &mdash; The statement operator types.
+* type: [CodeLocation](#codelocation) &mdash; Location where the code is running.
 * type: [VariableData](#variabledata) &mdash; The VariableData object holds the variable name, operator,
 and value which is the result of running a statement.
 * type: [VariableDataOr](#variabledataor) &mdash; A VariableData object or a warning.
@@ -27,6 +28,7 @@ and value which is the result of running a statement.
 * [getTeaVarStringDefault](#getteavarstringdefault) &mdash; Return the string value of one of the tea dictionary string items.
 * [resetVariables](#resetvariables) &mdash; Clear the local variables and reset the tea variables for running a command.
 * [assignVariable](#assignvariable) &mdash; Assign the variable the given value if possible, else return a warning.
+* [assignVariable](#assignvariable-1) &mdash; Assign the variable the given value if possible, else return a warning.
 * [getVariable](#getvariable) &mdash; Look up the variable and return its value when found, else return a warning.
 
 # outputValues
@@ -55,6 +57,19 @@ The statement operator types.
 ```nim
 Operator = enum
   opIgnore, opEqual, opAppendList, opReturn, opLog
+```
+
+# CodeLocation
+
+Location where the code is running.
+
+* inCommand -- in a template command
+* inCodeFile -- in a code file
+* inFunction -- in a user defined function
+
+```nim
+CodeLocation = enum
+  inCommand, inCodeFile, inFunction
 ```
 
 # VariableData
@@ -162,7 +177,17 @@ Assign the variable the given value if possible, else return a warning.
 
 ```nim
 proc assignVariable(variables: var Variables; dotNameStr: string; value: Value;
-                    operator = opEqual; inCodeFile = false): Option[WarningData]
+                    operator = opEqual; codeLocation = inCommand): Option[
+    WarningData]
+```
+
+# assignVariable
+
+Assign the variable the given value if possible, else return a warning.
+
+```nim
+proc assignVariable(variables: var Variables; variableData: VariableData;
+                    codeLocation: CodeLocation): Option[WarningData]
 ```
 
 # getVariable

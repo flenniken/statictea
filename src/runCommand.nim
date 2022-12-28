@@ -888,13 +888,47 @@ proc andOrFunctions*(
     value = a or b
   result = newValueAndPosOr(newValue(value), runningPos)
 
-func callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult =
+proc callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult =
   ## Run the given user function.
   assert funcVar.kind == vkFunc
   assert funcVar.funcv.builtIn == false
-  result = newFunResultWarn(wInvalidVersion, 1)
 
-func callFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult =
+  return newFunResultWarn(wInvalidStringType, 1)
+
+  # var userVariables = emptyVariables()
+
+  # # Populate the m dictionary with the parameters and arguments.
+  # let funResult = mapParameters(funcVar.funcv.signature, arguments)
+  # if funResult.kind == frWarning:
+  #   return funResult
+  # userVariables["m"] = funResult.value
+
+  # # Run the function statements.
+  # for statement in funcVar.funcv.statements:
+
+  #   let variableDataOr = runStatement(statement, variables)
+  #   if variableDataOr.isMessage:
+  #     return newFuncResult(variableDataOr.message)
+  #   let variableData = variableDataOr.value
+
+  #   # Handle a return function exit.
+  #   if variableData.operator == opReturn:
+  #       return newFuncResult(variableData.value)
+
+  #   # Write log lines.
+  #   if variableData.operator == opLog:
+  #     env.logLine(sourceFilename, statement.lineNum, variableData.value.stringv & "\n")
+
+  #   # if variableData.operator == opIgnore:
+
+  #   # Assign the variable if possible.
+  #   let warningDataO = assignVariable(userVariables,
+  #     variableData.dotNameStr, variableData.value,
+  #     variableData.operator, location = lcFunction)
+  #   if isSome(warningDataO):
+  #     return newFuncResult(warningDataO.message)
+
+proc callFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult =
   ## Call the function variable.
   assert funcVar.kind == vkFunc
   if funcVar.funcv.builtIn:
@@ -967,6 +1001,7 @@ proc getFunctionValueAndPos*(
 
   # Call the function.
   let funResult = callFunction(funcVar, variables, arguments)
+
   if funResult.kind == frWarning:
     var warningPos: int
     if funResult.parameter < argumentStarts.len:
@@ -1476,7 +1511,7 @@ proc runStatement*(statement: Statement, variables: Variables):
   result = newVariableDataOr(varName, operator, vlOr.value.value)
 
 proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var Variables,
-    sourceFilename: string, codeFile: bool): LoopControl =
+    sourceFilename: string, codeLocation: CodeLocation): LoopControl =
   ## Run a statement and assign the variable if appropriate. Return
   ## skip, stop or continue to control the loop.
 
@@ -1503,8 +1538,7 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
 
   # Assign the variable if possible.
   let warningDataO = assignVariable(variables,
-    variableData.dotNameStr, variableData.value,
-    variableData.operator, inCodeFile = codeFile)
+    variableData.dotNameStr, variableData.value, variableData.operator, codeLocation)
   if isSome(warningDataO):
     env.warnStatement(statement, warningDataO.get(), sourceFilename)
   return lcContinue
@@ -1828,19 +1862,19 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
   func dummy(variables: Variables, parameters: seq[Value]): FunResult =
     result = newFunResult(newValue(0))
 
-  let userFunc = newFunc(true, signature, docComments, sourceFilename, lineNum,
+  let userFunc = newFunc(builtIn=false, signature, docComments, sourceFilename, lineNum,
     numLines, userStatements, dummy)
   let funcVar = newValue(userFunc)
 
   # Assign the variable if possible.
   let warningDataO = assignVariable(variables, leftName, funcVar,
-    operator, inCodeFile = true)
+    operator, inCodeFile)
   if isSome(warningDataO):
     env.warnStatement(statement, warningDataO.get(), sourceFilename)
   return true
 
 proc runCommand*(env: var Env, cmdLines: CmdLines,
-    variables: var Variables): LoopControl =
+    variables: var Variables, codeLocation: CodeLocation): LoopControl =
   ## Run a command and fill in the variables dictionaries.
 
   # Clear the local variables and set the tea vars to their initial
@@ -1852,7 +1886,7 @@ proc runCommand*(env: var Env, cmdLines: CmdLines,
 
     # Run the statement.
     let loopControl = runStatementAssignVar(env, statement, variables,
-        env.templateFilename, codeFile=false)
+      env.templateFilename, codeLocation)
 
     # Stop looping when we get a return.
     if loopControl == lcStop or loopControl == lcSkip:
@@ -1909,7 +1943,7 @@ proc runCodeFile*(env: var Env, variables: var Variables, filename: string) =
       continue
 
     # Process a regular statement.
-    let loopControl = runStatementAssignVar(env, statement, variables, filename, codeFile=true)
+    let loopControl = runStatementAssignVar(env, statement, variables, filename, inCodeFile)
     if loopControl == lcStop:
       break
     elif loopControl == lcSkip:

@@ -2421,7 +2421,7 @@ details = functionDetails(mycmp)
     let eVarRep = """
 a = 5
 mycmp = "strNumCmp"
-details.builtIn = true
+details.builtIn = false
 details.signature.optional = false
 details.signature.name = "strNumCmp"
 details.signature.paramNames = ["numStr1","numStr2"]
@@ -2492,3 +2492,16 @@ if(false, return("abc")
 testcode.txt(6): w240: Out of lines; missing the function's return statement.
 """
     check testRunCodeFile(content, eErrLines=eErrLines)
+
+#   test "call user function":
+#     let content = """
+# mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+#   ## Compare two number strings and return 1, 0, or -1.
+#   return(cmp(int(numStr1), int(numStr2)))
+
+# a = l.mycmp("1", "2")
+# """
+#     let eVarRep = """
+# mycmp = "strNumCmp"
+# a = -1"""
+#     check testRunCodeFile(content, eVarRep)

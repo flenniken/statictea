@@ -38,6 +38,16 @@ type
     opReturn,
     opLog,
 
+  CodeLocation* = enum
+    ## Location where the code is running.
+    ## @:
+    ## @:* inCommand -- in a template command
+    ## @:* inCodeFile -- in a code file
+    ## @:* inFunction -- in a user defined function
+    inCommand
+    inCodeFile
+    inFunction
+
   VariableData* = object
     ## The VariableData object holds the variable name, operator,
     ## @:and value which is the result of running a statement.
@@ -266,12 +276,13 @@ func assignTeaVariable(variables: var Variables, dotNameStr: string,
 
   tea[varName] = value
 
+
 proc assignVariable*(
     variables: var Variables,
     dotNameStr: string,
     value: Value,
     operator = opEqual,
-    inCodeFile = false
+    codeLocation = inCommand
   ): Option[WarningData] =
   ## Assign the variable the given value if possible, else return a
   ## warning.
@@ -292,7 +303,7 @@ proc assignVariable*(
 
   let nameSpace = names[0]
 
-  if inCodeFile and nameSpace == "o":
+  if codeLocation == inCodeFile and nameSpace == "o":
     varsDictOr = getParentDictToAddTo(variables, dotNameStr)
   else:
     case nameSpace
@@ -309,7 +320,7 @@ proc assignVariable*(
         # You cannot overwrite the server variables.
         return some(newWarningData(wReadOnlyDictionary))
     of "g", "l":
-      if inCodeFile and nameSpace == "g":
+      if codeLocation == inCodeFile and nameSpace == "g":
         # You cannot assign to the g namespace in a code file.
         return some(newWarningData(wNoGlobalInCodeFile))
       if nameSpace == "l" and (dotNameStr == "l.true" or dotNameStr == "l.false"):
@@ -377,6 +388,16 @@ func lookUpVar(variables: Variables, names: seq[string]): ValueOr =
       return newValueOr(wNotDict, name)
     next = value.dictv
 
+proc assignVariable*(
+  variables: var Variables,
+  variableData: VariableData,
+  codeLocation: CodeLocation
+  ): Option[WarningData] =
+  ## Assign the variable the given value if possible, else return a
+  ## warning.
+  result = assignVariable(variables, variableData.dotNameStr, variableData.value,
+      variableData.operator, codeLocation)
+
 proc getVariable*(variables: Variables, dotNameStr: string, noPrefixDict = ""): ValueOr =
   ## Look up the variable and return its value when found, else return
   ## a warning. When no prefix, look in the noPrefixDict dictionary,
@@ -414,4 +435,3 @@ proc getVariable*(variables: Variables, dotNameStr: string, noPrefixDict = ""): 
         else:
           return result
         result = newValueOr(messageId, dotNameStr)
-

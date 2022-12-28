@@ -24,41 +24,75 @@ proc testGetVariableOk(variables: Variables, dotNameStr: string, eJson:
     return false
 
 proc testGetVariableWarning(variables: Variables, dotNameStr: string,
-    eWarningData: WarningData): bool =
+    eMessageId: MessageId, eP1 = "", ePos = 0): bool =
   let valueOr = getVariable(variables, dotNameStr, "l")
-  result = true
   if valueOr.isValue:
     echo "Did not get a warning: " & $valueOr
     return false
-  if not expectedItem("warning", $valueOr.message, $eWarningData):
-    return false
+  let eMd = newWarningData(eMessageId, eP1, ePos)
+  result = gotExpected($valueOr.message, $eMd)
 
-proc testAssignVariable(variables: var Variables, dotNameStr: string, value: Value,
-    eWarningDataO: Option[WarningData] = none(WarningData),
-    operator = opEqual, inCodeFile = false): bool =
-  ## Assign a variable then fetch and verify it was set.
-  let warningDataO = assignVariable(variables, dotNameStr, value,
-    operator, inCodeFile)
-  result = true
-  if not expectedItem("warningDataO", warningDataO, eWarningDataO):
-    return false
-  if warningDataO.isSome:
-    return true
-  let valueOr = getVariable(variables, dotNameStr, "l")
-  if valueOr.isMessage:
-    echo "Unable to fetch the variable: " & $valueOr
-    return false
-  if not expectedItem("fetched value", valueOr.value, value):
-    return false
+proc testAssignVarWarn(
+    dotNameStr: string,
+    operator: Operator,
+    value: Value,
+    codeLocation: CodeLocation,
+    eMessageId: MessageId,
+    eP1 = "",
+    ePos = 0,
+    inVars: string = "",
+    dictName: string = "l",
+  ): bool =
+  ## Assign a variable and make sure the warning matches the expected warning.
 
-proc testAssignVariable(dotNameStr: string, value: Value,
-    eWarningDataO: Option[WarningData] = none(WarningData),
-    operator = opEqual, inCodeFile = false): bool =
-  ## Assign a variable then fetch and verify it was set. Start with an
-  ## empty dictionary.
+  # Populate the variables dictionary when there are inVars.
   var variables = emptyVariables()
-  result = testAssignVariable(variables, dotNameStr,
-    value, eWarningDataO, operator, inCodeFile)
+  if inVars != "":
+    var valueOr = readJsonString(inVars)
+    if valueOr.isMessage:
+      echo $valueOr
+      return false
+    variables[dictName] = valueOr.value
+
+  # Assign a variable.
+  let warningDataO = assignVariable(variables, dotNameStr, value,
+    operator, codeLocation)
+  if not warningDataO.isSome:
+    echo "Did not get a message. got:"
+    echo $variables[dictName]
+    return false
+  let eWd = newWarningData(eMessageId, eP1, ePos)
+  result = gotExpected($warningDataO.get(), $eWd)
+
+proc testAssignVarFlex(
+    dotNameStr: string,
+    operator: Operator,
+    value: Value,
+    codeLocation: CodeLocation,
+    eVars: string,
+    inVars: string = "",
+    dictName: string = "l",
+  ): bool =
+  ## Test assignVariable.
+
+  # Populate the variables dictionary when there are inVars.
+  var variables = emptyVariables()
+  if inVars != "":
+    var valueOr = readJsonString(inVars)
+    if valueOr.isMessage:
+      echo $valueOr
+      return false
+    variables[dictName] = valueOr.value
+
+  let warningDataO = assignVariable(variables, dotNameStr, value,
+    operator, codeLocation)
+  if warningDataO.isSome:
+    echo "got unexpected message."
+    echo $warningDataO
+    return false
+
+  # let got = dotNameRep(variables, "", true)
+  result = gotExpected($variables[dictName], eVars)
 
 suite "variables.nim":
 
@@ -87,6 +121,7 @@ t.version = "$1"""" % staticteaVersion
     check testGetVariableOk(variables, "o", "{}")
     check testGetVariableOk(variables, "l", "{}")
     check testGetVariableOk(variables, "g", "{}")
+
     let eTea = """{"args":{},"row":0,"version":"$1"}""" % staticteaVersion
     check testGetVariableOk(variables, "t", eTea)
     let expected = """["cmp","cmp","cmp"]"""
@@ -118,8 +153,7 @@ t.version = "$1"""" % staticteaVersion
     check testGetVariableOk(variables, "l.a", """{"b":{"c":{}}}""")
     check testGetVariableOk(variables, "l", """{"a":{"b":{"c":{}}}}""")
 
-    let wO = newWarningData(wVariableMissing, "hello")
-    check testGetVariableWarning(variables, "l.hello", wO)
+    check testGetVariableWarning(variables, "l.hello", wVariableMissing, "hello")
 
 
   test "getVariable not dict":
@@ -133,25 +167,20 @@ t.version = "$1"""" % staticteaVersion
     var valueOr = readJsonString(variablesJson)
     check valueOr.isValue
     variables["l"] = valueOr.value
-    let wO = newWarningData(wNotDict, "b")
-    check testGetVariableWarning(variables, "l.a.b.tea", wO)
-    let w2 = newWarningData(wNotInL, "a.b.tea")
-    check testGetVariableWarning(variables, "a.b.tea", w2)
+    check testGetVariableWarning(variables, "l.a.b.tea", wNotDict, "b")
+    check testGetVariableWarning(variables, "a.b.tea", wNotInL, "a.b.tea")
 
   test "testGetVariableWarning wReservedNameSpaces":
     var variables = emptyVariables()
-    let eWarningData = newWarningData(wReservedNameSpaces)
-    check testGetVariableWarning(variables, "p", eWarningData)
+    check testGetVariableWarning(variables, "p", wReservedNameSpaces)
 
   test "testGetVariableWarning wVariableMissing":
     var variables = emptyVariables()
-    let eWarningData = newWarningData(wVariableMissing, "hello")
-    check testGetVariableWarning(variables, "s.hello", eWarningData)
+    check testGetVariableWarning(variables, "s.hello", wVariableMissing, "hello")
 
   test "testGetVariableWarning wVariableMissing 2":
     var variables = emptyVariables()
-    let eWarningData = newWarningData(wVariableMissing, "d")
-    check testGetVariableWarning(variables, "s.d.hello", eWarningData)
+    check testGetVariableWarning(variables, "s.d.hello", wVariableMissing, "d")
 
   test "testGetVariableWarning not dict":
     var variables = emptyVariables()
@@ -159,9 +188,7 @@ t.version = "$1"""" % staticteaVersion
     var valueOr = readJsonString(variablesJson)
     check valueOr.isValue
     variables["s"] = valueOr.value
-
-    let eWarningData = newWarningData(wNotDict, "d")
-    check testGetVariableWarning(variables, "s.d.hello", eWarningData)
+    check testGetVariableWarning(variables, "s.d.hello", wNotDict, "d")
 
   test "getTeaVarStringDefault":
     var variables = emptyVariables()
@@ -224,248 +251,239 @@ t.version = "$1"""" % staticteaVersion
     check $getVariable(variables, "g.a") == $newValueOr(newValue(2))
 
   test "assignVariable good":
-    check testAssignVariable("five", newValue(5))
-    check testAssignVariable("tfive", newValue(5))
-    check testAssignVariable("g.var", newValue(1))
-    check testAssignVariable("t.maxLines", newValue(20))
-    check testAssignVariable("t.maxRepeat", newValue(20))
-    check testAssignVariable("t.content", newValue("asdf"))
-    check testAssignVariable("t.output", newValue("stderr"))
-    check testAssignVariable("t.output", newValue("stdout"))
-    check testAssignVariable("t.repeat", newValue(20))
 
-  test "assign code variable":
-    check testAssignVariable("o.tea", newValue(20), inCodeFile = true)
-    check testAssignVariable("o.tea", newValue(20),
-      some(newWarningData(wReadOnlyCodeVars)))
+    let json1 = """{"five":5}"""
+    check testAssignVarFlex("five", opEqual, newValue(5), inCommand, json1)
+    check testAssignVarFlex("g.five", opEqual, newValue(5), inCommand, json1, dictName="g")
+
+    check testAssignVarFlex("o.five", opEqual, newValue(5), inCodeFile, json1, dictName="o")
+
+    let tkeys = """"args":{},"row":0,"version":"$1""""  % staticteaVersion
+    let json2 = """{$1,"maxLines":5}""" % tkeys
+    check testAssignVarFlex("t.maxLines", opEqual, newValue(5), inCommand,
+      json2, dictName="t")
+
+    let json3 = """{$1,"maxRepeat":5}""" % tkeys
+    check testAssignVarFlex("t.maxRepeat", opEqual, newValue(5), inCommand,
+      json3, dictName="t")
+
+    let json4 = """{$1,"repeat":5}""" % tkeys
+    check testAssignVarFlex("t.repeat", opEqual, newValue(5), inCommand, json4, dictName="t")
+
+    let json5 = """{$1,"content":"asdf"}""" % tkeys
+    check testAssignVarFlex("t.content", opEqual, newValue("asdf"), inCommand, json5, dictName="t")
+
+    # check testAssignVarFlex("t.content", opEqual, newValue("asdf"), inCommand, newValue("asdf"))
+    # check testAssignVarFlex("t.output", opEqual, newValue("stderr"), inCommand, newValue("stderr"))
+    # check testAssignVarFlex("t.output", opEqual, newValue("stdout"), inCommand, newValue("stdout"))
 
   test "assignVariable warning":
-    check testAssignVariable("t.repeat", newValue("hello"),
-      some(newWarningData(wInvalidRepeat)))
+    check testAssignVarWarn("o.tea", opEqual, newValue(20),
+      inCommand, wReadOnlyCodeVars)
+    check testAssignVarWarn("t.repeat", opEqual, newValue("hello"),
+      inCommand, wInvalidRepeat)
 
-  test "assignVariable true false":
-    check testAssignVariable("true", newValue("hello"),
-      some(newWarningData(wAssignTrueFalse)))
-    check testAssignVariable("l.true", newValue("hello"),
-      some(newWarningData(wAssignTrueFalse)))
+    check testAssignVarWarn("true", opEqual, newValue("hello"),
+      inCommand, wAssignTrueFalse)
+    check testAssignVarWarn("l.true", opEqual, newValue("hello"),
+      inCommand, wAssignTrueFalse)
 
-    check testAssignVariable("false", newValue("hello"),
-      some(newWarningData(wAssignTrueFalse)))
-    check testAssignVariable("l.false", newValue("hello"),
-      some(newWarningData(wAssignTrueFalse)))
+    check testAssignVarWarn("false", opEqual, newValue("hello"),
+      inCommand, wAssignTrueFalse)
+    check testAssignVarWarn("l.false", opEqual, newValue("hello"),
+      inCommand, wAssignTrueFalse)
 
   test "assignVariable wReadOnlyDictionary":
-    let eWarningDataO = some(newWarningData(wReadOnlyDictionary))
-    check testAssignVariable("s.hello", newValue(1), eWarningDataO)
+    check testAssignVarWarn("s.hello", opEqual, newValue(1), inCommand, wReadOnlyDictionary)
 
   test "assignVariable wImmutableVars":
-    let eWarningDataO = some(newWarningData(wImmutableVars))
-    check testAssignVariable("s", newValue(1), eWarningDataO)
-    check testAssignVariable("o", newValue(1), eWarningDataO)
-    check testAssignVariable("g", newValue(1), eWarningDataO)
-    check testAssignVariable("l", newValue(1), eWarningDataO)
-    check testAssignVariable("t", newValue(1), eWarningDataO)
+    check testAssignVarWarn("s", opEqual, newValue(1), inCommand, wImmutableVars)
+    check testAssignVarWarn("o", opEqual, newValue(1), inCommand, wImmutableVars)
+    check testAssignVarWarn("g", opEqual, newValue(1), inCommand, wImmutableVars)
+    check testAssignVarWarn("l", opEqual, newValue(1), inCommand, wImmutableVars)
+    check testAssignVarWarn("t", opEqual, newValue(1), inCommand, wImmutableVars)
 
   test "assignVariable wReadOnlyFunctions":
-    let eWarningDataO = some(newWarningData(wReadOnlyFunctions))
-    check testAssignVariable("f", newValue(1), eWarningDataO)
-    check testAssignVariable("f.a", newValue(1), eWarningDataO)
+    check testAssignVarWarn("f", opEqual, newValue(1), inCommand, wReadOnlyFunctions)
+    check testAssignVarWarn("f.a", opEqual, newValue(1), inCommand, wReadOnlyFunctions)
 
   test "assignVariable wReservedNameSpaces":
-    let eWarningDataO = some(newWarningData(wReservedNameSpaces))
-    for letterVar in ["i", "j", "k", "m", "n", "p", "q", "r", "u"]:
-      check testAssignVariable(letterVar, newValue(1), eWarningDataO)
+    for location in CodeLocation:
+      for letterVar in ["i", "j", "k", "m", "n", "p", "q", "r", "u"]:
+        check testAssignVarWarn(letterVar, opEqual, newValue(1), location, wReservedNameSpaces)
 
   test "assignVariable not wReservedNameSpaces":
-    for letterVar in ["a", "b", "c", "d", "e", "v", "w", "x", "y", "z"]:
-      check testAssignVariable(letterVar, newValue(1))
+    for location in CodeLocation:
+      for letterVar in ["a", "b", "c", "d", "e", "v", "w", "x", "y", "z"]:
+        check testAssignVarFlex(letterVar, opEqual, newValue(1), location, """{"$1":1}""" % letterVar)
 
   test "assignVariable wVariableMissing":
-    let eWarningDataO = some(newWarningData(wVariableMissing, "w"))
-    check testAssignVariable("w.hello", newValue(1), eWarningDataO)
+    check testAssignVarWarn("w.hello", opEqual, newValue(1),
+      inCodeFile, wVariableMissing, "w")
 
-  test "assignVariable wImmutableVars":
+  test "assignVariable wImmutableVars2":
     ## Set variables then try to change them.
-    var variables = emptyVariables()
-    let eWarningDataO = some(newWarningData(wImmutableVars))
+    let json1 = """{"five":1}"""
+    check testAssignVarFlex("five", opEqual, newValue(1), inCommand, json1)
+    check testAssignVarWarn("five", opEqual, newValue(2), inCommand,
+      wImmutableVars, inVars=json1)
 
-    check testAssignVariable(variables, "five", newValue(1))
-    check testAssignVariable(variables, "five", newValue(2), eWarningDataO)
+    check testAssignVarFlex("l.five", opEqual, newValue(1), inCommand, json1)
+    check testAssignVarWarn("l.five", opEqual, newValue(2), inCommand,
+      wImmutableVars, inVars=json1)
 
-    check testAssignVariable(variables, "g.five", newValue(1))
-    check testAssignVariable(variables, "g.five", newValue(2), eWarningDataO)
+    check testAssignVarFlex("o.five", opEqual, newValue(1), inCodeFile,
+      json1, dictName="o")
+    check testAssignVarWarn("o.five", opEqual, newValue(2), inCodeFile,
+      wImmutableVars, inVars=json1, dictName="o")
 
-    check testAssignVariable(variables, "o.five", newValue(1), inCodeFile = true)
-    check testAssignVariable(variables, "o.five", newValue(2),
-      eWarningDataO, inCodeFile = true)
+    check testAssignVarWarn("o.five", opEqual, newValue(2), inCommand,
+      wReadOnlyCodeVars, inVars=json1, dictName="o")
 
   test "assignVariable tea vars":
     ## Set tea variables then try to change them.
-    var variables = emptyVariables()
-    let eWarningDataO = some(newWarningData(wTeaVariableExists))
+    let tkeys = """"args":{},"row":0,"version":"$1""""  % staticteaVersion
 
-    check testAssignVariable(variables, "t.maxLines", newValue(2))
-    check testAssignVariable(variables, "t.maxLines", newValue(3), eWarningDataO)
+    let json1 = """{$1,"maxLines":2}""" % tkeys
+    check testAssignVarFlex("t.maxLines", opEqual, newValue(2), inCommand,
+      json1, dictName="t")
+    check testAssignVarWarn("t.maxLines", opEqual, newValue(3), inCommand,
+      wTeaVariableExists, inVars = json1, dictName="t")
 
-    check testAssignVariable(variables, "t.output", newValue("stderr"))
-    check testAssignVariable(variables, "t.output", newValue("result"), eWarningDataO)
+    let json2 = """{$1,"output":"stderr"}""" % tkeys
+    check testAssignVarFlex("t.output", opEqual, newValue("stderr"), inCommand,
+      json2, dictName="t")
+    check testAssignVarWarn("t.output", opEqual, newValue("result"), inCommand,
+      wTeaVariableExists, inVars = json2, dictName="t")
 
   test "assignVariable wReadOnlyTeaVar row":
-    let eWarningDataO = some(newWarningData(wReadOnlyTeaVar, "row"))
-    check testAssignVariable("t.row", newValue(1), eWarningDataO)
+    check testAssignVarWarn("t.row", opEqual, newValue(1),
+      inCommand, wReadOnlyTeaVar, "row")
 
   test "assignVariable wReadOnlyTeaVar args":
-    let eWarningDataO = some(newWarningData(wReadOnlyTeaVar, "args"))
-    check testAssignVariable("t.args", newValue(1), eWarningDataO)
+    check testAssignVarWarn("t.args", opEqual, newValue(1),
+      inCommand, wReadOnlyTeaVar, "args")
 
   test "assignVariable wInvalidTeaVar server":
-    let eWarningDataO = some(newWarningData(wInvalidTeaVar, "s"))
-    check testAssignVariable("t.s", newValue(1), eWarningDataO)
+    check testAssignVarWarn("t.s", opEqual, newValue(1),
+      inCommand, wInvalidTeaVar, "s")
 
   test "assignVariable wReadOnlyTeaVar version":
-    let eWarningDataO = some(newWarningData(wReadOnlyTeaVar, "version"))
-    check testAssignVariable("t.version", newValue(1), eWarningDataO)
+    check testAssignVarWarn("t.version", opEqual, newValue(1),
+      inCommand, wReadOnlyTeaVar, "version")
 
   test "assignVariable missing tea var":
-    let eWarningDataO = some(newWarningData(wInvalidTeaVar, "missing"))
-    check testAssignVariable("t.missing", newValue(1), eWarningDataO)
+    check testAssignVarWarn("t.missing", opEqual, newValue(1),
+      inCommand, wInvalidTeaVar, "missing")
 
   test "assignVariable args help":
-    let eWarningDataO = some(newWarningData(wReadOnlyTeaVar, "args"))
-    check testAssignVariable("t.args.help", newValue(1), eWarningDataO)
+    check testAssignVarWarn("t.args.help", opEqual, newValue(1),
+      inCommand, wReadOnlyTeaVar, "args")
 
   test "assignVariable maxLines not int":
-    let eWarningDataO = some(newWarningData(wInvalidMaxCount, ""))
-    check testAssignVariable("t.maxLines", newValue("max"), eWarningDataO)
+    check testAssignVarWarn("t.maxLines", opEqual, newValue("max"),
+      inCommand, wInvalidMaxCount)
 
   test "assignVariable maxLines less 0":
-    let eWarningDataO = some(newWarningData(wInvalidMaxCount, ""))
-    check testAssignVariable("t.maxLines", newValue(-1), eWarningDataO)
+    check testAssignVarWarn("t.maxLines", opEqual, newValue(-1),
+      inCommand, wInvalidMaxCount)
 
   test "assignVariable maxRepeat not int":
-    let eWarningDataO = some(newWarningData(wInvalidMaxRepeat, ""))
-    check testAssignVariable("t.maxRepeat", newValue("str"), eWarningDataO)
+    check testAssignVarWarn("t.maxRepeat", opEqual, newValue("str"),
+      inCommand, wInvalidMaxRepeat)
 
   test "assignVariable maxRepeat less 0":
-    let eWarningDataO = some(newWarningData(wInvalidMaxRepeat, ""))
-    check testAssignVariable("t.maxRepeat", newValue(-1), eWarningDataO)
+    check testAssignVarWarn("t.maxRepeat", opEqual, newValue(-1),
+      inCommand, wInvalidMaxRepeat)
 
   test "assignVariable content not string":
-    let eWarningDataO = some(newWarningData(wInvalidTeaContent, ""))
-    check testAssignVariable("t.content", newValue(1), eWarningDataO)
+    check testAssignVarWarn("t.content", opEqual, newValue(1),
+      inCommand, wInvalidTeaContent)
 
   test "assignVariable output not string":
-    let eWarningDataO = some(newWarningData(wInvalidOutputValue, ""))
-    check testAssignVariable("t.output", newValue(1), eWarningDataO)
+    check testAssignVarWarn("t.output", opEqual, newValue(1),
+      inCommand, wInvalidOutputValue)
 
   test "assignVariable output invalid":
-    let eWarningDataO = some(newWarningData(wInvalidOutputValue, ""))
-    check testAssignVariable("t.output", newValue("overthere"), eWarningDataO)
+    check testAssignVarWarn("t.output", opEqual, newValue("overthere"),
+      inCommand, wInvalidOutputValue)
 
   test "assignVariable repeat less 0":
-    let eWarningDataO = some(newWarningData(wInvalidRepeat, ""))
-    check testAssignVariable("t.repeat", newValue(-1), eWarningDataO)
+    check testAssignVarWarn("t.repeat", opEqual, newValue(-1),
+      inCommand, wInvalidRepeat)
 
   test "assignVariable repeat not int":
-    let eWarningDataO = some(newWarningData(wInvalidRepeat, ""))
-    check testAssignVariable("t.repeat", newValue("tasf"), eWarningDataO)
+    check testAssignVarWarn("t.repeat", opEqual, newValue("tasf"),
+      inCommand, wInvalidRepeat)
 
   test "assignVariable repeat above max":
-    let eWarningDataO = some(newWarningData(wInvalidRepeat, ""))
-    check testAssignVariable("t.repeat", newValue(101), eWarningDataO)
+    check testAssignVarWarn("t.repeat", opEqual, newValue(101),
+      inCommand, wInvalidRepeat)
 
   test "assignVariable invalid tea var":
-    let eWarningDataO = some(newWarningData(wInvalidTeaVar, "oops"))
-    check testAssignVariable("t.oops", newValue(1), eWarningDataO)
+    check testAssignVarWarn("t.oops", opEqual, newValue(1),
+      inCommand, wInvalidTeaVar, "oops")
 
   test "assignVariable append to tea":
-    let eWarningDataO = some(newWarningData(wImmutableVars))
-    check testAssignVariable("t", newValue("hello"), eWarningDataO, opAppendList)
+    check testAssignVarWarn("t", opAppendList, newValue("hello"),
+      inCommand, wImmutableVars)
 
   test "assignVariable append to tea args":
-    let eWarningDataO = some(newWarningData(wReadOnlyTeaVar, "args"))
-    check testAssignVariable("t.args", newValue("hello"), eWarningDataO, opAppendList)
-    check testAssignVariable("t.args.hello", newValue("hello"), eWarningDataO, opAppendList)
+    check testAssignVarWarn("t.args", opAppendList, newValue("hello"),
+      inCommand, wReadOnlyTeaVar, "args")
+    check testAssignVarWarn("t.args.hello", opAppendList, newValue("hello"),
+      inCommand, wReadOnlyTeaVar, "args")
 
   test "assignVariable nested dict":
-    var variables = emptyVariables()
-    let variablesJson = """{"a":{"b2":"tea","b":{"c2":[],"c":{"d":"hello"}}}}"""
-    var valueOr = readJsonString(variablesJson)
-    check valueOr.isValue
-    variables["l"] = valueOr.value
-    check testAssignVariable(variables, "l.a.b.c.tea", newValue(1))
+    let json1 = """{"a":{"b2":"tea","b":{"c2":[],"c":{"d":"hello"}}}}"""
+    let json2 = """{"a":{"b2":"tea","b":{"c2":[],"c":{"d":"hello","tea":1}}}}"""
+    check testAssignVarFlex("l.a.b.c.tea", opEqual, newValue(1), inCommand,
+      json2, json1)
 
-    let warning1 = some(newWarningData(wAppendToList, "dict"))
-    check testAssignVariable(variables, "l.a.b", newValue(1),
-      warning1, opAppendList)
+    check testAssignVarWarn("l.a.b", opAppendList, newValue(1), inCommand,
+      wAppendToList, "dict", inVars=json2)
 
-    let eWarningDataO = some(newWarningData(wVariableMissing, "missing"))
-    check testAssignVariable(variables, "l.a.b.missing.tea",
-                             newValue(1), eWarningDataO)
+    check testAssignVarWarn("l.a.b.missing.tea", opEqual, newValue(1), inCommand,
+      wVariableMissing, "missing", inVars = json2)
 
-    let eWarningDataO2 = some(newWarningData(wNotDict, "b2"))
-    check testAssignVariable(variables, "l.a.b2.missing.tea",
-                             newValue(1), eWarningDataO2)
-
+    check testAssignVarWarn("l.a.b2.missing.tea", opEqual, newValue(1), inCommand,
+      wNotDict, "b2", inVars = json2)
 
   test "append to a list":
-    var variables = emptyVariables()
-    var warningDataO = assignVariable(variables, "teas", newValue(5), opAppendList)
-    check not warningDataO.isSome
-    warningDataO = assignVariable(variables, "teas", newValue(6), opAppendList)
-    check not warningDataO.isSome
-    warningDataO = assignVariable(variables, "teas", newValue(7), opAppendList)
-    check not warningDataO.isSome
-    check $variables["l"] == """{"teas":[5,6,7]}"""
+    let json1 = """{"teas":[5]}"""
+    let json2 = """{"teas":[5,6]}"""
+    let json3 = """{"teas":[5,6,7]}"""
+    check testAssignVarFlex("teas", opAppendList, newValue(5), inCommand, json1)
+    check testAssignVarFlex("teas", opAppendList, newValue(6), inCommand, json2, json1)
+    check testAssignVarFlex("teas", opAppendList, newValue(7), inCommand, json3, json2)
+    check testAssignVarFlex("teas", opAppendList, newValue(5), inCodeFile, json1)
+    check testAssignVarFlex("teas", opAppendList, newValue(6), inCodeFile, json2, json1)
 
   test "append to a list2":
-    var variables = emptyVariables()
-    let variablesJson = """
-{
- "a1":"hello",
- "a2":{
-  "b1": [],
- },
- "a3":[]
-}"""
-    var valueOr = readJsonString(variablesJson)
-    check valueOr.isValue
-    variables["l"] = valueOr.value
+    let json1 = """{"a1":"hello","a2":{"b1":[]},"a3":[]}"""
+    let json2 = """{"a1":"hello","a2":{"b1":[]},"a3":[],"teas":[5]}"""
+    check testAssignVarFlex("l.teas", opAppendList, newValue(5), inCommand,
+      json2, json1)
 
-    var aO = assignVariable(variables, "l.teas", newValue(5), opAppendList)
-    check not aO.isSome
-    check $variables["l"] == """{"a1":"hello","a2":{"b1":[]},"a3":[],"teas":[5]}"""
+    let json3 = """{"a1":"hello","a2":{"b1":[]},"a3":[],"teas":[5,6]}"""
+    check testAssignVarFlex("teas", opAppendList, newValue(6), inCommand,
+      json3, json2)
 
-    var bO = assignVariable(variables, "teas", newValue(6), opAppendList)
-    check not bO.isSome
-    check $variables["l"] == """{"a1":"hello","a2":{"b1":[]},"a3":[],"teas":[5,6]}"""
-
-    var cO = assignVariable(variables, "a2.b1", newValue(7), opAppendList)
-    check not cO.isSome
-    check $variables["l"] == """{"a1":"hello","a2":{"b1":[7]},"a3":[],"teas":[5,6]}"""
-
+    let json4 = """{"a1":"hello","a2":{"b1":[7]},"a3":[],"teas":[5,6]}"""
+    check testAssignVarFlex("a2.b1", opAppendList, newValue(7), inCommand,
+      json4, json3)
 
   test "append nested dictionary":
-    var variables = emptyVariables()
-    let variablesJson = """{"a":{}}"""
-    var valueOr = readJsonString(variablesJson)
-    check valueOr.isValue
-    variables["l"] = valueOr.value
+    check testAssignVarFlex("a", opEqual, newValue(5), inCommand, """{"a":5}""")
+    check testAssignVarFlex("a", opEqual, newValue(5), inCodeFile, """{"a":5}""")
+    check testAssignVarFlex("a", opAppendList, newValue(5), inCommand, """{"a":[5]}""")
 
-    var aO = assignVariable(variables, "l.a.tea", newValue(5), opAppendList)
-    check not aO.isSome
-    check $variables["l"] == """{"a":{"tea":[5]}}"""
-
-  test "append nested dictionary2":
-    var variables = emptyVariables()
-    let variablesJson = """{"a":{"tea":2}}"""
-    var valueOr = readJsonString(variablesJson)
-    check valueOr.isValue
-    variables["l"] = valueOr.value
-
-    var aO = assignVariable(variables, "l.a.sea", newValue(5), opAppendList)
-    check not aO.isSome
-    check $variables["l"] == """{"a":{"tea":2,"sea":[5]}}"""
+    check testAssignVarFlex("l.a.tea", opAppendList, newValue(5), inCommand,
+      """{"a":{"tea":[5]}}""", """{"a":{}}""")
+    check testAssignVarFlex("a", opAppendList, newValue(6), inCommand,
+      """{"a":[5,6]}""", """{"a":[5]}""")
+    check testAssignVarFlex("l.a.sea", opAppendList, newValue(5), inCommand,
+      """{"a":{"tea":2,"sea":[5]}}""", """{"a":{"tea":2}}""")
 
   test "append list to a list":
     var variables = emptyVariables()
@@ -473,7 +491,6 @@ t.version = "$1"""" % staticteaVersion
     check not warningDataO.isSome
     warningDataO = assignVariable(variables, "teas", newEmptyListValue(), opAppendList)
     check not warningDataO.isSome
-    check $variables["l"] == """{"teas":[[],[]]}"""
 
   test "append to a non-list":
     var variables = emptyVariables()

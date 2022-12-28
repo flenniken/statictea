@@ -221,6 +221,7 @@ proc formatString*(variables: Variables, text: string): StringOr =
 
   result = newStringOr(newStr)
 
+# todo: rename parameters to arguments
 func funCmp_iii*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Compare two ints. Returns -1 for less, 0 for equal and 1 for
   ## @: greater than.

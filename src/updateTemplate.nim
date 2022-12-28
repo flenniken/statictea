@@ -124,7 +124,7 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
       # Run the command and fill in the variables.
       var row = 0
       tea["row"] = newValue(row)
-      discard runCommand(env, cmdLines, variables)
+      discard runCommand(env, cmdLines, variables, inCommand)
 
     # Write out the command lines.
     for dumpLine in cmdLines.lines:

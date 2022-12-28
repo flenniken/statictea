@@ -94,11 +94,11 @@ func sameType*(paramType: ParamType, valueKind: ValueKind): bool =
     result = false
 
 func mapParameters*(signature: Signature, args: seq[Value]): FunResult =
-  ## Create a dictionary of the arguments. The parameter names become
-  ## the dictionary keys.  Return a FunResult object containing the
-  ## dictionary or a warning when the arguments do not match the
-  ## signature.  When they do not match, the warning parameter tells
-  ## the first non-matching argument.
+  ## Create a dictionary of the parameters and arguments. The
+  ## parameter names become the dictionary keys.  Return a FunResult
+  ## object containing the dictionary or a warning when the arguments
+  ## do not match the signature.  When they do not match, the warning
+  ## parameter tells the first non-matching argument.
 
   var map = newVarsDict()
 
