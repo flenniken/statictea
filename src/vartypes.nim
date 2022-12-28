@@ -20,6 +20,13 @@ type
 
   ValueKind* = enum
     ## The statictea variable types.
+    ## @:* vkString -- string of UTF-8 characters
+    ## @:* vkInt -- 64 bit signed integer
+    ## @:* vkFloat -- 64 bit floating point number
+    ## @:* vkDict -- hash table mapping strings to any value
+    ## @:* vkList -- a list of values of any type
+    ## @:* vkBool -- true or false
+    ## @:* vkFunc -- reference to a function
     vkString = "string"
     vkInt = "int"
     vkFloat = "float"
@@ -76,6 +83,14 @@ type
   ParamType* = enum
     ## The statictea parameter types. The same as the variable types
     ## ValueKind with an extra for "any".
+    ## @:* ptString -- string parameter type
+    ## @:* ptInt -- integer
+    ## @:* ptFloat -- floating point number
+    ## @:* ptDict -- dictionary
+    ## @:* ptList -- list
+    ## @:* ptBool -- boolean
+    ## @:* ptFunc -- function pointer
+    ## @:* ptAny -- any parameter type
     ptString = "string"
     ptInt = "int"
     ptFloat = "float"
@@ -96,7 +111,7 @@ type
     ## Holds the function signature.
     ## @:* optional -- true when the last parameter is optional
     ## @:* name -- the function name
-    ## @:* params -- the function parameters name and type
+    ## @:* params -- the function parameter names and types
     ## @:* returnType -- the function return type
     optional*: bool
     name*: string
@@ -109,14 +124,14 @@ type
   FunctionSpec* = object
     ## Holds the function details.
     ## @:
-    ## @:builtIn -- true for the built-in functions, false for user functions
-    ## @:signature -- the function signature
-    ## @:docComments -- the function document comments
-    ## @:filename -- the filename where the function is defined either the code file or functions.nim
-    ## @:lineNum -- the line number where the function definition starts
-    ## @:numLines -- the number of lines to define the function
-    ## @:statements -- a list of the function statements for user functions
-    ## @:functionPtr -- pointer to the function for built-in functions
+    ## @:* builtIn -- true for the built-in functions, false for user functions
+    ## @:* signature -- the function signature
+    ## @:* docComments -- the function document comments
+    ## @:* filename -- the filename where the function is defined either the code file or functions.nim
+    ## @:* lineNum -- the line number where the function definition starts
+    ## @:* numLines -- the number of lines to define the function
+    ## @:* statements -- a list of the function statements for user functions
+    ## @:* functionPtr -- pointer to the function for built-in functions
     builtIn*: bool
     signature*: Signature
     docComments*: seq[string]
@@ -128,6 +143,8 @@ type
 
   FunResultKind* = enum
     ## The kind of a FunResult object, either a value or warning.
+    ## @:* frValue -- a value
+    ## @:* frWarning -- a warning message
     frValue,
     frWarning
 
@@ -148,9 +165,9 @@ type
     ## @:* seReturn -- a return side effect, either stop or skip. stop
     ## @:the command or skip the replacement block iteration.
     ## @:* seLogMessage -- the log function specified to write a message to the log file
-    seNone,
-    seReturn,
-    seLogMessage,
+    seNone = "none",
+    seReturn = "return",
+    seLogMessage = "log",
 
   ValueAndPos* = object
     ## A value and the position after the value in the statement along
@@ -159,13 +176,11 @@ type
     ## starts at index 6 and ends at position 10.
     ## @:
     ## @:~~~
-    ## @:0123456789
+    ## @:0123456789 123456789
     ## @:var = 567 # test
     ## @:      ^ start
     ## @:          ^ end position
     ## @:~~~~
-    ## @:
-    ## @:Exit is set true by the return function to exit a command.
     value*: Value
     pos*: Natural
     sideEffect*: SideEffect
@@ -628,6 +643,7 @@ static:
     {.error: message .}
 
 func codeToParamType*(code: ParamCode): ParamType =
+  ## Convert a parameter code letter to a ParamType.
   case code:
   of 'i':
     result = ptInt
@@ -650,7 +666,8 @@ func codeToParamType*(code: ParamCode): ParamType =
     result = ptInt
 
 func strToParamType*(str: string): ParamType =
-  ## Return the parameter type for the given string.
+  ## Return the parameter type for the given string, e.g. "int" to
+  ## ptInt.
   case str:
   of "int":
     result = ptInt
@@ -688,6 +705,19 @@ proc shortName*(index: Natural): string =
 
 func newSignatureO*(functionName: string, signatureCode: string): Option[Signature] =
   ## Return a new signature for the function name and signature code.
+  ## The parameter names come from the shortName function for letters
+  ## a through z in order. The last letter in the code is the
+  ## function's return type.
+  ## @:
+  ## @:Example:
+  ## @:
+  ## @:~~~
+  ## @:var signatureO = newSignatureO("myname", "ifss")
+  ## @:echo $signatureO.get()
+  ## @:=>
+  ## @:myname(a: int, b: float, c: string) string
+  ## @:~~~~
+  
   var params: seq[Param]
   var nameIx = 0
   var optional = false

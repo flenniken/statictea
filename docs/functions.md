@@ -1511,8 +1511,10 @@ The default stype is "rb" which is used for replacement blocks.
 stype:
 
 * json -- returns JSON
-* rb -- returns JSON except strings are not quoted and @ characters are not excaped. Rb stands for replacement block.
-* dn -- returns JSON except dictionary elements are @ printed one per line as "key = value". Dn stands for dot name.
+* rb — replacement block (rb) returns JSON except strings are
+not quoted and special characters are not escaped.
+* dn -- dot name (dn) returns JSON except dictionary elements
+are printed one per line as "key = value".
 
 Examples variables:
 
@@ -1663,7 +1665,7 @@ fd.signature.paramNames = ["numStr1","numStr2"]
 fd.signature.paramTypes = ["string","string"]
 fd.signature.returnType = "int"
 fd.docComments = ["  ## Compare two number strings and return 1, 0, or -1."]
-fd.filename = "testcode.txt"
+fd.filename = "testcode.tea"
 fd.lineNum = 3
 fd.numLines = 2
 fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]"""

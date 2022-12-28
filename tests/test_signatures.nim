@@ -194,3 +194,8 @@ suite "signatures.nim":
     let p = newValue(1)
     var parameters = @[list, p, p, p]
     check testMapParametersW("lioaa", parameters, 3, wTooManyArgsOpt, "3")
+
+  test "newSignatureO":
+    var signatureO = newSignatureO("myname", "ifss")
+    check signatureO.isSome
+    check $signatureO.get() == "myname(a: int, b: float, c: string) string"

@@ -99,17 +99,17 @@ SpecialFunctionOr = OpResultWarn[SpecialFunction]
 
 # Found
 
-The line endings found.<ul class="simple"><li>nothing = no special ending</li>
-<li>plus = +</li>
-<li>triple = """</li>
-<li>newline = \n</li>
-<li>plus_n = +\n</li>
-<li>triple_n = """\n</li>
-<li>crlf = \r\n</li>
-<li>plus_crlf = +\r\n</li>
-<li>triple_crlf = """\r\n</li>
-</ul>
+The line endings found.
 
+* nothing = no special ending
+* plus = +
+* triple = """
+* newline = \n
+* plus_n = +\n
+* triple_n = """\n
+* crlf = \r\n
+* plus_crlf = +\r\n
+* triple_crlf = """\r\n
 
 ```nim
 Found = enum
@@ -134,7 +134,7 @@ Controls whether to output the current replacement block iteration and whether t
 
 ```nim
 LoopControl = enum
-  lcStop, lcSkip, lcContinue
+  lcStop = "stop", lcSkip = "skip", lcContinue = "continue"
 ```
 
 # newLinesOr

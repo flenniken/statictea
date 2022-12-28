@@ -80,11 +80,11 @@ type
 
   ReplaceLineKind* = enum
     ## Line type returned by yieldReplacementLine.
-    ##
-    ## * rlNoLine -- Value when not initialized.
-    ## * rlReplaceLine -- A replacement block line.
-    ## * rlEndblockLine -- The endblock command line.
-    ## * rlNormalLine -- The last line when maxLines was exceeded.
+    ## @:
+    ## @:* rlNoLine -- Value when not initialized.
+    ## @:* rlReplaceLine -- A replacement block line.
+    ## @:* rlEndblockLine -- The endblock command line.
+    ## @:* rlNormalLine -- The last line when maxLines was exceeded.
     rlNoLine, rlReplaceLine, rlEndblockLine, rlNormalLine
 
   ReplaceLine* = object

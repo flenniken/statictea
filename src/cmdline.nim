@@ -73,6 +73,7 @@ type
 
   CmlOptionType* = enum
     ## The option type.
+    ## @:
     ## @:* cmlArgument0or1 -- option with a argument, 0 or 1 times.
     ## @:* cmlNoArgument -- option without a argument, 0 or 1 times.
     ## @:* cmlOptionalArgument -- option with an optional argument, 0

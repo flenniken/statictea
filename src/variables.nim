@@ -32,11 +32,11 @@ type
     ## @:* opAppendList ($=) -- append the value to the list
     ## @:* opReturn -- stop or skip the current replacement iteration
     ## @:* opLog -- log a message
-    opIgnore,
-    opEqual,
-    opAppendList,
-    opReturn,
-    opLog,
+    opIgnore = "ignore",
+    opEqual = "equal",
+    opAppendList = "appendList",
+    opReturn = "return",
+    opLog = "log",
 
   CodeLocation* = enum
     ## Location where the code is running.

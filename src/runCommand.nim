@@ -58,15 +58,16 @@ type
 
   Found* = enum
     ## The line endings found.
-    ## * nothing = no special ending
-    ## * plus = +
-    ## * triple = """
-    ## * newline = \\n
-    ## * plus_n = +\\n
-    ## * triple_n = """\\n
-    ## * crlf = \\r\\n
-    ## * plus_crlf = +\\r\\n
-    ## * triple_crlf = """\\r\\n
+    ## @:
+    ## @:* nothing = no special ending
+    ## @:* plus = +
+    ## @:* triple = """
+    ## @:* newline = \\n
+    ## @:* plus_n = +\\n
+    ## @:* triple_n = """\\n
+    ## @:* crlf = \\r\\n
+    ## @:* plus_crlf = +\\r\\n
+    ## @:* triple_crlf = """\\r\\n
     nothing,
     plus,       # +
     triple,     # """
@@ -87,9 +88,9 @@ type
     ## @:* lcStop -- do not output this replacement block and stop iterating
     ## @:* lcSkip -- do not output this replacement block and continue with the next iteration
     ## @:* lcContinue -- output the replacment block and continue with the next iteration
-    lcStop,
-    lcSkip,
-    lcContinue,
+    lcStop = "stop",
+    lcSkip = "skip",
+    lcContinue = "continue",
 
 func newLinesOr*(warning: MessageId, p1: string = "", pos = 0):
      LinesOr =

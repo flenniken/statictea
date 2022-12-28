@@ -56,7 +56,8 @@ The statement operator types.
 
 ```nim
 Operator = enum
-  opIgnore, opEqual, opAppendList, opReturn, opLog
+  opIgnore = "ignore", opEqual = "equal", opAppendList = "appendList",
+  opReturn = "return", opLog = "log"
 ```
 
 # CodeLocation

@@ -45,12 +45,12 @@ To use a left bracket in a replacement block you use two left brackets, {{,
 
 # ReplaceLineKind
 
-Line type returned by yieldReplacementLine.<ul class="simple"><li>rlNoLine -- Value when not initialized.</li>
-<li>rlReplaceLine -- A replacement block line.</li>
-<li>rlEndblockLine -- The endblock command line.</li>
-<li>rlNormalLine -- The last line when maxLines was exceeded.</li>
-</ul>
+Line type returned by yieldReplacementLine.
 
+* rlNoLine -- Value when not initialized.
+* rlReplaceLine -- A replacement block line.
+* rlEndblockLine -- The endblock command line.
+* rlNormalLine -- The last line when maxLines was exceeded.
 
 ```nim
 ReplaceLineKind = enum

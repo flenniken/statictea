@@ -77,8 +77,8 @@ same type which may be Value type.
 * [newValueAndPosOr](#newvalueandposor-2) &mdash; Create a ValueAndPosOr from a value, pos and exit.
 * [newValueAndPosOr](#newvalueandposor-3) &mdash; Create a ValueAndPosOr value from a number or string.
 * [newValueAndPosOr](#newvalueandposor-4) &mdash; Create a ValueAndPosOr from a ValueAndPos.
-* [codeToParamType](#codetoparamtype) &mdash; 
-* [strToParamType](#strtoparamtype) &mdash; Return the parameter type for the given string.
+* [codeToParamType](#codetoparamtype) &mdash; Convert a parameter code letter to a ParamType.
+* [strToParamType](#strtoparamtype) &mdash; Return the parameter type for the given string, e.
 * [shortName](#shortname) &mdash; Return a short name based on the given index value.
 * [newSignatureO](#newsignatureo) &mdash; Return a new signature for the function name and signature code.
 
@@ -110,6 +110,13 @@ VarsDictOr = OpResultWarn[VarsDict]
 # ValueKind
 
 The statictea variable types.
+* vkString -- string of UTF-8 characters
+* vkInt -- 64 bit signed integer
+* vkFloat -- 64 bit floating point number
+* vkDict -- hash table mapping strings to any value
+* vkList -- a list of values of any type
+* vkBool -- true or false
+* vkFunc -- reference to a function
 
 ```nim
 ValueKind = enum
@@ -170,6 +177,14 @@ ParamCode = char
 # ParamType
 
 The statictea parameter types. The same as the variable types ValueKind with an extra for "any".
+* ptString -- string parameter type
+* ptInt -- integer
+* ptFloat -- floating point number
+* ptDict -- dictionary
+* ptList -- list
+* ptBool -- boolean
+* ptFunc -- function pointer
+* ptAny -- any parameter type
 
 ```nim
 ParamType = enum
@@ -195,7 +210,7 @@ Param = object
 Holds the function signature.
 * optional -- true when the last parameter is optional
 * name -- the function name
-* params -- the function parameters name and type
+* params -- the function parameter names and types
 * returnType -- the function return type
 
 ```nim
@@ -219,14 +234,14 @@ SignatureOr = OpResultWarn[Signature]
 
 Holds the function details.
 
-builtIn -- true for the built-in functions, false for user functions
-signature -- the function signature
-docComments -- the function document comments
-filename -- the filename where the function is defined either the code file or functions.nim
-lineNum -- the line number where the function definition starts
-numLines -- the number of lines to define the function
-statements -- a list of the function statements for user functions
-functionPtr -- pointer to the function for built-in functions
+* builtIn -- true for the built-in functions, false for user functions
+* signature -- the function signature
+* docComments -- the function document comments
+* filename -- the filename where the function is defined either the code file or functions.nim
+* lineNum -- the line number where the function definition starts
+* numLines -- the number of lines to define the function
+* statements -- a list of the function statements for user functions
+* functionPtr -- pointer to the function for built-in functions
 
 ```nim
 FunctionSpec = object
@@ -244,6 +259,8 @@ FunctionSpec = object
 # FunResultKind
 
 The kind of a FunResult object, either a value or warning.
+* frValue -- a value
+* frWarning -- a warning message
 
 ```nim
 FunResultKind = enum
@@ -278,7 +295,7 @@ the command or skip the replacement block iteration.
 
 ```nim
 SideEffect = enum
-  seNone, seReturn, seLogMessage
+  seNone = "none", seReturn = "return", seLogMessage = "log"
 ```
 
 # ValueAndPos
@@ -286,13 +303,11 @@ SideEffect = enum
 A value and the position after the value in the statement along with the side effect, if any. The position includes the trailing whitespace.  For the example statement below, the value 567 starts at index 6 and ends at position 10.
 
 ~~~
-0123456789
+0123456789 123456789
 var = 567 # test
       ^ start
           ^ end position
 ~~~~
-
-Exit is set true by the return function to exit a command.
 
 ```nim
 ValueAndPos = object
@@ -740,7 +755,7 @@ func newValueAndPosOr(val: ValueAndPos): ValueAndPosOr
 
 # codeToParamType
 
-
+Convert a parameter code letter to a ParamType.
 
 ```nim
 func codeToParamType(code: ParamCode): ParamType
@@ -748,7 +763,7 @@ func codeToParamType(code: ParamCode): ParamType
 
 # strToParamType
 
-Return the parameter type for the given string.
+Return the parameter type for the given string, e.g. "int" to ptInt.
 
 ```nim
 func strToParamType(str: string): ParamType
@@ -764,7 +779,16 @@ proc shortName(index: Natural): string
 
 # newSignatureO
 
-Return a new signature for the function name and signature code.
+Return a new signature for the function name and signature code. The parameter names come from the shortName function for letters a through z in order. The last letter in the code is the function's return type.
+
+Example:
+
+~~~
+var signatureO = newSignatureO("myname", "ifss")
+echo $signatureO.get()
+=>
+myname(a: int, b: float, c: string) string
+~~~~
 
 ```nim
 func newSignatureO(functionName: string; signatureCode: string): Option[

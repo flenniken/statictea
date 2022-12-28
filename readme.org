@@ -2630,7 +2630,7 @@ List of functions:
 - [[#float][float]] -- Create a float from a number string.
 - [[#format][format]] -- Format a string using replacement variables similar to a replacement block.
 - [[#func][func]] -- Define a function.
-- [[#functionDetails][functionDetails]] -- Return the function details as a dictionary.
+- [[#functionDetails][functionDetails]] -- Return the function details.
 - [[#get][get]] -- Get a dictionary value by its key.
 - [[#get][get]] -- Get a list value by its index.
 - [[#githubAnchor][githubAnchor]] -- Create Github anchor names from heading names.
@@ -2677,6 +2677,7 @@ List of functions:
 - [[#type][type]] -- Return the parameter type, one of: int, float, string, list, dict, bool or func.
 - [[#values][values]] -- Create a list out of the values in the specified dictionary.
 - [[#warn][warn]] -- Return a warning message and skip the current statement.
+- [[#ctionDetails][ctionDetails]] -- Convert the function spec to a dictionary value.
 
 [[#contents][茶]]
 
@@ -3273,7 +3274,7 @@ fd.signature.paramNames = ["numStr1","numStr2"]
 fd.signature.paramTypes = ["string","string"]
 fd.signature.returnType = "int"
 fd.docComments = ["  ## Compare two number strings and return 1, 0, or -1."]
-fd.filename = "testcode.txt"
+fd.filename = "testcode.tea"
 fd.lineNum = 3
 fd.numLines = 2
 fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]"""
@@ -4422,8 +4423,10 @@ The default stype is "rb" which is used for replacement blocks.
 stype:
 
 - json -- returns JSON
-- rb -- returns JSON except strings are not quoted and @ characters are not excaped. Rb stands for replacement block.
-- dn -- returns JSON except dictionary elements are @ printed one per line as "key = value". Dn stands for dot name.
+- rb — replacement block (rb) returns JSON except strings are
+not quoted and special characters are not escaped.
+- dn -- dot name (dn) returns JSON except dictionary elements
+are printed one per line as "key = value".
 
 Examples variables:
 
