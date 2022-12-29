@@ -890,7 +890,7 @@ proc andOrFunctions*(
     value = a or b
   result = newValueAndPosOr(newValue(value), runningPos)
 
-proc callFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult
+proc callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult
 
 proc getFunctionValueAndPos*(
     functionName: string,
@@ -956,7 +956,12 @@ proc getFunctionValueAndPos*(
   let funcVar = funcValueOr.value
 
   # Call the function.
-  let funResult = callFunction(funcVar, variables, arguments)
+  assert funcVar.kind == vkFunc
+  var funResult: FunResult
+  if funcVar.funcv.builtIn:
+    funResult = funcVar.funcv.functionPtr(variables, arguments)
+  else:
+    funResult = callUserFunction(funcVar, variables, arguments)
 
   if funResult.kind == frWarning:
     var warningPos: int
@@ -1477,7 +1482,7 @@ proc callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Valu
   let funcsVarDict = createFuncDictionary().dictv
   var userVariables = emptyVariables(funcs=funcsVarDict)
 
-  # Populate the m dictionary with the parameters and arguments.
+  # Populate the l dictionary with the parameters and arguments.
   let funResult = mapParameters(funcVar.funcv.signature, arguments)
   if funResult.kind == frWarning:
     return funResult
@@ -1511,14 +1516,6 @@ proc callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Valu
   assert(false, "the function doesn't have a return statement")
   # Out of lines; missing the function's return statement.
   result = newFunResultWarn(wNoReturnStatement)
-
-proc callFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult =
-  ## Call the function variable.
-  assert funcVar.kind == vkFunc
-  if funcVar.funcv.builtIn:
-    result = funcVar.funcv.functionPtr(variables, arguments)
-  else:
-    result = callUserFunction(funcVar, variables, arguments)
 
 proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var Variables,
     sourceFilename: string, codeLocation: CodeLocation): LoopControl =
