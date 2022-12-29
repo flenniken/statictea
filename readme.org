@@ -649,8 +649,8 @@ rt = f.cmp(a, b)
 :END:
 
 All variables are stored in one of the reserved one letter top
-level dictionaries f - u. Seven are currently used: f, g, l, m,
-o, s, t.
+level dictionaries f - u. Seven are currently used: f, g, l, o,
+s, t.
 
 The server json variables are stored in the s dictionary. You
 reference them with "s.", for example:
@@ -672,8 +672,7 @@ Reserved single letter variables:
 - g -- [[#global-variables][Global Variables]]
 - h, i, j, k -- Reserved
 - l -- [[#local-variables][Local Variables]]
-- m -- [[#user-functions][User Function Locals]]
-- n -- Reserved
+- m, n -- Reserved
 - o -- [[#code-variables][Shared Code Variables]]
 - p, q, r -- Reserved
 - s -- [[#server-json-variables][Server Json Variables]]
@@ -718,6 +717,9 @@ dictionary.
 
 The local variables are cleared and recalculated for each
 iteration of a repeated block.
+
+Inside a user define function there is another local (l)
+dictionary used for its local variables and parameters.
 
 Examples:
 
@@ -1853,12 +1855,12 @@ the function.
 *Function Local Variables:*
 
 The function‘s local variables and its arguments are stored in
-the m dictionary which exists while the function runs. It
+the l dictionary which exists while the function runs. It
 contains the parameters and their argument values and local
 variables used in the function.
 
-To access variables outside the function, you need to pass them
-to it.
+You have access to f dictionary inside the function. To access
+other external variables, you need to pass them in.
 
 [[#contents][茶]]
 
