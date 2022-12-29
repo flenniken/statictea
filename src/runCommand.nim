@@ -661,7 +661,7 @@ func getSpecialFunction(dotNameStr: string, variables: Variables): SpecialFuncti
   ## Return the function type given a function name.
 
   # Get the function or list of functions.
-  let dotNameValueOr = getVariable(variables, dotNameStr, "f")
+  let dotNameValueOr = getVariable(variables, dotNameStr, npBuiltIn)
   if dotNameValueOr.isMessage:
     return newSpecialFunctionOr(dotNameValueOr.message.messageId, dotNameValueOr.message.p1)
   let dotNameValue = dotNameValueOr.value
@@ -940,7 +940,7 @@ proc getFunctionValueAndPos*(
         break
 
   # Lookup the variable's value.
-  let valueOr = getVariable(variables, functionName, "f")
+  let valueOr = getVariable(variables, functionName, npBuiltIn)
   if valueOr.isMessage:
     let warningData = newWarningData(valueOr.message.messageId,
       valueOr.message.p1, start)
@@ -1187,7 +1187,7 @@ proc getBracketedVarValue*(statement: Statement, dotName: string, dotNameLen: Na
   var runningPos = start
 
   # Get the container variable.
-  let containerOr = getVariable(variables, dotName, "l")
+  let containerOr = getVariable(variables, dotName, npLocal)
   if containerOr.isMessage:
     # The variable doesn't exist, etc.
     let warningData = newWarningData(containerOr.message.messageId,
@@ -1313,7 +1313,7 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
       return getBracketedVarValue(statement, dotNameStr, dotNameLen, start, variables)
 
     # We have a variable.
-    let valueOr = getVariable(variables, dotNameStr, "l")
+    let valueOr = getVariable(variables, dotNameStr, npLocal)
     if valueOr.isMessage:
       let warningData = newWarningData(valueOr.message.messageId,
         valueOr.message.p1, start)
@@ -1474,19 +1474,20 @@ proc callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Valu
   assert funcVar.kind == vkFunc
   assert funcVar.funcv.builtIn == false
 
-  var userVariables = emptyVariables()
+  let funcsVarDict = createFuncDictionary().dictv
+  var userVariables = emptyVariables(funcs=funcsVarDict)
 
   # Populate the m dictionary with the parameters and arguments.
   let funResult = mapParameters(funcVar.funcv.signature, arguments)
   if funResult.kind == frWarning:
     return funResult
-  userVariables["m"] = funResult.value
+  userVariables["l"] = funResult.value
 
   # Run the function statements.
   for statement in funcVar.funcv.statements:
 
     # Run the statement.
-    let variableDataOr = runStatement(statement, variables)
+    let variableDataOr = runStatement(statement, userVariables)
     if variableDataOr.isMessage:
       return newFunResultWarn(variableDataOr.message)
     let variableData = variableDataOr.value
@@ -1543,11 +1544,21 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
     result = lcContinue
   of opReturn:
     # Handle a return function exit.
-    if variableData.value.stringv == "stop":
-      result = lcStop
-    else:
-      assert(variableData.value.stringv == "skip", "returned something besides stop or skip")
-      result = lcSkip
+
+    if variableData.value.kind == vkString:
+      case variableData.value.stringv:
+      of "stop":
+        return lcStop
+      of "skip":
+        return lcSkip
+      else:
+        discard
+
+    # Expected 'skip' or 'stop' for the return function value.
+    let wd = newWarningData(wSkipOrStop)
+    env.warnStatement(statement, wd, sourceFilename = sourceFilename)
+    result = lcSkip
+
   of opLog:
     env.logLine(sourceFilename, statement.lineNum, variableData.value.stringv & "\n")
     result = lcContinue

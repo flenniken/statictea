@@ -2666,7 +2666,7 @@ List of functions:
 - [[#readJson][readJson]] -- Convert a JSON string to a variable.
 - [[#replaceRe][replaceRe]] -- Replace multiple parts of a string using regular expressions.
 - [[#replace][replace]] -- Replace a substring specified by its position and length with another string.
-- [[#return][return]] -- A return in a statement causes the command to stop processing the statement and following statements in the command for the current replacement block iteration.
+- [[#return][return]] -- A return in a statement causes the command to stop processing the statement and following statements.
 - [[#slice][slice]] -- Extract a substring from a string by its position and length.
 - [[#sort][sort]] -- Sort a list of values of the same type.
 - [[#sort][sort]] -- Sort a list of lists.
@@ -4240,18 +4240,26 @@ replace("", 0, 0, "abcd") => abcd
 :CUSTOM_ID: return
 :END:
 
-A return in a statement causes the command to stop processing the statement and following statements in the command for the current replacement block iteration. The replacement block is not output for this iteration. There are two variations, "stop" and "skip" which determine whether to continue iterating or not.
+A return in a statement causes the command to stop processing the statement and following statements. It returns the value passed in.
+
+In a user defined function, the return function completes the
+function and returns the value of the function.
+
+In a template command a return controls the replacement block
+looping. There are two variations, "stop" and "skip":
 
 - "stop" -- stop processing the command
-- "skip" -- skip this replacement block and continue with the next iteration
+- "skip" -- skip this replacement block and continue with the
+next iteration
 
 #+BEGIN_SRC
-return(value: string) string
+return(value: any) any
 #+END_SRC
 
 Examples:
 
 #+BEGIN_SRC
+return(5)
 if(c, return("stop"))
 if(c, return("skip"))
 #+END_SRC

@@ -32,7 +32,7 @@ proc testFunction(functionName: string, arguments: seq[Value],
 
   var funResult: FunResult
   # Lookup the variable's value.
-  let funcValueOr = getVariable(vars, functionName, "f")
+  let funcValueOr = getVariable(vars, functionName, npBuiltin)
   funResult = newFunResult(funcValueOr, parameter=0)
   if funResult.kind == frValue:
     # Get the function to match the arguments.
@@ -108,7 +108,7 @@ proc testGetBestFunctionExists(functionName: string, arguments: seq[Value],
   ## given arguments. Verify it returns a function with the expected
   ## signature code.
   let variables = emptyVariables(funcs = funcsVarDict)
-  var funcValueOr = getVariable(variables, functionName, "f")
+  var funcValueOr = getVariable(variables, functionName, npBuiltin)
   if funcValueOr.isMessage:
     echo funcValueOr.message
     return false
@@ -1689,10 +1689,8 @@ suite "functions.nim":
       newFunResult(newValue("skip")))
     check testFunction("return", @[newValue("stop")],
       newFunResult(newValue("stop")))
-    check testFunction("return", @[newValue("other")],
-      newFunResultWarn(wSkipOrStop, 0))
     check testFunction("return", @[newValue(5)],
-      newFunResultWarn(wWrongType, 0, "string"))
+      newFunResult(newValue(5)))
 
   test "string default":
     check testFunction("string", @[newValue(1)], newFunResult(newValue("1")))

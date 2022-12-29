@@ -204,7 +204,7 @@ proc formatString*(variables: Variables, text: string): StringOr =
         # Replace the placeholder with the variable's string
         # representation.
         let varName = text[varStart .. pos - 1]
-        var valueOr = getVariable(variables, varName, "l")
+        var valueOr = getVariable(variables, varName, npLocal)
         if valueOr.isMessage:
           let wd = newWarningData(valueOr.message.messageId,
             valueOr.message.p1, varStart)
@@ -2002,33 +2002,33 @@ func funLog_ss*(variables: Variables, parameters: seq[Value]): FunResult =
   let message = map["a"].stringv
   result = newFunResult(newValue(message))
 
-func funReturn_ss*(variables: Variables, parameters: seq[Value]): FunResult =
-  ## A return in a statement causes the command to stop processing the
-  ## statement and following statements in the command for the current
-  ## replacement block iteration. The replacement block is not output
-  ## for this iteration. There are two variations, "stop" and "skip"
-  ## which determine whether to continue iterating or not.
+func funReturn_aa*(variables: Variables, parameters: seq[Value]): FunResult =
+  ## A return function returns the value passed in and it has side
+  ## effects depending on where it is used.
+  ## @:
+  ## @:In a user defined function, the return completes the
+  ## @:function and returns the value of the function.
+  ## @:
+  ## @:In a template command a return controls the replacement block
+  ## @:looping and there are two variations:
   ## @:
   ## @:* "stop" -- stop processing the command
   ## @:* "skip" -- skip this replacement block and continue with the
-  ## next iteration
+  ## @:next iteration
   ## @:
   ## @:~~~
-  ## @:return(value: string) string
+  ## @:return(value: any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
+  ## @:return(5)
   ## @:if(c, return("stop"))
   ## @:if(c, return("skip"))
   ## @:~~~~
-
-  tMapParameters("return", "ss")
+  tMapParameters("return", "aa")
   result = newFunResult(map["a"])
-  if result.value.stringv != "stop" and result.value.stringv != "skip":
-    # Expected 'skip' or 'stop' for the return function value.
-    return newFunResultWarn(wSkipOrStop, 0)
 
 func funString_aoss*(variables: Variables, parameters: seq[Value]): FunResult =
   ## Convert a variable to a string. You specify the variable and
@@ -2676,7 +2676,7 @@ const
     ("readJson", funReadJson_sa, "sa"),
     ("replace", funReplace_siiss, "siiss"),
     ("replaceRe", funReplaceRe_sls, "sls"),
-    ("return", funReturn_ss, "ss"),
+    ("return", funReturn_aa, "aa"),
     ("slice", funSlice_siois, "siois"),
     ("sort", funSort_lsosl, "lsosl"),
     ("sort", funSort_lssil, "lssil"),

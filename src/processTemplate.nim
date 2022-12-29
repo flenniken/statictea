@@ -164,7 +164,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
           lb, prepostTable, command, maxLines):
         discard
       # Use the content as the replacement lines.
-      var content = getVariable(variables, "t.content").value.stringv
+      var content = getVariable(variables, "t.content", npLocal).value.stringv
 
       for line in yieldContentLine(content):
         storeLineSegments(env, tempSegments, line)

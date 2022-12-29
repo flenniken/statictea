@@ -63,6 +63,14 @@ type
   VariableDataOr* = OpResultWarn[VariableData]
     ## A VariableData object or a warning.
 
+  NoPrefixDict* = enum
+    ## The variable letter prefix to use when it's missing.
+    ## @:
+    ## @:* npLocal -- use the local (l) dictionary
+    ## @:* npBuiltIn -- use the built in function (f) dictionary
+    npLocal,
+    npBuiltIn,
+
 func newVariableDataOr*(warning: MessageId, p1 = "", pos = 0):
     VariableDataOr =
   ## Create an object containing a warning.
@@ -170,24 +178,23 @@ proc resetVariables*(variables: var Variables) =
 
   variables["l"] = newValue(newVarsDict())
 
-proc getParentDictToAddTo(variables: Variables, dotNameStr: string):
+proc getParentDictToAddTo(variables: Variables, dotNameList: openArray[string]):
     VarsDictOr =
   ## Return the last component dictionary specified by the given dot
-  ## name or, on error, return a warning.  For the dot name string
+  ## name list or, on error, return a warning.  For the dot name string
   ## "a.b.c.d" and the c dictionary is the result.
 
-  let names = split(dotNameStr, '.')
-  assert names.len > 1
-  assert names[0] in ["f", "g", "h", "l", "s", "o"]
+  assert(dotNameList.len > 1, "No namespace for '$1'." % dotNameList.join("."))
+  assert dotNameList[0] in ["f", "g", "h", "l", "s", "o"]
 
   var parentDict: VarsDict
   var dictNames: seq[string]
-  var nameSpace = names[0]
+  var nameSpace = dotNameList[0]
 
   parentDict = variables[nameSpace].dictv
-  if names.len == 2:
+  if dotNameList.len == 2:
     return newVarsDictOr(parentDict)
-  dictNames = names[1 .. ^2]
+  dictNames = dotNameList[1 .. ^2]
 
   # Loop through the dictionaries looking up each sub dict.
   for name in dictNames:
@@ -281,59 +288,58 @@ proc assignVariable*(
   # -- You can append to local and global lists but not others.
   # -- You can specify local variables without the l prefix.
   # -- You cannot assign true and false.
-
   # -- You can assign new values to the code dictonary when in code files.
 
   assert dotNameStr.len > 0
-  var varsDictOr: VarsDictOr
-  let names = split(dotNameStr, '.')
+  var dotNameList = split(dotNameStr, '.')
 
-  let nameSpace = names[0]
-
-  if codeLocation == inCodeFile and nameSpace == "o":
-    varsDictOr = getParentDictToAddTo(variables, dotNameStr)
+  # Make sure the variable can be added. Determine the full variable
+  # dot name by adding the default prefix when missing.
+  case dotNameList[0]
+  of "t":
+    return assignTeaVariable(variables, dotNameStr, value, operator)
+  of "o":
+    if codeLocation != inCodeFile:
+      # You can only change code variables in code files.
+      return some(newWarningData(wReadOnlyCodeVars))
+  of "s":
+    # You cannot overwrite the server variables.
+    return some(newWarningData(wReadOnlyDictionary))
+  of "g":
+    if codeLocation == inCodeFile:
+      # You cannot assign to the g namespace in a code file.
+      return some(newWarningData(wNoGlobalInCodeFile))
+  of "l":
+    if dotNameStr == "l.true" or dotNameStr == "l.false":
+      # You cannot assign true or false.
+      return some(newWarningData(wAssignTrueFalse))
+  of "f":
+    # You cannot assign to the functions dictionary.
+    return some(newWarningData(wReadOnlyFunctions))
+  of "h", "i", "j", "k", "m", "n", "p", "q", "r", "u":
+    # The variables f, h - k, m - r, u are reserved variable names.
+    return some(newWarningData(wReservedNameSpaces))
   else:
-    case nameSpace
-    of "t":
-      return assignTeaVariable(variables, dotNameStr, value, operator)
-    of "s", "o":
-      if names.len == 1:
-        # You cannot assign to an existing variable.
-        return some(newWarningData(wImmutableVars))
-      if nameSpace == "o":
-        # You can only change code variables in code files.
-        return some(newWarningData(wReadOnlyCodeVars))
-      else:
-        # You cannot overwrite the server variables.
-        return some(newWarningData(wReadOnlyDictionary))
-    of "g", "l":
-      if codeLocation == inCodeFile and nameSpace == "g":
-        # You cannot assign to the g namespace in a code file.
-        return some(newWarningData(wNoGlobalInCodeFile))
-      if nameSpace == "l" and (dotNameStr == "l.true" or dotNameStr == "l.false"):
-        # You cannot assign true or false.
-        return some(newWarningData(wAssignTrueFalse))
-      if names.len == 1:
-        # You cannot assign to an existing variable.
-        return some(newWarningData(wImmutableVars))
-      varsDictOr = getParentDictToAddTo(variables, dotNameStr)
-    of "f":
-        # You cannot assign to the functions dictionary.
-        return some(newWarningData(wReadOnlyFunctions))
-    of "h", "i", "j", "k", "m", "n", "p", "q", "r", "u":
-      # The variables f, h - k, m - r, u are reserved variable names.
-      return some(newWarningData(wReservedNameSpaces))
-    else:
-      if dotNameStr == "true" or dotNameStr == "false":
-        # You cannot assign true or false.
-        return some(newWarningData(wAssignTrueFalse))
-      # It must be a local variable, add the missing l.
-      varsDictOr = getParentDictToAddTo(variables, "l." & dotNameStr)
+    # It must be a "local" variable.
 
+    if dotNameStr == "true" or dotNameStr == "false":
+      # You cannot assign true or false.
+      return some(newWarningData(wAssignTrueFalse))
+
+    # Add the default l prefix to the variable name.
+    dotNameList.insert("l", 0)
+
+  if dotNameList.len == 1 and dotNameList[0] in ["l", "g", "o"]:
+    # You cannot assign to an existing variable.
+    return some(newWarningData(wImmutableVars))
+
+  # Determine the dictionary to add the variable.
+  let varsDictOr = getParentDictToAddTo(variables, dotNameList)
   if varsDictOr.isMessage:
     return some(varsDictOr.message)
 
-  let lastName = names[^1]
+  # Assign the last name to its dictionary.
+  let lastName = dotNameList[^1]
   case operator
   of opEqual:
     # Assign the value to the dictionary.
@@ -387,10 +393,11 @@ proc assignVariable*(
   result = assignVariable(variables, variableData.dotNameStr, variableData.value,
       variableData.operator, codeLocation)
 
-proc getVariable*(variables: Variables, dotNameStr: string, noPrefixDict = ""): ValueOr =
+proc getVariable*(variables: Variables, dotNameStr: string,
+    noPrefixDict: NoPrefixDict): ValueOr =
   ## Look up the variable and return its value when found, else return
-  ## a warning. When no prefix, look in the noPrefixDict dictionary,
-  ## either l or f or "".
+  ## a warning. When no prefix is specified, look in the noPrefixDict
+  ## dictionary.
   assert variables != nil
 
   if dotNameStr == "true":
@@ -404,23 +411,25 @@ proc getVariable*(variables: Variables, dotNameStr: string, noPrefixDict = ""): 
   of "g", "l", "s", "t", "o", "f":
     result = lookUpVar(variables, names)
   of "h", "i", "j", "k", "m", "n", "p", "q", "r", "u":
-    # The variables f, i, j, k, m, n, p, q, r, u are reserved variable names.
+    # The variables f, h - k, m - r, u are reserved variable names.
     result = newValueOr(wReservedNameSpaces)
   else:
-    # No prefix.
-    if noPrefixDict == "":
-      result = newValueOr(wVariableMissing, dotNameStr)
-    else:
-      # Look in the extra dictionary.
-      var varNames = @[noPrefixDict] & names
-      result = lookUpVar(variables, varNames)
-      if result.isMessage:
-        # The variable isn't in the x dictionary.
-        var messageId: MessageId
-        if noPrefixDict == "l":
-          messageId = wNotInL
-        elif noPrefixDict == "f":
-          messageId = wNotInF
-        else:
-          return result
-        result = newValueOr(messageId, dotNameStr)
+    # Non-prefix variable, look it up in its default dictionary.
+    var prefix: string
+    case noPrefixDict
+    of npLocal:
+      prefix = "l"
+    of npBuiltIn:
+      prefix = "f"
+
+    var varNames = @[prefix] & names
+    result = lookUpVar(variables, varNames)
+    if result.isMessage:
+      # The variable isn't in the x dictionary.
+      var messageId: MessageId
+      case noPrefixDict
+      of npLocal:
+        messageId = wNotInL
+      of npBuiltIn:
+        messageId = wNotInF
+      result = newValueOr(messageId, dotNameStr)

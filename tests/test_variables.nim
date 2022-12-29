@@ -13,9 +13,9 @@ import functions
 import version
 
 proc testGetVariableOk(variables: Variables, dotNameStr: string, eJson:
-    string): bool =
+                       string, noPrefixDict: NoPrefixDict = npLocal): bool =
   ## Get a variable and verify its value matches the expected value.
-  let valueOr = getVariable(variables, dotNameStr, "l")
+  let valueOr = getVariable(variables, dotNameStr, noPrefixDict)
   result = true
   if valueOr.isMessage:
     echo "Unable to get the variable: " & $valueOr
@@ -25,7 +25,7 @@ proc testGetVariableOk(variables: Variables, dotNameStr: string, eJson:
 
 proc testGetVariableWarning(variables: Variables, dotNameStr: string,
     eMessageId: MessageId, eP1 = "", ePos = 0): bool =
-  let valueOr = getVariable(variables, dotNameStr, "l")
+  let valueOr = getVariable(variables, dotNameStr, npLocal)
   if valueOr.isValue:
     echo "Did not get a warning: " & $valueOr
     return false
@@ -218,7 +218,7 @@ t.version = "$1"""" % staticteaVersion
     var variables = emptyVariables()
     variables["s"] = valueOr.value
     resetVariables(variables)
-    check $getVariable(variables, "s.a") == $newValueOr(newValue(2))
+    check $getVariable(variables, "s.a", npLocal) == $newValueOr(newValue(2))
 
   test "resetVariables with shared":
     # Make sure the shared variables are untouched after reset.
@@ -228,7 +228,7 @@ t.version = "$1"""" % staticteaVersion
     var variables = emptyVariables()
     variables["o"] = valueOr.value
     resetVariables(variables)
-    check $getVariable(variables, "o.a") == $newValueOr(newValue(2))
+    check $getVariable(variables, "o.a", npLocal) == $newValueOr(newValue(2))
 
   test "resetVariables with shared":
     # Make sure the code variables are untouched after reset.
@@ -238,7 +238,7 @@ t.version = "$1"""" % staticteaVersion
     var variables = emptyVariables()
     variables["o"] = valueOr.value
     resetVariables(variables)
-    check $getVariable(variables, "o.a") == $newValueOr(newValue(2))
+    check $getVariable(variables, "o.a", npLocal) == $newValueOr(newValue(2))
 
   test "resetVariables with global":
     # Make sure the global variables are untouched after reset.
@@ -248,7 +248,7 @@ t.version = "$1"""" % staticteaVersion
     var variables = emptyVariables()
     variables["g"] = valueOr.value
     resetVariables(variables)
-    check $getVariable(variables, "g.a") == $newValueOr(newValue(2))
+    check $getVariable(variables, "g.a", npLocal) == $newValueOr(newValue(2))
 
   test "assignVariable good":
 
@@ -297,11 +297,12 @@ t.version = "$1"""" % staticteaVersion
     check testAssignVarWarn("s.hello", opEqual, newValue(1), inCommand, wReadOnlyDictionary)
 
   test "assignVariable wImmutableVars":
-    check testAssignVarWarn("s", opEqual, newValue(1), inCommand, wImmutableVars)
-    check testAssignVarWarn("o", opEqual, newValue(1), inCommand, wImmutableVars)
+    check testAssignVarWarn("s", opEqual, newValue(1), inCommand, wReadOnlyDictionary)
+    check testAssignVarWarn("o", opEqual, newValue(1), inCommand, wReadOnlyCodeVars)
     check testAssignVarWarn("g", opEqual, newValue(1), inCommand, wImmutableVars)
     check testAssignVarWarn("l", opEqual, newValue(1), inCommand, wImmutableVars)
     check testAssignVarWarn("t", opEqual, newValue(1), inCommand, wImmutableVars)
+    check testAssignVarWarn("m", opEqual, newValue(1), inCommand, wReservedNameSpaces)
 
   test "assignVariable wReadOnlyFunctions":
     check testAssignVarWarn("f", opEqual, newValue(1), inCommand, wReadOnlyFunctions)
@@ -309,13 +310,18 @@ t.version = "$1"""" % staticteaVersion
 
   test "assignVariable wReservedNameSpaces":
     for location in CodeLocation:
-      for letterVar in ["i", "j", "k", "m", "n", "p", "q", "r", "u"]:
+      for letterVar in ["i", "j", "k", "n", "p", "q", "r", "u"]:
         check testAssignVarWarn(letterVar, opEqual, newValue(1), location, wReservedNameSpaces)
 
-  test "assignVariable not wReservedNameSpaces":
+  test "non wReservedNameSpaces in command":
+    check testAssignVarFlex("a", opEqual, newValue(1), inCommand, """{"a":1}""")
+    check testAssignVarFlex("a", opEqual, newValue(1), inCodeFile, """{"a":1}""")
+    check testAssignVarFlex("a", opEqual, newValue(1), inFunction, """{"a":1}""")
+
     for location in CodeLocation:
       for letterVar in ["a", "b", "c", "d", "e", "v", "w", "x", "y", "z"]:
-        check testAssignVarFlex(letterVar, opEqual, newValue(1), location, """{"$1":1}""" % letterVar)
+        check testAssignVarFlex(letterVar, opEqual, newValue(1),
+          location, """{"$1":1}""" % letterVar, dictName="l")
 
   test "assignVariable wVariableMissing":
     check testAssignVarWarn("w.hello", opEqual, newValue(1),

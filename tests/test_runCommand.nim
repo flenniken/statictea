@@ -1241,9 +1241,9 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     check testRunStatement(statement, eVariableDataOr)
 
   test "return empty":
-    let text = """a = return("asdf")"""
+    let text = """a = return()"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wSkipOrStop, "", 11)
+    let eVariableDataOr = newVariableDataOr(wNotEnoughArgs, "1", 11)
     check testRunStatement(statement, eVariableDataOr)
 
   test "return skip":
@@ -1597,7 +1597,7 @@ White$1
     let statement = newStatement(text="""a = f.cmp""", lineNum=1, 0)
     let funcsVarDict = createFuncDictionary().dictv
     let variables = emptyVariables(funcs = funcsVarDict)
-    let cmpValueOr = getVariable(variables, "f.cmp")
+    let cmpValueOr = getVariable(variables, "f.cmp", npLocal)
     if cmpValueOr.isMessage:
       echo cmpValueOr.message
       fail
@@ -1608,7 +1608,7 @@ White$1
     let statement = newStatement(text="""a = get(f.cmp, 0)""", lineNum=1, 0)
     let funcsVarDict = createFuncDictionary().dictv
     let variables = emptyVariables(funcs = funcsVarDict)
-    let cmpValueOr = getVariable(variables, "f.cmp")
+    let cmpValueOr = getVariable(variables, "f.cmp", npLocal)
     if cmpValueOr.isMessage:
       echo cmpValueOr.message
       fail
@@ -2493,15 +2493,18 @@ testcode.txt(6): w240: Out of lines; missing the function's return statement.
 """
     check testRunCodeFile(content, eErrLines=eErrLines)
 
-#   test "call user function":
-#     let content = """
-# mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
-#   ## Compare two number strings and return 1, 0, or -1.
-#   return(cmp(int(numStr1), int(numStr2)))
+  test "call user function":
+    let content = """
+mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+  ## Compare two number strings and return 1, 0, or -1.
+  n1 = int(numStr1)
+  n2 = int(numStr2)
+  ret = cmp(n1, n2)
+  return(ret)
 
-# a = l.mycmp("1", "2")
-# """
-#     let eVarRep = """
-# mycmp = "strNumCmp"
-# a = -1"""
-#     check testRunCodeFile(content, eVarRep)
+a = l.mycmp("1", "2")
+"""
+    let eVarRep = """
+mycmp = "strNumCmp"
+a = -1"""
+    check testRunCodeFile(content, eVarRep)

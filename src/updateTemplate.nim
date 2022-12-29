@@ -144,7 +144,7 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
         lastLine = replaceLine
 
       # Write the content as the replacement lines.
-      var valueOr = getVariable(variables, "t.content")
+      var valueOr = getVariable(variables, "t.content", npLocal)
       var content = valueOr.value.stringv
       for line in yieldContentLine(content):
         env.resultStream.write(line)

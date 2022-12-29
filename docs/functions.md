@@ -65,7 +65,7 @@ their values.
 * [funJoin_lsois](#funjoin_lsois) &mdash; Join a list of strings with a separator.
 * [funWarn_ss](#funwarn_ss) &mdash; Return a warning message and skip the current statement.
 * [funLog_ss](#funlog_ss) &mdash; Log a message to the log file.
-* [funReturn_ss](#funreturn_ss) &mdash; A return in a statement causes the command to stop processing the statement and following statements in the command for the current replacement block iteration.
+* [funReturn_aa](#funreturn_aa) &mdash; A return function returns the value passed in and it has side effects depending on where it is used.
 * [funString_aoss](#funstring_aoss) &mdash; Convert a variable to a string.
 * [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names.
 * [funFormat_ss](#funformat_ss) &mdash; Format a string using replacement variables similar to a replacement block.
@@ -1476,26 +1476,34 @@ log("always log")
 func funLog_ss(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
-# funReturn_ss
+# funReturn_aa
 
-A return in a statement causes the command to stop processing the statement and following statements in the command for the current replacement block iteration. The replacement block is not output for this iteration. There are two variations, "stop" and "skip" which determine whether to continue iterating or not.
+A return function returns the value passed in and it has side effects depending on where it is used.
+
+In a user defined function, the return completes the
+function and returns the value of the function.
+
+In a template command a return controls the replacement block
+looping and there are two variations:
 
 * "stop" -- stop processing the command
-* "skip" -- skip this replacement block and continue with the next iteration
+* "skip" -- skip this replacement block and continue with the
+next iteration
 
 ~~~
-return(value: string) string
+return(value: any) any
 ~~~~
 
 Examples:
 
 ~~~
+return(5)
 if(c, return("stop"))
 if(c, return("skip"))
 ~~~~
 
 ```nim
-func funReturn_ss(variables: Variables; parameters: seq[Value]): FunResult
+func funReturn_aa(variables: Variables; parameters: seq[Value]): FunResult
 ```
 
 # funString_aoss
@@ -2093,7 +2101,7 @@ functionsList = [("add", funAdd_fff, "fff"), ("add", funAdd_iii, "iii"),
                  ("readJson", funReadJson_sa, "sa"),
                  ("replace", funReplace_siiss, "siiss"),
                  ("replaceRe", funReplaceRe_sls, "sls"),
-                 ("return", funReturn_ss, "ss"),
+                 ("return", funReturn_aa, "aa"),
                  ("slice", funSlice_siois, "siois"),
                  ("sort", funSort_lsosl, "lsosl"),
                  ("sort", funSort_lssil, "lssil"),

@@ -18,6 +18,7 @@ prefix and it allows functions to be specified without the f prefix.
 * type: [VariableData](#variabledata) &mdash; The VariableData object holds the variable name, operator,
 and value which is the result of running a statement.
 * type: [VariableDataOr](#variabledataor) &mdash; A VariableData object or a warning.
+* type: [NoPrefixDict](#noprefixdict) &mdash; The variable letter prefix to use when it's missing.
 * [newVariableDataOr](#newvariabledataor) &mdash; Create an object containing a warning.
 * [newVariableDataOr](#newvariabledataor-1) &mdash; Create an object containing a warning.
 * [newVariableDataOr](#newvariabledataor-2) &mdash; Create an object containing a VariableData object.
@@ -96,6 +97,18 @@ A VariableData object or a warning.
 
 ```nim
 VariableDataOr = OpResultWarn[VariableData]
+```
+
+# NoPrefixDict
+
+The variable letter prefix to use when it's missing.
+
+* npLocal -- use the local (l) dictionary
+* npBuiltIn -- use the built in function (f) dictionary
+
+```nim
+NoPrefixDict = enum
+  npLocal, npBuiltIn
 ```
 
 # newVariableDataOr
@@ -184,10 +197,11 @@ proc assignVariable(variables: var Variables; variableData: VariableData;
 
 # getVariable
 
-Look up the variable and return its value when found, else return a warning. When no prefix, look in the noPrefixDict dictionary, either l or f or "".
+Look up the variable and return its value when found, else return a warning. When no prefix is specified, look in the noPrefixDict dictionary.
 
 ```nim
-proc getVariable(variables: Variables; dotNameStr: string; noPrefixDict = ""): ValueOr
+proc getVariable(variables: Variables; dotNameStr: string;
+                 noPrefixDict: NoPrefixDict): ValueOr
 ```
 
 
