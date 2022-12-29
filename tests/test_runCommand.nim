@@ -506,7 +506,7 @@ proc testRunCodeFile(
   # Open err and log streams.
   var env = openEnvTest("_testRunCodeFile.log")
 
-  let filename = "testcode.txt"
+  let filename = "testcode.tea"
   createFile(filename, content)
   defer: discard tryRemoveFile(filename)
 
@@ -2172,7 +2172,7 @@ a = 6
     let eVarRep = """
 a = 5"""
     let eErrLines: seq[string] = splitNewLines """
-testcode.txt(2): w95: You cannot assign to an existing variable.
+testcode.tea(2): w95: You cannot assign to an existing variable.
 statement: a = 6
            ^
 """
@@ -2244,7 +2244,7 @@ b = 1"""
 a = +
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.txt(2): w183: Out of lines looking for the plus sign line.
+testcode.tea(2): w183: Out of lines looking for the plus sign line.
 """
     check testRunCodeFile(content, eErrLines = eErrLines)
 
@@ -2260,7 +2260,7 @@ a = 5
 b = 1
 c = 3"""
     let eErrLines: seq[string] = splitNewLines """
-testcode.txt(4): w34: Missing operator, = or &=.
+testcode.tea(4): w34: Missing operator, = or &=.
 statement: d ~ 2
              ^
 """
@@ -2278,7 +2278,7 @@ c = 3
 len = 10"""
 
     let eErrLines: seq[string] = splitNewLines """
-testcode.txt(6): w184: Out of lines looking for the multiline string.
+testcode.tea(6): w184: Out of lines looking for the multiline string.
 """ % tripleQuotes
     check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 
@@ -2298,7 +2298,7 @@ nofile(0): w16: File not found: missing.
 g.a = 5
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.txt(1): w186: You cannot assign to the g namespace in a code file.
+testcode.tea(1): w186: You cannot assign to the g namespace in a code file.
 statement: g.a = 5
            ^
 """
@@ -2313,8 +2313,8 @@ a = warn("there")
     let eVarRep = """
 v = 5"""
     let eErrLines: seq[string] = splitNewLines """
-testcode.txt(1): hello
-testcode.txt(3): there
+testcode.tea(1): hello
+testcode.tea(3): there
 """
     check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 
@@ -2346,7 +2346,7 @@ b = 2
 a = 1
 b = 2"""
     let eErrLines: seq[string] = splitNewLines """
-testcode.txt(2): w187: Use '...return("stop")...' in a code file.
+testcode.tea(2): w187: Use '...return("stop")...' in a code file.
 statement: c = if0(0, return("skip"))
            ^
 """
@@ -2376,7 +2376,7 @@ c = 3
 a = 5"""
 
     let eErrLines: seq[string] = splitNewLines """
-testcode.txt(3): w148: Invalid UTF-8 byte sequence at position 2.
+testcode.tea(3): w148: Invalid UTF-8 byte sequence at position 2.
 statement: abÿcd␊
              ^
 """
@@ -2389,7 +2389,7 @@ a = $1+
 multiline+
 string$1""" % tripleQuotes
     let eErrLines: seq[string] = splitNewLines """
-testcode.txt(3): w185: Triple quotes must always end the line.
+testcode.tea(3): w185: Triple quotes must always end the line.
 statement: a = $1multilinestring$1␊
                   ^
 """ % tripleQuotes
@@ -2428,7 +2428,7 @@ details.signature.paramNames = ["numStr1","numStr2"]
 details.signature.paramTypes = ["string","string"]
 details.signature.returnType = "int"
 details.docComments = ["  ## Compare two number strings and return 1, 0, or -1."]
-details.filename = "testcode.txt"
+details.filename = "testcode.tea"
 details.lineNum = 3
 details.numLines = 2
 details.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]"""
@@ -2441,10 +2441,10 @@ mycmp = func()
   return(cmp(int(numStr1), int(numStr2)))
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.txt(1): w227: Expected signature string.
+testcode.tea(1): w227: Expected signature string.
 statement: mycmp = func()
                         ^
-testcode.txt(3): w205: The variable 'numStr1' isn't in the l dictionary.
+testcode.tea(3): w205: The variable 'numStr1' isn't in the l dictionary.
 statement:   return(cmp(int(numStr1), int(numStr2)))
                             ^
 """
@@ -2455,7 +2455,7 @@ statement:   return(cmp(int(numStr1), int(numStr2)))
 mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.txt(2): w238: Out of lines; Missing required doc comment.
+testcode.tea(2): w238: Out of lines; Missing required doc comment.
 """
     check testRunCodeFile(content, eErrLines=eErrLines)
 
@@ -2465,7 +2465,7 @@ mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
 ## hello
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.txt(3): w239: Out of lines; No statements for the function.
+testcode.tea(3): w239: Out of lines; No statements for the function.
 """
     check testRunCodeFile(content, eErrLines=eErrLines)
 
@@ -2476,7 +2476,7 @@ mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
 a = 5
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.txt(4): w240: Out of lines; missing the function's return statement.
+testcode.tea(4): w240: Out of lines; missing the function's return statement.
 """
     check testRunCodeFile(content, eErrLines=eErrLines)
 
@@ -2489,7 +2489,7 @@ b = if(false, return(a), a)
 if(false, return("abc")
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.txt(6): w240: Out of lines; missing the function's return statement.
+testcode.tea(6): w240: Out of lines; missing the function's return statement.
 """
     check testRunCodeFile(content, eErrLines=eErrLines)
 
@@ -2508,3 +2508,56 @@ a = l.mycmp("1", "2")
 mycmp = "strNumCmp"
 a = -1"""
     check testRunCodeFile(content, eVarRep)
+
+  test "call user function 2":
+    let content = """
+mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+  ## Compare two number strings and
+  ## return 1, 0, or -1.
+  return(cmp(int(numStr1), int(numStr2)))
+
+a = l.mycmp("1", "2")
+"""
+    let eVarRep = """
+mycmp = "strNumCmp"
+a = -1"""
+    check testRunCodeFile(content, eVarRep)
+
+  test "no statements":
+    let content = """
+mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+  ## Compare two number strings and
+  ## return 1, 0, or -1.
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(4): w239: Out of lines; No statements for the function.
+"""
+    check testRunCodeFile(content, eErrLines=eErrLines)
+
+  test "zero function":
+    let content = """
+zero = func("zero() int")
+  ## Return 0.
+  return(0)
+z = l.zero()
+"""
+    let eVarRep = """
+zero = "zero"
+z = 0"""
+    check testRunCodeFile(content, eVarRep)
+
+#   test "function with warning":
+#     let content = """
+# zero = func("zero() int")
+#   ## Return 0.
+#   return(0
+# z = l.zero()
+# """
+#     let eErrLines: seq[string] = splitNewLines """
+# testcode.tea(3): w46: Expected comma or right parentheses.
+# statement: return(0
+#                    ^
+# """
+#     let eVarRep = """
+# zero = "zero""""
+#     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
