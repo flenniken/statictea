@@ -101,7 +101,7 @@ proc matchTabSpace*(line: string, start: Natural = 0): Option[Matches] =
   let pattern = r"[ \t]+"
   result = matchPatternCached(line, pattern, start, 0)
 
-proc emptyOrSpaces*(text: string, start: Natural): bool =
+proc emptyOrSpaces*(text: string, start: Natural = 0): bool =
   ## Return true when the text is empty or all whitespace from start to the end.
   if start >= text.len:
     return true

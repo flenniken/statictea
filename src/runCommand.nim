@@ -361,7 +361,7 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
     # A statement is terminated by the end of the line without a
     # continuation.
     if not lp.continuation:
-      if not emptyOrSpaces(text, 0):
+      if not emptyOrSpaces(text):
         yield newStatement(strip(text), lineNum)
       # Setup variables for the next line, if there is one.
       text.setLen(0)
@@ -369,7 +369,7 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
         lineNum = lp.lineNum + 1
         start = cmdLines.lineParts[ix+1].codeStart
 
-  if not emptyOrSpaces(text, 0):
+  if not emptyOrSpaces(text):
     yield newStatement(strip(text), lineNum)
 
 proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
@@ -1604,7 +1604,7 @@ proc parseSignature*(signature: string): SignatureOr =
   var runningPos = 0
   let matchesO = matchDotNames(signature, runningPos)
   if not isSome(matchesO):
-    if not emptyOrSpaces(signature, 0):
+    if not emptyOrSpaces(signature):
       # Excected a function name.
       return newSignatureOr(wFunctionName, "", runningPos)
     else:
