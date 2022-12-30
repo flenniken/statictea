@@ -2668,7 +2668,7 @@ List of functions:
 - [[#readJson][readJson]] -- Convert a JSON string to a variable.
 - [[#replaceRe][replaceRe]] -- Replace multiple parts of a string using regular expressions.
 - [[#replace][replace]] -- Replace a substring specified by its position and length with another string.
-- [[#return][return]] -- A return in a statement causes the command to stop processing the statement and following statements.
+- [[#return][return]] -- A return function returns the value passed in and it has side effects depending on where it is used.
 - [[#slice][slice]] -- Extract a substring from a string by its position and length.
 - [[#sort][sort]] -- Sort a list of values of the same type.
 - [[#sort][sort]] -- Sort a list of lists.
@@ -4242,13 +4242,13 @@ replace("", 0, 0, "abcd") => abcd
 :CUSTOM_ID: return
 :END:
 
-A return in a statement causes the command to stop processing the statement and following statements. It returns the value passed in.
+A return function returns the value passed in and it has side effects depending on where it is used.
 
-In a user defined function, the return function completes the
+In a user defined function, the return completes the
 function and returns the value of the function.
 
 In a template command a return controls the replacement block
-looping. There are two variations, "stop" and "skip":
+looping and there are two variations:
 
 - "stop" -- stop processing the command
 - "skip" -- skip this replacement block and continue with the

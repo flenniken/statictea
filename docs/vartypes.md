@@ -153,7 +153,6 @@ statement starts.
 ```nim
 Statement = object
   text*: string
-  start*: Natural
   lineNum*: Natural
 
 ```
@@ -210,7 +209,7 @@ Param = object
 Holds the function signature.
 * optional -- true when the last parameter is optional
 * name -- the function name
-* params -- the function parameter names and types
+* params -- a list of the function parameter names and types
 * returnType -- the function return type
 
 ```nim
@@ -269,16 +268,16 @@ FunResultKind = enum
 
 # FunResult
 
-Contains the result of calling a function, either a value or a warning.
+Contains the result of calling a function, either a value or a warning. The parameter field is the index of the problem argument.
 
 ```nim
 FunResult = object
   case kind*: FunResultKind
   of frValue:
-      value*: Value          ## Return value of the function.
-    
+      value*: Value
+
   of frWarning:
-      parameter*: Natural    ## Index of problem parameter.
+      parameter*: Natural
       warningData*: WarningData
 
 
@@ -532,7 +531,7 @@ proc `==`(a: Value; b: Value): bool
 Create a new statement.
 
 ```nim
-func newStatement(text: string; lineNum: Natural = 1; start: Natural = 0): Statement
+func newStatement(text: string; lineNum: Natural = 1): Statement
 ```
 
 # `$`

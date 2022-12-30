@@ -127,12 +127,11 @@ func newSpecialFunctionOr*(specialFunction: SpecialFunction): SpecialFunctionOr 
 
 func `$`*(s: Statement): string =
   ## Return a string representation of a Statement.
-  result = """$1, $2: "$3"""" % [$s.lineNum, $s.start, s.text]
+  result = """$1, "$2"""" % [$s.lineNum, s.text]
 
 func `==`*(s1: Statement, s2: Statement): bool =
   ## Return true when the two statements are equal.
-  if s1.lineNum == s2.lineNum and s1.start == s2.start and
-      s1.text == s2.text:
+  if s1.lineNum == s2.lineNum and s1.text == s2.text:
     result = true
 
 func `==`*(a: PosOr, b: PosOr): bool =
@@ -362,16 +361,16 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
     # A statement is terminated by the end of the line without a
     # continuation.
     if not lp.continuation:
-      if notEmptyOrSpaces(text):
-        yield newStatement(strip(text), lineNum, start)
+      if not emptyOrSpaces(text, 0):
+        yield newStatement(strip(text), lineNum)
       # Setup variables for the next line, if there is one.
       text.setLen(0)
       if cmdLines.lines.len > ix+1:
         lineNum = lp.lineNum + 1
         start = cmdLines.lineParts[ix+1].codeStart
 
-  if notEmptyOrSpaces(text):
-    yield newStatement(strip(text), lineNum, start)
+  if not emptyOrSpaces(text, 0):
+    yield newStatement(strip(text), lineNum)
 
 proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
   ## Read the next statement from the code file reading multiple lines
@@ -984,7 +983,7 @@ proc getFunctionValueAndPos*(
 
 proc getList(statement: Statement, start: Natural,
     variables: Variables): ValueAndPosOr =
-  ## Return the literal list value and position afte it.
+  ## Return the literal list value and position after it.
   ## The start index points at [. The position includes the
   ## trailing whitespace after the ending ].
 
@@ -1605,7 +1604,7 @@ proc parseSignature*(signature: string): SignatureOr =
   var runningPos = 0
   let matchesO = matchDotNames(signature, runningPos)
   if not isSome(matchesO):
-    if notEmptyOrSpaces(signature):
+    if not emptyOrSpaces(signature, 0):
       # Excected a function name.
       return newSignatureOr(wFunctionName, "", runningPos)
     else:

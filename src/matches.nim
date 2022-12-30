@@ -96,22 +96,10 @@ proc getLastPart*(line: string, postfix: string): Option[Matches] =
     if matchesO.isSome:
       return matchesO
 
-proc matchAllSpaceTab(line: string, start: Natural = 0): Option[Matches] =
-  ## Match a line of all spaces or tabs.
-  let pattern = r"^[ \t]*$"
-  result = matchPatternCached(line, pattern, start, 0)
-
 proc matchTabSpace*(line: string, start: Natural = 0): Option[Matches] =
   ## Match one or more spaces or tabs starting at the given position.
   let pattern = r"[ \t]+"
   result = matchPatternCached(line, pattern, start, 0)
-
-proc notEmptyOrSpaces*(text: string): bool =
-  ## Return true when a statement is not empty or not all whitespace.
-  if text.len != 0:
-    let matchesO = matchAllSpaceTab(text, 0)
-    if not matchesO.isSome:
-      result = true
 
 proc emptyOrSpaces*(text: string, start: Natural): bool =
   ## Return true when the text is empty or all whitespace from start to the end.

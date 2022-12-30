@@ -68,7 +68,7 @@ type
     ## @:* lineNum -- line number in the file starting at 1 where the
     ## @:statement starts.
     text*: string
-    start*: Natural
+    # start*: Natural
     lineNum*: Natural
 
   FunctionPtr* = proc (variables: Variables, parameters: seq[Value]):
@@ -111,7 +111,7 @@ type
     ## Holds the function signature.
     ## @:* optional -- true when the last parameter is optional
     ## @:* name -- the function name
-    ## @:* params -- the function parameter names and types
+    ## @:* params -- a list of the function parameter names and types
     ## @:* returnType -- the function return type
     optional*: bool
     name*: string
@@ -150,12 +150,13 @@ type
 
   FunResult* = object
     ## Contains the result of calling a function, either a value or a
-    ## warning.
+    ## warning. The parameter field is the index of the problem
+    ## argument.
     case kind*: FunResultKind
       of frValue:
-        value*: Value       ## Return value of the function.
+        value*: Value
       of frWarning:
-        parameter*: Natural ## Index of problem parameter.
+        parameter*: Natural
         warningData*: WarningData
 
   SideEffect* = enum
@@ -349,10 +350,9 @@ proc `==`*(a: Value, b: Value): bool =
       of vkFunc:
         result = a.funcv == b.funcv
 
-func newStatement*(text: string, lineNum: Natural = 1,
-    start: Natural = 0): Statement =
+func newStatement*(text: string, lineNum: Natural = 1): Statement =
   ## Create a new statement.
-  result = Statement(lineNum: lineNum, start: start, text: text)
+  result = Statement(lineNum: lineNum, text: text)
 
 func `$`*(signature: Signature): string =
   ## Return a string representation of a signature.

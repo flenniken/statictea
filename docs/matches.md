@@ -12,7 +12,6 @@ Methods for matching sub-strings.
 * [matchLastPart](#matchlastpart) &mdash; Match the last part of a command line.
 * [getLastPart](#getlastpart) &mdash; Return the optional plus sign and line endings from the line.
 * [matchTabSpace](#matchtabspace) &mdash; Match one or more spaces or tabs starting at the given position.
-* [notEmptyOrSpaces](#notemptyorspaces) &mdash; Return true when a statement is not empty or not all whitespace.
 * [emptyOrSpaces](#emptyorspaces) &mdash; Return true when the text is empty or all whitespace from start to the end.
 * [matchEqualSign](#matchequalsign) &mdash; Match an equal sign or "&=" and the optional trailing whitespace.
 * [matchCommaParentheses](#matchcommaparentheses) &mdash; Match a comma or right parentheses and the optional trailing whitespace.
@@ -97,14 +96,6 @@ Match one or more spaces or tabs starting at the given position.
 
 ```nim
 proc matchTabSpace(line: string; start: Natural = 0): Option[Matches]
-```
-
-# notEmptyOrSpaces
-
-Return true when a statement is not empty or not all whitespace.
-
-```nim
-proc notEmptyOrSpaces(text: string): bool
 ```
 
 # emptyOrSpaces
@@ -192,7 +183,7 @@ func matchVersionNotCached(line: string; start: Natural = 0;
 
 Matches variable dot names and surrounding whitespace. Return the dot names as one string like "a.b.c.d".
 
-A dot name is a list of variable names separated by dots.
+A dot name is a list of variable names separated y dots.
 You can have 1 to 5 variable names in a dot name.
 
 A variable name starts with a letter followed by letters, digits
