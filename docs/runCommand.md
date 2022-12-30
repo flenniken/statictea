@@ -45,7 +45,6 @@ Run a command and fill in the variables dictionaries.
 * [getValueAndPos](#getvalueandpos) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [callUserFunction](#calluserfunction) &mdash; Run the given user function.
-* [callFunction](#callfunction) &mdash; Call the function variable.
 * [runStatementAssignVar](#runstatementassignvar) &mdash; Run a statement and assign the variable if appropriate.
 * [parseSignature](#parsesignature) &mdash; Parse the signature and return the list of parameters or a message.
 * [isFunctionDefinition](#isfunctiondefinition) &mdash; If the statement is the first line of a function definition, return true and fill in the return parameters.
@@ -382,18 +381,25 @@ func runCompareOp(left: Value; op: string; right: Value): Value
 
 Return the bool value of the condition expression and the position after it.  The start index points at the ( left parentheses. The position includes the trailing whitespace after the ending ).
 
+~~~
+a = (5 < 3) # condition
+    ^       ^
+~~~~
+
 ```nim
 proc getCondition(statement: Statement; start: Natural; variables: Variables): ValueAndPosOr
 ```
 
 # getBracketedVarValue
 
-Return the value of the bracketed variable. Start points a the container variable name.<dl class="docutils"><dt>a = list[ 4 ]</dt>
-<dd>^ sbv    ^ fbv</dd>
-<dt>a = dict[ "abc" ]</dt>
-<dd>^ sbv        ^ fbv</dd>
-</dl>
+Return the value of the bracketed variable. Start points a the container variable name.
 
+~~~
+a = list[ 4 ]
+    ^ sbv    ^ fbv
+a = dict[ "abc" ]
+    ^ sbv        ^ fbv
+~~~~
 
 ```nim
 proc getBracketedVarValue(statement: Statement; dotName: string;
@@ -448,14 +454,6 @@ Run the given user function.
 ```nim
 proc callUserFunction(funcVar: Value; variables: Variables;
                       arguments: seq[Value]): FunResult
-```
-
-# callFunction
-
-Call the function variable.
-
-```nim
-proc callFunction(funcVar: Value; variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # runStatementAssignVar

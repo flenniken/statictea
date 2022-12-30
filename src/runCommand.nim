@@ -1057,6 +1057,11 @@ proc getCondition*(statement: Statement, start: Natural,
   ## position after it.  The start index points at the ( left
   ## parentheses. The position includes the trailing whitespace after
   ## the ending ).
+  ## @:
+  ## @:~~~
+  ## @:a = (5 < 3) # condition
+  ## @:    ^       ^
+  ## @:~~~~
   when showPos:
     showDebugPos(statement, start, "^ s condition")
 
@@ -1183,10 +1188,13 @@ proc getBracketedVarValue*(statement: Statement, dotName: string, dotNameLen: Na
     variables: Variables): ValueAndPosOr =
   ## Return the value of the bracketed variable. Start points a the
   ## container variable name.
-  ## a = list[ 4 ]
-  ##     ^ sbv    ^ fbv
-  ## a = dict[ "abc" ]
-  ##     ^ sbv        ^ fbv
+  ## @:
+  ## @:~~~
+  ## @:a = list[ 4 ]
+  ## @:    ^ sbv    ^ fbv
+  ## @:a = dict[ "abc" ]
+  ## @:    ^ sbv        ^ fbv
+  ## @:~~~~
   when showPos:
     showDebugPos(statement, start, "^ s bracketed")
   var runningPos = start
@@ -1248,11 +1256,64 @@ proc getBracketedVarValue*(statement: Statement, dotName: string, dotNameLen: Na
 
   return newValueAndPosOr(value, runningPos)
 
+proc getValueAndPosFun(statement: Statement, start: Natural, variables:
+  Variables, dotNameStr: string, leftParenBrack:
+  string, dotNameLen: Natural): ValueAndPosOr =
+  ## Handle a function all. Start is pointing at the first character
+  ## after the left parentheses or bracket.
+  ## @:
+  ## @:~~~
+  ## @:a = cmp(4, 4) # statement
+  ## @:        ^     ^
+  ## @:a = cmd(len(b), len(c))
+  ## @:            ^ ^
+  ## @:~~~~
+
+  if leftParenBrack == "(":
+    # We have a function, run it and return its value.
+
+    let specialFunctionOr = getSpecialFunction(dotNameStr, variables)
+    if specialFunctionOr.isMessage:
+      let warningData = newWarningData(specialFunctionOr.message.messageId,
+        specialFunctionOr.message.p1, start)
+      return newValueAndPosOr(warningData)
+    let specialFunction = specialFunctionOr.value
+
+    case specialFunction:
+    of spIf, spIf0:
+      # Handle the special IF functions.
+      return ifFunctions(specialFunction, statement, start+dotNameLen, variables)
+    of spAnd, spOr:
+      # Handle the special AND/OR functions.
+      return andOrFunctions(specialFunction, statement, start+dotNameLen, variables)
+    of spFunc:
+      # Define a function in a code file and not nested.
+      return newValueAndPosOr(wDefineFunction, "", start)
+    of spNotSpecial, spReturn, spWarn, spLog:
+      # Handle normal functions and warn, return and log.
+      return getFunctionValueAndPos(dotNameStr, statement,
+        start+dotNameLen, variables, list=false)
+
+  elif leftParenBrack == "[":
+    # a = list[2] or a = dict["key"]
+    return getBracketedVarValue(statement, dotNameStr, dotNameLen, start, variables)
+
 proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
     Variables): ValueAndPosOr =
   ## Get the value, position and side effect from the statement. Start
-  ## points at the right hand side of the statement. For "a = 5" start
-  ## points at the 5.
+  ## points at the right hand side of the statement. The return pos is
+  ## the first character after trailing whitespace.
+  ## @:
+  ## @:~~~
+  ## @:a = 5  # statement
+  ## @:    ^ start
+  ## @:       ^ pos
+  ## @:
+  ## @:a = cmp(len(c), 4)
+  ## @:        ^ start
+  ## @:            ^ start
+  ## @:                ^ start
+  ## @:~~~~
 
   # The first character determines its type.
   # * quote -- string
@@ -1266,7 +1327,7 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
     # Expected a string, number, variable, list or condition.
     return newValueAndPosOr(wInvalidRightHandSide, "", start)
 
-  ## Branch based on the first character.
+  # Branch based on the first character.
   let char = statement.text[start]
   if char == '"':
     result = getString(statement, start)
@@ -1284,46 +1345,18 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
       return newValueAndPosOr(wInvalidRightHandSide, "", start)
     let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
 
-    # Handle top level function call or nested call.
-    # top level: a = cmp(4, 4)
-    # len nested: a = cmd(len(b), len(c))
-
-    if leftParenBrack == "(":
-      # We have a function, run it and return its value.
-
-      let specialFunctionOr = getSpecialFunction(dotNameStr, variables)
-      if specialFunctionOr.isMessage:
-        let warningData = newWarningData(specialFunctionOr.message.messageId,
-          specialFunctionOr.message.p1, start)
+    if leftParenBrack == "":
+      # We have a variable.
+      let valueOr = getVariable(variables, dotNameStr, npLocal)
+      if valueOr.isMessage:
+        let warningData = newWarningData(valueOr.message.messageId,
+          valueOr.message.p1, start)
         return newValueAndPosOr(warningData)
-      let specialFunction = specialFunctionOr.value
+      return newValueAndPosOr(valueOr.value, start+dotNameLen)
 
-      case specialFunction:
-      of spIf, spIf0:
-        # Handle the special IF functions.
-        return ifFunctions(specialFunction, statement, start+dotNameLen, variables)
-      of spAnd, spOr:
-        # Handle the special AND/OR functions.
-        return andOrFunctions(specialFunction, statement, start+dotNameLen, variables)
-      of spFunc:
-        # Define a function in a code file and not nested.
-        return newValueAndPosOr(wDefineFunction, "", start)
-      of spNotSpecial, spReturn, spWarn, spLog:
-        # Handle normal functions and warn, return and log.
-        return getFunctionValueAndPos(dotNameStr, statement,
-          start+dotNameLen, variables, list=false)
-
-    elif leftParenBrack == "[":
-      # a = list[2] or a = dict["key"]
-      return getBracketedVarValue(statement, dotNameStr, dotNameLen, start, variables)
-
-    # We have a variable.
-    let valueOr = getVariable(variables, dotNameStr, npLocal)
-    if valueOr.isMessage:
-      let warningData = newWarningData(valueOr.message.messageId,
-        valueOr.message.p1, start)
-      return newValueAndPosOr(warningData)
-    return newValueAndPosOr(valueOr.value, start+dotNameLen)
+    # Handle the function.
+    return getValueAndPosFun(statement, start, variables,
+      dotNameStr, leftParenBrack, dotNameLen)
   else:
     # Expected a string, number, variable, list or condition.
     return newValueAndPosOr(wInvalidRightHandSide, "", start)
@@ -1774,38 +1807,6 @@ proc isDocComment(statement: Statement): bool =
   let mO = matchDocComment(statement.text, 0)
   result = mO.isSome
 
-# func leftOpRightFunc*(statement: Statement,
-#     retLeftName: string,
-#     retOperator: string,
-#     retRightName: string,
-#     retRightNameParen: string,
-#     retPos: Natural
-#   ): bool =
-#   ## Parse the statement and fill in the left name, operator, the
-#   ## right hand side dot name and right hand paren. Return true when
-#   ## it matches.
-#   var runningPos = 0
-
-#   var leftName: string
-#   var operator: Operator
-#   var rightName: string
-#   var pos: Natural
-#   if not leftAndOperator(statement, leftName, operator, runningPos):
-#     return false
-
-#   let mO = matchDotNames(statement.text, runningPos)
-#   if not isSome(mO):
-#     return false
-#   let (_, rightName, rightNameParen, rightLen) = mO.get3GroupsLen()
-#   runningPos += funcStrLen
-
-#   retLeftName = leftName
-#   retOperator = operator
-#   retRightName = rightName
-#   retRightNameParen = rightNameParen
-#   retPos = runningPos
-#   return true
-
 proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: Statement,
     variables: var Variables, sourceFilename: string,
     codeFile: bool): bool =
@@ -1949,8 +1950,6 @@ proc runCodeFile*(env: var Env, variables: var Variables, filename: string) =
     if not statementO.isSome:
       break # done
     let statement = statementO.get()
-
-    # todo: merge in the code for defining user functions better
 
     # If the statement starts a function definition, define it and
     # assign the variable. A true return value means the statement(s)

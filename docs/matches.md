@@ -190,22 +190,24 @@ func matchVersionNotCached(line: string; start: Natural = 0;
 
 # matchDotNames
 
-Matches variable dot names and surrounding whitespace. Return the
-dot names as one string like "a.b.c.d".  A function call is a
-variable followed by a left parentheses or a left bracket.
+Matches variable dot names and surrounding whitespace. Return the dot names as one string like "a.b.c.d".
 
 A dot name is a list of variable names separated by dots.
 You can have 1 to 5 variable names in a dot name.
 
 A variable name starts with a letter followed by letters, digits
 and underscores limited to a total of 64 characters.
-
 No space is allowed between the function name and the left
 parentheses or bracket.
-
 Return three groups, the leading whitespace, the dotNames and the
-optional left parentheses or bracket. The length returned
-includes the optional trailing whitespace.
+optional left parentheses or bracket following the dot name. The
+length returned includes the optional trailing whitespace.
+
+Example call:
+
+~~~
+let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
+~~~~
 
 ```nim
 proc matchDotNames(line: string; start: Natural = 0): Option[Matches]
