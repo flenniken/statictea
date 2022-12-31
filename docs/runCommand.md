@@ -457,7 +457,7 @@ proc runBareFunction(statement: Statement; variables: Variables;
 
 # runStatement
 
-Run one statement and return the variable dot name string, operator and value. 
+Run one statement and return the variable dot name string, operator and value.
 
 ```nim
 proc runStatement(statement: Statement; variables: Variables): VariableDataOr

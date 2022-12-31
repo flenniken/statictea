@@ -130,7 +130,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     # Run the command the first time.
     var row = 0
     tea["row"] = newValue(row)
-    loopControl = runCommand(env, cmdLines, variables, inCommand)
+    loopControl = runCommand(env, cmdLines, variables, inOther)
 
     # Show a warning when the replace command does not have t.content
     # set.
@@ -193,7 +193,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       tea["row"] = newValue(row)
 
       # Run the command and fill in the variables.
-      loopControl = runCommand(env, cmdLines, variables, inCommand)
+      loopControl = runCommand(env, cmdLines, variables, inOther)
       if loopControl == lcStop:
         break
 

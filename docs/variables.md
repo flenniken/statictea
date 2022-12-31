@@ -64,13 +64,12 @@ Operator = enum
 
 Location where the code is running.
 
-* inCommand -- in a template command
 * inCodeFile -- in a code file
-* inFunction -- in a user defined function
+* inOther -- not in a code file
 
 ```nim
 CodeLocation = enum
-  inCommand, inCodeFile, inFunction
+  inCodeFile, inOther
 ```
 
 # VariableData
@@ -182,7 +181,7 @@ Assign the variable the given value if possible, else return a warning.
 
 ```nim
 proc assignVariable(variables: var Variables; dotNameStr: string; value: Value;
-                    operator = opEqual; codeLocation = inCommand): Option[
+                    operator = opEqual; codeLocation = inOther): Option[
     WarningData]
 ```
 

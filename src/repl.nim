@@ -49,6 +49,9 @@ func errorAndColumn(messageId: MessageId, line: string, runningPos: Natural, p1 
 proc runReplStatement(statement: Statement, variables: var Variables): Option[WarningData] =
   ## Run the statement and add to the variables.
 
+  # let loopControl = runStatementAssignVar(env, statement, variables,
+  #     env.templateFilename, codeLocation)
+
   let variableDataOr = runStatement(statement, variables)
   if variableDataOr.isMessage:
     return some(variableDataOr.message)

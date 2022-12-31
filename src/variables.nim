@@ -41,12 +41,10 @@ type
   CodeLocation* = enum
     ## Location where the code is running.
     ## @:
-    ## @:* inCommand -- in a template command
     ## @:* inCodeFile -- in a code file
-    ## @:* inFunction -- in a user defined function
-    inCommand
+    ## @:* inOther -- not in a code file
     inCodeFile
-    inFunction
+    inOther
 
   VariableData* = object
     ## The VariableData object holds the variable name, operator,
@@ -276,7 +274,7 @@ proc assignVariable*(
     dotNameStr: string,
     value: Value,
     operator = opEqual,
-    codeLocation = inCommand
+    codeLocation = inOther
   ): Option[WarningData] =
   ## Assign the variable the given value if possible, else return a
   ## warning.

@@ -1547,7 +1547,7 @@ proc callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Valu
     case variableData.operator
     of opEqual, opAppendList:
       # Assign the variable if possible.
-      let wdO = assignVariable(userVariables, variableData, inFunction)
+      let wdO = assignVariable(userVariables, variableData, inOther)
       if isSome(wdO):
         return newFunResultWarn(wdO.get())
     of opIgnore:
@@ -1587,7 +1587,6 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
     result = lcContinue
   of opReturn:
     # Handle a return function exit.
-
     if variableData.value.kind == vkString:
       case variableData.value.stringv:
       of "stop":
