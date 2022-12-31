@@ -1256,7 +1256,7 @@ proc getBracketedVarValue*(statement: Statement, dotName: string, dotNameLen: Na
   return newValueAndPosOr(value, runningPos)
 
 proc getValueAndPosFun(statement: Statement, start: Natural, variables:
-  Variables, dotNameStr: string, leftParenBrack:
+  Variables, dotNameStr: string, leftParenBracket:
   string, dotNameLen: Natural): ValueAndPosOr =
   ## Handle a function all. Start is pointing at the first character
   ## after the left parentheses or bracket.
@@ -1268,7 +1268,7 @@ proc getValueAndPosFun(statement: Statement, start: Natural, variables:
   ## @:            ^ ^
   ## @:~~~~
 
-  if leftParenBrack == "(":
+  if leftParenBracket == "(":
     # We have a function, run it and return its value.
 
     let specialFunctionOr = getSpecialFunction(dotNameStr, variables)
@@ -1293,7 +1293,7 @@ proc getValueAndPosFun(statement: Statement, start: Natural, variables:
       return getFunctionValueAndPos(dotNameStr, statement,
         start+dotNameLen, variables, list=false)
 
-  elif leftParenBrack == "[":
+  elif leftParenBracket == "[":
     # a = list[2] or a = dict["key"]
     return getBracketedVarValue(statement, dotNameStr, dotNameLen, start, variables)
 
@@ -1342,9 +1342,9 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
     if not matchesO.isSome:
       # Expected a string, number, variable, list or condition.
       return newValueAndPosOr(wInvalidRightHandSide, "", start)
-    let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
+    let (_, dotNameStr, leftParenBracket, dotNameLen) = matchesO.get3GroupsLen()
 
-    if leftParenBrack == "":
+    if leftParenBracket == "":
       # We have a variable.
       let valueOr = getVariable(variables, dotNameStr, npLocal)
       if valueOr.isMessage:
@@ -1355,7 +1355,7 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
 
     # Handle the function.
     return getValueAndPosFun(statement, start, variables,
-      dotNameStr, leftParenBrack, dotNameLen)
+      dotNameStr, leftParenBracket, dotNameLen)
   else:
     # Expected a string, number, variable, list or condition.
     return newValueAndPosOr(wInvalidRightHandSide, "", start)
@@ -1406,12 +1406,42 @@ proc getValueAndPos*(statement: Statement, start: Natural, variables:
       pos = result.value.pos
     showDebugPos(statement, pos, "^ f")
 
-proc runStatement*(statement: Statement, variables: Variables):
-    VariableDataOr =
+proc runBareFunction*(statement: Statement, variables: Variables,
+    dotNameStr: string, pos: Natural, start: Natural): ValueAndPosOr =
+  ## Handle bare function: if, if0, return, warn and log. A bare
+  ## function does not assign a variable.
+  ## @:
+  ## @:~~~
+  ## @:  if( true, warn("tea time")) # test
+  ## @:  ^ pos                       ^
+  ## @:      ^ start                 ^
+  ## @:~~~~
+
+  # Look up the special function type.
+  let specialFunctionOr = getSpecialFunction(dotNameStr, variables)
+  if specialFunctionOr.isMessage:
+    let wd = newWarningData(specialFunctionOr.message.messageId,
+      specialFunctionOr.message.p1, start)
+    return newValueAndPosOr(wd)
+  let specialFunction = specialFunctionOr.value
+
+  # Handle all the special function types.
+  case specialFunction:
+  of spIf, spIf0:
+    # Handle the special bare if functions.
+    result = ifFunctions(specialFunction, statement, start, variables, bare=true)
+  of spNotSpecial, spAnd, spOr, spFunc:
+    # Missing left hand side and operator, e.g. a = len(b) not len(b).
+    result = newValueAndPosOr(wMissingLeftAndOpr, "", pos)
+  of spReturn, spWarn, spLog:
+    # Handle a bare warn, log or return function.
+    result = getFunctionValueAndPos($specialFunction, statement, start, variables, list=false)
+
+proc runStatement*(statement: Statement, variables: Variables): VariableDataOr =
   ## Run one statement and return the variable dot name string,
   ## operator and value.
 
-  # Skip blank lines and comments.
+  # Skip comments and blank lines.
   var pos: Natural
   let spacesO = matchTabSpace(statement.text, 0)
   if not isSome(spacesO):
@@ -1427,7 +1457,7 @@ proc runStatement*(statement: Statement, variables: Variables):
   if not isSome(matchesO):
     # Statement does not start with a variable name.
     return newVariableDataOr(wMissingStatementVar)
-  let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
+  let (_, dotNameStr, leftParenBracket, dotNameLen) = matchesO.get3GroupsLen()
   let leadingLen = dotNameLen + pos
 
   var vlOr: ValueAndPosOr
@@ -1435,33 +1465,17 @@ proc runStatement*(statement: Statement, variables: Variables):
   var operatorLength = 0
   var varName = ""
 
-  if leftParenBrack == "(":
+  if leftParenBracket == "(":
     # Handle bare function: if, if0, return, warn and log. A bare
     # function does not assign a variable.
-
-    let specialFunctionOr = getSpecialFunction(dotNameStr, variables)
-    if specialFunctionOr.isMessage:
-      let warningData = newWarningData(specialFunctionOr.message.messageId,
-        specialFunctionOr.message.p1, pos)
-      return newVariableDataOr(warningData)
-    let specialFunction = specialFunctionOr.value
-
-    case specialFunction:
-    of spIf, spIf0:
-      # Handle the special bare if functions.
-      vlOr = ifFunctions(specialFunction, statement, leadingLen, variables, bare=true)
-    of spNotSpecial, spAnd, spOr, spFunc:
-      # Missing left hand side and operator, e.g. a = len(b) not len(b).
-      return newVariableDataOr(wMissingLeftAndOpr, "", pos)
-    of spReturn, spWarn, spLog:
-      # Handle a bare warn, log or return function.
-      vlOr = getFunctionValueAndPos($specialFunction, statement, leadingLen, variables, list=false)
-
+    vlOr = runBareFunction(statement, variables, dotNameStr, pos, leadingLen)
+    if vlOr.isMessage:
+      return newVariableDataOr(vlOr.message)
   else:
     # Handle normal "varName operator right" statements.
     varName = dotNameStr
 
-    if leftParenBrack != "":
+    if leftParenBracket != "":
       # Statement does not start with a variable name.
       return newVariableDataOr(wMissingStatementVar)
 
@@ -1610,8 +1624,8 @@ proc parseSignature*(signature: string): SignatureOr =
     else:
       # Missing the function signature string.
       return newSignatureOr(wMissingSignature, "", runningPos)
-  let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
-  if leftParenBrack != "(":
+  let (_, dotNameStr, leftParenBracket, dotNameLen) = matchesO.get3GroupsLen()
+  if leftParenBracket != "(":
     # Excected a left parentheses for the signature.
     return newSignatureOr(wMissingLeftParen, "", runningPos + dotNameStr.len)
   runningPos += dotNameLen
@@ -1722,8 +1736,8 @@ proc isFunctionDefinition*(statement: Statement, retLeftName: var string,
   let leftNameO = matchDotNames(statement.text, runningPos)
   if not isSome(leftNameO):
     return false
-  let (_, leftName, leftParenBrack, leftNameLen) = leftNameO.get3GroupsLen()
-  if leftParenBrack == "(":
+  let (_, leftName, leftParenBracket, leftNameLen) = leftNameO.get3GroupsLen()
+  if leftParenBracket == "(":
     return false
   runningPos += leftNameLen
 

@@ -168,7 +168,7 @@ proc testGetStatements(content: string, expected: string): bool =
   #   debugEcho "$1: $2" % [$ix, cmdLines.lines[ix]]
   #   debugEcho "$1: $2" % [$ix, $part]
   #   debugEcho ""
-    
+
   var statements = getStatements(cmdLines)
 
   discard env.readCloseDeleteEnv()

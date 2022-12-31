@@ -103,7 +103,7 @@ proc matchTabSpace(line: string; start: Natural = 0): Option[Matches]
 Return true when the text is empty or all whitespace from start to the end.
 
 ```nim
-proc emptyOrSpaces(text: string; start: Natural): bool
+proc emptyOrSpaces(text: string; start: Natural = 0): bool
 ```
 
 # matchEqualSign

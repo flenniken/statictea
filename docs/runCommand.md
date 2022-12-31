@@ -43,6 +43,7 @@ Run a command and fill in the variables dictionaries.
 * [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and the position after it.
 * [getBracketedVarValue](#getbracketedvarvalue) &mdash; Return the value of the bracketed variable.
 * [getValueAndPos](#getvalueandpos) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
+* [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, if0, return, warn and log.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [callUserFunction](#calluserfunction) &mdash; Run the given user function.
 * [runStatementAssignVar](#runstatementassignvar) &mdash; Run a statement and assign the variable if appropriate.
@@ -439,9 +440,24 @@ a = if( bool(len(b)), d, e) # if
 proc getValueAndPos(statement: Statement; start: Natural; variables: Variables): ValueAndPosOr
 ```
 
+# runBareFunction
+
+Handle bare function: if, if0, return, warn and log. A bare function does not assign a variable.
+
+~~~
+  if( true, warn("tea time")) # test
+  ^ pos                       ^
+      ^ start                 ^
+~~~~
+
+```nim
+proc runBareFunction(statement: Statement; variables: Variables;
+                     dotNameStr: string; pos: Natural; start: Natural): ValueAndPosOr
+```
+
 # runStatement
 
-Run one statement and return the variable dot name string, operator and value.
+Run one statement and return the variable dot name string, operator and value. 
 
 ```nim
 proc runStatement(statement: Statement; variables: Variables): VariableDataOr
