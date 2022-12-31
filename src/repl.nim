@@ -35,112 +35,104 @@ You enter statements or commands at the prompt.
 
 Available commands:
 * h — this help text
-* p dotname — print the value of a variable
-* pd dotname — print a dictionary as dot names
-* pj dotname — print a variable as json
-* v — show the number of variables in the top level dictionaries
+* p variable — print a variable as dot names
+* pj variable — print a variable as json
+* pr variable — print a variable like in a replacement block
+* v — show the number of top variables in the top level dictionaries
 * q — quit"""
 
-func errorAndColumn(messageId: MessageId, line: string, runningPos: Natural, p1 = ""): string =
-  result.add(startColumn(line, runningPos))
-  result.add("\n")
-  result.add(getWarning(messageId, p1))
+proc errorAndColumn(env: var Env, messageId: MessageId, line: string,
+    runningPos: Natural, p1 = "") =
+  env.writeErr(line)
+  env.writeErr(startColumn(line, runningPos))
+  env.writeErr(getWarning(messageId, p1))
 
-proc runReplStatement(statement: Statement, variables: var Variables): Option[WarningData] =
-  ## Run the statement and add to the variables.
+proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool =
+  ## Handle the REPL line. Return true to end the loop.
+  if emptyOrSpaces(line, 0):
+    return false
 
-  # let loopControl = runStatementAssignVar(env, statement, variables,
-  #     env.templateFilename, codeLocation)
-
-  let variableDataOr = runStatement(statement, variables)
-  if variableDataOr.isMessage:
-    return some(variableDataOr.message)
-  let variableData = variableDataOr.value
-
-  # Assign the variable if possible.
-  if variableData.operator == opEqual or variableData.operator == opAppendList:
-    result = assignVariable(variables, variableData.dotNameStr, variableData.value)
-
-proc handleReplLine*(line: string, start: Natural, variables: var Variables, stop: var bool): string =
-  ## Handle the REPL line. Set the stop variable to end the loop. The
-  ## return string is the result of the line.
-  if emptyOrSpaces(line, start):
-    return
-
-  var runningPos = start
+  var runningPos = 0
   let replCmdO = matchReplCmd(line, runningPos)
   if not replCmdO.isSome:
 
     # Run the statement and add to the variables.
-    let statement = newStatement(line[runningPos ..< line.len], 1)
-    let warningDataO = runReplStatement(statement, variables)
-    if isSome(warningDataO):
-      let wd = warningDataO.get()
-      return errorAndColumn(wd.messageId, line, wd.pos+runningPos, wd.p1)
-    return
+    let statement = newStatement(line[runningPos .. ^1], 1)
+
+    let loopControl = runStatementAssignVar(env, statement, variables,
+      "repl.tea", inOther)
+    if loopControl == lcStop:
+      return true
+    return false
+
+  # We got a REPL command.
 
   let replCmd = replCmdO.getGroup()
   runningPos += replCmdO.get().length
 
   if replCmd in ["q", "h", "v"]:
     if runningPos != line.len:
-      # Invalid REPL command syntax.
-      return errorAndColumn(wInvalidReplSyntax, line, runningPos)
+      # Invalid REPL command syntax, unexpected text.
+      errorAndColumn(env, wInvalidReplSyntax, line, runningPos)
+      return false
     case replCmd
     of "q":
-      stop = true
-      return
+      return true
     of "h":
-      return replHelp()
+      env.writeOut(replHelp())
+      return false
     of "v":
-      return showVariables(variables)
+      env.writeOut(showVariables(variables))
+      return false
 
+  # Read the variable for the command.
   let matchesO = matchDotNames(line, runningPos)
   if not matchesO.isSome:
     # Expected a variable or a dot name.
-    return errorAndColumn(wExpectedDotname, line, runningPos)
+    errorAndColumn(env, wExpectedDotname, line, runningPos)
+    return false
   let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
-  runningPos += dotNameLen
   if leftParen == "(":
-    # Invalid variable or dot name.
-    return errorAndColumn(wInvalidDotname, line, runningPos-1)
-  if runningPos != line.len:
-    # Invalid REPL command syntax.
-    return errorAndColumn(wInvalidReplSyntax, line, runningPos)
+    # Expected variable name not function call.
+    errorAndColumn(env, wInvalidDotname, line, runningPos+dotNameStr.len)
+    return false
+  if runningPos + dotNameLen != line.len:
+    # Invalid REPL command syntax, unexpected text.
+    errorAndColumn(env, wInvalidReplSyntax, line, runningPos + dotNameLen)
+    return false
 
-  # Read the dotname's value.
+  # Read the dot name's value.
   let valueOr = getVariable(variables, dotNameStr, npLocal)
   if valueOr.isMessage:
     # The variable '$1' does not exist.", ## wVariableMissing
-    return errorAndColumn(wVariableMissing, line, runningPos, dotNameStr)
+    errorAndColumn(env, wVariableMissing, line, runningPos, dotNameStr)
+    return false
   let value = valueOr.value
 
+  # The print options mirror the string function.
   case replCmd:
-  of "p":
-    result.add(valueToStringRB(value))
-  of "pd":
+  of "p": # string dn
     if value.kind == vkDict:
-      result.add(dotNameRep(value.dictv))
+      env.writeOut(dotNameRep(value.dictv))
     else:
-      result.add(valueToString(value))
-  of "pj":
-    result.add(valueToString(value))
+      env.writeOut(valueToString(value))
+  of "pj": # string json
+    env.writeOut(valueToString(value))
+  of "pr": # string rb
+    env.writeOut(valueToStringRB(value))
   else:
     discard
-  stop = false
+  result = false
 
 proc runEvaluatePrintLoop*(env: var Env, args: Args) =
   ## Run commands at a prompt.
   var variables = getStartingVariables(env, args)
   var line: string
-  var stop: bool
   while true:
     try:
       line = readLineFromStdin("tea> ")
     except IOError:
       break
-    let str = handleReplLine("tea> " & line, 5, variables, stop)
+    let stop = handleReplLine(env, variables, line)
     if stop:
       break
-    if str != "":
-      echo str

@@ -641,7 +641,7 @@ suite "matches.nim":
     check testMatchReplCmd("v ", 0, some(newMatches(2, 0, "v")))
     check testMatchReplCmd("p", 0, some(newMatches(1, 0, "p")))
     check testMatchReplCmd("p ", 0, some(newMatches(2, 0, "p")))
-    check testMatchReplCmd("pd ", 0, some(newMatches(3, 0, "pd")))
+    check testMatchReplCmd("pr ", 0, some(newMatches(3, 0, "pr")))
     check testMatchReplCmd("pj ", 0, some(newMatches(3, 0, "pj")))
 
   test "matchReplCmd":

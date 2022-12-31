@@ -10,11 +10,10 @@ Run commands at a prompt. Run evaluate print loop (REPL).
 
 # handleReplLine
 
-Handle the REPL line. Set the stop variable to end the loop. The return string is the result of the line.
+Handle the REPL line. Return true to end the loop.
 
 ```nim
-proc handleReplLine(line: string; start: Natural; variables: var Variables;
-                    stop: var bool): string
+proc handleReplLine(env: var Env; variables: var Variables; line: string): bool
 ```
 
 # runEvaluatePrintLoop

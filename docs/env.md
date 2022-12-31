@@ -21,6 +21,7 @@ Environment holding the input and output streams.
 * [logLine](#logline) &mdash; Append a message to the log file.
 * [log](#log) &mdash; Append the message to the log file.
 * [writeOut](#writeout) &mdash; Write a message to the output stream.
+* [writeErr](#writeerr) &mdash; Write a message to the error stream.
 * [checkLogSize](#checklogsize) &mdash; Check the log file size and write a warning message when the file is big.
 * [openLogFile](#openlogfile) &mdash; Open the log file and update the environment.
 * [openEnv](#openenv) &mdash; Open and return the environment containing standard error and standard out as streams.
@@ -188,6 +189,14 @@ Write a message to the output stream.
 
 ```nim
 proc writeOut(env: var Env; message: string)
+```
+
+# writeErr
+
+Write a message to the error stream.
+
+```nim
+proc writeErr(env: var Env; message: string)
 ```
 
 # checkLogSize

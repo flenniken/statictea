@@ -7,99 +7,128 @@ import sharedtestcode
 import vartypes
 import functions
 import version
+import comparelines
 
-proc testHandleReplLine(line: string, eStr = "", eStop = false, start: Natural = 5): bool =
+proc testHandleReplLine(
+    line: string,
+    eStop = false,
+    eOut: string = "",
+    eLog: string = "",
+    eErr: string = "",
+  ): bool =
+
+  var env = openEnvTest("_handleReplLine.log")
+
   # Set up variables when not passed in.
   let funcsVarDict = createFuncDictionary().dictv
   var variables = emptyVariables(funcs = funcsVarDict)
-  var stop = false
-  let str = handleReplLine(line, start, variables, stop)
-  result = true
+
+  let stop = handleReplLine(env, variables, line)
+
+  let eOutLines = splitNewLines(eOut)
+  let eLogLines = splitNewLines(eLog)
+  let eErrLines = splitNewLines(eErr)
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+
   if not gotExpected($stop, $eStop):
-    result = false
-  if str != eStr:
-    echo line
-    echo "got:"
-    echo str
-    echo "expected:"
-    echo eStr
     result = false
 
 suite "repl.nim":
 
   test "handle repl line":
-    check testHandleReplLine("tea> ", "")
-    check testHandleReplLine("tea>  ", "")
-    check testHandleReplLine("tea>\t", "")
+    check testHandleReplLine("", false)
+    check testHandleReplLine(" ", false)
+    check testHandleReplLine("", false)
+    check testHandleReplLine("\t", false)
+    check testHandleReplLine("q", true)
+    check testHandleReplLine("q   ", true)
 
-    let eStr = """
+  test "help text":
+    let eOut = """
 You enter statements or commands at the prompt.
 
 Available commands:
 * h — this help text
-* p dotname — print the value of a variable
-* pd dotname — print a dictionary as dot names
-* pj dotname — print a variable as json
-* v — show the number of variables in the top level dictionaries
-* q — quit"""
-    check testHandleReplLine("tea> h", eStr)
+* p variable — print a variable as dot names
+* pj variable — print a variable as json
+* pr variable — print a variable like in a replacement block
+* v — show the number of top variables in the top level dictionaries
+* q — quit
+"""
+    check testHandleReplLine("h", false, eOut)
 
-    check testHandleReplLine("tea> q", "", eStop = true)
-    check testHandleReplLine("tea> q   ", "", eStop = true)
-    let eStr2 = """
-       ^
-Invalid REPL command syntax."""
-    check testHandleReplLine("tea> q asdf", eStr2)
-    check testHandleReplLine("tea> h asdf", eStr2)
+  test "invalid syntax":
+    let eErr = """
+q asdf
+  ^
+Invalid REPL command syntax, unexpected text.
+"""
+    check testHandleReplLine("q asdf", false, eErr = eErr)
 
-  test "show t.row":
-    check testHandleReplLine("tea> p t.row", "0")
-    check testHandleReplLine("tea> pd t.row", "0")
-    check testHandleReplLine("tea> pj t.row", "0")
+  test "show p t.row":
+    check testHandleReplLine("p t.row", false, "0\n")
 
-  test "show t.version":
-    let version = staticteaVersion
-    let quotedVersion = """"$1"""" % version
-    check testHandleReplLine("tea> p t.version", version)
-    check testHandleReplLine("tea> pd t.version", quotedVersion)
-    check testHandleReplLine("tea> pj t.version", quotedVersion)
+  test "show pr t.row":
+    check testHandleReplLine("pr t.row", false, "0\n")
 
-  test "show t.args":
-    check testHandleReplLine("tea> p t.args", "{}")
-    check testHandleReplLine("tea> pd t.args", "")
-    check testHandleReplLine("tea> pj t.args", "{}")
+  test "show pj t.row":
+    check testHandleReplLine("pj t.row", false, "0\n")
+
+  test "show p t.version":
+    let quotedVersion = "\"$1\"\n" % staticteaVersion
+    check testHandleReplLine("p t.version", false, quotedVersion)
+    check testHandleReplLine("pj t.version", false, quotedVersion)
+
+  test "show pr t.version":
+    let version = "$1\n" % staticteaVersion
+    check testHandleReplLine("pr t.version", false, version)
+
+  test "show p t.args":
+    check testHandleReplLine("p s", false, "\n")
+
+  test "show pj t.args":
+    check testHandleReplLine("pj s", false, "{}\n")
+
+  test "show pr t.args":
+    check testHandleReplLine("pr s", false, "{}\n")
 
   test "show variables":
     let funcsVarDict = createFuncDictionary().dictv
     let numFunctionKeys = funcsVarDict.len
-    let str = "f={$1} g={} l={} o={} s={} t={3}" % $numFunctionKeys
-    check testHandleReplLine("tea> v", str)
+    let eOut = "f={$1} g={} l={} o={} s={} t={3}\n" % $numFunctionKeys
+    check testHandleReplLine("v", false, eOut)
 
   test "run statement":
-    check testHandleReplLine("tea> a = 5", "")
+    check testHandleReplLine("a = 5", false)
 
   test "junk at end":
-    let eStr = """
-           ^
-Unused text at the end of the statement."""
-    check testHandleReplLine("tea> a = 5 asdf", eStr)
+    let eErr = """
+repl.tea(1): w31: Unused text at the end of the statement.
+statement: a = 5 asdf
+                 ^
+"""
+    check testHandleReplLine("a = 5 asdf", false, eErr = eErr)
 
   test "p len(a)":
-    let eStr = """
-          ^
-Invalid variable or dot name."""
-    check testHandleReplLine("tea> p len(a)", eStr)
-  
+    let eErr = """
+p len(a)
+     ^
+Expected variable name not function call.
+"""
+    check testHandleReplLine("p len(a)", false, eErr = eErr)
+
   test "p len  abc":
-    let eStr = """
-            ^
-Invalid REPL command syntax."""
-    check testHandleReplLine("tea> p len  abc", eStr)
+    let eErr = """
+p len  abc
+       ^
+Invalid REPL command syntax, unexpected text.
+"""
+    check testHandleReplLine("p len  abc", false, eErr = eErr)
 
   test "p missing":
-    let eStr = """
-              ^
-The variable 'missing' does not exist."""
-    check testHandleReplLine("tea> p missing", eStr)
-
-
+    let eErr = """
+p missing
+  ^
+The variable 'missing' does not exist.
+"""
+    check testHandleReplLine("p missing", false, eErr = eErr)

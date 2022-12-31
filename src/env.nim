@@ -177,6 +177,10 @@ proc writeOut*(env: var Env, message: string) =
   ## Write a message to the output stream.
   env.outStream.writeLine(message)
 
+proc writeErr*(env: var Env, message: string) =
+  ## Write a message to the error stream.
+  env.errStream.writeLine(message)
+
 proc checkLogSize*(env: var Env) =
   ## Check the log file size and write a warning message when the file
   ## is big.

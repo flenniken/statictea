@@ -485,8 +485,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "An if with an assignment takes three arguments.", ## wAssignmentIf
     "An if without an assignment takes two arguments.", ## wBareIfTwoArguments
     "Expected a variable or a dot name.", ## wExpectedDotname
-    "Invalid variable or dot name.", ## wInvalidDotname
-    "Invalid REPL command syntax.", ## wInvalidReplSyntax
+    "Expected variable name not function call.", ## wInvalidDotname
+    "Invalid REPL command syntax, unexpected text.", ## wInvalidReplSyntax
     "The container variable must be a list or dictionary got $1.", ## wIndexNotListOrDict
     "The index variable must be an integer.", ## wIndexNotInt
     "The index value $1 is out of range.", ## wInvalidIndexRange
