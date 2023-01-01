@@ -46,7 +46,7 @@ proc testAssignVarWarn(
   ## Assign a variable and make sure the warning matches the expected warning.
 
   # Populate the variables dictionary when there are inVars.
-  var variables = emptyVariables()
+  var variables = startVariables()
   if inVars != "":
     var valueOr = readJsonString(inVars)
     if valueOr.isMessage:
@@ -76,7 +76,7 @@ proc testAssignVarFlex(
   ## Test assignVariable.
 
   # Populate the variables dictionary when there are inVars.
-  var variables = emptyVariables()
+  var variables = startVariables()
   if inVars != "":
     var valueOr = readJsonString(inVars)
     if valueOr.isMessage:
@@ -96,8 +96,8 @@ proc testAssignVarFlex(
 
 suite "variables.nim":
 
-  test "emptyVariables":
-    var variables = emptyVariables()
+  test "startVariables":
+    var variables = startVariables()
     let expected = """
 f = {}
 g = {}
@@ -111,7 +111,7 @@ t.version = "$1"""" % staticteaVersion
 
   test "getVariable":
     let funcsVarDict = createFuncDictionary().dictv
-    var variables = emptyVariables(funcs = funcsVarDict)
+    var variables = startVariables(funcs = funcsVarDict)
     check testGetVariableOk(variables, "true", "true")
     check testGetVariableOk(variables, "false", "false")
     check testGetVariableOk(variables, "t.row", "0")
@@ -128,13 +128,13 @@ t.version = "$1"""" % staticteaVersion
     check testGetVariableOk(variables, "f.cmp", expected)
 
   test "getVariable five":
-    var variables = emptyVariables()
+    var variables = startVariables()
     variables["l"].dictv["five"] = newValue(5)
     check testGetVariableOk(variables, "l.five", "5")
     check testGetVariableOk(variables, "five", "5")
 
   test "getVariable nested":
-    var variables = emptyVariables()
+    var variables = startVariables()
     let variablesJson = """
 {
   "a":{
@@ -157,7 +157,7 @@ t.version = "$1"""" % staticteaVersion
 
 
   test "getVariable not dict":
-    var variables = emptyVariables()
+    var variables = startVariables()
     let variablesJson = """
 {
   "a":{
@@ -171,19 +171,19 @@ t.version = "$1"""" % staticteaVersion
     check testGetVariableWarning(variables, "a.b.tea", wNotInL, "a.b.tea")
 
   test "testGetVariableWarning wReservedNameSpaces":
-    var variables = emptyVariables()
+    var variables = startVariables()
     check testGetVariableWarning(variables, "p", wReservedNameSpaces)
 
   test "testGetVariableWarning wVariableMissing":
-    var variables = emptyVariables()
+    var variables = startVariables()
     check testGetVariableWarning(variables, "s.hello", wVariableMissing, "hello")
 
   test "testGetVariableWarning wVariableMissing 2":
-    var variables = emptyVariables()
+    var variables = startVariables()
     check testGetVariableWarning(variables, "s.d.hello", wVariableMissing, "d")
 
   test "testGetVariableWarning not dict":
-    var variables = emptyVariables()
+    var variables = startVariables()
     let variablesJson = """{"d":"hello"}"""
     var valueOr = readJsonString(variablesJson)
     check valueOr.isValue
@@ -191,22 +191,22 @@ t.version = "$1"""" % staticteaVersion
     check testGetVariableWarning(variables, "s.d.hello", wNotDict, "d")
 
   test "getTeaVarStringDefault":
-    var variables = emptyVariables()
+    var variables = startVariables()
     check getTeaVarStringDefault(variables, "output") == "result"
 
   test "getTeaVarIntDefault":
-    var variables = emptyVariables()
+    var variables = startVariables()
     check getTeaVarIntDefault(variables, "row") == 0
     check getTeaVarIntDefault(variables, "repeat") == 1
     check getTeaVarIntDefault(variables, "maxLines") == 50
     check getTeaVarIntDefault(variables, "maxRepeat") == 100
 
   test "resetVariables":
-    var variables = emptyVariables()
-    let emptyVariables = $variables
+    var variables = startVariables()
+    let startVariables = $variables
     resetVariables(variables)
-    if $variables != emptyVariables:
-      echo "expected: " & emptyVariables
+    if $variables != startVariables:
+      echo "expected: " & startVariables
       echo "     got: " & $variables
       fail
 
@@ -215,7 +215,7 @@ t.version = "$1"""" % staticteaVersion
     let server = """{"a": 2}"""
     var valueOr = readJsonString(server)
     check valueOr.isValue
-    var variables = emptyVariables()
+    var variables = startVariables()
     variables["s"] = valueOr.value
     resetVariables(variables)
     check $getVariable(variables, "s.a", npLocal) == $newValueOr(newValue(2))
@@ -225,7 +225,7 @@ t.version = "$1"""" % staticteaVersion
     let shared = """{"a": 2}"""
     var valueOr = readJsonString(shared)
     check valueOr.isValue
-    var variables = emptyVariables()
+    var variables = startVariables()
     variables["o"] = valueOr.value
     resetVariables(variables)
     check $getVariable(variables, "o.a", npLocal) == $newValueOr(newValue(2))
@@ -235,7 +235,7 @@ t.version = "$1"""" % staticteaVersion
     let codeVars = """{"a": 2}"""
     var valueOr = readJsonString(codeVars)
     check valueOr.isValue
-    var variables = emptyVariables()
+    var variables = startVariables()
     variables["o"] = valueOr.value
     resetVariables(variables)
     check $getVariable(variables, "o.a", npLocal) == $newValueOr(newValue(2))
@@ -245,7 +245,7 @@ t.version = "$1"""" % staticteaVersion
     let global = """{"a": 2}"""
     var valueOr = readJsonString(global)
     check valueOr.isValue
-    var variables = emptyVariables()
+    var variables = startVariables()
     variables["g"] = valueOr.value
     resetVariables(variables)
     check $getVariable(variables, "g.a", npLocal) == $newValueOr(newValue(2))
@@ -491,14 +491,14 @@ t.version = "$1"""" % staticteaVersion
       """{"a":{"tea":2,"sea":[5]}}""", """{"a":{"tea":2}}""")
 
   test "append list to a list":
-    var variables = emptyVariables()
+    var variables = startVariables()
     var warningDataO = assignVariable(variables, "teas", newEmptyListValue(), opAppendList)
     check not warningDataO.isSome
     warningDataO = assignVariable(variables, "teas", newEmptyListValue(), opAppendList)
     check not warningDataO.isSome
 
   test "append to a non-list":
-    var variables = emptyVariables()
+    var variables = startVariables()
     var warningDataO = assignVariable(variables, "a", newValue(5))
     check not warningDataO.isSome
     let eWarningDataO = some(newWarningData(wAppendToList, "int"))

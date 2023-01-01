@@ -11,7 +11,7 @@ import unicodes
 import compareLines
 
 proc testTempSegments(replacmentBlock: string,
-    variables: Variables = emptyVariables(),
+    variables: Variables = startVariables(),
     eResultLines: seq[string] = @[],
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
@@ -350,7 +350,7 @@ two lines
     check testTempSegments(lines, eErrLines=eErrLines, eResultLines=eResultLines)
 
   test "testTempSegments var":
-    var variables = emptyVariables()
+    var variables = startVariables()
     discard assignVariable(variables, "var", newValue(5))
     let lines = """
 {var}
@@ -362,7 +362,7 @@ two lines
     check testTempSegments(lines, variables=variables, eResultLines=eResultLines)
 
   test "testTempSegments multiple vars":
-    var variables = emptyVariables()
+    var variables = startVariables()
     discard assignVariable(variables, "var", newValue(5))
     let lines = """
 {var}

@@ -1060,3 +1060,7 @@ task clean, "\tRemove all the binaries so everything gets built next time.":
     let list = listFiles(dir)
     for filename in list:
       rmFile(filename)
+
+task replace, "\tShow pattern for text search and replace in all the nim source files.":
+  let cmd = r"find . -name \*.nim -type f | xargs -n 1 gsed -i 's/stateVariables/startVariables/g'"
+  echo cmd

@@ -57,7 +57,7 @@ proc testGetValueAndPos(statement: Statement, start: Natural,
   var vars = variables
   if vars == nil:
     let funcsVarDict = createFuncDictionary().dictv
-    vars = emptyVariables(funcs = funcsVarDict)
+    vars = startVariables(funcs = funcsVarDict)
 
   let valueAndPosOr = getValueAndPos(statement, start, vars)
 
@@ -279,7 +279,7 @@ proc testGetFunctionValueAndPos(
     ): bool =
 
   let funcsVarDict = createFuncDictionary().dictv
-  let variables = emptyVariables(funcs = funcsVarDict)
+  let variables = startVariables(funcs = funcsVarDict)
   let valueAndPosOr = getFunctionValueAndPos(functionName,
     statement, start, variables, list=false)
   result = gotExpected($valueAndPosOr, $eValueAndPosOr, statement.text)
@@ -291,7 +291,7 @@ proc testRunStatement(statement: Statement, eVariableDataOr: VariableDataOr,
   var vars: Variables
   if variables == nil:
     let funcsVarDict = createFuncDictionary().dictv
-    vars = emptyVariables(funcs = funcsVarDict)
+    vars = startVariables(funcs = funcsVarDict)
   else:
     vars = variables
   let variableDataOr = runStatement(statement, vars)
@@ -340,7 +340,7 @@ proc testSkipArgument(text: string, startPos: Natural, ePosOr: PosOr): bool =
 
 proc testGetCondition(text: string, start: Natural, eBool: bool, ePos: Natural): bool =
   let funcsVarDict = createFuncDictionary().dictv
-  let variables = emptyVariables(funcs = funcsVarDict)
+  let variables = startVariables(funcs = funcsVarDict)
 
   let statement = newStatement(text)
   let valueAndPosOr = getCondition(statement, start, variables)
@@ -352,7 +352,7 @@ proc testGetCondition(text: string, start: Natural, eBool: bool, ePos: Natural):
 proc testGetConditionWarn(text: string, start: Natural, eWarning: MessageId,
     ePos = 0, eP1 = ""): bool =
   let funcsVarDict = createFuncDictionary().dictv
-  let variables = emptyVariables(funcs = funcsVarDict)
+  let variables = startVariables(funcs = funcsVarDict)
   let statement = newStatement(text)
   let valueAndPosOr = getCondition(statement, start, variables)
   let eValueAndPosOr = newValueAndPosOr(eWarning, eP1, ePos)
@@ -416,7 +416,7 @@ proc testProcessFunctionSignature(content: string, start: Natural,
 #   var lineBufferO = newLineBuffer(inStream, filename = sourceFilename)
 #   var lb = lineBufferO.get()
 #   let funcsVarDict = createFuncDictionary().dictv
-#   let variables = emptyVariables(funcs = funcsVarDict)
+#   let variables = startVariables(funcs = funcsVarDict)
 
 #   var retLeftName: string
 #   var retOperator: Operator
@@ -516,7 +516,7 @@ proc testRunCodeFile(
   defer: discard tryRemoveFile(filename)
 
   let funcsVarDict = createFuncDictionary().dictv
-  var variables = emptyVariables(funcs = funcsVarDict)
+  var variables = startVariables(funcs = funcsVarDict)
   runCodeFile(env, variables, filename)
 
   result = true
@@ -794,7 +794,7 @@ $$ : c = len("hello")
 
   test "getNewVariables":
     let funcsVarDict = createFuncDictionary().dictv
-    let variables = emptyVariables(funcs = funcsVarDict)
+    let variables = startVariables(funcs = funcsVarDict)
     check variables["f"].dictv.len != 0
     check variables["g"].dictv.len == 0
     check variables["l"].dictv.len == 0
@@ -1601,7 +1601,7 @@ White$1
   test "a = cmp":
     let statement = newStatement(text="""a = f.cmp""", lineNum=1)
     let funcsVarDict = createFuncDictionary().dictv
-    let variables = emptyVariables(funcs = funcsVarDict)
+    let variables = startVariables(funcs = funcsVarDict)
     let cmpValueOr = getVariable(variables, "f.cmp", npLocal)
     if cmpValueOr.isMessage:
       echo cmpValueOr.message
@@ -1612,7 +1612,7 @@ White$1
   test "a = get(cmp, 0)":
     let statement = newStatement(text="""a = get(f.cmp, 0)""", lineNum=1)
     let funcsVarDict = createFuncDictionary().dictv
-    let variables = emptyVariables(funcs = funcsVarDict)
+    let variables = startVariables(funcs = funcsVarDict)
     let cmpValueOr = getVariable(variables, "f.cmp", npLocal)
     if cmpValueOr.isMessage:
       echo cmpValueOr.message
@@ -1712,14 +1712,14 @@ White$1
 
   test "a = b[0]":
     let funcsVarDict = createFuncDictionary().dictv
-    var variables = emptyVariables(funcs = funcsVarDict)
+    var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check $variables["l"] == """{"b":[2]}"""
     check testGetValueAndPos("""a = b[0]""", 4, 8, "2", variables)
 
   test "index 1":
     let funcsVarDict = createFuncDictionary().dictv
-    var variables = emptyVariables(funcs = funcsVarDict)
+    var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     discard assignVariable(variables, "l.b", newValue(3), opAppendList)
     check $variables["l"] == """{"b":[2,3]}"""
@@ -1727,19 +1727,19 @@ White$1
 
   test "brackets with spaces":
     let funcsVarDict = createFuncDictionary().dictv
-    var variables = emptyVariables(funcs = funcsVarDict)
+    var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check testGetValueAndPos("""a = b[ 0 ]""", 4, 10, "2", variables)
 
   test "brackets with function":
     let funcsVarDict = createFuncDictionary().dictv
-    var variables = emptyVariables(funcs = funcsVarDict)
+    var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check testGetValueAndPos("""a = b[ len("") ]""", 4, 16, "2", variables)
 
   test "a = d['abc']":
     let funcsVarDict = createFuncDictionary().dictv
-    var variables = emptyVariables(funcs = funcsVarDict)
+    var variables = startVariables(funcs = funcsVarDict)
     let content = """{"abc": 5}"""
     var valueOr = readJsonString(content)
     let value = valueOr.value
@@ -1752,13 +1752,13 @@ White$1
 
   test "bracketed list or dict":
     let funcsVarDict = createFuncDictionary().dictv
-    var variables = emptyVariables(funcs = funcsVarDict)
+    var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opEqual)
     check testGetValueAndPos("""a = b[0]""", 4, wIndexNotListOrDict, 4, "int", variables)
 
   test "bracketed list warnings":
     let funcsVarDict = createFuncDictionary().dictv
-    var variables = emptyVariables(funcs = funcsVarDict)
+    var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.ix", newValue(22), opEqual)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check testGetValueAndPos("""a = b[abc]""", 4, wNotInL, 6, "abc", variables)
@@ -1769,7 +1769,7 @@ White$1
 
   test "bracketed dict warnings":
     let funcsVarDict = createFuncDictionary().dictv
-    var variables = emptyVariables(funcs = funcsVarDict)
+    var variables = startVariables(funcs = funcsVarDict)
     let content = """{"abc": 5}"""
     var valueOr = readJsonString(content)
     let value = valueOr.value
@@ -1780,18 +1780,18 @@ White$1
 
   test "missing ending bracket":
     let funcsVarDict = createFuncDictionary().dictv
-    var variables = emptyVariables(funcs = funcsVarDict)
+    var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check testGetValueAndPos("""a = b[0""", 4, wMissingRightBracket, 7, "", variables)
 
   test "function definition in template":
     let funcsVarDict = createFuncDictionary().dictv
-    var variables = emptyVariables(funcs = funcsVarDict)
+    var variables = startVariables(funcs = funcsVarDict)
     check testGetValueAndPos("""a = func("() int")""", 4, wDefineFunction, 4, "", variables)
 
   test "nested function definition":
     let funcsVarDict = createFuncDictionary().dictv
-    var variables = emptyVariables(funcs = funcsVarDict)
+    var variables = startVariables(funcs = funcsVarDict)
     check testGetValueAndPos("""a = len(func("() int"))""", 4, wDefineFunction, 8, "", variables)
 
   test "parse signature no params":
@@ -2294,7 +2294,7 @@ nofile(0): w16: File not found: missing.
 """ % tripleQuotes
 
     var env = openEnvTest("_missingfile.log")
-    var variables = emptyVariables()
+    var variables = startVariables()
     runCodeFile(env, variables, "missing")
     check env.readCloseDeleteCompare(eErrLines = eErrLines)
 

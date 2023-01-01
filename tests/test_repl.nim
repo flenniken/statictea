@@ -21,7 +21,7 @@ proc testHandleReplLine(
 
   # Set up variables when not passed in.
   let funcsVarDict = createFuncDictionary().dictv
-  var variables = emptyVariables(funcs = funcsVarDict)
+  var variables = startVariables(funcs = funcsVarDict)
 
   let stop = handleReplLine(env, variables, line)
 

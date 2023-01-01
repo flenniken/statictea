@@ -1526,7 +1526,7 @@ proc callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Valu
   assert funcVar.funcv.builtIn == false
 
   let funcsVarDict = createFuncDictionary().dictv
-  var userVariables = emptyVariables(funcs=funcsVarDict)
+  var userVariables = startVariables(funcs=funcsVarDict)
 
   # Populate the l dictionary with the parameters and arguments.
   let funResult = mapParameters(funcVar.funcv.signature, arguments)

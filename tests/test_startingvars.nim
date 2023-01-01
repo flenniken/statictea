@@ -38,7 +38,7 @@ suite "startingvars.nim":
   test "check the initial t.args":
     var args: Args
     var argsVarDict = getTeaArgs(args).dictv
-    var variables = emptyVariables(args = argsVarDict)
+    var variables = startVariables(args = argsVarDict)
     let targs = variables["t"].dictv["args"]
     let varRep = dotNameRep(targs.dictv)
     let eVarRep = """

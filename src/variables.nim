@@ -92,7 +92,7 @@ func `$`*(v: VariableData): string =
   result = "dotName='$1', operator='$2', value=$3" % [
   v.dotNameStr, $v.operator, $v.value]
 
-func emptyVariables*(server: VarsDict = nil, args: VarsDict = nil,
+func startVariables*(server: VarsDict = nil, args: VarsDict = nil,
     funcs: VarsDict = nil): Variables =
   ## Create an empty variables object in its initial state.
 

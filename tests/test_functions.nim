@@ -28,7 +28,7 @@ proc testFunction(functionName: string, arguments: seq[Value],
   # Set up variables when not passed in.
   var vars = variables
   if vars == nil:
-    vars = emptyVariables(funcs = funcsVarDict)
+    vars = startVariables(funcs = funcsVarDict)
 
   var funResult: FunResult
   # Lookup the variable's value.
@@ -107,7 +107,7 @@ proc testGetBestFunctionExists(functionName: string, arguments: seq[Value],
   ## Call getBestFunction with an existing function name with the
   ## given arguments. Verify it returns a function with the expected
   ## signature code.
-  let variables = emptyVariables(funcs = funcsVarDict)
+  let variables = startVariables(funcs = funcsVarDict)
   var funcValueOr = getVariable(variables, functionName, npBuiltin)
   if funcValueOr.isMessage:
     echo funcValueOr.message
@@ -157,7 +157,7 @@ proc testReadJson(json: string, eResult: Value): bool =
   result = testFunction("readJson", arguments, eFunResult)
 
 proc testFormatString(str: string, eStr: string,
-    variables = emptyVariables()): bool =
+    variables = startVariables()): bool =
   let stringOr = formatString(variables, str)
   if stringOr.isMessage:
     echo stringOr
@@ -165,7 +165,7 @@ proc testFormatString(str: string, eStr: string,
   result = gotExpected(stringOr.value, eStr)
 
 proc testFormatStringWarn(str: string, eWarningData: WarningData,
-    variables = emptyVariables()): bool =
+    variables = startVariables()): bool =
   let stringOr = formatString(variables, str)
   if stringOr.isValue:
     echo stringOr
@@ -1759,7 +1759,7 @@ d.sub.y = 4"""
       newFunResult(newValue("hello")))
 
   test "format one":
-    var variables = emptyVariables(funcs = funcsVarDict)
+    var variables = startVariables(funcs = funcsVarDict)
     variables["l"].dictv["name"] = newValue("world")
     let str = newValue("hello {name}")
     check testFunction("format", @[str],
@@ -1950,7 +1950,7 @@ d.sub.y = 4"""
     check testFormatString("ab", "ab")
     check testFormatString("}", "}")
 
-    var variables = emptyVariables()
+    var variables = startVariables()
     variables["l"].dictv["v"] = newValue("a")
     variables["l"].dictv["v2"] = newValue("ab")
     variables["l"].dictv["v3"] = newValue("xyz")
