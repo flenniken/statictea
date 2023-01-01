@@ -7,7 +7,10 @@ Test updating a template with the update option.
 ### File cmd.sh command
 
 ~~~
-$statictea -u -o shared.tea -t template.html >stdout 2>stderr
+$statictea -u \
+  -o shared.tea \
+  -t template.html \
+  >stdout 2>stderr
 ~~~
 
 ### File template.html

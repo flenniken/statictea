@@ -7,8 +7,12 @@ Test standard readme replace example 3.
 ### File cmd.sh command
 
 ~~~
-$statictea -s server.json -o shared.tea \
-  -t template.html -r result.html >stdout 2>stderr
+$statictea \
+  -s server.json \
+  -o shared.tea \
+  -t template.html \
+  -r result.html \
+  >stdout 2>stderr
 ~~~
 
 ### File template.html
@@ -27,9 +31,9 @@ $statictea -s server.json -o shared.tea \
 
 ~~~
 {
-"languageCode": "en",
-"languageDirection": "ltr",
-"title": "Teas in England"
+  "languageCode": "en",
+  "languageDirection": "ltr",
+  "title": "Teas in England"
 }
 ~~~
 
