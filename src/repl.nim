@@ -86,26 +86,27 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
       return false
 
   # Read the variable for the command.
-  let matchesO = matchDotNames(line, runningPos)
-  if not matchesO.isSome:
+  let varNameO = getVariableName(line, runningPos)
+  if not varNameO.isSome:
     # Expected a variable or a dot name.
     errorAndColumn(env, wExpectedDotname, line, runningPos)
     return false
-  let (_, dotNameStr, leftParen, dotNameLen) = matchesO.get3GroupsLen()
-  if leftParen == "(":
+  let varName = varNameO.get()
+
+  if varName.leftParenBracket == "(":
     # Expected variable name not function call.
-    errorAndColumn(env, wInvalidDotname, line, runningPos+dotNameStr.len)
+    errorAndColumn(env, wInvalidDotname, line, runningPos+varName.dotName.len)
     return false
-  if runningPos + dotNameLen != line.len:
+  if varName.pos != line.len:
     # Invalid REPL command syntax, unexpected text.
-    errorAndColumn(env, wInvalidReplSyntax, line, runningPos + dotNameLen)
+    errorAndColumn(env, wInvalidReplSyntax, line, varName.pos)
     return false
 
   # Read the dot name's value.
-  let valueOr = getVariable(variables, dotNameStr, npLocal)
+  let valueOr = getVariable(variables, varName.dotName, npLocal)
   if valueOr.isMessage:
     # The variable '$1' does not exist.", ## wVariableMissing
-    errorAndColumn(env, wVariableMissing, line, runningPos, dotNameStr)
+    errorAndColumn(env, wVariableMissing, line, runningPos, varName.dotName)
     return false
   let value = valueOr.value
 

@@ -261,7 +261,8 @@ MessageId = enum
   wReturnTypeRequired,      ## w237
   wMissingDocComment,       ## w238
   wMissingStatements,       ## w239
-  wNoReturnStatement         ## w240
+  wNoReturnStatement,       ## w240
+  wLeftHandBracket           ## w241
 ```
 
 # Messages
@@ -510,7 +511,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The return type is required.", ## wReturnTypeRequired
     "Out of lines; Missing required doc comment.", ## wMissingDocComment
     "Out of lines; No statements for the function.", ## wMissingStatements
-    "Out of lines; missing the function\'s return statement."]
+    "Out of lines; missing the function\'s return statement.", ## wNoReturnStatement
+    "You cannot use bracket notation to change a variable."]
 ```
 
 # WarningData

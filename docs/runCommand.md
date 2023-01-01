@@ -23,6 +23,11 @@ Run a command and fill in the variables dictionaries.
 * [`==`](#-1) &mdash; Return true when the two statements are equal.
 * [`==`](#-2) &mdash; Return true when a equals b.
 * [`!=`](#-3) &mdash; Compare whether two PosOr are not equal.
+* type: [VariableName](#variablename) &mdash; A variable name in a statement.
+* type: [RightType](#righttype) &mdash; The type of the right hand side of a statement.
+* [newVariableName](#newvariablename) &mdash; Create a new VariableName object.
+* [getRightType](#getrighttype) &mdash; Return the type of the right hand side of the statement at the start position.
+* [getVariableName](#getvariablename) &mdash; Get a variable name from the statement.
 * [matchTripleOrPlusSign](#matchtripleorplussign) &mdash; Match the optional """ or + at the end of the line.
 * [addText](#addtext) &mdash; Add the line up to the line-ending to the text string.
 * [getFragmentAndPos](#getfragmentandpos) &mdash; Split up a long statement around the given position.
@@ -223,6 +228,64 @@ Compare whether two PosOr are not equal.
 
 ```nim
 func `!=`(a: PosOr; b: PosOr): bool
+```
+
+# VariableName
+
+A variable name in a statement.
+
+* dotName -- the dot name string
+* leftParenBracket -- the optional left parentheses or right bracket after the variable.
+* pos -- the position after the trailing whitespace
+
+```nim
+VariableName = object
+  dotName*: string
+  leftParenBracket*: string
+  pos*: Natural
+
+```
+
+# RightType
+
+The type of the right hand side of a statement.
+
+rtNothing -- not a valid right hand side
+rtString -- a literal string starting with a quote
+rtNumber -- a literal number starting with a digit or minus sign
+rtVariable -- a variable starting with a-zA-Z
+rtFunction -- a function variable calling a function: len(b)
+rtList -- a literal list: [1, 2, 3, len(b), 5]
+rtCondition -- a condition: (a < b)
+rtGet -- a index into a list or dictionary: teas[2], teas["green"]
+
+```nim
+RightType = enum
+  rtNothing, rtString, rtNumber, rtVariable, rtList, rtCondition
+```
+
+# newVariableName
+
+Create a new VariableName object.
+
+```nim
+func newVariableName(dotName: string; leftParenBracket: string; pos: Natural): VariableName
+```
+
+# getRightType
+
+Return the type of the right hand side of the statement at the start position.
+
+```nim
+func getRightType(statement: Statement; start: Natural): RightType
+```
+
+# getVariableName
+
+Get a variable name from the statement. Start points at a name.
+
+```nim
+proc getVariableName(text: string; start: Natural): Option[VariableName]
 ```
 
 # matchTripleOrPlusSign

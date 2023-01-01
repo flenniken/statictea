@@ -146,6 +146,77 @@ func `!=`*(a: PosOr, b: PosOr): bool =
   ## Compare whether two PosOr are not equal.
   result = not (a == b)
 
+type
+  VariableName* = object
+    ## A variable name in a statement.
+    ## @:
+    ## @:* dotName -- the dot name string
+    ## @:* leftParenBracket -- the optional left parentheses or right bracket after the variable.
+    ## @:* pos -- the position after the trailing whitespace
+    dotName*: string
+    leftParenBracket*: string
+    pos*: Natural
+
+  RightType* = enum
+    ## The type of the right hand side of a statement.
+    ## @:
+    ## @:rtNothing -- not a valid right hand side
+    ## @:rtString -- a literal string starting with a quote
+    ## @:rtNumber -- a literal number starting with a digit or minus sign
+    ## @:rtVariable -- a variable starting with a-zA-Z
+    ## @:rtFunction -- a function variable calling a function: len(b)
+    ## @:rtList -- a literal list: [1, 2, 3, len(b), 5]
+    ## @:rtCondition -- a condition: (a < b)
+    ## @:rtGet -- a index into a list or dictionary: teas[2], teas["green"]
+    rtNothing,
+    rtString,
+    rtNumber,
+    rtVariable,
+    rtList,
+    rtCondition,
+
+func newVariableName*(dotName: string, leftParenBracket: string,
+    pos: Natural): VariableName =
+  ## Create a new VariableName object.
+  result = VariableName(dotName: dotName, leftParenBracket: leftParenBracket, pos: pos)
+
+func getRightType*(statement: Statement, start: Natural): RightType =
+  ## Return the type of the right hand side of the statement at the
+  ## start position.
+
+  # The first character determines the type.
+  # * quote -- string
+  # * digit or minus sign -- number
+  # * a-zA-Z -- variable
+  # * [ -- a list
+  # * ( -- a condition expression
+
+  # Make sure start is pointing to something.
+  if start >= statement.text.len:
+    return rtNothing
+
+  let char = statement.text[start]
+  if char == '"':
+    result = rtString
+  elif char in {'0' .. '9', '-'}:
+    result = rtNumber
+  elif char == '[':
+    result = rtList
+  elif char == '(':
+    result = rtCondition
+  elif isLowerAscii(char) or isUpperAscii(char):
+    result = rtVariable
+  else:
+    result = rtNothing
+
+proc getVariableName*(text: string, start: Natural): Option[VariableName] =
+  ## Get a variable name from the statement. Start points at a name.
+  let dotNamesO = matchDotNames(text, start)
+  if not dotNamesO.isSome:
+    return
+  let (_, dotName, leftParenBracket, length) = dotNamesO.get3GroupsLen()
+  result = some(newVariableName(dotName, leftParenBracket, start+length))
+
 func isTriple(line: string, ch: char, ix: Natural): bool =
   if ch == '"' and line.len >= ix-2 and
       line[ix-1] == '"' and line[ix-2] == '"':
@@ -1257,7 +1328,7 @@ proc getBracketedVarValue*(statement: Statement, dotName: string, dotNameLen: Na
 
 proc getValueAndPosFun(statement: Statement, start: Natural, variables:
   Variables, dotNameStr: string, leftParenBracket:
-  string, dotNameLen: Natural): ValueAndPosOr =
+  string, start2: Natural): ValueAndPosOr =
   ## Handle a function all. Start is pointing at the first character
   ## after the left parentheses or bracket.
   ## @:
@@ -1281,21 +1352,21 @@ proc getValueAndPosFun(statement: Statement, start: Natural, variables:
     case specialFunction:
     of spIf, spIf0:
       # Handle the special IF functions.
-      return ifFunctions(specialFunction, statement, start+dotNameLen, variables)
+      return ifFunctions(specialFunction, statement, start2, variables)
     of spAnd, spOr:
       # Handle the special AND/OR functions.
-      return andOrFunctions(specialFunction, statement, start+dotNameLen, variables)
+      return andOrFunctions(specialFunction, statement, start2, variables)
     of spFunc:
       # Define a function in a code file and not nested.
       return newValueAndPosOr(wDefineFunction, "", start)
     of spNotSpecial, spReturn, spWarn, spLog:
       # Handle normal functions and warn, return and log.
       return getFunctionValueAndPos(dotNameStr, statement,
-        start+dotNameLen, variables, list=false)
+        start2, variables, list=false)
 
   elif leftParenBracket == "[":
     # a = list[2] or a = dict["key"]
-    return getBracketedVarValue(statement, dotNameStr, dotNameLen, start, variables)
+    return getBracketedVarValue(statement, dotNameStr, start2-start, start, variables)
 
 proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
     Variables): ValueAndPosOr =
@@ -1314,51 +1385,39 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
   ## @:                ^ start
   ## @:~~~~
 
-  # The first character determines its type.
-  # * quote -- string
-  # * digit or minus sign -- number
-  # * a-zA-Z -- variable
-  # * [ -- a list
-  # * ( -- a condition expression
-
-  # Make sure start is pointing to something.
-  if start >= statement.text.len:
+  let rightType = getRightType(statement, start)
+  case rightType:
+  of rtNothing:
     # Expected a string, number, variable, list or condition.
     return newValueAndPosOr(wInvalidRightHandSide, "", start)
-
-  # Branch based on the first character.
-  let char = statement.text[start]
-  if char == '"':
+  of rtString:
     result = getString(statement, start)
-  elif char in {'0' .. '9', '-'}:
+  of rtNumber:
     result = getNumber(statement, start)
-  elif char == '[':
+  of rtList:
     result = getList(statement, start, variables)
-  elif char == '(':
+  of rtCondition:
     result = getCondition(statement, start, variables)
-  elif isLowerAscii(char) or isUpperAscii(char):
+  of rtVariable:
     # Get the variable name.
-    let matchesO = matchDotNames(statement.text, start)
-    if not matchesO.isSome:
+    let rightNameO = getVariableName(statement.text, start)
+    if not rightNameO.isSome:
       # Expected a string, number, variable, list or condition.
       return newValueAndPosOr(wInvalidRightHandSide, "", start)
-    let (_, dotNameStr, leftParenBracket, dotNameLen) = matchesO.get3GroupsLen()
+    let rightName = rightNameO.get()
 
-    if leftParenBracket == "":
-      # We have a variable.
-      let valueOr = getVariable(variables, dotNameStr, npLocal)
+    if rightName.leftParenBracket == "":
+      # Get the variable's value.
+      let valueOr = getVariable(variables, rightName.dotName, npLocal)
       if valueOr.isMessage:
         let warningData = newWarningData(valueOr.message.messageId,
           valueOr.message.p1, start)
         return newValueAndPosOr(warningData)
-      return newValueAndPosOr(valueOr.value, start+dotNameLen)
+      return newValueAndPosOr(valueOr.value, rightName.pos)
 
     # Handle the function.
     return getValueAndPosFun(statement, start, variables,
-      dotNameStr, leftParenBracket, dotNameLen)
-  else:
-    # Expected a string, number, variable, list or condition.
-    return newValueAndPosOr(wInvalidRightHandSide, "", start)
+      rightName.dotName, rightName.leftParenBracket, rightName.pos)
 
 proc getValueAndPos*(statement: Statement, start: Natural, variables:
     Variables): ValueAndPosOr =
@@ -1451,39 +1510,37 @@ proc runStatement*(statement: Statement, variables: Variables): VariableDataOr =
   if pos >= statement.text.len or statement.text[pos] == '#':
     return newVariableDataOr("", opIgnore, newValue(0))
 
-  # Get the variable dot name string and match the surrounding white
+  # Get the variable dot name string and match the trailing white
   # space.
-  let matchesO = matchDotNames(statement.text, pos)
-  if not isSome(matchesO):
+  let leftNameO = getVariableName(statement.text, pos)
+  if not isSome(leftNameO):
     # Statement does not start with a variable name.
     return newVariableDataOr(wMissingStatementVar)
-  let (_, dotNameStr, leftParenBracket, dotNameLen) = matchesO.get3GroupsLen()
-  let leadingLen = dotNameLen + pos
+  let leftName = leftNameO.get()
 
   var vlOr: ValueAndPosOr
   var operator = opIgnore
   var operatorLength = 0
-  var varName = ""
 
-  if leftParenBracket == "(":
+  if leftName.leftParenBracket == "(":
     # Handle bare function: if, if0, return, warn and log. A bare
     # function does not assign a variable.
-    vlOr = runBareFunction(statement, variables, dotNameStr, pos, leadingLen)
+    vlOr = runBareFunction(statement, variables, leftName.dotName, pos, leftName.pos)
     if vlOr.isMessage:
       return newVariableDataOr(vlOr.message)
   else:
     # Handle normal "varName operator right" statements.
-    varName = dotNameStr
 
-    if leftParenBracket != "":
-      # Statement does not start with a variable name.
-      return newVariableDataOr(wMissingStatementVar)
+    if leftName.leftParenBracket != "":
+      assert leftName.leftParenBracket == "["
+      # You cannot use bracket notation to change a variable.
+      return newVariableDataOr(wLeftHandBracket)
 
     # Get the equal sign or &= and the following whitespace.
-    let operatorO = matchEqualSign(statement.text, leadingLen)
+    let operatorO = matchEqualSign(statement.text, leftName.pos)
     if not operatorO.isSome:
       # Missing operator, = or &=.
-      return newVariableDataOr(wInvalidVariable, "", leadingLen)
+      return newVariableDataOr(wInvalidVariable, "", leftName.pos)
     let match = operatorO.get()
     let op = match.getGroup()
     if op == "=":
@@ -1495,7 +1552,7 @@ proc runStatement*(statement: Statement, variables: Variables): VariableDataOr =
 
     # Get the right hand side value and match the following whitespace.
     vlOr = getValueAndPos(statement,
-      leadingLen + operatorLength, variables)
+      leftName.pos + operatorLength, variables)
 
   if vlOr.isMessage:
     return newVariableDataOr(vlOr.message)
@@ -1518,7 +1575,7 @@ proc runStatement*(statement: Statement, variables: Variables): VariableDataOr =
       return newVariableDataOr(wTextAfterValue, "", vlOr.value.pos)
 
   # Return the variable dot name and value.
-  result = newVariableDataOr(varName, operator, vlOr.value.value)
+  result = newVariableDataOr(leftName.dotName, operator, vlOr.value.value)
 
 proc callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult =
   ## Run the given user function.
@@ -1615,20 +1672,20 @@ proc parseSignature*(signature: string): SignatureOr =
   ## @:get(group: list, ix: int, optional any) any
   ## @:~~~~
   var runningPos = 0
-  let matchesO = matchDotNames(signature, runningPos)
-  if not isSome(matchesO):
+  let functionNameO = getVariableName(signature, runningPos)
+  if not isSome(functionNameO):
     if not emptyOrSpaces(signature):
       # Excected a function name.
       return newSignatureOr(wFunctionName, "", runningPos)
     else:
       # Missing the function signature string.
       return newSignatureOr(wMissingSignature, "", runningPos)
-  let (_, dotNameStr, leftParenBracket, dotNameLen) = matchesO.get3GroupsLen()
-  if leftParenBracket != "(":
+  let functionName = functionNameO.get()
+
+  if functionName.leftParenBracket != "(":
     # Excected a left parentheses for the signature.
-    return newSignatureOr(wMissingLeftParen, "", runningPos + dotNameStr.len)
-  runningPos += dotNameLen
-  let functionName = dotNameStr
+    return newSignatureOr(wMissingLeftParen, "", runningPos + functionName.dotName.len)
+  runningPos = functionName.pos
 
   var optional = false
   var params = newSeq[Param]()
@@ -1647,15 +1704,16 @@ proc parseSignature*(signature: string): SignatureOr =
         return newSignatureOr(wNotLastOptional, "", runningPos)
 
       # Get the parameter name and following white space.
-      let paramNameO = matchDotNames(signature, runningPos)
+      let paramNameO = getVariableName(signature, runningPos)
       if not isSome(paramNameO):
         # Excected a parameter name.
         return newSignatureOr(wParameterName, "", runningPos)
-      let (_, paramName, leftP, paramNameLen) = paramNameO.get3GroupsLen()
-      if leftP == "(":
+      let paramName = paramNameO.get()
+
+      if paramName.leftParenBracket == "(":
         # Expected a colon.
-        return newSignatureOr(wMissingColon, "", runningPos + paramName.len)
-      runningPos += paramNameLen
+        return newSignatureOr(wMissingColon, "", runningPos + paramName.dotName.len)
+      runningPos = paramName.pos
 
       # Look for : and the following white space.
       let colonO = matchSymbol(signature, gColon, runningPos)
@@ -1675,7 +1733,7 @@ proc parseSignature*(signature: string): SignatureOr =
       runningPos += paramTypeLen
 
       let paramType = strToParamType(paramTypeStr)
-      params.add(newParam(paramName, paramType))
+      params.add(newParam(paramName.dotName, paramType))
 
       # Look for a comma or right parentheses.
       let corpO = matchCommaOrSymbol(signature, gRightParentheses, runningPos)
@@ -1705,7 +1763,7 @@ proc parseSignature*(signature: string): SignatureOr =
     # Unused extra text at the end of the signature.
     return newSignatureOr(wUnusedSignatureText, "", runningPos)
 
-  let signature = newSignature(optional, functionName, params, returnType)
+  let signature = newSignature(optional, functionName.dotName, params, returnType)
   result = newSignatureOr(signature)
 
 proc isFunctionDefinition*(statement: Statement, retLeftName: var string,
@@ -1732,13 +1790,14 @@ proc isFunctionDefinition*(statement: Statement, retLeftName: var string,
 
   # Get the left hand variable dot name string and match the
   # surrounding white space.
-  let leftNameO = matchDotNames(statement.text, runningPos)
+  let leftNameO = getVariableName(statement.text, runningPos)
   if not isSome(leftNameO):
     return false
-  let (_, leftName, leftParenBracket, leftNameLen) = leftNameO.get3GroupsLen()
-  if leftParenBracket == "(":
+  let leftName = leftNameO.get()
+
+  if leftName.leftParenBracket == "(":
     return false
-  runningPos += leftNameLen
+  runningPos = leftName.pos
 
   # Get the equal sign or &= and the following whitespace.
   let operatorO = matchEqualSign(statement.text, runningPos)
@@ -1753,17 +1812,17 @@ proc isFunctionDefinition*(statement: Statement, retLeftName: var string,
   runningPos += matchLen
 
   # Look for "func(".
-  let mO = matchDotNames(statement.text, runningPos)
-  if not isSome(mO):
+  let funcNameO = getVariableName(statement.text, runningPos)
+  if not isSome(funcNameO):
     return false
-  let (_, funcStr, leftParen, funcStrLen) = mO.get3GroupsLen()
-  if funcStr != "func":
+  let funcName = funcNameO.get()
+  if funcName.dotName != "func":
     return false
-  if leftParen != "(":
+  if funcName.leftParenBracket != "(":
     return false
-  runningPos += funcStrLen
+  runningPos = funcName.pos
 
-  retLeftName = leftName
+  retLeftName = leftName.dotName
   retOperator = operator
   retPos = runningPos
   return true
@@ -1873,10 +1932,10 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
   userStatements.add(statement)
   while true:
     # Look for a return statement.
-    let mO = matchDotNames(statement.text, 0)
-    if isSome(mO):
-      let (_, leftName, leftNameParen, _) = mO.get3GroupsLen()
-      if leftName == "return" and leftNameParen == "(":
+    let leftNameO = getVariableName(statement.text, 0)
+    if isSome(leftNameO):
+      let leftName = leftNameO.get()
+      if leftName.dotName == "return" and leftName.leftParenBracket == "(":
         break
 
     let statementO = readStatement(env, lb)

@@ -1314,7 +1314,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "bare if not taken":
     let text = """if0(1, return("stop"))"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(0))
+    let eVariableDataOr = newVariableDataOr("if0", opIgnore, newValue(0))
     check testRunStatement(statement, eVariableDataOr)
 
   test "bare if takes two args":

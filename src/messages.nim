@@ -253,6 +253,7 @@ type
     wMissingDocComment,    ## w238
     wMissingStatements,    ## w239
     wNoReturnStatement,    ## w240
+    wLeftHandBracket,      ## w241
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -497,6 +498,7 @@ const
     "Out of lines; Missing required doc comment.", ## wMissingDocComment
     "Out of lines; No statements for the function.", ## wMissingStatements
     "Out of lines; missing the function's return statement.", ## wNoReturnStatement
+    "You cannot use bracket notation to change a variable.", ## wLeftHandBracket
     ]
 
     ## The message text.
