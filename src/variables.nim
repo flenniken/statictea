@@ -38,6 +38,7 @@ type
     opReturn = "return",
     opLog = "log",
 
+  # todo: CodeLocation: determine another way to do this.
   CodeLocation* = enum
     ## Location where the code is running.
     ## @:

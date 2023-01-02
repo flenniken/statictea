@@ -1639,6 +1639,9 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
     result = lcContinue
   of opIgnore:
     result = lcContinue
+  of opLog:
+    env.logLine(sourceFilename, statement.lineNum, variableData.value.stringv & "\n")
+    result = lcContinue
   of opReturn:
     # Handle a return function exit.
     if variableData.value.kind == vkString:
@@ -1655,9 +1658,6 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
     env.warnStatement(statement, wd, sourceFilename = sourceFilename)
     result = lcSkip
 
-  of opLog:
-    env.logLine(sourceFilename, statement.lineNum, variableData.value.stringv & "\n")
-    result = lcContinue
 
 proc parseSignature*(signature: string): SignatureOr =
   ## Parse the signature and return the list of parameters or a
