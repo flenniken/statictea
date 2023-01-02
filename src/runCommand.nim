@@ -1263,33 +1263,22 @@ proc getCondition*(statement: Statement, start: Natural,
 
     accum = newValue(bValue)
 
-proc getBracketedVarValue*(statement: Statement, dotName: string, dotNameLen: Natural, start: Natural,
-    variables: Variables): ValueAndPosOr =
-  ## Return the value of the bracketed variable. Start points a the
-  ## container variable name.
+proc getBracketedVarValue*(statement: Statement, start: Natural,
+    container: Value, variables: Variables): ValueAndPosOr =
+  ## Return the value of the bracketed variable and the position after
+  ## the trailing whitespace.. Start points at the the first argument.
   ## @:
   ## @:~~~
   ## @:a = list[ 4 ]
-  ## @:    ^ sbv    ^ fbv
+  ## @:          ^  ^
   ## @:a = dict[ "abc" ]
-  ## @:    ^ sbv        ^ fbv
+  ## @:          ^      ^
   ## @:~~~~
   when showPos:
     showDebugPos(statement, start, "^ s bracketed")
   var runningPos = start
 
-  # Get the container variable.
-  let containerOr = getVariable(variables, dotName, npLocal)
-  if containerOr.isMessage:
-    # The variable doesn't exist, etc.
-    let warningData = newWarningData(containerOr.message.messageId,
-      containerOr.message.p1, runningPos)
-    return newValueAndPosOr(warningData)
-  let containerValue = containerOr.value
-  if containerValue.kind != vkList and containerValue.kind != vkDict:
-    # The container variable must be a list or dictionary got $1.
-    return newValueAndPosOr(wIndexNotListOrDict, $containerValue.kind, runningPos)
-  runningPos += dotNameLen
+  assert(container.kind == vkList or container.kind == vkDict, "expected list or dict")
 
   # Get the index/key value.
   let vAndPosOr = getValueAndPos(statement, runningPos, variables)
@@ -1299,24 +1288,24 @@ proc getBracketedVarValue*(statement: Statement, dotName: string, dotNameLen: Na
 
   # Get the value from the container using the index/key.
   var value: Value
-  if containerValue.kind == vkList:
+  if container.kind == vkList:
     # list container
     if indexValue.kind != vkInt:
       # The index variable must be an integer.
       return newValueAndPosOr(wIndexNotInt, "", runningPos)
     let index = indexValue.intv
-    let list = containerValue.listv
+    let list = container.listv
     if index < 0 or index >= list.len:
       # The index value $1 is out of range.
       return newValueAndPosOr(wInvalidIndexRange, $index, runningPos)
-    value = containerValue.listv[index]
+    value = container.listv[index]
   else:
     # dictionary container
     if indexValue.kind != vkString:
       # The key variable must be an string.
       return newValueAndPosOr(wKeyNotString, "", runningPos)
     let key = indexValue.stringv
-    let dict = containerValue.dictv
+    let dict = container.dictv
     if not (key in dict):
       # The key doesn't exist in the dictionary.
       return newValueAndPosOr(wMissingKey, "", runningPos)
@@ -1334,52 +1323,6 @@ proc getBracketedVarValue*(statement: Statement, dotName: string, dotNameLen: Na
     showDebugPos(statement, runningPos, "^ f bracketed")
 
   return newValueAndPosOr(value, runningPos)
-
-proc getValueAndPosFun(statement: Statement, start: Natural, variables:
-  Variables, varName: VariableName): ValueAndPosOr =
-  ## Handle a function call. Start is pointing at the first character
-  ## after the left parentheses or bracket.
-  ## @:
-  ## @:~~~
-  ## @:a = cmp(4, 4) # statement
-  ## @:        ^     ^
-  ## @:a = cmd(len(b), len(c))
-  ## @:            ^ ^
-  ## @:~~~~
-
-  case varName.kind
-  of vnkFunction:
-    # We have a function, run it and return its value.
-
-    # Get the function variable.
-    let funcVarOr = getVariable(variables, varName.dotName, npBuiltIn)
-    if funcVarOr.isMessage:
-      return newValueAndPosOr(funcVarOr.message.messageId, funcVarOr.message.p1, start)
-    let funcVar = funcVarOr.value
-
-    let specialFunction = getSpecialFunction(funcVar)
-
-    case specialFunction:
-    of spIf, spIf0:
-      # Handle the special IF functions.
-      return ifFunctions(specialFunction, statement, varName.pos, variables)
-    of spAnd, spOr:
-      # Handle the special AND/OR functions.
-      return andOrFunctions(specialFunction, statement, varName.pos, variables)
-    of spFunc:
-      # Define a function in a code file and not nested.
-      return newValueAndPosOr(wDefineFunction, "", start)
-    of spNotSpecial, spReturn, spWarn, spLog:
-      # Handle normal functions and warn, return and log.
-      return getFunctionValueAndPos(varName.dotName, statement,
-        varName.pos, variables, list=false)
-
-  of vnkGet:
-    # a = list[2] or a = dict["key"]
-    return getBracketedVarValue(statement, varName.dotName, varName.pos-start, start, variables)
-  of vnkNormal:
-    assert(false, "unexpected name type")
-    discard
 
 proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
     Variables): ValueAndPosOr =
@@ -1419,18 +1362,52 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
       return newValueAndPosOr(wInvalidRightHandSide, "", start)
     let rightName = rightNameO.get()
 
+    # Use f for functions, else use the local dictionary of no prefix
+    # vars.
+    var noPrefixDict: NoPrefixDict
+    case rightName.kind
+    of vnkNormal, vnkGet:
+      noPrefixDict = npLocal
+    of vnkFunction:
+      noPrefixDict = npBuiltIn
+
+    # Get the variable's value.
+    let valueOr = getVariable(variables, rightName.dotName, noPrefixDict)
+    if valueOr.isMessage:
+      let warningData = newWarningData(valueOr.message.messageId,
+        valueOr.message.p1, start)
+      return newValueAndPosOr(warningData)
+
     case rightName.kind
     of vnkNormal:
-      # Get the variable's value.
-      let valueOr = getVariable(variables, rightName.dotName, npLocal)
-      if valueOr.isMessage:
-        let warningData = newWarningData(valueOr.message.messageId,
-          valueOr.message.p1, start)
-        return newValueAndPosOr(warningData)
       return newValueAndPosOr(valueOr.value, rightName.pos)
-    of vnkFunction, vnkGet:
-      # Handle the function.
-      return getValueAndPosFun(statement, start, variables, rightName)
+
+    of vnkFunction:
+      # We have a function, run it and return its value.
+      let specialFunction = getSpecialFunction(valueOr.value)
+      case specialFunction:
+      of spIf, spIf0:
+        # Handle the special IF functions.
+        return ifFunctions(specialFunction, statement, rightName.pos, variables)
+      of spAnd, spOr:
+        # Handle the special AND/OR functions.
+        return andOrFunctions(specialFunction, statement, rightName.pos, variables)
+      of spFunc:
+        # Define a function in a code file and not nested.
+        return newValueAndPosOr(wDefineFunction, "", start)
+      of spNotSpecial, spReturn, spWarn, spLog:
+        # Handle normal functions and warn, return and log.
+        return getFunctionValueAndPos(rightName.dotName, statement,
+          rightName.pos, variables, list=false)
+
+    of vnkGet:
+      # a = list[2] or a = dict["key"]
+      let container = valueOr.value
+      if container.kind != vkList and container.kind != vkDict:
+        # The container variable must be a list or dictionary got $1.
+        return newValueAndPosOr(wIndexNotListOrDict, $container.kind, start)
+
+      return getBracketedVarValue(statement, rightName.pos, valueOr.value, variables)
 
 proc getValueAndPos*(statement: Statement, start: Natural, variables:
     Variables): ValueAndPosOr =
