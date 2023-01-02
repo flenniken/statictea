@@ -23,6 +23,7 @@ Run a command and fill in the variables dictionaries.
 * [`==`](#-1) &mdash; Return true when the two statements are equal.
 * [`==`](#-2) &mdash; Return true when a equals b.
 * [`!=`](#-3) &mdash; Compare whether two PosOr are not equal.
+* type: [VariableNameKind](#variablenamekind) &mdash; The variable name type.
 * type: [VariableName](#variablename) &mdash; A variable name in a statement.
 * type: [RightType](#righttype) &mdash; The type of the right hand side of a statement.
 * [newVariableName](#newvariablename) &mdash; Create a new VariableName object.
@@ -230,18 +231,31 @@ Compare whether two PosOr are not equal.
 func `!=`(a: PosOr; b: PosOr): bool
 ```
 
+# VariableNameKind
+
+The variable name type.
+
+vtNormal -- a variable with whitespace following it
+vtFunction -- a variable with ( following it
+vtGet -- a variable with [ following it
+
+```nim
+VariableNameKind = enum
+  vnkNormal, vnkFunction, vnkGet
+```
+
 # VariableName
 
 A variable name in a statement.
 
 * dotName -- the dot name string
-* leftParenBracket -- the optional left parentheses or right bracket after the variable.
+* kind -- the kind of name defined by the character following the name
 * pos -- the position after the trailing whitespace
 
 ```nim
 VariableName = object
   dotName*: string
-  leftParenBracket*: string
+  kind*: VariableNameKind
   pos*: Natural
 
 ```
@@ -269,7 +283,7 @@ RightType = enum
 Create a new VariableName object.
 
 ```nim
-func newVariableName(dotName: string; leftParenBracket: string; pos: Natural): VariableName
+func newVariableName(dotName: string; kind: VariableNameKind; pos: Natural): VariableName
 ```
 
 # getRightType

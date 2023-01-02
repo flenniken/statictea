@@ -147,14 +147,24 @@ func `!=`*(a: PosOr, b: PosOr): bool =
   result = not (a == b)
 
 type
+  VariableNameKind* = enum
+    ## The variable name type.
+    ## @:
+    ## @:vtNormal -- a variable with whitespace following it
+    ## @:vtFunction -- a variable with ( following it
+    ## @:vtGet -- a variable with [ following it
+    vnkNormal,
+    vnkFunction,
+    vnkGet
+
   VariableName* = object
     ## A variable name in a statement.
     ## @:
     ## @:* dotName -- the dot name string
-    ## @:* leftParenBracket -- the optional left parentheses or right bracket after the variable.
+    ## @:* kind -- the kind of name defined by the character following the name
     ## @:* pos -- the position after the trailing whitespace
     dotName*: string
-    leftParenBracket*: string
+    kind*: VariableNameKind
     pos*: Natural
 
   RightType* = enum
@@ -175,10 +185,10 @@ type
     rtList,
     rtCondition,
 
-func newVariableName*(dotName: string, leftParenBracket: string,
+func newVariableName*(dotName: string, kind: VariableNameKind,
     pos: Natural): VariableName =
   ## Create a new VariableName object.
-  result = VariableName(dotName: dotName, leftParenBracket: leftParenBracket, pos: pos)
+  result = VariableName(dotName: dotName, kind: kind, pos: pos)
 
 func getRightType*(statement: Statement, start: Natural): RightType =
   ## Return the type of the right hand side of the statement at the
@@ -215,7 +225,15 @@ proc getVariableName*(text: string, start: Natural): Option[VariableName] =
   if not dotNamesO.isSome:
     return
   let (_, dotName, leftParenBracket, length) = dotNamesO.get3GroupsLen()
-  result = some(newVariableName(dotName, leftParenBracket, start+length))
+  var kind: VariableNameKind
+  case leftParenBracket
+  of "(":
+    kind = vnkFunction
+  of "[":
+    kind = vnkGet
+  else:
+    kind = vnkNormal
+  result = some(newVariableName(dotName, kind, start+length))
 
 func isTriple(line: string, ch: char, ix: Natural): bool =
   if ch == '"' and line.len >= ix-2 and
@@ -1319,7 +1337,7 @@ proc getBracketedVarValue*(statement: Statement, dotName: string, dotNameLen: Na
 
 proc getValueAndPosFun(statement: Statement, start: Natural, variables:
   Variables, varName: VariableName): ValueAndPosOr =
-  ## Handle a function all. Start is pointing at the first character
+  ## Handle a function call. Start is pointing at the first character
   ## after the left parentheses or bracket.
   ## @:
   ## @:~~~
@@ -1329,7 +1347,8 @@ proc getValueAndPosFun(statement: Statement, start: Natural, variables:
   ## @:            ^ ^
   ## @:~~~~
 
-  if varName.leftParenBracket == "(":
+  case varName.kind
+  of vnkFunction:
     # We have a function, run it and return its value.
 
     # Get the function variable.
@@ -1355,9 +1374,12 @@ proc getValueAndPosFun(statement: Statement, start: Natural, variables:
       return getFunctionValueAndPos(varName.dotName, statement,
         varName.pos, variables, list=false)
 
-  elif varName.leftParenBracket == "[":
+  of vnkGet:
     # a = list[2] or a = dict["key"]
     return getBracketedVarValue(statement, varName.dotName, varName.pos-start, start, variables)
+  of vnkNormal:
+    assert(false, "unexpected name type")
+    discard
 
 proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
     Variables): ValueAndPosOr =
@@ -1397,7 +1419,8 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
       return newValueAndPosOr(wInvalidRightHandSide, "", start)
     let rightName = rightNameO.get()
 
-    if rightName.leftParenBracket == "":
+    case rightName.kind
+    of vnkNormal:
       # Get the variable's value.
       let valueOr = getVariable(variables, rightName.dotName, npLocal)
       if valueOr.isMessage:
@@ -1405,9 +1428,9 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
           valueOr.message.p1, start)
         return newValueAndPosOr(warningData)
       return newValueAndPosOr(valueOr.value, rightName.pos)
-
-    # Handle the function.
-    return getValueAndPosFun(statement, start, variables, rightName)
+    of vnkFunction, vnkGet:
+      # Handle the function.
+      return getValueAndPosFun(statement, start, variables, rightName)
 
 proc getValueAndPos*(statement: Statement, start: Natural, variables:
     Variables): ValueAndPosOr =
@@ -1513,19 +1536,18 @@ proc runStatement*(statement: Statement, variables: Variables): VariableDataOr =
   var operator = opIgnore
   var operatorLength = 0
 
-  if leftName.leftParenBracket == "(":
+  case leftName.kind
+  of vnkFunction:
     # Handle bare function: if, if0, return, warn and log. A bare
     # function does not assign a variable.
     vlOr = runBareFunction(statement, variables, leftName.dotName, pos, leftName.pos)
     if vlOr.isMessage:
       return newVariableDataOr(vlOr.message)
-  else:
+  of vnkGet:
+    # You cannot use bracket notation to change a variable.
+    return newVariableDataOr(wLeftHandBracket)
+  of vnkNormal:
     # Handle normal "varName operator right" statements.
-
-    if leftName.leftParenBracket != "":
-      assert leftName.leftParenBracket == "["
-      # You cannot use bracket notation to change a variable.
-      return newVariableDataOr(wLeftHandBracket)
 
     # Get the equal sign or &= and the following whitespace.
     let operatorO = matchEqualSign(statement.text, leftName.pos)
@@ -1673,9 +1695,12 @@ proc parseSignature*(signature: string): SignatureOr =
       return newSignatureOr(wMissingSignature, "", runningPos)
   let functionName = functionNameO.get()
 
-  if functionName.leftParenBracket != "(":
+  case functionName.kind
+  of vnkNormal, vnkGet:
     # Excected a left parentheses for the signature.
     return newSignatureOr(wMissingLeftParen, "", runningPos + functionName.dotName.len)
+  of vnkFunction:
+    discard
   runningPos = functionName.pos
 
   var optional = false
@@ -1701,9 +1726,12 @@ proc parseSignature*(signature: string): SignatureOr =
         return newSignatureOr(wParameterName, "", runningPos)
       let paramName = paramNameO.get()
 
-      if paramName.leftParenBracket == "(":
+      case paramName.kind
+      of vnkFunction, vnkGet:
         # Expected a colon.
         return newSignatureOr(wMissingColon, "", runningPos + paramName.dotName.len)
+      of vnkNormal:
+        discard
       runningPos = paramName.pos
 
       # Look for : and the following white space.
@@ -1786,8 +1814,11 @@ proc isFunctionDefinition*(statement: Statement, retLeftName: var string,
     return false
   let leftName = leftNameO.get()
 
-  if leftName.leftParenBracket == "(":
+  case leftName.kind
+  of vnkFunction, vnkGet:
     return false
+  of vnkNormal:
+    discard
   runningPos = leftName.pos
 
   # Get the equal sign or &= and the following whitespace.
@@ -1809,8 +1840,11 @@ proc isFunctionDefinition*(statement: Statement, retLeftName: var string,
   let funcName = funcNameO.get()
   if funcName.dotName != "func":
     return false
-  if funcName.leftParenBracket != "(":
+  case funcName.kind
+  of vnkNormal, vnkGet:
     return false
+  of vnkFunction:
+    discard
   runningPos = funcName.pos
 
   retLeftName = leftName.dotName
@@ -1926,7 +1960,7 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
     let leftNameO = getVariableName(statement.text, 0)
     if isSome(leftNameO):
       let leftName = leftNameO.get()
-      if leftName.dotName == "return" and leftName.leftParenBracket == "(":
+      if leftName.dotName == "return" and leftName.kind == vnkFunction:
         break
 
     let statementO = readStatement(env, lb)

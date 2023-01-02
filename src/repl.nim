@@ -93,10 +93,13 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
     return false
   let varName = varNameO.get()
 
-  if varName.leftParenBracket == "(":
+  case varName.kind:
+  of vnkFunction, vnkGet:
     # Expected variable name not function call.
     errorAndColumn(env, wInvalidDotname, line, runningPos+varName.dotName.len)
     return false
+  of vnkNormal:
+    discard
   if varName.pos != line.len:
     # Invalid REPL command syntax, unexpected text.
     errorAndColumn(env, wInvalidReplSyntax, line, varName.pos)
