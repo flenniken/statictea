@@ -263,7 +263,8 @@ MessageId = enum
   wMissingStatements,       ## w239
   wNoReturnStatement,       ## w240
   wLeftHandBracket,         ## w241
-  wUserFunctionWarning       ## w242
+  wUserFunctionWarning,     ## w242
+  wWrongReturnType           ## w243
 ```
 
 # Messages
@@ -454,7 +455,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The function requires at least $1 arguments.", ## wNotEnoughArgsOpt
     "The function requires at most $1 arguments.", ## wTooManyArgsOpt
     "The length must be a positive number.", ## wNegativeLength
-    "You can only change code variables in code files.", ## wReadOnlyCodeVars
+    "You can only change code variables (o) in code files.", ## wReadOnlyCodeVars
     "Out of lines looking for the plus sign line.", ## wNoPlusSignLine
     "Out of lines looking for the multiline string.", ## wIncompleteMultiline
     "Triple quotes must always end the line.", ## wTripleAtEnd
@@ -514,7 +515,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Out of lines; No statements for the function.", ## wMissingStatements
     "Out of lines; missing the function\'s return statement.", ## wNoReturnStatement
     "You cannot use bracket notation to change a variable.", ## wLeftHandBracket
-    "The user function generated a warning."]
+    "The user function generated a warning.", ## wUserFunctionWarning
+    "Wrong return type, got $1."]
 ```
 
 # WarningData

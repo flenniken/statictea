@@ -74,7 +74,7 @@ o.sum = 8
 ### File stderr.expected
 
 ~~~
-tmpl.txt(12): w182: You can only change code variables in code files.
+tmpl.txt(12): w182: You can only change code variables (o) in code files.
 statement: o.hello = "not allowed"
            ^
 ~~~

@@ -549,7 +549,7 @@ proc testReadStatement(
 
 proc testRunCodeFile(
     content: string = "",
-    eVarRep: string = "",
+    eVarRep: string = "l = {}\no = {}\n",
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[],
@@ -571,10 +571,9 @@ proc testRunCodeFile(
   if not env.readCloseDeleteCompare(eLogLines, eErrLines, showLog = showLog):
     result = false
 
-  let lRep = dotNameRep(variables["l"].dictv)
-  let varsDict = variables["o"].dictv
-  let oRep = dotNameRep(varsDict)
-  let varRep = $lRep & $oRep
+  let lRep = dotNameRep(variables["l"].dictv, "l")
+  let oRep = dotNameRep(variables["o"].dictv, "o")
+  let varRep = $lRep & "\n" & $oRep & "\n"
 
   if varRep != eVarRep:
     echo "got:"
@@ -2204,17 +2203,22 @@ $1
 
   test "runCodeFile empty":
     let content = ""
-    let eVarRep = ""
-    check testRunCodeFile(content, eVarRep)
+    check testRunCodeFile(content)
 
   test "runCodeFile a = 5":
     let content = "a = 5"
-    check testRunCodeFile(content, content)
+    let eVarRep = """
+l.a = 5
+o = {}
+"""
+    check testRunCodeFile(content, eVarRep)
 
   test "runCodeFile l.a = 5":
     let content = "l.a = 5"
     let eVarRep = """
-a = 5"""
+l.a = 5
+o = {}
+"""
     check testRunCodeFile(content, eVarRep)
 
   test "runCodeFile dup":
@@ -2223,7 +2227,9 @@ a = 5
 a = 6
 """
     let eVarRep = """
-a = 5"""
+l.a = 5
+o = {}
+"""
     let eErrLines: seq[string] = splitNewLines """
 testcode.tea(2): w95: You cannot assign to an existing variable.
 statement: a = 6
@@ -2241,19 +2247,23 @@ e = 3.14159
 ls = [1, 2, 3]
 """
     let eVarRep = """
-a = 5
-b = 3
-c = "string"
-d.x = 1
-d.y = 2
-e = 3.14159
-ls = [1,2,3]"""
+l.a = 5
+l.b = 3
+l.c = "string"
+l.d.x = 1
+l.d.y = 2
+l.e = 3.14159
+l.ls = [1,2,3]
+o = {}
+"""
     check testRunCodeFile(content, eVarRep)
 
   test "runCodeFile o.a = 5":
     let content = "o.a = 5"
     let eVarRep = """
-a = 5"""
+l = {}
+o.a = 5
+"""
     check testRunCodeFile(content, eVarRep)
 
   test "runCodeFile append to list":
@@ -2264,8 +2274,10 @@ o.l &= 2
 o.l &= 3"""
 
     let eVarRep = """
-a = 5
-l = [1,2,3]"""
+l = {}
+o.a = 5
+o.l = [1,2,3]
+"""
     check testRunCodeFile(content, eVarRep)
 
   test "runCodeFile +":
@@ -2275,8 +2287,10 @@ a = +
 b = 1
 """
     let eVarRep = """
-a = 5
-b = 1"""
+l.a = 5
+l.b = 1
+o = {}
+"""
     check testRunCodeFile(content, eVarRep)
 
   test "runCodeFile +++":
@@ -2288,8 +2302,10 @@ a = +
 b = 1
 """
     let eVarRep = """
-a = 555
-b = 1"""
+l.a = 555
+l.b = 1
+o = {}
+"""
     check testRunCodeFile(content, eVarRep)
 
   test "runCodeFile + at end":
@@ -2309,9 +2325,11 @@ c = 3
 d ~ 2
 """
     let eVarRep = """
-a = 5
-b = 1
-c = 3"""
+l.a = 5
+l.b = 1
+l.c = 3
+o = {}
+"""
     let eErrLines: seq[string] = splitNewLines """
 testcode.tea(4): w34: Missing operator, = or &=.
 statement: d ~ 2
@@ -2328,7 +2346,9 @@ abc$1 q
 c = 3
 """ % tripleQuotes
     let eVarRep = """
-len = 10"""
+l.len = 10
+o = {}
+"""
 
     let eErrLines: seq[string] = splitNewLines """
 testcode.tea(6): w184: Out of lines looking for the multiline string.
@@ -2364,7 +2384,9 @@ v = if0(1, warn("not this"), 5)
 a = warn("there")
 """
     let eVarRep = """
-v = 5"""
+l.v = 5
+o = {}
+"""
     let eErrLines: seq[string] = splitNewLines """
 testcode.tea(1): hello
 testcode.tea(3): there
@@ -2381,10 +2403,12 @@ e = if0(cmp(1,a), return("stop"))
 end = 5
 """
     let eVarRep = """
-a = 1
-b = 2
-c = 3
-d = 4"""
+l.a = 1
+l.b = 2
+l.c = 3
+l.d = 4
+o = {}
+"""
     let eErrLines: seq[string] = splitNewLines """
 """
     check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
@@ -2396,8 +2420,10 @@ c = if0(0, return("skip"))
 b = 2
 """
     let eVarRep = """
-a = 1
-b = 2"""
+l.a = 1
+l.b = 2
+o = {}
+"""
     let eErrLines: seq[string] = splitNewLines """
 testcode.tea(2): w187: Use '...return("stop")...' in a code file.
 statement: c = if0(0, return("skip"))
@@ -2411,7 +2437,9 @@ statement: c = if0(0, return("skip"))
 a = 5
 """
     let eVarRep = """
-a = 5"""
+l.a = 5
+o = {}
+"""
     let eErrLines: seq[string] = splitNewLines """
 """
     check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
@@ -2426,7 +2454,9 @@ c = 3
 """ % [tripleQuotes, "\xff"]
 
     let eVarRep = """
-a = 5"""
+l.a = 5
+o = {}
+"""
 
     let eErrLines: seq[string] = splitNewLines """
 testcode.tea(3): w148: Invalid UTF-8 byte sequence at position 2.
@@ -2458,7 +2488,9 @@ mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
   return(cmp(num1, num2))
 """
     let eVarRep = """
-mycmp = "strNumCmp""""
+l.mycmp = "strNumCmp"
+o = {}
+"""
     check testRunCodeFile(content, eVarRep)
 
   test "user function 2":
@@ -2472,19 +2504,21 @@ mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
 details = functionDetails(mycmp)
 """
     let eVarRep = """
-a = 5
-mycmp = "strNumCmp"
-details.builtIn = false
-details.signature.optional = false
-details.signature.name = "strNumCmp"
-details.signature.paramNames = ["numStr1","numStr2"]
-details.signature.paramTypes = ["string","string"]
-details.signature.returnType = "int"
-details.docComments = ["  ## Compare two number strings and return 1, 0, or -1."]
-details.filename = "testcode.tea"
-details.lineNum = 3
-details.numLines = 2
-details.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]"""
+l.a = 5
+l.mycmp = "strNumCmp"
+l.details.builtIn = false
+l.details.signature.optional = false
+l.details.signature.name = "strNumCmp"
+l.details.signature.paramNames = ["numStr1","numStr2"]
+l.details.signature.paramTypes = ["string","string"]
+l.details.signature.returnType = "int"
+l.details.docComments = ["  ## Compare two number strings and return 1, 0, or -1."]
+l.details.filename = "testcode.tea"
+l.details.lineNum = 3
+l.details.numLines = 2
+l.details.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]
+o = {}
+"""
     check testRunCodeFile(content, eVarRep)
 
   test "user function no signature":
@@ -2558,8 +2592,10 @@ mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
 a = l.mycmp("1", "2")
 """
     let eVarRep = """
-mycmp = "strNumCmp"
-a = -1"""
+l.mycmp = "strNumCmp"
+l.a = -1
+o = {}
+"""
     check testRunCodeFile(content, eVarRep)
 
   test "call user function 2":
@@ -2572,8 +2608,10 @@ mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
 a = l.mycmp("1", "2")
 """
     let eVarRep = """
-mycmp = "strNumCmp"
-a = -1"""
+l.mycmp = "strNumCmp"
+l.a = -1
+o = {}
+"""
     check testRunCodeFile(content, eVarRep)
 
   test "no statements":
@@ -2595,22 +2633,154 @@ zero = func("zero() int")
 z = l.zero()
 """
     let eVarRep = """
-zero = "zero"
-z = 0"""
+l.zero = "zero"
+l.z = 0
+o = {}
+"""
     check testRunCodeFile(content, eVarRep)
 
-#   test "function with warning":
-#     let content = """
-# zero = func("zero() int")
-#   ## Return 0.
-#   return(0
-# z = l.zero()
-# """
-#     let eErrLines: seq[string] = splitNewLines """
-# testcode.tea(3): w46: Expected comma or right parentheses.
-# statement: return(0
-#                    ^
-# """
-#     let eVarRep = """
-# zero = "zero""""
-#     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+  test "function with warning":
+    let content = """
+zero = func("zero() int")
+  ## Return 0.
+  return(0
+z = l.zero()
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(3): w46: Expected comma or right parentheses.
+statement:   return(0
+                     ^
+"""
+    let eVarRep = """
+l.zero = "zero"
+o = {}
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "function warning assigning var":
+    let content = """
+zero = func("zero() int")
+  ## Return 0.
+  t.row = 5
+  return(0)
+z = l.zero()
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(3): w39: You cannot change the t.row tea variable.
+statement:   t.row = 5
+             ^
+"""
+    let eVarRep = """
+l.zero = "zero"
+o = {}
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "function log":
+    let content = """
+zero = func("zero() int")
+  ## Return 0.
+  log("running zero")
+  return(0)
+z = l.zero()
+"""
+    let eLogLines: seq[string] = splitNewLines """
+XXXX-XX-XX XX:XX:XX.XXX; testcode.tea(3); running zero
+"""
+    let eVarRep = """
+l.zero = "zero"
+l.z = 0
+o = {}
+"""
+    check testRunCodeFile(content, eVarRep, eLogLines=eLogLines)
+
+  test "function return early":
+    let content = """
+zero = func("zero() int")
+  ## Return 0.
+  if(true, return(5))
+  return(0)
+z = l.zero()
+"""
+    let eVarRep = """
+l.zero = "zero"
+l.z = 5
+o = {}
+"""
+    check testRunCodeFile(content, eVarRep)
+
+  test "function warn":
+    let content = """
+zero = func("zero() int")
+  ## warn
+  if(true, warn("user warning"))
+  return(0)
+z = l.zero()
+"""
+    let eVarRep = """
+l.zero = "zero"
+o = {}
+"""
+
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(3): user warning
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "function wrong return type":
+    let content = """
+zero = func("zero() int")
+  ## wrong return
+  return(1.2)
+z = l.zero()
+"""
+    let eVarRep = """
+l.zero = "zero"
+o = {}
+"""
+
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(3): w243: Wrong return type, got float.
+statement:   return(1.2)
+           ^
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "function wrong arg type":
+    let content = """
+zero = func("zero(num: int) int")
+  ## wrong arg
+  return(0)
+z = l.zero(3.14)
+"""
+    let eVarRep = """
+l.zero = "zero"
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(4): w120: Wrong argument type, expected int.
+statement: z = l.zero(3.14)
+                      ^
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "function assign o":
+    let content = """
+zero = func("zero() int")
+  ## assign o
+  b = 5 # ok
+  o.a = 3
+  return(0)
+z = l.zero()
+"""
+    let eVarRep = """
+l.zero = "zero"
+o = {}
+"""
+    # todo: shouldn't be able to change o variables in user functions.
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(4): w182: You can only change code variables (o) in code files.
+statement:   o.a = 3
+             ^
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)

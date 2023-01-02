@@ -404,8 +404,12 @@ proc warnStatement*(env: var Env, statement: Statement,
     filename = sourceFilename
 
   if warningData.messageId == wUserMessage:
+    # Format user messages on one line.
     message = "$1($2): $3" % [filename,
       $statement.lineNum, warningData.p1]
+  elif warningData.messageId == wSuccess:
+    # Don't output success messages.
+    return
   else:
     message = getWarnStatement(filename, statement, warningData)
   env.outputWarning(statement.lineNum, message)
@@ -1577,6 +1581,11 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
   # Return the variable dot name and value.
   result = newVariableDataOr(leftName.dotName, operator, vlOr.value.value)
 
+proc skipSpaces*(text: string): Natural =
+  let spacesO = matchTabSpace(text, 0)
+  if isSome(spacesO):
+    result = spacesO.get().length
+
 proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
     arguments: seq[Value]): FunResult =
   ## Run the given user function.
@@ -1599,8 +1608,8 @@ proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
     let variableDataOr = runStatement(env, statement, userVariables)
     if variableDataOr.isMessage:
       env.warnStatement(statement, variableDataOr.message, funcVar.funcv.filename)
-      # The user function generated a warning.
-      return newFunResultWarn(wUserFunctionWarning)
+      # Return but don't show another message.
+      return newFunResultWarn(wSuccess)
     let variableData = variableDataOr.value
 
     # Handle the result of the statement.
@@ -1609,13 +1618,23 @@ proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
       # Assign the variable if possible.
       let wdO = assignVariable(userVariables, variableData, inOther)
       if isSome(wdO):
-        return newFunResultWarn(wdO.get())
+        let wd = wdO.get()
+        let pos = skipSpaces(statement.text)
+        let wd2 = newWarningData(wd.messageId, wd.p1, pos)
+        env.warnStatement(statement, wd2, funcVar.funcv.filename)
+        # Return but don't show another message.
+        return newFunResultWarn(wSuccess)
     of opIgnore:
       continue
     of opLog:
-      # todo: remove "\n" appending?
       env.logLine(funcVar.funcv.filename, statement.lineNum, variableData.value.stringv & "\n")
     of opReturn:
+      # Validate return type.
+      if not sameType(funcVar.funcv.signature.returnType, variableData.value.kind):
+        # Wrong return type, got $1.
+        env.warnStatement(statement, wWrongReturnType, $variableData.value.kind, 0, funcVar.funcv.filename)
+        # Return but don't show another message.
+        return newFunResultWarn(wSuccess)
       # Return the value of the function.
       return newFunResult(variableData.value)
 

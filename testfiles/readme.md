@@ -74,6 +74,8 @@ filename.
 * [update-readonly](../testfiles/update-readonly.stf.md) &mdash; Test update with a read only template.
 * [update-template](../testfiles/update-template.stf.md) &mdash; Test updating a template with the update option.
 * [update1](../testfiles/update1.stf.md) &mdash; Update the replace block in a template.
+* [userfun-call](../testfiles/userfun-call.stf.md) &mdash; Test user functions.
+* [userfun-details](../testfiles/userfun-details.stf.md) &mdash; Test the user function details function.
 * [warn-basics](../testfiles/warn-basics.stf.md) &mdash; Test the warn function.
 * [warn-log](../testfiles/warn-log.stf.md) &mdash; Test that the warn command increments the warning count and returns a
 non-zero return code.

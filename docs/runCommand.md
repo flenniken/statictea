@@ -51,6 +51,7 @@ Run a command and fill in the variables dictionaries.
 * [getValueAndPos](#getvalueandpos) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
 * [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, if0, return, warn and log.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
+* [skipSpaces](#skipspaces) &mdash; 
 * [callUserFunction](#calluserfunction) &mdash; Run the given user function.
 * [runStatementAssignVar](#runstatementassignvar) &mdash; Run a statement and assign the variable if appropriate.
 * [parseSignature](#parsesignature) &mdash; Parse the signature and return the list of parameters or a message.
@@ -560,6 +561,14 @@ Run one statement and return the variable dot name string, operator and value.
 
 ```nim
 proc runStatement(env: var Env; statement: Statement; variables: Variables): VariableDataOr
+```
+
+# skipSpaces
+
+
+
+```nim
+proc skipSpaces(text: string): Natural
 ```
 
 # callUserFunction
