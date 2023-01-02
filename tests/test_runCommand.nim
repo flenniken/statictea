@@ -7,7 +7,6 @@ import std/streams
 import runCommand
 import functions
 import parseCmdLine
-import env
 import args
 import vartypes
 import variables
@@ -50,8 +49,17 @@ proc echoValueAndPosOr(statement: Statement, start: Natural,
     echo getWarnStatement("filename", statement, eValueAndPosOr.message)
   echo ""
 
-proc testGetValueAndPos(statement: Statement, start: Natural,
-    eValueAndPosOr: ValueAndPosOr, variables: Variables = nil): bool =
+proc testGetValueAndPos(
+    statement: Statement,
+    start: Natural,
+    eValueAndPosOr: ValueAndPosOr,
+    variables: Variables = nil,
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[]
+  ): bool =
+
+  var env = openEnvTest("_testGetValueAndPos.txt")
 
   # Set up variables when not passed in.
   var vars = variables
@@ -59,9 +67,10 @@ proc testGetValueAndPos(statement: Statement, start: Natural,
     let funcsVarDict = createFuncDictionary().dictv
     vars = startVariables(funcs = funcsVarDict)
 
-  let valueAndPosOr = getValueAndPos(statement, start, vars)
+  let valueAndPosOr = getValueAndPos(env, statement, start, vars)
 
-  result = true
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+
   if valueAndPosOr != eValueAndPosOr:
     result = false
     echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
@@ -119,8 +128,7 @@ proc testGetMultilineStrE(pattern: string, start: Natural,
     echo visibleControl(text)
     echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
-proc getCmdLinePartsTest(env: var Env,
-    commandLines: seq[string]): seq[LineParts] =
+proc getCmdLinePartsTest(commandLines: seq[string]): seq[LineParts] =
   ## Return the line parts from the given lines. Only used for
   ## testing. It doesn't work for custom prefixes.
   let prepostTable = makeDefaultPrepostTable()
@@ -162,7 +170,7 @@ proc testGetStatements(content: string, expected: string): bool =
   var env = openEnvTest("_getStatements.txt")
   var cmdLines: CmdLines
   cmdLines.lines = splitNewLines(content)
-  cmdLines.lineParts = getCmdLinePartsTest(env, cmdLines.lines)
+  cmdLines.lineParts = getCmdLinePartsTest(cmdLines.lines)
 
   # for ix, part in cmdLines.lineParts:
   #   debugEcho "$1: $2" % [$ix, cmdLines.lines[ix]]
@@ -272,30 +280,48 @@ proc testWarnStatement(statement: Statement,
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
 proc testGetFunctionValueAndPos(
-  functionName: string,
-  statement: Statement,
-  start: Natural,
-  eValueAndPosOr: ValueAndPosOr
-    ): bool =
+    functionName: string,
+    statement: Statement,
+    start: Natural,
+    eValueAndPosOr: ValueAndPosOr,
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[]
+  ): bool =
 
   let funcsVarDict = createFuncDictionary().dictv
   let variables = startVariables(funcs = funcsVarDict)
-  let valueAndPosOr = getFunctionValueAndPos(functionName,
+
+  var env = openEnvTest("_testGetFunctionValueAndPos.txt")
+  let valueAndPosOr = getFunctionValueAndPos(env, functionName,
     statement, start, variables, list=false)
-  result = gotExpected($valueAndPosOr, $eValueAndPosOr, statement.text)
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+
+  gotExpectedResult($valueAndPosOr, $eValueAndPosOr, statement.text)
   if not result:
     echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
-proc testRunStatement(statement: Statement, eVariableDataOr: VariableDataOr,
-    variables: Variables = nil): bool =
+proc testRunStatement(
+    statement: Statement,
+    eVariableDataOr: VariableDataOr,
+    variables: Variables = nil,
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[]
+  ): bool =
+
   var vars: Variables
   if variables == nil:
     let funcsVarDict = createFuncDictionary().dictv
     vars = startVariables(funcs = funcsVarDict)
   else:
     vars = variables
-  let variableDataOr = runStatement(statement, vars)
-  result = gotExpected($variableDataOr, $eVariableDataOr)
+
+  var env = openEnvTest("_testGetFunctionValueAndPos.txt")
+  let variableDataOr = runStatement(env, statement, vars)
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+
+  gotExpectedResult($variableDataOr, $eVariableDataOr)
   if not result:
     echo statement.text
     if variableDataOr.isMessage:
@@ -304,7 +330,6 @@ proc testRunStatement(statement: Statement, eVariableDataOr: VariableDataOr,
     if eVariableDataOr.isMessage:
       echo "expected:"
       echo getWarnStatement("filename", statement, eVariableDataOr.message)
-
 
 proc testRunBoolOp(left: bool | Value, op: string, right: bool | Value, eValue: Value): bool =
   let value = runBoolOp(newValue(left), op, newValue(right))
@@ -338,25 +363,48 @@ proc testSkipArgument(text: string, startPos: Natural, ePosOr: PosOr): bool =
     else:
       echo startColumn(text, ePosOr.message.pos, "^ expected")
 
-proc testGetCondition(text: string, start: Natural, eBool: bool, ePos: Natural): bool =
+proc testGetCondition(
+    text: string,
+    start: Natural,
+    eBool: bool,
+    ePos: Natural,
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[]
+  ): bool =
   let funcsVarDict = createFuncDictionary().dictv
   let variables = startVariables(funcs = funcsVarDict)
-
   let statement = newStatement(text)
-  let valueAndPosOr = getCondition(statement, start, variables)
+
+  var env = openEnvTest("_testGetFunctionValueAndPos.txt")
+  let valueAndPosOr = getCondition(env, statement, start, variables)
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+
   let eValueAndPosOr = newValueAndPosOr(newValue(eBool), ePos)
-  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
+  gotExpectedResult($valueAndPosOr, $eValueAndPosOr)
   if not result:
     echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 
-proc testGetConditionWarn(text: string, start: Natural, eWarning: MessageId,
-    ePos = 0, eP1 = ""): bool =
+proc testGetConditionWarn(
+    text: string,
+    start: Natural,
+    eWarning: MessageId,
+    ePos = 0,
+    eP1 = "",
+    eLogLines: seq[string] = @[],
+    eErrLines: seq[string] = @[],
+    eOutLines: seq[string] = @[]
+  ): bool =
   let funcsVarDict = createFuncDictionary().dictv
   let variables = startVariables(funcs = funcsVarDict)
   let statement = newStatement(text)
-  let valueAndPosOr = getCondition(statement, start, variables)
+
+  var env = openEnvTest("_testGetConditionWarn.txt")
+  let valueAndPosOr = getCondition(env, statement, start, variables)
+  result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+
   let eValueAndPosOr = newValueAndPosOr(eWarning, eP1, ePos)
-  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
+  gotExpectedResult($valueAndPosOr, $eValueAndPosOr)
   if not result:
     echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
 

@@ -262,7 +262,8 @@ MessageId = enum
   wMissingDocComment,       ## w238
   wMissingStatements,       ## w239
   wNoReturnStatement,       ## w240
-  wLeftHandBracket           ## w241
+  wLeftHandBracket,         ## w241
+  wUserFunctionWarning       ## w242
 ```
 
 # Messages
@@ -512,7 +513,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Out of lines; Missing required doc comment.", ## wMissingDocComment
     "Out of lines; No statements for the function.", ## wMissingStatements
     "Out of lines; missing the function\'s return statement.", ## wNoReturnStatement
-    "You cannot use bracket notation to change a variable."]
+    "You cannot use bracket notation to change a variable.", ## wLeftHandBracket
+    "The user function generated a warning."]
 ```
 
 # WarningData

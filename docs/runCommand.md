@@ -429,9 +429,9 @@ if(cond, then)
 ~~~
 
 ```nim
-proc ifFunctions(specialFunction: SpecialFunction; statement: Statement;
-                 start: Natural; variables: Variables; list = false;
-                 bare = false): ValueAndPosOr
+proc ifFunctions(env: var Env; specialFunction: SpecialFunction;
+                 statement: Statement; start: Natural; variables: Variables;
+                 list = false; bare = false): ValueAndPosOr
 ```
 
 # andOrFunctions
@@ -439,8 +439,9 @@ proc ifFunctions(specialFunction: SpecialFunction; statement: Statement;
 Return the and/or function's value and the position after. The and function stops on the first false. The or function stops on the first true. The rest of the arguments are skipped. Start points at the first parameter of the function. The position includes the trailing whitespace after the ending ).
 
 ```nim
-proc andOrFunctions(specialFunction: SpecialFunction; statement: Statement;
-                    start: Natural; variables: Variables; list = false): ValueAndPosOr
+proc andOrFunctions(env: var Env; specialFunction: SpecialFunction;
+                    statement: Statement; start: Natural; variables: Variables;
+                    list = false): ValueAndPosOr
 ```
 
 # getFunctionValueAndPos
@@ -455,8 +456,9 @@ a = get(b, len("hi"), c)
 ~~~
 
 ```nim
-proc getFunctionValueAndPos(functionName: string; statement: Statement;
-                            start: Natural; variables: Variables; list = false): ValueAndPosOr
+proc getFunctionValueAndPos(env: var Env; functionName: string;
+                            statement: Statement; start: Natural;
+                            variables: Variables; list = false): ValueAndPosOr
 ```
 
 # runBoolOp
@@ -485,7 +487,8 @@ a = (5 < 3) # condition
 ~~~
 
 ```nim
-proc getCondition(statement: Statement; start: Natural; variables: Variables): ValueAndPosOr
+proc getCondition(env: var Env; statement: Statement; start: Natural;
+                  variables: Variables): ValueAndPosOr
 ```
 
 # getBracketedVarValue
@@ -500,7 +503,7 @@ a = dict[ "abc" ]
 ~~~
 
 ```nim
-proc getBracketedVarValue(statement: Statement; start: Natural;
+proc getBracketedVarValue(env: var Env; statement: Statement; start: Natural;
                           container: Value; variables: Variables): ValueAndPosOr
 ```
 
@@ -533,7 +536,8 @@ a = if( bool(len(b)), d, e) # if
 ~~~
 
 ```nim
-proc getValueAndPos(statement: Statement; start: Natural; variables: Variables): ValueAndPosOr
+proc getValueAndPos(env: var Env; statement: Statement; start: Natural;
+                    variables: Variables): ValueAndPosOr
 ```
 
 # runBareFunction
@@ -546,8 +550,8 @@ if( true, warn("tea time")) # test
 ~~~
 
 ```nim
-proc runBareFunction(statement: Statement; start: Natural; variables: Variables;
-                     leftName: VariableName): ValueAndPosOr
+proc runBareFunction(env: var Env; statement: Statement; start: Natural;
+                     variables: Variables; leftName: VariableName): ValueAndPosOr
 ```
 
 # runStatement
@@ -555,7 +559,7 @@ proc runBareFunction(statement: Statement; start: Natural; variables: Variables;
 Run one statement and return the variable dot name string, operator and value.
 
 ```nim
-proc runStatement(statement: Statement; variables: Variables): VariableDataOr
+proc runStatement(env: var Env; statement: Statement; variables: Variables): VariableDataOr
 ```
 
 # callUserFunction
@@ -563,7 +567,7 @@ proc runStatement(statement: Statement; variables: Variables): VariableDataOr
 Run the given user function.
 
 ```nim
-proc callUserFunction(funcVar: Value; variables: Variables;
+proc callUserFunction(env: var Env; funcVar: Value; variables: Variables;
                       arguments: seq[Value]): FunResult
 ```
 

@@ -254,6 +254,7 @@ type
     wMissingStatements,    ## w239
     wNoReturnStatement,    ## w240
     wLeftHandBracket,      ## w241
+    wUserFunctionWarning,  ## w242
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -499,6 +500,7 @@ const
     "Out of lines; No statements for the function.", ## wMissingStatements
     "Out of lines; missing the function's return statement.", ## wNoReturnStatement
     "You cannot use bracket notation to change a variable.", ## wLeftHandBracket
+    "The user function generated a warning.", ## wUserFunctionWarning
     ]
 
     ## The message text.

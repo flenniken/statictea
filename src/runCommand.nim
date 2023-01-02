@@ -742,7 +742,7 @@ func skipArg(statement: Statement, start: Natural): PosOr =
     showDebugPos(statement, pos, "^ f arg")
 
 # Forward reference to getValueAndPos since we call it recursively.
-proc getValueAndPos*(statement: Statement, start: Natural, variables:
+proc getValueAndPos*(env: var Env, statement: Statement, start: Natural, variables:
   Variables): ValueAndPosOr
 
 func getSpecialFunction(funcVar: Value): SpecialFunction =
@@ -783,6 +783,7 @@ func getSpecialFunction(funcVar: Value): SpecialFunction =
     result = spNotSpecial
 
 proc ifFunctions*(
+    env: var Env,
     specialFunction: SpecialFunction,
     statement: Statement,
     start: Natural,
@@ -807,7 +808,7 @@ proc ifFunctions*(
   ## @:~~~~
 
   # Get the condition's value.
-  let vlcOr = getValueAndPos(statement, start, variables)
+  let vlcOr = getValueAndPos(env, statement, start, variables)
   if quickExit(vlcOr):
     return vlcOr
   let cond = vlcOr.value.value
@@ -843,7 +844,7 @@ proc ifFunctions*(
       return newValueAndPosOr(posOr.message)
     runningPos = posOr.value
   else:
-    vl2Or = getValueAndPos(statement, runningPos, variables)
+    vl2Or = getValueAndPos(env, statement, runningPos, variables)
     if quickExit(vl2Or):
       return vl2Or
     runningPos = vl2Or.value.pos
@@ -867,7 +868,7 @@ proc ifFunctions*(
         return newValueAndPosOr(posOr.message)
       runningPos = posOr.value
     else:
-      vl3Or = getValueAndPos(statement, runningPos, variables)
+      vl3Or = getValueAndPos(env, statement, runningPos, variables)
       if quickExit(vl3Or):
         return vl3Or
       runningPos = vl3Or.value.pos
@@ -895,6 +896,7 @@ proc ifFunctions*(
     result = newValueAndPosOr(value, runningPos)
 
 proc andOrFunctions*(
+    env: var Env,
     specialFunction: SpecialFunction,
     statement: Statement,
     start: Natural,
@@ -912,7 +914,7 @@ proc andOrFunctions*(
   #           ^      ^
 
   # Get the first argument value.
-  let vlcOr = getValueAndPos(statement, start, variables)
+  let vlcOr = getValueAndPos(env, statement, start, variables)
   if quickExit(vlcOr):
     return vlcOr
   let firstValue = vlcOr.value.value
@@ -942,7 +944,7 @@ proc andOrFunctions*(
     afterSecond = posOr.value
     secondValue = newValue(0)
   else:
-    let vl2Or = getValueAndPos(statement, runningPos, variables)
+    let vl2Or = getValueAndPos(env, statement, runningPos, variables)
     if quickExit(vl2Or):
       return vl2Or
     afterSecond = vl2Or.value.pos
@@ -972,9 +974,10 @@ proc andOrFunctions*(
     value = a or b
   result = newValueAndPosOr(newValue(value), runningPos)
 
-proc callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult
+proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult
 
 proc getFunctionValueAndPos*(
+    env: var Env,
     functionName: string,
     statement: Statement,
     start: Natural,
@@ -1003,7 +1006,7 @@ proc getFunctionValueAndPos*(
   else:
     # Get the arguments to the function.
     while true:
-      let vlOr = getValueAndPos(statement, runningPos, variables)
+      let vlOr = getValueAndPos(env, statement, runningPos, variables)
       if quickExit(vlOr):
         return vlOr
       arguments.add(vlOr.value.value)
@@ -1049,7 +1052,7 @@ proc getFunctionValueAndPos*(
   if funcVar.funcv.builtIn:
     funResult = funcVar.funcv.functionPtr(variables, arguments)
   else:
-    funResult = callUserFunction(funcVar, variables, arguments)
+    funResult = callUserFunction(env, funcVar, variables, arguments)
 
   if funResult.kind == frWarning:
     var warningPos: int
@@ -1109,10 +1112,10 @@ func runCompareOp*(left: Value, op: string, right: Value): Value =
   result = newValue(b)
 
 # Forward reference since we call getCondition recursively.
-proc getCondition*(statement: Statement, start: Natural,
+proc getCondition*(env: var Env, statement: Statement, start: Natural,
     variables: Variables): ValueAndPosOr
 
-proc getValueOrNestedCond(statement: Statement, start: Natural,
+proc getValueOrNestedCond(env: var Env, statement: Statement, start: Natural,
     variables: Variables): ValueAndPosOr =
   ## Return a value and position after it. If start points at a nested
   ## condition, handle it.
@@ -1121,11 +1124,11 @@ proc getValueOrNestedCond(statement: Statement, start: Natural,
   let parenO = matchSymbol(statement.text, gLeftParentheses, runningPos)
   if parenO.isSome:
     # Found a left parenetheses, get the nested condition.
-    result = getCondition(statement, start, variables)
+    result = getCondition(env, statement, start, variables)
   else:
-    result = getValueAndPos(statement, start, variables)
+    result = getValueAndPos(env, statement, start, variables)
 
-proc getCondition*(statement: Statement, start: Natural,
+proc getCondition*(env: var Env, statement: Statement, start: Natural,
     variables: Variables): ValueAndPosOr =
   ## Return the bool value of the condition expression and the
   ## position after it.  The start index points at the ( left
@@ -1149,7 +1152,7 @@ proc getCondition*(statement: Statement, start: Natural,
   runningPos += parenO.get().length
 
   # Return a value and position after handling any nested condition.
-  var accumOr = getValueOrNestedCond(statement, runningPos, variables)
+  var accumOr = getValueOrNestedCond(env, statement, runningPos, variables)
   if quickExit(accumOr):
     return accumOr
   var accum = accumOr.value.value
@@ -1215,7 +1218,7 @@ proc getCondition*(statement: Statement, start: Natural,
       return newValueAndPosOr(newValue(shortCiruitResult), runningPos)
 
     # Return a value and position after handling any nestedcondition.
-    let vlRightOr = getValueOrNestedCond(statement, runningPos, variables)
+    let vlRightOr = getValueOrNestedCond(env, statement, runningPos, variables)
     if quickExit(vlRightOr):
       return vlRightOr
     let xyz = runningPos
@@ -1245,7 +1248,7 @@ proc getCondition*(statement: Statement, start: Natural,
       runningPos += op2O.get().length
 
       # Return a value and position after handling any nested condition.
-      let vlThirdOr = getValueOrNestedCond(statement, runningPos, variables)
+      let vlThirdOr = getValueOrNestedCond(env, statement, runningPos, variables)
       if quickExit(vlThirdOr):
         return vlThirdOr
 
@@ -1259,7 +1262,7 @@ proc getCondition*(statement: Statement, start: Natural,
 
     accum = newValue(bValue)
 
-proc getBracketedVarValue*(statement: Statement, start: Natural,
+proc getBracketedVarValue*(env: var Env, statement: Statement, start: Natural,
     container: Value, variables: Variables): ValueAndPosOr =
   ## Return the value of the bracketed variable and the position after
   ## the trailing whitespace.. Start points at the the first argument.
@@ -1277,7 +1280,7 @@ proc getBracketedVarValue*(statement: Statement, start: Natural,
   assert(container.kind == vkList or container.kind == vkDict, "expected list or dict")
 
   # Get the index/key value.
-  let vAndPosOr = getValueAndPos(statement, runningPos, variables)
+  let vAndPosOr = getValueAndPos(env, statement, runningPos, variables)
   if quickExit(vAndPosOr):
     return vAndPosOr
   let indexValue = vAndPosOr.value.value
@@ -1320,7 +1323,7 @@ proc getBracketedVarValue*(statement: Statement, start: Natural,
 
   return newValueAndPosOr(value, runningPos)
 
-proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
+proc getValueAndPosWorker(env: var Env, statement: Statement, start: Natural, variables:
     Variables): ValueAndPosOr =
   ## Get the value, position and side effect from the statement. Start
   ## points at the right hand side of the statement. The return pos is
@@ -1357,11 +1360,11 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
     let startSymbol = startSymbolO.get()
 
     # Get the list. The literal list [...] and list(...) are similar.
-    result = getFunctionValueAndPos("list", statement,
+    result = getFunctionValueAndPos(env, "list", statement,
       start+startSymbol.length, variables, list=true)
 
   of rtCondition:
-    result = getCondition(statement, start, variables)
+    result = getCondition(env, statement, start, variables)
 
   of rtVariable:
     # Get the variable name.
@@ -1397,16 +1400,16 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
       case specialFunction:
       of spIf, spIf0:
         # Handle the special IF functions.
-        return ifFunctions(specialFunction, statement, rightName.pos, variables)
+        return ifFunctions(env, specialFunction, statement, rightName.pos, variables)
       of spAnd, spOr:
         # Handle the special AND/OR functions.
-        return andOrFunctions(specialFunction, statement, rightName.pos, variables)
+        return andOrFunctions(env, specialFunction, statement, rightName.pos, variables)
       of spFunc:
         # Define a function in a code file and not nested.
         return newValueAndPosOr(wDefineFunction, "", start)
       of spNotSpecial, spReturn, spWarn, spLog:
         # Handle normal functions and warn, return and log.
-        return getFunctionValueAndPos(rightName.dotName, statement,
+        return getFunctionValueAndPos(env, rightName.dotName, statement,
           rightName.pos, variables, list=false)
 
     of vnkGet:
@@ -1416,9 +1419,9 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
         # The container variable must be a list or dictionary got $1.
         return newValueAndPosOr(wIndexNotListOrDict, $container.kind, start)
 
-      return getBracketedVarValue(statement, rightName.pos, valueOr.value, variables)
+      return getBracketedVarValue(env, statement, rightName.pos, valueOr.value, variables)
 
-proc getValueAndPos*(statement: Statement, start: Natural, variables:
+proc getValueAndPos*(env: var Env, statement: Statement, start: Natural, variables:
     Variables): ValueAndPosOr =
   ## Return the value and position of the item that the start parameter
   ## points at which is a string, number, variable, list, or condition.
@@ -1454,7 +1457,7 @@ proc getValueAndPos*(statement: Statement, start: Natural, variables:
   when showPos:
     showDebugPos(statement, start, "^ s")
 
-  result = getValueAndPosWorker(statement, start, variables)
+  result = getValueAndPosWorker(env, statement, start, variables)
 
   when showPos:
     var pos: Natural
@@ -1464,7 +1467,7 @@ proc getValueAndPos*(statement: Statement, start: Natural, variables:
       pos = result.value.pos
     showDebugPos(statement, pos, "^ f")
 
-proc runBareFunction*(statement: Statement, start: Natural,
+proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
     variables: Variables, leftName: VariableName): ValueAndPosOr =
   ## Handle bare function: if, if0, return, warn and log. A bare
   ## function does not assign a variable.
@@ -1488,15 +1491,15 @@ proc runBareFunction*(statement: Statement, start: Natural,
   case specialFunction:
   of spIf, spIf0:
     # Handle the special bare if functions.
-    result = ifFunctions(specialFunction, statement, runningPos, variables, bare=true)
+    result = ifFunctions(env, specialFunction, statement, runningPos, variables, bare=true)
   of spNotSpecial, spAnd, spOr, spFunc:
     # Missing left hand side and operator, e.g. a = len(b) not len(b).
     result = newValueAndPosOr(wMissingLeftAndOpr, "", start)
   of spReturn, spWarn, spLog:
     # Handle a bare warn, log or return function.
-    result = getFunctionValueAndPos($specialFunction, statement, runningPos, variables, list=false)
+    result = getFunctionValueAndPos(env, $specialFunction, statement, runningPos, variables, list=false)
 
-proc runStatement*(statement: Statement, variables: Variables): VariableDataOr =
+proc runStatement*(env: var Env, statement: Statement, variables: Variables): VariableDataOr =
   ## Run one statement and return the variable dot name string,
   ## operator and value.
 
@@ -1524,7 +1527,7 @@ proc runStatement*(statement: Statement, variables: Variables): VariableDataOr =
   of vnkFunction:
     # Handle bare function: if, if0, return, warn and log. A bare
     # function does not assign a variable.
-    vlOr = runBareFunction(statement, runningPos, variables, leftName)
+    vlOr = runBareFunction(env, statement, runningPos, variables, leftName)
     if vlOr.isMessage:
       return newVariableDataOr(vlOr.message)
   of vnkGet:
@@ -1548,7 +1551,7 @@ proc runStatement*(statement: Statement, variables: Variables): VariableDataOr =
     operatorLength = match.length
 
     # Get the right hand side value and match the following whitespace.
-    vlOr = getValueAndPos(statement,
+    vlOr = getValueAndPos(env, statement,
       leftName.pos + operatorLength, variables)
 
   if vlOr.isMessage:
@@ -1574,7 +1577,8 @@ proc runStatement*(statement: Statement, variables: Variables): VariableDataOr =
   # Return the variable dot name and value.
   result = newVariableDataOr(leftName.dotName, operator, vlOr.value.value)
 
-proc callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult =
+proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
+    arguments: seq[Value]): FunResult =
   ## Run the given user function.
   assert funcVar.kind == vkFunc
   assert funcVar.funcv.builtIn == false
@@ -1592,9 +1596,11 @@ proc callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Valu
   for statement in funcVar.funcv.statements:
 
     # Run the statement.
-    let variableDataOr = runStatement(statement, userVariables)
+    let variableDataOr = runStatement(env, statement, userVariables)
     if variableDataOr.isMessage:
-      return newFunResultWarn(variableDataOr.message)
+      env.warnStatement(statement, variableDataOr.message, funcVar.funcv.filename)
+      # The user function generated a warning.
+      return newFunResultWarn(wUserFunctionWarning)
     let variableData = variableDataOr.value
 
     # Handle the result of the statement.
@@ -1606,12 +1612,12 @@ proc callUserFunction*(funcVar: Value, variables: Variables, arguments: seq[Valu
         return newFunResultWarn(wdO.get())
     of opIgnore:
       continue
+    of opLog:
+      # todo: remove "\n" appending?
+      env.logLine(funcVar.funcv.filename, statement.lineNum, variableData.value.stringv & "\n")
     of opReturn:
       # Return the value of the function.
       return newFunResult(variableData.value)
-    of opLog:
-      # todo: support logging in user functions.
-      discard
 
   assert(false, "the function doesn't have a return statement")
   # Out of lines; missing the function's return statement.
@@ -1623,7 +1629,7 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
   ## skip, stop or continue to control the loop.
 
   # Run the statement and get the variable, operator and value.
-  let variableDataOr = runStatement(statement, variables)
+  let variableDataOr = runStatement(env, statement, variables)
   if variableDataOr.isMessage:
     env.warnStatement(statement, variableDataOr.message, sourceFilename = sourceFilename)
     return lcContinue
