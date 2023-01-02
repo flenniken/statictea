@@ -405,7 +405,7 @@ a = fn( 1 )
           ^^
 a = fn( 1 , 2 )
         ^ ^
-~~~~
+~~~
 
 ```nim
 func skipArgument(statement: Statement; startPos: Natural): PosOr
@@ -426,7 +426,7 @@ a = if(cond, then, else)
        ^                ^
 if(cond, then)
    ^          ^
-~~~~
+~~~
 
 ```nim
 proc ifFunctions(specialFunction: SpecialFunction; statement: Statement;
@@ -446,6 +446,13 @@ proc andOrFunctions(specialFunction: SpecialFunction; statement: Statement;
 # getFunctionValueAndPos
 
 Return the function's value and the position after it. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
+
+~~~
+a = get(b, 2, c) # condition
+        ^        ^
+a = get(b, len("hi"), c)
+               ^    ^
+~~~
 
 ```nim
 proc getFunctionValueAndPos(functionName: string; statement: Statement;
@@ -475,7 +482,7 @@ Return the bool value of the condition expression and the position after it.  Th
 ~~~
 a = (5 < 3) # condition
     ^       ^
-~~~~
+~~~
 
 ```nim
 proc getCondition(statement: Statement; start: Natural; variables: Variables): ValueAndPosOr
@@ -490,7 +497,7 @@ a = list[ 4 ]
           ^  ^
 a = dict[ "abc" ]
           ^      ^
-~~~~
+~~~
 
 ```nim
 proc getBracketedVarValue(statement: Statement; start: Natural;
@@ -523,7 +530,7 @@ a = if( bool(len(b)), d, e) # if
                  ^^
                       ^  ^
                          ^  ^
-~~~~
+~~~
 
 ```nim
 proc getValueAndPos(statement: Statement; start: Natural; variables: Variables): ValueAndPosOr
@@ -534,14 +541,13 @@ proc getValueAndPos(statement: Statement; start: Natural; variables: Variables):
 Handle bare function: if, if0, return, warn and log. A bare function does not assign a variable.
 
 ~~~
-  if( true, warn("tea time")) # test
-  ^ pos                       ^
-      ^ start                 ^
-~~~~
+if( true, warn("tea time")) # test
+^                           ^
+~~~
 
 ```nim
-proc runBareFunction(statement: Statement; variables: Variables;
-                     dotNameStr: string; pos: Natural; start: Natural): ValueAndPosOr
+proc runBareFunction(statement: Statement; start: Natural; variables: Variables;
+                     leftName: VariableName): ValueAndPosOr
 ```
 
 # runStatement
@@ -579,7 +585,7 @@ Example signatures:
 ~~~
 cmp(numStr1: string, numStr2: string) int
 get(group: list, ix: int, optional any) any
-~~~~
+~~~
 
 ```nim
 proc parseSignature(signature: string): SignatureOr

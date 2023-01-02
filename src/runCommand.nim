@@ -983,39 +983,45 @@ proc getFunctionValueAndPos*(
   ## Return the function's value and the position after it. Start points at the
   ## first argument of the function. The position includes the trailing
   ## whitespace after the ending ).
+  ## @:
+  ## @:~~~
+  ## @:a = get(b, 2, c) # condition
+  ## @:        ^        ^
+  ## @:a = get(b, len("hi"), c)
+  ## @:               ^    ^
+  ## @:~~~~
 
   var arguments: seq[Value] = @[]
   var argumentStarts: seq[Natural] = @[]
-  var pos: Natural
+  var runningPos = start
 
   let symbol = if list: gRightBracket else: gRightParentheses
-  let startSymbolO = matchSymbol(statement.text, symbol, start)
+  let startSymbolO = matchSymbol(statement.text, symbol, runningPos)
   if startSymbolO.isSome:
     # There are no arguments.
-    pos = start + startSymbolO.get().length
+    runningPos = start + startSymbolO.get().length
   else:
     # Get the arguments to the function.
-    pos = start
     while true:
-      let vlOr = getValueAndPos(statement, pos, variables)
+      let vlOr = getValueAndPos(statement, runningPos, variables)
       if quickExit(vlOr):
         return vlOr
       arguments.add(vlOr.value.value)
-      argumentStarts.add(pos)
+      argumentStarts.add(runningPos)
 
-      pos = vlOr.value.pos
+      runningPos = vlOr.value.pos
 
       # Get the , or ) or ] and white space following the value.
-      let commaSymbolO = matchCommaOrSymbol(statement.text, symbol, pos)
+      let commaSymbolO = matchCommaOrSymbol(statement.text, symbol, runningPos)
       if not commaSymbolO.isSome:
         if symbol == gRightParentheses:
           # Expected comma or right parentheses.
-          return newValueAndPosOr(wMissingCommaParen, "", pos)
+          return newValueAndPosOr(wMissingCommaParen, "", runningPos)
         else:
           # Missing comma or right bracket.
-          return newValueAndPosOr(wMissingCommaBracket, "", pos)
+          return newValueAndPosOr(wMissingCommaBracket, "", runningPos)
       let commaSymbol = commaSymbolO.get()
-      pos = pos + commaSymbol.length
+      runningPos = runningPos + commaSymbol.length
       let foundSymbol = commaSymbol.getGroup()
       if (foundSymbol == ")" and symbol == gRightParentheses) or
          (foundSymbol == "]" and symbol == gRightBracket):
@@ -1055,6 +1061,7 @@ proc getFunctionValueAndPos*(
       funResult.warningData.p1, warningPos)
 
   var sideEffect: SideEffect
+  # todo: use the signature function name instead?
   if functionName == "return":
     sideEffect = seReturn
   elif functionName == "log":
@@ -1062,22 +1069,7 @@ proc getFunctionValueAndPos*(
   else:
     sideEffect = seNone
 
-  result = newValueAndPosOr(funResult.value, pos, sideEffect)
-
-proc getList(statement: Statement, start: Natural,
-    variables: Variables): ValueAndPosOr =
-  ## Return the literal list value and position after it.
-  ## The start index points at [. The position includes the
-  ## trailing whitespace after the ending ].
-
-  # Match the left bracket and whitespace.
-  let startSymbolO = matchSymbol(statement.text, gLeftBracket, start)
-  assert startSymbolO.isSome
-  let startSymbol = startSymbolO.get()
-
-  # Get the list. The literal list [...] and list(...) are similar.
-  return getFunctionValueAndPos("list", statement,
-    start+startSymbol.length, variables, list=true)
+  result = newValueAndPosOr(funResult.value, runningPos, sideEffect)
 
 func runBoolOp*(left: Value, op: string, right: Value): Value =
   ## Evaluate the bool expression and return a bool value.
@@ -1150,7 +1142,8 @@ proc getCondition*(statement: Statement, start: Natural,
   var runningPos = start
   var lastBoolOp: string
 
-  # Match the left parentheses and following whitespace.
+  # Match the left parentheses and following whitespace to get the
+  # first argument.
   let parenO = matchSymbol(statement.text, gLeftParentheses, runningPos)
   assert parenO.isSome
   runningPos += parenO.get().length
@@ -1172,7 +1165,7 @@ proc getCondition*(statement: Statement, start: Natural,
         showDebugPos(statement, finish, "^ f condition")
       return newValueAndPosOr(vAndL)
 
-    # Get the operator.
+    # Get the boolean operator.
     let opO = matchBoolExprOperator(statement.text, runningPos)
     if not opO.isSome:
       # Expected a boolean expression operator, and, or, ==, !=, <, >, <=, >=.
@@ -1335,13 +1328,12 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
   ## @:
   ## @:~~~
   ## @:a = 5  # statement
-  ## @:    ^ start
-  ## @:       ^ pos
+  ## @:    ^  ^
   ## @:
   ## @:a = cmp(len(c), 4)
-  ## @:        ^ start
-  ## @:            ^ start
-  ## @:                ^ start
+  ## @:        ^         ^
+  ## @:a = [1, 2, 3]
+  ## @:    ^        ^
   ## @:~~~~
 
   let rightType = getRightType(statement, start)
@@ -1354,9 +1346,23 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
   of rtNumber:
     result = getNumber(statement, start)
   of rtList:
-    result = getList(statement, start, variables)
+    # Return the literal list value and position after it.
+    # The start index points at [. The return position includes the
+    # trailing whitespace after the ending ].
+
+    # Match the left bracket and whitespace to get the position of the
+    # first argument.
+    let startSymbolO = matchSymbol(statement.text, gLeftBracket, start)
+    assert startSymbolO.isSome
+    let startSymbol = startSymbolO.get()
+
+    # Get the list. The literal list [...] and list(...) are similar.
+    result = getFunctionValueAndPos("list", statement,
+      start+startSymbol.length, variables, list=true)
+
   of rtCondition:
     result = getCondition(statement, start, variables)
+
   of rtVariable:
     # Get the variable name.
     let rightNameO = getVariableName(statement.text, start)
@@ -1458,19 +1464,19 @@ proc getValueAndPos*(statement: Statement, start: Natural, variables:
       pos = result.value.pos
     showDebugPos(statement, pos, "^ f")
 
-proc runBareFunction*(statement: Statement, variables: Variables,
-    dotNameStr: string, pos: Natural, start: Natural): ValueAndPosOr =
+proc runBareFunction*(statement: Statement, start: Natural,
+    variables: Variables, leftName: VariableName): ValueAndPosOr =
   ## Handle bare function: if, if0, return, warn and log. A bare
   ## function does not assign a variable.
   ## @:
   ## @:~~~
-  ## @:  if( true, warn("tea time")) # test
-  ## @:  ^ pos                       ^
-  ## @:      ^ start                 ^
+  ## @:if( true, warn("tea time")) # test
+  ## @:^                           ^
   ## @:~~~~
+  let runningPos = leftName.pos
 
   # Get the function variable.
-  let funcVarOr = getVariable(variables, dotNameStr, npBuiltIn)
+  let funcVarOr = getVariable(variables, leftName.dotName, npBuiltIn)
   if funcVarOr.isMessage:
     return newValueAndPosOr(funcVarOr.message)
   let funcVar = funcVarOr.value
@@ -1482,31 +1488,29 @@ proc runBareFunction*(statement: Statement, variables: Variables,
   case specialFunction:
   of spIf, spIf0:
     # Handle the special bare if functions.
-    result = ifFunctions(specialFunction, statement, start, variables, bare=true)
+    result = ifFunctions(specialFunction, statement, runningPos, variables, bare=true)
   of spNotSpecial, spAnd, spOr, spFunc:
     # Missing left hand side and operator, e.g. a = len(b) not len(b).
-    result = newValueAndPosOr(wMissingLeftAndOpr, "", pos)
+    result = newValueAndPosOr(wMissingLeftAndOpr, "", start)
   of spReturn, spWarn, spLog:
     # Handle a bare warn, log or return function.
-    result = getFunctionValueAndPos($specialFunction, statement, start, variables, list=false)
+    result = getFunctionValueAndPos($specialFunction, statement, runningPos, variables, list=false)
 
 proc runStatement*(statement: Statement, variables: Variables): VariableDataOr =
   ## Run one statement and return the variable dot name string,
   ## operator and value.
 
   # Skip comments and blank lines.
-  var pos: Natural
+  var runningPos = 0
   let spacesO = matchTabSpace(statement.text, 0)
-  if not isSome(spacesO):
-    pos = 0
-  else:
-    pos = spacesO.get().length
-  if pos >= statement.text.len or statement.text[pos] == '#':
+  if isSome(spacesO):
+    runningPos = spacesO.get().length
+  if runningPos >= statement.text.len or statement.text[runningPos] == '#':
     return newVariableDataOr("", opIgnore, newValue(0))
 
   # Get the variable dot name string and match the trailing white
   # space.
-  let leftNameO = getVariableName(statement.text, pos)
+  let leftNameO = getVariableName(statement.text, runningPos)
   if not isSome(leftNameO):
     # Statement does not start with a variable name.
     return newVariableDataOr(wMissingStatementVar)
@@ -1520,7 +1524,7 @@ proc runStatement*(statement: Statement, variables: Variables): VariableDataOr =
   of vnkFunction:
     # Handle bare function: if, if0, return, warn and log. A bare
     # function does not assign a variable.
-    vlOr = runBareFunction(statement, variables, leftName.dotName, pos, leftName.pos)
+    vlOr = runBareFunction(statement, runningPos, variables, leftName)
     if vlOr.isMessage:
       return newVariableDataOr(vlOr.message)
   of vnkGet:

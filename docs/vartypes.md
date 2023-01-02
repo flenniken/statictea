@@ -306,7 +306,7 @@ A value and the position after the value in the statement along with the side ef
 var = 567 # test
       ^ start
           ^ end position
-~~~~
+~~~
 
 ```nim
 ValueAndPos = object
@@ -463,7 +463,7 @@ New list value from an array of items of the same kind.
 let listValue = newValue([1, 2, 3])
 let listValue = newValue(["a", "b", "c"])
 let listValue = newValue([newValue(1), newValue("b")])
-~~~~
+~~~
 
 ```nim
 proc newValue[T](list: openArray[T]): Value
@@ -478,7 +478,7 @@ same type which may be Value type.
  let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
  let dictValue = newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)])
  let dictValue = newValue([("a", newValue(1.1)), ("b", newValue("a"))])
-~~~~
+~~~
 
 ```nim
 proc newValue[T](dictPairs: openArray[(string, T)]): Value
@@ -787,7 +787,7 @@ var signatureO = newSignatureO("myname", "ifss")
 echo $signatureO.get()
 =>
 myname(a: int, b: float, c: string) string
-~~~~
+~~~
 
 ```nim
 func newSignatureO(functionName: string; signatureCode: string): Option[

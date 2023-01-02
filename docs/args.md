@@ -144,7 +144,7 @@ The predefined prefixes and postfixes.
 * C, C++: /*$ and */
 * HTML inside a textarea element: &lt;!--$ and --&gt;
 * Org Mode: # $
-~~~~
+~~~
 
 ```nim
 predefinedPrepost: array[8, Prepost] = [(prefix: "$$", postfix: ""),

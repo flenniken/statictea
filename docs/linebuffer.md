@@ -10,7 +10,7 @@ check lbO.isSome == true
 var lb = lbO.get()
 while line = lb.readLine():
   processLine(line)
-~~~~
+~~~
 
 * [linebuffer.nim](../src/linebuffer.nim) &mdash; Nim source code.
 # Index

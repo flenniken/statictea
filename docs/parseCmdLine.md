@@ -30,7 +30,7 @@ prefix command  [code]   [comment] [continuation]
 <!--$  nextline var = 5  # comment +-->n
      |
      optional spaces
-~~~~
+~~~
 
 Whitespace must follow a command except on the last line of the file.
 codeStart is 0 when codeLen is 0.

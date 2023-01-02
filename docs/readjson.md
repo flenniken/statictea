@@ -86,7 +86,7 @@ the message id tells what went wrong.
 ~~~
 a = "test string"  # test
      ^             ^
-~~~~
+~~~
 
 ```nim
 func parseJsonStr(text: string; startPos: Natural): ValueAndPosOr

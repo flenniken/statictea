@@ -13,7 +13,7 @@ let matchesO = matchPattern(line, pattern, start=0, numGroups=0)
 
 check matchesO.isSome == true
 check matchesO.get().length == 6
-~~~~
+~~~
 
 Match a file and line number like: filename(234):
 
@@ -26,7 +26,7 @@ check matchesO.isSome == true
 let (filename, lineNum) = matchesO.get2Groups()
 check filename == "template.html"
 check lineNum == "87"
-~~~~
+~~~
 
 Replace the patterns in the string with their replacements:
 
@@ -39,7 +39,7 @@ let resultStringO = replaceMany("abcdefabc", replacements)
 
 check resultStringO.isSome
 check resultStringO.get() == "456456"
-~~~~
+~~~
 
 * [regexes.nim](../src/regexes.nim) &mdash; Nim source code.
 # Index

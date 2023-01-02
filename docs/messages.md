@@ -545,7 +545,7 @@ Return a formatted warning line. For example:
 
 ~~~
 filename(line): wId: message.
-~~~~
+~~~
 
 ```nim
 func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = ""): string
@@ -557,7 +557,7 @@ Return a formatted warning line. For example:
 
 ~~~
 filename(line): wId: message.
-~~~~
+~~~
 
 ```nim
 func getWarningLine(filename: string; lineNum: int; warningData: WarningData): string
@@ -578,7 +578,7 @@ Return a string representation of WarningData.
 ~~~
 let warning = newWarningData(wUnknownArg, "p1", 5)
 check $warning == "wUnknownArg(p1):5"
-~~~~
+~~~
 
 ```nim
 func `$`(warningData: WarningData): string

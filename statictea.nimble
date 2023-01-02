@@ -833,11 +833,7 @@ task docsall, "\tCreate all the docs, docsix, docs, readmefun, dot.":
 task docs, "\tCreate one or more markdown docs; specify part of source filename.":
   let count = system.paramCount()+1
   var namePart = system.paramStr(count-1)
-  var forceRebuild = false
-  if namePart == "force":
-    forceRebuild = true
-    namePart = system.paramStr(count-2)
-  taskDocs(namePart, forceRebuild)
+  taskDocs(namePart, true)
 
 task docsix, "\tCreate markdown docs index.":
   taskDocsIx()

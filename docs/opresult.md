@@ -90,7 +90,7 @@ if strOr.isMessage:
   echo show_message(strOr.message)
 else:
   echo "value = " & $strOr.value
-~~~~
+~~~
 
 ```nim
 OpResultWarn[T] = OpResult[T, WarningData]
@@ -134,7 +134,7 @@ if strOr.isMessage:
   echo show_message(strOr.message)
 else:
   echo "value = " & $strOr.value
-~~~~
+~~~
 
 ```nim
 OpResultId[T] = OpResult[T, MessageId]

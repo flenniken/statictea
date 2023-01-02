@@ -168,13 +168,13 @@ exist. No space around the bracketed variables.
 let first = "Earl"
 let last = "Grey"
 "name: {first} {last}" => "name: Earl Grey"
-~~~~
+~~~
 
 To enter a left bracket use two in a row.
 
 ~~~
 "{{" => "{"
-~~~~
+~~~
 
 ```nim
 proc formatString(variables: Variables; text: string): StringOr
@@ -187,7 +187,7 @@ Compare two ints. Returns -1 for less, 0 for equal and 1 for
 
 ~~~
 cmp(a: int, b: int) int
-~~~~
+~~~
 
 Examples:
 
@@ -195,7 +195,7 @@ Examples:
 cmp(7, 9) => -1
 cmp(8, 8) => 0
 cmp(9, 2) => 1
-~~~~
+~~~
 
 ```nim
 func funCmp_iii(variables: Variables; parameters: seq[Value]): FunResult
@@ -208,7 +208,7 @@ equal and 1 for greater than.
 
 ~~~
 cmp(a: float, b: float) int
-~~~~
+~~~
 
 Examples:
 
@@ -216,7 +216,7 @@ Examples:
 cmp(7.8, 9.1) => -1
 cmp(8.4, 8.4) => 0
 cmp(9.3, 2.2) => 1
-~~~~
+~~~
 
 ```nim
 func funCmp_ffi(variables: Variables; parameters: seq[Value]): FunResult
@@ -232,7 +232,7 @@ is the default.
 
 ~~~
 cmp(a: string, b: string, insensitive: optional bool) int
-~~~~
+~~~
 
 Examples:
 
@@ -242,7 +242,7 @@ cmp("tea", "tea") => 0
 cmp("Tea", "tea") => 1
 cmp("Tea", "tea", true) => 1
 cmp("Tea", "tea", false) => 0
-~~~~
+~~~
 
 ```nim
 func funCmp_ssobi(variables: Variables; parameters: seq[Value]): FunResult
@@ -254,14 +254,14 @@ Concatentate two strings. See [[#join][join]] for more that two arguments.
 
 ~~~
 concat(a: string, b: string) string
-~~~~
+~~~
 
 Examples:
 
 ~~~
 concat("tea", " time") => "tea time"
 concat("a", "b") => "ab"
-~~~~
+~~~
 
 ```nim
 func funConcat_sss(variables: Variables; parameters: seq[Value]): FunResult
@@ -273,14 +273,14 @@ Number of unicode characters in a string.
 
 ~~~
 len(str: string) int
-~~~~
+~~~
 
 Examples:
 
 ~~~
 len("tea") => 3
 len("añyóng") => 6
-~~~~
+~~~
 
 ```nim
 func funLen_si(variables: Variables; parameters: seq[Value]): FunResult
@@ -292,7 +292,7 @@ Number of elements in a list.
 
 ~~~
 len(list: list) int
-~~~~
+~~~
 
 Examples:
 
@@ -300,7 +300,7 @@ Examples:
 len(list()) => 0
 len(list(1)) => 1
 len(list(4, 5)) => 2
-~~~~
+~~~
 
 ```nim
 func funLen_li(variables: Variables; parameters: seq[Value]): FunResult
@@ -312,7 +312,7 @@ Number of elements in a dictionary.
 
 ~~~
 len(dictionary: dict) int
-~~~~
+~~~
 
 Examples:
 
@@ -320,7 +320,7 @@ Examples:
 len(dict()) => 0
 len(dict("a", 4)) => 1
 len(dict("a", 4, "b", 3)) => 2
-~~~~
+~~~
 
 ```nim
 func funLen_di(variables: Variables; parameters: seq[Value]): FunResult
@@ -336,7 +336,7 @@ etc.
 
 ~~~
 get(list: list, index: int, default: optional any) any
-~~~~
+~~~
 
 Examples:
 
@@ -350,7 +350,7 @@ get(list, -1) => 10
 get(list, -2) => "a"
 get(list, -3) => 4
 get(list, -4, 11) => 11
-~~~~
+~~~
 
 ```nim
 func funGet_lioaa(variables: Variables; parameters: seq[Value]): FunResult
@@ -364,7 +364,7 @@ generated.
 
 ~~~
 get(dictionary: dict, key: string, default: optional any) any
-~~~~
+~~~
 
 Note: For dictionary lookup you can use dot notation. It's the
 same as get without the default.
@@ -375,13 +375,13 @@ Examples:
 d = dict("tea", "Earl Grey")
 get(d, "tea") => "Earl Grey"
 get(d, "coffee", "Tea") => "Tea"
-~~~~
+~~~
 
 Using dot notation:
 ~~~
 d = dict("tea", "Earl Grey")
 d.tea => "Earl Grey"
-~~~~
+~~~
 
 ```nim
 func funGet_dsoaa(variables: Variables; parameters: seq[Value]): FunResult
@@ -407,7 +407,7 @@ The if functions are special in a couple of ways, see
 ~~~
 if0(condition: any, then: any, else: any) any
 if0(condition: any, then: any)
-~~~~
+~~~
 
 Examples:
 
@@ -423,7 +423,7 @@ a = if0(dict(), "tea", "beer") => tea
 a = if0(dict("a",1), "tea", "beer") => beer
 a = if0(false, "tea", "beer") => tea
 a = if0(true, "tea", "beer") => beer
-~~~~
+~~~
 
 You don't have to assign the result of an if0 function which is
 useful when using a warn or return function for its side effects.
@@ -432,7 +432,7 @@ The if takes two arguments when there is no assignment.
 ~~~
 c = 0
 if0(c, warn("got zero value"))
-~~~~
+~~~
 
 ```nim
 func funIf0_iaoaa(variables: Variables; parameters: seq[Value]): FunResult
@@ -449,7 +449,7 @@ If the condition is true, return the second argument, else return the third argu
 
 ~~~
 if(condition: bool, then: any, else: optional any) any
-~~~~
+~~~
 
 Examples:
 
@@ -457,7 +457,7 @@ Examples:
 a = if(true, "tea", "beer") => tea
 b = if(false, "tea", "beer") => beer
 c = if((d < 5), "tea", "beer") => beer
-~~~~
+~~~
 
 You don't have to assign the result of an if function which is
 useful when using a warn or return function for its side effects.
@@ -466,7 +466,7 @@ The if takes two arguments when there is no assignment.
 ~~~
 if(c, warn("c is true"))
 if(c, return("skip"))
-~~~~
+~~~
 
 ```nim
 func funIf_baoaa(variables: Variables; parameters: seq[Value]): FunResult
@@ -478,7 +478,7 @@ Add two integers. A warning is generated on overflow.
 
 ~~~
 add(a: int, b: int) int
-~~~~
+~~~
 
 Examples:
 
@@ -486,7 +486,7 @@ Examples:
 add(1, 2) => 3
 add(3, -2) => 1
 add(-2, -5) => -7
-~~~~
+~~~
 
 ```nim
 func funAdd_iii(variables: Variables; parameters: seq[Value]): FunResult
@@ -498,14 +498,14 @@ Add two floats. A warning is generated on overflow.
 
 ~~~
 add(a: float, b: float) float
-~~~~
+~~~
 
 Examples:
 
 ~~~
 add(1.5, 2.3) => 3.8
 add(3.2, -2.2) => 1.0
-~~~~
+~~~
 
 ```nim
 func funAdd_fff(variables: Variables; parameters: seq[Value]): FunResult
@@ -517,7 +517,7 @@ Determine whether a key exists in a dictionary. Return true when it exists, else
 
 ~~~
 exists(dictionary: dict, key: string) bool
-~~~~
+~~~
 
 Examples:
 
@@ -525,7 +525,7 @@ Examples:
 d = dict("tea", "Earl")
 exists(d, "tea") => true
 exists(d, "coffee") => false
-~~~~
+~~~
 
 ```nim
 func funExists_dsb(variables: Variables; parameters: seq[Value]): FunResult
@@ -549,7 +549,7 @@ can be any type.
 
 ~~~
 case(condition: int, pairs: list, default: optional any) any
-~~~~
+~~~
 
 Examples:
 
@@ -560,7 +560,7 @@ case(1, cases) => "water"
 case(2, cases) => "beer"
 case(2, cases, "wine") => "beer"
 case(3, cases, "wine") => "wine"
-~~~~
+~~~
 
 ```nim
 func funCase_iloaa(variables: Variables; parameters: seq[Value]): FunResult
@@ -584,7 +584,7 @@ can be any type.
 
 ~~~
 case(condition: string, pairs: list, default: optional any) any
-~~~~
+~~~
 
 Examples:
 
@@ -594,7 +594,7 @@ case("tea", cases) => 15
 case("water", cases) => 2.3
 case("beer", cases) => "cold"
 case("bunch", cases, "other") => "other"
-~~~~
+~~~
 
 ```nim
 func funCase_sloaa(variables: Variables; parameters: seq[Value]): FunResult
@@ -615,7 +615,7 @@ equal and 1 for greater than.
 
 ~~~
 cmpVersion(versionA: string, versionB: string) int
-~~~~
+~~~
 
 StaticTea uses [[https://semver.org/][Semantic Versioning]]
 with the added restriction that each version component has one
@@ -627,7 +627,7 @@ Examples:
 cmpVersion("1.2.5", "1.1.8") => 1
 cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
-~~~~
+~~~
 
 ```nim
 func funCmpVersion_ssi(variables: Variables; parameters: seq[Value]): FunResult
@@ -639,14 +639,14 @@ Create a float from an int.
 
 ~~~
 float(num: int) float
-~~~~
+~~~
 
 Examples:
 
 ~~~
 float(2) => 2.0
 float(-33) => -33.0
-~~~~
+~~~
 
 ```nim
 func funFloat_if(variables: Variables; parameters: seq[Value]): FunResult
@@ -658,7 +658,7 @@ Create a float from a number string.
 
 ~~~
 float(numString: string) float
-~~~~
+~~~
 
 Examples:
 
@@ -666,7 +666,7 @@ Examples:
 float("2") => 2.0
 float("2.4") => 2.4
 float("33") => 33.0
-~~~~
+~~~
 
 ```nim
 func funFloat_sf(variables: Variables; parameters: seq[Value]): FunResult
@@ -678,14 +678,14 @@ Create a float from a number string. If the string is not a number, return the d
 
 ~~~
 float(numString: string, default: optional any) any
-~~~~
+~~~
 
 Examples:
 
 ~~~
 float("2") => 2.0
 float("notnum", "nan") => nan
-~~~~
+~~~
 
 ```nim
 func funFloat_saa(variables: Variables; parameters: seq[Value]): FunResult
@@ -697,7 +697,7 @@ Create an int from a float.
 
 ~~~
 int(num: float, roundOption: optional string) int
-~~~~
+~~~
 
 Round options:
 
@@ -720,7 +720,7 @@ int(6.3, "ceiling") => 7
 int(-6.3, "ceiling") => -6
 int(6.3456, "truncate") => 6
 int(-6.3456, "truncate") => -6
-~~~~
+~~~
 
 ```nim
 func funInt_fosi(variables: Variables; parameters: seq[Value]): FunResult
@@ -732,7 +732,7 @@ Create an int from a number string.
 
 ~~~
 int(numString: string, roundOption: optional string) int
-~~~~
+~~~
 
 Round options:
 
@@ -755,7 +755,7 @@ int("6.3", "ceiling") => 7
 int("-6.3", "ceiling") => -6
 int("6.3456", "truncate") => 6
 int("-6.3456", "truncate") => -6
-~~~~
+~~~
 
 ```nim
 func funInt_sosi(variables: Variables; parameters: seq[Value]): FunResult
@@ -767,7 +767,7 @@ Create an int from a number string. If the string is not a number, return the de
 
 ~~~
 int(numString: string, roundOption: string, default: optional any) any
-~~~~
+~~~
 
 Round options:
 
@@ -781,7 +781,7 @@ Examples:
 ~~~
 int("2", "round", "nan") => 2
 int("notnum", "round", "nan") => nan
-~~~~
+~~~
 
 ```nim
 func funInt_ssaa(variables: Variables; parameters: seq[Value]): FunResult
@@ -801,7 +801,7 @@ Create an bool from a value.
 
 ~~~
 bool(value: Value) bool
-~~~~
+~~~
 
 False values by variable types:
 
@@ -827,7 +827,7 @@ bool(3.3) => true
 bool([8]) => true
 bool("tea") => true
 bool(dict("tea", 2)) => true
-~~~~
+~~~
 
 ```nim
 func funBool_ab(variables: Variables; parameters: seq[Value]): FunResult
@@ -842,7 +842,7 @@ default value.
 
 ~~~
 find(str: string, substring: string, default: optional any) any
-~~~~
+~~~
 
 Examples:
 
@@ -855,7 +855,7 @@ find(msg, "me") = 6
 find(msg, "party", -1) = -1
 find(msg, "party", len(msg)) = 17
 find(msg, "party", 0) = 0
-~~~~
+~~~
 
 ```nim
 func funFind_ssoaa(variables: Variables; parameters: seq[Value]): FunResult
@@ -872,7 +872,7 @@ The start index and length are by unicode characters not bytes.
 
 ~~~
 slice(str: string, start: int, length: optional int) string
-~~~~
+~~~
 
 Examples:
 
@@ -880,7 +880,7 @@ Examples:
 slice("Earl Grey", 1, 3) => "arl"
 slice("Earl Grey", 6) => "rey"
 slice("añyóng", 0, 3) => "añy"
-~~~~
+~~~
 
 ```nim
 func funSlice_siois(variables: Variables; parameters: seq[Value]): FunResult
@@ -893,7 +893,7 @@ concatenating the string to itself the specified number of times.
 
 ~~~
 dup(pattern: string, count: int) string
-~~~~
+~~~
 
 Examples:
 
@@ -903,7 +903,7 @@ dup("abc", 0) => ""
 dup("abc", 1) => "abc"
 dup("abc", 2) => "abcabc"
 dup("", 3) => ""
-~~~~
+~~~
 
 ```nim
 func funDup_sis(variables: Variables; parameters: seq[Value]): FunResult
@@ -916,7 +916,7 @@ must be strings and the values can be any type.
 
 ~~~
 dict(pairs: optional list) dict
-~~~~
+~~~
 
 Examples:
 
@@ -925,7 +925,7 @@ dict() => {}
 dict(list("a", 5)) => {"a": 5}
 dict(list("a", 5, "b", 33, "c", 0)) =>
   {"a": 5, "b": 33, "c": 0}
-~~~~
+~~~
 
 ```nim
 func funDict_old(variables: Variables; parameters: seq[Value]): FunResult
@@ -937,7 +937,7 @@ Create a list of variables. You can also create a list with brackets.
 
 ~~~
 list(...) list
-~~~~
+~~~
 
 Examples:
 
@@ -950,7 +950,7 @@ a = []
 a = [1]
 a = [1, 2, 3]
 a = ["a", 5, "b"]
-~~~~
+~~~
 
 ```nim
 func funList(variables: Variables; parameters: seq[Value]): FunResult
@@ -963,7 +963,7 @@ a string as well.
 
 ~~~
 replace(str: string, start: int, length: int, replacement: string) string
-~~~~
+~~~
 
 * str: string
 * start: substring start index
@@ -983,18 +983,18 @@ replace("123", 1, 1, "abcd") => 1abcd3
 replace("123", 1, 2, "abcd") => 1abcd
 
 replace("123", 2, 1, "abcd") => 12abcd
-~~~~
+~~~
 Insert:
 ~~~
 replace("123", 0, 0, "abcd") => abcd123
 replace("123", 1, 0, "abcd") => 1abcd23
 replace("123", 2, 0, "abcd") => 12abcd3
 replace("123", 3, 0, "abcd") => 123abcd
-~~~~
+~~~
 Append:
 ~~~
 replace("123", 3, 0, "abcd") => 123abcd
-~~~~
+~~~
 Delete:
 ~~~
 replace("123", 0, 1, "") => 23
@@ -1005,7 +1005,7 @@ replace("123", 1, 1, "") => 13
 replace("123", 1, 2, "") => 1
 
 replace("123", 2, 1, "") => 12
-~~~~
+~~~
 Edge Cases:
 ~~~
 replace("", 0, 0, "") =>
@@ -1013,7 +1013,7 @@ replace("", 0, 0, "a") => a
 replace("", 0, 0, "ab") => ab
 replace("", 0, 0, "abc") => abc
 replace("", 0, 0, "abcd") => abcd
-~~~~
+~~~
 
 ```nim
 func funReplace_siiss(variables: Variables; parameters: seq[Value]): FunResult
@@ -1028,7 +1028,7 @@ replacements.
 
 ~~~
 replaceRe(str: string, pairs: list) string
-~~~~
+~~~
 
 Examples:
 
@@ -1036,7 +1036,7 @@ Examples:
 list = list("abc", "456", "def", "")
 replaceRe("abcdefabc", list))
   => "456456"
-~~~~
+~~~
 
 For developing and debugging regular expressions see the
 website: https://regex101.com/
@@ -1085,7 +1085,7 @@ system separator is used.
 
 ~~~
 path(filename: string, separator: optional string) dict
-~~~~
+~~~
 
 Examples:
 
@@ -1103,7 +1103,7 @@ path("src\functions.nim", "\") => {
   "ext": ".nim",
   "dir": "src\",
 }
-~~~~
+~~~
 
 ```nim
 func funPath_sosd(variables: Variables; parameters: seq[Value]): FunResult
@@ -1115,7 +1115,7 @@ Lowercase a string.
 
 ~~~
 lower(str: string) string
-~~~~
+~~~
 
 Examples:
 
@@ -1123,7 +1123,7 @@ Examples:
 lower("Tea") => "tea"
 lower("TEA") => "tea"
 lower("TEĀ") => "teā"
-~~~~
+~~~
 
 ```nim
 func funLower_ss(variables: Variables; parameters: seq[Value]): FunResult
@@ -1135,7 +1135,7 @@ Create a list from the keys in a dictionary.
 
 ~~~
 keys(dictionary: dict) list
-~~~~
+~~~
 
 Examples:
 
@@ -1143,7 +1143,7 @@ Examples:
 d = dict("a", 1, "b", 2, "c", 3)
 keys(d) => ["a", "b", "c"]
 values(d) => ["apple", 2, 3]
-~~~~
+~~~
 
 ```nim
 func funKeys_dl(variables: Variables; parameters: seq[Value]): FunResult
@@ -1155,7 +1155,7 @@ Create a list out of the values in the specified dictionary.
 
 ~~~
 values(dictionary: dict) list
-~~~~
+~~~
 
 Examples:
 
@@ -1163,7 +1163,7 @@ Examples:
 d = dict("a", "apple", "b", 2, "c", 3)
 keys(d) => ["a", "b", "c"]
 values(d) => ["apple", 2, 3]
-~~~~
+~~~
 
 ```nim
 func funValues_dl(variables: Variables; parameters: seq[Value]): FunResult
@@ -1181,7 +1181,7 @@ You have the option of sorting strings case "insensitive". Case
 
 ~~~
 sort(values: list, order: string, insensitive: optional string) list
-~~~~
+~~~
 
 Examples:
 
@@ -1198,7 +1198,7 @@ strs = list("T", "e", "a")
 sort(strs, "ascending") => ["T", "a", "e"]
 sort(strs, "ascending", "sensitive") => ["T", "a", "e"]
 sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
-~~~~
+~~~
 
 ```nim
 func funSort_lsosl(variables: Variables; parameters: seq[Value]): FunResult
@@ -1219,7 +1219,7 @@ or string.
 
 ~~~
 sort(lists: list, order: string, case: string, index: int) list
-~~~~
+~~~
 
 Examples:
 
@@ -1229,7 +1229,7 @@ l2 = list(2, 3, 4)
 listOfLists = list(l1, l2)
 sort(listOfLists, "ascending", "sensitive", 0) => [l2, l1]
 sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
-~~~~
+~~~
 
 ```nim
 func funSort_lssil(variables: Variables; parameters: seq[Value]): FunResult
@@ -1250,7 +1250,7 @@ string.
 
 ~~~
 sort(dicts: list, order: string, case: string, key: string) list
-~~~~
+~~~
 
 Examples:
 
@@ -1260,7 +1260,7 @@ d2 = dict("name", "Tea Pot", "weight", 3.5)
 dicts = list(d1, d2)
 sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
 sort(dicts, "descending", "sensitive", "name") => [d2, d1]
-~~~~
+~~~
 
 ```nim
 func funSort_lsssl(variables: Variables; parameters: seq[Value]): FunResult
@@ -1276,7 +1276,7 @@ duplicates in some cases.
 
 ~~~
 githubAnchor(name: string) string
-~~~~
+~~~
 
 Examples:
 
@@ -1284,7 +1284,7 @@ Examples:
 githubAnchor("MyHeading") => "myheading"
 githubAnchor("Eary Gray") => "eary-gray"
 githubAnchor("$Eary-Gray#") => "eary-gray"
-~~~~
+~~~
 
 Example in a markdown template:
 
@@ -1293,7 +1293,7 @@ $$ : anchor = githubAnchor(entry.name)
 * {type]{{entry.name}](#{anchor}) &mdash; {short}
 ...
 # {entry.name}
-~~~~
+~~~
 
 ```nim
 func funGithubAnchor_ss(variables: Variables; parameters: seq[Value]): FunResult
@@ -1306,7 +1306,7 @@ markdown internal links. It handles duplicate heading names.
 
 ~~~
 githubAnchor(names: list) list
-~~~~
+~~~
 
 Examples:
 
@@ -1314,7 +1314,7 @@ Examples:
 list = list("Tea", "Water", "Tea")
 githubAnchor(list) =>
   ["tea", "water", "tea-1"]
-~~~~
+~~~
 
 ```nim
 func funGithubAnchor_ll(variables: Variables; parameters: seq[Value]): FunResult
@@ -1326,7 +1326,7 @@ Return the parameter type, one of: int, float, string, list, dict, bool or func.
 
 ~~~
 type(variable: any) string
-~~~~
+~~~
 
 Examples:
 
@@ -1338,7 +1338,7 @@ type(list(1,2)) => "list"
 type(dict("a", 1)) => "dict"
 type(true) => "bool"
 type(f.cmp) => "func"
-~~~~
+~~~
 
 ```nim
 func funType_as(variables: Variables; parameters: seq[Value]): FunResult
@@ -1359,7 +1359,7 @@ used for it.
 
 ~~~
 joinPath(components: list, separator: optional string) string
-~~~~
+~~~
 
 Examples:
 
@@ -1381,7 +1381,7 @@ joinPath(["", "tea"]) =>
 
 joinPath(["/", "tea"]) =>
   "/tea"
-~~~~
+~~~
 
 ```nim
 func funJoinPath_loss(variables: Variables; parameters: seq[Value]): FunResult
@@ -1393,7 +1393,7 @@ Join a list of strings with a separator.  An optional parameter determines wheth
 
 ~~~
 join(strs: list, sep: string, skipEmpty: optional bool) string
-~~~~
+~~~
 
 Examples:
 
@@ -1406,7 +1406,7 @@ join([""], ", ") => ""
 join(["a", "b"], "") => "ab"
 join(["a", "", "c"], "|") => "a||c"
 join(["a", "", "c"], "|", true) => "a|c"
-~~~~
+~~~
 
 ```nim
 func funJoin_lsois(variables: Variables; parameters: seq[Value]): FunResult
@@ -1418,13 +1418,13 @@ Return a warning message and skip the current statement. You can call the warn f
 
 ~~~
 warn(message: string) string
-~~~~
+~~~
 
 You can warn conditionally in a bare if statement:
 
 ~~~
 if0(c, warn("message is 0"))
-~~~~
+~~~
 
 You can warn conditionally in a normal if statement. In the
 following example, if warn is called the b variable will not
@@ -1432,13 +1432,13 @@ get created.
 
 ~~~
 b = if0(c, warn("c is not 0"), "")
-~~~~
+~~~
 
 You can warn unconditionally using a bare warn statement:
 
 ~~~
 warn("always warn")
-~~~~
+~~~
 
 ```nim
 func funWarn_ss(variables: Variables; parameters: seq[Value]): FunResult
@@ -1450,7 +1450,7 @@ Log a message to the log file.  You can call the log function without an assignm
 
 ~~~
 log(message: string) string
-~~~~
+~~~
 
 You can log conditionally in a bare if statement:
 
@@ -1470,7 +1470,7 @@ You can log unconditionally using a bare log statement:
 
 ~~~
 log("always log")
-~~~~
+~~~
 
 ```nim
 func funLog_ss(variables: Variables; parameters: seq[Value]): FunResult
@@ -1492,7 +1492,7 @@ next iteration
 
 ~~~
 return(value: any) any
-~~~~
+~~~
 
 Examples:
 
@@ -1500,7 +1500,7 @@ Examples:
 return(5)
 if(c, return("stop"))
 if(c, return("skip"))
-~~~~
+~~~
 
 ```nim
 func funReturn_aa(variables: Variables; parameters: seq[Value]): FunResult
@@ -1512,7 +1512,7 @@ Convert a variable to a string. You specify the variable and optionally the type
 
 ~~~
 string(var: any, stype: optional string) string
-~~~~
+~~~
 
 The default stype is "rb" which is used for replacement blocks.
 
@@ -1534,7 +1534,7 @@ a = [1, 2, 3]
 d = dict(["x", 1, "y", 2])
 fn = cmp[[0]
 found = true
-~~~~
+~~~
 
 json:
 
@@ -1546,7 +1546,7 @@ a => [1,2,3]
 d => {"x":1,"y":2}
 fn => "cmp"
 found => true
-~~~~
+~~~
 
 rb:
 
@@ -1555,7 +1555,7 @@ Same as JSON except the following.
 ~~~
 str => Earl Grey
 fn => cmp
-~~~~
+~~~
 
 dn:
 
@@ -1565,7 +1565,7 @@ Same as JSON except the following.
 d =>
 x = 1
 y = 2
-~~~~
+~~~
 
 ```nim
 func funString_aoss(variables: Variables; parameters: seq[Value]): FunResult
@@ -1577,7 +1577,7 @@ Convert the dictionary variable to dot names. You specify the name of the dictio
 
 ~~~
 string(dictName: string: d: dict) string
-~~~~
+~~~
 
 Example:
 
@@ -1588,7 +1588,7 @@ string("teas", d) =>
 teas.x = 1
 teas.y = "tea"
 teas.z.a = 8
-~~~~
+~~~
 
 ```nim
 func funString_sds(variables: Variables; parameters: seq[Value]): FunResult
@@ -1600,7 +1600,7 @@ Format a string using replacement variables similar to a replacement block. To e
 
 ~~~
 format(str: string) string
-~~~~
+~~~
 
 Example:
 
@@ -1610,7 +1610,7 @@ let last = "Grey"
 str = format("name: {first} {last}")
 
 str => "name: Earl Grey"
-~~~~
+~~~
 
 To enter a left bracket use two in a row.
 
@@ -1618,7 +1618,7 @@ To enter a left bracket use two in a row.
 str = format("use two {{ to get one")
 
 str => "use two { to get one"
-~~~~
+~~~
 
 ```nim
 func funFormat_ss(variables: Variables; parameters: seq[Value]): FunResult
@@ -1630,7 +1630,7 @@ Define a function.
 
 ~~~
 func(signature: string) func
-~~~~
+~~~
 
 Example:
 
@@ -1641,7 +1641,7 @@ mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
   num1 = int(numStr1)
   num2 = int(numStr2)
   return(cmp(num1, num2))
-~~~~
+~~~
 
 ```nim
 func funFunc_sp(variables: Variables; parameters: seq[Value]): FunResult
@@ -1653,7 +1653,7 @@ Return the function details.
 
 ~~~
 functionDetails(funcVar: func) dict
-~~~~
+~~~
 
 The following example defines a simple function then gets its
 function details.
@@ -1677,7 +1677,7 @@ fd.filename = "testcode.tea"
 fd.lineNum = 3
 fd.numLines = 2
 fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]"""
-~~~~
+~~~
 
 ```nim
 func funFunctionDetails_pd(variables: Variables; parameters: seq[Value]): FunResult
@@ -1689,7 +1689,7 @@ Check whether a strings starts with the given prefix. Return true when it does, 
 
 ~~~
 startsWith(str: string, str: prefix) bool
-~~~~
+~~~
 
 Examples:
 
@@ -1699,7 +1699,7 @@ b = startsWith("abcdef", "abf")
 
 a => true
 b => false
-~~~~
+~~~
 
 ```nim
 func funStartsWith_ssb(variables: Variables; parameters: seq[Value]): FunResult
@@ -1711,14 +1711,14 @@ Boolean not.
 
 ~~~
 not(value: bool) bool
-~~~~
+~~~
 
 Examples:
 
 ~~~
 not(true) => false
 not(false) => true
-~~~~
+~~~
 
 ```nim
 func funNot_bb(variables: Variables; parameters: seq[Value]): FunResult
@@ -1730,7 +1730,7 @@ Boolean AND with short circuit. If the first argument is false, the second argum
 
 ~~~
 and(a: bool, b: bool) bool
-~~~~
+~~~
 
 Examples:
 
@@ -1740,7 +1740,7 @@ and(false, true) => false
 and(true, false) => false
 and(false, false) => false
 and(false, warn("not hit")) => false
-~~~~
+~~~
 
 ```nim
 func funAnd_bbb(variables: Variables; parameters: seq[Value]): FunResult
@@ -1752,7 +1752,7 @@ Boolean OR with short circuit. If the first argument is true, the second argumen
 
 ~~~
 or(a: bool, b: bool) bool
-~~~~
+~~~
 
 Examples:
 
@@ -1762,7 +1762,7 @@ or(false, true) => true
 or(true, false) => true
 or(false, false) => false
 or(true, warn("not hit")) => true
-~~~~
+~~~
 
 ```nim
 func funOr_bbb(variables: Variables; parameters: seq[Value]): FunResult
@@ -1774,14 +1774,14 @@ Return true when the two ints are equal.
 
 ~~~
 eq(a: int, b: int) bool
-~~~~
+~~~
 
 Examples:
 
 ~~~
 eq(1, 1) => true
 eq(2, 3) => false
-~~~~
+~~~
 
 ```nim
 func funEq_iib(variables: Variables; parameters: seq[Value]): FunResult
@@ -1793,14 +1793,14 @@ Return true when two floats are equal.
 
 ~~~
 eq(a: float, b: float) bool
-~~~~
+~~~
 
 Examples:
 
 ~~~
 eq(1.2, 1.2) => true
 eq(1.2, 3.2) => false
-~~~~
+~~~
 
 ```nim
 func funEq_ffb(variables: Variables; parameters: seq[Value]): FunResult
@@ -1812,14 +1812,14 @@ Return true when two strings are equal.  See [[#cmd][cmd]] for case insensitive 
 
 ~~~
 eq(a: string, b: string) bool
-~~~~
+~~~
 
 Examples:
 
 ~~~
 eq("tea", "tea") => true
 eq("1.2", "3.2") => false
-~~~~
+~~~
 
 ```nim
 func funEq_ssb(variables: Variables; parameters: seq[Value]): FunResult
@@ -1831,14 +1831,14 @@ Return true when two ints are not equal.
 
 ~~~
 ne(a: int, b: int) bool
-~~~~
+~~~
 
 Examples:
 
 ~~~
 ne(1, 1) => false
 ne(2, 3) => true
-~~~~
+~~~
 
 ```nim
 func funNe_iib(variables: Variables; parameters: seq[Value]): FunResult
@@ -1850,14 +1850,14 @@ Return true when two floats are not equal.
 
 ~~~
 ne(a: float, b: float) bool
-~~~~
+~~~
 
 Examples:
 
 ~~~
 ne(1.2, 1.2) => false
 ne(1.2, 3.2) => true
-~~~~
+~~~
 
 ```nim
 func funNe_ffb(variables: Variables; parameters: seq[Value]): FunResult
@@ -1869,14 +1869,14 @@ Return true when two strings are not equal.
 
 ~~~
 ne(a: string, b: string) bool
-~~~~
+~~~
 
 Examples:
 
 ~~~
 ne("tea", "tea") => false
 ne("earl", "grey") => true
-~~~~
+~~~
 
 ```nim
 func funNe_ssb(variables: Variables; parameters: seq[Value]): FunResult
@@ -1888,14 +1888,14 @@ Return true when an int is greater then another int.
 
 ~~~
 gt(a: int, b: int) bool
-~~~~
+~~~
 
 Examples:
 
 ~~~
 gt(2, 4) => false
 gt(3, 2) => true
-~~~~
+~~~
 
 ```nim
 func funGt_iib(variables: Variables; parameters: seq[Value]): FunResult
@@ -1907,14 +1907,14 @@ Return true when one float is greater than another float.
 
 ~~~
 gt(a: float, b: float) bool
-~~~~
+~~~
 
 Examples:
 
 ~~~
 gt(2.8, 4.3) => false
 gt(3.1, 2.5) => true
-~~~~
+~~~
 
 ```nim
 func funGt_ffb(variables: Variables; parameters: seq[Value]): FunResult
@@ -1926,14 +1926,14 @@ Return true when an int is greater then or equal to another int.
 
 ~~~
 gte(a: int, b: int) bool
-~~~~
+~~~
 
 Examples:
 
 ~~~
 gte(2, 4) => false
 gte(3, 3) => true
-~~~~
+~~~
 
 ```nim
 func funGte_iib(variables: Variables; parameters: seq[Value]): FunResult
@@ -1945,14 +1945,14 @@ Return true when a float is greater than or equal to another float.
 
 ~~~
 gte(a: float, b: float) bool
-~~~~
+~~~
 
 Examples:
 
 ~~~
 gte(2.8, 4.3) => false
 gte(3.1, 3.1) => true
-~~~~
+~~~
 
 ```nim
 func funGte_ffb(variables: Variables; parameters: seq[Value]): FunResult
@@ -1964,14 +1964,14 @@ Return true when an int is less than another int.
 
 ~~~
 lt(a: int, b: int) bool
-~~~~
+~~~
 
 Examples:
 
 ~~~
 gt(2, 4) => true
 gt(3, 2) => false
-~~~~
+~~~
 
 ```nim
 func funLt_iib(variables: Variables; parameters: seq[Value]): FunResult
@@ -1983,14 +1983,14 @@ Return true when a float is less then another float.
 
 ~~~
 lt(a: float, b: float) bool
-~~~~
+~~~
 
 Examples:
 
 ~~~
 lt(2.8, 4.3) => true
 lt(3.1, 2.5) => false
-~~~~
+~~~
 
 ```nim
 func funLt_ffb(variables: Variables; parameters: seq[Value]): FunResult
@@ -2002,7 +2002,7 @@ Return true when an int is less than or equal to another int.
 
 ~~~
 lte(a: int, b: int) bool
-~~~~
+~~~
 
 Examples:
 
@@ -2010,7 +2010,7 @@ Examples:
 lte(2, 4) => true
 lte(3, 3) => true
 lte(4, 3) => false
-~~~~
+~~~
 
 ```nim
 func funLte_iib(variables: Variables; parameters: seq[Value]): FunResult
@@ -2022,7 +2022,7 @@ Return true when a float is less than or equal to another float.
 
 ~~~
 lte(a: float, b: float) bool
-~~~~
+~~~
 
 Examples:
 
@@ -2030,7 +2030,7 @@ Examples:
 lte(2.3, 4.4) => true
 lte(3.0, 3.0) => true
 lte(4.0, 3.0) => false
-~~~~
+~~~
 
 ```nim
 func funLte_ffb(variables: Variables; parameters: seq[Value]): FunResult
@@ -2042,7 +2042,7 @@ Convert a JSON string to a variable.
 
 ~~~
 readJson(json: string) any
-~~~~
+~~~
 
 Examples:
 
@@ -2052,7 +2052,7 @@ b = readJson("4.5") => 4.5
 c = readJson("[1,2,3]") => [1, 2, 3]
 d = readJson("{"a":1, "b": 2}")
   => {"a": 1, "b", 2}
-~~~~
+~~~
 
 ```nim
 func funReadJson_sa(variables: Variables; parameters: seq[Value]): FunResult

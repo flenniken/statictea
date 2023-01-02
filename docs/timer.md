@@ -8,7 +8,7 @@ Time how long it takes something to run.
  timer = newTimer()
  # run something
  echo timer.seconds()
- ~~~~
+ ~~~
 
 * [timer.nim](../src/timer.nim) &mdash; Nim source code.
 # Index

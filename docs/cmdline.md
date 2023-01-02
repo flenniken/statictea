@@ -21,7 +21,7 @@ Parse the command line.
  else:
    # Optionally post process the resulting arguments.
    let args = newArgs(argsOrMessage.args)
- ~~~~
+ ~~~
 
  For a complete example see the bottom of the file in the isMainModule
  section.

@@ -148,7 +148,7 @@ A replacement variable is inside brackets.
 ~~~
 text on the line {variable} more text {variable2} asdf
                   ^
-~~~~
+~~~
 
 ```nim
 proc matchUpToLeftBracket(line: string; start: Natural = 0): Option[Matches]
@@ -198,7 +198,7 @@ Example call:
 
 ~~~
 let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
-~~~~
+~~~
 
 ```nim
 proc matchDotNames(line: string; start: Natural = 0): Option[Matches]
