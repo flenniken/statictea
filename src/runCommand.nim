@@ -727,51 +727,42 @@ func skipArg(statement: Statement, start: Natural): PosOr =
 proc getValueAndPos*(statement: Statement, start: Natural, variables:
   Variables): ValueAndPosOr
 
-func getSpecialFunction(dotNameStr: string, variables: Variables): SpecialFunctionOr =
-  ## Return the function type given a function name.
-
-  # Get the function or list of functions.
-  let dotNameValueOr = getVariable(variables, dotNameStr, npBuiltIn)
-  if dotNameValueOr.isMessage:
-    return newSpecialFunctionOr(dotNameValueOr.message.messageId, dotNameValueOr.message.p1)
-  let dotNameValue = dotNameValueOr.value
+func getSpecialFunction(funcVar: Value): SpecialFunction =
+  ## Return the function type given a function variable.
 
   var value: Value
-  if dotNameValue.kind == vkList:
-    let list = dotNameValue.listv
+  if funcVar.kind == vkList:
+    let list = funcVar.listv
     if list.len != 1:
       # This is not a special function because there is more than one
       # item in the list and all special functions are a list of one.
-      return newSpecialFunctionOr(spNotSpecial)
+      return spNotSpecial
     value = list[0]
   else:
-    value = dotNameValue
+    value = funcVar
 
   if value.kind != vkFunc:
-    return newSpecialFunctionOr(spNotSpecial)
+    return spNotSpecial
 
-  var spFun: SpecialFunction
   case value.funcv.signature.name
   of "if":
-    spFun = spIf
+    result = spIf
   of "if0":
-    spFun = spIf0
+    result = spIf0
   of "and":
-    spFun = spAnd
+    result = spAnd
   of "or":
-    spFun = spOr
+    result = spOr
   of "warn":
-    spFun = spWarn
+    result = spWarn
   of "return":
-    spFun = spReturn
+    result = spReturn
   of "log":
-    spFun = spLog
+    result = spLog
   of "func":
-    spFun = spFunc
+    result = spFunc
   else:
-    spFun = spNotSpecial
-
-  result = newSpecialFunctionOr(spFun)
+    result = spNotSpecial
 
 proc ifFunctions*(
     specialFunction: SpecialFunction,
@@ -1327,8 +1318,7 @@ proc getBracketedVarValue*(statement: Statement, dotName: string, dotNameLen: Na
   return newValueAndPosOr(value, runningPos)
 
 proc getValueAndPosFun(statement: Statement, start: Natural, variables:
-  Variables, dotNameStr: string, leftParenBracket:
-  string, start2: Natural): ValueAndPosOr =
+  Variables, varName: VariableName): ValueAndPosOr =
   ## Handle a function all. Start is pointing at the first character
   ## after the left parentheses or bracket.
   ## @:
@@ -1339,34 +1329,35 @@ proc getValueAndPosFun(statement: Statement, start: Natural, variables:
   ## @:            ^ ^
   ## @:~~~~
 
-  if leftParenBracket == "(":
+  if varName.leftParenBracket == "(":
     # We have a function, run it and return its value.
 
-    let specialFunctionOr = getSpecialFunction(dotNameStr, variables)
-    if specialFunctionOr.isMessage:
-      let warningData = newWarningData(specialFunctionOr.message.messageId,
-        specialFunctionOr.message.p1, start)
-      return newValueAndPosOr(warningData)
-    let specialFunction = specialFunctionOr.value
+    # Get the function variable.
+    let funcVarOr = getVariable(variables, varName.dotName, npBuiltIn)
+    if funcVarOr.isMessage:
+      return newValueAndPosOr(funcVarOr.message.messageId, funcVarOr.message.p1, start)
+    let funcVar = funcVarOr.value
+
+    let specialFunction = getSpecialFunction(funcVar)
 
     case specialFunction:
     of spIf, spIf0:
       # Handle the special IF functions.
-      return ifFunctions(specialFunction, statement, start2, variables)
+      return ifFunctions(specialFunction, statement, varName.pos, variables)
     of spAnd, spOr:
       # Handle the special AND/OR functions.
-      return andOrFunctions(specialFunction, statement, start2, variables)
+      return andOrFunctions(specialFunction, statement, varName.pos, variables)
     of spFunc:
       # Define a function in a code file and not nested.
       return newValueAndPosOr(wDefineFunction, "", start)
     of spNotSpecial, spReturn, spWarn, spLog:
       # Handle normal functions and warn, return and log.
-      return getFunctionValueAndPos(dotNameStr, statement,
-        start2, variables, list=false)
+      return getFunctionValueAndPos(varName.dotName, statement,
+        varName.pos, variables, list=false)
 
-  elif leftParenBracket == "[":
+  elif varName.leftParenBracket == "[":
     # a = list[2] or a = dict["key"]
-    return getBracketedVarValue(statement, dotNameStr, start2-start, start, variables)
+    return getBracketedVarValue(statement, varName.dotName, varName.pos-start, start, variables)
 
 proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
     Variables): ValueAndPosOr =
@@ -1416,8 +1407,7 @@ proc getValueAndPosWorker(statement: Statement, start: Natural, variables:
       return newValueAndPosOr(valueOr.value, rightName.pos)
 
     # Handle the function.
-    return getValueAndPosFun(statement, start, variables,
-      rightName.dotName, rightName.leftParenBracket, rightName.pos)
+    return getValueAndPosFun(statement, start, variables, rightName)
 
 proc getValueAndPos*(statement: Statement, start: Natural, variables:
     Variables): ValueAndPosOr =
@@ -1476,13 +1466,14 @@ proc runBareFunction*(statement: Statement, variables: Variables,
   ## @:      ^ start                 ^
   ## @:~~~~
 
+  # Get the function variable.
+  let funcVarOr = getVariable(variables, dotNameStr, npBuiltIn)
+  if funcVarOr.isMessage:
+    return newValueAndPosOr(funcVarOr.message)
+  let funcVar = funcVarOr.value
+
   # Look up the special function type.
-  let specialFunctionOr = getSpecialFunction(dotNameStr, variables)
-  if specialFunctionOr.isMessage:
-    let wd = newWarningData(specialFunctionOr.message.messageId,
-      specialFunctionOr.message.p1, start)
-    return newValueAndPosOr(wd)
-  let specialFunction = specialFunctionOr.value
+  let specialFunction = getSpecialFunction(funcVar)
 
   # Handle all the special function types.
   case specialFunction:
