@@ -47,7 +47,7 @@ Run a command and fill in the variables dictionaries.
 * [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value.
 * [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value.
 * [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and the position after it.
-* [getBracketedVarValue](#getbracketedvarvalue) &mdash; Return the value of the bracketed variable.
+* [getBracketedVarValue](#getbracketedvarvalue) &mdash; Return the value of the bracketed variable and the position after the trailing whitespace.
 * [getValueAndPos](#getvalueandpos) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
 * [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, if0, return, warn and log.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
@@ -415,6 +415,19 @@ func skipArgument(statement: Statement; startPos: Natural): PosOr
 
 Return the if/if0 function's value and position after. It conditionally runs one of its arguments and skips the other. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
 
+The three parameter if requires an assignment.  The two parameter
+version cannot have an assignment. The if function cond is a
+boolean, for if0 it is anything.
+
+cases:
+
+~~~
+a = if(cond, then, else)
+       ^                ^
+if(cond, then)
+   ^          ^
+~~~~
+
 ```nim
 proc ifFunctions(specialFunction: SpecialFunction; statement: Statement;
                  start: Natural; variables: Variables; list = false;
@@ -470,19 +483,18 @@ proc getCondition(statement: Statement; start: Natural; variables: Variables): V
 
 # getBracketedVarValue
 
-Return the value of the bracketed variable. Start points a the container variable name.
+Return the value of the bracketed variable and the position after the trailing whitespace.. Start points at the the first argument.
 
 ~~~
 a = list[ 4 ]
-    ^ sbv    ^ fbv
+          ^  ^
 a = dict[ "abc" ]
-    ^ sbv        ^ fbv
+          ^      ^
 ~~~~
 
 ```nim
-proc getBracketedVarValue(statement: Statement; dotName: string;
-                          dotNameLen: Natural; start: Natural;
-                          variables: Variables): ValueAndPosOr
+proc getBracketedVarValue(statement: Statement; start: Natural;
+                          container: Value; variables: Variables): ValueAndPosOr
 ```
 
 # getValueAndPos

@@ -725,7 +725,7 @@ func skipArgument*(statement: Statement, startPos: Natural): PosOr =
     result = newPosOr(pos)
 
 func quickExit(valueAndPosOr: ValueAndPosOr): bool =
-  ## Return true when the ValueAndPosOr is a messsage or a return or a
+  ## Return true when the ValueAndPosOr is a messsage, a return or a
   ## log.
   result = valueAndPosOr.isMessage or valueAndPosOr.value.sideEffect != seNone
 
@@ -792,16 +792,19 @@ proc ifFunctions*(
   ## conditionally runs one of its arguments and skips the
   ## other. Start points at the first argument of the function. The
   ## position includes the trailing whitespace after the ending ).
-
-  # The three parameter if requires an assignment.  The two parameter
-  # version cannot have an assignment.
-
-  # cases:
-  #   a = if(cond, then, else)
-  #          ^                ^
-  #   if(cond, then)
-  #      ^          ^
-  # The if function cond is a boolean, for if0 it is anything.
+  ## @:
+  ## @:The three parameter if requires an assignment.  The two parameter
+  ## @:version cannot have an assignment. The if function cond is a
+  ## @:boolean, for if0 it is anything.
+  ## @:
+  ## @:cases:
+  ## @:
+  ## @:~~~
+  ## @:a = if(cond, then, else)
+  ## @:       ^                ^
+  ## @:if(cond, then)
+  ## @:   ^          ^
+  ## @:~~~~
 
   # Get the condition's value.
   let vlcOr = getValueAndPos(statement, start, variables)
@@ -865,7 +868,7 @@ proc ifFunctions*(
       runningPos = posOr.value
     else:
       vl3Or = getValueAndPos(statement, runningPos, variables)
-      if vl3Or.isMessage or vl3Or.value.sideEffect != seNone:
+      if quickExit(vl3Or):
         return vl3Or
       runningPos = vl3Or.value.pos
   else:
@@ -1220,9 +1223,9 @@ proc getCondition*(statement: Statement, start: Natural,
 
     # Return a value and position after handling any nestedcondition.
     let vlRightOr = getValueOrNestedCond(statement, runningPos, variables)
-    let xyz = runningPos
     if quickExit(vlRightOr):
       return vlRightOr
+    let xyz = runningPos
     let right = vlRightOr.value.value
     runningPos = vlRightOr.value.pos
 
@@ -1282,7 +1285,7 @@ proc getBracketedVarValue*(statement: Statement, start: Natural,
 
   # Get the index/key value.
   let vAndPosOr = getValueAndPos(statement, runningPos, variables)
-  if vAndPosOr.isMessage:
+  if quickExit(vAndPosOr):
     return vAndPosOr
   let indexValue = vAndPosOr.value.value
 
