@@ -198,7 +198,7 @@ cmp(9, 2) => 1
 ~~~
 
 ```nim
-func funCmp_iii(variables: Variables; parameters: seq[Value]): FunResult
+func funCmp_iii(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funCmp_ffi
@@ -219,7 +219,7 @@ cmp(9.3, 2.2) => 1
 ~~~
 
 ```nim
-func funCmp_ffi(variables: Variables; parameters: seq[Value]): FunResult
+func funCmp_ffi(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funCmp_ssobi
@@ -245,7 +245,7 @@ cmp("Tea", "tea", false) => 0
 ~~~
 
 ```nim
-func funCmp_ssobi(variables: Variables; parameters: seq[Value]): FunResult
+func funCmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funConcat_sss
@@ -264,7 +264,7 @@ concat("a", "b") => "ab"
 ~~~
 
 ```nim
-func funConcat_sss(variables: Variables; parameters: seq[Value]): FunResult
+func funConcat_sss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funLen_si
@@ -283,7 +283,7 @@ len("añyóng") => 6
 ~~~
 
 ```nim
-func funLen_si(variables: Variables; parameters: seq[Value]): FunResult
+func funLen_si(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funLen_li
@@ -303,7 +303,7 @@ len(list(4, 5)) => 2
 ~~~
 
 ```nim
-func funLen_li(variables: Variables; parameters: seq[Value]): FunResult
+func funLen_li(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funLen_di
@@ -323,7 +323,7 @@ len(dict("a", 4, "b", 3)) => 2
 ~~~
 
 ```nim
-func funLen_di(variables: Variables; parameters: seq[Value]): FunResult
+func funLen_di(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funGet_lioaa
@@ -353,7 +353,7 @@ get(list, -4, 11) => 11
 ~~~
 
 ```nim
-func funGet_lioaa(variables: Variables; parameters: seq[Value]): FunResult
+func funGet_lioaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funGet_dsoaa
@@ -384,7 +384,7 @@ d.tea => "Earl Grey"
 ~~~
 
 ```nim
-func funGet_dsoaa(variables: Variables; parameters: seq[Value]): FunResult
+func funGet_dsoaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funIf0_iaoaa
@@ -435,7 +435,7 @@ if0(c, warn("got zero value"))
 ~~~
 
 ```nim
-func funIf0_iaoaa(variables: Variables; parameters: seq[Value]): FunResult
+func funIf0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funIf_baoaa
@@ -469,7 +469,7 @@ if(c, return("skip"))
 ~~~
 
 ```nim
-func funIf_baoaa(variables: Variables; parameters: seq[Value]): FunResult
+func funIf_baoaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funAdd_iii
@@ -489,7 +489,7 @@ add(-2, -5) => -7
 ~~~
 
 ```nim
-func funAdd_iii(variables: Variables; parameters: seq[Value]): FunResult
+func funAdd_iii(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funAdd_fff
@@ -508,7 +508,7 @@ add(3.2, -2.2) => 1.0
 ~~~
 
 ```nim
-func funAdd_fff(variables: Variables; parameters: seq[Value]): FunResult
+func funAdd_fff(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funExists_dsb
@@ -528,7 +528,7 @@ exists(d, "coffee") => false
 ~~~
 
 ```nim
-func funExists_dsb(variables: Variables; parameters: seq[Value]): FunResult
+func funExists_dsb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funCase_iloaa
@@ -563,7 +563,7 @@ case(3, cases, "wine") => "wine"
 ~~~
 
 ```nim
-func funCase_iloaa(variables: Variables; parameters: seq[Value]): FunResult
+func funCase_iloaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funCase_sloaa
@@ -597,7 +597,7 @@ case("bunch", cases, "other") => "other"
 ~~~
 
 ```nim
-func funCase_sloaa(variables: Variables; parameters: seq[Value]): FunResult
+func funCase_sloaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # parseVersion
@@ -630,7 +630,7 @@ cmpVersion("1.2.5", "1.2.5") => 0
 ~~~
 
 ```nim
-func funCmpVersion_ssi(variables: Variables; parameters: seq[Value]): FunResult
+func funCmpVersion_ssi(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funFloat_if
@@ -649,7 +649,7 @@ float(-33) => -33.0
 ~~~
 
 ```nim
-func funFloat_if(variables: Variables; parameters: seq[Value]): FunResult
+func funFloat_if(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funFloat_sf
@@ -669,7 +669,7 @@ float("33") => 33.0
 ~~~
 
 ```nim
-func funFloat_sf(variables: Variables; parameters: seq[Value]): FunResult
+func funFloat_sf(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funFloat_saa
@@ -688,7 +688,7 @@ float("notnum", "nan") => nan
 ~~~
 
 ```nim
-func funFloat_saa(variables: Variables; parameters: seq[Value]): FunResult
+func funFloat_saa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funInt_fosi
@@ -723,7 +723,7 @@ int(-6.3456, "truncate") => -6
 ~~~
 
 ```nim
-func funInt_fosi(variables: Variables; parameters: seq[Value]): FunResult
+func funInt_fosi(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funInt_sosi
@@ -758,7 +758,7 @@ int("-6.3456", "truncate") => -6
 ~~~
 
 ```nim
-func funInt_sosi(variables: Variables; parameters: seq[Value]): FunResult
+func funInt_sosi(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funInt_ssaa
@@ -784,7 +784,7 @@ int("notnum", "round", "nan") => nan
 ~~~
 
 ```nim
-func funInt_ssaa(variables: Variables; parameters: seq[Value]): FunResult
+func funInt_ssaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # if0Condition
@@ -830,7 +830,7 @@ bool(dict("tea", 2)) => true
 ~~~
 
 ```nim
-func funBool_ab(variables: Variables; parameters: seq[Value]): FunResult
+func funBool_ab(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funFind_ssoaa
@@ -858,7 +858,7 @@ find(msg, "party", 0) = 0
 ~~~
 
 ```nim
-func funFind_ssoaa(variables: Variables; parameters: seq[Value]): FunResult
+func funFind_ssoaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funSlice_siois
@@ -883,7 +883,7 @@ slice("añyóng", 0, 3) => "añy"
 ~~~
 
 ```nim
-func funSlice_siois(variables: Variables; parameters: seq[Value]): FunResult
+func funSlice_siois(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funDup_sis
@@ -906,7 +906,7 @@ dup("", 3) => ""
 ~~~
 
 ```nim
-func funDup_sis(variables: Variables; parameters: seq[Value]): FunResult
+func funDup_sis(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funDict_old
@@ -928,7 +928,7 @@ dict(list("a", 5, "b", 33, "c", 0)) =>
 ~~~
 
 ```nim
-func funDict_old(variables: Variables; parameters: seq[Value]): FunResult
+func funDict_old(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funList
@@ -953,7 +953,7 @@ a = ["a", 5, "b"]
 ~~~
 
 ```nim
-func funList(variables: Variables; parameters: seq[Value]): FunResult
+func funList(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funReplace_siiss
@@ -1016,7 +1016,7 @@ replace("", 0, 0, "abcd") => abcd
 ~~~
 
 ```nim
-func funReplace_siiss(variables: Variables; parameters: seq[Value]): FunResult
+func funReplace_siiss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funReplaceRe_sls
@@ -1042,7 +1042,7 @@ For developing and debugging regular expressions see the
 website: https://regex101.com/
 
 ```nim
-func funReplaceRe_sls(variables: Variables; parameters: seq[Value]): FunResult
+func funReplaceRe_sls(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # PathComponents
@@ -1106,7 +1106,7 @@ path("src\functions.nim", "\") => {
 ~~~
 
 ```nim
-func funPath_sosd(variables: Variables; parameters: seq[Value]): FunResult
+func funPath_sosd(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funLower_ss
@@ -1126,7 +1126,7 @@ lower("TEĀ") => "teā"
 ~~~
 
 ```nim
-func funLower_ss(variables: Variables; parameters: seq[Value]): FunResult
+func funLower_ss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funKeys_dl
@@ -1146,7 +1146,7 @@ values(d) => ["apple", 2, 3]
 ~~~
 
 ```nim
-func funKeys_dl(variables: Variables; parameters: seq[Value]): FunResult
+func funKeys_dl(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funValues_dl
@@ -1166,7 +1166,7 @@ values(d) => ["apple", 2, 3]
 ~~~
 
 ```nim
-func funValues_dl(variables: Variables; parameters: seq[Value]): FunResult
+func funValues_dl(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funSort_lsosl
@@ -1201,7 +1201,7 @@ sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
 ~~~
 
 ```nim
-func funSort_lsosl(variables: Variables; parameters: seq[Value]): FunResult
+func funSort_lsosl(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funSort_lssil
@@ -1232,7 +1232,7 @@ sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
 ~~~
 
 ```nim
-func funSort_lssil(variables: Variables; parameters: seq[Value]): FunResult
+func funSort_lssil(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funSort_lsssl
@@ -1263,7 +1263,7 @@ sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 ~~~
 
 ```nim
-func funSort_lsssl(variables: Variables; parameters: seq[Value]): FunResult
+func funSort_lsssl(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funGithubAnchor_ss
@@ -1296,7 +1296,7 @@ $$ : anchor = githubAnchor(entry.name)
 ~~~
 
 ```nim
-func funGithubAnchor_ss(variables: Variables; parameters: seq[Value]): FunResult
+func funGithubAnchor_ss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funGithubAnchor_ll
@@ -1317,7 +1317,7 @@ githubAnchor(list) =>
 ~~~
 
 ```nim
-func funGithubAnchor_ll(variables: Variables; parameters: seq[Value]): FunResult
+func funGithubAnchor_ll(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funType_as
@@ -1341,7 +1341,7 @@ type(f.cmp) => "func"
 ~~~
 
 ```nim
-func funType_as(variables: Variables; parameters: seq[Value]): FunResult
+func funType_as(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funJoinPath_loss
@@ -1384,7 +1384,7 @@ joinPath(["/", "tea"]) =>
 ~~~
 
 ```nim
-func funJoinPath_loss(variables: Variables; parameters: seq[Value]): FunResult
+func funJoinPath_loss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funJoin_lsois
@@ -1409,7 +1409,7 @@ join(["a", "", "c"], "|", true) => "a|c"
 ~~~
 
 ```nim
-func funJoin_lsois(variables: Variables; parameters: seq[Value]): FunResult
+func funJoin_lsois(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funWarn_ss
@@ -1441,7 +1441,7 @@ warn("always warn")
 ~~~
 
 ```nim
-func funWarn_ss(variables: Variables; parameters: seq[Value]): FunResult
+func funWarn_ss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funLog_ss
@@ -1473,7 +1473,7 @@ log("always log")
 ~~~
 
 ```nim
-func funLog_ss(variables: Variables; parameters: seq[Value]): FunResult
+func funLog_ss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funReturn_aa
@@ -1503,7 +1503,7 @@ if(c, return("skip"))
 ~~~
 
 ```nim
-func funReturn_aa(variables: Variables; parameters: seq[Value]): FunResult
+func funReturn_aa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funString_aoss
@@ -1568,7 +1568,7 @@ y = 2
 ~~~
 
 ```nim
-func funString_aoss(variables: Variables; parameters: seq[Value]): FunResult
+func funString_aoss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funString_sds
@@ -1591,7 +1591,7 @@ teas.z.a = 8
 ~~~
 
 ```nim
-func funString_sds(variables: Variables; parameters: seq[Value]): FunResult
+func funString_sds(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funFormat_ss
@@ -1621,7 +1621,7 @@ str => "use two { to get one"
 ~~~
 
 ```nim
-func funFormat_ss(variables: Variables; parameters: seq[Value]): FunResult
+func funFormat_ss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funFunc_sp
@@ -1644,7 +1644,7 @@ mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
 ~~~
 
 ```nim
-func funFunc_sp(variables: Variables; parameters: seq[Value]): FunResult
+func funFunc_sp(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funFunctionDetails_pd
@@ -1680,7 +1680,7 @@ fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]"""
 ~~~
 
 ```nim
-func funFunctionDetails_pd(variables: Variables; parameters: seq[Value]): FunResult
+func funFunctionDetails_pd(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funStartsWith_ssb
@@ -1702,7 +1702,7 @@ b => false
 ~~~
 
 ```nim
-func funStartsWith_ssb(variables: Variables; parameters: seq[Value]): FunResult
+func funStartsWith_ssb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funNot_bb
@@ -1721,7 +1721,7 @@ not(false) => true
 ~~~
 
 ```nim
-func funNot_bb(variables: Variables; parameters: seq[Value]): FunResult
+func funNot_bb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funAnd_bbb
@@ -1743,7 +1743,7 @@ and(false, warn("not hit")) => false
 ~~~
 
 ```nim
-func funAnd_bbb(variables: Variables; parameters: seq[Value]): FunResult
+func funAnd_bbb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funOr_bbb
@@ -1765,7 +1765,7 @@ or(true, warn("not hit")) => true
 ~~~
 
 ```nim
-func funOr_bbb(variables: Variables; parameters: seq[Value]): FunResult
+func funOr_bbb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funEq_iib
@@ -1784,7 +1784,7 @@ eq(2, 3) => false
 ~~~
 
 ```nim
-func funEq_iib(variables: Variables; parameters: seq[Value]): FunResult
+func funEq_iib(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funEq_ffb
@@ -1803,7 +1803,7 @@ eq(1.2, 3.2) => false
 ~~~
 
 ```nim
-func funEq_ffb(variables: Variables; parameters: seq[Value]): FunResult
+func funEq_ffb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funEq_ssb
@@ -1822,7 +1822,7 @@ eq("1.2", "3.2") => false
 ~~~
 
 ```nim
-func funEq_ssb(variables: Variables; parameters: seq[Value]): FunResult
+func funEq_ssb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funNe_iib
@@ -1841,7 +1841,7 @@ ne(2, 3) => true
 ~~~
 
 ```nim
-func funNe_iib(variables: Variables; parameters: seq[Value]): FunResult
+func funNe_iib(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funNe_ffb
@@ -1860,7 +1860,7 @@ ne(1.2, 3.2) => true
 ~~~
 
 ```nim
-func funNe_ffb(variables: Variables; parameters: seq[Value]): FunResult
+func funNe_ffb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funNe_ssb
@@ -1879,7 +1879,7 @@ ne("earl", "grey") => true
 ~~~
 
 ```nim
-func funNe_ssb(variables: Variables; parameters: seq[Value]): FunResult
+func funNe_ssb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funGt_iib
@@ -1898,7 +1898,7 @@ gt(3, 2) => true
 ~~~
 
 ```nim
-func funGt_iib(variables: Variables; parameters: seq[Value]): FunResult
+func funGt_iib(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funGt_ffb
@@ -1917,7 +1917,7 @@ gt(3.1, 2.5) => true
 ~~~
 
 ```nim
-func funGt_ffb(variables: Variables; parameters: seq[Value]): FunResult
+func funGt_ffb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funGte_iib
@@ -1936,7 +1936,7 @@ gte(3, 3) => true
 ~~~
 
 ```nim
-func funGte_iib(variables: Variables; parameters: seq[Value]): FunResult
+func funGte_iib(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funGte_ffb
@@ -1955,7 +1955,7 @@ gte(3.1, 3.1) => true
 ~~~
 
 ```nim
-func funGte_ffb(variables: Variables; parameters: seq[Value]): FunResult
+func funGte_ffb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funLt_iib
@@ -1974,7 +1974,7 @@ gt(3, 2) => false
 ~~~
 
 ```nim
-func funLt_iib(variables: Variables; parameters: seq[Value]): FunResult
+func funLt_iib(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funLt_ffb
@@ -1993,7 +1993,7 @@ lt(3.1, 2.5) => false
 ~~~
 
 ```nim
-func funLt_ffb(variables: Variables; parameters: seq[Value]): FunResult
+func funLt_ffb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funLte_iib
@@ -2013,7 +2013,7 @@ lte(4, 3) => false
 ~~~
 
 ```nim
-func funLte_iib(variables: Variables; parameters: seq[Value]): FunResult
+func funLte_iib(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funLte_ffb
@@ -2033,7 +2033,7 @@ lte(4.0, 3.0) => false
 ~~~
 
 ```nim
-func funLte_ffb(variables: Variables; parameters: seq[Value]): FunResult
+func funLte_ffb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funReadJson_sa
@@ -2055,7 +2055,7 @@ d = readJson("{"a":1, "b": 2}")
 ~~~
 
 ```nim
-func funReadJson_sa(variables: Variables; parameters: seq[Value]): FunResult
+func funReadJson_sa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # functionsList

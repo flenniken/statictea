@@ -2777,7 +2777,6 @@ z = l.zero()
 l.zero = "zero"
 o = {}
 """
-    # todo: shouldn't be able to change o variables in user functions.
     let eErrLines: seq[string] = splitNewLines """
 testcode.tea(4): w182: You can only change code variables (o) in code files.
 statement:   o.a = 3
