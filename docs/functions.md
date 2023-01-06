@@ -45,7 +45,8 @@ their values.
 * [funSlice_siois](#funslice_siois) &mdash; Extract a substring from a string by its position and length.
 * [funDup_sis](#fundup_sis) &mdash; Duplicate a string x times.
 * [funDict_old](#fundict_old) &mdash; Create a dictionary from a list of key, value pairs.
-* [funList](#funlist) &mdash; Create a list of variables.
+* [funList_al](#funlist_al) &mdash; Create a list of variables.
+* [funListLoop_lpoal](#funlistloop_lpoal) &mdash; You use the list function with a callback to make a new list.
 * [funReplace_siiss](#funreplace_siiss) &mdash; Replace a substring specified by its position and length with another string.
 * [funReplaceRe_sls](#funreplacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
 * type: [PathComponents](#pathcomponents) &mdash; PathComponents holds the components of the file path components.
@@ -931,7 +932,7 @@ dict(list("a", 5, "b", 33, "c", 0)) =>
 func funDict_old(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funList
+# funList_al
 
 Create a list of variables. You can also create a list with brackets.
 
@@ -953,7 +954,53 @@ a = ["a", 5, "b"]
 ~~~
 
 ```nim
-func funList(variables: Variables; arguments: seq[Value]): FunResult
+func funList_al(variables: Variables; arguments: seq[Value]): FunResult
+```
+
+# funListLoop_lpoal
+
+You use the list function with a callback to make a new list. The callback function is called for each item in the list.
+
+You pass a list, a callback function and an optional state
+variable. The state will get passed to the callback.  The list
+function signature:
+
+~~~
+list(a: list, callback: func, state: optional any) list
+~~~
+
+Callback signature:
+
+~~~
+callback(ix: int, item: any, state: optional any) list
+~~~
+
+The callback returns two values in a list. The first value tells
+whether to add the item, skip the item, or stop the loop. It is a
+string of “add”, “skip”, or “stop”.  The second value is the value
+to add to the new list for the add case.
+
+The following example makes a new list [6, 8] from the list
+[2,4,6,8].  The callback is called b5.
+
+~~~
+newList = list([2,4,6,8], b5)
+  => [6, 8]
+~~~
+
+Below is the definition of the b5 callback function.
+
+~~~
+b5 = func(“b5(ix: int, value: any, state: optional any) list”)
+  ## List callback that uses
+  ## values greater than 5.
+  result &= if( (value > 5), “add”, “skip“)
+  result &= value
+  return(result)
+~~~
+
+```nim
+func funListLoop_lpoal(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # funReplace_siiss
@@ -2091,13 +2138,14 @@ functionsList = [("add", funAdd_fff, "fff"), ("add", funAdd_iii, "iii"),
                  ("joinPath", funJoinPath_loss, "loss"),
                  ("keys", funKeys_dl, "dl"), ("len", funLen_di, "di"),
                  ("len", funLen_li, "li"), ("len", funLen_si, "si"),
-                 ("list", funList, "al"), ("log", funLog_ss, "si"),
-                 ("lower", funLower_ss, "ss"), ("lt", funLt_ffb, "ffb"),
-                 ("lt", funLt_iib, "iib"), ("lte", funLte_ffb, "ffb"),
-                 ("lte", funLte_iib, "iib"), ("ne", funNe_ffb, "ffb"),
-                 ("ne", funNe_iib, "iib"), ("ne", funNe_ssb, "ssb"),
-                 ("not", funNot_bb, "bb"), ("or", funOr_bbb, "bbb"),
-                 ("path", funPath_sosd, "sosd"),
+                 ("list", funList_al, "al"),
+                 ("listLoop", funListLoop_lpoal, "lpoal"),
+                 ("log", funLog_ss, "si"), ("lower", funLower_ss, "ss"),
+                 ("lt", funLt_ffb, "ffb"), ("lt", funLt_iib, "iib"),
+                 ("lte", funLte_ffb, "ffb"), ("lte", funLte_iib, "iib"),
+                 ("ne", funNe_ffb, "ffb"), ("ne", funNe_iib, "iib"),
+                 ("ne", funNe_ssb, "ssb"), ("not", funNot_bb, "bb"),
+                 ("or", funOr_bbb, "bbb"), ("path", funPath_sosd, "sosd"),
                  ("readJson", funReadJson_sa, "sa"),
                  ("replace", funReplace_siiss, "siiss"),
                  ("replaceRe", funReplaceRe_sls, "sls"),

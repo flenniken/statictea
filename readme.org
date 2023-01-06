@@ -2652,6 +2652,7 @@ List of functions:
 - [[#len][len]] -- Number of elements in a dictionary.
 - [[#len][len]] -- Number of elements in a list.
 - [[#len][len]] -- Number of unicode characters in a string.
+- [[#listLoop][listLoop]] -- You use the list function with a callback to make a new list.
 - [[#list][list]] -- Create a list of variables.
 - [[#log][log]] -- Log a message to the log file.
 - [[#lower][lower]] -- Lowercase a string.
@@ -3819,6 +3820,53 @@ Examples:
 len("tea") => 3
 len("añyóng") => 6
 #+END_SRC
+
+[[#contents][茶]]
+
+** listLoop
+:PROPERTIES:
+:CUSTOM_ID: listLoop
+:END:
+
+You use the list function with a callback to make a new list. The callback function is called for each item in the list.
+
+You pass a list, a callback function and an optional state
+variable. The state will get passed to the callback.  The list
+function signature:
+
+#+BEGIN_SRC
+list(a: list, callback: func, state: optional any) list
+#+END_SRC
+
+Callback signature:
+
+#+BEGIN_SRC
+callback(ix: int, item: any, state: optional any) list
+#+END_SRC
+
+The callback returns two values in a list. The first value tells
+whether to add the item, skip the item, or stop the loop. It is a
+string of “add”, “skip”, or “stop”.  The second value is the value
+to add to the new list for the add case.
+
+The following example makes a new list [6, 8] from the list
+[2,4,6,8].  The callback is called b5.
+
+#+BEGIN_SRC
+newList = list([2,4,6,8], b5)
+  => [6, 8]
+#+BEGIN_SRC
+
+Below is the definition of the b5 callback function.
+
+#+BEGIN_SRC
+b5 = func(“b5(ix: int, value: any, state: optional any) list”)
+  ## List callback that uses
+  ## values greater than 5.
+  result &= if( (value > 5), “add”, “skip“)
+  result &= value
+  return(result)
+#+BEGIN_SRC
 
 [[#contents][茶]]
 

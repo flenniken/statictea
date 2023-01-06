@@ -48,6 +48,7 @@ Run a command and fill in the variables dictionaries.
 * [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value.
 * [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and the position after it.
 * [getBracketedVarValue](#getbracketedvarvalue) &mdash; Return the value of the bracketed variable and the position after the trailing whitespace.
+* [listLoop](#listloop) &mdash; Make a new list from an existing list.
 * [getValueAndPos](#getvalueandpos) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
 * [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, if0, return, warn and log.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
@@ -83,14 +84,15 @@ PosOr = OpResultWarn[Natural]
 The special functions.
 
 * spNotSpecial -- not a special function
-* spIf -- if function.
-* spIf0 -- if0 function.
-* spWarn -- warn function.
-* spLog -- log function.
-* spReturn -- return function.
-* spAnd -- and function.
-* spOr -- or function.
-* spFunc -- func function.
+* spIf -- if function
+* spIf0 -- if0 function
+* spWarn -- warn function
+* spLog -- log function
+* spReturn -- return function
+* spAnd -- and function
+* spOr -- or function
+* spFunc -- func function
+* spList -- list with callback function
 
 ```nim
 SpecialFunction
@@ -506,6 +508,26 @@ a = dict[ "abc" ]
 ```nim
 proc getBracketedVarValue(env: var Env; statement: Statement; start: Natural;
                           container: Value; variables: Variables): ValueAndPosOr
+```
+
+# listLoop
+
+Make a new list from an existing list. The callback function is called for each item in the list and determines what goes in the new list.  See funList_lpoal in functions.nim for more information.
+
+Return the listLoop value and the ending position.  Start
+points at the first parameter of the function. The position
+includes the trailing whitespace after the ending right
+parentheses.
+
+~~~
+newList = listLoop(list, callback, state)
+                   ^                     ^
+~~~
+
+```nim
+proc listLoop(env: var Env; specialFunction: SpecialFunction;
+              statement: Statement; start: Natural; variables: Variables;
+              list = false): ValueAndPosOr
 ```
 
 # getValueAndPos

@@ -1207,7 +1207,7 @@ func funDict_old*(variables: Variables, arguments: seq[Value]): FunResult =
 
   result = newFunResult(newValue(dict))
 
-func funList*(variables: Variables, arguments: seq[Value]): FunResult =
+func funList_al*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a list of variables. You can also create a list with brackets.
   ## @:
   ## @:~~~
@@ -1228,6 +1228,53 @@ func funList*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:~~~~
 
   result = newFunResult(newValue(arguments))
+
+func funListLoop_lpoal*(variables: Variables, arguments: seq[Value]): FunResult =
+  ## You use the list function with a callback to make a new list.
+  ## The callback function is called for each item in the list.
+  ## @:
+  ## @:You pass a list, a callback function and an optional state
+  ## @:variable. The state will get passed to the callback.  The list
+  ## @:function signature:
+  ## @:
+  ## @:~~~
+  ## @:list(a: list, callback: func, state: optional any) list
+  ## @:~~~~
+  ## @:
+  ## @:Callback signature:
+  ## @:
+  ## @:~~~
+  ## @:callback(ix: int, item: any, state: optional any) list
+  ## @:~~~~
+  ## @:
+  ## @:The callback returns two values in a list. The first value tells
+  ## @:whether to add the item, skip the item, or stop the loop. It is a
+  ## @:string of “add”, “skip”, or “stop”.  The second value is the value
+  ## @:to add to the new list for the add case.
+  ## @:
+  ## @:The following example makes a new list [6, 8] from the list
+  ## @:[2,4,6,8].  The callback is called b5.
+  ## @:
+  ## @:~~~
+  ## @:newList = list([2,4,6,8], b5)
+  ## @:  => [6, 8]
+  ## @:~~~
+  ## @:
+  ## @:Below is the definition of the b5 callback function.
+  ## @:
+  ## @:~~~
+  ## @:b5 = func(“b5(ix: int, value: any, state: optional any) list”)
+  ## @:  ## List callback that uses
+  ## @:  ## values greater than 5.
+  ## @:  result &= if( (value > 5), “add”, “skip“)
+  ## @:  result &= value
+  ## @:  return(result)
+  ## @:~~~
+
+  # Note: This function is handled in runCommand as a special
+  # case. This code is not run. It is here for the function list and
+  # for documentation.
+  result = newFunResult(newValue(0))
 
 func funReplace_siiss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Replace a substring specified by its position and length with
@@ -1287,7 +1334,6 @@ func funReplace_siiss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:replace("", 0, 0, "abc") => abc
   ## @:replace("", 0, 0, "abcd") => abcd
   ## @:~~~~
-
 
   tMapParameters("replace", "siiss")
 
@@ -2659,7 +2705,8 @@ const
     ("len", funLen_di, "di"),
     ("len", funLen_li, "li"),
     ("len", funLen_si, "si"),
-    ("list", funList, "al"),
+    ("list", funList_al, "al"),
+    ("listLoop", funListLoop_lpoal, "lpoal"),
     ("log", funLog_ss, "si"),
     ("lower", funLower_ss, "ss"),
     ("lt", funLt_ffb, "ffb"),

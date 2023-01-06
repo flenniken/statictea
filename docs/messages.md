@@ -264,7 +264,14 @@ MessageId = enum
   wNoReturnStatement,       ## w240
   wLeftHandBracket,         ## w241
   wUserFunctionWarning,     ## w242
-  wWrongReturnType           ## w243
+  wWrongReturnType,         ## w243
+  wCallbackReturn,          ## w244
+  wCallbackStr,             ## w245
+  wExpectedListArg,         ## w246
+  wExceptionFunctionArg,    ## w247
+  wCallbackReturnType,      ## w248
+  wCallback2Or3,            ## w249
+  wCallbackIntParam          ## w250
 ```
 
 # Messages
@@ -516,7 +523,14 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Out of lines; missing the function\'s return statement.", ## wNoReturnStatement
     "You cannot use bracket notation to change a variable.", ## wLeftHandBracket
     "The user function generated a warning.", ## wUserFunctionWarning
-    "Wrong return type, got $1."]
+    "Wrong return type, got $1.", ## wWrongReturnType
+    "Expected the callback return\'s value to be a list with a string and a value.", ## wCallbackReturn
+    "Expected the callback\'s return string to be \'stop\', \'skip\' or \'add\'.", ## wCallbackStr
+    "Expected list argument, got $1.", ## wExpectedListArg
+    "Expected a callback function, got $1.", ## wExceptionFunctionArg
+    "Expected the callback\'s return type to be a list, got: $1.", ## wCallbackReturnType
+    "Expected 2 or 3 callback parameters, got $1.", ## wCallback2Or3
+    "Expected the callback\'s first parameter to be an int, got $1."]
 ```
 
 # WarningData

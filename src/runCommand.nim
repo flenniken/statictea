@@ -36,14 +36,15 @@ type
     ## The special functions.
     ## @:
     ## @:* spNotSpecial -- not a special function
-    ## @:* spIf -- if function.
-    ## @:* spIf0 -- if0 function.
-    ## @:* spWarn -- warn function.
-    ## @:* spLog -- log function.
-    ## @:* spReturn -- return function.
-    ## @:* spAnd -- and function.
-    ## @:* spOr -- or function.
-    ## @:* spFunc -- func function.
+    ## @:* spIf -- if function
+    ## @:* spIf0 -- if0 function
+    ## @:* spWarn -- warn function
+    ## @:* spLog -- log function
+    ## @:* spReturn -- return function
+    ## @:* spAnd -- and function
+    ## @:* spOr -- or function
+    ## @:* spFunc -- func function
+    ## @:* spList -- list with callback function
     spNotSpecial = "not-special",
     spIf = "if",
     spIf0 = "if0",
@@ -53,6 +54,7 @@ type
     spAnd = "and",
     spOr = "or",
     spFunc = "func",
+    spListLoop = "listLoop",
 
   SpecialFunctionOr* = OpResultWarn[SpecialFunction]
     ## A SpecialFunction or a warning message.
@@ -755,15 +757,14 @@ func getSpecialFunction(funcVar: Value): SpecialFunction =
   var value: Value
   if funcVar.kind == vkList:
     let list = funcVar.listv
-    if list.len != 1:
-      # This is not a special function because there is more than one
-      # item in the list and all special functions are a list of one.
+    if list.len < 1:
       return spNotSpecial
     value = list[0]
   else:
     value = funcVar
 
-  if value.kind != vkFunc:
+  # All special functions are built-in functions.
+  if not (value.kind == vkFunc and value.funcv.builtIn):
     return spNotSpecial
 
   case value.funcv.signature.name
@@ -783,6 +784,8 @@ func getSpecialFunction(funcVar: Value): SpecialFunction =
     result = spLog
   of "func":
     result = spFunc
+  of "listLoop":
+    result = spListLoop
   else:
     result = spNotSpecial
 
@@ -1327,6 +1330,130 @@ proc getBracketedVarValue*(env: var Env, statement: Statement, start: Natural,
 
   return newValueAndPosOr(value, runningPos)
 
+proc funListLoop(env: var Env, variables: Variables,
+    list: Value, callback: Value, state: Value): FunResult =
+  ## Build and return a new list by calling the callback for each item
+  ## in the given list.
+
+  # Create a new list from an existing list.
+  var newList = newSeq[Value]()
+  for ix, value in list.listv:
+
+    # Call the callback.
+    # callback(ix: int, item: any, state: optional any) list
+    var callbackArgs = newSeq[Value]()
+    callbackArgs.add(newValue(ix))
+    callbackArgs.add(value)
+    callbackArgs.add(state)
+    let callResult = callUserFunction(env, callback, variables, callbackArgs)
+    if callResult.kind == frWarning:
+      return callResult
+
+    # Add the new item to the new list, if appropriate.
+    if callResult.kind == frWarning:
+      return callResult
+    let retList = callResult.value
+    if not (retList.kind == vkList and retList.listv.len == 2 and
+            retList.listv[0].kind == vkString):
+      # Expected the callback return's value to be a list with a string and a value.
+      return newFunResultWarn(wCallbackReturn)
+    case retList.listv[0].stringv
+    of "stop":
+      break
+    of "skip":
+      continue
+    of "add":
+      newList.add(retList.listv[1])
+    else:
+      # Expected the callback's return first list item to be 'stop', 'skip' or 'add'.
+      return newFunResultWarn(wCallbackStr)
+
+    # todo: free the return list's memory.
+
+  result = newFunResult(newValue(newList))
+
+proc listLoop*(
+    env: var Env,
+    specialFunction: SpecialFunction,
+    statement: Statement,
+    start: Natural,
+    variables: Variables,
+    list=false): ValueAndPosOr =
+  ## Make a new list from an existing list. The callback function is
+  ## called for each item in the list and determines what goes in the
+  ## new list.  See funList_lpoal in functions.nim for more
+  ## information.
+  ## @:
+  ## @:Return the listLoop value and the ending position.  Start
+  ## @:points at the first parameter of the function. The position
+  ## @:includes the trailing whitespace after the ending right
+  ## @:parentheses.
+  ## @:
+  ## @:~~~
+  ## @:newList = listLoop(list, callback, state)
+  ## @:                   ^                     ^
+  ## @:~~~~
+
+  # Get the list argument value.
+  let listVarOr = getValueAndPos(env, statement, start, variables)
+  if quickExit(listVarOr):
+    return listVarOr
+  let listVar = listVarOr.value.value
+  var runningPos = listVarOr.value.pos
+  if listVar.kind != vkList:
+    # Expected list argument, got $1.
+    return newValueAndPosOr(wExpectedListArg, $listVar.kind, start)
+
+  # Get the callback argument value.
+  let callbackVarOr = getValueAndPos(env, statement, runningPos, variables)
+  if quickExit(callbackVarOr):
+    return callbackVarOr
+  let callbackVar = callbackVarOr.value.value
+  runningPos = callbackVarOr.value.pos
+  if callbackVar.kind != vkList:
+    # Expected a callback function, got $1.
+    return newValueAndPosOr(wExceptionFunctionArg, $callbackVar.kind, start)
+
+  # Validate the callback signature.
+  # callback(ix: int, item: any, state: optional any) list
+  let signature = callbackVar.funcv.signature
+  if signature.returnType != ptList:
+    # Expected the callback's return type to be a list, got: $1.
+    return newValueAndPosOr(wCallbackReturnType, $signature.returnType, runningPos)
+  if signature.params.len != 3 and signature.params.len != 2:
+    # Expected 2 or 3 callback parameters, got $1.
+    return newValueAndPosOr(wCallback2Or3, $signature.params.len, runningPos)
+  if signature.params[0].paramType != ptInt:
+    # Expected the callback's first parameter to be an int, got $1.
+    return newValueAndPosOr(wCallbackIntParam, $signature.params[0].paramType, runningPos)
+
+  var stateVar: Value
+  # Match ) and trailing whitespace.
+  var parenO = matchSymbol(statement.text, gRightParentheses, runningPos)
+  if parenO.isSome:
+    stateVar = newValue(0)
+    runningPos += parenO.get().length
+  else:
+    # Get the state argument value.
+    let stateVarOr = getValueAndPos(env, statement, runningPos, variables)
+    if quickExit(stateVarOr):
+      return stateVarOr
+    stateVar = stateVarOr.value.value
+    runningPos = stateVarOr.value.pos
+
+    # Match ) and trailing whitespace.
+    parenO = matchSymbol(statement.text, gRightParentheses, runningPos)
+    if not parenO.isSome:
+      # No matching end right parentheses.
+      return newValueAndPosOr(wNoMatchingParen, "", runningPos)
+    runningPos = stateVarOr.value.pos
+
+  let funResult = funListLoop(env, variables, listVar, callbackVar, stateVar)
+  if funResult.kind == frWarning:
+    return newValueAndPosOr(funResult.warningData)
+
+  return newValueAndPosOr(funResult.value, runningPos)
+
 proc getValueAndPosWorker(env: var Env, statement: Statement, start: Natural, variables:
     Variables): ValueAndPosOr =
   ## Get the value, position and side effect from the statement. Start
@@ -1408,6 +1535,9 @@ proc getValueAndPosWorker(env: var Env, statement: Statement, start: Natural, va
       of spAnd, spOr:
         # Handle the special AND/OR functions.
         return andOrFunctions(env, specialFunction, statement, rightName.pos, variables)
+      of spListLoop:
+        # Handle the special listLoop function.
+        return listLoop(env, specialFunction, statement, rightName.pos, variables)
       of spFunc:
         # Define a function in a code file and not nested.
         return newValueAndPosOr(wDefineFunction, "", start)
@@ -1496,7 +1626,7 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
   of spIf, spIf0:
     # Handle the special bare if functions.
     result = ifFunctions(env, specialFunction, statement, runningPos, variables, bare=true)
-  of spNotSpecial, spAnd, spOr, spFunc:
+  of spNotSpecial, spAnd, spOr, spFunc, spListLoop:
     # Missing left hand side and operator, e.g. a = len(b) not len(b).
     result = newValueAndPosOr(wMissingLeftAndOpr, "", start)
   of spReturn, spWarn, spLog:
