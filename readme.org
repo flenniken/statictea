@@ -592,12 +592,13 @@ control where the output goes, how many times it repeats and
 other aspects controlling a command.
 
 A variable name starts with a letter followed by letters, digits
-and underscores limited to a total of 64 ASCII characters. Some
-single letters are reserved for important dictionaries, see the
-next section.
+minuses and underscores limited to a total of 64 ASCII
+characters. Some single letters are reserved for important
+dictionaries, see the next section.
 
 #+BEGIN_SRC
 a = 5
+last-letter = "z"
 last_letter = "z"
 nameLen = len(s.name)
 #+END_SRC

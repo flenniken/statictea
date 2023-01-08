@@ -187,7 +187,7 @@ A dot name is a list of variable names separated y dots.
 You can have 1 to 5 variable names in a dot name.
 
 A variable name starts with a letter followed by letters, digits
-and underscores limited to a total of 64 characters.
+minuses and underscores limited to a total of 64 characters.
 No space is allowed between the function name and the left
 parentheses or bracket.
 Return three groups, the leading whitespace, the dotNames and the

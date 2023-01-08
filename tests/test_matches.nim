@@ -362,6 +362,7 @@ suite "matches.nim":
     check testMatchDotNames("abc = 5", 0, some(newMatches(4, 0, "", "abc", "")))
     check testMatchDotNames("   a = 5", 0, some(newMatches(5, 0, "   ", "a", "")))
     check testMatchDotNames("aBcD_t = 5", 0, some(newMatches(7, 0, "", "aBcD_t", "")))
+    check testMatchDotNames("one-two = 5", 0, some(newMatches(8, 0, "", "one-two", "")))
     check testMatchDotNames("t.server = 5", 0, some(newMatches(9, 0, "", "t.server", "")))
     check testMatchDotNames("t.server =", 0, some(newMatches(9, 0, "", "t.server", "")))
     check testMatchDotNames("   a =    5", 0, some(newMatches(5, 0, "   ", "a", "")))
@@ -382,6 +383,7 @@ suite "matches.nim":
 
     check testMatchDotNames(".a =", 0)
     check testMatchDotNames("_a =", 0)
+    check testMatchDotNames("-a =", 0)
     check testMatchDotNames("*a =", 0)
     check testMatchDotNames("34r =", 0)
     check testMatchDotNames("  2 =", 0)
