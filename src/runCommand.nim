@@ -1056,41 +1056,15 @@ proc getFunctionValueAndPos*(
   ## @:               ^    ^
   ## @:~~~~
 
-  var arguments: seq[Value] = @[]
-  var argumentStarts: seq[Natural] = @[]
+  # Get all the function arguments.
   var runningPos = start
-
-  let symbol = if list: gRightBracket else: gRightParentheses
-  let startSymbolO = matchSymbol(statement.text, symbol, runningPos)
-  if startSymbolO.isSome:
-    # There are no arguments.
-    runningPos = start + startSymbolO.get().length
-  else:
-    # Get the arguments to the function.
-    while true:
-      let vlOr = getValueAndPos(env, statement, runningPos, variables)
-      if quickExit(vlOr):
-        return vlOr
-      arguments.add(vlOr.value.value)
-      argumentStarts.add(runningPos)
-
-      runningPos = vlOr.value.pos
-
-      # Get the , or ) or ] and white space following the value.
-      let commaSymbolO = matchCommaOrSymbol(statement.text, symbol, runningPos)
-      if not commaSymbolO.isSome:
-        if symbol == gRightParentheses:
-          # Expected comma or right parentheses.
-          return newValueAndPosOr(wMissingCommaParen, "", runningPos)
-        else:
-          # Missing comma or right bracket.
-          return newValueAndPosOr(wMissingCommaBracket, "", runningPos)
-      let commaSymbol = commaSymbolO.get()
-      runningPos = runningPos + commaSymbol.length
-      let foundSymbol = commaSymbol.getGroup()
-      if (foundSymbol == ")" and symbol == gRightParentheses) or
-         (foundSymbol == "]" and symbol == gRightBracket):
-        break
+  var arguments: seq[Value]
+  var argumentStarts: seq[Natural]
+  let vpOr = getArguments(env, statement, runningPos, variables, list,
+    arguments, argumentStarts)
+  if quickExit(vpOr):
+    return vpOr
+  runningPos = vpOr.value.pos
 
   # Lookup the variable's value.
   let valueOr = getVariable(variables, functionName, npBuiltIn)
@@ -1469,6 +1443,7 @@ proc listLoop*(
   ## @:newList = listLoop(list, callback, state)
   ## @:                   ^                     ^
   ## @:~~~~
+  # Get all the function arguments.
   var runningPos = start
   var arguments: seq[Value]
   var argumentStarts: seq[Natural]
