@@ -55,7 +55,7 @@ func getTeaArgs*(args: Args): Value =
   varsDict["prepostList"] = newValue(argsPrepostList(args.prepostList))
   result = newValue(varsDict)
 
-proc getStartingVariables*(env: var Env, args: Args): Variables =
+proc getStartVariables*(env: var Env, args: Args): Variables =
   ## Return the starting variables.  Read the server json files, run
   ## the code files and setup the initial tea variables.
 

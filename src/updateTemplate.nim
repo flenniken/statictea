@@ -167,7 +167,7 @@ proc updateTemplate*(env: var Env, args: Args) =
   ## Update the template and return 0 on success. Return 1 if a
   ## warning messages was written while processing the template.
 
-  var variables = getStartingVariables(env, args)
+  var variables = getStartVariables(env, args)
   var prepostTable = getPrepostTable(args)
   updateTemplateLines(env, variables, prepostTable)
 

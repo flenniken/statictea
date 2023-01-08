@@ -130,7 +130,7 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
 
 proc runEvaluatePrintLoop*(env: var Env, args: Args) =
   ## Run commands at a prompt.
-  var variables = getStartingVariables(env, args)
+  var variables = getStartVariables(env, args)
   var line: string
   while true:
     try:

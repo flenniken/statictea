@@ -16,10 +16,10 @@ suite "startingvars.nim":
     let prepostList = @[newPrepost("abc", "def")]
     check argsPrepostList(prepostList) == @[@["abc", "def"]]
 
-  test "getStartingVariables":
+  test "getStartVariables":
     var env = openEnvTest("_testGetStartingVariables.log")
     var args: Args
-    var variables = getStartingVariables(env, args)
+    var variables = getStartVariables(env, args)
 
     # echo dotNameRep(variables, top=true)
     check "f" in variables

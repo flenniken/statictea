@@ -8,7 +8,7 @@ Get the starting variables.
 * [readJsonFiles](#readjsonfiles) &mdash; Read json files and return a variable dictionary.
 * [argsPrepostList](#argsprepostlist) &mdash; Create a prepost list of lists for t args.
 * [getTeaArgs](#getteaargs) &mdash; Create the t args dictionary from the statictea arguments.
-* [getStartingVariables](#getstartingvariables) &mdash; Return the starting variables.
+* [getStartVariables](#getstartvariables) &mdash; Return the starting variables.
 
 # readJsonFiles
 
@@ -34,12 +34,12 @@ Create the t args dictionary from the statictea arguments.
 func getTeaArgs(args: Args): Value
 ```
 
-# getStartingVariables
+# getStartVariables
 
 Return the starting variables.  Read the server json files, run the code files and setup the initial tea variables.
 
 ```nim
-proc getStartingVariables(env: var Env; args: Args): Variables
+proc getStartVariables(env: var Env; args: Args): Variables
 ```
 
 

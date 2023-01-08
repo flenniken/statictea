@@ -207,7 +207,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 proc processTemplate*(env: var Env, args: Args) =
   ## Process the template.
 
-  var variables = getStartingVariables(env, args)
+  var variables = getStartVariables(env, args)
 
   var prepostTable = getPrepostTable(args)
 
