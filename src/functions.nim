@@ -19,6 +19,35 @@ import opresult
 import readjson
 import variables
 
+type
+  StringOr* = OpResultWarn[string]
+    ## StringOr holds a string or a warning.
+
+  PathComponents* = object
+    ## PathComponents holds the components of the file path components.
+    dir: string
+    filename: string
+    basename: string
+    ext: string
+
+func newStringOr*(warning: MessageId, p1: string = "", pos = 0):
+     StringOr =
+  ## Create a new StringOr object containing a warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[string](warningData)
+
+func newStringOr*(warningData: WarningData): StringOr =
+  ## Create a new StringOr object containing a warning.
+  result = opMessageW[string](warningData)
+
+func newStringOr*(str: string): StringOr =
+  ## Create a new StringOr object containing a string.
+  result = opValueW[string](str)
+
+func newPathComponents*(dir, filename, basename, ext: string): PathComponents =
+  ## Create a new PathComponents object from its pieces.
+  result = PathComponents(dir: dir, filename: filename, basename: basename, ext: ext)
+
 template tMapParameters(functionName: string, signatureCode: string) =
   ## Template that checks the signatureCode against the parameters and
   ## sets the map dictionary variable.
@@ -120,28 +149,10 @@ func numberStringToNum(numString: string): FunResult =
 
   result = newFunResult(valueAndPosOr.value.value)
 
-type
-  StringOr* = OpResultWarn[string]
-    ## A string or a warning.
-
-func newStringOr*(warning: MessageId, p1: string = "", pos = 0):
-     StringOr =
-  ## Return a new StringOr object containing a warning.
-  let warningData = newWarningData(warning, p1, pos)
-  result = opMessageW[string](warningData)
-
-func newStringOr*(warningData: WarningData): StringOr =
-  ## Return a new StringOr object containing a warning.
-  result = opMessageW[string](warningData)
-
-func newStringOr*(str: string): StringOr =
-  ## Return a new StringOr object containing a string.
-  result = opValueW[string](str)
-
 proc formatString*(variables: Variables, text: string): StringOr =
   ## Format a string by filling in the variable placeholders with
-  ## @:their values. Generate a warning when the variable doesn't
-  ## @:exist. No space around the bracketed variables.
+  ## their values. Generate a warning when the variable doesn't
+  ## exist. No space around the bracketed variables.
   ## @:
   ## @:~~~
   ## @:let first = "Earl"
@@ -223,7 +234,7 @@ proc formatString*(variables: Variables, text: string): StringOr =
 
 func funCmp_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare two ints. Returns -1 for less, 0 for equal and 1 for
-  ## @: greater than.
+  ## greater than.
   ## @:
   ## @:~~~
   ## @:cmp(a: int, b: int) int
@@ -243,8 +254,8 @@ func funCmp_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   result = newFunResult(newValue(cmp(a, b)))
 
 func funCmp_ffi*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Compare two floats. Returns -1 for less, 0 for
-  ## @:equal and 1 for greater than.
+  ## Compare two floats. Returns -1 for less, 0 for equal and 1 for
+  ## greater than.
   ## @:
   ## @:~~~
   ## @:cmp(a: float, b: float) int
@@ -265,7 +276,7 @@ func funCmp_ffi*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func funCmp_ssobi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare two strings. Returns -1 for less, 0 for equal and 1 for
-  ## @:greater than.
+  ## greater than.
   ## @:
   ## @:You have the option to compare case insensitive. Case sensitive
   ## @:is the default.
@@ -373,10 +384,10 @@ func funLen_di*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func funGet_lioaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Get a list value by its index.  If the index is invalid, the
-  ## @:default value is returned when specified, else a warning is
-  ## @:generated. You can use negative index values. Index -1 gets the
-  ## @:last element. It is short hand for len - 1. Index -2 is len - 2,
-  ## @:etc.
+  ## default value is returned when specified, else a warning is
+  ## generated. You can use negative index values. Index -1 gets the
+  ## last element. It is short hand for len - 1. Index -2 is len - 2,
+  ## etc.
   ## @:
   ## @:~~~
   ## @:get(list: list, index: int, default: optional any) any
@@ -415,8 +426,8 @@ func funGet_lioaa*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func funGet_dsoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Get a dictionary value by its key.  If the key doesn't exist, the
-  ## @:default value is returned if specified, else a warning is
-  ## @:generated.
+  ## default value is returned if specified, else a warning is
+  ## generated.
   ## @:
   ## @:~~~
   ## @:get(dictionary: dict, key: string, default: optional any) any
@@ -521,9 +532,9 @@ func funIf_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## If the condition is true, return the second argument, else return
   ## the third argument.
   ## @:
-  ## @:- The if functions are special in a couple of ways, see
-  ## @:[[#if-functions][If Functions]]
-  ## @:- You usually use boolean expressions for the condition, see:
+  ## @:The if functions are special in a couple of ways, see
+  ## @:[[#if-functions][If Functions]].  You usually use boolean infix
+  ## @:expressions for the condition, see:
   ## @:[[#boolean-expressions][Boolean Expressions]]
   ## @:
   ## @:~~~
@@ -669,8 +680,8 @@ func getCase(map: VarsDict): FunResult =
 
 func funCase_iloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare integer cases and return the matching value.  It takes a
-  ## @:main integer condition, a list of case pairs and an optional
-  ## @:value when none of the cases match.
+  ## main integer condition, a list of case pairs and an optional
+  ## value when none of the cases match.
   ## @:
   ## @:The first element of a case pair is the condition and the
   ## @:second is the return value when that condition matches the main
@@ -702,8 +713,8 @@ func funCase_iloaa*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func funCase_sloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare string cases and return the matching value.  It takes a
-  ## @:main string condition, a list of case pairs and an optional
-  ## @:value when none of the cases match.
+  ## main string condition, a list of case pairs and an optional
+  ## value when none of the cases match.
   ## @:
   ## @:The first element of a case pair is the condition and the
   ## @:second is the return value when that condition matches the main
@@ -746,7 +757,7 @@ func parseVersion*(version: string): Option[(int, int, int)] =
 
 func funCmpVersion_ssi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare two StaticTea version numbers. Returns -1 for less, 0 for
-  ## @:equal and 1 for greater than.
+  ## equal and 1 for greater than.
   ## @:
   ## @:~~~
   ## @:cmpVersion(versionA: string, versionB: string) int
@@ -1061,9 +1072,9 @@ func funBool_ab*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func funFind_ssoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Find the position of a substring in a string.  When the substring
-  ## @:is not found, return an optional default value.  A warning is
-  ## @:generated when the substring is missing and you don't specify a
-  ## @:default value.
+  ## is not found, return an optional default value.  A warning is
+  ## generated when the substring is missing and you don't specify a
+  ## default value.
   ## @:
   ## @:~~~
   ## @:find(str: string, substring: string, default: optional any) any
@@ -1099,9 +1110,9 @@ func funFind_ssoaa*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func funSlice_siois*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Extract a substring from a string by its position and length. You
-  ## @:pass the string, the substring's start index and its length.  The
-  ## @:length is optional. When not specified, the slice returns the
-  ## @:characters from the start to the end of the string.
+  ## pass the string, the substring's start index and its length.  The
+  ## length is optional. When not specified, the slice returns the
+  ## characters from the start to the end of the string.
   ## @:
   ## @:The start index and length are by unicode characters not bytes.
   ## @:
@@ -1134,7 +1145,7 @@ func funSlice_siois*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func funDup_sis*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Duplicate a string x times.  The result is a new string built by
-  ## @:concatenating the string to itself the specified number of times.
+  ## concatenating the string to itself the specified number of times.
   ## @:
   ## @:~~~
   ## @:dup(pattern: string, count: int) string
@@ -1173,7 +1184,7 @@ func funDup_sis*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func funDict_old*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a dictionary from a list of key, value pairs.  The keys
-  ## @:must be strings and the values can be any type.
+  ## must be strings and the values can be any type.
   ## @:
   ## @:~~~
   ## @:dict(pairs: optional list) dict
@@ -1277,7 +1288,7 @@ func funListLoop_lpoal*(variables: Variables, arguments: seq[Value]): FunResult 
 func funReplace_siiss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Replace a substring specified by its position and length with
   ## another string.  You can use the function to insert and append to
-  ## @:a string as well.
+  ## a string as well.
   ## @:
   ## @:~~~
   ## @:replace(str: string, start: int, length: int, replacement: string) string
@@ -1417,17 +1428,6 @@ func funReplaceRe_sls*(variables: Variables, arguments: seq[Value]): FunResult =
 
   replaceReMap(map)
 
-type
-  PathComponents* = object
-    ## PathComponents holds the components of the file path components.
-    dir: string
-    filename: string
-    basename: string
-    ext: string
-
-func newPathComponents*(dir, filename, basename, ext: string): PathComponents =
-  result = PathComponents(dir: dir, filename: filename, basename: basename, ext: ext)
-
 func parsePath*(path: string, separator='/'): PathComponents =
   ## Parse the given file path into its component pieces.
 
@@ -1456,7 +1456,7 @@ func parsePath*(path: string, separator='/'): PathComponents =
 
 func funPath_sosd*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Split a file path into its component pieces. Return a dictionary
-  ## @:with the filename, basename, extension and directory.
+  ## with the filename, basename, extension and directory.
   ## @:
   ## @:You pass a path string and the optional path separator, forward
   ## @:slash or or backwards slash. When no separator, the current
@@ -1677,7 +1677,7 @@ func generalSort(map: VarsDict): FunResult =
 
 func funSort_lsosl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Sort a list of values of the same type.  The values are ints,
-  ## @:floats, or strings.
+  ## floats, or strings.
   ## @:
   ## @:You specify the sort order, "ascending" or "descending".
   ## @:
@@ -1768,10 +1768,10 @@ func funSort_lsssl*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func funGithubAnchor_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a Github anchor name from a heading name. Use it for
-  ## @:Github markdown internal links. If you have duplicate heading
-  ## @:names, the anchor name returned only works for the
-  ## @:first. Punctuation characters are removed so you can get
-  ## @:duplicates in some cases.
+  ## Github markdown internal links. If you have duplicate heading
+  ## names, the anchor name returned only works for the
+  ## first. Punctuation characters are removed so you can get
+  ## duplicates in some cases.
   ## @:
   ## @:~~~
   ## @:githubAnchor(name: string) string
@@ -1802,7 +1802,7 @@ func funGithubAnchor_ss*(variables: Variables, arguments: seq[Value]): FunResult
 
 func funGithubAnchor_ll*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create Github anchor names from heading names. Use it for Github
-  ## @:markdown internal links. It handles duplicate heading names.
+  ## markdown internal links. It handles duplicate heading names.
   ## @:
   ## @:~~~
   ## @:githubAnchor(names: list) list

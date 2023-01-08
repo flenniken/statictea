@@ -5,16 +5,17 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [functions.nim](../src/functions.nim) &mdash; Nim source code.
 # Index
 
+* type: [StringOr](#stringor) &mdash; StringOr holds a string or a warning.
+* type: [PathComponents](#pathcomponents) &mdash; PathComponents holds the components of the file path components.
+* [newStringOr](#newstringor) &mdash; Create a new StringOr object containing a warning.
+* [newStringOr](#newstringor-1) &mdash; Create a new StringOr object containing a warning.
+* [newStringOr](#newstringor-2) &mdash; Create a new StringOr object containing a string.
+* [newPathComponents](#newpathcomponents) &mdash; Create a new PathComponents object from its pieces.
 * [signatureDetails](#signaturedetails) &mdash; Convert the signature object to a dictionary value.
 * [functionDetails](#functiondetails) &mdash; Convert the function spec to a dictionary value.
 * [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
 * [parseNumber](#parsenumber) &mdash; Return the literal number value and position after it.
-* type: [StringOr](#stringor) &mdash; A string or a warning.
-* [newStringOr](#newstringor) &mdash; Return a new StringOr object containing a warning.
-* [newStringOr](#newstringor-1) &mdash; Return a new StringOr object containing a warning.
-* [newStringOr](#newstringor-2) &mdash; Return a new StringOr object containing a string.
-* [formatString](#formatstring) &mdash; Format a string by filling in the variable placeholders with
-their values.
+* [formatString](#formatstring) &mdash; Format a string by filling in the variable placeholders with their values.
 * [funCmp_iii](#funcmp_iii) &mdash; Compare two ints.
 * [funCmp_ffi](#funcmp_ffi) &mdash; Compare two floats.
 * [funCmp_ssobi](#funcmp_ssobi) &mdash; Compare two strings.
@@ -49,8 +50,6 @@ their values.
 * [funListLoop_lpoal](#funlistloop_lpoal) &mdash; You use the listLoop function to make a new list.
 * [funReplace_siiss](#funreplace_siiss) &mdash; Replace a substring specified by its position and length with another string.
 * [funReplaceRe_sls](#funreplacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
-* type: [PathComponents](#pathcomponents) &mdash; PathComponents holds the components of the file path components.
-* [newPathComponents](#newpathcomponents) &mdash; 
 * [parsePath](#parsepath) &mdash; Parse the given file path into its component pieces.
 * [funPath_sosd](#funpath_sosd) &mdash; Split a file path into its component pieces.
 * [funLower_ss](#funlower_ss) &mdash; Lowercase a string.
@@ -95,6 +94,59 @@ their values.
 * [getBestFunction](#getbestfunction) &mdash; Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
 * [createFuncDictionary](#createfuncdictionary) &mdash; Create the f dictionary from the built in functions.
 
+# StringOr
+
+StringOr holds a string or a warning.
+
+```nim
+StringOr = OpResultWarn[string]
+```
+
+# PathComponents
+
+PathComponents holds the components of the file path components.
+
+```nim
+PathComponents = object
+  dir: string
+  filename: string
+  basename: string
+  ext: string
+
+```
+
+# newStringOr
+
+Create a new StringOr object containing a warning.
+
+```nim
+func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
+```
+
+# newStringOr
+
+Create a new StringOr object containing a warning.
+
+```nim
+func newStringOr(warningData: WarningData): StringOr
+```
+
+# newStringOr
+
+Create a new StringOr object containing a string.
+
+```nim
+func newStringOr(str: string): StringOr
+```
+
+# newPathComponents
+
+Create a new PathComponents object from its pieces.
+
+```nim
+func newPathComponents(dir, filename, basename, ext: string): PathComponents
+```
+
 # signatureDetails
 
 Convert the signature object to a dictionary value.
@@ -127,43 +179,9 @@ Return the literal number value and position after it.  The start index points a
 func parseNumber(line: string; start: Natural): ValueAndPosOr
 ```
 
-# StringOr
-
-A string or a warning.
-
-```nim
-StringOr = OpResultWarn[string]
-```
-
-# newStringOr
-
-Return a new StringOr object containing a warning.
-
-```nim
-func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
-```
-
-# newStringOr
-
-Return a new StringOr object containing a warning.
-
-```nim
-func newStringOr(warningData: WarningData): StringOr
-```
-
-# newStringOr
-
-Return a new StringOr object containing a string.
-
-```nim
-func newStringOr(str: string): StringOr
-```
-
 # formatString
 
-Format a string by filling in the variable placeholders with
-their values. Generate a warning when the variable doesn't
-exist. No space around the bracketed variables.
+Format a string by filling in the variable placeholders with their values. Generate a warning when the variable doesn't exist. No space around the bracketed variables.
 
 ~~~
 let first = "Earl"
@@ -183,8 +201,7 @@ proc formatString(variables: Variables; text: string): StringOr
 
 # funCmp_iii
 
-Compare two ints. Returns -1 for less, 0 for equal and 1 for
- greater than.
+Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
 
 ~~~
 cmp(a: int, b: int) int
@@ -204,8 +221,7 @@ func funCmp_iii(variables: Variables; arguments: seq[Value]): FunResult
 
 # funCmp_ffi
 
-Compare two floats. Returns -1 for less, 0 for
-equal and 1 for greater than.
+Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
 
 ~~~
 cmp(a: float, b: float) int
@@ -225,8 +241,7 @@ func funCmp_ffi(variables: Variables; arguments: seq[Value]): FunResult
 
 # funCmp_ssobi
 
-Compare two strings. Returns -1 for less, 0 for equal and 1 for
-greater than.
+Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
 
 You have the option to compare case insensitive. Case sensitive
 is the default.
@@ -329,11 +344,7 @@ func funLen_di(variables: Variables; arguments: seq[Value]): FunResult
 
 # funGet_lioaa
 
-Get a list value by its index.  If the index is invalid, the
-default value is returned when specified, else a warning is
-generated. You can use negative index values. Index -1 gets the
-last element. It is short hand for len - 1. Index -2 is len - 2,
-etc.
+Get a list value by its index.  If the index is invalid, the default value is returned when specified, else a warning is generated. You can use negative index values. Index -1 gets the last element. It is short hand for len - 1. Index -2 is len - 2, etc.
 
 ~~~
 get(list: list, index: int, default: optional any) any
@@ -359,9 +370,7 @@ func funGet_lioaa(variables: Variables; arguments: seq[Value]): FunResult
 
 # funGet_dsoaa
 
-Get a dictionary value by its key.  If the key doesn't exist, the
-default value is returned if specified, else a warning is
-generated.
+Get a dictionary value by its key.  If the key doesn't exist, the default value is returned if specified, else a warning is generated.
 
 ~~~
 get(dictionary: dict, key: string, default: optional any) any
@@ -443,9 +452,9 @@ func funIf0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
 
 If the condition is true, return the second argument, else return the third argument.
 
-- The if functions are special in a couple of ways, see
-[[#if-functions][If Functions]]
-- You usually use boolean expressions for the condition, see:
+The if functions are special in a couple of ways, see
+[[#if-functions][If Functions]].  You usually use boolean infix
+expressions for the condition, see:
 [[#boolean-expressions][Boolean Expressions]]
 
 ~~~
@@ -534,9 +543,7 @@ func funExists_dsb(variables: Variables; arguments: seq[Value]): FunResult
 
 # funCase_iloaa
 
-Compare integer cases and return the matching value.  It takes a
-main integer condition, a list of case pairs and an optional
-value when none of the cases match.
+Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -569,9 +576,7 @@ func funCase_iloaa(variables: Variables; arguments: seq[Value]): FunResult
 
 # funCase_sloaa
 
-Compare string cases and return the matching value.  It takes a
-main string condition, a list of case pairs and an optional
-value when none of the cases match.
+Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -611,8 +616,7 @@ func parseVersion(version: string): Option[(int, int, int)]
 
 # funCmpVersion_ssi
 
-Compare two StaticTea version numbers. Returns -1 for less, 0 for
-equal and 1 for greater than.
+Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
 
 ~~~
 cmpVersion(versionA: string, versionB: string) int
@@ -836,10 +840,7 @@ func funBool_ab(variables: Variables; arguments: seq[Value]): FunResult
 
 # funFind_ssoaa
 
-Find the position of a substring in a string.  When the substring
-is not found, return an optional default value.  A warning is
-generated when the substring is missing and you don't specify a
-default value.
+Find the position of a substring in a string.  When the substring is not found, return an optional default value.  A warning is generated when the substring is missing and you don't specify a default value.
 
 ~~~
 find(str: string, substring: string, default: optional any) any
@@ -864,10 +865,7 @@ func funFind_ssoaa(variables: Variables; arguments: seq[Value]): FunResult
 
 # funSlice_siois
 
-Extract a substring from a string by its position and length. You
-pass the string, the substring's start index and its length.  The
-length is optional. When not specified, the slice returns the
-characters from the start to the end of the string.
+Extract a substring from a string by its position and length. You pass the string, the substring's start index and its length.  The length is optional. When not specified, the slice returns the characters from the start to the end of the string.
 
 The start index and length are by unicode characters not bytes.
 
@@ -889,8 +887,7 @@ func funSlice_siois(variables: Variables; arguments: seq[Value]): FunResult
 
 # funDup_sis
 
-Duplicate a string x times.  The result is a new string built by
-concatenating the string to itself the specified number of times.
+Duplicate a string x times.  The result is a new string built by concatenating the string to itself the specified number of times.
 
 ~~~
 dup(pattern: string, count: int) string
@@ -912,8 +909,7 @@ func funDup_sis(variables: Variables; arguments: seq[Value]): FunResult
 
 # funDict_old
 
-Create a dictionary from a list of key, value pairs.  The keys
-must be strings and the values can be any type.
+Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
 
 ~~~
 dict(pairs: optional list) dict
@@ -1002,8 +998,7 @@ func funListLoop_lpoal(variables: Variables; arguments: seq[Value]): FunResult
 
 # funReplace_siiss
 
-Replace a substring specified by its position and length with another string.  You can use the function to insert and append to
-a string as well.
+Replace a substring specified by its position and length with another string.  You can use the function to insert and append to a string as well.
 
 ~~~
 replace(str: string, start: int, length: int, replacement: string) string
@@ -1089,27 +1084,6 @@ website: https://regex101.com/
 func funReplaceRe_sls(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# PathComponents
-
-PathComponents holds the components of the file path components.
-
-```nim
-PathComponents = object
-  dir: string
-  filename: string
-  basename: string
-  ext: string
-
-```
-
-# newPathComponents
-
-
-
-```nim
-func newPathComponents(dir, filename, basename, ext: string): PathComponents
-```
-
 # parsePath
 
 Parse the given file path into its component pieces.
@@ -1120,8 +1094,7 @@ func parsePath(path: string; separator = '/'): PathComponents
 
 # funPath_sosd
 
-Split a file path into its component pieces. Return a dictionary
-with the filename, basename, extension and directory.
+Split a file path into its component pieces. Return a dictionary with the filename, basename, extension and directory.
 
 You pass a path string and the optional path separator, forward
 slash or or backwards slash. When no separator, the current
@@ -1215,8 +1188,7 @@ func funValues_dl(variables: Variables; arguments: seq[Value]): FunResult
 
 # funSort_lsosl
 
-Sort a list of values of the same type.  The values are ints,
-floats, or strings.
+Sort a list of values of the same type.  The values are ints, floats, or strings.
 
 You specify the sort order, "ascending" or "descending".
 
@@ -1312,11 +1284,7 @@ func funSort_lsssl(variables: Variables; arguments: seq[Value]): FunResult
 
 # funGithubAnchor_ss
 
-Create a Github anchor name from a heading name. Use it for
-Github markdown internal links. If you have duplicate heading
-names, the anchor name returned only works for the
-first. Punctuation characters are removed so you can get
-duplicates in some cases.
+Create a Github anchor name from a heading name. Use it for Github markdown internal links. If you have duplicate heading names, the anchor name returned only works for the first. Punctuation characters are removed so you can get duplicates in some cases.
 
 ~~~
 githubAnchor(name: string) string
@@ -1345,8 +1313,7 @@ func funGithubAnchor_ss(variables: Variables; arguments: seq[Value]): FunResult
 
 # funGithubAnchor_ll
 
-Create Github anchor names from heading names. Use it for Github
-markdown internal links. It handles duplicate heading names.
+Create Github anchor names from heading names. Use it for Github markdown internal links. It handles duplicate heading names.
 
 ~~~
 githubAnchor(names: list) list

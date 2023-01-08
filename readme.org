@@ -2792,9 +2792,7 @@ bool(dict("tea", 2)) => true
 :CUSTOM_ID: case
 :END:
 
-Compare integer cases and return the matching value.  It takes a
-main integer condition, a list of case pairs and an optional
-value when none of the cases match.
+Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -2828,9 +2826,7 @@ case(3, cases, "wine") => "wine"
 :CUSTOM_ID: case
 :END:
 
-Compare string cases and return the matching value.  It takes a
-main string condition, a list of case pairs and an optional
-value when none of the cases match.
+Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -2863,8 +2859,7 @@ case("bunch", cases, "other") => "other"
 :CUSTOM_ID: cmpVersion
 :END:
 
-Compare two StaticTea version numbers. Returns -1 for less, 0 for
-equal and 1 for greater than.
+Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
 
 #+BEGIN_SRC
 cmpVersion(versionA: string, versionB: string) int
@@ -2889,8 +2884,7 @@ cmpVersion("1.2.5", "1.2.5") => 0
 :CUSTOM_ID: cmp
 :END:
 
-Compare two floats. Returns -1 for less, 0 for
-equal and 1 for greater than.
+Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
 
 #+BEGIN_SRC
 cmp(a: float, b: float) int
@@ -2911,8 +2905,7 @@ cmp(9.3, 2.2) => 1
 :CUSTOM_ID: cmp
 :END:
 
-Compare two ints. Returns -1 for less, 0 for equal and 1 for
- greater than.
+Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
 
 #+BEGIN_SRC
 cmp(a: int, b: int) int
@@ -2933,8 +2926,7 @@ cmp(9, 2) => 1
 :CUSTOM_ID: cmp
 :END:
 
-Compare two strings. Returns -1 for less, 0 for equal and 1 for
-greater than.
+Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
 
 You have the option to compare case insensitive. Case sensitive
 is the default.
@@ -2980,8 +2972,7 @@ concat("a", "b") => "ab"
 :CUSTOM_ID: dict
 :END:
 
-Create a dictionary from a list of key, value pairs.  The keys
-must be strings and the values can be any type.
+Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
 
 #+BEGIN_SRC
 dict(pairs: optional list) dict
@@ -3003,8 +2994,7 @@ dict(list("a", 5, "b", 33, "c", 0)) =>
 :CUSTOM_ID: dup
 :END:
 
-Duplicate a string x times.  The result is a new string built by
-concatenating the string to itself the specified number of times.
+Duplicate a string x times.  The result is a new string built by concatenating the string to itself the specified number of times.
 
 #+BEGIN_SRC
 dup(pattern: string, count: int) string
@@ -3108,10 +3098,7 @@ exists(d, "coffee") => false
 :CUSTOM_ID: find
 :END:
 
-Find the position of a substring in a string.  When the substring
-is not found, return an optional default value.  A warning is
-generated when the substring is missing and you don't specify a
-default value.
+Find the position of a substring in a string.  When the substring is not found, return an optional default value.  A warning is generated when the substring is missing and you don't specify a default value.
 
 #+BEGIN_SRC
 find(str: string, substring: string, default: optional any) any
@@ -3290,9 +3277,7 @@ fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]"""
 :CUSTOM_ID: get
 :END:
 
-Get a dictionary value by its key.  If the key doesn't exist, the
-default value is returned if specified, else a warning is
-generated.
+Get a dictionary value by its key.  If the key doesn't exist, the default value is returned if specified, else a warning is generated.
 
 #+BEGIN_SRC
 get(dictionary: dict, key: string, default: optional any) any
@@ -3322,11 +3307,7 @@ d.tea => "Earl Grey"
 :CUSTOM_ID: get
 :END:
 
-Get a list value by its index.  If the index is invalid, the
-default value is returned when specified, else a warning is
-generated. You can use negative index values. Index -1 gets the
-last element. It is short hand for len - 1. Index -2 is len - 2,
-etc.
+Get a list value by its index.  If the index is invalid, the default value is returned when specified, else a warning is generated. You can use negative index values. Index -1 gets the last element. It is short hand for len - 1. Index -2 is len - 2, etc.
 
 #+BEGIN_SRC
 get(list: list, index: int, default: optional any) any
@@ -3353,8 +3334,7 @@ get(list, -4, 11) => 11
 :CUSTOM_ID: githubAnchor
 :END:
 
-Create Github anchor names from heading names. Use it for Github
-markdown internal links. It handles duplicate heading names.
+Create Github anchor names from heading names. Use it for Github markdown internal links. It handles duplicate heading names.
 
 #+BEGIN_SRC
 githubAnchor(names: list) list
@@ -3375,11 +3355,7 @@ githubAnchor(list) =>
 :CUSTOM_ID: githubAnchor
 :END:
 
-Create a Github anchor name from a heading name. Use it for
-Github markdown internal links. If you have duplicate heading
-names, the anchor name returned only works for the
-first. Punctuation characters are removed so you can get
-duplicates in some cases.
+Create a Github anchor name from a heading name. Use it for Github markdown internal links. If you have duplicate heading names, the anchor name returned only works for the first. Punctuation characters are removed so you can get duplicates in some cases.
 
 #+BEGIN_SRC
 githubAnchor(name: string) string
@@ -3543,9 +3519,9 @@ if0(c, warn("got zero value"))
 
 If the condition is true, return the second argument, else return the third argument.
 
-- The if functions are special in a couple of ways, see
-[[#if-functions][If Functions]]
-- You usually use boolean expressions for the condition, see:
+The if functions are special in a couple of ways, see
+[[#if-functions][If Functions]].  You usually use boolean infix
+expressions for the condition, see:
 [[#boolean-expressions][Boolean Expressions]]
 
 #+BEGIN_SRC
@@ -4137,8 +4113,7 @@ or(true, warn("not hit")) => true
 :CUSTOM_ID: path
 :END:
 
-Split a file path into its component pieces. Return a dictionary
-with the filename, basename, extension and directory.
+Split a file path into its component pieces. Return a dictionary with the filename, basename, extension and directory.
 
 You pass a path string and the optional path separator, forward
 slash or or backwards slash. When no separator, the current
@@ -4223,8 +4198,7 @@ website: https://regex101.com/
 :CUSTOM_ID: replace
 :END:
 
-Replace a substring specified by its position and length with another string.  You can use the function to insert and append to
-a string as well.
+Replace a substring specified by its position and length with another string.  You can use the function to insert and append to a string as well.
 
 #+BEGIN_SRC
 replace(str: string, start: int, length: int, replacement: string) string
@@ -4318,10 +4292,7 @@ if(c, return("skip"))
 :CUSTOM_ID: slice
 :END:
 
-Extract a substring from a string by its position and length. You
-pass the string, the substring's start index and its length.  The
-length is optional. When not specified, the slice returns the
-characters from the start to the end of the string.
+Extract a substring from a string by its position and length. You pass the string, the substring's start index and its length.  The length is optional. When not specified, the slice returns the characters from the start to the end of the string.
 
 The start index and length are by unicode characters not bytes.
 
@@ -4344,8 +4315,7 @@ slice("añyóng", 0, 3) => "añy"
 :CUSTOM_ID: sort
 :END:
 
-Sort a list of values of the same type.  The values are ints,
-floats, or strings.
+Sort a list of values of the same type.  The values are ints, floats, or strings.
 
 You specify the sort order, "ascending" or "descending".
 
