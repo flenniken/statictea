@@ -1,4 +1,4 @@
-# Nim module code file.
+# Nim code file for use by nimModule.md.
 
 # Define replacement patterns to remove formatting from the descriptions.
 o.patterns = list( +
@@ -14,48 +14,53 @@ o.patterns = list( +
   "&lt;", "<", +
   "&amp;", "&")
 
-# func getNameCallback(entry: dict) list
-#   ## Return the entry name.
-#   result &= "add"
-#   result &= entry.name
-#   return(result)
+get-name = func("get-name(ix: int, entry: dict, newList: list) bool")
+  ## Add the entry name to the list.
+  newList &= entry.name
+  return(false)
 
-# # Create a list of all the heading names.
-# names = list(s, getNameCallback)
-# anchors = githubAnchor(names)
+# Create the github anchors for all the heading names.
+names = listLoop(s.entries, l.get-name)
+anchors = githubAnchor(names)
 
-# path = path(s.orig)
-# o.moduleName = path.filename
+# Use the filename's basename for the module name.
+path = path(s.orig)
+o.moduleName = path.filename
 
-# func getEntryCallback(entry: dict, state: dict) list
-#   ## Return the entry name.
-#   newEntry = dict()
-#   newEntry.name = entry.name
-#   cases = list("skType", "type: ", +
-#     "skConst", "const: ", +
-#     "skMacro", "macro: ")
-#   newEntry.type = case(entry.type, cases, "")
+o.moduleDescription = replaceRe(s.moduleDescription, o.patterns)
 
-#   desc = get(entry, "description", "")
-#   sentence = slice(desc, 0, add(find(desc, ".", -1), 1))
-#   newEntry.short = replaceRe(sentence, state.patterns)
-#   newEntry.description = replaceRe(desc, state.patterns)
+get-entry = func("get-entry(ix: int, entry: dict, newList: list, state: dict) bool")
+  ## Reformat the entry and add it to the new list.
+  newEntry = dict()
+  newEntry.name = entry.name
 
-#   code = replaceRe(entry.code, list("[ ]*$", ""))
-#   pos = find(code, " {", len(code))
-#   newEntry.signature = slice(code, 0, pos)
+  # Set the entry type to: type, const, macro or "".
+  cases = list(+
+    "skType", "type: ", +
+    "skConst", "const: ", +
+    "skMacro", "macro: ")
+  newEntry.type = case(entry.type, cases, "")
 
-#   newEntry.anchor = state.anchors[t.row]
+  # Remove the formatting from the description and use the first
+  # sentence for the short description.
+  desc = get(entry, "description", "")
+  sentence = slice(desc, 0, add(find(desc, ".", -1), 1))
+  newEntry.short = replaceRe(sentence, state.patterns)
+  newEntry.description = replaceRe(desc, state.patterns)
 
-#   result &= "add"
-#   result &= newEntry
-#   return(result)
+  # Simplify the code signature.
+  code = replaceRe(entry.code, list("[ ]*$", ""))
+  pos = find(code, " {", len(code))
+  newEntry.signature = slice(code, 0, pos)
 
-# # Reformat the entries list and store it in o.entries.
-# state = dict()
-# state.patterns = o.patterns
-# state.anchors = anchors
-# o.entries = list(s, getEntryCallback, state)
+  newEntry.anchor = state.anchors[ix]
 
+  newList &= newEntry
 
+  return(false)
 
+# Reformat the entries list and store it in o.entries.
+state = dict()
+state.patterns = o.patterns
+state.anchors = anchors
+o.entries = listLoop(s.entries, l.get-entry, state)

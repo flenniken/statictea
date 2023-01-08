@@ -1,75 +1,32 @@
-$$ # StaticTea template for generating markdown documents from nim
-$$ # modules with doc comments.
-$$ #
-$$ # Create a list of all the heading names.
-$$ block
-$$ : t.repeat = len(s.entries)
-$$ : entry = s.entries[t.row]
-$$ : g.names &= entry.name
-$$ endblock
-$$ #
-$$ # Get the module name from the full path.
-$$ block
-$$ : path = path(s.orig)
-$$ : g.moduleName = path.filename
-$$ : t.repeat = if0(s.entries, 0, 1)
-$$ : g.anchors = githubAnchor(g.names)
-$$ endblock
-$$ #
-$$ # Reformat the entries list and store it in g.entries.
-$$ block
-$$ : t.repeat = len(s.entries)
-$$ : entry = get(s.entries, t.row, dict())
-$$ : newEntry = dict()
-$$ : newEntry.name = entry.name
-$$ : cases = list("skType", "type: ", +
-$$ :   "skConst", "const: ", +
-$$ :   "skMacro", "macro: ")
-$$ : newEntry.type = case(entry.type, cases, "")
-$$ : desc = get(entry, "description", "")
-$$ : sentence = slice(desc, 0, add(find(desc, ".", -1), 1))
-$$ : newEntry.short = replaceRe(sentence, o.patterns)
-$$ : newEntry.description = replaceRe(desc, o.patterns)
-$$ : code = replaceRe(entry.code, list("[ ]*$", ""))
-$$ : pos = find(code, " {", len(code))
-$$ : newEntry.signature = slice(code, 0, pos)
-$$ : newEntry.anchor = g.anchors[t.row]
-$$ : g.entries &= newEntry
-$$ endblock
-$$ #
-$$ # Module section.
+$$ # StaticTea template for generating a markdown document from a nim
+$$ # module's doc comments.
 $$ #
 $$ block
-$$ : modDescription = replaceRe(s.moduleDescription, o.patterns)
-# {g.moduleName}
+# {o.moduleName}
 
-{modDescription}
+{o.moduleDescription}
 
-* [{g.moduleName}](../src/{g.moduleName}) &mdash; Nim source code.
+* [{o.moduleName}](../src/{o.moduleName}) &mdash; Nim source code.
 $$ endblock
 $$ #
 $$ # Show the index label when there are entries.
 $$ #
 $$ nextline
-$$ : t.repeat = if0(s.entries, 0, 1)
+$$ : t.repeat = if0(o.entries, 0, 1)
 # Index
 
-$$ #
-$$ # Create the index.
+$$ # Create the index when there are entries.
 $$ #
 $$ nextline
-$$ : if(not(exists(g, "entries")), return("stop"))
-$$ : t.repeat = len(g.entries)
-$$ : entry = g.entries[t.row]
+$$ : t.repeat = len(o.entries)
+$$ : entry = o.entries[t.row]
 * {entry.type}[{entry.name}](#{entry.anchor}) &mdash; {entry.short}
 
-$$ #
 $$ # Create the function sections.
 $$ #
 $$ block
-$$ : if(not(exists(g, "entries")), return("stop"))
-$$ : t.repeat = len(g.entries)
-$$ : entry = g.entries[t.row]
+$$ : t.repeat = len(o.entries)
+$$ : entry = o.entries[t.row]
 # {entry.name}
 
 {entry.description}

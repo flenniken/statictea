@@ -27,8 +27,7 @@ $$ : # Use the first sentence for the short description.
 $$ : short = slice(description, 0, add(find(description, ".", -1), 1))
 * [{path.filename}]({mdName}) &mdash; {short}
 
-$$ # Show the module dependency svg file. Using img so we can resize
-$$ # the image.
+$$ # Show the nim module dependency svg file.
 # Nim Module Usage
 [<img src="staticteadep2.svg" width="500">](#nim-module-usage)
 
