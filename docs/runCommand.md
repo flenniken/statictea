@@ -43,6 +43,7 @@ Run a command and fill in the variables dictionaries.
 * [skipArgument](#skipargument) &mdash; Skip past the argument.
 * [ifFunctions](#iffunctions) &mdash; Return the if/if0 function's value and position after.
 * [andOrFunctions](#andorfunctions) &mdash; Return the and/or function's value and the position after.
+* [getArguments](#getarguments) &mdash; Get the function arguments and the position of each.
 * [getFunctionValueAndPos](#getfunctionvalueandpos) &mdash; Return the function's value and the position after it.
 * [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value.
 * [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value.
@@ -445,6 +446,22 @@ Return the and/or function's value and the position after. The and function stop
 proc andOrFunctions(env: var Env; specialFunction: SpecialFunction;
                     statement: Statement; start: Natural; variables: Variables;
                     list = false): ValueAndPosOr
+```
+
+# getArguments
+
+Get the function arguments and the position of each. If an argument has a side effect, the return value and pos and side effect is returned, else a 0 value and seNone is returned.
+~~~
+newList = listLoop(list, callback, state)  # comment
+                   ^                       ^
+newList = listLoop(return(3), callback, state)  # comment
+                   ^        ^
+~~~
+
+```nim
+proc getArguments(env: var Env; statement: Statement; start: Natural;
+                  variables: Variables; list = false; arguments: var seq[Value];
+                  argumentStarts: var seq[Natural]): ValueAndPosOr
 ```
 
 # getFunctionValueAndPos

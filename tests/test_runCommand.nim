@@ -2783,3 +2783,295 @@ statement:   o.a = 3
              ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "call callback":
+    let content = """
+callback = func("callback(ix: int, value: string, state: int) list")
+  ## Copy list.
+  result &= "add"
+  result &= value
+  return(result)
+ls = l.callback(5, "hello", 6)
+"""
+    let eVarRep = """
+l.callback = "callback"
+l.ls = ["add","hello"]
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "listLoop":
+    let content = """
+copy = func("copy(ix: int, value: int, newList: list) bool")
+  ## Copy list.
+  newList &= value
+  return(false)
+
+ls = [1, 1, 2, 3, 5, 8]
+newList = listLoop(ls, l.copy)
+"""
+    let eVarRep = """
+l.copy = "copy"
+l.ls = [1,1,2,3,5,8]
+l.newList = [1,1,2,3,5,8]
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "listLoop b5":
+    let content = """
+b5 = func("b5(ix: int, value: int, newList: list) bool")
+  ## Use items bigger than 5.
+  if( (value <= 5), return(false))
+  newList &= value
+  return(false)
+
+ls = [1, 1, 2, 7, 5, 8]
+newList = listLoop(ls, l.b5)
+"""
+    let eVarRep = """
+l.b5 = "b5"
+l.ls = [1,1,2,7,5,8]
+l.newList = [7,8]
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "listLoop b5 with state":
+    let content = """
+b5 = func("b5(ix: int, value: int, newList: list, state: int) bool")
+  ## Use items bigger than 5.
+  if( (value <= 5), return(false))
+  newList &= add(value, state)
+  return(false)
+
+ls = [1, 1, 2, 7, 5, 8]
+newList = listLoop(ls, l.b5, 3)
+"""
+    let eVarRep = """
+l.b5 = "b5"
+l.ls = [1,1,2,7,5,8]
+l.newList = [10,11]
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "listLoop no state":
+    let content = """
+b5 = func("b5(ix: int, value: int, newList: list, state: int) bool")
+  ## copy
+  newList &= value
+  return(false)
+
+ls = [1, 1, 2, 3, 5, 8]
+# No state passed.
+newList = listLoop(ls, l.b5)
+"""
+    let eVarRep = """
+l.b5 = "b5"
+l.ls = [1,1,2,3,5,8]
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(8): w254: The callback has a required state parameter but it is being not passed to it.
+statement: newList = listLoop(ls, l.b5)
+                                  ^
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "listLoop state optional":
+    let content = """
+b5 = func("b5(ix: int, value: int, newList: list, state: optional int) bool")
+  ## copy
+  newList &= value
+  return(false)
+
+ls = [1, 1, 2, 3, 5, 8]
+# No state passed.
+newList = listLoop(ls, l.b5)
+"""
+    let eVarRep = """
+l.b5 = "b5"
+l.ls = [1,1,2,3,5,8]
+l.newList = [1,1,2,3,5,8]
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "listLoop stop early":
+    let content = """
+b5 = func("b5(ix: int, value: int, newList: list) bool")
+  ## Stop on 3
+  if( (value == 3), return(true))
+  newList &= value
+  return(false)
+
+ls = [1, 1, 2, 3, 5, 8]
+newList = listLoop(ls, l.b5)
+"""
+    let eVarRep = """
+l.b5 = "b5"
+l.ls = [1,1,2,3,5,8]
+l.newList = [1,1,2]
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "listLoop warning":
+    let content = """
+newList = listLoop([1], )
+"""
+    let eVarRep = """
+l = {}
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(1): w33: Expected a string, number, variable, list or condition.
+statement: newList = listLoop([1], )
+                                   ^
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "listLoop quick exit":
+    let content = """
+newList = listLoop([1], return(4))
+"""
+    let eVarRep = """
+l = {}
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(1): w177: Expected 'skip' or 'stop' for the return function value.
+statement: newList = listLoop([1], return(4))
+           ^
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "listLoop to many args":
+    let content = """
+newList = listLoop([1], f.cmp[0], 2, 4)
+"""
+    let eVarRep = """
+l = {}
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(1): w180: The function requires at most 3 arguments.
+statement: newList = listLoop([1], f.cmp[0], 2, 4)
+                                                ^
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "funListLoop 3 or 4":
+    let content = """
+newList = listLoop([1], f.cmp[0], 2)
+"""
+    let eVarRep = """
+l = {}
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(1): w249: Expected 3 or 4 callback parameters, got 2.
+statement: newList = listLoop([1], f.cmp[0], 2)
+                                   ^
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "funListLoop int first":
+    let content = """
+b5 = func("b5(ix: float, value: int, newList: list, state: int) bool")
+  ## Use items bigger than 5.
+  if( (value <= 5), return(false))
+  newList &= add(value, state)
+  return(false)
+
+newList = listLoop([1], b5, 2)
+"""
+    let eVarRep = """
+l.b5 = "b5"
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(7): w250: Expected the callback's first parameter to be an int, got float.
+statement: newList = listLoop([1], b5, 2)
+                                   ^
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "funListLoop list third":
+    let content = """
+b5 = func("b5(ix: int, value: int, newList: dict, state: int) bool")
+  ## Use items bigger than 5.
+  if( (value <= 5), return(false))
+  newList &= add(value, state)
+  return(false)
+
+newList = listLoop([1], b5, 2)
+"""
+    let eVarRep = """
+l.b5 = "b5"
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(7): w253: Expected the callback's third parameter to be a list, got dict.
+statement: newList = listLoop([1], b5, 2)
+                                   ^
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "funListLoop no state":
+    let content = """
+b5 = func("b5(ix: int, value: int, newList: list) bool")
+  ## Use items bigger than 5.
+  if( (value <= 5), return(false))
+  newList &= add(value, state)
+  return(false)
+
+ls = [1, 2, 3]
+newList = listLoop(ls, b5, 2)
+"""
+    let eVarRep = """
+l.b5 = "b5"
+l.ls = [1,2,3]
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(8): w252: The listLoop state argument exists but the callback doesn't have a state parameter.
+statement: newList = listLoop(ls, b5, 2)
+                                      ^
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "funListLoop callback warning":
+    let content = """
+b5 = func("b5(ix: int, value: int, newList: list) bool")
+  ## Syntax error
+  syntaxError == 5
+  return(false)
+
+ls = [1, 2, 3]
+newList = listLoop(ls, b5)
+"""
+    let eVarRep = """
+l.b5 = "b5"
+l.ls = [1,2,3]
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(3): w33: Expected a string, number, variable, list or condition.
+statement:   syntaxError == 5
+                          ^
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)

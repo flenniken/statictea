@@ -128,7 +128,7 @@ type
     wSubListsDiffTypes,    ## w115
     wMaxWarnings,          ## w116
     wInvalidSignature,     ## w117
-    wInvalidParmType,     ## w118
+    wInvalidParmType,      ## w118
     wNotEnoughArgs,        ## w119
     wWrongType,            ## w120
     wNoVarargArgs,         ## w121
@@ -261,8 +261,12 @@ type
     wExpectedListArg,      ## w246
     wExceptionFunctionArg, ## w247
     wCallbackReturnType,   ## w248
-    wCallback2Or3,         ## w249
+    wCallbackNumParams,    ## w249
     wCallbackIntParam,     ## w250
+    wExpectedVariable,     ## w251
+    wMissingStateVar,      ## w252
+    wCallbackListParam,    ## w253
+    wStateRequired,        ## w254
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -514,9 +518,13 @@ const
     "Expected the callback's return string to be 'stop', 'skip' or 'add'.", ## wCallbackStr
     "Expected list argument, got $1.", ## wExpectedListArg
     "Expected a callback function, got $1.", ## wExceptionFunctionArg
-    "Expected the callback's return type to be a list, got: $1.", ## wCallbackReturnType
-    "Expected 2 or 3 callback parameters, got $1.", ## wCallback2Or3
+    "Expected the callback's return type to be a bool, got: $1.", ## wCallbackReturnType
+    "Expected 3 or 4 callback parameters, got $1.", ## wCallbackNumParams
     "Expected the callback's first parameter to be an int, got $1.", ## wCallbackIntParam
+    "Expected a variables.", ## wExpectedVariable
+    "The listLoop state argument exists but the callback doesn't have a state parameter.", ## wMissingStateVar
+    "Expected the callback's third parameter to be a list, got $1.", ## wCallbackListParam
+    "The callback has a required state parameter but it is being not passed to it.", ## wStateRequired
     ]
 
     ## The message text.

@@ -199,3 +199,8 @@ suite "signatures.nim":
     var signatureO = newSignatureO("myname", "ifss")
     check signatureO.isSome
     check $signatureO.get() == "myname(a: int, b: float, c: string) string"
+
+  test "newSignatureO listLoop":
+    let signatureO = newSignatureO("listLoop", "lpoal")
+    check signatureO.isSome
+    check $signatureO.get() == "listLoop(a: list, b: func, c: optional any) list"

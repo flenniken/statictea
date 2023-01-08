@@ -983,6 +983,61 @@ proc andOrFunctions*(
 
 proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult
 
+proc getArguments*(
+    env: var Env,
+    statement: Statement,
+    start: Natural,
+    variables: Variables,
+    list=false,
+    arguments: var seq[Value],
+    argumentStarts: var seq[Natural],
+  ): ValueAndPosOr =
+  ## Get the function arguments and the position of each. If an
+  ## argument has a side effect, the return value and pos and side
+  ## effect is returned, else a 0 value and seNone is returned.
+  ## @:~~~
+  ## @:newList = listLoop(list, callback, state)  # comment
+  ## @:                   ^                       ^
+  ## @:newList = listLoop(return(3), callback, state)  # comment
+  ## @:                   ^        ^
+  ## @:~~~~
+
+  var runningPos = start
+
+  # Look for the no argument case.
+  let symbol = if list: gRightBracket else: gRightParentheses
+  let startSymbolO = matchSymbol(statement.text, symbol, runningPos)
+  if startSymbolO.isSome:
+    # There are no arguments.
+    runningPos = start + startSymbolO.get().length
+  else:
+    # Get the arguments to the function.
+    while true:
+      let vlOr = getValueAndPos(env, statement, runningPos, variables)
+      if quickExit(vlOr):
+        return vlOr
+      arguments.add(vlOr.value.value)
+      argumentStarts.add(runningPos)
+      runningPos = vlOr.value.pos
+
+      # Get the , or ) or ] and white space following the value.
+      let commaSymbolO = matchCommaOrSymbol(statement.text, symbol, runningPos)
+      if not commaSymbolO.isSome:
+        if symbol == gRightParentheses:
+          # Expected comma or right parentheses.
+          return newValueAndPosOr(wMissingCommaParen, "", runningPos)
+        else:
+          # Missing comma or right bracket.
+          return newValueAndPosOr(wMissingCommaBracket, "", runningPos)
+      let commaSymbol = commaSymbolO.get()
+      runningPos = runningPos + commaSymbol.length
+      let foundSymbol = commaSymbol.getGroup()
+      if (foundSymbol == ")" and symbol == gRightParentheses) or
+         (foundSymbol == "]" and symbol == gRightBracket):
+        break
+
+  result = newValueAndPosOr(newValue(0), runningPos, seNone)
+
 proc getFunctionValueAndPos*(
     env: var Env,
     functionName: string,
@@ -1331,46 +1386,67 @@ proc getBracketedVarValue*(env: var Env, statement: Statement, start: Natural,
   return newValueAndPosOr(value, runningPos)
 
 proc funListLoop(env: var Env, variables: Variables,
-    list: Value, callback: Value, state: Value): FunResult =
+    arguments: seq[Value]
+  ): FunResult =
   ## Build and return a new list by calling the callback for each item
   ## in the given list.
 
-  # Create a new list from an existing list.
-  var newList = newSeq[Value]()
+  # listLoop(a: list, callback: func, state: optional any) list
+  let signatureO = newSignatureO("listLoop", "lpoal")
+  let funResult = mapParameters(signatureO.get(), arguments)
+  if funResult.kind == frWarning:
+    return funResult
+  let map = funResult.value.dictv
+
+  let list = map["a"]
+  let callbackVar = map["b"]
+
+  # Validate the callback signature.
+  # callback(ix: int, item: any, newList: list, state: optional any) list
+  let signature = callbackVar.funcv.signature
+
+  if signature.params.len != 3 and signature.params.len != 4:
+    # Expected 3 or 4 callback parameters, got $1.
+    return newFunResultWarn(wCallbackNumParams, 1, $signature.params.len)
+  if signature.params[0].paramType != ptInt:
+    # Expected the callback's first parameter to be an int, got $1.
+    return newFunResultWarn(wCallbackIntParam, 1, $signature.params[0].paramType)
+  if signature.params[2].paramType != ptList:
+    # Expected the callback's third parameter to be a list, got $1.
+    return newFunResultWarn(wCallbackListParam, 1, $signature.params[2].paramType)
+  if "c" in map and signature.params.len == 3:
+    # The listLoop state argument exists but the callback doesn't have a state parameter.
+    return newFunResultWarn(wMissingStateVar, 2, "")
+  if not signature.optional and signature.params.len == 4 and not ("c" in map):
+    # The callback has a required state parameter but it is being not passed to it.
+    return newFunResultWarn(wStateRequired, 1, "")
+  if signature.returnType != ptBool:
+    # Expected the callback's return type to be a bool, got: $1.
+    return newFunResultWarn(wCallbackReturnType, 1, $signature.returnType)
+
+  # Call the callback for each item in the list.
+  var newListVar = newValue(newSeq[Value]())
   for ix, value in list.listv:
 
     # Call the callback.
-    # callback(ix: int, item: any, state: optional any) list
+    # callback(ix: int, item: any, newList: list, state: optional any) list
     var callbackArgs = newSeq[Value]()
     callbackArgs.add(newValue(ix))
     callbackArgs.add(value)
-    callbackArgs.add(state)
-    let callResult = callUserFunction(env, callback, variables, callbackArgs)
+    callbackArgs.add(newListVar)
+    if "c" in map:
+      callbackArgs.add(map["c"])
+    let callResult = callUserFunction(env, callbackVar, variables, callbackArgs)
     if callResult.kind == frWarning:
+      # Note: if the warning is a signature type issue, add another
+      # signature check above.
       return callResult
 
-    # Add the new item to the new list, if appropriate.
-    if callResult.kind == frWarning:
-      return callResult
-    let retList = callResult.value
-    if not (retList.kind == vkList and retList.listv.len == 2 and
-            retList.listv[0].kind == vkString):
-      # Expected the callback return's value to be a list with a string and a value.
-      return newFunResultWarn(wCallbackReturn)
-    case retList.listv[0].stringv
-    of "stop":
+    # Stop the loop when the callback returns true.
+    if callResult.value.boolv:
       break
-    of "skip":
-      continue
-    of "add":
-      newList.add(retList.listv[1])
-    else:
-      # Expected the callback's return first list item to be 'stop', 'skip' or 'add'.
-      return newFunResultWarn(wCallbackStr)
 
-    # todo: free the return list's memory.
-
-  result = newFunResult(newValue(newList))
+  result = newFunResult(newListVar)
 
 proc listLoop*(
     env: var Env,
@@ -1393,64 +1469,25 @@ proc listLoop*(
   ## @:newList = listLoop(list, callback, state)
   ## @:                   ^                     ^
   ## @:~~~~
+  var runningPos = start
+  var arguments: seq[Value]
+  var argumentStarts: seq[Natural]
+  let vpOr = getArguments(env, statement, runningPos, variables, false,
+    arguments, argumentStarts)
+  if quickExit(vpOr):
+    return vpOr
+  runningPos = vpOr.value.pos
 
-  # Get the list argument value.
-  let listVarOr = getValueAndPos(env, statement, start, variables)
-  if quickExit(listVarOr):
-    return listVarOr
-  let listVar = listVarOr.value.value
-  var runningPos = listVarOr.value.pos
-  if listVar.kind != vkList:
-    # Expected list argument, got $1.
-    return newValueAndPosOr(wExpectedListArg, $listVar.kind, start)
-
-  # Get the callback argument value.
-  let callbackVarOr = getValueAndPos(env, statement, runningPos, variables)
-  if quickExit(callbackVarOr):
-    return callbackVarOr
-  let callbackVar = callbackVarOr.value.value
-  runningPos = callbackVarOr.value.pos
-  if callbackVar.kind != vkList:
-    # Expected a callback function, got $1.
-    return newValueAndPosOr(wExceptionFunctionArg, $callbackVar.kind, start)
-
-  # Validate the callback signature.
-  # callback(ix: int, item: any, state: optional any) list
-  let signature = callbackVar.funcv.signature
-  if signature.returnType != ptList:
-    # Expected the callback's return type to be a list, got: $1.
-    return newValueAndPosOr(wCallbackReturnType, $signature.returnType, runningPos)
-  if signature.params.len != 3 and signature.params.len != 2:
-    # Expected 2 or 3 callback parameters, got $1.
-    return newValueAndPosOr(wCallback2Or3, $signature.params.len, runningPos)
-  if signature.params[0].paramType != ptInt:
-    # Expected the callback's first parameter to be an int, got $1.
-    return newValueAndPosOr(wCallbackIntParam, $signature.params[0].paramType, runningPos)
-
-  var stateVar: Value
-  # Match ) and trailing whitespace.
-  var parenO = matchSymbol(statement.text, gRightParentheses, runningPos)
-  if parenO.isSome:
-    stateVar = newValue(0)
-    runningPos += parenO.get().length
-  else:
-    # Get the state argument value.
-    let stateVarOr = getValueAndPos(env, statement, runningPos, variables)
-    if quickExit(stateVarOr):
-      return stateVarOr
-    stateVar = stateVarOr.value.value
-    runningPos = stateVarOr.value.pos
-
-    # Match ) and trailing whitespace.
-    parenO = matchSymbol(statement.text, gRightParentheses, runningPos)
-    if not parenO.isSome:
-      # No matching end right parentheses.
-      return newValueAndPosOr(wNoMatchingParen, "", runningPos)
-    runningPos = stateVarOr.value.pos
-
-  let funResult = funListLoop(env, variables, listVar, callbackVar, stateVar)
+  let funResult = funListLoop(env, variables, arguments)
   if funResult.kind == frWarning:
-    return newValueAndPosOr(funResult.warningData)
+    # Translate the warning parameter to a warning position.
+    var warningPos: int
+    if funResult.parameter < argumentStarts.len:
+      warningPos = argumentStarts[funResult.parameter]
+    else:
+      warningPos = start
+    return newValueAndPosOr(funResult.warningData.messageId,
+      funResult.warningData.p1, warningPos)
 
   return newValueAndPosOr(funResult.value, runningPos)
 
@@ -1501,8 +1538,8 @@ proc getValueAndPosWorker(env: var Env, statement: Statement, start: Natural, va
     # Get the variable name.
     let rightNameO = getVariableName(statement.text, start)
     if not rightNameO.isSome:
-      # Expected a string, number, variable, list or condition.
-      return newValueAndPosOr(wInvalidRightHandSide, "", start)
+      # Expected a variable.
+      return newValueAndPosOr(wExpectedVariable, "", start)
     let rightName = rightNameO.get()
 
     # Use f for functions, else use the local dictionary of no prefix
@@ -1738,7 +1775,7 @@ proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
     let variableDataOr = runStatement(env, statement, userVariables)
     if variableDataOr.isMessage:
       env.warnStatement(statement, variableDataOr.message, funcVar.funcv.filename)
-      # Return but don't show another message.
+      # Return success so another message is not shown.
       return newFunResultWarn(wSuccess)
     let variableData = variableDataOr.value
 
@@ -1752,7 +1789,7 @@ proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
         let pos = skipSpaces(statement.text)
         let wd2 = newWarningData(wd.messageId, wd.p1, pos)
         env.warnStatement(statement, wd2, funcVar.funcv.filename)
-        # Return but don't show another message.
+        # Return success so another message is not shown.
         return newFunResultWarn(wSuccess)
     of opIgnore:
       continue
@@ -1763,7 +1800,7 @@ proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
       if not sameType(funcVar.funcv.signature.returnType, variableData.value.kind):
         # Wrong return type, got $1.
         env.warnStatement(statement, wWrongReturnType, $variableData.value.kind, 0, funcVar.funcv.filename)
-        # Return but don't show another message.
+        # Return success so another message is not shown.
         return newFunResultWarn(wSuccess)
       # Return the value of the function.
       return newFunResult(variableData.value)
@@ -1807,11 +1844,13 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
         return lcSkip
       else:
         discard
+    # todo: handle return differently.  We don't know the position of
+    # the return argument in the statement for the warning message.
 
     # Expected 'skip' or 'stop' for the return function value.
     let wd = newWarningData(wSkipOrStop)
     env.warnStatement(statement, wd, sourceFilename = sourceFilename)
-    result = lcSkip
+    result = lcStop
 
 
 proc parseSignature*(signature: string): SignatureOr =

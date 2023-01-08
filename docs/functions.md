@@ -46,7 +46,7 @@ their values.
 * [funDup_sis](#fundup_sis) &mdash; Duplicate a string x times.
 * [funDict_old](#fundict_old) &mdash; Create a dictionary from a list of key, value pairs.
 * [funList_al](#funlist_al) &mdash; Create a list of variables.
-* [funListLoop_lpoal](#funlistloop_lpoal) &mdash; You use the list function with a callback to make a new list.
+* [funListLoop_lpoal](#funlistloop_lpoal) &mdash; You use the listLoop function to make a new list.
 * [funReplace_siiss](#funreplace_siiss) &mdash; Replace a substring specified by its position and length with another string.
 * [funReplaceRe_sls](#funreplacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
 * type: [PathComponents](#pathcomponents) &mdash; PathComponents holds the components of the file path components.
@@ -959,44 +959,41 @@ func funList_al(variables: Variables; arguments: seq[Value]): FunResult
 
 # funListLoop_lpoal
 
-You use the list function with a callback to make a new list. The callback function is called for each item in the list.
+You use the listLoop function to make a new list.  The callback function is called for each item in the list and it decides what goes in the list.
 
-You pass a list, a callback function and an optional state
-variable. The state will get passed to the callback.  The list
-function signature:
-
-~~~
-list(a: list, callback: func, state: optional any) list
-~~~
-
-Callback signature:
+You pass a list, a callback function, and an optional state
+variable.
 
 ~~~
-callback(ix: int, item: any, state: optional any) list
+listLoop(a: list, callback: func, state: optional any) list
 ~~~
 
-The callback returns two values in a list. The first value tells
-whether to add the item, skip the item, or stop the loop. It is a
-string of “add”, “skip”, or “stop”.  The second value is the value
-to add to the new list for the add case.
+The callback gets pasted the index to the item, its value, the
+new list and the state variable.  The callback looks at the
+information and adds to the new list when appropriate. The
+callback returns true to stop iterating.
+
+~~~
+callback(ix: int, item: any, newList: list, state: optional any) bool
+~~~
 
 The following example makes a new list [6, 8] from the list
 [2,4,6,8].  The callback is called b5.
 
 ~~~
-newList = list([2,4,6,8], b5)
-  => [6, 8]
+list = [2,4,6,8]
+newlist = listLoop(list, b5)
+=> [6, 8]
 ~~~
 
 Below is the definition of the b5 callback function.
 
 ~~~
-b5 = func(“b5(ix: int, value: any, state: optional any) list”)
-  ## List callback that uses
-  ## values greater than 5.
-  result &= if( (value > 5), “add”, “skip“)
-  result &= value
-  return(result)
+b5 = func(“b5(ix: int, value: int, newList: list) bool”)
+  ## Collect values greater than 5.
+  if( (value <= 5), return(false))
+  newList &= value
+  return(false)
 ~~~
 
 ```nim
