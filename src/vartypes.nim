@@ -151,12 +151,12 @@ type
   FunResult* = object
     ## Contains the result of calling a function, either a value or a
     ## warning. The parameter field is the index of the problem
-    ## argument.
+    ## argument or -1 to point at the function itself.
     case kind*: FunResultKind
       of frValue:
         value*: Value
       of frWarning:
-        parameter*: Natural
+        parameter*: int
         warningData*: WarningData
 
   SideEffect* = enum
@@ -166,10 +166,13 @@ type
     ## @:* seReturn -- a return side effect, either stop or skip. stop
     ## @:the command or skip the replacement block iteration.
     ## @:* seLogMessage -- the log function specified to write a message to the log file
+    ## @:* seBareIfIgnore -- the bare IF was false, ignore the statement
     seNone = "none",
     seReturn = "return",
     seLogMessage = "log",
+    seBareIfIgnore = "bareIfIgnore",
 
+  # todo: rename ValueAndPos to ValuePosSE
   ValueAndPos* = object
     ## A value and the position after the value in the statement along
     ## with the side effect, if any. The position includes the trailing
@@ -543,7 +546,7 @@ func newValueOr*(value: Value): ValueOr =
   ## Create a new ValueOr containing a value.
   result = opValueW[Value](value)
 
-func newFunResultWarn*(warning: MessageId, parameter: Natural = 0,
+func newFunResultWarn*(warning: MessageId, parameter: int = 0,
     p1: string = "", pos = 0): FunResult =
   ## Return a new FunResult object containing a warning. It takes a
   ## message id, the index of the problem parameter, and the optional
@@ -552,7 +555,7 @@ func newFunResultWarn*(warning: MessageId, parameter: Natural = 0,
   result = FunResult(kind: frWarning, parameter: parameter,
                      warningData: warningData)
 
-func newFunResultWarn*(warningData: Warningdata, parameter: Natural = 0): FunResult =
+func newFunResultWarn*(warningData: Warningdata, parameter: int = 0): FunResult =
   ## Return a new FunResult object containing a warning created from a
   ## WarningData object.
   result = FunResult(kind: frWarning, parameter: parameter,
@@ -588,7 +591,7 @@ func `$`*(funResult: FunResult): string =
 proc newValueAndPos*(value: Value, pos: Natural,
     sideEffect: SideEffect = seNone): ValueAndPos =
   ## Create a newValueAndPos object.
-  result = ValueAndPos(value: value, pos: pos)
+  result = ValueAndPos(value: value, pos: pos, sideEffect: sideEffect)
 
 func newValueAndPosOr*(warning: MessageId, p1 = "", pos = 0):
     ValueAndPosOr =

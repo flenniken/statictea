@@ -92,16 +92,16 @@ Test number of args.
 ~~~
 tmpl.txt(25): c is 0
 tmpl.txt(31): c is 1
-tmpl.txt(35): w212: An if with an assignment takes three arguments.
+tmpl.txt(35): w212: An IF with an assignment takes three arguments.
 statement: a = if(true, 1)
                          ^
-tmpl.txt(36): w213: An if without an assignment takes two arguments.
+tmpl.txt(36): w213: An IF without an assignment takes two arguments.
 statement: if(true, 1, 2)
                      ^
-tmpl.txt(42): w213: An if without an assignment takes two arguments.
+tmpl.txt(42): w213: An IF without an assignment takes two arguments.
 statement: if(true, 1, 2)
                      ^
-tmpl.txt(44): w212: An if with an assignment takes three arguments.
+tmpl.txt(44): w212: An IF with an assignment takes three arguments.
 statement: a = if(true, 1)
                          ^
 ~~~

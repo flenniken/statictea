@@ -2217,6 +2217,9 @@ normal form:
 - log - writes a message to the log file
 - func - define a function, see [[#user-functions][User Functions]]
 
+If the form doesn't have an assignment it's called a bare
+function. The warn, return, if and log have bare forms.
+
 Special Form Examples:
 
 #+BEGIN_SRC
@@ -2238,33 +2241,39 @@ log("log message")
    :CUSTOM_ID: if-functions
    :END:
 
-The if and if0 functions are special in a couple of ways. They
-conditionally evaluate their arguments and they can be used in a
-statement without an assignment.
+You pass two or three arguments to the if/if0 functions and they
+are special in a few ways:
 
-There are two forms, one with assignment and one without. The
-assignment form has three parameters and the other one has two.
-Here is an example of each:
+- they conditionally evaluate their arguments
+- the 2 parameter case assigns nothing when the condition is false
+- the 2 parameter case can be used in a statement without an
+  assignment when using the return or warn function
+
+Here are examples of the cases:
 
 #+BEGIN_SRC
-a = if(true, 1, 2)
-if(c, warn("c is true"))
+a = if(cond, 5, 6)
+b = if(cond, 1)
+
+c &= if(cond, 5, 6)
+d &= if(cond, 1)
+
+if(cond, return("stop"))
+if(cond, warn("out of tea!"))
 #+END_SRC
 
-The no assignment form is used with the warn and return functions
-for their side effects.
+**Conditional Evaluate**
 
-The if functions evaluates their condition argument first to
+The if/if0 function evaluates its condition argument first to
 determine which argument to evaluate next and the non-matching
-argument is skipped. This is important when you use the warn or
-return functions to control the statement flow and it is
-different from the other functions which evaluate all their
+argument is skipped. Normally functions evaluate all their
 arguments before passing them to the function.
 
-In the following example do1 is executed and doOther is skipped.
+In the following example doThis is executed and doOther is
+skipped.
 
 #+BEGIN_SRC
-a = if(true, do1(), doOther())
+a = if(true, doThis(), doOther())
 #+END_SRC
 
 The next example has a warn call in it.  If all the arguments
@@ -2274,9 +2283,30 @@ were evaluated, the warn would run everytime.
 a = if0(0, do0(), warn("not zero"))
 #+END_SRC
 
-The warn and return functions modify the statement flow.  The
-warn function skips the current statement and the return function
-ends the current command.
+**False Two Parameter Case**
+
+The 2 parameter case assigns nothing when the condition is
+false. In the next example, the variable a and b are not created.
+
+~~~
+a = if(false, 5)
+b &= if(false, 6)
+~~~
+
+**No Assignment Two Parameter Case**
+
+The 2 parameter case can be used in a statement without an
+assignment when using the return or warn function. This is the
+only place the return function can be used as an argument (you
+can use warn anywhere).
+
+The return function has a side effect of controlling the
+statement flow.
+
+~~~
+if(true, return("stop"))
+if(true, warn("Buy more tea!"))
+~~~
 
 [[#contents][茶]]
 
@@ -4274,6 +4304,10 @@ looping and there are two variations:
 - "skip" -- skip this replacement block and continue with the
 next iteration
 
+You can use the return function as an argument to the 2
+parameter if functions, but not as an argument to other
+functions.
+
 #+BEGIN_SRC
 return(value: any) any
 #+END_SRC
@@ -4282,8 +4316,8 @@ Examples:
 
 #+BEGIN_SRC
 return(5)
-if(c, return("stop"))
-if(c, return("skip"))
+if(cond, return("stop"))
+if(cond, return("skip"))
 #+END_SRC
 
 [[#contents][茶]]

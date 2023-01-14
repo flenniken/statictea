@@ -1150,7 +1150,7 @@ $$ endblock
 
   test "return short circuit":
     let templateContent = """
-$$ block a = return("stop")
+$$ block if(true, return("stop"))
 $$ : a = warn("not hit")
 repeat short circuit
 $$ endblock

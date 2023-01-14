@@ -2059,6 +2059,10 @@ func funReturn_aa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:* "skip" -- skip this replacement block and continue with the
   ## @:next iteration
   ## @:
+  ## @:You can use the return function as an argument to the 2
+  ## @:parameter if functions, but not as an argument to other
+  ## @:functions.
+  ## @:
   ## @:~~~
   ## @:return(value: any) any
   ## @:~~~~
@@ -2067,11 +2071,14 @@ func funReturn_aa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:
   ## @:~~~
   ## @:return(5)
-  ## @:if(c, return("stop"))
-  ## @:if(c, return("skip"))
+  ## @:if(cond, return("stop"))
+  ## @:if(cond, return("skip"))
   ## @:~~~~
+  # Check there is one argument.
   tMapParameters("return", "aa")
-  result = newFunResult(map["a"])
+  discard map
+  # Invalid return; use a bare return in a user function or use it in a bare if statement.
+  result = newFunResultWarn(wReturnArgument, -1)
 
 func funString_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Convert a variable to a string. You specify the variable and

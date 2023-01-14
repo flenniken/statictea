@@ -267,6 +267,7 @@ type
     wMissingStateVar,      ## w252
     wCallbackListParam,    ## w253
     wStateRequired,        ## w254
+    wReturnArgument,       ## w255
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -482,8 +483,8 @@ const
     "No matching end right bracket.", ## wNoMatchingBracket
     "Invalid character.", ## wInvalidCharacter
     "Invalid first character of the argument.", ## wInvalidFirstArgChar
-    "An if with an assignment takes three arguments.", ## wAssignmentIf
-    "An if without an assignment takes two arguments.", ## wBareIfTwoArguments
+    "An IF with an assignment takes three arguments.", ## wAssignmentIf
+    "An IF without an assignment takes two arguments.", ## wBareIfTwoArguments
     "Expected a variable or a dot name.", ##  wExpectedDotname
     "Expected variable name not function call.", ## wInvalidDotname
     "Invalid REPL command syntax, unexpected text.", ## wInvalidReplSyntax
@@ -525,6 +526,7 @@ const
     "The listLoop state argument exists but the callback doesn't have a state parameter.", ## wMissingStateVar
     "Expected the callback's third parameter to be a list, got $1.", ## wCallbackListParam
     "The callback has a required state parameter but it is being not passed to it.", ## wStateRequired
+    "Invalid return; use a bare return in a user function or use it in a bare if statement.", ## wReturnArgument
     ]
 
     ## The message text.

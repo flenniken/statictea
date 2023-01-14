@@ -268,7 +268,7 @@ FunResultKind = enum
 
 # FunResult
 
-Contains the result of calling a function, either a value or a warning. The parameter field is the index of the problem argument.
+Contains the result of calling a function, either a value or a warning. The parameter field is the index of the problem argument or -1 to point at the function itself.
 
 ```nim
 FunResult = object
@@ -277,7 +277,7 @@ FunResult = object
       value*: Value
 
   of frWarning:
-      parameter*: Natural
+      parameter*: int
       warningData*: WarningData
 
 
@@ -291,10 +291,12 @@ The kind of side effect for a statement.
 * seReturn -- a return side effect, either stop or skip. stop
 the command or skip the replacement block iteration.
 * seLogMessage -- the log function specified to write a message to the log file
+* seBareIfIgnore -- the bare IF was false, ignore the statement
 
 ```nim
 SideEffect = enum
-  seNone = "none", seReturn = "return", seLogMessage = "log"
+  seNone = "none", seReturn = "return", seLogMessage = "log",
+  seBareIfIgnore = "bareIfIgnore"
 ```
 
 # ValueAndPos
@@ -643,8 +645,8 @@ func newValueOr(value: Value): ValueOr
 Return a new FunResult object containing a warning. It takes a message id, the index of the problem parameter, and the optional string that goes with the warning.
 
 ```nim
-func newFunResultWarn(warning: MessageId; parameter: Natural = 0;
-                      p1: string = ""; pos = 0): FunResult
+func newFunResultWarn(warning: MessageId; parameter: int = 0; p1: string = "";
+                      pos = 0): FunResult
 ```
 
 # newFunResultWarn
@@ -652,7 +654,7 @@ func newFunResultWarn(warning: MessageId; parameter: Natural = 0;
 Return a new FunResult object containing a warning created from a WarningData object.
 
 ```nim
-func newFunResultWarn(warningData: WarningData; parameter: Natural = 0): FunResult
+func newFunResultWarn(warningData: WarningData; parameter: int = 0): FunResult
 ```
 
 # newFunResult

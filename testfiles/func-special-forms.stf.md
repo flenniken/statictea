@@ -53,9 +53,6 @@ o.v1 = {o.v1} = false
 o.v2 = {o.v2} = false
 o.v3 = {o.v3} = true
 o.v4 = {o.v4} = {{o.v4}
-o.v5 = {o.v5} = skip
-o.v6 = {o.v6} = 3
-o.v7 = {o.v7} = 1
 $$ endblock
 ~~~
 
@@ -96,12 +93,12 @@ warnfunc = f.warn
 o.v4 = l.warnfunc("calling warn"))
 
 returnfunc = f.return
-o.v5 = l.returnfunc("skip")
+if(true,l.returnfunc("skip"))
 
 if(false, "not expected IF message")
 if(true, "if true message")
-o.v6 = if(true, 3, "not hit")
-o.v7 = if(false, "not hit", 1)
+if(true, 3, "bare requires two parameters")
+if(false, 3, "bare requires two parameters")
 ~~~
 
 ### File result.expected
@@ -115,9 +112,6 @@ o.v1 = false = false
 o.v2 = false = false
 o.v3 = true = true
 o.v4 = {o.v4} = {o.v4}
-o.v5 = skip = skip
-o.v6 = 3 = 3
-o.v7 = 1 = 1
 ~~~
 
 ### File stdout.expected
@@ -135,6 +129,15 @@ shared.tea(9): w224: The variable 'a' isn't in the f dictionary.
 statement: o.r2 = a(true, 3, 4)
                   ^
 shared.tea(23): calling warn
+shared.tea(26): w255: Invalid return; use a bare return in a user function or use it in a bare if statement.
+statement: if(true,l.returnfunc("skip"))
+                   ^
+shared.tea(30): w213: An IF without an assignment takes two arguments.
+statement: if(true, 3, "bare requires two parameters")
+                     ^
+shared.tea(31): w213: An IF without an assignment takes two arguments.
+statement: if(false, 3, "bare requires two parameters")
+                      ^
 tmpl.txt(4): w58: The replacement variable doesn't exist: o.r1.
 tmpl.txt(5): w58: The replacement variable doesn't exist: o.r2.
 tmpl.txt(10): w58: The replacement variable doesn't exist: o.v4.

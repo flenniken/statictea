@@ -52,18 +52,6 @@ $$ : num = add(t.row, 1)
 $$ : if((num == 2), return("skip"))
 * {num} -- skip row 2
 
-Stop on row 2:
-$$ nextline t.repeat = 3
-$$ : num = add(t.row, 1)
-$$ : a = if((num == 2), return("stop"), 1)
-* {num} -- stop on row 2
-
-Skip row 2:
-$$ nextline t.repeat = 3
-$$ : num = add(t.row, 1)
-$$ : a = if((num == 2), return("skip"), 1)
-* {num} -- skip row 2
-
 Loop 3 times:
 $$ nextline t.repeat = 3
 $$ : num = add(t.row, 1)
@@ -112,13 +100,6 @@ Tea code file o.type = json
 * 1 -- this nextline replacement block repeats 3 times
 * 2 -- this nextline replacement block repeats 3 times
 * 3 -- this nextline replacement block repeats 3 times
-
-Stop on row 2:
-* 1 -- stop on row 2
-
-Skip row 2:
-* 1 -- skip row 2
-* 3 -- skip row 2
 
 Stop on row 2:
 * 1 -- stop on row 2

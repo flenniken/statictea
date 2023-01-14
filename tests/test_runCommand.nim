@@ -286,14 +286,15 @@ proc testGetFunctionValueAndPos(
     eValueAndPosOr: ValueAndPosOr,
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
-    eOutLines: seq[string] = @[]
+    eOutLines: seq[string] = @[],
+    functionPos: Natural = 0,
   ): bool =
 
   let funcsVarDict = createFuncDictionary().dictv
   let variables = startVariables(funcs = funcsVarDict)
 
   var env = openEnvTest("_testGetFunctionValueAndPos.txt")
-  let valueAndPosOr = getFunctionValueAndPos(env, functionName,
+  let valueAndPosOr = getFunctionValueAndPos(env, functionName, functionPos,
     statement, start, variables, list=false)
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
@@ -977,6 +978,31 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr("", opReturn, newValue("stop"))
     check testRunStatement(statement, eVariableDataOr)
 
+  test "bare if with return":
+    let statement = newStatement(text="""if(true, return("stop"))""", lineNum=1)
+    let eVariableDataOr = newVariableDataOr("", opReturn, newValue("stop"))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "bare if with return false":
+    let statement = newStatement(text="""if(false, return("stop"))""", lineNum=1)
+    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(0))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "bare if true":
+    let statement = newStatement(text="""if(true, "hello")""", lineNum=1)
+    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue("hello"))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "bare if false":
+    let statement = newStatement(text="""if(false, "hello")""", lineNum=1)
+    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(0))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "if with return":
+    let statement = newStatement(text="""a = if(false, 1, return("stop"))""", lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 17)
+    check testRunStatement(statement, eVariableDataOr)
+
   test "bare warn":
     let statement = newStatement(text="""warn("hello")""", lineNum=1)
     let eVariableDataOr = newVariableDataOr(wUserMessage, "hello", 5)
@@ -1301,13 +1327,13 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "return skip":
     let text = """a = return("skip")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", opReturn, newValue("skip"))
+    let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 4)
     check testRunStatement(statement, eVariableDataOr)
 
   test "return stop nested":
     let text = """a = if0(0, return("stop"))"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", opReturn, newValue("stop"))
+    let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 11)
     check testRunStatement(statement, eVariableDataOr)
 
   test "if assignment takes three args":
@@ -1331,25 +1357,25 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "return no stop":
     let text = """a = if0(0, [1,2,return("stop")])"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", opReturn, newValue("stop"))
+    let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 16)
     check testRunStatement(statement, eVariableDataOr)
 
   test "return cond stop":
     let text = """a = if0(return("stop"),5)"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", opReturn, newValue("stop"))
+    let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 8)
     check testRunStatement(statement, eVariableDataOr)
 
   test "return third stop":
     let text = """a = if0(1, 5, return("stop"))"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", opReturn, newValue("stop"))
+    let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 14)
     check testRunStatement(statement, eVariableDataOr)
 
   test "return third stop":
     let text = """a = len(return("stop"))"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", opReturn, newValue("stop"))
+    let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 8)
     check testRunStatement(statement, eVariableDataOr)
 
   test "bare if taken":
@@ -1361,7 +1387,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "bare if not taken":
     let text = """if0(1, return("stop"))"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("if0", opIgnore, newValue(0))
+    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(0))
     check testRunStatement(statement, eVariableDataOr)
 
   test "bare if takes two args":
@@ -1377,9 +1403,9 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     check testRunStatement(statement, eVariableDataOr)
 
   test "bare extra":
-    let text = """if0(1, warn("got one")) junk"""
+    let text = """if0(1, len("got one")) junk"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wTextAfterValue, "", 24)
+    let eVariableDataOr = newVariableDataOr(wTextAfterValue, "", 23)
     check testRunStatement(statement, eVariableDataOr)
 
   test "empty line":
@@ -2397,16 +2423,15 @@ testcode.tea(3): there
     let content = """
 a = 1
 b = 2
-c = if0(a, return("stop"), 3)
-d = 4
-e = if0(cmp(1,a), return("stop"))
+if0(a, return("stop"))
+c = 4
+if0(cmp(1,a), return("stop"))
 end = 5
 """
     let eVarRep = """
 l.a = 1
 l.b = 2
-l.c = 3
-l.d = 4
+l.c = 4
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
@@ -2425,9 +2450,9 @@ l.b = 2
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.tea(2): w187: Use '...return("stop")...' in a code file.
+testcode.tea(2): w255: Invalid return; use a bare return in a user function or use it in a bare if statement.
 statement: c = if0(0, return("skip"))
-           ^
+                      ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 
@@ -2647,7 +2672,7 @@ zero = func("zero() int")
 z = l.zero()
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.tea(3): w46: Expected comma or right parentheses.
+testcode.tea(3): w203: No matching end right parentheses.
 statement:   return(0
                      ^
 """
@@ -2941,21 +2966,6 @@ o = {}
 testcode.tea(1): w33: Expected a string, number, variable, list or condition.
 statement: newList = listLoop([1], )
                                    ^
-"""
-    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
-
-  test "listLoop quick exit":
-    let content = """
-newList = listLoop([1], return(4))
-"""
-    let eVarRep = """
-l = {}
-o = {}
-"""
-    let eErrLines: seq[string] = splitNewLines """
-testcode.tea(1): w177: Expected 'skip' or 'stop' for the return function value.
-statement: newList = listLoop([1], return(4))
-           ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 

@@ -1501,6 +1501,10 @@ looping and there are two variations:
 * "skip" -- skip this replacement block and continue with the
 next iteration
 
+You can use the return function as an argument to the 2
+parameter if functions, but not as an argument to other
+functions.
+
 ~~~
 return(value: any) any
 ~~~
@@ -1509,8 +1513,8 @@ Examples:
 
 ~~~
 return(5)
-if(c, return("stop"))
-if(c, return("skip"))
+if(cond, return("stop"))
+if(cond, return("skip"))
 ~~~
 
 ```nim

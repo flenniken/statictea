@@ -789,29 +789,51 @@ func getSpecialFunction(funcVar: Value): SpecialFunction =
   else:
     result = spNotSpecial
 
+proc bareReturn(
+    env: var Env,
+    statement: Statement,
+    start: Natural,
+    variables: Variables,
+  ): ValueAndPosOr =
+  ## Handle the return function.
+  ## if(true, return( "stop")  )
+  ##                  ^         ^
+  ## return( "stop")
+  ##         ^      ^
+  # Get the value.
+  var runningPos = start
+  let valueAndPosOr = getValueAndPos(env, statement, runningPos, variables)
+  if valueAndPosOr.isMessage:
+    return valueAndPosOr
+  var value = valueAndPosOr.value.value
+  runningPos = valueAndPosOr.value.pos
+
+  # Match ) and trailing whitespace.
+  let parenO = matchSymbol(statement.text, gRightParentheses, runningPos)
+  if not parenO.isSome:
+    # No matching end right parentheses.
+    return newValueAndPosOr(wNoMatchingParen, "", runningPos)
+  runningPos += parenO.get().length
+
+  return newValueAndPosOr(value, runningPos, seReturn)
+
 proc ifFunctions*(
     env: var Env,
     specialFunction: SpecialFunction,
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list=false, bare=false): ValueAndPosOr =
+  ): ValueAndPosOr =
   ## Return the if/if0 function's value and position after. It
   ## conditionally runs one of its arguments and skips the
   ## other. Start points at the first argument of the function. The
   ## position includes the trailing whitespace after the ending ).
   ## @:
-  ## @:The three parameter if requires an assignment.  The two parameter
-  ## @:version cannot have an assignment. The if function cond is a
-  ## @:boolean, for if0 it is anything.
-  ## @:
-  ## @:cases:
+  ## @:This handles the three parameter form with an assignment.
   ## @:
   ## @:~~~
   ## @:a = if(cond, then, else)
   ## @:       ^                ^
-  ## @:if(cond, then)
-  ## @:   ^          ^
   ## @:~~~~
 
   # Get the condition's value.
@@ -821,6 +843,7 @@ proc ifFunctions*(
   let cond = vlcOr.value.value
   var runningPos = vlcOr.value.pos
 
+  # Get the boolean for IF and IF0.
   var condition = false
   if specialFunction == spIf:
     if cond.kind != vkBool:
@@ -833,12 +856,8 @@ proc ifFunctions*(
   # Match the comma and whitespace.
   let commaO = matchSymbol(statement.text, gComma, runningPos)
   if not commaO.isSome:
-    if bare:
-      # "An if without an assignment takes two arguments.
-      return newValueAndPosOr(wBareIfTwoArguments, "", start)
-    else:
-      # An if with an assignment takes three arguments.
-      return newValueAndPosOr(wAssignmentIf, "", start)
+    # An if with an assignment takes three arguments.
+    return newValueAndPosOr(wAssignmentIf, "", start)
   runningPos += commaO.get().length
 
   # Handle the second parameter.
@@ -851,56 +870,141 @@ proc ifFunctions*(
       return newValueAndPosOr(posOr.message)
     runningPos = posOr.value
   else:
+    # Get the second value.
     vl2Or = getValueAndPos(env, statement, runningPos, variables)
-    if quickExit(vl2Or):
+    if vl2Or.isMessage:
       return vl2Or
     runningPos = vl2Or.value.pos
 
-  var vl3Or: ValueAndPosOr
   # Match the comma and whitespace.
+  var vl3Or: ValueAndPosOr
   let cO = matchSymbol(statement.text, gComma, runningPos)
-  if cO.isSome:
-    if bare:
-      # A bare if statement takes to arguments.
-      return newValueAndPosOr(wBareIfTwoArguments, "", runningPos)
+  if not cO.isSome:
+    # An if with an assignment takes three arguments.
+    return newValueAndPosOr(wAssignmentIf, "", runningPos)
+  runningPos += cO.get().length
 
-    # We got a comma so we expect a third parameter.
-    runningPos += cO.get().length
-
-    # Handle the third parameter.
-    skip = (condition == true)
-    if skip:
-      let posOr = skipArg(statement, runningPos)
-      if posOr.isMessage:
-        return newValueAndPosOr(posOr.message)
-      runningPos = posOr.value
-    else:
-      vl3Or = getValueAndPos(env, statement, runningPos, variables)
-      if quickExit(vl3Or):
-        return vl3Or
-      runningPos = vl3Or.value.pos
+  # Handle the third parameter.
+  skip = (condition == true)
+  if skip:
+    let posOr = skipArg(statement, runningPos)
+    if posOr.isMessage:
+      return newValueAndPosOr(posOr.message)
+    runningPos = posOr.value
   else:
-    if not bare:
-      # An if with an assignment takes three arguments.
-      return newValueAndPosOr(wAssignmentIf, "", runningPos)
+    vl3Or = getValueAndPos(env, statement, runningPos, variables)
+    if vl3Or.isMessage:
+      return vl3Or
+    runningPos = vl3Or.value.pos
 
   # Match ) and trailing whitespace.
   let parenO = matchSymbol(statement.text, gRightParentheses, runningPos)
   if not parenO.isSome:
     # No matching end right parentheses.
     return newValueAndPosOr(wNoMatchingParen, "", runningPos)
-
   runningPos += parenO.get().length
 
-  if bare:
-    result = newValueAndPosOr(newValue(0), runningPos)
+  var value: Value
+  if condition:
+    value = vl2Or.value.value
   else:
-    var value: Value
-    if condition:
-      value = vl2Or.value.value
+    value = vl3Or.value.value
+  result = newValueAndPosOr(value, runningPos)
+
+proc bareIfAndIf0*(
+    env: var Env,
+    specialFunction: SpecialFunction,
+    statement: Statement,
+    start: Natural,
+    variables: Variables,
+  ): ValueAndPosOr =
+  ## Handle the bare if/if0. Return the resulting value and the
+  ## position in the statement after the if.
+  ## @:
+  ## @:~~~
+  ## @:if(cond, return("stop"))
+  ## @:   ^                    ^
+  ## @:if(c, warn("c is true"))
+  ## @:   ^                    ^
+  ## @:~~~~
+  var runningPos = start
+
+  # Get the condition's value.
+  let vlcOr = getValueAndPos(env, statement, runningPos, variables)
+  if vlcOr.isMessage:
+    return vlcOr
+  let cond = vlcOr.value.value
+  runningPos = vlcOr.value.pos
+
+  # Get the boolean for IF and IF0.
+  var condition = false
+  if specialFunction == spIf:
+    if cond.kind != vkBool:
+      # The if condition must be a bool value, got a $1.
+      return newValueAndPosOr(wExpectedBool, $cond.kind, start)
+    condition = cond.boolv
+  else: # if0
+    condition = if0Condition(cond) == false
+
+  # Match the comma and whitespace.
+  let commaO = matchSymbol(statement.text, gComma, runningPos)
+  if not commaO.isSome:
+    # "An IF without an assignment takes two arguments.
+    return newValueAndPosOr(wBareIfTwoArguments, "", start)
+  runningPos += commaO.get().length
+
+  # Handle the second parameter.
+  var skip = (condition == false)
+  var value2: Value
+  var se2: SideEffect
+  if skip:
+    let posOr = skipArg(statement, runningPos)
+    if posOr.isMessage:
+      return newValueAndPosOr(posOr.message)
+    runningPos = posOr.value
+    value2 = newValue(0)
+    se2 = seBareIfIgnore
+  else:
+    # Get the second value.
+    var valueAndPosOr: ValueAndPosOr
+    # Handle the return function extra special.
+    if statement.text[runningPos .. ^1].startsWith("return("):
+      const
+        returnParenLen = len("return(")
+      runningPos += returnParenLen
+
+      # Skip whitespace, if any.
+      let spaceMatchO = matchTabSpace(statement.text, runningPos)
+      if isSome(spaceMatchO):
+        runningPos += spaceMatchO.get().length
+
+      valueAndPosOr = bareReturn(env, statement, runningPos, variables)
+      if valueAndPosOr.isMessage:
+        return valueAndPosOr
+      se2 = valueAndPosOr.value.sideEffect
     else:
-      value = vl3Or.value.value
-    result = newValueAndPosOr(value, runningPos)
+      valueAndPosOr = getValueAndPos(env, statement, runningPos, variables)
+      if valueAndPosOr.isMessage:
+        return valueAndPosOr
+      se2 = valueAndPosOr.value.sideEffect
+    let vandp = valueAndPosOr.value
+    runningPos = vandp.pos
+    value2 = vandp.value
+
+  # Match , or ) and trailing whitespace.
+  let commaSymbolO = matchCommaOrSymbol(statement.text, gRightParentheses, runningPos)
+  if not commaSymbolO.isSome:
+    # No matching end right parentheses.
+    return newValueAndPosOr(wNoMatchingParen, "", runningPos)
+  let commaSymbol = commaSymbolO.get()
+  let foundSymbol = commaSymbol.getGroup()
+  if foundSymbol == ",":
+    # An IF without an assignment takes two arguments.
+    return newValueAndPosOr(wBareIfTwoArguments, "", runningPos)
+
+  runningPos += commaSymbol.length
+
+  result = newValueAndPosOr(value2, runningPos, se2)
 
 proc andOrFunctions*(
     env: var Env,
@@ -1038,9 +1142,24 @@ proc getArguments*(
 
   result = newValueAndPosOr(newValue(0), runningPos, seNone)
 
+func warningParameterPos(
+    parameter: int,
+    argumentStarts: seq[Natural],
+    start: Natural,
+    functionStart: Natural
+  ): Natural =
+  ## Translate the warning parameter to a warning position.
+  if parameter == -1:
+    result = functionStart
+  elif parameter < argumentStarts.len:
+    result = argumentStarts[parameter]
+  else:
+    result = start
+
 proc getFunctionValueAndPos*(
     env: var Env,
     functionName: string,
+    functionPos: Natural,
     statement: Statement,
     start: Natural,
     variables: Variables,
@@ -1091,19 +1210,15 @@ proc getFunctionValueAndPos*(
     funResult = callUserFunction(env, funcVar, variables, arguments)
 
   if funResult.kind == frWarning:
-    var warningPos: int
-    if funResult.parameter < argumentStarts.len:
-      warningPos = argumentStarts[funResult.parameter]
-    else:
-      warningPos = start
+    let warningPos = warningParameterPos(funResult.parameter, argumentStarts, start, functionPos)
     return newValueAndPosOr(funResult.warningData.messageId,
       funResult.warningData.p1, warningPos)
 
   var sideEffect: SideEffect
   # todo: use the signature function name instead?
-  if functionName == "return":
-    sideEffect = seReturn
-  elif functionName == "log":
+  assert functionName != "return"
+
+  if functionName == "log":
     sideEffect = seLogMessage
   else:
     sideEffect = seNone
@@ -1455,12 +1570,9 @@ proc listLoop*(
 
   let funResult = funListLoop(env, variables, arguments)
   if funResult.kind == frWarning:
-    # Translate the warning parameter to a warning position.
-    var warningPos: int
-    if funResult.parameter < argumentStarts.len:
-      warningPos = argumentStarts[funResult.parameter]
-    else:
-      warningPos = start
+    # todo: pass in functionPos
+    let functionPos = 0
+    let warningPos = warningParameterPos(funResult.parameter, argumentStarts, start, functionPos)
     return newValueAndPosOr(funResult.warningData.messageId,
       funResult.warningData.p1, warningPos)
 
@@ -1503,7 +1615,7 @@ proc getValueAndPosWorker(env: var Env, statement: Statement, start: Natural, va
     let startSymbol = startSymbolO.get()
 
     # Get the list. The literal list [...] and list(...) are similar.
-    result = getFunctionValueAndPos(env, "list", statement,
+    result = getFunctionValueAndPos(env, "list", start, statement,
       start+startSymbol.length, variables, list=true)
 
   of rtCondition:
@@ -1555,7 +1667,7 @@ proc getValueAndPosWorker(env: var Env, statement: Statement, start: Natural, va
         return newValueAndPosOr(wDefineFunction, "", start)
       of spNotSpecial, spReturn, spWarn, spLog:
         # Handle normal functions and warn, return and log.
-        return getFunctionValueAndPos(env, rightName.dotName, statement,
+        return getFunctionValueAndPos(env, rightName.dotName, start, statement,
           rightName.pos, variables, list=false)
 
     of vnkGet:
@@ -1621,6 +1733,8 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
   ## @:~~~
   ## @:if( true, warn("tea time")) # test
   ## @:^                           ^
+  ## @:return(5)
+  ## @:^        ^
   ## @:~~~~
   let runningPos = leftName.pos
 
@@ -1637,13 +1751,16 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
   case specialFunction:
   of spIf, spIf0:
     # Handle the special bare if functions.
-    result = ifFunctions(env, specialFunction, statement, runningPos, variables, bare=true)
+    result = bareIfAndIf0(env, specialFunction, statement, runningPos, variables)
+  of spReturn:
+    result = bareReturn(env, statement, runningPos, variables)
   of spNotSpecial, spAnd, spOr, spFunc, spListLoop:
     # Missing left hand side and operator, e.g. a = len(b) not len(b).
     result = newValueAndPosOr(wMissingLeftAndOpr, "", start)
-  of spReturn, spWarn, spLog:
-    # Handle a bare warn, log or return function.
-    result = getFunctionValueAndPos(env, $specialFunction, statement, runningPos, variables, list=false)
+  of spWarn, spLog:
+    # Handle a bare warn, or log function.
+    result = getFunctionValueAndPos(env, $specialFunction, start,
+      statement, runningPos, variables, list=false)
 
 proc runStatement*(env: var Env, statement: Statement, variables: Variables): VariableDataOr =
   ## Run one statement and return the variable dot name string,
@@ -1668,6 +1785,7 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
   var vlOr: ValueAndPosOr
   var operator = opIgnore
   var operatorLength = 0
+  var finalLeftName = leftName.dotName
 
   case leftName.kind
   of vnkFunction:
@@ -1676,6 +1794,7 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
     vlOr = runBareFunction(env, statement, runningPos, variables, leftName)
     if vlOr.isMessage:
       return newVariableDataOr(vlOr.message)
+    finalLeftName = ""
   of vnkGet:
     # You cannot use bracket notation to change a variable.
     return newVariableDataOr(wLeftHandBracket)
@@ -1703,16 +1822,6 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
   if vlOr.isMessage:
     return newVariableDataOr(vlOr.message)
 
-  case vlOr.value.sideEffect
-  of seReturn:
-    # Return function exit.
-    return newVariableDataOr("", opReturn, vlOr.value.value)
-  of seLogMessage:
-    # Log statement exit.
-    return newVariableDataOr("", opLog, vlOr.value.value)
-  of seNone:
-    discard
-
   # Check that there is not any unprocessed text following the value.
   if vlOr.value.pos != statement.text.len:
     # Check for a trailing comment.
@@ -1720,8 +1829,21 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
       # Unused text at the end of the statement.
       return newVariableDataOr(wTextAfterValue, "", vlOr.value.pos)
 
+  case vlOr.value.sideEffect
+  of seReturn:
+    # Return function exit.
+    return newVariableDataOr("", opReturn, vlOr.value.value)
+  of seLogMessage:
+    # Log statement exit.
+    return newVariableDataOr("", opLog, vlOr.value.value)
+  of seBareIfIgnore:
+    # Bare if with a false condition.
+    return newVariableDataOr("", opIgnore, vlOr.value.value)
+  of seNone:
+    discard
+
   # Return the variable dot name and value.
-  result = newVariableDataOr(leftName.dotName, operator, vlOr.value.value)
+  result = newVariableDataOr(finalLeftName, operator, vlOr.value.value)
 
 proc skipSpaces*(text: string): Natural =
   let spacesO = matchTabSpace(text, 0)

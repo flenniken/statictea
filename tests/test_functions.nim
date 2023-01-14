@@ -1685,12 +1685,10 @@ suite "functions.nim":
     check testFunction("warn", arguments, eFunResult)
 
   test "return":
-    check testFunction("return", @[newValue("skip")],
-      newFunResult(newValue("skip")))
-    check testFunction("return", @[newValue("stop")],
-      newFunResult(newValue("stop")))
+    check testFunction("return", @[newValue(0), newValue(1)],
+      newFunResultWarn(wTooManyArgs, 1, "1"))
     check testFunction("return", @[newValue(5)],
-      newFunResult(newValue(5)))
+      newFunResultWarn(wReturnArgument, -1, ""))
 
   test "string default":
     check testFunction("string", @[newValue(1)], newFunResult(newValue("1")))

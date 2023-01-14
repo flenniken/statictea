@@ -42,6 +42,7 @@ Run a command and fill in the variables dictionaries.
 * [getNumber](#getnumber) &mdash; Return the literal number value and position after it.
 * [skipArgument](#skipargument) &mdash; Skip past the argument.
 * [ifFunctions](#iffunctions) &mdash; Return the if/if0 function's value and position after.
+* [bareIfAndIf0](#bareifandif0) &mdash; Handle the bare if/if0.
 * [andOrFunctions](#andorfunctions) &mdash; Return the and/or function's value and the position after.
 * [getArguments](#getarguments) &mdash; Get the function arguments and the position of each.
 * [getFunctionValueAndPos](#getfunctionvalueandpos) &mdash; Return the function's value and the position after it.
@@ -419,23 +420,32 @@ func skipArgument(statement: Statement; startPos: Natural): PosOr
 
 Return the if/if0 function's value and position after. It conditionally runs one of its arguments and skips the other. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
 
-The three parameter if requires an assignment.  The two parameter
-version cannot have an assignment. The if function cond is a
-boolean, for if0 it is anything.
-
-cases:
+This handles the three parameter form with an assignment.
 
 ~~~
 a = if(cond, then, else)
        ^                ^
-if(cond, then)
-   ^          ^
 ~~~
 
 ```nim
 proc ifFunctions(env: var Env; specialFunction: SpecialFunction;
-                 statement: Statement; start: Natural; variables: Variables;
-                 list = false; bare = false): ValueAndPosOr
+                 statement: Statement; start: Natural; variables: Variables): ValueAndPosOr
+```
+
+# bareIfAndIf0
+
+Handle the bare if/if0. Return the resulting value and the position in the statement after the if.
+
+~~~
+if(cond, return("stop"))
+   ^                    ^
+if(c, warn("c is true"))
+   ^                    ^
+~~~
+
+```nim
+proc bareIfAndIf0(env: var Env; specialFunction: SpecialFunction;
+                  statement: Statement; start: Natural; variables: Variables): ValueAndPosOr
 ```
 
 # andOrFunctions
@@ -477,8 +487,8 @@ a = get(b, len("hi"), c)
 
 ```nim
 proc getFunctionValueAndPos(env: var Env; functionName: string;
-                            statement: Statement; start: Natural;
-                            variables: Variables; list = false): ValueAndPosOr
+                            functionPos: Natural; statement: Statement;
+                            start: Natural; variables: Variables; list = false): ValueAndPosOr
 ```
 
 # runBoolOp
@@ -587,6 +597,8 @@ Handle bare function: if, if0, return, warn and log. A bare function does not as
 ~~~
 if( true, warn("tea time")) # test
 ^                           ^
+return(5)
+^        ^
 ~~~
 
 ```nim
