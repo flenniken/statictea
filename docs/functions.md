@@ -65,7 +65,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funJoin_lsois](#funjoin_lsois) &mdash; Join a list of strings with a separator.
 * [funWarn_ss](#funwarn_ss) &mdash; Return a warning message and skip the current statement.
 * [funLog_ss](#funlog_ss) &mdash; Log a message to the log file.
-* [funReturn_aa](#funreturn_aa) &mdash; A return function returns the value passed in and it has side effects depending on where it is used.
+* [funReturn_aa](#funreturn_aa) &mdash; Return is a special function that returns the value passed in and has side effects.
 * [funString_aoss](#funstring_aoss) &mdash; Convert a variable to a string.
 * [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names.
 * [funFormat_ss](#funformat_ss) &mdash; Format a string using replacement variables similar to a replacement block.
@@ -1489,32 +1489,46 @@ func funLog_ss(variables: Variables; arguments: seq[Value]): FunResult
 
 # funReturn_aa
 
-A return function returns the value passed in and it has side effects depending on where it is used.
+Return is a special function that returns the value passed in and has side effects.
 
-In a user defined function, the return completes the
-function and returns the value of the function.
+In a function, the return completes the function and returns
+the value of it.
+
+~~~
+return(false)
+~~~
+
+You can also use it with a bare IF statement to conditionally
+return a function value.
+
+~~~
+if(c, return(5))
+~~~
 
 In a template command a return controls the replacement block
-looping and there are two variations:
-
-* "stop" -- stop processing the command
-* "skip" -- skip this replacement block and continue with the
-next iteration
-
-You can use the return function as an argument to the 2
-parameter if functions, but not as an argument to other
-functions.
+looping by returning “skip” and “stop”.
 
 ~~~
-return(value: any) any
+if(c, return("stop"))
+if(c, return("skip"))
 ~~~
 
-Examples:
+* “stop” – stops processing the command
+* “skip” – skips this replacement block and continues with the next iteration
+
+The following block command repeats 4 times but skips when t.row is 2.
 
 ~~~
-return(5)
-if(cond, return("stop"))
-if(cond, return("skip"))
+$$ block t.repeat = 4
+$$ : if((t.row == 2), return(“skip”))
+{t.row}
+$$ endblock
+
+output:
+
+0
+1
+3
 ~~~
 
 ```nim

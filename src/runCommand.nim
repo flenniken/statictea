@@ -90,10 +90,10 @@ type
     ## @:
     ## @:* lcStop -- do not output this replacement block and stop iterating
     ## @:* lcSkip -- do not output this replacement block and continue with the next iteration
-    ## @:* lcContinue -- output the replacment block and continue with the next iteration
+    ## @:* lcAdd -- output the replacment block and continue with the next iteration
     lcStop = "stop",
     lcSkip = "skip",
-    lcContinue = "continue",
+    lcAdd = "add",
 
 func newLinesOr*(warning: MessageId, p1: string = "", pos = 0):
      LinesOr =
@@ -631,8 +631,7 @@ func skipArgument*(statement: Statement, startPos: Natural): PosOr =
     case state
     of start:
       case ch
-      # true, false, variable, number
-      of 'a' .. 'z', 'A' .. 'Z', '0' .. '9', '-':
+      of startTFVarNumber:
         state = middle
       # string
       of '"':
@@ -669,7 +668,7 @@ func skipArgument*(statement: Statement, startPos: Natural): PosOr =
       of ' ', '\t':
         state = endWhitespace
       # true, false, variable, number
-      of 'a' .. 'z', 'A' .. 'Z', '0' .. '9', '_', '.':
+      of variableChars:
         discard
       else:
         # Invalid character.
@@ -1915,7 +1914,7 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
   let variableDataOr = runStatement(env, statement, variables)
   if variableDataOr.isMessage:
     env.warnStatement(statement, variableDataOr.message, sourceFilename = sourceFilename)
-    return lcContinue
+    return lcAdd
   let variableData = variableDataOr.value
 
   case variableData.operator
@@ -1925,12 +1924,12 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
       variableData.dotNameStr, variableData.value, variableData.operator, codeLocation)
     if isSome(warningDataO):
       env.warnStatement(statement, warningDataO.get(), sourceFilename)
-    result = lcContinue
+    result = lcAdd
   of opIgnore:
-    result = lcContinue
+    result = lcAdd
   of opLog:
     env.logLine(sourceFilename, statement.lineNum, variableData.value.stringv & "\n")
-    result = lcContinue
+    result = lcAdd
   of opReturn:
     # Handle a return function exit.
     if variableData.value.kind == vkString:
@@ -2286,7 +2285,7 @@ proc runCommand*(env: var Env, cmdLines: CmdLines,
     if "repeat" in tea and tea["repeat"].intv == 0:
       break
 
-  result = lcContinue
+  result = lcAdd
 
 proc runCodeFile*(env: var Env, variables: var Variables, filename: string) =
   ## Run the code file and fill in the variables.

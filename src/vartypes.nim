@@ -6,6 +6,18 @@ import messages
 import opresult
 import options
 
+const
+  variableStartChars*: set[char] = {'a'..'z', 'A'..'Z'}
+    ## The characters that make up a variable dotname.  A variable
+    ## starts with an ascii letter.
+  variableChars*: set[char] = {'a'..'z', '.', 'A'..'Z', '0' .. '9', '_', '-'}
+    ## A variable contains ascii letters, digit, underscore and
+    ## hypen. This are connected with dots to make a dot name.
+  variableEndChars*: set[char] = {'a'..'z', 'A'..'Z', '0' .. '9'}
+    ## A variable ends with a letter or digit.
+  startTFVarNumber*: set[char] = {'a'..'z', 'A'..'Z', '0' .. '9', '-'}
+    ## A character that starts true, false, variable or number.
+
 type
   VarsDict* = OrderedTableRef[string, Value]
     ## The statictea dictionary type. This is a ref type. Create a new
@@ -719,7 +731,7 @@ func newSignatureO*(functionName: string, signatureCode: string): Option[Signatu
   ## @:=>
   ## @:myname(a: int, b: float, c: string) string
   ## @:~~~~
-  
+
   var params: seq[Param]
   var nameIx = 0
   var optional = false

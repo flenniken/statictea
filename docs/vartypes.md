@@ -5,6 +5,10 @@ StaticTea variable types.
 * [vartypes.nim](../src/vartypes.nim) &mdash; Nim source code.
 # Index
 
+* const: [variableStartChars](#variablestartchars) &mdash; The characters that make up a variable dotname.
+* const: [variableChars](#variablechars) &mdash; A variable contains ascii letters, digit, underscore and hypen.
+* const: [variableEndChars](#variableendchars) &mdash; A variable ends with a letter or digit.
+* const: [startTFVarNumber](#starttfvarnumber) &mdash; A character that starts true, false, variable or number.
 * type: [VarsDict](#varsdict) &mdash; The statictea dictionary type.
 * type: [Variables](#variables) &mdash; Dictionary holding all statictea variables in multiple distinct logical dictionaries.
 * type: [VarsDictOr](#varsdictor) &mdash; A VarsDict object or a warning.
@@ -81,6 +85,38 @@ same type which may be Value type.
 * [strToParamType](#strtoparamtype) &mdash; Return the parameter type for the given string, e.
 * [shortName](#shortname) &mdash; Return a short name based on the given index value.
 * [newSignatureO](#newsignatureo) &mdash; Return a new signature for the function name and signature code.
+
+# variableStartChars
+
+The characters that make up a variable dotname.  A variable starts with an ascii letter.
+
+```nim
+variableStartChars: set[char] =
+```
+
+# variableChars
+
+A variable contains ascii letters, digit, underscore and hypen. This are connected with dots to make a dot name.
+
+```nim
+variableChars: set[char] =
+```
+
+# variableEndChars
+
+A variable ends with a letter or digit.
+
+```nim
+variableEndChars: set[char] =
+```
+
+# startTFVarNumber
+
+A character that starts true, false, variable or number.
+
+```nim
+startTFVarNumber: set[char] =
+```
 
 # VarsDict
 

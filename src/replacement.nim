@@ -192,7 +192,7 @@ proc lineToSegments*(line: string): seq[string] =
         # Two left brackets in a row equal one bracket.
         fragment.add('{')
         state = text
-      of 'a' .. 'z', 'A' .. 'Z':
+      of variableStartChars:
         dotName.add(ch)
         state = variable
       else:
@@ -221,7 +221,7 @@ proc lineToSegments*(line: string): seq[string] =
           dotName = ""
         state = text
         inc(pos)
-      of 'a' .. 'z', '.', 'A' .. 'Z', '0' .. '9', '_':
+      of variableChars:
         dotName.add(ch)
         inc(pos)
       else:

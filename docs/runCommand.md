@@ -141,11 +141,11 @@ Controls whether to output the current replacement block iteration and whether t
 
 * lcStop -- do not output this replacement block and stop iterating
 * lcSkip -- do not output this replacement block and continue with the next iteration
-* lcContinue -- output the replacment block and continue with the next iteration
+* lcAdd -- output the replacment block and continue with the next iteration
 
 ```nim
 LoopControl = enum
-  lcStop = "stop", lcSkip = "skip", lcContinue = "continue"
+  lcStop = "stop", lcSkip = "skip", lcAdd = "add"
 ```
 
 # newLinesOr

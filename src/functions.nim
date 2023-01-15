@@ -198,7 +198,7 @@ proc formatString*(variables: Variables, text: string): StringOr =
         # Two left brackets in a row equal one bracket.
         state = start
         newStr.add('{')
-      of 'a' .. 'z', 'A' .. 'Z':
+      of variableStartChars:
         state = variable
         varStart = pos
       else:
@@ -223,7 +223,7 @@ proc formatString*(variables: Variables, text: string): StringOr =
         let str = valueToStringRB(valueOr.value)
         newStr.add(str)
         state = start
-      of 'a' .. 'z', '.', 'A' .. 'Z', '0' .. '9', '_':
+      of variableChars:
         discard
       else:
         # Invalid variable name; names contain letters, digits or underscores.
@@ -2046,34 +2046,50 @@ func funLog_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   result = newFunResult(newValue(message))
 
 func funReturn_aa*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## A return function returns the value passed in and it has side
-  ## effects depending on where it is used.
+  ## Return is a special function that returns the value passed in and
+  ## has side effects.
   ## @:
-  ## @:In a user defined function, the return completes the
-  ## @:function and returns the value of the function.
+  ## @:In a function, the return completes the function and returns
+  ## @:the value of it.
+  ## @:
+  ## @:~~~
+  ## @:return(false)
+  ## @:~~~~
+  ## @:
+  ## @:You can also use it with a bare IF statement to conditionally
+  ## @:return a function value.
+  ## @:
+  ## @:~~~
+  ## @:if(c, return(5))
+  ## @:~~~~
   ## @:
   ## @:In a template command a return controls the replacement block
-  ## @:looping and there are two variations:
-  ## @:
-  ## @:* "stop" -- stop processing the command
-  ## @:* "skip" -- skip this replacement block and continue with the
-  ## @:next iteration
-  ## @:
-  ## @:You can use the return function as an argument to the 2
-  ## @:parameter if functions, but not as an argument to other
-  ## @:functions.
+  ## @:looping by returning “skip” and “stop”.
   ## @:
   ## @:~~~
-  ## @:return(value: any) any
+  ## @:if(c, return("stop"))
+  ## @:if(c, return("skip"))
   ## @:~~~~
   ## @:
-  ## @:Examples:
+  ## @:* “stop” – stops processing the command
+  ## @:* “skip” – skips this replacement block and continues with the next iteration
+  ## @:
+  ## @:The following block command repeats 4 times but skips when
+  ## t.row is 2.
   ## @:
   ## @:~~~
-  ## @:return(5)
-  ## @:if(cond, return("stop"))
-  ## @:if(cond, return("skip"))
+  ## @:$$ block t.repeat = 4
+  ## @:$$ : if((t.row == 2), return(“skip”))
+  ## @:{t.row}
+  ## @:$$ endblock
+  ## @:
+  ## @:output:
+  ## @:
+  ## @:0
+  ## @:1
+  ## @:3
   ## @:~~~~
+
   # Check there is one argument.
   tMapParameters("return", "aa")
   discard map

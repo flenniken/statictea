@@ -110,7 +110,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
   var firstReplaceLine: string
 
   # Read and process template lines.
-  var loopControl = lcContinue
+  var loopControl = lcAdd
   var tea = variables["t"].dictv
   while true:
     # Read template lines and write out non-commands lines. When a
