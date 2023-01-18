@@ -28,6 +28,14 @@ const
   tripleQuotes* = "\"\"\""
     ## Triple quotes for building strings.
 
+# Test code can set the max name length.
+when defined(test):
+  var maxNameLength* = 64
+else:
+  const
+    maxNameLength* = 64
+      ## The maximum length of a variable or dotname.
+
 type
   PosOr* = OpResultWarn[Natural]
     ## A position in a string or a message.
@@ -169,6 +177,8 @@ type
     kind*: VariableNameKind
     pos*: Natural
 
+  VariableNameOr* = OpResultWarn[VariableName]
+
   RightType* = enum
     ## The type of the right hand side of a statement.
     ## @:
@@ -191,6 +201,17 @@ func newVariableName*(dotName: string, kind: VariableNameKind,
     pos: Natural): VariableName =
   ## Create a new VariableName object.
   result = VariableName(dotName: dotName, kind: kind, pos: pos)
+
+func newVariableNameOr*(warning: MessageId, p1 = "", pos = 0): VariableNameOr =
+  ## Create a PosOr warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[VariableName](warningData)
+
+func newVariableNameOr*(dotName: string, kind: VariableNameKind,
+    pos: Natural): VariableNameOr =
+  ## Create a new VariableNameOr object.
+  let vn = newVariableName(dotName, kind, pos)
+  result = opValueW[VariableName](vn)
 
 func getRightType*(statement: Statement, start: Natural): RightType =
   ## Return the type of the right hand side of the statement at the
@@ -221,21 +242,161 @@ func getRightType*(statement: Statement, start: Natural): RightType =
   else:
     result = rtNothing
 
+proc getVariableNameOr*(text: string, startPos: Natural): VariableNameOr =
+  ## Get a variable name from the statement. Start points at a name.
+  ## @:
+  ## @:~~~
+  ## @:a = var-name( 1 )
+  ## @:    ^         ^
+  ## @:a = abc # comment
+  ## @:    ^   ^
+  ## @:a = o.def.bbb # comment
+  ## @:    ^         ^
+  ## @:~~~~
+
+  assert(startPos >= 0, "startPos is less than 0")
+
+  if startPos >= text.len:
+    # A variable starts with an ascii letter.
+    return newVariableNameOr(wVarStartsWithLetter, "", startPos)
+
+  type
+    State = enum
+      ## Parsing states.
+      start, middle, atHyphenUnderscore, dotState, endWhitespace
+
+  var state = start
+  var names = newSeq[string]()
+  var currentName = ""
+  var variableNameKind: VariableNameKind
+  var currentPos: Natural
+  var stopOnChar = false
+
+  # Loop through the text one byte at a time.
+  for ix in countUp(startPos, text.len-1):
+    currentPos = ix
+    let ch = text[currentPos]
+    case state
+    of start:
+      case ch
+      of 'a'..'z', 'A'..'Z':
+        currentName.add(ch)
+        state = middle
+      else:
+        # A variable starts with an ascii letter.
+        return newVariableNameOr(wVarStartsWithLetter, "", currentPos)
+
+    of middle:
+      case ch
+      of 'a'..'z', 'A'..'Z', '0'..'9':
+        currentName.add(ch)
+      of '-', '_':
+        currentName.add(ch)
+        state = atHyphenUnderscore
+      of '.':
+        state = dotState
+      of '(':
+        variableNameKind = vnkFunction
+        state = endWhitespace
+      of '[':
+        variableNameKind = vnkGet
+        state = endWhitespace
+      of ' ', '\t':
+        variableNameKind = vnkNormal
+        state = endWhitespace
+      else:
+        # done
+        stopOnChar = true
+        break
+
+      # Add the current name to the names list.
+      case state
+      of endWhitespace, start, dotState:
+        names.add(currentName)
+        currentName = ""
+      of atHyphenUnderscore, middle:
+        discard
+
+    of atHyphenUnderscore:
+      case ch
+      of 'a'..'z', 'A'..'Z', '0'..'9':
+        state = middle
+      of '-', '_':
+        discard
+      else:
+        # A variable name ends with an ascii letter or digit.
+        return newVariableNameOr(wVarEndsWith, "", currentPos)
+      currentName.add(ch)
+
+    of dotState:
+      case ch
+      of 'a'..'z', 'A'..'Z':
+        state = middle
+        currentName.add(ch)
+      else:
+        # A variable starts with an ascii letter.
+        return newVariableNameOr(wVarStartsWithLetter, "", currentPos)
+
+    of endWhitespace:
+      case ch
+      of ' ', '\t':
+        discard
+      else:
+        # done
+        stopOnChar = true
+        break
+
+  case state:
+  of start, middle:
+    names.add(currentName)
+  of endWhitespace:
+    discard
+  of dotState, atHyphenUnderscore:
+    # A variable name ends with an ascii letter or digit.
+    return newVariableNameOr(wVarEndsWith, "", currentPos)
+
+  let dotName = names.join(".")
+  if dotName.len > maxNameLength:
+    # A variable and dot name are limited to 64 characters.
+    return newVariableNameOr(wVarMaximumLength, "", startPos+maxNameLength)
+
+  if not stopOnChar:
+    # Ran out of characters.
+    currentPos += 1
+
+  result = newVariableNameOr(dotName, variableNameKind, currentPos)
+
+# proc getVariableName*(text: string, start: Natural): Option[VariableName] =
+#   ## Get a variable name from the statement. Start points at a name.
+#   let dotNamesO = matchDotNames(text, start)
+#   if not dotNamesO.isSome:
+#     return
+#   let (_, dotName, leftParenBracket, length) = dotNamesO.get3GroupsLen()
+#   var kind: VariableNameKind
+#   case leftParenBracket
+#   of "(":
+#     kind = vnkFunction
+#   of "[":
+#     kind = vnkGet
+#   else:
+#     kind = vnkNormal
+#   result = some(newVariableName(dotName, kind, start+length))
+
 proc getVariableName*(text: string, start: Natural): Option[VariableName] =
   ## Get a variable name from the statement. Start points at a name.
-  let dotNamesO = matchDotNames(text, start)
-  if not dotNamesO.isSome:
+
+  # todo: move white space up a level?
+  # todo: call getVariableNameOr directly instead.
+  # Skip whitespace, if any.
+  var runningPos = start
+  let spaceMatchO = matchTabSpace(text, runningPos)
+  if isSome(spaceMatchO):
+    runningPos += spaceMatchO.get().length
+
+  let variableNameOr = getVariableNameOr(text, runningPos)
+  if variableNameOr.isMessage:
     return
-  let (_, dotName, leftParenBracket, length) = dotNamesO.get3GroupsLen()
-  var kind: VariableNameKind
-  case leftParenBracket
-  of "(":
-    kind = vnkFunction
-  of "[":
-    kind = vnkGet
-  else:
-    kind = vnkNormal
-  result = some(newVariableName(dotName, kind, start+length))
+  result = some(variableNameOr.value)
 
 func isTriple(line: string, ch: char, ix: Natural): bool =
   if ch == '"' and line.len >= ix-2 and

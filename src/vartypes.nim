@@ -10,13 +10,14 @@ const
   variableStartChars*: set[char] = {'a'..'z', 'A'..'Z'}
     ## The characters that make up a variable dotname.  A variable
     ## starts with an ascii letter.
+  variableMiddleChars*: set[char] = {'a'..'z', 'A'..'Z', '0' .. '9', '_', '-'}
+    ## A variable contains ascii letters, digits, underscores and
+    ## hypens.
   variableChars*: set[char] = {'a'..'z', '.', 'A'..'Z', '0' .. '9', '_', '-'}
-    ## A variable contains ascii letters, digit, underscore and
-    ## hypen. This are connected with dots to make a dot name.
-  variableEndChars*: set[char] = {'a'..'z', 'A'..'Z', '0' .. '9'}
-    ## A variable ends with a letter or digit.
+    ## A variable contains ascii letters, digits, underscores and
+    ## hypens. Variables are connected with dots to make a dot name.
   startTFVarNumber*: set[char] = {'a'..'z', 'A'..'Z', '0' .. '9', '-'}
-    ## A character that starts true, false, variable or number.
+    ## A character that starts true, false, a variable or a number.
 
 type
   VarsDict* = OrderedTableRef[string, Value]

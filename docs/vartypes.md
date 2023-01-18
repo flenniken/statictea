@@ -6,9 +6,9 @@ StaticTea variable types.
 # Index
 
 * const: [variableStartChars](#variablestartchars) &mdash; The characters that make up a variable dotname.
-* const: [variableChars](#variablechars) &mdash; A variable contains ascii letters, digit, underscore and hypen.
-* const: [variableEndChars](#variableendchars) &mdash; A variable ends with a letter or digit.
-* const: [startTFVarNumber](#starttfvarnumber) &mdash; A character that starts true, false, variable or number.
+* const: [variableMiddleChars](#variablemiddlechars) &mdash; A variable contains ascii letters, digits, underscores and hypens.
+* const: [variableChars](#variablechars) &mdash; A variable contains ascii letters, digits, underscores and hypens.
+* const: [startTFVarNumber](#starttfvarnumber) &mdash; A character that starts true, false, a variable or a number.
 * type: [VarsDict](#varsdict) &mdash; The statictea dictionary type.
 * type: [Variables](#variables) &mdash; Dictionary holding all statictea variables in multiple distinct logical dictionaries.
 * type: [VarsDictOr](#varsdictor) &mdash; A VarsDict object or a warning.
@@ -94,25 +94,25 @@ The characters that make up a variable dotname.  A variable starts with an ascii
 variableStartChars: set[char] =
 ```
 
+# variableMiddleChars
+
+A variable contains ascii letters, digits, underscores and hypens.
+
+```nim
+variableMiddleChars: set[char] =
+```
+
 # variableChars
 
-A variable contains ascii letters, digit, underscore and hypen. This are connected with dots to make a dot name.
+A variable contains ascii letters, digits, underscores and hypens. Variables are connected with dots to make a dot name.
 
 ```nim
 variableChars: set[char] =
 ```
 
-# variableEndChars
-
-A variable ends with a letter or digit.
-
-```nim
-variableEndChars: set[char] =
-```
-
 # startTFVarNumber
 
-A character that starts true, false, variable or number.
+A character that starts true, false, a variable or a number.
 
 ```nim
 startTFVarNumber: set[char] =

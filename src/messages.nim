@@ -268,6 +268,10 @@ type
     wCallbackListParam,    ## w253
     wStateRequired,        ## w254
     wReturnArgument,       ## w255
+    wVarStartsWithLetter,  ## w256
+    wVarContainsChars,     ## w257
+    wVarEndsWith,          ## w258
+    wVarMaximumLength,     ## w259
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -522,11 +526,15 @@ const
     "Expected the callback's return type to be a bool, got: $1.", ## wCallbackReturnType
     "Expected 3 or 4 callback parameters, got $1.", ## wCallbackNumParams
     "Expected the callback's first parameter to be an int, got $1.", ## wCallbackIntParam
-    "Expected a variables.", ## wExpectedVariable
+    "Expected a variable.", ## wExpectedVariable
     "The listLoop state argument exists but the callback doesn't have a state parameter.", ## wMissingStateVar
     "Expected the callback's third parameter to be a list, got $1.", ## wCallbackListParam
     "The callback has a required state parameter but it is being not passed to it.", ## wStateRequired
     "Invalid return; use a bare return in a user function or use it in a bare if statement.", ## wReturnArgument
+    "A variable starts with an ascii letter.", ## wVarStartsWithLetter
+    "A variable contains ascii letters, digits, underscores and hypens.", ## wVarContainsChars
+    "A variable name ends with an ascii letter or digit.", ## wVarEndsWith
+    "A variable and dot name are limited to 64 characters.", ## wVarMaximumLength
     ]
 
     ## The message text.

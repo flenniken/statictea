@@ -21,6 +21,24 @@ import unicodes
 import utf8decoder
 import linebuffer
 
+proc showWarningData(text: string, start: Natural,
+    wd: WarningData, message: string) =
+  let msg = "↓ $1: $2" % [message, getWarning(wd.messageId, wd.p1)]
+  echo startColumn(text, wd.pos, msg)
+  echo text
+
+proc testGetVariableNameOr(text: string, start: Natural,
+    eNewVariableNameOr: VariableNameOr): bool =
+  let gotVnOr = getVariableNameOr(text, start)
+  result = gotExpected($gotVnOr, $eNewVariableNameOr)
+  if not result:
+    echo startColumn(text, start, "↓ start")
+    echo "0123456789 123456789 123456789 123456789"
+    if gotVnOr.isMessage:
+      showWarningData(text, start, gotVnOr.message, "got")
+    if eNewVariableNameOr.isMessage:
+      showWarningData(text, start, eNewVariableNameOr.message, "expected")
+
 proc echoValueAndPosOr(statement: Statement, start: Natural,
     valueAndPosOr: ValueAndPosOr, eValueAndPosOr: ValueAndPosOr) =
   ## Show the statement and the two values and positions so you can
@@ -968,6 +986,11 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr(wMissingStatementVar)
     check testRunStatement(statement, eVariableDataOr)
 
+  test "syntax error":
+    let statement = newStatement(text="syntax == 3", lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wInvalidRightHandSide, "", 8)
+    check testRunStatement(statement, eVariableDataOr)
+
   test "bare regular function":
     let statement = newStatement(text="cmp(5, 4)", lineNum=1)
     let eVariableDataOr = newVariableDataOr(wMissingLeftAndOpr)
@@ -1303,7 +1326,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "max var length + 1":
     let text = """a23456789_123456789_123456789_123456789_123456789_123456789_12345 = slice("abc", 2 100)"""
     let statement = newStatement(text, lineNum=1)
-    let eVariableDataOr = newVariableDataOr(wInvalidVariable, "", 64)
+    let eVariableDataOr = newVariableDataOr(wMissingStatementVar, "", 0)
     check testRunStatement(statement, eVariableDataOr)
 
   test "warn plus stuff":
@@ -1978,7 +2001,10 @@ White$1
 
   test "signature missing":
     check testParseSignature("path(", newSignatureOr(wParameterName, "", 5))
+    check testParseSignature("path( ", newSignatureOr(wParameterName, "", 6))
+    check testParseSignature("path( :", newSignatureOr(wParameterName, "", 6))
     check testParseSignature("path(name", newSignatureOr(wMissingColon, "", 9))
+    check testParseSignature("path(name a", newSignatureOr(wMissingColon, "", 10))
     check testParseSignature("path(name:", newSignatureOr(wExpectedParamType, "", 10))
     check testParseSignature("path(name:int", newSignatureOr(wMissingCommaParen, "", 13))
     check testParseSignature("path(name:int)", newSignatureOr(wExpectedReturnType, "", 14))
@@ -3085,3 +3111,72 @@ statement:   syntaxError == 5
                           ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "getVariableNameOr var":
+    maxNameLength = 4
+    check testGetVariableNameOr("", 0, newVariableNameOr(wVarStartsWithLetter, "", 0))
+    check testGetVariableNameOr("a", 0, newVariableNameOr("a", vnkNormal, 1))
+    check testGetVariableNameOr("ab", 0, newVariableNameOr("ab", vnkNormal, 2))
+    check testGetVariableNameOr("abc", 0, newVariableNameOr("abc", vnkNormal, 3))
+    check testGetVariableNameOr("abcd", 0, newVariableNameOr("abcd", vnkNormal, 4))
+    check testGetVariableNameOr("abcde", 0, newVariableNameOr(wVarMaximumLength, "", 4))
+
+    check testGetVariableNameOr("a ", 0, newVariableNameOr("a", vnkNormal, 2))
+    check testGetVariableNameOr("ab ", 0, newVariableNameOr("ab", vnkNormal, 3))
+
+    check testGetVariableNameOr("", 1, newVariableNameOr(wVarStartsWithLetter, "", 1))
+    check testGetVariableNameOr("a", 1, newVariableNameOr(wVarStartsWithLetter, "", 1))
+    check testGetVariableNameOr("ab", 1, newVariableNameOr("b", vnkNormal, 2))
+    check testGetVariableNameOr("abc", 1, newVariableNameOr("bc", vnkNormal, 3))
+    check testGetVariableNameOr("abcd", 1, newVariableNameOr("bcd", vnkNormal, 4))
+    check testGetVariableNameOr("abcde", 1, newVariableNameOr("bcde", vnkNormal, 5))
+    check testGetVariableNameOr("abcdef", 1, newVariableNameOr(wVarMaximumLength, "", 5))
+
+    check testGetVariableNameOr("9", 0, newVariableNameOr(wVarStartsWithLetter, "", 0))
+    check testGetVariableNameOr("abc", 6, newVariableNameOr(wVarStartsWithLetter, "", 6))
+    check testGetVariableNameOr("abc*", 0, newVariableNameOr("abc", vnkNormal, 3))
+    check testGetVariableNameOr("var-* = abc", 0, newVariableNameOr(wVarEndsWith, "", 4))
+    check testGetVariableNameOr("var_ = abc", 0, newVariableNameOr(wVarEndsWith, "", 4))
+    check testGetVariableNameOr("va_", 0, newVariableNameOr(wVarEndsWith, "", 2))
+    # check testGetVariableNameOr("var- = abc", 0, newVariableNameOr(wVarEndsWith, "", 3))
+
+    maxNameLength = 8
+    check testGetVariableNameOr("a.b", 0, newVariableNameOr("a.b", vnkNormal, 3))
+    check testGetVariableNameOr("a.b.c", 0, newVariableNameOr("a.b.c", vnkNormal, 5))
+    check testGetVariableNameOr("a.b.c.d", 0, newVariableNameOr("a.b.c.d", vnkNormal, 7))
+    check testGetVariableNameOr("a.b.c.d.e", 0, newVariableNameOr(wVarMaximumLength, "", 8))
+
+    check testGetVariableNameOr("o.abc", 0, newVariableNameOr("o.abc", vnkNormal, 5))
+    check testGetVariableNameOr("abc.def", 0, newVariableNameOr("abc.def", vnkNormal, 7))
+
+    check testGetVariableNameOr(".", 0, newVariableNameOr(wVarStartsWithLetter, "", 0))
+    check testGetVariableNameOr("a..b", 0, newVariableNameOr(wVarStartsWithLetter, "", 2))
+    check testGetVariableNameOr("a.", 0, newVariableNameOr(wVarEndsWith, "", 1))
+    check testGetVariableNameOr(".a", 0, newVariableNameOr(wVarStartsWithLetter, "", 0))
+
+    check testGetVariableNameOr("a-.b", 0, newVariableNameOr(wVarEndsWith, "", 2))
+    check testGetVariableNameOr("a.-b", 0, newVariableNameOr(wVarStartsWithLetter, "", 2))
+    check testGetVariableNameOr("a-b_c.a[  6", 0, newVariableNameOr("a-b_c.a", vnkGet, 10))
+
+
+    maxNameLength = 4
+    check testGetVariableNameOr("a(", 0, newVariableNameOr("a", vnkFunction, 2))
+    check testGetVariableNameOr("ab(", 0, newVariableNameOr("ab", vnkFunction, 3))
+    check testGetVariableNameOr("abc(", 0, newVariableNameOr("abc", vnkFunction, 4))
+    check testGetVariableNameOr("abcd(", 0, newVariableNameOr("abcd", vnkFunction, 5))
+    check testGetVariableNameOr("abcde(", 0, newVariableNameOr(wVarMaximumLength, "", 4))
+
+    check testGetVariableNameOr("a[", 0, newVariableNameOr("a", vnkGet, 2))
+    check testGetVariableNameOr("ab[", 0, newVariableNameOr("ab", vnkGet, 3))
+
+    check testGetVariableNameOr("a[ 5", 0, newVariableNameOr("a", vnkGet, 3))
+    check testGetVariableNameOr("ab[  6", 0, newVariableNameOr("ab", vnkGet, 5))
+
+    maxNameLength = 16
+    check testGetVariableNameOr("get(f.cmp, 0)", 4, newVariableNameOr("f.cmp", vnkNormal, 9))
+    check testGetVariableNameOr("get(f.cmp)", 4, newVariableNameOr("f.cmp", vnkNormal, 9))
+    check testGetVariableNameOr("get[f.cmp]", 4, newVariableNameOr("f.cmp", vnkNormal, 9))
+
+  test "getVariableName":
+    let vnO = getVariableName("get(f.cmp, 0)", 4)
+    check vnO.isSome

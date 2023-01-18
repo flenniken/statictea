@@ -6,6 +6,7 @@ Run a command and fill in the variables dictionaries.
 # Index
 
 * const: [tripleQuotes](#triplequotes) &mdash; Triple quotes for building strings.
+* const: [maxNameLength](#maxnamelength) &mdash; The maximum length of a variable or dotname.
 * type: [PosOr](#posor) &mdash; A position in a string or a message.
 * type: [SpecialFunction](#specialfunction) &mdash; The special functions.
 * type: [SpecialFunctionOr](#specialfunctionor) &mdash; A SpecialFunction or a warning message.
@@ -25,9 +26,13 @@ Run a command and fill in the variables dictionaries.
 * [`!=`](#-3) &mdash; Compare whether two PosOr are not equal.
 * type: [VariableNameKind](#variablenamekind) &mdash; The variable name type.
 * type: [VariableName](#variablename) &mdash; A variable name in a statement.
+* type: [VariableNameOr](#variablenameor) &mdash; 
 * type: [RightType](#righttype) &mdash; The type of the right hand side of a statement.
 * [newVariableName](#newvariablename) &mdash; Create a new VariableName object.
+* [newVariableNameOr](#newvariablenameor) &mdash; Create a PosOr warning.
+* [newVariableNameOr](#newvariablenameor-1) &mdash; Create a new VariableNameOr object.
 * [getRightType](#getrighttype) &mdash; Return the type of the right hand side of the statement at the start position.
+* [getVariableNameOr](#getvariablenameor) &mdash; Get a variable name from the statement.
 * [getVariableName](#getvariablename) &mdash; Get a variable name from the statement.
 * [matchTripleOrPlusSign](#matchtripleorplussign) &mdash; Match the optional """ or + at the end of the line.
 * [addText](#addtext) &mdash; Add the line up to the line-ending to the text string.
@@ -71,6 +76,14 @@ Triple quotes for building strings.
 
 ```nim
 tripleQuotes = "\"\"\""
+```
+
+# maxNameLength
+
+The maximum length of a variable or dotname.
+
+```nim
+maxNameLength = 64
 ```
 
 # PosOr
@@ -265,6 +278,14 @@ VariableName = object
 
 ```
 
+# VariableNameOr
+
+
+
+```nim
+VariableNameOr = OpResultWarn[VariableName]
+```
+
 # RightType
 
 The type of the right hand side of a statement.
@@ -291,12 +312,45 @@ Create a new VariableName object.
 func newVariableName(dotName: string; kind: VariableNameKind; pos: Natural): VariableName
 ```
 
+# newVariableNameOr
+
+Create a PosOr warning.
+
+```nim
+func newVariableNameOr(warning: MessageId; p1 = ""; pos = 0): VariableNameOr
+```
+
+# newVariableNameOr
+
+Create a new VariableNameOr object.
+
+```nim
+func newVariableNameOr(dotName: string; kind: VariableNameKind; pos: Natural): VariableNameOr
+```
+
 # getRightType
 
 Return the type of the right hand side of the statement at the start position.
 
 ```nim
 func getRightType(statement: Statement; start: Natural): RightType
+```
+
+# getVariableNameOr
+
+Get a variable name from the statement. Start points at a name.
+
+~~~
+a = var-name( 1 )
+    ^         ^
+a = abc # comment
+    ^   ^
+a = o.def.bbb # comment
+    ^         ^
+~~~
+
+```nim
+proc getVariableNameOr(text: string; startPos: Natural): VariableNameOr
 ```
 
 # getVariableName
