@@ -18,8 +18,8 @@ $$ # Output module names and a short descrition.
 $$ # Use the description's first sentence to describe the module.
 $$ nextline
 $$ : t.repeat = len(g.modules)
-$$ : entry = get(g.modules, t.row, dict())
-$$ : fullPath = get(entry, "filename", "")
+$$ : entry = g.modules[t.row]
+$$ : fullPath = entry["filename"]
 $$ : path = path(fullPath, "/")
 $$ : mdName = concat(path.basename, ".md")
 $$ : description = get(entry, "description", "")

@@ -47,7 +47,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funDup_sis](#fundup_sis) &mdash; Duplicate a string x times.
 * [funDict_old](#fundict_old) &mdash; Create a dictionary from a list of key, value pairs.
 * [funList_al](#funlist_al) &mdash; Create a list of variables.
-* [funListLoop_lpoal](#funlistloop_lpoal) &mdash; You use the listLoop function to make a new list.
+* [funListLoop_lpoal](#funlistloop_lpoal) &mdash; Create a new list from a list and a callback function.
 * [funReplace_siiss](#funreplace_siiss) &mdash; Replace a substring specified by its position and length with another string.
 * [funReplaceRe_sls](#funreplacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
 * [parsePath](#parsepath) &mdash; Parse the given file path into its component pieces.
@@ -955,7 +955,7 @@ func funList_al(variables: Variables; arguments: seq[Value]): FunResult
 
 # funListLoop_lpoal
 
-You use the listLoop function to make a new list.  The callback function is called for each item in the list and it decides what goes in the list.
+Create a new list from a list and a callback function. The callback function is called for each item in the list and it decides what goes in the list.
 
 You pass a list, a callback function, and an optional state
 variable.

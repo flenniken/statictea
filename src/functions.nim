@@ -1241,7 +1241,7 @@ func funList_al*(variables: Variables, arguments: seq[Value]): FunResult =
   result = newFunResult(newValue(arguments))
 
 func funListLoop_lpoal*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## You use the listLoop function to make a new list.  The callback
+  ## Create a new list from a list and a callback function. The callback
   ## function is called for each item in the list and it decides what
   ## goes in the list.
   ## @:

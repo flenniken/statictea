@@ -1,7 +1,7 @@
 # Nim code file for use by nimModule.md.
 
 # Define replacement patterns to remove formatting from the descriptions.
-o.patterns = list( +
+patterns = list( +
   "~~~~", "~~~", +
   "@@", "", +
   "@{", "[", +
@@ -27,7 +27,7 @@ anchors = githubAnchor(names)
 path = path(s.orig)
 o.moduleName = path.filename
 
-o.moduleDescription = replaceRe(s.moduleDescription, o.patterns)
+o.moduleDescription = replaceRe(s.moduleDescription, patterns)
 
 get-entry = func("get-entry(ix: int, entry: dict, newList: list, state: dict) bool")
   ## Reformat the entry and add it to the new list.
@@ -61,6 +61,6 @@ get-entry = func("get-entry(ix: int, entry: dict, newList: list, state: dict) bo
 
 # Reformat the entries list and store it in o.entries.
 state = dict()
-state.patterns = o.patterns
+state.patterns = patterns
 state.anchors = anchors
 o.entries = listLoop(s.entries, l.get-entry, state)

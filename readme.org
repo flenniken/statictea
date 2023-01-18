@@ -1247,7 +1247,7 @@ Example numbers:
 :END:
 
 A float is a 64 bit real number, it has a decimal point and
-starts with a digit or minus sign. You can use underscores in
+starts with a digit or hyphen sign. You can use underscores in
 long number literals to make them more readable.
 
 Example floats:
@@ -2317,7 +2317,8 @@ following process:
 1. create a json file from the doc comments at the top of all the source files
 2. format the json as markdown using the
    [[templates/nimModuleIndex.md][nimModuleIndex.md]] statictea
-   template. Click the link then "View Raw".
+   template and the [[templates/nimModule.tea][nimModule.tea]]
+   code file. Click the link then "View Raw".
 
 The nimble *docs* task builds the module markdown files by running
 the following process for each module:
@@ -2672,7 +2673,7 @@ List of functions:
 - [[#len][len]] -- Number of elements in a dictionary.
 - [[#len][len]] -- Number of elements in a list.
 - [[#len][len]] -- Number of unicode characters in a string.
-- [[#listLoop][listLoop]] -- You use the listLoop function to make a new list.
+- [[#listLoop][listLoop]] -- Create a new list from a list and a callback function.
 - [[#list][list]] -- Create a list of variables.
 - [[#log][log]] -- Log a message to the log file.
 - [[#lower][lower]] -- Lowercase a string.
@@ -3824,7 +3825,7 @@ len("añyóng") => 6
 :CUSTOM_ID: listLoop
 :END:
 
-You use the listLoop function to make a new list.  The callback function is called for each item in the list and it decides what goes in the list.
+Create a new list from a list and a callback function. The callback function is called for each item in the list and it decides what goes in the list.
 
 You pass a list, a callback function, and an optional state
 variable.
@@ -4672,7 +4673,7 @@ Convert the function spec to a dictionary value.
 - [[#multiline-strings][Multiline Strings]]
 - [[#user-functions][User Functions]]
 - [[#run-statictea][Run StaticTea]]
-- [[#miscellaneous][Miscellaneous]]
+- [[#miscellaneous][Miscellaneous (+15)]]
 - [[#built-in-functions][Built-in Functions]]
 
 * Tea Info                                                            :notoc:

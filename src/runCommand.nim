@@ -52,7 +52,7 @@ type
     ## @:* spAnd -- and function
     ## @:* spOr -- or function
     ## @:* spFunc -- func function
-    ## @:* spList -- list with callback function
+    ## @:* spListLoop -- list with callback function
     spNotSpecial = "not-special",
     spIf = "if",
     spIf0 = "if0",
@@ -1246,7 +1246,7 @@ proc getArguments*(
   ## @:newList = listLoop(list, callback, state)  # comment
   ## @:                   ^                       ^
   ## @:newList = listLoop(return(3), callback, state)  # comment
-  ## @:                   ^        ^
+  ## @:                          ^ ^
   ## @:~~~~
 
   var runningPos = start

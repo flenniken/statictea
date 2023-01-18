@@ -107,7 +107,7 @@ The special functions.
 * spAnd -- and function
 * spOr -- or function
 * spFunc -- func function
-* spList -- list with callback function
+* spListLoop -- list with callback function
 
 ```nim
 SpecialFunction
@@ -519,7 +519,7 @@ Get the function arguments and the position of each. If an argument has a side e
 newList = listLoop(list, callback, state)  # comment
                    ^                       ^
 newList = listLoop(return(3), callback, state)  # comment
-                   ^        ^
+                          ^ ^
 ~~~
 
 ```nim
