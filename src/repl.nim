@@ -85,13 +85,18 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
       env.writeOut(showVariables(variables))
       return false
 
+  # Skip whitespace, if any.
+  let spaceMatchO = matchTabSpace(line, runningPos)
+  if isSome(spaceMatchO):
+    runningPos += spaceMatchO.get().length
+
   # Read the variable for the command.
-  let varNameO = getVariableName(line, runningPos)
-  if not varNameO.isSome:
+  let varNameOr = getVariableName(line, runningPos)
+  if varNameOr.isMessage:
     # Expected a variable or a dot name.
     errorAndColumn(env, wExpectedDotname, line, runningPos)
     return false
-  let varName = varNameO.get()
+  let varName = varNameOr.value
 
   case varName.kind:
   of vnkFunction, vnkGet:

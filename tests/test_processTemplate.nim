@@ -858,7 +858,7 @@ $$ :  5, "five", "one"))
 template.html(2): w33: Expected a string, number, variable, list or condition.
 statement: num = len(case(5,
                             ^
-template.html(3): w29: Statement does not start with a variable name.
+template.html(3): w256: A variable starts with an ascii letter.
 statement: 5, "five", "one"))
            ^
 template.html(4): w58: The replacement variable doesn't exist: num.

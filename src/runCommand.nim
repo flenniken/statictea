@@ -365,21 +365,16 @@ proc getVariableNameOr*(text: string, startPos: Natural): VariableNameOr =
 
   result = newVariableNameOr(dotName, variableNameKind, currentPos)
 
-proc getVariableName*(text: string, start: Natural): Option[VariableName] =
-  ## Get a variable name from the statement. Start points at a name.
+proc getVariableName*(text: string, start: Natural): VariableNameOr =
+  ## Get a variable name from the statement. Skip leading whitespace.
 
-  # todo: move white space up a level?
-  # todo: call getVariableNameOr directly instead.
   # Skip whitespace, if any.
   var runningPos = start
   let spaceMatchO = matchTabSpace(text, runningPos)
   if isSome(spaceMatchO):
     runningPos += spaceMatchO.get().length
 
-  let variableNameOr = getVariableNameOr(text, runningPos)
-  if variableNameOr.isMessage:
-    return
-  result = some(variableNameOr.value)
+  result = getVariableNameOr(text, runningPos)
 
 func isTriple(line: string, ch: char, ix: Natural): bool =
   if ch == '"' and line.len >= ix-2 and
@@ -1766,11 +1761,10 @@ proc getValueAndPosWorker(env: var Env, statement: Statement, start: Natural, va
 
   of rtVariable:
     # Get the variable name.
-    let rightNameO = getVariableName(statement.text, start)
-    if not rightNameO.isSome:
-      # Expected a variable.
-      return newValueAndPosOr(wExpectedVariable, "", start)
-    let rightName = rightNameO.get()
+    let rightNameOr = getVariableName(statement.text, start)
+    if rightNameOr.isMessage:
+      return newValueAndPosOr(rightNameOr.message)
+    let rightName = rightNameOr.value
 
     # Use f for functions, else use the local dictionary of no prefix
     # vars.
@@ -1919,11 +1913,10 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
 
   # Get the variable dot name string and match the trailing white
   # space.
-  let leftNameO = getVariableName(statement.text, runningPos)
-  if not isSome(leftNameO):
-    # Statement does not start with a variable name.
-    return newVariableDataOr(wMissingStatementVar)
-  let leftName = leftNameO.get()
+  let leftNameOr = getVariableName(statement.text, runningPos)
+  if leftNameOr.isMessage:
+    return newVariableDataOr(leftNameOr.message)
+  let leftName = leftNameOr.value
 
   var vlOr: ValueAndPosOr
   var operator = opIgnore
@@ -2103,15 +2096,15 @@ proc parseSignature*(signature: string): SignatureOr =
   ## @:get(group: list, ix: int, optional any) any
   ## @:~~~~
   var runningPos = 0
-  let functionNameO = getVariableName(signature, runningPos)
-  if not isSome(functionNameO):
+  let functionNameOr = getVariableName(signature, runningPos)
+  if functionNameOr.isMessage:
     if not emptyOrSpaces(signature):
       # Excected a function name.
       return newSignatureOr(wFunctionName, "", runningPos)
     else:
       # Missing the function signature string.
       return newSignatureOr(wMissingSignature, "", runningPos)
-  let functionName = functionNameO.get()
+  let functionName = functionNameOr.value
 
   case functionName.kind
   of vnkNormal, vnkGet:
@@ -2138,11 +2131,11 @@ proc parseSignature*(signature: string): SignatureOr =
         return newSignatureOr(wNotLastOptional, "", runningPos)
 
       # Get the parameter name and following white space.
-      let paramNameO = getVariableName(signature, runningPos)
-      if not isSome(paramNameO):
+      let paramNameOr = getVariableName(signature, runningPos)
+      if paramNameOr.isMessage:
         # Excected a parameter name.
         return newSignatureOr(wParameterName, "", runningPos)
-      let paramName = paramNameO.get()
+      let paramName = paramNameOr.value
 
       case paramName.kind
       of vnkFunction, vnkGet:
@@ -2227,10 +2220,10 @@ proc isFunctionDefinition*(statement: Statement, retLeftName: var string,
 
   # Get the left hand variable dot name string and match the
   # surrounding white space.
-  let leftNameO = getVariableName(statement.text, runningPos)
-  if not isSome(leftNameO):
+  let leftNameOr = getVariableName(statement.text, runningPos)
+  if leftNameOr.isMessage:
     return false
-  let leftName = leftNameO.get()
+  let leftName = leftNameOr.value
 
   case leftName.kind
   of vnkFunction, vnkGet:
@@ -2252,10 +2245,10 @@ proc isFunctionDefinition*(statement: Statement, retLeftName: var string,
   runningPos += matchLen
 
   # Look for "func(".
-  let funcNameO = getVariableName(statement.text, runningPos)
-  if not isSome(funcNameO):
+  let funcNameOr = getVariableName(statement.text, runningPos)
+  if funcNameOr.isMessage:
     return false
-  let funcName = funcNameO.get()
+  let funcName = funcNameOr.value
   if funcName.dotName != "func":
     return false
   case funcName.kind
@@ -2375,9 +2368,9 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
   userStatements.add(statement)
   while true:
     # Look for a return statement.
-    let leftNameO = getVariableName(statement.text, 0)
-    if isSome(leftNameO):
-      let leftName = leftNameO.get()
+    let leftNameOr = getVariableName(statement.text, 0)
+    if leftNameOr.isValue:
+      let leftName = leftNameOr.value
       if leftName.dotName == "return" and leftName.kind == vnkFunction:
         break
 

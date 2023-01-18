@@ -355,10 +355,10 @@ proc getVariableNameOr(text: string; startPos: Natural): VariableNameOr
 
 # getVariableName
 
-Get a variable name from the statement. Start points at a name.
+Get a variable name from the statement. Skip leading whitespace.
 
 ```nim
-proc getVariableName(text: string; start: Natural): Option[VariableName]
+proc getVariableName(text: string; start: Natural): VariableNameOr
 ```
 
 # matchTripleOrPlusSign

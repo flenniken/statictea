@@ -983,7 +983,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "does not start with var":
     let statement = newStatement(text="123 = 343", lineNum=1)
-    let eVariableDataOr = newVariableDataOr(wMissingStatementVar)
+    let eVariableDataOr = newVariableDataOr(wVarStartsWithLetter)
     check testRunStatement(statement, eVariableDataOr)
 
   test "syntax error":
@@ -1326,7 +1326,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
   test "max var length + 1":
     let text = """a23456789_123456789_123456789_123456789_123456789_123456789_12345 = slice("abc", 2 100)"""
     let statement = newStatement(text, lineNum=1)
-    let eVariableDataOr = newVariableDataOr(wMissingStatementVar, "", 0)
+    let eVariableDataOr = newVariableDataOr(wVarMaximumLength, "", 64)
     check testRunStatement(statement, eVariableDataOr)
 
   test "warn plus stuff":
@@ -3179,6 +3179,3 @@ statement:   syntaxError == 5
     check testGetVariableNameOr("get(f.cmp)", 4, newVariableNameOr("f.cmp", vnkNormal, 9))
     check testGetVariableNameOr("get[f.cmp]", 4, newVariableNameOr("f.cmp", vnkNormal, 9))
 
-  test "getVariableName":
-    let vnO = getVariableName("get(f.cmp, 0)", 4)
-    check vnO.isSome
