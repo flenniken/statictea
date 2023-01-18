@@ -253,7 +253,6 @@ proc getVariableNameOr*(text: string, startPos: Natural): VariableNameOr =
   ## @:a = o.def.bbb # comment
   ## @:    ^         ^
   ## @:~~~~
-
   assert(startPos >= 0, "startPos is less than 0")
 
   if startPos >= text.len:
@@ -269,12 +268,16 @@ proc getVariableNameOr*(text: string, startPos: Natural): VariableNameOr =
   var names = newSeq[string]()
   var currentName = ""
   var variableNameKind: VariableNameKind
-  var currentPos: Natural
+  var currentPos: int
   var stopOnChar = false
 
   # Loop through the text one byte at a time.
-  for ix in countUp(startPos, text.len-1):
-    currentPos = ix
+  currentPos = startPos - 1
+  while true:
+    inc(currentPos)
+    if currentPos > text.len - 1:
+      break
+
     let ch = text[currentPos]
     case state
     of start:
@@ -360,27 +363,7 @@ proc getVariableNameOr*(text: string, startPos: Natural): VariableNameOr =
     # A variable and dot name are limited to 64 characters.
     return newVariableNameOr(wVarMaximumLength, "", startPos+maxNameLength)
 
-  if not stopOnChar:
-    # Ran out of characters.
-    currentPos += 1
-
   result = newVariableNameOr(dotName, variableNameKind, currentPos)
-
-# proc getVariableName*(text: string, start: Natural): Option[VariableName] =
-#   ## Get a variable name from the statement. Start points at a name.
-#   let dotNamesO = matchDotNames(text, start)
-#   if not dotNamesO.isSome:
-#     return
-#   let (_, dotName, leftParenBracket, length) = dotNamesO.get3GroupsLen()
-#   var kind: VariableNameKind
-#   case leftParenBracket
-#   of "(":
-#     kind = vnkFunction
-#   of "[":
-#     kind = vnkGet
-#   else:
-#     kind = vnkNormal
-#   result = some(newVariableName(dotName, kind, start+length))
 
 proc getVariableName*(text: string, start: Natural): Option[VariableName] =
   ## Get a variable name from the statement. Start points at a name.

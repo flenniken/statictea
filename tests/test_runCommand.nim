@@ -3137,8 +3137,8 @@ statement:   syntaxError == 5
     check testGetVariableNameOr("abc*", 0, newVariableNameOr("abc", vnkNormal, 3))
     check testGetVariableNameOr("var-* = abc", 0, newVariableNameOr(wVarEndsWith, "", 4))
     check testGetVariableNameOr("var_ = abc", 0, newVariableNameOr(wVarEndsWith, "", 4))
-    check testGetVariableNameOr("va_", 0, newVariableNameOr(wVarEndsWith, "", 2))
-    # check testGetVariableNameOr("var- = abc", 0, newVariableNameOr(wVarEndsWith, "", 3))
+    check testGetVariableNameOr("va_", 0, newVariableNameOr(wVarEndsWith, "", 3))
+    check testGetVariableNameOr("var- = abc", 0, newVariableNameOr(wVarEndsWith, "", 4))
 
     maxNameLength = 8
     check testGetVariableNameOr("a.b", 0, newVariableNameOr("a.b", vnkNormal, 3))
@@ -3151,13 +3151,15 @@ statement:   syntaxError == 5
 
     check testGetVariableNameOr(".", 0, newVariableNameOr(wVarStartsWithLetter, "", 0))
     check testGetVariableNameOr("a..b", 0, newVariableNameOr(wVarStartsWithLetter, "", 2))
-    check testGetVariableNameOr("a.", 0, newVariableNameOr(wVarEndsWith, "", 1))
+    check testGetVariableNameOr("a.", 0, newVariableNameOr(wVarEndsWith, "", 2))
+
+  test "more":
+    maxNameLength = 8
     check testGetVariableNameOr(".a", 0, newVariableNameOr(wVarStartsWithLetter, "", 0))
 
     check testGetVariableNameOr("a-.b", 0, newVariableNameOr(wVarEndsWith, "", 2))
     check testGetVariableNameOr("a.-b", 0, newVariableNameOr(wVarStartsWithLetter, "", 2))
     check testGetVariableNameOr("a-b_c.a[  6", 0, newVariableNameOr("a-b_c.a", vnkGet, 10))
-
 
     maxNameLength = 4
     check testGetVariableNameOr("a(", 0, newVariableNameOr("a", vnkFunction, 2))
