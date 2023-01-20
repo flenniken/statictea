@@ -40,6 +40,7 @@ Run a command and fill in the variables dictionaries.
 * [getWarnStatement](#getwarnstatement) &mdash; Return a multiline error message.
 * [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
 * [warnStatement](#warnstatement-1) &mdash; 
+* [removeLineEnd](#removelineend) &mdash; Return a new string with the n or rn removed from the end of the line.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
 * [readStatement](#readstatement) &mdash; Read the next statement from the code file reading multiple lines if needed.
 * [getMultilineStr](#getmultilinestr) &mdash; Return the triple quoted string literal.
@@ -412,9 +413,17 @@ proc warnStatement(env: var Env; statement: Statement; messageId: MessageId;
                    p1: string; pos: Natural; sourceFilename = "")
 ```
 
+# removeLineEnd
+
+Return a new string with the n or rn removed from the end of the line.
+
+```nim
+func removeLineEnd(s: string): string
+```
+
 # yieldStatements
 
-Iterate through the command's statements. Skip blank statements.
+Iterate through the command's statements. A statement can be blank or all whitespace.
 
 ```nim
 iterator yieldStatements(cmdLines: CmdLines): Statement

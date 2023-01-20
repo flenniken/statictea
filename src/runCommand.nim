@@ -560,8 +560,19 @@ proc warnStatement*(env: var Env, statement: Statement,
   let warningData = newWarningData(messageId, p1, pos)
   env.warnStatement(statement, warningData, sourceFilename)
 
+func removeLineEnd*(s: string): string =
+  ## Return a new string with the \n or \r\n removed from the end of
+  ## the line.
+  var last = s.len - 1
+  if s.len > 0 and s[^1] == '\n':
+    dec(last)
+    if s.len > 1 and s[^2] == '\r':
+      dec(last)
+  result = system.substr(s, 0, last)
+
 iterator yieldStatements*(cmdLines: CmdLines): Statement =
-  ## Iterate through the command's statements. Skip blank statements.
+  ## Iterate through the command's statements. A statement can be
+  ## blank or all whitespace.
 
   type
     State {.pure.} = enum
@@ -573,6 +584,7 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
   # sign at the end of the line.
 
   var text = newStringOfCap(defaultMaxLineLen)
+  var ending = ""
   var lineNum: Natural
   var start: Natural
   if cmdLines.lines.len > 0:
@@ -582,6 +594,7 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
   for ix in 0 ..< cmdLines.lines.len:
     let line = cmdLines.lines[ix]
     let lp = cmdLines.lineParts[ix]
+    ending = lp.ending
     for pos in lp.codeStart ..< lp.codeStart+lp.codeLen:
       let ch = line[pos]
       if state == State.start:
@@ -595,16 +608,17 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
     # A statement is terminated by the end of the line without a
     # continuation.
     if not lp.continuation:
-      if not emptyOrSpaces(text):
-        yield newStatement(strip(text), lineNum)
+      yield newStatement(removeLineEnd(text), lineNum, ending)
+
       # Setup variables for the next line, if there is one.
       text.setLen(0)
+      ending = ""
       if cmdLines.lines.len > ix+1:
         lineNum = lp.lineNum + 1
         start = cmdLines.lineParts[ix+1].codeStart
 
   if not emptyOrSpaces(text):
-    yield newStatement(strip(text), lineNum)
+    yield newStatement(removeLineEnd(text), lineNum, ending)
 
 proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
   ## Read the next statement from the code file reading multiple lines

@@ -844,11 +844,11 @@ statictea version number: {t.version}
     ]
     check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
 
-  test "missing slash":
+  test "missing +":
     let templateContent = """
 $$ nextline
 $$ : num = len(case(5,
-$$ :  5, "five", "one"))
+$$ : 5, "five", "one"))
 {num}
 """
     let eResultLines = splitNewLines """

@@ -185,23 +185,32 @@ proc compareStatements(statements: seq[Statement], eContent: string): bool =
 proc testGetStatements(content: string, expected: string): bool =
   ## Return true when the template content generates the expected statements.
 
-  var env = openEnvTest("_getStatements.txt")
   var cmdLines: CmdLines
   cmdLines.lines = splitNewLines(content)
   cmdLines.lineParts = getCmdLinePartsTest(cmdLines.lines)
 
-  # for ix, part in cmdLines.lineParts:
-  #   debugEcho "$1: $2" % [$ix, cmdLines.lines[ix]]
-  #   debugEcho "$1: $2" % [$ix, $part]
-  #   debugEcho ""
-
   var statements = getStatements(cmdLines)
-
-  discard env.readCloseDeleteEnv()
 
   result = true
   if not compareStatements(statements, expected):
     result = false
+
+proc testGetStatements2(content: string, expectedStatements: seq[Statement]): bool =
+  ## Return true when the template content generates the expected statements.
+
+  var cmdLines: CmdLines
+  cmdLines.lines = splitNewLines(content)
+  cmdLines.lineParts = getCmdLinePartsTest(cmdLines.lines)
+  var statements = getStatements(cmdLines)
+
+  result = true
+  if statements.len != expectedStatements.len:
+    echo "wrong number of statements"
+    return false
+  for ix, statement in statements:
+    let expected = expectedStatements[ix]
+    if not gotExpected($statement, $expected):
+      result = false
 
 proc testGetNumber(statement: Statement, start: Natural,
     eValueAndPosOr: ValueAndPosOr): bool =
@@ -601,7 +610,23 @@ proc testRunCodeFile(
     echo eVarRep
     result = false
 
+proc testRemoveLineEnd(line: string, expected: string): bool =
+  let got = removeLineEnd(line)
+  result = gotExpected(got, expected)
+
 suite "runCommand.nim":
+  test "removeLineEnd":
+    check testRemoveLineEnd("", "")
+    check testRemoveLineEnd("a", "a")
+    check testRemoveLineEnd("ab", "ab")
+    check testRemoveLineEnd("\n", "")
+    check testRemoveLineEnd("\r\n", "")
+    check testRemoveLineEnd("\r", "\r")
+    check testRemoveLineEnd("\na", "\na")
+    check testRemoveLineEnd("\ra", "\ra")
+    check testRemoveLineEnd("abc\n", "abc")
+    check testRemoveLineEnd("abc\r\n", "abc")
+
   test "startColumn":
     check testStartColumn("abcdefghij", 0, "^")
     check testStartColumn("abcdefghij", 1, " ^")
@@ -683,19 +708,19 @@ suite "runCommand.nim":
       newStatement("  c = 0", lineNum = 2)
     ], expected)
 
-  test "no statements":
+  test "one statement":
     var cmdLines: CmdLines
     cmdLines.lines = @["<!--$ nextline -->\n"]
     cmdLines.lineParts = @[newLineParts()]
     let statements = getStatements(cmdLines)
-    check statements.len == 0
+    check statements.len == 1
 
-  test "one statement":
+  test "one statement again":
     let content = """
 <!--$ nextline a = 5 -->
 """
     let expected = """
-1, "a = 5"
+1, "a = 5 "
 """
     check testGetStatements(content, expected)
 
@@ -704,7 +729,7 @@ suite "runCommand.nim":
 <!--$ nextline a = "tea" -->
 """
     let expected = """
-1, "a = "tea""
+1, "a = "tea" "
 """
     check testGetStatements(content, expected)
 
@@ -715,8 +740,8 @@ suite "runCommand.nim":
 """
 #123456789 123456789 123456789
     let expected = """
-1, "a = 5"
-2, "asdf"
+1, "a = 5 "
+2, "asdf "
 """
     check testGetStatements(content, expected)
 
@@ -729,6 +754,7 @@ $$ : c = len("hello")
 """
 #123456789 123456789 123456789
     let expected = """
+1, ""
 2, "a = 5"
 3, "asddasfd"
 4, "c = len("hello")"
@@ -740,7 +766,7 @@ $$ : c = len("hello")
 <!--$ nextline a="hi" -->
 """
     let expected = """
-1, "a="hi""
+1, "a="hi" "
 """
     check testGetStatements(content, expected)
 
@@ -749,7 +775,7 @@ $$ : c = len("hello")
 <!--$ nextline a="hi;" -->
 """
     let expected = """
-1, "a="hi;""
+1, "a="hi;" "
 """
     check testGetStatements(content, expected)
 
@@ -3183,4 +3209,39 @@ statement:   syntaxError == 5
     check testGetVariableNameOr("get(f.cmp, 0)", 4, newVariableNameOr("f.cmp", vnkNormal, 9))
     check testGetVariableNameOr("get(f.cmp)", 4, newVariableNameOr("f.cmp", vnkNormal, 9))
     check testGetVariableNameOr("get[f.cmp]", 4, newVariableNameOr("f.cmp", vnkNormal, 9))
+
+  test "getStatements ending \\n":
+    let content = "<!--$ nextline a = \"tea\" -->\n"
+    let expected = @[
+      newStatement("a = \"tea\" ", 1, "\n")
+    ]
+    check testGetStatements2(content, expected)
+
+  test "getStatements ending \\r\\n":
+    let content = "<!--$ nextline a = \"tea\" -->\r\n"
+    let expected = @[
+      newStatement("a = \"tea\" ", 1, "\n")
+    ]
+    check testGetStatements2(content, expected)
+
+  test "getStatements two lines":
+    let content = """
+<!--$ nextline a = 5 -->
+<!--$ : b = 6 -->
+"""
+    let expected = @[
+      newStatement("a = 5 ", 1, "\n"),
+      newStatement("b = 6 ", 2, "\n")
+    ]
+    check testGetStatements2(content, expected)
+
+  test "getStatements no ending":
+    let content = """
+<!--$ nextline a = 5 -->
+<!--$ : b = 6 -->"""
+    let expected = @[
+      newStatement("a = 5 ", 1, "\n"),
+      newStatement("b = 6 ", 2, "")
+    ]
+    check testGetStatements2(content, expected)
 

@@ -78,12 +78,11 @@ type
     ## @:
     ## @:* text -- a line containing a statement without the line ending
     ## @:* lineNum -- line number in the file starting at 1 where the
-    ## @:* ending -- the line ending, either \n or \r\n
     ## @:statement starts.
+    ## @:* ending -- the line ending, either \n or \r\n
     text*: string
     lineNum*: Natural
-    # todo: support ending so we can reproduce the original given a statement.
-    # ending*: string
+    ending*: string
 
   FunctionPtr* = proc (variables: Variables, parameters: seq[Value]):
       FunResult {.noSideEffect.}
@@ -354,9 +353,9 @@ proc `==`*(a: Value, b: Value): bool =
       of vkFunc:
         result = a.funcv == b.funcv
 
-func newStatement*(text: string, lineNum: Natural = 1): Statement =
+func newStatement*(text: string, lineNum: Natural = 1, ending = "\n"): Statement =
   ## Create a new statement.
-  result = Statement(lineNum: lineNum, text: text)
+  result = Statement(lineNum: lineNum, text: text, ending: ending)
 
 func `$`*(signature: Signature): string =
   ## Return a string representation of a signature.

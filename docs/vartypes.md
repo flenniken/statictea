@@ -183,13 +183,14 @@ starts in the template file.
 
 * text -- a line containing a statement without the line ending
 * lineNum -- line number in the file starting at 1 where the
-* ending -- the line ending, either n or rn
 statement starts.
+* ending -- the line ending, either n or rn
 
 ```nim
 Statement = object
   text*: string
   lineNum*: Natural
+  ending*: string
 
 ```
 
@@ -569,7 +570,7 @@ proc `==`(a: Value; b: Value): bool
 Create a new statement.
 
 ```nim
-func newStatement(text: string; lineNum: Natural = 1): Statement
+func newStatement(text: string; lineNum: Natural = 1; ending = "\n"): Statement
 ```
 
 # `$`
