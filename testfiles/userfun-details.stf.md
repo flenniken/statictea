@@ -24,12 +24,12 @@ $$ : d2 = functionDetails(o.fn1)
 $$ : p1n = d2.signature.paramNames[0]
 $$ : p1t = d2.signature.paramTypes[0]
 $$ : rt = d2.signature.returnType
-$$ : docComments = join(d2.docComments, "\n")
+$$ : docComment = d2.docComment
 $$ : statements = join(d2.statements, "\n")
 {d1}
 
 a = func("{d2.signature.name}({p1n}: {p1t}) {rt}")
-{docComments}
+{docComment}
 {statements}
 
 $$ endblock
@@ -63,7 +63,7 @@ signature.name = "fn1"
 signature.paramNames = ["num","str"]
 signature.paramTypes = ["int","string"]
 signature.returnType = "dict"
-docComments = ["  ## Simple function that returns a dictionary."]
+docComment = "  ## Simple function that returns a dictionary."
 filename = "shared.tea"
 lineNum = 1
 numLines = 3

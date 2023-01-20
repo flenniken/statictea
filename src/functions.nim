@@ -78,7 +78,7 @@ func functionDetails*(fs: FunctionSpec): Value =
   var dictv = newVarsDict()
   dictv["builtIn"] = newValue(fs.builtIn)
   dictv["signature"] = signatureDetails(fs.signature)
-  dictv["docComments"] = newValue(fs.docComments)
+  dictv["docComment"] = newValue(fs.docComment)
   dictv["filename"] = newValue(fs.filename)
   dictv["lineNum"] = newValue(fs.lineNum)
   dictv["numLines"] = newValue(fs.numLines)
@@ -2286,7 +2286,7 @@ func funFunctionDetails_pd*(variables: Variables, arguments: seq[Value]): FunRes
   ## @:fd.signature.paramNames = ["numStr1","numStr2"]
   ## @:fd.signature.paramTypes = ["string","string"]
   ## @:fd.signature.returnType = "int"
-  ## @:fd.docComments = ["  ## Compare two number strings and return 1, 0, or -1."]
+  ## @:fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.\n"
   ## @:fd.filename = "testcode.tea"
   ## @:fd.lineNum = 3
   ## @:fd.numLines = 2
@@ -2766,101 +2766,100 @@ type
     ## @:* name -- the function name
     ## @:* functionPtr -- the pointer to the function for calling it
     ## @:* signatureCode -- the single letters signature code
-    ## @:* docComments -- the function documentation
+    ## @:* docComment -- the function documentation
     ## @:* lineNum -- the function's starting line in the functions.nim file
     ## @:* numLines -- the number of function code lines
     name*: string
     functionPtr*: FunctionPtr
     signatureCode*: string
-    # todo: change docComments to a string? instead of a list of strings.
-    docComments*: seq[string]
+    docComment*: string
     lineNum*: LineNumber
     numLines*: Natural
 
 func newBuiltInInfo*(
     name: string,
     signatureCode: string,
-    docComments: seq[string],
+    docComment: string,
     lineNum: LineNumber,
     numLines: Natural
   ): BuiltInInfo =
   # let funName = name & signatureCode
   result = BuiltInInfo(name: name, signatureCode: signatureCode,
-    docComments: docComments, lineNum: lineNum, numLines: numLines)
+    docComment: docComment, lineNum: lineNum, numLines: numLines)
 
 const
   functionsList* = [
-    newBuiltInInfo("add", "fff", @[""], 1, 10),
-    newBuiltInInfo("add", "iii", @[""], 1, 10),
-    newBuiltInInfo("and", "bbb", @[""], 1, 10),
-    newBuiltInInfo("bool", "ab", @[""], 1, 10),
-    newBuiltInInfo("case", "iloaa", @[""], 1, 10),
-    newBuiltInInfo("case", "sloaa", @[""], 1, 10),
-    newBuiltInInfo("cmp", "ffi", @[""], 1, 10),
-    newBuiltInInfo("cmp", "iii", @[""], 1, 10),
-    newBuiltInInfo("cmp", "ssobi", @[""], 1, 10),
-    newBuiltInInfo("cmpVersion", "ssi", @[""], 1, 10),
-    newBuiltInInfo("concat", "sss", @[""], 1, 10),
-    newBuiltInInfo("dict", "old", @[""], 1, 10),
-    newBuiltInInfo("dup", "sis", @[""], 1, 10),
-    newBuiltInInfo("eq", "ffb", @[""], 1, 10),
-    newBuiltInInfo("eq", "iib", @[""], 1, 10),
-    newBuiltInInfo("eq", "ssb", @[""], 1, 10),
-    newBuiltInInfo("exists", "dsb", @[""], 1, 10),
-    newBuiltInInfo("find", "ssoaa", @[""], 1, 10),
-    newBuiltInInfo("float", "if", @[""], 1, 10),
-    newBuiltInInfo("float", "saa", @[""], 1, 10),
-    newBuiltInInfo("float", "sf", @[""], 1, 10),
-    newBuiltInInfo("format", "ss", @[""], 1, 10),
-    newBuiltInInfo("func", "sp", @[""], 1, 10),
-    newBuiltInInfo("functionDetails", "pd", @[""], 1, 10),
-    newBuiltInInfo("get", "dsoaa", @[""], 1, 10),
-    newBuiltInInfo("get", "lioaa", @[""], 1, 10),
-    newBuiltInInfo("githubAnchor", "ll", @[""], 1, 10),
-    newBuiltInInfo("githubAnchor", "ss", @[""], 1, 10),
-    newBuiltInInfo("gt", "ffb", @[""], 1, 10),
-    newBuiltInInfo("gt", "iib", @[""], 1, 10),
-    newBuiltInInfo("gte", "ffb", @[""], 1, 10),
-    newBuiltInInfo("gte", "iib", @[""], 1, 10),
-    newBuiltInInfo("if", "baoaa", @[""], 1, 10),
-    newBuiltInInfo("if0", "iaoaa", @[""], 1, 10),
-    newBuiltInInfo("int", "fosi", @[""], 1, 10),
-    newBuiltInInfo("int", "sosi", @[""], 1, 10),
-    newBuiltInInfo("int", "ssaa", @[""], 1, 10),
-    newBuiltInInfo("join", "lsois", @[""], 1, 10),
-    newBuiltInInfo("joinPath", "loss", @[""], 1, 10),
-    newBuiltInInfo("keys", "dl", @[""], 1, 10),
-    newBuiltInInfo("len", "di", @[""], 1, 10),
-    newBuiltInInfo("len", "li", @[""], 1, 10),
-    newBuiltInInfo("len", "si", @[""], 1, 10),
-    newBuiltInInfo("list", "al", @[""], 1, 10),
-    newBuiltInInfo("listLoop", "lpoal", @[""], 1, 10),
-    newBuiltInInfo("log", "ss", @[""], 1, 10),
-    newBuiltInInfo("lower", "ss", @[""], 1, 10),
-    newBuiltInInfo("lt", "ffb", @[""], 1, 10),
-    newBuiltInInfo("lt", "iib", @[""], 1, 10),
-    newBuiltInInfo("lte", "ffb", @[""], 1, 10),
-    newBuiltInInfo("lte", "iib", @[""], 1, 10),
-    newBuiltInInfo("ne", "ffb", @[""], 1, 10),
-    newBuiltInInfo("ne", "iib", @[""], 1, 10),
-    newBuiltInInfo("ne", "ssb", @[""], 1, 10),
-    newBuiltInInfo("not", "bb", @[""], 1, 10),
-    newBuiltInInfo("or", "bbb", @[""], 1, 10),
-    newBuiltInInfo("path", "sosd", @[""], 1, 10),
-    newBuiltInInfo("readJson", "sa", @[""], 1, 10),
-    newBuiltInInfo("replace", "siiss", @[""], 1, 10),
-    newBuiltInInfo("replaceRe", "sls", @[""], 1, 10),
-    newBuiltInInfo("return", "aa", @[""], 1, 10),
-    newBuiltInInfo("slice", "siois", @[""], 1, 10),
-    newBuiltInInfo("sort", "lsosl", @[""], 1, 10),
-    newBuiltInInfo("sort", "lssil", @[""], 1, 10),
-    newBuiltInInfo("sort", "lsssl", @[""], 1, 10),
-    newBuiltInInfo("startsWith", "ssb", @[""], 1, 10),
-    newBuiltInInfo("string", "aoss", @[""], 1, 10),
-    newBuiltInInfo("string", "sds", @[""], 1, 10),
-    newBuiltInInfo("type", "as", @[""], 1, 10),
-    newBuiltInInfo("values", "dl", @[""], 1, 10),
-    newBuiltInInfo("warn", "ss", @[""], 1, 10),
+    newBuiltInInfo("add", "fff", "", 1, 10),
+    newBuiltInInfo("add", "iii", "", 1, 10),
+    newBuiltInInfo("and", "bbb", "", 1, 10),
+    newBuiltInInfo("bool", "ab", "", 1, 10),
+    newBuiltInInfo("case", "iloaa", "", 1, 10),
+    newBuiltInInfo("case", "sloaa", "", 1, 10),
+    newBuiltInInfo("cmp", "ffi", "", 1, 10),
+    newBuiltInInfo("cmp", "iii", "", 1, 10),
+    newBuiltInInfo("cmp", "ssobi", "", 1, 10),
+    newBuiltInInfo("cmpVersion", "ssi", "", 1, 10),
+    newBuiltInInfo("concat", "sss", "", 1, 10),
+    newBuiltInInfo("dict", "old", "", 1, 10),
+    newBuiltInInfo("dup", "sis", "", 1, 10),
+    newBuiltInInfo("eq", "ffb", "", 1, 10),
+    newBuiltInInfo("eq", "iib", "", 1, 10),
+    newBuiltInInfo("eq", "ssb", "", 1, 10),
+    newBuiltInInfo("exists", "dsb", "", 1, 10),
+    newBuiltInInfo("find", "ssoaa", "", 1, 10),
+    newBuiltInInfo("float", "if", "", 1, 10),
+    newBuiltInInfo("float", "saa", "", 1, 10),
+    newBuiltInInfo("float", "sf", "", 1, 10),
+    newBuiltInInfo("format", "ss", "", 1, 10),
+    newBuiltInInfo("func", "sp", "", 1, 10),
+    newBuiltInInfo("functionDetails", "pd", "", 1, 10),
+    newBuiltInInfo("get", "dsoaa", "", 1, 10),
+    newBuiltInInfo("get", "lioaa", "", 1, 10),
+    newBuiltInInfo("githubAnchor", "ll", "", 1, 10),
+    newBuiltInInfo("githubAnchor", "ss", "", 1, 10),
+    newBuiltInInfo("gt", "ffb", "", 1, 10),
+    newBuiltInInfo("gt", "iib", "", 1, 10),
+    newBuiltInInfo("gte", "ffb", "", 1, 10),
+    newBuiltInInfo("gte", "iib", "", 1, 10),
+    newBuiltInInfo("if", "baoaa", "", 1, 10),
+    newBuiltInInfo("if0", "iaoaa", "", 1, 10),
+    newBuiltInInfo("int", "fosi", "", 1, 10),
+    newBuiltInInfo("int", "sosi", "", 1, 10),
+    newBuiltInInfo("int", "ssaa", "", 1, 10),
+    newBuiltInInfo("join", "lsois", "", 1, 10),
+    newBuiltInInfo("joinPath", "loss", "", 1, 10),
+    newBuiltInInfo("keys", "dl", "", 1, 10),
+    newBuiltInInfo("len", "di", "", 1, 10),
+    newBuiltInInfo("len", "li", "", 1, 10),
+    newBuiltInInfo("len", "si", "", 1, 10),
+    newBuiltInInfo("list", "al", "", 1, 10),
+    newBuiltInInfo("listLoop", "lpoal", "", 1, 10),
+    newBuiltInInfo("log", "ss", "", 1, 10),
+    newBuiltInInfo("lower", "ss", "", 1, 10),
+    newBuiltInInfo("lt", "ffb", "", 1, 10),
+    newBuiltInInfo("lt", "iib", "", 1, 10),
+    newBuiltInInfo("lte", "ffb", "", 1, 10),
+    newBuiltInInfo("lte", "iib", "", 1, 10),
+    newBuiltInInfo("ne", "ffb", "", 1, 10),
+    newBuiltInInfo("ne", "iib", "", 1, 10),
+    newBuiltInInfo("ne", "ssb", "", 1, 10),
+    newBuiltInInfo("not", "bb", "", 1, 10),
+    newBuiltInInfo("or", "bbb", "", 1, 10),
+    newBuiltInInfo("path", "sosd", "", 1, 10),
+    newBuiltInInfo("readJson", "sa", "", 1, 10),
+    newBuiltInInfo("replace", "siiss", "", 1, 10),
+    newBuiltInInfo("replaceRe", "sls", "", 1, 10),
+    newBuiltInInfo("return", "aa", "", 1, 10),
+    newBuiltInInfo("slice", "siois", "", 1, 10),
+    newBuiltInInfo("sort", "lsosl", "", 1, 10),
+    newBuiltInInfo("sort", "lssil", "", 1, 10),
+    newBuiltInInfo("sort", "lsssl", "", 1, 10),
+    newBuiltInInfo("startsWith", "ssb", "", 1, 10),
+    newBuiltInInfo("string", "aoss", "", 1, 10),
+    newBuiltInInfo("string", "sds", "", 1, 10),
+    newBuiltInInfo("type", "as", "", 1, 10),
+    newBuiltInInfo("values", "dl", "", 1, 10),
+    newBuiltInInfo("warn", "ss", "", 1, 10),
   ]
     ## Sorted list of built in functions, their function name, nim
     ## name and their signature.
@@ -2943,7 +2942,7 @@ proc makeFuncDictionary*(): VarsDict =
     let letter = toUpperAscii(bii.name[0])
     let functionName = "fun$1$2_$3" % [$letter, bii.name[1 .. ^1], bii.signatureCode]
     let functionPtr = functionsDict[functionName]
-    let function = newFunc(builtIn, signatureO.get(), bii.docComments, filename,
+    let function = newFunc(builtIn, signatureO.get(), bii.docComment, filename,
       bii.lineNum, bii.numLines, statementLines, functionPtr)
 
     let funcValue = newValue(function)

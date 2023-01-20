@@ -373,12 +373,13 @@ when defined(test):
       functionName: string = "zero",
       signatureCode: string = "i",
       builtIn = false,
-      docComments = newSeq[string](),
+      docComment = "## Return the number 0.\n",
       filename = "test.nim",
       lineNum = 0,
       numLines = 3,
       functionPtr: FunctionPtr = nil,
-      statements = newSeq[Statement]()): FunctionSpec =
+      statements = newSeq[Statement]()
+    ): FunctionSpec =
     # Create a function spec for testing.
 
     func zero(variables: Variables, parameters: seq[Value]): FunResult =
@@ -389,16 +390,12 @@ when defined(test):
     else:
       functionPtrDefault = functionPtr
     let signatureO = newSignatureO(functionName, signatureCode)
-    var docCommentsList: seq[string]
-    if docCommentsList.len == 0:
-      docCommentsList.add("Return the number 0.")
-    else:
-      docCommentsList = docComments
+
     var statementsList: seq[Statement]
     if statementsList.len == 0:
       statementsList.add(newStatement("return 0"))
     else:
       statementsList = statements
     let builtIn = false
-    result = newFunc(builtIn, signatureO.get(), docCommentsList, filename,
+    result = newFunc(builtIn, signatureO.get(), docComment, filename,
       lineNum, numLines, statementsList, functionPtrDefault)

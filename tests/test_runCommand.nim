@@ -2122,6 +2122,11 @@ White$1
   test "readStatement empty":
     check testReadStatement("", "")
 
+  test "readStatement simple":
+    check testReadStatement("abc", "abc")
+    # check testReadStatement("abc\n", "abc\n")
+    # check testReadStatement("abc\r\n", "abc\r\n")
+
   test "readStatement multiline":
     let content = """
 a = $1
@@ -2563,7 +2568,7 @@ l.details.signature.name = "strNumCmp"
 l.details.signature.paramNames = ["numStr1","numStr2"]
 l.details.signature.paramTypes = ["string","string"]
 l.details.signature.returnType = "int"
-l.details.docComments = ["  ## Compare two number strings and return 1, 0, or -1."]
+l.details.docComment = "  ## Compare two number strings and return 1, 0, or -1."
 l.details.filename = "testcode.tea"
 l.details.lineNum = 3
 l.details.numLines = 2

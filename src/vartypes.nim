@@ -76,13 +76,14 @@ type
     ## A Statement object stores the statement text and where it
     ## @:starts in the template file.
     ## @:
-    ## @:* text -- a line containing a statement
-    ## @:* start -- index where the statement starts in the text
+    ## @:* text -- a line containing a statement without the line ending
     ## @:* lineNum -- line number in the file starting at 1 where the
+    ## @:* ending -- the line ending, either \n or \r\n
     ## @:statement starts.
     text*: string
-    # start*: Natural
     lineNum*: Natural
+    # todo: support ending so we can reproduce the original given a statement.
+    # ending*: string
 
   FunctionPtr* = proc (variables: Variables, parameters: seq[Value]):
       FunResult {.noSideEffect.}
@@ -139,7 +140,7 @@ type
     ## @:
     ## @:* builtIn -- true for the built-in functions, false for user functions
     ## @:* signature -- the function signature
-    ## @:* docComments -- the function document comments
+    ## @:* docComment -- the function document comment
     ## @:* filename -- the filename where the function is defined either the code file or functions.nim
     ## @:* lineNum -- the line number where the function definition starts
     ## @:* numLines -- the number of lines to define the function
@@ -147,7 +148,7 @@ type
     ## @:* functionPtr -- pointer to the function for built-in functions
     builtIn*: bool
     signature*: Signature
-    docComments*: seq[string]
+    docComment*: string
     filename*: string
     lineNum*: Natural
     numLines*: Natural
@@ -304,20 +305,7 @@ proc newValue*[T](dictPairs: openArray[(string, T)]): Value =
     varsTable[a] = value
   result = Value(kind: vkDict, dictv: varsTable)
 
-# func newFunc*(signature: Signature, functionPtr: FunctionPtr): FunctionSpec =
-#   ## Create a new built-in func which is a FunctionSpec.
-#   let builtIn = true
-#   let docComments = newSeq[string]()
-#   let statements = newSeq[string]()
-#   let filename = "functions.nim"
-#   let lineNum = 0
-#   let numLines = 10
-#   assert(functionPtr != nil)
-#   result = FunctionSpec(builtIn: builtIn, signature: signature, docComments: docComments,
-#                           filename: filename, lineNum: lineNum, numLines: numLines,
-#                           statements: statements, functionPtr: functionPtr)
-
-func newFunc*(builtIn: bool, signature: Signature, docComments: seq[string],
+func newFunc*(builtIn: bool, signature: Signature, docComment: string,
     filename: string, lineNum: Natural, numLines: Natural,
     statements: seq[Statement], functionPtr: FunctionPtr): FunctionSpec =
   ## Create a new func which is a FunctionSpec.
@@ -330,7 +318,7 @@ func newFunc*(builtIn: bool, signature: Signature, docComments: seq[string],
       if statements.len < 1:
         raiseAssert("a user function requires statement lines")
 
-  result = FunctionSpec(builtIn: builtIn, signature: signature, docComments: docComments,
+  result = FunctionSpec(builtIn: builtIn, signature: signature, docComment: docComment,
                           filename: filename, lineNum: lineNum, numLines: numLines,
                           statements: statements, functionPtr: functionPtr)
 

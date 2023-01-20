@@ -2387,7 +2387,9 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
   func dummy(variables: Variables, parameters: seq[Value]): FunResult =
     result = newFunResult(newValue(0))
 
-  let userFunc = newFunc(builtIn=false, signature, docComments, sourceFilename, lineNum,
+  # todo: get the correct line ending, \n or \r\n.
+  let docComment = docComments.join("\n")
+  let userFunc = newFunc(builtIn=false, signature, docComment, sourceFilename, lineNum,
     numLines, userStatements, dummy)
   let funcVar = newValue(userFunc)
 

@@ -181,9 +181,9 @@ ValueOr = OpResultWarn[Value]
 A Statement object stores the statement text and where it
 starts in the template file.
 
-* text -- a line containing a statement
-* start -- index where the statement starts in the text
+* text -- a line containing a statement without the line ending
 * lineNum -- line number in the file starting at 1 where the
+* ending -- the line ending, either n or rn
 statement starts.
 
 ```nim
@@ -271,7 +271,7 @@ Holds the function details.
 
 * builtIn -- true for the built-in functions, false for user functions
 * signature -- the function signature
-* docComments -- the function document comments
+* docComment -- the function document comment
 * filename -- the filename where the function is defined either the code file or functions.nim
 * lineNum -- the line number where the function definition starts
 * numLines -- the number of lines to define the function
@@ -282,7 +282,7 @@ Holds the function details.
 FunctionSpec = object
   builtIn*: bool
   signature*: Signature
-  docComments*: seq[string]
+  docComment*: string
   filename*: string
   lineNum*: Natural
   numLines*: Natural
@@ -527,7 +527,7 @@ proc newValue[T](dictPairs: openArray[(string, T)]): Value
 Create a new func which is a FunctionSpec.
 
 ```nim
-func newFunc(builtIn: bool; signature: Signature; docComments: seq[string];
+func newFunc(builtIn: bool; signature: Signature; docComment: string;
              filename: string; lineNum: Natural; numLines: Natural;
              statements: seq[Statement]; functionPtr: FunctionPtr): FunctionSpec
 ```
