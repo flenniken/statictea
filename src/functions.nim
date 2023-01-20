@@ -2935,7 +2935,6 @@ proc makeFuncDictionary*(): VarsDict =
 
     let builtIn = true
     let filename = "functions.nim"
-    # todo: change statementLines to an array
     var statementLines = newSeq[Statement]()
     # todo: use fun_name_sig format instead of funName_sig.
     # capitalize the name like funAdd_fff

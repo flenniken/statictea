@@ -25,12 +25,12 @@ $$ : p1n = d2.signature.paramNames[0]
 $$ : p1t = d2.signature.paramTypes[0]
 $$ : rt = d2.signature.returnType
 $$ : docComment = d2.docComment
+$$ : # todo: add a stripEnding function?
 $$ : statements = join(d2.statements, "\n")
 {d1}
 
 a = func("{d2.signature.name}({p1n}: {p1t}) {rt}")
-{docComment}
-{statements}
+{docComment}{statements}
 
 $$ endblock
 ~~~
@@ -63,7 +63,7 @@ signature.name = "fn1"
 signature.paramNames = ["num","str"]
 signature.paramTypes = ["int","string"]
 signature.returnType = "dict"
-docComment = "  ## Simple function that returns a dictionary."
+docComment = "  ## Simple function that returns a dictionary.\n"
 filename = "shared.tea"
 lineNum = 1
 numLines = 3

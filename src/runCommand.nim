@@ -2352,7 +2352,7 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
   let signature = signatureOr.value
 
   # Read the doc comments.
-  var docComments = newSeq[string]()
+  var docComment = ""
   let firstStatementO = readStatement(env, lb)
   if not firstStatementO.isSome:
     # Out of lines; Missing required doc comment.
@@ -2364,7 +2364,7 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
     env.warnStatement(statement, wMissingDocComment, "",  0, sourceFilename)
     # Process it as a regular statement.
     return true # handled
-  docComments.add(firstStatement.text)
+  docComment.add(firstStatement.text & firstStatement.ending)
   var statement: Statement
   while true:
     let statementO = readStatement(env, lb)
@@ -2375,7 +2375,7 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
     statement = statementO.get()
     if not isDocComment(statement):
       break
-    docComments.add(statement.text)
+    docComment.add(statement.text & firstStatement.ending)
 
   # Collect the function's statements.
   var userStatements = newSeq[Statement]()
@@ -2401,8 +2401,6 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
   func dummy(variables: Variables, parameters: seq[Value]): FunResult =
     result = newFunResult(newValue(0))
 
-  # todo: get the correct line ending, \n or \r\n.
-  let docComment = docComments.join("\n")
   let userFunc = newFunc(builtIn=false, signature, docComment, sourceFilename, lineNum,
     numLines, userStatements, dummy)
   let funcVar = newValue(userFunc)
