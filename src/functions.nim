@@ -19,6 +19,7 @@ import opresult
 import readjson
 import variables
 
+
 type
   StringOr* = OpResultWarn[string]
     ## StringOr holds a string or a warning.
@@ -2681,79 +2682,185 @@ func funReadJson_sa*(variables: Variables, arguments: seq[Value]): FunResult =
     return newFunResultWarn(valueOr.message)
   result = newFunResult(valueOr.value)
 
+
+# Map a built-in function name to a function pointer.
+var functionsDict = newTable[string, FunctionPtr]()
+functionsDict["funAdd_fff"] = funAdd_fff
+functionsDict["funAdd_iii"] = funAdd_iii
+functionsDict["funAnd_bbb"] = funAnd_bbb
+functionsDict["funBool_ab"] = funBool_ab
+functionsDict["funCase_iloaa"] = funCase_iloaa
+functionsDict["funCase_sloaa"] = funCase_sloaa
+functionsDict["funCmp_ffi"] = funCmp_ffi
+functionsDict["funCmp_iii"] = funCmp_iii
+functionsDict["funCmp_ssobi"] = funCmp_ssobi
+functionsDict["funCmpVersion_ssi"] = funCmpVersion_ssi
+functionsDict["funConcat_sss"] = funConcat_sss
+functionsDict["funDict_old"] = funDict_old
+functionsDict["funDup_sis"] = funDup_sis
+functionsDict["funEq_ffb"] = funEq_ffb
+functionsDict["funEq_iib"] = funEq_iib
+functionsDict["funEq_ssb"] = funEq_ssb
+functionsDict["funExists_dsb"] = funExists_dsb
+functionsDict["funFind_ssoaa"] = funFind_ssoaa
+functionsDict["funFloat_if"] = funFloat_if
+functionsDict["funFloat_saa"] = funFloat_saa
+functionsDict["funFloat_sf"] = funFloat_sf
+functionsDict["funFormat_ss"] = funFormat_ss
+functionsDict["funFunc_sp"] = funFunc_sp
+functionsDict["funFunctionDetails_pd"] = funFunctionDetails_pd
+functionsDict["funGet_dsoaa"] = funGet_dsoaa
+functionsDict["funGet_lioaa"] = funGet_lioaa
+functionsDict["funGithubAnchor_ll"] = funGithubAnchor_ll
+functionsDict["funGithubAnchor_ss"] = funGithubAnchor_ss
+functionsDict["funGt_ffb"] = funGt_ffb
+functionsDict["funGt_iib"] = funGt_iib
+functionsDict["funGte_ffb"] = funGte_ffb
+functionsDict["funGte_iib"] = funGte_iib
+functionsDict["funIf_baoaa"] = funIf_baoaa
+functionsDict["funIf0_iaoaa"] = funIf0_iaoaa
+functionsDict["funInt_fosi"] = funInt_fosi
+functionsDict["funInt_sosi"] = funInt_sosi
+functionsDict["funInt_ssaa"] = funInt_ssaa
+functionsDict["funJoin_lsois"] = funJoin_lsois
+functionsDict["funJoinPath_loss"] = funJoinPath_loss
+functionsDict["funKeys_dl"] = funKeys_dl
+functionsDict["funLen_di"] = funLen_di
+functionsDict["funLen_li"] = funLen_li
+functionsDict["funLen_si"] = funLen_si
+functionsDict["funList_al"] = funList_al
+functionsDict["funListLoop_lpoal"] = funListLoop_lpoal
+functionsDict["funLog_ss"] = funLog_ss
+functionsDict["funLower_ss"] = funLower_ss
+functionsDict["funLt_ffb"] = funLt_ffb
+functionsDict["funLt_iib"] = funLt_iib
+functionsDict["funLte_ffb"] = funLte_ffb
+functionsDict["funLte_iib"] = funLte_iib
+functionsDict["funNe_ffb"] = funNe_ffb
+functionsDict["funNe_iib"] = funNe_iib
+functionsDict["funNe_ssb"] = funNe_ssb
+functionsDict["funNot_bb"] = funNot_bb
+functionsDict["funOr_bbb"] = funOr_bbb
+functionsDict["funPath_sosd"] = funPath_sosd
+functionsDict["funReadJson_sa"] = funReadJson_sa
+functionsDict["funReplace_siiss"] = funReplace_siiss
+functionsDict["funReplaceRe_sls"] = funReplaceRe_sls
+functionsDict["funReturn_aa"] = funReturn_aa
+functionsDict["funSlice_siois"] = funSlice_siois
+functionsDict["funSort_lsosl"] = funSort_lsosl
+functionsDict["funSort_lssil"] = funSort_lssil
+functionsDict["funSort_lsssl"] = funSort_lsssl
+functionsDict["funStartsWith_ssb"] = funStartsWith_ssb
+functionsDict["funString_aoss"] = funString_aoss
+functionsDict["funString_sds"] = funString_sds
+functionsDict["funType_as"] = funType_as
+functionsDict["funValues_dl"] = funValues_dl
+functionsDict["funWarn_ss"] = funWarn_ss
+
+type
+  LineNumber = range[1 .. high(int)]
+
+  BuiltInInfo* = object
+    ## The built-in function information.
+    ## @:
+    ## @:* name -- the function name
+    ## @:* functionPtr -- the pointer to the function for calling it
+    ## @:* signatureCode -- the single letters signature code
+    ## @:* docComments -- the function documentation
+    ## @:* lineNum -- the function's starting line in the functions.nim file
+    ## @:* numLines -- the number of function code lines
+    name*: string
+    functionPtr*: FunctionPtr
+    signatureCode*: string
+    # todo: change docComments to a string? instead of a list of strings.
+    docComments*: seq[string]
+    lineNum*: LineNumber
+    numLines*: Natural
+
+func newBuiltInInfo*(
+    name: string,
+    signatureCode: string,
+    docComments: seq[string],
+    lineNum: LineNumber,
+    numLines: Natural
+  ): BuiltInInfo =
+  # let funName = name & signatureCode
+  result = BuiltInInfo(name: name, signatureCode: signatureCode,
+    docComments: docComments, lineNum: lineNum, numLines: numLines)
+
 const
   functionsList* = [
-    ("add", funAdd_fff, "fff"),
-    ("add", funAdd_iii, "iii"),
-    ("and", funAnd_bbb, "bbb"),
-    ("bool", funBool_ab, "ab"),
-    ("case", funCase_iloaa, "iloaa"),
-    ("case", funCase_sloaa, "sloaa"),
-    ("cmp", funCmp_ffi, "ffi"),
-    ("cmp", funCmp_iii, "iii"),
-    ("cmp", funCmp_ssobi, "ssobi"),
-    ("cmpVersion", funCmpVersion_ssi, "ssi"),
-    ("concat", funConcat_sss, "sss"),
-    ("dict", funDict_old, "old"),
-    ("dup", funDup_sis, "sis"),
-    ("eq", funEq_ffb, "ffb"),
-    ("eq", funEq_iib, "iib"),
-    ("eq", funEq_ssb, "ssb"),
-    ("exists", funExists_dsb, "dsb"),
-    ("find", funFind_ssoaa, "ssoaa"),
-    ("float", funFloat_if, "if"),
-    ("float", funFloat_saa, "saa"),
-    ("float", funFloat_sf, "sf"),
-    ("format", funFormat_ss, "ss"),
-    ("func", funFunc_sp, "sp"),
-    ("functionDetails", funFunctionDetails_pd, "pd"),
-    ("get", funGet_dsoaa, "dsoaa"),
-    ("get", funGet_lioaa, "lioaa"),
-    ("githubAnchor", funGithubAnchor_ll, "ll"),
-    ("githubAnchor", funGithubAnchor_ss, "ss"),
-    ("gt", funGt_ffb, "ffb"),
-    ("gt", funGt_iib, "iib"),
-    ("gte", funGte_ffb, "ffb"),
-    ("gte", funGte_iib, "iib"),
-    ("if", funIf_baoaa, "baoaa"),
-    ("if0", funIf0_iaoaa, "iaoaa"),
-    ("int", funInt_fosi, "fosi"),
-    ("int", funInt_sosi, "sosi"),
-    ("int", funInt_ssaa, "ssaa"),
-    ("join", funJoin_lsois, "lsois"),
-    ("joinPath", funJoinPath_loss, "loss"),
-    ("keys", funKeys_dl, "dl"),
-    ("len", funLen_di, "di"),
-    ("len", funLen_li, "li"),
-    ("len", funLen_si, "si"),
-    ("list", funList_al, "al"),
-    ("listLoop", funListLoop_lpoal, "lpoal"),
-    ("log", funLog_ss, "si"),
-    ("lower", funLower_ss, "ss"),
-    ("lt", funLt_ffb, "ffb"),
-    ("lt", funLt_iib, "iib"),
-    ("lte", funLte_ffb, "ffb"),
-    ("lte", funLte_iib, "iib"),
-    ("ne", funNe_ffb, "ffb"),
-    ("ne", funNe_iib, "iib"),
-    ("ne", funNe_ssb, "ssb"),
-    ("not", funNot_bb, "bb"),
-    ("or", funOr_bbb, "bbb"),
-    ("path", funPath_sosd, "sosd"),
-    ("readJson", funReadJson_sa, "sa"),
-    ("replace", funReplace_siiss, "siiss"),
-    ("replaceRe", funReplaceRe_sls, "sls"),
-    ("return", funReturn_aa, "aa"),
-    ("slice", funSlice_siois, "siois"),
-    ("sort", funSort_lsosl, "lsosl"),
-    ("sort", funSort_lssil, "lssil"),
-    ("sort", funSort_lsssl, "lsssl"),
-    ("startsWith", funStartsWith_ssb, "ssb"),
-    ("string", funString_aoss, "aoss"),
-    ("string", funString_sds, "sds"),
-    ("type", funType_as, "as"),
-    ("values", funValues_dl, "dl"),
-    ("warn", funWarn_ss, "ss"),
+    newBuiltInInfo("add", "fff", @[""], 1, 10),
+    newBuiltInInfo("add", "iii", @[""], 1, 10),
+    newBuiltInInfo("and", "bbb", @[""], 1, 10),
+    newBuiltInInfo("bool", "ab", @[""], 1, 10),
+    newBuiltInInfo("case", "iloaa", @[""], 1, 10),
+    newBuiltInInfo("case", "sloaa", @[""], 1, 10),
+    newBuiltInInfo("cmp", "ffi", @[""], 1, 10),
+    newBuiltInInfo("cmp", "iii", @[""], 1, 10),
+    newBuiltInInfo("cmp", "ssobi", @[""], 1, 10),
+    newBuiltInInfo("cmpVersion", "ssi", @[""], 1, 10),
+    newBuiltInInfo("concat", "sss", @[""], 1, 10),
+    newBuiltInInfo("dict", "old", @[""], 1, 10),
+    newBuiltInInfo("dup", "sis", @[""], 1, 10),
+    newBuiltInInfo("eq", "ffb", @[""], 1, 10),
+    newBuiltInInfo("eq", "iib", @[""], 1, 10),
+    newBuiltInInfo("eq", "ssb", @[""], 1, 10),
+    newBuiltInInfo("exists", "dsb", @[""], 1, 10),
+    newBuiltInInfo("find", "ssoaa", @[""], 1, 10),
+    newBuiltInInfo("float", "if", @[""], 1, 10),
+    newBuiltInInfo("float", "saa", @[""], 1, 10),
+    newBuiltInInfo("float", "sf", @[""], 1, 10),
+    newBuiltInInfo("format", "ss", @[""], 1, 10),
+    newBuiltInInfo("func", "sp", @[""], 1, 10),
+    newBuiltInInfo("functionDetails", "pd", @[""], 1, 10),
+    newBuiltInInfo("get", "dsoaa", @[""], 1, 10),
+    newBuiltInInfo("get", "lioaa", @[""], 1, 10),
+    newBuiltInInfo("githubAnchor", "ll", @[""], 1, 10),
+    newBuiltInInfo("githubAnchor", "ss", @[""], 1, 10),
+    newBuiltInInfo("gt", "ffb", @[""], 1, 10),
+    newBuiltInInfo("gt", "iib", @[""], 1, 10),
+    newBuiltInInfo("gte", "ffb", @[""], 1, 10),
+    newBuiltInInfo("gte", "iib", @[""], 1, 10),
+    newBuiltInInfo("if", "baoaa", @[""], 1, 10),
+    newBuiltInInfo("if0", "iaoaa", @[""], 1, 10),
+    newBuiltInInfo("int", "fosi", @[""], 1, 10),
+    newBuiltInInfo("int", "sosi", @[""], 1, 10),
+    newBuiltInInfo("int", "ssaa", @[""], 1, 10),
+    newBuiltInInfo("join", "lsois", @[""], 1, 10),
+    newBuiltInInfo("joinPath", "loss", @[""], 1, 10),
+    newBuiltInInfo("keys", "dl", @[""], 1, 10),
+    newBuiltInInfo("len", "di", @[""], 1, 10),
+    newBuiltInInfo("len", "li", @[""], 1, 10),
+    newBuiltInInfo("len", "si", @[""], 1, 10),
+    newBuiltInInfo("list", "al", @[""], 1, 10),
+    newBuiltInInfo("listLoop", "lpoal", @[""], 1, 10),
+    newBuiltInInfo("log", "ss", @[""], 1, 10),
+    newBuiltInInfo("lower", "ss", @[""], 1, 10),
+    newBuiltInInfo("lt", "ffb", @[""], 1, 10),
+    newBuiltInInfo("lt", "iib", @[""], 1, 10),
+    newBuiltInInfo("lte", "ffb", @[""], 1, 10),
+    newBuiltInInfo("lte", "iib", @[""], 1, 10),
+    newBuiltInInfo("ne", "ffb", @[""], 1, 10),
+    newBuiltInInfo("ne", "iib", @[""], 1, 10),
+    newBuiltInInfo("ne", "ssb", @[""], 1, 10),
+    newBuiltInInfo("not", "bb", @[""], 1, 10),
+    newBuiltInInfo("or", "bbb", @[""], 1, 10),
+    newBuiltInInfo("path", "sosd", @[""], 1, 10),
+    newBuiltInInfo("readJson", "sa", @[""], 1, 10),
+    newBuiltInInfo("replace", "siiss", @[""], 1, 10),
+    newBuiltInInfo("replaceRe", "sls", @[""], 1, 10),
+    newBuiltInInfo("return", "aa", @[""], 1, 10),
+    newBuiltInInfo("slice", "siois", @[""], 1, 10),
+    newBuiltInInfo("sort", "lsosl", @[""], 1, 10),
+    newBuiltInInfo("sort", "lssil", @[""], 1, 10),
+    newBuiltInInfo("sort", "lsssl", @[""], 1, 10),
+    newBuiltInInfo("startsWith", "ssb", @[""], 1, 10),
+    newBuiltInInfo("string", "aoss", @[""], 1, 10),
+    newBuiltInInfo("string", "sds", @[""], 1, 10),
+    newBuiltInInfo("type", "as", @[""], 1, 10),
+    newBuiltInInfo("values", "dl", @[""], 1, 10),
+    newBuiltInInfo("warn", "ss", @[""], 1, 10),
   ]
     ## Sorted list of built in functions, their function name, nim
     ## name and their signature.
@@ -2811,44 +2918,51 @@ proc getBestFunction*(funcValue: Value, arguments: seq[Value]): ValueOr =
     # parameters.
     result = newValueOr(maxFuncValue)
 
-proc createFuncDictionary*(): Value =
+proc makeFuncDictionary*(): VarsDict =
   ## Create the f dictionary from the built in functions.
 
   # An f dictionary item's key is the name of a function. Its value is a list
   # of func values with that name.
 
   assert(functionsList.len > 0)
-  var varsDict = newVarsDict()
+  result = newVarsDict()
 
   # The functionsList is sorted by name then signature code.
 
   var funcList = newEmptyListValue()
   var lastName = ""
-  for (functionName, functionPtr, signatureCode) in functionsList:
-    let signatureO = newSignatureO(functionName, signatureCode)
+  for bii in functionsList:
+    let signatureO = newSignatureO(bii.name, bii.signatureCode)
 
-    # todo: fill in data correctly
     let builtIn = true
-    var docComments = newSeq[string]()
-    docComments.add(functionName)
     let filename = "functions.nim"
-    let lineNum = 0
-    let numLines = 0
+    # todo: change statementLines to an array
     var statementLines = newSeq[Statement]()
-    let function = newFunc(builtIn, signatureO.get(), docComments, filename,
-      lineNum, numLines, statementLines, functionPtr)
+    # todo: use fun_name_sig format instead of funName_sig.
+    # capitalize the name like funAdd_fff
+    let letter = toUpperAscii(bii.name[0])
+    let functionName = "fun$1$2_$3" % [$letter, bii.name[1 .. ^1], bii.signatureCode]
+    let functionPtr = functionsDict[functionName]
+    let function = newFunc(builtIn, signatureO.get(), bii.docComments, filename,
+      bii.lineNum, bii.numLines, statementLines, functionPtr)
 
     let funcValue = newValue(function)
-    if functionName == lastName:
+    if bii.name == lastName:
       funcList.listv.add(funcValue)
     else:
       if lastName != "":
-        varsDict[lastName] = funcList
+        result[lastName] = funcList
       funcList = newEmptyListValue()
       funcList.listv.add(funcValue)
-      lastName = functionName
+      lastName = bii.name
 
   if funcList.listv.len > 0:
-    varsDict[lastName] = funcList
+    result[lastName] = funcList
 
-  result = newValue(varsDict)
+# todo: how to you make the dictionary at compile time?
+let funcVarsDict = makeFuncDictionary()
+
+# todo: rename to getFuncDictionary
+proc createFuncDictionary*(): Value =
+  ## Get the "f" function dictionary.
+  result = newValue(funcVarsDict)

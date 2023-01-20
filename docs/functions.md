@@ -90,9 +90,12 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [funLte_iib](#funlte_iib) &mdash; Return true when an int is less than or equal to another int.
 * [funLte_ffb](#funlte_ffb) &mdash; Return true when a float is less than or equal to another float.
 * [funReadJson_sa](#funreadjson_sa) &mdash; Convert a JSON string to a variable.
+* type: [BuiltInInfo](#builtininfo) &mdash; The built-in function information.
+* [newBuiltInInfo](#newbuiltininfo) &mdash; 
 * const: [functionsList](#functionslist) &mdash; Sorted list of built in functions, their function name, nim name and their signature.
 * [getBestFunction](#getbestfunction) &mdash; Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
-* [createFuncDictionary](#createfuncdictionary) &mdash; Create the f dictionary from the built in functions.
+* [makeFuncDictionary](#makefuncdictionary) &mdash; Create the f dictionary from the built in functions.
+* [createFuncDictionary](#createfuncdictionary) &mdash; Get the "f" function dictionary.
 
 # StringOr
 
@@ -2087,59 +2090,178 @@ d = readJson("{"a":1, "b": 2}")
 func funReadJson_sa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
+# BuiltInInfo
+
+The built-in function information.
+
+* name -- the function name
+* functionPtr -- the pointer to the function for calling it
+* signatureCode -- the single letters signature code
+* docComments -- the function documentation
+* lineNum -- the function's starting line in the functions.nim file
+* numLines -- the number of function code lines
+
+```nim
+BuiltInInfo = object
+  name*: string
+  functionPtr*: FunctionPtr
+  signatureCode*: string
+  docComments*: seq[string]
+  lineNum*: LineNumber
+  numLines*: Natural
+
+```
+
+# newBuiltInInfo
+
+
+
+```nim
+func newBuiltInInfo(name: string; signatureCode: string;
+                    docComments: seq[string]; lineNum: LineNumber;
+                    numLines: Natural): BuiltInInfo
+```
+
 # functionsList
 
 Sorted list of built in functions, their function name, nim name and their signature.
 
 ```nim
-functionsList = [("add", funAdd_fff, "fff"), ("add", funAdd_iii, "iii"),
-                 ("and", funAnd_bbb, "bbb"), ("bool", funBool_ab, "ab"),
-                 ("case", funCase_iloaa, "iloaa"),
-                 ("case", funCase_sloaa, "sloaa"), ("cmp", funCmp_ffi, "ffi"),
-                 ("cmp", funCmp_iii, "iii"), ("cmp", funCmp_ssobi, "ssobi"),
-                 ("cmpVersion", funCmpVersion_ssi, "ssi"),
-                 ("concat", funConcat_sss, "sss"),
-                 ("dict", funDict_old, "old"), ("dup", funDup_sis, "sis"),
-                 ("eq", funEq_ffb, "ffb"), ("eq", funEq_iib, "iib"),
-                 ("eq", funEq_ssb, "ssb"), ("exists", funExists_dsb, "dsb"),
-                 ("find", funFind_ssoaa, "ssoaa"),
-                 ("float", funFloat_if, "if"), ("float", funFloat_saa, "saa"),
-                 ("float", funFloat_sf, "sf"), ("format", funFormat_ss, "ss"),
-                 ("func", funFunc_sp, "sp"),
-                 ("functionDetails", funFunctionDetails_pd, "pd"),
-                 ("get", funGet_dsoaa, "dsoaa"),
-                 ("get", funGet_lioaa, "lioaa"),
-                 ("githubAnchor", funGithubAnchor_ll, "ll"),
-                 ("githubAnchor", funGithubAnchor_ss, "ss"),
-                 ("gt", funGt_ffb, "ffb"), ("gt", funGt_iib, "iib"),
-                 ("gte", funGte_ffb, "ffb"), ("gte", funGte_iib, "iib"),
-                 ("if", funIf_baoaa, "baoaa"), ("if0", funIf0_iaoaa, "iaoaa"),
-                 ("int", funInt_fosi, "fosi"), ("int", funInt_sosi, "sosi"),
-                 ("int", funInt_ssaa, "ssaa"),
-                 ("join", funJoin_lsois, "lsois"),
-                 ("joinPath", funJoinPath_loss, "loss"),
-                 ("keys", funKeys_dl, "dl"), ("len", funLen_di, "di"),
-                 ("len", funLen_li, "li"), ("len", funLen_si, "si"),
-                 ("list", funList_al, "al"),
-                 ("listLoop", funListLoop_lpoal, "lpoal"),
-                 ("log", funLog_ss, "si"), ("lower", funLower_ss, "ss"),
-                 ("lt", funLt_ffb, "ffb"), ("lt", funLt_iib, "iib"),
-                 ("lte", funLte_ffb, "ffb"), ("lte", funLte_iib, "iib"),
-                 ("ne", funNe_ffb, "ffb"), ("ne", funNe_iib, "iib"),
-                 ("ne", funNe_ssb, "ssb"), ("not", funNot_bb, "bb"),
-                 ("or", funOr_bbb, "bbb"), ("path", funPath_sosd, "sosd"),
-                 ("readJson", funReadJson_sa, "sa"),
-                 ("replace", funReplace_siiss, "siiss"),
-                 ("replaceRe", funReplaceRe_sls, "sls"),
-                 ("return", funReturn_aa, "aa"),
-                 ("slice", funSlice_siois, "siois"),
-                 ("sort", funSort_lsosl, "lsosl"),
-                 ("sort", funSort_lssil, "lssil"),
-                 ("sort", funSort_lsssl, "lsssl"),
-                 ("startsWith", funStartsWith_ssb, "ssb"),
-                 ("string", funString_aoss, "aoss"),
-                 ("string", funString_sds, "sds"), ("type", funType_as, "as"),
-                 ("values", funValues_dl, "dl"), ("warn", funWarn_ss, "ss")]
+functionsList = [(name: "add", functionPtr: (nil, nil), signatureCode: "fff",
+                  docComments: [""], lineNum: 1, numLines: 10), (name: "add",
+    functionPtr: (nil, nil), signatureCode: "iii", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "and", functionPtr: (nil, nil),
+                                signatureCode: "bbb", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "bool",
+    functionPtr: (nil, nil), signatureCode: "ab", docComments: [""], lineNum: 1,
+    numLines: 10), (name: "case", functionPtr: (nil, nil),
+                    signatureCode: "iloaa", docComments: [""], lineNum: 1,
+                    numLines: 10), (name: "case", functionPtr: (nil, nil),
+                                    signatureCode: "sloaa", docComments: [""],
+                                    lineNum: 1, numLines: 10), (name: "cmp",
+    functionPtr: (nil, nil), signatureCode: "ffi", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "cmp", functionPtr: (nil, nil),
+                                signatureCode: "iii", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "cmp",
+    functionPtr: (nil, nil), signatureCode: "ssobi", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "cmpVersion", functionPtr: (nil, nil),
+                                signatureCode: "ssi", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "concat",
+    functionPtr: (nil, nil), signatureCode: "sss", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "dict", functionPtr: (nil, nil),
+                                signatureCode: "old", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "dup",
+    functionPtr: (nil, nil), signatureCode: "sis", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "eq", functionPtr: (nil, nil),
+                                signatureCode: "ffb", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "eq",
+    functionPtr: (nil, nil), signatureCode: "iib", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "eq", functionPtr: (nil, nil),
+                                signatureCode: "ssb", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "exists",
+    functionPtr: (nil, nil), signatureCode: "dsb", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "find", functionPtr: (nil, nil),
+                                signatureCode: "ssoaa", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "float",
+    functionPtr: (nil, nil), signatureCode: "if", docComments: [""], lineNum: 1,
+    numLines: 10), (name: "float", functionPtr: (nil, nil),
+                    signatureCode: "saa", docComments: [""], lineNum: 1,
+                    numLines: 10), (name: "float", functionPtr: (nil, nil),
+                                    signatureCode: "sf", docComments: [""],
+                                    lineNum: 1, numLines: 10), (name: "format",
+    functionPtr: (nil, nil), signatureCode: "ss", docComments: [""], lineNum: 1,
+    numLines: 10), (name: "func", functionPtr: (nil, nil), signatureCode: "sp",
+                    docComments: [""], lineNum: 1, numLines: 10), (
+    name: "functionDetails", functionPtr: (nil, nil), signatureCode: "pd",
+    docComments: [""], lineNum: 1, numLines: 10), (name: "get",
+    functionPtr: (nil, nil), signatureCode: "dsoaa", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "get", functionPtr: (nil, nil),
+                                signatureCode: "lioaa", docComments: [""],
+                                lineNum: 1, numLines: 10), (
+    name: "githubAnchor", functionPtr: (nil, nil), signatureCode: "ll",
+    docComments: [""], lineNum: 1, numLines: 10), (name: "githubAnchor",
+    functionPtr: (nil, nil), signatureCode: "ss", docComments: [""], lineNum: 1,
+    numLines: 10), (name: "gt", functionPtr: (nil, nil), signatureCode: "ffb",
+                    docComments: [""], lineNum: 1, numLines: 10), (name: "gt",
+    functionPtr: (nil, nil), signatureCode: "iib", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "gte", functionPtr: (nil, nil),
+                                signatureCode: "ffb", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "gte",
+    functionPtr: (nil, nil), signatureCode: "iib", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "if", functionPtr: (nil, nil),
+                                signatureCode: "baoaa", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "if0",
+    functionPtr: (nil, nil), signatureCode: "iaoaa", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "int", functionPtr: (nil, nil),
+                                signatureCode: "fosi", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "int",
+    functionPtr: (nil, nil), signatureCode: "sosi", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "int", functionPtr: (nil, nil),
+                                signatureCode: "ssaa", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "join",
+    functionPtr: (nil, nil), signatureCode: "lsois", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "joinPath", functionPtr: (nil, nil),
+                                signatureCode: "loss", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "keys",
+    functionPtr: (nil, nil), signatureCode: "dl", docComments: [""], lineNum: 1,
+    numLines: 10), (name: "len", functionPtr: (nil, nil), signatureCode: "di",
+                    docComments: [""], lineNum: 1, numLines: 10), (name: "len",
+    functionPtr: (nil, nil), signatureCode: "li", docComments: [""], lineNum: 1,
+    numLines: 10), (name: "len", functionPtr: (nil, nil), signatureCode: "si",
+                    docComments: [""], lineNum: 1, numLines: 10), (name: "list",
+    functionPtr: (nil, nil), signatureCode: "al", docComments: [""], lineNum: 1,
+    numLines: 10), (name: "listLoop", functionPtr: (nil, nil),
+                    signatureCode: "lpoal", docComments: [""], lineNum: 1,
+                    numLines: 10), (name: "log", functionPtr: (nil, nil),
+                                    signatureCode: "ss", docComments: [""],
+                                    lineNum: 1, numLines: 10), (name: "lower",
+    functionPtr: (nil, nil), signatureCode: "ss", docComments: [""], lineNum: 1,
+    numLines: 10), (name: "lt", functionPtr: (nil, nil), signatureCode: "ffb",
+                    docComments: [""], lineNum: 1, numLines: 10), (name: "lt",
+    functionPtr: (nil, nil), signatureCode: "iib", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "lte", functionPtr: (nil, nil),
+                                signatureCode: "ffb", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "lte",
+    functionPtr: (nil, nil), signatureCode: "iib", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "ne", functionPtr: (nil, nil),
+                                signatureCode: "ffb", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "ne",
+    functionPtr: (nil, nil), signatureCode: "iib", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "ne", functionPtr: (nil, nil),
+                                signatureCode: "ssb", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "not",
+    functionPtr: (nil, nil), signatureCode: "bb", docComments: [""], lineNum: 1,
+    numLines: 10), (name: "or", functionPtr: (nil, nil), signatureCode: "bbb",
+                    docComments: [""], lineNum: 1, numLines: 10), (name: "path",
+    functionPtr: (nil, nil), signatureCode: "sosd", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "readJson", functionPtr: (nil, nil),
+                                signatureCode: "sa", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "replace",
+    functionPtr: (nil, nil), signatureCode: "siiss", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "replaceRe", functionPtr: (nil, nil),
+                                signatureCode: "sls", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "return",
+    functionPtr: (nil, nil), signatureCode: "aa", docComments: [""], lineNum: 1,
+    numLines: 10), (name: "slice", functionPtr: (nil, nil),
+                    signatureCode: "siois", docComments: [""], lineNum: 1,
+                    numLines: 10), (name: "sort", functionPtr: (nil, nil),
+                                    signatureCode: "lsosl", docComments: [""],
+                                    lineNum: 1, numLines: 10), (name: "sort",
+    functionPtr: (nil, nil), signatureCode: "lssil", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "sort", functionPtr: (nil, nil),
+                                signatureCode: "lsssl", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "startsWith",
+    functionPtr: (nil, nil), signatureCode: "ssb", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "string", functionPtr: (nil, nil),
+                                signatureCode: "aoss", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "string",
+    functionPtr: (nil, nil), signatureCode: "sds", docComments: [""],
+    lineNum: 1, numLines: 10), (name: "type", functionPtr: (nil, nil),
+                                signatureCode: "as", docComments: [""],
+                                lineNum: 1, numLines: 10), (name: "values",
+    functionPtr: (nil, nil), signatureCode: "dl", docComments: [""], lineNum: 1,
+    numLines: 10), (name: "warn", functionPtr: (nil, nil), signatureCode: "ss",
+                    docComments: [""], lineNum: 1, numLines: 10)]
 ```
 
 # getBestFunction
@@ -2150,9 +2272,17 @@ Given a function variable or a list of function variables and a list of argument
 proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr
 ```
 
-# createFuncDictionary
+# makeFuncDictionary
 
 Create the f dictionary from the built in functions.
+
+```nim
+proc makeFuncDictionary(): VarsDict
+```
+
+# createFuncDictionary
+
+Get the "f" function dictionary.
 
 ```nim
 proc createFuncDictionary(): Value

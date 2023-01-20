@@ -1911,16 +1911,17 @@ d.sub.y = 4"""
     # signature code.
     var lastName = ""
     var lastSignatureCode = ""
-    for (name, functionPtr, signatureCode) in functionsList:
-      if name < lastName:
-        echo "'$1' < '$2'" % [name, lastName]
+    # for (name, functionPtr, signatureCode) in functionsList:
+    for bii in functionsList:
+      if bii.name < lastName:
+        echo "'$1' < '$2'" % [bii.name, lastName]
         fail
-      if name == lastName and signatureCode < lastSignatureCode:
-        echo "'$1' == '$2'" % [name, lastName]
-        echo "'$1' < '$2'" % [signatureCode, lastSignatureCode]
+      if bii.name == lastName and bii.signatureCode < lastSignatureCode:
+        echo "'$1' == '$2'" % [bii.name, lastName]
+        echo "'$1' < '$2'" % [bii.signatureCode, lastSignatureCode]
         fail
-      lastName = name
-      lastSignatureCode = signatureCode
+      lastName = bii.name
+      lastSignatureCode = bii.signatureCode
 
     var count = 0
     for key, value in funcsVarDict:
