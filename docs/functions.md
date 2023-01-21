@@ -1,6 +1,6 @@
 # functions.nim
 
-This module contains the StaticTea functions and supporting types. The StaticTea language functions start with "fun", for example, the "funCmp" function implements the StaticTea "cmp" function.
+This module contains the StaticTea functions and supporting types. The StaticTea language functions start with "fun", for example, the "fun_cmp_ffi" function implements on of the StaticTea "cmp" functions.
 
 * [functions.nim](../src/functions.nim) &mdash; Nim source code.
 # Index
@@ -16,80 +16,80 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
 * [parseNumber](#parsenumber) &mdash; Return the literal number value and position after it.
 * [formatString](#formatstring) &mdash; Format a string by filling in the variable placeholders with their values.
-* [funCmp_iii](#funcmp_iii) &mdash; Compare two ints.
-* [funCmp_ffi](#funcmp_ffi) &mdash; Compare two floats.
-* [funCmp_ssobi](#funcmp_ssobi) &mdash; Compare two strings.
-* [funConcat_sss](#funconcat_sss) &mdash; Concatentate two strings.
-* [funLen_si](#funlen_si) &mdash; Number of unicode characters in a string.
-* [funLen_li](#funlen_li) &mdash; Number of elements in a list.
-* [funLen_di](#funlen_di) &mdash; Number of elements in a dictionary.
-* [funGet_lioaa](#funget_lioaa) &mdash; Get a list value by its index.
-* [funGet_dsoaa](#funget_dsoaa) &mdash; Get a dictionary value by its key.
-* [funIf0_iaoaa](#funif0_iaoaa) &mdash; If the condition is 0, return the second argument, else return the third argument.
-* [funIf_baoaa](#funif_baoaa) &mdash; If the condition is true, return the second argument, else return the third argument.
-* [funAdd_iii](#funadd_iii) &mdash; Add two integers.
-* [funAdd_fff](#funadd_fff) &mdash; Add two floats.
-* [funExists_dsb](#funexists_dsb) &mdash; Determine whether a key exists in a dictionary.
-* [funCase_iloaa](#funcase_iloaa) &mdash; Compare integer cases and return the matching value.
-* [funCase_sloaa](#funcase_sloaa) &mdash; Compare string cases and return the matching value.
+* [fun_cmp_iii](#fun_cmp_iii) &mdash; Compare two ints.
+* [fun_cmp_ffi](#fun_cmp_ffi) &mdash; Compare two floats.
+* [fun_cmp_ssobi](#fun_cmp_ssobi) &mdash; Compare two strings.
+* [fun_concat_sss](#fun_concat_sss) &mdash; Concatentate two strings.
+* [fun_len_si](#fun_len_si) &mdash; Number of unicode characters in a string.
+* [fun_len_li](#fun_len_li) &mdash; Number of elements in a list.
+* [fun_len_di](#fun_len_di) &mdash; Number of elements in a dictionary.
+* [fun_get_lioaa](#fun_get_lioaa) &mdash; Get a list value by its index.
+* [fun_get_dsoaa](#fun_get_dsoaa) &mdash; Get a dictionary value by its key.
+* [fun_if0_iaoaa](#fun_if0_iaoaa) &mdash; If the condition is 0, return the second argument, else return the third argument.
+* [fun_if_baoaa](#fun_if_baoaa) &mdash; If the condition is true, return the second argument, else return the third argument.
+* [fun_add_iii](#fun_add_iii) &mdash; Add two integers.
+* [fun_add_fff](#fun_add_fff) &mdash; Add two floats.
+* [fun_exists_dsb](#fun_exists_dsb) &mdash; Determine whether a key exists in a dictionary.
+* [fun_case_iloaa](#fun_case_iloaa) &mdash; Compare integer cases and return the matching value.
+* [fun_case_sloaa](#fun_case_sloaa) &mdash; Compare string cases and return the matching value.
 * [parseVersion](#parseversion) &mdash; Parse a StaticTea version number and return its three components.
-* [funCmpVersion_ssi](#funcmpversion_ssi) &mdash; Compare two StaticTea version numbers.
-* [funFloat_if](#funfloat_if) &mdash; Create a float from an int.
-* [funFloat_sf](#funfloat_sf) &mdash; Create a float from a number string.
-* [funFloat_saa](#funfloat_saa) &mdash; Create a float from a number string.
-* [funInt_fosi](#funint_fosi) &mdash; Create an int from a float.
-* [funInt_sosi](#funint_sosi) &mdash; Create an int from a number string.
-* [funInt_ssaa](#funint_ssaa) &mdash; Create an int from a number string.
+* [fun_cmpVersion_ssi](#fun_cmpversion_ssi) &mdash; Compare two StaticTea version numbers.
+* [fun_float_if](#fun_float_if) &mdash; Create a float from an int.
+* [fun_float_sf](#fun_float_sf) &mdash; Create a float from a number string.
+* [fun_float_saa](#fun_float_saa) &mdash; Create a float from a number string.
+* [fun_int_fosi](#fun_int_fosi) &mdash; Create an int from a float.
+* [fun_int_sosi](#fun_int_sosi) &mdash; Create an int from a number string.
+* [fun_int_ssaa](#fun_int_ssaa) &mdash; Create an int from a number string.
 * [if0Condition](#if0condition) &mdash; Convert the value to a boolean.
-* [funBool_ab](#funbool_ab) &mdash; Create an bool from a value.
-* [funFind_ssoaa](#funfind_ssoaa) &mdash; Find the position of a substring in a string.
-* [funSlice_siois](#funslice_siois) &mdash; Extract a substring from a string by its position and length.
-* [funDup_sis](#fundup_sis) &mdash; Duplicate a string x times.
-* [funDict_old](#fundict_old) &mdash; Create a dictionary from a list of key, value pairs.
-* [funList_al](#funlist_al) &mdash; Create a list of variables.
-* [funListLoop_lpoal](#funlistloop_lpoal) &mdash; Create a new list from a list and a callback function.
-* [funReplace_siiss](#funreplace_siiss) &mdash; Replace a substring specified by its position and length with another string.
-* [funReplaceRe_sls](#funreplacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
+* [fun_bool_ab](#fun_bool_ab) &mdash; Create an bool from a value.
+* [fun_find_ssoaa](#fun_find_ssoaa) &mdash; Find the position of a substring in a string.
+* [fun_slice_siois](#fun_slice_siois) &mdash; Extract a substring from a string by its position and length.
+* [fun_dup_sis](#fun_dup_sis) &mdash; Duplicate a string x times.
+* [fun_dict_old](#fun_dict_old) &mdash; Create a dictionary from a list of key, value pairs.
+* [fun_list_al](#fun_list_al) &mdash; Create a list of variables.
+* [fun_listLoop_lpoal](#fun_listloop_lpoal) &mdash; Create a new list from a list and a callback function.
+* [fun_replace_siiss](#fun_replace_siiss) &mdash; Replace a substring specified by its position and length with another string.
+* [fun_replaceRe_sls](#fun_replacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
 * [parsePath](#parsepath) &mdash; Parse the given file path into its component pieces.
-* [funPath_sosd](#funpath_sosd) &mdash; Split a file path into its component pieces.
-* [funLower_ss](#funlower_ss) &mdash; Lowercase a string.
-* [funKeys_dl](#funkeys_dl) &mdash; Create a list from the keys in a dictionary.
-* [funValues_dl](#funvalues_dl) &mdash; Create a list out of the values in the specified dictionary.
-* [funSort_lsosl](#funsort_lsosl) &mdash; Sort a list of values of the same type.
-* [funSort_lssil](#funsort_lssil) &mdash; Sort a list of lists.
-* [funSort_lsssl](#funsort_lsssl) &mdash; Sort a list of dictionaries.
-* [funGithubAnchor_ss](#fungithubanchor_ss) &mdash; Create a Github anchor name from a heading name.
-* [funGithubAnchor_ll](#fungithubanchor_ll) &mdash; Create Github anchor names from heading names.
-* [funType_as](#funtype_as) &mdash; Return the parameter type, one of: int, float, string, list, dict, bool or func.
-* [funJoinPath_loss](#funjoinpath_loss) &mdash; Join the path components with a path separator.
-* [funJoin_lsois](#funjoin_lsois) &mdash; Join a list of strings with a separator.
-* [funWarn_ss](#funwarn_ss) &mdash; Return a warning message and skip the current statement.
-* [funLog_ss](#funlog_ss) &mdash; Log a message to the log file.
-* [funReturn_aa](#funreturn_aa) &mdash; Return is a special function that returns the value passed in and has side effects.
-* [funString_aoss](#funstring_aoss) &mdash; Convert a variable to a string.
-* [funString_sds](#funstring_sds) &mdash; Convert the dictionary variable to dot names.
-* [funFormat_ss](#funformat_ss) &mdash; Format a string using replacement variables similar to a replacement block.
-* [funFunc_sp](#funfunc_sp) &mdash; Define a function.
-* [funFunctionDetails_pd](#funfunctiondetails_pd) &mdash; Return the function details.
-* [funStartsWith_ssb](#funstartswith_ssb) &mdash; Check whether a strings starts with the given prefix.
-* [funNot_bb](#funnot_bb) &mdash; Boolean not.
-* [funAnd_bbb](#funand_bbb) &mdash; Boolean AND with short circuit.
-* [funOr_bbb](#funor_bbb) &mdash; Boolean OR with short circuit.
-* [funEq_iib](#funeq_iib) &mdash; Return true when the two ints are equal.
-* [funEq_ffb](#funeq_ffb) &mdash; Return true when two floats are equal.
-* [funEq_ssb](#funeq_ssb) &mdash; Return true when two strings are equal.
-* [funNe_iib](#funne_iib) &mdash; Return true when two ints are not equal.
-* [funNe_ffb](#funne_ffb) &mdash; Return true when two floats are not equal.
-* [funNe_ssb](#funne_ssb) &mdash; Return true when two strings are not equal.
-* [funGt_iib](#fungt_iib) &mdash; Return true when an int is greater then another int.
-* [funGt_ffb](#fungt_ffb) &mdash; Return true when one float is greater than another float.
-* [funGte_iib](#fungte_iib) &mdash; Return true when an int is greater then or equal to another int.
-* [funGte_ffb](#fungte_ffb) &mdash; Return true when a float is greater than or equal to another float.
-* [funLt_iib](#funlt_iib) &mdash; Return true when an int is less than another int.
-* [funLt_ffb](#funlt_ffb) &mdash; Return true when a float is less then another float.
-* [funLte_iib](#funlte_iib) &mdash; Return true when an int is less than or equal to another int.
-* [funLte_ffb](#funlte_ffb) &mdash; Return true when a float is less than or equal to another float.
-* [funReadJson_sa](#funreadjson_sa) &mdash; Convert a JSON string to a variable.
+* [fun_path_sosd](#fun_path_sosd) &mdash; Split a file path into its component pieces.
+* [fun_lower_ss](#fun_lower_ss) &mdash; Lowercase a string.
+* [fun_keys_dl](#fun_keys_dl) &mdash; Create a list from the keys in a dictionary.
+* [fun_values_dl](#fun_values_dl) &mdash; Create a list out of the values in the specified dictionary.
+* [fun_sort_lsosl](#fun_sort_lsosl) &mdash; Sort a list of values of the same type.
+* [fun_sort_lssil](#fun_sort_lssil) &mdash; Sort a list of lists.
+* [fun_sort_lsssl](#fun_sort_lsssl) &mdash; Sort a list of dictionaries.
+* [fun_githubAnchor_ss](#fun_githubanchor_ss) &mdash; Create a Github anchor name from a heading name.
+* [fun_githubAnchor_ll](#fun_githubanchor_ll) &mdash; Create Github anchor names from heading names.
+* [fun_type_as](#fun_type_as) &mdash; Return the parameter type, one of: int, float, string, list, dict, bool or func.
+* [fun_joinPath_loss](#fun_joinpath_loss) &mdash; Join the path components with a path separator.
+* [fun_join_lsois](#fun_join_lsois) &mdash; Join a list of strings with a separator.
+* [fun_warn_ss](#fun_warn_ss) &mdash; Return a warning message and skip the current statement.
+* [fun_log_ss](#fun_log_ss) &mdash; Log a message to the log file.
+* [fun_return_aa](#fun_return_aa) &mdash; Return is a special function that returns the value passed in and has side effects.
+* [fun_string_aoss](#fun_string_aoss) &mdash; Convert a variable to a string.
+* [fun_string_sds](#fun_string_sds) &mdash; Convert the dictionary variable to dot names.
+* [fun_format_ss](#fun_format_ss) &mdash; Format a string using replacement variables similar to a replacement block.
+* [fun_func_sp](#fun_func_sp) &mdash; Define a function.
+* [fun_functionDetails_pd](#fun_functiondetails_pd) &mdash; Return the function details.
+* [fun_startsWith_ssb](#fun_startswith_ssb) &mdash; Check whether a strings starts with the given prefix.
+* [fun_not_bb](#fun_not_bb) &mdash; Boolean not.
+* [fun_and_bbb](#fun_and_bbb) &mdash; Boolean AND with short circuit.
+* [fun_or_bbb](#fun_or_bbb) &mdash; Boolean OR with short circuit.
+* [fun_eq_iib](#fun_eq_iib) &mdash; Return true when the two ints are equal.
+* [fun_eq_ffb](#fun_eq_ffb) &mdash; Return true when two floats are equal.
+* [fun_eq_ssb](#fun_eq_ssb) &mdash; Return true when two strings are equal.
+* [fun_ne_iib](#fun_ne_iib) &mdash; Return true when two ints are not equal.
+* [fun_ne_ffb](#fun_ne_ffb) &mdash; Return true when two floats are not equal.
+* [fun_ne_ssb](#fun_ne_ssb) &mdash; Return true when two strings are not equal.
+* [fun_gt_iib](#fun_gt_iib) &mdash; Return true when an int is greater then another int.
+* [fun_gt_ffb](#fun_gt_ffb) &mdash; Return true when one float is greater than another float.
+* [fun_gte_iib](#fun_gte_iib) &mdash; Return true when an int is greater then or equal to another int.
+* [fun_gte_ffb](#fun_gte_ffb) &mdash; Return true when a float is greater than or equal to another float.
+* [fun_lt_iib](#fun_lt_iib) &mdash; Return true when an int is less than another int.
+* [fun_lt_ffb](#fun_lt_ffb) &mdash; Return true when a float is less then another float.
+* [fun_lte_iib](#fun_lte_iib) &mdash; Return true when an int is less than or equal to another int.
+* [fun_lte_ffb](#fun_lte_ffb) &mdash; Return true when a float is less than or equal to another float.
+* [fun_readJson_sa](#fun_readjson_sa) &mdash; Convert a JSON string to a variable.
 * type: [BuiltInInfo](#builtininfo) &mdash; The built-in function information.
 * [newBuiltInInfo](#newbuiltininfo) &mdash; 
 * const: [functionsList](#functionslist) &mdash; Sorted list of built in functions, their function name, nim name and their signature.
@@ -202,7 +202,7 @@ To enter a left bracket use two in a row.
 proc formatString(variables: Variables; text: string): StringOr
 ```
 
-# funCmp_iii
+# fun_cmp_iii
 
 Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
 
@@ -219,10 +219,10 @@ cmp(9, 2) => 1
 ~~~
 
 ```nim
-func funCmp_iii(variables: Variables; arguments: seq[Value]): FunResult
+func fun_cmp_iii(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funCmp_ffi
+# fun_cmp_ffi
 
 Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
 
@@ -239,10 +239,10 @@ cmp(9.3, 2.2) => 1
 ~~~
 
 ```nim
-func funCmp_ffi(variables: Variables; arguments: seq[Value]): FunResult
+func fun_cmp_ffi(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funCmp_ssobi
+# fun_cmp_ssobi
 
 Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
 
@@ -264,10 +264,10 @@ cmp("Tea", "tea", false) => 0
 ~~~
 
 ```nim
-func funCmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult
+func fun_cmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funConcat_sss
+# fun_concat_sss
 
 Concatentate two strings. See [[#join][join]] for more that two arguments.
 
@@ -283,10 +283,10 @@ concat("a", "b") => "ab"
 ~~~
 
 ```nim
-func funConcat_sss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_concat_sss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funLen_si
+# fun_len_si
 
 Number of unicode characters in a string.
 
@@ -302,10 +302,10 @@ len("añyóng") => 6
 ~~~
 
 ```nim
-func funLen_si(variables: Variables; arguments: seq[Value]): FunResult
+func fun_len_si(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funLen_li
+# fun_len_li
 
 Number of elements in a list.
 
@@ -322,10 +322,10 @@ len(list(4, 5)) => 2
 ~~~
 
 ```nim
-func funLen_li(variables: Variables; arguments: seq[Value]): FunResult
+func fun_len_li(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funLen_di
+# fun_len_di
 
 Number of elements in a dictionary.
 
@@ -342,10 +342,10 @@ len(dict("a", 4, "b", 3)) => 2
 ~~~
 
 ```nim
-func funLen_di(variables: Variables; arguments: seq[Value]): FunResult
+func fun_len_di(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funGet_lioaa
+# fun_get_lioaa
 
 Get a list value by its index.  If the index is invalid, the default value is returned when specified, else a warning is generated. You can use negative index values. Index -1 gets the last element. It is short hand for len - 1. Index -2 is len - 2, etc.
 
@@ -368,10 +368,10 @@ get(list, -4, 11) => 11
 ~~~
 
 ```nim
-func funGet_lioaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_get_lioaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funGet_dsoaa
+# fun_get_dsoaa
 
 Get a dictionary value by its key.  If the key doesn't exist, the default value is returned if specified, else a warning is generated.
 
@@ -397,10 +397,10 @@ d.tea => "Earl Grey"
 ~~~
 
 ```nim
-func funGet_dsoaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funIf0_iaoaa
+# fun_if0_iaoaa
 
 If the condition is 0, return the second argument, else return the third argument.  You can use any type for the condition.  The condition is 0 for strings, lists and dictionaries when their length is 0.
 
@@ -448,10 +448,10 @@ if0(c, warn("got zero value"))
 ~~~
 
 ```nim
-func funIf0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funIf_baoaa
+# fun_if_baoaa
 
 If the condition is true, return the second argument, else return the third argument.
 
@@ -482,10 +482,10 @@ if(c, return("skip"))
 ~~~
 
 ```nim
-func funIf_baoaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funAdd_iii
+# fun_add_iii
 
 Add two integers. A warning is generated on overflow.
 
@@ -502,10 +502,10 @@ add(-2, -5) => -7
 ~~~
 
 ```nim
-func funAdd_iii(variables: Variables; arguments: seq[Value]): FunResult
+func fun_add_iii(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funAdd_fff
+# fun_add_fff
 
 Add two floats. A warning is generated on overflow.
 
@@ -521,10 +521,10 @@ add(3.2, -2.2) => 1.0
 ~~~
 
 ```nim
-func funAdd_fff(variables: Variables; arguments: seq[Value]): FunResult
+func fun_add_fff(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funExists_dsb
+# fun_exists_dsb
 
 Determine whether a key exists in a dictionary. Return true when it exists, else false.
 
@@ -541,10 +541,10 @@ exists(d, "coffee") => false
 ~~~
 
 ```nim
-func funExists_dsb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_exists_dsb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funCase_iloaa
+# fun_case_iloaa
 
 Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
 
@@ -574,10 +574,10 @@ case(3, cases, "wine") => "wine"
 ~~~
 
 ```nim
-func funCase_iloaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funCase_sloaa
+# fun_case_sloaa
 
 Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
 
@@ -606,7 +606,7 @@ case("bunch", cases, "other") => "other"
 ~~~
 
 ```nim
-func funCase_sloaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # parseVersion
@@ -617,7 +617,7 @@ Parse a StaticTea version number and return its three components.
 func parseVersion(version: string): Option[(int, int, int)]
 ```
 
-# funCmpVersion_ssi
+# fun_cmpVersion_ssi
 
 Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
 
@@ -638,10 +638,10 @@ cmpVersion("1.2.5", "1.2.5") => 0
 ~~~
 
 ```nim
-func funCmpVersion_ssi(variables: Variables; arguments: seq[Value]): FunResult
+func fun_cmpVersion_ssi(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funFloat_if
+# fun_float_if
 
 Create a float from an int.
 
@@ -657,10 +657,10 @@ float(-33) => -33.0
 ~~~
 
 ```nim
-func funFloat_if(variables: Variables; arguments: seq[Value]): FunResult
+func fun_float_if(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funFloat_sf
+# fun_float_sf
 
 Create a float from a number string.
 
@@ -677,10 +677,10 @@ float("33") => 33.0
 ~~~
 
 ```nim
-func funFloat_sf(variables: Variables; arguments: seq[Value]): FunResult
+func fun_float_sf(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funFloat_saa
+# fun_float_saa
 
 Create a float from a number string. If the string is not a number, return the default.
 
@@ -696,10 +696,10 @@ float("notnum", "nan") => nan
 ~~~
 
 ```nim
-func funFloat_saa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_float_saa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funInt_fosi
+# fun_int_fosi
 
 Create an int from a float.
 
@@ -731,10 +731,10 @@ int(-6.3456, "truncate") => -6
 ~~~
 
 ```nim
-func funInt_fosi(variables: Variables; arguments: seq[Value]): FunResult
+func fun_int_fosi(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funInt_sosi
+# fun_int_sosi
 
 Create an int from a number string.
 
@@ -766,10 +766,10 @@ int("-6.3456", "truncate") => -6
 ~~~
 
 ```nim
-func funInt_sosi(variables: Variables; arguments: seq[Value]): FunResult
+func fun_int_sosi(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funInt_ssaa
+# fun_int_ssaa
 
 Create an int from a number string. If the string is not a number, return the default value.
 
@@ -792,7 +792,7 @@ int("notnum", "round", "nan") => nan
 ~~~
 
 ```nim
-func funInt_ssaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_int_ssaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # if0Condition
@@ -803,7 +803,7 @@ Convert the value to a boolean.
 func if0Condition(cond: Value): bool
 ```
 
-# funBool_ab
+# fun_bool_ab
 
 Create an bool from a value.
 
@@ -838,10 +838,10 @@ bool(dict("tea", 2)) => true
 ~~~
 
 ```nim
-func funBool_ab(variables: Variables; arguments: seq[Value]): FunResult
+func fun_bool_ab(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funFind_ssoaa
+# fun_find_ssoaa
 
 Find the position of a substring in a string.  When the substring is not found, return an optional default value.  A warning is generated when the substring is missing and you don't specify a default value.
 
@@ -863,10 +863,10 @@ find(msg, "party", 0) = 0
 ~~~
 
 ```nim
-func funFind_ssoaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_find_ssoaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funSlice_siois
+# fun_slice_siois
 
 Extract a substring from a string by its position and length. You pass the string, the substring's start index and its length.  The length is optional. When not specified, the slice returns the characters from the start to the end of the string.
 
@@ -885,10 +885,10 @@ slice("añyóng", 0, 3) => "añy"
 ~~~
 
 ```nim
-func funSlice_siois(variables: Variables; arguments: seq[Value]): FunResult
+func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funDup_sis
+# fun_dup_sis
 
 Duplicate a string x times.  The result is a new string built by concatenating the string to itself the specified number of times.
 
@@ -907,10 +907,10 @@ dup("", 3) => ""
 ~~~
 
 ```nim
-func funDup_sis(variables: Variables; arguments: seq[Value]): FunResult
+func fun_dup_sis(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funDict_old
+# fun_dict_old
 
 Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
 
@@ -928,10 +928,10 @@ dict(list("a", 5, "b", 33, "c", 0)) =>
 ~~~
 
 ```nim
-func funDict_old(variables: Variables; arguments: seq[Value]): FunResult
+func fun_dict_old(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funList_al
+# fun_list_al
 
 Create a list of variables. You can also create a list with brackets.
 
@@ -953,10 +953,10 @@ a = ["a", 5, "b"]
 ~~~
 
 ```nim
-func funList_al(variables: Variables; arguments: seq[Value]): FunResult
+func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funListLoop_lpoal
+# fun_listLoop_lpoal
 
 Create a new list from a list and a callback function. The callback function is called for each item in the list and it decides what goes in the list.
 
@@ -996,10 +996,10 @@ b5 = func(“b5(ix: int, value: int, newList: list) bool”)
 ~~~
 
 ```nim
-func funListLoop_lpoal(variables: Variables; arguments: seq[Value]): FunResult
+func fun_listLoop_lpoal(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funReplace_siiss
+# fun_replace_siiss
 
 Replace a substring specified by its position and length with another string.  You can use the function to insert and append to a string as well.
 
@@ -1058,10 +1058,10 @@ replace("", 0, 0, "abcd") => abcd
 ~~~
 
 ```nim
-func funReplace_siiss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_replace_siiss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funReplaceRe_sls
+# fun_replaceRe_sls
 
 Replace multiple parts of a string using regular expressions.
 
@@ -1084,7 +1084,7 @@ For developing and debugging regular expressions see the
 website: https://regex101.com/
 
 ```nim
-func funReplaceRe_sls(variables: Variables; arguments: seq[Value]): FunResult
+func fun_replaceRe_sls(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # parsePath
@@ -1095,7 +1095,7 @@ Parse the given file path into its component pieces.
 func parsePath(path: string; separator = '/'): PathComponents
 ```
 
-# funPath_sosd
+# fun_path_sosd
 
 Split a file path into its component pieces. Return a dictionary with the filename, basename, extension and directory.
 
@@ -1126,10 +1126,10 @@ path("src\functions.nim", "\") => {
 ~~~
 
 ```nim
-func funPath_sosd(variables: Variables; arguments: seq[Value]): FunResult
+func fun_path_sosd(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funLower_ss
+# fun_lower_ss
 
 Lowercase a string.
 
@@ -1146,10 +1146,10 @@ lower("TEĀ") => "teā"
 ~~~
 
 ```nim
-func funLower_ss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_lower_ss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funKeys_dl
+# fun_keys_dl
 
 Create a list from the keys in a dictionary.
 
@@ -1166,10 +1166,10 @@ values(d) => ["apple", 2, 3]
 ~~~
 
 ```nim
-func funKeys_dl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_keys_dl(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funValues_dl
+# fun_values_dl
 
 Create a list out of the values in the specified dictionary.
 
@@ -1186,10 +1186,10 @@ values(d) => ["apple", 2, 3]
 ~~~
 
 ```nim
-func funValues_dl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funSort_lsosl
+# fun_sort_lsosl
 
 Sort a list of values of the same type.  The values are ints, floats, or strings.
 
@@ -1220,10 +1220,10 @@ sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
 ~~~
 
 ```nim
-func funSort_lsosl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_sort_lsosl(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funSort_lssil
+# fun_sort_lssil
 
 Sort a list of lists.
 
@@ -1251,10 +1251,10 @@ sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
 ~~~
 
 ```nim
-func funSort_lssil(variables: Variables; arguments: seq[Value]): FunResult
+func fun_sort_lssil(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funSort_lsssl
+# fun_sort_lsssl
 
 Sort a list of dictionaries.
 
@@ -1282,10 +1282,10 @@ sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 ~~~
 
 ```nim
-func funSort_lsssl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_sort_lsssl(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funGithubAnchor_ss
+# fun_githubAnchor_ss
 
 Create a Github anchor name from a heading name. Use it for Github markdown internal links. If you have duplicate heading names, the anchor name returned only works for the first. Punctuation characters are removed so you can get duplicates in some cases.
 
@@ -1311,10 +1311,10 @@ $$ : anchor = githubAnchor(entry.name)
 ~~~
 
 ```nim
-func funGithubAnchor_ss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_githubAnchor_ss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funGithubAnchor_ll
+# fun_githubAnchor_ll
 
 Create Github anchor names from heading names. Use it for Github markdown internal links. It handles duplicate heading names.
 
@@ -1331,10 +1331,10 @@ githubAnchor(list) =>
 ~~~
 
 ```nim
-func funGithubAnchor_ll(variables: Variables; arguments: seq[Value]): FunResult
+func fun_githubAnchor_ll(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funType_as
+# fun_type_as
 
 Return the parameter type, one of: int, float, string, list, dict, bool or func.
 
@@ -1355,10 +1355,10 @@ type(f.cmp) => "func"
 ~~~
 
 ```nim
-func funType_as(variables: Variables; arguments: seq[Value]): FunResult
+func fun_type_as(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funJoinPath_loss
+# fun_joinPath_loss
 
 Join the path components with a path separator.
 
@@ -1398,10 +1398,10 @@ joinPath(["/", "tea"]) =>
 ~~~
 
 ```nim
-func funJoinPath_loss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funJoin_lsois
+# fun_join_lsois
 
 Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
 
@@ -1423,10 +1423,10 @@ join(["a", "", "c"], "|", true) => "a|c"
 ~~~
 
 ```nim
-func funJoin_lsois(variables: Variables; arguments: seq[Value]): FunResult
+func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funWarn_ss
+# fun_warn_ss
 
 Return a warning message and skip the current statement. You can call the warn function without an assignment.
 
@@ -1455,10 +1455,10 @@ warn("always warn")
 ~~~
 
 ```nim
-func funWarn_ss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_warn_ss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funLog_ss
+# fun_log_ss
 
 Log a message to the log file.  You can call the log function without an assignment.
 
@@ -1487,10 +1487,10 @@ log("always log")
 ~~~
 
 ```nim
-func funLog_ss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_log_ss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funReturn_aa
+# fun_return_aa
 
 Return is a special function that returns the value passed in and has side effects.
 
@@ -1535,10 +1535,10 @@ output:
 ~~~
 
 ```nim
-func funReturn_aa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funString_aoss
+# fun_string_aoss
 
 Convert a variable to a string. You specify the variable and optionally the type of output you want.
 
@@ -1600,10 +1600,10 @@ y = 2
 ~~~
 
 ```nim
-func funString_aoss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funString_sds
+# fun_string_sds
 
 Convert the dictionary variable to dot names. You specify the name of the dictionary and the dict variable.
 
@@ -1623,10 +1623,10 @@ teas.z.a = 8
 ~~~
 
 ```nim
-func funString_sds(variables: Variables; arguments: seq[Value]): FunResult
+func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funFormat_ss
+# fun_format_ss
 
 Format a string using replacement variables similar to a replacement block. To enter a left bracket use two in a row.
 
@@ -1653,10 +1653,10 @@ str => "use two { to get one"
 ~~~
 
 ```nim
-func funFormat_ss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_format_ss(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funFunc_sp
+# fun_func_sp
 
 Define a function.
 
@@ -1676,10 +1676,10 @@ mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
 ~~~
 
 ```nim
-func funFunc_sp(variables: Variables; arguments: seq[Value]): FunResult
+func fun_func_sp(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funFunctionDetails_pd
+# fun_functionDetails_pd
 
 Return the function details.
 
@@ -1712,10 +1712,10 @@ fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]"""
 ~~~
 
 ```nim
-func funFunctionDetails_pd(variables: Variables; arguments: seq[Value]): FunResult
+func fun_functionDetails_pd(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funStartsWith_ssb
+# fun_startsWith_ssb
 
 Check whether a strings starts with the given prefix. Return true when it does, else false.
 
@@ -1734,10 +1734,10 @@ b => false
 ~~~
 
 ```nim
-func funStartsWith_ssb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_startsWith_ssb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funNot_bb
+# fun_not_bb
 
 Boolean not.
 
@@ -1753,10 +1753,10 @@ not(false) => true
 ~~~
 
 ```nim
-func funNot_bb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_not_bb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funAnd_bbb
+# fun_and_bbb
 
 Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
 
@@ -1775,10 +1775,10 @@ and(false, warn("not hit")) => false
 ~~~
 
 ```nim
-func funAnd_bbb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funOr_bbb
+# fun_or_bbb
 
 Boolean OR with short circuit. If the first argument is true, the second argument is not evaluated.
 
@@ -1797,10 +1797,10 @@ or(true, warn("not hit")) => true
 ~~~
 
 ```nim
-func funOr_bbb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funEq_iib
+# fun_eq_iib
 
 Return true when the two ints are equal.
 
@@ -1816,10 +1816,10 @@ eq(2, 3) => false
 ~~~
 
 ```nim
-func funEq_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_eq_iib(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funEq_ffb
+# fun_eq_ffb
 
 Return true when two floats are equal.
 
@@ -1835,10 +1835,10 @@ eq(1.2, 3.2) => false
 ~~~
 
 ```nim
-func funEq_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_eq_ffb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funEq_ssb
+# fun_eq_ssb
 
 Return true when two strings are equal.  See [[#cmd][cmd]] for case insensitive compare.
 
@@ -1854,10 +1854,10 @@ eq("1.2", "3.2") => false
 ~~~
 
 ```nim
-func funEq_ssb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_eq_ssb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funNe_iib
+# fun_ne_iib
 
 Return true when two ints are not equal.
 
@@ -1873,10 +1873,10 @@ ne(2, 3) => true
 ~~~
 
 ```nim
-func funNe_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_ne_iib(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funNe_ffb
+# fun_ne_ffb
 
 Return true when two floats are not equal.
 
@@ -1892,10 +1892,10 @@ ne(1.2, 3.2) => true
 ~~~
 
 ```nim
-func funNe_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_ne_ffb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funNe_ssb
+# fun_ne_ssb
 
 Return true when two strings are not equal.
 
@@ -1911,10 +1911,10 @@ ne("earl", "grey") => true
 ~~~
 
 ```nim
-func funNe_ssb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_ne_ssb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funGt_iib
+# fun_gt_iib
 
 Return true when an int is greater then another int.
 
@@ -1930,10 +1930,10 @@ gt(3, 2) => true
 ~~~
 
 ```nim
-func funGt_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_gt_iib(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funGt_ffb
+# fun_gt_ffb
 
 Return true when one float is greater than another float.
 
@@ -1949,10 +1949,10 @@ gt(3.1, 2.5) => true
 ~~~
 
 ```nim
-func funGt_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_gt_ffb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funGte_iib
+# fun_gte_iib
 
 Return true when an int is greater then or equal to another int.
 
@@ -1968,10 +1968,10 @@ gte(3, 3) => true
 ~~~
 
 ```nim
-func funGte_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_gte_iib(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funGte_ffb
+# fun_gte_ffb
 
 Return true when a float is greater than or equal to another float.
 
@@ -1987,10 +1987,10 @@ gte(3.1, 3.1) => true
 ~~~
 
 ```nim
-func funGte_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_gte_ffb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funLt_iib
+# fun_lt_iib
 
 Return true when an int is less than another int.
 
@@ -2006,10 +2006,10 @@ gt(3, 2) => false
 ~~~
 
 ```nim
-func funLt_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_lt_iib(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funLt_ffb
+# fun_lt_ffb
 
 Return true when a float is less then another float.
 
@@ -2025,10 +2025,10 @@ lt(3.1, 2.5) => false
 ~~~
 
 ```nim
-func funLt_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_lt_ffb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funLte_iib
+# fun_lte_iib
 
 Return true when an int is less than or equal to another int.
 
@@ -2045,10 +2045,10 @@ lte(4, 3) => false
 ~~~
 
 ```nim
-func funLte_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_lte_iib(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funLte_ffb
+# fun_lte_ffb
 
 Return true when a float is less than or equal to another float.
 
@@ -2065,10 +2065,10 @@ lte(4.0, 3.0) => false
 ~~~
 
 ```nim
-func funLte_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_lte_ffb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# funReadJson_sa
+# fun_readJson_sa
 
 Convert a JSON string to a variable.
 
@@ -2087,7 +2087,7 @@ d = readJson("{"a":1, "b": 2}")
 ~~~
 
 ```nim
-func funReadJson_sa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # BuiltInInfo

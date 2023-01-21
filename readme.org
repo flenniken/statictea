@@ -2701,7 +2701,6 @@ List of functions:
 - [[#type][type]] -- Return the parameter type, one of: int, float, string, list, dict, bool or func.
 - [[#values][values]] -- Create a list out of the values in the specified dictionary.
 - [[#warn][warn]] -- Return a warning message and skip the current statement.
-- [[#ctionDetails][ctionDetails]] -- Convert the function spec to a dictionary value.
 
 [[#contents][茶]]
 
@@ -4637,15 +4636,6 @@ You can warn unconditionally using a bare warn statement:
 #+BEGIN_SRC
 warn("always warn")
 #+END_SRC
-
-[[#contents][茶]]
-
-** ctionDetails
-:PROPERTIES:
-:CUSTOM_ID: ctionDetails
-:END:
-
-Convert the function spec to a dictionary value.
 
 
 # Dynamic Content Ends

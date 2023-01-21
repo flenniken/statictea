@@ -32,20 +32,16 @@
 # $ : # if((entry.type != "skProc"), warn(format("skip {entry.name} of type {entry.type}")))
 # $ : if((entry.type != "skProc" and entry.type != "skFunc"), return("skip"))
 # $ :
-# $ : # Use the procs that start with "fun" and skip the others.
-# $ : pos = find(entry.name, "fun", -1)
+# $ : # Use the procs that start with "fun_" and skip the others.
+# $ : pos = find(entry.name, "fun_", -1)
 # $ : if((pos == -1), return("skip"))
+# $ : if((pos == -1), warn("did not skip!"))
 # $ :
-# $ : # Remove the fun prefix and the trailing code from the name and lower case it.
-# $ : # funCmp_iii => cmp
-# $ : nameLength = add(find(entry.name, "_", len(entry.name)), -3)
-# $ : capName = case(pos, list(0, slice(entry.name, 3, nameLength)), entry.name)
-# $ : name = concat(lower(slice(capName, 0, 1)), slice(capName, 1))
-# $ : if0( exists(entry, "description"), warn(entry.name))
-# $ : if0( exists(entry, "description"), warn(entry.type))
-# $ : if0( exists(entry, "description"), warn(capName))
-# $ : if0( exists(entry, "description"), warn(name))
-# $ : if0( exists(entry, "description"), warn(format("missing description for: {entry.name}")))
+# $ : # Remove the fun_ prefix and the trailing signature code from the name.
+# $ : # fun_cmp_iii => cmp
+# $ : part = slice(entry.name, 4)
+# $ : underscorePos = find(part, "_")
+# $ : name = slice(part, 0, underscorePos)
 # $ :
 # $ : # Remove the HTML formatting from the description.
 # $ : desc = if( exists(entry, "description"), replaceRe(entry.description, g.patterns), "")

@@ -1,6 +1,7 @@
 ## This module contains the StaticTea functions and supporting types.
 ## The StaticTea language functions start with "fun", for example, the
-## "funCmp" function implements the StaticTea "cmp" function.
+## "fun_cmp_ffi" function implements on of the StaticTea "cmp"
+## functions.
 
 import std/options
 import std/tables
@@ -233,7 +234,7 @@ proc formatString*(variables: Variables, text: string): StringOr =
 
   result = newStringOr(newStr)
 
-func funCmp_iii*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_cmp_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare two ints. Returns -1 for less, 0 for equal and 1 for
   ## greater than.
   ## @:
@@ -254,7 +255,7 @@ func funCmp_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   let b = map["b"].intv
   result = newFunResult(newValue(cmp(a, b)))
 
-func funCmp_ffi*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_cmp_ffi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare two floats. Returns -1 for less, 0 for equal and 1 for
   ## greater than.
   ## @:
@@ -275,7 +276,7 @@ func funCmp_ffi*(variables: Variables, arguments: seq[Value]): FunResult =
   let b = map["b"].floatv
   result = newFunResult(newValue(cmp(a, b)))
 
-func funCmp_ssobi*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_cmp_ssobi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare two strings. Returns -1 for less, 0 for equal and 1 for
   ## greater than.
   ## @:
@@ -308,7 +309,7 @@ func funCmp_ssobi*(variables: Variables, arguments: seq[Value]): FunResult =
   let ret = cmpString(a, b, insensitive)
   result = newFunResult(newValue(ret))
 
-func funConcat_sss*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_concat_sss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Concatentate two strings. See [[#join][join]] for more that two arguments.
   ## @:
   ## @:~~~
@@ -327,7 +328,7 @@ func funConcat_sss*(variables: Variables, arguments: seq[Value]): FunResult =
   let b = map["b"].stringv
   result = newFunResult(newValue(a & b))
 
-func funLen_si*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_len_si*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Number of unicode characters in a string.
   ## @:
   ## @:~~~
@@ -345,7 +346,7 @@ func funLen_si*(variables: Variables, arguments: seq[Value]): FunResult =
   let str = map["a"].stringv
   result = newFunResult(newValue(stringLen(str)))
 
-func funLen_li*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_len_li*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Number of elements in a list.
   ## @:
   ## @:~~~
@@ -364,7 +365,7 @@ func funLen_li*(variables: Variables, arguments: seq[Value]): FunResult =
   let list = map["a"].listv
   result = newFunResult(newValue(list.len))
 
-func funLen_di*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_len_di*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Number of elements in a dictionary.
   ## @:
   ## @:~~~
@@ -383,7 +384,7 @@ func funLen_di*(variables: Variables, arguments: seq[Value]): FunResult =
   let dict = map["a"].dictv
   result = newFunResult(newValue(dict.len))
 
-func funGet_lioaa*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_get_lioaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Get a list value by its index.  If the index is invalid, the
   ## default value is returned when specified, else a warning is
   ## generated. You can use negative index values. Index -1 gets the
@@ -425,7 +426,7 @@ func funGet_lioaa*(variables: Variables, arguments: seq[Value]): FunResult =
     # The list index $1 is out of range.
     result = newFunResultWarn(wMissingListItem, 1, $index)
 
-func funGet_dsoaa*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_get_dsoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Get a dictionary value by its key.  If the key doesn't exist, the
   ## default value is returned if specified, else a warning is
   ## generated.
@@ -463,7 +464,7 @@ func funGet_dsoaa*(variables: Variables, arguments: seq[Value]): FunResult =
     # The dictionary does not have an item with key $1.
     result = newFunResultWarn(wMissingDictItem, 1, key)
 
-func funIf0_iaoaa*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_if0_iaoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## If the condition is 0, return the second argument, else return
   ## the third argument.  You can use any type for the condition.  The
   ## condition is 0 for strings, lists and dictionaries when their
@@ -529,7 +530,7 @@ func funIf0_iaoaa*(variables: Variables, arguments: seq[Value]): FunResult =
 
 {.push overflowChecks: on, floatChecks: on.}
 
-func funIf_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_if_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## If the condition is true, return the second argument, else return
   ## the third argument.
   ## @:
@@ -576,7 +577,7 @@ func funIf_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
 
 {.push overflowChecks: on, floatChecks: on.}
 
-func funAdd_iii*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_add_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Add two integers. A warning is generated on overflow.
   ## @:
   ## @:~~~
@@ -599,7 +600,7 @@ func funAdd_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   except:
     result = newFunResultWarn(wOverflow)
 
-func funAdd_fff*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_add_fff*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Add two floats. A warning is generated on overflow.
   ## @:
   ## @:~~~
@@ -624,7 +625,7 @@ func funAdd_fff*(variables: Variables, arguments: seq[Value]): FunResult =
 
 {.pop.}
 
-func funExists_dsb*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_exists_dsb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Determine whether a key exists in a dictionary. Return true when it
   ## exists, else false.
   ## @:
@@ -679,7 +680,7 @@ func getCase(map: VarsDict): FunResult =
     # None of the case conditions match and no else case.
     result = newFunResultWarn(wMissingElse, 2)
 
-func funCase_iloaa*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_case_iloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare integer cases and return the matching value.  It takes a
   ## main integer condition, a list of case pairs and an optional
   ## value when none of the cases match.
@@ -712,7 +713,7 @@ func funCase_iloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   tMapParameters("case", "iloaa")
   result = getCase(map)
 
-func funCase_sloaa*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_case_sloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare string cases and return the matching value.  It takes a
   ## main string condition, a list of case pairs and an optional
   ## value when none of the cases match.
@@ -756,7 +757,7 @@ func parseVersion*(version: string): Option[(int, int, int)] =
   result = some((int(g1IntAndPosO.get().number),
     int(g2IntAndPosO.get().number), int(g3IntAndPosO.get().number)))
 
-func funCmpVersion_ssi*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_cmpVersion_ssi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare two StaticTea version numbers. Returns -1 for less, 0 for
   ## equal and 1 for greater than.
   ## @:
@@ -800,7 +801,7 @@ func funCmpVersion_ssi*(variables: Variables, arguments: seq[Value]): FunResult 
 
   result = newFunResult(newValue(ret))
 
-func funFloat_if*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_float_if*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a float from an int.
   ## @:
   ## @:~~~
@@ -817,7 +818,7 @@ func funFloat_if*(variables: Variables, arguments: seq[Value]): FunResult =
   let num = map["a"].intv
   result = newFunResult(newValue(float(num)))
 
-func funFloat_sf*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_float_sf*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a float from a number string.
   ## @:
   ## @:~~~
@@ -843,7 +844,7 @@ func funFloat_sf*(variables: Variables, arguments: seq[Value]): FunResult =
   else:
     result = newFunResult(newValue(float(funResult.value.intv)))
 
-func funFloat_saa*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_float_saa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a float from a number string. If the string is not a
   ## number, return the default.
   ## @:
@@ -898,7 +899,7 @@ func convertFloatToInt(num: float, map: VarsDict): FunResult =
       return newFunResultWarn(wExpectedRoundOption, 1)
   result = newFunResult(newValue(ret))
 
-func funInt_fosi*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_int_fosi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create an int from a float.
   ## @:
   ## @:~~~
@@ -933,7 +934,7 @@ func funInt_fosi*(variables: Variables, arguments: seq[Value]): FunResult =
 
   result = convertFloatToInt(num, map)
 
-func funInt_sosi*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_int_sosi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create an int from a number string.
   ## @:
   ## @:~~~
@@ -975,7 +976,7 @@ func funInt_sosi*(variables: Variables, arguments: seq[Value]): FunResult =
   else:
     result = funResult
 
-func funInt_ssaa*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_int_ssaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create an int from a number string. If the string is not a number,
   ## return the default value.
   ## @:
@@ -1034,7 +1035,7 @@ func if0Condition*(cond: Value): bool =
    of vkFunc:
      result = false
 
-func funBool_ab*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_bool_ab*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create an bool from a value.
   ## @:
   ## @:~~~
@@ -1071,7 +1072,7 @@ func funBool_ab*(variables: Variables, arguments: seq[Value]): FunResult =
   let value = map["a"]
   result = newFunResult(newValue(if0Condition(value)))
 
-func funFind_ssoaa*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_find_ssoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Find the position of a substring in a string.  When the substring
   ## is not found, return an optional default value.  A warning is
   ## generated when the substring is missing and you don't specify a
@@ -1109,7 +1110,7 @@ func funFind_ssoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   else:
     result = newFunResult(newValue(pos))
 
-func funSlice_siois*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_slice_siois*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Extract a substring from a string by its position and length. You
   ## pass the string, the substring's start index and its length.  The
   ## length is optional. When not specified, the slice returns the
@@ -1144,7 +1145,7 @@ func funSlice_siois*(variables: Variables, arguments: seq[Value]): FunResult =
 
   result = slice(str, start, length)
 
-func funDup_sis*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_dup_sis*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Duplicate a string x times.  The result is a new string built by
   ## concatenating the string to itself the specified number of times.
   ## @:
@@ -1183,7 +1184,7 @@ func funDup_sis*(variables: Variables, arguments: seq[Value]): FunResult =
     str.add(pattern)
   result = newFunResult(newValue(str))
 
-func funDict_old*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_dict_old*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a dictionary from a list of key, value pairs.  The keys
   ## must be strings and the values can be any type.
   ## @:
@@ -1219,7 +1220,7 @@ func funDict_old*(variables: Variables, arguments: seq[Value]): FunResult =
 
   result = newFunResult(newValue(dict))
 
-func funList_al*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_list_al*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a list of variables. You can also create a list with brackets.
   ## @:
   ## @:~~~
@@ -1241,7 +1242,7 @@ func funList_al*(variables: Variables, arguments: seq[Value]): FunResult =
 
   result = newFunResult(newValue(arguments))
 
-func funListLoop_lpoal*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_listLoop_lpoal*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a new list from a list and a callback function. The callback
   ## function is called for each item in the list and it decides what
   ## goes in the list.
@@ -1286,7 +1287,7 @@ func funListLoop_lpoal*(variables: Variables, arguments: seq[Value]): FunResult 
   # for documentation.
   result = newFunResult(newValue(0))
 
-func funReplace_siiss*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Replace a substring specified by its position and length with
   ## another string.  You can use the function to insert and append to
   ## a string as well.
@@ -1396,7 +1397,7 @@ func replaceReMap(map: VarsDict): FunResult =
 
   result = newFunResult(newValue(resultStringO.get()))
 
-func funReplaceRe_sls*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_replaceRe_sls*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Replace multiple parts of a string using regular expressions.
   ## @:
   ## @:You specify one or more pairs of regex patterns and their string
@@ -1455,7 +1456,7 @@ func parsePath*(path: string, separator='/'): PathComponents =
 
   result = newPathComponents(dir, filename, basename, ext)
 
-func funPath_sosd*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_path_sosd*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Split a file path into its component pieces. Return a dictionary
   ## with the filename, basename, extension and directory.
   ## @:
@@ -1510,7 +1511,7 @@ func funPath_sosd*(variables: Variables, arguments: seq[Value]): FunResult =
 
   result = newFunResult(newValue(dict))
 
-func funLower_ss*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_lower_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Lowercase a string.
   ## @:
   ## @:~~~
@@ -1529,7 +1530,7 @@ func funLower_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   let str = map["a"].stringv
   result = newFunResult(newValue(toLower(str)))
 
-func funKeys_dl*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_keys_dl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a list from the keys in a dictionary.
   ## @:
   ## @:~~~
@@ -1553,7 +1554,7 @@ func funKeys_dl*(variables: Variables, arguments: seq[Value]): FunResult =
 
   result = newFunResult(newValue(list))
 
-func funValues_dl*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_values_dl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a list out of the values in the specified dictionary.
   ## @:
   ## @:~~~
@@ -1676,7 +1677,7 @@ func generalSort(map: VarsDict): FunResult =
   let newList = sorted(list, sortCmpValues, sortOrder)
   result = newFunResult(newValue(newList))
 
-func funSort_lsosl*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_sort_lsosl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Sort a list of values of the same type.  The values are ints,
   ## floats, or strings.
   ## @:
@@ -1709,7 +1710,7 @@ func funSort_lsosl*(variables: Variables, arguments: seq[Value]): FunResult =
   tMapParameters("sort", "lsosl")
   result = generalSort(map)
 
-func funSort_lssil*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_sort_lssil*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Sort a list of lists.
   ## @:
   ## @:You specify the sort order, "ascending" or "descending".
@@ -1738,7 +1739,7 @@ func funSort_lssil*(variables: Variables, arguments: seq[Value]): FunResult =
   tMapParameters("sort", "lssil")
   result = generalSort(map)
 
-func funSort_lsssl*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_sort_lsssl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Sort a list of dictionaries.
   ## @:
   ## @:You specify the sort order, "ascending" or "descending".
@@ -1767,7 +1768,7 @@ func funSort_lsssl*(variables: Variables, arguments: seq[Value]): FunResult =
   tMapParameters("sort", "lsssl")
   result = generalSort(map)
 
-func funGithubAnchor_ss*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_githubAnchor_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a Github anchor name from a heading name. Use it for
   ## Github markdown internal links. If you have duplicate heading
   ## names, the anchor name returned only works for the
@@ -1801,7 +1802,7 @@ func funGithubAnchor_ss*(variables: Variables, arguments: seq[Value]): FunResult
   let anchorName = githubAnchor(name)
   result = newFunResult(newValue(anchorName))
 
-func funGithubAnchor_ll*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_githubAnchor_ll*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create Github anchor names from heading names. Use it for Github
   ## markdown internal links. It handles duplicate heading names.
   ## @:
@@ -1842,7 +1843,7 @@ func funGithubAnchor_ll*(variables: Variables, arguments: seq[Value]): FunResult
 
   result = newFunResult(newValue(anchorNames))
 
-func funType_as*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_type_as*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return the parameter type, one of: int, float, string, list,
   ## dict, bool or func.
   ## @:
@@ -1895,7 +1896,7 @@ func joinPathList(map: VarsDict): FunResult =
     ret.add(component)
   result = newFunResult(newValue(ret))
 
-func funJoinPath_loss*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_joinPath_loss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Join the path components with a path separator.
   ## @:
   ## @:You pass a list of components to join. For the second optional
@@ -1936,7 +1937,7 @@ func funJoinPath_loss*(variables: Variables, arguments: seq[Value]): FunResult =
   tMapParameters("joinPath", "loss")
   result = joinPathList(map)
 
-func funJoin_lsois*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_join_lsois*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Join a list of strings with a separator.  An optional parameter
   ## determines whether you skip empty strings or not. You can use an
   ## empty separator to concatenate the arguments.
@@ -1981,7 +1982,7 @@ func funJoin_lsois*(variables: Variables, arguments: seq[Value]): FunResult =
     ret.add(str)
   result = newFunResult(newValue(ret))
 
-func funWarn_ss*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_warn_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return a warning message and skip the current statement.
   ## You can call the warn function without an assignment.
   ## @:
@@ -2014,7 +2015,7 @@ func funWarn_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   let message = map["a"].stringv
   result = newFunResultWarn(wUserMessage, 0, message)
 
-func funLog_ss*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_log_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Log a message to the log file.  You can call the log function
   ## without an assignment.
   ## @:
@@ -2046,7 +2047,7 @@ func funLog_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   let message = map["a"].stringv
   result = newFunResult(newValue(message))
 
-func funReturn_aa*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_return_aa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return is a special function that returns the value passed in and
   ## has side effects.
   ## @:
@@ -2097,7 +2098,7 @@ func funReturn_aa*(variables: Variables, arguments: seq[Value]): FunResult =
   # Invalid return; use a bare return in a user function or use it in a bare if statement.
   result = newFunResultWarn(wReturnArgument, -1)
 
-func funString_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Convert a variable to a string. You specify the variable and
   ## optionally the type of output you want.
   ## @:
@@ -2183,7 +2184,7 @@ func funString_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
 
   result = newFunResult(newValue(str))
 
-func funString_sds*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_string_sds*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Convert the dictionary variable to dot names. You specify the
   ## name of the dictionary and the dict variable.
   ## @:
@@ -2207,7 +2208,7 @@ func funString_sds*(variables: Variables, arguments: seq[Value]): FunResult =
   let str = dotNameRep(dict, name)
   result = newFunResult(newValue(str))
 
-func funFormat_ss*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_format_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Format a string using replacement variables similar to a
   ## replacement block. To enter a left bracket use two in a row.
   ## @:
@@ -2241,7 +2242,7 @@ func funFormat_ss*(variables: Variables, arguments: seq[Value]): FunResult =
 
   result = newFunResult(newValue(stringOr.value))
 
-func funFunc_sp*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_func_sp*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Define a function.
   ## @:
   ## @:~~~
@@ -2262,7 +2263,7 @@ func funFunc_sp*(variables: Variables, arguments: seq[Value]): FunResult =
   # is called for nested calls to func and it returns a warning.
   result = newFunResultWarn(wDefineFunction)
 
-func funFunctionDetails_pd*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_functionDetails_pd*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return the function details.
   ## @:
   ## @:~~~
@@ -2297,7 +2298,7 @@ func funFunctionDetails_pd*(variables: Variables, arguments: seq[Value]): FunRes
   let details = functionDetails(functionSpec)
   result = newFunResult(details)
 
-func funStartsWith_ssb*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_startsWith_ssb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Check whether a strings starts with the given prefix. Return true
   ## when it does, else false.
   ## @:
@@ -2320,7 +2321,7 @@ func funStartsWith_ssb*(variables: Variables, arguments: seq[Value]): FunResult 
   let prefix = map["b"].stringv
   result = newFunResult(newValue(startsWith(str, prefix)))
 
-func funNot_bb*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_not_bb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Boolean not.
   ## @:
   ## @:~~~
@@ -2338,7 +2339,7 @@ func funNot_bb*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = map["a"].boolv
   result = newFunResult(newValue(not(cond)))
 
-func funAnd_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_and_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Boolean AND with short circuit. If the first argument is false,
   ## the second argument is not evaluated.
   ## @:
@@ -2364,7 +2365,7 @@ func funAnd_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a and b
   result = newFunResult(newValue(cond))
 
-func funOr_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_or_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Boolean OR with short circuit. If the first argument is true,
   ## the second argument is not evaluated.
   ## @:
@@ -2390,7 +2391,7 @@ func funOr_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a or b
   result = newFunResult(newValue(cond))
 
-func funEq_iib*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_eq_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when the two ints are equal.
   ## @:
   ## @:~~~
@@ -2409,7 +2410,7 @@ func funEq_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a == b
   result = newFunResult(newValue(cond))
 
-func funEq_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_eq_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when two floats are equal.
   ## @:
   ## @:~~~
@@ -2428,7 +2429,7 @@ func funEq_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a == b
   result = newFunResult(newValue(cond))
 
-func funEq_ssb*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_eq_ssb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when two strings are equal.  See [[#cmd][cmd]] for case
   ## insensitive compare.
   ## @:
@@ -2448,7 +2449,7 @@ func funEq_ssb*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a == b
   result = newFunResult(newValue(cond))
 
-func funNe_iib*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_ne_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when two ints are not equal.
   ## @:
   ## @:~~~
@@ -2467,7 +2468,7 @@ func funNe_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a != b
   result = newFunResult(newValue(cond))
 
-func funNe_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_ne_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when two floats are not equal.
   ## @:
   ## @:~~~
@@ -2486,7 +2487,7 @@ func funNe_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a != b
   result = newFunResult(newValue(cond))
 
-func funNe_ssb*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_ne_ssb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when two strings are not equal.
   ## @:
   ## @:~~~
@@ -2505,7 +2506,7 @@ func funNe_ssb*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a != b
   result = newFunResult(newValue(cond))
 
-func funGt_iib*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_gt_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when an int is greater then another int.
   ## @:
   ## @:~~~
@@ -2524,7 +2525,7 @@ func funGt_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a > b
   result = newFunResult(newValue(cond))
 
-func funGt_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_gt_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when one float is greater than another float.
   ## @:
   ## @:~~~
@@ -2543,7 +2544,7 @@ func funGt_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a > b
   result = newFunResult(newValue(cond))
 
-func funGte_iib*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_gte_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when an int is greater then or equal to another int.
   ## @:
   ## @:~~~
@@ -2562,7 +2563,7 @@ func funGte_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a >= b
   result = newFunResult(newValue(cond))
 
-func funGte_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_gte_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when a float is greater than or equal to another float.
   ## @:
   ## @:~~~
@@ -2581,7 +2582,7 @@ func funGte_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a >= b
   result = newFunResult(newValue(cond))
 
-func funLt_iib*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_lt_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when an int is less than another int.
   ## @:
   ## @:~~~
@@ -2600,7 +2601,7 @@ func funLt_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a < b
   result = newFunResult(newValue(cond))
 
-func funLt_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_lt_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when a float is less then another float.
   ## @:
   ## @:~~~
@@ -2619,7 +2620,7 @@ func funLt_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a > b
   result = newFunResult(newValue(cond))
 
-func funLte_iib*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_lte_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when an int is less than or equal to another int.
   ## @:
   ## @:~~~
@@ -2639,7 +2640,7 @@ func funLte_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a <= b
   result = newFunResult(newValue(cond))
 
-func funLte_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_lte_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when a float is less than or equal to another float.
   ## @:
   ## @:~~~
@@ -2659,7 +2660,7 @@ func funLte_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = a <= b
   result = newFunResult(newValue(cond))
 
-func funReadJson_sa*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_readJson_sa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Convert a JSON string to a variable.
   ## @:
   ## @:~~~
@@ -2685,77 +2686,77 @@ func funReadJson_sa*(variables: Variables, arguments: seq[Value]): FunResult =
 
 # Map a built-in function name to a function pointer.
 var functionsDict = newTable[string, FunctionPtr]()
-functionsDict["funAdd_fff"] = funAdd_fff
-functionsDict["funAdd_iii"] = funAdd_iii
-functionsDict["funAnd_bbb"] = funAnd_bbb
-functionsDict["funBool_ab"] = funBool_ab
-functionsDict["funCase_iloaa"] = funCase_iloaa
-functionsDict["funCase_sloaa"] = funCase_sloaa
-functionsDict["funCmp_ffi"] = funCmp_ffi
-functionsDict["funCmp_iii"] = funCmp_iii
-functionsDict["funCmp_ssobi"] = funCmp_ssobi
-functionsDict["funCmpVersion_ssi"] = funCmpVersion_ssi
-functionsDict["funConcat_sss"] = funConcat_sss
-functionsDict["funDict_old"] = funDict_old
-functionsDict["funDup_sis"] = funDup_sis
-functionsDict["funEq_ffb"] = funEq_ffb
-functionsDict["funEq_iib"] = funEq_iib
-functionsDict["funEq_ssb"] = funEq_ssb
-functionsDict["funExists_dsb"] = funExists_dsb
-functionsDict["funFind_ssoaa"] = funFind_ssoaa
-functionsDict["funFloat_if"] = funFloat_if
-functionsDict["funFloat_saa"] = funFloat_saa
-functionsDict["funFloat_sf"] = funFloat_sf
-functionsDict["funFormat_ss"] = funFormat_ss
-functionsDict["funFunc_sp"] = funFunc_sp
-functionsDict["funFunctionDetails_pd"] = funFunctionDetails_pd
-functionsDict["funGet_dsoaa"] = funGet_dsoaa
-functionsDict["funGet_lioaa"] = funGet_lioaa
-functionsDict["funGithubAnchor_ll"] = funGithubAnchor_ll
-functionsDict["funGithubAnchor_ss"] = funGithubAnchor_ss
-functionsDict["funGt_ffb"] = funGt_ffb
-functionsDict["funGt_iib"] = funGt_iib
-functionsDict["funGte_ffb"] = funGte_ffb
-functionsDict["funGte_iib"] = funGte_iib
-functionsDict["funIf_baoaa"] = funIf_baoaa
-functionsDict["funIf0_iaoaa"] = funIf0_iaoaa
-functionsDict["funInt_fosi"] = funInt_fosi
-functionsDict["funInt_sosi"] = funInt_sosi
-functionsDict["funInt_ssaa"] = funInt_ssaa
-functionsDict["funJoin_lsois"] = funJoin_lsois
-functionsDict["funJoinPath_loss"] = funJoinPath_loss
-functionsDict["funKeys_dl"] = funKeys_dl
-functionsDict["funLen_di"] = funLen_di
-functionsDict["funLen_li"] = funLen_li
-functionsDict["funLen_si"] = funLen_si
-functionsDict["funList_al"] = funList_al
-functionsDict["funListLoop_lpoal"] = funListLoop_lpoal
-functionsDict["funLog_ss"] = funLog_ss
-functionsDict["funLower_ss"] = funLower_ss
-functionsDict["funLt_ffb"] = funLt_ffb
-functionsDict["funLt_iib"] = funLt_iib
-functionsDict["funLte_ffb"] = funLte_ffb
-functionsDict["funLte_iib"] = funLte_iib
-functionsDict["funNe_ffb"] = funNe_ffb
-functionsDict["funNe_iib"] = funNe_iib
-functionsDict["funNe_ssb"] = funNe_ssb
-functionsDict["funNot_bb"] = funNot_bb
-functionsDict["funOr_bbb"] = funOr_bbb
-functionsDict["funPath_sosd"] = funPath_sosd
-functionsDict["funReadJson_sa"] = funReadJson_sa
-functionsDict["funReplace_siiss"] = funReplace_siiss
-functionsDict["funReplaceRe_sls"] = funReplaceRe_sls
-functionsDict["funReturn_aa"] = funReturn_aa
-functionsDict["funSlice_siois"] = funSlice_siois
-functionsDict["funSort_lsosl"] = funSort_lsosl
-functionsDict["funSort_lssil"] = funSort_lssil
-functionsDict["funSort_lsssl"] = funSort_lsssl
-functionsDict["funStartsWith_ssb"] = funStartsWith_ssb
-functionsDict["funString_aoss"] = funString_aoss
-functionsDict["funString_sds"] = funString_sds
-functionsDict["funType_as"] = funType_as
-functionsDict["funValues_dl"] = funValues_dl
-functionsDict["funWarn_ss"] = funWarn_ss
+functionsDict["fun_add_fff"] = fun_add_fff
+functionsDict["fun_add_iii"] = fun_add_iii
+functionsDict["fun_and_bbb"] = fun_and_bbb
+functionsDict["fun_bool_ab"] = fun_bool_ab
+functionsDict["fun_case_iloaa"] = fun_case_iloaa
+functionsDict["fun_case_sloaa"] = fun_case_sloaa
+functionsDict["fun_cmp_ffi"] = fun_cmp_ffi
+functionsDict["fun_cmp_iii"] = fun_cmp_iii
+functionsDict["fun_cmp_ssobi"] = fun_cmp_ssobi
+functionsDict["fun_cmpVersion_ssi"] = fun_cmpVersion_ssi
+functionsDict["fun_concat_sss"] = fun_concat_sss
+functionsDict["fun_dict_old"] = fun_dict_old
+functionsDict["fun_dup_sis"] = fun_dup_sis
+functionsDict["fun_eq_ffb"] = fun_eq_ffb
+functionsDict["fun_eq_iib"] = fun_eq_iib
+functionsDict["fun_eq_ssb"] = fun_eq_ssb
+functionsDict["fun_exists_dsb"] = fun_exists_dsb
+functionsDict["fun_find_ssoaa"] = fun_find_ssoaa
+functionsDict["fun_float_if"] = fun_float_if
+functionsDict["fun_float_saa"] = fun_float_saa
+functionsDict["fun_float_sf"] = fun_float_sf
+functionsDict["fun_format_ss"] = fun_format_ss
+functionsDict["fun_func_sp"] = fun_func_sp
+functionsDict["fun_functionDetails_pd"] = fun_functionDetails_pd
+functionsDict["fun_get_dsoaa"] = fun_get_dsoaa
+functionsDict["fun_get_lioaa"] = fun_get_lioaa
+functionsDict["fun_githubAnchor_ll"] = fun_githubAnchor_ll
+functionsDict["fun_githubAnchor_ss"] = fun_githubAnchor_ss
+functionsDict["fun_gt_ffb"] = fun_gt_ffb
+functionsDict["fun_gt_iib"] = fun_gt_iib
+functionsDict["fun_gte_ffb"] = fun_gte_ffb
+functionsDict["fun_gte_iib"] = fun_gte_iib
+functionsDict["fun_if_baoaa"] = fun_if_baoaa
+functionsDict["fun_if0_iaoaa"] = fun_if0_iaoaa
+functionsDict["fun_int_fosi"] = fun_int_fosi
+functionsDict["fun_int_sosi"] = fun_int_sosi
+functionsDict["fun_int_ssaa"] = fun_int_ssaa
+functionsDict["fun_join_lsois"] = fun_join_lsois
+functionsDict["fun_joinPath_loss"] = fun_joinPath_loss
+functionsDict["fun_keys_dl"] = fun_keys_dl
+functionsDict["fun_len_di"] = fun_len_di
+functionsDict["fun_len_li"] = fun_len_li
+functionsDict["fun_len_si"] = fun_len_si
+functionsDict["fun_list_al"] = fun_list_al
+functionsDict["fun_listLoop_lpoal"] = fun_listLoop_lpoal
+functionsDict["fun_log_ss"] = fun_log_ss
+functionsDict["fun_lower_ss"] = fun_lower_ss
+functionsDict["fun_lt_ffb"] = fun_lt_ffb
+functionsDict["fun_lt_iib"] = fun_lt_iib
+functionsDict["fun_lte_ffb"] = fun_lte_ffb
+functionsDict["fun_lte_iib"] = fun_lte_iib
+functionsDict["fun_ne_ffb"] = fun_ne_ffb
+functionsDict["fun_ne_iib"] = fun_ne_iib
+functionsDict["fun_ne_ssb"] = fun_ne_ssb
+functionsDict["fun_not_bb"] = fun_not_bb
+functionsDict["fun_or_bbb"] = fun_or_bbb
+functionsDict["fun_path_sosd"] = fun_path_sosd
+functionsDict["fun_readJson_sa"] = fun_readJson_sa
+functionsDict["fun_replace_siiss"] = fun_replace_siiss
+functionsDict["fun_replaceRe_sls"] = fun_replaceRe_sls
+functionsDict["fun_return_aa"] = fun_return_aa
+functionsDict["fun_slice_siois"] = fun_slice_siois
+functionsDict["fun_sort_lsosl"] = fun_sort_lsosl
+functionsDict["fun_sort_lssil"] = fun_sort_lssil
+functionsDict["fun_sort_lsssl"] = fun_sort_lsssl
+functionsDict["fun_startsWith_ssb"] = fun_startsWith_ssb
+functionsDict["fun_string_aoss"] = fun_string_aoss
+functionsDict["fun_string_sds"] = fun_string_sds
+functionsDict["fun_type_as"] = fun_type_as
+functionsDict["fun_values_dl"] = fun_values_dl
+functionsDict["fun_warn_ss"] = fun_warn_ss
 
 type
   LineNumber = range[1 .. high(int)]
@@ -2936,10 +2937,7 @@ proc makeFuncDictionary*(): VarsDict =
     let builtIn = true
     let filename = "functions.nim"
     var statementLines = newSeq[Statement]()
-    # todo: use fun_name_sig format instead of funName_sig.
-    # capitalize the name like funAdd_fff
-    let letter = toUpperAscii(bii.name[0])
-    let functionName = "fun$1$2_$3" % [$letter, bii.name[1 .. ^1], bii.signatureCode]
+    let functionName = "fun_$1_$2" % [bii.name, bii.signatureCode]
     let functionPtr = functionsDict[functionName]
     let function = newFunc(builtIn, signatureO.get(), bii.docComment, filename,
       bii.lineNum, bii.numLines, statementLines, functionPtr)
