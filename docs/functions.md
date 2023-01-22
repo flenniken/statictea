@@ -90,10 +90,12 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [fun_lte_iib](#fun_lte_iib) &mdash; Return true when an int is less than or equal to another int.
 * [fun_lte_ffb](#fun_lte_ffb) &mdash; Return true when a float is less than or equal to another float.
 * [fun_readJson_sa](#fun_readjson_sa) &mdash; Convert a JSON string to a variable.
+* [functionsDict](#functionsdict) &mdash; Maps a built-in function name to a function pointer you can call.
 * type: [BuiltInInfo](#builtininfo) &mdash; The built-in function information.
-* [newBuiltInInfo](#newbuiltininfo) &mdash; 
-* const: [functionsList](#functionslist) &mdash; Sorted list of built in functions, their function name, nim name and their signature.
+* [newBuiltInInfo](#newbuiltininfo) &mdash; Return a BuiltInInfo object.
+* const: [functionsList](#functionslist) &mdash; Dynamically generated sorted list of built-in functions.
 * [getBestFunction](#getbestfunction) &mdash; Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
+* [splitFuncName](#splitfuncname) &mdash; Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".
 * [makeFuncDictionary](#makefuncdictionary) &mdash; Create the f dictionary from the built in functions.
 * [createFuncDictionary](#createfuncdictionary) &mdash; Get the "f" function dictionary.
 
@@ -1708,7 +1710,7 @@ fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.n"
 fd.filename = "testcode.tea"
 fd.lineNum = 3
 fd.numLines = 2
-fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]"""
+fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]
 ~~~
 
 ```nim
@@ -2090,22 +2092,26 @@ d = readJson("{"a":1, "b": 2}")
 func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
+# functionsDict
+
+Maps a built-in function name to a function pointer you can call.
+
+```nim
+functionsDict = newTable(32)
+```
+
 # BuiltInInfo
 
 The built-in function information.
 
-* name -- the function name
-* functionPtr -- the pointer to the function for calling it
-* signatureCode -- the single letters signature code
+* funcName -- the function name in the nim file, e.g.: fun_add_ii
 * docComment -- the function documentation
 * lineNum -- the function's starting line in the functions.nim file
 * numLines -- the number of function code lines
 
 ```nim
 BuiltInInfo = object
-  name*: string
-  functionPtr*: FunctionPtr
-  signatureCode*: string
+  funcName*: string
   docComment*: string
   lineNum*: LineNumber
   numLines*: Natural
@@ -2114,144 +2120,239 @@ BuiltInInfo = object
 
 # newBuiltInInfo
 
-
+Return a BuiltInInfo object.
 
 ```nim
-func newBuiltInInfo(name: string; signatureCode: string; docComment: string;
-                    lineNum: LineNumber; numLines: Natural): BuiltInInfo
+func newBuiltInInfo(funcName: string; docComment: string; lineNum: LineNumber;
+                    numLines: Natural): BuiltInInfo
 ```
 
 # functionsList
 
-Sorted list of built in functions, their function name, nim name and their signature.
+Dynamically generated sorted list of built-in functions. Each line contains the nim function name, its doc comment, the starting line number and the number of lines in the function. See templates/dynamicFuncList.nim
 
 ```nim
-functionsList = [(name: "add", functionPtr: (nil, nil), signatureCode: "fff",
-                  docComment: "", lineNum: 1, numLines: 10), (name: "add",
-    functionPtr: (nil, nil), signatureCode: "iii", docComment: "", lineNum: 1,
-    numLines: 10), (name: "and", functionPtr: (nil, nil), signatureCode: "bbb",
-                    docComment: "", lineNum: 1, numLines: 10), (name: "bool",
-    functionPtr: (nil, nil), signatureCode: "ab", docComment: "", lineNum: 1,
-    numLines: 10), (name: "case", functionPtr: (nil, nil),
-                    signatureCode: "iloaa", docComment: "", lineNum: 1,
-                    numLines: 10), (name: "case", functionPtr: (nil, nil),
-                                    signatureCode: "sloaa", docComment: "",
-                                    lineNum: 1, numLines: 10), (name: "cmp",
-    functionPtr: (nil, nil), signatureCode: "ffi", docComment: "", lineNum: 1,
-    numLines: 10), (name: "cmp", functionPtr: (nil, nil), signatureCode: "iii",
-                    docComment: "", lineNum: 1, numLines: 10), (name: "cmp",
-    functionPtr: (nil, nil), signatureCode: "ssobi", docComment: "", lineNum: 1,
-    numLines: 10), (name: "cmpVersion", functionPtr: (nil, nil),
-                    signatureCode: "ssi", docComment: "", lineNum: 1,
-                    numLines: 10), (name: "concat", functionPtr: (nil, nil),
-                                    signatureCode: "sss", docComment: "",
-                                    lineNum: 1, numLines: 10), (name: "dict",
-    functionPtr: (nil, nil), signatureCode: "old", docComment: "", lineNum: 1,
-    numLines: 10), (name: "dup", functionPtr: (nil, nil), signatureCode: "sis",
-                    docComment: "", lineNum: 1, numLines: 10), (name: "eq",
-    functionPtr: (nil, nil), signatureCode: "ffb", docComment: "", lineNum: 1,
-    numLines: 10), (name: "eq", functionPtr: (nil, nil), signatureCode: "iib",
-                    docComment: "", lineNum: 1, numLines: 10), (name: "eq",
-    functionPtr: (nil, nil), signatureCode: "ssb", docComment: "", lineNum: 1,
-    numLines: 10), (name: "exists", functionPtr: (nil, nil),
-                    signatureCode: "dsb", docComment: "", lineNum: 1,
-                    numLines: 10), (name: "find", functionPtr: (nil, nil),
-                                    signatureCode: "ssoaa", docComment: "",
-                                    lineNum: 1, numLines: 10), (name: "float",
-    functionPtr: (nil, nil), signatureCode: "if", docComment: "", lineNum: 1,
-    numLines: 10), (name: "float", functionPtr: (nil, nil),
-                    signatureCode: "saa", docComment: "", lineNum: 1,
-                    numLines: 10), (name: "float", functionPtr: (nil, nil),
-                                    signatureCode: "sf", docComment: "",
-                                    lineNum: 1, numLines: 10), (name: "format",
-    functionPtr: (nil, nil), signatureCode: "ss", docComment: "", lineNum: 1,
-    numLines: 10), (name: "func", functionPtr: (nil, nil), signatureCode: "sp",
-                    docComment: "", lineNum: 1, numLines: 10), (
-    name: "functionDetails", functionPtr: (nil, nil), signatureCode: "pd",
-    docComment: "", lineNum: 1, numLines: 10), (name: "get",
-    functionPtr: (nil, nil), signatureCode: "dsoaa", docComment: "", lineNum: 1,
-    numLines: 10), (name: "get", functionPtr: (nil, nil),
-                    signatureCode: "lioaa", docComment: "", lineNum: 1,
-                    numLines: 10), (name: "githubAnchor",
-                                    functionPtr: (nil, nil),
-                                    signatureCode: "ll", docComment: "",
-                                    lineNum: 1, numLines: 10), (
-    name: "githubAnchor", functionPtr: (nil, nil), signatureCode: "ss",
-    docComment: "", lineNum: 1, numLines: 10), (name: "gt",
-    functionPtr: (nil, nil), signatureCode: "ffb", docComment: "", lineNum: 1,
-    numLines: 10), (name: "gt", functionPtr: (nil, nil), signatureCode: "iib",
-                    docComment: "", lineNum: 1, numLines: 10), (name: "gte",
-    functionPtr: (nil, nil), signatureCode: "ffb", docComment: "", lineNum: 1,
-    numLines: 10), (name: "gte", functionPtr: (nil, nil), signatureCode: "iib",
-                    docComment: "", lineNum: 1, numLines: 10), (name: "if",
-    functionPtr: (nil, nil), signatureCode: "baoaa", docComment: "", lineNum: 1,
-    numLines: 10), (name: "if0", functionPtr: (nil, nil),
-                    signatureCode: "iaoaa", docComment: "", lineNum: 1,
-                    numLines: 10), (name: "int", functionPtr: (nil, nil),
-                                    signatureCode: "fosi", docComment: "",
-                                    lineNum: 1, numLines: 10), (name: "int",
-    functionPtr: (nil, nil), signatureCode: "sosi", docComment: "", lineNum: 1,
-    numLines: 10), (name: "int", functionPtr: (nil, nil), signatureCode: "ssaa",
-                    docComment: "", lineNum: 1, numLines: 10), (name: "join",
-    functionPtr: (nil, nil), signatureCode: "lsois", docComment: "", lineNum: 1,
-    numLines: 10), (name: "joinPath", functionPtr: (nil, nil),
-                    signatureCode: "loss", docComment: "", lineNum: 1,
-                    numLines: 10), (name: "keys", functionPtr: (nil, nil),
-                                    signatureCode: "dl", docComment: "",
-                                    lineNum: 1, numLines: 10), (name: "len",
-    functionPtr: (nil, nil), signatureCode: "di", docComment: "", lineNum: 1,
-    numLines: 10), (name: "len", functionPtr: (nil, nil), signatureCode: "li",
-                    docComment: "", lineNum: 1, numLines: 10), (name: "len",
-    functionPtr: (nil, nil), signatureCode: "si", docComment: "", lineNum: 1,
-    numLines: 10), (name: "list", functionPtr: (nil, nil), signatureCode: "al",
-                    docComment: "", lineNum: 1, numLines: 10), (
-    name: "listLoop", functionPtr: (nil, nil), signatureCode: "lpoal",
-    docComment: "", lineNum: 1, numLines: 10), (name: "log",
-    functionPtr: (nil, nil), signatureCode: "ss", docComment: "", lineNum: 1,
-    numLines: 10), (name: "lower", functionPtr: (nil, nil), signatureCode: "ss",
-                    docComment: "", lineNum: 1, numLines: 10), (name: "lt",
-    functionPtr: (nil, nil), signatureCode: "ffb", docComment: "", lineNum: 1,
-    numLines: 10), (name: "lt", functionPtr: (nil, nil), signatureCode: "iib",
-                    docComment: "", lineNum: 1, numLines: 10), (name: "lte",
-    functionPtr: (nil, nil), signatureCode: "ffb", docComment: "", lineNum: 1,
-    numLines: 10), (name: "lte", functionPtr: (nil, nil), signatureCode: "iib",
-                    docComment: "", lineNum: 1, numLines: 10), (name: "ne",
-    functionPtr: (nil, nil), signatureCode: "ffb", docComment: "", lineNum: 1,
-    numLines: 10), (name: "ne", functionPtr: (nil, nil), signatureCode: "iib",
-                    docComment: "", lineNum: 1, numLines: 10), (name: "ne",
-    functionPtr: (nil, nil), signatureCode: "ssb", docComment: "", lineNum: 1,
-    numLines: 10), (name: "not", functionPtr: (nil, nil), signatureCode: "bb",
-                    docComment: "", lineNum: 1, numLines: 10), (name: "or",
-    functionPtr: (nil, nil), signatureCode: "bbb", docComment: "", lineNum: 1,
-    numLines: 10), (name: "path", functionPtr: (nil, nil),
-                    signatureCode: "sosd", docComment: "", lineNum: 1,
-                    numLines: 10), (name: "readJson", functionPtr: (nil, nil),
-                                    signatureCode: "sa", docComment: "",
-                                    lineNum: 1, numLines: 10), (name: "replace",
-    functionPtr: (nil, nil), signatureCode: "siiss", docComment: "", lineNum: 1,
-    numLines: 10), (name: "replaceRe", functionPtr: (nil, nil),
-                    signatureCode: "sls", docComment: "", lineNum: 1,
-                    numLines: 10), (name: "return", functionPtr: (nil, nil),
-                                    signatureCode: "aa", docComment: "",
-                                    lineNum: 1, numLines: 10), (name: "slice",
-    functionPtr: (nil, nil), signatureCode: "siois", docComment: "", lineNum: 1,
-    numLines: 10), (name: "sort", functionPtr: (nil, nil),
-                    signatureCode: "lsosl", docComment: "", lineNum: 1,
-                    numLines: 10), (name: "sort", functionPtr: (nil, nil),
-                                    signatureCode: "lssil", docComment: "",
-                                    lineNum: 1, numLines: 10), (name: "sort",
-    functionPtr: (nil, nil), signatureCode: "lsssl", docComment: "", lineNum: 1,
-    numLines: 10), (name: "startsWith", functionPtr: (nil, nil),
-                    signatureCode: "ssb", docComment: "", lineNum: 1,
-                    numLines: 10), (name: "string", functionPtr: (nil, nil),
-                                    signatureCode: "aoss", docComment: "",
-                                    lineNum: 1, numLines: 10), (name: "string",
-    functionPtr: (nil, nil), signatureCode: "sds", docComment: "", lineNum: 1,
-    numLines: 10), (name: "type", functionPtr: (nil, nil), signatureCode: "as",
-                    docComment: "", lineNum: 1, numLines: 10), (name: "values",
-    functionPtr: (nil, nil), signatureCode: "dl", docComment: "", lineNum: 1,
-    numLines: 10), (name: "warn", functionPtr: (nil, nil), signatureCode: "ss",
-                    docComment: "", lineNum: 1, numLines: 10)]
+functionsList = [(funcName: "fun_add_fff", docComment: """Add two floats. A warning is generated on overflow.
+
+~~~
+add(a: float, b: float) float
+~~~
+
+Examples:
+
+~~~
+add(1.5, 2.3) => 3.8
+add(3.2, -2.2) => 1.0
+~~~
+""",
+                  lineNum: 603, numLines: 10), (funcName: "fun_add_iii", docComment: """Add two integers. A warning is generated on overflow.
+
+~~~
+add(a: int, b: int) int
+~~~
+
+Examples:
+
+~~~
+add(1, 2) => 3
+add(3, -2) => 1
+add(-2, -5) => -7
+~~~
+""",
+    lineNum: 580, numLines: 10), (funcName: "fun_and_bbb", docComment: """Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
+
+~~~
+and(a: bool, b: bool) bool
+~~~
+
+Examples:
+
+~~~
+and(true, true) => true
+and(false, true) => false
+and(true, false) => false
+and(false, false) => false
+and(false, warn("not hit")) => false
+~~~
+""",
+                                  lineNum: 2342, numLines: 10), (
+    funcName: "fun_bool_ab", docComment: """Create an bool from a value.
+
+~~~
+bool(value: Value) bool
+~~~
+
+False values by variable types:
+
+* bool -- false
+* int -- 0
+* float -- 0.0
+* string -- when the length of the string is 0
+* list -- when the length of the list is 0
+* dict -- when the length of the dictionary is 0
+* func -- always false
+
+Examples:
+
+~~~
+bool(0) => false
+bool(0.0) => false
+bool([]) => false
+bool("") => false
+bool(dict()) => false
+
+bool(5) => true
+bool(3.3) => true
+bool([8]) => true
+bool("tea") => true
+bool(dict("tea", 2)) => true
+~~~
+""",
+    lineNum: 1038, numLines: 10), (funcName: "fun_case_iloaa", docComment: """Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
+
+The first element of a case pair is the condition and the
+second is the return value when that condition matches the main
+condition. The function compares the conditions left to right and
+returns the first match.
+
+When none of the cases match the main condition, the default
+value is returned if it is specified, otherwise a warning is
+generated.  The conditions must be integers. The return values
+can be any type.
+
+~~~
+case(condition: int, pairs: list, default: optional any) any
+~~~
+
+Examples:
+
+~~~
+cases = list(0, "tea", 1, "water", 2, "beer")
+case(0, cases) => "tea"
+case(1, cases) => "water"
+case(2, cases) => "beer"
+case(2, cases, "wine") => "beer"
+case(3, cases, "wine") => "wine"
+~~~
+""",
+                                   lineNum: 683, numLines: 10), (
+    funcName: "fun_case_sloaa", docComment: """Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
+
+The first element of a case pair is the condition and the
+second is the return value when that condition matches the main
+condition. The function compares the conditions left to right and
+returns the first match.
+
+When none of the cases match the main condition, the default
+value is returned if it is specified, otherwise a warning is
+generated.  The conditions must be strings. The return values
+can be any type.
+
+~~~
+case(condition: string, pairs: list, default: optional any) any
+~~~
+
+Examples:
+
+~~~
+cases = list("tea", 15, "water", 2.3, "beer", "cold")
+case("tea", cases) => 15
+case("water", cases) => 2.3
+case("beer", cases) => "cold"
+case("bunch", cases, "other") => "other"
+~~~
+""",
+    lineNum: 716, numLines: 10), (funcName: "fun_cmp_ffi", docComment: """Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
+
+~~~
+cmp(a: float, b: float) int
+~~~
+
+Examples:
+
+~~~
+cmp(7.8, 9.1) => -1
+cmp(8.4, 8.4) => 0
+cmp(9.3, 2.2) => 1
+~~~
+""",
+                                  lineNum: 258, numLines: 10), (
+    funcName: "fun_cmp_iii", docComment: """Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
+
+~~~
+cmp(a: int, b: int) int
+~~~
+
+Examples:
+
+~~~
+cmp(7, 9) => -1
+cmp(8, 8) => 0
+cmp(9, 2) => 1
+~~~
+""",
+    lineNum: 237, numLines: 10), (funcName: "fun_cmp_ssobi", docComment: """Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
+
+You have the option to compare case insensitive. Case sensitive
+is the default.
+
+~~~
+cmp(a: string, b: string, insensitive: optional bool) int
+~~~
+
+Examples:
+
+~~~
+cmp("coffee", "tea") => -1
+cmp("tea", "tea") => 0
+cmp("Tea", "tea") => 1
+cmp("Tea", "tea", true) => 1
+cmp("Tea", "tea", false) => 0
+~~~
+""",
+                                  lineNum: 279, numLines: 10), (
+    funcName: "fun_cmpVersion_ssi", docComment: """Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
+
+~~~
+cmpVersion(versionA: string, versionB: string) int
+~~~
+
+StaticTea uses [[https://semver.org/][Semantic Versioning]]
+with the added restriction that each version component has one
+to three digits (no letters).
+
+Examples:
+
+~~~
+cmpVersion("1.2.5", "1.1.8") => 1
+cmpVersion("1.2.5", "1.3.0") => -1
+cmpVersion("1.2.5", "1.2.5") => 0
+~~~
+""",
+    lineNum: 760, numLines: 10), (funcName: "fun_concat_sss", docComment: """Concatentate two strings. See [[#join][join]] for more that two arguments.
+
+~~~
+concat(a: string, b: string) string
+~~~
+
+Examples:
+
+~~~
+concat("tea", " time") => "tea time"
+concat("a", "b") => "ab"
+~~~
+""",
+                                  lineNum: 312, numLines: 10), (
+    funcName: "fun_dict_old", docComment: """Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
+
+~~~
+dict(pairs: optional list) dict
+~~~
+
+Examples:
+
+~~~
+dict() =>
 ```
 
 # getBestFunction
@@ -2260,6 +2361,14 @@ Given a function variable or a list of function variables and a list of argument
 
 ```nim
 proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr
+```
+
+# splitFuncName
+
+Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".
+
+```nim
+func splitFuncName(funcName: string): (string, string)
 ```
 
 # makeFuncDictionary

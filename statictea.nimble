@@ -46,7 +46,7 @@ proc exit() =
 proc get_test_filenames(): seq[string] =
   ## Return the basename of the nim files in the tests folder.
   result = @[]
-  let exclude = ["testall1.nim", "testall2.nim"]
+  let exclude = ["testall1.nim", "testall2.nim", "dynamicFuncList.nim"]
   var list = listFiles("tests")
   for filename in list:
     let basename = lastPathPart(filename)
@@ -73,7 +73,7 @@ proc get_dir_filenames(folder: string, extension: string, path: bool = false,
 proc get_source_filenames(path: bool = false, noExt: bool = false): seq[string] =
   ## Return the basename of the nim source files in the src
   ## folder excluding a few.
-  let excludeFilenames = @["t.nim", "dot.nim", "sharedtestcode.nim"]
+  let excludeFilenames = @["t.nim", "dot.nim", "sharedtestcode.nim", "dynamicFuncList.nim"]
   result = get_dir_filenames("src", ".nim", path = path, noExt = noExt,
     excludeFilenames = excludeFilenames)
 
@@ -806,6 +806,13 @@ proc runUnitTests(name = "") =
       echo cmd
       exec cmd
 
+proc makeJsonDoc(filename: string) =
+  # Create the json doc file for the given nim source file.
+  var jsonName = joinPath("docs", changeFileExt(filename, "json"))
+  var cmd = fmt"nim --hints:off jsondoc --out:{jsonName} src/{filename}"
+  # echo cmd
+  exec cmd
+
 # Tasks below
 
 task n, "\tShow available tasks.":
@@ -844,10 +851,8 @@ task json, "\tDisplay one or more source file's json doc comments; specify part 
   let filenames = get_source_filenames()
   for filename in filenames:
     if name.toLower in filename.toLower:
-      var jsonName = joinPath("docs", changeFileExt(filename, "json"))
-      var cmd = "nim --hints:off jsondoc --out:$1 src/$2" % [jsonName, filename]
-      # echo cmd
-      exec cmd
+      let jsonName = joinPath("docs", changeFileExt(filename, "json"))
+      makeJsonDoc(filename)
       let text = slurp(jsonName)
       for line in text.splitLines():
         echo line
@@ -1060,3 +1065,28 @@ task clean, "\tRemove all the binaries so everything gets built next time.":
 task replace, "\tShow pattern for text search and replace in all the nim source files.":
   let cmd = r"find . -name \*.nim -type f | xargs -n 1 gsed -i 's/stateVariables/startVariables/g'"
   echo cmd
+
+task cdy, "\tCreate dynamicFuncList.nim from functions.nim.":
+  # Extract the statictea function metadata from the functions.json file to create dynamicFuncList.nim":
+
+  # Build the release version of statictea. This makes sure function.nim builds.
+  echo fmt"Build statictea release version"
+  buildRelease()
+
+  let statictea = fmt"bin/{dirName}/statictea"
+  let server = "docs/functions.json"
+  let tFile = "templates/dynamicFuncList.nim"
+  let teaFile = "templates/dynamicFuncList.tea"
+  let result = "src/dynamicFuncList.nim"
+
+  # Build the functions.json file.
+  echo fmt"make {server}"
+  makeJsonDoc("functions.nim")
+
+  # Build the dynamicFuncList.nim file.
+  echo fmt"make {result}"
+  let cmd = fmt"{statictea} -s {server} -t {tFile} -o {teaFile} -r {result}"
+  exec cmd
+
+  echo fmt"Build statictea release version again using the new function list."
+  buildRelease()

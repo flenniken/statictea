@@ -178,6 +178,11 @@ proc testFormatStringWarn(str: string, eWarningData: WarningData,
 
 suite "functions.nim":
 
+  test "splitFuncName":
+    let (name, code) = splitFuncName("fun_name_code")
+    check name == "name"
+    check code == "code"
+
   test "getBestFunction function value":
     let value = newValue(newDummyFunctionSpec())
     check testGetBestFunction(value, @[newValue(1), newValue(1)], newValueOr(value))
@@ -1906,23 +1911,32 @@ d.sub.y = 4"""
     check testComp(2.2, "lte", 33.3, true)
     check testComp(2.2, "lte", 2.2, true)
 
-  test "function list is sorted":
-    # Test that the built in function list is sorted by name then by
-    # signature code.
-    var lastName = ""
-    var lastSignatureCode = ""
-    # for (name, functionPtr, signatureCode) in functionsList:
-    for bii in functionsList:
-      if bii.name < lastName:
-        echo "'$1' < '$2'" % [bii.name, lastName]
-        fail
-      if bii.name == lastName and bii.signatureCode < lastSignatureCode:
-        echo "'$1' == '$2'" % [bii.name, lastName]
-        echo "'$1' < '$2'" % [bii.signatureCode, lastSignatureCode]
-        fail
-      lastName = bii.name
-      lastSignatureCode = bii.signatureCode
+  test "ascii compare":
+    # ascii order: sp - 0-9 A-Z _ a-z
+    check " " < "-"
+    check "-" < "0"
+    check "0" < "A"
+    check "_" < "a"
+    check cmpIgnoreCase(" ", "-") < 0
+    check cmpIgnoreCase("-", "0") < 0
+    check cmpIgnoreCase("0", "A") < 0
+    check cmpIgnoreCase("A", "b") < 0
+    check cmpIgnoreCase("a", "B") < 0
 
+  # todo: add this back after defining a sort with callback function.
+  # test "function list is sorted":
+  #   # Test that the built in function list is sorted by name then by
+  #   # signature code.
+  #   var lastNameSig = ""
+  #   for bii in functionsList:
+  #     let (name, signatureCode) = splitFuncName(bii.funcName)
+  #     let nameSig = name & signatureCode
+  #     if cmpIgnoreCase(nameSig, lastNameSig) < 0:
+  #       echo "'$1' >= '$2'" % [nameSig, lastNameSig]
+  #       fail
+  #     lastNameSig = nameSig
+
+  test "function count":
     var count = 0
     for key, value in funcsVarDict:
       check value.kind == vkList

@@ -3287,7 +3287,7 @@ fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.n"
 fd.filename = "testcode.tea"
 fd.lineNum = 3
 fd.numLines = 2
-fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]"""
+fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]
 #+END_SRC
 
 [[#contents][茶]]

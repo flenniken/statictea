@@ -2291,7 +2291,7 @@ func fun_functionDetails_pd*(variables: Variables, arguments: seq[Value]): FunRe
   ## @:fd.filename = "testcode.tea"
   ## @:fd.lineNum = 3
   ## @:fd.numLines = 2
-  ## @:fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]"""
+  ## @:fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]
   ## @:~~~~
   tMapParameters("functionDetails", "pd")
   let functionSpec = map["a"].funcv
@@ -2683,9 +2683,14 @@ func fun_readJson_sa*(variables: Variables, arguments: seq[Value]): FunResult =
     return newFunResultWarn(valueOr.message)
   result = newFunResult(valueOr.value)
 
-
-# Map a built-in function name to a function pointer.
-var functionsDict = newTable[string, FunctionPtr]()
+# todo: start with a list of function pointers and build the dict from that.
+# functionPtrs = [fun_add_fff, ...]
+# for functionPtr in functionPtrs:
+#   let name = getName(functionPtr)
+#   functionsDict[name] = functionPtr
+  
+var functionsDict* = newTable[string, FunctionPtr]()
+  ## Maps a built-in function name to a function pointer you can call.
 functionsDict["fun_add_fff"] = fun_add_fff
 functionsDict["fun_add_iii"] = fun_add_iii
 functionsDict["fun_and_bbb"] = fun_and_bbb
@@ -2764,106 +2769,28 @@ type
   BuiltInInfo* = object
     ## The built-in function information.
     ## @:
-    ## @:* name -- the function name
-    ## @:* functionPtr -- the pointer to the function for calling it
-    ## @:* signatureCode -- the single letters signature code
+    ## @:* funcName -- the function name in the nim file, e.g.: fun_add_ii
     ## @:* docComment -- the function documentation
     ## @:* lineNum -- the function's starting line in the functions.nim file
     ## @:* numLines -- the number of function code lines
-    name*: string
-    functionPtr*: FunctionPtr
-    signatureCode*: string
+    funcName*: string
     docComment*: string
     lineNum*: LineNumber
     numLines*: Natural
 
 func newBuiltInInfo*(
-    name: string,
-    signatureCode: string,
+    funcName: string,
     docComment: string,
     lineNum: LineNumber,
     numLines: Natural
   ): BuiltInInfo =
-  # let funName = name & signatureCode
-  result = BuiltInInfo(name: name, signatureCode: signatureCode,
-    docComment: docComment, lineNum: lineNum, numLines: numLines)
+  ## Return a BuiltInInfo object.
+  result = BuiltInInfo(funcName: funcName, docComment: docComment,
+    lineNum: lineNum, numLines: numLines)
 
-const
-  functionsList* = [
-    newBuiltInInfo("add", "fff", "", 1, 10),
-    newBuiltInInfo("add", "iii", "", 1, 10),
-    newBuiltInInfo("and", "bbb", "", 1, 10),
-    newBuiltInInfo("bool", "ab", "", 1, 10),
-    newBuiltInInfo("case", "iloaa", "", 1, 10),
-    newBuiltInInfo("case", "sloaa", "", 1, 10),
-    newBuiltInInfo("cmp", "ffi", "", 1, 10),
-    newBuiltInInfo("cmp", "iii", "", 1, 10),
-    newBuiltInInfo("cmp", "ssobi", "", 1, 10),
-    newBuiltInInfo("cmpVersion", "ssi", "", 1, 10),
-    newBuiltInInfo("concat", "sss", "", 1, 10),
-    newBuiltInInfo("dict", "old", "", 1, 10),
-    newBuiltInInfo("dup", "sis", "", 1, 10),
-    newBuiltInInfo("eq", "ffb", "", 1, 10),
-    newBuiltInInfo("eq", "iib", "", 1, 10),
-    newBuiltInInfo("eq", "ssb", "", 1, 10),
-    newBuiltInInfo("exists", "dsb", "", 1, 10),
-    newBuiltInInfo("find", "ssoaa", "", 1, 10),
-    newBuiltInInfo("float", "if", "", 1, 10),
-    newBuiltInInfo("float", "saa", "", 1, 10),
-    newBuiltInInfo("float", "sf", "", 1, 10),
-    newBuiltInInfo("format", "ss", "", 1, 10),
-    newBuiltInInfo("func", "sp", "", 1, 10),
-    newBuiltInInfo("functionDetails", "pd", "", 1, 10),
-    newBuiltInInfo("get", "dsoaa", "", 1, 10),
-    newBuiltInInfo("get", "lioaa", "", 1, 10),
-    newBuiltInInfo("githubAnchor", "ll", "", 1, 10),
-    newBuiltInInfo("githubAnchor", "ss", "", 1, 10),
-    newBuiltInInfo("gt", "ffb", "", 1, 10),
-    newBuiltInInfo("gt", "iib", "", 1, 10),
-    newBuiltInInfo("gte", "ffb", "", 1, 10),
-    newBuiltInInfo("gte", "iib", "", 1, 10),
-    newBuiltInInfo("if", "baoaa", "", 1, 10),
-    newBuiltInInfo("if0", "iaoaa", "", 1, 10),
-    newBuiltInInfo("int", "fosi", "", 1, 10),
-    newBuiltInInfo("int", "sosi", "", 1, 10),
-    newBuiltInInfo("int", "ssaa", "", 1, 10),
-    newBuiltInInfo("join", "lsois", "", 1, 10),
-    newBuiltInInfo("joinPath", "loss", "", 1, 10),
-    newBuiltInInfo("keys", "dl", "", 1, 10),
-    newBuiltInInfo("len", "di", "", 1, 10),
-    newBuiltInInfo("len", "li", "", 1, 10),
-    newBuiltInInfo("len", "si", "", 1, 10),
-    newBuiltInInfo("list", "al", "", 1, 10),
-    newBuiltInInfo("listLoop", "lpoal", "", 1, 10),
-    newBuiltInInfo("log", "ss", "", 1, 10),
-    newBuiltInInfo("lower", "ss", "", 1, 10),
-    newBuiltInInfo("lt", "ffb", "", 1, 10),
-    newBuiltInInfo("lt", "iib", "", 1, 10),
-    newBuiltInInfo("lte", "ffb", "", 1, 10),
-    newBuiltInInfo("lte", "iib", "", 1, 10),
-    newBuiltInInfo("ne", "ffb", "", 1, 10),
-    newBuiltInInfo("ne", "iib", "", 1, 10),
-    newBuiltInInfo("ne", "ssb", "", 1, 10),
-    newBuiltInInfo("not", "bb", "", 1, 10),
-    newBuiltInInfo("or", "bbb", "", 1, 10),
-    newBuiltInInfo("path", "sosd", "", 1, 10),
-    newBuiltInInfo("readJson", "sa", "", 1, 10),
-    newBuiltInInfo("replace", "siiss", "", 1, 10),
-    newBuiltInInfo("replaceRe", "sls", "", 1, 10),
-    newBuiltInInfo("return", "aa", "", 1, 10),
-    newBuiltInInfo("slice", "siois", "", 1, 10),
-    newBuiltInInfo("sort", "lsosl", "", 1, 10),
-    newBuiltInInfo("sort", "lssil", "", 1, 10),
-    newBuiltInInfo("sort", "lsssl", "", 1, 10),
-    newBuiltInInfo("startsWith", "ssb", "", 1, 10),
-    newBuiltInInfo("string", "aoss", "", 1, 10),
-    newBuiltInInfo("string", "sds", "", 1, 10),
-    newBuiltInInfo("type", "as", "", 1, 10),
-    newBuiltInInfo("values", "dl", "", 1, 10),
-    newBuiltInInfo("warn", "ss", "", 1, 10),
-  ]
-    ## Sorted list of built in functions, their function name, nim
-    ## name and their signature.
+# Include the dynamically generated functions list file.
+include dynamicFuncList
+
 
 proc getBestFunction*(funcValue: Value, arguments: seq[Value]): ValueOr =
   ## Given a function variable or a list of function variables and a
@@ -2918,6 +2845,14 @@ proc getBestFunction*(funcValue: Value, arguments: seq[Value]): ValueOr =
     # parameters.
     result = newValueOr(maxFuncValue)
 
+func splitFuncName*(funcName: string): (string, string) =
+  ## Split a funcName like "fun_cmp_ffi" to its name and signature like:
+  ## "cmp" and "ffi".
+  let parts = funcName.split('_')
+  assert parts.len == 3
+  assert parts[0] == "fun"
+  result = (parts[1], parts[2])
+
 proc makeFuncDictionary*(): VarsDict =
   ## Create the f dictionary from the built in functions.
 
@@ -2931,26 +2866,29 @@ proc makeFuncDictionary*(): VarsDict =
 
   var funcList = newEmptyListValue()
   var lastName = ""
+  assert functionsDict.len == functionsList.len
+
   for bii in functionsList:
-    let signatureO = newSignatureO(bii.name, bii.signatureCode)
+    let (name, signatureCode) = splitFuncName(bii.funcName)
+    let signatureO = newSignatureO(name, signatureCode)
 
     let builtIn = true
     let filename = "functions.nim"
     var statementLines = newSeq[Statement]()
-    let functionName = "fun_$1_$2" % [bii.name, bii.signatureCode]
+    let functionName = "fun_$1_$2" % [name, signatureCode]
     let functionPtr = functionsDict[functionName]
     let function = newFunc(builtIn, signatureO.get(), bii.docComment, filename,
       bii.lineNum, bii.numLines, statementLines, functionPtr)
 
     let funcValue = newValue(function)
-    if bii.name == lastName:
+    if name == lastName:
       funcList.listv.add(funcValue)
     else:
       if lastName != "":
         result[lastName] = funcList
       funcList = newEmptyListValue()
       funcList.listv.add(funcValue)
-      lastName = bii.name
+      lastName = name
 
   if funcList.listv.len > 0:
     result[lastName] = funcList
