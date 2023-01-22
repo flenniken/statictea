@@ -623,6 +623,52 @@ func fun_add_fff*(variables: Variables, arguments: seq[Value]): FunResult =
     # Overflow or underflow.
     result = newFunResultWarn(wOverflow)
 
+func fun_sub_iii*(variables: Variables, arguments: seq[Value]): FunResult =
+  ## Subtract two integers. A warning is generated on overflow.
+  ## @:
+  ## @:~~~
+  ## @:sub(a: int, b: int) int
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:sub(3, 1) => 2
+  ## @:add(3, -2) => 5
+  ## @:add(1, 5) => -4
+  ## @:~~~~
+
+  tMapParameters("sub", "iii")
+  let a = map["a"].intv
+  let b = map["b"].intv
+  try:
+    result = newFunResult(newValue(a - b))
+  except:
+    result = newFunResultWarn(wOverflow)
+
+func fun_sub_fff*(variables: Variables, arguments: seq[Value]): FunResult =
+  ## Sub two floats. A warning is generated on overflow.
+  ## @:
+  ## @:~~~
+  ## @:sub(a: float, b: float) float
+  ## @:~~~~
+  ## @:
+  ## @:Examples:
+  ## @:
+  ## @:~~~
+  ## @:sub(4.5, 2.3) => 2.2
+  ## @:sub(1.0, 2.2) => -1.2
+  ## @:~~~~
+
+  tMapParameters("sub", "fff")
+  let a = map["a"].floatv
+  let b = map["b"].floatv
+  try:
+    result = newFunResult(newValue(a - b))
+  except:
+    # Overflow or underflow.
+    result = newFunResultWarn(wOverflow)
+
 {.pop.}
 
 func fun_exists_dsb*(variables: Variables, arguments: seq[Value]): FunResult =
@@ -2759,6 +2805,8 @@ functionsDict["fun_sort_lsssl"] = fun_sort_lsssl
 functionsDict["fun_startsWith_ssb"] = fun_startsWith_ssb
 functionsDict["fun_string_aoss"] = fun_string_aoss
 functionsDict["fun_string_sds"] = fun_string_sds
+functionsDict["fun_sub_iii"] = fun_sub_iii
+functionsDict["fun_sub_fff"] = fun_sub_fff
 functionsDict["fun_type_as"] = fun_type_as
 functionsDict["fun_values_dl"] = fun_values_dl
 functionsDict["fun_warn_ss"] = fun_warn_ss

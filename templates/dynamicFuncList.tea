@@ -1,6 +1,21 @@
 # Statictea code file for functionsList.nim template.
 
-get-entry = func("get-entry(ix: int, entry: dict, newList: list, patterns: list) bool")
+get-starts = func("get-starts(ix: int, entry: dict, newList: list, state: dict) bool")
+  ## Collect the start line followed by the number of lines to the next start line.
+  start = entry.line
+
+  next-entry = get(state.entries, add(ix,1), dict())
+  next = get(next-entry, "line", 100)
+
+  newList &= string(start)
+  newList &= sub(next, start)
+  return(false)
+
+# Make a dictionary mapping a start line to its the number of lines.
+alist = listLoop(s.entries, l.get-starts, s)
+starts = dict(alist)
+
+get-entry = func("get-entry(ix: int, entry: dict, newList: list, state: dict) bool")
   ## Add the Statictea functions to the new list.
 
   # Add entries that are functions that begin with "fun_", skip the
@@ -13,10 +28,10 @@ get-entry = func("get-entry(ix: int, entry: dict, newList: list, patterns: list)
 
   # Remove the formatting from the description.
   desc = get(entry, "description", "")
-  newEntry.docComment = replaceRe(desc, patterns)
+  newEntry.docComment = replaceRe(desc, state.patterns)
 
   newEntry.lineNum = entry.line
-  newEntry.numLines = 10
+  newEntry.numLines = state.starts[string(entry.line)]
   newList &= newEntry
   return(false)
 
@@ -38,7 +53,10 @@ patterns = list( +
   "&amp;", "&")
 
 # Create a list of the statictea functions.
-entries = listLoop(s.entries, l.get-entry, patterns)
+state = dict()
+state.patterns = patterns
+state.starts = starts
+entries = listLoop(s.entries, l.get-entry, state)
 
 # Sort the entries by function name. Use insensitive compare so
 # function cmp_ comes before cmpV.

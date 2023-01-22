@@ -1077,7 +1077,7 @@ task cdy, "\tCreate dynamicFuncList.nim from functions.nim.":
   let server = "docs/functions.json"
   let tFile = "templates/dynamicFuncList.nim"
   let teaFile = "templates/dynamicFuncList.tea"
-  let result = "src/dynamicFuncList.nim"
+  let result = "src/dynamicFuncList.nim.tmp"
 
   # Build the functions.json file.
   echo fmt"make {server}"
@@ -1085,7 +1085,7 @@ task cdy, "\tCreate dynamicFuncList.nim from functions.nim.":
 
   # Build the dynamicFuncList.nim file.
   echo fmt"make {result}"
-  let cmd = fmt"{statictea} -s {server} -t {tFile} -o {teaFile} -r {result}"
+  let cmd = fmt"{statictea} -l t.txt -s {server} -t {tFile} -o {teaFile} -r {result}"
   exec cmd
 
   echo fmt"Build statictea release version again using the new function list."

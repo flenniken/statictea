@@ -2690,6 +2690,8 @@ List of functions:
 - [[#startsWith][startsWith]] -- Check whether a strings starts with the given prefix.
 - [[#string][string]] -- Convert a variable to a string.
 - [[#string][string]] -- Convert the dictionary variable to dot names.
+- [[#sub][sub]] -- Sub two floats.
+- [[#sub][sub]] -- Subtract two integers.
 - [[#type][type]] -- Return the parameter type, one of: int, float, string, list, dict, bool or func.
 - [[#values][values]] -- Create a list out of the values in the specified dictionary.
 - [[#warn][warn]] -- Return a warning message and skip the current statement.
@@ -4548,6 +4550,47 @@ string("teas", d) =>
 teas.x = 1
 teas.y = "tea"
 teas.z.a = 8
+#+END_SRC
+
+[[#contents][茶]]
+
+** sub
+:PROPERTIES:
+:CUSTOM_ID: sub
+:END:
+
+Sub two floats. A warning is generated on overflow.
+
+#+BEGIN_SRC
+sub(a: float, b: float) float
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+sub(4.5, 2.3) => 2.2
+sub(1.0, 2.2) => -1.2
+#+END_SRC
+
+[[#contents][茶]]
+
+** sub
+:PROPERTIES:
+:CUSTOM_ID: sub
+:END:
+
+Subtract two integers. A warning is generated on overflow.
+
+#+BEGIN_SRC
+sub(a: int, b: int) int
+#+END_SRC
+
+Examples:
+
+#+BEGIN_SRC
+sub(3, 1) => 2
+add(3, -2) => 5
+add(1, 5) => -4
 #+END_SRC
 
 [[#contents][茶]]

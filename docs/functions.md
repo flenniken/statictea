@@ -29,6 +29,8 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [fun_if_baoaa](#fun_if_baoaa) &mdash; If the condition is true, return the second argument, else return the third argument.
 * [fun_add_iii](#fun_add_iii) &mdash; Add two integers.
 * [fun_add_fff](#fun_add_fff) &mdash; Add two floats.
+* [fun_sub_iii](#fun_sub_iii) &mdash; Subtract two integers.
+* [fun_sub_fff](#fun_sub_fff) &mdash; Sub two floats.
 * [fun_exists_dsb](#fun_exists_dsb) &mdash; Determine whether a key exists in a dictionary.
 * [fun_case_iloaa](#fun_case_iloaa) &mdash; Compare integer cases and return the matching value.
 * [fun_case_sloaa](#fun_case_sloaa) &mdash; Compare string cases and return the matching value.
@@ -524,6 +526,45 @@ add(3.2, -2.2) => 1.0
 
 ```nim
 func fun_add_fff(variables: Variables; arguments: seq[Value]): FunResult
+```
+
+# fun_sub_iii
+
+Subtract two integers. A warning is generated on overflow.
+
+~~~
+sub(a: int, b: int) int
+~~~
+
+Examples:
+
+~~~
+sub(3, 1) => 2
+add(3, -2) => 5
+add(1, 5) => -4
+~~~
+
+```nim
+func fun_sub_iii(variables: Variables; arguments: seq[Value]): FunResult
+```
+
+# fun_sub_fff
+
+Sub two floats. A warning is generated on overflow.
+
+~~~
+sub(a: float, b: float) float
+~~~
+
+Examples:
+
+~~~
+sub(4.5, 2.3) => 2.2
+sub(1.0, 2.2) => -1.2
+~~~
+
+```nim
+func fun_sub_fff(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # fun_exists_dsb
@@ -2145,7 +2186,7 @@ add(1.5, 2.3) => 3.8
 add(3.2, -2.2) => 1.0
 ~~~
 """,
-                  lineNum: 603, numLines: 10), (funcName: "fun_add_iii", docComment: """Add two integers. A warning is generated on overflow.
+                  lineNum: 603, numLines: 23), (funcName: "fun_add_iii", docComment: """Add two integers. A warning is generated on overflow.
 
 ~~~
 add(a: int, b: int) int
@@ -2159,7 +2200,7 @@ add(3, -2) => 1
 add(-2, -5) => -7
 ~~~
 """,
-    lineNum: 580, numLines: 10), (funcName: "fun_and_bbb", docComment: """Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
+    lineNum: 580, numLines: 23), (funcName: "fun_and_bbb", docComment: """Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
 
 ~~~
 and(a: bool, b: bool) bool
@@ -2175,7 +2216,7 @@ and(false, false) => false
 and(false, warn("not hit")) => false
 ~~~
 """,
-                                  lineNum: 2342, numLines: 10), (
+                                  lineNum: 2388, numLines: 26), (
     funcName: "fun_bool_ab", docComment: """Create an bool from a value.
 
 ~~~
@@ -2208,7 +2249,7 @@ bool("tea") => true
 bool(dict("tea", 2)) => true
 ~~~
 """,
-    lineNum: 1038, numLines: 10), (funcName: "fun_case_iloaa", docComment: """Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
+    lineNum: 1084, numLines: 37), (funcName: "fun_case_iloaa", docComment: """Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -2235,7 +2276,7 @@ case(2, cases, "wine") => "beer"
 case(3, cases, "wine") => "wine"
 ~~~
 """,
-                                   lineNum: 683, numLines: 10), (
+                                   lineNum: 729, numLines: 33), (
     funcName: "fun_case_sloaa", docComment: """Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
 
 The first element of a case pair is the condition and the
@@ -2262,7 +2303,7 @@ case("beer", cases) => "cold"
 case("bunch", cases, "other") => "other"
 ~~~
 """,
-    lineNum: 716, numLines: 10), (funcName: "fun_cmp_ffi", docComment: """Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
+    lineNum: 762, numLines: 32), (funcName: "fun_cmp_ffi", docComment: """Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
 
 ~~~
 cmp(a: float, b: float) int
@@ -2276,7 +2317,7 @@ cmp(8.4, 8.4) => 0
 cmp(9.3, 2.2) => 1
 ~~~
 """,
-                                  lineNum: 258, numLines: 10), (
+                                  lineNum: 258, numLines: 21), (
     funcName: "fun_cmp_iii", docComment: """Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
 
 ~~~
@@ -2291,7 +2332,7 @@ cmp(8, 8) => 0
 cmp(9, 2) => 1
 ~~~
 """,
-    lineNum: 237, numLines: 10), (funcName: "fun_cmp_ssobi", docComment: """Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
+    lineNum: 237, numLines: 21), (funcName: "fun_cmp_ssobi", docComment: """Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
 
 You have the option to compare case insensitive. Case sensitive
 is the default.
@@ -2310,7 +2351,7 @@ cmp("Tea", "tea", true) => 1
 cmp("Tea", "tea", false) => 0
 ~~~
 """,
-                                  lineNum: 279, numLines: 10), (
+                                  lineNum: 279, numLines: 33), (
     funcName: "fun_cmpVersion_ssi", docComment: """Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
 
 ~~~
@@ -2329,7 +2370,7 @@ cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
 ~~~
 """,
-    lineNum: 760, numLines: 10), (funcName: "fun_concat_sss", docComment: """Concatentate two strings. See [[#join][join]] for more that two arguments.
+    lineNum: 806, numLines: 44), (funcName: "fun_concat_sss", docComment: """Concatentate two strings. See [[#join][join]] for more that two arguments.
 
 ~~~
 concat(a: string, b: string) string
@@ -2342,7 +2383,7 @@ concat("tea", " time") => "tea time"
 concat("a", "b") => "ab"
 ~~~
 """,
-                                  lineNum: 312, numLines: 10), (
+                                  lineNum: 312, numLines: 19), (
     funcName: "fun_dict_old", docComment: """Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
 
 ~~~

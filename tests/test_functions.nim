@@ -335,6 +335,12 @@ suite "functions.nim":
     let eFunResult = newFunResult(newValue("hi"))
     check testFunction("get", arguments, eFunResult)
 
+  test "get dict default int":
+    var dict = newValue([("a", 1), ("b", 2)])
+    var arguments = @[dict, newValue("t"), newValue(3)]
+    let eFunResult = newFunResult(newValue(3))
+    check testFunction("get", arguments, eFunResult)
+
   test "get dict item missing":
     var dict = newValue([("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5)])
     var arguments = @[dict, newValue("p")]
@@ -484,6 +490,11 @@ suite "functions.nim":
     let eFunResult = newFunResult(newValue(3))
     check testFunction("add", arguments, eFunResult)
 
+  test "sub 3 - 1":
+    var arguments = @[newValue(3), newValue(1)]
+    let eFunResult = newFunResult(newValue(2))
+    check testFunction("sub", arguments, eFunResult)
+
   test "add 1 - 4":
     var arguments = @[newValue(1), newValue(-4)]
     let eFunResult = newFunResult(newValue(-3))
@@ -493,6 +504,11 @@ suite "functions.nim":
     var arguments = @[newValue(1.5), newValue(2.3)]
     let eFunResult = newFunResult(newValue(3.8))
     check testFunction("add", arguments, eFunResult)
+
+  test "sub 2.3 - 1.0":
+    var arguments = @[newValue(2.3), newValue(1.0)]
+    let eFunResult = newFunResult(newValue(1.3))
+    check testFunction("sub", arguments, eFunResult)
 
   test "add 3.3 - 2.2 = 1.1":
     var arguments = @[newValue(3.5), newValue(-2.5)]
