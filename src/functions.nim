@@ -2814,33 +2814,28 @@ functionsDict["fun_values_dl"] = fun_values_dl
 functionsDict["fun_warn_ss"] = fun_warn_ss
 
 type
-  LineNumber = range[1 .. high(int)]
-
   BuiltInInfo* = object
     ## The built-in function information.
     ## @:
     ## @:* funcName -- the function name in the nim file, e.g.: fun_add_ii
     ## @:* docComment -- the function documentation
-    ## @:* lineNum -- the function's starting line in the functions.nim file
     ## @:* numLines -- the number of function code lines
     funcName*: string
     docComment*: string
-    lineNum*: LineNumber
     numLines*: Natural
 
 func newBuiltInInfo*(
     funcName: string,
     docComment: string,
-    lineNum: LineNumber,
     numLines: Natural
   ): BuiltInInfo =
   ## Return a BuiltInInfo object.
   result = BuiltInInfo(funcName: funcName, docComment: docComment,
-    lineNum: lineNum, numLines: numLines)
+    numLines: numLines)
 
 # Include the dynamically generated functions list file.
+# Define two lists: functionsList and functionStarts.
 include dynamicFuncList
-
 
 proc getBestFunction*(funcValue: Value, arguments: seq[Value]): ValueOr =
   ## Given a function variable or a list of function variables and a
@@ -2917,8 +2912,9 @@ proc makeFuncDictionary*(): VarsDict =
   var funcList = newEmptyListValue()
   var lastName = ""
   assert functionsDict.len == functionsList.len
+  assert functionsDict.len == functionStarts.len
 
-  for bii in functionsList:
+  for ix, bii in functionsList:
     let (name, signatureCode) = splitFuncName(bii.funcName)
     let signatureO = newSignatureO(name, signatureCode)
 
@@ -2927,8 +2923,9 @@ proc makeFuncDictionary*(): VarsDict =
     var statementLines = newSeq[Statement]()
     let functionName = "fun_$1_$2" % [name, signatureCode]
     let functionPtr = functionsDict[functionName]
+    let lineNum = functionStarts[ix]
     let function = newFunc(builtIn, signatureO.get(), bii.docComment, filename,
-      bii.lineNum, bii.numLines, statementLines, functionPtr)
+      lineNum, bii.numLines, statementLines, functionPtr)
 
     let funcValue = newValue(function)
     if name == lastName:

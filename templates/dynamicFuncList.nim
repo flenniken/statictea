@@ -1,7 +1,7 @@
 #$ # Statictea template for src/functionsList.nim
 #$ #
 # This file is auto generated from functions.nim doc comments using
-# statictea.
+# the statictea template templates/dynamicFuncList.nim.
 
 const
 #$ # Define all the doc comments. Use prefix dc_ followed by the
@@ -18,11 +18,11 @@ const
 #$ # List all the functions.
 #$ #
 #$ # Example line:
-#$ # info("fun_add_fff", dc_add_fff, 1, 10),
+#$ # info("fun_add_fff", dc_add_fff, 10),
 #$ #
 #$ block t.repeat = len(o.entries)
 #$ : entry = o.entries[t.row]
-    info("{entry.funcName}", dc_{entry.funcName}, {entry.lineNum}, {entry.numLines}),
+    info("{entry.funcName}", dc_{entry.funcName}, {entry.numLines}),
 #$ endblock
   ]
     ## Dynamically generated sorted list of built-in functions. Each
@@ -30,3 +30,11 @@ const
     ## starting line number and the number of lines in the function.
     ## See templates/dynamicFuncList.nim
     
+  functionStarts* = [
+#$ # Make a list of all the function start lines.
+#$ nextline t.repeat = len(o.entries)
+#$ : entry = o.entries[t.row]
+    {entry.lineNum},
+  ]
+    ## Dynamically generated array of starting line numbers for each
+    ## built-in function in the functions.nim file.

@@ -96,6 +96,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * type: [BuiltInInfo](#builtininfo) &mdash; The built-in function information.
 * [newBuiltInInfo](#newbuiltininfo) &mdash; Return a BuiltInInfo object.
 * const: [functionsList](#functionslist) &mdash; Dynamically generated sorted list of built-in functions.
+* const: [functionStarts](#functionstarts) &mdash; Dynamically generated array of starting line numbers for each built-in function in the functions.
 * [getBestFunction](#getbestfunction) &mdash; Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
 * [splitFuncName](#splitfuncname) &mdash; Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".
 * [makeFuncDictionary](#makefuncdictionary) &mdash; Create the f dictionary from the built in functions.
@@ -2149,14 +2150,12 @@ The built-in function information.
 
 * funcName -- the function name in the nim file, e.g.: fun_add_ii
 * docComment -- the function documentation
-* lineNum -- the function's starting line in the functions.nim file
 * numLines -- the number of function code lines
 
 ```nim
 BuiltInInfo = object
   funcName*: string
   docComment*: string
-  lineNum*: LineNumber
   numLines*: Natural
 
 ```
@@ -2166,8 +2165,7 @@ BuiltInInfo = object
 Return a BuiltInInfo object.
 
 ```nim
-func newBuiltInInfo(funcName: string; docComment: string; lineNum: LineNumber;
-                    numLines: Natural): BuiltInInfo
+func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): BuiltInInfo
 ```
 
 # functionsList
@@ -2188,7 +2186,7 @@ add(1.5, 2.3) => 3.8
 add(3.2, -2.2) => 1.0
 ~~~
 """,
-                  lineNum: 603, numLines: 23), (funcName: "fun_add_iii", docComment: """Add two integers. A warning is generated on overflow.
+                  numLines: 23), (funcName: "fun_add_iii", docComment: """Add two integers. A warning is generated on overflow.
 
 ~~~
 add(a: int, b: int) int
@@ -2202,7 +2200,7 @@ add(3, -2) => 1
 add(-2, -5) => -7
 ~~~
 """,
-    lineNum: 580, numLines: 23), (funcName: "fun_and_bbb", docComment: """Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
+                                  numLines: 23), (funcName: "fun_and_bbb", docComment: """Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
 
 ~~~
 and(a: bool, b: bool) bool
@@ -2218,8 +2216,7 @@ and(false, false) => false
 and(false, warn("not hit")) => false
 ~~~
 """,
-                                  lineNum: 2388, numLines: 26), (
-    funcName: "fun_bool_ab", docComment: """Create an bool from a value.
+    numLines: 26), (funcName: "fun_bool_ab", docComment: """Create an bool from a value.
 
 ~~~
 bool(value: Value) bool
@@ -2251,7 +2248,7 @@ bool("tea") => true
 bool(dict("tea", 2)) => true
 ~~~
 """,
-    lineNum: 1084, numLines: 37), (funcName: "fun_case_iloaa", docComment: """Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
+                    numLines: 37), (funcName: "fun_case_iloaa", docComment: """Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -2278,8 +2275,7 @@ case(2, cases, "wine") => "beer"
 case(3, cases, "wine") => "wine"
 ~~~
 """,
-                                   lineNum: 729, numLines: 33), (
-    funcName: "fun_case_sloaa", docComment: """Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
+                                    numLines: 33), (funcName: "fun_case_sloaa", docComment: """Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -2305,7 +2301,7 @@ case("beer", cases) => "cold"
 case("bunch", cases, "other") => "other"
 ~~~
 """,
-    lineNum: 762, numLines: 32), (funcName: "fun_cmp_ffi", docComment: """Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
+    numLines: 32), (funcName: "fun_cmp_ffi", docComment: """Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
 
 ~~~
 cmp(a: float, b: float) int
@@ -2319,8 +2315,7 @@ cmp(8.4, 8.4) => 0
 cmp(9.3, 2.2) => 1
 ~~~
 """,
-                                  lineNum: 258, numLines: 21), (
-    funcName: "fun_cmp_iii", docComment: """Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
+                    numLines: 21), (funcName: "fun_cmp_iii", docComment: """Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
 
 ~~~
 cmp(a: int, b: int) int
@@ -2334,7 +2329,7 @@ cmp(8, 8) => 0
 cmp(9, 2) => 1
 ~~~
 """,
-    lineNum: 237, numLines: 21), (funcName: "fun_cmp_ssobi", docComment: """Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
+                                    numLines: 21), (funcName: "fun_cmp_ssobi", docComment: """Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
 
 You have the option to compare case insensitive. Case sensitive
 is the default.
@@ -2353,8 +2348,7 @@ cmp("Tea", "tea", true) => 1
 cmp("Tea", "tea", false) => 0
 ~~~
 """,
-                                  lineNum: 279, numLines: 33), (
-    funcName: "fun_cmpVersion_ssi", docComment: """Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
+    numLines: 33), (funcName: "fun_cmpVersion_ssi", docComment: """Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
 
 ~~~
 cmpVersion(versionA: string, versionB: string) int
@@ -2372,7 +2366,7 @@ cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
 ~~~
 """,
-    lineNum: 806, numLines: 44), (funcName: "fun_concat_sss", docComment: """Concatentate two strings. See [[#join][join]] for more that two arguments.
+                    numLines: 44), (funcName: "fun_concat_sss", docComment: """Concatentate two strings. See [[#join][join]] for more that two arguments.
 
 ~~~
 concat(a: string, b: string) string
@@ -2385,8 +2379,7 @@ concat("tea", " time") => "tea time"
 concat("a", "b") => "ab"
 ~~~
 """,
-                                  lineNum: 312, numLines: 19), (
-    funcName: "fun_dict_old", docComment: """Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
+                                    numLines: 19), (funcName: "fun_dict_old", docComment: """Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
 
 ~~~
 dict(pairs: optional list) dict
@@ -2396,6 +2389,20 @@ Examples:
 
 ~~~
 dict() =>
+```
+
+# functionStarts
+
+Dynamically generated array of starting line numbers for each built-in function in the functions.nim file.
+
+```nim
+functionStarts = [603, 580, 2390, 1084, 729, 762, 258, 237, 279, 806, 312, 1233,
+                  1194, 2461, 2442, 2480, 674, 1121, 850, 893, 867, 2259, 2293,
+                  2314, 429, 387, 1853, 1819, 2576, 2557, 2614, 2595, 467, 533,
+                  948, 983, 1025, 1988, 1947, 1581, 368, 349, 331, 1269, 1291,
+                  2066, 1562, 2652, 2633, 2691, 2671, 2519, 2500, 2538, 2372,
+                  2416, 1507, 2711, 1338, 1448, 2098, 1159, 1728, 1761, 1790,
+                  2349, 2149, 2235, 649, 626, 1894, 1605, 2033]
 ```
 
 # getBestFunction
