@@ -73,13 +73,12 @@ type
       funcv*: FunctionSpec
 
   Statement* = object
-    ## A Statement object stores the statement text and where it
-    ## @:starts in the template file.
+    ## Statement object stores the statement text, the line number and its line ending.
     ## @:
     ## @:* text -- a line containing a statement without the line ending
-    ## @:* lineNum -- line number in the file starting at 1 where the
+    ## @:* lineNum -- line number in the file where the statement starts (the first line is 1)
     ## @:statement starts.
-    ## @:* ending -- the line ending, either \n or \r\n
+    ## @:* ending -- the line ending, either linefeed (\\n) or carriage return and linefeed (\\r\\n).
     text*: string
     lineNum*: Natural
     ending*: string
@@ -163,8 +162,10 @@ type
 
   FunResult* = object
     ## Contains the result of calling a function, either a value or a
-    ## warning. The parameter field is the index of the problem
-    ## argument or -1 to point at the function itself.
+    ## warning.
+    ## @:
+    ## @:The parameter field is the index of the problem argument or
+    ## @:-1 to point at the function itself.
     case kind*: FunResultKind
       of frValue:
         value*: Value
@@ -176,10 +177,10 @@ type
     ## The kind of side effect for a statement.
     ## @:
     ## @:* seNone -- no side effect, the normal case
-    ## @:* seReturn -- a return side effect, either stop or skip. stop
-    ## @:the command or skip the replacement block iteration.
-    ## @:* seLogMessage -- the log function specified to write a message to the log file
-    ## @:* seBareIfIgnore -- the bare IF was false, ignore the statement
+    ## @:* seReturn -- the return function; stop the command and
+    ## @:either skip the replacement block or stop iterating.
+    ## @:* seLogMessage -- the log function; write a message to the log file
+    ## @:* seBareIfIgnore -- the bare IF function was false, ignore the statement
     seNone = "none",
     seReturn = "return",
     seLogMessage = "log",

@@ -15,8 +15,7 @@ StaticTea variable types.
 * type: [ValueKind](#valuekind) &mdash; The statictea variable types.
 * type: [Value](#value) &mdash; A variable's value reference.
 * type: [ValueOr](#valueor) &mdash; A Value object or a warning.
-* type: [Statement](#statement) &mdash; A Statement object stores the statement text and where it
-starts in the template file.
+* type: [Statement](#statement) &mdash; Statement object stores the statement text, the line number and its line ending.
 * type: [FunctionPtr](#functionptr) &mdash; Signature of a statictea built in function.
 * type: [ParamCode](#paramcode) &mdash; Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.
 * type: [ParamType](#paramtype) &mdash; The statictea parameter types.
@@ -178,13 +177,12 @@ ValueOr = OpResultWarn[Value]
 
 # Statement
 
-A Statement object stores the statement text and where it
-starts in the template file.
+Statement object stores the statement text, the line number and its line ending.
 
 * text -- a line containing a statement without the line ending
-* lineNum -- line number in the file starting at 1 where the
+* lineNum -- line number in the file where the statement starts (the first line is 1)
 statement starts.
-* ending -- the line ending, either n or rn
+* ending -- the line ending, either linefeed (\n) or carriage return and linefeed (\r\n).
 
 ```nim
 Statement = object
@@ -305,7 +303,10 @@ FunResultKind = enum
 
 # FunResult
 
-Contains the result of calling a function, either a value or a warning. The parameter field is the index of the problem argument or -1 to point at the function itself.
+Contains the result of calling a function, either a value or a warning.
+
+The parameter field is the index of the problem argument or
+-1 to point at the function itself.
 
 ```nim
 FunResult = object
@@ -325,10 +326,10 @@ FunResult = object
 The kind of side effect for a statement.
 
 * seNone -- no side effect, the normal case
-* seReturn -- a return side effect, either stop or skip. stop
-the command or skip the replacement block iteration.
-* seLogMessage -- the log function specified to write a message to the log file
-* seBareIfIgnore -- the bare IF was false, ignore the statement
+* seReturn -- the return function; stop the command and
+either skip the replacement block or stop iterating.
+* seLogMessage -- the log function; write a message to the log file
+* seBareIfIgnore -- the bare IF function was false, ignore the statement
 
 ```nim
 SideEffect = enum

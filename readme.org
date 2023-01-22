@@ -614,14 +614,7 @@ You can append a new variable to a list or dictionary but you
 cannot change an existing variable.
 
 A dot name is a fully qualified variable name where variables are
-connected with dots.
-
-You can combine up to five variable names together to make a dot
-name. For example:
-
-#+BEGIN_SRC
-s.tea.black.earlgrey.vanilla
-#+END_SRC
+connected with dots. It is limited to 64 characters.
 
 You can leave off the “l” prefix from your non-function local
 variables, they are assumed to be in the local dictionary.
@@ -2316,15 +2309,14 @@ following process:
 
 1. create a json file from the doc comments at the top of all the source files
 2. format the json as markdown using the
-   [[templates/nimModuleIndex.md][nimModuleIndex.md]] statictea
-   template and the [[templates/nimModule.tea][nimModule.tea]]
-   code file. Click the link then "View Raw".
+   [[templates/nimModuleIndex.md][nimModuleIndex.md]] statictea template. Click the link then "View Raw".
 
 The nimble *docs* task builds the module markdown files by running
 the following process for each module:
 
 1. create a json file of a module's docs using nim's jsondoc command
-2. format the json as markdown using the [[templates/nimModule.md][nimModule.md]] statictea template
+2. format the json as markdown using the [[templates/nimModule.md][nimModule.md]] and the [[templates/nimModule.tea][nimModule.tea]]
+   statictea files.
 
 [[#contents][茶]]
 
