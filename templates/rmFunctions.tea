@@ -1,0 +1,52 @@
+# Create a list of dictionaries, one dictionary for each function in
+# the f function dictionary.  Each dictionary contains, the function
+# name, doc comment, anchor name and a short description.
+
+listCallback = func("listCallback(ix: int, item: func, orig: list, new: any) bool")
+  # Add the function item to the list.
+  new &= item
+  return(false)
+
+dictCallback = func("dictCallback(ix: int, name: string, value: any, orig: dict, new: any) bool")
+  # Add all the func variables with the same name to the new list.
+  funcList = f[name]
+  stop = listLoop(funcList, newList, listCallback)
+  return(stop)
+
+# Create a flat list off all the functions in the f dictionary.
+flatFuncList = []
+stopped2 = dictLoop(f, flatFuncList, dictCallback)
+
+get-name = func("get-name(ix: int, funcVar: func, orig: list, new: any) bool")
+  ## Add the function name to the new list.
+  fd = functionDetails(funcVar)
+  new &= fd.signature.name
+  return(false)
+
+# Get a list of all the function names then make that into github
+# anchor names.
+names = []
+stopped3 = listLoop(flatFuncList, names, l.get-name)
+anchors = githubAnchor(names)
+
+make-entry = func("make-entry(ix: int, funcVar: func, orig: list, new: any: anchors: list) bool")
+  # Convert a func variable to a dictionary and add it to the new list.
+
+  # Look up the function details.
+  fd = functionDetails(funcVar)
+
+  # Make a dictionary containing the function name, its doc comments
+  # and its doc comment's first sentence.
+  entry = dict()
+  entry.name = fd.signature.name
+  entry.docComment = fd.docComment
+  entry.sentence = slice(fd.docComment, 0, add(find(fd.docComment, ".", -1), 1))
+  entry.anchorName = anchors[ix]
+  new &= entry
+  return(false)
+
+# Create a list of dictionaries, one dictionary for each function in
+# the f function dictionary.  Each dictionary contains, the function
+# name, doc comment, anchor name and a short description.
+o.entries = []
+stopped = listLoop(flatFuncList, o.entries, make-entry, anchors)
