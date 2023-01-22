@@ -1083,10 +1083,7 @@ task cdy, "\tCreate dynamicFuncList.nim from functions.nim.":
   echo fmt"make {server}"
   makeJsonDoc("functions.nim")
 
-  # Build the dynamicFuncList.nim file.
+  # Build the dynamicFuncList.nim.tmp file.
   echo fmt"make {result}"
-  let cmd = fmt"{statictea} -l t.txt -s {server} -t {tFile} -o {teaFile} -r {result}"
+  let cmd = fmt"{statictea} -s {server} -t {tFile} -o {teaFile} -r {result}"
   exec cmd
-
-  echo fmt"Build statictea release version again using the new function list."
-  buildRelease()

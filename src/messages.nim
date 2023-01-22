@@ -519,17 +519,17 @@ const
     "You cannot use bracket notation to change a variable.", ## wLeftHandBracket
     "The user function generated a warning.", ## wUserFunctionWarning
     "Wrong return type, got $1.", ## wWrongReturnType
-    "Expected the callback return's value to be a list with a string and a value.", ## wCallbackReturn
-    "Expected the callback's return string to be 'stop', 'skip' or 'add'.", ## wCallbackStr
+    "Expected the func variable's return value to be a list with a string and a value.", ## wCallbackReturn
+    "Expected the func variable's return string to be 'stop', 'skip' or 'add'.", ## wCallbackStr
     "Expected list argument, got $1.", ## wExpectedListArg
-    "Expected a callback function, got $1.", ## wExceptionFunctionArg
-    "Expected the callback's return type to be a bool, got: $1.", ## wCallbackReturnType
-    "Expected 3 or 4 callback parameters, got $1.", ## wCallbackNumParams
-    "Expected the callback's first parameter to be an int, got $1.", ## wCallbackIntParam
+    "Expected a func variable, got $1.", ## wExceptionFunctionArg
+    "Expected the func variable's return type to be a bool, got: $1.", ## wCallbackReturnType
+    "Expected the func variable has 3 or 4 parameters but it has 1.", ## wCallbackNumParams
+    "Expected the func variable's first parameter to be an int, got $1.", ## wCallbackIntParam
     "Expected a variable.", ## wExpectedVariable
     "The listLoop state argument exists but the callback doesn't have a state parameter.", ## wMissingStateVar
-    "Expected the callback's third parameter to be a list, got $1.", ## wCallbackListParam
-    "The callback has a required state parameter but it is being not passed to it.", ## wStateRequired
+    "Expected the func variable's third parameter to be a list, got $1.", ## wCallbackListParam
+    "The func variable has a required state parameter but it is being not passed to it.", ## wStateRequired
     "Invalid return; use a bare return in a user function or use it in a bare if statement.", ## wReturnArgument
     "A variable starts with an ascii letter.", ## wVarStartsWithLetter
     "A variable contains ascii letters, digits, underscores and hypens.", ## wVarContainsChars

@@ -610,8 +610,8 @@ includes the trailing whitespace after the ending right
 parentheses.
 
 ~~~
-newList = listLoop(list, callback, state)
-                   ^                     ^
+stopped = listLoop(list, new, callback, state)
+                   ^                          ^
 ~~~
 
 ```nim

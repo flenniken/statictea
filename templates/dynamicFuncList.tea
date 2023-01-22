@@ -12,7 +12,8 @@ get-starts = func("get-starts(ix: int, entry: dict, newList: list, state: dict) 
   return(false)
 
 # Make a dictionary mapping a start line to its the number of lines.
-alist = listLoop(s.entries, l.get-starts, s)
+alist = []
+stopped2 = listLoop(s.entries, alist, l.get-starts, s)
 starts = dict(alist)
 
 get-entry = func("get-entry(ix: int, entry: dict, newList: list, state: dict) bool")
@@ -56,7 +57,8 @@ patterns = list( +
 state = dict()
 state.patterns = patterns
 state.starts = starts
-entries = listLoop(s.entries, l.get-entry, state)
+entries = []
+stopped = listLoop(s.entries, entries, l.get-entry, state)
 
 # Sort the entries by function name. Use insensitive compare so
 # function cmp_ comes before cmpV.

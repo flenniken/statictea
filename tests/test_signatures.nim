@@ -201,6 +201,7 @@ suite "signatures.nim":
     check $signatureO.get() == "myname(a: int, b: float, c: string) string"
 
   test "newSignatureO listLoop":
-    let signatureO = newSignatureO("listLoop", "lpoal")
+    let signatureO = newSignatureO("listLoop", "llpoab")
     check signatureO.isSome
-    check $signatureO.get() == "listLoop(a: list, b: func, c: optional any) list"
+    let expected = "listLoop(a: list, b: list, c: func, d: optional any) bool"
+    check gotExpected($signatureO.get(), expected)

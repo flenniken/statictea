@@ -1629,54 +1629,55 @@ proc getBracketedVarValue*(env: var Env, statement: Statement, start: Natural,
 proc funListLoop(env: var Env, variables: Variables,
     arguments: seq[Value]
   ): FunResult =
-  ## Build and return a new list by calling the callback for each item
+  ## Build and return a new item by calling the callback for each item
   ## in the given list.
 
-  # listLoop(a: list, callback: func, state: optional any) list
-  let signatureO = newSignatureO("listLoop", "lpoal")
+  # listLoop(a: list, new: any, callback: func, state: optional any) bool
+  let signatureO = newSignatureO("listLoop", "lapoab")
   let funResult = mapParameters(signatureO.get(), arguments)
   if funResult.kind == frWarning:
     return funResult
   let map = funResult.value.dictv
 
   let list = map["a"]
-  let callbackVar = map["b"]
+  let new = map["b"]
+  let callbackVar = map["c"]
 
   # Validate the callback signature.
   # callback(ix: int, item: any, newList: list, state: optional any) list
   let signature = callbackVar.funcv.signature
 
   if signature.params.len != 3 and signature.params.len != 4:
-    # Expected 3 or 4 callback parameters, got $1.
-    return newFunResultWarn(wCallbackNumParams, 1, $signature.params.len)
+    # Expected the func variable has 3 or 4 parameters but it has 1.
+    return newFunResultWarn(wCallbackNumParams, 2, $signature.params.len)
   if signature.params[0].paramType != ptInt:
-    # Expected the callback's first parameter to be an int, got $1.
-    return newFunResultWarn(wCallbackIntParam, 1, $signature.params[0].paramType)
+    # Expected the func variable's first parameter to be an int, got $1.
+    return newFunResultWarn(wCallbackIntParam, 2, $signature.params[0].paramType)
   if signature.params[2].paramType != ptList:
-    # Expected the callback's third parameter to be a list, got $1.
-    return newFunResultWarn(wCallbackListParam, 1, $signature.params[2].paramType)
-  if "c" in map and signature.params.len == 3:
+    # Expected the function variable's third parameter to be a list, got $1.
+    return newFunResultWarn(wCallbackListParam, 2, $signature.params[2].paramType)
+  if "d" in map and signature.params.len == 3:
     # The listLoop state argument exists but the callback doesn't have a state parameter.
-    return newFunResultWarn(wMissingStateVar, 2, "")
-  if not signature.optional and signature.params.len == 4 and not ("c" in map):
-    # The callback has a required state parameter but it is being not passed to it.
-    return newFunResultWarn(wStateRequired, 1, "")
+    return newFunResultWarn(wMissingStateVar, 3, "")
+  if not signature.optional and signature.params.len == 4 and not ("d" in map):
+    # The func variable has a required state parameter but it is being not passed to it.
+    return newFunResultWarn(wStateRequired, 2, "")
   if signature.returnType != ptBool:
-    # Expected the callback's return type to be a bool, got: $1.
-    return newFunResultWarn(wCallbackReturnType, 1, $signature.returnType)
+    # Expected the function variable's return type to be a bool, got: $1.
+    return newFunResultWarn(wCallbackReturnType, 2, $signature.returnType)
 
   # Call the callback for each item in the list.
-  var newListVar = newValue(newSeq[Value]())
+  var stopped = false
   for ix, value in list.listv:
 
     # Call the callback.
-    # callback(ix: int, item: any, newList: list, state: optional any) list
+    # callback(ix: int, item: any, new: any, state: optional any) bool
     var callbackArgs = newSeq[Value]()
     callbackArgs.add(newValue(ix))
     callbackArgs.add(value)
-    callbackArgs.add(newListVar)
-    if "c" in map:
-      callbackArgs.add(map["c"])
+    callbackArgs.add(new)
+    if "d" in map:
+      callbackArgs.add(map["d"])
     let callResult = callUserFunction(env, callbackVar, variables, callbackArgs)
     if callResult.kind == frWarning:
       # Note: if the warning is a signature type issue, add another
@@ -1685,9 +1686,10 @@ proc funListLoop(env: var Env, variables: Variables,
 
     # Stop the loop when the callback returns true.
     if callResult.value.boolv:
+      stopped = true
       break
 
-  result = newFunResult(newListVar)
+  result = newFunResult(newValue(stopped))
 
 proc listLoop*(
     env: var Env,
@@ -1707,8 +1709,8 @@ proc listLoop*(
   ## @:parentheses.
   ## @:
   ## @:~~~
-  ## @:newList = listLoop(list, callback, state)
-  ## @:                   ^                     ^
+  ## @:stopped = listLoop(list, new, callback, state)
+  ## @:                   ^                          ^
   ## @:~~~~
   # Get all the function arguments.
   var runningPos = start
@@ -1716,6 +1718,7 @@ proc listLoop*(
   var argumentStarts: seq[Natural]
   let vpOr = getArguments(env, statement, runningPos, variables, false,
     arguments, argumentStarts)
+  # todo: remove quickExit and replace with warning check.
   if quickExit(vpOr):
     return vpOr
   runningPos = vpOr.value.pos

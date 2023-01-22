@@ -20,7 +20,8 @@ get-name = func("get-name(ix: int, entry: dict, newList: list) bool")
   return(false)
 
 # Create the github anchors for all the heading names.
-names = listLoop(s.entries, l.get-name)
+names = []
+stopped2 = listLoop(s.entries, names, l.get-name)
 anchors = githubAnchor(names)
 
 # Use the filename's basename for the module name.
@@ -63,4 +64,5 @@ get-entry = func("get-entry(ix: int, entry: dict, newList: list, state: dict) bo
 state = dict()
 state.patterns = patterns
 state.anchors = anchors
-o.entries = listLoop(s.entries, l.get-entry, state)
+o.entries = []
+stopped = listLoop(s.entries, o.entries, l.get-entry, state)

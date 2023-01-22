@@ -2891,13 +2891,15 @@ copy = func("copy(ix: int, value: int, newList: list) bool")
   newList &= value
   return(false)
 
+newList = []
 ls = [1, 1, 2, 3, 5, 8]
-newList = listLoop(ls, l.copy)
+stopped = listLoop(ls, newList, l.copy)
 """
     let eVarRep = """
 l.copy = "copy"
-l.ls = [1,1,2,3,5,8]
 l.newList = [1,1,2,3,5,8]
+l.ls = [1,1,2,3,5,8]
+l.stopped = false
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
@@ -2913,12 +2915,14 @@ b5 = func("b5(ix: int, value: int, newList: list) bool")
   return(false)
 
 ls = [1, 1, 2, 7, 5, 8]
-newList = listLoop(ls, l.b5)
+newList = []
+stopped = listLoop(ls, newList, l.b5)
 """
     let eVarRep = """
 l.b5 = "b5"
 l.ls = [1,1,2,7,5,8]
 l.newList = [7,8]
+l.stopped = false
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
@@ -2934,12 +2938,14 @@ b5 = func("b5(ix: int, value: int, newList: list, state: int) bool")
   return(false)
 
 ls = [1, 1, 2, 7, 5, 8]
-newList = listLoop(ls, l.b5, 3)
+newList = []
+stopped = listLoop(ls, newList, l.b5, 3)
 """
     let eVarRep = """
 l.b5 = "b5"
 l.ls = [1,1,2,7,5,8]
 l.newList = [10,11]
+l.stopped = false
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
@@ -2955,17 +2961,19 @@ b5 = func("b5(ix: int, value: int, newList: list, state: int) bool")
 
 ls = [1, 1, 2, 3, 5, 8]
 # No state passed.
-newList = listLoop(ls, l.b5)
+newList = []
+stopped = listLoop(ls, newList, l.b5)
 """
     let eVarRep = """
 l.b5 = "b5"
 l.ls = [1,1,2,3,5,8]
+l.newList = []
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.tea(8): w254: The callback has a required state parameter but it is being not passed to it.
-statement: newList = listLoop(ls, l.b5)
-                                  ^
+testcode.tea(9): w254: The func variable has a required state parameter but it is being not passed to it.
+statement: stopped = listLoop(ls, newList, l.b5)
+                                           ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
@@ -2978,12 +2986,14 @@ b5 = func("b5(ix: int, value: int, newList: list, state: optional int) bool")
 
 ls = [1, 1, 2, 3, 5, 8]
 # No state passed.
-newList = listLoop(ls, l.b5)
+newList = []
+stopped = listLoop(ls, newList, l.b5)
 """
     let eVarRep = """
 l.b5 = "b5"
 l.ls = [1,1,2,3,5,8]
 l.newList = [1,1,2,3,5,8]
+l.stopped = false
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
@@ -2998,13 +3008,15 @@ b5 = func("b5(ix: int, value: int, newList: list) bool")
   newList &= value
   return(false)
 
+newList = []
 ls = [1, 1, 2, 3, 5, 8]
-newList = listLoop(ls, l.b5)
+stopped = listLoop(ls, newList, l.b5)
 """
     let eVarRep = """
 l.b5 = "b5"
-l.ls = [1,1,2,3,5,8]
 l.newList = [1,1,2]
+l.ls = [1,1,2,3,5,8]
+l.stopped = true
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
@@ -3013,7 +3025,7 @@ o = {}
 
   test "listLoop warning":
     let content = """
-newList = listLoop([1], )
+stopped = listLoop([1], )
 """
     let eVarRep = """
 l = {}
@@ -3021,38 +3033,39 @@ o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
 testcode.tea(1): w33: Expected a string, number, variable, list or condition.
-statement: newList = listLoop([1], )
+statement: stopped = listLoop([1], )
                                    ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
   test "listLoop to many args":
     let content = """
-newList = listLoop([1], f.cmp[0], 2, 4)
+newList = []
+stopped = listLoop([1], newList, f.cmp[0], 2, 4)
 """
     let eVarRep = """
-l = {}
+l.newList = []
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.tea(1): w180: The function requires at most 3 arguments.
-statement: newList = listLoop([1], f.cmp[0], 2, 4)
-                                                ^
+testcode.tea(2): w180: The function requires at most 4 arguments.
+statement: stopped = listLoop([1], newList, f.cmp[0], 2, 4)
+                                                         ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
   test "funListLoop 3 or 4":
     let content = """
-newList = listLoop([1], f.cmp[0], 2)
+stopped = listLoop([1], [], f.cmp[0])
 """
     let eVarRep = """
 l = {}
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.tea(1): w249: Expected 3 or 4 callback parameters, got 2.
-statement: newList = listLoop([1], f.cmp[0], 2)
-                                   ^
+testcode.tea(1): w249: Expected the func variable has 3 or 4 parameters but it has 1.
+statement: stopped = listLoop([1], [], f.cmp[0])
+                                       ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
@@ -3064,16 +3077,18 @@ b5 = func("b5(ix: float, value: int, newList: list, state: int) bool")
   newList &= add(value, state)
   return(false)
 
-newList = listLoop([1], b5, 2)
+newList = []
+stopped = listLoop([1], newList, b5, 2)
 """
     let eVarRep = """
 l.b5 = "b5"
+l.newList = []
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.tea(7): w250: Expected the callback's first parameter to be an int, got float.
-statement: newList = listLoop([1], b5, 2)
-                                   ^
+testcode.tea(8): w250: Expected the func variable's first parameter to be an int, got float.
+statement: stopped = listLoop([1], newList, b5, 2)
+                                            ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
@@ -3085,16 +3100,18 @@ b5 = func("b5(ix: int, value: int, newList: dict, state: int) bool")
   newList &= add(value, state)
   return(false)
 
-newList = listLoop([1], b5, 2)
+newList = []
+stopped = listLoop([1], newList, b5, 2)
 """
     let eVarRep = """
 l.b5 = "b5"
+l.newList = []
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.tea(7): w253: Expected the callback's third parameter to be a list, got dict.
-statement: newList = listLoop([1], b5, 2)
-                                   ^
+testcode.tea(8): w253: Expected the func variable's third parameter to be a list, got dict.
+statement: stopped = listLoop([1], newList, b5, 2)
+                                            ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
@@ -3106,18 +3123,20 @@ b5 = func("b5(ix: int, value: int, newList: list) bool")
   newList &= add(value, state)
   return(false)
 
+newList = []
 ls = [1, 2, 3]
-newList = listLoop(ls, b5, 2)
+stopped = listLoop(ls, newList, b5, 2)
 """
     let eVarRep = """
 l.b5 = "b5"
+l.newList = []
 l.ls = [1,2,3]
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.tea(8): w252: The listLoop state argument exists but the callback doesn't have a state parameter.
-statement: newList = listLoop(ls, b5, 2)
-                                      ^
+testcode.tea(9): w252: The listLoop state argument exists but the callback doesn't have a state parameter.
+statement: stopped = listLoop(ls, newList, b5, 2)
+                                               ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
@@ -3128,11 +3147,13 @@ b5 = func("b5(ix: int, value: int, newList: list) bool")
   syntaxError == 5
   return(false)
 
+newList = []
 ls = [1, 2, 3]
-newList = listLoop(ls, b5)
+stopped = listLoop(ls, newList, b5)
 """
     let eVarRep = """
 l.b5 = "b5"
+l.newList = []
 l.ls = [1,2,3]
 o = {}
 """

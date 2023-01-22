@@ -923,32 +923,34 @@ a = ["a", 5, "b"]
 ~~~
 """
 
-  dc_fun_listLoop_lpoal = """
+  dc_fun_listLoop_llpoab = """
 Create a new list from a list and a callback function. The callback function is called for each item in the list and it decides what goes in the list.
 
-You pass a list, a callback function, and an optional state
-variable.
+You pass a list to loop over, a list to fill in, a callback
+function, and an optional state variable. The function returns
+whether the callback stopped early or not.
 
 ~~~
-listLoop(a: list, callback: func, state: optional any) list
+listLoop(a: list, newList: list, listCallback: func, state: optional any) bool
 ~~~
 
-The callback gets pasted the index to the item, its value, the
-new list and the state variable.  The callback looks at the
-information and adds to the new list when appropriate. The
+The callback gets passed the index to the item, its value, the
+new item and the state variable.  The callback looks at the
+information and adds to the new item when appropriate. The
 callback returns true to stop iterating.
 
 ~~~
-callback(ix: int, item: any, newList: list, state: optional any) bool
+listCallback(ix: int, item: any, newList: list, state: optional any) bool
 ~~~
 
 The following example makes a new list [6, 8] from the list
 [2,4,6,8].  The callback is called b5.
 
 ~~~
+newList = []
 list = [2,4,6,8]
-newlist = listLoop(list, b5)
-=> [6, 8]
+stopped = listLoop(list, newList, b5)
+newList => [6, 8]
 ~~~
 
 Below is the definition of the b5 callback function.
@@ -1617,7 +1619,7 @@ warn("always warn")
   functionsList* = [
     info("fun_add_fff", dc_fun_add_fff, 603, 23),
     info("fun_add_iii", dc_fun_add_iii, 580, 23),
-    info("fun_and_bbb", dc_fun_and_bbb, 2388, 26),
+    info("fun_and_bbb", dc_fun_and_bbb, 2390, 26),
     info("fun_bool_ab", dc_fun_bool_ab, 1084, 37),
     info("fun_case_iloaa", dc_fun_case_iloaa, 729, 33),
     info("fun_case_sloaa", dc_fun_case_sloaa, 762, 32),
@@ -1628,66 +1630,66 @@ warn("always warn")
     info("fun_concat_sss", dc_fun_concat_sss, 312, 19),
     info("fun_dict_old", dc_fun_dict_old, 1233, 36),
     info("fun_dup_sis", dc_fun_dup_sis, 1194, 39),
-    info("fun_eq_ffb", dc_fun_eq_ffb, 2459, 19),
-    info("fun_eq_iib", dc_fun_eq_iib, 2440, 19),
-    info("fun_eq_ssb", dc_fun_eq_ssb, 2478, 20),
+    info("fun_eq_ffb", dc_fun_eq_ffb, 2461, 19),
+    info("fun_eq_iib", dc_fun_eq_iib, 2442, 19),
+    info("fun_eq_ssb", dc_fun_eq_ssb, 2480, 20),
     info("fun_exists_dsb", dc_fun_exists_dsb, 674, 55),
     info("fun_find_ssoaa", dc_fun_find_ssoaa, 1121, 38),
     info("fun_float_if", dc_fun_float_if, 850, 17),
     info("fun_float_saa", dc_fun_float_saa, 893, 55),
     info("fun_float_sf", dc_fun_float_sf, 867, 26),
-    info("fun_format_ss", dc_fun_format_ss, 2257, 34),
-    info("fun_func_sp", dc_fun_func_sp, 2291, 21),
-    info("fun_functionDetails_pd", dc_fun_functionDetails_pd, 2312, 35),
+    info("fun_format_ss", dc_fun_format_ss, 2259, 34),
+    info("fun_func_sp", dc_fun_func_sp, 2293, 21),
+    info("fun_functionDetails_pd", dc_fun_functionDetails_pd, 2314, 35),
     info("fun_get_dsoaa", dc_fun_get_dsoaa, 429, 38),
     info("fun_get_lioaa", dc_fun_get_lioaa, 387, 42),
-    info("fun_githubAnchor_ll", dc_fun_githubAnchor_ll, 1851, 41),
-    info("fun_githubAnchor_ss", dc_fun_githubAnchor_ss, 1817, 34),
-    info("fun_gt_ffb", dc_fun_gt_ffb, 2574, 19),
-    info("fun_gt_iib", dc_fun_gt_iib, 2555, 19),
-    info("fun_gte_ffb", dc_fun_gte_ffb, 2612, 19),
-    info("fun_gte_iib", dc_fun_gte_iib, 2593, 19),
+    info("fun_githubAnchor_ll", dc_fun_githubAnchor_ll, 1853, 41),
+    info("fun_githubAnchor_ss", dc_fun_githubAnchor_ss, 1819, 34),
+    info("fun_gt_ffb", dc_fun_gt_ffb, 2576, 19),
+    info("fun_gt_iib", dc_fun_gt_iib, 2557, 19),
+    info("fun_gte_ffb", dc_fun_gte_ffb, 2614, 19),
+    info("fun_gte_iib", dc_fun_gte_iib, 2595, 19),
     info("fun_if0_iaoaa", dc_fun_if0_iaoaa, 467, 66),
     info("fun_if_baoaa", dc_fun_if_baoaa, 533, 47),
     info("fun_int_fosi", dc_fun_int_fosi, 948, 35),
     info("fun_int_sosi", dc_fun_int_sosi, 983, 42),
     info("fun_int_ssaa", dc_fun_int_ssaa, 1025, 35),
-    info("fun_join_lsois", dc_fun_join_lsois, 1986, 45),
-    info("fun_joinPath_loss", dc_fun_joinPath_loss, 1945, 41),
-    info("fun_keys_dl", dc_fun_keys_dl, 1579, 24),
+    info("fun_join_lsois", dc_fun_join_lsois, 1988, 45),
+    info("fun_joinPath_loss", dc_fun_joinPath_loss, 1947, 41),
+    info("fun_keys_dl", dc_fun_keys_dl, 1581, 24),
     info("fun_len_di", dc_fun_len_di, 368, 19),
     info("fun_len_li", dc_fun_len_li, 349, 19),
     info("fun_len_si", dc_fun_len_si, 331, 18),
     info("fun_list_al", dc_fun_list_al, 1269, 22),
-    info("fun_listLoop_lpoal", dc_fun_listLoop_lpoal, 1291, 45),
-    info("fun_log_ss", dc_fun_log_ss, 2064, 32),
-    info("fun_lower_ss", dc_fun_lower_ss, 1560, 19),
-    info("fun_lt_ffb", dc_fun_lt_ffb, 2650, 19),
-    info("fun_lt_iib", dc_fun_lt_iib, 2631, 19),
-    info("fun_lte_ffb", dc_fun_lte_ffb, 2689, 20),
-    info("fun_lte_iib", dc_fun_lte_iib, 2669, 20),
-    info("fun_ne_ffb", dc_fun_ne_ffb, 2517, 19),
-    info("fun_ne_iib", dc_fun_ne_iib, 2498, 19),
-    info("fun_ne_ssb", dc_fun_ne_ssb, 2536, 19),
-    info("fun_not_bb", dc_fun_not_bb, 2370, 18),
-    info("fun_or_bbb", dc_fun_or_bbb, 2414, 26),
-    info("fun_path_sosd", dc_fun_path_sosd, 1505, 55),
-    info("fun_readJson_sa", dc_fun_readJson_sa, 2709, 29),
-    info("fun_replace_siiss", dc_fun_replace_siiss, 1336, 110),
-    info("fun_replaceRe_sls", dc_fun_replaceRe_sls, 1446, 33),
-    info("fun_return_aa", dc_fun_return_aa, 2096, 51),
+    info("fun_listLoop_llpoab", dc_fun_listLoop_llpoab, 1291, 47),
+    info("fun_log_ss", dc_fun_log_ss, 2066, 32),
+    info("fun_lower_ss", dc_fun_lower_ss, 1562, 19),
+    info("fun_lt_ffb", dc_fun_lt_ffb, 2652, 19),
+    info("fun_lt_iib", dc_fun_lt_iib, 2633, 19),
+    info("fun_lte_ffb", dc_fun_lte_ffb, 2691, 20),
+    info("fun_lte_iib", dc_fun_lte_iib, 2671, 20),
+    info("fun_ne_ffb", dc_fun_ne_ffb, 2519, 19),
+    info("fun_ne_iib", dc_fun_ne_iib, 2500, 19),
+    info("fun_ne_ssb", dc_fun_ne_ssb, 2538, 19),
+    info("fun_not_bb", dc_fun_not_bb, 2372, 18),
+    info("fun_or_bbb", dc_fun_or_bbb, 2416, 26),
+    info("fun_path_sosd", dc_fun_path_sosd, 1507, 55),
+    info("fun_readJson_sa", dc_fun_readJson_sa, 2711, 29),
+    info("fun_replace_siiss", dc_fun_replace_siiss, 1338, 110),
+    info("fun_replaceRe_sls", dc_fun_replaceRe_sls, 1448, 33),
+    info("fun_return_aa", dc_fun_return_aa, 2098, 51),
     info("fun_slice_siois", dc_fun_slice_siois, 1159, 35),
-    info("fun_sort_lsosl", dc_fun_sort_lsosl, 1726, 33),
-    info("fun_sort_lssil", dc_fun_sort_lssil, 1759, 29),
-    info("fun_sort_lsssl", dc_fun_sort_lsssl, 1788, 29),
-    info("fun_startsWith_ssb", dc_fun_startsWith_ssb, 2347, 23),
-    info("fun_string_aoss", dc_fun_string_aoss, 2147, 86),
-    info("fun_string_sds", dc_fun_string_sds, 2233, 24),
+    info("fun_sort_lsosl", dc_fun_sort_lsosl, 1728, 33),
+    info("fun_sort_lssil", dc_fun_sort_lssil, 1761, 29),
+    info("fun_sort_lsssl", dc_fun_sort_lsssl, 1790, 29),
+    info("fun_startsWith_ssb", dc_fun_startsWith_ssb, 2349, 23),
+    info("fun_string_aoss", dc_fun_string_aoss, 2149, 86),
+    info("fun_string_sds", dc_fun_string_sds, 2235, 24),
     info("fun_sub_fff", dc_fun_sub_fff, 649, 25),
     info("fun_sub_iii", dc_fun_sub_iii, 626, 23),
-    info("fun_type_as", dc_fun_type_as, 1892, 53),
-    info("fun_values_dl", dc_fun_values_dl, 1603, 123),
-    info("fun_warn_ss", dc_fun_warn_ss, 2031, 33),
+    info("fun_type_as", dc_fun_type_as, 1894, 53),
+    info("fun_values_dl", dc_fun_values_dl, 1605, 123),
+    info("fun_warn_ss", dc_fun_warn_ss, 2033, 33),
   ]
     ## Dynamically generated sorted list of built-in functions. Each
     ## line contains the nim function name, its doc comment, the
