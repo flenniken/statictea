@@ -2,25 +2,28 @@
 # the f function dictionary.  Each dictionary contains, the function
 # name, doc comment, anchor name and a short description.
 
-listCallback = func("listCallback(ix: int, item: func, orig: list, new: any) bool")
-  # Add the function item to the list.
-  new &= item
+callback = func("callback(ix: int, funcVar: func, newList: list) bool")
+  ## Add the function item to the list.
+  newList &= funcVar
   return(false)
 
-dictCallback = func("dictCallback(ix: int, name: string, value: any, orig: dict, new: any) bool")
-  # Add all the func variables with the same name to the new list.
-  funcList = f[name]
-  stop = listLoop(funcList, newList, listCallback)
+dictCallback = func("dictCallback(ix: int, key: string, newList: list, state: dict) bool")
+  ## Add all the func variables with the same name to the new list.
+  funcList = state.f[key]
+  stop = listLoop(funcList, newList, state.callback)
   return(stop)
 
-# Create a flat list off all the functions in the f dictionary.
+# Create a flat list of all the functions in the f dictionary.
+state = dict()
+state.callback = callback
+state.f = f
 flatFuncList = []
-stopped2 = dictLoop(f, flatFuncList, dictCallback)
+stopped2 = listLoop(keys(f), flatFuncList, dictCallback, state)
 
-get-name = func("get-name(ix: int, funcVar: func, orig: list, new: any) bool")
+get-name = func("get-name(ix: int, funcVar: func, newList: list) bool")
   ## Add the function name to the new list.
   fd = functionDetails(funcVar)
-  new &= fd.signature.name
+  newList &= fd.signature.name
   return(false)
 
 # Get a list of all the function names then make that into github
@@ -29,8 +32,8 @@ names = []
 stopped3 = listLoop(flatFuncList, names, l.get-name)
 anchors = githubAnchor(names)
 
-make-entry = func("make-entry(ix: int, funcVar: func, orig: list, new: any: anchors: list) bool")
-  # Convert a func variable to a dictionary and add it to the new list.
+make-entry = func("make-entry(ix: int, funcVar: func, newList: list, anchors: list) bool")
+  ## Convert a func variable to a dictionary and add it to the new list.
 
   # Look up the function details.
   fd = functionDetails(funcVar)
@@ -42,7 +45,7 @@ make-entry = func("make-entry(ix: int, funcVar: func, orig: list, new: any: anch
   entry.docComment = fd.docComment
   entry.sentence = slice(fd.docComment, 0, add(find(fd.docComment, ".", -1), 1))
   entry.anchorName = anchors[ix]
-  new &= entry
+  newList &= entry
   return(false)
 
 # Create a list of dictionaries, one dictionary for each function in

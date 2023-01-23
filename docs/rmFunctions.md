@@ -1,56 +1,82 @@
 # Statictea Functions
 
+The build-in Statictea functions.
+
 # Index
 
-* add - Add two floats.
-* and - Boolean AND with short circuit.
-* bool - Create an bool from a value.
-* case - Compare integer cases and return the matching value.
-* cmp - Compare two floats.
-* cmpVersion - Compare two StaticTea version numbers.
-* concat - Concatentate two strings.
-* dict - Create a dictionary from a list of key, value pairs.
-* dup - Duplicate a string x times.
-* eq - Return true when two floats are equal.
-* exists - Determine whether a key exists in a dictionary.
-* find - Find the position of a substring in a string.
-* float - Create a float from an int.
-* format - Format a string using replacement variables similar to a replacement block.
-* func - Define a function.
-* functionDetails - Return the function details.
-* get - Get a dictionary value by its key.
-* githubAnchor - Create Github anchor names from heading names.
-* gt - Return true when one float is greater than another float.
-* gte - Return true when a float is greater than or equal to another float.
-* if0 - If the condition is 0, return the second argument, else return the third argument.
-* if - If the condition is true, return the second argument, else return the third argument.
-* int - Create an int from a float.
-* join - Join a list of strings with a separator.
-* joinPath - Join the path components with a path separator.
-* keys - Create a list from the keys in a dictionary.
-* len - Number of elements in a dictionary.
-* list - Create a list of variables.
-* listLoop - Create a new list from a list and a callback function.
-* log - Log a message to the log file.
-* lower - Lowercase a string.
-* lt - Return true when a float is less then another float.
-* lte - Return true when a float is less than or equal to another float.
-* ne - Return true when two floats are not equal.
-* not - Boolean not.
-* or - Boolean OR with short circuit.
-* path - Split a file path into its component pieces.
-* readJson - Convert a JSON string to a variable.
-* replace - Replace a substring specified by its position and length with another string.
-* replaceRe - Replace multiple parts of a string using regular expressions.
-* return - Return is a special function that returns the value passed in and has side effects.
-* slice - Extract a substring from a string by its position and length.
-* sort - Sort a list of values of the same type.
-* startsWith - Check whether a strings starts with the given prefix.
-* string - Convert a variable to a string.
-* sub - Sub two floats.
-* type - Return the parameter type, one of: int, float, string, list, dict, bool or func.
-* values - Create a list out of the values in the specified dictionary.
-* warn - Return a warning message and skip the current statement.
+* [add](#add) &mdash; Add two floats.
+* [add](#add-1) &mdash; Add two integers.
+* [and](#and) &mdash; Boolean AND with short circuit.
+* [bool](#bool) &mdash; Create an bool from a value.
+* [case](#case) &mdash; Compare integer cases and return the matching value.
+* [case](#case-1) &mdash; Compare string cases and return the matching value.
+* [cmp](#cmp) &mdash; Compare two floats.
+* [cmp](#cmp-1) &mdash; Compare two ints.
+* [cmp](#cmp-2) &mdash; Compare two strings.
+* [cmpVersion](#cmpversion) &mdash; Compare two StaticTea version numbers.
+* [concat](#concat) &mdash; Concatentate two strings.
+* [dict](#dict) &mdash; Create a dictionary from a list of key, value pairs.
+* [dup](#dup) &mdash; Duplicate a string x times.
+* [eq](#eq) &mdash; Return true when two floats are equal.
+* [eq](#eq-1) &mdash; Return true when the two ints are equal.
+* [eq](#eq-2) &mdash; Return true when two strings are equal.
+* [exists](#exists) &mdash; Determine whether a key exists in a dictionary.
+* [find](#find) &mdash; Find the position of a substring in a string.
+* [float](#float) &mdash; Create a float from an int.
+* [float](#float-1) &mdash; Create a float from a number string.
+* [float](#float-2) &mdash; Create a float from a number string.
+* [format](#format) &mdash; Format a string using replacement variables similar to a replacement block.
+* [func](#func) &mdash; Define a function.
+* [functionDetails](#functiondetails) &mdash; Return the function details.
+* [get](#get) &mdash; Get a dictionary value by its key.
+* [get](#get-1) &mdash; Get a list value by its index.
+* [githubAnchor](#githubanchor) &mdash; Create Github anchor names from heading names.
+* [githubAnchor](#githubanchor-1) &mdash; Create a Github anchor name from a heading name.
+* [gt](#gt) &mdash; Return true when one float is greater than another float.
+* [gt](#gt-1) &mdash; Return true when an int is greater then another int.
+* [gte](#gte) &mdash; Return true when a float is greater than or equal to another float.
+* [gte](#gte-1) &mdash; Return true when an int is greater then or equal to another int.
+* [if0](#if0) &mdash; If the condition is 0, return the second argument, else return the third argument.
+* [if](#if) &mdash; If the condition is true, return the second argument, else return the third argument.
+* [int](#int) &mdash; Create an int from a float.
+* [int](#int-1) &mdash; Create an int from a number string.
+* [int](#int-2) &mdash; Create an int from a number string.
+* [join](#join) &mdash; Join a list of strings with a separator.
+* [joinPath](#joinpath) &mdash; Join the path components with a path separator.
+* [keys](#keys) &mdash; Create a list from the keys in a dictionary.
+* [len](#len) &mdash; Number of elements in a dictionary.
+* [len](#len-1) &mdash; Number of elements in a list.
+* [len](#len-2) &mdash; Number of unicode characters in a string.
+* [list](#list) &mdash; Create a list of variables.
+* [listLoop](#listloop) &mdash; Create a new list from a list and a callback function.
+* [log](#log) &mdash; Log a message to the log file.
+* [lower](#lower) &mdash; Lowercase a string.
+* [lt](#lt) &mdash; Return true when a float is less then another float.
+* [lt](#lt-1) &mdash; Return true when an int is less than another int.
+* [lte](#lte) &mdash; Return true when a float is less than or equal to another float.
+* [lte](#lte-1) &mdash; Return true when an int is less than or equal to another int.
+* [ne](#ne) &mdash; Return true when two floats are not equal.
+* [ne](#ne-1) &mdash; Return true when two ints are not equal.
+* [ne](#ne-2) &mdash; Return true when two strings are not equal.
+* [not](#not) &mdash; Boolean not.
+* [or](#or) &mdash; Boolean OR with short circuit.
+* [path](#path) &mdash; Split a file path into its component pieces.
+* [readJson](#readjson) &mdash; Convert a JSON string to a variable.
+* [replace](#replace) &mdash; Replace a substring specified by its position and length with another string.
+* [replaceRe](#replacere) &mdash; Replace multiple parts of a string using regular expressions.
+* [return](#return) &mdash; Return is a special function that returns the value passed in and has side effects.
+* [slice](#slice) &mdash; Extract a substring from a string by its position and length.
+* [sort](#sort) &mdash; Sort a list of values of the same type.
+* [sort](#sort-1) &mdash; Sort a list of lists.
+* [sort](#sort-2) &mdash; Sort a list of dictionaries.
+* [startsWith](#startswith) &mdash; Check whether a strings starts with the given prefix.
+* [string](#string) &mdash; Convert a variable to a string.
+* [string](#string-1) &mdash; Convert the dictionary variable to dot names.
+* [sub](#sub) &mdash; Sub two floats.
+* [sub](#sub-1) &mdash; Subtract two integers.
+* [type](#type) &mdash; Return the parameter type, one of: int, float, string, list, dict, bool or func.
+* [values](#values) &mdash; Create a list out of the values in the specified dictionary.
+* [warn](#warn) &mdash; Return a warning message and skip the current statement.
 
 # add
 
@@ -65,6 +91,23 @@ Examples:
 ~~~
 add(1.5, 2.3) => 3.8
 add(3.2, -2.2) => 1.0
+~~~
+
+
+# add
+
+Add two integers. A warning is generated on overflow.
+
+~~~
+add(a: int, b: int) int
+~~~
+
+Examples:
+
+~~~
+add(1, 2) => 3
+add(3, -2) => 1
+add(-2, -5) => -7
 ~~~
 
 
@@ -152,6 +195,35 @@ case(3, cases, "wine") => "wine"
 ~~~
 
 
+# case
+
+Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
+
+The first element of a case pair is the condition and the
+second is the return value when that condition matches the main
+condition. The function compares the conditions left to right and
+returns the first match.
+
+When none of the cases match the main condition, the default
+value is returned if it is specified, otherwise a warning is
+generated.  The conditions must be strings. The return values
+can be any type.
+
+~~~
+case(condition: string, pairs: list, default: optional any) any
+~~~
+
+Examples:
+
+~~~
+cases = list("tea", 15, "water", 2.3, "beer", "cold")
+case("tea", cases) => 15
+case("water", cases) => 2.3
+case("beer", cases) => "cold"
+case("bunch", cases, "other") => "other"
+~~~
+
+
 # cmp
 
 Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
@@ -166,6 +238,45 @@ Examples:
 cmp(7.8, 9.1) => -1
 cmp(8.4, 8.4) => 0
 cmp(9.3, 2.2) => 1
+~~~
+
+
+# cmp
+
+Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
+
+~~~
+cmp(a: int, b: int) int
+~~~
+
+Examples:
+
+~~~
+cmp(7, 9) => -1
+cmp(8, 8) => 0
+cmp(9, 2) => 1
+~~~
+
+
+# cmp
+
+Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
+
+You have the option to compare case insensitive. Case sensitive
+is the default.
+
+~~~
+cmp(a: string, b: string, insensitive: optional bool) int
+~~~
+
+Examples:
+
+~~~
+cmp("coffee", "tea") => -1
+cmp("tea", "tea") => 0
+cmp("Tea", "tea") => 1
+cmp("Tea", "tea", true) => 1
+cmp("Tea", "tea", false) => 0
 ~~~
 
 
@@ -259,6 +370,38 @@ eq(1.2, 3.2) => false
 ~~~
 
 
+# eq
+
+Return true when the two ints are equal.
+
+~~~
+eq(a: int, b: int) bool
+~~~
+
+Examples:
+
+~~~
+eq(1, 1) => true
+eq(2, 3) => false
+~~~
+
+
+# eq
+
+Return true when two strings are equal.  See [[#cmd][cmd]] for case insensitive compare.
+
+~~~
+eq(a: string, b: string) bool
+~~~
+
+Examples:
+
+~~~
+eq("tea", "tea") => true
+eq("1.2", "3.2") => false
+~~~
+
+
 # exists
 
 Determine whether a key exists in a dictionary. Return true when it exists, else false.
@@ -311,6 +454,39 @@ Examples:
 ~~~
 float(2) => 2.0
 float(-33) => -33.0
+~~~
+
+
+# float
+
+Create a float from a number string. If the string is not a number, return the default.
+
+~~~
+float(numString: string, default: optional any) any
+~~~
+
+Examples:
+
+~~~
+float("2") => 2.0
+float("notnum", "nan") => nan
+~~~
+
+
+# float
+
+Create a float from a number string.
+
+~~~
+float(numString: string) float
+~~~
+
+Examples:
+
+~~~
+float("2") => 2.0
+float("2.4") => 2.4
+float("33") => 33.0
 ~~~
 
 
@@ -420,6 +596,29 @@ d.tea => "Earl Grey"
 ~~~
 
 
+# get
+
+Get a list value by its index.  If the index is invalid, the default value is returned when specified, else a warning is generated. You can use negative index values. Index -1 gets the last element. It is short hand for len - 1. Index -2 is len - 2, etc.
+
+~~~
+get(list: list, index: int, default: optional any) any
+~~~
+
+Examples:
+
+~~~
+list = list(4, "a", 10)
+get(list, 0) => 4
+get(list, 1) => "a"
+get(list, 2) => 10
+get(list, 3, 99) => 99
+get(list, -1) => 10
+get(list, -2) => "a"
+get(list, -3) => 4
+get(list, -4, 11) => 11
+~~~
+
+
 # githubAnchor
 
 Create Github anchor names from heading names. Use it for Github markdown internal links. It handles duplicate heading names.
@@ -434,6 +633,32 @@ Examples:
 list = list("Tea", "Water", "Tea")
 githubAnchor(list) =>
   ["tea", "water", "tea-1"]
+~~~
+
+
+# githubAnchor
+
+Create a Github anchor name from a heading name. Use it for Github markdown internal links. If you have duplicate heading names, the anchor name returned only works for the first. Punctuation characters are removed so you can get duplicates in some cases.
+
+~~~
+githubAnchor(name: string) string
+~~~
+
+Examples:
+
+~~~
+githubAnchor("MyHeading") => "myheading"
+githubAnchor("Eary Gray") => "eary-gray"
+githubAnchor("$Eary-Gray#") => "eary-gray"
+~~~
+
+Example in a markdown template:
+
+~~~
+$$ : anchor = githubAnchor(entry.name)
+* {type]{{entry.name}](#{anchor}) &mdash; {short}
+...
+# {entry.name}
 ~~~
 
 
@@ -453,6 +678,22 @@ gt(3.1, 2.5) => true
 ~~~
 
 
+# gt
+
+Return true when an int is greater then another int.
+
+~~~
+gt(a: int, b: int) bool
+~~~
+
+Examples:
+
+~~~
+gt(2, 4) => false
+gt(3, 2) => true
+~~~
+
+
 # gte
 
 Return true when a float is greater than or equal to another float.
@@ -466,6 +707,22 @@ Examples:
 ~~~
 gte(2.8, 4.3) => false
 gte(3.1, 3.1) => true
+~~~
+
+
+# gte
+
+Return true when an int is greater then or equal to another int.
+
+~~~
+gte(a: int, b: int) bool
+~~~
+
+Examples:
+
+~~~
+gte(2, 4) => false
+gte(3, 3) => true
 ~~~
 
 
@@ -580,6 +837,61 @@ int(-6.3456, "truncate") => -6
 ~~~
 
 
+# int
+
+Create an int from a number string.
+
+~~~
+int(numString: string, roundOption: optional string) int
+~~~
+
+Round options:
+
+* "round" - nearest integer, the default
+* "floor" - integer below (to the left on number line)
+* "ceiling" - integer above (to the right on number line)
+* "truncate" - remove decimals
+
+Examples:
+
+~~~
+int("2") => 2
+int("2.34") => 2
+int("-2.34", "round") => -2
+int("6.5", "round") => 7
+int("-6.5", "round") => -7
+int("4.57", "floor") => 4
+int("-4.57", "floor") => -5
+int("6.3", "ceiling") => 7
+int("-6.3", "ceiling") => -6
+int("6.3456", "truncate") => 6
+int("-6.3456", "truncate") => -6
+~~~
+
+
+# int
+
+Create an int from a number string. If the string is not a number, return the default value.
+
+~~~
+int(numString: string, roundOption: string, default: optional any) any
+~~~
+
+Round options:
+
+* "round" - nearest integer, the default
+* "floor" - integer below (to the left on number line)
+* "ceiling" - integer above (to the right on number line)
+* "truncate" - remove decimals
+
+Examples:
+
+~~~
+int("2", "round", "nan") => 2
+int("notnum", "round", "nan") => nan
+~~~
+
+
 # join
 
 Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
@@ -676,6 +988,39 @@ len(dict("a", 4, "b", 3)) => 2
 ~~~
 
 
+# len
+
+Number of elements in a list.
+
+~~~
+len(list: list) int
+~~~
+
+Examples:
+
+~~~
+len(list()) => 0
+len(list(1)) => 1
+len(list(4, 5)) => 2
+~~~
+
+
+# len
+
+Number of unicode characters in a string.
+
+~~~
+len(str: string) int
+~~~
+
+Examples:
+
+~~~
+len("tea") => 3
+len("añyóng") => 6
+~~~
+
+
 # list
 
 Create a list of variables. You can also create a list with brackets.
@@ -702,29 +1047,31 @@ a = ["a", 5, "b"]
 
 Create a new list from a list and a callback function. The callback function is called for each item in the list and it decides what goes in the list.
 
-You pass a list, a callback function, and an optional state
-variable.
+You pass a list to loop over, a list to fill in, a callback
+function, and an optional state variable. The function returns
+whether the callback stopped early or not.
 
 ~~~
-listLoop(a: list, callback: func, state: optional any) list
+listLoop(a: list, newList: list, listCallback: func, state: optional any) bool
 ~~~
 
-The callback gets pasted the index to the item, its value, the
-new list and the state variable.  The callback looks at the
-information and adds to the new list when appropriate. The
+The callback gets passed the index to the item, its value, the
+new item and the state variable.  The callback looks at the
+information and adds to the new item when appropriate. The
 callback returns true to stop iterating.
 
 ~~~
-callback(ix: int, item: any, newList: list, state: optional any) bool
+listCallback(ix: int, item: any, newList: list, state: optional any) bool
 ~~~
 
 The following example makes a new list [6, 8] from the list
 [2,4,6,8].  The callback is called b5.
 
 ~~~
+newList = []
 list = [2,4,6,8]
-newlist = listLoop(list, b5)
-=> [6, 8]
+stopped = listLoop(list, newList, b5)
+newList => [6, 8]
 ~~~
 
 Below is the definition of the b5 callback function.
@@ -800,6 +1147,22 @@ lt(3.1, 2.5) => false
 ~~~
 
 
+# lt
+
+Return true when an int is less than another int.
+
+~~~
+lt(a: int, b: int) bool
+~~~
+
+Examples:
+
+~~~
+gt(2, 4) => true
+gt(3, 2) => false
+~~~
+
+
 # lte
 
 Return true when a float is less than or equal to another float.
@@ -817,6 +1180,23 @@ lte(4.0, 3.0) => false
 ~~~
 
 
+# lte
+
+Return true when an int is less than or equal to another int.
+
+~~~
+lte(a: int, b: int) bool
+~~~
+
+Examples:
+
+~~~
+lte(2, 4) => true
+lte(3, 3) => true
+lte(4, 3) => false
+~~~
+
+
 # ne
 
 Return true when two floats are not equal.
@@ -830,6 +1210,38 @@ Examples:
 ~~~
 ne(1.2, 1.2) => false
 ne(1.2, 3.2) => true
+~~~
+
+
+# ne
+
+Return true when two ints are not equal.
+
+~~~
+ne(a: int, b: int) bool
+~~~
+
+Examples:
+
+~~~
+ne(1, 1) => false
+ne(2, 3) => true
+~~~
+
+
+# ne
+
+Return true when two strings are not equal.
+
+~~~
+ne(a: string, b: string) bool
+~~~
+
+Examples:
+
+~~~
+ne("tea", "tea") => false
+ne("earl", "grey") => true
 ~~~
 
 
@@ -1095,6 +1507,62 @@ sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
 ~~~
 
 
+# sort
+
+Sort a list of lists.
+
+You specify the sort order, "ascending" or "descending".
+
+You specify how to sort strings either case "sensitive" or
+"insensitive".
+
+You specify which index to compare by.  The compare index value
+must exist in each list, be the same type and be an int, float,
+or string.
+
+~~~
+sort(lists: list, order: string, case: string, index: int) list
+~~~
+
+Examples:
+
+~~~
+l1 = list(4, 3, 1)
+l2 = list(2, 3, 4)
+listOfLists = list(l1, l2)
+sort(listOfLists, "ascending", "sensitive", 0) => [l2, l1]
+sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
+~~~
+
+
+# sort
+
+Sort a list of dictionaries.
+
+You specify the sort order, "ascending" or "descending".
+
+You specify how to sort strings either case "sensitive" or
+"insensitive".
+
+You specify the compare key.  The key value must exist in
+each dictionary, be the same type and be an int, float or
+string.
+
+~~~
+sort(dicts: list, order: string, case: string, key: string) list
+~~~
+
+Examples:
+
+~~~
+d1 = dict("name", "Earl Gray", "weight", 1.2)
+d2 = dict("name", "Tea Pot", "weight", 3.5)
+dicts = list(d1, d2)
+sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
+sort(dicts, "descending", "sensitive", "name") => [d2, d1]
+~~~
+
+
 # startsWith
 
 Check whether a strings starts with the given prefix. Return true when it does, else false.
@@ -1176,6 +1644,26 @@ y = 2
 ~~~
 
 
+# string
+
+Convert the dictionary variable to dot names. You specify the name of the dictionary and the dict variable.
+
+~~~
+string(dictName: string: d: dict) string
+~~~
+
+Example:
+
+~~~
+d = {"x",1, "y":"tea", "z":{"a":8}}
+string("teas", d) =>
+
+teas.x = 1
+teas.y = "tea"
+teas.z.a = 8
+~~~
+
+
 # sub
 
 Sub two floats. A warning is generated on overflow.
@@ -1189,6 +1677,23 @@ Examples:
 ~~~
 sub(4.5, 2.3) => 2.2
 sub(1.0, 2.2) => -1.2
+~~~
+
+
+# sub
+
+Subtract two integers. A warning is generated on overflow.
+
+~~~
+sub(a: int, b: int) int
+~~~
+
+Examples:
+
+~~~
+sub(3, 1) => 2
+add(3, -2) => 5
+add(1, 5) => -4
 ~~~
 
 

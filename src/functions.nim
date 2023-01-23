@@ -1590,7 +1590,7 @@ func fun_keys_dl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:~~~
   ## @:d = dict("a", 1, "b", 2, "c", 3)
   ## @:keys(d) => ["a", "b", "c"]
-  ## @:values(d) => ["apple", 2, 3]
+  ## @:values(d) => [1, 2, 3]
   ## @:~~~~
 
   tMapParameters("keys", "dl")

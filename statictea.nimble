@@ -626,35 +626,18 @@ proc taskDocs(namePart: string, forceRebuild = false) =
 
   echoGrip()
 
-proc taskReadMeFun() =
-  ## Create the readme function section from the functions.nim
-  ## file.
+proc taskFuncDocs() =
+  ## Create the rmFunctions.md file from the f dictionary.
 
-  let filename = "functions.nim"
-  var jsonName = joinPath("docs", changeFileExt(filename, "json"))
-  let hintsOff = "--hint[Conf]:off --hint[SuccessX]:off --hint[Name]:off"
-  var cmd = "nim $1 jsondoc --out:$2 src/$3" %
-    [hintsOff, jsonName, filename]
+  let statictea = fmt"bin/{dirName}/statictea"
+  let tFile = "templates/rmFunctions.md"
+  let teaFile = "templates/rmFunctions.tea"
+  let result = "docs/rmFunctions.md"
+
+  # Build the docs/rmFunctions.md file.
+  echo fmt"make {result}"
+  let cmd = fmt"{statictea} -t {tFile} -o {teaFile} -r {result}"
   exec cmd
-  echo ""
-  echo "Exported functions.nim json doc comments to $1" % [jsonName]
-
-  # Create the readme function section org file.
-  let templateName = joinPath("templates", "readmeFuncSection.org")
-  let sectionFile = joinPath("docs", "readmeFuncs.org")
-  cmd = fmt"bin/{dirName}/statictea -l -s {jsonName} -t {templateName} -r {sectionFile}"
-  echo cmd
-  exec cmd
-  echo "Generated readme function section file " & sectionFile
-
-  # rmFile(jsonName)
-
-  # Insert the function section into the readme.
-  insertFile("readme.org", "# Dynamic Content Begins",
-    "# Dynamic Content Ends", sectionFile)
-  echo "Merged function section into readme.org."
-
-  # rmFile(sectionFile)
 
 proc buildRunner() =
   let part1 = "nim c --hint[Performance]:off "
@@ -832,7 +815,7 @@ task b, "\tBuild the statictea exe.":
 task docsall, "\tCreate all the docs, docsix, docs, readmefun, dot.":
   taskDocsIx()
   taskDocs("")
-  taskReadMeFun()
+  taskFuncDocs()
   taskTestfilesReadme()
   createDependencyGraph()
   createDependencyGraph2()
@@ -872,8 +855,8 @@ task stfix, "\tDisplay markdown testfiles index json.":
   for line in json.splitLines():
     echo line
 
-task readmefun, "Create the readme function section.":
-  taskReadMeFun()
+task funcdocs, "Create the function docs (rmFunctions.md).":
+  taskFuncDocs()
 
 task dot, "\tCreate a dependency graph of the StaticTea source.":
   createDependencyGraph()
@@ -960,7 +943,7 @@ task release, "\tRun tests and update docs.":
   otherTests()
   taskDocsIx()
   taskDocs("")
-  taskReadMeFun()
+  taskFuncDocs()
   taskTestfilesReadme()
   createDependencyGraph()
   createDependencyGraph2()

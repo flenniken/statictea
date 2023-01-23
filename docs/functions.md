@@ -1208,7 +1208,7 @@ Examples:
 ~~~
 d = dict("a", 1, "b", 2, "c", 3)
 keys(d) => ["a", "b", "c"]
-values(d) => ["apple", 2, 3]
+values(d) => [1, 2, 3]
 ~~~
 
 ```nim

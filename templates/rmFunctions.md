@@ -1,13 +1,14 @@
 $$ # Create the functions documentation from the f dictionary.
 # Statictea Functions
 
+The build-in Statictea functions.
+
 # Index
 
 $$ block
 $$ : t.repeat = len(o.entries)
 $$ : entry = o.entries[t.row]
 * [{entry.name}](#{entry.anchorName}) &mdash; {entry.sentence}
-
 $$ endblock
 
 $$ block
