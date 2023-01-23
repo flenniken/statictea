@@ -14,7 +14,7 @@ The build-in Statictea functions.
 * [cmp](#cmp-1) &mdash; Compare two ints.
 * [cmp](#cmp-2) &mdash; Compare two strings.
 * [cmpVersion](#cmpversion) &mdash; Compare two StaticTea version numbers.
-* [concat](#concat) &mdash; Concatentate two strings.
+* [concat](#concat) &mdash; Concatenate two strings.
 * [dict](#dict) &mdash; Create a dictionary from a list of key, value pairs.
 * [dup](#dup) &mdash; Duplicate a string x times.
 * [eq](#eq) &mdash; Return true when two floats are equal.
@@ -303,7 +303,7 @@ cmpVersion("1.2.5", "1.2.5") => 0
 
 # concat
 
-Concatentate two strings. See [[#join][join]] for more that two arguments.
+Concatenate two strings. See the join function for more that two arguments.
 
 ~~~
 concat(a: string, b: string) string
@@ -388,7 +388,7 @@ eq(2, 3) => false
 
 # eq
 
-Return true when two strings are equal.  See [[#cmd][cmd]] for case insensitive compare.
+Return true when two strings are equal.  See cmp function for case insensitive compare.
 
 ~~~
 eq(a: string, b: string) bool
@@ -562,7 +562,7 @@ fd.signature.name = "strNumCmp"
 fd.signature.paramNames = ["numStr1","numStr2"]
 fd.signature.paramTypes = ["string","string"]
 fd.signature.returnType = "int"
-fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.n"
+fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.\n"
 fd.filename = "testcode.tea"
 fd.lineNum = 3
 fd.numLines = 2
@@ -967,7 +967,7 @@ Examples:
 ~~~
 d = dict("a", 1, "b", 2, "c", 3)
 keys(d) => ["a", "b", "c"]
-values(d) => ["apple", 2, 3]
+values(d) => [1, 2, 3]
 ~~~
 
 

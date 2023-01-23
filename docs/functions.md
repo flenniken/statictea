@@ -19,7 +19,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [fun_cmp_iii](#fun_cmp_iii) &mdash; Compare two ints.
 * [fun_cmp_ffi](#fun_cmp_ffi) &mdash; Compare two floats.
 * [fun_cmp_ssobi](#fun_cmp_ssobi) &mdash; Compare two strings.
-* [fun_concat_sss](#fun_concat_sss) &mdash; Concatentate two strings.
+* [fun_concat_sss](#fun_concat_sss) &mdash; Concatenate two strings.
 * [fun_len_si](#fun_len_si) &mdash; Number of unicode characters in a string.
 * [fun_len_li](#fun_len_li) &mdash; Number of elements in a list.
 * [fun_len_di](#fun_len_di) &mdash; Number of elements in a dictionary.
@@ -274,7 +274,7 @@ func fun_cmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult
 
 # fun_concat_sss
 
-Concatentate two strings. See [[#join][join]] for more that two arguments.
+Concatenate two strings. See the join function for more that two arguments.
 
 ~~~
 concat(a: string, b: string) string
@@ -1750,7 +1750,7 @@ fd.signature.name = "strNumCmp"
 fd.signature.paramNames = ["numStr1","numStr2"]
 fd.signature.paramTypes = ["string","string"]
 fd.signature.returnType = "int"
-fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.n"
+fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.\n"
 fd.filename = "testcode.tea"
 fd.lineNum = 3
 fd.numLines = 2
@@ -1886,7 +1886,7 @@ func fun_eq_ffb(variables: Variables; arguments: seq[Value]): FunResult
 
 # fun_eq_ssb
 
-Return true when two strings are equal.  See [[#cmd][cmd]] for case insensitive compare.
+Return true when two strings are equal.  See cmp function for case insensitive compare.
 
 ~~~
 eq(a: string, b: string) bool
@@ -2366,7 +2366,7 @@ cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
 ~~~
 """,
-                    numLines: 44), (funcName: "fun_concat_sss", docComment: """Concatentate two strings. See [[#join][join]] for more that two arguments.
+                    numLines: 44), (funcName: "fun_concat_sss", docComment: """Concatenate two strings. See the join function for more that two arguments.
 
 ~~~
 concat(a: string, b: string) string

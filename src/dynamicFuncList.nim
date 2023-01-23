@@ -216,7 +216,7 @@ cmpVersion("1.2.5", "1.2.5") => 0
 """
 
   dc_fun_concat_sss = """
-Concatentate two strings. See [[#join][join]] for more that two arguments.
+Concatenate two strings. See the join function for more that two arguments.
 
 ~~~
 concat(a: string, b: string) string
@@ -296,7 +296,7 @@ eq(2, 3) => false
 """
 
   dc_fun_eq_ssb = """
-Return true when two strings are equal.  See [[#cmd][cmd]] for case insensitive compare.
+Return true when two strings are equal.  See cmp function for case insensitive compare.
 
 ~~~
 eq(a: string, b: string) bool
@@ -462,7 +462,7 @@ fd.signature.name = "strNumCmp"
 fd.signature.paramNames = ["numStr1","numStr2"]
 fd.signature.paramTypes = ["string","string"]
 fd.signature.returnType = "int"
-fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.n"
+fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.\n"
 fd.filename = "testcode.tea"
 fd.lineNum = 3
 fd.numLines = 2
@@ -851,7 +851,7 @@ Examples:
 ~~~
 d = dict("a", 1, "b", 2, "c", 3)
 keys(d) => ["a", "b", "c"]
-values(d) => ["apple", 2, 3]
+values(d) => [1, 2, 3]
 ~~~
 """
 

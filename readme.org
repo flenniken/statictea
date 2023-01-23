@@ -2621,7 +2621,7 @@ funcdocs nimble task which uses the StaticTea template
 
 List of functions:
 
-* [[docs/rmFunctions.md][Functions]] -- Build-in Function Docs
+- [[docs/rmFunctions.md][Functions]] -- Build-in Function Docs
 
 * Contents :notoc:
 :PROPERTIES:

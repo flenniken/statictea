@@ -310,7 +310,7 @@ func fun_cmp_ssobi*(variables: Variables, arguments: seq[Value]): FunResult =
   result = newFunResult(newValue(ret))
 
 func fun_concat_sss*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Concatentate two strings. See [[#join][join]] for more that two arguments.
+  ## Concatenate two strings. See the join function for more that two arguments.
   ## @:
   ## @:~~~
   ## @:concat(a: string, b: string) string
@@ -2335,7 +2335,7 @@ func fun_functionDetails_pd*(variables: Variables, arguments: seq[Value]): FunRe
   ## @:fd.signature.paramNames = ["numStr1","numStr2"]
   ## @:fd.signature.paramTypes = ["string","string"]
   ## @:fd.signature.returnType = "int"
-  ## @:fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.\n"
+  ## @:fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.\\n"
   ## @:fd.filename = "testcode.tea"
   ## @:fd.lineNum = 3
   ## @:fd.numLines = 2
@@ -2478,7 +2478,7 @@ func fun_eq_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   result = newFunResult(newValue(cond))
 
 func fun_eq_ssb*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return true when two strings are equal.  See [[#cmd][cmd]] for case
+  ## Return true when two strings are equal.  See cmp function for case
   ## insensitive compare.
   ## @:
   ## @:~~~
