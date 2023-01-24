@@ -100,7 +100,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [getBestFunction](#getbestfunction) &mdash; Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
 * [splitFuncName](#splitfuncname) &mdash; Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".
 * [makeFuncDictionary](#makefuncdictionary) &mdash; Create the f dictionary from the built in functions.
-* [createFuncDictionary](#createfuncdictionary) &mdash; Get the "f" function dictionary.
+* [funcsVarDict](#funcsvardict) &mdash; The f dictionary of built-in functions.
 
 # StringOr
 
@@ -2429,12 +2429,12 @@ Create the f dictionary from the built in functions.
 proc makeFuncDictionary(): VarsDict
 ```
 
-# createFuncDictionary
+# funcsVarDict
 
-Get the "f" function dictionary.
+The f dictionary of built-in functions.
 
 ```nim
-proc createFuncDictionary(): Value
+funcsVarDict = makeFuncDictionary()
 ```
 
 

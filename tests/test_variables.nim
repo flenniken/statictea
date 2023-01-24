@@ -110,7 +110,6 @@ t.version = "$1"""" % staticteaVersion
     check dotNameRep(variables, top=true) == expected
 
   test "getVariable":
-    let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     check testGetVariableOk(variables, "true", "true")
     check testGetVariableOk(variables, "false", "false")

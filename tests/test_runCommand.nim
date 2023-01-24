@@ -82,7 +82,6 @@ proc testGetValuePosSi(
   # Set up variables when not passed in.
   var vars = variables
   if vars == nil:
-    let funcsVarDict = createFuncDictionary().dictv
     vars = startVariables(funcs = funcsVarDict)
 
   let valueAndPosOr = getValuePosSi(env, statement, start, vars)
@@ -317,7 +316,6 @@ proc testGetFunctionValuePosSi(
     functionPos: Natural = 0,
   ): bool =
 
-  let funcsVarDict = createFuncDictionary().dictv
   let variables = startVariables(funcs = funcsVarDict)
 
   var env = openEnvTest("_testGetFunctionValuePosSi.txt")
@@ -340,7 +338,6 @@ proc testRunStatement(
 
   var vars: Variables
   if variables == nil:
-    let funcsVarDict = createFuncDictionary().dictv
     vars = startVariables(funcs = funcsVarDict)
   else:
     vars = variables
@@ -400,7 +397,6 @@ proc testGetCondition(
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]
   ): bool =
-  let funcsVarDict = createFuncDictionary().dictv
   let variables = startVariables(funcs = funcsVarDict)
   let statement = newStatement(text)
 
@@ -423,7 +419,6 @@ proc testGetConditionWarn(
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]
   ): bool =
-  let funcsVarDict = createFuncDictionary().dictv
   let variables = startVariables(funcs = funcsVarDict)
   let statement = newStatement(text)
 
@@ -491,7 +486,6 @@ proc testProcessFunctionSignature(content: string, start: Natural,
 #   var inStream = newStringStream(content)
 #   var lineBufferO = newLineBuffer(inStream, filename = sourceFilename)
 #   var lb = lineBufferO.get()
-#   let funcsVarDict = createFuncDictionary().dictv
 #   let variables = startVariables(funcs = funcsVarDict)
 
 #   var retLeftName: string
@@ -591,7 +585,6 @@ proc testRunCodeFile(
   createFile(filename, content)
   defer: discard tryRemoveFile(filename)
 
-  let funcsVarDict = createFuncDictionary().dictv
   var variables = startVariables(funcs = funcsVarDict)
   runCodeFile(env, variables, filename)
 
@@ -885,7 +878,6 @@ $$ : c = len("hello")
       newValuePosSiOr(wNoEndingQuote, "", 8))
 
   test "getNewVariables":
-    let funcsVarDict = createFuncDictionary().dictv
     let variables = startVariables(funcs = funcsVarDict)
     check variables["f"].dictv.len != 0
     check variables["g"].dictv.len == 0
@@ -1722,7 +1714,6 @@ White$1
 
   test "a = cmp":
     let statement = newStatement(text="""a = f.cmp""", lineNum=1)
-    let funcsVarDict = createFuncDictionary().dictv
     let variables = startVariables(funcs = funcsVarDict)
     let cmpValueOr = getVariable(variables, "f.cmp", npLocal)
     if cmpValueOr.isMessage:
@@ -1733,7 +1724,6 @@ White$1
 
   test "a = get(cmp, 0)":
     let statement = newStatement(text="""a = get(f.cmp, 0)""", lineNum=1)
-    let funcsVarDict = createFuncDictionary().dictv
     let variables = startVariables(funcs = funcsVarDict)
     let cmpValueOr = getVariable(variables, "f.cmp", npLocal)
     if cmpValueOr.isMessage:
@@ -1833,14 +1823,12 @@ White$1
     check testSkipArgument("""a = fn("tea""", 7, newPosOr(wNotEnoughCharacters, "", 11))
 
   test "a = b[0]":
-    let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check $variables["l"] == """{"b":[2]}"""
     check testGetValuePosSi("""a = b[0]""", 4, 8, "2", variables)
 
   test "index 1":
-    let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     discard assignVariable(variables, "l.b", newValue(3), opAppendList)
@@ -1848,19 +1836,16 @@ White$1
     check testGetValuePosSi("""a = b[1]""", 4, 8, "3", variables)
 
   test "brackets with spaces":
-    let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check testGetValuePosSi("""a = b[ 0 ]""", 4, 10, "2", variables)
 
   test "brackets with function":
-    let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check testGetValuePosSi("""a = b[ len("") ]""", 4, 16, "2", variables)
 
   test "a = d['abc']":
-    let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     let content = """{"abc": 5}"""
     var valueOr = readJsonString(content)
@@ -1873,13 +1858,11 @@ White$1
     check testGetValuePosSi("""a = b[0]""", 4, wNotInL, 4, "b")
 
   test "bracketed list or dict":
-    let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opEqual)
     check testGetValuePosSi("""a = b[0]""", 4, wIndexNotListOrDict, 4, "int", variables)
 
   test "bracketed list warnings":
-    let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.ix", newValue(22), opEqual)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
@@ -1890,7 +1873,6 @@ White$1
     check testGetValuePosSi("""a = b[ix]""", 4, wInvalidIndexRange, 6, "22", variables)
 
   test "bracketed dict warnings":
-    let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     let content = """{"abc": 5}"""
     var valueOr = readJsonString(content)
@@ -1901,18 +1883,15 @@ White$1
     check testGetValuePosSi("""a = d["missing"]""", 4, wMissingKey, 6, "", variables)
 
   test "missing ending bracket":
-    let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check testGetValuePosSi("""a = b[0""", 4, wMissingRightBracket, 7, "", variables)
 
   test "function definition in template":
-    let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     check testGetValuePosSi("""a = func("() int")""", 4, wDefineFunction, 4, "", variables)
 
   test "nested function definition":
-    let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     check testGetValuePosSi("""a = len(func("() int"))""", 4, wDefineFunction, 8, "", variables)
 

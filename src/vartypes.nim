@@ -186,7 +186,6 @@ type
     seLogMessage = "log",
     seBareIfIgnore = "bareIfIgnore",
 
-  # todo: rename ValuePosSi to ValuePosSi
   ValuePosSi* = object
     ## A value and the position after the value in the statement along
     ## with the side effect, if any. The position includes the trailing

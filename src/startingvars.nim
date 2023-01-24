@@ -61,6 +61,5 @@ proc getStartVariables*(env: var Env, args: Args): Variables =
 
   let serverVarDict = readJsonFiles(env, args.serverList)
   let argsVarDict = getTeaArgs(args).dictv
-  let funcsVarDict = createFuncDictionary().dictv
   result = startVariables(serverVarDict, argsVarDict, funcsVarDict)
   runCodeFiles(env, result, args.codeList)

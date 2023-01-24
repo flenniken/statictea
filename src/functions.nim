@@ -2736,7 +2736,7 @@ func fun_readJson_sa*(variables: Variables, arguments: seq[Value]): FunResult =
 # for functionPtr in functionPtrs:
 #   let name = getName(functionPtr)
 #   functionsDict[name] = functionPtr
-  
+
 var functionsDict* = newTable[string, FunctionPtr]()
   ## Maps a built-in function name to a function pointer you can call.
 functionsDict["fun_add_fff"] = fun_add_fff
@@ -2941,9 +2941,5 @@ proc makeFuncDictionary*(): VarsDict =
     result[lastName] = funcList
 
 # todo: how to you make the dictionary at compile time?
-let funcVarsDict = makeFuncDictionary()
-
-# todo: rename to getFuncDictionary
-proc createFuncDictionary*(): Value =
-  ## Get the "f" function dictionary.
-  result = newValue(funcVarsDict)
+let funcsVarDict* = makeFuncDictionary()
+  ## The f dictionary of built-in functions.

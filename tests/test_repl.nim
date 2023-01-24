@@ -20,7 +20,6 @@ proc testHandleReplLine(
   var env = openEnvTest("_handleReplLine.log")
 
   # Set up variables when not passed in.
-  let funcsVarDict = createFuncDictionary().dictv
   var variables = startVariables(funcs = funcsVarDict)
 
   let stop = handleReplLine(env, variables, line)
@@ -94,7 +93,6 @@ Invalid REPL command syntax, unexpected text.
     check testHandleReplLine("pr s", false, "{}\n")
 
   test "show variables":
-    let funcsVarDict = createFuncDictionary().dictv
     let numFunctionKeys = funcsVarDict.len
     let eOut = "f={$1} g={} l={} o={} s={} t={3}\n" % $numFunctionKeys
     check testHandleReplLine("v", false, eOut)

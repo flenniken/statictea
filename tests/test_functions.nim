@@ -9,8 +9,6 @@ import variables
 import opresult
 import sharedtestcode
 
-let funcsVarDict = createFuncDictionary().dictv
-
 func newFunResult(valueOr: ValueOr, parameter=0): FunResult =
   ## Return a new FunResult object based on the ValueOr and the parameter index.
   if valueOr.isValue:
