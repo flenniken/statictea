@@ -1714,7 +1714,7 @@ type("Tea") => "string"
 type(list(1,2)) => "list"
 type(dict("a", 1)) => "dict"
 type(true) => "bool"
-type(f.cmp) => "func"
+type(f.cmp[0]) => "func"
 ~~~
 
 

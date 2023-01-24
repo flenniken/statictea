@@ -36,6 +36,7 @@ You enter statements or commands at the prompt.
 Available commands:
 * h — this help text
 * p variable — print a variable as dot names
+* ph func variable — print function's doc comment
 * pj variable — print a variable as json
 * pr variable — print a variable like in a replacement block
 * v — show the number of top variables in the top level dictionaries
@@ -46,6 +47,12 @@ proc errorAndColumn(env: var Env, messageId: MessageId, line: string,
   env.writeErr(line)
   env.writeErr(startColumn(line, runningPos))
   env.writeErr(getWarning(messageId, p1))
+
+func getDocComment(funcVar: Value): string =
+  ## Get the function's doc comment.
+  assert funcVar.kind == vkFunc
+  let functionSpec = funcVar.funcv
+  result = functionSpec.docComment
 
 proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool =
   ## Handle the REPL line. Return true to end the loop.
@@ -127,6 +134,12 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
       env.writeOut(valueToString(value))
   of "pj": # string json
     env.writeOut(valueToString(value))
+  of "ph": # print doc comment
+    if value.kind == vkFunc:
+      env.writeOut(getDocComment(value))
+    else:
+      # The variable is not a function variable.
+      errorAndColumn(env, wNotFuncVariable, line, runningPos)
   of "pr": # string rb
     env.writeOut(valueToStringRB(value))
   else:

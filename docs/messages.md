@@ -280,7 +280,8 @@ MessageId = enum
   wVarStartsWithLetter,     ## w256
   wVarContainsChars,        ## w257
   wVarEndsWith,             ## w258
-  wVarMaximumLength          ## w259
+  wVarMaximumLength,        ## w259
+  wNotFuncVariable           ## w260
 ```
 
 # Messages
@@ -548,7 +549,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "A variable starts with an ascii letter.", ## wVarStartsWithLetter
     "A variable contains ascii letters, digits, underscores and hypens.", ## wVarContainsChars
     "A variable name ends with an ascii letter or digit.", ## wVarEndsWith
-    "A variable and dot name are limited to 64 characters."]
+    "A variable and dot name are limited to 64 characters.", ## wVarMaximumLength
+    "The variable is not a function variable."]
 ```
 
 # WarningData

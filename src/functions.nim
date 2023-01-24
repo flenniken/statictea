@@ -1908,7 +1908,7 @@ func fun_type_as*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:type(list(1,2)) => "list"
   ## @:type(dict("a", 1)) => "dict"
   ## @:type(true) => "bool"
-  ## @:type(f.cmp) => "func"
+  ## @:type(f.cmp[0]) => "func"
   ## @:~~~~
 
   tMapParameters("type", "as")

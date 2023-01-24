@@ -50,6 +50,7 @@ You enter statements or commands at the prompt.
 Available commands:
 * h — this help text
 * p variable — print a variable as dot names
+* ph func variable — print function's doc comment
 * pj variable — print a variable as json
 * pr variable — print a variable like in a replacement block
 * v — show the number of top variables in the top level dictionaries

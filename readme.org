@@ -2484,6 +2484,7 @@ Available commands:
   * h — this help text
   * p dotname — print the value of a variable
   * pd dotname — print a dictionary as dot names
+  * ph func variable — print function's doc comment
   * pj dotname — print a variable as json
   * v — show the number of variables in the top level dictionaries
   * q — quit
@@ -2618,8 +2619,6 @@ variable or pass to another function.
 This section was created from the nim source code by running the
 funcdocs nimble task which uses the StaticTea template
 [[templates/rmFunctions.md][rmFunctions.md template]].
-
-List of functions:
 
 - [[docs/rmFunctions.md][Functions]] -- Build-in Function Docs
 

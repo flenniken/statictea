@@ -645,6 +645,7 @@ suite "matches.nim":
     check testMatchReplCmd("p ", 0, some(newMatches(2, 0, "p")))
     check testMatchReplCmd("pr ", 0, some(newMatches(3, 0, "pr")))
     check testMatchReplCmd("pj ", 0, some(newMatches(3, 0, "pj")))
+    check testMatchReplCmd("ph ", 0, some(newMatches(3, 0, "ph")))
 
   test "matchReplCmd":
     check testEmptyOrSpaces("", 0, true)
