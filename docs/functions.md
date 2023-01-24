@@ -184,7 +184,7 @@ func cmpBaseValues(a, b: Value; insensitive: bool = false): int
 Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.
 
 ```nim
-func parseNumber(line: string; start: Natural): ValueAndPosOr
+func parseNumber(line: string; start: Natural): ValuePosSiOr
 ```
 
 # formatString

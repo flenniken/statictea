@@ -21,8 +21,8 @@ proc testParseJsonStr(text: string, start: Natural,
   if valueAndPosOr.isMessage:
     echo "Unexpected error: " & $valueAndPosOr
     return false
-  let eValueAndPosOr = newValueAndPosOr(newValue(eStr), ePos)
-  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
+  let eValuePosSiOr = newValuePosSiOr(newValue(eStr), ePos)
+  result = gotExpected($valueAndPosOr, $eValuePosSiOr)
   if not result:
     echo text
     echo startColumn(text, start)
@@ -42,8 +42,8 @@ proc testParseJsonStrE(text: string, start: Natural,
   if valueAndPosOr.isValue:
     echo "Unexpected value: " & $valueAndPosOr
     return false
-  let eValueAndPosOr = newValueAndPosOr(eWarningData)
-  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
+  let eValuePosSiOr = newValuePosSiOr(eWarningData)
+  result = gotExpected($valueAndPosOr, $eValuePosSiOr)
 
 proc testUnescapePopularChar(popular: char, eChar: char): bool =
   let ch = unescapePopularChar(popular)

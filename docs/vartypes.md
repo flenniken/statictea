@@ -26,8 +26,8 @@ StaticTea variable types.
 * type: [FunResultKind](#funresultkind) &mdash; The kind of a FunResult object, either a value or warning.
 * type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a warning.
 * type: [SideEffect](#sideeffect) &mdash; The kind of side effect for a statement.
-* type: [ValueAndPos](#valueandpos) &mdash; A value and the position after the value in the statement along with the side effect, if any.
-* type: [ValueAndPosOr](#valueandposor) &mdash; A ValueAndPos object or a warning.
+* type: [ValuePosSi](#valuepossi) &mdash; A value and the position after the value in the statement along with the side effect, if any.
+* type: [ValuePosSiOr](#valuepossior) &mdash; A ValuePosSi object or a warning.
 * [newSignature](#newsignature) &mdash; Create a Signature object.
 * [newSignatureOr](#newsignatureor) &mdash; Create a new SignatureOr with a message.
 * [newSignatureOr](#newsignatureor-1) &mdash; Create a new SignatureOr with a message.
@@ -72,14 +72,14 @@ same type which may be Value type.
 * [`==`](#-5) &mdash; Compare two FunResult objects and return true when equal.
 * [`!=`](#-6) &mdash; Compare two FunResult objects and return false when equal.
 * [`$`](#-7) &mdash; Return a string representation of a FunResult object.
-* [newValueAndPos](#newvalueandpos) &mdash; Create a newValueAndPos object.
-* [newValueAndPosOr](#newvalueandposor) &mdash; Create a ValueAndPosOr warning.
-* [newValueAndPosOr](#newvalueandposor-1) &mdash; Create a ValueAndPosOr warning.
+* [newValuePosSi](#newvaluepossi) &mdash; Create a newValuePosSi object.
+* [newValuePosSiOr](#newvaluepossior) &mdash; Create a ValuePosSiOr warning.
+* [newValuePosSiOr](#newvaluepossior-1) &mdash; Create a ValuePosSiOr warning.
 * [`==`](#-8) &mdash; Return true when a equals b.
-* [`!=`](#-9) &mdash; Compare two ValueAndPosOr objects and return false when equal.
-* [newValueAndPosOr](#newvalueandposor-2) &mdash; Create a ValueAndPosOr from a value, pos and exit.
-* [newValueAndPosOr](#newvalueandposor-3) &mdash; Create a ValueAndPosOr value from a number or string.
-* [newValueAndPosOr](#newvalueandposor-4) &mdash; Create a ValueAndPosOr from a ValueAndPos.
+* [`!=`](#-9) &mdash; Compare two ValuePosSiOr objects and return false when equal.
+* [newValuePosSiOr](#newvaluepossior-2) &mdash; Create a ValuePosSiOr from a value, pos and exit.
+* [newValuePosSiOr](#newvaluepossior-3) &mdash; Create a ValuePosSiOr value from a number or string.
+* [newValuePosSiOr](#newvaluepossior-4) &mdash; Create a ValuePosSiOr from a ValuePosSi.
 * [codeToParamType](#codetoparamtype) &mdash; Convert a parameter code letter to a ParamType.
 * [strToParamType](#strtoparamtype) &mdash; Return the parameter type for the given string, e.
 * [shortName](#shortname) &mdash; Return a short name based on the given index value.
@@ -337,7 +337,7 @@ SideEffect = enum
   seBareIfIgnore = "bareIfIgnore"
 ```
 
-# ValueAndPos
+# ValuePosSi
 
 A value and the position after the value in the statement along with the side effect, if any. The position includes the trailing whitespace.  For the example statement below, the value 567 starts at index 6 and ends at position 10.
 
@@ -349,19 +349,19 @@ var = 567 # test
 ~~~
 
 ```nim
-ValueAndPos = object
+ValuePosSi = object
   value*: Value
   pos*: Natural
   sideEffect*: SideEffect
 
 ```
 
-# ValueAndPosOr
+# ValuePosSiOr
 
-A ValueAndPos object or a warning.
+A ValuePosSi object or a warning.
 
 ```nim
-ValueAndPosOr = OpResultWarn[ValueAndPos]
+ValuePosSiOr = OpResultWarn[ValuePosSi]
 ```
 
 # newSignature
@@ -727,28 +727,28 @@ Return a string representation of a FunResult object.
 func `$`(funResult: FunResult): string
 ```
 
-# newValueAndPos
+# newValuePosSi
 
-Create a newValueAndPos object.
+Create a newValuePosSi object.
 
 ```nim
-proc newValueAndPos(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValueAndPos
+proc newValuePosSi(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSi
 ```
 
-# newValueAndPosOr
+# newValuePosSiOr
 
-Create a ValueAndPosOr warning.
+Create a ValuePosSiOr warning.
 
 ```nim
-func newValueAndPosOr(warning: MessageId; p1 = ""; pos = 0): ValueAndPosOr
+func newValuePosSiOr(warning: MessageId; p1 = ""; pos = 0): ValuePosSiOr
 ```
 
-# newValueAndPosOr
+# newValuePosSiOr
 
-Create a ValueAndPosOr warning.
+Create a ValuePosSiOr warning.
 
 ```nim
-func newValueAndPosOr(warningData: WarningData): ValueAndPosOr
+func newValuePosSiOr(warningData: WarningData): ValuePosSiOr
 ```
 
 # `==`
@@ -756,40 +756,39 @@ func newValueAndPosOr(warningData: WarningData): ValueAndPosOr
 Return true when a equals b.
 
 ```nim
-proc `==`(a: ValueAndPosOr; b: ValueAndPosOr): bool
+proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool
 ```
 
 # `!=`
 
-Compare two ValueAndPosOr objects and return false when equal.
+Compare two ValuePosSiOr objects and return false when equal.
 
 ```nim
-proc `!=`(a: ValueAndPosOr; b: ValueAndPosOr): bool
+proc `!=`(a: ValuePosSiOr; b: ValuePosSiOr): bool
 ```
 
-# newValueAndPosOr
+# newValuePosSiOr
 
-Create a ValueAndPosOr from a value, pos and exit.
+Create a ValuePosSiOr from a value, pos and exit.
 
 ```nim
-func newValueAndPosOr(value: Value; pos: Natural;
-                      sideEffect: SideEffect = seNone): ValueAndPosOr
+func newValuePosSiOr(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSiOr
 ```
 
-# newValueAndPosOr
+# newValuePosSiOr
 
-Create a ValueAndPosOr value from a number or string.
+Create a ValuePosSiOr value from a number or string.
 
 ```nim
-proc newValueAndPosOr(number: int | int64 | float64 | string; pos: Natural): ValueAndPosOr
+proc newValuePosSiOr(number: int | int64 | float64 | string; pos: Natural): ValuePosSiOr
 ```
 
-# newValueAndPosOr
+# newValuePosSiOr
 
-Create a ValueAndPosOr from a ValueAndPos.
+Create a ValuePosSiOr from a ValuePosSi.
 
 ```nim
-func newValueAndPosOr(val: ValueAndPos): ValueAndPosOr
+func newValuePosSiOr(val: ValuePosSi): ValuePosSiOr
 ```
 
 # codeToParamType

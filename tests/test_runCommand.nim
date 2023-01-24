@@ -39,8 +39,8 @@ proc testGetVariableNameOr(text: string, start: Natural,
     if eNewVariableNameOr.isMessage:
       showWarningData(text, start, eNewVariableNameOr.message, "expected")
 
-proc echoValueAndPosOr(statement: Statement, start: Natural,
-    valueAndPosOr: ValueAndPosOr, eValueAndPosOr: ValueAndPosOr) =
+proc echoValuePosSiOr(statement: Statement, start: Natural,
+    valueAndPosOr: ValuePosSiOr, eValuePosSiOr: ValuePosSiOr) =
   ## Show the statement and the two values and positions so you can
   ## visually compare them.
   echo ""
@@ -58,26 +58,26 @@ proc echoValueAndPosOr(statement: Statement, start: Natural,
     echo getWarnStatement("filename", statement, valueAndPosOr.message)
 
   echo "expected:"
-  if eValueAndPosOr.isValue:
-    echo "value: $1" % $eValueAndPosOr.value
+  if eValuePosSiOr.isValue:
+    echo "value: $1" % $eValuePosSiOr.value
     echo "0123456789 123456789 123456789"
     echo statement.text
-    echo startColumn(statement.text, eValueAndPosOr.value.pos, "^ pos")
+    echo startColumn(statement.text, eValuePosSiOr.value.pos, "^ pos")
   else:
-    echo getWarnStatement("filename", statement, eValueAndPosOr.message)
+    echo getWarnStatement("filename", statement, eValuePosSiOr.message)
   echo ""
 
-proc testGetValueAndPos(
+proc testGetValuePosSi(
     statement: Statement,
     start: Natural,
-    eValueAndPosOr: ValueAndPosOr,
+    eValuePosSiOr: ValuePosSiOr,
     variables: Variables = nil,
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]
   ): bool =
 
-  var env = openEnvTest("_testGetValueAndPos.txt")
+  var env = openEnvTest("_testGetValuePosSi.txt")
 
   # Set up variables when not passed in.
   var vars = variables
@@ -85,21 +85,21 @@ proc testGetValueAndPos(
     let funcsVarDict = createFuncDictionary().dictv
     vars = startVariables(funcs = funcsVarDict)
 
-  let valueAndPosOr = getValueAndPos(env, statement, start, vars)
+  let valueAndPosOr = getValuePosSi(env, statement, start, vars)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-  if valueAndPosOr != eValueAndPosOr:
+  if valueAndPosOr != eValuePosSiOr:
     result = false
-    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
+    echoValuePosSiOr(statement, start, valueAndPosOr, eValuePosSiOr)
 
-proc testGetValueAndPos(text: string, start: Natural,
+proc testGetValuePosSi(text: string, start: Natural,
     eWarning: MessageId, pos = 0, p1 = "", variables: Variables = nil): bool =
   let statement = newStatement(text)
-  let eValueAndPosOr = newValueAndPosOr(eWarning, p1, pos)
-  result = testGetValueAndPos(statement, start, eValueAndPosOr, variables)
+  let eValuePosSiOr = newValuePosSiOr(eWarning, p1, pos)
+  result = testGetValuePosSi(statement, start, eValuePosSiOr, variables)
 
-proc testGetValueAndPos(text: string, start: Natural,
+proc testGetValuePosSi(text: string, start: Natural,
     ePos: Natural, eJson: string, variables: Variables = nil): bool =
   let statement = newStatement(text)
   let eValue = readJsonString(eJson)
@@ -107,8 +107,8 @@ proc testGetValueAndPos(text: string, start: Natural,
     echo "eJson = " & eJson
     echo $eValue
     return false
-  let eValueAndPosOr = newValueAndPosOr(eValue.value, ePos)
-  result = testGetValueAndPos(statement, start, eValueAndPosOr, variables)
+  let eValuePosSiOr = newValuePosSiOr(eValue.value, ePos)
+  result = testGetValuePosSi(statement, start, eValuePosSiOr, variables)
 
 proc testGetMultilineStr(pattern: string, start: Natural,
     eStr: string, ePos: Natural): bool =
@@ -119,13 +119,13 @@ proc testGetMultilineStr(pattern: string, start: Natural,
   if valueAndPosOr.isMessage:
     echo "Unexpected error: " & $valueAndPosOr
     return false
-  let eValueAndPosOr = newValueAndPosOr(eStr, ePos)
-  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
+  let eValuePosSiOr = newValuePosSiOr(eStr, ePos)
+  result = gotExpected($valueAndPosOr, $eValuePosSiOr)
 
   if not result:
     let statement = newStatement(text)
     echo visibleControl(text)
-    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
+    echoValuePosSiOr(statement, start, valueAndPosOr, eValuePosSiOr)
   else:
     let literal = valueAndPosOr.value.value.stringv
     var pos = validateUtf8String(literal)
@@ -139,12 +139,12 @@ proc testGetMultilineStrE(pattern: string, start: Natural,
 
   let text = pattern % tripleQuotes
   let valueAndPosOr = getMultilineStr(text, start)
-  let eValueAndPosOr = newValueAndPosOr(eWarningData)
-  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
+  let eValuePosSiOr = newValuePosSiOr(eWarningData)
+  result = gotExpected($valueAndPosOr, $eValuePosSiOr)
   if not result:
     let statement = newStatement(text)
     echo visibleControl(text)
-    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
+    echoValuePosSiOr(statement, start, valueAndPosOr, eValuePosSiOr)
 
 proc getCmdLinePartsTest(commandLines: seq[string]): seq[LineParts] =
   ## Return the line parts from the given lines. Only used for
@@ -213,14 +213,14 @@ proc testGetStatements2(content: string, expectedStatements: seq[Statement]): bo
       result = false
 
 proc testGetNumber(statement: Statement, start: Natural,
-    eValueAndPosOr: ValueAndPosOr): bool =
+    eValuePosSiOr: ValuePosSiOr): bool =
   ## Return true when the statement contains the expected number. When
   ## it doesn't, show the values and expected values and return false.
 
   let valueAndPosOr = getNumber(statement, start)
-  result = gotExpected($valueAndPosOr, $eValueAndPosOr, statement.text)
+  result = gotExpected($valueAndPosOr, $eValuePosSiOr, statement.text)
   if not result:
-    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
+    echoValuePosSiOr(statement, start, valueAndPosOr, eValuePosSiOr)
 
 func sameNumBytesStr(text: string): Option[string] =
   ## Create an ascii string with the same number of bytes as the given
@@ -267,10 +267,10 @@ proc testStartColumn(text: string, start: Natural, eStr = "", message = "^"): bo
     echo eStr & " - expected"
 
 proc testGetString(statement: Statement, start: Natural,
-    eValueAndPosOr: ValueAndPosOr): bool =
+    eValuePosSiOr: ValuePosSiOr): bool =
 
   let valueAndPosOr = getString(statement, start)
-  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
+  result = gotExpected($valueAndPosOr, $eValuePosSiOr)
   if not result:
     let numBytesStrO = sameNumBytesStr(statement.text)
     if not numBytesStrO.isSome:
@@ -280,17 +280,17 @@ proc testGetString(statement: Statement, start: Natural,
     if numBytesStr != statement.text:
       echo numBytesStr
 
-    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
+    echoValuePosSiOr(statement, start, valueAndPosOr, eValuePosSiOr)
 
 proc testGetStringInvalid(buffer: seq[uint8]): bool =
   let str = bytesToString(buffer)
   let statement = newStatement("""a = "stringwithbadutf8:$1:end"""" % str)
   let start = 4
   let valueAndPosOr = getString(statement, start)
-  let eValueAndPosOr = newValueAndPosOr(wInvalidUtf8ByteSeq, "23", 23)
-  result = gotExpected($valueAndPosOr, $eValueAndPosOr)
+  let eValuePosSiOr = newValuePosSiOr(wInvalidUtf8ByteSeq, "23", 23)
+  result = gotExpected($valueAndPosOr, $eValuePosSiOr)
   if not result:
-    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
+    echoValuePosSiOr(statement, start, valueAndPosOr, eValuePosSiOr)
 
 proc testWarnStatement(statement: Statement,
     warning: MessageId, start: Natural, p1: string="",
@@ -306,11 +306,11 @@ proc testWarnStatement(statement: Statement,
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-proc testGetFunctionValueAndPos(
+proc testGetFunctionValuePosSi(
     functionName: string,
     statement: Statement,
     start: Natural,
-    eValueAndPosOr: ValueAndPosOr,
+    eValuePosSiOr: ValuePosSiOr,
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[],
@@ -320,14 +320,14 @@ proc testGetFunctionValueAndPos(
   let funcsVarDict = createFuncDictionary().dictv
   let variables = startVariables(funcs = funcsVarDict)
 
-  var env = openEnvTest("_testGetFunctionValueAndPos.txt")
-  let valueAndPosOr = getFunctionValueAndPos(env, functionName, functionPos,
+  var env = openEnvTest("_testGetFunctionValuePosSi.txt")
+  let valueAndPosOr = getFunctionValuePosSi(env, functionName, functionPos,
     statement, start, variables, list=false)
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-  gotExpectedResult($valueAndPosOr, $eValueAndPosOr, statement.text)
+  gotExpectedResult($valueAndPosOr, $eValuePosSiOr, statement.text)
   if not result:
-    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
+    echoValuePosSiOr(statement, start, valueAndPosOr, eValuePosSiOr)
 
 proc testRunStatement(
     statement: Statement,
@@ -345,7 +345,7 @@ proc testRunStatement(
   else:
     vars = variables
 
-  var env = openEnvTest("_testGetFunctionValueAndPos.txt")
+  var env = openEnvTest("_testGetFunctionValuePosSi.txt")
   let variableDataOr = runStatement(env, statement, vars)
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
@@ -404,14 +404,14 @@ proc testGetCondition(
   let variables = startVariables(funcs = funcsVarDict)
   let statement = newStatement(text)
 
-  var env = openEnvTest("_testGetFunctionValueAndPos.txt")
+  var env = openEnvTest("_testGetFunctionValuePosSi.txt")
   let valueAndPosOr = getCondition(env, statement, start, variables)
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-  let eValueAndPosOr = newValueAndPosOr(newValue(eBool), ePos)
-  gotExpectedResult($valueAndPosOr, $eValueAndPosOr)
+  let eValuePosSiOr = newValuePosSiOr(newValue(eBool), ePos)
+  gotExpectedResult($valueAndPosOr, $eValuePosSiOr)
   if not result:
-    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
+    echoValuePosSiOr(statement, start, valueAndPosOr, eValuePosSiOr)
 
 proc testGetConditionWarn(
     text: string,
@@ -431,10 +431,10 @@ proc testGetConditionWarn(
   let valueAndPosOr = getCondition(env, statement, start, variables)
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-  let eValueAndPosOr = newValueAndPosOr(eWarning, eP1, ePos)
-  gotExpectedResult($valueAndPosOr, $eValueAndPosOr)
+  let eValuePosSiOr = newValuePosSiOr(eWarning, eP1, ePos)
+  gotExpectedResult($valueAndPosOr, $eValuePosSiOr)
   if not result:
-    echoValueAndPosOr(statement, start, valueAndPosOr, eValueAndPosOr)
+    echoValuePosSiOr(statement, start, valueAndPosOr, eValuePosSiOr)
 
 proc showGotExpectedWarnings(line: string, signatureOr: SignatureOr, eSignatureOr: SignatureOr) =
   if signatureOr.isMessage or eSignatureOr.isMessage:
@@ -791,73 +791,73 @@ $$ : c = len("hello")
 
   test "getNumber":
     check testGetNumber(newStatement("a = 5"), 4,
-      newValueAndPosOr(5, 5))
+      newValuePosSiOr(5, 5))
     check testGetNumber(newStatement("a = 22  ,  # test"), 4,
-      newValueAndPosOr(22, 8))
+      newValuePosSiOr(22, 8))
     check testGetNumber(newStatement("a = 123456"), 4,
-      newValueAndPosOr(123456, 10))
+      newValuePosSiOr(123456, 10))
     check testGetNumber(newStatement("a = 1_23_456"), 4,
-      newValueAndPosOr(123456, 12))
+      newValuePosSiOr(123456, 12))
     check testGetNumber(newStatement("a = 1_23_456.78"), 4,
-      newValueAndPosOr(123456.78, 15))
+      newValuePosSiOr(123456.78, 15))
 
   test "getNumber more":
     check testGetNumber(newStatement("a = 5.0"), 4,
-      newValueAndPosOr(5.0, 7))
+      newValuePosSiOr(5.0, 7))
     check testGetNumber(newStatement("a = -2"), 4,
-      newValueAndPosOr(-2, 6))
+      newValuePosSiOr(-2, 6))
     check testGetNumber(newStatement("a = -3.4"), 4,
-      newValueAndPosOr(-3.4, 8))
+      newValuePosSiOr(-3.4, 8))
     check testGetNumber(newStatement("a = 88 "), 4,
-      newValueAndPosOr(88, 7))
+      newValuePosSiOr(88, 7))
 
     # Starts with Valid number but invalid statement.
     check testGetNumber(newStatement("a = 88 abc "), 4,
-      newValueAndPosOr(88, 7))
+      newValuePosSiOr(88, 7))
 
   test "getNumber not a number":
     check testGetNumber(newStatement("a = -abc"), 4,
-      newValueAndPosOr(wNotNumber, "", 4))
+      newValuePosSiOr(wNotNumber, "", 4))
 
   test "getNumberIntTooBig":
     let statement = newStatement("a = 9_223_372_036_854_775_808")
-    check testGetNumber(statement, 4, newValueAndPosOr(wNumberOverFlow, "", 4))
+    check testGetNumber(statement, 4, newValuePosSiOr(wNumberOverFlow, "", 4))
 
   test "getString":
     check testGetString(newStatement("""a = "hello""""), 4,
-      newValueAndPosOr("hello", 11))
+      newValuePosSiOr("hello", 11))
 
     check testGetString(newStatement("a = \"hello\""), 4,
-      newValueAndPosOr("hello", 11))
+      newValuePosSiOr("hello", 11))
 
     check testGetString(newStatement("""a = "hello"  """), 4,
-      newValueAndPosOr("hello", 13))
+      newValuePosSiOr("hello", 13))
 
     check testGetString(newStatement("a = \"hello\"\n"), 4,
-      newValueAndPosOr("hello", 12))
+      newValuePosSiOr("hello", 12))
 
     check testGetString(newStatement("a = \"hello\"   #\n"), 4,
-      newValueAndPosOr("hello", 14))
+      newValuePosSiOr("hello", 14))
 
   test "getString two bytes":
     let str = bytesToString(@[0xc3u8, 0xb1])
     let statement = newStatement("""a = "$1"""" % str)
-    check testGetString(statement, 4, newValueAndPosOr(str, 8))
+    check testGetString(statement, 4, newValuePosSiOr(str, 8))
 
   test "getString three bytes":
     let str = bytesToString(@[0xe2u8, 0x82, 0xa1])
     let statement = newStatement("""a = "$1"""" % str)
-    check testGetString(statement, 4, newValueAndPosOr(str, 9))
+    check testGetString(statement, 4, newValuePosSiOr(str, 9))
 
   test "getString four bytes":
     let str = bytesToString(@[0xf0u8, 0x90, 0x8c, 0xbc])
     let statement = newStatement("""a = "$1"""" % str)
-    check testGetString(statement, 4, newValueAndPosOr(str, 10))
+    check testGetString(statement, 4, newValuePosSiOr(str, 10))
 
   test "getString invalid after multibytes":
     let threeBytes = bytesToString(@[0xe2u8, 0x82, 0xa1])
     let statement = newStatement("""a = "$1 invalid \4 slashed " # test""" % threeBytes)
-    check testGetString(statement, 4, newValueAndPosOr(wNotPopular, "", 18))
+    check testGetString(statement, 4, newValuePosSiOr(wNotPopular, "", 18))
 
   test "getString invalid ff":
     check testGetStringInvalid(@[0xffu8])
@@ -882,7 +882,7 @@ $$ : c = len("hello")
 
   test "getString not string":
     check testGetString(newStatement("""a = "abc"""), 4,
-      newValueAndPosOr(wNoEndingQuote, "", 8))
+      newValuePosSiOr(wNoEndingQuote, "", 8))
 
   test "getNewVariables":
     let funcsVarDict = createFuncDictionary().dictv
@@ -942,39 +942,39 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "getFunctionValue":
     let statement = newStatement(text="""tea = len("abc") """, lineNum=16)
-    let valueAndPos = newValueAndPos(newValue(3), 17)
-    let eValueAndPosOr = newValueAndPosOr(valueAndPos)
-    check testGetFunctionValueAndPos("len", statement, 10, eValueAndPosOr)
+    let valueAndPos = newValuePosSi(newValue(3), 17)
+    let eValuePosSiOr = newValuePosSiOr(valueAndPos)
+    check testGetFunctionValuePosSi("len", statement, 10, eValuePosSiOr)
 
   test "getFunctionValue 2 parameters":
     let statement = newStatement(text="""tea = concat("abc", "def") """,
       lineNum=16)
-    let valueAndPos = newValueAndPos(newValue("abcdef"), 27)
-    let eValueAndPosOr = newValueAndPosOr(valueAndPos)
-    check testGetFunctionValueAndPos("concat", statement, 13, eValueAndPosOr)
+    let valueAndPos = newValuePosSi(newValue("abcdef"), 27)
+    let eValuePosSiOr = newValuePosSiOr(valueAndPos)
+    check testGetFunctionValuePosSi("concat", statement, 13, eValuePosSiOr)
 
   test "getFunctionValue nested":
     let text = """tea = concat("abc", concat("xyz", "123")) """
                  #0123456789 123456789 123456789 123456789 12345
     let statement = newStatement(text)
-    let valueAndPos = newValueAndPos(newValue("abcxyz123"), 42)
-    let eValueAndPosOr = newValueAndPosOr(valueAndPos)
-    check testGetFunctionValueAndPos("concat", statement, 13, eValueAndPosOr)
+    let valueAndPos = newValuePosSi(newValue("abcxyz123"), 42)
+    let eValuePosSiOr = newValuePosSiOr(valueAndPos)
+    check testGetFunctionValuePosSi("concat", statement, 13, eValuePosSiOr)
 
   test "getFunctionValue missing )":
     let statement = newStatement(text="""tea = len("abc"""", lineNum=16)
-    let eValueAndPosOr = newValueAndPosOr(wMissingCommaParen, "", 15)
-    check testGetFunctionValueAndPos("len", statement, 10, eValueAndPosOr)
+    let eValuePosSiOr = newValuePosSiOr(wMissingCommaParen, "", 15)
+    check testGetFunctionValuePosSi("len", statement, 10, eValuePosSiOr)
 
   test "getFunctionValue missing quote":
     let statement = newStatement(text="""tea = len("abc)""", lineNum=16)
-    let eValueAndPosOr = newValueAndPosOr(wNoEndingQuote, "", 15)
-    check testGetFunctionValueAndPos("len", statement, 10, eValueAndPosOr)
+    let eValuePosSiOr = newValuePosSiOr(wNoEndingQuote, "", 15)
+    check testGetFunctionValuePosSi("len", statement, 10, eValuePosSiOr)
 
   test "getFunctionValue extra comma":
     let statement = newStatement(text="""tea = len("abc",) """, lineNum=16)
-    let eValueAndPosOr = newValueAndPosOr(wInvalidRightHandSide, "", 16)
-    check testGetFunctionValueAndPos("len", statement, 10, eValueAndPosOr)
+    let eValuePosSiOr = newValuePosSiOr(wInvalidRightHandSide, "", 16)
+    check testGetFunctionValuePosSi("len", statement, 10, eValuePosSiOr)
 
   test "runStatement":
     let statement = newStatement(text="""t.repeat = 4 """, lineNum=1)
@@ -1743,9 +1743,9 @@ White$1
     check testRunStatement(statement, eVariableDataOr, variables)
 
   test "a5#":
-    check testGetValueAndPos("""a = 5 #""", 4, 6, "5")
+    check testGetValuePosSi("""a = 5 #""", 4, 6, "5")
 
-  test "getValueAndPos and skip":
+  test "getValuePosSi and skip":
     # var valueOr = readJsonString("{b:1,c:2}")
     let statements = [
       ("""a = 5 # number""", 4, 6, "5"),
@@ -1773,13 +1773,13 @@ White$1
       #             10        20        30        40
     ]
     for (text, start, ePos, eJson) in statements:
-      check testGetValueAndPos(text, start, ePos, eJson)
+      check testGetValuePosSi(text, start, ePos, eJson)
       check testSkipArgument(text, start, newPosOr(ePos))
 
-  test "getValueAndPos warnings":
-    check testGetValueAndPos("""a = 5""", 1, wInvalidRightHandSide, 1)
-    check testGetValueAndPos("""a = b""", 4, wNotInL, 4, "b")
-    check testGetValueAndPos("""a = _""", 4, wInvalidRightHandSide, 4)
+  test "getValuePosSi warnings":
+    check testGetValuePosSi("""a = 5""", 1, wInvalidRightHandSide, 1)
+    check testGetValuePosSi("""a = b""", 4, wNotInL, 4, "b")
+    check testGetValuePosSi("""a = _""", 4, wInvalidRightHandSide, 4)
 
   test "skipArgument":
     check testSkipArgument("""a = fn(1)""", 7, newPosOr(8))
@@ -1837,7 +1837,7 @@ White$1
     var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     check $variables["l"] == """{"b":[2]}"""
-    check testGetValueAndPos("""a = b[0]""", 4, 8, "2", variables)
+    check testGetValuePosSi("""a = b[0]""", 4, 8, "2", variables)
 
   test "index 1":
     let funcsVarDict = createFuncDictionary().dictv
@@ -1845,19 +1845,19 @@ White$1
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
     discard assignVariable(variables, "l.b", newValue(3), opAppendList)
     check $variables["l"] == """{"b":[2,3]}"""
-    check testGetValueAndPos("""a = b[1]""", 4, 8, "3", variables)
+    check testGetValuePosSi("""a = b[1]""", 4, 8, "3", variables)
 
   test "brackets with spaces":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
-    check testGetValueAndPos("""a = b[ 0 ]""", 4, 10, "2", variables)
+    check testGetValuePosSi("""a = b[ 0 ]""", 4, 10, "2", variables)
 
   test "brackets with function":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
-    check testGetValueAndPos("""a = b[ len("") ]""", 4, 16, "2", variables)
+    check testGetValuePosSi("""a = b[ len("") ]""", 4, 16, "2", variables)
 
   test "a = d['abc']":
     let funcsVarDict = createFuncDictionary().dictv
@@ -1867,27 +1867,27 @@ White$1
     let value = valueOr.value
     discard assignVariable(variables, "l.d", value, opEqual)
     check $variables["l"] == """{"d":{"abc":5}}"""
-    check testGetValueAndPos("""a = d["abc"]""", 4, 12, "5", variables)
+    check testGetValuePosSi("""a = d["abc"]""", 4, 12, "5", variables)
 
   test "bracketed variable missing":
-    check testGetValueAndPos("""a = b[0]""", 4, wNotInL, 4, "b")
+    check testGetValuePosSi("""a = b[0]""", 4, wNotInL, 4, "b")
 
   test "bracketed list or dict":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opEqual)
-    check testGetValueAndPos("""a = b[0]""", 4, wIndexNotListOrDict, 4, "int", variables)
+    check testGetValuePosSi("""a = b[0]""", 4, wIndexNotListOrDict, 4, "int", variables)
 
   test "bracketed list warnings":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.ix", newValue(22), opEqual)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
-    check testGetValueAndPos("""a = b[abc]""", 4, wNotInL, 6, "abc", variables)
-    check testGetValueAndPos("""a = b[%abc]""", 4, wInvalidRightHandSide, 6, "", variables)
-    check testGetValueAndPos("""a = b[2.3]""", 4, wIndexNotInt, 6, "", variables)
-    check testGetValueAndPos("""a = b[-1]""", 4, wInvalidIndexRange, 6, "-1", variables)
-    check testGetValueAndPos("""a = b[ix]""", 4, wInvalidIndexRange, 6, "22", variables)
+    check testGetValuePosSi("""a = b[abc]""", 4, wNotInL, 6, "abc", variables)
+    check testGetValuePosSi("""a = b[%abc]""", 4, wInvalidRightHandSide, 6, "", variables)
+    check testGetValuePosSi("""a = b[2.3]""", 4, wIndexNotInt, 6, "", variables)
+    check testGetValuePosSi("""a = b[-1]""", 4, wInvalidIndexRange, 6, "-1", variables)
+    check testGetValuePosSi("""a = b[ix]""", 4, wInvalidIndexRange, 6, "22", variables)
 
   test "bracketed dict warnings":
     let funcsVarDict = createFuncDictionary().dictv
@@ -1897,24 +1897,24 @@ White$1
     let value = valueOr.value
     discard assignVariable(variables, "l.d", value, opEqual)
 
-    check testGetValueAndPos("""a = d[5]""", 4, wKeyNotString, 6, "", variables)
-    check testGetValueAndPos("""a = d["missing"]""", 4, wMissingKey, 6, "", variables)
+    check testGetValuePosSi("""a = d[5]""", 4, wKeyNotString, 6, "", variables)
+    check testGetValuePosSi("""a = d["missing"]""", 4, wMissingKey, 6, "", variables)
 
   test "missing ending bracket":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
     discard assignVariable(variables, "l.b", newValue(2), opAppendList)
-    check testGetValueAndPos("""a = b[0""", 4, wMissingRightBracket, 7, "", variables)
+    check testGetValuePosSi("""a = b[0""", 4, wMissingRightBracket, 7, "", variables)
 
   test "function definition in template":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
-    check testGetValueAndPos("""a = func("() int")""", 4, wDefineFunction, 4, "", variables)
+    check testGetValuePosSi("""a = func("() int")""", 4, wDefineFunction, 4, "", variables)
 
   test "nested function definition":
     let funcsVarDict = createFuncDictionary().dictv
     var variables = startVariables(funcs = funcsVarDict)
-    check testGetValueAndPos("""a = len(func("() int"))""", 4, wDefineFunction, 8, "", variables)
+    check testGetValuePosSi("""a = len(func("() int"))""", 4, wDefineFunction, 8, "", variables)
 
   test "parse signature no params":
     let params = newSeq[Param]()

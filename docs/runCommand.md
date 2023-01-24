@@ -51,13 +51,13 @@ Run a command and fill in the variables dictionaries.
 * [bareIfAndIf0](#bareifandif0) &mdash; Handle the bare if/if0.
 * [andOrFunctions](#andorfunctions) &mdash; Return the and/or function's value and the position after.
 * [getArguments](#getarguments) &mdash; Get the function arguments and the position of each.
-* [getFunctionValueAndPos](#getfunctionvalueandpos) &mdash; Return the function's value and the position after it.
+* [getFunctionValuePosSi](#getfunctionvaluepossi) &mdash; Return the function's value and the position after it.
 * [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value.
 * [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value.
 * [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and the position after it.
 * [getBracketedVarValue](#getbracketedvarvalue) &mdash; Return the value of the bracketed variable and the position after the trailing whitespace.
 * [listLoop](#listloop) &mdash; Make a new list from an existing list.
-* [getValueAndPos](#getvalueandpos) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
+* [getValuePosSi](#getvaluepossi) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
 * [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, if0, return, warn and log.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [skipSpaces](#skipspaces) &mdash; 
@@ -445,7 +445,7 @@ string value and the ending position one past the trailing
 whitespace.
 
 ```nim
-func getMultilineStr(text: string; start: Natural): ValueAndPosOr
+func getMultilineStr(text: string; start: Natural): ValuePosSiOr
 ```
 
 # getString
@@ -453,7 +453,7 @@ func getMultilineStr(text: string; start: Natural): ValueAndPosOr
 Return a literal string value and position after it. The start parameter is the index of the first quote in the statement and the return position is after the optional trailing white space following the last quote.
 
 ```nim
-func getString(statement: Statement; start: Natural): ValueAndPosOr
+func getString(statement: Statement; start: Natural): ValuePosSiOr
 ```
 
 # getNumber
@@ -461,7 +461,7 @@ func getString(statement: Statement; start: Natural): ValueAndPosOr
 Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.
 
 ```nim
-func getNumber(statement: Statement; start: Natural): ValueAndPosOr
+func getNumber(statement: Statement; start: Natural): ValuePosSiOr
 ```
 
 # skipArgument
@@ -492,7 +492,7 @@ a = if(cond, then, else)
 
 ```nim
 proc ifFunctions(env: var Env; specialFunction: SpecialFunction;
-                 statement: Statement; start: Natural; variables: Variables): ValueAndPosOr
+                 statement: Statement; start: Natural; variables: Variables): ValuePosSiOr
 ```
 
 # bareIfAndIf0
@@ -508,7 +508,7 @@ if(c, warn("c is true"))
 
 ```nim
 proc bareIfAndIf0(env: var Env; specialFunction: SpecialFunction;
-                  statement: Statement; start: Natural; variables: Variables): ValueAndPosOr
+                  statement: Statement; start: Natural; variables: Variables): ValuePosSiOr
 ```
 
 # andOrFunctions
@@ -518,7 +518,7 @@ Return the and/or function's value and the position after. The and function stop
 ```nim
 proc andOrFunctions(env: var Env; specialFunction: SpecialFunction;
                     statement: Statement; start: Natural; variables: Variables;
-                    list = false): ValueAndPosOr
+                    list = false): ValuePosSiOr
 ```
 
 # getArguments
@@ -534,10 +534,10 @@ newList = listLoop(return(3), callback, state)  # comment
 ```nim
 proc getArguments(env: var Env; statement: Statement; start: Natural;
                   variables: Variables; list = false; arguments: var seq[Value];
-                  argumentStarts: var seq[Natural]): ValueAndPosOr
+                  argumentStarts: var seq[Natural]): ValuePosSiOr
 ```
 
-# getFunctionValueAndPos
+# getFunctionValuePosSi
 
 Return the function's value and the position after it. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
 
@@ -549,9 +549,9 @@ a = get(b, len("hi"), c)
 ~~~
 
 ```nim
-proc getFunctionValueAndPos(env: var Env; functionName: string;
-                            functionPos: Natural; statement: Statement;
-                            start: Natural; variables: Variables; list = false): ValueAndPosOr
+proc getFunctionValuePosSi(env: var Env; functionName: string;
+                           functionPos: Natural; statement: Statement;
+                           start: Natural; variables: Variables; list = false): ValuePosSiOr
 ```
 
 # runBoolOp
@@ -581,7 +581,7 @@ a = (5 < 3) # condition
 
 ```nim
 proc getCondition(env: var Env; statement: Statement; start: Natural;
-                  variables: Variables): ValueAndPosOr
+                  variables: Variables): ValuePosSiOr
 ```
 
 # getBracketedVarValue
@@ -597,7 +597,7 @@ a = dict[ "abc" ]
 
 ```nim
 proc getBracketedVarValue(env: var Env; statement: Statement; start: Natural;
-                          container: Value; variables: Variables): ValueAndPosOr
+                          container: Value; variables: Variables): ValuePosSiOr
 ```
 
 # listLoop
@@ -617,10 +617,10 @@ stopped = listLoop(list, new, callback, state)
 ```nim
 proc listLoop(env: var Env; specialFunction: SpecialFunction;
               statement: Statement; start: Natural; variables: Variables;
-              list = false): ValueAndPosOr
+              list = false): ValuePosSiOr
 ```
 
-# getValueAndPos
+# getValuePosSi
 
 Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition. The position returned includes the trailing whitespace after the item. So the ending position is pointing at the end of the statement, or at the first non-whitespace character after the item.
 
@@ -649,8 +649,8 @@ a = if( bool(len(b)), d, e) # if
 ~~~
 
 ```nim
-proc getValueAndPos(env: var Env; statement: Statement; start: Natural;
-                    variables: Variables): ValueAndPosOr
+proc getValuePosSi(env: var Env; statement: Statement; start: Natural;
+                   variables: Variables): ValuePosSiOr
 ```
 
 # runBareFunction
@@ -666,7 +666,7 @@ return(5)
 
 ```nim
 proc runBareFunction(env: var Env; statement: Statement; start: Natural;
-                     variables: Variables; leftName: VariableName): ValueAndPosOr
+                     variables: Variables; leftName: VariableName): ValuePosSiOr
 ```
 
 # runStatement

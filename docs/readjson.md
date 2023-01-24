@@ -89,7 +89,7 @@ a = "test string"  # test
 ~~~
 
 ```nim
-func parseJsonStr(text: string; startPos: Natural): ValueAndPosOr
+func parseJsonStr(text: string; startPos: Natural): ValuePosSiOr
 ```
 
 

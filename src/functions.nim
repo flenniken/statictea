@@ -104,7 +104,7 @@ func cmpBaseValues*(a, b: Value, insensitive: bool = false): int =
     else:
       result = 0
 
-func parseNumber*(line: string, start: Natural): ValueAndPosOr =
+func parseNumber*(line: string, start: Natural): ValuePosSiOr =
   ## Return the literal number value and position after it.  The start
   ## index points at a digit or minus sign. The position includes the
   ## trailing whitespace.
@@ -114,31 +114,31 @@ func parseNumber*(line: string, start: Natural): ValueAndPosOr =
   var matchesO = matchNumberNotCached(line, start)
   if not matchesO.isSome:
     # Invalid number.
-    return newValueAndPosOr(wNotNumber, "", start)
+    return newValuePosSiOr(wNotNumber, "", start)
 
   # The decimal point determines whether the number is an integer or
   # float.
   let matches = matchesO.get()
   let decimalPoint = matches.getGroup()
-  var valueAndPos: ValueAndPos
+  var valueAndPos: ValuePosSi
   if decimalPoint == ".":
     # Parse the float.
     let floatAndPosO = parseFloat(line, start)
     if not floatAndPosO.isSome:
       # The number is too big or too small.
-      return newValueAndPosOr(wNumberOverFlow, "", start)
+      return newValuePosSiOr(wNumberOverFlow, "", start)
     let (number, pos) = floatAndPosO.get()
-    valueAndPos = newValueAndPos(newValue(number), pos)
+    valueAndPos = newValuePosSi(newValue(number), pos)
   else:
     # Parse the int.
     let intAndPosO = parseInteger(line, start)
     if not intAndPosO.isSome:
       # The number is too big or too small.
-      return newValueAndPosOr(wNumberOverFlow, "", start)
+      return newValuePosSiOr(wNumberOverFlow, "", start)
     let (number, pos) = intAndPosO.get()
-    valueAndPos = newValueAndPos(newValue(number), pos)
+    valueAndPos = newValuePosSi(newValue(number), pos)
   # Note that we use the matches length so it includes the trailing whitespace.
-  result = newValueAndPosOr(newValueAndPos(valueAndPos.value, start + matches.length))
+  result = newValuePosSiOr(newValuePosSi(valueAndPos.value, start + matches.length))
 
 func numberStringToNum(numString: string): FunResult =
   ## Convert the number string to a float or int, if possible.

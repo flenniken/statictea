@@ -702,7 +702,7 @@ proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
 
   result = some(newStatement(text, lb.getLineNum()))
 
-func getMultilineStr*(text: string, start: Natural): ValueAndPosOr =
+func getMultilineStr*(text: string, start: Natural): ValuePosSiOr =
   ## Return the triple quoted string literal. The startPos points one
   ## @:past the leading triple quote.  Return the parsed
   ## @:string value and the ending position one past the trailing
@@ -713,15 +713,15 @@ func getMultilineStr*(text: string, start: Natural): ValueAndPosOr =
 
   if start >= text.len or text[start] != '\n':
     # Triple quotes must always end the line.
-    return newValueAndPosOr(wTripleAtEnd, "", start)
+    return newValuePosSiOr(wTripleAtEnd, "", start)
   if start + 5 > text.len or text[text.len - 4 .. text.len - 1] != "\"\"\"\n":
     # Missing the ending triple quotes.
-    return newValueAndPosOr(wMissingEndingTriple, "", text.len)
+    return newValuePosSiOr(wMissingEndingTriple, "", text.len)
 
   let newStr = text[start + 1 .. text.len - 5]
-  result = newValueAndPosOr(newStr, text.len)
+  result = newValuePosSiOr(newStr, text.len)
 
-func getString*(statement: Statement, start: Natural): ValueAndPosOr =
+func getString*(statement: Statement, start: Natural): ValuePosSiOr =
   ## Return a literal string value and position after it. The start
   ## parameter is the index of the first quote in the statement and
   ## the return position is after the optional trailing white space
@@ -740,7 +740,7 @@ func getString*(statement: Statement, start: Natural): ValueAndPosOr =
   if pos < str.len and pos == start+2 and str[start+2] == '"':
     result = getMultilineStr(str, start+3)
 
-func getNumber*(statement: Statement, start: Natural): ValueAndPosOr =
+func getNumber*(statement: Statement, start: Natural): ValuePosSiOr =
   ## Return the literal number value and position after it.  The start
   ## index points at a digit or minus sign. The position includes the
   ## trailing whitespace.
@@ -894,9 +894,9 @@ func skipArg(statement: Statement, start: Natural): PosOr =
       pos = result.value
     showDebugPos(statement, pos, "^ f arg")
 
-# Forward reference to getValueAndPos since we call it recursively.
-proc getValueAndPos*(env: var Env, statement: Statement, start: Natural, variables:
-  Variables): ValueAndPosOr
+# Forward reference to getValuePosSi since we call it recursively.
+proc getValuePosSi*(env: var Env, statement: Statement, start: Natural, variables:
+  Variables): ValuePosSiOr
 
 func getSpecialFunction(funcVar: Value): SpecialFunction =
   ## Return the function type given a function variable.
@@ -941,7 +941,7 @@ proc bareReturn(
     statement: Statement,
     start: Natural,
     variables: Variables,
-  ): ValueAndPosOr =
+  ): ValuePosSiOr =
   ## Handle the return function.
   ## if(true, return( "stop")  )
   ##                  ^         ^
@@ -949,7 +949,7 @@ proc bareReturn(
   ##         ^      ^
   # Get the value.
   var runningPos = start
-  let valueAndPosOr = getValueAndPos(env, statement, runningPos, variables)
+  let valueAndPosOr = getValuePosSi(env, statement, runningPos, variables)
   if valueAndPosOr.isMessage:
     return valueAndPosOr
   var value = valueAndPosOr.value.value
@@ -959,10 +959,10 @@ proc bareReturn(
   let parenO = matchSymbol(statement.text, gRightParentheses, runningPos)
   if not parenO.isSome:
     # No matching end right parentheses.
-    return newValueAndPosOr(wNoMatchingParen, "", runningPos)
+    return newValuePosSiOr(wNoMatchingParen, "", runningPos)
   runningPos += parenO.get().length
 
-  return newValueAndPosOr(value, runningPos, seReturn)
+  return newValuePosSiOr(value, runningPos, seReturn)
 
 proc ifFunctions*(
     env: var Env,
@@ -970,7 +970,7 @@ proc ifFunctions*(
     statement: Statement,
     start: Natural,
     variables: Variables,
-  ): ValueAndPosOr =
+  ): ValuePosSiOr =
   ## Return the if/if0 function's value and position after. It
   ## conditionally runs one of its arguments and skips the
   ## other. Start points at the first argument of the function. The
@@ -984,7 +984,7 @@ proc ifFunctions*(
   ## @:~~~~
 
   # Get the condition's value.
-  let vlcOr = getValueAndPos(env, statement, start, variables)
+  let vlcOr = getValuePosSi(env, statement, start, variables)
   if vlcOr.isMessage:
     return vlcOr
   let cond = vlcOr.value.value
@@ -995,7 +995,7 @@ proc ifFunctions*(
   if specialFunction == spIf:
     if cond.kind != vkBool:
       # The if condition must be a bool value, got a $1.
-      return newValueAndPosOr(wExpectedBool, $cond.kind, start)
+      return newValuePosSiOr(wExpectedBool, $cond.kind, start)
     condition = cond.boolv
   else: # if0
     condition = if0Condition(cond) == false
@@ -1004,31 +1004,31 @@ proc ifFunctions*(
   let commaO = matchSymbol(statement.text, gComma, runningPos)
   if not commaO.isSome:
     # An if with an assignment takes three arguments.
-    return newValueAndPosOr(wAssignmentIf, "", start)
+    return newValuePosSiOr(wAssignmentIf, "", start)
   runningPos += commaO.get().length
 
   # Handle the second parameter.
-  var vl2Or: ValueAndPosOr
+  var vl2Or: ValuePosSiOr
   var skip = (condition == false)
 
   if skip:
     let posOr = skipArg(statement, runningPos)
     if posOr.isMessage:
-      return newValueAndPosOr(posOr.message)
+      return newValuePosSiOr(posOr.message)
     runningPos = posOr.value
   else:
     # Get the second value.
-    vl2Or = getValueAndPos(env, statement, runningPos, variables)
+    vl2Or = getValuePosSi(env, statement, runningPos, variables)
     if vl2Or.isMessage:
       return vl2Or
     runningPos = vl2Or.value.pos
 
   # Match the comma and whitespace.
-  var vl3Or: ValueAndPosOr
+  var vl3Or: ValuePosSiOr
   let cO = matchSymbol(statement.text, gComma, runningPos)
   if not cO.isSome:
     # An if with an assignment takes three arguments.
-    return newValueAndPosOr(wAssignmentIf, "", runningPos)
+    return newValuePosSiOr(wAssignmentIf, "", runningPos)
   runningPos += cO.get().length
 
   # Handle the third parameter.
@@ -1036,10 +1036,10 @@ proc ifFunctions*(
   if skip:
     let posOr = skipArg(statement, runningPos)
     if posOr.isMessage:
-      return newValueAndPosOr(posOr.message)
+      return newValuePosSiOr(posOr.message)
     runningPos = posOr.value
   else:
-    vl3Or = getValueAndPos(env, statement, runningPos, variables)
+    vl3Or = getValuePosSi(env, statement, runningPos, variables)
     if vl3Or.isMessage:
       return vl3Or
     runningPos = vl3Or.value.pos
@@ -1048,7 +1048,7 @@ proc ifFunctions*(
   let parenO = matchSymbol(statement.text, gRightParentheses, runningPos)
   if not parenO.isSome:
     # No matching end right parentheses.
-    return newValueAndPosOr(wNoMatchingParen, "", runningPos)
+    return newValuePosSiOr(wNoMatchingParen, "", runningPos)
   runningPos += parenO.get().length
 
   var value: Value
@@ -1056,7 +1056,7 @@ proc ifFunctions*(
     value = vl2Or.value.value
   else:
     value = vl3Or.value.value
-  result = newValueAndPosOr(value, runningPos)
+  result = newValuePosSiOr(value, runningPos)
 
 proc bareIfAndIf0*(
     env: var Env,
@@ -1064,7 +1064,7 @@ proc bareIfAndIf0*(
     statement: Statement,
     start: Natural,
     variables: Variables,
-  ): ValueAndPosOr =
+  ): ValuePosSiOr =
   ## Handle the bare if/if0. Return the resulting value and the
   ## position in the statement after the if.
   ## @:
@@ -1077,7 +1077,7 @@ proc bareIfAndIf0*(
   var runningPos = start
 
   # Get the condition's value.
-  let vlcOr = getValueAndPos(env, statement, runningPos, variables)
+  let vlcOr = getValuePosSi(env, statement, runningPos, variables)
   if vlcOr.isMessage:
     return vlcOr
   let cond = vlcOr.value.value
@@ -1088,7 +1088,7 @@ proc bareIfAndIf0*(
   if specialFunction == spIf:
     if cond.kind != vkBool:
       # The if condition must be a bool value, got a $1.
-      return newValueAndPosOr(wExpectedBool, $cond.kind, start)
+      return newValuePosSiOr(wExpectedBool, $cond.kind, start)
     condition = cond.boolv
   else: # if0
     condition = if0Condition(cond) == false
@@ -1097,7 +1097,7 @@ proc bareIfAndIf0*(
   let commaO = matchSymbol(statement.text, gComma, runningPos)
   if not commaO.isSome:
     # "An IF without an assignment takes two arguments.
-    return newValueAndPosOr(wBareIfTwoArguments, "", start)
+    return newValuePosSiOr(wBareIfTwoArguments, "", start)
   runningPos += commaO.get().length
 
   # Handle the second parameter.
@@ -1107,13 +1107,13 @@ proc bareIfAndIf0*(
   if skip:
     let posOr = skipArg(statement, runningPos)
     if posOr.isMessage:
-      return newValueAndPosOr(posOr.message)
+      return newValuePosSiOr(posOr.message)
     runningPos = posOr.value
     value2 = newValue(0)
     se2 = seBareIfIgnore
   else:
     # Get the second value.
-    var valueAndPosOr: ValueAndPosOr
+    var valueAndPosOr: ValuePosSiOr
     # Handle the return function extra special.
     if statement.text[runningPos .. ^1].startsWith("return("):
       const
@@ -1130,7 +1130,7 @@ proc bareIfAndIf0*(
         return valueAndPosOr
       se2 = valueAndPosOr.value.sideEffect
     else:
-      valueAndPosOr = getValueAndPos(env, statement, runningPos, variables)
+      valueAndPosOr = getValuePosSi(env, statement, runningPos, variables)
       if valueAndPosOr.isMessage:
         return valueAndPosOr
       se2 = valueAndPosOr.value.sideEffect
@@ -1142,16 +1142,16 @@ proc bareIfAndIf0*(
   let commaSymbolO = matchCommaOrSymbol(statement.text, gRightParentheses, runningPos)
   if not commaSymbolO.isSome:
     # No matching end right parentheses.
-    return newValueAndPosOr(wNoMatchingParen, "", runningPos)
+    return newValuePosSiOr(wNoMatchingParen, "", runningPos)
   let commaSymbol = commaSymbolO.get()
   let foundSymbol = commaSymbol.getGroup()
   if foundSymbol == ",":
     # An IF without an assignment takes two arguments.
-    return newValueAndPosOr(wBareIfTwoArguments, "", runningPos)
+    return newValuePosSiOr(wBareIfTwoArguments, "", runningPos)
 
   runningPos += commaSymbol.length
 
-  result = newValueAndPosOr(value2, runningPos, se2)
+  result = newValuePosSiOr(value2, runningPos, se2)
 
 proc andOrFunctions*(
     env: var Env,
@@ -1159,7 +1159,7 @@ proc andOrFunctions*(
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list=false): ValueAndPosOr =
+    list=false): ValuePosSiOr =
   ## Return the and/or function's value and the position after. The and
   ## function stops on the first false. The or function stops on the
   ## first true. The rest of the arguments are skipped.
@@ -1172,7 +1172,7 @@ proc andOrFunctions*(
   #           ^      ^
 
   # Get the first argument value.
-  let vlcOr = getValueAndPos(env, statement, start, variables)
+  let vlcOr = getValuePosSi(env, statement, start, variables)
   if vlcOr.isMessage:
     return vlcOr
   let firstValue = vlcOr.value.value
@@ -1180,7 +1180,7 @@ proc andOrFunctions*(
 
   if firstValue.kind != vkBool:
     # Expected bool argument got $1.
-    return newValueAndPosOr(wExpectedBool, $firstValue.kind, start)
+    return newValuePosSiOr(wExpectedBool, $firstValue.kind, start)
 
   let a = firstValue.boolv
   var skip = if specialFunction == spAnd: a == false else: a == true
@@ -1189,7 +1189,7 @@ proc andOrFunctions*(
   let commaO = matchSymbol(statement.text, gComma, runningPos)
   if not commaO.isSome:
     # Expected two arguments.
-    return newValueAndPosOr(wTwoArguments, "", runningPos)
+    return newValuePosSiOr(wTwoArguments, "", runningPos)
   runningPos += commaO.get().length
 
   # Handle the second parameter.
@@ -1198,11 +1198,11 @@ proc andOrFunctions*(
   if skip:
     let posOr = skipArg(statement, runningPos)
     if posOr.isMessage:
-      return newValueAndPosOr(posOr.message)
+      return newValuePosSiOr(posOr.message)
     afterSecond = posOr.value
     secondValue = newValue(0)
   else:
-    let vl2Or = getValueAndPos(env, statement, runningPos, variables)
+    let vl2Or = getValuePosSi(env, statement, runningPos, variables)
     if vl2Or.isMessage:
       return vl2Or
     afterSecond = vl2Or.value.pos
@@ -1214,7 +1214,7 @@ proc andOrFunctions*(
   else:
     if secondValue.kind != vkBool:
       # Expected bool argument got $1.
-      return newValueAndPosOr(wExpectedBool, $secondValue.kind, runningPos)
+      return newValuePosSiOr(wExpectedBool, $secondValue.kind, runningPos)
     b = secondValue.boolv
   runningPos = afterSecond
 
@@ -1222,7 +1222,7 @@ proc andOrFunctions*(
   let parenO = matchSymbol(statement.text, gRightParentheses, runningPos)
   if not parenO.isSome:
     # Expected two arguments.
-    return newValueAndPosOr(wTwoArguments, "", runningPos)
+    return newValuePosSiOr(wTwoArguments, "", runningPos)
   runningPos += parenO.get().length
 
   var value: bool
@@ -1230,7 +1230,7 @@ proc andOrFunctions*(
     value = a and b
   else:
     value = a or b
-  result = newValueAndPosOr(newValue(value), runningPos)
+  result = newValuePosSiOr(newValue(value), runningPos)
 
 proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult
 
@@ -1242,7 +1242,7 @@ proc getArguments*(
     list=false,
     arguments: var seq[Value],
     argumentStarts: var seq[Natural],
-  ): ValueAndPosOr =
+  ): ValuePosSiOr =
   ## Get the function arguments and the position of each. If an
   ## argument has a side effect, the return value and pos and side
   ## effect is returned, else a 0 value and seNone is returned.
@@ -1264,7 +1264,7 @@ proc getArguments*(
   else:
     # Get the arguments to the function.
     while true:
-      let vlOr = getValueAndPos(env, statement, runningPos, variables)
+      let vlOr = getValuePosSi(env, statement, runningPos, variables)
       if vlOr.isMessage:
         return vlOr
       arguments.add(vlOr.value.value)
@@ -1276,10 +1276,10 @@ proc getArguments*(
       if not commaSymbolO.isSome:
         if symbol == gRightParentheses:
           # Expected comma or right parentheses.
-          return newValueAndPosOr(wMissingCommaParen, "", runningPos)
+          return newValuePosSiOr(wMissingCommaParen, "", runningPos)
         else:
           # Missing comma or right bracket.
-          return newValueAndPosOr(wMissingCommaBracket, "", runningPos)
+          return newValuePosSiOr(wMissingCommaBracket, "", runningPos)
       let commaSymbol = commaSymbolO.get()
       runningPos = runningPos + commaSymbol.length
       let foundSymbol = commaSymbol.getGroup()
@@ -1287,7 +1287,7 @@ proc getArguments*(
          (foundSymbol == "]" and symbol == gRightBracket):
         break
 
-  result = newValueAndPosOr(newValue(0), runningPos, seNone)
+  result = newValuePosSiOr(newValue(0), runningPos, seNone)
 
 func warningParameterPos(
     parameter: int,
@@ -1303,14 +1303,14 @@ func warningParameterPos(
   else:
     result = start
 
-proc getFunctionValueAndPos*(
+proc getFunctionValuePosSi*(
     env: var Env,
     functionName: string,
     functionPos: Natural,
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list = false): ValueAndPosOr =
+    list = false): ValuePosSiOr =
   ## Return the function's value and the position after it. Start points at the
   ## first argument of the function. The position includes the trailing
   ## whitespace after the ending ).
@@ -1337,7 +1337,7 @@ proc getFunctionValueAndPos*(
   if valueOr.isMessage:
     let warningData = newWarningData(valueOr.message.messageId,
       valueOr.message.p1, start)
-    return newValueAndPosOr(warningData)
+    return newValuePosSiOr(warningData)
   let value = valueOr.value
 
   # Find the best matching function by looking at the arguments.
@@ -1345,7 +1345,7 @@ proc getFunctionValueAndPos*(
   if funcValueOr.isMessage:
     let warningData = newWarningData(funcValueOr.message.messageId,
       funcValueOr.message.p1, start)
-    return newValueAndPosOr(warningData)
+    return newValuePosSiOr(warningData)
   let funcVar = funcValueOr.value
 
   # Call the function.
@@ -1358,7 +1358,7 @@ proc getFunctionValueAndPos*(
 
   if funResult.kind == frWarning:
     let warningPos = warningParameterPos(funResult.parameter, argumentStarts, start, functionPos)
-    return newValueAndPosOr(funResult.warningData.messageId,
+    return newValuePosSiOr(funResult.warningData.messageId,
       funResult.warningData.p1, warningPos)
 
   var sideEffect: SideEffect
@@ -1370,7 +1370,7 @@ proc getFunctionValueAndPos*(
   else:
     sideEffect = seNone
 
-  result = newValueAndPosOr(funResult.value, runningPos, sideEffect)
+  result = newValuePosSiOr(funResult.value, runningPos, sideEffect)
 
 func runBoolOp*(left: Value, op: string, right: Value): Value =
   ## Evaluate the bool expression and return a bool value.
@@ -1411,10 +1411,10 @@ func runCompareOp*(left: Value, op: string, right: Value): Value =
 
 # Forward reference since we call getCondition recursively.
 proc getCondition*(env: var Env, statement: Statement, start: Natural,
-    variables: Variables): ValueAndPosOr
+    variables: Variables): ValuePosSiOr
 
 proc getValueOrNestedCond(env: var Env, statement: Statement, start: Natural,
-    variables: Variables): ValueAndPosOr =
+    variables: Variables): ValuePosSiOr =
   ## Return a value and position after it. If start points at a nested
   ## condition, handle it.
 
@@ -1424,10 +1424,10 @@ proc getValueOrNestedCond(env: var Env, statement: Statement, start: Natural,
     # Found a left parenetheses, get the nested condition.
     result = getCondition(env, statement, start, variables)
   else:
-    result = getValueAndPos(env, statement, start, variables)
+    result = getValuePosSi(env, statement, start, variables)
 
 proc getCondition*(env: var Env, statement: Statement, start: Natural,
-    variables: Variables): ValueAndPosOr =
+    variables: Variables): ValuePosSiOr =
   ## Return the bool value of the condition expression and the
   ## position after it.  The start index points at the ( left
   ## parentheses. The position includes the trailing whitespace after
@@ -1461,20 +1461,20 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
     let rightParenO = matchSymbol(statement.text, gRightParentheses, runningPos)
     if rightParenO.isSome:
       let finish = runningPos + rightParenO.get().length
-      let vAndL = newValueAndPos(accum, finish)
+      let vAndL = newValuePosSi(accum, finish)
       when showPos:
         showDebugPos(statement, finish, "^ f condition")
-      return newValueAndPosOr(vAndL)
+      return newValuePosSiOr(vAndL)
 
     # Get the boolean operator.
     let opO = matchBoolExprOperator(statement.text, runningPos)
     if not opO.isSome:
       # Expected a boolean expression operator, and, or, ==, !=, <, >, <=, >=.
-      return newValueAndPosOr(wNotBoolOperator, "", runningPos)
+      return newValuePosSiOr(wNotBoolOperator, "", runningPos)
     let op = opO.getGroup()
     if (op == "and" or op == "or") and accum.kind != vkBool:
       # A boolean operator’s left value must be a bool.
-      return newValueAndPosOr(wBoolOperatorLeft, "", runningPos)
+      return newValuePosSiOr(wBoolOperatorLeft, "", runningPos)
 
     # Look for short ciruit conditions.
     var sortCiruitTaken: bool
@@ -1484,7 +1484,7 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
         lastBoolOp = "or"
       elif lastBoolOp != "or":
         # When mixing 'and's and 'or's you need to specify the precedence with parentheses.
-        return newValueAndPosOr(wNeedPrecedence, "", runningPos)
+        return newValuePosSiOr(wNeedPrecedence, "", runningPos)
       if accum.boolv == true:
         sortCiruitTaken = true
         shortCiruitResult = true
@@ -1493,7 +1493,7 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
         lastBoolOp = "and"
       elif lastBoolOp != "and":
         # When mixing 'and's and 'or's you need to specify the precedence with parentheses.
-        return newValueAndPosOr(wNeedPrecedence, "", runningPos)
+        return newValuePosSiOr(wNeedPrecedence, "", runningPos)
       if accum.boolv == false:
         sortCiruitTaken = true
         shortCiruitResult = false
@@ -1501,7 +1501,7 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
       # We have a compare operator.
       if accum.kind != vkInt and accum.kind != vkFloat and accum.kind != vkString:
         # The comparison operator’s left value must be a number or string.
-        return newValueAndPosOr(wCompareOperator, "", runningPos)
+        return newValuePosSiOr(wCompareOperator, "", runningPos)
 
     runningPos += opO.get().length
 
@@ -1509,11 +1509,11 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
       # Sort ciruit the condition and skip past the closing right parentheses.
       let posOr = skipArg(statement, start)
       if posOr.isMessage:
-        return newValueAndPosOr(posOr.message)
+        return newValuePosSiOr(posOr.message)
       runningPos = posOr.value
       when showPos:
         showDebugPos(statement, runningPos, "^ f condition")
-      return newValueAndPosOr(newValue(shortCiruitResult), runningPos)
+      return newValuePosSiOr(newValue(shortCiruitResult), runningPos)
 
     # Return a value and position after handling any nestedcondition.
     let vlRightOr = getValueOrNestedCond(env, statement, runningPos, variables)
@@ -1532,7 +1532,7 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
       if right.kind != accum.kind:
         # The comparison operator’s right value must be the same type as the left value.
         let messageData = newWarningData(wCompareOperatorSame, "", xyz)
-        return newValueAndPosOr(messageData)
+        return newValuePosSiOr(messageData)
       bValue = runCompareOp(accum, op, right)
     elif right.kind == vkBool:
       bValue = runBoolOp(accum, op, right)
@@ -1541,7 +1541,7 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
       let op2O = matchCompareOperator(statement.text, runningPos)
       if not op2O.isSome:
         # Expected a compare operator, ==, !=, <, >, <=, >=.
-        return newValueAndPosOr(wNotCompareOperator, "", runningPos)
+        return newValuePosSiOr(wNotCompareOperator, "", runningPos)
       let op2 = op2O.getGroup()
       runningPos += op2O.get().length
 
@@ -1552,7 +1552,7 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
 
       if vlThirdOr.value.value.kind != right.kind:
         # The comparison operator’s right value must be the same type as the left value.
-        return newValueAndPosOr(wCompareOperatorSame, "", runningPos)
+        return newValuePosSiOr(wCompareOperatorSame, "", runningPos)
 
       let bValue2 = runCompareOp(right, op2, vlThirdOr.value.value)
       bValue = runBoolOp(accum, op, bValue2)
@@ -1561,7 +1561,7 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
     accum = newValue(bValue)
 
 proc getBracketedVarValue*(env: var Env, statement: Statement, start: Natural,
-    container: Value, variables: Variables): ValueAndPosOr =
+    container: Value, variables: Variables): ValuePosSiOr =
   ## Return the value of the bracketed variable and the position after
   ## the trailing whitespace.. Start points at the the first argument.
   ## @:
@@ -1578,7 +1578,7 @@ proc getBracketedVarValue*(env: var Env, statement: Statement, start: Natural,
   assert(container.kind == vkList or container.kind == vkDict, "expected list or dict")
 
   # Get the index/key value.
-  let vAndPosOr = getValueAndPos(env, statement, runningPos, variables)
+  let vAndPosOr = getValuePosSi(env, statement, runningPos, variables)
   if vAndPosOr.isMessage:
     return vAndPosOr
   let indexValue = vAndPosOr.value.value
@@ -1589,23 +1589,23 @@ proc getBracketedVarValue*(env: var Env, statement: Statement, start: Natural,
     # list container
     if indexValue.kind != vkInt:
       # The index variable must be an integer.
-      return newValueAndPosOr(wIndexNotInt, "", runningPos)
+      return newValuePosSiOr(wIndexNotInt, "", runningPos)
     let index = indexValue.intv
     let list = container.listv
     if index < 0 or index >= list.len:
       # The index value $1 is out of range.
-      return newValueAndPosOr(wInvalidIndexRange, $index, runningPos)
+      return newValuePosSiOr(wInvalidIndexRange, $index, runningPos)
     value = container.listv[index]
   else:
     # dictionary container
     if indexValue.kind != vkString:
       # The key variable must be an string.
-      return newValueAndPosOr(wKeyNotString, "", runningPos)
+      return newValuePosSiOr(wKeyNotString, "", runningPos)
     let key = indexValue.stringv
     let dict = container.dictv
     if not (key in dict):
       # The key doesn't exist in the dictionary.
-      return newValueAndPosOr(wMissingKey, "", runningPos)
+      return newValuePosSiOr(wMissingKey, "", runningPos)
     value = dict[key]
 
   # Get the ending right bracket.
@@ -1613,13 +1613,13 @@ proc getBracketedVarValue*(env: var Env, statement: Statement, start: Natural,
   let rightBracketO = matchSymbol(statement.text, gRightBracket, runningPos)
   if not rightBracketO.isSome:
     # Missing right bracket.
-    return newValueAndPosOr(wMissingRightBracket, "", runningPos)
+    return newValuePosSiOr(wMissingRightBracket, "", runningPos)
   runningPos += rightBracketO.get().length
 
   when showPos:
     showDebugPos(statement, runningPos, "^ f bracketed")
 
-  return newValueAndPosOr(value, runningPos)
+  return newValuePosSiOr(value, runningPos)
 
 proc funListLoop(env: var Env, variables: Variables,
     arguments: seq[Value]
@@ -1692,7 +1692,7 @@ proc listLoop*(
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list=false): ValueAndPosOr =
+    list=false): ValuePosSiOr =
   ## Make a new list from an existing list. The callback function is
   ## called for each item in the list and determines what goes in the
   ## new list.  See funList_lpoal in functions.nim for more
@@ -1722,13 +1722,13 @@ proc listLoop*(
     # todo: pass in functionPos
     let functionPos = 0
     let warningPos = warningParameterPos(funResult.parameter, argumentStarts, start, functionPos)
-    return newValueAndPosOr(funResult.warningData.messageId,
+    return newValuePosSiOr(funResult.warningData.messageId,
       funResult.warningData.p1, warningPos)
 
-  return newValueAndPosOr(funResult.value, runningPos)
+  return newValuePosSiOr(funResult.value, runningPos)
 
-proc getValueAndPosWorker(env: var Env, statement: Statement, start: Natural, variables:
-    Variables): ValueAndPosOr =
+proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, variables:
+    Variables): ValuePosSiOr =
   ## Get the value, position and side effect from the statement. Start
   ## points at the right hand side of the statement. The return pos is
   ## the first character after trailing whitespace.
@@ -1747,7 +1747,7 @@ proc getValueAndPosWorker(env: var Env, statement: Statement, start: Natural, va
   case rightType:
   of rtNothing:
     # Expected a string, number, variable, list or condition.
-    return newValueAndPosOr(wInvalidRightHandSide, "", start)
+    return newValuePosSiOr(wInvalidRightHandSide, "", start)
   of rtString:
     result = getString(statement, start)
   of rtNumber:
@@ -1764,7 +1764,7 @@ proc getValueAndPosWorker(env: var Env, statement: Statement, start: Natural, va
     let startSymbol = startSymbolO.get()
 
     # Get the list. The literal list [...] and list(...) are similar.
-    result = getFunctionValueAndPos(env, "list", start, statement,
+    result = getFunctionValuePosSi(env, "list", start, statement,
       start+startSymbol.length, variables, list=true)
 
   of rtCondition:
@@ -1774,7 +1774,7 @@ proc getValueAndPosWorker(env: var Env, statement: Statement, start: Natural, va
     # Get the variable name.
     let rightNameOr = getVariableName(statement.text, start)
     if rightNameOr.isMessage:
-      return newValueAndPosOr(rightNameOr.message)
+      return newValuePosSiOr(rightNameOr.message)
     let rightName = rightNameOr.value
 
     # Use f for functions, else use the local dictionary of no prefix
@@ -1791,11 +1791,11 @@ proc getValueAndPosWorker(env: var Env, statement: Statement, start: Natural, va
     if valueOr.isMessage:
       let warningData = newWarningData(valueOr.message.messageId,
         valueOr.message.p1, start)
-      return newValueAndPosOr(warningData)
+      return newValuePosSiOr(warningData)
 
     case rightName.kind
     of vnkNormal:
-      return newValueAndPosOr(valueOr.value, rightName.pos)
+      return newValuePosSiOr(valueOr.value, rightName.pos)
 
     of vnkFunction:
       # We have a function, run it and return its value.
@@ -1812,10 +1812,10 @@ proc getValueAndPosWorker(env: var Env, statement: Statement, start: Natural, va
         return listLoop(env, specialFunction, statement, rightName.pos, variables)
       of spFunc:
         # Define a function in a code file and not nested.
-        return newValueAndPosOr(wDefineFunction, "", start)
+        return newValuePosSiOr(wDefineFunction, "", start)
       of spNotSpecial, spReturn, spWarn, spLog:
         # Handle normal functions and warn, return and log.
-        return getFunctionValueAndPos(env, rightName.dotName, start, statement,
+        return getFunctionValuePosSi(env, rightName.dotName, start, statement,
           rightName.pos, variables, list=false)
 
     of vnkGet:
@@ -1823,12 +1823,12 @@ proc getValueAndPosWorker(env: var Env, statement: Statement, start: Natural, va
       let container = valueOr.value
       if container.kind != vkList and container.kind != vkDict:
         # The container variable must be a list or dictionary got $1.
-        return newValueAndPosOr(wIndexNotListOrDict, $container.kind, start)
+        return newValuePosSiOr(wIndexNotListOrDict, $container.kind, start)
 
       return getBracketedVarValue(env, statement, rightName.pos, valueOr.value, variables)
 
-proc getValueAndPos*(env: var Env, statement: Statement, start: Natural, variables:
-    Variables): ValueAndPosOr =
+proc getValuePosSi*(env: var Env, statement: Statement, start: Natural, variables:
+    Variables): ValuePosSiOr =
   ## Return the value and position of the item that the start parameter
   ## points at which is a string, number, variable, list, or condition.
   ## The position returned includes the trailing whitespace after the
@@ -1863,7 +1863,7 @@ proc getValueAndPos*(env: var Env, statement: Statement, start: Natural, variabl
   when showPos:
     showDebugPos(statement, start, "^ s")
 
-  result = getValueAndPosWorker(env, statement, start, variables)
+  result = getValuePosSiWorker(env, statement, start, variables)
 
   when showPos:
     var pos: Natural
@@ -1874,7 +1874,7 @@ proc getValueAndPos*(env: var Env, statement: Statement, start: Natural, variabl
     showDebugPos(statement, pos, "^ f")
 
 proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
-    variables: Variables, leftName: VariableName): ValueAndPosOr =
+    variables: Variables, leftName: VariableName): ValuePosSiOr =
   ## Handle bare function: if, if0, return, warn and log. A bare
   ## function does not assign a variable.
   ## @:
@@ -1889,7 +1889,7 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
   # Get the function variable.
   let funcVarOr = getVariable(variables, leftName.dotName, npBuiltIn)
   if funcVarOr.isMessage:
-    return newValueAndPosOr(funcVarOr.message)
+    return newValuePosSiOr(funcVarOr.message)
   let funcVar = funcVarOr.value
 
   # Look up the special function type.
@@ -1904,10 +1904,10 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
     result = bareReturn(env, statement, runningPos, variables)
   of spNotSpecial, spAnd, spOr, spFunc, spListLoop:
     # Missing left hand side and operator, e.g. a = len(b) not len(b).
-    result = newValueAndPosOr(wMissingLeftAndOpr, "", start)
+    result = newValuePosSiOr(wMissingLeftAndOpr, "", start)
   of spWarn, spLog:
     # Handle a bare warn, or log function.
-    result = getFunctionValueAndPos(env, $specialFunction, start,
+    result = getFunctionValuePosSi(env, $specialFunction, start,
       statement, runningPos, variables, list=false)
 
 proc runStatement*(env: var Env, statement: Statement, variables: Variables): VariableDataOr =
@@ -1929,7 +1929,7 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
     return newVariableDataOr(leftNameOr.message)
   let leftName = leftNameOr.value
 
-  var vlOr: ValueAndPosOr
+  var vlOr: ValuePosSiOr
   var operator = opIgnore
   var operatorLength = 0
   var finalLeftName = leftName.dotName
@@ -1963,7 +1963,7 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
     operatorLength = match.length
 
     # Get the right hand side value and match the following whitespace.
-    vlOr = getValueAndPos(env, statement,
+    vlOr = getValuePosSi(env, statement,
       leftName.pos + operatorLength, variables)
 
   if vlOr.isMessage:

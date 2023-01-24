@@ -186,8 +186,8 @@ type
     seLogMessage = "log",
     seBareIfIgnore = "bareIfIgnore",
 
-  # todo: rename ValueAndPos to ValuePosSE
-  ValueAndPos* = object
+  # todo: rename ValuePosSi to ValuePosSi
+  ValuePosSi* = object
     ## A value and the position after the value in the statement along
     ## with the side effect, if any. The position includes the trailing
     ## whitespace.  For the example statement below, the value 567
@@ -203,8 +203,8 @@ type
     pos*: Natural
     sideEffect*: SideEffect
 
-  ValueAndPosOr* = OpResultWarn[ValueAndPos]
-    ## A ValueAndPos object or a warning.
+  ValuePosSiOr* = OpResultWarn[ValuePosSi]
+    ## A ValuePosSi object or a warning.
 
 proc newSignature*(optional: bool, name: string, params: seq[Param], returnType: ParamType): Signature =
   ## Create a Signature object.
@@ -589,23 +589,23 @@ func `$`*(funResult: FunResult): string =
   else:
     result = "warning: " & $funResult.warningData & ": parameter " & $funResult.parameter
 
-proc newValueAndPos*(value: Value, pos: Natural,
-    sideEffect: SideEffect = seNone): ValueAndPos =
-  ## Create a newValueAndPos object.
-  result = ValueAndPos(value: value, pos: pos, sideEffect: sideEffect)
+proc newValuePosSi*(value: Value, pos: Natural,
+    sideEffect: SideEffect = seNone): ValuePosSi =
+  ## Create a newValuePosSi object.
+  result = ValuePosSi(value: value, pos: pos, sideEffect: sideEffect)
 
-func newValueAndPosOr*(warning: MessageId, p1 = "", pos = 0):
-    ValueAndPosOr =
-  ## Create a ValueAndPosOr warning.
+func newValuePosSiOr*(warning: MessageId, p1 = "", pos = 0):
+    ValuePosSiOr =
+  ## Create a ValuePosSiOr warning.
   let warningData = newWarningData(warning, p1, pos)
-  result = opMessageW[ValueAndPos](warningData)
+  result = opMessageW[ValuePosSi](warningData)
 
-func newValueAndPosOr*(warningData: WarningData):
-    ValueAndPosOr =
-  ## Create a ValueAndPosOr warning.
-  result = opMessageW[ValueAndPos](warningData)
+func newValuePosSiOr*(warningData: WarningData):
+    ValuePosSiOr =
+  ## Create a ValuePosSiOr warning.
+  result = opMessageW[ValuePosSi](warningData)
 
-proc `==`*(a: ValueAndPosOr, b: ValueAndPosOr): bool =
+proc `==`*(a: ValuePosSiOr, b: ValuePosSiOr): bool =
   ## Return true when a equals b.
   if a.kind == b.kind:
     if a.isMessage:
@@ -613,25 +613,25 @@ proc `==`*(a: ValueAndPosOr, b: ValueAndPosOr): bool =
     else:
       result = a.value == b.value
 
-proc `!=`*(a: ValueAndPosOr, b: ValueAndPosOr): bool =
-  ## Compare two ValueAndPosOr objects and return false when equal.
+proc `!=`*(a: ValuePosSiOr, b: ValuePosSiOr): bool =
+  ## Compare two ValuePosSiOr objects and return false when equal.
   result = not (a == b)
 
-func newValueAndPosOr*(value: Value, pos: Natural, sideEffect: SideEffect = seNone):
-    ValueAndPosOr =
-  ## Create a ValueAndPosOr from a value, pos and exit.
-  let val = ValueAndPos(value: value, pos: pos, sideEffect: sideEffect)
-  result = opValueW[ValueAndPos](val)
+func newValuePosSiOr*(value: Value, pos: Natural, sideEffect: SideEffect = seNone):
+    ValuePosSiOr =
+  ## Create a ValuePosSiOr from a value, pos and exit.
+  let val = ValuePosSi(value: value, pos: pos, sideEffect: sideEffect)
+  result = opValueW[ValuePosSi](val)
 
-proc newValueAndPosOr*(number: int | int64 | float64 | string,
-    pos: Natural): ValueAndPosOr =
-  ## Create a ValueAndPosOr value from a number or string.
-  result = newValueAndPosOr(newValue(number), pos)
+proc newValuePosSiOr*(number: int | int64 | float64 | string,
+    pos: Natural): ValuePosSiOr =
+  ## Create a ValuePosSiOr value from a number or string.
+  result = newValuePosSiOr(newValue(number), pos)
 
-func newValueAndPosOr*(val: ValueAndPos):
-    ValueAndPosOr =
-  ## Create a ValueAndPosOr from a ValueAndPos.
-  result = opValueW[ValueAndPos](val)
+func newValuePosSiOr*(val: ValuePosSi):
+    ValuePosSiOr =
+  ## Create a ValuePosSiOr from a ValuePosSi.
+  result = opValueW[ValuePosSi](val)
 
 const
   singleCodes = {'a', 'i', 'f', 's', 'l', 'd', 'b', 'p'}

@@ -157,7 +157,7 @@ func unescapePopularChar*(popular: char): char =
     # Invalid popular character, return 0.
     result = char(0)
 
-func parseJsonStr*(text: string, startPos: Natural): ValueAndPosOr =
+func parseJsonStr*(text: string, startPos: Natural): ValuePosSiOr =
   ## Parse the quoted json string literal. The startPos points one
   ## @:past the leading double quote.  Return the parsed string value
   ## @:and the ending position after the trailing whitespace. On
@@ -170,7 +170,7 @@ func parseJsonStr*(text: string, startPos: Natural): ValueAndPosOr =
   ## @:~~~~
 
   if startPos >= text.len:
-    return newValueAndPosOr(wStartPosTooBig, "", startPos)
+    return newValuePosSiOr(wStartPosTooBig, "", startPos)
 
   type
     State = enum
@@ -200,7 +200,7 @@ func parseJsonStr*(text: string, startPos: Natural): ValueAndPosOr =
       case getChar(text, pos):
       of '\0':
         # No ending double quote.
-        return newValueAndPosOr(wNoEndingQuote, "", pos)
+        return newValuePosSiOr(wNoEndingQuote, "", pos)
       of '\\':
         state = slash
         inc(pos)
@@ -209,13 +209,13 @@ func parseJsonStr*(text: string, startPos: Natural): ValueAndPosOr =
         inc(pos)
       of char(1)..char(0x1f):
         # Controls characters must be escaped.
-        return newValueAndPosOr(wControlNotEscaped, "", pos)
+        return newValuePosSiOr(wControlNotEscaped, "", pos)
       else:
         # Get the unicode character at pos.
         let str = utf8CharString(text, pos)
         if str.len == 0:
           # Invalid UTF-8 byte sequence at position $1.
-          return newValueAndPosOr(wInvalidUtf8ByteSeq, $pos, pos)
+          return newValuePosSiOr(wInvalidUtf8ByteSeq, $pos, pos)
 
         # Add the unicode character to the result string.
         newStr.add(str)
@@ -225,13 +225,13 @@ func parseJsonStr*(text: string, startPos: Natural): ValueAndPosOr =
       of 'u':
         let strOrc = parseHexUnicodeToString(text, pos)
         if strOrc.isMessage:
-          return newValueAndPosOr(strOrc.message, "", pos)
+          return newValuePosSiOr(strOrc.message, "", pos)
         newStr.add(strOrc.value)
       else:
         let ch = unescapePopularChar(getChar(text, pos))
         if ch == '\0':
           # A slash must be followed by one letter from: nr"t\bf/.
-          return newValueAndPosOr(wNotPopular, "", pos)
+          return newValuePosSiOr(wNotPopular, "", pos)
         newStr.add(ch)
         inc(pos)
       state = middle
@@ -242,4 +242,4 @@ func parseJsonStr*(text: string, startPos: Natural): ValueAndPosOr =
       else:
         break
 
-  result = newValueAndPosOr(newValue(newStr), pos)
+  result = newValuePosSiOr(newValue(newStr), pos)
