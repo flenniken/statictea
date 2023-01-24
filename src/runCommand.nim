@@ -882,11 +882,6 @@ func skipArgument*(statement: Statement, startPos: Natural): PosOr =
   else:
     result = newPosOr(pos)
 
-func quickExit(valueAndPosOr: ValueAndPosOr): bool =
-  ## Return true when the ValueAndPosOr is a messsage, a return or a
-  ## log.
-  result = valueAndPosOr.isMessage or valueAndPosOr.value.sideEffect != seNone
-
 func skipArg(statement: Statement, start: Natural): PosOr =
   when showPos:
     showDebugPos(statement, start, "^ s arg")
@@ -990,7 +985,7 @@ proc ifFunctions*(
 
   # Get the condition's value.
   let vlcOr = getValueAndPos(env, statement, start, variables)
-  if quickExit(vlcOr):
+  if vlcOr.isMessage:
     return vlcOr
   let cond = vlcOr.value.value
   var runningPos = vlcOr.value.pos
@@ -1178,7 +1173,7 @@ proc andOrFunctions*(
 
   # Get the first argument value.
   let vlcOr = getValueAndPos(env, statement, start, variables)
-  if quickExit(vlcOr):
+  if vlcOr.isMessage:
     return vlcOr
   let firstValue = vlcOr.value.value
   var runningPos = vlcOr.value.pos
@@ -1208,7 +1203,7 @@ proc andOrFunctions*(
     secondValue = newValue(0)
   else:
     let vl2Or = getValueAndPos(env, statement, runningPos, variables)
-    if quickExit(vl2Or):
+    if vl2Or.isMessage:
       return vl2Or
     afterSecond = vl2Or.value.pos
     secondValue = vl2Or.value.value
@@ -1270,7 +1265,7 @@ proc getArguments*(
     # Get the arguments to the function.
     while true:
       let vlOr = getValueAndPos(env, statement, runningPos, variables)
-      if quickExit(vlOr):
+      if vlOr.isMessage:
         return vlOr
       arguments.add(vlOr.value.value)
       argumentStarts.add(runningPos)
@@ -1333,7 +1328,7 @@ proc getFunctionValueAndPos*(
   var argumentStarts: seq[Natural]
   let vpOr = getArguments(env, statement, runningPos, variables, list,
     arguments, argumentStarts)
-  if quickExit(vpOr):
+  if vpOr.isMessage:
     return vpOr
   runningPos = vpOr.value.pos
 
@@ -1456,7 +1451,7 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
 
   # Return a value and position after handling any nested condition.
   var accumOr = getValueOrNestedCond(env, statement, runningPos, variables)
-  if quickExit(accumOr):
+  if accumOr.isMessage:
     return accumOr
   var accum = accumOr.value.value
   runningPos = accumOr.value.pos
@@ -1522,7 +1517,7 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
 
     # Return a value and position after handling any nestedcondition.
     let vlRightOr = getValueOrNestedCond(env, statement, runningPos, variables)
-    if quickExit(vlRightOr):
+    if vlRightOr.isMessage:
       return vlRightOr
     let xyz = runningPos
     let right = vlRightOr.value.value
@@ -1552,7 +1547,7 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
 
       # Return a value and position after handling any nested condition.
       let vlThirdOr = getValueOrNestedCond(env, statement, runningPos, variables)
-      if quickExit(vlThirdOr):
+      if vlThirdOr.isMessage:
         return vlThirdOr
 
       if vlThirdOr.value.value.kind != right.kind:
@@ -1584,7 +1579,7 @@ proc getBracketedVarValue*(env: var Env, statement: Statement, start: Natural,
 
   # Get the index/key value.
   let vAndPosOr = getValueAndPos(env, statement, runningPos, variables)
-  if quickExit(vAndPosOr):
+  if vAndPosOr.isMessage:
     return vAndPosOr
   let indexValue = vAndPosOr.value.value
 
@@ -1718,8 +1713,7 @@ proc listLoop*(
   var argumentStarts: seq[Natural]
   let vpOr = getArguments(env, statement, runningPos, variables, false,
     arguments, argumentStarts)
-  # todo: remove quickExit and replace with warning check.
-  if quickExit(vpOr):
+  if vpOr.isMessage:
     return vpOr
   runningPos = vpOr.value.pos
 
