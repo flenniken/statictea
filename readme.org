@@ -2359,7 +2359,7 @@ can reside in the same github repository. Github renders markdown
 The index was created with one template and the module docs with
 another. The nimble *docsix* task builds the module index and the
 *docs* task builds one or more modules docs. For more details see
-the [[html-formatted-json][HTML Formatted Json]] section.
+the [[#html-formatted-json][HTML Formatted Json]] section.
 
 For easier reading of the markdown templates, click the link then
 switch to "View Raw".
@@ -2397,10 +2397,11 @@ that’s compiled in.
 
 The stf files used to test statictea exist in the testfiles
 folder. Each stf file is a test file that's also a markdown
-file. The nimble *stfrm* task extracts a sentence from the top of each
-stf file and makes an index from that with a template.
+file. The nimble *stfix* task extracts a sentence from the top of
+each stf file and makes an index from that with a template.
 
-- [[templates/stf-index.md][StaticTea Stf Files]] (view raw)
+- [[testfiles/stf-index.md][StaticTea Stf Files]]
+- [[templates/stf-index.md][stf-index.md]] (view raw)
 
 [[#contents][茶]]
 
@@ -2469,8 +2470,7 @@ Nimble Tasks:
 - *docsix*:  Create markdown docs index.
 - *json*:  Display one or more source file's json doc comments; specify part of name.
 - *jsonix*:  Display markdown docs index json.
-- *stfix*:  Display markdown testfiles index json.
-- *readmefun*:  Create the readme function section.
+- *teafuncs*:  Create the function docs (teaFunctions.md).
 - *dot*:  Create a dependency graph of the StaticTea source.
 - *dot2*:  Create a dependency graph of the system modules used by StaticTea.
 - *tt*:  Compile and run t.nim.
@@ -2478,17 +2478,20 @@ Nimble Tasks:
 - *args*:  Show command line arguments.
 - *br*:  Build the stf test runner.
 - *rt*:  Run one or more stf tests in testfiles; specify part of the name.
-- *stfix*:  Create stf test files index: testfiles/stf-index.md
+- *stfix*:  Create stf test files index stf-index.md.
+- *stfjson*:  Display stf test files index JSON.
 - *newstf*:  Create new stf as a starting point for a new test.
 - *runhelp*:  Show the runner help text with glow.
 - *helpme*:  Show the statictea help text.
 - *remote*:  Check whether the remote code needs updating.
-- *cmdline*: Build cmdline.
-- *release*: Run tests and update docs.
-- *drun*: Run a statictea debian docker build env.
-- *ddelete*: Delete the statictea docker image and container.
-- *dlist*: List the docker image and container.
-- *clean*: Remove all the binaries so everything gets built next time.
+- *cmdline*:  Build cmdline.
+- *release*:  Run tests and update docs.
+- *drun*:  Run a statictea debian docker build env.
+- *ddelete*:  Delete the statictea docker image and container.
+- *dlist*:  List the docker image and container.
+- *clean*:  Remove all the binaries so everything gets built next time.
+- *replace*:  Show pattern for text search and replace in all the nim source files.
+- *dyfuncs*:  Create dynamicFuncList.nim from functions.nim.
 
 [[#contents][茶]]
 
