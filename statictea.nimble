@@ -604,9 +604,10 @@ proc taskDocs(namePart: string, forceRebuild = false) =
   for filename in filenames:
     # Name is part of a source file name, or "docs" when not specified.
     if namePart.toLower in filename.toLower or namePart == "docs":
-      var mdName = "docs/$1" % [changeFileExt(filename, "md")]
+      let mdName = "docs/$1" % [changeFileExt(filename, "md")]
+      let srcFilename = fmt"src/{filename}"
 
-      if not forceRebuild and myFileNewer("src/" & filename, mdName):
+      if not forceRebuild and myFileNewer(mdName, srcFilename):
         echo "Skipping unchanged $1." % filename
         continue
 

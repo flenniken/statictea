@@ -1,6 +1,10 @@
 # Statictea Functions
 
-The build-in Statictea functions.
+The built-in Statictea functions.
+
+Functions allow you to format variables for presentation in a
+replacement block.  They return a value that you assign to a
+variable or pass to another function.
 
 # Index
 
