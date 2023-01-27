@@ -741,7 +741,7 @@ The condition types and what is considered 0:
 * func -- always 0
 
 The if functions are special in a couple of ways, see
-[[#if-functions][If Functions]]
+the If Functions section.
 
 ~~~
 if0(condition: any, then: any, else: any) any
@@ -778,9 +778,9 @@ if0(c, warn("got zero value"))
 If the condition is true, return the second argument, else return the third argument.
 
 The if functions are special in a couple of ways, see
-[[#if-functions][If Functions]].  You usually use boolean infix
+the If Functions section.  You usually use boolean infix
 expressions for the condition, see:
-[[#boolean-expressions][Boolean Expressions]]
+the Boolean Expressions section.
 
 ~~~
 if(condition: bool, then: any, else: optional any) any

@@ -481,7 +481,7 @@ func fun_if0_iaoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:* func -- always 0
   ## @:
   ## @:The if functions are special in a couple of ways, see
-  ## @:[[#if-functions][If Functions]]
+  ## @:the If Functions section.
   ## @:
   ## @:~~~
   ## @:if0(condition: any, then: any, else: any) any
@@ -534,9 +534,9 @@ func fun_if_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## the third argument.
   ## @:
   ## @:The if functions are special in a couple of ways, see
-  ## @:[[#if-functions][If Functions]].  You usually use boolean infix
+  ## @:the If Functions section.  You usually use boolean infix
   ## @:expressions for the condition, see:
-  ## @:[[#boolean-expressions][Boolean Expressions]]
+  ## @:the Boolean Expressions section.
   ## @:
   ## @:~~~
   ## @:if(condition: bool, then: any, else: optional any) any

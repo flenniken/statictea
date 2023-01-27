@@ -2308,7 +2308,7 @@ templates and we tell which nimble task builds it.
 *Nim Source Docs*
 
 Statictea is written in the Nim language.  The documentation for
-the functions and type exists in the source code as nim doc
+the functions and types exists in the source code as nim doc
 comments.  The nim compiler provides a command to export these
 doc comments to a JSON file.  The template uses the JSON to
 produce the resulting documentation in markdown format.
@@ -2337,9 +2337,9 @@ statictea's embedded docs by looping over the f dictionary and
 fetching each function's docComment. The *funcdocs* nimble task
 builds the template.
 
-- [[docs/rmFunctions.md][Functions]]
-- [[templates/rmFunctions.md][rmFunctions.md]] (view raw)
-- [[templates/rmFunctions.tea][rmFunctions.tea]]
+- [[docs/teaFunctions.md][Functions]]
+- [[templates/teaFunctions.md][teaFunctions.md]] (view raw)
+- [[templates/teaFunctions.tea][teaFunctions.tea]]
 
 *Built-in Docs*
 
@@ -2348,7 +2348,7 @@ example you can display help on a function with the ph REPL
 command.
 
 This documentation is extracted from the nim module functions.nim
-by the nimble task *cdy*. The template creates a nim source file
+by the nimble task *dyfuncs*. The template creates a nim source file
 that’s compiled in.
 
 - [[templates/dynamicFuncList.nim][dynamicFuncList.nim]]
@@ -2361,7 +2361,7 @@ folder. Each stf file is a test file that's also a markdown
 file. The nimble *stfrm* task extracts a sentence from the top of each
 stf file and makes an index from that with a template.
 
-- [[templates/readme.md][readme.md]] (view raw)
+- [[templates/stf-index.md][StaticTea Stf Files]] (view raw)
 
 [[#contents][茶]]
 
@@ -2439,7 +2439,7 @@ Nimble Tasks:
 - *args*:  Show command line arguments.
 - *br*:  Build the stf test runner.
 - *rt*:  Run one or more stf tests in testfiles; specify part of the name.
-- *stfrm*:  Create testfiles readme.md.
+- *stfix*:  Create stf test files index: testfiles/stf-index.md
 - *newstf*:  Create new stf as a starting point for a new test.
 - *runhelp*:  Show the runner help text with glow.
 - *helpme*:  Show the statictea help text.
@@ -2467,7 +2467,7 @@ instructions for creating files, running files and comparing
 files.
 
 The stf files are designed to look good in markdown readers.  The
-testfiles folder contains [[testfiles/readme.md][StaticTea Stf Files]].
+testfiles folder contains [[testfiles/stf-index.md][StaticTea Stf Files]].
 
 See the runner help message for more information about stf files.
 
@@ -2481,7 +2481,7 @@ See the runner help message for more information about stf files.
 You can examine simple self contained statictea templates
 in the testfiles folder.
 
-- [[testfiles/readme.md][StaticTea Stf Files]] --- Index to the stf files.
+- [[testfiles/stf-index.md][StaticTea Stf Files]] --- Index to the stf files.
 
 The [[#docs-and-templates][Module Docs]] section has more real world examples.
 
@@ -2661,11 +2661,7 @@ Functions allow you to format variables for presentation in a
 replacement block.  They return a value that you assign to a
 variable or pass to another function.
 
-This section was created from the nim source code by running the
-funcdocs nimble task which uses the StaticTea template
-[[templates/rmFunctions.md][rmFunctions.md template]].
-
-- [[docs/rmFunctions.md][Functions]] -- Build-in Function Docs
+- [[docs/teaFunctions.md][Functions]] -- Built-in Function Docs
 
 * Contents :notoc:
 :PROPERTIES:

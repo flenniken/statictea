@@ -420,7 +420,7 @@ The condition types and what is considered 0:
 * func -- always 0
 
 The if functions are special in a couple of ways, see
-[[#if-functions][If Functions]]
+the If Functions section.
 
 ~~~
 if0(condition: any, then: any, else: any) any
@@ -460,9 +460,9 @@ func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
 If the condition is true, return the second argument, else return the third argument.
 
 The if functions are special in a couple of ways, see
-[[#if-functions][If Functions]].  You usually use boolean infix
+the If Functions section.  You usually use boolean infix
 expressions for the condition, see:
-[[#boolean-expressions][Boolean Expressions]]
+the Boolean Expressions section.
 
 ~~~
 if(condition: bool, then: any, else: optional any) any
@@ -2152,7 +2152,7 @@ func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): Bu
 
 # functionsList
 
-Dynamically generated sorted list of built-in functions. Each line contains the nim function name, its doc comment, the starting line number and the number of lines in the function. See templates/dynamicFuncList.nim
+Dynamically generated sorted list of built-in functions. Each line contains the nim function name, its doc comment, and the starting line number.  See templates/dynamicFuncList.nim
 
 ```nim
 functionsList = [(funcName: "fun_add_fff", docComment: """Add two floats. A warning is generated on overflow.

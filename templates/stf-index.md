@@ -2,7 +2,7 @@
 
 Here are all the Statictea stf tests:
 
-$$ # Sort the index by filenames.
+$$ # Sort the index by filename.
 $$ block
 $$ : g.modules = sort(s.modules, "ascending", "sensitive", "filename")
 $$ endblock

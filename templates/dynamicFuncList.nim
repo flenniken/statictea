@@ -1,7 +1,8 @@
 #$ # Statictea template for src/functionsList.nim
 #$ #
-# This file is auto generated from functions.nim doc comments using
-# the statictea template templates/dynamicFuncList.nim.
+# This file is auto generated from src/functions.nim doc comments using
+# the statictea template templates/dynamicFuncList.nim and the nimble
+# task dyfuncs.
 
 const
 #$ # Define all the doc comments. Use prefix dc_ followed by the
@@ -26,10 +27,12 @@ const
 #$ endblock
   ]
     ## Dynamically generated sorted list of built-in functions. Each
-    ## line contains the nim function name, its doc comment, the
-    ## starting line number and the number of lines in the function.
-    ## See templates/dynamicFuncList.nim
+    ## line contains the nim function name, its doc comment, and the
+    ## starting line number.  See templates/dynamicFuncList.nim
     
+  # Note: the function starting lines is separate from the list above
+  # so when there are changes the diffs are easier to read.
+
   functionStarts* = [
 #$ # Make a list of all the function start lines.
 #$ nextline t.repeat = len(o.entries)

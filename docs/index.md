@@ -13,7 +13,7 @@ StaticTea nim source code documentation.
 * [linebuffer.nim](linebuffer.md) &mdash; Read lines from a stream without exceeding the maximum line
 length.
 * [matches.nim](matches.md) &mdash; Methods for matching sub-strings.
-* [messages.nim](messages.md) &mdash; 
+* [messages.nim](messages.md) &mdash; Messages IDs and associated strings and routines to get them.
 * [opresult.nim](opresult.md) &mdash; OpResult holds either a value or a message.
 * [parseCmdLine.nim](parseCmdLine.md) &mdash; Parse a StaticTea language command line.
 * [parseCommandLine.nim](parseCommandLine.md) &mdash; Parse the StaticTea terminal command line and return the arguments.

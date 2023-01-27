@@ -1,4 +1,4 @@
-## Messages IDs and associated strings and routines to get them
+## Messages IDs and associated strings and routines to get them.
 
 import std/strutils
 

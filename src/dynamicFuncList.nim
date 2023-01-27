@@ -1,5 +1,6 @@
-# This file is auto generated from functions.nim doc comments using
-# the statictea template templates/dynamicFuncList.nim.
+# This file is auto generated from src/functions.nim doc comments using
+# the statictea template templates/dynamicFuncList.nim and the nimble
+# task dyfuncs.
 
 const
   dc_fun_add_fff = """
@@ -632,7 +633,7 @@ The condition types and what is considered 0:
 * func -- always 0
 
 The if functions are special in a couple of ways, see
-[[#if-functions][If Functions]]
+the If Functions section.
 
 ~~~
 if0(condition: any, then: any, else: any) any
@@ -668,9 +669,9 @@ if0(c, warn("got zero value"))
 If the condition is true, return the second argument, else return the third argument.
 
 The if functions are special in a couple of ways, see
-[[#if-functions][If Functions]].  You usually use boolean infix
+the If Functions section.  You usually use boolean infix
 expressions for the condition, see:
-[[#boolean-expressions][Boolean Expressions]]
+the Boolean Expressions section.
 
 ~~~
 if(condition: bool, then: any, else: optional any) any
@@ -1674,10 +1675,12 @@ warn("always warn")
     info("fun_warn_ss", dc_fun_warn_ss, 25),
   ]
     ## Dynamically generated sorted list of built-in functions. Each
-    ## line contains the nim function name, its doc comment, the
-    ## starting line number and the number of lines in the function.
-    ## See templates/dynamicFuncList.nim
+    ## line contains the nim function name, its doc comment, and the
+    ## starting line number.  See templates/dynamicFuncList.nim
     
+  # Note: the function starting lines is separate from the list above
+  # so when there are changes the diffs are easier to read.
+
   functionStarts* = [
     602,
     579,

@@ -1,6 +1,6 @@
 # messages.nim
 
-Messages IDs and associated strings and routines to get them
+Messages IDs and associated strings and routines to get them.
 
 * [messages.nim](../src/messages.nim) &mdash; Nim source code.
 # Index

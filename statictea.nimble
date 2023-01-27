@@ -82,7 +82,7 @@ proc get_testfile_filenames(): seq[string] =
   ## folder.
   result = get_dir_filenames("testfiles", ".stf.md", path = true)
 
-proc get_test_module_cmd(filename: string, release = false): string =
+proc get_test_module_cmd(filename: string, release = false, force = false): string =
   ## Return the command line to test the given nim file.
 
   #[
@@ -153,14 +153,19 @@ proc get_test_module_cmd(filename: string, release = false): string =
 
   let binName = changeFileExt(filename, "bin")
   var rel: string
+  var fb: string
   if release:
     rel = "-d:release "
   else:
     rel = ""
+  if force:
+    fb = "-f "
+  else:
+    fb = ""
 
   let part1 = "nim c --verbosity:0 --hint[Performance]:off "
   let part2 = "--hint[XCannotRaiseY]:off --hint[Name]:off -d:test "
-  let part3 = fmt"{rel} -r -p:src --out:bin/{dirName}/{binName} tests/{filename}"
+  let part3 = fmt"{rel}{fb}-r -p:src --out:bin/{dirName}/{binName} tests/{filename}"
 
   result = part1 & part2 & part3
 
@@ -534,7 +539,7 @@ proc echoGrip() =
 The grip app is good for viewing github markdown locally.
   grip --quiet readme.org &
   http://localhost:6419/docs/index.md
-  http://localhost:6419/testfiles/readme.md
+  http://localhost:6419/testfiles/stf-index.md
 
 """
 
@@ -564,17 +569,19 @@ proc taskTestfilesReadme() =
   var json = testfilesIndexJson()
   writeFile(jsonFilename, json)
 
-  # Process the index template and create the index.md file.
-  echo "Create the testfiles/readme.md file"
-  var cmd = fmt"bin/{dirName}/statictea -s {jsonFilename} -t templates/testfiles.md -r testfiles/readme.md"
+  # Create the stf index file in the testfiles folder.
+  let templateName = "templates/stf-index.md"
+  let resultFilename = "testfiles/stf-index.md"
+  echo fmt"Create the {resultFilename} file"
+  let cmd = fmt"bin/{dirName}/statictea -s {jsonFilename} -t {templateName} -r {resultFilename}"
   exec cmd
 
   rmFile(jsonFilename)
-  echo "Generated testfiles/readme.md"
   echoGrip()
 
 proc myFileNewer(a: string, b: string): bool =
   ## Return true when file a is newer than file b.
+  # The following line doesn't work in a nimble file.
   # result = getLastModificationTime(a) > getLastModificationTime(b)
   for filename in [a, b]:
     if not fileExists(filename):
@@ -585,7 +592,8 @@ proc myFileNewer(a: string, b: string): bool =
   # echo cmd
   let diffStr = staticExec(cmd)
   let diff = parseInt(diffStr)
-  if diff < 0:
+  # echo diff
+  if diff > 0:
     result = true
   else:
     result = false
@@ -627,14 +635,14 @@ proc taskDocs(namePart: string, forceRebuild = false) =
   echoGrip()
 
 proc taskFuncDocs() =
-  ## Create the rmFunctions.md file from the f dictionary.
+  ## Create the teaFunctions.md file from the f dictionary.
 
   let statictea = fmt"bin/{dirName}/statictea"
-  let tFile = "templates/rmFunctions.md"
-  let teaFile = "templates/rmFunctions.tea"
-  let result = "docs/rmFunctions.md"
+  let tFile = "templates/teaFunctions.md"
+  let teaFile = "templates/teaFunctions.tea"
+  let result = "docs/teaFunctions.md"
 
-  # Build the docs/rmFunctions.md file.
+  # Build the docs/teaFunctions.md file.
   echo fmt"make {result}"
   let cmd = fmt"{statictea} -t {tFile} -o {teaFile} -r {result}"
   exec cmd
@@ -764,6 +772,16 @@ proc checkUtf8DecoderEcho() =
     echo "Use ^^ to update the local copy."
 
 proc otherTests() =
+  # If functions.nim changes the dynamically generated content might
+  # need to change. So check that the dynamic content file is newer
+  # than the functions.nim source file.
+  let dynamicContent = "src/dynamicFuncList.nim"
+  let sourceFile = "src/functions.nim"
+  if myFileNewer(sourceFile, dynamicContent):
+    echo "Run nimble task dyfuncs to update the dynamic content from functions.nim."
+    echo ""
+    exit()
+
   # Make sure it builds with test undefined.
   buildRelease()
 
@@ -804,6 +822,7 @@ task n, "\tShow available tasks.":
 task test, "\tRun one or more tests; specify part of test filename.":
   let count = system.paramCount()+1
   let name = system.paramStr(count-1)
+
   runUnitTests(name)
 
 task other, "\tRun other tests and build tests.":
@@ -850,12 +869,7 @@ task jsonix, "\tDisplay markdown docs index json.":
   for line in json.splitLines():
     echo line
 
-task stfix, "\tDisplay markdown testfiles index json.":
-  var json = testfilesIndexJson()
-  for line in json.splitLines():
-    echo line
-
-task funcdocs, "Create the function docs (rmFunctions.md).":
+task teafuncs, "Create the function docs (teaFunctions.md).":
   taskFuncDocs()
 
 task dot, "\tCreate a dependency graph of the StaticTea source.":
@@ -899,8 +913,13 @@ task rt, "\tRun one or more stf tests in testfiles; specify part of the name.":
 # task stf, "\tList stf tests with newest last.":
 #   exec """ls -1tr testfiles/*.stf | xargs grep "##" | cut -c 11- | sed 's/:## / -- /'"""
 
-task stfrm, "\tCreate testfiles readme.md.":
+task stfix, "\tCreate stf test files index stf-index.md.":
   taskTestfilesReadme()
+
+task stfjson, "\tDisplay stf test files index JSON.":
+  var json = testfilesIndexJson()
+  for line in json.splitLines():
+    echo line
 
 task newstf, "\tCreate new stf as a starting point for a new test.":
   let count = system.paramCount()+1
@@ -1049,7 +1068,7 @@ task replace, "\tShow pattern for text search and replace in all the nim source 
   let cmd = r"find . -name \*.nim -type f | xargs -n 1 gsed -i 's/stateVariables/startVariables/g'"
   echo cmd
 
-task cdy, "\tCreate dynamicFuncList.nim from functions.nim.":
+task dyfuncs, "\tCreate dynamicFuncList.nim from functions.nim.":
   # Extract the statictea function metadata from the functions.json file to create dynamicFuncList.nim":
 
   # Build the release version of statictea. This makes sure function.nim builds.
@@ -1061,6 +1080,7 @@ task cdy, "\tCreate dynamicFuncList.nim from functions.nim.":
   let tFile = "templates/dynamicFuncList.nim"
   let teaFile = "templates/dynamicFuncList.tea"
   let result = "src/dynamicFuncList.nim"
+  let functionsFile = "test_functions.nim"
 
   # Build the functions.json file.
   echo fmt"make {server}"
@@ -1070,3 +1090,7 @@ task cdy, "\tCreate dynamicFuncList.nim from functions.nim.":
   echo fmt"make {result}"
   let cmd = fmt"{statictea} -s {server} -t {tFile} -o {teaFile} -r {result}"
   exec cmd
+
+  # Buld the functions.nim file.
+  let cmd2 = get_test_module_cmd(functionsFile, force = true)
+  exec cmd2
