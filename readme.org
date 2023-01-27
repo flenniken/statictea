@@ -1922,14 +1922,12 @@ The StaticTea command line options:
 :CUSTOM_ID: how-to
 :END:
 
-Follow these guidelines when creating a new template:
+Follow these guidelines when creating a new template.  Open and
+test the template after each step in the process. For example an
+HTML file you would open it in a browser and validate it.
 
 1. Create a sample result file. For HTML create an HTML
    file. This will become your template.
-
-Open and test the template after each step in the process. For
-example an HTML file you would open it in a browser and validate
-it.
 
 2. Identify the variable and repeating parts of the file. Put a
    command around each as a comment for your template type. This
