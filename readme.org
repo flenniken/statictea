@@ -1914,6 +1914,47 @@ The StaticTea command line options:
   Postfix]] section.
 - log - log to a file, see [[#logging][Logging]] section
 
+
+[[#contents][茶]]
+
+* How To
+:PROPERTIES:
+:CUSTOM_ID: how-to
+:END:
+
+Follow these guidelines when creating a new template:
+
+1. Create a sample result file. For HTML create an HTML
+   file. This will become your template.
+
+Open and test the template after each step in the process. For
+example an HTML file you would open it in a browser and validate
+it.
+
+2. Identify the variable and repeating parts of the file. Put a
+   command around each as a comment for your template type. This
+   defines the replacement blocks.
+
+3. Inside the replacement blocks replace the variables with
+   variable names in brackets, e.g. {name}.
+
+4. Create a test JSON file containing the variables defined in
+   step 3. Create a list of dictionaries for repeating blocks.
+
+5. For repeating replacement blocks set t.repeat to the repeat
+   count (the length of its JSON list).
+
+6. Run statictea combining the JSON file and the template to make
+   a result file. Then edit the JSON or the template and repeat,
+   perfecting the template.
+
+In a project with many templates, you can share common template
+fragments using the replace command.
+
+If you don’t have control over the JSON, create a tea code file
+and write code converting the JSON to variables you want in the
+template.
+
 [[#contents][茶]]
 
 * Miscellaneous
@@ -2687,6 +2728,7 @@ variable or pass to another function.
 - [[#multiline-strings][Multiline Strings]]
 - [[#user-functions][User Functions]]
 - [[#run-statictea][Run StaticTea]]
+- [[#how-to][How To]]
 - [[#miscellaneous][Miscellaneous (+15)]]
 - [[#built-in-functions][Built-in Functions]]
 
