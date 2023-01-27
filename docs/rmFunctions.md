@@ -27,7 +27,7 @@ The build-in Statictea functions.
 * [float](#float-2) &mdash; Create a float from a number string.
 * [format](#format) &mdash; Format a string using replacement variables similar to a replacement block.
 * [func](#func) &mdash; Define a function.
-* [functionDetails](#functiondetails) &mdash; Return the function details.
+* [functionDetails](#functiondetails) &mdash; Return the function details in a dictionary.
 * [get](#get) &mdash; Get a dictionary value by its key.
 * [get](#get-1) &mdash; Get a list value by its index.
 * [githubAnchor](#githubanchor) &mdash; Create Github anchor names from heading names.
@@ -329,8 +329,8 @@ Examples:
 
 ~~~
 dict() => {}
-dict(list("a", 5)) => {"a": 5}
-dict(list("a", 5, "b", 33, "c", 0)) =>
+dict(["a", 5]) => {"a": 5}
+dict(["a", 5, "b", 33, "c", 0]) =>
   {"a": 5, "b": 33, "c": 0}
 ~~~
 
@@ -539,7 +539,7 @@ mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
 
 # functionDetails
 
-Return the function details.
+Return the function details in a dictionary.
 
 ~~~
 functionDetails(funcVar: func) dict
@@ -769,7 +769,6 @@ useful when using a warn or return function for its side effects.
 The if takes two arguments when there is no assignment.
 
 ~~~
-c = 0
 if0(c, warn("got zero value"))
 ~~~
 
@@ -1079,8 +1078,7 @@ Below is the definition of the b5 callback function.
 ~~~
 b5 = func(“b5(ix: int, value: int, newList: list) bool”)
   ## Collect values greater than 5.
-  if( (value <= 5), return(false))
-  newList &= value
+  newList &= if( (value > 5), value)
   return(false)
 ~~~
 
@@ -1097,14 +1095,6 @@ You can log conditionally in a bare if statement:
 
 ~~~
 if0(c, log("log this message when c is 0"))
-~~~
-
-You can log conditionally in a normal if statement. In the
-following example, if log is called the b variable will not
-get created.
-
-~~~
-b = if0(c, log("c is not 0"), "")
 ~~~
 
 You can log unconditionally using a bare log statement:
@@ -1285,7 +1275,7 @@ or(true, warn("not hit")) => true
 Split a file path into its component pieces. Return a dictionary with the filename, basename, extension and directory.
 
 You pass a path string and the optional path separator, forward
-slash or or backwards slash. When no separator, the current
+slash or or backslash. When no separator, the current
 system separator is used.
 
 ~~~
@@ -1747,14 +1737,6 @@ You can warn conditionally in a bare if statement:
 
 ~~~
 if0(c, warn("message is 0"))
-~~~
-
-You can warn conditionally in a normal if statement. In the
-following example, if warn is called the b variable will not
-get created.
-
-~~~
-b = if0(c, warn("c is not 0"), "")
 ~~~
 
 You can warn unconditionally using a bare warn statement:

@@ -241,8 +241,8 @@ Examples:
 
 ~~~
 dict() => {}
-dict(list("a", 5)) => {"a": 5}
-dict(list("a", 5, "b", 33, "c", 0)) =>
+dict(["a", 5]) => {"a": 5}
+dict(["a", 5, "b", 33, "c", 0]) =>
   {"a": 5, "b": 33, "c": 0}
 ~~~
 """
@@ -439,7 +439,7 @@ mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
 """
 
   dc_fun_functionDetails_pd = """
-Return the function details.
+Return the function details in a dictionary.
 
 ~~~
 functionDetails(funcVar: func) dict
@@ -660,7 +660,6 @@ useful when using a warn or return function for its side effects.
 The if takes two arguments when there is no assignment.
 
 ~~~
-c = 0
 if0(c, warn("got zero value"))
 ~~~
 """
@@ -958,8 +957,7 @@ Below is the definition of the b5 callback function.
 ~~~
 b5 = func(“b5(ix: int, value: int, newList: list) bool”)
   ## Collect values greater than 5.
-  if( (value <= 5), return(false))
-  newList &= value
+  newList &= if( (value > 5), value)
   return(false)
 ~~~
 """
@@ -975,14 +973,6 @@ You can log conditionally in a bare if statement:
 
 ~~~
 if0(c, log("log this message when c is 0"))
-~~~
-
-You can log conditionally in a normal if statement. In the
-following example, if log is called the b variable will not
-get created.
-
-~~~
-b = if0(c, log("c is not 0"), "")
 ~~~
 
 You can log unconditionally using a bare log statement:
@@ -1152,7 +1142,7 @@ or(true, warn("not hit")) => true
 Split a file path into its component pieces. Return a dictionary with the filename, basename, extension and directory.
 
 You pass a path string and the optional path separator, forward
-slash or or backwards slash. When no separator, the current
+slash or or backslash. When no separator, the current
 system separator is used.
 
 ~~~
@@ -1600,14 +1590,6 @@ You can warn conditionally in a bare if statement:
 if0(c, warn("message is 0"))
 ~~~
 
-You can warn conditionally in a normal if statement. In the
-following example, if warn is called the b variable will not
-get created.
-
-~~~
-b = if0(c, warn("c is not 0"), "")
-~~~
-
 You can warn unconditionally using a bare warn statement:
 
 ~~~
@@ -1649,7 +1631,7 @@ warn("always warn")
     info("fun_gt_iib", dc_fun_gt_iib, 19),
     info("fun_gte_ffb", dc_fun_gte_ffb, 19),
     info("fun_gte_iib", dc_fun_gte_iib, 19),
-    info("fun_if0_iaoaa", dc_fun_if0_iaoaa, 66),
+    info("fun_if0_iaoaa", dc_fun_if0_iaoaa, 65),
     info("fun_if_baoaa", dc_fun_if_baoaa, 47),
     info("fun_int_fosi", dc_fun_int_fosi, 35),
     info("fun_int_sosi", dc_fun_int_sosi, 42),
@@ -1661,8 +1643,8 @@ warn("always warn")
     info("fun_len_li", dc_fun_len_li, 19),
     info("fun_len_si", dc_fun_len_si, 18),
     info("fun_list_al", dc_fun_list_al, 22),
-    info("fun_listLoop_llpoab", dc_fun_listLoop_llpoab, 47),
-    info("fun_log_ss", dc_fun_log_ss, 32),
+    info("fun_listLoop_llpoab", dc_fun_listLoop_llpoab, 46),
+    info("fun_log_ss", dc_fun_log_ss, 24),
     info("fun_lower_ss", dc_fun_lower_ss, 19),
     info("fun_lt_ffb", dc_fun_lt_ffb, 19),
     info("fun_lt_iib", dc_fun_lt_iib, 19),
@@ -1674,7 +1656,7 @@ warn("always warn")
     info("fun_not_bb", dc_fun_not_bb, 18),
     info("fun_or_bbb", dc_fun_or_bbb, 26),
     info("fun_path_sosd", dc_fun_path_sosd, 55),
-    info("fun_readJson_sa", dc_fun_readJson_sa, 29),
+    info("fun_readJson_sa", dc_fun_readJson_sa, 23),
     info("fun_replace_siiss", dc_fun_replace_siiss, 110),
     info("fun_replaceRe_sls", dc_fun_replaceRe_sls, 33),
     info("fun_return_aa", dc_fun_return_aa, 51),
@@ -1689,7 +1671,7 @@ warn("always warn")
     info("fun_sub_iii", dc_fun_sub_iii, 23),
     info("fun_type_as", dc_fun_type_as, 53),
     info("fun_values_dl", dc_fun_values_dl, 123),
-    info("fun_warn_ss", dc_fun_warn_ss, 33),
+    info("fun_warn_ss", dc_fun_warn_ss, 25),
   ]
     ## Dynamically generated sorted list of built-in functions. Each
     ## line contains the nim function name, its doc comment, the
@@ -1697,79 +1679,79 @@ warn("always warn")
     ## See templates/dynamicFuncList.nim
     
   functionStarts* = [
-    603,
-    580,
-    2390,
-    1084,
-    729,
-    762,
+    602,
+    579,
+    2372,
+    1083,
+    728,
+    761,
     258,
     237,
     279,
-    806,
+    805,
     312,
-    1233,
-    1194,
-    2461,
-    2442,
-    2480,
-    674,
-    1121,
-    850,
-    893,
-    867,
-    2259,
-    2293,
-    2314,
+    1232,
+    1193,
+    2443,
+    2424,
+    2462,
+    673,
+    1120,
+    849,
+    892,
+    866,
+    2241,
+    2275,
+    2296,
     429,
     387,
-    1853,
-    1819,
-    2576,
-    2557,
-    2614,
-    2595,
+    1851,
+    1817,
+    2558,
+    2539,
+    2596,
+    2577,
     467,
-    533,
-    948,
-    983,
-    1025,
-    1988,
-    1947,
-    1581,
+    532,
+    947,
+    982,
+    1024,
+    1986,
+    1945,
+    1579,
     368,
     349,
     331,
-    1269,
-    1291,
-    2066,
-    1562,
-    2652,
-    2633,
-    2691,
-    2671,
-    2519,
-    2500,
-    2538,
-    2372,
-    2416,
-    1507,
-    2711,
-    1338,
-    1448,
-    2098,
-    1159,
-    1728,
-    1761,
-    1790,
-    2349,
-    2149,
-    2235,
-    649,
-    626,
-    1894,
-    1605,
-    2033,
+    1268,
+    1290,
+    2056,
+    1560,
+    2634,
+    2615,
+    2673,
+    2653,
+    2501,
+    2482,
+    2520,
+    2354,
+    2398,
+    1505,
+    2693,
+    1336,
+    1446,
+    2080,
+    1158,
+    1726,
+    1759,
+    1788,
+    2331,
+    2131,
+    2217,
+    648,
+    625,
+    1892,
+    1603,
+    2031,
   ]
     ## Dynamically generated array of starting line numbers for each
     ## built-in function in the functions.nim file.

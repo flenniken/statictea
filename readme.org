@@ -1928,7 +1928,7 @@ The StaticTea command line options:
 - [[#logging][Logging]]
 - [[#special-forms][Special Forms]]
 - [[#if-functions][If Functions]]
-- [[#module-docs][Module Docs]]
+- [[#docs-and-templates][Docs and Templates]]
 - [[#html-formatted-json][HTML Formatted Json]]
 - [[#nimble-tasks][Nimble Tasks]]
 - [[#stf-runner][Stf Runner]]
@@ -2205,8 +2205,8 @@ side, for example:
 a = len(“tea”)
 #+END_SRC
 
-The functions with special forms and how they deviate from the
-normal form:
+Below are the list of special functions and how the deviate from
+the normal form:
 
 - list - takes any number of arguments
 - if - conditionally evaluates its arguments and it has a bare no
@@ -2216,7 +2216,7 @@ normal form:
 - warn — exits the statement like a normal warning with no return value
 - return - exits the command block or function with a return value
 - log - writes a message to the log file
-- func - define a function, see [[#user-functions][User Functions]]
+- func - defines a function, see [[#user-functions][User Functions]]
 
 If the form doesn't have an assignment it's called a bare
 function. The warn, return, if and log have bare forms.
@@ -2256,7 +2256,7 @@ if(cond, return(“stop”))
 #+END_SRC
 
 
-**Three Parameter Form**
+*Three Parameter Form*
 
 Normally functions evaluate all their arguments before passing
 them to the function but the three parameter IF evaluates its
@@ -2270,7 +2270,7 @@ skipped.
 a = if(true, do-this(), do-other())
 #+END_SRC
 
-**Two Parameter Form**
+*Two Parameter Form*
 
 The two parameter form assigns the variable when the condition is
 true but not when it’s false. You use it to conditionally append
@@ -2280,7 +2280,7 @@ to a list.
 newList &= if(cond, value)
 #+END_SRC
 
-**Bare Two Parameter Form**
+*Bare Two Parameter Form*
 
 The bare two parameter form doesn’t have an assignment. You use
 it with the warn and return functions for their side effects.
@@ -2292,31 +2292,76 @@ if(c, warn("buy more tea!"))
 
 [[#contents][茶]]
 
-** Module Docs
+** Docs and Templates
 :PROPERTIES:
-   :CUSTOM_ID: module-docs
+   :CUSTOM_ID: docs-and-templates
    :END:
 
-You can read the StaticTea source code documentation in Github
-because it is formatted as github markdown. Statictea created the
-markdown files from the source code's embedded doc comments.
+All the documents for this project, except this readme, were
+created with Statictea templates. The resulting documents are
+useful as documentation as well as examples for building your own
+templates. They also the serve as test cases.
 
-- [[docs/index.md][StaticTea Source Docs]] --- Index to the
-  source code documents.
+Below we show the resulting documents and their associated
+templates and we tell which nimble task builds it.
 
-The nimble *docsix* task builds the module index by running the
-following process:
+*Nim Source Docs*
 
-1. create a json file from the doc comments at the top of all the source files
-2. format the json as markdown using the
-   [[templates/nimModuleIndex.md][nimModuleIndex.md]] statictea template. Click the link then "View Raw".
+Statictea is written in the Nim language.  The documentation for
+the functions and type exists in the source code as nim doc
+comments.  The nim compiler provides a command to export these
+doc comments to a JSON file.  The template uses the JSON to
+produce the resulting documentation in markdown format.
 
-The nimble *docs* task builds the module markdown files by running
-the following process for each module:
+The markdown format was choosen so the source and documentation
+can reside in the same github repository. Github renders markdown
+(unlike HTML) without having to create a separate github.io repo.
 
-1. create a json file of a module's docs using nim's jsondoc command
-2. format the json as markdown using the [[templates/nimModule.md][nimModule.md]] and the [[templates/nimModule.tea][nimModule.tea]]
-   statictea files.
+The index was created with one template and the module docs with
+another. The nimble *docsix* task builds the module index and the
+*docs* task builds one or more modules docs. For more details see
+the [[html-formatted-json][HTML Formatted Json]] section.
+
+For easier reading of the markdown templates, click the link then
+switch to "View Raw".
+
+- [[docs/index.md][Source Code]]
+- [[templates/nimModuleIndex.md][nimModuleIndex.md]] (view raw)
+- [[templates/nimModule.md][nimModule.md]] (view raw)
+- [[templates/nimModule.tea][nimModule.tea]]
+
+*Functions*
+
+The Statictea language functions doc was created from
+statictea's embedded docs by looping over the f dictionary and
+fetching each function's docComment. The *funcdocs* nimble task
+builds the template.
+
+- [[docs/rmFunctions.md][Functions]]
+- [[templates/rmFunctions.md][rmFunctions.md]] (view raw)
+- [[templates/rmFunctions.tea][rmFunctions.tea]]
+
+*Built-in Docs*
+
+Statictea function documentation is built in to the program, for
+example you can display help on a function with the ph REPL
+command.
+
+This documentation is extracted from the nim module functions.nim
+by the nimble task *cdy*. The template creates a nim source file
+that’s compiled in.
+
+- [[templates/dynamicFuncList.nim][dynamicFuncList.nim]]
+- [[templates/dynamicFuncList.tea][dynamicFuncList.tea]]
+
+*Stf Tests*
+
+The stf files used to test statictea exist in the testfiles
+folder. Each stf file is a test file that's also a markdown
+file. The nimble *stfrm* task extracts a sentence from the top of each
+stf file and makes an index from that with a template.
+
+- [[templates/readme.md][readme.md]] (view raw)
 
 [[#contents][茶]]
 
@@ -2413,10 +2458,10 @@ Nimble Tasks:
    :CUSTOM_ID: stf-runner
    :END:
 
-The Single Test File (stf) runner is a standalone program used
-for testing command line applications.
+The Single Test File (stf) runner is a standalone program in this
+project used for testing command line applications.
 
-A stf file contains the test which the runner executes to
+A stf file defines the test which the runner executes to
 determine whether the test passed. The stf file contains
 instructions for creating files, running files and comparing
 files.
@@ -2438,7 +2483,7 @@ in the testfiles folder.
 
 - [[testfiles/readme.md][StaticTea Stf Files]] --- Index to the stf files.
 
-The [[#module-docs][Module Docs]] section has more real world examples.
+The [[#docs-and-templates][Module Docs]] section has more real world examples.
 
 [[#contents][茶]]
 
@@ -2500,8 +2545,8 @@ tea>
 :END:
 
 You can use the statictea docker image as a development
-environment.  It is a Debian system with the nim compiler and
-applications used to build and test.
+environment.  It is a Debian system configured with the nim
+compiler and other applications needed to build and test.
 
 The statictea host source folder is shared with the docker
 container, so you can use your own editor and applications on the

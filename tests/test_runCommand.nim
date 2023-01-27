@@ -3098,8 +3098,7 @@ statement: stopped = listLoop([1], newList, b5, 2)
     let content = """
 b5 = func("b5(ix: int, value: int, newList: list) bool")
   ## Use items bigger than 5.
-  if( (value <= 5), return(false))
-  newList &= add(value, state)
+  newList &= if( (value > 5), add(value, state))
   return(false)
 
 newList = []
@@ -3113,7 +3112,7 @@ l.ls = [1,2,3]
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.tea(9): w252: The listLoop state argument exists but the callback doesn't have a state parameter.
+testcode.tea(8): w252: The listLoop state argument exists but the callback doesn't have a state parameter.
 statement: stopped = listLoop(ls, newList, b5, 2)
                                                ^
 """

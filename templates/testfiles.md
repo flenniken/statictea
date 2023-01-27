@@ -1,6 +1,6 @@
 # Stf Test Files
 
-This folder contains stf test files for statictea.
+Here are all the Statictea stf tests:
 
 $$ # Sort the index by filenames.
 $$ block

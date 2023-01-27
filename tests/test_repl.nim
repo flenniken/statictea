@@ -4,7 +4,6 @@ import std/strutils
 import repl
 import variables
 import sharedtestcode
-import vartypes
 import functions
 import version
 import comparelines

@@ -509,7 +509,6 @@ func fun_if0_iaoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:The if takes two arguments when there is no assignment.
   ## @:
   ## @:~~~
-  ## @:c = 0
   ## @:if0(c, warn("got zero value"))
   ## @:~~~~
 
@@ -1242,8 +1241,8 @@ func fun_dict_old*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:
   ## @:~~~
   ## @:dict() => {}
-  ## @:dict(list("a", 5)) => {"a": 5}
-  ## @:dict(list("a", 5, "b", 33, "c", 0)) =>
+  ## @:dict(["a", 5]) => {"a": 5}
+  ## @:dict(["a", 5, "b", 33, "c", 0]) =>
   ## @:  {"a": 5, "b": 33, "c": 0}
   ## @:~~~~
 
@@ -1325,8 +1324,7 @@ func fun_listLoop_llpoab*(variables: Variables, arguments: seq[Value]): FunResul
   ## @:~~~
   ## @:b5 = func(“b5(ix: int, value: int, newList: list) bool”)
   ## @:  ## Collect values greater than 5.
-  ## @:  if( (value <= 5), return(false))
-  ## @:  newList &= value
+  ## @:  newList &= if( (value > 5), value)
   ## @:  return(false)
   ## @:~~~
 
@@ -1509,7 +1507,7 @@ func fun_path_sosd*(variables: Variables, arguments: seq[Value]): FunResult =
   ## with the filename, basename, extension and directory.
   ## @:
   ## @:You pass a path string and the optional path separator, forward
-  ## @:slash or or backwards slash. When no separator, the current
+  ## @:slash or or backslash. When no separator, the current
   ## @:system separator is used.
   ## @:
   ## @:~~~
@@ -2044,14 +2042,6 @@ func fun_warn_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:if0(c, warn("message is 0"))
   ## @:~~~~
   ## @:
-  ## @:You can warn conditionally in a normal if statement. In the
-  ## @:following example, if warn is called the b variable will not
-  ## @:get created.
-  ## @:
-  ## @:~~~
-  ## @:b = if0(c, warn("c is not 0"), "")
-  ## @:~~~~
-  ## @:
   ## @:You can warn unconditionally using a bare warn statement:
   ## @:
   ## @:~~~
@@ -2075,14 +2065,6 @@ func fun_log_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:
   ## @:~~~
   ## @:if0(c, log("log this message when c is 0"))
-  ## @:~~~
-  ## @:
-  ## @:You can log conditionally in a normal if statement. In the
-  ## @:following example, if log is called the b variable will not
-  ## @:get created.
-  ## @:
-  ## @:~~~
-  ## @:b = if0(c, log("c is not 0"), "")
   ## @:~~~
   ## @:
   ## @:You can log unconditionally using a bare log statement:
@@ -2312,7 +2294,7 @@ func fun_func_sp*(variables: Variables, arguments: seq[Value]): FunResult =
   result = newFunResultWarn(wDefineFunction)
 
 func fun_functionDetails_pd*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return the function details.
+  ## Return the function details in a dictionary.
   ## @:
   ## @:~~~
   ## @:functionDetails(funcVar: func) dict
@@ -2730,12 +2712,6 @@ func fun_readJson_sa*(variables: Variables, arguments: seq[Value]): FunResult =
   if valueOr.isMessage:
     return newFunResultWarn(valueOr.message)
   result = newFunResult(valueOr.value)
-
-# todo: start with a list of function pointers and build the dict from that.
-# functionPtrs = [fun_add_fff, ...]
-# for functionPtr in functionPtrs:
-#   let name = getName(functionPtr)
-#   functionsDict[name] = functionPtr
 
 var functionsDict* = newTable[string, FunctionPtr]()
   ## Maps a built-in function name to a function pointer you can call.

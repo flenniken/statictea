@@ -1060,7 +1060,7 @@ task cdy, "\tCreate dynamicFuncList.nim from functions.nim.":
   let server = "docs/functions.json"
   let tFile = "templates/dynamicFuncList.nim"
   let teaFile = "templates/dynamicFuncList.tea"
-  let result = "src/dynamicFuncList.nim.tmp"
+  let result = "src/dynamicFuncList.nim"
 
   # Build the functions.json file.
   echo fmt"make {server}"
