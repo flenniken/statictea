@@ -2690,18 +2690,6 @@ nimble release
 
 [[#contents][茶]]
 
-* Built-in Functions
-:PROPERTIES:
-:CUSTOM_ID: built-in-functions
-:ORDERED:  t
-:END:
-
-Functions allow you to format variables for presentation in a
-replacement block.  They return a value that you assign to a
-variable or pass to another function.
-
-- [[docs/teaFunctions.md][Functions]] -- Built-in Function Docs
-
 * Contents :notoc:
 :PROPERTIES:
 :CUSTOM_ID: contents
@@ -2728,7 +2716,7 @@ variable or pass to another function.
 - [[#run-statictea][Run StaticTea]]
 - [[#how-to][How To]]
 - [[#miscellaneous][Miscellaneous (+15)]]
-- [[#built-in-functions][Built-in Functions]]
+- [[docs/teaFunctions.md][Functions]]
 
 * Tea Info                                                            :notoc:
 
