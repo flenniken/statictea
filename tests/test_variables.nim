@@ -128,7 +128,7 @@ t.version = "$1"""" % staticteaVersion
 
   test "getVariable five":
     var variables = startVariables()
-    variables["l"].dictv["five"] = newValue(5)
+    variables["l"].dictv.dict["five"] = newValue(5)
     check testGetVariableOk(variables, "l.five", "5")
     check testGetVariableOk(variables, "five", "5")
 

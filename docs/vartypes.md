@@ -9,7 +9,9 @@ StaticTea variable types.
 * const: [variableMiddleChars](#variablemiddlechars) &mdash; A variable contains ascii letters, digits, underscores and hypens.
 * const: [variableChars](#variablechars) &mdash; A variable contains ascii letters, digits, underscores and hypens.
 * const: [startTFVarNumber](#starttfvarnumber) &mdash; A character that starts true, false, a variable or a number.
-* type: [VarsDict](#varsdict) &mdash; The statictea dictionary type.
+* type: [VarsDict](#varsdict) &mdash; This is a ref type.
+* type: [DictType](#dicttype) &mdash; The statictea dictionary type.
+* type: [ListType](#listtype) &mdash; The statictea list type.
 * type: [Variables](#variables) &mdash; Dictionary holding all statictea variables in multiple distinct logical dictionaries.
 * type: [VarsDictOr](#varsdictor) &mdash; A VarsDict object or a warning.
 * type: [ValueKind](#valuekind) &mdash; The statictea variable types.
@@ -37,6 +39,8 @@ StaticTea variable types.
 * [newVarsDict](#newvarsdict) &mdash; Create a new empty variables dictionary.
 * [newVarsDictOr](#newvarsdictor) &mdash; Return a new varsDictOr object containing a warning.
 * [newVarsDictOr](#newvarsdictor-1) &mdash; Return a new VarsDict object containing a dictionary.
+* [newDictType](#newdicttype) &mdash; 
+* [newListType](#newlisttype) &mdash; 
 * [newValue](#newvalue) &mdash; Create a string value.
 * [newValue](#newvalue-1) &mdash; Create an integer value.
 * [newValue](#newvalue-2) &mdash; Create a bool value.
@@ -119,11 +123,38 @@ startTFVarNumber: set[char] =
 
 # VarsDict
 
-The statictea dictionary type. This is a ref type. Create a new
-VarsDict with newVarsDict procedure.
+This is a ref type. Create a new VarsDict with newVarsDict procedure.
 
 ```nim
 VarsDict = OrderedTableRef[string, Value]
+```
+
+# DictType
+
+The statictea dictionary type.
+
+* dict -- an ordered dictionary.
+* mutable -- whether you can append to the dictionary or not.
+
+```nim
+DictType = object
+  dict*: VarsDict
+  mutable*: bool
+
+```
+
+# ListType
+
+The statictea list type.
+
+* list -- a list of values.
+* mutable -- whether you can append to the dictionary or not.
+
+```nim
+ListType = object
+  list*: seq[Value]
+  mutable*: bool
+
 ```
 
 # Variables
@@ -438,6 +469,22 @@ Return a new VarsDict object containing a dictionary.
 func newVarsDictOr(varsDict: VarsDict): VarsDictOr
 ```
 
+# newDictType
+
+
+
+```nim
+func newDictType(varsDict: VarsDict; mutable = false): DictType
+```
+
+# newListType
+
+
+
+```nim
+func newListType(valueList: seq[Value]; mutable = false): ListType
+```
+
 # newValue
 
 Create a string value.
@@ -475,7 +522,7 @@ proc newValue(num: float): Value
 Create a list value.
 
 ```nim
-proc newValue(valueList: seq[Value]): Value
+proc newValue(valueList: seq[Value]; mutable = false): Value
 ```
 
 # newValue
@@ -483,7 +530,7 @@ proc newValue(valueList: seq[Value]): Value
 Create a dictionary value from a VarsDict.
 
 ```nim
-proc newValue(varsDict: VarsDict): Value
+proc newValue(varsDict: VarsDict; mutable = false): Value
 ```
 
 # newValue
@@ -506,7 +553,7 @@ let listValue = newValue([newValue(1), newValue("b")])
 ~~~
 
 ```nim
-proc newValue[T](list: openArray[T]): Value
+proc newValue[T](list: openArray[T]; mutable = false): Value
 ```
 
 # newValue
@@ -521,7 +568,7 @@ same type which may be Value type.
 ~~~
 
 ```nim
-proc newValue[T](dictPairs: openArray[(string, T)]): Value
+proc newValue[T](dictPairs: openArray[(string, T)]; mutable = false): Value
 ```
 
 # newFunc
@@ -547,7 +594,7 @@ func newValue(function: FunctionSpec): Value
 Return an empty list value.
 
 ```nim
-proc newEmptyListValue(): Value
+proc newEmptyListValue(mutable = true): Value
 ```
 
 # newEmptyDictValue
@@ -555,7 +602,7 @@ proc newEmptyListValue(): Value
 Create a dictionary value from a VarsDict.
 
 ```nim
-proc newEmptyDictValue(): Value
+proc newEmptyDictValue(mutable = true): Value
 ```
 
 # `==`

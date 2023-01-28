@@ -128,7 +128,7 @@ func getTeaVarIntDefault*(variables: Variables, varName: string): int64 =
   ## Return the int value of one of the tea dictionary integer
   ## items. If the value does not exist, return its default value.
   assert varName in ["row", "repeat", "maxRepeat", "maxLines"]
-  var tea = variables["t"].dictv
+  var tea = variables["t"].dictv.dict
   if varName in tea:
     let value = tea[varName]
     assert value.kind == vkInt
@@ -151,7 +151,7 @@ func getTeaVarStringDefault*(variables: Variables, varName: string): string =
   ## items. If the value does not exist, return its default value.
   assert varName in ["output"]
 
-  var tea = variables["t"].dictv
+  var tea = variables["t"].dictv.dict
   if varName in tea:
     let value = tea[varName]
     assert value.kind == vkString
@@ -170,7 +170,7 @@ proc resetVariables*(variables: var Variables) =
   # Delete some of the tea variables.
   let teaVars = ["content", "maxRepeat", "maxLines", "repeat", "output"]
   if "t" in variables:
-    var tea = variables["t"].dictv
+    var tea = variables["t"].dictv.dict
     for teaVar in teaVars:
       if teaVar in tea:
         tea.del(teaVar)
@@ -190,7 +190,7 @@ proc getParentDictToAddTo(variables: Variables, dotNameList: openArray[string]):
   var dictNames: seq[string]
   var nameSpace = dotNameList[0]
 
-  parentDict = variables[nameSpace].dictv
+  parentDict = variables[nameSpace].dictv.dict
   if dotNameList.len == 2:
     return newVarsDictOr(parentDict)
   dictNames = dotNameList[1 .. ^2]
@@ -203,7 +203,7 @@ proc getParentDictToAddTo(variables: Variables, dotNameList: openArray[string]):
     if parentDict[name].kind != vkDict:
       # Name, $1, is not a dictionary.
       return newVarsDictOr(wNotDict, name)
-    parentDict = parentDict[name].dictv
+    parentDict = parentDict[name].dictv.dict
 
   result = newVarsDictOr(parentDict)
 
@@ -222,7 +222,7 @@ func assignTeaVariable(variables: var Variables, dotNameStr: string,
     return some(newWarningData(wImmutableVars))
 
   let varName = names[1]
-  var tea = variables["t"].dictv
+  var tea = variables["t"].dictv.dict
   if varName in tea:
     if varName in ["row", "version", "args"]:
       # You cannot change the t.$1 tea variable.
@@ -359,7 +359,7 @@ proc assignVariable*(
       return some(newWarningData(wAppendToList, $lastItem.kind))
 
     # Append the value to the list.
-    lastItem.listv.add(value)
+    lastItem.listv.list.add(value)
   of opIgnore, opReturn, opLog:
     assert(false, "You cannot assign using the $1 operator." % $operator)
     discard
@@ -380,7 +380,7 @@ func lookUpVar(variables: Variables, names: seq[string]): ValueOr =
     if value.kind != vkDict:
       # Name, $1, is not a dictionary.
       return newValueOr(wNotDict, name)
-    next = value.dictv
+    next = value.dictv.dict
 
 proc assignVariable*(
   variables: var Variables,

@@ -262,7 +262,7 @@ suite "readjson.nim":
     jsonNode.add(newJNull())
     let valueOr = jsonToValue(jsonNode)
     let value = valueOr.value
-    check value.listv.len == 1
+    check value.listv.list.len == 1
     check $value == "[0]"
 
   test "jsonToValue list items":
@@ -275,7 +275,7 @@ suite "readjson.nim":
     jsonNode.add(newJBool(false))
     let valueOr = jsonToValue(jsonNode)
     let value = valueOr.value
-    check value.listv.len == 6
+    check value.listv.list.len == 6
     # check $value == """[0, 5, "string", 1.5, 1, 0]"""
     # check $value == """[...]"""
 
@@ -289,14 +289,14 @@ suite "readjson.nim":
     jsonNode.add(newJInt(7))
     let valueOr = jsonToValue(jsonNode)
     let value = valueOr.value
-    check value.listv.len == 4
+    check value.listv.list.len == 4
     check $value == "[5,6,[8],7]"
 
   test "empty dict":
     var jsonNode = newJObject()
     let valueOr = jsonToValue(jsonNode)
     let value = valueOr.value
-    check value.dictv.len == 0
+    check value.dictv.dict.len == 0
     check $value == "{}"
 
   test "tea list":

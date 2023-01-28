@@ -111,7 +111,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
   # Read and process template lines.
   var loopControl = lcAdd
-  var tea = variables["t"].dictv
+  var tea = variables["t"].dictv.dict
   while true:
     # Read template lines and write out non-commands lines. When a
     # command that needs processing is found, return its lines.
@@ -179,7 +179,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
 
     # Generate t.repeat number of replacement blocks. Recalculate the
     # variables for each one.
-    var tea = variables["t"].dictv
+    var tea = variables["t"].dictv.dict
     while true:
       # Write out all the stored replacement block lines and make the
       # variable substitutions.

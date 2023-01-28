@@ -102,7 +102,7 @@ proc updateTemplateLines(env: var Env, variables: var Variables,
 
 
   # Read and process template lines.
-  var tea = variables["t"].dictv
+  var tea = variables["t"].dictv.dict
   var maxLines = getTeaVarIntDefault(variables, "maxLines")
   var inOutExtraLine: ExtraLine
   while true:

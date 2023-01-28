@@ -14,7 +14,7 @@ proc testDotNameRep(json: string, eDotNameRep: string, top=false): bool =
   if valueOr.isMessage:
     echo valueOr.message
     return false
-  let dotNameRep = dotNameRep(valueOr.value.dictv, top=top)
+  let dotNameRep = dotNameRep(valueOr.value.dictv.dict, top=top)
   if dotNameRep != eDotNameRep:
     echo "     got:\n$1" % dotNameRep
     echo ""
@@ -108,10 +108,10 @@ suite "vartypes":
 
   test "newEmptyListValue":
     var listValue = newEmptyListValue()
-    check listValue.listv.len == 0
-    listValue.listv.add(newValue("a"))
-    listValue.listv.add(newValue(1))
-    listValue.listv.add(newValue(5.5))
+    check listValue.listv.list.len == 0
+    listValue.listv.list.add(newValue("a"))
+    listValue.listv.list.add(newValue(1))
+    listValue.listv.list.add(newValue(5.5))
     check $listValue == """["a",1,5.5]"""
 
   test "VarsDict ref":
@@ -134,11 +134,11 @@ suite "vartypes":
     ## Create a new value dict.
     var varsDict = newVarsDict()
     let value = newValue(varsDict)
-    check value.dictv.len == 0
-    check varsDict == value.dictv
+    check value.dictv.dict.len == 0
+    check varsDict == value.dictv.dict
     varsDict["a"] = newValue(5)
     check "a" in varsDict
-    check "a" in value.dictv
+    check "a" in value.dictv.dict
 
   test "varsDict to string":
     var varsDict = newVarsDict()
@@ -184,11 +184,11 @@ suite "vartypes":
   test "listToString":
     var listValue = newEmptyListValue()
     check listToString(listValue) == """[]"""
-    listValue.listv.add(newValue("a"))
+    listValue.listv.list.add(newValue("a"))
     check listToString(listValue) == """["a"]"""
-    listValue.listv.add(newValue("b"))
+    listValue.listv.list.add(newValue("b"))
     check listToString(listValue) == """["a","b"]"""
-    listValue.listv.add(newValue(2))
+    listValue.listv.list.add(newValue(2))
     check listToString(listValue) == """["a","b",2]"""
 
   test "valueToString":
@@ -375,7 +375,7 @@ c.d = [7]"""
     let expected = """
 x = 1
 y = 2"""
-    check dotNameRep(d.dictv) == expected
+    check dotNameRep(d.dictv.dict) == expected
 
     check $fn == """"abc""""
     check valueToString(fn) == """"abc""""

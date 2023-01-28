@@ -592,8 +592,8 @@ proc testRunCodeFile(
   if not env.readCloseDeleteCompare(eLogLines, eErrLines, showLog = showLog):
     result = false
 
-  let lRep = dotNameRep(variables["l"].dictv, "l")
-  let oRep = dotNameRep(variables["o"].dictv, "o")
+  let lRep = dotNameRep(variables["l"].dictv.dict, "l")
+  let oRep = dotNameRep(variables["o"].dictv.dict, "o")
   let varRep = $lRep & "\n" & $oRep & "\n"
 
   if varRep != eVarRep:
@@ -879,19 +879,19 @@ $$ : c = len("hello")
 
   test "getNewVariables":
     let variables = startVariables(funcs = funcsVarDict)
-    check variables["f"].dictv.len != 0
-    check variables["g"].dictv.len == 0
-    check variables["l"].dictv.len == 0
-    check variables["s"].dictv.len == 0
-    check variables["o"].dictv.len == 0
-    check variables["t"].dictv.len != 0
-    let tea = variables["t"].dictv
+    check variables["f"].dictv.dict.len != 0
+    check variables["g"].dictv.dict.len == 0
+    check variables["l"].dictv.dict.len == 0
+    check variables["s"].dictv.dict.len == 0
+    check variables["o"].dictv.dict.len == 0
+    check variables["t"].dictv.dict.len != 0
+    let tea = variables["t"].dictv.dict
     check tea["row"] == Value(kind: vkInt, intv: 0)
     check tea["version"] == Value(kind: vkString, stringv: staticteaVersion)
     check tea.contains("content") == false
 
-    let fDict = variables["f"].dictv
-    let existsList = fDict["exists"].listv
+    let fDict = variables["f"].dictv.dict
+    let existsList = fDict["exists"].listv.list
     check existsList.len == 1
     let function = existsList[0]
     check function.funcv.signature.name == "exists"
@@ -1729,7 +1729,7 @@ White$1
     if cmpValueOr.isMessage:
       echo cmpValueOr.message
       fail
-    let eVariableDataOr = newVariableDataOr("a", opEqual, cmpValueOr.value.listv[0])
+    let eVariableDataOr = newVariableDataOr("a", opEqual, cmpValueOr.value.listv.list[0])
     check testRunStatement(statement, eVariableDataOr, variables)
 
   test "a5#":

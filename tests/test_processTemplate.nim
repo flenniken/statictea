@@ -67,7 +67,7 @@ iterator yieldContentLine*(content: string): string =
 
 proc testGetTeaArgs(args: Args, eVarRep: string): bool =
   let value = getTeaArgs(args)
-  let varRep = dotNameRep(value.dictv)
+  let varRep = dotNameRep(value.dictv.dict)
   result = true
   if varRep != eVarRep:
     echo linesSideBySide(varRep, eVarRep)
@@ -945,7 +945,7 @@ prepostList = []"""
     args.templateFilename = "template.html"
     args.resultFilename = "result.html"
     let value = getTeaArgs(args)
-    let targs = value.dictv
+    let targs = value.dictv.dict
     let serverList = targs["serverList"]
     let templateFilename = targs["templateFilename"]
     let resultFilename = targs["resultFilename"]

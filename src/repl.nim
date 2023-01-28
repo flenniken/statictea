@@ -24,10 +24,10 @@ func showVariables(variables: Variables): string =
     if not first:
       result.add(" ")
     first = false
-    if d.dictv.len == 0:
+    if d.dictv.dict.len == 0:
       result.add("$1={}" % key)
     else:
-      result.add("$1={$2}" % [key, $d.dictv.len])
+      result.add("$1={$2}" % [key, $d.dictv.dict.len])
 
 proc replHelp(): string =
   result = """
@@ -129,7 +129,7 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
   case replCmd:
   of "p": # string dn
     if value.kind == vkDict:
-      env.writeOut(dotNameRep(value.dictv))
+      env.writeOut(dotNameRep(value.dictv.dict))
     else:
       env.writeOut(valueToString(value))
   of "pj": # string json

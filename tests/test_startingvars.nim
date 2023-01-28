@@ -37,10 +37,10 @@ suite "startingvars.nim":
 
   test "check the initial t.args":
     var args: Args
-    var argsVarDict = getTeaArgs(args).dictv
+    var argsVarDict = getTeaArgs(args).dictv.dict
     var variables = startVariables(args = argsVarDict)
-    let targs = variables["t"].dictv["args"]
-    let varRep = dotNameRep(targs.dictv)
+    let targs = variables["t"].dictv.dict["args"]
+    let varRep = dotNameRep(targs.dictv.dict)
     let eVarRep = """
 help = false
 version = false
@@ -79,7 +79,7 @@ prepostList = []"""
 """
     var valueOr = readJsonString(variablesJson)
     check valueOr.isValue
-    var variables = valueOr.value.dictv
+    var variables = valueOr.value.dictv.dict
     let beforeJson = valueToString(valueOr.value)
 
     resetVariables(variables)

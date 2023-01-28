@@ -245,17 +245,17 @@ suite "functions.nim":
     check testGetBestFunctionExists("float", arguments, "saa")
 
   test "concat hello world":
-    var arguments = newValue(["Hello", " World"]).listv
+    var arguments = newValue(["Hello", " World"]).listv.list
     let eFunResult = newFunResult(newValue("Hello World"))
     check testFunction("concat", arguments, eFunResult)
 
   test "concat empty string":
-    var arguments = newValue(["abc", ""]).listv
+    var arguments = newValue(["abc", ""]).listv.list
     let eFunResult = newFunResult(newValue("abc"))
     check testFunction("concat", arguments, eFunResult)
 
   test "len string":
-    var arguments = newValue(["abc"]).listv
+    var arguments = newValue(["abc"]).listv.list
     let eFunResult = newFunResult(newValue(3))
     check testFunction("len", arguments, eFunResult)
 
@@ -263,18 +263,18 @@ suite "functions.nim":
     # The byte length is different than the number of unicode characters.
     let str = "añyóng"
     check str.len == 8
-    var arguments = newValue([str]).listv
+    var arguments = newValue([str]).listv.list
     let eFunResult = newFunResult(newValue(6))
     check testFunction("len", arguments, eFunResult)
 
   test "len list":
-    var list = newValue([5, 3]).listv
+    var list = newValue([5, 3]).listv.list
     var arguments = @[newValue(list)]
     let eFunResult = newFunResult(newValue(2))
     check testFunction("len", arguments, eFunResult)
 
   test "len dict":
-    var dict = newValue([("a", 5), ("b", 5)]).dictv
+    var dict = newValue([("a", 5), ("b", 5)]).dictv.dict
     var arguments = @[newValue(dict)]
     let eFunResult = newFunResult(newValue(2))
     check testFunction("len", arguments, eFunResult)
@@ -776,12 +776,12 @@ suite "functions.nim":
     check testFunction("find", arguments, eFunResult)
 
   test "find missing":
-    var arguments = newValue(["Tea time at 4:00.", "party", "3:00"]).listv
+    var arguments = newValue(["Tea time at 4:00.", "party", "3:00"]).listv.list
     let eFunResult = newFunResult(newValue("3:00"))
     check testFunction("find", arguments, eFunResult)
 
   test "find bigger":
-    var arguments = newValue(["big", "bigger", "smaller"]).listv
+    var arguments = newValue(["big", "bigger", "smaller"]).listv.list
     let eFunResult = newFunResult(newValue("smaller"))
     check testFunction("find", arguments, eFunResult)
 
@@ -1777,7 +1777,7 @@ d.sub.y = 4"""
 
   test "format one":
     var variables = startVariables(funcs = funcsVarDict)
-    variables["l"].dictv["name"] = newValue("world")
+    variables["l"].dictv.dict["name"] = newValue("world")
     let str = newValue("hello {name}")
     check testFunction("format", @[str],
       newFunResult(newValue("hello world")), variables)
@@ -1954,8 +1954,8 @@ d.sub.y = 4"""
     var count = 0
     for key, value in funcsVarDict:
       check value.kind == vkList
-      count += value.listv.len
-      for val in value.listv:
+      count += value.listv.list.len
+      for val in value.listv.list:
         check val.kind == vkFunc
 
     check functionsList.len == count
@@ -1978,9 +1978,9 @@ d.sub.y = 4"""
     check testFormatString("}", "}")
 
     var variables = startVariables()
-    variables["l"].dictv["v"] = newValue("a")
-    variables["l"].dictv["v2"] = newValue("ab")
-    variables["l"].dictv["v3"] = newValue("xyz")
+    variables["l"].dictv.dict["v"] = newValue("a")
+    variables["l"].dictv.dict["v2"] = newValue("ab")
+    variables["l"].dictv.dict["v3"] = newValue("xyz")
 
     check testFormatString("{v}", "a", variables)
     check testFormatString("{v2}", "ab", variables)
@@ -2035,7 +2035,7 @@ d.sub.y = 4"""
   test "signatureDetails":
     var signatureO = newSignatureO("thename", "isp")
     let details = signatureDetails(signatureO.get())
-    let got = dotNameRep(details.dictv, "signature")
+    let got = dotNameRep(details.dictv.dict, "signature")
     let expected = """
 signature.optional = false
 signature.name = "thename"
@@ -2047,7 +2047,7 @@ signature.returnType = "func""""
   test "signatureDetails2":
     var signatureO = newSignatureO("n", "d")
     let details = signatureDetails(signatureO.get())
-    let got = dotNameRep(details.dictv, "signature")
+    let got = dotNameRep(details.dictv.dict, "signature")
     let expected = """
 signature.optional = false
 signature.name = "n"
@@ -2059,7 +2059,7 @@ signature.returnType = "dict""""
   test "signatureDetails3":
     var signatureO = newSignatureO("thename", "islosf")
     let details = signatureDetails(signatureO.get())
-    let got = dotNameRep(details.dictv, "signature")
+    let got = dotNameRep(details.dictv.dict, "signature")
     let expected = """
 signature.optional = true
 signature.name = "thename"
@@ -2071,7 +2071,7 @@ signature.returnType = "float""""
   test "functionDetails":
     let functionSpec = newDummyFunctionSpec()
     let details = functionDetails(functionSpec)
-    let got = dotNameRep(details.dictv, "spec")
+    let got = dotNameRep(details.dictv.dict, "spec")
     let expected = """
 spec.builtIn = false
 spec.signature.optional = false

@@ -26,7 +26,7 @@ proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
       env.warn(filename, 0, valueOr.message)
     else:
       # Merge in the variables.
-      for k, v in valueOr.value.dictv.pairs:
+      for k, v in valueOr.value.dictv.dict.pairs:
         if k in varsDict:
           # Duplicate json variable '$1' skipped.
           env.warn(filename, 0, wDuplicateVar, k)
@@ -60,6 +60,6 @@ proc getStartVariables*(env: var Env, args: Args): Variables =
   ## the code files and setup the initial tea variables.
 
   let serverVarDict = readJsonFiles(env, args.serverList)
-  let argsVarDict = getTeaArgs(args).dictv
+  let argsVarDict = getTeaArgs(args).dictv.dict
   result = startVariables(serverVarDict, argsVarDict, funcsVarDict)
   runCodeFiles(env, result, args.codeList)

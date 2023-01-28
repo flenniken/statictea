@@ -21,8 +21,24 @@ const
 
 type
   VarsDict* = OrderedTableRef[string, Value]
-    ## The statictea dictionary type. This is a ref type. Create a new
-    ## @:VarsDict with newVarsDict procedure.
+    ## This is a ref type. Create a new VarsDict with newVarsDict
+    ## procedure.
+
+  DictType* = object
+    ## The statictea dictionary type.
+    ## @:
+    ## @:* dict -- an ordered dictionary.
+    ## @:* mutable -- whether you can append to the dictionary or not.
+    dict*: VarsDict
+    mutable*: bool
+
+  ListType* = object
+    ## The statictea list type.
+    ## @:
+    ## @:* list -- a list of values.
+    ## @:* mutable -- whether you can append to the dictionary or not.
+    list*: seq[Value]
+    mutable*: bool
 
   Variables* = VarsDict
     ## Dictionary holding all statictea variables in multiple distinct
@@ -64,9 +80,9 @@ type
     of vkFloat:
       floatv*: float64
     of vkDict:
-      dictv*: VarsDict
+      dictv*: DictType
     of vkList:
-      listv*: seq[Value]
+      listv*: ListType
     of vkBool:
       boolv*: bool
     of vkFunc:
@@ -246,6 +262,12 @@ func newVarsDictOr*(varsDict: VarsDict): VarsDictOr =
   ## Return a new VarsDict object containing a dictionary.
   result = opValueW[VarsDict](varsDict)
 
+func newDictType*(varsDict: VarsDict, mutable = false): DictType =
+  result = DictType(dict: varsDict, mutable: mutable)
+
+func newListType*(valueList: seq[Value], mutable = false): ListType =
+  result = ListType(list: valueList, mutable: mutable)
+
 proc newValue*(str: string): Value =
   ## Create a string value.
   result = Value(kind: vkString, stringv: str)
@@ -262,20 +284,22 @@ proc newValue*(num: float): Value =
   ## Create a float value.
   result = Value(kind: vkFloat, floatv: num)
 
-proc newValue*(valueList: seq[Value]): Value =
+proc newValue*(valueList: seq[Value], mutable = false): Value =
   ## Create a list value.
-  result = Value(kind: vkList, listv: valueList)
+  let listv = newListType(valueList, mutable)
+  result = Value(kind: vkList, listv: listv)
 
-proc newValue*(varsDict: VarsDict): Value =
+proc newValue*(varsDict: VarsDict, mutable = false): Value =
   ## Create a dictionary value from a VarsDict.
-  result = Value(kind: vkDict, dictv: varsDict)
+  let dictv = newDictType(varsDict, mutable)
+  result = Value(kind: vkDict, dictv: dictv)
 
 proc newValue*(value: Value): Value =
   ## New value from an existing value. Since values are ref types, the
   ## @:new value is an alias to the same value.
   result = value
 
-proc newValue*[T](list: openArray[T]): Value =
+proc newValue*[T](list: openArray[T], mutable = false): Value =
   ## New list value from an array of items of the same kind.
   ## @:
   ## @:~~~
@@ -286,9 +310,10 @@ proc newValue*[T](list: openArray[T]): Value =
   var valueList: seq[Value]
   for num in list:
     valueList.add(newValue(num))
-  result = Value(kind: vkList, listv: valueList)
+  let listv = newListType(valueList, mutable)
+  result = Value(kind: vkList, listv: listv)
 
-proc newValue*[T](dictPairs: openArray[(string, T)]): Value =
+proc newValue*[T](dictPairs: openArray[(string, T)], mutable = false): Value =
   ## New dict value from an array of pairs where the pairs are the
   ## @:same type which may be Value type.
   ## @:
@@ -297,12 +322,13 @@ proc newValue*[T](dictPairs: openArray[(string, T)]): Value =
   ## @: let dictValue = newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)])
   ## @: let dictValue = newValue([("a", newValue(1.1)), ("b", newValue("a"))])
   ## @:~~~~
-  var varsTable = newVarsDict()
+  var varsDict = newVarsDict()
   for tup in dictPairs:
     let (a, b) = tup
     let value = newValue(b)
-    varsTable[a] = value
-  result = Value(kind: vkDict, dictv: varsTable)
+    varsDict[a] = value
+  let dictv = newDictType(varsDict, mutable)
+  result = Value(kind: vkDict, dictv: dictv)
 
 func newFunc*(builtIn: bool, signature: Signature, docComment: string,
     filename: string, lineNum: Natural, numLines: Natural,
@@ -325,14 +351,14 @@ func newValue*(function: FunctionSpec): Value =
   ## Create a new func value.
   result = Value(kind: vkFunc, funcv: function)
 
-proc newEmptyListValue*(): Value =
+proc newEmptyListValue*(mutable = true): Value =
   ## Return an empty list value.
   var valueList: seq[Value]
-  result = newValue(valueList)
+  result = newValue(valueList, mutable)
 
-proc newEmptyDictValue*(): Value =
+proc newEmptyDictValue*(mutable = true): Value =
   ## Create a dictionary value from a VarsDict.
-  result = newValue(newVarsDict())
+  result = newValue(newVarsDict(), mutable)
 
 proc `==`*(a: Value, b: Value): bool =
   ## Return true when two variables are equal.
@@ -434,7 +460,7 @@ func dictToString*(value: Value): string =
   ## Return a string representation of a dict Value in JSON format.
   result.add("{")
   var ix = 0
-  for k, v in value.dictv.pairs:
+  for k, v in value.dictv.dict.pairs:
     if ix > 0:
       result.add(",")
     result.add(jsonStringRepr(k))
@@ -446,7 +472,7 @@ func dictToString*(value: Value): string =
 func listToString*(value: Value): string =
   ## Return a string representation of a list variable in JSON format.
   result.add("[")
-  for ix, item in value.listv:
+  for ix, item in value.listv.list:
     if ix > 0:
       result.add(",")
     result.add(valueToString(item))
@@ -520,7 +546,7 @@ func dotNameRep*(dict: VarsDict, leftSide: string = "", top = false): string =
     ## except when it is empty.
     var left: string
     if leftSide == "":
-      if top and k == "l" and v.dictv.len != 0:
+      if top and k == "l" and v.dictv.dict.len != 0:
         left = ""
       else:
         left = k
@@ -529,7 +555,7 @@ func dotNameRep*(dict: VarsDict, leftSide: string = "", top = false): string =
 
     if v.kind == vkDict:
       # Recursively call dotNameRep.
-      result.add(dotNameRep(v.dictv, left))
+      result.add(dotNameRep(v.dictv.dict, left))
     else:
       result.add("$1 = $2" % [left, $v])
 

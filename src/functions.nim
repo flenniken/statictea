@@ -57,37 +57,37 @@ template tMapParameters(functionName: string, signatureCode: string) =
   let funResult = mapParameters(signatureO.get(), arguments)
   if funResult.kind == frWarning:
     return funResult
-  let map {.inject.} = funResult.value.dictv
+  let map {.inject.} = funResult.value.dictv.dict
 
 func signatureDetails*(signature: Signature): Value =
   ## Convert the signature object to a dictionary value.
-  var dictv = newVarsDict()
-  dictv["optional"] = newValue(signature.optional)
-  dictv["name"] = newValue(signature.name)
+  var dict = newVarsDict()
+  dict["optional"] = newValue(signature.optional)
+  dict["name"] = newValue(signature.name)
   var paramNames = newSeq[string]()
   var paramTypes = newSeq[string]()
   for param in signature.params:
     paramNames.add($param.name)
     paramTypes.add($param.paramType)
-  dictv["paramNames"] = newValue(paramNames)
-  dictv["paramTypes"] = newValue(paramTypes)
-  dictv["returnType"] = newValue($signature.returnType)
-  result = newValue(dictv)
+  dict["paramNames"] = newValue(paramNames)
+  dict["paramTypes"] = newValue(paramTypes)
+  dict["returnType"] = newValue($signature.returnType)
+  result = newValue(dict)
 
 func functionDetails*(fs: FunctionSpec): Value =
   ## Convert the function spec to a dictionary value.
-  var dictv = newVarsDict()
-  dictv["builtIn"] = newValue(fs.builtIn)
-  dictv["signature"] = signatureDetails(fs.signature)
-  dictv["docComment"] = newValue(fs.docComment)
-  dictv["filename"] = newValue(fs.filename)
-  dictv["lineNum"] = newValue(fs.lineNum)
-  dictv["numLines"] = newValue(fs.numLines)
+  var dict = newVarsDict()
+  dict["builtIn"] = newValue(fs.builtIn)
+  dict["signature"] = signatureDetails(fs.signature)
+  dict["docComment"] = newValue(fs.docComment)
+  dict["filename"] = newValue(fs.filename)
+  dict["lineNum"] = newValue(fs.lineNum)
+  dict["numLines"] = newValue(fs.numLines)
   var statementStrings = newSeq[string]()
   for statement in fs.statements:
     statementStrings.add(statement.text)
-  dictv["statements"] = newValue(statementStrings)
-  result = newValue(dictv)
+  dict["statements"] = newValue(statementStrings)
+  result = newValue(dict)
 
 func cmpBaseValues*(a, b: Value, insensitive: bool = false): int =
   ## Compares two values a and b.  When a equals b return 0, when a is
@@ -362,7 +362,7 @@ func fun_len_li*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:~~~~
 
   tMapParameters("len", "li")
-  let list = map["a"].listv
+  let list = map["a"].listv.list
   result = newFunResult(newValue(list.len))
 
 func fun_len_di*(variables: Variables, arguments: seq[Value]): FunResult =
@@ -381,7 +381,7 @@ func fun_len_di*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:~~~~
 
   tMapParameters("len", "di")
-  let dict = map["a"].dictv
+  let dict = map["a"].dictv.dict
   result = newFunResult(newValue(dict.len))
 
 func fun_get_lioaa*(variables: Variables, arguments: seq[Value]): FunResult =
@@ -410,7 +410,7 @@ func fun_get_lioaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:~~~~
 
   tMapParameters("get", "lioaa")
-  let list = map["a"].listv
+  let list = map["a"].listv.list
   let index = map["b"].intv
 
   var ix: int64
@@ -453,7 +453,7 @@ func fun_get_dsoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:~~~~
 
   tMapParameters("get", "dsoaa")
-  let dict = map["a"].dictv
+  let dict = map["a"].dictv.dict
   let key = map["b"].stringv
 
   if key in dict:
@@ -687,7 +687,7 @@ func fun_exists_dsb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:~~~~
 
   tMapParameters("exists", "dsb")
-  let dictionary = map["a"].dictv
+  let dictionary = map["a"].dictv.dict
   let key = map["b"].stringv
 
   var ret: bool
@@ -703,7 +703,7 @@ func getCase(map: VarsDict): FunResult =
   let mainCondition = map["a"]
   let cases = map["b"]
 
-  let caseList = cases.listv
+  let caseList = cases.listv.list
   if caseList.len mod 2 != 0:
     # Expected an even number of cases, got $1.
     return newFunResultWarn(wNotEvenCases, 1, $caseList.len)
@@ -1070,10 +1070,10 @@ func if0Condition*(cond: Value): bool =
      if cond.stringv.len == 0:
        result = false
    of vkList:
-     if cond.listv.len == 0:
+     if cond.listv.list.len == 0:
        result = false
    of vkDict:
-     if cond.dictv.len == 0:
+     if cond.dictv.dict.len == 0:
        result = false
    of vkBool:
      result = cond.boolv
@@ -1251,7 +1251,7 @@ func fun_dict_old*(variables: Variables, arguments: seq[Value]): FunResult =
   var dict = newVarsDict()
 
   if "a" in map:
-    let pairs = map["a"].listv
+    let pairs = map["a"].listv.list
     if pairs.len mod 2 != 0:
       # Dictionaries require an even number of list items.
       return newFunResultWarn(wDictRequiresEven, 0)
@@ -1424,7 +1424,7 @@ func replaceReMap(map: VarsDict): FunResult =
   ## b.
 
   let str = map["a"].stringv
-  let list = map["b"].listv
+  let list = map["b"].listv.list
 
   var replacements: seq[Replacement]
   for ix in countUp(0, list.len-1, 2):
@@ -1465,7 +1465,7 @@ func fun_replaceRe_sls*(variables: Variables, arguments: seq[Value]): FunResult 
   ## @:website: https@@://regex101.com/
 
   tMapParameters("replaceRe", "sls")
-  let list = map["b"].listv
+  let list = map["b"].listv.list
   if list.len mod 2 != 0:
     # Specify arguments in pairs.
     return newFunResultWarn(wPairParameters, 1)
@@ -1592,7 +1592,7 @@ func fun_keys_dl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:~~~~
 
   tMapParameters("keys", "dl")
-  let dict = map["a"].dictv
+  let dict = map["a"].dictv.dict
 
   var list: seq[string]
   for key, value in dict.pairs():
@@ -1616,7 +1616,7 @@ func fun_values_dl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:~~~~
 
   tMapParameters("values", "dl")
-  let dict = map["a"].dictv
+  let dict = map["a"].dictv.dict
 
   var list: seq[Value]
   for key, value in dict.pairs():
@@ -1627,10 +1627,10 @@ func fun_values_dl*(variables: Variables, arguments: seq[Value]): FunResult =
 func generalSort(map: VarsDict): FunResult =
   ## Sort a list of values of the same type.
 
-  let list = map["a"].listv
+  let list = map["a"].listv.list
 
   if list.len == 0:
-    return newFunResult(newEmptyListValue())
+    return newFunResult(newEmptyListValue(mutable = false))
 
   let listKind = list[0].kind
 
@@ -1675,15 +1675,15 @@ func generalSort(map: VarsDict): FunResult =
   var firstListValueKind = vkString
   var firstKeyValueKind = vkString
   if listKind == vkDict:
-    if not (key in firstItem.dictv):
+    if not (key in firstItem.dictv.dict):
       # A dictionary is missing the sort key.
       return newFunResultWarn(wDictKeyMissing, 0)
-    firstKeyValueKind = firstItem.dictv[key].kind
+    firstKeyValueKind = firstItem.dictv.dict[key].kind
   elif listKind == vkList:
-    if firstItem.listv.len == 0:
+    if firstItem.listv.list.len == 0:
       # A sublist is empty.
       return newFunResultWarn(wSubListsEmpty, 0)
-    firstListValueKind = firstItem.listv[0].kind
+    firstListValueKind = firstItem.listv.list[0].kind
 
   # Verify the all the values are the same type.
   for value in list:
@@ -1692,17 +1692,17 @@ func generalSort(map: VarsDict): FunResult =
       return newFunResultWarn(wNotSameKind, 0)
     case listKind:
       of vkList:
-        if value.listv.len == 0:
+        if value.listv.list.len == 0:
           # A sublist is empty.
           return newFunResultWarn(wSubListsEmpty, 0)
-        if value.listv[0].kind != firstListValueKind:
+        if value.listv.list[0].kind != firstListValueKind:
           # The first item in the sublists are different types.
           return newFunResultWarn(wSubListsDiffTypes, 0)
       of vkDict:
-        if not (key in value.dictv):
+        if not (key in value.dictv.dict):
           # A dictionary is missing the sort key.
           return newFunResultWarn(wDictKeyMissing, 0)
-        var keyValue = value.dictv[key]
+        var keyValue = value.dictv.dict[key]
         if keyValue.kind != firstKeyValueKind:
           # The sort key values are different types.
           return newFunResultWarn(wKeyValueKindDiff, 0)
@@ -1714,9 +1714,9 @@ func generalSort(map: VarsDict): FunResult =
     of vkString, vkInt, vkFloat:
       result = cmpBaseValues(a, b, insensitive)
     of vkList:
-      result = cmpBaseValues(a.listv[0], b.listv[0], insensitive)
+      result = cmpBaseValues(a.listv.list[0], b.listv.list[0], insensitive)
     of vkDict:
-      result = cmpBaseValues(a.dictv[key], b.dictv[key], insensitive)
+      result = cmpBaseValues(a.dictv.dict[key], b.dictv.dict[key], insensitive)
     of vkBool, vkFunc:
       result = 0
 
@@ -1866,7 +1866,7 @@ func fun_githubAnchor_ll*(variables: Variables, arguments: seq[Value]): FunResul
 
   tMapParameters("githubAnchor", "ll")
 
-  let list = map["a"].listv
+  let list = map["a"].listv.list
 
   # Add dash num postfix to the anchor name for dups.  Names is a
   # mapping from the anchor name to the number of times it is used.
@@ -1930,7 +1930,7 @@ func joinPathList(map: VarsDict): FunResult =
         return newFunResultWarn(wExpectedSeparator, 0)
 
   var ret: string
-  for value in map["a"].listv:
+  for value in map["a"].listv.list:
     var component = value.stringv
     if component == "":
       component.add(separator)
@@ -2007,17 +2007,17 @@ func fun_join_lsois*(variables: Variables, arguments: seq[Value]): FunResult =
 
   tMapParameters("join", "lsois")
 
-  let listv = map["a"].listv
+  let list = map["a"].listv.list
   let sep = map["b"].stringv
   var skipEmpty = false
   if "c" in map and map["c"].intv == 1:
     skipEmpty = true
   var ret: string
-  if listv.len == 0:
+  if list.len == 0:
     return newFunResult(newValue(""))
-  if listv.len > 0:
-    ret.add(listv[0].stringv)
-  for value in listv[1 .. listv.len - 1]:
+  if list.len > 0:
+    ret.add(list[0].stringv)
+  for value in list[1 .. list.len - 1]:
     if value.kind != vkString:
       # The join list items must be strings.
       return newFunResultWarn(wJoinListString, 0)
@@ -2205,7 +2205,7 @@ func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
     str = valueToStringRB(value)
   of "dn":
     if value.kind == vkDict:
-      str = dotNameRep(value.dictv)
+      str = dotNameRep(value.dictv.dict)
     else:
       str = valueToString(value)
   else:
@@ -2234,7 +2234,7 @@ func fun_string_sds*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:~~~~
   tMapParameters("string", "sds")
   let name = map["a"].stringv
-  let dict = map["b"].dictv
+  let dict = map["b"].dictv.dict
   let str = dotNameRep(dict, name)
   result = newFunResult(newValue(str))
 
@@ -2825,7 +2825,7 @@ proc getBestFunction*(funcValue: Value, arguments: seq[Value]): ValueOr =
     # You cannot call the variable because it's not a function or a list of functions.
     let warningData = newWarningData(wNotFunction)
     return newValueOr(warningData)
-  let funcList = funcValue.listv
+  let funcList = funcValue.listv.list
 
   if funcList.len == 1:
     # There is only one function, return it.
@@ -2885,7 +2885,7 @@ proc makeFuncDictionary*(): VarsDict =
 
   # The functionsList is sorted by name then signature code.
 
-  var funcList = newEmptyListValue()
+  var funcList = newEmptyListValue(mutable = false)
   var lastName = ""
   assert functionsDict.len == functionsList.len
   assert functionsDict.len == functionStarts.len
@@ -2905,15 +2905,15 @@ proc makeFuncDictionary*(): VarsDict =
 
     let funcValue = newValue(function)
     if name == lastName:
-      funcList.listv.add(funcValue)
+      funcList.listv.list.add(funcValue)
     else:
       if lastName != "":
         result[lastName] = funcList
-      funcList = newEmptyListValue()
-      funcList.listv.add(funcValue)
+      funcList = newEmptyListValue(mutable = false)
+      funcList.listv.list.add(funcValue)
       lastName = name
 
-  if funcList.listv.len > 0:
+  if funcList.listv.list.len > 0:
     result[lastName] = funcList
 
 # todo: how to you make the dictionary at compile time?

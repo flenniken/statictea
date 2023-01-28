@@ -903,7 +903,7 @@ func getSpecialFunction(funcVar: Value): SpecialFunction =
 
   var value: Value
   if funcVar.kind == vkList:
-    let list = funcVar.listv
+    let list = funcVar.listv.list
     if list.len < 1:
       return spNotSpecial
     value = list[0]
@@ -1591,18 +1591,18 @@ proc getBracketedVarValue*(env: var Env, statement: Statement, start: Natural,
       # The index variable must be an integer.
       return newValuePosSiOr(wIndexNotInt, "", runningPos)
     let index = indexValue.intv
-    let list = container.listv
+    let list = container.listv.list
     if index < 0 or index >= list.len:
       # The index value $1 is out of range.
       return newValuePosSiOr(wInvalidIndexRange, $index, runningPos)
-    value = container.listv[index]
+    value = container.listv.list[index]
   else:
     # dictionary container
     if indexValue.kind != vkString:
       # The key variable must be an string.
       return newValuePosSiOr(wKeyNotString, "", runningPos)
     let key = indexValue.stringv
-    let dict = container.dictv
+    let dict = container.dictv.dict
     if not (key in dict):
       # The key doesn't exist in the dictionary.
       return newValuePosSiOr(wMissingKey, "", runningPos)
@@ -1632,7 +1632,7 @@ proc funListLoop(env: var Env, variables: Variables,
   let funResult = mapParameters(signatureO.get(), arguments)
   if funResult.kind == frWarning:
     return funResult
-  let map = funResult.value.dictv
+  let map = funResult.value.dictv.dict
 
   let list = map["a"]
   let new = map["b"]
@@ -1663,7 +1663,7 @@ proc funListLoop(env: var Env, variables: Variables,
 
   # Call the callback for each item in the list.
   var stopped = false
-  for ix, value in list.listv:
+  for ix, value in list.listv.list:
 
     # Call the callback.
     # callback(ix: int, item: any, new: any, state: optional any) bool
@@ -2428,7 +2428,7 @@ proc runCommand*(env: var Env, cmdLines: CmdLines,
       return loopControl
 
     # If t.repeat was set to 0, we're done.
-    let tea = variables["t"].dictv
+    let tea = variables["t"].dictv.dict
     if "repeat" in tea and tea["repeat"].intv == 0:
       break
 

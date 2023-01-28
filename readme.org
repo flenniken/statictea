@@ -1,6 +1,7 @@
+#+TITLE: StaticTea
+
 [[docs/teapotlogo.png]]
 
-#+TITLE: StaticTea
 A template processor and language.
 
 StaticTea produces a file from a template and optional json and
