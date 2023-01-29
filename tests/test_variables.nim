@@ -78,7 +78,7 @@ proc testAssignVarFlex(
   # Populate the variables dictionary when there are inVars.
   var variables = startVariables()
   if inVars != "":
-    var valueOr = readJsonString(inVars)
+    var valueOr = readJsonString(inVars, mutable = true)
     if valueOr.isMessage:
       echo $valueOr
       return false
@@ -442,7 +442,7 @@ t.version = "$1"""" % staticteaVersion
     let json1 = """{"a":{"b2":"tea","b":{"c2":[],"c":{"d":"hello"}}}}"""
     let json2 = """{"a":{"b2":"tea","b":{"c2":[],"c":{"d":"hello","tea":1}}}}"""
     check testAssignVarFlex("l.a.b.c.tea", opEqual, newValue(1), inOther,
-      json2, json1)
+      eVars=json2, inVars=json1)
 
     check testAssignVarWarn("l.a.b", opAppendList, newValue(1), inOther,
       wAppendToList, "dict", inVars=json2)

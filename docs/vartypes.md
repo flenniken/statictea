@@ -80,7 +80,9 @@ same type which may be Value type.
 * [newValuePosSiOr](#newvaluepossior) &mdash; Create a ValuePosSiOr warning.
 * [newValuePosSiOr](#newvaluepossior-1) &mdash; Create a ValuePosSiOr warning.
 * [`==`](#-8) &mdash; Return true when a equals b.
-* [`!=`](#-9) &mdash; Compare two ValuePosSiOr objects and return false when equal.
+* [`==`](#-9) &mdash; Return true when a equals b.
+* [`!=`](#-10) &mdash; Compare two ValuePosSi objects and return false when equal.
+* [`!=`](#-11) &mdash; Compare two ValuePosSiOr objects and return false when equal.
 * [newValuePosSiOr](#newvaluepossior-2) &mdash; Create a ValuePosSiOr from a value, pos and exit.
 * [newValuePosSiOr](#newvaluepossior-3) &mdash; Create a ValuePosSiOr value from a number or string.
 * [newValuePosSiOr](#newvaluepossior-4) &mdash; Create a ValuePosSiOr from a ValuePosSi.
@@ -594,7 +596,7 @@ func newValue(function: FunctionSpec): Value
 Return an empty list value.
 
 ```nim
-proc newEmptyListValue(mutable = true): Value
+proc newEmptyListValue(mutable = false): Value
 ```
 
 # newEmptyDictValue
@@ -602,7 +604,7 @@ proc newEmptyListValue(mutable = true): Value
 Create a dictionary value from a VarsDict.
 
 ```nim
-proc newEmptyDictValue(mutable = true): Value
+proc newEmptyDictValue(mutable = false): Value
 ```
 
 # `==`
@@ -803,7 +805,23 @@ func newValuePosSiOr(warningData: WarningData): ValuePosSiOr
 Return true when a equals b.
 
 ```nim
+proc `==`(a: ValuePosSi; b: ValuePosSi): bool
+```
+
+# `==`
+
+Return true when a equals b.
+
+```nim
 proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool
+```
+
+# `!=`
+
+Compare two ValuePosSi objects and return false when equal.
+
+```nim
+proc `!=`(a: ValuePosSi; b: ValuePosSi): bool
 ```
 
 # `!=`

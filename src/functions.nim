@@ -1263,7 +1263,8 @@ func fun_dict_old*(variables: Variables, arguments: seq[Value]): FunResult =
       var value = pairs[ix+1]
       dict[key.stringv] = value
 
-  result = newFunResult(newValue(dict))
+  # todo: should be restrict mutable to empty dicts?
+  result = newFunResult(newValue(dict, mutable = true))
 
 func fun_list_al*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a list of variables. You can also create a list with brackets.
@@ -1284,8 +1285,12 @@ func fun_list_al*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:a = [1, 2, 3]
   ## @:a = ["a", 5, "b"]
   ## @:~~~~
-
-  result = newFunResult(newValue(arguments))
+  # todo: should be restrict mutable to empty lists?
+  # if arguments.len == 0:
+  #   result = newFunResult(newValue(arguments, mutable = true))
+  # else:
+  #   result = newFunResult(newValue(arguments))
+  result = newFunResult(newValue(arguments, mutable = true))
 
 func fun_listLoop_llpoab*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a new list from a list and a callback function. The callback
@@ -1630,7 +1635,7 @@ func generalSort(map: VarsDict): FunResult =
   let list = map["a"].listv.list
 
   if list.len == 0:
-    return newFunResult(newEmptyListValue(mutable = false))
+    return newFunResult(newEmptyListValue())
 
   let listKind = list[0].kind
 
@@ -2885,7 +2890,7 @@ proc makeFuncDictionary*(): VarsDict =
 
   # The functionsList is sorted by name then signature code.
 
-  var funcList = newEmptyListValue(mutable = false)
+  var funcList = newEmptyListValue()
   var lastName = ""
   assert functionsDict.len == functionsList.len
   assert functionsDict.len == functionStarts.len
@@ -2909,7 +2914,7 @@ proc makeFuncDictionary*(): VarsDict =
     else:
       if lastName != "":
         result[lastName] = funcList
-      funcList = newEmptyListValue(mutable = false)
+      funcList = newEmptyListValue()
       funcList.listv.list.add(funcValue)
       lastName = name
 

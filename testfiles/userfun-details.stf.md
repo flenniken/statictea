@@ -19,7 +19,9 @@ $statictea \
 
 ~~~
 $$ block
-$$ : d1 = string(functionDetails(o.fn1), "dn")
+$$ : fd = functionDetails(o.fn1)
+$$ : # fd.mutate = 5
+$$ : d1 = string(fd, "dn")
 $$ : d2 = functionDetails(o.fn1)
 $$ : p1n = d2.signature.paramNames[0]
 $$ : p1t = d2.signature.paramTypes[0]

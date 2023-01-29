@@ -273,6 +273,8 @@ type
     wVarEndsWith,          ## w258
     wVarMaximumLength,     ## w259
     wNotFuncVariable,      ## w260
+    wImmutableDict,        ## w261
+    wImmutableList,        ## w262
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -537,6 +539,8 @@ const
     "A variable name ends with an ascii letter or digit.", ## wVarEndsWith
     "A variable and dot name are limited to 64 characters.", ## wVarMaximumLength
     "The variable is not a function variable.", ## wNotFuncVariable
+    "You cannot assign to an immutable dictionary.", ## wImmutableDict
+    "You cannot append to an immutable list.", ## wImmutableList
     ]
 
     ## The message text.

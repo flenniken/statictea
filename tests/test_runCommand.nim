@@ -50,6 +50,10 @@ proc echoValuePosSiOr(statement: Statement, start: Natural,
   echo ""
   echo "got:"
   if valueAndPosOr.isValue:
+    if valueAndPosOr.value.value.kind == vkDict:
+      echo "mutable: $1" % $valueAndPosOr.value.value.dictv.mutable
+    elif valueAndPosOr.value.value.kind == vkList:
+      echo "mutable: $1" % $valueAndPosOr.value.value.listv.mutable
     echo "value: $1" % $valueAndPosOr.value
     echo "0123456789 123456789 123456789"
     echo statement.text
@@ -59,6 +63,10 @@ proc echoValuePosSiOr(statement: Statement, start: Natural,
 
   echo "expected:"
   if eValuePosSiOr.isValue:
+    if eValuePosSiOr.value.value.kind == vkDict:
+      echo "mutable: $1" % $eValuePosSiOr.value.value.dictv.mutable
+    elif eValuePosSiOr.value.value.kind == vkList:
+      echo "mutable: $1" % $eValuePosSiOr.value.value.listv.mutable
     echo "value: $1" % $eValuePosSiOr.value
     echo "0123456789 123456789 123456789"
     echo statement.text
@@ -72,6 +80,7 @@ proc testGetValuePosSi(
     start: Natural,
     eValuePosSiOr: ValuePosSiOr,
     variables: Variables = nil,
+    mutable: bool = false,
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]
@@ -84,30 +93,42 @@ proc testGetValuePosSi(
   if vars == nil:
     vars = startVariables(funcs = funcsVarDict)
 
-  let valueAndPosOr = getValuePosSi(env, statement, start, vars)
+  let valuePosSiOr = getValuePosSi(env, statement, start, vars)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
-  if valueAndPosOr != eValuePosSiOr:
+  if valuePosSiOr != eValuePosSiOr:
     result = false
-    echoValuePosSiOr(statement, start, valueAndPosOr, eValuePosSiOr)
+    echoValuePosSiOr(statement, start, valuePosSiOr, eValuePosSiOr)
 
-proc testGetValuePosSi(text: string, start: Natural,
-    eWarning: MessageId, pos = 0, p1 = "", variables: Variables = nil): bool =
+proc testGetValuePosSi(
+    text: string,
+    start: Natural,
+    eWarning: MessageId,
+    pos = 0,
+    p1 = "",
+    variables: Variables = nil
+  ): bool =
   let statement = newStatement(text)
   let eValuePosSiOr = newValuePosSiOr(eWarning, p1, pos)
   result = testGetValuePosSi(statement, start, eValuePosSiOr, variables)
 
-proc testGetValuePosSi(text: string, start: Natural,
-    ePos: Natural, eJson: string, variables: Variables = nil): bool =
+proc testGetValuePosSi(
+    text: string,
+    start: Natural,
+    ePos: Natural,
+    eJson: string,
+    variables: Variables = nil,
+    mutable: bool = false,
+  ): bool =
   let statement = newStatement(text)
-  let eValue = readJsonString(eJson)
+  let eValue = readJsonString(eJson, mutable)
   if eValue.isMessage:
     echo "eJson = " & eJson
     echo $eValue
     return false
   let eValuePosSiOr = newValuePosSiOr(eValue.value, ePos)
-  result = testGetValuePosSi(statement, start, eValuePosSiOr, variables)
+  result = testGetValuePosSi(statement, start, eValuePosSiOr, variables, mutable)
 
 proc testGetMultilineStr(pattern: string, start: Natural,
     eStr: string, ePos: Natural): bool =
@@ -320,7 +341,7 @@ proc testGetFunctionValuePosSi(
 
   var env = openEnvTest("_testGetFunctionValuePosSi.txt")
   let valueAndPosOr = getFunctionValuePosSi(env, functionName, functionPos,
-    statement, start, variables, list=false)
+    statement, start, variables, listCase=false)
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
   gotExpectedResult($valueAndPosOr, $eValuePosSiOr, statement.text)
@@ -1738,32 +1759,32 @@ White$1
   test "getValuePosSi and skip":
     # var valueOr = readJsonString("{b:1,c:2}")
     let statements = [
-      ("""a = 5 # number""", 4, 6, "5"),
-      ("""a = "abc" # string""", 4, 10, """"abc""""),
-      ("""a = [1,2,3] # list""", 4, 12, "[1,2,3]"),
-      ("""a = dict(["b", 1,"c", 2]) # dict""", 4, 26, """{"b":1,"c":2}"""),
-      ("""a = len("3") # var""", 4, 13, "1"),
-      ("""a = (3 < 5) # var""", 4, 12, "true"),
-      ("""a = t.row # variable""", 4, 10, "0"),
-      ("""a = if( (1 < 2), 3, 4) # if a""", 4, 23, "3"),
-      ("""a = if( bool(len("tea")), 22, 33) # if b""", 4, 34, "22"),
-      ("""a = if( bool(len("tea")), 22, 33) # if c""", 8, 24, "true"),
-      ("""a = if( bool(len("tea")), 22, 33) # if d""", 13, 23, "3"),
-      ("""a = if( bool(len("tea")), 22, 33) # if e""", 17, 22, """"tea""""),
-      ("""a = if( bool(len("tea")), 22, 33) # if f""", 26, 28, "22"),
-      ("""a = if( bool(len("tea")), 22, 33) # if g""", 30, 32, "33"),
+      ("""a = 5 # number""", 4, 6, "5", false),
+      ("""a = "abc" # string""", 4, 10, """"abc"""", false),
+      ("""a = [1,2,3] # list""", 4, 12, "[1,2,3]", true),
+      ("""a = dict(["b", 1,"c", 2]) # dict""", 4, 26, """{"b":1,"c":2}""", true),
+      ("""a = len("3") # var""", 4, 13, "1", false),
+      ("""a = (3 < 5) # var""", 4, 12, "true", false),
+      ("""a = t.row # variable""", 4, 10, "0", false),
+      ("""a = if( (1 < 2), 3, 4) # if a""", 4, 23, "3", false),
+      ("""a = if( bool(len("tea")), 22, 33) # if b""", 4, 34, "22", false),
+      ("""a = if( bool(len("tea")), 22, 33) # if c""", 8, 24, "true", false),
+      ("""a = if( bool(len("tea")), 22, 33) # if d""", 13, 23, "3", false),
+      ("""a = if( bool(len("tea")), 22, 33) # if e""", 17, 22, """"tea"""", false),
+      ("""a = if( bool(len("tea")), 22, 33) # if f""", 26, 28, "22", false),
+      ("""a = if( bool(len("tea")), 22, 33) # if g""", 30, 32, "33", false),
       #   0123456789 123456789 123456789 123456789 1234
-      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if h""", 4, 41, "22"),
-      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if i""", 8, 29, "true"),
-      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if j""", 14, 27, "3"),
-      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if k""", 19, 25, """"tea""""),
-      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if l""", 31, 34, "22"),
-      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if m""", 36, 39, "33"),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if h""", 4, 41, "22", false),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if i""", 8, 29, "true", false),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if j""", 14, 27, "3", false),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if k""", 19, 25, """"tea"""", false),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if l""", 31, 34, "22", false),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if m""", 36, 39, "33", false),
       #   0123456789 123456789 123456789 123456789 1234
       #             10        20        30        40
     ]
-    for (text, start, ePos, eJson) in statements:
-      check testGetValuePosSi(text, start, ePos, eJson)
+    for (text, start, ePos, eJson, mutable) in statements:
+      check testGetValuePosSi(text, start, ePos, eJson, mutable = mutable)
       check testSkipArgument(text, start, newPosOr(ePos))
 
   test "getValuePosSi warnings":

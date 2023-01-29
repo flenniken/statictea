@@ -281,7 +281,9 @@ MessageId = enum
   wVarContainsChars,        ## w257
   wVarEndsWith,             ## w258
   wVarMaximumLength,        ## w259
-  wNotFuncVariable           ## w260
+  wNotFuncVariable,         ## w260
+  wImmutableDict,           ## w261
+  wImmutableList             ## w262
 ```
 
 # Messages
@@ -550,7 +552,9 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "A variable contains ascii letters, digits, underscores and hypens.", ## wVarContainsChars
     "A variable name ends with an ascii letter or digit.", ## wVarEndsWith
     "A variable and dot name are limited to 64 characters.", ## wVarMaximumLength
-    "The variable is not a function variable."]
+    "The variable is not a function variable.", ## wNotFuncVariable
+    "You cannot assign to an immutable dictionary.", ## wImmutableDict
+    "You cannot append to an immutable list."]
 ```
 
 # WarningData

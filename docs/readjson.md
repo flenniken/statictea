@@ -23,26 +23,26 @@ maxDepth = 16
 
 # jsonToValue
 
-Convert a Nim json node to a statictea value.
+Convert a Nim json node to a statictea value. The mutable variable determines whether lists and dictionaries are mutable.
 
 ```nim
-func jsonToValue(jsonNode: JsonNode; depth: int = 0): ValueOr
+func jsonToValue(jsonNode: JsonNode; depth: int = 0; mutable = false): ValueOr
 ```
 
 # readJsonStream
 
-Read a json stream and return the parsed data in a value object or return a warning.
+Read a json stream and return the parsed data in a value object or return a warning. The mutable variable determines whether lists and dictionaries are mutable.
 
 ```nim
-func readJsonStream(stream: Stream): ValueOr
+func readJsonStream(stream: Stream; mutable = false): ValueOr
 ```
 
 # readJsonString
 
-Read a json string and return the parsed data in a value object or return a warning.
+Read a json string and return the parsed data in a value object or return a warning. The mutable variable determines whether lists and dictionaries are mutable.
 
 ```nim
-func readJsonString(content: string): ValueOr
+func readJsonString(content: string; mutable = false): ValueOr
 ```
 
 # readJsonFile
@@ -50,7 +50,7 @@ func readJsonString(content: string): ValueOr
 Read a json file and return the parsed data in a value object or return a warning. A warning is returned when the root object is not a dictionary.
 
 ```nim
-proc readJsonFile(filename: string): ValueOr
+proc readJsonFile(filename: string; mutable = false): ValueOr
 ```
 
 # unescapePopularChar

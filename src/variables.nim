@@ -105,9 +105,9 @@ func startVariables*(server: VarsDict = nil, args: VarsDict = nil,
   else:
     result["f"] = newValue(funcs)
 
-  result["g"] = newValue(newVarsDict())
-  result["l"] = newValue(newVarsDict())
-  result["o"] = newValue(newVarsDict())
+  result["g"] = newValue(newVarsDict(), mutable = true)
+  result["l"] = newValue(newVarsDict(), mutable = true)
+  result["o"] = newValue(newVarsDict(), mutable = true)
 
   if server == nil:
     result["s"] = newValue(newVarsDict())
@@ -122,7 +122,7 @@ func startVariables*(server: VarsDict = nil, args: VarsDict = nil,
     tea["args"] = newValue(args)
   tea["row"] = newValue(0)
   tea["version"] = newValue(staticteaVersion)
-  result["t"] = newValue(tea)
+  result["t"] = newValue(tea, mutable = true)
 
 func getTeaVarIntDefault*(variables: Variables, varName: string): int64 =
   ## Return the int value of one of the tea dictionary integer
@@ -175,10 +175,10 @@ proc resetVariables*(variables: var Variables) =
       if teaVar in tea:
         tea.del(teaVar)
 
-  variables["l"] = newValue(newVarsDict())
+  variables["l"] = newValue(newVarsDict(), mutable = true)
 
 proc getParentDictToAddTo(variables: Variables, dotNameList: openArray[string]):
-    VarsDictOr =
+    ValueOr =
   ## Return the last component dictionary specified by the given dot
   ## name list or, on error, return a warning.  For the dot name string
   ## "a.b.c.d" and the c dictionary is the result.
@@ -186,26 +186,25 @@ proc getParentDictToAddTo(variables: Variables, dotNameList: openArray[string]):
   assert(dotNameList.len > 1, "No namespace for '$1'." % dotNameList.join("."))
   assert dotNameList[0] in ["f", "g", "h", "l", "s", "o"]
 
-  var parentDict: VarsDict
+  var parentDict: Value
   var dictNames: seq[string]
   var nameSpace = dotNameList[0]
 
-  parentDict = variables[nameSpace].dictv.dict
+  parentDict = variables[nameSpace]
   if dotNameList.len == 2:
-    return newVarsDictOr(parentDict)
+    return newValueOr(parentDict)
   dictNames = dotNameList[1 .. ^2]
 
   # Loop through the dictionaries looking up each sub dict.
   for name in dictNames:
-    if not (name in parentDict):
+    if not (name in parentDict.dictv.dict):
       # The variable '$1' does not exist.
-      return newVarsDictOr(wVariableMissing, name)
-    if parentDict[name].kind != vkDict:
+      return newValueOr(wVariableMissing, name)
+    if parentDict.dictv.dict[name].kind != vkDict:
       # Name, $1, is not a dictionary.
-      return newVarsDictOr(wNotDict, name)
-    parentDict = parentDict[name].dictv.dict
-
-  result = newVarsDictOr(parentDict)
+      return newValueOr(wNotDict, name)
+    parentDict = parentDict.dictv.dict[name]
+  result = newValueOr(parentDict)
 
 func assignTeaVariable(variables: var Variables, dotNameStr: string,
     value: Value, operator = opEqual): Option[WarningData] =
@@ -288,6 +287,7 @@ proc assignVariable*(
   # -- You can specify local variables without the l prefix.
   # -- You cannot assign true and false.
   # -- You can assign new values to the code dictonary when in code files.
+  # -- You cannot assign or append to a immutable dict or list.
 
   assert dotNameStr.len > 0
   var dotNameList = split(dotNameStr, '.')
@@ -333,30 +333,37 @@ proc assignVariable*(
     return some(newWarningData(wImmutableVars))
 
   # Determine the dictionary to add the variable.
-  let varsDictOr = getParentDictToAddTo(variables, dotNameList)
-  if varsDictOr.isMessage:
-    return some(varsDictOr.message)
+  let valueOr = getParentDictToAddTo(variables, dotNameList)
+  if valueOr.isMessage:
+    return some(valueOr.message)
 
   # Assign the last name to its dictionary.
   let lastName = dotNameList[^1]
   case operator
   of opEqual:
     # Assign the value to the dictionary.
-    if lastName in varsDictOr.value:
+    if lastName in valueOr.value.dictv.dict:
       # You cannot assign to an existing variable.
       return some(newWarningData(wImmutableVars))
-    varsDictOr.value[lastName] = value
+    if not valueOr.value.dictv.mutable:
+      # You cannot assign to an immutable dictionary.
+      return some(newWarningData(wImmutableDict))
+    valueOr.value.dictv.dict[lastName] = value
   of opAppendList:
     # Append to a list, or create then append.
 
     # If the variable doesn't exists, create an empty list.
-    if not (lastName in varsDictOr.value):
-      varsDictOr.value[lastName] = newEmptyListValue()
+    if not (lastName in valueOr.value.dictv.dict):
+      valueOr.value.dictv.dict[lastName] = newEmptyListValue(mutable = true)
 
-    let lastItem = varsDictOr.value[lastName]
+    let lastItem = valueOr.value.dictv.dict[lastName]
     if lastItem.kind != vkList:
       # You can only append to a list, got $1.
       return some(newWarningData(wAppendToList, $lastItem.kind))
+
+    if not lastItem.listv.mutable:
+      # You cannot append to an immutable list.
+      return some(newWarningData(wImmutableList))
 
     # Append the value to the list.
     lastItem.listv.list.add(value)

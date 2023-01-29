@@ -1159,7 +1159,8 @@ proc andOrFunctions*(
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list=false): ValuePosSiOr =
+    listCase = false
+  ): ValuePosSiOr =
   ## Return the and/or function's value and the position after. The and
   ## function stops on the first false. The or function stops on the
   ## first true. The rest of the arguments are skipped.
@@ -1239,7 +1240,7 @@ proc getArguments*(
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list=false,
+    listCase=false,
     arguments: var seq[Value],
     argumentStarts: var seq[Natural],
   ): ValuePosSiOr =
@@ -1256,7 +1257,7 @@ proc getArguments*(
   var runningPos = start
 
   # Look for the no argument case.
-  let symbol = if list: gRightBracket else: gRightParentheses
+  let symbol = if listCase: gRightBracket else: gRightParentheses
   let startSymbolO = matchSymbol(statement.text, symbol, runningPos)
   if startSymbolO.isSome:
     # There are no arguments.
@@ -1310,7 +1311,7 @@ proc getFunctionValuePosSi*(
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list = false): ValuePosSiOr =
+    listCase = false): ValuePosSiOr =
   ## Return the function's value and the position after it. Start points at the
   ## first argument of the function. The position includes the trailing
   ## whitespace after the ending ).
@@ -1326,7 +1327,7 @@ proc getFunctionValuePosSi*(
   var runningPos = start
   var arguments: seq[Value]
   var argumentStarts: seq[Natural]
-  let vpOr = getArguments(env, statement, runningPos, variables, list,
+  let vpOr = getArguments(env, statement, runningPos, variables, listCase,
     arguments, argumentStarts)
   if vpOr.isMessage:
     return vpOr
@@ -1692,7 +1693,7 @@ proc listLoop*(
     statement: Statement,
     start: Natural,
     variables: Variables,
-    list=false): ValuePosSiOr =
+    listCase=false): ValuePosSiOr =
   ## Make a new list from an existing list. The callback function is
   ## called for each item in the list and determines what goes in the
   ## new list.  See funList_lpoal in functions.nim for more
@@ -1765,7 +1766,7 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
 
     # Get the list. The literal list [...] and list(...) are similar.
     result = getFunctionValuePosSi(env, "list", start, statement,
-      start+startSymbol.length, variables, list=true)
+      start+startSymbol.length, variables, listCase=true)
 
   of rtCondition:
     result = getCondition(env, statement, start, variables)
@@ -1816,7 +1817,7 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
       of spNotSpecial, spReturn, spWarn, spLog:
         # Handle normal functions and warn, return and log.
         return getFunctionValuePosSi(env, rightName.dotName, start, statement,
-          rightName.pos, variables, list=false)
+          rightName.pos, variables, listCase=false)
 
     of vnkGet:
       # a = list[2] or a = dict["key"]
@@ -1908,7 +1909,7 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
   of spWarn, spLog:
     # Handle a bare warn, or log function.
     result = getFunctionValuePosSi(env, $specialFunction, start,
-      statement, runningPos, variables, list=false)
+      statement, runningPos, variables, listCase=false)
 
 proc runStatement*(env: var Env, statement: Statement, variables: Variables): VariableDataOr =
   ## Run one statement and return the variable dot name string,
@@ -2009,7 +2010,7 @@ proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
   let funResult = mapParameters(funcVar.funcv.signature, arguments)
   if funResult.kind == frWarning:
     return funResult
-  userVariables["l"] = funResult.value
+  userVariables["l"] = newValue(funResult.value.dictv.dict, mutable = true)
 
   # Run the function statements.
   for statement in funcVar.funcv.statements:

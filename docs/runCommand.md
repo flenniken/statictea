@@ -518,7 +518,7 @@ Return the and/or function's value and the position after. The and function stop
 ```nim
 proc andOrFunctions(env: var Env; specialFunction: SpecialFunction;
                     statement: Statement; start: Natural; variables: Variables;
-                    list = false): ValuePosSiOr
+                    listCase = false): ValuePosSiOr
 ```
 
 # getArguments
@@ -533,8 +533,8 @@ newList = listLoop(return(3), callback, state)  # comment
 
 ```nim
 proc getArguments(env: var Env; statement: Statement; start: Natural;
-                  variables: Variables; list = false; arguments: var seq[Value];
-                  argumentStarts: var seq[Natural]): ValuePosSiOr
+                  variables: Variables; listCase = false;
+                  arguments: var seq[Value]; argumentStarts: var seq[Natural]): ValuePosSiOr
 ```
 
 # getFunctionValuePosSi
@@ -551,7 +551,8 @@ a = get(b, len("hi"), c)
 ```nim
 proc getFunctionValuePosSi(env: var Env; functionName: string;
                            functionPos: Natural; statement: Statement;
-                           start: Natural; variables: Variables; list = false): ValuePosSiOr
+                           start: Natural; variables: Variables;
+                           listCase = false): ValuePosSiOr
 ```
 
 # runBoolOp
@@ -617,7 +618,7 @@ stopped = listLoop(list, new, callback, state)
 ```nim
 proc listLoop(env: var Env; specialFunction: SpecialFunction;
               statement: Statement; start: Natural; variables: Variables;
-              list = false): ValuePosSiOr
+              listCase = false): ValuePosSiOr
 ```
 
 # getValuePosSi

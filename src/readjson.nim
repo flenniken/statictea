@@ -21,8 +21,9 @@ else:
     maxDepth* = 16
       ## The maximum depth you can nest items.
 
-func jsonToValue*(jsonNode: JsonNode, depth: int = 0): ValueOr =
-  ## Convert a Nim json node to a statictea value.
+func jsonToValue*(jsonNode: JsonNode, depth: int = 0, mutable = false): ValueOr =
+  ## Convert a Nim json node to a statictea value. The mutable
+  ## variable determines whether lists and dictionaries are mutable.
 
   # When testing remove the side effect so the function can be defined
   # as func.
@@ -53,25 +54,26 @@ func jsonToValue*(jsonNode: JsonNode, depth: int = 0): ValueOr =
     var newDepth = depth + 1
     var dict = newVarsDict()
     for key, jnode in jsonNode:
-      let valueOr = jsonToValue(jnode, newDepth)
+      let valueOr = jsonToValue(jnode, newDepth, mutable)
       if valueOr.isMessage:
         return valueOr
       dict[key] = valueOr.value
-    value = newValue(dict)
+    value = newValue(dict, mutable)
   of JArray:
     var newDepth = depth + 1
     var list: seq[Value]
     for jnode in jsonNode:
-      let valueOr = jsonToValue(jnode, newDepth)
+      let valueOr = jsonToValue(jnode, newDepth, mutable)
       if valueOr.isMessage:
         return valueOr
       list.add(valueOr.value)
-    value = newValue(list)
+    value = newValue(list, mutable)
   result = newValueOr(value)
 
-func readJsonStream*(stream: Stream): ValueOr =
+func readJsonStream*(stream: Stream, mutable = false): ValueOr =
   ## Read a json stream and return the parsed data in a value object
-  ## or return a warning.
+  ## or return a warning. The mutable variable determines whether
+  ## lists and dictionaries are mutable.
   if stream == nil:
     return newValueOr(wJsonParseError)
 
@@ -82,18 +84,19 @@ func readJsonStream*(stream: Stream): ValueOr =
   except:
     # Unable to parse the JSON.
     return newValueOr(wJsonParseError)
-  result = jsonToValue(rootNode)
+  result = jsonToValue(rootNode, mutable = mutable)
 
-func readJsonString*(content: string): ValueOr =
+func readJsonString*(content: string, mutable = false): ValueOr =
   ## Read a json string and return the parsed data in a value object
-  ## or return a warning.
+  ## or return a warning. The mutable variable determines whether
+  ## lists and dictionaries are mutable.
   var stream = newStringStream(content)
   if stream == nil:
     # Unable to create a stream object.
     return newValueOr(wUnableCreateStream)
-  result = readJsonStream(stream)
+  result = readJsonStream(stream, mutable)
 
-proc readJsonFile*(filename: string): ValueOr =
+proc readJsonFile*(filename: string, mutable = false): ValueOr =
   ## Read a json file and return the parsed data in a value object or
   ## return a warning. A warning is returned when the root object is
   ## not a dictionary.
@@ -112,7 +115,7 @@ proc readJsonFile*(filename: string): ValueOr =
     # Close the stream and file at the end.
     stream.close()
 
-  result = readJsonStream(stream)
+  result = readJsonStream(stream, mutable)
   if result.isValue:
     if result.value.kind != vkDict:
       # The root json element must be an object (dictionary).

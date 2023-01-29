@@ -351,12 +351,12 @@ func newValue*(function: FunctionSpec): Value =
   ## Create a new func value.
   result = Value(kind: vkFunc, funcv: function)
 
-proc newEmptyListValue*(mutable = true): Value =
+proc newEmptyListValue*(mutable = false): Value =
   ## Return an empty list value.
   var valueList: seq[Value]
   result = newValue(valueList, mutable)
 
-proc newEmptyDictValue*(mutable = true): Value =
+proc newEmptyDictValue*(mutable = false): Value =
   ## Create a dictionary value from a VarsDict.
   result = newValue(newVarsDict(), mutable)
 
@@ -372,8 +372,12 @@ proc `==`*(a: Value, b: Value): bool =
         result = a.floatv == b.floatv
       of vkDict:
         result = a.dictv == b.dictv
+        if result:
+          result = a.dictv.mutable == b.dictv.mutable
       of vkList:
         result = a.listv == b.listv
+        if result:
+          result = a.listv.mutable == b.listv.mutable
       of vkBool:
         result = a.boolv == b.boolv
       of vkFunc:
@@ -630,6 +634,14 @@ func newValuePosSiOr*(warningData: WarningData):
   ## Create a ValuePosSiOr warning.
   result = opMessageW[ValuePosSi](warningData)
 
+proc `==`*(a: ValuePosSi, b: ValuePosSi): bool =
+  ## Return true when a equals b.
+  result = a.pos == b.pos
+  if result:
+    result = a.sideEffect == b.sideEffect
+    if result:
+      result = a.value == b.value
+
 proc `==`*(a: ValuePosSiOr, b: ValuePosSiOr): bool =
   ## Return true when a equals b.
   if a.kind == b.kind:
@@ -637,6 +649,10 @@ proc `==`*(a: ValuePosSiOr, b: ValuePosSiOr): bool =
       result = a.message == b.message
     else:
       result = a.value == b.value
+
+proc `!=`*(a: ValuePosSi, b: ValuePosSi): bool =
+  ## Compare two ValuePosSi objects and return false when equal.
+  result = not (a == b)
 
 proc `!=`*(a: ValuePosSiOr, b: ValuePosSiOr): bool =
   ## Compare two ValuePosSiOr objects and return false when equal.
