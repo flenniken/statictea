@@ -275,6 +275,7 @@ type
     wNotFuncVariable,      ## w260
     wImmutableDict,        ## w261
     wImmutableList,        ## w262
+    wNewListInDict,        ## w263
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -460,11 +461,11 @@ const
     "The function requires at least $1 arguments.", ## wNotEnoughArgsOpt
     "The function requires at most $1 arguments.", ## wTooManyArgsOpt
     "The length must be a positive number.", ## wNegativeLength
-    "You can only change code variables (o) in code files.", ## wReadOnlyCodeVars
+    "You can only change code variables (o dictionary) in code files.", ## wReadOnlyCodeVars
     "Out of lines looking for the plus sign line.", ## wNoPlusSignLine
     "Out of lines looking for the multiline string.", ## wIncompleteMultiline
     "Triple quotes must always end the line.", ## wTripleAtEnd
-    "You cannot assign to the g namespace in a code file.", ## wNoGlobalInCodeFile
+    "You can only change global variables (g dictionary) in template files.", ## wNoGlobalInCodeFile
     "Use '...return(\"stop\")...' in a code file.", ## wUseStop
     "Missing the ending triple quotes.", ## wMissingEndingTriple
     "Invalid string type, expected rb, json or dn.", ## wInvalidStringType
@@ -541,6 +542,7 @@ const
     "The variable is not a function variable.", ## wNotFuncVariable
     "You cannot assign to an immutable dictionary.", ## wImmutableDict
     "You cannot append to an immutable list.", ## wImmutableList
+    "You cannot create a new list element in the immutable dictionary.", ## wNewListInDict
     ]
 
     ## The message text.

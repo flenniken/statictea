@@ -2043,6 +2043,11 @@ signature.paramNames = ["a","b"]
 signature.paramTypes = ["int","string"]
 signature.returnType = "func""""
     check gotExpected(got, expected)
+    check details.dictv.mutable == false
+    let namesVar = details.dictv.dict["paramNames"]
+    check namesVar.listv.mutable == false
+    let typesVar = details.dictv.dict["paramTypes"]
+    check typesVar.listv.mutable == false
 
   test "signatureDetails2":
     var signatureO = newSignatureO("n", "d")

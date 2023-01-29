@@ -38,15 +38,6 @@ type
     opReturn = "return",
     opLog = "log",
 
-  # todo: CodeLocation: determine another way to do this.
-  CodeLocation* = enum
-    ## Location where the code is running.
-    ## @:
-    ## @:* inCodeFile -- in a code file
-    ## @:* inOther -- not in a code file
-    inCodeFile
-    inOther
-
   VariableData* = object
     ## The VariableData object holds the variable name, operator,
     ## @:and value which is the result of running a statement.
@@ -105,7 +96,9 @@ func startVariables*(server: VarsDict = nil, args: VarsDict = nil,
   else:
     result["f"] = newValue(funcs)
 
-  result["g"] = newValue(newVarsDict(), mutable = true)
+  # The g dictionary starts out immutable and becomes mutable after
+  # the code files run and visa-versa for the o dictionary.
+  result["g"] = newValue(newVarsDict())
   result["l"] = newValue(newVarsDict(), mutable = true)
   result["o"] = newValue(newVarsDict(), mutable = true)
 
@@ -274,7 +267,6 @@ proc assignVariable*(
     dotNameStr: string,
     value: Value,
     operator = opEqual,
-    codeLocation = inOther
   ): Option[WarningData] =
   ## Assign the variable the given value if possible, else return a
   ## warning.
@@ -298,15 +290,15 @@ proc assignVariable*(
   of "t":
     return assignTeaVariable(variables, dotNameStr, value, operator)
   of "o":
-    if codeLocation != inCodeFile:
-      # You can only change code variables in code files.
+    if not variables["o"].dictv.mutable:
+      # You can only change code variables (o dictionary) in code files.
       return some(newWarningData(wReadOnlyCodeVars))
   of "s":
     # You cannot overwrite the server variables.
     return some(newWarningData(wReadOnlyDictionary))
   of "g":
-    if codeLocation == inCodeFile:
-      # You cannot assign to the g namespace in a code file.
+    if not variables["g"].dictv.mutable:
+      # You can only change global variables (g dictionary) in template files.
       return some(newWarningData(wNoGlobalInCodeFile))
   of "l":
     if dotNameStr == "l.true" or dotNameStr == "l.false":
@@ -341,32 +333,41 @@ proc assignVariable*(
   let lastName = dotNameList[^1]
   case operator
   of opEqual:
-    # Assign the value to the dictionary.
     if lastName in valueOr.value.dictv.dict:
       # You cannot assign to an existing variable.
       return some(newWarningData(wImmutableVars))
+
     if not valueOr.value.dictv.mutable:
       # You cannot assign to an immutable dictionary.
       return some(newWarningData(wImmutableDict))
+
+    # Assign the value to the dictionary.
     valueOr.value.dictv.dict[lastName] = value
+
   of opAppendList:
     # Append to a list, or create then append.
 
     # If the variable doesn't exists, create an empty list.
     if not (lastName in valueOr.value.dictv.dict):
+      # Make sure the parent element is mutable.
+      if not valueOr.value.dictv.mutable:
+        # You cannot create a new list element in the immutable dictionary.
+        return some(newWarningData(wNewListInDict))
+
+      # Create a new list dictionary element.
       valueOr.value.dictv.dict[lastName] = newEmptyListValue(mutable = true)
 
-    let lastItem = valueOr.value.dictv.dict[lastName]
-    if lastItem.kind != vkList:
+    let lastComponent = valueOr.value.dictv.dict[lastName]
+    if lastComponent.kind != vkList:
       # You can only append to a list, got $1.
-      return some(newWarningData(wAppendToList, $lastItem.kind))
+      return some(newWarningData(wAppendToList, $lastComponent.kind))
 
-    if not lastItem.listv.mutable:
+    if not lastComponent.listv.mutable:
       # You cannot append to an immutable list.
       return some(newWarningData(wImmutableList))
 
     # Append the value to the list.
-    lastItem.listv.list.add(value)
+    lastComponent.listv.list.add(value)
   of opIgnore, opReturn, opLog:
     assert(false, "You cannot assign using the $1 operator." % $operator)
     discard
@@ -392,12 +393,11 @@ func lookUpVar(variables: Variables, names: seq[string]): ValueOr =
 proc assignVariable*(
   variables: var Variables,
   variableData: VariableData,
-  codeLocation: CodeLocation
   ): Option[WarningData] =
   ## Assign the variable the given value if possible, else return a
   ## warning.
   result = assignVariable(variables, variableData.dotNameStr, variableData.value,
-      variableData.operator, codeLocation)
+      variableData.operator)
 
 proc getVariable*(variables: Variables, dotNameStr: string,
     noPrefixDict: NoPrefixDict): ValueOr =

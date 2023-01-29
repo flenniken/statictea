@@ -701,8 +701,7 @@ Run a statement and assign the variable if appropriate. Return skip, stop or con
 
 ```nim
 proc runStatementAssignVar(env: var Env; statement: Statement;
-                           variables: var Variables; sourceFilename: string;
-                           codeLocation: CodeLocation): LoopControl
+                           variables: var Variables; sourceFilename: string): LoopControl
 ```
 
 # parseSignature
@@ -755,8 +754,7 @@ proc defineUserFunctionAssignVar(env: var Env; lb: var LineBuffer;
 Run a command and fill in the variables dictionaries.
 
 ```nim
-proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables;
-                codeLocation: CodeLocation): LoopControl
+proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables): LoopControl
 ```
 
 # runCodeFile

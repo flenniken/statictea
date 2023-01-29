@@ -2454,7 +2454,7 @@ nofile(0): w16: File not found: missing.
 g.a = 5
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.tea(1): w186: You cannot assign to the g namespace in a code file.
+testcode.tea(1): w186: You can only change global variables (g dictionary) in template files.
 statement: g.a = 5
            ^
 """
@@ -2843,26 +2843,6 @@ o = {}
 testcode.tea(4): w120: Wrong argument type, expected int.
 statement: z = l.zero(3.14)
                       ^
-"""
-    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
-
-  test "function assign o":
-    let content = """
-zero = func("zero() int")
-  ## assign o
-  b = 5 # ok
-  o.a = 3
-  return(0)
-z = l.zero()
-"""
-    let eVarRep = """
-l.zero = "zero"
-o = {}
-"""
-    let eErrLines: seq[string] = splitNewLines """
-testcode.tea(4): w182: You can only change code variables (o) in code files.
-statement:   o.a = 3
-             ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 

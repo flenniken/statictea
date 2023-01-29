@@ -14,7 +14,6 @@ prefix and it allows functions to be specified without the f prefix.
 
 * const: [outputValues](#outputvalues) &mdash; Where the replacement block's output goes.
 * type: [Operator](#operator) &mdash; The statement operator types.
-* type: [CodeLocation](#codelocation) &mdash; Location where the code is running.
 * type: [VariableData](#variabledata) &mdash; The VariableData object holds the variable name, operator,
 and value which is the result of running a statement.
 * type: [VariableDataOr](#variabledataor) &mdash; A VariableData object or a warning.
@@ -58,18 +57,6 @@ The statement operator types.
 Operator = enum
   opIgnore = "ignore", opEqual = "=", opAppendList = "&=", opReturn = "return",
   opLog = "log"
-```
-
-# CodeLocation
-
-Location where the code is running.
-
-* inCodeFile -- in a code file
-* inOther -- not in a code file
-
-```nim
-CodeLocation = enum
-  inCodeFile, inOther
 ```
 
 # VariableData
@@ -181,8 +168,7 @@ Assign the variable the given value if possible, else return a warning.
 
 ```nim
 proc assignVariable(variables: var Variables; dotNameStr: string; value: Value;
-                    operator = opEqual; codeLocation = inOther): Option[
-    WarningData]
+                    operator = opEqual): Option[WarningData]
 ```
 
 # assignVariable
@@ -190,8 +176,8 @@ proc assignVariable(variables: var Variables; dotNameStr: string; value: Value;
 Assign the variable the given value if possible, else return a warning.
 
 ```nim
-proc assignVariable(variables: var Variables; variableData: VariableData;
-                    codeLocation: CodeLocation): Option[WarningData]
+proc assignVariable(variables: var Variables; variableData: VariableData): Option[
+    WarningData]
 ```
 
 # getVariable

@@ -40,6 +40,13 @@ filename.
 * [maxrepeat](../testfiles/maxrepeat.stf.md) &mdash; Test the t maxRepeat tea variable.
 * [missingvar](../testfiles/missingvar.stf.md) &mdash; Test with a missing replacement variable.
 * [multiple-json](../testfiles/multiple-json.stf.md) &mdash; Test with multiple json and code files.
+* [mutable-func-dicts](../testfiles/mutable-func-dicts.stf.md) &mdash; Test that you cannot change the dictionaries returned by built-in
+functions, except the dict function.
+* [mutable-func-lists](../testfiles/mutable-func-lists.stf.md) &mdash; Test that you cannot mutate the lists returned by the built-in
+functions (except the list function).
+* [mutable-o-g](../testfiles/mutable-o-g.stf.md) &mdash; Test that you cannot change o variables in templates and that you
+cannot change g variables in code files.
+* [mutable-tea](../testfiles/mutable-tea.stf.md) &mdash; Test that you cannot change the tea variables lists and dicts.
 * [nextline-readme](../testfiles/nextline-readme.stf.md) &mdash; The nextline readme example.
 * [noendingline](../testfiles/noendingline.stf.md) &mdash; Test with no ending newline at the bottom of the file.
 * [nothing](../testfiles/nothing.stf.md) &mdash; Test that the return code for no arguments is not 0.

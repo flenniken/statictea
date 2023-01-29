@@ -62,4 +62,10 @@ proc getStartVariables*(env: var Env, args: Args): Variables =
   let serverVarDict = readJsonFiles(env, args.serverList)
   let argsVarDict = getTeaArgs(args).dictv.dict
   result = startVariables(serverVarDict, argsVarDict, funcsVarDict)
+
+  # Run the code files.
   runCodeFiles(env, result, args.codeList)
+
+  # Make the o dictionary immutable and the g dictionary mutable.
+  result["o"].dictv.mutable = false
+  result["g"].dictv.mutable = true

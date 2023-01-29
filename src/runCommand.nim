@@ -2027,7 +2027,7 @@ proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
     case variableData.operator
     of opEqual, opAppendList:
       # Assign the variable if possible.
-      let wdO = assignVariable(userVariables, variableData, inOther)
+      let wdO = assignVariable(userVariables, variableData)
       if isSome(wdO):
         let wd = wdO.get()
         let pos = skipSpaces(statement.text)
@@ -2054,7 +2054,7 @@ proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
   result = newFunResultWarn(wNoReturnStatement)
 
 proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var Variables,
-    sourceFilename: string, codeLocation: CodeLocation): LoopControl =
+    sourceFilename: string): LoopControl =
   ## Run a statement and assign the variable if appropriate. Return
   ## skip, stop or continue to control the loop.
 
@@ -2069,7 +2069,7 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
   of opEqual, opAppendList:
     # Assign the variable if possible.
     let warningDataO = assignVariable(variables,
-      variableData.dotNameStr, variableData.value, variableData.operator, codeLocation)
+      variableData.dotNameStr, variableData.value, variableData.operator)
     if isSome(warningDataO):
       env.warnStatement(statement, warningDataO.get(), sourceFilename)
     result = lcAdd
@@ -2404,13 +2404,13 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
 
   # Assign the variable if possible.
   let warningDataO = assignVariable(variables, leftName, funcVar,
-    operator, inCodeFile)
+    operator)
   if isSome(warningDataO):
     env.warnStatement(statement, warningDataO.get(), sourceFilename)
   return true
 
 proc runCommand*(env: var Env, cmdLines: CmdLines,
-    variables: var Variables, codeLocation: CodeLocation): LoopControl =
+    variables: var Variables): LoopControl =
   ## Run a command and fill in the variables dictionaries.
 
   # Clear the local variables and set the tea vars to their initial
@@ -2422,7 +2422,7 @@ proc runCommand*(env: var Env, cmdLines: CmdLines,
 
     # Run the statement.
     let loopControl = runStatementAssignVar(env, statement, variables,
-      env.templateFilename, codeLocation)
+      env.templateFilename)
 
     # Stop looping when we get a return.
     if loopControl == lcStop or loopControl == lcSkip:
@@ -2477,7 +2477,7 @@ proc runCodeFile*(env: var Env, variables: var Variables, filename: string) =
       continue
 
     # Process a regular statement.
-    let loopControl = runStatementAssignVar(env, statement, variables, filename, inCodeFile)
+    let loopControl = runStatementAssignVar(env, statement, variables, filename)
     if loopControl == lcStop:
       break
     elif loopControl == lcSkip:
@@ -2490,3 +2490,4 @@ proc runCodeFiles*(env: var Env, variables: var Variables, codeList: seq[string]
   for filename in codeList:
     runCodeFile(env, variables, filename)
     resetVariables(variables)
+

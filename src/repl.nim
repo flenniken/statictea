@@ -67,7 +67,7 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
     let statement = newStatement(line[runningPos .. ^1], 1)
 
     let loopControl = runStatementAssignVar(env, statement, variables,
-      "repl.tea", inOther)
+      "repl.tea")
     if loopControl == lcStop:
       return true
     return false
