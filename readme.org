@@ -1,6 +1,6 @@
 #+TITLE: StaticTea
 
-[[docs/teapotlogo.png]]
+[[docs/teapotlogo.svg]]
 
 A template processor and language.
 

@@ -1,6 +1,6 @@
 # Statictea Functions
 
-<img src="teapotlogo.svg" width="150" height="90" />
+[![teapot](teapotlogo.svg)](#)
 
 The built-in Statictea functions.
 
