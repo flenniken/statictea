@@ -452,7 +452,7 @@ You can continue a long statement on the next line by using a "+"
 character at the end.
 
 You can have a bare if function on a statement and a few other
-exceptions, see special forms [[#special-forms][Special Forms].
+exceptions, see special forms [[#special-forms][Special Forms]].
 
 [[#contents][茶]]
 
@@ -640,6 +640,16 @@ cannot change an existing variable.
 A dot name is a fully qualified variable name where variables are
 connected with dots. It is limited to 64 characters.
 
+Example dot names:
+
+#+BEGIN_SRC
+t.repeat
+s.name
+d.path.filename
+f.cmp
+entry.name
+#+END_SRC
+
 You can leave off the “l” prefix from your non-function local
 variables, they are assumed to be in the local dictionary.
 
@@ -742,7 +752,7 @@ dictionary.
 The local variables are cleared and recalculated for each
 iteration of a repeated block.
 
-Inside a user define function there is another local (l)
+Inside a user defined function there is another local (l)
 dictionary used for its local variables and parameters.
 
 Examples:
@@ -762,7 +772,8 @@ l.tea = "earl grey"
 
 You create code variables with statements in code files. Code
 files are good for sharing common template variables between
-templates. The variables go in the o dictionary.
+templates. The variables go in the o dictionary, see
+[[#code-files][Code Files]].
 
 [[#contents][茶]]
 
@@ -1704,11 +1715,8 @@ a = 5
 o.x = a + 6
 #+END_SRC
 
-The code files run after importing the JSON files so they have
-access to the server variables.
-
-The maximum line length is 1024 bytes.  An ending plus sign
-continues a long statement on the next line.
+Like template commands, the maximum line length is 1024 bytes and
+an ending plus sign continues a long statement on the next line.
 
 [[#contents][茶]]
 
@@ -1764,7 +1772,7 @@ str = "All the tea in China."
 
 The advantage of a multiline string over a regular string is no
 quoting of the newline and other special characters.  For example
-you can copy and past HTML directly into the code file then mark
+you can copy and paste HTML directly into the code file then mark
 variables in it:
 
 #+BEGIN_SRC
@@ -1799,7 +1807,8 @@ count = len(str)
 You can define your own functions in code files.
 
 User defined functions are important for sharing common code,
-looping and as callbacks for building lists and dictionaries.
+looping and as callbacks for building lists and dictionaries, see
+the listLoop function.
 
 In the following example we define a function called strNumCmp
 and assign the result to the mycmp function variable. The
@@ -1923,7 +1932,7 @@ The StaticTea command line options:
 - server -- a server json file. You can specify multiple server
   options.
 - code -- a shared code file. You can specify multiple shared
-  options.
+  options, see [[#code-files][Code Files]].
 - template -- the template file, or "stdin" for input from
   standard input.
 - result -- the result file. When not specified, standard out is
@@ -1993,7 +2002,6 @@ template.
 - [[#html-formatted-json][HTML Formatted Json]]
 - [[#nimble-tasks][Nimble Tasks]]
 - [[#stf-runner][Stf Runner]]
-- [[#example-templates][Example Templates]]
 - [[#repl-environment][REPL Environment]]
 - [[#docker-development][Docker Development]]
 - [[#mac-development][Mac Development]]
@@ -2270,13 +2278,13 @@ Below are the list of special functions and how the deviate from
 the normal form:
 
 - list - takes any number of arguments
-- if - conditionally evaluates its arguments and it has a bare no
-  return value option, see [[#if-functions][If Functions]]
+- if - conditionally evaluates its arguments and it has a bare form, see [[#if-functions][If Functions]]
 - and — conditionally evaluates its arguments
 - or — conditionally evaluates its arguments
-- warn — exits the statement like a normal warning with no return value
-- return - exits the command block or function with a return value
-- log - writes a message to the log file
+- warn — exits the statement with a warning and has a bare form
+- return - exits the command block or function with a return
+  value and has a bare form
+- log - writes a message to the log file and has a bare form
 - func - defines a function, see [[#user-functions][User Functions]]
 
 If the form doesn't have an assignment it's called a bare
@@ -2289,6 +2297,7 @@ v = list(1,2,3,4,5,6,7)
 v = if(b, 5, 6)
 if(c, warn(“abc”))
 if(c, return(“abc”))
+newList &= if( (x > 5), value)
 v = and(c, d)
 v = or(c, d)
 warn(“the tea is hot”)
@@ -2534,20 +2543,6 @@ The stf files are designed to look good in markdown readers.  The
 testfiles folder contains [[testfiles/stf-index.md][StaticTea Stf Files]].
 
 See the runner help message for more information about stf files.
-
-[[#contents][茶]]
-
-** Example Templates
-:PROPERTIES:
-   :CUSTOM_ID: example-templates
-   :END:
-
-You can examine simple self contained statictea templates
-in the testfiles folder.
-
-- [[testfiles/stf-index.md][StaticTea Stf Files]] --- Index to the stf files.
-
-The [[#docs-and-templates][Module Docs]] section has more real world examples.
 
 [[#contents][茶]]
 
