@@ -393,19 +393,19 @@ side.
 The operator is an equal sign or an "&=". The equal sign appends
 to a dictionary and the &= appends to a list.
 
-The right hand side is either a variable, a string, a
-number, a list or a boolean expression.
+The right hand side is either a variable, string, number, list,
+boolean expression or a function.
 
 Here are a few example statements:
 
 #+BEGIN_SRC
 tea = "Earl Grey"
 num = 5
-t.repeat = 2
+t.repeat = len(tealist)
+numList = [1, 2, 3]
+flag = (s.name > 20)
+name = s.firstName
 b &= 3
-nums = [1, 2, 3]
-nameLen = len(s.name)
-name = concat(substr(s.name, 0, 7), "...")
 #+END_SRC
 
 Statements are allowed on the nextline, block, continue and
@@ -422,9 +422,9 @@ Statements are executed from top to bottom. You can use the warn
 function to exit a statement early and use the return function to
 exit a command early.
 
-You can loop at the replacement block level and run the command's
-statements multiple times using t.repeat, and vary the output using
-t.row. Here is an example that loops three times and outputs 0, 1, 2.
+You can repeat the replacement block and vary the output using
+t.row. Below is an example that repeats the block three times and
+outputs 0, 1, 2:
 
 template:
 
@@ -451,8 +451,8 @@ statement is skipped.
 You can continue a long statement on the next line by using a "+"
 character at the end.
 
-You can have a bare if function on a statement which is an
-exception to the rule, see [[#if-functions][If Functions]].
+You can have a bare if function on a statement and a few other
+exceptions, see special forms [[#special-forms][Special Forms].
 
 [[#contents][茶]]
 
@@ -552,7 +552,6 @@ You can have blank statements that do nothing.
 #+BEGIN_SRC
 $$ nextline
 $$ :
-$$ : a = 5
 $$ : # comment
 #+END_SRC
 
@@ -563,8 +562,7 @@ $$ : # comment
 :CUSTOM_ID: variables
 :END:
 
-You use variables to add variable content to your template in its
-replacement blocks.
+You use variables to add variable content to replacement blocks.
 
 A string variable gets replaced with its value, a function
 variable with its name, and the other variable types get replaced
@@ -603,15 +601,38 @@ limited to a total of 64 ASCII characters.
 Some single letters are reserved for important dictionaries, see
 the next section.
 
+Example variable names:
+
 #+BEGIN_SRC
-a = 5
-last-letter = "z"
-last_letter = "z"
-nameLen = len(s.name)
+a
+tea-type
+first_name
+nameLen
+b5
 #+END_SRC
 
-Local variables and writable tea variables are cleared after
-processing each replacement block.
+Each iteration of a replacement block starts fresh.  Local
+variables and some tea variables are undefined before processing
+the next replacement block. The t.repeat and t.row variables are
+exceptions since they control the loop.
+
+In the next example the name variable gets defined differently
+for each iteration based on t.row.
+
+#+BEGIN_SRC
+$$ nextline
+$$ : t.repeat = 3
+$$ : name = format(“a{t.row}”)
+{name}
+#+END_SRC
+
+Output:
+
+#+BEGIN_SRC
+a0
+a1
+a2
+#+END_SRC
 
 You can append a new variable to a list or dictionary but you
 cannot change an existing variable.
@@ -622,11 +643,10 @@ connected with dots. It is limited to 64 characters.
 You can leave off the “l” prefix from your non-function local
 variables, they are assumed to be in the local dictionary.
 
+Equivalent statements:
+
 #+BEGIN_SRC
 a = 5
-
-same as:
-
 l.a = 5
 #+END_SRC
 
@@ -634,11 +654,10 @@ You can leave off the “f” prefix from built-in functions you
 call, they are assumed to be in the function dictionary.  A
 function call is a variable followed by a left parentheses.
 
+Equivalent statements:
+
 #+BEGIN_SRC
 rt = cmp(a, b)
-
-same as:
-
 rt = f.cmp(a, b)
 #+END_SRC
 
