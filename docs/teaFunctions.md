@@ -1,5 +1,7 @@
 # Statictea Functions
 
+<img src="teapotlogo.svg" width="150" height="90" />
+
 The built-in Statictea functions.
 
 Functions allow you to format variables for presentation in a
