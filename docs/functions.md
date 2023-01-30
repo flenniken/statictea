@@ -60,7 +60,6 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [fun_sort_lsosl](#fun_sort_lsosl) &mdash; Sort a list of values of the same type.
 * [fun_sort_lssil](#fun_sort_lssil) &mdash; Sort a list of lists.
 * [fun_sort_lsssl](#fun_sort_lsssl) &mdash; Sort a list of dictionaries.
-* [fun_githubAnchor_ss](#fun_githubanchor_ss) &mdash; Create a Github anchor name from a heading name.
 * [fun_githubAnchor_ll](#fun_githubanchor_ll) &mdash; Create Github anchor names from heading names.
 * [fun_type_as](#fun_type_as) &mdash; Return the parameter type, one of: int, float, string, list, dict, bool or func.
 * [fun_joinPath_loss](#fun_joinpath_loss) &mdash; Join the path components with a path separator.
@@ -1329,35 +1328,6 @@ sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 func fun_sort_lsssl(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# fun_githubAnchor_ss
-
-Create a Github anchor name from a heading name. Use it for Github markdown internal links. If you have duplicate heading names, the anchor name returned only works for the first. Punctuation characters are removed so you can get duplicates in some cases.
-
-~~~
-githubAnchor(name: string) string
-~~~
-
-Examples:
-
-~~~
-githubAnchor("MyHeading") => "myheading"
-githubAnchor("Eary Gray") => "eary-gray"
-githubAnchor("$Eary-Gray#") => "eary-gray"
-~~~
-
-Example in a markdown template:
-
-~~~
-$$ : anchor = githubAnchor(entry.name)
-* {type]{{entry.name}](#{anchor}) &mdash; {short}
-...
-# {entry.name}
-~~~
-
-```nim
-func fun_githubAnchor_ss(variables: Variables; arguments: seq[Value]): FunResult
-```
-
 # fun_githubAnchor_ll
 
 Create Github anchor names from heading names. Use it for Github markdown internal links. It handles duplicate heading names.
@@ -2378,13 +2348,13 @@ dict() =>
 Dynamically generated array of starting line numbers for each built-in function in the functions.nim file.
 
 ```nim
-functionStarts = [602, 579, 2377, 1083, 728, 761, 258, 237, 279, 805, 312, 1232,
-                  1193, 2448, 2429, 2467, 673, 1120, 849, 892, 866, 2246, 2280,
-                  2301, 429, 387, 1856, 1822, 2563, 2544, 2601, 2582, 467, 532,
-                  947, 982, 1024, 1991, 1950, 1584, 368, 349, 331, 1269, 1295,
-                  2061, 1565, 2639, 2620, 2678, 2658, 2506, 2487, 2525, 2359,
-                  2403, 1510, 2698, 1341, 1451, 2085, 1158, 1731, 1764, 1793,
-                  2336, 2136, 2222, 648, 625, 1897, 1608, 2036]
+functionStarts = [602, 579, 2343, 1083, 728, 761, 258, 237, 279, 805, 312, 1232,
+                  1193, 2414, 2395, 2433, 673, 1120, 849, 892, 866, 2212, 2246,
+                  2267, 429, 387, 1822, 2529, 2510, 2567, 2548, 467, 532, 947,
+                  982, 1024, 1957, 1916, 1584, 368, 349, 331, 1269, 1295, 2027,
+                  1565, 2605, 2586, 2644, 2624, 2472, 2453, 2491, 2325, 2369,
+                  1510, 2664, 1341, 1451, 2051, 1158, 1731, 1764, 1793, 2302,
+                  2102, 2188, 648, 625, 1863, 1608, 2002]
 ```
 
 # getBestFunction

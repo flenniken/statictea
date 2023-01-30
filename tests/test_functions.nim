@@ -96,9 +96,11 @@ proc testLower(str: string, eStr: string): bool =
     result = testFunction("lower", arguments, eFunResult)
 
 proc testAnchor(str: string, eStr: string): bool =
-    var arguments = @[newValue(str)]
-    let eFunResult = newFunResult(newValue(eStr))
-    result = testFunction("githubAnchor", arguments, eFunResult)
+  let listVar = newValue(@[str])
+  var arguments = @[listVar]
+  let eListVar = newValue(@[eStr])
+  let eFunResult = newFunResult(eListVar)
+  result = testFunction("githubAnchor", arguments, eFunResult)
 
 proc testGetBestFunctionExists(functionName: string, arguments: seq[Value],
     eSignatureCode: string): bool =
@@ -1476,20 +1478,6 @@ suite "functions.nim":
     let eStr = "zwölf-boxkämpfer-jagten-eva-quer-über-den-sylter-deich"
     # (= Twelve boxing fighters hunted Eva across the dike of Sylt)
     check testAnchor(str, eStr)
-
-  test "githubAnchor signatures":
-    check testAnchor("funSort_lsssl", "funsort_lsssl")
-    check testAnchor("sort_lsssl", "sort_lsssl")
-
-  test "githubAnchor: wrong number of arguments":
-    var arguments: seq[Value] = @[]
-    let eFunResult = newFunResultWarn(wNoneMatchedFirst, 0, "2")
-    check testFunction("githubAnchor", arguments, eFunResult)
-
-  test "githubAnchor: wrong kind of parameter":
-    var arguments: seq[Value] = @[newValue(2)]
-    let eFunResult = newFunResultWarn(wNoneMatchedFirst, 0, "2")
-    check testFunction("githubAnchor", arguments, eFunResult)
 
   test "githubAnchor list":
     let list = newValue(["Tea", "Water", "tea"])

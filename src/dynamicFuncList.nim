@@ -534,31 +534,6 @@ githubAnchor(list) =>
 ~~~
 """
 
-  dc_fun_githubAnchor_ss = """
-Create a Github anchor name from a heading name. Use it for Github markdown internal links. If you have duplicate heading names, the anchor name returned only works for the first. Punctuation characters are removed so you can get duplicates in some cases.
-
-~~~
-githubAnchor(name: string) string
-~~~
-
-Examples:
-
-~~~
-githubAnchor("MyHeading") => "myheading"
-githubAnchor("Eary Gray") => "eary-gray"
-githubAnchor("$Eary-Gray#") => "eary-gray"
-~~~
-
-Example in a markdown template:
-
-~~~
-$$ : anchor = githubAnchor(entry.name)
-* {type]{{entry.name}](#{anchor}) &mdash; {short}
-...
-# {entry.name}
-~~~
-"""
-
   dc_fun_gt_ffb = """
 Return true when one float is greater than another float.
 
@@ -1627,7 +1602,6 @@ warn("always warn")
     info("fun_get_dsoaa", dc_fun_get_dsoaa, 38),
     info("fun_get_lioaa", dc_fun_get_lioaa, 42),
     info("fun_githubAnchor_ll", dc_fun_githubAnchor_ll, 41),
-    info("fun_githubAnchor_ss", dc_fun_githubAnchor_ss, 34),
     info("fun_gt_ffb", dc_fun_gt_ffb, 19),
     info("fun_gt_iib", dc_fun_gt_iib, 19),
     info("fun_gte_ffb", dc_fun_gte_ffb, 19),
@@ -1684,7 +1658,7 @@ warn("always warn")
   functionStarts* = [
     602,
     579,
-    2377,
+    2343,
     1083,
     728,
     761,
@@ -1695,66 +1669,65 @@ warn("always warn")
     312,
     1232,
     1193,
-    2448,
-    2429,
-    2467,
+    2414,
+    2395,
+    2433,
     673,
     1120,
     849,
     892,
     866,
+    2212,
     2246,
-    2280,
-    2301,
+    2267,
     429,
     387,
-    1856,
     1822,
-    2563,
-    2544,
-    2601,
-    2582,
+    2529,
+    2510,
+    2567,
+    2548,
     467,
     532,
     947,
     982,
     1024,
-    1991,
-    1950,
+    1957,
+    1916,
     1584,
     368,
     349,
     331,
     1269,
     1295,
-    2061,
+    2027,
     1565,
-    2639,
-    2620,
-    2678,
-    2658,
-    2506,
-    2487,
-    2525,
-    2359,
-    2403,
+    2605,
+    2586,
+    2644,
+    2624,
+    2472,
+    2453,
+    2491,
+    2325,
+    2369,
     1510,
-    2698,
+    2664,
     1341,
     1451,
-    2085,
+    2051,
     1158,
     1731,
     1764,
     1793,
-    2336,
-    2136,
-    2222,
+    2302,
+    2102,
+    2188,
     648,
     625,
-    1897,
+    1863,
     1608,
-    2036,
+    2002,
   ]
     ## Dynamically generated array of starting line numbers for each
     ## built-in function in the functions.nim file.

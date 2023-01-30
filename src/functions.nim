@@ -1819,40 +1819,6 @@ func fun_sort_lsssl*(variables: Variables, arguments: seq[Value]): FunResult =
   tMapParameters("sort", "lsssl")
   result = generalSort(map)
 
-func fun_githubAnchor_ss*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Create a Github anchor name from a heading name. Use it for
-  ## Github markdown internal links. If you have duplicate heading
-  ## names, the anchor name returned only works for the
-  ## first. Punctuation characters are removed so you can get
-  ## duplicates in some cases.
-  ## @:
-  ## @:~~~
-  ## @:githubAnchor(name: string) string
-  ## @:~~~~
-  ## @:
-  ## @:Examples:
-  ## @:
-  ## @:~~~
-  ## @:githubAnchor("MyHeading") => "myheading"
-  ## @:githubAnchor("Eary Gray") => "eary-gray"
-  ## @:githubAnchor("$Eary-Gray#") => "eary-gray"
-  ## @:~~~~
-  ## @:
-  ## @:Example in a markdown template:
-  ## @:
-  ## @:~~~
-  ## @:$$ : anchor = githubAnchor(entry.name)
-  ## @:* {type}@{{entry.name}](#{anchor}) &mdash; {short}
-  ## @:...
-  ## @:# {entry.name}
-  ## @:~~~~
-
-  tMapParameters("gethubAnchor", "ss")
-
-  let name = map["a"].stringv
-  let anchorName = githubAnchor(name)
-  result = newFunResult(newValue(anchorName))
-
 func fun_githubAnchor_ll*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create Github anchor names from heading names. Use it for Github
   ## markdown internal links. It handles duplicate heading names.
@@ -2747,7 +2713,6 @@ functionsDict["fun_functionDetails_pd"] = fun_functionDetails_pd
 functionsDict["fun_get_dsoaa"] = fun_get_dsoaa
 functionsDict["fun_get_lioaa"] = fun_get_lioaa
 functionsDict["fun_githubAnchor_ll"] = fun_githubAnchor_ll
-functionsDict["fun_githubAnchor_ss"] = fun_githubAnchor_ss
 functionsDict["fun_gt_ffb"] = fun_gt_ffb
 functionsDict["fun_gt_iib"] = fun_gt_iib
 functionsDict["fun_gte_ffb"] = fun_gte_ffb

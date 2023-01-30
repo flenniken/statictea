@@ -37,7 +37,6 @@ variable or pass to another function.
 * [get](#get) &mdash; Get a dictionary value by its key.
 * [get](#get-1) &mdash; Get a list value by its index.
 * [githubAnchor](#githubanchor) &mdash; Create Github anchor names from heading names.
-* [githubAnchor](#githubanchor-1) &mdash; Create a Github anchor name from a heading name.
 * [gt](#gt) &mdash; Return true when one float is greater than another float.
 * [gt](#gt-1) &mdash; Return true when an int is greater then another int.
 * [gte](#gte) &mdash; Return true when a float is greater than or equal to another float.
@@ -639,32 +638,6 @@ Examples:
 list = list("Tea", "Water", "Tea")
 githubAnchor(list) =>
   ["tea", "water", "tea-1"]
-~~~
-
-
-# githubAnchor
-
-Create a Github anchor name from a heading name. Use it for Github markdown internal links. If you have duplicate heading names, the anchor name returned only works for the first. Punctuation characters are removed so you can get duplicates in some cases.
-
-~~~
-githubAnchor(name: string) string
-~~~
-
-Examples:
-
-~~~
-githubAnchor("MyHeading") => "myheading"
-githubAnchor("Eary Gray") => "eary-gray"
-githubAnchor("$Eary-Gray#") => "eary-gray"
-~~~
-
-Example in a markdown template:
-
-~~~
-$$ : anchor = githubAnchor(entry.name)
-* {type]{{entry.name}](#{anchor}) &mdash; {short}
-...
-# {entry.name}
 ~~~
 
 
