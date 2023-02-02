@@ -726,6 +726,11 @@ func getString*(statement: Statement, start: Natural): ValuePosSiOr =
   ## parameter is the index of the first quote in the statement and
   ## the return position is after the optional trailing white space
   ## following the last quote.
+  ## @:
+  ## @:~~~
+  ## @:var = "hello" # asdf
+  ## @:      ^       ^
+  ## @:~~~~
 
   let str = statement.text
 
@@ -1911,6 +1916,55 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
     result = getFunctionValuePosSi(env, $specialFunction, start,
       statement, runningPos, variables, listCase=false)
 
+proc getBracketDotName*(env: var Env, statement: Statement, start: Natural,
+    variables: Variables, leftName: VariableName): ValuePosSiOr =
+  ## Convert var[key] to a dot name.
+  ## @:
+  ## @:~~~
+  ## @:key = "hello"
+  ## @:name[key] = 20
+  ## @:^         ^
+  ## @:=> name.hello, pos
+  ## @:
+  ## @:name["hello"] = 20
+  ## @:^             ^
+  ## @:~~~~
+
+  # Get the index name.
+  var runningPos = leftName.pos
+  var indexName: string
+  let indexVarNameOr = getVariableName(statement.text, runningPos)
+  if indexVarNameOr.isMessage:
+    # Not a variable name, Look for a string literal.
+    let valuePosSiOr = getString(statement, runningPos)
+    if valuePosSiOr.isMessage:
+      # The index value must be a variable name or literal string.
+      return newValuePosSiOr(wInvalidIndexValue, "", runningPos)
+    runningPos = valuePosSiOr.value.pos
+    indexName = valuePosSiOr.value.value.stringv
+  else:
+    let indexVarName = indexVarNameOr.value
+    if indexVarName.kind != vnkNormal:
+      # The index value must be a variable name or literal string.
+      return newValuePosSiOr(wInvalidIndexValue, "", runningPos)
+    runningPos = indexVarName.pos
+    indexName = indexVarName.dotName
+
+  # Concatenate the left name and the index name to make the dot name.
+  let dotName = "$1.$2" % [leftName.dotName, indexName]
+  if dotName.len > maxNameLength:
+    # A variable and dot name are limited to 64 characters.
+    return newValuePosSiOr(wVarMaximumLength, "", runningPos)
+
+  # Match ] and trailing whitespace.
+  let rightBracketO = matchSymbol(statement.text, gRightBracket, runningPos)
+  if not rightBracketO.isSome:
+    # Missing right bracket.
+    return newValuePosSiOr(wMissingRightBracket, "", runningPos)
+  runningPos += rightBracketO.get().length
+
+  result = newValuePosSiOr(newValue(dotName), runningPos)
+
 proc runStatement*(env: var Env, statement: Statement, variables: Variables): VariableDataOr =
   ## Run one statement and return the variable dot name string,
   ## operator and value.
@@ -1932,7 +1986,6 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
 
   var vlOr: ValuePosSiOr
   var operator = opIgnore
-  var operatorLength = 0
   var finalLeftName = leftName.dotName
 
   case leftName.kind
@@ -1943,29 +1996,34 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
     if vlOr.isMessage:
       return newVariableDataOr(vlOr.message)
     finalLeftName = ""
-  of vnkGet:
-    # You cannot use bracket notation to change a variable.
-    return newVariableDataOr(wLeftHandBracket)
-  of vnkNormal:
+  of vnkGet, vnkNormal:
+    if leftName.kind == vnkGet:
+      # Get the dotname of name[index] => name.index
+      let dotNameOr = getBracketDotName(env, statement, runningPos, variables, leftName)
+      if dotNameOr.isMessage:
+        return newVariableDataOr(dotNameOr.message)
+      finalLeftName = dotNameOr.value.value.stringv
+      runningPos = dotNameOr.value.pos
+    else:
+      runningPos = leftName.pos
+
     # Handle normal "varName operator right" statements.
 
     # Get the equal sign or &= and the following whitespace.
-    let operatorO = matchEqualSign(statement.text, leftName.pos)
+    let operatorO = matchEqualSign(statement.text, runningPos)
     if not operatorO.isSome:
       # Missing operator, = or &=.
-      return newVariableDataOr(wInvalidVariable, "", leftName.pos)
+      return newVariableDataOr(wInvalidVariable, "", runningPos)
     let match = operatorO.get()
     let op = match.getGroup()
     if op == "=":
       operator = opEqual
     else:
       operator = opAppendList
-
-    operatorLength = match.length
+    runningPos = runningPos + match.length
 
     # Get the right hand side value and match the following whitespace.
-    vlOr = getValuePosSi(env, statement,
-      leftName.pos + operatorLength, variables)
+    vlOr = getValuePosSi(env, statement, runningPos, variables)
 
   if vlOr.isMessage:
     return newVariableDataOr(vlOr.message)
@@ -2490,4 +2548,3 @@ proc runCodeFiles*(env: var Env, variables: var Variables, codeList: seq[string]
   for filename in codeList:
     runCodeFile(env, variables, filename)
     resetVariables(variables)
-

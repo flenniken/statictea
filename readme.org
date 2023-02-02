@@ -1364,6 +1364,22 @@ d => {
 }
 #+END_SRC
 
+You can also append to a dictionary using bracket notation on the
+left hand side. The index is a variable name or a literal
+string. For example:
+
+#+BEGIN_SRC
+d = dict()
+d["one"] = 1
+key2 = "two"
+d[key2] = 2
+
+d => {
+  "one": 1,
+  "two": 2
+}
+#+END_SRC
+
 [[#contents][茶]]
 
 ** List Type

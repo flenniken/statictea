@@ -276,6 +276,7 @@ type
     wImmutableDict,        ## w261
     wImmutableList,        ## w262
     wNewListInDict,        ## w263
+    wInvalidIndexValue,    ## w264
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -543,6 +544,7 @@ const
     "You cannot assign to an immutable dictionary.", ## wImmutableDict
     "You cannot append to an immutable list.", ## wImmutableList
     "You cannot create a new list element in the immutable dictionary.", ## wNewListInDict
+    "The index value must be a variable name or literal string.", ## wInvalidIndexValue
     ]
 
     ## The message text.

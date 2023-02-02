@@ -3245,3 +3245,33 @@ statement:   syntaxError == 5
     ]
     check testGetStatements2(content, expected)
 
+  test "left index literal":
+    let statement = newStatement(text="""var["a"] = 4""", lineNum=1)
+    let eVariableDataOr = newVariableDataOr("var.a", opEqual, newValue(4))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "left index variable":
+    let statement = newStatement(text="""var[a] = 4""", lineNum=1)
+    let eVariableDataOr = newVariableDataOr("var.a", opEqual, newValue(4))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "left index number":
+    let statement = newStatement(text="""var[5] = 4""", lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wInvalidIndexValue, "", 4)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "left index func":
+    let statement = newStatement(text="""var[len()] = 4""", lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wInvalidIndexValue, "", 4)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "left index bracket":
+    let statement = newStatement(text="""var[len[3]] = 4""", lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wInvalidIndexValue, "", 4)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "left index long name":
+    maxNameLength = 6
+    let statement = newStatement(text="""var[a23] = 4""", lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wVarMaximumLength, "", 7)
+    check testRunStatement(statement, eVariableDataOr)

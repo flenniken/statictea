@@ -284,7 +284,8 @@ MessageId = enum
   wNotFuncVariable,         ## w260
   wImmutableDict,           ## w261
   wImmutableList,           ## w262
-  wNewListInDict             ## w263
+  wNewListInDict,           ## w263
+  wInvalidIndexValue         ## w264
 ```
 
 # Messages
@@ -556,7 +557,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "The variable is not a function variable.", ## wNotFuncVariable
     "You cannot assign to an immutable dictionary.", ## wImmutableDict
     "You cannot append to an immutable list.", ## wImmutableList
-    "You cannot create a new list element in the immutable dictionary."]
+    "You cannot create a new list element in the immutable dictionary.", ## wNewListInDict
+    "The index value must be a variable name or literal string."]
 ```
 
 # WarningData

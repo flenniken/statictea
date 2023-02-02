@@ -59,6 +59,7 @@ Run a command and fill in the variables dictionaries.
 * [listLoop](#listloop) &mdash; Make a new list from an existing list.
 * [getValuePosSi](#getvaluepossi) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
 * [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, if0, return, warn and log.
+* [getBracketDotName](#getbracketdotname) &mdash; Convert var[key] to a dot name.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [skipSpaces](#skipspaces) &mdash; 
 * [callUserFunction](#calluserfunction) &mdash; Run the given user function.
@@ -452,6 +453,11 @@ func getMultilineStr(text: string; start: Natural): ValuePosSiOr
 
 Return a literal string value and position after it. The start parameter is the index of the first quote in the statement and the return position is after the optional trailing white space following the last quote.
 
+~~~
+var = "hello" # asdf
+      ^       ^
+~~~
+
 ```nim
 func getString(statement: Statement; start: Natural): ValuePosSiOr
 ```
@@ -668,6 +674,25 @@ return(5)
 ```nim
 proc runBareFunction(env: var Env; statement: Statement; start: Natural;
                      variables: Variables; leftName: VariableName): ValuePosSiOr
+```
+
+# getBracketDotName
+
+Convert var[key] to a dot name.
+
+~~~
+key = "hello"
+name[key] = 20
+^         ^
+=> name.hello, pos
+
+name["hello"] = 20
+^             ^
+~~~
+
+```nim
+proc getBracketDotName(env: var Env; statement: Statement; start: Natural;
+                       variables: Variables; leftName: VariableName): ValuePosSiOr
 ```
 
 # runStatement
