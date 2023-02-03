@@ -1264,7 +1264,7 @@ func fun_dict_old*(variables: Variables, arguments: seq[Value]): FunResult =
       dict[key.stringv] = value
 
   # todo: should be restrict mutable to empty dicts?
-  result = newFunResult(newValue(dict, mutable = true))
+  result = newFunResult(newValue(dict, mutable = Mutable.append))
 
 func fun_list_al*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a list of variables. You can also create a list with brackets.
@@ -1285,12 +1285,7 @@ func fun_list_al*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:a = [1, 2, 3]
   ## @:a = ["a", 5, "b"]
   ## @:~~~~
-  # todo: should be restrict mutable to empty lists?
-  # if arguments.len == 0:
-  #   result = newFunResult(newValue(arguments, mutable = true))
-  # else:
-  #   result = newFunResult(newValue(arguments))
-  result = newFunResult(newValue(arguments, mutable = true))
+  result = newFunResult(newValue(arguments, mutable = Mutable.append))
 
 func fun_listLoop_llpoab*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a new list from a list and a callback function. The callback

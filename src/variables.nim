@@ -99,8 +99,8 @@ func startVariables*(server: VarsDict = nil, args: VarsDict = nil,
   # The g dictionary starts out immutable and becomes mutable after
   # the code files run and visa-versa for the o dictionary.
   result["g"] = newValue(newVarsDict())
-  result["l"] = newValue(newVarsDict(), mutable = true)
-  result["o"] = newValue(newVarsDict(), mutable = true)
+  result["l"] = newValue(newVarsDict(), mutable = Mutable.append)
+  result["o"] = newValue(newVarsDict(), mutable = Mutable.append)
 
   if server == nil:
     result["s"] = newValue(newVarsDict())
@@ -115,7 +115,7 @@ func startVariables*(server: VarsDict = nil, args: VarsDict = nil,
     tea["args"] = newValue(args)
   tea["row"] = newValue(0)
   tea["version"] = newValue(staticteaVersion)
-  result["t"] = newValue(tea, mutable = true)
+  result["t"] = newValue(tea, mutable = Mutable.append)
 
 func getTeaVarIntDefault*(variables: Variables, varName: string): int64 =
   ## Return the int value of one of the tea dictionary integer
@@ -168,7 +168,7 @@ proc resetVariables*(variables: var Variables) =
       if teaVar in tea:
         tea.del(teaVar)
 
-  variables["l"] = newValue(newVarsDict(), mutable = true)
+  variables["l"] = newValue(newVarsDict(), mutable = Mutable.append)
 
 proc getParentDictToAddTo(variables: Variables, dotNameList: openArray[string]):
     ValueOr =
@@ -290,14 +290,14 @@ proc assignVariable*(
   of "t":
     return assignTeaVariable(variables, dotNameStr, value, operator)
   of "o":
-    if not variables["o"].dictv.mutable:
+    if variables["o"].dictv.mutable == Mutable.immutable:
       # You can only change code variables (o dictionary) in code files.
       return some(newWarningData(wReadOnlyCodeVars))
   of "s":
     # You cannot overwrite the server variables.
     return some(newWarningData(wReadOnlyDictionary))
   of "g":
-    if not variables["g"].dictv.mutable:
+    if variables["g"].dictv.mutable == Mutable.immutable:
       # You can only change global variables (g dictionary) in template files.
       return some(newWarningData(wNoGlobalInCodeFile))
   of "l":
@@ -337,7 +337,7 @@ proc assignVariable*(
       # You cannot assign to an existing variable.
       return some(newWarningData(wImmutableVars))
 
-    if not valueOr.value.dictv.mutable:
+    if valueOr.value.dictv.mutable == Mutable.immutable:
       # You cannot assign to an immutable dictionary.
       return some(newWarningData(wImmutableDict))
 
@@ -350,19 +350,19 @@ proc assignVariable*(
     # If the variable doesn't exists, create an empty list.
     if not (lastName in valueOr.value.dictv.dict):
       # Make sure the parent element is mutable.
-      if not valueOr.value.dictv.mutable:
+      if valueOr.value.dictv.mutable == Mutable.immutable:
         # You cannot create a new list element in the immutable dictionary.
         return some(newWarningData(wNewListInDict))
 
       # Create a new list dictionary element.
-      valueOr.value.dictv.dict[lastName] = newEmptyListValue(mutable = true)
+      valueOr.value.dictv.dict[lastName] = newEmptyListValue(mutable = Mutable.append)
 
     let lastComponent = valueOr.value.dictv.dict[lastName]
     if lastComponent.kind != vkList:
       # You can only append to a list, got $1.
       return some(newWarningData(wAppendToList, $lastComponent.kind))
 
-    if not lastComponent.listv.mutable:
+    if lastComponent.listv.mutable == Mutable.immutable:
       # You cannot append to an immutable list.
       return some(newWarningData(wImmutableList))
 

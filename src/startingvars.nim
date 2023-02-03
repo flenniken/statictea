@@ -67,5 +67,5 @@ proc getStartVariables*(env: var Env, args: Args): Variables =
   runCodeFiles(env, result, args.codeList)
 
   # Make the o dictionary immutable and the g dictionary mutable.
-  result["o"].dictv.mutable = false
-  result["g"].dictv.mutable = true
+  result["o"].dictv.mutable = Mutable.immutable
+  result["g"].dictv.mutable = Mutable.append

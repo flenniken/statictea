@@ -80,7 +80,7 @@ proc testGetValuePosSi(
     start: Natural,
     eValuePosSiOr: ValuePosSiOr,
     variables: Variables = nil,
-    mutable: bool = false,
+    mutable = Mutable.immutable,
     eLogLines: seq[string] = @[],
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[]
@@ -119,7 +119,7 @@ proc testGetValuePosSi(
     ePos: Natural,
     eJson: string,
     variables: Variables = nil,
-    mutable: bool = false,
+    mutable = Mutable.immutable,
   ): bool =
   let statement = newStatement(text)
   let eValue = readJsonString(eJson, mutable)
@@ -1759,27 +1759,27 @@ White$1
   test "getValuePosSi and skip":
     # var valueOr = readJsonString("{b:1,c:2}")
     let statements = [
-      ("""a = 5 # number""", 4, 6, "5", false),
-      ("""a = "abc" # string""", 4, 10, """"abc"""", false),
-      ("""a = [1,2,3] # list""", 4, 12, "[1,2,3]", true),
-      ("""a = dict(["b", 1,"c", 2]) # dict""", 4, 26, """{"b":1,"c":2}""", true),
-      ("""a = len("3") # var""", 4, 13, "1", false),
-      ("""a = (3 < 5) # var""", 4, 12, "true", false),
-      ("""a = t.row # variable""", 4, 10, "0", false),
-      ("""a = if( (1 < 2), 3, 4) # if a""", 4, 23, "3", false),
-      ("""a = if( bool(len("tea")), 22, 33) # if b""", 4, 34, "22", false),
-      ("""a = if( bool(len("tea")), 22, 33) # if c""", 8, 24, "true", false),
-      ("""a = if( bool(len("tea")), 22, 33) # if d""", 13, 23, "3", false),
-      ("""a = if( bool(len("tea")), 22, 33) # if e""", 17, 22, """"tea"""", false),
-      ("""a = if( bool(len("tea")), 22, 33) # if f""", 26, 28, "22", false),
-      ("""a = if( bool(len("tea")), 22, 33) # if g""", 30, 32, "33", false),
+      ("""a = 5 # number""", 4, 6, "5", Mutable.immutable),
+      ("""a = "abc" # string""", 4, 10, """"abc"""", Mutable.immutable),
+      ("""a = [1,2,3] # list""", 4, 12, "[1,2,3]", Mutable.append),
+      ("""a = dict(["b", 1,"c", 2]) # dict""", 4, 26, """{"b":1,"c":2}""", Mutable.append),
+      ("""a = len("3") # var""", 4, 13, "1", Mutable.immutable),
+      ("""a = (3 < 5) # var""", 4, 12, "true", Mutable.immutable),
+      ("""a = t.row # variable""", 4, 10, "0", Mutable.immutable),
+      ("""a = if( (1 < 2), 3, 4) # if a""", 4, 23, "3", Mutable.immutable),
+      ("""a = if( bool(len("tea")), 22, 33) # if b""", 4, 34, "22", Mutable.immutable),
+      ("""a = if( bool(len("tea")), 22, 33) # if c""", 8, 24, "true", Mutable.immutable),
+      ("""a = if( bool(len("tea")), 22, 33) # if d""", 13, 23, "3", Mutable.immutable),
+      ("""a = if( bool(len("tea")), 22, 33) # if e""", 17, 22, """"tea"""", Mutable.immutable),
+      ("""a = if( bool(len("tea")), 22, 33) # if f""", 26, 28, "22", Mutable.immutable),
+      ("""a = if( bool(len("tea")), 22, 33) # if g""", 30, 32, "33", Mutable.immutable),
       #   0123456789 123456789 123456789 123456789 1234
-      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if h""", 4, 41, "22", false),
-      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if i""", 8, 29, "true", false),
-      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if j""", 14, 27, "3", false),
-      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if k""", 19, 25, """"tea"""", false),
-      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if l""", 31, 34, "22", false),
-      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if m""", 36, 39, "33", false),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if h""", 4, 41, "22", Mutable.immutable),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if i""", 8, 29, "true", Mutable.immutable),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if j""", 14, 27, "3", Mutable.immutable),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if k""", 19, 25, """"tea"""", Mutable.immutable),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if l""", 31, 34, "22", Mutable.immutable),
+      ("""a = if( bool( len( "tea" ) ) , 22 , 33 ) # if m""", 36, 39, "33", Mutable.immutable),
       #   0123456789 123456789 123456789 123456789 1234
       #             10        20        30        40
     ]

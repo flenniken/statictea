@@ -76,7 +76,7 @@ proc testAssignVarFlex(
   # Populate the variables dictionary when there are inVars.
   var variables = startVariables()
   if inVars != "":
-    var valueOr = readJsonString(inVars, mutable = true)
+    var valueOr = readJsonString(inVars, mutable = Mutable.append)
     if valueOr.isMessage:
       echo $valueOr
       return false

@@ -21,7 +21,7 @@ else:
     maxDepth* = 16
       ## The maximum depth you can nest items.
 
-func jsonToValue*(jsonNode: JsonNode, depth: int = 0, mutable = false): ValueOr =
+func jsonToValue*(jsonNode: JsonNode, depth: int = 0, mutable = Mutable.immutable): ValueOr =
   ## Convert a Nim json node to a statictea value. The mutable
   ## variable determines whether lists and dictionaries are mutable.
 
@@ -70,7 +70,7 @@ func jsonToValue*(jsonNode: JsonNode, depth: int = 0, mutable = false): ValueOr 
     value = newValue(list, mutable)
   result = newValueOr(value)
 
-func readJsonStream*(stream: Stream, mutable = false): ValueOr =
+func readJsonStream*(stream: Stream, mutable = Mutable.immutable): ValueOr =
   ## Read a json stream and return the parsed data in a value object
   ## or return a warning. The mutable variable determines whether
   ## lists and dictionaries are mutable.
@@ -86,7 +86,7 @@ func readJsonStream*(stream: Stream, mutable = false): ValueOr =
     return newValueOr(wJsonParseError)
   result = jsonToValue(rootNode, mutable = mutable)
 
-func readJsonString*(content: string, mutable = false): ValueOr =
+func readJsonString*(content: string, mutable = Mutable.immutable): ValueOr =
   ## Read a json string and return the parsed data in a value object
   ## or return a warning. The mutable variable determines whether
   ## lists and dictionaries are mutable.
@@ -96,7 +96,7 @@ func readJsonString*(content: string, mutable = false): ValueOr =
     return newValueOr(wUnableCreateStream)
   result = readJsonStream(stream, mutable)
 
-proc readJsonFile*(filename: string, mutable = false): ValueOr =
+proc readJsonFile*(filename: string, mutable = Mutable.immutable): ValueOr =
   ## Read a json file and return the parsed data in a value object or
   ## return a warning. A warning is returned when the root object is
   ## not a dictionary.

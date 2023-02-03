@@ -10,6 +10,7 @@ StaticTea variable types.
 * const: [variableChars](#variablechars) &mdash; A variable contains ascii letters, digits, underscores and hypens.
 * const: [startTFVarNumber](#starttfvarnumber) &mdash; A character that starts true, false, a variable or a number.
 * type: [VarsDict](#varsdict) &mdash; This is a ref type.
+* type: [Mutable](#mutable) &mdash; The mutable state of lists and dictionaries.
 * type: [DictType](#dicttype) &mdash; The statictea dictionary type.
 * type: [ListType](#listtype) &mdash; The statictea list type.
 * type: [Variables](#variables) &mdash; Dictionary holding all statictea variables in multiple distinct logical dictionaries.
@@ -131,6 +132,17 @@ This is a ref type. Create a new VarsDict with newVarsDict procedure.
 VarsDict = OrderedTableRef[string, Value]
 ```
 
+# Mutable
+
+The mutable state of lists and dictionaries.
+* immutable -- you cannot change it
+* append -- you can append to the end
+* full -- you can change everything
+
+```nim
+Mutable
+```
+
 # DictType
 
 The statictea dictionary type.
@@ -141,7 +153,7 @@ The statictea dictionary type.
 ```nim
 DictType = object
   dict*: VarsDict
-  mutable*: bool
+  mutable*: Mutable
 
 ```
 
@@ -155,7 +167,7 @@ The statictea list type.
 ```nim
 ListType = object
   list*: seq[Value]
-  mutable*: bool
+  mutable*: Mutable
 
 ```
 
@@ -476,7 +488,7 @@ func newVarsDictOr(varsDict: VarsDict): VarsDictOr
 
 
 ```nim
-func newDictType(varsDict: VarsDict; mutable = false): DictType
+func newDictType(varsDict: VarsDict; mutable = Mutable.immutable): DictType
 ```
 
 # newListType
@@ -484,7 +496,7 @@ func newDictType(varsDict: VarsDict; mutable = false): DictType
 
 
 ```nim
-func newListType(valueList: seq[Value]; mutable = false): ListType
+func newListType(valueList: seq[Value]; mutable = Mutable.immutable): ListType
 ```
 
 # newValue
@@ -524,7 +536,7 @@ proc newValue(num: float): Value
 Create a list value.
 
 ```nim
-proc newValue(valueList: seq[Value]; mutable = false): Value
+proc newValue(valueList: seq[Value]; mutable = Mutable.immutable): Value
 ```
 
 # newValue
@@ -532,7 +544,7 @@ proc newValue(valueList: seq[Value]; mutable = false): Value
 Create a dictionary value from a VarsDict.
 
 ```nim
-proc newValue(varsDict: VarsDict; mutable = false): Value
+proc newValue(varsDict: VarsDict; mutable = Mutable.immutable): Value
 ```
 
 # newValue
@@ -555,7 +567,7 @@ let listValue = newValue([newValue(1), newValue("b")])
 ~~~
 
 ```nim
-proc newValue[T](list: openArray[T]; mutable = false): Value
+proc newValue[T](list: openArray[T]; mutable = Mutable.immutable): Value
 ```
 
 # newValue
@@ -570,7 +582,7 @@ same type which may be Value type.
 ~~~
 
 ```nim
-proc newValue[T](dictPairs: openArray[(string, T)]; mutable = false): Value
+proc newValue[T](dictPairs: openArray[(string, T)]; mutable = Mutable.immutable): Value
 ```
 
 # newFunc
@@ -596,7 +608,7 @@ func newValue(function: FunctionSpec): Value
 Return an empty list value.
 
 ```nim
-proc newEmptyListValue(mutable = false): Value
+proc newEmptyListValue(mutable = Mutable.immutable): Value
 ```
 
 # newEmptyDictValue
@@ -604,7 +616,7 @@ proc newEmptyListValue(mutable = false): Value
 Create a dictionary value from a VarsDict.
 
 ```nim
-proc newEmptyDictValue(mutable = false): Value
+proc newEmptyDictValue(mutable = Mutable.immutable): Value
 ```
 
 # `==`

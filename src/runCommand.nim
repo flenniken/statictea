@@ -2091,7 +2091,7 @@ proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
   let funResult = mapParameters(funcVar.funcv.signature, arguments)
   if funResult.kind == frWarning:
     return funResult
-  userVariables["l"] = newValue(funResult.value.dictv.dict, mutable = true)
+  userVariables["l"] = newValue(funResult.value.dictv.dict, mutable = Mutable.append)
 
   # Run the function statements.
   for statement in funcVar.funcv.statements:

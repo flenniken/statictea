@@ -24,13 +24,22 @@ type
     ## This is a ref type. Create a new VarsDict with newVarsDict
     ## procedure.
 
+  Mutable* {.pure.} = enum
+    ## The mutable state of lists and dictionaries.
+    ## @:* immutable -- you cannot change it
+    ## @:* append -- you can append to the end
+    ## @:* full -- you can change everything
+    immutable,
+    append,
+    full
+
   DictType* = object
     ## The statictea dictionary type.
     ## @:
     ## @:* dict -- an ordered dictionary.
     ## @:* mutable -- whether you can append to the dictionary or not.
     dict*: VarsDict
-    mutable*: bool
+    mutable*: Mutable
 
   ListType* = object
     ## The statictea list type.
@@ -38,7 +47,7 @@ type
     ## @:* list -- a list of values.
     ## @:* mutable -- whether you can append to the dictionary or not.
     list*: seq[Value]
-    mutable*: bool
+    mutable*: Mutable
 
   Variables* = VarsDict
     ## Dictionary holding all statictea variables in multiple distinct
@@ -262,10 +271,10 @@ func newVarsDictOr*(varsDict: VarsDict): VarsDictOr =
   ## Return a new VarsDict object containing a dictionary.
   result = opValueW[VarsDict](varsDict)
 
-func newDictType*(varsDict: VarsDict, mutable = false): DictType =
+func newDictType*(varsDict: VarsDict, mutable = Mutable.immutable): DictType =
   result = DictType(dict: varsDict, mutable: mutable)
 
-func newListType*(valueList: seq[Value], mutable = false): ListType =
+func newListType*(valueList: seq[Value], mutable = Mutable.immutable): ListType =
   result = ListType(list: valueList, mutable: mutable)
 
 proc newValue*(str: string): Value =
@@ -284,12 +293,12 @@ proc newValue*(num: float): Value =
   ## Create a float value.
   result = Value(kind: vkFloat, floatv: num)
 
-proc newValue*(valueList: seq[Value], mutable = false): Value =
+proc newValue*(valueList: seq[Value], mutable = Mutable.immutable): Value =
   ## Create a list value.
   let listv = newListType(valueList, mutable)
   result = Value(kind: vkList, listv: listv)
 
-proc newValue*(varsDict: VarsDict, mutable = false): Value =
+proc newValue*(varsDict: VarsDict, mutable = Mutable.immutable): Value =
   ## Create a dictionary value from a VarsDict.
   let dictv = newDictType(varsDict, mutable)
   result = Value(kind: vkDict, dictv: dictv)
@@ -299,7 +308,7 @@ proc newValue*(value: Value): Value =
   ## @:new value is an alias to the same value.
   result = value
 
-proc newValue*[T](list: openArray[T], mutable = false): Value =
+proc newValue*[T](list: openArray[T], mutable = Mutable.immutable): Value =
   ## New list value from an array of items of the same kind.
   ## @:
   ## @:~~~
@@ -313,7 +322,7 @@ proc newValue*[T](list: openArray[T], mutable = false): Value =
   let listv = newListType(valueList, mutable)
   result = Value(kind: vkList, listv: listv)
 
-proc newValue*[T](dictPairs: openArray[(string, T)], mutable = false): Value =
+proc newValue*[T](dictPairs: openArray[(string, T)], mutable = Mutable.immutable): Value =
   ## New dict value from an array of pairs where the pairs are the
   ## @:same type which may be Value type.
   ## @:
@@ -351,12 +360,12 @@ func newValue*(function: FunctionSpec): Value =
   ## Create a new func value.
   result = Value(kind: vkFunc, funcv: function)
 
-proc newEmptyListValue*(mutable = false): Value =
+proc newEmptyListValue*(mutable = Mutable.immutable): Value =
   ## Return an empty list value.
   var valueList: seq[Value]
   result = newValue(valueList, mutable)
 
-proc newEmptyDictValue*(mutable = false): Value =
+proc newEmptyDictValue*(mutable = Mutable.immutable): Value =
   ## Create a dictionary value from a VarsDict.
   result = newValue(newVarsDict(), mutable)
 
