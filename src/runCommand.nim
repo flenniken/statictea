@@ -1943,12 +1943,35 @@ proc getBracketDotName*(env: var Env, statement: Statement, start: Natural,
     runningPos = valuePosSiOr.value.pos
     indexName = valuePosSiOr.value.value.stringv
   else:
+    # Variable name.
     let indexVarName = indexVarNameOr.value
     if indexVarName.kind != vnkNormal:
       # The index value must be a variable name or literal string.
       return newValuePosSiOr(wInvalidIndexValue, "", runningPos)
+
+    # Look up the variable's value.
+    let valueOr = getVariable(variables, indexVarName.dotName, npLocal)
+    if valueOr.isMessage:
+      # The variable '$1' does not exist.
+      return newValuePosSiOr(wVariableMissing, indexVarName.dotName, runningPos)
+    let value = valueOr.value
+
+    # Make sure the value is a string.
+    if value.kind != vkString:
+      # The index value is not a string.
+      return newValuePosSiOr(wNotIndexString, "", runningPos)
+
+    # Make sure the string is a valid variable name.
+    let indexVarNameOr = getVariableName(value.stringv, 0)
+    if indexVarNameOr.isMessage:
+      # The index variable value is not a valid variable name.
+      return newValuePosSiOr(wNotVariableName, "", runningPos)
+    if indexVarNameOr.value.pos != value.stringv.len:
+      # The index variable value is not a valid variable name.
+      return newValuePosSiOr(wNotVariableName, "", runningPos)
+
     runningPos = indexVarName.pos
-    indexName = indexVarName.dotName
+    indexName = value.stringv
 
   # Concatenate the left name and the index name to make the dot name.
   let dotName = "$1.$2" % [leftName.dotName, indexName]

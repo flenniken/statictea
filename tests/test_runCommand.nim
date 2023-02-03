@@ -3251,9 +3251,11 @@ statement:   syntaxError == 5
     check testRunStatement(statement, eVariableDataOr)
 
   test "left index variable":
+    var variables = startVariables(funcs = funcsVarDict)
+    discard assignVariable(variables, "l.a", newValue("abc"), opEqual)
     let statement = newStatement(text="""var[a] = 4""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("var.a", opEqual, newValue(4))
-    check testRunStatement(statement, eVariableDataOr)
+    let eVariableDataOr = newVariableDataOr("var.abc", opEqual, newValue(4))
+    check testRunStatement(statement, eVariableDataOr, variables)
 
   test "left index number":
     let statement = newStatement(text="""var[5] = 4""", lineNum=1)
@@ -3272,6 +3274,52 @@ statement:   syntaxError == 5
 
   test "left index long name":
     maxNameLength = 6
+    var variables = startVariables(funcs = funcsVarDict)
+    discard assignVariable(variables, "l.a23", newValue("hello"), opEqual)
     let statement = newStatement(text="""var[a23] = 4""", lineNum=1)
     let eVariableDataOr = newVariableDataOr(wVarMaximumLength, "", 7)
+    check testRunStatement(statement, eVariableDataOr, variables)
+    maxNameLength = 64
+
+  test "index var missing":
+    let statement = newStatement(text="""var[abc] = 4""", lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wVariableMissing, "abc", 4)
     check testRunStatement(statement, eVariableDataOr)
+
+  test "index not string":
+    var variables = startVariables(funcs = funcsVarDict)
+    discard assignVariable(variables, "l.abc", newValue(5), opEqual)
+    let statement = newStatement(text="""var[abc] = 4""", lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wNotIndexString, "", 4)
+    check testRunStatement(statement, eVariableDataOr, variables)
+
+  test "index not valid var name":
+    var variables = startVariables(funcs = funcsVarDict)
+    discard assignVariable(variables, "l.abc", newValue("23b"), opEqual)
+    let statement = newStatement(text="""var[abc] = 4""", lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wNotVariableName, "", 4)
+    check testRunStatement(statement, eVariableDataOr, variables)
+
+  test "index not valid var name2":
+    var variables = startVariables(funcs = funcsVarDict)
+    discard assignVariable(variables, "l.abc", newValue("abc-"), opEqual)
+    let statement = newStatement(text="""var[abc] = 4""", lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wNotVariableName, "", 4)
+    check testRunStatement(statement, eVariableDataOr, variables)
+
+  test "d[key] = 5":
+    let content = """
+key = "hello"
+d = dict()
+d[key] = 5
+d["abc"] = 5
+"""
+    let eVarRep = """
+l.key = "hello"
+l.d.hello = 5
+l.d.abc = 5
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
