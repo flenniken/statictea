@@ -2510,39 +2510,42 @@ cd ~/code/statictea
 nimble n
 #+END_SRC
 
+# Build the list below with these commands:
+# n n | gsed 's/ [ \t]*/@/' | gawk -F@ '{printf "- *%s*:  %s\n", $1, $2}'
+
 Nimble Tasks:
 
 - *n*:  Show available tasks.
-- *test*:  Run one or more tests; specify part of test filename.
-- *other*:  Run other tests and build tests.
-- *b*:  Build the statictea exe.
-- *docsall*:  Create all the docs, docsix, docs, readmefun, dot.
-- *docs*:  Create one or more markdown docs; specify part of source filename.
-- *docsix*:  Create markdown docs index.
-- *json*:  Display one or more source file's json doc comments; specify part of name.
+- *test*:  Run one or more tests; specify part of the name.
+- *other*:  Run stf tests, build release exe and other tests.
+- *docsall*:  Create all the docs, docsix, teafuncs, stfix, dot, dot2.
+- *release*:  Run tests and update docs; test, other, docsall.
+- *b*:  Build the statictea release exe (bin/x/statictea).
+- *docsix*:  Create markdown docs index (docs/index.md).
+- *docs*:  Create one or more markdown docs; specify part of the name.
 - *jsonix*:  Display markdown docs index json.
+- *json*:  Display one or more source file's json doc comments; specify part of the name.
 - *teafuncs*:  Create the function docs (teaFunctions.md).
-- *dot*:  Create a dependency graph of the StaticTea source.
-- *dot2*:  Create a dependency graph of the system modules used by StaticTea.
+- *dyfuncs*:  Create the built-in function details (src/dynamicFuncList.nim) from (src/functions.nim).
+- *dot*:  Create source module dependency graph (docs/staticteadep.svg).
+- *dot2*:  Create system modules dependency graph (docs/staticteadep2.svg).
 - *tt*:  Compile and run t.nim.
 - *tree*:  Show the project directory tree.
 - *args*:  Show command line arguments.
-- *br*:  Build the stf test runner.
+- *br*:  Build the stf test runner (bin/x/runner).
 - *rt*:  Run one or more stf tests in testfiles; specify part of the name.
-- *stfix*:  Create stf test files index stf-index.md.
+- *stfix*:  Create stf test files index (testfiles/stf-index.md).
 - *stfjson*:  Display stf test files index JSON.
-- *newstf*:  Create new stf as a starting point for a new test.
+- *newstf*:  Create new stf test skeleton, specify a name no ext.
 - *runhelp*:  Show the runner help text with glow.
 - *helpme*:  Show the statictea help text.
-- *remote*:  Check whether the remote code needs updating.
-- *cmdline*:  Build cmdline.
-- *release*:  Run tests and update docs.
+- *remote*:  Check whether the utf8decoder module needs updating.
+- *cmdline*:  Build cmdline test app (bin/x/cmdline).
 - *drun*:  Run a statictea debian docker build env.
 - *ddelete*:  Delete the statictea docker image and container.
 - *dlist*:  List the docker image and container.
 - *clean*:  Remove all the binaries so everything gets built next time.
 - *replace*:  Show pattern for text search and replace in all the nim source files.
-- *dyfuncs*:  Create dynamicFuncList.nim from functions.nim.
 
 [[#contents][茶]]
 

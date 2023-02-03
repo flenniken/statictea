@@ -599,7 +599,7 @@ proc myFileNewer(a: string, b: string): bool =
     result = false
 
 proc taskDocs(namePart: string, forceRebuild = false) =
-  ## Create one or more markdown docs; specify part of source filename.":
+  ## Create one or more markdown docs; specify part of the name.":
   let filenames = get_source_filenames()
   for filename in filenames:
     # Name is part of a source file name, or "docs" when not specified.
@@ -820,19 +820,16 @@ proc makeJsonDoc(filename: string) =
 task n, "\tShow available tasks.":
   exec "nimble tasks"
 
-task test, "\tRun one or more tests; specify part of test filename.":
+task test, "\tRun one or more tests; specify part of the name.":
   let count = system.paramCount()+1
   let name = system.paramStr(count-1)
 
   runUnitTests(name)
 
-task other, "\tRun other tests and build tests.":
+task other, "\tRun stf tests, build release exe and other tests.":
   otherTests()
 
-task b, "\tBuild the statictea exe.":
-  buildRelease()
-
-task docsall, "\tCreate all the docs, docsix, docs, readmefun, dot.":
+task docsall, "\tCreate all the docs, docsix, teafuncs, stfix, dot, dot2.":
   taskDocsIx()
   taskDocs("")
   taskFuncDocs()
@@ -840,15 +837,34 @@ task docsall, "\tCreate all the docs, docsix, docs, readmefun, dot.":
   createDependencyGraph()
   createDependencyGraph2()
 
-task docs, "\tCreate one or more markdown docs; specify part of source filename.":
+task release, "\tRun tests and update docs; test, other, docsall.":
+  runUnitTests()
+  otherTests()
+  taskDocsIx()
+  taskDocs("")
+  taskFuncDocs()
+  taskTestfilesReadme()
+  createDependencyGraph()
+  createDependencyGraph2()
+
+task b, "\tBuild the statictea release exe (bin/x/statictea).":
+  buildRelease()
+
+task docsix, "\tCreate markdown docs index (docs/index.md).":
+  taskDocsIx()
+
+task docs, "\tCreate one or more markdown docs; specify part of the name.":
   let count = system.paramCount()+1
   var namePart = system.paramStr(count-1)
   taskDocs(namePart, true)
 
-task docsix, "\tCreate markdown docs index.":
-  taskDocsIx()
+task jsonix, "\tDisplay markdown docs index json.":
+  var json = sourceIndexJson()
+  # writeFile("docs/index.json", json)
+  for line in json.splitLines():
+    echo line
 
-task json, "\tDisplay one or more source file's json doc comments; specify part of name.":
+task json, "\tDisplay one or more source file's json doc comments; specify part of the name.":
   let count = system.paramCount()+1
   let name = system.paramStr(count-1)
   let filenames = get_source_filenames()
@@ -864,16 +880,37 @@ task json, "\tDisplay one or more source file's json doc comments; specify part 
   # echo "The jq command is good for viewing the output."
   # echo "n json name | jq | less"
 
-task jsonix, "\tDisplay markdown docs index json.":
-  var json = sourceIndexJson()
-  # writeFile("docs/index.json", json)
-  for line in json.splitLines():
-    echo line
-
 task teafuncs, "Create the function docs (teaFunctions.md).":
   taskFuncDocs()
 
-task dot, "\tCreate a dependency graph of the StaticTea source.":
+task dyfuncs, "\tCreate the built-in function details (src/dynamicFuncList.nim) from (src/functions.nim).":
+  # Extract the statictea function metadata from the functions.json file to create dynamicFuncList.nim":
+
+  # Build the release version of statictea. This makes sure function.nim builds.
+  echo fmt"Build statictea release version"
+  buildRelease()
+
+  let statictea = fmt"bin/{dirName}/statictea"
+  let server = "docs/functions.json"
+  let tFile = "templates/dynamicFuncList.nim"
+  let teaFile = "templates/dynamicFuncList.tea"
+  let result = "src/dynamicFuncList.nim"
+  let functionsFile = "test_functions.nim"
+
+  # Build the functions.json file.
+  echo fmt"make {server}"
+  makeJsonDoc("functions.nim")
+
+  # Build the dynamicFuncList.nim.tmp file.
+  echo fmt"make {result}"
+  let cmd = fmt"{statictea} -s {server} -t {tFile} -o {teaFile} -r {result}"
+  exec cmd
+
+  # Buld the functions.nim file.
+  let cmd2 = get_test_module_cmd(functionsFile, force = true)
+  exec cmd2
+
+task dot, "\tCreate source module dependency graph (docs/staticteadep.svg).":
   createDependencyGraph()
 
   echoGrip()
@@ -883,7 +920,7 @@ View the svg file in your browser:
   http://localhost:6419/docs/staticteadep.svg
 """
 
-task dot2, "\tCreate a dependency graph of the system modules used by StaticTea.":
+task dot2, "\tCreate system modules dependency graph (docs/staticteadep2.svg).":
   createDependencyGraph2()
 
   echoGrip()
@@ -905,7 +942,7 @@ task args, "\tShow command line arguments.":
   for i in 0..count-1:
     echo "$1: $2" % [$(i+1), system.paramStr(i)]
 
-task br, "\tBuild the stf test runner.":
+task br, "\tBuild the stf test runner (bin/x/runner).":
   buildRunner()
 
 task rt, "\tRun one or more stf tests in testfiles; specify part of the name.":
@@ -914,7 +951,7 @@ task rt, "\tRun one or more stf tests in testfiles; specify part of the name.":
 # task stf, "\tList stf tests with newest last.":
 #   exec """ls -1tr testfiles/*.stf | xargs grep "##" | cut -c 11- | sed 's/:## / -- /'"""
 
-task stfix, "\tCreate stf test files index stf-index.md.":
+task stfix, "\tCreate stf test files index (testfiles/stf-index.md).":
   taskTestfilesReadme()
 
 task stfjson, "\tDisplay stf test files index JSON.":
@@ -922,7 +959,7 @@ task stfjson, "\tDisplay stf test files index JSON.":
   for line in json.splitLines():
     echo line
 
-task newstf, "\tCreate new stf as a starting point for a new test.":
+task newstf, "\tCreate new stf test skeleton, specify a name no ext.":
   let count = system.paramCount()+1
   var name = system.paramStr(count-1)
   if name == "newstf":
@@ -946,10 +983,10 @@ task runhelp, "\tShow the runner help text with glow.":
 task helpme, "\tShow the statictea help text.":
   exec fmt"bin/{dirName}/statictea -h | less"
 
-task remote, "\tCheck whether the remote code needs updating.":
+task remote, "\tCheck whether the utf8decoder module needs updating.":
   checkUtf8DecoderEcho()
 
-task cmdline, "\tBuild cmdline.":
+task cmdline, "\tBuild cmdline test app (bin/x/cmdline).":
   let part1 = "nim c --hint[Performance]:off "
   let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
   let part3 = fmt"--out:bin/{dirName}/ src/cmdline"
@@ -957,16 +994,6 @@ task cmdline, "\tBuild cmdline.":
   echo cmd
   exec cmd
   echo fmt"Run bin/{dirName}/cmdline"
-
-task release, "\tRun tests and update docs.":
-  runUnitTests()
-  otherTests()
-  taskDocsIx()
-  taskDocs("")
-  taskFuncDocs()
-  taskTestfilesReadme()
-  createDependencyGraph()
-  createDependencyGraph2()
 
 const
   staticteaImage = "statictea-image"
@@ -1069,29 +1096,3 @@ task replace, "\tShow pattern for text search and replace in all the nim source 
   let cmd = r"find . -name \*.nim -type f | xargs -n 1 gsed -i 's/stateVariables/startVariables/g'"
   echo cmd
 
-task dyfuncs, "\tCreate dynamicFuncList.nim from functions.nim.":
-  # Extract the statictea function metadata from the functions.json file to create dynamicFuncList.nim":
-
-  # Build the release version of statictea. This makes sure function.nim builds.
-  echo fmt"Build statictea release version"
-  buildRelease()
-
-  let statictea = fmt"bin/{dirName}/statictea"
-  let server = "docs/functions.json"
-  let tFile = "templates/dynamicFuncList.nim"
-  let teaFile = "templates/dynamicFuncList.tea"
-  let result = "src/dynamicFuncList.nim"
-  let functionsFile = "test_functions.nim"
-
-  # Build the functions.json file.
-  echo fmt"make {server}"
-  makeJsonDoc("functions.nim")
-
-  # Build the dynamicFuncList.nim.tmp file.
-  echo fmt"make {result}"
-  let cmd = fmt"{statictea} -s {server} -t {tFile} -o {teaFile} -r {result}"
-  exec cmd
-
-  # Buld the functions.nim file.
-  let cmd2 = get_test_module_cmd(functionsFile, force = true)
-  exec cmd2
