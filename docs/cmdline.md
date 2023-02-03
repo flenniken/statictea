@@ -102,15 +102,15 @@ ArgsOrMessage = object
 
 The option type.
 
-* cmlArgument0or1 -- option with a argument, 0 or 1 times.
-* cmlNoArgument -- option without a argument, 0 or 1 times.
+* cmlArgument0or1 -- option with an argument, 0 or 1 times.
+* cmlNoArgument -- option without an argument, 0 or 1 times.
 * cmlOptionalArgument -- option with an optional argument, 0
     or 1 times.
-* cmlBareArgument -- a argument without an option, 1 time.
-* cmlArgumentOnce -- option with a argument, 1 time.
-* cmlArgumentMany -- option with a argument, unlimited
+* cmlBareArgument -- an argument without an option, 1 time.
+* cmlArgumentOnce -- option with an argument, 1 time.
+* cmlArgumentMany -- option with an argument, unlimited
     number of times.
-* cmlStopArgument -- option without a argument, 0 or 1
+* cmlStopArgument -- option without an argument, 0 or 1
     times. Stop and return this option by itself.
 
 ```nim

@@ -3,7 +3,7 @@
 Here are all the Statictea stf tests:
 
 * [and-or](../testfiles/and-or.stf.md) &mdash; Test the and and or functions.
-* [block-readme](../testfiles/block-readme.stf.md) &mdash; The readme block example.
+* [block-readme](../testfiles/block-readme.stf.md) &mdash; Test the readme block example.
 * [bool-expr](../testfiles/bool-expr.stf.md) &mdash; Test boolean expressions.
 * [cmdline-no-templates](../testfiles/cmdline-no-templates.stf.md) &mdash; Test with no templates on the command line.
 * [cmdline-two-templates](../testfiles/cmdline-two-templates.stf.md) &mdash; Test with two templates on the command line.
@@ -11,10 +11,10 @@ Here are all the Statictea stf tests:
 * [codefile-basics](../testfiles/codefile-basics.stf.md) &mdash; Test using a code file.
 * [comment](../testfiles/comment.stf.md) &mdash; The readme comment example.
 * [comments-inline](../testfiles/comments-inline.stf.md) &mdash; Test inline comments.
-* [continue-basics](../testfiles/continue-basics.stf.md) &mdash; The continue readme example.
+* [continue-basics](../testfiles/continue-basics.stf.md) &mdash; The continue line readme example.
 * [dict-basics](../testfiles/dict-basics.stf.md) &mdash; Test the dictionary type.
 * [dup-json](../testfiles/dup-json.stf.md) &mdash; Test duplicate json variables.
-* [endblock-readme](../testfiles/endblock-readme.stf.md) &mdash; The endblock readme example.
+* [endblock-readme](../testfiles/endblock-readme.stf.md) &mdash; Test the endblock readme example.
 * [endcommand-alone](../testfiles/endcommand-alone.stf.md) &mdash; Test endcommand without a block command.
 * [endline](../testfiles/endline.stf.md) &mdash; Test there are no extra lines for the readmefun case.
 * [format-basic](../testfiles/format-basic.stf.md) &mdash; Test the format function.
