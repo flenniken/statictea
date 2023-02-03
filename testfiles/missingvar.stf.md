@@ -7,7 +7,9 @@ Test with a missing replacement variable.
 ### File cmd.sh command nonZeroReturn
 
 ~~~
-$statictea -t template.md >stdout 2>stderr
+$statictea \
+  -t template.md \
+  >stdout 2>stderr
 ~~~
 
 ### File template.md

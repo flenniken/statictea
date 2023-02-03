@@ -12,7 +12,11 @@ noLastEnding command nonZeroReturn
 ### File cmd.sh command
 
 ~~~
-$statictea -u --code shared.tea -t stdin <tmpl.txt >stdout 2>stderr
+$statictea \
+  -u \
+  --code shared.tea \
+  -t stdin <tmpl.txt \
+  >stdout 2>stderr
 ~~~
 
 ### File tmpl.txt

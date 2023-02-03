@@ -7,7 +7,11 @@ Update the replace block in a template.
 ### File cmd.sh command
 
 ~~~
-$statictea -u -o shared.tea -t template.html >stdout 2>stderr
+$statictea \
+  -u \
+  -o shared.tea \
+  -t template.html \
+  >stdout 2>stderr
 ~~~
 
 ### File shared.tea

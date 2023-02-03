@@ -2,12 +2,14 @@ stf file, version 0.1.0
 
 # Continue Line
 
-The continue readme example.
+The continue line readme example.
 
 ### File cmd.sh command
 
 ~~~
-$statictea -t comment.html >stdout 2>stderr
+$statictea \
+  -t comment.html \
+  >stdout 2>stderr
 ~~~
 
 ### File comment.html

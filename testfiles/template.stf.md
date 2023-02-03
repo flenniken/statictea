@@ -18,7 +18,8 @@ $statictea \
   -s server.json \
   -o shared.tea \
   -t tmpl.txt \
-  -r result >stdout 2>stderr
+  -r result \
+  >stdout 2>stderr
 ~~~
 
 Run a command over the log file that removes the time prefix then

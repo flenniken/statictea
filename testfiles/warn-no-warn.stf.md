@@ -9,7 +9,8 @@ Test there is no warning when the warn is not run.
 ~~~
 $statictea \
   -t tmpl.txt \
-  -r result >stdout 2>stderr
+  -r result \
+  >stdout 2>stderr
 ~~~
 
 ### File tmpl.txt

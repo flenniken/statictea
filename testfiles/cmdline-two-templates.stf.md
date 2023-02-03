@@ -7,8 +7,11 @@ Test with two templates on the command line.
 ### File cmd.sh command nonZeroReturn
 
 ~~~
-$statictea -t tmpl.txt -t tmpl2.txt \
-  -r result >stdout 2>stderr
+$statictea \
+  -t tmpl.txt \
+  -t tmpl2.txt \
+  -r result \
+  >stdout 2>stderr
 ~~~
 
 ### File stderr.expected

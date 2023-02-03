@@ -7,7 +7,10 @@ Test the org mode prefix (# $).
 ### File cmd.sh command
 
 ~~~
-$statictea -p "# $" -t orgmode.org >stdout 2>stderr
+$statictea \
+  -p "# $" \
+  -t orgmode.org \
+  >stdout 2>stderr
 ~~~
 
 ### File orgmode.org

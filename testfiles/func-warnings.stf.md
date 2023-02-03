@@ -10,7 +10,8 @@ Test the function warnings.
 $statictea \
   -o shared.tea \
   -t tmpl.txt \
-  -r result >stdout 2>stderr
+  -r result \
+  >stdout 2>stderr
 ~~~
 
 ### File tmpl.txt

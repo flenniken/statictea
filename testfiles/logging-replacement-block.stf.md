@@ -7,7 +7,11 @@ Test logging the replacement block.
 ### File cmd.sh command
 
 ~~~
-$statictea -l log.txt -t tmpl.txt -r result.txt >stdout 2>stderr
+$statictea \
+  -l log.txt \
+  -t tmpl.txt \
+  -r result.txt \
+  >stdout 2>stderr
 ~~~
 
 ### File log.sh command

@@ -7,7 +7,10 @@ Test there are no extra lines for the readmefun case.
 ### File cmd.sh command
 
 ~~~
-$statictea -p "# $" -t endline.org >stdout 2>stderr
+$statictea \
+  -p "# $" \
+  -t endline.org \
+  >stdout 2>stderr
 ~~~
 
 ### File endline.org

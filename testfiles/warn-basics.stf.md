@@ -9,7 +9,8 @@ Test the warn function.
 ~~~
 $statictea \
   -t tmpl.txt \
-  -r result >stdout 2>stderr
+  -r result \
+  >stdout 2>stderr
 ~~~
 
 ### File tmpl.txt

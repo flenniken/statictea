@@ -4,18 +4,13 @@ stf file, version 0.1.0
 
 Test literal lists.
 
-Here are the file line attributes:
-
-~~~
-noLastEnding command nonZeroReturn
-~~~
-
 ### File cmd.sh command
 
 ~~~
 $statictea \
   -t tmpl.txt \
-  -r result >stdout 2>stderr
+  -r result \
+  >stdout 2>stderr
 ~~~
 
 ### File tmpl.txt

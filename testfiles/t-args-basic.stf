@@ -7,10 +7,16 @@ Test t.args with normal arguments.
 ### File cmd.sh command
 
 ~~~
-$statictea -l -s server.json -o codefile.tea \
-  -s server2.json -o codefile2.tea \
+$statictea \
+  -l \
+  -s server.json \
+  -o codefile.tea \
+  -s server2.json \
+  -o codefile2.tea \
   -p 'abc$,def' -p '$$' \
-  -t template.html -r result.html >stdout 2>stderr
+  -t template.html \
+  -r result.html \
+  >stdout 2>stderr
 ~~~
 
 ### File template.html

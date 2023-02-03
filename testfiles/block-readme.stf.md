@@ -2,12 +2,15 @@ stf file, version 0.1.0
 
 # Readme Block Example
 
-The readme block example.
+Test the readme block example.
 
 ### File cmd.sh command
 
 ~~~
-$statictea -s block.json -t block.html >stdout 2>stderr
+$statictea \
+  -s block.json \
+  -t block.html \
+  >stdout 2>stderr
 ~~~
 
 ### File block.html

@@ -9,7 +9,8 @@ Test endcommand without a block command.
 ~~~
 $statictea \
   -t tmpl.txt \
-  -r result >stdout 2>stderr
+  -r result \
+  >stdout 2>stderr
 ~~~
 
 ### File tmpl.txt

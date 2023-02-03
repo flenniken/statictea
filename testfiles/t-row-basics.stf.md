@@ -11,7 +11,8 @@ $statictea \
   -l log.txt \
   -s server.json \
   -t tmpl.txt \
-  -r result.html >stdout 2>stderr
+  -r result.html \
+  >stdout 2>stderr
 ~~~
 
 ### File log.sh command

@@ -192,8 +192,8 @@ func parseJsonStr*(text: string, startPos: Natural): ValuePosSiOr =
   var newStr = newStringOfCap((text.len - startPos) * 2)
   var pos = startPos
 
-  # Loop through the text one unicode character at a time and add to
-  # the result string.
+  # Loop through the text one byte or one unicode character at a time
+  # and add to the result string.
   while true:
     case state
     of middle:

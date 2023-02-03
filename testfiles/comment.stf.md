@@ -1,13 +1,15 @@
 stf file, version 0.1.0
 
-# Readme Command Example
+# Readme Comment Example
 
 The readme comment example.
 
 ### File cmd.sh command
 
 ~~~
-$statictea -t hello.html >stdout 2>stderr
+$statictea \
+  -t hello.html \
+  >stdout 2>stderr
 ~~~
 
 ### File hello.html noLastEnding

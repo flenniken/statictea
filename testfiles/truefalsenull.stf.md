@@ -7,7 +7,10 @@ Test json true, false and null.
 ### File cmd.sh command
 
 ~~~
-$statictea -s server.json -t template.html >stdout 2>stderr
+$statictea \
+  -s server.json \
+  -t template.html \
+  >stdout 2>stderr
 ~~~
 
 ### File template.html

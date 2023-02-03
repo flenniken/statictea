@@ -5,15 +5,14 @@ stf file, version 0.1.0
 Test that you cannot mutate the lists returned by the built-in
 functions (except the list function).
 
-# todo: why not allow mutation here?
-
 ### File cmd.sh command nonZeroReturn
 
 ~~~
 $statictea \
   -o shared.tea \
   -t tmpl.txt \
-  -r result >stdout 2>stderr
+  -r result \
+  >stdout 2>stderr
 ~~~
 
 ### File tmpl.txt

@@ -7,7 +7,9 @@ Test when no result file is specified. Result goes to stdout.
 ### File cmd.sh command
 
 ~~~
-$statictea -t tmpl.txt >stdout 2>stderr
+$statictea \
+  -t tmpl.txt \
+  >stdout 2>stderr
 ~~~
 
 

@@ -12,7 +12,8 @@ $statictea \
   -s server.json \
   -s shared.json \
   -t tmpl.txt \
-  -r result.html >stdout 2>stderr
+  -r result.html \
+  >stdout 2>stderr
 ~~~
 
 

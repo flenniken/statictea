@@ -7,15 +7,19 @@ Test duplicate json variables.
 ### File cmd.sh command nonZeroReturn
 
 ~~~
-$statictea -s server.json -s server2.json \
-  -t template.html -r result.html >stdout 2>stderr
+$statictea \
+  -s server.json \
+  -s server2.json \
+  -t template.html \
+  -r result.html \
+  >stdout 2>stderr
 ~~~
 
 ### File server.json
 
 ~~~
 {
-  "name": "Earl",
+  "name": "Earl"
 }
 ~~~
 
@@ -23,7 +27,7 @@ $statictea -s server.json -s server2.json \
 
 ~~~
 {
-  "name": "Grey",
+  "name": "Grey"
 }
 ~~~
 

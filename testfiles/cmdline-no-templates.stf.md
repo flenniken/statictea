@@ -7,7 +7,9 @@ Test with no templates on the command line.
 ### File cmd.sh command nonZeroReturn
 
 ~~~
-$statictea -r result >stdout 2>stderr
+$statictea \
+  -r result \
+  >stdout 2>stderr
 ~~~
 
 ### File stderr.expected

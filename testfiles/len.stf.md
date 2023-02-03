@@ -9,7 +9,8 @@ Test the len function.
 ~~~
 $statictea \
   -t tmpl.txt \
-  -r result.html >stdout 2>stderr
+  -r result.html \
+  >stdout 2>stderr
 ~~~
 
 ### File tmpl.txt

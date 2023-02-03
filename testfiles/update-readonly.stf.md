@@ -26,7 +26,10 @@ just another test file
 ### File cmd.sh command nonZeroReturn
 
 ~~~
-$statictea -u -t tmpl.txt >stdout 2>stderr
+$statictea \
+  -u \
+  -t tmpl.txt \
+  >stdout 2>stderr
 ~~~
 
 ### File tmpl.txt

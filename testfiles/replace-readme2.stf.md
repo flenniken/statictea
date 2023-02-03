@@ -7,7 +7,11 @@ The second replace readme example.
 ### File cmd.sh command
 
 ~~~
-$statictea -o shared.tea -s server.json -t replace.html >stdout 2>stderr
+$statictea \
+  -o shared.tea \
+  -s server.json \
+  -t replace.html \
+  >stdout 2>stderr
 ~~~
 
 ### File replace.html

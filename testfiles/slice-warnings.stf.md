@@ -7,8 +7,10 @@ Test the slice functions warning cases.
 ### File cmd.sh command nonZeroReturn
 
 ~~~
-$statictea -t tmpl.txt \
-  -r result >stdout 2>stderr
+$statictea \
+  -t tmpl.txt \
+  -r result \
+  >stdout 2>stderr
 ~~~
 
 ### File tmpl.txt

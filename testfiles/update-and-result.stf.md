@@ -9,9 +9,11 @@ because it's easy to think update applies to the result file.
 ### File cmd.sh command nonZeroReturn
 
 ~~~
-$statictea -u \
+$statictea \
+  -u \
   -t tmpl.txt \
-  -r result >stdout 2>stderr
+  -r result \
+  >stdout 2>stderr
 ~~~
 
 ### File tmpl.txt

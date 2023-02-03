@@ -5,15 +5,14 @@ stf file, version 0.1.0
 Test that you cannot change o variables in templates and that you
 cannot change g variables in code files.
 
-Here are the file line attributes:
-
 ### File cmd.sh command nonZeroReturn
 
 ~~~
 $statictea \
   -o shared.tea \
   -t tmpl.txt \
-  -r result >stdout 2>stderr
+  -r result \
+  >stdout 2>stderr
 ~~~
 
 ### File tmpl.txt

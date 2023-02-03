@@ -22,8 +22,12 @@ printf "{\"random\": \"%s%s\"}\n" $RANDOM $RANDOM > server.json
 ### File cmd.sh command
 
 ~~~
-$statictea -l -s server.json \
-  -t tmpl.txt -r result >stdout 2>stderr
+$statictea \
+  -l \
+  -s server.json \
+  -t tmpl.txt \
+  -r result \
+  >stdout 2>stderr
 ~~~
 
 ### File log.sh command
