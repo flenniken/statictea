@@ -1210,8 +1210,9 @@ Strings are encoded as UTF-8 and invalid byte sequences generate
 a warning.
 
 Strings follow the same escaping rules as json strings.  You can
-escape 8 special control characters using a slash followed by a
-letter. Special escape letters:
+escape eight special control characters using a slash followed by
+a letter, otherwise slash is a normal character. Special escape
+letters:
 
 - " -- quotation mark (U+0022)
 - \ -- reverse solidus (U+005C)
@@ -1235,8 +1236,11 @@ values greater the U-FFFF, two pairs.  The two pairs are
 called surrogate pairs.
 
 #+BEGIN_SRC
-The unicode code point U-8336 is 茶 and escaped is \u8336.
-The unicode code point U-1F600 is 😀 and escaped is \uD83D\uDE00.
+Unicode code point U-8336
+is 茶, escaped: \u8336.
+
+Unicode code point U-1F600
+is 😀, escaped: \uD83D\uDE00.
 #+END_SRC
 
 You can generate the surrogate pair for a unicode code point
