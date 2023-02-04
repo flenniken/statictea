@@ -922,18 +922,19 @@ The following example makes a new list [6, 8] from the list
 [2,4,6,8].  The callback is called b5.
 
 ~~~
-container = []
+o.container = []
 list = [2,4,6,8]
-stopped = listLoop(list, container, b5)
-newList => [6, 8]
+stopped = listLoop(list, o.container, b5)
+# o.container => [6, 8]
 ~~~
 
 Below is the definition of the b5 callback function.
 
 ~~~
-b5 = func(“b5(ix: int, value: int, container: list) bool”)
+b5 = func("b5(ix: int, value: int, container: list) bool")
   ## Collect values greater than 5.
-  container &= if( (value > 5), value)
+  if( (value <= 5), return(false))
+  container &= value
   return(false)
 ~~~
 """
@@ -1618,7 +1619,7 @@ warn("always warn")
     info("fun_len_li", dc_fun_len_li, 19),
     info("fun_len_si", dc_fun_len_si, 18),
     info("fun_list_al", dc_fun_list_al, 21),
-    info("fun_listLoop_lapoab", dc_fun_listLoop_lapoab, 46),
+    info("fun_listLoop_lapoab", dc_fun_listLoop_lapoab, 47),
     info("fun_log_ss", dc_fun_log_ss, 24),
     info("fun_lower_ss", dc_fun_lower_ss, 19),
     info("fun_lt_ffb", dc_fun_lt_ffb, 19),
@@ -1658,7 +1659,7 @@ warn("always warn")
   functionStarts* = [
     602,
     579,
-    2338,
+    2339,
     1083,
     728,
     761,
@@ -1669,65 +1670,65 @@ warn("always warn")
     312,
     1232,
     1193,
-    2409,
-    2390,
-    2428,
+    2410,
+    2391,
+    2429,
     673,
     1120,
     849,
     892,
     866,
-    2207,
-    2241,
-    2262,
+    2208,
+    2242,
+    2263,
     429,
     387,
-    1817,
-    2524,
-    2505,
-    2562,
-    2543,
+    1818,
+    2525,
+    2506,
+    2563,
+    2544,
     467,
     532,
     947,
     982,
     1024,
-    1952,
-    1911,
-    1579,
+    1953,
+    1912,
+    1580,
     368,
     349,
     331,
     1269,
     1290,
-    2022,
-    1560,
-    2600,
-    2581,
-    2639,
-    2619,
-    2467,
-    2448,
-    2486,
-    2320,
-    2364,
-    1505,
-    2659,
-    1336,
-    1446,
-    2046,
+    2023,
+    1561,
+    2601,
+    2582,
+    2640,
+    2620,
+    2468,
+    2449,
+    2487,
+    2321,
+    2365,
+    1506,
+    2660,
+    1337,
+    1447,
+    2047,
     1158,
-    1726,
-    1759,
-    1788,
-    2297,
-    2097,
-    2183,
+    1727,
+    1760,
+    1789,
+    2298,
+    2098,
+    2184,
     648,
     625,
-    1858,
-    1603,
-    1997,
+    1859,
+    1604,
+    1998,
   ]
     ## Dynamically generated array of starting line numbers for each
     ## built-in function in the functions.nim file.

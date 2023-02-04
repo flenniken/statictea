@@ -3072,29 +3072,6 @@ statement: stopped = listLoop([1], newList, b5, 2)
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
-  test "funListLoop list third":
-    let content = """
-b5 = func("b5(ix: int, value: int, newList: dict, state: int) bool")
-  ## Use items bigger than 5.
-  if( (value <= 5), return(false))
-  newList &= add(value, state)
-  return(false)
-
-newList = []
-stopped = listLoop([1], newList, b5, 2)
-"""
-    let eVarRep = """
-l.b5 = "b5"
-l.newList = []
-o = {}
-"""
-    let eErrLines: seq[string] = splitNewLines """
-testcode.tea(8): w253: Expected the func variable's third parameter to be a list, got dict.
-statement: stopped = listLoop([1], newList, b5, 2)
-                                            ^
-"""
-    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
-
   test "funListLoop no state":
     let content = """
 b5 = func("b5(ix: int, value: int, newList: list) bool")

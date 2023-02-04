@@ -4,8 +4,6 @@ stf file, version 0.1.0
 
 Test the if functions.
 
-
-
 ### File cmd.sh command nonZeroReturn
 
 ~~~

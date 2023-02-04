@@ -1023,18 +1023,19 @@ The following example makes a new list [6, 8] from the list
 [2,4,6,8].  The callback is called b5.
 
 ~~~
-container = []
+o.container = []
 list = [2,4,6,8]
-stopped = listLoop(list, container, b5)
-newList => [6, 8]
+stopped = listLoop(list, o.container, b5)
+# o.container => [6, 8]
 ~~~
 
 Below is the definition of the b5 callback function.
 
 ~~~
-b5 = func(“b5(ix: int, value: int, container: list) bool”)
+b5 = func("b5(ix: int, value: int, container: list) bool")
   ## Collect values greater than 5.
-  container &= if( (value > 5), value)
+  if( (value <= 5), return(false))
+  container &= value
   return(false)
 ~~~
 
@@ -2348,13 +2349,13 @@ dict() =>
 Dynamically generated array of starting line numbers for each built-in function in the functions.nim file.
 
 ```nim
-functionStarts = [602, 579, 2338, 1083, 728, 761, 258, 237, 279, 805, 312, 1232,
-                  1193, 2409, 2390, 2428, 673, 1120, 849, 892, 866, 2207, 2241,
-                  2262, 429, 387, 1817, 2524, 2505, 2562, 2543, 467, 532, 947,
-                  982, 1024, 1952, 1911, 1579, 368, 349, 331, 1269, 1290, 2022,
-                  1560, 2600, 2581, 2639, 2619, 2467, 2448, 2486, 2320, 2364,
-                  1505, 2659, 1336, 1446, 2046, 1158, 1726, 1759, 1788, 2297,
-                  2097, 2183, 648, 625, 1858, 1603, 1997]
+functionStarts = [602, 579, 2339, 1083, 728, 761, 258, 237, 279, 805, 312, 1232,
+                  1193, 2410, 2391, 2429, 673, 1120, 849, 892, 866, 2208, 2242,
+                  2263, 429, 387, 1818, 2525, 2506, 2563, 2544, 467, 532, 947,
+                  982, 1024, 1953, 1912, 1580, 368, 349, 331, 1269, 1290, 2023,
+                  1561, 2601, 2582, 2640, 2620, 2468, 2449, 2487, 2321, 2365,
+                  1506, 2660, 1337, 1447, 2047, 1158, 1727, 1760, 1789, 2298,
+                  2098, 2184, 648, 625, 1859, 1604, 1998]
 ```
 
 # getBestFunction

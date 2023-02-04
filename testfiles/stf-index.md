@@ -25,10 +25,13 @@ Here are all the Statictea stf tests:
 * [globalvars](../testfiles/globalvars.stf.md) &mdash; Test global variables.
 * [hello](../testfiles/hello.stf.md) &mdash; Readme Hello World example.
 * [if-fun](../testfiles/if-fun.stf.md) &mdash; Test the if functions.
+* [if-two-parameters](../testfiles/if-two-parameters.stf.md) &mdash; Test the IF statement with two parameters.
 * [int-section](../testfiles/int-section.stf.md) &mdash; Test the int type.
 * [json-get](../testfiles/json-get.stf.md) &mdash; Test that you can access non-variable name keys with get.
 * [len](../testfiles/len.stf.md) &mdash; Test the len function.
 * [list-literal](../testfiles/list-literal.stf.md) &mdash; Test literal lists.
+* [listLoop-basics](../testfiles/listLoop-basics.stf.md) &mdash; Test the listLoop function example in the function documentation.
+* [listLoop-new-dict](../testfiles/listLoop-new-dict.stf.md) &mdash; Test the listLoop function where it creates a dictionary.
 * [localvars-basics](../testfiles/localvars-basics.stf.md) &mdash; Test the readme local variables section.
 * [log-function](../testfiles/log-function.stf.md) &mdash; Test the log function.
 * [log-path](../testfiles/log-path.stf.md) &mdash; Test the default log path is written to when you specify -l without a

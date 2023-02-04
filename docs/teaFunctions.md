@@ -1046,18 +1046,19 @@ The following example makes a new list [6, 8] from the list
 [2,4,6,8].  The callback is called b5.
 
 ~~~
-container = []
+o.container = []
 list = [2,4,6,8]
-stopped = listLoop(list, container, b5)
-newList => [6, 8]
+stopped = listLoop(list, o.container, b5)
+# o.container => [6, 8]
 ~~~
 
 Below is the definition of the b5 callback function.
 
 ~~~
-b5 = func(“b5(ix: int, value: int, container: list) bool”)
+b5 = func("b5(ix: int, value: int, container: list) bool")
   ## Collect values greater than 5.
-  container &= if( (value > 5), value)
+  if( (value <= 5), return(false))
+  container &= value
   return(false)
 ~~~
 

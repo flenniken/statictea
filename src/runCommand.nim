@@ -1633,7 +1633,7 @@ proc funListLoop(env: var Env, variables: Variables,
   ## Build and return a new item by calling the callback for each item
   ## in the given list.
 
-  # listLoop(a: list, new: any, callback: func, state: optional any) bool
+  # listLoop(a: list, container: any, callback: func, state: optional any) bool
   let signatureO = newSignatureO("listLoop", "lapoab")
   let funResult = mapParameters(signatureO.get(), arguments)
   if funResult.kind == frWarning:
@@ -1641,11 +1641,11 @@ proc funListLoop(env: var Env, variables: Variables,
   let map = funResult.value.dictv.dict
 
   let list = map["a"]
-  let new = map["b"]
+  let container = map["b"]
   let callbackVar = map["c"]
 
   # Validate the callback signature.
-  # callback(ix: int, item: any, newList: list, state: optional any) list
+  # callback(ix: int, item: any, container: any, state: optional any) list
   let signature = callbackVar.funcv.signature
 
   if signature.params.len != 3 and signature.params.len != 4:
@@ -1654,9 +1654,6 @@ proc funListLoop(env: var Env, variables: Variables,
   if signature.params[0].paramType != ptInt:
     # Expected the func variable's first parameter to be an int, got $1.
     return newFunResultWarn(wCallbackIntParam, 2, $signature.params[0].paramType)
-  if signature.params[2].paramType != ptList:
-    # Expected the function variable's third parameter to be a list, got $1.
-    return newFunResultWarn(wCallbackListParam, 2, $signature.params[2].paramType)
   if "d" in map and signature.params.len == 3:
     # The listLoop state argument exists but the callback doesn't have a state parameter.
     return newFunResultWarn(wMissingStateVar, 3, "")
@@ -1672,11 +1669,11 @@ proc funListLoop(env: var Env, variables: Variables,
   for ix, value in list.listv.list:
 
     # Call the callback.
-    # callback(ix: int, item: any, new: any, state: optional any) bool
+    # callback(ix: int, item: any, container: any, state: optional any) bool
     var callbackArgs = newSeq[Value]()
     callbackArgs.add(newValue(ix))
     callbackArgs.add(value)
-    callbackArgs.add(new)
+    callbackArgs.add(container)
     if "d" in map:
       callbackArgs.add(map["d"])
     let callResult = callUserFunction(env, callbackVar, variables, callbackArgs)

@@ -549,7 +549,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "Expected the func variable\'s first parameter to be an int, got $1.", ## wCallbackIntParam
     "Expected a variable.", ## wExpectedVariable
     "The listLoop state argument exists but the callback doesn\'t have a state parameter.", ## wMissingStateVar
-    "Expected the func variable\'s third parameter to be a list, got $1.", ## wCallbackListParam
+    "",                     ## wCallbackListParam
     "The func variable has a required state parameter but it is being not passed to it.", ## wStateRequired
     "Invalid return; use a bare return in a user function or use it in a bare if statement.", ## wReturnArgument
     "A variable starts with an ascii letter.", ## wVarStartsWithLetter
