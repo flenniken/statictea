@@ -1301,15 +1301,58 @@ The dict type is an ordered key value store with fast lookup. It
 maps a string key to a value which can be any type. The dict is
 ordered by insertion order.
 
-- You create a dict in a json file or with the dict function.
-- You append to a dict when you create a new variable with a
-  statement.
-- You access a dict item with a dot name, bracket notation or
-  with the get function.
+You create a dict using the dict function. The example below
+creates an empty dict d and a dict d2 with 2 elements.
 
-In the following json data, the container element is the s
-dictionary and the d element is a dictionary.  The d dictionary
-has two key/value pairs, ("x", 100) and ("y", 200).
+#+BEGIN_SRC
+d = dict()
+d2 = dict("one", 1, "two", 2))
+#+END_SRC
+
+You can append to a dict using dot name notation:
+
+#+BEGIN_SRC
+d = dict()
+d.a = 5
+d.tea = "Eary Grey"
+#+END_SRC
+
+You can append to a dict using bracket notation on the left hand
+side of the equal sign and this way allows you to use a variable
+for the key:
+
+#+BEGIN_SRC
+d = dict()
+d["a"] = 5
+var = "tea"
+d[var] = "Eary Grey"
+#+END_SRC
+
+You append to the l dict when you create a new variable without a
+prefix.
+
+#+BEGIN_SRC
+a = 5
+tea = "Eary Grey"
+#+END_SRC
+
+You access a dict element with a dot name, bracket notation or
+with the get function. If the key is an invalid variable name,
+cannot access it using dot notation.
+
+The get function has an optional default parameter that's used
+when the key doesn't exist (the z case below).
+
+#+BEGIN_SRC
+d = dict("x", 100, "y", 200)
+x = get(d, "x") # => 100
+y = get(d, "y") # => 200
+z = get(d, "z", 300) # => 300
+#+END_SRC
+
+The server json data becomes the s dictionary. For example below
+s contains three top level elements, a, b and d. A and b are
+integers and d is a dictionary with elements x and y.
 
 server json:
 
@@ -1321,66 +1364,6 @@ server json:
     "x": 100,
     "y": 200
   }
-}
-#+END_SRC
-
-If the key is a valid variable name, you can access it using dot
-notation. For the json example above, you can access the data as:
-
-#+BEGIN_SRC
-s.a => 1
-s.b => 2
-s.d.x => 100
-s.d.y => 200
-#+END_SRC
-
-You can also access the elements with the get function or bracket
-notation. The get function has an optional default parameter and
-it works with keys that don't look like variables.  Examples:
-
-#+BEGIN_SRC
-get(s, "a") => 1
-get(s, "b") => 2
-get(s, "d") => dict("x", 100, "y", 200)
-
-s["a"] => 1
-s["b"] => 2
-
-d = get(s, "d")
-
-get(d, "x") => 100
-get(d, "y") => 200
-get(d, "missing", 99) => 99
-#+END_SRC
-
-You append to a dictionary when you create a new variable. In the
-following example the "a" and "str" elements are appended to the
-d dictionary.
-
-#+BEGIN_SRC
-d = dict()
-d.a = 5
-d.str = "black"
-
-d => {
-  "a": 5,
-  "str": "black"
-}
-#+END_SRC
-
-You can also append to a dictionary using bracket notation on the
-left hand side. The index is a variable name or a literal
-string. For example:
-
-#+BEGIN_SRC
-d = dict()
-d["one"] = 1
-key2 = "two"
-d[key2] = 2
-
-d => {
-  "one": 1,
-  "two": 2
 }
 #+END_SRC
 
@@ -1547,7 +1530,7 @@ statement: o.b = cmp(1.9, 5)
                           ^
 #+END_SRC
 
-You can call [[#functionDetails][functionDetails]] to get the signature, doc comment,
+You can call [[#docs/teaFunctions.md#functionDetails][functionDetails]] to get the signature, doc comment,
 statements etc. of a user or built-in function.
 
 [[#contents][茶]]
@@ -2441,6 +2424,7 @@ This documentation is extracted from the nim module functions.nim
 by the nimble task *dyfuncs*. The template creates a nim source file
 that’s compiled in.
 
+- [[src/dynamicFuncList.nim][src/dynamicFuncList.nim]]
 - [[templates/dynamicFuncList.nim][dynamicFuncList.nim]]
 - [[templates/dynamicFuncList.tea][dynamicFuncList.tea]]
 

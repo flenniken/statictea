@@ -17,6 +17,7 @@ $statictea \
 
 ~~~
 $$ block
+$$ : # test warnings
 $$ : c1 = and(1, 2)
 $$ : c2 = and(true, 2)
 $$ : c3 = or(1, 2)
@@ -80,28 +81,28 @@ c5 = true = true
 ### File stderr.expected
 
 ~~~
-tmpl.txt(2): w193: The argument must be a bool value, got int.
+tmpl.txt(3): w193: The argument must be a bool value, got int.
 statement: c1 = and(1, 2)
                     ^
-tmpl.txt(3): w193: The argument must be a bool value, got int.
+tmpl.txt(4): w193: The argument must be a bool value, got int.
 statement: c2 = and(true, 2)
                           ^
-tmpl.txt(4): w193: The argument must be a bool value, got int.
+tmpl.txt(5): w193: The argument must be a bool value, got int.
 statement: c3 = or(1, 2)
                    ^
-tmpl.txt(5): w193: The argument must be a bool value, got int.
+tmpl.txt(6): w193: The argument must be a bool value, got int.
 statement: c4 = or(false, 2)
                           ^
-tmpl.txt(6): w195: Expected two arguments.
+tmpl.txt(7): w195: Expected two arguments.
 statement: c5 = or(false, false, true)
                                ^
-tmpl.txt(7): w195: Expected two arguments.
+tmpl.txt(8): w195: Expected two arguments.
 statement: c6 = and(false, false, true)
                                 ^
-tmpl.txt(8): w195: Expected two arguments.
+tmpl.txt(9): w195: Expected two arguments.
 statement: c7 = or(false)
                         ^
-tmpl.txt(9): w195: Expected two arguments.
+tmpl.txt(10): w195: Expected two arguments.
 statement: c8 = and(false)
                          ^
 ~~~
