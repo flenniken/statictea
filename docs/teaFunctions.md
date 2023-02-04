@@ -53,7 +53,7 @@ variable or pass to another function.
 * [len](#len-1) &mdash; Number of elements in a list.
 * [len](#len-2) &mdash; Number of unicode characters in a string.
 * [list](#list) &mdash; Create a list of variables.
-* [listLoop](#listloop) &mdash; Create a new list from a list and a callback function.
+* [listLoop](#listloop) &mdash; Fill in a container from a list and a callback function.
 * [log](#log) &mdash; Log a message to the log file.
 * [lower](#lower) &mdash; Lowercase a string.
 * [lt](#lt) &mdash; Return true when a float is less then another float.
@@ -1023,41 +1023,41 @@ a = ["a", 5, "b"]
 
 # listLoop
 
-Create a new list from a list and a callback function. The callback function is called for each item in the list and it decides what goes in the list.
+Fill in a container from a list and a callback function. The callback function is called for each item in the list and it decides what goes in the container.
 
-You pass a list to loop over, a list to fill in, a callback
+You pass a list to loop over, a container to fill in, a callback
 function, and an optional state variable. The function returns
 whether the callback stopped early or not.
 
 ~~~
-listLoop(a: list, newList: list, listCallback: func, state: optional any) bool
+listLoop(a: list, container: any, listCallback: func, state: optional any) bool
 ~~~
 
 The callback gets passed the index to the item, its value, the
-new item and the state variable.  The callback looks at the
-information and adds to the new item when appropriate. The
+container and the state variable.  The callback looks at the
+information and adds to the container when appropriate. The
 callback returns true to stop iterating.
 
 ~~~
-listCallback(ix: int, item: any, newList: list, state: optional any) bool
+listCallback(ix: int, item: any, container: any, state: optional any) bool
 ~~~
 
 The following example makes a new list [6, 8] from the list
 [2,4,6,8].  The callback is called b5.
 
 ~~~
-newList = []
+container = []
 list = [2,4,6,8]
-stopped = listLoop(list, newList, b5)
+stopped = listLoop(list, container, b5)
 newList => [6, 8]
 ~~~
 
 Below is the definition of the b5 callback function.
 
 ~~~
-b5 = func(“b5(ix: int, value: int, newList: list) bool”)
+b5 = func(“b5(ix: int, value: int, container: list) bool”)
   ## Collect values greater than 5.
-  newList &= if( (value > 5), value)
+  container &= if( (value > 5), value)
   return(false)
 ~~~
 

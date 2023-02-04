@@ -1530,7 +1530,7 @@ statement: o.b = cmp(1.9, 5)
                           ^
 #+END_SRC
 
-You can call [[#docs/teaFunctions.md#functionDetails][functionDetails]] to get the signature, doc comment,
+You can call functionDetails to get the signature, doc comment,
 statements etc. of a user or built-in function.
 
 [[#contents][茶]]

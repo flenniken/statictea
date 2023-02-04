@@ -1287,44 +1287,44 @@ func fun_list_al*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:~~~~
   result = newFunResult(newValue(arguments, mutable = Mutable.append))
 
-func fun_listLoop_llpoab*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Create a new list from a list and a callback function. The callback
+func fun_listLoop_lapoab*(variables: Variables, arguments: seq[Value]): FunResult =
+  ## Fill in a container from a list and a callback function. The callback
   ## function is called for each item in the list and it decides what
-  ## goes in the list.
+  ## goes in the container.
   ## @:
-  ## @:You pass a list to loop over, a list to fill in, a callback
+  ## @:You pass a list to loop over, a container to fill in, a callback
   ## @:function, and an optional state variable. The function returns
   ## @:whether the callback stopped early or not.
   ## @:
   ## @:~~~
-  ## @:listLoop(a: list, newList: list, listCallback: func, state: optional any) bool
+  ## @:listLoop(a: list, container: any, listCallback: func, state: optional any) bool
   ## @:~~~~
   ## @:
   ## @:The callback gets passed the index to the item, its value, the
-  ## @:new item and the state variable.  The callback looks at the
-  ## @:information and adds to the new item when appropriate. The
+  ## @:container and the state variable.  The callback looks at the
+  ## @:information and adds to the container when appropriate. The
   ## @:callback returns true to stop iterating.
   ## @:
   ## @:~~~
-  ## @:listCallback(ix: int, item: any, newList: list, state: optional any) bool
+  ## @:listCallback(ix: int, item: any, container: any, state: optional any) bool
   ## @:~~~~
   ## @:
   ## @:The following example makes a new list [6, 8] from the list
   ## @:[2,4,6,8].  The callback is called b5.
   ## @:
   ## @:~~~
-  ## @:newList = []
+  ## @:container = []
   ## @:list = [2,4,6,8]
-  ## @:stopped = listLoop(list, newList, b5)
+  ## @:stopped = listLoop(list, container, b5)
   ## @:newList => [6, 8]
   ## @:~~~
   ## @:
   ## @:Below is the definition of the b5 callback function.
   ## @:
   ## @:~~~
-  ## @:b5 = func(“b5(ix: int, value: int, newList: list) bool”)
+  ## @:b5 = func(“b5(ix: int, value: int, container: list) bool”)
   ## @:  ## Collect values greater than 5.
-  ## @:  newList &= if( (value > 5), value)
+  ## @:  container &= if( (value > 5), value)
   ## @:  return(false)
   ## @:~~~
 
@@ -2724,7 +2724,7 @@ functionsDict["fun_len_di"] = fun_len_di
 functionsDict["fun_len_li"] = fun_len_li
 functionsDict["fun_len_si"] = fun_len_si
 functionsDict["fun_list_al"] = fun_list_al
-functionsDict["fun_listLoop_llpoab"] = fun_listLoop_llpoab
+functionsDict["fun_listLoop_lapoab"] = fun_listLoop_lapoab
 functionsDict["fun_log_ss"] = fun_log_ss
 functionsDict["fun_lower_ss"] = fun_lower_ss
 functionsDict["fun_lt_ffb"] = fun_lt_ffb

@@ -49,7 +49,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [fun_dup_sis](#fun_dup_sis) &mdash; Duplicate a string x times.
 * [fun_dict_old](#fun_dict_old) &mdash; Create a dictionary from a list of key, value pairs.
 * [fun_list_al](#fun_list_al) &mdash; Create a list of variables.
-* [fun_listLoop_llpoab](#fun_listloop_llpoab) &mdash; Create a new list from a list and a callback function.
+* [fun_listLoop_lapoab](#fun_listloop_lapoab) &mdash; Fill in a container from a list and a callback function.
 * [fun_replace_siiss](#fun_replace_siiss) &mdash; Replace a substring specified by its position and length with another string.
 * [fun_replaceRe_sls](#fun_replacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
 * [parsePath](#parsepath) &mdash; Parse the given file path into its component pieces.
@@ -998,48 +998,48 @@ a = ["a", 5, "b"]
 func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# fun_listLoop_llpoab
+# fun_listLoop_lapoab
 
-Create a new list from a list and a callback function. The callback function is called for each item in the list and it decides what goes in the list.
+Fill in a container from a list and a callback function. The callback function is called for each item in the list and it decides what goes in the container.
 
-You pass a list to loop over, a list to fill in, a callback
+You pass a list to loop over, a container to fill in, a callback
 function, and an optional state variable. The function returns
 whether the callback stopped early or not.
 
 ~~~
-listLoop(a: list, newList: list, listCallback: func, state: optional any) bool
+listLoop(a: list, container: any, listCallback: func, state: optional any) bool
 ~~~
 
 The callback gets passed the index to the item, its value, the
-new item and the state variable.  The callback looks at the
-information and adds to the new item when appropriate. The
+container and the state variable.  The callback looks at the
+information and adds to the container when appropriate. The
 callback returns true to stop iterating.
 
 ~~~
-listCallback(ix: int, item: any, newList: list, state: optional any) bool
+listCallback(ix: int, item: any, container: any, state: optional any) bool
 ~~~
 
 The following example makes a new list [6, 8] from the list
 [2,4,6,8].  The callback is called b5.
 
 ~~~
-newList = []
+container = []
 list = [2,4,6,8]
-stopped = listLoop(list, newList, b5)
+stopped = listLoop(list, container, b5)
 newList => [6, 8]
 ~~~
 
 Below is the definition of the b5 callback function.
 
 ~~~
-b5 = func(“b5(ix: int, value: int, newList: list) bool”)
+b5 = func(“b5(ix: int, value: int, container: list) bool”)
   ## Collect values greater than 5.
-  newList &= if( (value > 5), value)
+  container &= if( (value > 5), value)
   return(false)
 ~~~
 
 ```nim
-func fun_listLoop_llpoab(variables: Variables; arguments: seq[Value]): FunResult
+func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # fun_replace_siiss
