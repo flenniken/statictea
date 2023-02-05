@@ -445,46 +445,6 @@ suite "functions.nim":
     let eFunResult = newFunResult(newValue(1))
     check testFunction("cmp", arguments, eFunResult)
 
-  test "if0 function 0":
-    var arguments = @[newValue(0), newValue("then"), newValue("else")]
-    let eFunResult = newFunResult(newValue("then"))
-    check testFunction("if0", arguments, eFunResult)
-
-  test "if0 function no else":
-    var arguments = @[newValue(0), newValue("then")]
-    let eFunResult = newFunResult(newValue("then"))
-    check testFunction("if0", arguments, eFunResult)
-
-  test "if0 function no else taken":
-    var arguments = @[newValue(1), newValue("then")]
-    let eFunResult = newFunResult(newValue(0))
-    check testFunction("if0", arguments, eFunResult)
-
-  test "if0 function not 0":
-    var arguments = @[newValue(33), newValue("then"), newValue("else")]
-    let eFunResult = newFunResult(newValue("else"))
-    check testFunction("if0", arguments, eFunResult)
-
-  test "if function true":
-    var arguments = @[newValue(true), newValue("then"), newValue("else")]
-    let eFunResult = newFunResult(newValue("then"))
-    check testFunction("if", arguments, eFunResult)
-
-  test "if function no else":
-    var arguments = @[newValue(true), newValue("then")]
-    let eFunResult = newFunResult(newValue("then"))
-    check testFunction("if", arguments, eFunResult)
-
-  test "if function no else taken":
-    var arguments = @[newValue(false), newValue("then")]
-    let eFunResult = newFunResult(newValue(0))
-    check testFunction("if", arguments, eFunResult)
-
-  test "if function not false":
-    var arguments = @[newValue(false), newValue("then"), newValue("else")]
-    let eFunResult = newFunResult(newValue("else"))
-    check testFunction("if", arguments, eFunResult)
-
   test "add 1 + 2":
     var arguments = @[newValue(1), newValue(2)]
     let eFunResult = newFunResult(newValue(3))
@@ -1820,46 +1780,6 @@ d.sub.y = 4"""
     var arguments = @[newValue(true)]
     let eFunResult = newFunResult(newValue(false))
     check testFunction("not", arguments, eFunResult)
-
-  test "true and true":
-    var arguments = @[newValue(true), newValue(true)]
-    let eFunResult = newFunResult(newValue(true))
-    check testFunction("and", arguments, eFunResult)
-
-  test "false and true":
-    var arguments = @[newValue(false), newValue(true)]
-    let eFunResult = newFunResult(newValue(false))
-    check testFunction("and", arguments, eFunResult)
-
-  test "true and false":
-    var arguments = @[newValue(true), newValue(false)]
-    let eFunResult = newFunResult(newValue(false))
-    check testFunction("and", arguments, eFunResult)
-
-  test "false and false":
-    var arguments = @[newValue(false), newValue(false)]
-    let eFunResult = newFunResult(newValue(false))
-    check testFunction("and", arguments, eFunResult)
-
-  test "true or true":
-    var arguments = @[newValue(true), newValue(true)]
-    let eFunResult = newFunResult(newValue(true))
-    check testFunction("or", arguments, eFunResult)
-
-  test "false or true":
-    var arguments = @[newValue(false), newValue(true)]
-    let eFunResult = newFunResult(newValue(true))
-    check testFunction("or", arguments, eFunResult)
-
-  test "true or false":
-    var arguments = @[newValue(true), newValue(false)]
-    let eFunResult = newFunResult(newValue(true))
-    check testFunction("or", arguments, eFunResult)
-
-  test "false or false":
-    var arguments = @[newValue(false), newValue(false)]
-    let eFunResult = newFunResult(newValue(false))
-    check testFunction("or", arguments, eFunResult)
 
   test "eq int":
     check testComp(1, "eq", 1, true)

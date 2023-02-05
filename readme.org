@@ -2347,7 +2347,7 @@ a = if(true, do-this(), do-other())
 
 The two parameter form assigns the variable when the condition is
 true but not when it’s false. You use it to conditionally append
-to a list.
+to a list or dictionary.
 
 #+BEGIN_SRC
 newList &= if(cond, value)

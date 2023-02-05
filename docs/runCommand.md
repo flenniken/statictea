@@ -494,11 +494,14 @@ This handles the three parameter form with an assignment.
 ~~~
 a = if(cond, then, else)
        ^                ^
+a = if(cond, then)
+       ^          ^
 ~~~
 
 ```nim
 proc ifFunctions(env: var Env; specialFunction: SpecialFunction;
-                 statement: Statement; start: Natural; variables: Variables): ValuePosSiOr
+                 statement: Statement; start: Natural; variables: Variables;
+                 topLevel = false): ValuePosSiOr
 ```
 
 # bareIfAndIf0
@@ -558,7 +561,7 @@ a = get(b, len("hi"), c)
 proc getFunctionValuePosSi(env: var Env; functionName: string;
                            functionPos: Natural; statement: Statement;
                            start: Natural; variables: Variables;
-                           listCase = false): ValuePosSiOr
+                           listCase = false; topLevel = false): ValuePosSiOr
 ```
 
 # runBoolOp
@@ -629,35 +632,20 @@ proc listLoop(env: var Env; specialFunction: SpecialFunction;
 
 # getValuePosSi
 
-Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition. The position returned includes the trailing whitespace after the item. So the ending position is pointing at the end of the statement, or at the first non-whitespace character after the item.
+Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.  The position returned includes the trailing whitespace after the item. The ending position is pointing at the end of the statement, or at the first non-whitespace character after the argument. A true topLevel parameter means the item pointed to by start is the first item after the equal sign (not an argument).
 
 ~~~
 a = "tea" # string
     ^     ^
-a = 123.5 # number
-    ^     ^
-a = t.row # variable
-    ^     ^
-a = [1, 2, 3] # list
-    ^         ^
-a = (c < 10) # condition
-    ^        ^
 a = cmp(b, c) # calling variable
     ^         ^
-a = if( (b < c), d, e) # if
-    ^                  ^
 a = if( bool(len(b)), d, e) # if
-    ^                       ^
         ^             ^
-             ^     ^
-                 ^^
-                      ^  ^
-                         ^  ^
 ~~~
 
 ```nim
 proc getValuePosSi(env: var Env; statement: Statement; start: Natural;
-                   variables: Variables): ValuePosSiOr
+                   variables: Variables; topLevel = false): ValuePosSiOr
 ```
 
 # runBareFunction

@@ -1308,16 +1308,46 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(3))
     check testRunStatement(statement, eVariableDataOr)
 
-  test "if0 two arguments":
-    let text = """a = if0(2, "abc")"""
+  test "true two parameter if":
+    let text = """a = if(true, "abc")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wAssignmentIf, "", 16)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue("abc"))
     check testRunStatement(statement, eVariableDataOr)
 
-  test "if assignment takes 3 args":
+  test "true two parameter if0":
     let text = """a = if0(0, "abc")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wAssignmentIf, "", 16)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue("abc"))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "false two parameter if":
+    let text = """a = if(false, "abc")"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(0))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "false two parameter if0":
+    let text = """a = if0(1, "abc")"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(0))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "nested true three parameter if":
+    let text = """a = len(if(true, "abc", "hello"))"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(3))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "nested false three parameter if":
+    let text = """a = len(if(false, "abc", "hello"))"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(5))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "nested false two parameter if":
+    let text = """a = len(if(false, "abc"))"""
+    let statement = newStatement(text)
+    let eVariableDataOr = newVariableDataOr(wTwoParamIfArg, "", 23)
     check testRunStatement(statement, eVariableDataOr)
 
   test "warn syntax error":
@@ -1396,12 +1426,6 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let text = """a = if0(0, return("stop"))"""
     let statement = newStatement(text)
     let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 11)
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "if assignment takes three args":
-    let text = """a = if0(1, return("stop"))"""
-    let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wAssignmentIf, "", 25)
     check testRunStatement(statement, eVariableDataOr)
 
   test "if missing right paren":

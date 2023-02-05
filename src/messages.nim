@@ -279,6 +279,7 @@ type
     wInvalidIndexValue,    ## w264
     wNotVariableName,      ## w265
     wNotIndexString,       ## w266
+    wTwoParamIfArg,        ## w267
 
 const
   Messages*: array[low(MessageId)..high(MessageId), string] = [
@@ -494,8 +495,8 @@ const
     "No matching end right bracket.", ## wNoMatchingBracket
     "Invalid character.", ## wInvalidCharacter
     "Invalid first character of the argument.", ## wInvalidFirstArgChar
-    "An IF with an assignment takes three arguments.", ## wAssignmentIf
-    "An IF without an assignment takes two arguments.", ## wBareIfTwoArguments
+    "", ## wAssignmentIf
+    "A bare IF without an assignment takes two arguments.", ## wBareIfTwoArguments
     "Expected a variable or a dot name.", ##  wExpectedDotname
     "Expected variable name not function call.", ## wInvalidDotname
     "Invalid REPL command syntax, unexpected text.", ## wInvalidReplSyntax
@@ -549,6 +550,7 @@ const
     "The index value must be a variable name or literal string.", ## wInvalidIndexValue
     "The index variable value is not a valid variable name.", ## wNotVariableName
     "The index value is not a string.", ## wNotIndexString
+    "A two parameter IF function cannot be used as an argument.", ## wTwoParamIfArg
     ]
 
     ## The message text.

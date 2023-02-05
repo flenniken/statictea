@@ -719,12 +719,11 @@ The condition types and what is considered 0:
 * dict -- when the length of the dictionary is 0
 * func -- always 0
 
-The if functions are special in a couple of ways, see
+The IF functions are special in a couple of ways, see
 the If Functions section.
 
 ~~~
-if0(condition: any, then: any, else: any) any
-if0(condition: any, then: any)
+if0(condition: any, then: any, else: optional any) any
 ~~~
 
 Examples:
@@ -741,6 +740,9 @@ a = if0(dict(), "tea", "beer") => tea
 a = if0(dict("a",1), "tea", "beer") => beer
 a = if0(false, "tea", "beer") => tea
 a = if0(true, "tea", "beer") => beer
+
+a = if0(true, "tea")
+a = if0(false, "tea")
 ~~~
 
 You don't have to assign the result of an if0 function which is
@@ -756,7 +758,7 @@ if0(c, warn("got zero value"))
 
 If the condition is true, return the second argument, else return the third argument.
 
-The if functions are special in a couple of ways, see
+The IF functions are special in a couple of ways, see
 the If Functions section.  You usually use boolean infix
 expressions for the condition, see:
 the Boolean Expressions section.
@@ -768,9 +770,10 @@ if(condition: bool, then: any, else: optional any) any
 Examples:
 
 ~~~
-a = if(true, "tea", "beer") => tea
-b = if(false, "tea", "beer") => beer
-c = if((d < 5), "tea", "beer") => beer
+a = if(true, "tea", "beer") # => tea
+b = if(false, "tea", "beer") # => beer
+c = if((v < 5), "tea", "beer")
+d = if((v < 5), "tea")
 ~~~
 
 You don't have to assign the result of an if function which is

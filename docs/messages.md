@@ -287,7 +287,8 @@ MessageId = enum
   wNewListInDict,           ## w263
   wInvalidIndexValue,       ## w264
   wNotVariableName,         ## w265
-  wNotIndexString            ## w266
+  wNotIndexString,          ## w266
+  wTwoParamIfArg             ## w267
 ```
 
 # Messages
@@ -508,8 +509,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "No matching end right bracket.", ## wNoMatchingBracket
     "Invalid character.",   ## wInvalidCharacter
     "Invalid first character of the argument.", ## wInvalidFirstArgChar
-    "An IF with an assignment takes three arguments.", ## wAssignmentIf
-    "An IF without an assignment takes two arguments.", ## wBareIfTwoArguments
+    "",                     ## wAssignmentIf
+    "A bare IF without an assignment takes two arguments.", ## wBareIfTwoArguments
     "Expected a variable or a dot name.", ## wExpectedDotname
     "Expected variable name not function call.", ## wInvalidDotname
     "Invalid REPL command syntax, unexpected text.", ## wInvalidReplSyntax
@@ -562,7 +563,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", ## The
     "You cannot create a new list element in the immutable dictionary.", ## wNewListInDict
     "The index value must be a variable name or literal string.", ## wInvalidIndexValue
     "The index variable value is not a valid variable name.", ## wNotVariableName
-    "The index value is not a string."]
+    "The index value is not a string.", ## wNotIndexString
+    "A two parameter IF function cannot be used as an argument."]
 ```
 
 # WarningData

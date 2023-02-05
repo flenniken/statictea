@@ -418,12 +418,11 @@ The condition types and what is considered 0:
 * dict -- when the length of the dictionary is 0
 * func -- always 0
 
-The if functions are special in a couple of ways, see
+The IF functions are special in a couple of ways, see
 the If Functions section.
 
 ~~~
-if0(condition: any, then: any, else: any) any
-if0(condition: any, then: any)
+if0(condition: any, then: any, else: optional any) any
 ~~~
 
 Examples:
@@ -440,6 +439,9 @@ a = if0(dict(), "tea", "beer") => tea
 a = if0(dict("a",1), "tea", "beer") => beer
 a = if0(false, "tea", "beer") => tea
 a = if0(true, "tea", "beer") => beer
+
+a = if0(true, "tea")
+a = if0(false, "tea")
 ~~~
 
 You don't have to assign the result of an if0 function which is
@@ -458,7 +460,7 @@ func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
 
 If the condition is true, return the second argument, else return the third argument.
 
-The if functions are special in a couple of ways, see
+The IF functions are special in a couple of ways, see
 the If Functions section.  You usually use boolean infix
 expressions for the condition, see:
 the Boolean Expressions section.
@@ -470,9 +472,10 @@ if(condition: bool, then: any, else: optional any) any
 Examples:
 
 ~~~
-a = if(true, "tea", "beer") => tea
-b = if(false, "tea", "beer") => beer
-c = if((d < 5), "tea", "beer") => beer
+a = if(true, "tea", "beer") # => tea
+b = if(false, "tea", "beer") # => beer
+c = if((v < 5), "tea", "beer")
+d = if((v < 5), "tea")
 ~~~
 
 You don't have to assign the result of an if function which is
@@ -2169,7 +2172,7 @@ and(false, false) => false
 and(false, warn("not hit")) => false
 ~~~
 """,
-    numLines: 26), (funcName: "fun_bool_ab", docComment: """Create an bool from a value.
+    numLines: 23), (funcName: "fun_bool_ab", docComment: """Create an bool from a value.
 
 ~~~
 bool(value: Value) bool
@@ -2349,13 +2352,13 @@ dict() =>
 Dynamically generated array of starting line numbers for each built-in function in the functions.nim file.
 
 ```nim
-functionStarts = [602, 579, 2339, 1083, 728, 761, 258, 237, 279, 805, 312, 1232,
-                  1193, 2410, 2391, 2429, 673, 1120, 849, 892, 866, 2208, 2242,
-                  2263, 429, 387, 1818, 2525, 2506, 2563, 2544, 467, 532, 947,
-                  982, 1024, 1953, 1912, 1580, 368, 349, 331, 1269, 1290, 2023,
-                  1561, 2601, 2582, 2640, 2620, 2468, 2449, 2487, 2321, 2365,
-                  1506, 2660, 1337, 1447, 2047, 1158, 1727, 1760, 1789, 2298,
-                  2098, 2184, 648, 625, 1859, 1604, 1998]
+functionStarts = [587, 564, 2327, 1068, 713, 746, 258, 237, 279, 790, 312, 1217,
+                  1178, 2392, 2373, 2411, 658, 1105, 834, 877, 851, 2196, 2230,
+                  2251, 429, 387, 1804, 2507, 2488, 2545, 2526, 467, 525, 932,
+                  967, 1009, 1939, 1898, 1566, 368, 349, 331, 1254, 1275, 2009,
+                  1547, 2583, 2564, 2622, 2602, 2450, 2431, 2469, 2309, 2350,
+                  1492, 2642, 1323, 1433, 2033, 1143, 1713, 1746, 1775, 2286,
+                  2086, 2172, 633, 610, 1845, 1590, 1984]
 ```
 
 # getBestFunction

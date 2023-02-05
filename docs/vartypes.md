@@ -372,14 +372,14 @@ The kind of side effect for a statement.
 
 * seNone -- no side effect, the normal case
 * seReturn -- the return function; stop the command and
-either skip the replacement block or stop iterating.
+either skip the replacement block or stop iterating
 * seLogMessage -- the log function; write a message to the log file
-* seBareIfIgnore -- the bare IF function was false, ignore the statement
+* seIf2False -- the two parameter IF condition was false
 
 ```nim
 SideEffect = enum
   seNone = "none", seReturn = "return", seLogMessage = "log",
-  seBareIfIgnore = "bareIfIgnore"
+  seIf2False = "if2False"
 ```
 
 # ValuePosSi

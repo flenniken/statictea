@@ -901,7 +901,7 @@ func skipArg(statement: Statement, start: Natural): PosOr =
 
 # Forward reference to getValuePosSi since we call it recursively.
 proc getValuePosSi*(env: var Env, statement: Statement, start: Natural, variables:
-  Variables): ValuePosSiOr
+  Variables, topLevel = false): ValuePosSiOr
 
 func getSpecialFunction(funcVar: Value): SpecialFunction =
   ## Return the function type given a function variable.
@@ -954,7 +954,7 @@ proc bareReturn(
   ##         ^      ^
   # Get the value.
   var runningPos = start
-  let valueAndPosOr = getValuePosSi(env, statement, runningPos, variables)
+  let valueAndPosOr = getValuePosSi(env, statement, runningPos, variables, topLevel = true)
   if valueAndPosOr.isMessage:
     return valueAndPosOr
   var value = valueAndPosOr.value.value
@@ -975,6 +975,7 @@ proc ifFunctions*(
     statement: Statement,
     start: Natural,
     variables: Variables,
+    topLevel = false,
   ): ValuePosSiOr =
   ## Return the if/if0 function's value and position after. It
   ## conditionally runs one of its arguments and skips the
@@ -986,12 +987,15 @@ proc ifFunctions*(
   ## @:~~~
   ## @:a = if(cond, then, else)
   ## @:       ^                ^
+  ## @:a = if(cond, then)
+  ## @:       ^          ^
   ## @:~~~~
 
   # Get the condition's value.
   let vlcOr = getValuePosSi(env, statement, start, variables)
   if vlcOr.isMessage:
     return vlcOr
+
   let cond = vlcOr.value.value
   var runningPos = vlcOr.value.pos
 
@@ -1008,8 +1012,8 @@ proc ifFunctions*(
   # Match the comma and whitespace.
   let commaO = matchSymbol(statement.text, gComma, runningPos)
   if not commaO.isSome:
-    # An if with an assignment takes three arguments.
-    return newValuePosSiOr(wAssignmentIf, "", start)
+    # The function requires at least $1 arguments.
+    return newValuePosSiOr(wNotEnoughArgsOpt, "2", start)
   runningPos += commaO.get().length
 
   # Handle the second parameter.
@@ -1032,22 +1036,26 @@ proc ifFunctions*(
   var vl3Or: ValuePosSiOr
   let cO = matchSymbol(statement.text, gComma, runningPos)
   if not cO.isSome:
-    # An if with an assignment takes three arguments.
-    return newValuePosSiOr(wAssignmentIf, "", runningPos)
-  runningPos += cO.get().length
-
-  # Handle the third parameter.
-  skip = (condition == true)
-  if skip:
-    let posOr = skipArg(statement, runningPos)
-    if posOr.isMessage:
-      return newValuePosSiOr(posOr.message)
-    runningPos = posOr.value
+    # No third argument.
+    if not topLevel:
+      # A two parameter IF function cannot be used as an argument.
+      return newValuePosSiOr(wTwoParamIfArg, "", runningPos)
+    vl3Or = newValuePosSiOr(newValue(0), runningPos, seIf2False)
   else:
-    vl3Or = getValuePosSi(env, statement, runningPos, variables)
-    if vl3Or.isMessage:
-      return vl3Or
-    runningPos = vl3Or.value.pos
+    runningPos += cO.get().length
+
+    # Handle the third parameter.
+    skip = (condition == true)
+    if skip:
+      let posOr = skipArg(statement, runningPos)
+      if posOr.isMessage:
+        return newValuePosSiOr(posOr.message)
+      runningPos = posOr.value
+    else:
+      vl3Or = getValuePosSi(env, statement, runningPos, variables)
+      if vl3Or.isMessage:
+        return vl3Or
+      runningPos = vl3Or.value.pos
 
   # Match ) and trailing whitespace.
   let parenO = matchSymbol(statement.text, gRightParentheses, runningPos)
@@ -1057,11 +1065,14 @@ proc ifFunctions*(
   runningPos += parenO.get().length
 
   var value: Value
+  var sideEffect: SideEffect
   if condition:
     value = vl2Or.value.value
+    sideEffect = vl2Or.value.sideEffect
   else:
     value = vl3Or.value.value
-  result = newValuePosSiOr(value, runningPos)
+    sideEffect = vl3Or.value.sideEffect
+  result = newValuePosSiOr(value, runningPos, sideEffect)
 
 proc bareIfAndIf0*(
     env: var Env,
@@ -1082,7 +1093,7 @@ proc bareIfAndIf0*(
   var runningPos = start
 
   # Get the condition's value.
-  let vlcOr = getValuePosSi(env, statement, runningPos, variables)
+  let vlcOr = getValuePosSi(env, statement, runningPos, variables, topLevel = true)
   if vlcOr.isMessage:
     return vlcOr
   let cond = vlcOr.value.value
@@ -1101,7 +1112,7 @@ proc bareIfAndIf0*(
   # Match the comma and whitespace.
   let commaO = matchSymbol(statement.text, gComma, runningPos)
   if not commaO.isSome:
-    # "An IF without an assignment takes two arguments.
+    # A bare IF without an assignment takes two arguments.
     return newValuePosSiOr(wBareIfTwoArguments, "", start)
   runningPos += commaO.get().length
 
@@ -1110,15 +1121,17 @@ proc bareIfAndIf0*(
   var value2: Value
   var se2: SideEffect
   if skip:
+    # The two parameter IF was false.
     let posOr = skipArg(statement, runningPos)
     if posOr.isMessage:
       return newValuePosSiOr(posOr.message)
     runningPos = posOr.value
     value2 = newValue(0)
-    se2 = seBareIfIgnore
+    se2 = seIf2False
   else:
     # Get the second value.
     var valueAndPosOr: ValuePosSiOr
+    # todo: go through the specialFunction logic incase return has been assigned to another variable.
     # Handle the return function extra special.
     if statement.text[runningPos .. ^1].startsWith("return("):
       const
@@ -1135,7 +1148,7 @@ proc bareIfAndIf0*(
         return valueAndPosOr
       se2 = valueAndPosOr.value.sideEffect
     else:
-      valueAndPosOr = getValuePosSi(env, statement, runningPos, variables)
+      valueAndPosOr = getValuePosSi(env, statement, runningPos, variables, topLevel = true)
       if valueAndPosOr.isMessage:
         return valueAndPosOr
       se2 = valueAndPosOr.value.sideEffect
@@ -1151,7 +1164,7 @@ proc bareIfAndIf0*(
   let commaSymbol = commaSymbolO.get()
   let foundSymbol = commaSymbol.getGroup()
   if foundSymbol == ",":
-    # An IF without an assignment takes two arguments.
+    # A bare IF without an assignment takes two arguments.
     return newValuePosSiOr(wBareIfTwoArguments, "", runningPos)
 
   runningPos += commaSymbol.length
@@ -1316,7 +1329,9 @@ proc getFunctionValuePosSi*(
     statement: Statement,
     start: Natural,
     variables: Variables,
-    listCase = false): ValuePosSiOr =
+    listCase = false,
+    topLevel = false,
+): ValuePosSiOr =
   ## Return the function's value and the position after it. Start points at the
   ## first argument of the function. The position includes the trailing
   ## whitespace after the ending ).
@@ -1731,7 +1746,7 @@ proc listLoop*(
   return newValuePosSiOr(funResult.value, runningPos)
 
 proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, variables:
-    Variables): ValuePosSiOr =
+    Variables, topLevel = false): ValuePosSiOr =
   ## Get the value, position and side effect from the statement. Start
   ## points at the right hand side of the statement. The return pos is
   ## the first character after trailing whitespace.
@@ -1806,7 +1821,7 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
       case specialFunction:
       of spIf, spIf0:
         # Handle the special IF functions.
-        return ifFunctions(env, specialFunction, statement, rightName.pos, variables)
+        return ifFunctions(env, specialFunction, statement, rightName.pos, variables, topLevel)
       of spAnd, spOr:
         # Handle the special AND/OR functions.
         return andOrFunctions(env, specialFunction, statement, rightName.pos, variables)
@@ -1831,42 +1846,29 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
       return getBracketedVarValue(env, statement, rightName.pos, valueOr.value, variables)
 
 proc getValuePosSi*(env: var Env, statement: Statement, start: Natural, variables:
-    Variables): ValuePosSiOr =
-  ## Return the value and position of the item that the start parameter
-  ## points at which is a string, number, variable, list, or condition.
-  ## The position returned includes the trailing whitespace after the
-  ## item. So the ending position is pointing at the end of the
-  ## statement, or at the first non-whitespace character after the
-  ## item.
+  Variables, topLevel = false): ValuePosSiOr =
+  ## Return the value and position of the item that the start
+  ## parameter points at which is a string, number, variable, list, or
+  ## condition.  The position returned includes the trailing
+  ## whitespace after the item. The ending position is pointing at the
+  ## end of the statement, or at the first non-whitespace character
+  ## after the argument. A true topLevel parameter means the item
+  ## pointed to by start is the first item after the equal sign (not
+  ## an argument).
   ## @:
   ## @:~~~
   ## @:a = "tea" # string
   ## @:    ^     ^
-  ## @:a = 123.5 # number
-  ## @:    ^     ^
-  ## @:a = t.row # variable
-  ## @:    ^     ^
-  ## @:a = [1, 2, 3] # list
-  ## @:    ^         ^
-  ## @:a = (c < 10) # condition
-  ## @:    ^        ^
   ## @:a = cmp(b, c) # calling variable
   ## @:    ^         ^
-  ## @:a = if( (b < c), d, e) # if
-  ## @:    ^                  ^
   ## @:a = if( bool(len(b)), d, e) # if
-  ## @:    ^                       ^
   ## @:        ^             ^
-  ## @:             ^     ^
-  ## @:                 ^^
-  ## @:                      ^  ^
-  ## @:                         ^  ^
   ## @:~~~~
 
   when showPos:
     showDebugPos(statement, start, "^ s")
 
-  result = getValuePosSiWorker(env, statement, start, variables)
+  result = getValuePosSiWorker(env, statement, start, variables, topLevel)
 
   when showPos:
     var pos: Natural
@@ -1911,7 +1913,7 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
   of spWarn, spLog:
     # Handle a bare warn, or log function.
     result = getFunctionValuePosSi(env, $specialFunction, start,
-      statement, runningPos, variables, listCase=false)
+      statement, runningPos, variables, listCase=false, topLevel = true)
 
 proc getBracketDotName*(env: var Env, statement: Statement, start: Natural,
     variables: Variables, leftName: VariableName): ValuePosSiOr =
@@ -2043,7 +2045,7 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
     runningPos = runningPos + match.length
 
     # Get the right hand side value and match the following whitespace.
-    vlOr = getValuePosSi(env, statement, runningPos, variables)
+    vlOr = getValuePosSi(env, statement, runningPos, variables, topLevel = true)
 
   if vlOr.isMessage:
     return newVariableDataOr(vlOr.message)
@@ -2062,8 +2064,8 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
   of seLogMessage:
     # Log statement exit.
     return newVariableDataOr("", opLog, vlOr.value.value)
-  of seBareIfIgnore:
-    # Bare if with a false condition.
+  of seIf2False:
+    # False Bare IF or false two parameter IF.
     return newVariableDataOr("", opIgnore, vlOr.value.value)
   of seNone:
     discard

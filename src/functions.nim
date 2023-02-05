@@ -480,12 +480,11 @@ func fun_if0_iaoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:* dict -- when the length of the dictionary is 0
   ## @:* func -- always 0
   ## @:
-  ## @:The if functions are special in a couple of ways, see
+  ## @:The IF functions are special in a couple of ways, see
   ## @:the If Functions section.
   ## @:
   ## @:~~~
-  ## @:if0(condition: any, then: any, else: any) any
-  ## @:if0(condition: any, then: any)
+  ## @:if0(condition: any, then: any, else: optional any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -502,6 +501,9 @@ func fun_if0_iaoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:a = if0(dict("a",1), "tea", "beer") => beer
   ## @:a = if0(false, "tea", "beer") => tea
   ## @:a = if0(true, "tea", "beer") => beer
+  ## @:
+  ## @:a = if0(true, "tea")
+  ## @:a = if0(false, "tea")
   ## @:~~~~
   ## @:
   ## @:You don't have to assign the result of an if0 function which is
@@ -515,17 +517,8 @@ func fun_if0_iaoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   # Note: the if functions are handled in runCommand as a special
   # case. This code is not run. It is here for the function list and
   # documentation.
-
-  tMapParameters("if0", "iaoaa")
-  let condition = map["a"].intv
-  let thenCase = map["b"]
-
-  if condition == 0:
-    result = newFunResult(thenCase)
-  elif "c" in map:
-    result = newFunResult(map["c"])
-  else:
-    result = newFunResult(newValue(0))
+  assert(false, "Unexpectedly hit IF0 in functions.nim.")
+  result = newFunResult(newValue(0))
 
 {.push overflowChecks: on, floatChecks: on.}
 
@@ -533,7 +526,7 @@ func fun_if_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## If the condition is true, return the second argument, else return
   ## the third argument.
   ## @:
-  ## @:The if functions are special in a couple of ways, see
+  ## @:The IF functions are special in a couple of ways, see
   ## @:the If Functions section.  You usually use boolean infix
   ## @:expressions for the condition, see:
   ## @:the Boolean Expressions section.
@@ -545,9 +538,10 @@ func fun_if_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:Examples:
   ## @:
   ## @:~~~
-  ## @:a = if(true, "tea", "beer") => tea
-  ## @:b = if(false, "tea", "beer") => beer
-  ## @:c = if((d < 5), "tea", "beer") => beer
+  ## @:a = if(true, "tea", "beer") # => tea
+  ## @:b = if(false, "tea", "beer") # => beer
+  ## @:c = if((v < 5), "tea", "beer")
+  ## @:d = if((v < 5), "tea")
   ## @:~~~~
   ## @:
   ## @:You don't have to assign the result of an if function which is
@@ -562,17 +556,8 @@ func fun_if_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   # Note: the if functions are handled in runCommand as a special
   # case. This code is not run. It is here for the function list and
   # documentation.
-
-  tMapParameters("if", "baoaa")
-  let condition = map["a"].boolv
-  let thenCase = map["b"]
-
-  if condition:
-    result = newFunResult(thenCase)
-  elif "c" in map:
-    result = newFunResult(map["c"])
-  else:
-    result = newFunResult(newValue(0))
+  assert(false, "Unexpectedly hit IF in functions.nim.")
+  result = newFunResult(newValue(0))
 
 {.push overflowChecks: on, floatChecks: on.}
 
@@ -1332,6 +1317,7 @@ func fun_listLoop_lapoab*(variables: Variables, arguments: seq[Value]): FunResul
   # Note: This function is handled in runCommand as a special
   # case. This code is not run. It is here for the function list and
   # for documentation.
+  assert(false, "Unexpectedly hit listLoop in functions.nim.")
   result = newFunResult(newValue(0))
 
 func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult =
@@ -2088,6 +2074,8 @@ func fun_return_aa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:1
   ## @:3
   ## @:~~~~
+  # This code gets called when return is used as an argument other
+  # than in a two parameter if statement.
 
   # Check there is one argument.
   tMapParameters("return", "aa")
@@ -2356,11 +2344,8 @@ func fun_and_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
 
   # Note: this code isn't run, it's here for the docs and the function
   # list.  The the code in runCommand.nim.
-  tMapParameters("and", "bbb")
-  let a = map["a"].boolv
-  let b = map["b"].boolv
-  let cond = a and b
-  result = newFunResult(newValue(cond))
+  assert(false, "Unexpectedly hit AND in functions.nim.")
+  result = newFunResult(newValue(0))
 
 func fun_or_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Boolean OR with short circuit. If the first argument is true,
@@ -2382,11 +2367,8 @@ func fun_or_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
 
   # Note: this code isn't run, it's here for the docs and the function
   # list.  The the code in runCommand.nim.
-  tMapParameters("or", "bbb")
-  let a = map["a"].boolv
-  let b = map["b"].boolv
-  let cond = a or b
-  result = newFunResult(newValue(cond))
+  assert(false, "Unexpectedly hit OR in functions.nim.")
+  result = newFunResult(newValue(0))
 
 func fun_eq_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when the two ints are equal.

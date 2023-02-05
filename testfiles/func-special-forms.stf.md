@@ -92,8 +92,13 @@ o.v3 = l.orfunc(true, warn("not expected orfunc"))
 warnfunc = f.warn
 o.v4 = l.warnfunc("calling warn"))
 
-returnfunc = f.return
-if(true,l.returnfunc("skip"))
+if(true, return("skip"))
+# todo: return assigned to a variable
+#returnfunc = f.return
+#if(true,l.returnfunc("skip"))
+
+a = len(return(4))
+b = if(true, return(5))
 
 if(false, "not expected IF message")
 if(true, "if true message")
@@ -129,13 +134,19 @@ shared.tea(9): w224: The variable 'a' isn't in the f dictionary.
 statement: o.r2 = a(true, 3, 4)
                   ^
 shared.tea(23): calling warn
-shared.tea(26): w255: Invalid return; use a bare return in a user function or use it in a bare if statement.
-statement: if(true,l.returnfunc("skip"))
+shared.tea(25): w187: Use '...return("stop")...' in a code file.
+statement: if(true, return("skip"))
+           ^
+shared.tea(30): w255: Invalid return; use a bare return in a user function or use it in a bare if statement.
+statement: a = len(return(4))
                    ^
-shared.tea(30): w213: An IF without an assignment takes two arguments.
+shared.tea(31): w255: Invalid return; use a bare return in a user function or use it in a bare if statement.
+statement: b = if(true, return(5))
+                        ^
+shared.tea(35): w213: A bare IF without an assignment takes two arguments.
 statement: if(true, 3, "bare requires two parameters")
                      ^
-shared.tea(31): w213: An IF without an assignment takes two arguments.
+shared.tea(36): w213: A bare IF without an assignment takes two arguments.
 statement: if(false, 3, "bare requires two parameters")
                       ^
 tmpl.txt(4): w58: The replacement variable doesn't exist: o.r1.
