@@ -1,20 +1,22 @@
 # Statictea code file for functionsList.nim template.
 
-get-starts = func("get-starts(ix: int, entry: dict, newList: list, state: dict) bool")
-  ## Collect the start line followed by the number of lines to the next start line.
+get-starts = func("get-starts(ix: int, entry: dict, starts: dict, entries: list) bool")
+  ## Collect the a function's start line and number of lines.
   start = entry.line
 
-  next-entry = get(state.entries, add(ix,1), dict())
+  # Calculate the number of lines by the difference between the
+  # current start line and the next one.
+  next-entry = get(entries, add(ix,1), dict())
   next = get(next-entry, "line", 100)
+  numLines = sub(next, start)
 
-  newList &= string(start)
-  newList &= sub(next, start)
+  key = concat("k", string(start))
+  starts[key] = numLines
   return(false)
 
-# Make a dictionary mapping a start line to its the number of lines.
-alist = []
-stopped2 = listLoop(s.entries, alist, l.get-starts, s)
-starts = dict(alist)
+# Make a dictionary mapping a function's start line to its number of lines.
+starts = dict()
+dummy = listLoop(s.entries, starts, l.get-starts, s.entries)
 
 get-entry = func("get-entry(ix: int, entry: dict, newList: list, state: dict) bool")
   ## Add the Statictea functions to the new list.
@@ -32,7 +34,7 @@ get-entry = func("get-entry(ix: int, entry: dict, newList: list, state: dict) bo
   newEntry.docComment = replaceRe(desc, state.patterns)
 
   newEntry.lineNum = entry.line
-  newEntry.numLines = state.starts[string(entry.line)]
+  newEntry.numLines = state.starts[concat("k", string(entry.line))]
   newList &= newEntry
   return(false)
 

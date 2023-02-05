@@ -2347,10 +2347,12 @@ a = if(true, do-this(), do-other())
 
 The two parameter form assigns the variable when the condition is
 true but not when it’s false. You use it to conditionally append
-to a list or dictionary.
+to a list or dictionary. You cannot use this form as an argument
+to another function.
 
 #+BEGIN_SRC
 newList &= if(cond, value)
+d.tea = if(cond, value)
 #+END_SRC
 
 *Bare Two Parameter Form*
@@ -2509,7 +2511,7 @@ Nimble Tasks:
 - *docs*:  Create one or more markdown docs; specify part of the name.
 - *jsonix*:  Display markdown docs index json.
 - *json*:  Display one or more source file's json doc comments; specify part of the name.
-- *teafuncs*:  Create the function docs (teaFunctions.md).
+- *teafuncs*:  Create the function docs (docs/teaFunctions.md).
 - *dyfuncs*:  Create the built-in function details (src/dynamicFuncList.nim) from (src/functions.nim).
 - *dot*:  Create source module dependency graph (docs/staticteadep.svg).
 - *dot2*:  Create system modules dependency graph (docs/staticteadep2.svg).
@@ -2624,7 +2626,7 @@ Steps:
 2. start docker environment
 3. build
 
-- Download Code
+*Download Code*
 
 Download the statictea source code to a folder on your system in a terminal window:
 
@@ -2634,7 +2636,7 @@ cd ~/code/statictea
 git clone git@github.com:flenniken/statictea.git .
 #+END_SRC
 
-- Start Docker Environment
+*Start Docker Environment*
 
 You start the docker statictea environment with the nimble drun
 command. The first time you run it, it builds the docker image
@@ -2645,7 +2647,7 @@ the env.
 nimble drun
 #+END_SRC
 
-- Build
+*Build*
 
 You build the statictea executable in the environment using the
 nimble release command.  It runs all the tests and builds the exe
@@ -2669,7 +2671,7 @@ You setup for it is similar to the docker environment except you
 need to install the needed apps to your mac manually. Once you’re
 setup, you run the release command.
 
-- Download Code
+*Download Code*
 
 Download the statictea source code to a folder on your system:
 
@@ -2679,12 +2681,12 @@ cd ~/code/statictea
 git clone git@github.com:flenniken/statictea.git .
 #+END_SRC
 
-- Download Nim
+*Download Nim*
 
 Download nim following instructions on their website:
 https://nim-lang.org/install.html.
 
-- Install Helper Apps (optional)
+*Install Helper Apps (optional)*
 
 On the mac you install the helper applications using brew. They
 help debugging issues.
@@ -2705,7 +2707,7 @@ brew install tree
 brew install graphviz
 #+END_SRC
 
-- Build
+*Build*
 
 Then you build the statictea executable using the nimble release
 command.  It runs all the tests and builds the exe and docs.

@@ -420,7 +420,7 @@ const
     "A \\u must be followed by 4 hex digits.", ## wFourHexDigits
     "", ## wNotMatchingSurrogate
     "Missing the low surrogate.", ## wMissingSurrogatePair
-    """A slash must be followed by one letter from: nr"t\bf/.""", ## wNotPopular
+    """A slash must be followed by one letter from: bfnru"/\.""", ## wNotPopular
     "Controls characters must be escaped.", ## wControlNotEscaped
     "No ending double quote.", ## wNoEndingQuote
     "You cannot use a low surrogate by itself or first in a pair.", ## wLowSurrogateFirst

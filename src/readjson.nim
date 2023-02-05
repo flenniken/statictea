@@ -75,6 +75,7 @@ func readJsonStream*(stream: Stream, mutable = Mutable.immutable): ValueOr =
   ## or return a warning. The mutable variable determines whether
   ## lists and dictionaries are mutable.
   if stream == nil:
+    # Unable to parse the JSON.
     return newValueOr(wJsonParseError)
 
   var rootNode: JsonNode
@@ -233,7 +234,7 @@ func parseJsonStr*(text: string, startPos: Natural): ValuePosSiOr =
       else:
         let ch = unescapePopularChar(getChar(text, pos))
         if ch == '\0':
-          # A slash must be followed by one letter from: nr"t\bf/.
+          # A slash must be followed by one letter from: bfnru"/\.
           return newValuePosSiOr(wNotPopular, "", pos)
         newStr.add(ch)
         inc(pos)

@@ -880,7 +880,7 @@ task json, "\tDisplay one or more source file's json doc comments; specify part 
   # echo "The jq command is good for viewing the output."
   # echo "n json name | jq | less"
 
-task teafuncs, "Create the function docs (teaFunctions.md).":
+task teafuncs, "Create the function docs (docs/teaFunctions.md).":
   taskFuncDocs()
 
 task dyfuncs, "\tCreate the built-in function details (src/dynamicFuncList.nim) from (src/functions.nim).":

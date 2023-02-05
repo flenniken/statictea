@@ -853,6 +853,9 @@ $$ : c = len("hello")
     check testGetString(newStatement("a = \"hello\"   #\n"), 4,
       newValuePosSiOr("hello", 14))
 
+    check testGetString(newStatement("""a = "abc\"""), 4,
+      newValuePosSiOr(wNotPopular, "", 9))
+
   test "getString two bytes":
     let str = bytesToString(@[0xc3u8, 0xb1])
     let statement = newStatement("""a = "$1"""" % str)
