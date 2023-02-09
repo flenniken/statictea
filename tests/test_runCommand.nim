@@ -3080,8 +3080,7 @@ statement: stopped = listLoop([1], [], f.cmp[0])
     let content = """
 b5 = func("b5(ix: float, value: int, newList: list, state: int) bool")
   ## Use items bigger than 5.
-  if( (value <= 5), return(false))
-  newList &= add(value, state)
+  newList &= if( (value > 5), value)
   return(false)
 
 newList = []
@@ -3093,7 +3092,7 @@ l.newList = []
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.tea(8): w250: Expected the func variable's first parameter to be an int, got float.
+testcode.tea(7): w250: Expected the func variable's first parameter to be an int, got float.
 statement: stopped = listLoop([1], newList, b5, 2)
                                             ^
 """

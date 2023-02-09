@@ -53,7 +53,7 @@ variable or pass to another function.
 * [len](#len-1) &mdash; Number of elements in a list.
 * [len](#len-2) &mdash; Number of unicode characters in a string.
 * [list](#list) &mdash; Create a list of variables.
-* [listLoop](#listloop) &mdash; Fill in a container from a list and a callback function.
+* [listLoop](#listloop) &mdash; Loop over items in a list and fill in a container.
 * [log](#log) &mdash; Log a message to the log file.
 * [lower](#lower) &mdash; Lowercase a string.
 * [lt](#lt) &mdash; Return true when a float is less then another float.
@@ -77,9 +77,9 @@ variable or pass to another function.
 * [startsWith](#startswith) &mdash; Check whether a strings starts with the given prefix.
 * [string](#string) &mdash; Convert a variable to a string.
 * [string](#string-1) &mdash; Convert the dictionary variable to dot names.
-* [sub](#sub) &mdash; Sub two floats.
+* [sub](#sub) &mdash; Subtract two floats.
 * [sub](#sub-1) &mdash; Subtract two integers.
-* [type](#type) &mdash; Return the parameter type, one of: int, float, string, list, dict, bool or func.
+* [type](#type) &mdash; Return the argument type, one of: int, float, string, list, dict, bool or func.
 * [values](#values) &mdash; Create a list out of the values in the specified dictionary.
 * [warn](#warn) &mdash; Return a warning message and skip the current statement.
 
@@ -623,6 +623,12 @@ get(list, -3) => 4
 get(list, -4, 11) => 11
 ~~~
 
+You can also use bracket notation to access list items.
+
+~~~
+a = teas[0]
+~~~
+
 
 # githubAnchor
 
@@ -1026,7 +1032,7 @@ a = ["a", 5, "b"]
 
 # listLoop
 
-Fill in a container from a list and a callback function. The callback function is called for each item in the list and it decides what goes in the container.
+Loop over items in a list and fill in a container. A callback function is called for each item in the list and it decides what goes in the container.
 
 You pass a list to loop over, a container to fill in, a callback
 function, and an optional state variable. The function returns
@@ -1060,8 +1066,7 @@ Below is the definition of the b5 callback function.
 ~~~
 b5 = func("b5(ix: int, value: int, container: list) bool")
   ## Collect values greater than 5.
-  if( (value <= 5), return(false))
-  container &= value
+  container &= if( (value > 5), value)
   return(false)
 ~~~
 
@@ -1639,7 +1644,7 @@ teas.z.a = 8
 
 # sub
 
-Sub two floats. A warning is generated on overflow.
+Subtract two floats. A warning is generated on overflow.
 
 ~~~
 sub(a: float, b: float) float
@@ -1672,7 +1677,7 @@ add(1, 5) => -4
 
 # type
 
-Return the parameter type, one of: int, float, string, list, dict, bool or func.
+Return the argument type, one of: int, float, string, list, dict, bool or func.
 
 ~~~
 type(variable: any) string

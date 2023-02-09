@@ -30,7 +30,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [fun_add_iii](#fun_add_iii) &mdash; Add two integers.
 * [fun_add_fff](#fun_add_fff) &mdash; Add two floats.
 * [fun_sub_iii](#fun_sub_iii) &mdash; Subtract two integers.
-* [fun_sub_fff](#fun_sub_fff) &mdash; Sub two floats.
+* [fun_sub_fff](#fun_sub_fff) &mdash; Subtract two floats.
 * [fun_exists_dsb](#fun_exists_dsb) &mdash; Determine whether a key exists in a dictionary.
 * [fun_case_iloaa](#fun_case_iloaa) &mdash; Compare integer cases and return the matching value.
 * [fun_case_sloaa](#fun_case_sloaa) &mdash; Compare string cases and return the matching value.
@@ -49,7 +49,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [fun_dup_sis](#fun_dup_sis) &mdash; Duplicate a string x times.
 * [fun_dict_old](#fun_dict_old) &mdash; Create a dictionary from a list of key, value pairs.
 * [fun_list_al](#fun_list_al) &mdash; Create a list of variables.
-* [fun_listLoop_lapoab](#fun_listloop_lapoab) &mdash; Fill in a container from a list and a callback function.
+* [fun_listLoop_lapoab](#fun_listloop_lapoab) &mdash; Loop over items in a list and fill in a container.
 * [fun_replace_siiss](#fun_replace_siiss) &mdash; Replace a substring specified by its position and length with another string.
 * [fun_replaceRe_sls](#fun_replacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
 * [parsePath](#parsepath) &mdash; Parse the given file path into its component pieces.
@@ -61,7 +61,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [fun_sort_lssil](#fun_sort_lssil) &mdash; Sort a list of lists.
 * [fun_sort_lsssl](#fun_sort_lsssl) &mdash; Sort a list of dictionaries.
 * [fun_githubAnchor_ll](#fun_githubanchor_ll) &mdash; Create Github anchor names from heading names.
-* [fun_type_as](#fun_type_as) &mdash; Return the parameter type, one of: int, float, string, list, dict, bool or func.
+* [fun_type_as](#fun_type_as) &mdash; Return the argument type, one of: int, float, string, list, dict, bool or func.
 * [fun_joinPath_loss](#fun_joinpath_loss) &mdash; Join the path components with a path separator.
 * [fun_join_lsois](#fun_join_lsois) &mdash; Join a list of strings with a separator.
 * [fun_warn_ss](#fun_warn_ss) &mdash; Return a warning message and skip the current statement.
@@ -371,6 +371,12 @@ get(list, -3) => 4
 get(list, -4, 11) => 11
 ~~~
 
+You can also use bracket notation to access list items.
+
+~~~
+a = teas[0]
+~~~
+
 ```nim
 func fun_get_lioaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
@@ -552,7 +558,7 @@ func fun_sub_iii(variables: Variables; arguments: seq[Value]): FunResult
 
 # fun_sub_fff
 
-Sub two floats. A warning is generated on overflow.
+Subtract two floats. A warning is generated on overflow.
 
 ~~~
 sub(a: float, b: float) float
@@ -1003,7 +1009,7 @@ func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult
 
 # fun_listLoop_lapoab
 
-Fill in a container from a list and a callback function. The callback function is called for each item in the list and it decides what goes in the container.
+Loop over items in a list and fill in a container. A callback function is called for each item in the list and it decides what goes in the container.
 
 You pass a list to loop over, a container to fill in, a callback
 function, and an optional state variable. The function returns
@@ -1037,8 +1043,7 @@ Below is the definition of the b5 callback function.
 ~~~
 b5 = func("b5(ix: int, value: int, container: list) bool")
   ## Collect values greater than 5.
-  if( (value <= 5), return(false))
-  container &= value
+  container &= if( (value > 5), value)
   return(false)
 ~~~
 
@@ -1354,7 +1359,7 @@ func fun_githubAnchor_ll(variables: Variables; arguments: seq[Value]): FunResult
 
 # fun_type_as
 
-Return the parameter type, one of: int, float, string, list, dict, bool or func.
+Return the argument type, one of: int, float, string, list, dict, bool or func.
 
 ~~~
 type(variable: any) string
@@ -2156,7 +2161,7 @@ add(3, -2) => 1
 add(-2, -5) => -7
 ~~~
 """,
-                                  numLines: 23), (funcName: "fun_and_bbb", docComment: """Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
+                                  numLines: 24), (funcName: "fun_and_bbb", docComment: """Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
 
 ~~~
 and(a: bool, b: bool) bool
@@ -2352,13 +2357,13 @@ dict() =>
 Dynamically generated array of starting line numbers for each built-in function in the functions.nim file.
 
 ```nim
-functionStarts = [587, 564, 2331, 1068, 713, 746, 258, 237, 279, 790, 312, 1217,
-                  1178, 2396, 2377, 2415, 658, 1105, 834, 877, 851, 2200, 2234,
-                  2255, 429, 387, 1804, 2511, 2492, 2549, 2530, 467, 525, 932,
-                  967, 1009, 1939, 1898, 1566, 368, 349, 331, 1254, 1275, 2009,
-                  1547, 2587, 2568, 2626, 2606, 2454, 2435, 2473, 2313, 2354,
-                  1492, 2646, 1323, 1433, 2033, 1143, 1713, 1746, 1775, 2290,
-                  2090, 2176, 633, 610, 1845, 1590, 1984]
+functionStarts = [594, 570, 2335, 1073, 718, 751, 258, 237, 279, 795, 312, 1222,
+                  1183, 2400, 2381, 2419, 666, 1110, 839, 882, 856, 2204, 2238,
+                  2259, 435, 387, 1808, 2515, 2496, 2553, 2534, 473, 531, 937,
+                  972, 1014, 1943, 1902, 1570, 368, 349, 331, 1259, 1280, 2013,
+                  1551, 2591, 2572, 2630, 2610, 2458, 2439, 2477, 2317, 2358,
+                  1496, 2650, 1327, 1437, 2037, 1148, 1717, 1750, 1779, 2294,
+                  2094, 2180, 641, 617, 1849, 1594, 1988]
 ```
 
 # getBestFunction

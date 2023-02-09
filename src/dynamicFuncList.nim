@@ -516,6 +516,12 @@ get(list, -2) => "a"
 get(list, -3) => 4
 get(list, -4, 11) => 11
 ~~~
+
+You can also use bracket notation to access list items.
+
+~~~
+a = teas[0]
+~~~
 """
 
   dc_fun_githubAnchor_ll = """
@@ -902,7 +908,7 @@ a = ["a", 5, "b"]
 """
 
   dc_fun_listLoop_lapoab = """
-Fill in a container from a list and a callback function. The callback function is called for each item in the list and it decides what goes in the container.
+Loop over items in a list and fill in a container. A callback function is called for each item in the list and it decides what goes in the container.
 
 You pass a list to loop over, a container to fill in, a callback
 function, and an optional state variable. The function returns
@@ -936,8 +942,7 @@ Below is the definition of the b5 callback function.
 ~~~
 b5 = func("b5(ix: int, value: int, container: list) bool")
   ## Collect values greater than 5.
-  if( (value <= 5), return(false))
-  container &= value
+  container &= if( (value > 5), value)
   return(false)
 ~~~
 """
@@ -1491,7 +1496,7 @@ teas.z.a = 8
 """
 
   dc_fun_sub_fff = """
-Sub two floats. A warning is generated on overflow.
+Subtract two floats. A warning is generated on overflow.
 
 ~~~
 sub(a: float, b: float) float
@@ -1522,7 +1527,7 @@ add(1, 5) => -4
 """
 
   dc_fun_type_as = """
-Return the parameter type, one of: int, float, string, list, dict, bool or func.
+Return the argument type, one of: int, float, string, list, dict, bool or func.
 
 ~~~
 type(variable: any) string
@@ -1580,7 +1585,7 @@ warn("always warn")
   info = newBuiltInInfo
   functionsList* = [
     info("fun_add_fff", dc_fun_add_fff, 23),
-    info("fun_add_iii", dc_fun_add_iii, 23),
+    info("fun_add_iii", dc_fun_add_iii, 24),
     info("fun_and_bbb", dc_fun_and_bbb, 23),
     info("fun_bool_ab", dc_fun_bool_ab, 37),
     info("fun_case_iloaa", dc_fun_case_iloaa, 33),
@@ -1595,7 +1600,7 @@ warn("always warn")
     info("fun_eq_ffb", dc_fun_eq_ffb, 19),
     info("fun_eq_iib", dc_fun_eq_iib, 19),
     info("fun_eq_ssb", dc_fun_eq_ssb, 20),
-    info("fun_exists_dsb", dc_fun_exists_dsb, 55),
+    info("fun_exists_dsb", dc_fun_exists_dsb, 52),
     info("fun_find_ssoaa", dc_fun_find_ssoaa, 38),
     info("fun_float_if", dc_fun_float_if, 17),
     info("fun_float_saa", dc_fun_float_saa, 55),
@@ -1604,7 +1609,7 @@ warn("always warn")
     info("fun_func_sp", dc_fun_func_sp, 21),
     info("fun_functionDetails_pd", dc_fun_functionDetails_pd, 35),
     info("fun_get_dsoaa", dc_fun_get_dsoaa, 38),
-    info("fun_get_lioaa", dc_fun_get_lioaa, 42),
+    info("fun_get_lioaa", dc_fun_get_lioaa, 48),
     info("fun_githubAnchor_ll", dc_fun_githubAnchor_ll, 41),
     info("fun_gt_ffb", dc_fun_gt_ffb, 19),
     info("fun_gt_iib", dc_fun_gt_iib, 19),
@@ -1622,7 +1627,7 @@ warn("always warn")
     info("fun_len_li", dc_fun_len_li, 19),
     info("fun_len_si", dc_fun_len_si, 18),
     info("fun_list_al", dc_fun_list_al, 21),
-    info("fun_listLoop_lapoab", dc_fun_listLoop_lapoab, 48),
+    info("fun_listLoop_lapoab", dc_fun_listLoop_lapoab, 47),
     info("fun_log_ss", dc_fun_log_ss, 24),
     info("fun_lower_ss", dc_fun_lower_ss, 19),
     info("fun_lt_ffb", dc_fun_lt_ffb, 19),
@@ -1647,7 +1652,7 @@ warn("always warn")
     info("fun_string_aoss", dc_fun_string_aoss, 86),
     info("fun_string_sds", dc_fun_string_sds, 24),
     info("fun_sub_fff", dc_fun_sub_fff, 25),
-    info("fun_sub_iii", dc_fun_sub_iii, 23),
+    info("fun_sub_iii", dc_fun_sub_iii, 24),
     info("fun_type_as", dc_fun_type_as, 53),
     info("fun_values_dl", dc_fun_values_dl, 123),
     info("fun_warn_ss", dc_fun_warn_ss, 25),
@@ -1660,78 +1665,78 @@ warn("always warn")
   # so when there are changes the diffs are easier to read.
 
   functionStarts* = [
-    587,
-    564,
-    2331,
-    1068,
-    713,
-    746,
+    594,
+    570,
+    2335,
+    1073,
+    718,
+    751,
     258,
     237,
     279,
-    790,
+    795,
     312,
-    1217,
-    1178,
-    2396,
-    2377,
-    2415,
-    658,
-    1105,
-    834,
-    877,
-    851,
-    2200,
-    2234,
-    2255,
-    429,
+    1222,
+    1183,
+    2400,
+    2381,
+    2419,
+    666,
+    1110,
+    839,
+    882,
+    856,
+    2204,
+    2238,
+    2259,
+    435,
     387,
-    1804,
-    2511,
-    2492,
-    2549,
-    2530,
-    467,
-    525,
-    932,
-    967,
-    1009,
-    1939,
-    1898,
-    1566,
+    1808,
+    2515,
+    2496,
+    2553,
+    2534,
+    473,
+    531,
+    937,
+    972,
+    1014,
+    1943,
+    1902,
+    1570,
     368,
     349,
     331,
-    1254,
-    1275,
-    2009,
-    1547,
-    2587,
-    2568,
-    2626,
-    2606,
-    2454,
-    2435,
-    2473,
-    2313,
-    2354,
-    1492,
-    2646,
-    1323,
-    1433,
-    2033,
-    1143,
-    1713,
-    1746,
-    1775,
-    2290,
-    2090,
-    2176,
-    633,
-    610,
-    1845,
-    1590,
-    1984,
+    1259,
+    1280,
+    2013,
+    1551,
+    2591,
+    2572,
+    2630,
+    2610,
+    2458,
+    2439,
+    2477,
+    2317,
+    2358,
+    1496,
+    2650,
+    1327,
+    1437,
+    2037,
+    1148,
+    1717,
+    1750,
+    1779,
+    2294,
+    2094,
+    2180,
+    641,
+    617,
+    1849,
+    1594,
+    1988,
   ]
     ## Dynamically generated array of starting line numbers for each
     ## built-in function in the functions.nim file.

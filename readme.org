@@ -1277,7 +1277,7 @@ Example numbers:
 :END:
 
 A float is a 64 bit real number, it has a decimal point and
-starts with a digit or hyphen sign. You can use underscores in
+starts with a digit or minus sign. You can use underscores in
 long number literals to make them more readable.
 
 Example floats:
@@ -1717,6 +1717,9 @@ disappear when the code file finishes running.  For example the
 a = 5
 o.x = a + 6
 #+END_SRC
+
+You can use the listLoop function to loop over a list and build lists
+and dictionaries. It’s the looping method you use in code files.
 
 Like template commands, the maximum line length is 1024 bytes and
 an ending plus sign continues a long statement on the next line.

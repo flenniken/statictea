@@ -408,6 +408,12 @@ func fun_get_lioaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:get(list, -3) => 4
   ## @:get(list, -4, 11) => 11
   ## @:~~~~
+  ## @:
+  ## @:You can also use bracket notation to access list items.
+  ## @:
+  ## @:~~~
+  ## @:a = teas[0]
+  ## @:~~~~
 
   tMapParameters("get", "lioaa")
   let list = map["a"].listv.list
@@ -582,6 +588,7 @@ func fun_add_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   try:
     result = newFunResult(newValue(a + b))
   except:
+    # Overflow or underflow.
     result = newFunResultWarn(wOverflow)
 
 func fun_add_fff*(variables: Variables, arguments: seq[Value]): FunResult =
@@ -628,10 +635,11 @@ func fun_sub_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   try:
     result = newFunResult(newValue(a - b))
   except:
+    # Overflow or underflow.
     result = newFunResultWarn(wOverflow)
 
 func fun_sub_fff*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Sub two floats. A warning is generated on overflow.
+  ## Subtract two floats. A warning is generated on overflow.
   ## @:
   ## @:~~~
   ## @:sub(a: float, b: float) float
@@ -675,10 +683,7 @@ func fun_exists_dsb*(variables: Variables, arguments: seq[Value]): FunResult =
   let dictionary = map["a"].dictv.dict
   let key = map["b"].stringv
 
-  var ret: bool
-  if key in dictionary:
-    ret = true
-  result = newFunResult(newValue(ret))
+  result = newFunResult(newValue(key in dictionary))
 
 func getCase(map: VarsDict): FunResult =
   ## Return the matching case value or the default when none
@@ -1273,7 +1278,7 @@ func fun_list_al*(variables: Variables, arguments: seq[Value]): FunResult =
   result = newFunResult(newValue(arguments, mutable = Mutable.append))
 
 func fun_listLoop_lapoab*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Fill in a container from a list and a callback function. The callback
+  ## Loop over items in a list and fill in a container. A callback
   ## function is called for each item in the list and it decides what
   ## goes in the container.
   ## @:
@@ -1309,8 +1314,7 @@ func fun_listLoop_lapoab*(variables: Variables, arguments: seq[Value]): FunResul
   ## @:~~~
   ## @:b5 = func("b5(ix: int, value: int, container: list) bool")
   ## @:  ## Collect values greater than 5.
-  ## @:  if( (value <= 5), return(false))
-  ## @:  container &= value
+  ## @:  container &= if( (value > 5), value)
   ## @:  return(false)
   ## @:~~~
 
@@ -1843,7 +1847,7 @@ func fun_githubAnchor_ll*(variables: Variables, arguments: seq[Value]): FunResul
   result = newFunResult(newValue(anchorNames))
 
 func fun_type_as*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return the parameter type, one of: int, float, string, list,
+  ## Return the argument type, one of: int, float, string, list,
   ## dict, bool or func.
   ## @:
   ## @:~~~
