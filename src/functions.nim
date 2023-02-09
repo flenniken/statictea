@@ -2032,7 +2032,7 @@ func fun_log_ss*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_return_aa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return is a special function that returns the value passed in and
-  ## has side effects.
+  ## has has side effects.
   ## @:
   ## @:In a function, the return completes the function and returns
   ## @:the value of it.
@@ -2082,6 +2082,10 @@ func fun_return_aa*(variables: Variables, arguments: seq[Value]): FunResult =
   discard map
   # Invalid return; use a bare return in a user function or use it in a bare if statement.
   result = newFunResultWarn(wReturnArgument, -1)
+
+  # # No side effect when used as an argument?
+  # let value = map["a"]
+  # result = newFunResult(newValue(value))
 
 func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Convert a variable to a string. You specify the variable and

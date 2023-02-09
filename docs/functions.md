@@ -66,7 +66,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [fun_join_lsois](#fun_join_lsois) &mdash; Join a list of strings with a separator.
 * [fun_warn_ss](#fun_warn_ss) &mdash; Return a warning message and skip the current statement.
 * [fun_log_ss](#fun_log_ss) &mdash; Log a message to the log file.
-* [fun_return_aa](#fun_return_aa) &mdash; Return is a special function that returns the value passed in and has side effects.
+* [fun_return_aa](#fun_return_aa) &mdash; Return is a special function that returns the value passed in and has has side effects.
 * [fun_string_aoss](#fun_string_aoss) &mdash; Convert a variable to a string.
 * [fun_string_sds](#fun_string_sds) &mdash; Convert the dictionary variable to dot names.
 * [fun_format_ss](#fun_format_ss) &mdash; Format a string using replacement variables similar to a replacement block.
@@ -1494,7 +1494,7 @@ func fun_log_ss(variables: Variables; arguments: seq[Value]): FunResult
 
 # fun_return_aa
 
-Return is a special function that returns the value passed in and has side effects.
+Return is a special function that returns the value passed in and has has side effects.
 
 In a function, the return completes the function and returns
 the value of it.
@@ -2352,13 +2352,13 @@ dict() =>
 Dynamically generated array of starting line numbers for each built-in function in the functions.nim file.
 
 ```nim
-functionStarts = [587, 564, 2327, 1068, 713, 746, 258, 237, 279, 790, 312, 1217,
-                  1178, 2392, 2373, 2411, 658, 1105, 834, 877, 851, 2196, 2230,
-                  2251, 429, 387, 1804, 2507, 2488, 2545, 2526, 467, 525, 932,
+functionStarts = [587, 564, 2331, 1068, 713, 746, 258, 237, 279, 790, 312, 1217,
+                  1178, 2396, 2377, 2415, 658, 1105, 834, 877, 851, 2200, 2234,
+                  2255, 429, 387, 1804, 2511, 2492, 2549, 2530, 467, 525, 932,
                   967, 1009, 1939, 1898, 1566, 368, 349, 331, 1254, 1275, 2009,
-                  1547, 2583, 2564, 2622, 2602, 2450, 2431, 2469, 2309, 2350,
-                  1492, 2642, 1323, 1433, 2033, 1143, 1713, 1746, 1775, 2286,
-                  2086, 2172, 633, 610, 1845, 1590, 1984]
+                  1547, 2587, 2568, 2626, 2606, 2454, 2435, 2473, 2313, 2354,
+                  1492, 2646, 1323, 1433, 2033, 1143, 1713, 1746, 1775, 2290,
+                  2090, 2176, 633, 610, 1845, 1590, 1984]
 ```
 
 # getBestFunction

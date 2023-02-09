@@ -60,6 +60,7 @@ cannot change g variables in code files.
 * [replace-readme1](../testfiles/replace-readme1.stf.md) &mdash; The first replace readme example.
 * [replace-readme2](../testfiles/replace-readme2.stf.md) &mdash; The second replace readme example.
 * [replace-readme3](../testfiles/replace-readme3.stf.md) &mdash; Test standard readme replace example 3.
+* [return-basic](../testfiles/return-basic.stf.md) &mdash; Test the return function.
 * [slice-warnings](../testfiles/slice-warnings.stf.md) &mdash; Test the slice functions warning cases.
 * [slice](../testfiles/slice.stf.md) &mdash; Test the slice function.
 * [statements](../testfiles/statements.stf.md) &mdash; Test readme statements section.

@@ -952,7 +952,7 @@ proc bareReturn(
   ##                  ^         ^
   ## return( "stop")
   ##         ^      ^
-  # Get the value.
+  # Get the argument value.
   var runningPos = start
   let valueAndPosOr = getValuePosSi(env, statement, runningPos, variables, topLevel = true)
   if valueAndPosOr.isMessage:
@@ -2168,14 +2168,16 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
         return lcSkip
       else:
         discard
-    # todo: handle return differently.  We don't know the position of
-    # the return argument in the statement for the warning message.
+    # todo: handle return differently so we can point at the return
+    # argument.  We don't know the position of the return argument in
+    # the statement for the warning message.  The issue is that we
+    # don't know whether skip or stop is required until here.
+    # create side effects, seStop, seSkip, seReturn? or lcReturn
 
     # Expected 'skip' or 'stop' for the return function value.
     let wd = newWarningData(wSkipOrStop)
     env.warnStatement(statement, wd, sourceFilename = sourceFilename)
-    result = lcStop
-
+    result = lcAdd
 
 proc parseSignature*(signature: string): SignatureOr =
   ## Parse the signature and return the list of parameters or a

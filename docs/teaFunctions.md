@@ -69,7 +69,7 @@ variable or pass to another function.
 * [readJson](#readjson) &mdash; Convert a JSON string to a variable.
 * [replace](#replace) &mdash; Replace a substring specified by its position and length with another string.
 * [replaceRe](#replacere) &mdash; Replace multiple parts of a string using regular expressions.
-* [return](#return) &mdash; Return is a special function that returns the value passed in and has side effects.
+* [return](#return) &mdash; Return is a special function that returns the value passed in and has has side effects.
 * [slice](#slice) &mdash; Extract a substring from a string by its position and length.
 * [sort](#sort) &mdash; Sort a list of values of the same type.
 * [sort](#sort-1) &mdash; Sort a list of lists.
@@ -1387,7 +1387,7 @@ website: https://regex101.com/
 
 # return
 
-Return is a special function that returns the value passed in and has side effects.
+Return is a special function that returns the value passed in and has has side effects.
 
 In a function, the return completes the function and returns
 the value of it.
