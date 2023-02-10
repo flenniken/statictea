@@ -930,7 +930,7 @@ View the svg file in your browser:
 """
 
 task tt, "\tCompile and run t.nim.":
-  let cmd = fmt"nim c -r --hints:off --outdir:bin/{dirName}/tests/ src/t.nim"
+  let cmd = fmt"nim c -r --outdir:bin/{dirName}/tests/ src/t.nim"
   echo cmd
   exec cmd
 
