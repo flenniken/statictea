@@ -34,9 +34,9 @@ proc parseInteger*(s: string, start: Natural = 0): Option[tuple[number: int64, p
     i = start
 
   if i < s.len:
-    if s[i] == '+':
-      inc(i)
-    elif s[i] == '-':
+    # Note: no plus sign
+
+    if s[i] == '-':
       inc(i)
       sign = 1
 

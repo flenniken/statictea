@@ -26,7 +26,8 @@ message.txt({ix}): {msg}
   stopMsg(message)
 
 proc readMessages(): seq[MessageLine] =
-  ## Read the message.txt file into a list of MessageLines.
+  ## Read the message.txt file into a list of MessageLines at compile
+  ## time.
 
   let text = slurp("messages.txt")
   let textLines = text.splitLines()
@@ -111,7 +112,7 @@ genMsgData()
 type
   WarningData* = object
     ## Warning data.
-    ## * warning -- the message id
+    ## * messageId -- the message id
     ## * p1 -- the optional string substituted for the message's $1.
     ## * pos -- the index in the statement where the warning was detected.
     messageId*: MessageId

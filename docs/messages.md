@@ -261,7 +261,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
 
 # WarningData
 
-Warning data.<ul class="simple"><li>warning -- the message id</li>
+Warning data.<ul class="simple"><li>messageId -- the message id</li>
 <li>p1 -- the optional string substituted for the message's $1.</li>
 <li>pos -- the index in the statement where the warning was detected.</li>
 </ul>

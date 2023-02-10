@@ -52,12 +52,12 @@ suite "parseNumber.nim":
     check testParseInteger("0", 0, 0, 1)
     check testParseInteger("7", 0, 7, 1)
     check testParseInteger("9", 0, 9, 1)
+    check testParseInteger("9a", 0, 9, 1)
 
   test "parseInteger2":
     check testParseInteger("12", 0, 12, 2)
     check testParseInteger("99", 0, 99, 2)
     check testParseInteger("-1", 0, -1, 2)
-    check testParseInteger("+2", 0, 2, 2)
     check testParseInteger("2_", 0, 2, 2)
 
   test "parseInteger3":
@@ -65,7 +65,6 @@ suite "parseNumber.nim":
     check testParseInteger("-23", 0, -23, 3)
     check testParseInteger("-88", 0, -88, 3)
     check testParseInteger("-8_", 0, -8, 3)
-    check testParseInteger("+8_", 0, 8, 3)
     check testParseInteger("12_", 0, 12, 3)
     check testParseInteger("1__", 0, 1, 3)
     check testParseInteger("1_2", 0, 12, 3)
@@ -74,13 +73,11 @@ suite "parseNumber.nim":
     check testParseInteger("123456789", 0, 123456789, 9)
     check testParseInteger("123_456_789", 0, 123456789, 11)
     check testParseInteger("-123456789", 0, -123456789, 10)
-    check testParseInteger("+123_456_789", 0, 123456789, 12)
 
   test "parseIntegerMax":
     check testParseInteger("-9_223_372_036_854_775_808", 0, low(int64), 26)
-    check testParseInteger("+9_223_372_036_854_775_807", 0, high(int64), 26)
+    check testParseInteger("9_223_372_036_854_775_807", 0, high(int64), 25)
     check testParseInteger("-9223372036854775808", 0, low(int64), 20)
-    check testParseInteger("+9223372036854775807", 0, high(int64), 20)
     check testParseInteger("9223372036854775807", 0, high(int64), 19)
 
   test "parseIntegerStopEarly":
@@ -94,6 +91,9 @@ suite "parseNumber.nim":
 
   test "parseIntegerStartLateStopEarly":
     check testParseInteger("abc9def", 3, 9, 4)
+
+  test "no plus sign":
+    check testParseIntegerError("+9")
 
   test "parseIntegerNotInt":
     check testParseIntegerError("")
