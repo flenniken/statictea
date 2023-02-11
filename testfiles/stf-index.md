@@ -9,6 +9,8 @@ Here are all the Statictea stf tests:
 * [cmdline-two-templates](../testfiles/cmdline-two-templates.stf.md) &mdash; Test with two templates on the command line.
 * [cmp-basics](../testfiles/cmp-basics.stf.md) &mdash; Test the cmp functions.
 * [codefile-basics](../testfiles/codefile-basics.stf.md) &mdash; Test using a code file.
+* [codefile-mult2](../testfiles/codefile-mult2.stf.md) &mdash; Test multiline strings.
+* [codefile-multilines](../testfiles/codefile-multilines.stf.md) &mdash; Test multiline strings.
 * [comment](../testfiles/comment.stf.md) &mdash; The readme comment example.
 * [comments-inline](../testfiles/comments-inline.stf.md) &mdash; Test inline comments.
 * [continue-basics](../testfiles/continue-basics.stf.md) &mdash; The continue line readme example.

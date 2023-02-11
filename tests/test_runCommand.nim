@@ -2192,14 +2192,22 @@ b = 2
     let eText = "a = $1\nmultiline\nstring\n$1\n" % tripleQuotes
     check testReadStatement(content, eText, 4)
 
-  test "readStatement multiline at end":
+  test "readStatement comment ending triples":
     let content = """
-a = $1
-multiline
-string$1""" % tripleQuotes
+# a = $1
+""" % tripleQuotes
 
-    let eText = "a = $1\nmultiline\nstring$1\n" % tripleQuotes
-    check testReadStatement(content, eText, 3)
+    let eText = "# a = $1\n" % tripleQuotes
+    check testReadStatement(content, eText, 1)
+
+  test "readStatement comment plus":
+    let content = """
+# a = +
+more comments
+""" % tripleQuotes
+
+    let eText = "# a = more comments"
+    check testReadStatement(content, eText, 2)
 
   test "readStatement no continue":
     check testReadStatement("one", "one")
@@ -2283,7 +2291,7 @@ d = 5
 """ % tripleQuotes
 
     let eErrLines: seq[string] = splitNewLines """
-testlb.txt(1): w185: Triple quotes must always end the line.
+testlb.txt(1): w185: A multiline string's leading and ending triple quotes must end the line.
 statement: a = $1 multiline $1␊
                   ^
 """ % tripleQuotes
@@ -2296,7 +2304,7 @@ b = 3
 """ % tripleQuotes
 
     let eErrLines: seq[string] = splitNewLines """
-testlb.txt(1): w185: Triple quotes must always end the line.
+testlb.txt(1): w185: A multiline string's leading and ending triple quotes must end the line.
 statement: a = $1$1␊
                   ^
 """ % tripleQuotes
@@ -2345,6 +2353,24 @@ testcode.tea(2): w95: You cannot assign to an existing variable.
 statement: a = 6
            ^
 """
+    check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
+
+  test "runCodeFile triple":
+    let content = """
+a = 5
+first-line = $1invalid$1
+b = 6
+""" % tripleQuotes
+
+    let eVarRep = """
+l.a = 5
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(2): w185: A multiline string's leading and ending triple quotes must end the line.
+statement: first-line = $1invalid$1␊
+                           ^
+""" % tripleQuotes
     check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 
   test "runCodeFile variety":
@@ -2553,7 +2579,7 @@ o = {}
 """
     check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 
-  test "readStatement invalid UTF-8":
+  test "readStatement invalid UTF-8 multiline":
     let content = """
 a = 5
 b = $1
@@ -2574,6 +2600,24 @@ statement: abÿcd␊
 """
     check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 
+  test "readStatement invalid UTF-8":
+    let content = """
+a = 5
+d = "123$1cd"
+e = 4
+""" % ["abc\xff"]
+
+    let eVarRep = """
+l.a = 5
+o = {}
+"""
+
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(2): w148: Invalid UTF-8 byte sequence at position 11.
+statement: d = "123abcÿcd"␊
+                      ^
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 
   test "runCodeFile triple +":
     let content = """
@@ -2581,7 +2625,7 @@ a = $1+
 multiline+
 string$1""" % tripleQuotes
     let eErrLines: seq[string] = splitNewLines """
-testcode.tea(3): w185: Triple quotes must always end the line.
+testcode.tea(3): w185: A multiline string's leading and ending triple quotes must end the line.
 statement: a = $1multilinestring$1␊
                   ^
 """ % tripleQuotes
@@ -3321,6 +3365,19 @@ d["abc"] = 5
 l.key = "hello"
 l.d.hello = 5
 l.d.abc = 5
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "comment and triple quotes":
+    let content = """
+# comment $1
+a = 5
+""" % tripleQuotes
+    let eVarRep = """
+l.a = 5
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """

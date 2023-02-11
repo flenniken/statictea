@@ -1792,6 +1792,15 @@ dir="{s.languageDirection}">
 """
 #+END_SRC
 
+A multiline string can contain triple quotes as long as they
+don't end the line.
+
+#+BEGIN_SRC
+str = """
+This is a """triple quoted""" string.
+"""
+#+END_SRC
+
 A multiline string literal cannot be an argument to a
 function. The workaround is to assign it to a local variable and
 pass that to the function.

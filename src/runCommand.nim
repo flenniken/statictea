@@ -622,7 +622,8 @@ iterator yieldStatements*(cmdLines: CmdLines): Statement =
 
 proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
   ## Read the next statement from the code file reading multiple lines
-  ## if needed.
+  ## if needed. When there is an error, show the warning and return
+  ## nothing. When no more statements, return nothing.
 
   type
     State = enum
@@ -655,7 +656,7 @@ proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
           # Out of lines looking for the multiline string.
           messageId = wIncompleteMultiline
       env.warn(lb.getFilename, lb.getLineNum(), newWarningData(messageId))
-      return
+      return # no more lines
 
     # Match the optional """ or + at the end of the line. This tells
     # whether the statement continues on the next line.
@@ -666,18 +667,28 @@ proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
         if found == plus or found == plus_n or found == plus_crlf:
           state = plusSign
         elif found == triple or found == triple_n or found == triple_crlf:
-          state = multiline
+          # Check for a comment line, it doesn't start a multiline.
+          var pos = 0
+          let spacesO = matchTabSpace(line, 0)
+          if isSome(spacesO):
+            pos = spacesO.get().length
+          if line[pos] == '#':
+            addText(line, found, text)
+            break # return comment line
 
           # Check for the case where there are starting and ending
           # triple quotes on the same line. This catches the mistake
           # like: a = """xyx""".
           let triplePos = line.find(tripleQuotes)
           if triplePos != -1 and triplePos+4 != line.len:
-            # Triple quotes must always end the line.
+            # A multiline string's leading and ending triple quotes must end the line.
             let statement = newStatement(line, lb.getLineNum())
             env.warnStatement(statement,
               newWarningData(wTripleAtEnd, "", triplePos+3), lb.getfilename)
+            # An error in triple quote handling ends the code file.
             return
+
+          state = multiline
 
         addText(line, found, text)
         if state == start:

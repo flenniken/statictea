@@ -432,7 +432,7 @@ iterator yieldStatements(cmdLines: CmdLines): Statement
 
 # readStatement
 
-Read the next statement from the code file reading multiple lines if needed.
+Read the next statement from the code file reading multiple lines if needed. When there is an error, show the warning and return nothing. When no more statements, return nothing.
 
 ```nim
 proc readStatement(env: var Env; lb: var LineBuffer): Option[Statement]
