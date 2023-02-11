@@ -91,6 +91,7 @@ cannot change g variables in code files.
 * [update1](../testfiles/update1.stf.md) &mdash; Update the replace block in a template.
 * [userfun-call](../testfiles/userfun-call.stf.md) &mdash; Test user functions.
 * [userfun-details](../testfiles/userfun-details.stf.md) &mdash; Test the user function details function.
+* [userfun-signatures](../testfiles/userfun-signatures.stf.md) &mdash; Show built-in functions.
 * [warn-basics](../testfiles/warn-basics.stf.md) &mdash; Test the warn function.
 * [warn-log](../testfiles/warn-log.stf.md) &mdash; Test that the warn command increments the warning count and returns a
 non-zero return code.
