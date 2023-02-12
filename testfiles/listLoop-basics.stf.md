@@ -26,7 +26,7 @@ $$ endblock
 ### File shared.tea
 
 ~~~
-b5 = func("b5(ix: int, value: int, container: list) bool")
+b5 = func(ix: int, value: int, container: list) bool
   ## Collect values greater than 5.
   if( (value <= 5), return(false))
   container &= value

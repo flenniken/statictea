@@ -2190,33 +2190,15 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
     env.warnStatement(statement, wd, sourceFilename = sourceFilename)
     result = lcAdd
 
-proc parseSignature*(signature: string): SignatureOr =
+proc parseSignature*(dotName: string, signature: string, start: Natural): SignatureOr =
   ## Parse the signature and return the list of parameters or a
   ## message.
   ## @:
-  ## @:Example signatures:
   ## @:~~~
-  ## @:cmp(numStr1: string, numStr2: string) int
-  ## @:get(group: list, ix: int, optional any) any
+  ## @:cmp = func(numStr1: string, numStr2: string) int
+  ## @:           ^
   ## @:~~~~
-  var runningPos = 0
-  let functionNameOr = getVariableName(signature, runningPos)
-  if functionNameOr.isMessage:
-    if not emptyOrSpaces(signature):
-      # Excected a function name.
-      return newSignatureOr(wFunctionName, "", runningPos)
-    else:
-      # Missing the function signature string.
-      return newSignatureOr(wMissingSignature, "", runningPos)
-  let functionName = functionNameOr.value
-
-  case functionName.kind
-  of vnkNormal, vnkGet:
-    # Excected a left parentheses for the signature.
-    return newSignatureOr(wMissingLeftParen, "", runningPos + functionName.dotName.len)
-  of vnkFunction:
-    discard
-  runningPos = functionName.pos
+  var runningPos = start
 
   var optional = false
   var params = newSeq[Param]()
@@ -2297,7 +2279,7 @@ proc parseSignature*(signature: string): SignatureOr =
     # Unused extra text at the end of the signature.
     return newSignatureOr(wUnusedSignatureText, "", runningPos)
 
-  let signature = newSignature(optional, functionName.dotName, params, returnType)
+  let signature = newSignature(optional, dotName, params, returnType)
   result = newSignatureOr(signature)
 
 proc isFunctionDefinition*(statement: Statement, retLeftName: var string,
@@ -2367,52 +2349,6 @@ proc isFunctionDefinition*(statement: Statement, retLeftName: var string,
   retPos = runningPos
   return true
 
-proc processFunctionSignature*(statement: Statement, start: Natural): SignatureOr =
-  ## Process the function definition line starting at the signature
-  ## string. The start parameter points at the first non-whitespace
-  ## character after "func(".
-  ## @:
-  ## @:Example:
-  ## @:mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
-  ## @:             ^ start
-
-  var runningPos = start
-  if runningPos >= statement.text.len or statement.text[runningPos] != '"':
-    return newSignatureOr(wExpectedSignature, "", runningPos)
-
-  let signatureStrStart = runningPos+1
-  runningPos = signatureStrStart
-
-  # Get the signature string argument and following white space.
-  let vlOr = parseJsonStr(statement.text, runningPos)
-  if vlOr.isMessage:
-    return newSignatureOr(vlOr.message)
-  assert vlOr.value.value.kind == vkString
-  let signatureStr = vlOr.value.value.stringv
-  runningPos = vlOr.value.pos
-
-  # Check for ending right parentheses and trailing whitespace.
-  let rightParenO = matchSymbol(statement.text, gRightParentheses, runningPos)
-  if not rightParenO.isSome:
-    # No matching end right parentheses.
-    return newSignatureOr(wNoMatchingParen, "", runningPos)
-  runningPos += rightParenO.get().length
-
-  # Check that there is not any unprocessed text following the function.
-  if runningPos < statement.text.len:
-    # Check for a trailing comment.
-    if statement.text[runningPos] != '#':
-      # Unused text at the end of the statement.
-      return newSignatureOr(wTextAfterValue, "", runningPos)
-
-  # Parse the signature string and return a signature object.
-  let signatureOr = parseSignature(signatureStr)
-  if signatureOr.isMessage:
-    let md = signatureOr.message
-    return newSignatureOr(md.messageId, md.p1, signatureStrStart + md.pos)
-
-  result = signatureOr
-
 proc isDocComment(statement: Statement): bool =
   ## Return true when the statement is a doc comment.
   let mO = matchDocComment(statement.text, 0)
@@ -2434,7 +2370,7 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
 
   let lineNum = lb.getLineNum()
 
-  let signatureOr = processFunctionSignature(statement, pos)
+  let signatureOr = parseSignature(leftName, statement.text, pos)
   if signatureOr.isMessage:
     let md = signatureOr.message
     env.warnStatement(statement, md.messageId, md.p1,  md.pos, sourceFilename)

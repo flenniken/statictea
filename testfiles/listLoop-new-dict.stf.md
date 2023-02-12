@@ -26,7 +26,7 @@ $$ endblock
 ### File shared.tea
 
 ~~~
-callback = func("valueMapping(ix: int, value: int, container: dict) bool")
+callback = func(ix: int, value: int, container: dict) bool
   ## Add key for each value mapping to its index.
   key = concat("a", string(value))
   container[key] = ix

@@ -1825,13 +1825,13 @@ User defined functions are important for sharing common code,
 looping and as callbacks for building lists and dictionaries, see
 the listLoop function.
 
-In the following example we define a function called strNumCmp
-and assign the result to the mycmp function variable. The
-function takes two string parameters called numStr1 and numStr2
-and it returns an integer.
+In the following example we define a function called mycmp and
+assign the result to the mycmp function variable. The function
+takes two string parameters called numStr1 and numStr2 and it
+returns an integer.
 
 #+BEGIN_SRC
-mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+mycmp = func(numStr1: string, numStr2: string) int
   ## Compare two number strings
   ## and return 1, 0, or -1.
   num1 = int(numStr1)
@@ -1843,7 +1843,7 @@ The first line names the function and defines its signature and
 assigns it to a variable.
 
 #+BEGIN_SRC
-mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+mycmp = func(numStr1: string, numStr2: string) int
 #+END_SRC
 
 The doc comment come next and tells what the function does:
@@ -1878,12 +1878,8 @@ and types and the return type. For the example above the
 signature string is:
 
 #+BEGIN_SRC
-"strNumCmp(numStr1: string, numStr2: string) int"
+mycmp(numStr1: string, numStr2: string) int
 #+END_SRC
-
-You call, query and pass around the the function variable. The
-signature function name (strNumCmp) is not used except in the
-function details.
 
 You can specify an optional last parameter and a parameter can
 use "any" when it accepts any type. The built-in get function

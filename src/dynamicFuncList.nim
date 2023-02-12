@@ -430,7 +430,7 @@ func(signature: string) func
 Example:
 
 ~~~
-mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
+mycmp = func(numStr1: string, numStr2: string) int
   ## Compare two number strings
   ## and return 1, 0, or -1.
   num1 = int(numStr1)
@@ -450,7 +450,7 @@ The following example defines a simple function then gets its
 function details.
 
 ~~~
-mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+mycmp = func(numStr1: string, numStr2: string) int
   ## Compare two number strings and return 1, 0, or -1.
   return(cmp(int(numStr1), int(numStr2)))
 
@@ -940,7 +940,7 @@ stopped = listLoop(list, o.container, b5)
 Below is the definition of the b5 callback function.
 
 ~~~
-b5 = func("b5(ix: int, value: int, container: list) bool")
+b5 = func(ix: int, value: int, container: list) bool
   ## Collect values greater than 5.
   container &= if( (value > 5), value)
   return(false)

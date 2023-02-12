@@ -2,12 +2,12 @@
 # the f function dictionary.  Each dictionary contains, the function
 # name, doc comment, anchor name and a short description.
 
-callback = func("callback(ix: int, funcVar: func, newList: list) bool")
+callback = func(ix: int, funcVar: func, newList: list) bool
   ## Add the function item to the list.
   newList &= funcVar
   return(false)
 
-dictCallback = func("dictCallback(ix: int, key: string, newList: list, state: dict) bool")
+dictCallback = func(ix: int, key: string, newList: list, state: dict) bool
   ## Add all the func variables with the same name to the new list.
   funcList = state.f[key]
   stop = listLoop(funcList, newList, state.callback)
@@ -20,7 +20,7 @@ state.f = f
 flatFuncList = []
 stopped2 = listLoop(keys(f), flatFuncList, dictCallback, state)
 
-get-name = func("get-name(ix: int, funcVar: func, newList: list) bool")
+get-name = func(ix: int, funcVar: func, newList: list) bool
   ## Add the function name to the new list.
   fd = functionDetails(funcVar)
   newList &= fd.signature.name
@@ -32,7 +32,7 @@ names = []
 stopped3 = listLoop(flatFuncList, names, l.get-name)
 anchors = githubAnchor(names)
 
-make-entry = func("make-entry(ix: int, funcVar: func, newList: list, anchors: list) bool")
+make-entry = func(ix: int, funcVar: func, newList: list, anchors: list) bool
   ## Convert a func variable to a dictionary and add it to the new list.
 
   # Look up the function details.

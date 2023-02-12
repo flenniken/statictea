@@ -31,7 +31,7 @@ $$ : # todo: add a stripEnding function?
 $$ : statements = join(d2.statements, "\n")
 {d1}
 
-a = func("{d2.signature.name}({p1n}: {p1t}) {rt}")
+a = func({p1n}: {p1t}) {rt}
 {docComment}{statements}
 
 $$ endblock
@@ -49,7 +49,7 @@ $$ endblock
 ### File shared.tea
 
 ~~~
-o.fn1 = func("fn1(num: int, str: string) dict")
+o.fn1 = func(num: int, str: string) dict
   ## Simple function that returns a dictionary.
   dict = dict("one", num, "two", str)
   return(dict)
@@ -61,7 +61,7 @@ o.fn1 = func("fn1(num: int, str: string) dict")
 ~~~
 builtIn = false
 signature.optional = false
-signature.name = "fn1"
+signature.name = "o.fn1"
 signature.paramNames = ["num","str"]
 signature.paramTypes = ["int","string"]
 signature.returnType = "dict"
@@ -71,7 +71,7 @@ lineNum = 1
 numLines = 3
 statements = ["  dict = dict(\"one\", num, \"two\", str)","  return(dict)"]
 
-a = func("fn1(num: int) dict")
+a = func(num: int) dict
   ## Simple function that returns a dictionary.
   dict = dict("one", num, "two", str)
   return(dict)

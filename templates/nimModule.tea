@@ -14,7 +14,7 @@ patterns = list( +
   "&lt;", "<", +
   "&amp;", "&")
 
-get-name = func("get-name(ix: int, entry: dict, newList: list) bool")
+get-name = func(ix: int, entry: dict, newList: list) bool
   ## Add the entry name to the list.
   newList &= entry.name
   return(false)
@@ -30,7 +30,7 @@ o.moduleName = path.filename
 
 o.moduleDescription = replaceRe(s.moduleDescription, patterns)
 
-get-entry = func("get-entry(ix: int, entry: dict, newList: list, state: dict) bool")
+get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
   ## Reformat the entry and add it to the new list.
   newEntry = dict()
   newEntry.name = entry.name

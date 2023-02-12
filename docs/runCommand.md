@@ -66,7 +66,6 @@ Run a command and fill in the variables dictionaries.
 * [runStatementAssignVar](#runstatementassignvar) &mdash; Run a statement and assign the variable if appropriate.
 * [parseSignature](#parsesignature) &mdash; Parse the signature and return the list of parameters or a message.
 * [isFunctionDefinition](#isfunctiondefinition) &mdash; If the statement is the first line of a function definition, return true and fill in the return parameters.
-* [processFunctionSignature](#processfunctionsignature) &mdash; Process the function definition line starting at the signature string.
 * [defineUserFunctionAssignVar](#defineuserfunctionassignvar) &mdash; If the statement starts a function definition, define it and assign the variable.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 * [runCodeFile](#runcodefile) &mdash; Run the code file and fill in the variables.
@@ -721,14 +720,13 @@ proc runStatementAssignVar(env: var Env; statement: Statement;
 
 Parse the signature and return the list of parameters or a message.
 
-Example signatures:
 ~~~
-cmp(numStr1: string, numStr2: string) int
-get(group: list, ix: int, optional any) any
+cmp = func(numStr1: string, numStr2: string) int
+           ^
 ~~~
 
 ```nim
-proc parseSignature(signature: string): SignatureOr
+proc parseSignature(dotName: string; signature: string; start: Natural): SignatureOr
 ```
 
 # isFunctionDefinition
@@ -738,18 +736,6 @@ If the statement is the first line of a function definition, return true and fil
 ```nim
 proc isFunctionDefinition(statement: Statement; retLeftName: var string;
                           retOperator: var Operator; retPos: var Natural): bool
-```
-
-# processFunctionSignature
-
-Process the function definition line starting at the signature string. The start parameter points at the first non-whitespace character after "func(".
-
-Example:
-mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
-             ^ start
-
-```nim
-proc processFunctionSignature(statement: Statement; start: Natural): SignatureOr
 ```
 
 # defineUserFunctionAssignVar

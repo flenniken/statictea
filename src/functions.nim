@@ -1312,7 +1312,7 @@ func fun_listLoop_lapoab*(variables: Variables, arguments: seq[Value]): FunResul
   ## @:Below is the definition of the b5 callback function.
   ## @:
   ## @:~~~
-  ## @:b5 = func("b5(ix: int, value: int, container: list) bool")
+  ## @:b5 = func(ix: int, value: int, container: list) bool
   ## @:  ## Collect values greater than 5.
   ## @:  container &= if( (value > 5), value)
   ## @:  return(false)
@@ -2245,7 +2245,7 @@ func fun_func_sp*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:Example:
   ## @:
   ## @:~~~
-  ## @:mycmp = func("numStrCmp(numStr1: string, numStr2: string) int")
+  ## @:mycmp = func(numStr1: string, numStr2: string) int
   ## @:  ## Compare two number strings
   ## @:  ## and return 1, 0, or -1.
   ## @:  num1 = int(numStr1)
@@ -2267,7 +2267,7 @@ func fun_functionDetails_pd*(variables: Variables, arguments: seq[Value]): FunRe
   ## @:function details.
   ## @:
   ## @:~~~
-  ## @:mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+  ## @:mycmp = func(numStr1: string, numStr2: string) int
   ## @:  ## Compare two number strings and return 1, 0, or -1.
   ## @:  return(cmp(int(numStr1), int(numStr2)))
   ## @:

@@ -53,15 +53,15 @@ $$ endblock
 ### File shared.tea
 
 ~~~
-o.get5 = func("get5() int")
+o.get5 = func() int
   ## Return 5.
   return(5)
 
-o.nested = func("nested(o: dict) int")
+o.nested = func(o: dict) int
   ## Return get5 value.
   return(l.o.get5())
 
-o.internalVars = func("internalVars(intNum: int, floatNum: float, str: string) dict")
+o.internalVars = func(intNum: int, floatNum: float, str: string) dict
   ## Return the variables available in this function.
   return(l)
 
@@ -83,9 +83,9 @@ five = 5
 
 The o dictionary variables:
 
-get5 = "get5"
-nested = "nested"
-internalVars = "internalVars"
+get5 = "o.get5"
+nested = "o.nested"
+internalVars = "o.internalVars"
 locals = "name = \"shared.tea\"\nfive = 5"
 
 The variables available inside "internalVars" function.

@@ -464,11 +464,12 @@ proc showGotExpectedWarnings(line: string, signatureOr: SignatureOr, eSignatureO
     echo startColumn(line, eSignatureOr.message.pos, msg)
   echo ""
 
-proc testParseSignature(signatureStr: string, eSignatureOr: SignatureOr): bool =
-  let signatureOr = parseSignature(signatureStr)
+proc testParseSignature(dotName: string, text: string, start: Natural,
+    eSignatureOr: SignatureOr): bool =
+  let signatureOr = parseSignature(dotName, text, start)
   result = gotExpected($signatureOr, $eSignatureOr)
   if not result:
-    showGotExpectedWarnings(signatureStr, signatureOr, eSignatureOr)
+    showGotExpectedWarnings(text, signatureOr, eSignatureOr)
 
 proc testIsFunctionDefinition(content: string, eIsFunction: bool, eLeftName: string = "",
     eOperator: Operator = opEqual, ePos: Natural = 0): bool =
@@ -486,10 +487,10 @@ proc testIsFunctionDefinition(content: string, eIsFunction: bool, eLeftName: str
     gotExpectedResult($operator, $eOperator, "operator:")
     gotExpectedResult($pos, $ePos, "pos:")
 
-proc testProcessFunctionSignature(content: string, start: Natural,
-    eSignatureOr: SignatureOr): bool =
+proc testParseSignature2(content: string, start: Natural,
+    dotName: string, eSignatureOr: SignatureOr): bool =
   let statement = newStatement(content)
-  let signatureOr = processFunctionSignature(statement, start)
+  let signatureOr = parseSignature(dotName, statement.text, start)
   result = gotExpected($signatureOr, $eSignatureOr)
   if not result:
     showGotExpectedWarnings(content, signatureOr, eSignatureOr)
@@ -1937,37 +1938,39 @@ White$1
 
   test "function definition in template":
     var variables = startVariables(funcs = funcsVarDict)
-    check testGetValuePosSi("""a = func("() int")""", 4, wDefineFunction, 4, "", variables)
+    check testGetValuePosSi("""a = func() int""", 4, wDefineFunction, 4, "", variables)
 
   test "nested function definition":
     var variables = startVariables(funcs = funcsVarDict)
-    check testGetValuePosSi("""a = len(func("() int"))""", 4, wDefineFunction, 8, "", variables)
+    check testGetValuePosSi("""a = len(func() int)""", 4, wDefineFunction, 8, "", variables)
 
   test "parse signature no params":
     let params = newSeq[Param]()
-    check testParseSignature("zero() int", newSignatureOr(false, "zero", params, ptInt))
+    check testParseSignature("zero", "zero() int", 5, newSignatureOr(false, "zero", params, ptInt))
 
   test "parse signature one param":
     var params = newSeq[Param]()
     params.add(newParam("num", ptInt))
-    check testParseSignature("one(num: int) int", newSignatureOr(false, "one", params, ptInt))
+    check testParseSignature("one", "func(num: int) int", 5, newSignatureOr(false, "one", params, ptInt))
 
   test "parse signature one optional param":
     var params = newSeq[Param]()
     params.add(newParam("num", ptInt))
-    check testParseSignature("one(num: optional int) int", newSignatureOr(true, "one", params, ptInt))
+    check testParseSignature("one", "func(num: optional int) int", 5,
+      newSignatureOr(true, "one", params, ptInt))
 
   test "parse signature two params":
     var params = newSeq[Param]()
     params.add(newParam("num1", ptInt))
     params.add(newParam("num2", ptInt))
-    check testParseSignature("two(num1: int, num2: int) int", newSignatureOr(false, "two", params, ptInt))
+    check testParseSignature("two", "func(num1: int, num2: int) int", 5,
+      newSignatureOr(false, "two", params, ptInt))
 
   test "parse signature two params optional":
     var params = newSeq[Param]()
     params.add(newParam("num1", ptInt))
     params.add(newParam("num2", ptInt))
-    check testParseSignature("two(num1: int, num2: optional int) int",
+    check testParseSignature("two", "func(num1: int, num2: optional int) int", 5,
       newSignatureOr(true, "two", params, ptInt))
 
   test "parse signature three params":
@@ -1975,93 +1978,87 @@ White$1
     params.add(newParam("num1", ptInt))
     params.add(newParam("num2", ptInt))
     params.add(newParam("num3", ptInt))
-    check testParseSignature("three(num1: int, num2: int, num3: int) int",
+    check testParseSignature("three", "func(num1: int, num2: int, num3: int) int", 5,
       newSignatureOr(false, "three", params, ptInt))
 
   test "parse path signature":
     var params = newSeq[Param]()
     params.add(newParam("filename", ptString))
-    check testParseSignature("path(filename: string) dict", newSignatureOr(false, "path", params, ptDict))
+    check testParseSignature("path", "func(filename: string) dict", 5,
+      newSignatureOr(false, "path", params, ptDict))
 
   test "parse path signature no space":
     var params = newSeq[Param]()
     params.add(newParam("filename", ptString))
-    check testParseSignature("path(filename:string)dict", newSignatureOr(false, "path", params, ptDict))
+    check testParseSignature("path", "func(filename:string)dict", 5,
+      newSignatureOr(false, "path", params, ptDict))
 
   test "parse path signature space":
     var params = newSeq[Param]()
     params.add(newParam("name", ptString))
-    check testParseSignature("  path(  name  : string  )  dict  ",
+    check testParseSignature("path", "func(  name  : string  )  dict  ", 5,
       newSignatureOr(false, "path", params, ptDict))
 
   test "signature missing signature":
-    check testParseSignature("", newSignatureOr(wMissingSignature, "", 0))
+    check testParseSignature("fn", "", 0, newSignatureOr(wParameterName, "", 0))
 
   test "signature missing signature2":
-    check testParseSignature("   \t  ", newSignatureOr(wMissingSignature, "", 0))
-
-  test "signature bad function name":
-    check testParseSignature("123(name: string) dict",
-      newSignatureOr(wFunctionName, "", 0))
-
-  test "signature missing (":
-    check testParseSignature("path (name: string) dict",
-      newSignatureOr(wMissingLeftParen, "", 4))
+    check testParseSignature("fn", "   \t  ", 0, newSignatureOr(wParameterName, "", 0))
 
   test "signature bad parameter name":
-    check testParseSignature("path(21name: string) dict",
+    check testParseSignature("path", "func(21name: string) dict", 5,
       newSignatureOr(wParameterName, "", 5))
 
   test "signature extra parentheses":
-    check testParseSignature("path(name(): string) dict",
+    check testParseSignature("path", "func(name(): string) dict", 5,
       newSignatureOr(wMissingColon, "", 9))
 
   test "signature missing colon":
-    check testParseSignature("path(name , string) dict",
+    check testParseSignature("path", "func(name , string) dict", 5,
       newSignatureOr(wMissingColon, "", 10))
 
   test "signature invalid type":
-    check testParseSignature("path(name: number) dict",
+    check testParseSignature("path", "func(name: number) dict", 5,
       newSignatureOr(wExpectedParamType, "", 11))
 
   test "signature comma or paren":
-    check testParseSignature("path(num: string;) dict",
+    check testParseSignature("path", "func(num: string;) dict", 5,
       newSignatureOr(wMissingCommaParen, "", 16))
 
   test "signature comma or paren 2":
-    check testParseSignature("path(num: string, abc: int dict",
+    check testParseSignature("path", "func(num: string, abc: int dict", 5,
       newSignatureOr(wMissingCommaParen, "", 27))
 
   test "signature invalid return type":
-    check testParseSignature("path(num: string, abc: int) number",
+    check testParseSignature("path", "func(num: string, abc: int) number", 5,
       newSignatureOr(wExpectedReturnType, "", 28))
 
   test "signature trailing junk":
-    check testParseSignature("path(num: string, abc: int) int 333",
+    check testParseSignature("path", "func(num: string, abc: int) int 333", 5,
       newSignatureOr(wUnusedSignatureText, "", 32))
 
   test "signature optional not last":
-    check testParseSignature("path(name: optional string, num: int) dict",
+    check testParseSignature("path", "func(name: optional string, num: int) dict", 5,
       newSignatureOr(wNotLastOptional, "", 28))
 
   test "signature two optionals":
-    check testParseSignature("path(name: optional string, num: optional int) dict",
+    check testParseSignature("path", "func(name: optional string, num: optional int) dict", 5,
       newSignatureOr(wNotLastOptional, "", 28))
 
   test "signature return required":
-    check testParseSignature("path(name: string) optional dict",
+    check testParseSignature("path", "func(name: string) optional dict", 5,
       newSignatureOr(wReturnTypeRequired, "", 19))
 
   test "signature missing":
-    check testParseSignature("path(", newSignatureOr(wParameterName, "", 5))
-    check testParseSignature("path( ", newSignatureOr(wParameterName, "", 6))
-    check testParseSignature("path( :", newSignatureOr(wParameterName, "", 6))
-    check testParseSignature("path(name", newSignatureOr(wMissingColon, "", 9))
-    check testParseSignature("path(name a", newSignatureOr(wMissingColon, "", 10))
-    check testParseSignature("path(name:", newSignatureOr(wExpectedParamType, "", 10))
-    check testParseSignature("path(name:int", newSignatureOr(wMissingCommaParen, "", 13))
-    check testParseSignature("path(name:int)", newSignatureOr(wExpectedReturnType, "", 14))
-    check testParseSignature("path(name:int)  ", newSignatureOr(wExpectedReturnType, "", 16))
+    check testParseSignature("path", "func(", 5, newSignatureOr(wParameterName, "", 5))
+    check testParseSignature("path", "func( ", 6, newSignatureOr(wParameterName, "", 6))
+    check testParseSignature("path", "func( :", 6, newSignatureOr(wParameterName, "", 6))
+    check testParseSignature("path", "func(name", 5, newSignatureOr(wMissingColon, "", 9))
+    check testParseSignature("path", "func(name a", 5, newSignatureOr(wMissingColon, "", 10))
+    check testParseSignature("path", "func(name:", 5, newSignatureOr(wExpectedParamType, "", 10))
+    check testParseSignature("path", "func(name:int", 5, newSignatureOr(wMissingCommaParen, "", 13))
+    check testParseSignature("path", "func(name:int)", 5, newSignatureOr(wExpectedReturnType, "", 14))
+    check testParseSignature("path", "func(name:int)  ", 5, newSignatureOr(wExpectedReturnType, "", 16))
 
   test "isFunctionDefinition false":
     check testIsFunctionDefinition("", false)
@@ -2076,54 +2073,46 @@ White$1
     check testIsFunctionDefinition("a = func[] # func()", false)
 
   test "isFunctionDefinition true":
-    check testIsFunctionDefinition("""a = func("mycmp() int")""", true, "a", opEqual, 9)
-    check testIsFunctionDefinition(""" a = func(  "mycmp() int" )""", true, "a", opEqual, 12)
+    check testIsFunctionDefinition("""a = func() int""", true, "a", opEqual, 9)
+    check testIsFunctionDefinition(""" a = func(  ) int   """, true, "a", opEqual, 12)
     check testIsFunctionDefinition("""a = func(""", true, "a", opEqual, 9)
 
   test "processFunctionSignature none":
     var params = newSeq[Param]()
-    check testProcessFunctionSignature("""fn = func("test() int")""", 10,
+    check testParseSignature2("""test = func() int""", 12, "test",
       newSignatureOr(false, "test", params, ptInt))
 
   test "processFunctionSignature one":
     var params = newSeq[Param]()
     params.add(newParam("a", ptInt))
-    check testProcessFunctionSignature("""fn = func("test(a: int) int")""", 10,
-      newSignatureOr(false, "test", params, ptInt))
+    check testParseSignature2("fn = func(a: int) int", 10, "fn",
+      newSignatureOr(false, "fn", params, ptInt))
 
   test "processFunctionSignature two":
     var params = newSeq[Param]()
     params.add(newParam("a", ptString))
     params.add(newParam("b", ptFloat))
-    check testProcessFunctionSignature("""fn = func("test(a: string, b: float) dict")""", 10,
-      newSignatureOr(false, "test", params, ptDict))
+    check testParseSignature2("fn = func(a: string, b: float) dict", 10, "fn",
+      newSignatureOr(false, "fn", params, ptDict))
 
   test "processFunctionSignature comment":
-    var params = newSeq[Param]()
-    check testProcessFunctionSignature("""fn = func("test() int")  # comment""", 10,
-      newSignatureOr(false, "test", params, ptInt))
+    check testParseSignature2("""fn = func() int  # comment""", 10, "fn",
+      newSignatureOr(wUnusedSignatureText, "", 17))
 
   test "processFunctionSignature spaces":
-    var params = newSeq[Param]()
-    check testProcessFunctionSignature("""  fn  =  func(  "test()  int " )  # comment """, 16,
-      newSignatureOr(false, "test", params, ptInt))
+    check testParseSignature2("""  fn  =  func(  )  int   # comment """, 16, "fn",
+      newSignatureOr(wUnusedSignatureText, "", 25))
 
   test "processFunctionSignature bad signature":
     #                                     0123456789 123456789
-    check testProcessFunctionSignature("""fn = func(""", 10,
-      newSignatureOr(wExpectedSignature, "", 10))
-    check testProcessFunctionSignature("""fn = func()""", 10,
-      newSignatureOr(wExpectedSignature, "", 10))
-    check testProcessFunctionSignature("""fn = func(")""", 10,
-      newSignatureOr(wNoEndingQuote, "", 12))
-    check testProcessFunctionSignature("""fn = func("\uDC00")""", 10,
-      newSignatureOr(wLowSurrogateFirst, "", 12))
-    check testProcessFunctionSignature("""fn = func("abc"""", 10,
-      newSignatureOr(wNoMatchingParen, "", 15))
-    check testProcessFunctionSignature("""fn = func("abc") j """, 10,
-      newSignatureOr(wTextAfterValue, "", 17))
-    check testProcessFunctionSignature("""fn = func("test() num")""", 10,
-      newSignatureOr(wExpectedReturnType, "", 18))
+    check testParseSignature2("""fn = func(""", 10, "fn",
+      newSignatureOr(wParameterName, "", 10))
+    check testParseSignature2("""fn = func()""", 10, "fn",
+      newSignatureOr(wExpectedReturnType, "", 11))
+    check testParseSignature2("""fn = func(")""", 10, "fn",
+      newSignatureOr(wParameterName, "", 10))
+    check testParseSignature2("""fn = func() j """, 10, "fn",
+      newSignatureOr(wExpectedReturnType, "", 12))
 
   test "addText":
     for beginning in ["", "a", "ab", "abc", "abcd", "abcde", "abcdef"]:
@@ -2633,7 +2622,7 @@ statement: a = $1multilinestring$1␊
 
   test "user function":
     let content = """
-mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+mycmp = func(numStr1: string, numStr2: string) int
   ## Compare two number strings
   ## and return 1, 0, or -1.
   num1 = int(numStr1)
@@ -2641,7 +2630,7 @@ mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
   return(cmp(num1, num2))
 """
     let eVarRep = """
-l.mycmp = "strNumCmp"
+l.mycmp = "mycmp"
 o = {}
 """
     check testRunCodeFile(content, eVarRep)
@@ -2650,7 +2639,7 @@ o = {}
     let content = """
 a = 5
 
-mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+mycmp = func(numStr1: string, numStr2: string) int
   ## Compare two number strings and return 1, 0, or -1.
   return(cmp(int(numStr1), int(numStr2)))
 
@@ -2658,10 +2647,10 @@ details = functionDetails(mycmp)
 """
     let eVarRep = """
 l.a = 5
-l.mycmp = "strNumCmp"
+l.mycmp = "mycmp"
 l.details.builtIn = false
 l.details.signature.optional = false
-l.details.signature.name = "strNumCmp"
+l.details.signature.name = "mycmp"
 l.details.signature.paramNames = ["numStr1","numStr2"]
 l.details.signature.paramTypes = ["string","string"]
 l.details.signature.returnType = "int"
@@ -2681,9 +2670,9 @@ mycmp = func()
   return(cmp(int(numStr1), int(numStr2)))
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.tea(1): w227: Expected signature string.
+testcode.tea(1): w233: Invalid return type.
 statement: mycmp = func()
-                        ^
+                         ^
 testcode.tea(3): w205: The variable 'numStr1' isn't in the l dictionary.
 statement:   return(cmp(int(numStr1), int(numStr2)))
                             ^
@@ -2692,7 +2681,7 @@ statement:   return(cmp(int(numStr1), int(numStr2)))
 
   test "user function no doc comments":
     let content = """
-mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+mycmp = func(numStr1: string, numStr2: string) int
 """
     let eErrLines: seq[string] = splitNewLines """
 testcode.tea(2): w238: Out of lines; Missing required doc comment.
@@ -2701,7 +2690,7 @@ testcode.tea(2): w238: Out of lines; Missing required doc comment.
 
   test "user function no statements":
     let content = """
-mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+mycmp = func(numStr1: string, numStr2: string) int
 ## hello
 """
     let eErrLines: seq[string] = splitNewLines """
@@ -2711,7 +2700,7 @@ testcode.tea(3): w239: Out of lines; No statements for the function.
 
   test "user function no return":
     let content = """
-mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+mycmp = func(numStr1: string, numStr2: string) int
 ## hello
 a = 5
 """
@@ -2722,7 +2711,7 @@ testcode.tea(4): w240: Out of lines; missing the function's return statement.
 
   test "user function no return":
     let content = """
-mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+mycmp = func(numStr1: string, numStr2: string) int
 ## hello
 a = 5
 b = if(false, return(a), a)
@@ -2735,7 +2724,7 @@ testcode.tea(6): w240: Out of lines; missing the function's return statement.
 
   test "call user function":
     let content = """
-mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+mycmp = func(numStr1: string, numStr2: string) int
   ## Compare two number strings and return 1, 0, or -1.
   n1 = int(numStr1)
   n2 = int(numStr2)
@@ -2745,7 +2734,7 @@ mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
 a = l.mycmp("1", "2")
 """
     let eVarRep = """
-l.mycmp = "strNumCmp"
+l.mycmp = "mycmp"
 l.a = -1
 o = {}
 """
@@ -2753,7 +2742,7 @@ o = {}
 
   test "call user function 2":
     let content = """
-mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+mycmp = func(numStr1: string, numStr2: string) int
   ## Compare two number strings and
   ## return 1, 0, or -1.
   return(cmp(int(numStr1), int(numStr2)))
@@ -2761,7 +2750,7 @@ mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
 a = l.mycmp("1", "2")
 """
     let eVarRep = """
-l.mycmp = "strNumCmp"
+l.mycmp = "mycmp"
 l.a = -1
 o = {}
 """
@@ -2769,7 +2758,7 @@ o = {}
 
   test "no statements":
     let content = """
-mycmp = func("strNumCmp(numStr1: string, numStr2: string) int")
+mycmp = func(numStr1: string, numStr2: string) int
   ## Compare two number strings and
   ## return 1, 0, or -1.
 """
@@ -2780,7 +2769,7 @@ testcode.tea(4): w239: Out of lines; No statements for the function.
 
   test "zero function":
     let content = """
-zero = func("zero() int")
+zero = func() int
   ## Return 0.
   return(0)
 z = l.zero()
@@ -2794,7 +2783,7 @@ o = {}
 
   test "function with warning":
     let content = """
-zero = func("zero() int")
+zero = func() int
   ## Return 0.
   return(0
 z = l.zero()
@@ -2812,7 +2801,7 @@ o = {}
 
   test "function warning assigning var":
     let content = """
-zero = func("zero() int")
+zero = func() int
   ## Return 0.
   t.row = 5
   return(0)
@@ -2831,7 +2820,7 @@ o = {}
 
   test "function log":
     let content = """
-zero = func("zero() int")
+zero = func() int
   ## Return 0.
   log("running zero")
   return(0)
@@ -2849,7 +2838,7 @@ o = {}
 
   test "function return early":
     let content = """
-zero = func("zero() int")
+zero = func() int
   ## Return 0.
   if(true, return(5))
   return(0)
@@ -2864,7 +2853,7 @@ o = {}
 
   test "function warn":
     let content = """
-zero = func("zero() int")
+zero = func() int
   ## warn
   if(true, warn("user warning"))
   return(0)
@@ -2882,7 +2871,7 @@ testcode.tea(3): user warning
 
   test "function wrong return type":
     let content = """
-zero = func("zero() int")
+zero = func() int
   ## wrong return
   return(1.2)
 z = l.zero()
@@ -2901,7 +2890,7 @@ statement:   return(1.2)
 
   test "function wrong arg type":
     let content = """
-zero = func("zero(num: int) int")
+zero = func(num: int) int
   ## wrong arg
   return(0)
 z = l.zero(3.14)
@@ -2919,7 +2908,7 @@ statement: z = l.zero(3.14)
 
   test "call callback":
     let content = """
-callback = func("callback(ix: int, value: string, state: int) list")
+callback = func(ix: int, value: string, state: int) list
   ## Copy list.
   result &= "add"
   result &= value
@@ -2937,7 +2926,7 @@ o = {}
 
   test "listLoop":
     let content = """
-copy = func("copy(ix: int, value: int, newList: list) bool")
+copy = func(ix: int, value: int, newList: list) bool
   ## Copy list.
   newList &= value
   return(false)
@@ -2959,7 +2948,7 @@ o = {}
 
   test "listLoop b5":
     let content = """
-b5 = func("b5(ix: int, value: int, newList: list) bool")
+b5 = func(ix: int, value: int, newList: list) bool
   ## Use items bigger than 5.
   if( (value <= 5), return(false))
   newList &= value
@@ -2982,7 +2971,7 @@ o = {}
 
   test "listLoop b5 with state":
     let content = """
-b5 = func("b5(ix: int, value: int, newList: list, state: int) bool")
+b5 = func(ix: int, value: int, newList: list, state: int) bool
   ## Use items bigger than 5.
   if( (value <= 5), return(false))
   newList &= add(value, state)
@@ -3005,7 +2994,7 @@ o = {}
 
   test "listLoop no state":
     let content = """
-b5 = func("b5(ix: int, value: int, newList: list, state: int) bool")
+b5 = func(ix: int, value: int, newList: list, state: int) bool
   ## copy
   newList &= value
   return(false)
@@ -3030,7 +3019,7 @@ statement: stopped = listLoop(ls, newList, l.b5)
 
   test "listLoop state optional":
     let content = """
-b5 = func("b5(ix: int, value: int, newList: list, state: optional int) bool")
+b5 = func(ix: int, value: int, newList: list, state: optional int) bool
   ## copy
   newList &= value
   return(false)
@@ -3053,7 +3042,7 @@ o = {}
 
   test "listLoop stop early":
     let content = """
-b5 = func("b5(ix: int, value: int, newList: list) bool")
+b5 = func(ix: int, value: int, newList: list) bool
   ## Stop on 3
   if( (value == 3), return(true))
   newList &= value
@@ -3122,7 +3111,7 @@ statement: stopped = listLoop([1], [], f.cmp[0])
 
   test "funListLoop int first":
     let content = """
-b5 = func("b5(ix: float, value: int, newList: list, state: int) bool")
+b5 = func(ix: float, value: int, newList: list, state: int) bool
   ## Use items bigger than 5.
   newList &= if( (value > 5), value)
   return(false)
@@ -3144,7 +3133,7 @@ statement: stopped = listLoop([1], newList, b5, 2)
 
   test "funListLoop no state":
     let content = """
-b5 = func("b5(ix: int, value: int, newList: list) bool")
+b5 = func(ix: int, value: int, newList: list) bool
   ## Use items bigger than 5.
   newList &= if( (value > 5), add(value, state))
   return(false)
@@ -3168,7 +3157,7 @@ statement: stopped = listLoop(ls, newList, b5, 2)
 
   test "funListLoop callback warning":
     let content = """
-b5 = func("b5(ix: int, value: int, newList: list) bool")
+b5 = func(ix: int, value: int, newList: list) bool
   ## Syntax error
   syntaxError == 5
   return(false)
