@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+</head>
+<style>
+body {
+    max-width: 40em;
+    font-size: 2em;
+    margin-left: 1em;
+}
+
+#staticteadep {
+    width: 100%;
+}
+
+.signature {
+    color: green;
+}
+
+.code {
+    border-left: 6px solid green;
+}
+</style>
+<body>
+<h1>args.nim</h1>
+
+<p>Types for handling command line arguments.</p>
+
+Nim source code: <a href="../../src/args.nim">args.nim</a>
+
+<h1>Index</h1>
+
+<ul>
+<li>type:  <a href="#prepost">Prepost</a> &mdash; Prepost holds one prefix and its associated postfix.</li>
+<li>type:  <a href="#preposttable">PrepostTable</a> &mdash; The prefix postfix pairs stored in an ordered dictionary.</li>
+<li>type:  <a href="#args">Args</a> &mdash; Args holds all the command line arguments.</li>
+<li>type:  <a href="#argsor">ArgsOr</a> &mdash; The args or a warning.</li>
+<li> <a href="#makeuserpreposttable">makeUserPrepostTable</a> &mdash; Return the user's ordered table that maps prefixes to postfixes.</li>
+<li> <a href="#newargsor">newArgsOr</a> &mdash; Return a new ArgsOr object containing a warning.</li>
+<li> <a href="#newargsor-1">newArgsOr</a> &mdash; Return a new ArgsOr object containing a warning.</li>
+<li> <a href="#newargsor-2">newArgsOr</a> &mdash; Return a new ArgsOr object containing args.</li>
+<li> <a href="#newprepost">newPrepost</a> &mdash; Create a new prepost object from the prefix and postfix.</li>
+<li> <a href="#">`$`</a> &mdash; Return the Prepost string representation.</li>
+<li> <a href="#-1">`$`</a> &mdash; Return the Args string representation.</li>
+<li> <a href="#-2">`$`</a> &mdash; Return the seq[Prepost] string representation.</li>
+<li>const:  <a href="#predefinedprepost">predefinedPrepost</a> &mdash; The predefined prefixes and postfixes.</li>
+<li> <a href="#makedefaultpreposttable">makeDefaultPrepostTable</a> &mdash; Return the default ordered table that maps prefixes to postfixes.</li>
+<li> <a href="#getpreposttable">getPrepostTable</a> &mdash; Get the the prepost settings from the user or use the default ones.</li>
+</ul>
+
+<h3 id=prepost>Prepost</h3>
+
+<p>Prepost holds one prefix and its associated postfix.</p>
+
+<pre class="signature">
+Prepost = object
+  prefix*: string
+  postfix*: string
+
+</pre>
+
+<h3 id=preposttable>PrepostTable</h3>
+
+<p>The prefix postfix pairs stored in an ordered dictionary.</p>
+
+<pre class="signature">
+PrepostTable = OrderedTable[string, string]
+</pre>
+
+<h3 id=args>Args</h3>
+
+<p>Args holds all the command line arguments.</p>
+
+<pre class="signature">
+Args = object
+  help*: bool
+  version*: bool
+  update*: bool
+  log*: bool
+  repl*: bool
+  serverList*: seq[string]
+  codeList*: seq[string]
+  prepostList*: seq[Prepost]
+  templateFilename*: string
+  resultFilename*: string
+  logFilename*: string
+
+</pre>
+
+<h3 id=argsor>ArgsOr</h3>
+
+<p>The args or a warning.</p>
+
+<pre class="signature">
+ArgsOr = OpResultWarn[Args]
+</pre>
+
+<h3 id=makeuserpreposttable>makeUserPrepostTable</h3>
+
+<p>Return the user's ordered table that maps prefixes to postfixes. This is used when the user specifies prefixes on the command line and it does not contain any defaults.</p>
+
+<pre class="signature">
+proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable
+</pre>
+
+<h3 id=newargsor>newArgsOr</h3>
+
+<p>Return a new ArgsOr object containing a warning.</p>
+
+<pre class="signature">
+func newArgsOr(warningData: WarningData): ArgsOr
+</pre>
+
+<h3 id=newargsor-1>newArgsOr</h3>
+
+<p>Return a new ArgsOr object containing a warning.</p>
+
+<pre class="signature">
+func newArgsOr(warning: MessageId; p1: string = ""; pos = 0): ArgsOr
+</pre>
+
+<h3 id=newargsor-2>newArgsOr</h3>
+
+<p>Return a new ArgsOr object containing args.</p>
+
+<pre class="signature">
+func newArgsOr(args: Args): ArgsOr
+</pre>
+
+<h3 id=newprepost>newPrepost</h3>
+
+<p>Create a new prepost object from the prefix and postfix.</p>
+
+<pre class="signature">
+func newPrepost(prefix: string; postfix: string): Prepost
+</pre>
+
+<h3 id=>`$`</h3>
+
+<p>Return the Prepost string representation.</p>
+
+<pre class="signature">
+func `$`(p: Prepost): string
+</pre>
+
+<h3 id=-1>`$`</h3>
+
+<p>Return the Args string representation.</p>
+
+<pre class="signature">
+func `$`(args: Args): string
+</pre>
+
+<h3 id=-2>`$`</h3>
+
+<p>Return the seq[Prepost] string representation.</p>
+
+<pre class="signature">
+func `$`(prepostList: seq[Prepost]): string
+</pre>
+
+<h3 id=predefinedprepost>predefinedPrepost</h3>
+
+<p>The predefined prefixes and postfixes.
+
+* $$ -- Default when no comment like Markdown
+* &lt;!--$ and --&gt; -- HTML
+* #$ -- Bash, python, etc.
+* ;$ -- Config files, Lisp
+* //$ -- C++
+* /*$ and */ -- C, C++
+* &amp;lt;!--$ and --&amp;gt; -- HTML inside a textarea element
+* # $ -- Org Mode</p>
+
+<pre class="signature">
+predefinedPrepost: array[8, Prepost] = [(prefix: "$$", postfix: ""),
+                                        (prefix: "<!--$", postfix: "-->"),
+                                        (prefix: "#$", postfix: ""),
+                                        (prefix: ";$", postfix: ""),
+                                        (prefix: "//$", postfix: ""),
+                                        (prefix: "/*$", postfix: "*/"), (
+    prefix: "&lt;!--$", postfix: "--&gt;"), (prefix: "# $", postfix: "")]
+</pre>
+
+<h3 id=makedefaultpreposttable>makeDefaultPrepostTable</h3>
+
+<p>Return the default ordered table that maps prefixes to postfixes.</p>
+
+<pre class="signature">
+proc makeDefaultPrepostTable(): PrepostTable
+</pre>
+
+<h3 id=getpreposttable>getPrepostTable</h3>
+
+<p>Get the the prepost settings from the user or use the default ones.</p>
+
+<pre class="signature">
+proc getPrepostTable(args: Args): PrepostTable
+</pre>
+
+
+<p>⦿ This page was generated
+by <a href="https://github.com/flenniken/statictea/">statictea</a>
+from nim doc comments. ⦿</p>
+
+</body>
+</html>

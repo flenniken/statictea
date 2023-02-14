@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+</head>
+<style>
+body {
+    max-width: 40em;
+    font-size: 2em;
+    margin-left: 1em;
+}
+
+#staticteadep {
+    width: 100%;
+}
+
+.signature {
+    color: green;
+}
+
+.code {
+    border-left: 6px solid green;
+}
+</style>
+<body>
+<h1>regexes.nim</h1>
+
+<p>Perl regular expression matching.
+
+Examples:
+
+Match a string with "abc" in it:
+
+~~~
+let line = "123abc456"
+let pattern = ".*abc"
+let matchesO = matchPattern(line, pattern, start=0, numGroups=0)
+
+check matchesO.isSome == true
+check matchesO.get().length == 6
+~~~
+
+Match a file and line number like: filename(234):
+
+~~~
+let line = "template.html(87)"
+let pattern = r"^(.*)(([0-9]+))$"
+let matchesO = matchPatternCached(line, pattern, 0, 2)
+
+check matchesO.isSome == true
+let (filename, lineNum) = matchesO.get2Groups()
+check filename == "template.html"
+check lineNum == "87"
+~~~
+
+Replace the patterns in the string with their replacements:
+
+~~~
+var replacements: seq[Replacement]
+replacements.add(newReplacement("abc", "456"))
+replacements.add(newReplacement("def", ""))
+
+let resultStringO = replaceMany("abcdefabc", replacements)
+
+check resultStringO.isSome
+check resultStringO.get() == "456456"
+~~~</p>
+
+Nim source code: <a href="../../src/regexes.nim">regexes.nim</a>
+
+<h1>Index</h1>
+
+<ul>
+<li>type:  <a href="#Matches">Matches</a> &mdash; Holds the result of a match.</li>
+<li>type:  <a href="#Replacement">Replacement</a> &mdash; Holds the regular expression pattern and its replacement for the replaceMany function.</li>
+<li> <a href="#newMatches">newMatches</a> &mdash; Create a new Matches object with no groups.</li>
+<li> <a href="#newMatches">newMatches</a> &mdash; Create a new Matches object with one group.</li>
+<li> <a href="#newMatches">newMatches</a> &mdash; Create a new Matches object with two groups.</li>
+<li> <a href="#newMatches">newMatches</a> &mdash; Create a new Matches object with three groups.</li>
+<li> <a href="#newMatches">newMatches</a> &mdash; Create a Matches object with the given number of groups.</li>
+<li> <a href="#newMatches">newMatches</a> &mdash; Create a Matches object with the given number of groups.</li>
+<li> <a href="#newReplacement">newReplacement</a> &mdash; Create a new Replacement object.</li>
+<li> <a href="#getGroup">getGroup</a> &mdash; Get the group in matches.</li>
+<li> <a href="#getGroupLen">getGroupLen</a> &mdash; Get the group in matches.</li>
+<li> <a href="#getGroup">getGroup</a> &mdash; Get the group in matches.</li>
+<li> <a href="#getGroupLen">getGroupLen</a> &mdash; Get the group in matches and the match length.</li>
+<li> <a href="#get2Groups">get2Groups</a> &mdash; Get two groups in matches.</li>
+<li> <a href="#get2GroupsLen">get2GroupsLen</a> &mdash; Get two groups and length in matches.</li>
+<li> <a href="#get2Groups">get2Groups</a> &mdash; Get two groups in matches.</li>
+<li> <a href="#get2GroupsLen">get2GroupsLen</a> &mdash; Get two groups and length in matchesO.</li>
+<li> <a href="#get3Groups">get3Groups</a> &mdash; Get three groups in matches.</li>
+<li> <a href="#get3Groups">get3Groups</a> &mdash; Get three groups in matches.</li>
+<li> <a href="#get3GroupsLen">get3GroupsLen</a> &mdash; Return the three groups and the length of the match.</li>
+<li> <a href="#getGroups">getGroups</a> &mdash; Return the number of groups specified.</li>
+<li> <a href="#getGroups">getGroups</a> &mdash; Return the number of groups specified.</li>
+<li> <a href="#matchPattern">matchPattern</a> &mdash; Match a regular expression pattern in a string.</li>
+<li> <a href="#matchPatternCached">matchPatternCached</a> &mdash; Match a pattern in a string and cache the compiled regular
+expression pattern for next time.</li>
+<li> <a href="#replaceMany">replaceMany</a> &mdash; Replace the patterns in the string with their replacements.</li>
+</ul>
+
+<h3 id=Matches>Matches</h3>
+
+<p>Holds the result of a match.
+* groups -- list of matching groups
+* length -- length of the match
+* start -- where the match started
+* numGroups -- number of groups</p>
+
+<pre class="signature">
+Matches = object
+  groups*: seq[string]
+  length*: Natural
+  start*: Natural
+  numGroups*: Natural
+
+</pre>
+
+<h3 id=Replacement>Replacement</h3>
+
+<p>Holds the regular expression pattern and its replacement for the replaceMany function.</p>
+
+<pre class="signature">
+Replacement = object
+  pattern*: string
+  sub*: string
+
+</pre>
+
+<h3 id=newMatches>newMatches</h3>
+
+<p>Create a new Matches object with no groups.</p>
+
+<pre class="signature">
+func newMatches(length: Natural; start: Natural): Matches
+</pre>
+
+<h3 id=newMatches>newMatches</h3>
+
+<p>Create a new Matches object with one group.</p>
+
+<pre class="signature">
+func newMatches(length: Natural; start: Natural; group: string): Matches
+</pre>
+
+<h3 id=newMatches>newMatches</h3>
+
+<p>Create a new Matches object with two groups.</p>
+
+<pre class="signature">
+func newMatches(length: Natural; start: Natural; group1: string; group2: string): Matches
+</pre>
+
+<h3 id=newMatches>newMatches</h3>
+
+<p>Create a new Matches object with three groups.</p>
+
+<pre class="signature">
+func newMatches(length: Natural; start: Natural; group1: string; group2: string;
+                group3: string): Matches
+</pre>
+
+<h3 id=newMatches>newMatches</h3>
+
+<p>Create a Matches object with the given number of groups.</p>
+
+<pre class="signature">
+proc newMatches(length: Natural; start: Natural; groups: seq[string]): Matches
+</pre>
+
+<h3 id=newMatches>newMatches</h3>
+
+<p>Create a Matches object with the given number of groups.</p>
+
+<pre class="signature">
+proc newMatches(length: Natural; start: Natural; numGroups: Natural): Matches
+</pre>
+
+<h3 id=newReplacement>newReplacement</h3>
+
+<p>Create a new Replacement object.</p>
+
+<pre class="signature">
+func newReplacement(pattern: string; sub: string): Replacement
+</pre>
+
+<h3 id=getGroup>getGroup</h3>
+
+<p>Get the group in matches.</p>
+
+<pre class="signature">
+func getGroup(matches: Matches): string
+</pre>
+
+<h3 id=getGroupLen>getGroupLen</h3>
+
+<p>Get the group in matches.</p>
+
+<pre class="signature">
+func getGroupLen(matches: Matches): (string, Natural)
+</pre>
+
+<h3 id=getGroup>getGroup</h3>
+
+<p>Get the group in matches.</p>
+
+<pre class="signature">
+func getGroup(matchesO: Option[Matches]): string
+</pre>
+
+<h3 id=getGroupLen>getGroupLen</h3>
+
+<p>Get the group in matches and the match length.</p>
+
+<pre class="signature">
+func getGroupLen(matchesO: Option[Matches]): (string, Natural)
+</pre>
+
+<h3 id=get2Groups>get2Groups</h3>
+
+<p>Get two groups in matches.</p>
+
+<pre class="signature">
+func get2Groups(matches: Matches): (string, string)
+</pre>
+
+<h3 id=get2GroupsLen>get2GroupsLen</h3>
+
+<p>Get two groups and length in matches.</p>
+
+<pre class="signature">
+func get2GroupsLen(matches: Matches): (string, string, Natural)
+</pre>
+
+<h3 id=get2Groups>get2Groups</h3>
+
+<p>Get two groups in matches.</p>
+
+<pre class="signature">
+func get2Groups(matchesO: Option[Matches]): (string, string)
+</pre>
+
+<h3 id=get2GroupsLen>get2GroupsLen</h3>
+
+<p>Get two groups and length in matchesO.</p>
+
+<pre class="signature">
+func get2GroupsLen(matchesO: Option[Matches]): (string, string, Natural)
+</pre>
+
+<h3 id=get3Groups>get3Groups</h3>
+
+<p>Get three groups in matches.</p>
+
+<pre class="signature">
+func get3Groups(matches: Matches): (string, string, string)
+</pre>
+
+<h3 id=get3Groups>get3Groups</h3>
+
+<p>Get three groups in matches.</p>
+
+<pre class="signature">
+func get3Groups(matchesO: Option[Matches]): (string, string, string)
+</pre>
+
+<h3 id=get3GroupsLen>get3GroupsLen</h3>
+
+<p>Return the three groups and the length of the match.</p>
+
+<pre class="signature">
+func get3GroupsLen(matchesO: Option[Matches]): (string, string, string, Natural)
+</pre>
+
+<h3 id=getGroups>getGroups</h3>
+
+<p>Return the number of groups specified. If one of the groups doesn't exist, "" is returned for it.</p>
+
+<pre class="signature">
+func getGroups(matches: Matches; numGroups: Natural): seq[string]
+</pre>
+
+<h3 id=getGroups>getGroups</h3>
+
+<p>Return the number of groups specified. If one of the groups doesn't exist, "" is returned for it.</p>
+
+<pre class="signature">
+func getGroups(matchesO: Option[Matches]; numGroups: Natural): seq[string]
+</pre>
+
+<h3 id=matchPattern>matchPattern</h3>
+
+<p>Match a regular expression pattern in a string. Start is the
+index in the string to start the search. NumGroups is the number
+of groups in the pattern.
+
+Note: the pattern uses the anchored option.</p>
+
+<pre class="signature">
+func matchPattern(str: string; pattern: string; start: Natural;
+                  numGroups: Natural): Option[Matches]
+</pre>
+
+<h3 id=matchPatternCached>matchPatternCached</h3>
+
+<p>Match a pattern in a string and cache the compiled regular
+expression pattern for next time. Start is the index in the
+string to start the search. NumGroups is the number of groups in
+the pattern.</p>
+
+<pre class="signature">
+proc matchPatternCached(str: string; pattern: string; start: Natural;
+                        numGroups: Natural): Option[Matches]
+</pre>
+
+<h3 id=replaceMany>replaceMany</h3>
+
+<p>Replace the patterns in the string with their replacements.</p>
+
+<pre class="signature">
+proc replaceMany(str: string; replacements: seq[Replacement]): Option[string]
+</pre>
+
+
+<p>⦿ This page was generated
+by <a href="https://github.com/flenniken/statictea/">statictea</a>
+from nim doc comments. ⦿</p>
+
+</body>
+</html>

@@ -4,11 +4,6 @@ $$ #
 
 StaticTea nim source code documentation.
 
-$$ # Sort the index by filenames.
-$$ block
-$$ : g.modules = sort(s.modules, "ascending", "sensitive", "filename")
-$$ endblock
-$$ #
 $$ # Show the dependency svg file. Wrap it with a do nothing link
 $$ # to prevent github from showing the raw svg source when clicking on it.
 $$ #
@@ -17,15 +12,9 @@ $$ #
 $$ # Output module names and a short descrition.
 $$ # Use the description's first sentence to describe the module.
 $$ nextline
-$$ : t.repeat = len(g.modules)
-$$ : entry = g.modules[t.row]
-$$ : fullPath = entry["filename"]
-$$ : path = path(fullPath, "/")
-$$ : mdName = concat(path.basename, ".md")
-$$ : description = get(entry, "description", "")
-$$ : # Use the first sentence for the short description.
-$$ : short = slice(description, 0, add(find(description, ".", -1), 1))
-* [{path.filename}]({mdName}) &mdash; {short}
+$$ : t.repeat = len(o.entries)
+$$ : entry = o.entries[t.row]
+* [{entry.name}.nim]({entry.name}.md) &mdash; {entry.shortDesc}
 
 $$ # Show the nim module dependency svg file.
 # Nim Module Usage

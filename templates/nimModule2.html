@@ -1,0 +1,68 @@
+<!--$ # StaticTea Template -->
+<!--$ # This template creates a module's docs from nim doc comments.  -->
+<!--$ # Also see nimModule.tea -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+</head>
+<style>
+body {
+    max-width: 40em;
+    font-size: 2em;
+    margin-left: 1em;
+}
+
+#staticteadep {
+    width: 100%;
+}
+
+.signature {
+    color: green;
+}
+
+.code {
+    border-left: 6px solid green;
+}
+</style>
+<body>
+<!--$ block -->
+<h1>{o.moduleName}</h1>
+
+<p>{o.moduleDescription}</p>
+
+Nim source code: <a href="../../src/{o.moduleName}">{o.moduleName}</a>
+<!--$ endblock -->
+
+<!--$ # Show the index label when there are entries. -->
+<!--$ nextline -->
+<!--$ : t.repeat = if0(o.entries, 0, 1) -->
+<h1>Index</h1>
+
+<ul>
+<!--$ nextline -->
+<!--$ : t.repeat = len(o.entries) -->
+<!--$ : entry = o.entries[t.row] -->
+<li>{entry.type} <a href="#{entry.anchor}">{entry.name}</a> &mdash; {entry.short}</li>
+</ul>
+
+<!--$ # Create the function sections. -->
+<!--$ block -->
+<!--$ : t.repeat = len(o.entries) -->
+<!--$ : entry = o.entries[t.row] -->
+<h3 id={entry.anchor}>{entry.name}</h3>
+
+<p>{entry.description}</p>
+
+<pre class="nim-code">
+{entry.signature}
+</pre>
+
+<!--$ endblock -->
+
+<p>⦿ This page was generated
+by <a href="https://github.com/flenniken/statictea/">statictea</a>
+from nim doc comments. ⦿</p>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+# Create a dictionary for each StaticTea module containing the module
+# name and a short description.
+
+make-entry = func(ix: int, module: dict, entries: list) bool
+  ## Add a module entry dictionary to the entries list.
+
+  entry = dict()
+
+  # Name is the basename without an extension.
+  path = path(module["filename"], "/")
+  entry.name = path.basename
+
+  # Use the first sentence for the short description.
+  description = get(module, "description", "")
+  entry.shortDesc = slice(description, 0, add(find(description, ".", -1), 1))
+
+  entries &= entry
+  return(false)
+
+entries = []
+stopped = listLoop(s.modules, entries, make-entry)
+
+# Sort the list of entries by name.
+o.entries = sort(entries, "ascending", "sensitive", "name")

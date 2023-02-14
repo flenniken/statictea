@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+</head>
+<style>
+body {
+    max-width: 40em;
+    font-size: 2em;
+    margin-left: 1em;
+}
+
+#staticteadep {
+    width: 100%;
+}
+
+.signature {
+    color: green;
+}
+
+.code {
+    border-left: 6px solid green;
+}
+</style>
+<body>
+<h1>comparelines.nim</h1>
+
+<p>Compare lines of text.</p>
+
+Nim source code: <a href="../../src/comparelines.nim">comparelines.nim</a>
+
+<h1>Index</h1>
+
+<ul>
+<li>type:  <a href="#OpResultStr">OpResultStr</a> &mdash; On success return T, otherwise return a message telling what went wrong.</li>
+<li> <a href="#opValueStr">opValueStr</a> &mdash; Return an OpResultStr with a value.</li>
+<li> <a href="#opMessageStr">opMessageStr</a> &mdash; Return an OpResultStr with a message why the value cannot be returned.</li>
+<li> <a href="#splitNewLines">splitNewLines</a> &mdash; Split lines and keep the line endings.</li>
+<li> <a href="#linesSideBySide">linesSideBySide</a> &mdash; Show the two sets of lines side by side.</li>
+<li> <a href="#testLinesSideBySide">testLinesSideBySide</a> &mdash; If the two strings are equal, return true, else show the differences and return false.</li>
+<li> <a href="#compareFiles">compareFiles</a> &mdash; Compare two files and return the differences.</li>
+</ul>
+
+<h3 id=OpResultStr>OpResultStr</h3>
+
+<p>On success return T, otherwise return a message telling what went wrong.</p>
+
+<pre class="signature">
+OpResultStr[T] = OpResult[T, string]
+</pre>
+
+<h3 id=opValueStr>opValueStr</h3>
+
+<p>Return an OpResultStr with a value.</p>
+
+<pre class="signature">
+func opValueStr[T](value: T): OpResultStr[T]
+</pre>
+
+<h3 id=opMessageStr>opMessageStr</h3>
+
+<p>Return an OpResultStr with a message why the value cannot be returned.</p>
+
+<pre class="signature">
+func opMessageStr[T](message: string): OpResultStr[T]
+</pre>
+
+<h3 id=splitNewLines>splitNewLines</h3>
+
+<p>Split lines and keep the line endings. Works with n and rn type endings. keyword: splitLines</p>
+
+<pre class="signature">
+func splitNewLines(content: string): seq[string]
+</pre>
+
+<h3 id=linesSideBySide>linesSideBySide</h3>
+
+<p>Show the two sets of lines side by side.</p>
+
+<pre class="signature">
+proc linesSideBySide(gotContent: string; expectedContent: string): string
+</pre>
+
+<h3 id=testLinesSideBySide>testLinesSideBySide</h3>
+
+<p>If the two strings are equal, return true, else show the differences and return false.</p>
+
+<pre class="signature">
+proc testLinesSideBySide(got: string; expected: string): bool
+</pre>
+
+<h3 id=compareFiles>compareFiles</h3>
+
+<p>Compare two files and return the differences. When they are equal return "".</p>
+
+<pre class="signature">
+proc compareFiles(gotFilename: string; expectedFilename: string): OpResultStr[
+    string]
+</pre>
+
+
+<p>⦿ This page was generated
+by <a href="https://github.com/flenniken/statictea/">statictea</a>
+from nim doc comments. ⦿</p>
+
+</body>
+</html>

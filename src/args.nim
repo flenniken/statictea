@@ -120,16 +120,15 @@ const
     newPrepost("# $", "")
   ]
     ## The predefined prefixes and postfixes.
-    ## @:~~~
-    ## @:* Default when no comment like Markdown: $$
-    ## @:* HTML: <!--$ and -->
-    ## @:* Bash, python, etc: #$
-    ## @:* Config files, Lisp: ;$
-    ## @:* C++: //$
-    ## @:* C, C++: /@.$ and @./
-    ## @:* HTML inside a textarea element: &lt;!--$ and --&gt;
-    ## @:* Org Mode: # $
-    ## @:~~~~
+    ## @:
+    ## @:* $$ -- Default when no comment like Markdown
+    ## @:* &lt;!--$ and --&gt; -- HTML
+    ## @:* #$ -- Bash, python, etc.
+    ## @:* ;$ -- Config files, Lisp
+    ## @:* //$ -- C++
+    ## @:* /@.$ and @./ -- C, C++
+    ## @:* &amp;lt;!--$ and --&amp;gt; -- HTML inside a textarea element
+    ## @:* # $ -- Org Mode
 
 proc makeDefaultPrepostTable*(): PrepostTable =
   ## Return the default ordered table that maps prefixes to postfixes.

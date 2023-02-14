@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+</head>
+<style>
+body {
+    max-width: 40em;
+    font-size: 2em;
+    margin-left: 1em;
+}
+
+#staticteadep {
+    width: 100%;
+}
+
+.signature {
+    color: green;
+}
+
+.code {
+    border-left: 6px solid green;
+}
+</style>
+<body>
+<h1>repl.nim</h1>
+
+<p>Run commands at a prompt. Run evaluate print loop (REPL).</p>
+
+Nim source code: <a href="../../src/repl.nim">repl.nim</a>
+
+<h1>Index</h1>
+
+<ul>
+<li> <a href="#handleReplLine">handleReplLine</a> &mdash; Handle the REPL line.</li>
+<li> <a href="#runEvaluatePrintLoop">runEvaluatePrintLoop</a> &mdash; Run commands at a prompt.</li>
+</ul>
+
+<h3 id=handleReplLine>handleReplLine</h3>
+
+<p>Handle the REPL line. Return true to end the loop.</p>
+
+<pre class="signature">
+proc handleReplLine(env: var Env; variables: var Variables; line: string): bool
+</pre>
+
+<h3 id=runEvaluatePrintLoop>runEvaluatePrintLoop</h3>
+
+<p>Run commands at a prompt.</p>
+
+<pre class="signature">
+proc runEvaluatePrintLoop(env: var Env; args: Args)
+</pre>
+
+
+<p>⦿ This page was generated
+by <a href="https://github.com/flenniken/statictea/">statictea</a>
+from nim doc comments. ⦿</p>
+
+</body>
+</html>

@@ -1,25 +1,53 @@
-# messages.nim
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+</head>
+<style>
+body {
+    max-width: 40em;
+    font-size: 2em;
+    margin-left: 1em;
+}
 
-Messages IDs and associated strings and routines to get them.
+#staticteadep {
+    width: 100%;
+}
 
-* [messages.nim](../src/messages.nim) &mdash; Nim source code.
-# Index
+.signature {
+    color: green;
+}
 
-* type: [MessageId](#messageid) &mdash; Message numbers.
-* const: [Messages](#messages) &mdash; The message text.
-* type: [WarningData](#warningdata) &mdash; Warning data.
-* [getWarning](#getwarning) &mdash; Return the warning string.
-* [getWarningLine](#getwarningline) &mdash; Return a formatted warning line.
-* [getWarningLine](#getwarningline-1) &mdash; Return a formatted warning line.
-* [newWarningData](#newwarningdata) &mdash; Create a WarningData object containing all the warning information.
-* [`$`](#) &mdash; Return a string representation of WarningData.
-* [`==`](#-1) &mdash; Return true when the two WarningData objects are equal.
+.code {
+    border-left: 6px solid green;
+}
+</style>
+<body>
+<h1>messages.nim</h1>
 
-# MessageId
+<p>Messages IDs and associated strings and routines to get them.</p>
 
-Message numbers.
+Nim source code: <a href="../../src/messages.nim">messages.nim</a>
 
-```nim
+<h1>Index</h1>
+
+<ul>
+<li>type:  <a href="#MessageId">MessageId</a> &mdash; Message numbers.</li>
+<li>const:  <a href="#Messages">Messages</a> &mdash; The message text.</li>
+<li>type:  <a href="#WarningData">WarningData</a> &mdash; Warning data.</li>
+<li> <a href="#getWarning">getWarning</a> &mdash; Return the warning string.</li>
+<li> <a href="#getWarningLine">getWarningLine</a> &mdash; Return a formatted warning line.</li>
+<li> <a href="#getWarningLine">getWarningLine</a> &mdash; Return a formatted warning line.</li>
+<li> <a href="#newWarningData">newWarningData</a> &mdash; Create a WarningData object containing all the warning information.</li>
+<li> <a href="#`$`">`$`</a> &mdash; Return a string representation of WarningData.</li>
+<li> <a href="#`==`">`==`</a> &mdash; Return true when the two WarningData objects are equal.</li>
+</ul>
+
+<h3 id=MessageId>MessageId</h3>
+
+<p>Message numbers.</p>
+
+<pre class="signature">
 MessageId = enum
   wSuccess, wUnknownSwitch, wUnknownArg, wOneResultAllowed, wExtraPrepostText,
   wOneTemplateAllowed, wNoPrepostValue, wSkippingExtraPrepost,
@@ -90,13 +118,13 @@ MessageId = enum
   wVarStartsWithLetter, wVarContainsChars, wVarEndsWith, wVarMaximumLength,
   wNotFuncVariable, wImmutableDict, wImmutableList, wNewListInDict,
   wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg
-```
+</pre>
 
-# Messages
+<h3 id=Messages>Messages</h3>
 
-The message text.
+<p>The message text.</p>
 
-```nim
+<pre class="signature">
 Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "Unknown argument: $1.", "", "", "", "", "Skipping extra prepost text: $1.",
     "Unable to open log file: \'$1\'.", "",
@@ -256,85 +284,89 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "The index variable value is not a valid variable name.",
     "The index value is not a string.",
     "A two parameter IF function cannot be used as an argument."]
-```
+</pre>
 
-# WarningData
+<h3 id=WarningData>WarningData</h3>
 
-Warning data.<ul class="simple"><li>messageId -- the message id</li>
+<p>Warning data.<ul class="simple"><li>messageId -- the message id</li>
 <li>p1 -- the optional string substituted for the message's $1.</li>
 <li>pos -- the index in the statement where the warning was detected.</li>
 </ul>
+</p>
 
-
-```nim
+<pre class="signature">
 WarningData = object
   messageId*: MessageId
   p1*: string
   pos*: Natural
 
-```
+</pre>
 
-# getWarning
+<h3 id=getWarning>getWarning</h3>
 
-Return the warning string.
+<p>Return the warning string.</p>
 
-```nim
+<pre class="signature">
 func getWarning(warning: MessageId; p1 = ""): string
-```
+</pre>
 
-# getWarningLine
+<h3 id=getWarningLine>getWarningLine</h3>
 
-Return a formatted warning line. For example:
+<p>Return a formatted warning line. For example:
 
 ~~~
 filename(line): wId: message.
-~~~
+~~~</p>
 
-```nim
+<pre class="signature">
 func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = ""): string
-```
+</pre>
 
-# getWarningLine
+<h3 id=getWarningLine>getWarningLine</h3>
 
-Return a formatted warning line. For example:
+<p>Return a formatted warning line. For example:
 
 ~~~
 filename(line): wId: message.
-~~~
+~~~</p>
 
-```nim
+<pre class="signature">
 func getWarningLine(filename: string; lineNum: int; warningData: WarningData): string
-```
+</pre>
 
-# newWarningData
+<h3 id=newWarningData>newWarningData</h3>
 
-Create a WarningData object containing all the warning information.
+<p>Create a WarningData object containing all the warning information.</p>
 
-```nim
+<pre class="signature">
 func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData
-```
+</pre>
 
-# `$`
+<h3 id=`$`>`$`</h3>
 
-Return a string representation of WarningData.
+<p>Return a string representation of WarningData.
 
 ~~~
 let warning = newWarningData(wUnknownArg, "p1", 5)
 check $warning == "wUnknownArg(p1):5"
-~~~
+~~~</p>
 
-```nim
+<pre class="signature">
 func `$`(warningData: WarningData): string
-```
+</pre>
 
-# `==`
+<h3 id=`==`>`==`</h3>
 
-Return true when the two WarningData objects are equal.
+<p>Return true when the two WarningData objects are equal.</p>
 
-```nim
+<pre class="signature">
 func `==`(w1: WarningData; w2: WarningData): bool
-```
+</pre>
 
 
----
-⦿ Markdown page generated by [StaticTea](https://github.com/flenniken/statictea/) from nim doc comments. ⦿
+<p>⦿ This page was generated
+by <a href="https://github.com/flenniken/statictea/">statictea</a>
+from nim doc comments. ⦿</p>
+
+</body>
+</html>

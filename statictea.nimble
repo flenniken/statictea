@@ -535,30 +535,48 @@ proc createDependencyGraph2() =
 
 proc echoGrip() =
   echo """
-
 The grip app is good for viewing github markdown locally.
   grip --quiet readme.org &
   http://localhost:6419/docs/index.md
-  http://localhost:6419/testfiles/stf-index.md
-
-"""
+  http://localhost:6419/testfiles/stf-index.md"""
 
 proc taskDocsIx() =
-  ## Create the index json file.
+  ## Create the index html file.
 
-  echo "Create index json."
-  var jsonFilename = "docs/index.json"
+  var resultFile = "docs/index.md"
+  var templateFile = "templates/nimModuleIndex.md"
+  var teaFile = "templates/nimModuleIndex.tea"
+  var jsonFile = "docs/index.json"
+
+  echo "Create the index json file."
   var json = sourceIndexJson()
-  writeFile(jsonFilename, json)
+  writeFile(jsonFile, json)
 
   # Process the index template and create the index.md file.
-  echo "Create the index.md file"
-  var cmd = fmt"bin/{dirName}/statictea -s {jsonFilename} -t templates/nimModuleIndex.md -r docs/index.md"
+  var cmd = fmt"bin/{dirName}/statictea -s {jsonFile} -t {templateFile} -o {teaFile} -r {resultFile}"
   exec cmd
 
-  rmFile(jsonFilename)
-  echo "Generated docs/index.md"
-  # echoGrip()
+  rmFile(jsonFile)
+  echo fmt"Generated {resultFile}"
+
+proc taskDocsIx2() =
+  ## Create the index html file.
+
+  var resultFile = "docs/html/index.html"
+  var templateFile = "templates/nimModuleIndex2.html"
+  var teaFile = "templates/nimModuleIndex.tea"
+  var jsonFile = "docs/index.json"
+
+  echo "Create the index json file."
+  var json = sourceIndexJson()
+  writeFile(jsonFile, json)
+
+  # Process the index template and create the index.md file.
+  var cmd = fmt"bin/{dirName}/statictea -s {jsonFile} -t {templateFile} -o {teaFile} -r {resultFile}"
+  exec cmd
+
+  rmFile(jsonFile)
+  echo fmt"Generated {resultFile}"
 
 proc taskTestfilesReadme() =
   ## Create a testfiles folder readme containing an index to the stf
@@ -577,7 +595,6 @@ proc taskTestfilesReadme() =
   exec cmd
 
   rmFile(jsonFilename)
-  echoGrip()
 
 proc myFileNewer(a: string, b: string): bool =
   ## Return true when file a is newer than file b.
@@ -598,42 +615,89 @@ proc myFileNewer(a: string, b: string): bool =
   else:
     result = false
 
+func removeExt(filename: string): string =
+  ## Return the filename without path or extension information.
+  let (dir, name, ext) = splitFile(filename)
+  result = name
+
 proc taskDocs(namePart: string, forceRebuild = false) =
   ## Create one or more markdown docs; specify part of the name.":
   let filenames = get_source_filenames()
-  for filename in filenames:
-    # Name is part of a source file name, or "docs" when not specified.
-    if namePart.toLower in filename.toLower or namePart == "docs":
-      let mdName = "docs/$1" % [changeFileExt(filename, "md")]
-      let srcFilename = fmt"src/{filename}"
+  for basename in filenames:
 
-      if not forceRebuild and myFileNewer(mdName, srcFilename):
-        echo "Skipping unchanged $1." % filename
-        continue
+    if not (namePart.toLower in basename.toLower) and namePart != "docs":
+      continue
 
-      # Create json doc comments from the source file.
-      var jsonName = "docs/$1" % [changeFileExt(filename, "json")]
-      let hintsOff = "--hint[Conf]:off --hint[SuccessX]:off --hint[Name]:off"
-      var cmd = "nim $1 jsondoc --out:$2 src/$3" % [hintsOff, jsonName, filename]
-      echo "Create $1 from nim json doc comments." % [jsonName]
-      exec cmd
-      echo ""
+    let name = removeExt(basename)
+    let srcFile = fmt"src/{name}.nim"
+    let resultFile = fmt"docs/{name}.md"
 
-      # Create markdown from the json comments using a statictea template.
-      echo "Generate $1" % [mdName]
-      let part1 = fmt"bin/{dirName}/statictea -t templates/nimModule.md "
-      let part2 = fmt"-o templates/nimModule.tea -s {jsonName} -r {mdName}"
-      cmd = part1 & part2
-      echo cmd
-      let output = staticExec(cmd)
-      if len(output) > 0:
-        echo output
-        exec fmt"rm {mdName}"
+    if not forceRebuild and myFileNewer(resultFile, srcFile):
+      # echo "Skipping unchanged $1." % name
+      continue
 
-      # Remove the temporary files.
-      rmFile(jsonName)
+    let jsonFile = fmt"docs/{name}.json"
 
-  echoGrip()
+    # Create json doc comments from the source file.
+    echo fmt"Create {jsonFile} from nim json doc comments."
+    let hintsOff = "--hint[Conf]:off --hint[SuccessX]:off --hint[Name]:off"
+    var cmd = fmt"nim {hintsOff} jsonDoc --out:{jsonFile} {srcFile}"
+    echo cmd
+    exec cmd
+
+    # Create the markdown file.
+    let statictea = fmt"bin/{dirName}/statictea"
+    let templateFile = "templates/nimModule.md"
+    let teaFile = "templates/nimModule.tea"
+    cmd = fmt"{statictea} -t {templateFile} -o {teaFile} -s {jsonFile} -r {resultFile}"
+    echo cmd
+    let output = staticExec(cmd)
+    if len(output) > 0:
+      echo output
+      exec fmt"rm {resultFile}"
+    else:
+      echo fmt"Created {resultFile}."
+    rmFile(jsonFile)
+
+proc taskDocs2(namePart: string, forceRebuild = false) =
+  ## Create one or more html docs; specify part of the name.":
+  ## namePart is part of a source file name, or "docs" when not specified.
+  let filenames = get_source_filenames()
+  for basename in filenames:
+
+    if not (namePart.toLower in basename.toLower) and namePart != "docs2":
+      continue
+
+    let name = removeExt(basename)
+    let srcFile = fmt"src/{name}.nim"
+    let resultFile = fmt"docs/html/{name}.html"
+
+    if not forceRebuild and myFileNewer(resultFile, srcFile):
+      # echo "Skipping unchanged $1." % name
+      continue
+
+    let jsonFile = fmt"docs/{name}.json"
+
+    # Create json doc comments from the source file.
+    echo fmt"Create {jsonFile} from nim json doc comments."
+    let hintsOff = "--hint[Conf]:off --hint[SuccessX]:off --hint[Name]:off"
+    var cmd = fmt"nim {hintsOff} jsonDoc --out:{jsonFile} {srcFile}"
+    echo cmd
+    exec cmd
+
+    # Create the html file.
+    let statictea = fmt"bin/{dirName}/statictea"
+    let templateFile = "templates/nimModule2.html"
+    let teaFile = "templates/nimModule.tea"
+    cmd = fmt"{statictea} -t {templateFile} -o {teaFile} -s {jsonFile} -r {resultFile}"
+    echo cmd
+    let output = staticExec(cmd)
+    if len(output) > 0:
+      echo output
+      exec fmt"rm {resultFile}"
+    else:
+      echo fmt"Created {resultFile}."
+    rmFile(jsonFile)
 
 proc taskFuncDocs() =
   ## Create the teaFunctions.md file from the f dictionary.
@@ -647,6 +711,7 @@ proc taskFuncDocs() =
   echo fmt"make {result}"
   let cmd = fmt"{statictea} -t {tFile} -o {teaFile} -r {result}"
   exec cmd
+  echoGrip()
 
 proc buildRunner() =
   let part1 = "nim c --hint[Performance]:off "
@@ -829,23 +894,23 @@ task test, "\tRun one or more tests; specify part of the name.":
 task other, "\tRun stf tests, build release exe and other tests.":
   otherTests()
 
-task docsall, "\tCreate all the docs, docsix, teafuncs, stfix, dot, dot2.":
+proc taskDocsAll() =
   taskDocsIx()
+  taskDocsIx2()
   taskDocs("")
+  taskDocs2("")
   taskFuncDocs()
   taskTestfilesReadme()
   createDependencyGraph()
   createDependencyGraph2()
 
+task docsall, "\tCreate all the docs, docsix, teafuncs, stfix, dot, dot2.":
+  taskDocsAll()
+
 task release, "\tRun tests and update docs; test, other, docsall.":
   runUnitTests()
   otherTests()
-  taskDocsIx()
-  taskDocs("")
-  taskFuncDocs()
-  taskTestfilesReadme()
-  createDependencyGraph()
-  createDependencyGraph2()
+  taskDocsAll()
 
 task b, "\tBuild the statictea release exe (bin/x/statictea).":
   buildRelease()
@@ -853,10 +918,18 @@ task b, "\tBuild the statictea release exe (bin/x/statictea).":
 task docsix, "\tCreate markdown docs index (docs/index.md).":
   taskDocsIx()
 
+task docsix2, "\tCreate html docs index (docs/html/index.html).":
+  taskDocsIx2()
+
 task docs, "\tCreate one or more markdown docs; specify part of the name.":
   let count = system.paramCount()+1
   var namePart = system.paramStr(count-1)
   taskDocs(namePart, true)
+
+task docs2, "\tCreate one or more html docs; specify part of the name.":
+  let count = system.paramCount()+1
+  var namePart = system.paramStr(count-1)
+  taskDocs2(namePart, true)
 
 task jsonix, "\tDisplay markdown docs index json.":
   var json = sourceIndexJson()
@@ -912,18 +985,13 @@ task dyfuncs, "\tCreate the built-in function details (src/dynamicFuncList.nim) 
 
 task dot, "\tCreate source module dependency graph (docs/staticteadep.svg).":
   createDependencyGraph()
-
-  echoGrip()
   echo """
-
 View the svg file in your browser:
   http://localhost:6419/docs/staticteadep.svg
 """
 
 task dot2, "\tCreate system modules dependency graph (docs/staticteadep2.svg).":
   createDependencyGraph2()
-
-  echoGrip()
   echo """
 View the svg file in your browser:
   http://localhost:6419/docs/staticteadep2.svg

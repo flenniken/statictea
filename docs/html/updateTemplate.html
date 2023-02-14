@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+</head>
+<style>
+body {
+    max-width: 40em;
+    font-size: 2em;
+    margin-left: 1em;
+}
+
+#staticteadep {
+    width: 100%;
+}
+
+.signature {
+    color: green;
+}
+
+.code {
+    border-left: 6px solid green;
+}
+</style>
+<body>
+<h1>updateTemplate.nim</h1>
+
+<p>Update a template.</p>
+
+Nim source code: <a href="../../src/updateTemplate.nim">updateTemplate.nim</a>
+
+<h1>Index</h1>
+
+<ul>
+<li> <a href="#collectReplaceCommand">collectReplaceCommand</a> &mdash; Collect the replace commands.</li>
+<li> <a href="#updateTemplate">updateTemplate</a> &mdash; Update the template and return 0 on success.</li>
+<li> <a href="#updateTemplateTop">updateTemplateTop</a> &mdash; Update the template.</li>
+</ul>
+
+<h3 id=collectReplaceCommand>collectReplaceCommand</h3>
+
+<p>Collect the replace commands.  Read template lines and write out non-command lines. When a replace command is found, return its lines.  This includes the command line and its continue lines. On input extraLine is the first line to use.  On exit extraLine is the line that caused the collection to stop which is commonly the first replacement block line.</p>
+
+<pre class="signature">
+proc collectReplaceCommand(env: var Env; lb: var LineBuffer;
+                           prepostTable: PrepostTable; extraLine: var ExtraLine): CmdLines
+</pre>
+
+<h3 id=updateTemplate>updateTemplate</h3>
+
+<p>Update the template and return 0 on success. Return 1 if a warning messages was written while processing the template.</p>
+
+<pre class="signature">
+proc updateTemplate(env: var Env; args: Args)
+</pre>
+
+<h3 id=updateTemplateTop>updateTemplateTop</h3>
+
+<p>Update the template.</p>
+
+<pre class="signature">
+proc updateTemplateTop(env: var Env; args: Args)
+</pre>
+
+
+<p>⦿ This page was generated
+by <a href="https://github.com/flenniken/statictea/">statictea</a>
+from nim doc comments. ⦿</p>
+
+</body>
+</html>

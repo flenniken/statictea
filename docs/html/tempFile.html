@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+</head>
+<style>
+body {
+    max-width: 40em;
+    font-size: 2em;
+    margin-left: 1em;
+}
+
+#staticteadep {
+    width: 100%;
+}
+
+.signature {
+    color: green;
+}
+
+.code {
+    border-left: 6px solid green;
+}
+</style>
+<body>
+<h1>tempFile.nim</h1>
+
+<p>Create a temporary file.
+
+Example:
+~~~
+var tempFileO = openTempFile()
+require tempFileO.isSome
+var tempFile = tempFileO.get()
+
+tempFile.file.write("this is a test\n")
+tempFile.file.write("line 2\n")
+tempFile.file.close()
+
+var fh = open(tempFile.filename, fmRead)
+let line1 = readline(fh)
+let line2 = readline(fh)
+fh.close()
+
+discard tryRemoveFile(tempFile.filename)
+
+check line1 == "this is a test"
+check line2 == "line 2"
+~~~</p>
+
+Nim source code: <a href="../../src/tempFile.nim">tempFile.nim</a>
+
+<h1>Index</h1>
+
+<ul>
+<li>type:  <a href="#TempFile">TempFile</a> &mdash; Temporary filename and associated file object.</li>
+<li>type:  <a href="#TempFileStream">TempFileStream</a> &mdash; Temporary filename and associated stream object.</li>
+<li> <a href="#openTempFile">openTempFile</a> &mdash; Create an empty file in the temp directory open for read write.</li>
+<li> <a href="#closeDeleteFile">closeDeleteFile</a> &mdash; Close and delete the temp file.</li>
+<li> <a href="#openTempFileStream">openTempFileStream</a> &mdash; Create an empty file stream in the temp directory open for read write.</li>
+<li> <a href="#closeDeleteStream">closeDeleteStream</a> &mdash; Close the stream and delete the associated temp file.</li>
+</ul>
+
+<h3 id=TempFile>TempFile</h3>
+
+<p>Temporary filename and associated file object.</p>
+
+<pre class="signature">
+TempFile = object
+  filename*: string
+  file*: File
+
+</pre>
+
+<h3 id=TempFileStream>TempFileStream</h3>
+
+<p>Temporary filename and associated stream object.</p>
+
+<pre class="signature">
+TempFileStream = object
+  filename*: string
+  stream*: Stream
+
+</pre>
+
+<h3 id=openTempFile>openTempFile</h3>
+
+<p>Create an empty file in the temp directory open for read write. Return a TempFile object containing the filename and file object.  Call closeDeleteFile when you are done with the file.</p>
+
+<pre class="signature">
+proc openTempFile(): Option[TempFile]
+</pre>
+
+<h3 id=closeDeleteFile>closeDeleteFile</h3>
+
+<p>Close and delete the temp file.</p>
+
+<pre class="signature">
+proc closeDeleteFile(tempFile: TempFile)
+</pre>
+
+<h3 id=openTempFileStream>openTempFileStream</h3>
+
+<p>Create an empty file stream in the temp directory open for read write. Return a TempFileStream object containing the filename and stream object.  Call closeDeleteStream when you are done with the stream.</p>
+
+<pre class="signature">
+proc openTempFileStream(): Option[TempFileStream]
+</pre>
+
+<h3 id=closeDeleteStream>closeDeleteStream</h3>
+
+<p>Close the stream and delete the associated temp file.</p>
+
+<pre class="signature">
+proc closeDeleteStream(tempFileStream: TempFileStream)
+</pre>
+
+
+<p>⦿ This page was generated
+by <a href="https://github.com/flenniken/statictea/">statictea</a>
+from nim doc comments. ⦿</p>
+
+</body>
+</html>

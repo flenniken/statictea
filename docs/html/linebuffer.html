@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+</head>
+<style>
+body {
+    max-width: 40em;
+    font-size: 2em;
+    margin-left: 1em;
+}
+
+#staticteadep {
+    width: 100%;
+}
+
+.signature {
+    color: green;
+}
+
+.code {
+    border-left: 6px solid green;
+}
+</style>
+<body>
+<h1>linebuffer.nim</h1>
+
+<p>Read lines from a stream without exceeding the maximum line length. The returned lines contain the line ending, either crlf or lf.
+
+Example:
+
+~~~
+let lbO = newLineBuffer(stream)
+check lbO.isSome == true
+var lb = lbO.get()
+while line = lb.readLine():
+  processLine(line)
+~~~</p>
+
+Nim source code: <a href="../../src/linebuffer.nim">linebuffer.nim</a>
+
+<h1>Index</h1>
+
+<ul>
+<li>const:  <a href="#minMaxLineLen">minMaxLineLen</a> &mdash; The minimum line length supported.</li>
+<li>const:  <a href="#maxMaxLineLen">maxMaxLineLen</a> &mdash; The maximum line length supported.</li>
+<li>const:  <a href="#defaultMaxLineLen">defaultMaxLineLen</a> &mdash; The maximum line length.</li>
+<li>const:  <a href="#defaultBufferSize">defaultBufferSize</a> &mdash; The buffer size for reading lines.</li>
+<li>type:  <a href="#LineBuffer">LineBuffer</a> &mdash; The LineBuffer holds information about reading lines from a buffer.</li>
+<li> <a href="#getLineNum">getLineNum</a> &mdash; Return the current line number.</li>
+<li> <a href="#getMaxLineLen">getMaxLineLen</a> &mdash; Return the maximum line length.</li>
+<li> <a href="#getFilename">getFilename</a> &mdash; Return the filename of the stream, if there is one.</li>
+<li> <a href="#getStream">getStream</a> &mdash; Return the associated stream.</li>
+<li> <a href="#newLineBuffer">newLineBuffer</a> &mdash; Return a new LineBuffer for the given stream.</li>
+<li> <a href="#reset">reset</a> &mdash; Clear the buffer and set the read position at the start of the stream.</li>
+<li> <a href="#readline">readline</a> &mdash; Return the next line from the LineBuffer.</li>
+<li> <a href="#yieldContentLine">yieldContentLine</a> &mdash; Yield one line at a time from the content string and keep the line endings.</li>
+</ul>
+
+<h3 id=minMaxLineLen>minMaxLineLen</h3>
+
+<p>The minimum line length supported.</p>
+
+<pre class="signature">
+minMaxLineLen = 8
+</pre>
+
+<h3 id=maxMaxLineLen>maxMaxLineLen</h3>
+
+<p>The maximum line length supported.</p>
+
+<pre class="signature">
+maxMaxLineLen = 8192
+</pre>
+
+<h3 id=defaultMaxLineLen>defaultMaxLineLen</h3>
+
+<p>The maximum line length.</p>
+
+<pre class="signature">
+defaultMaxLineLen = 1024
+</pre>
+
+<h3 id=defaultBufferSize>defaultBufferSize</h3>
+
+<p>The buffer size for reading lines.</p>
+
+<pre class="signature">
+defaultBufferSize = 16384
+</pre>
+
+<h3 id=LineBuffer>LineBuffer</h3>
+
+<p>The LineBuffer holds information about reading lines from a buffer.
+* stream -- a stream containing lines to read processed sequentially
+* maxLineLen -- the maximum line length
+* bufferSize -- the buffer size for reading lines
+* lineNum -- he current line number in the file starting at 1
+* pos -- current byte position in the buffer
+* charsRead -- number of bytes in the buffer
+* buffer -- memory allocated for the buffer
+* filename -- the optional stream's filename</p>
+
+<pre class="signature">
+LineBuffer = object
+  stream: Stream
+  maxLineLen: int
+  bufferSize: int
+  lineNum: int
+  pos: int
+  charsRead: int
+  buffer: string
+  filename: string
+
+</pre>
+
+<h3 id=getLineNum>getLineNum</h3>
+
+<p>Return the current line number.</p>
+
+<pre class="signature">
+proc getLineNum(lineBuffer: LineBuffer): int
+</pre>
+
+<h3 id=getMaxLineLen>getMaxLineLen</h3>
+
+<p>Return the maximum line length.</p>
+
+<pre class="signature">
+proc getMaxLineLen(lineBuffer: LineBuffer): int
+</pre>
+
+<h3 id=getFilename>getFilename</h3>
+
+<p>Return the filename of the stream, if there is one.</p>
+
+<pre class="signature">
+proc getFilename(lineBuffer: LineBuffer): string
+</pre>
+
+<h3 id=getStream>getStream</h3>
+
+<p>Return the associated stream.</p>
+
+<pre class="signature">
+proc getStream(lineBuffer: LineBuffer): Stream
+</pre>
+
+<h3 id=newLineBuffer>newLineBuffer</h3>
+
+<p>Return a new LineBuffer for the given stream.</p>
+
+<pre class="signature">
+proc newLineBuffer(stream: Stream; maxLineLen: int = defaultMaxLineLen;
+                   bufferSize: int = defaultBufferSize; filename: string = ""): Option[
+    LineBuffer]
+</pre>
+
+<h3 id=reset>reset</h3>
+
+<p>Clear the buffer and set the read position at the start of the stream.</p>
+
+<pre class="signature">
+proc reset(lb: var LineBuffer)
+</pre>
+
+<h3 id=readline>readline</h3>
+
+<p>Return the next line from the LineBuffer. Reading starts from the
+current position in the stream and advances the amount read.
+
+A line end is defined by either a crlf or lf and they get
+returned with the line bytes. A line is returned when the line
+ending is found, when the stream runs out of bytes or when the
+maximum line length is reached.
+
+You cannot tell whether the line was truncated or not without
+reading the next line. When no more data exists in the stream, an
+empty string is returned.</p>
+
+<pre class="signature">
+proc readline(lb: var LineBuffer): string
+</pre>
+
+<h3 id=yieldContentLine>yieldContentLine</h3>
+
+<p>Yield one line at a time from the content string and keep the line endings.</p>
+
+<pre class="signature">
+iterator yieldContentLine(content: string): string
+</pre>
+
+
+<p>⦿ This page was generated
+by <a href="https://github.com/flenniken/statictea/">statictea</a>
+from nim doc comments. ⦿</p>
+
+</body>
+</html>

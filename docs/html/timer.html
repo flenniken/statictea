@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+</head>
+<style>
+body {
+    max-width: 40em;
+    font-size: 2em;
+    margin-left: 1em;
+}
+
+#staticteadep {
+    width: 100%;
+}
+
+.signature {
+    color: green;
+}
+
+.code {
+    border-left: 6px solid green;
+}
+</style>
+<body>
+<h1>timer.nim</h1>
+
+<p>Time how long it takes something to run.
+
+ Usage:
+
+ ~~~
+ timer = newTimer()
+ # run something
+ echo timer.seconds()
+ ~~~</p>
+
+Nim source code: <a href="../../src/timer.nim">timer.nim</a>
+
+<h1>Index</h1>
+
+<ul>
+<li>type:  <a href="#Timer">Timer</a> &mdash; Holds the start time in seconds.</li>
+<li> <a href="#newTimer">newTimer</a> &mdash; Create a new timer and set the start time.</li>
+<li> <a href="#seconds">seconds</a> &mdash; Return the elapsed seconds rounded to the specified number of digits.</li>
+</ul>
+
+<h3 id=Timer>Timer</h3>
+
+<p>Holds the start time in seconds.</p>
+
+<pre class="signature">
+Timer = object
+  start: float
+
+</pre>
+
+<h3 id=newTimer>newTimer</h3>
+
+<p>Create a new timer and set the start time.</p>
+
+<pre class="signature">
+proc newTimer(): Timer
+</pre>
+
+<h3 id=seconds>seconds</h3>
+
+<p>Return the elapsed seconds rounded to the specified number of digits.</p>
+
+<pre class="signature">
+proc seconds(timer: Timer; digits: Natural = 3): float
+</pre>
+
+
+<p>⦿ This page was generated
+by <a href="https://github.com/flenniken/statictea/">statictea</a>
+from nim doc comments. ⦿</p>
+
+</body>
+</html>

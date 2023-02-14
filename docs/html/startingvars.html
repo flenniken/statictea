@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+</head>
+<style>
+body {
+    max-width: 40em;
+    font-size: 2em;
+    margin-left: 1em;
+}
+
+#staticteadep {
+    width: 100%;
+}
+
+.signature {
+    color: green;
+}
+
+.code {
+    border-left: 6px solid green;
+}
+</style>
+<body>
+<h1>startingvars.nim</h1>
+
+<p>Get the starting variables.</p>
+
+Nim source code: <a href="../../src/startingvars.nim">startingvars.nim</a>
+
+<h1>Index</h1>
+
+<ul>
+<li> <a href="#readJsonFiles">readJsonFiles</a> &mdash; Read json files and return a variable dictionary.</li>
+<li> <a href="#argsPrepostList">argsPrepostList</a> &mdash; Create a prepost list of lists for t args.</li>
+<li> <a href="#getTeaArgs">getTeaArgs</a> &mdash; Create the t args dictionary from the statictea arguments.</li>
+<li> <a href="#getStartVariables">getStartVariables</a> &mdash; Return the starting variables.</li>
+</ul>
+
+<h3 id=readJsonFiles>readJsonFiles</h3>
+
+<p>Read json files and return a variable dictionary.  Skip a duplicate variable and generate a warning.</p>
+
+<pre class="signature">
+proc readJsonFiles(env: var Env; filenames: seq[string]): VarsDict
+</pre>
+
+<h3 id=argsPrepostList>argsPrepostList</h3>
+
+<p>Create a prepost list of lists for t args.</p>
+
+<pre class="signature">
+func argsPrepostList(prepostList: seq[Prepost]): seq[seq[string]]
+</pre>
+
+<h3 id=getTeaArgs>getTeaArgs</h3>
+
+<p>Create the t args dictionary from the statictea arguments.</p>
+
+<pre class="signature">
+func getTeaArgs(args: Args): Value
+</pre>
+
+<h3 id=getStartVariables>getStartVariables</h3>
+
+<p>Return the starting variables.  Read the server json files, run the code files and setup the initial tea variables.</p>
+
+<pre class="signature">
+proc getStartVariables(env: var Env; args: Args): Variables
+</pre>
+
+
+<p>⦿ This page was generated
+by <a href="https://github.com/flenniken/statictea/">statictea</a>
+from nim doc comments. ⦿</p>
+
+</body>
+</html>
