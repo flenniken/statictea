@@ -538,6 +538,7 @@ proc echoGrip() =
 The grip app is good for viewing github markdown locally.
   grip --quiet readme.org &
   http://localhost:6419/docs/index.md
+  http://localhost:6419/docs/teaFunctions.md
   http://localhost:6419/testfiles/stf-index.md"""
 
 proc taskDocsIx() =

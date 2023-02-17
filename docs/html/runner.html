@@ -18,14 +18,19 @@ body {
     color: green;
 }
 
-.code {
+.description {
+    white-space: pre-wrap;
+}
+
+.nim-code {
     border-left: 6px solid green;
+    padding-left: 10px;
 }
 </style>
 <body>
 <h1>runner.nim</h1>
 
-<p>A standalone command to run Single Test File (stf) files.
+A standalone command to run Single Test File (stf) files.
 
 You use runner for testing command line applications. A stf file
 contains the test which the runner executes to determine whether the
@@ -36,60 +41,64 @@ comparing files and it is designed to look good in a markdown reader.
 
 See the runner help message (get_help) for more information about stf
 files, or run the nimble task "runhelp" to show the help text with
-glow.</p>
+glow.
 
 Nim source code: <a href="../../src/runner.nim">runner.nim</a>
 
 <h1>Index</h1>
 
 <ul>
-<li>const:  <a href="#runnerId">runnerId</a> &mdash; The first line of the stf file.</li>
-<li>type:  <a href="#RunArgs">RunArgs</a> &mdash; RunArgs holds the command line arguments.</li>
-<li>type:  <a href="#Rc">Rc</a> &mdash; Rc holds a return code where 0 is success.</li>
-<li>type:  <a href="#RunFileLine">RunFileLine</a> &mdash; RunFileLine holds the file line options.</li>
-<li>type:  <a href="#ExpectedLine">ExpectedLine</a> &mdash; ExpectedLine holds the expected line options.</li>
-<li>type:  <a href="#LineKind">LineKind</a> &mdash; The kind of line in a stf file.</li>
-<li>type:  <a href="#AnyLine">AnyLine</a> &mdash; Contains the information about one line in a stf file.</li>
-<li>type:  <a href="#DirAndFiles">DirAndFiles</a> &mdash; DirAndFiles holds the file and compare lines of the stf file.</li>
-<li> <a href="#newAnyLineRunFileLine">newAnyLineRunFileLine</a> &mdash; Create a new AnyLine object for a file line.</li>
-<li> <a href="#newAnyLineExpectedLine">newAnyLineExpectedLine</a> &mdash; Create a new AnyLine object for a expected line.</li>
-<li> <a href="#newAnyLineBlockLine">newAnyLineBlockLine</a> &mdash; Create a new AnyLine object for a block line.</li>
-<li> <a href="#newAnyLineCommentLine">newAnyLineCommentLine</a> &mdash; Create a new AnyLine object for a comment line.</li>
-<li> <a href="#newAnyLineIdLine">newAnyLineIdLine</a> &mdash; Create a new AnyLine object for a id line.</li>
-<li> <a href="#newRunArgs">newRunArgs</a> &mdash; Create a new RunArgs object.</li>
-<li> <a href="#newRunFileLine">newRunFileLine</a> &mdash; Create a new RunFileLine object.</li>
-<li> <a href="#newExpectedLine">newExpectedLine</a> &mdash; Create a new ExpectedLine object.</li>
-<li> <a href="#newDirAndFiles">newDirAndFiles</a> &mdash; Create a new DirAndFiles object.</li>
-<li> <a href="#`$`">`$`</a> &mdash; Return a string representation of a ExpectedLine object.</li>
-<li> <a href="#`$`">`$`</a> &mdash; Return a string representation of a RunFileLine object.</li>
-<li> <a href="#writeErr">writeErr</a> &mdash; Write a message to stderr.</li>
-<li> <a href="#createFolder">createFolder</a> &mdash; Create a folder with the given name.</li>
-<li> <a href="#deleteFolder">deleteFolder</a> &mdash; Delete a folder with the given name.</li>
-<li> <a href="#parseRunCommandLine">parseRunCommandLine</a> &mdash; Parse the command line arguments.</li>
-<li> <a href="#isRunFileLine">isRunFileLine</a> &mdash; Return true when the line is a file line.</li>
-<li> <a href="#isExpectedLine">isExpectedLine</a> &mdash; Return true when the line is an expected line.</li>
-<li> <a href="#parseRunFileLine">parseRunFileLine</a> &mdash; Parse a file command line.</li>
-<li> <a href="#parseExpectedLine">parseExpectedLine</a> &mdash; Parse an expected line.</li>
-<li> <a href="#openNewFile">openNewFile</a> &mdash; Create a new file in the given folder and return an open File object.</li>
-<li> <a href="#getAnyLine">getAnyLine</a> &mdash; Return information about the stf line.</li>
-<li> <a href="#makeDirAndFiles">makeDirAndFiles</a> &mdash; Read the stf file and create its temp folder and files.</li>
-<li> <a href="#runCommands">runCommands</a> &mdash; Run the command files and return 0 when they all returned their expected return code.</li>
-<li> <a href="#runStfFilename">runStfFilename</a> &mdash; Run the stf file and leave the temp dir.</li>
+<li>const:  <a href="#runnerid">runnerId</a> &mdash; The first line of the stf file.</li>
+<li>type:  <a href="#runargs">RunArgs</a> &mdash; RunArgs holds the command line arguments.</li>
+<li>type:  <a href="#rc">Rc</a> &mdash; Rc holds a return code where 0 is success.</li>
+<li>type:  <a href="#runfileline">RunFileLine</a> &mdash; RunFileLine holds the file line options.</li>
+<li>type:  <a href="#expectedline">ExpectedLine</a> &mdash; ExpectedLine holds the expected line options.</li>
+<li>type:  <a href="#linekind">LineKind</a> &mdash; The kind of line in a stf file.</li>
+<li>type:  <a href="#anyline">AnyLine</a> &mdash; Contains the information about one line in a stf file.</li>
+<li>type:  <a href="#dirandfiles">DirAndFiles</a> &mdash; DirAndFiles holds the file and compare lines of the stf file.</li>
+<li> <a href="#newanylinerunfileline">newAnyLineRunFileLine</a> &mdash; Create a new AnyLine object for a file line.</li>
+<li> <a href="#newanylineexpectedline">newAnyLineExpectedLine</a> &mdash; Create a new AnyLine object for a expected line.</li>
+<li> <a href="#newanylineblockline">newAnyLineBlockLine</a> &mdash; Create a new AnyLine object for a block line.</li>
+<li> <a href="#newanylinecommentline">newAnyLineCommentLine</a> &mdash; Create a new AnyLine object for a comment line.</li>
+<li> <a href="#newanylineidline">newAnyLineIdLine</a> &mdash; Create a new AnyLine object for a id line.</li>
+<li> <a href="#newrunargs">newRunArgs</a> &mdash; Create a new RunArgs object.</li>
+<li> <a href="#newrunfileline">newRunFileLine</a> &mdash; Create a new RunFileLine object.</li>
+<li> <a href="#newexpectedline">newExpectedLine</a> &mdash; Create a new ExpectedLine object.</li>
+<li> <a href="#newdirandfiles">newDirAndFiles</a> &mdash; Create a new DirAndFiles object.</li>
+<li> <a href="#">`$`</a> &mdash; Return a string representation of a ExpectedLine object.</li>
+<li> <a href="#-1">`$`</a> &mdash; Return a string representation of a RunFileLine object.</li>
+<li> <a href="#writeerr">writeErr</a> &mdash; Write a message to stderr.</li>
+<li> <a href="#createfolder">createFolder</a> &mdash; Create a folder with the given name.</li>
+<li> <a href="#deletefolder">deleteFolder</a> &mdash; Delete a folder with the given name.</li>
+<li> <a href="#parseruncommandline">parseRunCommandLine</a> &mdash; Parse the command line arguments.</li>
+<li> <a href="#isrunfileline">isRunFileLine</a> &mdash; Return true when the line is a file line.</li>
+<li> <a href="#isexpectedline">isExpectedLine</a> &mdash; Return true when the line is an expected line.</li>
+<li> <a href="#parserunfileline">parseRunFileLine</a> &mdash; Parse a file command line.</li>
+<li> <a href="#parseexpectedline">parseExpectedLine</a> &mdash; Parse an expected line.</li>
+<li> <a href="#opennewfile">openNewFile</a> &mdash; Create a new file in the given folder and return an open File object.</li>
+<li> <a href="#getanyline">getAnyLine</a> &mdash; Return information about the stf line.</li>
+<li> <a href="#makedirandfiles">makeDirAndFiles</a> &mdash; Read the stf file and create its temp folder and files.</li>
+<li> <a href="#runcommands">runCommands</a> &mdash; Run the command files and return 0 when they all returned their expected return code.</li>
+<li> <a href="#runstffilename">runStfFilename</a> &mdash; Run the stf file and leave the temp dir.</li>
 </ul>
 
-<h3 id=runnerId>runnerId</h3>
+<h3 id=runnerid>runnerId</h3>
 
-<p>The first line of the stf file.</p>
+<pre class="description">
+The first line of the stf file.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 runnerId = "stf file, version 0.1.0"
 </pre>
 
-<h3 id=RunArgs>RunArgs</h3>
+<h3 id=runargs>RunArgs</h3>
 
-<p>RunArgs holds the command line arguments.</p>
+<pre class="description">
+RunArgs holds the command line arguments.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 RunArgs = object
   help*: bool
   version*: bool
@@ -99,19 +108,23 @@ RunArgs = object
 
 </pre>
 
-<h3 id=Rc>Rc</h3>
+<h3 id=rc>Rc</h3>
 
-<p>Rc holds a return code where 0 is success.</p>
+<pre class="description">
+Rc holds a return code where 0 is success.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 Rc = int
 </pre>
 
-<h3 id=RunFileLine>RunFileLine</h3>
+<h3 id=runfileline>RunFileLine</h3>
 
-<p>RunFileLine holds the file line options.</p>
+<pre class="description">
+RunFileLine holds the file line options.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 RunFileLine = object
   filename*: string
   noLastEnding*: bool
@@ -120,31 +133,37 @@ RunFileLine = object
 
 </pre>
 
-<h3 id=ExpectedLine>ExpectedLine</h3>
+<h3 id=expectedline>ExpectedLine</h3>
 
-<p>ExpectedLine holds the expected line options.</p>
+<pre class="description">
+ExpectedLine holds the expected line options.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 ExpectedLine = object
   gotFilename*: string
   expectedFilename*: string
 
 </pre>
 
-<h3 id=LineKind>LineKind</h3>
+<h3 id=linekind>LineKind</h3>
 
-<p>The kind of line in a stf file.</p>
+<pre class="description">
+The kind of line in a stf file.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 LineKind = enum
   lkRunFileLine, lkExpectedLine, lkBlockLine, lkIdLine, lkCommentLine
 </pre>
 
-<h3 id=AnyLine>AnyLine</h3>
+<h3 id=anyline>AnyLine</h3>
 
-<p>Contains the information about one line in a stf file.</p>
+<pre class="description">
+Contains the information about one line in a stf file.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 AnyLine = object
   case kind*: LineKind
   of lkRunFileLine:
@@ -165,209 +184,259 @@ AnyLine = object
 
 </pre>
 
-<h3 id=DirAndFiles>DirAndFiles</h3>
+<h3 id=dirandfiles>DirAndFiles</h3>
 
-<p>DirAndFiles holds the file and compare lines of the stf file.</p>
+<pre class="description">
+DirAndFiles holds the file and compare lines of the stf file.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 DirAndFiles = object
   expectedLines*: seq[ExpectedLine]
   runFileLines*: seq[RunFileLine]
 
 </pre>
 
-<h3 id=newAnyLineRunFileLine>newAnyLineRunFileLine</h3>
+<h3 id=newanylinerunfileline>newAnyLineRunFileLine</h3>
 
-<p>Create a new AnyLine object for a file line.</p>
+<pre class="description">
+Create a new AnyLine object for a file line.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newAnyLineRunFileLine(runFileLine: RunFileLine): AnyLine
 </pre>
 
-<h3 id=newAnyLineExpectedLine>newAnyLineExpectedLine</h3>
+<h3 id=newanylineexpectedline>newAnyLineExpectedLine</h3>
 
-<p>Create a new AnyLine object for a expected line.</p>
+<pre class="description">
+Create a new AnyLine object for a expected line.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newAnyLineExpectedLine(expectedLine: ExpectedLine): AnyLine
 </pre>
 
-<h3 id=newAnyLineBlockLine>newAnyLineBlockLine</h3>
+<h3 id=newanylineblockline>newAnyLineBlockLine</h3>
 
-<p>Create a new AnyLine object for a block line.</p>
+<pre class="description">
+Create a new AnyLine object for a block line.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newAnyLineBlockLine(blockLine: string): AnyLine
 </pre>
 
-<h3 id=newAnyLineCommentLine>newAnyLineCommentLine</h3>
+<h3 id=newanylinecommentline>newAnyLineCommentLine</h3>
 
-<p>Create a new AnyLine object for a comment line.</p>
+<pre class="description">
+Create a new AnyLine object for a comment line.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newAnyLineCommentLine(commentLine: string): AnyLine
 </pre>
 
-<h3 id=newAnyLineIdLine>newAnyLineIdLine</h3>
+<h3 id=newanylineidline>newAnyLineIdLine</h3>
 
-<p>Create a new AnyLine object for a id line.</p>
+<pre class="description">
+Create a new AnyLine object for a id line.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newAnyLineIdLine(idLine: string): AnyLine
 </pre>
 
-<h3 id=newRunArgs>newRunArgs</h3>
+<h3 id=newrunargs>newRunArgs</h3>
 
-<p>Create a new RunArgs object.</p>
+<pre class="description">
+Create a new RunArgs object.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newRunArgs(help = false; version = false; leaveTempDir = false;
                 filename = ""; directory = ""): RunArgs
 </pre>
 
-<h3 id=newRunFileLine>newRunFileLine</h3>
+<h3 id=newrunfileline>newRunFileLine</h3>
 
-<p>Create a new RunFileLine object.</p>
+<pre class="description">
+Create a new RunFileLine object.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newRunFileLine(filename: string; noLastEnding = false; command = false;
                     nonZeroReturn = false): RunFileLine
 </pre>
 
-<h3 id=newExpectedLine>newExpectedLine</h3>
+<h3 id=newexpectedline>newExpectedLine</h3>
 
-<p>Create a new ExpectedLine object.</p>
+<pre class="description">
+Create a new ExpectedLine object.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newExpectedLine(gotFilename: string; expectedFilename: string): ExpectedLine
 </pre>
 
-<h3 id=newDirAndFiles>newDirAndFiles</h3>
+<h3 id=newdirandfiles>newDirAndFiles</h3>
 
-<p>Create a new DirAndFiles object.</p>
+<pre class="description">
+Create a new DirAndFiles object.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newDirAndFiles(expectedLines: seq[ExpectedLine];
                     runFileLines: seq[RunFileLine]): DirAndFiles
 </pre>
 
-<h3 id=`$`>`$`</h3>
+<h3 id=>`$`</h3>
 
-<p>Return a string representation of a ExpectedLine object.</p>
+<pre class="description">
+Return a string representation of a ExpectedLine object.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func `$`(r: ExpectedLine): string
 </pre>
 
-<h3 id=`$`>`$`</h3>
+<h3 id=-1>`$`</h3>
 
-<p>Return a string representation of a RunFileLine object.</p>
+<pre class="description">
+Return a string representation of a RunFileLine object.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func `$`(r: RunFileLine): string
 </pre>
 
-<h3 id=writeErr>writeErr</h3>
+<h3 id=writeerr>writeErr</h3>
 
-<p>Write a message to stderr.</p>
+<pre class="description">
+Write a message to stderr.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc writeErr(message: string)
 </pre>
 
-<h3 id=createFolder>createFolder</h3>
+<h3 id=createfolder>createFolder</h3>
 
-<p>Create a folder with the given name. When the folder cannot be created return a message telling why, else return "".</p>
+<pre class="description">
+Create a folder with the given name. When the folder cannot be created return a message telling why, else return "".
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc createFolder(folder: string): string
 </pre>
 
-<h3 id=deleteFolder>deleteFolder</h3>
+<h3 id=deletefolder>deleteFolder</h3>
 
-<p>Delete a folder with the given name. When the folder cannot be deleted return a message telling why, else return "".</p>
+<pre class="description">
+Delete a folder with the given name. When the folder cannot be deleted return a message telling why, else return "".
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc deleteFolder(folder: string): string
 </pre>
 
-<h3 id=parseRunCommandLine>parseRunCommandLine</h3>
+<h3 id=parseruncommandline>parseRunCommandLine</h3>
 
-<p>Parse the command line arguments.</p>
+<pre class="description">
+Parse the command line arguments.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc parseRunCommandLine(argv: seq[string]): OpResultStr[RunArgs]
 </pre>
 
-<h3 id=isRunFileLine>isRunFileLine</h3>
+<h3 id=isrunfileline>isRunFileLine</h3>
 
-<p>Return true when the line is a file line.</p>
+<pre class="description">
+Return true when the line is a file line.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc isRunFileLine(line: string): bool
 </pre>
 
-<h3 id=isExpectedLine>isExpectedLine</h3>
+<h3 id=isexpectedline>isExpectedLine</h3>
 
-<p>Return true when the line is an expected line.</p>
+<pre class="description">
+Return true when the line is an expected line.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc isExpectedLine(line: string): bool
 </pre>
 
-<h3 id=parseRunFileLine>parseRunFileLine</h3>
+<h3 id=parserunfileline>parseRunFileLine</h3>
 
-<p>Parse a file command line.</p>
+<pre class="description">
+Parse a file command line.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc parseRunFileLine(line: string): OpResultStr[RunFileLine]
 </pre>
 
-<h3 id=parseExpectedLine>parseExpectedLine</h3>
+<h3 id=parseexpectedline>parseExpectedLine</h3>
 
-<p>Parse an expected line.</p>
+<pre class="description">
+Parse an expected line.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc parseExpectedLine(line: string): OpResultStr[ExpectedLine]
 </pre>
 
-<h3 id=openNewFile>openNewFile</h3>
+<h3 id=opennewfile>openNewFile</h3>
 
-<p>Create a new file in the given folder and return an open File object.</p>
+<pre class="description">
+Create a new file in the given folder and return an open File object.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc openNewFile(folder: string; filename: string): OpResultStr[File]
 </pre>
 
-<h3 id=getAnyLine>getAnyLine</h3>
+<h3 id=getanyline>getAnyLine</h3>
 
-<p>Return information about the stf line.</p>
+<pre class="description">
+Return information about the stf line.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc getAnyLine(line: string): OpResultStr[AnyLine]
 </pre>
 
-<h3 id=makeDirAndFiles>makeDirAndFiles</h3>
+<h3 id=makedirandfiles>makeDirAndFiles</h3>
 
-<p>Read the stf file and create its temp folder and files. Return the file lines and expected lines.</p>
+<pre class="description">
+Read the stf file and create its temp folder and files. Return the file lines and expected lines.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc makeDirAndFiles(filename: string): OpResultStr[DirAndFiles]
 </pre>
 
-<h3 id=runCommands>runCommands</h3>
+<h3 id=runcommands>runCommands</h3>
 
-<p>Run the command files and return 0 when they all returned their expected return code.</p>
+<pre class="description">
+Run the command files and return 0 when they all returned their expected return code.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc runCommands(folder: string; runFileLines: seq[RunFileLine]): int
 </pre>
 
-<h3 id=runStfFilename>runStfFilename</h3>
+<h3 id=runstffilename>runStfFilename</h3>
 
-<p>Run the stf file and leave the temp dir. Return 0 when all the tests passed.</p>
+<pre class="description">
+Run the stf file and leave the temp dir. Return 0 when all the tests passed.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc runStfFilename(filename: string): int
 </pre>
 

@@ -18,37 +18,43 @@ body {
     color: green;
 }
 
-.code {
+.description {
+    white-space: pre-wrap;
+}
+
+.nim-code {
     border-left: 6px solid green;
+    padding-left: 10px;
 }
 </style>
 <body>
 <h1>parseCmdLine.nim</h1>
 
-<p>Parse a StaticTea language command line.</p>
+Parse a StaticTea language command line.
 
 Nim source code: <a href="../../src/parseCmdLine.nim">parseCmdLine.nim</a>
 
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#LineParts">LineParts</a> &mdash; LineParts holds parsed components of a line.</li>
-<li>type:  <a href="#LinePartsOr">LinePartsOr</a> &mdash; The line parts or a warning.</li>
-<li>type:  <a href="#CmdLines">CmdLines</a> &mdash; The collected command lines and their parts.</li>
-<li>type:  <a href="#ExtraLineKind">ExtraLineKind</a> &mdash; The ExtraLine type.</li>
-<li>type:  <a href="#ExtraLine">ExtraLine</a> &mdash; The extra line and its type.</li>
-<li> <a href="#newNormalLine">newNormalLine</a> &mdash; Create a normal ExtraLine.</li>
-<li> <a href="#newNoLine">newNoLine</a> &mdash; Create a no line ExtraLine.</li>
-<li> <a href="#newOutOfLines">newOutOfLines</a> &mdash; Create an out of lines ExtraLine.</li>
-<li> <a href="#newLinePartsOr">newLinePartsOr</a> &mdash; Return a new LinePartsOr object containing a warning.</li>
-<li> <a href="#newLinePartsOr">newLinePartsOr</a> &mdash; Return a new LinePartsOr object containing a LineParts object.</li>
-<li> <a href="#getCodeLength">getCodeLength</a> &mdash; Return the length of the code in the line.</li>
-<li> <a href="#parseCmdLine">parseCmdLine</a> &mdash; Parse the line and return its parts.</li>
+<li>type:  <a href="#lineparts">LineParts</a> &mdash; LineParts holds parsed components of a line.</li>
+<li>type:  <a href="#linepartsor">LinePartsOr</a> &mdash; The line parts or a warning.</li>
+<li>type:  <a href="#cmdlines">CmdLines</a> &mdash; The collected command lines and their parts.</li>
+<li>type:  <a href="#extralinekind">ExtraLineKind</a> &mdash; The ExtraLine type.</li>
+<li>type:  <a href="#extraline">ExtraLine</a> &mdash; The extra line and its type.</li>
+<li> <a href="#newnormalline">newNormalLine</a> &mdash; Create a normal ExtraLine.</li>
+<li> <a href="#newnoline">newNoLine</a> &mdash; Create a no line ExtraLine.</li>
+<li> <a href="#newoutoflines">newOutOfLines</a> &mdash; Create an out of lines ExtraLine.</li>
+<li> <a href="#newlinepartsor">newLinePartsOr</a> &mdash; Return a new LinePartsOr object containing a warning.</li>
+<li> <a href="#newlinepartsor-1">newLinePartsOr</a> &mdash; Return a new LinePartsOr object containing a LineParts object.</li>
+<li> <a href="#getcodelength">getCodeLength</a> &mdash; Return the length of the code in the line.</li>
+<li> <a href="#parsecmdline">parseCmdLine</a> &mdash; Parse the line and return its parts.</li>
 </ul>
 
-<h3 id=LineParts>LineParts</h3>
+<h3 id=lineparts>LineParts</h3>
 
-<p>LineParts holds parsed components of a line.
+<pre class="description">
+LineParts holds parsed components of a line.
 
 ~~~
 prefix command  [code]   [comment] [continuation]
@@ -61,9 +67,10 @@ prefix command  [code]   [comment] [continuation]
 ~~~
 
 Whitespace must follow a command except on the last line of the file.
-codeStart is 0 when codeLen is 0.</p>
+codeStart is 0 when codeLen is 0.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 LineParts = object
   prefix*: string
   command*: string
@@ -77,102 +84,124 @@ LineParts = object
 
 </pre>
 
-<h3 id=LinePartsOr>LinePartsOr</h3>
+<h3 id=linepartsor>LinePartsOr</h3>
 
-<p>The line parts or a warning.</p>
+<pre class="description">
+The line parts or a warning.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 LinePartsOr = OpResultWarn[LineParts]
 </pre>
 
-<h3 id=CmdLines>CmdLines</h3>
+<h3 id=cmdlines>CmdLines</h3>
 
-<p>The collected command lines and their parts.</p>
+<pre class="description">
+The collected command lines and their parts.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 CmdLines = object
   lines*: seq[string]
   lineParts*: seq[LineParts]
 
 </pre>
 
-<h3 id=ExtraLineKind>ExtraLineKind</h3>
+<h3 id=extralinekind>ExtraLineKind</h3>
 
-<p>The ExtraLine type.
+<pre class="description">
+The ExtraLine type.
 
 * elkNoLine -- there is no line here
 * elkOutOfLines -- no more lines in the template
-* elkNormalLine -- we have a line of some type</p>
+* elkNormalLine -- we have a line of some type
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 ExtraLineKind = enum
   elkNoLine, elkOutOfLines, elkNormalLine
 </pre>
 
-<h3 id=ExtraLine>ExtraLine</h3>
+<h3 id=extraline>ExtraLine</h3>
 
-<p>The extra line and its type. The line is empty except for the elkNormalLine type.</p>
+<pre class="description">
+The extra line and its type. The line is empty except for the elkNormalLine type.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 ExtraLine = object
   kind*: ExtraLineKind
   line*: string
 
 </pre>
 
-<h3 id=newNormalLine>newNormalLine</h3>
+<h3 id=newnormalline>newNormalLine</h3>
 
-<p>Create a normal ExtraLine.</p>
+<pre class="description">
+Create a normal ExtraLine.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newNormalLine(line: string): ExtraLine
 </pre>
 
-<h3 id=newNoLine>newNoLine</h3>
+<h3 id=newnoline>newNoLine</h3>
 
-<p>Create a no line ExtraLine.</p>
+<pre class="description">
+Create a no line ExtraLine.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newNoLine(): ExtraLine
 </pre>
 
-<h3 id=newOutOfLines>newOutOfLines</h3>
+<h3 id=newoutoflines>newOutOfLines</h3>
 
-<p>Create an out of lines ExtraLine.</p>
+<pre class="description">
+Create an out of lines ExtraLine.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newOutOfLines(): ExtraLine
 </pre>
 
-<h3 id=newLinePartsOr>newLinePartsOr</h3>
+<h3 id=newlinepartsor>newLinePartsOr</h3>
 
-<p>Return a new LinePartsOr object containing a warning.</p>
+<pre class="description">
+Return a new LinePartsOr object containing a warning.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newLinePartsOr(warning: MessageId; p1: string = ""; pos = 0): LinePartsOr
 </pre>
 
-<h3 id=newLinePartsOr>newLinePartsOr</h3>
+<h3 id=newlinepartsor-1>newLinePartsOr</h3>
 
-<p>Return a new LinePartsOr object containing a LineParts object.</p>
+<pre class="description">
+Return a new LinePartsOr object containing a LineParts object.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newLinePartsOr(lineParts: LineParts): LinePartsOr
 </pre>
 
-<h3 id=getCodeLength>getCodeLength</h3>
+<h3 id=getcodelength>getCodeLength</h3>
 
-<p>Return the length of the code in the line.  The code starts at codeStart and cannot exceed the given length. The code ends when there is a comment (a pound sign), or the end is reached. The input length is returned on errors.</p>
+<pre class="description">
+Return the length of the code in the line.  The code starts at codeStart and cannot exceed the given length. The code ends when there is a comment (a pound sign), or the end is reached. The input length is returned on errors.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func getCodeLength(line: string; codeStart: Natural; length: Natural): Natural
 </pre>
 
-<h3 id=parseCmdLine>parseCmdLine</h3>
+<h3 id=parsecmdline>parseCmdLine</h3>
 
-<p>Parse the line and return its parts. Return quickly when not a command line.</p>
+<pre class="description">
+Parse the line and return its parts. Return quickly when not a command line.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc parseCmdLine(prepostTable: PrepostTable; line: string; lineNum: Natural): LinePartsOr
 </pre>
 

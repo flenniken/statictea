@@ -21,15 +21,22 @@ body {
     color: green;
 }
 
-.code {
+.description {
+    white-space: pre-wrap;
+}
+
+.nim-code {
     border-left: 6px solid green;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
 <body>
 <!--$ block -->
 <h1>{o.moduleName}</h1>
 
-<p>{o.moduleDescription}</p>
+{o.moduleDescription}
 
 Nim source code: <a href="../../src/{o.moduleName}">{o.moduleName}</a>
 <!--$ endblock -->
@@ -52,7 +59,9 @@ Nim source code: <a href="../../src/{o.moduleName}">{o.moduleName}</a>
 <!--$ : entry = o.entries[t.row] -->
 <h3 id={entry.anchor}>{entry.name}</h3>
 
-<p>{entry.description}</p>
+<pre class="description">
+{entry.description}
+</pre>
 
 <pre class="nim-code">
 {entry.signature}

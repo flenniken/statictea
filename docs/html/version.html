@@ -18,28 +18,35 @@ body {
     color: green;
 }
 
-.code {
+.description {
+    white-space: pre-wrap;
+}
+
+.nim-code {
     border-left: 6px solid green;
+    padding-left: 10px;
 }
 </style>
 <body>
 <h1>version.nim</h1>
 
-<p>The current StaticTea version number.</p>
+The current StaticTea version number.
 
 Nim source code: <a href="../../src/version.nim">version.nim</a>
 
 <h1>Index</h1>
 
 <ul>
-<li>const:  <a href="#staticteaVersion">staticteaVersion</a> &mdash; The statictea version number.</li>
+<li>const:  <a href="#staticteaversion">staticteaVersion</a> &mdash; The statictea version number.</li>
 </ul>
 
-<h3 id=staticteaVersion>staticteaVersion</h3>
+<h3 id=staticteaversion>staticteaVersion</h3>
 
-<p>The statictea version number. It follows a subset of Semantic Versioning; it always uses three components and each uses 1 to 3 ascii digits.</p>
+<pre class="description">
+The statictea version number. It follows a subset of Semantic Versioning; it always uses three components and each uses 1 to 3 ascii digits.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 staticteaVersion = "0.1.1"
 </pre>
 

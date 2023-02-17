@@ -1721,6 +1721,10 @@ o.x = a + 6
 You can use the listLoop function to loop over a list and build lists
 and dictionaries. It’s the looping method you use in code files.
 
+A error reading a statement stops processing the code file, for
+example an error in a multi-line string or an error with a + line
+continuation.
+
 Like template commands, the maximum line length is 1024 bytes and
 an ending plus sign continues a long statement on the next line.
 
@@ -1822,8 +1826,8 @@ count = len(str)
 You can define your own functions in code files.
 
 User defined functions are important for sharing common code,
-looping and as callbacks for building lists and dictionaries, see
-the listLoop function.
+looping (listLoop) and as callbacks for building lists and
+dictionaries.
 
 In the following example we define a function called mycmp and
 assign the result to the mycmp function variable. The function
@@ -1846,15 +1850,15 @@ assigns it to a variable.
 mycmp = func(numStr1: string, numStr2: string) int
 #+END_SRC
 
-The doc comment come next and tells what the function does:
+The doc comment comes next and tells what the function does:
 
 #+BEGIN_SRC
   ## Compare two number strings
   ## and return 1, 0, or -1.
 #+END_SRC
 
-The last lines of the definition are the statement
-lines.  A return statement ends the function definition.
+The last lines of the definition are the statement lines. A bare
+return statement ends the function definition.
 
 #+BEGIN_SRC
   num1 = int(numStr1)
@@ -2411,6 +2415,19 @@ switch to "View Raw".
 - [[docs/index.md][Source Code]]
 - [[templates/nimModuleIndex.md][nimModuleIndex.md]] (view raw)
 - [[templates/nimModule.md][nimModule.md]] (view raw)
+- [[templates/nimModule.tea][nimModule.tea]]
+
+*HTML Docs*
+
+A second set of nim source documents exist for HTML. They are
+designed for viewing locally on your machine and for testing. The
+HTML templates share the same tea code files with the markdown
+templates. The nimble *docsix2* task builds the module index and
+the *docs2* task builds one or more HTML modules docs.
+
+- Open docs/html/index.html in your browser.
+- [[templates/nimModuleIndex2.html][nimModuleIndex2.html]] HTML template
+- [[templates/nimModule2.html][nimModule2.html]] HTML template
 - [[templates/nimModule.tea][nimModule.tea]]
 
 *Functions*

@@ -18,14 +18,19 @@ body {
     color: green;
 }
 
-.code {
+.description {
+    white-space: pre-wrap;
+}
+
+.nim-code {
     border-left: 6px solid green;
+    padding-left: 10px;
 }
 </style>
 <body>
 <h1>statictea.nim</h1>
 
-<p>StaticTea; A template processor and language.</p>
+StaticTea; A template processor and language.
 
 Nim source code: <a href="../../src/statictea.nim">statictea.nim</a>
 
@@ -37,9 +42,11 @@ Nim source code: <a href="../../src/statictea.nim">statictea.nim</a>
 
 <h3 id=main>main</h3>
 
-<p>Run statictea.</p>
+<pre class="description">
+Run statictea.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc main(env: var Env; argv: seq[string])
 </pre>
 

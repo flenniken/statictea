@@ -18,14 +18,19 @@ body {
     color: green;
 }
 
-.code {
+.description {
+    white-space: pre-wrap;
+}
+
+.nim-code {
     border-left: 6px solid green;
+    padding-left: 10px;
 }
 </style>
 <body>
 <h1>tempFile.nim</h1>
 
-<p>Create a temporary file.
+Create a temporary file.
 
 Example:
 ~~~
@@ -46,72 +51,84 @@ discard tryRemoveFile(tempFile.filename)
 
 check line1 == "this is a test"
 check line2 == "line 2"
-~~~</p>
+~~~
 
 Nim source code: <a href="../../src/tempFile.nim">tempFile.nim</a>
 
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#TempFile">TempFile</a> &mdash; Temporary filename and associated file object.</li>
-<li>type:  <a href="#TempFileStream">TempFileStream</a> &mdash; Temporary filename and associated stream object.</li>
-<li> <a href="#openTempFile">openTempFile</a> &mdash; Create an empty file in the temp directory open for read write.</li>
-<li> <a href="#closeDeleteFile">closeDeleteFile</a> &mdash; Close and delete the temp file.</li>
-<li> <a href="#openTempFileStream">openTempFileStream</a> &mdash; Create an empty file stream in the temp directory open for read write.</li>
-<li> <a href="#closeDeleteStream">closeDeleteStream</a> &mdash; Close the stream and delete the associated temp file.</li>
+<li>type:  <a href="#tempfile">TempFile</a> &mdash; Temporary filename and associated file object.</li>
+<li>type:  <a href="#tempfilestream">TempFileStream</a> &mdash; Temporary filename and associated stream object.</li>
+<li> <a href="#opentempfile">openTempFile</a> &mdash; Create an empty file in the temp directory open for read write.</li>
+<li> <a href="#closedeletefile">closeDeleteFile</a> &mdash; Close and delete the temp file.</li>
+<li> <a href="#opentempfilestream">openTempFileStream</a> &mdash; Create an empty file stream in the temp directory open for read write.</li>
+<li> <a href="#closedeletestream">closeDeleteStream</a> &mdash; Close the stream and delete the associated temp file.</li>
 </ul>
 
-<h3 id=TempFile>TempFile</h3>
+<h3 id=tempfile>TempFile</h3>
 
-<p>Temporary filename and associated file object.</p>
+<pre class="description">
+Temporary filename and associated file object.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 TempFile = object
   filename*: string
   file*: File
 
 </pre>
 
-<h3 id=TempFileStream>TempFileStream</h3>
+<h3 id=tempfilestream>TempFileStream</h3>
 
-<p>Temporary filename and associated stream object.</p>
+<pre class="description">
+Temporary filename and associated stream object.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 TempFileStream = object
   filename*: string
   stream*: Stream
 
 </pre>
 
-<h3 id=openTempFile>openTempFile</h3>
+<h3 id=opentempfile>openTempFile</h3>
 
-<p>Create an empty file in the temp directory open for read write. Return a TempFile object containing the filename and file object.  Call closeDeleteFile when you are done with the file.</p>
+<pre class="description">
+Create an empty file in the temp directory open for read write. Return a TempFile object containing the filename and file object.  Call closeDeleteFile when you are done with the file.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc openTempFile(): Option[TempFile]
 </pre>
 
-<h3 id=closeDeleteFile>closeDeleteFile</h3>
+<h3 id=closedeletefile>closeDeleteFile</h3>
 
-<p>Close and delete the temp file.</p>
+<pre class="description">
+Close and delete the temp file.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc closeDeleteFile(tempFile: TempFile)
 </pre>
 
-<h3 id=openTempFileStream>openTempFileStream</h3>
+<h3 id=opentempfilestream>openTempFileStream</h3>
 
-<p>Create an empty file stream in the temp directory open for read write. Return a TempFileStream object containing the filename and stream object.  Call closeDeleteStream when you are done with the stream.</p>
+<pre class="description">
+Create an empty file stream in the temp directory open for read write. Return a TempFileStream object containing the filename and stream object.  Call closeDeleteStream when you are done with the stream.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc openTempFileStream(): Option[TempFileStream]
 </pre>
 
-<h3 id=closeDeleteStream>closeDeleteStream</h3>
+<h3 id=closedeletestream>closeDeleteStream</h3>
 
-<p>Close the stream and delete the associated temp file.</p>
+<pre class="description">
+Close the stream and delete the associated temp file.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc closeDeleteStream(tempFileStream: TempFileStream)
 </pre>
 

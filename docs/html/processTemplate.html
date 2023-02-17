@@ -18,53 +18,64 @@ body {
     color: green;
 }
 
-.code {
+.description {
+    white-space: pre-wrap;
+}
+
+.nim-code {
     border-left: 6px solid green;
+    padding-left: 10px;
 }
 </style>
 <body>
 <h1>processTemplate.nim</h1>
 
-<p>Process the template.</p>
+Process the template.
 
 Nim source code: <a href="../../src/processTemplate.nim">processTemplate.nim</a>
 
 <h1>Index</h1>
 
 <ul>
-<li> <a href="#collectCommand">collectCommand</a> &mdash; Read template lines and write out non-command lines.</li>
-<li> <a href="#processTemplate">processTemplate</a> &mdash; Process the template.</li>
-<li> <a href="#processTemplateTop">processTemplateTop</a> &mdash; Setup the environment streams then process the template.</li>
+<li> <a href="#collectcommand">collectCommand</a> &mdash; Read template lines and write out non-command lines.</li>
+<li> <a href="#processtemplate">processTemplate</a> &mdash; Process the template.</li>
+<li> <a href="#processtemplatetop">processTemplateTop</a> &mdash; Setup the environment streams then process the template.</li>
 </ul>
 
-<h3 id=collectCommand>collectCommand</h3>
+<h3 id=collectcommand>collectCommand</h3>
 
-<p>Read template lines and write out non-command lines. When a
+<pre class="description">
+Read template lines and write out non-command lines. When a
 nextline, block or replace command is found, return its lines.
 This includes the command line and its continue lines.
 
 On input extraLine is the first line to use.  On exit extraLine
 is the line that caused the collection to stop which is commonly
-the first replacement block line.</p>
+the first replacement block line.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc collectCommand(env: var Env; lb: var LineBuffer;
                     prepostTable: PrepostTable; extraLine: var ExtraLine): CmdLines
 </pre>
 
-<h3 id=processTemplate>processTemplate</h3>
+<h3 id=processtemplate>processTemplate</h3>
 
-<p>Process the template.</p>
+<pre class="description">
+Process the template.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc processTemplate(env: var Env; args: Args)
 </pre>
 
-<h3 id=processTemplateTop>processTemplateTop</h3>
+<h3 id=processtemplatetop>processTemplateTop</h3>
 
-<p>Setup the environment streams then process the template.</p>
+<pre class="description">
+Setup the environment streams then process the template.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc processTemplateTop(env: var Env; args: Args)
 </pre>
 

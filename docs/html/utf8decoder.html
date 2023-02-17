@@ -18,14 +18,19 @@ body {
     color: green;
 }
 
-.code {
+.description {
+    white-space: pre-wrap;
+}
+
+.nim-code {
     border-left: 6px solid green;
+    padding-left: 10px;
 }
 </style>
 <body>
 <h1>utf8decoder.nim</h1>
 
-<p>Functions for decoding and validating UTF-8.</p>
+Functions for decoding and validating UTF-8.
 
 Nim source code: <a href="../../src/utf8decoder.nim">utf8decoder.nim</a>
 
@@ -33,57 +38,67 @@ Nim source code: <a href="../../src/utf8decoder.nim">utf8decoder.nim</a>
 
 <ul>
 <li> <a href="#decode">decode</a> &mdash; Interior part of a UTF-8 decoder.</li>
-<li> <a href="#yieldUtf8Chars">yieldUtf8Chars</a> &mdash; Iterate through the string's UTF-8 character byte sequences.</li>
-<li> <a href="#validateUtf8String">validateUtf8String</a> &mdash; Return the position of the first invalid UTF-8 byte in the string else return -1.</li>
-<li> <a href="#sanitizeUtf8">sanitizeUtf8</a> &mdash; Sanitize and return the UTF-8 string.</li>
-<li> <a href="#utf8CharString">utf8CharString</a> &mdash; Get the unicode character at pos.</li>
+<li> <a href="#yieldutf8chars">yieldUtf8Chars</a> &mdash; Iterate through the string's UTF-8 character byte sequences.</li>
+<li> <a href="#validateutf8string">validateUtf8String</a> &mdash; Return the position of the first invalid UTF-8 byte in the string else return -1.</li>
+<li> <a href="#sanitizeutf8">sanitizeUtf8</a> &mdash; Sanitize and return the UTF-8 string.</li>
+<li> <a href="#utf8charstring">utf8CharString</a> &mdash; Get the unicode character at pos.</li>
 </ul>
 
 <h3 id=decode>decode</h3>
 
-<p>Interior part of a UTF-8 decoder.</p>
+<pre class="description">
+Interior part of a UTF-8 decoder.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc decode(state: var uint32; codep: var uint32; sByte: char)
 </pre>
 
-<h3 id=yieldUtf8Chars>yieldUtf8Chars</h3>
+<h3 id=yieldutf8chars>yieldUtf8Chars</h3>
 
-<p>Iterate through the string's UTF-8 character byte sequences.
+<pre class="description">
+Iterate through the string's UTF-8 character byte sequences.
 For each character set ixStartSeq, ixEndSeq, and codePoint.
 Return true when the bytes sequence is valid else return false.
 
 You can get the current byte sequence with:
 str[ixStartSeq .. ixEndSeq]
 
-A UTF-8 character is a one to four byte sequence.</p>
+A UTF-8 character is a one to four byte sequence.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 iterator yieldUtf8Chars(str: string; ixStartSeq: var int; ixEndSeq: var int;
                         codePoint: var uint32): bool
 </pre>
 
-<h3 id=validateUtf8String>validateUtf8String</h3>
+<h3 id=validateutf8string>validateUtf8String</h3>
 
-<p>Return the position of the first invalid UTF-8 byte in the string else return -1.</p>
+<pre class="description">
+Return the position of the first invalid UTF-8 byte in the string else return -1.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func validateUtf8String(str: string): int
 </pre>
 
-<h3 id=sanitizeUtf8>sanitizeUtf8</h3>
+<h3 id=sanitizeutf8>sanitizeUtf8</h3>
 
-<p>Sanitize and return the UTF-8 string. The skipOrReplace parameter determines whether to skip or replace invalid bytes.  When replacing the U+FFFD character is used.</p>
+<pre class="description">
+Sanitize and return the UTF-8 string. The skipOrReplace parameter determines whether to skip or replace invalid bytes.  When replacing the U+FFFD character is used.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func sanitizeUtf8(str: string; skipOrReplace: string = "replace"): string
 </pre>
 
-<h3 id=utf8CharString>utf8CharString</h3>
+<h3 id=utf8charstring>utf8CharString</h3>
 
-<p>Get the unicode character at pos.  Return a one character string. Return "" when not a UTF-8 character.</p>
+<pre class="description">
+Get the unicode character at pos.  Return a one character string. Return "" when not a UTF-8 character.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func utf8CharString(str: string; pos: Natural): string
 </pre>
 

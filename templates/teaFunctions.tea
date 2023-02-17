@@ -2,23 +2,22 @@
 # the f function dictionary.  Each dictionary contains, the function
 # name, doc comment, anchor name and a short description.
 
-callback = func(ix: int, funcVar: func, newList: list) bool
+add-func-var = func(ix: int, funcVar: func, newList: list) bool
   ## Add the function item to the list.
   newList &= funcVar
   return(false)
 
-dictCallback = func(ix: int, key: string, newList: list, state: dict) bool
+add-vars = func(ix: int, key: string, newList: list, state: dict) bool
   ## Add all the func variables with the same name to the new list.
-  funcList = state.f[key]
-  stop = listLoop(funcList, newList, state.callback)
+  funcList = f[key]
+  stop = listLoop(funcList, newList, state.add-func-var)
   return(stop)
 
 # Create a flat list of all the functions in the f dictionary.
 state = dict()
-state.callback = callback
-state.f = f
+state.add-func-var = add-func-var
 flatFuncList = []
-stopped2 = listLoop(keys(f), flatFuncList, dictCallback, state)
+stopped2 = listLoop(keys(f), flatFuncList, add-vars, state)
 
 get-name = func(ix: int, funcVar: func, newList: list) bool
   ## Add the function name to the new list.

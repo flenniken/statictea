@@ -67,12 +67,12 @@ make-signature = func(ix: int, funcVar: func, newList: list, state: dict) bool
   newList &= signature
   return(false)
 
-# Create a list if function signatures.
+# Create a list of function signatures.
 o.signatures = []
-state2 = dict()
-state2.signature-string = signature-string
-state2.make-param = make-param
-stopped2 = listLoop(funcList, o.signatures, make-signature, state2)
+state = dict()
+state.signature-string = signature-string
+state.make-param = make-param
+stopped2 = listLoop(funcList, o.signatures, make-signature, state)
 ~~~
 
 ### File result.expected

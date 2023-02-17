@@ -18,14 +18,21 @@ body {
     color: green;
 }
 
-.code {
+.description {
+    white-space: pre-wrap;
+}
+
+.nim-code {
     border-left: 6px solid green;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
 <body>
 <h1>args.nim</h1>
 
-<p>Types for handling command line arguments.</p>
+Types for handling command line arguments.
 
 Nim source code: <a href="../../src/args.nim">args.nim</a>
 
@@ -51,9 +58,11 @@ Nim source code: <a href="../../src/args.nim">args.nim</a>
 
 <h3 id=prepost>Prepost</h3>
 
-<p>Prepost holds one prefix and its associated postfix.</p>
+<pre class="description">
+Prepost holds one prefix and its associated postfix.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 Prepost = object
   prefix*: string
   postfix*: string
@@ -62,17 +71,21 @@ Prepost = object
 
 <h3 id=preposttable>PrepostTable</h3>
 
-<p>The prefix postfix pairs stored in an ordered dictionary.</p>
+<pre class="description">
+The prefix postfix pairs stored in an ordered dictionary.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 PrepostTable = OrderedTable[string, string]
 </pre>
 
 <h3 id=args>Args</h3>
 
-<p>Args holds all the command line arguments.</p>
+<pre class="description">
+Args holds all the command line arguments.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 Args = object
   help*: bool
   version*: bool
@@ -90,79 +103,98 @@ Args = object
 
 <h3 id=argsor>ArgsOr</h3>
 
-<p>The args or a warning.</p>
+<pre class="description">
+The args or a warning.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 ArgsOr = OpResultWarn[Args]
 </pre>
 
 <h3 id=makeuserpreposttable>makeUserPrepostTable</h3>
 
-<p>Return the user's ordered table that maps prefixes to postfixes. This is used when the user specifies prefixes on the command line and it does not contain any defaults.</p>
+<pre class="description">
+Return the user's ordered table that maps prefixes to postfixes. This is used when the user specifies prefixes on the command line and it does not contain any defaults.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable
 </pre>
 
 <h3 id=newargsor>newArgsOr</h3>
 
-<p>Return a new ArgsOr object containing a warning.</p>
+<pre class="description">
+Return a new ArgsOr object containing a warning.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newArgsOr(warningData: WarningData): ArgsOr
 </pre>
 
 <h3 id=newargsor-1>newArgsOr</h3>
 
-<p>Return a new ArgsOr object containing a warning.</p>
+<pre class="description">
+Return a new ArgsOr object containing a warning.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newArgsOr(warning: MessageId; p1: string = ""; pos = 0): ArgsOr
 </pre>
 
 <h3 id=newargsor-2>newArgsOr</h3>
 
-<p>Return a new ArgsOr object containing args.</p>
+<pre class="description">
+Return a new ArgsOr object containing args.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newArgsOr(args: Args): ArgsOr
 </pre>
 
 <h3 id=newprepost>newPrepost</h3>
 
-<p>Create a new prepost object from the prefix and postfix.</p>
+<pre class="description">
+Create a new prepost object from the prefix and postfix.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newPrepost(prefix: string; postfix: string): Prepost
 </pre>
 
 <h3 id=>`$`</h3>
 
-<p>Return the Prepost string representation.</p>
+<pre class="description">
+Return the Prepost string representation.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func `$`(p: Prepost): string
 </pre>
 
 <h3 id=-1>`$`</h3>
 
-<p>Return the Args string representation.</p>
+<pre class="description">
+Return the Args string representation.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func `$`(args: Args): string
 </pre>
 
 <h3 id=-2>`$`</h3>
 
-<p>Return the seq[Prepost] string representation.</p>
+<pre class="description">
+Return the seq[Prepost] string representation.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func `$`(prepostList: seq[Prepost]): string
 </pre>
 
 <h3 id=predefinedprepost>predefinedPrepost</h3>
 
-<p>The predefined prefixes and postfixes.
+<pre class="description">
+The predefined prefixes and postfixes.
 
 * $$ -- Default when no comment like Markdown
 * &lt;!--$ and --&gt; -- HTML
@@ -171,9 +203,10 @@ func `$`(prepostList: seq[Prepost]): string
 * //$ -- C++
 * /*$ and */ -- C, C++
 * &amp;lt;!--$ and --&amp;gt; -- HTML inside a textarea element
-* # $ -- Org Mode</p>
+* # $ -- Org Mode
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 predefinedPrepost: array[8, Prepost] = [(prefix: "$$", postfix: ""),
                                         (prefix: "<!--$", postfix: "-->"),
                                         (prefix: "#$", postfix: ""),
@@ -185,17 +218,21 @@ predefinedPrepost: array[8, Prepost] = [(prefix: "$$", postfix: ""),
 
 <h3 id=makedefaultpreposttable>makeDefaultPrepostTable</h3>
 
-<p>Return the default ordered table that maps prefixes to postfixes.</p>
+<pre class="description">
+Return the default ordered table that maps prefixes to postfixes.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc makeDefaultPrepostTable(): PrepostTable
 </pre>
 
 <h3 id=getpreposttable>getPrepostTable</h3>
 
-<p>Get the the prepost settings from the user or use the default ones.</p>
+<pre class="description">
+Get the the prepost settings from the user or use the default ones.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc getPrepostTable(args: Args): PrepostTable
 </pre>
 

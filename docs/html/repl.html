@@ -18,37 +18,46 @@ body {
     color: green;
 }
 
-.code {
+.description {
+    white-space: pre-wrap;
+}
+
+.nim-code {
     border-left: 6px solid green;
+    padding-left: 10px;
 }
 </style>
 <body>
 <h1>repl.nim</h1>
 
-<p>Run commands at a prompt. Run evaluate print loop (REPL).</p>
+Run commands at a prompt. Run evaluate print loop (REPL).
 
 Nim source code: <a href="../../src/repl.nim">repl.nim</a>
 
 <h1>Index</h1>
 
 <ul>
-<li> <a href="#handleReplLine">handleReplLine</a> &mdash; Handle the REPL line.</li>
-<li> <a href="#runEvaluatePrintLoop">runEvaluatePrintLoop</a> &mdash; Run commands at a prompt.</li>
+<li> <a href="#handlereplline">handleReplLine</a> &mdash; Handle the REPL line.</li>
+<li> <a href="#runevaluateprintloop">runEvaluatePrintLoop</a> &mdash; Run commands at a prompt.</li>
 </ul>
 
-<h3 id=handleReplLine>handleReplLine</h3>
+<h3 id=handlereplline>handleReplLine</h3>
 
-<p>Handle the REPL line. Return true to end the loop.</p>
+<pre class="description">
+Handle the REPL line. Return true to end the loop.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc handleReplLine(env: var Env; variables: var Variables; line: string): bool
 </pre>
 
-<h3 id=runEvaluatePrintLoop>runEvaluatePrintLoop</h3>
+<h3 id=runevaluateprintloop>runEvaluatePrintLoop</h3>
 
-<p>Run commands at a prompt.</p>
+<pre class="description">
+Run commands at a prompt.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc runEvaluatePrintLoop(env: var Env; args: Args)
 </pre>
 

@@ -18,36 +18,43 @@ body {
     color: green;
 }
 
-.code {
+.description {
+    white-space: pre-wrap;
+}
+
+.nim-code {
     border-left: 6px solid green;
+    padding-left: 10px;
 }
 </style>
 <body>
 <h1>messages.nim</h1>
 
-<p>Messages IDs and associated strings and routines to get them.</p>
+Messages IDs and associated strings and routines to get them.
 
 Nim source code: <a href="../../src/messages.nim">messages.nim</a>
 
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#MessageId">MessageId</a> &mdash; Message numbers.</li>
-<li>const:  <a href="#Messages">Messages</a> &mdash; The message text.</li>
-<li>type:  <a href="#WarningData">WarningData</a> &mdash; Warning data.</li>
-<li> <a href="#getWarning">getWarning</a> &mdash; Return the warning string.</li>
-<li> <a href="#getWarningLine">getWarningLine</a> &mdash; Return a formatted warning line.</li>
-<li> <a href="#getWarningLine">getWarningLine</a> &mdash; Return a formatted warning line.</li>
-<li> <a href="#newWarningData">newWarningData</a> &mdash; Create a WarningData object containing all the warning information.</li>
-<li> <a href="#`$`">`$`</a> &mdash; Return a string representation of WarningData.</li>
-<li> <a href="#`==`">`==`</a> &mdash; Return true when the two WarningData objects are equal.</li>
+<li>type:  <a href="#messageid">MessageId</a> &mdash; Message numbers.</li>
+<li>const:  <a href="#messages">Messages</a> &mdash; The message text.</li>
+<li>type:  <a href="#warningdata">WarningData</a> &mdash; Warning data.</li>
+<li> <a href="#getwarning">getWarning</a> &mdash; Return the warning string.</li>
+<li> <a href="#getwarningline">getWarningLine</a> &mdash; Return a formatted warning line.</li>
+<li> <a href="#getwarningline-1">getWarningLine</a> &mdash; Return a formatted warning line.</li>
+<li> <a href="#newwarningdata">newWarningData</a> &mdash; Create a WarningData object containing all the warning information.</li>
+<li> <a href="#">`$`</a> &mdash; Return a string representation of WarningData.</li>
+<li> <a href="#-1">`==`</a> &mdash; Return true when the two WarningData objects are equal.</li>
 </ul>
 
-<h3 id=MessageId>MessageId</h3>
+<h3 id=messageid>MessageId</h3>
 
-<p>Message numbers.</p>
+<pre class="description">
+Message numbers.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 MessageId = enum
   wSuccess, wUnknownSwitch, wUnknownArg, wOneResultAllowed, wExtraPrepostText,
   wOneTemplateAllowed, wNoPrepostValue, wSkippingExtraPrepost,
@@ -120,11 +127,13 @@ MessageId = enum
   wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg
 </pre>
 
-<h3 id=Messages>Messages</h3>
+<h3 id=messages>Messages</h3>
 
-<p>The message text.</p>
+<pre class="description">
+The message text.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "Unknown argument: $1.", "", "", "", "", "Skipping extra prepost text: $1.",
     "Unable to open log file: \'$1\'.", "",
@@ -286,15 +295,17 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "A two parameter IF function cannot be used as an argument."]
 </pre>
 
-<h3 id=WarningData>WarningData</h3>
+<h3 id=warningdata>WarningData</h3>
 
-<p>Warning data.<ul class="simple"><li>messageId -- the message id</li>
+<pre class="description">
+Warning data.<ul class="simple"><li>messageId -- the message id</li>
 <li>p1 -- the optional string substituted for the message's $1.</li>
 <li>pos -- the index in the statement where the warning was detected.</li>
 </ul>
-</p>
 
-<pre class="signature">
+</pre>
+
+<pre class="nim-code">
 WarningData = object
   messageId*: MessageId
   p1*: string
@@ -302,64 +313,76 @@ WarningData = object
 
 </pre>
 
-<h3 id=getWarning>getWarning</h3>
+<h3 id=getwarning>getWarning</h3>
 
-<p>Return the warning string.</p>
+<pre class="description">
+Return the warning string.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func getWarning(warning: MessageId; p1 = ""): string
 </pre>
 
-<h3 id=getWarningLine>getWarningLine</h3>
+<h3 id=getwarningline>getWarningLine</h3>
 
-<p>Return a formatted warning line. For example:
+<pre class="description">
+Return a formatted warning line. For example:
 
 ~~~
 filename(line): wId: message.
-~~~</p>
+~~~
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = ""): string
 </pre>
 
-<h3 id=getWarningLine>getWarningLine</h3>
+<h3 id=getwarningline-1>getWarningLine</h3>
 
-<p>Return a formatted warning line. For example:
+<pre class="description">
+Return a formatted warning line. For example:
 
 ~~~
 filename(line): wId: message.
-~~~</p>
+~~~
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func getWarningLine(filename: string; lineNum: int; warningData: WarningData): string
 </pre>
 
-<h3 id=newWarningData>newWarningData</h3>
+<h3 id=newwarningdata>newWarningData</h3>
 
-<p>Create a WarningData object containing all the warning information.</p>
+<pre class="description">
+Create a WarningData object containing all the warning information.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData
 </pre>
 
-<h3 id=`$`>`$`</h3>
+<h3 id=>`$`</h3>
 
-<p>Return a string representation of WarningData.
+<pre class="description">
+Return a string representation of WarningData.
 
 ~~~
 let warning = newWarningData(wUnknownArg, "p1", 5)
 check $warning == "wUnknownArg(p1):5"
-~~~</p>
+~~~
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func `$`(warningData: WarningData): string
 </pre>
 
-<h3 id=`==`>`==`</h3>
+<h3 id=-1>`==`</h3>
 
-<p>Return true when the two WarningData objects are equal.</p>
+<pre class="description">
+Return true when the two WarningData objects are equal.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func `==`(w1: WarningData; w2: WarningData): bool
 </pre>
 

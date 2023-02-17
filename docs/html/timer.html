@@ -18,14 +18,19 @@ body {
     color: green;
 }
 
-.code {
+.description {
+    white-space: pre-wrap;
+}
+
+.nim-code {
     border-left: 6px solid green;
+    padding-left: 10px;
 }
 </style>
 <body>
 <h1>timer.nim</h1>
 
-<p>Time how long it takes something to run.
+Time how long it takes something to run.
 
  Usage:
 
@@ -33,41 +38,47 @@ body {
  timer = newTimer()
  # run something
  echo timer.seconds()
- ~~~</p>
+ ~~~
 
 Nim source code: <a href="../../src/timer.nim">timer.nim</a>
 
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#Timer">Timer</a> &mdash; Holds the start time in seconds.</li>
-<li> <a href="#newTimer">newTimer</a> &mdash; Create a new timer and set the start time.</li>
+<li>type:  <a href="#timer">Timer</a> &mdash; Holds the start time in seconds.</li>
+<li> <a href="#newtimer">newTimer</a> &mdash; Create a new timer and set the start time.</li>
 <li> <a href="#seconds">seconds</a> &mdash; Return the elapsed seconds rounded to the specified number of digits.</li>
 </ul>
 
-<h3 id=Timer>Timer</h3>
+<h3 id=timer>Timer</h3>
 
-<p>Holds the start time in seconds.</p>
+<pre class="description">
+Holds the start time in seconds.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 Timer = object
   start: float
 
 </pre>
 
-<h3 id=newTimer>newTimer</h3>
+<h3 id=newtimer>newTimer</h3>
 
-<p>Create a new timer and set the start time.</p>
+<pre class="description">
+Create a new timer and set the start time.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc newTimer(): Timer
 </pre>
 
 <h3 id=seconds>seconds</h3>
 
-<p>Return the elapsed seconds rounded to the specified number of digits.</p>
+<pre class="description">
+Return the elapsed seconds rounded to the specified number of digits.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 proc seconds(timer: Timer; digits: Natural = 3): float
 </pre>
 

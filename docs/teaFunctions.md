@@ -1576,7 +1576,7 @@ stype:
 * rb — replacement block (rb) returns JSON except strings are
 not quoted and special characters are not escaped.
 * dn -- dot name (dn) returns JSON except dictionary elements
-are printed one per line as "key = value".
+are printed one per line as "key = value". See string(dotName, string).
 
 Examples variables:
 

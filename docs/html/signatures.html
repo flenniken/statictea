@@ -18,64 +18,79 @@ body {
     color: green;
 }
 
-.code {
+.description {
+    white-space: pre-wrap;
+}
+
+.nim-code {
     border-left: 6px solid green;
+    padding-left: 10px;
 }
 </style>
 <body>
 <h1>signatures.nim</h1>
 
-<p>Statictea function signatures and parameter checking.</p>
+Statictea function signatures and parameter checking.
 
 Nim source code: <a href="../../src/signatures.nim">signatures.nim</a>
 
 <h1>Index</h1>
 
 <ul>
-<li> <a href="#paramCodeString">paramCodeString</a> &mdash; Return a string representation of a ParamCode object.</li>
-<li> <a href="#kindToParamCode">kindToParamCode</a> &mdash; Convert a value type to a parameter type.</li>
-<li> <a href="#sameType">sameType</a> &mdash; Check whether the param type is the same type or compatible with the value.</li>
-<li> <a href="#sameType">sameType</a> &mdash; Check whether the param type is the same type or compatible with the value.</li>
-<li> <a href="#mapParameters">mapParameters</a> &mdash; Create a dictionary of the parameters and arguments.</li>
+<li> <a href="#paramcodestring">paramCodeString</a> &mdash; Return a string representation of a ParamCode object.</li>
+<li> <a href="#kindtoparamcode">kindToParamCode</a> &mdash; Convert a value type to a parameter type.</li>
+<li> <a href="#sametype">sameType</a> &mdash; Check whether the param type is the same type or compatible with the value.</li>
+<li> <a href="#sametype-1">sameType</a> &mdash; Check whether the param type is the same type or compatible with the value.</li>
+<li> <a href="#mapparameters">mapParameters</a> &mdash; Create a dictionary of the parameters and arguments.</li>
 </ul>
 
-<h3 id=paramCodeString>paramCodeString</h3>
+<h3 id=paramcodestring>paramCodeString</h3>
 
-<p>Return a string representation of a ParamCode object.</p>
+<pre class="description">
+Return a string representation of a ParamCode object.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func paramCodeString(paramCode: ParamCode): string
 </pre>
 
-<h3 id=kindToParamCode>kindToParamCode</h3>
+<h3 id=kindtoparamcode>kindToParamCode</h3>
 
-<p>Convert a value type to a parameter type.</p>
+<pre class="description">
+Convert a value type to a parameter type.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func kindToParamCode(kind: ValueKind): ParamCode
 </pre>
 
-<h3 id=sameType>sameType</h3>
+<h3 id=sametype>sameType</h3>
 
-<p>Check whether the param type is the same type or compatible with the value.</p>
+<pre class="description">
+Check whether the param type is the same type or compatible with the value.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func sameType(paramCode: ParamCode; valueKind: ValueKind): bool
 </pre>
 
-<h3 id=sameType>sameType</h3>
+<h3 id=sametype-1>sameType</h3>
 
-<p>Check whether the param type is the same type or compatible with the value.</p>
+<pre class="description">
+Check whether the param type is the same type or compatible with the value.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func sameType(paramType: ParamType; valueKind: ValueKind): bool
 </pre>
 
-<h3 id=mapParameters>mapParameters</h3>
+<h3 id=mapparameters>mapParameters</h3>
 
-<p>Create a dictionary of the parameters and arguments. The parameter names become the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the arguments do not match the signature.  When they do not match, the warning parameter tells the first non-matching argument.</p>
+<pre class="description">
+Create a dictionary of the parameters and arguments. The parameter names become the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the arguments do not match the signature.  When they do not match, the warning parameter tells the first non-matching argument.
+</pre>
 
-<pre class="signature">
+<pre class="nim-code">
 func mapParameters(signature: Signature; args: seq[Value]): FunResult
 </pre>
 
