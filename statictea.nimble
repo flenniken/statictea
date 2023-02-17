@@ -421,7 +421,7 @@ ratio=.5;
 """
 
   for name in sorted(sourceNames):
-    let url = fmt"""URL="{name}.md""""
+    let url = fmt"""URL="html/{name}.html""""
     let tooltip = fmt"""tooltip="{name}.md""""
     var extra: string
     var fontSize = sourceSizes[name]
@@ -437,9 +437,10 @@ ratio=.5;
       extra = "fillcolor=palegoldenrod, style=filled"
     var attrs: string
     if name == "statictea":
-      attrs = fmt"{name} [fontsize=48, shape=diamond, {extra}, {url}, {tooltip}];" & "\n"
+      attrs = fmt"""{name} [fontsize=48, shape=diamond, {extra}, {url}, {tooltip}];""" & "\n"
     else:
-      attrs = fmt"{name} [fontsize={fontSize}, {extra}, {url}, {tooltip}];" & "\n"
+      attrs = fmt"""{name} [fontsize={fontSize}, {extra}, {url}, {tooltip}];""" & "\n"
+
     dotText.add(attrs)
 
   # Generate the connections between the nodes.
@@ -519,7 +520,7 @@ proc createDependencyGraph2() =
     elif nameCount[left] == 2:
       nodetAttrs = "color=red;"
       lineAttrs = "color=red;"
-    let attrs = fmt"{left} [fontsize=24; {nodetAttrs}];" & "\n"
+    let attrs = fmt"""{left} [fontsize=24; {nodetAttrs}];""" & "\n"
     dotText.add(attrs)
     dotText.add("$1 -> \"$2\" [$3];\n" % [left, dependency.right, lineAttrs])
     # dotText.add(fmt"""{dependency.left} -> "{dependency.right}" [{lineAttrs}];""" & "\n")
