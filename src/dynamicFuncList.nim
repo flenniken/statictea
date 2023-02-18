@@ -34,6 +34,27 @@ add(-2, -5) => -7
 ~~~
 """
 
+  dc_fun_anchors_lsl = """
+Create anchor names from heading names. Use it for HTML class names or Github markdown internal links. It handles duplicate heading names.
+
+~~~
+anchors(names: list, type: string) list
+~~~
+
+type:
+
+* html -- HTML class names
+* github -- GitHub markdown anchor links
+
+Examples:
+
+~~~
+list = list("Tea", "Water", "Tea")
+anchores(list, "github") =>
+  ["tea", "water", "tea-1"]
+~~~
+"""
+
   dc_fun_and_bbb = """
 Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
 
@@ -521,22 +542,6 @@ You can also use bracket notation to access list items.
 
 ~~~
 a = teas[0]
-~~~
-"""
-
-  dc_fun_githubAnchor_ll = """
-Create Github anchor names from heading names. Use it for Github markdown internal links. It handles duplicate heading names.
-
-~~~
-githubAnchor(names: list) list
-~~~
-
-Examples:
-
-~~~
-list = list("Tea", "Water", "Tea")
-githubAnchor(list) =>
-  ["tea", "water", "tea-1"]
 ~~~
 """
 
@@ -1586,6 +1591,7 @@ warn("always warn")
   functionsList* = [
     info("fun_add_fff", dc_fun_add_fff, 23),
     info("fun_add_iii", dc_fun_add_iii, 24),
+    info("fun_anchors_lsl", dc_fun_anchors_lsl, 50),
     info("fun_and_bbb", dc_fun_and_bbb, 23),
     info("fun_bool_ab", dc_fun_bool_ab, 37),
     info("fun_case_iloaa", dc_fun_case_iloaa, 33),
@@ -1600,17 +1606,16 @@ warn("always warn")
     info("fun_eq_ffb", dc_fun_eq_ffb, 19),
     info("fun_eq_iib", dc_fun_eq_iib, 19),
     info("fun_eq_ssb", dc_fun_eq_ssb, 20),
-    info("fun_exists_dsb", dc_fun_exists_dsb, 52),
+    info("fun_exists_dsb", dc_fun_exists_dsb, 22),
     info("fun_find_ssoaa", dc_fun_find_ssoaa, 38),
     info("fun_float_if", dc_fun_float_if, 17),
-    info("fun_float_saa", dc_fun_float_saa, 55),
+    info("fun_float_saa", dc_fun_float_saa, 27),
     info("fun_float_sf", dc_fun_float_sf, 26),
     info("fun_format_ss", dc_fun_format_ss, 34),
     info("fun_func_sp", dc_fun_func_sp, 21),
     info("fun_functionDetails_pd", dc_fun_functionDetails_pd, 35),
     info("fun_get_dsoaa", dc_fun_get_dsoaa, 38),
     info("fun_get_lioaa", dc_fun_get_lioaa, 48),
-    info("fun_githubAnchor_ll", dc_fun_githubAnchor_ll, 41),
     info("fun_gt_ffb", dc_fun_gt_ffb, 19),
     info("fun_gt_iib", dc_fun_gt_iib, 19),
     info("fun_gte_ffb", dc_fun_gte_ffb, 19),
@@ -1665,78 +1670,78 @@ warn("always warn")
   # so when there are changes the diffs are easier to read.
 
   functionStarts* = [
-    594,
-    570,
-    2335,
-    1073,
-    718,
-    751,
-    258,
-    237,
-    279,
-    795,
-    312,
-    1222,
-    1183,
-    2400,
-    2381,
-    2419,
-    666,
-    1110,
-    839,
-    882,
-    856,
-    2204,
-    2238,
-    2259,
-    435,
-    387,
-    1808,
-    2515,
-    2496,
-    2553,
-    2534,
-    473,
-    531,
-    937,
-    972,
-    1014,
-    1943,
-    1902,
-    1570,
-    368,
-    349,
-    331,
-    1259,
+    673,
+    649,
+    1829,
+    2365,
+    1094,
+    767,
+    800,
+    337,
+    316,
+    358,
+    844,
+    391,
+    1243,
+    1204,
+    2430,
+    2411,
+    2449,
+    745,
+    1131,
+    888,
+    931,
+    905,
+    2234,
+    2268,
+    2289,
+    514,
+    466,
+    2545,
+    2526,
+    2583,
+    2564,
+    552,
+    610,
+    958,
+    993,
+    1035,
+    1973,
+    1932,
+    1591,
+    447,
+    428,
+    410,
     1280,
-    2013,
-    1551,
-    2591,
-    2572,
-    2630,
-    2610,
-    2458,
-    2439,
-    2477,
-    2317,
-    2358,
-    1496,
-    2650,
-    1327,
-    1437,
-    2037,
-    1148,
-    1717,
-    1750,
-    1779,
-    2294,
-    2094,
-    2180,
-    641,
-    617,
-    1849,
-    1594,
-    1988,
+    1301,
+    2043,
+    1572,
+    2621,
+    2602,
+    2660,
+    2640,
+    2488,
+    2469,
+    2507,
+    2347,
+    2388,
+    1517,
+    2680,
+    1348,
+    1458,
+    2067,
+    1169,
+    1738,
+    1771,
+    1800,
+    2324,
+    2124,
+    2210,
+    720,
+    696,
+    1879,
+    1615,
+    2018,
   ]
     ## Dynamically generated array of starting line numbers for each
     ## built-in function in the functions.nim file.

@@ -60,7 +60,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [fun_sort_lsosl](#fun_sort_lsosl) &mdash; Sort a list of values of the same type.
 * [fun_sort_lssil](#fun_sort_lssil) &mdash; Sort a list of lists.
 * [fun_sort_lsssl](#fun_sort_lsssl) &mdash; Sort a list of dictionaries.
-* [fun_githubAnchor_ll](#fun_githubanchor_ll) &mdash; Create Github anchor names from heading names.
+* [fun_anchors_lsl](#fun_anchors_lsl) &mdash; Create anchor names from heading names.
 * [fun_type_as](#fun_type_as) &mdash; Return the argument type, one of: int, float, string, list, dict, bool or func.
 * [fun_joinPath_loss](#fun_joinpath_loss) &mdash; Join the path components with a path separator.
 * [fun_join_lsois](#fun_join_lsois) &mdash; Join a list of strings with a separator.
@@ -1337,24 +1337,29 @@ sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 func fun_sort_lsssl(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
-# fun_githubAnchor_ll
+# fun_anchors_lsl
 
-Create Github anchor names from heading names. Use it for Github markdown internal links. It handles duplicate heading names.
+Create anchor names from heading names. Use it for HTML class names or Github markdown internal links. It handles duplicate heading names.
 
 ~~~
-githubAnchor(names: list) list
+anchors(names: list, type: string) list
 ~~~
+
+type:
+
+* html -- HTML class names
+* github -- GitHub markdown anchor links
 
 Examples:
 
 ~~~
 list = list("Tea", "Water", "Tea")
-githubAnchor(list) =>
+anchores(list, "github") =>
   ["tea", "water", "tea-1"]
 ~~~
 
 ```nim
-func fun_githubAnchor_ll(variables: Variables; arguments: seq[Value]): FunResult
+func fun_anchors_lsl(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # fun_type_as
@@ -2161,7 +2166,26 @@ add(3, -2) => 1
 add(-2, -5) => -7
 ~~~
 """,
-                                  numLines: 24), (funcName: "fun_and_bbb", docComment: """Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
+                                  numLines: 24), (funcName: "fun_anchors_lsl", docComment: """Create anchor names from heading names. Use it for HTML class names or Github markdown internal links. It handles duplicate heading names.
+
+~~~
+anchors(names: list, type: string) list
+~~~
+
+type:
+
+* html -- HTML class names
+* github -- GitHub markdown anchor links
+
+Examples:
+
+~~~
+list = list("Tea", "Water", "Tea")
+anchores(list, "github") =>
+  ["tea", "water", "tea-1"]
+~~~
+""",
+    numLines: 50), (funcName: "fun_and_bbb", docComment: """Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
 
 ~~~
 and(a: bool, b: bool) bool
@@ -2177,7 +2201,7 @@ and(false, false) => false
 and(false, warn("not hit")) => false
 ~~~
 """,
-    numLines: 23), (funcName: "fun_bool_ab", docComment: """Create an bool from a value.
+                    numLines: 23), (funcName: "fun_bool_ab", docComment: """Create an bool from a value.
 
 ~~~
 bool(value: Value) bool
@@ -2209,7 +2233,7 @@ bool("tea") => true
 bool(dict("tea", 2)) => true
 ~~~
 """,
-                    numLines: 37), (funcName: "fun_case_iloaa", docComment: """Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
+                                    numLines: 37), (funcName: "fun_case_iloaa", docComment: """Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -2236,7 +2260,7 @@ case(2, cases, "wine") => "beer"
 case(3, cases, "wine") => "wine"
 ~~~
 """,
-                                    numLines: 33), (funcName: "fun_case_sloaa", docComment: """Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
+    numLines: 33), (funcName: "fun_case_sloaa", docComment: """Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -2262,7 +2286,7 @@ case("beer", cases) => "cold"
 case("bunch", cases, "other") => "other"
 ~~~
 """,
-    numLines: 32), (funcName: "fun_cmp_ffi", docComment: """Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
+                    numLines: 32), (funcName: "fun_cmp_ffi", docComment: """Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
 
 ~~~
 cmp(a: float, b: float) int
@@ -2276,7 +2300,7 @@ cmp(8.4, 8.4) => 0
 cmp(9.3, 2.2) => 1
 ~~~
 """,
-                    numLines: 21), (funcName: "fun_cmp_iii", docComment: """Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
+                                    numLines: 21), (funcName: "fun_cmp_iii", docComment: """Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
 
 ~~~
 cmp(a: int, b: int) int
@@ -2290,7 +2314,7 @@ cmp(8, 8) => 0
 cmp(9, 2) => 1
 ~~~
 """,
-                                    numLines: 21), (funcName: "fun_cmp_ssobi", docComment: """Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
+    numLines: 21), (funcName: "fun_cmp_ssobi", docComment: """Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
 
 You have the option to compare case insensitive. Case sensitive
 is the default.
@@ -2309,7 +2333,7 @@ cmp("Tea", "tea", true) => 1
 cmp("Tea", "tea", false) => 0
 ~~~
 """,
-    numLines: 33), (funcName: "fun_cmpVersion_ssi", docComment: """Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
+                    numLines: 33), (funcName: "fun_cmpVersion_ssi", docComment: """Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
 
 ~~~
 cmpVersion(versionA: string, versionB: string) int
@@ -2327,7 +2351,7 @@ cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
 ~~~
 """,
-                    numLines: 44), (funcName: "fun_concat_sss", docComment: """Concatenate two strings. See the join function for more that two arguments.
+                                    numLines: 44), (funcName: "fun_concat_sss", docComment: """Concatenate two strings. See the join function for more that two arguments.
 
 ~~~
 concat(a: string, b: string) string
@@ -2340,7 +2364,7 @@ concat("tea", " time") => "tea time"
 concat("a", "b") => "ab"
 ~~~
 """,
-                                    numLines: 19), (funcName: "fun_dict_old", docComment: """Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
+    numLines: 19), (funcName: "fun_dict_old", docComment: """Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
 
 ~~~
 dict(pairs: optional list) dict
@@ -2357,13 +2381,13 @@ dict() =>
 Dynamically generated array of starting line numbers for each built-in function in the functions.nim file.
 
 ```nim
-functionStarts = [594, 570, 2335, 1073, 718, 751, 258, 237, 279, 795, 312, 1222,
-                  1183, 2400, 2381, 2419, 666, 1110, 839, 882, 856, 2204, 2238,
-                  2259, 435, 387, 1808, 2515, 2496, 2553, 2534, 473, 531, 937,
-                  972, 1014, 1943, 1902, 1570, 368, 349, 331, 1259, 1280, 2013,
-                  1551, 2591, 2572, 2630, 2610, 2458, 2439, 2477, 2317, 2358,
-                  1496, 2650, 1327, 1437, 2037, 1148, 1717, 1750, 1779, 2294,
-                  2094, 2180, 641, 617, 1849, 1594, 1988]
+functionStarts = [673, 649, 1829, 2365, 1094, 767, 800, 337, 316, 358, 844, 391,
+                  1243, 1204, 2430, 2411, 2449, 745, 1131, 888, 931, 905, 2234,
+                  2268, 2289, 514, 466, 2545, 2526, 2583, 2564, 552, 610, 958,
+                  993, 1035, 1973, 1932, 1591, 447, 428, 410, 1280, 1301, 2043,
+                  1572, 2621, 2602, 2660, 2640, 2488, 2469, 2507, 2347, 2388,
+                  1517, 2680, 1348, 1458, 2067, 1169, 1738, 1771, 1800, 2324,
+                  2124, 2210, 720, 696, 1879, 1615, 2018]
 ```
 
 # getBestFunction

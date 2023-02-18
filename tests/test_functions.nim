@@ -95,13 +95,6 @@ proc testLower(str: string, eStr: string): bool =
     let eFunResult = newFunResult(newValue(eStr))
     result = testFunction("lower", arguments, eFunResult)
 
-proc testAnchor(str: string, eStr: string): bool =
-  let listVar = newValue(@[str])
-  var arguments = @[listVar]
-  let eListVar = newValue(@[eStr])
-  let eFunResult = newFunResult(eListVar)
-  result = testFunction("githubAnchor", arguments, eFunResult)
-
 proc testGetBestFunctionExists(functionName: string, arguments: seq[Value],
     eSignatureCode: string): bool =
   ## Call getBestFunction with an existing function name with the
@@ -1421,42 +1414,24 @@ suite "functions.nim":
     let eFunResult = newFunResultWarn(wKeyValueKindDiff, 0)
     check testFunction("sort", arguments, eFunResult)
 
-  test "githubAnchor":
-    check testAnchor("", "")
-    check testAnchor("a_b", "a_b")
-    check testAnchor("T", "t")
-    check testAnchor("Tea", "tea")
-    check testAnchor("t", "t")
-    check testAnchor("TEA", "tea")
-    check testAnchor("$", "")
-    check testAnchor("==", "")
-    check testAnchor("Eary Gray", "eary-gray")
-    check testAnchor("Eary-Gray", "eary-gray")
-    check testAnchor("1234567890", "1234567890")
-    check testAnchor("1!2@3#4%5^6&7*8(9)0", "1234567890")
-    let str = "Zwölf Boxkämpfer jagten Eva quer über den Sylter Deich"
-    let eStr = "zwölf-boxkämpfer-jagten-eva-quer-über-den-sylter-deich"
-    # (= Twelve boxing fighters hunted Eva across the dike of Sylt)
-    check testAnchor(str, eStr)
-
-  test "githubAnchor list":
+  test "anchors list":
     let list = newValue(["Tea", "Water", "tea"])
     let expected = newValue(["tea", "water", "tea-1"])
-    let arguments = @[list]
+    let arguments = @[list, newValue("github")]
     let eFunResult = newFunResult(expected)
-    check testFunction("githubAnchor", arguments, eFunResult)
+    check testFunction("anchors", arguments, eFunResult)
 
-  test "githubAnchor wrong list item":
+  test "anchors wrong list item":
     let list = newValue([newValue("Tea"), newValue(5)])
-    let arguments = @[list]
+    let arguments = @[list, newValue("github")]
     let eFunResult = newFunResultWarn(wNotAllStrings, 0)
-    check testFunction("githubAnchor", arguments, eFunResult)
+    check testFunction("anchors", arguments, eFunResult)
 
-  test "githubAnchor empty list":
+  test "anchors empty list":
     let emptyList = newEmptyListValue()
-    let arguments = @[emptyList]
+    let arguments = @[emptyList, newValue("github")]
     let eFunResult = newFunResult(emptyList)
-    check testFunction("githubAnchor", arguments, eFunResult)
+    check testFunction("anchors", arguments, eFunResult)
 
   test "cmdVersion":
     check testCmpVersionGood("0.0.0", "0.0.0", 0)

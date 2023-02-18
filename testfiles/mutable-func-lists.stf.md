@@ -30,7 +30,7 @@ $$ endblock
 ### File shared.tea
 
 ~~~
-o.anchors = githubAnchor(["a", "b"])
+o.anchors = anchors(["a", "b"], "github")
 o.anchors &= "c"
 
 d = dict(["one", 1,"two", 2, "three", 3])

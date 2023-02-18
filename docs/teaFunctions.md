@@ -12,6 +12,7 @@ variable or pass to another function.
 
 * [add](#add) &mdash; Add two floats.
 * [add](#add-1) &mdash; Add two integers.
+* [anchors](#anchors) &mdash; Create anchor names from heading names.
 * [and](#and) &mdash; Boolean AND with short circuit.
 * [bool](#bool) &mdash; Create an bool from a value.
 * [case](#case) &mdash; Compare integer cases and return the matching value.
@@ -36,7 +37,6 @@ variable or pass to another function.
 * [functionDetails](#functiondetails) &mdash; Return the function details in a dictionary.
 * [get](#get) &mdash; Get a dictionary value by its key.
 * [get](#get-1) &mdash; Get a list value by its index.
-* [githubAnchor](#githubanchor) &mdash; Create Github anchor names from heading names.
 * [gt](#gt) &mdash; Return true when one float is greater than another float.
 * [gt](#gt-1) &mdash; Return true when an int is greater then another int.
 * [gte](#gte) &mdash; Return true when a float is greater than or equal to another float.
@@ -113,6 +113,28 @@ Examples:
 add(1, 2) => 3
 add(3, -2) => 1
 add(-2, -5) => -7
+~~~
+
+
+# anchors
+
+Create anchor names from heading names. Use it for HTML class names or Github markdown internal links. It handles duplicate heading names.
+
+~~~
+anchors(names: list, type: string) list
+~~~
+
+type:
+
+* html -- HTML class names
+* github -- GitHub markdown anchor links
+
+Examples:
+
+~~~
+list = list("Tea", "Water", "Tea")
+anchores(list, "github") =>
+  ["tea", "water", "tea-1"]
 ~~~
 
 
@@ -627,23 +649,6 @@ You can also use bracket notation to access list items.
 
 ~~~
 a = teas[0]
-~~~
-
-
-# githubAnchor
-
-Create Github anchor names from heading names. Use it for Github markdown internal links. It handles duplicate heading names.
-
-~~~
-githubAnchor(names: list) list
-~~~
-
-Examples:
-
-~~~
-list = list("Tea", "Water", "Tea")
-githubAnchor(list) =>
-  ["tea", "water", "tea-1"]
 ~~~
 
 

@@ -280,3 +280,4 @@ w264 wInvalidIndexValue "The index value must be a variable name or literal stri
 w265 wNotVariableName "The index variable value is not a valid variable name."
 w266 wNotIndexString "The index value is not a string."
 w267 wTwoParamIfArg "A two parameter IF function cannot be used as an argument."
+w268 wInvalidAnchorType "Invalid anchor type, expected html or github."

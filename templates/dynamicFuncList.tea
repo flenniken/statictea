@@ -11,6 +11,8 @@ get-starts = func(ix: int, entry: dict, starts: dict, entries: list) bool
   numLines = sub(next, start)
 
   key = concat("k", string(start))
+  # Skip dups that can happen in the included code.
+  if(exists(starts, key), return(false))
   starts[key] = numLines
   return(false)
 

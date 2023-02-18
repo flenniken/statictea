@@ -80,6 +80,7 @@ stopped2 = listLoop(funcList, o.signatures, make-signature, state)
 ~~~
 add(a: float, b: float) float
 add(a: int, b: int) int
+anchors(a: list, b: string) list
 and(a: bool, b: bool) bool
 bool(a: any) bool
 case(a: int, b: list, c: any) any
@@ -104,7 +105,6 @@ func(a: string) func
 functionDetails(a: func) dict
 get(a: dict, b: string, c: any) any
 get(a: list, b: int, c: any) any
-githubAnchor(a: list) list
 gt(a: float, b: float) bool
 gt(a: int, b: int) bool
 gte(a: float, b: float) bool

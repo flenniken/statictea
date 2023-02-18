@@ -961,7 +961,7 @@ task teafuncs, "Create the function docs (docs/teaFunctions.md).":
 task dyfuncs, "\tCreate the built-in function details (src/dynamicFuncList.nim) from (src/functions.nim).":
   # Extract the statictea function metadata from the functions.json file to create dynamicFuncList.nim":
 
-  # Build the release version of statictea. This makes sure function.nim builds.
+  # Build the release version of statictea. This makes sure functions.nim builds.
   echo fmt"Build statictea release version"
   buildRelease()
 
@@ -976,7 +976,7 @@ task dyfuncs, "\tCreate the built-in function details (src/dynamicFuncList.nim) 
   echo fmt"make {server}"
   makeJsonDoc("functions.nim")
 
-  # Build the dynamicFuncList.nim.tmp file.
+  # Build the dynamicFuncList.nim file.
   echo fmt"make {result}"
   let cmd = fmt"{statictea} -s {server} -t {tFile} -o {teaFile} -r {result}"
   exec cmd

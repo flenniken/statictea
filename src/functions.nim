@@ -234,6 +234,85 @@ proc formatString*(variables: Variables, text: string): StringOr =
 
   result = newStringOr(newStr)
 
+proc githubAnchors(anchorNames: var seq[string],
+    names: var OrderedTable[string, int], name: string) =
+  ## Create an anchor name from the given name and add it to the list
+  ## of names. Handle dups.
+
+  let anchorName = gitHubAnchor(name)
+  var count: int
+  if anchorName in names:
+    count = names[anchorName] + 1
+    anchorNames.add("$1-$2" % [anchorName, $(count-1)])
+  else:
+    count = 1
+    anchorNames.add(anchorName)
+  names[anchorName] = count
+
+func getCase(map: VarsDict): FunResult =
+  ## Return the matching case value or the default when none
+  ## match. The map dictionary contains the parameters to the case
+  ## functions.
+
+  let mainCondition = map["a"]
+  let cases = map["b"]
+
+  let caseList = cases.listv.list
+  if caseList.len mod 2 != 0:
+    # Expected an even number of cases, got $1.
+    return newFunResultWarn(wNotEvenCases, 1, $caseList.len)
+
+  for ix in countUp(0, caseList.len-1, 2):
+    let condition = caseList[ix]
+    if mainCondition.kind != condition.kind:
+      # A case condition is not the same type as the main condition.
+     return newFunResultWarn(wCaseTypeMismatch)
+
+    if condition == mainCondition:
+      let value = caseList[ix+1]
+      return newFunResult(value)
+
+  # Return the else case if it exists.
+  if "c" in map:
+    result = newFunResult(map["c"])
+  else:
+    # None of the case conditions match and no else case.
+    result = newFunResultWarn(wMissingElse, 2)
+
+func convertFloatToInt(num: float, map: VarsDict): FunResult =
+  ## Convert float to an integer. The map contains the optional round
+  ## options as "b".
+  if num > float(high(int64)) or num < float(low(int64)):
+    # The number is too big or too small.
+    return newFunResultWarn(wNumberOverFlow)
+
+  var option: string
+  if "b" in map:
+    option = map["b"].stringv
+  else:
+    option = "round"
+
+  var ret: int64
+  case option
+    of "round":
+      ret = int(round(num))
+    of "ceiling":
+      ret = int(ceil(num))
+    of "floor":
+      ret = int(floor(num))
+    of "truncate":
+      ret = int(trunc(num))
+    else:
+      # Expected round, floor, ceiling or truncate.
+      return newFunResultWarn(wExpectedRoundOption, 1)
+  result = newFunResult(newValue(ret))
+
+
+# StaticTea functions below.  The function line count is determined by
+# the starts of the functions. If you put help functions between them
+# it changes the number of lines for the previous function. Put help
+# methods above so the line counts remain stable.
+
 func fun_cmp_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare two ints. Returns -1 for less, 0 for equal and 1 for
   ## greater than.
@@ -685,36 +764,6 @@ func fun_exists_dsb*(variables: Variables, arguments: seq[Value]): FunResult =
 
   result = newFunResult(newValue(key in dictionary))
 
-func getCase(map: VarsDict): FunResult =
-  ## Return the matching case value or the default when none
-  ## match. The map dictionary contains the parameters to the case
-  ## functions.
-
-  let mainCondition = map["a"]
-  let cases = map["b"]
-
-  let caseList = cases.listv.list
-  if caseList.len mod 2 != 0:
-    # Expected an even number of cases, got $1.
-    return newFunResultWarn(wNotEvenCases, 1, $caseList.len)
-
-  for ix in countUp(0, caseList.len-1, 2):
-    let condition = caseList[ix]
-    if mainCondition.kind != condition.kind:
-      # A case condition is not the same type as the main condition.
-     return newFunResultWarn(wCaseTypeMismatch)
-
-    if condition == mainCondition:
-      let value = caseList[ix+1]
-      return newFunResult(value)
-
-  # Return the else case if it exists.
-  if "c" in map:
-    result = newFunResult(map["c"])
-  else:
-    # None of the case conditions match and no else case.
-    result = newFunResultWarn(wMissingElse, 2)
-
 func fun_case_iloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare integer cases and return the matching value.  It takes a
   ## main integer condition, a list of case pairs and an optional
@@ -905,34 +954,6 @@ func fun_float_saa*(variables: Variables, arguments: seq[Value]): FunResult =
 
   if result.value.kind == vkInt:
     result = newFunResult(newValue(float(result.value.intv)))
-
-func convertFloatToInt(num: float, map: VarsDict): FunResult =
-  ## Convert float to an integer. The map contains the optional round
-  ## options as "b".
-  if num > float(high(int64)) or num < float(low(int64)):
-    # The number is too big or too small.
-    return newFunResultWarn(wNumberOverFlow)
-
-  var option: string
-  if "b" in map:
-    option = map["b"].stringv
-  else:
-    option = "round"
-
-  var ret: int64
-  case option
-    of "round":
-      ret = int(round(num))
-    of "ceiling":
-      ret = int(ceil(num))
-    of "floor":
-      ret = int(floor(num))
-    of "truncate":
-      ret = int(trunc(num))
-    else:
-      # Expected round, floor, ceiling or truncate.
-      return newFunResultWarn(wExpectedRoundOption, 1)
-  result = newFunResult(newValue(ret))
 
 func fun_int_fosi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create an int from a float.
@@ -1805,44 +1826,53 @@ func fun_sort_lsssl*(variables: Variables, arguments: seq[Value]): FunResult =
   tMapParameters("sort", "lsssl")
   result = generalSort(map)
 
-func fun_githubAnchor_ll*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Create Github anchor names from heading names. Use it for Github
-  ## markdown internal links. It handles duplicate heading names.
+func fun_anchors_lsl*(variables: Variables, arguments: seq[Value]): FunResult =
+  ## Create anchor names from heading names. Use it for HTML class
+  ## names or Github markdown internal links. It handles duplicate
+  ## heading names.
   ## @:
   ## @:~~~
-  ## @:githubAnchor(names: list) list
+  ## @:anchors(names: list, type: string) list
   ## @:~~~~
+  ## @:
+  ## @:type:
+  ## @:
+  ## @:* html -- HTML class names
+  ## @:* github -- GitHub markdown anchor links
   ## @:
   ## @:Examples:
   ## @:
   ## @:~~~
   ## @:list = list("Tea", "Water", "Tea")
-  ## @:githubAnchor(list) =>
+  ## @:anchores(list, "github") =>
   ## @:  ["tea", "water", "tea-1"]
   ## @:~~~~
 
-  tMapParameters("githubAnchor", "ll")
+  tMapParameters("anchors", "lsl")
 
   let list = map["a"].listv.list
+  let anchorType = map["b"].stringv
 
-  # Add dash num postfix to the anchor name for dups.  Names is a
-  # mapping from the anchor name to the number of times it is used.
-  var names = newOrderedTable[string, int]()
+  var anchorFunction: proc(anchorNames: var seq[string],
+    names: var OrderedTable[string, int], name: string)
+
+  if anchorType == "github":
+    anchorFunction = githubAnchors
+  # elif anchorType == "html":
+  #   anchorFunction = htmlAnchors
+  else:
+    # Invalid anchor type, expected html or github.
+    return newFunResultWarn(wInvalidAnchorType, 0)
+
+  # Names is a mapping from the anchor name to the number of times it
+  # is used.
+  var names: OrderedTable[string, int]
   var anchorNames: seq[string]
   for name in list:
     if name.kind != vkString:
       # The list values must be all strings.
       return newFunResultWarn(wNotAllStrings, 0)
-
-    let anchorName = githubAnchor(name.stringv)
-    var count: int
-    if anchorName in names:
-      count = names[anchorName] + 1
-      anchorNames.add("$1-$2" % [anchorName, $(count-1)])
-    else:
-      count = 1
-      anchorNames.add(anchorName)
-    names[anchorName] = count
+    githubAnchors(anchorNames, names, name.stringv)
 
   result = newFunResult(newValue(anchorNames))
 
@@ -2674,6 +2704,7 @@ var functionsDict* = newTable[string, FunctionPtr]()
   ## Maps a built-in function name to a function pointer you can call.
 functionsDict["fun_add_fff"] = fun_add_fff
 functionsDict["fun_add_iii"] = fun_add_iii
+functionsDict["fun_anchors_lsl"] = fun_anchors_lsl
 functionsDict["fun_and_bbb"] = fun_and_bbb
 functionsDict["fun_bool_ab"] = fun_bool_ab
 functionsDict["fun_case_iloaa"] = fun_case_iloaa
@@ -2698,7 +2729,6 @@ functionsDict["fun_func_sp"] = fun_func_sp
 functionsDict["fun_functionDetails_pd"] = fun_functionDetails_pd
 functionsDict["fun_get_dsoaa"] = fun_get_dsoaa
 functionsDict["fun_get_lioaa"] = fun_get_lioaa
-functionsDict["fun_githubAnchor_ll"] = fun_githubAnchor_ll
 functionsDict["fun_gt_ffb"] = fun_gt_ffb
 functionsDict["fun_gt_iib"] = fun_gt_iib
 functionsDict["fun_gte_ffb"] = fun_gte_ffb

@@ -171,6 +171,10 @@ proc testParseHexUnicodeToString(text: string, pos: Natural,
     echo "expected: " & $ePos
     result = false
 
+proc testGithubAnchor(name: string, eAnchorName: string): bool =
+  let anchorName = githubAnchor(name)
+  result = gotExpected(anchorName, eAnchorName)
+
 suite "unicodes.nim":
 
   test "cmpString":
@@ -462,3 +466,20 @@ suite "unicodes.nim":
       str.add(rune)
       # echo visibleControl(str)
 
+  test "githubAnchor":
+    check testGithubAnchor("", "")
+    check testGithubAnchor("a_b", "a_b")
+    check testGithubAnchor("T", "t")
+    check testGithubAnchor("Tea", "tea")
+    check testGithubAnchor("t", "t")
+    check testGithubAnchor("TEA", "tea")
+    check testGithubAnchor("$", "")
+    check testGithubAnchor("==", "")
+    check testGithubAnchor("Eary Gray", "eary-gray")
+    check testGithubAnchor("Eary-Gray", "eary-gray")
+    check testGithubAnchor("1234567890", "1234567890")
+    check testGithubAnchor("1!2@3#4%5^6&7*8(9)0", "1234567890")
+    let str = "Zwölf Boxkämpfer jagten Eva quer über den Sylter Deich"
+    let eStr = "zwölf-boxkämpfer-jagten-eva-quer-über-den-sylter-deich"
+    # (= Twelve boxing fighters hunted Eva across the dike of Sylt)
+    check testGithubAnchor(str, eStr)
