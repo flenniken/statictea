@@ -1,7 +1,7 @@
 $$ # Create the functions documentation from the f dictionary.
 # Statictea Functions
 
-[![teapot](teapotlogo.svg)](#)
+[![teapot](logo/teapotlogo.svg)](#)
 
 The built-in Statictea functions.
 
