@@ -29,7 +29,11 @@ get-name = func(ix: int, funcVar: func, newList: list) bool
 # anchor names.
 names = []
 stopped3 = listLoop(flatFuncList, names, l.get-name)
-anchors = anchors(names, "github")
+
+# Use the anchor type depending on the result type (extension).
+path = path(t.args.resultFilename)
+type = if((path.ext == ".md"), "github", "html")
+anchors = anchors(names, type)
 
 make-entry = func(ix: int, funcVar: func, newList: list, anchors: list) bool
   ## Convert a func variable to a dictionary and add it to the new list.
