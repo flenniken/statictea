@@ -234,20 +234,35 @@ proc formatString*(variables: Variables, text: string): StringOr =
 
   result = newStringOr(newStr)
 
-proc githubAnchors(anchorNames: var seq[string],
-    names: var OrderedTable[string, int], name: string) =
-  ## Create an anchor name from the given name and add it to the list
-  ## of names. Handle dups.
+type
+  AnchorNameProc = proc(name: string): string
 
-  let anchorName = gitHubAnchor(name)
-  var count: int
-  if anchorName in names:
-    count = names[anchorName] + 1
-    anchorNames.add("$1-$2" % [anchorName, $(count-1)])
-  else:
-    count = 1
-    anchorNames.add(anchorName)
-  names[anchorName] = count
+func anchors(names: seq[Value], anchorNameProc: AnchorNameProc): FunResult =
+  ## Create a list of anchor names from the given list of
+  ## names. Handle dups.
+
+  # Names is a mapping from the anchor name to the number of times it
+  # is used.
+  var nameCounts: OrderedTable[string, int]
+
+  var anchorNames: seq[Value]
+  for name in names:
+    if name.kind != vkString:
+      # The list values must be all strings.
+      return newFunResultWarn(wNotAllStrings, 0)
+
+    let anchorName = anchorNameProc(name.stringv)
+    var count: int
+    if anchorName in nameCounts:
+      count = nameCounts[anchorName] + 1
+      let uniqueName = "$1-$2" % [anchorName, $(count-1)]
+      anchorNames.add(newValue(uniqueName))
+    else:
+      count = 1
+      anchorNames.add(newValue(anchorName))
+    nameCounts[anchorName] = count
+
+  result = newFunResult(newValue(anchorNames))
 
 func getCase(map: VarsDict): FunResult =
   ## Return the matching case value or the default when none
@@ -1853,28 +1868,16 @@ func fun_anchors_lsl*(variables: Variables, arguments: seq[Value]): FunResult =
   let list = map["a"].listv.list
   let anchorType = map["b"].stringv
 
-  var anchorFunction: proc(anchorNames: var seq[string],
-    names: var OrderedTable[string, int], name: string)
-
+  var anchorNameProc: AnchorNameProc
   if anchorType == "github":
-    anchorFunction = githubAnchors
-  # elif anchorType == "html":
-  #   anchorFunction = htmlAnchors
+    anchorNameProc = githubAnchor
+  elif anchorType == "html":
+    anchorNameProc = htmlAnchor
   else:
     # Invalid anchor type, expected html or github.
     return newFunResultWarn(wInvalidAnchorType, 0)
 
-  # Names is a mapping from the anchor name to the number of times it
-  # is used.
-  var names: OrderedTable[string, int]
-  var anchorNames: seq[string]
-  for name in list:
-    if name.kind != vkString:
-      # The list values must be all strings.
-      return newFunResultWarn(wNotAllStrings, 0)
-    githubAnchors(anchorNames, names, name.stringv)
-
-  result = newFunResult(newValue(anchorNames))
+  result = anchors(list, anchorNameProc)
 
 func fun_type_as*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return the argument type, one of: int, float, string, list,

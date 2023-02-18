@@ -8,6 +8,7 @@ Functions that deal with Unicode.
 * [cmpString](#cmpstring) &mdash; Compares two UTF-8 strings a and b.
 * [stringLen](#stringlen) &mdash; Return the number of unicode characters in the string (not bytes).
 * [githubAnchor](#githubanchor) &mdash; Convert the name to a github anchor name.
+* [htmlAnchor](#htmlanchor) &mdash; Convert the name to a html anchor (class) name.
 * [parseHexUnicode16](#parsehexunicode16) &mdash; Return the unicode code point given a 4 character unicode escape string like u1234.
 * [parseHexUnicode](#parsehexunicode) &mdash; Return the unicode code point given a 4 or 8 character unicode escape string.
 * [codePointToString](#codepointtostring) &mdash; Convert a code point to a one character UTF-8 string.
@@ -39,6 +40,14 @@ Convert the name to a github anchor name.
 
 ```nim
 func githubAnchor(name: string): string
+```
+
+# htmlAnchor
+
+Convert the name to a html anchor (class) name.
+
+```nim
+func htmlAnchor(name: string): string
 ```
 
 # parseHexUnicode16

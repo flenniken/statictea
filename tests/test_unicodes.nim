@@ -175,6 +175,10 @@ proc testGithubAnchor(name: string, eAnchorName: string): bool =
   let anchorName = githubAnchor(name)
   result = gotExpected(anchorName, eAnchorName)
 
+proc testHtmlAnchor(name: string, eAnchorName: string): bool =
+  let anchorName = htmlAnchor(name)
+  result = gotExpected(anchorName, eAnchorName)
+
 suite "unicodes.nim":
 
   test "cmpString":
@@ -483,3 +487,14 @@ suite "unicodes.nim":
     let eStr = "zwölf-boxkämpfer-jagten-eva-quer-über-den-sylter-deich"
     # (= Twelve boxing fighters hunted Eva across the dike of Sylt)
     check testGithubAnchor(str, eStr)
+
+  test "htmlAnchor":
+    check testHtmlAnchor("", "")
+    check testHtmlAnchor("b", "b")
+    check testHtmlAnchor("Tea-12_4", "Tea-12_4")
+    check testHtmlAnchor("*", "a")
+    check testHtmlAnchor("&*(", "a__")
+    check testHtmlAnchor("TEA&tea", "TEA_tea")
+    let str = "Zwölf Boxkämpfer"
+    let eStr = "Zw_lf_Boxk_mpfer"
+    check testHtmlAnchor(str, eStr)

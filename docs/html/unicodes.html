@@ -24,7 +24,9 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
 <body>
@@ -40,6 +42,7 @@ Nim source code: <a href="../../src/unicodes.nim">unicodes.nim</a>
 <li> <a href="#cmpstring">cmpString</a> &mdash; Compares two UTF-8 strings a and b.</li>
 <li> <a href="#stringlen">stringLen</a> &mdash; Return the number of unicode characters in the string (not bytes).</li>
 <li> <a href="#githubanchor">githubAnchor</a> &mdash; Convert the name to a github anchor name.</li>
+<li> <a href="#htmlanchor">htmlAnchor</a> &mdash; Convert the name to a html anchor (class) name.</li>
 <li> <a href="#parsehexunicode16">parseHexUnicode16</a> &mdash; Return the unicode code point given a 4 character unicode escape string like u1234.</li>
 <li> <a href="#parsehexunicode">parseHexUnicode</a> &mdash; Return the unicode code point given a 4 or 8 character unicode escape string.</li>
 <li> <a href="#codepointtostring">codePointToString</a> &mdash; Convert a code point to a one character UTF-8 string.</li>
@@ -78,6 +81,16 @@ Convert the name to a github anchor name.
 
 <pre class="nim-code">
 func githubAnchor(name: string): string
+</pre>
+
+<h3 id=htmlanchor>htmlAnchor</h3>
+
+<pre class="description">
+Convert the name to a html anchor (class) name.
+</pre>
+
+<pre class="nim-code">
+func htmlAnchor(name: string): string
 </pre>
 
 <h3 id=parsehexunicode16>parseHexUnicode16</h3>

@@ -1421,6 +1421,13 @@ suite "functions.nim":
     let eFunResult = newFunResult(expected)
     check testFunction("anchors", arguments, eFunResult)
 
+  test "anchors html":
+    let list = newValue(["tea", "Water", "tea"])
+    let expected = newValue(["tea", "Water", "tea-1"])
+    let arguments = @[list, newValue("html")]
+    let eFunResult = newFunResult(expected)
+    check testFunction("anchors", arguments, eFunResult)
+
   test "anchors wrong list item":
     let list = newValue([newValue("Tea"), newValue(5)])
     let arguments = @[list, newValue("github")]

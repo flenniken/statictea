@@ -75,6 +75,48 @@ func githubAnchor*(name: string): string =
       if isDigit(ch) or ch == '-' or ch == '_':
         result.add(ch)
 
+func htmlAnchor*(name: string): string =
+  ## Convert the name to a html anchor (class) name.
+
+  # ID and NAME tokens must begin with a letter ([A-Za-z]) and may be
+  # followed by any number of letters, digits ([0-9]), hyphens ("-"),
+  # underscores ("_"), colons (":"), and periods (".").
+
+  # Use letters, digits, hyphens and underscores but not the
+  # troublesome : or dot.
+
+  # Use the letters of the name and replace invalid characters with
+  # underscore. Use an "a" for the first character if it doesn't start
+  # with a letter.
+
+  var firstNotLetter = true
+  var ixStartSeq: int
+  var ixEndSeq: int
+  var codePoint: uint32
+  for valid in yieldUtf8Chars(name, ixStartSeq, ixEndSeq, codePoint):
+    if not valid:
+      # Invalid UTF-8 name.
+      break
+    let rune = Rune(codePoint)
+
+    var letter = '_'
+    if rune.uint32 < 128:
+      let ch = char(rune.uint32)
+      case ch
+      of 'a'..'z', 'A'..'Z':
+        letter = ch
+        firstNotLetter = false
+      of '-', '_', '0'..'9':
+        letter = ch
+      else:
+        letter = '_'
+
+    if firstNotLetter:
+      letter = 'a'
+      firstNotLetter = false
+
+    result.add(letter)
+
 func parseHexUnicode16*(text: string, start: Natural): OpResultId[uint32] =
   ## Return the unicode code point given a 4 character unicode escape
   ## string like u1234. Start is pointing at the u. On error, return a
