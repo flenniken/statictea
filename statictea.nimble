@@ -365,9 +365,9 @@ proc createDependencyGraph() =
   # Online viewer: http://magjac.com/graphviz-visual-editor/
 
   # Create dot file of the dependencies between nim modules.
-  let dotFilename = "src/statictea.dot"
+  let staticteaDot = "src/statictea.dot"
   exec "nim --hints:off genDepend src/statictea.nim"
-  echo fmt"Generated {dotFilename}"
+  # echo fmt"Generated {staticteaDot}"
   rmFile("src/statictea.png")
   rmFile("statictea.deps")
 
@@ -399,7 +399,7 @@ proc createDependencyGraph() =
     # echo fmt"{bin} {name} {fontSize}"
 
   # Read the dot file into a sequence of left and right values.
-  let dependencies = readDotFile(dotFilename)
+  let dependencies = readDotFile(staticteaDot)
 
   # Count the number of modules the source file imports.
   for dependency in dependencies:
@@ -456,9 +456,11 @@ ratio=.5;
   # Create an svg file from the new dot file.
   let dotDotFilename = "src/dot.dot"
   writeFile(dotDotFilename, dotText)
-  echo "Generated $1" % dotDotFilename
+  # echo "Generated $1" % dotDotFilename
   exec "dot -Tsvg src/dot.dot -o docs/staticteadep.svg"
   echo "Generated docs/staticteadep.svg"
+  rmFile(dotDotFilename)
+  rmFile(staticteaDot)
 
 proc createDependencyGraph2() =
   ## Create a dependency dot file from the StaticTea source. Show the
@@ -466,10 +468,10 @@ proc createDependencyGraph2() =
   ## the right.
 
   # Create a dot file of all the import dependencies.
-  let dotFilename = "src/statictea.dot"
+  let statictea2Dot = "src/statictea.dot"
   exec "nim --hints:off genDepend src/statictea.nim"
 
-  echo fmt"Generated {dotFilename}"
+  echo fmt"Generated {statictea2Dot}"
   rmFile("src/statictea.png")
   rmFile("statictea.deps")
 
@@ -477,7 +479,7 @@ proc createDependencyGraph2() =
   var sourceNamesSet = toHashSet(get_source_filenames(noExt = true))
 
   # Read the dot file into a sequence of left and right values.
-  let dotDepends = readDotFile(dotFilename)
+  let dotDepends = readDotFile(statictea2Dot)
 
   # Switch the dependencies so the nim system modules are on the left
   # and the statictea modules are on the right.
@@ -529,10 +531,12 @@ proc createDependencyGraph2() =
   # Create an svg file from the new dot file.
   let src_dot2_dot = "src/dot2.dot"
   writeFile(src_dot2_dot, dotText)
-  echo fmt"Generated {src_dot2_dot}"
+  # echo fmt"Generated {src_dot2_dot}"
   let staticteadep2_svg = "docs/staticteadep2.svg"
   exec fmt"dot -Tsvg {src_dot2_dot} -o {staticteadep2_svg}"
   echo fmt"Generated {staticteadep2_svg}"
+  rmFile(src_dot2_dot)
+  rmFile(statictea2Dot)
 
 proc echoGrip() =
   echo """
