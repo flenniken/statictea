@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>parseNumber.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>parseNumber.nim</h1>
 
@@ -37,11 +40,11 @@ Nim source code: <a href="../../src/parseNumber.nim">parseNumber.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li> <a href="#parsefloat">parseFloat</a> &mdash; Parse the string and return the 64 bit float number and the position after the number.</li>
-<li> <a href="#parseinteger">parseInteger</a> &mdash; Parse the string and return the 64 bit signed integer and the position after the number.</li>
+<li> <a href="#parseFloat">parseFloat</a> &mdash; Parse the string and return the 64 bit float number and the position after the number.</li>
+<li> <a href="#parseInteger">parseInteger</a> &mdash; Parse the string and return the 64 bit signed integer and the position after the number.</li>
 </ul>
 
-<h3 id=parsefloat>parseFloat</h3>
+<h3 id="parseFloat">parseFloat</h3>
 
 <pre class="description">
 Parse the string and return the 64 bit float number and the position after the number. The number starts at the start index. Nothing is returned when the float is out of range or the str is not a float number.  Processing stops at the first non-number character.
@@ -52,7 +55,7 @@ proc parseFloat(str: string; start: Natural = 0): Option[
     tuple[number: float64, pos: Natural]]
 </pre>
 
-<h3 id=parseinteger>parseInteger</h3>
+<h3 id="parseInteger">parseInteger</h3>
 
 <pre class="description">
 Parse the string and return the 64 bit signed integer and the position after the number. The number starts at the start index. Parsing stops at the first non-number character.  Nothing is returned when the integer is out of range or the str is not a number.

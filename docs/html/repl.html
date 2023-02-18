@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>repl.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>repl.nim</h1>
 
@@ -37,11 +40,11 @@ Nim source code: <a href="../../src/repl.nim">repl.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li> <a href="#handlereplline">handleReplLine</a> &mdash; Handle the REPL line.</li>
-<li> <a href="#runevaluateprintloop">runEvaluatePrintLoop</a> &mdash; Run commands at a prompt.</li>
+<li> <a href="#handleReplLine">handleReplLine</a> &mdash; Handle the REPL line.</li>
+<li> <a href="#runEvaluatePrintLoop">runEvaluatePrintLoop</a> &mdash; Run commands at a prompt.</li>
 </ul>
 
-<h3 id=handlereplline>handleReplLine</h3>
+<h3 id="handleReplLine">handleReplLine</h3>
 
 <pre class="description">
 Handle the REPL line. Return true to end the loop.
@@ -51,7 +54,7 @@ Handle the REPL line. Return true to end the loop.
 proc handleReplLine(env: var Env; variables: var Variables; line: string): bool
 </pre>
 
-<h3 id=runevaluateprintloop>runEvaluatePrintLoop</h3>
+<h3 id="runEvaluatePrintLoop">runEvaluatePrintLoop</h3>
 
 <pre class="description">
 Run commands at a prompt.

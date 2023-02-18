@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>startingvars.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>startingvars.nim</h1>
 
@@ -37,13 +40,13 @@ Nim source code: <a href="../../src/startingvars.nim">startingvars.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li> <a href="#readjsonfiles">readJsonFiles</a> &mdash; Read json files and return a variable dictionary.</li>
-<li> <a href="#argsprepostlist">argsPrepostList</a> &mdash; Create a prepost list of lists for t args.</li>
-<li> <a href="#getteaargs">getTeaArgs</a> &mdash; Create the t args dictionary from the statictea arguments.</li>
-<li> <a href="#getstartvariables">getStartVariables</a> &mdash; Return the starting variables.</li>
+<li> <a href="#readJsonFiles">readJsonFiles</a> &mdash; Read json files and return a variable dictionary.</li>
+<li> <a href="#argsPrepostList">argsPrepostList</a> &mdash; Create a prepost list of lists for t args.</li>
+<li> <a href="#getTeaArgs">getTeaArgs</a> &mdash; Create the t args dictionary from the statictea arguments.</li>
+<li> <a href="#getStartVariables">getStartVariables</a> &mdash; Return the starting variables.</li>
 </ul>
 
-<h3 id=readjsonfiles>readJsonFiles</h3>
+<h3 id="readJsonFiles">readJsonFiles</h3>
 
 <pre class="description">
 Read json files and return a variable dictionary.  Skip a duplicate variable and generate a warning.
@@ -53,7 +56,7 @@ Read json files and return a variable dictionary.  Skip a duplicate variable and
 proc readJsonFiles(env: var Env; filenames: seq[string]): VarsDict
 </pre>
 
-<h3 id=argsprepostlist>argsPrepostList</h3>
+<h3 id="argsPrepostList">argsPrepostList</h3>
 
 <pre class="description">
 Create a prepost list of lists for t args.
@@ -63,7 +66,7 @@ Create a prepost list of lists for t args.
 func argsPrepostList(prepostList: seq[Prepost]): seq[seq[string]]
 </pre>
 
-<h3 id=getteaargs>getTeaArgs</h3>
+<h3 id="getTeaArgs">getTeaArgs</h3>
 
 <pre class="description">
 Create the t args dictionary from the statictea arguments.
@@ -73,7 +76,7 @@ Create the t args dictionary from the statictea arguments.
 func getTeaArgs(args: Args): Value
 </pre>
 
-<h3 id=getstartvariables>getStartVariables</h3>
+<h3 id="getStartVariables">getStartVariables</h3>
 
 <pre class="description">
 Return the starting variables.  Read the server json files, run the code files and setup the initial tea variables.

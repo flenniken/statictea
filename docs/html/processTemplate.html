@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>processTemplate.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>processTemplate.nim</h1>
 
@@ -37,12 +40,12 @@ Nim source code: <a href="../../src/processTemplate.nim">processTemplate.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li> <a href="#collectcommand">collectCommand</a> &mdash; Read template lines and write out non-command lines.</li>
-<li> <a href="#processtemplate">processTemplate</a> &mdash; Process the template.</li>
-<li> <a href="#processtemplatetop">processTemplateTop</a> &mdash; Setup the environment streams then process the template.</li>
+<li> <a href="#collectCommand">collectCommand</a> &mdash; Read template lines and write out non-command lines.</li>
+<li> <a href="#processTemplate">processTemplate</a> &mdash; Process the template.</li>
+<li> <a href="#processTemplateTop">processTemplateTop</a> &mdash; Setup the environment streams then process the template.</li>
 </ul>
 
-<h3 id=collectcommand>collectCommand</h3>
+<h3 id="collectCommand">collectCommand</h3>
 
 <pre class="description">
 Read template lines and write out non-command lines. When a
@@ -59,7 +62,7 @@ proc collectCommand(env: var Env; lb: var LineBuffer;
                     prepostTable: PrepostTable; extraLine: var ExtraLine): CmdLines
 </pre>
 
-<h3 id=processtemplate>processTemplate</h3>
+<h3 id="processTemplate">processTemplate</h3>
 
 <pre class="description">
 Process the template.
@@ -69,7 +72,7 @@ Process the template.
 proc processTemplate(env: var Env; args: Args)
 </pre>
 
-<h3 id=processtemplatetop>processTemplateTop</h3>
+<h3 id="processTemplateTop">processTemplateTop</h3>
 
 <pre class="description">
 Setup the environment streams then process the template.

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>matches.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>matches.nim</h1>
 
@@ -38,35 +41,35 @@ Nim source code: <a href="../../src/matches.nim">matches.nim</a>
 
 <ul>
 <li>const:  <a href="#commands">commands</a> &mdash; The StaticTea commands.</li>
-<li> <a href="#parseprepost">parsePrepost</a> &mdash; Parse the prepost item on the terminal command line.</li>
-<li> <a href="#matchprefix">matchPrefix</a> &mdash; Match lines that start with one of the prefixes in the given table plus optional following whitespace.</li>
-<li> <a href="#matchcommand">matchCommand</a> &mdash; Match statictea commands.</li>
-<li> <a href="#matchlastpart">matchLastPart</a> &mdash; Match the last part of a command line.</li>
-<li> <a href="#getlastpart">getLastPart</a> &mdash; Return the optional plus sign and line endings from the line.</li>
-<li> <a href="#matchtabspace">matchTabSpace</a> &mdash; Match one or more spaces or tabs starting at the given position.</li>
-<li> <a href="#emptyorspaces">emptyOrSpaces</a> &mdash; Return true when the text is empty or all whitespace from start to the end.</li>
-<li> <a href="#matchequalsign">matchEqualSign</a> &mdash; Match an equal sign or "&=" and the optional trailing whitespace.</li>
-<li> <a href="#matchcommaparentheses">matchCommaParentheses</a> &mdash; Match a comma or right parentheses and the optional trailing whitespace.</li>
-<li> <a href="#matchnumber">matchNumber</a> &mdash; Match a number and the optional trailing whitespace.</li>
-<li> <a href="#matchnumbernotcached">matchNumberNotCached</a> &mdash; Match a number and the optional trailing whitespace.</li>
-<li> <a href="#matchuptoleftbracket">matchUpToLeftBracket</a> &mdash; Match everything up to a left backet.</li>
-<li> <a href="#matchfileline">matchFileLine</a> &mdash; Match a file and line number like: filename(234).</li>
-<li> <a href="#matchversion">matchVersion</a> &mdash; Match a StaticTea version number.</li>
-<li> <a href="#matchversionnotcached">matchVersionNotCached</a> &mdash; Match a StaticTea version number.</li>
-<li> <a href="#matchdotnames">matchDotNames</a> &mdash; Matches variable dot names and surrounding whitespace.</li>
-<li>type:  <a href="#groupsymbol">GroupSymbol</a> &mdash; Grouping symbols we search for in the statements.</li>
-<li> <a href="#matchcommaorsymbol">matchCommaOrSymbol</a> &mdash; Match a comma or the symbol and the optional trailing whitespace.</li>
-<li> <a href="#matchsymbol">matchSymbol</a> &mdash; Match the symbol and the optional trailing whitespace.</li>
-<li> <a href="#matchnotorparen">matchNotOrParen</a> &mdash; Match "not " or "(" and the trailing whitespace.</li>
-<li> <a href="#matchboolexproperator">matchBoolExprOperator</a> &mdash; Match boolean expression operators (bool operators plus compareh operators) and the trailing whitespace.</li>
-<li> <a href="#matchcompareoperator">matchCompareOperator</a> &mdash; Match the compare operators and the trailing whitespace.</li>
-<li> <a href="#matchreplcmd">matchReplCmd</a> &mdash; Match the REPL commands and the trailing optional whitespace.</li>
-<li> <a href="#matchparametertype">matchParameterType</a> &mdash; Match a parameter type and the trailing whitespace.</li>
-<li> <a href="#matchdoccomment">matchDocComment</a> &mdash; Match a doc comment.</li>
-<li> <a href="#matchreturnstatement">matchReturnStatement</a> &mdash; Match a return statement.</li>
+<li> <a href="#parsePrepost">parsePrepost</a> &mdash; Parse the prepost item on the terminal command line.</li>
+<li> <a href="#matchPrefix">matchPrefix</a> &mdash; Match lines that start with one of the prefixes in the given table plus optional following whitespace.</li>
+<li> <a href="#matchCommand">matchCommand</a> &mdash; Match statictea commands.</li>
+<li> <a href="#matchLastPart">matchLastPart</a> &mdash; Match the last part of a command line.</li>
+<li> <a href="#getLastPart">getLastPart</a> &mdash; Return the optional plus sign and line endings from the line.</li>
+<li> <a href="#matchTabSpace">matchTabSpace</a> &mdash; Match one or more spaces or tabs starting at the given position.</li>
+<li> <a href="#emptyOrSpaces">emptyOrSpaces</a> &mdash; Return true when the text is empty or all whitespace from start to the end.</li>
+<li> <a href="#matchEqualSign">matchEqualSign</a> &mdash; Match an equal sign or "&=" and the optional trailing whitespace.</li>
+<li> <a href="#matchCommaParentheses">matchCommaParentheses</a> &mdash; Match a comma or right parentheses and the optional trailing whitespace.</li>
+<li> <a href="#matchNumber">matchNumber</a> &mdash; Match a number and the optional trailing whitespace.</li>
+<li> <a href="#matchNumberNotCached">matchNumberNotCached</a> &mdash; Match a number and the optional trailing whitespace.</li>
+<li> <a href="#matchUpToLeftBracket">matchUpToLeftBracket</a> &mdash; Match everything up to a left backet.</li>
+<li> <a href="#matchFileLine">matchFileLine</a> &mdash; Match a file and line number like: filename(234).</li>
+<li> <a href="#matchVersion">matchVersion</a> &mdash; Match a StaticTea version number.</li>
+<li> <a href="#matchVersionNotCached">matchVersionNotCached</a> &mdash; Match a StaticTea version number.</li>
+<li> <a href="#matchDotNames">matchDotNames</a> &mdash; Matches variable dot names and surrounding whitespace.</li>
+<li>type:  <a href="#GroupSymbol">GroupSymbol</a> &mdash; Grouping symbols we search for in the statements.</li>
+<li> <a href="#matchCommaOrSymbol">matchCommaOrSymbol</a> &mdash; Match a comma or the symbol and the optional trailing whitespace.</li>
+<li> <a href="#matchSymbol">matchSymbol</a> &mdash; Match the symbol and the optional trailing whitespace.</li>
+<li> <a href="#matchNotOrParen">matchNotOrParen</a> &mdash; Match "not " or "(" and the trailing whitespace.</li>
+<li> <a href="#matchBoolExprOperator">matchBoolExprOperator</a> &mdash; Match boolean expression operators (bool operators plus compareh operators) and the trailing whitespace.</li>
+<li> <a href="#matchCompareOperator">matchCompareOperator</a> &mdash; Match the compare operators and the trailing whitespace.</li>
+<li> <a href="#matchReplCmd">matchReplCmd</a> &mdash; Match the REPL commands and the trailing optional whitespace.</li>
+<li> <a href="#matchParameterType">matchParameterType</a> &mdash; Match a parameter type and the trailing whitespace.</li>
+<li> <a href="#matchDocComment">matchDocComment</a> &mdash; Match a doc comment.</li>
+<li> <a href="#matchReturnStatement">matchReturnStatement</a> &mdash; Match a return statement.</li>
 </ul>
 
-<h3 id=commands>commands</h3>
+<h3 id="commands">commands</h3>
 
 <pre class="description">
 The StaticTea commands.
@@ -83,7 +86,7 @@ commands: array[6, string] = ["nextline", "block", "replace", "#", ":",
                               "endblock"]
 </pre>
 
-<h3 id=parseprepost>parsePrepost</h3>
+<h3 id="parsePrepost">parsePrepost</h3>
 
 <pre class="description">
 Parse the prepost item on the terminal command line.  A prefix is followed by an optional postfix, prefix[,postfix].  Each part contains 1 to 20 ascii characters including spaces but without control characters or commas.
@@ -93,7 +96,7 @@ Parse the prepost item on the terminal command line.  A prefix is followed by an
 proc parsePrepost(str: string): Option[tuple[prefix: string, postfix: string]]
 </pre>
 
-<h3 id=matchprefix>matchPrefix</h3>
+<h3 id="matchPrefix">matchPrefix</h3>
 
 <pre class="description">
 Match lines that start with one of the prefixes in the given table plus optional following whitespace.
@@ -104,7 +107,7 @@ proc matchPrefix(line: string; prefixes: seq[string]; start: Natural = 0): Optio
     Matches]
 </pre>
 
-<h3 id=matchcommand>matchCommand</h3>
+<h3 id="matchCommand">matchCommand</h3>
 
 <pre class="description">
 Match statictea commands.
@@ -114,7 +117,7 @@ Match statictea commands.
 proc matchCommand(line: string; start: Natural = 0): Option[Matches]
 </pre>
 
-<h3 id=matchlastpart>matchLastPart</h3>
+<h3 id="matchLastPart">matchLastPart</h3>
 
 <pre class="description">
 Match the last part of a command line.  It matches the optional continuation plus character, the optional postfix and the optional line endings. A match has two groups, the plus sign and the line ending. When nothing at the end, return groups: "", "".
@@ -125,7 +128,7 @@ proc matchLastPart(line: string; postfix: string; start: Natural = 0): Option[
     Matches]
 </pre>
 
-<h3 id=getlastpart>getLastPart</h3>
+<h3 id="getLastPart">getLastPart</h3>
 
 <pre class="description">
 Return the optional plus sign and line endings from the line.
@@ -135,7 +138,7 @@ Return the optional plus sign and line endings from the line.
 proc getLastPart(line: string; postfix: string): Option[Matches]
 </pre>
 
-<h3 id=matchtabspace>matchTabSpace</h3>
+<h3 id="matchTabSpace">matchTabSpace</h3>
 
 <pre class="description">
 Match one or more spaces or tabs starting at the given position.
@@ -145,7 +148,7 @@ Match one or more spaces or tabs starting at the given position.
 proc matchTabSpace(line: string; start: Natural = 0): Option[Matches]
 </pre>
 
-<h3 id=emptyorspaces>emptyOrSpaces</h3>
+<h3 id="emptyOrSpaces">emptyOrSpaces</h3>
 
 <pre class="description">
 Return true when the text is empty or all whitespace from start to the end.
@@ -155,7 +158,7 @@ Return true when the text is empty or all whitespace from start to the end.
 proc emptyOrSpaces(text: string; start: Natural = 0): bool
 </pre>
 
-<h3 id=matchequalsign>matchEqualSign</h3>
+<h3 id="matchEqualSign">matchEqualSign</h3>
 
 <pre class="description">
 Match an equal sign or "&=" and the optional trailing whitespace. Return the operator in the group, "=" or "&=".
@@ -165,7 +168,7 @@ Match an equal sign or "&=" and the optional trailing whitespace. Return the ope
 proc matchEqualSign(line: string; start: Natural = 0): Option[Matches]
 </pre>
 
-<h3 id=matchcommaparentheses>matchCommaParentheses</h3>
+<h3 id="matchCommaParentheses">matchCommaParentheses</h3>
 
 <pre class="description">
 Match a comma or right parentheses and the optional trailing whitespace.
@@ -175,7 +178,7 @@ Match a comma or right parentheses and the optional trailing whitespace.
 proc matchCommaParentheses(line: string; start: Natural = 0): Option[Matches]
 </pre>
 
-<h3 id=matchnumber>matchNumber</h3>
+<h3 id="matchNumber">matchNumber</h3>
 
 <pre class="description">
 Match a number and the optional trailing whitespace. Return the optional decimal point that tells whether the number is a float or integer.
@@ -185,7 +188,7 @@ Match a number and the optional trailing whitespace. Return the optional decimal
 proc matchNumber(line: string; start: Natural = 0): Option[Matches]
 </pre>
 
-<h3 id=matchnumbernotcached>matchNumberNotCached</h3>
+<h3 id="matchNumberNotCached">matchNumberNotCached</h3>
 
 <pre class="description">
 Match a number and the optional trailing whitespace. Return the optional decimal point that tells whether the number is a float or integer. "Not cached" allows it to be called by a function because it has no side effects.
@@ -195,7 +198,7 @@ Match a number and the optional trailing whitespace. Return the optional decimal
 func matchNumberNotCached(line: string; start: Natural = 0): Option[Matches]
 </pre>
 
-<h3 id=matchuptoleftbracket>matchUpToLeftBracket</h3>
+<h3 id="matchUpToLeftBracket">matchUpToLeftBracket</h3>
 
 <pre class="description">
 Match everything up to a left backet. The match length includes
@@ -213,7 +216,7 @@ text on the line {variable} more text {variable2} asdf
 proc matchUpToLeftBracket(line: string; start: Natural = 0): Option[Matches]
 </pre>
 
-<h3 id=matchfileline>matchFileLine</h3>
+<h3 id="matchFileLine">matchFileLine</h3>
 
 <pre class="description">
 Match a file and line number like: filename(234).
@@ -223,7 +226,7 @@ Match a file and line number like: filename(234).
 proc matchFileLine(line: string; start: Natural = 0): Option[Matches]
 </pre>
 
-<h3 id=matchversion>matchVersion</h3>
+<h3 id="matchVersion">matchVersion</h3>
 
 <pre class="description">
 Match a StaticTea version number.
@@ -233,7 +236,7 @@ Match a StaticTea version number.
 proc matchVersion(line: string; start: Natural = 0): Option[Matches]
 </pre>
 
-<h3 id=matchversionnotcached>matchVersionNotCached</h3>
+<h3 id="matchVersionNotCached">matchVersionNotCached</h3>
 
 <pre class="description">
 Match a StaticTea version number. "Not cached" allows it to be called by a function because it has no side effects.
@@ -244,7 +247,7 @@ func matchVersionNotCached(line: string; start: Natural = 0;
                            numGroups: Natural = 0): Option[Matches]
 </pre>
 
-<h3 id=matchdotnames>matchDotNames</h3>
+<h3 id="matchDotNames">matchDotNames</h3>
 
 <pre class="description">
 Matches variable dot names and surrounding whitespace. Return the dot names as one string like "a.b.c.d".
@@ -271,7 +274,7 @@ let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
 proc matchDotNames(line: string; start: Natural = 0): Option[Matches]
 </pre>
 
-<h3 id=groupsymbol>GroupSymbol</h3>
+<h3 id="GroupSymbol">GroupSymbol</h3>
 
 <pre class="description">
 Grouping symbols we search for in the statements.
@@ -283,7 +286,7 @@ GroupSymbol = enum
   gColon
 </pre>
 
-<h3 id=matchcommaorsymbol>matchCommaOrSymbol</h3>
+<h3 id="matchCommaOrSymbol">matchCommaOrSymbol</h3>
 
 <pre class="description">
 Match a comma or the symbol and the optional trailing whitespace.
@@ -294,7 +297,7 @@ proc matchCommaOrSymbol(line: string; symbol: GroupSymbol; start: Natural = 0): 
     Matches]
 </pre>
 
-<h3 id=matchsymbol>matchSymbol</h3>
+<h3 id="matchSymbol">matchSymbol</h3>
 
 <pre class="description">
 Match the symbol and the optional trailing whitespace.
@@ -305,7 +308,7 @@ proc matchSymbol(line: string; symbol: GroupSymbol; start: Natural = 0): Option[
     Matches]
 </pre>
 
-<h3 id=matchnotorparen>matchNotOrParen</h3>
+<h3 id="matchNotOrParen">matchNotOrParen</h3>
 
 <pre class="description">
 Match "not " or "(" and the trailing whitespace.
@@ -315,7 +318,7 @@ Match "not " or "(" and the trailing whitespace.
 proc matchNotOrParen(line: string; start: Natural = 0): Option[Matches]
 </pre>
 
-<h3 id=matchboolexproperator>matchBoolExprOperator</h3>
+<h3 id="matchBoolExprOperator">matchBoolExprOperator</h3>
 
 <pre class="description">
 Match boolean expression operators (bool operators plus compareh operators) and the trailing whitespace.  The bool operators require a trailing space but it isn't part of the operator name returned but still in the length.
@@ -325,7 +328,7 @@ Match boolean expression operators (bool operators plus compareh operators) and 
 proc matchBoolExprOperator(line: string; start: Natural): Option[Matches]
 </pre>
 
-<h3 id=matchcompareoperator>matchCompareOperator</h3>
+<h3 id="matchCompareOperator">matchCompareOperator</h3>
 
 <pre class="description">
 Match the compare operators and the trailing whitespace.
@@ -335,7 +338,7 @@ Match the compare operators and the trailing whitespace.
 proc matchCompareOperator(line: string; start: Natural): Option[Matches]
 </pre>
 
-<h3 id=matchreplcmd>matchReplCmd</h3>
+<h3 id="matchReplCmd">matchReplCmd</h3>
 
 <pre class="description">
 Match the REPL commands and the trailing optional whitespace.
@@ -345,7 +348,7 @@ Match the REPL commands and the trailing optional whitespace.
 proc matchReplCmd(line: string; start: Natural): Option[Matches]
 </pre>
 
-<h3 id=matchparametertype>matchParameterType</h3>
+<h3 id="matchParameterType">matchParameterType</h3>
 
 <pre class="description">
 Match a parameter type and the trailing whitespace.
@@ -355,7 +358,7 @@ Match a parameter type and the trailing whitespace.
 proc matchParameterType(line: string; start: Natural): Option[Matches]
 </pre>
 
-<h3 id=matchdoccomment>matchDocComment</h3>
+<h3 id="matchDocComment">matchDocComment</h3>
 
 <pre class="description">
 Match a doc comment.
@@ -365,7 +368,7 @@ Match a doc comment.
 proc matchDocComment(line: string; start: Natural): Option[Matches]
 </pre>
 
-<h3 id=matchreturnstatement>matchReturnStatement</h3>
+<h3 id="matchReturnStatement">matchReturnStatement</h3>
 
 <pre class="description">
 Match a return statement. a = return(...

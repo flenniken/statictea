@@ -22,11 +22,15 @@ get-name = func(ix: int, entry: dict, newList: list) bool
 # Create the github anchors for all the heading names.
 names = []
 stopped2 = listLoop(s.entries, names, l.get-name)
-anchors = anchors(names, "github")
+
+# Use the anchor type depending on the result type (extension).
+path = path(t.args.resultFilename)
+type = if((path.ext == ".md"), "github", "html")
+anchors = anchors(names, type)
 
 # Use the filename's basename for the module name.
-path = path(s.orig)
-o.moduleName = path.filename
+orig-path = path(s.orig)
+o.moduleName = orig-path.filename
 
 o.moduleDescription = replaceRe(s.moduleDescription, patterns)
 

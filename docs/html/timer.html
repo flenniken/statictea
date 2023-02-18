@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>timer.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>timer.nim</h1>
 
@@ -45,12 +48,12 @@ Nim source code: <a href="../../src/timer.nim">timer.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#timer">Timer</a> &mdash; Holds the start time in seconds.</li>
-<li> <a href="#newtimer">newTimer</a> &mdash; Create a new timer and set the start time.</li>
+<li>type:  <a href="#Timer">Timer</a> &mdash; Holds the start time in seconds.</li>
+<li> <a href="#newTimer">newTimer</a> &mdash; Create a new timer and set the start time.</li>
 <li> <a href="#seconds">seconds</a> &mdash; Return the elapsed seconds rounded to the specified number of digits.</li>
 </ul>
 
-<h3 id=timer>Timer</h3>
+<h3 id="Timer">Timer</h3>
 
 <pre class="description">
 Holds the start time in seconds.
@@ -62,7 +65,7 @@ Timer = object
 
 </pre>
 
-<h3 id=newtimer>newTimer</h3>
+<h3 id="newTimer">newTimer</h3>
 
 <pre class="description">
 Create a new timer and set the start time.
@@ -72,7 +75,7 @@ Create a new timer and set the start time.
 proc newTimer(): Timer
 </pre>
 
-<h3 id=seconds>seconds</h3>
+<h3 id="seconds">seconds</h3>
 
 <pre class="description">
 Return the elapsed seconds rounded to the specified number of digits.

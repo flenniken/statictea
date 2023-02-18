@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>vartypes.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>vartypes.nim</h1>
 
@@ -37,95 +40,95 @@ Nim source code: <a href="../../src/vartypes.nim">vartypes.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>const:  <a href="#variablestartchars">variableStartChars</a> &mdash; The characters that make up a variable dotname.</li>
-<li>const:  <a href="#variablemiddlechars">variableMiddleChars</a> &mdash; A variable contains ascii letters, digits, underscores and hypens.</li>
-<li>const:  <a href="#variablechars">variableChars</a> &mdash; A variable contains ascii letters, digits, underscores and hypens.</li>
-<li>const:  <a href="#starttfvarnumber">startTFVarNumber</a> &mdash; A character that starts true, false, a variable or a number.</li>
-<li>type:  <a href="#varsdict">VarsDict</a> &mdash; This is a ref type.</li>
-<li>type:  <a href="#mutable">Mutable</a> &mdash; The mutable state of lists and dictionaries.</li>
-<li>type:  <a href="#dicttype">DictType</a> &mdash; The statictea dictionary type.</li>
-<li>type:  <a href="#listtype">ListType</a> &mdash; The statictea list type.</li>
-<li>type:  <a href="#variables">Variables</a> &mdash; Dictionary holding all statictea variables in multiple distinct logical dictionaries.</li>
-<li>type:  <a href="#varsdictor">VarsDictOr</a> &mdash; A VarsDict object or a warning.</li>
-<li>type:  <a href="#valuekind">ValueKind</a> &mdash; The statictea variable types.</li>
-<li>type:  <a href="#value">Value</a> &mdash; A variable's value reference.</li>
-<li>type:  <a href="#valueor">ValueOr</a> &mdash; A Value object or a warning.</li>
-<li>type:  <a href="#statement">Statement</a> &mdash; Statement object stores the statement text, the line number and its line ending.</li>
-<li>type:  <a href="#functionptr">FunctionPtr</a> &mdash; Signature of a statictea built in function.</li>
-<li>type:  <a href="#paramcode">ParamCode</a> &mdash; Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.</li>
-<li>type:  <a href="#paramtype">ParamType</a> &mdash; The statictea parameter types.</li>
-<li>type:  <a href="#param">Param</a> &mdash; Holds attributes for one parameter.</li>
-<li>type:  <a href="#signature">Signature</a> &mdash; Holds the function signature.</li>
-<li>type:  <a href="#signatureor">SignatureOr</a> &mdash; A signature or message.</li>
-<li>type:  <a href="#functionspec">FunctionSpec</a> &mdash; Holds the function details.</li>
-<li>type:  <a href="#funresultkind">FunResultKind</a> &mdash; The kind of a FunResult object, either a value or warning.</li>
-<li>type:  <a href="#funresult">FunResult</a> &mdash; Contains the result of calling a function, either a value or a warning.</li>
-<li>type:  <a href="#sideeffect">SideEffect</a> &mdash; The kind of side effect for a statement.</li>
-<li>type:  <a href="#valuepossi">ValuePosSi</a> &mdash; A value and the position after the value in the statement along with the side effect, if any.</li>
-<li>type:  <a href="#valuepossior">ValuePosSiOr</a> &mdash; A ValuePosSi object or a warning.</li>
-<li> <a href="#newsignature">newSignature</a> &mdash; Create a Signature object.</li>
-<li> <a href="#newsignatureor">newSignatureOr</a> &mdash; Create a new SignatureOr with a message.</li>
-<li> <a href="#newsignatureor-1">newSignatureOr</a> &mdash; Create a new SignatureOr with a message.</li>
-<li> <a href="#newsignatureor-2">newSignatureOr</a> &mdash; Create a new SignatureOr with a value.</li>
-<li> <a href="#newsignatureor-3">newSignatureOr</a> &mdash; Create a SignatureOr object.</li>
-<li> <a href="#newparam">newParam</a> &mdash; Create a new Param object.</li>
-<li> <a href="#newvarsdict">newVarsDict</a> &mdash; Create a new empty variables dictionary.</li>
-<li> <a href="#newvarsdictor">newVarsDictOr</a> &mdash; Return a new varsDictOr object containing a warning.</li>
-<li> <a href="#newvarsdictor-1">newVarsDictOr</a> &mdash; Return a new VarsDict object containing a dictionary.</li>
-<li> <a href="#newdicttype">newDictType</a> &mdash; </li>
-<li> <a href="#newlisttype">newListType</a> &mdash; </li>
-<li> <a href="#newvalue">newValue</a> &mdash; Create a string value.</li>
-<li> <a href="#newvalue-1">newValue</a> &mdash; Create an integer value.</li>
-<li> <a href="#newvalue-2">newValue</a> &mdash; Create a bool value.</li>
-<li> <a href="#newvalue-3">newValue</a> &mdash; Create a float value.</li>
-<li> <a href="#newvalue-4">newValue</a> &mdash; Create a list value.</li>
-<li> <a href="#newvalue-5">newValue</a> &mdash; Create a dictionary value from a VarsDict.</li>
-<li> <a href="#newvalue-6">newValue</a> &mdash; New value from an existing value.</li>
-<li> <a href="#newvalue-7">newValue</a> &mdash; New list value from an array of items of the same kind.</li>
-<li> <a href="#newvalue-8">newValue</a> &mdash; New dict value from an array of pairs where the pairs are the
+<li>const:  <a href="#variableStartChars">variableStartChars</a> &mdash; The characters that make up a variable dotname.</li>
+<li>const:  <a href="#variableMiddleChars">variableMiddleChars</a> &mdash; A variable contains ascii letters, digits, underscores and hypens.</li>
+<li>const:  <a href="#variableChars">variableChars</a> &mdash; A variable contains ascii letters, digits, underscores and hypens.</li>
+<li>const:  <a href="#startTFVarNumber">startTFVarNumber</a> &mdash; A character that starts true, false, a variable or a number.</li>
+<li>type:  <a href="#VarsDict">VarsDict</a> &mdash; This is a ref type.</li>
+<li>type:  <a href="#Mutable">Mutable</a> &mdash; The mutable state of lists and dictionaries.</li>
+<li>type:  <a href="#DictType">DictType</a> &mdash; The statictea dictionary type.</li>
+<li>type:  <a href="#ListType">ListType</a> &mdash; The statictea list type.</li>
+<li>type:  <a href="#Variables">Variables</a> &mdash; Dictionary holding all statictea variables in multiple distinct logical dictionaries.</li>
+<li>type:  <a href="#VarsDictOr">VarsDictOr</a> &mdash; A VarsDict object or a warning.</li>
+<li>type:  <a href="#ValueKind">ValueKind</a> &mdash; The statictea variable types.</li>
+<li>type:  <a href="#Value">Value</a> &mdash; A variable's value reference.</li>
+<li>type:  <a href="#ValueOr">ValueOr</a> &mdash; A Value object or a warning.</li>
+<li>type:  <a href="#Statement">Statement</a> &mdash; Statement object stores the statement text, the line number and its line ending.</li>
+<li>type:  <a href="#FunctionPtr">FunctionPtr</a> &mdash; Signature of a statictea built in function.</li>
+<li>type:  <a href="#ParamCode">ParamCode</a> &mdash; Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.</li>
+<li>type:  <a href="#ParamType">ParamType</a> &mdash; The statictea parameter types.</li>
+<li>type:  <a href="#Param">Param</a> &mdash; Holds attributes for one parameter.</li>
+<li>type:  <a href="#Signature">Signature</a> &mdash; Holds the function signature.</li>
+<li>type:  <a href="#SignatureOr">SignatureOr</a> &mdash; A signature or message.</li>
+<li>type:  <a href="#FunctionSpec">FunctionSpec</a> &mdash; Holds the function details.</li>
+<li>type:  <a href="#FunResultKind">FunResultKind</a> &mdash; The kind of a FunResult object, either a value or warning.</li>
+<li>type:  <a href="#FunResult">FunResult</a> &mdash; Contains the result of calling a function, either a value or a warning.</li>
+<li>type:  <a href="#SideEffect">SideEffect</a> &mdash; The kind of side effect for a statement.</li>
+<li>type:  <a href="#ValuePosSi">ValuePosSi</a> &mdash; A value and the position after the value in the statement along with the side effect, if any.</li>
+<li>type:  <a href="#ValuePosSiOr">ValuePosSiOr</a> &mdash; A ValuePosSi object or a warning.</li>
+<li> <a href="#newSignature">newSignature</a> &mdash; Create a Signature object.</li>
+<li> <a href="#newSignatureOr">newSignatureOr</a> &mdash; Create a new SignatureOr with a message.</li>
+<li> <a href="#newSignatureOr-1">newSignatureOr</a> &mdash; Create a new SignatureOr with a message.</li>
+<li> <a href="#newSignatureOr-2">newSignatureOr</a> &mdash; Create a new SignatureOr with a value.</li>
+<li> <a href="#newSignatureOr-3">newSignatureOr</a> &mdash; Create a SignatureOr object.</li>
+<li> <a href="#newParam">newParam</a> &mdash; Create a new Param object.</li>
+<li> <a href="#newVarsDict">newVarsDict</a> &mdash; Create a new empty variables dictionary.</li>
+<li> <a href="#newVarsDictOr">newVarsDictOr</a> &mdash; Return a new varsDictOr object containing a warning.</li>
+<li> <a href="#newVarsDictOr-1">newVarsDictOr</a> &mdash; Return a new VarsDict object containing a dictionary.</li>
+<li> <a href="#newDictType">newDictType</a> &mdash; </li>
+<li> <a href="#newListType">newListType</a> &mdash; </li>
+<li> <a href="#newValue">newValue</a> &mdash; Create a string value.</li>
+<li> <a href="#newValue-1">newValue</a> &mdash; Create an integer value.</li>
+<li> <a href="#newValue-2">newValue</a> &mdash; Create a bool value.</li>
+<li> <a href="#newValue-3">newValue</a> &mdash; Create a float value.</li>
+<li> <a href="#newValue-4">newValue</a> &mdash; Create a list value.</li>
+<li> <a href="#newValue-5">newValue</a> &mdash; Create a dictionary value from a VarsDict.</li>
+<li> <a href="#newValue-6">newValue</a> &mdash; New value from an existing value.</li>
+<li> <a href="#newValue-7">newValue</a> &mdash; New list value from an array of items of the same kind.</li>
+<li> <a href="#newValue-8">newValue</a> &mdash; New dict value from an array of pairs where the pairs are the
 same type which may be Value type.</li>
-<li> <a href="#newfunc">newFunc</a> &mdash; Create a new func which is a FunctionSpec.</li>
-<li> <a href="#newvalue-9">newValue</a> &mdash; Create a new func value.</li>
-<li> <a href="#newemptylistvalue">newEmptyListValue</a> &mdash; Return an empty list value.</li>
-<li> <a href="#newemptydictvalue">newEmptyDictValue</a> &mdash; Create a dictionary value from a VarsDict.</li>
-<li> <a href="#">`==`</a> &mdash; Return true when two variables are equal.</li>
-<li> <a href="#newstatement">newStatement</a> &mdash; Create a new statement.</li>
-<li> <a href="#-1">`$`</a> &mdash; Return a string representation of a signature.</li>
-<li> <a href="#-2">`$`</a> &mdash; Return a string representation of a function.</li>
-<li> <a href="#jsonstringrepr">jsonStringRepr</a> &mdash; Return the JSON string representation.</li>
-<li> <a href="#dicttostring">dictToString</a> &mdash; Return a string representation of a dict Value in JSON format.</li>
-<li> <a href="#listtostring">listToString</a> &mdash; Return a string representation of a list variable in JSON format.</li>
-<li> <a href="#valuetostring">valueToString</a> &mdash; Return a string representation of a variable in JSON format.</li>
-<li> <a href="#valuetostringrb">valueToStringRB</a> &mdash; Return the string representation of the variable for use in the replacement blocks.</li>
-<li> <a href="#-3">`$`</a> &mdash; Return a string representation of a Value.</li>
-<li> <a href="#-4">`$`</a> &mdash; Return a string representation of a VarsDict.</li>
-<li> <a href="#dotnamerep">dotNameRep</a> &mdash; Return a dot name string representation of a dictionary.</li>
-<li> <a href="#newvalueor">newValueOr</a> &mdash; Create a new ValueOr containing a warning.</li>
-<li> <a href="#newvalueor-1">newValueOr</a> &mdash; Create a new ValueOr containing a warning.</li>
-<li> <a href="#newvalueor-2">newValueOr</a> &mdash; Create a new ValueOr containing a value.</li>
-<li> <a href="#newfunresultwarn">newFunResultWarn</a> &mdash; Return a new FunResult object containing a warning.</li>
-<li> <a href="#newfunresultwarn-1">newFunResultWarn</a> &mdash; Return a new FunResult object containing a warning created from a WarningData object.</li>
-<li> <a href="#newfunresult">newFunResult</a> &mdash; Return a new FunResult object containing a value.</li>
-<li> <a href="#-5">`==`</a> &mdash; Compare two FunResult objects and return true when equal.</li>
-<li> <a href="#-6">`!=`</a> &mdash; Compare two FunResult objects and return false when equal.</li>
-<li> <a href="#-7">`$`</a> &mdash; Return a string representation of a FunResult object.</li>
-<li> <a href="#newvaluepossi">newValuePosSi</a> &mdash; Create a newValuePosSi object.</li>
-<li> <a href="#newvaluepossior">newValuePosSiOr</a> &mdash; Create a ValuePosSiOr warning.</li>
-<li> <a href="#newvaluepossior-1">newValuePosSiOr</a> &mdash; Create a ValuePosSiOr warning.</li>
-<li> <a href="#-8">`==`</a> &mdash; Return true when a equals b.</li>
-<li> <a href="#-9">`==`</a> &mdash; Return true when a equals b.</li>
-<li> <a href="#-10">`!=`</a> &mdash; Compare two ValuePosSi objects and return false when equal.</li>
-<li> <a href="#-11">`!=`</a> &mdash; Compare two ValuePosSiOr objects and return false when equal.</li>
-<li> <a href="#newvaluepossior-2">newValuePosSiOr</a> &mdash; Create a ValuePosSiOr from a value, pos and exit.</li>
-<li> <a href="#newvaluepossior-3">newValuePosSiOr</a> &mdash; Create a ValuePosSiOr value from a number or string.</li>
-<li> <a href="#newvaluepossior-4">newValuePosSiOr</a> &mdash; Create a ValuePosSiOr from a ValuePosSi.</li>
-<li> <a href="#codetoparamtype">codeToParamType</a> &mdash; Convert a parameter code letter to a ParamType.</li>
-<li> <a href="#strtoparamtype">strToParamType</a> &mdash; Return the parameter type for the given string, e.</li>
-<li> <a href="#shortname">shortName</a> &mdash; Return a short name based on the given index value.</li>
-<li> <a href="#newsignatureo">newSignatureO</a> &mdash; Return a new signature for the function name and signature code.</li>
+<li> <a href="#newFunc">newFunc</a> &mdash; Create a new func which is a FunctionSpec.</li>
+<li> <a href="#newValue-9">newValue</a> &mdash; Create a new func value.</li>
+<li> <a href="#newEmptyListValue">newEmptyListValue</a> &mdash; Return an empty list value.</li>
+<li> <a href="#newEmptyDictValue">newEmptyDictValue</a> &mdash; Create a dictionary value from a VarsDict.</li>
+<li> <a href="#a___">`==`</a> &mdash; Return true when two variables are equal.</li>
+<li> <a href="#newStatement">newStatement</a> &mdash; Create a new statement.</li>
+<li> <a href="#a__">`$`</a> &mdash; Return a string representation of a signature.</li>
+<li> <a href="#a__-1">`$`</a> &mdash; Return a string representation of a function.</li>
+<li> <a href="#jsonStringRepr">jsonStringRepr</a> &mdash; Return the JSON string representation.</li>
+<li> <a href="#dictToString">dictToString</a> &mdash; Return a string representation of a dict Value in JSON format.</li>
+<li> <a href="#listToString">listToString</a> &mdash; Return a string representation of a list variable in JSON format.</li>
+<li> <a href="#valueToString">valueToString</a> &mdash; Return a string representation of a variable in JSON format.</li>
+<li> <a href="#valueToStringRB">valueToStringRB</a> &mdash; Return the string representation of the variable for use in the replacement blocks.</li>
+<li> <a href="#a__-2">`$`</a> &mdash; Return a string representation of a Value.</li>
+<li> <a href="#a__-3">`$`</a> &mdash; Return a string representation of a VarsDict.</li>
+<li> <a href="#dotNameRep">dotNameRep</a> &mdash; Return a dot name string representation of a dictionary.</li>
+<li> <a href="#newValueOr">newValueOr</a> &mdash; Create a new ValueOr containing a warning.</li>
+<li> <a href="#newValueOr-1">newValueOr</a> &mdash; Create a new ValueOr containing a warning.</li>
+<li> <a href="#newValueOr-2">newValueOr</a> &mdash; Create a new ValueOr containing a value.</li>
+<li> <a href="#newFunResultWarn">newFunResultWarn</a> &mdash; Return a new FunResult object containing a warning.</li>
+<li> <a href="#newFunResultWarn-1">newFunResultWarn</a> &mdash; Return a new FunResult object containing a warning created from a WarningData object.</li>
+<li> <a href="#newFunResult">newFunResult</a> &mdash; Return a new FunResult object containing a value.</li>
+<li> <a href="#a___-1">`==`</a> &mdash; Compare two FunResult objects and return true when equal.</li>
+<li> <a href="#a___-2">`!=`</a> &mdash; Compare two FunResult objects and return false when equal.</li>
+<li> <a href="#a__-4">`$`</a> &mdash; Return a string representation of a FunResult object.</li>
+<li> <a href="#newValuePosSi">newValuePosSi</a> &mdash; Create a newValuePosSi object.</li>
+<li> <a href="#newValuePosSiOr">newValuePosSiOr</a> &mdash; Create a ValuePosSiOr warning.</li>
+<li> <a href="#newValuePosSiOr-1">newValuePosSiOr</a> &mdash; Create a ValuePosSiOr warning.</li>
+<li> <a href="#a___-3">`==`</a> &mdash; Return true when a equals b.</li>
+<li> <a href="#a___-4">`==`</a> &mdash; Return true when a equals b.</li>
+<li> <a href="#a___-5">`!=`</a> &mdash; Compare two ValuePosSi objects and return false when equal.</li>
+<li> <a href="#a___-6">`!=`</a> &mdash; Compare two ValuePosSiOr objects and return false when equal.</li>
+<li> <a href="#newValuePosSiOr-2">newValuePosSiOr</a> &mdash; Create a ValuePosSiOr from a value, pos and exit.</li>
+<li> <a href="#newValuePosSiOr-3">newValuePosSiOr</a> &mdash; Create a ValuePosSiOr value from a number or string.</li>
+<li> <a href="#newValuePosSiOr-4">newValuePosSiOr</a> &mdash; Create a ValuePosSiOr from a ValuePosSi.</li>
+<li> <a href="#codeToParamType">codeToParamType</a> &mdash; Convert a parameter code letter to a ParamType.</li>
+<li> <a href="#strToParamType">strToParamType</a> &mdash; Return the parameter type for the given string, e.</li>
+<li> <a href="#shortName">shortName</a> &mdash; Return a short name based on the given index value.</li>
+<li> <a href="#newSignatureO">newSignatureO</a> &mdash; Return a new signature for the function name and signature code.</li>
 </ul>
 
-<h3 id=variablestartchars>variableStartChars</h3>
+<h3 id="variableStartChars">variableStartChars</h3>
 
 <pre class="description">
 The characters that make up a variable dotname.  A variable starts with an ascii letter.
@@ -135,7 +138,7 @@ The characters that make up a variable dotname.  A variable starts with an ascii
 variableStartChars: set[char] =
 </pre>
 
-<h3 id=variablemiddlechars>variableMiddleChars</h3>
+<h3 id="variableMiddleChars">variableMiddleChars</h3>
 
 <pre class="description">
 A variable contains ascii letters, digits, underscores and hypens.
@@ -145,7 +148,7 @@ A variable contains ascii letters, digits, underscores and hypens.
 variableMiddleChars: set[char] =
 </pre>
 
-<h3 id=variablechars>variableChars</h3>
+<h3 id="variableChars">variableChars</h3>
 
 <pre class="description">
 A variable contains ascii letters, digits, underscores and hypens. Variables are connected with dots to make a dot name.
@@ -155,7 +158,7 @@ A variable contains ascii letters, digits, underscores and hypens. Variables are
 variableChars: set[char] =
 </pre>
 
-<h3 id=starttfvarnumber>startTFVarNumber</h3>
+<h3 id="startTFVarNumber">startTFVarNumber</h3>
 
 <pre class="description">
 A character that starts true, false, a variable or a number.
@@ -165,7 +168,7 @@ A character that starts true, false, a variable or a number.
 startTFVarNumber: set[char] =
 </pre>
 
-<h3 id=varsdict>VarsDict</h3>
+<h3 id="VarsDict">VarsDict</h3>
 
 <pre class="description">
 This is a ref type. Create a new VarsDict with newVarsDict procedure.
@@ -175,7 +178,7 @@ This is a ref type. Create a new VarsDict with newVarsDict procedure.
 VarsDict = OrderedTableRef[string, Value]
 </pre>
 
-<h3 id=mutable>Mutable</h3>
+<h3 id="Mutable">Mutable</h3>
 
 <pre class="description">
 The mutable state of lists and dictionaries.
@@ -188,7 +191,7 @@ The mutable state of lists and dictionaries.
 Mutable
 </pre>
 
-<h3 id=dicttype>DictType</h3>
+<h3 id="DictType">DictType</h3>
 
 <pre class="description">
 The statictea dictionary type.
@@ -204,7 +207,7 @@ DictType = object
 
 </pre>
 
-<h3 id=listtype>ListType</h3>
+<h3 id="ListType">ListType</h3>
 
 <pre class="description">
 The statictea list type.
@@ -220,7 +223,7 @@ ListType = object
 
 </pre>
 
-<h3 id=variables>Variables</h3>
+<h3 id="Variables">Variables</h3>
 
 <pre class="description">
 Dictionary holding all statictea variables in multiple distinct logical dictionaries.
@@ -230,7 +233,7 @@ Dictionary holding all statictea variables in multiple distinct logical dictiona
 Variables = VarsDict
 </pre>
 
-<h3 id=varsdictor>VarsDictOr</h3>
+<h3 id="VarsDictOr">VarsDictOr</h3>
 
 <pre class="description">
 A VarsDict object or a warning.
@@ -240,7 +243,7 @@ A VarsDict object or a warning.
 VarsDictOr = OpResultWarn[VarsDict]
 </pre>
 
-<h3 id=valuekind>ValueKind</h3>
+<h3 id="ValueKind">ValueKind</h3>
 
 <pre class="description">
 The statictea variable types.
@@ -259,7 +262,7 @@ ValueKind = enum
   vkList = "list", vkBool = "bool", vkFunc = "func"
 </pre>
 
-<h3 id=value>Value</h3>
+<h3 id="Value">Value</h3>
 
 <pre class="description">
 A variable's value reference.
@@ -269,7 +272,7 @@ A variable's value reference.
 Value = ref ValueObj
 </pre>
 
-<h3 id=valueor>ValueOr</h3>
+<h3 id="ValueOr">ValueOr</h3>
 
 <pre class="description">
 A Value object or a warning.
@@ -279,7 +282,7 @@ A Value object or a warning.
 ValueOr = OpResultWarn[Value]
 </pre>
 
-<h3 id=statement>Statement</h3>
+<h3 id="Statement">Statement</h3>
 
 <pre class="description">
 Statement object stores the statement text, the line number and its line ending.
@@ -298,7 +301,7 @@ Statement = object
 
 </pre>
 
-<h3 id=functionptr>FunctionPtr</h3>
+<h3 id="FunctionPtr">FunctionPtr</h3>
 
 <pre class="description">
 Signature of a statictea built in function. It takes any number of values and returns a value or a warning message.
@@ -308,7 +311,7 @@ Signature of a statictea built in function. It takes any number of values and re
 FunctionPtr = proc (variables: Variables; parameters: seq[Value]): FunResult
 </pre>
 
-<h3 id=paramcode>ParamCode</h3>
+<h3 id="ParamCode">ParamCode</h3>
 
 <pre class="description">
 Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.
@@ -318,7 +321,7 @@ Parameter type, one character of "ifsldpa" corresponding to int, float, string, 
 ParamCode = char
 </pre>
 
-<h3 id=paramtype>ParamType</h3>
+<h3 id="ParamType">ParamType</h3>
 
 <pre class="description">
 The statictea parameter types. The same as the variable types ValueKind with an extra for "any".
@@ -338,7 +341,7 @@ ParamType = enum
   ptList = "list", ptBool = "bool", ptFunc = "func", ptAny = "any"
 </pre>
 
-<h3 id=param>Param</h3>
+<h3 id="Param">Param</h3>
 
 <pre class="description">
 Holds attributes for one parameter.
@@ -353,7 +356,7 @@ Param = object
 
 </pre>
 
-<h3 id=signature>Signature</h3>
+<h3 id="Signature">Signature</h3>
 
 <pre class="description">
 Holds the function signature.
@@ -372,7 +375,7 @@ Signature = object
 
 </pre>
 
-<h3 id=signatureor>SignatureOr</h3>
+<h3 id="SignatureOr">SignatureOr</h3>
 
 <pre class="description">
 A signature or message.
@@ -382,7 +385,7 @@ A signature or message.
 SignatureOr = OpResultWarn[Signature]
 </pre>
 
-<h3 id=functionspec>FunctionSpec</h3>
+<h3 id="FunctionSpec">FunctionSpec</h3>
 
 <pre class="description">
 Holds the function details.
@@ -410,7 +413,7 @@ FunctionSpec = object
 
 </pre>
 
-<h3 id=funresultkind>FunResultKind</h3>
+<h3 id="FunResultKind">FunResultKind</h3>
 
 <pre class="description">
 The kind of a FunResult object, either a value or warning.
@@ -423,7 +426,7 @@ FunResultKind = enum
   frValue, frWarning
 </pre>
 
-<h3 id=funresult>FunResult</h3>
+<h3 id="FunResult">FunResult</h3>
 
 <pre class="description">
 Contains the result of calling a function, either a value or a warning.
@@ -445,7 +448,7 @@ FunResult = object
 
 </pre>
 
-<h3 id=sideeffect>SideEffect</h3>
+<h3 id="SideEffect">SideEffect</h3>
 
 <pre class="description">
 The kind of side effect for a statement.
@@ -463,7 +466,7 @@ SideEffect = enum
   seIf2False = "if2False"
 </pre>
 
-<h3 id=valuepossi>ValuePosSi</h3>
+<h3 id="ValuePosSi">ValuePosSi</h3>
 
 <pre class="description">
 A value and the position after the value in the statement along with the side effect, if any. The position includes the trailing whitespace.  For the example statement below, the value 567 starts at index 6 and ends at position 10.
@@ -484,7 +487,7 @@ ValuePosSi = object
 
 </pre>
 
-<h3 id=valuepossior>ValuePosSiOr</h3>
+<h3 id="ValuePosSiOr">ValuePosSiOr</h3>
 
 <pre class="description">
 A ValuePosSi object or a warning.
@@ -494,7 +497,7 @@ A ValuePosSi object or a warning.
 ValuePosSiOr = OpResultWarn[ValuePosSi]
 </pre>
 
-<h3 id=newsignature>newSignature</h3>
+<h3 id="newSignature">newSignature</h3>
 
 <pre class="description">
 Create a Signature object.
@@ -505,7 +508,7 @@ proc newSignature(optional: bool; name: string; params: seq[Param];
                   returnType: ParamType): Signature
 </pre>
 
-<h3 id=newsignatureor>newSignatureOr</h3>
+<h3 id="newSignatureOr">newSignatureOr</h3>
 
 <pre class="description">
 Create a new SignatureOr with a message.
@@ -515,7 +518,7 @@ Create a new SignatureOr with a message.
 func newSignatureOr(warning: MessageId; p1 = ""; pos = 0): SignatureOr
 </pre>
 
-<h3 id=newsignatureor-1>newSignatureOr</h3>
+<h3 id="newSignatureOr-1">newSignatureOr</h3>
 
 <pre class="description">
 Create a new SignatureOr with a message.
@@ -525,7 +528,7 @@ Create a new SignatureOr with a message.
 func newSignatureOr(warningData: WarningData): SignatureOr
 </pre>
 
-<h3 id=newsignatureor-2>newSignatureOr</h3>
+<h3 id="newSignatureOr-2">newSignatureOr</h3>
 
 <pre class="description">
 Create a new SignatureOr with a value.
@@ -535,7 +538,7 @@ Create a new SignatureOr with a value.
 func newSignatureOr(signature: Signature): SignatureOr
 </pre>
 
-<h3 id=newsignatureor-3>newSignatureOr</h3>
+<h3 id="newSignatureOr-3">newSignatureOr</h3>
 
 <pre class="description">
 Create a SignatureOr object.
@@ -546,7 +549,7 @@ proc newSignatureOr(optional: bool; name: string; params: seq[Param];
                     returnType: ParamType): SignatureOr
 </pre>
 
-<h3 id=newparam>newParam</h3>
+<h3 id="newParam">newParam</h3>
 
 <pre class="description">
 Create a new Param object.
@@ -556,7 +559,7 @@ Create a new Param object.
 func newParam(name: string; paramType: ParamType): Param
 </pre>
 
-<h3 id=newvarsdict>newVarsDict</h3>
+<h3 id="newVarsDict">newVarsDict</h3>
 
 <pre class="description">
 Create a new empty variables dictionary. VarsDict is a ref type.
@@ -566,7 +569,7 @@ Create a new empty variables dictionary. VarsDict is a ref type.
 proc newVarsDict(): VarsDict
 </pre>
 
-<h3 id=newvarsdictor>newVarsDictOr</h3>
+<h3 id="newVarsDictOr">newVarsDictOr</h3>
 
 <pre class="description">
 Return a new varsDictOr object containing a warning.
@@ -576,7 +579,7 @@ Return a new varsDictOr object containing a warning.
 func newVarsDictOr(warning: MessageId; p1: string = ""; pos = 0): VarsDictOr
 </pre>
 
-<h3 id=newvarsdictor-1>newVarsDictOr</h3>
+<h3 id="newVarsDictOr-1">newVarsDictOr</h3>
 
 <pre class="description">
 Return a new VarsDict object containing a dictionary.
@@ -586,7 +589,7 @@ Return a new VarsDict object containing a dictionary.
 func newVarsDictOr(varsDict: VarsDict): VarsDictOr
 </pre>
 
-<h3 id=newdicttype>newDictType</h3>
+<h3 id="newDictType">newDictType</h3>
 
 <pre class="description">
 
@@ -596,7 +599,7 @@ func newVarsDictOr(varsDict: VarsDict): VarsDictOr
 func newDictType(varsDict: VarsDict; mutable = Mutable.immutable): DictType
 </pre>
 
-<h3 id=newlisttype>newListType</h3>
+<h3 id="newListType">newListType</h3>
 
 <pre class="description">
 
@@ -606,7 +609,7 @@ func newDictType(varsDict: VarsDict; mutable = Mutable.immutable): DictType
 func newListType(valueList: seq[Value]; mutable = Mutable.immutable): ListType
 </pre>
 
-<h3 id=newvalue>newValue</h3>
+<h3 id="newValue">newValue</h3>
 
 <pre class="description">
 Create a string value.
@@ -616,7 +619,7 @@ Create a string value.
 proc newValue(str: string): Value
 </pre>
 
-<h3 id=newvalue-1>newValue</h3>
+<h3 id="newValue-1">newValue</h3>
 
 <pre class="description">
 Create an integer value.
@@ -626,7 +629,7 @@ Create an integer value.
 proc newValue(num: int | int64): Value
 </pre>
 
-<h3 id=newvalue-2>newValue</h3>
+<h3 id="newValue-2">newValue</h3>
 
 <pre class="description">
 Create a bool value.
@@ -636,7 +639,7 @@ Create a bool value.
 proc newValue(a: bool): Value
 </pre>
 
-<h3 id=newvalue-3>newValue</h3>
+<h3 id="newValue-3">newValue</h3>
 
 <pre class="description">
 Create a float value.
@@ -646,7 +649,7 @@ Create a float value.
 proc newValue(num: float): Value
 </pre>
 
-<h3 id=newvalue-4>newValue</h3>
+<h3 id="newValue-4">newValue</h3>
 
 <pre class="description">
 Create a list value.
@@ -656,7 +659,7 @@ Create a list value.
 proc newValue(valueList: seq[Value]; mutable = Mutable.immutable): Value
 </pre>
 
-<h3 id=newvalue-5>newValue</h3>
+<h3 id="newValue-5">newValue</h3>
 
 <pre class="description">
 Create a dictionary value from a VarsDict.
@@ -666,7 +669,7 @@ Create a dictionary value from a VarsDict.
 proc newValue(varsDict: VarsDict; mutable = Mutable.immutable): Value
 </pre>
 
-<h3 id=newvalue-6>newValue</h3>
+<h3 id="newValue-6">newValue</h3>
 
 <pre class="description">
 New value from an existing value. Since values are ref types, the
@@ -677,7 +680,7 @@ new value is an alias to the same value.
 proc newValue(value: Value): Value
 </pre>
 
-<h3 id=newvalue-7>newValue</h3>
+<h3 id="newValue-7">newValue</h3>
 
 <pre class="description">
 New list value from an array of items of the same kind.
@@ -693,7 +696,7 @@ let listValue = newValue([newValue(1), newValue("b")])
 proc newValue[T](list: openArray[T]; mutable = Mutable.immutable): Value
 </pre>
 
-<h3 id=newvalue-8>newValue</h3>
+<h3 id="newValue-8">newValue</h3>
 
 <pre class="description">
 New dict value from an array of pairs where the pairs are the
@@ -710,7 +713,7 @@ same type which may be Value type.
 proc newValue[T](dictPairs: openArray[(string, T)]; mutable = Mutable.immutable): Value
 </pre>
 
-<h3 id=newfunc>newFunc</h3>
+<h3 id="newFunc">newFunc</h3>
 
 <pre class="description">
 Create a new func which is a FunctionSpec.
@@ -722,7 +725,7 @@ func newFunc(builtIn: bool; signature: Signature; docComment: string;
              statements: seq[Statement]; functionPtr: FunctionPtr): FunctionSpec
 </pre>
 
-<h3 id=newvalue-9>newValue</h3>
+<h3 id="newValue-9">newValue</h3>
 
 <pre class="description">
 Create a new func value.
@@ -732,7 +735,7 @@ Create a new func value.
 func newValue(function: FunctionSpec): Value
 </pre>
 
-<h3 id=newemptylistvalue>newEmptyListValue</h3>
+<h3 id="newEmptyListValue">newEmptyListValue</h3>
 
 <pre class="description">
 Return an empty list value.
@@ -742,7 +745,7 @@ Return an empty list value.
 proc newEmptyListValue(mutable = Mutable.immutable): Value
 </pre>
 
-<h3 id=newemptydictvalue>newEmptyDictValue</h3>
+<h3 id="newEmptyDictValue">newEmptyDictValue</h3>
 
 <pre class="description">
 Create a dictionary value from a VarsDict.
@@ -752,7 +755,7 @@ Create a dictionary value from a VarsDict.
 proc newEmptyDictValue(mutable = Mutable.immutable): Value
 </pre>
 
-<h3 id=>`==`</h3>
+<h3 id="a___">`==`</h3>
 
 <pre class="description">
 Return true when two variables are equal.
@@ -762,7 +765,7 @@ Return true when two variables are equal.
 proc `==`(a: Value; b: Value): bool
 </pre>
 
-<h3 id=newstatement>newStatement</h3>
+<h3 id="newStatement">newStatement</h3>
 
 <pre class="description">
 Create a new statement.
@@ -772,7 +775,7 @@ Create a new statement.
 func newStatement(text: string; lineNum: Natural = 1; ending = "\n"): Statement
 </pre>
 
-<h3 id=-1>`$`</h3>
+<h3 id="a__">`$`</h3>
 
 <pre class="description">
 Return a string representation of a signature.
@@ -782,7 +785,7 @@ Return a string representation of a signature.
 func `$`(signature: Signature): string
 </pre>
 
-<h3 id=-2>`$`</h3>
+<h3 id="a__-1">`$`</h3>
 
 <pre class="description">
 Return a string representation of a function.
@@ -792,7 +795,7 @@ Return a string representation of a function.
 func `$`(function: FunctionSpec): string
 </pre>
 
-<h3 id=jsonstringrepr>jsonStringRepr</h3>
+<h3 id="jsonStringRepr">jsonStringRepr</h3>
 
 <pre class="description">
 Return the JSON string representation. It is assumed the string is a valid UTF-8 encoded string.
@@ -802,7 +805,7 @@ Return the JSON string representation. It is assumed the string is a valid UTF-8
 proc jsonStringRepr(str: string): string
 </pre>
 
-<h3 id=dicttostring>dictToString</h3>
+<h3 id="dictToString">dictToString</h3>
 
 <pre class="description">
 Return a string representation of a dict Value in JSON format.
@@ -812,7 +815,7 @@ Return a string representation of a dict Value in JSON format.
 func dictToString(value: Value): string
 </pre>
 
-<h3 id=listtostring>listToString</h3>
+<h3 id="listToString">listToString</h3>
 
 <pre class="description">
 Return a string representation of a list variable in JSON format.
@@ -822,7 +825,7 @@ Return a string representation of a list variable in JSON format.
 func listToString(value: Value): string
 </pre>
 
-<h3 id=valuetostring>valueToString</h3>
+<h3 id="valueToString">valueToString</h3>
 
 <pre class="description">
 Return a string representation of a variable in JSON format.
@@ -832,7 +835,7 @@ Return a string representation of a variable in JSON format.
 func valueToString(value: Value): string
 </pre>
 
-<h3 id=valuetostringrb>valueToStringRB</h3>
+<h3 id="valueToStringRB">valueToStringRB</h3>
 
 <pre class="description">
 Return the string representation of the variable for use in the replacement blocks.
@@ -842,7 +845,7 @@ Return the string representation of the variable for use in the replacement bloc
 func valueToStringRB(value: Value): string
 </pre>
 
-<h3 id=-3>`$`</h3>
+<h3 id="a__-2">`$`</h3>
 
 <pre class="description">
 Return a string representation of a Value.
@@ -852,7 +855,7 @@ Return a string representation of a Value.
 func `$`(value: Value): string
 </pre>
 
-<h3 id=-4>`$`</h3>
+<h3 id="a__-3">`$`</h3>
 
 <pre class="description">
 Return a string representation of a VarsDict.
@@ -862,7 +865,7 @@ Return a string representation of a VarsDict.
 proc `$`(varsDict: VarsDict): string
 </pre>
 
-<h3 id=dotnamerep>dotNameRep</h3>
+<h3 id="dotNameRep">dotNameRep</h3>
 
 <pre class="description">
 Return a dot name string representation of a dictionary. The top variables tells whether the dict is the variables dictionary.
@@ -872,7 +875,7 @@ Return a dot name string representation of a dictionary. The top variables tells
 func dotNameRep(dict: VarsDict; leftSide: string = ""; top = false): string
 </pre>
 
-<h3 id=newvalueor>newValueOr</h3>
+<h3 id="newValueOr">newValueOr</h3>
 
 <pre class="description">
 Create a new ValueOr containing a warning.
@@ -882,7 +885,7 @@ Create a new ValueOr containing a warning.
 func newValueOr(warning: MessageId; p1 = ""; pos = 0): ValueOr
 </pre>
 
-<h3 id=newvalueor-1>newValueOr</h3>
+<h3 id="newValueOr-1">newValueOr</h3>
 
 <pre class="description">
 Create a new ValueOr containing a warning.
@@ -892,7 +895,7 @@ Create a new ValueOr containing a warning.
 func newValueOr(warningData: WarningData): ValueOr
 </pre>
 
-<h3 id=newvalueor-2>newValueOr</h3>
+<h3 id="newValueOr-2">newValueOr</h3>
 
 <pre class="description">
 Create a new ValueOr containing a value.
@@ -902,7 +905,7 @@ Create a new ValueOr containing a value.
 func newValueOr(value: Value): ValueOr
 </pre>
 
-<h3 id=newfunresultwarn>newFunResultWarn</h3>
+<h3 id="newFunResultWarn">newFunResultWarn</h3>
 
 <pre class="description">
 Return a new FunResult object containing a warning. It takes a message id, the index of the problem parameter, and the optional string that goes with the warning.
@@ -913,7 +916,7 @@ func newFunResultWarn(warning: MessageId; parameter: int = 0; p1: string = "";
                       pos = 0): FunResult
 </pre>
 
-<h3 id=newfunresultwarn-1>newFunResultWarn</h3>
+<h3 id="newFunResultWarn-1">newFunResultWarn</h3>
 
 <pre class="description">
 Return a new FunResult object containing a warning created from a WarningData object.
@@ -923,7 +926,7 @@ Return a new FunResult object containing a warning created from a WarningData ob
 func newFunResultWarn(warningData: WarningData; parameter: int = 0): FunResult
 </pre>
 
-<h3 id=newfunresult>newFunResult</h3>
+<h3 id="newFunResult">newFunResult</h3>
 
 <pre class="description">
 Return a new FunResult object containing a value.
@@ -933,7 +936,7 @@ Return a new FunResult object containing a value.
 func newFunResult(value: Value): FunResult
 </pre>
 
-<h3 id=-5>`==`</h3>
+<h3 id="a___-1">`==`</h3>
 
 <pre class="description">
 Compare two FunResult objects and return true when equal.
@@ -943,7 +946,7 @@ Compare two FunResult objects and return true when equal.
 func `==`(r1: FunResult; r2: FunResult): bool
 </pre>
 
-<h3 id=-6>`!=`</h3>
+<h3 id="a___-2">`!=`</h3>
 
 <pre class="description">
 Compare two FunResult objects and return false when equal.
@@ -953,7 +956,7 @@ Compare two FunResult objects and return false when equal.
 proc `!=`(a: FunResult; b: FunResult): bool
 </pre>
 
-<h3 id=-7>`$`</h3>
+<h3 id="a__-4">`$`</h3>
 
 <pre class="description">
 Return a string representation of a FunResult object.
@@ -963,7 +966,7 @@ Return a string representation of a FunResult object.
 func `$`(funResult: FunResult): string
 </pre>
 
-<h3 id=newvaluepossi>newValuePosSi</h3>
+<h3 id="newValuePosSi">newValuePosSi</h3>
 
 <pre class="description">
 Create a newValuePosSi object.
@@ -973,7 +976,7 @@ Create a newValuePosSi object.
 proc newValuePosSi(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSi
 </pre>
 
-<h3 id=newvaluepossior>newValuePosSiOr</h3>
+<h3 id="newValuePosSiOr">newValuePosSiOr</h3>
 
 <pre class="description">
 Create a ValuePosSiOr warning.
@@ -983,7 +986,7 @@ Create a ValuePosSiOr warning.
 func newValuePosSiOr(warning: MessageId; p1 = ""; pos = 0): ValuePosSiOr
 </pre>
 
-<h3 id=newvaluepossior-1>newValuePosSiOr</h3>
+<h3 id="newValuePosSiOr-1">newValuePosSiOr</h3>
 
 <pre class="description">
 Create a ValuePosSiOr warning.
@@ -993,7 +996,7 @@ Create a ValuePosSiOr warning.
 func newValuePosSiOr(warningData: WarningData): ValuePosSiOr
 </pre>
 
-<h3 id=-8>`==`</h3>
+<h3 id="a___-3">`==`</h3>
 
 <pre class="description">
 Return true when a equals b.
@@ -1003,7 +1006,7 @@ Return true when a equals b.
 proc `==`(a: ValuePosSi; b: ValuePosSi): bool
 </pre>
 
-<h3 id=-9>`==`</h3>
+<h3 id="a___-4">`==`</h3>
 
 <pre class="description">
 Return true when a equals b.
@@ -1013,7 +1016,7 @@ Return true when a equals b.
 proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool
 </pre>
 
-<h3 id=-10>`!=`</h3>
+<h3 id="a___-5">`!=`</h3>
 
 <pre class="description">
 Compare two ValuePosSi objects and return false when equal.
@@ -1023,7 +1026,7 @@ Compare two ValuePosSi objects and return false when equal.
 proc `!=`(a: ValuePosSi; b: ValuePosSi): bool
 </pre>
 
-<h3 id=-11>`!=`</h3>
+<h3 id="a___-6">`!=`</h3>
 
 <pre class="description">
 Compare two ValuePosSiOr objects and return false when equal.
@@ -1033,7 +1036,7 @@ Compare two ValuePosSiOr objects and return false when equal.
 proc `!=`(a: ValuePosSiOr; b: ValuePosSiOr): bool
 </pre>
 
-<h3 id=newvaluepossior-2>newValuePosSiOr</h3>
+<h3 id="newValuePosSiOr-2">newValuePosSiOr</h3>
 
 <pre class="description">
 Create a ValuePosSiOr from a value, pos and exit.
@@ -1043,7 +1046,7 @@ Create a ValuePosSiOr from a value, pos and exit.
 func newValuePosSiOr(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSiOr
 </pre>
 
-<h3 id=newvaluepossior-3>newValuePosSiOr</h3>
+<h3 id="newValuePosSiOr-3">newValuePosSiOr</h3>
 
 <pre class="description">
 Create a ValuePosSiOr value from a number or string.
@@ -1053,7 +1056,7 @@ Create a ValuePosSiOr value from a number or string.
 proc newValuePosSiOr(number: int | int64 | float64 | string; pos: Natural): ValuePosSiOr
 </pre>
 
-<h3 id=newvaluepossior-4>newValuePosSiOr</h3>
+<h3 id="newValuePosSiOr-4">newValuePosSiOr</h3>
 
 <pre class="description">
 Create a ValuePosSiOr from a ValuePosSi.
@@ -1063,7 +1066,7 @@ Create a ValuePosSiOr from a ValuePosSi.
 func newValuePosSiOr(val: ValuePosSi): ValuePosSiOr
 </pre>
 
-<h3 id=codetoparamtype>codeToParamType</h3>
+<h3 id="codeToParamType">codeToParamType</h3>
 
 <pre class="description">
 Convert a parameter code letter to a ParamType.
@@ -1073,7 +1076,7 @@ Convert a parameter code letter to a ParamType.
 func codeToParamType(code: ParamCode): ParamType
 </pre>
 
-<h3 id=strtoparamtype>strToParamType</h3>
+<h3 id="strToParamType">strToParamType</h3>
 
 <pre class="description">
 Return the parameter type for the given string, e.g. "int" to ptInt.
@@ -1083,7 +1086,7 @@ Return the parameter type for the given string, e.g. "int" to ptInt.
 func strToParamType(str: string): ParamType
 </pre>
 
-<h3 id=shortname>shortName</h3>
+<h3 id="shortName">shortName</h3>
 
 <pre class="description">
 Return a short name based on the given index value. Return a for 0, b for 1, etc.  It returns names a, b, c, ..., z then repeats a0, b0, c0,....
@@ -1093,7 +1096,7 @@ Return a short name based on the given index value. Return a for 0, b for 1, etc
 proc shortName(index: Natural): string
 </pre>
 
-<h3 id=newsignatureo>newSignatureO</h3>
+<h3 id="newSignatureO">newSignatureO</h3>
 
 <pre class="description">
 Return a new signature for the function name and signature code. The parameter names come from the shortName function for letters a through z in order. The last letter in the code is the function's return type.

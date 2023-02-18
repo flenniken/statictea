@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>functions.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -29,6 +29,7 @@ body {
     border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>functions.nim</h1>
 
@@ -39,17 +40,17 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#stringor">StringOr</a> &mdash; StringOr holds a string or a warning.</li>
-<li>type:  <a href="#pathcomponents">PathComponents</a> &mdash; PathComponents holds the components of the file path components.</li>
-<li> <a href="#newstringor">newStringOr</a> &mdash; Create a new StringOr object containing a warning.</li>
-<li> <a href="#newstringor-1">newStringOr</a> &mdash; Create a new StringOr object containing a warning.</li>
-<li> <a href="#newstringor-2">newStringOr</a> &mdash; Create a new StringOr object containing a string.</li>
-<li> <a href="#newpathcomponents">newPathComponents</a> &mdash; Create a new PathComponents object from its pieces.</li>
-<li> <a href="#signaturedetails">signatureDetails</a> &mdash; Convert the signature object to a dictionary value.</li>
-<li> <a href="#functiondetails">functionDetails</a> &mdash; Convert the function spec to a dictionary value.</li>
-<li> <a href="#cmpbasevalues">cmpBaseValues</a> &mdash; Compares two values a and b.</li>
-<li> <a href="#parsenumber">parseNumber</a> &mdash; Return the literal number value and position after it.</li>
-<li> <a href="#formatstring">formatString</a> &mdash; Format a string by filling in the variable placeholders with their values.</li>
+<li>type:  <a href="#StringOr">StringOr</a> &mdash; StringOr holds a string or a warning.</li>
+<li>type:  <a href="#PathComponents">PathComponents</a> &mdash; PathComponents holds the components of the file path components.</li>
+<li> <a href="#newStringOr">newStringOr</a> &mdash; Create a new StringOr object containing a warning.</li>
+<li> <a href="#newStringOr-1">newStringOr</a> &mdash; Create a new StringOr object containing a warning.</li>
+<li> <a href="#newStringOr-2">newStringOr</a> &mdash; Create a new StringOr object containing a string.</li>
+<li> <a href="#newPathComponents">newPathComponents</a> &mdash; Create a new PathComponents object from its pieces.</li>
+<li> <a href="#signatureDetails">signatureDetails</a> &mdash; Convert the signature object to a dictionary value.</li>
+<li> <a href="#functionDetails">functionDetails</a> &mdash; Convert the function spec to a dictionary value.</li>
+<li> <a href="#cmpBaseValues">cmpBaseValues</a> &mdash; Compares two values a and b.</li>
+<li> <a href="#parseNumber">parseNumber</a> &mdash; Return the literal number value and position after it.</li>
+<li> <a href="#formatString">formatString</a> &mdash; Format a string by filling in the variable placeholders with their values.</li>
 <li> <a href="#fun_cmp_iii">fun_cmp_iii</a> &mdash; Compare two ints.</li>
 <li> <a href="#fun_cmp_ffi">fun_cmp_ffi</a> &mdash; Compare two floats.</li>
 <li> <a href="#fun_cmp_ssobi">fun_cmp_ssobi</a> &mdash; Compare two strings.</li>
@@ -68,25 +69,25 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_exists_dsb">fun_exists_dsb</a> &mdash; Determine whether a key exists in a dictionary.</li>
 <li> <a href="#fun_case_iloaa">fun_case_iloaa</a> &mdash; Compare integer cases and return the matching value.</li>
 <li> <a href="#fun_case_sloaa">fun_case_sloaa</a> &mdash; Compare string cases and return the matching value.</li>
-<li> <a href="#parseversion">parseVersion</a> &mdash; Parse a StaticTea version number and return its three components.</li>
-<li> <a href="#fun_cmpversion_ssi">fun_cmpVersion_ssi</a> &mdash; Compare two StaticTea version numbers.</li>
+<li> <a href="#parseVersion">parseVersion</a> &mdash; Parse a StaticTea version number and return its three components.</li>
+<li> <a href="#fun_cmpVersion_ssi">fun_cmpVersion_ssi</a> &mdash; Compare two StaticTea version numbers.</li>
 <li> <a href="#fun_float_if">fun_float_if</a> &mdash; Create a float from an int.</li>
 <li> <a href="#fun_float_sf">fun_float_sf</a> &mdash; Create a float from a number string.</li>
 <li> <a href="#fun_float_saa">fun_float_saa</a> &mdash; Create a float from a number string.</li>
 <li> <a href="#fun_int_fosi">fun_int_fosi</a> &mdash; Create an int from a float.</li>
 <li> <a href="#fun_int_sosi">fun_int_sosi</a> &mdash; Create an int from a number string.</li>
 <li> <a href="#fun_int_ssaa">fun_int_ssaa</a> &mdash; Create an int from a number string.</li>
-<li> <a href="#if0condition">if0Condition</a> &mdash; Convert the value to a boolean.</li>
+<li> <a href="#if0Condition">if0Condition</a> &mdash; Convert the value to a boolean.</li>
 <li> <a href="#fun_bool_ab">fun_bool_ab</a> &mdash; Create an bool from a value.</li>
 <li> <a href="#fun_find_ssoaa">fun_find_ssoaa</a> &mdash; Find the position of a substring in a string.</li>
 <li> <a href="#fun_slice_siois">fun_slice_siois</a> &mdash; Extract a substring from a string by its position and length.</li>
 <li> <a href="#fun_dup_sis">fun_dup_sis</a> &mdash; Duplicate a string x times.</li>
 <li> <a href="#fun_dict_old">fun_dict_old</a> &mdash; Create a dictionary from a list of key, value pairs.</li>
 <li> <a href="#fun_list_al">fun_list_al</a> &mdash; Create a list of variables.</li>
-<li> <a href="#fun_listloop_lapoab">fun_listLoop_lapoab</a> &mdash; Loop over items in a list and fill in a container.</li>
+<li> <a href="#fun_listLoop_lapoab">fun_listLoop_lapoab</a> &mdash; Loop over items in a list and fill in a container.</li>
 <li> <a href="#fun_replace_siiss">fun_replace_siiss</a> &mdash; Replace a substring specified by its position and length with another string.</li>
-<li> <a href="#fun_replacere_sls">fun_replaceRe_sls</a> &mdash; Replace multiple parts of a string using regular expressions.</li>
-<li> <a href="#parsepath">parsePath</a> &mdash; Parse the given file path into its component pieces.</li>
+<li> <a href="#fun_replaceRe_sls">fun_replaceRe_sls</a> &mdash; Replace multiple parts of a string using regular expressions.</li>
+<li> <a href="#parsePath">parsePath</a> &mdash; Parse the given file path into its component pieces.</li>
 <li> <a href="#fun_path_sosd">fun_path_sosd</a> &mdash; Split a file path into its component pieces.</li>
 <li> <a href="#fun_lower_ss">fun_lower_ss</a> &mdash; Lowercase a string.</li>
 <li> <a href="#fun_keys_dl">fun_keys_dl</a> &mdash; Create a list from the keys in a dictionary.</li>
@@ -96,7 +97,7 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_sort_lsssl">fun_sort_lsssl</a> &mdash; Sort a list of dictionaries.</li>
 <li> <a href="#fun_anchors_lsl">fun_anchors_lsl</a> &mdash; Create anchor names from heading names.</li>
 <li> <a href="#fun_type_as">fun_type_as</a> &mdash; Return the argument type, one of: int, float, string, list, dict, bool or func.</li>
-<li> <a href="#fun_joinpath_loss">fun_joinPath_loss</a> &mdash; Join the path components with a path separator.</li>
+<li> <a href="#fun_joinPath_loss">fun_joinPath_loss</a> &mdash; Join the path components with a path separator.</li>
 <li> <a href="#fun_join_lsois">fun_join_lsois</a> &mdash; Join a list of strings with a separator.</li>
 <li> <a href="#fun_warn_ss">fun_warn_ss</a> &mdash; Return a warning message and skip the current statement.</li>
 <li> <a href="#fun_log_ss">fun_log_ss</a> &mdash; Log a message to the log file.</li>
@@ -105,8 +106,8 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_string_sds">fun_string_sds</a> &mdash; Convert the dictionary variable to dot names.</li>
 <li> <a href="#fun_format_ss">fun_format_ss</a> &mdash; Format a string using replacement variables similar to a replacement block.</li>
 <li> <a href="#fun_func_sp">fun_func_sp</a> &mdash; Define a function.</li>
-<li> <a href="#fun_functiondetails_pd">fun_functionDetails_pd</a> &mdash; Return the function details in a dictionary.</li>
-<li> <a href="#fun_startswith_ssb">fun_startsWith_ssb</a> &mdash; Check whether a strings starts with the given prefix.</li>
+<li> <a href="#fun_functionDetails_pd">fun_functionDetails_pd</a> &mdash; Return the function details in a dictionary.</li>
+<li> <a href="#fun_startsWith_ssb">fun_startsWith_ssb</a> &mdash; Check whether a strings starts with the given prefix.</li>
 <li> <a href="#fun_not_bb">fun_not_bb</a> &mdash; Boolean not.</li>
 <li> <a href="#fun_and_bbb">fun_and_bbb</a> &mdash; Boolean AND with short circuit.</li>
 <li> <a href="#fun_or_bbb">fun_or_bbb</a> &mdash; Boolean OR with short circuit.</li>
@@ -124,19 +125,19 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_lt_ffb">fun_lt_ffb</a> &mdash; Return true when a float is less then another float.</li>
 <li> <a href="#fun_lte_iib">fun_lte_iib</a> &mdash; Return true when an int is less than or equal to another int.</li>
 <li> <a href="#fun_lte_ffb">fun_lte_ffb</a> &mdash; Return true when a float is less than or equal to another float.</li>
-<li> <a href="#fun_readjson_sa">fun_readJson_sa</a> &mdash; Convert a JSON string to a variable.</li>
-<li> <a href="#functionsdict">functionsDict</a> &mdash; Maps a built-in function name to a function pointer you can call.</li>
-<li>type:  <a href="#builtininfo">BuiltInInfo</a> &mdash; The built-in function information.</li>
-<li> <a href="#newbuiltininfo">newBuiltInInfo</a> &mdash; Return a BuiltInInfo object.</li>
-<li>const:  <a href="#functionslist">functionsList</a> &mdash; Dynamically generated sorted list of built-in functions.</li>
-<li>const:  <a href="#functionstarts">functionStarts</a> &mdash; Dynamically generated array of starting line numbers for each built-in function in the functions.</li>
-<li> <a href="#getbestfunction">getBestFunction</a> &mdash; Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.</li>
-<li> <a href="#splitfuncname">splitFuncName</a> &mdash; Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".</li>
-<li> <a href="#makefuncdictionary">makeFuncDictionary</a> &mdash; Create the f dictionary from the built in functions.</li>
-<li> <a href="#funcsvardict">funcsVarDict</a> &mdash; The f dictionary of built-in functions.</li>
+<li> <a href="#fun_readJson_sa">fun_readJson_sa</a> &mdash; Convert a JSON string to a variable.</li>
+<li> <a href="#functionsDict">functionsDict</a> &mdash; Maps a built-in function name to a function pointer you can call.</li>
+<li>type:  <a href="#BuiltInInfo">BuiltInInfo</a> &mdash; The built-in function information.</li>
+<li> <a href="#newBuiltInInfo">newBuiltInInfo</a> &mdash; Return a BuiltInInfo object.</li>
+<li>const:  <a href="#functionsList">functionsList</a> &mdash; Dynamically generated sorted list of built-in functions.</li>
+<li>const:  <a href="#functionStarts">functionStarts</a> &mdash; Dynamically generated array of starting line numbers for each built-in function in the functions.</li>
+<li> <a href="#getBestFunction">getBestFunction</a> &mdash; Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.</li>
+<li> <a href="#splitFuncName">splitFuncName</a> &mdash; Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".</li>
+<li> <a href="#makeFuncDictionary">makeFuncDictionary</a> &mdash; Create the f dictionary from the built in functions.</li>
+<li> <a href="#funcsVarDict">funcsVarDict</a> &mdash; The f dictionary of built-in functions.</li>
 </ul>
 
-<h3 id=stringor>StringOr</h3>
+<h3 id="StringOr">StringOr</h3>
 
 <pre class="description">
 StringOr holds a string or a warning.
@@ -146,7 +147,7 @@ StringOr holds a string or a warning.
 StringOr = OpResultWarn[string]
 </pre>
 
-<h3 id=pathcomponents>PathComponents</h3>
+<h3 id="PathComponents">PathComponents</h3>
 
 <pre class="description">
 PathComponents holds the components of the file path components.
@@ -161,7 +162,7 @@ PathComponents = object
 
 </pre>
 
-<h3 id=newstringor>newStringOr</h3>
+<h3 id="newStringOr">newStringOr</h3>
 
 <pre class="description">
 Create a new StringOr object containing a warning.
@@ -171,7 +172,7 @@ Create a new StringOr object containing a warning.
 func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
 </pre>
 
-<h3 id=newstringor-1>newStringOr</h3>
+<h3 id="newStringOr-1">newStringOr</h3>
 
 <pre class="description">
 Create a new StringOr object containing a warning.
@@ -181,7 +182,7 @@ Create a new StringOr object containing a warning.
 func newStringOr(warningData: WarningData): StringOr
 </pre>
 
-<h3 id=newstringor-2>newStringOr</h3>
+<h3 id="newStringOr-2">newStringOr</h3>
 
 <pre class="description">
 Create a new StringOr object containing a string.
@@ -191,7 +192,7 @@ Create a new StringOr object containing a string.
 func newStringOr(str: string): StringOr
 </pre>
 
-<h3 id=newpathcomponents>newPathComponents</h3>
+<h3 id="newPathComponents">newPathComponents</h3>
 
 <pre class="description">
 Create a new PathComponents object from its pieces.
@@ -201,7 +202,7 @@ Create a new PathComponents object from its pieces.
 func newPathComponents(dir, filename, basename, ext: string): PathComponents
 </pre>
 
-<h3 id=signaturedetails>signatureDetails</h3>
+<h3 id="signatureDetails">signatureDetails</h3>
 
 <pre class="description">
 Convert the signature object to a dictionary value.
@@ -211,7 +212,7 @@ Convert the signature object to a dictionary value.
 func signatureDetails(signature: Signature): Value
 </pre>
 
-<h3 id=functiondetails>functionDetails</h3>
+<h3 id="functionDetails">functionDetails</h3>
 
 <pre class="description">
 Convert the function spec to a dictionary value.
@@ -221,7 +222,7 @@ Convert the function spec to a dictionary value.
 func functionDetails(fs: FunctionSpec): Value
 </pre>
 
-<h3 id=cmpbasevalues>cmpBaseValues</h3>
+<h3 id="cmpBaseValues">cmpBaseValues</h3>
 
 <pre class="description">
 Compares two values a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. The values must be the same kind and either int, float or string.
@@ -231,7 +232,7 @@ Compares two values a and b.  When a equals b return 0, when a is greater than b
 func cmpBaseValues(a, b: Value; insensitive: bool = false): int
 </pre>
 
-<h3 id=parsenumber>parseNumber</h3>
+<h3 id="parseNumber">parseNumber</h3>
 
 <pre class="description">
 Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.
@@ -241,7 +242,7 @@ Return the literal number value and position after it.  The start index points a
 func parseNumber(line: string; start: Natural): ValuePosSiOr
 </pre>
 
-<h3 id=formatstring>formatString</h3>
+<h3 id="formatString">formatString</h3>
 
 <pre class="description">
 Format a string by filling in the variable placeholders with their values. Generate a warning when the variable doesn't exist. No space around the bracketed variables.
@@ -263,7 +264,7 @@ To enter a left bracket use two in a row.
 proc formatString(variables: Variables; text: string): StringOr
 </pre>
 
-<h3 id=fun_cmp_iii>fun_cmp_iii</h3>
+<h3 id="fun_cmp_iii">fun_cmp_iii</h3>
 
 <pre class="description">
 Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
@@ -285,7 +286,7 @@ cmp(9, 2) => 1
 func fun_cmp_iii(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_cmp_ffi>fun_cmp_ffi</h3>
+<h3 id="fun_cmp_ffi">fun_cmp_ffi</h3>
 
 <pre class="description">
 Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
@@ -307,7 +308,7 @@ cmp(9.3, 2.2) => 1
 func fun_cmp_ffi(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_cmp_ssobi>fun_cmp_ssobi</h3>
+<h3 id="fun_cmp_ssobi">fun_cmp_ssobi</h3>
 
 <pre class="description">
 Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
@@ -334,7 +335,7 @@ cmp("Tea", "tea", false) => 0
 func fun_cmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_concat_sss>fun_concat_sss</h3>
+<h3 id="fun_concat_sss">fun_concat_sss</h3>
 
 <pre class="description">
 Concatenate two strings. See the join function for more that two arguments.
@@ -355,7 +356,7 @@ concat("a", "b") => "ab"
 func fun_concat_sss(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_len_si>fun_len_si</h3>
+<h3 id="fun_len_si">fun_len_si</h3>
 
 <pre class="description">
 Number of unicode characters in a string.
@@ -376,7 +377,7 @@ len("añyóng") => 6
 func fun_len_si(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_len_li>fun_len_li</h3>
+<h3 id="fun_len_li">fun_len_li</h3>
 
 <pre class="description">
 Number of elements in a list.
@@ -398,7 +399,7 @@ len(list(4, 5)) => 2
 func fun_len_li(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_len_di>fun_len_di</h3>
+<h3 id="fun_len_di">fun_len_di</h3>
 
 <pre class="description">
 Number of elements in a dictionary.
@@ -420,7 +421,7 @@ len(dict("a", 4, "b", 3)) => 2
 func fun_len_di(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_get_lioaa>fun_get_lioaa</h3>
+<h3 id="fun_get_lioaa">fun_get_lioaa</h3>
 
 <pre class="description">
 Get a list value by its index.  If the index is invalid, the default value is returned when specified, else a warning is generated. You can use negative index values. Index -1 gets the last element. It is short hand for len - 1. Index -2 is len - 2, etc.
@@ -454,7 +455,7 @@ a = teas[0]
 func fun_get_lioaa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_get_dsoaa>fun_get_dsoaa</h3>
+<h3 id="fun_get_dsoaa">fun_get_dsoaa</h3>
 
 <pre class="description">
 Get a dictionary value by its key.  If the key doesn't exist, the default value is returned if specified, else a warning is generated.
@@ -485,7 +486,7 @@ d.tea => "Earl Grey"
 func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_if0_iaoaa>fun_if0_iaoaa</h3>
+<h3 id="fun_if0_iaoaa">fun_if0_iaoaa</h3>
 
 <pre class="description">
 If the condition is 0, return the second argument, else return the third argument.  You can use any type for the condition.  The condition is 0 for strings, lists and dictionaries when their length is 0.
@@ -539,7 +540,7 @@ if0(c, warn("got zero value"))
 func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_if_baoaa>fun_if_baoaa</h3>
+<h3 id="fun_if_baoaa">fun_if_baoaa</h3>
 
 <pre class="description">
 If the condition is true, return the second argument, else return the third argument.
@@ -576,7 +577,7 @@ if(c, return("skip"))
 func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_add_iii>fun_add_iii</h3>
+<h3 id="fun_add_iii">fun_add_iii</h3>
 
 <pre class="description">
 Add two integers. A warning is generated on overflow.
@@ -598,7 +599,7 @@ add(-2, -5) => -7
 func fun_add_iii(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_add_fff>fun_add_fff</h3>
+<h3 id="fun_add_fff">fun_add_fff</h3>
 
 <pre class="description">
 Add two floats. A warning is generated on overflow.
@@ -619,7 +620,7 @@ add(3.2, -2.2) => 1.0
 func fun_add_fff(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_sub_iii>fun_sub_iii</h3>
+<h3 id="fun_sub_iii">fun_sub_iii</h3>
 
 <pre class="description">
 Subtract two integers. A warning is generated on overflow.
@@ -641,7 +642,7 @@ add(1, 5) => -4
 func fun_sub_iii(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_sub_fff>fun_sub_fff</h3>
+<h3 id="fun_sub_fff">fun_sub_fff</h3>
 
 <pre class="description">
 Subtract two floats. A warning is generated on overflow.
@@ -662,7 +663,7 @@ sub(1.0, 2.2) => -1.2
 func fun_sub_fff(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_exists_dsb>fun_exists_dsb</h3>
+<h3 id="fun_exists_dsb">fun_exists_dsb</h3>
 
 <pre class="description">
 Determine whether a key exists in a dictionary. Return true when it exists, else false.
@@ -684,7 +685,7 @@ exists(d, "coffee") => false
 func fun_exists_dsb(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_case_iloaa>fun_case_iloaa</h3>
+<h3 id="fun_case_iloaa">fun_case_iloaa</h3>
 
 <pre class="description">
 Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
@@ -719,7 +720,7 @@ case(3, cases, "wine") => "wine"
 func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_case_sloaa>fun_case_sloaa</h3>
+<h3 id="fun_case_sloaa">fun_case_sloaa</h3>
 
 <pre class="description">
 Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
@@ -753,7 +754,7 @@ case("bunch", cases, "other") => "other"
 func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=parseversion>parseVersion</h3>
+<h3 id="parseVersion">parseVersion</h3>
 
 <pre class="description">
 Parse a StaticTea version number and return its three components.
@@ -763,7 +764,7 @@ Parse a StaticTea version number and return its three components.
 func parseVersion(version: string): Option[(int, int, int)]
 </pre>
 
-<h3 id=fun_cmpversion_ssi>fun_cmpVersion_ssi</h3>
+<h3 id="fun_cmpVersion_ssi">fun_cmpVersion_ssi</h3>
 
 <pre class="description">
 Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
@@ -789,7 +790,7 @@ cmpVersion("1.2.5", "1.2.5") => 0
 func fun_cmpVersion_ssi(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_float_if>fun_float_if</h3>
+<h3 id="fun_float_if">fun_float_if</h3>
 
 <pre class="description">
 Create a float from an int.
@@ -810,7 +811,7 @@ float(-33) => -33.0
 func fun_float_if(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_float_sf>fun_float_sf</h3>
+<h3 id="fun_float_sf">fun_float_sf</h3>
 
 <pre class="description">
 Create a float from a number string.
@@ -832,7 +833,7 @@ float("33") => 33.0
 func fun_float_sf(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_float_saa>fun_float_saa</h3>
+<h3 id="fun_float_saa">fun_float_saa</h3>
 
 <pre class="description">
 Create a float from a number string. If the string is not a number, return the default.
@@ -853,7 +854,7 @@ float("notnum", "nan") => nan
 func fun_float_saa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_int_fosi>fun_int_fosi</h3>
+<h3 id="fun_int_fosi">fun_int_fosi</h3>
 
 <pre class="description">
 Create an int from a float.
@@ -890,7 +891,7 @@ int(-6.3456, "truncate") => -6
 func fun_int_fosi(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_int_sosi>fun_int_sosi</h3>
+<h3 id="fun_int_sosi">fun_int_sosi</h3>
 
 <pre class="description">
 Create an int from a number string.
@@ -927,7 +928,7 @@ int("-6.3456", "truncate") => -6
 func fun_int_sosi(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_int_ssaa>fun_int_ssaa</h3>
+<h3 id="fun_int_ssaa">fun_int_ssaa</h3>
 
 <pre class="description">
 Create an int from a number string. If the string is not a number, return the default value.
@@ -955,7 +956,7 @@ int("notnum", "round", "nan") => nan
 func fun_int_ssaa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=if0condition>if0Condition</h3>
+<h3 id="if0Condition">if0Condition</h3>
 
 <pre class="description">
 Convert the value to a boolean.
@@ -965,7 +966,7 @@ Convert the value to a boolean.
 func if0Condition(cond: Value): bool
 </pre>
 
-<h3 id=fun_bool_ab>fun_bool_ab</h3>
+<h3 id="fun_bool_ab">fun_bool_ab</h3>
 
 <pre class="description">
 Create an bool from a value.
@@ -1005,7 +1006,7 @@ bool(dict("tea", 2)) => true
 func fun_bool_ab(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_find_ssoaa>fun_find_ssoaa</h3>
+<h3 id="fun_find_ssoaa">fun_find_ssoaa</h3>
 
 <pre class="description">
 Find the position of a substring in a string.  When the substring is not found, return an optional default value.  A warning is generated when the substring is missing and you don't specify a default value.
@@ -1032,7 +1033,7 @@ find(msg, "party", 0) = 0
 func fun_find_ssoaa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_slice_siois>fun_slice_siois</h3>
+<h3 id="fun_slice_siois">fun_slice_siois</h3>
 
 <pre class="description">
 Extract a substring from a string by its position and length. You pass the string, the substring's start index and its length.  The length is optional. When not specified, the slice returns the characters from the start to the end of the string.
@@ -1056,7 +1057,7 @@ slice("añyóng", 0, 3) => "añy"
 func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_dup_sis>fun_dup_sis</h3>
+<h3 id="fun_dup_sis">fun_dup_sis</h3>
 
 <pre class="description">
 Duplicate a string x times.  The result is a new string built by concatenating the string to itself the specified number of times.
@@ -1080,7 +1081,7 @@ dup("", 3) => ""
 func fun_dup_sis(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_dict_old>fun_dict_old</h3>
+<h3 id="fun_dict_old">fun_dict_old</h3>
 
 <pre class="description">
 Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
@@ -1103,7 +1104,7 @@ dict(["a", 5, "b", 33, "c", 0]) =>
 func fun_dict_old(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_list_al>fun_list_al</h3>
+<h3 id="fun_list_al">fun_list_al</h3>
 
 <pre class="description">
 Create a list of variables. You can also create a list with brackets.
@@ -1130,7 +1131,7 @@ a = ["a", 5, "b"]
 func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_listloop_lapoab>fun_listLoop_lapoab</h3>
+<h3 id="fun_listLoop_lapoab">fun_listLoop_lapoab</h3>
 
 <pre class="description">
 Loop over items in a list and fill in a container. A callback function is called for each item in the list and it decides what goes in the container.
@@ -1176,7 +1177,7 @@ b5 = func(ix: int, value: int, container: list) bool
 func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_replace_siiss>fun_replace_siiss</h3>
+<h3 id="fun_replace_siiss">fun_replace_siiss</h3>
 
 <pre class="description">
 Replace a substring specified by its position and length with another string.  You can use the function to insert and append to a string as well.
@@ -1240,7 +1241,7 @@ replace("", 0, 0, "abcd") => abcd
 func fun_replace_siiss(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_replacere_sls>fun_replaceRe_sls</h3>
+<h3 id="fun_replaceRe_sls">fun_replaceRe_sls</h3>
 
 <pre class="description">
 Replace multiple parts of a string using regular expressions.
@@ -1268,7 +1269,7 @@ website: https://regex101.com/
 func fun_replaceRe_sls(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=parsepath>parsePath</h3>
+<h3 id="parsePath">parsePath</h3>
 
 <pre class="description">
 Parse the given file path into its component pieces.
@@ -1278,7 +1279,7 @@ Parse the given file path into its component pieces.
 func parsePath(path: string; separator = '/'): PathComponents
 </pre>
 
-<h3 id=fun_path_sosd>fun_path_sosd</h3>
+<h3 id="fun_path_sosd">fun_path_sosd</h3>
 
 <pre class="description">
 Split a file path into its component pieces. Return a dictionary with the filename, basename, extension and directory.
@@ -1314,7 +1315,7 @@ path("src\functions.nim", "\") => {
 func fun_path_sosd(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_lower_ss>fun_lower_ss</h3>
+<h3 id="fun_lower_ss">fun_lower_ss</h3>
 
 <pre class="description">
 Lowercase a string.
@@ -1336,7 +1337,7 @@ lower("TEĀ") => "teā"
 func fun_lower_ss(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_keys_dl>fun_keys_dl</h3>
+<h3 id="fun_keys_dl">fun_keys_dl</h3>
 
 <pre class="description">
 Create a list from the keys in a dictionary.
@@ -1358,7 +1359,7 @@ values(d) => [1, 2, 3]
 func fun_keys_dl(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_values_dl>fun_values_dl</h3>
+<h3 id="fun_values_dl">fun_values_dl</h3>
 
 <pre class="description">
 Create a list out of the values in the specified dictionary.
@@ -1380,7 +1381,7 @@ values(d) => ["apple", 2, 3]
 func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_sort_lsosl>fun_sort_lsosl</h3>
+<h3 id="fun_sort_lsosl">fun_sort_lsosl</h3>
 
 <pre class="description">
 Sort a list of values of the same type.  The values are ints, floats, or strings.
@@ -1416,7 +1417,7 @@ sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
 func fun_sort_lsosl(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_sort_lssil>fun_sort_lssil</h3>
+<h3 id="fun_sort_lssil">fun_sort_lssil</h3>
 
 <pre class="description">
 Sort a list of lists.
@@ -1449,7 +1450,7 @@ sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
 func fun_sort_lssil(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_sort_lsssl>fun_sort_lsssl</h3>
+<h3 id="fun_sort_lsssl">fun_sort_lsssl</h3>
 
 <pre class="description">
 Sort a list of dictionaries.
@@ -1482,7 +1483,7 @@ sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 func fun_sort_lsssl(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_anchors_lsl>fun_anchors_lsl</h3>
+<h3 id="fun_anchors_lsl">fun_anchors_lsl</h3>
 
 <pre class="description">
 Create anchor names from heading names. Use it for HTML class names or Github markdown internal links. It handles duplicate heading names.
@@ -1509,7 +1510,7 @@ anchores(list, "github") =>
 func fun_anchors_lsl(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_type_as>fun_type_as</h3>
+<h3 id="fun_type_as">fun_type_as</h3>
 
 <pre class="description">
 Return the argument type, one of: int, float, string, list, dict, bool or func.
@@ -1535,7 +1536,7 @@ type(f.cmp[0]) => "func"
 func fun_type_as(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_joinpath_loss>fun_joinPath_loss</h3>
+<h3 id="fun_joinPath_loss">fun_joinPath_loss</h3>
 
 <pre class="description">
 Join the path components with a path separator.
@@ -1580,7 +1581,7 @@ joinPath(["/", "tea"]) =>
 func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_join_lsois>fun_join_lsois</h3>
+<h3 id="fun_join_lsois">fun_join_lsois</h3>
 
 <pre class="description">
 Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
@@ -1607,7 +1608,7 @@ join(["a", "", "c"], "|", true) => "a|c"
 func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_warn_ss>fun_warn_ss</h3>
+<h3 id="fun_warn_ss">fun_warn_ss</h3>
 
 <pre class="description">
 Return a warning message and skip the current statement. You can call the warn function without an assignment.
@@ -1633,7 +1634,7 @@ warn("always warn")
 func fun_warn_ss(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_log_ss>fun_log_ss</h3>
+<h3 id="fun_log_ss">fun_log_ss</h3>
 
 <pre class="description">
 Log a message to the log file.  You can call the log function without an assignment.
@@ -1659,7 +1660,7 @@ log("always log")
 func fun_log_ss(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_return_aa>fun_return_aa</h3>
+<h3 id="fun_return_aa">fun_return_aa</h3>
 
 <pre class="description">
 Return is a special function that returns the value passed in and has has side effects.
@@ -1709,7 +1710,7 @@ output:
 func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_string_aoss>fun_string_aoss</h3>
+<h3 id="fun_string_aoss">fun_string_aoss</h3>
 
 <pre class="description">
 Convert a variable to a string. You specify the variable and optionally the type of output you want.
@@ -1776,7 +1777,7 @@ y = 2
 func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_string_sds>fun_string_sds</h3>
+<h3 id="fun_string_sds">fun_string_sds</h3>
 
 <pre class="description">
 Convert the dictionary variable to dot names. You specify the name of the dictionary and the dict variable.
@@ -1801,7 +1802,7 @@ teas.z.a = 8
 func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_format_ss>fun_format_ss</h3>
+<h3 id="fun_format_ss">fun_format_ss</h3>
 
 <pre class="description">
 Format a string using replacement variables similar to a replacement block. To enter a left bracket use two in a row.
@@ -1833,7 +1834,7 @@ str => "use two { to get one"
 func fun_format_ss(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_func_sp>fun_func_sp</h3>
+<h3 id="fun_func_sp">fun_func_sp</h3>
 
 <pre class="description">
 Define a function.
@@ -1858,7 +1859,7 @@ mycmp = func(numStr1: string, numStr2: string) int
 func fun_func_sp(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_functiondetails_pd>fun_functionDetails_pd</h3>
+<h3 id="fun_functionDetails_pd">fun_functionDetails_pd</h3>
 
 <pre class="description">
 Return the function details in a dictionary.
@@ -1896,7 +1897,7 @@ fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]
 func fun_functionDetails_pd(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_startswith_ssb>fun_startsWith_ssb</h3>
+<h3 id="fun_startsWith_ssb">fun_startsWith_ssb</h3>
 
 <pre class="description">
 Check whether a strings starts with the given prefix. Return true when it does, else false.
@@ -1920,7 +1921,7 @@ b => false
 func fun_startsWith_ssb(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_not_bb>fun_not_bb</h3>
+<h3 id="fun_not_bb">fun_not_bb</h3>
 
 <pre class="description">
 Boolean not.
@@ -1941,7 +1942,7 @@ not(false) => true
 func fun_not_bb(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_and_bbb>fun_and_bbb</h3>
+<h3 id="fun_and_bbb">fun_and_bbb</h3>
 
 <pre class="description">
 Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
@@ -1965,7 +1966,7 @@ and(false, warn("not hit")) => false
 func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_or_bbb>fun_or_bbb</h3>
+<h3 id="fun_or_bbb">fun_or_bbb</h3>
 
 <pre class="description">
 Boolean OR with short circuit. If the first argument is true, the second argument is not evaluated.
@@ -1989,7 +1990,7 @@ or(true, warn("not hit")) => true
 func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_eq_iib>fun_eq_iib</h3>
+<h3 id="fun_eq_iib">fun_eq_iib</h3>
 
 <pre class="description">
 Return true when the two ints are equal.
@@ -2010,7 +2011,7 @@ eq(2, 3) => false
 func fun_eq_iib(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_eq_ffb>fun_eq_ffb</h3>
+<h3 id="fun_eq_ffb">fun_eq_ffb</h3>
 
 <pre class="description">
 Return true when two floats are equal.
@@ -2031,7 +2032,7 @@ eq(1.2, 3.2) => false
 func fun_eq_ffb(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_eq_ssb>fun_eq_ssb</h3>
+<h3 id="fun_eq_ssb">fun_eq_ssb</h3>
 
 <pre class="description">
 Return true when two strings are equal.  See cmp function for case insensitive compare.
@@ -2052,7 +2053,7 @@ eq("1.2", "3.2") => false
 func fun_eq_ssb(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_ne_iib>fun_ne_iib</h3>
+<h3 id="fun_ne_iib">fun_ne_iib</h3>
 
 <pre class="description">
 Return true when two ints are not equal.
@@ -2073,7 +2074,7 @@ ne(2, 3) => true
 func fun_ne_iib(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_ne_ffb>fun_ne_ffb</h3>
+<h3 id="fun_ne_ffb">fun_ne_ffb</h3>
 
 <pre class="description">
 Return true when two floats are not equal.
@@ -2094,7 +2095,7 @@ ne(1.2, 3.2) => true
 func fun_ne_ffb(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_ne_ssb>fun_ne_ssb</h3>
+<h3 id="fun_ne_ssb">fun_ne_ssb</h3>
 
 <pre class="description">
 Return true when two strings are not equal.
@@ -2115,7 +2116,7 @@ ne("earl", "grey") => true
 func fun_ne_ssb(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_gt_iib>fun_gt_iib</h3>
+<h3 id="fun_gt_iib">fun_gt_iib</h3>
 
 <pre class="description">
 Return true when an int is greater then another int.
@@ -2136,7 +2137,7 @@ gt(3, 2) => true
 func fun_gt_iib(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_gt_ffb>fun_gt_ffb</h3>
+<h3 id="fun_gt_ffb">fun_gt_ffb</h3>
 
 <pre class="description">
 Return true when one float is greater than another float.
@@ -2157,7 +2158,7 @@ gt(3.1, 2.5) => true
 func fun_gt_ffb(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_gte_iib>fun_gte_iib</h3>
+<h3 id="fun_gte_iib">fun_gte_iib</h3>
 
 <pre class="description">
 Return true when an int is greater then or equal to another int.
@@ -2178,7 +2179,7 @@ gte(3, 3) => true
 func fun_gte_iib(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_gte_ffb>fun_gte_ffb</h3>
+<h3 id="fun_gte_ffb">fun_gte_ffb</h3>
 
 <pre class="description">
 Return true when a float is greater than or equal to another float.
@@ -2199,7 +2200,7 @@ gte(3.1, 3.1) => true
 func fun_gte_ffb(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_lt_iib>fun_lt_iib</h3>
+<h3 id="fun_lt_iib">fun_lt_iib</h3>
 
 <pre class="description">
 Return true when an int is less than another int.
@@ -2220,7 +2221,7 @@ gt(3, 2) => false
 func fun_lt_iib(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_lt_ffb>fun_lt_ffb</h3>
+<h3 id="fun_lt_ffb">fun_lt_ffb</h3>
 
 <pre class="description">
 Return true when a float is less then another float.
@@ -2241,7 +2242,7 @@ lt(3.1, 2.5) => false
 func fun_lt_ffb(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_lte_iib>fun_lte_iib</h3>
+<h3 id="fun_lte_iib">fun_lte_iib</h3>
 
 <pre class="description">
 Return true when an int is less than or equal to another int.
@@ -2263,7 +2264,7 @@ lte(4, 3) => false
 func fun_lte_iib(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_lte_ffb>fun_lte_ffb</h3>
+<h3 id="fun_lte_ffb">fun_lte_ffb</h3>
 
 <pre class="description">
 Return true when a float is less than or equal to another float.
@@ -2285,7 +2286,7 @@ lte(4.0, 3.0) => false
 func fun_lte_ffb(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=fun_readjson_sa>fun_readJson_sa</h3>
+<h3 id="fun_readJson_sa">fun_readJson_sa</h3>
 
 <pre class="description">
 Convert a JSON string to a variable.
@@ -2309,7 +2310,7 @@ d = readJson("{"a":1, "b": 2}")
 func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=functionsdict>functionsDict</h3>
+<h3 id="functionsDict">functionsDict</h3>
 
 <pre class="description">
 Maps a built-in function name to a function pointer you can call.
@@ -2319,7 +2320,7 @@ Maps a built-in function name to a function pointer you can call.
 functionsDict = newTable(32)
 </pre>
 
-<h3 id=builtininfo>BuiltInInfo</h3>
+<h3 id="BuiltInInfo">BuiltInInfo</h3>
 
 <pre class="description">
 The built-in function information.
@@ -2337,7 +2338,7 @@ BuiltInInfo = object
 
 </pre>
 
-<h3 id=newbuiltininfo>newBuiltInInfo</h3>
+<h3 id="newBuiltInInfo">newBuiltInInfo</h3>
 
 <pre class="description">
 Return a BuiltInInfo object.
@@ -2347,7 +2348,7 @@ Return a BuiltInInfo object.
 func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): BuiltInInfo
 </pre>
 
-<h3 id=functionslist>functionsList</h3>
+<h3 id="functionsList">functionsList</h3>
 
 <pre class="description">
 Dynamically generated sorted list of built-in functions. Each line contains the nim function name, its doc comment, and the starting line number.  See templates/dynamicFuncList.nim
@@ -2591,7 +2592,7 @@ Examples:
 dict() =>
 </pre>
 
-<h3 id=functionstarts>functionStarts</h3>
+<h3 id="functionStarts">functionStarts</h3>
 
 <pre class="description">
 Dynamically generated array of starting line numbers for each built-in function in the functions.nim file.
@@ -2607,7 +2608,7 @@ functionStarts = [688, 664, 1844, 2368, 1109, 782, 815, 352, 331, 373, 859, 406,
                   2127, 2213, 735, 711, 1882, 1630, 2021]
 </pre>
 
-<h3 id=getbestfunction>getBestFunction</h3>
+<h3 id="getBestFunction">getBestFunction</h3>
 
 <pre class="description">
 Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
@@ -2617,7 +2618,7 @@ Given a function variable or a list of function variables and a list of argument
 proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr
 </pre>
 
-<h3 id=splitfuncname>splitFuncName</h3>
+<h3 id="splitFuncName">splitFuncName</h3>
 
 <pre class="description">
 Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".
@@ -2627,7 +2628,7 @@ Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "f
 func splitFuncName(funcName: string): (string, string)
 </pre>
 
-<h3 id=makefuncdictionary>makeFuncDictionary</h3>
+<h3 id="makeFuncDictionary">makeFuncDictionary</h3>
 
 <pre class="description">
 Create the f dictionary from the built in functions.
@@ -2637,7 +2638,7 @@ Create the f dictionary from the built in functions.
 proc makeFuncDictionary(): VarsDict
 </pre>
 
-<h3 id=funcsvardict>funcsVarDict</h3>
+<h3 id="funcsVarDict">funcsVarDict</h3>
 
 <pre class="description">
 The f dictionary of built-in functions.

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>parseCmdLine.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>parseCmdLine.nim</h1>
 
@@ -37,21 +40,21 @@ Nim source code: <a href="../../src/parseCmdLine.nim">parseCmdLine.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#lineparts">LineParts</a> &mdash; LineParts holds parsed components of a line.</li>
-<li>type:  <a href="#linepartsor">LinePartsOr</a> &mdash; The line parts or a warning.</li>
-<li>type:  <a href="#cmdlines">CmdLines</a> &mdash; The collected command lines and their parts.</li>
-<li>type:  <a href="#extralinekind">ExtraLineKind</a> &mdash; The ExtraLine type.</li>
-<li>type:  <a href="#extraline">ExtraLine</a> &mdash; The extra line and its type.</li>
-<li> <a href="#newnormalline">newNormalLine</a> &mdash; Create a normal ExtraLine.</li>
-<li> <a href="#newnoline">newNoLine</a> &mdash; Create a no line ExtraLine.</li>
-<li> <a href="#newoutoflines">newOutOfLines</a> &mdash; Create an out of lines ExtraLine.</li>
-<li> <a href="#newlinepartsor">newLinePartsOr</a> &mdash; Return a new LinePartsOr object containing a warning.</li>
-<li> <a href="#newlinepartsor-1">newLinePartsOr</a> &mdash; Return a new LinePartsOr object containing a LineParts object.</li>
-<li> <a href="#getcodelength">getCodeLength</a> &mdash; Return the length of the code in the line.</li>
-<li> <a href="#parsecmdline">parseCmdLine</a> &mdash; Parse the line and return its parts.</li>
+<li>type:  <a href="#LineParts">LineParts</a> &mdash; LineParts holds parsed components of a line.</li>
+<li>type:  <a href="#LinePartsOr">LinePartsOr</a> &mdash; The line parts or a warning.</li>
+<li>type:  <a href="#CmdLines">CmdLines</a> &mdash; The collected command lines and their parts.</li>
+<li>type:  <a href="#ExtraLineKind">ExtraLineKind</a> &mdash; The ExtraLine type.</li>
+<li>type:  <a href="#ExtraLine">ExtraLine</a> &mdash; The extra line and its type.</li>
+<li> <a href="#newNormalLine">newNormalLine</a> &mdash; Create a normal ExtraLine.</li>
+<li> <a href="#newNoLine">newNoLine</a> &mdash; Create a no line ExtraLine.</li>
+<li> <a href="#newOutOfLines">newOutOfLines</a> &mdash; Create an out of lines ExtraLine.</li>
+<li> <a href="#newLinePartsOr">newLinePartsOr</a> &mdash; Return a new LinePartsOr object containing a warning.</li>
+<li> <a href="#newLinePartsOr-1">newLinePartsOr</a> &mdash; Return a new LinePartsOr object containing a LineParts object.</li>
+<li> <a href="#getCodeLength">getCodeLength</a> &mdash; Return the length of the code in the line.</li>
+<li> <a href="#parseCmdLine">parseCmdLine</a> &mdash; Parse the line and return its parts.</li>
 </ul>
 
-<h3 id=lineparts>LineParts</h3>
+<h3 id="LineParts">LineParts</h3>
 
 <pre class="description">
 LineParts holds parsed components of a line.
@@ -84,7 +87,7 @@ LineParts = object
 
 </pre>
 
-<h3 id=linepartsor>LinePartsOr</h3>
+<h3 id="LinePartsOr">LinePartsOr</h3>
 
 <pre class="description">
 The line parts or a warning.
@@ -94,7 +97,7 @@ The line parts or a warning.
 LinePartsOr = OpResultWarn[LineParts]
 </pre>
 
-<h3 id=cmdlines>CmdLines</h3>
+<h3 id="CmdLines">CmdLines</h3>
 
 <pre class="description">
 The collected command lines and their parts.
@@ -107,7 +110,7 @@ CmdLines = object
 
 </pre>
 
-<h3 id=extralinekind>ExtraLineKind</h3>
+<h3 id="ExtraLineKind">ExtraLineKind</h3>
 
 <pre class="description">
 The ExtraLine type.
@@ -122,7 +125,7 @@ ExtraLineKind = enum
   elkNoLine, elkOutOfLines, elkNormalLine
 </pre>
 
-<h3 id=extraline>ExtraLine</h3>
+<h3 id="ExtraLine">ExtraLine</h3>
 
 <pre class="description">
 The extra line and its type. The line is empty except for the elkNormalLine type.
@@ -135,7 +138,7 @@ ExtraLine = object
 
 </pre>
 
-<h3 id=newnormalline>newNormalLine</h3>
+<h3 id="newNormalLine">newNormalLine</h3>
 
 <pre class="description">
 Create a normal ExtraLine.
@@ -145,7 +148,7 @@ Create a normal ExtraLine.
 func newNormalLine(line: string): ExtraLine
 </pre>
 
-<h3 id=newnoline>newNoLine</h3>
+<h3 id="newNoLine">newNoLine</h3>
 
 <pre class="description">
 Create a no line ExtraLine.
@@ -155,7 +158,7 @@ Create a no line ExtraLine.
 func newNoLine(): ExtraLine
 </pre>
 
-<h3 id=newoutoflines>newOutOfLines</h3>
+<h3 id="newOutOfLines">newOutOfLines</h3>
 
 <pre class="description">
 Create an out of lines ExtraLine.
@@ -165,7 +168,7 @@ Create an out of lines ExtraLine.
 func newOutOfLines(): ExtraLine
 </pre>
 
-<h3 id=newlinepartsor>newLinePartsOr</h3>
+<h3 id="newLinePartsOr">newLinePartsOr</h3>
 
 <pre class="description">
 Return a new LinePartsOr object containing a warning.
@@ -175,7 +178,7 @@ Return a new LinePartsOr object containing a warning.
 func newLinePartsOr(warning: MessageId; p1: string = ""; pos = 0): LinePartsOr
 </pre>
 
-<h3 id=newlinepartsor-1>newLinePartsOr</h3>
+<h3 id="newLinePartsOr-1">newLinePartsOr</h3>
 
 <pre class="description">
 Return a new LinePartsOr object containing a LineParts object.
@@ -185,7 +188,7 @@ Return a new LinePartsOr object containing a LineParts object.
 func newLinePartsOr(lineParts: LineParts): LinePartsOr
 </pre>
 
-<h3 id=getcodelength>getCodeLength</h3>
+<h3 id="getCodeLength">getCodeLength</h3>
 
 <pre class="description">
 Return the length of the code in the line.  The code starts at codeStart and cannot exceed the given length. The code ends when there is a comment (a pound sign), or the end is reached. The input length is returned on errors.
@@ -195,7 +198,7 @@ Return the length of the code in the line.  The code starts at codeStart and can
 func getCodeLength(line: string; codeStart: Natural; length: Natural): Natural
 </pre>
 
-<h3 id=parsecmdline>parseCmdLine</h3>
+<h3 id="parseCmdLine">parseCmdLine</h3>
 
 <pre class="description">
 Parse the line and return its parts. Return quickly when not a command line.

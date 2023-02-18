@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>updateTemplate.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>updateTemplate.nim</h1>
 
@@ -37,12 +40,12 @@ Nim source code: <a href="../../src/updateTemplate.nim">updateTemplate.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li> <a href="#collectreplacecommand">collectReplaceCommand</a> &mdash; Collect the replace commands.</li>
-<li> <a href="#updatetemplate">updateTemplate</a> &mdash; Update the template and return 0 on success.</li>
-<li> <a href="#updatetemplatetop">updateTemplateTop</a> &mdash; Update the template.</li>
+<li> <a href="#collectReplaceCommand">collectReplaceCommand</a> &mdash; Collect the replace commands.</li>
+<li> <a href="#updateTemplate">updateTemplate</a> &mdash; Update the template and return 0 on success.</li>
+<li> <a href="#updateTemplateTop">updateTemplateTop</a> &mdash; Update the template.</li>
 </ul>
 
-<h3 id=collectreplacecommand>collectReplaceCommand</h3>
+<h3 id="collectReplaceCommand">collectReplaceCommand</h3>
 
 <pre class="description">
 Collect the replace commands.  Read template lines and write out non-command lines. When a replace command is found, return its lines.  This includes the command line and its continue lines. On input extraLine is the first line to use.  On exit extraLine is the line that caused the collection to stop which is commonly the first replacement block line.
@@ -53,7 +56,7 @@ proc collectReplaceCommand(env: var Env; lb: var LineBuffer;
                            prepostTable: PrepostTable; extraLine: var ExtraLine): CmdLines
 </pre>
 
-<h3 id=updatetemplate>updateTemplate</h3>
+<h3 id="updateTemplate">updateTemplate</h3>
 
 <pre class="description">
 Update the template and return 0 on success. Return 1 if a warning messages was written while processing the template.
@@ -63,7 +66,7 @@ Update the template and return 0 on success. Return 1 if a warning messages was 
 proc updateTemplate(env: var Env; args: Args)
 </pre>
 
-<h3 id=updatetemplatetop>updateTemplateTop</h3>
+<h3 id="updateTemplateTop">updateTemplateTop</h3>
 
 <pre class="description">
 Update the template.

@@ -89,7 +89,8 @@ MessageId = enum
   wMissingStateVar, wCallbackListParam, wStateRequired, wReturnArgument,
   wVarStartsWithLetter, wVarContainsChars, wVarEndsWith, wVarMaximumLength,
   wNotFuncVariable, wImmutableDict, wImmutableList, wNewListInDict,
-  wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg
+  wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg,
+  wInvalidAnchorType
 ```
 
 # Messages
@@ -255,7 +256,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "The index value must be a variable name or literal string.",
     "The index variable value is not a valid variable name.",
     "The index value is not a string.",
-    "A two parameter IF function cannot be used as an argument."]
+    "A two parameter IF function cannot be used as an argument.",
+    "Invalid anchor type, expected html or github."]
 ```
 
 # WarningData

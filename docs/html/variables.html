@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>variables.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>variables.nim</h1>
 
@@ -44,26 +47,26 @@ Nim source code: <a href="../../src/variables.nim">variables.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>const:  <a href="#outputvalues">outputValues</a> &mdash; Where the replacement block's output goes.</li>
-<li>type:  <a href="#operator">Operator</a> &mdash; The statement operator types.</li>
-<li>type:  <a href="#variabledata">VariableData</a> &mdash; The VariableData object holds the variable name, operator,
+<li>const:  <a href="#outputValues">outputValues</a> &mdash; Where the replacement block's output goes.</li>
+<li>type:  <a href="#Operator">Operator</a> &mdash; The statement operator types.</li>
+<li>type:  <a href="#VariableData">VariableData</a> &mdash; The VariableData object holds the variable name, operator,
 and value which is the result of running a statement.</li>
-<li>type:  <a href="#variabledataor">VariableDataOr</a> &mdash; A VariableData object or a warning.</li>
-<li>type:  <a href="#noprefixdict">NoPrefixDict</a> &mdash; The variable letter prefix to use when it's missing.</li>
-<li> <a href="#newvariabledataor">newVariableDataOr</a> &mdash; Create an object containing a warning.</li>
-<li> <a href="#newvariabledataor-1">newVariableDataOr</a> &mdash; Create an object containing a warning.</li>
-<li> <a href="#newvariabledataor-2">newVariableDataOr</a> &mdash; Create an object containing a VariableData object.</li>
-<li> <a href="#">`$`</a> &mdash; Return a string representation of VariableData.</li>
-<li> <a href="#startvariables">startVariables</a> &mdash; Create an empty variables object in its initial state.</li>
-<li> <a href="#getteavarintdefault">getTeaVarIntDefault</a> &mdash; Return the int value of one of the tea dictionary integer items.</li>
-<li> <a href="#getteavarstringdefault">getTeaVarStringDefault</a> &mdash; Return the string value of one of the tea dictionary string items.</li>
-<li> <a href="#resetvariables">resetVariables</a> &mdash; Clear the local variables and reset the tea variables for running a command.</li>
-<li> <a href="#assignvariable">assignVariable</a> &mdash; Assign the variable the given value if possible, else return a warning.</li>
-<li> <a href="#assignvariable-1">assignVariable</a> &mdash; Assign the variable the given value if possible, else return a warning.</li>
-<li> <a href="#getvariable">getVariable</a> &mdash; Look up the variable and return its value when found, else return a warning.</li>
+<li>type:  <a href="#VariableDataOr">VariableDataOr</a> &mdash; A VariableData object or a warning.</li>
+<li>type:  <a href="#NoPrefixDict">NoPrefixDict</a> &mdash; The variable letter prefix to use when it's missing.</li>
+<li> <a href="#newVariableDataOr">newVariableDataOr</a> &mdash; Create an object containing a warning.</li>
+<li> <a href="#newVariableDataOr-1">newVariableDataOr</a> &mdash; Create an object containing a warning.</li>
+<li> <a href="#newVariableDataOr-2">newVariableDataOr</a> &mdash; Create an object containing a VariableData object.</li>
+<li> <a href="#a__">`$`</a> &mdash; Return a string representation of VariableData.</li>
+<li> <a href="#startVariables">startVariables</a> &mdash; Create an empty variables object in its initial state.</li>
+<li> <a href="#getTeaVarIntDefault">getTeaVarIntDefault</a> &mdash; Return the int value of one of the tea dictionary integer items.</li>
+<li> <a href="#getTeaVarStringDefault">getTeaVarStringDefault</a> &mdash; Return the string value of one of the tea dictionary string items.</li>
+<li> <a href="#resetVariables">resetVariables</a> &mdash; Clear the local variables and reset the tea variables for running a command.</li>
+<li> <a href="#assignVariable">assignVariable</a> &mdash; Assign the variable the given value if possible, else return a warning.</li>
+<li> <a href="#assignVariable-1">assignVariable</a> &mdash; Assign the variable the given value if possible, else return a warning.</li>
+<li> <a href="#getVariable">getVariable</a> &mdash; Look up the variable and return its value when found, else return a warning.</li>
 </ul>
 
-<h3 id=outputvalues>outputValues</h3>
+<h3 id="outputValues">outputValues</h3>
 
 <pre class="description">
 Where the replacement block's output goes.
@@ -78,7 +81,7 @@ Where the replacement block's output goes.
 outputValues = ["result", "stdout", "stderr", "log", "skip"]
 </pre>
 
-<h3 id=operator>Operator</h3>
+<h3 id="Operator">Operator</h3>
 
 <pre class="description">
 The statement operator types.
@@ -96,7 +99,7 @@ Operator = enum
   opLog = "log"
 </pre>
 
-<h3 id=variabledata>VariableData</h3>
+<h3 id="VariableData">VariableData</h3>
 
 <pre class="description">
 The VariableData object holds the variable name, operator,
@@ -116,7 +119,7 @@ VariableData = object
 
 </pre>
 
-<h3 id=variabledataor>VariableDataOr</h3>
+<h3 id="VariableDataOr">VariableDataOr</h3>
 
 <pre class="description">
 A VariableData object or a warning.
@@ -126,7 +129,7 @@ A VariableData object or a warning.
 VariableDataOr = OpResultWarn[VariableData]
 </pre>
 
-<h3 id=noprefixdict>NoPrefixDict</h3>
+<h3 id="NoPrefixDict">NoPrefixDict</h3>
 
 <pre class="description">
 The variable letter prefix to use when it's missing.
@@ -140,7 +143,7 @@ NoPrefixDict = enum
   npLocal, npBuiltIn
 </pre>
 
-<h3 id=newvariabledataor>newVariableDataOr</h3>
+<h3 id="newVariableDataOr">newVariableDataOr</h3>
 
 <pre class="description">
 Create an object containing a warning.
@@ -150,7 +153,7 @@ Create an object containing a warning.
 func newVariableDataOr(warning: MessageId; p1 = ""; pos = 0): VariableDataOr
 </pre>
 
-<h3 id=newvariabledataor-1>newVariableDataOr</h3>
+<h3 id="newVariableDataOr-1">newVariableDataOr</h3>
 
 <pre class="description">
 Create an object containing a warning.
@@ -160,7 +163,7 @@ Create an object containing a warning.
 func newVariableDataOr(warningData: WarningData): VariableDataOr
 </pre>
 
-<h3 id=newvariabledataor-2>newVariableDataOr</h3>
+<h3 id="newVariableDataOr-2">newVariableDataOr</h3>
 
 <pre class="description">
 Create an object containing a VariableData object.
@@ -170,7 +173,7 @@ Create an object containing a VariableData object.
 func newVariableDataOr(dotNameStr: string; operator: Operator; value: Value): VariableDataOr
 </pre>
 
-<h3 id=>`$`</h3>
+<h3 id="a__">`$`</h3>
 
 <pre class="description">
 Return a string representation of VariableData.
@@ -180,7 +183,7 @@ Return a string representation of VariableData.
 func `$`(v: VariableData): string
 </pre>
 
-<h3 id=startvariables>startVariables</h3>
+<h3 id="startVariables">startVariables</h3>
 
 <pre class="description">
 Create an empty variables object in its initial state.
@@ -191,7 +194,7 @@ func startVariables(server: VarsDict = nil; args: VarsDict = nil;
                     funcs: VarsDict = nil): Variables
 </pre>
 
-<h3 id=getteavarintdefault>getTeaVarIntDefault</h3>
+<h3 id="getTeaVarIntDefault">getTeaVarIntDefault</h3>
 
 <pre class="description">
 Return the int value of one of the tea dictionary integer items. If the value does not exist, return its default value.
@@ -201,7 +204,7 @@ Return the int value of one of the tea dictionary integer items. If the value do
 func getTeaVarIntDefault(variables: Variables; varName: string): int64
 </pre>
 
-<h3 id=getteavarstringdefault>getTeaVarStringDefault</h3>
+<h3 id="getTeaVarStringDefault">getTeaVarStringDefault</h3>
 
 <pre class="description">
 Return the string value of one of the tea dictionary string items. If the value does not exist, return its default value.
@@ -211,7 +214,7 @@ Return the string value of one of the tea dictionary string items. If the value 
 func getTeaVarStringDefault(variables: Variables; varName: string): string
 </pre>
 
-<h3 id=resetvariables>resetVariables</h3>
+<h3 id="resetVariables">resetVariables</h3>
 
 <pre class="description">
 Clear the local variables and reset the tea variables for running a command.
@@ -221,7 +224,7 @@ Clear the local variables and reset the tea variables for running a command.
 proc resetVariables(variables: var Variables)
 </pre>
 
-<h3 id=assignvariable>assignVariable</h3>
+<h3 id="assignVariable">assignVariable</h3>
 
 <pre class="description">
 Assign the variable the given value if possible, else return a warning.
@@ -232,7 +235,7 @@ proc assignVariable(variables: var Variables; dotNameStr: string; value: Value;
                     operator = opEqual): Option[WarningData]
 </pre>
 
-<h3 id=assignvariable-1>assignVariable</h3>
+<h3 id="assignVariable-1">assignVariable</h3>
 
 <pre class="description">
 Assign the variable the given value if possible, else return a warning.
@@ -243,7 +246,7 @@ proc assignVariable(variables: var Variables; variableData: VariableData): Optio
     WarningData]
 </pre>
 
-<h3 id=getvariable>getVariable</h3>
+<h3 id="getVariable">getVariable</h3>
 
 <pre class="description">
 Look up the variable and return its value when found, else return a warning. When no prefix is specified, look in the noPrefixDict dictionary.

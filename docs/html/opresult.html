@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>opresult.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>opresult.nim</h1>
 
@@ -41,20 +44,20 @@ Nim source code: <a href="../../src/opresult.nim">opresult.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#opresultkind">OpResultKind</a> &mdash; The kind of OpResult object, either a message or a value.</li>
-<li>type:  <a href="#opresult">OpResult</a> &mdash; Contains either a value or a message.</li>
-<li> <a href="#ismessage">isMessage</a> &mdash; Return true when the OpResult object contains a message.</li>
-<li> <a href="#isvalue">isValue</a> &mdash; Return true when the OpResult object contains a value.</li>
-<li> <a href="#">`$`</a> &mdash; Return a string representation of an OpResult object.</li>
-<li>type:  <a href="#opresultwarn">OpResultWarn</a> &mdash; OpResultWarn holds either a value or warning data.</li>
-<li> <a href="#opvaluew">opValueW</a> &mdash; Create a new OpResultWarn object containing a value T.</li>
-<li> <a href="#opmessagew">opMessageW</a> &mdash; Create a new OpResultWarn object containing a warning.</li>
-<li>type:  <a href="#opresultid">OpResultId</a> &mdash; OpResultId holds either a value or a message id.</li>
-<li> <a href="#opvalue">opValue</a> &mdash; Create a new OpResultId object containing a value T.</li>
-<li> <a href="#opmessage">opMessage</a> &mdash; Create a new OpResultId object containing a message id.</li>
+<li>type:  <a href="#OpResultKind">OpResultKind</a> &mdash; The kind of OpResult object, either a message or a value.</li>
+<li>type:  <a href="#OpResult">OpResult</a> &mdash; Contains either a value or a message.</li>
+<li> <a href="#isMessage">isMessage</a> &mdash; Return true when the OpResult object contains a message.</li>
+<li> <a href="#isValue">isValue</a> &mdash; Return true when the OpResult object contains a value.</li>
+<li> <a href="#a__">`$`</a> &mdash; Return a string representation of an OpResult object.</li>
+<li>type:  <a href="#OpResultWarn">OpResultWarn</a> &mdash; OpResultWarn holds either a value or warning data.</li>
+<li> <a href="#opValueW">opValueW</a> &mdash; Create a new OpResultWarn object containing a value T.</li>
+<li> <a href="#opMessageW">opMessageW</a> &mdash; Create a new OpResultWarn object containing a warning.</li>
+<li>type:  <a href="#OpResultId">OpResultId</a> &mdash; OpResultId holds either a value or a message id.</li>
+<li> <a href="#opValue">opValue</a> &mdash; Create a new OpResultId object containing a value T.</li>
+<li> <a href="#opMessage">opMessage</a> &mdash; Create a new OpResultId object containing a message id.</li>
 </ul>
 
-<h3 id=opresultkind>OpResultKind</h3>
+<h3 id="OpResultKind">OpResultKind</h3>
 
 <pre class="description">
 The kind of OpResult object, either a message or a value.
@@ -65,7 +68,7 @@ OpResultKind = enum
   orMessage, orValue
 </pre>
 
-<h3 id=opresult>OpResult</h3>
+<h3 id="OpResult">OpResult</h3>
 
 <pre class="description">
 Contains either a value or a message. Defaults to an empty message.
@@ -83,7 +86,7 @@ OpResult[T; T2] = object
 
 </pre>
 
-<h3 id=ismessage>isMessage</h3>
+<h3 id="isMessage">isMessage</h3>
 
 <pre class="description">
 Return true when the OpResult object contains a message.
@@ -93,7 +96,7 @@ Return true when the OpResult object contains a message.
 func isMessage(opResult: OpResult): bool
 </pre>
 
-<h3 id=isvalue>isValue</h3>
+<h3 id="isValue">isValue</h3>
 
 <pre class="description">
 Return true when the OpResult object contains a value.
@@ -103,7 +106,7 @@ Return true when the OpResult object contains a value.
 func isValue(opResult: OpResult): bool
 </pre>
 
-<h3 id=>`$`</h3>
+<h3 id="a__">`$`</h3>
 
 <pre class="description">
 Return a string representation of an OpResult object.
@@ -113,7 +116,7 @@ Return a string representation of an OpResult object.
 func `$`(opResult: OpResult): string
 </pre>
 
-<h3 id=opresultwarn>OpResultWarn</h3>
+<h3 id="OpResultWarn">OpResultWarn</h3>
 
 <pre class="description">
 OpResultWarn holds either a value or warning data.  It's similar to the Option type but instead of returning nothing, you return a warning that tells why you cannot return the value.
@@ -141,7 +144,7 @@ else:
 OpResultWarn[T] = OpResult[T, WarningData]
 </pre>
 
-<h3 id=opvaluew>opValueW</h3>
+<h3 id="opValueW">opValueW</h3>
 
 <pre class="description">
 Create a new OpResultWarn object containing a value T.
@@ -151,7 +154,7 @@ Create a new OpResultWarn object containing a value T.
 func opValueW[T](value: T): OpResultWarn[T]
 </pre>
 
-<h3 id=opmessagew>opMessageW</h3>
+<h3 id="opMessageW">opMessageW</h3>
 
 <pre class="description">
 Create a new OpResultWarn object containing a warning.
@@ -161,7 +164,7 @@ Create a new OpResultWarn object containing a warning.
 func opMessageW[T](message: WarningData): OpResultWarn[T]
 </pre>
 
-<h3 id=opresultid>OpResultId</h3>
+<h3 id="OpResultId">OpResultId</h3>
 
 <pre class="description">
 OpResultId holds either a value or a message id.  It's similar to
@@ -191,7 +194,7 @@ else:
 OpResultId[T] = OpResult[T, MessageId]
 </pre>
 
-<h3 id=opvalue>opValue</h3>
+<h3 id="opValue">opValue</h3>
 
 <pre class="description">
 Create a new OpResultId object containing a value T.
@@ -201,7 +204,7 @@ Create a new OpResultId object containing a value T.
 func opValue[T](value: T): OpResultId[T]
 </pre>
 
-<h3 id=opmessage>opMessage</h3>
+<h3 id="opMessage">opMessage</h3>
 
 <pre class="description">
 Create a new OpResultId object containing a message id.

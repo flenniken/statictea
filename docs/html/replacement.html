@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>replacement.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>replacement.nim</h1>
 
@@ -61,22 +64,22 @@ Nim source code: <a href="../../src/replacement.nim">replacement.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#replacelinekind">ReplaceLineKind</a> &mdash; Line type returned by yieldReplacementLine.</li>
-<li>type:  <a href="#replaceline">ReplaceLine</a> &mdash; Line information returned by yieldReplacementLine.</li>
-<li> <a href="#newreplaceline">newReplaceLine</a> &mdash; Return a new ReplaceLine object.</li>
-<li> <a href="#">`$`</a> &mdash; Return a string representation of a ReplaceLine object.</li>
-<li> <a href="#stringsegment">stringSegment</a> &mdash; Return a string segment made from the fragment.</li>
-<li> <a href="#varsegment">varSegment</a> &mdash; Return a variable segment made from the dot name.</li>
-<li> <a href="#linetosegments">lineToSegments</a> &mdash; Convert a line to a list of segments.</li>
-<li> <a href="#varsegmentdotname">varSegmentDotName</a> &mdash; Given a variable segment, return its dot name.</li>
-<li> <a href="#writetempsegments">writeTempSegments</a> &mdash; Write the replacement block's stored segments to the result stream with the variables filled in.</li>
-<li> <a href="#alloctempsegments">allocTempSegments</a> &mdash; Create a TempSegments object.</li>
-<li> <a href="#closedeletetempsegments">closeDeleteTempSegments</a> &mdash; Close the TempSegments and delete its backing temporary file.</li>
-<li> <a href="#storelinesegments">storeLineSegments</a> &mdash; Divide the line into segments and write them to the TempSegments' temp file.</li>
-<li> <a href="#yieldreplacementline">yieldReplacementLine</a> &mdash; Yield all the replacement block lines and one line after.</li>
+<li>type:  <a href="#ReplaceLineKind">ReplaceLineKind</a> &mdash; Line type returned by yieldReplacementLine.</li>
+<li>type:  <a href="#ReplaceLine">ReplaceLine</a> &mdash; Line information returned by yieldReplacementLine.</li>
+<li> <a href="#newReplaceLine">newReplaceLine</a> &mdash; Return a new ReplaceLine object.</li>
+<li> <a href="#a__">`$`</a> &mdash; Return a string representation of a ReplaceLine object.</li>
+<li> <a href="#stringSegment">stringSegment</a> &mdash; Return a string segment made from the fragment.</li>
+<li> <a href="#varSegment">varSegment</a> &mdash; Return a variable segment made from the dot name.</li>
+<li> <a href="#lineToSegments">lineToSegments</a> &mdash; Convert a line to a list of segments.</li>
+<li> <a href="#varSegmentDotName">varSegmentDotName</a> &mdash; Given a variable segment, return its dot name.</li>
+<li> <a href="#writeTempSegments">writeTempSegments</a> &mdash; Write the replacement block's stored segments to the result stream with the variables filled in.</li>
+<li> <a href="#allocTempSegments">allocTempSegments</a> &mdash; Create a TempSegments object.</li>
+<li> <a href="#closeDeleteTempSegments">closeDeleteTempSegments</a> &mdash; Close the TempSegments and delete its backing temporary file.</li>
+<li> <a href="#storeLineSegments">storeLineSegments</a> &mdash; Divide the line into segments and write them to the TempSegments' temp file.</li>
+<li> <a href="#yieldReplacementLine">yieldReplacementLine</a> &mdash; Yield all the replacement block lines and one line after.</li>
 </ul>
 
-<h3 id=replacelinekind>ReplaceLineKind</h3>
+<h3 id="ReplaceLineKind">ReplaceLineKind</h3>
 
 <pre class="description">
 Line type returned by yieldReplacementLine.
@@ -92,7 +95,7 @@ ReplaceLineKind = enum
   rlNoLine, rlReplaceLine, rlEndblockLine, rlNormalLine
 </pre>
 
-<h3 id=replaceline>ReplaceLine</h3>
+<h3 id="ReplaceLine">ReplaceLine</h3>
 
 <pre class="description">
 Line information returned by yieldReplacementLine.
@@ -105,7 +108,7 @@ ReplaceLine = object
 
 </pre>
 
-<h3 id=newreplaceline>newReplaceLine</h3>
+<h3 id="newReplaceLine">newReplaceLine</h3>
 
 <pre class="description">
 Return a new ReplaceLine object.
@@ -115,7 +118,7 @@ Return a new ReplaceLine object.
 func newReplaceLine(kind: ReplaceLineKind; line: string): ReplaceLine
 </pre>
 
-<h3 id=>`$`</h3>
+<h3 id="a__">`$`</h3>
 
 <pre class="description">
 Return a string representation of a ReplaceLine object.
@@ -125,7 +128,7 @@ Return a string representation of a ReplaceLine object.
 func `$`(replaceLine: ReplaceLine): string
 </pre>
 
-<h3 id=stringsegment>stringSegment</h3>
+<h3 id="stringSegment">stringSegment</h3>
 
 <pre class="description">
 Return a string segment made from the fragment. AtEnd is true when the fragment ends the line.
@@ -135,7 +138,7 @@ Return a string segment made from the fragment. AtEnd is true when the fragment 
 proc stringSegment(fragment: string; atEnd: bool): string
 </pre>
 
-<h3 id=varsegment>varSegment</h3>
+<h3 id="varSegment">varSegment</h3>
 
 <pre class="description">
 Return a variable segment made from the dot name. AtEnd is true when the bracketed variable ends the line.
@@ -145,7 +148,7 @@ Return a variable segment made from the dot name. AtEnd is true when the bracket
 proc varSegment(dotName: string; atEnd: bool): string
 </pre>
 
-<h3 id=linetosegments>lineToSegments</h3>
+<h3 id="lineToSegments">lineToSegments</h3>
 
 <pre class="description">
 Convert a line to a list of segments. No warnings.
@@ -155,7 +158,7 @@ Convert a line to a list of segments. No warnings.
 proc lineToSegments(line: string): seq[string]
 </pre>
 
-<h3 id=varsegmentdotname>varSegmentDotName</h3>
+<h3 id="varSegmentDotName">varSegmentDotName</h3>
 
 <pre class="description">
 Given a variable segment, return its dot name.
@@ -165,7 +168,7 @@ Given a variable segment, return its dot name.
 func varSegmentDotName(segment: string): string
 </pre>
 
-<h3 id=writetempsegments>writeTempSegments</h3>
+<h3 id="writeTempSegments">writeTempSegments</h3>
 
 <pre class="description">
 Write the replacement block's stored segments to the result stream with the variables filled in.  The lineNum is the beginning line of the replacement block.
@@ -176,7 +179,7 @@ proc writeTempSegments(env: var Env; tempSegments: var TempSegments;
                        lineNum: Natural; variables: Variables)
 </pre>
 
-<h3 id=alloctempsegments>allocTempSegments</h3>
+<h3 id="allocTempSegments">allocTempSegments</h3>
 
 <pre class="description">
 Create a TempSegments object. This reserves memory for a line buffer and creates a backing temp file. Call the closeDeleteTempSegments procedure when done to free the memory and to close and delete the file.
@@ -186,7 +189,7 @@ Create a TempSegments object. This reserves memory for a line buffer and creates
 proc allocTempSegments(env: var Env; lineNum: Natural): Option[TempSegments]
 </pre>
 
-<h3 id=closedeletetempsegments>closeDeleteTempSegments</h3>
+<h3 id="closeDeleteTempSegments">closeDeleteTempSegments</h3>
 
 <pre class="description">
 Close the TempSegments and delete its backing temporary file.
@@ -196,7 +199,7 @@ Close the TempSegments and delete its backing temporary file.
 proc closeDeleteTempSegments(tempSegments: TempSegments)
 </pre>
 
-<h3 id=storelinesegments>storeLineSegments</h3>
+<h3 id="storeLineSegments">storeLineSegments</h3>
 
 <pre class="description">
 Divide the line into segments and write them to the TempSegments' temp file.
@@ -206,7 +209,7 @@ Divide the line into segments and write them to the TempSegments' temp file.
 proc storeLineSegments(env: var Env; tempSegments: TempSegments; line: string)
 </pre>
 
-<h3 id=yieldreplacementline>yieldReplacementLine</h3>
+<h3 id="yieldReplacementLine">yieldReplacementLine</h3>
 
 <pre class="description">
 Yield all the replacement block lines and one line after.

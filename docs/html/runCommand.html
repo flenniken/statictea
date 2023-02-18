@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>runCommand.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>runCommand.nim</h1>
 
@@ -37,74 +40,74 @@ Nim source code: <a href="../../src/runCommand.nim">runCommand.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>const:  <a href="#triplequotes">tripleQuotes</a> &mdash; Triple quotes for building strings.</li>
-<li>const:  <a href="#maxnamelength">maxNameLength</a> &mdash; The maximum length of a variable or dotname.</li>
-<li>type:  <a href="#posor">PosOr</a> &mdash; A position in a string or a message.</li>
-<li>type:  <a href="#specialfunction">SpecialFunction</a> &mdash; The special functions.</li>
-<li>type:  <a href="#specialfunctionor">SpecialFunctionOr</a> &mdash; A SpecialFunction or a warning message.</li>
-<li>type:  <a href="#found">Found</a> &mdash; The line endings found.</li>
-<li>type:  <a href="#linesor">LinesOr</a> &mdash; A list of lines or a warning.</li>
-<li>type:  <a href="#loopcontrol">LoopControl</a> &mdash; Controls whether to output the current replacement block iteration and whether to stop or not.</li>
-<li> <a href="#newlinesor">newLinesOr</a> &mdash; Return a new LinesOr object containing a warning.</li>
-<li> <a href="#newlinesor-1">newLinesOr</a> &mdash; Return a new LinesOr object containing a warning.</li>
-<li> <a href="#newlinesor-2">newLinesOr</a> &mdash; Return a new LinesOr object containing a list of lines.</li>
-<li> <a href="#newposor">newPosOr</a> &mdash; Create a PosOr warning.</li>
-<li> <a href="#newposor-1">newPosOr</a> &mdash; Create a PosOr value.</li>
-<li> <a href="#newspecialfunctionor">newSpecialFunctionOr</a> &mdash; Create a PosOr warning.</li>
-<li> <a href="#newspecialfunctionor-1">newSpecialFunctionOr</a> &mdash; Create a SpecialFunctionOr value.</li>
-<li> <a href="#">`$`</a> &mdash; Return a string representation of a Statement.</li>
-<li> <a href="#-1">`==`</a> &mdash; Return true when the two statements are equal.</li>
-<li> <a href="#-2">`==`</a> &mdash; Return true when a equals b.</li>
-<li> <a href="#-3">`!=`</a> &mdash; Compare whether two PosOr are not equal.</li>
-<li>type:  <a href="#variablenamekind">VariableNameKind</a> &mdash; The variable name type.</li>
-<li>type:  <a href="#variablename">VariableName</a> &mdash; A variable name in a statement.</li>
-<li>type:  <a href="#variablenameor">VariableNameOr</a> &mdash; </li>
-<li>type:  <a href="#righttype">RightType</a> &mdash; The type of the right hand side of a statement.</li>
-<li> <a href="#newvariablename">newVariableName</a> &mdash; Create a new VariableName object.</li>
-<li> <a href="#newvariablenameor">newVariableNameOr</a> &mdash; Create a PosOr warning.</li>
-<li> <a href="#newvariablenameor-1">newVariableNameOr</a> &mdash; Create a new VariableNameOr object.</li>
-<li> <a href="#getrighttype">getRightType</a> &mdash; Return the type of the right hand side of the statement at the start position.</li>
-<li> <a href="#getvariablenameor">getVariableNameOr</a> &mdash; Get a variable name from the statement.</li>
-<li> <a href="#getvariablename">getVariableName</a> &mdash; Get a variable name from the statement.</li>
-<li> <a href="#matchtripleorplussign">matchTripleOrPlusSign</a> &mdash; Match the optional """ or + at the end of the line.</li>
-<li> <a href="#addtext">addText</a> &mdash; Add the line up to the line-ending to the text string.</li>
-<li> <a href="#getfragmentandpos">getFragmentAndPos</a> &mdash; Split up a long statement around the given position.</li>
-<li> <a href="#getwarnstatement">getWarnStatement</a> &mdash; Return a multiline error message.</li>
-<li> <a href="#warnstatement">warnStatement</a> &mdash; Show an invalid statement with a pointer pointing at the start of the problem.</li>
-<li> <a href="#warnstatement-1">warnStatement</a> &mdash; </li>
-<li> <a href="#removelineend">removeLineEnd</a> &mdash; Return a new string with the n or rn removed from the end of the line.</li>
-<li> <a href="#yieldstatements">yieldStatements</a> &mdash; Iterate through the command's statements.</li>
-<li> <a href="#readstatement">readStatement</a> &mdash; Read the next statement from the code file reading multiple lines if needed.</li>
-<li> <a href="#getmultilinestr">getMultilineStr</a> &mdash; Return the triple quoted string literal.</li>
-<li> <a href="#getstring">getString</a> &mdash; Return a literal string value and position after it.</li>
-<li> <a href="#getnumber">getNumber</a> &mdash; Return the literal number value and position after it.</li>
-<li> <a href="#skipargument">skipArgument</a> &mdash; Skip past the argument.</li>
-<li> <a href="#iffunctions">ifFunctions</a> &mdash; Return the if/if0 function's value and position after.</li>
-<li> <a href="#bareifandif0">bareIfAndIf0</a> &mdash; Handle the bare if/if0.</li>
-<li> <a href="#andorfunctions">andOrFunctions</a> &mdash; Return the and/or function's value and the position after.</li>
-<li> <a href="#getarguments">getArguments</a> &mdash; Get the function arguments and the position of each.</li>
-<li> <a href="#getfunctionvaluepossi">getFunctionValuePosSi</a> &mdash; Return the function's value and the position after it.</li>
-<li> <a href="#runboolop">runBoolOp</a> &mdash; Evaluate the bool expression and return a bool value.</li>
-<li> <a href="#runcompareop">runCompareOp</a> &mdash; Evaluate the comparison and return a bool value.</li>
-<li> <a href="#getcondition">getCondition</a> &mdash; Return the bool value of the condition expression and the position after it.</li>
-<li> <a href="#getbracketedvarvalue">getBracketedVarValue</a> &mdash; Return the value of the bracketed variable and the position after the trailing whitespace.</li>
-<li> <a href="#listloop">listLoop</a> &mdash; Make a new list from an existing list.</li>
-<li> <a href="#getvaluepossi">getValuePosSi</a> &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.</li>
-<li> <a href="#runbarefunction">runBareFunction</a> &mdash; Handle bare function: if, if0, return, warn and log.</li>
-<li> <a href="#getbracketdotname">getBracketDotName</a> &mdash; Convert var[key] to a dot name.</li>
-<li> <a href="#runstatement">runStatement</a> &mdash; Run one statement and return the variable dot name string, operator and value.</li>
-<li> <a href="#skipspaces">skipSpaces</a> &mdash; </li>
-<li> <a href="#calluserfunction">callUserFunction</a> &mdash; Run the given user function.</li>
-<li> <a href="#runstatementassignvar">runStatementAssignVar</a> &mdash; Run a statement and assign the variable if appropriate.</li>
-<li> <a href="#parsesignature">parseSignature</a> &mdash; Parse the signature and return the list of parameters or a message.</li>
-<li> <a href="#isfunctiondefinition">isFunctionDefinition</a> &mdash; If the statement is the first line of a function definition, return true and fill in the return parameters.</li>
-<li> <a href="#defineuserfunctionassignvar">defineUserFunctionAssignVar</a> &mdash; If the statement starts a function definition, define it and assign the variable.</li>
-<li> <a href="#runcommand">runCommand</a> &mdash; Run a command and fill in the variables dictionaries.</li>
-<li> <a href="#runcodefile">runCodeFile</a> &mdash; Run the code file and fill in the variables.</li>
-<li> <a href="#runcodefiles">runCodeFiles</a> &mdash; Run each code file and populate the variables.</li>
+<li>const:  <a href="#tripleQuotes">tripleQuotes</a> &mdash; Triple quotes for building strings.</li>
+<li>const:  <a href="#maxNameLength">maxNameLength</a> &mdash; The maximum length of a variable or dotname.</li>
+<li>type:  <a href="#PosOr">PosOr</a> &mdash; A position in a string or a message.</li>
+<li>type:  <a href="#SpecialFunction">SpecialFunction</a> &mdash; The special functions.</li>
+<li>type:  <a href="#SpecialFunctionOr">SpecialFunctionOr</a> &mdash; A SpecialFunction or a warning message.</li>
+<li>type:  <a href="#Found">Found</a> &mdash; The line endings found.</li>
+<li>type:  <a href="#LinesOr">LinesOr</a> &mdash; A list of lines or a warning.</li>
+<li>type:  <a href="#LoopControl">LoopControl</a> &mdash; Controls whether to output the current replacement block iteration and whether to stop or not.</li>
+<li> <a href="#newLinesOr">newLinesOr</a> &mdash; Return a new LinesOr object containing a warning.</li>
+<li> <a href="#newLinesOr-1">newLinesOr</a> &mdash; Return a new LinesOr object containing a warning.</li>
+<li> <a href="#newLinesOr-2">newLinesOr</a> &mdash; Return a new LinesOr object containing a list of lines.</li>
+<li> <a href="#newPosOr">newPosOr</a> &mdash; Create a PosOr warning.</li>
+<li> <a href="#newPosOr-1">newPosOr</a> &mdash; Create a PosOr value.</li>
+<li> <a href="#newSpecialFunctionOr">newSpecialFunctionOr</a> &mdash; Create a PosOr warning.</li>
+<li> <a href="#newSpecialFunctionOr-1">newSpecialFunctionOr</a> &mdash; Create a SpecialFunctionOr value.</li>
+<li> <a href="#a__">`$`</a> &mdash; Return a string representation of a Statement.</li>
+<li> <a href="#a___">`==`</a> &mdash; Return true when the two statements are equal.</li>
+<li> <a href="#a___-1">`==`</a> &mdash; Return true when a equals b.</li>
+<li> <a href="#a___-2">`!=`</a> &mdash; Compare whether two PosOr are not equal.</li>
+<li>type:  <a href="#VariableNameKind">VariableNameKind</a> &mdash; The variable name type.</li>
+<li>type:  <a href="#VariableName">VariableName</a> &mdash; A variable name in a statement.</li>
+<li>type:  <a href="#VariableNameOr">VariableNameOr</a> &mdash; </li>
+<li>type:  <a href="#RightType">RightType</a> &mdash; The type of the right hand side of a statement.</li>
+<li> <a href="#newVariableName">newVariableName</a> &mdash; Create a new VariableName object.</li>
+<li> <a href="#newVariableNameOr">newVariableNameOr</a> &mdash; Create a PosOr warning.</li>
+<li> <a href="#newVariableNameOr-1">newVariableNameOr</a> &mdash; Create a new VariableNameOr object.</li>
+<li> <a href="#getRightType">getRightType</a> &mdash; Return the type of the right hand side of the statement at the start position.</li>
+<li> <a href="#getVariableNameOr">getVariableNameOr</a> &mdash; Get a variable name from the statement.</li>
+<li> <a href="#getVariableName">getVariableName</a> &mdash; Get a variable name from the statement.</li>
+<li> <a href="#matchTripleOrPlusSign">matchTripleOrPlusSign</a> &mdash; Match the optional """ or + at the end of the line.</li>
+<li> <a href="#addText">addText</a> &mdash; Add the line up to the line-ending to the text string.</li>
+<li> <a href="#getFragmentAndPos">getFragmentAndPos</a> &mdash; Split up a long statement around the given position.</li>
+<li> <a href="#getWarnStatement">getWarnStatement</a> &mdash; Return a multiline error message.</li>
+<li> <a href="#warnStatement">warnStatement</a> &mdash; Show an invalid statement with a pointer pointing at the start of the problem.</li>
+<li> <a href="#warnStatement-1">warnStatement</a> &mdash; </li>
+<li> <a href="#removeLineEnd">removeLineEnd</a> &mdash; Return a new string with the n or rn removed from the end of the line.</li>
+<li> <a href="#yieldStatements">yieldStatements</a> &mdash; Iterate through the command's statements.</li>
+<li> <a href="#readStatement">readStatement</a> &mdash; Read the next statement from the code file reading multiple lines if needed.</li>
+<li> <a href="#getMultilineStr">getMultilineStr</a> &mdash; Return the triple quoted string literal.</li>
+<li> <a href="#getString">getString</a> &mdash; Return a literal string value and position after it.</li>
+<li> <a href="#getNumber">getNumber</a> &mdash; Return the literal number value and position after it.</li>
+<li> <a href="#skipArgument">skipArgument</a> &mdash; Skip past the argument.</li>
+<li> <a href="#ifFunctions">ifFunctions</a> &mdash; Return the if/if0 function's value and position after.</li>
+<li> <a href="#bareIfAndIf0">bareIfAndIf0</a> &mdash; Handle the bare if/if0.</li>
+<li> <a href="#andOrFunctions">andOrFunctions</a> &mdash; Return the and/or function's value and the position after.</li>
+<li> <a href="#getArguments">getArguments</a> &mdash; Get the function arguments and the position of each.</li>
+<li> <a href="#getFunctionValuePosSi">getFunctionValuePosSi</a> &mdash; Return the function's value and the position after it.</li>
+<li> <a href="#runBoolOp">runBoolOp</a> &mdash; Evaluate the bool expression and return a bool value.</li>
+<li> <a href="#runCompareOp">runCompareOp</a> &mdash; Evaluate the comparison and return a bool value.</li>
+<li> <a href="#getCondition">getCondition</a> &mdash; Return the bool value of the condition expression and the position after it.</li>
+<li> <a href="#getBracketedVarValue">getBracketedVarValue</a> &mdash; Return the value of the bracketed variable and the position after the trailing whitespace.</li>
+<li> <a href="#listLoop">listLoop</a> &mdash; Make a new list from an existing list.</li>
+<li> <a href="#getValuePosSi">getValuePosSi</a> &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.</li>
+<li> <a href="#runBareFunction">runBareFunction</a> &mdash; Handle bare function: if, if0, return, warn and log.</li>
+<li> <a href="#getBracketDotName">getBracketDotName</a> &mdash; Convert var[key] to a dot name.</li>
+<li> <a href="#runStatement">runStatement</a> &mdash; Run one statement and return the variable dot name string, operator and value.</li>
+<li> <a href="#skipSpaces">skipSpaces</a> &mdash; </li>
+<li> <a href="#callUserFunction">callUserFunction</a> &mdash; Run the given user function.</li>
+<li> <a href="#runStatementAssignVar">runStatementAssignVar</a> &mdash; Run a statement and assign the variable if appropriate.</li>
+<li> <a href="#parseSignature">parseSignature</a> &mdash; Parse the signature and return the list of parameters or a message.</li>
+<li> <a href="#isFunctionDefinition">isFunctionDefinition</a> &mdash; If the statement is the first line of a function definition, return true and fill in the return parameters.</li>
+<li> <a href="#defineUserFunctionAssignVar">defineUserFunctionAssignVar</a> &mdash; If the statement starts a function definition, define it and assign the variable.</li>
+<li> <a href="#runCommand">runCommand</a> &mdash; Run a command and fill in the variables dictionaries.</li>
+<li> <a href="#runCodeFile">runCodeFile</a> &mdash; Run the code file and fill in the variables.</li>
+<li> <a href="#runCodeFiles">runCodeFiles</a> &mdash; Run each code file and populate the variables.</li>
 </ul>
 
-<h3 id=triplequotes>tripleQuotes</h3>
+<h3 id="tripleQuotes">tripleQuotes</h3>
 
 <pre class="description">
 Triple quotes for building strings.
@@ -114,7 +117,7 @@ Triple quotes for building strings.
 tripleQuotes = "\"\"\""
 </pre>
 
-<h3 id=maxnamelength>maxNameLength</h3>
+<h3 id="maxNameLength">maxNameLength</h3>
 
 <pre class="description">
 The maximum length of a variable or dotname.
@@ -124,7 +127,7 @@ The maximum length of a variable or dotname.
 maxNameLength = 64
 </pre>
 
-<h3 id=posor>PosOr</h3>
+<h3 id="PosOr">PosOr</h3>
 
 <pre class="description">
 A position in a string or a message.
@@ -134,7 +137,7 @@ A position in a string or a message.
 PosOr = OpResultWarn[Natural]
 </pre>
 
-<h3 id=specialfunction>SpecialFunction</h3>
+<h3 id="SpecialFunction">SpecialFunction</h3>
 
 <pre class="description">
 The special functions.
@@ -155,7 +158,7 @@ The special functions.
 SpecialFunction
 </pre>
 
-<h3 id=specialfunctionor>SpecialFunctionOr</h3>
+<h3 id="SpecialFunctionOr">SpecialFunctionOr</h3>
 
 <pre class="description">
 A SpecialFunction or a warning message.
@@ -165,7 +168,7 @@ A SpecialFunction or a warning message.
 SpecialFunctionOr = OpResultWarn[SpecialFunction]
 </pre>
 
-<h3 id=found>Found</h3>
+<h3 id="Found">Found</h3>
 
 <pre class="description">
 The line endings found.
@@ -186,7 +189,7 @@ Found = enum
   nothing, plus, triple, newline, plus_n, triple_n, crlf, plus_crlf, triple_crlf
 </pre>
 
-<h3 id=linesor>LinesOr</h3>
+<h3 id="LinesOr">LinesOr</h3>
 
 <pre class="description">
 A list of lines or a warning.
@@ -196,7 +199,7 @@ A list of lines or a warning.
 LinesOr = OpResultWarn[seq[string]]
 </pre>
 
-<h3 id=loopcontrol>LoopControl</h3>
+<h3 id="LoopControl">LoopControl</h3>
 
 <pre class="description">
 Controls whether to output the current replacement block iteration and whether to stop or not.
@@ -211,7 +214,7 @@ LoopControl = enum
   lcStop = "stop", lcSkip = "skip", lcAdd = "add"
 </pre>
 
-<h3 id=newlinesor>newLinesOr</h3>
+<h3 id="newLinesOr">newLinesOr</h3>
 
 <pre class="description">
 Return a new LinesOr object containing a warning.
@@ -221,7 +224,7 @@ Return a new LinesOr object containing a warning.
 func newLinesOr(warning: MessageId; p1: string = ""; pos = 0): LinesOr
 </pre>
 
-<h3 id=newlinesor-1>newLinesOr</h3>
+<h3 id="newLinesOr-1">newLinesOr</h3>
 
 <pre class="description">
 Return a new LinesOr object containing a warning.
@@ -231,7 +234,7 @@ Return a new LinesOr object containing a warning.
 func newLinesOr(warningData: WarningData): LinesOr
 </pre>
 
-<h3 id=newlinesor-2>newLinesOr</h3>
+<h3 id="newLinesOr-2">newLinesOr</h3>
 
 <pre class="description">
 Return a new LinesOr object containing a list of lines.
@@ -241,7 +244,7 @@ Return a new LinesOr object containing a list of lines.
 func newLinesOr(lines: seq[string]): LinesOr
 </pre>
 
-<h3 id=newposor>newPosOr</h3>
+<h3 id="newPosOr">newPosOr</h3>
 
 <pre class="description">
 Create a PosOr warning.
@@ -251,7 +254,7 @@ Create a PosOr warning.
 func newPosOr(warning: MessageId; p1 = ""; pos = 0): PosOr
 </pre>
 
-<h3 id=newposor-1>newPosOr</h3>
+<h3 id="newPosOr-1">newPosOr</h3>
 
 <pre class="description">
 Create a PosOr value.
@@ -261,7 +264,7 @@ Create a PosOr value.
 func newPosOr(pos: Natural): PosOr
 </pre>
 
-<h3 id=newspecialfunctionor>newSpecialFunctionOr</h3>
+<h3 id="newSpecialFunctionOr">newSpecialFunctionOr</h3>
 
 <pre class="description">
 Create a PosOr warning.
@@ -271,7 +274,7 @@ Create a PosOr warning.
 func newSpecialFunctionOr(warning: MessageId; p1 = ""; pos = 0): SpecialFunctionOr
 </pre>
 
-<h3 id=newspecialfunctionor-1>newSpecialFunctionOr</h3>
+<h3 id="newSpecialFunctionOr-1">newSpecialFunctionOr</h3>
 
 <pre class="description">
 Create a SpecialFunctionOr value.
@@ -281,7 +284,7 @@ Create a SpecialFunctionOr value.
 func newSpecialFunctionOr(specialFunction: SpecialFunction): SpecialFunctionOr
 </pre>
 
-<h3 id=>`$`</h3>
+<h3 id="a__">`$`</h3>
 
 <pre class="description">
 Return a string representation of a Statement.
@@ -291,7 +294,7 @@ Return a string representation of a Statement.
 func `$`(s: Statement): string
 </pre>
 
-<h3 id=-1>`==`</h3>
+<h3 id="a___">`==`</h3>
 
 <pre class="description">
 Return true when the two statements are equal.
@@ -301,7 +304,7 @@ Return true when the two statements are equal.
 func `==`(s1: Statement; s2: Statement): bool
 </pre>
 
-<h3 id=-2>`==`</h3>
+<h3 id="a___-1">`==`</h3>
 
 <pre class="description">
 Return true when a equals b.
@@ -311,7 +314,7 @@ Return true when a equals b.
 func `==`(a: PosOr; b: PosOr): bool
 </pre>
 
-<h3 id=-3>`!=`</h3>
+<h3 id="a___-2">`!=`</h3>
 
 <pre class="description">
 Compare whether two PosOr are not equal.
@@ -321,7 +324,7 @@ Compare whether two PosOr are not equal.
 func `!=`(a: PosOr; b: PosOr): bool
 </pre>
 
-<h3 id=variablenamekind>VariableNameKind</h3>
+<h3 id="VariableNameKind">VariableNameKind</h3>
 
 <pre class="description">
 The variable name type.
@@ -336,7 +339,7 @@ VariableNameKind = enum
   vnkNormal, vnkFunction, vnkGet
 </pre>
 
-<h3 id=variablename>VariableName</h3>
+<h3 id="VariableName">VariableName</h3>
 
 <pre class="description">
 A variable name in a statement.
@@ -354,7 +357,7 @@ VariableName = object
 
 </pre>
 
-<h3 id=variablenameor>VariableNameOr</h3>
+<h3 id="VariableNameOr">VariableNameOr</h3>
 
 <pre class="description">
 
@@ -364,7 +367,7 @@ VariableName = object
 VariableNameOr = OpResultWarn[VariableName]
 </pre>
 
-<h3 id=righttype>RightType</h3>
+<h3 id="RightType">RightType</h3>
 
 <pre class="description">
 The type of the right hand side of a statement.
@@ -384,7 +387,7 @@ RightType = enum
   rtNothing, rtString, rtNumber, rtVariable, rtList, rtCondition
 </pre>
 
-<h3 id=newvariablename>newVariableName</h3>
+<h3 id="newVariableName">newVariableName</h3>
 
 <pre class="description">
 Create a new VariableName object.
@@ -394,7 +397,7 @@ Create a new VariableName object.
 func newVariableName(dotName: string; kind: VariableNameKind; pos: Natural): VariableName
 </pre>
 
-<h3 id=newvariablenameor>newVariableNameOr</h3>
+<h3 id="newVariableNameOr">newVariableNameOr</h3>
 
 <pre class="description">
 Create a PosOr warning.
@@ -404,7 +407,7 @@ Create a PosOr warning.
 func newVariableNameOr(warning: MessageId; p1 = ""; pos = 0): VariableNameOr
 </pre>
 
-<h3 id=newvariablenameor-1>newVariableNameOr</h3>
+<h3 id="newVariableNameOr-1">newVariableNameOr</h3>
 
 <pre class="description">
 Create a new VariableNameOr object.
@@ -414,7 +417,7 @@ Create a new VariableNameOr object.
 func newVariableNameOr(dotName: string; kind: VariableNameKind; pos: Natural): VariableNameOr
 </pre>
 
-<h3 id=getrighttype>getRightType</h3>
+<h3 id="getRightType">getRightType</h3>
 
 <pre class="description">
 Return the type of the right hand side of the statement at the start position.
@@ -424,7 +427,7 @@ Return the type of the right hand side of the statement at the start position.
 func getRightType(statement: Statement; start: Natural): RightType
 </pre>
 
-<h3 id=getvariablenameor>getVariableNameOr</h3>
+<h3 id="getVariableNameOr">getVariableNameOr</h3>
 
 <pre class="description">
 Get a variable name from the statement. Start points at a name.
@@ -443,7 +446,7 @@ a = o.def.bbb # comment
 proc getVariableNameOr(text: string; startPos: Natural): VariableNameOr
 </pre>
 
-<h3 id=getvariablename>getVariableName</h3>
+<h3 id="getVariableName">getVariableName</h3>
 
 <pre class="description">
 Get a variable name from the statement. Skip leading whitespace.
@@ -453,7 +456,7 @@ Get a variable name from the statement. Skip leading whitespace.
 proc getVariableName(text: string; start: Natural): VariableNameOr
 </pre>
 
-<h3 id=matchtripleorplussign>matchTripleOrPlusSign</h3>
+<h3 id="matchTripleOrPlusSign">matchTripleOrPlusSign</h3>
 
 <pre class="description">
 Match the optional """ or + at the end of the line. This tells whether the statement continues on the next line for code files.
@@ -463,7 +466,7 @@ Match the optional """ or + at the end of the line. This tells whether the state
 func matchTripleOrPlusSign(line: string): Found
 </pre>
 
-<h3 id=addtext>addText</h3>
+<h3 id="addText">addText</h3>
 
 <pre class="description">
 Add the line up to the line-ending to the text string.
@@ -473,7 +476,7 @@ Add the line up to the line-ending to the text string.
 func addText(line: string; found: Found; text: var string)
 </pre>
 
-<h3 id=getfragmentandpos>getFragmentAndPos</h3>
+<h3 id="getFragmentAndPos">getFragmentAndPos</h3>
 
 <pre class="description">
 Split up a long statement around the given position.  Return the statement fragment, and the position where the fragment starts in the statement.
@@ -483,7 +486,7 @@ Split up a long statement around the given position.  Return the statement fragm
 func getFragmentAndPos(statement: Statement; start: Natural): (string, Natural)
 </pre>
 
-<h3 id=getwarnstatement>getWarnStatement</h3>
+<h3 id="getWarnStatement">getWarnStatement</h3>
 
 <pre class="description">
 Return a multiline error message.
@@ -494,7 +497,7 @@ func getWarnStatement(filename: string; statement: Statement;
                       warningData: WarningData): string
 </pre>
 
-<h3 id=warnstatement>warnStatement</h3>
+<h3 id="warnStatement">warnStatement</h3>
 
 <pre class="description">
 Show an invalid statement with a pointer pointing at the start of the problem. Long statements are trimmed around the problem area.
@@ -505,7 +508,7 @@ proc warnStatement(env: var Env; statement: Statement; warningData: WarningData;
                    sourceFilename = "")
 </pre>
 
-<h3 id=warnstatement-1>warnStatement</h3>
+<h3 id="warnStatement-1">warnStatement</h3>
 
 <pre class="description">
 
@@ -516,7 +519,7 @@ proc warnStatement(env: var Env; statement: Statement; messageId: MessageId;
                    p1: string; pos: Natural; sourceFilename = "")
 </pre>
 
-<h3 id=removelineend>removeLineEnd</h3>
+<h3 id="removeLineEnd">removeLineEnd</h3>
 
 <pre class="description">
 Return a new string with the n or rn removed from the end of the line.
@@ -526,7 +529,7 @@ Return a new string with the n or rn removed from the end of the line.
 func removeLineEnd(s: string): string
 </pre>
 
-<h3 id=yieldstatements>yieldStatements</h3>
+<h3 id="yieldStatements">yieldStatements</h3>
 
 <pre class="description">
 Iterate through the command's statements. A statement can be blank or all whitespace.
@@ -536,7 +539,7 @@ Iterate through the command's statements. A statement can be blank or all whites
 iterator yieldStatements(cmdLines: CmdLines): Statement
 </pre>
 
-<h3 id=readstatement>readStatement</h3>
+<h3 id="readStatement">readStatement</h3>
 
 <pre class="description">
 Read the next statement from the code file reading multiple lines if needed. When there is an error, show the warning and return nothing. When no more statements, return nothing.
@@ -546,7 +549,7 @@ Read the next statement from the code file reading multiple lines if needed. Whe
 proc readStatement(env: var Env; lb: var LineBuffer): Option[Statement]
 </pre>
 
-<h3 id=getmultilinestr>getMultilineStr</h3>
+<h3 id="getMultilineStr">getMultilineStr</h3>
 
 <pre class="description">
 Return the triple quoted string literal. The startPos points one
@@ -559,7 +562,7 @@ whitespace.
 func getMultilineStr(text: string; start: Natural): ValuePosSiOr
 </pre>
 
-<h3 id=getstring>getString</h3>
+<h3 id="getString">getString</h3>
 
 <pre class="description">
 Return a literal string value and position after it. The start parameter is the index of the first quote in the statement and the return position is after the optional trailing white space following the last quote.
@@ -574,7 +577,7 @@ var = "hello" # asdf
 func getString(statement: Statement; start: Natural): ValuePosSiOr
 </pre>
 
-<h3 id=getnumber>getNumber</h3>
+<h3 id="getNumber">getNumber</h3>
 
 <pre class="description">
 Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.
@@ -584,7 +587,7 @@ Return the literal number value and position after it.  The start index points a
 func getNumber(statement: Statement; start: Natural): ValuePosSiOr
 </pre>
 
-<h3 id=skipargument>skipArgument</h3>
+<h3 id="skipArgument">skipArgument</h3>
 
 <pre class="description">
 Skip past the argument.  startPos points at the first character of a function argument.  Return the first non-whitespace character after the argument or a message when there is a problem.
@@ -601,7 +604,7 @@ a = fn( 1 , 2 )
 func skipArgument(statement: Statement; startPos: Natural): PosOr
 </pre>
 
-<h3 id=iffunctions>ifFunctions</h3>
+<h3 id="ifFunctions">ifFunctions</h3>
 
 <pre class="description">
 Return the if/if0 function's value and position after. It conditionally runs one of its arguments and skips the other. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
@@ -622,7 +625,7 @@ proc ifFunctions(env: var Env; specialFunction: SpecialFunction;
                  topLevel = false): ValuePosSiOr
 </pre>
 
-<h3 id=bareifandif0>bareIfAndIf0</h3>
+<h3 id="bareIfAndIf0">bareIfAndIf0</h3>
 
 <pre class="description">
 Handle the bare if/if0. Return the resulting value and the position in the statement after the if.
@@ -640,7 +643,7 @@ proc bareIfAndIf0(env: var Env; specialFunction: SpecialFunction;
                   statement: Statement; start: Natural; variables: Variables): ValuePosSiOr
 </pre>
 
-<h3 id=andorfunctions>andOrFunctions</h3>
+<h3 id="andOrFunctions">andOrFunctions</h3>
 
 <pre class="description">
 Return the and/or function's value and the position after. The and function stops on the first false. The or function stops on the first true. The rest of the arguments are skipped. Start points at the first parameter of the function. The position includes the trailing whitespace after the ending ).
@@ -652,7 +655,7 @@ proc andOrFunctions(env: var Env; specialFunction: SpecialFunction;
                     listCase = false): ValuePosSiOr
 </pre>
 
-<h3 id=getarguments>getArguments</h3>
+<h3 id="getArguments">getArguments</h3>
 
 <pre class="description">
 Get the function arguments and the position of each. If an argument has a side effect, the return value and pos and side effect is returned, else a 0 value and seNone is returned.
@@ -670,7 +673,7 @@ proc getArguments(env: var Env; statement: Statement; start: Natural;
                   arguments: var seq[Value]; argumentStarts: var seq[Natural]): ValuePosSiOr
 </pre>
 
-<h3 id=getfunctionvaluepossi>getFunctionValuePosSi</h3>
+<h3 id="getFunctionValuePosSi">getFunctionValuePosSi</h3>
 
 <pre class="description">
 Return the function's value and the position after it. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
@@ -690,7 +693,7 @@ proc getFunctionValuePosSi(env: var Env; functionName: string;
                            listCase = false; topLevel = false): ValuePosSiOr
 </pre>
 
-<h3 id=runboolop>runBoolOp</h3>
+<h3 id="runBoolOp">runBoolOp</h3>
 
 <pre class="description">
 Evaluate the bool expression and return a bool value.
@@ -700,7 +703,7 @@ Evaluate the bool expression and return a bool value.
 func runBoolOp(left: Value; op: string; right: Value): Value
 </pre>
 
-<h3 id=runcompareop>runCompareOp</h3>
+<h3 id="runCompareOp">runCompareOp</h3>
 
 <pre class="description">
 Evaluate the comparison and return a bool value.
@@ -710,7 +713,7 @@ Evaluate the comparison and return a bool value.
 func runCompareOp(left: Value; op: string; right: Value): Value
 </pre>
 
-<h3 id=getcondition>getCondition</h3>
+<h3 id="getCondition">getCondition</h3>
 
 <pre class="description">
 Return the bool value of the condition expression and the position after it.  The start index points at the ( left parentheses. The position includes the trailing whitespace after the ending ).
@@ -726,7 +729,7 @@ proc getCondition(env: var Env; statement: Statement; start: Natural;
                   variables: Variables): ValuePosSiOr
 </pre>
 
-<h3 id=getbracketedvarvalue>getBracketedVarValue</h3>
+<h3 id="getBracketedVarValue">getBracketedVarValue</h3>
 
 <pre class="description">
 Return the value of the bracketed variable and the position after the trailing whitespace.. Start points at the the first argument.
@@ -744,7 +747,7 @@ proc getBracketedVarValue(env: var Env; statement: Statement; start: Natural;
                           container: Value; variables: Variables): ValuePosSiOr
 </pre>
 
-<h3 id=listloop>listLoop</h3>
+<h3 id="listLoop">listLoop</h3>
 
 <pre class="description">
 Make a new list from an existing list. The callback function is called for each item in the list and determines what goes in the new list.  See funList_lpoal in functions.nim for more information.
@@ -766,7 +769,7 @@ proc listLoop(env: var Env; specialFunction: SpecialFunction;
               listCase = false): ValuePosSiOr
 </pre>
 
-<h3 id=getvaluepossi>getValuePosSi</h3>
+<h3 id="getValuePosSi">getValuePosSi</h3>
 
 <pre class="description">
 Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.  The position returned includes the trailing whitespace after the item. The ending position is pointing at the end of the statement, or at the first non-whitespace character after the argument. A true topLevel parameter means the item pointed to by start is the first item after the equal sign (not an argument).
@@ -786,7 +789,7 @@ proc getValuePosSi(env: var Env; statement: Statement; start: Natural;
                    variables: Variables; topLevel = false): ValuePosSiOr
 </pre>
 
-<h3 id=runbarefunction>runBareFunction</h3>
+<h3 id="runBareFunction">runBareFunction</h3>
 
 <pre class="description">
 Handle bare function: if, if0, return, warn and log. A bare function does not assign a variable.
@@ -804,7 +807,7 @@ proc runBareFunction(env: var Env; statement: Statement; start: Natural;
                      variables: Variables; leftName: VariableName): ValuePosSiOr
 </pre>
 
-<h3 id=getbracketdotname>getBracketDotName</h3>
+<h3 id="getBracketDotName">getBracketDotName</h3>
 
 <pre class="description">
 Convert var[key] to a dot name.
@@ -825,7 +828,7 @@ proc getBracketDotName(env: var Env; statement: Statement; start: Natural;
                        variables: Variables; leftName: VariableName): ValuePosSiOr
 </pre>
 
-<h3 id=runstatement>runStatement</h3>
+<h3 id="runStatement">runStatement</h3>
 
 <pre class="description">
 Run one statement and return the variable dot name string, operator and value.
@@ -835,7 +838,7 @@ Run one statement and return the variable dot name string, operator and value.
 proc runStatement(env: var Env; statement: Statement; variables: Variables): VariableDataOr
 </pre>
 
-<h3 id=skipspaces>skipSpaces</h3>
+<h3 id="skipSpaces">skipSpaces</h3>
 
 <pre class="description">
 
@@ -845,7 +848,7 @@ proc runStatement(env: var Env; statement: Statement; variables: Variables): Var
 proc skipSpaces(text: string): Natural
 </pre>
 
-<h3 id=calluserfunction>callUserFunction</h3>
+<h3 id="callUserFunction">callUserFunction</h3>
 
 <pre class="description">
 Run the given user function.
@@ -856,7 +859,7 @@ proc callUserFunction(env: var Env; funcVar: Value; variables: Variables;
                       arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id=runstatementassignvar>runStatementAssignVar</h3>
+<h3 id="runStatementAssignVar">runStatementAssignVar</h3>
 
 <pre class="description">
 Run a statement and assign the variable if appropriate. Return skip, stop or continue to control the loop.
@@ -867,7 +870,7 @@ proc runStatementAssignVar(env: var Env; statement: Statement;
                            variables: var Variables; sourceFilename: string): LoopControl
 </pre>
 
-<h3 id=parsesignature>parseSignature</h3>
+<h3 id="parseSignature">parseSignature</h3>
 
 <pre class="description">
 Parse the signature and return the list of parameters or a message.
@@ -882,7 +885,7 @@ cmp = func(numStr1: string, numStr2: string) int
 proc parseSignature(dotName: string; signature: string; start: Natural): SignatureOr
 </pre>
 
-<h3 id=isfunctiondefinition>isFunctionDefinition</h3>
+<h3 id="isFunctionDefinition">isFunctionDefinition</h3>
 
 <pre class="description">
 If the statement is the first line of a function definition, return true and fill in the return parameters.  Return quickly when not a function definition. The retPos points at the first non-whitespace after the "func(".
@@ -893,7 +896,7 @@ proc isFunctionDefinition(statement: Statement; retLeftName: var string;
                           retOperator: var Operator; retPos: var Natural): bool
 </pre>
 
-<h3 id=defineuserfunctionassignvar>defineUserFunctionAssignVar</h3>
+<h3 id="defineUserFunctionAssignVar">defineUserFunctionAssignVar</h3>
 
 <pre class="description">
 If the statement starts a function definition, define it and assign the variable. A true return value means the statement(s) were processed and maybe errors output. A false means the statement should be processed as a regular statement.
@@ -905,7 +908,7 @@ proc defineUserFunctionAssignVar(env: var Env; lb: var LineBuffer;
                                  sourceFilename: string; codeFile: bool): bool
 </pre>
 
-<h3 id=runcommand>runCommand</h3>
+<h3 id="runCommand">runCommand</h3>
 
 <pre class="description">
 Run a command and fill in the variables dictionaries.
@@ -915,7 +918,7 @@ Run a command and fill in the variables dictionaries.
 proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables): LoopControl
 </pre>
 
-<h3 id=runcodefile>runCodeFile</h3>
+<h3 id="runCodeFile">runCodeFile</h3>
 
 <pre class="description">
 Run the code file and fill in the variables.
@@ -925,7 +928,7 @@ Run the code file and fill in the variables.
 proc runCodeFile(env: var Env; variables: var Variables; filename: string)
 </pre>
 
-<h3 id=runcodefiles>runCodeFiles</h3>
+<h3 id="runCodeFiles">runCodeFiles</h3>
 
 <pre class="description">
 Run each code file and populate the variables.

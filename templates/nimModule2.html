@@ -2,10 +2,11 @@
 <!--$ # This template creates a module's docs from nim doc comments.  -->
 <!--$ # Also see nimModule.tea -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<!--$ nextline -->
+<title>{o.moduleName}</title>
 <style>
 body {
     max-width: 40em;
@@ -32,6 +33,7 @@ body {
     border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <!--$ block -->
 <h1>{o.moduleName}</h1>
@@ -53,11 +55,44 @@ Nim source code: <a href="../../src/{o.moduleName}">{o.moduleName}</a>
 <li>{entry.type} <a href="#{entry.anchor}">{entry.name}</a> &mdash; {entry.short}</li>
 </ul>
 
+<!--$ # Create a test function section. -->
+<!--$ block t.repeat = 0-->
+<h3 id="test">Get</h3>
+<p>
+Get a dictionary value by its key.  If the key doesn't exist, the
+default value is returned if specified, else a warning is
+generated.
+</p>
+<pre class="signature">
+get(dictionary: dict, key: string, default: optional any) any
+</pre>
+<p>
+Note: For dictionary lookup you can use dot notation. It's the
+same as get without the default.
+</p>
+<p>
+Examples:
+</p>
+<pre class="statictea-code">
+d = dict("tea", "Earl Grey")
+get(d, "tea") => "Earl Grey"
+get(d, "coffee", "Tea") => "Tea"
+</pre>
+<p>
+Using dot notation:
+</p>
+<pre class="statictea-code">
+d = dict("tea", "Earl Grey")
+d.tea => "Earl Grey"
+</pre>
+
+<!--$ endblock -->
+<!--$ # -->
 <!--$ # Create the function sections. -->
 <!--$ block -->
 <!--$ : t.repeat = len(o.entries) -->
 <!--$ : entry = o.entries[t.row] -->
-<h3 id={entry.anchor}>{entry.name}</h3>
+<h3 id="{entry.anchor}">{entry.name}</h3>
 
 <pre class="description">
 {entry.description}

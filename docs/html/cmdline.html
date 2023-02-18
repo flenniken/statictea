@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>cmdline.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>cmdline.nim</h1>
 
@@ -61,27 +64,27 @@ Nim source code: <a href="../../src/cmdline.nim">cmdline.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#cmlargs">CmlArgs</a> &mdash; CmlArgs holds the parsed command line arguments in an ordered
+<li>type:  <a href="#CmlArgs">CmlArgs</a> &mdash; CmlArgs holds the parsed command line arguments in an ordered
 dictionary.</li>
-<li>type:  <a href="#cmlmessageid">CmlMessageId</a> &mdash; Possible message IDs returned by cmdline.</li>
-<li>type:  <a href="#argsormessagekind">ArgsOrMessageKind</a> &mdash; The kind of an ArgsOrMessage object, either args or a message.</li>
-<li>type:  <a href="#argsormessage">ArgsOrMessage</a> &mdash; Contains the command line args or a message.</li>
-<li>type:  <a href="#cmloptiontype">CmlOptionType</a> &mdash; The option type.</li>
-<li>type:  <a href="#cmloption">CmlOption</a> &mdash; An CmlOption holds its type, long name and short name.</li>
-<li> <a href="#newcmloption">newCmlOption</a> &mdash; Create a new CmlOption object.</li>
-<li> <a href="#newargsormessage">newArgsOrMessage</a> &mdash; Create a new ArgsOrMessage object containing arguments.</li>
-<li> <a href="#newargsormessage-1">newArgsOrMessage</a> &mdash; Create a new ArgsOrMessage object containing a message id and optionally the problem argument.</li>
-<li> <a href="#">`$`</a> &mdash; Return a string representation of an CmlOption object.</li>
-<li> <a href="#-1">`$`</a> &mdash; Return a string representation of a ArgsOrMessage object.</li>
-<li> <a href="#commandlineecho">commandLineEcho</a> &mdash; Show the command line arguments.</li>
-<li> <a href="#collectargs">collectArgs</a> &mdash; Get the command line arguments from the system and return a list.</li>
-<li> <a href="#cmdline">cmdLine</a> &mdash; Parse the command line arguments.</li>
-<li>const:  <a href="#cmlmessages">cmlMessages</a> &mdash; Messages used by this module.</li>
-<li> <a href="#getmessage">getMessage</a> &mdash; Return a message from a message id and problem argument.</li>
-<li> <a href="#-2">`$`</a> &mdash; Return a string representation of an Args object.</li>
+<li>type:  <a href="#CmlMessageId">CmlMessageId</a> &mdash; Possible message IDs returned by cmdline.</li>
+<li>type:  <a href="#ArgsOrMessageKind">ArgsOrMessageKind</a> &mdash; The kind of an ArgsOrMessage object, either args or a message.</li>
+<li>type:  <a href="#ArgsOrMessage">ArgsOrMessage</a> &mdash; Contains the command line args or a message.</li>
+<li>type:  <a href="#CmlOptionType">CmlOptionType</a> &mdash; The option type.</li>
+<li>type:  <a href="#CmlOption">CmlOption</a> &mdash; An CmlOption holds its type, long name and short name.</li>
+<li> <a href="#newCmlOption">newCmlOption</a> &mdash; Create a new CmlOption object.</li>
+<li> <a href="#newArgsOrMessage">newArgsOrMessage</a> &mdash; Create a new ArgsOrMessage object containing arguments.</li>
+<li> <a href="#newArgsOrMessage-1">newArgsOrMessage</a> &mdash; Create a new ArgsOrMessage object containing a message id and optionally the problem argument.</li>
+<li> <a href="#a__">`$`</a> &mdash; Return a string representation of an CmlOption object.</li>
+<li> <a href="#a__-1">`$`</a> &mdash; Return a string representation of a ArgsOrMessage object.</li>
+<li> <a href="#commandLineEcho">commandLineEcho</a> &mdash; Show the command line arguments.</li>
+<li> <a href="#collectArgs">collectArgs</a> &mdash; Get the command line arguments from the system and return a list.</li>
+<li> <a href="#cmdLine">cmdLine</a> &mdash; Parse the command line arguments.</li>
+<li>const:  <a href="#cmlMessages">cmlMessages</a> &mdash; Messages used by this module.</li>
+<li> <a href="#getMessage">getMessage</a> &mdash; Return a message from a message id and problem argument.</li>
+<li> <a href="#a__-2">`$`</a> &mdash; Return a string representation of an Args object.</li>
 </ul>
 
-<h3 id=cmlargs>CmlArgs</h3>
+<h3 id="CmlArgs">CmlArgs</h3>
 
 <pre class="description">
 CmlArgs holds the parsed command line arguments in an ordered
@@ -94,7 +97,7 @@ An option without arguments will have an empty list.
 CmlArgs = OrderedTable[string, seq[string]]
 </pre>
 
-<h3 id=cmlmessageid>CmlMessageId</h3>
+<h3 id="CmlMessageId">CmlMessageId</h3>
 
 <pre class="description">
 Possible message IDs returned by cmdline. The number in the name is the same as its ord value.  Since the message handling is left to the caller, it is important for these values to be stable. New values are added to the end and this is a minor version change. It is ok to leave unused values in the list and this is backward compatible. If items are removed or reordered, that is a major version change.
@@ -109,7 +112,7 @@ CmlMessageId = enum
   cml_12_AlreadyHaveOneArg
 </pre>
 
-<h3 id=argsormessagekind>ArgsOrMessageKind</h3>
+<h3 id="ArgsOrMessageKind">ArgsOrMessageKind</h3>
 
 <pre class="description">
 The kind of an ArgsOrMessage object, either args or a message.
@@ -120,7 +123,7 @@ ArgsOrMessageKind = enum
   cmlArgsKind, cmlMessageKind
 </pre>
 
-<h3 id=argsormessage>ArgsOrMessage</h3>
+<h3 id="ArgsOrMessage">ArgsOrMessage</h3>
 
 <pre class="description">
 Contains the command line args or a message.
@@ -139,7 +142,7 @@ ArgsOrMessage = object
 
 </pre>
 
-<h3 id=cmloptiontype>CmlOptionType</h3>
+<h3 id="CmlOptionType">CmlOptionType</h3>
 
 <pre class="description">
 The option type.
@@ -162,7 +165,7 @@ CmlOptionType = enum
   cmlArgumentOnce, cmlArgumentMany, cmlStopArgument
 </pre>
 
-<h3 id=cmloption>CmlOption</h3>
+<h3 id="CmlOption">CmlOption</h3>
 
 <pre class="description">
 An CmlOption holds its type, long name and short name.
@@ -176,7 +179,7 @@ CmlOption = object
 
 </pre>
 
-<h3 id=newcmloption>newCmlOption</h3>
+<h3 id="newCmlOption">newCmlOption</h3>
 
 <pre class="description">
 Create a new CmlOption object. For no short option use a dash.
@@ -186,7 +189,7 @@ Create a new CmlOption object. For no short option use a dash.
 func newCmlOption(long: string; short: char; optionType: CmlOptionType): CmlOption
 </pre>
 
-<h3 id=newargsormessage>newArgsOrMessage</h3>
+<h3 id="newArgsOrMessage">newArgsOrMessage</h3>
 
 <pre class="description">
 Create a new ArgsOrMessage object containing arguments.
@@ -196,7 +199,7 @@ Create a new ArgsOrMessage object containing arguments.
 func newArgsOrMessage(args: CmlArgs): ArgsOrMessage
 </pre>
 
-<h3 id=newargsormessage-1>newArgsOrMessage</h3>
+<h3 id="newArgsOrMessage-1">newArgsOrMessage</h3>
 
 <pre class="description">
 Create a new ArgsOrMessage object containing a message id and optionally the problem argument.
@@ -206,7 +209,7 @@ Create a new ArgsOrMessage object containing a message id and optionally the pro
 func newArgsOrMessage(messageId: CmlMessageId; problemArg = ""): ArgsOrMessage
 </pre>
 
-<h3 id=>`$`</h3>
+<h3 id="a__">`$`</h3>
 
 <pre class="description">
 Return a string representation of an CmlOption object.
@@ -216,7 +219,7 @@ Return a string representation of an CmlOption object.
 func `$`(a: CmlOption): string
 </pre>
 
-<h3 id=-1>`$`</h3>
+<h3 id="a__-1">`$`</h3>
 
 <pre class="description">
 Return a string representation of a ArgsOrMessage object.
@@ -226,7 +229,7 @@ Return a string representation of a ArgsOrMessage object.
 func `$`(a: ArgsOrMessage): string
 </pre>
 
-<h3 id=commandlineecho>commandLineEcho</h3>
+<h3 id="commandLineEcho">commandLineEcho</h3>
 
 <pre class="description">
 Show the command line arguments.
@@ -236,7 +239,7 @@ Show the command line arguments.
 proc commandLineEcho()
 </pre>
 
-<h3 id=collectargs>collectArgs</h3>
+<h3 id="collectArgs">collectArgs</h3>
 
 <pre class="description">
 Get the command line arguments from the system and return a list. Don't return the first one which is the app name. This is the list that cmdLine expects.
@@ -246,7 +249,7 @@ Get the command line arguments from the system and return a list. Don't return t
 proc collectArgs(): seq[string]
 </pre>
 
-<h3 id=cmdline>cmdLine</h3>
+<h3 id="cmdLine">cmdLine</h3>
 
 <pre class="description">
 Parse the command line arguments.  You pass in the list of supported options and the arguments to parse. The arguments found are returned. If there is a problem with the arguments, args contains a message telling the problem. Use collectArgs() to generate the arguments. Parse uses "arg value" not "arg=value".
@@ -256,7 +259,7 @@ Parse the command line arguments.  You pass in the list of supported options and
 func cmdLine(options: openArray[CmlOption]; arguments: openArray[string]): ArgsOrMessage
 </pre>
 
-<h3 id=cmlmessages>cmlMessages</h3>
+<h3 id="cmlMessages">cmlMessages</h3>
 
 <pre class="description">
 Messages used by this module.
@@ -276,7 +279,7 @@ cmlMessages: array[low(CmlMessageId) .. high(CmlMessageId), string] = [
     "One \'$1\' argument is allowed."]
 </pre>
 
-<h3 id=getmessage>getMessage</h3>
+<h3 id="getMessage">getMessage</h3>
 
 <pre class="description">
 Return a message from a message id and problem argument.
@@ -286,7 +289,7 @@ Return a message from a message id and problem argument.
 func getMessage(message: CmlMessageId; problemArg: string = ""): string
 </pre>
 
-<h3 id=-2>`$`</h3>
+<h3 id="a__-2">`$`</h3>
 
 <pre class="description">
 Return a string representation of an Args object.

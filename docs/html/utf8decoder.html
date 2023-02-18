@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>utf8decoder.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>utf8decoder.nim</h1>
 
@@ -38,13 +41,13 @@ Nim source code: <a href="../../src/utf8decoder.nim">utf8decoder.nim</a>
 
 <ul>
 <li> <a href="#decode">decode</a> &mdash; Interior part of a UTF-8 decoder.</li>
-<li> <a href="#yieldutf8chars">yieldUtf8Chars</a> &mdash; Iterate through the string's UTF-8 character byte sequences.</li>
-<li> <a href="#validateutf8string">validateUtf8String</a> &mdash; Return the position of the first invalid UTF-8 byte in the string else return -1.</li>
-<li> <a href="#sanitizeutf8">sanitizeUtf8</a> &mdash; Sanitize and return the UTF-8 string.</li>
-<li> <a href="#utf8charstring">utf8CharString</a> &mdash; Get the unicode character at pos.</li>
+<li> <a href="#yieldUtf8Chars">yieldUtf8Chars</a> &mdash; Iterate through the string's UTF-8 character byte sequences.</li>
+<li> <a href="#validateUtf8String">validateUtf8String</a> &mdash; Return the position of the first invalid UTF-8 byte in the string else return -1.</li>
+<li> <a href="#sanitizeUtf8">sanitizeUtf8</a> &mdash; Sanitize and return the UTF-8 string.</li>
+<li> <a href="#utf8CharString">utf8CharString</a> &mdash; Get the unicode character at pos.</li>
 </ul>
 
-<h3 id=decode>decode</h3>
+<h3 id="decode">decode</h3>
 
 <pre class="description">
 Interior part of a UTF-8 decoder.
@@ -54,7 +57,7 @@ Interior part of a UTF-8 decoder.
 proc decode(state: var uint32; codep: var uint32; sByte: char)
 </pre>
 
-<h3 id=yieldutf8chars>yieldUtf8Chars</h3>
+<h3 id="yieldUtf8Chars">yieldUtf8Chars</h3>
 
 <pre class="description">
 Iterate through the string's UTF-8 character byte sequences.
@@ -72,7 +75,7 @@ iterator yieldUtf8Chars(str: string; ixStartSeq: var int; ixEndSeq: var int;
                         codePoint: var uint32): bool
 </pre>
 
-<h3 id=validateutf8string>validateUtf8String</h3>
+<h3 id="validateUtf8String">validateUtf8String</h3>
 
 <pre class="description">
 Return the position of the first invalid UTF-8 byte in the string else return -1.
@@ -82,7 +85,7 @@ Return the position of the first invalid UTF-8 byte in the string else return -1
 func validateUtf8String(str: string): int
 </pre>
 
-<h3 id=sanitizeutf8>sanitizeUtf8</h3>
+<h3 id="sanitizeUtf8">sanitizeUtf8</h3>
 
 <pre class="description">
 Sanitize and return the UTF-8 string. The skipOrReplace parameter determines whether to skip or replace invalid bytes.  When replacing the U+FFFD character is used.
@@ -92,7 +95,7 @@ Sanitize and return the UTF-8 string. The skipOrReplace parameter determines whe
 func sanitizeUtf8(str: string; skipOrReplace: string = "replace"): string
 </pre>
 
-<h3 id=utf8charstring>utf8CharString</h3>
+<h3 id="utf8CharString">utf8CharString</h3>
 
 <pre class="description">
 Get the unicode character at pos.  Return a one character string. Return "" when not a UTF-8 character.

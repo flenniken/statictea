@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>comparelines.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>comparelines.nim</h1>
 
@@ -37,16 +40,16 @@ Nim source code: <a href="../../src/comparelines.nim">comparelines.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#opresultstr">OpResultStr</a> &mdash; On success return T, otherwise return a message telling what went wrong.</li>
-<li> <a href="#opvaluestr">opValueStr</a> &mdash; Return an OpResultStr with a value.</li>
-<li> <a href="#opmessagestr">opMessageStr</a> &mdash; Return an OpResultStr with a message why the value cannot be returned.</li>
-<li> <a href="#splitnewlines">splitNewLines</a> &mdash; Split lines and keep the line endings.</li>
-<li> <a href="#linessidebyside">linesSideBySide</a> &mdash; Show the two sets of lines side by side.</li>
-<li> <a href="#testlinessidebyside">testLinesSideBySide</a> &mdash; If the two strings are equal, return true, else show the differences and return false.</li>
-<li> <a href="#comparefiles">compareFiles</a> &mdash; Compare two files and return the differences.</li>
+<li>type:  <a href="#OpResultStr">OpResultStr</a> &mdash; On success return T, otherwise return a message telling what went wrong.</li>
+<li> <a href="#opValueStr">opValueStr</a> &mdash; Return an OpResultStr with a value.</li>
+<li> <a href="#opMessageStr">opMessageStr</a> &mdash; Return an OpResultStr with a message why the value cannot be returned.</li>
+<li> <a href="#splitNewLines">splitNewLines</a> &mdash; Split lines and keep the line endings.</li>
+<li> <a href="#linesSideBySide">linesSideBySide</a> &mdash; Show the two sets of lines side by side.</li>
+<li> <a href="#testLinesSideBySide">testLinesSideBySide</a> &mdash; If the two strings are equal, return true, else show the differences and return false.</li>
+<li> <a href="#compareFiles">compareFiles</a> &mdash; Compare two files and return the differences.</li>
 </ul>
 
-<h3 id=opresultstr>OpResultStr</h3>
+<h3 id="OpResultStr">OpResultStr</h3>
 
 <pre class="description">
 On success return T, otherwise return a message telling what went wrong.
@@ -56,7 +59,7 @@ On success return T, otherwise return a message telling what went wrong.
 OpResultStr[T] = OpResult[T, string]
 </pre>
 
-<h3 id=opvaluestr>opValueStr</h3>
+<h3 id="opValueStr">opValueStr</h3>
 
 <pre class="description">
 Return an OpResultStr with a value.
@@ -66,7 +69,7 @@ Return an OpResultStr with a value.
 func opValueStr[T](value: T): OpResultStr[T]
 </pre>
 
-<h3 id=opmessagestr>opMessageStr</h3>
+<h3 id="opMessageStr">opMessageStr</h3>
 
 <pre class="description">
 Return an OpResultStr with a message why the value cannot be returned.
@@ -76,7 +79,7 @@ Return an OpResultStr with a message why the value cannot be returned.
 func opMessageStr[T](message: string): OpResultStr[T]
 </pre>
 
-<h3 id=splitnewlines>splitNewLines</h3>
+<h3 id="splitNewLines">splitNewLines</h3>
 
 <pre class="description">
 Split lines and keep the line endings. Works with n and rn type endings. keyword: splitLines
@@ -86,7 +89,7 @@ Split lines and keep the line endings. Works with n and rn type endings. keyword
 func splitNewLines(content: string): seq[string]
 </pre>
 
-<h3 id=linessidebyside>linesSideBySide</h3>
+<h3 id="linesSideBySide">linesSideBySide</h3>
 
 <pre class="description">
 Show the two sets of lines side by side.
@@ -96,7 +99,7 @@ Show the two sets of lines side by side.
 proc linesSideBySide(gotContent: string; expectedContent: string): string
 </pre>
 
-<h3 id=testlinessidebyside>testLinesSideBySide</h3>
+<h3 id="testLinesSideBySide">testLinesSideBySide</h3>
 
 <pre class="description">
 If the two strings are equal, return true, else show the differences and return false.
@@ -106,7 +109,7 @@ If the two strings are equal, return true, else show the differences and return 
 proc testLinesSideBySide(got: string; expected: string): bool
 </pre>
 
-<h3 id=comparefiles>compareFiles</h3>
+<h3 id="compareFiles">compareFiles</h3>
 
 <pre class="description">
 Compare two files and return the differences. When they are equal return "".

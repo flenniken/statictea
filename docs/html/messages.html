@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-</head>
+<title>messages.nim</title>
 <style>
 body {
     max-width: 40em;
@@ -24,9 +24,12 @@ body {
 
 .nim-code {
     border-left: 6px solid green;
-    padding-left: 10px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
 }
 </style>
+</head>
 <body>
 <h1>messages.nim</h1>
 
@@ -37,18 +40,18 @@ Nim source code: <a href="../../src/messages.nim">messages.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#messageid">MessageId</a> &mdash; Message numbers.</li>
-<li>const:  <a href="#messages">Messages</a> &mdash; The message text.</li>
-<li>type:  <a href="#warningdata">WarningData</a> &mdash; Warning data.</li>
-<li> <a href="#getwarning">getWarning</a> &mdash; Return the warning string.</li>
-<li> <a href="#getwarningline">getWarningLine</a> &mdash; Return a formatted warning line.</li>
-<li> <a href="#getwarningline-1">getWarningLine</a> &mdash; Return a formatted warning line.</li>
-<li> <a href="#newwarningdata">newWarningData</a> &mdash; Create a WarningData object containing all the warning information.</li>
-<li> <a href="#">`$`</a> &mdash; Return a string representation of WarningData.</li>
-<li> <a href="#-1">`==`</a> &mdash; Return true when the two WarningData objects are equal.</li>
+<li>type:  <a href="#MessageId">MessageId</a> &mdash; Message numbers.</li>
+<li>const:  <a href="#Messages">Messages</a> &mdash; The message text.</li>
+<li>type:  <a href="#WarningData">WarningData</a> &mdash; Warning data.</li>
+<li> <a href="#getWarning">getWarning</a> &mdash; Return the warning string.</li>
+<li> <a href="#getWarningLine">getWarningLine</a> &mdash; Return a formatted warning line.</li>
+<li> <a href="#getWarningLine-1">getWarningLine</a> &mdash; Return a formatted warning line.</li>
+<li> <a href="#newWarningData">newWarningData</a> &mdash; Create a WarningData object containing all the warning information.</li>
+<li> <a href="#a__">`$`</a> &mdash; Return a string representation of WarningData.</li>
+<li> <a href="#a___">`==`</a> &mdash; Return true when the two WarningData objects are equal.</li>
 </ul>
 
-<h3 id=messageid>MessageId</h3>
+<h3 id="MessageId">MessageId</h3>
 
 <pre class="description">
 Message numbers.
@@ -124,10 +127,11 @@ MessageId = enum
   wMissingStateVar, wCallbackListParam, wStateRequired, wReturnArgument,
   wVarStartsWithLetter, wVarContainsChars, wVarEndsWith, wVarMaximumLength,
   wNotFuncVariable, wImmutableDict, wImmutableList, wNewListInDict,
-  wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg
+  wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg,
+  wInvalidAnchorType
 </pre>
 
-<h3 id=messages>Messages</h3>
+<h3 id="Messages">Messages</h3>
 
 <pre class="description">
 The message text.
@@ -292,10 +296,11 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "The index value must be a variable name or literal string.",
     "The index variable value is not a valid variable name.",
     "The index value is not a string.",
-    "A two parameter IF function cannot be used as an argument."]
+    "A two parameter IF function cannot be used as an argument.",
+    "Invalid anchor type, expected html or github."]
 </pre>
 
-<h3 id=warningdata>WarningData</h3>
+<h3 id="WarningData">WarningData</h3>
 
 <pre class="description">
 Warning data.<ul class="simple"><li>messageId -- the message id</li>
@@ -313,7 +318,7 @@ WarningData = object
 
 </pre>
 
-<h3 id=getwarning>getWarning</h3>
+<h3 id="getWarning">getWarning</h3>
 
 <pre class="description">
 Return the warning string.
@@ -323,7 +328,7 @@ Return the warning string.
 func getWarning(warning: MessageId; p1 = ""): string
 </pre>
 
-<h3 id=getwarningline>getWarningLine</h3>
+<h3 id="getWarningLine">getWarningLine</h3>
 
 <pre class="description">
 Return a formatted warning line. For example:
@@ -337,7 +342,7 @@ filename(line): wId: message.
 func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = ""): string
 </pre>
 
-<h3 id=getwarningline-1>getWarningLine</h3>
+<h3 id="getWarningLine-1">getWarningLine</h3>
 
 <pre class="description">
 Return a formatted warning line. For example:
@@ -351,7 +356,7 @@ filename(line): wId: message.
 func getWarningLine(filename: string; lineNum: int; warningData: WarningData): string
 </pre>
 
-<h3 id=newwarningdata>newWarningData</h3>
+<h3 id="newWarningData">newWarningData</h3>
 
 <pre class="description">
 Create a WarningData object containing all the warning information.
@@ -361,7 +366,7 @@ Create a WarningData object containing all the warning information.
 func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData
 </pre>
 
-<h3 id=>`$`</h3>
+<h3 id="a__">`$`</h3>
 
 <pre class="description">
 Return a string representation of WarningData.
@@ -376,7 +381,7 @@ check $warning == "wUnknownArg(p1):5"
 func `$`(warningData: WarningData): string
 </pre>
 
-<h3 id=-1>`==`</h3>
+<h3 id="a___">`==`</h3>
 
 <pre class="description">
 Return true when the two WarningData objects are equal.
