@@ -3,9 +3,30 @@ import parseMarkdown
 import sharedtestcode
 import compareLines
 
+proc markdownString(elements: seq[Element]): string =
+  ## Recreate the markdown string from the markdown elements.
+  for element in elements:
+    case element.tag
+    of nothing:
+      discard
+    of p, code:
+      for nl_string in element.content:
+        result.add(nl_string)
+    of bullets:
+      for nl_string in element.content:
+        result.add("* ")
+        result.add(nl_string)
+
 proc testParseMarkdown(content: string, expected: string): bool =
   ## Test parseMarkdown
   let elements = parseMarkdown(content)
+
+  let roundtrip = markdownString(elements)
+  if content != roundtrip:
+    echo "roundtrip:"
+    echo linesSideBySide(roundtrip, content)
+    return false
+
   let got = $elements
   if got == expected:
     return true
@@ -136,8 +157,7 @@ c = 7
 :a = 5
 b = 6
 c = 7
-:
-"""
+:"""
     check testParseMarkdown(content, expected)
 
   test "code out of lines":
@@ -161,8 +181,7 @@ c = 7
 ---code---
 :~~~
 :* fake bullet
-:
-"""
+:"""
     check testParseMarkdown(content, expected)
 
   test "bullets":

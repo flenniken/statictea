@@ -11,8 +11,8 @@ type
     bullets,
 
   Element* = object
-    tag: ElementTag
-    content: seq[string]
+    tag*: ElementTag
+    content*: seq[string]
 
 proc newElement*(tag: ElementTag, content: seq[string]): Element =
   ## Create an Element object.
@@ -130,7 +130,7 @@ func parseMarkdown*(desc: string): seq[Element] =
   of code:
     # code ended
     content.add(newLineString)
-    content.add("\n")
+    content.add("")
     result.add(newElement(tag, content))
   of bullets:
     # bullets ended

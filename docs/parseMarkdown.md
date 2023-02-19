@@ -27,8 +27,8 @@ ElementTag = enum
 
 ```nim
 Element = object
-  tag: ElementTag
-  content: seq[string]
+  tag*: ElementTag
+  content*: seq[string]
 
 ```
 
