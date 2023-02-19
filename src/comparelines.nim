@@ -40,7 +40,7 @@ proc readFileContent(filename: string): OpResultStr[string] =
     result = opMessageStr[string](getCurrentExceptionMsg())
 
 proc linesSideBySide*(gotContent: string, expectedContent: string): string =
-  ## Show the two sets of lines side by side.
+  ## Show the two sets of lines side by side (above and below).
 
   if gotContent == "" and expectedContent == "":
      return "both empty"

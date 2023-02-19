@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>parseMarkdown.nim</title>
+<style>
+body {
+    max-width: 40em;
+    font-size: 2em;
+    margin-left: 1em;
+}
+
+#staticteadep {
+    width: 100%;
+}
+
+.signature {
+    color: green;
+}
+
+.description {
+    white-space: pre-wrap;
+}
+
+.nim-code {
+    border-left: 6px solid green;
+    padding: 16px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
+}
+</style>
+</head>
+<body>
+<h1>parseMarkdown.nim</h1>
+
+Parse the simple markdown used in the function descriptions.
+
+Nim source code: <a href="../../src/parseMarkdown.nim">parseMarkdown.nim</a>
+
+<h1>Index</h1>
+
+<ul>
+<li>type:  <a href="#ElementTag">ElementTag</a> &mdash; </li>
+<li>type:  <a href="#Element">Element</a> &mdash; </li>
+<li> <a href="#newElement">newElement</a> &mdash; Create an Element object.</li>
+<li> <a href="#parseMarkdown">parseMarkdown</a> &mdash; Parse the description markdown and return a list of elements.</li>
+<li> <a href="#a__">`$`</a> &mdash; Return a string representation of an Element.</li>
+<li> <a href="#a__-1">`$`</a> &mdash; Return a string representation of a list of Elements.</li>
+</ul>
+
+<h3 id="ElementTag">ElementTag</h3>
+
+<pre class="description">
+
+</pre>
+
+<pre class="nim-code">
+ElementTag = enum
+  nothing, p, code, bullets
+</pre>
+
+<h3 id="Element">Element</h3>
+
+<pre class="description">
+
+</pre>
+
+<pre class="nim-code">
+Element = object
+  tag: ElementTag
+  content: seq[string]
+
+</pre>
+
+<h3 id="newElement">newElement</h3>
+
+<pre class="description">
+Create an Element object.
+</pre>
+
+<pre class="nim-code">
+proc newElement(tag: ElementTag; content: seq[string]): Element
+</pre>
+
+<h3 id="parseMarkdown">parseMarkdown</h3>
+
+<pre class="description">
+Parse the description markdown and return a list of elements.
+
+elements:
+* p -- a paragraph
+* code -- a code block
+* bullets -- a list of bullet points
+</pre>
+
+<pre class="nim-code">
+func parseMarkdown(desc: string): seq[Element]
+</pre>
+
+<h3 id="a__">`$`</h3>
+
+<pre class="description">
+Return a string representation of an Element.
+</pre>
+
+<pre class="nim-code">
+func `$`(element: Element): string
+</pre>
+
+<h3 id="a__-1">`$`</h3>
+
+<pre class="description">
+Return a string representation of a list of Elements.
+</pre>
+
+<pre class="nim-code">
+func `$`(elements: seq[Element]): string
+</pre>
+
+
+<p>⦿ This page was generated
+by <a href="https://github.com/flenniken/statictea/">statictea</a>
+from nim doc comments. ⦿</p>
+
+</body>
+</html>
