@@ -1,7 +1,31 @@
 import std/unittest
+import std/strutils
 import parseMarkdown
 import sharedtestcode
 import compareLines
+
+proc markdownHtml(elements: seq[Element]): string =
+  ## Generate HTML from the markdown elements.
+  for element in elements:
+    case element.tag
+    of nothing:
+      discard
+    of p:
+      result.add("<p>\n")
+      result.add(strip(element.content[0]))
+      result.add("\n</p>\n")
+    of code:
+      result.add("<pre>\n")
+      if element.content.len == 3:
+        result.add(element.content[1])
+      result.add("</pre>\n")
+    of bullets:
+      result.add("<ul>\n")
+      for nl_string in element.content:
+        result.add("  <ls>")
+        result.add(strip(nl_string))
+        result.add("</ls>\n")
+      result.add("</ul>\n")
 
 proc markdownString(elements: seq[Element]): string =
   ## Recreate the markdown string from the markdown elements.
@@ -9,7 +33,11 @@ proc markdownString(elements: seq[Element]): string =
     case element.tag
     of nothing:
       discard
-    of p, code:
+    of p:
+      assert element.content.len == 1
+      result.add(element.content[0])
+    of code:
+      assert element.content.len == 3 or element.content.len == 2
       for nl_string in element.content:
         result.add(nl_string)
     of bullets:
@@ -140,6 +168,22 @@ c = 7
 :a = 5
 b = 6
 c = 7
+:~~~
+"""
+    check testParseMarkdown(content, expected)
+
+  test "parseMarkdown code type":
+    let content = """
+~~~nim
+a = 5
+b = 6
+~~~
+"""
+    let expected = """
+---code---
+:~~~nim
+:a = 5
+b = 6
 :~~~
 """
     check testParseMarkdown(content, expected)
@@ -281,3 +325,27 @@ b = 6
 :~~~
 """
     check testParseMarkdown(content, expected)
+
+    let expectedHtml = """
+<p>
+This is a full test of all the
+different elements.
+</p>
+<ul>
+  <ls>red</ls>
+  <ls>green</ls>
+  <ls>blue</ls>
+</ul>
+<p>
+Examples:
+</p>
+<pre>
+a = 5
+b = 6
+</pre>
+"""
+    let elements = parseMarkdown(content)
+    let html =  markdownHtml(elements)
+    if html != expectedHtml:
+      echo linesSideBySide(html, expectedHtml)
+      fail
