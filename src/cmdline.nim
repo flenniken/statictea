@@ -1,7 +1,7 @@
 ## Parse the command line.
 ## @:
 ## @: Example:
-## @: ~~~
+## @: ~~~nim
 ## @: import cmdline
 ## @:
 ## @: # Define the supported options.

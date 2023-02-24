@@ -26,18 +26,20 @@ body {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
-    border-radius: 6px;
+    overflow: auto;
 }
 </style>
 </head>
 <body>
 <h1>opresult.nim</h1>
 
+<pre class="description">
 OpResult holds either a value or a message.  It's similar to
 the Option type but instead of returning nothing, you return a
 message that tells why you cannot return the value.
 
 You use this to make particular OpResult objects. See [OpResultId](opresultid.md).
+</pre>
 
 Nim source code: <a href="../../src/opresult.nim">opresult.nim</a>
 

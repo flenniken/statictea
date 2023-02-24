@@ -30,7 +30,7 @@ body {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
-    border-radius: 6px;
+    overflow: auto;
 }
 </style>
 </head>
@@ -38,7 +38,9 @@ body {
 <!--$ block -->
 <h1>{o.moduleName}</h1>
 
+<pre class="description">
 {o.moduleDescription}
+</pre>
 
 Nim source code: <a href="../../src/{o.moduleName}">{o.moduleName}</a>
 <!--$ endblock -->

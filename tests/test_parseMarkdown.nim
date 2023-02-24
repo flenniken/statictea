@@ -32,12 +32,13 @@ proc markdownString(elements: seq[Element]): string =
   for element in elements:
     case element.tag
     of nothing:
+      assert false
       discard
     of p:
       assert element.content.len == 1
       result.add(element.content[0])
     of code:
-      assert element.content.len == 3 or element.content.len == 2
+      assert element.content.len == 3
       for nl_string in element.content:
         result.add(nl_string)
     of bullets:
@@ -204,7 +205,7 @@ c = 7
 :"""
     check testParseMarkdown(content, expected)
 
-  test "code out of lines":
+  test "empty block":
     let content = """
 ~~~
 ~~~
@@ -212,7 +213,7 @@ c = 7
     let expected = """
 ---code---
 :~~~
-:~~~
+::~~~
 """
     check testParseMarkdown(content, expected)
 

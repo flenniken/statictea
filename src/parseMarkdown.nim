@@ -27,15 +27,18 @@ func parseMarkdown*(desc: string): seq[Element] =
   ## elements.
   ## @:
   ## @:elements:
-  ## @:* p -- a paragraph
-  ## @:* code -- a code block
-  ## @:* bullets -- a list of bullet points
-
-  # result = [
-  #   ["p", [nl-string],
-  #   ["code", [~~~line, nl-string, ~~~line],
-  #   ["bullets", [nl-string, nl-string, nl-string, ...],
-  # ]
+  ## @:
+  ## @:* p -- A paragraph element is one string, possibly containing
+  ## @:newlines.
+  ## @:
+  ## @:* code -- A code element is three strings. The first string is
+  ## @:the code start line, for example “~~~” or “~~~nim”.  The second
+  ## @:string contains the contents of the block, when none it’s empty.
+  ## @:The third string is the ending line, for example “~~~”.
+  ## @:
+  ## @:* bullets -- A bullets element contains a string for each
+  ## @:bullet point and it may contain newlines.  The leading “* “ is
+  ## @:not part of the string.
 
   # The current tag.
   var tag = nothing
@@ -84,8 +87,7 @@ func parseMarkdown*(desc: string): seq[Element] =
     of code:
       if line.startsWith("~~~"):
         # code ended
-        if newLineString != "":
-          content.add(newLineString)
+        content.add(newLineString)
         content.add(line)
         result.add(newElement(tag, content))
         content.clear()

@@ -45,9 +45,18 @@ proc newElement(tag: ElementTag; content: seq[string]): Element
 Parse the description markdown and return a list of elements.
 
 elements:
-* p -- a paragraph
-* code -- a code block
-* bullets -- a list of bullet points
+
+* p -- A paragraph element is one string, possibly containing
+newlines.
+
+* code -- A code element is three strings. The first string is
+the code start line, for example “~~~” or “~~~nim”.  The second
+string contains the contents of the block, when none it’s empty.
+The third string is the ending line, for example “~~~”.
+
+* bullets -- A bullets element contains a string for each
+bullet point and it may contain newlines.  The leading “* “ is
+not part of the string.
 
 ```nim
 func parseMarkdown(desc: string): seq[Element]

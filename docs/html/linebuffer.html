@@ -26,13 +26,14 @@ body {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
-    border-radius: 6px;
+    overflow: auto;
 }
 </style>
 </head>
 <body>
 <h1>linebuffer.nim</h1>
 
+<pre class="description">
 Read lines from a stream without exceeding the maximum line length. The returned lines contain the line ending, either crlf or lf.
 
 Example:
@@ -44,6 +45,7 @@ var lb = lbO.get()
 while line = lb.readLine():
   processLine(line)
 ~~~
+</pre>
 
 Nim source code: <a href="../../src/linebuffer.nim">linebuffer.nim</a>
 

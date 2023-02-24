@@ -26,13 +26,14 @@ body {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
-    border-radius: 6px;
+    overflow: auto;
 }
 </style>
 </head>
 <body>
 <h1>regexes.nim</h1>
 
+<pre class="description">
 Perl regular expression matching.
 
 Examples:
@@ -73,6 +74,7 @@ let resultStringO = replaceMany("abcdefabc", replacements)
 check resultStringO.isSome
 check resultStringO.get() == "456456"
 ~~~
+</pre>
 
 Nim source code: <a href="../../src/regexes.nim">regexes.nim</a>
 

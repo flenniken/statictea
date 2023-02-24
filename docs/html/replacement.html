@@ -26,13 +26,14 @@ body {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
-    border-radius: 6px;
+    overflow: auto;
 }
 </style>
 </head>
 <body>
 <h1>replacement.nim</h1>
 
+<pre class="description">
 Handle the replacement block lines.
 
 To support replacement blocks that consists of many lines and blocks
@@ -58,6 +59,7 @@ A bracketed variable does not contain space around the variable.
 
 To use a left bracket in a replacement block you use two left brackets, {{,
 {{ results in {.
+</pre>
 
 Nim source code: <a href="../../src/replacement.nim">replacement.nim</a>
 
