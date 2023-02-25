@@ -28,7 +28,7 @@ const
   ]
     ## Dynamically generated sorted list of built-in functions. Each
     ## line contains the nim function name, its doc comment, and the
-    ## starting line number.  See templates/dynamicFuncList.nim
+    ## number of lines.  See templates/dynamicFuncList.nim
     
   # Note: the function starting lines is separate from the list above
   # so when there are changes the diffs are easier to read.

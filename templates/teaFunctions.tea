@@ -25,8 +25,8 @@ get-name = func(ix: int, funcVar: func, newList: list) bool
   newList &= fd.signature.name
   return(false)
 
-# Get a list of all the function names then make that into github
-# anchor names.
+# Get a list of all the function names then make that into anchor
+# names.
 names = []
 stopped3 = listLoop(flatFuncList, names, l.get-name)
 

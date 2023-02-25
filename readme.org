@@ -2576,7 +2576,8 @@ files.
 The stf files are designed to look good in markdown readers.  The
 testfiles folder contains [[testfiles/stf-index.md][StaticTea Stf Files]].
 
-See the runner help message for more information about stf files.
+See the runner help message for more information about stf
+files. The runhelp nimble task shows the stf help with glow.
 
 [[#contents][茶]]
 
