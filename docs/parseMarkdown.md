@@ -11,6 +11,13 @@ Parse the simple markdown used in the function descriptions.
 * [parseMarkdown](#parsemarkdown) &mdash; Parse the description markdown and return a list of elements.
 * [`$`](#) &mdash; Return a string representation of an Element.
 * [`$`](#-1) &mdash; Return a string representation of a list of Elements.
+* type: [FragmentType](#fragmenttype) &mdash; Hightlight fragments.
+* type: [Fragment](#fragment) &mdash; A fragment of a string.
+* [newFragment](#newfragment) &mdash; 
+* [`$`](#-2) &mdash; Return a string representation of a Fragment.
+* [`$`](#-3) &mdash; Return a string representation of a sequence of fragments.
+* [matchFragment](#matchfragment) &mdash; Match a highlight fragment starting at the given position.
+* [highlightStaticTea](#highlightstatictea) &mdash; Identify all the fragments in the StaticTea code line to highlight.
 
 # ElementTag
 
@@ -76,6 +83,78 @@ Return a string representation of a list of Elements.
 
 ```nim
 func `$`(elements: seq[Element]): string
+```
+
+# FragmentType
+
+Hightlight fragments.
+
+* ftType -- int, float, string, list, dict, bool, any, true, false
+* ftFunc -- a variable name followed by a left parenthesis
+* ftVarName -- a variable name
+* ftNumber -- a literal number
+* ftString -- a literal string
+* ftDocComment -- a ## to the end of the line
+* ftComment -- a # to the end of the line
+
+```nim
+FragmentType = enum
+  ftType, ftFunc, ftVarName, ftNumber, ftString, ftDocComment, ftComment
+```
+
+# Fragment
+
+A fragment of a string.
+* kind -- the type of fragment
+* start -- the index in the string where the fragment starts
+* length -- the number of ascii characters in the fragment
+
+```nim
+Fragment = object
+  fragmentType*: FragmentType
+  start*: Natural
+  length*: Natural
+
+```
+
+# newFragment
+
+
+
+```nim
+func newFragment(fragmentType: FragmentType; start: Natural; length: Natural): Fragment
+```
+
+# `$`
+
+Return a string representation of a Fragment.
+
+```nim
+func `$`(f: Fragment): string
+```
+
+# `$`
+
+Return a string representation of a sequence of fragments.
+
+```nim
+func `$`(fragments: seq[Fragment]): string
+```
+
+# matchFragment
+
+Match a highlight fragment starting at the given position.
+
+```nim
+proc matchFragment(line: string; start: Natural): Option[Fragment]
+```
+
+# highlightStaticTea
+
+Identify all the fragments in the StaticTea code line to highlight.
+
+```nim
+proc highlightStaticTea(codeLine: string): seq[Fragment]
 ```
 
 

@@ -1,7 +1,9 @@
 ## Parse the simple markdown used in the function descriptions.
 
 import std/strutils
+import std/options
 import lineBuffer
+import regexes
 
 type
   ElementTag* = enum
@@ -149,3 +151,81 @@ func `$`*(elements: seq[Element]): string =
   ## Return a string representation of a list of Elements.
   for element in elements:
     result.add($element)
+
+type
+  FragmentType* = enum
+    ## Hightlight fragments.
+    ## @:
+    ## @:* ftType -- int, float, string, list, dict, bool, any, true, false
+    ## @:* ftFunc -- a variable name followed by a left parenthesis
+    ## @:* ftVarName -- a variable name
+    ## @:* ftNumber -- a literal number
+    ## @:* ftString -- a literal string
+    ## @:* ftDocComment -- a ## to the end of the line
+    ## @:* ftComment -- a # to the end of the line
+    ftType
+    ftFunc
+    ftVarName
+    ftNumber
+    ftString
+    ftDocComment
+    ftComment
+
+  Fragment* = object
+    ## A fragment of a string.
+    ## @:* kind -- the type of fragment
+    ## @:* start -- the index in the string where the fragment starts
+    ## @:* length -- the number of ascii characters in the fragment
+    fragmentType*: FragmentType
+    start*: Natural
+    length*: Natural
+
+func newFragment*(fragmentType: FragmentType, start: Natural, length: Natural): Fragment =
+  result = Fragment(fragmentType: fragmentType, start: start, length: length)
+
+func `$`*(f: Fragment): string =
+  ## Return a string representation of a Fragment.
+  result.add("$1, start: $2, length: $3" % [$f.fragmentType, $f.start, $f.length])
+
+func `$`*(fragments: seq[Fragment]): string =
+  ## Return a string representation of a sequence of fragments.
+  if fragments.len == 0:
+    return "no fragments"
+  for f in fragments:
+    result.add("$1, start: $2, length: $3\n" % [$f.fragmentType, $f.start, $f.length])
+
+proc matchFragment*(line: string, start: Natural): Option[Fragment] =
+  ## Match a highlight fragment starting at the given position.
+
+  let numGroups = 7
+  let typeP = r"(true|false|int|string|float|dict|list|any|bool)\b"
+  let funcP = r"([a-zA-Z]+[a-zA-Z0-9\.\-_]*)\("
+  let varNameP = r"([a-zA-Z]+[a-zA-Z0-9\.\-_]*)\b"
+  let numP = r"(\-*[.0-9]*)\b"
+  let stringP = r"($1(?:\\.|[^\$1])*$1)" % "\""
+  let docCommentP = r"(##.*)"
+  let commentP = r"(#.*)"
+  let pattern = "$1|$2|$3|$4|$5|$6|$7" % [typeP, funcP, varNameP, numP, stringP, docCommentP, commentP]
+  let matchesO = matchPatternCached(line, pattern, start, numGroups)
+  if not matchesO.isSome:
+    return
+  let groups = getGroups(matchesO.get(), numGroups)
+  for ix, group in groups:
+    if group != "":
+      let fragmentType = FragmentType(ix)
+      return some(newFragment(fragmentType, start, matchesO.get().length))
+
+proc highlightStaticTea*(codeLine: string): seq[Fragment] =
+  ## Identify all the fragments in the StaticTea code line to
+  ## highlight.
+  var ix = 0
+  while true:
+    if ix >= codeLine.len:
+      break
+    let fragmentO = matchFragment(codeLine, ix)
+    if fragmentO.isSome:
+      let fragment = fragmentO.get()
+      result.add(fragment)
+      ix = ix + fragment.length
+    else:
+      inc(ix)

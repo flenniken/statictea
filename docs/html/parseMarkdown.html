@@ -48,6 +48,13 @@ Nim source code: <a href="../../src/parseMarkdown.nim">parseMarkdown.nim</a>
 <li> <a href="#parseMarkdown">parseMarkdown</a> &mdash; Parse the description markdown and return a list of elements.</li>
 <li> <a href="#a__">`$`</a> &mdash; Return a string representation of an Element.</li>
 <li> <a href="#a__-1">`$`</a> &mdash; Return a string representation of a list of Elements.</li>
+<li>type:  <a href="#FragmentType">FragmentType</a> &mdash; Hightlight fragments.</li>
+<li>type:  <a href="#Fragment">Fragment</a> &mdash; A fragment of a string.</li>
+<li> <a href="#newFragment">newFragment</a> &mdash; </li>
+<li> <a href="#a__-2">`$`</a> &mdash; Return a string representation of a Fragment.</li>
+<li> <a href="#a__-3">`$`</a> &mdash; Return a string representation of a sequence of fragments.</li>
+<li> <a href="#matchFragment">matchFragment</a> &mdash; Match a highlight fragment starting at the given position.</li>
+<li> <a href="#highlightStaticTea">highlightStaticTea</a> &mdash; Identify all the fragments in the StaticTea code line to highlight.</li>
 </ul>
 
 <h3 id="ElementTag">ElementTag</h3>
@@ -126,6 +133,92 @@ Return a string representation of a list of Elements.
 
 <pre class="nim-code">
 func `$`(elements: seq[Element]): string
+</pre>
+
+<h3 id="FragmentType">FragmentType</h3>
+
+<pre class="description">
+Hightlight fragments.
+
+* ftType -- int, float, string, list, dict, bool, any, true, false
+* ftFunc -- a variable name followed by a left parenthesis
+* ftVarName -- a variable name
+* ftNumber -- a literal number
+* ftString -- a literal string
+* ftDocComment -- a ## to the end of the line
+* ftComment -- a # to the end of the line
+</pre>
+
+<pre class="nim-code">
+FragmentType = enum
+  ftType, ftFunc, ftVarName, ftNumber, ftString, ftDocComment, ftComment
+</pre>
+
+<h3 id="Fragment">Fragment</h3>
+
+<pre class="description">
+A fragment of a string.
+* kind -- the type of fragment
+* start -- the index in the string where the fragment starts
+* length -- the number of ascii characters in the fragment
+</pre>
+
+<pre class="nim-code">
+Fragment = object
+  fragmentType*: FragmentType
+  start*: Natural
+  length*: Natural
+
+</pre>
+
+<h3 id="newFragment">newFragment</h3>
+
+<pre class="description">
+
+</pre>
+
+<pre class="nim-code">
+func newFragment(fragmentType: FragmentType; start: Natural; length: Natural): Fragment
+</pre>
+
+<h3 id="a__-2">`$`</h3>
+
+<pre class="description">
+Return a string representation of a Fragment.
+</pre>
+
+<pre class="nim-code">
+func `$`(f: Fragment): string
+</pre>
+
+<h3 id="a__-3">`$`</h3>
+
+<pre class="description">
+Return a string representation of a sequence of fragments.
+</pre>
+
+<pre class="nim-code">
+func `$`(fragments: seq[Fragment]): string
+</pre>
+
+<h3 id="matchFragment">matchFragment</h3>
+
+<pre class="description">
+Match a highlight fragment starting at the given position.
+</pre>
+
+<pre class="nim-code">
+proc matchFragment(line: string; start: Natural): Option[Fragment]
+</pre>
+
+<h3 id="highlightStaticTea">highlightStaticTea</h3>
+
+<pre class="description">
+Identify all the fragments in the StaticTea code line to highlight.
+</pre>
+
+<pre class="nim-code">
+proc highlightStaticTea(codeLine: string): seq[Fragment]
 </pre>
 
 
