@@ -217,7 +217,7 @@ proc matchFragment*(line: string, start: Natural): Option[Fragment] =
 
 proc highlightStaticTea*(codeLine: string): seq[Fragment] =
   ## Identify all the fragments in the StaticTea code line to
-  ## highlight.
+  ## highlight. The fragments are ordered from left to right.
   var ix = 0
   while true:
     if ix >= codeLine.len:

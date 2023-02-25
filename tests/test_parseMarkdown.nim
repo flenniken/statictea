@@ -1,6 +1,7 @@
 import std/unittest
 import std/strutils
 import std/options
+import std/strFormat
 import parseMarkdown
 import sharedtestcode
 import compareLines
@@ -17,16 +18,45 @@ proc markdownHtml(elements: seq[Element]): string =
       result.add(strip(element.content[0]))
       result.add("\n</p>\n")
     of code:
-      result.add("<pre>\n")
-      if element.content.len == 3:
-        result.add(element.content[1])
+      result.add("""<pre class="nim-code">""" & "\n")
+      let codeString = element.content[1]
+      let fragments = highlightStaticTea(codeString)
+      var begin = 0
+      for fragment in fragments:
+        var color: string
+        case fragment.fragmentType
+        of ftType:
+          color = "red"
+        of ftFunc:
+          color = "blue"
+        of ftVarName:
+          color = "green"
+        of ftNumber:
+          color = "IndianRed"
+        of ftString:
+          color = "SeaGreen"
+        of ftDocComment:
+          color = "OrangeRed"
+        of ftComment:
+          color = "FireBrick"
+
+        result.add(codeString[begin .. fragment.start-1])
+
+        result.add(fmt"""<span style="color: {color};">""")
+        let finish = fragment.start + fragment.length
+        result.add(codeString[fragment.start .. finish-1])
+        result.add("</span>")
+
+        begin = finish
+
+      result.add(codeString[begin .. ^1])
       result.add("</pre>\n")
     of bullets:
       result.add("<ul>\n")
       for nl_string in element.content:
-        result.add("  <ls>")
+        result.add("  <li>")
         result.add(strip(nl_string))
-        result.add("</ls>\n")
+        result.add("</li>\n")
       result.add("</ul>\n")
 
 proc markdownString(elements: seq[Element]): string =
@@ -329,8 +359,8 @@ different elements.
 Examples:
 
 ~~~
-a = 5
-b = 6
+apple = 123
+banana = "plant"
 ~~~
 """
     let expected = """
@@ -348,8 +378,8 @@ different elements.
 
 ---code---
 :~~~
-:a = 5
-b = 6
+:apple = 123
+banana = "plant"
 :~~~
 """
     check testParseMarkdown(content, expected)
@@ -360,20 +390,21 @@ This is a full test of all the
 different elements.
 </p>
 <ul>
-  <ls>red</ls>
-  <ls>green</ls>
-  <ls>blue</ls>
+  <li>red</li>
+  <li>green</li>
+  <li>blue</li>
 </ul>
 <p>
 Examples:
 </p>
-<pre>
-a = 5
-b = 6
+<pre class="nim-code">
+<span style="color: green;">apple</span> = <span style="color: IndianRed;">123</span>
+<span style="color: green;">banana</span> = <span style="color: SeaGreen;">"plant"</span>
 </pre>
 """
     let elements = parseMarkdown(content)
     let html =  markdownHtml(elements)
+    # echo html
     if html != expectedHtml:
       echo linesSideBySide(html, expectedHtml)
       fail
@@ -471,4 +502,3 @@ b = 6
       newFragment(ftNumber, 4, 1),
       newFragment(ftComment, 6, 9),
     ])
-
