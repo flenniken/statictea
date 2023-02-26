@@ -22,20 +22,24 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>startingvars.nim</h1>
 
-<pre class="description">
-Get the starting variables.
-</pre>
+<p>Get the starting variables.</p>
 
 Nim source code: <a href="../../src/startingvars.nim">startingvars.nim</a>
 
@@ -50,42 +54,38 @@ Nim source code: <a href="../../src/startingvars.nim">startingvars.nim</a>
 
 <h3 id="readJsonFiles">readJsonFiles</h3>
 
-<pre class="description">
-Read json files and return a variable dictionary.  Skip a duplicate variable and generate a warning.
-</pre>
+<p>Read json files and return a variable dictionary.  Skip a duplicate variable and generate a warning.</p>
 
 <pre class="nim-code">
-proc readJsonFiles(env: var Env; filenames: seq[string]): VarsDict
+proc readJsonFiles(env: var Env; filenames: seq[string]): VarsDict {.
+    raises: [ValueError, IOError, OSError, Exception],
+    tags: [TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect].}
 </pre>
 
 <h3 id="argsPrepostList">argsPrepostList</h3>
 
-<pre class="description">
-Create a prepost list of lists for t args.
-</pre>
+<p>Create a prepost list of lists for t args.</p>
 
 <pre class="nim-code">
-func argsPrepostList(prepostList: seq[Prepost]): seq[seq[string]]
+func argsPrepostList(prepostList: seq[Prepost]): seq[seq[string]] 
 </pre>
 
 <h3 id="getTeaArgs">getTeaArgs</h3>
 
-<pre class="description">
-Create the t args dictionary from the statictea arguments.
-</pre>
+<p>Create the t args dictionary from the statictea arguments.</p>
 
 <pre class="nim-code">
-func getTeaArgs(args: Args): Value
+func getTeaArgs(args: Args): Value 
 </pre>
 
 <h3 id="getStartVariables">getStartVariables</h3>
 
-<pre class="description">
-Return the starting variables.  Read the server json files, run the code files and setup the initial tea variables.
-</pre>
+<p>Return the starting variables.  Read the server json files, run the code files and setup the initial tea variables.</p>
 
 <pre class="nim-code">
-proc getStartVariables(env: var Env; args: Args): Variables
+proc getStartVariables(env: var Env; args: Args): Variables {.
+    raises: [ValueError, IOError, OSError, Exception, KeyError],
+    tags: [TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect, RootEffect].}
 </pre>
 
 

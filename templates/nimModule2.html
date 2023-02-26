@@ -26,11 +26,17 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
@@ -38,9 +44,7 @@ body {
 <!--$ block -->
 <h1>{o.moduleName}</h1>
 
-<pre class="description">
 {o.moduleDescription}
-</pre>
 
 Nim source code: <a href="../../src/{o.moduleName}">{o.moduleName}</a>
 <!--$ endblock -->
@@ -96,9 +100,7 @@ d.tea => "Earl Grey"
 <!--$ : entry = o.entries[t.row] -->
 <h3 id="{entry.anchor}">{entry.name}</h3>
 
-<pre class="description">
 {entry.description}
-</pre>
 
 <pre class="nim-code">
 {entry.signature}

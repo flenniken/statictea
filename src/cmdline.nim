@@ -1,28 +1,29 @@
 ## Parse the command line.
 ## @:
-## @: Example:
-## @: ~~~nim
-## @: import cmdline
+## @:Example:
 ## @:
-## @: # Define the supported options.
-## @: var options = newSeq@{CmlOption]()
-## @: options.add(newCmlOption("help", 'h', cmlStopArgument))
-## @: options.add(newCmlOption("log", 'l', cmlOptionalArgument))
-## @: ...
+## @:~~~nim
+## @:import cmdline
 ## @:
-## @: # Parse the command line.
-## @: let argsOrMessage = cmdline(options, collectArgs())
-## @: if argsOrMessage.kind == cmlMessageKind:
-## @:   # Display the message.
-## @:   echo getMessage(argsOrMessage.messageId,
-## @:     argsOrMessage.problemArg)
-## @: else:
-## @:   # Optionally post process the resulting arguments.
-## @:   let args = newArgs(argsOrMessage.args)
-## @: ~~~~
+## @:# Define the supported options.
+## @:var options = newSeq@{CmlOption]()
+## @:options.add(newCmlOption("help", 'h', cmlStopArgument))
+## @:options.add(newCmlOption("log", 'l', cmlOptionalArgument))
+## @:...
 ## @:
-## @: For a complete example see the bottom of the file in the isMainModule
-## @: section.
+## @:# Parse the command line.
+## @:let argsOrMessage = cmdline(options, collectArgs())
+## @:if argsOrMessage.kind == cmlMessageKind:
+## @:  # Display the message.
+## @:  echo getMessage(argsOrMessage.messageId,
+## @:    argsOrMessage.problemArg)
+## @:else:
+## @:  # Optionally post process the resulting arguments.
+## @:  let args = newArgs(argsOrMessage.args)
+## @:~~~~
+## @:
+## @:For a complete example see the bottom of the file in the isMainModule
+## @:section.
 
 import std/os
 import std/tables

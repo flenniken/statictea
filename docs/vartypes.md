@@ -38,23 +38,22 @@ StaticTea variable types.
 * [newSignatureOr](#newsignatureor-3) &mdash; Create a SignatureOr object.
 * [newParam](#newparam) &mdash; Create a new Param object.
 * [newVarsDict](#newvarsdict) &mdash; Create a new empty variables dictionary.
-* [newVarsDictOr](#newvarsdictor) &mdash; Return a new varsDictOr object containing a warning.
-* [newVarsDictOr](#newvarsdictor-1) &mdash; Return a new VarsDict object containing a dictionary.
-* [newDictType](#newdicttype) &mdash; 
-* [newListType](#newlisttype) &mdash; 
+* [newVarsDictOr](#newvarsdictor) &mdash; Create a new varsDictOr object containing a warning.
+* [newVarsDictOr](#newvarsdictor-1) &mdash; Create a new VarsDict object containing a dictionary.
+* [newDictType](#newdicttype) &mdash; Create a new DictType object.
+* [newListType](#newlisttype) &mdash; Create a new ListType object.
 * [newValue](#newvalue) &mdash; Create a string value.
 * [newValue](#newvalue-1) &mdash; Create an integer value.
 * [newValue](#newvalue-2) &mdash; Create a bool value.
 * [newValue](#newvalue-3) &mdash; Create a float value.
 * [newValue](#newvalue-4) &mdash; Create a list value.
 * [newValue](#newvalue-5) &mdash; Create a dictionary value from a VarsDict.
-* [newValue](#newvalue-6) &mdash; New value from an existing value.
-* [newValue](#newvalue-7) &mdash; New list value from an array of items of the same kind.
-* [newValue](#newvalue-8) &mdash; New dict value from an array of pairs where the pairs are the
-same type which may be Value type.
+* [newValue](#newvalue-6) &mdash; Create a new value from an existing value.
+* [newValue](#newvalue-7) &mdash; Create a new list value from an array of items of the same kind.
+* [newValue](#newvalue-8) &mdash; Create a new dict value from an array of pairs where the pairs are the same type which may be Value type.
 * [newFunc](#newfunc) &mdash; Create a new func which is a FunctionSpec.
 * [newValue](#newvalue-9) &mdash; Create a new func value.
-* [newEmptyListValue](#newemptylistvalue) &mdash; Return an empty list value.
+* [newEmptyListValue](#newemptylistvalue) &mdash; Create a new empty list value.
 * [newEmptyDictValue](#newemptydictvalue) &mdash; Create a dictionary value from a VarsDict.
 * [`==`](#) &mdash; Return true when two variables are equal.
 * [newStatement](#newstatement) &mdash; Create a new statement.
@@ -97,7 +96,7 @@ same type which may be Value type.
 The characters that make up a variable dotname.  A variable starts with an ascii letter.
 
 ```nim
-variableStartChars: set[char] =
+variableStartChars: set[char] = {'a'..'z', 'A'..'Z'}
 ```
 
 # variableMiddleChars
@@ -105,7 +104,7 @@ variableStartChars: set[char] =
 A variable contains ascii letters, digits, underscores and hypens.
 
 ```nim
-variableMiddleChars: set[char] =
+variableMiddleChars: set[char] = {'a'..'z', 'A'..'Z', '0'..'9', '_', '-'}
 ```
 
 # variableChars
@@ -113,7 +112,7 @@ variableMiddleChars: set[char] =
 A variable contains ascii letters, digits, underscores and hypens. Variables are connected with dots to make a dot name.
 
 ```nim
-variableChars: set[char] =
+variableChars: set[char] = {'a'..'z', '.', 'A'..'Z', '0'..'9', '_', '-'}
 ```
 
 # startTFVarNumber
@@ -121,7 +120,7 @@ variableChars: set[char] =
 A character that starts true, false, a variable or a number.
 
 ```nim
-startTFVarNumber: set[char] =
+startTFVarNumber: set[char] = {'a'..'z', 'A'..'Z', '0'..'9', '-'}
 ```
 
 # VarsDict
@@ -140,7 +139,8 @@ The mutable state of lists and dictionaries.
 * full -- you can change everything
 
 ```nim
-Mutable
+Mutable {.pure.} = enum
+  immutable, append, full
 ```
 
 # DictType
@@ -242,7 +242,8 @@ Statement = object
 Signature of a statictea built in function. It takes any number of values and returns a value or a warning message.
 
 ```nim
-FunctionPtr = proc (variables: Variables; parameters: seq[Value]): FunResult
+FunctionPtr = proc (variables: Variables; parameters: seq[Value]): FunResult {.
+    noSideEffect.}
 ```
 
 # ParamCode
@@ -363,7 +364,7 @@ FunResult = object
       parameter*: int
       warningData*: WarningData
 
-
+  
 ```
 
 # SideEffect
@@ -385,6 +386,8 @@ SideEffect = enum
 # ValuePosSi
 
 A value and the position after the value in the statement along with the side effect, if any. The position includes the trailing whitespace.  For the example statement below, the value 567 starts at index 6 and ends at position 10.
+
+Example:
 
 ~~~
 0123456789 123456789
@@ -415,7 +418,7 @@ Create a Signature object.
 
 ```nim
 proc newSignature(optional: bool; name: string; params: seq[Param];
-                  returnType: ParamType): Signature
+                  returnType: ParamType): Signature 
 ```
 
 # newSignatureOr
@@ -423,7 +426,7 @@ proc newSignature(optional: bool; name: string; params: seq[Param];
 Create a new SignatureOr with a message.
 
 ```nim
-func newSignatureOr(warning: MessageId; p1 = ""; pos = 0): SignatureOr
+func newSignatureOr(warning: MessageId; p1 = ""; pos = 0): SignatureOr 
 ```
 
 # newSignatureOr
@@ -431,7 +434,7 @@ func newSignatureOr(warning: MessageId; p1 = ""; pos = 0): SignatureOr
 Create a new SignatureOr with a message.
 
 ```nim
-func newSignatureOr(warningData: WarningData): SignatureOr
+func newSignatureOr(warningData: WarningData): SignatureOr 
 ```
 
 # newSignatureOr
@@ -439,7 +442,7 @@ func newSignatureOr(warningData: WarningData): SignatureOr
 Create a new SignatureOr with a value.
 
 ```nim
-func newSignatureOr(signature: Signature): SignatureOr
+func newSignatureOr(signature: Signature): SignatureOr 
 ```
 
 # newSignatureOr
@@ -448,7 +451,7 @@ Create a SignatureOr object.
 
 ```nim
 proc newSignatureOr(optional: bool; name: string; params: seq[Param];
-                    returnType: ParamType): SignatureOr
+                    returnType: ParamType): SignatureOr 
 ```
 
 # newParam
@@ -456,7 +459,7 @@ proc newSignatureOr(optional: bool; name: string; params: seq[Param];
 Create a new Param object.
 
 ```nim
-func newParam(name: string; paramType: ParamType): Param
+func newParam(name: string; paramType: ParamType): Param 
 ```
 
 # newVarsDict
@@ -464,39 +467,39 @@ func newParam(name: string; paramType: ParamType): Param
 Create a new empty variables dictionary. VarsDict is a ref type.
 
 ```nim
-proc newVarsDict(): VarsDict
+proc newVarsDict(): VarsDict 
 ```
 
 # newVarsDictOr
 
-Return a new varsDictOr object containing a warning.
+Create a new varsDictOr object containing a warning.
 
 ```nim
-func newVarsDictOr(warning: MessageId; p1: string = ""; pos = 0): VarsDictOr
+func newVarsDictOr(warning: MessageId; p1: string = ""; pos = 0): VarsDictOr 
 ```
 
 # newVarsDictOr
 
-Return a new VarsDict object containing a dictionary.
+Create a new VarsDict object containing a dictionary.
 
 ```nim
-func newVarsDictOr(varsDict: VarsDict): VarsDictOr
+func newVarsDictOr(varsDict: VarsDict): VarsDictOr 
 ```
 
 # newDictType
 
-
+Create a new DictType object.
 
 ```nim
-func newDictType(varsDict: VarsDict; mutable = Mutable.immutable): DictType
+func newDictType(varsDict: VarsDict; mutable = Mutable.immutable): DictType 
 ```
 
 # newListType
 
-
+Create a new ListType object.
 
 ```nim
-func newListType(valueList: seq[Value]; mutable = Mutable.immutable): ListType
+func newListType(valueList: seq[Value]; mutable = Mutable.immutable): ListType 
 ```
 
 # newValue
@@ -504,7 +507,7 @@ func newListType(valueList: seq[Value]; mutable = Mutable.immutable): ListType
 Create a string value.
 
 ```nim
-proc newValue(str: string): Value
+proc newValue(str: string): Value 
 ```
 
 # newValue
@@ -520,7 +523,7 @@ proc newValue(num: int | int64): Value
 Create a bool value.
 
 ```nim
-proc newValue(a: bool): Value
+proc newValue(a: bool): Value 
 ```
 
 # newValue
@@ -528,7 +531,7 @@ proc newValue(a: bool): Value
 Create a float value.
 
 ```nim
-proc newValue(num: float): Value
+proc newValue(num: float): Value 
 ```
 
 # newValue
@@ -536,7 +539,7 @@ proc newValue(num: float): Value
 Create a list value.
 
 ```nim
-proc newValue(valueList: seq[Value]; mutable = Mutable.immutable): Value
+proc newValue(valueList: seq[Value]; mutable = Mutable.immutable): Value 
 ```
 
 # newValue
@@ -544,21 +547,22 @@ proc newValue(valueList: seq[Value]; mutable = Mutable.immutable): Value
 Create a dictionary value from a VarsDict.
 
 ```nim
-proc newValue(varsDict: VarsDict; mutable = Mutable.immutable): Value
+proc newValue(varsDict: VarsDict; mutable = Mutable.immutable): Value 
 ```
 
 # newValue
 
-New value from an existing value. Since values are ref types, the
-new value is an alias to the same value.
+Create a new value from an existing value. Since values are ref types, the new value is an alias.
 
 ```nim
-proc newValue(value: Value): Value
+proc newValue(value: Value): Value 
 ```
 
 # newValue
 
-New list value from an array of items of the same kind.
+Create a new list value from an array of items of the same kind.
+
+Examples:
 
 ~~~
 let listValue = newValue([1, 2, 3])
@@ -572,8 +576,9 @@ proc newValue[T](list: openArray[T]; mutable = Mutable.immutable): Value
 
 # newValue
 
-New dict value from an array of pairs where the pairs are the
-same type which may be Value type.
+Create a new dict value from an array of pairs where the pairs are the same type which may be Value type.
+
+Examples:
 
 ~~~
  let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
@@ -592,7 +597,7 @@ Create a new func which is a FunctionSpec.
 ```nim
 func newFunc(builtIn: bool; signature: Signature; docComment: string;
              filename: string; lineNum: Natural; numLines: Natural;
-             statements: seq[Statement]; functionPtr: FunctionPtr): FunctionSpec
+             statements: seq[Statement]; functionPtr: FunctionPtr): FunctionSpec 
 ```
 
 # newValue
@@ -600,15 +605,15 @@ func newFunc(builtIn: bool; signature: Signature; docComment: string;
 Create a new func value.
 
 ```nim
-func newValue(function: FunctionSpec): Value
+func newValue(function: FunctionSpec): Value 
 ```
 
 # newEmptyListValue
 
-Return an empty list value.
+Create a new empty list value.
 
 ```nim
-proc newEmptyListValue(mutable = Mutable.immutable): Value
+proc newEmptyListValue(mutable = Mutable.immutable): Value 
 ```
 
 # newEmptyDictValue
@@ -616,7 +621,7 @@ proc newEmptyListValue(mutable = Mutable.immutable): Value
 Create a dictionary value from a VarsDict.
 
 ```nim
-proc newEmptyDictValue(mutable = Mutable.immutable): Value
+proc newEmptyDictValue(mutable = Mutable.immutable): Value 
 ```
 
 # `==`
@@ -624,7 +629,7 @@ proc newEmptyDictValue(mutable = Mutable.immutable): Value
 Return true when two variables are equal.
 
 ```nim
-proc `==`(a: Value; b: Value): bool
+proc `==`(a: Value; b: Value): bool 
 ```
 
 # newStatement
@@ -632,7 +637,7 @@ proc `==`(a: Value; b: Value): bool
 Create a new statement.
 
 ```nim
-func newStatement(text: string; lineNum: Natural = 1; ending = "\n"): Statement
+func newStatement(text: string; lineNum: Natural = 1; ending = "\n"): Statement 
 ```
 
 # `$`
@@ -640,7 +645,7 @@ func newStatement(text: string; lineNum: Natural = 1; ending = "\n"): Statement
 Return a string representation of a signature.
 
 ```nim
-func `$`(signature: Signature): string
+func `$`(signature: Signature): string 
 ```
 
 # `$`
@@ -648,7 +653,7 @@ func `$`(signature: Signature): string
 Return a string representation of a function.
 
 ```nim
-func `$`(function: FunctionSpec): string
+func `$`(function: FunctionSpec): string 
 ```
 
 # jsonStringRepr
@@ -656,7 +661,7 @@ func `$`(function: FunctionSpec): string
 Return the JSON string representation. It is assumed the string is a valid UTF-8 encoded string.
 
 ```nim
-proc jsonStringRepr(str: string): string
+proc jsonStringRepr(str: string): string 
 ```
 
 # dictToString
@@ -664,7 +669,8 @@ proc jsonStringRepr(str: string): string
 Return a string representation of a dict Value in JSON format.
 
 ```nim
-func dictToString(value: Value): string
+func dictToString(value: Value): string {.raises: [Exception],
+    tags: [RootEffect].}
 ```
 
 # listToString
@@ -672,7 +678,8 @@ func dictToString(value: Value): string
 Return a string representation of a list variable in JSON format.
 
 ```nim
-func listToString(value: Value): string
+func listToString(value: Value): string {.raises: [Exception],
+    tags: [RootEffect].}
 ```
 
 # valueToString
@@ -680,7 +687,8 @@ func listToString(value: Value): string
 Return a string representation of a variable in JSON format.
 
 ```nim
-func valueToString(value: Value): string
+func valueToString(value: Value): string {.raises: [Exception],
+    tags: [RootEffect].}
 ```
 
 # valueToStringRB
@@ -688,7 +696,8 @@ func valueToString(value: Value): string
 Return the string representation of the variable for use in the replacement blocks.
 
 ```nim
-func valueToStringRB(value: Value): string
+func valueToStringRB(value: Value): string {.raises: [Exception],
+    tags: [RootEffect].}
 ```
 
 # `$`
@@ -696,7 +705,7 @@ func valueToStringRB(value: Value): string
 Return a string representation of a Value.
 
 ```nim
-func `$`(value: Value): string
+func `$`(value: Value): string {.raises: [Exception], tags: [RootEffect].}
 ```
 
 # `$`
@@ -704,7 +713,7 @@ func `$`(value: Value): string
 Return a string representation of a VarsDict.
 
 ```nim
-proc `$`(varsDict: VarsDict): string
+proc `$`(varsDict: VarsDict): string {.raises: [Exception], tags: [RootEffect].}
 ```
 
 # dotNameRep
@@ -712,7 +721,8 @@ proc `$`(varsDict: VarsDict): string
 Return a dot name string representation of a dictionary. The top variables tells whether the dict is the variables dictionary.
 
 ```nim
-func dotNameRep(dict: VarsDict; leftSide: string = ""; top = false): string
+func dotNameRep(dict: VarsDict; leftSide: string = ""; top = false): string {.
+    raises: [ValueError, Exception], tags: [RootEffect].}
 ```
 
 # newValueOr
@@ -720,7 +730,7 @@ func dotNameRep(dict: VarsDict; leftSide: string = ""; top = false): string
 Create a new ValueOr containing a warning.
 
 ```nim
-func newValueOr(warning: MessageId; p1 = ""; pos = 0): ValueOr
+func newValueOr(warning: MessageId; p1 = ""; pos = 0): ValueOr 
 ```
 
 # newValueOr
@@ -728,7 +738,7 @@ func newValueOr(warning: MessageId; p1 = ""; pos = 0): ValueOr
 Create a new ValueOr containing a warning.
 
 ```nim
-func newValueOr(warningData: WarningData): ValueOr
+func newValueOr(warningData: WarningData): ValueOr 
 ```
 
 # newValueOr
@@ -736,7 +746,7 @@ func newValueOr(warningData: WarningData): ValueOr
 Create a new ValueOr containing a value.
 
 ```nim
-func newValueOr(value: Value): ValueOr
+func newValueOr(value: Value): ValueOr 
 ```
 
 # newFunResultWarn
@@ -745,7 +755,7 @@ Return a new FunResult object containing a warning. It takes a message id, the i
 
 ```nim
 func newFunResultWarn(warning: MessageId; parameter: int = 0; p1: string = "";
-                      pos = 0): FunResult
+                      pos = 0): FunResult 
 ```
 
 # newFunResultWarn
@@ -753,7 +763,7 @@ func newFunResultWarn(warning: MessageId; parameter: int = 0; p1: string = "";
 Return a new FunResult object containing a warning created from a WarningData object.
 
 ```nim
-func newFunResultWarn(warningData: WarningData; parameter: int = 0): FunResult
+func newFunResultWarn(warningData: WarningData; parameter: int = 0): FunResult 
 ```
 
 # newFunResult
@@ -761,7 +771,7 @@ func newFunResultWarn(warningData: WarningData; parameter: int = 0): FunResult
 Return a new FunResult object containing a value.
 
 ```nim
-func newFunResult(value: Value): FunResult
+func newFunResult(value: Value): FunResult 
 ```
 
 # `==`
@@ -769,7 +779,7 @@ func newFunResult(value: Value): FunResult
 Compare two FunResult objects and return true when equal.
 
 ```nim
-func `==`(r1: FunResult; r2: FunResult): bool
+func `==`(r1: FunResult; r2: FunResult): bool 
 ```
 
 # `!=`
@@ -777,7 +787,7 @@ func `==`(r1: FunResult; r2: FunResult): bool
 Compare two FunResult objects and return false when equal.
 
 ```nim
-proc `!=`(a: FunResult; b: FunResult): bool
+proc `!=`(a: FunResult; b: FunResult): bool 
 ```
 
 # `$`
@@ -785,7 +795,8 @@ proc `!=`(a: FunResult; b: FunResult): bool
 Return a string representation of a FunResult object.
 
 ```nim
-func `$`(funResult: FunResult): string
+func `$`(funResult: FunResult): string {.raises: [Exception, ValueError],
+    tags: [RootEffect].}
 ```
 
 # newValuePosSi
@@ -793,7 +804,7 @@ func `$`(funResult: FunResult): string
 Create a newValuePosSi object.
 
 ```nim
-proc newValuePosSi(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSi
+proc newValuePosSi(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSi 
 ```
 
 # newValuePosSiOr
@@ -801,7 +812,7 @@ proc newValuePosSi(value: Value; pos: Natural; sideEffect: SideEffect = seNone):
 Create a ValuePosSiOr warning.
 
 ```nim
-func newValuePosSiOr(warning: MessageId; p1 = ""; pos = 0): ValuePosSiOr
+func newValuePosSiOr(warning: MessageId; p1 = ""; pos = 0): ValuePosSiOr 
 ```
 
 # newValuePosSiOr
@@ -809,7 +820,7 @@ func newValuePosSiOr(warning: MessageId; p1 = ""; pos = 0): ValuePosSiOr
 Create a ValuePosSiOr warning.
 
 ```nim
-func newValuePosSiOr(warningData: WarningData): ValuePosSiOr
+func newValuePosSiOr(warningData: WarningData): ValuePosSiOr 
 ```
 
 # `==`
@@ -817,7 +828,7 @@ func newValuePosSiOr(warningData: WarningData): ValuePosSiOr
 Return true when a equals b.
 
 ```nim
-proc `==`(a: ValuePosSi; b: ValuePosSi): bool
+proc `==`(a: ValuePosSi; b: ValuePosSi): bool 
 ```
 
 # `==`
@@ -825,7 +836,7 @@ proc `==`(a: ValuePosSi; b: ValuePosSi): bool
 Return true when a equals b.
 
 ```nim
-proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool
+proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool 
 ```
 
 # `!=`
@@ -833,7 +844,7 @@ proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool
 Compare two ValuePosSi objects and return false when equal.
 
 ```nim
-proc `!=`(a: ValuePosSi; b: ValuePosSi): bool
+proc `!=`(a: ValuePosSi; b: ValuePosSi): bool 
 ```
 
 # `!=`
@@ -841,7 +852,7 @@ proc `!=`(a: ValuePosSi; b: ValuePosSi): bool
 Compare two ValuePosSiOr objects and return false when equal.
 
 ```nim
-proc `!=`(a: ValuePosSiOr; b: ValuePosSiOr): bool
+proc `!=`(a: ValuePosSiOr; b: ValuePosSiOr): bool 
 ```
 
 # newValuePosSiOr
@@ -849,7 +860,7 @@ proc `!=`(a: ValuePosSiOr; b: ValuePosSiOr): bool
 Create a ValuePosSiOr from a value, pos and exit.
 
 ```nim
-func newValuePosSiOr(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSiOr
+func newValuePosSiOr(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSiOr 
 ```
 
 # newValuePosSiOr
@@ -865,7 +876,7 @@ proc newValuePosSiOr(number: int | int64 | float64 | string; pos: Natural): Valu
 Create a ValuePosSiOr from a ValuePosSi.
 
 ```nim
-func newValuePosSiOr(val: ValuePosSi): ValuePosSiOr
+func newValuePosSiOr(val: ValuePosSi): ValuePosSiOr 
 ```
 
 # codeToParamType
@@ -873,7 +884,7 @@ func newValuePosSiOr(val: ValuePosSi): ValuePosSiOr
 Convert a parameter code letter to a ParamType.
 
 ```nim
-func codeToParamType(code: ParamCode): ParamType
+func codeToParamType(code: ParamCode): ParamType 
 ```
 
 # strToParamType
@@ -881,7 +892,7 @@ func codeToParamType(code: ParamCode): ParamType
 Return the parameter type for the given string, e.g. "int" to ptInt.
 
 ```nim
-func strToParamType(str: string): ParamType
+func strToParamType(str: string): ParamType 
 ```
 
 # shortName
@@ -889,7 +900,7 @@ func strToParamType(str: string): ParamType
 Return a short name based on the given index value. Return a for 0, b for 1, etc.  It returns names a, b, c, ..., z then repeats a0, b0, c0,....
 
 ```nim
-proc shortName(index: Natural): string
+proc shortName(index: Natural): string 
 ```
 
 # newSignatureO
@@ -907,7 +918,7 @@ myname(a: int, b: float, c: string) string
 
 ```nim
 func newSignatureO(functionName: string; signatureCode: string): Option[
-    Signature]
+    Signature] 
 ```
 
 

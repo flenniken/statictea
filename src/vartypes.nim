@@ -217,6 +217,8 @@ type
     ## whitespace.  For the example statement below, the value 567
     ## starts at index 6 and ends at position 10.
     ## @:
+    ## @:Example:
+    ## @:
     ## @:~~~
     ## @:0123456789 123456789
     ## @:var = 567 # test
@@ -263,18 +265,20 @@ proc newVarsDict*(): VarsDict =
 
 func newVarsDictOr*(warning: MessageId, p1: string = "", pos = 0):
      VarsDictOr =
-  ## Return a new varsDictOr object containing a warning.
+  ## Create a new varsDictOr object containing a warning.
   let warningData = newWarningData(warning, p1, pos)
   result = opMessageW[VarsDict](warningData)
 
 func newVarsDictOr*(varsDict: VarsDict): VarsDictOr =
-  ## Return a new VarsDict object containing a dictionary.
+  ## Create a new VarsDict object containing a dictionary.
   result = opValueW[VarsDict](varsDict)
 
 func newDictType*(varsDict: VarsDict, mutable = Mutable.immutable): DictType =
+  ## Create a new DictType object.
   result = DictType(dict: varsDict, mutable: mutable)
 
 func newListType*(valueList: seq[Value], mutable = Mutable.immutable): ListType =
+  ## Create a new ListType object.
   result = ListType(list: valueList, mutable: mutable)
 
 proc newValue*(str: string): Value =
@@ -304,12 +308,14 @@ proc newValue*(varsDict: VarsDict, mutable = Mutable.immutable): Value =
   result = Value(kind: vkDict, dictv: dictv)
 
 proc newValue*(value: Value): Value =
-  ## New value from an existing value. Since values are ref types, the
-  ## @:new value is an alias to the same value.
+  ## Create a new value from an existing value. Since values are ref
+  ## types, the new value is an alias.
   result = value
 
 proc newValue*[T](list: openArray[T], mutable = Mutable.immutable): Value =
-  ## New list value from an array of items of the same kind.
+  ## Create a new list value from an array of items of the same kind.
+  ## @:
+  ## @:Examples:
   ## @:
   ## @:~~~
   ## @:let listValue = newValue([1, 2, 3])
@@ -323,8 +329,10 @@ proc newValue*[T](list: openArray[T], mutable = Mutable.immutable): Value =
   result = Value(kind: vkList, listv: listv)
 
 proc newValue*[T](dictPairs: openArray[(string, T)], mutable = Mutable.immutable): Value =
-  ## New dict value from an array of pairs where the pairs are the
-  ## @:same type which may be Value type.
+  ## Create a new dict value from an array of pairs where the pairs
+  ## are the same type which may be Value type.
+  ## @:
+  ## @:Examples:
   ## @:
   ## @:~~~
   ## @: let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
@@ -361,7 +369,7 @@ func newValue*(function: FunctionSpec): Value =
   result = Value(kind: vkFunc, funcv: function)
 
 proc newEmptyListValue*(mutable = Mutable.immutable): Value =
-  ## Return an empty list value.
+  ## Create a new empty list value.
   var valueList: seq[Value]
   result = newValue(valueList, mutable)
 

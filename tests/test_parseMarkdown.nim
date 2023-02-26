@@ -94,8 +94,6 @@ proc testParseMarkdown(content: string, expected: string): bool =
   echo linesSideBySide(got, expected)
   return false
 
-    # eFt: FragmentType, eStart: Natural, eLength: Natural): bool =
-
 proc testMatchFragment(aLine: string, start: Natural, eFragmentO: Option[Fragment]): bool =
   ## Test matchFragment. a ! in the line is replaced with a quote (").
   let line = replace(aLine, '!', '"')

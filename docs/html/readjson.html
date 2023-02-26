@@ -22,20 +22,24 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>readjson.nim</h1>
 
-<pre class="description">
-Read json content.
-</pre>
+<p>Read json content.</p>
 
 Nim source code: <a href="../../src/readjson.nim">readjson.nim</a>
 
@@ -53,9 +57,7 @@ Nim source code: <a href="../../src/readjson.nim">readjson.nim</a>
 
 <h3 id="maxDepth">maxDepth</h3>
 
-<pre class="description">
-The maximum depth you can nest items.
-</pre>
+<p>The maximum depth you can nest items.</p>
 
 <pre class="nim-code">
 maxDepth = 16
@@ -63,53 +65,48 @@ maxDepth = 16
 
 <h3 id="jsonToValue">jsonToValue</h3>
 
-<pre class="description">
-Convert a Nim json node to a statictea value. The mutable variable determines whether lists and dictionaries are mutable.
-</pre>
+<p>Convert a Nim json node to a statictea value. The mutable variable determines whether lists and dictionaries are mutable.</p>
 
 <pre class="nim-code">
-func jsonToValue(jsonNode: JsonNode; depth: int = 0; mutable = Mutable.immutable): ValueOr
+func jsonToValue(jsonNode: JsonNode; depth: int = 0; mutable = Mutable.immutable): ValueOr 
 </pre>
 
 <h3 id="readJsonStream">readJsonStream</h3>
 
-<pre class="description">
-Read a json stream and return the parsed data in a value object or return a warning. The mutable variable determines whether lists and dictionaries are mutable.
-</pre>
+<p>Read a json stream and return the parsed data in a value object or return a warning. The mutable variable determines whether lists and dictionaries are mutable.</p>
 
 <pre class="nim-code">
-func readJsonStream(stream: Stream; mutable = Mutable.immutable): ValueOr
+func readJsonStream(stream: Stream; mutable = Mutable.immutable): ValueOr {.
+    raises: [], tags: [ReadIOEffect, WriteIOEffect].}
 </pre>
 
 <h3 id="readJsonString">readJsonString</h3>
 
-<pre class="description">
-Read a json string and return the parsed data in a value object or return a warning. The mutable variable determines whether lists and dictionaries are mutable.
-</pre>
+<p>Read a json string and return the parsed data in a value object or return a warning. The mutable variable determines whether lists and dictionaries are mutable.</p>
 
 <pre class="nim-code">
-func readJsonString(content: string; mutable = Mutable.immutable): ValueOr
+func readJsonString(content: string; mutable = Mutable.immutable): ValueOr {.
+    raises: [], tags: [ReadIOEffect, WriteIOEffect].}
 </pre>
 
 <h3 id="readJsonFile">readJsonFile</h3>
 
-<pre class="description">
-Read a json file and return the parsed data in a value object or return a warning. A warning is returned when the root object is not a dictionary.
-</pre>
+<p>Read a json file and return the parsed data in a value object or return a warning. A warning is returned when the root object is not a dictionary.</p>
 
 <pre class="nim-code">
-proc readJsonFile(filename: string; mutable = Mutable.immutable): ValueOr
+proc readJsonFile(filename: string; mutable = Mutable.immutable): ValueOr {.
+    raises: [Exception, IOError, OSError],
+    tags: [ReadDirEffect, WriteIOEffect, ReadIOEffect].}
 </pre>
 
 <h3 id="unescapePopularChar">unescapePopularChar</h3>
 
-<pre class="description">
-Unescape the popular char and return its value. If the char is
+<p>Unescape the popular char and return its value. If the char is
 not a popular char, return 0.
 
- Popular characters and their escape values:
+</p><p> Popular characters and their escape values:
 
-|char      | name           | unicode|
+</p><p>|char      | name           | unicode|
 |----------|----------------|--------|
 |"         | quotation mark | U+0022 |
 |\        | reverse solidus| U+005C |
@@ -118,30 +115,26 @@ not a popular char, return 0.
 |f         | form feed      | U+000C |
 |n         | line feed      | U+000A |
 |r         | carriage return| U+000D |
-|t         | tab            | U+0009 |
-</pre>
+|t         | tab            | U+0009 |</p>
 
 <pre class="nim-code">
-func unescapePopularChar(popular: char): char
+func unescapePopularChar(popular: char): char 
 </pre>
 
 <h3 id="parseJsonStr">parseJsonStr</h3>
 
-<pre class="description">
-Parse the quoted json string literal. The startPos points one
+<p>Parse the quoted json string literal. The startPos points one
 past the leading double quote.  Return the parsed string value
 and the ending position after the trailing whitespace. On
 failure, the ending position points at the invalid character and
 the message id tells what went wrong.
 
-~~~
-a = "test string"  # test
+</p><pre class="desc-code">a = "test string"  # test
      ^             ^
-~~~
 </pre>
 
 <pre class="nim-code">
-func parseJsonStr(text: string; startPos: Natural): ValuePosSiOr
+func parseJsonStr(text: string; startPos: Natural): ValuePosSiOr 
 </pre>
 
 

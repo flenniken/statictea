@@ -86,3 +86,14 @@ prepostList = []"""
     let afterJson = valueToString(newValue(variables))
     check expectedItem("reset test", beforeJson, afterJson)
 
+  test "readJsonFiles":
+    var env = openEnvTest("_readJsonFiles.log")
+    let filenames = @["missing.json"]
+    let varsDict = readJsonFiles(env, filenames)
+
+    let eLogLines: seq[string] = @[]
+    let eErrLines: seq[string] = @["missing.json(0): w16: File not found: missing.json.\n"]
+    let eOutLines: seq[string] = @[]
+    check env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
+
+    check varsDict.len == 0

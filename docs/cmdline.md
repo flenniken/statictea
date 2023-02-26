@@ -2,29 +2,30 @@
 
 Parse the command line.
 
- Example:
- ~~~nim
- import cmdline
+Example:
 
- # Define the supported options.
- var options = newSeq[CmlOption]()
- options.add(newCmlOption("help", 'h', cmlStopArgument))
- options.add(newCmlOption("log", 'l', cmlOptionalArgument))
- ...
+~~~nim
+import cmdline
 
- # Parse the command line.
- let argsOrMessage = cmdline(options, collectArgs())
- if argsOrMessage.kind == cmlMessageKind:
-   # Display the message.
-   echo getMessage(argsOrMessage.messageId,
-     argsOrMessage.problemArg)
- else:
-   # Optionally post process the resulting arguments.
-   let args = newArgs(argsOrMessage.args)
- ~~~
+# Define the supported options.
+var options = newSeq[CmlOption]()
+options.add(newCmlOption("help", 'h', cmlStopArgument))
+options.add(newCmlOption("log", 'l', cmlOptionalArgument))
+...
 
- For a complete example see the bottom of the file in the isMainModule
- section.
+# Parse the command line.
+let argsOrMessage = cmdline(options, collectArgs())
+if argsOrMessage.kind == cmlMessageKind:
+  # Display the message.
+  echo getMessage(argsOrMessage.messageId,
+    argsOrMessage.problemArg)
+else:
+  # Optionally post process the resulting arguments.
+  let args = newArgs(argsOrMessage.args)
+~~~
+
+For a complete example see the bottom of the file in the isMainModule
+section.
 
 * [cmdline.nim](../src/cmdline.nim) &mdash; Nim source code.
 # Index
@@ -95,7 +96,7 @@ ArgsOrMessage = object
       messageId*: CmlMessageId
       problemArg*: string
 
-
+  
 ```
 
 # CmlOptionType
@@ -136,7 +137,7 @@ CmlOption = object
 Create a new CmlOption object. For no short option use a dash.
 
 ```nim
-func newCmlOption(long: string; short: char; optionType: CmlOptionType): CmlOption
+func newCmlOption(long: string; short: char; optionType: CmlOptionType): CmlOption 
 ```
 
 # newArgsOrMessage
@@ -144,7 +145,7 @@ func newCmlOption(long: string; short: char; optionType: CmlOptionType): CmlOpti
 Create a new ArgsOrMessage object containing arguments.
 
 ```nim
-func newArgsOrMessage(args: CmlArgs): ArgsOrMessage
+func newArgsOrMessage(args: CmlArgs): ArgsOrMessage 
 ```
 
 # newArgsOrMessage
@@ -152,7 +153,7 @@ func newArgsOrMessage(args: CmlArgs): ArgsOrMessage
 Create a new ArgsOrMessage object containing a message id and optionally the problem argument.
 
 ```nim
-func newArgsOrMessage(messageId: CmlMessageId; problemArg = ""): ArgsOrMessage
+func newArgsOrMessage(messageId: CmlMessageId; problemArg = ""): ArgsOrMessage 
 ```
 
 # `$`
@@ -160,7 +161,7 @@ func newArgsOrMessage(messageId: CmlMessageId; problemArg = ""): ArgsOrMessage
 Return a string representation of an CmlOption object.
 
 ```nim
-func `$`(a: CmlOption): string
+func `$`(a: CmlOption): string {.raises: [ValueError], tags: [].}
 ```
 
 # `$`
@@ -168,7 +169,7 @@ func `$`(a: CmlOption): string
 Return a string representation of a ArgsOrMessage object.
 
 ```nim
-func `$`(a: ArgsOrMessage): string
+func `$`(a: ArgsOrMessage): string {.raises: [ValueError], tags: [].}
 ```
 
 # commandLineEcho
@@ -176,7 +177,7 @@ func `$`(a: ArgsOrMessage): string
 Show the command line arguments.
 
 ```nim
-proc commandLineEcho()
+proc commandLineEcho() {.raises: [ValueError], tags: [ReadIOEffect].}
 ```
 
 # collectArgs
@@ -184,7 +185,7 @@ proc commandLineEcho()
 Get the command line arguments from the system and return a list. Don't return the first one which is the app name. This is the list that cmdLine expects.
 
 ```nim
-proc collectArgs(): seq[string]
+proc collectArgs(): seq[string] {.raises: [], tags: [ReadIOEffect].}
 ```
 
 # cmdLine
@@ -192,7 +193,8 @@ proc collectArgs(): seq[string]
 Parse the command line arguments.  You pass in the list of supported options and the arguments to parse. The arguments found are returned. If there is a problem with the arguments, args contains a message telling the problem. Use collectArgs() to generate the arguments. Parse uses "arg value" not "arg=value".
 
 ```nim
-func cmdLine(options: openArray[CmlOption]; arguments: openArray[string]): ArgsOrMessage
+func cmdLine(options: openArray[CmlOption]; arguments: openArray[string]): ArgsOrMessage {.
+    raises: [KeyError], tags: [].}
 ```
 
 # cmlMessages
@@ -218,7 +220,8 @@ cmlMessages: array[low(CmlMessageId) .. high(CmlMessageId), string] = [
 Return a message from a message id and problem argument.
 
 ```nim
-func getMessage(message: CmlMessageId; problemArg: string = ""): string
+func getMessage(message: CmlMessageId; problemArg: string = ""): string {.
+    raises: [ValueError], tags: [].}
 ```
 
 # `$`
@@ -226,7 +229,7 @@ func getMessage(message: CmlMessageId; problemArg: string = ""): string
 Return a string representation of an Args object.
 
 ```nim
-func `$`(a: Args): string
+func `$`(a: Args): string {.raises: [ValueError], tags: [].}
 ```
 
 

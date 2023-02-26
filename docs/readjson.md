@@ -26,7 +26,7 @@ maxDepth = 16
 Convert a Nim json node to a statictea value. The mutable variable determines whether lists and dictionaries are mutable.
 
 ```nim
-func jsonToValue(jsonNode: JsonNode; depth: int = 0; mutable = Mutable.immutable): ValueOr
+func jsonToValue(jsonNode: JsonNode; depth: int = 0; mutable = Mutable.immutable): ValueOr 
 ```
 
 # readJsonStream
@@ -34,7 +34,8 @@ func jsonToValue(jsonNode: JsonNode; depth: int = 0; mutable = Mutable.immutable
 Read a json stream and return the parsed data in a value object or return a warning. The mutable variable determines whether lists and dictionaries are mutable.
 
 ```nim
-func readJsonStream(stream: Stream; mutable = Mutable.immutable): ValueOr
+func readJsonStream(stream: Stream; mutable = Mutable.immutable): ValueOr {.
+    raises: [], tags: [ReadIOEffect, WriteIOEffect].}
 ```
 
 # readJsonString
@@ -42,7 +43,8 @@ func readJsonStream(stream: Stream; mutable = Mutable.immutable): ValueOr
 Read a json string and return the parsed data in a value object or return a warning. The mutable variable determines whether lists and dictionaries are mutable.
 
 ```nim
-func readJsonString(content: string; mutable = Mutable.immutable): ValueOr
+func readJsonString(content: string; mutable = Mutable.immutable): ValueOr {.
+    raises: [], tags: [ReadIOEffect, WriteIOEffect].}
 ```
 
 # readJsonFile
@@ -50,7 +52,9 @@ func readJsonString(content: string; mutable = Mutable.immutable): ValueOr
 Read a json file and return the parsed data in a value object or return a warning. A warning is returned when the root object is not a dictionary.
 
 ```nim
-proc readJsonFile(filename: string; mutable = Mutable.immutable): ValueOr
+proc readJsonFile(filename: string; mutable = Mutable.immutable): ValueOr {.
+    raises: [Exception, IOError, OSError],
+    tags: [ReadDirEffect, WriteIOEffect, ReadIOEffect].}
 ```
 
 # unescapePopularChar
@@ -72,7 +76,7 @@ not a popular char, return 0.
 |t         | tab            | U+0009 |
 
 ```nim
-func unescapePopularChar(popular: char): char
+func unescapePopularChar(popular: char): char 
 ```
 
 # parseJsonStr
@@ -89,7 +93,7 @@ a = "test string"  # test
 ~~~
 
 ```nim
-func parseJsonStr(text: string; startPos: Natural): ValuePosSiOr
+func parseJsonStr(text: string; startPos: Natural): ValuePosSiOr 
 ```
 
 

@@ -22,20 +22,24 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>vartypes.nim</h1>
 
-<pre class="description">
-StaticTea variable types.
-</pre>
+<p>StaticTea variable types.</p>
 
 Nim source code: <a href="../../src/vartypes.nim">vartypes.nim</a>
 
@@ -75,23 +79,22 @@ Nim source code: <a href="../../src/vartypes.nim">vartypes.nim</a>
 <li> <a href="#newSignatureOr-3">newSignatureOr</a> &mdash; Create a SignatureOr object.</li>
 <li> <a href="#newParam">newParam</a> &mdash; Create a new Param object.</li>
 <li> <a href="#newVarsDict">newVarsDict</a> &mdash; Create a new empty variables dictionary.</li>
-<li> <a href="#newVarsDictOr">newVarsDictOr</a> &mdash; Return a new varsDictOr object containing a warning.</li>
-<li> <a href="#newVarsDictOr-1">newVarsDictOr</a> &mdash; Return a new VarsDict object containing a dictionary.</li>
-<li> <a href="#newDictType">newDictType</a> &mdash; </li>
-<li> <a href="#newListType">newListType</a> &mdash; </li>
+<li> <a href="#newVarsDictOr">newVarsDictOr</a> &mdash; Create a new varsDictOr object containing a warning.</li>
+<li> <a href="#newVarsDictOr-1">newVarsDictOr</a> &mdash; Create a new VarsDict object containing a dictionary.</li>
+<li> <a href="#newDictType">newDictType</a> &mdash; Create a new DictType object.</li>
+<li> <a href="#newListType">newListType</a> &mdash; Create a new ListType object.</li>
 <li> <a href="#newValue">newValue</a> &mdash; Create a string value.</li>
 <li> <a href="#newValue-1">newValue</a> &mdash; Create an integer value.</li>
 <li> <a href="#newValue-2">newValue</a> &mdash; Create a bool value.</li>
 <li> <a href="#newValue-3">newValue</a> &mdash; Create a float value.</li>
 <li> <a href="#newValue-4">newValue</a> &mdash; Create a list value.</li>
 <li> <a href="#newValue-5">newValue</a> &mdash; Create a dictionary value from a VarsDict.</li>
-<li> <a href="#newValue-6">newValue</a> &mdash; New value from an existing value.</li>
-<li> <a href="#newValue-7">newValue</a> &mdash; New list value from an array of items of the same kind.</li>
-<li> <a href="#newValue-8">newValue</a> &mdash; New dict value from an array of pairs where the pairs are the
-same type which may be Value type.</li>
+<li> <a href="#newValue-6">newValue</a> &mdash; Create a new value from an existing value.</li>
+<li> <a href="#newValue-7">newValue</a> &mdash; Create a new list value from an array of items of the same kind.</li>
+<li> <a href="#newValue-8">newValue</a> &mdash; Create a new dict value from an array of pairs where the pairs are the same type which may be Value type.</li>
 <li> <a href="#newFunc">newFunc</a> &mdash; Create a new func which is a FunctionSpec.</li>
 <li> <a href="#newValue-9">newValue</a> &mdash; Create a new func value.</li>
-<li> <a href="#newEmptyListValue">newEmptyListValue</a> &mdash; Return an empty list value.</li>
+<li> <a href="#newEmptyListValue">newEmptyListValue</a> &mdash; Create a new empty list value.</li>
 <li> <a href="#newEmptyDictValue">newEmptyDictValue</a> &mdash; Create a dictionary value from a VarsDict.</li>
 <li> <a href="#a___">`==`</a> &mdash; Return true when two variables are equal.</li>
 <li> <a href="#newStatement">newStatement</a> &mdash; Create a new statement.</li>
@@ -132,49 +135,39 @@ same type which may be Value type.</li>
 
 <h3 id="variableStartChars">variableStartChars</h3>
 
-<pre class="description">
-The characters that make up a variable dotname.  A variable starts with an ascii letter.
-</pre>
+<p>The characters that make up a variable dotname.  A variable starts with an ascii letter.</p>
 
 <pre class="nim-code">
-variableStartChars: set[char] =
+variableStartChars: set[char] = {'a'..'z', 'A'..'Z'}
 </pre>
 
 <h3 id="variableMiddleChars">variableMiddleChars</h3>
 
-<pre class="description">
-A variable contains ascii letters, digits, underscores and hypens.
-</pre>
+<p>A variable contains ascii letters, digits, underscores and hypens.</p>
 
 <pre class="nim-code">
-variableMiddleChars: set[char] =
+variableMiddleChars: set[char] = {'a'..'z', 'A'..'Z', '0'..'9', '_', '-'}
 </pre>
 
 <h3 id="variableChars">variableChars</h3>
 
-<pre class="description">
-A variable contains ascii letters, digits, underscores and hypens. Variables are connected with dots to make a dot name.
-</pre>
+<p>A variable contains ascii letters, digits, underscores and hypens. Variables are connected with dots to make a dot name.</p>
 
 <pre class="nim-code">
-variableChars: set[char] =
+variableChars: set[char] = {'a'..'z', '.', 'A'..'Z', '0'..'9', '_', '-'}
 </pre>
 
 <h3 id="startTFVarNumber">startTFVarNumber</h3>
 
-<pre class="description">
-A character that starts true, false, a variable or a number.
-</pre>
+<p>A character that starts true, false, a variable or a number.</p>
 
 <pre class="nim-code">
-startTFVarNumber: set[char] =
+startTFVarNumber: set[char] = {'a'..'z', 'A'..'Z', '0'..'9', '-'}
 </pre>
 
 <h3 id="VarsDict">VarsDict</h3>
 
-<pre class="description">
-This is a ref type. Create a new VarsDict with newVarsDict procedure.
-</pre>
+<p>This is a ref type. Create a new VarsDict with newVarsDict procedure.</p>
 
 <pre class="nim-code">
 VarsDict = OrderedTableRef[string, Value]
@@ -182,25 +175,26 @@ VarsDict = OrderedTableRef[string, Value]
 
 <h3 id="Mutable">Mutable</h3>
 
-<pre class="description">
-The mutable state of lists and dictionaries.
-* immutable -- you cannot change it
-* append -- you can append to the end
-* full -- you can change everything
-</pre>
+<p>The mutable state of lists and dictionaries.
+</p><ul>
+<li>immutable -- you cannot change it
+</li><li>append -- you can append to the end
+</li><li>full -- you can change everything</li></ul>
+
 
 <pre class="nim-code">
-Mutable
+Mutable {.pure.} = enum
+  immutable, append, full
 </pre>
 
 <h3 id="DictType">DictType</h3>
 
-<pre class="description">
-The statictea dictionary type.
+<p>The statictea dictionary type.
 
-* dict -- an ordered dictionary.
-* mutable -- whether you can append to the dictionary or not.
-</pre>
+</p><ul>
+<li>dict -- an ordered dictionary.
+</li><li>mutable -- whether you can append to the dictionary or not.</li></ul>
+
 
 <pre class="nim-code">
 DictType = object
@@ -211,12 +205,12 @@ DictType = object
 
 <h3 id="ListType">ListType</h3>
 
-<pre class="description">
-The statictea list type.
+<p>The statictea list type.
 
-* list -- a list of values.
-* mutable -- whether you can append to the dictionary or not.
-</pre>
+</p><ul>
+<li>list -- a list of values.
+</li><li>mutable -- whether you can append to the dictionary or not.</li></ul>
+
 
 <pre class="nim-code">
 ListType = object
@@ -227,9 +221,7 @@ ListType = object
 
 <h3 id="Variables">Variables</h3>
 
-<pre class="description">
-Dictionary holding all statictea variables in multiple distinct logical dictionaries.
-</pre>
+<p>Dictionary holding all statictea variables in multiple distinct logical dictionaries.</p>
 
 <pre class="nim-code">
 Variables = VarsDict
@@ -237,9 +229,7 @@ Variables = VarsDict
 
 <h3 id="VarsDictOr">VarsDictOr</h3>
 
-<pre class="description">
-A VarsDict object or a warning.
-</pre>
+<p>A VarsDict object or a warning.</p>
 
 <pre class="nim-code">
 VarsDictOr = OpResultWarn[VarsDict]
@@ -247,16 +237,16 @@ VarsDictOr = OpResultWarn[VarsDict]
 
 <h3 id="ValueKind">ValueKind</h3>
 
-<pre class="description">
-The statictea variable types.
-* vkString -- string of UTF-8 characters
-* vkInt -- 64 bit signed integer
-* vkFloat -- 64 bit floating point number
-* vkDict -- hash table mapping strings to any value
-* vkList -- a list of values of any type
-* vkBool -- true or false
-* vkFunc -- reference to a function
-</pre>
+<p>The statictea variable types.
+</p><ul>
+<li>vkString -- string of UTF-8 characters
+</li><li>vkInt -- 64 bit signed integer
+</li><li>vkFloat -- 64 bit floating point number
+</li><li>vkDict -- hash table mapping strings to any value
+</li><li>vkList -- a list of values of any type
+</li><li>vkBool -- true or false
+</li><li>vkFunc -- reference to a function</li></ul>
+
 
 <pre class="nim-code">
 ValueKind = enum
@@ -266,9 +256,7 @@ ValueKind = enum
 
 <h3 id="Value">Value</h3>
 
-<pre class="description">
-A variable's value reference.
-</pre>
+<p>A variable's value reference.</p>
 
 <pre class="nim-code">
 Value = ref ValueObj
@@ -276,9 +264,7 @@ Value = ref ValueObj
 
 <h3 id="ValueOr">ValueOr</h3>
 
-<pre class="description">
-A Value object or a warning.
-</pre>
+<p>A Value object or a warning.</p>
 
 <pre class="nim-code">
 ValueOr = OpResultWarn[Value]
@@ -286,14 +272,14 @@ ValueOr = OpResultWarn[Value]
 
 <h3 id="Statement">Statement</h3>
 
-<pre class="description">
-Statement object stores the statement text, the line number and its line ending.
+<p>Statement object stores the statement text, the line number and its line ending.
 
-* text -- a line containing a statement without the line ending
-* lineNum -- line number in the file where the statement starts (the first line is 1)
+</p><ul>
+<li>text -- a line containing a statement without the line ending
+</li><li>lineNum -- line number in the file where the statement starts (the first line is 1)
 statement starts.
-* ending -- the line ending, either linefeed (\n) or carriage return and linefeed (\r\n).
-</pre>
+</li><li>ending -- the line ending, either linefeed (\n) or carriage return and linefeed (\r\n).</li></ul>
+
 
 <pre class="nim-code">
 Statement = object
@@ -305,19 +291,16 @@ Statement = object
 
 <h3 id="FunctionPtr">FunctionPtr</h3>
 
-<pre class="description">
-Signature of a statictea built in function. It takes any number of values and returns a value or a warning message.
-</pre>
+<p>Signature of a statictea built in function. It takes any number of values and returns a value or a warning message.</p>
 
 <pre class="nim-code">
-FunctionPtr = proc (variables: Variables; parameters: seq[Value]): FunResult
+FunctionPtr = proc (variables: Variables; parameters: seq[Value]): FunResult {.
+    noSideEffect.}
 </pre>
 
 <h3 id="ParamCode">ParamCode</h3>
 
-<pre class="description">
-Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.
-</pre>
+<p>Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.</p>
 
 <pre class="nim-code">
 ParamCode = char
@@ -325,17 +308,17 @@ ParamCode = char
 
 <h3 id="ParamType">ParamType</h3>
 
-<pre class="description">
-The statictea parameter types. The same as the variable types ValueKind with an extra for "any".
-* ptString -- string parameter type
-* ptInt -- integer
-* ptFloat -- floating point number
-* ptDict -- dictionary
-* ptList -- list
-* ptBool -- boolean
-* ptFunc -- function pointer
-* ptAny -- any parameter type
-</pre>
+<p>The statictea parameter types. The same as the variable types ValueKind with an extra for "any".
+</p><ul>
+<li>ptString -- string parameter type
+</li><li>ptInt -- integer
+</li><li>ptFloat -- floating point number
+</li><li>ptDict -- dictionary
+</li><li>ptList -- list
+</li><li>ptBool -- boolean
+</li><li>ptFunc -- function pointer
+</li><li>ptAny -- any parameter type</li></ul>
+
 
 <pre class="nim-code">
 ParamType = enum
@@ -345,11 +328,11 @@ ParamType = enum
 
 <h3 id="Param">Param</h3>
 
-<pre class="description">
-Holds attributes for one parameter.
-* name -- the parameter name
-* paramType -- the parameter type
-</pre>
+<p>Holds attributes for one parameter.
+</p><ul>
+<li>name -- the parameter name
+</li><li>paramType -- the parameter type</li></ul>
+
 
 <pre class="nim-code">
 Param = object
@@ -360,13 +343,13 @@ Param = object
 
 <h3 id="Signature">Signature</h3>
 
-<pre class="description">
-Holds the function signature.
-* optional -- true when the last parameter is optional
-* name -- the function name
-* params -- a list of the function parameter names and types
-* returnType -- the function return type
-</pre>
+<p>Holds the function signature.
+</p><ul>
+<li>optional -- true when the last parameter is optional
+</li><li>name -- the function name
+</li><li>params -- a list of the function parameter names and types
+</li><li>returnType -- the function return type</li></ul>
+
 
 <pre class="nim-code">
 Signature = object
@@ -379,9 +362,7 @@ Signature = object
 
 <h3 id="SignatureOr">SignatureOr</h3>
 
-<pre class="description">
-A signature or message.
-</pre>
+<p>A signature or message.</p>
 
 <pre class="nim-code">
 SignatureOr = OpResultWarn[Signature]
@@ -389,18 +370,18 @@ SignatureOr = OpResultWarn[Signature]
 
 <h3 id="FunctionSpec">FunctionSpec</h3>
 
-<pre class="description">
-Holds the function details.
+<p>Holds the function details.
 
-* builtIn -- true for the built-in functions, false for user functions
-* signature -- the function signature
-* docComment -- the function document comment
-* filename -- the filename where the function is defined either the code file or functions.nim
-* lineNum -- the line number where the function definition starts
-* numLines -- the number of lines to define the function
-* statements -- a list of the function statements for user functions
-* functionPtr -- pointer to the function for built-in functions
-</pre>
+</p><ul>
+<li>builtIn -- true for the built-in functions, false for user functions
+</li><li>signature -- the function signature
+</li><li>docComment -- the function document comment
+</li><li>filename -- the filename where the function is defined either the code file or functions.nim
+</li><li>lineNum -- the line number where the function definition starts
+</li><li>numLines -- the number of lines to define the function
+</li><li>statements -- a list of the function statements for user functions
+</li><li>functionPtr -- pointer to the function for built-in functions</li></ul>
+
 
 <pre class="nim-code">
 FunctionSpec = object
@@ -417,11 +398,11 @@ FunctionSpec = object
 
 <h3 id="FunResultKind">FunResultKind</h3>
 
-<pre class="description">
-The kind of a FunResult object, either a value or warning.
-* frValue -- a value
-* frWarning -- a warning message
-</pre>
+<p>The kind of a FunResult object, either a value or warning.
+</p><ul>
+<li>frValue -- a value
+</li><li>frWarning -- a warning message</li></ul>
+
 
 <pre class="nim-code">
 FunResultKind = enum
@@ -430,12 +411,10 @@ FunResultKind = enum
 
 <h3 id="FunResult">FunResult</h3>
 
-<pre class="description">
-Contains the result of calling a function, either a value or a warning.
+<p>Contains the result of calling a function, either a value or a warning.
 
-The parameter field is the index of the problem argument or
--1 to point at the function itself.
-</pre>
+</p><p>The parameter field is the index of the problem argument or
+-1 to point at the function itself.</p>
 
 <pre class="nim-code">
 FunResult = object
@@ -447,20 +426,20 @@ FunResult = object
       parameter*: int
       warningData*: WarningData
 
-
+  
 </pre>
 
 <h3 id="SideEffect">SideEffect</h3>
 
-<pre class="description">
-The kind of side effect for a statement.
+<p>The kind of side effect for a statement.
 
-* seNone -- no side effect, the normal case
-* seReturn -- the return function; stop the command and
+</p><ul>
+<li>seNone -- no side effect, the normal case
+</li><li>seReturn -- the return function; stop the command and
 either skip the replacement block or stop iterating
-* seLogMessage -- the log function; write a message to the log file
-* seIf2False -- the two parameter IF condition was false
-</pre>
+</li><li>seLogMessage -- the log function; write a message to the log file
+</li><li>seIf2False -- the two parameter IF condition was false</li></ul>
+
 
 <pre class="nim-code">
 SideEffect = enum
@@ -470,15 +449,14 @@ SideEffect = enum
 
 <h3 id="ValuePosSi">ValuePosSi</h3>
 
-<pre class="description">
-A value and the position after the value in the statement along with the side effect, if any. The position includes the trailing whitespace.  For the example statement below, the value 567 starts at index 6 and ends at position 10.
+<p>A value and the position after the value in the statement along with the side effect, if any. The position includes the trailing whitespace.  For the example statement below, the value 567 starts at index 6 and ends at position 10.
 
-~~~
-0123456789 123456789
+</p><p>Example:
+
+</p><pre class="desc-code">0123456789 123456789
 var = 567 # test
       ^ start
           ^ end position
-~~~
 </pre>
 
 <pre class="nim-code">
@@ -491,9 +469,7 @@ ValuePosSi = object
 
 <h3 id="ValuePosSiOr">ValuePosSiOr</h3>
 
-<pre class="description">
-A ValuePosSi object or a warning.
-</pre>
+<p>A ValuePosSi object or a warning.</p>
 
 <pre class="nim-code">
 ValuePosSiOr = OpResultWarn[ValuePosSi]
@@ -501,131 +477,105 @@ ValuePosSiOr = OpResultWarn[ValuePosSi]
 
 <h3 id="newSignature">newSignature</h3>
 
-<pre class="description">
-Create a Signature object.
-</pre>
+<p>Create a Signature object.</p>
 
 <pre class="nim-code">
 proc newSignature(optional: bool; name: string; params: seq[Param];
-                  returnType: ParamType): Signature
+                  returnType: ParamType): Signature 
 </pre>
 
 <h3 id="newSignatureOr">newSignatureOr</h3>
 
-<pre class="description">
-Create a new SignatureOr with a message.
-</pre>
+<p>Create a new SignatureOr with a message.</p>
 
 <pre class="nim-code">
-func newSignatureOr(warning: MessageId; p1 = ""; pos = 0): SignatureOr
+func newSignatureOr(warning: MessageId; p1 = ""; pos = 0): SignatureOr 
 </pre>
 
 <h3 id="newSignatureOr-1">newSignatureOr</h3>
 
-<pre class="description">
-Create a new SignatureOr with a message.
-</pre>
+<p>Create a new SignatureOr with a message.</p>
 
 <pre class="nim-code">
-func newSignatureOr(warningData: WarningData): SignatureOr
+func newSignatureOr(warningData: WarningData): SignatureOr 
 </pre>
 
 <h3 id="newSignatureOr-2">newSignatureOr</h3>
 
-<pre class="description">
-Create a new SignatureOr with a value.
-</pre>
+<p>Create a new SignatureOr with a value.</p>
 
 <pre class="nim-code">
-func newSignatureOr(signature: Signature): SignatureOr
+func newSignatureOr(signature: Signature): SignatureOr 
 </pre>
 
 <h3 id="newSignatureOr-3">newSignatureOr</h3>
 
-<pre class="description">
-Create a SignatureOr object.
-</pre>
+<p>Create a SignatureOr object.</p>
 
 <pre class="nim-code">
 proc newSignatureOr(optional: bool; name: string; params: seq[Param];
-                    returnType: ParamType): SignatureOr
+                    returnType: ParamType): SignatureOr 
 </pre>
 
 <h3 id="newParam">newParam</h3>
 
-<pre class="description">
-Create a new Param object.
-</pre>
+<p>Create a new Param object.</p>
 
 <pre class="nim-code">
-func newParam(name: string; paramType: ParamType): Param
+func newParam(name: string; paramType: ParamType): Param 
 </pre>
 
 <h3 id="newVarsDict">newVarsDict</h3>
 
-<pre class="description">
-Create a new empty variables dictionary. VarsDict is a ref type.
-</pre>
+<p>Create a new empty variables dictionary. VarsDict is a ref type.</p>
 
 <pre class="nim-code">
-proc newVarsDict(): VarsDict
+proc newVarsDict(): VarsDict 
 </pre>
 
 <h3 id="newVarsDictOr">newVarsDictOr</h3>
 
-<pre class="description">
-Return a new varsDictOr object containing a warning.
-</pre>
+<p>Create a new varsDictOr object containing a warning.</p>
 
 <pre class="nim-code">
-func newVarsDictOr(warning: MessageId; p1: string = ""; pos = 0): VarsDictOr
+func newVarsDictOr(warning: MessageId; p1: string = ""; pos = 0): VarsDictOr 
 </pre>
 
 <h3 id="newVarsDictOr-1">newVarsDictOr</h3>
 
-<pre class="description">
-Return a new VarsDict object containing a dictionary.
-</pre>
+<p>Create a new VarsDict object containing a dictionary.</p>
 
 <pre class="nim-code">
-func newVarsDictOr(varsDict: VarsDict): VarsDictOr
+func newVarsDictOr(varsDict: VarsDict): VarsDictOr 
 </pre>
 
 <h3 id="newDictType">newDictType</h3>
 
-<pre class="description">
-
-</pre>
+<p>Create a new DictType object.</p>
 
 <pre class="nim-code">
-func newDictType(varsDict: VarsDict; mutable = Mutable.immutable): DictType
+func newDictType(varsDict: VarsDict; mutable = Mutable.immutable): DictType 
 </pre>
 
 <h3 id="newListType">newListType</h3>
 
-<pre class="description">
-
-</pre>
+<p>Create a new ListType object.</p>
 
 <pre class="nim-code">
-func newListType(valueList: seq[Value]; mutable = Mutable.immutable): ListType
+func newListType(valueList: seq[Value]; mutable = Mutable.immutable): ListType 
 </pre>
 
 <h3 id="newValue">newValue</h3>
 
-<pre class="description">
-Create a string value.
-</pre>
+<p>Create a string value.</p>
 
 <pre class="nim-code">
-proc newValue(str: string): Value
+proc newValue(str: string): Value 
 </pre>
 
 <h3 id="newValue-1">newValue</h3>
 
-<pre class="description">
-Create an integer value.
-</pre>
+<p>Create an integer value.</p>
 
 <pre class="nim-code">
 proc newValue(num: int | int64): Value
@@ -633,65 +583,53 @@ proc newValue(num: int | int64): Value
 
 <h3 id="newValue-2">newValue</h3>
 
-<pre class="description">
-Create a bool value.
-</pre>
+<p>Create a bool value.</p>
 
 <pre class="nim-code">
-proc newValue(a: bool): Value
+proc newValue(a: bool): Value 
 </pre>
 
 <h3 id="newValue-3">newValue</h3>
 
-<pre class="description">
-Create a float value.
-</pre>
+<p>Create a float value.</p>
 
 <pre class="nim-code">
-proc newValue(num: float): Value
+proc newValue(num: float): Value 
 </pre>
 
 <h3 id="newValue-4">newValue</h3>
 
-<pre class="description">
-Create a list value.
-</pre>
+<p>Create a list value.</p>
 
 <pre class="nim-code">
-proc newValue(valueList: seq[Value]; mutable = Mutable.immutable): Value
+proc newValue(valueList: seq[Value]; mutable = Mutable.immutable): Value 
 </pre>
 
 <h3 id="newValue-5">newValue</h3>
 
-<pre class="description">
-Create a dictionary value from a VarsDict.
-</pre>
+<p>Create a dictionary value from a VarsDict.</p>
 
 <pre class="nim-code">
-proc newValue(varsDict: VarsDict; mutable = Mutable.immutable): Value
+proc newValue(varsDict: VarsDict; mutable = Mutable.immutable): Value 
 </pre>
 
 <h3 id="newValue-6">newValue</h3>
 
-<pre class="description">
-New value from an existing value. Since values are ref types, the
-new value is an alias to the same value.
-</pre>
+<p>Create a new value from an existing value. Since values are ref types, the new value is an alias.</p>
 
 <pre class="nim-code">
-proc newValue(value: Value): Value
+proc newValue(value: Value): Value 
 </pre>
 
 <h3 id="newValue-7">newValue</h3>
 
-<pre class="description">
-New list value from an array of items of the same kind.
+<p>Create a new list value from an array of items of the same kind.
 
-~~~
-let listValue = newValue([1, 2, 3])
+</p><p>Examples:
+
+</p><pre class="desc-code">let listValue = newValue([1, 2, 3])
 let listValue = newValue(["a", "b", "c"])
 let listValue = newValue([newValue(1), newValue("b")])
-~~~
 </pre>
 
 <pre class="nim-code">
@@ -700,15 +638,13 @@ proc newValue[T](list: openArray[T]; mutable = Mutable.immutable): Value
 
 <h3 id="newValue-8">newValue</h3>
 
-<pre class="description">
-New dict value from an array of pairs where the pairs are the
-same type which may be Value type.
+<p>Create a new dict value from an array of pairs where the pairs are the same type which may be Value type.
 
-~~~
- let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
+</p><p>Examples:
+
+</p><pre class="desc-code"> let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
  let dictValue = newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)])
  let dictValue = newValue([("a", newValue(1.1)), ("b", newValue("a"))])
-~~~
 </pre>
 
 <pre class="nim-code">
@@ -717,342 +653,280 @@ proc newValue[T](dictPairs: openArray[(string, T)]; mutable = Mutable.immutable)
 
 <h3 id="newFunc">newFunc</h3>
 
-<pre class="description">
-Create a new func which is a FunctionSpec.
-</pre>
+<p>Create a new func which is a FunctionSpec.</p>
 
 <pre class="nim-code">
 func newFunc(builtIn: bool; signature: Signature; docComment: string;
              filename: string; lineNum: Natural; numLines: Natural;
-             statements: seq[Statement]; functionPtr: FunctionPtr): FunctionSpec
+             statements: seq[Statement]; functionPtr: FunctionPtr): FunctionSpec 
 </pre>
 
 <h3 id="newValue-9">newValue</h3>
 
-<pre class="description">
-Create a new func value.
-</pre>
+<p>Create a new func value.</p>
 
 <pre class="nim-code">
-func newValue(function: FunctionSpec): Value
+func newValue(function: FunctionSpec): Value 
 </pre>
 
 <h3 id="newEmptyListValue">newEmptyListValue</h3>
 
-<pre class="description">
-Return an empty list value.
-</pre>
+<p>Create a new empty list value.</p>
 
 <pre class="nim-code">
-proc newEmptyListValue(mutable = Mutable.immutable): Value
+proc newEmptyListValue(mutable = Mutable.immutable): Value 
 </pre>
 
 <h3 id="newEmptyDictValue">newEmptyDictValue</h3>
 
-<pre class="description">
-Create a dictionary value from a VarsDict.
-</pre>
+<p>Create a dictionary value from a VarsDict.</p>
 
 <pre class="nim-code">
-proc newEmptyDictValue(mutable = Mutable.immutable): Value
+proc newEmptyDictValue(mutable = Mutable.immutable): Value 
 </pre>
 
 <h3 id="a___">`==`</h3>
 
-<pre class="description">
-Return true when two variables are equal.
-</pre>
+<p>Return true when two variables are equal.</p>
 
 <pre class="nim-code">
-proc `==`(a: Value; b: Value): bool
+proc `==`(a: Value; b: Value): bool 
 </pre>
 
 <h3 id="newStatement">newStatement</h3>
 
-<pre class="description">
-Create a new statement.
-</pre>
+<p>Create a new statement.</p>
 
 <pre class="nim-code">
-func newStatement(text: string; lineNum: Natural = 1; ending = "\n"): Statement
+func newStatement(text: string; lineNum: Natural = 1; ending = "\n"): Statement 
 </pre>
 
 <h3 id="a__">`$`</h3>
 
-<pre class="description">
-Return a string representation of a signature.
-</pre>
+<p>Return a string representation of a signature.</p>
 
 <pre class="nim-code">
-func `$`(signature: Signature): string
+func `$`(signature: Signature): string 
 </pre>
 
 <h3 id="a__-1">`$`</h3>
 
-<pre class="description">
-Return a string representation of a function.
-</pre>
+<p>Return a string representation of a function.</p>
 
 <pre class="nim-code">
-func `$`(function: FunctionSpec): string
+func `$`(function: FunctionSpec): string 
 </pre>
 
 <h3 id="jsonStringRepr">jsonStringRepr</h3>
 
-<pre class="description">
-Return the JSON string representation. It is assumed the string is a valid UTF-8 encoded string.
-</pre>
+<p>Return the JSON string representation. It is assumed the string is a valid UTF-8 encoded string.</p>
 
 <pre class="nim-code">
-proc jsonStringRepr(str: string): string
+proc jsonStringRepr(str: string): string 
 </pre>
 
 <h3 id="dictToString">dictToString</h3>
 
-<pre class="description">
-Return a string representation of a dict Value in JSON format.
-</pre>
+<p>Return a string representation of a dict Value in JSON format.</p>
 
 <pre class="nim-code">
-func dictToString(value: Value): string
+func dictToString(value: Value): string {.raises: [Exception],
+    tags: [RootEffect].}
 </pre>
 
 <h3 id="listToString">listToString</h3>
 
-<pre class="description">
-Return a string representation of a list variable in JSON format.
-</pre>
+<p>Return a string representation of a list variable in JSON format.</p>
 
 <pre class="nim-code">
-func listToString(value: Value): string
+func listToString(value: Value): string {.raises: [Exception],
+    tags: [RootEffect].}
 </pre>
 
 <h3 id="valueToString">valueToString</h3>
 
-<pre class="description">
-Return a string representation of a variable in JSON format.
-</pre>
+<p>Return a string representation of a variable in JSON format.</p>
 
 <pre class="nim-code">
-func valueToString(value: Value): string
+func valueToString(value: Value): string {.raises: [Exception],
+    tags: [RootEffect].}
 </pre>
 
 <h3 id="valueToStringRB">valueToStringRB</h3>
 
-<pre class="description">
-Return the string representation of the variable for use in the replacement blocks.
-</pre>
+<p>Return the string representation of the variable for use in the replacement blocks.</p>
 
 <pre class="nim-code">
-func valueToStringRB(value: Value): string
+func valueToStringRB(value: Value): string {.raises: [Exception],
+    tags: [RootEffect].}
 </pre>
 
 <h3 id="a__-2">`$`</h3>
 
-<pre class="description">
-Return a string representation of a Value.
-</pre>
+<p>Return a string representation of a Value.</p>
 
 <pre class="nim-code">
-func `$`(value: Value): string
+func `$`(value: Value): string {.raises: [Exception], tags: [RootEffect].}
 </pre>
 
 <h3 id="a__-3">`$`</h3>
 
-<pre class="description">
-Return a string representation of a VarsDict.
-</pre>
+<p>Return a string representation of a VarsDict.</p>
 
 <pre class="nim-code">
-proc `$`(varsDict: VarsDict): string
+proc `$`(varsDict: VarsDict): string {.raises: [Exception], tags: [RootEffect].}
 </pre>
 
 <h3 id="dotNameRep">dotNameRep</h3>
 
-<pre class="description">
-Return a dot name string representation of a dictionary. The top variables tells whether the dict is the variables dictionary.
-</pre>
+<p>Return a dot name string representation of a dictionary. The top variables tells whether the dict is the variables dictionary.</p>
 
 <pre class="nim-code">
-func dotNameRep(dict: VarsDict; leftSide: string = ""; top = false): string
+func dotNameRep(dict: VarsDict; leftSide: string = ""; top = false): string {.
+    raises: [ValueError, Exception], tags: [RootEffect].}
 </pre>
 
 <h3 id="newValueOr">newValueOr</h3>
 
-<pre class="description">
-Create a new ValueOr containing a warning.
-</pre>
+<p>Create a new ValueOr containing a warning.</p>
 
 <pre class="nim-code">
-func newValueOr(warning: MessageId; p1 = ""; pos = 0): ValueOr
+func newValueOr(warning: MessageId; p1 = ""; pos = 0): ValueOr 
 </pre>
 
 <h3 id="newValueOr-1">newValueOr</h3>
 
-<pre class="description">
-Create a new ValueOr containing a warning.
-</pre>
+<p>Create a new ValueOr containing a warning.</p>
 
 <pre class="nim-code">
-func newValueOr(warningData: WarningData): ValueOr
+func newValueOr(warningData: WarningData): ValueOr 
 </pre>
 
 <h3 id="newValueOr-2">newValueOr</h3>
 
-<pre class="description">
-Create a new ValueOr containing a value.
-</pre>
+<p>Create a new ValueOr containing a value.</p>
 
 <pre class="nim-code">
-func newValueOr(value: Value): ValueOr
+func newValueOr(value: Value): ValueOr 
 </pre>
 
 <h3 id="newFunResultWarn">newFunResultWarn</h3>
 
-<pre class="description">
-Return a new FunResult object containing a warning. It takes a message id, the index of the problem parameter, and the optional string that goes with the warning.
-</pre>
+<p>Return a new FunResult object containing a warning. It takes a message id, the index of the problem parameter, and the optional string that goes with the warning.</p>
 
 <pre class="nim-code">
 func newFunResultWarn(warning: MessageId; parameter: int = 0; p1: string = "";
-                      pos = 0): FunResult
+                      pos = 0): FunResult 
 </pre>
 
 <h3 id="newFunResultWarn-1">newFunResultWarn</h3>
 
-<pre class="description">
-Return a new FunResult object containing a warning created from a WarningData object.
-</pre>
+<p>Return a new FunResult object containing a warning created from a WarningData object.</p>
 
 <pre class="nim-code">
-func newFunResultWarn(warningData: WarningData; parameter: int = 0): FunResult
+func newFunResultWarn(warningData: WarningData; parameter: int = 0): FunResult 
 </pre>
 
 <h3 id="newFunResult">newFunResult</h3>
 
-<pre class="description">
-Return a new FunResult object containing a value.
-</pre>
+<p>Return a new FunResult object containing a value.</p>
 
 <pre class="nim-code">
-func newFunResult(value: Value): FunResult
+func newFunResult(value: Value): FunResult 
 </pre>
 
 <h3 id="a___-1">`==`</h3>
 
-<pre class="description">
-Compare two FunResult objects and return true when equal.
-</pre>
+<p>Compare two FunResult objects and return true when equal.</p>
 
 <pre class="nim-code">
-func `==`(r1: FunResult; r2: FunResult): bool
+func `==`(r1: FunResult; r2: FunResult): bool 
 </pre>
 
 <h3 id="a___-2">`!=`</h3>
 
-<pre class="description">
-Compare two FunResult objects and return false when equal.
-</pre>
+<p>Compare two FunResult objects and return false when equal.</p>
 
 <pre class="nim-code">
-proc `!=`(a: FunResult; b: FunResult): bool
+proc `!=`(a: FunResult; b: FunResult): bool 
 </pre>
 
 <h3 id="a__-4">`$`</h3>
 
-<pre class="description">
-Return a string representation of a FunResult object.
-</pre>
+<p>Return a string representation of a FunResult object.</p>
 
 <pre class="nim-code">
-func `$`(funResult: FunResult): string
+func `$`(funResult: FunResult): string {.raises: [Exception, ValueError],
+    tags: [RootEffect].}
 </pre>
 
 <h3 id="newValuePosSi">newValuePosSi</h3>
 
-<pre class="description">
-Create a newValuePosSi object.
-</pre>
+<p>Create a newValuePosSi object.</p>
 
 <pre class="nim-code">
-proc newValuePosSi(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSi
+proc newValuePosSi(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSi 
 </pre>
 
 <h3 id="newValuePosSiOr">newValuePosSiOr</h3>
 
-<pre class="description">
-Create a ValuePosSiOr warning.
-</pre>
+<p>Create a ValuePosSiOr warning.</p>
 
 <pre class="nim-code">
-func newValuePosSiOr(warning: MessageId; p1 = ""; pos = 0): ValuePosSiOr
+func newValuePosSiOr(warning: MessageId; p1 = ""; pos = 0): ValuePosSiOr 
 </pre>
 
 <h3 id="newValuePosSiOr-1">newValuePosSiOr</h3>
 
-<pre class="description">
-Create a ValuePosSiOr warning.
-</pre>
+<p>Create a ValuePosSiOr warning.</p>
 
 <pre class="nim-code">
-func newValuePosSiOr(warningData: WarningData): ValuePosSiOr
+func newValuePosSiOr(warningData: WarningData): ValuePosSiOr 
 </pre>
 
 <h3 id="a___-3">`==`</h3>
 
-<pre class="description">
-Return true when a equals b.
-</pre>
+<p>Return true when a equals b.</p>
 
 <pre class="nim-code">
-proc `==`(a: ValuePosSi; b: ValuePosSi): bool
+proc `==`(a: ValuePosSi; b: ValuePosSi): bool 
 </pre>
 
 <h3 id="a___-4">`==`</h3>
 
-<pre class="description">
-Return true when a equals b.
-</pre>
+<p>Return true when a equals b.</p>
 
 <pre class="nim-code">
-proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool
+proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool 
 </pre>
 
 <h3 id="a___-5">`!=`</h3>
 
-<pre class="description">
-Compare two ValuePosSi objects and return false when equal.
-</pre>
+<p>Compare two ValuePosSi objects and return false when equal.</p>
 
 <pre class="nim-code">
-proc `!=`(a: ValuePosSi; b: ValuePosSi): bool
+proc `!=`(a: ValuePosSi; b: ValuePosSi): bool 
 </pre>
 
 <h3 id="a___-6">`!=`</h3>
 
-<pre class="description">
-Compare two ValuePosSiOr objects and return false when equal.
-</pre>
+<p>Compare two ValuePosSiOr objects and return false when equal.</p>
 
 <pre class="nim-code">
-proc `!=`(a: ValuePosSiOr; b: ValuePosSiOr): bool
+proc `!=`(a: ValuePosSiOr; b: ValuePosSiOr): bool 
 </pre>
 
 <h3 id="newValuePosSiOr-2">newValuePosSiOr</h3>
 
-<pre class="description">
-Create a ValuePosSiOr from a value, pos and exit.
-</pre>
+<p>Create a ValuePosSiOr from a value, pos and exit.</p>
 
 <pre class="nim-code">
-func newValuePosSiOr(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSiOr
+func newValuePosSiOr(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSiOr 
 </pre>
 
 <h3 id="newValuePosSiOr-3">newValuePosSiOr</h3>
 
-<pre class="description">
-Create a ValuePosSiOr value from a number or string.
-</pre>
+<p>Create a ValuePosSiOr value from a number or string.</p>
 
 <pre class="nim-code">
 proc newValuePosSiOr(number: int | int64 | float64 | string; pos: Natural): ValuePosSiOr
@@ -1060,62 +934,51 @@ proc newValuePosSiOr(number: int | int64 | float64 | string; pos: Natural): Valu
 
 <h3 id="newValuePosSiOr-4">newValuePosSiOr</h3>
 
-<pre class="description">
-Create a ValuePosSiOr from a ValuePosSi.
-</pre>
+<p>Create a ValuePosSiOr from a ValuePosSi.</p>
 
 <pre class="nim-code">
-func newValuePosSiOr(val: ValuePosSi): ValuePosSiOr
+func newValuePosSiOr(val: ValuePosSi): ValuePosSiOr 
 </pre>
 
 <h3 id="codeToParamType">codeToParamType</h3>
 
-<pre class="description">
-Convert a parameter code letter to a ParamType.
-</pre>
+<p>Convert a parameter code letter to a ParamType.</p>
 
 <pre class="nim-code">
-func codeToParamType(code: ParamCode): ParamType
+func codeToParamType(code: ParamCode): ParamType 
 </pre>
 
 <h3 id="strToParamType">strToParamType</h3>
 
-<pre class="description">
-Return the parameter type for the given string, e.g. "int" to ptInt.
-</pre>
+<p>Return the parameter type for the given string, e.g. "int" to ptInt.</p>
 
 <pre class="nim-code">
-func strToParamType(str: string): ParamType
+func strToParamType(str: string): ParamType 
 </pre>
 
 <h3 id="shortName">shortName</h3>
 
-<pre class="description">
-Return a short name based on the given index value. Return a for 0, b for 1, etc.  It returns names a, b, c, ..., z then repeats a0, b0, c0,....
-</pre>
+<p>Return a short name based on the given index value. Return a for 0, b for 1, etc.  It returns names a, b, c, ..., z then repeats a0, b0, c0,....</p>
 
 <pre class="nim-code">
-proc shortName(index: Natural): string
+proc shortName(index: Natural): string 
 </pre>
 
 <h3 id="newSignatureO">newSignatureO</h3>
 
-<pre class="description">
-Return a new signature for the function name and signature code. The parameter names come from the shortName function for letters a through z in order. The last letter in the code is the function's return type.
+<p>Return a new signature for the function name and signature code. The parameter names come from the shortName function for letters a through z in order. The last letter in the code is the function's return type.
 
-Example:
+</p><p>Example:
 
-~~~
-var signatureO = newSignatureO("myname", "ifss")
+</p><pre class="desc-code">var signatureO = newSignatureO("myname", "ifss")
 echo $signatureO.get()
 =>
 myname(a: int, b: float, c: string) string
-~~~
 </pre>
 
 <pre class="nim-code">
 func newSignatureO(functionName: string; signatureCode: string): Option[
-    Signature]
+    Signature] 
 </pre>
 
 

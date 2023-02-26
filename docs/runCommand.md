@@ -111,7 +111,10 @@ The special functions.
 * spListLoop -- list with callback function
 
 ```nim
-SpecialFunction
+SpecialFunction {.pure.} = enum
+  spNotSpecial = "not-special", spIf = "if", spIf0 = "if0", spWarn = "warn",
+  spLog = "log", spReturn = "return", spAnd = "and", spOr = "or",
+  spFunc = "func", spListLoop = "listLoop"
 ```
 
 # SpecialFunctionOr
@@ -167,7 +170,7 @@ LoopControl = enum
 Return a new LinesOr object containing a warning.
 
 ```nim
-func newLinesOr(warning: MessageId; p1: string = ""; pos = 0): LinesOr
+func newLinesOr(warning: MessageId; p1: string = ""; pos = 0): LinesOr 
 ```
 
 # newLinesOr
@@ -175,7 +178,7 @@ func newLinesOr(warning: MessageId; p1: string = ""; pos = 0): LinesOr
 Return a new LinesOr object containing a warning.
 
 ```nim
-func newLinesOr(warningData: WarningData): LinesOr
+func newLinesOr(warningData: WarningData): LinesOr 
 ```
 
 # newLinesOr
@@ -183,7 +186,7 @@ func newLinesOr(warningData: WarningData): LinesOr
 Return a new LinesOr object containing a list of lines.
 
 ```nim
-func newLinesOr(lines: seq[string]): LinesOr
+func newLinesOr(lines: seq[string]): LinesOr 
 ```
 
 # newPosOr
@@ -191,7 +194,7 @@ func newLinesOr(lines: seq[string]): LinesOr
 Create a PosOr warning.
 
 ```nim
-func newPosOr(warning: MessageId; p1 = ""; pos = 0): PosOr
+func newPosOr(warning: MessageId; p1 = ""; pos = 0): PosOr 
 ```
 
 # newPosOr
@@ -199,7 +202,7 @@ func newPosOr(warning: MessageId; p1 = ""; pos = 0): PosOr
 Create a PosOr value.
 
 ```nim
-func newPosOr(pos: Natural): PosOr
+func newPosOr(pos: Natural): PosOr 
 ```
 
 # newSpecialFunctionOr
@@ -207,7 +210,7 @@ func newPosOr(pos: Natural): PosOr
 Create a PosOr warning.
 
 ```nim
-func newSpecialFunctionOr(warning: MessageId; p1 = ""; pos = 0): SpecialFunctionOr
+func newSpecialFunctionOr(warning: MessageId; p1 = ""; pos = 0): SpecialFunctionOr 
 ```
 
 # newSpecialFunctionOr
@@ -215,7 +218,7 @@ func newSpecialFunctionOr(warning: MessageId; p1 = ""; pos = 0): SpecialFunction
 Create a SpecialFunctionOr value.
 
 ```nim
-func newSpecialFunctionOr(specialFunction: SpecialFunction): SpecialFunctionOr
+func newSpecialFunctionOr(specialFunction: SpecialFunction): SpecialFunctionOr 
 ```
 
 # `$`
@@ -223,7 +226,7 @@ func newSpecialFunctionOr(specialFunction: SpecialFunction): SpecialFunctionOr
 Return a string representation of a Statement.
 
 ```nim
-func `$`(s: Statement): string
+func `$`(s: Statement): string {.raises: [ValueError], tags: [].}
 ```
 
 # `==`
@@ -231,7 +234,7 @@ func `$`(s: Statement): string
 Return true when the two statements are equal.
 
 ```nim
-func `==`(s1: Statement; s2: Statement): bool
+func `==`(s1: Statement; s2: Statement): bool 
 ```
 
 # `==`
@@ -239,7 +242,7 @@ func `==`(s1: Statement; s2: Statement): bool
 Return true when a equals b.
 
 ```nim
-func `==`(a: PosOr; b: PosOr): bool
+func `==`(a: PosOr; b: PosOr): bool 
 ```
 
 # `!=`
@@ -247,7 +250,7 @@ func `==`(a: PosOr; b: PosOr): bool
 Compare whether two PosOr are not equal.
 
 ```nim
-func `!=`(a: PosOr; b: PosOr): bool
+func `!=`(a: PosOr; b: PosOr): bool 
 ```
 
 # VariableNameKind
@@ -310,7 +313,7 @@ RightType = enum
 Create a new VariableName object.
 
 ```nim
-func newVariableName(dotName: string; kind: VariableNameKind; pos: Natural): VariableName
+func newVariableName(dotName: string; kind: VariableNameKind; pos: Natural): VariableName 
 ```
 
 # newVariableNameOr
@@ -318,7 +321,7 @@ func newVariableName(dotName: string; kind: VariableNameKind; pos: Natural): Var
 Create a PosOr warning.
 
 ```nim
-func newVariableNameOr(warning: MessageId; p1 = ""; pos = 0): VariableNameOr
+func newVariableNameOr(warning: MessageId; p1 = ""; pos = 0): VariableNameOr 
 ```
 
 # newVariableNameOr
@@ -326,7 +329,7 @@ func newVariableNameOr(warning: MessageId; p1 = ""; pos = 0): VariableNameOr
 Create a new VariableNameOr object.
 
 ```nim
-func newVariableNameOr(dotName: string; kind: VariableNameKind; pos: Natural): VariableNameOr
+func newVariableNameOr(dotName: string; kind: VariableNameKind; pos: Natural): VariableNameOr 
 ```
 
 # getRightType
@@ -334,7 +337,7 @@ func newVariableNameOr(dotName: string; kind: VariableNameKind; pos: Natural): V
 Return the type of the right hand side of the statement at the start position.
 
 ```nim
-func getRightType(statement: Statement; start: Natural): RightType
+func getRightType(statement: Statement; start: Natural): RightType 
 ```
 
 # getVariableNameOr
@@ -351,7 +354,7 @@ a = o.def.bbb # comment
 ~~~
 
 ```nim
-proc getVariableNameOr(text: string; startPos: Natural): VariableNameOr
+proc getVariableNameOr(text: string; startPos: Natural): VariableNameOr 
 ```
 
 # getVariableName
@@ -359,7 +362,8 @@ proc getVariableNameOr(text: string; startPos: Natural): VariableNameOr
 Get a variable name from the statement. Skip leading whitespace.
 
 ```nim
-proc getVariableName(text: string; start: Natural): VariableNameOr
+proc getVariableName(text: string; start: Natural): VariableNameOr {.
+    raises: [KeyError], tags: [].}
 ```
 
 # matchTripleOrPlusSign
@@ -367,7 +371,7 @@ proc getVariableName(text: string; start: Natural): VariableNameOr
 Match the optional """ or + at the end of the line. This tells whether the statement continues on the next line for code files.
 
 ```nim
-func matchTripleOrPlusSign(line: string): Found
+func matchTripleOrPlusSign(line: string): Found 
 ```
 
 # addText
@@ -375,7 +379,7 @@ func matchTripleOrPlusSign(line: string): Found
 Add the line up to the line-ending to the text string.
 
 ```nim
-func addText(line: string; found: Found; text: var string)
+func addText(line: string; found: Found; text: var string) 
 ```
 
 # getFragmentAndPos
@@ -383,7 +387,7 @@ func addText(line: string; found: Found; text: var string)
 Split up a long statement around the given position.  Return the statement fragment, and the position where the fragment starts in the statement.
 
 ```nim
-func getFragmentAndPos(statement: Statement; start: Natural): (string, Natural)
+func getFragmentAndPos(statement: Statement; start: Natural): (string, Natural) 
 ```
 
 # getWarnStatement
@@ -392,7 +396,8 @@ Return a multiline error message.
 
 ```nim
 func getWarnStatement(filename: string; statement: Statement;
-                      warningData: WarningData): string
+                      warningData: WarningData): string {.raises: [ValueError],
+    tags: [].}
 ```
 
 # warnStatement
@@ -401,7 +406,8 @@ Show an invalid statement with a pointer pointing at the start of the problem. L
 
 ```nim
 proc warnStatement(env: var Env; statement: Statement; warningData: WarningData;
-                   sourceFilename = "")
+                   sourceFilename = "") {.
+    raises: [ValueError, IOError, OSError], tags: [WriteIOEffect].}
 ```
 
 # warnStatement
@@ -410,7 +416,8 @@ proc warnStatement(env: var Env; statement: Statement; warningData: WarningData;
 
 ```nim
 proc warnStatement(env: var Env; statement: Statement; messageId: MessageId;
-                   p1: string; pos: Natural; sourceFilename = "")
+                   p1: string; pos: Natural; sourceFilename = "") {.
+    raises: [ValueError, IOError, OSError], tags: [WriteIOEffect].}
 ```
 
 # removeLineEnd
@@ -418,7 +425,7 @@ proc warnStatement(env: var Env; statement: Statement; messageId: MessageId;
 Return a new string with the n or rn removed from the end of the line.
 
 ```nim
-func removeLineEnd(s: string): string
+func removeLineEnd(s: string): string 
 ```
 
 # yieldStatements
@@ -426,7 +433,8 @@ func removeLineEnd(s: string): string
 Iterate through the command's statements. A statement can be blank or all whitespace.
 
 ```nim
-iterator yieldStatements(cmdLines: CmdLines): Statement
+iterator yieldStatements(cmdLines: CmdLines): Statement {.raises: [KeyError],
+    tags: [].}
 ```
 
 # readStatement
@@ -434,7 +442,9 @@ iterator yieldStatements(cmdLines: CmdLines): Statement
 Read the next statement from the code file reading multiple lines if needed. When there is an error, show the warning and return nothing. When no more statements, return nothing.
 
 ```nim
-proc readStatement(env: var Env; lb: var LineBuffer): Option[Statement]
+proc readStatement(env: var Env; lb: var LineBuffer): Option[Statement] {.
+    raises: [IOError, OSError, ValueError, KeyError],
+    tags: [ReadIOEffect, WriteIOEffect].}
 ```
 
 # getMultilineStr
@@ -445,7 +455,7 @@ string value and the ending position one past the trailing
 whitespace.
 
 ```nim
-func getMultilineStr(text: string; start: Natural): ValuePosSiOr
+func getMultilineStr(text: string; start: Natural): ValuePosSiOr 
 ```
 
 # getString
@@ -458,7 +468,7 @@ var = "hello" # asdf
 ~~~
 
 ```nim
-func getString(statement: Statement; start: Natural): ValuePosSiOr
+func getString(statement: Statement; start: Natural): ValuePosSiOr 
 ```
 
 # getNumber
@@ -466,7 +476,7 @@ func getString(statement: Statement; start: Natural): ValuePosSiOr
 Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.
 
 ```nim
-func getNumber(statement: Statement; start: Natural): ValuePosSiOr
+func getNumber(statement: Statement; start: Natural): ValuePosSiOr 
 ```
 
 # skipArgument
@@ -481,7 +491,7 @@ a = fn( 1 , 2 )
 ~~~
 
 ```nim
-func skipArgument(statement: Statement; startPos: Natural): PosOr
+func skipArgument(statement: Statement; startPos: Natural): PosOr 
 ```
 
 # ifFunctions
@@ -500,7 +510,8 @@ a = if(cond, then)
 ```nim
 proc ifFunctions(env: var Env; specialFunction: SpecialFunction;
                  statement: Statement; start: Natural; variables: Variables;
-                 topLevel = false): ValuePosSiOr
+                 topLevel = false): ValuePosSiOr {.
+    raises: [Exception, KeyError], tags: [RootEffect].}
 ```
 
 # bareIfAndIf0
@@ -516,7 +527,8 @@ if(c, warn("c is true"))
 
 ```nim
 proc bareIfAndIf0(env: var Env; specialFunction: SpecialFunction;
-                  statement: Statement; start: Natural; variables: Variables): ValuePosSiOr
+                  statement: Statement; start: Natural; variables: Variables): ValuePosSiOr {.
+    raises: [Exception, KeyError], tags: [RootEffect].}
 ```
 
 # andOrFunctions
@@ -526,7 +538,8 @@ Return the and/or function's value and the position after. The and function stop
 ```nim
 proc andOrFunctions(env: var Env; specialFunction: SpecialFunction;
                     statement: Statement; start: Natural; variables: Variables;
-                    listCase = false): ValuePosSiOr
+                    listCase = false): ValuePosSiOr {.
+    raises: [Exception, KeyError], tags: [RootEffect].}
 ```
 
 # getArguments
@@ -542,7 +555,8 @@ newList = listLoop(return(3), callback, state)  # comment
 ```nim
 proc getArguments(env: var Env; statement: Statement; start: Natural;
                   variables: Variables; listCase = false;
-                  arguments: var seq[Value]; argumentStarts: var seq[Natural]): ValuePosSiOr
+                  arguments: var seq[Value]; argumentStarts: var seq[Natural]): ValuePosSiOr {.
+    raises: [KeyError, Exception], tags: [RootEffect].}
 ```
 
 # getFunctionValuePosSi
@@ -560,7 +574,8 @@ a = get(b, len("hi"), c)
 proc getFunctionValuePosSi(env: var Env; functionName: string;
                            functionPos: Natural; statement: Statement;
                            start: Natural; variables: Variables;
-                           listCase = false; topLevel = false): ValuePosSiOr
+                           listCase = false; topLevel = false): ValuePosSiOr {.
+    raises: [KeyError, Exception], tags: [RootEffect].}
 ```
 
 # runBoolOp
@@ -568,7 +583,7 @@ proc getFunctionValuePosSi(env: var Env; functionName: string;
 Evaluate the bool expression and return a bool value.
 
 ```nim
-func runBoolOp(left: Value; op: string; right: Value): Value
+func runBoolOp(left: Value; op: string; right: Value): Value 
 ```
 
 # runCompareOp
@@ -576,7 +591,7 @@ func runBoolOp(left: Value; op: string; right: Value): Value
 Evaluate the comparison and return a bool value.
 
 ```nim
-func runCompareOp(left: Value; op: string; right: Value): Value
+func runCompareOp(left: Value; op: string; right: Value): Value 
 ```
 
 # getCondition
@@ -590,7 +605,8 @@ a = (5 < 3) # condition
 
 ```nim
 proc getCondition(env: var Env; statement: Statement; start: Natural;
-                  variables: Variables): ValuePosSiOr
+                  variables: Variables): ValuePosSiOr {.
+    raises: [KeyError, Exception], tags: [RootEffect].}
 ```
 
 # getBracketedVarValue
@@ -606,7 +622,8 @@ a = dict[ "abc" ]
 
 ```nim
 proc getBracketedVarValue(env: var Env; statement: Statement; start: Natural;
-                          container: Value; variables: Variables): ValuePosSiOr
+                          container: Value; variables: Variables): ValuePosSiOr {.
+    raises: [Exception, KeyError], tags: [RootEffect].}
 ```
 
 # listLoop
@@ -626,7 +643,8 @@ stopped = listLoop(list, new, callback, state)
 ```nim
 proc listLoop(env: var Env; specialFunction: SpecialFunction;
               statement: Statement; start: Natural; variables: Variables;
-              listCase = false): ValuePosSiOr
+              listCase = false): ValuePosSiOr {.raises: [KeyError, Exception],
+    tags: [RootEffect].}
 ```
 
 # getValuePosSi
@@ -644,7 +662,8 @@ a = if( bool(len(b)), d, e) # if
 
 ```nim
 proc getValuePosSi(env: var Env; statement: Statement; start: Natural;
-                   variables: Variables; topLevel = false): ValuePosSiOr
+                   variables: Variables; topLevel = false): ValuePosSiOr {.
+    raises: [KeyError, Exception], tags: [RootEffect].}
 ```
 
 # runBareFunction
@@ -660,7 +679,8 @@ return(5)
 
 ```nim
 proc runBareFunction(env: var Env; statement: Statement; start: Natural;
-                     variables: Variables; leftName: VariableName): ValuePosSiOr
+                     variables: Variables; leftName: VariableName): ValuePosSiOr {.
+    raises: [KeyError, Exception], tags: [RootEffect].}
 ```
 
 # getBracketDotName
@@ -679,7 +699,8 @@ name["hello"] = 20
 
 ```nim
 proc getBracketDotName(env: var Env; statement: Statement; start: Natural;
-                       variables: Variables; leftName: VariableName): ValuePosSiOr
+                       variables: Variables; leftName: VariableName): ValuePosSiOr {.
+    raises: [KeyError, ValueError], tags: [].}
 ```
 
 # runStatement
@@ -687,7 +708,8 @@ proc getBracketDotName(env: var Env; statement: Statement; start: Natural;
 Run one statement and return the variable dot name string, operator and value.
 
 ```nim
-proc runStatement(env: var Env; statement: Statement; variables: Variables): VariableDataOr
+proc runStatement(env: var Env; statement: Statement; variables: Variables): VariableDataOr {.
+    raises: [KeyError, Exception, ValueError], tags: [RootEffect].}
 ```
 
 # skipSpaces
@@ -695,7 +717,7 @@ proc runStatement(env: var Env; statement: Statement; variables: Variables): Var
 
 
 ```nim
-proc skipSpaces(text: string): Natural
+proc skipSpaces(text: string): Natural {.raises: [KeyError], tags: [].}
 ```
 
 # callUserFunction
@@ -704,7 +726,9 @@ Run the given user function.
 
 ```nim
 proc callUserFunction(env: var Env; funcVar: Value; variables: Variables;
-                      arguments: seq[Value]): FunResult
+                      arguments: seq[Value]): FunResult {.
+    raises: [KeyError, Exception, ValueError, IOError, OSError],
+    tags: [RootEffect, WriteIOEffect, TimeEffect].}
 ```
 
 # runStatementAssignVar
@@ -713,7 +737,9 @@ Run a statement and assign the variable if appropriate. Return skip, stop or con
 
 ```nim
 proc runStatementAssignVar(env: var Env; statement: Statement;
-                           variables: var Variables; sourceFilename: string): LoopControl
+                           variables: var Variables; sourceFilename: string): LoopControl {.
+    raises: [KeyError, Exception, ValueError, IOError, OSError],
+    tags: [RootEffect, WriteIOEffect, TimeEffect].}
 ```
 
 # parseSignature
@@ -726,7 +752,8 @@ cmp = func(numStr1: string, numStr2: string) int
 ~~~
 
 ```nim
-proc parseSignature(dotName: string; signature: string; start: Natural): SignatureOr
+proc parseSignature(dotName: string; signature: string; start: Natural): SignatureOr {.
+    raises: [KeyError], tags: [].}
 ```
 
 # isFunctionDefinition
@@ -735,7 +762,8 @@ If the statement is the first line of a function definition, return true and fil
 
 ```nim
 proc isFunctionDefinition(statement: Statement; retLeftName: var string;
-                          retOperator: var Operator; retPos: var Natural): bool
+                          retOperator: var Operator; retPos: var Natural): bool {.
+    raises: [KeyError], tags: [].}
 ```
 
 # defineUserFunctionAssignVar
@@ -745,7 +773,9 @@ If the statement starts a function definition, define it and assign the variable
 ```nim
 proc defineUserFunctionAssignVar(env: var Env; lb: var LineBuffer;
                                  statement: Statement; variables: var Variables;
-                                 sourceFilename: string; codeFile: bool): bool
+                                 sourceFilename: string; codeFile: bool): bool {.
+    raises: [KeyError, ValueError, IOError, OSError],
+    tags: [WriteIOEffect, ReadIOEffect].}
 ```
 
 # runCommand
@@ -753,7 +783,9 @@ proc defineUserFunctionAssignVar(env: var Env; lb: var LineBuffer;
 Run a command and fill in the variables dictionaries.
 
 ```nim
-proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables): LoopControl
+proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables): LoopControl {.
+    raises: [KeyError, Exception, ValueError, IOError, OSError],
+    tags: [RootEffect, WriteIOEffect, TimeEffect].}
 ```
 
 # runCodeFile
@@ -761,7 +793,9 @@ proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables): Loo
 Run the code file and fill in the variables.
 
 ```nim
-proc runCodeFile(env: var Env; variables: var Variables; filename: string)
+proc runCodeFile(env: var Env; variables: var Variables; filename: string) {.
+    raises: [ValueError, IOError, OSError, Exception, KeyError],
+    tags: [ReadDirEffect, WriteIOEffect, ReadIOEffect, RootEffect, TimeEffect].}
 ```
 
 # runCodeFiles
@@ -769,7 +803,9 @@ proc runCodeFile(env: var Env; variables: var Variables; filename: string)
 Run each code file and populate the variables.
 
 ```nim
-proc runCodeFiles(env: var Env; variables: var Variables; codeList: seq[string])
+proc runCodeFiles(env: var Env; variables: var Variables; codeList: seq[string]) {.
+    raises: [ValueError, IOError, OSError, Exception, KeyError],
+    tags: [ReadDirEffect, WriteIOEffect, ReadIOEffect, RootEffect, TimeEffect].}
 ```
 
 

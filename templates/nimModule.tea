@@ -14,6 +14,54 @@ patterns = list( +
   "&lt;", "<", +
   "&amp;", "&")
 
+handle-bullet = func(ix: int, bullet: string, lines: list) bool
+  ## Make the bullet text into an html bullet and add it to lines.
+  lines &= join(["<li>", bullet, "</li>"], "")
+  return(false)
+
+html-paragraph = func(item: list) string
+  ## Return html given a "p" element item list.
+  return(join(["<p>", item[0], "</p>"], ""))
+
+html-code = func(item: list) string
+  ## Return html given a "code" element item list.
+  return(join(["<pre class=\"desc-code\">", item[1], "</pre>"], ""))
+
+html-bullets = func(item: list, funcs: dict) string
+  ## Return html given a "bullets" element item list.
+  lines = []
+  lines &= "<ul>\n"
+  dummy = listLoop(item, lines, funcs.handle-bullet)
+  lines &= "</ul>\n"
+  return(join(lines, ""))
+
+handle-element = func(ix: int, element: list, lines: list, funcs: dict) bool
+  ## Make the element into html and add it to the lines.
+  fn = case(element[0], [ +
+    "p", funcs.html-paragraph, +
+    "code", funcs.html-code, +
+    "bullets", funcs.html-bullets +
+  ])
+  html = if((element[0] == "bullets"), l.fn(element[1], funcs), l.fn(element[1]))
+  lines &= html
+  return(false)
+
+get-html-description = func(mdDescription: string, funcs: dict) string
+  ## Parse the description markdown text and return html paragraphs,
+  ## bullet lists and code blocks.
+  elements = markdownLite(mdDescription)
+  lines = []
+  dummy = listLoop(elements, lines, funcs.handle-element, funcs)
+  return(join(lines, ""))
+
+funcs = dict()
+funcs.html-paragraph = html-paragraph
+funcs.html-code = html-code
+funcs.html-bullets = html-bullets
+funcs.handle-element = handle-element
+funcs.handle-bullet = handle-bullet
+funcs.get-html-description = get-html-description
+
 get-name = func(ix: int, entry: dict, newList: list) bool
   ## Add the entry name to the list.
   newList &= entry.name
@@ -25,23 +73,17 @@ stopped2 = listLoop(s.entries, names, l.get-name)
 
 # Use the anchor type depending on the result type (extension).
 path = path(t.args.resultFilename)
-type = if((path.ext == ".md"), "github", "html")
-anchors = anchors(names, type)
+templateType = if((path.ext == ".md"), "github", "html")
+anchors = anchors(names, templateType)
 
 # Use the filename's basename for the module name.
 orig-path = path(s.orig)
 o.moduleName = orig-path.filename
 
-textDesc = replaceRe(s.moduleDescription, patterns)
-
-# For html, parse the markdown and turn it into html paragraphs,
-# bullet lists and code blocks.
-
-
-# elements = markdownLite(textDesc)
-
-
-o.moduleDescription = textDesc
+mdDescription = replaceRe(s.moduleDescription, patterns)
+o.moduleDescription = if((templateType == "html"), +
+  l.get-html-description(mdDescription, funcs), +
+  mdDescription)
 
 get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
   ## Reformat the entry and add it to the new list.
@@ -57,15 +99,19 @@ get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
 
   # Remove the formatting from the description and use the first
   # sentence for the short description.
-  desc = get(entry, "description", "")
-  sentence = slice(desc, 0, add(find(desc, ".", -1), 1))
-  newEntry.short = replaceRe(sentence, state.patterns)
-  newEntry.description = replaceRe(desc, state.patterns)
+  descr = get(entry, "description", "")
+  mdDescription = replaceRe(descr, state.patterns)
+  newEntry.short = slice(mdDescription, 0, add(find(mdDescription, ".", -1), 1))
 
-  # Simplify the code signature.
-  code = replaceRe(entry.code, list("[ ]*$", ""))
-  pos = find(code, " {", len(code))
-  newEntry.signature = slice(code, 0, pos)
+  # Convert the markdown description to html for the html template.
+  newEntry.description = if((state.templateType == "html"), +
+    l.state.funcs.get-html-description(mdDescription, state.funcs), +
+    mdDescription)
+
+  # Simplify the code by removing some text.
+  junk = "{.\\s*raises:\\s*\\[],\\s*tags:\\s*\\[].}"
+  code = replaceRe(entry.code, list(junk, ""))
+  newEntry.signature = code
 
   newEntry.anchor = state.anchors[ix]
 
@@ -77,5 +123,7 @@ get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
 state = dict()
 state.patterns = patterns
 state.anchors = anchors
+state.funcs = funcs
+state.templateType = templateType
 o.entries = []
 stopped = listLoop(s.entries, o.entries, l.get-entry, state)

@@ -22,7 +22,7 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
@@ -33,33 +33,30 @@ body {
 <body>
 <h1>cmdline.nim</h1>
 
-<pre class="description">
-Parse the command line.
+<p>Parse the command line.
 
- Example:
- ~~~nim
- import cmdline
+</p><p>Example:
 
- # Define the supported options.
- var options = newSeq[CmlOption]()
- options.add(newCmlOption("help", 'h', cmlStopArgument))
- options.add(newCmlOption("log", 'l', cmlOptionalArgument))
- ...
+</p><pre>import cmdline
 
- # Parse the command line.
- let argsOrMessage = cmdline(options, collectArgs())
- if argsOrMessage.kind == cmlMessageKind:
-   # Display the message.
-   echo getMessage(argsOrMessage.messageId,
-     argsOrMessage.problemArg)
- else:
-   # Optionally post process the resulting arguments.
-   let args = newArgs(argsOrMessage.args)
- ~~~
+# Define the supported options.
+var options = newSeq[CmlOption]()
+options.add(newCmlOption("help", 'h', cmlStopArgument))
+options.add(newCmlOption("log", 'l', cmlOptionalArgument))
+...
 
- For a complete example see the bottom of the file in the isMainModule
- section.
-</pre>
+# Parse the command line.
+let argsOrMessage = cmdline(options, collectArgs())
+if argsOrMessage.kind == cmlMessageKind:
+  # Display the message.
+  echo getMessage(argsOrMessage.messageId,
+    argsOrMessage.problemArg)
+else:
+  # Optionally post process the resulting arguments.
+  let args = newArgs(argsOrMessage.args)
+</pre><p>
+For a complete example see the bottom of the file in the isMainModule
+section.</p>
 
 Nim source code: <a href="../../src/cmdline.nim">cmdline.nim</a>
 

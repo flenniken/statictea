@@ -1109,6 +1109,15 @@ suite "functions.nim":
     check testReplaceReGoodList("abc123abc", newValue(["a", "x", "b", "y", "c", "z"]),
                                 "xyz123xyz")
 
+  test "replaceRe code junk":
+    let str = "func newValuePosSiOr(val: ValuePosSi): ValuePosSiOr {.raises: [], tags: [].}"
+    let junk = r"{\.raises: \[], tags: \[]\.}"
+    let expected = "func newValuePosSiOr(val: ValuePosSi): ValuePosSiOr "
+    check testReplaceReGoodList(str, newValue([junk, ""]), expected)
+
+    let junk2 = r"{.\s*raises:\s*\[],\s*tags:\s*\[].}"
+    check testReplaceReGoodList(str, newValue([junk2, ""]), expected)
+
   test "path":
     check testPathGood("dir/basename.ext", "basename.ext", "basename", ".ext", "dir/")
     check testPathGood("", "", "", "", "")
