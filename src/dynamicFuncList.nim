@@ -1615,7 +1615,7 @@ warn("always warn")
 """
 
   info = newBuiltInInfo
-  functionsList* = [
+  functionsList = [
     info("fun_add_fff", dc_fun_add_fff, 23),
     info("fun_add_iii", dc_fun_add_iii, 24),
     info("fun_anchors_lsl", dc_fun_anchors_lsl, 38),
@@ -1697,7 +1697,7 @@ warn("always warn")
   # Note: the function starting lines is separate from the list above
   # so when there are changes the diffs are easier to read.
 
-  functionStarts* = [
+  functionStarts = [
     688,
     664,
     1844,

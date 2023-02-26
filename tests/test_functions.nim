@@ -1852,15 +1852,15 @@ d.sub.y = 4"""
   #       fail
   #     lastNameSig = nameSig
 
-  test "function count":
-    var count = 0
-    for key, value in funcsVarDict:
-      check value.kind == vkList
-      count += value.listv.list.len
-      for val in value.listv.list:
-        check val.kind == vkFunc
+  # test "function count":
+  #   var count = 0
+  #   for key, value in funcsVarDict:
+  #     check value.kind == vkList
+  #     count += value.listv.list.len
+  #     for val in value.listv.list:
+  #       check val.kind == vkFunc
 
-    check functionsList.len == count
+  #   check functionsList.len == count
 
   test "readJson":
     check testReadJson(""""tea"""", newValue("tea"))

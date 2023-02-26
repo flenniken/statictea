@@ -15,7 +15,7 @@ const
 
 #$ endblock
   info = newBuiltInInfo
-  functionsList* = [
+  functionsList = [
 #$ # List all the functions.
 #$ #
 #$ # Example line:
@@ -33,7 +33,7 @@ const
   # Note: the function starting lines is separate from the list above
   # so when there are changes the diffs are easier to read.
 
-  functionStarts* = [
+  functionStarts = [
 #$ # Make a list of all the function start lines.
 #$ nextline t.repeat = len(o.entries)
 #$ : entry = o.entries[t.row]
