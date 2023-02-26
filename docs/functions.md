@@ -91,6 +91,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [fun_lte_iib](#fun_lte_iib) &mdash; Return true when an int is less than or equal to another int.
 * [fun_lte_ffb](#fun_lte_ffb) &mdash; Return true when a float is less than or equal to another float.
 * [fun_readJson_sa](#fun_readjson_sa) &mdash; Convert a JSON string to a variable.
+* [fun_markdownLite_sl](#fun_markdownlite_sl) &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.
 * [functionsDict](#functionsdict) &mdash; Maps a built-in function name to a function pointer you can call.
 * type: [BuiltInInfo](#builtininfo) &mdash; The built-in function information.
 * [newBuiltInInfo](#newbuiltininfo) &mdash; Return a BuiltInInfo object.
@@ -2102,6 +2103,37 @@ d = readJson("{"a":1, "b": 2}")
 func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
+# fun_markdownLite_sl
+
+Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
+
+list elements:
+
+* p -- A paragraph element is one string, possibly containing
+newlines.
+
+* code -- A code element is three strings. The first string is
+the code start line, for example “~~~” or “~~~nim”.  The second
+string (with newlines) contains the text of the block.  The third
+string is the ending line, for example “~~~”.
+
+* bullets -- A bullets element contains a string (with newlines)
+for each bullet point.  The leading “* “ is not part of the
+string.
+
+~~~
+elements = markdownLite(description)
+elements => [
+  ["p", ["the paragraph which may contain newlines"]]
+  ["code", ["~~~", "code text with newlines", "~~~"]]
+  ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
+]
+~~~
+
+```nim
+func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult
+```
+
 # functionsDict
 
 Maps a built-in function name to a function pointer you can call.
@@ -2136,7 +2168,7 @@ func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): Bu
 
 # functionsList
 
-Dynamically generated sorted list of built-in functions. Each line contains the nim function name, its doc comment, and the starting line number.  See templates/dynamicFuncList.nim
+Dynamically generated sorted list of built-in functions. Each line contains the nim function name, its doc comment, and the number of lines.  See templates/dynamicFuncList.nim
 
 ```nim
 functionsList = [(funcName: "fun_add_fff", docComment: """Add two floats. A warning is generated on overflow.
@@ -2385,9 +2417,9 @@ functionStarts = [688, 664, 1844, 2368, 1109, 782, 815, 352, 331, 373, 859, 406,
                   1258, 1219, 2433, 2414, 2452, 760, 1146, 903, 946, 920, 2237,
                   2271, 2292, 529, 481, 2548, 2529, 2586, 2567, 567, 625, 973,
                   1008, 1050, 1976, 1935, 1606, 462, 443, 425, 1295, 1316, 2046,
-                  1587, 2624, 2605, 2663, 2643, 2491, 2472, 2510, 2350, 2391,
-                  1532, 2683, 1363, 1473, 2070, 1184, 1753, 1786, 1815, 2327,
-                  2127, 2213, 735, 711, 1882, 1630, 2021]
+                  1587, 2624, 2605, 2663, 2643, 2706, 2491, 2472, 2510, 2350,
+                  2391, 1532, 2683, 1363, 1473, 2070, 1184, 1753, 1786, 1815,
+                  2327, 2127, 2213, 735, 711, 1882, 1630, 2021]
 ```
 
 # getBestFunction

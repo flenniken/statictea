@@ -8,6 +8,7 @@ import messages
 import variables
 import opresult
 import sharedtestcode
+import readJson
 
 func newFunResult(valueOr: ValueOr, parameter=0): FunResult =
   ## Return a new FunResult object based on the ValueOr and the parameter index.
@@ -17,31 +18,37 @@ func newFunResult(valueOr: ValueOr, parameter=0): FunResult =
     result = FunResult(kind: frWarning, parameter: parameter,
       warningData: valueOr.message)
 
+proc callFunction(functionName: string, arguments: seq[Value],
+    variables: Variables = nil): FunResult =
+  ## Call a function.
+  # Set up variables when not passed in.
+  var vars = variables
+  if vars == nil:
+    vars = startVariables(funcs = funcsVarDict)
+
+  # Lookup the function variable by name.
+  let funcValueOr = getVariable(vars, functionName, npBuiltin)
+  if funcValueOr.isMessage:
+    return newFunResult(funcValueOr, parameter=0)
+
+  # Get the function to match the arguments.
+  let bestValueOr = getBestFunction(funcValueOr.value, arguments)
+  if bestValueOr.isMessage:
+    return newFunResult(bestValueOr, parameter=0)
+
+  # Call the function.
+  result = bestValueOr.value.funcv.functionPtr(vars, arguments)
+
 proc testFunction(functionName: string, arguments: seq[Value],
     eFunResult: FunResult, variables: Variables = nil): bool =
   ## Call the function with the given arguments and verify it returns
   ## the expected results. If you don't pass in variables, variables
   ## in the initial state are used.
 
-  # Set up variables when not passed in.
-  var vars = variables
-  if vars == nil:
-    vars = startVariables(funcs = funcsVarDict)
-
-  var funResult: FunResult
-  # Lookup the variable's value.
-  let funcValueOr = getVariable(vars, functionName, npBuiltin)
-  funResult = newFunResult(funcValueOr, parameter=0)
-  if funResult.kind == frValue:
-    # Get the function to match the arguments.
-    let bestValueOr = getBestFunction(funcValueOr.value, arguments)
-    funResult = newFunResult(bestValueOr, parameter=0)
-    if funResult.kind == frValue:
-      # Call the function.
-      funResult = bestValueOr.value.funcv.functionPtr(vars, arguments)
+  let funResult = callFunction(functionName, arguments, variables)
 
   # Verify we got the expected results.
-  let test = "$1(args=$2)  $3\n" % [functionName, $arguments, $funcValueOr]
+  let test = "$1(args=$2)\n" % [functionName, $arguments]
   result = gotExpected($funResult, $eFunResult, test)
   if not result and eFunResult.kind == frWarning and funResult.kind == frWarning:
     echo ""
@@ -168,6 +175,11 @@ proc testFormatStringWarn(str: string, eWarningData: WarningData,
   if not result:
     echo str
     echo getWarningLine("", 0, warningData.messageId, warningData.p1)
+
+proc testMarkdownLite(text: string, eJson: string): bool =
+  var arguments = @[newValue(text)]
+  let funResult = callFunction("markdownLite", arguments)
+  result = gotExpected($funResult, eJson)
 
 suite "functions.nim":
 
@@ -1980,3 +1992,63 @@ spec.lineNum = 0
 spec.numLines = 3
 spec.statements = ["return 0"]"""
     check gotExpected(got, expected)
+
+  test "markdownLite paragraph":
+    let text = """
+Markdown lite: paragraphs, code and bullets.
+"""
+    let expected = """[["p",["Markdown lite: paragraphs, code and bullets.\n"]]]"""
+    check testMarkdownLite(text, expected)
+
+  test "markdownLite bullets":
+    let text = """
+* b1
+* b2
+* b3
+* b4
+"""
+    let expected = """[["bullets",["b1\n","b2\n","b3\n","b4\n"]]]"""
+    check testMarkdownLite(text, expected)
+
+  test "markdownLite code":
+    let text = """
+~~~statictex
+xyz = 5
+tea = "Earl Grey"
+~~~
+"""
+    let expected = """[["code",["~~~statictex\n","xyz = 5\ntea = \"Earl Grey\"\n","~~~\n"]]]"""
+    check testMarkdownLite(text, expected)
+
+  test "markdownLite all":
+    let text = """
+This test uses p, code and bullets.
+
+Second p.
+
+* one
+* two
+
+~~~statictex
+xyz = 5
+tea = "Earl Grey"
+~~~
+
+Another p
+with 2 lines
+
+end
+"""
+    let expected = """[
+["p",["This test uses p, code and bullets.\n\n"]],
+["p",["Second p.\n\n"]],
+["bullets",["one\n","two\n\n"]],
+["code", [
+  "~~~statictex\n",
+  "xyz = 5\ntea = \"Earl Grey\"\n",
+  "~~~\n"]],
+["p", ["\nAnother p\nwith 2 lines\n\n"]],
+["p", ["end\n"]]]"""
+    var eValueOr = readJsonString(expected)
+    assert eValueOr.isValue
+    check testMarkdownLite(text, $eValueOr.value)

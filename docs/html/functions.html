@@ -128,6 +128,7 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_lte_iib">fun_lte_iib</a> &mdash; Return true when an int is less than or equal to another int.</li>
 <li> <a href="#fun_lte_ffb">fun_lte_ffb</a> &mdash; Return true when a float is less than or equal to another float.</li>
 <li> <a href="#fun_readJson_sa">fun_readJson_sa</a> &mdash; Convert a JSON string to a variable.</li>
+<li> <a href="#fun_markdownLite_sl">fun_markdownLite_sl</a> &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.</li>
 <li> <a href="#functionsDict">functionsDict</a> &mdash; Maps a built-in function name to a function pointer you can call.</li>
 <li>type:  <a href="#BuiltInInfo">BuiltInInfo</a> &mdash; The built-in function information.</li>
 <li> <a href="#newBuiltInInfo">newBuiltInInfo</a> &mdash; Return a BuiltInInfo object.</li>
@@ -2312,6 +2313,39 @@ d = readJson("{"a":1, "b": 2}")
 func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
+<h3 id="fun_markdownLite_sl">fun_markdownLite_sl</h3>
+
+<pre class="description">
+Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
+
+list elements:
+
+* p -- A paragraph element is one string, possibly containing
+newlines.
+
+* code -- A code element is three strings. The first string is
+the code start line, for example “~~~” or “~~~nim”.  The second
+string (with newlines) contains the text of the block.  The third
+string is the ending line, for example “~~~”.
+
+* bullets -- A bullets element contains a string (with newlines)
+for each bullet point.  The leading “* “ is not part of the
+string.
+
+~~~
+elements = markdownLite(description)
+elements => [
+  ["p", ["the paragraph which may contain newlines"]]
+  ["code", ["~~~", "code text with newlines", "~~~"]]
+  ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
+]
+~~~
+</pre>
+
+<pre class="nim-code">
+func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult
+</pre>
+
 <h3 id="functionsDict">functionsDict</h3>
 
 <pre class="description">
@@ -2353,7 +2387,7 @@ func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): Bu
 <h3 id="functionsList">functionsList</h3>
 
 <pre class="description">
-Dynamically generated sorted list of built-in functions. Each line contains the nim function name, its doc comment, and the starting line number.  See templates/dynamicFuncList.nim
+Dynamically generated sorted list of built-in functions. Each line contains the nim function name, its doc comment, and the number of lines.  See templates/dynamicFuncList.nim
 </pre>
 
 <pre class="nim-code">
@@ -2605,9 +2639,9 @@ functionStarts = [688, 664, 1844, 2368, 1109, 782, 815, 352, 331, 373, 859, 406,
                   1258, 1219, 2433, 2414, 2452, 760, 1146, 903, 946, 920, 2237,
                   2271, 2292, 529, 481, 2548, 2529, 2586, 2567, 567, 625, 973,
                   1008, 1050, 1976, 1935, 1606, 462, 443, 425, 1295, 1316, 2046,
-                  1587, 2624, 2605, 2663, 2643, 2491, 2472, 2510, 2350, 2391,
-                  1532, 2683, 1363, 1473, 2070, 1184, 1753, 1786, 1815, 2327,
-                  2127, 2213, 735, 711, 1882, 1630, 2021]
+                  1587, 2624, 2605, 2663, 2643, 2706, 2491, 2472, 2510, 2350,
+                  2391, 1532, 2683, 1363, 1473, 2070, 1184, 1753, 1786, 1815,
+                  2327, 2127, 2213, 735, 711, 1882, 1630, 2021]
 </pre>
 
 <h3 id="getBestFunction">getBestFunction</h3>

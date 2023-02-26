@@ -32,7 +32,16 @@ anchors = anchors(names, type)
 orig-path = path(s.orig)
 o.moduleName = orig-path.filename
 
-o.moduleDescription = replaceRe(s.moduleDescription, patterns)
+textDesc = replaceRe(s.moduleDescription, patterns)
+
+# For html, parse the markdown and turn it into html paragraphs,
+# bullet lists and code blocks.
+
+
+# elements = markdownLite(textDesc)
+
+
+o.moduleDescription = textDesc
 
 get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
   ## Reformat the entry and add it to the new list.

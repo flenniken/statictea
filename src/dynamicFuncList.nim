@@ -1050,6 +1050,33 @@ lte(4, 3) => false
 ~~~
 """
 
+  dc_fun_markdownLite_sl = """
+Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
+
+list elements:
+
+* p -- A paragraph element is one string, possibly containing
+newlines.
+
+* code -- A code element is three strings. The first string is
+the code start line, for example “~~~” or “~~~nim”.  The second
+string (with newlines) contains the text of the block.  The third
+string is the ending line, for example “~~~”.
+
+* bullets -- A bullets element contains a string (with newlines)
+for each bullet point.  The leading “* “ is not part of the
+string.
+
+~~~
+elements = markdownLite(description)
+elements => [
+  ["p", ["the paragraph which may contain newlines"]]
+  ["code", ["~~~", "code text with newlines", "~~~"]]
+  ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
+]
+~~~
+"""
+
   dc_fun_ne_ffb = """
 Return true when two floats are not equal.
 
@@ -1639,6 +1666,7 @@ warn("always warn")
     info("fun_lt_iib", dc_fun_lt_iib, 19),
     info("fun_lte_ffb", dc_fun_lte_ffb, 20),
     info("fun_lte_iib", dc_fun_lte_iib, 20),
+    info("fun_markdownLite_sl", dc_fun_markdownLite_sl, 38),
     info("fun_ne_ffb", dc_fun_ne_ffb, 19),
     info("fun_ne_iib", dc_fun_ne_iib, 19),
     info("fun_ne_ssb", dc_fun_ne_ssb, 19),
@@ -1664,7 +1692,7 @@ warn("always warn")
   ]
     ## Dynamically generated sorted list of built-in functions. Each
     ## line contains the nim function name, its doc comment, and the
-    ## starting line number.  See templates/dynamicFuncList.nim
+    ## number of lines.  See templates/dynamicFuncList.nim
     
   # Note: the function starting lines is separate from the list above
   # so when there are changes the diffs are easier to read.
@@ -1720,6 +1748,7 @@ warn("always warn")
     2605,
     2663,
     2643,
+    2706,
     2491,
     2472,
     2510,

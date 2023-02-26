@@ -8,7 +8,7 @@ Parse the simple markdown used in the function descriptions.
 * type: [ElementTag](#elementtag) &mdash; 
 * type: [Element](#element) &mdash; 
 * [newElement](#newelement) &mdash; Create an Element object.
-* [parseMarkdown](#parsemarkdown) &mdash; Parse the description markdown and return a list of elements.
+* [parseMarkdown](#parsemarkdown) &mdash; Parse the simple description markdown and return a list of elements.
 * [`$`](#) &mdash; Return a string representation of an Element.
 * [`$`](#-1) &mdash; Return a string representation of a list of Elements.
 * type: [FragmentType](#fragmenttype) &mdash; Hightlight fragments.
@@ -49,7 +49,7 @@ proc newElement(tag: ElementTag; content: seq[string]): Element
 
 # parseMarkdown
 
-Parse the description markdown and return a list of elements.
+Parse the simple description markdown and return a list of elements.
 
 elements:
 
@@ -58,8 +58,9 @@ newlines.
 
 * code -- A code element is three strings. The first string is
 the code start line, for example “~~~” or “~~~nim”.  The second
-string contains the contents of the block, when none it’s empty.
-The third string is the ending line, for example “~~~”.
+string contains the contents of the block containing newlines,
+when none it’s empty.  The third string is the ending line, for
+example “~~~”.
 
 * bullets -- A bullets element contains a string for each
 bullet point and it may contain newlines.  The leading “* “ is
@@ -151,7 +152,7 @@ proc matchFragment(line: string; start: Natural): Option[Fragment]
 
 # highlightStaticTea
 
-Identify all the fragments in the StaticTea code line to highlight.
+Identify all the fragments in the StaticTea code line to highlight. The fragments are ordered from left to right.
 
 ```nim
 proc highlightStaticTea(codeLine: string): seq[Fragment]

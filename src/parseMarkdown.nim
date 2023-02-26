@@ -25,7 +25,7 @@ proc clear(list: var seq[string]) =
   list.setLen(0)
 
 func parseMarkdown*(desc: string): seq[Element] =
-  ## Parse the description markdown and return a list of
+  ## Parse the simple description markdown and return a list of
   ## elements.
   ## @:
   ## @:elements:
@@ -35,8 +35,9 @@ func parseMarkdown*(desc: string): seq[Element] =
   ## @:
   ## @:* code -- A code element is three strings. The first string is
   ## @:the code start line, for example “~~~” or “~~~nim”.  The second
-  ## @:string contains the contents of the block, when none it’s empty.
-  ## @:The third string is the ending line, for example “~~~”.
+  ## @:string contains the contents of the block containing newlines,
+  ## @:when none it’s empty.  The third string is the ending line, for
+  ## @:example “~~~”.
   ## @:
   ## @:* bullets -- A bullets element contains a string for each
   ## @:bullet point and it may contain newlines.  The leading “* “ is

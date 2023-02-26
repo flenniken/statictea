@@ -985,9 +985,12 @@ task dyfuncs, "\tCreate the built-in function details (src/dynamicFuncList.nim) 
   let cmd = fmt"{statictea} -s {server} -t {tFile} -o {teaFile} -r {result}"
   exec cmd
 
+  rmFile(server)
+
   # Buld the functions.nim file.
   let cmd2 = get_test_module_cmd(functionsFile, force = true)
   exec cmd2
+
 
 task dot, "\tCreate source module dependency graph (docs/staticteadep.svg).":
   createDependencyGraph()

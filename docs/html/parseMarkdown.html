@@ -45,7 +45,7 @@ Nim source code: <a href="../../src/parseMarkdown.nim">parseMarkdown.nim</a>
 <li>type:  <a href="#ElementTag">ElementTag</a> &mdash; </li>
 <li>type:  <a href="#Element">Element</a> &mdash; </li>
 <li> <a href="#newElement">newElement</a> &mdash; Create an Element object.</li>
-<li> <a href="#parseMarkdown">parseMarkdown</a> &mdash; Parse the description markdown and return a list of elements.</li>
+<li> <a href="#parseMarkdown">parseMarkdown</a> &mdash; Parse the simple description markdown and return a list of elements.</li>
 <li> <a href="#a__">`$`</a> &mdash; Return a string representation of an Element.</li>
 <li> <a href="#a__-1">`$`</a> &mdash; Return a string representation of a list of Elements.</li>
 <li>type:  <a href="#FragmentType">FragmentType</a> &mdash; Hightlight fragments.</li>
@@ -94,7 +94,7 @@ proc newElement(tag: ElementTag; content: seq[string]): Element
 <h3 id="parseMarkdown">parseMarkdown</h3>
 
 <pre class="description">
-Parse the description markdown and return a list of elements.
+Parse the simple description markdown and return a list of elements.
 
 elements:
 
@@ -103,8 +103,9 @@ newlines.
 
 * code -- A code element is three strings. The first string is
 the code start line, for example “~~~” or “~~~nim”.  The second
-string contains the contents of the block, when none it’s empty.
-The third string is the ending line, for example “~~~”.
+string contains the contents of the block containing newlines,
+when none it’s empty.  The third string is the ending line, for
+example “~~~”.
 
 * bullets -- A bullets element contains a string for each
 bullet point and it may contain newlines.  The leading “* “ is
@@ -214,7 +215,7 @@ proc matchFragment(line: string; start: Natural): Option[Fragment]
 <h3 id="highlightStaticTea">highlightStaticTea</h3>
 
 <pre class="description">
-Identify all the fragments in the StaticTea code line to highlight.
+Identify all the fragments in the StaticTea code line to highlight. The fragments are ordered from left to right.
 </pre>
 
 <pre class="nim-code">

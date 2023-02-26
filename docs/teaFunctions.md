@@ -60,6 +60,7 @@ variable or pass to another function.
 * [lt](#lt-1) &mdash; Return true when an int is less than another int.
 * [lte](#lte) &mdash; Return true when a float is less than or equal to another float.
 * [lte](#lte-1) &mdash; Return true when an int is less than or equal to another int.
+* [markdownLite](#markdownlite) &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.
 * [ne](#ne) &mdash; Return true when two floats are not equal.
 * [ne](#ne-1) &mdash; Return true when two ints are not equal.
 * [ne](#ne-2) &mdash; Return true when two strings are not equal.
@@ -1177,6 +1178,34 @@ Examples:
 lte(2, 4) => true
 lte(3, 3) => true
 lte(4, 3) => false
+~~~
+
+
+# markdownLite
+
+Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
+
+list elements:
+
+* p -- A paragraph element is one string, possibly containing
+newlines.
+
+* code -- A code element is three strings. The first string is
+the code start line, for example “~~~” or “~~~nim”.  The second
+string (with newlines) contains the text of the block.  The third
+string is the ending line, for example “~~~”.
+
+* bullets -- A bullets element contains a string (with newlines)
+for each bullet point.  The leading “* “ is not part of the
+string.
+
+~~~
+elements = markdownLite(description)
+elements => [
+  ["p", ["the paragraph which may contain newlines"]]
+  ["code", ["~~~", "code text with newlines", "~~~"]]
+  ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
+]
 ~~~
 
 

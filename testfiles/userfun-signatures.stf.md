@@ -128,6 +128,7 @@ lt(a: float, b: float) bool
 lt(a: int, b: int) bool
 lte(a: float, b: float) bool
 lte(a: int, b: int) bool
+markdownLite(a: string) list
 ne(a: float, b: float) bool
 ne(a: int, b: int) bool
 ne(a: string, b: string) bool
