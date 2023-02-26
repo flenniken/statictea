@@ -130,3 +130,17 @@ p missing
 The variable 'missing' does not exist.
 """
     check testHandleReplLine("p missing", false, eErr = eErr)
+
+  test "ph f ":
+    let eOut = """
+The f dictionary contains 73 functions and 50 names.
+"""
+    check testHandleReplLine("ph f", eOut = eOut)
+
+  test "ph f.cmp":
+    let eOut = """
+f.cmp[0] -- cmp(a: float, b: float) int
+f.cmp[1] -- cmp(a: int, b: int) int
+f.cmp[2] -- cmp(a: string, b: string, c: optional bool) int
+"""
+    check testHandleReplLine("ph f.cmp", eOut = eOut)

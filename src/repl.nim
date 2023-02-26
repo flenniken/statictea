@@ -5,6 +5,7 @@ import std/rdstdin
 import std/tables
 import std/options
 import std/strutils
+import std/strformat
 import messages
 import env
 import vartypes
@@ -16,6 +17,7 @@ import regexes
 import runCommand
 import variables
 import unicodes
+import functions
 
 func showVariables(variables: Variables): string =
   ## Show repl command.
@@ -135,7 +137,13 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
   of "pj": # string json
     env.writeOut(valueToString(value))
   of "ph": # print doc comment
-    if value.kind == vkFunc:
+    if varName.dotName == "f":
+      let count = variables["f"].dictv.dict.len
+      env.writeOut(fmt"The f dictionary contains {functionsDict.len} functions and {count} names.")
+    elif value.kind == vkList:
+      for ix, funcVar in value.listv.list:
+        env.writeOut(fmt"{varName.dotName}[{ix}] -- {funcVar.funcv.signature}")
+    elif value.kind == vkFunc:
       env.writeOut(getDocComment(value))
     else:
       # The variable is not a function variable.
